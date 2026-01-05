@@ -75,6 +75,42 @@ const bookFormats: { value: BookFormat; label: string; width: number; height: nu
   { value: '8x10', label: '8" x 10" (Large)', width: 8, height: 10 },
 ];
 
+// Templates de couverture pré-conçus par genre
+interface CoverTemplate {
+  id: string;
+  name: string;
+  genre: CoverGenre;
+  style: CoverStyle;
+  colorPalette: string;
+  customPrompt: string;
+  preview: string;
+}
+
+const coverTemplates: CoverTemplate[] = [
+  // Non-fiction / Business
+  { id: 'business-pro', name: 'Business Pro', genre: 'business', style: 'professional', colorPalette: 'navy-gold', customPrompt: 'Fond bleu marine élégant avec accents dorés, typographie moderne et sobre, éléments graphiques minimalistes', preview: '💼' },
+  { id: 'coach-modern', name: 'Coach Moderne', genre: 'self-help', style: 'modern', colorPalette: 'gradient-purple', customPrompt: 'Gradient violet vers bleu, ambiance inspirante et motivante, typographie bold et impactante', preview: '🌟' },
+  { id: 'health-zen', name: 'Santé Zen', genre: 'health', style: 'minimalist', colorPalette: 'green-white', customPrompt: 'Design épuré vert et blanc, éléments naturels subtils, sensation de calme et bien-être', preview: '🧘' },
+  
+  // Fiction
+  { id: 'romance-soft', name: 'Romance Douce', genre: 'romance', style: 'romance', colorPalette: 'pink-gold', customPrompt: 'Tons roses et dorés, texture florale délicate, atmosphère romantique et élégante, silhouettes de couple', preview: '💕' },
+  { id: 'romance-dark', name: 'Dark Romance', genre: 'romance', style: 'thriller', colorPalette: 'black-red', customPrompt: 'Noir profond avec accents rouges, ambiance sensuelle et mystérieuse, typographie élégante', preview: '🖤' },
+  { id: 'thriller-noir', name: 'Thriller Noir', genre: 'thriller', style: 'thriller', colorPalette: 'black-red', customPrompt: 'Noir intense avec éclats de rouge sang, atmosphère oppressante, typographie bold et anxiogène', preview: '🔪' },
+  { id: 'mystery-classic', name: 'Mystère Classique', genre: 'mystery', style: 'detective', colorPalette: 'sepia-gold', customPrompt: 'Style film noir, tons sépia et or, silhouette mystérieuse, loupe ou indices visuels', preview: '🔍' },
+  { id: 'fantasy-epic', name: 'Fantasy Épique', genre: 'fantasy', style: 'fantasy', colorPalette: 'purple-gold', customPrompt: 'Univers magique grandiose, château ou dragon en arrière-plan, éléments lumineux mystiques, typographie médiévale', preview: '🐉' },
+  { id: 'fantasy-dark', name: 'Dark Fantasy', genre: 'fantasy', style: 'horror', colorPalette: 'black-purple', customPrompt: 'Forêt sombre enchantée, brume mystérieuse, créatures fantastiques menaçantes, lune rouge', preview: '🌙' },
+  { id: 'scifi-cyber', name: 'Sci-Fi Cyber', genre: 'sci-fi', style: 'modern', colorPalette: 'neon-dark', customPrompt: 'Ville futuriste néon, hologrammes et technologie avancée, couleurs cyan et magenta sur noir', preview: '🚀' },
+  { id: 'horror-gothic', name: 'Horreur Gothique', genre: 'horror', style: 'horror', colorPalette: 'black-blood', customPrompt: 'Manoir hanté, éclairs, ombres menaçantes, typographie craquelée et effrayante', preview: '👻' },
+  { id: 'historical-vintage', name: 'Historique Vintage', genre: 'historical', style: 'historical', colorPalette: 'sepia-cream', customPrompt: 'Texture parchemin ancien, éléments d\'époque, typographie classique, cadre ornemental', preview: '🏰' },
+  
+  // Jeunesse et autres
+  { id: 'children-fun', name: 'Jeunesse Fun', genre: 'children', style: 'artistic', colorPalette: 'rainbow', customPrompt: 'Illustrations colorées et joyeuses, personnages mignons, typographie ludique et arrondie', preview: '🧸' },
+  { id: 'cookbook-gourmet', name: 'Cuisine Gourmet', genre: 'cooking', style: 'cookbook', colorPalette: 'warm-food', customPrompt: 'Photo appétissante de plat, arrière-plan cuisine rustique, typographie élégante', preview: '🍳' },
+  { id: 'travel-adventure', name: 'Voyage Aventure', genre: 'travel', style: 'adventure', colorPalette: 'sunset', customPrompt: 'Paysage exotique époustouflant, couleurs de coucher de soleil, sensation d\'évasion', preview: '✈️' },
+  { id: 'poetry-literary', name: 'Poésie Littéraire', genre: 'poetry', style: 'literary', colorPalette: 'cream-ink', customPrompt: 'Design minimaliste et raffiné, plume d\'écriture, texture papier, typographie serif élégante', preview: '✒️' },
+  { id: 'bio-modern', name: 'Biographie Moderne', genre: 'biography', style: 'modern', colorPalette: 'monochrome', customPrompt: 'Portrait stylisé en arrière-plan, typographie bold et impactante, design contemporain', preview: '👤' },
+];
+
 // KDP spine calculation constants (in inches)
 const SPINE_MULTIPLIERS = {
   white: 0.002252, // per page for white paper
@@ -108,6 +144,24 @@ export const EbookCoverGenerator: React.FC<EbookCoverGeneratorProps> = ({
   // Author photo
   const [authorPhoto, setAuthorPhoto] = useState<string | null>(null);
   const authorPhotoInputRef = useRef<HTMLInputElement>(null);
+  
+  // Template selection
+  const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
+  
+  // Appliquer un template
+  const applyTemplate = (template: CoverTemplate) => {
+    setGenre(template.genre);
+    setCoverStyle(template.style);
+    setCustomPrompt(template.customPrompt);
+    setSelectedTemplate(template.id);
+    toast.success(`Template "${template.name}" appliqué !`, {
+      description: `Genre: ${template.genre}, Style: ${template.style}`
+    });
+  };
+  
+  // Templates filtrés par genre sélectionné
+  const filteredTemplates = coverTemplates.filter(t => t.genre === genre);
+  const allGenreTemplates = coverTemplates;
 
   const handleAuthorPhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -421,12 +475,55 @@ export const EbookCoverGenerator: React.FC<EbookCoverGeneratorProps> = ({
       </CardHeader>
       
       <CardContent className="p-6">
-        <Tabs defaultValue="design" className="space-y-6">
-          <TabsList className="grid grid-cols-3 w-full">
+        <Tabs defaultValue="templates" className="space-y-6">
+          <TabsList className="grid grid-cols-4 w-full">
+            <TabsTrigger value="templates">🎯 Templates</TabsTrigger>
             <TabsTrigger value="design">🎨 Design</TabsTrigger>
             <TabsTrigger value="kdp">📐 Dimensions KDP</TabsTrigger>
             <TabsTrigger value="preview">👁️ Aperçu</TabsTrigger>
           </TabsList>
+          
+          {/* Onglet Templates */}
+          <TabsContent value="templates" className="space-y-4">
+            <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-4 border border-purple-200">
+              <h4 className="font-semibold text-purple-800 mb-3 flex items-center gap-2">
+                <Sparkles className="w-4 h-4" />
+                Templates pré-conçus par genre
+              </h4>
+              <p className="text-sm text-muted-foreground mb-4">
+                Sélectionnez un template pour appliquer automatiquement le style, les couleurs et les paramètres optimaux.
+              </p>
+              
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                {allGenreTemplates.map((template) => (
+                  <button
+                    key={template.id}
+                    onClick={() => applyTemplate(template)}
+                    className={`p-3 rounded-lg border-2 text-left transition-all hover:scale-105 ${
+                      selectedTemplate === template.id
+                        ? 'border-purple-500 bg-purple-100 ring-2 ring-purple-300'
+                        : 'border-gray-200 bg-white hover:border-purple-300 hover:bg-purple-50'
+                    }`}
+                  >
+                    <div className="text-2xl mb-1">{template.preview}</div>
+                    <div className="font-medium text-sm text-gray-800">{template.name}</div>
+                    <div className="text-xs text-muted-foreground capitalize">{template.genre}</div>
+                  </button>
+                ))}
+              </div>
+              
+              {selectedTemplate && (
+                <div className="mt-4 p-3 bg-white rounded-lg border border-purple-200">
+                  <p className="text-sm text-purple-700">
+                    <strong>Template actif:</strong> {coverTemplates.find(t => t.id === selectedTemplate)?.name}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {coverTemplates.find(t => t.id === selectedTemplate)?.customPrompt}
+                  </p>
+                </div>
+              )}
+            </div>
+          </TabsContent>
 
           {/* Onglet Design */}
           <TabsContent value="design" className="space-y-4">

@@ -26,6 +26,7 @@ interface ChapterImage {
   chapterTitle: string;
   imageUrl: string;
   style: string;
+  seed?: number;
 }
 
 
@@ -58,6 +59,15 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
   const [imageRatio, setImageRatio] = useState<string>('square');
   const [imageQuality, setImageQuality] = useState<string>('high');
   const [colorScheme, setColorScheme] = useState<string>('auto');
+  
+  // Cohérence visuelle
+  const [visualCoherence, setVisualCoherence] = useState(false);
+  const [coherenceStyle, setCoherenceStyle] = useState<string>('');
+  const [coherenceColorScheme, setCoherenceColorScheme] = useState<string>('');
+  
+  // Seed pour régénération similaire
+  const [lastSeed, setLastSeed] = useState<number | null>(null);
+  const [useSameSeed, setUseSameSeed] = useState(false);
 
   const styleCategories = [
     {
@@ -246,15 +256,21 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
             hasApiKey: !!config.apiKey
           });
 
+          // Utiliser les paramètres de cohérence si activé
+          const effectiveStyle = visualCoherence && coherenceStyle ? coherenceStyle : imageStyle;
+          const effectiveColorScheme = visualCoherence && coherenceColorScheme ? coherenceColorScheme : colorScheme;
+          
           const { data, error } = await supabase.functions.invoke('generate-chapter-images', {
             body: {
               chapterTitle: chapter.title,
               chapterContent: chapter.content || '',
               ebookTitle,
-              style: imageStyle,
+              style: effectiveStyle,
               ratio: imageRatio,
               quality: imageQuality,
-              colorScheme: colorScheme,
+              colorScheme: effectiveColorScheme,
+              visualCoherence,
+              seed: useSameSeed && lastSeed ? lastSeed : undefined,
               characters: characters.map(c => ({
                 name: c.name,
                 description: c.description
@@ -271,15 +287,27 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
           if (error) throw error;
 
           if (data?.imageUrl) {
+            // Sauvegarder le seed si retourné
+            if (data.seed) {
+              setLastSeed(data.seed);
+            }
+            
             newImages.push({
               chapterId: chapter.id,
               chapterTitle: chapter.title,
               imageUrl: data.imageUrl,
-              style: imageStyle
+              style: visualCoherence && coherenceStyle ? coherenceStyle : imageStyle,
+              seed: data.seed
             });
             // Auto-save to library
             saveImageToLibrary(data.imageUrl, chapter.title);
             success = true;
+            
+            // Activer automatiquement la cohérence après la première image
+            if (i === 0 && !visualCoherence) {
+              setCoherenceStyle(imageStyle);
+              setCoherenceColorScheme(colorScheme);
+            }
           } else {
             throw new Error('Pas d\'URL d\'image dans la réponse');
           }
@@ -380,15 +408,21 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
         hasApiKey: !!config.apiKey
       });
 
+      // Utiliser les paramètres de cohérence si activé
+      const effectiveStyle = visualCoherence && coherenceStyle ? coherenceStyle : imageStyle;
+      const effectiveColorScheme = visualCoherence && coherenceColorScheme ? coherenceColorScheme : colorScheme;
+      
       const { data, error } = await supabase.functions.invoke('generate-chapter-images', {
         body: {
           chapterTitle: chapter.title,
           chapterContent: chapter.content || '',
           ebookTitle,
-          style: imageStyle,
+          style: effectiveStyle,
           ratio: imageRatio,
           quality: imageQuality,
-          colorScheme: colorScheme,
+          colorScheme: effectiveColorScheme,
+          visualCoherence,
+          seed: useSameSeed && lastSeed ? lastSeed : undefined,
           characters: characters.map(c => ({
             name: c.name,
             description: c.description
@@ -405,11 +439,17 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
       if (error) throw error;
 
       if (data?.imageUrl) {
+        // Sauvegarder le seed si retourné
+        if (data.seed) {
+          setLastSeed(data.seed);
+        }
+        
         const newImage: ChapterImage = {
           chapterId: chapter.id,
           chapterTitle: chapter.title,
           imageUrl: data.imageUrl,
-          style: imageStyle
+          style: visualCoherence && coherenceStyle ? coherenceStyle : imageStyle,
+          seed: data.seed
         };
 
         setGeneratedImages(prev => {
@@ -656,6 +696,85 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
             <Checkbox id="force-lovable" checked={forceLovable} onCheckedChange={(v) => setForceLovable(!!v)} />
             <Label htmlFor="force-lovable" className="text-sm">Forcer Lovable AI (désactiver fallback OpenAI)</Label>
           </div>
+          
+          {/* Cohérence visuelle */}
+          <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 space-y-3">
+            <div className="flex items-center gap-2">
+              <Checkbox 
+                id="visual-coherence" 
+                checked={visualCoherence} 
+                onCheckedChange={(v) => {
+                  setVisualCoherence(!!v);
+                  if (v && !coherenceStyle) {
+                    setCoherenceStyle(imageStyle);
+                    setCoherenceColorScheme(colorScheme);
+                  }
+                }} 
+              />
+              <Label htmlFor="visual-coherence" className="text-sm font-medium text-blue-800">
+                🎨 Cohérence visuelle entre chapitres
+              </Label>
+            </div>
+            
+            {visualCoherence && (
+              <div className="pl-6 space-y-2">
+                <p className="text-xs text-blue-700">
+                  ⚡ Toutes les images utiliseront le même style et la même palette pour un rendu uniforme.
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <Label className="text-xs">Style verrouillé</Label>
+                    <Select value={coherenceStyle} onValueChange={setCoherenceStyle}>
+                      <SelectTrigger className="h-8 text-xs">
+                        <SelectValue placeholder="Style" />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-60">
+                        {styleCategories.flatMap(cat => cat.styles).map(s => (
+                          <SelectItem key={s.value} value={s.value}>
+                            {s.preview} {s.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label className="text-xs">Palette verrouillée</Label>
+                    <Select value={coherenceColorScheme} onValueChange={setCoherenceColorScheme}>
+                      <SelectTrigger className="h-8 text-xs">
+                        <SelectValue placeholder="Palette" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {colorSchemeOptions.map(opt => (
+                          <SelectItem key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+          
+          {/* Régénération avec même seed */}
+          {lastSeed && (
+            <div className="p-3 bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg border border-amber-200">
+              <div className="flex items-center gap-2">
+                <Checkbox 
+                  id="use-same-seed" 
+                  checked={useSameSeed} 
+                  onCheckedChange={(v) => setUseSameSeed(!!v)} 
+                />
+                <Label htmlFor="use-same-seed" className="text-sm font-medium text-amber-800">
+                  🔄 Régénérer avec variations similaires
+                </Label>
+              </div>
+              <p className="text-xs text-amber-700 mt-1 pl-6">
+                Seed actuel: {lastSeed} — Les nouvelles images auront un style proche
+              </p>
+            </div>
+          )}
           {/* Style Selection avec catégories */}
           <div className="space-y-3">
             <Label>Style d'illustration</Label>

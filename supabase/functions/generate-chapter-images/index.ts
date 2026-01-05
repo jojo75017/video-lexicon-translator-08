@@ -258,12 +258,14 @@ serve(async (req) => {
       ratio = "square",
       quality = "high",
       colorScheme = "auto",
+      visualCoherence = false,
+      seed = null,
       characters = [], 
       useOpenAI = false, 
       openaiApiKey, 
       disableOpenAIFallback = false, 
       forceLovable = false,
-      uploadToStorage = true // Nouveau paramètre pour activer l'upload vers Storage
+      uploadToStorage = true
     } = await req.json();
     
     if (!chapterTitle) {
@@ -274,6 +276,8 @@ serve(async (req) => {
     }
 
     let generatedImageUrl: string;
+    // Générer un seed pour cohérence visuelle
+    const generatedSeed = seed || (visualCoherence ? Math.floor(Math.random() * 2147483647) : null);
 
     // Si useOpenAI est true et non forcé à Lovable, utiliser EXCLUSIVEMENT OpenAI
     if (useOpenAI && openaiApiKey && !forceLovable) {
@@ -337,6 +341,13 @@ Style artistique demandé: ${style}
 Qualité: ${qualityDesc}
 ${colorPrompt ? `Palette de couleurs: ${colorPrompt}` : ''}
 ${photorealisticEnhancement}
+${visualCoherence ? `
+COHÉRENCE VISUELLE ACTIVÉE:
+- Maintenir EXACTEMENT le même style artistique que les autres chapitres
+- Utiliser la MÊME palette de couleurs cohérente
+- Garder le même niveau de détail et la même ambiance visuelle
+- Si un seed est fourni, s'en inspirer pour des variations similaires
+` : ''}
 
 Instructions de génération:
 - Créer une illustration de haute qualité adaptée à un ebook professionnel
@@ -428,6 +439,7 @@ Instructions de génération:
       JSON.stringify({ 
         imageUrl: finalImageUrl,
         chapterTitle,
+        seed: typeof generatedSeed !== 'undefined' ? generatedSeed : null,
         storedInCloud: uploadToStorage && finalImageUrl !== generatedImageUrl
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
