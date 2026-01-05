@@ -355,6 +355,71 @@ serve(async (req) => {
       );
     }
 
+    // Handle KDP research (bestsellers, titles, categories, niche analysis)
+    if (type === 'kdp-research') {
+      console.log('Processing KDP research...');
+      const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+      
+      if (!LOVABLE_API_KEY) {
+        return new Response(
+          JSON.stringify({ error: 'Lovable API key not configured' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const systemPrompt = `Tu es un expert en analyse de marché Amazon KDP et en optimisation SEO pour les ebooks. 
+Tu fournis des données réalistes et exploitables basées sur les tendances actuelles du marché.
+Réponds UNIQUEMENT avec du JSON valide, sans markdown, sans \`\`\`, sans commentaires.
+Génère des données riches, variées et professionnelles.`;
+
+      const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-2.5-flash',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: prompt }
+          ],
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Lovable AI error for KDP research:', response.status, errorText);
+        
+        if (response.status === 429) {
+          return new Response(
+            JSON.stringify({ error: 'Limite de requêtes atteinte. Réessayez dans quelques instants.' }),
+            { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        if (response.status === 402) {
+          return new Response(
+            JSON.stringify({ error: 'Crédits épuisés. Veuillez recharger vos crédits.' }),
+            { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        
+        return new Response(
+          JSON.stringify({ error: 'Erreur lors de la recherche KDP' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const data = await response.json();
+      const researchText = data.choices[0].message.content;
+      
+      console.log('KDP research completed successfully');
+      return new Response(
+        JSON.stringify({ content: researchText }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     // Handle narrative analysis (uses Lovable AI - no API key needed)
     if (type === 'narrative-analysis') {
       console.log('Processing narrative analysis...');
