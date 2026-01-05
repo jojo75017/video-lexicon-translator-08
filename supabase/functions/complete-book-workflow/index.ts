@@ -227,83 +227,120 @@ Crée la structure en JSON :
       }
 
       case 'P4': {
-        // RÉDACTION EXPERTE - Génère un APERÇU et les INTRODUCTIONS de chaque chapitre
-        // Le contenu complet sera généré séparément via le module EbookWriting
+        // RÉDACTION EXPERTE - Génère le CONTENU COMPLET de chaque chapitre un par un
         const structure = previousContext.P3?.chapitres || [];
         const descriptionGeneree = previousContext.P1?.descriptionGeneree || '';
-        console.log(`Step P4: Generating chapter previews for ${structure.length} chapters`);
+        const tonEditorial = previousContext.P1?.tonEditorial || '';
+        const lecteurCible = previousContext.P1?.lecteurCible || '';
         
-        const content = await callAI(
-          `Tu es un AUTEUR PROFESSIONNEL. Tu prépares le plan de rédaction détaillé de chaque chapitre avec une introduction captivante. PAS DE STYLE ROBOT. Écris comme un vrai auteur humain passionné.`,
-          `Prépare le plan de rédaction pour ce livre :
+        console.log(`Step P4: Generating FULL CONTENT for ${structure.length} chapters`);
+        
+        const chapitresComplets: any[] = [];
+        
+        // Générer chaque chapitre un par un pour éviter les timeouts
+        for (const chapitre of structure) {
+          console.log(`Generating chapter ${chapitre.numero}: ${chapitre.titre}`);
+          
+          const chapterContent = await callAI(
+            `Tu es un AUTEUR PROFESSIONNEL avec 20 ans d'expérience. Tu rédiges des chapitres COMPLETS, captivants, dans le style du genre "${category}".
+            
+RÈGLES D'ÉCRITURE :
+- Style naturel et humain, JAMAIS robotique
+- Phrases variées (courtes et longues)
+- Dialogues si approprié au genre
+- Descriptions vivantes et immersives
+- Transitions fluides entre paragraphes
+- TON : ${tonEditorial}`,
+            `Rédige le CHAPITRE COMPLET suivant (environ 3000-4000 mots) :
 
-${bookContext}
-DESCRIPTION DU LIVRE : ${descriptionGeneree}
-VISION : ${JSON.stringify(previousContext.P1 || {})}
+LIVRE : "${fullTitle}"
+CATÉGORIE : ${category}
+DESCRIPTION : ${descriptionGeneree}
+LECTEUR CIBLE : ${lecteurCible}
 
-CHAPITRES PRÉVUS (${structure.length}) :
-${structure.map((ch: any) => `- Ch.${ch.numero}: ${ch.titre} (Objectif: ${ch.objectif})`).join('\n')}
+CHAPITRE ${chapitre.numero} : "${chapitre.titre}"
+OBJECTIF DU CHAPITRE : ${chapitre.objectif}
+SOUS-SECTIONS À COUVRIR : ${(chapitre.sousSections || []).join(', ')}
+POINTS CLÉS : ${(chapitre.pointsCles || []).join(', ')}
+ACCROCHE : ${chapitre.accroche || ''}
 
-Pour CHAQUE chapitre, génère :
-1. Une INTRODUCTION CAPTIVANTE (200-300 mots) adaptée au genre "${category}"
-2. Les POINTS CLÉS à développer
-3. Le TON et STYLE recommandé
+IMPORTANT :
+- Écris le contenu COMPLET du chapitre (pas juste une introduction)
+- Inclus des exemples concrets, anecdotes, ou dialogues selon le genre
+- Maintiens l'engagement du lecteur tout au long
+- Termine par une transition vers le chapitre suivant
 
-Format JSON :
+Retourne le contenu en JSON :
 {
-  "chapitres": [
-    {
-      "numero": 1,
-      "titre": "titre du chapitre",
-      "introduction": "200-300 mots d'introduction captivante",
-      "pointsCles": ["point 1", "point 2", "point 3"],
-      "tonRecommande": "description du ton"
-    }
-  ],
-  "conseilsRedaction": "conseils globaux pour maintenir la cohérence du genre ${category}",
-  "estimationMotsTotal": ${structure.length * 3500}
+  "numero": ${chapitre.numero},
+  "titre": "${chapitre.titre}",
+  "contenu": "LE CONTENU COMPLET DU CHAPITRE ICI (3000-4000 mots)",
+  "nombreMots": 3500
 }`,
-          8000
-        );
-        
-        result = parseJSON(content) || { raw: content };
-        console.log('Step P4 completed successfully');
-        
-        if (result.chapitres) {
-          const chaptersPreview = result.chapitres.slice(0, 3);
-          displayContent = `**Plan de rédaction pour ${result.chapitres.length} chapitres** (~${result.estimationMotsTotal || structure.length * 3500} mots estimés)\n\n` +
-            chaptersPreview.map((ch: any) => 
-              `**Ch.${ch.numero} - ${ch.titre}**\n_Introduction :_ ${(ch.introduction || '').substring(0, 200)}...`
-            ).join('\n\n') +
-            (result.chapitres.length > 3 ? `\n\n_...et ${result.chapitres.length - 3} autres chapitres préparés_` : '') +
-            `\n\n**💡 ${result.conseilsRedaction || 'Conseils de rédaction prêts'}**`;
-        } else {
-          displayContent = content;
+            8000
+          );
+          
+          const parsedChapter = parseJSON(chapterContent);
+          if (parsedChapter) {
+            chapitresComplets.push(parsedChapter);
+          } else {
+            // Fallback si le JSON échoue
+            chapitresComplets.push({
+              numero: chapitre.numero,
+              titre: chapitre.titre,
+              contenu: chapterContent,
+              nombreMots: chapterContent.split(/\s+/).length
+            });
+          }
         }
+        
+        const totalMots = chapitresComplets.reduce((acc, ch) => acc + (ch.nombreMots || 3500), 0);
+        
+        result = {
+          chapitres: chapitresComplets,
+          nombreChapitres: chapitresComplets.length,
+          nombreMotsTotal: totalMots,
+          pagesEstimees: Math.ceil(totalMots / 250)
+        };
+        
+        console.log(`Step P4 completed: ${chapitresComplets.length} chapters, ~${totalMots} words`);
+        
+        // Afficher un résumé des chapitres générés
+        displayContent = `**✅ ${chapitresComplets.length} chapitres rédigés** (~${totalMots} mots, ~${result.pagesEstimees} pages)\n\n` +
+          chapitresComplets.map((ch: any) => 
+            `**Ch.${ch.numero} - ${ch.titre}** (~${ch.nombreMots || 3500} mots)\n_${(ch.contenu || '').substring(0, 150)}..._`
+          ).join('\n\n');
+        
         break;
       }
 
       case 'P5': {
-        // RÉÉCRITURE NATURELLE - Travaille sur les introductions générées en P4
+        // RÉÉCRITURE NATURELLE - Analyse et améliore les chapitres complets
         const chapitres = previousContext.P4?.chapitres || [];
-        console.log(`Step P5: Humanizing ${chapitres.length} chapter introductions`);
+        console.log(`Step P5: Analyzing ${chapitres.length} complete chapters for humanization`);
+        
+        // Prendre un échantillon du contenu de chaque chapitre pour l'analyse
+        const echantillons = chapitres.slice(0, 5).map((ch: any) => 
+          `Ch.${ch.numero} "${ch.titre}": ${(ch.contenu || '').substring(0, 500)}`
+        ).join('\n\n');
         
         const content = await callAI(
           `Tu es un RÉÉCRIVAIN expert qui humanise les textes. Tu supprimes tout ce qui sonne "IA" ou "corporate". Tu ajoutes de la vie, des tournures naturelles, du rythme.`,
-          `Analyse ces introductions de chapitres et donne des conseils d'humanisation :
+          `Analyse ces extraits de chapitres et donne des conseils d'humanisation :
 
-INTRODUCTIONS DES CHAPITRES :
-${chapitres.slice(0, 5).map((ch: any) => `Ch.${ch.numero} "${ch.titre}": ${(ch.introduction || '').substring(0, 300)}`).join('\n\n')}
+EXTRAITS DES CHAPITRES :
+${echantillons}
 
 Analyse et donne tes recommandations en JSON :
 {
-  "analyseGlobale": "ton évaluation du ton actuel",
+  "analyseGlobale": "ton évaluation du ton actuel et de la qualité d'écriture",
+  "pointsForts": ["ce qui fonctionne bien"],
   "pointsAHumaniser": ["élément 1 à améliorer", "élément 2"],
   "exemplesReformulation": [
     {"avant": "phrase originale", "apres": "version humanisée"}
   ],
   "conseilsStyle": ["conseil 1", "conseil 2", "conseil 3"],
-  "scoreHumanite": 7
+  "scoreHumanite": 8
 }`,
           4000
         );
@@ -311,11 +348,11 @@ Analyse et donne tes recommandations en JSON :
         result = parseJSON(content) || { raw: content };
         console.log('Step P5 completed successfully');
         
-        // Transférer les chapitres de P4 vers le résultat final
+        // Transférer les chapitres complets de P4 vers le résultat final
         result.chapitresFinal = chapitres;
         
         displayContent = result.analyseGlobale
-          ? `**Analyse d'humanisation :**\n\n${result.analyseGlobale}\n\n**Score d'humanité : ${result.scoreHumanite || '?'}/10**\n\n**Points à humaniser :**\n${(result.pointsAHumaniser || []).map((p: string) => `• ${p}`).join('\n')}\n\n**Conseils de style :**\n${(result.conseilsStyle || []).map((c: string) => `✓ ${c}`).join('\n')}`
+          ? `**Analyse d'humanisation :**\n\n${result.analyseGlobale}\n\n**Score d'humanité : ${result.scoreHumanite || '?'}/10**\n\n**Points forts :**\n${(result.pointsForts || []).map((p: string) => `✓ ${p}`).join('\n')}\n\n**Points à améliorer :**\n${(result.pointsAHumaniser || []).map((p: string) => `• ${p}`).join('\n')}\n\n**Conseils de style :**\n${(result.conseilsStyle || []).map((c: string) => `→ ${c}`).join('\n')}`
           : 'Analyse d\'humanisation effectuée';
         break;
       }
