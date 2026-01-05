@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { 
   Sparkles, BookOpen, CheckCircle2, Loader2, AlertCircle,
   Rocket, Target, TrendingUp, Layers, FileText, Award, User, Hash,
-  ChevronDown, ChevronUp, Tag, AlignLeft, RotateCcw
+  ChevronDown, ChevronUp, Tag, AlignLeft, RotateCcw, Trash2, Plus
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -24,6 +24,14 @@ interface Character {
   name: string;
   description: string;
   role?: string;
+  arc?: string;
+}
+
+interface GeneratedCharacter {
+  name: string;
+  description: string;
+  role: string;
+  arc?: string;
 }
 
 interface EbookCompleteWorkflowProps {
@@ -82,6 +90,11 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   const [failedStepIndex, setFailedStepIndex] = useState<number | null>(null);
   const [allContext, setAllContext] = useState<Record<string, any>>({});
   const [hasSavedProgress, setHasSavedProgress] = useState(false);
+  
+  // État pour les personnages générés en P3 et l'édition avant P4
+  const [generatedCharacters, setGeneratedCharacters] = useState<GeneratedCharacter[]>([]);
+  const [waitingForCharacterValidation, setWaitingForCharacterValidation] = useState(false);
+  const [editingCharacterIndex, setEditingCharacterIndex] = useState<number | null>(null);
 
   const progress = currentStepIndex >= 0 ? ((currentStepIndex + 1) / 14) * 100 : 0;
   const canGenerate = title.trim() && authorName.trim() && category && hasReadSteps;
@@ -185,14 +198,20 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
     extraBody: Record<string, any> = {}
   ): Promise<{ result: any; displayContent: string } | null> => {
     try {
-      // Préparer les personnages pour l'envoi
-      const charactersForAI = externalCharacters.length > 0 
-        ? externalCharacters.map(c => ({
+      // Utiliser les personnages générés en P3 OU ceux passés en externe
+      const personnagesP3 = generatedCharacters.length > 0 ? generatedCharacters : context.P3?.personnages || [];
+      const charactersForAI = personnagesP3.length > 0 
+        ? personnagesP3.map((c: any) => ({
+            name: c.name,
+            description: c.description,
+            role: c.role || 'secondary',
+            arc: c.arc || ''
+          }))
+        : externalCharacters.map(c => ({
             name: c.name,
             description: c.description,
             role: c.role || 'secondary'
-          }))
-        : [];
+          }));
 
       const { data, error: fnError } = await supabase.functions.invoke('complete-book-workflow', {
         body: {
@@ -219,6 +238,38 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
       console.error(`Step ${stepId} error:`, err);
       throw err;
     }
+  };
+
+  // Continuer le workflow après validation des personnages
+  const continueAfterCharacterValidation = () => {
+    setWaitingForCharacterValidation(false);
+    // Mettre à jour le contexte P3 avec les personnages modifiés
+    const updatedP3 = { ...allContext.P3, personnages: generatedCharacters };
+    setAllContext(prev => ({ ...prev, P3: updatedP3 }));
+    // Reprendre à partir de P4 (index 3)
+    generateCompleteBook(3);
+  };
+
+  // Éditer un personnage
+  const updateCharacter = (index: number, field: keyof GeneratedCharacter, value: string) => {
+    setGeneratedCharacters(prev => 
+      prev.map((char, i) => i === index ? { ...char, [field]: value } : char)
+    );
+  };
+
+  // Supprimer un personnage
+  const removeCharacter = (index: number) => {
+    setGeneratedCharacters(prev => prev.filter((_, i) => i !== index));
+  };
+
+  // Ajouter un personnage
+  const addCharacter = () => {
+    setGeneratedCharacters(prev => [...prev, {
+      name: 'Nouveau personnage',
+      role: 'secondaire',
+      description: 'Description à compléter...',
+      arc: ''
+    }]);
   };
   const generateCompleteBook = async (resumeFromIndex: number = 0) => {
     if (!title.trim() || !authorName.trim() || !category) {
@@ -307,6 +358,17 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             if (i > 0) {
               const prevStep = workflowSteps[i - 1];
               setExpandedSteps(prev => ({ ...prev, [prevStep.id]: false }));
+            }
+            
+            // APRÈS P3 : pause pour valider les personnages avant P4
+            if (step.id === 'P3' && result.result?.personnages) {
+              const personnagesP3 = result.result.personnages;
+              setGeneratedCharacters(personnagesP3);
+              setWaitingForCharacterValidation(true);
+              setIsGenerating(false);
+              saveProgress();
+              toast.info('🎭 Personnages générés ! Validez-les ou modifiez-les avant la rédaction.');
+              return; // Pause le workflow - l'utilisateur doit cliquer pour continuer
             }
           }
         }
@@ -644,6 +706,130 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
           )}
         </CardContent>
       </Card>
+
+      {/* Character Validation Card - After P3 */}
+      {waitingForCharacterValidation && generatedCharacters.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <Card className="border-2 border-amber-500/50 bg-gradient-to-br from-amber-500/10 via-background to-orange-500/10">
+            <CardHeader className="pb-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-full bg-amber-500/20">
+                    <User className="h-5 w-5 text-amber-600" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg">🎭 Personnages générés</CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      Vérifiez et modifiez les personnages avant la rédaction
+                    </p>
+                  </div>
+                </div>
+                <Badge variant="outline" className="text-amber-600 border-amber-500">
+                  Étape P3 → P4
+                </Badge>
+              </div>
+            </CardHeader>
+            
+            <CardContent className="space-y-4">
+              {generatedCharacters.map((char, index) => (
+                <div 
+                  key={index}
+                  className="p-4 bg-background/80 border rounded-lg space-y-3"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1 grid gap-3 md:grid-cols-2">
+                      <div className="space-y-1">
+                        <Label className="text-xs text-muted-foreground">Nom</Label>
+                        <Input
+                          value={char.name}
+                          onChange={(e) => updateCharacter(index, 'name', e.target.value)}
+                          className="font-medium"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs text-muted-foreground">Rôle</Label>
+                        <Select 
+                          value={char.role} 
+                          onValueChange={(v) => updateCharacter(index, 'role', v)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="protagoniste">👤 Protagoniste</SelectItem>
+                            <SelectItem value="antagoniste">🦹 Antagoniste</SelectItem>
+                            <SelectItem value="secondaire">👥 Secondaire</SelectItem>
+                            <SelectItem value="mentor">🎓 Mentor</SelectItem>
+                            <SelectItem value="narrateur">📖 Narrateur</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                      onClick={() => removeCharacter(index)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <Label className="text-xs text-muted-foreground">Description</Label>
+                    <Textarea
+                      value={char.description}
+                      onChange={(e) => updateCharacter(index, 'description', e.target.value)}
+                      rows={2}
+                      className="resize-none"
+                    />
+                  </div>
+                  
+                  {char.arc && (
+                    <div className="space-y-1">
+                      <Label className="text-xs text-muted-foreground">Arc narratif</Label>
+                      <Textarea
+                        value={char.arc}
+                        onChange={(e) => updateCharacter(index, 'arc', e.target.value)}
+                        rows={2}
+                        className="resize-none text-sm"
+                      />
+                    </div>
+                  )}
+                </div>
+              ))}
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={addCharacter}
+                className="w-full gap-2"
+              >
+                <Plus className="h-4 w-4" />
+                Ajouter un personnage
+              </Button>
+              
+              <div className="flex gap-3 pt-4 border-t">
+                <Button
+                  size="lg"
+                  onClick={continueAfterCharacterValidation}
+                  className="flex-1 gap-2 bg-gradient-to-r from-primary to-amber-500"
+                >
+                  <Rocket className="h-5 w-5" />
+                  Valider et continuer (P4 → P14)
+                </Button>
+              </div>
+              
+              <p className="text-xs text-center text-muted-foreground">
+                Ces personnages seront utilisés dans tous les chapitres de votre livre
+              </p>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
 
       {/* Workflow Steps Card - Always visible */}
       <Card className="border border-primary/30">
