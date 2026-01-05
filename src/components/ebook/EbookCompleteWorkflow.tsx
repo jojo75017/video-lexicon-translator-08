@@ -57,6 +57,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   const [stepResults, setStepResults] = useState<Record<string, { result: any; displayContent: string }>>({});
   const [expandedSteps, setExpandedSteps] = useState<Record<string, boolean>>({});
   const [error, setError] = useState<string | null>(null);
+  const [failedStepIndex, setFailedStepIndex] = useState<number | null>(null);
   const [allContext, setAllContext] = useState<Record<string, any>>({});
 
   const progress = currentStepIndex >= 0 ? ((currentStepIndex + 1) / 14) * 100 : 0;
@@ -97,7 +98,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
       throw err;
     }
   };
-  const generateCompleteBook = async () => {
+  const generateCompleteBook = async (resumeFromIndex: number = 0) => {
     if (!title.trim() || !authorName.trim() || !category) {
       toast.error('Veuillez remplir le titre, le nom d\'auteur et la catégorie');
       return;
@@ -105,17 +106,29 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
 
     setIsGenerating(true);
     setError(null);
-    setCurrentStepIndex(0);
-    setStepResults({});
-    setExpandedSteps({});
+    setFailedStepIndex(null);
     
-    const context: Record<string, any> = {};
-    setAllContext({});
+    // Si on reprend, on garde le contexte existant, sinon on repart de zéro
+    const isResuming = resumeFromIndex > 0;
+    if (!isResuming) {
+      setCurrentStepIndex(0);
+      setStepResults({});
+      setExpandedSteps({});
+      setAllContext({});
+    } else {
+      setCurrentStepIndex(resumeFromIndex);
+    }
+    
+    // Récupérer le contexte existant ou en créer un nouveau
+    const context: Record<string, any> = isResuming ? { ...allContext } : {};
 
-    toast.info('🚀 Le Directeur Éditorial lance le workflow complet...');
+    toast.info(isResuming 
+      ? `🔄 Reprise à l'étape ${workflowSteps[resumeFromIndex].id}...` 
+      : '🚀 Le Directeur Éditorial lance le workflow complet...'
+    );
 
     try {
-      for (let i = 0; i < workflowSteps.length; i++) {
+      for (let i = resumeFromIndex; i < workflowSteps.length; i++) {
         const step = workflowSteps[i];
         setCurrentStepIndex(i);
 
@@ -129,8 +142,13 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             throw new Error("Structure P3 introuvable : impossible de rédiger les chapitres (P4)");
           }
 
-          const chapitresComplets: any[] = [];
-          for (const chapitre of structure) {
+          // Récupérer les chapitres déjà générés (si reprise)
+          const existingChapters = context.P4?.chapitres || [];
+          const chapitresComplets: any[] = [...existingChapters];
+          const startFromChapter = existingChapters.length;
+          
+          for (let chIdx = startFromChapter; chIdx < structure.length; chIdx++) {
+            const chapitre = structure[chIdx];
             const partial = await runStep('P4', context, { chapter: chapitre });
             const chapitreGenere = partial?.result?.chapitre;
             if (chapitreGenere) chapitresComplets.push(chapitreGenere);
@@ -143,10 +161,11 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
                 displayContent: `**📄 Chapitres rédigés : ${chapitresComplets.length}/${structure.length}**\n\nDernier : ${partial?.displayContent || ''}`,
               }
             }));
+            
+            // Sauvegarder le contexte intermédiaire pour la reprise
+            context.P4 = { chapitres: chapitresComplets };
+            setAllContext(prev => ({ ...prev, P4: context.P4 }));
           }
-
-          context.P4 = { chapitres: chapitresComplets };
-          setAllContext(prev => ({ ...prev, P4: context.P4 }));
 
           // Collapse previous step, keep current expanded
           if (i > 0) {
@@ -178,6 +197,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
 
       // All steps complete
       setCurrentStepIndex(14);
+      setFailedStepIndex(null);
       
       // Build final book data
       const bookData = {
@@ -211,10 +231,17 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
 
     } catch (err: any) {
       console.error('Workflow error:', err);
+      setFailedStepIndex(currentStepIndex);
       setError(err.message || 'Erreur lors de la génération');
-      toast.error(`Erreur: ${err.message}`);
+      toast.error(`Erreur à l'étape ${workflowSteps[currentStepIndex]?.id}: ${err.message}`);
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  const resumeFromFailedStep = () => {
+    if (failedStepIndex !== null && failedStepIndex >= 0) {
+      generateCompleteBook(failedStepIndex);
     }
   };
 
@@ -428,7 +455,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
               <Button
                 type="button"
                 size="lg"
-                onClick={generateCompleteBook}
+                onClick={() => generateCompleteBook(0)}
                 disabled={!canGenerate}
                 className="gap-3 px-10 py-7 text-lg font-bold bg-gradient-to-r from-primary via-amber-500 to-orange-500 hover:from-primary/90 hover:via-amber-500/90 hover:to-orange-500/90 shadow-xl shadow-primary/30 transition-all duration-300 w-full max-w-md disabled:opacity-50 disabled:cursor-not-allowed"
               >
@@ -591,7 +618,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
         </CardContent>
       </Card>
 
-      {/* Error Display */}
+      {/* Error Display with Resume Button */}
       {error && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -600,20 +627,47 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
         >
           <div className="flex items-start gap-3">
             <AlertCircle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
-            <div>
-              <p className="font-medium text-destructive">Erreur de génération</p>
+            <div className="flex-1">
+              <p className="font-medium text-destructive">
+                Erreur à l'étape {failedStepIndex !== null ? workflowSteps[failedStepIndex]?.id : '?'}
+              </p>
               <p className="text-sm text-muted-foreground mt-1">{error}</p>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="mt-3"
-                onClick={() => {
-                  setError(null);
-                  setCurrentStepIndex(-1);
-                }}
-              >
-                Réessayer
-              </Button>
+              
+              <div className="flex flex-wrap gap-2 mt-3">
+                {/* Bouton principal : Reprendre */}
+                {failedStepIndex !== null && failedStepIndex >= 0 && (
+                  <Button 
+                    size="sm" 
+                    className="gap-2 bg-gradient-to-r from-primary to-amber-500 hover:from-primary/90 hover:to-amber-500/90"
+                    onClick={resumeFromFailedStep}
+                    disabled={isGenerating}
+                  >
+                    <Rocket className="h-4 w-4" />
+                    Reprendre à {workflowSteps[failedStepIndex]?.id}
+                  </Button>
+                )}
+                
+                {/* Bouton secondaire : Tout recommencer */}
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => {
+                    setError(null);
+                    setFailedStepIndex(null);
+                    setCurrentStepIndex(-1);
+                    setStepResults({});
+                    setAllContext({});
+                  }}
+                >
+                  Tout recommencer
+                </Button>
+              </div>
+              
+              {failedStepIndex !== null && Object.keys(stepResults).length > 0 && (
+                <p className="text-xs text-muted-foreground mt-3">
+                  ✓ {Object.keys(stepResults).length} étape(s) déjà terminée(s) seront conservées
+                </p>
+              )}
             </div>
           </div>
         </motion.div>
