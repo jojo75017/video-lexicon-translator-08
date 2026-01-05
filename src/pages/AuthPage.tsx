@@ -14,8 +14,6 @@ export const AuthPage = () => {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
-  // Évite le “popup/loader” systématique: on ne l'affiche que s'il y a une session à vérifier
-  const [isCheckingSession, setIsCheckingSession] = useState(false);
   const navigate = useNavigate();
 
   const checkAdmin = async (accessToken?: string) => {
@@ -28,51 +26,28 @@ export const AuthPage = () => {
   };
 
   useEffect(() => {
+    // Vérification en arrière-plan (sans écran bloquant)
     const checkAuth = async () => {
       try {
         const {
           data: { session },
         } = await supabase.auth.getSession();
 
-        // Pas de session admin -> on ne bloque pas l'écran
         if (!session) return;
 
-        setIsCheckingSession(true);
-        console.log('Session existante trouvée, vérification du rôle admin...');
         const { data, error } = await checkAdmin(session.access_token);
-
-        if (error) {
-          console.error('Erreur lors de la vérification admin:', error);
-          return;
-        }
+        if (error) return;
 
         if (data?.isAdmin) {
-          console.log('Utilisateur admin confirmé, redirection automatique...');
           navigate('/admin', { replace: true });
-        } else {
-          console.log('Utilisateur non-admin, reste sur la page de connexion');
         }
       } catch (error) {
         console.error('Erreur dans checkAuth:', error);
-      } finally {
-        setIsCheckingSession(false);
       }
     };
 
     checkAuth();
   }, [navigate]);
-
-  // Afficher un loader seulement pendant une vérification réelle de session admin
-  if (isCheckingSession) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">Vérification de la session...</p>
-        </div>
-      </div>
-    );
-  }
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
