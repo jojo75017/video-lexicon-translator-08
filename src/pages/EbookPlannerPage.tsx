@@ -913,6 +913,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
                   
                   <div className="flex flex-wrap gap-3">
                     <Button 
+                      type="button"
                       onClick={generateAutomaticPlan} 
                       disabled={!ebookTitle || isGenerating}
                       className="bg-white text-violet-600 hover:bg-white/90 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
@@ -922,6 +923,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
                       {isGenerating ? 'Génération...' : 'Générer avec l\'IA'}
                     </Button>
                     <Button 
+                      type="button"
                       onClick={resetPlan}
                       variant="outline"
                       className="border-white/30 text-white hover:bg-white/20 backdrop-blur-sm"
@@ -930,6 +932,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
                       Nouveau
                     </Button>
                     <Button 
+                      type="button"
                       onClick={() => {
                         setShowWelcome(true);
                         setShowTutorial(true);
@@ -2139,6 +2142,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
             {/* Boutons d'action - bien visibles */}
             <div className="absolute top-4 right-4 flex gap-2">
               <Button
+                type="button"
                 onClick={handleManualSave}
                 disabled={isSaving || !ebookTitle}
                 className="bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg font-semibold"
@@ -2147,6 +2151,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
                 {isSaving ? 'Sauvegarde...' : 'Sauvegarder'}
               </Button>
               <Button
+                type="button"
                 onClick={resetPlan}
                 className="bg-white text-primary hover:bg-white/90 shadow-lg font-semibold"
               >
