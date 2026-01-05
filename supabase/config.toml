@@ -74,3 +74,6 @@ verify_jwt = false
 
 [functions.market-analysis]
 verify_jwt = false
+
+[functions.content-architect]
+verify_jwt = false

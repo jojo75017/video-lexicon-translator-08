@@ -68,6 +68,7 @@ import EbookAtlas from '@/components/ebook/EbookAtlas';
 import { EbookEditorAudit } from '@/components/ebook/EbookEditorAudit';
 import { EbookEditorialDirector } from '@/components/ebook/EbookEditorialDirector';
 import { EbookMarketAnalysis } from '@/components/ebook/EbookMarketAnalysis';
+import { EbookContentArchitect } from '@/components/ebook/EbookContentArchitect';
 import { useConfetti } from '@/hooks/useConfetti';
 
 // Hooks et données
@@ -1922,6 +1923,26 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
       case 'market-analysis':
         return (
           <EbookMarketAnalysis />
+        );
+      
+      case 'content-architect':
+        return (
+          <EbookContentArchitect 
+            onApplyStructure={(structure) => {
+              const newChapters = structure.map((ch, index) => ({
+                id: `chapter-${Date.now()}-${index}`,
+                title: ch.title,
+                content: '',
+                subChapters: ch.subChapters.map((sub, subIndex) => ({
+                  id: `subchapter-${Date.now()}-${index}-${subIndex}`,
+                  title: sub,
+                  content: ''
+                }))
+              }));
+              setChapters(newChapters);
+              setActiveTab('planner');
+            }}
+          />
         );
       
       case 'formation-pdf':
