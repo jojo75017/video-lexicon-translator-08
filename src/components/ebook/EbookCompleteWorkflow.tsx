@@ -7,10 +7,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   Sparkles, BookOpen, CheckCircle2, Loader2, AlertCircle,
   Rocket, Target, TrendingUp, Layers, FileText, Award, User, Hash,
-  ChevronDown, ChevronUp
+  ChevronDown, ChevronUp, Tag, AlignLeft
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -41,6 +43,9 @@ const workflowSteps = [
 const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplete }) => {
   // Form state
   const [title, setTitle] = useState('');
+  const [subtitle, setSubtitle] = useState('');
+  const [category, setCategory] = useState('');
+  const [description, setDescription] = useState('');
   const [authorName, setAuthorName] = useState('');
   const [numberOfChapters, setNumberOfChapters] = useState(8);
   const [hasReadSteps, setHasReadSteps] = useState(false);
@@ -54,7 +59,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   const [allContext, setAllContext] = useState<Record<string, any>>({});
 
   const progress = currentStepIndex >= 0 ? ((currentStepIndex + 1) / 14) * 100 : 0;
-  const canGenerate = title.trim() && authorName.trim() && hasReadSteps;
+  const canGenerate = title.trim() && authorName.trim() && category && hasReadSteps;
 
   const toggleStep = (stepId: string) => {
     setExpandedSteps(prev => ({ ...prev, [stepId]: !prev[stepId] }));
@@ -66,6 +71,9 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
         body: {
           step: stepId,
           title,
+          subtitle,
+          category,
+          description,
           authorName,
           numberOfChapters,
           previousContext: context
@@ -86,8 +94,8 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   };
 
   const generateCompleteBook = async () => {
-    if (!title.trim() || !authorName.trim()) {
-      toast.error('Veuillez remplir le titre et le nom d\'auteur');
+    if (!title.trim() || !authorName.trim() || !category) {
+      toast.error('Veuillez remplir le titre, le nom d\'auteur et la catégorie');
       return;
     }
 
@@ -225,16 +233,16 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
         </CardHeader>
 
         <CardContent className="space-y-6">
-          {/* Form Fields */}
+          {/* Form Fields - Row 1: Title & Subtitle */}
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="title" className="flex items-center gap-2">
                 <BookOpen className="h-4 w-4 text-primary" />
-                Titre du livre
+                Titre du livre *
               </Label>
               <Input
                 id="title"
-                placeholder="Ex: Les secrets de la productivité"
+                placeholder="Ex: Elle faisait partie de la famille"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 disabled={isGenerating}
@@ -243,9 +251,59 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             </div>
             
             <div className="space-y-2">
+              <Label htmlFor="subtitle" className="flex items-center gap-2">
+                <AlignLeft className="h-4 w-4 text-primary" />
+                Sous-titre (optionnel)
+              </Label>
+              <Input
+                id="subtitle"
+                placeholder="Ex: L'histoire vraie d'une chienne extraordinaire"
+                value={subtitle}
+                onChange={(e) => setSubtitle(e.target.value)}
+                disabled={isGenerating}
+              />
+            </div>
+          </div>
+
+          {/* Form Fields - Row 2: Category & Author */}
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="category" className="flex items-center gap-2">
+                <Tag className="h-4 w-4 text-primary" />
+                Catégorie / Genre *
+              </Label>
+              <Select value={category} onValueChange={setCategory} disabled={isGenerating}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Choisissez une catégorie..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="fiction-litteraire">📚 Fiction littéraire</SelectItem>
+                  <SelectItem value="romance">💕 Romance</SelectItem>
+                  <SelectItem value="thriller-policier">🔍 Thriller / Policier</SelectItem>
+                  <SelectItem value="science-fiction">🚀 Science-Fiction</SelectItem>
+                  <SelectItem value="fantasy">🐉 Fantasy / Fantastique</SelectItem>
+                  <SelectItem value="horreur">👻 Horreur</SelectItem>
+                  <SelectItem value="historique">🏛️ Roman historique</SelectItem>
+                  <SelectItem value="biographie-memoires">📖 Biographie / Mémoires</SelectItem>
+                  <SelectItem value="temoignage">💬 Témoignage / Récit de vie</SelectItem>
+                  <SelectItem value="developpement-personnel">🧠 Développement personnel</SelectItem>
+                  <SelectItem value="business-entrepreneuriat">💼 Business / Entrepreneuriat</SelectItem>
+                  <SelectItem value="sante-bien-etre">🌿 Santé / Bien-être</SelectItem>
+                  <SelectItem value="cuisine">🍳 Cuisine / Recettes</SelectItem>
+                  <SelectItem value="voyage">✈️ Voyage / Guide</SelectItem>
+                  <SelectItem value="enfants-jeunesse">👶 Enfants / Jeunesse</SelectItem>
+                  <SelectItem value="animaux">🐕 Animaux / Récit animalier</SelectItem>
+                  <SelectItem value="spiritualite">🙏 Spiritualité / Religion</SelectItem>
+                  <SelectItem value="education">📝 Éducation / Pédagogie</SelectItem>
+                  <SelectItem value="autre">📦 Autre</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
               <Label htmlFor="author" className="flex items-center gap-2">
                 <User className="h-4 w-4 text-primary" />
-                Nom d'auteur
+                Nom d'auteur *
               </Label>
               <Input
                 id="author"
@@ -256,6 +314,26 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
                 className="text-lg"
               />
             </div>
+          </div>
+
+          {/* Description field */}
+          <div className="space-y-2">
+            <Label htmlFor="description" className="flex items-center gap-2">
+              <FileText className="h-4 w-4 text-primary" />
+              Description courte (optionnel mais recommandé)
+            </Label>
+            <Textarea
+              id="description"
+              placeholder="Ex: L'histoire vraie de Luna, une chienne adoptée qui a transformé la vie de notre famille pendant 15 ans. Un récit émouvant sur l'amour inconditionnel entre un animal et ses humains."
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              disabled={isGenerating}
+              rows={3}
+              className="resize-none"
+            />
+            <p className="text-xs text-muted-foreground">
+              💡 Plus vous décrivez votre livre, mieux l'IA comprendra votre vision
+            </p>
           </div>
 
           {/* Chapters Slider */}
@@ -329,9 +407,9 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
                 Lancer la génération complète
               </Button>
               
-              {!title.trim() || !authorName.trim() ? (
+              {!title.trim() || !authorName.trim() || !category ? (
                 <p className="text-sm text-destructive">
-                  ⚠️ Veuillez remplir le titre et le nom d'auteur
+                  ⚠️ Veuillez remplir le titre, la catégorie et le nom d'auteur
                 </p>
               ) : !hasReadSteps ? (
                 <p className="text-sm text-amber-600">
