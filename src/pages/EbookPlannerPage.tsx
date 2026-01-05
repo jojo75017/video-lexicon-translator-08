@@ -74,6 +74,12 @@ import EbookNaturalRewrite from '@/components/ebook/EbookNaturalRewrite';
 import EbookEditorialPackaging from '@/components/ebook/EbookEditorialPackaging';
 import { EbookEditorialQuality } from '@/components/ebook/EbookEditorialQuality';
 import { EbookFinalDiagnosis } from '@/components/ebook/EbookFinalDiagnosis';
+import EbookEditorialMemory from '@/components/ebook/EbookEditorialMemory';
+import EbookChapterCoherence from '@/components/ebook/EbookChapterCoherence';
+import EbookSelfCritique from '@/components/ebook/EbookSelfCritique';
+import EbookIterativeLoop from '@/components/ebook/EbookIterativeLoop';
+import EbookStyleSignature from '@/components/ebook/EbookStyleSignature';
+import EbookUltimateVerdict from '@/components/ebook/EbookUltimateVerdict';
 import { useConfetti } from '@/hooks/useConfetti';
 
 // Hooks et données
@@ -1973,6 +1979,36 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
       case 'final-diagnosis':
         return (
           <EbookFinalDiagnosis />
+        );
+      
+      case 'editorial-memory':
+        return (
+          <EbookEditorialMemory />
+        );
+      
+      case 'chapter-coherence':
+        return (
+          <EbookChapterCoherence />
+        );
+      
+      case 'self-critique':
+        return (
+          <EbookSelfCritique />
+        );
+      
+      case 'iterative-loop':
+        return (
+          <EbookIterativeLoop />
+        );
+      
+      case 'style-signature':
+        return (
+          <EbookStyleSignature />
+        );
+      
+      case 'ultimate-verdict':
+        return (
+          <EbookUltimateVerdict />
         );
       
       case 'formation-pdf':

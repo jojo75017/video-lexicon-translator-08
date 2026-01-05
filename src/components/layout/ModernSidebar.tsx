@@ -36,7 +36,13 @@ import {
   Crown,
   BookMarked,
   Map,
-  Search
+  Search,
+  Brain,
+  GitBranch,
+  Eye,
+  RefreshCw,
+  Fingerprint,
+  Award
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -98,6 +104,21 @@ const categories: PremiumCategory[] = [
       { id: 'editorial-quality', label: '6. Cohérence & Qualité', icon: FileEdit, color: 'text-teal-500', bgColor: 'bg-teal-500/10', activeGradient: 'from-teal-400 to-cyan-500', isPremium: true, promptNumber: 6 },
       { id: 'editorial-packaging', label: '7. Packaging Éditorial', icon: FileText, color: 'text-green-500', bgColor: 'bg-green-500/10', activeGradient: 'from-green-400 to-emerald-500', isPremium: true, promptNumber: 7 },
       { id: 'final-diagnosis', label: '8. Diagnostic Final', icon: Shield, color: 'text-purple-500', bgColor: 'bg-purple-500/10', activeGradient: 'from-purple-400 to-fuchsia-500', isPremium: true, promptNumber: 8 },
+    ]
+  },
+  {
+    id: 'moteur-v2',
+    label: 'Moteur IA V2',
+    icon: '🧬',
+    color: 'from-purple-400 via-violet-500 to-indigo-600',
+    isPremiumCategory: true,
+    items: [
+      { id: 'editorial-memory', label: '9. Mémoire Éditoriale', icon: Brain, color: 'text-purple-500', bgColor: 'bg-purple-500/10', activeGradient: 'from-purple-400 to-violet-500', isPremium: true, promptNumber: 9 },
+      { id: 'chapter-coherence', label: '10. Cohérence Inter-Chap', icon: GitBranch, color: 'text-indigo-500', bgColor: 'bg-indigo-500/10', activeGradient: 'from-indigo-400 to-blue-500', isPremium: true, promptNumber: 10 },
+      { id: 'self-critique', label: '11. Auto-Critique IA', icon: Eye, color: 'text-rose-500', bgColor: 'bg-rose-500/10', activeGradient: 'from-rose-400 to-pink-500', isPremium: true, promptNumber: 11 },
+      { id: 'iterative-loop', label: '12. Amélioration Loop', icon: RefreshCw, color: 'text-cyan-500', bgColor: 'bg-cyan-500/10', activeGradient: 'from-cyan-400 to-teal-500', isPremium: true, promptNumber: 12 },
+      { id: 'style-signature', label: '13. Signature Style', icon: Fingerprint, color: 'text-amber-500', bgColor: 'bg-amber-500/10', activeGradient: 'from-amber-400 to-orange-500', isPremium: true, promptNumber: 13 },
+      { id: 'ultimate-verdict', label: '14. Verdict Ultime', icon: Award, color: 'text-yellow-500', bgColor: 'bg-yellow-500/10', activeGradient: 'from-yellow-400 to-amber-500', isPremium: true, promptNumber: 14 },
     ]
   },
   {

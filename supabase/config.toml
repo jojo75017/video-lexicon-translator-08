@@ -92,3 +92,21 @@ verify_jwt = false
 
 [functions.final-diagnosis]
 verify_jwt = false
+
+[functions.editorial-memory]
+verify_jwt = false
+
+[functions.chapter-coherence]
+verify_jwt = false
+
+[functions.self-critique]
+verify_jwt = false
+
+[functions.iterative-loop]
+verify_jwt = false
+
+[functions.style-signature]
+verify_jwt = false
+
+[functions.ultimate-verdict]
+verify_jwt = false
