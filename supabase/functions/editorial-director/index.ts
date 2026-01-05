@@ -41,7 +41,8 @@ IMPORTANT: Tu dois TOUJOURS répondre en JSON valide avec exactement cette struc
   "angleEditorial": "L'angle différenciant qui distingue ce livre de la concurrence",
   "cibleIdeale": "Description détaillée du lecteur idéal (profil, besoins, frustrations)",
   "erreursCourantes": ["Erreur 1", "Erreur 2", "Erreur 3", "Erreur 4", "Erreur 5"],
-  "visionGlobale": "La vision stratégique de l'ebook et son positionnement sur le marché"
+  "visionGlobale": "La vision stratégique de l'ebook et son positionnement sur le marché",
+  "suggestionsTitle": ["Titre alternatif 1 (accrocheur)", "Titre alternatif 2 (professionnel)", "Titre alternatif 3 (émotionnel)", "Titre alternatif 4 (curiosité)", "Titre alternatif 5 (bénéfice direct)"]
 }`;
 
     const userPrompt = `Analyse ce sujet d'ebook et définis la stratégie éditoriale:
