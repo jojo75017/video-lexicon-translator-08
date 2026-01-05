@@ -2123,7 +2123,10 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
       
       case 'editorial-director':
         return (
-          <EbookEditorialDirector />
+          <EbookEditorialDirector
+            subject={ebookTitle}
+            onSubjectChange={setEbookTitle}
+          />
         );
       
       case 'market-analysis':
