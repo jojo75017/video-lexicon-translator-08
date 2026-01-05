@@ -43,22 +43,30 @@ IMPORTANT: Tu dois TOUJOURS répondre en JSON valide avec exactement cette struc
   "erreursCourantes": ["Erreur 1", "Erreur 2", "Erreur 3", "Erreur 4", "Erreur 5"],
   "visionGlobale": "La vision stratégique de l'ebook et son positionnement sur le marché",
   "suggestionsTitle": [
-    {"titre": "Titre alternatif 1", "scoreKdp": 85, "raison": "Explication courte du potentiel KDP"},
-    {"titre": "Titre alternatif 2", "scoreKdp": 78, "raison": "Explication courte"},
-    {"titre": "Titre alternatif 3", "scoreKdp": 92, "raison": "Explication courte"},
-    {"titre": "Titre alternatif 4", "scoreKdp": 70, "raison": "Explication courte"},
-    {"titre": "Titre alternatif 5", "scoreKdp": 88, "raison": "Explication courte"}
+    {"titre": "Titre Court", "sousTitre": "Le sous-titre explicatif avec la promesse", "scoreKdp": 85, "raison": "Explication courte du potentiel KDP"},
+    {"titre": "Titre Court 2", "sousTitre": "Sous-titre accrocheur", "scoreKdp": 78, "raison": "Explication courte"},
+    {"titre": "Titre Court 3", "sousTitre": "Sous-titre avec bénéfice", "scoreKdp": 92, "raison": "Explication courte"},
+    {"titre": "Titre Court 4", "sousTitre": "Sous-titre émotionnel", "scoreKdp": 70, "raison": "Explication courte"},
+    {"titre": "Titre Court 5", "sousTitre": "Sous-titre pratique", "scoreKdp": 88, "raison": "Explication courte"}
   ],
   "meilleurTitre": {"index": 2, "explication": "Pourquoi ce titre est le meilleur choix global"},
   "titreOriginalScore": {"scoreKdp": 65, "forces": "Points forts du titre actuel", "faiblesses": "Points faibles à améliorer"}
 }
 
-Pour les scores KDP (0-100), évalue selon ces critères Amazon KDP:
-- Clarté de la promesse (le lecteur comprend immédiatement le bénéfice)
-- Mots-clés recherchables sur Amazon
-- Longueur optimale (5-10 mots idéal)
-- Accroche émotionnelle ou curiosité
-- Différenciation par rapport aux bestsellers existants`;
+RÈGLES STRICTES POUR LES TITRES AMAZON KDP:
+1. Le TITRE doit être COURT (2-5 mots max) - percutant, mémorable, brandable
+2. Le SOUS-TITRE contient la promesse détaillée (5-15 mots) - mots-clés, bénéfice, cible
+3. Format Amazon: "Titre Court : Sous-titre avec promesse et mots-clés"
+4. Exemples corrects:
+   - "Atomic Habits : Tiny Changes, Remarkable Results"
+   - "Deep Work : Rules for Focused Success in a Distracted World"
+   - "IA Business : Automatisez Votre Entreprise et Gagnez 10h Par Semaine"
+
+Pour les scores KDP (0-100), évalue selon:
+- Titre court et mémorable (brandable)
+- Sous-titre avec mots-clés recherchables
+- Clarté de la promesse
+- Différenciation marché`;
 
     const userPrompt = `Analyse ce sujet d'ebook et définis la stratégie éditoriale:
 
