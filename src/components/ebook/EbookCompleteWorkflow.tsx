@@ -66,7 +66,11 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
     setExpandedSteps(prev => ({ ...prev, [stepId]: !prev[stepId] }));
   };
 
-  const runStep = async (stepId: string, context: Record<string, any>): Promise<{ result: any; displayContent: string } | null> => {
+  const runStep = async (
+    stepId: string,
+    context: Record<string, any>,
+    extraBody: Record<string, any> = {}
+  ): Promise<{ result: any; displayContent: string } | null> => {
     try {
       const { data, error: fnError } = await supabase.functions.invoke('complete-book-workflow', {
         body: {
@@ -76,7 +80,8 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
           category,
           authorName,
           numberOfChapters,
-          previousContext: context
+          previousContext: context,
+          ...extraBody,
         }
       });
 
@@ -92,7 +97,6 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
       throw err;
     }
   };
-
   const generateCompleteBook = async () => {
     if (!title.trim() || !authorName.trim() || !category) {
       toast.error('Veuillez remplir le titre, le nom d\'auteur et la catégorie');
@@ -114,22 +118,55 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
       for (let i = 0; i < workflowSteps.length; i++) {
         const step = workflowSteps[i];
         setCurrentStepIndex(i);
-        
+
         // Auto-expand current step
         setExpandedSteps(prev => ({ ...prev, [step.id]: true }));
 
-        const result = await runStep(step.id, context);
-        
-        if (result) {
-          // Store result
-          setStepResults(prev => ({ ...prev, [step.id]: result }));
-          context[step.id] = result.result;
-          setAllContext(prev => ({ ...prev, [step.id]: result.result }));
-          
+        // P4 est la seule étape potentiellement très longue : on la découpe en requêtes "1 chapitre".
+        if (step.id === 'P4') {
+          const structure = context.P3?.chapitres || [];
+          if (!Array.isArray(structure) || structure.length === 0) {
+            throw new Error("Structure P3 introuvable : impossible de rédiger les chapitres (P4)");
+          }
+
+          const chapitresComplets: any[] = [];
+          for (const chapitre of structure) {
+            const partial = await runStep('P4', context, { chapter: chapitre });
+            const chapitreGenere = partial?.result?.chapitre;
+            if (chapitreGenere) chapitresComplets.push(chapitreGenere);
+
+            // UI : on met à jour P4 au fil de l'eau
+            setStepResults(prev => ({
+              ...prev,
+              P4: {
+                result: { chapitres: chapitresComplets, nombreChapitres: chapitresComplets.length },
+                displayContent: `**📄 Chapitres rédigés : ${chapitresComplets.length}/${structure.length}**\n\nDernier : ${partial?.displayContent || ''}`,
+              }
+            }));
+          }
+
+          context.P4 = { chapitres: chapitresComplets };
+          setAllContext(prev => ({ ...prev, P4: context.P4 }));
+
           // Collapse previous step, keep current expanded
           if (i > 0) {
             const prevStep = workflowSteps[i - 1];
             setExpandedSteps(prev => ({ ...prev, [prevStep.id]: false }));
+          }
+        } else {
+          const result = await runStep(step.id, context);
+
+          if (result) {
+            // Store result
+            setStepResults(prev => ({ ...prev, [step.id]: result }));
+            context[step.id] = result.result;
+            setAllContext(prev => ({ ...prev, [step.id]: result.result }));
+
+            // Collapse previous step, keep current expanded
+            if (i > 0) {
+              const prevStep = workflowSteps[i - 1];
+              setExpandedSteps(prev => ({ ...prev, [prevStep.id]: false }));
+            }
           }
         }
 

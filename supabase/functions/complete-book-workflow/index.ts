@@ -227,23 +227,43 @@ Crée la structure en JSON :
       }
 
       case 'P4': {
-        // RÉDACTION EXPERTE - Génère le CONTENU COMPLET de chaque chapitre un par un
+        // RÉDACTION EXPERTE
+        // IMPORTANT: cette étape est lourde. Pour éviter les timeouts, on supporte 2 modes :
+        // - Mode "un chapitre" (recommandé) via `chapter` dans le body
+        // - Mode legacy (tout d'un coup) si `chapter` n'est pas fourni
+
         const structure = previousContext.P3?.chapitres || [];
         const descriptionGeneree = previousContext.P1?.descriptionGeneree || '';
         const tonEditorial = previousContext.P1?.tonEditorial || '';
         const lecteurCible = previousContext.P1?.lecteurCible || '';
-        
-        console.log(`Step P4: Generating FULL CONTENT for ${structure.length} chapters`);
-        
-        const chapitresComplets: any[] = [];
-        
-        // Générer chaque chapitre un par un pour éviter les timeouts
-        for (const chapitre of structure) {
-          console.log(`Generating chapter ${chapitre.numero}: ${chapitre.titre}`);
-          
+
+        // Nouveau: génération par chapitre (évite le timeout)
+        // `chapter` peut être soit un chapitre complet (numero/titre/...), soit juste { numero }
+        // Dans ce cas, on le retrouve depuis P3.
+        const { chapter } = await (async () => {
+          try {
+            const body = await req.clone().json();
+            return { chapter: body?.chapter };
+          } catch {
+            return { chapter: undefined };
+          }
+        })();
+
+        if (chapter) {
+          const chapitre = chapter?.titre ? chapter : structure.find((c: any) => c.numero === chapter.numero) || chapter;
+
+          if (!chapitre?.numero || !chapitre?.titre) {
+            return new Response(
+              JSON.stringify({ error: 'Invalid chapter payload for P4' }),
+              { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
+          }
+
+          console.log(`Step P4 (single): Generating chapter ${chapitre.numero}: ${chapitre.titre}`);
+
           const chapterContent = await callAI(
             `Tu es un AUTEUR PROFESSIONNEL avec 20 ans d'expérience. Tu rédiges des chapitres COMPLETS, captivants, dans le style du genre "${category}".
-            
+
 RÈGLES D'ÉCRITURE :
 - Style naturel et humain, JAMAIS robotique
 - Phrases variées (courtes et longues)
@@ -251,7 +271,7 @@ RÈGLES D'ÉCRITURE :
 - Descriptions vivantes et immersives
 - Transitions fluides entre paragraphes
 - TON : ${tonEditorial}`,
-            `Rédige le CHAPITRE COMPLET suivant (environ 3000-4000 mots) :
+            `Rédige le CHAPITRE COMPLET suivant (environ 2500-3500 mots) :
 
 LIVRE : "${fullTitle}"
 CATÉGORIE : ${category}
@@ -259,58 +279,76 @@ DESCRIPTION : ${descriptionGeneree}
 LECTEUR CIBLE : ${lecteurCible}
 
 CHAPITRE ${chapitre.numero} : "${chapitre.titre}"
-OBJECTIF DU CHAPITRE : ${chapitre.objectif}
+OBJECTIF DU CHAPITRE : ${chapitre.objectif || ''}
 SOUS-SECTIONS À COUVRIR : ${(chapitre.sousSections || []).join(', ')}
 POINTS CLÉS : ${(chapitre.pointsCles || []).join(', ')}
 ACCROCHE : ${chapitre.accroche || ''}
 
 IMPORTANT :
-- Écris le contenu COMPLET du chapitre (pas juste une introduction)
+- Écris le contenu COMPLET du chapitre
 - Inclus des exemples concrets, anecdotes, ou dialogues selon le genre
-- Maintiens l'engagement du lecteur tout au long
 - Termine par une transition vers le chapitre suivant
 
 Retourne le contenu en JSON :
 {
   "numero": ${chapitre.numero},
   "titre": "${chapitre.titre}",
-  "contenu": "LE CONTENU COMPLET DU CHAPITRE ICI (3000-4000 mots)",
-  "nombreMots": 3500
+  "contenu": "LE CONTENU COMPLET DU CHAPITRE ICI",
+  "nombreMots": 3000
 }`,
-            8000
+            6000
           );
-          
+
           const parsedChapter = parseJSON(chapterContent);
-          if (parsedChapter) {
-            chapitresComplets.push(parsedChapter);
-          } else {
-            // Fallback si le JSON échoue
-            chapitresComplets.push({
-              numero: chapitre.numero,
-              titre: chapitre.titre,
-              contenu: chapterContent,
-              nombreMots: chapterContent.split(/\s+/).length
-            });
-          }
+          const chapitreGenere = parsedChapter || {
+            numero: chapitre.numero,
+            titre: chapitre.titre,
+            contenu: chapterContent,
+            nombreMots: chapterContent.split(/\s+/).length,
+          };
+
+          result = {
+            chapitre: chapitreGenere,
+            numero: chapitreGenere.numero,
+            titre: chapitreGenere.titre,
+            nombreMots: chapitreGenere.nombreMots,
+          };
+
+          displayContent = `**Ch.${chapitreGenere.numero} - ${chapitreGenere.titre}** (~${chapitreGenere.nombreMots || 3000} mots)\n_${(chapitreGenere.contenu || '').substring(0, 200)}..._`;
+          break;
         }
-        
-        const totalMots = chapitresComplets.reduce((acc, ch) => acc + (ch.nombreMots || 3500), 0);
-        
+
+        // Mode legacy: tout générer dans une seule requête (peut timeout sur de gros livres)
+        console.log(`Step P4 (legacy): Generating FULL CONTENT for ${structure.length} chapters`);
+
+        const chapitresComplets: any[] = [];
+        for (const chapitre of structure) {
+          console.log(`Generating chapter ${chapitre.numero}: ${chapitre.titre}`);
+
+          const chapterContent = await callAI(
+            `Tu es un AUTEUR PROFESSIONNEL avec 20 ans d'expérience. Tu rédiges des chapitres COMPLETS, captivants, dans le style du genre "${category}".\n\nTON : ${tonEditorial}`,
+            `Rédige le CHAPITRE COMPLET suivant :\n\nLIVRE : "${fullTitle}"\nCATÉGORIE : ${category}\nDESCRIPTION : ${descriptionGeneree}\nLECTEUR CIBLE : ${lecteurCible}\n\nCHAPITRE ${chapitre.numero} : "${chapitre.titre}"\nSOUS-SECTIONS : ${(chapitre.sousSections || []).join(', ')}\n\nRetourne le contenu en JSON :\n{\n  "numero": ${chapitre.numero},\n  "titre": "${chapitre.titre}",\n  "contenu": "...",\n  "nombreMots": 3000\n}`,
+            6000
+          );
+
+          const parsed = parseJSON(chapterContent);
+          chapitresComplets.push(parsed || {
+            numero: chapitre.numero,
+            titre: chapitre.titre,
+            contenu: chapterContent,
+            nombreMots: chapterContent.split(/\s+/).length,
+          });
+        }
+
+        const totalMots = chapitresComplets.reduce((acc, ch) => acc + (ch.nombreMots || 3000), 0);
         result = {
           chapitres: chapitresComplets,
           nombreChapitres: chapitresComplets.length,
           nombreMotsTotal: totalMots,
-          pagesEstimees: Math.ceil(totalMots / 250)
+          pagesEstimees: Math.ceil(totalMots / 250),
         };
-        
-        console.log(`Step P4 completed: ${chapitresComplets.length} chapters, ~${totalMots} words`);
-        
-        // Afficher un résumé des chapitres générés
-        displayContent = `**✅ ${chapitresComplets.length} chapitres rédigés** (~${totalMots} mots, ~${result.pagesEstimees} pages)\n\n` +
-          chapitresComplets.map((ch: any) => 
-            `**Ch.${ch.numero} - ${ch.titre}** (~${ch.nombreMots || 3500} mots)\n_${(ch.contenu || '').substring(0, 150)}..._`
-          ).join('\n\n');
-        
+
+        displayContent = `**✅ ${chapitresComplets.length} chapitres rédigés** (~${totalMots} mots, ~${result.pagesEstimees} pages)`;
         break;
       }
 
