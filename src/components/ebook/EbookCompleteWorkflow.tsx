@@ -517,7 +517,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
                   <CollapsibleContent>
                     {stepData && (
                       <div className="px-4 pb-4 pt-2 border-t border-border/50">
-                        <div className="bg-background/50 rounded-lg p-4 text-sm">
+                      <div className="bg-background/50 rounded-lg p-4 text-sm text-foreground prose prose-sm dark:prose-invert max-w-none">
                           {renderMarkdown(stepData.displayContent)}
                         </div>
                       </div>
