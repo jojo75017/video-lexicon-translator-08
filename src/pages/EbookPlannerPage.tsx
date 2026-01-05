@@ -783,11 +783,11 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
   };
 
   const resetPlan = () => {
-    if (!confirm('Êtes-vous sûr de vouloir réinitialiser ? Toutes les données seront perdues et vous pourrez commencer un nouvel ebook.')) {
+    if (!confirm('⚠️ RÉINITIALISATION COMPLÈTE\n\nCette action va effacer :\n• Le titre et l\'auteur\n• Tous les chapitres\n• Tous les personnages\n• La préface et conclusion\n• Toutes les images\n\nVoulez-vous vraiment tout supprimer et repartir de zéro ?')) {
       return;
     }
     
-    // Réinitialiser tous les états
+    // Réinitialiser TOUS les états (y compris bookDescription et genre)
     setEbookTitle(''); setAuthorName(''); setPreface(''); setConclusion(''); setEpilogue('');
     setChapters([]); setNumberOfChapters(8); setSelectedChapters([]);
     setImportText(''); setEbookImages([]); setTargetAudience('Adultes');
@@ -796,6 +796,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
     setNarrativeFormat('troisième personne'); setCharacters([]);
     setBookSummary(''); setCoverConcepts(''); setSeoOptimization('');
     setKdpDescription(''); setKdpKeywords(''); setKdpCategories('');
+    setBookDescription(''); setGenre(''); // ← AJOUT: reset description et genre
     
     // IMPORTANT: Réinitialiser l'ID du projet pour créer un nouveau projet lors de la prochaine sauvegarde
     setCurrentProjectId(null);
@@ -809,8 +810,8 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
       console.error('Erreur localStorage:', error);
     }
     
-    toast.success('🎉 Nouveau projet créé !', {
-      description: 'Vous pouvez maintenant commencer votre nouvel ebook.',
+    toast.success('🧹 Projet réinitialisé !', {
+      description: 'Toutes les données ont été effacées. Vous repartez de zéro.',
       duration: 4000,
     });
   };
