@@ -165,43 +165,51 @@ Donne ton analyse marché en JSON :
       }
 
       case 'P3': {
-        // ARCHITECTE DE CONTENU - Structure pour 400+ pages
-        const wordsPerChapter = Math.ceil(100000 / numberOfChapters);
+        // ARCHITECTE DE CONTENU - Structure réaliste basée sur le nombre de chapitres
+        const wordsPerChapter = 3500; // Estimation réaliste : 3500 mots = ~14 pages par chapitre
+        const totalWords = numberOfChapters * wordsPerChapter;
+        const estimatedPages = Math.ceil(totalWords / 250);
+        
+        console.log(`Step P3: Structuring ${numberOfChapters} chapters (~${estimatedPages} pages)`);
+        
         const content = await callAI(
-          `Tu es un ARCHITECTE DE CONTENU expert. Tu structures les livres LONGS (400+ pages) pour maximiser l'impact et la rétention du lecteur. Tu penses progression pédagogique, storytelling, points de bascule. Chaque chapitre doit avoir 6-10 sous-sections pour atteindre ${wordsPerChapter} mots.`,
-          `Structure ce livre LONG (400+ pages) en ${numberOfChapters} chapitres :
+          `Tu es un ARCHITECTE DE CONTENU expert. Tu structures des livres pour maximiser l'impact et la rétention du lecteur. Tu penses progression pédagogique, storytelling, points de bascule. Chaque chapitre doit avoir 4-6 sous-sections.`,
+          `Structure ce livre en ${numberOfChapters} chapitres :
 TITRE : "${title}"
 VISION : ${JSON.stringify(previousContext.P1 || {})}
 MARCHÉ : ${JSON.stringify(previousContext.P2 || {})}
 
-OBJECTIF : 100 000+ mots total (400+ pages)
-Chaque chapitre doit avoir ~${wordsPerChapter} mots avec 6-10 sous-sections détaillées.
+OBJECTIF : ~${totalWords} mots total (~${estimatedPages} pages)
+Chaque chapitre doit avoir ~${wordsPerChapter} mots avec 4-6 sous-sections.
 
 Crée la structure en JSON :
 {
   "structureGlobale": "description de l'arc narratif/pédagogique du livre",
-  "nombrePagesEstime": 400,
+  "nombrePagesEstime": ${estimatedPages},
+  "nombreMotsEstime": ${totalWords},
   "chapitres": [
     {
       "numero": 1,
       "titre": "Titre accrocheur du chapitre",
       "objectif": "Ce que le lecteur maîtrisera après ce chapitre",
       "nombreMotsPrevu": ${wordsPerChapter},
-      "sousSections": ["sous-section 1", "sous-section 2", "sous-section 3", "sous-section 4", "sous-section 5", "sous-section 6"],
-      "pointsCles": ["point1", "point2", "point3", "point4", "point5"],
-      "exercicesPratiques": ["exercice1", "exercice2"],
+      "sousSections": ["sous-section 1", "sous-section 2", "sous-section 3", "sous-section 4"],
+      "pointsCles": ["point1", "point2", "point3"],
       "accroche": "Phrase d'ouverture captivante"
     }
   ],
   "progressionLogique": "explication de pourquoi cet ordre"
 }`,
-          10000
+          8000
         );
         result = parseJSON(content) || { raw: content };
+        console.log('Step P3 completed successfully');
+        
         if (result.chapitres) {
           const totalMotsPrevu = result.chapitres.reduce((acc: number, ch: any) => acc + (ch.nombreMotsPrevu || wordsPerChapter), 0);
-          displayContent = `**Structure globale :** ${result.structureGlobale}\n\n**📖 ${result.nombrePagesEstime || 400}+ pages prévues (~${totalMotsPrevu} mots)**\n\n**${result.chapitres.length} chapitres structurés :**\n\n` +
-            result.chapitres.map((ch: any) => `**Ch.${ch.numero} - ${ch.titre}** (~${ch.nombreMotsPrevu || wordsPerChapter} mots, ${(ch.sousSections || []).length} sous-sections)\n_Objectif :_ ${ch.objectif}`).join('\n\n');
+          const pagesEstime = result.nombrePagesEstime || estimatedPages;
+          displayContent = `**Structure globale :** ${result.structureGlobale}\n\n**📖 ~${pagesEstime} pages prévues (~${totalMotsPrevu} mots)**\n\n**${result.chapitres.length} chapitres structurés :**\n\n` +
+            result.chapitres.map((ch: any) => `**Ch.${ch.numero} - ${ch.titre}** (~${ch.nombreMotsPrevu || wordsPerChapter} mots)\n_Objectif :_ ${ch.objectif}`).join('\n\n');
         } else {
           displayContent = content;
         }
@@ -209,125 +217,95 @@ Crée la structure en JSON :
       }
 
       case 'P4': {
-        // RÉDACTION EXPERTE - Génère CHAQUE chapitre SÉPARÉMENT pour 400+ pages
+        // RÉDACTION EXPERTE - Génère un APERÇU et les INTRODUCTIONS de chaque chapitre
+        // Le contenu complet sera généré séparément via le module EbookWriting
         const structure = previousContext.P3?.chapitres || [];
-        const wordsPerChapter = 5000; // 5000 mots par chapitre = 20 pages par chapitre
-        const allChapters: any[] = [];
+        console.log(`Step P4: Generating chapter previews for ${structure.length} chapters`);
         
-        // Générer chaque chapitre un par un
-        for (let i = 0; i < structure.length; i++) {
-          const chapterInfo = structure[i];
-          console.log(`Generating chapter ${i + 1}/${structure.length}: ${chapterInfo.titre}`);
-          
-          const chapterContent = await callAI(
-            `Tu es un AUTEUR PROFESSIONNEL PROLIFIQUE. Tu écris des chapitres TRÈS LONGS et DÉTAILLÉS (${wordsPerChapter} mots minimum). PAS DE STYLE ROBOT. Écris comme un vrai auteur humain passionné.`,
-            `Rédige LE CHAPITRE ${chapterInfo.numero} de ce livre (MINIMUM ${wordsPerChapter} MOTS) :
+        const content = await callAI(
+          `Tu es un AUTEUR PROFESSIONNEL. Tu prépares le plan de rédaction détaillé de chaque chapitre avec une introduction captivante. PAS DE STYLE ROBOT. Écris comme un vrai auteur humain passionné.`,
+          `Prépare le plan de rédaction pour ce livre :
 
 TITRE DU LIVRE : "${title}"
 AUTEUR : ${authorName}
 VISION : ${JSON.stringify(previousContext.P1 || {})}
 
-CHAPITRE À RÉDIGER :
-- Numéro : ${chapterInfo.numero}
-- Titre : ${chapterInfo.titre}
-- Objectif : ${chapterInfo.objectif}
-- Sous-sections prévues : ${JSON.stringify(chapterInfo.sousSections || chapterInfo.pointsCles)}
-- Accroche : ${chapterInfo.accroche}
+CHAPITRES PRÉVUS (${structure.length}) :
+${structure.map((ch: any) => `- Ch.${ch.numero}: ${ch.titre} (Objectif: ${ch.objectif})`).join('\n')}
 
-OBJECTIF CRITIQUE : Ce chapitre DOIT faire MINIMUM ${wordsPerChapter} MOTS (environ 20 pages).
-
-Structure obligatoire du chapitre :
-1. ACCROCHE PUISSANTE (300+ mots) - Histoire, anecdote ou question percutante
-2. INTRODUCTION DU CHAPITRE (400+ mots) - Contexte et promesse
-3. SECTION 1 (800+ mots) - Premier concept clé avec exemples détaillés
-4. SECTION 2 (800+ mots) - Deuxième concept avec études de cas
-5. SECTION 3 (800+ mots) - Troisième concept avec histoires vraies
-6. SECTION 4 (600+ mots) - Applications pratiques et exercices
-7. SECTION 5 (600+ mots) - Conseils avancés et astuces
-8. RÉCAPITULATIF (400+ mots) - Points clés à retenir
-9. TRANSITION (300+ mots) - Lien vers le chapitre suivant
-
-SOIS EXTRÊMEMENT GÉNÉREUX EN CONTENU. Développe chaque idée en profondeur avec des exemples concrets, des anecdotes, des métaphores. Le lecteur doit sentir qu'il en a pour son argent.
+Pour CHAQUE chapitre, génère :
+1. Une INTRODUCTION CAPTIVANTE (200-300 mots) qui accroche le lecteur
+2. Les POINTS CLÉS à développer
+3. Le TON et STYLE recommandé
 
 Format JSON :
 {
-  "numero": ${chapterInfo.numero},
-  "titre": "${chapterInfo.titre}",
-  "contenu": "CONTENU COMPLET DU CHAPITRE (${wordsPerChapter}+ mots)",
-  "nombreMots": "nombre de mots"
+  "chapitres": [
+    {
+      "numero": 1,
+      "titre": "titre du chapitre",
+      "introduction": "200-300 mots d'introduction captivante",
+      "pointsCles": ["point 1", "point 2", "point 3"],
+      "tonRecommande": "description du ton"
+    }
+  ],
+  "conseilsRedaction": "conseils globaux pour maintenir la cohérence",
+  "estimationMotsTotal": ${structure.length * 3500}
 }`,
-            16000
-          );
-          
-          const parsedChapter = parseJSON(chapterContent);
-          if (parsedChapter) {
-            allChapters.push(parsedChapter);
-          } else {
-            allChapters.push({
-              numero: chapterInfo.numero,
-              titre: chapterInfo.titre,
-              contenu: chapterContent,
-              nombreMots: chapterContent.split(' ').length
-            });
-          }
-        }
+          8000
+        );
         
-        result = { chapitres: allChapters };
-        const totalWords = allChapters.reduce((acc: number, ch: any) => acc + (ch.contenu?.split(' ').length || 0), 0);
-        const estimatedPages = Math.ceil(totalWords / 250);
-        displayContent = `**${allChapters.length} chapitres rédigés** (~${totalWords} mots / ~${estimatedPages} pages)\n\n` +
-          allChapters.slice(0, 3).map((ch: any) => {
-            const chWords = (ch.contenu || '').split(' ').length;
-            return `**${ch.titre}** (${chWords} mots)\n${(ch.contenu || '').substring(0, 400)}...`;
-          }).join('\n\n') +
-          (allChapters.length > 3 ? `\n\n_...et ${allChapters.length - 3} autres chapitres_` : '');
+        result = parseJSON(content) || { raw: content };
+        console.log('Step P4 completed successfully');
+        
+        if (result.chapitres) {
+          const chaptersPreview = result.chapitres.slice(0, 3);
+          displayContent = `**Plan de rédaction pour ${result.chapitres.length} chapitres** (~${result.estimationMotsTotal || structure.length * 3500} mots estimés)\n\n` +
+            chaptersPreview.map((ch: any) => 
+              `**Ch.${ch.numero} - ${ch.titre}**\n_Introduction :_ ${(ch.introduction || '').substring(0, 200)}...`
+            ).join('\n\n') +
+            (result.chapitres.length > 3 ? `\n\n_...et ${result.chapitres.length - 3} autres chapitres préparés_` : '') +
+            `\n\n**💡 ${result.conseilsRedaction || 'Conseils de rédaction prêts'}**`;
+        } else {
+          displayContent = content;
+        }
         break;
       }
 
       case 'P5': {
-        // RÉÉCRITURE NATURELLE
+        // RÉÉCRITURE NATURELLE - Travaille sur les introductions générées en P4
         const chapitres = previousContext.P4?.chapitres || [];
+        console.log(`Step P5: Humanizing ${chapitres.length} chapter introductions`);
+        
         const content = await callAI(
-          `Tu es un RÉÉCRIVALN expert qui humanise les textes. Tu supprimes tout ce qui sonne "IA" ou "corporate". Tu ajoutes de la vie, des tournures naturelles, du rythme. Ton but : qu'on ne puisse JAMAIS deviner que c'est écrit par une IA.`,
-          `Réécris ces chapitres pour les rendre 100% humains et naturels :
-CHAPITRES ACTUELS : ${JSON.stringify(chapitres.slice(0, 3))}
+          `Tu es un RÉÉCRIVAIN expert qui humanise les textes. Tu supprimes tout ce qui sonne "IA" ou "corporate". Tu ajoutes de la vie, des tournures naturelles, du rythme.`,
+          `Analyse ces introductions de chapitres et donne des conseils d'humanisation :
 
-Supprime :
-- Les formules génériques
-- Les transitions prévisibles
-- Le ton corporate/distant
-- Les répétitions ennuyeuses
+INTRODUCTIONS DES CHAPITRES :
+${chapitres.slice(0, 5).map((ch: any) => `Ch.${ch.numero} "${ch.titre}": ${(ch.introduction || '').substring(0, 300)}`).join('\n\n')}
 
-Ajoute :
-- Des tournures conversationnelles
-- Des exemples concrets du quotidien
-- Du rythme varié (phrases courtes/longues)
-- De la personnalité
-
-Format JSON :
+Analyse et donne tes recommandations en JSON :
 {
-  "chapitresHumanises": [
-    {
-      "numero": 1,
-      "titre": "titre",
-      "contenu": "CONTENU HUMANISÉ COMPLET"
-    }
+  "analyseGlobale": "ton évaluation du ton actuel",
+  "pointsAHumaniser": ["élément 1 à améliorer", "élément 2"],
+  "exemplesReformulation": [
+    {"avant": "phrase originale", "apres": "version humanisée"}
   ],
-  "modificationsApportees": ["liste des types de modifications"]
+  "conseilsStyle": ["conseil 1", "conseil 2", "conseil 3"],
+  "scoreHumanite": 7
 }`,
-          20000
+          4000
         );
+        
         result = parseJSON(content) || { raw: content };
-        // Merge humanized chapters with originals
-        if (result.chapitresHumanises && chapitres.length > 0) {
-          result.chapitresFinal = chapitres.map((ch: any, idx: number) => {
-            const humanized = result.chapitresHumanises.find((h: any) => h.numero === ch.numero);
-            return humanized || ch;
-          });
-        }
-        displayContent = result.modificationsApportees
-          ? `**Humanisation effectuée :**\n\n${result.modificationsApportees.map((m: string) => `✓ ${m}`).join('\n')}`
-          : 'Texte humanisé avec succès';
+        console.log('Step P5 completed successfully');
+        
+        // Transférer les chapitres de P4 vers le résultat final
+        result.chapitresFinal = chapitres;
+        
+        displayContent = result.analyseGlobale
+          ? `**Analyse d'humanisation :**\n\n${result.analyseGlobale}\n\n**Score d'humanité : ${result.scoreHumanite || '?'}/10**\n\n**Points à humaniser :**\n${(result.pointsAHumaniser || []).map((p: string) => `• ${p}`).join('\n')}\n\n**Conseils de style :**\n${(result.conseilsStyle || []).map((c: string) => `✓ ${c}`).join('\n')}`
+          : 'Analyse d\'humanisation effectuée';
         break;
       }
 

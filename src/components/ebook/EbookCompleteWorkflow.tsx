@@ -169,7 +169,8 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
     }
   };
 
-  const estimatedPages = Math.round(numberOfChapters * 20); // 5000 mots/chapitre = ~20 pages
+  // Estimation réaliste : 3000-4000 mots/chapitre = ~12-16 pages/chapitre
+  const estimatedPages = Math.round(numberOfChapters * 15);
 
   const renderMarkdown = (content: string) => {
     // Simple markdown rendering
