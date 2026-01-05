@@ -4,8 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2, RefreshCw, Copy, Sparkles, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -20,8 +18,6 @@ interface RewriteResult {
 
 const EbookNaturalRewrite = () => {
   const [text, setText] = useState('');
-  const [style, setStyle] = useState('');
-  const [preserveStructure, setPreserveStructure] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
   const [result, setResult] = useState<RewriteResult | null>(null);
 
@@ -34,7 +30,11 @@ const EbookNaturalRewrite = () => {
     setIsGenerating(true);
     try {
       const { data, error } = await supabase.functions.invoke('natural-rewrite', {
-        body: { text, style, preserveStructure }
+        body: { 
+          text, 
+          style: 'conversationnel',
+          preserveStructure: true
+        }
       });
 
       if (error) throw error;
@@ -76,7 +76,7 @@ const EbookNaturalRewrite = () => {
             Réécriture Naturelle
           </CardTitle>
           <p className="text-sm text-muted-foreground">
-            Transformez votre texte pour le rendre fluide, naturel et sans trace IA
+            Collez votre texte - il sera automatiquement réécrit pour être fluide et sans trace IA
           </p>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -93,35 +93,6 @@ const EbookNaturalRewrite = () => {
             <p className="text-xs text-muted-foreground">
               {text.length} caractères • {text.split(/\s+/).filter(w => w).length} mots
             </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Style de réécriture</Label>
-              <Select value={style} onValueChange={setStyle}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Choisir un style" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="conversationnel">Conversationnel</SelectItem>
-                  <SelectItem value="professionnel">Professionnel</SelectItem>
-                  <SelectItem value="pedagogique">Pédagogique</SelectItem>
-                  <SelectItem value="narratif">Narratif</SelectItem>
-                  <SelectItem value="journalistique">Journalistique</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex items-center space-x-2 pt-6">
-              <Checkbox
-                id="preserve-structure"
-                checked={preserveStructure}
-                onCheckedChange={(checked) => setPreserveStructure(checked as boolean)}
-              />
-              <Label htmlFor="preserve-structure" className="text-sm cursor-pointer">
-                Préserver la structure globale
-              </Label>
-            </div>
           </div>
 
           <Button 

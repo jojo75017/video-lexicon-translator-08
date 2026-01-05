@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
@@ -23,7 +22,6 @@ interface EbookEditorialDirectorProps {
 
 export const EbookEditorialDirector = ({ onAnalysisComplete }: EbookEditorialDirectorProps) => {
   const [sujet, setSujet] = useState("");
-  const [contexte, setContexte] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState<EditorialAnalysis | null>(null);
 
@@ -36,7 +34,10 @@ export const EbookEditorialDirector = ({ onAnalysisComplete }: EbookEditorialDir
     setIsAnalyzing(true);
     try {
       const { data, error } = await supabase.functions.invoke("editorial-director", {
-        body: { sujet, contexte },
+        body: { 
+          sujet, 
+          contexte: `Analyse automatique complète pour un ebook sur "${sujet}". Identifier le positionnement optimal, la cible idéale et les opportunités de différenciation.`
+        },
       });
 
       if (error) throw error;
@@ -63,29 +64,19 @@ export const EbookEditorialDirector = ({ onAnalysisComplete }: EbookEditorialDir
             Directeur Éditorial IA
           </CardTitle>
           <p className="text-sm text-muted-foreground">
-            Analyse stratégique pour transformer votre expertise en ebook professionnel à forte valeur commerciale
+            Entrez juste le titre - l'analyse stratégique complète est générée automatiquement
           </p>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="sujet">Sujet de l'ebook *</Label>
+            <Label htmlFor="sujet">Titre / Sujet de l'ebook *</Label>
             <Input
               id="sujet"
               placeholder="Ex: Comment automatiser son business avec l'IA en 2024"
               value={sujet}
               onChange={(e) => setSujet(e.target.value)}
               className="text-base"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="contexte">Contexte additionnel (optionnel)</Label>
-            <Textarea
-              id="contexte"
-              placeholder="Décrivez votre expertise, votre audience cible, vos objectifs..."
-              value={contexte}
-              onChange={(e) => setContexte(e.target.value)}
-              rows={3}
+              onKeyDown={(e) => e.key === 'Enter' && analyzeSubject()}
             />
           </div>
 

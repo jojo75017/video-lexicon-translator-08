@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, PenTool, Copy, CheckCircle, BookOpen, Target, Lightbulb } from 'lucide-react';
@@ -25,9 +24,6 @@ interface ExpertWritingResult {
 
 const EbookExpertWriting = () => {
   const [chapterTitle, setChapterTitle] = useState('');
-  const [chapterContext, setChapterContext] = useState('');
-  const [targetAudience, setTargetAudience] = useState('');
-  const [expertise, setExpertise] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [result, setResult] = useState<ExpertWritingResult | null>(null);
 
@@ -40,7 +36,12 @@ const EbookExpertWriting = () => {
     setIsGenerating(true);
     try {
       const { data, error } = await supabase.functions.invoke('expert-writing', {
-        body: { chapterTitle, chapterContext, targetAudience, expertise }
+        body: { 
+          chapterTitle,
+          chapterContext: `Générer automatiquement un chapitre complet et professionnel sur "${chapterTitle}"`,
+          targetAudience: 'Grand public intéressé par le sujet',
+          expertise: chapterTitle
+        }
       });
 
       if (error) throw error;
@@ -92,7 +93,7 @@ const EbookExpertWriting = () => {
             Rédaction Experte
           </CardTitle>
           <p className="text-sm text-muted-foreground">
-            Générez un chapitre rédigé comme un expert reconnu dans son domaine
+            Entrez juste le titre du chapitre - tout le reste est généré automatiquement
           </p>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -103,39 +104,8 @@ const EbookExpertWriting = () => {
               value={chapterTitle}
               onChange={(e) => setChapterTitle(e.target.value)}
               placeholder="Ex: Les fondamentaux de la productivité"
+              onKeyDown={(e) => e.key === 'Enter' && generateContent()}
             />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="context">Contexte du chapitre</Label>
-            <Textarea
-              id="context"
-              value={chapterContext}
-              onChange={(e) => setChapterContext(e.target.value)}
-              placeholder="Décrivez le contexte, les points à couvrir..."
-              rows={3}
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="audience">Public cible</Label>
-              <Input
-                id="audience"
-                value={targetAudience}
-                onChange={(e) => setTargetAudience(e.target.value)}
-                placeholder="Ex: Entrepreneurs débutants"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="expertise">Domaine d'expertise</Label>
-              <Input
-                id="expertise"
-                value={expertise}
-                onChange={(e) => setExpertise(e.target.value)}
-                placeholder="Ex: Gestion du temps"
-              />
-            </div>
           </div>
 
           <Button 
@@ -151,7 +121,7 @@ const EbookExpertWriting = () => {
             ) : (
               <>
                 <PenTool className="mr-2 h-4 w-4" />
-                Rédiger comme un expert
+                Générer le chapitre complet
               </>
             )}
           </Button>
