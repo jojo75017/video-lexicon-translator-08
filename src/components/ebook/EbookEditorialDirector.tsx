@@ -4,14 +4,32 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, BookOpen, Target, Lightbulb, AlertTriangle, Eye, Sparkles, PenLine, Copy, Check } from "lucide-react";
+import { Loader2, BookOpen, Target, Lightbulb, AlertTriangle, Eye, Sparkles, PenLine, Copy, Check, Trophy, TrendingUp, Star } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { Progress } from "@/components/ui/progress";
 
 interface CibleIdealeObject {
   profil?: string;
   besoins?: string;
   frustrations?: string;
+}
+
+interface TitleSuggestion {
+  titre: string;
+  scoreKdp: number;
+  raison: string;
+}
+
+interface TitreOriginalScore {
+  scoreKdp: number;
+  forces: string;
+  faiblesses: string;
+}
+
+interface MeilleurTitre {
+  index: number;
+  explication: string;
 }
 
 interface EditorialAnalysis {
@@ -20,7 +38,9 @@ interface EditorialAnalysis {
   cibleIdeale: string | CibleIdealeObject;
   erreursCourantes: string[];
   visionGlobale: string;
-  suggestionsTitle?: string[];
+  suggestionsTitle?: TitleSuggestion[] | string[];
+  meilleurTitre?: MeilleurTitre;
+  titreOriginalScore?: TitreOriginalScore;
 }
 
 // Helper to render cibleIdeale whether it's a string or object
@@ -63,6 +83,10 @@ export const EbookEditorialDirector = ({ onAnalysisComplete }: EbookEditorialDir
   const [analysis, setAnalysis] = useState<EditorialAnalysis | null>(null);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
+  const getTitleText = (item: TitleSuggestion | string): string => {
+    return typeof item === 'string' ? item : item.titre;
+  };
+
   const copyTitle = (title: string, index: number) => {
     navigator.clipboard.writeText(title);
     setCopiedIndex(index);
@@ -73,6 +97,18 @@ export const EbookEditorialDirector = ({ onAnalysisComplete }: EbookEditorialDir
   const useTitle = (title: string) => {
     setSujet(title);
     toast.success("Titre appliqué ! Relancez l'analyse pour affiner.");
+  };
+
+  const getScoreColor = (score: number) => {
+    if (score >= 85) return "text-green-600 dark:text-green-400";
+    if (score >= 70) return "text-yellow-600 dark:text-yellow-400";
+    return "text-red-600 dark:text-red-400";
+  };
+
+  const getProgressColor = (score: number) => {
+    if (score >= 85) return "bg-green-500";
+    if (score >= 70) return "bg-yellow-500";
+    return "bg-red-500";
   };
 
   const analyzeSubject = async () => {
@@ -225,41 +261,127 @@ export const EbookEditorialDirector = ({ onAnalysisComplete }: EbookEditorialDir
                 <CardTitle className="flex items-center gap-2 text-lg text-yellow-700 dark:text-yellow-400">
                   <PenLine className="h-5 w-5" />
                   Suggestions de Titres Alternatifs
+                  <Badge variant="outline" className="ml-auto text-xs">
+                    Score KDP Amazon
+                  </Badge>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {analysis.suggestionsTitle.map((title, index) => (
-                    <div 
-                      key={index} 
-                      className="flex items-center justify-between gap-2 p-3 rounded-lg bg-background/50 border border-yellow-500/20 hover:border-yellow-500/40 transition-colors"
-                    >
-                      <span className="text-sm font-medium flex-1">{title}</span>
-                      <div className="flex gap-1">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => copyTitle(title, index)}
-                          className="h-8 w-8 p-0"
-                        >
-                          {copiedIndex === index ? (
-                            <Check className="h-4 w-4 text-green-500" />
-                          ) : (
-                            <Copy className="h-4 w-4" />
-                          )}
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => useTitle(title)}
-                          className="h-8 text-xs"
-                        >
-                          Utiliser
-                        </Button>
+              <CardContent className="space-y-4">
+                {/* Score du titre original */}
+                {analysis.titreOriginalScore && (
+                  <div className="p-4 rounded-lg bg-muted/50 border border-muted-foreground/20 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Star className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm font-medium">Votre titre actuel</span>
+                      </div>
+                      <span className={`text-lg font-bold ${getScoreColor(analysis.titreOriginalScore.scoreKdp)}`}>
+                        {analysis.titreOriginalScore.scoreKdp}/100
+                      </span>
+                    </div>
+                    <div className="relative h-2 w-full overflow-hidden rounded-full bg-muted">
+                      <div 
+                        className={`h-full transition-all ${getProgressColor(analysis.titreOriginalScore.scoreKdp)}`}
+                        style={{ width: `${analysis.titreOriginalScore.scoreKdp}%` }}
+                      />
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-2 text-xs">
+                      <div className="p-2 rounded bg-green-500/10 border border-green-500/20">
+                        <span className="font-medium text-green-700 dark:text-green-400">✓ Forces : </span>
+                        <span className="text-muted-foreground">{analysis.titreOriginalScore.forces}</span>
+                      </div>
+                      <div className="p-2 rounded bg-red-500/10 border border-red-500/20">
+                        <span className="font-medium text-red-700 dark:text-red-400">✗ À améliorer : </span>
+                        <span className="text-muted-foreground">{analysis.titreOriginalScore.faiblesses}</span>
                       </div>
                     </div>
-                  ))}
+                  </div>
+                )}
+
+                {/* Liste des suggestions avec scores */}
+                <div className="space-y-2">
+                  {analysis.suggestionsTitle.map((item, index) => {
+                    const isString = typeof item === 'string';
+                    const title = isString ? item : item.titre;
+                    const score = isString ? null : item.scoreKdp;
+                    const raison = isString ? null : item.raison;
+                    const isBest = analysis.meilleurTitre?.index === index;
+
+                    return (
+                      <div 
+                        key={index} 
+                        className={`p-3 rounded-lg border transition-all ${
+                          isBest 
+                            ? 'bg-green-500/10 border-green-500/40 ring-2 ring-green-500/20' 
+                            : 'bg-background/50 border-yellow-500/20 hover:border-yellow-500/40'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex-1 space-y-1">
+                            <div className="flex items-center gap-2">
+                              {isBest && (
+                                <Trophy className="h-4 w-4 text-green-500 shrink-0" />
+                              )}
+                              <span className={`text-sm font-medium ${isBest ? 'text-green-700 dark:text-green-400' : ''}`}>
+                                {title}
+                              </span>
+                            </div>
+                            {raison && (
+                              <p className="text-xs text-muted-foreground pl-6">{raison}</p>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {score !== null && (
+                              <div className="flex items-center gap-1 min-w-[60px]">
+                                <TrendingUp className={`h-3 w-3 ${getScoreColor(score)}`} />
+                                <span className={`text-sm font-bold ${getScoreColor(score)}`}>
+                                  {score}
+                                </span>
+                              </div>
+                            )}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => copyTitle(title, index)}
+                              className="h-8 w-8 p-0"
+                            >
+                              {copiedIndex === index ? (
+                                <Check className="h-4 w-4 text-green-500" />
+                              ) : (
+                                <Copy className="h-4 w-4" />
+                              )}
+                            </Button>
+                            <Button
+                              variant={isBest ? "default" : "outline"}
+                              size="sm"
+                              onClick={() => useTitle(title)}
+                              className="h-8 text-xs"
+                            >
+                              {isBest ? "🏆 Utiliser" : "Utiliser"}
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
+
+                {/* Explication du meilleur titre */}
+                {analysis.meilleurTitre && (
+                  <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/30">
+                    <div className="flex items-start gap-2">
+                      <Trophy className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-sm font-medium text-green-700 dark:text-green-400">
+                          Recommandation KDP
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {analysis.meilleurTitre.explication}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           )}
