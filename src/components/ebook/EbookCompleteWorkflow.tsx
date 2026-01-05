@@ -613,7 +613,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
               value={[numberOfChapters]}
               onValueChange={(value) => setNumberOfChapters(value[0])}
               min={3}
-              max={20}
+              max={50}
               step={1}
               disabled={isGenerating}
               className="w-full"
