@@ -68,3 +68,9 @@ verify_jwt = false
 
 [functions.increment-quota]
 verify_jwt = false
+
+[functions.editorial-director]
+verify_jwt = false
+
+[functions.market-analysis]
+verify_jwt = false
