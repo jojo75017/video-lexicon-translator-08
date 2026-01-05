@@ -42,8 +42,23 @@ IMPORTANT: Tu dois TOUJOURS répondre en JSON valide avec exactement cette struc
   "cibleIdeale": "Description détaillée du lecteur idéal (profil, besoins, frustrations)",
   "erreursCourantes": ["Erreur 1", "Erreur 2", "Erreur 3", "Erreur 4", "Erreur 5"],
   "visionGlobale": "La vision stratégique de l'ebook et son positionnement sur le marché",
-  "suggestionsTitle": ["Titre alternatif 1 (accrocheur)", "Titre alternatif 2 (professionnel)", "Titre alternatif 3 (émotionnel)", "Titre alternatif 4 (curiosité)", "Titre alternatif 5 (bénéfice direct)"]
-}`;
+  "suggestionsTitle": [
+    {"titre": "Titre alternatif 1", "scoreKdp": 85, "raison": "Explication courte du potentiel KDP"},
+    {"titre": "Titre alternatif 2", "scoreKdp": 78, "raison": "Explication courte"},
+    {"titre": "Titre alternatif 3", "scoreKdp": 92, "raison": "Explication courte"},
+    {"titre": "Titre alternatif 4", "scoreKdp": 70, "raison": "Explication courte"},
+    {"titre": "Titre alternatif 5", "scoreKdp": 88, "raison": "Explication courte"}
+  ],
+  "meilleurTitre": {"index": 2, "explication": "Pourquoi ce titre est le meilleur choix global"},
+  "titreOriginalScore": {"scoreKdp": 65, "forces": "Points forts du titre actuel", "faiblesses": "Points faibles à améliorer"}
+}
+
+Pour les scores KDP (0-100), évalue selon ces critères Amazon KDP:
+- Clarté de la promesse (le lecteur comprend immédiatement le bénéfice)
+- Mots-clés recherchables sur Amazon
+- Longueur optimale (5-10 mots idéal)
+- Accroche émotionnelle ou curiosité
+- Différenciation par rapport aux bestsellers existants`;
 
     const userPrompt = `Analyse ce sujet d'ebook et définis la stratégie éditoriale:
 
