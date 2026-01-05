@@ -57,390 +57,128 @@ const FormationPage = () => {
   const modules: Module[] = [
     {
       id: 1,
-      title: "Configuration et Démarrage",
-      description: "Installation, configuration API OpenAI, générateur d'idées",
+      title: "Étape 1 : Choisir",
+      description: "Définissez votre sujet, votre lecteur et votre objectif",
       category: 'basics',
-      icon: Settings,
-      duration: '15 min',
+      icon: Target,
+      duration: '5 min',
       difficulty: 'débutant',
-      content: `# Module 1 : Configuration et Démarrage
+      content: `# Étape 1 : Choisir votre projet
 
-## 1.1 Installation et Configuration Initiale
+## Vous ne rédigez aucune ligne.
+**Vous guidez l'intention, l'éditeur numérique fait le reste.**
 
-**Fonctionnalités principales :**
-- Configuration de l'API OpenAI
-- Paramétrage des préférences utilisateur
-- Interface de navigation intuitive
+---
 
-**Actions à effectuer :**
-1. Saisir votre clé API OpenAI
-2. Configurer le nombre de chapitres par défaut
-3. Paramétrer vos préférences de génération
+## Ce que vous faites :
 
-### Captures d'écran à inclure :
-- Écran de configuration API
-- Panneau de paramètres utilisateur
-- Interface de navigation principale
+### 1. Choisissez votre sujet
+- Quel thème voulez-vous aborder ?
+- Quelle expertise souhaitez-vous partager ?
+- Quelle histoire voulez-vous raconter ?
 
-## 1.2 Générateur d'Idées d'Ebooks
+### 2. Définissez votre lecteur idéal
+- À qui s'adresse votre livre ?
+- Quels sont ses besoins, ses frustrations ?
+- Que cherche-t-il à apprendre ou ressentir ?
 
-**Fonctionnalités principales :**
-- 50+ idées d'ebooks pré-générées
-- Catégories diversifiées : Business, Santé, Technologie, Finance
-- Système de génération automatique de nouveaux concepts
+### 3. Fixez votre objectif
+- Informer, inspirer, divertir, transformer ?
+- Quel résultat attendez-vous pour votre lecteur ?
 
-**Actions à effectuer :**
-1. Explorer les catégories d'idées
-2. Sélectionner une idée qui vous inspire
-3. Transférer automatiquement vers le planificateur`
+---
+
+## Ce que vous obtenez :
+
+✅ Une direction claire pour votre projet  
+✅ Un angle éditorial défini  
+✅ Les bases pour que l'éditeur numérique travaille pour vous`
     },
     {
       id: 2,
-      title: "Planificateur d'Ebook",
-      description: "Création du plan, gestion des chapitres, structure",
+      title: "Étape 2 : Générer",
+      description: "Le système structure et rédige automatiquement",
       category: 'creation',
-      icon: Layers,
-      duration: '25 min',
+      icon: Sparkles,
+      duration: '3 min',
       difficulty: 'débutant',
-      content: `# Module 2 : Planificateur d'Ebook
+      content: `# Étape 2 : Générer votre livre
 
-## 2.1 Création du Plan Initial
+## Vous ne rédigez aucune ligne.
+**Vous guidez l'intention, l'éditeur numérique fait le reste.**
 
-**Fonctionnalités principales :**
-- Génération automatique de structure
-- Personnalisation du titre et de l'auteur
-- Création de préface et conclusion
-- Système de chapitres et sous-chapitres
+---
 
-**Actions à effectuer :**
-1. Saisir le titre de l'ebook
-2. Renseigner le nom de l'auteur
-3. Générer la structure automatiquement
-4. Personnaliser la préface et la conclusion
+## Ce que vous faites :
 
-## 2.2 Gestion Avancée des Chapitres
+### 1. Validez le titre et la description
+- Vérifiez que le titre correspond à votre vision
+- Ajustez la description si nécessaire
 
-**Fonctionnalités principales :**
-- Drag & Drop pour réorganiser
-- Fusion et division de chapitres
-- Duplication de chapitres
-- Ajout de sous-chapitres
+### 2. Lancez la génération
+- Cliquez sur "Générer le plan"
+- Cliquez sur "Rédiger le contenu"
+- Attendez quelques instants
 
-**Actions à effectuer :**
-1. Réorganiser les chapitres par glisser-déposer
-2. Diviser un chapitre en plusieurs parties
-3. Fusionner des chapitres similaires
-4. Ajouter des sous-chapitres détaillés`
+### 3. Laissez le système travailler
+- Structure automatique en chapitres cohérents
+- Rédaction fluide et naturelle
+- Ton adapté à votre lecteur cible
+
+---
+
+## Ce que vous obtenez :
+
+✅ Un plan structuré de votre livre  
+✅ Des chapitres rédigés avec votre voix  
+✅ Une cohérence narrative de bout en bout  
+✅ Un contenu prêt à être validé`
     },
     {
       id: 3,
-      title: "Templates Professionnels",
-      description: "Galerie de templates, personnalisation",
-      category: 'creation',
-      icon: BookOpen,
-      duration: '20 min',
+      title: "Étape 3 : Valider",
+      description: "Lisez le verdict éditorial et finalisez",
+      category: 'advanced',
+      icon: CheckCircle2,
+      duration: '5 min',
       difficulty: 'débutant',
-      content: `# Module 3 : Templates Professionnels
+      content: `# Étape 3 : Valider et publier
 
-## 3.1 Galerie de Templates
+## Vous ne rédigez aucune ligne.
+**Vous guidez l'intention, l'éditeur numérique fait le reste.**
 
-**Templates disponibles :**
-- **Business** : Guides entrepreneuriaux, stratégies
-- **Fiction** : Romans, nouvelles, récits
-- **Mémoires** : Autobiographies, témoignages
-- **Guides** : Tutoriels, formations
+---
 
-**Actions à effectuer :**
-1. Parcourir la galerie de templates
-2. Prévisualiser les structures
-3. Appliquer un template à votre ebook
-4. Personnaliser selon vos besoins
+## Ce que vous faites :
 
-## 3.2 Personnalisation des Templates
+### 1. Consultez le verdict éditorial
+- Un diagnostic complet de votre livre
+- Points forts identifiés
+- Recommandations finales
 
-**Fonctionnalités principales :**
-- Modification de la structure
-- Adaptation du contenu
-- Personnalisation des styles
-- Sauvegarde de templates personnalisés`
-    },
-    {
-      id: 4,
-      title: "Génération de Contenu IA",
-      description: "Rédaction automatique, outils d'écriture avancés",
-      category: 'creation',
-      icon: Sparkles,
-      duration: '30 min',
-      difficulty: 'intermédiaire',
-      content: `# Module 4 : Génération de Contenu IA
+### 2. Relisez votre contenu
+- Parcourez les chapitres générés
+- Vérifiez que tout correspond à votre intention
+- Demandez des ajustements si besoin
 
-## 4.1 Rédaction Automatique
+### 3. Exportez votre livre
+- Choisissez le format (PDF, EPUB, MOBI...)
+- Téléchargez votre fichier final
+- Publiez sur la plateforme de votre choix
 
-**Fonctionnalités principales :**
-- Génération de contenu par chapitre
-- Génération de sous-chapitres détaillés
-- Amélioration du style d'écriture
-- Optimisation SEO automatique
+---
 
-**Actions à effectuer :**
-1. Générer le contenu d'un chapitre
-2. Améliorer le style d'écriture
-3. Optimiser pour le SEO
-4. Réviser et affiner le contenu
+## Ce que vous obtenez :
 
-## 4.2 Outils d'Écriture Avancés
-
-**Fonctionnalités principales :**
-- Analyse de texte existant
-- Génération de table des matières
-- Compteur de mots automatique
-- Sauvegarde automatique
-- Dictaphone IA avec transcription`
-    },
-    {
-      id: 5,
-      title: "Outils Avancés",
-      description: "Générateur de couverture IA, outils de productivité",
-      category: 'advanced',
-      icon: Zap,
-      duration: '25 min',
-      difficulty: 'intermédiaire',
-      content: `# Module 5 : Outils Avancés
-
-## 5.1 Générateur de Couverture IA
-
-**Fonctionnalités principales :**
-- Création automatique de couvertures
-- Styles variés et professionnels
-- Personnalisation des couleurs
-- Export haute résolution
-
-**Actions à effectuer :**
-1. Générer une couverture automatiquement
-2. Choisir parmi plusieurs styles
-3. Personnaliser les couleurs
-4. Télécharger en haute résolution
-
-## 5.2 Outils de Productivité
-
-**Fonctionnalités principales :**
-- Sauvegarde automatique
-- Statistiques détaillées
-- Historique des modifications
-- Export de brouillons`
-    },
-    {
-      id: 6,
-      title: "Banque d'Images IA",
-      description: "Génération d'illustrations, optimisation visuelle",
-      category: 'advanced',
-      icon: Image,
-      duration: '20 min',
-      difficulty: 'intermédiaire',
-      content: `# Module 6 : Banque d'Images IA
-
-## 6.1 Génération d'Illustrations
-
-**Fonctionnalités principales :**
-- Génération d'images personnalisées
-- Styles variés (réaliste, artistique, cartoon)
-- Optimisation automatique des formats
-- Intégration directe dans l'ebook
-
-**Actions à effectuer :**
-1. Créer des illustrations pour chaque chapitre
-2. Générer des images de couverture
-3. Optimiser les images pour différents formats
-4. Intégrer automatiquement dans l'ebook
-
-## 6.2 Optimisation Visuelle
-
-**Fonctionnalités principales :**
-- Redimensionnement automatique
-- Compression intelligente
-- Formats multiples (JPEG, PNG, WebP)
-- Métadonnées SEO`
-    },
-    {
-      id: 7,
-      title: "Optimisation KDP",
-      description: "Préparation Amazon KDP, analyse concurrentielle",
-      category: 'marketing',
-      icon: Target,
-      duration: '35 min',
-      difficulty: 'avancé',
-      content: `# Module 7 : Optimisation KDP
-
-## 7.1 Préparation pour Amazon KDP
-
-**Fonctionnalités principales :**
-- Génération de description KDP
-- Recherche de mots-clés optimisés
-- Sélection de catégories appropriées
-- Conseils de prix dynamiques
-
-**Actions à effectuer :**
-1. Générer une description accrocheuse
-2. Rechercher les meilleurs mots-clés
-3. Sélectionner les catégories optimales
-4. Définir le prix de vente
-
-## 7.2 Analyse Concurrentielle
-
-**Fonctionnalités principales :**
-- Analyse des concurrents directs
-- Étude des prix du marché
-- Identification des niches rentables
-- Recommandations stratégiques`
-    },
-    {
-      id: 8,
-      title: "Marketing et Promotion",
-      description: "Réseaux sociaux, email marketing, landing pages",
-      category: 'marketing',
-      icon: Megaphone,
-      duration: '40 min',
-      difficulty: 'avancé',
-      content: `# Module 8 : Marketing et Promotion
-
-## 8.1 Contenu pour Réseaux Sociaux
-
-**Fonctionnalités principales :**
-- Posts Facebook automatiques
-- Tweets promotionnels
-- Stories Instagram
-- Publications LinkedIn
-
-**Actions à effectuer :**
-1. Générer du contenu pour chaque réseau
-2. Planifier les publications
-3. Créer des visuels attractifs
-4. Suivre les performances
-
-## 8.2 Email Marketing
-
-**Fonctionnalités principales :**
-- Campagnes email automatisées
-- Templates d'emails professionnels
-- Séquences de lancement
-- Emails de suivi
-
-## 8.3 Landing Pages
-
-**Fonctionnalités principales :**
-- Création de pages de vente
-- Optimisation des conversions
-- A/B testing intégré
-- Analytics détaillés`
-    },
-    {
-      id: 9,
-      title: "Monétisation",
-      description: "Stratégies de prix, diversification des revenus",
-      category: 'marketing',
-      icon: DollarSign,
-      duration: '30 min',
-      difficulty: 'avancé',
-      content: `# Module 9 : Monétisation
-
-## 9.1 Stratégies de Prix
-
-**Fonctionnalités principales :**
-- Calculateur de ROI
-- Prix dynamiques
-- Stratégies de bundle
-- Programmes d'affiliation
-
-**Actions à effectuer :**
-1. Calculer le ROI optimal
-2. Définir une stratégie de prix
-3. Créer des bundles attractifs
-4. Mettre en place l'affiliation
-
-## 9.2 Diversification des Revenus
-
-**Fonctionnalités principales :**
-- Vente multi-plateformes
-- Licences et droits d'auteur
-- Formations complémentaires
-- Services de consulting`
-    },
-    {
-      id: 10,
-      title: "Export Multi-Format",
-      description: "Formats disponibles, optimisation par format",
-      category: 'advanced',
-      icon: FileOutput,
-      duration: '25 min',
-      difficulty: 'intermédiaire',
-      content: `# Module 10 : Export Multi-Format
-
-## 10.1 Formats Disponibles
-
-**Formats supportés :**
-- **PDF** : Version imprimable haute qualité
-- **EPUB** : Compatible liseuses électroniques
-- **MOBI** : Format Kindle
-- **DOCX** : Édition Microsoft Word
-- **HTML** : Version web interactive
-- **InDesign (IDML)** : Format professionnel
-
-**Actions à effectuer :**
-1. Choisir le format d'export
-2. Configurer les options avancées
-3. Générer l'ebook final
-4. Télécharger et vérifier
-
-## 10.2 Optimisation par Format
-
-**Fonctionnalités principales :**
-- Mise en page automatique
-- Métadonnées optimisées
-- Table des matières interactive
-- Index automatique`
-    },
-    {
-      id: 11,
-      title: "Stratégies Avancées",
-      description: "Automatisation, scaling et growth hacking",
-      category: 'advanced',
-      icon: Rocket,
-      duration: '45 min',
-      difficulty: 'avancé',
-      content: `# Module 11 : Stratégies Avancées
-
-## 11.1 Automatisation Complète
-
-**Fonctionnalités principales :**
-- Workflows automatisés
-- Génération en masse
-- Planification de contenu
-- Monitoring des performances
-
-## 11.2 Scaling et Growth Hacking
-
-**Stratégies couvertes :**
-- Multiplication des niches
-- Partenariats stratégiques
-- Optimisation continue
-- Expansion internationale
-
-## 11.3 Livre Audio
-
-**Fonctionnalités principales :**
-- Conversion texte vers audio avec ElevenLabs
-- Voix naturelles et expressives
-- Export MP3 haute qualité
-- Chapitrage automatique`
+✅ Un livre complet et cohérent  
+✅ Un verdict de qualité professionnelle  
+✅ Votre ebook prêt à publier  
+✅ Votre voix, pas celle d'un robot`
     }
   ];
 
   const categories = [
-    { id: 'all', label: 'Tous', icon: Layers, count: modules.length },
-    { id: 'basics', label: 'Bases', icon: GraduationCap, count: modules.filter(m => m.category === 'basics').length },
-    { id: 'creation', label: 'Création', icon: Sparkles, count: modules.filter(m => m.category === 'creation').length },
-    { id: 'advanced', label: 'Avancé', icon: Zap, count: modules.filter(m => m.category === 'advanced').length },
-    { id: 'marketing', label: 'Marketing', icon: TrendingUp, count: modules.filter(m => m.category === 'marketing').length },
+    { id: 'all', label: 'Toutes les étapes', icon: Layers, count: modules.length },
   ];
 
   const filteredModules = useMemo(() => {
@@ -712,11 +450,19 @@ ${module.content}
             Formation Complète
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent">
-            Maîtrisez le Générateur d'Ebook IA
+            Créez votre livre en 3 étapes
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            {modules.length} modules • {modules.reduce((acc, m) => acc + parseInt(m.duration), 0)} minutes de contenu
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-6">
+            Vous guidez l'intention, l'éditeur numérique fait le reste.
           </p>
+          <div className="bg-primary/10 border border-primary/20 rounded-xl p-6 max-w-xl mx-auto">
+            <p className="text-lg font-medium text-primary">
+              ✨ Vous ne rédigez aucune ligne.
+            </p>
+            <p className="text-muted-foreground mt-1">
+              Choisissez • Générez • Validez
+            </p>
+          </div>
           
           {/* Statistiques de progression */}
           <div className="flex justify-center gap-6 mt-8">
@@ -990,115 +736,54 @@ ${module.content}
           )}
         </AnimatePresence>
 
-        {/* Checklist améliorée */}
+        {/* Résumé des 3 étapes */}
         <Card className="overflow-hidden">
-          <CardHeader className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10">
+          <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5">
             <div className="flex items-center gap-3">
-              <Trophy className="h-6 w-6 text-yellow-500" />
-              <CardTitle>Checklist de Lancement d'Ebook</CardTitle>
+              <Rocket className="h-6 w-6 text-primary" />
+              <CardTitle>En résumé : votre parcours</CardTitle>
             </div>
           </CardHeader>
           <CardContent className="pt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="space-y-6">
-                <div>
-                  <h4 className="font-semibold mb-3 flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-blue-500" />
-                    Pré-production
-                  </h4>
-                  <ul className="space-y-2 text-sm pl-4">
-                    <li className="flex items-center gap-2">
-                      <input type="checkbox" className="rounded" />
-                      Idée validée et recherche effectuée
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <input type="checkbox" className="rounded" />
-                      Structure détaillée créée
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <input type="checkbox" className="rounded" />
-                      Template sélectionné et personnalisé
-                    </li>
-                  </ul>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="text-center p-6 rounded-xl bg-muted/50 border">
+                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-4">
+                  <Target className="h-6 w-6 text-primary" />
                 </div>
-                
-                <div>
-                  <h4 className="font-semibold mb-3 flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-green-500" />
-                    Production
-                  </h4>
-                  <ul className="space-y-2 text-sm pl-4">
-                    <li className="flex items-center gap-2">
-                      <input type="checkbox" className="rounded" />
-                      Contenu généré et optimisé
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <input type="checkbox" className="rounded" />
-                      Couverture créée et finalisée
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <input type="checkbox" className="rounded" />
-                      Images intégrées et optimisées
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <input type="checkbox" className="rounded" />
-                      Relecture et corrections effectuées
-                    </li>
-                  </ul>
-                </div>
+                <h4 className="font-bold text-lg mb-2">1. Choisir</h4>
+                <p className="text-sm text-muted-foreground">
+                  Votre sujet, votre lecteur, votre objectif
+                </p>
               </div>
               
-              <div className="space-y-6">
-                <div>
-                  <h4 className="font-semibold mb-3 flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-purple-500" />
-                    Optimisation KDP
-                  </h4>
-                  <ul className="space-y-2 text-sm pl-4">
-                    <li className="flex items-center gap-2">
-                      <input type="checkbox" className="rounded" />
-                      Description accrocheuse rédigée
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <input type="checkbox" className="rounded" />
-                      Mots-clés recherchés et sélectionnés
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <input type="checkbox" className="rounded" />
-                      Catégories optimales choisies
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <input type="checkbox" className="rounded" />
-                      Prix compétitif défini
-                    </li>
-                  </ul>
+              <div className="text-center p-6 rounded-xl bg-muted/50 border">
+                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-4">
+                  <Sparkles className="h-6 w-6 text-primary" />
                 </div>
-                
-                <div>
-                  <h4 className="font-semibold mb-3 flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-orange-500" />
-                    Marketing
-                  </h4>
-                  <ul className="space-y-2 text-sm pl-4">
-                    <li className="flex items-center gap-2">
-                      <input type="checkbox" className="rounded" />
-                      Contenu social media préparé
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <input type="checkbox" className="rounded" />
-                      Campagne email configurée
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <input type="checkbox" className="rounded" />
-                      Landing page créée
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <input type="checkbox" className="rounded" />
-                      Stratégie de lancement planifiée
-                    </li>
-                  </ul>
-                </div>
+                <h4 className="font-bold text-lg mb-2">2. Générer</h4>
+                <p className="text-sm text-muted-foreground">
+                  Le système structure et rédige pour vous
+                </p>
               </div>
+              
+              <div className="text-center p-6 rounded-xl bg-muted/50 border">
+                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-4">
+                  <CheckCircle2 className="h-6 w-6 text-primary" />
+                </div>
+                <h4 className="font-bold text-lg mb-2">3. Valider</h4>
+                <p className="text-sm text-muted-foreground">
+                  Lisez le verdict et exportez votre livre
+                </p>
+              </div>
+            </div>
+            
+            <div className="mt-8 text-center p-6 bg-primary/5 rounded-xl border border-primary/20">
+              <p className="text-lg font-semibold text-primary mb-2">
+                ✨ Vous ne rédigez aucune ligne.
+              </p>
+              <p className="text-muted-foreground">
+                Vous guidez l'intention, l'éditeur numérique fait le reste.
+              </p>
             </div>
           </CardContent>
         </Card>
