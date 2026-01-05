@@ -72,6 +72,8 @@ import { EbookContentArchitect } from '@/components/ebook/EbookContentArchitect'
 import EbookExpertWriting from '@/components/ebook/EbookExpertWriting';
 import EbookNaturalRewrite from '@/components/ebook/EbookNaturalRewrite';
 import EbookEditorialPackaging from '@/components/ebook/EbookEditorialPackaging';
+import { EbookEditorialQuality } from '@/components/ebook/EbookEditorialQuality';
+import { EbookFinalDiagnosis } from '@/components/ebook/EbookFinalDiagnosis';
 import { useConfetti } from '@/hooks/useConfetti';
 
 // Hooks et données
@@ -1961,6 +1963,16 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
       case 'editorial-packaging':
         return (
           <EbookEditorialPackaging />
+        );
+      
+      case 'editorial-quality':
+        return (
+          <EbookEditorialQuality />
+        );
+      
+      case 'final-diagnosis':
+        return (
+          <EbookFinalDiagnosis />
         );
       
       case 'formation-pdf':
