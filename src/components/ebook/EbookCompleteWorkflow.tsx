@@ -6,6 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
+import { Checkbox } from '@/components/ui/checkbox';
 import { 
   Sparkles, BookOpen, CheckCircle2, Loader2, AlertCircle,
   Rocket, Target, TrendingUp, Layers, FileText, Award, User, Hash,
@@ -22,19 +23,19 @@ interface EbookCompleteWorkflowProps {
 
 const workflowSteps = [
   { id: 'P1', name: 'Directeur Éditorial', icon: Target, description: 'Vision stratégique et analyse du projet' },
-  { id: 'P2', name: 'Analyse de Marché', icon: TrendingUp, description: 'Positionnement Amazon KDP' },
-  { id: 'P3', name: 'Architecte de Contenu', icon: Layers, description: 'Structure détaillée des chapitres' },
-  { id: 'P4', name: 'Rédaction Experte', icon: FileText, description: 'Écriture professionnelle du contenu' },
-  { id: 'P5', name: 'Réécriture Naturelle', icon: Sparkles, description: 'Humanisation du texte' },
+  { id: 'P2', name: 'Analyse de Marché', icon: TrendingUp, description: 'Positionnement Amazon KDP + 7 mots-clés stratégiques' },
+  { id: 'P3', name: 'Architecte de Contenu', icon: Layers, description: 'Structure détaillée (400+ pages)' },
+  { id: 'P4', name: 'Rédaction Experte', icon: FileText, description: 'Écriture professionnelle chapitre par chapitre' },
+  { id: 'P5', name: 'Réécriture Naturelle', icon: Sparkles, description: 'Humanisation du texte (votre voix, pas un robot)' },
   { id: 'P6', name: 'Qualité Éditoriale', icon: CheckCircle2, description: 'Contrôle qualité approfondi' },
-  { id: 'P7', name: 'Packaging Éditorial', icon: BookOpen, description: 'Métadonnées et mots-clés KDP' },
+  { id: 'P7', name: 'Packaging Éditorial', icon: BookOpen, description: 'Métadonnées et mots-clés KDP optimisés' },
   { id: 'P8', name: 'Diagnostic Final', icon: Target, description: 'Vérification cohérence globale' },
-  { id: 'P9', name: 'Mémoire Éditoriale', icon: Sparkles, description: 'Capture de votre voix unique' },
+  { id: 'P9', name: 'Mémoire Éditoriale', icon: Sparkles, description: 'Capture de VOTRE voix unique d\'auteur' },
   { id: 'P10', name: 'Cohérence Chapitres', icon: Layers, description: 'Transitions fluides entre chapitres' },
   { id: 'P11', name: 'Auto-Critique', icon: AlertCircle, description: 'Détection des faiblesses (sans flatterie)' },
   { id: 'P12', name: 'Boucle Itérative', icon: Sparkles, description: 'Améliorations automatiques' },
-  { id: 'P13', name: 'Signature de Style', icon: Award, description: 'Voix d\'auteur unifiée' },
-  { id: 'P14', name: 'Verdict Ultime', icon: CheckCircle2, description: 'Validation finale par l\'éditeur' },
+  { id: 'P13', name: 'Signature de Style', icon: Award, description: 'Voix d\'auteur unifiée et reconnaissable' },
+  { id: 'P14', name: 'Verdict Ultime', icon: CheckCircle2, description: 'Validation finale par l\'éditeur professionnel' },
 ];
 
 const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplete }) => {
@@ -42,6 +43,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   const [title, setTitle] = useState('');
   const [authorName, setAuthorName] = useState('');
   const [numberOfChapters, setNumberOfChapters] = useState(8);
+  const [hasReadSteps, setHasReadSteps] = useState(false);
   
   // Workflow state
   const [isGenerating, setIsGenerating] = useState(false);
@@ -52,6 +54,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   const [allContext, setAllContext] = useState<Record<string, any>>({});
 
   const progress = currentStepIndex >= 0 ? ((currentStepIndex + 1) / 14) * 100 : 0;
+  const canGenerate = title.trim() && authorName.trim() && hasReadSteps;
 
   const toggleStep = (stepId: string) => {
     setExpandedSteps(prev => ({ ...prev, [stepId]: !prev[stepId] }));
@@ -166,8 +169,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
     }
   };
 
-  const estimatedPages = Math.round(numberOfChapters * 12);
-  const canGenerate = title.trim() && authorName.trim();
+  const estimatedPages = Math.round(numberOfChapters * 20); // 5000 mots/chapitre = ~20 pages
 
   const renderMarkdown = (content: string) => {
     // Simple markdown rendering
@@ -286,28 +288,55 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             </div>
           </div>
 
+          {/* Mandatory Checkbox */}
+          <div className="flex items-start space-x-3 p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg">
+            <Checkbox
+              id="hasReadSteps"
+              checked={hasReadSteps}
+              onCheckedChange={(checked) => setHasReadSteps(checked === true)}
+              disabled={isGenerating}
+              className="mt-0.5"
+            />
+            <div className="space-y-1">
+              <Label 
+                htmlFor="hasReadSteps" 
+                className="text-sm font-medium cursor-pointer leading-tight"
+              >
+                ✅ J'ai lu et compris les 14 étapes du workflow éditorial
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                Je comprends que le système capture MA voix d'auteur (P9) et unifie mon style (P13) pour un résultat humain et naturel, pas robotique.
+              </p>
+            </div>
+          </div>
+
           {/* Generate Button */}
           {currentStepIndex < 0 && (
             <motion.div
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="text-center"
+              whileHover={{ scale: canGenerate ? 1.02 : 1 }}
+              whileTap={{ scale: canGenerate ? 0.98 : 1 }}
+              className="text-center space-y-3"
             >
               <Button
+                type="button"
                 size="lg"
                 onClick={generateCompleteBook}
                 disabled={!canGenerate}
-                className="gap-3 px-10 py-7 text-lg font-bold bg-gradient-to-r from-primary via-amber-500 to-orange-500 hover:from-primary/90 hover:via-amber-500/90 hover:to-orange-500/90 shadow-xl shadow-primary/30 transition-all duration-300 w-full max-w-md"
+                className="gap-3 px-10 py-7 text-lg font-bold bg-gradient-to-r from-primary via-amber-500 to-orange-500 hover:from-primary/90 hover:via-amber-500/90 hover:to-orange-500/90 shadow-xl shadow-primary/30 transition-all duration-300 w-full max-w-md disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Rocket className="h-6 w-6" />
                 Lancer la génération complète
               </Button>
               
-              {!canGenerate && (
-                <p className="text-sm text-destructive mt-2">
-                  Veuillez remplir le titre et le nom d'auteur
+              {!title.trim() || !authorName.trim() ? (
+                <p className="text-sm text-destructive">
+                  ⚠️ Veuillez remplir le titre et le nom d'auteur
                 </p>
-              )}
+              ) : !hasReadSteps ? (
+                <p className="text-sm text-amber-600">
+                  ⚠️ Veuillez cocher la case ci-dessus pour confirmer que vous avez lu les 14 étapes
+                </p>
+              ) : null}
             </motion.div>
           )}
         </CardContent>
