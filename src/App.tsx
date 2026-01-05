@@ -191,13 +191,7 @@ const App = () => {
             />
             <Route 
               path="/formation" 
-              element={
-                isAdmin || isAuthenticated ? (
-                  <FormationPage />
-                ) : (
-                  <SubscriptionAuth onAuthenticated={handleAuthenticated} />
-                )
-              }
+              element={<FormationPage />}
             />
             <Route 
               path="/formation-audio" 
