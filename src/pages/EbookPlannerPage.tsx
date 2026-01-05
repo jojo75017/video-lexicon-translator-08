@@ -2284,12 +2284,11 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
 
         {/* Content */}
         <div className="container mx-auto px-6 py-8">
-          {isDemo && (
-            <DemoBanner 
-              plansGenerated={demoLimits.plansGenerated} 
-              maxPlans={demoLimits.maxPlansInDemo} 
-            />
-          )}
+          <DemoBanner 
+            plansGenerated={demoLimits.plansGenerated} 
+            maxPlans={demoLimits.maxPlansInDemo} 
+            isAuthenticated={!isDemo}
+          />
           {renderContent()}
         </div>
       </main>
