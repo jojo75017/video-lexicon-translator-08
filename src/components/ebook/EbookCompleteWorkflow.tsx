@@ -199,12 +199,13 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   const runStep = async (
     stepId: string,
     context: Record<string, any>,
-    extraBody: Record<string, any> = {}
+    extraBody: Record<string, any> = {},
+    options: { previousContextOverride?: Record<string, any> } = {}
   ): Promise<{ result: any; displayContent: string } | null> => {
     try {
       // Utiliser les personnages générés en P3 OU ceux passés en externe
       const personnagesP3 = generatedCharacters.length > 0 ? generatedCharacters : context.P3?.personnages || [];
-      const charactersForAI = personnagesP3.length > 0 
+      const charactersForAI = personnagesP3.length > 0
         ? personnagesP3.map((c: any) => ({
             name: c.name,
             description: c.description,
@@ -217,6 +218,10 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             role: c.role || 'secondary'
           }));
 
+      // IMPORTANT: pour éviter des payloads énormes (P4 chapitre par chapitre),
+      // on peut passer un contexte "slim".
+      const previousContext = options.previousContextOverride ?? context;
+
       const { data, error: fnError } = await supabase.functions.invoke('complete-book-workflow', {
         body: {
           step: stepId,
@@ -226,7 +231,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
           authorName,
           numberOfChapters,
           characters: charactersForAI,
-          previousContext: context,
+          previousContext,
           ...extraBody,
         }
       });
@@ -332,10 +337,18 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
           const existingChapters = context.P4?.chapitres || [];
           const chapitresComplets: any[] = [...existingChapters];
           const startFromChapter = existingChapters.length;
-          
+
+          // Contexte ultra-léger pour P4 afin d'éviter que la requête grossisse à chaque chapitre
+          // (sinon on renvoie à l'API tout le texte déjà généré et ça finit par casser).
+          const p4SlimContext: Record<string, any> = {
+            P1: context.P1,
+            P2: context.P2,
+            P3: context.P3,
+          };
+
           for (let chIdx = startFromChapter; chIdx < structure.length; chIdx++) {
             const chapitre = structure[chIdx];
-            const partial = await runStep('P4', context, { chapter: chapitre });
+            const partial = await runStep('P4', context, { chapter: chapitre }, { previousContextOverride: p4SlimContext });
             const chapitreGenere = partial?.result?.chapitre;
             if (chapitreGenere) chapitresComplets.push(chapitreGenere);
 
