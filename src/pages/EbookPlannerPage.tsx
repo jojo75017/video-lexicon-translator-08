@@ -119,6 +119,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
   const { fireStars } = useConfetti();
   const { limits: demoLimits, incrementPlanCount } = useDemoMode(!isDemo ? true : false);
   const [showPaywall, setShowPaywall] = useState<'chapters' | 'export' | 'cover' | 'advanced' | null>(null);
+  const [userProjectsCount, setUserProjectsCount] = useState(0);
   
   const [apiKey, setApiKey] = useState(savedData?.apiKey || '');
   const [ebookTitle, setEbookTitle] = useState(location.state?.suggestedTitle || savedData?.ebookTitle || '');
@@ -208,6 +209,20 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
       }
     };
     loadFromDatabase();
+
+    // Charger le nombre de projets de l'utilisateur
+    const loadProjectsCount = async () => {
+      if (!isDemo) {
+        const { count, error } = await supabase
+          .from('ebook_projects')
+          .select('*', { count: 'exact', head: true });
+        
+        if (!error && count !== null) {
+          setUserProjectsCount(count);
+        }
+      }
+    };
+    loadProjectsCount();
   }, []);
 
   // Fonction pour nettoyer les images base64 volumineuses du contenu avant localStorage
@@ -2289,6 +2304,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
             maxPlans={demoLimits.maxPlansInDemo} 
             isAuthenticated={!isDemo}
             userName={subscriberEmail}
+            projectsCount={userProjectsCount}
           />
           {renderContent()}
         </div>

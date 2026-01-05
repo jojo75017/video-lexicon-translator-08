@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, ArrowRight, Crown, CheckCircle2 } from 'lucide-react';
+import { Sparkles, ArrowRight, Crown, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -9,9 +9,10 @@ interface DemoBannerProps {
   maxPlans: number;
   isAuthenticated?: boolean;
   userName?: string;
+  projectsCount?: number;
 }
 
-export const DemoBanner: React.FC<DemoBannerProps> = ({ plansGenerated, maxPlans, isAuthenticated = false, userName }) => {
+export const DemoBanner: React.FC<DemoBannerProps> = ({ plansGenerated, maxPlans, isAuthenticated = false, userName, projectsCount = 0 }) => {
   const navigate = useNavigate();
   const remaining = maxPlans - plansGenerated;
 
@@ -58,10 +59,17 @@ export const DemoBanner: React.FC<DemoBannerProps> = ({ plansGenerated, maxPlans
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2 text-sm text-primary">
-            <CheckCircle2 className="w-4 h-4" />
-            <span>Merci pour votre confiance !</span>
-          </div>
+          <motion.div 
+            className="flex items-center gap-2 px-3 py-1.5 bg-primary/10 rounded-full"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            <BookOpen className="w-4 h-4 text-primary" />
+            <span className="text-sm font-medium text-primary">
+              {projectsCount} projet{projectsCount !== 1 ? 's' : ''} créé{projectsCount !== 1 ? 's' : ''}
+            </span>
+          </motion.div>
         </div>
       </motion.div>
     );
