@@ -140,34 +140,43 @@ Donne ton analyse marché en JSON :
       }
 
       case 'P3': {
-        // ARCHITECTE DE CONTENU
+        // ARCHITECTE DE CONTENU - Structure pour 400+ pages
+        const wordsPerChapter = Math.ceil(100000 / numberOfChapters);
         const content = await callAI(
-          `Tu es un ARCHITECTE DE CONTENU expert. Tu structures les livres pour maximiser l'impact et la rétention du lecteur. Tu penses progression pédagogique, storytelling, points de bascule.`,
-          `Structure ce livre en ${numberOfChapters} chapitres :
+          `Tu es un ARCHITECTE DE CONTENU expert. Tu structures les livres LONGS (400+ pages) pour maximiser l'impact et la rétention du lecteur. Tu penses progression pédagogique, storytelling, points de bascule. Chaque chapitre doit avoir 6-10 sous-sections pour atteindre ${wordsPerChapter} mots.`,
+          `Structure ce livre LONG (400+ pages) en ${numberOfChapters} chapitres :
 TITRE : "${title}"
 VISION : ${JSON.stringify(previousContext.P1 || {})}
 MARCHÉ : ${JSON.stringify(previousContext.P2 || {})}
 
+OBJECTIF : 100 000+ mots total (400+ pages)
+Chaque chapitre doit avoir ~${wordsPerChapter} mots avec 6-10 sous-sections détaillées.
+
 Crée la structure en JSON :
 {
   "structureGlobale": "description de l'arc narratif/pédagogique du livre",
+  "nombrePagesEstime": 400,
   "chapitres": [
     {
       "numero": 1,
       "titre": "Titre accrocheur du chapitre",
       "objectif": "Ce que le lecteur maîtrisera après ce chapitre",
-      "pointsCles": ["point1", "point2", "point3"],
+      "nombreMotsPrevu": ${wordsPerChapter},
+      "sousSections": ["sous-section 1", "sous-section 2", "sous-section 3", "sous-section 4", "sous-section 5", "sous-section 6"],
+      "pointsCles": ["point1", "point2", "point3", "point4", "point5"],
+      "exercicesPratiques": ["exercice1", "exercice2"],
       "accroche": "Phrase d'ouverture captivante"
     }
   ],
   "progressionLogique": "explication de pourquoi cet ordre"
 }`,
-          6000
+          10000
         );
         result = parseJSON(content) || { raw: content };
         if (result.chapitres) {
-          displayContent = `**Structure globale :** ${result.structureGlobale}\n\n**${result.chapitres.length} chapitres structurés :**\n\n` +
-            result.chapitres.map((ch: any) => `**Ch.${ch.numero} - ${ch.titre}**\n_Objectif :_ ${ch.objectif}`).join('\n\n');
+          const totalMotsPrevu = result.chapitres.reduce((acc: number, ch: any) => acc + (ch.nombreMotsPrevu || wordsPerChapter), 0);
+          displayContent = `**Structure globale :** ${result.structureGlobale}\n\n**📖 ${result.nombrePagesEstime || 400}+ pages prévues (~${totalMotsPrevu} mots)**\n\n**${result.chapitres.length} chapitres structurés :**\n\n` +
+            result.chapitres.map((ch: any) => `**Ch.${ch.numero} - ${ch.titre}** (~${ch.nombreMotsPrevu || wordsPerChapter} mots, ${(ch.sousSections || []).length} sous-sections)\n_Objectif :_ ${ch.objectif}`).join('\n\n');
         } else {
           displayContent = content;
         }
@@ -175,21 +184,32 @@ Crée la structure en JSON :
       }
 
       case 'P4': {
-        // RÉDACTION EXPERTE - Génère tous les chapitres
+        // RÉDACTION EXPERTE - Génère tous les chapitres TRÈS LONGS (400+ pages = 100K+ mots)
         const structure = previousContext.P3?.chapitres || [];
+        const wordsPerChapter = Math.ceil(100000 / numberOfChapters); // ~100K mots total pour 400+ pages
         const content = await callAI(
-          `Tu es un AUTEUR PROFESSIONNEL avec une plume fluide et engageante. Tu écris des contenus qui captivent, informent et transforment le lecteur. PAS DE STYLE ROBOT. Écris comme un vrai auteur humain passionné.`,
-          `Rédige les ${numberOfChapters} chapitres complets de ce livre :
+          `Tu es un AUTEUR PROFESSIONNEL PROLIFIQUE avec une plume fluide et engageante. Tu écris des contenus LONGS et DÉTAILLÉS qui captivent, informent et transforment le lecteur. PAS DE STYLE ROBOT. Écris comme un vrai auteur humain passionné. CHAQUE CHAPITRE DOIT FAIRE MINIMUM ${wordsPerChapter} MOTS.`,
+          `Rédige les ${numberOfChapters} chapitres TRÈS COMPLETS de ce livre pour atteindre 400+ PAGES :
 TITRE : "${title}"
 AUTEUR : ${authorName}
 STRUCTURE : ${JSON.stringify(structure)}
 VISION : ${JSON.stringify(previousContext.P1 || {})}
 
-Pour CHAQUE chapitre, écris minimum 600 mots de contenu RÉEL avec :
-- Une accroche qui donne envie de lire
-- Du contenu substantiel avec exemples concrets
-- Des conseils actionnables
+OBJECTIF CRITIQUE : Le livre DOIT faire plus de 400 pages (environ 100 000 mots total).
+Chaque chapitre doit donc contenir environ ${wordsPerChapter} mots.
+
+Pour CHAQUE chapitre, écris un contenu TRÈS DÉTAILLÉ avec :
+- Une accroche puissante qui donne envie de lire (200+ mots)
+- 5-8 sous-sections avec titres
+- Des explications approfondies avec exemples concrets détaillés
+- Des études de cas, anecdotes, histoires vraies
+- Des conseils actionnables étape par étape
+- Des exercices pratiques ou questions de réflexion
+- Des citations inspirantes
+- Une conclusion de chapitre avec récapitulatif
 - Une transition vers le chapitre suivant
+
+SOIS GÉNÉREUX EN CONTENU. Plus c'est long et détaillé, mieux c'est.
 
 Format JSON :
 {
@@ -197,20 +217,23 @@ Format JSON :
     {
       "numero": 1,
       "titre": "Titre",
-      "contenu": "CONTENU COMPLET DU CHAPITRE (600+ mots)"
+      "contenu": "CONTENU TRÈS COMPLET DU CHAPITRE (${wordsPerChapter}+ mots)"
     }
   ],
-  "nombreMots": "total approximatif"
+  "nombreMots": "total approximatif",
+  "nombrePages": "estimation pages"
 }`,
-          30000
+          60000
         );
         result = parseJSON(content) || { raw: content };
         if (result.chapitres) {
           const totalWords = result.chapitres.reduce((acc: number, ch: any) => acc + (ch.contenu?.split(' ').length || 0), 0);
-          displayContent = `**${result.chapitres.length} chapitres rédigés** (~${totalWords} mots)\n\n` +
-            result.chapitres.slice(0, 3).map((ch: any) => 
-              `**${ch.titre}**\n${(ch.contenu || '').substring(0, 300)}...`
-            ).join('\n\n') +
+          const estimatedPages = Math.ceil(totalWords / 250); // ~250 mots par page
+          displayContent = `**${result.chapitres.length} chapitres rédigés** (~${totalWords} mots / ~${estimatedPages} pages)\n\n` +
+            result.chapitres.slice(0, 3).map((ch: any) => {
+              const chWords = (ch.contenu || '').split(' ').length;
+              return `**${ch.titre}** (${chWords} mots)\n${(ch.contenu || '').substring(0, 400)}...`;
+            }).join('\n\n') +
             (result.chapitres.length > 3 ? `\n\n_...et ${result.chapitres.length - 3} autres chapitres_` : '');
         } else {
           displayContent = 'Chapitres en cours de rédaction...';
