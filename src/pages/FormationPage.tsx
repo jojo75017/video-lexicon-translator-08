@@ -671,6 +671,32 @@ ${module.content}
                 </motion.div>
               </div>
             </div>
+
+            {/* Bouton Commencer maintenant */}
+            <motion.div 
+              className="mt-10 text-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 2, duration: 0.5 }}
+            >
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Button 
+                  size="lg" 
+                  onClick={() => navigate('/ebook-planner')}
+                  className="gap-3 px-8 py-6 text-lg font-semibold bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300"
+                >
+                  <Rocket className="h-5 w-5" />
+                  Commencer maintenant
+                  <ChevronRight className="h-5 w-5" />
+                </Button>
+              </motion.div>
+              <p className="mt-3 text-sm text-muted-foreground">
+                Créez votre premier livre en quelques clics
+              </p>
+            </motion.div>
           </div>
           
           {/* Statistiques de progression */}
