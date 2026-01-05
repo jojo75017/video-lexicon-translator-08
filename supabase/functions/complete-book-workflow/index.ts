@@ -184,60 +184,78 @@ Crée la structure en JSON :
       }
 
       case 'P4': {
-        // RÉDACTION EXPERTE - Génère tous les chapitres TRÈS LONGS (400+ pages = 100K+ mots)
+        // RÉDACTION EXPERTE - Génère CHAQUE chapitre SÉPARÉMENT pour 400+ pages
         const structure = previousContext.P3?.chapitres || [];
-        const wordsPerChapter = Math.ceil(100000 / numberOfChapters); // ~100K mots total pour 400+ pages
-        const content = await callAI(
-          `Tu es un AUTEUR PROFESSIONNEL PROLIFIQUE avec une plume fluide et engageante. Tu écris des contenus LONGS et DÉTAILLÉS qui captivent, informent et transforment le lecteur. PAS DE STYLE ROBOT. Écris comme un vrai auteur humain passionné. CHAQUE CHAPITRE DOIT FAIRE MINIMUM ${wordsPerChapter} MOTS.`,
-          `Rédige les ${numberOfChapters} chapitres TRÈS COMPLETS de ce livre pour atteindre 400+ PAGES :
-TITRE : "${title}"
+        const wordsPerChapter = 5000; // 5000 mots par chapitre = 20 pages par chapitre
+        const allChapters: any[] = [];
+        
+        // Générer chaque chapitre un par un
+        for (let i = 0; i < structure.length; i++) {
+          const chapterInfo = structure[i];
+          console.log(`Generating chapter ${i + 1}/${structure.length}: ${chapterInfo.titre}`);
+          
+          const chapterContent = await callAI(
+            `Tu es un AUTEUR PROFESSIONNEL PROLIFIQUE. Tu écris des chapitres TRÈS LONGS et DÉTAILLÉS (${wordsPerChapter} mots minimum). PAS DE STYLE ROBOT. Écris comme un vrai auteur humain passionné.`,
+            `Rédige LE CHAPITRE ${chapterInfo.numero} de ce livre (MINIMUM ${wordsPerChapter} MOTS) :
+
+TITRE DU LIVRE : "${title}"
 AUTEUR : ${authorName}
-STRUCTURE : ${JSON.stringify(structure)}
 VISION : ${JSON.stringify(previousContext.P1 || {})}
 
-OBJECTIF CRITIQUE : Le livre DOIT faire plus de 400 pages (environ 100 000 mots total).
-Chaque chapitre doit donc contenir environ ${wordsPerChapter} mots.
+CHAPITRE À RÉDIGER :
+- Numéro : ${chapterInfo.numero}
+- Titre : ${chapterInfo.titre}
+- Objectif : ${chapterInfo.objectif}
+- Sous-sections prévues : ${JSON.stringify(chapterInfo.sousSections || chapterInfo.pointsCles)}
+- Accroche : ${chapterInfo.accroche}
 
-Pour CHAQUE chapitre, écris un contenu TRÈS DÉTAILLÉ avec :
-- Une accroche puissante qui donne envie de lire (200+ mots)
-- 5-8 sous-sections avec titres
-- Des explications approfondies avec exemples concrets détaillés
-- Des études de cas, anecdotes, histoires vraies
-- Des conseils actionnables étape par étape
-- Des exercices pratiques ou questions de réflexion
-- Des citations inspirantes
-- Une conclusion de chapitre avec récapitulatif
-- Une transition vers le chapitre suivant
+OBJECTIF CRITIQUE : Ce chapitre DOIT faire MINIMUM ${wordsPerChapter} MOTS (environ 20 pages).
 
-SOIS GÉNÉREUX EN CONTENU. Plus c'est long et détaillé, mieux c'est.
+Structure obligatoire du chapitre :
+1. ACCROCHE PUISSANTE (300+ mots) - Histoire, anecdote ou question percutante
+2. INTRODUCTION DU CHAPITRE (400+ mots) - Contexte et promesse
+3. SECTION 1 (800+ mots) - Premier concept clé avec exemples détaillés
+4. SECTION 2 (800+ mots) - Deuxième concept avec études de cas
+5. SECTION 3 (800+ mots) - Troisième concept avec histoires vraies
+6. SECTION 4 (600+ mots) - Applications pratiques et exercices
+7. SECTION 5 (600+ mots) - Conseils avancés et astuces
+8. RÉCAPITULATIF (400+ mots) - Points clés à retenir
+9. TRANSITION (300+ mots) - Lien vers le chapitre suivant
+
+SOIS EXTRÊMEMENT GÉNÉREUX EN CONTENU. Développe chaque idée en profondeur avec des exemples concrets, des anecdotes, des métaphores. Le lecteur doit sentir qu'il en a pour son argent.
 
 Format JSON :
 {
-  "chapitres": [
-    {
-      "numero": 1,
-      "titre": "Titre",
-      "contenu": "CONTENU TRÈS COMPLET DU CHAPITRE (${wordsPerChapter}+ mots)"
-    }
-  ],
-  "nombreMots": "total approximatif",
-  "nombrePages": "estimation pages"
+  "numero": ${chapterInfo.numero},
+  "titre": "${chapterInfo.titre}",
+  "contenu": "CONTENU COMPLET DU CHAPITRE (${wordsPerChapter}+ mots)",
+  "nombreMots": "nombre de mots"
 }`,
-          60000
-        );
-        result = parseJSON(content) || { raw: content };
-        if (result.chapitres) {
-          const totalWords = result.chapitres.reduce((acc: number, ch: any) => acc + (ch.contenu?.split(' ').length || 0), 0);
-          const estimatedPages = Math.ceil(totalWords / 250); // ~250 mots par page
-          displayContent = `**${result.chapitres.length} chapitres rédigés** (~${totalWords} mots / ~${estimatedPages} pages)\n\n` +
-            result.chapitres.slice(0, 3).map((ch: any) => {
-              const chWords = (ch.contenu || '').split(' ').length;
-              return `**${ch.titre}** (${chWords} mots)\n${(ch.contenu || '').substring(0, 400)}...`;
-            }).join('\n\n') +
-            (result.chapitres.length > 3 ? `\n\n_...et ${result.chapitres.length - 3} autres chapitres_` : '');
-        } else {
-          displayContent = 'Chapitres en cours de rédaction...';
+            16000
+          );
+          
+          const parsedChapter = parseJSON(chapterContent);
+          if (parsedChapter) {
+            allChapters.push(parsedChapter);
+          } else {
+            allChapters.push({
+              numero: chapterInfo.numero,
+              titre: chapterInfo.titre,
+              contenu: chapterContent,
+              nombreMots: chapterContent.split(' ').length
+            });
+          }
         }
+        
+        result = { chapitres: allChapters };
+        const totalWords = allChapters.reduce((acc: number, ch: any) => acc + (ch.contenu?.split(' ').length || 0), 0);
+        const estimatedPages = Math.ceil(totalWords / 250);
+        displayContent = `**${allChapters.length} chapitres rédigés** (~${totalWords} mots / ~${estimatedPages} pages)\n\n` +
+          allChapters.slice(0, 3).map((ch: any) => {
+            const chWords = (ch.contenu || '').split(' ').length;
+            return `**${ch.titre}** (${chWords} mots)\n${(ch.contenu || '').substring(0, 400)}...`;
+          }).join('\n\n') +
+          (allChapters.length > 3 ? `\n\n_...et ${allChapters.length - 3} autres chapitres_` : '');
         break;
       }
 
