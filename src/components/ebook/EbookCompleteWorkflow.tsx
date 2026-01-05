@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { 
   Sparkles, BookOpen, CheckCircle2, Loader2, AlertCircle,
   Rocket, Target, TrendingUp, Layers, FileText, Award, User, Hash,
-  ChevronDown, ChevronUp, Tag, AlignLeft
+  ChevronDown, ChevronUp, Tag, AlignLeft, RotateCcw
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -21,6 +21,20 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 
 interface EbookCompleteWorkflowProps {
   onComplete: (bookData: any) => void;
+}
+
+const STORAGE_KEY = 'ebook_workflow_progress';
+
+interface WorkflowProgress {
+  title: string;
+  subtitle: string;
+  category: string;
+  authorName: string;
+  numberOfChapters: number;
+  currentStepIndex: number;
+  stepResults: Record<string, { result: any; displayContent: string }>;
+  allContext: Record<string, any>;
+  savedAt: string;
 }
 
 const workflowSteps = [
@@ -59,9 +73,99 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   const [error, setError] = useState<string | null>(null);
   const [failedStepIndex, setFailedStepIndex] = useState<number | null>(null);
   const [allContext, setAllContext] = useState<Record<string, any>>({});
+  const [hasSavedProgress, setHasSavedProgress] = useState(false);
 
   const progress = currentStepIndex >= 0 ? ((currentStepIndex + 1) / 14) * 100 : 0;
   const canGenerate = title.trim() && authorName.trim() && category && hasReadSteps;
+
+  // Load saved progress on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const data: WorkflowProgress = JSON.parse(saved);
+        // Only restore if there's actual progress
+        if (data.currentStepIndex >= 0 && Object.keys(data.stepResults).length > 0) {
+          setHasSavedProgress(true);
+        }
+      }
+    } catch (e) {
+      console.error('Error loading saved progress:', e);
+    }
+  }, []);
+
+  // Save progress after each step
+  const saveProgress = useCallback(() => {
+    if (currentStepIndex < 0 || Object.keys(stepResults).length === 0) return;
+    
+    const progress: WorkflowProgress = {
+      title,
+      subtitle,
+      category,
+      authorName,
+      numberOfChapters,
+      currentStepIndex,
+      stepResults,
+      allContext,
+      savedAt: new Date().toISOString()
+    };
+    
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+      console.log(`📦 Progress saved at step ${currentStepIndex + 1}`);
+    } catch (e) {
+      console.error('Error saving progress:', e);
+    }
+  }, [title, subtitle, category, authorName, numberOfChapters, currentStepIndex, stepResults, allContext]);
+
+  // Auto-save whenever stepResults changes
+  useEffect(() => {
+    if (Object.keys(stepResults).length > 0) {
+      saveProgress();
+    }
+  }, [stepResults, saveProgress]);
+
+  // Clear saved progress
+  const clearSavedProgress = () => {
+    localStorage.removeItem(STORAGE_KEY);
+    setHasSavedProgress(false);
+    toast.success('Sauvegarde supprimée');
+  };
+
+  // Restore saved progress
+  const restoreSavedProgress = () => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const data: WorkflowProgress = JSON.parse(saved);
+        setTitle(data.title);
+        setSubtitle(data.subtitle);
+        setCategory(data.category);
+        setAuthorName(data.authorName);
+        setNumberOfChapters(data.numberOfChapters);
+        setCurrentStepIndex(data.currentStepIndex);
+        setStepResults(data.stepResults);
+        setAllContext(data.allContext);
+        setHasReadSteps(true);
+        setHasSavedProgress(false);
+        
+        // Expand all completed steps
+        const expanded: Record<string, boolean> = {};
+        Object.keys(data.stepResults).forEach(stepId => {
+          expanded[stepId] = false;
+        });
+        // Expand the last completed step
+        const lastStepId = workflowSteps[data.currentStepIndex]?.id;
+        if (lastStepId) expanded[lastStepId] = true;
+        setExpandedSteps(expanded);
+        
+        toast.success(`✅ Progression restaurée (${Object.keys(data.stepResults).length} étapes)`);
+      }
+    } catch (e) {
+      console.error('Error restoring progress:', e);
+      toast.error('Erreur lors de la restauration');
+    }
+  };
 
   const toggleStep = (stepId: string) => {
     setExpandedSteps(prev => ({ ...prev, [stepId]: !prev[stepId] }));
@@ -226,6 +330,10 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
         qualityScores: context.P6 || {}
       };
 
+      // Clear saved progress on success
+      localStorage.removeItem(STORAGE_KEY);
+      setHasSavedProgress(false);
+
       toast.success('✅ Livre généré ! Le contenu a été importé dans l\'onglet "Rédaction".');
       onComplete(bookData);
 
@@ -233,6 +341,8 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
       console.error('Workflow error:', err);
       setFailedStepIndex(currentStepIndex);
       setError(err.message || 'Erreur lors de la génération');
+      // Save progress on error so user can resume
+      saveProgress();
       toast.error(`Erreur à l'étape ${workflowSteps[currentStepIndex]?.id}: ${err.message}`);
     } finally {
       setIsGenerating(false);
@@ -444,6 +554,46 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
               </p>
             </div>
           </div>
+
+          {/* Saved Progress Banner */}
+          {hasSavedProgress && currentStepIndex < 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg"
+            >
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <RotateCcw className="h-5 w-5 text-amber-600" />
+                  <div>
+                    <p className="font-medium text-amber-700 dark:text-amber-400">
+                      Une session précédente a été sauvegardée
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Vous pouvez reprendre là où vous vous étiez arrêté
+                    </p>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    onClick={restoreSavedProgress}
+                    className="gap-2 bg-gradient-to-r from-amber-500 to-orange-500"
+                  >
+                    <RotateCcw className="h-4 w-4" />
+                    Restaurer
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={clearSavedProgress}
+                  >
+                    Ignorer
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          )}
 
           {/* Generate Button */}
           {currentStepIndex < 0 && (
