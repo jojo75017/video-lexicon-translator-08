@@ -2288,6 +2288,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
             plansGenerated={demoLimits.plansGenerated} 
             maxPlans={demoLimits.maxPlansInDemo} 
             isAuthenticated={!isDemo}
+            userName={subscriberEmail}
           />
           {renderContent()}
         </div>
