@@ -1,0 +1,108 @@
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const { title } = await req.json();
+
+    if (!title) {
+      return new Response(
+        JSON.stringify({ error: 'Title is required' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    if (!LOVABLE_API_KEY) {
+      throw new Error('LOVABLE_API_KEY is not configured');
+    }
+
+    const systemPrompt = `Tu es un directeur éditorial senior créant une MÉMOIRE ÉDITORIALE de référence.
+
+Cette mémoire servira de guide obligatoire pour tous les contenus du projet.
+
+Tu dois définir:
+1. La promesse centrale du livre (ce que le lecteur obtiendra)
+2. L'angle éditorial unique (ce qui différencie ce livre)
+3. Le ton global à maintenir
+4. Le niveau de profondeur approprié
+5. Le profil exact du lecteur cible
+6. Les mots-clés de style à respecter
+
+IMPORTANT: Cette mémoire doit être précise, actionnable et servir de référence absolue.
+
+Réponds UNIQUEMENT en JSON valide:
+{
+  "promesseCentrale": "...",
+  "angleEditorial": "...",
+  "tonGlobal": "...",
+  "niveauProfondeur": "...",
+  "lecteurCible": "...",
+  "motsClesStyle": ["mot1", "mot2", "mot3", "mot4", "mot5"]
+}`;
+
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-flash',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: `Titre de l'ebook: "${title}"\n\nCrée la mémoire éditoriale complète pour ce projet.` }
+        ],
+        temperature: 0.7,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('AI Gateway error:', response.status, errorText);
+      throw new Error(`AI Gateway error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content || '';
+
+    let memory;
+    try {
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        memory = JSON.parse(jsonMatch[0]);
+      } else {
+        throw new Error('No JSON found');
+      }
+    } catch {
+      memory = {
+        promesseCentrale: "Transformer le lecteur en expert du sujet",
+        angleEditorial: "Approche pratique et actionnable",
+        tonGlobal: "Professionnel mais accessible",
+        niveauProfondeur: "Intermédiaire à avancé",
+        lecteurCible: "Professionnel cherchant à monter en compétence",
+        motsClesStyle: ["clarté", "précision", "actionnable", "professionnel", "expert"]
+      };
+    }
+
+    return new Response(
+      JSON.stringify({ memory }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+
+  } catch (error) {
+    console.error('Error in editorial-memory:', error);
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+});

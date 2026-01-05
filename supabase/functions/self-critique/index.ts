@@ -1,0 +1,116 @@
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const { title, content } = await req.json();
+
+    if (!title) {
+      return new Response(
+        JSON.stringify({ error: 'Title is required' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    if (!LOVABLE_API_KEY) {
+      throw new Error('LOVABLE_API_KEY is not configured');
+    }
+
+    const systemPrompt = `Tu es un ÉDITEUR CRITIQUE INDÉPENDANT pratiquant l'auto-critique éditoriale.
+
+L'IA ne se contente plus d'écrire — elle se corrige elle-même.
+
+Challenge ce contenu avec rigueur:
+1. Points faibles (avec niveau de gravité: haute/moyenne/basse)
+2. Sections manquant de profondeur
+3. Éléments pouvant être simplifiés
+4. Éléments pouvant être renforcés
+
+Sois exigeant mais constructif.
+
+Réponds UNIQUEMENT en JSON valide:
+{
+  "pointsFaibles": [
+    {"element": "nom", "raison": "explication", "gravite": "haute|moyenne|basse"}
+  ],
+  "manqueProfondeur": [
+    {"section": "nom", "suggestion": "comment approfondir"}
+  ],
+  "simplifications": [
+    {"original": "formulation actuelle", "simplifie": "version simplifiée"}
+  ],
+  "renforcements": [
+    {"element": "nom", "amelioration": "comment renforcer"}
+  ],
+  "verdictGlobal": "synthèse critique globale"
+}`;
+
+    const userContent = content 
+      ? `Titre: "${title}"\n\nContenu à critiquer:\n${content}`
+      : `Titre: "${title}"\n\nFais une critique anticipée des risques éditoriaux pour ce sujet.`;
+
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-flash',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userContent }
+        ],
+        temperature: 0.7,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('AI Gateway error:', response.status, errorText);
+      throw new Error(`AI Gateway error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const responseContent = data.choices?.[0]?.message?.content || '';
+
+    let critique;
+    try {
+      const jsonMatch = responseContent.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        critique = JSON.parse(jsonMatch[0]);
+      } else {
+        throw new Error('No JSON found');
+      }
+    } catch {
+      critique = {
+        pointsFaibles: [],
+        manqueProfondeur: [],
+        simplifications: [],
+        renforcements: [],
+        verdictGlobal: "Analyse critique non disponible. Veuillez fournir du contenu à analyser."
+      };
+    }
+
+    return new Response(
+      JSON.stringify({ critique }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+
+  } catch (error) {
+    console.error('Error in self-critique:', error);
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+});
