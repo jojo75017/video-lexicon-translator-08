@@ -17,6 +17,7 @@ interface CibleIdealeObject {
 
 interface TitleSuggestion {
   titre: string;
+  sousTitre?: string;
   scoreKdp: number;
   raison: string;
 }
@@ -303,6 +304,8 @@ export const EbookEditorialDirector = ({ onAnalysisComplete }: EbookEditorialDir
                   {analysis.suggestionsTitle.map((item, index) => {
                     const isString = typeof item === 'string';
                     const title = isString ? item : item.titre;
+                    const sousTitre = isString ? null : item.sousTitre;
+                    const fullTitle = sousTitre ? `${title} : ${sousTitre}` : title;
                     const score = isString ? null : item.scoreKdp;
                     const raison = isString ? null : item.raison;
                     const isBest = analysis.meilleurTitre?.index === index;
@@ -316,18 +319,25 @@ export const EbookEditorialDirector = ({ onAnalysisComplete }: EbookEditorialDir
                             : 'bg-background/50 border-yellow-500/20 hover:border-yellow-500/40'
                         }`}
                       >
-                        <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-start justify-between gap-2">
                           <div className="flex-1 space-y-1">
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-start gap-2">
                               {isBest && (
-                                <Trophy className="h-4 w-4 text-green-500 shrink-0" />
+                                <Trophy className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
                               )}
-                              <span className={`text-sm font-medium ${isBest ? 'text-green-700 dark:text-green-400' : ''}`}>
-                                {title}
-                              </span>
+                              <div className="space-y-0.5">
+                                <span className={`text-sm font-bold ${isBest ? 'text-green-700 dark:text-green-400' : ''}`}>
+                                  {title}
+                                </span>
+                                {sousTitre && (
+                                  <p className="text-xs text-muted-foreground">
+                                    : {sousTitre}
+                                  </p>
+                                )}
+                              </div>
                             </div>
                             {raison && (
-                              <p className="text-xs text-muted-foreground pl-6">{raison}</p>
+                              <p className="text-xs text-muted-foreground pl-6 italic">{raison}</p>
                             )}
                           </div>
                           <div className="flex items-center gap-2">
@@ -342,8 +352,9 @@ export const EbookEditorialDirector = ({ onAnalysisComplete }: EbookEditorialDir
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => copyTitle(title, index)}
+                              onClick={() => copyTitle(fullTitle, index)}
                               className="h-8 w-8 p-0"
+                              title="Copier titre complet"
                             >
                               {copiedIndex === index ? (
                                 <Check className="h-4 w-4 text-green-500" />
@@ -354,7 +365,7 @@ export const EbookEditorialDirector = ({ onAnalysisComplete }: EbookEditorialDir
                             <Button
                               variant={isBest ? "default" : "outline"}
                               size="sm"
-                              onClick={() => useTitle(title)}
+                              onClick={() => useTitle(fullTitle)}
                               className="h-8 text-xs"
                             >
                               {isBest ? "🏆 Utiliser" : "Utiliser"}
