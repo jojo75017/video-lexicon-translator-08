@@ -65,12 +65,222 @@ export const EbookKdpResearch: React.FC = () => {
   const [activeTab, setActiveTab] = useState('bestsellers');
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isFullAnalysis, setIsFullAnalysis] = useState(false);
+  const [analysisProgress, setAnalysisProgress] = useState<{[key: string]: 'pending' | 'loading' | 'done' | 'error'}>({});
   
   // States for different research types
   const [bestSellers, setBestSellers] = useState<BestSeller[]>([]);
   const [titleSuggestions, setTitleSuggestions] = useState<TitleSuggestion[]>([]);
   const [categories, setCategories] = useState<CategoryInfo[]>([]);
   const [nicheAnalysis, setNicheAnalysis] = useState<NicheAnalysis | null>(null);
+
+  // Fonction pour lancer l'analyse complète (4 recherches en parallèle)
+  const handleFullAnalysis = async () => {
+    if (!searchQuery.trim()) {
+      toast.error('Entrez une catégorie ou niche à analyser');
+      return;
+    }
+
+    setIsFullAnalysis(true);
+    setAnalysisProgress({
+      bestsellers: 'loading',
+      titles: 'loading', 
+      categories: 'loading',
+      niche: 'loading'
+    });
+
+    const types = ['bestsellers', 'titles', 'categories', 'niche'];
+    
+    // Lancer les 4 recherches en parallèle
+    const promises = types.map(async (type) => {
+      try {
+        await handleSearchSingle(type);
+        setAnalysisProgress(prev => ({ ...prev, [type]: 'done' }));
+        return { type, success: true };
+      } catch (error) {
+        setAnalysisProgress(prev => ({ ...prev, [type]: 'error' }));
+        return { type, success: false };
+      }
+    });
+
+    await Promise.allSettled(promises);
+    
+    setIsFullAnalysis(false);
+    toast.success('🎯 Analyse complète terminée !');
+  };
+
+  // Version modifiée de handleSearch pour une seule recherche (sans toast)
+  const handleSearchSingle = async (type: string) => {
+    let prompt = '';
+    
+    switch (type) {
+      case 'bestsellers':
+        prompt = `Analyse les best-sellers Amazon KDP pour la niche "${searchQuery}".
+
+Génère une liste de 8 best-sellers fictifs mais réalistes en JSON:
+{
+  "bestSellers": [
+    {
+      "rank": 1,
+      "title": "Titre du livre best-seller",
+      "author": "Nom de l'auteur",
+      "price": 12.99,
+      "reviews": 1500,
+      "rating": 4.5,
+      "category": "Catégorie principale",
+      "estimatedSales": 500,
+      "estimatedRevenue": 3500,
+      "keywords": ["mot-clé 1", "mot-clé 2", "mot-clé 3"],
+      "strengths": ["Point fort 1", "Point fort 2"]
+    }
+  ]
+}
+
+Crée des livres variés avec des prix entre 4.99€ et 19.99€, des rangs entre 1 et 10000, des ventes estimées réalistes.`;
+        break;
+
+      case 'titles':
+        prompt = `Génère des titres et sous-titres optimisés SEO Amazon KDP pour la niche "${searchQuery}".
+
+Crée 8 suggestions de titres en JSON:
+{
+  "titleSuggestions": [
+    {
+      "title": "Titre accrocheur et SEO",
+      "subtitle": "Sous-titre descriptif avec mots-clés",
+      "score": 92,
+      "keywords": ["mot-clé principal", "mot-clé secondaire", "mot-clé LSI"],
+      "hook": "Promesse ou accroche principale du livre",
+      "targetAudience": "Description du public cible"
+    }
+  ]
+}
+
+Les titres doivent être optimisés pour Amazon avec:
+- Mots-clés principaux en début de titre
+- Sous-titres qui complètent le SEO
+- Score de 70 à 98 basé sur l'optimisation
+- Hooks variés (promesse, curiosité, bénéfice, urgence)`;
+        break;
+
+      case 'categories':
+        prompt = `Trouve les meilleures catégories Amazon KDP "cachées" pour la niche "${searchQuery}".
+
+Génère 10 catégories en JSON:
+{
+  "categories": [
+    {
+      "name": "Nom de la catégorie",
+      "path": "Kindle eBooks > Catégorie Parent > Sous-catégorie > Niche",
+      "competition": "low",
+      "avgBsr": 15000,
+      "topKeywords": ["mot-clé 1", "mot-clé 2", "mot-clé 3"],
+      "opportunity": 85,
+      "monthlySearches": 12000
+    }
+  ]
+}
+
+Inclus des catégories:
+- Évidentes mais stratégiques
+- Niches "cachées" moins concurrentielles
+- Croisées (2 thèmes combinés)
+La compétition peut être "low", "medium" ou "high".`;
+        break;
+
+      case 'niche':
+        prompt = `Effectue une analyse de niche complète pour "${searchQuery}" sur Amazon KDP.
+
+Génère une analyse exhaustive en JSON:
+{
+  "niche": "${searchQuery}",
+  "score": 78,
+  "demand": 82,
+  "competition": 55,
+  "profitability": 75,
+  "trend": "rising",
+  "topBooks": [
+    {
+      "rank": 1,
+      "title": "Titre best-seller",
+      "author": "Auteur",
+      "price": 14.99,
+      "reviews": 2000,
+      "rating": 4.6,
+      "category": "Catégorie",
+      "estimatedSales": 800,
+      "estimatedRevenue": 6000,
+      "keywords": ["mot1", "mot2"],
+      "strengths": ["force1", "force2"]
+    }
+  ],
+  "suggestedTitles": [
+    {
+      "title": "Titre suggéré",
+      "subtitle": "Sous-titre optimisé",
+      "score": 88,
+      "keywords": ["kw1", "kw2"],
+      "hook": "Accroche",
+      "targetAudience": "Audience cible"
+    }
+  ],
+  "bestCategories": [
+    {
+      "name": "Catégorie",
+      "path": "Chemin complet",
+      "competition": "low",
+      "avgBsr": 20000,
+      "topKeywords": ["kw1", "kw2"],
+      "opportunity": 90,
+      "monthlySearches": 8000
+    }
+  ],
+  "contentGaps": [
+    "Lacune de contenu 1 à exploiter",
+    "Lacune de contenu 2 à exploiter",
+    "Lacune de contenu 3 à exploiter"
+  ],
+  "recommendations": [
+    "Recommandation stratégique 1",
+    "Recommandation stratégique 2",
+    "Recommandation stratégique 3",
+    "Recommandation stratégique 4"
+  ]
+}
+
+Génère 5 top books, 5 titres suggérés, 5 catégories, 4 lacunes et 5 recommandations.`;
+        break;
+    }
+
+    const { data, error } = await supabase.functions.invoke('generate-content', {
+      body: {
+        type: 'kdp-research',
+        prompt
+      }
+    });
+
+    if (error) {
+      throw error;
+    }
+
+    const cleanContent = data.content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const parsedData = JSON.parse(cleanContent);
+
+    switch (type) {
+      case 'bestsellers':
+        setBestSellers(parsedData.bestSellers || []);
+        break;
+      case 'titles':
+        setTitleSuggestions(parsedData.titleSuggestions || []);
+        break;
+      case 'categories':
+        setCategories(parsedData.categories || []);
+        break;
+      case 'niche':
+        setNicheAnalysis(parsedData);
+        break;
+    }
+  };
 
   const handleSearch = async (type: string) => {
     if (!searchQuery.trim()) {
@@ -354,7 +564,7 @@ Génère 5 top books, 5 titres suggérés, 5 catégories, 4 lacunes et 5 recomma
         {/* Search Bar - Catégorie/Niche uniquement */}
         <Card className="mt-4 border-border/50 bg-gradient-to-r from-primary/5 to-secondary/5">
           <CardContent className="pt-4">
-            <div className="space-y-3">
+            <div className="space-y-4">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Sparkles className="h-4 w-4 text-amber-500" />
                 <span>Entrez une <strong>catégorie</strong> ou <strong>niche</strong> et l'IA trouvera automatiquement les best-sellers, titres optimisés et opportunités</span>
@@ -364,27 +574,85 @@ Génère 5 top books, 5 titres suggérés, 5 catégories, 4 lacunes et 5 recomma
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Ex: développement personnel, cuisine végan, thriller psychologique, fantasy épique..."
-                  onKeyPress={(e) => e.key === 'Enter' && handleSearch(activeTab)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleFullAnalysis()}
                   className="flex-1 text-base"
+                  disabled={isFullAnalysis || isLoading}
                 />
                 <Button
                   onClick={() => handleSearch(activeTab)}
-                  disabled={isLoading}
-                  className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 min-w-[180px]"
+                  disabled={isLoading || isFullAnalysis}
+                  variant="outline"
+                  className="min-w-[140px]"
                 >
                   {isLoading ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Recherche IA...
+                      Analyse...
+                    </>
+                  ) : (
+                    <>
+                      <Search className="h-4 w-4 mr-2" />
+                      Onglet actif
+                    </>
+                  )}
+                </Button>
+                <Button
+                  onClick={handleFullAnalysis}
+                  disabled={isLoading || isFullAnalysis}
+                  className="bg-gradient-to-r from-rose-500 via-purple-500 to-indigo-500 hover:from-rose-600 hover:via-purple-600 hover:to-indigo-600 min-w-[200px] shadow-lg"
+                >
+                  {isFullAnalysis ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Analyse en cours...
                     </>
                   ) : (
                     <>
                       <Zap className="h-4 w-4 mr-2" />
-                      Trouver tout
+                      🚀 Analyse Complète
                     </>
                   )}
                 </Button>
               </div>
+
+              {/* Barre de progression analyse complète */}
+              {isFullAnalysis && (
+                <div className="p-4 rounded-xl bg-gradient-to-r from-rose-500/10 via-purple-500/10 to-indigo-500/10 border border-purple-500/30 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium text-sm">Analyse complète en cours...</span>
+                    <span className="text-xs text-muted-foreground">
+                      {Object.values(analysisProgress).filter(s => s === 'done').length}/4 terminées
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-4 gap-2">
+                    {[
+                      { key: 'bestsellers', label: 'Best-sellers', icon: Trophy },
+                      { key: 'titles', label: 'Titres', icon: PenTool },
+                      { key: 'categories', label: 'Catégories', icon: FolderTree },
+                      { key: 'niche', label: 'Niche', icon: Target }
+                    ].map(({ key, label, icon: Icon }) => (
+                      <div 
+                        key={key}
+                        className={`p-2 rounded-lg text-center text-xs transition-all ${
+                          analysisProgress[key] === 'done' 
+                            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' 
+                            : analysisProgress[key] === 'loading'
+                            ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30 animate-pulse'
+                            : analysisProgress[key] === 'error'
+                            ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+                            : 'bg-muted/30 text-muted-foreground'
+                        }`}
+                      >
+                        <Icon className="h-4 w-4 mx-auto mb-1" />
+                        {label}
+                        {analysisProgress[key] === 'done' && <CheckCircle className="h-3 w-3 mx-auto mt-1" />}
+                        {analysisProgress[key] === 'loading' && <Loader2 className="h-3 w-3 mx-auto mt-1 animate-spin" />}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="flex flex-wrap gap-2">
                 <span className="text-xs text-muted-foreground">Suggestions :</span>
                 {['Développement personnel', 'Romance', 'Cuisine healthy', 'Business', 'Fantasy'].map((suggestion) => (
