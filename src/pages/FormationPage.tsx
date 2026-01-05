@@ -685,7 +685,7 @@ ${module.content}
               >
                 <Button 
                   size="lg" 
-                  onClick={() => navigate('/ebook-planner')}
+                  onClick={() => navigate('/ebook-planner', { state: { fromFormation: true } })}
                   className="gap-3 px-8 py-6 text-lg font-semibold bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300"
                 >
                   <Rocket className="h-5 w-5" />
