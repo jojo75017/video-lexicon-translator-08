@@ -77,3 +77,12 @@ verify_jwt = false
 
 [functions.content-architect]
 verify_jwt = false
+
+[functions.expert-writing]
+verify_jwt = false
+
+[functions.natural-rewrite]
+verify_jwt = false
+
+[functions.editorial-packaging]
+verify_jwt = false

@@ -69,6 +69,9 @@ import { EbookEditorAudit } from '@/components/ebook/EbookEditorAudit';
 import { EbookEditorialDirector } from '@/components/ebook/EbookEditorialDirector';
 import { EbookMarketAnalysis } from '@/components/ebook/EbookMarketAnalysis';
 import { EbookContentArchitect } from '@/components/ebook/EbookContentArchitect';
+import EbookExpertWriting from '@/components/ebook/EbookExpertWriting';
+import EbookNaturalRewrite from '@/components/ebook/EbookNaturalRewrite';
+import EbookEditorialPackaging from '@/components/ebook/EbookEditorialPackaging';
 import { useConfetti } from '@/hooks/useConfetti';
 
 // Hooks et données
@@ -1943,6 +1946,21 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
               setActiveTab('planner');
             }}
           />
+        );
+      
+      case 'expert-writing':
+        return (
+          <EbookExpertWriting />
+        );
+      
+      case 'natural-rewrite':
+        return (
+          <EbookNaturalRewrite />
+        );
+      
+      case 'editorial-packaging':
+        return (
+          <EbookEditorialPackaging />
         );
       
       case 'formation-pdf':
