@@ -133,6 +133,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   };
 
   const estimatedPages = Math.round(numberOfChapters * 12);
+  const canGenerate = title.trim() && authorName.trim();
 
   return (
     <div className="space-y-6">
@@ -147,7 +148,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             Créer votre livre en 1 clic
           </CardTitle>
           <p className="text-muted-foreground mt-2">
-            Entrez les informations de base, le Directeur Éditorial s'occupe du reste.
+            Entrez les informations de base, lisez les étapes ci-dessous, puis lancez la génération.
           </p>
         </CardHeader>
 
@@ -215,145 +216,154 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
               <span>20 chapitres (long)</span>
             </div>
           </div>
-
-          {/* Generate Button */}
-          <motion.div
-            whileHover={{ scale: isGenerating ? 1 : 1.02 }}
-            whileTap={{ scale: isGenerating ? 1 : 0.98 }}
-            className="text-center"
-          >
-            <Button
-              size="lg"
-              onClick={generateCompleteBook}
-              disabled={isGenerating || !title.trim() || !authorName.trim()}
-              className="gap-3 px-10 py-7 text-lg font-bold bg-gradient-to-r from-primary via-amber-500 to-orange-500 hover:from-primary/90 hover:via-amber-500/90 hover:to-orange-500/90 shadow-xl shadow-primary/30 transition-all duration-300 w-full max-w-md"
-            >
-              {isGenerating ? (
-                <>
-                  <Loader2 className="h-6 w-6 animate-spin" />
-                  Génération en cours...
-                </>
-              ) : (
-                <>
-                  <Rocket className="h-6 w-6" />
-                  Générer mon livre complet
-                </>
-              )}
-            </Button>
-          </motion.div>
         </CardContent>
       </Card>
 
-      {/* Workflow Progress Card */}
-      <AnimatePresence>
-        {(isGenerating || currentStep >= 0) && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-          >
-            <Card className="border border-primary/30">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-primary" />
-                  Progression du Workflow Éditorial
-                </CardTitle>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">
-                      {currentStep >= 14 ? 'Terminé !' : `Étape ${currentStep + 1} sur 14`}
-                    </span>
-                    <span className="font-semibold text-primary">{Math.round(progress)}%</span>
+      {/* Workflow Steps Card - ALWAYS VISIBLE */}
+      <Card className="border border-primary/30">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-primary" />
+            Les 14 étapes du Directeur Éditorial
+          </CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Voici ce que le système va faire automatiquement pour créer votre livre :
+          </p>
+          
+          {/* Progress bar - only visible when generating */}
+          {isGenerating && (
+            <div className="space-y-2 mt-4">
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">
+                  Étape {currentStep + 1} sur 14
+                </span>
+                <span className="font-semibold text-primary">{Math.round(progress)}%</span>
+              </div>
+              <Progress value={progress} className="h-3" />
+            </div>
+          )}
+        </CardHeader>
+
+        <CardContent className="space-y-4">
+          {/* Steps List - Always visible */}
+          <div className="grid gap-2">
+            {workflowSteps.map((step, index) => {
+              const StepIcon = step.icon;
+              const isActive = isGenerating && index === currentStep;
+              const isCompleted = isGenerating && (index < currentStep || currentStep >= 14);
+              const result = stepResults[step.id];
+              
+              return (
+                <motion.div
+                  key={step.id}
+                  initial={false}
+                  animate={{ 
+                    opacity: isGenerating ? (isCompleted || isActive ? 1 : 0.4) : 1,
+                    scale: isActive ? 1.02 : 1
+                  }}
+                  className={`
+                    flex items-center gap-3 p-3 rounded-lg transition-all
+                    ${isCompleted ? 'bg-green-500/10 border border-green-500/30' : ''}
+                    ${isActive ? 'bg-primary/10 border border-primary/30 shadow-md' : ''}
+                    ${!isActive && !isCompleted ? 'bg-muted/20 border border-muted/30' : ''}
+                  `}
+                >
+                  <div className={`
+                    w-10 h-10 rounded-full flex items-center justify-center shrink-0
+                    ${isCompleted ? 'bg-green-500 text-white' : ''}
+                    ${isActive ? 'bg-primary text-white animate-pulse' : ''}
+                    ${!isActive && !isCompleted ? 'bg-muted text-muted-foreground' : ''}
+                  `}>
+                    {isCompleted ? (
+                      <CheckCircle2 className="h-5 w-5" />
+                    ) : isActive ? (
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                    ) : (
+                      <StepIcon className="h-5 w-5" />
+                    )}
                   </div>
-                  <Progress value={progress} className="h-3" />
-                </div>
-              </CardHeader>
-
-              <CardContent className="space-y-4">
-                {/* Steps List with Results */}
-                <div className="grid gap-2">
-                  {workflowSteps.map((step, index) => {
-                    const StepIcon = step.icon;
-                    const isActive = index === currentStep;
-                    const isCompleted = index < currentStep || currentStep >= 14;
-                    const result = stepResults[step.id];
-                    
-                    return (
-                      <motion.div
-                        key={step.id}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ 
-                          opacity: isCompleted || isActive ? 1 : 0.4,
-                          x: 0
-                        }}
-                        transition={{ delay: index * 0.05 }}
-                        className={`
-                          flex items-center gap-3 p-3 rounded-lg transition-all
-                          ${isCompleted ? 'bg-green-500/10 border border-green-500/30' : ''}
-                          ${isActive ? 'bg-primary/10 border border-primary/30 shadow-md' : ''}
-                          ${!isActive && !isCompleted ? 'bg-muted/20 border border-transparent' : ''}
-                        `}
+                  
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <Badge 
+                        variant={isCompleted ? 'default' : isActive ? 'secondary' : 'outline'} 
+                        className="text-xs"
                       >
-                        <div className={`
-                          w-10 h-10 rounded-full flex items-center justify-center shrink-0
-                          ${isCompleted ? 'bg-green-500 text-white' : ''}
-                          ${isActive ? 'bg-primary text-white animate-pulse' : ''}
-                          ${!isActive && !isCompleted ? 'bg-muted text-muted-foreground' : ''}
-                        `}>
-                          {isCompleted ? (
-                            <CheckCircle2 className="h-5 w-5" />
-                          ) : isActive ? (
-                            <Loader2 className="h-5 w-5 animate-spin" />
-                          ) : (
-                            <StepIcon className="h-5 w-5" />
-                          )}
-                        </div>
-                        
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <Badge variant={isCompleted ? 'default' : isActive ? 'secondary' : 'outline'} className="text-xs">
-                              {step.id}
-                            </Badge>
-                            <span className={`font-medium ${isActive ? 'text-primary' : ''}`}>
-                              {step.name}
-                            </span>
-                          </div>
-                          <p className="text-sm text-muted-foreground truncate">
-                            {result || step.description}
-                          </p>
-                        </div>
-
-                        {isActive && (
-                          <div className="text-xs text-primary font-medium animate-pulse">
-                            En cours...
-                          </div>
-                        )}
-                      </motion.div>
-                    );
-                  })}
-                </div>
-
-                {/* Final Success Message */}
-                {currentStep >= 14 && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="p-4 bg-green-500/10 border border-green-500/30 rounded-lg text-center"
-                  >
-                    <CheckCircle2 className="h-8 w-8 text-green-500 mx-auto mb-2" />
-                    <p className="font-semibold text-green-700 dark:text-green-400">
-                      Livre généré avec succès !
+                        {step.id}
+                      </Badge>
+                      <span className={`font-medium ${isActive ? 'text-primary' : ''}`}>
+                        {step.name}
+                      </span>
+                    </div>
+                    <p className="text-sm text-muted-foreground truncate">
+                      {result || step.description}
                     </p>
-                    <p className="text-sm text-muted-foreground">
-                      Le Verdict Éditeur Ultime a validé votre projet. Prêt pour KDP.
-                    </p>
-                  </motion.div>
+                  </div>
+
+                  {isActive && (
+                    <div className="text-xs text-primary font-medium animate-pulse">
+                      En cours...
+                    </div>
+                  )}
+                </motion.div>
+              );
+            })}
+          </div>
+
+          {/* Final Success Message */}
+          {currentStep >= 14 && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="p-4 bg-green-500/10 border border-green-500/30 rounded-lg text-center"
+            >
+              <CheckCircle2 className="h-8 w-8 text-green-500 mx-auto mb-2" />
+              <p className="font-semibold text-green-700 dark:text-green-400">
+                Livre généré avec succès !
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Le Verdict Éditeur Ultime a validé votre projet. Prêt pour KDP.
+              </p>
+            </motion.div>
+          )}
+
+          {/* Generate Button - At the bottom after reading all steps */}
+          {currentStep < 14 && (
+            <div className="pt-4 border-t border-border">
+              <motion.div
+                whileHover={{ scale: isGenerating ? 1 : 1.02 }}
+                whileTap={{ scale: isGenerating ? 1 : 0.98 }}
+                className="text-center"
+              >
+                <Button
+                  size="lg"
+                  onClick={generateCompleteBook}
+                  disabled={isGenerating || !canGenerate}
+                  className="gap-3 px-10 py-7 text-lg font-bold bg-gradient-to-r from-primary via-amber-500 to-orange-500 hover:from-primary/90 hover:via-amber-500/90 hover:to-orange-500/90 shadow-xl shadow-primary/30 transition-all duration-300 w-full max-w-md"
+                >
+                  {isGenerating ? (
+                    <>
+                      <Loader2 className="h-6 w-6 animate-spin" />
+                      Génération en cours...
+                    </>
+                  ) : (
+                    <>
+                      <Rocket className="h-6 w-6" />
+                      J'ai lu les étapes, générer mon livre
+                    </>
+                  )}
+                </Button>
+                
+                {!canGenerate && (
+                  <p className="text-sm text-destructive mt-2">
+                    Veuillez remplir le titre et le nom d'auteur
+                  </p>
                 )}
-              </CardContent>
-            </Card>
-          </motion.div>
-        )}
-      </AnimatePresence>
+              </motion.div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Error Display */}
       {error && (
