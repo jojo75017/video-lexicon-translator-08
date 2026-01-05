@@ -42,7 +42,8 @@ import {
   Eye,
   RefreshCw,
   Fingerprint,
-  Award
+  Award,
+  Rocket
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -96,6 +97,7 @@ const categories: PremiumCategory[] = [
     color: 'from-amber-400 via-orange-500 to-red-500',
     isPremiumCategory: true,
     items: [
+      { id: 'complete-workflow', label: '⚡ Générer Livre Complet', icon: Rocket, color: 'text-white', bgColor: 'bg-gradient-to-r from-primary via-amber-500 to-orange-500', activeGradient: 'from-primary via-amber-500 to-orange-500', isPremium: true },
       { id: 'editorial-director', label: '1. Directeur Éditorial', icon: Crown, color: 'text-amber-500', bgColor: 'bg-amber-500/10', activeGradient: 'from-amber-400 to-orange-500', isPremium: true, promptNumber: 1 },
       { id: 'market-analysis', label: '2. Analyse Marché', icon: Search, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10', activeGradient: 'from-emerald-400 to-teal-500', isPremium: true, promptNumber: 2 },
       { id: 'content-architect', label: '3. Architecte Contenu', icon: LayoutDashboard, color: 'text-violet-500', bgColor: 'bg-violet-500/10', activeGradient: 'from-violet-400 to-purple-500', isPremium: true, promptNumber: 3 },
