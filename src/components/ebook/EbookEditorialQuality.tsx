@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2, CheckCircle2, AlertTriangle, Sparkles, BookOpen } from 'lucide-react';
+import { Loader2, CheckCircle2, AlertTriangle, Sparkles, BookOpen, RefreshCw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useWorkflowResults } from '@/hooks/useWorkflowResults';
 
 interface QualityAnalysis {
   clarteGlobale: {
@@ -34,10 +35,54 @@ export const EbookEditorialQuality: React.FC = () => {
   const [content, setContent] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [analysis, setAnalysis] = useState<QualityAnalysis | null>(null);
+  const [hasAutoLoadedContent, setHasAutoLoadedContent] = useState(false);
+  
+  const { getStepResult, hasStepResult } = useWorkflowResults();
+
+  // Auto-load content from workflow results (P4 = chapters, P1 = editorial director)
+  useEffect(() => {
+    if (hasAutoLoadedContent) return;
+    
+    // Get title from P1 (Editorial Director)
+    const p1Result = getStepResult('P1');
+    if (p1Result?.result?.titreOptimise || p1Result?.result?.titre) {
+      setTitle(p1Result.result.titreOptimise || p1Result.result.titre || '');
+    }
+    
+    // Get content from P4 (Writing) - chapters
+    const p4Result = getStepResult('P4');
+    if (p4Result?.result) {
+      let fullContent = '';
+      
+      // If result has chapters array
+      if (Array.isArray(p4Result.result.chapters)) {
+        fullContent = p4Result.result.chapters.map((ch: any, i: number) => {
+          const chapterTitle = ch.title || ch.titre || `Chapitre ${i + 1}`;
+          const chapterContent = ch.content || ch.contenu || '';
+          return `## ${chapterTitle}\n\n${chapterContent}`;
+        }).join('\n\n---\n\n');
+      } else if (typeof p4Result.result === 'string') {
+        fullContent = p4Result.result;
+      } else if (p4Result.displayContent) {
+        fullContent = p4Result.displayContent;
+      }
+      
+      if (fullContent.length > 100) {
+        setContent(fullContent);
+        setHasAutoLoadedContent(true);
+        toast.success('Contenu du livre chargé automatiquement depuis le workflow');
+      }
+    }
+  }, [getStepResult, hasAutoLoadedContent]);
 
   const handleAnalyze = async () => {
     if (!title.trim()) {
       toast.error('Veuillez entrer le titre du contenu');
+      return;
+    }
+    
+    if (!content.trim() || content.length < 100) {
+      toast.error('Le contenu est trop court pour une analyse de qualité. Ajoutez au moins un chapitre complet.');
       return;
     }
 
@@ -48,7 +93,7 @@ export const EbookEditorialQuality: React.FC = () => {
       const { data, error } = await supabase.functions.invoke('editorial-quality', {
         body: { 
           title,
-          content: content || `Contenu du livre "${title}" à analyser pour la cohérence et qualité éditoriale.`
+          content: content
         }
       });
 
@@ -62,6 +107,10 @@ export const EbookEditorialQuality: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+  
+  const handleReloadFromWorkflow = () => {
+    setHasAutoLoadedContent(false);
   };
 
   const getScoreColor = (score: number) => {
@@ -115,15 +164,31 @@ export const EbookEditorialQuality: React.FC = () => {
             />
           </div>
           
-          <div>
-            <label className="text-sm font-medium mb-2 block">Contenu à évaluer (optionnel)</label>
-            <Textarea 
-              placeholder="Collez ici le contenu à analyser... Si vide, une analyse basée sur le titre sera générée."
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              className="min-h-[150px] border-teal-500/30 focus:border-teal-500"
-            />
+          <div className="flex items-center justify-between">
+            <label className="text-sm font-medium">Contenu à évaluer</label>
+            {hasStepResult('P4') && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={handleReloadFromWorkflow}
+                className="text-xs text-teal-600"
+              >
+                <RefreshCw className="w-3 h-3 mr-1" />
+                Recharger du workflow
+              </Button>
+            )}
           </div>
+          <Textarea 
+            placeholder="Le contenu du livre sera chargé automatiquement depuis le workflow complet..."
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            className="min-h-[150px] border-teal-500/30 focus:border-teal-500"
+          />
+          {content && (
+            <p className="text-xs text-muted-foreground">
+              {content.length.toLocaleString()} caractères chargés
+            </p>
+          )}
 
           <Button 
             onClick={handleAnalyze} 
