@@ -550,14 +550,18 @@ Le score overall_score doit être entre 0 et 100 (100 = parfaitement cohérent).
       const hasContent = content && content.trim().length > 50;
       
       const charactersPrompt = hasContent 
-        ? `Tu es un expert en analyse littéraire. Analyse le contenu suivant et extrait TOUS les personnages mentionnés avec leurs rôles et descriptions.
+        ? `Tu es un expert en analyse littéraire. Analyse le contenu suivant et extrait une liste de 4 à 6 personnages (maximum 6) : personnages principaux + secondaires.
 
 TITRE: ${ebookTitle || 'Sans titre'}
 
 CONTENU:
 ${content}
 
-Pour chaque personnage trouvé, identifie:
+Règles:
+- Inclus aussi les personnages mentionnés brièvement (même une seule fois)
+- Si le texte contient moins de 4 personnages nommés, complète avec des personnages secondaires plausibles et cohérents
+
+Pour chaque personnage, fournis:
 - Son nom exact
 - Son rôle dans l'histoire (protagonist, antagonist, secondary, mentor, ally, love_interest, comic_relief, narrator, other)
 - Une brève description de qui il est et ce qu'il fait`
