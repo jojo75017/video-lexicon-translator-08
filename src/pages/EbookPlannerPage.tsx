@@ -57,6 +57,7 @@ import { EbookStatisticsTools } from '@/components/ebook/EbookStatisticsTools';
 import { EbookVoiceDictation } from '@/components/ebook/EbookVoiceDictation';
 import { EbookSeriesManager } from '@/components/ebook/EbookSeriesManager';
 import { EbookKdpMarketAnalysis } from '@/components/ebook/EbookKdpMarketAnalysis';
+import { EbookKdpResearch } from '@/components/ebook/EbookKdpResearch';
 import { EbookAudioGenerator } from '@/components/ebook/EbookAudioGenerator';
 import { EbookFormationPDF } from '@/components/ebook/EbookFormationPDF';
 import EbookKdpAnalytics from '@/components/ebook/EbookKdpAnalytics';
@@ -2143,6 +2144,11 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
               toast.success(`"${data.title}" importé avec ${data.chapters.length} chapitres ! (~${data.targetWordsPerChapter.toLocaleString()} mots/chapitre)`);
             }}
           />
+        );
+      
+      case 'kdp-research':
+        return (
+          <EbookKdpResearch />
         );
       
       case 'market':
