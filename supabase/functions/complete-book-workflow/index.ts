@@ -189,17 +189,17 @@ Donne ton analyse marché en JSON :
       }
 
       case 'P3': {
-        // ARCHITECTE DE CONTENU - Structure réaliste basée sur le nombre de chapitres
-        const wordsPerChapter = 3500; // Estimation réaliste : 3500 mots = ~14 pages par chapitre
+        // ARCHITECTE DE CONTENU - Structure + GÉNÉRATION AUTOMATIQUE DES PERSONNAGES
+        const wordsPerChapter = 3500;
         const totalWords = numberOfChapters * wordsPerChapter;
         const estimatedPages = Math.ceil(totalWords / 250);
         const descriptionGeneree = previousContext.P1?.descriptionGeneree || '';
         
-        console.log(`Step P3: Structuring ${numberOfChapters} chapters (~${estimatedPages} pages)`);
+        console.log(`Step P3: Structuring ${numberOfChapters} chapters + generating characters for "${fullTitle}"`);
         
         const content = await callAI(
-          `Tu es un ARCHITECTE DE CONTENU expert. Tu structures des livres pour maximiser l'impact et la rétention du lecteur. Tu penses progression pédagogique, storytelling, points de bascule.`,
-          `Structure ce livre en ${numberOfChapters} chapitres :
+          `Tu es un ARCHITECTE DE CONTENU et CRÉATEUR DE PERSONNAGES expert. Tu structures des livres ET tu crées les personnages adaptés au récit.`,
+          `Structure ce livre en ${numberOfChapters} chapitres ET crée les personnages adaptés :
 ${bookContext}
 DESCRIPTION DU LIVRE (générée en P1): ${descriptionGeneree}
 VISION : ${JSON.stringify(previousContext.P1 || {})}
@@ -208,11 +208,28 @@ MARCHÉ : ${JSON.stringify(previousContext.P2 || {})}
 OBJECTIF : ~${totalWords} mots total (~${estimatedPages} pages)
 Chaque chapitre doit avoir ~${wordsPerChapter} mots avec 4-6 sous-sections.
 
+MISSION CRITIQUE - PERSONNAGES :
+Crée 4-6 personnages UNIQUES et COHÉRENTS pour CE LIVRE SPÉCIFIQUE :
+- Personnage principal (héros/narrateur)
+- 2-3 personnages secondaires importants
+- 1-2 personnages d'appui ou antagonistes
+
+Chaque personnage doit être ADAPTÉ au titre "${fullTitle}" et à la catégorie "${category}".
+NE RÉUTILISE JAMAIS des personnages d'autres livres. Crée des personnages 100% originaux.
+
 Crée la structure en JSON :
 {
   "structureGlobale": "description de l'arc narratif/pédagogique du livre adapté à la catégorie ${category}",
   "nombrePagesEstime": ${estimatedPages},
   "nombreMotsEstime": ${totalWords},
+  "personnages": [
+    {
+      "name": "Nom du personnage",
+      "role": "protagoniste/antagoniste/secondaire/mentor",
+      "description": "Description physique et psychologique détaillée (2-3 phrases)",
+      "arc": "Son évolution au cours du récit"
+    }
+  ],
   "chapitres": [
     {
       "numero": 1,
@@ -226,15 +243,20 @@ Crée la structure en JSON :
   ],
   "progressionLogique": "explication de pourquoi cet ordre"
 }`,
-          8000
+          10000
         );
         result = parseJSON(content) || { raw: content };
-        console.log('Step P3 completed successfully');
+        console.log(`Step P3 completed - Generated ${result.personnages?.length || 0} characters`);
         
         if (result.chapitres) {
           const totalMotsPrevu = result.chapitres.reduce((acc: number, ch: any) => acc + (ch.nombreMotsPrevu || wordsPerChapter), 0);
           const pagesEstime = result.nombrePagesEstime || estimatedPages;
-          displayContent = `**Structure globale :** ${result.structureGlobale}\n\n**📖 ~${pagesEstime} pages prévues (~${totalMotsPrevu} mots)**\n\n**${result.chapitres.length} chapitres structurés :**\n\n` +
+          
+          const personnagesDisplay = result.personnages?.length > 0
+            ? `\n\n**🎭 ${result.personnages.length} Personnages créés :**\n${result.personnages.map((p: any) => `- **${p.name}** (${p.role}): ${p.description}`).join('\n')}`
+            : '';
+          
+          displayContent = `**Structure globale :** ${result.structureGlobale}${personnagesDisplay}\n\n**📖 ~${pagesEstime} pages prévues (~${totalMotsPrevu} mots)**\n\n**${result.chapitres.length} chapitres structurés :**\n\n` +
             result.chapitres.map((ch: any) => `**Ch.${ch.numero} - ${ch.titre}** (~${ch.nombreMotsPrevu || wordsPerChapter} mots)\n_Objectif :_ ${ch.objectif}`).join('\n\n');
         } else {
           displayContent = content;
@@ -253,9 +275,15 @@ Crée la structure en JSON :
         const tonEditorial = previousContext.P1?.tonEditorial || '';
         const lecteurCible = previousContext.P1?.lecteurCible || '';
 
+        // PRIORITÉ : utiliser les personnages générés en P3, sinon ceux passés en paramètre
+        const personnagesP3 = previousContext.P3?.personnages || [];
+        const personnagesAUtiliser = personnagesP3.length > 0 ? personnagesP3 : characters;
+        
+        console.log(`Step P4: Using ${personnagesAUtiliser.length} characters (from P3: ${personnagesP3.length}, from params: ${characters.length})`);
+
         // Construire la section personnages pour P4
-        const personnagesSection = characters.length > 0
-          ? `\n\nPERSONNAGES À UTILISER OBLIGATOIREMENT :\n${characters.map((c: any) => `- **${c.name}** (${c.role || 'personnage'}): ${c.description}`).join('\n')}\n\nATTENTION : Tu DOIS utiliser ces personnages et UNIQUEMENT ces personnages. N'invente PAS d'autres personnages principaux.`
+        const personnagesSection = personnagesAUtiliser.length > 0
+          ? `\n\nPERSONNAGES À UTILISER OBLIGATOIREMENT :\n${personnagesAUtiliser.map((c: any) => `- **${c.name}** (${c.role || 'personnage'}): ${c.description}${c.arc ? ` | Arc: ${c.arc}` : ''}`).join('\n')}\n\nATTENTION : Tu DOIS utiliser ces personnages et UNIQUEMENT ces personnages. N'invente PAS d'autres personnages principaux.`
           : '';
 
         // Nouveau: génération par chapitre (évite le timeout)
@@ -274,7 +302,7 @@ Crée la structure en JSON :
             );
           }
 
-          console.log(`Step P4 (single): Generating chapter ${chapitre.numero}: ${chapitre.titre} with ${characters.length} characters`);
+          console.log(`Step P4 (single): Generating chapter ${chapitre.numero}: ${chapitre.titre} with ${personnagesAUtiliser.length} characters`);
 
           const chapterContent = await callAI(
             `Tu es un AUTEUR PROFESSIONNEL avec 20 ans d'expérience. Tu rédiges des chapitres COMPLETS, captivants, dans le style du genre "${category}".
