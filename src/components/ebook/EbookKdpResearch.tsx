@@ -521,11 +521,20 @@ Génère 5 top books, 5 titres suggérés, 5 catégories, 4 lacunes et 5 recomma
                 🔍 Recherche KDP Pro
               </span>
               <p className="text-sm text-muted-foreground font-normal mt-1">
-                Analysez les best-sellers, générez des titres optimisés et découvrez les niches rentables
+                Analysez les tendances du marché, générez des idées de titres et découvrez les niches rentables
               </p>
             </div>
           </CardTitle>
         </CardHeader>
+        <CardContent className="pt-0">
+          <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-start gap-2">
+            <Lightbulb className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
+            <div className="text-sm text-muted-foreground">
+              <strong className="text-foreground">💡 Important :</strong> Les données affichées sont des <strong>suggestions générées par IA</strong> basées sur l'analyse des tendances du marché KDP. 
+              Ce ne sont pas des livres réels, mais des <strong>idées originales</strong> que vous pouvez utiliser librement pour créer votre propre ebook unique.
+            </div>
+          </div>
+        </CardContent>
       </Card>
 
       {/* Tabs */}
