@@ -107,6 +107,13 @@ export const EbookCharacters = ({ characters, onUpdateCharacters, ebookTitle = '
       if (error) throw error;
 
       if (data?.characters && Array.isArray(data.characters)) {
+        const normalizeName = (name: string) =>
+          name
+            .normalize('NFD')
+            .replace(/\p{Diacritic}/gu, '')
+            .toLowerCase()
+            .trim();
+
         const newCharacters: Character[] = data.characters.map((char: any) => ({
           id: crypto.randomUUID(),
           name: char.name || 'Sans nom',
@@ -114,18 +121,25 @@ export const EbookCharacters = ({ characters, onUpdateCharacters, ebookTitle = '
           role: char.role || 'secondary',
         }));
 
-        // Filtrer les doublons par nom (insensible à la casse)
-        const existingNames = new Set(characters.map(c => c.name.toLowerCase().trim()));
-        const uniqueNewCharacters = newCharacters.filter(
-          nc => !existingNames.has(nc.name.toLowerCase().trim())
-        );
+        // Déduplication globale (anciens + nouveaux) par nom
+        const merged = [...characters, ...newCharacters];
+        const seen = new Set<string>();
+        const deduped: Character[] = [];
 
-        if (uniqueNewCharacters.length === 0) {
-          toast.info('Tous les personnages générés existent déjà');
-        } else {
-          onUpdateCharacters([...characters, ...uniqueNewCharacters]);
-          toast.success(`${uniqueNewCharacters.length} nouveau(x) personnage(s) ajouté(s) !`);
+        for (const ch of merged) {
+          const key = normalizeName(ch.name || '');
+          if (!key) {
+            deduped.push(ch);
+            continue;
+          }
+          if (seen.has(key)) continue;
+          seen.add(key);
+          deduped.push(ch);
         }
+
+        const removed = merged.length - deduped.length;
+        onUpdateCharacters(deduped);
+        toast.success(`Personnages mis à jour${removed > 0 ? ` (doublons supprimés : ${removed})` : ''}`);
       } else {
         throw new Error('Format de réponse invalide');
       }
