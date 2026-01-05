@@ -8,13 +8,49 @@ import { Loader2, BookOpen, Target, Lightbulb, AlertTriangle, Eye, Sparkles } fr
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
+interface CibleIdealeObject {
+  profil?: string;
+  besoins?: string;
+  frustrations?: string;
+}
+
 interface EditorialAnalysis {
   promesseCentrale: string;
   angleEditorial: string;
-  cibleIdeale: string;
+  cibleIdeale: string | CibleIdealeObject;
   erreursCourantes: string[];
   visionGlobale: string;
 }
+
+// Helper to render cibleIdeale whether it's a string or object
+const renderCibleIdeale = (cible: string | CibleIdealeObject): React.ReactNode => {
+  if (typeof cible === 'string') {
+    return <p className="text-sm leading-relaxed">{cible}</p>;
+  }
+  
+  return (
+    <div className="space-y-2 text-sm">
+      {cible.profil && (
+        <div>
+          <span className="font-medium text-purple-700 dark:text-purple-400">Profil : </span>
+          <span>{cible.profil}</span>
+        </div>
+      )}
+      {cible.besoins && (
+        <div>
+          <span className="font-medium text-purple-700 dark:text-purple-400">Besoins : </span>
+          <span>{cible.besoins}</span>
+        </div>
+      )}
+      {cible.frustrations && (
+        <div>
+          <span className="font-medium text-purple-700 dark:text-purple-400">Frustrations : </span>
+          <span>{cible.frustrations}</span>
+        </div>
+      )}
+    </div>
+  );
+};
 
 interface EbookEditorialDirectorProps {
   onAnalysisComplete?: (analysis: EditorialAnalysis) => void;
@@ -135,7 +171,7 @@ export const EbookEditorialDirector = ({ onAnalysisComplete }: EbookEditorialDir
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm leading-relaxed">{analysis.cibleIdeale}</p>
+              {renderCibleIdeale(analysis.cibleIdeale)}
             </CardContent>
           </Card>
 
