@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { 
   BookOpen, Plus, Wand2, RotateCcw, ArrowLeft, Merge, Sparkles, Eye, Search, Palette, Users,
-  Save, Zap, Target, FileText, Crown, Trash2, ImageIcon, Loader2
+  Save, Zap, Target, FileText, Crown, Trash2, ImageIcon, Loader2, X, ChevronRight, Rocket, CheckCircle2
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -148,6 +148,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
   
   const [activeTab, setActiveTab] = useState('planner');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(location.state?.fromFormation || false);
 
   // Ref pour toujours avoir les dernières données (évite les problèmes de closure)
   const currentDataRef = useRef({
@@ -817,6 +818,67 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
       case 'planner':
         return (
           <div className="relative animate-fade-in">
+            {/* Indicateur de bienvenue pour les utilisateurs venant de la formation */}
+            {showWelcome && (
+              <div className="mb-8 relative overflow-hidden rounded-2xl bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 p-6 shadow-2xl animate-scale-in">
+                <div className="absolute inset-0 bg-grid-white opacity-10" />
+                <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/20 rounded-full blur-2xl" />
+                
+                <button 
+                  onClick={() => setShowWelcome(false)}
+                  className="absolute top-4 right-4 p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+                >
+                  <X className="h-4 w-4 text-white" />
+                </button>
+                
+                <div className="relative flex flex-col md:flex-row items-start md:items-center gap-6">
+                  <div className="p-4 bg-white/20 backdrop-blur-sm rounded-2xl">
+                    <Rocket className="w-10 h-10 text-white" />
+                  </div>
+                  
+                  <div className="flex-1 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-2xl font-bold text-white">
+                        🎉 Bravo ! Vous êtes prêt à créer votre livre
+                      </h2>
+                    </div>
+                    <p className="text-white/90">
+                      Vous ne rédigez aucune ligne. <span className="font-semibold">Vous guidez l'intention, l'éditeur numérique fait le reste.</span>
+                    </p>
+                    
+                    <div className="flex flex-wrap gap-4 pt-2">
+                      <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-xl">
+                        <div className="w-8 h-8 rounded-full bg-white/30 flex items-center justify-center text-white font-bold text-sm">1</div>
+                        <div className="text-white">
+                          <p className="font-semibold text-sm">Choisir</p>
+                          <p className="text-xs text-white/80">Remplissez le titre et la description</p>
+                        </div>
+                        <ChevronRight className="h-4 w-4 text-white/60" />
+                      </div>
+                      
+                      <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-xl">
+                        <div className="w-8 h-8 rounded-full bg-white/30 flex items-center justify-center text-white font-bold text-sm">2</div>
+                        <div className="text-white">
+                          <p className="font-semibold text-sm">Générer</p>
+                          <p className="text-xs text-white/80">Cliquez sur "Générer avec l'IA"</p>
+                        </div>
+                        <ChevronRight className="h-4 w-4 text-white/60" />
+                      </div>
+                      
+                      <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-xl">
+                        <div className="w-8 h-8 rounded-full bg-white/30 flex items-center justify-center text-white font-bold text-sm">3</div>
+                        <div className="text-white">
+                          <p className="font-semibold text-sm">Valider</p>
+                          <p className="text-xs text-white/80">Consultez le verdict final</p>
+                        </div>
+                        <CheckCircle2 className="h-4 w-4 text-white" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Background décoratif */}
             <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 via-transparent to-fuchsia-500/5 pointer-events-none" />
             <div className="absolute top-20 right-10 w-72 h-72 bg-violet-500/10 rounded-full blur-3xl pointer-events-none" />
