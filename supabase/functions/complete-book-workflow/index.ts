@@ -65,7 +65,17 @@ serve(async (req) => {
   }
 
   try {
-    const { step, title, subtitle = '', category = '', authorName, numberOfChapters = 8, previousContext = {} } = await req.json();
+    const payload = await req.json();
+    const {
+      step,
+      title,
+      subtitle = '',
+      category = '',
+      authorName,
+      numberOfChapters = 8,
+      previousContext = {},
+      chapter,
+    } = payload;
 
     if (!title) {
       return new Response(
@@ -240,14 +250,8 @@ Crée la structure en JSON :
         // Nouveau: génération par chapitre (évite le timeout)
         // `chapter` peut être soit un chapitre complet (numero/titre/...), soit juste { numero }
         // Dans ce cas, on le retrouve depuis P3.
-        const { chapter } = await (async () => {
-          try {
-            const body = await req.clone().json();
-            return { chapter: body?.chapter };
-          } catch {
-            return { chapter: undefined };
-          }
-        })();
+        // IMPORTANT: on lit `chapter` depuis le body déjà parsé (payload), sinon Deno ne peut pas relire req.json() une 2e fois.
+
 
         if (chapter) {
           const chapitre = chapter?.titre ? chapter : structure.find((c: any) => c.numero === chapter.numero) || chapter;
