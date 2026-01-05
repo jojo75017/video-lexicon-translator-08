@@ -83,6 +83,9 @@ import EbookStyleSignature from '@/components/ebook/EbookStyleSignature';
 import EbookUltimateVerdict from '@/components/ebook/EbookUltimateVerdict';
 import { EbookInteractiveTutorial } from '@/components/ebook/EbookInteractiveTutorial';
 import { useConfetti } from '@/hooks/useConfetti';
+import { useDemoMode } from '@/hooks/useDemoMode';
+import { DemoBanner } from '@/components/ebook/DemoBanner';
+import { DemoPaywall } from '@/components/ebook/DemoPaywall';
 
 // Hooks et données
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
@@ -92,9 +95,10 @@ import { type Character as EbookCharacter } from '@/components/ebook/EbookCharac
 interface EbookPlannerPageProps {
   subscriberEmail?: string;
   subscriberData?: any;
+  isDemo?: boolean;
 }
 
-const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '', subscriberData }) => {
+const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '', subscriberData, isDemo = false }) => {
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -113,6 +117,8 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
   const savedData = loadSavedData();
   const { saveProject, loadLatestProject, isSaving, currentProjectId, setCurrentProjectId, saveVersion, loadVersions, restoreVersion } = useEbookDatabase();
   const { fireStars } = useConfetti();
+  const { limits: demoLimits, incrementPlanCount } = useDemoMode(!isDemo ? true : false);
+  const [showPaywall, setShowPaywall] = useState<'chapters' | 'export' | 'cover' | 'advanced' | null>(null);
   
   const [apiKey, setApiKey] = useState(savedData?.apiKey || '');
   const [ebookTitle, setEbookTitle] = useState(location.state?.suggestedTitle || savedData?.ebookTitle || '');
@@ -369,6 +375,12 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
   };
 
   const handleGenerateChapterContent = async (chapterId: string) => {
+    // Bloquer en mode démo
+    if (isDemo) {
+      setShowPaywall('chapters');
+      return;
+    }
+    
     const chapter = chapters.find(c => c.id === chapterId);
     if (!chapter) return;
     const content = await generateChapterContent(chapter);
@@ -376,6 +388,12 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
   };
 
   const handleGenerateSubChapterContent = async (chapterId: string, subChapterId: string) => {
+    // Bloquer en mode démo
+    if (isDemo) {
+      setShowPaywall('chapters');
+      return;
+    }
+    
     const chapter = chapters.find(c => c.id === chapterId);
     if (!chapter) return;
     const subChapter = chapter.subChapters.find(sc => sc.id === subChapterId);
@@ -430,6 +448,12 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
 
   // Générer l'ebook complet en une seule action
   const generateCompleteEbook = async () => {
+    // Bloquer en mode démo
+    if (isDemo) {
+      setShowPaywall('chapters');
+      return;
+    }
+    
     if (!ebookTitle) {
       toast.error('Veuillez entrer un titre');
       return;
@@ -596,6 +620,13 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
       toast.error('Veuillez entrer un titre');
       return;
     }
+    
+    // En mode démo, vérifier les limites
+    if (isDemo && !demoLimits.canGeneratePlan) {
+      setShowPaywall('chapters');
+      return;
+    }
+    
     const planData = await generateEbookPlan(ebookTitle, authorName, numberOfChapters);
     if (planData) {
       if (!authorName) setAuthorName(planData.author);
@@ -612,6 +643,11 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
         }))
       }));
       setChapters(generatedChapters);
+      
+      // Incrémenter le compteur en mode démo
+      if (isDemo) {
+        incrementPlanCount();
+      }
     }
   };
 
@@ -1573,6 +1609,27 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
         );
       
       case 'writing':
+        // Bloquer l'écriture en mode démo
+        if (isDemo) {
+          return (
+            <div className="flex flex-col items-center justify-center py-20 space-y-6">
+              <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center">
+                <BookOpen className="w-10 h-10 text-primary" />
+              </div>
+              <h2 className="text-2xl font-bold text-center">Écriture des chapitres</h2>
+              <p className="text-muted-foreground text-center max-w-md">
+                Cette fonctionnalité est réservée aux membres. Débloquez l'accès complet pour écrire vos chapitres avec l'IA.
+              </p>
+              <Button 
+                className="bg-gradient-to-r from-primary to-primary/80"
+                onClick={() => setShowPaywall('chapters')}
+              >
+                <Sparkles className="w-4 h-4 mr-2" />
+                Débloquer pour 37€
+              </Button>
+            </div>
+          );
+        }
         return (
           <EbookWriting
             chapters={chapters}
@@ -1583,6 +1640,27 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
         );
       
       case 'cover':
+        // Bloquer la couverture en mode démo
+        if (isDemo) {
+          return (
+            <div className="flex flex-col items-center justify-center py-20 space-y-6">
+              <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center">
+                <ImageIcon className="w-10 h-10 text-primary" />
+              </div>
+              <h2 className="text-2xl font-bold text-center">Générateur de couvertures</h2>
+              <p className="text-muted-foreground text-center max-w-md">
+                Créez des couvertures professionnelles avec l'IA. Disponible avec l'accès complet.
+              </p>
+              <Button 
+                className="bg-gradient-to-r from-primary to-primary/80"
+                onClick={() => setShowPaywall('cover')}
+              >
+                <Sparkles className="w-4 h-4 mr-2" />
+                Débloquer pour 37€
+              </Button>
+            </div>
+          );
+        }
         return (
           <EbookCoverGenerator
             ebookTitle={ebookTitle}
@@ -1733,6 +1811,27 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
         );
       
       case 'export':
+        // Bloquer l'export en mode démo
+        if (isDemo) {
+          return (
+            <div className="flex flex-col items-center justify-center py-20 space-y-6">
+              <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center">
+                <FileText className="w-10 h-10 text-primary" />
+              </div>
+              <h2 className="text-2xl font-bold text-center">Export PDF, Word & ePub</h2>
+              <p className="text-muted-foreground text-center max-w-md">
+                Exportez votre ebook dans tous les formats professionnels. Disponible avec l'accès complet.
+              </p>
+              <Button 
+                className="bg-gradient-to-r from-primary to-primary/80"
+                onClick={() => setShowPaywall('export')}
+              >
+                <Sparkles className="w-4 h-4 mr-2" />
+                Débloquer pour 37€
+              </Button>
+            </div>
+          );
+        }
         return (
           <EbookExporter
             ebookTitle={ebookTitle}
@@ -2185,6 +2284,12 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
 
         {/* Content */}
         <div className="container mx-auto px-6 py-8">
+          {isDemo && (
+            <DemoBanner 
+              plansGenerated={demoLimits.plansGenerated} 
+              maxPlans={demoLimits.maxPlansInDemo} 
+            />
+          )}
           {renderContent()}
         </div>
       </main>
@@ -2198,6 +2303,14 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
           toast.success('🎉 Tutoriel terminé ! Vous êtes prêt à créer votre ebook.');
         }}
       />
+      
+      {/* Demo Paywall */}
+      {showPaywall && (
+        <DemoPaywall 
+          feature={showPaywall} 
+          onClose={() => setShowPaywall(null)} 
+        />
+      )}
     </div>
   );
 };
