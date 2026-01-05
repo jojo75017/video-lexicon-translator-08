@@ -930,7 +930,10 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
                       Nouveau
                     </Button>
                     <Button 
-                      onClick={() => setShowTutorial(true)}
+                      onClick={() => {
+                        setShowWelcome(true);
+                        setShowTutorial(true);
+                      }}
                       variant="outline"
                       className="border-white/30 text-white hover:bg-white/20 backdrop-blur-sm"
                     >
