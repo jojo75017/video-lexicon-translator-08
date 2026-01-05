@@ -206,7 +206,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
         qualityScores: context.P6 || {}
       };
 
-      toast.success('✅ Livre généré avec succès ! Vérifiez chaque étape ci-dessous.');
+      toast.success('✅ Livre généré ! Le contenu a été importé dans l\'onglet "Rédaction".');
       onComplete(bookData);
 
     } catch (err: any) {
