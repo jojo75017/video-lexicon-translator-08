@@ -209,6 +209,35 @@ const DemoPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 py-12 px-4">
       <div className="max-w-4xl mx-auto">
+        {/* Demo Banner */}
+        <div className="bg-gradient-to-r from-emerald-500/10 via-green-500/10 to-teal-500/10 border border-emerald-500/20 rounded-lg p-4 mb-6">
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-emerald-500/20 rounded-full flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-emerald-500" />
+              </div>
+              <div>
+                <p className="font-medium text-foreground">
+                  🎁 Mode Démo Gratuit
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {remainingTries > 0 
+                    ? `${remainingTries} essai${remainingTries > 1 ? 's' : ''} gratuit${remainingTries > 1 ? 's' : ''} • Génération de plans uniquement`
+                    : 'Essais épuisés • Passez à la version complète'
+                  }
+                </p>
+              </div>
+            </div>
+            <Button 
+              size="sm"
+              className="bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white"
+              onClick={() => navigate('/offres')}
+            >
+              Débloquer tout <ArrowRight className="w-4 h-4 ml-1" />
+            </Button>
+          </div>
+        </div>
+
         {/* Header */}
         <div className="text-center mb-8">
           <Badge className="mb-4 bg-primary/10 text-primary border-primary/20 px-4 py-2">
