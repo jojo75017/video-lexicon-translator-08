@@ -76,10 +76,20 @@ const renderCibleIdeale = (cible: string | CibleIdealeObject): React.ReactNode =
 
 interface EbookEditorialDirectorProps {
   onAnalysisComplete?: (analysis: EditorialAnalysis) => void;
+  /** Permet de synchroniser le module avec le titre global du planner */
+  subject?: string;
+  onSubjectChange?: (next: string) => void;
 }
 
-export const EbookEditorialDirector = ({ onAnalysisComplete }: EbookEditorialDirectorProps) => {
-  const [sujet, setSujet] = useState("");
+export const EbookEditorialDirector = ({
+  onAnalysisComplete,
+  subject,
+  onSubjectChange,
+}: EbookEditorialDirectorProps) => {
+  const [localSujet, setLocalSujet] = useState("");
+  const sujet = subject ?? localSujet;
+  const setSujet = onSubjectChange ?? setLocalSujet;
+
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState<EditorialAnalysis | null>(null);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
