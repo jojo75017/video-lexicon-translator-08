@@ -135,9 +135,8 @@ export const AuthPage = () => {
 
         if (roleError) {
           console.error('Erreur lors de la vérification du rôle:', roleError);
-          await supabase.auth.signOut();
           toast.error('Erreur de vérification', {
-            description: 'Impossible de vérifier les droits administrateur.',
+            description: 'Impossible de vérifier les droits administrateur. Réessayez dans quelques secondes.',
           });
           setIsLoading(false);
           return;
@@ -145,10 +144,13 @@ export const AuthPage = () => {
 
         if (!roleData?.isAdmin) {
           console.log('Utilisateur non-admin détecté');
-          await supabase.auth.signOut();
+          // IMPORTANT: ne pas déconnecter l’utilisateur ici.
+          // Beaucoup d’utilisateurs sont abonnés (accès ebook) mais pas admin.
+          // On garde la session intacte et on redirige simplement.
           toast.error('Accès refusé', {
-            description: "Votre compte n'a pas les droits administrateur.",
+            description: "Ce compte n'a pas les droits administrateur.",
           });
+          navigate('/ebook-planner', { replace: true });
           setIsLoading(false);
           return;
         }
