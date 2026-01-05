@@ -351,39 +351,53 @@ Génère 5 top books, 5 titres suggérés, 5 catégories, 4 lacunes et 5 recomma
           </TabsTrigger>
         </TabsList>
 
-        {/* Search Bar */}
-        <Card className="mt-4 border-border/50">
+        {/* Search Bar - Catégorie/Niche uniquement */}
+        <Card className="mt-4 border-border/50 bg-gradient-to-r from-primary/5 to-secondary/5">
           <CardContent className="pt-4">
-            <div className="flex gap-3">
-              <Input
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={
-                  activeTab === 'bestsellers' ? "Ex: développement personnel, cuisine healthy..." :
-                  activeTab === 'titles' ? "Ex: productivité, roman fantasy, guide jardinage..." :
-                  activeTab === 'categories' ? "Ex: bien-être, science-fiction, business..." :
-                  "Ex: mindfulness, recettes véganes, thriller psychologique..."
-                }
-                onKeyPress={(e) => e.key === 'Enter' && handleSearch(activeTab)}
-                className="flex-1"
-              />
-              <Button
-                onClick={() => handleSearch(activeTab)}
-                disabled={isLoading}
-                className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 min-w-[140px]"
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Analyse...
-                  </>
-                ) : (
-                  <>
-                    <Search className="h-4 w-4 mr-2" />
-                    Rechercher
-                  </>
-                )}
-              </Button>
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Sparkles className="h-4 w-4 text-amber-500" />
+                <span>Entrez une <strong>catégorie</strong> ou <strong>niche</strong> et l'IA trouvera automatiquement les best-sellers, titres optimisés et opportunités</span>
+              </div>
+              <div className="flex gap-3">
+                <Input
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Ex: développement personnel, cuisine végan, thriller psychologique, fantasy épique..."
+                  onKeyPress={(e) => e.key === 'Enter' && handleSearch(activeTab)}
+                  className="flex-1 text-base"
+                />
+                <Button
+                  onClick={() => handleSearch(activeTab)}
+                  disabled={isLoading}
+                  className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 min-w-[180px]"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Recherche IA...
+                    </>
+                  ) : (
+                    <>
+                      <Zap className="h-4 w-4 mr-2" />
+                      Trouver tout
+                    </>
+                  )}
+                </Button>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <span className="text-xs text-muted-foreground">Suggestions :</span>
+                {['Développement personnel', 'Romance', 'Cuisine healthy', 'Business', 'Fantasy'].map((suggestion) => (
+                  <Badge 
+                    key={suggestion}
+                    variant="outline" 
+                    className="cursor-pointer hover:bg-primary/10 transition-colors text-xs"
+                    onClick={() => setSearchQuery(suggestion)}
+                  >
+                    {suggestion}
+                  </Badge>
+                ))}
+              </div>
             </div>
           </CardContent>
         </Card>
