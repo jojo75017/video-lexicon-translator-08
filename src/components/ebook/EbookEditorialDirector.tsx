@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, BookOpen, Target, Lightbulb, AlertTriangle, Eye, Sparkles } from "lucide-react";
+import { Loader2, BookOpen, Target, Lightbulb, AlertTriangle, Eye, Sparkles, PenLine, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -20,6 +20,7 @@ interface EditorialAnalysis {
   cibleIdeale: string | CibleIdealeObject;
   erreursCourantes: string[];
   visionGlobale: string;
+  suggestionsTitle?: string[];
 }
 
 // Helper to render cibleIdeale whether it's a string or object
@@ -60,6 +61,19 @@ export const EbookEditorialDirector = ({ onAnalysisComplete }: EbookEditorialDir
   const [sujet, setSujet] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState<EditorialAnalysis | null>(null);
+  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+
+  const copyTitle = (title: string, index: number) => {
+    navigator.clipboard.writeText(title);
+    setCopiedIndex(index);
+    toast.success("Titre copié !");
+    setTimeout(() => setCopiedIndex(null), 2000);
+  };
+
+  const useTitle = (title: string) => {
+    setSujet(title);
+    toast.success("Titre appliqué ! Relancez l'analyse pour affiner.");
+  };
 
   const analyzeSubject = async () => {
     if (!sujet.trim()) {
@@ -204,6 +218,51 @@ export const EbookEditorialDirector = ({ onAnalysisComplete }: EbookEditorialDir
               <p className="text-sm leading-relaxed">{analysis.visionGlobale}</p>
             </CardContent>
           </Card>
+
+          {analysis.suggestionsTitle && analysis.suggestionsTitle.length > 0 && (
+            <Card className="md:col-span-2 border-yellow-500/30 bg-yellow-500/5">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2 text-lg text-yellow-700 dark:text-yellow-400">
+                  <PenLine className="h-5 w-5" />
+                  Suggestions de Titres Alternatifs
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {analysis.suggestionsTitle.map((title, index) => (
+                    <div 
+                      key={index} 
+                      className="flex items-center justify-between gap-2 p-3 rounded-lg bg-background/50 border border-yellow-500/20 hover:border-yellow-500/40 transition-colors"
+                    >
+                      <span className="text-sm font-medium flex-1">{title}</span>
+                      <div className="flex gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => copyTitle(title, index)}
+                          className="h-8 w-8 p-0"
+                        >
+                          {copiedIndex === index ? (
+                            <Check className="h-4 w-4 text-green-500" />
+                          ) : (
+                            <Copy className="h-4 w-4" />
+                          )}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => useTitle(title)}
+                          className="h-8 text-xs"
+                        >
+                          Utiliser
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       )}
     </div>
