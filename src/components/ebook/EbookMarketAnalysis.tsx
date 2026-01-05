@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Search, Users, Frown, Lightbulb, AlertTriangle, TrendingUp } from "lucide-react";
+import { Loader2, Search, Users, Frown, Lightbulb, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -33,7 +32,6 @@ const impactColors = {
 
 export const EbookMarketAnalysis = ({ onAnalysisComplete }: EbookMarketAnalysisProps) => {
   const [sujet, setSujet] = useState("");
-  const [contexte, setContexte] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState<MarketAnalysis | null>(null);
 
@@ -46,7 +44,10 @@ export const EbookMarketAnalysis = ({ onAnalysisComplete }: EbookMarketAnalysisP
     setIsAnalyzing(true);
     try {
       const { data, error } = await supabase.functions.invoke("market-analysis", {
-        body: { sujet, contexte },
+        body: { 
+          sujet, 
+          contexte: `Analyse de marché complète et automatique pour un ebook sur "${sujet}". Identifier toutes les opportunités et les pièges à éviter.`
+        },
       });
 
       if (error) throw error;
@@ -64,32 +65,6 @@ export const EbookMarketAnalysis = ({ onAnalysisComplete }: EbookMarketAnalysisP
     }
   };
 
-  const renderInsights = (insights: MarketInsight[], icon: React.ReactNode, title: string, colorClass: string) => (
-    <Card className={`border-${colorClass}/30 bg-${colorClass}/5`}>
-      <CardHeader className="pb-2">
-        <CardTitle className="flex items-center gap-2 text-lg">
-          {icon}
-          {title}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-2">
-          {insights.map((insight, index) => (
-            <div key={index} className="flex items-start gap-2">
-              <Badge 
-                variant="outline" 
-                className={`text-[10px] shrink-0 ${impactColors[insight.impact]}`}
-              >
-                {insight.impact}
-              </Badge>
-              <p className="text-sm leading-relaxed">{insight.element}</p>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
-  );
-
   return (
     <div className="space-y-6">
       <Card className="border-emerald-500/20 bg-gradient-to-br from-emerald-500/5 to-transparent">
@@ -99,29 +74,19 @@ export const EbookMarketAnalysis = ({ onAnalysisComplete }: EbookMarketAnalysisP
             Analyse de Marché IA
           </CardTitle>
           <p className="text-sm text-muted-foreground">
-            Consultant en édition numérique : identifiez les opportunités et évitez les pièges du marché
+            Entrez juste le titre - l'analyse complète du marché est générée automatiquement
           </p>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="sujet-market">Sujet à analyser *</Label>
+            <Label htmlFor="sujet-market">Titre / Sujet à analyser *</Label>
             <Input
               id="sujet-market"
               placeholder="Ex: Guide pratique du développement personnel pour entrepreneurs"
               value={sujet}
               onChange={(e) => setSujet(e.target.value)}
               className="text-base"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="contexte-market">Contexte additionnel (optionnel)</Label>
-            <Textarea
-              id="contexte-market"
-              placeholder="Précisez le marché cible, la région, le format envisagé..."
-              value={contexte}
-              onChange={(e) => setContexte(e.target.value)}
-              rows={3}
+              onKeyDown={(e) => e.key === 'Enter' && analyzeMarket()}
             />
           </div>
 

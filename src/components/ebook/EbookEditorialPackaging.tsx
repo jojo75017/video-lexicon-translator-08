@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -42,10 +41,7 @@ interface PackagingResult {
 
 const EbookEditorialPackaging = () => {
   const [bookTitle, setBookTitle] = useState('');
-  const [bookSummary, setBookSummary] = useState('');
   const [authorName, setAuthorName] = useState('');
-  const [targetAudience, setTargetAudience] = useState('');
-  const [genre, setGenre] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [result, setResult] = useState<PackagingResult | null>(null);
 
@@ -58,7 +54,13 @@ const EbookEditorialPackaging = () => {
     setIsGenerating(true);
     try {
       const { data, error } = await supabase.functions.invoke('editorial-packaging', {
-        body: { bookTitle, bookSummary, authorName, targetAudience, genre }
+        body: { 
+          bookTitle, 
+          bookSummary: `Livre complet sur "${bookTitle}" - génération automatique du résumé`,
+          authorName: authorName || 'Auteur expert',
+          targetAudience: 'Grand public passionné par le sujet',
+          genre: 'Non-fiction / Guide pratique'
+        }
       });
 
       if (error) throw error;
@@ -86,7 +88,7 @@ const EbookEditorialPackaging = () => {
             Packaging Éditorial
           </CardTitle>
           <p className="text-sm text-muted-foreground">
-            Générez tous les éléments marketing de votre livre : descriptions, accroches, bio auteur
+            Entrez le titre et l'auteur - tout le marketing est généré automatiquement
           </p>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -98,6 +100,7 @@ const EbookEditorialPackaging = () => {
                 value={bookTitle}
                 onChange={(e) => setBookTitle(e.target.value)}
                 placeholder="Ex: Les secrets de la productivité"
+                onKeyDown={(e) => e.key === 'Enter' && generatePackaging()}
               />
             </div>
             <div className="space-y-2">
@@ -106,39 +109,7 @@ const EbookEditorialPackaging = () => {
                 id="author-name"
                 value={authorName}
                 onChange={(e) => setAuthorName(e.target.value)}
-                placeholder="Ex: Jean Dupont"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="book-summary">Résumé du livre</Label>
-            <Textarea
-              id="book-summary"
-              value={bookSummary}
-              onChange={(e) => setBookSummary(e.target.value)}
-              placeholder="Décrivez brièvement le contenu et la promesse du livre..."
-              rows={3}
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="target-audience">Public cible</Label>
-              <Input
-                id="target-audience"
-                value={targetAudience}
-                onChange={(e) => setTargetAudience(e.target.value)}
-                placeholder="Ex: Entrepreneurs, cadres, freelances"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="genre">Genre / Catégorie</Label>
-              <Input
-                id="genre"
-                value={genre}
-                onChange={(e) => setGenre(e.target.value)}
-                placeholder="Ex: Développement personnel, Business"
+                placeholder="Ex: Jean Dupont (optionnel)"
               />
             </div>
           </div>
@@ -156,7 +127,7 @@ const EbookEditorialPackaging = () => {
             ) : (
               <>
                 <Package className="mr-2 h-4 w-4" />
-                Générer le packaging complet
+                Générer tout le packaging
               </>
             )}
           </Button>

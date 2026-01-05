@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
@@ -37,8 +36,6 @@ interface EbookContentArchitectProps {
 
 export const EbookContentArchitect = ({ onArchitectureComplete, onApplyStructure }: EbookContentArchitectProps) => {
   const [sujet, setSujet] = useState("");
-  const [objectif, setObjectif] = useState("");
-  const [nombreChapitres, setNombreChapitres] = useState(8);
   const [isGenerating, setIsGenerating] = useState(false);
   const [architecture, setArchitecture] = useState<ContentArchitecture | null>(null);
 
@@ -51,7 +48,11 @@ export const EbookContentArchitect = ({ onArchitectureComplete, onApplyStructure
     setIsGenerating(true);
     try {
       const { data, error } = await supabase.functions.invoke("content-architect", {
-        body: { sujet, objectif, nombreChapitres },
+        body: { 
+          sujet, 
+          objectif: `Permettre au lecteur de maîtriser complètement "${sujet}" de façon pratique et actionnable`,
+          nombreChapitres: 8
+        },
       });
 
       if (error) throw error;
@@ -90,42 +91,19 @@ export const EbookContentArchitect = ({ onArchitectureComplete, onApplyStructure
             Architecte de Contenu IA
           </CardTitle>
           <p className="text-sm text-muted-foreground">
-            Structure professionnelle optimisée pour la compréhension, la progression pédagogique et l'engagement
+            Entrez juste le titre - la structure complète est générée automatiquement
           </p>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="sujet-arch">Sujet de l'ebook *</Label>
+            <Label htmlFor="sujet-arch">Titre / Sujet de l'ebook *</Label>
             <Input
               id="sujet-arch"
               placeholder="Ex: Maîtriser le marketing digital pour les entrepreneurs"
               value={sujet}
               onChange={(e) => setSujet(e.target.value)}
               className="text-base"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="objectif-arch">Objectif principal du lecteur (optionnel)</Label>
-            <Textarea
-              id="objectif-arch"
-              placeholder="Que doit être capable de faire le lecteur après lecture ?"
-              value={objectif}
-              onChange={(e) => setObjectif(e.target.value)}
-              rows={2}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="chapitres-arch">Nombre de chapitres souhaité</Label>
-            <Input
-              id="chapitres-arch"
-              type="number"
-              min={3}
-              max={20}
-              value={nombreChapitres}
-              onChange={(e) => setNombreChapitres(parseInt(e.target.value) || 8)}
-              className="w-32"
+              onKeyDown={(e) => e.key === 'Enter' && generateArchitecture()}
             />
           </div>
 
@@ -143,7 +121,7 @@ export const EbookContentArchitect = ({ onArchitectureComplete, onApplyStructure
             ) : (
               <>
                 <LayoutGrid className="mr-2 h-4 w-4" />
-                Générer l'architecture
+                Générer l'architecture complète
               </>
             )}
           </Button>
