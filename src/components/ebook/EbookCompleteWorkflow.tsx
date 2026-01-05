@@ -249,6 +249,46 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
     }
   };
 
+  const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+  const isTransientError = (err: any) => {
+    const msg = String(err?.message || err || '').toLowerCase();
+    return (
+      msg.includes('timeout') ||
+      msg.includes('rate') ||
+      msg.includes('429') ||
+      msg.includes('503') ||
+      msg.includes('502') ||
+      msg.includes('network') ||
+      msg.includes('failed to fetch')
+    );
+  };
+
+  const runStepWithRetry = async (
+    stepId: string,
+    context: Record<string, any>,
+    extraBody: Record<string, any> = {},
+    options: { previousContextOverride?: Record<string, any> } = {},
+    maxRetries: number = 3
+  ) => {
+    let lastErr: any;
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        return await runStep(stepId, context, extraBody, options);
+      } catch (err: any) {
+        lastErr = err;
+        if (!isTransientError(err) || attempt === maxRetries) break;
+
+        const backoffMs = 700 * Math.pow(2, attempt - 1);
+        toast.info(`⏳ Reprise automatique (${stepId}) — tentative ${attempt + 1}/${maxRetries}…`);
+        await sleep(backoffMs);
+      }
+    }
+
+    throw lastErr;
+  };
+
   // Continuer le workflow après validation des personnages
   const continueAfterCharacterValidation = () => {
     setWaitingForCharacterValidation(false);
@@ -348,7 +388,19 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
 
           for (let chIdx = startFromChapter; chIdx < structure.length; chIdx++) {
             const chapitre = structure[chIdx];
-            const partial = await runStep('P4', context, { chapter: chapitre }, { previousContextOverride: p4SlimContext });
+
+            let partial: { result: any; displayContent: string } | null = null;
+            try {
+              partial = await runStepWithRetry(
+                'P4',
+                context,
+                { chapter: chapitre },
+                { previousContextOverride: p4SlimContext },
+                3
+              );
+            } catch (err: any) {
+              throw new Error(`P4 — Chapitre ${chIdx + 1}/${structure.length} : ${err?.message || 'Erreur inconnue'}`);
+            }
             const chapitreGenere = partial?.result?.chapitre;
             if (chapitreGenere) chapitresComplets.push(chapitreGenere);
 
