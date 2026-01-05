@@ -159,13 +159,7 @@ const App = () => {
             />
             <Route
               path="/ebook-planner"
-              element={
-                isAdmin || isAuthenticated ? (
-                  <EbookPlannerPage subscriberEmail={subscriberEmail} subscriberData={subscriberData} />
-                ) : (
-                  <SubscriptionAuth onAuthenticated={handleAuthenticated} />
-                )
-              }
+              element={<EbookPlannerPage subscriberEmail={subscriberEmail || 'guest@ebook.local'} subscriberData={subscriberData || { plan_type: 'pro', status: 'active' }} />}
             />
             <Route 
               path="/subscription" 
