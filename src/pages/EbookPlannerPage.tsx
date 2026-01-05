@@ -873,12 +873,12 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
       case 'complete-workflow':
         return (
           <EbookCompleteWorkflow
-            title={ebookTitle}
-            authorName={authorName}
-            targetAudience={targetAudience}
-            genre={genre}
-            numberOfChapters={numberOfChapters}
             onComplete={(bookData) => {
+              // Update title and author from the workflow
+              if (bookData.title) setEbookTitle(bookData.title);
+              if (bookData.authorName) setAuthorName(bookData.authorName);
+              if (bookData.numberOfChapters) setNumberOfChapters(bookData.numberOfChapters);
+              
               // Update all the state with the generated book data
               if (bookData.preface) setPreface(bookData.preface);
               if (bookData.conclusion) setConclusion(bookData.conclusion);

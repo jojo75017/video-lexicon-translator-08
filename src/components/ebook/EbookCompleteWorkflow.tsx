@@ -3,50 +3,48 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Slider } from '@/components/ui/slider';
 import { 
   Sparkles, BookOpen, CheckCircle2, Loader2, AlertCircle,
-  Rocket, Target, TrendingUp, Layers, FileText, Award
+  Rocket, Target, TrendingUp, Layers, FileText, Award, User, Hash
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface EbookCompleteWorkflowProps {
-  title: string;
-  authorName: string;
-  targetAudience?: string;
-  genre?: string;
-  numberOfChapters?: number;
   onComplete: (bookData: any) => void;
 }
 
 const workflowSteps = [
-  { id: 'P1', name: 'Directeur Éditorial', icon: Target, description: 'Vision stratégique' },
-  { id: 'P2', name: 'Analyse de Marché', icon: TrendingUp, description: 'Positionnement KDP' },
-  { id: 'P3', name: 'Architecte de Contenu', icon: Layers, description: 'Structure des chapitres' },
-  { id: 'P4', name: 'Rédaction Experte', icon: FileText, description: 'Écriture du contenu' },
+  { id: 'P1', name: 'Directeur Éditorial', icon: Target, description: 'Vision stratégique et analyse du projet' },
+  { id: 'P2', name: 'Analyse de Marché', icon: TrendingUp, description: 'Positionnement Amazon KDP' },
+  { id: 'P3', name: 'Architecte de Contenu', icon: Layers, description: 'Structure détaillée des chapitres' },
+  { id: 'P4', name: 'Rédaction Experte', icon: FileText, description: 'Écriture professionnelle du contenu' },
   { id: 'P5', name: 'Réécriture Naturelle', icon: Sparkles, description: 'Humanisation du texte' },
-  { id: 'P6', name: 'Qualité Éditoriale', icon: CheckCircle2, description: 'Contrôle qualité' },
-  { id: 'P7', name: 'Packaging Éditorial', icon: BookOpen, description: 'Métadonnées KDP' },
-  { id: 'P8', name: 'Diagnostic Final', icon: Target, description: 'Cohérence globale' },
-  { id: 'P9', name: 'Mémoire Éditoriale', icon: Sparkles, description: 'Capture de votre voix' },
-  { id: 'P10', name: 'Cohérence Chapitres', icon: Layers, description: 'Transitions fluides' },
-  { id: 'P11', name: 'Auto-Critique', icon: AlertCircle, description: 'Détection faiblesses' },
-  { id: 'P12', name: 'Boucle Itérative', icon: Sparkles, description: 'Améliorations' },
-  { id: 'P13', name: 'Signature de Style', icon: Award, description: 'Voix unifiée' },
-  { id: 'P14', name: 'Verdict Ultime', icon: CheckCircle2, description: 'Validation finale' },
+  { id: 'P6', name: 'Qualité Éditoriale', icon: CheckCircle2, description: 'Contrôle qualité approfondi' },
+  { id: 'P7', name: 'Packaging Éditorial', icon: BookOpen, description: 'Métadonnées et mots-clés KDP' },
+  { id: 'P8', name: 'Diagnostic Final', icon: Target, description: 'Vérification cohérence globale' },
+  { id: 'P9', name: 'Mémoire Éditoriale', icon: Sparkles, description: 'Capture de votre voix unique' },
+  { id: 'P10', name: 'Cohérence Chapitres', icon: Layers, description: 'Transitions fluides entre chapitres' },
+  { id: 'P11', name: 'Auto-Critique', icon: AlertCircle, description: 'Détection des faiblesses' },
+  { id: 'P12', name: 'Boucle Itérative', icon: Sparkles, description: 'Améliorations automatiques' },
+  { id: 'P13', name: 'Signature de Style', icon: Award, description: 'Voix d\'auteur unifiée' },
+  { id: 'P14', name: 'Verdict Ultime', icon: CheckCircle2, description: 'Validation finale par l\'éditeur' },
 ];
 
-const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
-  title,
-  authorName,
-  targetAudience,
-  genre,
-  numberOfChapters = 8,
-  onComplete
-}) => {
+const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplete }) => {
+  // Form state
+  const [title, setTitle] = useState('');
+  const [authorName, setAuthorName] = useState('');
+  const [numberOfChapters, setNumberOfChapters] = useState(8);
+  
+  // Workflow state
   const [isGenerating, setIsGenerating] = useState(false);
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState(-1);
+  const [stepResults, setStepResults] = useState<Record<string, string>>({});
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
@@ -55,35 +53,47 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
       toast.error('Veuillez entrer un titre pour votre ebook');
       return;
     }
+    if (!authorName.trim()) {
+      toast.error('Veuillez entrer votre nom d\'auteur');
+      return;
+    }
 
     setIsGenerating(true);
     setError(null);
     setCurrentStep(0);
     setProgress(0);
+    setStepResults({});
 
-    // Simulate progress through steps while waiting for AI
-    const progressInterval = setInterval(() => {
+    // Animate through steps while waiting for AI
+    const stepInterval = setInterval(() => {
       setCurrentStep(prev => {
         const next = prev < 13 ? prev + 1 : prev;
-        setProgress((next / 14) * 100);
+        setProgress(((next + 1) / 14) * 100);
+        
+        // Add simulated result for visual feedback
+        if (prev >= 0 && prev < 14) {
+          setStepResults(results => ({
+            ...results,
+            [workflowSteps[prev].id]: `✓ ${workflowSteps[prev].description} - Terminé`
+          }));
+        }
+        
         return next;
       });
-    }, 3000); // Each step takes ~3 seconds visually
+    }, 2500);
 
     try {
-      toast.info('🚀 Génération en cours... Le Directeur Éditorial orchestre les 14 modules IA.');
+      toast.info('🚀 Le Directeur Éditorial lance le workflow complet...');
 
       const { data, error: fnError } = await supabase.functions.invoke('complete-book-workflow', {
         body: {
           title,
           authorName,
-          targetAudience,
-          genre,
           numberOfChapters
         }
       });
 
-      clearInterval(progressInterval);
+      clearInterval(stepInterval);
 
       if (fnError) {
         throw new Error(fnError.message || 'Erreur lors de la génération');
@@ -94,66 +104,128 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
       }
 
       if (data?.success && data?.book) {
+        // Mark all steps complete
         setCurrentStep(14);
         setProgress(100);
         
-        toast.success('✅ Livre généré avec succès ! Le Verdict Éditeur Ultime a validé votre projet.');
+        const allResults: Record<string, string> = {};
+        workflowSteps.forEach(step => {
+          allResults[step.id] = `✓ ${step.description} - Terminé`;
+        });
+        setStepResults(allResults);
         
-        // Pass the complete book data to parent
+        toast.success('✅ Livre généré avec succès ! Prêt pour publication KDP.');
         onComplete(data.book);
-      } else if (data?.rawContent) {
-        // Partial success
-        toast.warning('⚠️ Le livre a été généré mais le format nécessite des ajustements.');
-        setError('Contenu généré mais format à vérifier. Veuillez réessayer.');
       } else {
         throw new Error('Réponse inattendue du serveur');
       }
 
     } catch (err: any) {
-      clearInterval(progressInterval);
+      clearInterval(stepInterval);
       console.error('Complete workflow error:', err);
       
       const errorMessage = err.message || 'Erreur lors de la génération';
       setError(errorMessage);
-      
-      if (errorMessage.includes('429') || errorMessage.includes('Limite')) {
-        toast.error('Limite de requêtes atteinte. Veuillez réessayer dans quelques instants.');
-      } else if (errorMessage.includes('402') || errorMessage.includes('Crédits')) {
-        toast.error('Crédits IA épuisés. Veuillez ajouter des crédits.');
-      } else {
-        toast.error(`Erreur: ${errorMessage}`);
-      }
+      toast.error(`Erreur: ${errorMessage}`);
     } finally {
       setIsGenerating(false);
     }
   };
 
-  return (
-    <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 via-background to-amber-500/5">
-      <CardHeader className="text-center pb-4">
-        <div className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-amber-500 text-white px-4 py-2 rounded-full text-sm font-semibold mb-4 mx-auto">
-          <Sparkles className="h-4 w-4" />
-          Workflow IA Complet
-        </div>
-        <CardTitle className="text-2xl font-bold">
-          Générer le livre complet
-        </CardTitle>
-        <p className="text-muted-foreground mt-2">
-          Le Directeur Éditorial orchestre automatiquement les 14 modules IA pour créer votre ebook.
-        </p>
-      </CardHeader>
+  const estimatedPages = Math.round(numberOfChapters * 12);
 
-      <CardContent className="space-y-6">
-        {/* Main CTA Button */}
-        <div className="text-center">
+  return (
+    <div className="space-y-6">
+      {/* Input Card */}
+      <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 via-background to-amber-500/5">
+        <CardHeader className="text-center pb-4">
+          <div className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-amber-500 text-white px-4 py-2 rounded-full text-sm font-semibold mb-4 mx-auto">
+            <Sparkles className="h-4 w-4" />
+            Workflow IA Éditorial Complet
+          </div>
+          <CardTitle className="text-2xl font-bold">
+            Créer votre livre en 1 clic
+          </CardTitle>
+          <p className="text-muted-foreground mt-2">
+            Entrez les informations de base, le Directeur Éditorial s'occupe du reste.
+          </p>
+        </CardHeader>
+
+        <CardContent className="space-y-6">
+          {/* Form Fields */}
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="title" className="flex items-center gap-2">
+                <BookOpen className="h-4 w-4 text-primary" />
+                Titre du livre
+              </Label>
+              <Input
+                id="title"
+                placeholder="Ex: Les secrets de la productivité"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                disabled={isGenerating}
+                className="text-lg"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="author" className="flex items-center gap-2">
+                <User className="h-4 w-4 text-primary" />
+                Nom d'auteur
+              </Label>
+              <Input
+                id="author"
+                placeholder="Ex: Jean Dupont"
+                value={authorName}
+                onChange={(e) => setAuthorName(e.target.value)}
+                disabled={isGenerating}
+                className="text-lg"
+              />
+            </div>
+          </div>
+
+          {/* Chapters Slider */}
+          <div className="space-y-4 p-4 bg-muted/30 rounded-lg">
+            <div className="flex items-center justify-between">
+              <Label className="flex items-center gap-2">
+                <Hash className="h-4 w-4 text-primary" />
+                Nombre de chapitres
+              </Label>
+              <div className="flex items-center gap-3">
+                <Badge variant="secondary" className="text-lg px-3 py-1">
+                  {numberOfChapters} chapitres
+                </Badge>
+                <Badge variant="outline" className="text-sm">
+                  ~{estimatedPages} pages
+                </Badge>
+              </div>
+            </div>
+            <Slider
+              value={[numberOfChapters]}
+              onValueChange={(value) => setNumberOfChapters(value[0])}
+              min={3}
+              max={20}
+              step={1}
+              disabled={isGenerating}
+              className="w-full"
+            />
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>3 chapitres (court)</span>
+              <span>20 chapitres (long)</span>
+            </div>
+          </div>
+
+          {/* Generate Button */}
           <motion.div
             whileHover={{ scale: isGenerating ? 1 : 1.02 }}
             whileTap={{ scale: isGenerating ? 1 : 0.98 }}
+            className="text-center"
           >
             <Button
               size="lg"
               onClick={generateCompleteBook}
-              disabled={isGenerating || !title.trim()}
+              disabled={isGenerating || !title.trim() || !authorName.trim()}
               className="gap-3 px-10 py-7 text-lg font-bold bg-gradient-to-r from-primary via-amber-500 to-orange-500 hover:from-primary/90 hover:via-amber-500/90 hover:to-orange-500/90 shadow-xl shadow-primary/30 transition-all duration-300 w-full max-w-md"
             >
               {isGenerating ? (
@@ -169,122 +241,137 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
               )}
             </Button>
           </motion.div>
-          
-          {!title.trim() && (
-            <p className="text-sm text-destructive mt-2">
-              Veuillez d'abord entrer un titre pour votre ebook
-            </p>
-          )}
-        </div>
+        </CardContent>
+      </Card>
 
-        {/* Progress Section */}
-        <AnimatePresence>
-          {isGenerating && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="space-y-4"
-            >
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Progression du workflow</span>
-                  <span className="font-semibold text-primary">{Math.round(progress)}%</span>
-                </div>
-                <Progress value={progress} className="h-3" />
-              </div>
-
-              {/* Steps Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2">
-                {workflowSteps.map((step, index) => {
-                  const StepIcon = step.icon;
-                  const isActive = index === currentStep;
-                  const isCompleted = index < currentStep;
-                  
-                  return (
-                    <motion.div
-                      key={step.id}
-                      initial={{ opacity: 0.5 }}
-                      animate={{ 
-                        opacity: isCompleted ? 1 : isActive ? 1 : 0.5,
-                        scale: isActive ? 1.05 : 1
-                      }}
-                      className={`
-                        flex flex-col items-center p-2 rounded-lg text-center transition-colors
-                        ${isCompleted ? 'bg-green-500/10 border border-green-500/30' : ''}
-                        ${isActive ? 'bg-primary/10 border border-primary/30' : ''}
-                        ${!isActive && !isCompleted ? 'bg-muted/30' : ''}
-                      `}
-                    >
-                      <div className={`
-                        w-8 h-8 rounded-full flex items-center justify-center mb-1
-                        ${isCompleted ? 'bg-green-500 text-white' : ''}
-                        ${isActive ? 'bg-primary text-white animate-pulse' : ''}
-                        ${!isActive && !isCompleted ? 'bg-muted text-muted-foreground' : ''}
-                      `}>
-                        {isCompleted ? (
-                          <CheckCircle2 className="h-4 w-4" />
-                        ) : isActive ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <StepIcon className="h-4 w-4" />
-                        )}
-                      </div>
-                      <span className="text-[10px] font-medium">{step.id}</span>
-                      <span className="text-[9px] text-muted-foreground line-clamp-1">{step.name}</span>
-                    </motion.div>
-                  );
-                })}
-              </div>
-
-              <div className="text-center text-sm text-muted-foreground">
-                <span className="font-medium text-primary">
-                  {workflowSteps[currentStep]?.name || 'Finalisation'}
-                </span>
-                {' - '}
-                {workflowSteps[currentStep]?.description || 'Validation du livre'}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Error Display */}
-        {error && (
+      {/* Workflow Progress Card */}
+      <AnimatePresence>
+        {(isGenerating || currentStep >= 0) && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="p-4 bg-destructive/10 border border-destructive/30 rounded-lg"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
           >
-            <div className="flex items-start gap-3">
-              <AlertCircle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
-              <div>
-                <p className="font-medium text-destructive">Erreur de génération</p>
-                <p className="text-sm text-muted-foreground mt-1">{error}</p>
-              </div>
-            </div>
+            <Card className="border border-primary/30">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                  Progression du Workflow Éditorial
+                </CardTitle>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">
+                      {currentStep >= 14 ? 'Terminé !' : `Étape ${currentStep + 1} sur 14`}
+                    </span>
+                    <span className="font-semibold text-primary">{Math.round(progress)}%</span>
+                  </div>
+                  <Progress value={progress} className="h-3" />
+                </div>
+              </CardHeader>
+
+              <CardContent className="space-y-4">
+                {/* Steps List with Results */}
+                <div className="grid gap-2">
+                  {workflowSteps.map((step, index) => {
+                    const StepIcon = step.icon;
+                    const isActive = index === currentStep;
+                    const isCompleted = index < currentStep || currentStep >= 14;
+                    const result = stepResults[step.id];
+                    
+                    return (
+                      <motion.div
+                        key={step.id}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ 
+                          opacity: isCompleted || isActive ? 1 : 0.4,
+                          x: 0
+                        }}
+                        transition={{ delay: index * 0.05 }}
+                        className={`
+                          flex items-center gap-3 p-3 rounded-lg transition-all
+                          ${isCompleted ? 'bg-green-500/10 border border-green-500/30' : ''}
+                          ${isActive ? 'bg-primary/10 border border-primary/30 shadow-md' : ''}
+                          ${!isActive && !isCompleted ? 'bg-muted/20 border border-transparent' : ''}
+                        `}
+                      >
+                        <div className={`
+                          w-10 h-10 rounded-full flex items-center justify-center shrink-0
+                          ${isCompleted ? 'bg-green-500 text-white' : ''}
+                          ${isActive ? 'bg-primary text-white animate-pulse' : ''}
+                          ${!isActive && !isCompleted ? 'bg-muted text-muted-foreground' : ''}
+                        `}>
+                          {isCompleted ? (
+                            <CheckCircle2 className="h-5 w-5" />
+                          ) : isActive ? (
+                            <Loader2 className="h-5 w-5 animate-spin" />
+                          ) : (
+                            <StepIcon className="h-5 w-5" />
+                          )}
+                        </div>
+                        
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <Badge variant={isCompleted ? 'default' : isActive ? 'secondary' : 'outline'} className="text-xs">
+                              {step.id}
+                            </Badge>
+                            <span className={`font-medium ${isActive ? 'text-primary' : ''}`}>
+                              {step.name}
+                            </span>
+                          </div>
+                          <p className="text-sm text-muted-foreground truncate">
+                            {result || step.description}
+                          </p>
+                        </div>
+
+                        {isActive && (
+                          <div className="text-xs text-primary font-medium animate-pulse">
+                            En cours...
+                          </div>
+                        )}
+                      </motion.div>
+                    );
+                  })}
+                </div>
+
+                {/* Final Success Message */}
+                {currentStep >= 14 && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="p-4 bg-green-500/10 border border-green-500/30 rounded-lg text-center"
+                  >
+                    <CheckCircle2 className="h-8 w-8 text-green-500 mx-auto mb-2" />
+                    <p className="font-semibold text-green-700 dark:text-green-400">
+                      Livre généré avec succès !
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Le Verdict Éditeur Ultime a validé votre projet. Prêt pour KDP.
+                    </p>
+                  </motion.div>
+                )}
+              </CardContent>
+            </Card>
           </motion.div>
         )}
+      </AnimatePresence>
 
-        {/* Info Section */}
-        <div className="bg-muted/30 rounded-lg p-4 space-y-3">
-          <h4 className="font-semibold flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-primary" />
-            Ce que fait le Directeur Éditorial :
-          </h4>
-          <ul className="text-sm text-muted-foreground space-y-1">
-            <li>✅ Analyse stratégique de votre projet (P1-P2)</li>
-            <li>✅ Structure et rédaction complète des chapitres (P3-P4)</li>
-            <li>✅ Humanisation et contrôle qualité (P5-P6)</li>
-            <li>✅ Packaging KDP et cohérence narrative (P7-P10)</li>
-            <li>✅ Auto-critique et améliorations (P11-P12)</li>
-            <li>✅ Signature de style unique + Verdict final (P13-P14)</li>
-          </ul>
-          <p className="text-xs text-muted-foreground border-t border-border pt-2 mt-2">
-            💡 Le résultat est un ebook complet avec une voix d'auteur cohérente, prêt pour KDP.
-          </p>
-        </div>
-      </CardContent>
-    </Card>
+      {/* Error Display */}
+      {error && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="p-4 bg-destructive/10 border border-destructive/30 rounded-lg"
+        >
+          <div className="flex items-start gap-3">
+            <AlertCircle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+            <div>
+              <p className="font-medium text-destructive">Erreur de génération</p>
+              <p className="text-sm text-muted-foreground mt-1">{error}</p>
+            </div>
+          </div>
+        </motion.div>
+      )}
+    </div>
   );
 };
 

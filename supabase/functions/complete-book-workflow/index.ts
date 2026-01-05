@@ -229,11 +229,16 @@ GÉNÈRE LE JSON COMPLET MAINTENANT.`;
 
     console.log("Book generation completed successfully!");
 
-    // Return the complete book data
+    // Return the complete book data with input params for state sync
     return new Response(
       JSON.stringify({ 
         success: true,
-        book: bookData,
+        book: {
+          ...bookData,
+          title,
+          authorName: authorName || '',
+          numberOfChapters
+        },
         workflow: {
           stepsCompleted: 14,
           totalSteps: 14,
