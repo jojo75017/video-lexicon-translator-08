@@ -1019,7 +1019,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
                       type="button"
                       onClick={resetPlan}
                       variant="outline"
-                      className="border-white/30 text-white hover:bg-white/20 backdrop-blur-sm"
+                      className="bg-white/90 border-violet-300 text-violet-700 hover:bg-white hover:border-violet-400"
                     >
                       <RotateCcw className="h-4 w-4 mr-2" />
                       Nouveau
@@ -1031,7 +1031,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
                         setShowTutorial(true);
                       }}
                       variant="outline"
-                      className="border-white/30 text-white hover:bg-white/20 backdrop-blur-sm"
+                      className="bg-white/90 border-violet-300 text-violet-700 hover:bg-white hover:border-violet-400"
                     >
                       <HelpCircle className="h-4 w-4 mr-2" />
                       Aide
