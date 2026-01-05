@@ -87,6 +87,8 @@ import { useConfetti } from '@/hooks/useConfetti';
 import { useDemoMode } from '@/hooks/useDemoMode';
 import { DemoBanner } from '@/components/ebook/DemoBanner';
 import { DemoPaywall } from '@/components/ebook/DemoPaywall';
+import { useWorkflowResults } from '@/hooks/useWorkflowResults';
+import { WorkflowResultViewer } from '@/components/ebook/WorkflowResultViewer';
 
 // Hooks et données
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
@@ -119,6 +121,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
   const { saveProject, loadLatestProject, isSaving, currentProjectId, setCurrentProjectId, saveVersion, loadVersions, restoreVersion } = useEbookDatabase();
   const { fireStars } = useConfetti();
   const { limits: demoLimits, incrementPlanCount } = useDemoMode(!isDemo ? true : false);
+  const { getStepResult, clearResults: clearWorkflowResults } = useWorkflowResults();
   const [showPaywall, setShowPaywall] = useState<'chapters' | 'export' | 'cover' | 'advanced' | null>(null);
   const [userProjectsCount, setUserProjectsCount] = useState(0);
   
@@ -2234,90 +2237,174 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
       
       case 'editorial-director':
         return (
-          <EbookEditorialDirector
-            subject={ebookTitle}
-            onSubjectChange={setEbookTitle}
-          />
+          <WorkflowResultViewer
+            stepId="P1"
+            stepName="Directeur Éditorial"
+            result={getStepResult('P1')}
+          >
+            <EbookEditorialDirector
+              subject={ebookTitle}
+              onSubjectChange={setEbookTitle}
+            />
+          </WorkflowResultViewer>
         );
       
       case 'market-analysis':
         return (
-          <EbookMarketAnalysis />
+          <WorkflowResultViewer
+            stepId="P2"
+            stepName="Analyse de Marché"
+            result={getStepResult('P2')}
+          >
+            <EbookMarketAnalysis />
+          </WorkflowResultViewer>
         );
       
       case 'content-architect':
         return (
-          <EbookContentArchitect 
-            onApplyStructure={(structure) => {
-              const newChapters = structure.map((ch, index) => ({
-                id: `chapter-${Date.now()}-${index}`,
-                title: ch.title,
-                content: '',
-                subChapters: ch.subChapters.map((sub, subIndex) => ({
-                  id: `subchapter-${Date.now()}-${index}-${subIndex}`,
-                  title: sub,
-                  content: ''
-                }))
-              }));
-              setChapters(newChapters);
-              setActiveTab('planner');
-            }}
-          />
+          <WorkflowResultViewer
+            stepId="P3"
+            stepName="Architecte de Contenu"
+            result={getStepResult('P3')}
+          >
+            <EbookContentArchitect 
+              onApplyStructure={(structure) => {
+                const newChapters = structure.map((ch, index) => ({
+                  id: `chapter-${Date.now()}-${index}`,
+                  title: ch.title,
+                  content: '',
+                  subChapters: ch.subChapters.map((sub, subIndex) => ({
+                    id: `subchapter-${Date.now()}-${index}-${subIndex}`,
+                    title: sub,
+                    content: ''
+                  }))
+                }));
+                setChapters(newChapters);
+                setActiveTab('planner');
+              }}
+            />
+          </WorkflowResultViewer>
         );
       
       case 'expert-writing':
         return (
-          <EbookExpertWriting />
+          <WorkflowResultViewer
+            stepId="P4"
+            stepName="Rédaction Experte"
+            result={getStepResult('P4')}
+          >
+            <EbookExpertWriting />
+          </WorkflowResultViewer>
         );
       
       case 'natural-rewrite':
         return (
-          <EbookNaturalRewrite />
+          <WorkflowResultViewer
+            stepId="P5"
+            stepName="Réécriture Naturelle"
+            result={getStepResult('P5')}
+          >
+            <EbookNaturalRewrite />
+          </WorkflowResultViewer>
         );
       
       case 'editorial-packaging':
         return (
-          <EbookEditorialPackaging />
+          <WorkflowResultViewer
+            stepId="P7"
+            stepName="Packaging Éditorial"
+            result={getStepResult('P7')}
+          >
+            <EbookEditorialPackaging />
+          </WorkflowResultViewer>
         );
       
       case 'editorial-quality':
         return (
-          <EbookEditorialQuality />
+          <WorkflowResultViewer
+            stepId="P6"
+            stepName="Qualité Éditoriale"
+            result={getStepResult('P6')}
+          >
+            <EbookEditorialQuality />
+          </WorkflowResultViewer>
         );
       
       case 'final-diagnosis':
         return (
-          <EbookFinalDiagnosis />
+          <WorkflowResultViewer
+            stepId="P8"
+            stepName="Diagnostic Final"
+            result={getStepResult('P8')}
+          >
+            <EbookFinalDiagnosis />
+          </WorkflowResultViewer>
         );
       
       case 'editorial-memory':
         return (
-          <EbookEditorialMemory />
+          <WorkflowResultViewer
+            stepId="P9"
+            stepName="Mémoire Éditoriale"
+            result={getStepResult('P9')}
+          >
+            <EbookEditorialMemory />
+          </WorkflowResultViewer>
         );
       
       case 'chapter-coherence':
         return (
-          <EbookChapterCoherence />
+          <WorkflowResultViewer
+            stepId="P10"
+            stepName="Cohérence Chapitres"
+            result={getStepResult('P10')}
+          >
+            <EbookChapterCoherence />
+          </WorkflowResultViewer>
         );
       
       case 'self-critique':
         return (
-          <EbookSelfCritique />
+          <WorkflowResultViewer
+            stepId="P11"
+            stepName="Auto-Critique"
+            result={getStepResult('P11')}
+          >
+            <EbookSelfCritique />
+          </WorkflowResultViewer>
         );
       
       case 'iterative-loop':
         return (
-          <EbookIterativeLoop />
+          <WorkflowResultViewer
+            stepId="P12"
+            stepName="Boucle Itérative"
+            result={getStepResult('P12')}
+          >
+            <EbookIterativeLoop />
+          </WorkflowResultViewer>
         );
       
       case 'style-signature':
         return (
-          <EbookStyleSignature />
+          <WorkflowResultViewer
+            stepId="P13"
+            stepName="Signature de Style"
+            result={getStepResult('P13')}
+          >
+            <EbookStyleSignature />
+          </WorkflowResultViewer>
         );
       
       case 'ultimate-verdict':
         return (
-          <EbookUltimateVerdict />
+          <WorkflowResultViewer
+            stepId="P14"
+            stepName="Verdict Ultime"
+            result={getStepResult('P14')}
+          >
+            <EbookUltimateVerdict />
+          </WorkflowResultViewer>
         );
       
       case 'formation-pdf':

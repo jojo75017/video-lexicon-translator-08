@@ -18,6 +18,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { useWorkflowResults } from '@/hooks/useWorkflowResults';
 
 interface Character {
   id: string;
@@ -71,6 +72,9 @@ const workflowSteps = [
 ];
 
 const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplete, characters: externalCharacters = [] }) => {
+  // Hook pour sauvegarder les résultats P1-P14 globalement
+  const { saveStepResult, saveAllResults } = useWorkflowResults();
+  
   // Form state
   const [title, setTitle] = useState('');
   const [subtitle, setSubtitle] = useState('');
@@ -327,17 +331,21 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             if (chapitreGenere) chapitresComplets.push(chapitreGenere);
 
             // UI : on met à jour P4 au fil de l'eau
+            const p4DisplayContent = `**📄 Chapitres rédigés : ${chapitresComplets.length}/${structure.length}**\n\nDernier : ${partial?.displayContent || ''}`;
             setStepResults(prev => ({
               ...prev,
               P4: {
                 result: { chapitres: chapitresComplets, nombreChapitres: chapitresComplets.length },
-                displayContent: `**📄 Chapitres rédigés : ${chapitresComplets.length}/${structure.length}**\n\nDernier : ${partial?.displayContent || ''}`,
+                displayContent: p4DisplayContent,
               }
             }));
             
             // Sauvegarder le contexte intermédiaire pour la reprise
             context.P4 = { chapitres: chapitresComplets };
             setAllContext(prev => ({ ...prev, P4: context.P4 }));
+            
+            // Sauvegarder P4 dans le hook global (pour consultation dans onglet individuel)
+            saveStepResult('P4', context.P4, p4DisplayContent);
           }
 
           // Collapse previous step, keep current expanded
@@ -349,10 +357,13 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
           const result = await runStep(step.id, context);
 
           if (result) {
-            // Store result
+            // Store result locally
             setStepResults(prev => ({ ...prev, [step.id]: result }));
             context[step.id] = result.result;
             setAllContext(prev => ({ ...prev, [step.id]: result.result }));
+            
+            // SAUVEGARDER dans le hook global pour consultation dans les onglets individuels
+            saveStepResult(step.id, result.result, result.displayContent);
 
             // Collapse previous step, keep current expanded
             if (i > 0) {
