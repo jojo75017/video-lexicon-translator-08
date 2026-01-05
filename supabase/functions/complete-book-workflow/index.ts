@@ -65,7 +65,7 @@ serve(async (req) => {
   }
 
   try {
-    const { step, title, authorName, numberOfChapters = 8, previousContext = {} } = await req.json();
+    const { step, title, subtitle = '', category = '', description = '', authorName, numberOfChapters = 8, previousContext = {} } = await req.json();
 
     if (!title) {
       return new Response(
@@ -79,7 +79,17 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
-    console.log(`Step ${step} for: "${title}"`);
+    // Construire le contexte complet du livre
+    const fullTitle = subtitle ? `${title} : ${subtitle}` : title;
+    const bookContext = `
+TITRE COMPLET : "${fullTitle}"
+CATÉGORIE : ${category || 'Non spécifiée'}
+DESCRIPTION : ${description || 'Non fournie'}
+AUTEUR : ${authorName}
+CHAPITRES PRÉVUS : ${numberOfChapters}
+`.trim();
+
+    console.log(`Step ${step} for: "${fullTitle}" (Category: ${category})`);
 
     let result: any = {};
     let displayContent = '';
@@ -88,11 +98,11 @@ serve(async (req) => {
       case 'P1': {
         // DIRECTEUR ÉDITORIAL - Vision stratégique
         const content = await callAI(
-          `Tu es un DIRECTEUR ÉDITORIAL avec 20 ans d'expérience. Tu analyses un projet de livre et donnes ta vision stratégique. Sois direct, incisif, comme un vrai pro.`,
+          `Tu es un DIRECTEUR ÉDITORIAL avec 20 ans d'expérience. Tu analyses un projet de livre et donnes ta vision stratégique. Sois direct, incisif, comme un vrai pro. UTILISE LA CATÉGORIE ET LA DESCRIPTION FOURNIES pour comprendre le sujet exact du livre.`,
           `Analyse ce projet de livre :
-TITRE : "${title}"
-AUTEUR : ${authorName}
-CHAPITRES PRÉVUS : ${numberOfChapters}
+${bookContext}
+
+IMPORTANT : Base ton analyse sur la CATÉGORIE et la DESCRIPTION fournies. Ne devine pas le sujet.
 
 Donne ta vision éditoriale en JSON :
 {
@@ -109,55 +119,44 @@ Donne ta vision éditoriale en JSON :
         displayContent = result.promesseCentrale 
           ? `**Promesse centrale :** ${result.promesseCentrale}\n\n**Angle unique :** ${result.angleUnique}\n\n**Lecteur cible :** ${result.lecteurCible}\n\n**Ton éditorial :** ${result.tonEditorial}\n\n**Recommandation :** ${result.recommandation}`
           : content;
+        console.log('Step P1 completed successfully');
         break;
       }
 
       case 'P2': {
         // ANALYSE DE MARCHÉ + 7 MOTS-CLÉS KDP OPTIMISÉS
         const content = await callAI(
-          `Tu es un expert en SEO Amazon KDP et en analyse d'intention de recherche. Tu connais les tendances, les niches rentables, la concurrence. Parle comme un consultant business pragmatique.`,
+          `Tu es un expert en SEO Amazon KDP et en analyse d'intention de recherche. Tu connais les tendances, les niches rentables, la concurrence. Parle comme un consultant business pragmatique. UTILISE LA CATÉGORIE fournie pour cibler la bonne niche.`,
           `Analyse le marché pour ce livre et génère 7 mots-clés KDP très performants :
 
-TITRE EXACT DE L'EBOOK : "${title}"
+${bookContext}
 VISION ÉDITORIALE : ${JSON.stringify(previousContext.P1 || {})}
 
 MISSION MOTS-CLÉS KDP :
-Trouve 7 mots-clés très performants pour Amazon KDP France basés EXCLUSIVEMENT sur le TITRE EXACT.
+Trouve 7 mots-clés très performants pour Amazon KDP France basés sur le TITRE et la CATÉGORIE.
 
 CONTRAINTES OBLIGATOIRES pour les mots-clés :
 - Correspondre à des recherches réelles d'internautes (Amazon + Google)
-- Avoir un bon potentiel de visibilité (volume réel + concurrence raisonnable)
-- Être strictement cohérents avec le titre et la promesse implicite
+- Être strictement cohérents avec la CATÉGORIE "${category}"
 - Être adaptés à Amazon KDP (ni trop génériques, ni trop vagues)
-- Un seul mot-clé par entrée (pas de phrases longues)
 - Pas de répétition exacte du titre
-- Pas de hashtags, pas de virgules
-
-OBJECTIF MOTS-CLÉS :
-- Maximiser la découvrabilité sur Amazon.fr
-- Déclencher des catégories Amazon secondaires (dites "cachées")
-- Attirer une audience qualifiée et réellement intéressée
-
-MÉTHODE :
-1. Analyse sémantique du titre
-2. Identification des intentions de recherche principales et secondaires
-3. Sélection de mots-clés orientés problème, solution, action ou bénéfice
 
 Donne ton analyse marché en JSON :
 {
-  "nichePrincipale": "la niche KDP précise",
+  "nichePrincipale": "la niche KDP précise basée sur la catégorie ${category}",
   "tailleMarche": "estimation de la taille (grand/moyen/niche)",
   "concurrenceNiveau": "faible/moyenne/forte",
   "opportunite": "l'opportunité identifiée",
   "motsClésKDP": ["7 mots-clés classés du plus stratégique au plus secondaire"],
   "justificationMotsCles": ["justification pour chaque mot-clé"],
-  "categoriesKDP": ["2 catégories recommandées"],
+  "categoriesKDP": ["2 catégories Amazon principales recommandées"],
   "categoriesSecondaires": ["3 catégories cachées potentielles"],
   "prixOptimal": "prix suggéré avec justification",
   "potentielVentes": "estimation réaliste"
 }`
         );
         result = parseJSON(content) || { raw: content };
+        console.log('Step P2 completed successfully');
         displayContent = result.nichePrincipale
           ? `**Niche :** ${result.nichePrincipale}\n\n**Concurrence :** ${result.concurrenceNiveau}\n\n**Opportunité :** ${result.opportunite}\n\n**Prix optimal :** ${result.prixOptimal}\n\n**🔑 7 Mots-clés KDP stratégiques :**\n${(result.motsClésKDP || []).map((kw: string, i: number) => `${i + 1}. ${kw}`).join('\n')}\n\n**Catégories :** ${(result.categoriesKDP || []).join(', ')}\n**Catégories secondaires :** ${(result.categoriesSecondaires || []).join(', ')}`
           : content;
@@ -173,9 +172,9 @@ Donne ton analyse marché en JSON :
         console.log(`Step P3: Structuring ${numberOfChapters} chapters (~${estimatedPages} pages)`);
         
         const content = await callAI(
-          `Tu es un ARCHITECTE DE CONTENU expert. Tu structures des livres pour maximiser l'impact et la rétention du lecteur. Tu penses progression pédagogique, storytelling, points de bascule. Chaque chapitre doit avoir 4-6 sous-sections.`,
+          `Tu es un ARCHITECTE DE CONTENU expert. Tu structures des livres pour maximiser l'impact et la rétention du lecteur. Tu penses progression pédagogique, storytelling, points de bascule. UTILISE LA CATÉGORIE ET LA DESCRIPTION pour créer une structure adaptée.`,
           `Structure ce livre en ${numberOfChapters} chapitres :
-TITRE : "${title}"
+${bookContext}
 VISION : ${JSON.stringify(previousContext.P1 || {})}
 MARCHÉ : ${JSON.stringify(previousContext.P2 || {})}
 
@@ -184,7 +183,7 @@ Chaque chapitre doit avoir ~${wordsPerChapter} mots avec 4-6 sous-sections.
 
 Crée la structure en JSON :
 {
-  "structureGlobale": "description de l'arc narratif/pédagogique du livre",
+  "structureGlobale": "description de l'arc narratif/pédagogique du livre adapté à la catégorie ${category}",
   "nombrePagesEstime": ${estimatedPages},
   "nombreMotsEstime": ${totalWords},
   "chapitres": [
@@ -223,18 +222,17 @@ Crée la structure en JSON :
         console.log(`Step P4: Generating chapter previews for ${structure.length} chapters`);
         
         const content = await callAI(
-          `Tu es un AUTEUR PROFESSIONNEL. Tu prépares le plan de rédaction détaillé de chaque chapitre avec une introduction captivante. PAS DE STYLE ROBOT. Écris comme un vrai auteur humain passionné.`,
+          `Tu es un AUTEUR PROFESSIONNEL. Tu prépares le plan de rédaction détaillé de chaque chapitre avec une introduction captivante. PAS DE STYLE ROBOT. Écris comme un vrai auteur humain passionné. UTILISE LA CATÉGORIE ET LA DESCRIPTION pour adapter ton style.`,
           `Prépare le plan de rédaction pour ce livre :
 
-TITRE DU LIVRE : "${title}"
-AUTEUR : ${authorName}
+${bookContext}
 VISION : ${JSON.stringify(previousContext.P1 || {})}
 
 CHAPITRES PRÉVUS (${structure.length}) :
 ${structure.map((ch: any) => `- Ch.${ch.numero}: ${ch.titre} (Objectif: ${ch.objectif})`).join('\n')}
 
 Pour CHAQUE chapitre, génère :
-1. Une INTRODUCTION CAPTIVANTE (200-300 mots) qui accroche le lecteur
+1. Une INTRODUCTION CAPTIVANTE (200-300 mots) adaptée au genre "${category}"
 2. Les POINTS CLÉS à développer
 3. Le TON et STYLE recommandé
 
@@ -249,7 +247,7 @@ Format JSON :
       "tonRecommande": "description du ton"
     }
   ],
-  "conseilsRedaction": "conseils globaux pour maintenir la cohérence",
+  "conseilsRedaction": "conseils globaux pour maintenir la cohérence du genre ${category}",
   "estimationMotsTotal": ${structure.length * 3500}
 }`,
           8000
