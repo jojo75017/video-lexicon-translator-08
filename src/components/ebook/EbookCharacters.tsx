@@ -114,8 +114,18 @@ export const EbookCharacters = ({ characters, onUpdateCharacters, ebookTitle = '
           role: char.role || 'secondary',
         }));
 
-        onUpdateCharacters([...characters, ...newCharacters]);
-        toast.success(`${newCharacters.length} personnage(s) généré(s) !`);
+        // Filtrer les doublons par nom (insensible à la casse)
+        const existingNames = new Set(characters.map(c => c.name.toLowerCase().trim()));
+        const uniqueNewCharacters = newCharacters.filter(
+          nc => !existingNames.has(nc.name.toLowerCase().trim())
+        );
+
+        if (uniqueNewCharacters.length === 0) {
+          toast.info('Tous les personnages générés existent déjà');
+        } else {
+          onUpdateCharacters([...characters, ...uniqueNewCharacters]);
+          toast.success(`${uniqueNewCharacters.length} nouveau(x) personnage(s) ajouté(s) !`);
+        }
       } else {
         throw new Error('Format de réponse invalide');
       }
