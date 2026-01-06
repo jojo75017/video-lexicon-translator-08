@@ -20,9 +20,9 @@ serve(async (req) => {
       );
     }
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+    const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
+    if (!OPENAI_API_KEY) {
+      throw new Error("OPENAI_API_KEY is not configured");
     }
 
     const systemPrompt = `Tu es un directeur éditorial senior, spécialisé dans la transformation d'expertise en ebooks professionnels à forte valeur commerciale.
@@ -75,40 +75,40 @@ ${contexte ? `\nCONTEXTE ADDITIONNEL: ${contexte}` : ""}
 
 Fournis une analyse complète et professionnelle en JSON.`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 60000);
+
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        Authorization: `Bearer ${OPENAI_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "gpt-4o-mini",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
-        max_tokens: 2000,
+        max_tokens: 2500,
       }),
+      signal: controller.signal
     });
+
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("AI Gateway error:", response.status, errorText);
+      console.error("OpenAI error:", response.status, errorText);
 
       if (response.status === 429) {
         return new Response(
-          JSON.stringify({ error: "Service temporairement surchargé, réessayez plus tard" }),
+          JSON.stringify({ error: "Trop de requêtes, réessayez plus tard" }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "Crédits épuisés, veuillez recharger votre compte" }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
 
-      throw new Error(`AI Gateway error: ${response.status}`);
+      throw new Error(`OpenAI error: ${response.status}`);
     }
 
     const data = await response.json();
@@ -118,10 +118,8 @@ Fournis une analyse complète et professionnelle en JSON.`;
       throw new Error("Aucune réponse de l'IA");
     }
 
-    // Parse JSON from response
     let analysis;
     try {
-      // Try to extract JSON from the response
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         analysis = JSON.parse(jsonMatch[0]);
@@ -130,7 +128,6 @@ Fournis une analyse complète et professionnelle en JSON.`;
       }
     } catch (parseError) {
       console.error("JSON parse error:", parseError, "Content:", content);
-      // Fallback structure
       analysis = {
         promesseCentrale: "Analyse en cours de traitement...",
         angleEditorial: content.substring(0, 500),
@@ -146,8 +143,9 @@ Fournis une analyse complète et professionnelle en JSON.`;
     );
   } catch (error) {
     console.error("Error in editorial-director:", error);
+    const errorMessage = error.name === 'AbortError' ? 'Timeout - analyse trop longue' : (error instanceof Error ? error.message : "Erreur inconnue");
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Erreur inconnue" }),
+      JSON.stringify({ error: errorMessage }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
