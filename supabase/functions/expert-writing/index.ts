@@ -21,9 +21,9 @@ serve(async (req) => {
       );
     }
 
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY non configurée");
+    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+    if (!OPENAI_API_KEY) {
+      throw new Error("OPENAI_API_KEY non configurée");
     }
 
     const systemPrompt = `Tu es un rédacteur expert reconnu dans ton domaine. Tu rédiges des contenus de qualité professionnelle.
@@ -65,26 +65,33 @@ ${expertise ? `Domaine d'expertise : ${expertise}` : ''}
 
 Applique rigoureusement les règles de rédaction experte.`;
 
-    console.log("Calling Lovable AI for expert writing...");
+    console.log("Calling OpenAI for expert writing...");
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 90000);
+
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        Authorization: `Bearer ${OPENAI_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "gpt-4o-mini",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt }
         ],
+        max_tokens: 3000,
       }),
+      signal: controller.signal
     });
+
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("AI Gateway error:", response.status, errorText);
+      console.error("OpenAI error:", response.status, errorText);
       
       if (response.status === 429) {
         return new Response(
@@ -92,19 +99,13 @@ Applique rigoureusement les règles de rédaction experte.`;
           { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
-      if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "Crédits insuffisants." }),
-          { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-      throw new Error(`AI Gateway error: ${response.status}`);
+      throw new Error(`OpenAI error: ${response.status}`);
     }
 
     const data = await response.json();
     const content = data.choices[0].message.content;
 
-    console.log("Raw AI response received");
+    console.log("OpenAI response received");
 
     let result;
     try {
@@ -133,8 +134,9 @@ Applique rigoureusement les règles de rédaction experte.`;
 
   } catch (error) {
     console.error("Error in expert-writing:", error);
+    const errorMessage = error.name === 'AbortError' ? 'Timeout - rédaction trop longue' : error.message;
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: errorMessage }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
