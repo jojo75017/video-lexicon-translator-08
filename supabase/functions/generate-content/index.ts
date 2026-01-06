@@ -600,14 +600,15 @@ Le score overall_score doit être entre 0 et 100 (100 = parfaitement cohérent).
       }
     }
 
-    // Handle characters extraction (uses Lovable AI - no API key needed)
+    // Handle characters extraction (uses OpenAI for reliability)
     if (type === 'characters') {
-      console.log('Processing characters extraction...');
-      const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+      console.log('Processing characters extraction (OpenAI)...');
+      const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
       
-      if (!LOVABLE_API_KEY) {
+      if (!OPENAI_API_KEY) {
+        console.error('OPENAI_API_KEY not found for characters');
         return new Response(
-          JSON.stringify({ error: 'Lovable API key not configured' }),
+          JSON.stringify({ error: 'Clé API OpenAI non configurée' }),
           { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
@@ -641,7 +642,7 @@ Crée 4 à 6 personnages intéressants et cohérents avec le thème du titre. Po
 
       const jsonInstruction = `
 
-Réponds UNIQUEMENT avec un JSON valide (sans markdown, sans \`\`\`) dans ce format exact:
+Réponds UNIQUEMENT avec un JSON valide (sans markdown, sans balises) dans ce format exact:
 {
   "characters": [
     {
@@ -652,56 +653,80 @@ Réponds UNIQUEMENT avec un JSON valide (sans markdown, sans \`\`\`) dans ce for
   ]
 }`;
 
-      const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'google/gemini-2.5-flash',
-          messages: [
-            { role: 'user', content: charactersPrompt + jsonInstruction }
-          ],
-        }),
-      });
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 60000);
+        
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${OPENAI_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'gpt-4o-mini',
+            messages: [
+              { role: 'system', content: 'Tu es un expert en création littéraire. Génère uniquement du JSON valide sans markdown.' },
+              { role: 'user', content: charactersPrompt + jsonInstruction }
+            ],
+            max_tokens: 2000,
+          }),
+          signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Lovable AI error:', errorText);
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('OpenAI error (characters):', response.status, errorText);
+          if (response.status === 429) {
+            return new Response(
+              JSON.stringify({ error: 'Trop de requêtes. Réessayez dans quelques instants.' }),
+              { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
+          }
+          return new Response(
+            JSON.stringify({ error: `Erreur API: ${response.status}` }),
+            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        const data = await response.json();
+        const resultText = data.choices?.[0]?.message?.content || '';
+        
+        let result;
+        try {
+          const cleanJson = resultText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+          result = JSON.parse(cleanJson);
+        } catch (parseError) {
+          console.error('JSON parse error:', parseError, 'Raw:', resultText);
+          result = { characters: [] };
+        }
+
+        console.log('Characters extraction completed:', result.characters?.length || 0, 'found');
         return new Response(
-          JSON.stringify({ error: 'Erreur lors de l\'extraction des personnages' }),
+          JSON.stringify(result),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      } catch (err) {
+        console.error('Characters extraction error:', err);
+        const errorMessage = err.name === 'AbortError' ? 'Timeout - génération trop longue' : err.message;
+        return new Response(
+          JSON.stringify({ error: errorMessage }),
           { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
-
-      const data = await response.json();
-      const resultText = data.choices[0].message.content;
-      
-      let result;
-      try {
-        const cleanJson = resultText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-        result = JSON.parse(cleanJson);
-      } catch (parseError) {
-        console.error('JSON parse error:', parseError, 'Raw:', resultText);
-        result = { characters: [] };
-      }
-
-      console.log('Characters extraction completed:', result.characters?.length || 0, 'found');
-      return new Response(
-        JSON.stringify(result),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
     }
 
-    // Handle character profile generation (uses Lovable AI)
+    // Handle character profile generation (uses OpenAI for reliability)
     if (type === 'character-profile') {
-      console.log('Processing character profile generation...');
-      const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+      console.log('Processing character profile generation (OpenAI)...');
+      const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
       
-      if (!LOVABLE_API_KEY) {
+      if (!OPENAI_API_KEY) {
+        console.error('OPENAI_API_KEY not found for character-profile');
         return new Response(
-          JSON.stringify({ error: 'Lovable API key not configured' }),
+          JSON.stringify({ error: 'Clé API OpenAI non configurée' }),
           { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
@@ -733,7 +758,7 @@ AUTRES PERSONNAGES DU LIVRE: ${otherCharacters || 'Aucun'}
 
 Crée une fiche détaillée et cohérente avec les informations existantes. Sois créatif mais réaliste.
 
-Réponds UNIQUEMENT avec un JSON valide (sans markdown, sans \`\`\`) dans ce format exact:
+Réponds UNIQUEMENT avec un JSON valide (sans markdown) dans ce format exact:
 {
   "profile": {
     "physicalDescription": "Description physique détaillée (apparence, taille, traits distinctifs, style vestimentaire)",
@@ -744,46 +769,69 @@ Réponds UNIQUEMENT avec un JSON valide (sans markdown, sans \`\`\`) dans ce for
   }
 }`;
 
-      const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'google/gemini-2.5-flash',
-          messages: [
-            { role: 'user', content: profilePrompt }
-          ],
-        }),
-      });
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 60000);
+        
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${OPENAI_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'gpt-4o-mini',
+            messages: [
+              { role: 'system', content: 'Tu es un expert en création littéraire. Génère uniquement du JSON valide sans markdown.' },
+              { role: 'user', content: profilePrompt }
+            ],
+            max_tokens: 2000,
+          }),
+          signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Lovable AI error:', errorText);
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('OpenAI error (character-profile):', response.status, errorText);
+          if (response.status === 429) {
+            return new Response(
+              JSON.stringify({ error: 'Trop de requêtes. Réessayez dans quelques instants.' }),
+              { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
+          }
+          return new Response(
+            JSON.stringify({ error: `Erreur API: ${response.status}` }),
+            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        const data = await response.json();
+        const resultText = data.choices?.[0]?.message?.content || '';
+        
+        let result;
+        try {
+          const cleanJson = resultText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+          result = JSON.parse(cleanJson);
+        } catch (parseError) {
+          console.error('JSON parse error:', parseError, 'Raw:', resultText);
+          result = { profile: {} };
+        }
+
+        console.log('Character profile generated for:', characterName);
         return new Response(
-          JSON.stringify({ error: 'Erreur lors de la génération du profil' }),
+          JSON.stringify(result),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      } catch (err) {
+        console.error('Character profile error:', err);
+        const errorMessage = err.name === 'AbortError' ? 'Timeout - génération trop longue' : err.message;
+        return new Response(
+          JSON.stringify({ error: errorMessage }),
           { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
-
-      const data = await response.json();
-      const resultText = data.choices[0].message.content;
-      
-      let result;
-      try {
-        const cleanJson = resultText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-        result = JSON.parse(cleanJson);
-      } catch (parseError) {
-        console.error('JSON parse error:', parseError, 'Raw:', resultText);
-        result = { profile: {} };
-      }
-
-      console.log('Character profile generated for:', characterName);
-      return new Response(
-        JSON.stringify(result),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
     }
 
     // Handle next-tome generation (uses OpenAI for reliability)
