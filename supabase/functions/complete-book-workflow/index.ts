@@ -57,6 +57,41 @@ function parseJSON(content: string): any {
   }
 }
 
+// Fonction pour nettoyer le texte généré - supprime les artefacts JSON/échappement
+function cleanGeneratedText(text: string): string {
+  if (!text || typeof text !== 'string') return text;
+  
+  return text
+    // Supprimer les guillemets échappés \" -> "
+    .replace(/\\"/g, '"')
+    // Supprimer les backslashes échappés \\ -> \
+    .replace(/\\\\/g, '\\')
+    // Supprimer les retours à la ligne échappés \n -> nouvelle ligne
+    .replace(/\\n/g, '\n')
+    // Supprimer les tabulations échappées
+    .replace(/\\t/g, '\t')
+    // Supprimer les slashes échappés
+    .replace(/\\\//g, '/')
+    // Nettoyer les doubles espaces
+    .replace(/  +/g, ' ')
+    // Nettoyer les espaces avant ponctuation
+    .replace(/ ([.,;:!?])/g, '$1')
+    // Supprimer les caractères de contrôle Unicode indésirables
+    .replace(/[\u0000-\u001F\u007F-\u009F]/g, '')
+    .trim();
+}
+
+// Fonction pour nettoyer un chapitre entier
+function cleanChapter(chapter: any): any {
+  if (!chapter) return chapter;
+  
+  return {
+    ...chapter,
+    titre: cleanGeneratedText(chapter.titre),
+    contenu: cleanGeneratedText(chapter.contenu),
+  };
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -342,12 +377,13 @@ Retourne le contenu en JSON :
           );
 
           const parsedChapter = parseJSON(chapterContent);
-          const chapitreGenere = parsedChapter || {
+          // Nettoyer le chapitre pour supprimer les artefacts d'échappement
+          const chapitreGenere = cleanChapter(parsedChapter || {
             numero: chapitre.numero,
             titre: chapitre.titre,
             contenu: chapterContent,
             nombreMots: chapterContent.split(/\s+/).length,
-          };
+          });
 
           result = {
             chapitre: chapitreGenere,
@@ -356,7 +392,7 @@ Retourne le contenu en JSON :
             nombreMots: chapitreGenere.nombreMots,
           };
 
-          displayContent = `**Ch.${chapitreGenere.numero} - ${chapitreGenere.titre}** (~${chapitreGenere.nombreMots || 3000} mots)\n_${(chapitreGenere.contenu || '').substring(0, 200)}..._`;
+          displayContent = `**Ch.${chapitreGenere.numero} - ${chapitreGenere.titre}** (~${chapitreGenere.nombreMots || 3000} mots)\n_${cleanGeneratedText((chapitreGenere.contenu || '').substring(0, 200))}..._`;
           break;
         }
 
@@ -374,12 +410,13 @@ Retourne le contenu en JSON :
           );
 
           const parsed = parseJSON(chapterContent);
-          chapitresComplets.push(parsed || {
+          // Nettoyer le chapitre pour supprimer les artefacts d'échappement
+          chapitresComplets.push(cleanChapter(parsed || {
             numero: chapitre.numero,
             titre: chapitre.titre,
             contenu: chapterContent,
             nombreMots: chapterContent.split(/\s+/).length,
-          });
+          }));
         }
 
         const totalMots = chapitresComplets.reduce((acc, ch) => acc + (ch.nombreMots || 3000), 0);
