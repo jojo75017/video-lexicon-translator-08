@@ -90,6 +90,7 @@ import { DemoBanner } from '@/components/ebook/DemoBanner';
 import { DemoPaywall } from '@/components/ebook/DemoPaywall';
 import { useWorkflowResults } from '@/hooks/useWorkflowResults';
 import { WorkflowResultViewer } from '@/components/ebook/WorkflowResultViewer';
+import { cleanGeneratedText } from '@/utils/textCleaner';
 
 // Hooks et données
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
@@ -2217,8 +2218,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
               const generatedChapters: Chapter[] = Array.isArray(bookData?.chapters)
                 ? bookData.chapters.map((ch: any, index: number) => ({
                     id: `cw-${Date.now()}-${index}`,
-                    title: ch?.title || `Chapitre ${index + 1}`,
-                    content: ch?.content || '',
+                    // Nettoyer le titre et le contenu pour supprimer les artefacts d'échappement JSON
+                    title: cleanGeneratedText(ch?.title) || `Chapitre ${index + 1}`,
+                    content: cleanGeneratedText(ch?.content) || '',
                     subChapters: [],
                   }))
                 : [];
