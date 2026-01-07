@@ -5,6 +5,39 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Nettoie le texte généré des artefacts JSON et caractères échappés
+function cleanGeneratedText(text: string): string {
+  if (!text) return text;
+  
+  return text
+    // Supprimer les guillemets échappés
+    .replace(/\\"/g, '"')
+    .replace(/\\'/g, "'")
+    // Supprimer les backslashes échappés
+    .replace(/\\\\/g, '\\')
+    // Supprimer les sauts de ligne échappés
+    .replace(/\\n/g, '\n')
+    .replace(/\\r/g, '')
+    // Supprimer les tabulations échappées
+    .replace(/\\t/g, '\t')
+    // Supprimer les slashes échappés
+    .replace(/\\\//g, '/')
+    // Nettoyer les doubles espaces
+    .replace(/  +/g, ' ')
+    // Supprimer les espaces avant la ponctuation
+    .replace(/ ([.,;:!?])/g, '$1')
+    // Supprimer les caractères de contrôle unicode indésirables
+    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '')
+    // Supprimer les patterns JSON résiduels
+    .replace(/^\s*{\s*"[^"]+"\s*:\s*"/gm, '')
+    .replace(/"\s*}\s*$/gm, '')
+    .replace(/^\s*\[\s*"/gm, '')
+    .replace(/"\s*\]\s*$/gm, '')
+    // Nettoyer les lignes vides multiples
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
 // Extrait les URLs d'images du contenu
 function extractImageUrls(content: string): { cleanContent: string; imageUrls: Array<{ position: number; url: string }> } {
   const imageUrls: Array<{ position: number; url: string }> = [];
@@ -31,6 +64,9 @@ function extractImageUrls(content: string): { cleanContent: string; imageUrls: A
     .replace(/\[IMAGE:\d+:data:image\/[^;]+;base64,[^\]]+\]/g, '\n')
     .replace(/\[IMAGE:[^\]]+\]/g, '\n')
     .replace(/\[IMAGE_REMOVED\]/g, '\n');
+  
+  // Appliquer le nettoyage des artefacts JSON
+  cleanContent = cleanGeneratedText(cleanContent);
   
   return { cleanContent, imageUrls };
 }
