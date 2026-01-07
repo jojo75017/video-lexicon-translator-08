@@ -10,32 +10,95 @@ function cleanGeneratedText(text: string): string {
   if (!text) return text;
   
   return text
-    // Supprimer les guillemets échappés
     .replace(/\\"/g, '"')
     .replace(/\\'/g, "'")
-    // Supprimer les backslashes échappés
     .replace(/\\\\/g, '\\')
-    // Supprimer les sauts de ligne échappés
     .replace(/\\n/g, '\n')
     .replace(/\\r/g, '')
-    // Supprimer les tabulations échappées
     .replace(/\\t/g, '\t')
-    // Supprimer les slashes échappés
     .replace(/\\\//g, '/')
-    // Nettoyer les doubles espaces
     .replace(/  +/g, ' ')
-    // Supprimer les espaces avant la ponctuation
     .replace(/ ([.,;:!?])/g, '$1')
-    // Supprimer les caractères de contrôle unicode indésirables
     .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '')
-    // Supprimer les patterns JSON résiduels
     .replace(/^\s*{\s*"[^"]+"\s*:\s*"/gm, '')
     .replace(/"\s*}\s*$/gm, '')
     .replace(/^\s*\[\s*"/gm, '')
     .replace(/"\s*\]\s*$/gm, '')
-    // Nettoyer les lignes vides multiples
     .replace(/\n{3,}/g, '\n\n')
     .trim();
+}
+
+// Corrige la grammaire et l'orthographe d'un texte
+async function correctGrammar(text: string): Promise<string> {
+  const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+  if (!openAIApiKey || !text || text.length < 50) return text;
+
+  try {
+    // Diviser en chunks de 4000 caractères max pour éviter les timeouts
+    const chunks: string[] = [];
+    const maxChunkSize = 4000;
+    let remaining = text;
+    
+    while (remaining.length > 0) {
+      if (remaining.length <= maxChunkSize) {
+        chunks.push(remaining);
+        break;
+      }
+      // Trouver une coupure naturelle (fin de phrase ou paragraphe)
+      let cutPoint = remaining.lastIndexOf('\n\n', maxChunkSize);
+      if (cutPoint < maxChunkSize / 2) cutPoint = remaining.lastIndexOf('. ', maxChunkSize);
+      if (cutPoint < maxChunkSize / 2) cutPoint = maxChunkSize;
+      
+      chunks.push(remaining.substring(0, cutPoint + 1));
+      remaining = remaining.substring(cutPoint + 1);
+    }
+
+    console.log(`📝 Correction grammaticale: ${chunks.length} chunks à traiter`);
+
+    const correctedChunks: string[] = [];
+    for (let i = 0; i < chunks.length; i++) {
+      const chunk = chunks[i];
+      console.log(`📝 Correction chunk ${i + 1}/${chunks.length} (${chunk.length} chars)`);
+      
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${openAIApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            {
+              role: 'system',
+              content: `Tu es un correcteur professionnel. Corrige UNIQUEMENT les fautes d'orthographe et de grammaire du texte suivant. 
+RÈGLES STRICTES:
+- NE MODIFIE PAS le style, le ton ou le contenu
+- NE REFORMULE PAS les phrases
+- Conserve EXACTEMENT la mise en forme (sauts de ligne, titres, etc.)
+- Retourne UNIQUEMENT le texte corrigé, sans commentaires ni explications`
+            },
+            { role: 'user', content: chunk }
+          ],
+          temperature: 0.1,
+          max_tokens: 4096,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        correctedChunks.push(data.choices[0]?.message?.content || chunk);
+      } else {
+        console.error(`❌ Erreur correction chunk ${i + 1}:`, await response.text());
+        correctedChunks.push(chunk);
+      }
+    }
+
+    return correctedChunks.join('');
+  } catch (error) {
+    console.error('❌ Erreur correction grammaticale:', error);
+    return text;
+  }
 }
 
 // Extrait les URLs d'images du contenu
@@ -44,7 +107,6 @@ function extractImageUrls(content: string): { cleanContent: string; imageUrls: A
   let cleanContent = content;
   let offset = 0;
   
-  // Pattern pour [IMAGE_URL:https://...]
   const urlRegex = /\[IMAGE_URL:(https?:\/\/[^\]]+)\]/g;
   let match;
   
@@ -58,14 +120,12 @@ function extractImageUrls(content: string): { cleanContent: string; imageUrls: A
     offset += fullMatch.length;
   }
   
-  // Nettoyer le contenu
   cleanContent = content
     .replace(/\[IMAGE_URL:https?:\/\/[^\]]+\]/g, '\n[IMAGE SERA INSÉRÉE ICI]\n')
     .replace(/\[IMAGE:\d+:data:image\/[^;]+;base64,[^\]]+\]/g, '\n')
     .replace(/\[IMAGE:[^\]]+\]/g, '\n')
     .replace(/\[IMAGE_REMOVED\]/g, '\n');
   
-  // Appliquer le nettoyage des artefacts JSON
   cleanContent = cleanGeneratedText(cleanContent);
   
   return { cleanContent, imageUrls };
@@ -204,6 +264,11 @@ serve(async (req) => {
       console.log(`📷 URLs des images:`, imageUrls.map(i => i.url.substring(0, 60) + '...'));
     }
 
+    // Correction grammaticale du contenu
+    console.log(`📝 Début de la correction grammaticale...`);
+    const correctedContent = await correctGrammar(cleanContent);
+    console.log(`✅ Correction grammaticale terminée`);
+
     // Créer le JWT pour l'authentification Google
     const header = {
       alg: 'RS256',
@@ -302,7 +367,7 @@ serve(async (req) => {
       fullText += `Par ${authorName}\n\n`;
     }
     
-    fullText += cleanContent;
+    fullText += correctedContent;
 
     // Préparer les requêtes pour ajouter le contenu
     const requests: any[] = [];
