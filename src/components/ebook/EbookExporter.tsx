@@ -5,14 +5,15 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Download, FileText, Image, BookOpen, Printer, Settings } from 'lucide-react';
+import { Download, FileText, Image, BookOpen, Printer, Settings, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import { Chapter } from '@/hooks/useEbookGeneration';
 import jsPDF from 'jspdf';
 import { supabase } from '@/integrations/supabase/client';
 import JSZip from 'jszip';
 import { Character } from './EbookCharacters';
-import { 
+import { EbookExportPreview } from './EbookExportPreview';
+import {
   Document, 
   Packer, 
   Paragraph, 
@@ -61,6 +62,8 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
   const [isExporting, setIsExporting] = useState(false);
   const [generateKdpMetadata, setGenerateKdpMetadata] = useState(false);
   const [includeCharacterList, setIncludeCharacterList] = useState(true);
+  const [showGoogleDocsPreview, setShowGoogleDocsPreview] = useState(false);
+  const [isExportingGoogleDocs, setIsExportingGoogleDocs] = useState(false);
 
   const generateEbookContent = () => {
     let content = '';
@@ -1754,6 +1757,7 @@ Paperback: 9.99€ - 19.99€
   };
 
   const exportToGoogleDocs = async () => {
+    setIsExportingGoogleDocs(true);
     try {
       const content = generateKdpContent();
       
@@ -1768,6 +1772,7 @@ Paperback: 9.99€ - 19.99€
       if (error) throw error;
 
       if (data?.success && data?.documentUrl) {
+        setShowGoogleDocsPreview(false);
         toast.success('Document créé sur Google Docs !', {
           description: 'Cliquez pour ouvrir',
           action: {
@@ -1779,7 +1784,21 @@ Paperback: 9.99€ - 19.99€
     } catch (error) {
       console.error('Erreur export Google Docs:', error);
       toast.error('Erreur lors de l\'export vers Google Docs');
+    } finally {
+      setIsExportingGoogleDocs(false);
     }
+  };
+
+  const handleOpenGoogleDocsPreview = () => {
+    if (!ebookTitle) {
+      toast.error('Veuillez ajouter un titre à votre ebook');
+      return;
+    }
+    if (chapters.length === 0) {
+      toast.error('Veuillez ajouter au moins un chapitre');
+      return;
+    }
+    setShowGoogleDocsPreview(true);
   };
 
   const handleExport = async () => {
@@ -1977,26 +1996,53 @@ Paperback: 9.99€ - 19.99€
             </div>
           </div>
 
-          <Button
-            onClick={handleExport}
-            disabled={isExporting || !ebookTitle || chapters.length === 0}
-            className="w-full"
-            size="lg"
-          >
-            {isExporting ? (
-              <>
-                <Printer className="h-4 w-4 mr-2 animate-spin" />
-                Export en cours...
-              </>
-            ) : (
-              <>
-                <Download className="h-4 w-4 mr-2" />
-                📚 Exporter l'Ebook Complet
-              </>
-            )}
-          </Button>
+          <div className="flex flex-col gap-3">
+            <Button
+              onClick={handleOpenGoogleDocsPreview}
+              disabled={isExportingGoogleDocs || !ebookTitle || chapters.length === 0}
+              variant="outline"
+              className="w-full border-primary/30 hover:bg-primary/5"
+              size="lg"
+            >
+              <Eye className="h-4 w-4 mr-2" />
+              👁️ Prévisualiser avant Google Docs
+            </Button>
+
+            <Button
+              onClick={handleExport}
+              disabled={isExporting || !ebookTitle || chapters.length === 0}
+              className="w-full"
+              size="lg"
+            >
+              {isExporting ? (
+                <>
+                  <Printer className="h-4 w-4 mr-2 animate-spin" />
+                  Export en cours...
+                </>
+              ) : (
+                <>
+                  <Download className="h-4 w-4 mr-2" />
+                  📚 Exporter l'Ebook Complet
+                </>
+              )}
+            </Button>
+          </div>
         </CardContent>
       </Card>
+
+      <EbookExportPreview
+        isOpen={showGoogleDocsPreview}
+        onClose={() => setShowGoogleDocsPreview(false)}
+        onConfirmExport={exportToGoogleDocs}
+        ebookTitle={ebookTitle}
+        authorName={authorName}
+        preface={preface}
+        conclusion={conclusion}
+        epilogue={epilogue}
+        chapters={chapters}
+        characters={characters}
+        isExporting={isExportingGoogleDocs}
+      />
     </div>
   );
 };
