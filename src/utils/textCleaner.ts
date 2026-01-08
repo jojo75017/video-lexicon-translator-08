@@ -11,24 +11,42 @@
 export function cleanGeneratedText(text: string): string {
   if (!text || typeof text !== 'string') return text || '';
   
-  return text
-    // Supprimer les guillemets échappés \" -> "
-    .replace(/\\"/g, '"')
-    // Supprimer les backslashes échappés \\ -> \
-    .replace(/\\\\/g, '\\')
+  let cleaned = text
+    // Supprimer les guillemets échappés \" -> rien (pas de guillemet)
+    .replace(/\\"/g, '')
+    // Supprimer les backslashes échappés
+    .replace(/\\\\/g, '')
     // Supprimer les retours à la ligne échappés \n -> nouvelle ligne
     .replace(/\\n/g, '\n')
     // Supprimer les tabulations échappées
     .replace(/\\t/g, '\t')
     // Supprimer les slashes échappés
     .replace(/\\\//g, '/')
+    // Supprimer les patterns JSON résiduels
+    .replace(/^\s*{\s*"[^"]*"\s*:\s*"/gm, '')
+    .replace(/"\s*}\s*$/gm, '')
+    .replace(/^\s*\[\s*"/gm, '')
+    .replace(/"\s*\]\s*$/gm, '')
+    .replace(/",\s*"[^"]*"\s*:\s*"/g, ' ')
+    .replace(/":\s*"/g, ': ')
+    .replace(/{\s*"/g, '')
+    .replace(/"\s*}/g, '')
+    // Supprimer les guillemets orphelins en début/fin de ligne
+    .replace(/^"+/gm, '')
+    .replace(/"+$/gm, '')
+    // Supprimer les guillemets isolés
+    .replace(/(?<!\w)"(?!\w)/g, '')
     // Nettoyer les doubles espaces
     .replace(/  +/g, ' ')
     // Nettoyer les espaces avant ponctuation
     .replace(/ ([.,;:!?])/g, '$1')
     // Supprimer les caractères de contrôle Unicode indésirables
     .replace(/[\u0000-\u001F\u007F-\u009F]/g, '')
+    // Nettoyer les lignes vides multiples
+    .replace(/\n{3,}/g, '\n\n')
     .trim();
+
+  return cleaned;
 }
 
 /**
