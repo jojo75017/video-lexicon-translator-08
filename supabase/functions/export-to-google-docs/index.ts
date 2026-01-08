@@ -10,20 +10,37 @@ function cleanGeneratedText(text: string): string {
   if (!text) return text;
   
   return text
-    .replace(/\\"/g, '"')
-    .replace(/\\'/g, "'")
-    .replace(/\\\\/g, '\\')
+    // Supprimer les guillemets échappés
+    .replace(/\\"/g, '')
+    .replace(/\\'/g, '')
+    // Supprimer les backslashes échappés
+    .replace(/\\\\/g, '')
+    // Convertir les retours à la ligne échappés
     .replace(/\\n/g, '\n')
     .replace(/\\r/g, '')
     .replace(/\\t/g, '\t')
     .replace(/\\\//g, '/')
-    .replace(/  +/g, ' ')
-    .replace(/ ([.,;:!?])/g, '$1')
-    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '')
-    .replace(/^\s*{\s*"[^"]+"\s*:\s*"/gm, '')
+    // Supprimer les patterns JSON résiduels complets
+    .replace(/^\s*{\s*"[^"]*"\s*:\s*"/gm, '')
     .replace(/"\s*}\s*$/gm, '')
     .replace(/^\s*\[\s*"/gm, '')
     .replace(/"\s*\]\s*$/gm, '')
+    .replace(/",\s*"[^"]*"\s*:\s*"/g, ' ')
+    .replace(/":\s*"/g, ': ')
+    .replace(/{\s*"/g, '')
+    .replace(/"\s*}/g, '')
+    // Supprimer les guillemets orphelins en début/fin de ligne
+    .replace(/^"+/gm, '')
+    .replace(/"+$/gm, '')
+    // Supprimer les guillemets isolés qui ne font pas partie de dialogues
+    .replace(/(?<![a-zA-ZÀ-ÿ])"(?![a-zA-ZÀ-ÿ])/g, '')
+    // Nettoyer les doubles espaces
+    .replace(/  +/g, ' ')
+    // Nettoyer les espaces avant ponctuation
+    .replace(/ ([.,;:!?])/g, '$1')
+    // Supprimer les caractères de contrôle Unicode indésirables
+    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '')
+    // Nettoyer les lignes vides multiples
     .replace(/\n{3,}/g, '\n\n')
     .trim();
 }

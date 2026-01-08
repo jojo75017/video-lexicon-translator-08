@@ -90,7 +90,7 @@ import { DemoBanner } from '@/components/ebook/DemoBanner';
 import { DemoPaywall } from '@/components/ebook/DemoPaywall';
 import { useWorkflowResults } from '@/hooks/useWorkflowResults';
 import { WorkflowResultViewer } from '@/components/ebook/WorkflowResultViewer';
-import { cleanGeneratedText } from '@/utils/textCleaner';
+import { cleanGeneratedText, cleanChapters } from '@/utils/textCleaner';
 
 // Hooks et données
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
@@ -394,6 +394,27 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
     if (newIndex < 0 || newIndex >= chapters.length) return;
     setChapters(arrayMove(chapters, currentIndex, newIndex));
   };
+
+  // Fonction pour nettoyer tous les chapitres des artefacts JSON
+  const handleCleanAllChapters = React.useCallback(() => {
+    const cleanedChapters = chapters.map(chapter => ({
+      ...chapter,
+      title: cleanGeneratedText(chapter.title || ''),
+      content: cleanGeneratedText(chapter.content || ''),
+      subChapters: chapter.subChapters.map(sub => ({
+        ...sub,
+        title: cleanGeneratedText(sub.title || ''),
+        content: cleanGeneratedText(sub.content || '')
+      }))
+    }));
+    setChapters(cleanedChapters);
+    
+    // Nettoyer aussi la préface et conclusion
+    setPreface(cleanGeneratedText(preface));
+    setConclusion(cleanGeneratedText(conclusion));
+    
+    toast.success('✨ Tous les chapitres ont été nettoyés !');
+  }, [chapters, preface, conclusion]);
 
   const handleGenerateChapterContent = async (chapterId: string) => {
     // Bloquer en mode démo
@@ -1709,6 +1730,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
             onUpdateChapterContent={updateChapterContent}
             onUpdateSubChapterContent={updateSubChapterContent}
             targetWordsPerChapter={targetWordsPerChapter}
+            onCleanAllChapters={handleCleanAllChapters}
           />
         );
       

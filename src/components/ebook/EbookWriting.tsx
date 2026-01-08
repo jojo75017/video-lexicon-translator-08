@@ -6,12 +6,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { FileText, Image as ImageIcon, Plus, Trash2, Edit3, Check } from 'lucide-react';
+import { FileText, Image as ImageIcon, Plus, Trash2, Edit3, Check, Sparkles } from 'lucide-react';
 import { Chapter } from '@/hooks/useEbookGeneration';
 import { toast } from 'sonner';
 import EbookImageBank from './EbookImageBank';
 import { EbookFormattingToolbar } from './EbookFormattingToolbar';
 import { EbookImageLibrary } from './EbookImageLibrary';
+import { cleanGeneratedText } from '@/utils/textCleaner';
 
 interface ChapterImage {
   id: string;
@@ -26,6 +27,7 @@ interface EbookWritingProps {
   onUpdateSubChapterContent: (chapterId: string, subChapterId: string, content: string) => void;
   ebookTitle?: string;
   targetWordsPerChapter?: number;
+  onCleanAllChapters?: () => void;
 }
 
 // Fonction de rendu du texte avec style (identique au planificateur)
@@ -109,7 +111,8 @@ export const EbookWriting: React.FC<EbookWritingProps> = ({
   onUpdateChapterContent,
   onUpdateSubChapterContent,
   ebookTitle = 'Mon Ebook',
-  targetWordsPerChapter = 2500
+  targetWordsPerChapter = 2500,
+  onCleanAllChapters
 }) => {
   const [chapterImages, setChapterImages] = useState<Record<string, ChapterImage[]>>({});
   const [imageUrl, setImageUrl] = useState('');
@@ -269,13 +272,28 @@ export const EbookWriting: React.FC<EbookWritingProps> = ({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <FileText className="h-5 w-5" />
-          Espace de Rédaction
-        </CardTitle>
-        <CardDescription>
-          Rédigez vos chapitres avec des modèles de mise en forme professionnels
-        </CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              Espace de Rédaction
+            </CardTitle>
+            <CardDescription>
+              Rédigez vos chapitres avec des modèles de mise en forme professionnels
+            </CardDescription>
+          </div>
+          {chapters.length > 0 && onCleanAllChapters && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onCleanAllChapters}
+              className="gap-2"
+            >
+              <Sparkles className="h-4 w-4" />
+              Nettoyer tout
+            </Button>
+          )}
+        </div>
       </CardHeader>
       <CardContent className="space-y-6">
         {chapters.length === 0 ? (
