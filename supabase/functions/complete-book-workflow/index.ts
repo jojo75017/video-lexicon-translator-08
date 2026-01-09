@@ -18,13 +18,21 @@ RÈGLES ABSOLUES POUR UNE VOIX HUMAINE :
 - Écris comme un auteur humain passionné par son sujet
 `;
 
+// Variable globale pour stocker la clé API (sera définie par le handler principal)
+let activeApiKey: string | null = null;
+
 async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000): Promise<string> {
-  const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+  // Utiliser la clé active (utilisateur ou serveur)
+  const apiKey = activeApiKey || Deno.env.get('OPENAI_API_KEY');
+  
+  if (!apiKey) {
+    throw new Error('NO_API_KEY: Aucune clé API OpenAI disponible. Veuillez configurer votre clé dans les paramètres.');
+  }
   
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${OPENAI_API_KEY}`,
+      'Authorization': `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
@@ -40,6 +48,7 @@ async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000
   if (!response.ok) {
     const status = response.status;
     if (status === 429) throw new Error('RATE_LIMIT');
+    if (status === 401) throw new Error('INVALID_API_KEY: Clé API OpenAI invalide. Veuillez vérifier votre clé.');
     throw new Error(`AI Error: ${status}`);
   }
 
@@ -128,18 +137,31 @@ serve(async (req) => {
       characters = [],
       previousContext = {},
       chapter,
+      userApiKey,
+      useUserKey,
     } = payload;
+
+    // LOGIQUE CLÉ API : Priorité à la clé utilisateur si fournie et valide
+    if (useUserKey && userApiKey) {
+      activeApiKey = userApiKey;
+      console.log(`Using USER API key for step ${step}`);
+    } else {
+      activeApiKey = Deno.env.get('OPENAI_API_KEY') || null;
+      console.log(`Using SERVER API key for step ${step}`);
+    }
+
+    if (!activeApiKey) {
+      return new Response(
+        JSON.stringify({ error: 'Aucune clé API OpenAI disponible. Veuillez configurer votre clé API dans les paramètres.' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     if (!title) {
       return new Response(
         JSON.stringify({ error: 'Title is required' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
-    }
-
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) {
-      throw new Error('LOVABLE_API_KEY is not configured');
     }
 
     // Construire la liste des personnages pour le contexte
