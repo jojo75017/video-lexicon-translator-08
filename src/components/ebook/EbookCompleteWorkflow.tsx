@@ -12,13 +12,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { 
   Sparkles, BookOpen, CheckCircle2, Loader2, AlertCircle,
   Rocket, Target, TrendingUp, Layers, FileText, Award, User, Hash,
-  ChevronDown, ChevronUp, Tag, AlignLeft, RotateCcw, Trash2, Plus
+  ChevronDown, ChevronUp, Tag, AlignLeft, RotateCcw, Trash2, Plus, Key
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useWorkflowResults } from '@/hooks/useWorkflowResults';
+import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 
 interface Character {
   id: string;
@@ -77,6 +78,9 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   // Hook pour sauvegarder les résultats P1-P14 globalement
   const { saveStepResult, saveAllResults } = useWorkflowResults();
   
+  // Hook pour récupérer la clé API utilisateur
+  const { apiKey: userApiKey, isValid: isUserKeyValid } = useOpenAIConfig();
+  
   // Form state
   const [title, setTitle] = useState('');
   const [subtitle, setSubtitle] = useState('');
@@ -103,7 +107,9 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   const [editingCharacterIndex, setEditingCharacterIndex] = useState<number | null>(null);
 
   const progress = currentStepIndex >= 0 ? ((currentStepIndex + 1) / 14) * 100 : 0;
-  const canGenerate = title.trim() && authorName.trim() && category && hasReadSteps;
+  // La clé API utilisateur est OBLIGATOIRE pour générer
+  const hasValidApiKey = isUserKeyValid && !!userApiKey;
+  const canGenerate = title.trim() && authorName.trim() && category && hasReadSteps && hasValidApiKey;
 
   // Load saved progress on mount
   useEffect(() => {
@@ -244,6 +250,9 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
           numberOfChapters,
           characters: charactersForAI,
           previousContext,
+          // Transmettre la clé API utilisateur si disponible et valide
+          userApiKey: isUserKeyValid ? userApiKey : undefined,
+          useUserKey: isUserKeyValid && !!userApiKey,
           ...extraBody,
         }
       });
@@ -335,6 +344,12 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   const generateCompleteBook = async (resumeFromIndex: number = 0) => {
     if (!title.trim() || !authorName.trim() || !category) {
       toast.error('Veuillez remplir le titre, le nom d\'auteur et la catégorie');
+      return;
+    }
+
+    // Vérifier que l'utilisateur a configuré sa clé API
+    if (!hasValidApiKey) {
+      toast.error('🔑 Veuillez configurer votre clé API OpenAI dans l\'onglet "Paramètres" avant de générer.');
       return;
     }
 
@@ -707,6 +722,29 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             <div className="flex justify-between text-xs text-muted-foreground">
               <span>3 chapitres (court)</span>
               <span>20 chapitres (long)</span>
+            </div>
+          </div>
+
+          {/* API Key Status Indicator */}
+          <div className={`flex items-start space-x-3 p-4 rounded-lg border ${hasValidApiKey ? 'bg-green-500/10 border-green-500/30' : 'bg-red-500/10 border-red-500/30'}`}>
+            <Key className={`h-5 w-5 mt-0.5 ${hasValidApiKey ? 'text-green-600' : 'text-red-500'}`} />
+            <div className="space-y-1 flex-1">
+              <div className="flex items-center justify-between">
+                <span className={`text-sm font-medium ${hasValidApiKey ? 'text-green-700' : 'text-red-600'}`}>
+                  {hasValidApiKey ? '🔑 Votre clé API OpenAI est active' : '🔑 Clé API OpenAI requise'}
+                </span>
+                {hasValidApiKey && (
+                  <Badge variant="outline" className="bg-green-100 text-green-700 border-green-300">
+                    Prêt
+                  </Badge>
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {hasValidApiKey 
+                  ? 'Les coûts de génération seront facturés directement sur votre compte OpenAI.'
+                  : 'Configurez votre clé API OpenAI dans l\'onglet "Paramètres" pour générer votre livre. Les coûts (~0.50€ - 2€ par livre) seront facturés sur votre compte OpenAI.'
+                }
+              </p>
             </div>
           </div>
 
