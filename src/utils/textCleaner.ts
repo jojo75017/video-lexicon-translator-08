@@ -40,6 +40,14 @@ export function cleanGeneratedText(text: string): string {
     .replace(/  +/g, ' ')
     // Nettoyer les espaces avant ponctuation
     .replace(/ ([.,;:!?])/g, '$1')
+    // IMPORTANT: Ajouter un espace après la ponctuation de fin de phrase si suivi d'une lettre
+    .replace(/\.([A-ZÀ-ÖØ-öø-ÿa-z])/g, '. $1')
+    .replace(/\!([A-ZÀ-ÖØ-öø-ÿa-z])/g, '! $1')
+    .replace(/\?([A-ZÀ-ÖØ-öø-ÿa-z])/g, '? $1')
+    // Ajouter un espace après virgule/point-virgule/deux-points si suivi d'une lettre
+    .replace(/,([A-ZÀ-ÖØ-öø-ÿa-z])/g, ', $1')
+    .replace(/;([A-ZÀ-ÖØ-öø-ÿa-z])/g, '; $1')
+    .replace(/:([A-ZÀ-ÖØ-öø-ÿa-z])/g, ': $1')
     // Supprimer les caractères de contrôle Unicode indésirables
     .replace(/[\u0000-\u001F\u007F-\u009F]/g, '')
     // Nettoyer les lignes vides multiples
