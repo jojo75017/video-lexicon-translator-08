@@ -100,6 +100,13 @@ function cleanGeneratedText(text: string): string {
     .replace(/  +/g, ' ')
     // Nettoyer les espaces avant ponctuation
     .replace(/ ([.,;:!?])/g, '$1')
+    // IMPORTANT: Ajouter un espace après la ponctuation de fin de phrase si suivi d'une lettre
+    .replace(/\.([A-ZÀ-ÖØ-öø-ÿa-z])/g, '. $1')
+    .replace(/\!([A-ZÀ-ÖØ-öø-ÿa-z])/g, '! $1')
+    .replace(/\?([A-ZÀ-ÖØ-öø-ÿa-z])/g, '? $1')
+    .replace(/,([A-ZÀ-ÖØ-öø-ÿa-z])/g, ', $1')
+    .replace(/;([A-ZÀ-ÖØ-öø-ÿa-z])/g, '; $1')
+    .replace(/:([A-ZÀ-ÖØ-öø-ÿa-z])/g, ': $1')
     // Supprimer les caractères de contrôle Unicode indésirables
     .replace(/[\u0000-\u001F\u007F-\u009F]/g, '')
     // Nettoyer les lignes vides multiples
@@ -272,8 +279,28 @@ Donne ton analyse marché en JSON :
         console.log(`Step P3: Structuring ${numberOfChapters} chapters + generating characters for "${fullTitle}"`);
         
         const content = await callAI(
-          `Tu es un ARCHITECTE DE CONTENU et CRÉATEUR DE PERSONNAGES expert. Tu structures des livres ET tu crées les personnages adaptés au récit.`,
-          `Structure ce livre en ${numberOfChapters} chapitres ET crée les personnages adaptés :
+          `Tu es un ARCHITECTE DE CONTENU et CRÉATEUR DE PERSONNAGES expert, spécialisé dans les livres publiés sur Amazon KDP.
+          
+STRUCTURE KDP OBLIGATOIRE À RESPECTER (dans cet ordre) :
+1. PAGE DE TITRE (titre, sous-titre, auteur)
+2. PRÉFACE (pourquoi ce livre existe et à qui il s'adresse)
+3. TABLE DES MATIÈRES (générée automatiquement)
+4. INTRODUCTION (présentation du problème et promesse du livre)
+5. CHAPITRES PRINCIPAUX (le cœur du contenu)
+6. BLOCS PRATIQUES (checklist, FAQ, études de cas, plan d'action)
+7. CONCLUSION (synthèse et appel à l'action)
+8. À PROPOS DE L'AUTEUR (présentation professionnelle)
+9. ANNEXES (ressources et compléments utiles)
+10. NOTES ET PAGES DE TRAVAIL (pages pour prise de notes)
+11. PERSONNAGES (si applicable)
+
+CONTRAINTES KDP :
+- Pas de dédicace obligatoire
+- Pas de témoignages inventés
+- Pas de promesses financières ou miracles
+- Style lisible, compatible impression broché
+- Objectif : clarté, utilité, crédibilité`,
+          `Structure ce livre selon les normes KDP en ${numberOfChapters} chapitres ET crée les personnages adaptés :
 ${bookContext}
 DESCRIPTION DU LIVRE (générée en P1): ${descriptionGeneree}
 VISION : ${JSON.stringify(previousContext.P1 || {})}
@@ -283,24 +310,24 @@ OBJECTIF : ~${totalWords} mots total (~${estimatedPages} pages)
 Chaque chapitre doit avoir ~${wordsPerChapter} mots avec 4-6 sous-sections.
 
 MISSION CRITIQUE - PERSONNAGES :
-Crée 4-6 personnages UNIQUES et COHÉRENTS pour CE LIVRE SPÉCIFIQUE :
-- Personnage principal (héros/narrateur)
-- 2-3 personnages secondaires importants
-- 1-2 personnages d'appui ou antagonistes
+Crée 4-6 personnages UNIQUES et COHÉRENTS pour CE LIVRE SPÉCIFIQUE.
 
-Chaque personnage doit être ADAPTÉ au titre "${fullTitle}" et à la catégorie "${category}".
-NE RÉUTILISE JAMAIS des personnages d'autres livres. Crée des personnages 100% originaux.
-
-Crée la structure en JSON :
+Crée la structure COMPLÈTE en JSON :
 {
-  "structureGlobale": "description de l'arc narratif/pédagogique du livre adapté à la catégorie ${category}",
+  "structureGlobale": "description de l'arc narratif/pédagogique adapté à ${category}",
   "nombrePagesEstime": ${estimatedPages},
   "nombreMotsEstime": ${totalWords},
+  "introduction": {
+    "titre": "Introduction",
+    "accroche": "Phrase d'ouverture captivante",
+    "promesse": "Ce que le lecteur va apprendre/vivre",
+    "elements": ["élément clé 1", "élément clé 2", "élément clé 3"]
+  },
   "personnages": [
     {
       "name": "Nom du personnage",
       "role": "protagoniste/antagoniste/secondaire/mentor",
-      "description": "Description physique et psychologique détaillée (2-3 phrases)",
+      "description": "Description physique et psychologique (2-3 phrases)",
       "arc": "Son évolution au cours du récit"
     }
   ],
@@ -308,19 +335,38 @@ Crée la structure en JSON :
     {
       "numero": 1,
       "titre": "Titre accrocheur du chapitre",
-      "objectif": "Ce que le lecteur maîtrisera après ce chapitre",
+      "objectif": "Ce que le lecteur maîtrisera",
       "nombreMotsPrevu": ${wordsPerChapter},
       "sousSections": ["sous-section 1", "sous-section 2", "sous-section 3", "sous-section 4"],
       "pointsCles": ["point1", "point2", "point3"],
       "accroche": "Phrase d'ouverture captivante"
     }
   ],
+  "blocsPratiques": {
+    "checklist": ["Point de vérification 1", "Point 2", "Point 3"],
+    "faq": [
+      {"question": "Question fréquente 1?", "reponse": "Réponse concise"},
+      {"question": "Question fréquente 2?", "reponse": "Réponse concise"}
+    ],
+    "etudeDeCas": "Description d'un scénario réaliste",
+    "planAction": ["Étape 1", "Étape 2", "Étape 3", "Étape 4", "Étape 5"]
+  },
+  "aproposAuteur": {
+    "bio": "Présentation professionnelle courte de ${authorName}",
+    "expertise": "Domaine d'expertise",
+    "contact": "Comment le contacter (placeholder)"
+  },
+  "annexes": {
+    "titre": "Annexes - Ressources complémentaires",
+    "ressources": ["Ressource 1", "Ressource 2", "Ressource 3"],
+    "references": ["Référence utile 1", "Référence 2"]
+  },
   "progressionLogique": "explication de pourquoi cet ordre"
 }`,
-          10000
+          12000
         );
         result = parseJSON(content) || { raw: content };
-        console.log(`Step P3 completed - Generated ${result.personnages?.length || 0} characters`);
+        console.log(`Step P3 completed - Generated ${result.personnages?.length || 0} characters with KDP structure`);
         
         if (result.chapitres) {
           const totalMotsPrevu = result.chapitres.reduce((acc: number, ch: any) => acc + (ch.nombreMotsPrevu || wordsPerChapter), 0);
@@ -330,7 +376,19 @@ Crée la structure en JSON :
             ? `\n\n**🎭 ${result.personnages.length} Personnages créés :**\n${result.personnages.map((p: any) => `- **${p.name}** (${p.role}): ${p.description}`).join('\n')}`
             : '';
           
-          displayContent = `**Structure globale :** ${result.structureGlobale}${personnagesDisplay}\n\n**📖 ~${pagesEstime} pages prévues (~${totalMotsPrevu} mots)**\n\n**${result.chapitres.length} chapitres structurés :**\n\n` +
+          const introDisplay = result.introduction
+            ? `\n\n**📖 Introduction :** ${result.introduction.promesse}`
+            : '';
+          
+          const blocsPratiquesDisplay = result.blocsPratiques
+            ? `\n\n**🛠️ Blocs pratiques :** Checklist (${result.blocsPratiques.checklist?.length || 0} points), FAQ (${result.blocsPratiques.faq?.length || 0} questions), Plan d'action (${result.blocsPratiques.planAction?.length || 0} étapes)`
+            : '';
+          
+          const aproposDisplay = result.aproposAuteur
+            ? `\n\n**👤 À propos de l'auteur :** ${result.aproposAuteur.bio?.substring(0, 100)}...`
+            : '';
+          
+          displayContent = `**Structure KDP complète générée :** ${result.structureGlobale}${introDisplay}${personnagesDisplay}${blocsPratiquesDisplay}${aproposDisplay}\n\n**📖 ~${pagesEstime} pages prévues (~${totalMotsPrevu} mots)**\n\n**${result.chapitres.length} chapitres structurés :**\n\n` +
             result.chapitres.map((ch: any) => `**Ch.${ch.numero} - ${ch.titre}** (~${ch.nombreMotsPrevu || wordsPerChapter} mots)\n_Objectif :_ ${ch.objectif}`).join('\n\n');
         } else {
           displayContent = content;

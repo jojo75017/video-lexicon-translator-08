@@ -1927,6 +1927,15 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
             </div>
           );
         }
+        // Récupérer la structure KDP depuis les résultats du workflow P3
+        const p3Result = getStepResult('P3');
+        const kdpStructure = p3Result?.result ? {
+          introduction: p3Result.result.introduction,
+          blocsPratiques: p3Result.result.blocsPratiques,
+          aproposAuteur: p3Result.result.aproposAuteur,
+          annexes: p3Result.result.annexes,
+        } : undefined;
+        
         return (
           <EbookExporter
             ebookTitle={ebookTitle}
@@ -1936,6 +1945,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
             epilogue={epilogue}
             chapters={chapters}
             characters={characters}
+            kdpStructure={kdpStructure}
           />
         );
       

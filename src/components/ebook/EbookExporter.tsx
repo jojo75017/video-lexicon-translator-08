@@ -36,6 +36,32 @@ import {
   UnderlineType
 } from 'docx';
 
+// Structure KDP complète
+interface KdpStructure {
+  introduction?: {
+    titre: string;
+    accroche: string;
+    promesse: string;
+    contenu?: string;
+  };
+  blocsPratiques?: {
+    checklist?: string[];
+    faq?: Array<{ question: string; reponse: string }>;
+    etudeDeCas?: string;
+    planAction?: string[];
+  };
+  aproposAuteur?: {
+    bio: string;
+    expertise?: string;
+    contact?: string;
+  };
+  annexes?: {
+    titre: string;
+    ressources?: string[];
+    references?: string[];
+  };
+}
+
 interface EbookExporterProps {
   ebookTitle: string;
   authorName: string;
@@ -44,6 +70,7 @@ interface EbookExporterProps {
   epilogue?: string;
   chapters: Chapter[];
   characters?: Character[];
+  kdpStructure?: KdpStructure;
 }
 
 export const EbookExporter: React.FC<EbookExporterProps> = ({
@@ -53,7 +80,8 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
   conclusion,
   epilogue,
   chapters,
-  characters = []
+  characters = [],
+  kdpStructure
 }) => {
   const [exportFormat, setExportFormat] = useState<'pdf' | 'docx' | 'txt' | 'html' | 'epub' | 'googledocs' | 'idml'>('pdf');
   const [includeTableOfContents, setIncludeTableOfContents] = useState(true);
@@ -68,7 +96,7 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
   const generateEbookContent = () => {
     let content = '';
     
-    // Page de couverture
+    // 1. PAGE DE TITRE
     if (includeCoverPage) {
       content += `${ebookTitle}\n`;
       content += `${'='.repeat(ebookTitle.length)}\n\n`;
@@ -78,17 +106,31 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
       content += `${'='.repeat(50)}\n\n\n`;
     }
 
-    // Table des matières
+    // 2. PAGE BLANCHE (symbolique dans le texte)
+    content += `\n\n`;
+
+    // 3. PRÉFACE
+    if (preface) {
+      content += `📝 PRÉFACE\n`;
+      content += `${'='.repeat(50)}\n\n`;
+      content += `${preface}\n\n`;
+      content += `${'='.repeat(50)}\n\n\n`;
+    }
+
+    // 4. TABLE DES MATIÈRES
     if (includeTableOfContents) {
       content += `📚 TABLE DES MATIÈRES\n`;
       content += `${'='.repeat(50)}\n\n`;
       
-      if (preface) {
-        content += `Préface ................................................ 3\n\n`;
-      }
-      
       let currentPage = preface ? 5 : 3;
       
+      // Introduction
+      if (kdpStructure?.introduction) {
+        content += `Introduction ................................................ ${currentPage}\n`;
+        currentPage += 3;
+      }
+      
+      // Chapitres
       chapters.forEach((chapter, index) => {
         const chapterNumber = index + 1;
         content += `${chapterNumber}. ${chapter.title}`;
@@ -106,22 +148,55 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
         currentPage += Math.max(5, chapter.subChapters.length + 3);
       });
       
+      // Blocs pratiques
+      if (kdpStructure?.blocsPratiques) {
+        content += `Blocs pratiques ................................ ${currentPage}\n`;
+        currentPage += 5;
+      }
+      
+      // Conclusion
       if (conclusion) {
-        content += `Conclusion/Mot de la fin ................................ ${currentPage + 2}\n`;
+        content += `Conclusion ................................ ${currentPage}\n`;
+        currentPage += 3;
+      }
+      
+      // À propos de l'auteur
+      if (kdpStructure?.aproposAuteur) {
+        content += `À propos de l'auteur ................................ ${currentPage}\n`;
+        currentPage += 2;
+      }
+      
+      // Annexes
+      if (kdpStructure?.annexes) {
+        content += `Annexes ................................ ${currentPage}\n`;
+        currentPage += 3;
+      }
+      
+      // Personnages
+      if (includeCharacterList && characters.length > 0) {
+        content += `Personnages ................................ ${currentPage}\n`;
       }
       
       content += `\n${'='.repeat(50)}\n\n\n`;
     }
 
-    // Préface
-    if (preface) {
-      content += `📝 PRÉFACE\n`;
+    // 5. INTRODUCTION
+    if (kdpStructure?.introduction) {
+      content += `📖 INTRODUCTION\n`;
       content += `${'='.repeat(50)}\n\n`;
-      content += `${preface}\n\n`;
+      if (kdpStructure.introduction.accroche) {
+        content += `${kdpStructure.introduction.accroche}\n\n`;
+      }
+      if (kdpStructure.introduction.promesse) {
+        content += `${kdpStructure.introduction.promesse}\n\n`;
+      }
+      if (kdpStructure.introduction.contenu) {
+        content += `${kdpStructure.introduction.contenu}\n\n`;
+      }
       content += `${'='.repeat(50)}\n\n\n`;
     }
 
-    // Chapitres
+    // 6. CHAPITRES PRINCIPAUX
     chapters.forEach((chapter, index) => {
       const chapterNumber = index + 1;
       
@@ -146,17 +221,125 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
       content += `${'='.repeat(50)}\n\n\n`;
     });
 
-    // Conclusion
+    // 7. BLOCS PRATIQUES
+    if (kdpStructure?.blocsPratiques) {
+      content += `🛠️ BLOCS PRATIQUES\n`;
+      content += `${'='.repeat(50)}\n\n`;
+      
+      // Checklist
+      if (kdpStructure.blocsPratiques.checklist && kdpStructure.blocsPratiques.checklist.length > 0) {
+        content += `✅ CHECKLIST\n`;
+        content += `${'-'.repeat(30)}\n`;
+        kdpStructure.blocsPratiques.checklist.forEach((item, i) => {
+          content += `☐ ${item}\n`;
+        });
+        content += `\n`;
+      }
+      
+      // FAQ
+      if (kdpStructure.blocsPratiques.faq && kdpStructure.blocsPratiques.faq.length > 0) {
+        content += `❓ QUESTIONS FRÉQUENTES\n`;
+        content += `${'-'.repeat(30)}\n\n`;
+        kdpStructure.blocsPratiques.faq.forEach((item) => {
+          content += `Q: ${item.question}\n`;
+          content += `R: ${item.reponse}\n\n`;
+        });
+      }
+      
+      // Étude de cas
+      if (kdpStructure.blocsPratiques.etudeDeCas) {
+        content += `📋 ÉTUDE DE CAS\n`;
+        content += `${'-'.repeat(30)}\n`;
+        content += `${kdpStructure.blocsPratiques.etudeDeCas}\n\n`;
+      }
+      
+      // Plan d'action
+      if (kdpStructure.blocsPratiques.planAction && kdpStructure.blocsPratiques.planAction.length > 0) {
+        content += `🎯 PLAN D'ACTION ÉTAPE PAR ÉTAPE\n`;
+        content += `${'-'.repeat(30)}\n`;
+        kdpStructure.blocsPratiques.planAction.forEach((step, i) => {
+          content += `${i + 1}. ${step}\n`;
+        });
+        content += `\n`;
+      }
+      
+      content += `${'='.repeat(50)}\n\n\n`;
+    }
+
+    // 8. CONCLUSION
     if (conclusion) {
-      content += `🎯 MOT DE LA FIN\n`;
+      content += `🎯 CONCLUSION\n`;
       content += `${'='.repeat(50)}\n\n`;
       content += `${conclusion}\n\n`;
+      content += `${'='.repeat(50)}\n\n\n`;
+    }
+
+    // 9. À PROPOS DE L'AUTEUR
+    if (kdpStructure?.aproposAuteur) {
+      content += `👤 À PROPOS DE L'AUTEUR\n`;
+      content += `${'='.repeat(50)}\n\n`;
+      content += `${kdpStructure.aproposAuteur.bio}\n\n`;
+      if (kdpStructure.aproposAuteur.expertise) {
+        content += `Expertise : ${kdpStructure.aproposAuteur.expertise}\n\n`;
+      }
+      if (kdpStructure.aproposAuteur.contact) {
+        content += `Contact : ${kdpStructure.aproposAuteur.contact}\n\n`;
+      }
+      content += `${'='.repeat(50)}\n\n\n`;
+    }
+
+    // 10. ANNEXES
+    if (kdpStructure?.annexes) {
+      content += `📎 ${kdpStructure.annexes.titre?.toUpperCase() || 'ANNEXES'}\n`;
+      content += `${'='.repeat(50)}\n\n`;
+      
+      if (kdpStructure.annexes.ressources && kdpStructure.annexes.ressources.length > 0) {
+        content += `Ressources utiles :\n`;
+        kdpStructure.annexes.ressources.forEach((res) => {
+          content += `• ${res}\n`;
+        });
+        content += `\n`;
+      }
+      
+      if (kdpStructure.annexes.references && kdpStructure.annexes.references.length > 0) {
+        content += `Références :\n`;
+        kdpStructure.annexes.references.forEach((ref) => {
+          content += `• ${ref}\n`;
+        });
+        content += `\n`;
+      }
+      
+      content += `${'='.repeat(50)}\n\n\n`;
+    }
+
+    // 11. NOTES ET PAGES DE TRAVAIL
+    content += `📝 NOTES ET PAGES DE TRAVAIL\n`;
+    content += `${'='.repeat(50)}\n\n`;
+    content += `(Pages laissées intentionnellement vierges pour vos notes)\n\n`;
+    content += `\n\n\n\n\n\n\n\n`;
+    content += `${'='.repeat(50)}\n\n\n`;
+
+    // 12. PERSONNAGES (si applicable)
+    if (includeCharacterList && characters.length > 0) {
+      content += `🎭 PERSONNAGES\n`;
+      content += `${'='.repeat(50)}\n\n`;
+      characters.forEach((character) => {
+        content += `**${character.name}**`;
+        if (character.role) {
+          content += ` (${character.role})`;
+        }
+        content += `\n`;
+        if (character.description) {
+          content += `${character.description}\n`;
+        }
+        content += `\n`;
+      });
       content += `${'='.repeat(50)}\n\n`;
     }
 
     // Pied de page
     content += `\n\n${'='.repeat(50)}\n`;
-    content += `Généré avec le Planificateur d'Ebook\n`;
+    content += `Généré avec EbookStudio Pro\n`;
     content += `${new Date().toLocaleDateString()}\n`;
     content += `${'='.repeat(50)}`;
 
