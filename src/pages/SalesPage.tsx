@@ -619,11 +619,33 @@ const SalesPage = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Footer */}
-      <footer className="py-6 text-center border-t border-border/50">
-        <p className="text-xs text-muted-foreground/50">
-          © 2024
-        </p>
+      {/* Footer avec liens SEO */}
+      <footer className="py-8 text-center border-t border-border/50 bg-slate-50/50">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="flex flex-wrap justify-center gap-4 mb-4 text-sm">
+            <button 
+              onClick={() => navigate("/ecrire-livre-chatgpt")}
+              className="text-violet-600 hover:text-violet-700 underline-offset-2 hover:underline"
+            >
+              📚 Guide : Écrire un Livre avec ChatGPT
+            </button>
+            <button 
+              onClick={() => navigate("/valeur-offre")}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              Valeur de l'offre
+            </button>
+            <button 
+              onClick={() => navigate("/demo")}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              Démo gratuite
+            </button>
+          </div>
+          <p className="text-xs text-muted-foreground/50">
+            © 2025 EbookStudio.fr • Générateur de Livre IA pour Amazon KDP
+          </p>
+        </div>
       </footer>
     </div>
   );
