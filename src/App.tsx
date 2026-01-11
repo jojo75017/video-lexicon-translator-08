@@ -20,6 +20,7 @@ import SalesPage from './pages/SalesPage';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import DemoPage from './pages/DemoPage';
 import OfferValuePage from './pages/OfferValuePage';
+import SeoTutorialChatGptPage from './pages/SeoTutorialChatGptPage';
 import { SubscriptionAuth } from '@/components/SubscriptionAuth';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -146,6 +147,7 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Navigate to="/offres" replace />} />
             <Route path="/offres" element={<SalesPage />} />
+            <Route path="/ecrire-livre-chatgpt" element={<SeoTutorialChatGptPage />} />
             <Route path="/valeur-offre" element={<OfferValuePage />} />
             <Route path="/demo" element={<DemoPage />} />
             <Route path="/paiement-succes" element={<PaymentSuccessPage />} />
