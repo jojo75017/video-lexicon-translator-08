@@ -19,6 +19,40 @@ const SalesPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
+  // SEO Meta Tags dynamiques pour la page /offres
+  useEffect(() => {
+    // Title optimisé pour le mot-clé principal
+    document.title = "Créer un Ebook avec l'IA - Générateur de Livres Amazon KDP | 37€";
+    
+    // Meta description optimisée
+    const metaDescription = document.querySelector('meta[name="description"]');
+    if (metaDescription) {
+      metaDescription.setAttribute("content", "Créez un ebook professionnel avec l'intelligence artificielle. Générateur de livre IA complet pour autoédition Amazon KDP. Écrivez et publiez votre premier livre en quelques clics. Accès à vie pour seulement 37€.");
+    }
+    
+    // Canonical URL
+    const canonical = document.querySelector('link[rel="canonical"]');
+    if (canonical) {
+      canonical.setAttribute("href", "https://ebookstudio.fr/offres");
+    }
+    
+    // Open Graph
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) {
+      ogTitle.setAttribute("content", "Créer un Ebook avec l'IA - Offre Spéciale 37€");
+    }
+    
+    const ogDescription = document.querySelector('meta[property="og:description"]');
+    if (ogDescription) {
+      ogDescription.setAttribute("content", "Générateur de livre IA pour Amazon KDP. Créez, écrivez et publiez votre ebook en autoédition facilement.");
+    }
+    
+    const ogUrl = document.querySelector('meta[property="og:url"]');
+    if (ogUrl) {
+      ogUrl.setAttribute("content", "https://ebookstudio.fr/offres");
+    }
+  }, []);
+
   // Countdown to January 31, 2025
   useEffect(() => {
     const targetDate = new Date('2025-01-31T23:59:59');
