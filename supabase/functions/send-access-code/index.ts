@@ -14,6 +14,35 @@ interface SendCodeRequest {
   planType: string;
 }
 
+// SECURITY: Simple in-memory rate limiting (3 emails per hour per email)
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+
+function checkRateLimit(email: string): boolean {
+  const now = Date.now();
+  const key = email.toLowerCase().trim();
+  const limit = rateLimitMap.get(key);
+  
+  // Clean up old entries periodically
+  if (rateLimitMap.size > 1000) {
+    for (const [k, v] of rateLimitMap.entries()) {
+      if (now > v.resetTime) rateLimitMap.delete(k);
+    }
+  }
+  
+  if (!limit || now > limit.resetTime) {
+    rateLimitMap.set(key, { count: 1, resetTime: now + 3600000 }); // 1 hour
+    return true;
+  }
+  
+  if (limit.count >= 3) {
+    console.warn(`Rate limit exceeded for ${email}`);
+    return false;
+  }
+  
+  limit.count++;
+  return true;
+}
+
 const handler = async (req: Request): Promise<Response> => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
@@ -22,6 +51,23 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const { email, accessCode, planType }: SendCodeRequest = await req.json();
+
+    // SECURITY: Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRegex.test(email)) {
+      return new Response(
+        JSON.stringify({ error: "Email invalide" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    // SECURITY: Check rate limit
+    if (!checkRateLimit(email)) {
+      return new Response(
+        JSON.stringify({ error: "Trop de requêtes. Réessayez dans 1 heure." }),
+        { status: 429, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
 
     console.log(`Sending access code to ${email}`);
 

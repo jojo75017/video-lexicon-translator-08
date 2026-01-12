@@ -12,9 +12,10 @@ serve(async (req) => {
   }
 
   try {
-    const { email, action, count = 1 } = await req.json();
+    const { email, access_code, action, count = 1 } = await req.json();
     console.log('Increment quota request:', { email, action, count });
 
+    // SECURITY: Require email, access_code and action
     if (!email || !action) {
       return new Response(
         JSON.stringify({ error: 'Email et action requis' }),
@@ -25,6 +26,31 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // SECURITY: Validate subscription via email + access_code
+    const { data: subscriber, error: fetchError } = await supabase
+      .from('subscribers')
+      .select('*')
+      .eq('email', email.toLowerCase().trim())
+      .eq('status', 'active')
+      .single();
+
+    if (fetchError || !subscriber) {
+      console.error('Subscriber not found:', fetchError);
+      return new Response(
+        JSON.stringify({ error: 'Abonnement non trouvé' }),
+        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // SECURITY: Verify access code matches
+    if (access_code && subscriber.access_code !== access_code) {
+      console.error('Invalid access code for:', email);
+      return new Response(
+        JSON.stringify({ error: 'Code d\'accès invalide' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     // Mapper l'action vers le champ de la base de données
     const fieldMap: Record<string, string> = {
@@ -39,22 +65,6 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ error: 'Action invalide' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // Récupérer l'abonnement actuel
-    const { data: subscriber, error: fetchError } = await supabase
-      .from('subscribers')
-      .select('*')
-      .eq('email', email)
-      .eq('status', 'active')
-      .single();
-
-    if (fetchError || !subscriber) {
-      console.error('Subscriber not found:', fetchError);
-      return new Response(
-        JSON.stringify({ error: 'Abonnement non trouvé' }),
-        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
