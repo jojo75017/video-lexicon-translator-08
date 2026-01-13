@@ -97,6 +97,7 @@ import EbookAmazonSimulator from '@/components/ebook/EbookAmazonSimulator';
 import EbookSeoArticleGenerator from '@/components/ebook/EbookSeoArticleGenerator';
 import EbookDocumentTransformer from '@/components/ebook/EbookDocumentTransformer';
 import EbookAmazonAdsSimulator from '@/components/ebook/EbookAmazonAdsSimulator';
+import EbookLaunchPlan from '@/components/ebook/EbookLaunchPlan';
 
 // Hooks et données
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
@@ -2243,6 +2244,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
             genre={genre}
           />
         );
+      
+      case 'launch-plan':
+        return <EbookLaunchPlan />;
       
       case 'market':
         return (
