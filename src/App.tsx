@@ -148,6 +148,16 @@ const App = () => {
       <TooltipProvider>
         <div className="min-h-screen bg-background">
           <Routes>
+            {/* Google Search Console verification (fallback if static file routing is rewritten) */}
+            <Route
+              path="/googleba4e4a3539729cd0.html"
+              element={
+                <main className="min-h-screen bg-background text-foreground">
+                  <pre className="p-6 text-sm">google-site-verification: googleba4e4a3539729cd0.html</pre>
+                </main>
+              }
+            />
+
             <Route path="/" element={<Navigate to="/offres" replace />} />
             <Route path="/offres" element={<SalesPage />} />
             <Route path="/blog" element={<BlogPage />} />
