@@ -61,7 +61,7 @@ const SeoGenerateurEbookPage: React.FC = () => {
     },
     {
       question: "Le générateur est-il vraiment gratuit ?",
-      answer: "EbookiaPro propose un essai gratuit avec 3 plans d'ebooks. L'accès complet à vie est ensuite à 37€, incluant toutes les fonctionnalités et mises à jour futures."
+      answer: "EbookStudio Pro propose un essai gratuit avec 3 plans d'ebooks. L'accès complet à vie est ensuite à 37€, incluant toutes les fonctionnalités et mises à jour futures."
     },
     {
       question: "Les ebooks générés sont-ils uniques ?",
@@ -84,7 +84,7 @@ const SeoGenerateurEbookPage: React.FC = () => {
         __html: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "SoftwareApplication",
-          "name": "EbookiaPro - Générateur Ebook IA",
+          "name": "EbookStudio Pro - Générateur Ebook IA",
           "applicationCategory": "BusinessApplication",
           "operatingSystem": "Web",
           "offers": {
@@ -366,7 +366,7 @@ const SeoGenerateurEbookPage: React.FC = () => {
             </div>
           </div>
           <div className="border-t border-gray-800 pt-6 text-center text-sm">
-            <p>© 2025 EbookiaPro - Le meilleur générateur d'ebook IA</p>
+            <p>© 2025 EbookStudio Pro - Le meilleur générateur d'ebook IA</p>
           </div>
         </div>
       </footer>

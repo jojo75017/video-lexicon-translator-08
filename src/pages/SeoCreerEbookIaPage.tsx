@@ -49,23 +49,23 @@ const SeoCreerEbookIaPage: React.FC = () => {
   const faqs = [
     {
       question: "Peut-on vraiment créer un ebook avec l'IA ?",
-      answer: "Oui ! Les outils d'IA modernes comme EbookiaPro permettent de générer des ebooks complets de qualité professionnelle. L'IA assiste la création tout en vous laissant le contrôle éditorial final."
+      answer: "Oui ! Les outils d'IA modernes comme EbookStudio Pro permettent de générer des ebooks complets de qualité professionnelle. L'IA assiste la création tout en vous laissant le contrôle éditorial final."
     },
     {
       question: "Combien de temps faut-il pour créer un ebook avec l'IA ?",
-      answer: "Avec EbookiaPro, vous pouvez créer un ebook complet de 200+ pages en 24 à 48 heures, contre plusieurs semaines ou mois en écriture traditionnelle."
+      answer: "Avec EbookStudio Pro, vous pouvez créer un ebook complet de 200+ pages en 24 à 48 heures, contre plusieurs semaines ou mois en écriture traditionnelle."
     },
     {
       question: "Les ebooks générés par IA sont-ils de bonne qualité ?",
-      answer: "EbookiaPro utilise un workflow éditorial en 14 étapes incluant réécriture naturelle, cohérence narrative et verdict éditeur pour garantir une qualité professionnelle."
+      answer: "EbookStudio Pro utilise un workflow éditorial en 14 étapes incluant réécriture naturelle, cohérence narrative et verdict éditeur pour garantir une qualité professionnelle."
     },
     {
       question: "Puis-je publier un ebook créé avec l'IA sur Amazon ?",
-      answer: "Absolument ! Les ebooks générés sont originaux et vous appartiennent. EbookiaPro formate automatiquement pour Amazon KDP avec métadonnées optimisées."
+      answer: "Absolument ! Les ebooks générés sont originaux et vous appartiennent. EbookStudio Pro formate automatiquement pour Amazon KDP avec métadonnées optimisées."
     },
     {
       question: "Faut-il des compétences techniques pour utiliser le générateur ?",
-      answer: "Non, EbookiaPro est conçu pour les débutants. L'interface intuitive guide chaque étape, de l'idée à la publication."
+      answer: "Non, EbookStudio Pro est conçu pour les débutants. L'interface intuitive guide chaque étape, de l'idée à la publication."
     },
   ];
 
@@ -78,8 +78,8 @@ const SeoCreerEbookIaPage: React.FC = () => {
           "@type": "Article",
           "headline": "Créer un Ebook avec l'IA en 2025 : Guide Complet",
           "description": "Découvrez comment créer un ebook professionnel avec l'intelligence artificielle. Guide étape par étape pour publier sur Amazon KDP.",
-          "author": { "@type": "Organization", "name": "EbookiaPro" },
-          "publisher": { "@type": "Organization", "name": "EbookiaPro" },
+          "author": { "@type": "Organization", "name": "EbookStudio Pro" },
+          "publisher": { "@type": "Organization", "name": "EbookStudio Pro" },
           "datePublished": "2025-01-01",
           "dateModified": new Date().toISOString().split('T')[0]
         })
@@ -205,7 +205,7 @@ const SeoCreerEbookIaPage: React.FC = () => {
           <p>
             L'intelligence artificielle transforme radicalement la façon dont nous créons des ebooks. 
             Ce qui prenait autrefois des mois de travail peut désormais être accompli en quelques heures 
-            grâce aux générateurs d'ebooks IA comme <strong>EbookiaPro</strong>.
+            grâce aux générateurs d'ebooks IA comme <strong>EbookStudio Pro</strong>.
           </p>
 
           <h3>Les avantages de créer un ebook avec l'IA</h3>
@@ -222,7 +222,7 @@ const SeoCreerEbookIaPage: React.FC = () => {
           
           <p>
             Utiliser ChatGPT seul pour écrire un livre présente des limites : incohérences entre chapitres, 
-            ton robotique, structure désorganisée. <strong>EbookiaPro</strong> résout ces problèmes avec son 
+            ton robotique, structure désorganisée. <strong>EbookStudio Pro</strong> résout ces problèmes avec son 
             workflow éditorial en 14 étapes incluant :
           </p>
 
@@ -292,7 +292,7 @@ const SeoCreerEbookIaPage: React.FC = () => {
             Prêt à créer votre ebook avec l'IA ?
           </h2>
           <p className="text-xl opacity-90 mb-8">
-            Rejoignez +500 auteurs qui ont déjà publié leur livre grâce à EbookiaPro
+            Rejoignez +500 auteurs qui ont déjà publié leur livre grâce à EbookStudio Pro
           </p>
           
           <Button 
@@ -339,7 +339,7 @@ const SeoCreerEbookIaPage: React.FC = () => {
             </div>
           </div>
           <div className="border-t border-gray-800 pt-6 text-center text-sm">
-            <p>© 2025 EbookiaPro - Générateur d'ebooks avec l'IA</p>
+            <p>© 2025 EbookStudio Pro - Générateur d'ebooks avec l'IA</p>
           </div>
         </div>
       </footer>

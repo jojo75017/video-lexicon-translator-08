@@ -480,10 +480,10 @@ ${module.content}
                 <div className="text-left">
                   <h1 className="text-3xl md:text-4xl font-black tracking-tight">
                     <span className="bg-gradient-to-r from-amber-300 via-orange-400 to-amber-300 bg-clip-text text-transparent">
-                      Ebookia
+                      EbookStudio
                     </span>
                     <span className="bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
-                      Pro
+                      {' '}Pro
                     </span>
                   </h1>
                   <p className="text-slate-400 text-sm font-medium tracking-widest">
@@ -791,7 +791,7 @@ ${module.content}
                 Moteur IA Éditorial
               </div>
               <CardTitle className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary via-amber-500 to-orange-500 bg-clip-text text-transparent">
-                Ce que vous découvrirez dans EbookiaPro.V2
+                Ce que vous découvrirez dans EbookStudio Pro V2
               </CardTitle>
               <p className="text-muted-foreground mt-2 text-lg">
                 14 outils IA professionnels pour créer des ebooks de qualité éditoriale
@@ -851,7 +851,7 @@ ${module.content}
                   className="gap-3 px-8 py-6 text-lg font-semibold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 shadow-lg shadow-orange-500/25"
                 >
                   <Rocket className="h-5 w-5" />
-                  Accéder à EbookiaPro.V2
+                  Accéder à EbookStudio Pro V2
                   <ChevronRight className="h-5 w-5" />
                 </Button>
               </motion.div>

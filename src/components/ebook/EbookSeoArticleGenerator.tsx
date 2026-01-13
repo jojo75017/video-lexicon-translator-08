@@ -280,7 +280,7 @@ Génère maintenant l'article complet en JSON valide.`,
     </section>
     
     <div class="cta">
-      <p>🚀 Créez votre ebook dès maintenant avec EbookiaPro</p>
+      <p>🚀 Créez votre ebook dès maintenant avec EbookStudio Pro</p>
       <a href="https://ebookstudio.fr/offres">Essayer gratuitement →</a>
     </div>
     
@@ -303,7 +303,7 @@ Génère maintenant l'article complet en JSON valide.`,
     "description": "${generatedArticle.metaDescription}",
     "author": {
       "@type": "Organization",
-      "name": "EbookiaPro"
+      "name": "EbookStudio Pro"
     }
   }
   </script>
@@ -539,7 +539,7 @@ Génère maintenant l'article complet en JSON valide.`,
                       <h3 className="text-lg font-semibold text-violet-700 mb-2">🚀 Passez à l'action</h3>
                       <p className="text-gray-600 mb-4">{generatedArticle.conclusion}</p>
                       <Button className="bg-gradient-to-r from-violet-500 to-purple-600">
-                        Essayer EbookiaPro gratuitement
+                        Essayer EbookStudio Pro gratuitement
                         <ArrowRight className="w-4 h-4 ml-2" />
                       </Button>
                     </div>

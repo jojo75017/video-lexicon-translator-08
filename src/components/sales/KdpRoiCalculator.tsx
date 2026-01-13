@@ -78,7 +78,7 @@ export const KdpRoiCalculator: React.FC<KdpRoiCalculatorProps> = ({ onCtaClick }
               className="w-full"
             />
             <p className="text-xs text-muted-foreground">
-              Avec EbookiaPro, créez un ebook complet en 2-3h au lieu de plusieurs semaines
+              Avec EbookStudio Pro, créez un ebook complet en 2-3h au lieu de plusieurs semaines
             </p>
           </div>
 
