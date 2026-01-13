@@ -119,3 +119,6 @@ verify_jwt = false
 
 [functions.generate-from-urls]
 verify_jwt = false
+
+[functions.stripe-verify-session]
+verify_jwt = false
