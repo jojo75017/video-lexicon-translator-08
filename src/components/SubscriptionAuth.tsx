@@ -155,23 +155,6 @@ export const SubscriptionAuth = ({ onAuthenticated }: SubscriptionAuthProps) => 
     }
   };
   
-  const handleDemo = () => {
-    const demoEmail = 'demo@ebook.local';
-    const subscriber = {
-      email: demoEmail,
-      plan_type: 'pro',
-      status: 'active',
-      chapters_generated: 0,
-      ebook_plans_generated: 0,
-      demo: true,
-    };
-    localStorage.setItem('subscriber_email', demoEmail);
-    localStorage.setItem('subscriber_data', JSON.stringify(subscriber));
-    toast.info('Mode démo activé', { description: 'Vous pouvez tester toutes les rubriques.' });
-    onAuthenticated(demoEmail, subscriber);
-    navigate('/ebook-planner');
-  };
-  
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 via-background to-secondary/10 p-4">
       <Card className="w-full max-w-md p-8 space-y-6">
@@ -305,23 +288,6 @@ export const SubscriptionAuth = ({ onAuthenticated }: SubscriptionAuthProps) => 
           </Button>
         </form>
 
-        <div className="flex items-center my-2">
-          <div className="flex-1 h-px bg-border" />
-          <span className="px-2 text-xs text-muted-foreground">ou</span>
-          <div className="flex-1 h-px bg-border" />
-        </div>
-        <Button
-          type="button"
-          variant="secondary"
-          className="w-full"
-          onClick={handleDemo}
-          disabled={isLoading}
-        >
-          Découvrir en mode démo
-        </Button>
-        <p className="text-xs text-muted-foreground text-center mt-2">
-          Accès temporaire pour tester toutes les rubriques.
-        </p>
 
         <div className="text-center text-sm text-muted-foreground space-y-3">
           <div>
