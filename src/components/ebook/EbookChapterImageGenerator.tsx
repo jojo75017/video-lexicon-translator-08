@@ -60,14 +60,21 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
   const [imageQuality, setImageQuality] = useState<string>('high');
   const [colorScheme, setColorScheme] = useState<string>('auto');
   
-  // Cohérence visuelle
+  // Cohérence visuelle avancée
   const [visualCoherence, setVisualCoherence] = useState(false);
   const [coherenceStyle, setCoherenceStyle] = useState<string>('');
   const [coherenceColorScheme, setCoherenceColorScheme] = useState<string>('');
+  const [referenceImageUrl, setReferenceImageUrl] = useState<string | null>(null);
+  const [coherenceIntensity, setCoherenceIntensity] = useState<'light' | 'medium' | 'strict'>('medium');
+  const [autoCoherenceFromFirst, setAutoCoherenceFromFirst] = useState(true);
   
   // Seed pour régénération similaire
   const [lastSeed, setLastSeed] = useState<number | null>(null);
   const [useSameSeed, setUseSameSeed] = useState(false);
+  
+  // Palette de couleurs personnalisée pour cohérence
+  const [customPrimaryColor, setCustomPrimaryColor] = useState<string>('');
+  const [customSecondaryColor, setCustomSecondaryColor] = useState<string>('');
 
   const styleCategories = [
     {
@@ -270,10 +277,13 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
               quality: imageQuality,
               colorScheme: effectiveColorScheme,
               visualCoherence,
+              coherenceIntensity,
+              referenceImageUrl: referenceImageUrl || undefined,
               seed: useSameSeed && lastSeed ? lastSeed : undefined,
               characters: characters.map(c => ({
                 name: c.name,
-                description: c.description
+                description: c.description,
+                referenceImageUrl: c.referenceImageUrl
               })),
               useOpenAI,
               openaiApiKey: useOpenAI ? config.apiKey : undefined,
@@ -304,9 +314,15 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
             success = true;
             
             // Activer automatiquement la cohérence après la première image
-            if (i === 0 && !visualCoherence) {
+            if (i === 0 && autoCoherenceFromFirst) {
               setCoherenceStyle(imageStyle);
               setCoherenceColorScheme(colorScheme);
+              if (!referenceImageUrl) {
+                setReferenceImageUrl(data.imageUrl);
+              }
+              if (!visualCoherence) {
+                setVisualCoherence(true);
+              }
             }
           } else {
             throw new Error('Pas d\'URL d\'image dans la réponse');
@@ -422,10 +438,13 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
           quality: imageQuality,
           colorScheme: effectiveColorScheme,
           visualCoherence,
+          coherenceIntensity,
+          referenceImageUrl: referenceImageUrl || undefined,
           seed: useSameSeed && lastSeed ? lastSeed : undefined,
           characters: characters.map(c => ({
             name: c.name,
-            description: c.description
+            description: c.description,
+            referenceImageUrl: c.referenceImageUrl
           })),
           useOpenAI,
           openaiApiKey: useOpenAI ? config.apiKey : undefined,
@@ -697,35 +716,115 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
             <Label htmlFor="force-lovable" className="text-sm">Forcer Lovable AI (désactiver fallback OpenAI)</Label>
           </div>
           
-          {/* Cohérence visuelle */}
-          <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 space-y-3">
-            <div className="flex items-center gap-2">
-              <Checkbox 
-                id="visual-coherence" 
-                checked={visualCoherence} 
-                onCheckedChange={(v) => {
-                  setVisualCoherence(!!v);
-                  if (v && !coherenceStyle) {
-                    setCoherenceStyle(imageStyle);
-                    setCoherenceColorScheme(colorScheme);
-                  }
-                }} 
-              />
-              <Label htmlFor="visual-coherence" className="text-sm font-medium text-blue-800">
-                🎨 Cohérence visuelle entre chapitres
-              </Label>
+          {/* Cohérence visuelle avancée */}
+          <div className="p-4 bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 rounded-xl border-2 border-blue-300 space-y-4 shadow-sm">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Checkbox 
+                  id="visual-coherence" 
+                  checked={visualCoherence} 
+                  onCheckedChange={(v) => {
+                    setVisualCoherence(!!v);
+                    if (v && !coherenceStyle) {
+                      setCoherenceStyle(imageStyle);
+                      setCoherenceColorScheme(colorScheme);
+                    }
+                  }} 
+                />
+                <Label htmlFor="visual-coherence" className="text-sm font-bold text-blue-900">
+                  🎨 Mode Cohérence Visuelle
+                </Label>
+              </div>
+              {visualCoherence && (
+                <span className="px-2 py-0.5 bg-green-500 text-white text-xs font-medium rounded-full animate-pulse">
+                  ACTIVÉ
+                </span>
+              )}
             </div>
             
             {visualCoherence && (
-              <div className="pl-6 space-y-2">
-                <p className="text-xs text-blue-700">
-                  ⚡ Toutes les images utiliseront le même style et la même palette pour un rendu uniforme.
+              <div className="space-y-4">
+                <p className="text-xs text-blue-700 bg-blue-100 p-2 rounded-lg">
+                  ⚡ <strong>Mode activé:</strong> Toutes les images utiliseront le même style, la même palette et la même ambiance pour un rendu uniforme dans tout l'ebook.
                 </p>
-                <div className="grid grid-cols-2 gap-2">
+                
+                {/* Image de référence */}
+                {referenceImageUrl && (
+                  <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-green-300">
+                    <img 
+                      src={referenceImageUrl} 
+                      alt="Référence" 
+                      className="w-16 h-16 object-cover rounded-lg border-2 border-green-500"
+                    />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-green-800">✓ Image de référence définie</p>
+                      <p className="text-xs text-green-600">Les nouvelles images s'inspireront de ce style</p>
+                    </div>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => setReferenceImageUrl(null)}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      ✕
+                    </Button>
+                  </div>
+                )}
+                
+                {!referenceImageUrl && generatedImages.length > 0 && (
+                  <div className="p-3 bg-amber-50 rounded-lg border border-amber-200">
+                    <p className="text-xs text-amber-800 mb-2">
+                      💡 <strong>Conseil:</strong> Définissez la première image réussie comme référence pour une cohérence parfaite
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {generatedImages.slice(0, 4).map((img) => (
+                        <button
+                          key={img.chapterId}
+                          onClick={() => {
+                            setReferenceImageUrl(img.imageUrl);
+                            toast.success('Image de référence définie', {
+                              description: 'Les nouvelles images s\'inspireront de ce style'
+                            });
+                          }}
+                          className="w-12 h-12 rounded-lg overflow-hidden border-2 border-transparent hover:border-blue-500 transition-all hover:scale-105"
+                        >
+                          <img src={img.imageUrl} alt="" className="w-full h-full object-cover" />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {/* Intensité de cohérence */}
+                <div className="space-y-2">
+                  <Label className="text-xs font-medium">Intensité de cohérence</Label>
+                  <div className="flex gap-2">
+                    {[
+                      { value: 'light', label: '🌱 Légère', desc: 'Style similaire, variations permises' },
+                      { value: 'medium', label: '⚖️ Moyenne', desc: 'Style cohérent, petites variations' },
+                      { value: 'strict', label: '🔒 Stricte', desc: 'Style identique, aucune variation' }
+                    ].map((opt) => (
+                      <button
+                        key={opt.value}
+                        onClick={() => setCoherenceIntensity(opt.value as 'light' | 'medium' | 'strict')}
+                        className={`flex-1 p-2 rounded-lg border-2 transition-all text-xs ${
+                          coherenceIntensity === opt.value 
+                            ? 'border-blue-500 bg-blue-50 text-blue-800' 
+                            : 'border-gray-200 hover:border-blue-300'
+                        }`}
+                      >
+                        <div className="font-medium">{opt.label}</div>
+                        <div className="text-[10px] opacity-70">{opt.desc}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <Label className="text-xs">Style verrouillé</Label>
+                    <Label className="text-xs font-medium">Style verrouillé</Label>
                     <Select value={coherenceStyle} onValueChange={setCoherenceStyle}>
-                      <SelectTrigger className="h-8 text-xs">
+                      <SelectTrigger className="h-9 text-xs mt-1">
                         <SelectValue placeholder="Style" />
                       </SelectTrigger>
                       <SelectContent className="max-h-60">
@@ -738,9 +837,9 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
                     </Select>
                   </div>
                   <div>
-                    <Label className="text-xs">Palette verrouillée</Label>
+                    <Label className="text-xs font-medium">Palette verrouillée</Label>
                     <Select value={coherenceColorScheme} onValueChange={setCoherenceColorScheme}>
-                      <SelectTrigger className="h-8 text-xs">
+                      <SelectTrigger className="h-9 text-xs mt-1">
                         <SelectValue placeholder="Palette" />
                       </SelectTrigger>
                       <SelectContent>
@@ -752,6 +851,18 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
                       </SelectContent>
                     </Select>
                   </div>
+                </div>
+                
+                {/* Auto-cohérence depuis première image */}
+                <div className="flex items-center gap-2 pt-2 border-t border-blue-200">
+                  <Checkbox 
+                    id="auto-coherence" 
+                    checked={autoCoherenceFromFirst} 
+                    onCheckedChange={(v) => setAutoCoherenceFromFirst(!!v)} 
+                  />
+                  <Label htmlFor="auto-coherence" className="text-xs text-blue-700">
+                    🔄 Appliquer automatiquement le style de la 1ère image aux suivantes
+                  </Label>
                 </div>
               </div>
             )}
