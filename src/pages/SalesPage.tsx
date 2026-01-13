@@ -782,31 +782,86 @@ const SalesPage = () => {
       </div>
 
       {/* Footer avec liens SEO */}
-      <footer className="py-8 pb-20 md:pb-8 text-center border-t border-border/50 bg-slate-50/50">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="flex flex-wrap justify-center gap-4 mb-4 text-sm">
-            <button 
-              onClick={() => navigate("/ecrire-livre-chatgpt")}
-              className="text-violet-600 hover:text-violet-700 underline-offset-2 hover:underline"
-            >
-              📚 Guide : Écrire un Livre avec ChatGPT
-            </button>
-            <button 
-              onClick={() => navigate("/valeur-offre")}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              Valeur de l'offre
-            </button>
-            <button 
-              onClick={() => navigate("/demo")}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              Démo gratuite
-            </button>
+      <footer className="py-12 pb-20 md:pb-12 border-t border-border/50 bg-slate-900 text-white">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
+            {/* Logo & Description */}
+            <div className="md:col-span-1">
+              <h3 className="text-xl font-bold mb-3 bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">
+                EbookiaPro
+              </h3>
+              <p className="text-gray-400 text-sm">
+                Le générateur d'ebook IA #1 en France. Créez et publiez votre livre sur Amazon KDP en 24h.
+              </p>
+            </div>
+            
+            {/* Guides SEO */}
+            <div>
+              <h4 className="font-semibold mb-3 text-gray-200">📚 Guides Gratuits</h4>
+              <ul className="space-y-2 text-sm">
+                <li>
+                  <button onClick={() => navigate("/ecrire-livre-chatgpt")} className="text-gray-400 hover:text-violet-400 transition-colors">
+                    Écrire un livre avec ChatGPT
+                  </button>
+                </li>
+                <li>
+                  <button onClick={() => navigate("/creer-ebook-ia")} className="text-gray-400 hover:text-violet-400 transition-colors">
+                    Créer un ebook avec l'IA
+                  </button>
+                </li>
+                <li>
+                  <button onClick={() => navigate("/generateur-ebook")} className="text-gray-400 hover:text-violet-400 transition-colors">
+                    Générateur ebook IA
+                  </button>
+                </li>
+              </ul>
+            </div>
+            
+            {/* Produit */}
+            <div>
+              <h4 className="font-semibold mb-3 text-gray-200">🚀 Produit</h4>
+              <ul className="space-y-2 text-sm">
+                <li>
+                  <button onClick={() => navigate("/demo")} className="text-gray-400 hover:text-violet-400 transition-colors">
+                    Essai gratuit
+                  </button>
+                </li>
+                <li>
+                  <button onClick={() => navigate("/valeur-offre")} className="text-gray-400 hover:text-violet-400 transition-colors">
+                    Valeur de l'offre
+                  </button>
+                </li>
+                <li>
+                  <button onClick={() => navigate("/formation")} className="text-gray-400 hover:text-violet-400 transition-colors">
+                    Formation complète
+                  </button>
+                </li>
+              </ul>
+            </div>
+            
+            {/* Ressources */}
+            <div>
+              <h4 className="font-semibold mb-3 text-gray-200">💡 Ressources</h4>
+              <ul className="space-y-2 text-sm">
+                <li>
+                  <button onClick={() => navigate("/ebook-planner")} className="text-gray-400 hover:text-violet-400 transition-colors">
+                    Accéder au générateur
+                  </button>
+                </li>
+                <li>
+                  <button onClick={() => navigate("/affiliation")} className="text-gray-400 hover:text-violet-400 transition-colors">
+                    Programme d'affiliation
+                  </button>
+                </li>
+              </ul>
+            </div>
           </div>
-          <p className="text-xs text-muted-foreground/50">
-            © 2025 EbookStudio.fr • Générateur de Livre IA pour Amazon KDP
-          </p>
+          
+          <div className="border-t border-gray-800 pt-6 text-center">
+            <p className="text-xs text-gray-500">
+              © 2025 EbookiaPro.fr • Générateur de Livre IA pour Amazon KDP • Tous droits réservés
+            </p>
+          </div>
         </div>
       </footer>
 
