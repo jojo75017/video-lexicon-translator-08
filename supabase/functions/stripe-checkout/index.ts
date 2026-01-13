@@ -119,37 +119,61 @@ serve(async (req) => {
       );
     }
 
-    // Run customer lookup and price lookup in parallel
-    const [customersResult, priceId] = await Promise.all([
-      stripe.customers.list({ email, limit: 1 }),
-      isRestrictedKey ? Promise.resolve(configuredPriceId) : getOrCreatePrice(stripe, planId, plan),
-    ]);
+    let priceId: string;
+    let sessionConfig: Stripe.Checkout.SessionCreateParams;
 
-    // Get or create customer
-    let customerId: string;
-    if (customersResult.data.length > 0) {
-      customerId = customersResult.data[0].id;
-      console.log("Found existing customer:", customerId);
+    if (isRestrictedKey) {
+      // Mode clé limitée: pas de lookup client/prix, utiliser uniquement le price_id configuré
+      console.log("Restricted key mode: using configured price_id:", configuredPriceId);
+      priceId = configuredPriceId;
+      
+      sessionConfig = {
+        customer_email: email, // Stripe crée le client automatiquement
+        line_items: [{ price: priceId, quantity: 1 }],
+        mode: "payment",
+        success_url: successUrl || `${req.headers.get("origin")}/paiement-succes?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: cancelUrl || `${req.headers.get("origin")}/offres`,
+        metadata: {
+          planId,
+          email,
+        },
+        allow_promotion_codes: true,
+      };
     } else {
-      const newCustomer = await stripe.customers.create({ email });
-      customerId = newCustomer.id;
-      console.log("Created new customer:", customerId);
+      // Mode clé complète: lookup client + prix dynamiques
+      const [customersResult, dynamicPriceId] = await Promise.all([
+        stripe.customers.list({ email, limit: 1 }),
+        getOrCreatePrice(stripe, planId, plan),
+      ]);
+
+      priceId = dynamicPriceId;
+
+      // Get or create customer
+      let customerId: string;
+      if (customersResult.data.length > 0) {
+        customerId = customersResult.data[0].id;
+        console.log("Found existing customer:", customerId);
+      } else {
+        const newCustomer = await stripe.customers.create({ email });
+        customerId = newCustomer.id;
+        console.log("Created new customer:", customerId);
+      }
+
+      sessionConfig = {
+        customer: customerId,
+        line_items: [{ price: priceId, quantity: 1 }],
+        mode: "payment",
+        success_url: successUrl || `${req.headers.get("origin")}/paiement-succes?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: cancelUrl || `${req.headers.get("origin")}/offres`,
+        metadata: {
+          planId,
+          email,
+        },
+        allow_promotion_codes: true,
+      };
     }
 
     // Create checkout session
-    const sessionConfig: Stripe.Checkout.SessionCreateParams = {
-      customer: customerId,
-      line_items: [{ price: priceId, quantity: 1 }],
-      mode: "payment", // All one-time payments
-      success_url: successUrl || `${req.headers.get("origin")}/paiement-succes?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: cancelUrl || `${req.headers.get("origin")}/offres`,
-      metadata: {
-        planId,
-        email,
-      },
-      allow_promotion_codes: true,
-    };
-
     const session = await stripe.checkout.sessions.create(sessionConfig);
     console.log("Created checkout session:", session.id);
 
