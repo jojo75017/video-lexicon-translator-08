@@ -127,7 +127,8 @@ const categories: PremiumCategory[] = [
     id: 'gestion',
     label: 'Gestion & Projet',
     icon: '📁',
-    color: 'from-violet-500 to-purple-500',
+    color: 'from-violet-500 via-purple-500 to-indigo-500',
+    isPremiumCategory: false,
     items: [
       { id: 'projects', label: 'Mes Projets', icon: FolderOpen, color: 'text-violet-500', bgColor: 'bg-violet-500/10', activeGradient: 'from-violet-500 to-purple-500' },
       { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, color: 'text-cyan-500', bgColor: 'bg-cyan-500/10', activeGradient: 'from-cyan-500 to-blue-500' },
@@ -139,7 +140,8 @@ const categories: PremiumCategory[] = [
     id: 'creation',
     label: 'Création & Rédaction',
     icon: '✍️',
-    color: 'from-fuchsia-500 to-pink-500',
+    color: 'from-fuchsia-500 via-pink-500 to-rose-500',
+    isPremiumCategory: false,
     items: [
       { id: 'planner', label: 'Planificateur', icon: BookOpen, color: 'text-fuchsia-500', bgColor: 'bg-fuchsia-500/10', activeGradient: 'from-fuchsia-500 to-pink-500' },
       { id: 'templates', label: 'Templates', icon: LayoutTemplate, color: 'text-cyan-500', bgColor: 'bg-cyan-500/10', activeGradient: 'from-cyan-500 to-teal-500' },
@@ -157,7 +159,8 @@ const categories: PremiumCategory[] = [
     id: 'visuels',
     label: 'Visuels & Design',
     icon: '🎨',
-    color: 'from-rose-500 to-red-500',
+    color: 'from-rose-500 via-red-500 to-orange-500',
+    isPremiumCategory: false,
     items: [
       { id: 'cover', label: 'Couverture', icon: Palette, color: 'text-rose-500', bgColor: 'bg-rose-500/10', activeGradient: 'from-rose-500 to-red-500' },
       { id: 'backcover', label: '4e Couverture', icon: BookCopy, color: 'text-red-500', bgColor: 'bg-red-500/10', activeGradient: 'from-red-500 to-rose-500' },
@@ -170,7 +173,8 @@ const categories: PremiumCategory[] = [
     id: 'publication',
     label: 'Publication & Export',
     icon: '📤',
-    color: 'from-teal-500 to-cyan-500',
+    color: 'from-teal-500 via-cyan-500 to-sky-500',
+    isPremiumCategory: false,
     items: [
       { id: 'kdp-research', label: '🔍 Recherche KDP', icon: Search, color: 'text-amber-500', bgColor: 'bg-gradient-to-r from-amber-500/20 to-orange-500/20', activeGradient: 'from-amber-500 to-orange-500', isPremium: true },
       { id: 'editor-audit', label: 'Audit Éditeur', icon: FileEdit, color: 'text-violet-500', bgColor: 'bg-violet-500/10', activeGradient: 'from-violet-500 to-purple-500' },
@@ -185,7 +189,8 @@ const categories: PremiumCategory[] = [
     id: 'marketing',
     label: 'Marketing & Monétisation',
     icon: '💰',
-    color: 'from-green-500 to-emerald-500',
+    color: 'from-green-500 via-emerald-500 to-teal-500',
+    isPremiumCategory: false,
     items: [
       { id: 'marketing', label: 'Marketing', icon: MessageSquare, color: 'text-pink-500', bgColor: 'bg-pink-500/10', activeGradient: 'from-pink-500 to-rose-500' },
       { id: 'monetization', label: 'Monétisation', icon: DollarSign, color: 'text-green-500', bgColor: 'bg-green-500/10', activeGradient: 'from-green-500 to-emerald-500' },
@@ -197,7 +202,8 @@ const categories: PremiumCategory[] = [
     id: 'audio',
     label: 'Audio & Formation',
     icon: '🎧',
-    color: 'from-purple-500 to-violet-500',
+    color: 'from-purple-500 via-violet-500 to-indigo-500',
+    isPremiumCategory: false,
     items: [
       { id: 'audiobook', label: 'Livre Audio', icon: Headphones, color: 'text-purple-500', bgColor: 'bg-purple-500/10', activeGradient: 'from-purple-500 to-violet-500' },
       { id: 'formation-complete', label: 'Formation Complète', icon: GraduationCap, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10', activeGradient: 'from-emerald-500 to-teal-500', isLink: true, href: '/formation' },
@@ -209,7 +215,8 @@ const categories: PremiumCategory[] = [
     id: 'outils',
     label: 'Outils & Compte',
     icon: '🔧',
-    color: 'from-indigo-500 to-violet-500',
+    color: 'from-indigo-500 via-blue-500 to-sky-500',
+    isPremiumCategory: false,
     items: [
       { id: 'tools', label: 'Outils IA', icon: Wand2, color: 'text-indigo-500', bgColor: 'bg-indigo-500/10', activeGradient: 'from-indigo-500 to-violet-500' },
       { id: 'subscription', label: 'Mon Abonnement', icon: CreditCard, color: 'text-purple-500', bgColor: 'bg-purple-500/10', activeGradient: 'from-purple-500 to-pink-500', isLink: true, href: '/subscription' },
@@ -399,42 +406,64 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
             const hasActiveItem = category.items.some(item => item.id === activeTab);
             const isPremium = category.isPremiumCategory;
             
+            // Définir les couleurs de fond pour chaque catégorie
+            const categoryBgStyles: Record<string, string> = {
+              'workflow-ia': 'from-amber-500/10 via-orange-500/5 to-red-500/10 border-amber-500/20',
+              'moteur-v2': 'from-purple-500/10 via-violet-500/5 to-indigo-500/10 border-purple-500/20',
+              'gestion': 'from-violet-500/8 via-purple-500/5 to-indigo-500/8 border-violet-500/15',
+              'creation': 'from-fuchsia-500/8 via-pink-500/5 to-rose-500/8 border-fuchsia-500/15',
+              'visuels': 'from-rose-500/8 via-red-500/5 to-orange-500/8 border-rose-500/15',
+              'publication': 'from-teal-500/8 via-cyan-500/5 to-sky-500/8 border-teal-500/15',
+              'marketing': 'from-green-500/8 via-emerald-500/5 to-teal-500/8 border-green-500/15',
+              'audio': 'from-purple-500/8 via-violet-500/5 to-indigo-500/8 border-purple-500/15',
+              'outils': 'from-indigo-500/8 via-blue-500/5 to-sky-500/8 border-indigo-500/15',
+            };
+            
+            const categoryHeaderStyles: Record<string, string> = {
+              'workflow-ia': 'from-amber-500/20 to-orange-500/20 text-amber-600 dark:text-amber-400',
+              'moteur-v2': 'from-purple-500/20 to-violet-500/20 text-purple-600 dark:text-purple-400',
+              'gestion': 'from-violet-500/15 to-purple-500/15 text-violet-600 dark:text-violet-400',
+              'creation': 'from-fuchsia-500/15 to-pink-500/15 text-fuchsia-600 dark:text-fuchsia-400',
+              'visuels': 'from-rose-500/15 to-red-500/15 text-rose-600 dark:text-rose-400',
+              'publication': 'from-teal-500/15 to-cyan-500/15 text-teal-600 dark:text-teal-400',
+              'marketing': 'from-green-500/15 to-emerald-500/15 text-green-600 dark:text-green-400',
+              'audio': 'from-purple-500/15 to-violet-500/15 text-purple-600 dark:text-purple-400',
+              'outils': 'from-indigo-500/15 to-blue-500/15 text-indigo-600 dark:text-indigo-400',
+            };
+            
             return (
               <div key={category.id} className={cn(
                 "mb-1",
-                isPremium && !isCollapsed && "mx-2 mb-3 rounded-xl bg-gradient-to-br from-amber-500/10 via-orange-500/5 to-red-500/10 border border-amber-500/20 overflow-hidden"
+                !isCollapsed && "mx-2 mb-2 rounded-xl bg-gradient-to-br border overflow-hidden",
+                !isCollapsed && (categoryBgStyles[category.id] || 'from-gray-500/5 to-gray-500/5 border-gray-500/10')
               )}>
                 {/* Category Header */}
                 {!isCollapsed ? (
                   <button
                     onClick={() => toggleCategory(category.id)}
                     className={cn(
-                      "w-full flex items-center justify-between px-3 py-2 text-xs font-semibold transition-all duration-200",
-                      isPremium 
-                        ? "bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-600 dark:text-amber-400"
-                        : hasActiveItem 
-                          ? "text-foreground" 
-                          : "text-muted-foreground hover:text-foreground"
+                      "w-full flex items-center justify-between px-3 py-2 text-xs font-semibold transition-all duration-200 bg-gradient-to-r",
+                      categoryHeaderStyles[category.id] || 'from-gray-500/10 to-gray-500/10 text-muted-foreground'
                     )}
                   >
                     <div className="flex items-center gap-2">
                       <span className="text-sm">{category.icon}</span>
                       <span>{category.label}</span>
                       {isPremium && (
-                        <span className="px-1.5 py-0.5 text-[9px] font-bold rounded bg-gradient-to-r from-amber-500 to-orange-500 text-white uppercase tracking-wider">
+                        <span className="px-1.5 py-0.5 text-[9px] font-bold rounded bg-gradient-to-r from-amber-500 to-orange-500 text-white uppercase tracking-wider shadow-sm">
                           PRO
                         </span>
                       )}
-                      {hasActiveItem && !isPremium && (
+                      {hasActiveItem && (
                         <span className={cn(
-                          "w-1.5 h-1.5 rounded-full bg-gradient-to-r",
+                          "w-2 h-2 rounded-full bg-gradient-to-r shadow-sm",
                           category.color
                         )} />
                       )}
                     </div>
                     <ChevronDown 
                       className={cn(
-                        "w-3 h-3 transition-transform duration-200",
+                        "w-3.5 h-3.5 transition-transform duration-200",
                         isExpanded ? "rotate-0" : "-rotate-90"
                       )} 
                     />
@@ -443,9 +472,9 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <div className={cn(
-                        "flex justify-center py-2 mb-1 relative",
+                        "flex justify-center py-2 mb-1 relative rounded-lg mx-1",
                         hasActiveItem && "border-l-2 border-primary",
-                        isPremium && "bg-gradient-to-r from-amber-500/20 to-orange-500/20"
+                        `bg-gradient-to-r ${categoryHeaderStyles[category.id]?.split(' ').slice(0, 2).join(' ') || 'from-gray-500/10 to-gray-500/10'}`
                       )}>
                         <span className="text-sm">{category.icon}</span>
                         {isPremium && (
