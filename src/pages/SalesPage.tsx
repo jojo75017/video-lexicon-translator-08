@@ -167,45 +167,67 @@ const SalesPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
       {/* Bannière Lancement Spécial */}
-      <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white py-4 px-4 text-center relative overflow-hidden">
+      <div className="bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-white py-5 px-4 text-center relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxjaXJjbGUgZmlsbD0iI2ZmZiIgZmlsbC1vcGFjaXR5PSIuMSIgY3g9IjIwIiBjeT0iMjAiIHI9IjIiLz48L2c+PC9zdmc+')] opacity-30" />
         <div className="relative z-10 max-w-4xl mx-auto">
-          <div className="flex items-center justify-center gap-2 mb-1">
-            <span className="text-2xl">🎉</span>
-            <span className="font-bold text-lg md:text-xl uppercase tracking-wider animate-pulse">
-              Offre Spéciale Lancement
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <span className="text-3xl">🙏</span>
+            <span className="font-bold text-xl md:text-2xl">
+              Merci d'être arrivé(e) jusqu'ici !
             </span>
-            <span className="text-2xl">🎉</span>
+            <span className="text-3xl">❤️</span>
           </div>
-          <p className="text-sm md:text-base font-medium">
-            <span className="bg-white/20 px-3 py-1 rounded-full inline-block">
-              🔥 Réservé aux <strong>50 premiers utilisateurs</strong> : Accès à vie pour seulement <strong>37€</strong> au lieu de 97€
-            </span>
+          <p className="text-base md:text-lg font-medium mb-3">
+            Vous faites partie des personnes qui veulent <strong>vraiment</strong> changer leur vie avec l'écriture.
           </p>
-          <p className="text-xs mt-2 opacity-90">
-            ⚡ Places limitées – L'offre disparaît dès que les 50 places sont prises
-          </p>
+          <div className="bg-white/20 backdrop-blur-sm px-4 py-3 rounded-xl inline-block">
+            <p className="text-sm md:text-base font-bold">
+              🎁 Pour vous remercier : <span className="text-yellow-200">Accès à vie pour seulement 37€</span> au lieu de 97€
+            </p>
+            <p className="text-xs mt-1 opacity-90">
+              ⚡ Offre réservée aux <strong>50 premiers inscrits</strong> – Ensuite le prix remonte
+            </p>
+          </div>
         </div>
       </div>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden py-20 px-4">
+      <section className="relative overflow-hidden py-16 px-4">
         <div className="absolute inset-0 bg-grid-pattern opacity-5" />
         <div className="max-w-6xl mx-auto text-center relative z-10">
+          
+          {/* Message personnel */}
+          <div className="max-w-3xl mx-auto mb-8 p-6 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 rounded-2xl border-2 border-amber-200 dark:border-amber-800">
+            <p className="text-lg md:text-xl text-amber-900 dark:text-amber-100 leading-relaxed">
+              <span className="text-2xl">👋</span> <strong>Salut !</strong> Si vous êtes ici, c'est que vous avez un rêve : 
+              <strong> écrire et publier votre propre livre</strong>. 
+              <br className="hidden md:block" />
+              Je sais à quel point ça peut sembler compliqué... C'est pour ça que j'ai créé cet outil.
+              <br />
+              <span className="text-amber-700 dark:text-amber-300 font-semibold">
+                En vous inscrivant aujourd'hui, vous rejoignez une communauté d'auteurs qui osent se lancer. 🚀
+              </span>
+            </p>
+          </div>
+          
           <Badge className="mb-6 bg-primary/10 text-primary border-primary/20 px-4 py-2">
             <Sparkles className="w-4 h-4 mr-2" />
             Générateur IA Professionnel
           </Badge>
           
           <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent">
-            Créez des Ebooks Professionnels
+            Votre Premier Ebook
             <br />
-            <span className="text-primary">en Quelques Minutes</span>
+            <span className="text-primary">Publié Cette Semaine</span>
           </h1>
           
-          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            L'outil IA complet pour générer des plans d'ebook, créer du contenu de qualité 
-            et publier sur Amazon KDP avec succès.
+          <p className="text-xl text-muted-foreground mb-4 max-w-2xl mx-auto">
+            Fini la page blanche et les heures de travail. L'IA fait 90% du travail, 
+            <strong className="text-foreground"> vous gardez 100% des droits et revenus</strong>.
+          </p>
+          
+          <p className="text-lg text-primary font-semibold mb-8">
+            ✅ Aucune compétence technique requise • ✅ Résultats en quelques minutes
           </p>
 
           {/* Vidéo de présentation */}
