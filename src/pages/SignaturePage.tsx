@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeft, Mail, User, Copy, Download } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { createSafeHtml } from '@/utils/security/htmlSanitizer';
 
 const SignaturePage: React.FC = () => {
   const navigate = useNavigate();
@@ -274,7 +275,7 @@ const SignaturePage: React.FC = () => {
               {generatedSignature ? (
                 <div className="space-y-4">
                   <div className="border rounded-lg p-4 bg-white">
-                    <div dangerouslySetInnerHTML={{ __html: generatedSignature }} />
+                    <div dangerouslySetInnerHTML={createSafeHtml(generatedSignature)} />
                   </div>
 
                   <div className="flex gap-2">
