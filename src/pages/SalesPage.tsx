@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, Sparkles, BookOpen, Zap, Download, Star, ArrowRight, Play, Loader2, Clock, HelpCircle, CheckCircle, Calculator } from "lucide-react";
+import { Check, Sparkles, BookOpen, Zap, Download, Star, ArrowRight, Play, Loader2, Clock, HelpCircle, CheckCircle, Calculator, Gift } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import ExitIntentPopup from "@/components/sales/ExitIntentPopup";
+import { generateKdpNichesPdf } from "@/utils/generateKdpNichesPdf";
 const SalesPage = () => {
   const navigate = useNavigate();
   const [showDemo, setShowDemo] = useState(false);
@@ -724,8 +725,22 @@ const SalesPage = () => {
         </DialogContent>
       </Dialog>
 
+      {/* Bouton bonus fallback (mobile) */}
+      <div className="fixed bottom-4 left-4 right-4 z-40 md:hidden">
+        <button
+          onClick={() => {
+            generateKdpNichesPdf();
+            toast.success("🎉 Votre guide PDF a été téléchargé !");
+          }}
+          className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-medium py-3 px-4 rounded-full shadow-lg hover:shadow-xl transition-all"
+        >
+          <Gift className="w-4 h-4" />
+          <span>🎁 Télécharger le Guide Gratuit (10 Niches KDP)</span>
+        </button>
+      </div>
+
       {/* Footer avec liens SEO */}
-      <footer className="py-8 text-center border-t border-border/50 bg-slate-50/50">
+      <footer className="py-8 pb-20 md:pb-8 text-center border-t border-border/50 bg-slate-50/50">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex flex-wrap justify-center gap-4 mb-4 text-sm">
             <button 
