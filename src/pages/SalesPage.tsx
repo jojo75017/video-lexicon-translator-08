@@ -152,9 +152,16 @@ const SalesPage = () => {
       if (error) throw error;
 
       if (data?.url) {
-        // Rediriger dans le même onglet (évite les bloqueurs de popups)
+        // Stocker le sessionId pour récupération ultérieure
+        localStorage.setItem('pending_stripe_session', data.sessionId);
+        localStorage.setItem('pending_stripe_email', email);
+        
+        // Fermer la modale et rediriger
         setShowEmailDialog(false);
-        window.location.assign(data.url);
+        setIsLoading(false);
+        
+        // Utiliser href car assign peut être bloqué dans certains contextes
+        window.location.href = data.url;
       } else {
         throw new Error("URL de paiement non reçue");
       }
