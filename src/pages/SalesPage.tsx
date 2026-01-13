@@ -134,51 +134,8 @@ const SalesPage = () => {
   };
 
   const handleCheckout = async () => {
-    const normalizedEmail = (email || emailInputRef.current?.value || "")
-      .trim()
-      .toLowerCase();
-
-    if (!normalizedEmail || !selectedPlan) {
-      toast.error("Veuillez entrer votre email");
-      return;
-    }
-
-    // Synchroniser l'état au cas où le navigateur a auto-rempli le champ sans déclencher onChange
-    if (normalizedEmail !== email) setEmail(normalizedEmail);
-
-    setIsLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("stripe-checkout", {
-        body: {
-          planId: selectedPlan,
-          email: normalizedEmail,
-          successUrl: `${window.location.origin}/paiement-succes`,
-          cancelUrl: `${window.location.origin}/offres`,
-        },
-      });
-
-      if (error) throw error;
-
-      if (data?.url) {
-        // Stocker le sessionId pour récupération ultérieure
-        localStorage.setItem('pending_stripe_session', data.sessionId);
-        localStorage.setItem('pending_stripe_email', normalizedEmail);
-
-        // Fermer la modale et rediriger
-        setShowEmailDialog(false);
-        setIsLoading(false);
-
-        // Utiliser href car assign peut être bloqué dans certains contextes
-        window.location.href = data.url;
-      } else {
-        throw new Error("URL de paiement non reçue");
-      }
-    } catch (error: any) {
-      console.error("Checkout error:", error);
-      toast.error(error.message || "Erreur lors de la création du paiement");
-    } finally {
-      setIsLoading(false);
-    }
+    // Redirection vers paiement manuel
+    window.location.href = "/paiement-manuel";
   };
 
   return (
