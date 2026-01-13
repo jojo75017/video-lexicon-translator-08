@@ -26,6 +26,7 @@ import SeoGenerateurEbookPage from './pages/SeoGenerateurEbookPage';
 import BlogPage from './pages/BlogPage';
 import { SubscriptionAuth } from '@/components/SubscriptionAuth';
 import { supabase } from '@/integrations/supabase/client';
+import { SubscriberGate } from '@/components/auth/SubscriberGate';
 
 // SaaS Pages
 import { SaasLayout } from '@/components/saas/SaasLayout';
@@ -178,23 +179,26 @@ const App = () => {
             <Route
               path="/ebook-planner"
               element={
-                isAdmin || isAuthenticated ? (
-                  <EbookPlannerPage 
-                    subscriberEmail={subscriberEmail || ''} 
-                    subscriberData={subscriberData} 
+                <SubscriberGate
+                  isAdmin={isAdmin}
+                  subscriberEmail={subscriberEmail}
+                  subscriberData={subscriberData}
+                  onInvalid={handleLogout}
+                >
+                  <EbookPlannerPage
+                    subscriberEmail={subscriberEmail || ''}
+                    subscriberData={subscriberData}
                     isDemo={false}
                   />
-                ) : (
-                  <Navigate to="/subscription" replace />
-                )
+                </SubscriberGate>
               }
             />
-            <Route 
-              path="/subscription" 
+            <Route
+              path="/subscription"
               element={
                 isAuthenticated ? (
-                  <SubscriptionPage 
-                    subscriberEmail={subscriberEmail} 
+                  <SubscriptionPage
+                    subscriberEmail={subscriberEmail}
                     subscriberData={subscriberData}
                     onLogout={handleLogout}
                   />
