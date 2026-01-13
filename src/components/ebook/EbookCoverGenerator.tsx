@@ -18,8 +18,8 @@ interface EbookCoverGeneratorProps {
   onCoverGenerated?: (coverUrl: string) => void;
 }
 
-type CoverStyle = 'professional' | 'minimalist' | 'artistic' | 'modern' | 'vintage' | 'fantasy' | 'thriller' | 'romance' | 'horror' | 'detective' | 'historical' | 'literary' | 'comedy' | 'adventure' | 'dystopian' | 'western' | 'spiritual' | 'cookbook';
-type CoverGenre = 'non-fiction' | 'fiction' | 'business' | 'self-help' | 'fantasy' | 'romance' | 'thriller' | 'sci-fi' | 'children' | 'horror' | 'mystery' | 'historical' | 'biography' | 'cooking' | 'travel' | 'poetry' | 'health';
+type CoverStyle = 'professional' | 'minimalist' | 'artistic' | 'modern' | 'vintage' | 'fantasy' | 'thriller' | 'romance' | 'horror' | 'detective' | 'historical' | 'literary' | 'comedy' | 'adventure' | 'dystopian' | 'western' | 'spiritual' | 'cookbook' | 'garden';
+type CoverGenre = 'non-fiction' | 'fiction' | 'business' | 'self-help' | 'fantasy' | 'romance' | 'thriller' | 'sci-fi' | 'children' | 'horror' | 'mystery' | 'historical' | 'biography' | 'cooking' | 'travel' | 'poetry' | 'health' | 'gardening' | 'garden-bio' | 'permaculture' | 'potager';
 type BookFormat = '6x9' | '5x8' | '5.5x8.5' | '8.5x11' | '7x10' | '8x10';
 type PaperType = 'white' | 'cream';
 type BindingType = 'paperback' | 'hardcover';
@@ -43,7 +43,8 @@ const styleDescriptions: Record<CoverStyle, string> = {
   dystopian: 'Futuriste sombre, décor post-apocalyptique, atmosphère oppressante',
   western: 'Far West américain, tons sépia, ambiance cowboy',
   spiritual: 'Spirituel et apaisant, lumière douce, symboles sacrés',
-  cookbook: 'Culinaire appétissant, photos de plats, style gourmand'
+  cookbook: 'Culinaire appétissant, photos de plats, style gourmand',
+  garden: 'Nature verdoyante, plantes, fleurs, ambiance jardin naturel'
 };
 
 const genreOptions: { value: CoverGenre; label: string }[] = [
@@ -63,7 +64,11 @@ const genreOptions: { value: CoverGenre; label: string }[] = [
   { value: 'cooking', label: '🍳 Cuisine' },
   { value: 'travel', label: '✈️ Voyage' },
   { value: 'poetry', label: '✒️ Poésie' },
-  { value: 'health', label: '💪 Santé / Bien-être' }
+  { value: 'health', label: '💪 Santé / Bien-être' },
+  { value: 'gardening', label: '🌱 Jardinage' },
+  { value: 'garden-bio', label: '🌿 Jardin Bio' },
+  { value: 'permaculture', label: '🌾 Permaculture' },
+  { value: 'potager', label: '🥕 Potager' }
 ];
 
 const bookFormats: { value: BookFormat; label: string; width: number; height: number }[] = [
