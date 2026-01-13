@@ -6,16 +6,53 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-async function generateWithOpenAI(ebookTitle: string, authorName: string, genre: string, style: string, variation: number, apiKey: string) {
+async function generateWithOpenAI(
+  ebookTitle: string, 
+  authorName: string, 
+  genre: string, 
+  style: string, 
+  variation: number, 
+  apiKey: string,
+  options: {
+    includeAuthorName?: boolean;
+    authorNamePosition?: string;
+    includeBookSummary?: boolean;
+    colorScheme?: string;
+  } = {}
+) {
   const styleText = style || 'moderne et professionnel';
   const genreText = genre || 'non-fiction';
   const variationNum = variation || 1;
+  
+  const { 
+    includeAuthorName = true, 
+    authorNamePosition = 'bottom',
+    includeBookSummary = true,
+    colorScheme = 'auto'
+  } = options;
   
   const styleVariations = [
     'minimaliste avec fond clair et sections délimitées',
     'élégant avec texture subtile et typographie classique',
     'moderne avec couleurs douces et design épuré'
   ];
+  
+  const colorSchemeDesc: Record<string, string> = {
+    'auto': 'couleurs adaptées au genre du livre',
+    'dark': 'fond sombre (noir, gris foncé), texte clair',
+    'light': 'fond clair (blanc, crème), texte foncé',
+    'warm': 'tons chauds (rouge, orange, doré)',
+    'cold': 'tons froids (bleu, violet, cyan)',
+    'nature': 'tons naturels (vert, brun, beige)',
+    'monochrome': 'noir et blanc élégant'
+  };
+  
+  const authorPositionDesc: Record<string, string> = {
+    'bottom': 'en bas de la 4ème de couverture',
+    'top': 'en haut de la 4ème de couverture',
+    'center': 'centré verticalement',
+    'signature': 'en style signature manuscrite élégante'
+  };
   
   const currentStyle = styleVariations[(variationNum - 1) % 3];
   
@@ -25,23 +62,24 @@ CRITICAL LAYOUT - TWO SECTION DESIGN:
 
 SECTION 1 (TOP 65%):
 - Header: Small elegant text "À propos de ce livre" or decorative element
-- Main area for book description/summary
-- Light background (cream, light gray, or subtle texture)
+${includeBookSummary ? '- Main area for book description/summary with visible placeholder lines' : '- Clean minimal area without text placeholders'}
+- Background style: ${colorSchemeDesc[colorScheme] || colorSchemeDesc['auto']}
 - Clear text zone with subtle borders or frame
-- Leave space for actual text to be added later
 
 SECTION 2 (BOTTOM 35%):
-- Header: "À propos de l'auteur" or "About the Author"
-- Area for author biography
+- Header: "À propos de l'auteur"
+${includeAuthorName ? `- AUTHOR NAME "${authorName}" displayed prominently ${authorPositionDesc[authorNamePosition] || authorPositionDesc['bottom']}
+- Author name must be in elegant, large typography that is clearly readable
+- Include decorative elements around the author name` : '- Area for author biography text only'}
 - Slightly different background shade to distinguish from top section
-- Small placeholder for author photo (left side)
-- Clear text zone for bio text
+- Small circular placeholder for author photo (left side)
 
 GENERAL DESIGN:
 - Title reference: "${ebookTitle}"
 - Author: ${authorName || 'Author'}
 - Style: ${currentStyle}
 - Genre: ${genreText}
+- Color scheme: ${colorSchemeDesc[colorScheme] || colorSchemeDesc['auto']}
 - Variation ${variationNum}/3 (make unique)
 
 TECHNICAL REQUIREMENTS:
@@ -52,10 +90,11 @@ TECHNICAL REQUIREMENTS:
 - ISBN barcode placeholder (bottom right corner)
 - Subtle design elements but keep it clean for text readability
 - Each section clearly separated with line or color variation
+${includeAuthorName ? `- The author name "${authorName}" MUST be visible and prominent in the design` : ''}
 
-This should look like a REAL book back cover template with TWO distinct zones for text.`;
+This should look like a REAL book back cover with professional typography.`;
 
-  console.log('Generating back cover with OpenAI for variation', variationNum);
+  console.log('Generating back cover with OpenAI for variation', variationNum, 'options:', options);
 
   const response = await fetch('https://api.openai.com/v1/images/generations', {
     method: 'POST',
@@ -96,16 +135,52 @@ This should look like a REAL book back cover template with TWO distinct zones fo
   );
 }
 
-async function generateWithLovableAI(ebookTitle: string, authorName: string, genre: string, style: string, variation: number, lovableApiKey: string) {
-  const styleText = style || 'moderne et professionnel';
+async function generateWithLovableAI(
+  ebookTitle: string, 
+  authorName: string, 
+  genre: string, 
+  style: string, 
+  variation: number, 
+  lovableApiKey: string,
+  options: {
+    includeAuthorName?: boolean;
+    authorNamePosition?: string;
+    includeBookSummary?: boolean;
+    colorScheme?: string;
+  } = {}
+) {
   const genreText = genre || 'non-fiction';
   const variationNum = variation || 1;
+  
+  const { 
+    includeAuthorName = true, 
+    authorNamePosition = 'bottom',
+    includeBookSummary = true,
+    colorScheme = 'auto'
+  } = options;
   
   const styleVariations = [
     'minimaliste avec fond clair et sections délimitées',
     'élégant avec texture subtile et typographie classique',
     'moderne avec couleurs douces et design épuré'
   ];
+  
+  const colorSchemeDesc: Record<string, string> = {
+    'auto': 'couleurs adaptées au genre du livre',
+    'dark': 'fond sombre (noir, gris foncé), texte clair',
+    'light': 'fond clair (blanc, crème), texte foncé',
+    'warm': 'tons chauds (rouge, orange, doré)',
+    'cold': 'tons froids (bleu, violet, cyan)',
+    'nature': 'tons naturels (vert, brun, beige)',
+    'monochrome': 'noir et blanc élégant'
+  };
+  
+  const authorPositionDesc: Record<string, string> = {
+    'bottom': 'en bas de la 4ème de couverture',
+    'top': 'en haut de la 4ème de couverture',
+    'center': 'centré verticalement',
+    'signature': 'en style signature manuscrite élégante'
+  };
   
   const currentStyle = styleVariations[(variationNum - 1) % 3];
   
@@ -115,23 +190,24 @@ CRITICAL LAYOUT - TWO SECTION DESIGN:
 
 SECTION 1 (TOP 65%):
 - Header: Small elegant text "À propos de ce livre" or decorative element
-- Main area for book description/summary
-- Light background (cream, light gray, or subtle texture)
+${includeBookSummary ? '- Main area for book description/summary with visible placeholder lines' : '- Clean minimal area without text placeholders'}
+- Background style: ${colorSchemeDesc[colorScheme] || colorSchemeDesc['auto']}
 - Clear text zone with subtle borders or frame
-- Leave space for actual text to be added later
 
 SECTION 2 (BOTTOM 35%):
-- Header: "À propos de l'auteur" or "About the Author"
-- Area for author biography
+- Header: "À propos de l'auteur"
+${includeAuthorName ? `- AUTHOR NAME "${authorName}" displayed prominently ${authorPositionDesc[authorNamePosition] || authorPositionDesc['bottom']}
+- Author name must be in elegant, large typography that is clearly readable
+- Include decorative elements around the author name` : '- Area for author biography text only'}
 - Slightly different background shade to distinguish from top section
-- Small placeholder for author photo (left side)
-- Clear text zone for bio text
+- Small circular placeholder for author photo (left side)
 
 GENERAL DESIGN:
 - Title reference: "${ebookTitle}"
 - Author: ${authorName || 'Author'}
 - Style: ${currentStyle}
 - Genre: ${genreText}
+- Color scheme: ${colorSchemeDesc[colorScheme] || colorSchemeDesc['auto']}
 - Variation ${variationNum}/3 (make unique)
 
 TECHNICAL REQUIREMENTS:
@@ -142,10 +218,11 @@ TECHNICAL REQUIREMENTS:
 - ISBN barcode placeholder (bottom right corner)
 - Subtle design elements but keep it clean for text readability
 - Each section clearly separated with line or color variation
+${includeAuthorName ? `- The author name "${authorName}" MUST be visible and prominent in the design` : ''}
 
-This should look like a REAL book back cover template with TWO distinct zones for text.`;
+This should look like a REAL book back cover with professional typography.`;
 
-  console.log('Generating back cover with Lovable AI for variation', variationNum);
+  console.log('Generating back cover with Lovable AI for variation', variationNum, 'options:', options);
 
   const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
     method: 'POST',
@@ -204,9 +281,24 @@ serve(async (req) => {
   }
 
   try {
-    const { ebookTitle, authorName, genre = 'non-fiction', style = 'moderne', variation = 1, useOpenAI = false, openaiApiKey } = await req.json();
+    const { 
+      ebookTitle, 
+      authorName, 
+      genre = 'non-fiction', 
+      style = 'moderne', 
+      variation = 1, 
+      useOpenAI = false, 
+      openaiApiKey,
+      // Nouvelles options
+      includeAuthorName = true,
+      authorNamePosition = 'bottom',
+      includeBookSummary = true,
+      colorScheme = 'auto'
+    } = await req.json();
 
-    console.log('Received request:', { ebookTitle, authorName, genre, style, variation, useOpenAI });
+    const options = { includeAuthorName, authorNamePosition, includeBookSummary, colorScheme };
+    
+    console.log('Received request:', { ebookTitle, authorName, genre, style, variation, useOpenAI, options });
 
     if (!ebookTitle) {
       return new Response(
@@ -218,7 +310,7 @@ serve(async (req) => {
     // Si useOpenAI est true, tenter OpenAI, sinon Lovable AI (fallback automatique)
     if (useOpenAI && openaiApiKey) {
       try {
-        return await generateWithOpenAI(ebookTitle, authorName, genre, style, variation, openaiApiKey);
+        return await generateWithOpenAI(ebookTitle, authorName, genre, style, variation, openaiApiKey, options);
       } catch (err) {
         console.error('OpenAI generation failed, falling back to Lovable AI:', err);
         // Continue vers Lovable AI ci-dessous
@@ -235,7 +327,7 @@ serve(async (req) => {
       );
     }
 
-    return await generateWithLovableAI(ebookTitle, authorName, genre, style, variation, LOVABLE_API_KEY);
+    return await generateWithLovableAI(ebookTitle, authorName, genre, style, variation, LOVABLE_API_KEY, options);
   } catch (error) {
     console.error('Error in generate-cover-image:', error);
     return new Response(
