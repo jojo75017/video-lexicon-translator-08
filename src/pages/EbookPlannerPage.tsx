@@ -92,6 +92,7 @@ import { useWorkflowResults } from '@/hooks/useWorkflowResults';
 import { WorkflowResultViewer } from '@/components/ebook/WorkflowResultViewer';
 import { cleanGeneratedText, cleanChapters } from '@/utils/textCleaner';
 import EbookUrlImport from '@/components/ebook/EbookUrlImport';
+import EbookPlagiarismValidator from '@/components/ebook/EbookPlagiarismValidator';
 
 // Hooks et données
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
@@ -2303,6 +2304,11 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
               }
             }}
           />
+        );
+      
+      case 'plagiarism-validator':
+        return (
+          <EbookPlagiarismValidator />
         );
       
       case 'editor-audit':
