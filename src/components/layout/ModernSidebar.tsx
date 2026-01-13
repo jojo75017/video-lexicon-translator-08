@@ -202,6 +202,7 @@ const categories: PremiumCategory[] = [
     isPremiumCategory: false,
     items: [
       { id: 'amazon-ads', label: '🎯 Amazon Ads', icon: Target, color: 'text-orange-500', bgColor: 'bg-gradient-to-r from-orange-500/20 to-amber-500/20', activeGradient: 'from-orange-500 to-amber-500', isPremium: true, isNew2026: true },
+      { id: 'launch-plan', label: '📅 Plan Lancement 30j', icon: Rocket, color: 'text-violet-500', bgColor: 'bg-gradient-to-r from-violet-500/20 to-purple-500/20', activeGradient: 'from-violet-500 to-purple-500', isPremium: true, isNew2026: true },
       { id: 'seo-articles', label: '📝 Articles SEO', icon: Globe, color: 'text-emerald-500', bgColor: 'bg-gradient-to-r from-emerald-500/20 to-teal-500/20', activeGradient: 'from-emerald-500 to-teal-500', isPremium: true, isNew2026: true },
       { id: 'marketing', label: 'Marketing', icon: MessageSquare, color: 'text-pink-500', bgColor: 'bg-pink-500/10', activeGradient: 'from-pink-500 to-rose-500' },
       { id: 'monetization', label: 'Monétisation', icon: DollarSign, color: 'text-green-500', bgColor: 'bg-green-500/10', activeGradient: 'from-green-500 to-emerald-500' },
