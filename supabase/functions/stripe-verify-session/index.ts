@@ -36,11 +36,13 @@ serve(async (req) => {
 
     const session = await stripe.checkout.sessions.retrieve(sessionId);
 
-    // Validate paid session
+    // Validate paid session: we require BOTH paid + complete
     const paymentStatus = (session as any).payment_status;
     const status = (session as any).status;
 
-    if (paymentStatus !== "paid" && status !== "complete") {
+    // NOTE: previous logic used "&&" which could incorrectly accept sessions that are
+    // marked complete but not actually paid.
+    if (paymentStatus !== "paid" || status !== "complete") {
       return new Response(
         JSON.stringify({
           ok: false,
