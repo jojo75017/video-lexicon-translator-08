@@ -23,6 +23,7 @@ import OfferValuePage from './pages/OfferValuePage';
 import SeoTutorialChatGptPage from './pages/SeoTutorialChatGptPage';
 import SeoCreerEbookIaPage from './pages/SeoCreerEbookIaPage';
 import SeoGenerateurEbookPage from './pages/SeoGenerateurEbookPage';
+import BlogPage from './pages/BlogPage';
 import { SubscriptionAuth } from '@/components/SubscriptionAuth';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -149,6 +150,7 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Navigate to="/offres" replace />} />
             <Route path="/offres" element={<SalesPage />} />
+            <Route path="/blog" element={<BlogPage />} />
             <Route path="/ecrire-livre-chatgpt" element={<SeoTutorialChatGptPage />} />
             <Route path="/creer-ebook-ia" element={<SeoCreerEbookIaPage />} />
             <Route path="/generateur-ebook" element={<SeoGenerateurEbookPage />} />
