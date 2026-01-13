@@ -87,7 +87,7 @@ export const SubscriptionAuth = ({ onAuthenticated }: SubscriptionAuthProps) => 
     e.preventDefault();
     const normalizedEmail = email.trim().toLowerCase();
     const normalizedCode = accessCode.trim().toUpperCase();
-    
+
     if (!normalizedEmail || !normalizedEmail.includes('@')) {
       toast.error('Veuillez entrer une adresse email valide');
       return;
@@ -95,6 +95,15 @@ export const SubscriptionAuth = ({ onAuthenticated }: SubscriptionAuthProps) => 
 
     if (!normalizedCode) {
       toast.error('Veuillez entrer votre code d\'accès');
+      return;
+    }
+
+    // IMPORTANT: éviter toute confusion (ex: "4242") en imposant le format officiel.
+    // Format attendu : EBK-XXXXXX (6 caractères alphanumériques)
+    if (!/^EBK-[A-Z0-9]{6}$/.test(normalizedCode)) {
+      toast.error('Code invalide', {
+        description: 'Le code doit être au format EBK-XXXXXX (ex: EBK-1A2B3C).',
+      });
       return;
     }
 
