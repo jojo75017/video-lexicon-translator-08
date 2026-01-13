@@ -177,7 +177,7 @@ const SalesPage = () => {
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
               <BookOpen className="w-5 h-5 text-white" />
             </div>
-            <span className="text-lg font-bold text-white">EbookiaPro</span>
+            <span className="text-lg font-bold text-white">EbookStudio Pro</span>
           </Link>
           <nav className="hidden md:flex items-center gap-6">
             <Link to="/blog" className="text-white/70 hover:text-violet-400 transition-colors font-medium">Blog</Link>
@@ -827,7 +827,7 @@ const SalesPage = () => {
             {/* Logo & Description */}
             <div className="md:col-span-1">
               <h3 className="text-xl font-bold mb-3 bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">
-                EbookiaPro
+                EbookStudio Pro
               </h3>
               <p className="text-gray-400 text-sm">
                 Le générateur d'ebook IA #1 en France. Créez et publiez votre livre sur Amazon KDP en 24h.
@@ -898,7 +898,7 @@ const SalesPage = () => {
           
           <div className="border-t border-gray-800 pt-6 text-center">
             <p className="text-xs text-gray-500">
-              © 2025 EbookiaPro.fr • Générateur de Livre IA pour Amazon KDP • Tous droits réservés
+              © 2025 EbookStudio Pro • Générateur de Livre IA pour Amazon KDP • Tous droits réservés
             </p>
           </div>
         </div>

@@ -420,7 +420,7 @@ const SeoTutorialChatGptPage = () => {
             </div>
           </div>
           <div className="border-t border-gray-800 pt-6 text-center text-sm">
-            <p>© 2025 EbookiaPro - Comment écrire un livre avec ChatGPT</p>
+            <p>© 2025 EbookStudio Pro - Comment écrire un livre avec ChatGPT</p>
           </div>
         </div>
       </footer>

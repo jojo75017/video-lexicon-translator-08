@@ -48,13 +48,13 @@ const BlogPage = () => {
   return (
     <>
       <Helmet>
-        <title>Blog EbookiaPro - Guides IA pour Créer des Ebooks | Tutoriels KDP</title>
+        <title>Blog EbookStudio Pro - Guides IA pour Créer des Ebooks | Tutoriels KDP</title>
         <meta name="description" content="Découvrez nos guides complets pour créer des ebooks avec l'IA. Tutoriels ChatGPT, astuces KDP et stratégies de publication Amazon." />
         <meta name="keywords" content="blog ebook ia, tutoriel chatgpt livre, guide kdp amazon, créer ebook intelligence artificielle" />
         <link rel="canonical" href="https://ebookstudio.fr/blog" />
         
         {/* Open Graph */}
-        <meta property="og:title" content="Blog EbookiaPro - Guides IA pour Créer des Ebooks" />
+        <meta property="og:title" content="Blog EbookStudio Pro - Guides IA pour Créer des Ebooks" />
         <meta property="og:description" content="Guides complets pour créer des ebooks avec l'IA. Tutoriels ChatGPT et stratégies KDP." />
         <meta property="og:url" content="https://ebookstudio.fr/blog" />
         <meta property="og:type" content="website" />
@@ -64,12 +64,12 @@ const BlogPage = () => {
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "Blog",
-            "name": "Blog EbookiaPro",
+            "name": "Blog EbookStudio Pro",
             "description": "Guides et tutoriels pour créer des ebooks avec l'intelligence artificielle",
             "url": "https://ebookstudio.fr/blog",
             "publisher": {
               "@type": "Organization",
-              "name": "EbookiaPro",
+              "name": "EbookStudio Pro",
               "url": "https://ebookstudio.fr"
             },
             "blogPost": articles.map(article => ({
@@ -91,7 +91,7 @@ const BlogPage = () => {
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
                 <BookOpen className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-white">EbookiaPro</span>
+              <span className="text-xl font-bold text-white">EbookStudio Pro</span>
             </Link>
             <nav className="hidden md:flex items-center gap-6">
               <Link to="/offres" className="text-white/70 hover:text-white transition-colors">Accueil</Link>
@@ -114,7 +114,7 @@ const BlogPage = () => {
               📚 Ressources & Guides
             </Badge>
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
-              Blog <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-purple-400">EbookiaPro</span>
+              Blog <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-purple-400">EbookStudio Pro</span>
             </h1>
             <p className="text-xl text-white/70 max-w-2xl mx-auto mb-8">
               Guides complets, tutoriels et stratégies pour créer des ebooks professionnels avec l'intelligence artificielle
@@ -235,7 +235,7 @@ const BlogPage = () => {
                   <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
                     <BookOpen className="w-4 h-4 text-white" />
                   </div>
-                  <span className="font-bold text-white">EbookiaPro</span>
+                  <span className="font-bold text-white">EbookStudio Pro</span>
                 </div>
                 <p className="text-white/50 text-sm">
                   Le générateur d'ebooks IA le plus complet pour publier sur Amazon KDP.
@@ -271,7 +271,7 @@ const BlogPage = () => {
             </div>
             
             <div className="border-t border-white/10 pt-8 text-center text-white/40 text-sm">
-              © 2025 EbookiaPro. Tous droits réservés.
+              © 2025 EbookStudio Pro. Tous droits réservés.
             </div>
           </div>
         </footer>
