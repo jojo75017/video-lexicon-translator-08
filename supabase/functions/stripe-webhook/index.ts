@@ -273,7 +273,7 @@ async function sendEmail(email: string, accessCode: string, planType: string, is
                 <div class="code-box">${accessCode}</div>
                 <p><strong>Plan :</strong> ${planType.charAt(0).toUpperCase() + planType.slice(1)}</p>
                 <p style="margin-top: 20px;">Pour accéder à l'application, connectez-vous avec votre email et ce code d'accès.</p>
-                <a href="https://video-lexicon-translator-08.lovable.app/ebook-planner" class="button">Accéder à l'application →</a>
+                <a href="https://ebookstudio.fr/ebook-planner" class="button">Accéder à l'application →</a>
               </div>
               <div class="footer">
                 <p>Si vous avez des questions, n'hésitez pas à nous contacter.</p>
