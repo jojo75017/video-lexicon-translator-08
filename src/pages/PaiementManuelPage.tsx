@@ -12,7 +12,7 @@ const PaiementManuelPage = () => {
   const [copied, setCopied] = useState<string | null>(null);
 
   const paymentInfo = {
-    paypal: "boubetgeorges@gmail.com",
+    paypalMe: "https://paypal.me/VotreNom/37", // À remplacer par votre lien PayPal.me
     iban: "FR76 XXXX XXXX XXXX XXXX XXXX XXX", // À remplacer par votre IBAN
     price: "37€",
     product: "EbookStudio Pro - Accès à Vie"
@@ -42,7 +42,7 @@ Merci de m'envoyer mon code d'accès.
 
 Cordialement`);
     
-    window.open(`mailto:${paymentInfo.paypal}?subject=${subject}&body=${body}`, '_blank');
+    window.open(`mailto:boubetgeorges@gmail.com?subject=${subject}&body=${body}`, '_blank');
     toast.success("Email préparé ! Envoyez-le après votre paiement.");
   };
 
@@ -94,26 +94,24 @@ Cordialement`);
               </h3>
 
               {/* PayPal */}
-              <div className="border rounded-lg p-4 hover:border-violet-400 transition-colors">
+              <a 
+                href={paymentInfo.paypalMe}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block border-2 border-blue-200 rounded-lg p-4 hover:border-blue-400 hover:bg-blue-50 transition-all"
+              >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="bg-blue-100 p-2 rounded-lg">
                       <CreditCard className="w-5 h-5 text-blue-600" />
                     </div>
                     <div>
-                      <p className="font-medium">PayPal</p>
-                      <p className="text-sm text-muted-foreground">{paymentInfo.paypal}</p>
+                      <p className="font-semibold text-blue-700">💳 Payer avec PayPal</p>
+                      <p className="text-sm text-blue-600">Cliquez ici pour payer {paymentInfo.price} directement</p>
                     </div>
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => copyToClipboard(paymentInfo.paypal, "PayPal")}
-                  >
-                    {copied === "PayPal" ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                  </Button>
                 </div>
-              </div>
+              </a>
 
               {/* Virement */}
               <div className="border rounded-lg p-4 hover:border-violet-400 transition-colors">
