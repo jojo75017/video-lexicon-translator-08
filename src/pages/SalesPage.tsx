@@ -447,6 +447,34 @@ const SalesPage = () => {
             </div>
           </div>
 
+          {/* Spots Counter */}
+          <div className="max-w-2xl mx-auto mb-6">
+            <div className="bg-gradient-to-r from-violet-600 to-purple-600 rounded-xl p-4 text-white text-center shadow-lg relative overflow-hidden">
+              <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iLjEiIGN4PSIxMCIgY3k9IjEwIiByPSIxIi8+PC9zdmc+')] opacity-30" />
+              <div className="relative z-10">
+                <div className="flex items-center justify-center gap-3 mb-2">
+                  <span className="text-2xl">🔥</span>
+                  <span className="font-bold text-lg">Places restantes à 37€</span>
+                </div>
+                <div className="flex items-center justify-center gap-4">
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-5xl font-black text-yellow-300 animate-pulse">39</span>
+                    <span className="text-2xl font-bold text-white/80">/ 50</span>
+                  </div>
+                </div>
+                <div className="mt-3 bg-white/20 rounded-full h-3 max-w-xs mx-auto overflow-hidden">
+                  <div 
+                    className="bg-gradient-to-r from-yellow-400 to-orange-400 h-full rounded-full transition-all duration-1000"
+                    style={{ width: '78%' }}
+                  />
+                </div>
+                <p className="text-sm mt-2 text-white/80">
+                  ⚡ 11 personnes ont déjà rejoint aujourd'hui
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* Countdown Timer */}
           <div className="max-w-2xl mx-auto mb-12">
             <div className="bg-gradient-to-r from-red-500 to-orange-500 rounded-xl p-6 text-white text-center shadow-lg">
