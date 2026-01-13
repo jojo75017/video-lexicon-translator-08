@@ -179,6 +179,7 @@ const categories: PremiumCategory[] = [
     isPremiumCategory: false,
     items: [
       { id: 'kdp-research', label: '🔍 Recherche KDP', icon: Search, color: 'text-amber-500', bgColor: 'bg-gradient-to-r from-amber-500/20 to-orange-500/20', activeGradient: 'from-amber-500 to-orange-500', isPremium: true },
+      { id: 'amazon-simulator', label: '🛒 Simulateur Amazon', icon: Eye, color: 'text-orange-500', bgColor: 'bg-gradient-to-r from-orange-500/20 to-amber-500/20', activeGradient: 'from-orange-500 to-amber-500', isPremium: true },
       { id: 'plagiarism-validator', label: '🛡️ Anti-Plagiat', icon: Shield, color: 'text-red-500', bgColor: 'bg-gradient-to-r from-red-500/20 to-rose-500/20', activeGradient: 'from-red-500 to-rose-500', isPremium: true },
       { id: 'editor-audit', label: 'Audit Éditeur', icon: FileEdit, color: 'text-violet-500', bgColor: 'bg-violet-500/10', activeGradient: 'from-violet-500 to-purple-500' },
       { id: 'export', label: 'Exporter', icon: Download, color: 'text-teal-500', bgColor: 'bg-teal-500/10', activeGradient: 'from-teal-500 to-cyan-500' },

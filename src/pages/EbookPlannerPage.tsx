@@ -93,6 +93,7 @@ import { WorkflowResultViewer } from '@/components/ebook/WorkflowResultViewer';
 import { cleanGeneratedText, cleanChapters } from '@/utils/textCleaner';
 import EbookUrlImport from '@/components/ebook/EbookUrlImport';
 import EbookPlagiarismValidator from '@/components/ebook/EbookPlagiarismValidator';
+import EbookAmazonSimulator from '@/components/ebook/EbookAmazonSimulator';
 
 // Hooks et données
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
@@ -2219,6 +2220,14 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
       case 'kdp-research':
         return (
           <EbookKdpResearch />
+        );
+      
+      case 'amazon-simulator':
+        return (
+          <EbookAmazonSimulator 
+            title={ebookTitle}
+            authorName={authorName}
+          />
         );
       
       case 'market':
