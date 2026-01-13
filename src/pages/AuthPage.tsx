@@ -144,13 +144,12 @@ export const AuthPage = () => {
 
         if (!roleData?.isAdmin) {
           console.log('Utilisateur non-admin détecté');
-          // IMPORTANT: ne pas déconnecter l’utilisateur ici.
-          // Beaucoup d’utilisateurs sont abonnés (accès ebook) mais pas admin.
-          // On garde la session intacte et on redirige simplement.
           toast.error('Accès refusé', {
-            description: "Ce compte n'a pas les droits administrateur.",
+            description: "Cette page est réservée à l'administration. Pour accéder au générateur, connectez-vous avec votre email + code d'accès.",
           });
-          navigate('/ebook-planner', { replace: true });
+          // Important: éviter qu'une session non-admin puisse court-circuiter l'accès par code
+          await supabase.auth.signOut();
+          navigate('/subscription', { replace: true });
           setIsLoading(false);
           return;
         }

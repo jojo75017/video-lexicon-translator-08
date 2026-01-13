@@ -178,11 +178,15 @@ const App = () => {
             <Route
               path="/ebook-planner"
               element={
-                <EbookPlannerPage 
-                  subscriberEmail={subscriberEmail || ''} 
-                  subscriberData={subscriberData} 
-                  isDemo={!isAuthenticated && !isAdmin}
-                />
+                isAdmin || isAuthenticated ? (
+                  <EbookPlannerPage 
+                    subscriberEmail={subscriberEmail || ''} 
+                    subscriberData={subscriberData} 
+                    isDemo={false}
+                  />
+                ) : (
+                  <Navigate to="/subscription" replace />
+                )
               }
             />
             <Route 
