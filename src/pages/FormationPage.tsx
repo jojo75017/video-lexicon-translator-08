@@ -461,11 +461,18 @@ ${module.content}
             >
               {/* Premium badge */}
               <motion.div
-                className="absolute -top-3 -right-3 bg-gradient-to-r from-amber-400 to-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg"
-                animate={{ scale: [1, 1.05, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
+                className="absolute -top-3 -right-3 flex items-center gap-1"
               >
-                V2.0
+                <motion.span
+                  className="bg-gradient-to-r from-amber-400 to-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg"
+                  animate={{ scale: [1, 1.05, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                  V2.0
+                </motion.span>
+                <span className="bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-lg">
+                  2026
+                </span>
               </motion.div>
               
               {/* Main logo text */}
@@ -789,6 +796,9 @@ ${module.content}
               <div className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-2 rounded-full text-sm font-semibold mb-4 mx-auto">
                 <Sparkles className="h-4 w-4" />
                 Moteur IA Éditorial
+                <span className="bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded-full ml-1">
+                  2026
+                </span>
               </div>
               <CardTitle className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary via-amber-500 to-orange-500 bg-clip-text text-transparent">
                 Ce que vous découvrirez dans EbookStudio Pro V2
