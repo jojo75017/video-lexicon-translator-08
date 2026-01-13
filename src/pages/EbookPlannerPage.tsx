@@ -2147,7 +2147,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       
       case 'aichat':
         return (
-          <EbookAiChat />
+          <EbookAiChat isDemo={isDemo} />
         );
       
       case 'characters':
@@ -2183,6 +2183,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             chapters={chapters}
             characters={characters}
             apiKey={apiKey}
+            isDemo={isDemo}
             onTranslate={(translatedData) => {
               setPreface(translatedData.preface);
               setConclusion(translatedData.conclusion);

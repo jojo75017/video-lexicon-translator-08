@@ -27,6 +27,7 @@ interface EbookStatisticsToolsProps {
   chapters: Chapter[];
   characters?: Character[];
   apiKey: string;
+  isDemo?: boolean;
   onTranslate?: (translatedData: { preface: string; conclusion: string; epilogue: string; chapters: Chapter[] }) => void;
 }
 
@@ -53,6 +54,7 @@ export const EbookStatisticsTools: React.FC<EbookStatisticsToolsProps> = ({
   chapters,
   characters = [],
   apiKey,
+  isDemo = false,
   onTranslate
 }) => {
   const [targetLanguage, setTargetLanguage] = useState('anglais');
@@ -141,6 +143,13 @@ export const EbookStatisticsTools: React.FC<EbookStatisticsToolsProps> = ({
 
   // Traduction automatique
   const handleTranslate = async () => {
+    if (isDemo) {
+      toast.error("Fonction réservée aux abonnés", {
+        description: "La traduction automatique est désactivée en mode démo.",
+      });
+      return;
+    }
+
     if (!apiKey) {
       toast.error('Clé API OpenAI requise pour la traduction');
       return;
