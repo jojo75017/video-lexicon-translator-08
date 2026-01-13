@@ -11,7 +11,7 @@ import {
   Search, Star, StarOff, CheckCircle2, Circle, Play, Clock, Filter,
   Sparkles, GraduationCap, Trophy, Target, Zap, Layers, Settings,
   Image, TrendingUp, Megaphone, DollarSign, FileOutput, Rocket, HelpCircle,
-  Link, Shield, ShoppingCart, FileText, Mic, Globe, Volume2, Palette,
+  Link2, Shield, ShoppingCart, FileText, Mic, Globe, Volume2, Palette,
   BarChart3, Users, Brain, Wand2
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -917,7 +917,7 @@ ${module.content}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {[
                   { 
-                    icon: Link, 
+                    icon: Link2,
                     title: 'Import URL', 
                     desc: 'Transformez vidéos YouTube et articles en ebooks structurés automatiquement',
                     color: 'from-blue-500 to-cyan-500',
