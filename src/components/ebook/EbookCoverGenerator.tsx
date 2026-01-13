@@ -20,7 +20,7 @@ interface EbookCoverGeneratorProps {
 
 type CoverStyle = 'professional' | 'minimalist' | 'artistic' | 'modern' | 'vintage' | 'fantasy' | 'thriller' | 'romance' | 'horror' | 'detective' | 'historical' | 'literary' | 'comedy' | 'adventure' | 'dystopian' | 'western' | 'spiritual' | 'cookbook' | 'garden';
 type CoverGenre = 'non-fiction' | 'fiction' | 'business' | 'self-help' | 'fantasy' | 'romance' | 'thriller' | 'sci-fi' | 'children' | 'horror' | 'mystery' | 'historical' | 'biography' | 'cooking' | 'travel' | 'poetry' | 'health' | 'gardening' | 'garden-bio' | 'permaculture' | 'potager';
-type BookFormat = '6x9' | '5x8' | '5.5x8.5' | '8.5x11' | '7x10' | '8x10';
+type BookFormat = '6x9' | '5x8' | '5.5x8.5' | '8.5x11' | '7x10' | '8x10' | '4.25x6.87' | '4.72x7.48' | '5.12x7.87' | '4.33x7.09' | '5.51x8.27';
 type PaperType = 'white' | 'cream';
 type BindingType = 'paperback' | 'hardcover';
 type CoverType = 'front' | 'full';
@@ -71,13 +71,23 @@ const genreOptions: { value: CoverGenre; label: string }[] = [
   { value: 'potager', label: '🥕 Potager' }
 ];
 
-const bookFormats: { value: BookFormat; label: string; width: number; height: number }[] = [
-  { value: '6x9', label: '6" x 9" (Standard)', width: 6, height: 9 },
-  { value: '5x8', label: '5" x 8" (Petit format)', width: 5, height: 8 },
-  { value: '5.5x8.5', label: '5.5" x 8.5" (Digest)', width: 5.5, height: 8.5 },
-  { value: '8.5x11', label: '8.5" x 11" (Lettre US)', width: 8.5, height: 11 },
-  { value: '7x10', label: '7" x 10" (Textbook)', width: 7, height: 10 },
-  { value: '8x10', label: '8" x 10" (Large)', width: 8, height: 10 },
+const bookFormats: { value: BookFormat; label: string; width: number; height: number; category?: string }[] = [
+  // 📚 LIVRES DE POCHE (formats français standards)
+  { value: '4.25x6.87', label: '📖 Poche Standard (11x17.5cm)', width: 4.25, height: 6.87, category: 'poche' },
+  { value: '4.72x7.48', label: '📖 Poche Large (12x19cm)', width: 4.72, height: 7.48, category: 'poche' },
+  { value: '5.12x7.87', label: '📖 Format Folio (13x20cm)', width: 5.12, height: 7.87, category: 'poche' },
+  { value: '4.33x7.09', label: '📖 Livre de Poche (11x18cm)', width: 4.33, height: 7.09, category: 'poche' },
+  { value: '5.51x8.27', label: '📖 Semi-Poche (14x21cm)', width: 5.51, height: 8.27, category: 'poche' },
+  
+  // 📕 FORMATS KDP STANDARDS
+  { value: '5x8', label: '📕 5" x 8" (Petit format KDP)', width: 5, height: 8, category: 'kdp' },
+  { value: '5.5x8.5', label: '📕 5.5" x 8.5" (Digest)', width: 5.5, height: 8.5, category: 'kdp' },
+  { value: '6x9', label: '📕 6" x 9" (Standard KDP)', width: 6, height: 9, category: 'kdp' },
+  
+  // 📗 GRANDS FORMATS
+  { value: '7x10', label: '📗 7" x 10" (Textbook)', width: 7, height: 10, category: 'grand' },
+  { value: '8x10', label: '📗 8" x 10" (Large)', width: 8, height: 10, category: 'grand' },
+  { value: '8.5x11', label: '📗 8.5" x 11" (Lettre US)', width: 8.5, height: 11, category: 'grand' },
 ];
 
 // Templates de couverture pré-conçus par genre
@@ -800,22 +810,60 @@ export const EbookCoverGenerator: React.FC<EbookCoverGeneratorProps> = ({
 
           {/* Onglet Dimensions KDP */}
           <TabsContent value="kdp" className="space-y-4">
+            {/* Catégorie Format - Mise en avant Poche */}
+            <div className="p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border border-amber-200">
+              <Label className="text-sm font-semibold text-amber-800 flex items-center gap-2 mb-3">
+                <BookOpen className="w-4 h-4" />
+                Format du livre
+                <Badge className="bg-amber-500 text-white text-[10px] animate-pulse">NOUVEAU : Poche!</Badge>
+              </Label>
+              <Select value={bookFormat} onValueChange={(v) => setBookFormat(v as BookFormat)}>
+                <SelectTrigger className="mt-1 bg-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="max-h-[400px]">
+                  {/* 📚 Livres de Poche */}
+                  <div className="px-2 py-1.5 text-xs font-semibold text-amber-700 bg-amber-100 border-b">
+                    📚 LIVRES DE POCHE (Formats français)
+                  </div>
+                  {bookFormats.filter(f => f.category === 'poche').map(format => (
+                    <SelectItem key={format.value} value={format.value} className="ml-2">
+                      {format.label}
+                    </SelectItem>
+                  ))}
+                  
+                  {/* 📕 KDP Standards */}
+                  <div className="px-2 py-1.5 text-xs font-semibold text-purple-700 bg-purple-100 border-b border-t mt-1">
+                    📕 FORMATS KDP STANDARDS
+                  </div>
+                  {bookFormats.filter(f => f.category === 'kdp').map(format => (
+                    <SelectItem key={format.value} value={format.value} className="ml-2">
+                      {format.label}
+                    </SelectItem>
+                  ))}
+                  
+                  {/* 📗 Grands Formats */}
+                  <div className="px-2 py-1.5 text-xs font-semibold text-green-700 bg-green-100 border-b border-t mt-1">
+                    📗 GRANDS FORMATS
+                  </div>
+                  {bookFormats.filter(f => f.category === 'grand').map(format => (
+                    <SelectItem key={format.value} value={format.value} className="ml-2">
+                      {format.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              
+              {/* Indication du format actuel */}
+              {bookFormats.find(f => f.value === bookFormat)?.category === 'poche' && (
+                <div className="mt-2 p-2 bg-amber-100 rounded-lg border border-amber-300 text-xs text-amber-800">
+                  ✨ <strong>Livre de poche :</strong> Format idéal pour les romans, guides pratiques et livres à emporter. 
+                  Compatible avec l'impression française et européenne.
+                </div>
+              )}
+            </div>
+
             <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <Label className="text-sm font-medium">Format du livre</Label>
-                <Select value={bookFormat} onValueChange={(v) => setBookFormat(v as BookFormat)}>
-                  <SelectTrigger className="mt-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {bookFormats.map(format => (
-                      <SelectItem key={format.value} value={format.value}>
-                        {format.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
 
               <div>
                 <Label className="text-sm font-medium">Type de reliure</Label>
