@@ -70,7 +70,12 @@ export const SocialProofNotifications: React.FC = () => {
           transition={{ type: 'spring', damping: 20, stiffness: 300 }}
           className="fixed bottom-24 left-4 z-50 max-w-xs"
         >
-          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-emerald-200 dark:border-emerald-800 p-4 flex items-start gap-3">
+          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-emerald-200 dark:border-emerald-800 p-4 flex items-start gap-3 relative">
+            {/* Badge 2026 */}
+            <span className="absolute -top-2 -right-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-lg">
+              2026
+            </span>
+            
             {/* Avatar */}
             <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center">
               <User className="w-5 h-5 text-white" />

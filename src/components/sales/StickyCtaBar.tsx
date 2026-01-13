@@ -73,6 +73,9 @@ export const StickyCtaBar: React.FC<StickyCtaBarProps> = ({
               {/* Left: Offer info */}
               <div className="flex items-center gap-4 flex-wrap">
                 <div className="flex items-center gap-2">
+                  <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0 text-[10px] font-bold">
+                    2026
+                  </Badge>
                   <Badge className="bg-red-500/20 text-red-400 border-red-500/30 animate-pulse">
                     🔥 OFFRE LIMITÉE
                   </Badge>

@@ -47,6 +47,9 @@ export const KdpRoiCalculator: React.FC<KdpRoiCalculatorProps> = ({ onCtaClick }
               <Badge className="bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/30">
                 ROI
               </Badge>
+              <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0 text-[10px] font-bold">
+                2026
+              </Badge>
             </CardTitle>
             <CardDescription>
               Estimez vos revenus passifs avec Amazon KDP
