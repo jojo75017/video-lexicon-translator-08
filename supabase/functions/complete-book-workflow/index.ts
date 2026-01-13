@@ -21,6 +21,13 @@ RÈGLES ABSOLUES POUR UNE VOIX HUMAINE :
 // Variable globale pour stocker la clé API (sera définie par le handler principal)
 let activeApiKey: string | null = null;
 
+// Token tracking global
+let totalTokenUsage = {
+  promptTokens: 0,
+  completionTokens: 0,
+  totalTokens: 0
+};
+
 async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000): Promise<string> {
   // Utiliser la clé active (utilisateur ou serveur)
   const apiKey = activeApiKey || Deno.env.get('OPENAI_API_KEY');
@@ -53,6 +60,15 @@ async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000
   }
 
   const data = await response.json();
+  
+  // Track token usage
+  if (data.usage) {
+    totalTokenUsage.promptTokens += data.usage.prompt_tokens || 0;
+    totalTokenUsage.completionTokens += data.usage.completion_tokens || 0;
+    totalTokenUsage.totalTokens += data.usage.total_tokens || 0;
+    console.log(`📊 Tokens used: +${data.usage.total_tokens} (cumulative: ${totalTokenUsage.totalTokens})`);
+  }
+  
   return data.choices?.[0]?.message?.content || '';
 }
 
@@ -131,6 +147,9 @@ serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
+
+  // Reset token tracking for each request
+  totalTokenUsage = { promptTokens: 0, completionTokens: 0, totalTokens: 0 };
 
   try {
     const payload = await req.json();
@@ -837,7 +856,13 @@ Format JSON (VERDICT HONNÊTE - pas de flatterie) :
         );
     }
 
-    console.log(`Step ${step} completed successfully`);
+    console.log(`Step ${step} completed successfully - Total tokens: ${totalTokenUsage.totalTokens}`);
+
+    // Calculate estimated cost (gpt-4o-mini pricing: $0.15/$0.60 per 1M tokens)
+    const estimatedCost = (
+      (totalTokenUsage.promptTokens / 1_000_000) * 0.15 +
+      (totalTokenUsage.completionTokens / 1_000_000) * 0.60
+    );
 
     return new Response(
       JSON.stringify({ 
@@ -847,7 +872,13 @@ Format JSON (VERDICT HONNÊTE - pas de flatterie) :
         displayContent,
         title,
         authorName,
-        numberOfChapters
+        numberOfChapters,
+        tokenUsage: {
+          promptTokens: totalTokenUsage.promptTokens,
+          completionTokens: totalTokenUsage.completionTokens,
+          totalTokens: totalTokenUsage.totalTokens,
+          estimatedCost: estimatedCost.toFixed(4)
+        }
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

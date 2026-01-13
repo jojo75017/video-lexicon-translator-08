@@ -246,12 +246,57 @@ async function uploadImageToDrive(imageUrl: string, accessToken: string): Promis
   }
 }
 
+// Helper: Validate JWT token
+async function validateJWT(req: Request): Promise<{ valid: boolean; error?: string }> {
+  const authHeader = req.headers.get('authorization');
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return { valid: false, error: 'Authorization header required' };
+  }
+  
+  const token = authHeader.replace('Bearer ', '');
+  
+  try {
+    // Decode and validate JWT structure
+    const parts = token.split('.');
+    if (parts.length !== 3) {
+      return { valid: false, error: 'Invalid token format' };
+    }
+    
+    const payload = JSON.parse(atob(parts[1]));
+    
+    // Check expiration
+    if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {
+      return { valid: false, error: 'Token expired' };
+    }
+    
+    // Check required claims
+    if (!payload.sub) {
+      return { valid: false, error: 'Invalid token claims' };
+    }
+    
+    return { valid: true };
+  } catch (e) {
+    return { valid: false, error: 'Token validation failed' };
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    // 🔒 AUTHENTIFICATION OBLIGATOIRE
+    const jwtValidation = await validateJWT(req);
+    if (!jwtValidation.valid) {
+      console.error(`❌ Auth failed: ${jwtValidation.error}`);
+      return new Response(
+        JSON.stringify({ error: 'Authentification requise', details: jwtValidation.error }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    console.log('✅ JWT validated successfully');
+
     const { title, content, authorName } = await req.json();
     
     console.log(`📄 Export Google Docs demandé pour: "${title}"`);
