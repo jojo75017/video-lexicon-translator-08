@@ -11,6 +11,9 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import ExitIntentPopup from "@/components/sales/ExitIntentPopup";
 import { generateKdpNichesPdf } from "@/utils/generateKdpNichesPdf";
+import SocialProofNotifications from "@/components/sales/SocialProofNotifications";
+import KdpRoiCalculator from "@/components/sales/KdpRoiCalculator";
+import StickyCtaBar from "@/components/sales/StickyCtaBar";
 const SalesPage = () => {
   const navigate = useNavigate();
   const [showDemo, setShowDemo] = useState(false);
@@ -438,6 +441,17 @@ const SalesPage = () => {
               <span>Satisfaction garantie à 100% - Plus de 15 000 ebooks générés</span>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ROI Calculator Section */}
+      <section className="py-20 px-4 bg-gradient-to-br from-emerald-50/50 via-background to-teal-50/50 dark:from-emerald-950/20 dark:via-background dark:to-teal-950/20">
+        <div className="max-w-2xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-4">💰 Combien pouvez-vous gagner ?</h2>
+          <p className="text-muted-foreground text-center mb-8">
+            Calculez votre potentiel de revenus passifs avec Amazon KDP
+          </p>
+          <KdpRoiCalculator />
         </div>
       </section>
 
@@ -892,6 +906,12 @@ const SalesPage = () => {
 
       {/* Exit Intent Popup */}
       <ExitIntentPopup />
+
+      {/* Social Proof Notifications */}
+      <SocialProofNotifications />
+
+      {/* Sticky CTA Bar */}
+      <StickyCtaBar spotsLeft={39} totalSpots={50} />
     </div>
   );
 };
