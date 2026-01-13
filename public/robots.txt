@@ -1,0 +1,28 @@
+# Robots.txt for EbookStudio.fr
+# https://ebookstudio.fr
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://ebookstudio.fr/sitemap.xml
+
+# Block admin and auth pages
+Disallow: /admin
+Disallow: /admin-direct
+Disallow: /auth
+Disallow: /logout
+
+# Block internal tools
+Disallow: /ebook-planner
+Disallow: /subscription
+
+# Allow SEO pages
+Allow: /offres
+Allow: /demo
+Allow: /formation
+Allow: /creer-ebook-ia
+Allow: /generateur-ebook
+Allow: /ecrire-livre-chatgpt
+Allow: /valeur-offre
+Allow: /affiliation-formation
