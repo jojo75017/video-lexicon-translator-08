@@ -24,7 +24,8 @@ const stylePrompts: Record<string, string> = {
   dystopian: 'dystopian dark style, post-apocalyptic elements, ruined cityscapes, oppressive atmosphere, muted colors',
   western: 'wild west style, desert landscapes, cowboy elements, sepia and brown tones, rustic textures',
   spiritual: 'spiritual serene style, soft light, sacred symbols, peaceful atmosphere, ethereal glow',
-  cookbook: 'culinary appetizing style, food photography aesthetic, warm kitchen tones, delicious presentation'
+  cookbook: 'culinary appetizing style, food photography aesthetic, warm kitchen tones, delicious presentation',
+  garden: 'lush garden style, green nature, plants, flowers, natural organic aesthetic, earthy tones'
 };
 
 const genrePrompts: Record<string, string> = {
@@ -44,7 +45,11 @@ const genrePrompts: Record<string, string> = {
   'cooking': 'cookbook, recipes, food, culinary arts',
   'travel': 'travel book, adventures, destinations, exploration',
   'poetry': 'poetry book, verses, lyrical, emotional expression',
-  'health': 'health wellness book, fitness, wellbeing, lifestyle'
+  'health': 'health wellness book, fitness, wellbeing, lifestyle',
+  'gardening': 'gardening book, plants, nature, botanical illustrations, green and earthy colors',
+  'garden-bio': 'organic gardening, eco-friendly, natural methods, green and brown tones, sustainable',
+  'permaculture': 'permaculture book, sustainable living, ecological design, nature harmony, green ecosystem',
+  'potager': 'vegetable garden book, fresh produce, kitchen garden, colorful vegetables, organic farming'
 };
 
 serve(async (req) => {

@@ -665,6 +665,10 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
                   <SelectItem value="animaux">🐕 Animaux / Récit animalier</SelectItem>
                   <SelectItem value="spiritualite">🙏 Spiritualité / Religion</SelectItem>
                   <SelectItem value="education">📝 Éducation / Pédagogie</SelectItem>
+                  <SelectItem value="jardinage">🌱 Jardinage</SelectItem>
+                  <SelectItem value="jardin-bio">🌿 Jardin Bio</SelectItem>
+                  <SelectItem value="permaculture">🌾 Permaculture</SelectItem>
+                  <SelectItem value="potager">🥕 Potager</SelectItem>
                   <SelectItem value="autre">📦 Autre</SelectItem>
                 </SelectContent>
               </Select>

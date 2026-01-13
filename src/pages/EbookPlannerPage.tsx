@@ -1186,6 +1186,10 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
                               <SelectItem value="education">🎓 Éducation</SelectItem>
                               <SelectItem value="sante">❤️ Santé/Bien-être</SelectItem>
                               <SelectItem value="spiritualite">🙏 Spiritualité</SelectItem>
+                              <SelectItem value="jardinage">🌱 Jardinage</SelectItem>
+                              <SelectItem value="jardin-bio">🌿 Jardin Bio</SelectItem>
+                              <SelectItem value="permaculture">🌾 Permaculture</SelectItem>
+                              <SelectItem value="potager">🥕 Potager</SelectItem>
                               <SelectItem value="autre">📋 Autre</SelectItem>
                             </SelectContent>
                           </Select>
