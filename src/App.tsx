@@ -53,15 +53,31 @@ const App = () => {
     };
 
     const initAuth = async () => {
-      // Check subscriber auth
+      // Check subscriber auth (client cache)
+      // NOTE: localStorage can be tampered with, so we only use it as a hint.
       const savedEmail = localStorage.getItem('subscriber_email');
       const savedData = localStorage.getItem('subscriber_data');
-      if (savedEmail && savedData) {
-        setSubscriberEmail(savedEmail);
-        setSubscriberData(JSON.parse(savedData));
-        setIsAuthenticated(true);
-      }
 
+      if (savedEmail && savedData) {
+        try {
+          const parsed = JSON.parse(savedData);
+          const hasCode = typeof parsed?.access_code === 'string' && parsed.access_code.trim().length > 0;
+          const isActive = parsed?.status === 'active' || parsed?.plan_type === 'lifetime';
+
+          if (hasCode && isActive) {
+            setSubscriberEmail(savedEmail);
+            setSubscriberData(parsed);
+            setIsAuthenticated(true);
+          } else {
+            // Invalid cached data → reset
+            localStorage.removeItem('subscriber_email');
+            localStorage.removeItem('subscriber_data');
+          }
+        } catch {
+          localStorage.removeItem('subscriber_email');
+          localStorage.removeItem('subscriber_data');
+        }
+      }
       // Check admin session
       try {
         const {
@@ -134,6 +150,10 @@ const App = () => {
   };
 
   const handleLogout = () => {
+    // IMPORTANT: always clear client cache, otherwise users can appear logged-in without a valid backend check
+    localStorage.removeItem('subscriber_email');
+    localStorage.removeItem('subscriber_data');
+
     setIsAuthenticated(false);
     setSubscriberEmail('');
     setSubscriberData(null);
