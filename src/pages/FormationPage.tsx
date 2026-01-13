@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -36,8 +35,9 @@ interface Module {
 
 const FormationPage = () => {
   const navigate = useNavigate();
-  const { isAuthenticated, role } = useAuth();
-  const isSubscriber = isAuthenticated && (role === 'pro' || role === 'admin');
+  // Check authentication from localStorage (public page - no AuthProvider needed)
+  const subscriberEmail = localStorage.getItem('subscriber_email');
+  const isSubscriber = !!subscriberEmail;
   const [selectedModule, setSelectedModule] = useState<number | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const [previewPage, setPreviewPage] = useState(0);
