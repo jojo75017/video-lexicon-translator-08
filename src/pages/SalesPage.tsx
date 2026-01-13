@@ -95,27 +95,27 @@ const SalesPage = () => {
   const plans = [
     {
       id: "lifetime",
-      name: "Accès Complet",
+      name: "Accès Complet à Vie",
       price: "37",
       originalPrice: "97",
       period: "",
-      description: "Tout inclus – Sans limite",
-      badge: "OFFRE DE LANCEMENT",
-      discount: "🎯 Économie immédiate : 60 €",
+      description: "Offre réservée aux 50 premiers utilisateurs",
+      badge: "🔥 50 PREMIERS INSCRITS",
+      discount: "🎯 Économie immédiate : 60 € (-62%)",
       features: [
-        "Ebooks illimités à vie",
-        "Chapitres illimités",
-        "Couvertures illimitées",
-        "Export PDF / EPUB / Word",
+        "✨ Ebooks illimités à vie",
+        "📝 Chapitres illimités",
+        "🎨 Couvertures illimitées",
+        "📄 Export PDF / EPUB / Word / Google Docs",
         "🎓 Toutes les formations (texte + audio)",
         "📚 Gestionnaire Séries / Sagas",
-        "Outils KDP Premium",
-        "Mises à jour gratuites à vie",
-        "Support prioritaire",
+        "📊 Outils KDP Premium",
+        "🔄 Mises à jour gratuites à vie",
+        "💬 Support prioritaire inclus",
       ],
-      cta: "Accéder Maintenant",
+      cta: "🚀 Rejoindre les 50 Premiers",
       popular: true,
-      footnote: "📌 Paiement unique – Accès immédiat et illimité",
+      footnote: "📌 Paiement unique – Accès immédiat et illimité – Sans abonnement",
     },
   ];
 
@@ -166,6 +166,28 @@ const SalesPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+      {/* Bannière Lancement Spécial */}
+      <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white py-4 px-4 text-center relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxjaXJjbGUgZmlsbD0iI2ZmZiIgZmlsbC1vcGFjaXR5PSIuMSIgY3g9IjIwIiBjeT0iMjAiIHI9IjIiLz48L2c+PC9zdmc+')] opacity-30" />
+        <div className="relative z-10 max-w-4xl mx-auto">
+          <div className="flex items-center justify-center gap-2 mb-1">
+            <span className="text-2xl">🎉</span>
+            <span className="font-bold text-lg md:text-xl uppercase tracking-wider animate-pulse">
+              Offre Spéciale Lancement
+            </span>
+            <span className="text-2xl">🎉</span>
+          </div>
+          <p className="text-sm md:text-base font-medium">
+            <span className="bg-white/20 px-3 py-1 rounded-full inline-block">
+              🔥 Réservé aux <strong>50 premiers utilisateurs</strong> : Accès à vie pour seulement <strong>37€</strong> au lieu de 97€
+            </span>
+          </p>
+          <p className="text-xs mt-2 opacity-90">
+            ⚡ Places limitées – L'offre disparaît dès que les 50 places sont prises
+          </p>
+        </div>
+      </div>
+
       {/* Hero Section */}
       <section className="relative overflow-hidden py-20 px-4">
         <div className="absolute inset-0 bg-grid-pattern opacity-5" />
@@ -186,23 +208,46 @@ const SalesPage = () => {
             et publier sur Amazon KDP avec succès.
           </p>
 
+          {/* Vidéo de présentation */}
+          <div className="max-w-3xl mx-auto mb-10">
+            <Card className="overflow-hidden border-2 border-primary/30 shadow-2xl">
+              <CardContent className="p-0">
+                <div className="relative aspect-video">
+                  <iframe 
+                    title="Présentation EbookStudio" 
+                    src="https://player.vimeo.com/video/1153641502?h=d5388db3e9" 
+                    className="absolute inset-0 w-full h-full"
+                    frameBorder="0" 
+                    allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    allowFullScreen
+                  />
+                </div>
+              </CardContent>
+            </Card>
+            <p className="text-sm text-muted-foreground mt-3 flex items-center justify-center gap-2">
+              <Play className="w-4 h-4" />
+              Découvrez en 3 minutes comment créer votre premier ebook
+            </p>
+          </div>
+
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <Button 
               size="lg" 
-              className="text-lg px-8 py-6"
-              onClick={() => setShowDemo(true)}
+              className="text-lg px-8 py-6 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 shadow-lg"
+              onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
             >
-              <Play className="w-5 h-5 mr-2" />
-              Voir la Démo
+              <Sparkles className="w-5 h-5 mr-2" />
+              Profiter de l'Offre à 37€
             </Button>
             <Button 
               size="lg" 
               variant="outline"
               className="text-lg px-8 py-6"
-              onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={() => navigate('/demo')}
             >
-              Voir les Offres
-              <ArrowRight className="w-5 h-5 ml-2" />
+              <Play className="w-5 h-5 mr-2" />
+              Essayer la Démo Gratuite
             </Button>
           </div>
 
