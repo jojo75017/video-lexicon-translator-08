@@ -159,6 +159,7 @@ const App = () => {
     setSubscriberData(null);
   };
 
+  const showAccessDebug = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('debug') === '1';
 
   if (isCheckingAuth) {
     return null;
@@ -168,6 +169,18 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <div className="min-h-screen bg-background">
+          {showAccessDebug && (
+            <div className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur">
+              <div className="mx-auto max-w-6xl px-4 py-2 text-xs text-muted-foreground flex flex-wrap gap-3">
+                <span><strong>host</strong>: {window.location.host}</span>
+                <span><strong>path</strong>: {window.location.pathname}</span>
+                <span><strong>isAdmin</strong>: {String(isAdmin)}</span>
+                <span><strong>isAuthenticated</strong>: {String(isAuthenticated)}</span>
+                <span><strong>subscriberEmail</strong>: {subscriberEmail ? 'yes' : 'no'}</span>
+                <span><strong>subscriberData.access_code</strong>: {subscriberData?.access_code ? 'yes' : 'no'}</span>
+              </div>
+            </div>
+          )}
           <Routes>
             {/* Google Search Console verification (fallback if static file routing is rewritten) */}
             <Route
