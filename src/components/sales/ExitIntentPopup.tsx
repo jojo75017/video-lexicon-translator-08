@@ -15,9 +15,17 @@ const ExitIntentPopup = ({ onContinueToOffer }: ExitIntentPopupProps) => {
   const [isDownloading, setIsDownloading] = useState(false);
 
   const tryOpen = useCallback(() => {
-    if (hasShown) return;
-    const alreadyShown = sessionStorage.getItem("exitIntentShown");
-    if (alreadyShown) return;
+    // Ne pas ré-ouvrir si déjà affichée (sauf mode test)
+    const params = new URLSearchParams(window.location.search);
+    const force = params.get("forceExitIntent") === "1";
+
+    if (!force) {
+      if (hasShown) return;
+      const alreadyShown = sessionStorage.getItem("exitIntentShown");
+      if (alreadyShown) return;
+    } else {
+      sessionStorage.removeItem("exitIntentShown");
+    }
 
     setIsOpen(true);
     setHasShown(true);
@@ -25,32 +33,31 @@ const ExitIntentPopup = ({ onContinueToOffer }: ExitIntentPopupProps) => {
   }, [hasShown]);
 
   useEffect(() => {
-    // Mode test : /offres?forceExitIntent=1
     const params = new URLSearchParams(window.location.search);
     const force = params.get("forceExitIntent") === "1";
+
     if (force) {
+      // Affichage garanti en mode test
+      setIsOpen(true);
+      setHasShown(true);
       sessionStorage.removeItem("exitIntentShown");
-      setHasShown(false);
-      setTimeout(() => tryOpen(), 500);
       return;
     }
 
     // Détection "scroll up" (l'utilisateur remonte après avoir descendu)
     let lastScrollY = window.scrollY;
     let maxScrollY = 0;
-    let hasScrolledDown = false;
 
     const handleScroll = () => {
       const currentY = window.scrollY;
-      
-      // Enregistrer le max atteint
-      if (currentY > maxScrollY) {
-        maxScrollY = currentY;
-        hasScrolledDown = maxScrollY > 300; // Au moins 300px descendus
-      }
 
-      // Détecter le scroll up significatif (remonte de plus de 150px)
-      if (hasScrolledDown && currentY < lastScrollY && (maxScrollY - currentY) > 150) {
+      if (currentY > maxScrollY) maxScrollY = currentY;
+
+      const hasScrolledDown = maxScrollY > 300;
+      const scrollingUp = currentY < lastScrollY;
+      const pulledUpEnough = (maxScrollY - currentY) > 160;
+
+      if (hasScrolledDown && scrollingUp && pulledUpEnough) {
         tryOpen();
       }
 
@@ -60,13 +67,23 @@ const ExitIntentPopup = ({ onContinueToOffer }: ExitIntentPopupProps) => {
     // Délai avant d'activer
     const timeout = setTimeout(() => {
       window.addEventListener("scroll", handleScroll, { passive: true });
-    }, 2000);
+
+      // Fallback : si l'onglet perd le focus
+      window.addEventListener("blur", tryOpen);
+
+      // Optionnel: mode debug /offres?debugPopup=1
+      if (params.get("debugPopup") === "1") {
+        (window as any).__OPEN_EXIT_POPUP__ = tryOpen;
+      }
+    }, 800);
 
     return () => {
       clearTimeout(timeout);
       window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("blur", tryOpen);
+      if ((window as any).__OPEN_EXIT_POPUP__) delete (window as any).__OPEN_EXIT_POPUP__;
     };
-  }, [tryOpen, hasShown]);
+  }, [tryOpen]);
 
   const handleDownloadBonus = async () => {
     setIsDownloading(true);
@@ -96,9 +113,9 @@ const ExitIntentPopup = ({ onContinueToOffer }: ExitIntentPopupProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-lg p-0 overflow-hidden border-0 bg-transparent">
-        <div className="relative bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700 rounded-2xl p-1">
-          <div className="bg-white dark:bg-gray-900 rounded-xl overflow-hidden">
+      <DialogContent className="sm:max-w-lg p-0 overflow-hidden border bg-background">
+        <div className="relative rounded-2xl p-1 bg-[linear-gradient(135deg,hsl(var(--primary)),hsl(var(--accent)))]">
+          <div className="bg-background rounded-xl overflow-hidden">
             {/* Header avec animation */}
             <div className="relative bg-gradient-to-r from-amber-400 via-orange-400 to-red-400 p-4 text-center">
               <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iLjIiIGN4PSIxMCIgY3k9IjEwIiByPSIxIi8+PC9zdmc+')] opacity-50" />
