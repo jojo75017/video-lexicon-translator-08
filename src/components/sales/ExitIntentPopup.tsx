@@ -43,21 +43,34 @@ const ExitIntentPopup = ({ onContinueToOffer }: ExitIntentPopupProps) => {
       if (document.visibilityState === "hidden") tryOpen();
     };
 
+    // Mode test : /offres?forceExitIntent=1
+    const params = new URLSearchParams(window.location.search);
+    const force = params.get("forceExitIntent") === "1";
+    if (force) {
+      // Permet de tester même si la popup a déjà été montrée
+      sessionStorage.removeItem("exitIntentShown");
+      setHasShown(false);
+    }
+
     // Délai avant d'activer la détection (éviter les faux positifs au chargement)
     const timeout = setTimeout(() => {
+      // Dans l'aperçu (iframe), les événements peuvent se comporter différemment.
+      // On écoute à la fois sur document et window pour maximiser les chances.
       document.addEventListener("mouseout", handleMouseOut);
+      window.addEventListener("mouseout", handleMouseOut);
+      window.addEventListener("blur", tryOpen);
       document.addEventListener("visibilitychange", onVisibility);
 
-      // Mode test : /offres?forceExitIntent=1
-      const params = new URLSearchParams(window.location.search);
-      if (params.get("forceExitIntent") === "1") {
-        setTimeout(() => tryOpen(), 800);
+      if (force) {
+        setTimeout(() => tryOpen(), 400);
       }
-    }, 1500);
+    }, 1200);
 
     return () => {
       clearTimeout(timeout);
       document.removeEventListener("mouseout", handleMouseOut);
+      window.removeEventListener("mouseout", handleMouseOut);
+      window.removeEventListener("blur", tryOpen);
       document.removeEventListener("visibilitychange", onVisibility);
     };
   }, [handleMouseOut, tryOpen]);
