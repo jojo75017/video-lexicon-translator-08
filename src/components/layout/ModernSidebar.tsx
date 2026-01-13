@@ -350,9 +350,23 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
   onToggleCollapse
 }) => {
   const navigate = useNavigate();
-  const [expandedCategories, setExpandedCategories] = useState<string[]>(
-    categories.map(c => c.id) // All expanded by default
-  );
+  
+  // Find which category contains the active tab
+  const activeCategoryId = categories.find(cat => 
+    cat.items.some(item => item.id === activeTab)
+  )?.id;
+  
+  const [expandedCategories, setExpandedCategories] = useState<string[]>(() => {
+    // Open all categories by default, but ensure the active one is always open
+    return categories.map(c => c.id);
+  });
+
+  // Ensure the category with the active tab is always expanded
+  React.useEffect(() => {
+    if (activeCategoryId && !expandedCategories.includes(activeCategoryId)) {
+      setExpandedCategories(prev => [...prev, activeCategoryId]);
+    }
+  }, [activeCategoryId, expandedCategories]);
 
   const toggleCategory = (categoryId: string) => {
     setExpandedCategories(prev => 
@@ -369,11 +383,6 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
       onTabChange(item.id);
     }
   };
-
-  // Find which category contains the active tab
-  const activeCategoryId = categories.find(cat => 
-    cat.items.some(item => item.id === activeTab)
-  )?.id;
 
   return (
     <TooltipProvider delayDuration={0}>
