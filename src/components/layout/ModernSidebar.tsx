@@ -377,7 +377,9 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
     <TooltipProvider delayDuration={0}>
       <aside 
         className={cn(
-          "relative flex flex-col h-screen bg-card border-r border-border/50 transition-all duration-300 ease-in-out",
+          "relative flex flex-col h-screen border-r border-border/50 transition-all duration-300 ease-in-out",
+          "bg-gradient-to-b from-background via-card to-background/95",
+          "before:absolute before:inset-0 before:bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] before:from-violet-500/5 before:via-transparent before:to-transparent before:pointer-events-none",
           isCollapsed ? "w-16" : "w-60"
         )}
       >
@@ -420,22 +422,36 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
             };
             
             const categoryHeaderStyles: Record<string, string> = {
-              'workflow-ia': 'from-amber-500/20 to-orange-500/20 text-amber-600 dark:text-amber-400',
-              'moteur-v2': 'from-purple-500/20 to-violet-500/20 text-purple-600 dark:text-purple-400',
-              'gestion': 'from-violet-500/15 to-purple-500/15 text-violet-600 dark:text-violet-400',
-              'creation': 'from-fuchsia-500/15 to-pink-500/15 text-fuchsia-600 dark:text-fuchsia-400',
-              'visuels': 'from-rose-500/15 to-red-500/15 text-rose-600 dark:text-rose-400',
-              'publication': 'from-teal-500/15 to-cyan-500/15 text-teal-600 dark:text-teal-400',
-              'marketing': 'from-green-500/15 to-emerald-500/15 text-green-600 dark:text-green-400',
-              'audio': 'from-purple-500/15 to-violet-500/15 text-purple-600 dark:text-purple-400',
-              'outils': 'from-indigo-500/15 to-blue-500/15 text-indigo-600 dark:text-indigo-400',
+              'workflow-ia': 'from-amber-500/20 to-orange-500/20 text-amber-600 dark:text-amber-400 hover:from-amber-500/30 hover:to-orange-500/30',
+              'moteur-v2': 'from-purple-500/20 to-violet-500/20 text-purple-600 dark:text-purple-400 hover:from-purple-500/30 hover:to-violet-500/30',
+              'gestion': 'from-violet-500/15 to-purple-500/15 text-violet-600 dark:text-violet-400 hover:from-violet-500/25 hover:to-purple-500/25',
+              'creation': 'from-fuchsia-500/15 to-pink-500/15 text-fuchsia-600 dark:text-fuchsia-400 hover:from-fuchsia-500/25 hover:to-pink-500/25',
+              'visuels': 'from-rose-500/15 to-red-500/15 text-rose-600 dark:text-rose-400 hover:from-rose-500/25 hover:to-red-500/25',
+              'publication': 'from-teal-500/15 to-cyan-500/15 text-teal-600 dark:text-teal-400 hover:from-teal-500/25 hover:to-cyan-500/25',
+              'marketing': 'from-green-500/15 to-emerald-500/15 text-green-600 dark:text-green-400 hover:from-green-500/25 hover:to-emerald-500/25',
+              'audio': 'from-purple-500/15 to-violet-500/15 text-purple-600 dark:text-purple-400 hover:from-purple-500/25 hover:to-violet-500/25',
+              'outils': 'from-indigo-500/15 to-blue-500/15 text-indigo-600 dark:text-indigo-400 hover:from-indigo-500/25 hover:to-blue-500/25',
+            };
+            
+            // Styles de surbrillance au survol
+            const categoryHoverGlow: Record<string, string> = {
+              'workflow-ia': 'hover:shadow-amber-500/20',
+              'moteur-v2': 'hover:shadow-purple-500/20',
+              'gestion': 'hover:shadow-violet-500/15',
+              'creation': 'hover:shadow-fuchsia-500/15',
+              'visuels': 'hover:shadow-rose-500/15',
+              'publication': 'hover:shadow-teal-500/15',
+              'marketing': 'hover:shadow-green-500/15',
+              'audio': 'hover:shadow-purple-500/15',
+              'outils': 'hover:shadow-indigo-500/15',
             };
             
             return (
               <div key={category.id} className={cn(
-                "mb-1",
-                !isCollapsed && "mx-2 mb-2 rounded-xl bg-gradient-to-br border overflow-hidden",
-                !isCollapsed && (categoryBgStyles[category.id] || 'from-gray-500/5 to-gray-500/5 border-gray-500/10')
+                "mb-1 transition-all duration-300",
+                !isCollapsed && "mx-2 mb-2 rounded-xl bg-gradient-to-br border overflow-hidden shadow-sm hover:shadow-lg",
+                !isCollapsed && (categoryBgStyles[category.id] || 'from-gray-500/5 to-gray-500/5 border-gray-500/10'),
+                !isCollapsed && (categoryHoverGlow[category.id] || 'hover:shadow-gray-500/10')
               )}>
                 {/* Category Header */}
                 {!isCollapsed ? (
