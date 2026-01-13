@@ -134,7 +134,10 @@ async function generateWithOpenAI(
   apiKey: string,
   ratio: string = 'square',
   quality: string = 'high',
-  colorScheme: string = 'auto'
+  colorScheme: string = 'auto',
+  visualCoherence: boolean = false,
+  coherenceIntensity: string = 'medium',
+  referenceImageUrl: string | null = null
 ): Promise<string> {
   let charactersContext = '';
   if (characters && characters.length > 0) {
@@ -156,6 +159,22 @@ async function generateWithOpenAI(
   const qualityDesc = QUALITY_MAP[quality]?.description || QUALITY_MAP['high'].description;
   const size = RATIO_SIZES[ratio]?.openai || '1024x1024';
   const photorealisticEnhancement = getPhotorealisticEnhancement(style);
+  
+  // Instructions de cohérence selon l'intensité
+  const coherenceInstructions: Record<string, string> = {
+    light: 'Maintenir une ambiance visuelle similaire, style reconnaissable, variations créatives permises.',
+    medium: 'Style artistique IDENTIQUE, même palette de couleurs dominante, même niveau de détail.',
+    strict: 'Style artistique IDENTIQUE pixel par pixel, palette EXACTEMENT la même, AUCUNE variation permise.'
+  };
+  
+  const coherencePrompt = visualCoherence ? `
+COHÉRENCE VISUELLE (${coherenceIntensity.toUpperCase()}):
+${coherenceInstructions[coherenceIntensity] || coherenceInstructions.medium}` : '';
+  
+  const referencePrompt = referenceImageUrl ? `
+RÉFÉRENCE VISUELLE:
+- Reproduire EXACTEMENT le même style que l'image de référence
+- Utiliser la même palette de couleurs et technique de rendu` : '';
 
   const imagePrompt = `Contexte de l'ebook: "${ebookTitle}"
 Chapitre à illustrer: "${chapterTitle}"
@@ -166,6 +185,8 @@ Style artistique demandé: ${style}
 Qualité: ${qualityDesc}
 ${colorPrompt ? `Palette de couleurs: ${colorPrompt}` : ''}
 ${photorealisticEnhancement}
+${coherencePrompt}
+${referencePrompt}
 
 Instructions de génération:
 - Créer une illustration de haute qualité adaptée à un ebook professionnel
@@ -259,6 +280,8 @@ serve(async (req) => {
       quality = "high",
       colorScheme = "auto",
       visualCoherence = false,
+      coherenceIntensity = "medium",
+      referenceImageUrl = null,
       seed = null,
       characters = [], 
       useOpenAI = false, 
@@ -278,6 +301,28 @@ serve(async (req) => {
     let generatedImageUrl: string;
     // Générer un seed pour cohérence visuelle
     const generatedSeed = seed || (visualCoherence ? Math.floor(Math.random() * 2147483647) : null);
+    
+    // Instructions de cohérence selon l'intensité
+    const coherenceInstructions: Record<string, string> = {
+      light: `
+COHÉRENCE LÉGÈRE:
+- Maintenir une ambiance visuelle similaire aux autres chapitres
+- Le style artistique doit rester reconnaissable
+- Des variations créatives sont permises pour chaque scène`,
+      medium: `
+COHÉRENCE MOYENNE:
+- Maintenir EXACTEMENT le même style artistique
+- Utiliser la MÊME palette de couleurs dominante
+- Garder le même niveau de détail et rendu
+- Les personnages doivent être immédiatement reconnaissables`,
+      strict: `
+COHÉRENCE STRICTE ABSOLUE:
+- Style artistique IDENTIQUE pixel par pixel
+- Palette de couleurs EXACTEMENT la même
+- Même technique de rendu, même éclairage
+- AUCUNE variation stylistique permise
+- Les personnages sont des clones visuels parfaits entre les images`
+    };
 
     // Si useOpenAI est true et non forcé à Lovable, utiliser EXCLUSIVEMENT OpenAI
     if (useOpenAI && openaiApiKey && !forceLovable) {
@@ -291,7 +336,10 @@ serve(async (req) => {
           openaiApiKey,
           ratio,
           quality,
-          colorScheme
+          colorScheme,
+          visualCoherence,
+          coherenceIntensity,
+          referenceImageUrl
         );
       } catch (err) {
         console.error('OpenAI image generation failed:', err);
@@ -331,6 +379,16 @@ serve(async (req) => {
       const colorPrompt = COLOR_SCHEME_PROMPTS[colorScheme] || '';
       const qualityDesc = QUALITY_MAP[quality]?.description || QUALITY_MAP['high'].description;
       const photorealisticEnhancement = getPhotorealisticEnhancement(style);
+      const coherencePrompt = visualCoherence ? coherenceInstructions[coherenceIntensity] || coherenceInstructions.medium : '';
+      
+      // Instruction pour image de référence si fournie
+      const referencePrompt = referenceImageUrl ? `
+RÉFÉRENCE VISUELLE OBLIGATOIRE:
+- Une image de référence est fournie comme modèle
+- Reproduire EXACTEMENT le même style artistique
+- Utiliser la même palette de couleurs
+- Maintenir le même niveau de détail et technique de rendu
+- Cette image définit le standard visuel pour tout l'ebook` : '';
 
       const imagePrompt = `Contexte de l'ebook: "${ebookTitle}"
 Chapitre à illustrer: "${chapterTitle}"
@@ -341,13 +399,8 @@ Style artistique demandé: ${style}
 Qualité: ${qualityDesc}
 ${colorPrompt ? `Palette de couleurs: ${colorPrompt}` : ''}
 ${photorealisticEnhancement}
-${visualCoherence ? `
-COHÉRENCE VISUELLE ACTIVÉE:
-- Maintenir EXACTEMENT le même style artistique que les autres chapitres
-- Utiliser la MÊME palette de couleurs cohérente
-- Garder le même niveau de détail et la même ambiance visuelle
-- Si un seed est fourni, s'en inspirer pour des variations similaires
-` : ''}
+${coherencePrompt}
+${referencePrompt}
 
 Instructions de génération:
 - Créer une illustration de haute qualité adaptée à un ebook professionnel
@@ -384,7 +437,7 @@ Instructions de génération:
             if (FALLBACK_OPENAI_KEY) {
               console.log('Lovable AI error, attempting automatic fallback to OpenAI...');
               try {
-                generatedImageUrl = await generateWithOpenAI(chapterTitle, chapterContent, ebookTitle, style, characters, FALLBACK_OPENAI_KEY, ratio, quality, colorScheme);
+                generatedImageUrl = await generateWithOpenAI(chapterTitle, chapterContent, ebookTitle, style, characters, FALLBACK_OPENAI_KEY, ratio, quality, colorScheme, visualCoherence, coherenceIntensity, referenceImageUrl);
               } catch (openaiErr) {
                 console.error('OpenAI fallback failed:', openaiErr);
                 throw openaiErr;
