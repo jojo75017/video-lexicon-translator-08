@@ -39,6 +39,15 @@ export const SubscriptionAuth = ({ onAuthenticated }: SubscriptionAuthProps) => 
       if (session) {
         setHasAdminSession(true);
       }
+
+      // Info utile pour les tests : si un cache "abonné" existe déjà, la personne peut
+      // croire tester un nouvel email alors que l'app réutilise l'accès déjà validé.
+      const cachedEmail = localStorage.getItem('subscriber_email');
+      if (cachedEmail) {
+        toast.message('Accès déjà mémorisé sur ce navigateur', {
+          description: `Abonné en cache : ${cachedEmail}. Pour tester un non-abonné, utilise /logout-total ou une fenêtre privée.`,
+        });
+      }
     };
     checkAdminSession();
   }, []);
