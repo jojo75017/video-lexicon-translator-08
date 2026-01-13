@@ -43,7 +43,8 @@ import {
   RefreshCw,
   Fingerprint,
   Award,
-  Rocket
+  Rocket,
+  Link
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -143,6 +144,7 @@ const categories: PremiumCategory[] = [
     color: 'from-fuchsia-500 via-pink-500 to-rose-500',
     isPremiumCategory: false,
     items: [
+      { id: 'url-import', label: '🔗 Import URL', icon: Link, color: 'text-violet-500', bgColor: 'bg-gradient-to-r from-violet-500/20 to-purple-500/20', activeGradient: 'from-violet-500 to-purple-500', isPremium: true },
       { id: 'planner', label: 'Planificateur', icon: BookOpen, color: 'text-fuchsia-500', bgColor: 'bg-fuchsia-500/10', activeGradient: 'from-fuchsia-500 to-pink-500' },
       { id: 'templates', label: 'Templates', icon: LayoutTemplate, color: 'text-cyan-500', bgColor: 'bg-cyan-500/10', activeGradient: 'from-cyan-500 to-teal-500' },
       { id: 'encyclopedia', label: 'Encyclopédie', icon: BookMarked, color: 'text-amber-500', bgColor: 'bg-amber-500/10', activeGradient: 'from-amber-500 to-orange-500' },

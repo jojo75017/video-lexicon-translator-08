@@ -91,6 +91,7 @@ import { DemoPaywall } from '@/components/ebook/DemoPaywall';
 import { useWorkflowResults } from '@/hooks/useWorkflowResults';
 import { WorkflowResultViewer } from '@/components/ebook/WorkflowResultViewer';
 import { cleanGeneratedText, cleanChapters } from '@/utils/textCleaner';
+import EbookUrlImport from '@/components/ebook/EbookUrlImport';
 
 // Hooks et données
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
@@ -2043,6 +2044,37 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
                 setActiveTab('planner');
                 toast.success(`Template "${template.title}" appliqué avec ${template.chapters.length} chapitres !`);
               }
+            }}
+          />
+        );
+
+      case 'url-import':
+        return (
+          <EbookUrlImport
+            onGuideGenerated={(guide) => {
+              // Appliquer le guide généré au projet
+              if (guide.title) setEbookTitle(guide.title);
+              
+              // Convertir les chapitres du guide
+              if (guide.chapters && guide.chapters.length > 0) {
+                const newChapters: Chapter[] = guide.chapters.map((ch, index) => ({
+                  id: `url-${Date.now()}-${index}`,
+                  title: ch.title,
+                  content: ch.content || '',
+                  subChapters: ch.keyPoints?.map((kp, ki) => ({
+                    id: `url-sub-${Date.now()}-${index}-${ki}`,
+                    title: kp,
+                    content: ''
+                  })) || []
+                }));
+                setChapters(newChapters);
+              }
+              
+              if (guide.conclusion) setConclusion(guide.conclusion);
+              if (guide.summary) setBookDescription(guide.summary);
+              
+              toast.success(`Guide "${guide.title}" importé avec ${guide.chapters?.length || 0} chapitres !`);
+              setActiveTab('planner');
             }}
           />
         );
