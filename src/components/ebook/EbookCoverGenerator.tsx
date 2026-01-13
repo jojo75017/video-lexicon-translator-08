@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Palette, Download, Wand2, RefreshCw, Loader2, Sparkles, Image as ImageIcon, BookOpen, Ruler, Info, FileText, Upload, X, User } from 'lucide-react';
+import { Palette, Download, Wand2, RefreshCw, Loader2, Sparkles, Image as ImageIcon, BookOpen, Ruler, Info, FileText, Upload, X, User, Type, PaintBucket } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import jsPDF from 'jspdf';
@@ -148,6 +148,13 @@ export const EbookCoverGenerator: React.FC<EbookCoverGeneratorProps> = ({
   // Template selection
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
   
+  // Nouvelles options de personnalisation avancées
+  const [authorNamePosition, setAuthorNamePosition] = useState<string>('bottom');
+  const [authorNameStyle, setAuthorNameStyle] = useState<string>('elegant');
+  const [colorScheme, setColorScheme] = useState<string>('auto');
+  const [titlePosition, setTitlePosition] = useState<string>('center');
+  const [showAuthorOnCover, setShowAuthorOnCover] = useState<boolean>(true);
+  
   // Appliquer un template
   const applyTemplate = (template: CoverTemplate) => {
     setGenre(template.genre);
@@ -245,7 +252,13 @@ export const EbookCoverGenerator: React.FC<EbookCoverGeneratorProps> = ({
           bindingType,
           spineWidth: spineWidth.toFixed(4),
           dimensions: coverDimensions,
-          backCoverText
+          backCoverText,
+          // Nouvelles options de personnalisation
+          authorNamePosition,
+          authorNameStyle,
+          colorScheme,
+          titlePosition,
+          showAuthorOnCover
         }
       });
 
@@ -595,6 +608,107 @@ export const EbookCoverGenerator: React.FC<EbookCoverGeneratorProps> = ({
                   onChange={(e) => setSubtitle(e.target.value)}
                   className="mt-1"
                 />
+              </div>
+            </div>
+
+            {/* Nouvelles options de personnalisation */}
+            <div className="p-4 bg-gradient-to-r from-violet-50 to-purple-50 rounded-xl border border-violet-200 space-y-4">
+              <h4 className="font-semibold text-violet-800 flex items-center gap-2">
+                <PaintBucket className="w-4 h-4" />
+                Personnalisation avancée
+              </h4>
+              
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div>
+                  <Label className="text-sm font-medium flex items-center gap-1.5">
+                    <Type className="w-3.5 h-3.5 text-violet-500" />
+                    Position du titre
+                  </Label>
+                  <Select value={titlePosition} onValueChange={setTitlePosition}>
+                    <SelectTrigger className="mt-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="top">📍 En haut</SelectItem>
+                      <SelectItem value="center">📍 Centré</SelectItem>
+                      <SelectItem value="bottom">📍 En bas</SelectItem>
+                      <SelectItem value="overlay">🎬 Superposé à l'image</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label className="text-sm font-medium flex items-center gap-1.5">
+                    <User className="w-3.5 h-3.5 text-violet-500" />
+                    Position nom auteur
+                  </Label>
+                  <Select value={authorNamePosition} onValueChange={setAuthorNamePosition}>
+                    <SelectTrigger className="mt-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="bottom">📍 En bas (classique)</SelectItem>
+                      <SelectItem value="top">📍 En haut</SelectItem>
+                      <SelectItem value="below-title">📍 Sous le titre</SelectItem>
+                      <SelectItem value="signature">✍️ Style signature</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label className="text-sm font-medium flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-violet-500" />
+                    Style du nom
+                  </Label>
+                  <Select value={authorNameStyle} onValueChange={setAuthorNameStyle}>
+                    <SelectTrigger className="mt-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="elegant">✨ Élégant</SelectItem>
+                      <SelectItem value="bold">💪 Gras impactant</SelectItem>
+                      <SelectItem value="script">✒️ Script manuscrit</SelectItem>
+                      <SelectItem value="minimal">◻️ Minimaliste</SelectItem>
+                      <SelectItem value="serif">📖 Serif classique</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label className="text-sm font-medium flex items-center gap-1.5">
+                    <Palette className="w-3.5 h-3.5 text-violet-500" />
+                    Palette de couleurs
+                  </Label>
+                  <Select value={colorScheme} onValueChange={setColorScheme}>
+                    <SelectTrigger className="mt-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="auto">🎯 Automatique (genre)</SelectItem>
+                      <SelectItem value="dark">🌙 Sombre</SelectItem>
+                      <SelectItem value="light">☀️ Clair</SelectItem>
+                      <SelectItem value="warm">🔥 Chaud (rouge/orange/or)</SelectItem>
+                      <SelectItem value="cold">❄️ Froid (bleu/violet)</SelectItem>
+                      <SelectItem value="nature">🌿 Nature (vert/brun)</SelectItem>
+                      <SelectItem value="monochrome">⚫ Monochrome</SelectItem>
+                      <SelectItem value="pastel">🎨 Pastel doux</SelectItem>
+                      <SelectItem value="vibrant">💥 Vibrant / Pop</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="flex items-center space-x-3 pt-6">
+                  <input
+                    type="checkbox"
+                    id="showAuthorOnCover"
+                    checked={showAuthorOnCover}
+                    onChange={(e) => setShowAuthorOnCover(e.target.checked)}
+                    className="w-4 h-4 rounded border-violet-300 text-violet-600 focus:ring-violet-500"
+                  />
+                  <Label htmlFor="showAuthorOnCover" className="text-sm cursor-pointer">
+                    Afficher le nom d'auteur sur la couverture
+                  </Label>
+                </div>
               </div>
             </div>
 
