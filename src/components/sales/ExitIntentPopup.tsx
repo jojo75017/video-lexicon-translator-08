@@ -38,38 +38,40 @@ const ExitIntentPopup = ({ onContinueToOffer }: ExitIntentPopupProps) => {
   );
 
   useEffect(() => {
-    // Fallback : si l'onglet perd le focus (mobile / changements d'onglet)
-    const onVisibility = () => {
-      if (document.visibilityState === "hidden") tryOpen();
-    };
-
     // Mode test : /offres?forceExitIntent=1
     const params = new URLSearchParams(window.location.search);
     const force = params.get("forceExitIntent") === "1";
     if (force) {
-      // Permet de tester même si la popup a déjà été montrée
       sessionStorage.removeItem("exitIntentShown");
       setHasShown(false);
     }
 
-    // Délai avant d'activer la détection (éviter les faux positifs au chargement)
-    const timeout = setTimeout(() => {
-      // Dans l'aperçu (iframe), les événements peuvent se comporter différemment.
-      // On écoute à la fois sur document et window pour maximiser les chances.
+    // Fallback : visibilité (changement d'onglet)
+    const onVisibility = () => {
+      if (document.visibilityState === "hidden") tryOpen();
+    };
+
+    // Délai avant d'activer la détection
+    const activationTimeout = setTimeout(() => {
       document.addEventListener("mouseout", handleMouseOut);
-      window.addEventListener("mouseout", handleMouseOut);
       window.addEventListener("blur", tryOpen);
       document.addEventListener("visibilitychange", onVisibility);
 
+      // Force immédiate si mode test
       if (force) {
-        setTimeout(() => tryOpen(), 400);
+        tryOpen();
       }
-    }, 1200);
+    }, 1500);
+
+    // Fallback automatique après 25 secondes sur la page (garantit l'affichage)
+    const autoShowTimeout = setTimeout(() => {
+      tryOpen();
+    }, 25000);
 
     return () => {
-      clearTimeout(timeout);
+      clearTimeout(activationTimeout);
+      clearTimeout(autoShowTimeout);
       document.removeEventListener("mouseout", handleMouseOut);
-      window.removeEventListener("mouseout", handleMouseOut);
       window.removeEventListener("blur", tryOpen);
       document.removeEventListener("visibilitychange", onVisibility);
     };
