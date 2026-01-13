@@ -12,7 +12,8 @@ const PaiementManuelPage = () => {
   const [copied, setCopied] = useState<string | null>(null);
 
   const paymentInfo = {
-    paypalMe: "https://paypal.me/VotreNom/37", // À remplacer par votre lien PayPal.me
+    paypalMe: "https://www.paypal.com/paypalme/boubetgeorges/37EUR",
+    paypalDirect: "https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=37&currency_code=EUR&item_name=EbookStudio%20Pro%20-%20Acces%20a%20Vie",
     iban: "FR76 XXXX XXXX XXXX XXXX XXXX XXX", // À remplacer par votre IBAN
     price: "37€",
     product: "EbookStudio Pro - Accès à Vie"
@@ -95,20 +96,18 @@ Cordialement`);
 
               {/* PayPal */}
               <a 
-                href={paymentInfo.paypalMe}
+                href={paymentInfo.paypalDirect}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block border-2 border-blue-200 rounded-lg p-4 hover:border-blue-400 hover:bg-blue-50 transition-all"
+                className="block border-2 border-blue-300 rounded-lg p-5 hover:border-blue-500 hover:bg-blue-50 transition-all bg-gradient-to-r from-blue-50 to-white"
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-blue-100 p-2 rounded-lg">
-                      <CreditCard className="w-5 h-5 text-blue-600" />
-                    </div>
-                    <div>
-                      <p className="font-semibold text-blue-700">💳 Payer avec PayPal</p>
-                      <p className="text-sm text-blue-600">Cliquez ici pour payer {paymentInfo.price} directement</p>
-                    </div>
+                <div className="flex items-center gap-4">
+                  <div className="bg-blue-500 p-3 rounded-xl">
+                    <CreditCard className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-blue-700 text-lg">💳 Payer 37€ avec PayPal</p>
+                    <p className="text-sm text-blue-600">Paiement sécurisé - Cliquez pour payer maintenant</p>
                   </div>
                 </div>
               </a>
