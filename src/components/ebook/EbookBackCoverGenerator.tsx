@@ -4,13 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FileText, Copy, Download, RefreshCw, Sparkles, Image as ImageIcon, Settings } from 'lucide-react';
+import { FileText, Copy, Download, RefreshCw, Sparkles, Image as ImageIcon, Settings, User, Type, Palette as PaletteIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { Chapter } from '@/hooks/useSubscriptionGeneration';
 import { supabase } from '@/integrations/supabase/client';
 import { OpenAIConfigPanel } from '@/components/shared/OpenAIConfigPanel';
 import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface EbookBackCoverGeneratorProps {
   ebookTitle: string;
@@ -40,6 +41,12 @@ export const EbookBackCoverGenerator: React.FC<EbookBackCoverGeneratorProps> = (
   const [isGeneratingCover, setIsGeneratingCover] = useState(false);
   const [coverStyle, setCoverStyle] = useState<string>('moderne');
   const [showConfig, setShowConfig] = useState(false);
+  
+  // Nouvelles options pour personnalisation avancée
+  const [includeAuthorName, setIncludeAuthorName] = useState<boolean>(true);
+  const [authorNamePosition, setAuthorNamePosition] = useState<string>('bottom');
+  const [includeBookSummary, setIncludeBookSummary] = useState<boolean>(true);
+  const [colorScheme, setColorScheme] = useState<string>('auto');
 
   const handleGenerate = async () => {
     console.log('[BackCover] handleGenerate called', { ebookTitle, authorName, chaptersLength: chapters.length });
@@ -121,7 +128,12 @@ export const EbookBackCoverGenerator: React.FC<EbookBackCoverGeneratorProps> = (
             genre: 'non-fiction',
             variation: i + 1,
             useOpenAI,
-            openaiApiKey: useOpenAI ? config.apiKey : undefined
+            openaiApiKey: useOpenAI ? config.apiKey : undefined,
+            // Nouvelles options de personnalisation
+            includeAuthorName,
+            authorNamePosition,
+            includeBookSummary,
+            colorScheme
           }
         });
 
@@ -230,7 +242,8 @@ export const EbookBackCoverGenerator: React.FC<EbookBackCoverGeneratorProps> = (
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Options de style */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label htmlFor="coverStyle">Style de couverture</Label>
               <Select value={coverStyle} onValueChange={setCoverStyle}>
@@ -238,33 +251,95 @@ export const EbookBackCoverGenerator: React.FC<EbookBackCoverGeneratorProps> = (
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="moderne">Moderne</SelectItem>
-                  <SelectItem value="minimaliste">Minimaliste</SelectItem>
-                  <SelectItem value="elegant">Élégant</SelectItem>
-                  <SelectItem value="dynamique">Dynamique</SelectItem>
+                  <SelectItem value="moderne">🎨 Moderne</SelectItem>
+                  <SelectItem value="minimaliste">◻️ Minimaliste</SelectItem>
+                  <SelectItem value="elegant">✨ Élégant</SelectItem>
+                  <SelectItem value="dynamique">⚡ Dynamique</SelectItem>
+                  <SelectItem value="classique">📖 Classique</SelectItem>
+                  <SelectItem value="creatif">🌈 Créatif</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex items-end">
-              <Button
-                onClick={handleGenerateCover}
-                disabled={isGeneratingCover || !ebookTitle || !authorName}
-                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
-              >
-                {isGeneratingCover ? (
-                  <>
-                    <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                    Génération...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="w-4 h-4 mr-2" />
-                    Générer 4ème de Couverture
-                  </>
-                )}
-              </Button>
+
+            <div className="space-y-2">
+              <Label htmlFor="colorScheme">Palette de couleurs</Label>
+              <Select value={colorScheme} onValueChange={setColorScheme}>
+                <SelectTrigger id="colorScheme">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="auto">🎯 Automatique (genre)</SelectItem>
+                  <SelectItem value="dark">🌙 Sombre</SelectItem>
+                  <SelectItem value="light">☀️ Clair</SelectItem>
+                  <SelectItem value="warm">🔥 Chaud (rouge/orange)</SelectItem>
+                  <SelectItem value="cold">❄️ Froid (bleu/violet)</SelectItem>
+                  <SelectItem value="nature">🌿 Nature (vert)</SelectItem>
+                  <SelectItem value="monochrome">⚫ Monochrome</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="authorNamePosition">Position nom auteur</Label>
+              <Select value={authorNamePosition} onValueChange={setAuthorNamePosition}>
+                <SelectTrigger id="authorNamePosition">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="bottom">📍 En bas</SelectItem>
+                  <SelectItem value="top">📍 En haut</SelectItem>
+                  <SelectItem value="center">📍 Centré</SelectItem>
+                  <SelectItem value="signature">✍️ Style signature</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
+
+          {/* Options d'inclusion */}
+          <div className="flex flex-wrap gap-6 p-3 bg-muted/50 rounded-lg">
+            <div className="flex items-center space-x-2">
+              <Checkbox 
+                id="includeAuthorName" 
+                checked={includeAuthorName} 
+                onCheckedChange={(checked) => setIncludeAuthorName(checked as boolean)} 
+              />
+              <Label htmlFor="includeAuthorName" className="text-sm flex items-center gap-1.5 cursor-pointer">
+                <User className="w-4 h-4 text-violet-500" />
+                Inclure nom de l'auteur
+              </Label>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <Checkbox 
+                id="includeBookSummary" 
+                checked={includeBookSummary} 
+                onCheckedChange={(checked) => setIncludeBookSummary(checked as boolean)} 
+              />
+              <Label htmlFor="includeBookSummary" className="text-sm flex items-center gap-1.5 cursor-pointer">
+                <Type className="w-4 h-4 text-blue-500" />
+                Zone résumé visible
+              </Label>
+            </div>
+          </div>
+
+          {/* Bouton de génération */}
+          <Button
+            onClick={handleGenerateCover}
+            disabled={isGeneratingCover || !ebookTitle || !authorName}
+            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+          >
+            {isGeneratingCover ? (
+              <>
+                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                Génération de 3 versions...
+              </>
+            ) : (
+              <>
+                <Sparkles className="w-4 h-4 mr-2" />
+                Générer 3 Versions de 4ème de Couverture
+              </>
+            )}
+          </Button>
 
           {coverImages.length > 0 && (
             <div className="mt-4 space-y-4">
