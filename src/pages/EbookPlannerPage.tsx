@@ -95,6 +95,7 @@ import EbookUrlImport from '@/components/ebook/EbookUrlImport';
 import EbookPlagiarismValidator from '@/components/ebook/EbookPlagiarismValidator';
 import EbookAmazonSimulator from '@/components/ebook/EbookAmazonSimulator';
 import EbookSeoArticleGenerator from '@/components/ebook/EbookSeoArticleGenerator';
+import EbookDocumentTransformer from '@/components/ebook/EbookDocumentTransformer';
 
 // Hooks et données
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
@@ -2081,6 +2082,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
             }}
           />
         );
+      
+      case 'doc-transform':
+        return <EbookDocumentTransformer />;
       
       case 'encyclopedia':
         return (
