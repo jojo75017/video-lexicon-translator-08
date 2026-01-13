@@ -110,3 +110,6 @@ verify_jwt = false
 
 [functions.ultimate-verdict]
 verify_jwt = false
+
+[functions.generate-seo-content]
+verify_jwt = false

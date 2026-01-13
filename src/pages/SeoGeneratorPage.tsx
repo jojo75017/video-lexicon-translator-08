@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Progress } from '@/components/ui/progress';
+import { supabase } from '@/integrations/supabase/client';
 import { 
   ArrowLeft, 
   Wand2, 
@@ -243,12 +244,15 @@ Voici les éléments essentiels à connaître sur ${keyword || 'ce sujet'}...`
     { value: 'social', label: 'Contenu social', icon: Users, description: 'Posts réseaux sociaux' }
   ];
 
-  const handleGenerateContent = async () => {
-    if (!hasValidApiKey) {
-      toast.error('Veuillez configurer votre clé API OpenAI');
-      return;
-    }
+  // Estimation de coût basée sur la longueur cible
+  const estimatedCost = React.useMemo(() => {
+    const words = contentConfig.targetLength || 2000;
+    // Estimation: ~0.002€ par 100 mots (gpt-4o-mini)
+    const cost = (words / 100) * 0.002 + 0.01; // + coût fixe d'analyse
+    return cost.toFixed(2);
+  }, [contentConfig.targetLength]);
 
+  const handleGenerateContent = async () => {
     if (!contentConfig.topic.trim() || !contentConfig.keyword.trim()) {
       toast.error('Veuillez renseigner le sujet et le mot-clé principal');
       return;
@@ -258,28 +262,49 @@ Voici les éléments essentiels à connaître sur ${keyword || 'ce sujet'}...`
     setGenerationProgress(0);
 
     try {
-      const steps = [
-        { message: 'Analyse sémantique du sujet...', progress: 15 },
-        { message: 'Recherche des mots-clés connexes...', progress: 30 },
-        { message: 'Génération de la structure...', progress: 50 },
-        { message: 'Rédaction du contenu...', progress: 75 },
-        { message: 'Optimisation SEO...', progress: 90 },
-        { message: 'Finalisation...', progress: 100 }
-      ];
-
-      for (const step of steps) {
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        setGenerationProgress(step.progress);
-        toast.loading(step.message, { id: 'generation-progress' });
+      // Vérifier l'authentification
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error('Veuillez vous connecter pour générer du contenu');
+        setIsGenerating(false);
+        return;
       }
 
-      // Génération du contenu selon le mot-clé
-      setGeneratedContent(generateContentForKeyword(contentConfig.keyword));
-      toast.success('✅ Contenu SEO professionnel généré !', { id: 'generation-progress' });
+      toast.loading('Génération IA en cours...', { id: 'generation-progress' });
+      setGenerationProgress(20);
+
+      // Appeler l'edge function avec vraie génération IA
+      const { data, error } = await supabase.functions.invoke('generate-seo-content', {
+        body: {
+          topic: contentConfig.topic,
+          keyword: contentConfig.keyword,
+          contentType: contentConfig.contentType,
+          targetLength: contentConfig.targetLength,
+          tone: contentConfig.tone,
+          audience: contentConfig.audience,
+          intent: contentConfig.intent,
+          language: contentConfig.language
+        }
+      });
+
+      setGenerationProgress(80);
+
+      if (error) {
+        console.error('Error calling generate-seo-content:', error);
+        throw new Error(error.message || 'Erreur lors de la génération');
+      }
+
+      if (data?.error) {
+        throw new Error(data.error);
+      }
+
+      setGenerationProgress(100);
+      setGeneratedContent(data);
+      toast.success('✅ Contenu SEO généré par IA !', { id: 'generation-progress' });
 
     } catch (error) {
       console.error('Erreur génération:', error);
-      toast.error('❌ Erreur lors de la génération', { id: 'generation-progress' });
+      toast.error(`❌ ${error instanceof Error ? error.message : 'Erreur lors de la génération'}`, { id: 'generation-progress' });
     } finally {
       setIsGenerating(false);
       setGenerationProgress(0);
@@ -395,10 +420,10 @@ Généré le ${new Date().toLocaleDateString('fr-FR')} avec le Générateur SEO 
                 </div>
               </div>
 
-              <div className="mt-6 flex items-center gap-4">
+              <div className="mt-6 flex flex-wrap items-center gap-4">
                 <Button 
                   onClick={handleGenerateContent} 
-                  disabled={isGenerating || !hasValidApiKey}
+                  disabled={isGenerating}
                   className="flex-1 md:flex-none"
                   size="lg"
                 >
@@ -419,6 +444,11 @@ Généré le ${new Date().toLocaleDateString('fr-FR')} avec le Générateur SEO 
                   <Download className="h-4 w-4 mr-2" />
                   Télécharger
                 </Button>
+
+                {/* Estimation de coût */}
+                <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-300">
+                  💰 Coût estimé: ~{estimatedCost}€
+                </Badge>
               </div>
 
               {isGenerating && (
