@@ -9,6 +9,7 @@ import { OpenAIConfigPanel } from '@/components/shared/OpenAIConfigPanel';
 import { ShoppingBag, Package, Star, Copy, Download, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import { createSafeHtml } from '@/utils/security/htmlSanitizer';
 
 const ProductGeneratorPage = () => {
   const [productTitle, setProductTitle] = useState('');
@@ -176,7 +177,7 @@ ${result.characteristics.map(char => `• ${char}`).join('\n')}
               <CardContent>
                 <div 
                   className="text-foreground leading-relaxed"
-                  dangerouslySetInnerHTML={{ __html: result.h2Section.content }}
+                  dangerouslySetInnerHTML={createSafeHtml(result.h2Section.content)}
                 />
               </CardContent>
             </Card>
