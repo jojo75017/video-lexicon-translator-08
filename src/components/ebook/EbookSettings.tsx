@@ -115,18 +115,32 @@ export const EbookSettings: React.FC<EbookSettingsProps> = ({
                     <p className="text-amber-600 dark:text-amber-400">Meilleurs modèles, réponses plus riches, résultats supérieurs</p>
                   </div>
                 </div>
-                <p className="text-xs text-blue-600 dark:text-blue-400">
-                  👉 Créez votre clé API sur{' '}
+                <div className="flex flex-wrap gap-2 text-xs mt-2">
                   <a 
                     href="https://platform.openai.com/api-keys" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="underline font-semibold hover:text-blue-800"
+                    className="inline-flex items-center gap-1 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 px-3 py-1.5 rounded-full hover:bg-blue-200 dark:hover:bg-blue-800/60 transition-colors"
                   >
-                    platform.openai.com/api-keys
+                    🔑 Créer ma clé API
                   </a>
-                  {' '}• Ajoutez du crédit pour débloquer les meilleurs résultats
-                </p>
+                  <a 
+                    href="https://platform.openai.com/settings/organization/billing/overview" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 px-3 py-1.5 rounded-full hover:bg-amber-200 dark:hover:bg-amber-800/60 transition-colors"
+                  >
+                    📊 Voir mon tier actuel
+                  </a>
+                  <a 
+                    href="https://platform.openai.com/settings/organization/billing/overview" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 px-3 py-1.5 rounded-full hover:bg-green-200 dark:hover:bg-green-800/60 transition-colors"
+                  >
+                    💳 Ajouter du crédit
+                  </a>
+                </div>
               </div>
             </div>
           </div>
