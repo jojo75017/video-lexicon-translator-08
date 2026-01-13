@@ -2570,6 +2570,22 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
               <p className="text-white/80 max-w-xl mx-auto mt-2">
                 Créez des ebooks professionnels avec l'intelligence artificielle
               </p>
+              
+              {/* Bouton spécial Import URL 2026 */}
+              <Button
+                type="button"
+                onClick={() => handleTabChange('url-import')}
+                className="mt-6 relative overflow-hidden bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 hover:from-violet-700 hover:via-purple-700 hover:to-fuchsia-700 text-white font-bold px-6 py-3 h-auto rounded-xl shadow-2xl shadow-purple-500/30 border border-white/20 group animate-pulse hover:animate-none"
+              >
+                <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                <span className="relative flex items-center gap-2">
+                  <span className="text-lg">🔗</span>
+                  <span>Créer depuis YouTube / Article</span>
+                  <Badge className="bg-amber-400 text-amber-900 font-black text-[10px] px-1.5 py-0 animate-bounce">
+                    2026
+                  </Badge>
+                </span>
+              </Button>
             </div>
           </div>
         </div>
