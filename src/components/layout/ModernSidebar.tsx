@@ -567,12 +567,19 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                             </span>
                           )}
                           
-                          {/* Indicateur de numéro pour les prompts premium */}
-                          {premiumItem.isPremium && premiumItem.promptNumber && !isCollapsed && !isActive && (
-                            <span className="ml-auto text-[9px] font-bold text-amber-500/60">
-                              P{premiumItem.promptNumber}
+                          {/* Badge 2026 */}
+                          {!isCollapsed && (
+                            <span className={cn(
+                              "ml-auto text-[8px] font-bold px-1 py-0.5 rounded",
+                              isActive 
+                                ? "bg-white/20 text-white" 
+                                : "bg-gradient-to-r from-amber-500 to-orange-500 text-white"
+                            )}>
+                              2026
                             </span>
                           )}
+                          
+                          {/* Indicateur de numéro pour les prompts premium (supprimé - remplacé par badge 2026) */}
                         </button>
                       );
 
