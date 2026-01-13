@@ -20,6 +20,7 @@ import {
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
+import { useConfetti } from '@/hooks/useConfetti';
 
 interface ExtractedContent {
   youtube?: { title: string; content: string; url: string };
@@ -49,6 +50,7 @@ interface EbookUrlImportProps {
 }
 
 const EbookUrlImport: React.FC<EbookUrlImportProps> = ({ onGuideGenerated }) => {
+  const { fireStars, fireSideCanons } = useConfetti();
   const [youtubeUrl, setYoutubeUrl] = useState('');
   const [articleUrl, setArticleUrl] = useState('');
   const [websiteUrl, setWebsiteUrl] = useState('');
@@ -123,7 +125,12 @@ const EbookUrlImport: React.FC<EbookUrlImportProps> = ({ onGuideGenerated }) => 
       if (data.success) {
         setGeneratedGuide(data.guide);
         setStep('generated');
-        toast.success("Guide pratique généré avec succès !");
+        
+        // 🎉 Effet confettis spectaculaire !
+        fireStars();
+        setTimeout(() => fireSideCanons(), 500);
+        
+        toast.success("🎉 Guide pratique généré avec succès !");
         onGuideGenerated?.(data.guide);
       } else {
         throw new Error(data.error || "Erreur lors de la génération");
