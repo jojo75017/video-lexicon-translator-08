@@ -44,7 +44,8 @@ import {
   Fingerprint,
   Award,
   Rocket,
-  Link
+  Link,
+  Globe
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -196,6 +197,7 @@ const categories: PremiumCategory[] = [
     color: 'from-green-500 via-emerald-500 to-teal-500',
     isPremiumCategory: false,
     items: [
+      { id: 'seo-articles', label: '📝 Articles SEO', icon: Globe, color: 'text-emerald-500', bgColor: 'bg-gradient-to-r from-emerald-500/20 to-teal-500/20', activeGradient: 'from-emerald-500 to-teal-500', isPremium: true },
       { id: 'marketing', label: 'Marketing', icon: MessageSquare, color: 'text-pink-500', bgColor: 'bg-pink-500/10', activeGradient: 'from-pink-500 to-rose-500' },
       { id: 'monetization', label: 'Monétisation', icon: DollarSign, color: 'text-green-500', bgColor: 'bg-green-500/10', activeGradient: 'from-green-500 to-emerald-500' },
       { id: 'price-estimator', label: 'Estimations Prix', icon: DollarSign, color: 'text-yellow-500', bgColor: 'bg-yellow-500/10', activeGradient: 'from-yellow-500 to-amber-500' },

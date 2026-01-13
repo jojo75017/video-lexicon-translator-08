@@ -94,6 +94,7 @@ import { cleanGeneratedText, cleanChapters } from '@/utils/textCleaner';
 import EbookUrlImport from '@/components/ebook/EbookUrlImport';
 import EbookPlagiarismValidator from '@/components/ebook/EbookPlagiarismValidator';
 import EbookAmazonSimulator from '@/components/ebook/EbookAmazonSimulator';
+import EbookSeoArticleGenerator from '@/components/ebook/EbookSeoArticleGenerator';
 
 // Hooks et données
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
@@ -2507,6 +2508,11 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
         // Rediriger vers la page affiliation
         navigate('/affiliation');
         return null;
+      
+      case 'seo-articles':
+        return (
+          <EbookSeoArticleGenerator />
+        );
       
       case 'admin':
         // Rediriger vers la page admin
