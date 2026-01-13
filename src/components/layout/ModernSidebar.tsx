@@ -70,6 +70,7 @@ interface MenuItem {
   activeGradient: string;
   isLink?: boolean;
   href?: string;
+  isNew2026?: boolean;
 }
 
 interface Category {
@@ -84,6 +85,7 @@ interface Category {
 interface PremiumMenuItem extends MenuItem {
   isPremium?: boolean;
   promptNumber?: number;
+  isNew2026?: boolean;
 }
 
 interface PremiumCategory extends Omit<Category, 'items'> {
@@ -99,7 +101,7 @@ const categories: PremiumCategory[] = [
     color: 'from-amber-400 via-orange-500 to-red-500',
     isPremiumCategory: true,
     items: [
-      { id: 'complete-workflow', label: '⚡ Générer Livre Complet', icon: Rocket, color: 'text-orange-500', bgColor: 'bg-gradient-to-r from-primary via-amber-500 to-orange-500', activeGradient: 'from-primary via-amber-500 to-orange-500', isPremium: true },
+      { id: 'complete-workflow', label: '⚡ Générer Livre Complet', icon: Rocket, color: 'text-orange-500', bgColor: 'bg-gradient-to-r from-primary via-amber-500 to-orange-500', activeGradient: 'from-primary via-amber-500 to-orange-500', isPremium: true, isNew2026: true },
       { id: 'editorial-director', label: '1. Directeur Éditorial', icon: Crown, color: 'text-amber-500', bgColor: 'bg-amber-500/10', activeGradient: 'from-amber-400 to-orange-500', isPremium: true, promptNumber: 1 },
       { id: 'market-analysis', label: '2. Analyse Marché', icon: Search, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10', activeGradient: 'from-emerald-400 to-teal-500', isPremium: true, promptNumber: 2 },
       { id: 'content-architect', label: '3. Architecte Contenu', icon: LayoutDashboard, color: 'text-violet-500', bgColor: 'bg-violet-500/10', activeGradient: 'from-violet-400 to-purple-500', isPremium: true, promptNumber: 3 },
@@ -145,17 +147,17 @@ const categories: PremiumCategory[] = [
     color: 'from-fuchsia-500 via-pink-500 to-rose-500',
     isPremiumCategory: false,
     items: [
-      { id: 'url-import', label: '🔗 Import URL', icon: Link, color: 'text-violet-500', bgColor: 'bg-gradient-to-r from-violet-500/20 to-purple-500/20', activeGradient: 'from-violet-500 to-purple-500', isPremium: true },
-      { id: 'doc-transform', label: '📄 Import Word/Doc', icon: FileText, color: 'text-blue-500', bgColor: 'bg-gradient-to-r from-blue-500/20 to-cyan-500/20', activeGradient: 'from-blue-500 to-cyan-500', isPremium: true },
+      { id: 'url-import', label: '🔗 Import URL', icon: Link, color: 'text-violet-500', bgColor: 'bg-gradient-to-r from-violet-500/20 to-purple-500/20', activeGradient: 'from-violet-500 to-purple-500', isPremium: true, isNew2026: true },
+      { id: 'doc-transform', label: '📄 Import Word/Doc', icon: FileText, color: 'text-blue-500', bgColor: 'bg-gradient-to-r from-blue-500/20 to-cyan-500/20', activeGradient: 'from-blue-500 to-cyan-500', isPremium: true, isNew2026: true },
       { id: 'planner', label: 'Planificateur', icon: BookOpen, color: 'text-fuchsia-500', bgColor: 'bg-fuchsia-500/10', activeGradient: 'from-fuchsia-500 to-pink-500' },
       { id: 'templates', label: 'Templates', icon: LayoutTemplate, color: 'text-cyan-500', bgColor: 'bg-cyan-500/10', activeGradient: 'from-cyan-500 to-teal-500' },
-      { id: 'encyclopedia', label: 'Encyclopédie', icon: BookMarked, color: 'text-amber-500', bgColor: 'bg-amber-500/10', activeGradient: 'from-amber-500 to-orange-500' },
-      { id: 'atlas', label: 'Atlas', icon: Map, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10', activeGradient: 'from-emerald-500 to-teal-500' },
+      { id: 'encyclopedia', label: 'Encyclopédie', icon: BookMarked, color: 'text-amber-500', bgColor: 'bg-amber-500/10', activeGradient: 'from-amber-500 to-orange-500', isNew2026: true },
+      { id: 'atlas', label: 'Atlas', icon: Map, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10', activeGradient: 'from-emerald-500 to-teal-500', isNew2026: true },
       { id: 'writing', label: 'Rédaction', icon: PenTool, color: 'text-blue-500', bgColor: 'bg-blue-500/10', activeGradient: 'from-blue-500 to-cyan-500' },
       { id: 'assistant', label: 'Assistant IA', icon: FileEdit, color: 'text-purple-500', bgColor: 'bg-purple-500/10', activeGradient: 'from-purple-500 to-violet-500' },
       { id: 'aichat', label: 'Chat IA', icon: Bot, color: 'text-orange-500', bgColor: 'bg-orange-500/10', activeGradient: 'from-orange-500 to-amber-500' },
       { id: 'characters', label: 'Personnages', icon: Users, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10', activeGradient: 'from-emerald-500 to-teal-500' },
-      { id: 'series', label: 'Série / Saga', icon: BookCopy, color: 'text-indigo-500', bgColor: 'bg-indigo-500/10', activeGradient: 'from-indigo-500 to-purple-500' },
+      { id: 'series', label: 'Série / Saga', icon: BookCopy, color: 'text-indigo-500', bgColor: 'bg-indigo-500/10', activeGradient: 'from-indigo-500 to-purple-500', isNew2026: true },
       { id: 'voice', label: 'Dictée Vocale', icon: Volume2, color: 'text-rose-500', bgColor: 'bg-rose-500/10', activeGradient: 'from-rose-500 to-pink-500' },
     ]
   },
@@ -180,9 +182,9 @@ const categories: PremiumCategory[] = [
     color: 'from-teal-500 via-cyan-500 to-sky-500',
     isPremiumCategory: false,
     items: [
-      { id: 'kdp-research', label: '🔍 Recherche KDP', icon: Search, color: 'text-amber-500', bgColor: 'bg-gradient-to-r from-amber-500/20 to-orange-500/20', activeGradient: 'from-amber-500 to-orange-500', isPremium: true },
-      { id: 'amazon-simulator', label: '🛒 Simulateur Amazon', icon: Eye, color: 'text-orange-500', bgColor: 'bg-gradient-to-r from-orange-500/20 to-amber-500/20', activeGradient: 'from-orange-500 to-amber-500', isPremium: true },
-      { id: 'plagiarism-validator', label: '🛡️ Anti-Plagiat', icon: Shield, color: 'text-red-500', bgColor: 'bg-gradient-to-r from-red-500/20 to-rose-500/20', activeGradient: 'from-red-500 to-rose-500', isPremium: true },
+      { id: 'kdp-research', label: '🔍 Recherche KDP', icon: Search, color: 'text-amber-500', bgColor: 'bg-gradient-to-r from-amber-500/20 to-orange-500/20', activeGradient: 'from-amber-500 to-orange-500', isPremium: true, isNew2026: true },
+      { id: 'amazon-simulator', label: '🛒 Simulateur Amazon', icon: Eye, color: 'text-orange-500', bgColor: 'bg-gradient-to-r from-orange-500/20 to-amber-500/20', activeGradient: 'from-orange-500 to-amber-500', isPremium: true, isNew2026: true },
+      { id: 'plagiarism-validator', label: '🛡️ Anti-Plagiat', icon: Shield, color: 'text-red-500', bgColor: 'bg-gradient-to-r from-red-500/20 to-rose-500/20', activeGradient: 'from-red-500 to-rose-500', isPremium: true, isNew2026: true },
       { id: 'editor-audit', label: 'Audit Éditeur', icon: FileEdit, color: 'text-violet-500', bgColor: 'bg-violet-500/10', activeGradient: 'from-violet-500 to-purple-500' },
       { id: 'export', label: 'Exporter', icon: Download, color: 'text-teal-500', bgColor: 'bg-teal-500/10', activeGradient: 'from-teal-500 to-cyan-500' },
       { id: 'kdp', label: 'Amazon KDP', icon: TrendingUp, color: 'text-sky-500', bgColor: 'bg-sky-500/10', activeGradient: 'from-sky-500 to-blue-500' },
@@ -198,7 +200,7 @@ const categories: PremiumCategory[] = [
     color: 'from-green-500 via-emerald-500 to-teal-500',
     isPremiumCategory: false,
     items: [
-      { id: 'seo-articles', label: '📝 Articles SEO', icon: Globe, color: 'text-emerald-500', bgColor: 'bg-gradient-to-r from-emerald-500/20 to-teal-500/20', activeGradient: 'from-emerald-500 to-teal-500', isPremium: true },
+      { id: 'seo-articles', label: '📝 Articles SEO', icon: Globe, color: 'text-emerald-500', bgColor: 'bg-gradient-to-r from-emerald-500/20 to-teal-500/20', activeGradient: 'from-emerald-500 to-teal-500', isPremium: true, isNew2026: true },
       { id: 'marketing', label: 'Marketing', icon: MessageSquare, color: 'text-pink-500', bgColor: 'bg-pink-500/10', activeGradient: 'from-pink-500 to-rose-500' },
       { id: 'monetization', label: 'Monétisation', icon: DollarSign, color: 'text-green-500', bgColor: 'bg-green-500/10', activeGradient: 'from-green-500 to-emerald-500' },
       { id: 'price-estimator', label: 'Estimations Prix', icon: DollarSign, color: 'text-yellow-500', bgColor: 'bg-yellow-500/10', activeGradient: 'from-yellow-500 to-amber-500' },
@@ -567,8 +569,8 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                             </span>
                           )}
                           
-                          {/* Badge 2026 */}
-                          {!isCollapsed && (
+                          {/* Badge 2026 - uniquement sur les nouvelles fonctionnalités */}
+                          {!isCollapsed && premiumItem.isNew2026 && (
                             <span className={cn(
                               "ml-auto text-[8px] font-bold px-1 py-0.5 rounded",
                               isActive 
