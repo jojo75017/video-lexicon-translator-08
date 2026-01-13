@@ -97,6 +97,33 @@ export const EbookSettings: React.FC<EbookSettingsProps> = ({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Alerte importante ChatGPT Plus vs API */}
+          <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
+            <div className="flex items-start gap-3">
+              <span className="text-2xl">⚠️</span>
+              <div className="space-y-2">
+                <p className="text-sm font-semibold text-blue-800 dark:text-blue-200">
+                  ChatGPT Plus ≠ Clé API (ce sont 2 choses différentes !)
+                </p>
+                <ul className="text-xs text-blue-700 dark:text-blue-300 space-y-1">
+                  <li>• <strong>ChatGPT Plus (20$/mois)</strong> = Abonnement au chatbot web - NE FONCTIONNE PAS ici</li>
+                  <li>• <strong>Clé API OpenAI</strong> = Facturation à l'usage (~0.01€ par requête) - C'EST ÇA qu'il vous faut</li>
+                </ul>
+                <p className="text-xs text-blue-600 dark:text-blue-400 mt-2">
+                  👉 Créez votre clé API gratuite sur{' '}
+                  <a 
+                    href="https://platform.openai.com/api-keys" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="underline font-semibold hover:text-blue-800"
+                  >
+                    platform.openai.com/api-keys
+                  </a>
+                  {' '}(ajoutez 5€ de crédit pour générer ~10 livres)
+                </p>
+              </div>
+            </div>
+          </div>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label htmlFor="openai-api-key" className="font-medium">Clé API OpenAI</Label>
