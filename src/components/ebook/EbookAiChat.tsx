@@ -14,7 +14,7 @@ interface Message {
   content: string;
 }
 
-export const EbookAiChat: React.FC = () => {
+export const EbookAiChat: React.FC<{ isDemo?: boolean }> = ({ isDemo = false }) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
@@ -45,11 +45,16 @@ export const EbookAiChat: React.FC = () => {
   };
 
   const saveApiKey = async () => {
+    if (isDemo) {
+      toast.error("Mode démo", { description: "La configuration de clé API est réservée aux abonnés." });
+      return;
+    }
+
     if (!tempApiKey.trim()) {
       toast.error('Veuillez entrer une clé API');
       return;
     }
-    
+
     if (!tempApiKey.startsWith('sk-')) {
       toast.error('La clé API doit commencer par "sk-"');
       return;
@@ -81,7 +86,14 @@ export const EbookAiChat: React.FC = () => {
 
   const handleSend = async () => {
     if (!input.trim()) return;
-    
+
+    if (isDemo) {
+      toast.error("Fonction réservée aux abonnés", {
+        description: "L'assistant IA est désactivé en mode démo.",
+      });
+      return;
+    }
+
     if (!apiKey) {
       toast.error('Veuillez configurer votre clé API OpenAI');
       setShowSettings(true);
