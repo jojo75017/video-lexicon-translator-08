@@ -45,6 +45,13 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { OpenAIConfigPanel } from '@/components/shared/OpenAIConfigPanel';
 import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
+import { TokenCounter } from '@/components/shared/TokenCounter';
+
+interface TokenUsage {
+  promptTokens: number;
+  completionTokens: number;
+  totalTokens: number;
+}
 
 const SeoGeneratorPage: React.FC = () => {
   const navigate = useNavigate();
@@ -54,6 +61,7 @@ const SeoGeneratorPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'article' | 'blog' | 'product' | 'landing' | 'social'>('article');
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationProgress, setGenerationProgress] = useState(0);
+  const [tokenUsage, setTokenUsage] = useState<TokenUsage | null>(null);
   
   // Configuration du contenu
   const [contentConfig, setContentConfig] = useState({
@@ -100,6 +108,12 @@ const SeoGeneratorPage: React.FC = () => {
       }
     }
   });
+
+  // Estimation des tokens basée sur la longueur cible
+  const estimatedTokens = React.useMemo(() => {
+    // Estimation: ~1.3 tokens par mot + tokens du prompt (~500)
+    return Math.ceil(contentConfig.targetLength * 1.3) + 500;
+  }, [contentConfig.targetLength]);
 
   // Fonction pour générer le contenu dynamiquement
   const generateContentForKeyword = (keyword: string) => {
@@ -260,6 +274,7 @@ Voici les éléments essentiels à connaître sur ${keyword || 'ce sujet'}...`
 
     setIsGenerating(true);
     setGenerationProgress(0);
+    setTokenUsage(null);
 
     try {
       // Vérifier l'authentification
@@ -300,6 +315,20 @@ Voici les éléments essentiels à connaître sur ${keyword || 'ce sujet'}...`
 
       setGenerationProgress(100);
       setGeneratedContent(data);
+      
+      // Mettre à jour les tokens si disponibles dans la réponse
+      if (data?.tokenUsage) {
+        setTokenUsage(data.tokenUsage);
+      } else {
+        // Estimation basée sur le contenu généré
+        const estimatedOutput = (data?.wordCount || 0) * 1.3;
+        setTokenUsage({
+          promptTokens: 500,
+          completionTokens: Math.ceil(estimatedOutput),
+          totalTokens: Math.ceil(500 + estimatedOutput)
+        });
+      }
+      
       toast.success('✅ Contenu SEO généré par IA !', { id: 'generation-progress' });
 
     } catch (error) {
@@ -464,6 +493,16 @@ Généré le ${new Date().toLocaleDateString('fr-FR')} avec le Générateur SEO 
 
           {/* Résultats de génération */}
           <div className="space-y-6">
+            {/* Compteur de tokens en temps réel */}
+            {(isGenerating || tokenUsage) && (
+              <TokenCounter
+                isGenerating={isGenerating}
+                tokenUsage={tokenUsage}
+                estimatedTokens={estimatedTokens}
+                model="gpt-4o-mini"
+              />
+            )}
+
             {/* Métriques globales */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <Card>

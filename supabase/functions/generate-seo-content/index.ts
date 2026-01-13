@@ -205,6 +205,18 @@ Rédige maintenant le contenu complet, optimisé pour le SEO et engageant pour l
     const contentData = await contentResponse.json();
     const generatedContent = contentData.choices?.[0]?.message?.content || '';
 
+    // Extract token usage from both API calls
+    const analysisTokens = analysisData.usage || { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 };
+    const contentTokens = contentData.usage || { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 };
+    
+    const totalTokenUsage = {
+      promptTokens: analysisTokens.prompt_tokens + contentTokens.prompt_tokens,
+      completionTokens: analysisTokens.completion_tokens + contentTokens.completion_tokens,
+      totalTokens: analysisTokens.total_tokens + contentTokens.total_tokens
+    };
+
+    console.log(`Token usage - Prompt: ${totalTokenUsage.promptTokens}, Completion: ${totalTokenUsage.completionTokens}, Total: ${totalTokenUsage.totalTokens}`);
+
     // Calculate actual word count
     const actualWordCount = generatedContent.split(/\s+/).filter((w: string) => w.length > 0).length;
     const estimatedReadTime = Math.ceil(actualWordCount / 200);
@@ -229,7 +241,8 @@ Rédige maintenant le contenu complet, optimisé pour le SEO et engageant pour l
       technicalSEO: {
         pagespeed: { mobile: 85, desktop: 92 },
         mobileOptimization: { score: 88 }
-      }
+      },
+      tokenUsage: totalTokenUsage
     };
 
     console.log(`SEO content generated successfully: ${actualWordCount} words, score: ${result.seoScore}`);
