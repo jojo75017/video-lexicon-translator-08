@@ -59,7 +59,8 @@ serve(async (req) => {
     }
 
     try {
-      event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+      // Use async version for Deno compatibility
+      event = await stripe.webhooks.constructEventAsync(body, signature, webhookSecret);
       console.log("Event verified successfully, type:", event.type);
     } catch (signatureErr: any) {
       console.error("Webhook signature verification failed:", signatureErr.message);
