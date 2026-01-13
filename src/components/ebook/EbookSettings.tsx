@@ -97,20 +97,26 @@ export const EbookSettings: React.FC<EbookSettingsProps> = ({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Alerte importante ChatGPT Plus vs API */}
-          <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
+          {/* Info sur les offres OpenAI */}
+          <div className="bg-gradient-to-r from-blue-50 to-violet-50 dark:from-blue-950/30 dark:to-violet-950/30 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
             <div className="flex items-start gap-3">
-              <span className="text-2xl">⚠️</span>
-              <div className="space-y-2">
+              <span className="text-2xl">💡</span>
+              <div className="space-y-3">
                 <p className="text-sm font-semibold text-blue-800 dark:text-blue-200">
-                  ChatGPT Plus ≠ Clé API (ce sont 2 choses différentes !)
+                  Offre gratuite ou payante ? À vous de choisir !
                 </p>
-                <ul className="text-xs text-blue-700 dark:text-blue-300 space-y-1">
-                  <li>• <strong>ChatGPT Plus (20$/mois)</strong> = Abonnement au chatbot web - NE FONCTIONNE PAS ici</li>
-                  <li>• <strong>Clé API OpenAI</strong> = Facturation à l'usage (~0.01€ par requête) - C'EST ÇA qu'il vous faut</li>
-                </ul>
-                <p className="text-xs text-blue-600 dark:text-blue-400 mt-2">
-                  👉 Créez votre clé API gratuite sur{' '}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                  <div className="bg-white/60 dark:bg-white/5 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
+                    <p className="font-semibold text-gray-700 dark:text-gray-300 mb-1">🆓 Offre Gratuite (Tier 1)</p>
+                    <p className="text-gray-600 dark:text-gray-400">Crédits limités, modèles standards, parfait pour tester</p>
+                  </div>
+                  <div className="bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20 rounded-lg p-3 border border-amber-300 dark:border-amber-700">
+                    <p className="font-semibold text-amber-700 dark:text-amber-300 mb-1">⭐ Offre Payante (Tier 2+)</p>
+                    <p className="text-amber-600 dark:text-amber-400">Meilleurs modèles, réponses plus riches, résultats supérieurs</p>
+                  </div>
+                </div>
+                <p className="text-xs text-blue-600 dark:text-blue-400">
+                  👉 Créez votre clé API sur{' '}
                   <a 
                     href="https://platform.openai.com/api-keys" 
                     target="_blank" 
@@ -119,7 +125,7 @@ export const EbookSettings: React.FC<EbookSettingsProps> = ({
                   >
                     platform.openai.com/api-keys
                   </a>
-                  {' '}(ajoutez 5€ de crédit pour générer ~10 livres)
+                  {' '}• Ajoutez du crédit pour débloquer les meilleurs résultats
                 </p>
               </div>
             </div>
