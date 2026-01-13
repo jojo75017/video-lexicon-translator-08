@@ -113,3 +113,9 @@ verify_jwt = false
 
 [functions.generate-seo-content]
 verify_jwt = false
+
+[functions.extract-url-content]
+verify_jwt = false
+
+[functions.generate-from-urls]
+verify_jwt = false
