@@ -10,7 +10,9 @@ import {
   Copy, Download, BookOpen, ChevronRight, Eye, ChevronLeft, ArrowLeft,
   Search, Star, StarOff, CheckCircle2, Circle, Play, Clock, Filter,
   Sparkles, GraduationCap, Trophy, Target, Zap, Layers, Settings,
-  Image, TrendingUp, Megaphone, DollarSign, FileOutput, Rocket, HelpCircle
+  Image, TrendingUp, Megaphone, DollarSign, FileOutput, Rocket, HelpCircle,
+  Link, Shield, ShoppingCart, FileText, Mic, Globe, Volume2, Palette,
+  BarChart3, Users, Brain, Wand2
 } from 'lucide-react';
 import { toast } from 'sonner';
 import jsPDF from 'jspdf';
@@ -887,6 +889,174 @@ ${module.content}
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Section Fonctionnalités 2026 */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="mb-12"
+        >
+          <Card className="overflow-hidden border-2 border-amber-500/30 bg-gradient-to-br from-amber-500/5 via-background to-orange-500/10">
+            <CardHeader className="text-center pb-4">
+              <div className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-orange-600 text-white px-4 py-2 rounded-full text-sm font-semibold mb-4 mx-auto">
+                <Rocket className="h-4 w-4" />
+                Nouvelles Fonctionnalités
+                <span className="bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded-full ml-1 animate-pulse">
+                  2026
+                </span>
+              </div>
+              <CardTitle className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 bg-clip-text text-transparent">
+                Les Outils Exclusifs 2026
+              </CardTitle>
+              <p className="text-muted-foreground mt-2 text-lg">
+                Des fonctionnalités révolutionnaires pour maximiser votre productivité
+              </p>
+            </CardHeader>
+            <CardContent className="px-6 pb-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {[
+                  { 
+                    icon: Link, 
+                    title: 'Import URL', 
+                    desc: 'Transformez vidéos YouTube et articles en ebooks structurés automatiquement',
+                    color: 'from-blue-500 to-cyan-500',
+                    badge: 'Nouveau'
+                  },
+                  { 
+                    icon: Shield, 
+                    title: 'Anti-Plagiat', 
+                    desc: 'Analyse d\'originalité et détection des marqueurs IA dans votre texte',
+                    color: 'from-green-500 to-emerald-500',
+                    badge: 'Nouveau'
+                  },
+                  { 
+                    icon: ShoppingCart, 
+                    title: 'Simulateur Amazon', 
+                    desc: 'Prévisualisez votre fiche produit KDP avant publication',
+                    color: 'from-orange-500 to-amber-500',
+                    badge: 'Nouveau'
+                  },
+                  { 
+                    icon: BarChart3, 
+                    title: 'Comparateur KDP', 
+                    desc: 'Analysez les bestsellers et identifiez les opportunités de marché',
+                    color: 'from-purple-500 to-violet-500',
+                    badge: 'Nouveau'
+                  },
+                  { 
+                    icon: Globe, 
+                    title: 'Encyclopédie IA', 
+                    desc: 'Générez jusqu\'à 50 fiches encyclopédiques en une seule session',
+                    color: 'from-teal-500 to-cyan-500',
+                    badge: 'Nouveau'
+                  },
+                  { 
+                    icon: FileText, 
+                    title: 'Atlas Géographique', 
+                    desc: 'Créez des guides de voyage et atlas thématiques complets',
+                    color: 'from-indigo-500 to-blue-500',
+                    badge: 'Nouveau'
+                  },
+                  { 
+                    icon: Users, 
+                    title: 'Série / Saga', 
+                    desc: 'Gérez vos bibles de série et maintenez la cohérence narrative',
+                    color: 'from-pink-500 to-rose-500',
+                    badge: 'Nouveau'
+                  },
+                  { 
+                    icon: Wand2, 
+                    title: 'Articles SEO', 
+                    desc: 'Générez des articles optimisés pour le référencement de votre livre',
+                    color: 'from-yellow-500 to-orange-500',
+                    badge: 'Nouveau'
+                  },
+                  { 
+                    icon: Volume2, 
+                    title: 'Audiobook Pro', 
+                    desc: 'Convertissez vos chapitres en audio avec voix ElevenLabs',
+                    color: 'from-red-500 to-pink-500',
+                    badge: 'Premium'
+                  },
+                  { 
+                    icon: Palette, 
+                    title: 'Images Chapitres', 
+                    desc: 'Générez des illustrations cohérentes pour chaque chapitre',
+                    color: 'from-fuchsia-500 to-purple-500',
+                    badge: 'Premium'
+                  },
+                  { 
+                    icon: Brain, 
+                    title: 'Dictaphone IA', 
+                    desc: 'Dictez vos idées, l\'IA les transcrit et améliore en temps réel',
+                    color: 'from-cyan-500 to-blue-500',
+                    badge: 'Premium'
+                  },
+                  { 
+                    icon: FileOutput, 
+                    title: 'Export Google Docs', 
+                    desc: 'Exportez directement vers Google Docs avec mise en forme KDP',
+                    color: 'from-lime-500 to-green-500',
+                    badge: 'Premium'
+                  },
+                ].map((feature, index) => {
+                  const FeatureIcon = feature.icon;
+                  return (
+                    <motion.div
+                      key={feature.title}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: index * 0.05 }}
+                      whileHover={{ scale: 1.02, y: -2 }}
+                      className="relative p-5 rounded-xl bg-card border border-border hover:border-amber-500/50 hover:shadow-xl hover:shadow-amber-500/10 transition-all duration-300 group cursor-pointer"
+                    >
+                      {/* Badge */}
+                      <span className={`absolute top-3 right-3 text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                        feature.badge === 'Nouveau' 
+                          ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white' 
+                          : 'bg-gradient-to-r from-violet-500 to-purple-500 text-white'
+                      }`}>
+                        {feature.badge}
+                      </span>
+                      
+                      {/* Icon */}
+                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center shadow-lg mb-4 group-hover:scale-110 transition-transform`}>
+                        <FeatureIcon className="h-6 w-6 text-white" />
+                      </div>
+                      
+                      {/* Content */}
+                      <h4 className="font-bold text-lg mb-2 group-hover:text-amber-500 transition-colors">
+                        {feature.title}
+                      </h4>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        {feature.desc}
+                      </p>
+                    </motion.div>
+                  );
+                })}
+              </div>
+              
+              {/* CTA */}
+              <motion.div 
+                className="mt-8 text-center"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.6 }}
+              >
+                <Button 
+                  size="lg"
+                  onClick={() => navigate(isSubscriber ? '/ebook-planner' : '/offres')}
+                  className="gap-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-amber-500/25"
+                >
+                  <Rocket className="h-5 w-5" />
+                  Découvrir toutes les fonctionnalités 2026
+                  <ChevronRight className="h-5 w-5" />
+                </Button>
+              </motion.div>
+            </CardContent>
+          </Card>
+        </motion.div>
 
         {/* Filtres et recherche */}
         <div className="mb-8 space-y-4">
