@@ -312,12 +312,35 @@ const SeoCreerEbookIaPage: React.FC = () => {
       </section>
 
       {/* Footer */}
-      <footer className="py-8 px-4 bg-gray-900 text-gray-400 text-center text-sm">
-        <p>© 2025 EbookiaPro - Générateur d'ebooks avec l'IA</p>
-        <div className="flex justify-center gap-4 mt-4">
-          <a href="/offres" className="hover:text-white transition-colors">Offres</a>
-          <a href="/formation" className="hover:text-white transition-colors">Formation</a>
-          <a href="/demo" className="hover:text-white transition-colors">Démo gratuite</a>
+      <footer className="py-10 px-4 bg-gray-900 text-gray-400">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-8 mb-8">
+            <div>
+              <h4 className="font-semibold text-white mb-3">📚 Guides SEO</h4>
+              <ul className="space-y-2 text-sm">
+                <li><a href="/ecrire-livre-chatgpt" className="hover:text-violet-400 transition-colors">Écrire un livre avec ChatGPT</a></li>
+                <li><a href="/generateur-ebook" className="hover:text-violet-400 transition-colors">Générateur ebook IA</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold text-white mb-3">🚀 Produit</h4>
+              <ul className="space-y-2 text-sm">
+                <li><a href="/offres" className="hover:text-violet-400 transition-colors">Voir les offres</a></li>
+                <li><a href="/demo" className="hover:text-violet-400 transition-colors">Essai gratuit</a></li>
+                <li><a href="/formation" className="hover:text-violet-400 transition-colors">Formation</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold text-white mb-3">💡 Ressources</h4>
+              <ul className="space-y-2 text-sm">
+                <li><a href="/valeur-offre" className="hover:text-violet-400 transition-colors">Valeur de l'offre</a></li>
+                <li><a href="/ebook-planner" className="hover:text-violet-400 transition-colors">Accéder au générateur</a></li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-gray-800 pt-6 text-center text-sm">
+            <p>© 2025 EbookiaPro - Générateur d'ebooks avec l'IA</p>
+          </div>
         </div>
       </footer>
     </div>
