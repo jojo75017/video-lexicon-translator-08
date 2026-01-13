@@ -96,6 +96,7 @@ import EbookPlagiarismValidator from '@/components/ebook/EbookPlagiarismValidato
 import EbookAmazonSimulator from '@/components/ebook/EbookAmazonSimulator';
 import EbookSeoArticleGenerator from '@/components/ebook/EbookSeoArticleGenerator';
 import EbookDocumentTransformer from '@/components/ebook/EbookDocumentTransformer';
+import EbookAmazonAdsSimulator from '@/components/ebook/EbookAmazonAdsSimulator';
 
 // Hooks et données
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
@@ -2232,6 +2233,14 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
           <EbookAmazonSimulator 
             title={ebookTitle}
             authorName={authorName}
+          />
+        );
+      
+      case 'amazon-ads':
+        return (
+          <EbookAmazonAdsSimulator 
+            ebookTitle={ebookTitle}
+            genre={genre}
           />
         );
       
