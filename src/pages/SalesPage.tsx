@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -24,6 +24,7 @@ const SalesPage = () => {
   const [showEmailDialog, setShowEmailDialog] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [email, setEmail] = useState("");
+  const emailInputRef = useRef<HTMLInputElement | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
@@ -133,17 +134,24 @@ const SalesPage = () => {
   };
 
   const handleCheckout = async () => {
-    if (!email || !selectedPlan) {
+    const normalizedEmail = (email || emailInputRef.current?.value || "")
+      .trim()
+      .toLowerCase();
+
+    if (!normalizedEmail || !selectedPlan) {
       toast.error("Veuillez entrer votre email");
       return;
     }
+
+    // Synchroniser l'état au cas où le navigateur a auto-rempli le champ sans déclencher onChange
+    if (normalizedEmail !== email) setEmail(normalizedEmail);
 
     setIsLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("stripe-checkout", {
         body: {
           planId: selectedPlan,
-          email,
+          email: normalizedEmail,
           successUrl: `${window.location.origin}/paiement-succes`,
           cancelUrl: `${window.location.origin}/offres`,
         },
@@ -154,12 +162,12 @@ const SalesPage = () => {
       if (data?.url) {
         // Stocker le sessionId pour récupération ultérieure
         localStorage.setItem('pending_stripe_session', data.sessionId);
-        localStorage.setItem('pending_stripe_email', email);
-        
+        localStorage.setItem('pending_stripe_email', normalizedEmail);
+
         // Fermer la modale et rediriger
         setShowEmailDialog(false);
         setIsLoading(false);
-        
+
         // Utiliser href car assign peut être bloqué dans certains contextes
         window.location.href = data.url;
       } else {
@@ -785,17 +793,20 @@ const SalesPage = () => {
           </DialogHeader>
           <div className="space-y-4 pt-4">
             <Input
+              ref={emailInputRef}
               type="email"
               placeholder="votre@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              onInput={(e) => setEmail(e.currentTarget.value)}
               disabled={isLoading}
+              autoComplete="email"
             />
             <Button 
               className="w-full" 
               size="lg"
               onClick={handleCheckout}
-              disabled={isLoading || !email}
+              disabled={isLoading}
             >
               {isLoading ? (
                 <>
