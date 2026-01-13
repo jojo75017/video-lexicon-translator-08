@@ -14,6 +14,10 @@ import { generateKdpNichesPdf } from "@/utils/generateKdpNichesPdf";
 import SocialProofNotifications from "@/components/sales/SocialProofNotifications";
 import KdpRoiCalculator from "@/components/sales/KdpRoiCalculator";
 import StickyCtaBar from "@/components/sales/StickyCtaBar";
+import LiveEbookCounter from "@/components/sales/LiveEbookCounter";
+import LiveActivityNotifications from "@/components/sales/LiveActivityNotifications";
+import AuthorQuiz from "@/components/sales/AuthorQuiz";
+import SuccessGallery from "@/components/sales/SuccessGallery";
 const SalesPage = () => {
   const navigate = useNavigate();
   const [showDemo, setShowDemo] = useState(false);
@@ -302,6 +306,11 @@ const SalesPage = () => {
             </Button>
           </div>
 
+          {/* Compteur live */}
+          <div className="flex justify-center mb-8">
+            <LiveEbookCounter variant="compact" />
+          </div>
+
           {/* Stats */}
           <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto">
             <div className="text-center">
@@ -317,6 +326,13 @@ const SalesPage = () => {
               <div className="text-sm text-muted-foreground">Satisfaction</div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Quiz Section */}
+      <section className="py-16 px-4 bg-gradient-to-br from-primary/5 via-violet-500/5 to-background">
+        <div className="max-w-4xl mx-auto">
+          <AuthorQuiz showEmailCapture={true} />
         </div>
       </section>
 
@@ -646,6 +662,13 @@ const SalesPage = () => {
         </div>
       </section>
 
+      {/* Success Stories Gallery */}
+      <section className="py-20 px-4 bg-gradient-to-br from-background via-primary/5 to-background">
+        <div className="max-w-6xl mx-auto">
+          <SuccessGallery variant="grid" limit={3} />
+        </div>
+      </section>
+
       {/* FAQ Section */}
       <section className="py-20 px-4">
         <div className="max-w-3xl mx-auto">
@@ -907,8 +930,11 @@ const SalesPage = () => {
       {/* Exit Intent Popup */}
       <ExitIntentPopup />
 
-      {/* Social Proof Notifications */}
-      <SocialProofNotifications />
+      {/* Live Activity Notifications - remplace SocialProofNotifications */}
+      <LiveActivityNotifications position="bottom-left" intervalMs={30000} />
+
+      {/* Sticky CTA Bar */}
+      <StickyCtaBar spotsLeft={39} totalSpots={50} />
 
       {/* Sticky CTA Bar */}
       <StickyCtaBar spotsLeft={39} totalSpots={50} />
