@@ -172,12 +172,28 @@ export const EbookSettings: React.FC<EbookSettingsProps> = ({
                 {isValidating ? 'Validation...' : 'Valider'}
               </Button>
             </div>
-            <p className="text-xs text-muted-foreground">
-              {configApiKey ? 
-                "✓ Votre clé est stockée localement dans votre navigateur (sécurisée)" : 
-                "⚠️ Obtenez votre clé sur platform.openai.com/api-keys"
-              }
-            </p>
+            {isValid === true ? (
+              <div className="bg-green-50 dark:bg-green-950/30 border border-green-300 dark:border-green-700 rounded-lg p-3 mt-2">
+                <div className="flex items-start gap-2">
+                  <span className="text-lg">🎉</span>
+                  <div className="text-xs text-green-700 dark:text-green-300">
+                    <p className="font-semibold mb-1">Clé validée ! Tout est automatique maintenant :</p>
+                    <ul className="space-y-0.5 text-green-600 dark:text-green-400">
+                      <li>✓ Vos générations utilisent votre clé personnelle</li>
+                      <li>✓ La facturation va directement sur votre compte OpenAI</li>
+                      <li>✓ Aucune autre configuration nécessaire</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                {configApiKey ? 
+                  "✓ Votre clé est stockée localement dans votre navigateur (sécurisée)" : 
+                  "⚠️ Obtenez votre clé sur platform.openai.com/api-keys"
+                }
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">
