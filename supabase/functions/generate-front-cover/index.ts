@@ -69,10 +69,16 @@ serve(async (req) => {
       bindingType = 'paperback',
       spineWidth = '0.45',
       dimensions = null,
-      backCoverText = ''
+      backCoverText = '',
+      // Nouvelles options de personnalisation
+      authorNamePosition = 'bottom',
+      authorNameStyle = 'elegant',
+      colorScheme = 'auto',
+      titlePosition = 'center',
+      showAuthorOnCover = true
     } = await req.json();
 
-    console.log('Generating cover:', { ebookTitle, authorName, genre, style, coverType, bookFormat, pageCount });
+    console.log('Generating cover:', { ebookTitle, authorName, genre, style, coverType, bookFormat, pageCount, colorScheme, authorNamePosition });
 
     if (!ebookTitle) {
       return new Response(
@@ -93,6 +99,41 @@ serve(async (req) => {
     const styleDesc = stylePrompts[style] || stylePrompts.professional;
     const genreDesc = genrePrompts[genre] || genrePrompts['non-fiction'];
 
+    // Descriptions pour les nouvelles options
+    const colorSchemeDesc: Record<string, string> = {
+      'auto': 'couleurs adaptées au genre du livre',
+      'dark': 'fond sombre (noir, gris foncé, bleu nuit), texte clair et contrasté',
+      'light': 'fond clair (blanc, crème, beige), texte foncé élégant',
+      'warm': 'tons chauds (rouge, orange, doré, ambre), ambiance chaleureuse',
+      'cold': 'tons froids (bleu, violet, cyan, argent), ambiance mystérieuse',
+      'nature': 'tons naturels (vert forêt, brun, beige, terre), organique',
+      'monochrome': 'noir et blanc élégant avec nuances de gris',
+      'pastel': 'couleurs pastel douces et apaisantes',
+      'vibrant': 'couleurs vives et saturées, impactantes'
+    };
+
+    const authorPositionDesc: Record<string, string> = {
+      'bottom': 'en bas de la couverture, centré horizontalement',
+      'top': 'en haut de la couverture, sous ou au-dessus du titre',
+      'below-title': 'directement sous le titre principal',
+      'signature': 'en style signature manuscrite élégante, positionné de manière artistique'
+    };
+
+    const authorStyleDesc: Record<string, string> = {
+      'elegant': 'typographie élégante et raffinée, lettres espacées',
+      'bold': 'typographie grasse et impactante, très visible',
+      'script': 'typographie script manuscrite, artistique',
+      'minimal': 'typographie minimaliste, fine et discrète',
+      'serif': 'typographie serif classique, traditionnelle'
+    };
+
+    const titlePositionDesc: Record<string, string> = {
+      'top': 'le titre en haut de la couverture',
+      'center': 'le titre centré verticalement',
+      'bottom': 'le titre dans la partie inférieure',
+      'overlay': 'le titre superposé sur l\'illustration de manière intégrée'
+    };
+
     let imagePrompt = '';
 
     if (coverType === 'full') {
@@ -100,10 +141,13 @@ serve(async (req) => {
       imagePrompt = `Create a COMPLETE BOOK COVER for Amazon KDP print publication. This must include FRONT COVER, SPINE, and BACK COVER in a single horizontal image.
 
 CRITICAL - TEXT REQUIREMENTS (MOST IMPORTANT):
-- The TITLE "${ebookTitle}" MUST be clearly visible and readable on the front cover
-- The AUTHOR NAME "${authorName}" MUST appear on both the front cover and spine
+- The TITLE "${ebookTitle}" MUST be clearly visible and readable on the front cover, positioned ${titlePositionDesc[titlePosition] || titlePositionDesc['center']}
+${showAuthorOnCover ? `- The AUTHOR NAME "${authorName}" MUST appear ${authorPositionDesc[authorNamePosition] || authorPositionDesc['bottom']} with ${authorStyleDesc[authorNameStyle] || authorStyleDesc['elegant']} typography` : '- NO author name on front cover'}
+- The author name MUST also appear on the spine
 - All text must be LARGE, BOLD, and HIGH CONTRAST against the background
 - Use professional typography that stands out
+
+COLOR SCHEME: ${colorSchemeDesc[colorScheme] || colorSchemeDesc['auto']}
 
 BOOK DETAILS:
 - Title: "${ebookTitle}"
@@ -116,8 +160,8 @@ LAYOUT (LEFT TO RIGHT):
 BACK COVER (LEFT) | SPINE (CENTER) | FRONT COVER (RIGHT)
 
 FRONT COVER (RIGHT SIDE - Most Important):
-1. TITLE "${ebookTitle}" - LARGE, PROMINENT, TOP OR CENTER, must be clearly readable
-2. Author name "${authorName}" - At bottom, clearly visible
+1. TITLE "${ebookTitle}" - LARGE, PROMINENT, ${titlePositionDesc[titlePosition] || 'centered'}, must be clearly readable
+${showAuthorOnCover ? `2. Author name "${authorName}" - ${authorPositionDesc[authorNamePosition] || 'at bottom'}, ${authorStyleDesc[authorNameStyle] || 'elegant'} style` : '2. NO author name displayed'}
 ${subtitle ? `3. Subtitle "${subtitle}" - Below title` : ''}
 4. Compelling visual illustration matching the ${genre} genre and ${style} style
 
@@ -127,7 +171,8 @@ SPINE (CENTER - NARROW VERTICAL STRIP):
 
 BACK COVER (LEFT SIDE):
 ${backCoverText ? `1. Synopsis/marketing text: "${backCoverText.substring(0, 200)}"` : '1. Clean space for synopsis'}
-2. Leave empty space for author bio (NO faces, NO people)
+2. Author section with name "${authorName}" prominently displayed
+3. Leave space for author photo
 
 CRITICAL PROHIBITIONS - DO NOT INCLUDE:
 - NO ISBN barcode
@@ -138,7 +183,7 @@ CRITICAL PROHIBITIONS - DO NOT INCLUDE:
 - NO publisher logos
 
 DESIGN:
-- Professional ${style} aesthetic
+- Professional ${style} aesthetic with ${colorSchemeDesc[colorScheme] || 'appropriate'} colors
 - Seamless design flowing across all sections
 - Full bleed - NO white borders
 - High contrast for readability
@@ -159,14 +204,21 @@ ${subtitle ? `- Subtitle: "${subtitle}"` : ''}
 - Style: ${styleDesc}
 - Book format: ${bookFormat}
 
+COLOR SCHEME: ${colorSchemeDesc[colorScheme] || colorSchemeDesc['auto']}
+Apply this color palette throughout the design for a cohesive look.
+
 DESIGN REQUIREMENTS:
-1. TITLE "${ebookTitle}" must be prominently displayed, large and clearly readable
-2. AUTHOR NAME "${authorName}" at the bottom, smaller but visible
+1. TITLE "${ebookTitle}" must be prominently displayed, ${titlePositionDesc[titlePosition] || 'centered'}, large and clearly readable
+${showAuthorOnCover ? `2. AUTHOR NAME "${authorName}" positioned ${authorPositionDesc[authorNamePosition] || 'at the bottom'}, with ${authorStyleDesc[authorNameStyle] || 'elegant'} typography style` : '2. NO author name on this cover'}
 ${subtitle ? `3. SUBTITLE "${subtitle}" below the main title, medium size` : ''}
 4. Create a compelling visual illustration that represents the book theme
-5. Use appropriate color palette for the ${genre} genre
+5. Use the ${colorSchemeDesc[colorScheme] || 'appropriate'} color palette
 6. Professional typography that fits the ${style} style
 7. High-quality book cover composition
+
+TYPOGRAPHY SPECIFICATIONS:
+- Title: Large, bold, high contrast, ${titlePositionDesc[titlePosition] || 'centered'}
+${showAuthorOnCover ? `- Author name: ${authorStyleDesc[authorNameStyle] || 'Elegant'}, positioned ${authorPositionDesc[authorNamePosition] || 'at bottom'}` : ''}
 
 TECHNICAL SPECIFICATIONS:
 - Portrait format (book cover standard ratio 2:3)
