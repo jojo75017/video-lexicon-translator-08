@@ -24,19 +24,6 @@ const ExitIntentPopup = ({ onContinueToOffer }: ExitIntentPopupProps) => {
     sessionStorage.setItem("exitIntentShown", "true");
   }, [hasShown]);
 
-  const handleMouseOut = useCallback(
-    (e: MouseEvent) => {
-      // Plus fiable que "mouseleave" dans les iframes :
-      // - relatedTarget null => sortie du document
-      // - clientY proche du haut => intention de fermer l'onglet/la fenêtre
-      const leavingDocument = (e as any).relatedTarget === null;
-      if (leavingDocument && e.clientY <= 10) {
-        tryOpen();
-      }
-    },
-    [tryOpen]
-  );
-
   useEffect(() => {
     // Mode test : /offres?forceExitIntent=1
     const params = new URLSearchParams(window.location.search);
@@ -44,38 +31,42 @@ const ExitIntentPopup = ({ onContinueToOffer }: ExitIntentPopupProps) => {
     if (force) {
       sessionStorage.removeItem("exitIntentShown");
       setHasShown(false);
+      setTimeout(() => tryOpen(), 500);
+      return;
     }
 
-    // Fallback : visibilité (changement d'onglet)
-    const onVisibility = () => {
-      if (document.visibilityState === "hidden") tryOpen();
-    };
+    // Détection "scroll up" (l'utilisateur remonte après avoir descendu)
+    let lastScrollY = window.scrollY;
+    let maxScrollY = 0;
+    let hasScrolledDown = false;
 
-    // Délai avant d'activer la détection
-    const activationTimeout = setTimeout(() => {
-      document.addEventListener("mouseout", handleMouseOut);
-      window.addEventListener("blur", tryOpen);
-      document.addEventListener("visibilitychange", onVisibility);
+    const handleScroll = () => {
+      const currentY = window.scrollY;
+      
+      // Enregistrer le max atteint
+      if (currentY > maxScrollY) {
+        maxScrollY = currentY;
+        hasScrolledDown = maxScrollY > 300; // Au moins 300px descendus
+      }
 
-      // Force immédiate si mode test
-      if (force) {
+      // Détecter le scroll up significatif (remonte de plus de 150px)
+      if (hasScrolledDown && currentY < lastScrollY && (maxScrollY - currentY) > 150) {
         tryOpen();
       }
-    }, 1500);
 
-    // Fallback automatique après 25 secondes sur la page (garantit l'affichage)
-    const autoShowTimeout = setTimeout(() => {
-      tryOpen();
-    }, 25000);
+      lastScrollY = currentY;
+    };
+
+    // Délai avant d'activer
+    const timeout = setTimeout(() => {
+      window.addEventListener("scroll", handleScroll, { passive: true });
+    }, 2000);
 
     return () => {
-      clearTimeout(activationTimeout);
-      clearTimeout(autoShowTimeout);
-      document.removeEventListener("mouseout", handleMouseOut);
-      window.removeEventListener("blur", tryOpen);
-      document.removeEventListener("visibilitychange", onVisibility);
+      clearTimeout(timeout);
+      window.removeEventListener("scroll", handleScroll);
     };
-  }, [handleMouseOut, tryOpen]);
+  }, [tryOpen, hasShown]);
 
   const handleDownloadBonus = async () => {
     setIsDownloading(true);
