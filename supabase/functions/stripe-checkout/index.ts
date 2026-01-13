@@ -19,7 +19,7 @@ const PLANS = {
 // Cache for price IDs to avoid repeated API calls
 const priceCache: Record<string, string> = {};
 
-async function getOrCreatePrice(stripe: Stripe, planId: string, plan: typeof PLANS.starter): Promise<string> {
+async function getOrCreatePrice(stripe: Stripe, planId: string, plan: typeof PLANS.lifetime): Promise<string> {
   // Check cache first
   if (priceCache[planId]) {
     console.log("Using cached price for", planId);
@@ -82,11 +82,15 @@ serve(async (req) => {
   }
 
   try {
-    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
+    const stripeKeyRaw = Deno.env.get("STRIPE_SECRET_KEY");
+    const stripeKey = (stripeKeyRaw || "").trim();
     if (!stripeKey) {
       console.error("STRIPE_SECRET_KEY not configured");
       throw new Error("Stripe non configuré");
     }
+
+    // Helpful diagnostic (never log the full key)
+    console.log("Stripe key prefix:", stripeKey.slice(0, 7));
 
     const stripe = new Stripe(stripeKey, {
       apiVersion: "2023-10-16",
@@ -106,10 +110,19 @@ serve(async (req) => {
 
     const plan = PLANS[planId as keyof typeof PLANS];
 
+    const isRestrictedKey = stripeKey.startsWith("rk_");
+    const configuredPriceId = (Deno.env.get("STRIPE_LIFETIME_PRICE_ID") || Deno.env.get("STRIPE_PRICE_ID") || "").trim();
+
+    if (isRestrictedKey && !configuredPriceId) {
+      throw new Error(
+        "Clé Stripe limitée détectée: configurez STRIPE_LIFETIME_PRICE_ID (ex: price_...) dans le backend."
+      );
+    }
+
     // Run customer lookup and price lookup in parallel
     const [customersResult, priceId] = await Promise.all([
       stripe.customers.list({ email, limit: 1 }),
-      getOrCreatePrice(stripe, planId, plan),
+      isRestrictedKey ? Promise.resolve(configuredPriceId) : getOrCreatePrice(stripe, planId, plan),
     ]);
 
     // Get or create customer
