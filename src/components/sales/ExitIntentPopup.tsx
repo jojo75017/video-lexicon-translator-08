@@ -14,29 +14,53 @@ const ExitIntentPopup = ({ onContinueToOffer }: ExitIntentPopupProps) => {
   const [hasShown, setHasShown] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
 
-  const handleMouseLeave = useCallback((e: MouseEvent) => {
-    // Déclencher uniquement si la souris va vers le haut (intention de fermer)
-    if (e.clientY <= 10 && !hasShown) {
-      const alreadyShown = sessionStorage.getItem("exitIntentShown");
-      if (!alreadyShown) {
-        setIsOpen(true);
-        setHasShown(true);
-        sessionStorage.setItem("exitIntentShown", "true");
-      }
-    }
+  const tryOpen = useCallback(() => {
+    if (hasShown) return;
+    const alreadyShown = sessionStorage.getItem("exitIntentShown");
+    if (alreadyShown) return;
+
+    setIsOpen(true);
+    setHasShown(true);
+    sessionStorage.setItem("exitIntentShown", "true");
   }, [hasShown]);
 
+  const handleMouseOut = useCallback(
+    (e: MouseEvent) => {
+      // Plus fiable que "mouseleave" dans les iframes :
+      // - relatedTarget null => sortie du document
+      // - clientY proche du haut => intention de fermer l'onglet/la fenêtre
+      const leavingDocument = (e as any).relatedTarget === null;
+      if (leavingDocument && e.clientY <= 10) {
+        tryOpen();
+      }
+    },
+    [tryOpen]
+  );
+
   useEffect(() => {
+    // Fallback : si l'onglet perd le focus (mobile / changements d'onglet)
+    const onVisibility = () => {
+      if (document.visibilityState === "hidden") tryOpen();
+    };
+
     // Délai avant d'activer la détection (éviter les faux positifs au chargement)
     const timeout = setTimeout(() => {
-      document.addEventListener("mouseleave", handleMouseLeave);
-    }, 3000);
+      document.addEventListener("mouseout", handleMouseOut);
+      document.addEventListener("visibilitychange", onVisibility);
+
+      // Mode test : /offres?forceExitIntent=1
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("forceExitIntent") === "1") {
+        setTimeout(() => tryOpen(), 800);
+      }
+    }, 1500);
 
     return () => {
       clearTimeout(timeout);
-      document.removeEventListener("mouseleave", handleMouseLeave);
+      document.removeEventListener("mouseout", handleMouseOut);
+      document.removeEventListener("visibilitychange", onVisibility);
     };
-  }, [handleMouseLeave]);
+  }, [handleMouseOut, tryOpen]);
 
   const handleDownloadBonus = async () => {
     setIsDownloading(true);
