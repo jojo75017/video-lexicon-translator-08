@@ -24,10 +24,10 @@ interface CharacterInfo {
 }
 
 export const useSubscriptionGeneration = (
-  subscriberEmail: string, 
-  apiKey?: string, 
-  ebookTitle?: string, 
-  targetAudience?: string, 
+  subscriberEmail: string,
+  apiKey?: string,
+  ebookTitle?: string,
+  targetAudience?: string,
   tomeNumber?: number | null,
   writingStyle?: string,
   chapterLength?: string,
@@ -36,11 +36,20 @@ export const useSubscriptionGeneration = (
   narrativeFormat?: string,
   bookDescription?: string,
   genre?: string,
-  characters?: CharacterInfo[]
+  characters?: CharacterInfo[],
+  isDemo: boolean = false,
 ) => {
   const [isGenerating, setIsGenerating] = useState(false);
 
   const callGenerateContent = async (actionType: string, prompt: string, additionalData?: any) => {
+    // Hard stop in demo mode: prevents any premium generation, even if a user has an API key.
+    if (isDemo) {
+      toast.error("Fonction réservée aux abonnés", {
+        description: "Souscrivez pour débloquer la génération complète (chapitres, SEO, couvertures, export, etc.).",
+      });
+      return null;
+    }
+
     if (!apiKey) {
       toast.error('Clé API OpenAI requise');
       return null;
