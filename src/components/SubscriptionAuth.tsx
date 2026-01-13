@@ -160,10 +160,27 @@ export const SubscriptionAuth = ({ onAuthenticated }: SubscriptionAuthProps) => 
       <Card className="w-full max-w-md p-8 space-y-6">
         <div className="text-center space-y-2">
           {hasAdminSession && (
-            <div className="flex justify-center">
-              <Badge className="mb-2">
-                Session admin active
-              </Badge>
+            <div className="flex flex-col items-center gap-2">
+              <Badge className="mb-0">Session admin active</Badge>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={async () => {
+                  try {
+                    await supabase.auth.signOut();
+                    setHasAdminSession(false);
+                    toast.success('Session admin déconnectée');
+                  } catch {
+                    toast.error('Impossible de déconnecter la session admin');
+                  }
+                }}
+              >
+                Se déconnecter (admin)
+              </Button>
+              <p className="text-xs text-muted-foreground">
+                Important : tant qu'une session admin est active, l'accès au générateur est autorisé sans code.
+              </p>
             </div>
           )}
           <div className="flex justify-center mb-4">
