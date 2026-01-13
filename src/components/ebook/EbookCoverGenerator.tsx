@@ -19,7 +19,7 @@ interface EbookCoverGeneratorProps {
 }
 
 type CoverStyle = 'professional' | 'minimalist' | 'artistic' | 'modern' | 'vintage' | 'fantasy' | 'thriller' | 'romance' | 'horror' | 'detective' | 'historical' | 'literary' | 'comedy' | 'adventure' | 'dystopian' | 'western' | 'spiritual' | 'cookbook' | 'garden';
-type CoverGenre = 'non-fiction' | 'fiction' | 'business' | 'self-help' | 'fantasy' | 'romance' | 'thriller' | 'sci-fi' | 'children' | 'horror' | 'mystery' | 'historical' | 'biography' | 'cooking' | 'travel' | 'poetry' | 'health' | 'gardening' | 'garden-bio' | 'permaculture' | 'potager';
+type CoverGenre = 'non-fiction' | 'fiction' | 'business' | 'self-help' | 'fantasy' | 'romance' | 'thriller' | 'sci-fi' | 'children' | 'horror' | 'mystery' | 'historical' | 'biography' | 'cooking' | 'travel' | 'poetry' | 'health' | 'gardening' | 'garden-bio' | 'permaculture' | 'potager' | 'bricolage';
 type BookFormat = '6x9' | '5x8' | '5.5x8.5' | '8.5x11' | '7x10' | '8x10' | '4.25x6.87' | '4.72x7.48' | '5.12x7.87' | '4.33x7.09' | '5.51x8.27';
 type PaperType = 'white' | 'cream';
 type BindingType = 'paperback' | 'hardcover';
@@ -68,7 +68,8 @@ const genreOptions: { value: CoverGenre; label: string }[] = [
   { value: 'gardening', label: '🌱 Jardinage' },
   { value: 'garden-bio', label: '🌿 Jardin Bio' },
   { value: 'permaculture', label: '🌾 Permaculture' },
-  { value: 'potager', label: '🥕 Potager' }
+  { value: 'potager', label: '🥕 Potager' },
+  { value: 'bricolage', label: '🔨 Bricolage' }
 ];
 
 const bookFormats: { value: BookFormat; label: string; width: number; height: number; category?: string }[] = [

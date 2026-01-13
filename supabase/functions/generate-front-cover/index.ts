@@ -49,7 +49,8 @@ const genrePrompts: Record<string, string> = {
   'gardening': 'gardening book, plants, nature, botanical illustrations, green and earthy colors',
   'garden-bio': 'organic gardening, eco-friendly, natural methods, green and brown tones, sustainable',
   'permaculture': 'permaculture book, sustainable living, ecological design, nature harmony, green ecosystem',
-  'potager': 'vegetable garden book, fresh produce, kitchen garden, colorful vegetables, organic farming'
+  'potager': 'vegetable garden book, fresh produce, kitchen garden, colorful vegetables, organic farming',
+  'bricolage': 'DIY book, home improvement, tools, woodworking, crafts, hands-on projects, workshop atmosphere'
 };
 
 serve(async (req) => {
