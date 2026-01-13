@@ -110,9 +110,23 @@ interface EbookPlannerPageProps {
   isDemo?: boolean;
 }
 
-const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '', subscriberData, isDemo = false }) => {
+const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
+  subscriberEmail = '',
+  subscriberData,
+  isDemo: isDemoProp = false,
+}) => {
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Security: if the page is reached without a verified subscriber context,
+  // we force demo mode so premium actions stay blocked.
+  const hasValidSubscriber =
+    !!subscriberEmail &&
+    typeof subscriberData?.access_code === 'string' &&
+    subscriberData.access_code.trim().length > 0 &&
+    (subscriberData?.status === 'active' || subscriberData?.plan_type === 'lifetime');
+
+  const isDemo = isDemoProp || !hasValidSubscriber;
   
   const STORAGE_KEY = 'ebook-planner-autosave';
   
