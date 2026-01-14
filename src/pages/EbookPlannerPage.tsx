@@ -108,23 +108,27 @@ interface EbookPlannerPageProps {
   subscriberEmail?: string;
   subscriberData?: any;
   isDemo?: boolean;
+  isAdmin?: boolean;
 }
 
 const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   subscriberEmail = '',
   subscriberData,
   isDemo: isDemoProp = false,
+  isAdmin: isAdminProp = false,
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
   // Security: if the page is reached without a verified subscriber context,
   // we force demo mode so premium actions stay blocked.
+  // EXCEPTION: Admins have full access without needing a subscriber code.
   const hasValidSubscriber =
-    !!subscriberEmail &&
-    typeof subscriberData?.access_code === 'string' &&
-    subscriberData.access_code.trim().length > 0 &&
-    (subscriberData?.status === 'active' || subscriberData?.plan_type === 'lifetime');
+    isAdminProp ||
+    (!!subscriberEmail &&
+      typeof subscriberData?.access_code === 'string' &&
+      subscriberData.access_code.trim().length > 0 &&
+      (subscriberData?.status === 'active' || subscriberData?.plan_type === 'lifetime'));
 
   const isDemo = isDemoProp || !hasValidSubscriber;
   
