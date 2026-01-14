@@ -7,10 +7,11 @@ import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Shield, UserPlus, Users, Copy, Mail, LogOut, Loader2, Pause, Play, RotateCcw, Edit, Calendar, TrendingUp, Activity, User, DollarSign, CreditCard, BarChart3, Clock, Bell, BellOff, Volume2 } from 'lucide-react';
+import { Shield, UserPlus, Users, Copy, Mail, LogOut, Loader2, Pause, Play, RotateCcw, Edit, Calendar, TrendingUp, Activity, User, DollarSign, CreditCard, BarChart3, Clock, Bell, BellOff, Volume2, CheckCircle, AlertCircle, Inbox } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 import { useNavigate } from 'react-router-dom';
 import { usePaymentNotifications } from '@/hooks/usePaymentNotifications';
+import { usePaymentConfirmations } from '@/hooks/usePaymentConfirmations';
 import { format } from 'date-fns';
 
 export const AdminPage = () => {
@@ -32,6 +33,9 @@ export const AdminPage = () => {
   
   // Hook pour les notifications de paiement
   const { isMonitoring, toggleMonitoring, testSound, newPayments, clearNewPayments } = usePaymentNotifications(true);
+  
+  // Hook pour les confirmations de paiement en attente
+  const { confirmations, pendingCount, markAsProcessed, loadConfirmations: refreshConfirmations } = usePaymentConfirmations();
 
   useEffect(() => {
     loadSubscribers();
@@ -418,6 +422,82 @@ export const AdminPage = () => {
             </div>
           )}
         </Card>
+
+        {/* Payment Confirmations Pending */}
+        {pendingCount > 0 && (
+          <Card className="p-6 border-2 border-orange-400 bg-orange-50 animate-pulse">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Inbox className="w-6 h-6 text-orange-600" />
+                <h2 className="text-xl font-semibold text-orange-800">
+                  📬 Confirmations de paiement en attente
+                </h2>
+                <Badge className="bg-orange-500 text-white animate-bounce">
+                  {pendingCount} en attente
+                </Badge>
+              </div>
+              <Button onClick={refreshConfirmations} variant="outline" size="sm">
+                <RotateCcw className="w-4 h-4 mr-2" />
+                Actualiser
+              </Button>
+            </div>
+
+            <div className="bg-white rounded-lg border overflow-hidden">
+              <table className="w-full">
+                <thead className="bg-orange-100">
+                  <tr>
+                    <th className="text-left p-3 font-semibold text-orange-800">Email</th>
+                    <th className="text-left p-3 font-semibold text-orange-800">Date</th>
+                    <th className="text-center p-3 font-semibold text-orange-800">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {confirmations
+                    .filter(c => c.status === 'pending')
+                    .map((confirmation) => (
+                      <tr key={confirmation.id} className="border-t hover:bg-orange-50">
+                        <td className="p-3">
+                          <span className="font-medium text-lg">{confirmation.email}</span>
+                        </td>
+                        <td className="p-3 text-muted-foreground">
+                          {format(new Date(confirmation.created_at), 'dd/MM/yyyy HH:mm')}
+                        </td>
+                        <td className="p-3 text-center">
+                          <div className="flex justify-center gap-2 flex-wrap">
+                            <Button
+                              onClick={() => {
+                                setEmail(confirmation.email);
+                                toast.info('Email copié dans le formulaire. Créez l\'abonné !');
+                              }}
+                              variant="default"
+                              size="sm"
+                              className="bg-violet-600 hover:bg-violet-700"
+                            >
+                              <UserPlus className="w-4 h-4 mr-1" />
+                              Créer abonné
+                            </Button>
+                            <Button
+                              onClick={() => markAsProcessed(confirmation.id, 'admin')}
+                              variant="outline"
+                              size="sm"
+                              className="border-green-500 text-green-700 hover:bg-green-50"
+                            >
+                              <CheckCircle className="w-4 h-4 mr-1" />
+                              Traité
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+
+            <p className="text-sm text-orange-700 mt-4">
+              💡 Ces clients ont confirmé leur paiement PayPal. Vérifiez le paiement, puis créez leur compte avec le bouton "Créer abonné".
+            </p>
+          </Card>
+        )}
 
         {/* Revenue Dashboard */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

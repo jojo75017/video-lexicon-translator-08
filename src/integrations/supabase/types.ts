@@ -240,6 +240,33 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_confirmations: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          processed_at: string | null
+          processed_by: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          processed_at?: string | null
+          processed_by?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          processed_at?: string | null
+          processed_by?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       published_books: {
         Row: {
           asin: string | null
