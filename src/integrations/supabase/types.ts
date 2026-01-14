@@ -240,6 +240,48 @@ export type Database = {
         }
         Relationships: []
       }
+      email_sequences: {
+        Row: {
+          completed: boolean
+          created_at: string
+          current_step: number
+          email: string
+          id: string
+          last_email_sent_at: string | null
+          next_email_at: string
+          sequence_name: string
+          subscribed_at: string
+          unsubscribed: boolean
+          updated_at: string
+        }
+        Insert: {
+          completed?: boolean
+          created_at?: string
+          current_step?: number
+          email: string
+          id?: string
+          last_email_sent_at?: string | null
+          next_email_at?: string
+          sequence_name?: string
+          subscribed_at?: string
+          unsubscribed?: boolean
+          updated_at?: string
+        }
+        Update: {
+          completed?: boolean
+          created_at?: string
+          current_step?: number
+          email?: string
+          id?: string
+          last_email_sent_at?: string | null
+          next_email_at?: string
+          sequence_name?: string
+          subscribed_at?: string
+          unsubscribed?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       payment_confirmations: {
         Row: {
           created_at: string
