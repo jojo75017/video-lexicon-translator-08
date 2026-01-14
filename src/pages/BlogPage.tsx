@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
-import { BookOpen, Clock, TrendingUp, ArrowRight, Sparkles, Target, Zap } from 'lucide-react';
+import { BookOpen, Clock, TrendingUp, ArrowRight, Sparkles, Target, Zap, PenTool, DollarSign, Lightbulb } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -41,6 +41,42 @@ const articles = [
     icon: Zap,
     gradient: 'from-amber-500 to-orange-500',
     date: '13 Janvier 2025'
+  },
+  {
+    slug: '/blog/auto-edition-amazon-kdp',
+    title: 'Auto-édition Amazon KDP : Le Guide Ultime 2025',
+    excerpt: 'Tout ce qu\'il faut savoir pour réussir son auto-édition sur Amazon KDP. Formatage, prix, catégories et stratégies de lancement.',
+    category: 'Guide',
+    readTime: '15 min',
+    keyword: 'auto édition amazon kdp',
+    searchVolume: 880,
+    icon: PenTool,
+    gradient: 'from-rose-500 to-pink-500',
+    date: '14 Janvier 2025'
+  },
+  {
+    slug: '/blog/gagner-argent-ebook',
+    title: 'Gagner de l\'Argent avec les Ebooks : Stratégies Rentables',
+    excerpt: 'Découvrez comment générer des revenus passifs avec vos ebooks. Niches rentables, pricing et techniques de vente sur Amazon.',
+    category: 'Monétisation',
+    readTime: '11 min',
+    keyword: 'gagner argent ebook',
+    searchVolume: 590,
+    icon: DollarSign,
+    gradient: 'from-emerald-500 to-teal-500',
+    date: '14 Janvier 2025'
+  },
+  {
+    slug: '/blog/idees-ebook-rentables',
+    title: '50 Idées d\'Ebooks Rentables à Créer en 2025',
+    excerpt: 'Liste complète d\'idées de niches et sujets d\'ebooks qui se vendent bien sur Amazon KDP. Inspirez-vous pour votre prochain bestseller.',
+    category: 'Inspiration',
+    readTime: '9 min',
+    keyword: 'idées ebook rentables',
+    searchVolume: 390,
+    icon: Lightbulb,
+    gradient: 'from-indigo-500 to-blue-500',
+    date: '14 Janvier 2025'
   }
 ];
 
