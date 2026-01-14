@@ -7,7 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Shield, UserPlus, Users, Copy, Mail, LogOut, Loader2, Pause, Play, RotateCcw, Edit, Calendar, TrendingUp, Activity, User, DollarSign, CreditCard, BarChart3, Clock, Bell, BellOff, Volume2, CheckCircle, AlertCircle, Inbox } from 'lucide-react';
+import { Shield, UserPlus, Users, Copy, Mail, LogOut, Loader2, Pause, Play, RotateCcw, Edit, Calendar, TrendingUp, Activity, User, DollarSign, CreditCard, BarChart3, Clock, Bell, BellOff, Volume2, CheckCircle, AlertCircle, Inbox, RefreshCw } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 import { useNavigate } from 'react-router-dom';
 import { usePaymentNotifications } from '@/hooks/usePaymentNotifications';
@@ -29,7 +29,43 @@ export const AdminPage = () => {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [expirationDate, setExpirationDate] = useState('');
   const [sendingEmailTo, setSendingEmailTo] = useState<string | null>(null);
+  const [isRefreshingAdmin, setIsRefreshingAdmin] = useState(false);
   const navigate = useNavigate();
+
+  const refreshAdminStatus = async () => {
+    setIsRefreshingAdmin(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error('Session expirée - veuillez vous reconnecter');
+        sessionStorage.removeItem('is_admin');
+        navigate('/auth');
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke('check-admin', {
+        headers: { Authorization: `Bearer ${session.access_token}` }
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      if (data?.isAdmin) {
+        sessionStorage.setItem('is_admin', 'true');
+        toast.success('✅ Statut admin confirmé !');
+      } else {
+        sessionStorage.removeItem('is_admin');
+        toast.error('Vous n\'êtes plus admin - redirection...');
+        navigate('/auth');
+      }
+    } catch (error: any) {
+      console.error('Error refreshing admin status:', error);
+      toast.error(`Erreur: ${error.message}`);
+    } finally {
+      setIsRefreshingAdmin(false);
+    }
+  };
   
   // Hook pour les notifications de paiement
   const { isMonitoring, toggleMonitoring, testSound, newPayments, clearNewPayments } = usePaymentNotifications(true);
@@ -306,6 +342,17 @@ export const AdminPage = () => {
                 </Badge>
               )}
             </div>
+            
+            <Button 
+              onClick={refreshAdminStatus} 
+              variant="outline" 
+              size="sm"
+              disabled={isRefreshingAdmin}
+              title="Rafraîchir le statut admin"
+            >
+              <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshingAdmin ? 'animate-spin' : ''}`} />
+              {isRefreshingAdmin ? 'Vérification...' : 'Refresh Admin'}
+            </Button>
             
             <Button onClick={() => navigate('/ebook-planner')} variant="outline">
               Retour au générateur
