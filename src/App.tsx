@@ -226,6 +226,7 @@ const App = () => {
                     subscriberEmail={subscriberEmail || ''}
                     subscriberData={subscriberData}
                     isDemo={false}
+                    isAdmin={isAdmin}
                   />
                 </SubscriberGate>
               }
