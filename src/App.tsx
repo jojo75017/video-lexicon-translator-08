@@ -27,6 +27,7 @@ import BlogPage from './pages/BlogPage';
 import LogoutTotalPage from './pages/LogoutTotalPage';
 import PaiementManuelPage from './pages/PaiementManuelPage';
 import ConfirmationPaiementPage from './pages/ConfirmationPaiementPage';
+import FaqAssistancePage from './pages/FaqAssistancePage';
 import { SubscriptionAuth } from '@/components/SubscriptionAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { SubscriberGate } from '@/components/auth/SubscriberGate';
@@ -219,6 +220,8 @@ const App = () => {
             <Route path="/paiement-succes" element={<PaymentSuccessPage />} />
             <Route path="/paiement-manuel" element={<PaiementManuelPage />} />
             <Route path="/confirmation-paiement" element={<ConfirmationPaiementPage />} />
+            <Route path="/faq" element={<FaqAssistancePage />} />
+            <Route path="/assistance" element={<FaqAssistancePage />} />
             <Route path="/affiliation" element={<AffiliationFormationPage />} />
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/admin-direct" element={<AdminDirectPage />} />
