@@ -14,9 +14,10 @@ import { format } from 'date-fns';
 
 export const AdminPage = () => {
   const [email, setEmail] = useState('');
-  const [planType, setPlanType] = useState('starter');
+  const [planType, setPlanType] = useState('lifetime');
   const [isLoading, setIsLoading] = useState(false);
   const [generatedCode, setGeneratedCode] = useState('');
+  const [lastAddedEmail, setLastAddedEmail] = useState('');
   const [subscribers, setSubscribers] = useState<any[]>([]);
   const [isLoadingSubscribers, setIsLoadingSubscribers] = useState(false);
   const [searchEmail, setSearchEmail] = useState('');
@@ -96,12 +97,16 @@ export const AdminPage = () => {
 
       if (data.success) {
         setGeneratedCode(data.accessCode);
+        setLastAddedEmail(email);
+        
+        // Copy code to clipboard automatically
+        navigator.clipboard.writeText(data.accessCode);
         
         // Show different toast based on email status
         if (data.emailSent) {
-          toast.success('✅ Abonné créé et email envoyé ! Demandez à l\'utilisateur de vérifier ses spams.', { duration: 8000 });
+          toast.success('✅ Abonné créé, email envoyé et code copié !', { duration: 8000 });
         } else {
-          toast.warning(`⚠️ Abonné créé mais l'email n'a pas pu être envoyé. Code: ${data.accessCode}`, {
+          toast.warning(`⚠️ Abonné créé mais l'email n'a pas pu être envoyé. Code copié !`, {
             duration: 10000,
           });
           if (data.emailError) {
@@ -295,13 +300,14 @@ export const AdminPage = () => {
             <div>
               <label className="text-sm font-medium">Plan</label>
               <select
-                className="w-full px-3 py-2 border rounded-md"
+                className="w-full px-3 py-2 border rounded-md bg-background"
                 value={planType}
                 onChange={(e) => setPlanType(e.target.value)}
                 disabled={isLoading}
               >
-                <option value="starter">Starter</option>
-                <option value="pro">Pro</option>
+                <option value="lifetime">🌟 Lifetime - 37€ (Accès à vie)</option>
+                <option value="starter">Starter - 27€/mois</option>
+                <option value="pro">Pro - 67€/mois</option>
                 <option value="enterprise">Enterprise</option>
               </select>
             </div>
@@ -323,25 +329,53 @@ export const AdminPage = () => {
           </form>
 
           {generatedCode && (
-            <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <Shield className="w-5 h-5 text-green-600" />
-                <h3 className="font-semibold text-green-900">Code d'accès généré</h3>
+            <div className="mt-6 p-5 bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-300 rounded-xl shadow-lg">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="p-2 bg-green-500 rounded-full">
+                  <Shield className="w-5 h-5 text-white" />
+                </div>
+                <h3 className="font-bold text-green-900 text-lg">✅ Abonné ajouté avec succès !</h3>
               </div>
-              <div className="bg-white p-3 rounded border border-green-300 font-mono text-2xl text-center text-green-800 font-bold">
+              
+              {lastAddedEmail && (
+                <p className="text-sm text-green-700 mb-3 font-medium">
+                  📧 Email : <span className="font-mono bg-white px-2 py-1 rounded">{lastAddedEmail}</span>
+                </p>
+              )}
+              
+              <div className="bg-white p-4 rounded-lg border-2 border-green-400 font-mono text-3xl text-center text-green-800 font-bold tracking-widest shadow-inner">
                 {generatedCode}
               </div>
-              <p className="text-sm text-green-700 mt-2">
-                Envoyez ce code au client avec son email pour qu'il puisse se connecter.
+              
+              <p className="text-sm text-green-600 mt-3 text-center">
+                📋 Code copié automatiquement dans le presse-papier !
               </p>
-              <Button
-                onClick={() => handleCopyCode(generatedCode)}
-                variant="outline"
-                className="w-full mt-3"
-              >
-                <Copy className="w-4 h-4 mr-2" />
-                Copier le code
-              </Button>
+              
+              <div className="grid grid-cols-2 gap-3 mt-4">
+                <Button
+                  onClick={() => handleCopyCode(generatedCode)}
+                  variant="outline"
+                  className="border-green-400 text-green-700 hover:bg-green-100"
+                >
+                  <Copy className="w-4 h-4 mr-2" />
+                  Copier à nouveau
+                </Button>
+                <Button
+                  onClick={() => {
+                    if (lastAddedEmail) {
+                      const subscriber = subscribers.find(s => s.email === lastAddedEmail);
+                      if (subscriber) {
+                        sendAccessCodeByEmail(subscriber);
+                      }
+                    }
+                  }}
+                  variant="outline"
+                  className="border-blue-400 text-blue-700 hover:bg-blue-100"
+                >
+                  <Mail className="w-4 h-4 mr-2" />
+                  Renvoyer par email
+                </Button>
+              </div>
             </div>
           )}
         </Card>
