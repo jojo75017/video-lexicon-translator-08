@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,7 +9,19 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
+// SEO Meta pour la page FAQ
+const useFaqSeo = () => {
+  useEffect(() => {
+    document.title = "FAQ & Assistance - EbookStudio Pro | Support Client";
+    const metaDescription = document.querySelector('meta[name="description"]');
+    if (metaDescription) {
+      metaDescription.setAttribute("content", "Besoin d'aide avec EbookStudio Pro ? Trouvez des réponses à vos questions sur l'accès, le paiement, l'utilisation du générateur d'ebook IA. Support client réactif.");
+    }
+  }, []);
+};
+
 export const FaqAssistancePage = () => {
+  useFaqSeo();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [isResending, setIsResending] = useState(false);
