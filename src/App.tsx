@@ -26,6 +26,7 @@ import SeoGenerateurEbookPage from './pages/SeoGenerateurEbookPage';
 import BlogPage from './pages/BlogPage';
 import LogoutTotalPage from './pages/LogoutTotalPage';
 import PaiementManuelPage from './pages/PaiementManuelPage';
+import ConfirmationPaiementPage from './pages/ConfirmationPaiementPage';
 import { SubscriptionAuth } from '@/components/SubscriptionAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { SubscriberGate } from '@/components/auth/SubscriberGate';
@@ -205,6 +206,7 @@ const App = () => {
             <Route path="/demo" element={<DemoPage />} />
             <Route path="/paiement-succes" element={<PaymentSuccessPage />} />
             <Route path="/paiement-manuel" element={<PaiementManuelPage />} />
+            <Route path="/confirmation-paiement" element={<ConfirmationPaiementPage />} />
             <Route path="/affiliation" element={<AffiliationFormationPage />} />
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/admin-direct" element={<AdminDirectPage />} />

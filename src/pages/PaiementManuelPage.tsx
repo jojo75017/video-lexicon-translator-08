@@ -3,18 +3,19 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Check, Copy, Mail, CreditCard, ArrowLeft } from "lucide-react";
+import { Check, Copy, CreditCard, ArrowLeft, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const PaiementManuelPage = () => {
   const [email, setEmail] = useState("");
   const [copied, setCopied] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const paymentInfo = {
     paypalMe: "https://www.paypal.com/paypalme/boubetgeorges/37EUR",
     paypalDirect: "https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=37&currency_code=EUR&item_name=EbookStudio%20Pro%20-%20Acces%20a%20Vie",
-    iban: "FR76 XXXX XXXX XXXX XXXX XXXX XXX", // À remplacer par votre IBAN
+    iban: "FR76 XXXX XXXX XXXX XXXX XXXX XXX",
     price: "37€",
     product: "EbookStudio Pro - Accès à Vie"
   };
@@ -26,25 +27,20 @@ const PaiementManuelPage = () => {
     setTimeout(() => setCopied(null), 2000);
   };
 
-  const handleSubmit = () => {
-    if (!email) {
-      toast.error("Veuillez entrer votre email");
+  const handlePayPalClick = () => {
+    // Sauvegarder l'email pour la page de confirmation
+    if (email.trim()) {
+      sessionStorage.setItem('payment_email', email.trim());
+    }
+  };
+
+  const goToConfirmation = () => {
+    if (!email.trim()) {
+      toast.error("Veuillez d'abord entrer votre email");
       return;
     }
-    
-    const subject = encodeURIComponent("Nouveau paiement EbookStudio Pro");
-    const body = encodeURIComponent(`Bonjour,
-
-Je viens d'effectuer un paiement de 37€ pour EbookStudio Pro.
-
-Mon email : ${email}
-
-Merci de m'envoyer mon code d'accès.
-
-Cordialement`);
-    
-    window.open(`mailto:boubetgeorges@gmail.com?subject=${subject}&body=${body}`, '_blank');
-    toast.success("Email préparé ! Envoyez-le après votre paiement.");
+    sessionStorage.setItem('payment_email', email.trim());
+    navigate('/confirmation-paiement');
   };
 
   return (
@@ -99,6 +95,7 @@ Cordialement`);
                 href={paymentInfo.paypalDirect}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={handlePayPalClick}
                 className="block border-2 border-blue-300 rounded-lg p-5 hover:border-blue-500 hover:bg-blue-50 transition-all bg-gradient-to-r from-blue-50 to-white"
               >
                 <div className="flex items-center gap-4">
@@ -107,7 +104,7 @@ Cordialement`);
                   </div>
                   <div>
                     <p className="font-bold text-blue-700 text-lg">💳 Payer 37€ avec PayPal</p>
-                    <p className="text-sm text-blue-600">Paiement sécurisé - Cliquez pour payer maintenant</p>
+                    <p className="text-sm text-blue-600">Paiement sécurisé - PayPal ou carte bancaire</p>
                   </div>
                 </div>
               </a>
@@ -128,6 +125,7 @@ Cordialement`);
                     variant="outline"
                     size="sm"
                     onClick={() => copyToClipboard(paymentInfo.iban, "IBAN")}
+                    type="button"
                   >
                     {copied === "IBAN" ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                   </Button>
@@ -139,15 +137,16 @@ Cordialement`);
             <div className="space-y-2">
               <h3 className="font-semibold flex items-center gap-2">
                 <span className="bg-violet-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm">3</span>
-                Confirmez votre paiement
+                Après paiement, confirmez ici
               </h3>
               <Button 
-                onClick={handleSubmit} 
-                className="w-full bg-gradient-to-r from-violet-600 to-emerald-600 hover:from-violet-700 hover:to-emerald-700"
+                onClick={goToConfirmation} 
+                className="w-full bg-gradient-to-r from-emerald-600 to-violet-600 hover:from-emerald-700 hover:to-violet-700"
                 size="lg"
+                type="button"
               >
-                <Mail className="w-5 h-5 mr-2" />
-                Envoyer ma confirmation
+                <ArrowRight className="w-5 h-5 mr-2" />
+                J'ai payé, confirmer mon achat
               </Button>
               <p className="text-xs text-center text-muted-foreground">
                 Vous recevrez votre code d'accès sous 24h maximum (souvent en quelques minutes)
