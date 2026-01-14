@@ -47,6 +47,11 @@ const ConfirmationPaiementPage = () => {
 
       if (error) throw error;
 
+      // Notifier l'admin par email
+      await supabase.functions.invoke('notify-admin-confirmation', {
+        body: { email: email.trim().toLowerCase(), timestamp: new Date().toISOString() }
+      });
+
       setIsSubmitted(true);
       toast.success("Confirmation envoyée ! Vous recevrez votre code sous peu.");
     } catch (error) {
