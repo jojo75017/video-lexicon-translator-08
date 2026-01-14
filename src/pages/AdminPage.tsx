@@ -7,9 +7,10 @@ import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Shield, UserPlus, Users, Copy, Mail, LogOut, Loader2, Pause, Play, RotateCcw, Edit, Calendar, TrendingUp, Activity, User, DollarSign, CreditCard, BarChart3, Clock } from 'lucide-react';
+import { Shield, UserPlus, Users, Copy, Mail, LogOut, Loader2, Pause, Play, RotateCcw, Edit, Calendar, TrendingUp, Activity, User, DollarSign, CreditCard, BarChart3, Clock, Bell, BellOff, Volume2 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 import { useNavigate } from 'react-router-dom';
+import { usePaymentNotifications } from '@/hooks/usePaymentNotifications';
 import { format } from 'date-fns';
 
 export const AdminPage = () => {
@@ -28,6 +29,9 @@ export const AdminPage = () => {
   const [expirationDate, setExpirationDate] = useState('');
   const [sendingEmailTo, setSendingEmailTo] = useState<string | null>(null);
   const navigate = useNavigate();
+  
+  // Hook pour les notifications de paiement
+  const { isMonitoring, toggleMonitoring, testSound, newPayments, clearNewPayments } = usePaymentNotifications(true);
 
   useEffect(() => {
     loadSubscribers();
@@ -263,7 +267,42 @@ export const AdminPage = () => {
               <p className="text-muted-foreground">Gestion des abonnés</p>
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap items-center">
+            {/* Notification Controls */}
+            <div className="flex items-center gap-2 mr-2 p-2 rounded-lg bg-muted/50">
+              <Button 
+                onClick={toggleMonitoring} 
+                variant={isMonitoring ? "default" : "outline"}
+                size="sm"
+                className={isMonitoring ? "bg-green-600 hover:bg-green-700" : ""}
+              >
+                {isMonitoring ? (
+                  <>
+                    <Bell className="w-4 h-4 mr-2 animate-pulse" />
+                    Surveillance active
+                  </>
+                ) : (
+                  <>
+                    <BellOff className="w-4 h-4 mr-2" />
+                    Surveillance OFF
+                  </>
+                )}
+              </Button>
+              <Button 
+                onClick={testSound} 
+                variant="ghost" 
+                size="sm"
+                title="Tester le son"
+              >
+                <Volume2 className="w-4 h-4" />
+              </Button>
+              {newPayments.length > 0 && (
+                <Badge variant="destructive" className="animate-bounce">
+                  {newPayments.length} nouveau(x)
+                </Badge>
+              )}
+            </div>
+            
             <Button onClick={() => navigate('/ebook-planner')} variant="outline">
               Retour au générateur
             </Button>
