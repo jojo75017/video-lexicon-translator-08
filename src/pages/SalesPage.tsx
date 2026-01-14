@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, Sparkles, BookOpen, Zap, Download, Star, ArrowRight, Play, Loader2, Clock, HelpCircle, CheckCircle, Calculator, Gift } from "lucide-react";
+import { Check, Sparkles, BookOpen, Zap, Download, Star, ArrowRight, Play, Loader2, Clock, HelpCircle, CheckCircle, Calculator, Gift, Mail, Send } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -18,6 +18,69 @@ import LiveEbookCounter from "@/components/sales/LiveEbookCounter";
 import LiveActivityNotifications from "@/components/sales/LiveActivityNotifications";
 import AuthorQuiz from "@/components/sales/AuthorQuiz";
 import SuccessGallery from "@/components/sales/SuccessGallery";
+
+// Composant Newsletter inline pour le footer
+const NewsletterForm = () => {
+  const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [isSubscribing, setIsSubscribing] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newsletterEmail || !newsletterEmail.includes("@")) {
+      toast.error("Email invalide");
+      return;
+    }
+    
+    setIsSubscribing(true);
+    try {
+      // Ajouter à la séquence email automatique
+      await supabase.functions.invoke("add-to-email-sequence", {
+        body: { email: newsletterEmail.trim().toLowerCase() }
+      });
+      
+      setIsSubscribed(true);
+      toast.success("🎉 Inscrit ! Vérifiez votre boîte mail");
+      setNewsletterEmail("");
+    } catch (error) {
+      console.error("Newsletter error:", error);
+      toast.error("Erreur, réessayez");
+    } finally {
+      setIsSubscribing(false);
+    }
+  };
+
+  if (isSubscribed) {
+    return (
+      <div className="flex items-center gap-2 text-emerald-400 text-sm">
+        <CheckCircle className="w-4 h-4" />
+        <span>Inscrit !</span>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleNewsletterSubmit} className="flex gap-2">
+      <Input
+        type="email"
+        placeholder="votre@email.com"
+        value={newsletterEmail}
+        onChange={(e) => setNewsletterEmail(e.target.value)}
+        className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500 text-sm h-9"
+        disabled={isSubscribing}
+      />
+      <Button 
+        type="submit" 
+        size="sm" 
+        disabled={isSubscribing}
+        className="bg-violet-600 hover:bg-violet-700 h-9 px-3"
+      >
+        {isSubscribing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+      </Button>
+    </form>
+  );
+};
+
 const SalesPage = () => {
   const navigate = useNavigate();
   const [showDemo, setShowDemo] = useState(false);
@@ -815,7 +878,7 @@ const SalesPage = () => {
       {/* Footer avec liens SEO */}
       <footer className="py-12 pb-20 md:pb-12 border-t border-border/50 bg-slate-900 text-white">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
+          <div className="grid md:grid-cols-5 gap-8 mb-8">
             {/* Logo & Description */}
             <div className="md:col-span-1">
               <h3 className="text-xl font-bold mb-3 bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">
@@ -875,8 +938,13 @@ const SalesPage = () => {
               <h4 className="font-semibold mb-3 text-gray-200">💡 Ressources</h4>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <button onClick={() => navigate("/ebook-planner")} className="text-gray-400 hover:text-violet-400 transition-colors">
-                    Accéder au générateur
+                  <button onClick={() => navigate("/faq")} className="text-gray-400 hover:text-violet-400 transition-colors">
+                    FAQ & Assistance
+                  </button>
+                </li>
+                <li>
+                  <button onClick={() => navigate("/blog")} className="text-gray-400 hover:text-violet-400 transition-colors">
+                    Blog
                   </button>
                 </li>
                 <li>
@@ -885,6 +953,13 @@ const SalesPage = () => {
                   </button>
                 </li>
               </ul>
+            </div>
+
+            {/* Newsletter */}
+            <div>
+              <h4 className="font-semibold mb-3 text-gray-200">📧 Newsletter</h4>
+              <p className="text-gray-400 text-sm mb-3">Recevez nos conseils KDP gratuits</p>
+              <NewsletterForm />
             </div>
           </div>
           
@@ -901,9 +976,6 @@ const SalesPage = () => {
 
       {/* Live Activity Notifications - remplace SocialProofNotifications */}
       <LiveActivityNotifications position="bottom-left" intervalMs={30000} />
-
-      {/* Sticky CTA Bar */}
-      <StickyCtaBar spotsLeft={39} totalSpots={50} />
 
       {/* Sticky CTA Bar */}
       <StickyCtaBar spotsLeft={39} totalSpots={50} />
