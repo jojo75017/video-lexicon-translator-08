@@ -44,7 +44,10 @@ const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [subscriberEmail, setSubscriberEmail] = useState('');
   const [subscriberData, setSubscriberData] = useState<any>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
+  // Persist admin status in sessionStorage to prevent logout on re-renders
+  const [isAdmin, setIsAdmin] = useState(() => {
+    return sessionStorage.getItem('is_admin') === 'true';
+  });
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {
@@ -96,8 +99,10 @@ const App = () => {
           } else if (data?.isAdmin) {
             console.log('Statut admin confirmé dans App.tsx');
             setIsAdmin(true);
+            sessionStorage.setItem('is_admin', 'true');
           } else {
             console.log('Utilisateur non-admin dans App.tsx');
+            sessionStorage.removeItem('is_admin');
           }
         } else {
           console.log('Aucune session admin trouvée dans App.tsx');
@@ -128,11 +133,17 @@ const App = () => {
           const { data, error } = await invokeCheckAdmin(session.access_token);
           if (error) {
             console.error("Erreur check-admin lors du changement d'état:", error);
-            setIsAdmin(false);
+            // Don't reset admin on error - keep current state
             return;
           }
 
-          setIsAdmin(!!data?.isAdmin);
+          const adminStatus = !!data?.isAdmin;
+          setIsAdmin(adminStatus);
+          if (adminStatus) {
+            sessionStorage.setItem('is_admin', 'true');
+          } else {
+            sessionStorage.removeItem('is_admin');
+          }
         }, 0);
         return;
       }
@@ -140,6 +151,7 @@ const App = () => {
       if (!session || event === 'SIGNED_OUT') {
         console.log('Déconnexion détectée');
         setIsAdmin(false);
+        sessionStorage.removeItem('is_admin');
       }
     });
 
