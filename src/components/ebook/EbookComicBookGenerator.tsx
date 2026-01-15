@@ -31,6 +31,21 @@ interface ComicBookGeneratorProps {
   ebookTitle?: string;
 }
 
+// Fonction pour nettoyer les emojis des textes (incompatibles avec jsPDF/Helvetica)
+const cleanTextForPDF = (text: string): string => {
+  if (!text) return '';
+  // Supprime les emojis et caractères unicode spéciaux
+  return text
+    .replace(/[\u{1F300}-\u{1F9FF}]/gu, '') // Emojis
+    .replace(/[\u{2600}-\u{26FF}]/gu, '')   // Symboles divers
+    .replace(/[\u{2700}-\u{27BF}]/gu, '')   // Dingbats
+    .replace(/[\u{FE00}-\u{FE0F}]/gu, '')   // Variation selectors
+    .replace(/[\u{1F1E0}-\u{1F1FF}]/gu, '') // Drapeaux
+    .replace(/🏴‍☠️|🧙|🦸|🚀|😂|🔍|🐾|🏠|⚔️|✏️|🎨|🎌|🇫🇷|🇺🇸|✨|🌈|⬛|📜/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+};
+
 const GENRES = [
   { value: 'adventure', label: '🏴‍☠️ Aventure', examples: 'Explorateurs, trésors, voyages...' },
   { value: 'fantasy', label: '🧙 Fantaisie', examples: 'Magie, créatures, quêtes...' },
@@ -381,11 +396,13 @@ VISUAL STYLE:
       pdf.setFontSize(16);
       pdf.text(`Une aventure de ${mainCharacter}`, pageWidth / 2, 110, { align: 'center' });
 
-      // Genre et style
+      // Genre et style (nettoyé des emojis)
       const selectedGenre = GENRES.find(g => g.value === genre);
       const selectedStyle = ART_STYLES.find(s => s.value === artStyle);
+      const cleanGenre = cleanTextForPDF(selectedGenre?.label || '');
+      const cleanStyle = cleanTextForPDF(selectedStyle?.label || '');
       pdf.setFontSize(12);
-      pdf.text(`${selectedGenre?.label || ''} • ${selectedStyle?.label || ''}`, pageWidth / 2, 130, { align: 'center' });
+      pdf.text(`${cleanGenre} - ${cleanStyle}`, pageWidth / 2, 130, { align: 'center' });
 
       // ===== PAGE COPYRIGHT =====
       pdf.addPage();
@@ -409,8 +426,8 @@ VISUAL STYLE:
         'Toute ressemblance avec des personnes réelles serait fortuite.',
         '',
         `Nombre de pages : ${generatedPages.length + 4}`,
-        `Genre : ${selectedGenre?.label || genre}`,
-        `Style artistique : ${selectedStyle?.label || artStyle}`,
+        `Genre : ${cleanTextForPDF(selectedGenre?.label || genre)}`,
+        `Style artistique : ${cleanTextForPDF(selectedStyle?.label || artStyle)}`,
       ];
       let yPos = 55;
       copyrightText.forEach(line => {
