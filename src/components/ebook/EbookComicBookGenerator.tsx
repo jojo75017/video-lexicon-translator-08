@@ -201,9 +201,8 @@ Réponds en JSON avec ce format exact:
 
       const { data, error } = await supabase.functions.invoke('generate-content', {
         body: {
+          type: 'comic-scenario',
           prompt,
-          temperature: 0.8,
-          maxTokens: 4000,
         }
       });
 

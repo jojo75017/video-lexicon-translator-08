@@ -1031,6 +1031,81 @@ Réponds UNIQUEMENT avec un JSON valide (sans markdown) dans ce format exact:
       }
     }
 
+    // Handle comic book scenario generation (uses Lovable AI)
+    if (type === 'comic-scenario') {
+      console.log('Processing comic scenario generation (Lovable AI)...');
+      const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+      
+      if (!LOVABLE_API_KEY) {
+        return new Response(
+          JSON.stringify({ error: 'Lovable API key not configured' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const systemPrompt = `Tu es un scénariste expert de bandes dessinées pour enfants et adolescents. 
+Tu crées des scénarios visuels riches et des dialogues percutants adaptés à l'âge du public.
+Réponds UNIQUEMENT avec du JSON valide, sans markdown, sans \`\`\`, sans commentaires.`;
+
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 120000);
+        
+        const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'google/gemini-2.5-flash',
+            messages: [
+              { role: 'system', content: systemPrompt },
+              { role: 'user', content: prompt }
+            ],
+          }),
+          signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Lovable AI error for comic scenario:', response.status, errorText);
+          
+          const { status, error: errMsg } = lovableAiHttpError(response.status);
+          return new Response(
+            JSON.stringify({ error: errMsg }),
+            { status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        const data = await response.json();
+        const scenarioText = data.choices?.[0]?.message?.content;
+        
+        if (!scenarioText) {
+          console.error('No content in Lovable AI response:', JSON.stringify(data));
+          return new Response(
+            JSON.stringify({ error: "Réponse vide de l'IA" }),
+            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        console.log('Comic scenario generated successfully');
+        return new Response(
+          JSON.stringify({ content: scenarioText }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      } catch (err) {
+        console.error('Comic scenario generation error:', err);
+        const errorMessage = err?.name === 'AbortError' ? 'Timeout - génération trop longue' : err?.message;
+        return new Response(
+          JSON.stringify({ error: errorMessage || 'Erreur inconnue' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+
     // Handle encyclopedia / atlas generation
     // We use OpenAI here (via OPENAI_API_KEY secret) to avoid Lovable AI credit issues.
     if (type === 'encyclopedia' || type === 'atlas') {
