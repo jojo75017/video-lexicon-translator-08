@@ -1,30 +1,58 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { HelpCircle, Mail, MessageCircle, Clock, CheckCircle, AlertCircle, Book, Key, CreditCard, RefreshCw, ArrowLeft } from 'lucide-react';
+import { HelpCircle, Mail, MessageCircle, Clock, CheckCircle, AlertCircle, Book, Key, CreditCard, RefreshCw, ArrowLeft, Search, TrendingUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
-// SEO Meta pour la page FAQ
-const useFaqSeo = () => {
+// SEO Meta + Schema.org FAQ pour la page
+const useFaqSeo = (faqItems: { question: string; answer: string }[]) => {
   useEffect(() => {
     document.title = "FAQ & Assistance - EbookStudio Pro | Support Client";
     const metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription) {
       metaDescription.setAttribute("content", "Besoin d'aide avec EbookStudio Pro ? Trouvez des réponses à vos questions sur l'accès, le paiement, l'utilisation du générateur d'ebook IA. Support client réactif.");
     }
-  }, []);
+    
+    // Schema.org FAQPage pour SEO
+    const existingSchema = document.querySelector('script[data-faq-schema]');
+    if (existingSchema) existingSchema.remove();
+    
+    const schema = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": faqItems.map(item => ({
+        "@type": "Question",
+        "name": item.question,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": item.answer.replace(/\*\*/g, '').replace(/\n/g, ' ')
+        }
+      }))
+    };
+    
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.setAttribute('data-faq-schema', 'true');
+    script.textContent = JSON.stringify(schema);
+    document.head.appendChild(script);
+    
+    return () => {
+      const schemaScript = document.querySelector('script[data-faq-schema]');
+      if (schemaScript) schemaScript.remove();
+    };
+  }, [faqItems]);
 };
 
 export const FaqAssistancePage = () => {
-  useFaqSeo();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [isResending, setIsResending] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const handleResendCode = async () => {
     if (!email || !email.includes('@')) {
@@ -161,6 +189,21 @@ Vos ebooks vous appartiennent à 100%.`
     }
   ];
 
+  // Hook SEO avec Schema.org
+  useFaqSeo(faqItems);
+
+  // Filtrage des FAQ par recherche
+  const filteredFaqItems = useMemo(() => {
+    if (!searchQuery.trim()) return faqItems;
+    const query = searchQuery.toLowerCase();
+    return faqItems.filter(
+      item => 
+        item.question.toLowerCase().includes(query) || 
+        item.answer.toLowerCase().includes(query) ||
+        item.category.toLowerCase().includes(query)
+    );
+  }, [searchQuery, faqItems]);
+
   const getCategoryIcon = (category: string) => {
     switch (category) {
       case 'access': return <Key className="h-4 w-4" />;
@@ -253,22 +296,44 @@ Vos ebooks vous appartiennent à 100%.`
         </Card>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <Card className="text-center p-4">
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+          <Card className="text-center p-4 hover:shadow-md transition-shadow">
+            <TrendingUp className="h-6 w-6 text-emerald-500 mx-auto mb-2" />
+            <p className="font-semibold text-2xl text-emerald-600">95%</p>
+            <p className="text-sm text-muted-foreground">Problèmes résolus</p>
+          </Card>
+          <Card className="text-center p-4 hover:shadow-md transition-shadow">
             <Clock className="h-6 w-6 text-primary mx-auto mb-2" />
             <p className="font-semibold">Réponse en -24h</p>
             <p className="text-sm text-muted-foreground">Par email</p>
           </Card>
-          <Card className="text-center p-4">
+          <Card className="text-center p-4 hover:shadow-md transition-shadow">
             <CheckCircle className="h-6 w-6 text-emerald-500 mx-auto mb-2" />
             <p className="font-semibold">Garantie 30 jours</p>
             <p className="text-sm text-muted-foreground">Satisfait ou remboursé</p>
           </Card>
-          <Card className="text-center p-4">
+          <Card className="text-center p-4 hover:shadow-md transition-shadow">
             <MessageCircle className="h-6 w-6 text-blue-500 mx-auto mb-2" />
             <p className="font-semibold">Support inclus</p>
             <p className="text-sm text-muted-foreground">À vie avec votre accès</p>
           </Card>
+        </div>
+
+        {/* Barre de recherche FAQ */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Rechercher dans la FAQ..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10 py-6 text-lg"
+          />
+          {searchQuery && (
+            <p className="text-sm text-muted-foreground mt-2">
+              {filteredFaqItems.length} résultat(s) trouvé(s)
+            </p>
+          )}
         </div>
 
         {/* FAQ Accordion */}
@@ -278,22 +343,29 @@ Vos ebooks vous appartiennent à 100%.`
           </CardHeader>
           <CardContent>
             <Accordion type="single" collapsible className="w-full">
-              {faqItems.map((item, index) => (
-                <AccordionItem key={index} value={`item-${index}`}>
-                  <AccordionTrigger className="text-left">
-                    <div className="flex items-center gap-3">
-                      <Badge variant="outline" className="shrink-0">
-                        {getCategoryIcon(item.category)}
-                        <span className="ml-1">{getCategoryLabel(item.category)}</span>
-                      </Badge>
-                      <span>{item.question}</span>
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground whitespace-pre-line pl-4 border-l-2 border-primary/20 ml-2">
-                    {item.answer}
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
+              {filteredFaqItems.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">
+                  Aucune question ne correspond à votre recherche. 
+                  <br />Essayez d'autres mots-clés ou contactez-nous directement.
+                </p>
+              ) : (
+                filteredFaqItems.map((item, index) => (
+                  <AccordionItem key={index} value={`item-${index}`} className="animate-in fade-in duration-300">
+                    <AccordionTrigger className="text-left">
+                      <div className="flex items-center gap-3">
+                        <Badge variant="outline" className="shrink-0">
+                          {getCategoryIcon(item.category)}
+                          <span className="ml-1">{getCategoryLabel(item.category)}</span>
+                        </Badge>
+                        <span>{item.question}</span>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground whitespace-pre-line pl-4 border-l-2 border-primary/20 ml-2">
+                      {item.answer}
+                    </AccordionContent>
+                  </AccordionItem>
+                ))
+              )}
             </Accordion>
           </CardContent>
         </Card>
