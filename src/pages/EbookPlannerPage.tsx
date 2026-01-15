@@ -98,6 +98,7 @@ import EbookSeoArticleGenerator from '@/components/ebook/EbookSeoArticleGenerato
 import EbookDocumentTransformer from '@/components/ebook/EbookDocumentTransformer';
 import EbookAmazonAdsSimulator from '@/components/ebook/EbookAmazonAdsSimulator';
 import EbookLaunchPlan from '@/components/ebook/EbookLaunchPlan';
+import EbookColoringBookGenerator from '@/components/ebook/EbookColoringBookGenerator';
 
 // Hooks et données
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
@@ -2242,6 +2243,11 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               toast.success(`"${data.title}" importé avec ${data.chapters.length} chapitres ! (~${data.targetWordsPerChapter.toLocaleString()} mots/chapitre)`);
             }}
           />
+        );
+      
+      case 'coloring-book':
+        return (
+          <EbookColoringBookGenerator ebookTitle={ebookTitle} />
         );
       
       case 'kdp-research':
