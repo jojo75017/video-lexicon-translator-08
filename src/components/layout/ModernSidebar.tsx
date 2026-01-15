@@ -160,6 +160,7 @@ const categories: PremiumCategory[] = [
       { id: 'characters', label: 'Personnages', icon: Users, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10', activeGradient: 'from-emerald-500 to-teal-500' },
       { id: 'series', label: 'Série / Saga', icon: BookCopy, color: 'text-indigo-500', bgColor: 'bg-indigo-500/10', activeGradient: 'from-indigo-500 to-purple-500', isNew2026: true },
       { id: 'coloring-book', label: '🖍️ Livre Coloriage', icon: Palette, color: 'text-pink-500', bgColor: 'bg-gradient-to-r from-pink-500/20 to-purple-500/20', activeGradient: 'from-pink-500 to-purple-500', isPremium: true, isNew2026: true },
+      { id: 'comic-book', label: '💬 Bande Dessinée', icon: LayoutTemplate, color: 'text-amber-500', bgColor: 'bg-gradient-to-r from-amber-500/20 to-orange-500/20', activeGradient: 'from-amber-500 to-orange-500', isPremium: true, isNew2026: true },
       { id: 'voice', label: 'Dictée Vocale', icon: Volume2, color: 'text-rose-500', bgColor: 'bg-rose-500/10', activeGradient: 'from-rose-500 to-pink-500' },
     ]
   },

@@ -1,0 +1,861 @@
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+import { Slider } from '@/components/ui/slider';
+import { Loader2, Layout, Download, RefreshCw, Sparkles, MessageSquare, ImagePlus, BookOpen, Wand2, FileDown, Users, Zap } from 'lucide-react';
+import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import jsPDF from 'jspdf';
+
+interface ComicPanel {
+  id: string;
+  imageUrl: string;
+  dialogue: string;
+  character: string;
+  action: string;
+}
+
+interface ComicPage {
+  id: string;
+  pageNumber: number;
+  panels: ComicPanel[];
+  layout: string;
+}
+
+interface ComicBookGeneratorProps {
+  ebookTitle?: string;
+}
+
+const GENRES = [
+  { value: 'adventure', label: '🏴‍☠️ Aventure', examples: 'Explorateurs, trésors, voyages...' },
+  { value: 'fantasy', label: '🧙 Fantaisie', examples: 'Magie, créatures, quêtes...' },
+  { value: 'superhero', label: '🦸 Super-héros', examples: 'Pouvoirs, combats, sauvetages...' },
+  { value: 'scifi', label: '🚀 Science-Fiction', examples: 'Espace, robots, futur...' },
+  { value: 'comedy', label: '😂 Comédie', examples: 'Gags, situations drôles...' },
+  { value: 'mystery', label: '🔍 Mystère', examples: 'Enquêtes, indices, secrets...' },
+  { value: 'animals', label: '🐾 Animaux', examples: 'Animaux anthropomorphes...' },
+  { value: 'slice-of-life', label: '🏠 Tranche de vie', examples: 'Quotidien, école, amitié...' },
+  { value: 'historical', label: '⚔️ Historique', examples: 'Époques passées, légendes...' },
+  { value: 'custom', label: '✏️ Personnalisé', examples: 'Votre propre genre' },
+];
+
+const AGE_GROUPS = [
+  { value: '4-7', label: '4-7 ans', description: 'Histoires très simples, dialogues courts' },
+  { value: '7-10', label: '7-10 ans', description: 'Aventures accessibles, vocabulaire adapté' },
+  { value: '10-14', label: '10-14 ans', description: 'Histoires plus complexes, suspense' },
+  { value: 'all-ages', label: 'Tout public', description: 'Contenu familial universel' },
+];
+
+const PANEL_LAYOUTS = [
+  { value: '2-panels', label: '2 cases', description: 'Simple, impact maximal', grid: [1, 2] },
+  { value: '3-panels', label: '3 cases', description: 'Classique manga', grid: [1, 1, 1] },
+  { value: '4-panels', label: '4 cases', description: 'Standard BD', grid: [2, 2] },
+  { value: '6-panels', label: '6 cases', description: 'Détaillé', grid: [2, 2, 2] },
+];
+
+const ART_STYLES = [
+  { value: 'cartoon', label: '🎨 Cartoon', description: 'Style simple et coloré' },
+  { value: 'manga', label: '🎌 Manga', description: 'Style japonais expressif' },
+  { value: 'franco-belge', label: '🇫🇷 Franco-belge', description: 'Style classique européen' },
+  { value: 'american', label: '🇺🇸 Comics américain', description: 'Style super-héros' },
+  { value: 'minimal', label: '✨ Minimaliste', description: 'Lignes épurées, moderne' },
+];
+
+const STORY_TEMPLATES = [
+  { 
+    value: 'hero-journey', 
+    label: "Le voyage du héros",
+    description: "Un personnage ordinaire vit une aventure extraordinaire",
+    structure: ['Introduction du héros', 'Appel à l\'aventure', 'Défis et alliés', 'Épreuve finale', 'Retour victorieux']
+  },
+  { 
+    value: 'rescue', 
+    label: "Mission sauvetage",
+    description: "Un héros doit sauver quelqu'un ou quelque chose",
+    structure: ['Situation de départ', 'Le problème survient', 'Le héros agit', 'Obstacles', 'Sauvetage réussi']
+  },
+  { 
+    value: 'mystery', 
+    label: "Le mystère à résoudre",
+    description: "Un mystère doit être élucidé",
+    structure: ['Découverte du mystère', 'Recherche d\'indices', 'Fausses pistes', 'Révélation', 'Résolution']
+  },
+  { 
+    value: 'competition', 
+    label: "Le grand défi",
+    description: "Un personnage doit remporter un défi",
+    structure: ['Présentation du défi', 'Préparation', 'La compétition', 'Moment de doute', 'Victoire']
+  },
+  { 
+    value: 'friendship', 
+    label: "Nouvelle amitié",
+    description: "Deux personnages deviennent amis",
+    structure: ['Rencontre maladroite', 'Malentendu', 'Épreuve commune', 'Compréhension mutuelle', 'Amitié scellée']
+  },
+];
+
+export const EbookComicBookGenerator: React.FC<ComicBookGeneratorProps> = ({ ebookTitle }) => {
+  const [genre, setGenre] = useState('adventure');
+  const [customGenre, setCustomGenre] = useState('');
+  const [ageGroup, setAgeGroup] = useState('7-10');
+  const [artStyle, setArtStyle] = useState('cartoon');
+  const [panelLayout, setPanelLayout] = useState('4-panels');
+  const [storyTemplate, setStoryTemplate] = useState('hero-journey');
+  const [numberOfPages, setNumberOfPages] = useState(12);
+  const [title, setTitle] = useState(ebookTitle || '');
+  const [mainCharacter, setMainCharacter] = useState('');
+  const [characterDescription, setCharacterDescription] = useState('');
+  const [setting, setSetting] = useState('');
+  const [customPrompt, setCustomPrompt] = useState('');
+  
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isGeneratingScenario, setIsGeneratingScenario] = useState(false);
+  const [generatedPages, setGeneratedPages] = useState<ComicPage[]>([]);
+  const [scenario, setScenario] = useState<{ pages: { description: string; dialogues: { character: string; text: string }[] }[] } | null>(null);
+  const [currentProgress, setCurrentProgress] = useState(0);
+
+  const getLayoutDescription = (layout: string): string => {
+    const layouts: Record<string, string> = {
+      '2-panels': '2 grandes cases horizontales',
+      '3-panels': '3 cases verticales (style manga)',
+      '4-panels': '4 cases en grille 2x2',
+      '6-panels': '6 cases en grille 2x3',
+    };
+    return layouts[layout] || '4 cases';
+  };
+
+  const generateScenario = async () => {
+    if (!title.trim() || !mainCharacter.trim()) {
+      toast.error('Veuillez renseigner le titre et le personnage principal');
+      return;
+    }
+
+    setIsGeneratingScenario(true);
+    
+    try {
+      const selectedTemplate = STORY_TEMPLATES.find(t => t.value === storyTemplate);
+      const selectedGenre = GENRES.find(g => g.value === genre);
+      const selectedAge = AGE_GROUPS.find(a => a.value === ageGroup);
+
+      const prompt = `Tu es un scénariste de bandes dessinées pour enfants. Crée un scénario de BD en ${numberOfPages} pages.
+
+INFORMATIONS:
+- Titre: "${title}"
+- Genre: ${selectedGenre?.label || genre}
+- Public: ${selectedAge?.label} (${selectedAge?.description})
+- Personnage principal: ${mainCharacter}
+${characterDescription ? `- Description du personnage: ${characterDescription}` : ''}
+${setting ? `- Univers/Décor: ${setting}` : ''}
+- Structure narrative: ${selectedTemplate?.label} - ${selectedTemplate?.structure?.join(' → ')}
+${customPrompt ? `- Instructions supplémentaires: ${customPrompt}` : ''}
+
+Pour chaque page, fournis:
+1. Une description visuelle détaillée de la scène (pour générer l'image)
+2. Les dialogues des personnages (bulles de texte)
+
+IMPORTANT: Les dialogues doivent être courts et adaptés à l'âge cible. Maximum 2-3 bulles par page.
+
+Réponds en JSON avec ce format exact:
+{
+  "pages": [
+    {
+      "description": "Description visuelle détaillée de la scène...",
+      "dialogues": [
+        { "character": "Nom du personnage", "text": "Ce qu'il dit..." }
+      ]
+    }
+  ]
+}`;
+
+      const { data, error } = await supabase.functions.invoke('generate-content', {
+        body: {
+          prompt,
+          temperature: 0.8,
+          maxTokens: 4000,
+        }
+      });
+
+      if (error) throw error;
+
+      let parsedScenario;
+      try {
+        const content = data.content || data.text || data;
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          parsedScenario = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error('Format JSON invalide');
+        }
+      } catch (parseError) {
+        throw new Error('Impossible de parser le scénario généré');
+      }
+
+      setScenario(parsedScenario);
+      toast.success(`Scénario de ${parsedScenario.pages.length} pages généré !`);
+
+    } catch (error) {
+      console.error('Erreur génération scénario:', error);
+      toast.error('Erreur lors de la génération du scénario');
+    } finally {
+      setIsGeneratingScenario(false);
+    }
+  };
+
+  const generateComicPage = async (pageIndex: number, pageScenario: { description: string; dialogues: { character: string; text: string }[] }): Promise<ComicPage | null> => {
+    try {
+      const selectedStyle = ART_STYLES.find(s => s.value === artStyle);
+      const selectedGenre = GENRES.find(g => g.value === genre);
+
+      const imagePrompt = `Comic book illustration, ${selectedStyle?.description || 'cartoon style'}, ${selectedGenre?.label || 'adventure'} genre.
+Scene: ${pageScenario.description}
+Main character: ${mainCharacter}${characterDescription ? `, ${characterDescription}` : ''}
+Style: Clean lines, vibrant colors, expressive characters, ${getLayoutDescription(panelLayout)} layout.
+Professional comic book art, child-friendly, no text or speech bubbles in image.`;
+
+      const { data: imageData, error: imageError } = await supabase.functions.invoke('generate-cover-image', {
+        body: {
+          prompt: imagePrompt,
+          style: 'cartoon',
+          aspectRatio: '3:4'
+        }
+      });
+
+      if (imageError) throw imageError;
+
+      const panels: ComicPanel[] = pageScenario.dialogues.map((d, i) => ({
+        id: `panel-${pageIndex}-${i}`,
+        imageUrl: imageData.imageUrl || imageData.url || '',
+        dialogue: d.text,
+        character: d.character,
+        action: pageScenario.description
+      }));
+
+      return {
+        id: `page-${pageIndex}`,
+        pageNumber: pageIndex + 1,
+        panels,
+        layout: panelLayout
+      };
+
+    } catch (error) {
+      console.error(`Erreur page ${pageIndex + 1}:`, error);
+      return null;
+    }
+  };
+
+  const handleGenerate = async () => {
+    if (!scenario || scenario.pages.length === 0) {
+      toast.error('Veuillez d\'abord générer le scénario');
+      return;
+    }
+
+    setIsGenerating(true);
+    setGeneratedPages([]);
+    setCurrentProgress(0);
+
+    const BATCH_SIZE = 3;
+    const totalPages = scenario.pages.length;
+    const allPages: ComicPage[] = [];
+
+    toast.info(`Génération de ${totalPages} pages de BD...`);
+
+    try {
+      for (let batchStart = 0; batchStart < totalPages; batchStart += BATCH_SIZE) {
+        const batchEnd = Math.min(batchStart + BATCH_SIZE, totalPages);
+        const batchPromises: Promise<ComicPage | null>[] = [];
+
+        for (let i = batchStart; i < batchEnd; i++) {
+          batchPromises.push(generateComicPage(i, scenario.pages[i]));
+        }
+
+        const batchResults = await Promise.all(batchPromises);
+        
+        const successfulPages = batchResults.filter((p): p is ComicPage => p !== null);
+        allPages.push(...successfulPages);
+        setGeneratedPages([...allPages]);
+        setCurrentProgress(Math.round((batchEnd / totalPages) * 100));
+      }
+
+      toast.success(`${allPages.length} pages de BD générées avec succès !`);
+
+    } catch (error) {
+      console.error('Erreur génération BD:', error);
+      toast.error('Erreur lors de la génération des pages');
+    } finally {
+      setIsGenerating(false);
+      setCurrentProgress(100);
+    }
+  };
+
+  const exportToPDF = async () => {
+    if (generatedPages.length === 0) {
+      toast.error('Aucune page à exporter');
+      return;
+    }
+
+    toast.info('Création du PDF en cours...');
+
+    try {
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: [215.9, 279.4] // Letter format
+      });
+
+      const pageWidth = 215.9;
+      const pageHeight = 279.4;
+      const margin = 15;
+
+      // ===== PAGE DE TITRE =====
+      pdf.setFillColor(45, 45, 60);
+      pdf.rect(0, 0, pageWidth, pageHeight, 'F');
+
+      // Titre
+      pdf.setTextColor(255, 215, 0);
+      pdf.setFontSize(36);
+      pdf.setFont('helvetica', 'bold');
+      const titleLines = pdf.splitTextToSize(title || 'Ma Bande Dessinée', pageWidth - 40);
+      pdf.text(titleLines, pageWidth / 2, 80, { align: 'center' });
+
+      // Sous-titre
+      pdf.setTextColor(200, 200, 200);
+      pdf.setFontSize(16);
+      pdf.text(`Une aventure de ${mainCharacter}`, pageWidth / 2, 110, { align: 'center' });
+
+      // Genre et style
+      const selectedGenre = GENRES.find(g => g.value === genre);
+      const selectedStyle = ART_STYLES.find(s => s.value === artStyle);
+      pdf.setFontSize(12);
+      pdf.text(`${selectedGenre?.label || ''} • ${selectedStyle?.label || ''}`, pageWidth / 2, 130, { align: 'center' });
+
+      // ===== PAGE COPYRIGHT =====
+      pdf.addPage();
+      pdf.setFillColor(255, 255, 255);
+      pdf.rect(0, 0, pageWidth, pageHeight, 'F');
+      
+      pdf.setTextColor(50, 50, 50);
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('Mentions légales', margin, 40);
+
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(10);
+      const copyrightText = [
+        `© ${new Date().getFullYear()} - Tous droits réservés`,
+        '',
+        `Titre : ${title}`,
+        `Créé avec EbookStudio Pro`,
+        '',
+        'Ce livre est une œuvre de fiction générée par intelligence artificielle.',
+        'Toute ressemblance avec des personnes réelles serait fortuite.',
+        '',
+        `Nombre de pages : ${generatedPages.length + 4}`,
+        `Genre : ${selectedGenre?.label || genre}`,
+        `Style artistique : ${selectedStyle?.label || artStyle}`,
+      ];
+      let yPos = 55;
+      copyrightText.forEach(line => {
+        pdf.text(line, margin, yPos);
+        yPos += 6;
+      });
+
+      // ===== PAGES DE BD =====
+      for (let i = 0; i < generatedPages.length; i++) {
+        const page = generatedPages[i];
+        pdf.addPage();
+
+        // Image principale
+        if (page.panels[0]?.imageUrl) {
+          try {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            await new Promise((resolve, reject) => {
+              img.onload = resolve;
+              img.onerror = reject;
+              img.src = page.panels[0].imageUrl;
+            });
+
+            const imgWidth = pageWidth - (margin * 2);
+            const imgHeight = (pageHeight - 80);
+            pdf.addImage(img, 'JPEG', margin, margin, imgWidth, imgHeight);
+          } catch (imgError) {
+            console.error('Erreur chargement image:', imgError);
+            pdf.setFillColor(240, 240, 240);
+            pdf.rect(margin, margin, pageWidth - (margin * 2), pageHeight - 80, 'F');
+          }
+        }
+
+        // Bulles de dialogue en bas
+        if (page.panels.length > 0) {
+          const dialogueY = pageHeight - 50;
+          pdf.setFillColor(255, 255, 255);
+          pdf.roundedRect(margin, dialogueY - 15, pageWidth - (margin * 2), 45, 5, 5, 'F');
+          
+          pdf.setDrawColor(0, 0, 0);
+          pdf.setLineWidth(0.5);
+          pdf.roundedRect(margin, dialogueY - 15, pageWidth - (margin * 2), 45, 5, 5, 'S');
+
+          let textY = dialogueY;
+          page.panels.forEach((panel, pIndex) => {
+            if (panel.dialogue && pIndex < 3) {
+              pdf.setFontSize(10);
+              pdf.setFont('helvetica', 'bold');
+              pdf.setTextColor(50, 50, 150);
+              pdf.text(`${panel.character}:`, margin + 5, textY);
+              
+              pdf.setFont('helvetica', 'normal');
+              pdf.setTextColor(30, 30, 30);
+              const dialogueLines = pdf.splitTextToSize(panel.dialogue, pageWidth - (margin * 2) - 40);
+              pdf.text(dialogueLines[0] || '', margin + 35, textY);
+              textY += 12;
+            }
+          });
+        }
+
+        // Numéro de page
+        pdf.setFontSize(9);
+        pdf.setTextColor(150, 150, 150);
+        pdf.text(`${i + 1}`, pageWidth / 2, pageHeight - 8, { align: 'center' });
+      }
+
+      // ===== PAGE FIN =====
+      pdf.addPage();
+      pdf.setFillColor(45, 45, 60);
+      pdf.rect(0, 0, pageWidth, pageHeight, 'F');
+
+      pdf.setTextColor(255, 215, 0);
+      pdf.setFontSize(24);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('FIN', pageWidth / 2, pageHeight / 2 - 20, { align: 'center' });
+
+      pdf.setTextColor(200, 200, 200);
+      pdf.setFontSize(14);
+      pdf.text(`Merci d'avoir lu "${title}"`, pageWidth / 2, pageHeight / 2 + 10, { align: 'center' });
+      pdf.setFontSize(10);
+      pdf.text('Créé avec EbookStudio Pro', pageWidth / 2, pageHeight / 2 + 30, { align: 'center' });
+
+      // Sauvegarde
+      const fileName = `BD_${title.replace(/[^a-zA-Z0-9]/g, '_')}_${Date.now()}.pdf`;
+      pdf.save(fileName);
+
+      toast.success(`BD exportée: ${generatedPages.length + 4} pages !`);
+
+    } catch (error) {
+      console.error('Erreur export PDF:', error);
+      toast.error('Erreur lors de l\'export PDF');
+    }
+  };
+
+  const regeneratePage = async (pageIndex: number) => {
+    if (!scenario || !scenario.pages[pageIndex]) {
+      toast.error('Scénario manquant pour cette page');
+      return;
+    }
+
+    toast.info(`Régénération de la page ${pageIndex + 1}...`);
+
+    const newPage = await generateComicPage(pageIndex, scenario.pages[pageIndex]);
+    if (newPage) {
+      const updatedPages = [...generatedPages];
+      const existingIndex = updatedPages.findIndex(p => p.pageNumber === pageIndex + 1);
+      if (existingIndex >= 0) {
+        updatedPages[existingIndex] = newPage;
+      } else {
+        updatedPages.push(newPage);
+      }
+      setGeneratedPages(updatedPages);
+      toast.success(`Page ${pageIndex + 1} régénérée !`);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <Card className="bg-gradient-to-br from-amber-500/10 via-orange-500/10 to-red-500/10 border-amber-500/30">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-3 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 shadow-lg">
+              <Layout className="h-6 w-6 text-white" />
+            </div>
+            <div>
+              <CardTitle className="text-2xl flex items-center gap-2">
+                Générateur de Bandes Dessinées
+                <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white">
+                  2026
+                </Badge>
+              </CardTitle>
+              <CardDescription>
+                Créez des BD complètes avec scénario IA et illustrations automatiques
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+      </Card>
+
+      {/* Configuration */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Colonne gauche - Paramètres */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Wand2 className="h-5 w-5 text-amber-500" />
+              Configuration de l'histoire
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Titre */}
+            <div className="space-y-2">
+              <Label>Titre de la BD *</Label>
+              <Input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Ex: Les Aventures de Super Chat"
+              />
+            </div>
+
+            {/* Genre */}
+            <div className="space-y-2">
+              <Label>Genre</Label>
+              <Select value={genre} onValueChange={setGenre}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {GENRES.map(g => (
+                    <SelectItem key={g.value} value={g.value}>
+                      {g.label} - {g.examples}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {genre === 'custom' && (
+                <Input
+                  value={customGenre}
+                  onChange={(e) => setCustomGenre(e.target.value)}
+                  placeholder="Décrivez votre genre..."
+                  className="mt-2"
+                />
+              )}
+            </div>
+
+            {/* Personnage principal */}
+            <div className="space-y-2">
+              <Label>Personnage principal *</Label>
+              <Input
+                value={mainCharacter}
+                onChange={(e) => setMainCharacter(e.target.value)}
+                placeholder="Ex: Luna le chat magique"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Description du personnage</Label>
+              <Textarea
+                value={characterDescription}
+                onChange={(e) => setCharacterDescription(e.target.value)}
+                placeholder="Ex: Un petit chat blanc avec des yeux bleus et un collier étoilé..."
+                rows={2}
+              />
+            </div>
+
+            {/* Univers */}
+            <div className="space-y-2">
+              <Label>Univers / Décor</Label>
+              <Input
+                value={setting}
+                onChange={(e) => setSetting(e.target.value)}
+                placeholder="Ex: Une ville fantastique dans les nuages"
+              />
+            </div>
+
+            {/* Public cible */}
+            <div className="space-y-2">
+              <Label>Public cible</Label>
+              <Select value={ageGroup} onValueChange={setAgeGroup}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {AGE_GROUPS.map(age => (
+                    <SelectItem key={age.value} value={age.value}>
+                      {age.label} - {age.description}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Colonne droite - Style et structure */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-orange-500" />
+              Style et structure
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Template d'histoire */}
+            <div className="space-y-2">
+              <Label>Structure narrative</Label>
+              <Select value={storyTemplate} onValueChange={setStoryTemplate}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {STORY_TEMPLATES.map(template => (
+                    <SelectItem key={template.value} value={template.value}>
+                      {template.label} - {template.description}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {storyTemplate && (
+                <div className="mt-2 p-3 bg-muted/50 rounded-lg">
+                  <p className="text-xs text-muted-foreground">
+                    {STORY_TEMPLATES.find(t => t.value === storyTemplate)?.structure?.join(' → ')}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Style artistique */}
+            <div className="space-y-2">
+              <Label>Style artistique</Label>
+              <Select value={artStyle} onValueChange={setArtStyle}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {ART_STYLES.map(style => (
+                    <SelectItem key={style.value} value={style.value}>
+                      {style.label} - {style.description}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Layout des cases */}
+            <div className="space-y-2">
+              <Label>Disposition des cases</Label>
+              <Select value={panelLayout} onValueChange={setPanelLayout}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {PANEL_LAYOUTS.map(layout => (
+                    <SelectItem key={layout.value} value={layout.value}>
+                      {layout.label} - {layout.description}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Nombre de pages */}
+            <div className="space-y-2">
+              <Label>Nombre de pages: {numberOfPages}</Label>
+              <Slider
+                value={[numberOfPages]}
+                onValueChange={(val) => setNumberOfPages(val[0])}
+                min={6}
+                max={24}
+                step={2}
+                className="py-2"
+              />
+              <p className="text-xs text-muted-foreground">
+                Recommandé: 12-16 pages pour une BD enfant
+              </p>
+            </div>
+
+            {/* Instructions supplémentaires */}
+            <div className="space-y-2">
+              <Label>Instructions supplémentaires (optionnel)</Label>
+              <Textarea
+                value={customPrompt}
+                onChange={(e) => setCustomPrompt(e.target.value)}
+                placeholder="Ex: Inclure un message sur l'amitié, ajouter un personnage secondaire rigolo..."
+                rows={2}
+              />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Actions */}
+      <Card>
+        <CardContent className="py-4">
+          <div className="flex flex-wrap gap-3 items-center justify-between">
+            <div className="flex gap-3">
+              <Button
+                onClick={generateScenario}
+                disabled={isGeneratingScenario || isGenerating}
+                className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
+              >
+                {isGeneratingScenario ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Écriture du scénario...
+                  </>
+                ) : (
+                  <>
+                    <MessageSquare className="mr-2 h-4 w-4" />
+                    1. Générer le scénario
+                  </>
+                )}
+              </Button>
+
+              <Button
+                onClick={handleGenerate}
+                disabled={isGenerating || !scenario}
+                variant={scenario ? 'default' : 'secondary'}
+                className={scenario ? 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600' : ''}
+              >
+                {isGenerating ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Génération... {currentProgress}%
+                  </>
+                ) : (
+                  <>
+                    <ImagePlus className="mr-2 h-4 w-4" />
+                    2. Générer les illustrations
+                  </>
+                )}
+              </Button>
+            </div>
+
+            <Button
+              onClick={exportToPDF}
+              disabled={generatedPages.length === 0}
+              variant="outline"
+              className="border-green-500 text-green-600 hover:bg-green-50"
+            >
+              <Download className="mr-2 h-4 w-4" />
+              Exporter PDF ({generatedPages.length + 4} pages)
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Aperçu du scénario */}
+      {scenario && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <BookOpen className="h-5 w-5 text-amber-500" />
+              Scénario généré ({scenario.pages.length} pages)
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto">
+              {scenario.pages.map((page, index) => (
+                <div 
+                  key={index} 
+                  className="p-3 bg-muted/50 rounded-lg border border-border/50 hover:border-amber-500/50 transition-colors"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <Badge variant="outline">Page {index + 1}</Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
+                    {page.description}
+                  </p>
+                  {page.dialogues.map((d, dIndex) => (
+                    <div key={dIndex} className="text-xs mt-1">
+                      <span className="font-medium text-amber-600">{d.character}:</span>{' '}
+                      <span className="text-foreground">"{d.text}"</span>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Galerie des pages générées */}
+      {generatedPages.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Layout className="h-5 w-5 text-orange-500" />
+              Pages générées ({generatedPages.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {generatedPages.map((page, index) => (
+                <div 
+                  key={page.id} 
+                  className="relative group rounded-lg overflow-hidden border border-border/50 hover:border-orange-500/50 transition-all hover:shadow-lg"
+                >
+                  {page.panels[0]?.imageUrl ? (
+                    <img
+                      src={page.panels[0].imageUrl}
+                      alt={`Page ${page.pageNumber}`}
+                      className="w-full aspect-[3/4] object-cover"
+                    />
+                  ) : (
+                    <div className="w-full aspect-[3/4] bg-muted flex items-center justify-center">
+                      <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                    </div>
+                  )}
+                  
+                  {/* Overlay avec dialogues */}
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2">
+                    <Badge className="bg-white/90 text-black text-xs mb-1">
+                      Page {page.pageNumber}
+                    </Badge>
+                    {page.panels[0]?.dialogue && (
+                      <p className="text-xs text-white line-clamp-2">
+                        "{page.panels[0].dialogue}"
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Bouton régénérer */}
+                  <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Button
+                      size="icon"
+                      variant="secondary"
+                      className="h-8 w-8"
+                      onClick={() => regeneratePage(index)}
+                    >
+                      <RefreshCw className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Info crédit */}
+      <Card className="bg-muted/30">
+        <CardContent className="py-4">
+          <div className="flex items-start gap-3">
+            <Zap className="h-5 w-5 text-amber-500 mt-0.5" />
+            <div className="text-sm text-muted-foreground">
+              <p className="font-medium text-foreground">À propos du générateur de BD</p>
+              <p className="mt-1">
+                Ce module crée des bandes dessinées illustrées avec scénario IA. Chaque page est générée 
+                individuellement avec cohérence stylistique. Le résultat est un "album illustré narratif" 
+                parfait pour les enfants et compatible KDP.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default EbookComicBookGenerator;
