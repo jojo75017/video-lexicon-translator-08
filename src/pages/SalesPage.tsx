@@ -861,20 +861,6 @@ const SalesPage = () => {
         </button>
       </div>
 
-      {/* Bouton bonus fallback (mobile + desktop discret) */}
-      <div className="fixed bottom-4 left-4 right-4 z-40 md:hidden">
-        <button
-          onClick={() => {
-            generateKdpNichesPdf();
-            toast.success("🎉 Votre guide PDF a été téléchargé !");
-          }}
-          className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-medium py-3 px-4 rounded-full shadow-lg hover:shadow-xl transition-all"
-        >
-          <Gift className="w-4 h-4" />
-          <span>🎁 Télécharger le Guide Gratuit (10 Niches KDP)</span>
-        </button>
-      </div>
-
       {/* Footer avec liens SEO */}
       <footer className="py-12 pb-20 md:pb-12 border-t border-border/50 bg-slate-900 text-white">
         <div className="max-w-6xl mx-auto px-4">
