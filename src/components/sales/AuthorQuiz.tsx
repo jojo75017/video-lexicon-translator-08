@@ -7,10 +7,11 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { 
   Sparkles, ArrowRight, ArrowLeft, CheckCircle2, BookOpen, 
-  Rocket, PenTool, Target, Trophy, Mail, Gift
+  Rocket, PenTool, Target, Trophy, Mail, Gift, Loader2
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 interface QuizQuestion {
   id: number;
@@ -169,26 +170,34 @@ const AuthorQuiz: React.FC<AuthorQuizProps> = ({
   };
 
   const handleSubmitEmail = async () => {
-    if (!email) {
-      toast.error('Veuillez entrer votre email');
+    if (!email || !email.includes('@')) {
+      toast.error('Veuillez entrer un email valide');
       return;
     }
 
     setIsSubmitting(true);
     try {
-      // Sauvegarder l'email (optionnel - à connecter à votre système)
-      localStorage.setItem('quiz_email', email);
+      const emailLower = email.trim().toLowerCase();
+      
+      // Sauvegarder l'email dans la séquence automatique
+      await supabase.functions.invoke('add-to-email-sequence', {
+        body: { email: emailLower }
+      });
+
+      // Sauvegarder localement
+      localStorage.setItem('quiz_email', emailLower);
       localStorage.setItem('quiz_profile', getResultProfile().type);
       
       toast.success('🎁 Votre guide personnalisé arrive dans votre boîte mail !');
       
       if (onComplete) {
-        onComplete(getResultProfile(), email);
+        onComplete(getResultProfile(), emailLower);
       }
       
       // Rediriger vers la démo ou les offres
       setTimeout(() => navigate('/demo'), 1500);
     } catch (error) {
+      console.error('Quiz email error:', error);
       toast.error('Une erreur est survenue');
     } finally {
       setIsSubmitting(false);
@@ -326,7 +335,7 @@ const AuthorQuiz: React.FC<AuthorQuizProps> = ({
                       disabled={isSubmitting}
                       className="bg-gradient-to-r from-primary to-violet-600"
                     >
-                      {isSubmitting ? 'Envoi...' : 'Recevoir'}
+                      {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Recevoir'}
                     </Button>
                   </div>
                 </div>

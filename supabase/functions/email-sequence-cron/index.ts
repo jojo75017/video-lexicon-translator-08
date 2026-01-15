@@ -16,6 +16,7 @@ const EMAIL_SEQUENCE = [
   { step: 2, daysAfter: 3, subject: "150 pages en 2 jours (mon dernier résultat)" },
   { step: 3, daysAfter: 5, subject: "\"C'est trop beau pour être vrai ?\" (Ma réponse honnête)" },
   { step: 4, daysAfter: 7, subject: "⏰ Dernière chance : le prix augmente bientôt" },
+  { step: 5, daysAfter: 14, subject: "🎯 Une opportunité exclusive pour vous (valable 48h)" },
 ];
 
 const getEmailContent = (step: number): string => {
@@ -132,6 +133,40 @@ const getEmailContent = (step: number): string => {
       <p>Après ça, je ne vous embêterai plus avec des emails promotionnels.</p>
       <p>Merci de m'avoir lu,<br><strong>Georges</strong></p>
       <p style="color: #666; font-size: 14px;">PS : Si vous avez la moindre question, répondez simplement à cet email.</p>
+      <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+      <p style="color: #9ca3af; font-size: 12px; text-align: center;">
+        <a href="https://ebookstudio.fr/faq" style="color: #9ca3af;">FAQ</a> | 
+        Pour ne plus recevoir ces emails, répondez avec "STOP"
+      </p>
+    </div>`,
+
+    // Email 6 - J+14 (offre exclusive dernière chance)
+    `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <p>Bonjour,</p>
+      <p>Cela fait 2 semaines que vous avez téléchargé notre guide des niches KDP...</p>
+      <p>Et je me demandais : <strong>avez-vous enfin lancé votre premier ebook ?</strong></p>
+      <p>Si ce n'est pas encore fait, j'ai une offre exclusive pour vous :</p>
+      <div style="background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%); color: white; padding: 25px; border-radius: 15px; margin: 20px 0; text-align: center;">
+        <h2 style="margin: 0 0 15px 0; font-size: 24px;">🎯 Offre VIP 48h</h2>
+        <p style="margin: 0 0 15px 0; font-size: 18px;">Accès à vie à EbookStudio Pro</p>
+        <div style="background: white; color: #8b5cf6; display: inline-block; padding: 10px 25px; border-radius: 10px; font-weight: bold;">
+          <span style="text-decoration: line-through; opacity: 0.6;">97€</span> → <span style="font-size: 28px;">37€</span>
+        </div>
+        <p style="margin: 15px 0 0 0; font-size: 14px; opacity: 0.9;">Cette offre expire dans 48 heures</p>
+      </div>
+      <p><strong>Ce qui vous attend :</strong></p>
+      <ul style="color: #16a34a;">
+        <li>✅ Votre premier ebook créé en quelques heures</li>
+        <li>✅ Une couverture professionnelle générée par IA</li>
+        <li>✅ Tout optimisé pour Amazon KDP</li>
+        <li>✅ Formation complète incluse</li>
+      </ul>
+      <p style="text-align: center; margin: 30px 0;">
+        <a href="https://ebookstudio.fr/offres" style="display: inline-block; background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%); color: white; padding: 18px 40px; text-decoration: none; border-radius: 10px; font-weight: bold; font-size: 18px; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);">👉 Profiter de l'offre VIP</a>
+      </p>
+      <p>C'est vraiment ma dernière proposition à ce prix.</p>
+      <p>À bientôt j'espère,<br><strong>Georges</strong></p>
+      <p style="color: #666; font-size: 14px;">PS : Garantie satisfait ou remboursé 30 jours, vous ne risquez rien.</p>
       <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
       <p style="color: #9ca3af; font-size: 12px; text-align: center;">
         <a href="https://ebookstudio.fr/faq" style="color: #9ca3af;">FAQ</a> | 

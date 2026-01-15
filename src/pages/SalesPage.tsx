@@ -18,6 +18,8 @@ import LiveEbookCounter from "@/components/sales/LiveEbookCounter";
 import LiveActivityNotifications from "@/components/sales/LiveActivityNotifications";
 import AuthorQuiz from "@/components/sales/AuthorQuiz";
 import SuccessGallery from "@/components/sales/SuccessGallery";
+import ScrollIntentPopup from "@/components/sales/ScrollIntentPopup";
+import VideoTestimonials from "@/components/sales/VideoTestimonials";
 
 // Composant Newsletter inline pour le footer
 const NewsletterForm = () => {
@@ -127,7 +129,19 @@ const SalesPage = () => {
 
   // Countdown to January 31, 2025
   useEffect(() => {
-    const targetDate = new Date('2025-01-31T23:59:59');
+    // Countdown dynamique : 3 jours à partir de maintenant (créant urgence permanente)
+    const getTargetDate = () => {
+      const stored = sessionStorage.getItem('countdown_target');
+      if (stored) {
+        return new Date(stored);
+      }
+      const newTarget = new Date();
+      newTarget.setDate(newTarget.getDate() + 3);
+      newTarget.setHours(23, 59, 59, 999);
+      sessionStorage.setItem('countdown_target', newTarget.toISOString());
+      return newTarget;
+    };
+    const targetDate = getTargetDate();
     
     const updateCountdown = () => {
       const now = new Date();
@@ -493,6 +507,9 @@ const SalesPage = () => {
         </div>
       </section>
 
+      {/* Video Testimonials Section */}
+      <VideoTestimonials />
+
       {/* ROI Calculator Section */}
       <section className="py-20 px-4 bg-gradient-to-br from-emerald-50/50 via-background to-teal-50/50 dark:from-emerald-950/20 dark:via-background dark:to-teal-950/20">
         <div className="max-w-2xl mx-auto">
@@ -568,7 +585,7 @@ const SalesPage = () => {
             <div className="bg-gradient-to-r from-red-500 to-orange-500 rounded-xl p-6 text-white text-center shadow-lg">
               <div className="flex items-center justify-center gap-2 mb-3">
                 <Clock className="w-5 h-5 animate-pulse" />
-                <span className="font-bold text-lg">🔥 Tarif de lancement – Après le 31 janvier : 97€</span>
+                <span className="font-bold text-lg">🔥 Offre spéciale lancement – Prix réduit limité</span>
               </div>
               <div className="grid grid-cols-4 gap-4 max-w-md mx-auto">
                 <div className="bg-white/20 rounded-lg p-3">
@@ -963,6 +980,9 @@ const SalesPage = () => {
 
       {/* Exit Intent Popup */}
       <ExitIntentPopup />
+
+      {/* Scroll Intent Popup at 50% */}
+      <ScrollIntentPopup scrollThreshold={50} />
 
       {/* Live Activity Notifications - remplace SocialProofNotifications */}
       <LiveActivityNotifications position="bottom-left" intervalMs={30000} />
