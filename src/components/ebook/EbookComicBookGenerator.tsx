@@ -264,45 +264,92 @@ Same exact character design, proportions, colors, outfit, and features on every 
       // Seed visuel pour cohérence
       const seedInfo = visualSeed ? `[SEED:${visualSeed}] ` : '';
 
-      const imagePrompt = `${seedInfo}Comic book illustration, ${selectedStyle?.description || 'cartoon style'}, ${selectedGenre?.label || 'adventure'} genre.
+      // Générer 4 images distinctes pour les 4 cases
+      const panelCount = 4;
+      const panelPromises: Promise<{ imageUrl: string; dialogue: string; character: string; action: string } | null>[] = [];
+
+      // Diviser la description en 4 moments
+      const sceneMoments = [
+        `Début de la scène: ${pageScenario.description} - moment d'introduction`,
+        `Développement: ${pageScenario.description} - action principale`,
+        `Tension: ${pageScenario.description} - point culminant`,
+        `Conclusion: ${pageScenario.description} - réaction finale`
+      ];
+
+      for (let panelIndex = 0; panelIndex < panelCount; panelIndex++) {
+        const panelPromise = (async () => {
+          const dialogue = pageScenario.dialogues[panelIndex] || { character: mainCharacter, text: '' };
+          
+          const imagePrompt = `${seedInfo}Single comic panel illustration, ${selectedStyle?.description || 'cartoon style'}, ${cleanTextForPDF(selectedGenre?.label || 'adventure')} genre.
 
 ${visualRef}
 
-Scene (Page ${pageIndex + 1}/${numberOfPages}): ${pageScenario.description}
+Panel ${panelIndex + 1}/4 - ${sceneMoments[panelIndex]}
 
 VISUAL STYLE:
 - ${colorPrompt}
-- ${getLayoutDescription(panelLayout)} layout
+- Single square panel, close-up or medium shot
 - Professional comic book art, child-friendly
-- No text, no speech bubbles in image
-- CONSISTENCY: Same art style, line weight, and character design as previous pages`;
+- NO text, NO speech bubbles, NO words in image
+- CONSISTENCY: Same art style, line weight, and character design`;
 
-      const { data: imageData, error: imageError } = await supabase.functions.invoke('generate-chapter-images', {
-        body: {
-          chapterTitle: `Page ${pageIndex + 1} - ${pageScenario.description.substring(0, 50)}`,
-          ebookTitle: title || 'Bande Dessinée',
-          style: `${selectedStyle?.description || 'cartoon comic'}, ${colorPrompt}`,
-          ratio: 'portrait',
-          quality: 'high',
-          colorScheme: colorMode === 'bw' ? 'monochrome' : 'auto',
-          customPrompt: imagePrompt
-        }
-      });
+          try {
+            const { data: imageData, error: imageError } = await supabase.functions.invoke('generate-chapter-images', {
+              body: {
+                chapterTitle: `Page ${pageIndex + 1} Panel ${panelIndex + 1}`,
+                ebookTitle: title || 'Bande Dessinée',
+                style: `${selectedStyle?.description || 'cartoon comic'}, ${colorPrompt}`,
+                ratio: 'square',
+                quality: 'standard',
+                colorScheme: colorMode === 'bw' ? 'monochrome' : 'auto',
+                customPrompt: imagePrompt
+              }
+            });
 
-      if (imageError) throw imageError;
+            if (imageError) throw imageError;
+
+            return {
+              imageUrl: imageData?.imageUrl || imageData?.url || '',
+              dialogue: dialogue.text,
+              character: dialogue.character,
+              action: sceneMoments[panelIndex]
+            };
+          } catch (err) {
+            console.error(`Erreur panel ${panelIndex + 1}:`, err);
+            return null;
+          }
+        })();
+
+        panelPromises.push(panelPromise);
+      }
+
+      const panelResults = await Promise.all(panelPromises);
 
       // Générer seed si première page
       if (pageIndex === 0 && !visualSeed) {
         setVisualSeed(`comic-${Date.now()}`);
       }
 
-      const panels: ComicPanel[] = pageScenario.dialogues.map((d, i) => ({
-        id: `panel-${pageIndex}-${i}`,
-        imageUrl: imageData.imageUrl || imageData.url || '',
-        dialogue: d.text,
-        character: d.character,
-        action: pageScenario.description
-      }));
+      const panels: ComicPanel[] = panelResults
+        .filter((p): p is NonNullable<typeof p> => p !== null)
+        .map((p, i) => ({
+          id: `panel-${pageIndex}-${i}`,
+          imageUrl: p.imageUrl,
+          dialogue: p.dialogue,
+          character: p.character,
+          action: p.action
+        }));
+
+      // Remplir les panels manquants avec des placeholders
+      while (panels.length < 4) {
+        panels.push({
+          id: `panel-${pageIndex}-${panels.length}`,
+          imageUrl: '',
+          dialogue: '',
+          character: mainCharacter,
+          action: ''
+        });
+      }
 
       return {
         id: `page-${pageIndex}`,
@@ -435,63 +482,87 @@ VISUAL STYLE:
         yPos += 6;
       });
 
-      // ===== PAGES DE BD =====
+      // ===== PAGES DE BD EN GRILLE 2x2 =====
       for (let i = 0; i < generatedPages.length; i++) {
         const page = generatedPages[i];
         pdf.addPage();
 
-        // Image principale
-        if (page.panels[0]?.imageUrl) {
-          try {
-            const img = new Image();
-            img.crossOrigin = 'anonymous';
-            await new Promise((resolve, reject) => {
-              img.onload = resolve;
-              img.onerror = reject;
-              img.src = page.panels[0].imageUrl;
-            });
+        // Dimensions pour grille 2x2
+        const panelWidth = (pageWidth - (margin * 3)) / 2;
+        const panelHeight = (pageHeight - margin - 60) / 2 - 15; // Espace pour dialogues
+        const gap = margin;
 
-            const imgWidth = pageWidth - (margin * 2);
-            const imgHeight = (pageHeight - 80);
-            pdf.addImage(img, 'JPEG', margin, margin, imgWidth, imgHeight);
-          } catch (imgError) {
-            console.error('Erreur chargement image:', imgError);
-            pdf.setFillColor(240, 240, 240);
-            pdf.rect(margin, margin, pageWidth - (margin * 2), pageHeight - 80, 'F');
+        // Positions des 4 cases
+        const positions = [
+          { x: margin, y: margin },                           // Case 1 (haut-gauche)
+          { x: margin + panelWidth + gap, y: margin },        // Case 2 (haut-droite)
+          { x: margin, y: margin + panelHeight + 25 },        // Case 3 (bas-gauche)
+          { x: margin + panelWidth + gap, y: margin + panelHeight + 25 } // Case 4 (bas-droite)
+        ];
+
+        // Dessiner les 4 cases avec images et dialogues
+        for (let panelIdx = 0; panelIdx < 4; panelIdx++) {
+          const panel = page.panels[panelIdx];
+          const pos = positions[panelIdx];
+
+          // Bordure de la case
+          pdf.setDrawColor(30, 30, 30);
+          pdf.setLineWidth(1);
+          pdf.rect(pos.x, pos.y, panelWidth, panelHeight, 'S');
+
+          // Image dans la case
+          if (panel?.imageUrl) {
+            try {
+              const img = new Image();
+              img.crossOrigin = 'anonymous';
+              await new Promise((resolve, reject) => {
+                img.onload = resolve;
+                img.onerror = reject;
+                setTimeout(reject, 10000); // Timeout 10s
+                img.src = panel.imageUrl;
+              });
+
+              pdf.addImage(img, 'JPEG', pos.x + 1, pos.y + 1, panelWidth - 2, panelHeight - 2);
+            } catch (imgError) {
+              console.error(`Erreur image case ${panelIdx + 1}:`, imgError);
+              pdf.setFillColor(245, 245, 245);
+              pdf.rect(pos.x + 1, pos.y + 1, panelWidth - 2, panelHeight - 2, 'F');
+              pdf.setFontSize(8);
+              pdf.setTextColor(150, 150, 150);
+              pdf.text('Image non disponible', pos.x + panelWidth / 2, pos.y + panelHeight / 2, { align: 'center' });
+            }
+          } else {
+            // Placeholder si pas d'image
+            pdf.setFillColor(250, 250, 250);
+            pdf.rect(pos.x + 1, pos.y + 1, panelWidth - 2, panelHeight - 2, 'F');
+          }
+
+          // Bulle de dialogue sous la case
+          if (panel?.dialogue) {
+            const bubbleY = pos.y + panelHeight + 2;
+            pdf.setFillColor(255, 255, 255);
+            pdf.roundedRect(pos.x, bubbleY, panelWidth, 18, 3, 3, 'FD');
+            
+            pdf.setFontSize(7);
+            pdf.setFont('helvetica', 'bold');
+            pdf.setTextColor(50, 50, 150);
+            pdf.text(`${panel.character}:`, pos.x + 3, bubbleY + 6);
+            
+            pdf.setFont('helvetica', 'normal');
+            pdf.setTextColor(30, 30, 30);
+            const maxDialogueWidth = panelWidth - 25;
+            const dialogueLines = pdf.splitTextToSize(panel.dialogue, maxDialogueWidth);
+            pdf.text(dialogueLines[0] || '', pos.x + 22, bubbleY + 6);
+            if (dialogueLines[1]) {
+              pdf.text(dialogueLines[1].substring(0, 40) + (dialogueLines[1].length > 40 ? '...' : ''), pos.x + 3, bubbleY + 13);
+            }
           }
         }
 
-        // Bulles de dialogue en bas
-        if (page.panels.length > 0) {
-          const dialogueY = pageHeight - 50;
-          pdf.setFillColor(255, 255, 255);
-          pdf.roundedRect(margin, dialogueY - 15, pageWidth - (margin * 2), 45, 5, 5, 'F');
-          
-          pdf.setDrawColor(0, 0, 0);
-          pdf.setLineWidth(0.5);
-          pdf.roundedRect(margin, dialogueY - 15, pageWidth - (margin * 2), 45, 5, 5, 'S');
-
-          let textY = dialogueY;
-          page.panels.forEach((panel, pIndex) => {
-            if (panel.dialogue && pIndex < 3) {
-              pdf.setFontSize(10);
-              pdf.setFont('helvetica', 'bold');
-              pdf.setTextColor(50, 50, 150);
-              pdf.text(`${panel.character}:`, margin + 5, textY);
-              
-              pdf.setFont('helvetica', 'normal');
-              pdf.setTextColor(30, 30, 30);
-              const dialogueLines = pdf.splitTextToSize(panel.dialogue, pageWidth - (margin * 2) - 40);
-              pdf.text(dialogueLines[0] || '', margin + 35, textY);
-              textY += 12;
-            }
-          });
-        }
-
-        // Numéro de page
+        // Numéro de page en bas
         pdf.setFontSize(9);
-        pdf.setTextColor(150, 150, 150);
-        pdf.text(`${i + 1}`, pageWidth / 2, pageHeight - 8, { align: 'center' });
+        pdf.setTextColor(100, 100, 100);
+        pdf.text(`- ${i + 1} -`, pageWidth / 2, pageHeight - 10, { align: 'center' });
       }
 
       // ===== PAGE FIN =====
