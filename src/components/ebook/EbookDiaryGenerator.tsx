@@ -328,7 +328,7 @@ High quality, professional book cover design, vertical format 6x9 inches.`;
         pdf.rect(0, 0, pageWidth, pageHeight, 'F');
         pdf.setFontSize(24);
         pdf.setTextColor(themeColors[1]);
-        pdf.text(customTitle || `Le Journal de ${firstName}`, pageWidth / 2, pageHeight / 2, { align: 'center' });
+        pdf.text('Mon Journal', pageWidth / 2, pageHeight / 2, { align: 'center' });
       }
     } else {
       // Simple cover
@@ -336,7 +336,7 @@ High quality, professional book cover design, vertical format 6x9 inches.`;
       pdf.rect(0, 0, pageWidth, pageHeight, 'F');
       pdf.setFontSize(28);
       pdf.setTextColor('#333333');
-      pdf.text(customTitle || `Le Journal de ${firstName || 'Moi'}`, pageWidth / 2, 80, { align: 'center' });
+      pdf.text('Mon Journal', pageWidth / 2, 80, { align: 'center' });
       pdf.setFontSize(16);
       pdf.text(subtitle || selectedType?.description || '', pageWidth / 2, 100, { align: 'center' });
       pdf.setFontSize(14);
@@ -352,7 +352,7 @@ High quality, professional book cover design, vertical format 6x9 inches.`;
         case 'title':
           pdf.setFontSize(28);
           pdf.setTextColor('#333333');
-          pdf.text(page.content.title, pageWidth / 2, 60, { align: 'center' });
+          pdf.text('Mon Journal', pageWidth / 2, 60, { align: 'center' });
           pdf.setFontSize(14);
           pdf.text(page.content.subtitle || '', pageWidth / 2, 80, { align: 'center' });
           pdf.setFontSize(18);
