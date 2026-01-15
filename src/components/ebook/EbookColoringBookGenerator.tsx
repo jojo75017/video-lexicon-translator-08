@@ -607,7 +607,9 @@ CRITICAL REQUIREMENTS:
       const contentWidth = pageWidth - (margin * 2);
       const contentHeight = pageHeight - (margin * 2);
       const title = ebookTitle || 'Mon Livre de Coloriage';
-      const themeLabel = THEMES.find(t => t.value === theme)?.label || theme;
+      // Supprimer les emojis du thème (non supportés par jsPDF)
+      const rawThemeLabel = THEMES.find(t => t.value === theme)?.label || theme;
+      const themeLabel = rawThemeLabel.replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]/gu, '').trim();
       const currentYear = new Date().getFullYear();
 
       // ============================================
@@ -677,7 +679,7 @@ CRITICAL REQUIREMENTS:
       
       pdf.setFontSize(20);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('🎨 Teste tes Couleurs !', pageWidth / 2, 20, { align: 'center' });
+      pdf.text('Teste tes Couleurs !', pageWidth / 2, 20, { align: 'center' });
       
       pdf.setFontSize(11);
       pdf.setFont('helvetica', 'normal');
@@ -780,12 +782,44 @@ CRITICAL REQUIREMENTS:
             reader.readAsDataURL(blob);
           });
 
-          // Calculer les dimensions pour centrer l'image
-          const imgSize = Math.min(contentWidth, contentHeight - 10);
+          // Calculer les dimensions pour centrer l'image (laisser de la place pour les couleurs en bas)
+          const colorSectionHeight = 25; // Espace pour les couleurs suggérées
+          const imgSize = Math.min(contentWidth, contentHeight - colorSectionHeight - 10);
           const imgX = (pageWidth - imgSize) / 2;
           const imgY = margin - 5;
 
           pdf.addImage(base64, 'PNG', imgX, imgY, imgSize, imgSize);
+
+          // ============================================
+          // COULEURS SUGGÉRÉES SOUS L'IMAGE
+          // ============================================
+          const colorY = imgY + imgSize + 5;
+          pdf.setFontSize(8);
+          pdf.setFont('helvetica', 'bold');
+          pdf.text('Couleurs suggerees :', margin, colorY);
+
+          // Afficher les carrés de couleur avec les noms
+          let colorX = margin;
+          const colorRowY = colorY + 5;
+          page.suggestedColors.slice(0, 5).forEach((color) => {
+            const hexColor = color.hexCode.replace('#', '');
+            const r = parseInt(hexColor.substring(0, 2), 16);
+            const g = parseInt(hexColor.substring(2, 4), 16);
+            const b = parseInt(hexColor.substring(4, 6), 16);
+            
+            // Carré de couleur
+            pdf.setFillColor(r, g, b);
+            pdf.rect(colorX, colorRowY, 5, 5, 'F');
+            pdf.setDrawColor(100, 100, 100);
+            pdf.rect(colorX, colorRowY, 5, 5, 'S');
+            
+            // Nom de la couleur
+            pdf.setFontSize(6);
+            pdf.setFont('helvetica', 'normal');
+            pdf.text(color.color.substring(0, 10), colorX + 6, colorRowY + 4);
+            
+            colorX += 35;
+          });
 
           // Numéro de page discret en bas
           pdf.setFontSize(8);
@@ -804,11 +838,11 @@ CRITICAL REQUIREMENTS:
       pdf.addPage();
       pdf.setFontSize(18);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('🎨 Guide des Couleurs', pageWidth / 2, 20, { align: 'center' });
+      pdf.text('Guide des Couleurs', pageWidth / 2, 20, { align: 'center' });
 
       pdf.setFontSize(10);
       pdf.setFont('helvetica', 'normal');
-      pdf.text('Retrouve ici toutes les couleurs utilisées dans ce livre !', pageWidth / 2, 30, { align: 'center' });
+      pdf.text('Retrouve ici toutes les couleurs utilisees dans ce livre !', pageWidth / 2, 30, { align: 'center' });
 
       // Afficher les couleurs par page
       let colorY = 45;
