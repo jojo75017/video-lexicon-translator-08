@@ -68,14 +68,14 @@ const COVER_STYLES = [
 ];
 
 const INSPIRATIONAL_QUOTES = [
-  "Crois en tes rêves ✨",
-  "Tu es capable de grandes choses 💪",
-  "Chaque jour est une nouvelle chance 🌅",
-  "Sois toi-même, les autres sont déjà pris 💕",
-  "La vie est belle quand on y croit 🌈",
-  "Brille comme tu sais le faire ⭐",
-  "Tes pensées créent ta réalité 🦋",
-  "Aujourd'hui est un bon jour 🌸",
+  "Crois en tes reves",
+  "Tu es capable de grandes choses",
+  "Chaque jour est une nouvelle chance",
+  "Sois toi-meme, les autres sont deja pris",
+  "La vie est belle quand on y croit",
+  "Brille comme tu sais le faire",
+  "Tes pensees creent ta realite",
+  "Aujourd'hui est un bon jour",
 ];
 
 const EbookDiaryGenerator: React.FC<EbookDiaryGeneratorProps> = ({ ebookTitle }) => {
@@ -356,13 +356,13 @@ High quality, professional book cover design, vertical format 6x9 inches.`;
           pdf.setFontSize(14);
           pdf.text(page.content.subtitle || '', pageWidth / 2, 80, { align: 'center' });
           pdf.setFontSize(18);
-          pdf.text(`✨ ${page.content.year} ✨`, pageWidth / 2, 120, { align: 'center' });
+          pdf.text(`- ${page.content.year} -`, pageWidth / 2, 120, { align: 'center' });
           break;
 
         case 'personal':
           pdf.setFontSize(20);
           pdf.setTextColor(themeColors[1]);
-          pdf.text('💕 À propos de moi 💕', pageWidth / 2, 30, { align: 'center' });
+          pdf.text('A propos de moi', pageWidth / 2, 30, { align: 'center' });
           pdf.setFontSize(12);
           pdf.setTextColor('#333333');
           let yPos = 50;
@@ -377,33 +377,29 @@ High quality, professional book cover design, vertical format 6x9 inches.`;
         case 'monthly':
           pdf.setFontSize(22);
           pdf.setTextColor(themeColors[1]);
-          pdf.text(`📅 ${page.content.month} ${page.content.year}`, pageWidth / 2, 25, { align: 'center' });
+          pdf.text(`${page.content.month} ${page.content.year}`, pageWidth / 2, 25, { align: 'center' });
           
-          // Draw calendar grid
-          const cellWidth = (pageWidth - 2 * margin) / 7;
-          const cellHeight = 20;
-          const days = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+          // Simple lined format instead of grid
+          pdf.setFontSize(11);
+          pdf.setTextColor('#333333');
           
-          pdf.setFontSize(10);
-          days.forEach((day, i) => {
-            pdf.text(day, margin + i * cellWidth + cellWidth / 2, 45, { align: 'center' });
-          });
-          
-          // Draw grid
-          pdf.setDrawColor('#CCCCCC');
-          for (let row = 0; row < 6; row++) {
-            for (let col = 0; col < 7; col++) {
-              pdf.rect(margin + col * cellWidth, 50 + row * cellHeight, cellWidth, cellHeight);
+          // Draw lines for each day (31 days max)
+          pdf.setDrawColor('#DDDDDD');
+          for (let day = 1; day <= 31; day++) {
+            const lineY = 40 + (day - 1) * 6;
+            if (lineY < pageHeight - 40) {
+              pdf.setFontSize(9);
+              pdf.text(`${day}`, margin, lineY);
+              pdf.line(margin + 8, lineY, pageWidth - margin, lineY);
             }
           }
           
-          // Notes section
-          pdf.setFontSize(12);
-          pdf.text('Notes du mois:', margin, 185);
-          pdf.setDrawColor('#CCCCCC');
-          for (let i = 0; i < 4; i++) {
-            pdf.line(margin, 195 + i * 10, pageWidth - margin, 195 + i * 10);
-          }
+          // Notes section at bottom
+          pdf.setFontSize(11);
+          pdf.text('Notes:', margin, pageHeight - 35);
+          pdf.line(margin + 15, pageHeight - 35, pageWidth - margin, pageHeight - 35);
+          pdf.line(margin, pageHeight - 25, pageWidth - margin, pageHeight - 25);
+          pdf.line(margin, pageHeight - 15, pageWidth - margin, pageHeight - 15);
           break;
 
         case 'weekly':
@@ -440,7 +436,7 @@ High quality, professional book cover design, vertical format 6x9 inches.`;
           if (page.content.hasGratitude) {
             pdf.setFontSize(10);
             pdf.setTextColor('#333333');
-            pdf.text('Mon humeur: 😊 😐 😢 😡 🥰', margin, 55);
+            pdf.text('Mon humeur: (entourer) Joyeuse - Calme - Triste - Energique - Fatiguee', margin, 55);
           }
           
           // Writing lines
@@ -454,7 +450,7 @@ High quality, professional book cover design, vertical format 6x9 inches.`;
         case 'notes':
           pdf.setFontSize(16);
           pdf.setTextColor(themeColors[1]);
-          pdf.text('📝 Notes', pageWidth / 2, 20, { align: 'center' });
+          pdf.text('Notes', pageWidth / 2, 20, { align: 'center' });
           
           pdf.setDrawColor('#DDDDDD');
           for (let i = 0; i < 20; i++) {
@@ -465,7 +461,7 @@ High quality, professional book cover design, vertical format 6x9 inches.`;
         case 'reminder':
           pdf.setFontSize(16);
           pdf.setTextColor(themeColors[1]);
-          pdf.text('📌 Pense-bête', pageWidth / 2, 20, { align: 'center' });
+          pdf.text('Pense-bete', pageWidth / 2, 20, { align: 'center' });
           
           pdf.setFontSize(10);
           pdf.setTextColor('#333333');
@@ -478,17 +474,17 @@ High quality, professional book cover design, vertical format 6x9 inches.`;
         case 'goals':
           pdf.setFontSize(18);
           pdf.setTextColor(themeColors[1]);
-          pdf.text('🎯 Mes Objectifs & Rêves', pageWidth / 2, 25, { align: 'center' });
+          pdf.text('Mes Objectifs et Reves', pageWidth / 2, 25, { align: 'center' });
           
           pdf.setFontSize(12);
           pdf.setTextColor('#333333');
           
-          const goalSections = ['Court terme (1 mois)', 'Moyen terme (6 mois)', 'Long terme (1 an)', 'Mes rêves fous'];
+          const goalSections = ['Court terme (1 mois)', 'Moyen terme (6 mois)', 'Long terme (1 an)', 'Mes reves fous'];
           goalSections.forEach((section, idx) => {
             const sectionY = 45 + idx * 45;
             pdf.text(`${section}:`, margin, sectionY);
             for (let i = 0; i < 3; i++) {
-              pdf.text('•', margin + 5, sectionY + 10 + i * 10);
+              pdf.text('-', margin + 5, sectionY + 10 + i * 10);
               pdf.line(margin + 10, sectionY + 10 + i * 10, pageWidth - margin, sectionY + 10 + i * 10);
             }
           });
@@ -497,42 +493,36 @@ High quality, professional book cover design, vertical format 6x9 inches.`;
         case 'mood':
           pdf.setFontSize(16);
           pdf.setTextColor(themeColors[1]);
-          pdf.text('💫 Tracker d\'humeur', pageWidth / 2, 20, { align: 'center' });
+          pdf.text('Suivi de mon humeur', pageWidth / 2, 20, { align: 'center' });
           
-          // Draw mood grid
-          const moodDays = 31;
-          const moodCellSize = (pageWidth - 2 * margin - 20) / moodDays;
+          // Simple mood tracker with lines instead of grid
+          pdf.setFontSize(10);
+          pdf.setTextColor('#333333');
           
-          pdf.setFontSize(8);
-          pdf.setTextColor('#666666');
-          pdf.text('Jour:', margin, 40);
+          const moodLabels = ['Joyeuse', 'Calme', 'Triste', 'Energique', 'Fatiguee', 'Stresse'];
+          pdf.text('Entoure ton humeur chaque jour:', margin, 40);
           
-          for (let i = 1; i <= moodDays; i++) {
-            pdf.text(String(i), margin + 15 + (i - 1) * moodCellSize, 40);
-          }
-          
-          const moods = ['😊', '😐', '😢', '😡', '🥰', '😴'];
-          moods.forEach((mood, idx) => {
-            pdf.text(mood, margin, 55 + idx * 12);
-            for (let day = 0; day < moodDays; day++) {
-              pdf.rect(margin + 15 + day * moodCellSize - 1, 50 + idx * 12, moodCellSize - 1, 10);
-            }
+          moodLabels.forEach((mood, idx) => {
+            pdf.text(`${mood}:`, margin, 55 + idx * 15);
+            pdf.setDrawColor('#DDDDDD');
+            pdf.line(margin + 25, 55 + idx * 15, pageWidth - margin, 55 + idx * 15);
           });
           
-          pdf.setFontSize(10);
-          pdf.text('Notes sur mon humeur ce mois:', margin, 140);
+          pdf.setFontSize(11);
+          pdf.text('Notes sur mon humeur ce mois:', margin, 160);
           pdf.setDrawColor('#DDDDDD');
-          for (let i = 0; i < 8; i++) {
-            pdf.line(margin, 150 + i * 10, pageWidth - margin, 150 + i * 10);
+          for (let i = 0; i < 6; i++) {
+            pdf.line(margin, 170 + i * 10, pageWidth - margin, 170 + i * 10);
           }
           break;
 
         case 'list':
           pdf.setFontSize(16);
           pdf.setTextColor(themeColors[1]);
-          pdf.text(`📋 ${page.content.title}`, pageWidth / 2, 20, { align: 'center' });
+          pdf.text(page.content.title, pageWidth / 2, 20, { align: 'center' });
           
           pdf.setFontSize(10);
+          pdf.setTextColor('#333333');
           for (let i = 0; i < 20; i++) {
             pdf.text(`${i + 1}.`, margin, 40 + i * 10);
             pdf.line(margin + 8, 40 + i * 10, pageWidth - margin, 40 + i * 10);
@@ -542,14 +532,12 @@ High quality, professional book cover design, vertical format 6x9 inches.`;
         case 'doodle':
           pdf.setFontSize(14);
           pdf.setTextColor(themeColors[1]);
-          pdf.text('✏️ Espace créatif ✏️', pageWidth / 2, 20, { align: 'center' });
+          pdf.text('Espace creatif', pageWidth / 2, 20, { align: 'center' });
           
-          // Light dotted grid
+          // Simple lined space for creativity instead of dots
           pdf.setDrawColor('#EEEEEE');
-          for (let x = margin; x <= pageWidth - margin; x += 10) {
-            for (let y = 35; y <= pageHeight - margin; y += 10) {
-              pdf.circle(x, y, 0.3, 'F');
-            }
+          for (let i = 0; i < 20; i++) {
+            pdf.line(margin, 35 + i * 10, pageWidth - margin, 35 + i * 10);
           }
           break;
       }
