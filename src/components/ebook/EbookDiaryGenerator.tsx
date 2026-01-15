@@ -124,8 +124,10 @@ ${firstName ? `Personalized for someone named ${firstName}.` : ''}
 High quality, professional book cover design, vertical format 6x9 inches.`;
 
     try {
+      const diaryTitle = customTitle || `Journal ${firstName || 'Intime'}`;
       const { data, error } = await supabase.functions.invoke('generate-cover-image', {
         body: { 
+          title: diaryTitle,
           prompt: coverPrompt,
           width: 612,
           height: 792
@@ -135,7 +137,8 @@ High quality, professional book cover design, vertical format 6x9 inches.`;
       if (error) throw error;
       return data?.imageUrl || null;
     } catch (error) {
-      console.error('Error generating cover:', error);
+      console.error('Cover generation skipped:', error);
+      // Don't show error toast - cover is optional, PDF will work without it
       return null;
     }
   };
