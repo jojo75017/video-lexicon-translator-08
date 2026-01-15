@@ -166,19 +166,21 @@ High quality, professional book cover design, vertical format 6x9 inches.`;
         }
       });
 
-      // Personal info page
+      // Personal info page - empty fields for buyer to fill
       pages.push({
         type: 'personal',
         content: {
-          firstName,
-          age,
           sections: [
-            { label: 'Mon prénom', value: firstName || '_______________' },
-            { label: 'Mon âge', value: age || '___' },
-            { label: 'Année', value: year },
-            { label: 'Ma couleur préférée', value: '_______________' },
-            { label: 'Mon rêve', value: '_______________' },
-            { label: 'Ce qui me rend heureuse', value: '_______________' },
+            { label: 'Mon prénom' },
+            { label: 'Mon âge' },
+            { label: 'Mon anniversaire' },
+            { label: 'Ma couleur préférée' },
+            { label: 'Mon animal préféré' },
+            { label: 'Ma chanson préférée' },
+            { label: 'Mon rêve' },
+            { label: 'Ce qui me rend heureuse' },
+            { label: 'Ma meilleure amie' },
+            { label: 'Mon mot secret' },
           ]
         }
       });
@@ -360,10 +362,12 @@ High quality, professional book cover design, vertical format 6x9 inches.`;
           pdf.text('💕 À propos de moi 💕', pageWidth / 2, 30, { align: 'center' });
           pdf.setFontSize(12);
           pdf.setTextColor('#333333');
-          let yPos = 55;
+          let yPos = 50;
           page.content.sections.forEach((section: any) => {
-            pdf.text(`${section.label}: ${section.value}`, margin, yPos);
-            yPos += 20;
+            pdf.text(`${section.label}:`, margin, yPos);
+            pdf.setDrawColor('#CCCCCC');
+            pdf.line(margin + 45, yPos, pageWidth - margin, yPos);
+            yPos += 18;
           });
           break;
 
