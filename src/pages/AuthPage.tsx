@@ -26,7 +26,7 @@ export const AuthPage = () => {
   };
 
   useEffect(() => {
-    // Vérification en arrière-plan (sans écran bloquant)
+    // Redirection automatique admin vers ebook-planner
     const checkAuth = async () => {
       try {
         const {
@@ -39,7 +39,10 @@ export const AuthPage = () => {
         if (error) return;
 
         if (data?.isAdmin) {
-          navigate('/admin', { replace: true });
+          // Persist admin status in sessionStorage
+          sessionStorage.setItem('is_admin', 'true');
+          // Redirect admin directly to ebook-planner (not /admin)
+          navigate('/ebook-planner', { replace: true });
         }
       } catch (error) {
         console.error('Erreur dans checkAuth:', error);
@@ -155,8 +158,9 @@ export const AuthPage = () => {
         }
 
         console.log('Utilisateur admin confirmé');
+        sessionStorage.setItem('is_admin', 'true');
         toast.success('Connexion admin réussie');
-        navigate('/admin');
+        navigate('/ebook-planner');
       } else {
         const { error } = await supabase.auth.signUp({
           email,
