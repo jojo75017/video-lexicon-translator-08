@@ -55,12 +55,36 @@ const COMPLEXITY_LEVELS = [
   { value: 5, label: 'Complexe', description: '20+ éléments à colorier' },
 ];
 
+// Formats de livres cartonnés pour enfants (Board Books)
+const BOOK_FORMATS = [
+  { 
+    category: '📚 Cartonné (Board Book)',
+    formats: [
+      { value: '6x6', label: '15x15 cm (6x6")', description: 'Carré classique bébé', aspectRatio: '1:1' },
+      { value: '7x7', label: '18x18 cm (7x7")', description: 'Carré grand format', aspectRatio: '1:1' },
+      { value: '8x8', label: '20x20 cm (8x8")', description: 'Carré premium', aspectRatio: '1:1' },
+      { value: '5x7', label: '13x18 cm (5x7")', description: 'Portrait compact', aspectRatio: '5:7' },
+      { value: '8.5x8.5', label: '21.5x21.5 cm (8.5x8.5")', description: 'Grand carré KDP', aspectRatio: '1:1' },
+    ]
+  },
+  {
+    category: '📖 Broché / KDP',
+    formats: [
+      { value: '8.5x8.5-kdp', label: '8.5x8.5" KDP', description: 'Carré standard KDP', aspectRatio: '1:1' },
+      { value: '8.5x11', label: '8.5x11" (Letter)', description: 'Portrait US standard', aspectRatio: '17:22' },
+      { value: '8x10', label: '8x10"', description: 'Portrait populaire', aspectRatio: '4:5' },
+      { value: 'a4', label: 'A4 (21x29.7 cm)', description: 'Format européen', aspectRatio: '210:297' },
+    ]
+  },
+];
+
 export const EbookColoringBookGenerator: React.FC<ColoringBookGeneratorProps> = ({ ebookTitle }) => {
   const [theme, setTheme] = useState('animals');
   const [customTheme, setCustomTheme] = useState('');
   const [ageGroup, setAgeGroup] = useState('4-6');
   const [complexity, setComplexity] = useState([2]);
-  const [numberOfPages, setNumberOfPages] = useState(5);
+  const [numberOfPages, setNumberOfPages] = useState(10); // Défaut: 10 pages
+  const [bookFormat, setBookFormat] = useState('8x8'); // Format cartonné par défaut
   const [customPrompt, setCustomPrompt] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedPages, setGeneratedPages] = useState<ColoringPage[]>([]);
@@ -360,6 +384,36 @@ CRITICAL REQUIREMENTS:
               </p>
             </div>
 
+            {/* Format du livre */}
+            <div className="space-y-2">
+              <Label>Format du livre</Label>
+              <Select value={bookFormat} onValueChange={setBookFormat}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Choisir un format" />
+                </SelectTrigger>
+                <SelectContent>
+                  {BOOK_FORMATS.map((category) => (
+                    <React.Fragment key={category.category}>
+                      <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground bg-muted/50">
+                        {category.category}
+                      </div>
+                      {category.formats.map((format) => (
+                        <SelectItem key={format.value} value={format.value}>
+                          <div className="flex flex-col">
+                            <span className="font-medium">{format.label}</span>
+                            <span className="text-xs text-muted-foreground">{format.description}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </React.Fragment>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                💡 Les formats cartonnés (Board Book) sont idéaux pour les 0-3 ans
+              </p>
+            </div>
+
             {/* Nombre de pages */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
@@ -369,13 +423,13 @@ CRITICAL REQUIREMENTS:
               <Slider
                 value={[numberOfPages]}
                 onValueChange={(v) => setNumberOfPages(v[0])}
-                min={1}
-                max={20}
+                min={10}
+                max={15}
                 step={1}
                 className="w-full"
               />
               <p className="text-xs text-muted-foreground">
-                Estimation: {numberOfPages} crédits (~{numberOfPages * 0.5}€)
+                📘 Livres cartonnés: 10-15 pages recommandées • Estimation: ~{(numberOfPages * 0.5).toFixed(1)}€
               </p>
             </div>
 
@@ -527,10 +581,11 @@ CRITICAL REQUIREMENTS:
                 Conseils pour un livre de coloriage réussi
               </h4>
               <ul className="text-sm text-yellow-700 dark:text-yellow-300 space-y-1">
-                <li>• Imprimez sur du papier épais (120-160 g/m²) pour éviter que les feutres traversent</li>
-                <li>• Incluez une page de test des couleurs au début du livre</li>
-                <li>• Ajoutez les codes couleurs à côté de chaque dessin pour guider les enfants</li>
-                <li>• Pour KDP, utilisez le format 8.5x8.5" ou 8.5x11" en intérieur noir et blanc</li>
+                <li>• <strong>Livre cartonné (Board Book)</strong> : Idéal pour 0-3 ans, pages épaisses et résistantes, format carré recommandé</li>
+                <li>• <strong>Impression</strong> : Papier épais 120-160 g/m² pour éviter que les feutres traversent</li>
+                <li>• <strong>KDP Amazon</strong> : Format 8.5x8.5" carré, intérieur noir et blanc, couverture brillante</li>
+                <li>• <strong>Page de test</strong> : Incluez une page avec tous les codes couleurs au début</li>
+                <li>• <strong>Conseil pro</strong> : Les formats carrés (15x15, 20x20 cm) sont les plus populaires pour les tout-petits</li>
               </ul>
             </div>
           </div>
