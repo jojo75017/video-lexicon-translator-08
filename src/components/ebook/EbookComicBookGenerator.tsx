@@ -66,6 +66,13 @@ const ART_STYLES = [
   { value: 'minimal', label: '✨ Minimaliste', description: 'Lignes épurées, moderne' },
 ];
 
+const COLOR_MODES = [
+  { value: 'color', label: '🌈 Couleur', description: 'Illustrations en couleurs vives' },
+  { value: 'bw', label: '⬛ Noir & Blanc', description: 'Style classique économique' },
+  { value: 'sepia', label: '📜 Sépia', description: 'Tons vintage et nostalgiques' },
+  { value: 'limited', label: '🎨 Couleurs limitées', description: '2-3 couleurs principales' },
+];
+
 const STORY_TEMPLATES = [
   { 
     value: 'hero-journey', 
@@ -104,6 +111,7 @@ export const EbookComicBookGenerator: React.FC<ComicBookGeneratorProps> = ({ ebo
   const [customGenre, setCustomGenre] = useState('');
   const [ageGroup, setAgeGroup] = useState('7-10');
   const [artStyle, setArtStyle] = useState('cartoon');
+  const [colorMode, setColorMode] = useState('color');
   const [panelLayout, setPanelLayout] = useState('4-panels');
   const [storyTemplate, setStoryTemplate] = useState('hero-journey');
   const [numberOfPages, setNumberOfPages] = useState(12);
@@ -112,6 +120,10 @@ export const EbookComicBookGenerator: React.FC<ComicBookGeneratorProps> = ({ ebo
   const [characterDescription, setCharacterDescription] = useState('');
   const [setting, setSetting] = useState('');
   const [customPrompt, setCustomPrompt] = useState('');
+  
+  // Cohérence visuelle
+  const [visualSeed, setVisualSeed] = useState<string>('');
+  const [characterVisualRef, setCharacterVisualRef] = useState<string>('');
   
   const [isGenerating, setIsGenerating] = useState(false);
   const [isGeneratingScenario, setIsGeneratingScenario] = useState(false);
@@ -206,26 +218,64 @@ Réponds en JSON avec ce format exact:
     }
   };
 
+  // Générer une description visuelle cohérente du personnage
+  const generateVisualReference = (): string => {
+    if (characterVisualRef) return characterVisualRef;
+    
+    const baseRef = `${mainCharacter}: ${characterDescription || 'personnage principal'}`;
+    const newRef = `VISUAL REFERENCE (must be consistent across ALL pages): ${baseRef}. 
+Same exact character design, proportions, colors, outfit, and features on every page.`;
+    setCharacterVisualRef(newRef);
+    return newRef;
+  };
+
+  const getColorModePrompt = (): string => {
+    const modes: Record<string, string> = {
+      'color': 'Full vibrant colors, rich palette, colorful illustration',
+      'bw': 'Black and white only, no colors, grayscale, monochrome comic art, ink drawing style',
+      'sepia': 'Sepia tones, vintage brown and cream colors, nostalgic old photo style',
+      'limited': 'Limited color palette, 2-3 main accent colors on neutral background, spot color technique'
+    };
+    return modes[colorMode] || modes['color'];
+  };
+
   const generateComicPage = async (pageIndex: number, pageScenario: { description: string; dialogues: { character: string; text: string }[] }): Promise<ComicPage | null> => {
     try {
       const selectedStyle = ART_STYLES.find(s => s.value === artStyle);
       const selectedGenre = GENRES.find(g => g.value === genre);
+      const visualRef = generateVisualReference();
+      const colorPrompt = getColorModePrompt();
 
-      const imagePrompt = `Comic book illustration, ${selectedStyle?.description || 'cartoon style'}, ${selectedGenre?.label || 'adventure'} genre.
-Scene: ${pageScenario.description}
-Main character: ${mainCharacter}${characterDescription ? `, ${characterDescription}` : ''}
-Style: Clean lines, vibrant colors, expressive characters, ${getLayoutDescription(panelLayout)} layout.
-Professional comic book art, child-friendly, no text or speech bubbles in image.`;
+      // Seed visuel pour cohérence
+      const seedInfo = visualSeed ? `[SEED:${visualSeed}] ` : '';
+
+      const imagePrompt = `${seedInfo}Comic book illustration, ${selectedStyle?.description || 'cartoon style'}, ${selectedGenre?.label || 'adventure'} genre.
+
+${visualRef}
+
+Scene (Page ${pageIndex + 1}/${numberOfPages}): ${pageScenario.description}
+
+VISUAL STYLE:
+- ${colorPrompt}
+- ${getLayoutDescription(panelLayout)} layout
+- Professional comic book art, child-friendly
+- No text, no speech bubbles in image
+- CONSISTENCY: Same art style, line weight, and character design as previous pages`;
 
       const { data: imageData, error: imageError } = await supabase.functions.invoke('generate-cover-image', {
         body: {
           prompt: imagePrompt,
-          style: 'cartoon',
+          style: artStyle,
           aspectRatio: '3:4'
         }
       });
 
       if (imageError) throw imageError;
+
+      // Générer seed si première page
+      if (pageIndex === 0 && !visualSeed) {
+        setVisualSeed(`comic-${Date.now()}`);
+      }
 
       const panels: ComicPanel[] = pageScenario.dialogues.map((d, i) => ({
         id: `panel-${pageIndex}-${i}`,
@@ -478,20 +528,43 @@ Professional comic book art, child-friendly, no text or speech bubbles in image.
       {/* Header */}
       <Card className="bg-gradient-to-br from-amber-500/10 via-orange-500/10 to-red-500/10 border-amber-500/30">
         <CardHeader>
-          <div className="flex items-center gap-3">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 shadow-lg">
-              <Layout className="h-6 w-6 text-white" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-3 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 shadow-lg">
+                <Layout className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <CardTitle className="text-2xl flex items-center gap-2">
+                  Générateur de Bandes Dessinées
+                  <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white">
+                    2026
+                  </Badge>
+                </CardTitle>
+                <CardDescription>
+                  Créez des BD complètes avec scénario IA et illustrations automatiques
+                </CardDescription>
+              </div>
             </div>
-            <div>
-              <CardTitle className="text-2xl flex items-center gap-2">
-                Générateur de Bandes Dessinées
-                <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white">
-                  2026
+            
+            {/* Compteur de pages */}
+            <div className="flex flex-col items-end gap-1">
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className={colorMode === 'bw' ? 'bg-gray-100 border-gray-400' : 'bg-gradient-to-r from-pink-100 to-purple-100 border-pink-300'}>
+                  {COLOR_MODES.find(c => c.value === colorMode)?.label || '🌈 Couleur'}
                 </Badge>
-              </CardTitle>
-              <CardDescription>
-                Créez des BD complètes avec scénario IA et illustrations automatiques
-              </CardDescription>
+                <Badge variant="outline" className="bg-amber-50 border-amber-300 text-amber-700">
+                  {numberOfPages} pages BD
+                </Badge>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Total PDF: ~{numberOfPages + 4} pages (avec légales)
+              </p>
+              {visualSeed && (
+                <p className="text-xs text-emerald-600 flex items-center gap-1">
+                  <Sparkles className="h-3 w-3" />
+                  Cohérence visuelle active
+                </p>
+              )}
             </div>
           </div>
         </CardHeader>
@@ -640,6 +713,29 @@ Professional comic book art, child-friendly, no text or speech bubbles in image.
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+
+            {/* Mode couleur */}
+            <div className="space-y-2">
+              <Label>Mode couleur</Label>
+              <Select value={colorMode} onValueChange={setColorMode}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {COLOR_MODES.map(mode => (
+                    <SelectItem key={mode.value} value={mode.value}>
+                      {mode.label} - {mode.description}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                {colorMode === 'bw' && '💡 Noir & blanc = impression économique sur KDP'}
+                {colorMode === 'color' && '🎨 Couleur = coût d\'impression plus élevé'}
+                {colorMode === 'sepia' && '📜 Sépia = ambiance rétro/historique'}
+                {colorMode === 'limited' && '🎯 2-3 couleurs = style graphique distinctif'}
+              </p>
             </div>
 
             {/* Layout des cases */}
