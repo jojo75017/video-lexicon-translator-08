@@ -168,26 +168,267 @@ export const EbookColoringBookGenerator: React.FC<ColoringBookGeneratorProps> = 
     return palettes[theme] || palettes.custom;
   };
 
-  const generateColoringPage = async (pageNumber: number): Promise<ColoringPage | null> => {
+  // Liste étendue de 30+ sujets variés par thème
+  const EXTENDED_SUBJECTS: Record<string, string[]> = {
+    animals: [
+      'un lion majestueux avec une grande crinière', 'un éléphant adorable qui joue', 'un papillon aux ailes déployées', 
+      'un chat joueur avec une pelote', 'un chien heureux qui court', 'une grenouille souriante sur un nénuphar',
+      'un hibou sage sur une branche', 'un lapin mignon dans un jardin', 'un ours en peluche câlin',
+      'une girafe avec son long cou', 'un zèbre avec ses rayures', 'un singe espiègle dans un arbre',
+      'un panda qui mange du bambou', 'un koala endormi', 'un pingouin sur la glace',
+      'un perroquet coloré', 'un flamant rose élégant', 'une coccinelle sur une feuille',
+      'une abeille près d\'une fleur', 'un écureuil avec une noisette', 'un renard rusé',
+      'un hérisson mignon', 'une chouette dans la nuit', 'un canard sur l\'eau',
+      'un cheval qui galope', 'une vache dans un pré', 'un mouton laineux',
+      'un cochon rose joyeux', 'un coq qui chante', 'une poule avec ses poussins',
+      'un âne gentil', 'une chèvre qui broute', 'un lama souriant'
+    ],
+    fantasy: [
+      'une licorne magique avec arc-en-ciel', 'un dragon amical qui crache des étoiles', 'une fée étincelante avec des ailes',
+      'un château enchanté dans les nuages', 'une sirène gracieuse sous l\'eau', 'un phoenix majestueux en vol',
+      'un lutin farceur', 'une princesse avec une couronne', 'un prince charmant sur son cheval',
+      'un gnome de jardin', 'une sorcière gentille sur son balai', 'un troll rigolo sous un pont',
+      'un pegase ailé', 'un elfe de la forêt', 'une baguette magique étoilée',
+      'un champignon enchanté', 'une potion magique', 'un grimoire mystérieux',
+      'une citrouille enchantée', 'un arc-en-ciel magique', 'des étoiles filantes',
+      'une maison de fée', 'un jardin secret', 'une porte magique',
+      'un trésor étincelant', 'une couronne royale', 'un miroir magique',
+      'une lampe à génie', 'un tapis volant', 'une boule de cristal',
+      'un chaudron de sorcière', 'une forêt enchantée', 'un nuage arc-en-ciel'
+    ],
+    nature: [
+      'un bouquet de fleurs printanières', 'un arbre majestueux en été', 'un jardin fleuri avec papillons',
+      'une montagne enneigée au soleil', 'un champ de tulipes colorées', 'une forêt avec champignons',
+      'un lac paisible avec reflets', 'une cascade dans la jungle', 'un arc-en-ciel après la pluie',
+      'un coucher de soleil sur la mer', 'des nuages en forme d\'animaux', 'un pré avec des marguerites',
+      'un potager avec légumes', 'un verger avec fruits', 'une rivière qui coule',
+      'des feuilles d\'automne', 'des flocons de neige', 'un orage avec éclairs',
+      'une pleine lune', 'des étoiles scintillantes', 'un lever de soleil',
+      'une plage avec coquillages', 'une île tropicale', 'un désert avec cactus',
+      'une prairie avec coquelicots', 'un nid d\'oiseau', 'une toile d\'araignée avec rosée',
+      'un rocher avec mousse', 'une grotte mystérieuse', 'un volcan endormi',
+      'une oasis dans le désert', 'des dunes de sable', 'une aurore boréale'
+    ],
+    vehicles: [
+      'une voiture de course rapide', 'un camion de pompiers rouge', 'un avion dans les nuages',
+      'un bateau sur les vagues', 'une fusée spatiale décollant', 'un train à vapeur',
+      'un hélicoptère en vol', 'un sous-marin sous l\'eau', 'une montgolfière colorée',
+      'un vélo avec panier', 'une moto sportive', 'un tracteur dans un champ',
+      'un bus scolaire jaune', 'une ambulance qui aide', 'un taxi en ville',
+      'un camion poubelle', 'une grue de chantier', 'un bulldozer au travail',
+      'un quad dans la boue', 'un jet ski sur l\'eau', 'un kayak sur la rivière',
+      'un voilier au vent', 'un paquebot géant', 'un yacht de luxe',
+      'un avion de chasse', 'un ULM léger', 'un dirigeable dans le ciel',
+      'une trottinette électrique', 'un skateboard cool', 'des rollers rapides',
+      'un chariot élévateur', 'une pelleteuse', 'un camion benne'
+    ],
+    seasons: [
+      'un bonhomme de neige avec chapeau', 'des feuilles d\'automne qui tombent', 'des fleurs de printemps',
+      'une plage d\'été avec parasol', 'Père Noël avec ses rennes', 'un sapin de Noël décoré',
+      'des œufs de Pâques cachés', 'un lapin de Pâques', 'une citrouille d\'Halloween',
+      'un fantôme mignon', 'une chauve-souris amicale', 'des bonbons d\'Halloween',
+      'un feu d\'artifice coloré', 'une guirlande lumineuse', 'des cadeaux emballés',
+      'un cerf-volant au printemps', 'un pique-nique d\'été', 'des châteaux de sable',
+      'une bataille de boules de neige', 'une luge sur la colline', 'des patins à glace',
+      'un épouvantail d\'automne', 'une récolte de pommes', 'des champignons d\'automne',
+      'un parapluie sous la pluie', 'des bottes en caoutchouc', 'un imperméable jaune',
+      'un thermomètre qui gèle', 'un soleil d\'été souriant', 'une fleur qui pousse',
+      'un nid avec œufs', 'un papillon au printemps', 'une abeille butinant'
+    ],
+    food: [
+      'une pizza appétissante', 'un gâteau d\'anniversaire avec bougies', 'une corbeille de fruits frais',
+      'un sundae géant avec cerises', 'des cupcakes décorés', 'une glace en cornet',
+      'un hamburger délicieux', 'des frites croustillantes', 'un hot-dog gourmand',
+      'une tarte aux pommes', 'des cookies aux pépites', 'un donut glacé',
+      'des bonbons colorés', 'une sucette géante', 'du pop-corn au caramel',
+      'un bol de céréales', 'des crêpes avec fruits', 'des gaufres belges',
+      'un sandwich au fromage', 'une salade fraîche', 'une soupe chaude',
+      'des sushis japonais', 'des tacos mexicains', 'une paella espagnole',
+      'des croissants français', 'une baguette de pain', 'un éclair au chocolat',
+      'une mousse au chocolat', 'des macarons colorés', 'un tiramisu italien',
+      'un smoothie aux fruits', 'un milk-shake vanille', 'un jus d\'orange frais'
+    ],
+    space: [
+      'une fusée décollant vers les étoiles', 'un astronaute sur la lune', 'Saturne avec ses anneaux',
+      'un alien amical vert', 'une station spatiale ISS', 'le soleil radieux',
+      'la Terre vue de l\'espace', 'Mars la planète rouge', 'Jupiter la géante',
+      'une comète traversant le ciel', 'une galaxie spirale', 'un trou noir mystérieux',
+      'un rover sur Mars', 'un satellite en orbite', 'une navette spatiale',
+      'un télescope spatial', 'une combinaison d\'astronaute', 'un casque spatial',
+      'des météorites qui tombent', 'une pluie d\'étoiles filantes', 'une éclipse de lune',
+      'une éclipse de soleil', 'la Voie lactée', 'une constellation d\'étoiles',
+      'un vaisseau extraterrestre', 'une base lunaire', 'un drapeau sur la lune',
+      'des cratères lunaires', 'une planète avec deux soleils', 'un robot spatial',
+      'une fusée rétro vintage', 'un astronaute qui flotte', 'une capsule spatiale'
+    ],
+    ocean: [
+      'un dauphin joueur sautant', 'un poisson clown dans une anémone', 'une tortue de mer nageant',
+      'un poulpe amusant avec tentacules', 'un hippocampe élégant', 'une baleine majestueuse',
+      'un requin amical', 'une étoile de mer colorée', 'un crabe sur le sable',
+      'une méduse transparente', 'un phoque sur un rocher', 'une otarie joueuse',
+      'un narval licorne des mers', 'un orque qui saute', 'un morse avec défenses',
+      'une raie manta gracieuse', 'un poisson-globe gonflé', 'un poisson-ange tropical',
+      'un corail coloré', 'une anémone de mer', 'des algues ondulantes',
+      'un trésor englouti', 'un coffre de pirate', 'une épave de bateau',
+      'une sirène sous l\'eau', 'un château de sable sous-marin', 'des bulles qui montent',
+      'un plongeur avec masque', 'un sous-marin jaune', 'une ancre marine',
+      'un phare sur la côte', 'un bateau de pêche', 'des filets de pêche'
+    ],
+    dinosaurs: [
+      'un T-Rex souriant et amical', 'un Tricératops avec ses cornes', 'un Diplodocus au long cou',
+      'un Ptéranodon en vol', 'un Stégosaure avec plaques', 'un Vélociraptor curieux',
+      'un Ankylosaure blindé', 'un Brachiosaure géant', 'un Parasaurolophus à crête',
+      'un Spinosaure avec voile', 'un Tyrannosaure bébé', 'un œuf de dinosaure qui éclot',
+      'un nid de dinosaures', 'une empreinte de dinosaure', 'un fossile dans la roche',
+      'un volcan préhistorique', 'une fougère géante', 'un marécage préhistorique',
+      'un Pachycéphalosaure têtu', 'un Compsognathus minuscule', 'un Dilophosaure à crête',
+      'un Iguanodon herbivore', 'un Carnotaure à cornes', 'un Mosasaure marin',
+      'un Archaeopteryx à plumes', 'un Dimétrodon à voile', 'un Mammouth laineux',
+      'un Smilodon à dents', 'un Mégalodon géant', 'un Quetzalcoatlus volant',
+      'un paléontologue au travail', 'des os de dinosaure', 'un musée de dinosaures'
+    ],
+    custom: []
+  };
+
+  // Génération de palette dynamique basée sur le sujet spécifique
+  const generateDynamicColorPalette = (subject: string): { element: string; color: string; hexCode: string }[] => {
+    const subjectLower = subject.toLowerCase();
+    
+    // Détection des éléments dans le sujet pour palette personnalisée
+    const colorMappings: { keywords: string[]; palette: { element: string; color: string; hexCode: string }[] }[] = [
+      {
+        keywords: ['lion', 'girafe', 'sable', 'désert'],
+        palette: [
+          { element: 'Corps / Fourrure', color: 'Jaune doré', hexCode: '#FFD700' },
+          { element: 'Crinière / Taches', color: 'Orange foncé', hexCode: '#FF8C00' },
+          { element: 'Yeux', color: 'Ambre', hexCode: '#FFBF00' },
+          { element: 'Nez', color: 'Marron foncé', hexCode: '#654321' },
+          { element: 'Fond / Savane', color: 'Beige', hexCode: '#F5DEB3' },
+        ]
+      },
+      {
+        keywords: ['éléphant', 'rhinocéros', 'hippopotame'],
+        palette: [
+          { element: 'Corps', color: 'Gris', hexCode: '#808080' },
+          { element: 'Oreilles', color: 'Gris rosé', hexCode: '#C4AEAD' },
+          { element: 'Défenses', color: 'Ivoire', hexCode: '#FFFFF0' },
+          { element: 'Yeux', color: 'Marron', hexCode: '#8B4513' },
+          { element: 'Fond', color: 'Vert savane', hexCode: '#9ACD32' },
+        ]
+      },
+      {
+        keywords: ['licorne', 'fée', 'magie', 'arc-en-ciel'],
+        palette: [
+          { element: 'Corps', color: 'Blanc nacré', hexCode: '#FFFAFA' },
+          { element: 'Crinière', color: 'Rose magique', hexCode: '#FF69B4' },
+          { element: 'Corne', color: 'Or scintillant', hexCode: '#FFD700' },
+          { element: 'Ailes / Étoiles', color: 'Violet féerique', hexCode: '#9370DB' },
+          { element: 'Arc-en-ciel', color: 'Multicolore', hexCode: '#FF6B6B' },
+        ]
+      },
+      {
+        keywords: ['dragon', 'feu', 'volcan'],
+        palette: [
+          { element: 'Écailles', color: 'Vert dragon', hexCode: '#228B22' },
+          { element: 'Flammes', color: 'Orange feu', hexCode: '#FF4500' },
+          { element: 'Yeux', color: 'Jaune lumineux', hexCode: '#FFFF00' },
+          { element: 'Ailes', color: 'Rouge bordeaux', hexCode: '#8B0000' },
+          { element: 'Ventre', color: 'Jaune pâle', hexCode: '#FFFACD' },
+        ]
+      },
+      {
+        keywords: ['océan', 'mer', 'eau', 'poisson', 'dauphin', 'baleine', 'tortue'],
+        palette: [
+          { element: 'Eau / Fond', color: 'Bleu océan', hexCode: '#006994' },
+          { element: 'Poisson / Corps', color: 'Turquoise', hexCode: '#40E0D0' },
+          { element: 'Coraux', color: 'Corail', hexCode: '#FF7F50' },
+          { element: 'Sable', color: 'Sable doré', hexCode: '#F4A460' },
+          { element: 'Bulles', color: 'Blanc transparent', hexCode: '#E0FFFF' },
+        ]
+      },
+      {
+        keywords: ['espace', 'fusée', 'astronaute', 'planète', 'étoile'],
+        palette: [
+          { element: 'Espace / Fond', color: 'Bleu nuit', hexCode: '#191970' },
+          { element: 'Fusée', color: 'Argent métallique', hexCode: '#C0C0C0' },
+          { element: 'Flammes', color: 'Orange vif', hexCode: '#FF4500' },
+          { element: 'Étoiles', color: 'Jaune brillant', hexCode: '#FFFF00' },
+          { element: 'Planètes', color: 'Rouge Mars', hexCode: '#CD5C5C' },
+        ]
+      },
+      {
+        keywords: ['fleur', 'jardin', 'rose', 'tulipe', 'marguerite'],
+        palette: [
+          { element: 'Pétales', color: 'Rose vif', hexCode: '#FF69B4' },
+          { element: 'Tige / Feuilles', color: 'Vert feuille', hexCode: '#228B22' },
+          { element: 'Cœur', color: 'Jaune pollen', hexCode: '#FFD700' },
+          { element: 'Terre', color: 'Marron terre', hexCode: '#8B4513' },
+          { element: 'Ciel', color: 'Bleu clair', hexCode: '#87CEEB' },
+        ]
+      },
+      {
+        keywords: ['dinosaure', 't-rex', 'tricératops', 'diplodocus'],
+        palette: [
+          { element: 'Corps', color: 'Vert dinosaure', hexCode: '#556B2F' },
+          { element: 'Écailles', color: 'Vert foncé', hexCode: '#006400' },
+          { element: 'Ventre', color: 'Vert clair', hexCode: '#90EE90' },
+          { element: 'Yeux', color: 'Orange', hexCode: '#FFA500' },
+          { element: 'Fond préhistorique', color: 'Marron', hexCode: '#A0522D' },
+        ]
+      },
+      {
+        keywords: ['gâteau', 'cupcake', 'bonbon', 'glace', 'sucette'],
+        palette: [
+          { element: 'Glaçage', color: 'Rose bonbon', hexCode: '#FFB6C1' },
+          { element: 'Base / Biscuit', color: 'Marron doré', hexCode: '#D2691E' },
+          { element: 'Décorations', color: 'Multicolore', hexCode: '#FF6B6B' },
+          { element: 'Crème', color: 'Blanc crème', hexCode: '#FFFDD0' },
+          { element: 'Cerises', color: 'Rouge cerise', hexCode: '#DC143C' },
+        ]
+      },
+      {
+        keywords: ['voiture', 'camion', 'bus', 'véhicule'],
+        palette: [
+          { element: 'Carrosserie', color: 'Rouge vif', hexCode: '#FF0000' },
+          { element: 'Roues', color: 'Noir', hexCode: '#000000' },
+          { element: 'Fenêtres', color: 'Bleu ciel', hexCode: '#87CEEB' },
+          { element: 'Phares', color: 'Jaune', hexCode: '#FFFF00' },
+          { element: 'Route', color: 'Gris asphalte', hexCode: '#696969' },
+        ]
+      },
+      {
+        keywords: ['noël', 'père noël', 'sapin', 'cadeau'],
+        palette: [
+          { element: 'Costume / Sapin', color: 'Rouge Noël', hexCode: '#C41E3A' },
+          { element: 'Sapin', color: 'Vert sapin', hexCode: '#228B22' },
+          { element: 'Étoile / Décos', color: 'Or', hexCode: '#FFD700' },
+          { element: 'Neige', color: 'Blanc pur', hexCode: '#FFFFFF' },
+          { element: 'Cadeaux', color: 'Multicolore', hexCode: '#FF69B4' },
+        ]
+      },
+    ];
+
+    // Chercher une correspondance
+    for (const mapping of colorMappings) {
+      if (mapping.keywords.some(keyword => subjectLower.includes(keyword))) {
+        return mapping.palette;
+      }
+    }
+
+    // Palette par défaut générique
+    return [
+      { element: 'Élément principal', color: 'Couleur au choix', hexCode: '#808080' },
+      { element: 'Fond', color: 'Couleur claire', hexCode: '#F5F5F5' },
+      { element: 'Détails', color: 'Couleur contrastée', hexCode: '#4A4A4A' },
+      { element: 'Accents', color: 'Couleur vive', hexCode: '#FF6B6B' },
+      { element: 'Ombres', color: 'Gris doux', hexCode: '#A9A9A9' },
+    ];
+  };
+
+  const generateColoringPage = async (pageNumber: number, subject: string): Promise<ColoringPage | null> => {
     const selectedTheme = theme === 'custom' ? customTheme : THEMES.find(t => t.value === theme)?.label || theme;
     const ageInfo = AGE_GROUPS.find(a => a.value === ageGroup);
     const complexityInfo = COMPLEXITY_LEVELS.find(c => c.value === complexity[0]);
-
-    const subjects = {
-      animals: ['un lion majestueux', 'un éléphant adorable', 'un papillon coloré', 'un chat joueur', 'un chien heureux', 'une grenouille souriante', 'un hibou sage', 'un lapin mignon'],
-      fantasy: ['une licorne magique', 'un dragon amical', 'une fée étincelante', 'un château enchanté', 'une sirène gracieuse', 'un phoenix majestueux'],
-      nature: ['un bouquet de fleurs', 'un arbre majestueux', 'un jardin fleuri', 'une montagne avec soleil', 'un champ de tulipes'],
-      vehicles: ['une voiture de course', 'un camion de pompiers', 'un avion dans les nuages', 'un bateau sur l\'eau', 'une fusée spatiale'],
-      seasons: ['un bonhomme de neige', 'des feuilles d\'automne', 'des fleurs de printemps', 'une plage d\'été', 'Père Noël avec cadeaux'],
-      food: ['une pizza appétissante', 'un gâteau d\'anniversaire', 'une corbeille de fruits', 'un sundae géant', 'des cupcakes décorés'],
-      space: ['une fusée dans l\'espace', 'un astronaute sur la lune', 'une planète avec anneaux', 'un alien amical', 'une station spatiale'],
-      ocean: ['un dauphin joueur', 'un poisson clown', 'une tortue de mer', 'un poulpe amusant', 'un hippocampe élégant'],
-      dinosaurs: ['un T-Rex souriant', 'un Tricératops amical', 'un Diplodocus géant', 'un Ptéranodon volant', 'un Stégosaure paisible'],
-      custom: [customTheme || 'un dessin personnalisé'],
-    };
-
-    const themeSubjects = subjects[theme as keyof typeof subjects] || subjects.custom;
-    const subject = customPrompt || themeSubjects[pageNumber % themeSubjects.length];
 
     const prompt = `Create a simple, child-friendly coloring book page for ages ${ageGroup}. 
 Subject: ${subject}
@@ -229,13 +470,37 @@ CRITICAL REQUIREMENTS:
         id: `page-${pageNumber}-${Date.now()}`,
         title: subject,
         imageUrl,
-        suggestedColors: generateColorPalette(theme, subject),
+        suggestedColors: generateDynamicColorPalette(subject), // Palette dynamique !
         prompt,
       };
     } catch (error) {
       console.error(`Erreur génération page ${pageNumber}:`, error);
       return null;
     }
+  };
+
+  // Génération des sujets pour le nombre de pages demandé
+  const generateSubjectsList = (): string[] => {
+    if (customPrompt.trim()) {
+      // Si prompt personnalisé, l'utiliser pour toutes les pages avec variations
+      return Array.from({ length: numberOfPages }, (_, i) => `${customPrompt} (variation ${i + 1})`);
+    }
+
+    const themeSubjects = EXTENDED_SUBJECTS[theme] || [];
+    if (theme === 'custom' && customTheme) {
+      // Générer des variations pour thème personnalisé
+      return Array.from({ length: numberOfPages }, (_, i) => `${customTheme} - scène ${i + 1}`);
+    }
+
+    // Mélanger les sujets et en prendre le nombre nécessaire
+    const shuffled = [...themeSubjects].sort(() => Math.random() - 0.5);
+    const subjects: string[] = [];
+    
+    for (let i = 0; i < numberOfPages; i++) {
+      subjects.push(shuffled[i % shuffled.length]);
+    }
+    
+    return subjects;
   };
 
   const handleGenerate = async () => {
@@ -248,25 +513,44 @@ CRITICAL REQUIREMENTS:
     setGeneratedPages([]);
     setCurrentProgress(0);
 
+    const subjects = generateSubjectsList();
     const pages: ColoringPage[] = [];
+    const BATCH_SIZE = 5; // Générer 5 pages en parallèle
 
-    for (let i = 0; i < numberOfPages; i++) {
-      setCurrentProgress(((i + 1) / numberOfPages) * 100);
-      const page = await generateColoringPage(i);
-      if (page) {
-        pages.push(page);
-        setGeneratedPages([...pages]);
-      }
-      // Petit délai entre les générations
-      if (i < numberOfPages - 1) {
-        await new Promise(resolve => setTimeout(resolve, 500));
+    toast.info(`Génération de ${numberOfPages} pages en lots de ${BATCH_SIZE}...`);
+
+    // Générer par lots de 5
+    for (let batchStart = 0; batchStart < numberOfPages; batchStart += BATCH_SIZE) {
+      const batchEnd = Math.min(batchStart + BATCH_SIZE, numberOfPages);
+      const batchSubjects = subjects.slice(batchStart, batchEnd);
+      
+      // Générer le lot en parallèle
+      const batchPromises = batchSubjects.map((subject, idx) => 
+        generateColoringPage(batchStart + idx, subject)
+      );
+
+      const batchResults = await Promise.all(batchPromises);
+      
+      // Ajouter les pages réussies
+      batchResults.forEach(page => {
+        if (page) {
+          pages.push(page);
+        }
+      });
+
+      setGeneratedPages([...pages]);
+      setCurrentProgress((batchEnd / numberOfPages) * 100);
+
+      // Petit délai entre les lots pour éviter le rate limiting
+      if (batchEnd < numberOfPages) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
       }
     }
 
     setIsGenerating(false);
     
     if (pages.length > 0) {
-      toast.success(`${pages.length} page(s) de coloriage générée(s) !`);
+      toast.success(`${pages.length}/${numberOfPages} page(s) de coloriage générée(s) !`);
     } else {
       toast.error('Erreur lors de la génération');
     }
@@ -274,7 +558,8 @@ CRITICAL REQUIREMENTS:
 
   const regeneratePage = async (index: number) => {
     setIsGenerating(true);
-    const newPage = await generateColoringPage(index);
+    const currentPage = generatedPages[index];
+    const newPage = await generateColoringPage(index, currentPage?.title || `Page ${index + 1}`);
     if (newPage) {
       const updatedPages = [...generatedPages];
       updatedPages[index] = newPage;
