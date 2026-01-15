@@ -84,8 +84,8 @@ export const EbookColoringBookGenerator: React.FC<ColoringBookGeneratorProps> = 
   const [customTheme, setCustomTheme] = useState('');
   const [ageGroup, setAgeGroup] = useState('4-6');
   const [complexity, setComplexity] = useState([2]);
-  const [numberOfPages, setNumberOfPages] = useState(10); // Défaut: 10 pages
-  const [bookFormat, setBookFormat] = useState('8x8'); // Format cartonné par défaut
+  const [numberOfPages, setNumberOfPages] = useState(25); // Défaut: 25 pages (KDP minimum 24)
+  const [bookFormat, setBookFormat] = useState('8.5x8.5-kdp'); // Format KDP par défaut
   const [customPrompt, setCustomPrompt] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedPages, setGeneratedPages] = useState<ColoringPage[]>([]);
@@ -602,20 +602,30 @@ CRITICAL REQUIREMENTS:
             {/* Nombre de pages */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label>Nombre de pages</Label>
-                <Badge variant="secondary">{numberOfPages} pages</Badge>
+                <Label>Nombre de pages de coloriage</Label>
+                <Badge variant={numberOfPages >= 24 ? "default" : "destructive"} className={numberOfPages >= 24 ? "bg-green-500" : ""}>
+                  {numberOfPages} pages {numberOfPages >= 24 ? '✓ KDP OK' : '⚠️ < 24'}
+                </Badge>
               </div>
               <Slider
                 value={[numberOfPages]}
                 onValueChange={(v) => setNumberOfPages(v[0])}
                 min={10}
-                max={15}
+                max={50}
                 step={1}
                 className="w-full"
               />
-              <p className="text-xs text-muted-foreground">
-                📘 Livres cartonnés: 10-15 pages recommandées • Estimation: ~{(numberOfPages * 0.5).toFixed(1)}€
-              </p>
+              <div className="text-xs space-y-1">
+                <p className={numberOfPages < 24 ? "text-destructive font-medium" : "text-muted-foreground"}>
+                  {numberOfPages < 24 
+                    ? `⚠️ KDP exige minimum 24 pages - il vous manque ${24 - numberOfPages} pages`
+                    : `✅ Compatible KDP (${numberOfPages} pages + ~4 pages légales = ~${numberOfPages + 4} pages total)`
+                  }
+                </p>
+                <p className="text-muted-foreground">
+                  💰 Estimation: ~{(numberOfPages * 0.5).toFixed(1)}€ • 📖 Recommandé: 25-40 pages
+                </p>
+              </div>
             </div>
 
             {/* Prompt personnalisé */}
