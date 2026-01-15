@@ -578,7 +578,7 @@ CRITICAL REQUIREMENTS:
     }
 
     setIsExporting(true);
-    toast.info('Création du PDF en cours...');
+    toast.info('Création du PDF KDP en cours...');
 
     try {
       // Déterminer les dimensions du PDF selon le format
@@ -603,31 +603,174 @@ CRITICAL REQUIREMENTS:
 
       const pageWidth = dimensions.width;
       const pageHeight = dimensions.height;
-      const margin = 10;
+      const margin = 15;
       const contentWidth = pageWidth - (margin * 2);
       const contentHeight = pageHeight - (margin * 2);
-
-      // Page de titre
-      pdf.setFontSize(24);
-      pdf.setFont('helvetica', 'bold');
       const title = ebookTitle || 'Mon Livre de Coloriage';
+      const themeLabel = THEMES.find(t => t.value === theme)?.label || theme;
+      const currentYear = new Date().getFullYear();
+
+      // ============================================
+      // PAGE 1: PAGE DE TITRE (KDP obligatoire)
+      // ============================================
+      pdf.setFontSize(28);
+      pdf.setFont('helvetica', 'bold');
       pdf.text(title, pageWidth / 2, pageHeight / 3, { align: 'center' });
       
-      pdf.setFontSize(14);
+      pdf.setFontSize(16);
       pdf.setFont('helvetica', 'normal');
-      const themeLabel = THEMES.find(t => t.value === theme)?.label || theme;
-      pdf.text(`Thème: ${themeLabel}`, pageWidth / 2, pageHeight / 3 + 15, { align: 'center' });
+      pdf.text(themeLabel, pageWidth / 2, pageHeight / 3 + 20, { align: 'center' });
+      
+      pdf.setFontSize(14);
+      pdf.text(`${generatedPages.length} dessins à colorier`, pageWidth / 2, pageHeight / 2, { align: 'center' });
       
       pdf.setFontSize(12);
-      pdf.text(`${generatedPages.length} pages de coloriage`, pageWidth / 2, pageHeight / 3 + 25, { align: 'center' });
-      pdf.text(`Tranche d'âge: ${ageGroup} ans`, pageWidth / 2, pageHeight / 3 + 35, { align: 'center' });
+      pdf.text(`Pour les ${ageGroup} ans`, pageWidth / 2, pageHeight / 2 + 15, { align: 'center' });
 
-      // Ajouter chaque page de coloriage
+      // Décoration simple
+      pdf.setDrawColor(200, 200, 200);
+      pdf.setLineWidth(0.5);
+      pdf.line(margin + 20, pageHeight / 3 + 30, pageWidth - margin - 20, pageHeight / 3 + 30);
+
+      // ============================================
+      // PAGE 2: COPYRIGHT (KDP obligatoire)
+      // ============================================
+      pdf.addPage();
+      
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'normal');
+      
+      const copyrightText = [
+        `© ${currentYear} - Tous droits réservés`,
+        '',
+        title,
+        '',
+        'Aucune partie de ce livre ne peut être reproduite,',
+        'stockée dans un système de récupération, ou transmise',
+        'sous quelque forme ou par quelque moyen que ce soit,',
+        'électronique, mécanique, photocopie, enregistrement',
+        'ou autre, sans l\'autorisation écrite préalable de l\'éditeur.',
+        '',
+        '---',
+        '',
+        `Format: ${BOOK_FORMATS.flatMap(c => c.formats).find(f => f.value === bookFormat)?.label || bookFormat}`,
+        `Thème: ${themeLabel}`,
+        `Tranche d\'âge: ${ageGroup} ans`,
+        `Nombre de pages: ${generatedPages.length + 6} (dont pages légales)`,
+        '',
+        '---',
+        '',
+        'Créé avec EbookStudio Pro',
+        'www.ebookstudio.fr',
+      ];
+
+      let copyrightY = pageHeight / 4;
+      copyrightText.forEach(line => {
+        pdf.text(line, pageWidth / 2, copyrightY, { align: 'center' });
+        copyrightY += 7;
+      });
+
+      // ============================================
+      // PAGE 3: PAGE TEST COULEURS (Guide pour enfants)
+      // ============================================
+      pdf.addPage();
+      
+      pdf.setFontSize(20);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('🎨 Teste tes Couleurs !', pageWidth / 2, 20, { align: 'center' });
+      
+      pdf.setFontSize(11);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text('Avant de commencer, essaie tes crayons ici :', pageWidth / 2, 30, { align: 'center' });
+
+      // Collecter toutes les couleurs uniques du livre
+      const allColorsForTest: Map<string, { element: string; color: string; hexCode: string }> = new Map();
+      generatedPages.forEach(page => {
+        page.suggestedColors.forEach(color => {
+          const key = color.hexCode;
+          if (!allColorsForTest.has(key)) {
+            allColorsForTest.set(key, color);
+          }
+        });
+      });
+
+      // Dessiner des cercles à colorier avec les couleurs suggérées
+      const colorsArray = Array.from(allColorsForTest.values()).slice(0, 12); // Max 12 couleurs
+      const circleRadius = 12;
+      const circlesPerRow = 3;
+      let circleY = 50;
+      let circleX = margin + 25;
+
+      colorsArray.forEach((color, idx) => {
+        // Cercle vide (contour)
+        pdf.setDrawColor(100, 100, 100);
+        pdf.setLineWidth(1);
+        pdf.circle(circleX, circleY, circleRadius, 'S');
+
+        // Petit carré de référence couleur
+        const hexColor = color.hexCode.replace('#', '');
+        const r = parseInt(hexColor.substring(0, 2), 16);
+        const g = parseInt(hexColor.substring(2, 4), 16);
+        const b = parseInt(hexColor.substring(4, 6), 16);
+        
+        pdf.setFillColor(r, g, b);
+        pdf.rect(circleX + circleRadius + 5, circleY - 4, 8, 8, 'F');
+        pdf.setDrawColor(50, 50, 50);
+        pdf.rect(circleX + circleRadius + 5, circleY - 4, 8, 8, 'S');
+
+        // Nom de la couleur
+        pdf.setFontSize(8);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(color.color, circleX + circleRadius + 16, circleY + 2);
+
+        // Passer au suivant
+        if ((idx + 1) % circlesPerRow === 0) {
+          circleY += 35;
+          circleX = margin + 25;
+        } else {
+          circleX += (contentWidth / circlesPerRow);
+        }
+      });
+
+      // Instructions en bas
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'italic');
+      pdf.text('Colorie chaque cercle avec la couleur indiquée !', pageWidth / 2, pageHeight - 20, { align: 'center' });
+
+      // ============================================
+      // PAGE 4: SOMMAIRE / TABLE DES MATIÈRES
+      // ============================================
+      pdf.addPage();
+      
+      pdf.setFontSize(18);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('📖 Sommaire', pageWidth / 2, 20, { align: 'center' });
+
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'normal');
+      
+      let sommY = 35;
+      const pagesPerColumn = Math.ceil(generatedPages.length / 2);
+      
+      generatedPages.forEach((page, idx) => {
+        const colOffset = idx >= pagesPerColumn ? contentWidth / 2 : 0;
+        const adjustedIdx = idx >= pagesPerColumn ? idx - pagesPerColumn : idx;
+        const yOffset = sommY + (adjustedIdx * 8);
+        
+        if (yOffset < pageHeight - 30) {
+          const pageNum = idx + 5; // Compte les pages légales avant
+          pdf.text(`${idx + 1}. ${page.title.substring(0, 30)}${page.title.length > 30 ? '...' : ''}`, margin + colOffset, yOffset);
+          pdf.text(`p.${pageNum}`, pageWidth - margin - colOffset - 10, yOffset, { align: 'right' });
+        }
+      });
+
+      // ============================================
+      // PAGES DE COLORIAGE
+      // ============================================
       for (let i = 0; i < generatedPages.length; i++) {
         const page = generatedPages[i];
         pdf.addPage();
 
-        // Télécharger l'image et la convertir en base64
         try {
           const response = await fetch(page.imageUrl);
           const blob = await response.blob();
@@ -638,16 +781,16 @@ CRITICAL REQUIREMENTS:
           });
 
           // Calculer les dimensions pour centrer l'image
-          const imgSize = Math.min(contentWidth, contentHeight);
+          const imgSize = Math.min(contentWidth, contentHeight - 10);
           const imgX = (pageWidth - imgSize) / 2;
-          const imgY = margin;
+          const imgY = margin - 5;
 
           pdf.addImage(base64, 'PNG', imgX, imgY, imgSize, imgSize);
 
-          // Ajouter le titre de la page en bas
-          pdf.setFontSize(10);
-          pdf.setFont('helvetica', 'italic');
-          pdf.text(`Page ${i + 1}: ${page.title}`, pageWidth / 2, pageHeight - 5, { align: 'center' });
+          // Numéro de page discret en bas
+          pdf.setFontSize(8);
+          pdf.setFont('helvetica', 'normal');
+          pdf.text(`${i + 1}`, pageWidth / 2, pageHeight - 5, { align: 'center' });
         } catch (imgError) {
           console.error(`Erreur chargement image ${i}:`, imgError);
           pdf.setFontSize(12);
@@ -655,96 +798,107 @@ CRITICAL REQUIREMENTS:
         }
       }
 
-      // Page Annexe: Palette de couleurs
+      // ============================================
+      // ANNEXE: GUIDE DES COULEURS COMPLET
+      // ============================================
       pdf.addPage();
-      pdf.setFontSize(20);
+      pdf.setFontSize(18);
       pdf.setFont('helvetica', 'bold');
       pdf.text('🎨 Guide des Couleurs', pageWidth / 2, 20, { align: 'center' });
 
       pdf.setFontSize(10);
       pdf.setFont('helvetica', 'normal');
-      pdf.text('Utilisez ces couleurs pour remplir vos dessins !', pageWidth / 2, 30, { align: 'center' });
+      pdf.text('Retrouve ici toutes les couleurs utilisées dans ce livre !', pageWidth / 2, 30, { align: 'center' });
 
-      // Collecter toutes les couleurs uniques
-      const allColors: Map<string, { element: string; color: string; hexCode: string }> = new Map();
-      generatedPages.forEach(page => {
-        page.suggestedColors.forEach(color => {
-          if (!allColors.has(color.element)) {
-            allColors.set(color.element, color);
-          }
-        });
-      });
-
-      // Afficher les couleurs
-      let yPos = 45;
-      const colWidth = (contentWidth - 10) / 2;
-      let colIndex = 0;
-
-      Array.from(allColors.values()).forEach((color, index) => {
-        const xPos = margin + (colIndex * (colWidth + 10));
-        
-        // Carré de couleur
-        const hexColor = color.hexCode.replace('#', '');
-        const r = parseInt(hexColor.substring(0, 2), 16);
-        const g = parseInt(hexColor.substring(2, 4), 16);
-        const b = parseInt(hexColor.substring(4, 6), 16);
-        
-        pdf.setFillColor(r, g, b);
-        pdf.rect(xPos, yPos, 10, 10, 'F');
-        pdf.setDrawColor(100, 100, 100);
-        pdf.rect(xPos, yPos, 10, 10, 'S');
-
-        // Texte
-        pdf.setFontSize(9);
-        pdf.setFont('helvetica', 'bold');
-        pdf.text(color.element, xPos + 14, yPos + 4);
-        pdf.setFont('helvetica', 'normal');
-        pdf.text(`${color.color} (${color.hexCode})`, xPos + 14, yPos + 9);
-
-        colIndex++;
-        if (colIndex >= 2) {
-          colIndex = 0;
-          yPos += 18;
-        }
-
-        // Nouvelle page si nécessaire
-        if (yPos > pageHeight - 30 && index < allColors.size - 1) {
+      // Afficher les couleurs par page
+      let colorY = 45;
+      generatedPages.forEach((page, pageIdx) => {
+        if (colorY > pageHeight - 40) {
           pdf.addPage();
-          yPos = 20;
-          colIndex = 0;
+          colorY = 20;
         }
+
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(`Page ${pageIdx + 1}: ${page.title.substring(0, 40)}`, margin, colorY);
+        colorY += 6;
+
+        pdf.setFontSize(8);
+        pdf.setFont('helvetica', 'normal');
+        
+        let colorX = margin;
+        page.suggestedColors.slice(0, 5).forEach((color) => {
+          const hexColor = color.hexCode.replace('#', '');
+          const r = parseInt(hexColor.substring(0, 2), 16);
+          const g = parseInt(hexColor.substring(2, 4), 16);
+          const b = parseInt(hexColor.substring(4, 6), 16);
+          
+          pdf.setFillColor(r, g, b);
+          pdf.rect(colorX, colorY, 6, 6, 'F');
+          pdf.setDrawColor(100, 100, 100);
+          pdf.rect(colorX, colorY, 6, 6, 'S');
+          
+          pdf.text(color.element.substring(0, 12), colorX + 8, colorY + 5);
+          colorX += 38;
+        });
+        colorY += 12;
       });
 
-      // Page de conseils pour les parents
+      // ============================================
+      // À PROPOS DE L'AUTEUR (KDP recommandé)
+      // ============================================
       pdf.addPage();
+      
       pdf.setFontSize(18);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('💡 Conseils pour les Parents', pageWidth / 2, 20, { align: 'center' });
+      pdf.text('À Propos de ce Livre', pageWidth / 2, 25, { align: 'center' });
 
-      const conseils = [
+      pdf.setFontSize(11);
+      pdf.setFont('helvetica', 'normal');
+      
+      const aboutText = [
+        `Ce livre de coloriage "${title}" a été conçu`,
+        `avec amour pour les enfants de ${ageGroup} ans.`,
+        '',
+        `Thème: ${themeLabel}`,
+        `Contient ${generatedPages.length} dessins originaux`,
+        '',
+        '---',
+        '',
+        '💡 Conseils pour les parents:',
+        '',
         '• Utilisez des crayons de couleur ou des feutres lavables',
         '• Laissez votre enfant choisir ses propres couleurs',
         '• Félicitez les efforts, pas seulement le résultat',
         '• Le coloriage développe la motricité fine',
         '• Coloriez ensemble pour un moment de partage',
         '',
-        '📘 Format du livre: ' + (BOOK_FORMATS.flatMap(c => c.formats).find(f => f.value === bookFormat)?.label || bookFormat),
-        '👶 Adapté pour: ' + ageGroup + ' ans',
+        '---',
+        '',
+        '📧 Contact & Retours:',
+        'Merci d\'avoir choisi ce livre !',
+        'Vos avis nous aident à créer de meilleurs contenus.',
       ];
 
-      pdf.setFontSize(11);
-      pdf.setFont('helvetica', 'normal');
-      let conseilY = 35;
-      conseils.forEach(conseil => {
-        pdf.text(conseil, margin, conseilY);
-        conseilY += 8;
+      let aboutY = 40;
+      aboutText.forEach(line => {
+        pdf.text(line, pageWidth / 2, aboutY, { align: 'center' });
+        aboutY += 8;
       });
 
-      // Télécharger le PDF
-      const fileName = `livre-coloriage-${theme}-${Date.now()}.pdf`;
+      // Pied de page final
+      pdf.setFontSize(9);
+      pdf.setFont('helvetica', 'italic');
+      pdf.text('Créé avec EbookStudio Pro - www.ebookstudio.fr', pageWidth / 2, pageHeight - 10, { align: 'center' });
+
+      // ============================================
+      // TÉLÉCHARGEMENT
+      // ============================================
+      const fileName = `livre-coloriage-kdp-${theme}-${Date.now()}.pdf`;
       pdf.save(fileName);
 
-      toast.success(`PDF exporté: ${fileName}`);
+      const totalPages = generatedPages.length + 6; // 4 pages légales + guide couleurs + à propos
+      toast.success(`PDF KDP exporté: ${totalPages} pages (${fileName})`);
     } catch (error) {
       console.error('Erreur export PDF:', error);
       toast.error('Erreur lors de l\'export PDF');
