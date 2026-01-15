@@ -217,6 +217,10 @@ const SalesPage = () => {
             <Link to="/demo" className="text-white/70 hover:text-white transition-colors">Démo</Link>
             <Link to="/formation" className="text-white/70 hover:text-white transition-colors">Formation</Link>
             <Link to="/valeur-offre" className="text-white/70 hover:text-white transition-colors">Valeur</Link>
+            <Link to="/faq" className="text-white/70 hover:text-emerald-400 transition-colors flex items-center gap-1">
+              <HelpCircle className="w-4 h-4" />
+              FAQ
+            </Link>
           </nav>
           <Button 
             size="sm" 
