@@ -99,6 +99,7 @@ import EbookDocumentTransformer from '@/components/ebook/EbookDocumentTransforme
 import EbookAmazonAdsSimulator from '@/components/ebook/EbookAmazonAdsSimulator';
 import EbookLaunchPlan from '@/components/ebook/EbookLaunchPlan';
 import EbookColoringBookGenerator from '@/components/ebook/EbookColoringBookGenerator';
+import EbookComicBookGenerator from '@/components/ebook/EbookComicBookGenerator';
 
 // Hooks et données
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
@@ -2248,6 +2249,11 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       case 'coloring-book':
         return (
           <EbookColoringBookGenerator ebookTitle={ebookTitle} />
+        );
+      
+      case 'comic-book':
+        return (
+          <EbookComicBookGenerator ebookTitle={ebookTitle} />
         );
       
       case 'kdp-research':
