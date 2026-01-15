@@ -197,19 +197,21 @@ Instructions de génération:
 
   console.log('Generating image with OpenAI:', imagePrompt);
 
-  const generateViaImagesAPI = async (model: string) => {
+  const generateViaImagesAPI = async (model: string): Promise<{ ok: boolean; status: number; data?: any; errorText?: string }> => {
     const payload: any = {
       model,
       prompt: imagePrompt,
       n: 1,
       size,
-      response_format: 'b64_json',
     };
 
-    if (model === 'gpt-image-1') {
-      payload.quality = quality === 'standard' ? 'medium' : 'high';
-    } else if (model === 'dall-e-3') {
+    // gpt-image-1 ne supporte PAS response_format, mais dall-e-3 le supporte
+    if (model === 'dall-e-3') {
+      payload.response_format = 'b64_json';
       payload.quality = QUALITY_MAP[quality]?.openai || 'hd';
+    } else if (model === 'gpt-image-1') {
+      payload.quality = quality === 'standard' ? 'medium' : 'high';
+      // gpt-image-1 retourne directement une URL, pas de response_format
     }
 
     const resp = await fetch('https://api.openai.com/v1/images/generations', {
@@ -221,32 +223,34 @@ Instructions de génération:
       body: JSON.stringify(payload),
     });
 
-    return resp;
+    if (!resp.ok) {
+      const errorText = await resp.text();
+      return { ok: false, status: resp.status, errorText };
+    }
+
+    const data = await resp.json();
+    return { ok: true, status: resp.status, data };
   };
 
-  // Try gpt-image-1 first, then automatically fall back to dall-e-3 on 403/permission issues
-  let response = await generateViaImagesAPI('gpt-image-1');
+  // Try gpt-image-1 first, then automatically fall back to dall-e-3 on errors
+  let result = await generateViaImagesAPI('gpt-image-1');
 
-  if (!response.ok) {
-    const status = response.status;
-    const errorText = await response.text();
-    console.error('OpenAI error (gpt-image-1):', status, errorText);
+  if (!result.ok) {
+    console.error('OpenAI error (gpt-image-1):', result.status, result.errorText);
 
-    // If org not verified or general 403, try dall-e-3 as a widely available fallback
-    if (status === 403 || /must be verified|permission/i.test(errorText)) {
+    // Fallback to dall-e-3 for permission issues or parameter errors
+    if (result.status === 403 || result.status === 400 || /must be verified|permission|unknown_parameter/i.test(result.errorText || '')) {
       console.log('Falling back to OpenAI dall-e-3 image generation...');
-      response = await generateViaImagesAPI('dall-e-3');
+      result = await generateViaImagesAPI('dall-e-3');
     }
   }
 
-  if (!response.ok) {
-    const finalStatus = response.status;
-    const finalError = await response.text();
-    console.error('OpenAI error (final):', finalStatus, finalError);
-    throw new Error(`OpenAI API error: ${finalStatus}`);
+  if (!result.ok) {
+    console.error('OpenAI error (final):', result.status, result.errorText);
+    throw new Error(`OpenAI API error: ${result.status}`);
   }
 
-  const data = await response.json();
+  const data = result.data;
   
   // Gérer les deux formats possibles (base64 et URL)
   let imageUrl: string | null = null;
