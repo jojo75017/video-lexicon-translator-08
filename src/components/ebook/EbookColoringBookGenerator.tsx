@@ -606,7 +606,8 @@ CRITICAL REQUIREMENTS:
       const margin = 15;
       const contentWidth = pageWidth - (margin * 2);
       const contentHeight = pageHeight - (margin * 2);
-      const title = ebookTitle || 'Mon Livre de Coloriage';
+      // Titre spécifique au livre de coloriage (pas le titre générique de l'ebook)
+      const coloringBookTitle = 'Mon Livre de Coloriage';
       // Supprimer les emojis du thème (non supportés par jsPDF)
       const rawThemeLabel = THEMES.find(t => t.value === theme)?.label || theme;
       const themeLabel = rawThemeLabel.replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]/gu, '').trim();
@@ -615,16 +616,16 @@ CRITICAL REQUIREMENTS:
       // ============================================
       // PAGE 1: PAGE DE TITRE (KDP obligatoire)
       // ============================================
-      pdf.setFontSize(28);
+      pdf.setFontSize(24);
       pdf.setFont('helvetica', 'bold');
-      pdf.text(title, pageWidth / 2, pageHeight / 3, { align: 'center' });
+      pdf.text(coloringBookTitle, pageWidth / 2, pageHeight / 3, { align: 'center' });
       
-      pdf.setFontSize(16);
+      pdf.setFontSize(18);
       pdf.setFont('helvetica', 'normal');
-      pdf.text(themeLabel, pageWidth / 2, pageHeight / 3 + 20, { align: 'center' });
+      pdf.text(themeLabel, pageWidth / 2, pageHeight / 3 + 15, { align: 'center' });
       
       pdf.setFontSize(14);
-      pdf.text(`${generatedPages.length} dessins à colorier`, pageWidth / 2, pageHeight / 2, { align: 'center' });
+      pdf.text(`${generatedPages.length} dessins a colorier`, pageWidth / 2, pageHeight / 2, { align: 'center' });
       
       pdf.setFontSize(12);
       pdf.text(`Pour les ${ageGroup} ans`, pageWidth / 2, pageHeight / 2 + 15, { align: 'center' });
@@ -632,7 +633,7 @@ CRITICAL REQUIREMENTS:
       // Décoration simple
       pdf.setDrawColor(200, 200, 200);
       pdf.setLineWidth(0.5);
-      pdf.line(margin + 20, pageHeight / 3 + 30, pageWidth - margin - 20, pageHeight / 3 + 30);
+      pdf.line(margin + 20, pageHeight / 3 + 25, pageWidth - margin - 20, pageHeight / 3 + 25);
 
       // ============================================
       // PAGE 2: COPYRIGHT (KDP obligatoire)
@@ -645,7 +646,7 @@ CRITICAL REQUIREMENTS:
       const copyrightText = [
         `© ${currentYear} - Tous droits réservés`,
         '',
-        title,
+        coloringBookTitle,
         '',
         'Aucune partie de ce livre ne peut être reproduite,',
         'stockée dans un système de récupération, ou transmise',
@@ -891,7 +892,7 @@ CRITICAL REQUIREMENTS:
       pdf.setFont('helvetica', 'normal');
       
       const aboutText = [
-        `Ce livre de coloriage "${title}" a été conçu`,
+        `Ce livre de coloriage "${coloringBookTitle}" a ete concu`,
         `avec amour pour les enfants de ${ageGroup} ans.`,
         '',
         `Thème: ${themeLabel}`,
