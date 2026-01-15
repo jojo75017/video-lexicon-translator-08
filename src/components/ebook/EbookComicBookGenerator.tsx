@@ -262,11 +262,15 @@ VISUAL STYLE:
 - No text, no speech bubbles in image
 - CONSISTENCY: Same art style, line weight, and character design as previous pages`;
 
-      const { data: imageData, error: imageError } = await supabase.functions.invoke('generate-cover-image', {
+      const { data: imageData, error: imageError } = await supabase.functions.invoke('generate-chapter-images', {
         body: {
-          prompt: imagePrompt,
-          style: artStyle,
-          aspectRatio: '3:4'
+          chapterTitle: `Page ${pageIndex + 1} - ${pageScenario.description.substring(0, 50)}`,
+          ebookTitle: title || 'Bande Dessinée',
+          style: `${selectedStyle?.description || 'cartoon comic'}, ${colorPrompt}`,
+          ratio: 'portrait',
+          quality: 'high',
+          colorScheme: colorMode === 'bw' ? 'monochrome' : 'auto',
+          customPrompt: imagePrompt
         }
       });
 
