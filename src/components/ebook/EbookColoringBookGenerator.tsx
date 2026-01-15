@@ -7,9 +7,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
-import { Loader2, Palette, Download, RefreshCw, Sparkles, Baby, ImagePlus, BookOpen, Wand2 } from 'lucide-react';
+import { Loader2, Palette, Download, RefreshCw, Sparkles, Baby, ImagePlus, BookOpen, Wand2, FileDown } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import jsPDF from 'jspdf';
 
 interface ColoringPage {
   id: string;
@@ -283,6 +284,190 @@ CRITICAL REQUIREMENTS:
     setIsGenerating(false);
   };
 
+  const [isExporting, setIsExporting] = useState(false);
+
+  const exportToPDF = async () => {
+    if (generatedPages.length === 0) {
+      toast.error('Aucune page à exporter');
+      return;
+    }
+
+    setIsExporting(true);
+    toast.info('Création du PDF en cours...');
+
+    try {
+      // Déterminer les dimensions du PDF selon le format
+      const formatDimensions: Record<string, { width: number; height: number }> = {
+        '6x6': { width: 152, height: 152 },
+        '7x7': { width: 178, height: 178 },
+        '8x8': { width: 203, height: 203 },
+        '5x7': { width: 127, height: 178 },
+        '8.5x8.5': { width: 216, height: 216 },
+        '8.5x8.5-kdp': { width: 216, height: 216 },
+        '8.5x11': { width: 216, height: 279 },
+        '8x10': { width: 203, height: 254 },
+        'a4': { width: 210, height: 297 },
+      };
+
+      const dimensions = formatDimensions[bookFormat] || { width: 203, height: 203 };
+      const pdf = new jsPDF({
+        orientation: dimensions.width > dimensions.height ? 'landscape' : 'portrait',
+        unit: 'mm',
+        format: [dimensions.width, dimensions.height],
+      });
+
+      const pageWidth = dimensions.width;
+      const pageHeight = dimensions.height;
+      const margin = 10;
+      const contentWidth = pageWidth - (margin * 2);
+      const contentHeight = pageHeight - (margin * 2);
+
+      // Page de titre
+      pdf.setFontSize(24);
+      pdf.setFont('helvetica', 'bold');
+      const title = ebookTitle || 'Mon Livre de Coloriage';
+      pdf.text(title, pageWidth / 2, pageHeight / 3, { align: 'center' });
+      
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'normal');
+      const themeLabel = THEMES.find(t => t.value === theme)?.label || theme;
+      pdf.text(`Thème: ${themeLabel}`, pageWidth / 2, pageHeight / 3 + 15, { align: 'center' });
+      
+      pdf.setFontSize(12);
+      pdf.text(`${generatedPages.length} pages de coloriage`, pageWidth / 2, pageHeight / 3 + 25, { align: 'center' });
+      pdf.text(`Tranche d'âge: ${ageGroup} ans`, pageWidth / 2, pageHeight / 3 + 35, { align: 'center' });
+
+      // Ajouter chaque page de coloriage
+      for (let i = 0; i < generatedPages.length; i++) {
+        const page = generatedPages[i];
+        pdf.addPage();
+
+        // Télécharger l'image et la convertir en base64
+        try {
+          const response = await fetch(page.imageUrl);
+          const blob = await response.blob();
+          const base64 = await new Promise<string>((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result as string);
+            reader.readAsDataURL(blob);
+          });
+
+          // Calculer les dimensions pour centrer l'image
+          const imgSize = Math.min(contentWidth, contentHeight);
+          const imgX = (pageWidth - imgSize) / 2;
+          const imgY = margin;
+
+          pdf.addImage(base64, 'PNG', imgX, imgY, imgSize, imgSize);
+
+          // Ajouter le titre de la page en bas
+          pdf.setFontSize(10);
+          pdf.setFont('helvetica', 'italic');
+          pdf.text(`Page ${i + 1}: ${page.title}`, pageWidth / 2, pageHeight - 5, { align: 'center' });
+        } catch (imgError) {
+          console.error(`Erreur chargement image ${i}:`, imgError);
+          pdf.setFontSize(12);
+          pdf.text(`[Image non disponible: ${page.title}]`, pageWidth / 2, pageHeight / 2, { align: 'center' });
+        }
+      }
+
+      // Page Annexe: Palette de couleurs
+      pdf.addPage();
+      pdf.setFontSize(20);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('🎨 Guide des Couleurs', pageWidth / 2, 20, { align: 'center' });
+
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text('Utilisez ces couleurs pour remplir vos dessins !', pageWidth / 2, 30, { align: 'center' });
+
+      // Collecter toutes les couleurs uniques
+      const allColors: Map<string, { element: string; color: string; hexCode: string }> = new Map();
+      generatedPages.forEach(page => {
+        page.suggestedColors.forEach(color => {
+          if (!allColors.has(color.element)) {
+            allColors.set(color.element, color);
+          }
+        });
+      });
+
+      // Afficher les couleurs
+      let yPos = 45;
+      const colWidth = (contentWidth - 10) / 2;
+      let colIndex = 0;
+
+      Array.from(allColors.values()).forEach((color, index) => {
+        const xPos = margin + (colIndex * (colWidth + 10));
+        
+        // Carré de couleur
+        const hexColor = color.hexCode.replace('#', '');
+        const r = parseInt(hexColor.substring(0, 2), 16);
+        const g = parseInt(hexColor.substring(2, 4), 16);
+        const b = parseInt(hexColor.substring(4, 6), 16);
+        
+        pdf.setFillColor(r, g, b);
+        pdf.rect(xPos, yPos, 10, 10, 'F');
+        pdf.setDrawColor(100, 100, 100);
+        pdf.rect(xPos, yPos, 10, 10, 'S');
+
+        // Texte
+        pdf.setFontSize(9);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(color.element, xPos + 14, yPos + 4);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(`${color.color} (${color.hexCode})`, xPos + 14, yPos + 9);
+
+        colIndex++;
+        if (colIndex >= 2) {
+          colIndex = 0;
+          yPos += 18;
+        }
+
+        // Nouvelle page si nécessaire
+        if (yPos > pageHeight - 30 && index < allColors.size - 1) {
+          pdf.addPage();
+          yPos = 20;
+          colIndex = 0;
+        }
+      });
+
+      // Page de conseils pour les parents
+      pdf.addPage();
+      pdf.setFontSize(18);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('💡 Conseils pour les Parents', pageWidth / 2, 20, { align: 'center' });
+
+      const conseils = [
+        '• Utilisez des crayons de couleur ou des feutres lavables',
+        '• Laissez votre enfant choisir ses propres couleurs',
+        '• Félicitez les efforts, pas seulement le résultat',
+        '• Le coloriage développe la motricité fine',
+        '• Coloriez ensemble pour un moment de partage',
+        '',
+        '📘 Format du livre: ' + (BOOK_FORMATS.flatMap(c => c.formats).find(f => f.value === bookFormat)?.label || bookFormat),
+        '👶 Adapté pour: ' + ageGroup + ' ans',
+      ];
+
+      pdf.setFontSize(11);
+      pdf.setFont('helvetica', 'normal');
+      let conseilY = 35;
+      conseils.forEach(conseil => {
+        pdf.text(conseil, margin, conseilY);
+        conseilY += 8;
+      });
+
+      // Télécharger le PDF
+      const fileName = `livre-coloriage-${theme}-${Date.now()}.pdf`;
+      pdf.save(fileName);
+
+      toast.success(`PDF exporté: ${fileName}`);
+    } catch (error) {
+      console.error('Erreur export PDF:', error);
+      toast.error('Erreur lors de l\'export PDF');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -504,11 +689,28 @@ CRITICAL REQUIREMENTS:
       {/* Pages générées */}
       {generatedPages.length > 0 && (
         <Card>
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="flex items-center gap-2">
               <BookOpen className="h-5 w-5 text-green-500" />
               Pages générées ({generatedPages.length})
             </CardTitle>
+            <Button
+              onClick={exportToPDF}
+              disabled={isExporting || isGenerating}
+              className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white"
+            >
+              {isExporting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Export en cours...
+                </>
+              ) : (
+                <>
+                  <FileDown className="mr-2 h-4 w-4" />
+                  Exporter PDF complet
+                </>
+              )}
+            </Button>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
