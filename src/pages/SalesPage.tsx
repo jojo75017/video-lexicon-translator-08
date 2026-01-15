@@ -20,6 +20,10 @@ import AuthorQuiz from "@/components/sales/AuthorQuiz";
 import SuccessGallery from "@/components/sales/SuccessGallery";
 import ScrollIntentPopup from "@/components/sales/ScrollIntentPopup";
 import VideoTestimonials from "@/components/sales/VideoTestimonials";
+import TrustBadges from "@/components/sales/TrustBadges";
+import PriceComparison from "@/components/sales/PriceComparison";
+import SalesFaq from "@/components/sales/SalesFaq";
+import StarTestimonials from "@/components/sales/StarTestimonials";
 
 // Composant Newsletter inline pour le footer
 const NewsletterForm = () => {
@@ -507,8 +511,14 @@ const SalesPage = () => {
         </div>
       </section>
 
+      {/* Star Testimonials Carousel */}
+      <StarTestimonials />
+
       {/* Video Testimonials Section */}
       <VideoTestimonials />
+
+      {/* Price Comparison Table */}
+      <PriceComparison />
 
       {/* ROI Calculator Section */}
       <section className="py-20 px-4 bg-gradient-to-br from-emerald-50/50 via-background to-teal-50/50 dark:from-emerald-950/20 dark:via-background dark:to-teal-950/20">
@@ -712,6 +722,9 @@ const SalesPage = () => {
         </div>
       </section>
 
+      {/* Trust Badges Section */}
+      <TrustBadges />
+
       {/* Success Stories Gallery */}
       <section className="py-20 px-4 bg-gradient-to-br from-background via-primary/5 to-background">
         <div className="max-w-6xl mx-auto">
@@ -719,88 +732,8 @@ const SalesPage = () => {
         </div>
       </section>
 
-      {/* FAQ Section */}
-      <section className="py-20 px-4">
-        <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-12">
-            <Badge className="mb-4 bg-primary/10 text-primary border-primary/20 px-4 py-2">
-              <HelpCircle className="w-4 h-4 mr-2" />
-              Questions Fréquentes
-            </Badge>
-            <h2 className="text-3xl font-bold mb-4">Tout ce que vous devez savoir</h2>
-            <p className="text-muted-foreground">
-              Réponses aux questions les plus courantes sur notre générateur
-            </p>
-          </div>
-
-          <Accordion type="single" collapsible className="w-full space-y-4">
-            <AccordionItem value="item-1" className="border rounded-lg px-6 bg-card">
-              <AccordionTrigger className="text-left font-semibold hover:no-underline">
-                Comment fonctionne la garantie satisfait ou remboursé ?
-              </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground pb-4">
-                Vous disposez de 30 jours après votre achat pour demander un remboursement complet, sans condition. 
-                Il vous suffit de nous contacter par email et nous procédons au remboursement sous 48h. 
-                Nous sommes convaincus que vous allez adorer notre outil !
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="item-2" className="border rounded-lg px-6 bg-card">
-              <AccordionTrigger className="text-left font-semibold hover:no-underline">
-                Comment accéder à mon compte après achat ?
-              </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground pb-4">
-                Après votre paiement, vous recevez immédiatement un email avec votre code d'accès personnel. 
-                Connectez-vous sur la plateforme avec votre email et ce code pour accéder à tous vos outils. 
-                L'accès est instantané, vous pouvez commencer à créer vos ebooks dans les minutes qui suivent !
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="item-3" className="border rounded-lg px-6 bg-card">
-              <AccordionTrigger className="text-left font-semibold hover:no-underline">
-                Les mises à jour sont-elles incluses ?
-              </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground pb-4">
-                Oui ! Toutes les mises à jour sont gratuites et automatiques. Nous améliorons constamment 
-                l'outil avec de nouvelles fonctionnalités, modèles et optimisations. Avec l'offre Lifetime, 
-                vous bénéficiez de toutes les évolutions futures sans frais supplémentaires.
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="item-4" className="border rounded-lg px-6 bg-card">
-              <AccordionTrigger className="text-left font-semibold hover:no-underline">
-                Puis-je publier mes ebooks sur Amazon KDP ?
-              </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground pb-4">
-                Absolument ! Les ebooks générés vous appartiennent à 100%. Vous pouvez les publier sur 
-                Amazon KDP, Kobo, Apple Books ou toute autre plateforme. Notre outil inclut même des 
-                fonctionnalités spécifiques pour optimiser vos publications KDP (mots-clés, catégories, descriptions).
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="item-5" className="border rounded-lg px-6 bg-card">
-              <AccordionTrigger className="text-left font-semibold hover:no-underline">
-                Que comprend l'offre à 37€ ?
-              </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground pb-4">
-                L'offre à 37€ vous donne un accès complet et illimité à vie : ebooks illimités, chapitres illimités, 
-                couvertures illimitées, toutes les formations (texte et audio), tous les outils KDP, 
-                et toutes les mises à jour futures. C'est l'accès le plus complet possible.
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="item-6" className="border rounded-lg px-6 bg-card">
-              <AccordionTrigger className="text-left font-semibold hover:no-underline">
-                Comment fonctionne le support ?
-              </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground pb-4">
-                Tous les utilisateurs bénéficient d'un support prioritaire par email avec réponse rapide. 
-                Nous sommes là pour vous aider à tirer le meilleur parti de l'outil.
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-        </div>
-      </section>
+      {/* Mini FAQ Section */}
+      <SalesFaq />
 
       {/* Final CTA */}
       <section className="py-20 px-4">
