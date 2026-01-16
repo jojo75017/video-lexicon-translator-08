@@ -51,12 +51,22 @@ const App = () => {
   });
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
+  // Permanent admin email - bypasses session expiration
+  const PERMANENT_ADMIN_EMAIL = 'boubetgeorges@gmail.com';
+
   useEffect(() => {
     const invokeCheckAdmin = (accessToken?: string) => {
       return supabase.functions.invoke(
         'check-admin',
         accessToken ? { headers: { Authorization: `Bearer ${accessToken}` } } : undefined
       );
+    };
+
+    // Check admin by email (no session required)
+    const checkAdminByEmail = async (email: string) => {
+      return supabase.functions.invoke('check-admin', {
+        body: { email }
+      });
     };
 
     const initAuth = async () => {
@@ -85,6 +95,7 @@ const App = () => {
           localStorage.removeItem('subscriber_data');
         }
       }
+
       // Check admin session
       try {
         const {
@@ -101,15 +112,34 @@ const App = () => {
             console.log('Statut admin confirmé dans App.tsx');
             setIsAdmin(true);
             sessionStorage.setItem('is_admin', 'true');
+            // Store admin email for permanent access
+            localStorage.setItem('permanent_admin_email', session.user?.email || '');
           } else {
             console.log('Utilisateur non-admin dans App.tsx');
             sessionStorage.removeItem('is_admin');
           }
         } else {
-          console.log('Aucune session admin trouvée dans App.tsx - Connectez-vous sur /auth');
-          // Clear stale sessionStorage if no active session
-          sessionStorage.removeItem('is_admin');
-          setIsAdmin(false);
+          console.log('Aucune session Supabase - vérification admin permanent par email...');
+          
+          // FALLBACK: Check permanent admin by email (no session required)
+          const storedAdminEmail = localStorage.getItem('permanent_admin_email');
+          if (storedAdminEmail === PERMANENT_ADMIN_EMAIL) {
+            const { data, error } = await checkAdminByEmail(storedAdminEmail);
+            
+            if (!error && data?.isAdmin) {
+              console.log('Admin permanent confirmé par email:', storedAdminEmail);
+              setIsAdmin(true);
+              sessionStorage.setItem('is_admin', 'true');
+            } else {
+              console.log('Email admin non confirmé');
+              sessionStorage.removeItem('is_admin');
+              localStorage.removeItem('permanent_admin_email');
+              setIsAdmin(false);
+            }
+          } else {
+            sessionStorage.removeItem('is_admin');
+            setIsAdmin(false);
+          }
         }
       } catch (error) {
         console.error('Erreur lors de la vérification de la session admin:', error);
