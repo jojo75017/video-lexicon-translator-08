@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Loader2, Layout, Download, RefreshCw, Sparkles, MessageSquare, ImagePlus, BookOpen, Wand2, FileDown, Users, Zap } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -131,6 +132,7 @@ export const EbookComicBookGenerator: React.FC<ComicBookGeneratorProps> = ({ ebo
   const [storyTemplate, setStoryTemplate] = useState('hero-journey');
   const [numberOfPages, setNumberOfPages] = useState(12);
   const [title, setTitle] = useState(ebookTitle || '');
+  const [showAdvanced, setShowAdvanced] = useState(false);
   const [mainCharacter, setMainCharacter] = useState('');
   const [characterDescription, setCharacterDescription] = useState('');
   const [setting, setSetting] = useState('');
@@ -856,202 +858,199 @@ Réponds en JSON:
               />
             </div>
 
-            {/* Genre */}
-            <div className="space-y-2">
-              <Label>Genre</Label>
-              <Select value={genre} onValueChange={setGenre}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {GENRES.map(g => (
-                    <SelectItem key={g.value} value={g.value}>
-                      {g.label} - {g.examples}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {genre === 'custom' && (
-                <Input
-                  value={customGenre}
-                  onChange={(e) => setCustomGenre(e.target.value)}
-                  placeholder="Décrivez votre genre..."
-                  className="mt-2"
-                />
-              )}
-            </div>
+            <Collapsible open={showAdvanced} onOpenChange={setShowAdvanced}>
+              <div className="flex items-center justify-between">
+                <p className="text-xs text-muted-foreground">
+                  Optionnel : personnalisez le style, les personnages, le nombre de pages…
+                </p>
+                <CollapsibleTrigger asChild>
+                  <Button type="button" variant="outline" size="sm">
+                    {showAdvanced ? 'Masquer options' : 'Options avancées'}
+                  </Button>
+                </CollapsibleTrigger>
+              </div>
 
-            {/* Personnage principal */}
-            <div className="space-y-2">
-              <Label>Personnage principal (optionnel)</Label>
-              <Input
-                value={mainCharacter}
-                onChange={(e) => setMainCharacter(e.target.value)}
-                placeholder="Ex: Luna (sinon on mettra 'Le héros')"
-              />
-            </div>
+              <CollapsibleContent className="space-y-4 mt-4">
+                {/* Genre */}
+                <div className="space-y-2">
+                  <Label>Genre</Label>
+                  <Select value={genre} onValueChange={setGenre}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {GENRES.map(g => (
+                        <SelectItem key={g.value} value={g.value}>
+                          {g.label} - {g.examples}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {genre === 'custom' && (
+                    <Input
+                      value={customGenre}
+                      onChange={(e) => setCustomGenre(e.target.value)}
+                      placeholder="Décrivez votre genre..."
+                      className="mt-2"
+                    />
+                  )}
+                </div>
 
-            <div className="space-y-2">
-              <Label>Description du personnage</Label>
-              <Textarea
-                value={characterDescription}
-                onChange={(e) => setCharacterDescription(e.target.value)}
-                placeholder="Ex: Un petit chat blanc avec des yeux bleus et un collier étoilé..."
-                rows={2}
-              />
-            </div>
+                {/* Personnage principal */}
+                <div className="space-y-2">
+                  <Label>Personnage principal (optionnel)</Label>
+                  <Input
+                    value={mainCharacter}
+                    onChange={(e) => setMainCharacter(e.target.value)}
+                    placeholder="Ex: Luna (sinon on mettra 'Le héros')"
+                  />
+                </div>
 
-            {/* Univers */}
-            <div className="space-y-2">
-              <Label>Univers / Décor</Label>
-              <Input
-                value={setting}
-                onChange={(e) => setSetting(e.target.value)}
-                placeholder="Ex: Une ville fantastique dans les nuages"
-              />
-            </div>
+                <div className="space-y-2">
+                  <Label>Description du personnage</Label>
+                  <Textarea
+                    value={characterDescription}
+                    onChange={(e) => setCharacterDescription(e.target.value)}
+                    placeholder="Ex: Un petit chat blanc avec des yeux bleus et un collier étoilé..."
+                    rows={2}
+                  />
+                </div>
 
-            {/* Public cible */}
-            <div className="space-y-2">
-              <Label>Public cible</Label>
-              <Select value={ageGroup} onValueChange={setAgeGroup}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {AGE_GROUPS.map(age => (
-                    <SelectItem key={age.value} value={age.value}>
-                      {age.label} - {age.description}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </CardContent>
-        </Card>
+                {/* Univers */}
+                <div className="space-y-2">
+                  <Label>Univers / Décor</Label>
+                  <Input
+                    value={setting}
+                    onChange={(e) => setSetting(e.target.value)}
+                    placeholder="Ex: Une ville fantastique dans les nuages"
+                  />
+                </div>
 
-        {/* Colonne droite - Style et structure */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-orange-500" />
-              Style et structure
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Template d'histoire */}
-            <div className="space-y-2">
-              <Label>Structure narrative</Label>
-              <Select value={storyTemplate} onValueChange={setStoryTemplate}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {STORY_TEMPLATES.map(template => (
-                    <SelectItem key={template.value} value={template.value}>
-                      {template.label} - {template.description}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {storyTemplate && (
-                <div className="mt-2 p-3 bg-muted/50 rounded-lg">
+                {/* Public cible */}
+                <div className="space-y-2">
+                  <Label>Public cible</Label>
+                  <Select value={ageGroup} onValueChange={setAgeGroup}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {AGE_GROUPS.map(age => (
+                        <SelectItem key={age.value} value={age.value}>
+                          {age.label} - {age.description}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Petite description (optionnelle) */}
+                <div className="space-y-2">
+                  <Label>Description (optionnel)</Label>
+                  <Textarea
+                    value={customPrompt}
+                    onChange={(e) => setCustomPrompt(e.target.value)}
+                    placeholder="Optionnel : précisez une idée si vous voulez, sinon l'IA invente tout !"
+                    rows={2}
+                  />
                   <p className="text-xs text-muted-foreground">
-                    {STORY_TEMPLATES.find(t => t.value === storyTemplate)?.structure?.join(' → ')}
+                    💡 Laissez vide = l'IA crée l'histoire à partir du titre
                   </p>
                 </div>
-              )}
-            </div>
 
-            {/* Style artistique */}
-            <div className="space-y-2">
-              <Label>Style artistique</Label>
-              <Select value={artStyle} onValueChange={setArtStyle}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {ART_STYLES.map(style => (
-                    <SelectItem key={style.value} value={style.value}>
-                      {style.label} - {style.description}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+                <div className="pt-2 border-t border-border/60" />
 
-            {/* Mode couleur */}
-            <div className="space-y-2">
-              <Label>Mode couleur</Label>
-              <Select value={colorMode} onValueChange={setColorMode}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {COLOR_MODES.map(mode => (
-                    <SelectItem key={mode.value} value={mode.value}>
-                      {mode.label} - {mode.description}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-muted-foreground">
-                {colorMode === 'bw' && '💡 Noir & blanc = impression économique sur KDP'}
-                {colorMode === 'color' && '🎨 Couleur = coût d\'impression plus élevé'}
-                {colorMode === 'sepia' && '📜 Sépia = ambiance rétro/historique'}
-                {colorMode === 'limited' && '🎯 2-3 couleurs = style graphique distinctif'}
-              </p>
-            </div>
+                {/* Style et structure (options avancées) */}
+                <div className="space-y-2">
+                  <Label>Structure narrative</Label>
+                  <Select value={storyTemplate} onValueChange={setStoryTemplate}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {STORY_TEMPLATES.map(template => (
+                        <SelectItem key={template.value} value={template.value}>
+                          {template.label} - {template.description}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {storyTemplate && (
+                    <div className="mt-2 p-3 bg-muted/50 rounded-lg">
+                      <p className="text-xs text-muted-foreground">
+                        {STORY_TEMPLATES.find(t => t.value === storyTemplate)?.structure?.join(' → ')}
+                      </p>
+                    </div>
+                  )}
+                </div>
 
-            {/* Layout des cases */}
-            <div className="space-y-2">
-              <Label>Disposition des cases</Label>
-              <Select value={panelLayout} onValueChange={setPanelLayout}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {PANEL_LAYOUTS.map(layout => (
-                    <SelectItem key={layout.value} value={layout.value}>
-                      {layout.label} - {layout.description}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+                <div className="space-y-2">
+                  <Label>Style artistique</Label>
+                  <Select value={artStyle} onValueChange={setArtStyle}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {ART_STYLES.map(style => (
+                        <SelectItem key={style.value} value={style.value}>
+                          {style.label} - {style.description}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-            {/* Nombre de pages */}
-            <div className="space-y-2">
-              <Label>Nombre de pages: {numberOfPages}</Label>
-              <Slider
-                value={[numberOfPages]}
-                onValueChange={(val) => setNumberOfPages(val[0])}
-                min={6}
-                max={24}
-                step={2}
-                className="py-2"
-              />
-              <p className="text-xs text-muted-foreground">
-                Recommandé: 12-16 pages pour une BD enfant
-              </p>
-            </div>
+                <div className="space-y-2">
+                  <Label>Mode couleur</Label>
+                  <Select value={colorMode} onValueChange={setColorMode}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {COLOR_MODES.map(mode => (
+                        <SelectItem key={mode.value} value={mode.value}>
+                          {mode.label} - {mode.description}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-            {/* Petite description (optionnelle) */}
-            <div className="space-y-2">
-              <Label>Description (optionnel)</Label>
-              <Textarea
-                value={customPrompt}
-                onChange={(e) => setCustomPrompt(e.target.value)}
-                placeholder="Optionnel : précisez une idée si vous voulez, sinon l'IA invente tout !"
-                rows={2}
-              />
-              <p className="text-xs text-muted-foreground">
-                💡 Laissez vide = l'IA crée l'histoire à partir du titre
-              </p>
-            </div>
+                <div className="space-y-2">
+                  <Label>Disposition des cases</Label>
+                  <Select value={panelLayout} onValueChange={setPanelLayout}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PANEL_LAYOUTS.map(layout => (
+                        <SelectItem key={layout.value} value={layout.value}>
+                          {layout.label} - {layout.description}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Nombre de pages: {numberOfPages}</Label>
+                  <Slider
+                    value={[numberOfPages]}
+                    onValueChange={(val) => setNumberOfPages(val[0])}
+                    min={6}
+                    max={24}
+                    step={2}
+                    className="py-2"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Recommandé: 12-16 pages pour une BD enfant
+                  </p>
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
           </CardContent>
         </Card>
       </div>
+
 
       {/* Actions */}
       <Card className="border-2 border-emerald-200 bg-gradient-to-r from-emerald-50 to-green-50">
