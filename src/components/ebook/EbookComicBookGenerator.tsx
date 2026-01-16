@@ -156,30 +156,63 @@ export const EbookComicBookGenerator: React.FC<ComicBookGeneratorProps> = ({ ebo
     return layouts[layout] || '4 cases';
   };
 
+  const buildFallbackScenario = () => {
+    const selectedTemplate = STORY_TEMPLATES.find(t => t.value === storyTemplate);
+    const heroName = (mainCharacter || 'Le héros').trim();
+    const baseDesc = (customPrompt || setting || '').trim();
+
+    const steps = selectedTemplate?.structure?.length ? selectedTemplate.structure : [
+      'Introduction',
+      'Déclencheur',
+      'Défis',
+      'Épreuve finale',
+      'Résolution'
+    ];
+
+    const pages = Array.from({ length: numberOfPages }, (_, i) => {
+      const step = steps[Math.min(steps.length - 1, Math.floor((i / Math.max(1, numberOfPages - 1)) * steps.length))];
+      const pageNumber = i + 1;
+
+      const description = `Page ${pageNumber} — ${step}. ${heroName} avance dans l'histoire. ${baseDesc ? `Contexte: ${baseDesc}.` : ''}`.trim();
+
+      const dialogues = [
+        { character: heroName, text: pageNumber === 1 ? "On y va !" : "On continue." },
+        { character: heroName, text: pageNumber === numberOfPages ? "On a réussi !" : "Regarde !" },
+      ];
+
+      return { description, dialogues };
+    });
+
+    return { pages };
+  };
+
   const generateScenario = async () => {
-    if (!title.trim() || !mainCharacter.trim()) {
-      toast.error('Veuillez renseigner le titre et le personnage principal');
+    // Objectif: avec juste un titre + une courte description, tout doit fonctionner.
+    if (!title.trim() || !customPrompt.trim()) {
+      toast.error('Veuillez renseigner le titre et une petite description');
       return;
     }
 
     setIsGeneratingScenario(true);
-    
+
     try {
       const selectedTemplate = STORY_TEMPLATES.find(t => t.value === storyTemplate);
       const selectedGenre = GENRES.find(g => g.value === genre);
       const selectedAge = AGE_GROUPS.find(a => a.value === ageGroup);
 
+      const heroName = (mainCharacter || 'Le héros').trim();
+
       const prompt = `Tu es un scénariste de bandes dessinées pour enfants. Crée un scénario de BD en ${numberOfPages} pages.
 
 INFORMATIONS:
 - Titre: "${title}"
+- Description (courte): ${customPrompt}
 - Genre: ${selectedGenre?.label || genre}
 - Public: ${selectedAge?.label} (${selectedAge?.description})
-- Personnage principal: ${mainCharacter}
+- Personnage principal (si utile): ${heroName}
 ${characterDescription ? `- Description du personnage: ${characterDescription}` : ''}
 ${setting ? `- Univers/Décor: ${setting}` : ''}
 - Structure narrative: ${selectedTemplate?.label} - ${selectedTemplate?.structure?.join(' → ')}
-${customPrompt ? `- Instructions supplémentaires: ${customPrompt}` : ''}
 
 Pour chaque page, fournis:
 1. Une description visuelle détaillée de la scène (pour générer l'image)
@@ -206,27 +239,44 @@ Réponds en JSON avec ce format exact:
         }
       });
 
-      if (error) throw error;
+      // Fallback sans IA si crédits épuisés / erreur
+      if (error) {
+        const status = (error as any)?.status;
+        const message = (error as any)?.message || '';
+        if (status === 402 || String(message).includes('Crédits')) {
+          const fallback = buildFallbackScenario();
+          setScenario(fallback);
+          toast.warning('Crédits IA épuisés : scénario de base généré automatiquement.');
+          return;
+        }
+        throw error;
+      }
 
       let parsedScenario;
       try {
         const content = data.content || data.text || data;
-        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        const jsonMatch = String(content).match(/\{[\s\S]*\}/);
         if (jsonMatch) {
           parsedScenario = JSON.parse(jsonMatch[0]);
         } else {
           throw new Error('Format JSON invalide');
         }
-      } catch (parseError) {
-        throw new Error('Impossible de parser le scénario généré');
+      } catch {
+        // Si l'IA renvoie un JSON imparfait, on ne bloque pas : on génère un scénario de base.
+        const fallback = buildFallbackScenario();
+        setScenario(fallback);
+        toast.warning('Scénario IA difficile à parser : scénario de base généré automatiquement.');
+        return;
       }
 
       setScenario(parsedScenario);
       toast.success(`Scénario de ${parsedScenario.pages.length} pages généré !`);
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erreur génération scénario:', error);
-      toast.error('Erreur lors de la génération du scénario');
+      toast.error('Erreur lors de la génération du scénario', {
+        description: error?.message ? String(error.message) : undefined,
+      });
     } finally {
       setIsGeneratingScenario(false);
     }
@@ -709,11 +759,11 @@ VISUAL STYLE:
 
             {/* Personnage principal */}
             <div className="space-y-2">
-              <Label>Personnage principal *</Label>
+              <Label>Personnage principal (optionnel)</Label>
               <Input
                 value={mainCharacter}
                 onChange={(e) => setMainCharacter(e.target.value)}
-                placeholder="Ex: Luna le chat magique"
+                placeholder="Ex: Luna (sinon on mettra 'Le héros')"
               />
             </div>
 
@@ -862,13 +912,13 @@ VISUAL STYLE:
               </p>
             </div>
 
-            {/* Instructions supplémentaires */}
+            {/* Petite description */}
             <div className="space-y-2">
-              <Label>Instructions supplémentaires (optionnel)</Label>
+              <Label>Petite description *</Label>
               <Textarea
                 value={customPrompt}
                 onChange={(e) => setCustomPrompt(e.target.value)}
-                placeholder="Ex: Inclure un message sur l'amitié, ajouter un personnage secondaire rigolo..."
+                placeholder="En 1-3 phrases : de quoi parle votre BD ?"
                 rows={2}
               />
             </div>
