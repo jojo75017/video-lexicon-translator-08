@@ -106,7 +106,10 @@ const App = () => {
             sessionStorage.removeItem('is_admin');
           }
         } else {
-          console.log('Aucune session admin trouvée dans App.tsx');
+          console.log('Aucune session admin trouvée dans App.tsx - Connectez-vous sur /auth');
+          // Clear stale sessionStorage if no active session
+          sessionStorage.removeItem('is_admin');
+          setIsAdmin(false);
         }
       } catch (error) {
         console.error('Erreur lors de la vérification de la session admin:', error);
