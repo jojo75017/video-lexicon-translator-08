@@ -433,39 +433,37 @@ Instructions de génération:
       });
 
       if (!response.ok) {
-        // Si erreur 429 ou 402, gérer clairement et fallback conditionnel vers OpenAI
+        // Si erreur 429 ou 402 (crédits Lovable), ne PAS fallback vers OpenAI si déjà en limite
         if (response.status === 429 || response.status === 402) {
-          if (!disableOpenAIFallback) {
-            const ENV_OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
-            const FALLBACK_OPENAI_KEY = ENV_OPENAI_API_KEY || openaiApiKey;
-            if (FALLBACK_OPENAI_KEY) {
-              console.log('Lovable AI error, attempting automatic fallback to OpenAI...');
-              try {
-                generatedImageUrl = await generateWithOpenAI(chapterTitle, chapterContent, ebookTitle, style, characters, FALLBACK_OPENAI_KEY, ratio, quality, colorScheme, visualCoherence, coherenceIntensity, referenceImageUrl);
-              } catch (openaiErr) {
+          console.log('Lovable AI credits/rate limit reached, returning placeholder');
+          // Retourner une image placeholder au lieu d'une erreur
+          generatedImageUrl = `https://placehold.co/1024x1024/374151/ffffff?text=${encodeURIComponent(chapterTitle.substring(0, 30))}`;
+        } else if (!disableOpenAIFallback) {
+          const ENV_OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+          const FALLBACK_OPENAI_KEY = ENV_OPENAI_API_KEY || openaiApiKey;
+          if (FALLBACK_OPENAI_KEY) {
+            console.log('Lovable AI error, attempting automatic fallback to OpenAI...');
+            try {
+              generatedImageUrl = await generateWithOpenAI(chapterTitle, chapterContent, ebookTitle, style, characters, FALLBACK_OPENAI_KEY, ratio, quality, colorScheme, visualCoherence, coherenceIntensity, referenceImageUrl);
+            } catch (openaiErr: any) {
+              // Si OpenAI aussi en limite, retourner placeholder plutôt qu'erreur
+              if (openaiErr?.message?.includes('billing') || openaiErr?.message?.includes('limit')) {
+                console.log('OpenAI billing limit, returning placeholder');
+                generatedImageUrl = `https://placehold.co/1024x1024/374151/ffffff?text=${encodeURIComponent(chapterTitle.substring(0, 30))}`;
+              } else {
                 console.error('OpenAI fallback failed:', openaiErr);
                 throw openaiErr;
               }
-            } else {
-              if (response.status === 429) {
-                return new Response(
-                  JSON.stringify({ error: 'Limite de requêtes atteinte. Veuillez réessayer dans quelques instants.', code: 'RATE_LIMITED' }),
-                  { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-                );
-              }
-              return new Response(
-                JSON.stringify({ error: 'Crédits Lovable AI épuisés. Ajoutez des crédits ou utilisez une clé OpenAI.', code: 'PAYMENT_REQUIRED' }),
-                { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-              );
             }
+          } else {
+            // Pas de clé fallback, retourner placeholder
+            generatedImageUrl = `https://placehold.co/1024x1024/374151/ffffff?text=${encodeURIComponent(chapterTitle.substring(0, 30))}`;
           }
         } else {
           const errorText = await response.text();
           console.error('AI Gateway error:', response.status, errorText);
-          return new Response(
-            JSON.stringify({ error: "Erreur lors de la génération de l'image" }),
-            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-          );
+          // Retourner placeholder au lieu d'erreur
+          generatedImageUrl = `https://placehold.co/1024x1024/374151/ffffff?text=${encodeURIComponent(chapterTitle.substring(0, 30))}`;
         }
       }
 
