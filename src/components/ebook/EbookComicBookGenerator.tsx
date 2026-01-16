@@ -187,9 +187,9 @@ export const EbookComicBookGenerator: React.FC<ComicBookGeneratorProps> = ({ ebo
   };
 
   const generateScenario = async () => {
-    // Objectif: avec juste un titre + une courte description, tout doit fonctionner.
-    if (!title.trim() || !customPrompt.trim()) {
-      toast.error('Veuillez renseigner le titre et une petite description');
+    // Objectif: avec JUSTE un titre, tout doit fonctionner - description auto-générée
+    if (!title.trim()) {
+      toast.error('Veuillez renseigner un titre pour votre BD');
       return;
     }
 
@@ -201,18 +201,23 @@ export const EbookComicBookGenerator: React.FC<ComicBookGeneratorProps> = ({ ebo
       const selectedAge = AGE_GROUPS.find(a => a.value === ageGroup);
 
       const heroName = (mainCharacter || 'Le héros').trim();
+      
+      // Auto-générer la description si non fournie
+      const autoDescription = customPrompt?.trim() || `Une aventure captivante intitulée "${title}" dans un style ${selectedGenre?.label || 'aventure'} pour ${selectedAge?.label || 'enfants'}`;
 
       const prompt = `Tu es un scénariste de bandes dessinées pour enfants. Crée un scénario de BD en ${numberOfPages} pages.
 
 INFORMATIONS:
 - Titre: "${title}"
-- Description (courte): ${customPrompt}
+- Description: ${autoDescription}
 - Genre: ${selectedGenre?.label || genre}
 - Public: ${selectedAge?.label} (${selectedAge?.description})
-- Personnage principal (si utile): ${heroName}
+- Personnage principal: ${heroName}
 ${characterDescription ? `- Description du personnage: ${characterDescription}` : ''}
 ${setting ? `- Univers/Décor: ${setting}` : ''}
 - Structure narrative: ${selectedTemplate?.label} - ${selectedTemplate?.structure?.join(' → ')}
+
+MISSION: À partir du titre "${title}", invente une histoire complète et captivante. Crée les personnages, les péripéties, les dialogues.
 
 Pour chaque page, fournis:
 1. Une description visuelle détaillée de la scène (pour générer l'image)
@@ -912,15 +917,18 @@ VISUAL STYLE:
               </p>
             </div>
 
-            {/* Petite description */}
+            {/* Petite description (optionnelle) */}
             <div className="space-y-2">
-              <Label>Petite description *</Label>
+              <Label>Description (optionnel)</Label>
               <Textarea
                 value={customPrompt}
                 onChange={(e) => setCustomPrompt(e.target.value)}
-                placeholder="En 1-3 phrases : de quoi parle votre BD ?"
+                placeholder="Optionnel : précisez une idée si vous voulez, sinon l'IA invente tout !"
                 rows={2}
               />
+              <p className="text-xs text-muted-foreground">
+                💡 Laissez vide = l'IA crée l'histoire à partir du titre
+              </p>
             </div>
           </CardContent>
         </Card>
