@@ -142,9 +142,11 @@ export const EbookComicBookGenerator: React.FC<ComicBookGeneratorProps> = ({ ebo
   
   const [isGenerating, setIsGenerating] = useState(false);
   const [isGeneratingScenario, setIsGeneratingScenario] = useState(false);
+  const [isGeneratingAll, setIsGeneratingAll] = useState(false);
   const [generatedPages, setGeneratedPages] = useState<ComicPage[]>([]);
   const [scenario, setScenario] = useState<{ pages: { description: string; dialogues: { character: string; text: string }[] }[] } | null>(null);
   const [currentProgress, setCurrentProgress] = useState(0);
+  const [generationStep, setGenerationStep] = useState<'idle' | 'scenario' | 'images'>('idle');
 
   const getLayoutDescription = (layout: string): string => {
     const layouts: Record<string, string> = {
@@ -458,6 +460,123 @@ VISUAL STYLE:
       toast.error('Erreur lors de la génération des pages');
     } finally {
       setIsGenerating(false);
+      setCurrentProgress(100);
+      setGenerationStep('idle');
+    }
+  };
+
+  // NOUVEAU: Générer tout en un clic (scénario + images)
+  const handleGenerateAll = async () => {
+    if (!title.trim()) {
+      toast.error('Veuillez renseigner un titre pour votre BD');
+      return;
+    }
+
+    setIsGeneratingAll(true);
+    setGenerationStep('scenario');
+    setGeneratedPages([]);
+    setCurrentProgress(0);
+
+    try {
+      // Étape 1: Générer le scénario
+      toast.info('🎬 Étape 1/2 : Écriture du scénario...');
+      
+      const selectedTemplate = STORY_TEMPLATES.find(t => t.value === storyTemplate);
+      const selectedGenre = GENRES.find(g => g.value === genre);
+      const selectedAge = AGE_GROUPS.find(a => a.value === ageGroup);
+      const heroName = (mainCharacter || 'Le héros').trim();
+      const autoDescription = customPrompt?.trim() || `Une aventure captivante intitulée "${title}" dans un style ${selectedGenre?.label || 'aventure'} pour ${selectedAge?.label || 'enfants'}`;
+
+      const prompt = `Tu es un scénariste de bandes dessinées pour enfants. Crée un scénario de BD en ${numberOfPages} pages.
+
+INFORMATIONS:
+- Titre: "${title}"
+- Description: ${autoDescription}
+- Genre: ${selectedGenre?.label || genre}
+- Public: ${selectedAge?.label} (${selectedAge?.description})
+- Personnage principal: ${heroName}
+${characterDescription ? `- Description du personnage: ${characterDescription}` : ''}
+${setting ? `- Univers/Décor: ${setting}` : ''}
+- Structure narrative: ${selectedTemplate?.label} - ${selectedTemplate?.structure?.join(' → ')}
+
+MISSION: À partir du titre "${title}", invente une histoire complète et captivante. Crée les personnages, les péripéties, les dialogues.
+
+Pour chaque page, fournis:
+1. Une description visuelle détaillée de la scène (pour générer l'image)
+2. Les dialogues des personnages (bulles de texte)
+
+Réponds en JSON:
+{
+  "pages": [
+    {
+      "description": "Description visuelle...",
+      "dialogues": [{ "character": "Nom", "text": "Ce qu'il dit" }]
+    }
+  ]
+}`;
+
+      const { data, error } = await supabase.functions.invoke('generate-content', {
+        body: { type: 'comic-scenario', prompt }
+      });
+
+      let generatedScenario: { pages: { description: string; dialogues: { character: string; text: string }[] }[] };
+
+      if (error || !data?.content) {
+        console.warn('Scénario IA échoué, utilisation du fallback');
+        generatedScenario = buildFallbackScenario();
+      } else {
+        try {
+          let content = data.content;
+          const jsonMatch = content.match(/```json\s*([\s\S]*?)```/) || content.match(/\{[\s\S]*"pages"[\s\S]*\}/);
+          if (jsonMatch) {
+            content = jsonMatch[1] || jsonMatch[0];
+          }
+          generatedScenario = JSON.parse(content);
+        } catch {
+          generatedScenario = buildFallbackScenario();
+        }
+      }
+
+      if (!generatedScenario?.pages?.length) {
+        generatedScenario = buildFallbackScenario();
+      }
+
+      setScenario(generatedScenario);
+      toast.success(`✅ Scénario de ${generatedScenario.pages.length} pages prêt !`);
+
+      // Étape 2: Générer les images
+      setGenerationStep('images');
+      toast.info('🎨 Étape 2/2 : Génération des illustrations...');
+
+      const BATCH_SIZE = 3;
+      const totalPages = generatedScenario.pages.length;
+      const allPages: ComicPage[] = [];
+
+      for (let batchStart = 0; batchStart < totalPages; batchStart += BATCH_SIZE) {
+        const batchEnd = Math.min(batchStart + BATCH_SIZE, totalPages);
+        const batchPromises: Promise<ComicPage | null>[] = [];
+
+        for (let i = batchStart; i < batchEnd; i++) {
+          batchPromises.push(generateComicPage(i, generatedScenario.pages[i]));
+        }
+
+        const batchResults = await Promise.all(batchPromises);
+        const successfulPages = batchResults.filter((p): p is ComicPage => p !== null);
+        allPages.push(...successfulPages);
+        setGeneratedPages([...allPages]);
+        setCurrentProgress(Math.round((batchEnd / totalPages) * 100));
+      }
+
+      toast.success(`🎉 BD complète générée : ${allPages.length} pages !`);
+
+    } catch (error: any) {
+      console.error('Erreur génération complète:', error);
+      toast.error('Erreur lors de la génération', {
+        description: error?.message || 'Veuillez réessayer'
+      });
+    } finally {
+      setIsGeneratingAll(false);
+      setGenerationStep('idle');
       setCurrentProgress(100);
     }
   };
@@ -935,45 +1054,59 @@ VISUAL STYLE:
       </div>
 
       {/* Actions */}
-      <Card>
+      <Card className="border-2 border-emerald-200 bg-gradient-to-r from-emerald-50 to-green-50">
         <CardContent className="py-4">
           <div className="flex flex-wrap gap-3 items-center justify-between">
-            <div className="flex gap-3">
+            {/* Bouton principal: Générer tout */}
+            <Button
+              onClick={handleGenerateAll}
+              disabled={isGeneratingAll || isGenerating || isGeneratingScenario || !title.trim()}
+              size="lg"
+              className="bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white font-bold shadow-lg"
+            >
+              {isGeneratingAll ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  {generationStep === 'scenario' ? 'Scénario...' : `Images... ${currentProgress}%`}
+                </>
+              ) : (
+                <>
+                  <Sparkles className="mr-2 h-5 w-5" />
+                  🚀 Générer tout en 1 clic
+                </>
+              )}
+            </Button>
+
+            <div className="flex gap-2 items-center">
+              <span className="text-xs text-muted-foreground">ou étape par étape :</span>
               <Button
                 onClick={generateScenario}
-                disabled={isGeneratingScenario || isGenerating}
-                className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
+                disabled={isGeneratingScenario || isGenerating || isGeneratingAll}
+                variant="outline"
+                size="sm"
+                className="border-amber-300 text-amber-700 hover:bg-amber-50"
               >
                 {isGeneratingScenario ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Écriture du scénario...
-                  </>
+                  <Loader2 className="mr-1 h-3 w-3 animate-spin" />
                 ) : (
-                  <>
-                    <MessageSquare className="mr-2 h-4 w-4" />
-                    1. Générer le scénario
-                  </>
+                  <MessageSquare className="mr-1 h-3 w-3" />
                 )}
+                Scénario
               </Button>
 
               <Button
                 onClick={handleGenerate}
-                disabled={isGenerating || !scenario}
-                variant={scenario ? 'default' : 'secondary'}
-                className={scenario ? 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600' : ''}
+                disabled={isGenerating || !scenario || isGeneratingAll}
+                variant="outline"
+                size="sm"
+                className={scenario ? 'border-orange-300 text-orange-700 hover:bg-orange-50' : ''}
               >
                 {isGenerating ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Génération... {currentProgress}%
-                  </>
+                  <Loader2 className="mr-1 h-3 w-3 animate-spin" />
                 ) : (
-                  <>
-                    <ImagePlus className="mr-2 h-4 w-4" />
-                    2. Générer les illustrations
-                  </>
+                  <ImagePlus className="mr-1 h-3 w-3" />
                 )}
+                Images
               </Button>
             </div>
 
