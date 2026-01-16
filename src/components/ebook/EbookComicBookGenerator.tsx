@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Loader2, Layout, Download, RefreshCw, Sparkles, MessageSquare, ImagePlus, BookOpen, Wand2, FileDown, Users, Zap } from 'lucide-react';
+import { Loader2, Layout, Download, RefreshCw, Sparkles, MessageSquare, ImagePlus, BookOpen, Wand2, FileDown, Users, Zap, Lightbulb } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import jsPDF from 'jspdf';
@@ -148,6 +148,10 @@ export const EbookComicBookGenerator: React.FC<ComicBookGeneratorProps> = ({ ebo
   const [generatedPages, setGeneratedPages] = useState<ComicPage[]>([]);
   const [scenario, setScenario] = useState<{ pages: { description: string; dialogues: { character: string; text: string }[] }[] } | null>(null);
   const [currentProgress, setCurrentProgress] = useState(0);
+  
+  // Suggestions de titres
+  const [titleSuggestions, setTitleSuggestions] = useState<string[]>([]);
+  const [isGeneratingTitles, setIsGeneratingTitles] = useState(false);
   const [generationStep, setGenerationStep] = useState<'idle' | 'scenario' | 'images'>('idle');
 
   const getLayoutDescription = (layout: string): string => {
@@ -188,6 +192,91 @@ export const EbookComicBookGenerator: React.FC<ComicBookGeneratorProps> = ({ ebo
     });
 
     return { pages };
+  };
+
+  // Générer 10 idées de titres via IA
+  const generateTitleIdeas = async () => {
+    setIsGeneratingTitles(true);
+    setTitleSuggestions([]);
+
+    try {
+      const selectedGenre = GENRES.find(g => g.value === genre);
+      const selectedAge = AGE_GROUPS.find(a => a.value === ageGroup);
+
+      const prompt = `Tu es un expert en bandes dessinées pour enfants. Génère exactement 10 titres accrocheurs et originaux pour une BD.
+
+PARAMÈTRES:
+- Genre: ${selectedGenre?.label || 'Aventure'}
+- Public: ${selectedAge?.label || '7-10 ans'}
+${mainCharacter ? `- Personnage principal suggéré: ${mainCharacter}` : ''}
+
+CONSIGNES:
+- Titres courts (3-6 mots max)
+- Accrocheurs et mémorables
+- Adaptés aux enfants
+- Variés en style et thème
+
+Réponds UNIQUEMENT avec un tableau JSON de 10 strings, sans explication:
+["Titre 1", "Titre 2", ...]`;
+
+      const { data, error } = await supabase.functions.invoke('generate-content', {
+        body: {
+          type: 'comic-scenario',
+          prompt,
+        }
+      });
+
+      if (error) throw error;
+
+      // Parser la réponse JSON
+      const content = data?.content || data?.scenario || '';
+      const jsonMatch = content.match(/\[[\s\S]*?\]/);
+      
+      if (jsonMatch) {
+        const titles = JSON.parse(jsonMatch[0]);
+        if (Array.isArray(titles) && titles.length > 0) {
+          setTitleSuggestions(titles.slice(0, 10));
+          toast.success('10 idées de titres générées !');
+        } else {
+          throw new Error('Format invalide');
+        }
+      } else {
+        // Fallback: générer des titres par défaut
+        const fallbackTitles = [
+          "Les Aventures de Max",
+          "L'Île aux Trésors Magiques",
+          "Super Chat contre le Mal",
+          "Le Mystère de la Forêt Enchantée",
+          "Les Héros de l'École",
+          "Mission Espace Infini",
+          "Le Dragon et la Princesse",
+          "L'Incroyable Voyage de Luna",
+          "Les Détectives en Herbe",
+          "Le Secret du Château"
+        ];
+        setTitleSuggestions(fallbackTitles);
+        toast.info('Voici quelques idées de titres !');
+      }
+    } catch (err) {
+      console.error('Erreur génération titres:', err);
+      // Fallback en cas d'erreur
+      const fallbackTitles = [
+        "Les Aventures de Max",
+        "L'Île aux Trésors Magiques",
+        "Super Chat contre le Mal",
+        "Le Mystère de la Forêt Enchantée",
+        "Les Héros de l'École",
+        "Mission Espace Infini",
+        "Le Dragon et la Princesse",
+        "L'Incroyable Voyage de Luna",
+        "Les Détectives en Herbe",
+        "Le Secret du Château"
+      ];
+      setTitleSuggestions(fallbackTitles);
+      toast.info('Voici quelques idées de titres !');
+    } finally {
+      setIsGeneratingTitles(false);
+    }
   };
 
   const generateScenario = async () => {
@@ -851,11 +940,50 @@ Réponds en JSON:
             {/* Titre */}
             <div className="space-y-2">
               <Label>Titre de la BD *</Label>
-              <Input
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Ex: Les Aventures de Super Chat"
-              />
+              <div className="flex gap-2">
+                <Input
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Ex: Les Aventures de Super Chat"
+                  className="flex-1"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={generateTitleIdeas}
+                  disabled={isGeneratingTitles}
+                  className="shrink-0"
+                >
+                  {isGeneratingTitles ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <>
+                      <Lightbulb className="h-4 w-4 mr-1" />
+                      Idées
+                    </>
+                  )}
+                </Button>
+              </div>
+              
+              {/* Suggestions de titres */}
+              {titleSuggestions.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 pt-2">
+                  {titleSuggestions.map((suggestion, idx) => (
+                    <Badge
+                      key={idx}
+                      variant="outline"
+                      className="cursor-pointer hover:bg-amber-500/20 hover:border-amber-500 transition-colors text-xs"
+                      onClick={() => {
+                        setTitle(suggestion);
+                        toast.success(`Titre sélectionné : ${suggestion}`);
+                      }}
+                    >
+                      {suggestion}
+                    </Badge>
+                  ))}
+                </div>
+              )}
             </div>
 
             <Collapsible open={showAdvanced} onOpenChange={setShowAdvanced}>
