@@ -477,9 +477,11 @@ Instructions de génération:
       }
     }
 
-    // Upload vers Supabase Storage si activé
+    // Upload vers Supabase Storage si activé (mais pas les placeholders)
     let finalImageUrl = generatedImageUrl;
-    if (uploadToStorage) {
+    const isPlaceholder = generatedImageUrl.includes('placehold.co');
+    
+    if (uploadToStorage && !isPlaceholder) {
       try {
         finalImageUrl = await uploadImageToStorage(generatedImageUrl, chapterTitle);
         console.log('Image uploaded to storage:', finalImageUrl);
@@ -487,6 +489,8 @@ Instructions de génération:
         console.error('Failed to upload to storage, returning original URL:', uploadErr);
         // En cas d'erreur d'upload, on retourne quand même l'image générée
       }
+    } else if (isPlaceholder) {
+      console.log('Placeholder image detected, skipping storage upload');
     }
 
     console.log('Image generated successfully');
