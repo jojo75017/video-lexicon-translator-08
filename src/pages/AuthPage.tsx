@@ -41,8 +41,8 @@ export const AuthPage = () => {
         if (data?.isAdmin) {
           // Persist admin status in sessionStorage
           sessionStorage.setItem('is_admin', 'true');
-          // Redirect admin directly to ebook-planner (not /admin)
-          navigate('/ebook-planner', { replace: true });
+          // Redirect admin to /admin dashboard
+          navigate('/admin', { replace: true });
         }
       } catch (error) {
         console.error('Erreur dans checkAuth:', error);
@@ -160,7 +160,7 @@ export const AuthPage = () => {
         console.log('Utilisateur admin confirmé');
         sessionStorage.setItem('is_admin', 'true');
         toast.success('Connexion admin réussie');
-        navigate('/ebook-planner');
+        navigate('/admin');
       } else {
         const { error } = await supabase.auth.signUp({
           email,
