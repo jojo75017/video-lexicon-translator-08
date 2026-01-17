@@ -380,25 +380,49 @@ Réponds en JSON avec ce format exact:
     }
   };
 
-  // Générer une description visuelle cohérente du personnage
+  // Générer une description visuelle cohérente du personnage avec détails précis
   const generateVisualReference = (): string => {
     if (characterVisualRef) return characterVisualRef;
     
-    const baseRef = `${mainCharacter}: ${characterDescription || 'personnage principal'}`;
-    const newRef = `VISUAL REFERENCE (must be consistent across ALL pages): ${baseRef}. 
-Same exact character design, proportions, colors, outfit, and features on every page.`;
+    const selectedStyle = ART_STYLES.find(s => s.value === artStyle);
+    const heroName = mainCharacter || 'Le héros';
+    const heroDesc = characterDescription || 'personnage principal sympathique';
+    
+    // Créer une référence visuelle TRÈS détaillée pour cohérence
+    const newRef = `
+=== CHARACTER SHEET - MUST MATCH EXACTLY ON ALL PANELS ===
+CHARACTER: ${heroName}
+APPEARANCE: ${heroDesc}
+ART STYLE: ${selectedStyle?.description || 'cartoon style'} - SAME STYLE ON ALL IMAGES
+LINE WEIGHT: Medium, consistent black outlines
+PROPORTIONS: Keep exact same head-to-body ratio
+OUTFIT: Same clothing colors and design throughout
+EXPRESSION STYLE: ${artStyle === 'manga' ? 'Large expressive eyes, anime style' : 'Western cartoon proportions'}
+===`;
+    
     setCharacterVisualRef(newRef);
     return newRef;
   };
 
   const getColorModePrompt = (): string => {
     const modes: Record<string, string> = {
-      'color': 'Full vibrant colors, rich palette, colorful illustration',
-      'bw': 'Black and white only, no colors, grayscale, monochrome comic art, ink drawing style',
-      'sepia': 'Sepia tones, vintage brown and cream colors, nostalgic old photo style',
-      'limited': 'Limited color palette, 2-3 main accent colors on neutral background, spot color technique'
+      'color': 'Vibrant saturated colors, rich warm palette, cel-shaded coloring, consistent lighting from top-left',
+      'bw': 'Pure black and white, strong contrast, detailed ink hatching, no gray tones, bold linework',
+      'sepia': 'Warm sepia tones only (browns, creams, tans), vintage paper texture feel, nostalgic coloring',
+      'limited': 'Duotone or tritone, 2-3 spot colors maximum on neutral gray/beige background, graphic novel style'
     };
     return modes[colorMode] || modes['color'];
+  };
+
+  const getArtStylePrompt = (): string => {
+    const styles: Record<string, string> = {
+      'cartoon': 'Disney/Pixar inspired cartoon style, rounded shapes, big eyes, exaggerated expressions, clean vector-like lines',
+      'manga': 'Japanese manga style, screentones, speed lines, large expressive eyes, dynamic poses, thin precise linework',
+      'franco-belge': 'Franco-Belgian BD style like Tintin or Asterix, ligne claire, flat colors, detailed backgrounds, realistic proportions',
+      'american': 'American superhero comic style, dramatic shading, muscular forms, dynamic action poses, bold inking',
+      'minimal': 'Minimalist illustration, simple geometric shapes, limited details, lots of white space, modern clean aesthetic'
+    };
+    return styles[artStyle] || styles['cartoon'];
   };
 
   const generateComicPage = async (pageIndex: number, pageScenario: { description: string; dialogues: { character: string; text: string }[] }): Promise<ComicPage | null> => {
@@ -415,41 +439,57 @@ Same exact character design, proportions, colors, outfit, and features on every 
       const panelCount = 4;
       const panelPromises: Promise<{ imageUrl: string; dialogue: string; character: string; action: string } | null>[] = [];
 
-      // Diviser la description en 4 moments
+      // Diviser la description en 4 moments distincts mais cohérents visuellement
       const sceneMoments = [
-        `Début de la scène: ${pageScenario.description} - moment d'introduction`,
-        `Développement: ${pageScenario.description} - action principale`,
-        `Tension: ${pageScenario.description} - point culminant`,
-        `Conclusion: ${pageScenario.description} - réaction finale`
+        `Scene establishing shot: ${pageScenario.description} - Introduction of the scene, wide or medium angle`,
+        `Action beat: ${pageScenario.description} - Main action, character close-up or medium shot`,
+        `Dramatic moment: ${pageScenario.description} - Peak tension, dynamic angle or close-up on expression`,
+        `Resolution: ${pageScenario.description} - Scene conclusion, reaction shot or establishing return`
       ];
+
+      const artStylePrompt = getArtStylePrompt();
 
       for (let panelIndex = 0; panelIndex < panelCount; panelIndex++) {
         const panelPromise = (async () => {
           const dialogue = pageScenario.dialogues[panelIndex] || { character: mainCharacter, text: '' };
           
-          const imagePrompt = `${seedInfo}Single comic panel illustration, ${selectedStyle?.description || 'cartoon style'}, ${cleanTextForPDF(selectedGenre?.label || 'adventure')} genre.
+          // Prompt ultra-détaillé pour cohérence maximale
+          const imagePrompt = `${seedInfo}SINGLE COMIC PANEL - Panel ${panelIndex + 1} of 4
 
+=== MANDATORY STYLE RULES ===
+${artStylePrompt}
+${colorPrompt}
 ${visualRef}
 
-Panel ${panelIndex + 1}/4 - ${sceneMoments[panelIndex]}
+=== THIS PANEL ===
+${sceneMoments[panelIndex]}
 
-VISUAL STYLE:
-- ${colorPrompt}
-- Single square panel, close-up or medium shot
-- Professional comic book art, child-friendly
-- NO text, NO speech bubbles, NO words in image
-- CONSISTENCY: Same art style, line weight, and character design`;
+=== TECHNICAL REQUIREMENTS ===
+- Single square illustration, professional comic art quality
+- Child-friendly, age-appropriate content
+- ABSOLUTELY NO TEXT, no speech bubbles, no onomatopoeia, no written words
+- Clean panel composition with clear focal point
+- Consistent perspective and lighting with other panels
+- Same exact character design as reference sheet above
+
+=== CONSISTENCY CHECKLIST ===
+✓ Same character proportions and outfit
+✓ Same art style and line weight  
+✓ Same color palette and saturation
+✓ Same lighting direction (top-left)
+✓ Same level of background detail`;
 
           try {
             const { data: imageData, error: imageError } = await supabase.functions.invoke('generate-chapter-images', {
               body: {
                 chapterTitle: `Page ${pageIndex + 1} Panel ${panelIndex + 1}`,
                 ebookTitle: title || 'Bande Dessinée',
-                style: `${selectedStyle?.description || 'cartoon comic'}, ${colorPrompt}`,
+                style: artStylePrompt,
                 ratio: 'square',
-                quality: 'standard',
-                colorScheme: colorMode === 'bw' ? 'monochrome' : 'auto',
-                customPrompt: imagePrompt
+                quality: 'hd',
+                colorScheme: colorMode === 'bw' ? 'monochrome' : colorMode,
+                customPrompt: imagePrompt,
+                seed: visualSeed || undefined
               }
             });
 
