@@ -465,14 +465,26 @@ Instructions de génération:
           // Retourner placeholder au lieu d'erreur
           generatedImageUrl = `https://placehold.co/1024x1024/374151/ffffff?text=${encodeURIComponent(chapterTitle.substring(0, 30))}`;
         }
-      }
-
-      if (!generatedImageUrl!) {
+      } else {
+        // Réponse OK - extraire l'image base64 de la réponse Gemini
         const data = await response.json();
-        generatedImageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-
-        if (!generatedImageUrl) {
-          throw new Error('No image URL in response');
+        console.log('Lovable AI response received successfully');
+        
+        // Le modèle gemini-2.5-flash-image-preview renvoie les images en base64
+        const imageData = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+        
+        if (imageData) {
+          generatedImageUrl = imageData;
+          console.log('Image extracted from Lovable AI response (base64 length:', imageData.length, ')');
+        } else {
+          // Fallback: vérifier d'autres formats de réponse possibles
+          const content = data.choices?.[0]?.message?.content;
+          if (typeof content === 'string' && content.startsWith('data:image')) {
+            generatedImageUrl = content;
+          } else {
+            console.error('No image in Lovable AI response:', JSON.stringify(data).substring(0, 500));
+            throw new Error('No image URL in response');
+          }
         }
       }
     }
