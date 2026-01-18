@@ -11,6 +11,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { Loader2, Layout, Download, RefreshCw, Sparkles, MessageSquare, ImagePlus, BookOpen, Wand2, FileDown, Users, Zap, Lightbulb } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 import jsPDF from 'jspdf';
 
 interface ComicPanel {
@@ -137,6 +138,10 @@ export const EbookComicBookGenerator: React.FC<ComicBookGeneratorProps> = ({ ebo
   const [characterDescription, setCharacterDescription] = useState('');
   const [setting, setSetting] = useState('');
   const [customPrompt, setCustomPrompt] = useState('');
+
+  // Clé OpenAI utilisateur (fallback fiable si les crédits image internes sont épuisés)
+  const { apiKey: userApiKey, isValid: isUserKeyValid } = useOpenAIConfig();
+  const useOpenAI = Boolean(userApiKey) && isUserKeyValid === true;
   
   // Cohérence visuelle
   const [visualSeed, setVisualSeed] = useState<string>('');
@@ -489,14 +494,22 @@ ${sceneMoments[panelIndex]}
                 quality: 'hd',
                 colorScheme: colorMode === 'bw' ? 'monochrome' : colorMode,
                 customPrompt: imagePrompt,
-                seed: visualSeed || undefined
+                seed: visualSeed || undefined,
+                // Utilise la clé OpenAI de l'utilisateur si dispo (sinon, risque de placeholder sombre)
+                useOpenAI,
+                openaiApiKey: useOpenAI ? userApiKey : undefined,
               }
             });
 
             if (imageError) throw imageError;
 
+            const url = imageData?.imageUrl || imageData?.url || '';
+            if (url.includes('placehold.co')) {
+              toast.warning('Images de BD en mode dégradé (crédits image épuisés). Ajoutez votre clé OpenAI dans Paramètres → API.', { duration: 6000 });
+            }
+
             return {
-              imageUrl: imageData?.imageUrl || imageData?.url || '',
+              imageUrl: url,
               dialogue: dialogue.text,
               character: dialogue.character,
               action: sceneMoments[panelIndex]
@@ -505,6 +518,7 @@ ${sceneMoments[panelIndex]}
             console.error(`Erreur panel ${panelIndex + 1}:`, err);
             return null;
           }
+
         })();
 
         panelPromises.push(panelPromise);
