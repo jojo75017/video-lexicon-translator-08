@@ -31,6 +31,7 @@ import FaqAssistancePage from './pages/FaqAssistancePage';
 import { SubscriptionAuth } from '@/components/SubscriptionAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { SubscriberGate } from '@/components/auth/SubscriberGate';
+import { AdminGate } from '@/components/auth/AdminGate';
 
 // SaaS Pages
 import { SaasLayout } from '@/components/saas/SaasLayout';
@@ -297,11 +298,19 @@ const App = () => {
             />
             <Route 
               path="/admin" 
-              element={isAdmin ? <AdminPage /> : <Navigate to="/auth" replace />} 
+              element={
+                <AdminGate>
+                  <AdminPage />
+                </AdminGate>
+              }
             />
             <Route 
               path="/admin/profile" 
-              element={isAdmin ? <AdminProfilePage /> : <Navigate to="/auth" replace />} 
+              element={
+                <AdminGate>
+                  <AdminProfilePage />
+                </AdminGate>
+              }
             />
             <Route 
               path="/formation" 
