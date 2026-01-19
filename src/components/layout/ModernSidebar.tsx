@@ -46,7 +46,8 @@ import {
   Target,
   Sun,
   Moon,
-  X
+  X,
+  Star
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -67,132 +68,141 @@ interface MenuItem {
   id: string;
   label: string;
   icon: LucideIcon;
-  color: string;
   isLink?: boolean;
   href?: string;
-  isNew2026?: boolean;
-  isPremium?: boolean;
+  isNew?: boolean;
+  isPro?: boolean;
 }
 
 interface Category {
   id: string;
   label: string;
   emoji: string;
+  color: string;
   items: MenuItem[];
 }
 
 const categories: Category[] = [
   {
     id: 'generateurs',
-    label: 'Générateurs',
-    emoji: '🚀',
+    label: '🎯 Générateurs Rapides',
+    emoji: '🎯',
+    color: 'from-orange-500 to-amber-500',
     items: [
-      { id: 'complete-workflow', label: 'Livre Complet IA', icon: Rocket, color: 'text-orange-500', isPremium: true, isNew2026: true },
-      { id: 'comic-book', label: 'Bande Dessinée', icon: LayoutTemplate, color: 'text-amber-500', isNew2026: true },
-      { id: 'coloring-book', label: 'Livre Coloriage', icon: Palette, color: 'text-pink-500', isNew2026: true },
-      { id: 'documentary', label: 'Documentaire', icon: BookMarked, color: 'text-blue-500', isNew2026: true },
-      { id: 'diary-generator', label: 'Agenda / Journal', icon: BookHeart, color: 'text-rose-500', isNew2026: true },
+      { id: 'complete-workflow', label: '⚡ Livre Complet IA', icon: Rocket, isPro: true, isNew: true },
+      { id: 'comic-book', label: '📚 Bande Dessinée', icon: LayoutTemplate, isNew: true },
+      { id: 'coloring-book', label: '🎨 Livre Coloriage', icon: Palette, isNew: true },
+      { id: 'documentary', label: '📖 Documentaire', icon: BookMarked, isNew: true },
+      { id: 'diary-generator', label: '📔 Agenda / Journal', icon: BookHeart, isNew: true },
     ]
   },
   {
-    id: 'workflow',
-    label: 'Workflow IA (P1-P8)',
-    emoji: '⚡',
-    items: [
-      { id: 'editorial-director', label: 'P1 Directeur', icon: Crown, color: 'text-amber-500', isPremium: true },
-      { id: 'market-analysis', label: 'P2 Marché', icon: Search, color: 'text-emerald-500', isPremium: true },
-      { id: 'content-architect', label: 'P3 Architecte', icon: LayoutDashboard, color: 'text-violet-500', isPremium: true },
-      { id: 'expert-writing', label: 'P4 Rédaction', icon: PenTool, color: 'text-blue-500', isPremium: true },
-      { id: 'natural-rewrite', label: 'P5 Réécriture', icon: Sparkles, color: 'text-pink-500', isPremium: true },
-      { id: 'editorial-quality', label: 'P6 Qualité', icon: FileEdit, color: 'text-teal-500', isPremium: true },
-      { id: 'editorial-packaging', label: 'P7 Packaging', icon: FileText, color: 'text-green-500', isPremium: true },
-      { id: 'final-diagnosis', label: 'P8 Diagnostic', icon: Shield, color: 'text-purple-500', isPremium: true },
-    ]
-  },
-  {
-    id: 'moteur',
-    label: 'Moteur V2 (P9-P14)',
-    emoji: '🧬',
-    items: [
-      { id: 'editorial-memory', label: 'P9 Mémoire', icon: Brain, color: 'text-purple-500', isPremium: true },
-      { id: 'chapter-coherence', label: 'P10 Cohérence', icon: GitBranch, color: 'text-indigo-500', isPremium: true },
-      { id: 'self-critique', label: 'P11 Critique', icon: Eye, color: 'text-rose-500', isPremium: true },
-      { id: 'iterative-loop', label: 'P12 Boucle', icon: RefreshCw, color: 'text-cyan-500', isPremium: true },
-      { id: 'style-signature', label: 'P13 Style', icon: Fingerprint, color: 'text-amber-500', isPremium: true },
-      { id: 'ultimate-verdict', label: 'P14 Verdict', icon: Award, color: 'text-yellow-500', isPremium: true },
-    ]
-  },
-  {
-    id: 'creation',
-    label: 'Création',
+    id: 'redaction',
+    label: '✍️ Rédaction',
     emoji: '✍️',
+    color: 'from-blue-500 to-cyan-500',
     items: [
-      { id: 'url-import', label: 'Import URL', icon: Link, color: 'text-violet-500', isNew2026: true },
-      { id: 'doc-transform', label: 'Import Word', icon: FileText, color: 'text-blue-500', isNew2026: true },
-      { id: 'planner', label: 'Planificateur', icon: BookOpen, color: 'text-fuchsia-500' },
-      { id: 'writing', label: 'Rédaction', icon: PenTool, color: 'text-blue-500' },
-      { id: 'aichat', label: 'Chat IA', icon: Bot, color: 'text-orange-500' },
-      { id: 'characters', label: 'Personnages', icon: Users, color: 'text-emerald-500' },
-      { id: 'encyclopedia', label: 'Encyclopédie', icon: BookMarked, color: 'text-amber-500' },
-      { id: 'atlas', label: 'Atlas', icon: Map, color: 'text-emerald-500' },
-      { id: 'series', label: 'Série / Saga', icon: BookCopy, color: 'text-indigo-500' },
+      { id: 'planner', label: 'Planificateur', icon: BookOpen },
+      { id: 'writing', label: 'Écriture', icon: PenTool },
+      { id: 'aichat', label: 'Assistant IA', icon: Bot },
+      { id: 'characters', label: 'Personnages', icon: Users },
+    ]
+  },
+  {
+    id: 'workflow-pro',
+    label: '🚀 Workflow PRO',
+    emoji: '🚀',
+    color: 'from-violet-500 to-purple-500',
+    items: [
+      { id: 'editorial-director', label: 'P1 Directeur', icon: Crown, isPro: true },
+      { id: 'market-analysis', label: 'P2 Marché', icon: Search, isPro: true },
+      { id: 'content-architect', label: 'P3 Architecte', icon: LayoutDashboard, isPro: true },
+      { id: 'expert-writing', label: 'P4 Rédaction', icon: PenTool, isPro: true },
+      { id: 'natural-rewrite', label: 'P5 Réécriture', icon: Sparkles, isPro: true },
+      { id: 'editorial-quality', label: 'P6 Qualité', icon: FileEdit, isPro: true },
+      { id: 'editorial-packaging', label: 'P7 Packaging', icon: FileText, isPro: true },
+      { id: 'final-diagnosis', label: 'P8 Diagnostic', icon: Shield, isPro: true },
+    ]
+  },
+  {
+    id: 'moteur-v2',
+    label: '🧬 Moteur IA V2',
+    emoji: '🧬',
+    color: 'from-purple-500 to-pink-500',
+    items: [
+      { id: 'editorial-memory', label: 'P9 Mémoire', icon: Brain, isPro: true },
+      { id: 'chapter-coherence', label: 'P10 Cohérence', icon: GitBranch, isPro: true },
+      { id: 'self-critique', label: 'P11 Critique', icon: Eye, isPro: true },
+      { id: 'iterative-loop', label: 'P12 Boucle', icon: RefreshCw, isPro: true },
+      { id: 'style-signature', label: 'P13 Style', icon: Fingerprint, isPro: true },
+      { id: 'ultimate-verdict', label: 'P14 Verdict', icon: Award, isPro: true },
     ]
   },
   {
     id: 'visuels',
-    label: 'Visuels',
+    label: '🎨 Visuels & Covers',
     emoji: '🎨',
+    color: 'from-rose-500 to-pink-500',
     items: [
-      { id: 'cover', label: 'Couverture', icon: Palette, color: 'text-rose-500' },
-      { id: 'backcover', label: '4e Couverture', icon: BookCopy, color: 'text-red-500' },
-      { id: 'images', label: 'Images IA', icon: Image, color: 'text-amber-500' },
-      { id: 'imagebank', label: 'Banque Images', icon: ImagePlus, color: 'text-lime-500' },
+      { id: 'cover', label: 'Couverture', icon: Palette },
+      { id: 'backcover', label: '4e Couverture', icon: BookCopy },
+      { id: 'images', label: 'Images IA', icon: Image },
+      { id: 'imagebank', label: 'Banque Images', icon: ImagePlus },
     ]
   },
   {
     id: 'publication',
-    label: 'Publication',
+    label: '📤 Publication',
     emoji: '📤',
+    color: 'from-emerald-500 to-teal-500',
     items: [
-      { id: 'kdp-research', label: 'Recherche KDP', icon: Search, color: 'text-amber-500', isNew2026: true },
-      { id: 'amazon-simulator', label: 'Simulateur Amazon', icon: Eye, color: 'text-orange-500', isNew2026: true },
-      { id: 'plagiarism-validator', label: 'Anti-Plagiat', icon: Shield, color: 'text-red-500', isNew2026: true },
-      { id: 'export', label: 'Exporter', icon: Download, color: 'text-teal-500' },
-      { id: 'kdp', label: 'Amazon KDP', icon: TrendingUp, color: 'text-sky-500' },
+      { id: 'kdp-research', label: 'Recherche KDP', icon: Search, isNew: true },
+      { id: 'amazon-simulator', label: 'Simulateur Amazon', icon: Eye, isNew: true },
+      { id: 'plagiarism-validator', label: 'Anti-Plagiat', icon: Shield, isNew: true },
+      { id: 'export', label: 'Exporter', icon: Download },
+      { id: 'kdp', label: 'Amazon KDP', icon: TrendingUp },
     ]
   },
   {
     id: 'marketing',
-    label: 'Marketing',
+    label: '💰 Marketing',
     emoji: '💰',
+    color: 'from-green-500 to-emerald-500',
     items: [
-      { id: 'amazon-ads', label: 'Amazon Ads', icon: Target, color: 'text-orange-500', isNew2026: true },
-      { id: 'launch-plan', label: 'Plan Lancement', icon: Rocket, color: 'text-violet-500', isNew2026: true },
-      { id: 'seo-articles', label: 'Articles SEO', icon: Globe, color: 'text-emerald-500', isNew2026: true },
-      { id: 'marketing', label: 'Social Media', icon: MessageSquare, color: 'text-pink-500' },
-      { id: 'monetization', label: 'Monétisation', icon: DollarSign, color: 'text-green-500' },
+      { id: 'amazon-ads', label: 'Amazon Ads', icon: Target, isNew: true },
+      { id: 'launch-plan', label: 'Plan Lancement', icon: Rocket, isNew: true },
+      { id: 'seo-articles', label: 'Articles SEO', icon: Globe, isNew: true },
+      { id: 'marketing', label: 'Social Media', icon: MessageSquare },
+      { id: 'monetization', label: 'Monétisation', icon: DollarSign },
     ]
   },
   {
-    id: 'audio',
-    label: 'Audio & Formation',
+    id: 'extras',
+    label: '🎧 Extras',
     emoji: '🎧',
+    color: 'from-indigo-500 to-violet-500',
     items: [
-      { id: 'audiobook', label: 'Livre Audio', icon: Headphones, color: 'text-purple-500' },
-      { id: 'formation-complete', label: 'Formation', icon: GraduationCap, color: 'text-emerald-500', isLink: true, href: '/formation' },
-      { id: 'voice', label: 'Dictée Vocale', icon: Volume2, color: 'text-rose-500' },
+      { id: 'url-import', label: 'Import URL', icon: Link, isNew: true },
+      { id: 'doc-transform', label: 'Import Word', icon: FileText, isNew: true },
+      { id: 'encyclopedia', label: 'Encyclopédie', icon: BookMarked },
+      { id: 'atlas', label: 'Atlas', icon: Map },
+      { id: 'series', label: 'Série / Saga', icon: BookCopy },
+      { id: 'audiobook', label: 'Livre Audio', icon: Headphones },
+      { id: 'voice', label: 'Dictée Vocale', icon: Volume2 },
     ]
   },
   {
     id: 'outils',
-    label: 'Outils',
+    label: '⚙️ Mon Compte',
     emoji: '⚙️',
+    color: 'from-slate-500 to-gray-500',
     items: [
-      { id: 'projects', label: 'Mes Projets', icon: FolderOpen, color: 'text-violet-500' },
-      { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, color: 'text-cyan-500' },
-      { id: 'settings', label: 'Paramètres', icon: Settings, color: 'text-slate-500' },
-      { id: 'subscription', label: 'Abonnement', icon: CreditCard, color: 'text-purple-500', isLink: true, href: '/subscription' },
-      { id: 'offres', label: 'Offres', icon: Sparkles, color: 'text-amber-500', isLink: true, href: '/offres' },
+      { id: 'projects', label: 'Mes Projets', icon: FolderOpen },
+      { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+      { id: 'settings', label: 'Paramètres', icon: Settings },
+      { id: 'formation-complete', label: 'Formation', icon: GraduationCap, isLink: true, href: '/formation' },
+      { id: 'subscription', label: 'Abonnement', icon: CreditCard, isLink: true, href: '/subscription' },
+      { id: 'offres', label: 'Offres', icon: Sparkles, isLink: true, href: '/offres' },
     ]
   },
 ];
@@ -239,14 +249,14 @@ const QuotaDisplay: React.FC<{ isCollapsed: boolean }> = ({ isCollapsed }) => {
 
   if (isLoading || !hasSubscription || !quotas) {
     return (
-      <div className={cn("border-t border-border/50 p-3", isCollapsed && "flex justify-center")}>
+      <div className={cn("p-3", isCollapsed && "flex justify-center")}>
         <Button
           variant="default"
           size="sm"
           onClick={() => navigate('/offres')}
           className={cn(
-            "bg-gradient-to-r from-violet-500 to-purple-500 text-white hover:from-violet-600 hover:to-purple-600 shadow-md",
-            isCollapsed ? "w-9 h-9 p-0" : "w-full"
+            "bg-gradient-to-r from-violet-500 to-purple-500 text-white hover:from-violet-600 hover:to-purple-600 shadow-lg shadow-violet-500/25",
+            isCollapsed ? "w-10 h-10 p-0 rounded-xl" : "w-full rounded-xl"
           )}
         >
           {isCollapsed ? <Crown className="w-4 h-4" /> : (
@@ -264,11 +274,11 @@ const QuotaDisplay: React.FC<{ isCollapsed: boolean }> = ({ isCollapsed }) => {
   const ebookPercentage = getQuotaPercentage(quotas.ebook_plans);
 
   return (
-    <div className={cn("border-t border-border/50 p-3", isCollapsed && "flex justify-center")}>
+    <div className={cn("p-3", isCollapsed && "flex justify-center")}>
       {isCollapsed ? (
         <Tooltip>
           <TooltipTrigger asChild>
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-100 to-purple-100 dark:from-violet-900/40 dark:to-purple-900/40 flex items-center justify-center border border-violet-200/50 dark:border-violet-700/50">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500/20 to-purple-500/20 dark:from-violet-500/30 dark:to-purple-500/30 flex items-center justify-center border border-violet-300/30 dark:border-violet-600/30">
               <Zap className="w-4 h-4 text-violet-600 dark:text-violet-400" />
             </div>
           </TooltipTrigger>
@@ -280,25 +290,28 @@ const QuotaDisplay: React.FC<{ isCollapsed: boolean }> = ({ isCollapsed }) => {
           </TooltipContent>
         </Tooltip>
       ) : (
-        <div className="space-y-2 p-2 rounded-xl bg-gradient-to-br from-violet-50/80 to-purple-50/80 dark:from-violet-900/20 dark:to-purple-900/20 border border-violet-100 dark:border-violet-800/30">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-muted-foreground font-medium">Plan actif</span>
+        <div className="p-3 rounded-xl bg-gradient-to-br from-violet-500/10 to-purple-500/10 dark:from-violet-500/20 dark:to-purple-500/20 border border-violet-200/50 dark:border-violet-700/30">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <Star className="w-4 h-4 text-violet-500" />
+              <span className="text-xs font-semibold text-foreground">Mon Plan</span>
+            </div>
             <span className={cn(
               "text-[10px] font-bold px-2 py-0.5 rounded-full",
-              quotas.plan === 'lifetime' ? 'bg-violet-200/80 text-violet-700 dark:bg-violet-800/60 dark:text-violet-200' :
-              quotas.plan === 'pro' ? 'bg-amber-200/80 text-amber-700 dark:bg-amber-800/60 dark:text-amber-200' :
-              'bg-emerald-200/80 text-emerald-700 dark:bg-emerald-800/60 dark:text-emerald-200'
+              quotas.plan === 'lifetime' ? 'bg-violet-500 text-white' :
+              quotas.plan === 'pro' ? 'bg-amber-500 text-white' :
+              'bg-emerald-500 text-white'
             )}>
               {quotas.plan.toUpperCase()}
             </span>
           </div>
           {isUnlimited ? (
-            <div className="text-center py-1.5">
-              <span className="text-xs font-semibold text-violet-600 dark:text-violet-300">∞ Accès illimité</span>
+            <div className="text-center py-1">
+              <span className="text-sm font-bold text-violet-600 dark:text-violet-400">∞ Accès illimité</span>
             </div>
           ) : (
             <>
-              <div className="flex justify-between text-xs">
+              <div className="flex justify-between text-xs mb-1">
                 <span className="text-muted-foreground">Ebooks</span>
                 <span className="font-medium text-foreground">{quotas.ebook_plans.remaining}/{quotas.ebook_plans.limit}</span>
               </div>
@@ -320,7 +333,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
   const navigate = useNavigate();
   const { isDark, toggleTheme } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
-  const [expandedCategories, setExpandedCategories] = useState<string[]>(['generateurs']);
+  const [expandedCategories, setExpandedCategories] = useState<string[]>(['generateurs', 'redaction']);
 
   // Filtrer les items par recherche
   const filteredCategories = useMemo(() => {
@@ -367,61 +380,59 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
       <aside 
         className={cn(
           "relative flex flex-col h-screen transition-all duration-300 ease-out",
-          "bg-gradient-to-b from-violet-50/70 via-purple-50/50 to-fuchsia-50/40 border-r border-violet-100/60",
-          "dark:bg-gradient-to-b dark:from-[#0d0a12] dark:via-[#0a080e] dark:to-[#08060a] dark:border-violet-950/80",
-          isCollapsed ? "w-[72px]" : "w-64"
+          "bg-gradient-to-b from-violet-50 via-purple-50/80 to-fuchsia-50/60 border-r border-violet-200/60",
+          "dark:from-[#0d0a14] dark:via-[#0a0810] dark:to-[#08060c] dark:border-violet-900/40",
+          isCollapsed ? "w-[72px]" : "w-72"
         )}
       >
-        {/* Header avec Logo et Theme Toggle */}
+        {/* Header */}
         <div className={cn(
-          "flex items-center gap-3 p-4 border-b border-border/50",
+          "flex items-center gap-3 p-4 border-b border-violet-200/50 dark:border-violet-900/30",
           isCollapsed && "justify-center p-3"
         )}>
-          <div className="relative">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-400 via-purple-500 to-fuchsia-500 flex items-center justify-center shadow-lg shadow-violet-400/30 dark:shadow-violet-600/20">
-              <Sparkles className="w-5 h-5 text-white" />
-            </div>
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 via-purple-500 to-fuchsia-500 flex items-center justify-center shadow-lg shadow-violet-500/30">
+            <Sparkles className="w-5 h-5 text-white" />
           </div>
           {!isCollapsed && (
             <>
               <div className="min-w-0 flex-1">
-                <h1 className="font-bold text-foreground text-sm">EbookStudio</h1>
-                <p className="text-[11px] text-muted-foreground">Pro 2026</p>
+                <h1 className="font-bold text-foreground">EbookStudio</h1>
+                <p className="text-xs text-muted-foreground">Pro Edition 2026</p>
               </div>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={toggleTheme}
-                className="h-8 w-8 rounded-lg hover:bg-muted/80"
+                className="h-9 w-9 rounded-xl hover:bg-violet-100 dark:hover:bg-violet-900/30"
               >
                 {isDark ? (
                   <Sun className="w-4 h-4 text-amber-500" />
                 ) : (
-                  <Moon className="w-4 h-4 text-violet-500" />
+                  <Moon className="w-4 h-4 text-violet-600" />
                 )}
               </Button>
             </>
           )}
         </div>
 
-        {/* Barre de recherche */}
+        {/* Recherche */}
         {!isCollapsed && (
-          <div className="px-3 py-3">
+          <div className="p-3">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/60" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-violet-400" />
               <Input
                 type="text"
-                placeholder="Rechercher..."
+                placeholder="Rechercher un outil..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-8 py-2 h-9 text-sm bg-muted/50 border-border/50 text-foreground placeholder:text-muted-foreground/60 rounded-xl focus:bg-muted/80 focus:border-violet-400/50 transition-colors"
+                className="w-full pl-10 pr-8 h-10 text-sm bg-white/60 dark:bg-white/5 border-violet-200/60 dark:border-violet-800/40 rounded-xl focus:border-violet-400 focus:ring-violet-400/20"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded hover:bg-muted"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-violet-100 dark:hover:bg-violet-900/30"
                 >
-                  <X className="w-3.5 h-3.5 text-muted-foreground" />
+                  <X className="w-3 h-3 text-muted-foreground" />
                 </button>
               )}
             </div>
@@ -429,29 +440,33 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
         )}
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto py-2 px-2">
+        <nav className="flex-1 overflow-y-auto py-2 px-2 space-y-1">
           {filteredCategories.map((category) => {
             const isExpanded = expandedCategories.includes(category.id);
             const hasActiveItem = category.items.some(item => item.id === activeTab);
 
             return (
-              <div key={category.id} className="mb-1">
-                {/* Header catégorie */}
+              <div key={category.id} className="mb-2">
+                {/* Titre catégorie */}
                 {!isCollapsed ? (
                   <button
                     onClick={() => toggleCategory(category.id)}
                     className={cn(
-                      "w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all",
-                      "hover:bg-muted/60",
-                      hasActiveItem ? "bg-violet-50/80 dark:bg-violet-900/20" : ""
+                      "w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all group",
+                      hasActiveItem 
+                        ? `bg-gradient-to-r ${category.color} text-white shadow-md` 
+                        : "hover:bg-violet-100/80 dark:hover:bg-violet-900/30"
                     )}
                   >
-                    <div className="flex items-center gap-2.5">
-                      <span className="text-base">{category.emoji}</span>
-                      <span className="text-sm font-semibold text-foreground">{category.label}</span>
-                    </div>
+                    <span className={cn(
+                      "text-sm font-semibold",
+                      hasActiveItem ? "text-white" : "text-foreground"
+                    )}>
+                      {category.label}
+                    </span>
                     <ChevronDown className={cn(
-                      "w-4 h-4 text-muted-foreground transition-transform",
+                      "w-4 h-4 transition-transform",
+                      hasActiveItem ? "text-white/80" : "text-muted-foreground",
                       isExpanded ? "rotate-0" : "-rotate-90"
                     )} />
                   </button>
@@ -459,8 +474,10 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <div className={cn(
-                        "flex justify-center py-2 mb-1 rounded-xl cursor-pointer hover:bg-muted/60",
-                        hasActiveItem && "bg-violet-50/80 dark:bg-violet-900/20"
+                        "flex justify-center py-2 mb-1 rounded-xl cursor-pointer",
+                        hasActiveItem 
+                          ? `bg-gradient-to-r ${category.color} shadow-md` 
+                          : "hover:bg-violet-100/80 dark:hover:bg-violet-900/30"
                       )}>
                         <span className="text-lg">{category.emoji}</span>
                       </div>
@@ -475,9 +492,9 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                 {!isCollapsed && (
                   <div className={cn(
                     "overflow-hidden transition-all duration-200",
-                    isExpanded ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"
+                    isExpanded ? "max-h-[800px] opacity-100 mt-1" : "max-h-0 opacity-0"
                   )}>
-                    <div className="space-y-0.5 py-1 pl-2">
+                    <div className="space-y-0.5 pl-1">
                       {category.items.map(item => {
                         const isActive = activeTab === item.id;
                         const Icon = item.icon;
@@ -487,23 +504,38 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                             key={item.id}
                             onClick={() => handleItemClick(item)}
                             className={cn(
-                              "w-full flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all text-left",
+                              "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-left group",
                               isActive 
-                                ? "bg-gradient-to-r from-violet-100 to-purple-100 dark:from-violet-900/50 dark:to-purple-900/50 text-violet-700 dark:text-violet-200 shadow-sm border border-violet-200/50 dark:border-violet-700/30" 
-                                : "hover:bg-muted/50 text-foreground/80 hover:text-foreground"
+                                ? "bg-white dark:bg-white/10 shadow-md border border-violet-200/60 dark:border-violet-700/40" 
+                                : "hover:bg-white/60 dark:hover:bg-white/5"
                             )}
                           >
-                            <Icon className={cn("w-4 h-4 flex-shrink-0", isActive ? "text-violet-500 dark:text-violet-400" : item.color)} />
-                            <span className="text-sm font-medium truncate flex-1">{item.label}</span>
+                            <div className={cn(
+                              "w-8 h-8 rounded-lg flex items-center justify-center transition-all",
+                              isActive 
+                                ? `bg-gradient-to-br ${category.color} shadow-sm` 
+                                : "bg-violet-100/80 dark:bg-violet-900/40 group-hover:bg-violet-200/80 dark:group-hover:bg-violet-800/40"
+                            )}>
+                              <Icon className={cn(
+                                "w-4 h-4",
+                                isActive ? "text-white" : "text-violet-600 dark:text-violet-400"
+                              )} />
+                            </div>
+                            <span className={cn(
+                              "text-sm font-medium flex-1",
+                              isActive ? "text-foreground" : "text-foreground/80"
+                            )}>
+                              {item.label}
+                            </span>
                             
-                            {item.isNew2026 && (
-                              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-gradient-to-r from-amber-400 to-orange-400 text-white shadow-sm">
-                                2026
+                            {item.isNew && (
+                              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-gradient-to-r from-amber-400 to-orange-500 text-white">
+                                NEW
                               </span>
                             )}
                             
-                            {item.isPremium && !item.isNew2026 && (
-                              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-violet-100 text-violet-600 dark:bg-violet-800/50 dark:text-violet-300">
+                            {item.isPro && !item.isNew && (
+                              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-violet-500 text-white">
                                 PRO
                               </span>
                             )}
@@ -516,7 +548,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
 
                 {/* Items collapsed */}
                 {isCollapsed && (
-                  <div className="space-y-1 px-1">
+                  <div className="space-y-1">
                     {category.items.map(item => {
                       const isActive = activeTab === item.id;
                       const Icon = item.icon;
@@ -527,10 +559,10 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                             <button
                               onClick={() => handleItemClick(item)}
                               className={cn(
-                                "w-full flex items-center justify-center p-2 rounded-xl transition-all",
+                                "w-full flex items-center justify-center p-2.5 rounded-xl transition-all",
                                 isActive 
-                                  ? "bg-violet-100 dark:bg-violet-900/40 text-violet-500 dark:text-violet-400" 
-                                  : "hover:bg-muted/50 text-muted-foreground hover:text-foreground"
+                                  ? `bg-gradient-to-br ${category.color} text-white shadow-md` 
+                                  : "hover:bg-violet-100/80 dark:hover:bg-violet-900/30 text-violet-600 dark:text-violet-400"
                               )}
                             >
                               <Icon className="w-4 h-4" />
@@ -538,8 +570,8 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                           </TooltipTrigger>
                           <TooltipContent side="right" className="font-medium">
                             {item.label}
-                            {item.isNew2026 && <span className="ml-2 text-amber-500">2026</span>}
-                            {item.isPremium && !item.isNew2026 && <span className="ml-2 text-violet-500">PRO</span>}
+                            {item.isNew && <span className="ml-2 text-amber-500 text-xs">NEW</span>}
+                            {item.isPro && !item.isNew && <span className="ml-2 text-violet-400 text-xs">PRO</span>}
                           </TooltipContent>
                         </Tooltip>
                       );
@@ -552,10 +584,12 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
         </nav>
 
         {/* Quota */}
-        <QuotaDisplay isCollapsed={isCollapsed} />
+        <div className="border-t border-violet-200/50 dark:border-violet-900/30">
+          <QuotaDisplay isCollapsed={isCollapsed} />
+        </div>
 
-        {/* Toggle + Theme (collapsed) */}
-        <div className="p-2 border-t border-border/50 flex gap-1">
+        {/* Footer */}
+        <div className="p-2 border-t border-violet-200/50 dark:border-violet-900/30 flex gap-1">
           {isCollapsed && (
             <Tooltip>
               <TooltipTrigger asChild>
@@ -563,12 +597,12 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                   variant="ghost"
                   size="sm"
                   onClick={toggleTheme}
-                  className="flex-1 h-9 rounded-xl hover:bg-muted/60"
+                  className="flex-1 h-10 rounded-xl hover:bg-violet-100 dark:hover:bg-violet-900/30"
                 >
                   {isDark ? (
                     <Sun className="w-4 h-4 text-amber-500" />
                   ) : (
-                    <Moon className="w-4 h-4 text-violet-500" />
+                    <Moon className="w-4 h-4 text-violet-600" />
                   )}
                 </Button>
               </TooltipTrigger>
@@ -582,16 +616,16 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
             size="sm"
             onClick={onToggleCollapse}
             className={cn(
-              "h-9 flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-muted/60 rounded-xl",
+              "h-10 flex items-center gap-2 rounded-xl hover:bg-violet-100 dark:hover:bg-violet-900/30",
               isCollapsed ? "flex-1 justify-center" : "w-full"
             )}
           >
             {isCollapsed ? (
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-4 h-4 text-muted-foreground" />
             ) : (
               <>
-                <ChevronLeft className="w-4 h-4" />
-                <span className="text-xs">Réduire</span>
+                <ChevronLeft className="w-4 h-4 text-muted-foreground" />
+                <span className="text-xs text-muted-foreground">Réduire le menu</span>
               </>
             )}
           </Button>
