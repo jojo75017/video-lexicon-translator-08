@@ -29,12 +29,15 @@ export function AdminGate({ children }: Props) {
         } = await supabase.auth.getSession();
 
         if (!session) {
+          console.log("AdminGate: No session found");
           if (!cancelled) {
             setAllowed(false);
             setChecking(false);
           }
           return;
         }
+
+        console.log("AdminGate: Session found, checking admin status...");
 
         const { data, error } = await supabase.functions.invoke("check-admin", {
           headers: { Authorization: `Bearer ${session.access_token}` },
@@ -51,14 +54,19 @@ export function AdminGate({ children }: Props) {
         }
 
         const isAdmin = !!data?.isAdmin;
+        console.log("AdminGate: isAdmin =", isAdmin);
 
-        if (!isAdmin) {
-          // Safety: ensure we don't keep an authenticated non-admin session for admin area
-          await supabase.auth.signOut();
+        if (isAdmin) {
+          // Persist admin status for UI optimizations
+          sessionStorage.setItem('is_admin', 'true');
+          setAllowed(true);
+        } else {
+          // Non-admin trying to access admin area
+          sessionStorage.removeItem('is_admin');
           toast.error("Accès admin refusé");
+          setAllowed(false);
         }
-
-        setAllowed(isAdmin);
+        
         setChecking(false);
       } catch (e) {
         console.error("AdminGate error:", e);
