@@ -87,12 +87,11 @@ const RESEARCH_DEPTH = [
 ];
 
 const EbookDocumentaryGenerator: React.FC<DocumentaryGeneratorProps> = ({ ebookTitle: initialTitle }) => {
-  // Configuration - forcer utilisation Lovable AI
+  // Configuration - utiliser la clé API utilisateur si disponible
   const { apiKey: userApiKey, isValid: isUserKeyValid, isValidating } = useOpenAIConfig();
-  // DÉSACTIVER temporairement l'usage de la clé OpenAI utilisateur (quota épuisé)
-  const useOpenAI = false; // Force l'usage de Lovable AI
+  const useOpenAI = !!userApiKey && userApiKey.startsWith('sk-');
   
-  console.log('[Documentary] Utilisation de Lovable AI (clé OpenAI utilisateur désactivée)');
+  console.log('[Documentary] API Key config:', { hasKey: !!userApiKey, useOpenAI, isValid: isUserKeyValid });
 
   // État du formulaire
   const [title, setTitle] = useState(initialTitle || '');
