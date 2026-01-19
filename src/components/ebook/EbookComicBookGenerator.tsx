@@ -684,9 +684,9 @@ EXPRESSION STYLE: ${artStyle === 'manga' ? 'Large expressive eyes, anime style' 
       const seedInfo = visualSeed ? `[SEED:${visualSeed}] ` : '';
 
       // Nombre de panels selon le layout choisi
-      const selectedLayout = PANEL_LAYOUTS.find(l => l.value === panelLayout);
-      const panelCount = selectedLayout?.panelsPerPage || 4;
-      const panelPromises: Promise<{ imageUrl: string; dialogue: string; character: string; action: string } | null>[] = [];
+      const layoutForPage = panelLayout;
+      const selectedLayout = PANEL_LAYOUTS.find(l => l.value === layoutForPage) || PANEL_LAYOUTS.find(l => l.value === '4-panels');
+      const panelCount = Number(selectedLayout?.panelsPerPage) || 4;
 
       // Diviser la description en moments distincts selon le nombre de panels
       const baseMoments = [
@@ -798,6 +798,18 @@ ${hasSpeechBubble ? '✓ Speech bubble clearly readable with correct text' : ''}
             action: sceneMoments[panelIndex]
           });
         }
+      }
+
+      // Sécurité: s'assurer qu'on a bien le bon nombre de panels (même si certains appels ont échoué)
+      while (panels.length < panelCount) {
+        const panelIdx = panels.length;
+        panels.push({
+          id: `panel-${pageIndex}-${panelIdx}`,
+          imageUrl: '',
+          dialogue: pageScenario.dialogues[panelIdx]?.text || '',
+          character: pageScenario.dialogues[panelIdx]?.character || (mainCharacter || 'Le héros'),
+          action: sceneMoments[panelIdx] || pageScenario.description,
+        });
       }
 
       // Générer seed si première page
@@ -1760,9 +1772,10 @@ Réponds en JSON:
                 return (
                   <div key={page.id} className="border border-border/50 rounded-lg p-4 bg-muted/20">
                     <div className="flex items-center justify-between mb-3">
-                      <Badge className="bg-amber-500 text-white">
-                        Page {page.pageNumber}
-                      </Badge>
+                      <div className="flex items-center gap-2">
+                        <Badge className="bg-amber-500 text-white">Page {page.pageNumber}</Badge>
+                        <Badge variant="outline" className="text-xs">Cases: {page.panels.length}/{panelsPerPage}</Badge>
+                      </div>
                       <Button
                         size="sm"
                         variant="outline"
