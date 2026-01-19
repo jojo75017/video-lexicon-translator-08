@@ -94,6 +94,7 @@ const EbookDocumentaryGenerator: React.FC<DocumentaryGeneratorProps> = ({ ebookT
   // Configuration - utiliser la clé API utilisateur si disponible
   const { apiKey: userApiKey, isValid: isUserKeyValid, isValidating } = useOpenAIConfig();
   const useOpenAI = !!userApiKey && userApiKey.startsWith('sk-');
+  const { saveSpecializedProject } = useProjectSave();
   
   console.log('[Documentary] API Key config:', { hasKey: !!userApiKey, useOpenAI, isValid: isUserKeyValid });
 
@@ -113,6 +114,7 @@ const EbookDocumentaryGenerator: React.FC<DocumentaryGeneratorProps> = ({ ebookT
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationStep, setGenerationStep] = useState(0);
   const [generationProgress, setGenerationProgress] = useState(0);
+  const [isSavingProject, setIsSavingProject] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   // État du livre
@@ -1634,6 +1636,36 @@ Inclus des faits marquants et des anecdotes.`;
                 </div>
 
                 <div className="flex flex-col gap-3">
+                  <Button
+                    onClick={async () => {
+                      if (!book) return;
+                      setIsSavingProject(true);
+                      await saveSpecializedProject({
+                        title: book.title,
+                        author_name: book.author,
+                        project_type: 'documentary',
+                        target_audience: targetAudience,
+                        preface: book.introduction,
+                        conclusion: book.conclusion,
+                        chapters: book.chapters.map(ch => ({
+                          title: ch.title,
+                          content: ch.content,
+                          facts: ch.facts,
+                          sources: ch.sources,
+                        })),
+                        number_of_chapters: book.chapters.length,
+                        book_summary: book.subtitle,
+                      });
+                      setIsSavingProject(false);
+                    }}
+                    disabled={isSavingProject}
+                    className="w-full h-12 bg-violet-600 hover:bg-violet-700"
+                    size="lg"
+                  >
+                    {isSavingProject ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : <Save className="w-5 h-5 mr-2" />}
+                    Sauvegarder dans mes projets
+                  </Button>
+                  
                   <Button onClick={exportToWord} className="w-full h-12 bg-blue-600 hover:bg-blue-700" size="lg">
                     <FileType className="w-5 h-5 mr-2" />
                     Télécharger en Word (.docx)

@@ -85,6 +85,7 @@ export const EbookColoringBookGenerator: React.FC<ColoringBookGeneratorProps> = 
   // Configuration OpenAI - utiliser la clé API utilisateur si disponible
   const { apiKey: userApiKey, isValid: isUserKeyValid } = useOpenAIConfig();
   const useOpenAI = Boolean(userApiKey) && isUserKeyValid === true;
+  const { saveSpecializedProject } = useProjectSave();
 
   const [theme, setTheme] = useState('animals');
   const [customTheme, setCustomTheme] = useState('');
@@ -96,6 +97,7 @@ export const EbookColoringBookGenerator: React.FC<ColoringBookGeneratorProps> = 
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedPages, setGeneratedPages] = useState<ColoringPage[]>([]);
   const [currentProgress, setCurrentProgress] = useState(0);
+  const [isSavingProject, setIsSavingProject] = useState(false);
 
   const generateColorPalette = (theme: string, subject: string): { element: string; color: string; hexCode: string }[] => {
     // Génération intelligente de palettes de couleurs suggérées
@@ -1200,28 +1202,55 @@ CRITICAL REQUIREMENTS:
       {/* Pages générées */}
       {generatedPages.length > 0 && (
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
+          <CardHeader className="flex flex-row items-center justify-between flex-wrap gap-2">
             <CardTitle className="flex items-center gap-2">
               <BookOpen className="h-5 w-5 text-green-500" />
               Pages générées ({generatedPages.length})
             </CardTitle>
-            <Button
-              onClick={exportToPDF}
-              disabled={isExporting || isGenerating}
-              className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white"
-            >
-              {isExporting ? (
-                <>
+            <div className="flex gap-2 flex-wrap">
+              <Button
+                onClick={async () => {
+                  setIsSavingProject(true);
+                  const selectedTheme = THEMES.find(t => t.value === theme);
+                  await saveSpecializedProject({
+                    title: `Coloriage - ${selectedTheme?.label || theme}`,
+                    project_type: 'coloring',
+                    target_audience: ageGroup,
+                    ebook_images: generatedPages.map(p => ({ url: p.imageUrl, title: p.title })),
+                    number_of_chapters: generatedPages.length,
+                    book_summary: customPrompt || `Livre de coloriage thème ${selectedTheme?.label || theme}`,
+                  });
+                  setIsSavingProject(false);
+                }}
+                disabled={isSavingProject || isExporting}
+                variant="outline"
+                className="border-violet-500 text-violet-600 hover:bg-violet-50"
+              >
+                {isSavingProject ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Export en cours...
-                </>
-              ) : (
-                <>
-                  <FileDown className="mr-2 h-4 w-4" />
-                  Exporter PDF complet
-                </>
-              )}
-            </Button>
+                ) : (
+                  <Save className="mr-2 h-4 w-4" />
+                )}
+                Sauvegarder
+              </Button>
+              <Button
+                onClick={exportToPDF}
+                disabled={isExporting || isGenerating}
+                className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white"
+              >
+                {isExporting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Export en cours...
+                  </>
+                ) : (
+                  <>
+                    <FileDown className="mr-2 h-4 w-4" />
+                    Exporter PDF complet
+                  </>
+                )}
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

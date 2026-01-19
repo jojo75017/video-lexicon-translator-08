@@ -80,6 +80,8 @@ const INSPIRATIONAL_QUOTES = [
 ];
 
 const EbookDiaryGenerator: React.FC<EbookDiaryGeneratorProps> = ({ ebookTitle }) => {
+  const { saveSpecializedProject } = useProjectSave();
+  
   const [firstName, setFirstName] = useState('');
   const [age, setAge] = useState('');
   const [ageGroup, setAgeGroup] = useState('13-16');
@@ -96,6 +98,7 @@ const EbookDiaryGenerator: React.FC<EbookDiaryGeneratorProps> = ({ ebookTitle })
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedCover, setGeneratedCover] = useState<string | null>(null);
   const [generatedPages, setGeneratedPages] = useState<any[]>([]);
+  const [isSavingProject, setIsSavingProject] = useState(false);
 
   const selectedTheme = DIARY_THEMES.find(t => t.id === theme);
   const selectedType = DIARY_TYPES.find(t => t.id === diaryType);
@@ -785,14 +788,40 @@ High quality, professional book cover design, vertical format 6x9 inches.`;
             </Button>
 
             {generatedPages.length > 0 && (
-              <Button
-                onClick={exportToPDF}
-                variant="outline"
-                className="border-pink-300 text-pink-700 hover:bg-pink-50"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Exporter PDF ({generatedPages.length} pages)
-              </Button>
+              <>
+                <Button
+                  onClick={async () => {
+                    setIsSavingProject(true);
+                    const selectedTheme = DIARY_THEMES.find(t => t.id === theme);
+                    const selectedType = DIARY_TYPES.find(t => t.id === diaryType);
+                    await saveSpecializedProject({
+                      title: customTitle || `${selectedType?.label || 'Journal'} ${year}`,
+                      author_name: firstName || '',
+                      project_type: 'diary',
+                      target_audience: ageGroup,
+                      ebook_images: generatedCover ? [{ url: generatedCover, title: 'Couverture' }] : [],
+                      number_of_chapters: generatedPages.length,
+                      book_summary: `${selectedType?.label} - Thème: ${selectedTheme?.label}`,
+                      chapters: generatedPages,
+                    });
+                    setIsSavingProject(false);
+                  }}
+                  disabled={isSavingProject}
+                  variant="outline"
+                  className="border-violet-300 text-violet-700 hover:bg-violet-50"
+                >
+                  {isSavingProject ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+                  Sauvegarder
+                </Button>
+                <Button
+                  onClick={exportToPDF}
+                  variant="outline"
+                  className="border-pink-300 text-pink-700 hover:bg-pink-50"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Exporter PDF ({generatedPages.length} pages)
+                </Button>
+              </>
             )}
           </div>
 
