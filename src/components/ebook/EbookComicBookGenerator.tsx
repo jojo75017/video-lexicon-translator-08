@@ -524,8 +524,12 @@ EXPRESSION STYLE: ${artStyle === 'manga' ? 'Large expressive eyes, anime style' 
       for (let panelIndex = 0; panelIndex < panelCount; panelIndex++) {
         const dialogue = pageScenario.dialogues[panelIndex] || { character: mainCharacter, text: '' };
         
-        // Prompt ultra-détaillé pour cohérence maximale
-        const imagePrompt = `${seedInfo}SINGLE COMIC PANEL - Panel ${panelIndex + 1} of ${panelCount}
+        // Construire le texte de la bulle de dialogue
+        const dialogueText = dialogue.text ? dialogue.text.substring(0, 60) : '';
+        const hasSpeechBubble = dialogueText.length > 0;
+        
+        // Prompt ultra-détaillé avec bulles de dialogue INTÉGRÉES dans l'image
+        const imagePrompt = `${seedInfo}SINGLE COMIC PANEL WITH SPEECH BUBBLE - Panel ${panelIndex + 1} of ${panelCount}
 
 === MANDATORY STYLE RULES ===
 ${artStylePrompt}
@@ -535,10 +539,17 @@ ${visualRef}
 === THIS PANEL ===
 ${sceneMoments[panelIndex]}
 
+${hasSpeechBubble ? `=== SPEECH BUBBLE (MUST BE INCLUDED) ===
+- Draw a WHITE speech bubble with BLACK outline pointing to the character
+- Inside the bubble, write in clear readable text: "${dialogueText}"
+- Position the bubble in the TOP portion of the panel, not covering the character's face
+- Use simple, clean comic book lettering style
+- The bubble tail points toward the speaking character` : '=== NO DIALOGUE ===\n- This panel has no speech bubble, pure action scene'}
+
 === TECHNICAL REQUIREMENTS ===
 - Single square illustration, professional comic art quality
 - Child-friendly, age-appropriate content
-- ABSOLUTELY NO TEXT, no speech bubbles, no onomatopoeia, no written words
+- ${hasSpeechBubble ? 'INCLUDE the speech bubble with the exact text above' : 'No text in this panel'}
 - Clean panel composition with clear focal point
 - Consistent perspective and lighting with other panels
 - Same exact character design as reference sheet above
@@ -548,7 +559,8 @@ ${sceneMoments[panelIndex]}
 ✓ Same art style and line weight  
 ✓ Same color palette and saturation
 ✓ Same lighting direction (top-left)
-✓ Same level of background detail`;
+✓ Same level of background detail
+${hasSpeechBubble ? '✓ Speech bubble clearly readable with correct text' : ''}`;
 
         try {
           // Délai entre les appels pour éviter le rate-limiting (sauf premier panel)
@@ -1501,24 +1513,22 @@ Réponds en JSON:
                       style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}
                     >
                       {page.panels.slice(0, panelsPerPage).map((panel, panelIdx) => (
-                        <div key={panel.id} className="relative">
+                        <div key={panel.id} className="relative group">
                           {panel.imageUrl ? (
                             <img
                               src={panel.imageUrl}
                               alt={`Panel ${panelIdx + 1}`}
-                              className="w-full aspect-square object-cover rounded-md border border-border"
+                              className="w-full aspect-square object-cover rounded-md border-2 border-black shadow-md"
                             />
                           ) : (
-                            <div className="w-full aspect-square bg-muted flex items-center justify-center rounded-md border border-dashed">
+                            <div className="w-full aspect-square bg-muted flex items-center justify-center rounded-md border-2 border-dashed border-black">
                               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
                             </div>
                           )}
-                          {panel.dialogue && (
-                            <div className="mt-1 p-2 bg-white rounded text-xs border border-border">
-                              <span className="font-medium text-amber-600">{panel.character}:</span>{' '}
-                              "{panel.dialogue.substring(0, 50)}{panel.dialogue.length > 50 ? '...' : ''}"
-                            </div>
-                          )}
+                          {/* Badge numéro de case */}
+                          <div className="absolute top-1 left-1 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded">
+                            {panelIdx + 1}
+                          </div>
                         </div>
                       ))}
                     </div>
