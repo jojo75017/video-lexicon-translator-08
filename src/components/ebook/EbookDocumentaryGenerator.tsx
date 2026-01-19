@@ -87,12 +87,12 @@ const RESEARCH_DEPTH = [
 ];
 
 const EbookDocumentaryGenerator: React.FC<DocumentaryGeneratorProps> = ({ ebookTitle: initialTitle }) => {
-  // Configuration - utiliser la clé API si elle existe, même si pas encore validée
+  // Configuration - forcer utilisation Lovable AI
   const { apiKey: userApiKey, isValid: isUserKeyValid, isValidating } = useOpenAIConfig();
-  // Envoyer la clé si elle existe et commence par 'sk-'
-  const useOpenAI = !!userApiKey && userApiKey.startsWith('sk-');
+  // DÉSACTIVER temporairement l'usage de la clé OpenAI utilisateur (quota épuisé)
+  const useOpenAI = false; // Force l'usage de Lovable AI
   
-  console.log('[Documentary] API Key config:', { hasKey: !!userApiKey, useOpenAI, isValid: isUserKeyValid, isValidating });
+  console.log('[Documentary] Utilisation de Lovable AI (clé OpenAI utilisateur désactivée)');
 
   // État du formulaire
   const [title, setTitle] = useState(initialTitle || '');
@@ -299,9 +299,14 @@ Audience: ${targetAudience}`;
       setActiveTab('preview');
       toast.success('Documentaire généré!', { description: `${bookData.chapters.length} chapitres créés` });
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erreur génération:', error);
-      toast.error('Erreur de génération', { description: 'Veuillez réessayer' });
+      const details =
+        error?.context?.error_description ||
+        error?.context?.error ||
+        error?.message ||
+        'Veuillez réessayer';
+      toast.error('Erreur de génération', { description: String(details) });
     } finally {
       setIsGenerating(false);
     }
