@@ -15,6 +15,7 @@ import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 import { useProjectSave } from '@/hooks/useProjectSave';
 import jsPDF from 'jspdf';
 import { KdpQuickTools } from './KdpQuickTools';
+import SpecializedAmazonPreview from './SpecializedAmazonPreview';
 
 interface SavedComicBook {
   id: string;
@@ -1867,6 +1868,19 @@ Réponds en JSON:
           </div>
         </CardContent>
       </Card>
+
+      {/* Simulateur Amazon */}
+      {generatedPages.length > 0 && (
+        <SpecializedAmazonPreview
+          productType="comic"
+          title={title || `Bande Dessinée - ${GENRES.find(g => g.value === genre)?.label?.replace(/^[^\s]+\s/, '') || genre}`}
+          authorName="Votre Nom"
+          coverUrl={generatedPages[0]?.panels[0]?.imageUrl}
+          pageCount={generatedPages.length + 4}
+          targetAudience={AGE_GROUPS.find(a => a.value === ageGroup)?.label}
+          theme={genre === 'custom' ? customGenre : GENRES.find(g => g.value === genre)?.label}
+        />
+      )}
 
       {/* Outils KDP */}
       {generatedPages.length > 0 && (

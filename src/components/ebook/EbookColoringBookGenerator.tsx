@@ -14,6 +14,7 @@ import jsPDF from 'jspdf';
 import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 import { useProjectSave } from '@/hooks/useProjectSave';
 import { KdpQuickTools } from './KdpQuickTools';
+import SpecializedAmazonPreview from './SpecializedAmazonPreview';
 
 interface ColoringPage {
   id: string;
@@ -1334,6 +1335,19 @@ CRITICAL REQUIREMENTS:
           </div>
         </CardContent>
       </Card>
+
+      {/* Simulateur Amazon */}
+      {generatedPages.length > 0 && (
+        <SpecializedAmazonPreview
+          productType="coloring"
+          title={`Livre de Coloriage - ${THEMES.find(t => t.value === theme)?.label?.replace(/^[^\s]+\s/, '') || theme}`}
+          authorName="Votre Nom"
+          coverUrl={generatedPages[0]?.imageUrl}
+          pageCount={generatedPages.length + 3}
+          targetAudience={AGE_GROUPS.find(a => a.value === ageGroup)?.label}
+          theme={theme === 'custom' ? customTheme : THEMES.find(t => t.value === theme)?.label}
+        />
+      )}
 
       {/* Outils KDP */}
       {generatedPages.length > 0 && (

@@ -13,6 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import jsPDF from 'jspdf';
 import { useProjectSave } from '@/hooks/useProjectSave';
 import { KdpQuickTools } from './KdpQuickTools';
+import SpecializedAmazonPreview from './SpecializedAmazonPreview';
 
 interface EbookDiaryGeneratorProps {
   ebookTitle?: string;
@@ -840,6 +841,19 @@ High quality, professional book cover design, vertical format 6x9 inches.`;
           )}
         </CardContent>
       </Card>
+
+      {/* Simulateur Amazon */}
+      {generatedPages.length > 0 && (
+        <SpecializedAmazonPreview
+          productType="diary"
+          title={customTitle || `${DIARY_TYPES.find(t => t.id === diaryType)?.label || 'Journal'} ${year}`}
+          authorName="Votre Nom"
+          coverUrl={generatedCover || undefined}
+          pageCount={generatedPages.length}
+          targetAudience={AGE_GROUPS.find(a => a.id === ageGroup)?.label}
+          theme={DIARY_THEMES.find(t => t.id === theme)?.label}
+        />
+      )}
 
       {/* Outils KDP */}
       {generatedPages.length > 0 && (
