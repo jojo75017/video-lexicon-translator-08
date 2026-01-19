@@ -800,9 +800,86 @@ export const AdminPage = () => {
           </div>
           
           <p className="text-sm text-muted-foreground mt-4">
-            💡 <strong>Lors d'un achat (27€) sur Systeme.io :</strong> Ajoutez l'abonné ci-dessus, puis cliquez sur "Envoyer" pour lui envoyer son code par email automatiquement.
+            💡 <strong>Lors d'un achat (37€) :</strong> Ajoutez l'abonné ci-dessus, puis cliquez sur "Envoyer" pour lui envoyer son code par email automatiquement.
           </p>
         </Card>
+
+        {/* Inactive Subscribers - Reactivation */}
+        {subscribers.filter(s => s.status === 'inactive').length > 0 && (
+          <Card className="p-6 border-2 border-gray-300 bg-gray-50/50">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Pause className="w-5 h-5 text-gray-500" />
+                <h2 className="text-xl font-semibold text-gray-700">
+                  🚫 Abonnés désactivés
+                </h2>
+                <Badge variant="secondary">
+                  {subscribers.filter(s => s.status === 'inactive').length}
+                </Badge>
+              </div>
+            </div>
+
+            <div className="bg-background rounded-lg border overflow-hidden">
+              <table className="w-full">
+                <thead className="bg-muted/50">
+                  <tr>
+                    <th className="text-left p-3 font-semibold">Email</th>
+                    <th className="text-left p-3 font-semibold">Code d'accès</th>
+                    <th className="text-left p-3 font-semibold">Plan</th>
+                    <th className="text-center p-3 font-semibold">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {subscribers
+                    .filter(s => s.status === 'inactive')
+                    .map((subscriber) => (
+                      <tr key={subscriber.id} className="border-t hover:bg-muted/30">
+                        <td className="p-3">
+                          <span className="font-medium text-gray-600">{subscriber.email}</span>
+                        </td>
+                        <td className="p-3">
+                          <span className="font-mono text-lg text-gray-400 bg-gray-100 px-3 py-1 rounded">
+                            {subscriber.access_code}
+                          </span>
+                        </td>
+                        <td className="p-3">
+                          <Badge variant="outline" className="text-gray-500">{subscriber.plan_type}</Badge>
+                        </td>
+                        <td className="p-3 text-center">
+                          <div className="flex justify-center gap-2 flex-wrap">
+                            <Button
+                              onClick={() => handleManageSubscription('toggle_status', subscriber.id)}
+                              variant="default"
+                              size="sm"
+                              className="bg-green-600 hover:bg-green-700"
+                            >
+                              <Play className="w-4 h-4 mr-1" />
+                              Réactiver
+                            </Button>
+                            <Button
+                              onClick={() => {
+                                navigator.clipboard.writeText(subscriber.access_code);
+                                toast.success('Code copié !');
+                              }}
+                              variant="outline"
+                              size="sm"
+                            >
+                              <Copy className="w-4 h-4 mr-1" />
+                              Code
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+
+            <p className="text-sm text-gray-500 mt-4">
+              💡 Ces abonnés ont été désactivés. Cliquez sur "Réactiver" pour restaurer leur accès.
+            </p>
+          </Card>
+        )}
 
         {/* Subscribers List */}
         <Card className="p-6">
