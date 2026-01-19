@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   BookOpen, 
@@ -47,11 +47,14 @@ import {
   Rocket,
   Link,
   Globe,
-  Target
+  Target,
+  Star,
+  Clock
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Progress } from '@/components/ui/progress';
 import { useUserQuotas, getQuotaPercentage } from '@/hooks/useUserQuotas';
@@ -73,6 +76,8 @@ interface MenuItem {
   isLink?: boolean;
   href?: string;
   isNew2026?: boolean;
+  isPremium?: boolean;
+  promptNumber?: number;
 }
 
 interface Category {
@@ -81,276 +86,209 @@ interface Category {
   icon: string;
   color: string;
   items: MenuItem[];
-}
-
-// Items du workflow IA éditorial avec style premium
-interface PremiumMenuItem extends MenuItem {
-  isPremium?: boolean;
-  promptNumber?: number;
-  isNew2026?: boolean;
-}
-
-interface PremiumCategory extends Omit<Category, 'items'> {
-  items: PremiumMenuItem[];
   isPremiumCategory?: boolean;
 }
 
-const categories: PremiumCategory[] = [
+const categories: Category[] = [
   {
-    id: 'workflow-ia',
-    label: 'Workflow IA Éditorial',
-    icon: '🚀',
-    color: 'from-amber-400 via-orange-500 to-red-500',
+    id: 'quick-actions',
+    label: '⚡ Actions Rapides',
+    icon: '⚡',
+    color: 'from-violet-500 to-purple-600',
     isPremiumCategory: true,
     items: [
-      { id: 'complete-workflow', label: '⚡ Générer Livre Complet', icon: Rocket, color: 'text-orange-500', bgColor: 'bg-gradient-to-r from-primary via-amber-500 to-orange-500', activeGradient: 'from-primary via-amber-500 to-orange-500', isPremium: true, isNew2026: true },
-      { id: 'editorial-director', label: '1. Directeur Éditorial', icon: Crown, color: 'text-amber-500', bgColor: 'bg-amber-500/10', activeGradient: 'from-amber-400 to-orange-500', isPremium: true, promptNumber: 1 },
-      { id: 'market-analysis', label: '2. Analyse Marché', icon: Search, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10', activeGradient: 'from-emerald-400 to-teal-500', isPremium: true, promptNumber: 2 },
-      { id: 'content-architect', label: '3. Architecte Contenu', icon: LayoutDashboard, color: 'text-violet-500', bgColor: 'bg-violet-500/10', activeGradient: 'from-violet-400 to-purple-500', isPremium: true, promptNumber: 3 },
-      { id: 'expert-writing', label: '4. Rédaction Experte', icon: PenTool, color: 'text-blue-500', bgColor: 'bg-blue-500/10', activeGradient: 'from-blue-400 to-cyan-500', isPremium: true, promptNumber: 4 },
-      { id: 'natural-rewrite', label: '5. Réécriture Naturelle', icon: Sparkles, color: 'text-pink-500', bgColor: 'bg-pink-500/10', activeGradient: 'from-pink-400 to-rose-500', isPremium: true, promptNumber: 5 },
-      { id: 'editorial-quality', label: '6. Cohérence & Qualité', icon: FileEdit, color: 'text-teal-500', bgColor: 'bg-teal-500/10', activeGradient: 'from-teal-400 to-cyan-500', isPremium: true, promptNumber: 6 },
-      { id: 'editorial-packaging', label: '7. Packaging Éditorial', icon: FileText, color: 'text-green-500', bgColor: 'bg-green-500/10', activeGradient: 'from-green-400 to-emerald-500', isPremium: true, promptNumber: 7 },
-      { id: 'final-diagnosis', label: '8. Diagnostic Final', icon: Shield, color: 'text-purple-500', bgColor: 'bg-purple-500/10', activeGradient: 'from-purple-400 to-fuchsia-500', isPremium: true, promptNumber: 8 },
+      { id: 'complete-workflow', label: 'Générer Livre Complet', icon: Rocket, color: 'text-orange-500', bgColor: 'bg-gradient-to-r from-orange-500/20 to-amber-500/20', activeGradient: 'from-orange-500 via-amber-500 to-yellow-500', isPremium: true, isNew2026: true },
+      { id: 'comic-book', label: 'Bande Dessinée', icon: LayoutTemplate, color: 'text-amber-500', bgColor: 'bg-amber-500/15', activeGradient: 'from-amber-500 to-orange-500', isPremium: true, isNew2026: true },
+      { id: 'coloring-book', label: 'Livre Coloriage', icon: Palette, color: 'text-pink-500', bgColor: 'bg-pink-500/15', activeGradient: 'from-pink-500 to-rose-500', isPremium: true, isNew2026: true },
+      { id: 'documentary', label: 'Documentaires', icon: BookMarked, color: 'text-blue-500', bgColor: 'bg-blue-500/15', activeGradient: 'from-blue-500 to-indigo-500', isPremium: true, isNew2026: true },
+      { id: 'diary-generator', label: 'Agendas & Journaux', icon: BookHeart, color: 'text-rose-500', bgColor: 'bg-rose-500/15', activeGradient: 'from-rose-500 to-pink-500', isPremium: true, isNew2026: true },
+    ]
+  },
+  {
+    id: 'workflow-ia',
+    label: 'Workflow Éditorial',
+    icon: '🚀',
+    color: 'from-amber-400 to-orange-500',
+    isPremiumCategory: true,
+    items: [
+      { id: 'editorial-director', label: 'P1. Directeur Éditorial', icon: Crown, color: 'text-amber-500', bgColor: 'bg-amber-500/10', activeGradient: 'from-amber-400 to-orange-500', isPremium: true, promptNumber: 1 },
+      { id: 'market-analysis', label: 'P2. Analyse Marché', icon: Search, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10', activeGradient: 'from-emerald-400 to-teal-500', isPremium: true, promptNumber: 2 },
+      { id: 'content-architect', label: 'P3. Architecte Contenu', icon: LayoutDashboard, color: 'text-violet-500', bgColor: 'bg-violet-500/10', activeGradient: 'from-violet-400 to-purple-500', isPremium: true, promptNumber: 3 },
+      { id: 'expert-writing', label: 'P4. Rédaction Experte', icon: PenTool, color: 'text-blue-500', bgColor: 'bg-blue-500/10', activeGradient: 'from-blue-400 to-cyan-500', isPremium: true, promptNumber: 4 },
+      { id: 'natural-rewrite', label: 'P5. Réécriture', icon: Sparkles, color: 'text-pink-500', bgColor: 'bg-pink-500/10', activeGradient: 'from-pink-400 to-rose-500', isPremium: true, promptNumber: 5 },
+      { id: 'editorial-quality', label: 'P6. Qualité', icon: FileEdit, color: 'text-teal-500', bgColor: 'bg-teal-500/10', activeGradient: 'from-teal-400 to-cyan-500', isPremium: true, promptNumber: 6 },
+      { id: 'editorial-packaging', label: 'P7. Packaging', icon: FileText, color: 'text-green-500', bgColor: 'bg-green-500/10', activeGradient: 'from-green-400 to-emerald-500', isPremium: true, promptNumber: 7 },
+      { id: 'final-diagnosis', label: 'P8. Diagnostic', icon: Shield, color: 'text-purple-500', bgColor: 'bg-purple-500/10', activeGradient: 'from-purple-400 to-fuchsia-500', isPremium: true, promptNumber: 8 },
     ]
   },
   {
     id: 'moteur-v2',
     label: 'Moteur IA V2',
     icon: '🧬',
-    color: 'from-purple-400 via-violet-500 to-indigo-600',
+    color: 'from-purple-400 to-violet-600',
     isPremiumCategory: true,
     items: [
-      { id: 'editorial-memory', label: '9. Mémoire Éditoriale', icon: Brain, color: 'text-purple-500', bgColor: 'bg-purple-500/10', activeGradient: 'from-purple-400 to-violet-500', isPremium: true, promptNumber: 9 },
-      { id: 'chapter-coherence', label: '10. Cohérence Inter-Chap', icon: GitBranch, color: 'text-indigo-500', bgColor: 'bg-indigo-500/10', activeGradient: 'from-indigo-400 to-blue-500', isPremium: true, promptNumber: 10 },
-      { id: 'self-critique', label: '11. Auto-Critique IA', icon: Eye, color: 'text-rose-500', bgColor: 'bg-rose-500/10', activeGradient: 'from-rose-400 to-pink-500', isPremium: true, promptNumber: 11 },
-      { id: 'iterative-loop', label: '12. Amélioration Loop', icon: RefreshCw, color: 'text-cyan-500', bgColor: 'bg-cyan-500/10', activeGradient: 'from-cyan-400 to-teal-500', isPremium: true, promptNumber: 12 },
-      { id: 'style-signature', label: '13. Signature Style', icon: Fingerprint, color: 'text-amber-500', bgColor: 'bg-amber-500/10', activeGradient: 'from-amber-400 to-orange-500', isPremium: true, promptNumber: 13 },
-      { id: 'ultimate-verdict', label: '14. Verdict Ultime', icon: Award, color: 'text-yellow-500', bgColor: 'bg-yellow-500/10', activeGradient: 'from-yellow-400 to-amber-500', isPremium: true, promptNumber: 14 },
-    ]
-  },
-  {
-    id: 'gestion',
-    label: 'Gestion & Projet',
-    icon: '📁',
-    color: 'from-violet-500 via-purple-500 to-indigo-500',
-    isPremiumCategory: false,
-    items: [
-      { id: 'projects', label: 'Mes Projets', icon: FolderOpen, color: 'text-violet-500', bgColor: 'bg-violet-500/10', activeGradient: 'from-violet-500 to-purple-500' },
-      { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, color: 'text-cyan-500', bgColor: 'bg-cyan-500/10', activeGradient: 'from-cyan-500 to-blue-500' },
-      { id: 'analytics', label: 'Analytics Pro', icon: BarChart3, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10', activeGradient: 'from-emerald-500 to-teal-500' },
-      { id: 'settings', label: 'Paramètres', icon: Settings, color: 'text-slate-500', bgColor: 'bg-slate-500/10', activeGradient: 'from-slate-500 to-gray-500' },
+      { id: 'editorial-memory', label: 'P9. Mémoire', icon: Brain, color: 'text-purple-500', bgColor: 'bg-purple-500/10', activeGradient: 'from-purple-400 to-violet-500', isPremium: true, promptNumber: 9 },
+      { id: 'chapter-coherence', label: 'P10. Cohérence', icon: GitBranch, color: 'text-indigo-500', bgColor: 'bg-indigo-500/10', activeGradient: 'from-indigo-400 to-blue-500', isPremium: true, promptNumber: 10 },
+      { id: 'self-critique', label: 'P11. Auto-Critique', icon: Eye, color: 'text-rose-500', bgColor: 'bg-rose-500/10', activeGradient: 'from-rose-400 to-pink-500', isPremium: true, promptNumber: 11 },
+      { id: 'iterative-loop', label: 'P12. Amélioration', icon: RefreshCw, color: 'text-cyan-500', bgColor: 'bg-cyan-500/10', activeGradient: 'from-cyan-400 to-teal-500', isPremium: true, promptNumber: 12 },
+      { id: 'style-signature', label: 'P13. Style', icon: Fingerprint, color: 'text-amber-500', bgColor: 'bg-amber-500/10', activeGradient: 'from-amber-400 to-orange-500', isPremium: true, promptNumber: 13 },
+      { id: 'ultimate-verdict', label: 'P14. Verdict', icon: Award, color: 'text-yellow-500', bgColor: 'bg-yellow-500/10', activeGradient: 'from-yellow-400 to-amber-500', isPremium: true, promptNumber: 14 },
     ]
   },
   {
     id: 'creation',
-    label: 'Création & Rédaction',
+    label: 'Création',
     icon: '✍️',
-    color: 'from-fuchsia-500 via-pink-500 to-rose-500',
-    isPremiumCategory: false,
+    color: 'from-fuchsia-500 to-pink-500',
     items: [
-      { id: 'url-import', label: '🔗 Import URL', icon: Link, color: 'text-violet-500', bgColor: 'bg-gradient-to-r from-violet-500/20 to-purple-500/20', activeGradient: 'from-violet-500 to-purple-500', isPremium: true, isNew2026: true },
-      { id: 'doc-transform', label: '📄 Import Word/Doc', icon: FileText, color: 'text-blue-500', bgColor: 'bg-gradient-to-r from-blue-500/20 to-cyan-500/20', activeGradient: 'from-blue-500 to-cyan-500', isPremium: true, isNew2026: true },
+      { id: 'url-import', label: 'Import URL', icon: Link, color: 'text-violet-500', bgColor: 'bg-violet-500/10', activeGradient: 'from-violet-500 to-purple-500', isNew2026: true },
+      { id: 'doc-transform', label: 'Import Word', icon: FileText, color: 'text-blue-500', bgColor: 'bg-blue-500/10', activeGradient: 'from-blue-500 to-cyan-500', isNew2026: true },
       { id: 'planner', label: 'Planificateur', icon: BookOpen, color: 'text-fuchsia-500', bgColor: 'bg-fuchsia-500/10', activeGradient: 'from-fuchsia-500 to-pink-500' },
-      { id: 'templates', label: 'Templates', icon: LayoutTemplate, color: 'text-cyan-500', bgColor: 'bg-cyan-500/10', activeGradient: 'from-cyan-500 to-teal-500' },
-      { id: 'encyclopedia', label: 'Encyclopédie', icon: BookMarked, color: 'text-amber-500', bgColor: 'bg-amber-500/10', activeGradient: 'from-amber-500 to-orange-500', isNew2026: true },
-      { id: 'atlas', label: 'Atlas', icon: Map, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10', activeGradient: 'from-emerald-500 to-teal-500', isNew2026: true },
       { id: 'writing', label: 'Rédaction', icon: PenTool, color: 'text-blue-500', bgColor: 'bg-blue-500/10', activeGradient: 'from-blue-500 to-cyan-500' },
-      { id: 'assistant', label: 'Assistant IA', icon: FileEdit, color: 'text-purple-500', bgColor: 'bg-purple-500/10', activeGradient: 'from-purple-500 to-violet-500' },
       { id: 'aichat', label: 'Chat IA', icon: Bot, color: 'text-orange-500', bgColor: 'bg-orange-500/10', activeGradient: 'from-orange-500 to-amber-500' },
       { id: 'characters', label: 'Personnages', icon: Users, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10', activeGradient: 'from-emerald-500 to-teal-500' },
-      { id: 'series', label: 'Série / Saga', icon: BookCopy, color: 'text-indigo-500', bgColor: 'bg-indigo-500/10', activeGradient: 'from-indigo-500 to-purple-500', isNew2026: true },
-      { id: 'coloring-book', label: '🖍️ Livre Coloriage', icon: Palette, color: 'text-pink-500', bgColor: 'bg-gradient-to-r from-pink-500/20 to-purple-500/20', activeGradient: 'from-pink-500 to-purple-500', isPremium: true, isNew2026: true },
-      { id: 'comic-book', label: '💬 Bande Dessinée', icon: LayoutTemplate, color: 'text-amber-500', bgColor: 'bg-gradient-to-r from-amber-500/20 to-orange-500/20', activeGradient: 'from-amber-500 to-orange-500', isPremium: true, isNew2026: true },
-      { id: 'documentary', label: '📚 Documentaires', icon: BookMarked, color: 'text-blue-500', bgColor: 'bg-gradient-to-r from-blue-500/20 to-indigo-500/20', activeGradient: 'from-blue-500 to-indigo-500', isPremium: true, isNew2026: true },
-      { id: 'diary-generator', label: '💕 Agendas & Journaux', icon: BookHeart, color: 'text-pink-500', bgColor: 'bg-gradient-to-r from-pink-500/20 to-rose-500/20', activeGradient: 'from-pink-500 to-rose-500', isPremium: true, isNew2026: true },
-      { id: 'voice', label: 'Dictée Vocale', icon: Volume2, color: 'text-rose-500', bgColor: 'bg-rose-500/10', activeGradient: 'from-rose-500 to-pink-500' },
+      { id: 'encyclopedia', label: 'Encyclopédie', icon: BookMarked, color: 'text-amber-500', bgColor: 'bg-amber-500/10', activeGradient: 'from-amber-500 to-orange-500' },
+      { id: 'atlas', label: 'Atlas', icon: Map, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10', activeGradient: 'from-emerald-500 to-teal-500' },
+      { id: 'series', label: 'Série / Saga', icon: BookCopy, color: 'text-indigo-500', bgColor: 'bg-indigo-500/10', activeGradient: 'from-indigo-500 to-purple-500' },
     ]
   },
   {
     id: 'visuels',
-    label: 'Visuels & Design',
+    label: 'Visuels',
     icon: '🎨',
-    color: 'from-rose-500 via-red-500 to-orange-500',
-    isPremiumCategory: false,
+    color: 'from-rose-500 to-orange-500',
     items: [
       { id: 'cover', label: 'Couverture', icon: Palette, color: 'text-rose-500', bgColor: 'bg-rose-500/10', activeGradient: 'from-rose-500 to-red-500' },
       { id: 'backcover', label: '4e Couverture', icon: BookCopy, color: 'text-red-500', bgColor: 'bg-red-500/10', activeGradient: 'from-red-500 to-rose-500' },
       { id: 'images', label: 'Images IA', icon: Image, color: 'text-amber-500', bgColor: 'bg-amber-500/10', activeGradient: 'from-amber-500 to-orange-500' },
       { id: 'imagebank', label: 'Banque Images', icon: ImagePlus, color: 'text-lime-500', bgColor: 'bg-lime-500/10', activeGradient: 'from-lime-500 to-green-500' },
-      { id: 'library', label: 'Bibliothèque', icon: FolderOpen, color: 'text-teal-500', bgColor: 'bg-teal-500/10', activeGradient: 'from-teal-500 to-cyan-500' },
     ]
   },
   {
     id: 'publication',
-    label: 'Publication & Export',
+    label: 'Publication',
     icon: '📤',
-    color: 'from-teal-500 via-cyan-500 to-sky-500',
-    isPremiumCategory: false,
+    color: 'from-teal-500 to-cyan-500',
     items: [
-      { id: 'kdp-research', label: '🔍 Recherche KDP', icon: Search, color: 'text-amber-500', bgColor: 'bg-gradient-to-r from-amber-500/20 to-orange-500/20', activeGradient: 'from-amber-500 to-orange-500', isPremium: true, isNew2026: true },
-      { id: 'amazon-simulator', label: '🛒 Simulateur Amazon', icon: Eye, color: 'text-orange-500', bgColor: 'bg-gradient-to-r from-orange-500/20 to-amber-500/20', activeGradient: 'from-orange-500 to-amber-500', isPremium: true, isNew2026: true },
-      { id: 'plagiarism-validator', label: '🛡️ Anti-Plagiat', icon: Shield, color: 'text-red-500', bgColor: 'bg-gradient-to-r from-red-500/20 to-rose-500/20', activeGradient: 'from-red-500 to-rose-500', isPremium: true, isNew2026: true },
-      { id: 'editor-audit', label: 'Audit Éditeur', icon: FileEdit, color: 'text-violet-500', bgColor: 'bg-violet-500/10', activeGradient: 'from-violet-500 to-purple-500' },
+      { id: 'kdp-research', label: 'Recherche KDP', icon: Search, color: 'text-amber-500', bgColor: 'bg-amber-500/10', activeGradient: 'from-amber-500 to-orange-500', isNew2026: true },
+      { id: 'amazon-simulator', label: 'Simulateur Amazon', icon: Eye, color: 'text-orange-500', bgColor: 'bg-orange-500/10', activeGradient: 'from-orange-500 to-amber-500', isNew2026: true },
+      { id: 'plagiarism-validator', label: 'Anti-Plagiat', icon: Shield, color: 'text-red-500', bgColor: 'bg-red-500/10', activeGradient: 'from-red-500 to-rose-500', isNew2026: true },
       { id: 'export', label: 'Exporter', icon: Download, color: 'text-teal-500', bgColor: 'bg-teal-500/10', activeGradient: 'from-teal-500 to-cyan-500' },
       { id: 'kdp', label: 'Amazon KDP', icon: TrendingUp, color: 'text-sky-500', bgColor: 'bg-sky-500/10', activeGradient: 'from-sky-500 to-blue-500' },
-      { id: 'kdp-analytics', label: 'KDP Analytics', icon: TrendingUp, color: 'text-cyan-500', bgColor: 'bg-cyan-500/10', activeGradient: 'from-cyan-500 to-blue-500' },
-      { id: 'market', label: 'Analyse Marché', icon: BarChart3, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10', activeGradient: 'from-emerald-500 to-green-500' },
-      { id: 'statistics', label: 'Stats & Outils', icon: BarChart3, color: 'text-slate-500', bgColor: 'bg-slate-500/10', activeGradient: 'from-slate-500 to-gray-500' },
     ]
   },
   {
     id: 'marketing',
-    label: 'Marketing & Monétisation',
+    label: 'Marketing',
     icon: '💰',
-    color: 'from-green-500 via-emerald-500 to-teal-500',
-    isPremiumCategory: false,
+    color: 'from-green-500 to-emerald-500',
     items: [
-      { id: 'amazon-ads', label: '🎯 Amazon Ads', icon: Target, color: 'text-orange-500', bgColor: 'bg-gradient-to-r from-orange-500/20 to-amber-500/20', activeGradient: 'from-orange-500 to-amber-500', isPremium: true, isNew2026: true },
-      { id: 'launch-plan', label: '📅 Plan Lancement 30j', icon: Rocket, color: 'text-violet-500', bgColor: 'bg-gradient-to-r from-violet-500/20 to-purple-500/20', activeGradient: 'from-violet-500 to-purple-500', isPremium: true, isNew2026: true },
-      { id: 'seo-articles', label: '📝 Articles SEO', icon: Globe, color: 'text-emerald-500', bgColor: 'bg-gradient-to-r from-emerald-500/20 to-teal-500/20', activeGradient: 'from-emerald-500 to-teal-500', isPremium: true, isNew2026: true },
+      { id: 'amazon-ads', label: 'Amazon Ads', icon: Target, color: 'text-orange-500', bgColor: 'bg-orange-500/10', activeGradient: 'from-orange-500 to-amber-500', isNew2026: true },
+      { id: 'launch-plan', label: 'Plan Lancement', icon: Rocket, color: 'text-violet-500', bgColor: 'bg-violet-500/10', activeGradient: 'from-violet-500 to-purple-500', isNew2026: true },
+      { id: 'seo-articles', label: 'Articles SEO', icon: Globe, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10', activeGradient: 'from-emerald-500 to-teal-500', isNew2026: true },
       { id: 'marketing', label: 'Marketing', icon: MessageSquare, color: 'text-pink-500', bgColor: 'bg-pink-500/10', activeGradient: 'from-pink-500 to-rose-500' },
       { id: 'monetization', label: 'Monétisation', icon: DollarSign, color: 'text-green-500', bgColor: 'bg-green-500/10', activeGradient: 'from-green-500 to-emerald-500' },
-      { id: 'price-estimator', label: 'Estimations Prix', icon: DollarSign, color: 'text-yellow-500', bgColor: 'bg-yellow-500/10', activeGradient: 'from-yellow-500 to-amber-500' },
-      { id: 'affiliation', label: 'Affiliation', icon: Handshake, color: 'text-amber-500', bgColor: 'bg-amber-500/10', activeGradient: 'from-amber-500 to-yellow-500' },
     ]
   },
   {
     id: 'audio',
     label: 'Audio & Formation',
     icon: '🎧',
-    color: 'from-purple-500 via-violet-500 to-indigo-500',
-    isPremiumCategory: false,
+    color: 'from-purple-500 to-violet-500',
     items: [
       { id: 'audiobook', label: 'Livre Audio', icon: Headphones, color: 'text-purple-500', bgColor: 'bg-purple-500/10', activeGradient: 'from-purple-500 to-violet-500' },
-      { id: 'formation-complete', label: 'Formation Complète', icon: GraduationCap, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10', activeGradient: 'from-emerald-500 to-teal-500', isLink: true, href: '/formation' },
-      { id: 'formation-pdf', label: 'Formation PDF', icon: FileText, color: 'text-orange-500', bgColor: 'bg-orange-500/10', activeGradient: 'from-orange-500 to-red-500' },
-      { id: 'formation-audio', label: 'Formation Audio', icon: Headphones, color: 'text-purple-500', bgColor: 'bg-purple-500/10', activeGradient: 'from-purple-500 to-violet-500', isLink: true, href: '/formation-audio' },
+      { id: 'formation-complete', label: 'Formation', icon: GraduationCap, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10', activeGradient: 'from-emerald-500 to-teal-500', isLink: true, href: '/formation' },
+      { id: 'voice', label: 'Dictée Vocale', icon: Volume2, color: 'text-rose-500', bgColor: 'bg-rose-500/10', activeGradient: 'from-rose-500 to-pink-500' },
     ]
   },
   {
     id: 'outils',
-    label: 'Outils & Compte',
-    icon: '🔧',
-    color: 'from-indigo-500 via-blue-500 to-sky-500',
-    isPremiumCategory: false,
+    label: 'Outils',
+    icon: '⚙️',
+    color: 'from-slate-500 to-gray-500',
     items: [
-      { id: 'tools', label: 'Outils IA', icon: Wand2, color: 'text-indigo-500', bgColor: 'bg-indigo-500/10', activeGradient: 'from-indigo-500 to-violet-500' },
-      { id: 'subscription', label: 'Mon Abonnement', icon: CreditCard, color: 'text-purple-500', bgColor: 'bg-purple-500/10', activeGradient: 'from-purple-500 to-pink-500', isLink: true, href: '/subscription' },
-      { id: 'demo', label: 'Essai Gratuit', icon: Play, color: 'text-green-500', bgColor: 'bg-green-500/10', activeGradient: 'from-green-500 to-emerald-500', isLink: true, href: '/demo' },
-      { id: 'offres', label: 'Voir les Offres', icon: Sparkles, color: 'text-amber-500', bgColor: 'bg-amber-500/10', activeGradient: 'from-yellow-500 to-orange-500', isLink: true, href: '/offres' },
-      { id: 'admin', label: 'Admin / Abonnés', icon: Shield, color: 'text-red-500', bgColor: 'bg-red-500/10', activeGradient: 'from-red-500 to-orange-500' },
+      { id: 'projects', label: 'Mes Projets', icon: FolderOpen, color: 'text-violet-500', bgColor: 'bg-violet-500/10', activeGradient: 'from-violet-500 to-purple-500' },
+      { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, color: 'text-cyan-500', bgColor: 'bg-cyan-500/10', activeGradient: 'from-cyan-500 to-blue-500' },
+      { id: 'settings', label: 'Paramètres', icon: Settings, color: 'text-slate-500', bgColor: 'bg-slate-500/10', activeGradient: 'from-slate-500 to-gray-500' },
+      { id: 'subscription', label: 'Abonnement', icon: CreditCard, color: 'text-purple-500', bgColor: 'bg-purple-500/10', activeGradient: 'from-purple-500 to-pink-500', isLink: true, href: '/subscription' },
+      { id: 'offres', label: 'Offres', icon: Sparkles, color: 'text-amber-500', bgColor: 'bg-amber-500/10', activeGradient: 'from-yellow-500 to-orange-500', isLink: true, href: '/offres' },
     ]
   },
 ];
 
-// Composant d'affichage des quotas compact
+// Composant Quota compact
 const QuotaDisplay: React.FC<{ isCollapsed: boolean }> = ({ isCollapsed }) => {
   const navigate = useNavigate();
   const { quotas, isLoading, hasSubscription } = useUserQuotas();
 
-  if (isLoading) {
-    return null;
-  }
-
-  if (!hasSubscription || !quotas) {
+  if (isLoading || !hasSubscription || !quotas) {
     return (
-      <div className={cn(
-        "border-t border-border/50 p-2",
-        isCollapsed && "flex justify-center"
-      )}>
-        {isCollapsed ? (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate('/offres')}
-                className="w-8 h-8 p-0"
-              >
-                <Crown className="w-4 h-4 text-amber-500" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="right">
-              <p className="text-xs">Souscrire à une offre</p>
-            </TooltipContent>
-          </Tooltip>
-        ) : (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate('/offres')}
-            className="w-full justify-start text-xs text-amber-500 hover:text-amber-600"
-          >
-            <Crown className="w-3.5 h-3.5 mr-2" />
-            Souscrire à une offre
-          </Button>
-        )}
+      <div className={cn("border-t border-white/10 p-3", isCollapsed && "flex justify-center")}>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate('/offres')}
+          className={cn(
+            "bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600",
+            isCollapsed ? "w-8 h-8 p-0" : "w-full"
+          )}
+        >
+          {isCollapsed ? <Crown className="w-4 h-4" /> : (
+            <>
+              <Crown className="w-4 h-4 mr-2" />
+              Débloquer PRO
+            </>
+          )}
+        </Button>
       </div>
     );
   }
 
-  const ebookPercentage = getQuotaPercentage(quotas.ebook_plans);
   const isUnlimited = quotas.ebook_plans.limit === -1;
+  const ebookPercentage = getQuotaPercentage(quotas.ebook_plans);
 
   return (
-    <div className={cn(
-      "border-t border-border/50 p-2",
-      isCollapsed && "flex justify-center"
-    )}>
+    <div className={cn("border-t border-white/10 p-3", isCollapsed && "flex justify-center")}>
       {isCollapsed ? (
         <Tooltip>
           <TooltipTrigger asChild>
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center cursor-pointer" onClick={() => navigate('/offres')}>
-              <Zap className="w-4 h-4 text-primary" />
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500/20 to-purple-500/20 flex items-center justify-center">
+              <Zap className="w-4 h-4 text-violet-400" />
             </div>
           </TooltipTrigger>
-          <TooltipContent side="right" className="text-xs">
+          <TooltipContent side="right">
             <p className="font-medium">{quotas.plan.toUpperCase()}</p>
-            <p>{isUnlimited ? '∞ Illimité' : `${quotas.ebook_plans.remaining} ebooks restants`}</p>
+            <p className="text-xs text-muted-foreground">
+              {isUnlimited ? '∞ Illimité' : `${quotas.ebook_plans.remaining} restants`}
+            </p>
           </TooltipContent>
         </Tooltip>
       ) : (
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5">
-              <Zap className="w-3.5 h-3.5 text-primary" />
-              <span className="text-[10px] font-medium text-muted-foreground">Quotas</span>
-            </div>
+            <span className="text-xs text-white/60">Plan</span>
             <span className={cn(
-              "text-[10px] font-semibold px-1.5 py-0.5 rounded",
-              quotas.plan === 'lifetime' ? 'bg-purple-500/20 text-purple-500' :
-              quotas.plan === 'pro' ? 'bg-amber-500/20 text-amber-500' :
-              'bg-green-500/20 text-green-500'
+              "text-xs font-bold px-2 py-0.5 rounded-full",
+              quotas.plan === 'lifetime' ? 'bg-violet-500/30 text-violet-300' :
+              quotas.plan === 'pro' ? 'bg-amber-500/30 text-amber-300' :
+              'bg-emerald-500/30 text-emerald-300'
             )}>
               {quotas.plan.toUpperCase()}
             </span>
           </div>
-          
           {isUnlimited ? (
-            <div className="text-[10px] text-center py-1 bg-purple-500/10 rounded text-purple-500 font-medium">
-              ∞ Accès illimité
+            <div className="text-center py-1.5 bg-gradient-to-r from-violet-500/20 to-purple-500/20 rounded-lg">
+              <span className="text-xs font-medium text-violet-300">∞ Accès illimité</span>
             </div>
           ) : (
             <>
-              <div className="flex items-center justify-between text-[10px]">
-                <span className="text-muted-foreground">Ebooks</span>
-                <span className="font-medium">{quotas.ebook_plans.remaining}/{quotas.ebook_plans.limit}</span>
+              <div className="flex justify-between text-xs">
+                <span className="text-white/60">Ebooks</span>
+                <span className="text-white/90">{quotas.ebook_plans.remaining}/{quotas.ebook_plans.limit}</span>
               </div>
-              <Progress value={ebookPercentage} className="h-1" />
+              <Progress value={ebookPercentage} className="h-1.5 bg-white/10" />
             </>
-          )}
-          
-          {quotas.plan !== 'lifetime' && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate('/offres')}
-              className="w-full h-6 text-[10px] text-primary hover:text-primary/80"
-            >
-              <Crown className="w-3 h-3 mr-1" />
-              Upgrade
-            </Button>
           )}
         </div>
       )}
@@ -365,23 +303,50 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
   onToggleCollapse
 }) => {
   const navigate = useNavigate();
-  
-  // Find which category contains the active tab
+  const [searchQuery, setSearchQuery] = useState('');
+  const [expandedCategories, setExpandedCategories] = useState<string[]>(['quick-actions']);
+  const [favorites, setFavorites] = useState<string[]>(() => {
+    const saved = localStorage.getItem('sidebar-favorites');
+    return saved ? JSON.parse(saved) : ['complete-workflow', 'comic-book', 'coloring-book'];
+  });
+
+  // Filtrer les items par recherche
+  const filteredCategories = useMemo(() => {
+    if (!searchQuery.trim()) return categories;
+    
+    const query = searchQuery.toLowerCase();
+    return categories.map(cat => ({
+      ...cat,
+      items: cat.items.filter(item => 
+        item.label.toLowerCase().includes(query) ||
+        item.id.toLowerCase().includes(query)
+      )
+    })).filter(cat => cat.items.length > 0);
+  }, [searchQuery]);
+
+  // Favoris avec données complètes
+  const favoriteItems = useMemo(() => {
+    const allItems = categories.flatMap(c => c.items);
+    return favorites.map(id => allItems.find(item => item.id === id)).filter(Boolean) as MenuItem[];
+  }, [favorites]);
+
+  const toggleFavorite = (itemId: string) => {
+    const newFavorites = favorites.includes(itemId)
+      ? favorites.filter(id => id !== itemId)
+      : [...favorites, itemId];
+    setFavorites(newFavorites);
+    localStorage.setItem('sidebar-favorites', JSON.stringify(newFavorites));
+  };
+
   const activeCategoryId = categories.find(cat => 
     cat.items.some(item => item.id === activeTab)
   )?.id;
-  
-  const [expandedCategories, setExpandedCategories] = useState<string[]>(() => {
-    // Open all categories by default, but ensure the active one is always open
-    return categories.map(c => c.id);
-  });
 
-  // Ensure the category with the active tab is always expanded
   React.useEffect(() => {
     if (activeCategoryId && !expandedCategories.includes(activeCategoryId)) {
       setExpandedCategories(prev => [...prev, activeCategoryId]);
     }
-  }, [activeCategoryId, expandedCategories]);
+  }, [activeCategoryId]);
 
   const toggleCategory = (categoryId: string) => {
     setExpandedCategories(prev => 
@@ -399,233 +364,221 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
     }
   };
 
+  const renderMenuItem = (item: MenuItem, showFavoriteButton = false) => {
+    const isActive = activeTab === item.id;
+    const isFavorite = favorites.includes(item.id);
+    const Icon = item.icon;
+
+    return (
+      <div key={item.id} className="group relative">
+        <button
+          onClick={() => handleItemClick(item)}
+          className={cn(
+            "w-full flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all duration-200",
+            isActive 
+              ? `bg-gradient-to-r ${item.activeGradient} text-white shadow-lg shadow-black/20` 
+              : "hover:bg-white/5 text-white/70 hover:text-white",
+            isCollapsed && "justify-center px-2"
+          )}
+        >
+          <div className={cn(
+            "flex items-center justify-center w-7 h-7 rounded-lg transition-all",
+            isActive ? "bg-white/20" : `${item.bgColor}`
+          )}>
+            <Icon className={cn("w-4 h-4", isActive ? "text-white" : item.color)} />
+          </div>
+          
+          {!isCollapsed && (
+            <>
+              <span className="text-sm font-medium truncate flex-1 text-left">
+                {item.label}
+              </span>
+              
+              {item.isNew2026 && (
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-gradient-to-r from-amber-400 to-orange-500 text-white">
+                  2026
+                </span>
+              )}
+              
+              {item.isPremium && !item.isNew2026 && (
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-violet-500/30 text-violet-300">
+                  PRO
+                </span>
+              )}
+            </>
+          )}
+        </button>
+        
+        {/* Bouton favori */}
+        {showFavoriteButton && !isCollapsed && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleFavorite(item.id);
+            }}
+            className={cn(
+              "absolute right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-md hover:bg-white/10",
+              isFavorite && "opacity-100"
+            )}
+          >
+            <Star className={cn(
+              "w-3.5 h-3.5",
+              isFavorite ? "fill-amber-400 text-amber-400" : "text-white/40"
+            )} />
+          </button>
+        )}
+      </div>
+    );
+  };
+
   return (
     <TooltipProvider delayDuration={0}>
       <aside 
         className={cn(
-          "relative flex flex-col h-screen border-r border-border/50 transition-all duration-300 ease-in-out",
-          "bg-gradient-to-b from-background via-card to-background/95",
-          "before:absolute before:inset-0 before:bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] before:from-violet-500/5 before:via-transparent before:to-transparent before:pointer-events-none",
-          isCollapsed ? "w-16" : "w-60"
+          "relative flex flex-col h-screen transition-all duration-300 ease-out",
+          "bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950",
+          "border-r border-white/5",
+          isCollapsed ? "w-[72px]" : "w-64"
         )}
       >
-        {/* Header */}
+        {/* Header avec Logo */}
         <div className={cn(
-          "flex items-center gap-2 px-3 py-4 border-b border-border/50",
-          isCollapsed && "justify-center"
+          "flex items-center gap-3 p-4 border-b border-white/5",
+          isCollapsed && "justify-center p-3"
         )}>
           <div className="relative">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center shadow-lg shadow-violet-500/20">
-              <Sparkles className="w-4 h-4 text-white" />
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-violet-500 via-purple-500 to-fuchsia-500 flex items-center justify-center shadow-lg shadow-violet-500/30">
+              <Sparkles className="w-5 h-5 text-white" />
             </div>
+            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-slate-900" />
           </div>
           {!isCollapsed && (
-            <div className="animate-fade-in min-w-0">
-              <h1 className="font-bold text-sm text-foreground truncate">Ebook Studio</h1>
-              <p className="text-[10px] text-muted-foreground">Créateur IA</p>
+            <div className="min-w-0">
+              <h1 className="font-bold text-white text-sm">EbookStudio</h1>
+              <p className="text-[11px] text-white/50">Pro Edition 2026</p>
             </div>
           )}
         </div>
 
-        {/* Navigation with Categories */}
-        <nav className="flex-1 py-2 overflow-y-auto scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
-          {categories.map((category) => {
+        {/* Barre de recherche */}
+        {!isCollapsed && (
+          <div className="px-3 py-3">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+              <Input
+                type="text"
+                placeholder="Rechercher..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-3 py-2 h-9 text-sm bg-white/5 border-white/10 text-white placeholder:text-white/30 rounded-xl focus:bg-white/10 focus:border-violet-500/50"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Favoris */}
+        {!isCollapsed && favoriteItems.length > 0 && !searchQuery && (
+          <div className="px-3 pb-2">
+            <div className="flex items-center gap-2 px-2 mb-2">
+              <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+              <span className="text-xs font-medium text-white/50 uppercase tracking-wider">Favoris</span>
+            </div>
+            <div className="space-y-0.5">
+              {favoriteItems.slice(0, 4).map(item => renderMenuItem(item, false))}
+            </div>
+          </div>
+        )}
+
+        {/* Navigation */}
+        <nav className="flex-1 overflow-y-auto py-2 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+          {filteredCategories.map((category) => {
             const isExpanded = expandedCategories.includes(category.id);
             const hasActiveItem = category.items.some(item => item.id === activeTab);
-            const isPremium = category.isPremiumCategory;
-            
-            // Définir les couleurs de fond pour chaque catégorie
-            const categoryBgStyles: Record<string, string> = {
-              'workflow-ia': 'from-amber-500/10 via-orange-500/5 to-red-500/10 border-amber-500/20',
-              'moteur-v2': 'from-purple-500/10 via-violet-500/5 to-indigo-500/10 border-purple-500/20',
-              'gestion': 'from-violet-500/8 via-purple-500/5 to-indigo-500/8 border-violet-500/15',
-              'creation': 'from-fuchsia-500/8 via-pink-500/5 to-rose-500/8 border-fuchsia-500/15',
-              'visuels': 'from-rose-500/8 via-red-500/5 to-orange-500/8 border-rose-500/15',
-              'publication': 'from-teal-500/8 via-cyan-500/5 to-sky-500/8 border-teal-500/15',
-              'marketing': 'from-green-500/8 via-emerald-500/5 to-teal-500/8 border-green-500/15',
-              'audio': 'from-purple-500/8 via-violet-500/5 to-indigo-500/8 border-purple-500/15',
-              'outils': 'from-indigo-500/8 via-blue-500/5 to-sky-500/8 border-indigo-500/15',
-            };
-            
-            const categoryHeaderStyles: Record<string, string> = {
-              'workflow-ia': 'from-amber-500/20 to-orange-500/20 text-amber-600 dark:text-amber-400 hover:from-amber-500/30 hover:to-orange-500/30',
-              'moteur-v2': 'from-purple-500/20 to-violet-500/20 text-purple-600 dark:text-purple-400 hover:from-purple-500/30 hover:to-violet-500/30',
-              'gestion': 'from-violet-500/15 to-purple-500/15 text-violet-600 dark:text-violet-400 hover:from-violet-500/25 hover:to-purple-500/25',
-              'creation': 'from-fuchsia-500/15 to-pink-500/15 text-fuchsia-600 dark:text-fuchsia-400 hover:from-fuchsia-500/25 hover:to-pink-500/25',
-              'visuels': 'from-rose-500/15 to-red-500/15 text-rose-600 dark:text-rose-400 hover:from-rose-500/25 hover:to-red-500/25',
-              'publication': 'from-teal-500/15 to-cyan-500/15 text-teal-600 dark:text-teal-400 hover:from-teal-500/25 hover:to-cyan-500/25',
-              'marketing': 'from-green-500/15 to-emerald-500/15 text-green-600 dark:text-green-400 hover:from-green-500/25 hover:to-emerald-500/25',
-              'audio': 'from-purple-500/15 to-violet-500/15 text-purple-600 dark:text-purple-400 hover:from-purple-500/25 hover:to-violet-500/25',
-              'outils': 'from-indigo-500/15 to-blue-500/15 text-indigo-600 dark:text-indigo-400 hover:from-indigo-500/25 hover:to-blue-500/25',
-            };
-            
-            // Styles de surbrillance au survol
-            const categoryHoverGlow: Record<string, string> = {
-              'workflow-ia': 'hover:shadow-amber-500/20',
-              'moteur-v2': 'hover:shadow-purple-500/20',
-              'gestion': 'hover:shadow-violet-500/15',
-              'creation': 'hover:shadow-fuchsia-500/15',
-              'visuels': 'hover:shadow-rose-500/15',
-              'publication': 'hover:shadow-teal-500/15',
-              'marketing': 'hover:shadow-green-500/15',
-              'audio': 'hover:shadow-purple-500/15',
-              'outils': 'hover:shadow-indigo-500/15',
-            };
-            
+
             return (
-              <div key={category.id} className={cn(
-                "mb-1 transition-all duration-300",
-                !isCollapsed && "mx-2 mb-2 rounded-xl bg-gradient-to-br border overflow-hidden shadow-sm hover:shadow-lg",
-                !isCollapsed && (categoryBgStyles[category.id] || 'from-gray-500/5 to-gray-500/5 border-gray-500/10'),
-                !isCollapsed && (categoryHoverGlow[category.id] || 'hover:shadow-gray-500/10')
-              )}>
-                {/* Category Header */}
+              <div key={category.id} className="px-2 mb-1">
+                {/* Header catégorie */}
                 {!isCollapsed ? (
                   <button
                     onClick={() => toggleCategory(category.id)}
                     className={cn(
-                      "w-full flex items-center justify-between px-3 py-2 text-xs font-semibold transition-all duration-200 bg-gradient-to-r",
-                      categoryHeaderStyles[category.id] || 'from-gray-500/10 to-gray-500/10 text-muted-foreground'
+                      "w-full flex items-center justify-between px-2 py-2 rounded-xl transition-all",
+                      "hover:bg-white/5 text-white/60 hover:text-white/90",
+                      hasActiveItem && "text-white/90"
                     )}
                   >
                     <div className="flex items-center gap-2">
-                      <span className="text-sm">{category.icon}</span>
-                      <span>{category.label}</span>
-                      {isPremium && (
-                        <span className="px-1.5 py-0.5 text-[9px] font-bold rounded bg-gradient-to-r from-amber-500 to-orange-500 text-white uppercase tracking-wider shadow-sm">
+                      <span className="text-base">{category.icon}</span>
+                      <span className="text-xs font-semibold uppercase tracking-wider">{category.label}</span>
+                      {category.isPremiumCategory && (
+                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-gradient-to-r from-violet-500 to-purple-500 text-white">
                           PRO
                         </span>
                       )}
-                      {hasActiveItem && (
-                        <span className={cn(
-                          "w-2 h-2 rounded-full bg-gradient-to-r shadow-sm",
-                          category.color
-                        )} />
-                      )}
                     </div>
-                    <ChevronDown 
-                      className={cn(
-                        "w-3.5 h-3.5 transition-transform duration-200",
-                        isExpanded ? "rotate-0" : "-rotate-90"
-                      )} 
-                    />
+                    <ChevronDown className={cn(
+                      "w-4 h-4 transition-transform",
+                      isExpanded ? "rotate-0" : "-rotate-90"
+                    )} />
                   </button>
                 ) : (
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <div className={cn(
-                        "flex justify-center py-2 mb-1 relative rounded-lg mx-1",
-                        hasActiveItem && "border-l-2 border-primary",
-                        `bg-gradient-to-r ${categoryHeaderStyles[category.id]?.split(' ').slice(0, 2).join(' ') || 'from-gray-500/10 to-gray-500/10'}`
+                        "flex justify-center py-2 mb-1 rounded-xl",
+                        hasActiveItem && "bg-white/10"
                       )}>
-                        <span className="text-sm">{category.icon}</span>
-                        {isPremium && (
-                          <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-amber-500 rounded-full animate-pulse" />
-                        )}
+                        <span className="text-lg">{category.icon}</span>
                       </div>
                     </TooltipTrigger>
-                    <TooltipContent side="right" className="font-medium text-xs">
-                      {category.label} {isPremium && '⭐'}
+                    <TooltipContent side="right">
+                      <p className="font-medium">{category.label}</p>
                     </TooltipContent>
                   </Tooltip>
                 )}
 
-                {/* Category Items */}
-                <div className={cn(
-                  "overflow-hidden transition-all duration-200",
-                  !isCollapsed && !isExpanded && "max-h-0",
-                  !isCollapsed && isExpanded && "max-h-[500px]",
-                  !isCollapsed && !isPremium && "px-2"
-                )}>
+                {/* Items */}
+                {!isCollapsed && (
                   <div className={cn(
-                    "space-y-0.5",
-                    !isCollapsed && isExpanded && "pb-2 max-h-[280px] overflow-y-auto scrollbar-thin scrollbar-thumb-border/50 scrollbar-track-transparent pr-1",
-                    isPremium && "px-2"
+                    "overflow-hidden transition-all duration-200 pl-2",
+                    isExpanded ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
                   )}>
-                    {category.items.map((item) => {
-                      const isActive = activeTab === item.id;
-                      const Icon = item.icon;
-                      const premiumItem = item as PremiumMenuItem;
-                      
-                      const button = (
-                        <button
-                          onClick={() => handleItemClick(item)}
-                          className={cn(
-                            "group relative w-full flex items-center gap-2 px-2 py-1.5 rounded-lg transition-all duration-200",
-                            isActive 
-                              ? `bg-gradient-to-r ${item.activeGradient} text-white shadow-md` 
-                              : premiumItem.isPremium
-                                ? `hover:bg-amber-500/10 ${item.color}`
-                                : `hover:${item.bgColor} ${item.color}`,
-                            isCollapsed && "justify-center px-2"
-                          )}
-                        >
-                          <div className={cn(
-                            "flex items-center justify-center w-6 h-6 rounded-md transition-all",
-                            isActive ? "bg-white/20" : item.bgColor
-                          )}>
-                            <Icon className="w-3.5 h-3.5" />
-                          </div>
-                          
-                          {!isCollapsed && (
-                            <span className={cn(
-                              "text-xs font-medium truncate flex items-center gap-1",
-                              isActive ? "text-white" : ""
-                            )}>
-                              {item.label}
-                              {item.isLink && <span className="ml-1 text-[10px] opacity-60">↗</span>}
-                            </span>
-                          )}
-                          
-                          {/* Badge 2026 - uniquement sur les nouvelles fonctionnalités */}
-                          {!isCollapsed && premiumItem.isNew2026 && (
-                            <span className={cn(
-                              "ml-auto text-[8px] font-bold px-1 py-0.5 rounded",
-                              isActive 
-                                ? "bg-white/20 text-white" 
-                                : "bg-gradient-to-r from-amber-500 to-orange-500 text-white"
-                            )}>
-                              2026
-                            </span>
-                          )}
-                          
-                          {/* Indicateur de numéro pour les prompts premium (supprimé - remplacé par badge 2026) */}
-                        </button>
-                      );
-
-                      if (isCollapsed) {
-                        return (
-                          <Tooltip key={item.id}>
-                            <TooltipTrigger asChild>
-                              {button}
-                            </TooltipTrigger>
-                            <TooltipContent side="right" className="font-medium text-xs">
-                              {premiumItem.isPremium && `${premiumItem.promptNumber}. `}{item.label}
-                            </TooltipContent>
-                          </Tooltip>
-                        );
-                      }
-
-                      return <div key={item.id}>{button}</div>;
-                    })}
+                    <div className="space-y-0.5 py-1">
+                      {category.items.map(item => renderMenuItem(item, true))}
+                    </div>
                   </div>
-                </div>
+                )}
+
+                {isCollapsed && (
+                  <div className="space-y-1">
+                    {category.items.map(item => (
+                      <Tooltip key={item.id}>
+                        <TooltipTrigger asChild>
+                          {renderMenuItem(item, false)}
+                        </TooltipTrigger>
+                        <TooltipContent side="right">
+                          <p className="font-medium">{item.label}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    ))}
+                  </div>
+                )}
               </div>
             );
           })}
         </nav>
 
-        {/* Quota Display */}
+        {/* Quota */}
         <QuotaDisplay isCollapsed={isCollapsed} />
 
-        {/* Collapse Toggle */}
-        <div className="p-2 border-t border-border/50">
+        {/* Toggle */}
+        <div className="p-2 border-t border-white/5">
           <Button
             variant="ghost"
             size="sm"
             onClick={onToggleCollapse}
             className={cn(
-              "w-full h-8 flex items-center gap-2 text-muted-foreground hover:text-foreground text-xs",
+              "w-full h-9 flex items-center gap-2 text-white/50 hover:text-white hover:bg-white/5 rounded-xl",
               isCollapsed && "justify-center"
             )}
           >
@@ -634,7 +587,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
             ) : (
               <>
                 <ChevronLeft className="w-4 h-4" />
-                <span>Réduire</span>
+                <span className="text-xs">Réduire</span>
               </>
             )}
           </Button>
