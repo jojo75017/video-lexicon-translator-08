@@ -518,12 +518,14 @@ EXPRESSION STYLE: ${artStyle === 'manga' ? 'Large expressive eyes, anime style' 
 
       const artStylePrompt = getArtStylePrompt();
 
+      // Génération SÉQUENTIELLE des panels pour éviter les erreurs de rate-limit
+      const panels: ComicPanel[] = [];
+      
       for (let panelIndex = 0; panelIndex < panelCount; panelIndex++) {
-        const panelPromise = (async () => {
-          const dialogue = pageScenario.dialogues[panelIndex] || { character: mainCharacter, text: '' };
-          
-          // Prompt ultra-détaillé pour cohérence maximale
-          const imagePrompt = `${seedInfo}SINGLE COMIC PANEL - Panel ${panelIndex + 1} of ${panelCount}
+        const dialogue = pageScenario.dialogues[panelIndex] || { character: mainCharacter, text: '' };
+        
+        // Prompt ultra-détaillé pour cohérence maximale
+        const imagePrompt = `${seedInfo}SINGLE COMIC PANEL - Panel ${panelIndex + 1} of ${panelCount}
 
 === MANDATORY STYLE RULES ===
 ${artStylePrompt}
@@ -548,73 +550,62 @@ ${sceneMoments[panelIndex]}
 ✓ Same lighting direction (top-left)
 ✓ Same level of background detail`;
 
-          try {
-            const { data: imageData, error: imageError } = await supabase.functions.invoke('generate-chapter-images', {
-              body: {
-                chapterTitle: `Page ${pageIndex + 1} Panel ${panelIndex + 1}`,
-                ebookTitle: title || 'Bande Dessinée',
-                style: artStylePrompt,
-                ratio: 'square',
-                quality: 'hd',
-                colorScheme: colorMode === 'bw' ? 'monochrome' : colorMode,
-                customPrompt: imagePrompt,
-                seed: visualSeed || undefined,
-                // Utilise la clé OpenAI de l'utilisateur si dispo (sinon, risque de placeholder sombre)
-                useOpenAI,
-                openaiApiKey: useOpenAI ? userApiKey : undefined,
-              }
-            });
-
-            if (imageError) throw imageError;
-
-            const url = imageData?.imageUrl || imageData?.url || '';
-            if (url.includes('placehold.co')) {
-              toast.warning('Images de BD en mode dégradé (crédits image épuisés). Ajoutez votre clé OpenAI dans Paramètres → API.', { duration: 6000 });
-            }
-
-            return {
-              imageUrl: url,
-              dialogue: dialogue.text,
-              character: dialogue.character,
-              action: sceneMoments[panelIndex]
-            };
-          } catch (err) {
-            console.error(`Erreur panel ${panelIndex + 1}:`, err);
-            return null;
+        try {
+          // Délai entre les appels pour éviter le rate-limiting (sauf premier panel)
+          if (panelIndex > 0) {
+            await new Promise(resolve => setTimeout(resolve, 1500));
           }
 
-        })();
+          const { data: imageData, error: imageError } = await supabase.functions.invoke('generate-chapter-images', {
+            body: {
+              chapterTitle: `Page ${pageIndex + 1} Panel ${panelIndex + 1}`,
+              ebookTitle: title || 'Bande Dessinée',
+              style: artStylePrompt,
+              ratio: 'square',
+              quality: 'hd',
+              colorScheme: colorMode === 'bw' ? 'monochrome' : colorMode,
+              customPrompt: imagePrompt,
+              seed: visualSeed || undefined,
+              useOpenAI,
+              openaiApiKey: useOpenAI ? userApiKey : undefined,
+            }
+          });
 
-        panelPromises.push(panelPromise);
+          if (imageError) throw imageError;
+
+          const url = imageData?.imageUrl || imageData?.url || '';
+          if (url.includes('placehold.co')) {
+            toast.warning('Images de BD en mode dégradé. Ajoutez votre clé OpenAI dans Paramètres.', { duration: 4000 });
+          }
+
+          panels.push({
+            id: `panel-${pageIndex}-${panelIndex}`,
+            imageUrl: url,
+            dialogue: dialogue.text,
+            character: dialogue.character,
+            action: sceneMoments[panelIndex]
+          });
+
+          // Mise à jour de progression par panel
+          const progressPerPanel = 100 / (panelCount * scenario!.pages.length);
+          setCurrentProgress(prev => Math.min(prev + progressPerPanel / 2, 95));
+
+        } catch (err) {
+          console.error(`Erreur panel ${panelIndex + 1}:`, err);
+          // En cas d'erreur, ajouter un placeholder au lieu de rien
+          panels.push({
+            id: `panel-${pageIndex}-${panelIndex}`,
+            imageUrl: '',
+            dialogue: dialogue.text,
+            character: dialogue.character,
+            action: sceneMoments[panelIndex]
+          });
+        }
       }
-
-      const panelResults = await Promise.all(panelPromises);
 
       // Générer seed si première page
       if (pageIndex === 0 && !visualSeed) {
         setVisualSeed(`comic-${Date.now()}`);
-      }
-
-      const panels: ComicPanel[] = panelResults
-        .filter((p): p is NonNullable<typeof p> => p !== null)
-        .map((p, i) => ({
-          id: `panel-${pageIndex}-${i}`,
-          imageUrl: p.imageUrl,
-          dialogue: p.dialogue,
-          character: p.character,
-          action: p.action
-        }));
-
-      // Remplir les panels manquants avec des placeholders selon le layout choisi
-      const targetPanelCount = selectedLayout?.panelsPerPage || 4;
-      while (panels.length < targetPanelCount) {
-        panels.push({
-          id: `panel-${pageIndex}-${panels.length}`,
-          imageUrl: '',
-          dialogue: '',
-          character: mainCharacter,
-          action: ''
-        });
       }
 
       return {
