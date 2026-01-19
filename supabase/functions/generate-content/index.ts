@@ -1185,12 +1185,15 @@ Réponds UNIQUEMENT avec du JSON valide, sans markdown, sans \`\`\`, sans commen
     }
 
     // Handle documentary book generation (structure, chapters, regeneration)
-    // Use Lovable AI by default, fallback to user's OpenAI key if provided
+    // Prioritize user's OpenAI key if provided, fallback to Lovable AI
     if (type === 'documentary-structure' || type === 'documentary-chapter' || type === 'documentary-chapter-regen') {
       console.log(`Processing ${type} generation...`);
+      console.log(`useOpenAI flag: ${useOpenAI}, has openaiApiKey: ${!!openaiApiKey}`);
 
       const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
       const userOpenAIKey = (useOpenAI && openaiApiKey) ? openaiApiKey : null;
+      
+      console.log(`User OpenAI key provided: ${!!userOpenAIKey}`);
       
       const systemPrompt = type === 'documentary-structure'
         ? `Tu es un auteur documentaire professionnel spécialisé dans la création de livres factuels de haute qualité.
@@ -1205,11 +1208,46 @@ Réponds avec du texte formaté de manière professionnelle, bien structuré ave
         const timeoutId = setTimeout(() => controller.abort(), 180000); // 3 min timeout
 
         let response;
-        let usedProvider = 'lovable';
+        let usedProvider = 'none';
 
-        // Try Lovable AI first (free credits)
-        if (LOVABLE_API_KEY) {
-          console.log(`Trying Lovable AI for ${type}...`);
+        // PRIORITY 1: Use user's OpenAI key if provided
+        if (userOpenAIKey) {
+          console.log(`Using user's OpenAI key for ${type}...`);
+          usedProvider = 'user-openai';
+          
+          response = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${userOpenAIKey}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              model: 'gpt-4o-mini',
+              messages: [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: prompt },
+              ],
+              max_tokens: maxTokens || (type === 'documentary-structure' ? 8000 : 2500),
+              temperature: 0.7,
+            }),
+            signal: controller.signal,
+          });
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error(`User OpenAI key failed:`, response.status, errorText);
+            clearTimeout(timeoutId);
+            return new Response(
+              JSON.stringify({ error: `Erreur avec votre clé API OpenAI (${response.status}). Vérifiez votre quota/facturation.` }),
+              { status: response.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
+          }
+        }
+        // PRIORITY 2: Try Lovable AI (free credits)
+        else if (LOVABLE_API_KEY) {
+          console.log(`Using Lovable AI for ${type}...`);
+          usedProvider = 'lovable';
+          
           response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
             method: 'POST',
             headers: {
@@ -1227,63 +1265,23 @@ Réponds avec du texte formaté de manière professionnelle, bien structuré ave
           });
 
           if (!response.ok) {
-            console.log(`Lovable AI failed with status ${response.status}, trying fallback...`);
-            response = null;
-          }
-        }
-
-        // Fallback to user's OpenAI key or server OpenAI key
-        if (!response) {
-          const openaiKey = userOpenAIKey || Deno.env.get('OPENAI_API_KEY');
-          
-          if (!openaiKey) {
+            const errorText = await response.text();
+            console.error(`Lovable AI failed:`, response.status, errorText);
             clearTimeout(timeoutId);
             return new Response(
-              JSON.stringify({ error: 'Aucune clé API disponible. Crédits Lovable épuisés.' }),
+              JSON.stringify({ error: 'Crédits Lovable épuisés. Configurez votre clé API OpenAI dans Paramètres.' }),
               { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
             );
           }
-
-          console.log(`Using OpenAI fallback for ${type}...`);
-          usedProvider = 'openai';
-          
-          response = await fetch('https://api.openai.com/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${openaiKey}`,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              model: 'gpt-4o-mini',
-              messages: [
-                { role: 'system', content: systemPrompt },
-                { role: 'user', content: prompt },
-              ],
-              max_tokens: maxTokens || (type === 'documentary-structure' ? 8000 : 2500),
-              temperature: 0.7,
-            }),
-            signal: controller.signal,
-          });
+        } else {
+          clearTimeout(timeoutId);
+          return new Response(
+            JSON.stringify({ error: 'Aucune clé API disponible. Configurez votre clé OpenAI dans les Paramètres.' }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
         }
 
         clearTimeout(timeoutId);
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error(`${usedProvider} documentary error:`, response.status, errorText);
-          
-          if (response.status === 429 || response.status === 402) {
-            return new Response(
-              JSON.stringify({ error: 'Quota épuisé. Veuillez configurer votre clé API OpenAI dans les paramètres.' }),
-              { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-            );
-          }
-          
-          return new Response(
-            JSON.stringify({ error: 'Erreur lors de la génération du documentaire' }),
-            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-          );
-        }
 
         const data = await response.json();
         const generatedContent = data?.choices?.[0]?.message?.content;

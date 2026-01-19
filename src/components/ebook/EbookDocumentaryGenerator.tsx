@@ -87,9 +87,12 @@ const RESEARCH_DEPTH = [
 ];
 
 const EbookDocumentaryGenerator: React.FC<DocumentaryGeneratorProps> = ({ ebookTitle: initialTitle }) => {
-  // Configuration
-  const { apiKey: userApiKey, isValid: isUserKeyValid } = useOpenAIConfig();
-  const useOpenAI = isUserKeyValid === true && !!userApiKey;
+  // Configuration - utiliser la clé API si elle existe, même si pas encore validée
+  const { apiKey: userApiKey, isValid: isUserKeyValid, isValidating } = useOpenAIConfig();
+  // Envoyer la clé si elle existe et commence par 'sk-'
+  const useOpenAI = !!userApiKey && userApiKey.startsWith('sk-');
+  
+  console.log('[Documentary] API Key config:', { hasKey: !!userApiKey, useOpenAI, isValid: isUserKeyValid, isValidating });
 
   // État du formulaire
   const [title, setTitle] = useState(initialTitle || '');
