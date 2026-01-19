@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,11 +8,20 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Loader2, Layout, Download, RefreshCw, Sparkles, MessageSquare, ImagePlus, BookOpen, Wand2, FileDown, Users, Zap, Lightbulb, AlertTriangle } from 'lucide-react';
+import { Loader2, Layout, Download, RefreshCw, Sparkles, MessageSquare, ImagePlus, BookOpen, Wand2, FileDown, Users, Zap, Lightbulb, AlertTriangle, Save, FolderOpen, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 import jsPDF from 'jspdf';
+
+interface SavedComicBook {
+  id: string;
+  title: string;
+  created_at: string;
+  updated_at: string;
+  status: string;
+  number_of_pages: number;
+}
 
 interface ComicPanel {
   id: string;
@@ -158,6 +167,171 @@ export const EbookComicBookGenerator: React.FC<ComicBookGeneratorProps> = ({ ebo
   const [titleSuggestions, setTitleSuggestions] = useState<string[]>([]);
   const [isGeneratingTitles, setIsGeneratingTitles] = useState(false);
   const [generationStep, setGenerationStep] = useState<'idle' | 'scenario' | 'images'>('idle');
+  
+  // Sauvegarde et chargement
+  const [savedComics, setSavedComics] = useState<SavedComicBook[]>([]);
+  const [currentComicId, setCurrentComicId] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isLoadingComics, setIsLoadingComics] = useState(false);
+
+  // Charger les BD sauvegardées au démarrage
+  useEffect(() => {
+    loadSavedComics();
+  }, []);
+
+  const loadSavedComics = async () => {
+    setIsLoadingComics(true);
+    try {
+      const { data: session } = await supabase.auth.getSession();
+      if (!session?.session?.user) {
+        setIsLoadingComics(false);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('comic_books')
+        .select('id, title, created_at, updated_at, status, number_of_pages')
+        .order('updated_at', { ascending: false })
+        .limit(20);
+
+      if (error) throw error;
+      setSavedComics((data as SavedComicBook[]) || []);
+    } catch (err) {
+      console.error('Erreur chargement BD:', err);
+    } finally {
+      setIsLoadingComics(false);
+    }
+  };
+
+  const saveComicBook = async () => {
+    if (!title.trim()) {
+      toast.error('Veuillez entrer un titre pour sauvegarder');
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const { data: session } = await supabase.auth.getSession();
+      if (!session?.session?.user) {
+        toast.error('Veuillez vous connecter pour sauvegarder');
+        setIsSaving(false);
+        return;
+      }
+
+      const comicData = {
+        user_id: session.session.user.id,
+        title: title.trim(),
+        main_character: mainCharacter || null,
+        genre,
+        age_group: ageGroup,
+        art_style: artStyle,
+        color_mode: colorMode,
+        panel_layout: panelLayout,
+        number_of_pages: numberOfPages,
+        scenario: scenario ? JSON.parse(JSON.stringify(scenario)) : null,
+        pages: generatedPages.length > 0 ? JSON.parse(JSON.stringify(generatedPages)) : null,
+        visual_seed: visualSeed || null,
+        status: generatedPages.length > 0 ? 'completed' : 'draft',
+      };
+
+      let result;
+      if (currentComicId) {
+        // Mise à jour
+        result = await supabase
+          .from('comic_books')
+          .update(comicData)
+          .eq('id', currentComicId)
+          .select()
+          .single();
+      } else {
+        // Nouvelle création
+        result = await supabase
+          .from('comic_books')
+          .insert(comicData)
+          .select()
+          .single();
+      }
+
+      if (result.error) throw result.error;
+      
+      setCurrentComicId(result.data.id);
+      toast.success(currentComicId ? 'BD mise à jour !' : 'BD sauvegardée !');
+      loadSavedComics();
+    } catch (err) {
+      console.error('Erreur sauvegarde:', err);
+      toast.error('Erreur lors de la sauvegarde');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const loadComicBook = async (comicId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('comic_books')
+        .select('*')
+        .eq('id', comicId)
+        .single();
+
+      if (error) throw error;
+
+      // Restaurer l'état
+      setTitle(data.title || '');
+      setMainCharacter(data.main_character || '');
+      setGenre(data.genre || 'adventure');
+      setAgeGroup(data.age_group || '7-10');
+      setArtStyle(data.art_style || 'cartoon');
+      setColorMode(data.color_mode || 'color');
+      setPanelLayout(data.panel_layout || '4-panels');
+      setNumberOfPages(data.number_of_pages || 12);
+      setScenario(data.scenario ? (data.scenario as unknown as typeof scenario) : null);
+      setGeneratedPages(data.pages ? (data.pages as unknown as ComicPage[]) : []);
+      setVisualSeed(data.visual_seed || '');
+      setCurrentComicId(comicId);
+
+      toast.success(`BD "${data.title}" chargée !`);
+    } catch (err) {
+      console.error('Erreur chargement:', err);
+      toast.error('Erreur lors du chargement');
+    }
+  };
+
+  const deleteComicBook = async (comicId: string) => {
+    if (!confirm('Supprimer cette BD ?')) return;
+    
+    try {
+      const { error } = await supabase
+        .from('comic_books')
+        .delete()
+        .eq('id', comicId);
+
+      if (error) throw error;
+      
+      if (currentComicId === comicId) {
+        setCurrentComicId(null);
+      }
+      
+      toast.success('BD supprimée');
+      loadSavedComics();
+    } catch (err) {
+      console.error('Erreur suppression:', err);
+      toast.error('Erreur lors de la suppression');
+    }
+  };
+
+  const newComicBook = () => {
+    setCurrentComicId(null);
+    setTitle('');
+    setMainCharacter('');
+    setCharacterDescription('');
+    setSetting('');
+    setCustomPrompt('');
+    setScenario(null);
+    setGeneratedPages([]);
+    setVisualSeed('');
+    setTitleSuggestions([]);
+    toast.info('Nouvelle BD créée');
+  };
 
   const getLayoutDescription = (layout: string): string => {
     const layouts: Record<string, string> = {
@@ -1071,6 +1245,86 @@ Réponds en JSON:
             </div>
           </div>
         </CardHeader>
+      </Card>
+
+      {/* Boutons de gestion */}
+      <Card className="bg-muted/30">
+        <CardContent className="py-4">
+          <div className="flex flex-wrap items-center gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={newComicBook}
+              className="gap-1"
+            >
+              <BookOpen className="h-4 w-4" />
+              Nouvelle BD
+            </Button>
+            
+            <Button
+              type="button"
+              variant="default"
+              size="sm"
+              onClick={saveComicBook}
+              disabled={isSaving || !title.trim()}
+              className="gap-1 bg-emerald-600 hover:bg-emerald-700"
+            >
+              {isSaving ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Save className="h-4 w-4" />
+              )}
+              {currentComicId ? 'Mettre à jour' : 'Sauvegarder'}
+            </Button>
+
+            {currentComicId && (
+              <Badge variant="secondary" className="text-xs">
+                BD sauvegardée
+              </Badge>
+            )}
+
+            {/* BD sauvegardées */}
+            {savedComics.length > 0 && (
+              <div className="flex items-center gap-2 ml-auto">
+                <span className="text-sm text-muted-foreground flex items-center gap-1">
+                  <FolderOpen className="h-4 w-4" />
+                  Mes BD :
+                </span>
+                <div className="flex flex-wrap gap-1 max-w-md">
+                  {savedComics.slice(0, 5).map((comic) => (
+                    <div key={comic.id} className="flex items-center gap-0.5">
+                      <Badge
+                        variant={currentComicId === comic.id ? "default" : "outline"}
+                        className="cursor-pointer hover:bg-primary/20 text-xs"
+                        onClick={() => loadComicBook(comic.id)}
+                      >
+                        {comic.title.substring(0, 15)}{comic.title.length > 15 ? '...' : ''}
+                      </Badge>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-5 w-5 text-destructive hover:bg-destructive/10"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deleteComicBook(comic.id);
+                        }}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ))}
+                  {savedComics.length > 5 && (
+                    <Badge variant="secondary" className="text-xs">
+                      +{savedComics.length - 5} autres
+                    </Badge>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </CardContent>
       </Card>
 
       {/* Avertissement si pas de clé OpenAI */}

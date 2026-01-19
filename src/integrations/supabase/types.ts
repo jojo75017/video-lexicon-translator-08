@@ -61,6 +61,66 @@ export type Database = {
           },
         ]
       }
+      comic_books: {
+        Row: {
+          age_group: string | null
+          art_style: string | null
+          color_mode: string | null
+          cover_url: string | null
+          created_at: string
+          genre: string | null
+          id: string
+          main_character: string | null
+          number_of_pages: number | null
+          pages: Json | null
+          panel_layout: string | null
+          scenario: Json | null
+          status: string | null
+          title: string
+          updated_at: string
+          user_id: string
+          visual_seed: string | null
+        }
+        Insert: {
+          age_group?: string | null
+          art_style?: string | null
+          color_mode?: string | null
+          cover_url?: string | null
+          created_at?: string
+          genre?: string | null
+          id?: string
+          main_character?: string | null
+          number_of_pages?: number | null
+          pages?: Json | null
+          panel_layout?: string | null
+          scenario?: Json | null
+          status?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+          visual_seed?: string | null
+        }
+        Update: {
+          age_group?: string | null
+          art_style?: string | null
+          color_mode?: string | null
+          cover_url?: string | null
+          created_at?: string
+          genre?: string | null
+          id?: string
+          main_character?: string | null
+          number_of_pages?: number | null
+          pages?: Json | null
+          panel_layout?: string | null
+          scenario?: Json | null
+          status?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+          visual_seed?: string | null
+        }
+        Relationships: []
+      }
       ebook_project_versions: {
         Row: {
           author_name: string | null
