@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Loader2, Layout, Download, RefreshCw, Sparkles, MessageSquare, ImagePlus, BookOpen, Wand2, FileDown, Users, Zap, Lightbulb } from 'lucide-react';
+import { Loader2, Layout, Download, RefreshCw, Sparkles, MessageSquare, ImagePlus, BookOpen, Wand2, FileDown, Users, Zap, Lightbulb, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
@@ -979,6 +979,26 @@ Réponds en JSON:
           </div>
         </CardHeader>
       </Card>
+
+      {/* Avertissement si pas de clé OpenAI */}
+      {!useOpenAI && (
+        <Card className="border-amber-500/50 bg-amber-500/5">
+          <CardContent className="py-4">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="h-5 w-5 text-amber-500 mt-0.5 flex-shrink-0" />
+              <div className="space-y-1">
+                <p className="font-medium text-amber-700 dark:text-amber-400">
+                  Clé OpenAI non configurée
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Pour générer de vraies images de BD, ajoutez votre clé API OpenAI dans l'onglet <strong>Paramètres</strong>. 
+                  Sans clé, des images placeholder seront affichées.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Configuration */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
