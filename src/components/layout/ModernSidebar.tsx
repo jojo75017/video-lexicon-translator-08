@@ -91,7 +91,6 @@ const categories: Category[] = [
     color: 'from-violet-500 to-purple-500',
     items: [
       { id: 'complete-workflow', label: '⚡ Livre Complet (1 clic)', icon: Rocket, isPro: true },
-      { id: 'editorial-director', label: '👑 Directeur Éditorial', icon: Crown },
       { id: 'planner', label: '📋 Planificateur', icon: BookOpen },
     ]
   },
@@ -109,19 +108,36 @@ const categories: Category[] = [
       { id: 'voice', label: '🎤 Dictée Vocale', icon: Volume2 },
     ]
   },
-  // ========== 3. OUTILS IA PRO ==========
+  // ========== 3. WORKFLOW P1-P8 ==========
   {
-    id: 'workflow-pro',
-    label: '⚡ Outils IA Pro',
+    id: 'workflow-p1-p8',
+    label: '⚡ Workflow IA (P1-P8)',
     emoji: '⚡',
     color: 'from-amber-500 to-orange-500',
     items: [
-      { id: 'market-analysis', label: '📊 Analyse Marché', icon: Search },
-      { id: 'content-architect', label: '🏗️ Architecture', icon: LayoutDashboard },
-      { id: 'expert-writing', label: '✍️ Rédaction Expert', icon: PenTool },
-      { id: 'natural-rewrite', label: '✨ Réécriture Naturelle', icon: Sparkles },
-      { id: 'editorial-quality', label: '✅ Contrôle Qualité', icon: FileEdit },
-      { id: 'ultimate-verdict', label: '🏆 Verdict Final', icon: Award },
+      { id: 'editorial-director', label: 'P1 👑 Directeur', icon: Crown, isPro: true },
+      { id: 'market-analysis', label: 'P2 📊 Marché', icon: Search, isPro: true },
+      { id: 'content-architect', label: 'P3 🏗️ Architecte', icon: LayoutDashboard, isPro: true },
+      { id: 'expert-writing', label: 'P4 ✍️ Rédaction', icon: PenTool, isPro: true },
+      { id: 'natural-rewrite', label: 'P5 ✨ Réécriture', icon: Sparkles, isPro: true },
+      { id: 'editorial-quality', label: 'P6 ✅ Qualité', icon: FileEdit, isPro: true },
+      { id: 'editorial-packaging', label: 'P7 📦 Packaging', icon: FileText, isPro: true },
+      { id: 'final-diagnosis', label: 'P8 🔍 Diagnostic', icon: Shield, isPro: true },
+    ]
+  },
+  // ========== 4. MOTEUR IA V2 (P9-P14) ==========
+  {
+    id: 'workflow-p9-p14',
+    label: '🧬 Moteur IA V2 (P9-P14)',
+    emoji: '🧬',
+    color: 'from-green-500 to-teal-500',
+    items: [
+      { id: 'editorial-memory', label: 'P9 🧠 Mémoire', icon: Brain, isPro: true },
+      { id: 'chapter-coherence', label: 'P10 🔗 Cohérence', icon: GitBranch, isPro: true },
+      { id: 'self-critique', label: 'P11 👁️ Critique', icon: Eye, isPro: true },
+      { id: 'iterative-loop', label: 'P12 🔄 Boucle', icon: RefreshCw, isPro: true },
+      { id: 'style-signature', label: 'P13 🎨 Style', icon: Fingerprint, isPro: true },
+      { id: 'ultimate-verdict', label: 'P14 🏆 Verdict', icon: Award, isPro: true },
     ]
   },
   // ========== 4. LIVRES SPÉCIAUX ==========
