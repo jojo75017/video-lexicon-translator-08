@@ -274,6 +274,20 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Helper pour générer un placeholder approprié selon le style
+  const getPlaceholderUrl = (title: string, style: string, colorScheme: string): string => {
+    const safeTitle = encodeURIComponent(title.substring(0, 30));
+    // Pour les livres de coloriage (line art, monochrome), utiliser fond blanc + texte noir
+    const isColoringBook = style.toLowerCase().includes('line art') || 
+                           style.toLowerCase().includes('coloring') ||
+                           colorScheme === 'monochrome';
+    if (isColoringBook) {
+      return `https://placehold.co/1024x1024/ffffff/000000?text=${safeTitle}`;
+    }
+    // Placeholder standard avec fond gris clair
+    return `https://placehold.co/1024x1024/e5e7eb/374151?text=${safeTitle}`;
+  };
+
   try {
     const { 
       chapterTitle, 
@@ -436,8 +450,8 @@ Instructions de génération:
         // Si erreur 429 ou 402 (crédits Lovable), ne PAS fallback vers OpenAI si déjà en limite
         if (response.status === 429 || response.status === 402) {
           console.log('Lovable AI credits/rate limit reached, returning placeholder');
-          // Retourner une image placeholder au lieu d'une erreur
-          generatedImageUrl = `https://placehold.co/1024x1024/374151/ffffff?text=${encodeURIComponent(chapterTitle.substring(0, 30))}`;
+          // Retourner une image placeholder au lieu d'une erreur (style approprié au contenu)
+          generatedImageUrl = getPlaceholderUrl(chapterTitle, style, colorScheme);
         } else if (!disableOpenAIFallback) {
           const ENV_OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
           const FALLBACK_OPENAI_KEY = ENV_OPENAI_API_KEY || openaiApiKey;
@@ -449,7 +463,7 @@ Instructions de génération:
               // Si OpenAI aussi en limite, retourner placeholder plutôt qu'erreur
               if (openaiErr?.message?.includes('billing') || openaiErr?.message?.includes('limit')) {
                 console.log('OpenAI billing limit, returning placeholder');
-                generatedImageUrl = `https://placehold.co/1024x1024/374151/ffffff?text=${encodeURIComponent(chapterTitle.substring(0, 30))}`;
+                generatedImageUrl = getPlaceholderUrl(chapterTitle, style, colorScheme);
               } else {
                 console.error('OpenAI fallback failed:', openaiErr);
                 throw openaiErr;
@@ -457,13 +471,13 @@ Instructions de génération:
             }
           } else {
             // Pas de clé fallback, retourner placeholder
-            generatedImageUrl = `https://placehold.co/1024x1024/374151/ffffff?text=${encodeURIComponent(chapterTitle.substring(0, 30))}`;
+            generatedImageUrl = getPlaceholderUrl(chapterTitle, style, colorScheme);
           }
         } else {
           const errorText = await response.text();
           console.error('AI Gateway error:', response.status, errorText);
           // Retourner placeholder au lieu d'erreur
-          generatedImageUrl = `https://placehold.co/1024x1024/374151/ffffff?text=${encodeURIComponent(chapterTitle.substring(0, 30))}`;
+          generatedImageUrl = getPlaceholderUrl(chapterTitle, style, colorScheme);
         }
       } else {
         // Réponse OK - extraire l'image base64 de la réponse Gemini
