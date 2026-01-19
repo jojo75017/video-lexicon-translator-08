@@ -83,72 +83,126 @@ interface Category {
 }
 
 const categories: Category[] = [
-  // ========== 1. CRÉER MON LIVRE ==========
+  // ========== 1. DÉMARRAGE RAPIDE ==========
   {
-    id: 'creer',
-    label: '📖 Créer mon Livre',
-    emoji: '📖',
+    id: 'start',
+    label: '🚀 Démarrage Rapide',
+    emoji: '🚀',
     color: 'from-violet-500 to-purple-500',
     items: [
-      { id: 'complete-workflow', label: '⚡ Générer en 1 clic', icon: Rocket, isPro: true },
-      { id: 'planner', label: '📋 Planifier', icon: BookOpen },
-      { id: 'writing', label: '✏️ Écrire', icon: PenTool },
-      { id: 'aichat', label: '💬 Chat IA', icon: Bot },
-      { id: 'characters', label: '👥 Personnages', icon: Users },
+      { id: 'complete-workflow', label: '⚡ Livre Complet (1 clic)', icon: Rocket, isPro: true },
+      { id: 'editorial-director', label: '👑 Directeur Éditorial', icon: Crown },
+      { id: 'planner', label: '📋 Planificateur', icon: BookOpen },
     ]
   },
-  // ========== 2. GÉNÉRATEURS SPÉCIAUX ==========
+  // ========== 2. RÉDACTION ==========
+  {
+    id: 'redaction',
+    label: '✍️ Rédaction',
+    emoji: '✍️',
+    color: 'from-blue-500 to-indigo-500',
+    items: [
+      { id: 'writing', label: '✏️ Écrire les Chapitres', icon: PenTool },
+      { id: 'aichat', label: '💬 Assistant IA', icon: Bot },
+      { id: 'characters', label: '👥 Personnages', icon: Users },
+      { id: 'series', label: '📚 Série / Saga', icon: BookCopy },
+      { id: 'voice', label: '🎤 Dictée Vocale', icon: Volume2 },
+    ]
+  },
+  // ========== 3. OUTILS IA PRO ==========
+  {
+    id: 'workflow-pro',
+    label: '⚡ Outils IA Pro',
+    emoji: '⚡',
+    color: 'from-amber-500 to-orange-500',
+    items: [
+      { id: 'market-analysis', label: '📊 Analyse Marché', icon: Search },
+      { id: 'content-architect', label: '🏗️ Architecture', icon: LayoutDashboard },
+      { id: 'expert-writing', label: '✍️ Rédaction Expert', icon: PenTool },
+      { id: 'natural-rewrite', label: '✨ Réécriture Naturelle', icon: Sparkles },
+      { id: 'editorial-quality', label: '✅ Contrôle Qualité', icon: FileEdit },
+      { id: 'ultimate-verdict', label: '🏆 Verdict Final', icon: Award },
+    ]
+  },
+  // ========== 4. LIVRES SPÉCIAUX ==========
   {
     id: 'special',
     label: '🎨 Livres Spéciaux',
     emoji: '🎨',
     color: 'from-pink-500 to-rose-500',
     items: [
-      { id: 'coloring-book', label: '🖍️ Coloriage', icon: Palette },
+      { id: 'coloring-book', label: '🖍️ Livre Coloriage', icon: Palette },
       { id: 'comic-book', label: '💬 Bande Dessinée', icon: LayoutTemplate },
       { id: 'diary-generator', label: '📔 Journal / Agenda', icon: BookHeart },
       { id: 'documentary', label: '🎬 Documentaire', icon: BookMarked },
       { id: 'encyclopedia', label: '📚 Encyclopédie', icon: BookMarked },
+      { id: 'atlas', label: '🗺️ Atlas', icon: Map },
       { id: 'url-import', label: '🔗 Créer depuis URL', icon: Link },
+      { id: 'doc-transform', label: '📄 Importer Word', icon: FileText },
     ]
   },
-  // ========== 3. VISUELS ==========
+  // ========== 5. VISUELS ==========
   {
     id: 'visuels',
     label: '🖼️ Couvertures & Images',
     emoji: '🖼️',
-    color: 'from-amber-500 to-orange-500',
+    color: 'from-teal-500 to-cyan-500',
     items: [
       { id: 'cover', label: '📕 Couverture Avant', icon: Palette },
       { id: 'backcover', label: '📖 Couverture Arrière', icon: BookCopy },
       { id: 'images', label: '🎨 Images Chapitres', icon: Image },
+      { id: 'imagebank', label: '🏦 Banque Images', icon: ImagePlus },
     ]
   },
-  // ========== 4. PUBLIER SUR AMAZON ==========
+  // ========== 6. AMAZON KDP ==========
   {
     id: 'amazon',
-    label: '🛒 Publier sur Amazon',
+    label: '🛒 Amazon KDP',
     emoji: '🛒',
-    color: 'from-orange-500 to-amber-500',
+    color: 'from-orange-500 to-red-500',
     items: [
       { id: 'export', label: '💾 Exporter (PDF, Word)', icon: Download },
-      { id: 'kdp', label: '📝 Fiche Amazon KDP', icon: TrendingUp },
-      { id: 'amazon-simulator', label: '👀 Prévisualiser Amazon', icon: Eye },
-      { id: 'kdp-research', label: '🔍 Trouver une Niche', icon: Search },
+      { id: 'kdp', label: '📝 Description KDP', icon: TrendingUp },
+      { id: 'amazon-simulator', label: '👀 Simulateur Amazon', icon: Eye },
+      { id: 'kdp-research', label: '🔍 Recherche Niche', icon: Search },
+      { id: 'plagiarism-validator', label: '🛡️ Anti-Plagiat', icon: Shield },
     ]
   },
-  // ========== 5. BONUS & AIDE ==========
+  // ========== 7. MARKETING ==========
   {
-    id: 'bonus',
-    label: '🎁 Bonus & Aide',
-    emoji: '🎁',
-    color: 'from-emerald-500 to-teal-500',
+    id: 'marketing-cat',
+    label: '📱 Marketing',
+    emoji: '📱',
+    color: 'from-green-500 to-emerald-500',
     items: [
-      { id: 'audiobook', label: '🎧 Livre Audio', icon: Headphones },
       { id: 'marketing', label: '📱 Posts Réseaux Sociaux', icon: MessageSquare },
-      { id: 'formation-complete', label: '🎓 Formation Complète', icon: GraduationCap, isLink: true, href: '/formation' },
+      { id: 'seo-articles', label: '🌐 Articles SEO', icon: Globe },
+      { id: 'amazon-ads', label: '🎯 Amazon Ads', icon: Target },
+      { id: 'launch-plan', label: '🚀 Plan Lancement', icon: Rocket },
+      { id: 'monetization', label: '💵 Monétisation', icon: DollarSign },
+    ]
+  },
+  // ========== 8. AUDIO ==========
+  {
+    id: 'audio',
+    label: '🎧 Audio',
+    emoji: '🎧',
+    color: 'from-indigo-500 to-violet-500',
+    items: [
+      { id: 'audiobook', label: '🎙️ Livre Audio', icon: Headphones },
+    ]
+  },
+  // ========== 9. MON COMPTE ==========
+  {
+    id: 'compte',
+    label: '⚙️ Mon Compte',
+    emoji: '⚙️',
+    color: 'from-gray-500 to-slate-500',
+    items: [
       { id: 'projects', label: '📁 Mes Projets', icon: FolderOpen },
+      { id: 'dashboard', label: '📊 Tableau de Bord', icon: LayoutDashboard },
       { id: 'settings', label: '⚙️ Paramètres', icon: Settings },
+      { id: 'formation-complete', label: '🎓 Formation', icon: GraduationCap, isLink: true, href: '/formation' },
     ]
   },
 ];
