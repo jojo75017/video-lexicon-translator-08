@@ -2574,6 +2574,11 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
         return (
           <EbookSeoArticleGenerator />
         );
+
+      case 'subscription':
+        // Rediriger vers la page Abonnement
+        navigate('/subscription');
+        return null;
       
       case 'admin':
         // Rediriger vers la page admin
