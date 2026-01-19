@@ -69,10 +69,10 @@ const AGE_GROUPS = [
 ];
 
 const PANEL_LAYOUTS = [
-  { value: '2-panels', label: '2 cases', description: 'Simple, impact maximal', grid: [1, 2] },
-  { value: '3-panels', label: '3 cases', description: 'Classique manga', grid: [1, 1, 1] },
-  { value: '4-panels', label: '4 cases', description: 'Standard BD', grid: [2, 2] },
-  { value: '6-panels', label: '6 cases', description: 'Détaillé', grid: [2, 2, 2] },
+  { value: '4-panels', label: '4 cases', description: 'Standard BD (2x2)', grid: [2, 2], panelsPerPage: 4 },
+  { value: '6-panels', label: '6 cases', description: 'Détaillé (2x3)', grid: [2, 2, 2], panelsPerPage: 6 },
+  { value: '8-panels', label: '8 cases', description: 'Riche (2x4)', grid: [2, 2, 2, 2], panelsPerPage: 8 },
+  { value: '2-panels', label: '2 cases', description: 'Panoramique', grid: [1, 1], panelsPerPage: 2 },
 ];
 
 const ART_STYLES = [
@@ -498,17 +498,23 @@ EXPRESSION STYLE: ${artStyle === 'manga' ? 'Large expressive eyes, anime style' 
       // Seed visuel pour cohérence
       const seedInfo = visualSeed ? `[SEED:${visualSeed}] ` : '';
 
-      // Générer 4 images distinctes pour les 4 cases
-      const panelCount = 4;
+      // Nombre de panels selon le layout choisi
+      const selectedLayout = PANEL_LAYOUTS.find(l => l.value === panelLayout);
+      const panelCount = selectedLayout?.panelsPerPage || 4;
       const panelPromises: Promise<{ imageUrl: string; dialogue: string; character: string; action: string } | null>[] = [];
 
-      // Diviser la description en 4 moments distincts mais cohérents visuellement
-      const sceneMoments = [
+      // Diviser la description en moments distincts selon le nombre de panels
+      const baseMoments = [
         `Scene establishing shot: ${pageScenario.description} - Introduction of the scene, wide or medium angle`,
         `Action beat: ${pageScenario.description} - Main action, character close-up or medium shot`,
         `Dramatic moment: ${pageScenario.description} - Peak tension, dynamic angle or close-up on expression`,
-        `Resolution: ${pageScenario.description} - Scene conclusion, reaction shot or establishing return`
+        `Resolution: ${pageScenario.description} - Scene conclusion, reaction shot or establishing return`,
+        `Character reaction: ${pageScenario.description} - Emotional close-up showing character feelings`,
+        `Environment detail: ${pageScenario.description} - Background or setting establishing context`,
+        `Secondary action: ${pageScenario.description} - Supporting action or secondary character`,
+        `Transition: ${pageScenario.description} - Bridge to next scene, movement or time passing`
       ];
+      const sceneMoments = baseMoments.slice(0, panelCount);
 
       const artStylePrompt = getArtStylePrompt();
 
@@ -517,7 +523,7 @@ EXPRESSION STYLE: ${artStyle === 'manga' ? 'Large expressive eyes, anime style' 
           const dialogue = pageScenario.dialogues[panelIndex] || { character: mainCharacter, text: '' };
           
           // Prompt ultra-détaillé pour cohérence maximale
-          const imagePrompt = `${seedInfo}SINGLE COMIC PANEL - Panel ${panelIndex + 1} of 4
+          const imagePrompt = `${seedInfo}SINGLE COMIC PANEL - Panel ${panelIndex + 1} of ${panelCount}
 
 === MANDATORY STYLE RULES ===
 ${artStylePrompt}
@@ -599,8 +605,9 @@ ${sceneMoments[panelIndex]}
           action: p.action
         }));
 
-      // Remplir les panels manquants avec des placeholders
-      while (panels.length < 4) {
+      // Remplir les panels manquants avec des placeholders selon le layout choisi
+      const targetPanelCount = selectedLayout?.panelsPerPage || 4;
+      while (panels.length < targetPanelCount) {
         panels.push({
           id: `panel-${pageIndex}-${panels.length}`,
           imageUrl: '',
@@ -858,28 +865,41 @@ Réponds en JSON:
         yPos += 6;
       });
 
-      // ===== PAGES DE BD EN GRILLE 2x2 =====
+      // ===== PAGES DE BD - GRILLE DYNAMIQUE SELON LE LAYOUT =====
+      const selectedLayout = PANEL_LAYOUTS.find(l => l.value === panelLayout);
+      const panelsPerPage = selectedLayout?.panelsPerPage || 4;
+      
       for (let i = 0; i < generatedPages.length; i++) {
         const page = generatedPages[i];
         pdf.addPage();
 
-        // Dimensions pour grille 2x2
-        const panelWidth = (pageWidth - (margin * 3)) / 2;
-        const panelHeight = (pageHeight - margin - 60) / 2 - 15; // Espace pour dialogues
-        const gap = margin;
+        // Calcul des dimensions selon le nombre de panels
+        let cols = 2;
+        let rows = Math.ceil(panelsPerPage / 2);
+        
+        const gap = 4;
+        const panelWidth = (pageWidth - (margin * 2) - gap) / cols;
+        const dialogueSpace = 15; // Espace pour les dialogues
+        const panelHeight = (pageHeight - (margin * 2) - (rows * dialogueSpace) - ((rows - 1) * gap)) / rows;
 
-        // Positions des 4 cases
-        const positions = [
-          { x: margin, y: margin },                           // Case 1 (haut-gauche)
-          { x: margin + panelWidth + gap, y: margin },        // Case 2 (haut-droite)
-          { x: margin, y: margin + panelHeight + 25 },        // Case 3 (bas-gauche)
-          { x: margin + panelWidth + gap, y: margin + panelHeight + 25 } // Case 4 (bas-droite)
-        ];
+        // Générer les positions pour chaque panel
+        const positions: { x: number; y: number }[] = [];
+        for (let row = 0; row < rows; row++) {
+          for (let col = 0; col < cols; col++) {
+            if (positions.length < panelsPerPage) {
+              positions.push({
+                x: margin + col * (panelWidth + gap),
+                y: margin + row * (panelHeight + dialogueSpace + gap)
+              });
+            }
+          }
+        }
 
-        // Dessiner les 4 cases avec images et dialogues
-        for (let panelIdx = 0; panelIdx < 4; panelIdx++) {
+        // Dessiner les cases avec images et dialogues
+        for (let panelIdx = 0; panelIdx < panelsPerPage; panelIdx++) {
           const panel = page.panels[panelIdx];
           const pos = positions[panelIdx];
+          if (!pos) continue;
 
           // Bordure de la case
           pdf.setDrawColor(30, 30, 30);
@@ -913,24 +933,25 @@ Réponds en JSON:
             pdf.rect(pos.x + 1, pos.y + 1, panelWidth - 2, panelHeight - 2, 'F');
           }
 
-          // Bulle de dialogue sous la case
+          // Bulle de dialogue sous la case (plus compacte pour les layouts denses)
           if (panel?.dialogue) {
-            const bubbleY = pos.y + panelHeight + 2;
+            const bubbleY = pos.y + panelHeight + 1;
+            const bubbleHeight = panelsPerPage > 4 ? 12 : 14;
             pdf.setFillColor(255, 255, 255);
-            pdf.roundedRect(pos.x, bubbleY, panelWidth, 18, 3, 3, 'FD');
+            pdf.roundedRect(pos.x, bubbleY, panelWidth, bubbleHeight, 2, 2, 'FD');
             
-            pdf.setFontSize(7);
+            pdf.setFontSize(panelsPerPage > 6 ? 6 : 7);
             pdf.setFont('helvetica', 'bold');
             pdf.setTextColor(50, 50, 150);
-            pdf.text(`${panel.character}:`, pos.x + 3, bubbleY + 6);
+            pdf.text(`${cleanTextForPDF(panel.character)}:`, pos.x + 2, bubbleY + (panelsPerPage > 6 ? 4 : 5));
             
             pdf.setFont('helvetica', 'normal');
             pdf.setTextColor(30, 30, 30);
-            const maxDialogueWidth = panelWidth - 25;
-            const dialogueLines = pdf.splitTextToSize(panel.dialogue, maxDialogueWidth);
-            pdf.text(dialogueLines[0] || '', pos.x + 22, bubbleY + 6);
-            if (dialogueLines[1]) {
-              pdf.text(dialogueLines[1].substring(0, 40) + (dialogueLines[1].length > 40 ? '...' : ''), pos.x + 3, bubbleY + 13);
+            const maxDialogueWidth = panelWidth - 20;
+            const dialogueLines = pdf.splitTextToSize(cleanTextForPDF(panel.dialogue), maxDialogueWidth);
+            pdf.text(dialogueLines[0] || '', pos.x + 18, bubbleY + (panelsPerPage > 6 ? 4 : 5));
+            if (dialogueLines[1] && panelsPerPage <= 6) {
+              pdf.text(dialogueLines[1].substring(0, 30) + (dialogueLines[1].length > 30 ? '...' : ''), pos.x + 2, bubbleY + 10);
             }
           }
         }
@@ -1118,14 +1139,88 @@ Réponds en JSON:
               )}
             </div>
 
+            {/* Options essentielles VISIBLES - Couleur et Format */}
+            <div className="grid grid-cols-2 gap-4 p-4 bg-gradient-to-r from-amber-50/50 to-orange-50/50 rounded-lg border border-amber-200/50">
+              {/* Mode couleur - VISIBLE */}
+              <div className="space-y-2">
+                <Label className="flex items-center gap-2">
+                  <span className="text-lg">🎨</span> Style couleur
+                </Label>
+                <div className="grid grid-cols-2 gap-2">
+                  {COLOR_MODES.map(mode => (
+                    <Button
+                      key={mode.value}
+                      type="button"
+                      variant={colorMode === mode.value ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setColorMode(mode.value)}
+                      className={colorMode === mode.value 
+                        ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white" 
+                        : "hover:bg-amber-50"}
+                    >
+                      {mode.label.split(' ')[0]}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Nombre de cases - VISIBLE */}
+              <div className="space-y-2">
+                <Label className="flex items-center gap-2">
+                  <span className="text-lg">📐</span> Cases par page
+                </Label>
+                <div className="grid grid-cols-2 gap-2">
+                  {PANEL_LAYOUTS.map(layout => (
+                    <Button
+                      key={layout.value}
+                      type="button"
+                      variant={panelLayout === layout.value ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setPanelLayout(layout.value)}
+                      className={panelLayout === layout.value 
+                        ? "bg-gradient-to-r from-blue-500 to-indigo-500 text-white" 
+                        : "hover:bg-blue-50"}
+                    >
+                      {layout.label}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Nombre de pages - VISIBLE */}
+            <div className="space-y-2 p-3 bg-muted/30 rounded-lg">
+              <div className="flex items-center justify-between">
+                <Label className="flex items-center gap-2">
+                  <span className="text-lg">📖</span> Nombre de pages
+                </Label>
+                <Badge variant="secondary" className="text-lg font-bold">
+                  {numberOfPages} pages
+                </Badge>
+              </div>
+              <Slider
+                value={[numberOfPages]}
+                onValueChange={(val) => setNumberOfPages(val[0])}
+                min={6}
+                max={24}
+                step={2}
+                className="py-2"
+              />
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>6 pages (court)</span>
+                <span>📚 {numberOfPages * (PANEL_LAYOUTS.find(l => l.value === panelLayout)?.panelsPerPage || 4)} images au total</span>
+                <span>24 pages (long)</span>
+              </div>
+            </div>
+
             <Collapsible open={showAdvanced} onOpenChange={setShowAdvanced}>
               <div className="flex items-center justify-between">
                 <p className="text-xs text-muted-foreground">
-                  Optionnel : personnalisez le style, les personnages, le nombre de pages…
+                  Personnaliser personnages, univers, style artistique…
                 </p>
                 <CollapsibleTrigger asChild>
                   <Button type="button" variant="outline" size="sm">
-                    {showAdvanced ? 'Masquer options' : 'Options avancées'}
+                    {showAdvanced ? 'Masquer options' : '⚙️ Plus d\'options'}
                   </Button>
                 </CollapsibleTrigger>
               </div>
@@ -1259,52 +1354,7 @@ Réponds en JSON:
                   </Select>
                 </div>
 
-                <div className="space-y-2">
-                  <Label>Mode couleur</Label>
-                  <Select value={colorMode} onValueChange={setColorMode}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {COLOR_MODES.map(mode => (
-                        <SelectItem key={mode.value} value={mode.value}>
-                          {mode.label} - {mode.description}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Disposition des cases</Label>
-                  <Select value={panelLayout} onValueChange={setPanelLayout}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {PANEL_LAYOUTS.map(layout => (
-                        <SelectItem key={layout.value} value={layout.value}>
-                          {layout.label} - {layout.description}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Nombre de pages: {numberOfPages}</Label>
-                  <Slider
-                    value={[numberOfPages]}
-                    onValueChange={(val) => setNumberOfPages(val[0])}
-                    min={6}
-                    max={24}
-                    step={2}
-                    className="py-2"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Recommandé: 12-16 pages pour une BD enfant
-                  </p>
-                </div>
+                {/* Mode couleur et disposition déjà visibles au-dessus - supprimés ici */}
               </CollapsibleContent>
             </Collapsible>
           </CardContent>
@@ -1421,55 +1471,69 @@ Réponds en JSON:
       {generatedPages.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Layout className="h-5 w-5 text-orange-500" />
-              Pages générées ({generatedPages.length})
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Layout className="h-5 w-5 text-orange-500" />
+                Pages générées ({generatedPages.length})
+              </CardTitle>
+              <Badge variant="secondary">
+                {PANEL_LAYOUTS.find(l => l.value === panelLayout)?.label || '4 cases'} par page
+              </Badge>
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {generatedPages.map((page, index) => (
-                <div 
-                  key={page.id} 
-                  className="relative group rounded-lg overflow-hidden border border-border/50 hover:border-orange-500/50 transition-all hover:shadow-lg"
-                >
-                  {page.panels[0]?.imageUrl ? (
-                    <img
-                      src={page.panels[0].imageUrl}
-                      alt={`Page ${page.pageNumber}`}
-                      className="w-full aspect-[3/4] object-cover"
-                    />
-                  ) : (
-                    <div className="w-full aspect-[3/4] bg-muted flex items-center justify-center">
-                      <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            <div className="space-y-6">
+              {generatedPages.map((page, index) => {
+                const panelsPerPage = PANEL_LAYOUTS.find(l => l.value === panelLayout)?.panelsPerPage || 4;
+                const cols = 2;
+                const rows = Math.ceil(panelsPerPage / 2);
+                
+                return (
+                  <div key={page.id} className="border border-border/50 rounded-lg p-4 bg-muted/20">
+                    <div className="flex items-center justify-between mb-3">
+                      <Badge className="bg-amber-500 text-white">
+                        Page {page.pageNumber}
+                      </Badge>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => regeneratePage(index)}
+                      >
+                        <RefreshCw className="h-4 w-4 mr-1" />
+                        Régénérer
+                      </Button>
                     </div>
-                  )}
-                  
-                  {/* Overlay avec dialogues */}
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2">
-                    <Badge className="bg-white/90 text-black text-xs mb-1">
-                      Page {page.pageNumber}
-                    </Badge>
-                    {page.panels[0]?.dialogue && (
-                      <p className="text-xs text-white line-clamp-2">
-                        "{page.panels[0].dialogue}"
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Bouton régénérer */}
-                  <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Button
-                      size="icon"
-                      variant="secondary"
-                      className="h-8 w-8"
-                      onClick={() => regeneratePage(index)}
+                    
+                    {/* Grille des panels */}
+                    <div 
+                      className="grid gap-2" 
+                      style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}
                     >
-                      <RefreshCw className="h-4 w-4" />
-                    </Button>
+                      {page.panels.slice(0, panelsPerPage).map((panel, panelIdx) => (
+                        <div key={panel.id} className="relative">
+                          {panel.imageUrl ? (
+                            <img
+                              src={panel.imageUrl}
+                              alt={`Panel ${panelIdx + 1}`}
+                              className="w-full aspect-square object-cover rounded-md border border-border"
+                            />
+                          ) : (
+                            <div className="w-full aspect-square bg-muted flex items-center justify-center rounded-md border border-dashed">
+                              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                            </div>
+                          )}
+                          {panel.dialogue && (
+                            <div className="mt-1 p-2 bg-white rounded text-xs border border-border">
+                              <span className="font-medium text-amber-600">{panel.character}:</span>{' '}
+                              "{panel.dialogue.substring(0, 50)}{panel.dialogue.length > 50 ? '...' : ''}"
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </CardContent>
         </Card>
