@@ -12,6 +12,7 @@ import { Loader2, Layout, Download, RefreshCw, Sparkles, MessageSquare, ImagePlu
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
+import { useProjectSave } from '@/hooks/useProjectSave';
 import jsPDF from 'jspdf';
 
 interface SavedComicBook {
@@ -133,6 +134,8 @@ const STORY_TEMPLATES = [
 ];
 
 export const EbookComicBookGenerator: React.FC<ComicBookGeneratorProps> = ({ ebookTitle }) => {
+  const { saveSpecializedProject } = useProjectSave();
+  
   const [genre, setGenre] = useState('adventure');
   const [customGenre, setCustomGenre] = useState('');
   const [ageGroup, setAgeGroup] = useState('7-10');
@@ -173,6 +176,7 @@ export const EbookComicBookGenerator: React.FC<ComicBookGeneratorProps> = ({ ebo
   const [currentComicId, setCurrentComicId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoadingComics, setIsLoadingComics] = useState(false);
+  const [isSavingProject, setIsSavingProject] = useState(false);
 
   // Charger les BD sauvegardées au démarrage
   useEffect(() => {
@@ -1699,6 +1703,33 @@ Réponds en JSON:
                 Images
               </Button>
             </div>
+
+            <Button
+              onClick={async () => {
+                setIsSavingProject(true);
+                const selectedGenre = GENRES.find(g => g.value === genre);
+                await saveSpecializedProject({
+                  title: title || `BD - ${selectedGenre?.label || genre}`,
+                  project_type: 'comic',
+                  target_audience: ageGroup,
+                  ebook_images: generatedPages.flatMap(p => p.panels.map(panel => ({ url: panel.imageUrl, title: panel.action }))),
+                  chapters: generatedPages.map(p => ({
+                    title: `Page ${p.pageNumber}`,
+                    content: p.panels.map(panel => `${panel.character}: ${panel.dialogue}`).join('\n'),
+                  })),
+                  number_of_chapters: generatedPages.length,
+                  book_summary: scenario ? `Scénario ${numberOfPages} pages - ${selectedGenre?.label}` : '',
+                  characters: mainCharacter ? [{ name: mainCharacter, description: characterDescription }] : [],
+                });
+                setIsSavingProject(false);
+              }}
+              disabled={generatedPages.length === 0 || isSavingProject}
+              variant="outline"
+              className="border-violet-500 text-violet-600 hover:bg-violet-50"
+            >
+              {isSavingProject ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+              Sauvegarder
+            </Button>
 
             <Button
               onClick={exportToPDF}
