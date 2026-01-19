@@ -7,10 +7,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
-import { Loader2, Palette, Download, RefreshCw, Sparkles, Baby, ImagePlus, BookOpen, Wand2, FileDown } from 'lucide-react';
+import { Loader2, Palette, Download, RefreshCw, Sparkles, Baby, ImagePlus, BookOpen, Wand2, FileDown, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import jsPDF from 'jspdf';
+import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 
 interface ColoringPage {
   id: string;
@@ -80,6 +81,10 @@ const BOOK_FORMATS = [
 ];
 
 export const EbookColoringBookGenerator: React.FC<ColoringBookGeneratorProps> = ({ ebookTitle }) => {
+  // Configuration OpenAI - utiliser la clé API utilisateur si disponible
+  const { apiKey: userApiKey, isValid: isUserKeyValid } = useOpenAIConfig();
+  const useOpenAI = Boolean(userApiKey) && isUserKeyValid === true;
+
   const [theme, setTheme] = useState('animals');
   const [customTheme, setCustomTheme] = useState('');
   const [ageGroup, setAgeGroup] = useState('4-6');
@@ -456,7 +461,8 @@ CRITICAL REQUIREMENTS:
           aspectRatio: '1:1',
           quality: 'high',
           colorScheme: 'monochrome',
-          useOpenAI: false,
+          useOpenAI: useOpenAI,
+          openaiApiKey: userApiKey || undefined,
           customPrompt: prompt,
         },
       });
@@ -959,6 +965,26 @@ CRITICAL REQUIREMENTS:
           </CardDescription>
         </CardHeader>
       </Card>
+
+      {/* Avertissement si pas de clé OpenAI */}
+      {!useOpenAI && (
+        <Card className="border-amber-500/50 bg-amber-500/5">
+          <CardContent className="py-4">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="h-5 w-5 text-amber-500 mt-0.5 flex-shrink-0" />
+              <div className="space-y-1">
+                <p className="font-medium text-amber-700 dark:text-amber-400">
+                  Clé OpenAI non configurée
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Pour générer de vraies images de coloriage, ajoutez votre clé API OpenAI dans l'onglet <strong>Paramètres</strong>. 
+                  Sans clé, des images placeholder seront affichées.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Configuration */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
