@@ -11,7 +11,7 @@ import {
   Sparkles, GraduationCap, Trophy, Target, Zap, Layers, Settings,
   Image, TrendingUp, Megaphone, DollarSign, FileOutput, Rocket, HelpCircle,
   Link2, Shield, ShoppingCart, FileText, Mic, Globe, Volume2, Palette,
-  BarChart3, Users, Brain, Wand2
+  BarChart3, Users, Brain, Wand2, FileDown
 } from 'lucide-react';
 import { toast } from 'sonner';
 import jsPDF from 'jspdf';
@@ -21,6 +21,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ReactMarkdown from 'react-markdown';
 import FormationQuiz from '@/components/formation/FormationQuiz';
 import FormationBadges from '@/components/formation/FormationBadges';
+import { FORMATION_SYSTEME_IO_CONTENT } from '@/data/formationSystemeIo';
 
 interface Module {
   id: number;
@@ -260,6 +261,14 @@ ${module.content}
     copyToClipboard(fullContent);
   };
 
+  const copySystemeIoFormation = () => {
+    navigator.clipboard.writeText(FORMATION_SYSTEME_IO_CONTENT);
+    toast.success('Formation Systeme.io copiée !', {
+      description: 'Collez-la maintenant dans votre espace Systeme.io',
+      duration: 5000
+    });
+  };
+
   const exportFormationPDF = () => {
     const pdf = new jsPDF();
     const pageWidth = pdf.internal.pageSize.getWidth();
@@ -431,8 +440,19 @@ ${module.content}
                 <span className="hidden sm:inline">Copier tout</span>
               </Button>
               <Button 
+                onClick={copySystemeIoFormation} 
+                size="sm" 
+                variant="default"
+                className="gap-2 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white"
+              >
+                <FileDown className="h-4 w-4" />
+                <span className="hidden sm:inline">Formation Systeme.io</span>
+                <span className="sm:hidden">Systeme.io</span>
+              </Button>
+              <Button 
                 onClick={() => { setPreviewPage(0); setShowPreview(true); }} 
                 size="sm" 
+                variant="outline"
                 className="gap-2"
               >
                 <Download className="h-4 w-4" />
