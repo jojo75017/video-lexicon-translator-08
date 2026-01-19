@@ -169,29 +169,84 @@ export const EbookComicBookGenerator: React.FC<ComicBookGeneratorProps> = ({ ebo
     return layouts[layout] || '4 cases';
   };
 
+  // Fallback amélioré avec vraie narration
   const buildFallbackScenario = () => {
     const selectedTemplate = STORY_TEMPLATES.find(t => t.value === storyTemplate);
+    const selectedGenre = GENRES.find(g => g.value === genre);
     const heroName = (mainCharacter || 'Le héros').trim();
     const baseDesc = (customPrompt || setting || '').trim();
+    const bookTitle = title || 'L\'Aventure';
 
-    const steps = selectedTemplate?.structure?.length ? selectedTemplate.structure : [
-      'Introduction',
-      'Déclencheur',
-      'Défis',
-      'Épreuve finale',
-      'Résolution'
-    ];
+    // Bibliothèque de scènes variées par étape narrative
+    const sceneLibrary: Record<string, { descriptions: string[]; dialogues: { char: string; texts: string[] }[] }> = {
+      'Introduction du héros': {
+        descriptions: [
+          `${heroName} se réveille dans son monde paisible. Le soleil brille et une nouvelle journée commence.`,
+          `C'est un jour ordinaire pour ${heroName}. Mais quelque chose dans l'air semble différent aujourd'hui.`,
+          `${heroName} regarde par la fenêtre, rêvant d'aventures lointaines.`
+        ],
+        dialogues: [{ char: heroName, texts: ["Quelle belle journée !", "Je sens que quelque chose va se passer...", "Aujourd'hui sera spécial !"] }]
+      },
+      'Appel à l\'aventure': {
+        descriptions: [
+          `Un mystérieux message arrive ! ${heroName} découvre qu'une mission importante l'attend.`,
+          `Un vieil ami apparaît avec des nouvelles urgentes pour ${heroName}.`,
+          `Une carte au trésor tombe entre les mains de ${heroName}. L'aventure commence !`
+        ],
+        dialogues: [{ char: heroName, texts: ["Une mission pour moi ?", "Je dois y aller !", "C'est le moment d'agir !"] }]
+      },
+      'Défis et alliés': {
+        descriptions: [
+          `${heroName} rencontre un nouvel ami qui accepte de l'aider dans sa quête.`,
+          `Un obstacle se dresse sur le chemin. ${heroName} doit faire preuve d'intelligence.`,
+          `${heroName} traverse un lieu mystérieux rempli de surprises.`
+        ],
+        dialogues: [{ char: heroName, texts: ["Ensemble, on est plus forts !", "Je n'abandonnerai pas !", "Il doit y avoir une solution..."] }]
+      },
+      'Épreuve finale': {
+        descriptions: [
+          `Le moment décisif approche. ${heroName} fait face au plus grand défi de l'aventure.`,
+          `${heroName} rassemble tout son courage pour l'épreuve finale.`,
+          `C'est maintenant ou jamais ! ${heroName} donne tout ce qu'il a.`
+        ],
+        dialogues: [{ char: heroName, texts: ["Je peux le faire !", "Pour mes amis !", "C'est ma destinée !"] }]
+      },
+      'Victoire et retour': {
+        descriptions: [
+          `${heroName} a réussi ! La joie et la fierté illuminent son visage.`,
+          `Mission accomplie ! ${heroName} rentre chez lui, changé par cette aventure.`,
+          `Tout le monde célèbre la victoire de ${heroName}. C'est un jour de fête !`
+        ],
+        dialogues: [{ char: heroName, texts: ["On a réussi !", "Quelle aventure incroyable !", "Je suis prêt pour la prochaine !"] }]
+      }
+    };
+
+    // Structure par défaut
+    const defaultSteps = ['Introduction du héros', 'Appel à l\'aventure', 'Défis et alliés', 'Épreuve finale', 'Victoire et retour'];
+    const steps = selectedTemplate?.structure?.length ? selectedTemplate.structure : defaultSteps;
 
     const pages = Array.from({ length: numberOfPages }, (_, i) => {
-      const step = steps[Math.min(steps.length - 1, Math.floor((i / Math.max(1, numberOfPages - 1)) * steps.length))];
+      const stepIndex = Math.min(steps.length - 1, Math.floor((i / Math.max(1, numberOfPages - 1)) * steps.length));
+      const step = steps[stepIndex];
       const pageNumber = i + 1;
 
-      const description = `Page ${pageNumber} — ${step}. ${heroName} avance dans l'histoire. ${baseDesc ? `Contexte: ${baseDesc}.` : ''}`.trim();
+      // Trouver la scène correspondante ou fallback
+      const scene = sceneLibrary[step] || sceneLibrary[defaultSteps[Math.min(stepIndex, defaultSteps.length - 1)]];
+      const descIndex = i % scene.descriptions.length;
+      const dialogueIndex = i % scene.dialogues[0].texts.length;
 
+      // Description variée avec contexte du titre
+      const description = `Page ${pageNumber} — ${step}. ${scene.descriptions[descIndex]} ${baseDesc ? `(${baseDesc})` : ''} [Style: ${selectedGenre?.label || 'Aventure'}]`.trim();
+
+      // Dialogues variés
       const dialogues = [
-        { character: heroName, text: pageNumber === 1 ? "On y va !" : "On continue." },
-        { character: heroName, text: pageNumber === numberOfPages ? "On a réussi !" : "Regarde !" },
+        { character: heroName, text: scene.dialogues[0].texts[dialogueIndex] },
       ];
+
+      // Ajouter un second personnage occasionnellement
+      if (i > 0 && i < numberOfPages - 1 && i % 3 === 0) {
+        dialogues.push({ character: 'Ami', text: 'Je suis avec toi !' });
+      }
 
       return { description, dialogues };
     });
@@ -339,6 +394,9 @@ Réponds en JSON avec ce format exact:
         body: {
           type: 'comic-scenario',
           prompt,
+          // Passer la clé OpenAI utilisateur pour éviter les limites Lovable AI
+          useOpenAI: useOpenAI,
+          openaiApiKey: userApiKey || undefined,
         }
       });
 

@@ -1031,21 +1031,68 @@ Réponds UNIQUEMENT avec un JSON valide (sans markdown) dans ce format exact:
       }
     }
 
-    // Handle comic book scenario generation (uses Lovable AI)
+    // Handle comic book scenario generation (prioritizes user OpenAI key, then Lovable AI)
     if (type === 'comic-scenario') {
-      console.log('Processing comic scenario generation (Lovable AI)...');
-      const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+      console.log('Processing comic scenario generation...');
       
+      const systemPrompt = `Tu es un scénariste expert de bandes dessinées pour enfants et adolescents. 
+Tu crées des scénarios visuels riches et des dialogues percutants adaptés à l'âge du public.
+CHAQUE PAGE doit avoir une description visuelle UNIQUE et des dialogues DIFFÉRENTS.
+Réponds UNIQUEMENT avec du JSON valide, sans markdown, sans \`\`\`, sans commentaires.`;
+
+      // Priorité 1: Clé OpenAI de l'utilisateur
+      const userOpenAIKey = openaiApiKey;
+      if (useOpenAI && userOpenAIKey) {
+        console.log('Using user OpenAI key for comic scenario...');
+        try {
+          const response = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${userOpenAIKey}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              model: 'gpt-4o-mini',
+              messages: [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: prompt }
+              ],
+              max_tokens: 4000,
+            }),
+          });
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error('User OpenAI error for comic scenario:', response.status, errorText);
+            throw new Error(`OpenAI error: ${response.status}`);
+          }
+
+          const data = await response.json();
+          const scenarioText = data.choices?.[0]?.message?.content;
+          
+          if (!scenarioText) {
+            throw new Error('No content in OpenAI response');
+          }
+
+          console.log('Comic scenario generated successfully via user OpenAI');
+          return new Response(
+            JSON.stringify({ content: scenarioText }),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        } catch (openaiErr) {
+          console.error('User OpenAI failed, will try Lovable AI fallback:', openaiErr);
+          // Continue to Lovable AI fallback
+        }
+      }
+
+      // Priorité 2: Lovable AI
+      const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
       if (!LOVABLE_API_KEY) {
         return new Response(
-          JSON.stringify({ error: 'Lovable API key not configured' }),
+          JSON.stringify({ error: 'Aucune clé API configurée. Ajoutez votre clé OpenAI dans Paramètres.' }),
           { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
-
-      const systemPrompt = `Tu es un scénariste expert de bandes dessinées pour enfants et adolescents. 
-Tu crées des scénarios visuels riches et des dialogues percutants adaptés à l'âge du public.
-Réponds UNIQUEMENT avec du JSON valide, sans markdown, sans \`\`\`, sans commentaires.`;
 
       try {
         const controller = new AbortController();
@@ -1091,7 +1138,7 @@ Réponds UNIQUEMENT avec du JSON valide, sans markdown, sans \`\`\`, sans commen
           );
         }
 
-        console.log('Comic scenario generated successfully');
+        console.log('Comic scenario generated successfully via Lovable AI');
         return new Response(
           JSON.stringify({ content: scenarioText }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
