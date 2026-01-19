@@ -306,6 +306,29 @@ Audience: ${targetAudience}`;
       setActiveTab('preview');
       toast.success('Documentaire généré!', { description: `${bookData.chapters.length} chapitres créés` });
 
+      // Sauvegarde automatique du projet
+      try {
+        await saveSpecializedProject({
+          title: bookData.title,
+          author_name: bookData.author,
+          project_type: 'documentary',
+          target_audience: targetAudience,
+          preface: bookData.introduction,
+          conclusion: bookData.conclusion,
+          chapters: bookData.chapters.map(ch => ({
+            title: ch.title,
+            content: ch.content,
+            facts: ch.facts,
+            sources: ch.sources,
+          })),
+          number_of_chapters: bookData.chapters.length,
+          book_summary: bookData.subtitle,
+        });
+        toast.success('Projet sauvegardé', { description: 'Retrouvez-le dans "Mes Projets"' });
+      } catch (saveError) {
+        console.error('Erreur sauvegarde auto:', saveError);
+      }
+
     } catch (error: any) {
       console.error('Erreur génération:', error);
       const details =
