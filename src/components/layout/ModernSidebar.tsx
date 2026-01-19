@@ -464,7 +464,16 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
             const hasActiveItem = category.items.some(item => item.id === activeTab);
 
             return (
-              <div key={category.id} className="mb-2">
+              <div 
+                key={category.id} 
+                className={cn(
+                  "mb-3 rounded-2xl border-2 transition-all",
+                  hasActiveItem 
+                    ? "border-violet-400/60 dark:border-violet-500/50 bg-gradient-to-br from-violet-50/50 to-purple-50/30 dark:from-violet-950/30 dark:to-purple-950/20 shadow-lg shadow-violet-500/10" 
+                    : "border-violet-200/40 dark:border-violet-800/30 bg-white/30 dark:bg-white/5 hover:border-violet-300/60 dark:hover:border-violet-700/50",
+                  isCollapsed ? "p-1" : "p-2"
+                )}
+              >
                 {/* Titre catégorie */}
                 {!isCollapsed ? (
                   <button
