@@ -4,26 +4,34 @@
 
 @layer base {
   :root {
-    --background: 220 20% 98%;
-    --foreground: 222 47% 11%;
+    --background: 240 20% 98%;
+    --foreground: 240 10% 20%;
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 240 10% 20%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
-    --primary: 262 83% 58%;
+    --popover-foreground: 240 10% 20%;
+    --primary: 262 70% 60%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 220 14% 96%;
-    --secondary-foreground: 222 47% 11%;
-    --muted: 220 14% 96%;
-    --muted-foreground: 220 9% 46%;
-    --accent: 262 83% 58%;
+    --secondary: 240 15% 95%;
+    --secondary-foreground: 240 10% 25%;
+    --muted: 240 15% 94%;
+    --muted-foreground: 240 8% 50%;
+    --accent: 280 65% 65%;
     --accent-foreground: 0 0% 100%;
-    --destructive: 0 84% 60%;
+    --destructive: 0 70% 55%;
     --destructive-foreground: 0 0% 100%;
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 262 83% 58%;
+    --border: 240 12% 90%;
+    --input: 240 12% 90%;
+    --ring: 262 70% 60%;
     --radius: 1rem;
+    
+    /* Pastel palette */
+    --pastel-violet: 262 65% 75%;
+    --pastel-pink: 330 65% 80%;
+    --pastel-blue: 210 70% 80%;
+    --pastel-mint: 160 55% 75%;
+    --pastel-peach: 25 80% 80%;
+    --pastel-lavender: 280 60% 82%;
     
     /* Palette Moderne Vibrante */
     --violet: 262 83% 58%;
@@ -66,34 +74,42 @@
   }
 
   .dark {
-    --background: 224 71% 4%;
-    --foreground: 213 31% 91%;
-    --card: 224 71% 6%;
-    --card-foreground: 213 31% 91%;
-    --popover: 224 71% 6%;
-    --popover-foreground: 213 31% 91%;
-    --primary: 262 83% 65%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 215 28% 17%;
-    --secondary-foreground: 213 31% 91%;
-    --muted: 215 28% 17%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 262 83% 65%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 63% 31%;
+    --background: 250 25% 12%;
+    --foreground: 240 15% 92%;
+    --card: 250 25% 15%;
+    --card-foreground: 240 15% 92%;
+    --popover: 250 25% 15%;
+    --popover-foreground: 240 15% 92%;
+    --primary: 262 70% 70%;
+    --primary-foreground: 250 25% 10%;
+    --secondary: 250 20% 20%;
+    --secondary-foreground: 240 15% 90%;
+    --muted: 250 20% 18%;
+    --muted-foreground: 240 12% 65%;
+    --accent: 280 60% 70%;
+    --accent-foreground: 250 25% 10%;
+    --destructive: 0 60% 45%;
     --destructive-foreground: 0 0% 100%;
-    --border: 215 28% 17%;
-    --input: 215 28% 17%;
-    --ring: 262 83% 65%;
+    --border: 250 20% 22%;
+    --input: 250 20% 22%;
+    --ring: 262 70% 70%;
+    
+    /* Dark pastel palette */
+    --pastel-violet: 262 50% 55%;
+    --pastel-pink: 330 50% 60%;
+    --pastel-blue: 210 55% 60%;
+    --pastel-mint: 160 45% 55%;
+    --pastel-peach: 25 60% 60%;
+    --pastel-lavender: 280 45% 62%;
     
     /* Dark gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(262 83% 50%) 0%, hsl(292 84% 50%) 100%);
-    --gradient-secondary: linear-gradient(135deg, hsl(189 94% 35%) 0%, hsl(160 84% 30%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(38 92% 45%) 0%, hsl(346 77% 45%) 100%);
-    --gradient-hero: linear-gradient(135deg, hsl(262 83% 45%) 0%, hsl(292 84% 50%) 50%, hsl(346 77% 45%) 100%);
-    --gradient-subtle: linear-gradient(135deg, hsl(224 71% 4%) 0%, hsl(262 83% 50% / 0.1) 100%);
-    --gradient-card: linear-gradient(145deg, rgba(30,41,59,0.95) 0%, rgba(30,41,59,0.8) 100%);
-    --gradient-glass: linear-gradient(145deg, rgba(30,41,59,0.7) 0%, rgba(30,41,59,0.4) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(262 60% 55%) 0%, hsl(292 60% 55%) 100%);
+    --gradient-secondary: linear-gradient(135deg, hsl(189 70% 40%) 0%, hsl(160 60% 40%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(38 70% 50%) 0%, hsl(346 60% 50%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(262 60% 50%) 0%, hsl(292 60% 55%) 50%, hsl(346 55% 50%) 100%);
+    --gradient-subtle: linear-gradient(135deg, hsl(250 25% 12%) 0%, hsl(262 60% 55% / 0.15) 100%);
+    --gradient-card: linear-gradient(145deg, rgba(35,30,55,0.95) 0%, rgba(35,30,55,0.8) 100%);
+    --gradient-glass: linear-gradient(145deg, rgba(35,30,55,0.7) 0%, rgba(35,30,55,0.4) 100%);
   }
 }
 
