@@ -285,7 +285,21 @@ const App = () => {
             <Route
               path="/subscription"
               element={
-                isAuthenticated ? (
+                isAdmin ? (
+                  <SubscriptionPage
+                    subscriberEmail={subscriberEmail || PERMANENT_ADMIN_EMAIL}
+                    subscriberData={subscriberData || { 
+                      plan_type: 'lifetime', 
+                      status: 'active', 
+                      access_code: 'ADMIN-ACCESS',
+                      ebook_plans_generated: 0,
+                      chapters_generated: 0,
+                      subchapters_generated: 0,
+                      covers_generated: 0
+                    }}
+                    onLogout={handleLogout}
+                  />
+                ) : isAuthenticated ? (
                   <SubscriptionPage
                     subscriberEmail={subscriberEmail}
                     subscriberData={subscriberData}
