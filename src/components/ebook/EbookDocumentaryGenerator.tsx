@@ -15,11 +15,12 @@ import {
   Wand2, FileDown, Globe, History, Microscope, Camera, TreePine, 
   Building, Landmark, Users, Award, ChevronDown, CheckCircle2,
   Eye, Edit, Plus, Trash2, GripVertical, Lightbulb, Target, BookMarked,
-  FileType
+  FileType, Save
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
+import { useProjectSave } from '@/hooks/useProjectSave';
 import jsPDF from 'jspdf';
 import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, PageBreak, BorderStyle, Table, TableRow, TableCell, WidthType } from 'docx';
 import { saveAs } from 'file-saver';

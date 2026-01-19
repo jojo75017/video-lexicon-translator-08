@@ -3,8 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { BookOpen, Trash2, Calendar, Eye, Search, Copy } from 'lucide-react';
-import { useEbookDatabase } from '@/hooks/useEbookDatabase';
+import { BookOpen, Trash2, Calendar, Eye, Search, Copy, Map, BookText, Palette, MessageSquare, Film, CalendarDays, Filter } from 'lucide-react';
+import { useEbookDatabase, ProjectType, PROJECT_TYPE_LABELS } from '@/hooks/useEbookDatabase';
 import { toast } from 'sonner';
 import {
   Dialog,
@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { EbookVersionHistory } from "./EbookVersionHistory";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface EbookProjectsListProps {
   onProjectLoad: (project: any) => void;
@@ -25,6 +26,17 @@ interface EbookProjectsListProps {
     hasContent: boolean;
   };
 }
+
+const TYPE_ICONS: Record<ProjectType | 'all', React.ReactNode> = {
+  all: <Filter className="h-4 w-4" />,
+  ebook: <BookOpen className="h-4 w-4" />,
+  atlas: <Map className="h-4 w-4" />,
+  encyclopedia: <BookText className="h-4 w-4" />,
+  coloring: <Palette className="h-4 w-4" />,
+  comic: <MessageSquare className="h-4 w-4" />,
+  documentary: <Film className="h-4 w-4" />,
+  diary: <CalendarDays className="h-4 w-4" />,
+};
 
 export function EbookProjectsList({ onProjectLoad, onCreateNew, currentProject }: EbookProjectsListProps) {
   const { 
@@ -42,6 +54,7 @@ export function EbookProjectsList({ onProjectLoad, onCreateNew, currentProject }
   const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<"date" | "title" | "author">("date");
+  const [filterType, setFilterType] = useState<ProjectType | 'all'>('all');
 
   useEffect(() => {
     loadProjects();
@@ -99,10 +112,12 @@ export function EbookProjectsList({ onProjectLoad, onCreateNew, currentProject }
   const filteredProjects = projects
     .filter(project => {
       const searchLower = searchQuery.toLowerCase();
-      return (
+      const matchesSearch = (
         project.title?.toLowerCase().includes(searchLower) ||
         project.author_name?.toLowerCase().includes(searchLower)
       );
+      const matchesType = filterType === 'all' || (project.project_type || 'ebook') === filterType;
+      return matchesSearch && matchesType;
     })
     .sort((a, b) => {
       switch (sortBy) {
@@ -115,6 +130,13 @@ export function EbookProjectsList({ onProjectLoad, onCreateNew, currentProject }
           return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
       }
     });
+
+  // Compter les projets par type
+  const typeCounts = projects.reduce((acc, p) => {
+    const type = p.project_type || 'ebook';
+    acc[type] = (acc[type] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
 
   if (loading) {
     return (
@@ -194,10 +216,10 @@ export function EbookProjectsList({ onProjectLoad, onCreateNew, currentProject }
       
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-playfair font-bold text-navy-deep mb-2">
-            Mes Projets d'Ebook
+          <h2 className="text-2xl font-playfair font-bold text-navy-deep dark:text-white mb-2">
+            Mes Projets
           </h2>
-          <p className="text-gray-cool">
+          <p className="text-muted-foreground">
             {filteredProjects.length} projet{filteredProjects.length > 1 ? 's' : ''} trouvé{filteredProjects.length > 1 ? 's' : ''}
           </p>
         </div>
@@ -205,6 +227,28 @@ export function EbookProjectsList({ onProjectLoad, onCreateNew, currentProject }
           <BookOpen className="mr-2 h-5 w-5" />
           Nouveau projet
         </Button>
+      </div>
+
+      {/* Filtres par catégorie */}
+      <div className="mb-6">
+        <Tabs value={filterType} onValueChange={(v) => setFilterType(v as ProjectType | 'all')}>
+          <TabsList className="flex-wrap h-auto gap-1 p-1 bg-muted/50">
+            <TabsTrigger value="all" className="flex items-center gap-1.5 text-xs">
+              {TYPE_ICONS.all}
+              <span>Tous</span>
+              <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-xs">{projects.length}</Badge>
+            </TabsTrigger>
+            {(Object.keys(PROJECT_TYPE_LABELS) as ProjectType[]).map(type => (
+              typeCounts[type] > 0 && (
+                <TabsTrigger key={type} value={type} className="flex items-center gap-1.5 text-xs">
+                  {TYPE_ICONS[type]}
+                  <span className="hidden sm:inline">{PROJECT_TYPE_LABELS[type].split(' ')[1]}</span>
+                  <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-xs">{typeCounts[type]}</Badge>
+                </TabsTrigger>
+              )
+            ))}
+          </TabsList>
+        </Tabs>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-4 mb-6">
@@ -254,10 +298,16 @@ export function EbookProjectsList({ onProjectLoad, onCreateNew, currentProject }
               key={project.id} 
               className={`hover:shadow-lg transition-all ${isActive ? 'ring-2 ring-primary' : ''}`}
             >
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <CardTitle className="text-lg font-playfair line-clamp-1">
+              <CardHeader className="pb-2">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      {TYPE_ICONS[project.project_type as ProjectType || 'ebook']}
+                      <Badge variant="outline" className="text-xs shrink-0">
+                        {PROJECT_TYPE_LABELS[project.project_type as ProjectType || 'ebook']?.split(' ')[1] || 'Ebook'}
+                      </Badge>
+                    </div>
+                    <CardTitle className="text-lg font-playfair line-clamp-2">
                       {project.title}
                     </CardTitle>
                     {project.author_name && (
@@ -267,17 +317,17 @@ export function EbookProjectsList({ onProjectLoad, onCreateNew, currentProject }
                     )}
                   </div>
                   {isActive && (
-                    <Badge variant="default" className="ml-2">
+                    <Badge variant="default" className="shrink-0">
                       Actif
                     </Badge>
                   )}
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex items-center gap-4 text-sm text-gray-cool">
+                <div className="flex items-center gap-4 text-sm text-muted-foreground">
                   <div className="flex items-center gap-1">
                     <BookOpen className="h-4 w-4" />
-                    <span>{chapterCount} chapitres</span>
+                    <span>{chapterCount} éléments</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Calendar className="h-4 w-4" />
@@ -286,7 +336,7 @@ export function EbookProjectsList({ onProjectLoad, onCreateNew, currentProject }
                 </div>
 
                 {project.target_audience && (
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-wrap">
                     <Badge variant="secondary">{project.target_audience}</Badge>
                     {project.tone && (
                       <Badge variant="outline">{project.tone}</Badge>
