@@ -1053,18 +1053,19 @@ Réponds en JSON:
         yPos += 6;
       });
 
-      // ===== PAGES DE BD - GRILLE DYNAMIQUE SELON LE LAYOUT =====
-      const selectedLayout = PANEL_LAYOUTS.find(l => l.value === panelLayout);
-      const panelsPerPage = selectedLayout?.panelsPerPage || 4;
-      
+      // ===== PAGES DE BD - GRILLE DYNAMIQUE SELON LE LAYOUT (par page) =====
       for (let i = 0; i < generatedPages.length; i++) {
         const page = generatedPages[i];
         pdf.addPage();
 
+        const layoutForPage = page.layout || panelLayout;
+        const selectedLayout = PANEL_LAYOUTS.find(l => l.value === layoutForPage);
+        const panelsPerPage = selectedLayout?.panelsPerPage || 4;
+
         // Calcul des dimensions selon le nombre de panels
-        let cols = 2;
-        let rows = Math.ceil(panelsPerPage / 2);
-        
+        const cols = 2;
+        const rows = Math.ceil(panelsPerPage / 2);
+
         const gap = 4;
         const panelWidth = (pageWidth - (margin * 2) - gap) / cols;
         const dialogueSpace = 15; // Espace pour les dialogues
@@ -1752,10 +1753,10 @@ Réponds en JSON:
           <CardContent>
             <div className="space-y-6">
               {generatedPages.map((page, index) => {
-                const panelsPerPage = PANEL_LAYOUTS.find(l => l.value === panelLayout)?.panelsPerPage || 4;
+                const layoutForPage = page.layout || panelLayout;
+                const panelsPerPage = PANEL_LAYOUTS.find(l => l.value === layoutForPage)?.panelsPerPage || 4;
                 const cols = 2;
                 const rows = Math.ceil(panelsPerPage / 2);
-                
                 return (
                   <div key={page.id} className="border border-border/50 rounded-lg p-4 bg-muted/20">
                     <div className="flex items-center justify-between mb-3">
