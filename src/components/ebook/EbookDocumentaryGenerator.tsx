@@ -22,6 +22,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 import { useProjectSave } from '@/hooks/useProjectSave';
 import jsPDF from 'jspdf';
+import { KdpQuickTools } from './KdpQuickTools';
 import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, PageBreak, BorderStyle, Table, TableRow, TableCell, WidthType } from 'docx';
 import { saveAs } from 'file-saver';
 
@@ -1689,6 +1690,17 @@ Inclus des faits marquants et des anecdotes.`;
             </Card>
           </TabsContent>
         </Tabs>
+      )}
+
+      {/* Outils KDP */}
+      {book && (
+        <KdpQuickTools
+          productType="documentary"
+          title={book.title}
+          pageCount={book.chapters.length * 10}
+          targetAudience={targetAudience}
+          theme={category}
+        />
       )}
     </div>
   );

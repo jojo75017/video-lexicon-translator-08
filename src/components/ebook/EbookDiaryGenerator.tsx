@@ -12,6 +12,7 @@ import { Heart, Star, Sparkles, Download, Loader2, BookHeart, Calendar, Flower2,
 import { supabase } from '@/integrations/supabase/client';
 import jsPDF from 'jspdf';
 import { useProjectSave } from '@/hooks/useProjectSave';
+import { KdpQuickTools } from './KdpQuickTools';
 
 interface EbookDiaryGeneratorProps {
   ebookTitle?: string;
@@ -839,6 +840,17 @@ High quality, professional book cover design, vertical format 6x9 inches.`;
           )}
         </CardContent>
       </Card>
+
+      {/* Outils KDP */}
+      {generatedPages.length > 0 && (
+        <KdpQuickTools
+          productType="diary"
+          title={customTitle || `${DIARY_TYPES.find(t => t.id === diaryType)?.label || 'Journal'} ${year}`}
+          pageCount={generatedPages.length}
+          targetAudience={ageGroup}
+          theme={theme}
+        />
+      )}
     </div>
   );
 };

@@ -13,6 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import jsPDF from 'jspdf';
 import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 import { useProjectSave } from '@/hooks/useProjectSave';
+import { KdpQuickTools } from './KdpQuickTools';
 
 interface ColoringPage {
   id: string;
@@ -1333,6 +1334,17 @@ CRITICAL REQUIREMENTS:
           </div>
         </CardContent>
       </Card>
+
+      {/* Outils KDP */}
+      {generatedPages.length > 0 && (
+        <KdpQuickTools
+          productType="coloring"
+          title={`Coloriage - ${THEMES.find(t => t.value === theme)?.label || theme}`}
+          pageCount={generatedPages.length + 3}
+          targetAudience={ageGroup}
+          theme={theme === 'custom' ? customTheme : theme}
+        />
+      )}
     </div>
   );
 };
