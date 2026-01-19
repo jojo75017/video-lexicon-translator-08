@@ -8,9 +8,11 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import { toast } from 'sonner';
-import { Heart, Star, Sparkles, Download, Loader2, BookHeart, Calendar, Flower2, Moon, Sun, Rainbow, Crown, Save } from 'lucide-react';
+import { Heart, Star, Sparkles, Download, Loader2, BookHeart, Calendar, Flower2, Moon, Sun, Rainbow, Crown, Save, FileText } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import jsPDF from 'jspdf';
+import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, PageBreak, BorderStyle } from 'docx';
+import { saveAs } from 'file-saver';
 import { useProjectSave } from '@/hooks/useProjectSave';
 import { KdpQuickTools } from './KdpQuickTools';
 import SpecializedAmazonPreview from './SpecializedAmazonPreview';
@@ -285,6 +287,7 @@ High quality, professional book cover design, vertical format 6x9 inches.`;
 
     toast.info('Création du PDF en cours...');
 
+    // Format KDP 6x9 pouces avec marges conformes
     const pdf = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',
@@ -293,7 +296,11 @@ High quality, professional book cover design, vertical format 6x9 inches.`;
 
     const pageWidth = 152.4;
     const pageHeight = 228.6;
-    const margin = 15;
+    
+    // Marges KDP conformes (en mm) - valeurs sécurisées pour 120+ pages
+    // Gouttière minimum: 9.5mm, extérieur: 6.35mm - on prend des valeurs généreuses
+    const margin = 19; // ~0.75 inch - marge uniforme conforme KDP
+    
     const themeColors = selectedTheme?.colors || ['#FFB6C1', '#FF69B4', '#FFC0CB'];
 
     // Helper function to draw decorative elements
@@ -552,7 +559,257 @@ High quality, professional book cover design, vertical format 6x9 inches.`;
     // Save PDF
     const fileName = `${customTitle || `Journal_${firstName || 'Mon_Agenda'}`}_${year}.pdf`;
     pdf.save(fileName);
-    toast.success(`PDF exporté: ${fileName}`);
+    toast.success(`PDF KDP exporté: ${fileName}`, { description: 'Marges conformes pour impression' });
+  };
+
+  const exportToWord = async () => {
+    if (generatedPages.length === 0) {
+      toast.error('Veuillez d\'abord générer le contenu');
+      return;
+    }
+
+    toast.info('Création du fichier Word en cours...');
+
+    try {
+      const children: any[] = [];
+
+      // === PAGE DE TITRE ===
+      children.push(
+        new Paragraph({
+          children: [],
+          spacing: { before: 2000 },
+        }),
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: 'Mon Journal',
+              bold: true,
+              size: 72, // 36pt
+              color: "FF69B4",
+            }),
+          ],
+          alignment: AlignmentType.CENTER,
+          spacing: { after: 400 },
+        }),
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: subtitle || selectedType?.description || '',
+              italics: true,
+              size: 32,
+              color: "666666",
+            }),
+          ],
+          alignment: AlignmentType.CENTER,
+          spacing: { after: 400 },
+        }),
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: `- ${year} -`,
+              size: 28,
+              color: "333333",
+            }),
+          ],
+          alignment: AlignmentType.CENTER,
+          spacing: { before: 1200 },
+        }),
+        new Paragraph({ children: [new PageBreak()] })
+      );
+
+      // === PAGE À PROPOS DE MOI ===
+      if (firstName) {
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: 'À propos de moi',
+                bold: true,
+                size: 36,
+                color: "FF69B4",
+              }),
+            ],
+            alignment: AlignmentType.CENTER,
+            spacing: { after: 400 },
+          })
+        );
+
+        const personalFields = [
+          'Mon prénom', 'Mon âge', 'Ma date de naissance', 'Mes passions',
+          'Ma couleur préférée', 'Mon animal préféré', 'Mon rêve secret'
+        ];
+
+        personalFields.forEach(field => {
+          children.push(
+            new Paragraph({
+              children: [
+                new TextRun({ text: `${field}: `, bold: true, size: 24 }),
+                new TextRun({ text: '_'.repeat(50), size: 24, color: "CCCCCC" }),
+              ],
+              spacing: { after: 300 },
+            })
+          );
+        });
+
+        children.push(new Paragraph({ children: [new PageBreak()] }));
+      }
+
+      // === PAGES MENSUELLES ===
+      const months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 
+                      'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+      
+      for (const month of months) {
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: `${month} ${year}`,
+                bold: true,
+                size: 40,
+                color: "FF69B4",
+              }),
+            ],
+            alignment: AlignmentType.CENTER,
+            spacing: { after: 400 },
+          })
+        );
+
+        // Lignes pour chaque jour
+        for (let day = 1; day <= 31; day++) {
+          children.push(
+            new Paragraph({
+              children: [
+                new TextRun({ text: `${day}  `, bold: true, size: 20 }),
+                new TextRun({ text: '_'.repeat(80), size: 20, color: "DDDDDD" }),
+              ],
+              spacing: { after: 100 },
+            })
+          );
+        }
+
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({ text: 'Notes: ', bold: true, size: 22 }),
+            ],
+            spacing: { before: 200 },
+          }),
+          new Paragraph({
+            children: [
+              new TextRun({ text: '_'.repeat(100), size: 20, color: "DDDDDD" }),
+            ],
+            spacing: { after: 100 },
+          }),
+          new Paragraph({
+            children: [
+              new TextRun({ text: '_'.repeat(100), size: 20, color: "DDDDDD" }),
+            ],
+            spacing: { after: 100 },
+          }),
+          new Paragraph({ children: [new PageBreak()] })
+        );
+      }
+
+      // === PAGES DE NOTES ===
+      for (let i = 0; i < 10; i++) {
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: 'Notes',
+                bold: true,
+                size: 32,
+                color: "FF69B4",
+              }),
+            ],
+            alignment: AlignmentType.CENTER,
+            spacing: { after: 300 },
+          })
+        );
+
+        for (let line = 0; line < 25; line++) {
+          children.push(
+            new Paragraph({
+              children: [
+                new TextRun({ text: '_'.repeat(100), size: 20, color: "EEEEEE" }),
+              ],
+              spacing: { after: 100 },
+            })
+          );
+        }
+
+        children.push(new Paragraph({ children: [new PageBreak()] }));
+      }
+
+      // === OBJECTIFS ===
+      children.push(
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: 'Mes Objectifs et Rêves',
+              bold: true,
+              size: 40,
+              color: "FF69B4",
+            }),
+          ],
+          alignment: AlignmentType.CENTER,
+          spacing: { after: 500 },
+        })
+      );
+
+      const goalSections = ['Court terme (1 mois)', 'Moyen terme (6 mois)', 'Long terme (1 an)', 'Mes rêves fous'];
+      goalSections.forEach(section => {
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({ text: section, bold: true, size: 26 }),
+            ],
+            spacing: { before: 300, after: 200 },
+          })
+        );
+        for (let i = 0; i < 5; i++) {
+          children.push(
+            new Paragraph({
+              children: [
+                new TextRun({ text: '○  ', size: 24 }),
+                new TextRun({ text: '_'.repeat(80), size: 20, color: "DDDDDD" }),
+              ],
+              spacing: { after: 120 },
+            })
+          );
+        }
+      });
+
+      // Création du document avec marges KDP
+      const doc = new Document({
+        sections: [{
+          properties: {
+            page: {
+              size: {
+                width: 6 * 72 * 20, // 6 inches en twips
+                height: 9 * 72 * 20, // 9 inches en twips
+              },
+              margin: {
+                top: 720, // 0.5 inch
+                right: 720,
+                bottom: 720,
+                left: 1080, // 0.75 inch pour gouttière
+              },
+            },
+          },
+          children,
+        }],
+      });
+
+      const blob = await Packer.toBlob(doc);
+      const fileName = `${customTitle || `Journal_${firstName || 'Mon_Agenda'}`}_${year}.docx`;
+      saveAs(blob, fileName);
+      toast.success(`Word exporté: ${fileName}`, { description: 'Compatible KDP pour impression' });
+
+    } catch (error) {
+      console.error('Erreur export Word:', error);
+      toast.error('Erreur lors de l\'export Word');
+    }
   };
 
   return (
@@ -821,7 +1078,15 @@ High quality, professional book cover design, vertical format 6x9 inches.`;
                   className="border-pink-300 text-pink-700 hover:bg-pink-50"
                 >
                   <Download className="w-4 h-4 mr-2" />
-                  Exporter PDF ({generatedPages.length} pages)
+                  PDF KDP
+                </Button>
+                <Button
+                  onClick={exportToWord}
+                  variant="outline"
+                  className="border-blue-300 text-blue-700 hover:bg-blue-50"
+                >
+                  <FileText className="w-4 h-4 mr-2" />
+                  Word KDP
                 </Button>
               </>
             )}
