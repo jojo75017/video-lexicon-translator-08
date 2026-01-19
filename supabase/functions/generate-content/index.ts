@@ -23,7 +23,7 @@ serve(async (req) => {
   }
 
   try {
-    const { email, actionType, prompt, numberOfChapters, ebookTitle, authorName, apiKey, type, content } = await req.json();
+    const { email, actionType, prompt, numberOfChapters, ebookTitle, authorName, apiKey, type, content, openaiApiKey, useOpenAI, maxTokens } = await req.json();
     console.log('Content generation request:', { email, actionType, type });
 
     // Handle KDP analytics (uses OpenAI for reliability)
@@ -1163,6 +1163,95 @@ Réponds UNIQUEMENT avec du JSON valide, sans markdown, sans \`\`\`, sans commen
 
         if (!generatedContent) {
           console.error('No content in OpenAI response:', JSON.stringify(data));
+          return new Response(
+            JSON.stringify({ error: "Réponse vide de l'IA" }),
+            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        console.log(`${type} generated successfully`);
+        return new Response(
+          JSON.stringify({ content: generatedContent }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      } catch (err) {
+        console.error(`${type} generation error:`, err);
+        const errorMessage = err?.name === 'AbortError' ? 'Timeout - génération trop longue' : err?.message;
+        return new Response(
+          JSON.stringify({ error: errorMessage || 'Erreur inconnue' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+
+    // Handle documentary book generation (structure, chapters, regeneration)
+    if (type === 'documentary-structure' || type === 'documentary-chapter' || type === 'documentary-chapter-regen') {
+      console.log(`Processing ${type} generation (OpenAI)...`);
+
+      // Prioritize user API key, fallback to server key
+      const openaiKey = (useOpenAI && openaiApiKey) ? openaiApiKey : Deno.env.get('OPENAI_API_KEY');
+      
+      if (!openaiKey) {
+        return new Response(
+          JSON.stringify({ error: 'Clé API OpenAI requise pour les documentaires' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const systemPrompt = type === 'documentary-structure'
+        ? `Tu es un auteur documentaire professionnel spécialisé dans la création de livres factuels de haute qualité.
+Tu génères des structures complètes avec introduction, chapitres détaillés, conclusion, bibliographie et glossaire.
+Réponds UNIQUEMENT avec du JSON valide, sans markdown, sans balises code.`
+        : `Tu es un rédacteur documentaire expert.
+Tu écris du contenu factuel, bien documenté, engageant et adapté à l'audience cible.
+Réponds avec du texte formaté de manière professionnelle, bien structuré avec des paragraphes clairs.`;
+
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 180000); // 3 min timeout for large content
+
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${openaiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'gpt-4o-mini',
+            messages: [
+              { role: 'system', content: systemPrompt },
+              { role: 'user', content: prompt },
+            ],
+            max_tokens: maxTokens || (type === 'documentary-structure' ? 8000 : 2500),
+            temperature: 0.7,
+          }),
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('OpenAI documentary error:', response.status, errorText);
+          
+          if (response.status === 429) {
+            return new Response(
+              JSON.stringify({ error: 'Trop de requêtes. Veuillez réessayer dans quelques instants.' }),
+              { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
+          }
+          
+          return new Response(
+            JSON.stringify({ error: 'Erreur lors de la génération du documentaire' }),
+            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        const data = await response.json();
+        const generatedContent = data?.choices?.[0]?.message?.content;
+
+        if (!generatedContent) {
+          console.error('No content in documentary response:', JSON.stringify(data));
           return new Response(
             JSON.stringify({ error: "Réponse vide de l'IA" }),
             { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
