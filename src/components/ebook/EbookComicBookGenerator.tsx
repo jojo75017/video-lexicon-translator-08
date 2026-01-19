@@ -254,7 +254,7 @@ export const EbookComicBookGenerator: React.FC<ComicBookGeneratorProps> = ({ ebo
     return { pages };
   };
 
-  // Générer 10 idées de titres via IA
+  // Générer 20 idées de titres via IA
   const generateTitleIdeas = async () => {
     setIsGeneratingTitles(true);
     setTitleSuggestions([]);
@@ -263,7 +263,7 @@ export const EbookComicBookGenerator: React.FC<ComicBookGeneratorProps> = ({ ebo
       const selectedGenre = GENRES.find(g => g.value === genre);
       const selectedAge = AGE_GROUPS.find(a => a.value === ageGroup);
 
-      const prompt = `Tu es un expert en bandes dessinées pour enfants. Génère exactement 10 titres accrocheurs et originaux pour une BD.
+      const prompt = `Tu es un expert en bandes dessinées pour enfants. Génère exactement 20 titres accrocheurs et originaux pour une BD.
 
 PARAMÈTRES:
 - Genre: ${selectedGenre?.label || 'Aventure'}
@@ -275,8 +275,9 @@ CONSIGNES:
 - Accrocheurs et mémorables
 - Adaptés aux enfants
 - Variés en style et thème
+- 20 titres DIFFÉRENTS et CRÉATIFS
 
-Réponds UNIQUEMENT avec un tableau JSON de 10 strings, sans explication:
+Réponds UNIQUEMENT avec un tableau JSON de 20 strings, sans explication:
 ["Titre 1", "Titre 2", ...]`;
 
       const { data, error } = await supabase.functions.invoke('generate-content', {
@@ -295,13 +296,13 @@ Réponds UNIQUEMENT avec un tableau JSON de 10 strings, sans explication:
       if (jsonMatch) {
         const titles = JSON.parse(jsonMatch[0]);
         if (Array.isArray(titles) && titles.length > 0) {
-          setTitleSuggestions(titles.slice(0, 10));
-          toast.success('10 idées de titres générées !');
+          setTitleSuggestions(titles.slice(0, 20));
+          toast.success(`${titles.length} idées de titres générées !`);
         } else {
           throw new Error('Format invalide');
         }
       } else {
-        // Fallback: générer des titres par défaut
+        // Fallback: générer des titres par défaut variés
         const fallbackTitles = [
           "Les Aventures de Max",
           "L'Île aux Trésors Magiques",
@@ -312,10 +313,20 @@ Réponds UNIQUEMENT avec un tableau JSON de 10 strings, sans explication:
           "Le Dragon et la Princesse",
           "L'Incroyable Voyage de Luna",
           "Les Détectives en Herbe",
-          "Le Secret du Château"
+          "Le Secret du Château",
+          "Robots en Folie",
+          "La Quête du Cristal Perdu",
+          "Pirate Malgré Moi",
+          "L'Escouade des Super-Animaux",
+          "Le Monde sous la Mer",
+          "Ninja Academy",
+          "La Magie de Noël",
+          "Course contre le Temps",
+          "Le Club des Inventeurs",
+          "Les Gardiens de la Galaxie Junior"
         ];
         setTitleSuggestions(fallbackTitles);
-        toast.info('Voici quelques idées de titres !');
+        toast.info('Voici 20 idées de titres !');
       }
     } catch (err) {
       console.error('Erreur génération titres:', err);
