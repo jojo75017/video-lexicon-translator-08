@@ -421,183 +421,327 @@ Inclus des faits marquants et des anecdotes.`;
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
-      const margin = 20;
+      const margin = 25;
       const contentWidth = pageWidth - 2 * margin;
       let yPos = margin;
+      const lineHeight = 7; // Interligne 1.5
+      const paragraphSpacing = 10; // Espace entre paragraphes
 
-      // Page de titre
+      // Helper pour écrire des paragraphes avec espacement
+      const writeParagraphs = (text: string, fontSize: number = 11) => {
+        const cleanText = cleanTextForPDF(text);
+        const paragraphs = cleanText.split(/\n\n+/).filter(p => p.trim());
+        
+        pdf.setFontSize(fontSize);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setTextColor(30, 30, 30);
+        
+        for (const para of paragraphs) {
+          const lines = pdf.splitTextToSize(para.trim(), contentWidth);
+          
+          for (const line of lines) {
+            if (yPos > pageHeight - margin - 10) {
+              pdf.addPage();
+              yPos = margin;
+            }
+            pdf.text(line, margin, yPos);
+            yPos += lineHeight;
+          }
+          yPos += paragraphSpacing - lineHeight; // Espace après paragraphe
+        }
+      };
+
+      // Helper pour les titres de section
+      const writeSectionTitle = (title: string, level: 1 | 2 = 1) => {
+        if (yPos > pageHeight - margin - 40) {
+          pdf.addPage();
+          yPos = margin;
+        }
+        
+        yPos += level === 1 ? 15 : 10;
+        
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(45, 55, 72);
+        pdf.setFontSize(level === 1 ? 22 : 16);
+        pdf.text(cleanTextForPDF(title), margin, yPos);
+        
+        // Ligne décorative sous le titre
+        if (level === 1) {
+          yPos += 4;
+          pdf.setDrawColor(66, 153, 225);
+          pdf.setLineWidth(0.8);
+          pdf.line(margin, yPos, margin + 40, yPos);
+        }
+        
+        yPos += level === 1 ? 12 : 8;
+      };
+
+      // === PAGE DE TITRE ===
+      // Fond dégradé simulé
       pdf.setFillColor(45, 55, 72);
       pdf.rect(0, 0, pageWidth, pageHeight, 'F');
-      pdf.setTextColor(255, 255, 255);
-      pdf.setFontSize(32);
-      pdf.text(cleanTextForPDF(book.title), pageWidth / 2, pageHeight / 3, { align: 'center' });
       
+      // Décoration
+      pdf.setFillColor(66, 153, 225);
+      pdf.rect(0, pageHeight * 0.4, pageWidth, 2, 'F');
+      
+      // Titre principal
+      pdf.setTextColor(255, 255, 255);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(36);
+      const titleLines = pdf.splitTextToSize(cleanTextForPDF(book.title), contentWidth);
+      let titleY = pageHeight / 3;
+      for (const line of titleLines) {
+        pdf.text(line, pageWidth / 2, titleY, { align: 'center' });
+        titleY += 14;
+      }
+      
+      // Sous-titre
       if (book.subtitle) {
+        pdf.setFont('helvetica', 'italic');
         pdf.setFontSize(18);
-        pdf.text(cleanTextForPDF(book.subtitle), pageWidth / 2, pageHeight / 3 + 15, { align: 'center' });
+        pdf.setTextColor(200, 200, 200);
+        pdf.text(cleanTextForPDF(book.subtitle), pageWidth / 2, titleY + 10, { align: 'center' });
       }
 
+      // Auteur
+      pdf.setFont('helvetica', 'normal');
       pdf.setFontSize(14);
-      pdf.text(`par ${cleanTextForPDF(book.author)}`, pageWidth / 2, pageHeight / 2, { align: 'center' });
+      pdf.setTextColor(255, 255, 255);
+      pdf.text(`par ${cleanTextForPDF(book.author)}`, pageWidth / 2, pageHeight * 0.55, { align: 'center' });
 
+      // Badge documentaire
+      pdf.setFillColor(66, 153, 225);
+      pdf.roundedRect(pageWidth / 2 - 25, pageHeight - 45, 50, 12, 3, 3, 'F');
       pdf.setFontSize(10);
-      pdf.text('DOCUMENTAIRE', pageWidth / 2, pageHeight - 30, { align: 'center' });
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('DOCUMENTAIRE', pageWidth / 2, pageHeight - 37, { align: 'center' });
 
-      // Table des matières
+      // === TABLE DES MATIÈRES ===
       pdf.addPage();
       pdf.setTextColor(0, 0, 0);
       yPos = margin;
-      pdf.setFontSize(24);
-      pdf.text('Table des matieres', margin, yPos);
-      yPos += 15;
-
+      
+      writeSectionTitle('Table des matières');
+      
+      pdf.setFont('helvetica', 'normal');
       pdf.setFontSize(12);
+      pdf.setTextColor(50, 50, 50);
+      
       book.chapters.forEach((chapter, idx) => {
-        if (yPos > pageHeight - margin) {
+        if (yPos > pageHeight - margin - 10) {
           pdf.addPage();
           yPos = margin;
         }
-        pdf.text(`${idx + 1}. ${cleanTextForPDF(chapter.title)}`, margin, yPos);
-        yPos += 8;
+        
+        // Numéro de chapitre en couleur
+        pdf.setTextColor(66, 153, 225);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(`${idx + 1}.`, margin, yPos);
+        
+        // Titre du chapitre
+        pdf.setTextColor(50, 50, 50);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(cleanTextForPDF(chapter.title), margin + 12, yPos);
+        
+        // Ligne pointillée
+        pdf.setDrawColor(200, 200, 200);
+        pdf.setLineDashPattern([1, 1], 0);
+        const titleWidth = pdf.getTextWidth(cleanTextForPDF(chapter.title));
+        pdf.line(margin + 14 + titleWidth, yPos, pageWidth - margin - 10, yPos);
+        pdf.setLineDashPattern([], 0);
+        
+        yPos += 10;
       });
 
-      // Introduction
+      // === INTRODUCTION ===
       pdf.addPage();
       yPos = margin;
-      pdf.setFontSize(20);
-      pdf.text('Introduction', margin, yPos);
-      yPos += 12;
-      pdf.setFontSize(11);
-      const introLines = pdf.splitTextToSize(cleanTextForPDF(book.introduction), contentWidth);
-      for (const line of introLines) {
-        if (yPos > pageHeight - margin) {
-          pdf.addPage();
-          yPos = margin;
-        }
-        pdf.text(line, margin, yPos);
-        yPos += 6;
-      }
+      writeSectionTitle('Introduction');
+      writeParagraphs(book.introduction);
 
-      // Chapitres
-      for (const chapter of book.chapters) {
+      // === CHAPITRES ===
+      for (const [idx, chapter] of book.chapters.entries()) {
         pdf.addPage();
         yPos = margin;
 
+        // Numéro de chapitre
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(12);
+        pdf.setTextColor(66, 153, 225);
+        pdf.text(`CHAPITRE ${idx + 1}`, margin, yPos);
+        yPos += 8;
+
+        // Titre du chapitre
+        pdf.setFont('helvetica', 'bold');
         pdf.setFontSize(20);
         pdf.setTextColor(45, 55, 72);
-        pdf.text(cleanTextForPDF(chapter.title), margin, yPos);
-        yPos += 10;
-
-        if (chapter.subtitle) {
-          pdf.setFontSize(14);
-          pdf.setTextColor(100, 100, 100);
-          pdf.text(cleanTextForPDF(chapter.subtitle), margin, yPos);
-          yPos += 10;
-        }
-
-        pdf.setFontSize(11);
-        pdf.setTextColor(0, 0, 0);
-        const contentLines = pdf.splitTextToSize(cleanTextForPDF(chapter.content), contentWidth);
-        for (const line of contentLines) {
-          if (yPos > pageHeight - margin) {
-            pdf.addPage();
-            yPos = margin;
-          }
+        const chapterTitleLines = pdf.splitTextToSize(cleanTextForPDF(chapter.title), contentWidth);
+        for (const line of chapterTitleLines) {
           pdf.text(line, margin, yPos);
-          yPos += 6;
+          yPos += 9;
         }
 
-        // Faits marquants
-        if (chapter.facts.length > 0) {
+        // Sous-titre
+        if (chapter.subtitle) {
+          pdf.setFont('helvetica', 'italic');
+          pdf.setFontSize(13);
+          pdf.setTextColor(100, 100, 100);
+          pdf.text(cleanTextForPDF(chapter.subtitle), margin, yPos + 2);
           yPos += 10;
-          if (yPos > pageHeight - margin - 30) {
+        }
+
+        // Ligne décorative
+        yPos += 3;
+        pdf.setDrawColor(66, 153, 225);
+        pdf.setLineWidth(0.5);
+        pdf.line(margin, yPos, margin + 30, yPos);
+        yPos += 12;
+
+        // Contenu du chapitre
+        writeParagraphs(chapter.content);
+
+        // Encadré "À retenir"
+        if (chapter.facts.length > 0) {
+          yPos += 8;
+          
+          if (yPos > pageHeight - margin - 50) {
             pdf.addPage();
             yPos = margin;
           }
-          pdf.setFontSize(12);
-          pdf.setTextColor(45, 55, 72);
-          pdf.text('A retenir :', margin, yPos);
-          yPos += 8;
+          
+          // Fond de l'encadré
+          const boxHeight = 15 + chapter.facts.length * 8;
+          pdf.setFillColor(240, 249, 255);
+          pdf.roundedRect(margin, yPos - 3, contentWidth, Math.min(boxHeight, 60), 3, 3, 'F');
+          
+          // Bordure gauche colorée
+          pdf.setFillColor(66, 153, 225);
+          pdf.rect(margin, yPos - 3, 3, Math.min(boxHeight, 60), 'F');
+          
+          // Titre de l'encadré
+          pdf.setFont('helvetica', 'bold');
+          pdf.setFontSize(11);
+          pdf.setTextColor(43, 108, 176);
+          pdf.text('À retenir', margin + 8, yPos + 4);
+          yPos += 12;
+          
+          // Points
+          pdf.setFont('helvetica', 'normal');
           pdf.setFontSize(10);
-          pdf.setTextColor(0, 0, 0);
+          pdf.setTextColor(50, 50, 50);
+          
           for (const fact of chapter.facts) {
+            if (yPos > pageHeight - margin - 10) {
+              pdf.addPage();
+              yPos = margin;
+            }
+            pdf.setTextColor(66, 153, 225);
+            pdf.text('•', margin + 8, yPos);
+            pdf.setTextColor(50, 50, 50);
+            const factLines = pdf.splitTextToSize(cleanTextForPDF(fact), contentWidth - 20);
+            pdf.text(factLines[0], margin + 14, yPos);
+            yPos += 7;
+          }
+          yPos += 8;
+        }
+
+        // Sources
+        if (chapter.sources && chapter.sources.length > 0) {
+          yPos += 5;
+          pdf.setFont('helvetica', 'italic');
+          pdf.setFontSize(9);
+          pdf.setTextColor(120, 120, 120);
+          pdf.text('Sources:', margin, yPos);
+          yPos += 5;
+          
+          for (const source of chapter.sources) {
             if (yPos > pageHeight - margin) {
               pdf.addPage();
               yPos = margin;
             }
-            pdf.text(`- ${cleanTextForPDF(fact)}`, margin + 5, yPos);
-            yPos += 6;
+            const sourceLines = pdf.splitTextToSize(`- ${cleanTextForPDF(source)}`, contentWidth - 10);
+            pdf.text(sourceLines[0], margin + 5, yPos);
+            yPos += 5;
           }
         }
       }
 
-      // Conclusion
+      // === CONCLUSION ===
       pdf.addPage();
       yPos = margin;
-      pdf.setFontSize(20);
-      pdf.setTextColor(45, 55, 72);
-      pdf.text('Conclusion', margin, yPos);
-      yPos += 12;
-      pdf.setFontSize(11);
-      pdf.setTextColor(0, 0, 0);
-      const conclusionLines = pdf.splitTextToSize(cleanTextForPDF(book.conclusion), contentWidth);
-      for (const line of conclusionLines) {
-        if (yPos > pageHeight - margin) {
-          pdf.addPage();
-          yPos = margin;
-        }
-        pdf.text(line, margin, yPos);
-        yPos += 6;
-      }
+      writeSectionTitle('Conclusion');
+      writeParagraphs(book.conclusion);
 
-      // Bibliographie
+      // === BIBLIOGRAPHIE ===
       if (book.bibliography.length > 0) {
         pdf.addPage();
         yPos = margin;
-        pdf.setFontSize(20);
-        pdf.setTextColor(45, 55, 72);
-        pdf.text('Bibliographie', margin, yPos);
-        yPos += 12;
+        writeSectionTitle('Bibliographie');
+        
+        pdf.setFont('helvetica', 'normal');
         pdf.setFontSize(10);
-        pdf.setTextColor(0, 0, 0);
-        for (const ref of book.bibliography) {
-          if (yPos > pageHeight - margin) {
+        pdf.setTextColor(50, 50, 50);
+        
+        book.bibliography.forEach((ref, idx) => {
+          if (yPos > pageHeight - margin - 10) {
             pdf.addPage();
             yPos = margin;
           }
-          pdf.text(`- ${cleanTextForPDF(ref)}`, margin, yPos);
+          
+          pdf.setTextColor(66, 153, 225);
+          pdf.text(`[${idx + 1}]`, margin, yPos);
+          pdf.setTextColor(50, 50, 50);
+          
+          const refLines = pdf.splitTextToSize(cleanTextForPDF(ref), contentWidth - 15);
+          pdf.text(refLines[0], margin + 12, yPos);
+          yPos += 8;
+        });
+      }
+
+      // === GLOSSAIRE ===
+      if (book.glossary.length > 0) {
+        pdf.addPage();
+        yPos = margin;
+        writeSectionTitle('Glossaire');
+        
+        for (const entry of book.glossary) {
+          if (yPos > pageHeight - margin - 20) {
+            pdf.addPage();
+            yPos = margin;
+          }
+          
+          // Terme en gras
+          pdf.setFont('helvetica', 'bold');
+          pdf.setFontSize(11);
+          pdf.setTextColor(45, 55, 72);
+          pdf.text(cleanTextForPDF(entry.term), margin, yPos);
+          
+          // Définition
+          pdf.setFont('helvetica', 'normal');
+          pdf.setFontSize(10);
+          pdf.setTextColor(70, 70, 70);
+          const defLines = pdf.splitTextToSize(cleanTextForPDF(entry.definition), contentWidth - 5);
+          yPos += 6;
+          for (const line of defLines) {
+            pdf.text(line, margin + 5, yPos);
+            yPos += 5;
+          }
           yPos += 6;
         }
       }
 
-      // Glossaire
-      if (book.glossary.length > 0) {
-        pdf.addPage();
-        yPos = margin;
-        pdf.setFontSize(20);
-        pdf.setTextColor(45, 55, 72);
-        pdf.text('Glossaire', margin, yPos);
-        yPos += 12;
-        pdf.setFontSize(10);
-        pdf.setTextColor(0, 0, 0);
-        for (const entry of book.glossary) {
-          if (yPos > pageHeight - margin) {
-            pdf.addPage();
-            yPos = margin;
-          }
-          pdf.setFont('helvetica', 'bold');
-          pdf.text(cleanTextForPDF(entry.term), margin, yPos);
-          pdf.setFont('helvetica', 'normal');
-          const defLines = pdf.splitTextToSize(cleanTextForPDF(entry.definition), contentWidth - 30);
-          for (let i = 0; i < defLines.length; i++) {
-            pdf.text(defLines[i], margin + 30, yPos);
-            yPos += 5;
-          }
-          yPos += 3;
-        }
+      // Numéros de page (sauf page de titre)
+      const totalPages = pdf.getNumberOfPages();
+      for (let i = 2; i <= totalPages; i++) {
+        pdf.setPage(i);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(9);
+        pdf.setTextColor(150, 150, 150);
+        pdf.text(`${i - 1}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
       }
 
-      const fileName = `${book.title.replace(/[^a-zA-Z0-9]/g, '_')}_documentaire.pdf`;
+      const fileName = `${book.title.replace(/[^a-zA-Z0-9àâäéèêëïîôöùûüç\s]/gi, '_')}_documentaire.pdf`;
       pdf.save(fileName);
       toast.success('PDF exporté!', { description: fileName });
 
