@@ -26,26 +26,35 @@ export const AuthPage = () => {
   };
 
   useEffect(() => {
-    // Redirection automatique admin vers ebook-planner
+    // Redirection silencieuse si déjà admin avec session active
     const checkAuth = async () => {
       try {
         const {
           data: { session },
         } = await supabase.auth.getSession();
 
-        if (!session) return;
+        // Pas de session = pas de vérification automatique
+        if (!session) {
+          console.log('AuthPage: Pas de session, affichage du formulaire');
+          return;
+        }
 
+        // Vérification silencieuse en arrière-plan (sans popup ni toast)
         const { data, error } = await checkAdmin(session.access_token);
-        if (error) return;
+        
+        // En cas d'erreur, on ignore silencieusement et on laisse l'utilisateur se connecter
+        if (error) {
+          console.log('AuthPage: Erreur check-admin silencieuse, formulaire affiché');
+          return;
+        }
 
         if (data?.isAdmin) {
-          // Persist admin status in sessionStorage
           sessionStorage.setItem('is_admin', 'true');
-          // Redirect admin to /admin dashboard
           navigate('/admin', { replace: true });
         }
       } catch (error) {
-        console.error('Erreur dans checkAuth:', error);
+        // Ignorer les erreurs silencieusement
+        console.log('AuthPage: Exception checkAuth ignorée');
       }
     };
 
