@@ -23,6 +23,7 @@ import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 import { useProjectSave } from '@/hooks/useProjectSave';
 import jsPDF from 'jspdf';
 import { KdpQuickTools } from './KdpQuickTools';
+import SpecializedAmazonPreview from './SpecializedAmazonPreview';
 import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, PageBreak, BorderStyle, Table, TableRow, TableCell, WidthType } from 'docx';
 import { saveAs } from 'file-saver';
 
@@ -1690,6 +1691,19 @@ Inclus des faits marquants et des anecdotes.`;
             </Card>
           </TabsContent>
         </Tabs>
+      )}
+
+      {/* Simulateur Amazon */}
+      {book && (
+        <SpecializedAmazonPreview
+          productType="documentary"
+          title={book.title}
+          authorName={book.author || "Votre Nom"}
+          pageCount={book.chapters.length * 10}
+          description={book.introduction}
+          targetAudience={targetAudience}
+          theme={DOCUMENTARY_CATEGORIES.find(c => c.value === category)?.label}
+        />
       )}
 
       {/* Outils KDP */}
