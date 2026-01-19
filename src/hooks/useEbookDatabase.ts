@@ -2,6 +2,29 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
+// Types de projets supportés
+export type ProjectType = 'ebook' | 'atlas' | 'encyclopedia' | 'coloring' | 'comic' | 'documentary' | 'diary';
+
+export const PROJECT_TYPE_LABELS: Record<ProjectType, string> = {
+  ebook: '📚 Ebook',
+  atlas: '🗺️ Atlas',
+  encyclopedia: '📖 Encyclopédie',
+  coloring: '🎨 Coloriage',
+  comic: '💬 BD',
+  documentary: '📹 Documentaire',
+  diary: '📓 Agenda/Journal',
+};
+
+export const PROJECT_TYPE_ICONS: Record<ProjectType, string> = {
+  ebook: 'BookOpen',
+  atlas: 'Map',
+  encyclopedia: 'BookText',
+  coloring: 'Palette',
+  comic: 'MessageSquare',
+  documentary: 'Film',
+  diary: 'Calendar',
+};
+
 interface EbookProject {
   id?: string;
   title: string;
@@ -25,6 +48,7 @@ interface EbookProject {
   kdp_description?: string;
   kdp_keywords?: string;
   kdp_categories?: string;
+  project_type?: ProjectType;
 }
 
 export const useEbookDatabase = () => {
@@ -246,18 +270,24 @@ export const useEbookDatabase = () => {
     }
   };
 
-  // Charger tous les projets de l'utilisateur
-  const loadAllProjects = async () => {
+  // Charger tous les projets de l'utilisateur (avec filtre optionnel par type)
+  const loadAllProjects = async (projectType?: ProjectType) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) return [];
 
-      const { data, error } = await supabase
+      let query = supabase
         .from('ebook_projects')
         .select('*')
-        .eq('user_id', user.id)
-        .order('updated_at', { ascending: false });
+        .eq('user_id', user.id);
+      
+      // Filtre par type si spécifié
+      if (projectType) {
+        query = query.eq('project_type', projectType);
+      }
+      
+      const { data, error } = await query.order('updated_at', { ascending: false });
 
       if (error) throw error;
       

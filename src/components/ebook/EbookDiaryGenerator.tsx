@@ -8,9 +8,10 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import { toast } from 'sonner';
-import { Heart, Star, Sparkles, Download, Loader2, BookHeart, Calendar, Flower2, Moon, Sun, Rainbow, Crown } from 'lucide-react';
+import { Heart, Star, Sparkles, Download, Loader2, BookHeart, Calendar, Flower2, Moon, Sun, Rainbow, Crown, Save } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import jsPDF from 'jspdf';
+import { useProjectSave } from '@/hooks/useProjectSave';
 
 interface EbookDiaryGeneratorProps {
   ebookTitle?: string;

@@ -235,6 +235,7 @@ export type Database = {
           narrative_format: string | null
           number_of_chapters: number | null
           preface: string | null
+          project_type: string | null
           seo_optimization: string | null
           target_audience: string | null
           title: string
@@ -262,6 +263,7 @@ export type Database = {
           narrative_format?: string | null
           number_of_chapters?: number | null
           preface?: string | null
+          project_type?: string | null
           seo_optimization?: string | null
           target_audience?: string | null
           title: string
@@ -289,6 +291,7 @@ export type Database = {
           narrative_format?: string | null
           number_of_chapters?: number | null
           preface?: string | null
+          project_type?: string | null
           seo_optimization?: string | null
           target_audience?: string | null
           title?: string
