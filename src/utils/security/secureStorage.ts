@@ -133,18 +133,17 @@ export function isValidApiKeyFormat(key: string, prefix?: string): boolean {
     return false;
   }
   
-  // Check prefix if provided
+  // Check prefix if provided - support sk-proj-, sk-svcacct-, sk-...
   if (prefix && !trimmed.startsWith(prefix)) {
     return false;
   }
   
+  // OpenAI keys can contain alphanumeric, dashes, and underscores
   // Check for suspicious patterns (potential injection attempts)
   const suspiciousPatterns = [
     /<script/i,
     /javascript:/i,
-    /{|}|\[|\]/,
-    /SELECT|INSERT|UPDATE|DELETE|DROP/i,
-    /--|\|\||&&/
+    /SELECT\s+\*|INSERT\s+INTO|UPDATE\s+.+SET|DELETE\s+FROM|DROP\s+TABLE/i,
   ];
   
   for (const pattern of suspiciousPatterns) {
