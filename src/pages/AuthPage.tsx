@@ -321,6 +321,16 @@ export const AuthPage = () => {
           </div>
           <div className="mt-2 text-center">
             <Button
+              variant="secondary"
+              onClick={() => navigate('/admin-direct')}
+              disabled={isLoading}
+              className="text-sm"
+            >
+              Accès admin direct (lien email)
+            </Button>
+          </div>
+          <div className="mt-2 text-center">
+            <Button
               variant="link"
               onClick={() => navigate('/')}
               disabled={isLoading}
