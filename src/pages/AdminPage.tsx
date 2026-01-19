@@ -776,6 +776,16 @@ export const AdminPage = () => {
                             <Copy className="w-4 h-4 mr-1" />
                             Code
                           </Button>
+                          <Button
+                            onClick={() => handleManageSubscription('toggle_status', subscriber.id)}
+                            variant="outline"
+                            size="sm"
+                            className="border-red-300 text-red-600 hover:bg-red-50"
+                            title="Désactiver l'accès"
+                          >
+                            <Pause className="w-4 h-4 mr-1" />
+                            Désactiver
+                          </Button>
                         </div>
                       </td>
                     </tr>
