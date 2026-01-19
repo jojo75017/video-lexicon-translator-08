@@ -243,6 +243,139 @@ export const EbookSettings: React.FC<EbookSettingsProps> = ({
               </p>
             </div>
           )}
+
+          {/* Guide pas-à-pas */}
+          <div className="border-t pt-4 mt-4">
+            <details className="group">
+              <summary className="cursor-pointer flex items-center gap-2 text-sm font-semibold text-orange-700 dark:text-orange-300 hover:text-orange-800 dark:hover:text-orange-200 transition-colors">
+                <span className="text-lg">📖</span>
+                Guide pas-à-pas : Créer et configurer votre clé API OpenAI
+                <span className="ml-auto text-xs text-orange-500 group-open:hidden">▼ Voir le guide</span>
+                <span className="ml-auto text-xs text-orange-500 hidden group-open:inline">▲ Masquer</span>
+              </summary>
+              
+              <div className="mt-4 space-y-4 text-sm">
+                {/* Étape 1 */}
+                <div className="bg-white dark:bg-gray-900 rounded-lg p-4 border border-orange-200 dark:border-orange-800">
+                  <div className="flex items-start gap-3">
+                    <span className="flex-shrink-0 w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center font-bold text-sm">1</span>
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-gray-800 dark:text-gray-200">Créer un compte OpenAI</h4>
+                      <p className="text-gray-600 dark:text-gray-400">
+                        Rendez-vous sur{' '}
+                        <a 
+                          href="https://platform.openai.com/signup" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-blue-600 dark:text-blue-400 underline hover:text-blue-700"
+                        >
+                          platform.openai.com/signup
+                        </a>
+                        {' '}et créez un compte gratuit avec votre email ou compte Google.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Étape 2 */}
+                <div className="bg-white dark:bg-gray-900 rounded-lg p-4 border border-orange-200 dark:border-orange-800">
+                  <div className="flex items-start gap-3">
+                    <span className="flex-shrink-0 w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center font-bold text-sm">2</span>
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-gray-800 dark:text-gray-200">Accéder aux clés API</h4>
+                      <p className="text-gray-600 dark:text-gray-400">
+                        Une fois connecté, allez dans{' '}
+                        <a 
+                          href="https://platform.openai.com/api-keys" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-blue-600 dark:text-blue-400 underline hover:text-blue-700"
+                        >
+                          API Keys
+                        </a>
+                        {' '}(menu de gauche → API Keys).
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Étape 3 */}
+                <div className="bg-white dark:bg-gray-900 rounded-lg p-4 border border-orange-200 dark:border-orange-800">
+                  <div className="flex items-start gap-3">
+                    <span className="flex-shrink-0 w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center font-bold text-sm">3</span>
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-gray-800 dark:text-gray-200">Créer une nouvelle clé</h4>
+                      <p className="text-gray-600 dark:text-gray-400">
+                        Cliquez sur <strong>"+ Create new secret key"</strong>, donnez-lui un nom (ex: "EbookStudio"), puis copiez la clé affichée.
+                      </p>
+                      <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-700 rounded p-2 text-xs text-amber-700 dark:text-amber-300">
+                        ⚠️ <strong>Important :</strong> La clé ne sera affichée qu'une seule fois ! Copiez-la immédiatement.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Étape 4 */}
+                <div className="bg-white dark:bg-gray-900 rounded-lg p-4 border border-orange-200 dark:border-orange-800">
+                  <div className="flex items-start gap-3">
+                    <span className="flex-shrink-0 w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center font-bold text-sm">4</span>
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-gray-800 dark:text-gray-200">Ajouter du crédit (optionnel mais recommandé)</h4>
+                      <p className="text-gray-600 dark:text-gray-400">
+                        Pour de meilleurs résultats, ajoutez du crédit sur{' '}
+                        <a 
+                          href="https://platform.openai.com/settings/organization/billing/overview" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-blue-600 dark:text-blue-400 underline hover:text-blue-700"
+                        >
+                          Billing → Add payment details
+                        </a>
+                        . Un crédit de <strong>5€</strong> suffit pour générer environ <strong>10-15 livres complets</strong>.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Étape 5 */}
+                <div className="bg-white dark:bg-gray-900 rounded-lg p-4 border border-green-200 dark:border-green-800">
+                  <div className="flex items-start gap-3">
+                    <span className="flex-shrink-0 w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center font-bold text-sm">5</span>
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-gray-800 dark:text-gray-200">Coller votre clé ci-dessus</h4>
+                      <p className="text-gray-600 dark:text-gray-400">
+                        Collez votre clé (commence par <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">sk-proj-...</code>) dans le champ ci-dessus et cliquez sur <strong>"Valider"</strong>.
+                      </p>
+                      <div className="bg-green-50 dark:bg-green-950/30 border border-green-300 dark:border-green-700 rounded p-2 text-xs text-green-700 dark:text-green-300">
+                        ✅ <strong>C'est tout !</strong> Votre clé est stockée localement et sécurisée. Vous pouvez maintenant générer vos livres.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* FAQ rapide */}
+                <div className="bg-gradient-to-r from-violet-50 to-purple-50 dark:from-violet-950/30 dark:to-purple-950/30 rounded-lg p-4 border border-violet-200 dark:border-violet-700">
+                  <h4 className="font-semibold text-violet-800 dark:text-violet-200 mb-3 flex items-center gap-2">
+                    <span>❓</span> Questions fréquentes
+                  </h4>
+                  <div className="space-y-3 text-xs">
+                    <div>
+                      <p className="font-medium text-violet-700 dark:text-violet-300">Combien ça coûte par livre ?</p>
+                      <p className="text-violet-600 dark:text-violet-400">Entre 0,30€ et 2€ selon la longueur du livre (10 à 50 chapitres).</p>
+                    </div>
+                    <div>
+                      <p className="font-medium text-violet-700 dark:text-violet-300">Ma clé est-elle sécurisée ?</p>
+                      <p className="text-violet-600 dark:text-violet-400">Oui, elle est stockée uniquement dans votre navigateur (localStorage), jamais sur nos serveurs.</p>
+                    </div>
+                    <div>
+                      <p className="font-medium text-violet-700 dark:text-violet-300">Puis-je utiliser le tier gratuit d'OpenAI ?</p>
+                      <p className="text-violet-600 dark:text-violet-400">Oui, mais les limites sont strictes. Pour un usage fluide, 5€ de crédit suffisent pour plusieurs semaines.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
         </CardContent>
       </Card>
 
