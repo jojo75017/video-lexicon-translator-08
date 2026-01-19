@@ -162,6 +162,7 @@ const categories: PremiumCategory[] = [
       { id: 'series', label: 'Série / Saga', icon: BookCopy, color: 'text-indigo-500', bgColor: 'bg-indigo-500/10', activeGradient: 'from-indigo-500 to-purple-500', isNew2026: true },
       { id: 'coloring-book', label: '🖍️ Livre Coloriage', icon: Palette, color: 'text-pink-500', bgColor: 'bg-gradient-to-r from-pink-500/20 to-purple-500/20', activeGradient: 'from-pink-500 to-purple-500', isPremium: true, isNew2026: true },
       { id: 'comic-book', label: '💬 Bande Dessinée', icon: LayoutTemplate, color: 'text-amber-500', bgColor: 'bg-gradient-to-r from-amber-500/20 to-orange-500/20', activeGradient: 'from-amber-500 to-orange-500', isPremium: true, isNew2026: true },
+      { id: 'documentary', label: '📚 Documentaires', icon: BookMarked, color: 'text-blue-500', bgColor: 'bg-gradient-to-r from-blue-500/20 to-indigo-500/20', activeGradient: 'from-blue-500 to-indigo-500', isPremium: true, isNew2026: true },
       { id: 'diary-generator', label: '💕 Agendas & Journaux', icon: BookHeart, color: 'text-pink-500', bgColor: 'bg-gradient-to-r from-pink-500/20 to-rose-500/20', activeGradient: 'from-pink-500 to-rose-500', isPremium: true, isNew2026: true },
       { id: 'voice', label: 'Dictée Vocale', icon: Volume2, color: 'text-rose-500', bgColor: 'bg-rose-500/10', activeGradient: 'from-rose-500 to-pink-500' },
     ]
