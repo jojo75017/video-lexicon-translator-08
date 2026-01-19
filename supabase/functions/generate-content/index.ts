@@ -1185,19 +1185,13 @@ Réponds UNIQUEMENT avec du JSON valide, sans markdown, sans \`\`\`, sans commen
     }
 
     // Handle documentary book generation (structure, chapters, regeneration)
+    // Use Lovable AI by default, fallback to user's OpenAI key if provided
     if (type === 'documentary-structure' || type === 'documentary-chapter' || type === 'documentary-chapter-regen') {
-      console.log(`Processing ${type} generation (OpenAI)...`);
+      console.log(`Processing ${type} generation...`);
 
-      // Prioritize user API key, fallback to server key
-      const openaiKey = (useOpenAI && openaiApiKey) ? openaiApiKey : Deno.env.get('OPENAI_API_KEY');
+      const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+      const userOpenAIKey = (useOpenAI && openaiApiKey) ? openaiApiKey : null;
       
-      if (!openaiKey) {
-        return new Response(
-          JSON.stringify({ error: 'Clé API OpenAI requise pour les documentaires' }),
-          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-
       const systemPrompt = type === 'documentary-structure'
         ? `Tu es un auteur documentaire professionnel spécialisé dans la création de livres factuels de haute qualité.
 Tu génères des structures complètes avec introduction, chapitres détaillés, conclusion, bibliographie et glossaire.
@@ -1208,36 +1202,80 @@ Réponds avec du texte formaté de manière professionnelle, bien structuré ave
 
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 180000); // 3 min timeout for large content
+        const timeoutId = setTimeout(() => controller.abort(), 180000); // 3 min timeout
 
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${openaiKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model: 'gpt-4o-mini',
-            messages: [
-              { role: 'system', content: systemPrompt },
-              { role: 'user', content: prompt },
-            ],
-            max_tokens: maxTokens || (type === 'documentary-structure' ? 8000 : 2500),
-            temperature: 0.7,
-          }),
-          signal: controller.signal,
-        });
+        let response;
+        let usedProvider = 'lovable';
+
+        // Try Lovable AI first (free credits)
+        if (LOVABLE_API_KEY) {
+          console.log(`Trying Lovable AI for ${type}...`);
+          response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              model: 'google/gemini-2.5-flash',
+              messages: [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: prompt },
+              ],
+            }),
+            signal: controller.signal,
+          });
+
+          if (!response.ok) {
+            console.log(`Lovable AI failed with status ${response.status}, trying fallback...`);
+            response = null;
+          }
+        }
+
+        // Fallback to user's OpenAI key or server OpenAI key
+        if (!response) {
+          const openaiKey = userOpenAIKey || Deno.env.get('OPENAI_API_KEY');
+          
+          if (!openaiKey) {
+            clearTimeout(timeoutId);
+            return new Response(
+              JSON.stringify({ error: 'Aucune clé API disponible. Crédits Lovable épuisés.' }),
+              { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
+          }
+
+          console.log(`Using OpenAI fallback for ${type}...`);
+          usedProvider = 'openai';
+          
+          response = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${openaiKey}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              model: 'gpt-4o-mini',
+              messages: [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: prompt },
+              ],
+              max_tokens: maxTokens || (type === 'documentary-structure' ? 8000 : 2500),
+              temperature: 0.7,
+            }),
+            signal: controller.signal,
+          });
+        }
 
         clearTimeout(timeoutId);
 
         if (!response.ok) {
           const errorText = await response.text();
-          console.error('OpenAI documentary error:', response.status, errorText);
+          console.error(`${usedProvider} documentary error:`, response.status, errorText);
           
-          if (response.status === 429) {
+          if (response.status === 429 || response.status === 402) {
             return new Response(
-              JSON.stringify({ error: 'Trop de requêtes. Veuillez réessayer dans quelques instants.' }),
-              { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+              JSON.stringify({ error: 'Quota épuisé. Veuillez configurer votre clé API OpenAI dans les paramètres.' }),
+              { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
             );
           }
           
@@ -1258,7 +1296,7 @@ Réponds avec du texte formaté de manière professionnelle, bien structuré ave
           );
         }
 
-        console.log(`${type} generated successfully`);
+        console.log(`${type} generated successfully via ${usedProvider}`);
         return new Response(
           JSON.stringify({ content: generatedContent }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
