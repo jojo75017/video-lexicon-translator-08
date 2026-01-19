@@ -14,6 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 import { useProjectSave } from '@/hooks/useProjectSave';
 import jsPDF from 'jspdf';
+import { KdpQuickTools } from './KdpQuickTools';
 
 interface SavedComicBook {
   id: string;
@@ -1866,6 +1867,17 @@ Réponds en JSON:
           </div>
         </CardContent>
       </Card>
+
+      {/* Outils KDP */}
+      {generatedPages.length > 0 && (
+        <KdpQuickTools
+          productType="comic"
+          title={title || `BD - ${GENRES.find(g => g.value === genre)?.label || genre}`}
+          pageCount={generatedPages.length + 4}
+          targetAudience={ageGroup}
+          theme={genre === 'custom' ? customGenre : genre}
+        />
+      )}
     </div>
   );
 };
