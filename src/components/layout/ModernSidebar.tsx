@@ -83,126 +83,72 @@ interface Category {
 }
 
 const categories: Category[] = [
+  // ========== 1. CRÉER MON LIVRE ==========
   {
-    id: 'generateurs',
-    label: '🚀 Générateurs Rapides',
-    emoji: '🚀',
-    color: 'from-red-500 to-orange-500',
-    items: [
-      { id: 'complete-workflow', label: '⚡ Livre Complet IA', icon: Rocket, isPro: true, isNew: true },
-      { id: 'comic-book', label: '📚 Bande Dessinée', icon: LayoutTemplate, isNew: true },
-      { id: 'coloring-book', label: '🎨 Livre Coloriage', icon: Palette, isNew: true },
-      { id: 'documentary', label: '🎬 Documentaire', icon: BookMarked, isNew: true },
-      { id: 'diary-generator', label: '📔 Agenda / Journal', icon: BookHeart, isNew: true },
-      { id: 'encyclopedia', label: '📖 Encyclopédie', icon: BookMarked, isNew: true },
-      { id: 'atlas', label: '🗺️ Atlas Mondial', icon: Map, isNew: true },
-    ]
-  },
-  {
-    id: 'redaction',
-    label: '✍️ Création & Rédaction',
-    emoji: '✍️',
-    color: 'from-orange-500 to-yellow-500',
-    items: [
-      { id: 'planner', label: '📋 Planificateur', icon: BookOpen },
-      { id: 'writing', label: '✏️ Écriture', icon: PenTool },
-      { id: 'aichat', label: '🤖 Assistant IA', icon: Bot },
-      { id: 'characters', label: '👥 Personnages', icon: Users },
-      { id: 'series', label: '📚 Série / Saga', icon: BookCopy },
-      { id: 'url-import', label: '🔗 Import URL', icon: Link, isNew: true },
-      { id: 'doc-transform', label: '📄 Import Word', icon: FileText, isNew: true },
-    ]
-  },
-  {
-    id: 'workflow-pro',
-    label: '⚡ Workflow PRO (P1-P8)',
-    emoji: '⚡',
-    color: 'from-yellow-500 to-green-500',
-    items: [
-      { id: 'editorial-director', label: '👑 P1 Directeur', icon: Crown, isPro: true },
-      { id: 'market-analysis', label: '📊 P2 Marché', icon: Search, isPro: true },
-      { id: 'content-architect', label: '🏗️ P3 Architecte', icon: LayoutDashboard, isPro: true },
-      { id: 'expert-writing', label: '✍️ P4 Rédaction', icon: PenTool, isPro: true },
-      { id: 'natural-rewrite', label: '✨ P5 Réécriture', icon: Sparkles, isPro: true },
-      { id: 'editorial-quality', label: '✅ P6 Qualité', icon: FileEdit, isPro: true },
-      { id: 'editorial-packaging', label: '📦 P7 Packaging', icon: FileText, isPro: true },
-      { id: 'final-diagnosis', label: '🔍 P8 Diagnostic', icon: Shield, isPro: true },
-    ]
-  },
-  {
-    id: 'moteur-v2',
-    label: '🧬 Moteur IA V2 (P9-P14)',
-    emoji: '🧬',
-    color: 'from-green-500 to-teal-500',
-    items: [
-      { id: 'editorial-memory', label: '🧠 P9 Mémoire', icon: Brain, isPro: true },
-      { id: 'chapter-coherence', label: '🔗 P10 Cohérence', icon: GitBranch, isPro: true },
-      { id: 'self-critique', label: '👁️ P11 Critique', icon: Eye, isPro: true },
-      { id: 'iterative-loop', label: '🔄 P12 Boucle', icon: RefreshCw, isPro: true },
-      { id: 'style-signature', label: '🎨 P13 Style', icon: Fingerprint, isPro: true },
-      { id: 'ultimate-verdict', label: '🏆 P14 Verdict', icon: Award, isPro: true },
-    ]
-  },
-  {
-    id: 'visuels',
-    label: '🎨 Visuels & Design',
-    emoji: '🎨',
-    color: 'from-teal-500 to-cyan-500',
-    items: [
-      { id: 'cover', label: '🖼️ Couverture', icon: Palette },
-      { id: 'backcover', label: '📕 4e Couverture', icon: BookCopy },
-      { id: 'images', label: '🤖 Images IA', icon: Image },
-      { id: 'imagebank', label: '🏦 Banque Images', icon: ImagePlus },
-    ]
-  },
-  {
-    id: 'publication',
-    label: '📤 Publication & Export',
-    emoji: '📤',
-    color: 'from-cyan-500 to-blue-500',
-    items: [
-      { id: 'kdp-research', label: '🔎 Recherche KDP', icon: Search, isNew: true },
-      { id: 'amazon-simulator', label: '👀 Simulateur Amazon', icon: Eye, isNew: true },
-      { id: 'plagiarism-validator', label: '🛡️ Anti-Plagiat', icon: Shield, isNew: true },
-      { id: 'export', label: '💾 Exporter', icon: Download },
-      { id: 'kdp', label: '📈 Amazon KDP', icon: TrendingUp },
-    ]
-  },
-  {
-    id: 'marketing',
-    label: '💰 Marketing & Ventes',
-    emoji: '💰',
-    color: 'from-blue-500 to-indigo-500',
-    items: [
-      { id: 'amazon-ads', label: '🎯 Amazon Ads', icon: Target, isNew: true },
-      { id: 'launch-plan', label: '🚀 Plan Lancement', icon: Rocket, isNew: true },
-      { id: 'seo-articles', label: '🌐 Articles SEO', icon: Globe, isNew: true },
-      { id: 'marketing', label: '📱 Social Media', icon: MessageSquare },
-      { id: 'monetization', label: '💵 Monétisation', icon: DollarSign },
-    ]
-  },
-  {
-    id: 'audio',
-    label: '🎧 Audio & Voix',
-    emoji: '🎧',
-    color: 'from-indigo-500 to-violet-500',
-    items: [
-      { id: 'audiobook', label: '🎙️ Livre Audio', icon: Headphones },
-      { id: 'voice', label: '🗣️ Dictée Vocale', icon: Volume2 },
-    ]
-  },
-  {
-    id: 'outils',
-    label: '⚙️ Mon Compte',
-    emoji: '⚙️',
+    id: 'creer',
+    label: '📖 Créer mon Livre',
+    emoji: '📖',
     color: 'from-violet-500 to-purple-500',
     items: [
+      { id: 'complete-workflow', label: '⚡ Générer en 1 clic', icon: Rocket, isPro: true },
+      { id: 'planner', label: '📋 Planifier', icon: BookOpen },
+      { id: 'writing', label: '✏️ Écrire', icon: PenTool },
+      { id: 'aichat', label: '💬 Chat IA', icon: Bot },
+      { id: 'characters', label: '👥 Personnages', icon: Users },
+    ]
+  },
+  // ========== 2. GÉNÉRATEURS SPÉCIAUX ==========
+  {
+    id: 'special',
+    label: '🎨 Livres Spéciaux',
+    emoji: '🎨',
+    color: 'from-pink-500 to-rose-500',
+    items: [
+      { id: 'coloring-book', label: '🖍️ Coloriage', icon: Palette },
+      { id: 'comic-book', label: '💬 Bande Dessinée', icon: LayoutTemplate },
+      { id: 'diary-generator', label: '📔 Journal / Agenda', icon: BookHeart },
+      { id: 'documentary', label: '🎬 Documentaire', icon: BookMarked },
+      { id: 'encyclopedia', label: '📚 Encyclopédie', icon: BookMarked },
+      { id: 'url-import', label: '🔗 Créer depuis URL', icon: Link },
+    ]
+  },
+  // ========== 3. VISUELS ==========
+  {
+    id: 'visuels',
+    label: '🖼️ Couvertures & Images',
+    emoji: '🖼️',
+    color: 'from-amber-500 to-orange-500',
+    items: [
+      { id: 'cover', label: '📕 Couverture Avant', icon: Palette },
+      { id: 'backcover', label: '📖 Couverture Arrière', icon: BookCopy },
+      { id: 'images', label: '🎨 Images Chapitres', icon: Image },
+    ]
+  },
+  // ========== 4. PUBLIER SUR AMAZON ==========
+  {
+    id: 'amazon',
+    label: '🛒 Publier sur Amazon',
+    emoji: '🛒',
+    color: 'from-orange-500 to-amber-500',
+    items: [
+      { id: 'export', label: '💾 Exporter (PDF, Word)', icon: Download },
+      { id: 'kdp', label: '📝 Fiche Amazon KDP', icon: TrendingUp },
+      { id: 'amazon-simulator', label: '👀 Prévisualiser Amazon', icon: Eye },
+      { id: 'kdp-research', label: '🔍 Trouver une Niche', icon: Search },
+    ]
+  },
+  // ========== 5. BONUS & AIDE ==========
+  {
+    id: 'bonus',
+    label: '🎁 Bonus & Aide',
+    emoji: '🎁',
+    color: 'from-emerald-500 to-teal-500',
+    items: [
+      { id: 'audiobook', label: '🎧 Livre Audio', icon: Headphones },
+      { id: 'marketing', label: '📱 Posts Réseaux Sociaux', icon: MessageSquare },
+      { id: 'formation-complete', label: '🎓 Formation Complète', icon: GraduationCap, isLink: true, href: '/formation' },
       { id: 'projects', label: '📁 Mes Projets', icon: FolderOpen },
-      { id: 'dashboard', label: '📊 Dashboard', icon: LayoutDashboard },
       { id: 'settings', label: '⚙️ Paramètres', icon: Settings },
-      { id: 'formation-complete', label: '🎓 Formation', icon: GraduationCap, isLink: true, href: '/formation' },
-      { id: 'subscription', label: '💳 Abonnement', icon: CreditCard, isLink: true, href: '/subscription' },
-      { id: 'offres', label: '✨ Offres', icon: Sparkles, isLink: true, href: '/offres' },
     ]
   },
 ];
