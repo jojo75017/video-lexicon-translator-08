@@ -367,7 +367,8 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
       <aside 
         className={cn(
           "relative flex flex-col h-screen transition-all duration-300 ease-out",
-          "bg-gradient-to-b from-violet-50/70 via-purple-50/50 to-fuchsia-50/40 dark:from-[#1a1525] dark:via-[#151220] dark:to-[#12101a] border-r border-violet-100/60 dark:border-violet-900/50",
+          "bg-gradient-to-b from-violet-50/70 via-purple-50/50 to-fuchsia-50/40 border-r border-violet-100/60",
+          "dark:bg-gradient-to-b dark:from-[#0d0a12] dark:via-[#0a080e] dark:to-[#08060a] dark:border-violet-950/80",
           isCollapsed ? "w-[72px]" : "w-64"
         )}
       >
