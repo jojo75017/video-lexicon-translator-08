@@ -1,16 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { 
-  User, 
-  Mail, 
-  Calendar, 
-  Package, 
-  BookOpen, 
-  FileText, 
-  Layers, 
+import {
+  User,
+  Mail,
+  Calendar,
+  Package,
+  BookOpen,
+  FileText,
+  Layers,
   Image,
   LogOut,
   Key,
@@ -19,13 +19,10 @@ import {
   GraduationCap,
   Library,
   ArrowRight,
-  Loader2,
-  Crown
+  Crown,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import LifetimeBadge from '@/components/ui/lifetime-badge';
 
 interface SubscriptionPageProps {
@@ -36,9 +33,6 @@ interface SubscriptionPageProps {
 
 const SubscriptionPage = ({ subscriberEmail, subscriberData, onLogout }: SubscriptionPageProps) => {
   const navigate = useNavigate();
-  const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
 
   const planLimits: Record<string, Record<string, number>> = {
     starter: { 
@@ -76,11 +70,6 @@ const SubscriptionPage = ({ subscriberEmail, subscriberData, onLogout }: Subscri
     }
   };
 
-  const planPrices: Record<string, { price: string; period: string; originalPrice?: string }> = {
-    starter: { price: '27€', period: '/mois' },
-    pro: { price: '67€', period: '/mois' },
-    lifetime: { price: '597€', period: ' (lancement)', originalPrice: '897€' }
-  };
 
   const currentLimits = planLimits[subscriberData?.plan_type] || planLimits.starter;
   const currentFeatures = planFeatures[subscriberData?.plan_type] || planFeatures.starter;
@@ -163,41 +152,6 @@ const SubscriptionPage = ({ subscriberEmail, subscriberData, onLogout }: Subscri
     onLogout();
   };
 
-  const handleUpgrade = async (planId: string) => {
-    setSelectedPlan(planId);
-    setIsLoading(true);
-    
-    try {
-      const { data, error } = await supabase.functions.invoke("stripe-checkout", {
-        body: {
-          planId: planId,
-          email: subscriberEmail,
-          successUrl: `${window.location.origin}/paiement-succes`,
-          cancelUrl: `${window.location.origin}/abonnement`,
-        },
-      });
-
-      if (error) throw error;
-
-      if (data?.url) {
-        window.location.href = data.url;
-      } else {
-        throw new Error("URL de paiement non reçue");
-      }
-    } catch (error: any) {
-      console.error("Erreur checkout:", error);
-      toast.error(error.message || "Erreur lors de la redirection vers le paiement");
-    } finally {
-      setIsLoading(false);
-      setShowUpgradeDialog(false);
-    }
-  };
-
-  const canUpgradeTo = (targetPlan: string) => {
-    const currentPlan = subscriberData?.plan_type || 'starter';
-    const planOrder = ['starter', 'pro', 'lifetime'];
-    return planOrder.indexOf(targetPlan) > planOrder.indexOf(currentPlan);
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
@@ -382,94 +336,48 @@ const SubscriptionPage = ({ subscriberEmail, subscriberData, onLogout }: Subscri
           </div>
         </div>
 
-        {/* Plan Comparison */}
+        {/* Offre unique */}
         <Card>
           <CardHeader>
-            <CardTitle>Changer de plan</CardTitle>
+            <CardTitle>Offre unique : Accès à vie (37€)</CardTitle>
             <CardDescription>
-              Passez à un plan supérieur pour débloquer plus de fonctionnalités
+              EbookStudio Pro fonctionne désormais avec une seule offre à 37€ (accès à vie + mises à jour).
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid md:grid-cols-3 gap-4">
-              {/* Starter */}
-              <div className={`border rounded-lg p-4 space-y-3 ${subscriberData?.plan_type === 'starter' ? 'border-blue-500 bg-blue-50/50' : ''}`}>
-                <div className="flex items-center justify-between">
-                  <Badge className="bg-blue-500">STARTER</Badge>
-                  <span className="font-bold">27€/mois</span>
+            <div className="grid md:grid-cols-2 gap-6 items-start">
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <LifetimeBadge size="md" />
+                  <Badge variant="outline">37€</Badge>
                 </div>
                 <ul className="space-y-2 text-sm">
-                  <li>✅ 5 ebooks/mois</li>
-                  <li>✅ 10 chapitres max</li>
-                  <li>✅ 3 couvertures/mois</li>
-                  <li>✅ Export PDF</li>
-                  <li className="text-emerald-600">🎓 Formation Ebook</li>
+                  <li>✅ Ebooks illimités</li>
+                  <li>✅ Couvertures & exports inclus</li>
+                  <li>✅ Toutes les formations incluses</li>
+                  <li>✅ Mises à jour à vie</li>
                 </ul>
-                {subscriberData?.plan_type === 'starter' && (
-                  <Badge variant="outline" className="w-full justify-center">Plan actuel</Badge>
-                )}
               </div>
-              
-              {/* Pro */}
-              <div className={`border-2 rounded-lg p-4 space-y-3 ${subscriberData?.plan_type === 'pro' ? 'border-purple-500 bg-purple-50/50' : 'border-purple-500'}`}>
-                <div className="flex items-center justify-between">
-                  <Badge className="bg-purple-500">PRO</Badge>
-                  <span className="font-bold">67€/mois</span>
-                </div>
-                <ul className="space-y-2 text-sm">
-                  <li>✅ 20 ebooks/mois</li>
-                  <li>✅ 20 chapitres max</li>
-                  <li>✅ 10 couvertures/mois</li>
-                  <li>✅ Export PDF/EPUB</li>
-                  <li className="text-emerald-600">🎓 3 Formations incluses</li>
-                  <li className="text-purple-600">📚 Séries/Sagas</li>
-                </ul>
-                {subscriberData?.plan_type === 'pro' ? (
-                  <Badge variant="outline" className="w-full justify-center">Plan actuel</Badge>
-                ) : canUpgradeTo('pro') && (
-                  <Button 
-                    className="w-full bg-purple-500 hover:bg-purple-600" 
-                    size="sm"
-                    onClick={() => handleUpgrade('pro')}
-                    disabled={isLoading}
-                  >
-                    {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Passer au Pro'}
-                  </Button>
-                )}
-              </div>
-              
-              {/* Lifetime */}
-              <div className={`border rounded-lg p-4 space-y-3 bg-gradient-to-br from-yellow-50 to-orange-50 ${subscriberData?.plan_type === 'lifetime' ? 'border-yellow-500' : 'border-orange-500'}`}>
-                <div className="flex items-center justify-between">
-                  <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500">LIFETIME</Badge>
-                  <div className="text-right">
-                    <span className="text-sm text-muted-foreground line-through mr-1">897€</span>
-                    <span className="font-bold text-orange-600">597€</span>
-                  </div>
-                </div>
-                <Badge variant="outline" className="w-full justify-center text-red-500 border-red-200 bg-red-50">
-                  🔥 -300€ Prix lancement
-                </Badge>
-                <ul className="space-y-2 text-sm">
-                  <li>✅ Ebooks illimités à vie</li>
-                  <li>✅ Chapitres illimités</li>
-                  <li>✅ Couvertures illimitées</li>
-                  <li>✅ Export PDF/EPUB/Word</li>
-                  <li className="text-emerald-600">🎓 Toutes les formations</li>
-                  <li className="text-purple-600">📚 Séries/Sagas complet</li>
-                  <li className="text-orange-600">⭐ Support VIP</li>
-                </ul>
-                {subscriberData?.plan_type === 'lifetime' ? (
-                  <Badge variant="outline" className="w-full justify-center">Plan actuel</Badge>
-                ) : canUpgradeTo('lifetime') && (
-                  <Button 
-                    className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:opacity-90" 
-                    size="sm"
-                    onClick={() => handleUpgrade('lifetime')}
-                    disabled={isLoading}
-                  >
-                    {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Accès à vie'}
-                  </Button>
+
+              <div className="space-y-3">
+                {subscriberData?.plan_type === 'lifetime' && subscriberData?.status === 'active' ? (
+                  <>
+                    <Badge variant="outline" className="w-full justify-center">Accès actif</Badge>
+                    <Button onClick={() => navigate('/ebook-planner')} className="w-full">
+                      <ArrowRight className="w-4 h-4 mr-2" />
+                      Ouvrir le générateur
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-sm text-muted-foreground">
+                      Vous n’êtes pas encore sur l’offre unique. Cliquez ci-dessous pour accéder à la page de paiement.
+                    </p>
+                    <Button onClick={() => navigate('/offres')} className="w-full">
+                      <ArrowRight className="w-4 h-4 mr-2" />
+                      Accéder à l’offre 37€
+                    </Button>
+                  </>
                 )}
               </div>
             </div>
