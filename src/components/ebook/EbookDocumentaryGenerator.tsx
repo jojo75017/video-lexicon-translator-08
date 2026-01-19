@@ -14,12 +14,15 @@ import {
   Loader2, BookOpen, Download, RefreshCw, Sparkles, FileText, 
   Wand2, FileDown, Globe, History, Microscope, Camera, TreePine, 
   Building, Landmark, Users, Award, ChevronDown, CheckCircle2,
-  Eye, Edit, Plus, Trash2, GripVertical, Lightbulb, Target, BookMarked
+  Eye, Edit, Plus, Trash2, GripVertical, Lightbulb, Target, BookMarked,
+  FileType
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 import jsPDF from 'jspdf';
+import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, PageBreak, BorderStyle, Table, TableRow, TableCell, WidthType } from 'docx';
+import { saveAs } from 'file-saver';
 
 interface DocumentaryChapter {
   id: string;
@@ -604,6 +607,384 @@ Inclus des faits marquants et des anecdotes.`;
     }
   };
 
+  const exportToWord = async () => {
+    if (!book) return;
+
+    try {
+      // Helper pour créer des paragraphes à partir du texte
+      const createParagraphs = (text: string, spacing?: number) => {
+        const cleanText = cleanTextForPDF(text);
+        const paragraphs = cleanText.split(/\n\n+/).filter(p => p.trim());
+        
+        return paragraphs.map((para, idx) => 
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: para.trim(),
+                size: 24, // 12pt
+              }),
+            ],
+            spacing: {
+              after: spacing || 240, // 12pt après
+              line: 360, // 1.5 interligne
+            },
+            alignment: AlignmentType.JUSTIFIED,
+          })
+        );
+      };
+
+      const children: any[] = [];
+
+      // === PAGE DE TITRE ===
+      children.push(
+        new Paragraph({
+          children: [],
+          spacing: { before: 2000 },
+        }),
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: book.title,
+              bold: true,
+              size: 72, // 36pt
+              color: "2D3748",
+            }),
+          ],
+          alignment: AlignmentType.CENTER,
+          spacing: { after: 400 },
+        })
+      );
+
+      if (book.subtitle) {
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: book.subtitle,
+                italics: true,
+                size: 36, // 18pt
+                color: "4A5568",
+              }),
+            ],
+            alignment: AlignmentType.CENTER,
+            spacing: { after: 800 },
+          })
+        );
+      }
+
+      children.push(
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: `par ${book.author}`,
+              size: 28, // 14pt
+            }),
+          ],
+          alignment: AlignmentType.CENTER,
+          spacing: { before: 1200 },
+        }),
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: "DOCUMENTAIRE",
+              bold: true,
+              size: 20,
+              color: "718096",
+            }),
+          ],
+          alignment: AlignmentType.CENTER,
+          spacing: { before: 2400 },
+        }),
+        new Paragraph({
+          children: [new PageBreak()],
+        })
+      );
+
+      // === TABLE DES MATIÈRES ===
+      children.push(
+        new Paragraph({
+          text: "Table des matières",
+          heading: HeadingLevel.HEADING_1,
+          spacing: { after: 400 },
+        })
+      );
+
+      book.chapters.forEach((chapter, idx) => {
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: `${idx + 1}. ${cleanTextForPDF(chapter.title)}`,
+                size: 24,
+              }),
+            ],
+            spacing: { after: 120 },
+            indent: { left: 360 },
+          })
+        );
+      });
+
+      children.push(
+        new Paragraph({
+          children: [new PageBreak()],
+        })
+      );
+
+      // === INTRODUCTION ===
+      children.push(
+        new Paragraph({
+          text: "Introduction",
+          heading: HeadingLevel.HEADING_1,
+          spacing: { after: 400 },
+        })
+      );
+      children.push(...createParagraphs(book.introduction));
+      children.push(
+        new Paragraph({
+          children: [new PageBreak()],
+        })
+      );
+
+      // === CHAPITRES ===
+      for (const [idx, chapter] of book.chapters.entries()) {
+        // Titre du chapitre
+        children.push(
+          new Paragraph({
+            text: `Chapitre ${idx + 1}`,
+            heading: HeadingLevel.HEADING_1,
+            spacing: { after: 200 },
+          }),
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: cleanTextForPDF(chapter.title),
+                bold: true,
+                size: 36,
+                color: "2D3748",
+              }),
+            ],
+            spacing: { after: 200 },
+          })
+        );
+
+        if (chapter.subtitle) {
+          children.push(
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: cleanTextForPDF(chapter.subtitle),
+                  italics: true,
+                  size: 26,
+                  color: "4A5568",
+                }),
+              ],
+              spacing: { after: 400 },
+            })
+          );
+        }
+
+        // Contenu du chapitre
+        children.push(...createParagraphs(chapter.content));
+
+        // Faits marquants
+        if (chapter.facts.length > 0) {
+          children.push(
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: "À retenir :",
+                  bold: true,
+                  size: 24,
+                  color: "2B6CB0",
+                }),
+              ],
+              spacing: { before: 400, after: 200 },
+              border: {
+                top: { style: BorderStyle.SINGLE, size: 1, color: "2B6CB0" },
+              },
+            })
+          );
+
+          chapter.facts.forEach(fact => {
+            children.push(
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: `• ${cleanTextForPDF(fact)}`,
+                    size: 22,
+                  }),
+                ],
+                spacing: { after: 100 },
+                indent: { left: 360 },
+              })
+            );
+          });
+        }
+
+        // Sources du chapitre
+        if (chapter.sources.length > 0) {
+          children.push(
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: "Sources :",
+                  bold: true,
+                  size: 20,
+                  color: "718096",
+                }),
+              ],
+              spacing: { before: 300, after: 100 },
+            })
+          );
+
+          chapter.sources.forEach(source => {
+            children.push(
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: `- ${cleanTextForPDF(source)}`,
+                    size: 18,
+                    italics: true,
+                    color: "718096",
+                  }),
+                ],
+                indent: { left: 360 },
+              })
+            );
+          });
+        }
+
+        children.push(
+          new Paragraph({
+            children: [new PageBreak()],
+          })
+        );
+      }
+
+      // === CONCLUSION ===
+      children.push(
+        new Paragraph({
+          text: "Conclusion",
+          heading: HeadingLevel.HEADING_1,
+          spacing: { after: 400 },
+        })
+      );
+      children.push(...createParagraphs(book.conclusion));
+      children.push(
+        new Paragraph({
+          children: [new PageBreak()],
+        })
+      );
+
+      // === BIBLIOGRAPHIE ===
+      if (book.bibliography.length > 0) {
+        children.push(
+          new Paragraph({
+            text: "Bibliographie",
+            heading: HeadingLevel.HEADING_1,
+            spacing: { after: 400 },
+          })
+        );
+
+        book.bibliography.forEach((ref, idx) => {
+          children.push(
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: `${idx + 1}. ${cleanTextForPDF(ref)}`,
+                  size: 22,
+                }),
+              ],
+              spacing: { after: 120 },
+            })
+          );
+        });
+
+        children.push(
+          new Paragraph({
+            children: [new PageBreak()],
+          })
+        );
+      }
+
+      // === GLOSSAIRE ===
+      if (book.glossary.length > 0) {
+        children.push(
+          new Paragraph({
+            text: "Glossaire",
+            heading: HeadingLevel.HEADING_1,
+            spacing: { after: 400 },
+          })
+        );
+
+        book.glossary.forEach(entry => {
+          children.push(
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: cleanTextForPDF(entry.term),
+                  bold: true,
+                  size: 24,
+                }),
+                new TextRun({
+                  text: ` : ${cleanTextForPDF(entry.definition)}`,
+                  size: 22,
+                }),
+              ],
+              spacing: { after: 200 },
+            })
+          );
+        });
+      }
+
+      // Créer le document
+      const doc = new Document({
+        sections: [{
+          properties: {
+            page: {
+              margin: {
+                top: 1440, // 1 inch
+                right: 1440,
+                bottom: 1440,
+                left: 1440,
+              },
+            },
+          },
+          children,
+        }],
+        styles: {
+          paragraphStyles: [
+            {
+              id: "Heading1",
+              name: "Heading 1",
+              basedOn: "Normal",
+              next: "Normal",
+              run: {
+                size: 48,
+                bold: true,
+                color: "2D3748",
+              },
+              paragraph: {
+                spacing: { before: 400, after: 200 },
+              },
+            },
+          ],
+        },
+      });
+
+      // Générer et télécharger
+      const blob = await Packer.toBlob(doc);
+      const fileName = `${book.title.replace(/[^a-zA-Z0-9àâäéèêëïîôöùûüç\s]/gi, '_')}_documentaire.docx`;
+      saveAs(blob, fileName);
+      
+      toast.success('Document Word exporté!', { description: fileName });
+
+    } catch (error) {
+      console.error('Erreur export Word:', error);
+      toast.error('Erreur lors de l\'export Word');
+    }
+  };
+
   const wordCount = book ? 
     book.introduction.split(/\s+/).length + 
     book.chapters.reduce((acc, ch) => acc + ch.content.split(/\s+/).length, 0) + 
@@ -1108,13 +1489,18 @@ Inclus des faits marquants et des anecdotes.`;
                 </div>
 
                 <div className="flex flex-col gap-3">
-                  <Button onClick={exportToPDF} className="w-full h-12" size="lg">
+                  <Button onClick={exportToWord} className="w-full h-12 bg-blue-600 hover:bg-blue-700" size="lg">
+                    <FileType className="w-5 h-5 mr-2" />
+                    Télécharger en Word (.docx)
+                  </Button>
+                  
+                  <Button onClick={exportToPDF} variant="outline" className="w-full h-12" size="lg">
                     <Download className="w-5 h-5 mr-2" />
                     Télécharger en PDF
                   </Button>
                   
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     onClick={() => setBook(null)}
                     className="w-full"
                   >
