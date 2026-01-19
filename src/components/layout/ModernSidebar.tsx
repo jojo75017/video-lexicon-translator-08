@@ -333,7 +333,9 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
   const navigate = useNavigate();
   const { isDark, toggleTheme } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
-  const [expandedCategories, setExpandedCategories] = useState<string[]>(['generateurs', 'redaction']);
+  const [expandedCategories, setExpandedCategories] = useState<string[]>(
+    categories.map(c => c.id) // Toutes les catégories ouvertes par défaut
+  );
 
   // Filtrer les items par recherche
   const filteredCategories = useMemo(() => {
