@@ -217,6 +217,7 @@ const categories: Category[] = [
     items: [
       { id: 'projects', label: '📁 Mes Projets', icon: FolderOpen },
       { id: 'dashboard', label: '📊 Tableau de Bord', icon: LayoutDashboard },
+      { id: 'subscription', label: '💳 Abonnement', icon: CreditCard },
       { id: 'settings', label: '⚙️ Paramètres', icon: Settings },
       { id: 'formation-complete', label: '🎓 Formation', icon: GraduationCap, isLink: true, href: '/formation' },
     ]
