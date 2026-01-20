@@ -20,26 +20,53 @@ serve(async (req) => {
       );
     }
 
-    // Note: Video generation requires specialized APIs (like Runway, Pika, etc.)
-    // This is a placeholder that returns a demo response
-    // In production, integrate with a video generation service
-
     console.log("Video trailer request:", { prompt, aspectRatio, duration, ebookTitle, clipType });
 
-    // Simulate processing time
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    const lovableApiKey = Deno.env.get("LOVABLE_API_KEY");
+    if (!lovableApiKey) {
+      throw new Error("LOVABLE_API_KEY not configured");
+    }
 
-    // Return a placeholder response
-    // In production, this would return the actual generated video URL
+    // Build enhanced prompt for book trailer
+    const enhancedPrompt = buildTrailerPrompt(prompt, ebookTitle, clipType);
+    
+    // Map aspect ratio to video dimensions
+    const dimensions = getVideoDimensions(aspectRatio);
+
+    console.log("Generating video with prompt:", enhancedPrompt);
+    console.log("Dimensions:", dimensions, "Duration:", duration);
+
+    // Call Lovable AI Video Generation API
+    const response = await fetch("https://api.lovable.dev/v1/videos", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${lovableApiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        prompt: enhancedPrompt,
+        aspect_ratio: aspectRatio,
+        duration: duration || 5,
+        resolution: "1080p",
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Lovable API error:", errorText);
+      throw new Error(`Video generation failed: ${response.status}`);
+    }
+
+    const result = await response.json();
+    console.log("Video generated successfully:", result);
+
     return new Response(
       JSON.stringify({ 
         success: true,
-        message: "Video generation initiated",
-        videoUrl: null, // Would be the actual video URL from the video generation API
-        status: "pending",
-        estimatedTime: duration === 10 ? 60 : 30, // seconds
+        videoUrl: result.url || result.video_url,
+        status: "completed",
         metadata: {
-          prompt,
+          prompt: enhancedPrompt,
           aspectRatio,
           duration,
           ebookTitle,
@@ -56,3 +83,27 @@ serve(async (req) => {
     );
   }
 });
+
+function buildTrailerPrompt(basePrompt: string, ebookTitle: string, clipType: string): string {
+  const styleGuides: Record<string, string> = {
+    teaser: `Cinematic book trailer with dark, mysterious atmosphere. Text "${ebookTitle}" emerges from shadows with dramatic lighting. Slow camera movement, suspenseful mood, professional book promotion style. Ultra high quality, 4K cinematic.`,
+    highlights: `Dynamic book trailer with bright, energetic visuals. Bold typography showing "${ebookTitle}". Fast cuts, inspiring mood, motivational feel. Professional marketing video quality.`,
+    cta: `Compelling book advertisement with eye-catching visuals. "${ebookTitle}" prominently displayed with urgent, exciting atmosphere. Strong call-to-action energy, professional marketing style.`,
+    mystery: `Atmospheric book teaser with ethereal, dreamlike visuals. Soft particles and light rays with "${ebookTitle}" appearing elegantly. Immersive artistic cinematography, high production value.`
+  };
+
+  if (basePrompt && basePrompt.trim().length > 0) {
+    return `${basePrompt}. Book title: "${ebookTitle}". Ultra high resolution, professional cinematic quality.`;
+  }
+
+  return styleGuides[clipType] || styleGuides.teaser;
+}
+
+function getVideoDimensions(aspectRatio: string): { width: number; height: number } {
+  const dimensions: Record<string, { width: number; height: number }> = {
+    "16:9": { width: 1920, height: 1080 },
+    "9:16": { width: 1080, height: 1920 },
+    "1:1": { width: 1080, height: 1080 },
+  };
+  return dimensions[aspectRatio] || dimensions["16:9"];
+}
