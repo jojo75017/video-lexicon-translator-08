@@ -47,6 +47,20 @@ const categoryColors: Record<string, string> = {
   'Business & Carrière': 'from-blue-500 to-cyan-600',
   'Parentalité et famille': 'from-lime-500 to-green-600',
   'Loisirs et compétences': 'from-teal-500 to-cyan-600',
+  // Categories from ebookThemes
+  'Romans & Fiction Populaires': 'from-rose-500 to-pink-600',
+  'Romance': 'from-pink-500 to-rose-600',
+  'Livres pour Enfants': 'from-yellow-400 to-orange-500',
+  'Développement Personnel': 'from-violet-500 to-purple-600',
+  'Business & Entrepreneuriat': 'from-blue-500 to-cyan-600',
+  'Santé & Bien-être': 'from-emerald-500 to-green-600',
+  'Cuisine & Gastronomie': 'from-orange-500 to-red-600',
+  'Technologie & Gadgets': 'from-yellow-500 to-amber-600',
+  'Voyages & Aventure': 'from-sky-500 to-blue-600',
+  'Animaux de compagnie': 'from-pink-400 to-rose-500',
+  'Parentalité & Éducation': 'from-lime-500 to-green-600',
+  'Finance & Investissement': 'from-amber-500 to-yellow-600',
+  'Mode & Style': 'from-fuchsia-500 to-pink-600',
 };
 
 const NichesPage = () => {
