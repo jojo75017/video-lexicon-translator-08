@@ -63,10 +63,12 @@ const EbookVideoTrailer: React.FC<EbookVideoTrailerProps> = ({
     setProgress(0);
 
     try {
-      // Simulate progress
+      // Simulate progress during generation
       const progressInterval = setInterval(() => {
-        setProgress(prev => Math.min(prev + 5, 90));
-      }, 500);
+        setProgress(prev => Math.min(prev + 2, 85));
+      }, 1000);
+
+      toast.info('🎬 Génération du trailer en cours... (30-60 secondes)');
 
       const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-video-trailer`, {
         method: 'POST',
@@ -87,12 +89,11 @@ const EbookVideoTrailer: React.FC<EbookVideoTrailerProps> = ({
 
       clearInterval(progressInterval);
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Erreur lors de la génération');
-      }
-
       const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Erreur lors de la génération');
+      }
       
       if (data.videoUrl) {
         setVideoUrl(data.videoUrl);
@@ -104,10 +105,16 @@ const EbookVideoTrailer: React.FC<EbookVideoTrailerProps> = ({
         }]);
         setProgress(100);
         toast.success('🎬 Trailer vidéo généré avec succès !');
+      } else if (data.status === 'pending') {
+        toast.info('Vidéo en cours de génération. Veuillez patienter...');
+        setProgress(50);
+      } else {
+        throw new Error('Aucune URL vidéo retournée');
       }
     } catch (error) {
       console.error('Erreur génération vidéo:', error);
       toast.error(error instanceof Error ? error.message : 'Erreur lors de la génération de la vidéo');
+      setProgress(0);
     } finally {
       setIsGenerating(false);
     }
