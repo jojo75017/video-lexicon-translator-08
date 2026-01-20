@@ -473,7 +473,8 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             }
             
             // APRÈS P3 : pause pour valider les personnages avant P4
-            if (step.id === 'P3' && result.result?.personnages) {
+            // Important: ne pas bloquer le workflow si P3 renvoie `personnages: []` (sinon la carte n'apparaît pas)
+            if (step.id === 'P3' && Array.isArray(result.result?.personnages) && result.result.personnages.length > 0) {
               const personnagesP3 = result.result.personnages;
               setGeneratedCharacters(personnagesP3);
               setWaitingForCharacterValidation(true);
@@ -848,7 +849,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
       </Card>
 
       {/* Character Validation Card - After P3 */}
-      {waitingForCharacterValidation && generatedCharacters.length > 0 && (
+      {waitingForCharacterValidation && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -874,7 +875,14 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             </CardHeader>
             
             <CardContent className="space-y-4">
-              {generatedCharacters.map((char, index) => (
+              {generatedCharacters.length === 0 ? (
+                <div className="p-4 bg-background/80 border rounded-lg">
+                  <p className="text-sm text-muted-foreground">
+                    Aucun personnage n'a été détecté pour l'étape P3. Vous pouvez continuer directement (ou en ajouter si besoin).
+                  </p>
+                </div>
+              ) : (
+                generatedCharacters.map((char, index) => (
                 <div 
                   key={index}
                   className="p-4 bg-background/80 border rounded-lg space-y-3"
@@ -940,7 +948,8 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
                     </div>
                   )}
                 </div>
-              ))}
+                ))
+              )}
               
               <Button
                 variant="outline"
