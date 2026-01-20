@@ -12,7 +12,7 @@ import {
   HelpCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { ModernSidebar } from '@/components/layout/ModernSidebar';
 import { useEbookDatabase } from '@/hooks/useEbookDatabase';
@@ -156,8 +156,13 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   const [showPaywall, setShowPaywall] = useState<'chapters' | 'export' | 'cover' | 'advanced' | null>(null);
   const [userProjectsCount, setUserProjectsCount] = useState(0);
   
+  // Read niche from URL query params
+  const [searchParams] = useSearchParams();
+  const nicheFromUrl = searchParams.get('niche');
+  const categoryFromUrl = searchParams.get('category');
+  
   const [apiKey, setApiKey] = useState(savedData?.apiKey || '');
-  const [ebookTitle, setEbookTitle] = useState(location.state?.suggestedTitle || savedData?.ebookTitle || '');
+  const [ebookTitle, setEbookTitle] = useState(nicheFromUrl || location.state?.suggestedTitle || savedData?.ebookTitle || '');
   const [targetAudience, setTargetAudience] = useState(savedData?.targetAudience || 'Adultes');
   const [tomeNumber, setTomeNumber] = useState<number | null>(savedData?.tomeNumber || null);
   const [writingStyle, setWritingStyle] = useState(savedData?.writingStyle || 'narratif');
@@ -166,7 +171,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   const [tone, setTone] = useState(savedData?.tone || 'professionnel');
   const [narrativeFormat, setNarrativeFormat] = useState(savedData?.narrativeFormat || 'troisième personne');
   const [bookDescription, setBookDescription] = useState(savedData?.bookDescription || '');
-  const [genre, setGenre] = useState(savedData?.genre || '');
+  const [genre, setGenre] = useState(categoryFromUrl || savedData?.genre || '');
   const [characters, setCharacters] = useState<EbookCharacter[]>(savedData?.characters || []);
   
   const { isGenerating, generateChapterContent, generateSubChapterContent, generateEbookPlan, generateBookSummary, generateBookSynopsis, generateEbookCover, optimizeForSEO, generateKDPDescription, generateKDPKeywords, generateKDPCategories, generateBackCover, generatePreface, generateConclusion, generateEpilogue, translateContent, analyzeTextStatistics } = useSubscriptionGeneration(subscriberEmail, apiKey, ebookTitle, targetAudience, tomeNumber, writingStyle, chapterLength, detailLevel, tone, narrativeFormat, bookDescription, genre, characters, isDemo);

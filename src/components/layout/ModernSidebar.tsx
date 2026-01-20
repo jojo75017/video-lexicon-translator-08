@@ -47,7 +47,8 @@ import {
   Sun,
   Moon,
   X,
-  Star
+  Star,
+  Lightbulb
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -147,6 +148,7 @@ const categories: Category[] = [
     emoji: '🎨',
     color: 'from-pink-500 to-rose-500',
     items: [
+      { id: 'niches', label: '💡 Niches Rentables', icon: Lightbulb, isLink: true, href: '/niches', isNew: true },
       { id: 'coloring-book', label: '🖍️ Livre Coloriage', icon: Palette },
       { id: 'comic-book', label: '💬 Bande Dessinée', icon: LayoutTemplate },
       { id: 'diary-generator', label: '📔 Journal / Agenda', icon: BookHeart },
