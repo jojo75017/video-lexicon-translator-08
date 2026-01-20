@@ -39,14 +39,13 @@ function cleanGeneratedText(text: string): string {
     .replace(/  +/g, ' ')
     // Nettoyer les espaces avant ponctuation
     .replace(/ ([.,;:!?])/g, '$1')
-    // ✅ CRITIQUE: Ajouter un espace après la ponctuation de fin de phrase si suivi d'une lettre
-    .replace(/\.([A-ZÀ-ÖØ-öø-ÿa-z])/g, '. $1')
-    .replace(/\!([A-ZÀ-ÖØ-öø-ÿa-z])/g, '! $1')
-    .replace(/\?([A-ZÀ-ÖØ-öø-ÿa-z])/g, '? $1')
-    // ✅ Ajouter un espace après virgule/point-virgule/deux-points si suivi d'une lettre
-    .replace(/,([A-ZÀ-ÖØ-öø-ÿa-z])/g, ', $1')
-    .replace(/;([A-ZÀ-ÖØ-öø-ÿa-z])/g, '; $1')
-    .replace(/:([A-ZÀ-ÖØ-öø-ÿa-z])/g, ': $1')
+    // ✅ CRITIQUE: empêcher les mots collés après ponctuation
+    // Cas principal: ponctuation directement suivie d'une lettre/chiffre -> ajouter un espace
+    .replace(/([.!?…])(?=[A-ZÀ-ÖØ-öø-ÿa-z0-9])/g, '$1 ')
+    .replace(/([,;:])(?=[A-ZÀ-ÖØ-öø-ÿa-z0-9])/g, '$1 ')
+    // Cas guillemets: ."Mot / .»Mot -> ." Mot / .» Mot
+    .replace(/([.!?…])(["'»”])(?=\S)/g, '$1$2 ')
+    .replace(/([,;:])(["'»”])(?=\S)/g, '$1$2 ')
     // Supprimer les caractères de contrôle Unicode indésirables
     .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '')
     // Nettoyer les lignes vides multiples
@@ -335,9 +334,17 @@ serve(async (req) => {
       console.log(`📷 URLs des images:`, imageUrls.map(i => i.url.substring(0, 60) + '...'));
     }
 
+    // Debug: compter les occurrences typiques de mots collés avant correction
+    const stuckBefore = (cleanContent.match(/[.!?…,:;][A-ZÀ-ÖØ-öø-ÿa-z0-9]/g) || []).length;
+    console.log(`🔎 [spacing] occurrences mots collés (après cleanGeneratedText): ${stuckBefore}`);
+
     // Correction grammaticale du contenu
     console.log(`📝 Début de la correction grammaticale...`);
-    const correctedContent = await correctGrammar(cleanContent);
+    const correctedContentRaw = await correctGrammar(cleanContent);
+    // Sécurité: reclean après la correction (ou si la correction est désactivée)
+    const correctedContent = cleanGeneratedText(correctedContentRaw);
+    const stuckAfter = (correctedContent.match(/[.!?…,:;][A-ZÀ-ÖØ-öø-ÿa-z0-9]/g) || []).length;
+    console.log(`🔎 [spacing] occurrences mots collés (après correction + reclean): ${stuckAfter}`);
     console.log(`✅ Correction grammaticale terminée`);
 
     // Créer le JWT pour l'authentification Google
