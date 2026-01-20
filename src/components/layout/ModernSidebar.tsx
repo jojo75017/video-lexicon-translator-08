@@ -198,6 +198,19 @@ const categories: Category[] = [
       { id: 'amazon-ads', label: '🎯 Amazon Ads', icon: Target },
       { id: 'launch-plan', label: '🚀 Plan Lancement', icon: Rocket },
       { id: 'monetization', label: '💵 Monétisation', icon: DollarSign },
+      { id: 'video-trailer', label: '🎬 Trailer Vidéo', icon: Video, isNew: true },
+      { id: 'ab-testing', label: '🧪 A/B Testing', icon: Target, isNew: true },
+    ]
+  },
+  // ========== 8. OUTILS 2026 ==========
+  {
+    id: 'tools-2026',
+    label: '🚀 Outils 2026',
+    emoji: '🚀',
+    color: 'from-purple-500 to-pink-500',
+    items: [
+      { id: 'multi-translator', label: '🌍 Traduction Multi-Langues', icon: Globe, isNew: true },
+      { id: 'trend-predictor', label: '🔮 Prédicteur Tendances', icon: TrendingUp, isNew: true },
     ]
   },
   // ========== 8. AUDIO ==========
