@@ -28,6 +28,7 @@ import LogoutTotalPage from './pages/LogoutTotalPage';
 import PaiementManuelPage from './pages/PaiementManuelPage';
 import ConfirmationPaiementPage from './pages/ConfirmationPaiementPage';
 import FaqAssistancePage from './pages/FaqAssistancePage';
+import NichesPage from './pages/NichesPage';
 import { SubscriptionAuth } from '@/components/SubscriptionAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { SubscriberGate } from '@/components/auth/SubscriberGate';
@@ -260,6 +261,7 @@ const App = () => {
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/admin-direct" element={<AdminDirectPage />} />
             <Route path="/ai-chat" element={<AiChatPage />} />
+            <Route path="/niches" element={<NichesPage />} />
             <Route
               path="/ebook-ideas"
               element={<EbookIdeasPage />}
