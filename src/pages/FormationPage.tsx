@@ -21,6 +21,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ReactMarkdown from 'react-markdown';
 import FormationQuiz from '@/components/formation/FormationQuiz';
 import FormationBadges from '@/components/formation/FormationBadges';
+import FormationModuleTabs from '@/components/formation/FormationModuleTabs';
 import { FORMATION_SYSTEME_IO_CONTENT } from '@/data/formationSystemeIo';
 
 interface Module {
@@ -889,6 +890,16 @@ ${module.content}
               </motion.div>
             </CardContent>
           </Card>
+        </motion.div>
+
+        {/* Section Formation Systeme.io avec 12 modules */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35 }}
+          className="mb-12"
+        >
+          <FormationModuleTabs />
         </motion.div>
 
         {/* Section Badges */}
