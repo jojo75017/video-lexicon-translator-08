@@ -48,7 +48,10 @@ import {
   Moon,
   X,
   Star,
-  Lightbulb
+  Lightbulb,
+  Video,
+  FlaskConical,
+  Languages
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -199,7 +202,7 @@ const categories: Category[] = [
       { id: 'launch-plan', label: '🚀 Plan Lancement', icon: Rocket },
       { id: 'monetization', label: '💵 Monétisation', icon: DollarSign },
       { id: 'video-trailer', label: '🎬 Trailer Vidéo', icon: Video, isNew: true },
-      { id: 'ab-testing', label: '🧪 A/B Testing', icon: Target, isNew: true },
+      { id: 'ab-testing', label: '🧪 A/B Testing', icon: FlaskConical, isNew: true },
     ]
   },
   // ========== 8. OUTILS 2026 ==========
@@ -209,7 +212,7 @@ const categories: Category[] = [
     emoji: '🚀',
     color: 'from-purple-500 to-pink-500',
     items: [
-      { id: 'multi-translator', label: '🌍 Traduction Multi-Langues', icon: Globe, isNew: true },
+      { id: 'multi-translator', label: '🌍 Traduction Multi-Langues', icon: Languages, isNew: true },
       { id: 'trend-predictor', label: '🔮 Prédicteur Tendances', icon: TrendingUp, isNew: true },
     ]
   },

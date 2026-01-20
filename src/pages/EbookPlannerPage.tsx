@@ -103,7 +103,12 @@ import EbookComicBookGenerator from '@/components/ebook/EbookComicBookGenerator'
 import EbookDiaryGenerator from '@/components/ebook/EbookDiaryGenerator';
 import EbookDocumentaryGenerator from '@/components/ebook/EbookDocumentaryGenerator';
 
-// Hooks et données
+// Composants 2026
+import EbookVideoTrailer from '@/components/ebook/EbookVideoTrailer';
+import EbookMultiTranslator from '@/components/ebook/EbookMultiTranslator';
+import EbookTrendPredictor from '@/components/ebook/EbookTrendPredictor';
+import EbookABTesting from '@/components/ebook/EbookABTesting';
+
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
 import { ebookTemplates } from '@/data/ebookTemplates';
 import { type Character as EbookCharacter } from '@/components/ebook/EbookCharacters';
@@ -2578,6 +2583,37 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       case 'seo-articles':
         return (
           <EbookSeoArticleGenerator />
+        );
+
+      // ========== OUTILS 2026 ==========
+      case 'video-trailer':
+        return (
+          <EbookVideoTrailer
+            ebookTitle={ebookTitle}
+            bookSummary={bookSummary}
+            coverImage={ebookImages[0]?.url}
+          />
+        );
+      
+      case 'multi-translator':
+        return (
+          <EbookMultiTranslator
+            ebookTitle={ebookTitle}
+            chapters={chapters}
+            preface={preface}
+            conclusion={conclusion}
+          />
+        );
+      
+      case 'trend-predictor':
+        return <EbookTrendPredictor />;
+      
+      case 'ab-testing':
+        return (
+          <EbookABTesting
+            ebookTitle={ebookTitle}
+            coverImage={ebookImages[0]?.url}
+          />
         );
 
       case 'subscription':
