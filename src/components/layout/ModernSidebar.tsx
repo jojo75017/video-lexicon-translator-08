@@ -201,7 +201,6 @@ const categories: Category[] = [
       { id: 'amazon-ads', label: '🎯 Amazon Ads', icon: Target },
       { id: 'launch-plan', label: '🚀 Plan Lancement', icon: Rocket },
       { id: 'monetization', label: '💵 Monétisation', icon: DollarSign },
-      { id: 'video-trailer', label: '🎬 Trailer Vidéo', icon: Video, isNew: true },
       { id: 'ab-testing', label: '🧪 A/B Testing', icon: FlaskConical, isNew: true },
     ]
   },
