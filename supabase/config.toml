@@ -122,3 +122,6 @@ verify_jwt = false
 
 [functions.stripe-verify-session]
 verify_jwt = false
+
+[functions.predict-trends]
+verify_jwt = false
