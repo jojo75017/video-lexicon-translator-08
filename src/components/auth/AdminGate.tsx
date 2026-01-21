@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 
 type Props = {
   children: React.ReactNode;
@@ -55,7 +54,8 @@ export function AdminGate({ children }: Props) {
 
         if (error) {
           console.error("AdminGate check-admin error:", error);
-          toast.error("Impossible de vérifier les droits admin");
+          // Évite les popups/toasts bruyants en cas d'erreur réseau temporaire.
+          // La redirection (ou /admin-direct pour l'admin permanent) gère le flux.
           setAllowed(false);
           setChecking(false);
           return;
@@ -71,7 +71,8 @@ export function AdminGate({ children }: Props) {
         } else {
           // Non-admin trying to access admin area
           sessionStorage.removeItem('is_admin');
-          toast.error("Accès admin refusé");
+          // Pas de toast ici: on redirige simplement vers /auth (ou /admin-direct si admin permanent)
+          // pour éviter la popup répétitive quand la session est instable.
           setAllowed(false);
         }
         
