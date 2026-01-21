@@ -85,6 +85,7 @@ serve(async (req) => {
         valid: true, 
         subscriber: {
           email: subscriber.email,
+          access_code: subscriber.access_code,
           plan_type: subscriber.plan_type,
           expires_at: subscriber.expires_at,
           chapters_generated: subscriber.chapters_generated,
