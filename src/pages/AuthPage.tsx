@@ -26,6 +26,14 @@ export const AuthPage = () => {
   };
 
   useEffect(() => {
+    // Si l'admin est déjà reconnu côté client (sessionStorage) ou via email admin permanent,
+    // on évite d'afficher cette page et on renvoie directement vers le générateur.
+    const storedPermanentAdminEmail = (localStorage.getItem('permanent_admin_email') || '').toLowerCase();
+    if (sessionStorage.getItem('is_admin') === 'true' || storedPermanentAdminEmail === 'boubetgeorges@gmail.com') {
+      navigate('/ebook-planner', { replace: true });
+      return;
+    }
+
     // Redirection silencieuse si déjà admin avec session active
     const checkAuth = async () => {
       try {
