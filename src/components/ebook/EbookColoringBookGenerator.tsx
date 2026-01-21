@@ -7,10 +7,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
-import { Loader2, Palette, Download, RefreshCw, Sparkles, Baby, ImagePlus, BookOpen, Wand2, FileDown, AlertTriangle, Save } from 'lucide-react';
+import { Loader2, Palette, Download, RefreshCw, Sparkles, Baby, ImagePlus, BookOpen, Wand2, FileDown, AlertTriangle, Save, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import jsPDF from 'jspdf';
+import { Document, Packer, Paragraph, TextRun, ImageRun, PageBreak, AlignmentType, HeadingLevel, Table, TableRow, TableCell, WidthType, BorderStyle } from 'docx';
+import { saveAs } from 'file-saver';
 import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 import { useProjectSave } from '@/hooks/useProjectSave';
 import { KdpQuickTools } from './KdpQuickTools';
@@ -955,6 +957,254 @@ CRITICAL REQUIREMENTS:
     }
   };
 
+  // ============================================
+  // EXPORT WORD (DOCX) - Pour impression et modification
+  // ============================================
+  const exportToWord = async () => {
+    if (generatedPages.length === 0) {
+      toast.error('Aucune page à exporter');
+      return;
+    }
+
+    setIsExporting(true);
+    toast.info('Création du fichier Word en cours...');
+
+    try {
+      const coloringBookTitle = 'Mon Livre de Coloriage';
+      const rawThemeLabel = THEMES.find(t => t.value === theme)?.label || theme;
+      const themeLabel = rawThemeLabel.replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]/gu, '').trim();
+      const currentYear = new Date().getFullYear();
+
+      // Convertir les images en base64 pour Word
+      const imageDataArray: { base64: string; width: number; height: number }[] = [];
+      
+      for (const page of generatedPages) {
+        try {
+          const response = await fetch(page.imageUrl);
+          const blob = await response.blob();
+          const base64 = await new Promise<string>((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result as string);
+            reader.readAsDataURL(blob);
+          });
+          // Extraire juste le base64 sans le préfixe data:image/...
+          const base64Data = base64.split(',')[1];
+          imageDataArray.push({ base64: base64Data, width: 500, height: 500 });
+        } catch (err) {
+          console.error('Erreur chargement image pour Word:', err);
+          imageDataArray.push({ base64: '', width: 500, height: 500 });
+        }
+      }
+
+      // Créer les sections du document
+      const children: (Paragraph | Table)[] = [];
+
+      // PAGE DE TITRE
+      children.push(
+        new Paragraph({
+          text: coloringBookTitle,
+          heading: HeadingLevel.TITLE,
+          alignment: AlignmentType.CENTER,
+          spacing: { after: 400 },
+        }),
+        new Paragraph({
+          text: themeLabel,
+          heading: HeadingLevel.HEADING_1,
+          alignment: AlignmentType.CENTER,
+          spacing: { after: 400 },
+        }),
+        new Paragraph({
+          text: `${generatedPages.length} dessins à colorier`,
+          alignment: AlignmentType.CENTER,
+          spacing: { after: 200 },
+        }),
+        new Paragraph({
+          text: `Pour les ${ageGroup} ans`,
+          alignment: AlignmentType.CENTER,
+          spacing: { after: 600 },
+        }),
+        new Paragraph({
+          children: [new PageBreak()],
+        })
+      );
+
+      // PAGE COPYRIGHT
+      children.push(
+        new Paragraph({
+          text: `© ${currentYear} - Tous droits réservés`,
+          alignment: AlignmentType.CENTER,
+          spacing: { after: 400 },
+        }),
+        new Paragraph({
+          text: coloringBookTitle,
+          alignment: AlignmentType.CENTER,
+          spacing: { after: 400 },
+        }),
+        new Paragraph({
+          text: "Aucune partie de ce livre ne peut être reproduite sans autorisation écrite préalable.",
+          alignment: AlignmentType.CENTER,
+          spacing: { after: 200 },
+        }),
+        new Paragraph({
+          text: `Format: ${BOOK_FORMATS.flatMap(c => c.formats).find(f => f.value === bookFormat)?.label || bookFormat}`,
+          alignment: AlignmentType.CENTER,
+          spacing: { after: 100 },
+        }),
+        new Paragraph({
+          text: `Thème: ${themeLabel} | Tranche d'âge: ${ageGroup} ans`,
+          alignment: AlignmentType.CENTER,
+          spacing: { after: 400 },
+        }),
+        new Paragraph({
+          children: [new PageBreak()],
+        })
+      );
+
+      // PAGES DE COLORIAGE
+      for (let i = 0; i < generatedPages.length; i++) {
+        const page = generatedPages[i];
+        const imgData = imageDataArray[i];
+
+        // Titre de la page
+        children.push(
+          new Paragraph({
+            text: page.title,
+            heading: HeadingLevel.HEADING_2,
+            alignment: AlignmentType.CENTER,
+            spacing: { after: 200 },
+          })
+        );
+
+        // Image (si disponible)
+        if (imgData.base64) {
+          children.push(
+            new Paragraph({
+              alignment: AlignmentType.CENTER,
+              children: [
+                new ImageRun({
+                  data: Buffer.from(imgData.base64, 'base64'),
+                  transformation: {
+                    width: 450,
+                    height: 450,
+                  },
+                  type: 'png',
+                }),
+              ],
+              spacing: { after: 200 },
+            })
+          );
+        } else {
+          children.push(
+            new Paragraph({
+              text: '[Image non disponible]',
+              alignment: AlignmentType.CENTER,
+              spacing: { after: 200 },
+            })
+          );
+        }
+
+        // Couleurs suggérées
+        children.push(
+          new Paragraph({
+            text: 'Couleurs suggérées :',
+            alignment: AlignmentType.CENTER,
+            spacing: { before: 100, after: 100 },
+            children: [
+              new TextRun({
+                text: 'Couleurs suggérées : ',
+                bold: true,
+              }),
+              new TextRun({
+                text: page.suggestedColors.slice(0, 5).map(c => `${c.element} (${c.color})`).join(' • '),
+              }),
+            ],
+          })
+        );
+
+        // Saut de page
+        children.push(
+          new Paragraph({
+            children: [new PageBreak()],
+          })
+        );
+      }
+
+      // PAGE À PROPOS
+      children.push(
+        new Paragraph({
+          text: 'À Propos de ce Livre',
+          heading: HeadingLevel.HEADING_1,
+          alignment: AlignmentType.CENTER,
+          spacing: { after: 400 },
+        }),
+        new Paragraph({
+          text: `Ce livre de coloriage a été conçu pour les enfants de ${ageGroup} ans.`,
+          alignment: AlignmentType.CENTER,
+          spacing: { after: 200 },
+        }),
+        new Paragraph({
+          text: `Thème: ${themeLabel} | ${generatedPages.length} dessins originaux`,
+          alignment: AlignmentType.CENTER,
+          spacing: { after: 400 },
+        }),
+        new Paragraph({
+          text: 'Conseils pour les parents:',
+          alignment: AlignmentType.LEFT,
+          spacing: { after: 200 },
+          children: [new TextRun({ text: 'Conseils pour les parents:', bold: true })],
+        }),
+        new Paragraph({
+          text: '• Utilisez des crayons de couleur ou des feutres lavables',
+          spacing: { after: 100 },
+        }),
+        new Paragraph({
+          text: '• Laissez votre enfant choisir ses propres couleurs',
+          spacing: { after: 100 },
+        }),
+        new Paragraph({
+          text: '• Le coloriage développe la motricité fine et la créativité',
+          spacing: { after: 200 },
+        }),
+        new Paragraph({
+          text: 'Créé avec EbookStudio Pro',
+          alignment: AlignmentType.CENTER,
+          spacing: { before: 400 },
+        })
+      );
+
+      // Créer le document
+      const doc = new Document({
+        sections: [
+          {
+            properties: {
+              page: {
+                margin: {
+                  top: 720, // 0.5 inch
+                  right: 720,
+                  bottom: 720,
+                  left: 720,
+                },
+              },
+            },
+            children,
+          },
+        ],
+      });
+
+      // Exporter
+      const blob = await Packer.toBlob(doc);
+      const fileName = `livre-coloriage-${theme}-${Date.now()}.docx`;
+      saveAs(blob, fileName);
+
+      toast.success(`Document Word exporté: ${fileName}`);
+    } catch (error) {
+      console.error('Erreur export Word:', error);
+      toast.error('Erreur lors de l\'export Word');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -1250,7 +1500,25 @@ CRITICAL REQUIREMENTS:
                 ) : (
                   <>
                     <FileDown className="mr-2 h-4 w-4" />
-                    Exporter PDF complet
+                    PDF (impression)
+                  </>
+                )}
+              </Button>
+              <Button
+                onClick={exportToWord}
+                disabled={isExporting || isGenerating}
+                variant="outline"
+                className="border-blue-500 text-blue-600 hover:bg-blue-50"
+              >
+                {isExporting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Export...
+                  </>
+                ) : (
+                  <>
+                    <FileText className="mr-2 h-4 w-4" />
+                    Word (modifiable)
                   </>
                 )}
               </Button>
