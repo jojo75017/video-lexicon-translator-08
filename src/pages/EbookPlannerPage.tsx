@@ -90,7 +90,7 @@ import { DemoBanner } from '@/components/ebook/DemoBanner';
 import { DemoPaywall } from '@/components/ebook/DemoPaywall';
 import { useWorkflowResults } from '@/hooks/useWorkflowResults';
 import { WorkflowResultViewer } from '@/components/ebook/WorkflowResultViewer';
-import { cleanGeneratedText, cleanChapters } from '@/utils/textCleaner';
+import { cleanGeneratedText, cleanChapters, countAllStuckWords } from '@/utils/textCleaner';
 import EbookUrlImport from '@/components/ebook/EbookUrlImport';
 import EbookPlagiarismValidator from '@/components/ebook/EbookPlagiarismValidator';
 import EbookAmazonSimulator from '@/components/ebook/EbookAmazonSimulator';
@@ -436,6 +436,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
 
   // Fonction pour nettoyer tous les chapitres des artefacts JSON
   const handleCleanAllChapters = React.useCallback(() => {
+    // Compter les mots collés AVANT le nettoyage
+    const stuckWordsBefore = countAllStuckWords(chapters, preface, conclusion);
+    
     const cleanedChapters = chapters.map(chapter => ({
       ...chapter,
       title: cleanGeneratedText(chapter.title || ''),
@@ -446,13 +449,28 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
         content: cleanGeneratedText(sub.content || '')
       }))
     }));
+    
+    const cleanedPreface = cleanGeneratedText(preface);
+    const cleanedConclusion = cleanGeneratedText(conclusion);
+    
+    // Compter les mots collés APRÈS le nettoyage
+    const stuckWordsAfter = countAllStuckWords(cleanedChapters, cleanedPreface, cleanedConclusion);
+    
+    // Appliquer les changements
     setChapters(cleanedChapters);
+    setPreface(cleanedPreface);
+    setConclusion(cleanedConclusion);
     
-    // Nettoyer aussi la préface et conclusion
-    setPreface(cleanGeneratedText(preface));
-    setConclusion(cleanGeneratedText(conclusion));
-    
-    toast.success('✨ Tous les chapitres ont été nettoyés !');
+    // Afficher le résultat avec les statistiques
+    const corrected = stuckWordsBefore - stuckWordsAfter;
+    if (stuckWordsBefore > 0) {
+      toast.success(
+        `✨ Nettoyage terminé ! ${corrected} mot${corrected > 1 ? 's' : ''} collé${corrected > 1 ? 's' : ''} corrigé${corrected > 1 ? 's' : ''} sur ${stuckWordsBefore} détecté${stuckWordsBefore > 1 ? 's' : ''}.`,
+        { duration: 5000 }
+      );
+    } else {
+      toast.success('✨ Texte déjà propre ! Aucun mot collé détecté.', { duration: 4000 });
+    }
   }, [chapters, preface, conclusion]);
 
   const handleGenerateChapterContent = async (chapterId: string) => {

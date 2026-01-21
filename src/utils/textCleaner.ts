@@ -82,3 +82,53 @@ export function cleanChapters<T extends { titre?: string; title?: string; conten
   if (!chapters || !Array.isArray(chapters)) return chapters || [];
   return chapters.map(cleanChapter);
 }
+
+/**
+ * Compte le nombre de "mots collés" (ponctuation suivie directement d'une lettre/chiffre)
+ * @param text Le texte à analyser
+ * @returns Le nombre de mots collés détectés
+ */
+export function countStuckWords(text: string): number {
+  if (!text || typeof text !== 'string') return 0;
+  
+  // Pattern pour détecter les mots collés après ponctuation
+  const stuckWordsPattern = /([.!?…,;:])(?=[A-ZÀ-ÖØ-öø-ÿa-z0-9])/g;
+  const matches = text.match(stuckWordsPattern);
+  
+  return matches ? matches.length : 0;
+}
+
+/**
+ * Compte les mots collés dans tout le contenu d'un livre
+ * @param chapters Tableau de chapitres
+ * @param preface Préface du livre
+ * @param conclusion Conclusion du livre
+ * @returns Le nombre total de mots collés
+ */
+export function countAllStuckWords(
+  chapters: Array<{ title?: string; content?: string; subChapters?: Array<{ title?: string; content?: string }> }>,
+  preface: string = '',
+  conclusion: string = ''
+): number {
+  let total = 0;
+  
+  // Compter dans la préface et conclusion
+  total += countStuckWords(preface);
+  total += countStuckWords(conclusion);
+  
+  // Compter dans chaque chapitre
+  for (const chapter of chapters) {
+    total += countStuckWords(chapter.title || '');
+    total += countStuckWords(chapter.content || '');
+    
+    // Compter dans les sous-chapitres
+    if (chapter.subChapters) {
+      for (const sub of chapter.subChapters) {
+        total += countStuckWords(sub.title || '');
+        total += countStuckWords(sub.content || '');
+      }
+    }
+  }
+  
+  return total;
+}
