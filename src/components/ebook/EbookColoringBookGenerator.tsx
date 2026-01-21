@@ -960,6 +960,17 @@ CRITICAL REQUIREMENTS:
   // ============================================
   // EXPORT WORD (DOCX) - Pour impression et modification
   // ============================================
+  
+  // Helper: convertir base64 en Uint8Array (compatible navigateur)
+  const base64ToUint8Array = (base64: string): Uint8Array => {
+    const binaryString = atob(base64);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    return bytes;
+  };
+
   const exportToWord = async () => {
     if (generatedPages.length === 0) {
       toast.error('Aucune page à exporter');
@@ -975,8 +986,8 @@ CRITICAL REQUIREMENTS:
       const themeLabel = rawThemeLabel.replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]/gu, '').trim();
       const currentYear = new Date().getFullYear();
 
-      // Convertir les images en base64 pour Word
-      const imageDataArray: { base64: string; width: number; height: number }[] = [];
+      // Convertir les images en Uint8Array pour Word
+      const imageDataArray: { bytes: Uint8Array | null; width: number; height: number }[] = [];
       
       for (const page of generatedPages) {
         try {
@@ -989,10 +1000,11 @@ CRITICAL REQUIREMENTS:
           });
           // Extraire juste le base64 sans le préfixe data:image/...
           const base64Data = base64.split(',')[1];
-          imageDataArray.push({ base64: base64Data, width: 500, height: 500 });
+          const bytes = base64ToUint8Array(base64Data);
+          imageDataArray.push({ bytes, width: 500, height: 500 });
         } catch (err) {
           console.error('Erreur chargement image pour Word:', err);
-          imageDataArray.push({ base64: '', width: 500, height: 500 });
+          imageDataArray.push({ bytes: null, width: 500, height: 500 });
         }
       }
 
@@ -1076,13 +1088,13 @@ CRITICAL REQUIREMENTS:
         );
 
         // Image (si disponible)
-        if (imgData.base64) {
+        if (imgData.bytes) {
           children.push(
             new Paragraph({
               alignment: AlignmentType.CENTER,
               children: [
                 new ImageRun({
-                  data: Buffer.from(imgData.base64, 'base64'),
+                  data: imgData.bytes,
                   transformation: {
                     width: 450,
                     height: 450,
