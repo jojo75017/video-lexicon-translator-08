@@ -349,21 +349,23 @@ export const AuthPage = () => {
             <Button
               variant="outline"
               onClick={() => {
-                // Vérification côté client de l'email admin avant accès direct
                 const adminEmail = 'boubetgeorges@gmail.com';
-                if (email.toLowerCase().trim() === adminEmail) {
+                const storedAdmin = (localStorage.getItem('permanent_admin_email') || '').toLowerCase();
+                
+                // En mode dev OU si déjà reconnu comme admin permanent → accès direct
+                if (import.meta.env.DEV || storedAdmin === adminEmail || email.toLowerCase().trim() === adminEmail) {
                   sessionStorage.setItem('is_admin', 'true');
                   localStorage.setItem('permanent_admin_email', adminEmail);
                   navigate('/ebook-planner', { replace: true });
                 } else {
                   if (shouldToast) {
                     toast.error('Accès refusé', {
-                      description: 'Entrez l\'email administrateur dans le champ ci-dessus.',
+                      description: 'Réservé à l\'administrateur.',
                     });
                   }
                 }
               }}
-              disabled={isLoading || !email}
+              disabled={isLoading}
               className="text-sm border-primary/50 hover:bg-primary/10"
             >
               🔐 Accès Admin Direct
