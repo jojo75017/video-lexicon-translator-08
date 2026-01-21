@@ -33,6 +33,43 @@ const COLOR_SCHEME_PROMPTS: Record<string, string> = {
   'sepia': 'Appliquer un effet sépia vintage avec des tons bruns et beiges.',
 };
 
+// Prompt spécialisé pour les livres de coloriage - TRÈS STRICT
+const getColoringBookPrompt = (subject: string, ageGroup: string = '3-6'): string => {
+  const thicknessGuide = {
+    '0-3': 'lignes très épaisses (minimum 4-5 pixels), formes ultra-simples, maximum 5-8 éléments',
+    '3-6': 'lignes épaisses (3-4 pixels), formes simples et arrondies, 8-15 éléments maximum',
+    '6-10': 'lignes moyennes (2-3 pixels), détails modérés, motifs clairs',
+    '10+': 'lignes fines à moyennes, détails plus nombreux mais zones bien définies',
+  };
+  
+  const thickness = thicknessGuide[ageGroup as keyof typeof thicknessGuide] || thicknessGuide['3-6'];
+  
+  return `COLORING BOOK PAGE - CRITICAL REQUIREMENTS:
+
+SUBJECT: ${subject}
+
+MANDATORY STYLE RULES:
+- BLACK AND WHITE LINE DRAWING ONLY
+- ABSOLUTELY NO colors, NO shading, NO gradients, NO gray tones
+- Pure white background (#FFFFFF)
+- Clean, bold black outlines (#000000) only
+- ${thickness}
+- Simple, closed shapes that children can color inside
+- Every area must be clearly defined and easy to fill with color
+- Cute, friendly, child-safe appearance
+- NO realistic shadows or 3D effects
+- NO texture or hatching
+- NO watermarks or text
+- Professional coloring book quality like Melissa & Doug or Crayola coloring books
+
+TECHNICAL REQUIREMENTS:
+- High contrast black lines on pure white
+- Anti-aliased smooth lines
+- Large coloring areas, not tiny details
+- Clear separation between all elements
+- Style: clean vector-like line art illustration`;
+};
+
 // Styles optimisés pour le photoréalisme humain
 const PHOTOREALISTIC_STYLES = [
   'photorealistic',
@@ -137,8 +174,83 @@ async function generateWithOpenAI(
   colorScheme: string = 'auto',
   visualCoherence: boolean = false,
   coherenceIntensity: string = 'medium',
-  referenceImageUrl: string | null = null
+  referenceImageUrl: string | null = null,
+  isColoringBook: boolean = false,
+  coloringBookAgeGroup: string = '3-6'
 ): Promise<string> {
+  const size = RATIO_SIZES[ratio]?.openai || '1024x1024';
+  
+  // MODE LIVRE DE COLORIAGE - Utiliser le prompt spécialisé
+  if (isColoringBook) {
+    const imagePrompt = getColoringBookPrompt(chapterTitle, coloringBookAgeGroup);
+    console.log('🎨 COLORING BOOK MODE (OpenAI) - Using specialized prompt');
+    console.log('Generating image with OpenAI:', imagePrompt);
+
+    const generateViaImagesAPI = async (model: string): Promise<{ ok: boolean; status: number; data?: any; errorText?: string }> => {
+      const payload: any = {
+        model,
+        prompt: imagePrompt,
+        n: 1,
+        size,
+      };
+
+      if (model === 'dall-e-3') {
+        payload.response_format = 'b64_json';
+        payload.quality = 'hd'; // Haute qualité pour des lignes nettes
+      } else if (model === 'gpt-image-1') {
+        payload.quality = 'high';
+      }
+
+      const resp = await fetch('https://api.openai.com/v1/images/generations', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!resp.ok) {
+        const errorText = await resp.text();
+        return { ok: false, status: resp.status, errorText };
+      }
+
+      const data = await resp.json();
+      return { ok: true, status: resp.status, data };
+    };
+
+    let result = await generateViaImagesAPI('gpt-image-1');
+
+    if (!result.ok) {
+      console.error('OpenAI error (gpt-image-1):', result.status, result.errorText);
+      if (result.status === 403 || result.status === 400 || /must be verified|permission|unknown_parameter/i.test(result.errorText || '')) {
+        console.log('Falling back to OpenAI dall-e-3 for coloring book...');
+        result = await generateViaImagesAPI('dall-e-3');
+      }
+    }
+
+    if (!result.ok) {
+      console.error('OpenAI error (final):', result.status, result.errorText);
+      throw new Error(`OpenAI API error: ${result.status}`);
+    }
+
+    const data = result.data;
+    let imageUrl: string | null = null;
+    if (data.data?.[0]?.b64_json) {
+      imageUrl = `data:image/png;base64,${data.data[0].b64_json}`;
+    } else if (data.data?.[0]?.url) {
+      imageUrl = data.data[0].url;
+    }
+
+    if (!imageUrl) {
+      throw new Error('No image URL in OpenAI response');
+    }
+
+    console.log('Coloring book image generated successfully with OpenAI');
+    return imageUrl;
+  }
+
+  // MODE STANDARD - Prompt classique pour ebooks illustrés
   let charactersContext = '';
   if (characters && characters.length > 0) {
     charactersContext = '\n\nIMPORTANT - Personnages principaux de l\'histoire (à représenter de manière STRICTEMENT cohérente):\n';
@@ -157,10 +269,8 @@ async function generateWithOpenAI(
 
   const colorPrompt = COLOR_SCHEME_PROMPTS[colorScheme] || '';
   const qualityDesc = QUALITY_MAP[quality]?.description || QUALITY_MAP['high'].description;
-  const size = RATIO_SIZES[ratio]?.openai || '1024x1024';
   const photorealisticEnhancement = getPhotorealisticEnhancement(style);
   
-  // Instructions de cohérence selon l'intensité
   const coherenceInstructions: Record<string, string> = {
     light: 'Maintenir une ambiance visuelle similaire, style reconnaissable, variations créatives permises.',
     medium: 'Style artistique IDENTIQUE, même palette de couleurs dominante, même niveau de détail.',
@@ -306,7 +416,10 @@ serve(async (req) => {
       openaiApiKey, 
       disableOpenAIFallback = false, 
       forceLovable = false,
-      uploadToStorage = true
+      uploadToStorage = true,
+      customPrompt = null,
+      isColoringBook = false,
+      coloringBookAgeGroup = '3-6',
     } = await req.json();
     
     if (!chapterTitle) {
@@ -357,7 +470,9 @@ COHÉRENCE STRICTE ABSOLUE:
           colorScheme,
           visualCoherence,
           coherenceIntensity,
-          referenceImageUrl
+          referenceImageUrl,
+          isColoringBook,
+          coloringBookAgeGroup
         );
       } catch (err) {
         console.error('OpenAI image generation failed:', err);
@@ -408,7 +523,26 @@ RÉFÉRENCE VISUELLE OBLIGATOIRE:
 - Maintenir le même niveau de détail et technique de rendu
 - Cette image définit le standard visuel pour tout l'ebook` : '';
 
-      const imagePrompt = `Contexte de l'ebook: "${ebookTitle}"
+      // Détecter si c'est un livre de coloriage (via flag ou style)
+      const isColoringMode = isColoringBook || 
+        style.toLowerCase().includes('line art') || 
+        style.toLowerCase().includes('coloring') ||
+        colorScheme === 'monochrome';
+
+      // Utiliser le prompt personnalisé ou le prompt de coloriage si applicable
+      let imagePrompt: string;
+      
+      if (isColoringMode) {
+        // MODE LIVRE DE COLORIAGE - Prompt ultra-strict
+        imagePrompt = getColoringBookPrompt(chapterTitle, coloringBookAgeGroup);
+        console.log('🎨 COLORING BOOK MODE ACTIVATED - Using specialized prompt');
+      } else if (customPrompt) {
+        // Utiliser le prompt personnalisé fourni par le client
+        imagePrompt = customPrompt;
+        console.log('📝 Using custom prompt from client');
+      } else {
+        // Prompt standard pour ebooks illustrés
+        imagePrompt = `Contexte de l'ebook: "${ebookTitle}"
 Chapitre à illustrer: "${chapterTitle}"
 ${chapterContent ? `Résumé du chapitre: ${chapterContent.substring(0, 300)}...` : ''}
 ${charactersContext}
@@ -426,6 +560,8 @@ Instructions de génération:
 - Si des personnages sont mentionnés ci-dessus, les représenter avec EXACTEMENT les mêmes caractéristiques physiques que décrites
 - COHÉRENCE VISUELLE ABSOLUE pour tous les personnages récurrents
 - L'illustration doit refléter le thème et l'atmosphère du titre de l'ebook "${ebookTitle}"`;
+      }
+      
       console.log('Generating image with prompt:', imagePrompt);
 
       const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
