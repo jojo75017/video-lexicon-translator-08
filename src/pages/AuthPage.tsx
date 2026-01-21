@@ -347,12 +347,17 @@ export const AuthPage = () => {
           </div>
           <div className="mt-2 text-center">
             <Button
-              variant="secondary"
-              onClick={() => navigate('/admin-direct')}
+              variant="outline"
+              onClick={() => {
+                // Accès direct silencieux pour l'admin permanent
+                sessionStorage.setItem('is_admin', 'true');
+                localStorage.setItem('permanent_admin_email', 'boubetgeorges@gmail.com');
+                navigate('/ebook-planner', { replace: true });
+              }}
               disabled={isLoading}
-              className="text-sm"
+              className="text-sm border-primary/50 hover:bg-primary/10"
             >
-              Accès admin direct (lien email)
+              🔐 Accès Admin Direct
             </Button>
           </div>
           <div className="mt-2 text-center">
