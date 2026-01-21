@@ -16,6 +16,9 @@ export const AuthPage = () => {
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const navigate = useNavigate();
 
+  // En mode édition/dev, on évite les toasts (popups) qui deviennent vite envahissants.
+  const shouldToast = !import.meta.env.DEV;
+
   const checkAdmin = async (accessToken?: string) => {
     // Important: after sign-in, the client token can take a tick to propagate.
     // Passing the access token explicitly avoids false "non-admin" results.
@@ -100,7 +103,9 @@ export const AuthPage = () => {
 
     try {
       if (!email) {
-        toast.error('Email requis', { description: "Entrez votre email pour recevoir un lien de connexion." });
+        if (shouldToast) {
+          toast.error('Email requis', { description: "Entrez votre email pour recevoir un lien de connexion." });
+        }
         return;
       }
 
@@ -176,7 +181,7 @@ export const AuthPage = () => {
 
         console.log('Utilisateur admin confirmé');
         sessionStorage.setItem('is_admin', 'true');
-        toast.success('Connexion admin réussie');
+        if (shouldToast) toast.success('Connexion admin réussie');
         navigate('/admin');
       } else {
         const { error } = await supabase.auth.signUp({
@@ -189,15 +194,19 @@ export const AuthPage = () => {
 
         if (error) throw error;
 
-        toast.success('Compte créé', {
-          description: 'Veuillez vérifier votre email pour confirmer votre compte',
-        });
+        if (shouldToast) {
+          toast.success('Compte créé', {
+            description: 'Veuillez vérifier votre email pour confirmer votre compte',
+          });
+        }
       }
     } catch (error: any) {
       console.error('Auth error:', error);
-      toast.error('Erreur', {
-        description: error.message || 'Une erreur est survenue',
-      });
+      if (shouldToast) {
+        toast.error('Erreur', {
+          description: error.message || 'Une erreur est survenue',
+        });
+      }
     } finally {
       setIsLoading(false);
     }
