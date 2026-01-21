@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -20,6 +20,7 @@ import {
   Library,
   ArrowRight,
   Crown,
+  Shield,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -31,8 +32,21 @@ interface SubscriptionPageProps {
   onLogout: () => void;
 }
 
+const ADMIN_EMAIL = 'boubetgeorges@gmail.com';
+
 const SubscriptionPage = ({ subscriberEmail, subscriberData, onLogout }: SubscriptionPageProps) => {
   const navigate = useNavigate();
+  
+  // Redirection automatique pour l'admin permanent
+  useEffect(() => {
+    const storedAdmin = (localStorage.getItem('permanent_admin_email') || '').toLowerCase();
+    if (storedAdmin === ADMIN_EMAIL || import.meta.env.DEV) {
+      // L'admin est reconnu, on le redirige directement
+      sessionStorage.setItem('is_admin', 'true');
+      localStorage.setItem('permanent_admin_email', ADMIN_EMAIL);
+      navigate('/ebook-planner', { replace: true });
+    }
+  }, [navigate]);
 
   const planLimits: Record<string, Record<string, number>> = {
     starter: { 
