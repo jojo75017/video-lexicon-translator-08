@@ -463,12 +463,14 @@ CRITICAL REQUIREMENTS:
           chapterTitle: subject,
           ebookTitle: ebookTitle || 'Livre de Coloriage',
           style: 'line art sketch',
-          aspectRatio: '1:1',
+          ratio: 'square',
           quality: 'high',
           colorScheme: 'monochrome',
           useOpenAI: useOpenAI,
           openaiApiKey: userApiKey || undefined,
-          customPrompt: prompt,
+          // Activer explicitement le mode livre de coloriage
+          isColoringBook: true,
+          coloringBookAgeGroup: ageGroup,
         },
       });
 
