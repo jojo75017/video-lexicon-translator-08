@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 import { Loader2, Mail, CheckCircle, Shield } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -26,7 +25,6 @@ const AdminDirectPage = () => {
           });
 
           if (isAdmin) {
-            toast.success("Session admin active");
             navigate("/admin", { replace: true });
             return;
           }
@@ -50,7 +48,6 @@ const AdminDirectPage = () => {
             console.error("Session error:", error);
             setStatus("error");
             setMessage("Erreur d'authentification");
-            toast.error("Erreur d'authentification");
             return;
           }
 
@@ -62,13 +59,11 @@ const AdminDirectPage = () => {
             });
 
             if (isAdmin) {
-              toast.success("Connexion admin réussie !");
               navigate("/admin", { replace: true });
               return;
             } else {
               setStatus("error");
               setMessage("Accès refusé - Vous n'êtes pas administrateur");
-              toast.error("Accès refusé");
               return;
             }
           }
@@ -89,15 +84,11 @@ const AdminDirectPage = () => {
           console.error("Magic link error:", magicLinkError);
           setStatus("error");
           setMessage("Erreur lors de l'envoi du lien");
-          toast.error("Erreur lors de l'envoi du magic link");
           return;
         }
 
         setStatus("sent");
         setMessage("Lien magique envoyé ! Vérifiez votre boîte mail.");
-        toast.success("Magic link envoyé", {
-          description: `Un email a été envoyé à ${ADMIN_EMAIL}`
-        });
 
       } catch (err) {
         console.error("Admin direct error:", err);
