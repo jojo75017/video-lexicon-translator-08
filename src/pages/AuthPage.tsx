@@ -349,12 +349,21 @@ export const AuthPage = () => {
             <Button
               variant="outline"
               onClick={() => {
-                // Accès direct silencieux pour l'admin permanent
-                sessionStorage.setItem('is_admin', 'true');
-                localStorage.setItem('permanent_admin_email', 'boubetgeorges@gmail.com');
-                navigate('/ebook-planner', { replace: true });
+                // Vérification côté client de l'email admin avant accès direct
+                const adminEmail = 'boubetgeorges@gmail.com';
+                if (email.toLowerCase().trim() === adminEmail) {
+                  sessionStorage.setItem('is_admin', 'true');
+                  localStorage.setItem('permanent_admin_email', adminEmail);
+                  navigate('/ebook-planner', { replace: true });
+                } else {
+                  if (shouldToast) {
+                    toast.error('Accès refusé', {
+                      description: 'Entrez l\'email administrateur dans le champ ci-dessus.',
+                    });
+                  }
+                }
               }}
-              disabled={isLoading}
+              disabled={isLoading || !email}
               className="text-sm border-primary/50 hover:bg-primary/10"
             >
               🔐 Accès Admin Direct
