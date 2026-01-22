@@ -10,7 +10,7 @@ const corsHeaders = {
 function cleanGeneratedText(text: string): string {
   if (!text) return text;
   
-  return text
+  let cleaned = text
     // Supprimer les guillemets échappés
     .replace(/\\"/g, '')
     .replace(/\\'/g, '')
@@ -38,16 +38,46 @@ function cleanGeneratedText(text: string): string {
     // Nettoyer les doubles espaces
     .replace(/  +/g, ' ')
     // Nettoyer les espaces avant ponctuation
-    .replace(/ ([.,;:!?])/g, '$1')
-    // ✅ CRITIQUE: empêcher les mots collés après ponctuation
-    // Cas principal: ponctuation directement suivie d'une lettre/chiffre -> ajouter un espace
-    .replace(/([.!?…])(?=[A-ZÀ-ÖØ-öø-ÿa-z0-9])/g, '$1 ')
-    .replace(/([,;:])(?=[A-ZÀ-ÖØ-öø-ÿa-z0-9])/g, '$1 ')
-    // Cas guillemets: ."Mot / .»Mot -> ." Mot / .» Mot
-    .replace(/([.!?…])(["'»”])(?=\S)/g, '$1$2 ')
-    .replace(/([,;:])(["'»”])(?=\S)/g, '$1$2 ')
+    .replace(/ ([.,;:!?])/g, '$1');
+  
+  // ✅ CRITIQUE: Boucle pour garantir que TOUS les mots collés sont corrigés
+  let previousLength = 0;
+  let iterations = 0;
+  const maxIterations = 5;
+  
+  while (cleaned.length !== previousLength && iterations < maxIterations) {
+    previousLength = cleaned.length;
+    iterations++;
+    
+    cleaned = cleaned
+      // Cas 1: Point/exclamation/interrogation suivi d'une lettre minuscule ou majuscule
+      .replace(/\.([A-Za-zÀ-ÿ])/g, '. $1')
+      .replace(/!([A-Za-zÀ-ÿ])/g, '! $1')
+      .replace(/\?([A-Za-zÀ-ÿ])/g, '? $1')
+      .replace(/…([A-Za-zÀ-ÿ])/g, '… $1')
+      // Cas 2: Virgule/point-virgule/deux-points suivi d'une lettre
+      .replace(/,([A-Za-zÀ-ÿ])/g, ', $1')
+      .replace(/;([A-Za-zÀ-ÿ])/g, '; $1')
+      .replace(/:([A-Za-zÀ-ÿ])/g, ': $1')
+      // Cas 3: Ponctuation suivie d'un chiffre
+      .replace(/\.(\d)/g, '. $1')
+      .replace(/,(\d)/g, ', $1')
+      // Cas 4: Guillemets après ponctuation puis mot
+      .replace(/\."/g, '." ')
+      .replace(/\."([A-Za-zÀ-ÿ])/g, '." $1')
+      .replace(/\.»([A-Za-zÀ-ÿ])/g, '.» $1')
+      .replace(/!"/g, '!" ')
+      .replace(/!"([A-Za-zÀ-ÿ])/g, '!" $1')
+      .replace(/\?"/g, '?" ')
+      .replace(/\?"([A-Za-zÀ-ÿ])/g, '?" $1');
+  }
+  
+  // Nettoyage final
+  return cleaned
     // Supprimer les caractères de contrôle Unicode indésirables
     .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '')
+    // Nettoyer les doubles espaces (réapparus après corrections)
+    .replace(/  +/g, ' ')
     // Nettoyer les lignes vides multiples
     .replace(/\n{3,}/g, '\n\n')
     .trim();
