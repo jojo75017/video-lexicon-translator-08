@@ -1122,6 +1122,29 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                       <HelpCircle className="h-4 w-4 mr-2" />
                       Aide
                     </Button>
+                    {/* Bouton Connexion Auth Admin pour récupérer les projets */}
+                    {isAdminProp && (
+                      <Button 
+                        type="button"
+                        onClick={async () => {
+                          const { data: { session } } = await supabase.auth.getSession();
+                          if (session) {
+                            toast.success('Session Auth active !', {
+                              description: `Connecté: ${session.user.email}`
+                            });
+                            window.location.reload();
+                          } else {
+                            toast.info('Redirection vers connexion Auth...');
+                            navigate('/auth?redirect=/ebook-planner');
+                          }
+                        }}
+                        variant="outline"
+                        className="bg-amber-500/20 border-amber-400 text-amber-700 hover:bg-amber-500/30"
+                      >
+                        <Crown className="h-4 w-4 mr-2" />
+                        Connexion Auth
+                      </Button>
+                    )}
                   </div>
                 </div>
               </div>

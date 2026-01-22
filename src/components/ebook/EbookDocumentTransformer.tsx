@@ -153,6 +153,9 @@ export const EbookDocumentTransformer: React.FC = () => {
       // Étape 1: Analyse et structuration via IA
       setTransformProgress(20);
       
+      // Estimer le nombre de chapitres basé sur la longueur du texte
+      const estimatedChapters = Math.max(6, Math.min(20, Math.floor(rawText.length / 3000)));
+      
       const { data, error } = await supabase.functions.invoke('generate-content', {
         body: {
           type: 'document-transform',
@@ -162,21 +165,24 @@ TITRE DU LIVRE: ${bookTitle}
 AUTEUR: ${authorName || 'Anonyme'}
 
 TEXTE À TRANSFORMER:
-${rawText.slice(0, 25000)}
+${rawText.slice(0, 50000)}
 
-INSTRUCTIONS:
-1. Découpe intelligemment le texte en chapitres logiques (minimum 3 chapitres)
-2. Crée des titres de chapitres accrocheurs
-3. Rédige une préface engageante (200 mots)
-4. Rédige une conclusion inspirante (200 mots)
-5. Nettoie et reformule les passages confus
-6. Garde le style et le message de l'auteur original
+INSTRUCTIONS CRITIQUES:
+1. Découpe intelligemment le texte en ${estimatedChapters} à ${estimatedChapters + 4} chapitres MINIMUM (JAMAIS moins de 6 chapitres!)
+2. Chaque chapitre doit contenir au moins 500 mots
+3. Crée des titres de chapitres accrocheurs et descriptifs
+4. Rédige une préface engageante (300-400 mots)
+5. Rédige une conclusion inspirante (300-400 mots)
+6. Nettoie et reformule les passages confus
+7. Garde le style et le message de l'auteur original
+8. Si le texte est long, crée PLUS de chapitres (jusqu'à 20 si nécessaire)
 
 Réponds UNIQUEMENT en JSON valide:
 {
   "preface": "Texte de la préface...",
   "chapters": [
-    {"title": "Titre du chapitre", "content": "Contenu du chapitre..."},
+    {"title": "Titre du chapitre 1", "content": "Contenu complet du chapitre 1..."},
+    {"title": "Titre du chapitre 2", "content": "Contenu complet du chapitre 2..."},
     ...
   ],
   "conclusion": "Texte de conclusion..."
