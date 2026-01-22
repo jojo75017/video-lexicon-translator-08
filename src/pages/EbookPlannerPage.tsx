@@ -112,6 +112,7 @@ import EbookABTesting from '@/components/ebook/EbookABTesting';
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
 import { ebookTemplates } from '@/data/ebookTemplates';
 import { type Character as EbookCharacter } from '@/components/ebook/EbookCharacters';
+import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 
 interface EbookPlannerPageProps {
   subscriberEmail?: string;
@@ -166,7 +167,8 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   const nicheFromUrl = searchParams.get('niche');
   const categoryFromUrl = searchParams.get('category');
   
-  const [apiKey, setApiKey] = useState(savedData?.apiKey || '');
+  // Utiliser useOpenAIConfig pour une persistance fiable de la clé API
+  const { apiKey, updateApiKey: setApiKey } = useOpenAIConfig();
   const [ebookTitle, setEbookTitle] = useState(nicheFromUrl || location.state?.suggestedTitle || savedData?.ebookTitle || '');
   const [targetAudience, setTargetAudience] = useState(savedData?.targetAudience || 'Adultes');
   const [tomeNumber, setTomeNumber] = useState<number | null>(savedData?.tomeNumber || null);
@@ -291,8 +293,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
 
   useEffect(() => {
     // Sauvegarder dans localStorage SANS les images base64 volumineuses
+    // Note: apiKey est géré séparément par useOpenAIConfig
     const dataToSave = {
-      apiKey, ebookTitle, authorName, targetAudience, tomeNumber, writingStyle,
+      ebookTitle, authorName, targetAudience, tomeNumber, writingStyle,
       chapterLength, detailLevel, tone, narrativeFormat, bookDescription, genre,
       preface: stripBase64ImagesFromContent(preface), 
       conclusion: stripBase64ImagesFromContent(conclusion), 
@@ -324,7 +327,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       const timer = setTimeout(() => saveProject(projectData), 2000);
       return () => clearTimeout(timer);
     }
-  }, [apiKey, ebookTitle, authorName, targetAudience, tomeNumber, writingStyle, chapterLength, detailLevel, tone, narrativeFormat, bookDescription, genre, preface, conclusion, epilogue, chapters, numberOfChapters, ebookImages, characters, bookSummary, coverConcepts, seoOptimization, kdpDescription, kdpKeywords, kdpCategories]);
+  }, [ebookTitle, authorName, targetAudience, tomeNumber, writingStyle, chapterLength, detailLevel, tone, narrativeFormat, bookDescription, genre, preface, conclusion, epilogue, chapters, numberOfChapters, ebookImages, characters, bookSummary, coverConcepts, seoOptimization, kdpDescription, kdpKeywords, kdpCategories]);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
