@@ -108,6 +108,7 @@ import EbookVideoTrailer from '@/components/ebook/EbookVideoTrailer';
 import EbookMultiTranslator from '@/components/ebook/EbookMultiTranslator';
 import EbookTrendPredictor from '@/components/ebook/EbookTrendPredictor';
 import EbookABTesting from '@/components/ebook/EbookABTesting';
+import EbookPresentation from '@/components/ebook/EbookPresentation';
 
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
 import { ebookTemplates } from '@/data/ebookTemplates';
@@ -934,6 +935,11 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
 
   const renderContent = () => {
     switch (activeTab) {
+      case 'presentation':
+        return (
+          <EbookPresentation onNavigate={(tab) => setActiveTab(tab)} />
+        );
+
       case 'projects':
         return (
           <EbookProjectsList 

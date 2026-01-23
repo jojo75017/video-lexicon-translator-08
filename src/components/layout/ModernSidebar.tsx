@@ -51,7 +51,8 @@ import {
   Lightbulb,
   Video,
   FlaskConical,
-  Languages
+  Languages,
+  Info
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -87,6 +88,16 @@ interface Category {
 }
 
 const categories: Category[] = [
+  // ========== 0. PRÉSENTATION ==========
+  {
+    id: 'presentation',
+    label: '📖 Présentation',
+    emoji: '📖',
+    color: 'from-cyan-500 to-blue-500',
+    items: [
+      { id: 'presentation', label: '🎯 Découvrir KDP Studio', icon: Info, isNew: true },
+    ]
+  },
   // ========== 1. DÉMARRAGE RAPIDE ==========
   {
     id: 'start',
