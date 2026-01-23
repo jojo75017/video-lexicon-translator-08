@@ -25,7 +25,11 @@ import {
   AlertCircle,
   FileText,
   Gift,
-  Link2
+  Link2,
+  FileDown,
+  ExternalLink,
+  BookMarked,
+  Smartphone
 } from 'lucide-react';
 import { toast } from 'sonner';
 import ArcLinkGenerator from './ArcLinkGenerator';
@@ -230,7 +234,7 @@ ${authorName}`);
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="readers" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="readers">
               <Users className="h-4 w-4 mr-2" />
               <span className="hidden sm:inline">Lecteurs</span> ({readers.length})
@@ -238,6 +242,10 @@ ${authorName}`);
             <TabsTrigger value="form">
               <Link2 className="h-4 w-4 mr-2" />
               <span className="hidden sm:inline">Formulaire</span>
+            </TabsTrigger>
+            <TabsTrigger value="distribution">
+              <FileDown className="h-4 w-4 mr-2" />
+              <span className="hidden sm:inline">Distribution</span>
             </TabsTrigger>
             <TabsTrigger value="email-arc">
               <Gift className="h-4 w-4 mr-2" />
@@ -359,6 +367,240 @@ ${authorName}`);
               authorName={authorName}
               genre=""
             />
+          </TabsContent>
+
+          <TabsContent value="distribution" className="space-y-6">
+            {/* Guide des formats */}
+            <div className="space-y-4">
+              <h4 className="font-semibold flex items-center gap-2">
+                <FileDown className="h-4 w-4 text-primary" />
+                Formats à envoyer à vos lecteurs ARC
+              </h4>
+              
+              <div className="grid gap-4 md:grid-cols-3">
+                <Card className="p-4 border-2 border-green-200 dark:border-green-800 bg-green-50/50 dark:bg-green-950/20">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="p-2 rounded-lg bg-green-500 text-white">
+                      <BookMarked className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h5 className="font-bold text-green-700 dark:text-green-400">EPUB</h5>
+                      <Badge variant="secondary" className="text-xs">Recommandé</Badge>
+                    </div>
+                  </div>
+                  <ul className="text-sm space-y-1 text-muted-foreground">
+                    <li>✓ Standard universel</li>
+                    <li>✓ Kobo, Apple Books, Google</li>
+                    <li>✓ Ajustable (taille police)</li>
+                    <li>✓ Léger et fluide</li>
+                  </ul>
+                </Card>
+
+                <Card className="p-4 border-2 border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/20">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="p-2 rounded-lg bg-amber-500 text-white">
+                      <Smartphone className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h5 className="font-bold text-amber-700 dark:text-amber-400">MOBI / KPF</h5>
+                      <Badge variant="secondary" className="text-xs">Kindle</Badge>
+                    </div>
+                  </div>
+                  <ul className="text-sm space-y-1 text-muted-foreground">
+                    <li>✓ Liseuses Kindle</li>
+                    <li>✓ App Kindle mobile</li>
+                    <li>✓ Envoi par email @kindle.com</li>
+                    <li>⚠ Format Amazon uniquement</li>
+                  </ul>
+                </Card>
+
+                <Card className="p-4 border-2 border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/20">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="p-2 rounded-lg bg-blue-500 text-white">
+                      <FileText className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h5 className="font-bold text-blue-700 dark:text-blue-400">PDF</h5>
+                      <Badge variant="secondary" className="text-xs">Universel</Badge>
+                    </div>
+                  </div>
+                  <ul className="text-sm space-y-1 text-muted-foreground">
+                    <li>✓ Mise en page fixe</li>
+                    <li>✓ Tous les appareils</li>
+                    <li>✓ Idéal pour impression</li>
+                    <li>⚠ Moins confortable sur liseuse</li>
+                  </ul>
+                </Card>
+              </div>
+
+              <div className="p-3 rounded-lg bg-primary/10 border border-primary/20">
+                <p className="text-sm">
+                  <strong>💡 Conseil :</strong> Proposez EPUB + PDF pour couvrir tous les besoins. 
+                  Ajoutez MOBI si vous avez des lecteurs Kindle.
+                </p>
+              </div>
+            </div>
+
+            {/* BookFunnel */}
+            <div className="space-y-4 pt-4 border-t">
+              <h4 className="font-semibold flex items-center gap-2">
+                <ExternalLink className="h-4 w-4 text-primary" />
+                Distribution avec BookFunnel (Recommandé)
+              </h4>
+
+              <Card className="p-5 bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-950/30 dark:to-indigo-950/30 border-2 border-purple-200 dark:border-purple-800">
+                <div className="flex items-start gap-4">
+                  <div className="text-4xl">📚</div>
+                  <div className="flex-1">
+                    <h5 className="font-bold text-lg mb-2">BookFunnel</h5>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      Service professionnel de distribution d'ebooks. Version gratuite disponible pour les auteurs indépendants.
+                    </p>
+                    <div className="grid gap-2 md:grid-cols-2 mb-4">
+                      <div className="flex items-center gap-2 text-sm">
+                        <Check className="h-4 w-4 text-green-500" />
+                        <span>Détection automatique de l'appareil</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Check className="h-4 w-4 text-green-500" />
+                        <span>Conversion EPUB → MOBI automatique</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Check className="h-4 w-4 text-green-500" />
+                        <span>Support lecteur intégré</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Check className="h-4 w-4 text-green-500" />
+                        <span>Collecte d'emails automatique</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Check className="h-4 w-4 text-green-500" />
+                        <span>Statistiques de téléchargement</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Check className="h-4 w-4 text-green-500" />
+                        <span>Lien unique à partager</span>
+                      </div>
+                    </div>
+                    <Button 
+                      onClick={() => window.open('https://bookfunnel.com/', '_blank')}
+                      className="bg-purple-600 hover:bg-purple-700"
+                    >
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      Visiter BookFunnel
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+
+              <div className="p-4 rounded-lg bg-muted/50">
+                <h5 className="font-medium mb-3">📋 Comment utiliser BookFunnel :</h5>
+                <ol className="text-sm space-y-2 text-muted-foreground list-decimal list-inside">
+                  <li>Créez un compte gratuit sur BookFunnel</li>
+                  <li>Uploadez votre fichier EPUB (il sera converti automatiquement)</li>
+                  <li>Créez une "landing page" pour votre livre</li>
+                  <li>Obtenez un lien unique à partager avec vos lecteurs ARC</li>
+                  <li>BookFunnel gère le téléchargement et le support technique</li>
+                </ol>
+              </div>
+            </div>
+
+            {/* Alternatives manuelles */}
+            <div className="space-y-4 pt-4 border-t">
+              <h4 className="font-semibold flex items-center gap-2">
+                <Download className="h-4 w-4 text-primary" />
+                Alternatives manuelles
+              </h4>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <Card className="p-4">
+                  <h5 className="font-medium mb-2">☁️ Cloud Storage</h5>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Uploadez vos fichiers sur Google Drive, Dropbox ou OneDrive et partagez le lien.
+                  </p>
+                  <ul className="text-sm space-y-1 text-muted-foreground">
+                    <li>✓ Gratuit</li>
+                    <li>✓ Simple à mettre en place</li>
+                    <li>⚠ Pas de statistiques</li>
+                    <li>⚠ Support technique à votre charge</li>
+                  </ul>
+                </Card>
+
+                <Card className="p-4">
+                  <h5 className="font-medium mb-2">📧 Envoi direct par email</h5>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Attachez les fichiers directement à vos emails (attention à la taille).
+                  </p>
+                  <ul className="text-sm space-y-1 text-muted-foreground">
+                    <li>✓ Personnel et direct</li>
+                    <li>✓ Aucun intermédiaire</li>
+                    <li>⚠ Limite de taille (~25MB)</li>
+                    <li>⚠ Fastidieux si nombreux lecteurs</li>
+                  </ul>
+                </Card>
+
+                <Card className="p-4">
+                  <h5 className="font-medium mb-2">📱 Envoi Kindle direct</h5>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Envoyez le MOBI à l'adresse @kindle.com du lecteur.
+                  </p>
+                  <ul className="text-sm space-y-1 text-muted-foreground">
+                    <li>✓ Arrive directement sur Kindle</li>
+                    <li>✓ Synchronisation automatique</li>
+                    <li>⚠ Uniquement pour Kindle</li>
+                    <li>⚠ Le lecteur doit autoriser votre email</li>
+                  </ul>
+                </Card>
+
+                <Card className="p-4">
+                  <h5 className="font-medium mb-2">🔗 StoryOrigin</h5>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Alternative à BookFunnel avec fonctionnalités similaires.
+                  </p>
+                  <Button 
+                    size="sm"
+                    variant="outline"
+                    onClick={() => window.open('https://storyoriginapp.com/', '_blank')}
+                  >
+                    Visiter →
+                  </Button>
+                </Card>
+              </div>
+            </div>
+
+            {/* Checklist export */}
+            <div className="p-4 rounded-lg bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 border border-green-200 dark:border-green-800">
+              <h4 className="font-medium flex items-center gap-2 mb-3">
+                <CheckCircle2 className="h-4 w-4 text-green-600" />
+                Checklist avant distribution
+              </h4>
+              <div className="grid gap-2 md:grid-cols-2">
+                <div className="flex items-center gap-2 text-sm">
+                  <Check className="h-4 w-4 text-green-500" />
+                  <span>Fichier EPUB validé (pas d'erreurs)</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <Check className="h-4 w-4 text-green-500" />
+                  <span>PDF mis en page correctement</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <Check className="h-4 w-4 text-green-500" />
+                  <span>Couverture incluse dans les fichiers</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <Check className="h-4 w-4 text-green-500" />
+                  <span>Mention "Copie ARC - Ne pas distribuer"</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <Check className="h-4 w-4 text-green-500" />
+                  <span>Table des matières fonctionnelle</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <Check className="h-4 w-4 text-green-500" />
+                  <span>Date de sortie prévue indiquée</span>
+                </div>
+              </div>
+            </div>
           </TabsContent>
 
           <TabsContent value="email-arc" className="space-y-4">
