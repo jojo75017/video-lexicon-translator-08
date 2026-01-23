@@ -243,9 +243,10 @@ ${authorName}`);
               <Link2 className="h-4 w-4 mr-2" />
               <span className="hidden sm:inline">Formulaire</span>
             </TabsTrigger>
-            <TabsTrigger value="distribution">
+            <TabsTrigger value="distribution" className="relative">
               <FileDown className="h-4 w-4 mr-2" />
               <span className="hidden sm:inline">Distribution</span>
+              <Badge className="absolute -top-1 -right-1 text-[10px] px-1 py-0 bg-amber-500 text-white">2026</Badge>
             </TabsTrigger>
             <TabsTrigger value="email-arc">
               <Gift className="h-4 w-4 mr-2" />
