@@ -109,6 +109,9 @@ import EbookMultiTranslator from '@/components/ebook/EbookMultiTranslator';
 import EbookTrendPredictor from '@/components/ebook/EbookTrendPredictor';
 import EbookABTesting from '@/components/ebook/EbookABTesting';
 import EbookPresentation from '@/components/ebook/EbookPresentation';
+import EbookHumanizer from '@/components/ebook/EbookHumanizer';
+import EbookArcManager from '@/components/ebook/EbookArcManager';
+import EbookDirectSales from '@/components/ebook/EbookDirectSales';
 
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
 import { ebookTemplates } from '@/data/ebookTemplates';
@@ -2663,6 +2666,26 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           <EbookABTesting
             ebookTitle={ebookTitle}
             coverImage={ebookImages[0]?.url}
+          />
+        );
+      
+      case 'humanizer':
+        return <EbookHumanizer />;
+      
+      case 'arc-manager':
+        return (
+          <EbookArcManager
+            ebookTitle={ebookTitle}
+            authorName={authorName}
+            bookSummary={bookSummary}
+          />
+        );
+      
+      case 'direct-sales':
+        return (
+          <EbookDirectSales
+            ebookTitle={ebookTitle}
+            authorName={authorName}
           />
         );
 
