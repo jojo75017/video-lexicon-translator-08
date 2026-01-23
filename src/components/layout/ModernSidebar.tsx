@@ -222,6 +222,9 @@ const categories: Category[] = [
     emoji: '🚀',
     color: 'from-purple-500 to-pink-500',
     items: [
+      { id: 'humanizer', label: '🛡️ Humaniseur IA', icon: Shield, isNew: true },
+      { id: 'arc-manager', label: '👥 Gestionnaire ARC', icon: Users, isNew: true },
+      { id: 'direct-sales', label: '💰 Vente Directe', icon: DollarSign, isNew: true },
       { id: 'multi-translator', label: '🌍 Traduction Multi-Langues', icon: Languages, isNew: true },
       { id: 'trend-predictor', label: '🔮 Prédicteur Tendances', icon: TrendingUp, isNew: true },
     ]
