@@ -24,9 +24,11 @@ import {
   XCircle,
   AlertCircle,
   FileText,
-  Gift
+  Gift,
+  Link2
 } from 'lucide-react';
 import { toast } from 'sonner';
+import ArcLinkGenerator from './ArcLinkGenerator';
 
 interface ArcReader {
   id: string;
@@ -228,22 +230,26 @@ ${authorName}`);
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="readers" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="readers">
               <Users className="h-4 w-4 mr-2" />
-              Lecteurs ({readers.length})
+              <span className="hidden sm:inline">Lecteurs</span> ({readers.length})
+            </TabsTrigger>
+            <TabsTrigger value="form">
+              <Link2 className="h-4 w-4 mr-2" />
+              <span className="hidden sm:inline">Formulaire</span>
             </TabsTrigger>
             <TabsTrigger value="email-arc">
               <Gift className="h-4 w-4 mr-2" />
-              Email ARC
+              <span className="hidden sm:inline">Email ARC</span>
             </TabsTrigger>
             <TabsTrigger value="email-review">
               <Star className="h-4 w-4 mr-2" />
-              Demande d'avis
+              <span className="hidden sm:inline">Demande</span>
             </TabsTrigger>
             <TabsTrigger value="resources">
               <MessageSquare className="h-4 w-4 mr-2" />
-              Ressources
+              <span className="hidden sm:inline">Ressources</span>
             </TabsTrigger>
           </TabsList>
 
@@ -345,6 +351,14 @@ ${authorName}`);
                 ))}
               </div>
             )}
+          </TabsContent>
+
+          <TabsContent value="form" className="space-y-4">
+            <ArcLinkGenerator 
+              ebookTitle={ebookTitle}
+              authorName={authorName}
+              genre=""
+            />
           </TabsContent>
 
           <TabsContent value="email-arc" className="space-y-4">
