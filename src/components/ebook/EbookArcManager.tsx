@@ -228,7 +228,7 @@ ${authorName}`);
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="readers" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="readers">
               <Users className="h-4 w-4 mr-2" />
               Lecteurs ({readers.length})
@@ -240,6 +240,10 @@ ${authorName}`);
             <TabsTrigger value="email-review">
               <Star className="h-4 w-4 mr-2" />
               Demande d'avis
+            </TabsTrigger>
+            <TabsTrigger value="resources">
+              <MessageSquare className="h-4 w-4 mr-2" />
+              Ressources
             </TabsTrigger>
           </TabsList>
 
@@ -396,6 +400,206 @@ ${authorName}`);
               <Copy className="h-4 w-4 mr-2" />
               Copier le template
             </Button>
+          </TabsContent>
+
+          <TabsContent value="resources" className="space-y-4">
+            {/* Où trouver des lecteurs ARC */}
+            <div className="space-y-3">
+              <h4 className="font-semibold flex items-center gap-2">
+                <Users className="h-4 w-4 text-primary" />
+                Où trouver des lecteurs ARC français
+              </h4>
+              
+              <div className="grid gap-3 md:grid-cols-2">
+                <Card className="p-4 hover:bg-muted/50 transition-colors">
+                  <div className="flex items-start gap-3">
+                    <div className="text-2xl">📚</div>
+                    <div>
+                      <h5 className="font-medium">Babelio - Masse Critique</h5>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        Programme officiel de lecture anticipée avec +1M de lecteurs
+                      </p>
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => window.open('https://www.babelio.com/massecritique/', '_blank')}
+                      >
+                        Visiter →
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+
+                <Card className="p-4 hover:bg-muted/50 transition-colors">
+                  <div className="flex items-start gap-3">
+                    <div className="text-2xl">💬</div>
+                    <div>
+                      <h5 className="font-medium">Groupes Facebook</h5>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        "Lecteurs Bêta Francophones", "Auteurs Indépendants"
+                      </p>
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => window.open('https://www.facebook.com/search/groups?q=lecteurs%20beta%20francais', '_blank')}
+                      >
+                        Rechercher →
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+
+                <Card className="p-4 hover:bg-muted/50 transition-colors">
+                  <div className="flex items-start gap-3">
+                    <div className="text-2xl">📖</div>
+                    <div>
+                      <h5 className="font-medium">Livraddict</h5>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        Forum avec section bêta-lecture et partenariats
+                      </p>
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => window.open('https://www.livraddict.com/', '_blank')}
+                      >
+                        Visiter →
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+
+                <Card className="p-4 hover:bg-muted/50 transition-colors">
+                  <div className="flex items-start gap-3">
+                    <div className="text-2xl">⭐</div>
+                    <div>
+                      <h5 className="font-medium">Booknode</h5>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        Communauté de lecteurs passionnés avec système de partenariats
+                      </p>
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => window.open('https://booknode.com/', '_blank')}
+                      >
+                        Visiter →
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+            </div>
+
+            {/* Template de recrutement */}
+            <div className="space-y-3 pt-4 border-t">
+              <h4 className="font-semibold flex items-center gap-2">
+                <FileText className="h-4 w-4 text-primary" />
+                Annonce de recrutement ARC
+              </h4>
+              
+              <div className="p-4 rounded-lg bg-muted/50 font-mono text-sm whitespace-pre-wrap">
+{`🎁 RECHERCHE LECTEURS ARC - "${ebookTitle}"
+
+Bonjour à tous ! 
+
+Je recherche des lecteurs passionnés pour recevoir une copie GRATUITE de mon nouveau livre "${ebookTitle}" en avant-première !
+
+📖 À PROPOS DU LIVRE:
+${bookSummary || '[Votre résumé ici]'}
+
+✨ CE QUE VOUS RECEVEZ:
+• Le livre complet en PDF/EPUB
+• Accès 2 semaines avant la sortie officielle
+• Mention dans les remerciements (optionnel)
+
+🤝 CE QUE JE DEMANDE:
+• Lire le livre avant la date de sortie
+• Laisser un avis HONNÊTE sur Amazon après publication
+• (Pas besoin d'avis positif, juste sincère !)
+
+📧 COMMENT PARTICIPER:
+Envoyez-moi un message privé avec:
+1. Votre email
+2. Votre format préféré (PDF/EPUB/MOBI)
+3. Pourquoi ce livre vous intéresse
+
+⏰ PLACES LIMITÉES: 20 lecteurs seulement !
+
+Merci d'avance ! 🙏
+${authorName}`}
+              </div>
+              
+              <div className="flex gap-2">
+                <Button 
+                  onClick={() => {
+                    const text = `🎁 RECHERCHE LECTEURS ARC - "${ebookTitle}"
+
+Bonjour à tous ! 
+
+Je recherche des lecteurs passionnés pour recevoir une copie GRATUITE de mon nouveau livre "${ebookTitle}" en avant-première !
+
+📖 À PROPOS DU LIVRE:
+${bookSummary || '[Votre résumé ici]'}
+
+✨ CE QUE VOUS RECEVEZ:
+• Le livre complet en PDF/EPUB
+• Accès 2 semaines avant la sortie officielle
+• Mention dans les remerciements (optionnel)
+
+🤝 CE QUE JE DEMANDE:
+• Lire le livre avant la date de sortie
+• Laisser un avis HONNÊTE sur Amazon après publication
+• (Pas besoin d'avis positif, juste sincère !)
+
+📧 COMMENT PARTICIPER:
+Envoyez-moi un message privé avec:
+1. Votre email
+2. Votre format préféré (PDF/EPUB/MOBI)
+3. Pourquoi ce livre vous intéresse
+
+⏰ PLACES LIMITÉES: 20 lecteurs seulement !
+
+Merci d'avance ! 🙏
+${authorName}`;
+                    navigator.clipboard.writeText(text);
+                    toast.success('Annonce copiée !');
+                  }}
+                  className="flex-1"
+                >
+                  <Copy className="h-4 w-4 mr-2" />
+                  Copier l'annonce Facebook/Forum
+                </Button>
+              </div>
+            </div>
+
+            {/* Conseils pro */}
+            <div className="p-4 rounded-lg bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 border border-amber-200 dark:border-amber-800">
+              <h4 className="font-medium flex items-center gap-2 mb-3">
+                <Star className="h-4 w-4 text-amber-600" />
+                Conseils pro pour recruter des lecteurs ARC
+              </h4>
+              <ul className="text-sm space-y-2 text-muted-foreground">
+                <li className="flex items-start gap-2">
+                  <Check className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+                  <span><strong>Ciblez votre genre</strong> - Postez dans des groupes spécialisés (romance, thriller, SF...)</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+                  <span><strong>Proposez plusieurs formats</strong> - PDF, EPUB et MOBI pour toucher plus de lecteurs</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+                  <span><strong>Limitez les places</strong> - La rareté motive les inscriptions</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+                  <span><strong>Utilisez BookFunnel</strong> - Service gratuit pour distribuer vos copies ARC facilement</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+                  <span><strong>Constituez une liste email</strong> - Vos lecteurs ARC deviendront vos fans fidèles</span>
+                </li>
+              </ul>
+            </div>
           </TabsContent>
         </Tabs>
 
