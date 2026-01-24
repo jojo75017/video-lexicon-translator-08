@@ -5,27 +5,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
-
-  try {
-    const { title } = await req.json();
-
-    if (!title) {
-      return new Response(
-        JSON.stringify({ error: "Le titre est requis" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
-    }
-
-    const systemPrompt = `Tu es un expert en marketing de livres Amazon KDP et en copywriting. Tu analyses les titres de livres pour évaluer leur potentiel commercial.
+const systemPrompt = `Tu es un expert en marketing de livres Amazon KDP et en copywriting. Tu analyses les titres de livres pour évaluer leur potentiel commercial.
 
 IMPORTANT: Tu dois TOUJOURS répondre en JSON valide avec exactement cette structure:
 {
@@ -63,36 +43,110 @@ CRITÈRES DE NOTATION (score sur 100):
 5. Longueur appropriée (court et mémorable)
 6. Présence de mots puissants (secret, ultime, complet, etc.)`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: `Analyse ce titre de livre: "${title}"` }
-        ],
-        max_tokens: 2000,
-      }),
-    });
+async function callLovableAI(title: string, apiKey: string): Promise<Response> {
+  return await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "google/gemini-2.5-flash-lite",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: `Analyse ce titre de livre: "${title}"` }
+      ],
+      max_tokens: 2000,
+    }),
+  });
+}
+
+async function callOpenAI(title: string, apiKey: string): Promise<Response> {
+  return await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: `Analyse ce titre de livre: "${title}"` }
+      ],
+      max_tokens: 2000,
+    }),
+  });
+}
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const { title } = await req.json();
+    console.log("Analyzing title:", title);
+
+    if (!title) {
+      return new Response(
+        JSON.stringify({ error: "Le titre est requis" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
+    
+    console.log("LOVABLE_API_KEY exists:", !!LOVABLE_API_KEY);
+    console.log("OPENAI_API_KEY exists:", !!OPENAI_API_KEY);
+
+    let response: Response | null = null;
+    let usedProvider = "lovable";
+
+    // Try Lovable AI first
+    if (LOVABLE_API_KEY) {
+      response = await callLovableAI(title, LOVABLE_API_KEY);
+      console.log("Lovable AI response status:", response.status);
+      
+      // If credits exhausted or rate limited, try OpenAI
+      if (response.status === 402 || response.status === 429) {
+        console.log("Lovable AI credits exhausted, trying OpenAI fallback...");
+        response = null;
+        usedProvider = "openai";
+      }
+    }
+
+    // Fallback to OpenAI
+    if (!response && OPENAI_API_KEY) {
+      response = await callOpenAI(title, OPENAI_API_KEY);
+      console.log("OpenAI response status:", response.status);
+      usedProvider = "openai";
+    }
+
+    // No API available
+    if (!response) {
+      console.error("No API key available");
+      return new Response(
+        JSON.stringify({ error: "Aucune clé API configurée. Contactez l'administrateur." }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     if (!response.ok) {
+      const errorBody = await response.text();
+      console.error(`${usedProvider} API error:`, errorBody);
+      
       if (response.status === 429) {
         return new Response(
           JSON.stringify({ error: "Limite de requêtes atteinte, réessayez plus tard" }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "Crédits insuffisants" }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      throw new Error(`AI API error: ${response.status}`);
+      return new Response(
+        JSON.stringify({ error: `Erreur API (${usedProvider}): ${response.status}` }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     const data = await response.json();
@@ -130,8 +184,10 @@ CRITÈRES DE NOTATION (score sur 100):
       };
     }
 
+    console.log("Analysis successful using:", usedProvider);
+    
     return new Response(
-      JSON.stringify({ analysis }),
+      JSON.stringify({ analysis, provider: usedProvider }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
