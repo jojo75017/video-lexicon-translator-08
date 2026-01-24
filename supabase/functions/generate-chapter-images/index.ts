@@ -176,7 +176,8 @@ async function generateWithOpenAI(
   coherenceIntensity: string = 'medium',
   referenceImageUrl: string | null = null,
   isColoringBook: boolean = false,
-  coloringBookAgeGroup: string = '3-6'
+  coloringBookAgeGroup: string = '3-6',
+  customPrompt: string | null = null
 ): Promise<string> {
   const size = RATIO_SIZES[ratio]?.openai || '1024x1024';
   
@@ -251,6 +252,78 @@ async function generateWithOpenAI(
   }
 
   // MODE STANDARD - Prompt classique pour ebooks illustrés
+  
+  // Si un customPrompt est fourni (ex: BD avec scènes détaillées), l'utiliser directement
+  if (customPrompt) {
+    console.log('Using custom prompt for OpenAI image generation');
+    const imagePrompt = customPrompt;
+    console.log('Generating image with OpenAI (custom prompt):', imagePrompt.substring(0, 500) + '...');
+
+    const generateViaImagesAPI = async (model: string): Promise<{ ok: boolean; status: number; data?: any; errorText?: string }> => {
+      const payload: any = {
+        model,
+        prompt: imagePrompt,
+        n: 1,
+        size,
+      };
+
+      if (model === 'dall-e-3') {
+        payload.response_format = 'b64_json';
+        payload.quality = QUALITY_MAP[quality]?.openai || 'hd';
+      } else if (model === 'gpt-image-1') {
+        payload.quality = quality === 'standard' ? 'medium' : 'high';
+      }
+
+      const resp = await fetch('https://api.openai.com/v1/images/generations', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!resp.ok) {
+        const errorText = await resp.text();
+        return { ok: false, status: resp.status, errorText };
+      }
+
+      const data = await resp.json();
+      return { ok: true, status: resp.status, data };
+    };
+
+    let result = await generateViaImagesAPI('gpt-image-1');
+
+    if (!result.ok) {
+      console.error('OpenAI error (gpt-image-1):', result.status, result.errorText);
+      if (result.status === 403 || result.status === 400 || /must be verified|permission|unknown_parameter/i.test(result.errorText || '')) {
+        console.log('Falling back to OpenAI dall-e-3 for custom prompt...');
+        result = await generateViaImagesAPI('dall-e-3');
+      }
+    }
+
+    if (!result.ok) {
+      console.error('OpenAI error (final):', result.status, result.errorText);
+      throw new Error(`OpenAI API error: ${result.status}`);
+    }
+
+    const data = result.data;
+    let imageUrl: string | null = null;
+    if (data.data?.[0]?.b64_json) {
+      imageUrl = `data:image/png;base64,${data.data[0].b64_json}`;
+    } else if (data.data?.[0]?.url) {
+      imageUrl = data.data[0].url;
+    }
+
+    if (!imageUrl) {
+      throw new Error('No image URL in OpenAI response');
+    }
+
+    console.log('Image generated successfully with OpenAI (custom prompt)');
+    return imageUrl;
+  }
+  
+  // Sinon, construire le prompt standard pour ebooks
   let charactersContext = '';
   if (characters && characters.length > 0) {
     charactersContext = '\n\nIMPORTANT - Personnages principaux de l\'histoire (à représenter de manière STRICTEMENT cohérente):\n';
@@ -472,7 +545,8 @@ COHÉRENCE STRICTE ABSOLUE:
           coherenceIntensity,
           referenceImageUrl,
           isColoringBook,
-          coloringBookAgeGroup
+          coloringBookAgeGroup,
+          customPrompt
         );
       } catch (err) {
         console.error('OpenAI image generation failed:', err);
@@ -594,7 +668,7 @@ Instructions de génération:
           if (FALLBACK_OPENAI_KEY) {
             console.log('Lovable AI error, attempting automatic fallback to OpenAI...');
             try {
-              generatedImageUrl = await generateWithOpenAI(chapterTitle, chapterContent, ebookTitle, style, characters, FALLBACK_OPENAI_KEY, ratio, quality, colorScheme, visualCoherence, coherenceIntensity, referenceImageUrl);
+              generatedImageUrl = await generateWithOpenAI(chapterTitle, chapterContent, ebookTitle, style, characters, FALLBACK_OPENAI_KEY, ratio, quality, colorScheme, visualCoherence, coherenceIntensity, referenceImageUrl, isColoringBook, coloringBookAgeGroup, customPrompt);
             } catch (openaiErr: any) {
               // Si OpenAI aussi en limite, retourner placeholder plutôt qu'erreur
               if (openaiErr?.message?.includes('billing') || openaiErr?.message?.includes('limit')) {
