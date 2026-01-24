@@ -92,6 +92,29 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
   const [includeCharacterList, setIncludeCharacterList] = useState(true);
   const [showGoogleDocsPreview, setShowGoogleDocsPreview] = useState(false);
   const [isExportingGoogleDocs, setIsExportingGoogleDocs] = useState(false);
+  
+  // Options de typographie
+  type FontFamily = 'Georgia' | 'Times New Roman' | 'Garamond' | 'Palatino Linotype' | 'Comic Sans MS';
+  const [selectedFont, setSelectedFont] = useState<FontFamily>('Georgia');
+  const [fontSize, setFontSize] = useState<number>(12); // Taille en points (12-18)
+  
+  const fontOptions: { value: FontFamily; label: string; description: string }[] = [
+    { value: 'Georgia', label: 'Georgia', description: 'Classique, lisible (Recommandé)' },
+    { value: 'Times New Roman', label: 'Times New Roman', description: 'Traditionnel, professionnel' },
+    { value: 'Garamond', label: 'Garamond', description: 'Élégant, livres classiques' },
+    { value: 'Palatino Linotype', label: 'Palatino', description: 'Moderne, confortable' },
+    { value: 'Comic Sans MS', label: 'Comic Sans', description: 'Enfants, ludique' },
+  ];
+  
+  const fontSizeOptions = [
+    { value: 12, label: '12 pt', description: 'Adultes (standard)' },
+    { value: 13, label: '13 pt', description: 'Adultes (confort)' },
+    { value: 14, label: '14 pt', description: 'Lecture facile' },
+    { value: 15, label: '15 pt', description: 'Jeunes lecteurs' },
+    { value: 16, label: '16 pt', description: 'Enfants 8-12 ans' },
+    { value: 17, label: '17 pt', description: 'Enfants 6-8 ans' },
+    { value: 18, label: '18 pt', description: 'Enfants 4-6 ans (gros)' },
+  ];
 
   const generateEbookContent = () => {
     let content = '';
@@ -1247,9 +1270,9 @@ ${navContent}    </ol>
   };
 
   // Fonction pour parser le markdown en TextRuns Word avec gras, italique et souligné
-  const parseMarkdownToTextRuns = (text: string, baseSize: number = 24): TextRun[] => {
+  const parseMarkdownToTextRuns = (text: string, baseSize: number = 24, fontName: string = selectedFont): TextRun[] => {
     if (!text || text.trim() === '') {
-      return [new TextRun({ text: '', size: baseSize, font: 'Georgia' })];
+      return [new TextRun({ text: '', size: baseSize, font: fontName })];
     }
 
     const runs: TextRun[] = [];
@@ -1269,7 +1292,7 @@ ${navContent}    </ol>
           runs.push(new TextRun({
             text: normalText,
             size: baseSize,
-            font: 'Georgia',
+            font: fontName,
           }));
         }
       }
@@ -1283,7 +1306,7 @@ ${navContent}    </ol>
           bold: true,
           italics: true,
           size: baseSize,
-          font: 'Georgia',
+          font: fontName,
         }));
       } else if (matchedText.startsWith('**') && matchedText.endsWith('**')) {
         // **gras**
@@ -1291,7 +1314,7 @@ ${navContent}    </ol>
           text: matchedText.slice(2, -2),
           bold: true,
           size: baseSize,
-          font: 'Georgia',
+          font: fontName,
         }));
       } else if (matchedText.startsWith('__') && matchedText.endsWith('__')) {
         // __gras__
@@ -1299,7 +1322,7 @@ ${navContent}    </ol>
           text: matchedText.slice(2, -2),
           bold: true,
           size: baseSize,
-          font: 'Georgia',
+          font: fontName,
         }));
       } else if (matchedText.startsWith('~~') && matchedText.endsWith('~~')) {
         // ~~souligné~~
@@ -1307,7 +1330,7 @@ ${navContent}    </ol>
           text: matchedText.slice(2, -2),
           underline: { type: UnderlineType.SINGLE },
           size: baseSize,
-          font: 'Georgia',
+          font: fontName,
         }));
       } else if (matchedText.startsWith('<u>') && matchedText.endsWith('</u>')) {
         // <u>souligné</u>
@@ -1315,7 +1338,7 @@ ${navContent}    </ol>
           text: matchedText.slice(3, -4),
           underline: { type: UnderlineType.SINGLE },
           size: baseSize,
-          font: 'Georgia',
+          font: fontName,
         }));
       } else if (matchedText.startsWith('*') && matchedText.endsWith('*')) {
         // *italique*
@@ -1323,7 +1346,7 @@ ${navContent}    </ol>
           text: matchedText.slice(1, -1),
           italics: true,
           size: baseSize,
-          font: 'Georgia',
+          font: fontName,
         }));
       } else if (matchedText.startsWith('_') && matchedText.endsWith('_')) {
         // _italique_
@@ -1331,7 +1354,7 @@ ${navContent}    </ol>
           text: matchedText.slice(1, -1),
           italics: true,
           size: baseSize,
-          font: 'Georgia',
+          font: fontName,
         }));
       }
       
@@ -1345,18 +1368,24 @@ ${navContent}    </ol>
         runs.push(new TextRun({
           text: remainingText,
           size: baseSize,
-          font: 'Georgia',
+          font: fontName,
         }));
       }
     }
     
-    return runs.length > 0 ? runs : [new TextRun({ text, size: baseSize, font: 'Georgia' })];
+    return runs.length > 0 ? runs : [new TextRun({ text, size: baseSize, font: fontName })];
   };
 
   // Export DOCX formaté KDP professionnel
   const exportAsKdpDocx = async () => {
     try {
       const children: any[] = [];
+      
+      // Taille de base en half-points (Word utilise half-points: 24 = 12pt, 36 = 18pt)
+      const baseFontSizeHalfPt = fontSize * 2;
+      const titleSizeHalfPt = Math.round(fontSize * 3); // Titre 1.5x plus grand
+      const chapterTitleSizeHalfPt = Math.round(fontSize * 2.5); // Titre chapitre
+      const subTitleSizeHalfPt = Math.round(fontSize * 1.75); // Sous-titre
 
       // === PAGE DE TITRE ===
       if (includeCoverPage) {
@@ -1370,8 +1399,8 @@ ${navContent}    </ol>
               new TextRun({
                 text: ebookTitle,
                 bold: true,
-                size: 72, // 36pt
-                font: 'Georgia',
+                size: 72, // 36pt pour le titre principal (toujours grand)
+                font: selectedFont,
               }),
             ],
             alignment: AlignmentType.CENTER,
@@ -1403,7 +1432,7 @@ ${navContent}    </ol>
                   text: authorName,
                   italics: true,
                   size: 36, // 18pt
-                  font: 'Georgia',
+                  font: selectedFont,
                 }),
               ],
               alignment: AlignmentType.CENTER,
@@ -1424,8 +1453,8 @@ ${navContent}    </ol>
               new TextRun({
                 text: 'TABLE DES MATIÈRES',
                 bold: true,
-                size: 32, // 16pt
-                font: 'Georgia',
+                size: chapterTitleSizeHalfPt,
+                font: selectedFont,
               }),
             ],
             alignment: AlignmentType.CENTER,
@@ -1437,9 +1466,9 @@ ${navContent}    </ol>
         if (preface) {
           children.push(
             new Paragraph({
-              children: [
-                new TextRun({ text: 'Préface', size: 24, font: 'Georgia' }),
-              ],
+            children: [
+              new TextRun({ text: 'Préface', size: baseFontSizeHalfPt, font: selectedFont }),
+            ],
               spacing: { after: 120 },
             })
           );
@@ -1451,8 +1480,8 @@ ${navContent}    </ol>
               children: [
                 new TextRun({
                   text: `Chapitre ${index + 1} : ${chapter.title}`,
-                  size: 24,
-                  font: 'Georgia',
+                  size: baseFontSizeHalfPt,
+                  font: selectedFont,
                 }),
               ],
               spacing: { after: 80 },
@@ -1462,12 +1491,12 @@ ${navContent}    </ol>
           chapter.subChapters.forEach((sub, subIdx) => {
             children.push(
               new Paragraph({
-                children: [
-                  new TextRun({
-                    text: `    ${index + 1}.${subIdx + 1} ${sub.title}`,
-                    size: 22,
-                    font: 'Georgia',
-                    color: '555555',
+              children: [
+                new TextRun({
+                  text: `    ${index + 1}.${subIdx + 1} ${sub.title}`,
+                  size: Math.round(baseFontSizeHalfPt * 0.9),
+                  font: selectedFont,
+                  color: '555555',
                   }),
                 ],
                 spacing: { after: 60 },
@@ -1479,9 +1508,9 @@ ${navContent}    </ol>
         if (conclusion) {
           children.push(
             new Paragraph({
-              children: [
-                new TextRun({ text: 'Conclusion', size: 24, font: 'Georgia' }),
-              ],
+            children: [
+              new TextRun({ text: 'Conclusion', size: baseFontSizeHalfPt, font: selectedFont }),
+            ],
               spacing: { after: 120 },
             })
           );
@@ -1498,8 +1527,8 @@ ${navContent}    </ol>
               new TextRun({
                 text: 'PRÉFACE',
                 bold: true,
-                size: 36,
-                font: 'Georgia',
+                size: chapterTitleSizeHalfPt,
+                font: selectedFont,
               }),
             ],
             alignment: AlignmentType.CENTER,
@@ -1511,7 +1540,7 @@ ${navContent}    </ol>
           if (para.trim()) {
             children.push(
               new Paragraph({
-                children: parseMarkdownToTextRuns(para.trim(), 24),
+                children: parseMarkdownToTextRuns(para.trim(), baseFontSizeHalfPt, selectedFont),
                 alignment: AlignmentType.JUSTIFIED,
                 spacing: { after: 240, line: 360 }, // Interligne 1.5
                 indent: { firstLine: convertInchesToTwip(0.3) },
@@ -1532,8 +1561,8 @@ ${navContent}    </ol>
               new TextRun({
                 text: `CHAPITRE ${index + 1}`,
                 bold: true,
-                size: 28,
-                font: 'Georgia',
+                size: subTitleSizeHalfPt,
+                font: selectedFont,
                 color: '666666',
               }),
             ],
@@ -1548,8 +1577,8 @@ ${navContent}    </ol>
               new TextRun({
                 text: chapter.title.toUpperCase(),
                 bold: true,
-                size: 36,
-                font: 'Georgia',
+                size: chapterTitleSizeHalfPt,
+                font: selectedFont,
               }),
             ],
             alignment: AlignmentType.CENTER,
@@ -1563,7 +1592,7 @@ ${navContent}    </ol>
             if (para.trim()) {
               children.push(
                 new Paragraph({
-                  children: parseMarkdownToTextRuns(para.trim(), 24),
+                  children: parseMarkdownToTextRuns(para.trim(), baseFontSizeHalfPt, selectedFont),
                   alignment: AlignmentType.JUSTIFIED,
                   spacing: { after: 240, line: 360 },
                   indent: { firstLine: convertInchesToTwip(0.3) },
@@ -1582,8 +1611,8 @@ ${navContent}    </ol>
                 new TextRun({
                   text: `${index + 1}.${subIdx + 1}  ${sub.title}`,
                   bold: true,
-                  size: 28,
-                  font: 'Georgia',
+                  size: subTitleSizeHalfPt,
+                  font: selectedFont,
                 }),
               ],
               spacing: { before: 480, after: 240 },
@@ -1596,7 +1625,7 @@ ${navContent}    </ol>
               if (para.trim()) {
                 children.push(
                   new Paragraph({
-                    children: parseMarkdownToTextRuns(para.trim(), 24),
+                    children: parseMarkdownToTextRuns(para.trim(), baseFontSizeHalfPt, selectedFont),
                     alignment: AlignmentType.JUSTIFIED,
                     spacing: { after: 240, line: 360 },
                     indent: { firstLine: convertInchesToTwip(0.3) },
@@ -1623,8 +1652,8 @@ ${navContent}    </ol>
               new TextRun({
                 text: 'CONCLUSION',
                 bold: true,
-                size: 36,
-                font: 'Georgia',
+                size: chapterTitleSizeHalfPt,
+                font: selectedFont,
               }),
             ],
             alignment: AlignmentType.CENTER,
@@ -1636,7 +1665,7 @@ ${navContent}    </ol>
           if (para.trim()) {
             children.push(
               new Paragraph({
-                children: parseMarkdownToTextRuns(para.trim(), 24),
+                children: parseMarkdownToTextRuns(para.trim(), baseFontSizeHalfPt, selectedFont),
                 alignment: AlignmentType.JUSTIFIED,
                 spacing: { after: 240, line: 360 },
                 indent: { firstLine: convertInchesToTwip(0.3) },
@@ -1656,8 +1685,8 @@ ${navContent}    </ol>
               new TextRun({
                 text: 'ÉPILOGUE',
                 bold: true,
-                size: 36,
-                font: 'Georgia',
+                size: chapterTitleSizeHalfPt,
+                font: selectedFont,
               }),
             ],
             alignment: AlignmentType.CENTER,
@@ -1669,7 +1698,7 @@ ${navContent}    </ol>
           if (para.trim()) {
             children.push(
               new Paragraph({
-                children: parseMarkdownToTextRuns(para.trim(), 24),
+                children: parseMarkdownToTextRuns(para.trim(), baseFontSizeHalfPt, selectedFont),
                 alignment: AlignmentType.JUSTIFIED,
                 spacing: { after: 240, line: 360 },
                 indent: { firstLine: convertInchesToTwip(0.3) },
@@ -1689,8 +1718,8 @@ ${navContent}    </ol>
               new TextRun({
                 text: 'PERSONNAGES',
                 bold: true,
-                size: 36,
-                font: 'Georgia',
+                size: chapterTitleSizeHalfPt,
+                font: selectedFont,
               }),
             ],
             alignment: AlignmentType.CENTER,
@@ -1705,8 +1734,8 @@ ${navContent}    </ol>
                 new TextRun({
                   text: character.name || 'Personnage',
                   bold: true,
-                  size: 26,
-                  font: 'Georgia',
+                  size: subTitleSizeHalfPt,
+                  font: selectedFont,
                 }),
               ],
               spacing: { before: 240, after: 80 },
@@ -1720,8 +1749,8 @@ ${navContent}    </ol>
                   new TextRun({
                     text: character.description,
                     italics: true,
-                    size: 22,
-                    font: 'Georgia',
+                    size: baseFontSizeHalfPt,
+                    font: selectedFont,
                     color: '555555',
                   }),
                 ],
@@ -1762,7 +1791,7 @@ ${navContent}    </ol>
                       new TextRun({
                         text: ebookTitle,
                         size: 18,
-                        font: 'Georgia',
+                        font: selectedFont,
                         color: '888888',
                       }),
                     ],
@@ -2085,19 +2114,79 @@ Paperback: 9.99€ - 19.99€
           </div>
 
           {exportFormat === 'docx' && (
-            <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 border border-green-200 dark:border-green-800 rounded-lg p-4">
-              <h4 className="font-semibold text-green-800 dark:text-green-200 mb-2 flex items-center gap-2">
-                <Settings className="h-4 w-4" />
-                Format KDP Professionnel
-              </h4>
-              <ul className="text-sm text-green-700 dark:text-green-300 space-y-1">
-                <li>✓ Format 6x9 pouces (standard KDP)</li>
-                <li>✓ Marges optimisées pour reliure</li>
-                <li>✓ Police Georgia (lisibilité)</li>
-                <li>✓ Interligne 1.5 (confort lecture)</li>
-                <li>✓ En-têtes et numérotation</li>
-                <li>✓ Table des matières formatée</li>
-              </ul>
+            <div className="space-y-4">
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 border border-green-200 dark:border-green-800 rounded-lg p-4">
+                <h4 className="font-semibold text-green-800 dark:text-green-200 mb-2 flex items-center gap-2">
+                  <Settings className="h-4 w-4" />
+                  Format KDP Professionnel
+                </h4>
+                <ul className="text-sm text-green-700 dark:text-green-300 space-y-1">
+                  <li>✓ Format 6x9 pouces (standard KDP)</li>
+                  <li>✓ Marges optimisées pour reliure</li>
+                  <li>✓ Police {selectedFont} ({fontSize}pt)</li>
+                  <li>✓ Interligne 1.5 (confort lecture)</li>
+                  <li>✓ En-têtes et numérotation</li>
+                  <li>✓ Table des matières formatée</li>
+                </ul>
+              </div>
+
+              {/* Options de typographie */}
+              <div className="border border-primary/20 rounded-lg p-4 space-y-4 bg-muted/30">
+                <h4 className="font-semibold text-foreground flex items-center gap-2">
+                  🔤 Typographie personnalisée
+                </h4>
+                
+                {/* Sélection de la police */}
+                <div className="space-y-2">
+                  <Label htmlFor="font-select">Police de caractères</Label>
+                  <Select value={selectedFont} onValueChange={(value: FontFamily) => setSelectedFont(value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choisir une police" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {fontOptions.map((font) => (
+                        <SelectItem key={font.value} value={font.value}>
+                          <div className="flex flex-col">
+                            <span style={{ fontFamily: font.value }}>{font.label}</span>
+                            <span className="text-xs text-muted-foreground">{font.description}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Sélection de la taille */}
+                <div className="space-y-2">
+                  <Label htmlFor="font-size">Taille de police ({fontSize}pt)</Label>
+                  <Select value={fontSize.toString()} onValueChange={(value) => setFontSize(parseInt(value))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choisir une taille" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {fontSizeOptions.map((size) => (
+                        <SelectItem key={size.value} value={size.value.toString()}>
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium">{size.label}</span>
+                            <span className="text-xs text-muted-foreground">- {size.description}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">
+                    💡 Recommandé : 12pt pour adultes, 16-18pt pour enfants
+                  </p>
+                </div>
+
+                {/* Aperçu de la police */}
+                <div className="p-3 bg-background rounded-md border">
+                  <p className="text-xs text-muted-foreground mb-1">Aperçu :</p>
+                  <p style={{ fontFamily: selectedFont, fontSize: `${fontSize}px` }}>
+                    Voici un exemple de texte avec la police {selectedFont} en {fontSize}pt.
+                  </p>
+                </div>
+              </div>
             </div>
           )}
 
