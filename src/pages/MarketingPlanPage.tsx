@@ -19,8 +19,10 @@ import {
   Clock,
   Zap,
   ExternalLink,
-  RotateCcw
+  RotateCcw,
+  FileText
 } from 'lucide-react';
+import MarketingTemplates from '@/components/marketing/MarketingTemplates';
 import { toast } from 'sonner';
 
 interface MarketingTask {
@@ -367,6 +369,11 @@ const MarketingPlanPage: React.FC = () => {
               </Card>
             );
           })}
+        </div>
+
+        {/* Templates Marketing */}
+        <div className="mt-8">
+          <MarketingTemplates />
         </div>
 
         {/* Calendrier recommandé */}
