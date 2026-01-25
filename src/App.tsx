@@ -30,6 +30,7 @@ import ConfirmationPaiementPage from './pages/ConfirmationPaiementPage';
 import FaqAssistancePage from './pages/FaqAssistancePage';
 import NichesPage from './pages/NichesPage';
 import ArcSignupPage from './pages/ArcSignupPage';
+import MarketingPlanPage from './pages/MarketingPlanPage';
 import { SubscriptionAuth } from '@/components/SubscriptionAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { SubscriberGate } from '@/components/auth/SubscriberGate';
@@ -264,6 +265,7 @@ const App = () => {
             <Route path="/ai-chat" element={<AiChatPage />} />
             <Route path="/niches" element={<NichesPage />} />
             <Route path="/arc-signup" element={<ArcSignupPage />} />
+            <Route path="/plan-marketing" element={<MarketingPlanPage />} />
             <Route
               path="/ebook-ideas"
               element={<EbookIdeasPage />}
