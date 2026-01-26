@@ -156,6 +156,191 @@ Analysé sur des milliers de bestsellers Amazon :
     hashtags: ['nichebook', 'kdpniches', 'amazonkdp', 'ebookrentable', 'autoedition', 'revenuspassifs', 'businessenligne', 'auteurindependant', 'marketresearch', 'selfpublish']
   },
 
+  {
+    id: 'pin-6',
+    platform: 'pinterest',
+    category: 'Romance',
+    title: '💕 Écrire une Romance Bestseller',
+    content: `💕 COMMENT ÉCRIRE UNE ROMANCE QUI FAIT VIBRER 💕
+
+Vous rêvez d'écrire le prochain bestseller romantique ?
+
+Voici les secrets des auteurs de romance à succès :
+
+📖 Les 5 ingrédients d'une romance addictive :
+
+1️⃣ Tension romantique dès le chapitre 1
+2️⃣ Personnages attachants avec des failles
+3️⃣ Obstacles crédibles à l'amour
+4️⃣ Moments "papillons dans le ventre"
+5️⃣ Happy End satisfaisant (ou HFN)
+
+🔥 Sous-genres qui cartonnent :
+• Dark Romance
+• Romantasy
+• New Adult
+• Enemies to Lovers
+• Second Chance
+
+📊 La romance = 25% du marché ebook !
+
+📌 Sauvegardez pour votre prochain livre !
+
+💖 Créez votre romance avec l'IA → lien en bio`,
+    hashtags: ['romancebooks', 'romanceauthor', 'writingromance', 'bookstagram', 'romancereaders', 'authorlife', 'kdpromance', 'lovetoread', 'romancenovel', 'booklover']
+  },
+  {
+    id: 'pin-7',
+    platform: 'pinterest',
+    category: 'Low-Content',
+    title: '📓 Low-Content Books KDP',
+    content: `📓 LOW-CONTENT BOOKS : LE SECRET DES REVENUS PASSIFS 📓
+
+Pas envie d'écrire 200 pages ? Les low-content books sont faits pour vous !
+
+✨ Qu'est-ce qu'un low-content book ?
+Des livres avec peu ou pas de texte : carnets, journals, planners...
+
+💰 Pourquoi c'est rentable :
+• Création rapide (quelques heures)
+• Pas besoin d'être écrivain
+• Demande constante toute l'année
+• Marges élevées (coût = 0)
+
+📚 Idées qui se vendent :
+✅ Carnets de notes lignés
+✅ Journals de gratitude
+✅ Trackers d'habitudes
+✅ Cahiers de coloriage adultes
+✅ Planners quotidiens/hebdo
+✅ Livres de recettes vierges
+
+🎨 Clé du succès = couverture attractive !
+
+📌 Épinglez ce guide !
+
+🚀 Créez votre low-content → lien en bio`,
+    hashtags: ['lowcontentbooks', 'kdplowcontent', 'passiveincome', 'amazonkdp', 'journaling', 'planner', 'notebook', 'sidehustle', 'printables', 'selfpublishing']
+  },
+  {
+    id: 'pin-8',
+    platform: 'pinterest',
+    category: 'Enfants',
+    title: '🧒 Livres pour Enfants KDP',
+    content: `🧒 CRÉER DES LIVRES POUR ENFANTS QUI SE VENDENT 🧒
+
+Le marché des livres jeunesse explose sur Amazon !
+
+👶 Pourquoi ce créneau est en or :
+• Parents toujours à la recherche de nouveautés
+• Cadeaux populaires toute l'année
+• Moins de concurrence que les adultes
+• Prix de vente élevés acceptés
+
+📚 Types de livres qui marchent :
+
+🌟 0-3 ans : Imagiers, livres tactiles
+🌟 3-6 ans : Histoires courtes illustrées
+🌟 6-9 ans : Premières lectures, BD
+🌟 9-12 ans : Romans jeunesse, aventures
+
+🎨 L'illustration fait 90% du succès !
+→ L'IA peut générer des illustrations uniques
+
+💡 Niches rentables :
+• Émotions & sentiments
+• Animaux
+• Aventures
+• Éducatif ludique
+• Histoires du soir
+
+📌 Gardez cette liste !
+
+✨ Créez votre livre enfant → lien en bio`,
+    hashtags: ['livresenfants', 'childrenbooks', 'kidsbooks', 'illustratedbooks', 'authorillustrator', 'picturebook', 'kidlit', 'parentingtips', 'readingwithkids', 'amazonkdp']
+  },
+  {
+    id: 'pin-9',
+    platform: 'pinterest',
+    category: 'Journaux/Planners',
+    title: '📅 Planners & Journaux Bestsellers',
+    content: `📅 CRÉER DES PLANNERS QUI SE VENDENT COMME DES PETITS PAINS 📅
+
+Les planners = revenus récurrents garantis !
+
+📊 Pourquoi ça marche :
+• Demande CHAQUE année (renouvellement)
+• Prix premium accepté (15-25€)
+• Peu de texte à rédiger
+• Personnalisation infinie
+
+🗓️ Types de planners rentables :
+
+📌 Par période :
+• Planner annuel/mensuel/hebdo
+• Planner scolaire (rentrée = pic)
+• Planner de mariage
+• Planner grossesse
+
+📌 Par thème :
+• Budget & finances
+• Fitness & nutrition
+• Productivité
+• Développement personnel
+• Business & freelance
+
+🎯 Secrets de vente :
+1️⃣ Design moderne et épuré
+2️⃣ Couverture Instagram-worthy
+3️⃣ Intérieur fonctionnel
+4️⃣ Niche précise > généraliste
+
+📌 Sauvegardez ces idées !
+
+🚀 Créez votre planner → lien en bio`,
+    hashtags: ['planner', 'planneraddict', 'bulletjournal', 'journaling', 'productivity', 'organization', 'plannerlife', 'goalsetting', 'kdpplanner', 'printableplanner']
+  },
+  {
+    id: 'pin-10',
+    platform: 'pinterest',
+    category: 'Recettes',
+    title: '🍳 Livres de Recettes Rentables',
+    content: `🍳 CRÉER UN LIVRE DE RECETTES BESTSELLER 🍳
+
+Les livres de cuisine = evergreen absolu sur Amazon !
+
+🔥 Pourquoi ce marché est en or :
+• Demande constante (on mange tous les jours !)
+• Cadeaux populaires
+• Sous-niches infinies
+• Photos = ventes garanties
+
+📚 Niches de recettes qui cartonnent :
+
+🥗 Régimes spécifiques :
+• Keto / Cétogène
+• Vegan / Végétarien  
+• Sans gluten
+• Batch cooking
+• Air Fryer (tendance !)
+
+👨‍👩‍👧 Par audience :
+• Recettes pour étudiants
+• Repas famille nombreuse
+• Cuisine solo
+• Meal prep sportifs
+
+🌍 Par cuisine :
+• Asiatique, Mexicaine, Méditerranéenne...
+
+💡 Astuce : L'IA peut générer des recettes ET des photos réalistes !
+
+📌 Épinglez pour plus tard !
+
+👨‍🍳 Créez votre livre de recettes → lien en bio`,
+    hashtags: ['cookbook', 'recettes', 'cuisinemaison', 'foodie', 'healthyrecipes', 'mealprep', 'cookbookauthor', 'recipebook', 'foodblogger', 'kdpcookbook']
+  },
+
   // Quora Templates
   {
     id: 'quora-1',
