@@ -52,7 +52,8 @@ import {
   Video,
   FlaskConical,
   Languages,
-  Info
+  Info,
+  BarChart3
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -196,6 +197,7 @@ const categories: Category[] = [
       { id: 'export', label: '💾 Exporter (PDF, Word)', icon: Download },
       { id: 'kdp', label: '📝 Description KDP', icon: TrendingUp },
       { id: 'amazon-simulator', label: '👀 Simulateur Amazon', icon: Eye },
+      { id: 'bsr-tracker', label: '📊 BSR Multi-Pays', icon: BarChart3, isNew: true },
       { id: 'kdp-research', label: '🔍 Recherche Niche', icon: Search },
       { id: 'plagiarism-validator', label: '🛡️ Anti-Plagiat', icon: Shield },
     ]

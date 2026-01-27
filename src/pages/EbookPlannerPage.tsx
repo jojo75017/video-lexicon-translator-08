@@ -112,6 +112,7 @@ import EbookPresentation from '@/components/ebook/EbookPresentation';
 import EbookHumanizer from '@/components/ebook/EbookHumanizer';
 import EbookArcManager from '@/components/ebook/EbookArcManager';
 import EbookDirectSales from '@/components/ebook/EbookDirectSales';
+import EbookBsrTracker from '@/components/ebook/EbookBsrTracker';
 
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
 import { ebookTemplates } from '@/data/ebookTemplates';
@@ -2688,6 +2689,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             authorName={authorName}
           />
         );
+      
+      case 'bsr-tracker':
+        return <EbookBsrTracker />;
 
       case 'subscription':
         // Rediriger vers la page Abonnement
