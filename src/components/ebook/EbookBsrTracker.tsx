@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -15,15 +16,21 @@ import {
   Trash2,
   RefreshCw,
   Star,
-  DollarSign
+  DollarSign,
+  User,
+  Users,
+  Eye
 } from 'lucide-react';
 import { toast } from 'sonner';
 import Flag from 'react-world-flags';
+
+type BookType = 'mine' | 'competitor';
 
 interface BookBsr {
   id: string;
   asin: string;
   title: string;
+  type: BookType;
   bsr: {
     us: number | null;
     uk: number | null;
@@ -66,6 +73,7 @@ const EbookBsrTracker: React.FC = () => {
       id: '1',
       asin: 'B0EXAMPLE1',
       title: 'Mon Premier Ebook KDP',
+      type: 'mine',
       bsr: { us: 45230, uk: 12450, de: 8920, fr: 5670 },
       previousBsr: { us: 52000, uk: 13200, de: 9500, fr: 6100 },
       price: { us: 4.99, uk: 3.99, de: 4.49, fr: 4.49 },
@@ -73,8 +81,9 @@ const EbookBsrTracker: React.FC = () => {
     },
     {
       id: '2',
-      asin: 'B0EXAMPLE2',
-      title: 'Guide Complet du Self-Publishing',
+      asin: 'B0COMPETITOR',
+      title: 'Concurrent - Guide Self-Publishing',
+      type: 'competitor',
       bsr: { us: 89450, uk: 34200, de: 15600, fr: 9800 },
       previousBsr: { us: 75000, uk: 32000, de: 14200, fr: 8500 },
       price: { us: 9.99, uk: 7.99, de: 8.99, fr: 8.99 },
@@ -85,11 +94,13 @@ const EbookBsrTracker: React.FC = () => {
   const [newBook, setNewBook] = useState({
     asin: '',
     title: '',
+    type: 'mine' as BookType,
     bsr: { us: '', uk: '', de: '', fr: '' },
     price: { us: '', uk: '', de: '', fr: '' }
   });
 
   const [activeCountry, setActiveCountry] = useState<'us' | 'uk' | 'de' | 'fr'>('us');
+  const [filterType, setFilterType] = useState<'all' | 'mine' | 'competitor'>('all');
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const getBsrTrend = (current: number | null, previous: number | null) => {
@@ -130,6 +141,7 @@ const EbookBsrTracker: React.FC = () => {
       id: Date.now().toString(),
       asin: newBook.asin,
       title: newBook.title,
+      type: newBook.type,
       bsr: {
         us: newBook.bsr.us ? parseInt(newBook.bsr.us) : null,
         uk: newBook.bsr.uk ? parseInt(newBook.bsr.uk) : null,
@@ -149,10 +161,11 @@ const EbookBsrTracker: React.FC = () => {
     setNewBook({ 
       asin: '', 
       title: '', 
+      type: 'mine',
       bsr: { us: '', uk: '', de: '', fr: '' },
       price: { us: '', uk: '', de: '', fr: '' }
     });
-    toast.success('Livre ajouté au tracker');
+    toast.success(newBook.type === 'mine' ? '📘 Votre livre ajouté' : '📕 Concurrent ajouté');
   };
 
   const handleRemoveBook = (id: string) => {
@@ -204,24 +217,74 @@ const EbookBsrTracker: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold flex items-center gap-2">
             <BarChart3 className="w-6 h-6 text-primary" />
             Tracker BSR Multi-Pays
           </h2>
           <p className="text-muted-foreground">
-            Suivez le classement de vos livres sur 4 marketplaces Amazon
+            Suivez vos livres et analysez vos concurrents sur 4 marketplaces Amazon
           </p>
         </div>
-        <Button 
-          onClick={handleRefresh}
-          disabled={isRefreshing}
-          className="bg-primary hover:bg-primary/90"
-        >
-          <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
-          {isRefreshing ? 'Mise à jour...' : 'Actualiser'}
-        </Button>
+        <div className="flex items-center gap-2">
+          {/* Filtre type */}
+          <div className="flex items-center gap-1 p-1 bg-muted rounded-lg">
+            <Button
+              variant={filterType === 'all' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setFilterType('all')}
+              className="h-8"
+            >
+              <Eye className="w-4 h-4 mr-1" />
+              Tous
+            </Button>
+            <Button
+              variant={filterType === 'mine' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setFilterType('mine')}
+              className="h-8"
+            >
+              <User className="w-4 h-4 mr-1" />
+              Mes livres
+            </Button>
+            <Button
+              variant={filterType === 'competitor' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setFilterType('competitor')}
+              className="h-8"
+            >
+              <Users className="w-4 h-4 mr-1" />
+              Concurrents
+            </Button>
+          </div>
+          <Button 
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            className="bg-primary hover:bg-primary/90"
+          >
+            <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+            {isRefreshing ? 'Mise à jour...' : 'Actualiser'}
+          </Button>
+        </div>
+      </div>
+
+      {/* Légende */}
+      <div className="flex items-center gap-4 text-sm">
+        <div className="flex items-center gap-2">
+          <Badge className="bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border-emerald-300">
+            <User className="w-3 h-3 mr-1" />
+            Mon livre
+          </Badge>
+          <span className="text-muted-foreground">= Votre livre</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Badge className="bg-orange-500/20 text-orange-700 dark:text-orange-400 border-orange-300">
+            <Users className="w-3 h-3 mr-1" />
+            Concurrent
+          </Badge>
+          <span className="text-muted-foreground">= Livre concurrent à analyser</span>
+        </div>
       </div>
 
       {/* Tabs par pays */}
@@ -299,7 +362,9 @@ const EbookBsrTracker: React.FC = () => {
 
             {/* Liste des livres */}
             <div className="space-y-4">
-              {books.map(book => {
+              {books
+                .filter(b => filterType === 'all' || b.type === filterType)
+                .map(book => {
                 const bsr = book.bsr[country.code];
                 const previousBsr = book.previousBsr?.[country.code];
                 const price = book.price[country.code];
@@ -307,12 +372,30 @@ const EbookBsrTracker: React.FC = () => {
                 const change = getBsrChange(bsr, previousBsr);
 
                 return (
-                  <Card key={book.id} className="hover:shadow-md transition-shadow">
+                  <Card 
+                    key={book.id} 
+                    className={`hover:shadow-md transition-shadow ${
+                      book.type === 'mine' 
+                        ? 'border-l-4 border-l-emerald-500' 
+                        : 'border-l-4 border-l-orange-500'
+                    }`}
+                  >
                     <CardContent className="pt-6">
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
                             <Flag code={country.flag} className="w-6 h-4 rounded-sm" />
+                            {book.type === 'mine' ? (
+                              <Badge className="bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border-emerald-300 text-xs">
+                                <User className="w-3 h-3 mr-1" />
+                                Mon livre
+                              </Badge>
+                            ) : (
+                              <Badge className="bg-orange-500/20 text-orange-700 dark:text-orange-400 border-orange-300 text-xs">
+                                <Users className="w-3 h-3 mr-1" />
+                                Concurrent
+                              </Badge>
+                            )}
                             <h3 className="font-semibold">{book.title}</h3>
                             <Badge variant="outline" className="text-xs">
                               {book.asin}
@@ -416,6 +499,36 @@ const EbookBsrTracker: React.FC = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Type de livre */}
+          <div className="space-y-2">
+            <Label>Type de livre</Label>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant={newBook.type === 'mine' ? 'default' : 'outline'}
+                onClick={() => setNewBook(prev => ({ ...prev, type: 'mine' }))}
+                className={newBook.type === 'mine' ? 'bg-emerald-600 hover:bg-emerald-700' : ''}
+              >
+                <User className="w-4 h-4 mr-2" />
+                Mon livre
+              </Button>
+              <Button
+                type="button"
+                variant={newBook.type === 'competitor' ? 'default' : 'outline'}
+                onClick={() => setNewBook(prev => ({ ...prev, type: 'competitor' }))}
+                className={newBook.type === 'competitor' ? 'bg-orange-600 hover:bg-orange-700' : ''}
+              >
+                <Users className="w-4 h-4 mr-2" />
+                Livre concurrent
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {newBook.type === 'mine' 
+                ? '📘 Trackez les performances de votre propre livre' 
+                : '📕 Analysez un concurrent pour comparer vos résultats'}
+            </p>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>ASIN</Label>
