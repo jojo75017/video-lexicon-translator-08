@@ -84,6 +84,7 @@ import EbookStyleSignature from '@/components/ebook/EbookStyleSignature';
 import EbookUltimateVerdict from '@/components/ebook/EbookUltimateVerdict';
 import EbookCompleteWorkflow from '@/components/ebook/EbookCompleteWorkflow';
 import { EbookInteractiveTutorial } from '@/components/ebook/EbookInteractiveTutorial';
+import { WorkflowStepWrapper } from '@/components/ebook/WorkflowStepWrapper';
 import { useConfetti } from '@/hooks/useConfetti';
 import { useDemoMode } from '@/hooks/useDemoMode';
 import { DemoBanner } from '@/components/ebook/DemoBanner';
@@ -2454,174 +2455,202 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       
       case 'editorial-director':
         return (
-          <WorkflowResultViewer
-            stepId="P1"
-            stepName="Directeur Éditorial"
-            result={getStepResult('P1')}
-          >
-            <EbookEditorialDirector
-              subject={ebookTitle}
-              onSubjectChange={setEbookTitle}
-            />
-          </WorkflowResultViewer>
+          <WorkflowStepWrapper currentTabId={activeTab} onNavigate={handleTabChange} isGenerating={isGenerating}>
+            <WorkflowResultViewer
+              stepId="P1"
+              stepName="Directeur Éditorial"
+              result={getStepResult('P1')}
+            >
+              <EbookEditorialDirector
+                subject={ebookTitle}
+                onSubjectChange={setEbookTitle}
+              />
+            </WorkflowResultViewer>
+          </WorkflowStepWrapper>
         );
       
       case 'market-analysis':
         return (
-          <WorkflowResultViewer
-            stepId="P2"
-            stepName="Analyse de Marché"
-            result={getStepResult('P2')}
-          >
-            <EbookMarketAnalysis />
-          </WorkflowResultViewer>
+          <WorkflowStepWrapper currentTabId={activeTab} onNavigate={handleTabChange} isGenerating={isGenerating}>
+            <WorkflowResultViewer
+              stepId="P2"
+              stepName="Analyse de Marché"
+              result={getStepResult('P2')}
+            >
+              <EbookMarketAnalysis />
+            </WorkflowResultViewer>
+          </WorkflowStepWrapper>
         );
       
       case 'content-architect':
         return (
-          <WorkflowResultViewer
-            stepId="P3"
-            stepName="Architecte de Contenu"
-            result={getStepResult('P3')}
-          >
-            <EbookContentArchitect 
-              onApplyStructure={(structure) => {
-                const newChapters = structure.map((ch, index) => ({
-                  id: `chapter-${Date.now()}-${index}`,
-                  title: ch.title,
-                  content: '',
-                  subChapters: ch.subChapters.map((sub, subIndex) => ({
-                    id: `subchapter-${Date.now()}-${index}-${subIndex}`,
-                    title: sub,
-                    content: ''
-                  }))
-                }));
-                setChapters(newChapters);
-                setActiveTab('planner');
-              }}
-            />
-          </WorkflowResultViewer>
+          <WorkflowStepWrapper currentTabId={activeTab} onNavigate={handleTabChange} isGenerating={isGenerating}>
+            <WorkflowResultViewer
+              stepId="P3"
+              stepName="Architecte de Contenu"
+              result={getStepResult('P3')}
+            >
+              <EbookContentArchitect 
+                onApplyStructure={(structure) => {
+                  const newChapters = structure.map((ch, index) => ({
+                    id: `chapter-${Date.now()}-${index}`,
+                    title: ch.title,
+                    content: '',
+                    subChapters: ch.subChapters.map((sub, subIndex) => ({
+                      id: `subchapter-${Date.now()}-${index}-${subIndex}`,
+                      title: sub,
+                      content: ''
+                    }))
+                  }));
+                  setChapters(newChapters);
+                  setActiveTab('planner');
+                }}
+              />
+            </WorkflowResultViewer>
+          </WorkflowStepWrapper>
         );
       
       case 'expert-writing':
         return (
-          <WorkflowResultViewer
-            stepId="P4"
-            stepName="Rédaction Experte"
-            result={getStepResult('P4')}
-          >
-            <EbookExpertWriting />
-          </WorkflowResultViewer>
+          <WorkflowStepWrapper currentTabId={activeTab} onNavigate={handleTabChange} isGenerating={isGenerating}>
+            <WorkflowResultViewer
+              stepId="P4"
+              stepName="Rédaction Experte"
+              result={getStepResult('P4')}
+            >
+              <EbookExpertWriting />
+            </WorkflowResultViewer>
+          </WorkflowStepWrapper>
         );
       
       case 'natural-rewrite':
         return (
-          <WorkflowResultViewer
-            stepId="P5"
-            stepName="Réécriture Naturelle"
-            result={getStepResult('P5')}
-          >
-            <EbookNaturalRewrite />
-          </WorkflowResultViewer>
+          <WorkflowStepWrapper currentTabId={activeTab} onNavigate={handleTabChange} isGenerating={isGenerating}>
+            <WorkflowResultViewer
+              stepId="P5"
+              stepName="Réécriture Naturelle"
+              result={getStepResult('P5')}
+            >
+              <EbookNaturalRewrite />
+            </WorkflowResultViewer>
+          </WorkflowStepWrapper>
         );
       
       case 'editorial-packaging':
         return (
-          <WorkflowResultViewer
-            stepId="P7"
-            stepName="Packaging Éditorial"
-            result={getStepResult('P7')}
-          >
-            <EbookEditorialPackaging />
-          </WorkflowResultViewer>
+          <WorkflowStepWrapper currentTabId={activeTab} onNavigate={handleTabChange} isGenerating={isGenerating}>
+            <WorkflowResultViewer
+              stepId="P7"
+              stepName="Packaging Éditorial"
+              result={getStepResult('P7')}
+            >
+              <EbookEditorialPackaging />
+            </WorkflowResultViewer>
+          </WorkflowStepWrapper>
         );
       
       case 'editorial-quality':
         return (
-          <WorkflowResultViewer
-            stepId="P6"
-            stepName="Qualité Éditoriale"
-            result={getStepResult('P6')}
-          >
-            <EbookEditorialQuality />
-          </WorkflowResultViewer>
+          <WorkflowStepWrapper currentTabId={activeTab} onNavigate={handleTabChange} isGenerating={isGenerating}>
+            <WorkflowResultViewer
+              stepId="P6"
+              stepName="Qualité Éditoriale"
+              result={getStepResult('P6')}
+            >
+              <EbookEditorialQuality />
+            </WorkflowResultViewer>
+          </WorkflowStepWrapper>
         );
       
       case 'final-diagnosis':
         return (
-          <WorkflowResultViewer
-            stepId="P8"
-            stepName="Diagnostic Final"
-            result={getStepResult('P8')}
-          >
-            <EbookFinalDiagnosis />
-          </WorkflowResultViewer>
+          <WorkflowStepWrapper currentTabId={activeTab} onNavigate={handleTabChange} isGenerating={isGenerating}>
+            <WorkflowResultViewer
+              stepId="P8"
+              stepName="Diagnostic Final"
+              result={getStepResult('P8')}
+            >
+              <EbookFinalDiagnosis />
+            </WorkflowResultViewer>
+          </WorkflowStepWrapper>
         );
       
       case 'editorial-memory':
         return (
-          <WorkflowResultViewer
-            stepId="P9"
-            stepName="Mémoire Éditoriale"
-            result={getStepResult('P9')}
-          >
-            <EbookEditorialMemory />
-          </WorkflowResultViewer>
+          <WorkflowStepWrapper currentTabId={activeTab} onNavigate={handleTabChange} isGenerating={isGenerating}>
+            <WorkflowResultViewer
+              stepId="P9"
+              stepName="Mémoire Éditoriale"
+              result={getStepResult('P9')}
+            >
+              <EbookEditorialMemory />
+            </WorkflowResultViewer>
+          </WorkflowStepWrapper>
         );
       
       case 'chapter-coherence':
         return (
-          <WorkflowResultViewer
-            stepId="P10"
-            stepName="Cohérence Chapitres"
-            result={getStepResult('P10')}
-          >
-            <EbookChapterCoherence />
-          </WorkflowResultViewer>
+          <WorkflowStepWrapper currentTabId={activeTab} onNavigate={handleTabChange} isGenerating={isGenerating}>
+            <WorkflowResultViewer
+              stepId="P10"
+              stepName="Cohérence Chapitres"
+              result={getStepResult('P10')}
+            >
+              <EbookChapterCoherence />
+            </WorkflowResultViewer>
+          </WorkflowStepWrapper>
         );
       
       case 'self-critique':
         return (
-          <WorkflowResultViewer
-            stepId="P11"
-            stepName="Auto-Critique"
-            result={getStepResult('P11')}
-          >
-            <EbookSelfCritique />
-          </WorkflowResultViewer>
+          <WorkflowStepWrapper currentTabId={activeTab} onNavigate={handleTabChange} isGenerating={isGenerating}>
+            <WorkflowResultViewer
+              stepId="P11"
+              stepName="Auto-Critique"
+              result={getStepResult('P11')}
+            >
+              <EbookSelfCritique />
+            </WorkflowResultViewer>
+          </WorkflowStepWrapper>
         );
       
       case 'iterative-loop':
         return (
-          <WorkflowResultViewer
-            stepId="P12"
-            stepName="Boucle Itérative"
-            result={getStepResult('P12')}
-          >
-            <EbookIterativeLoop />
-          </WorkflowResultViewer>
+          <WorkflowStepWrapper currentTabId={activeTab} onNavigate={handleTabChange} isGenerating={isGenerating}>
+            <WorkflowResultViewer
+              stepId="P12"
+              stepName="Boucle Itérative"
+              result={getStepResult('P12')}
+            >
+              <EbookIterativeLoop />
+            </WorkflowResultViewer>
+          </WorkflowStepWrapper>
         );
       
       case 'style-signature':
         return (
-          <WorkflowResultViewer
-            stepId="P13"
-            stepName="Signature de Style"
-            result={getStepResult('P13')}
-          >
-            <EbookStyleSignature />
-          </WorkflowResultViewer>
+          <WorkflowStepWrapper currentTabId={activeTab} onNavigate={handleTabChange} isGenerating={isGenerating}>
+            <WorkflowResultViewer
+              stepId="P13"
+              stepName="Signature de Style"
+              result={getStepResult('P13')}
+            >
+              <EbookStyleSignature />
+            </WorkflowResultViewer>
+          </WorkflowStepWrapper>
         );
       
       case 'ultimate-verdict':
         return (
-          <WorkflowResultViewer
-            stepId="P14"
-            stepName="Verdict Ultime"
-            result={getStepResult('P14')}
-          >
-            <EbookUltimateVerdict />
-          </WorkflowResultViewer>
+          <WorkflowStepWrapper currentTabId={activeTab} onNavigate={handleTabChange} isGenerating={isGenerating}>
+            <WorkflowResultViewer
+              stepId="P14"
+              stepName="Verdict Ultime"
+              result={getStepResult('P14')}
+            >
+              <EbookUltimateVerdict />
+            </WorkflowResultViewer>
+          </WorkflowStepWrapper>
         );
       
       case 'formation-pdf':
