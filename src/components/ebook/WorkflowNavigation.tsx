@@ -103,18 +103,23 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
   return (
     <TooltipProvider delayDuration={200}>
       <div className={cn("space-y-4 mb-6", className)}>
-        {/* Progress Bar */}
-        <div className="bg-card border rounded-xl p-4 shadow-sm">
+        {/* Progress Bar - Enhanced visibility */}
+        <div className="bg-gradient-to-br from-primary/10 via-card to-primary/5 border-2 border-primary/30 rounded-xl p-4 shadow-lg">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-foreground">Progression du Workflow</span>
-              <Badge variant="outline" className="text-xs">
-                {completedCount}/{WORKFLOW_STEPS.length} étapes
-              </Badge>
+              <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
+                <span className="text-lg">🚀</span>
+              </div>
+              <div>
+                <span className="text-sm font-semibold text-foreground">Workflow Éditorial</span>
+                <Badge variant="outline" className="ml-2 text-xs bg-primary/10 border-primary/30">
+                  {completedCount}/{WORKFLOW_STEPS.length} étapes
+                </Badge>
+              </div>
             </div>
-            <span className="text-sm font-bold text-primary">{Math.round(progressPercentage)}%</span>
+            <span className="text-lg font-bold text-primary">{Math.round(progressPercentage)}%</span>
           </div>
-          <Progress value={progressPercentage} className="h-2" />
+          <Progress value={progressPercentage} className="h-3" />
           
           {/* Step Indicators */}
           <div className="flex justify-between mt-3 overflow-x-auto pb-1">
