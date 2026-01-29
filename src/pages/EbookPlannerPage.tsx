@@ -1682,6 +1682,20 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                             <Plus className="h-4 w-4 mr-1" />
                             Ajouter
                           </Button>
+                          {chapters.length > 0 && (
+                            <Button 
+                              onClick={() => {
+                                setChapters([]);
+                                toast.success("Chapitres réinitialisés");
+                              }} 
+                              variant="outline" 
+                              size="sm" 
+                              className="border-red-200 hover:bg-red-50 text-red-600 hover:text-red-700"
+                            >
+                              <RotateCcw className="h-4 w-4 mr-1" />
+                              Réinitialiser
+                            </Button>
+                          )}
                         </div>
                       </div>
                     </CardHeader>
