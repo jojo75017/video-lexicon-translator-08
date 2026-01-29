@@ -2492,17 +2492,21 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             >
               <EbookContentArchitect 
                 onApplyStructure={(structure) => {
+                  // Generate new unique chapters - replaces entirely to avoid duplicates
+                  const timestamp = Date.now();
                   const newChapters = structure.map((ch, index) => ({
-                    id: `chapter-${Date.now()}-${index}`,
+                    id: `chapter-${timestamp}-${index}`,
                     title: ch.title,
                     content: '',
                     subChapters: ch.subChapters.map((sub, subIndex) => ({
-                      id: `subchapter-${Date.now()}-${index}-${subIndex}`,
+                      id: `subchapter-${timestamp}-${index}-${subIndex}`,
                       title: sub,
                       content: ''
                     }))
                   }));
+                  // Replace chapters entirely (not append) to prevent duplicates
                   setChapters(newChapters);
+                  toast.success(`Structure appliquée : ${newChapters.length} chapitres créés`);
                   setActiveTab('planner');
                 }}
               />
