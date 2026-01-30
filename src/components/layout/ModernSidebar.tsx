@@ -210,6 +210,7 @@ const categories: Category[] = [
     color: 'from-green-500 to-emerald-500',
     items: [
       { id: 'marketing', label: '📱 Posts Réseaux Sociaux', icon: MessageSquare },
+      { id: 'seo-generator', label: '✍️ Générateur SEO IA', icon: FileEdit, isLink: true, href: '/seo-generator', isNew: true },
       { id: 'seo-articles', label: '🌐 Articles SEO', icon: Globe },
       { id: 'amazon-ads', label: '🎯 Amazon Ads', icon: Target },
       { id: 'launch-plan', label: '🚀 Plan Lancement', icon: Rocket },
