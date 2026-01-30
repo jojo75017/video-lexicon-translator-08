@@ -31,6 +31,7 @@ import FaqAssistancePage from './pages/FaqAssistancePage';
 import NichesPage from './pages/NichesPage';
 import ArcSignupPage from './pages/ArcSignupPage';
 import MarketingPlanPage from './pages/MarketingPlanPage';
+import SeoGeneratorPage from './pages/SeoGeneratorPage';
 import { SubscriptionAuth } from '@/components/SubscriptionAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { SubscriberGate } from '@/components/auth/SubscriberGate';
@@ -266,6 +267,19 @@ const App = () => {
             <Route path="/niches" element={<NichesPage />} />
             <Route path="/arc-signup" element={<ArcSignupPage />} />
             <Route path="/plan-marketing" element={<MarketingPlanPage />} />
+            <Route 
+              path="/seo-generator" 
+              element={
+                <SubscriberGate
+                  isAdmin={isAdmin}
+                  subscriberEmail={subscriberEmail}
+                  subscriberData={subscriberData}
+                  onInvalid={handleLogout}
+                >
+                  <SeoGeneratorPage />
+                </SubscriberGate>
+              }
+            />
             <Route
               path="/ebook-ideas"
               element={<EbookIdeasPage />}
