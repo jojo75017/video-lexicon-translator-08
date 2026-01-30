@@ -159,25 +159,60 @@ Réponds UNIQUEMENT en JSON valide avec cette structure exacte:
       };
     }
 
-    // Step 2: Generate full content
-    const contentPrompt = `Rédige un ${contentType || 'article'} SEO complet sur "${topic}" avec le mot-clé "${keyword}".
+    // Step 2: Generate full content with 12 editorial rules
+    const contentPrompt = `Rédige un ${contentType || 'article'} SEO complet sur "${topic}" avec le mot-clé principal "${keyword}".
 
-Contraintes:
+=== 12 RÈGLES ÉDITORIALES OBLIGATOIRES ===
+
+1. TON CONVERSATIONNEL : Adopte un ton amical et chaleureux, comme si tu parles à un ami autour d'un café.
+
+2. CLARTÉ MAXIMALE : Utilise des phrases courtes et simples, faciles à comprendre pour un néophyte.
+
+3. ILLUSTRATIONS : Emploie des exemples concrets, des métaphores ou des analogies pour expliquer les concepts complexes.
+
+4. ADRESSE DIRECTE : Adresse-toi directement au lecteur ('vous') et intègre des questions rhétoriques pour le maintenir actif.
+
+5. RELATIBILITÉ : Utilise des anecdotes du quotidien ou des scénarios communs pour que le contenu résonne personnellement avec le lecteur.
+
+6. AMBIANCE POSITIVE : Injecte une touche d'humour léger ou d'enthousiasme pour rendre la lecture agréable.
+
+7. ÉVITE LE JARGON : Si un terme technique est nécessaire, explique-le immédiatement et simplement.
+
+8. INTENTION SEO : Le mot-clé principal "${keyword}" doit être naturellement inséré dans le premier paragraphe ET dans au moins deux titres H2.
+
+9. TITRES À DOUBLE GÂCHETTE : Chaque titre H2/H3 doit être à la fois accrocheur pour le lecteur (pour le sommaire) ET optimisé SEO avec des mots-clés secondaires.
+
+10. STRUCTURE SOMMAIRE : Propose une structure détaillée H2/H3 claire pour permettre un sommaire automatique (table des matières).
+
+11. FAQ OBLIGATOIRE : L'article DOIT se terminer par une section "Foire Aux Questions" avec 3 à 5 questions/réponses courtes + 3 témoignages fictifs réalistes pour viser les requêtes longue traîne et la position Zéro.
+
+12. CONCLUSION POSITIVE : Termine sur une note motivante ou un encouragement incitant le lecteur à passer immédiatement à l'action.
+
+=== CONTRAINTES TECHNIQUES ===
 - Environ ${wordCount} mots
 - Ton: ${selectedTone}
 - Audience: ${selectedAudience}
 - Intent: ${selectedIntent}
 - Langue: ${selectedLanguage}
-- Utilise le mot-clé naturellement (densité ~1-2%)
-- Structure avec H1, H2, H3 (utilise # ## ###)
-- Inclus des listes à puces et des paragraphes aérés
-- Ajoute des statistiques et exemples concrets
-- Termine par une conclusion avec call-to-action
+- Densité mot-clé: 1-2%
+- Format: Markdown avec # H1, ## H2, ### H3
+- Listes à puces pour la lisibilité
+- Statistiques et exemples concrets
 
 Structure suggérée:
 ${seoAnalysis.structure?.map((s: any) => `${'#'.repeat(s.level)} ${s.title}`).join('\n') || '# Introduction\n## Section principale\n## Conseils\n# Conclusion'}
 
-Rédige maintenant le contenu complet, optimisé pour le SEO et engageant pour le lecteur.`;
+## FAQ (obligatoire à la fin)
+### Question 1 ?
+Réponse courte...
+
+## Témoignages
+> "Témoignage 1..." - Prénom, Ville
+
+## Conclusion
+Note motivante + call-to-action
+
+Rédige maintenant le contenu complet en respectant TOUTES les 12 règles.`;
 
     const contentResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
