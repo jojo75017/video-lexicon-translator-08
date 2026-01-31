@@ -164,6 +164,7 @@ const categories: Category[] = [
     color: 'from-pink-500 to-rose-500',
     items: [
       { id: 'niches', label: '💡 Niches Rentables', icon: Lightbulb, isLink: true, href: '/niches', isNew: true },
+      { id: 'practical-sheets', label: '📋 Fiches Pratiques', icon: FileText, isLink: true, href: '/fiches-pratiques', isNew: true },
       { id: 'coloring-book', label: '🖍️ Livre Coloriage', icon: Palette },
       { id: 'comic-book', label: '💬 Bande Dessinée', icon: LayoutTemplate },
       { id: 'diary-generator', label: '📔 Journal / Agenda', icon: BookHeart },

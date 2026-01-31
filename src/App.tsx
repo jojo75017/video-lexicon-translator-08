@@ -32,6 +32,7 @@ import NichesPage from './pages/NichesPage';
 import ArcSignupPage from './pages/ArcSignupPage';
 import MarketingPlanPage from './pages/MarketingPlanPage';
 import SeoGeneratorPage from './pages/SeoGeneratorPage';
+import PracticalSheetsGeneratorPage from './pages/PracticalSheetsGeneratorPage';
 import { SubscriptionAuth } from '@/components/SubscriptionAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { SubscriberGate } from '@/components/auth/SubscriberGate';
@@ -277,6 +278,19 @@ const App = () => {
                   onInvalid={handleLogout}
                 >
                   <SeoGeneratorPage />
+                </SubscriberGate>
+              }
+            />
+            <Route 
+              path="/fiches-pratiques" 
+              element={
+                <SubscriberGate
+                  isAdmin={isAdmin}
+                  subscriberEmail={subscriberEmail}
+                  subscriberData={subscriberData}
+                  onInvalid={handleLogout}
+                >
+                  <PracticalSheetsGeneratorPage />
                 </SubscriberGate>
               }
             />
