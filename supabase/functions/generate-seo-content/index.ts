@@ -42,7 +42,7 @@ serve(async (req) => {
     const userId = claimsData.claims.sub;
     console.log(`Authenticated user: ${userId}`);
 
-    const { topic, keyword, contentType, targetLength, tone, audience, intent, language } = await req.json();
+    const { topic, keyword, contentType, targetLength, tone, audience, intent, language, internalLinks } = await req.json();
 
     // SECURITY: Validate inputs
     if (!topic || !keyword) {
@@ -159,6 +159,22 @@ Réponds UNIQUEMENT en JSON valide avec cette structure exacte:
       };
     }
 
+    // Préparer les liens internes pour le prompt
+    const internalLinksArray: string[] = Array.isArray(internalLinks) ? internalLinks : [];
+    const internalLinksSection = internalLinksArray.length > 0 
+      ? `
+=== LIENS INTERNES (MAILLAGE SEO) ===
+Tu DOIS intégrer naturellement ces liens internes dans le contenu pour améliorer le maillage SEO du site.
+Utilise des ancres textuelles pertinentes et contextuelles (pas "cliquez ici").
+Répartis les liens de manière équilibrée dans le contenu.
+
+Liens à intégrer:
+${internalLinksArray.map((link, i) => `${i + 1}. ${link}`).join('\n')}
+
+Pour chaque lien, crée une ancre textuelle descriptive en rapport avec le contenu de la page liée.
+Exemple de format: [texte d'ancre pertinent](URL)`
+      : '';
+
     // Step 2: Generate full content with 12 editorial rules
     const contentPrompt = `Rédige un ${contentType || 'article'} SEO complet sur "${topic}" avec le mot-clé principal "${keyword}".
 
@@ -187,7 +203,7 @@ Réponds UNIQUEMENT en JSON valide avec cette structure exacte:
 11. FAQ OBLIGATOIRE : L'article DOIT se terminer par une section "Foire Aux Questions" avec 3 à 5 questions/réponses courtes + 3 témoignages fictifs réalistes pour viser les requêtes longue traîne et la position Zéro.
 
 12. CONCLUSION POSITIVE : Termine sur une note motivante ou un encouragement incitant le lecteur à passer immédiatement à l'action.
-
+${internalLinksSection}
 === CONTRAINTES TECHNIQUES ===
 - Environ ${wordCount} mots
 - Ton: ${selectedTone}
@@ -198,6 +214,7 @@ Réponds UNIQUEMENT en JSON valide avec cette structure exacte:
 - Format: Markdown avec # H1, ## H2, ### H3
 - Listes à puces pour la lisibilité
 - Statistiques et exemples concrets
+${internalLinksArray.length > 0 ? `- IMPORTANT: Intègre les ${internalLinksArray.length} liens internes fournis de manière naturelle` : ''}
 
 Structure suggérée:
 ${seoAnalysis.structure?.map((s: any) => `${'#'.repeat(s.level)} ${s.title}`).join('\n') || '# Introduction\n## Section principale\n## Conseils\n# Conclusion'}
@@ -212,7 +229,7 @@ Réponse courte...
 ## Conclusion
 Note motivante + call-to-action
 
-Rédige maintenant le contenu complet en respectant TOUTES les 12 règles.`;
+Rédige maintenant le contenu complet en respectant TOUTES les 12 règles${internalLinksArray.length > 0 ? ' et en intégrant les liens internes fournis' : ''}.`;
 
     const contentResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
