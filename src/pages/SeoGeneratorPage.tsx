@@ -78,7 +78,8 @@ const SeoGeneratorPage: React.FC = () => {
     includeSchema: true,
     industry: 'marketing',
     competitors: '',
-    targetCountry: 'France'
+    targetCountry: 'France',
+    internalLinks: '' // URLs séparées par des virgules ou retours à la ligne
   });
 
   // Résultats générés
@@ -288,6 +289,12 @@ Voici les éléments essentiels à connaître sur ${keyword || 'ce sujet'}...`
       toast.loading('Génération IA en cours...', { id: 'generation-progress' });
       setGenerationProgress(20);
 
+      // Parser les liens internes
+      const internalLinksArray = contentConfig.internalLinks
+        .split(/[\n,]+/)
+        .map(link => link.trim())
+        .filter(link => link.length > 0 && (link.startsWith('http://') || link.startsWith('https://')));
+
       // Appeler l'edge function avec vraie génération IA
       const { data, error } = await supabase.functions.invoke('generate-seo-content', {
         body: {
@@ -298,7 +305,8 @@ Voici les éléments essentiels à connaître sur ${keyword || 'ce sujet'}...`
           tone: contentConfig.tone,
           audience: contentConfig.audience,
           intent: contentConfig.intent,
-          language: contentConfig.language
+          language: contentConfig.language,
+          internalLinks: internalLinksArray
         }
       });
 
@@ -446,6 +454,29 @@ Généré le ${new Date().toLocaleDateString('fr-FR')} avec le Générateur SEO 
                       ))}
                     </SelectContent>
                   </Select>
+                </div>
+
+                {/* Champ pour les liens internes (maillage) */}
+                <div className="space-y-2 md:col-span-2 lg:col-span-3">
+                  <label className="text-sm font-medium flex items-center gap-2">
+                    <Link className="h-4 w-4 text-blue-500" />
+                    Liens internes (maillage SEO)
+                    <Badge variant="outline" className="text-xs">Optionnel</Badge>
+                  </label>
+                  <Textarea
+                    placeholder="Ajoutez vos URLs internes pour le maillage SEO (une par ligne ou séparées par des virgules)
+
+Exemple:
+https://monsite.com/guide-seo
+https://monsite.com/blog/conseils-marketing
+https://monsite.com/services/referencement"
+                    value={contentConfig.internalLinks}
+                    onChange={(e) => setContentConfig(prev => ({ ...prev, internalLinks: e.target.value }))}
+                    className="min-h-[100px] font-mono text-sm"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    💡 Ces liens seront intégrés naturellement dans le contenu généré pour améliorer votre maillage interne et le SEO.
+                  </p>
                 </div>
               </div>
 
