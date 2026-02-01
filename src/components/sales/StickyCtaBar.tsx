@@ -20,7 +20,7 @@ export const StickyCtaBar: React.FC<StickyCtaBarProps> = ({ onCtaClick }) => {
   const price = isVipAvailable ? '37' : '47';
   const originalPrice = isVipAvailable ? '97' : '97';
   const discount = isVipAvailable ? '-62%' : '-52%';
-  const spotsLeft = remainingSpots ?? 12;
+  const spotsLeft = 12; // Affichage fixe pour la rareté perçue
 
   useEffect(() => {
     const handleScroll = () => {
