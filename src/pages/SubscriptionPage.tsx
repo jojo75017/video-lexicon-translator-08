@@ -48,6 +48,8 @@ const SubscriptionPage = ({ subscriberEmail, subscriberData, onLogout }: Subscri
     }
   }, [navigate]);
 
+  const isVip = subscriberData?.plan_tier === 'vip';
+
   const planLimits: Record<string, Record<string, number>> = {
     starter: { 
       chapters_generated: 50, 
@@ -84,9 +86,10 @@ const SubscriptionPage = ({ subscriberEmail, subscriberData, onLogout }: Subscri
     }
   };
 
-
-  const currentLimits = planLimits[subscriberData?.plan_type] || planLimits.starter;
-  const currentFeatures = planFeatures[subscriberData?.plan_type] || planFeatures.starter;
+  // VIP gets lifetime features
+  const effectivePlanType = isVip ? 'lifetime' : subscriberData?.plan_type;
+  const currentLimits = planLimits[effectivePlanType] || planLimits.starter;
+  const currentFeatures = planFeatures[effectivePlanType] || planFeatures.starter;
 
   const getStatusBadge = (status: string) => {
     if (status === 'active') {
@@ -95,7 +98,17 @@ const SubscriptionPage = ({ subscriberEmail, subscriberData, onLogout }: Subscri
     return <Badge variant="destructive"><XCircle className="w-3 h-3 mr-1" />Expiré</Badge>;
   };
 
-  const getPlanBadge = (plan: string) => {
+  const getPlanBadge = (plan: string, tier?: string) => {
+    // VIP badge takes priority
+    if (tier === 'vip') {
+      return (
+        <Badge className="bg-gradient-to-r from-amber-500 to-yellow-400 text-black font-bold animate-pulse">
+          <Crown className="w-3 h-3 mr-1" />
+          VIP FONDATEUR
+        </Badge>
+      );
+    }
+    
     if (plan === 'lifetime') {
       return <LifetimeBadge size="md" />;
     }
@@ -220,7 +233,7 @@ const SubscriptionPage = ({ subscriberEmail, subscriberData, onLogout }: Subscri
                 <Package className="w-4 h-4 text-muted-foreground" />
                 <div>
                   <p className="text-sm text-muted-foreground">Plan</p>
-                  <div className="mt-1">{getPlanBadge(subscriberData?.plan_type)}</div>
+                  <div className="mt-1">{getPlanBadge(subscriberData?.plan_type, subscriberData?.plan_tier)}</div>
                 </div>
               </div>
 
