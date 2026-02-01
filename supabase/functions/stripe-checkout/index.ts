@@ -14,7 +14,6 @@ const PLANS = {
     type: "one_time" as const,
     features: ["20 ebooks/mois", "Chapitres inclus", "Export PDF", "Modules 1-4 formation", "Support email"],
   },
-  },
   pro: {
     name: "Ebook Generator - Pro Lifetime",
     price: 9700, // 97€
