@@ -24,6 +24,7 @@ import TrustBadges from "@/components/sales/TrustBadges";
 import PriceComparison from "@/components/sales/PriceComparison";
 import SalesFaq from "@/components/sales/SalesFaq";
 import StarTestimonials from "@/components/sales/StarTestimonials";
+import { useVipAvailability } from "@/hooks/useVipAvailability";
 
 // Composant Newsletter inline pour le footer
 const NewsletterForm = () => {
@@ -96,6 +97,9 @@ const SalesPage = () => {
   const emailInputRef = useRef<HTMLInputElement | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+  
+  // Vérifier disponibilité VIP (20 places à 37€)
+  const { isVipAvailable, remainingSpots, isLoading: vipLoading } = useVipAvailability();
 
   // SEO Meta Tags dynamiques pour la page /offres
   useEffect(() => {
@@ -240,8 +244,14 @@ const SalesPage = () => {
   ];
 
   const handlePlanClick = (planId: string) => {
-    // Tous les boutons redirigent vers l'offre principale à 37€
-    navigate('/paiement-manuel');
+    // Si VIP disponible (< 20 places), offre à 37€
+    // Sinon, rediriger vers les offres normales 47€/97€
+    if (isVipAvailable) {
+      navigate('/paiement-manuel');
+    } else {
+      // VIP épuisé → rediriger vers upsell avec le plan choisi
+      navigate(`/upsell-paiement?plan=${planId === 'starter' ? 'starter' : 'pro'}`);
+    }
   };
 
   const handleCheckout = async () => {
