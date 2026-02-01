@@ -32,6 +32,7 @@ import NichesPage from './pages/NichesPage';
 import ArcSignupPage from './pages/ArcSignupPage';
 import MarketingPlanPage from './pages/MarketingPlanPage';
 import UpsellPage from './pages/UpsellPage';
+import UpsellPaiementPage from './pages/UpsellPaiementPage';
 import SeoGeneratorPage from './pages/SeoGeneratorPage';
 import PracticalSheetsGeneratorPage from './pages/PracticalSheetsGeneratorPage';
 import { SubscriptionAuth } from '@/components/SubscriptionAuth';
@@ -258,6 +259,7 @@ const App = () => {
             <Route path="/valeur-offre" element={<OfferValuePage />} />
             <Route path="/demo" element={<DemoPage />} />
             <Route path="/upsell" element={<UpsellPage />} />
+            <Route path="/upsell-paiement" element={<UpsellPaiementPage />} />
             <Route path="/paiement-succes" element={<PaymentSuccessPage />} />
             <Route path="/paiement-manuel" element={<PaiementManuelPage />} />
             <Route path="/confirmation-paiement" element={<ConfirmationPaiementPage />} />
