@@ -32,9 +32,9 @@ const UpsellPage = () => {
   }, []);
 
   const starterFeatures = [
-    { text: "5 ebooks/mois", included: true },
-    { text: "20 chapitres/mois", included: true },
-    { text: "Export PDF uniquement", included: true },
+    { text: "20 ebooks/mois", included: true },
+    { text: "Chapitres inclus", included: true },
+    { text: "Export PDF", included: true },
     { text: "Modules 1-4", included: true },
     { text: "Couvertures IA", included: false },
     { text: "Traduction multi-langues", included: false },
