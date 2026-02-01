@@ -132,10 +132,27 @@ serve(async (req) => {
       );
     }
 
+    if (
+      isRestrictedKey &&
+      configuredPriceId &&
+      (configuredPriceId.startsWith("rk_") || configuredPriceId.startsWith("sk_"))
+    ) {
+      // Common misconfiguration: secret key pasted instead of price id
+      throw new Error(
+        "STRIPE_LIFETIME_PRICE_ID est invalide: vous avez collé une clé Stripe (rk_/sk_...). Il faut l'ID de prix (price_...) associé au produit dans Stripe."
+      );
+    }
+
     if (isRestrictedKey && configuredPriceId && configuredPriceId.startsWith("prod_")) {
       // Common misconfiguration: product id (prod_) provided instead of price id (price_)
       throw new Error(
         "STRIPE_LIFETIME_PRICE_ID est invalide: vous avez fourni un ID produit (prod_...). Il faut l'ID de prix (price_...) associé au produit dans Stripe."
+      );
+    }
+
+    if (isRestrictedKey && configuredPriceId && !configuredPriceId.startsWith("price_")) {
+      throw new Error(
+        "STRIPE_LIFETIME_PRICE_ID est invalide: il doit commencer par price_... (ID de prix Stripe)."
       );
     }
 
