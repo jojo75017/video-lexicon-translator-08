@@ -995,7 +995,7 @@ const SalesPage = () => {
       <LiveActivityNotifications position="bottom-left" intervalMs={30000} />
 
       {/* Sticky CTA Bar */}
-      <StickyCtaBar spotsLeft={39} totalSpots={50} />
+      <StickyCtaBar />
     </div>
   );
 };

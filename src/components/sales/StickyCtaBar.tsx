@@ -3,24 +3,24 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Sparkles, Shield, Clock, ArrowRight, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useVipAvailability } from '@/hooks/useVipAvailability';
 
 interface StickyCtaBarProps {
-  price?: string;
-  originalPrice?: string;
-  spotsLeft?: number;
-  totalSpots?: number;
   onCtaClick?: () => void;
 }
 
-export const StickyCtaBar: React.FC<StickyCtaBarProps> = ({
-  price = '37',
-  originalPrice = '97',
-  spotsLeft = 12,
-  totalSpots = 20,
-  onCtaClick
-}) => {
+export const StickyCtaBar: React.FC<StickyCtaBarProps> = ({ onCtaClick }) => {
+  const navigate = useNavigate();
+  const { isVipAvailable, remainingSpots, vipCount } = useVipAvailability();
   const [isVisible, setIsVisible] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
+
+  // Déterminer le prix selon disponibilité VIP
+  const price = isVipAvailable ? '37' : '47';
+  const originalPrice = isVipAvailable ? '97' : '97';
+  const discount = isVipAvailable ? '-62%' : '-52%';
+  const spotsLeft = remainingSpots ?? 12;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -37,7 +37,12 @@ export const StickyCtaBar: React.FC<StickyCtaBarProps> = ({
     if (onCtaClick) {
       onCtaClick();
     } else {
-      document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
+      // Rediriger vers le bon paiement selon disponibilité VIP
+      if (isVipAvailable) {
+        navigate('/paiement-manuel');
+      } else {
+        navigate('/upsell-paiement?plan=pro');
+      }
     }
   };
 
@@ -46,7 +51,9 @@ export const StickyCtaBar: React.FC<StickyCtaBarProps> = ({
     setIsVisible(false);
   };
 
-  const progressPercentage = ((totalSpots - spotsLeft) / totalSpots) * 100;
+  const progressPercentage = isVipAvailable 
+    ? ((20 - spotsLeft) / 20) * 100 
+    : 100;
 
   return (
     <AnimatePresence>
@@ -76,12 +83,20 @@ export const StickyCtaBar: React.FC<StickyCtaBarProps> = ({
                   <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0 text-[10px] font-bold">
                     2026
                   </Badge>
-                  <Badge className="bg-red-500/20 text-red-400 border-red-500/30 animate-pulse">
-                    🔥 OFFRE LIMITÉE
-                  </Badge>
-                  <span className="text-white/60 text-sm hidden sm:inline">
-                    Plus que <strong className="text-amber-400">{spotsLeft} places</strong> à ce prix
-                  </span>
+                  {isVipAvailable ? (
+                    <>
+                      <Badge className="bg-red-500/20 text-red-400 border-red-500/30 animate-pulse">
+                        🔥 OFFRE FONDATEUR
+                      </Badge>
+                      <span className="text-white/60 text-sm hidden sm:inline">
+                        Plus que <strong className="text-amber-400">{spotsLeft} places</strong> à 37€
+                      </span>
+                    </>
+                  ) : (
+                    <Badge className="bg-violet-500/20 text-violet-400 border-violet-500/30">
+                      ⭐ OFFRE SPÉCIALE
+                    </Badge>
+                  )}
                 </div>
                 
                 {/* Price */}
@@ -89,7 +104,7 @@ export const StickyCtaBar: React.FC<StickyCtaBarProps> = ({
                   <span className="text-3xl font-bold text-white">{price}€</span>
                   <span className="text-lg text-white/40 line-through">{originalPrice}€</span>
                   <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 text-xs">
-                    -62%
+                    {discount}
                   </Badge>
                 </div>
               </div>
@@ -102,7 +117,7 @@ export const StickyCtaBar: React.FC<StickyCtaBarProps> = ({
                 </span>
                 <span className="flex items-center gap-1">
                   <Clock className="w-4 h-4 text-amber-400" />
-                  Accès instantané
+                  Accès à vie
                 </span>
               </div>
 
@@ -114,8 +129,8 @@ export const StickyCtaBar: React.FC<StickyCtaBarProps> = ({
                   onClick={handleCtaClick}
                 >
                   <Sparkles className="w-4 h-4 mr-2" />
-                  <span className="hidden sm:inline">Accès à Vie</span>
-                  <span className="sm:hidden">Acheter</span>
+                  <span className="hidden sm:inline">Accès à Vie – {price}€</span>
+                  <span className="sm:hidden">{price}€</span>
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
                 
