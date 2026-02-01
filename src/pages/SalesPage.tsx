@@ -240,8 +240,8 @@ const SalesPage = () => {
   ];
 
   const handlePlanClick = (planId: string) => {
-    // Redirection vers le paiement PayPal manuel
-    navigate('/paiement-manuel');
+    // Redirection vers le paiement PayPal manuel avec le plan sélectionné
+    navigate(`/paiement-manuel?plan=${planId}`);
   };
 
   const handleCheckout = async () => {

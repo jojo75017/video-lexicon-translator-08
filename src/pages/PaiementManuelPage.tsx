@@ -5,19 +5,41 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Check, Copy, CreditCard, ArrowLeft, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+
+// Configuration des plans avec leurs prix PayPal
+const PLANS = {
+  starter: {
+    name: "Starter",
+    price: "47",
+    paypalLink: "https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=47&currency_code=EUR&item_name=EbookStudio%20Starter",
+    description: "20 ebooks/mois • Export PDF • Modules 1-4"
+  },
+  pro: {
+    name: "Pro Lifetime",
+    price: "97",
+    paypalLink: "https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=97&currency_code=EUR&item_name=EbookStudio%20Pro%20Lifetime",
+    description: "Tout illimité à vie • Toutes les formations"
+  },
+  lifetime: {
+    name: "Accès à Vie",
+    price: "37",
+    paypalLink: "https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=37&currency_code=EUR&item_name=EbookStudio%20Pro%20-%20Acces%20a%20Vie",
+    description: "Offre spéciale fondateur • Accès complet à vie"
+  }
+};
 
 const PaiementManuelPage = () => {
+  const [searchParams] = useSearchParams();
+  const planId = searchParams.get('plan') || 'lifetime';
+  const plan = PLANS[planId as keyof typeof PLANS] || PLANS.lifetime;
+  
   const [email, setEmail] = useState("");
   const [copied, setCopied] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const paymentInfo = {
-    paypalMe: "https://www.paypal.com/paypalme/boubetgeorges/37EUR",
-    paypalDirect: "https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=37&currency_code=EUR&item_name=EbookStudio%20Pro%20-%20Acces%20a%20Vie",
     iban: "FR76 XXXX XXXX XXXX XXXX XXXX XXX",
-    price: "37€",
-    product: "EbookStudio Pro - Accès à Vie"
   };
 
   const copyToClipboard = (text: string, label: string) => {
@@ -61,10 +83,10 @@ const PaiementManuelPage = () => {
             {/* Récapitulatif */}
             <div className="bg-violet-50 rounded-lg p-4 flex justify-between items-center">
               <div>
-                <p className="font-semibold text-violet-900">{paymentInfo.product}</p>
-                <p className="text-sm text-violet-600">Accès illimité à vie</p>
+                <p className="font-semibold text-violet-900">EbookStudio {plan.name}</p>
+                <p className="text-sm text-violet-600">{plan.description}</p>
               </div>
-              <Badge className="text-xl bg-emerald-500 hover:bg-emerald-600">{paymentInfo.price}</Badge>
+              <Badge className="text-xl bg-emerald-500 hover:bg-emerald-600">{plan.price}€</Badge>
             </div>
 
             {/* Étape 1: Email */}
@@ -83,16 +105,15 @@ const PaiementManuelPage = () => {
               <p className="text-xs text-muted-foreground">Vous recevrez votre code d'accès à cette adresse</p>
             </div>
 
-            {/* Étape 2: Paiement */}
             <div className="space-y-4">
               <h3 className="font-semibold flex items-center gap-2">
                 <span className="bg-violet-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm">2</span>
-                Effectuez votre paiement de {paymentInfo.price}
+                Effectuez votre paiement de {plan.price}€
               </h3>
 
               {/* PayPal */}
               <a 
-                href={paymentInfo.paypalDirect}
+                href={plan.paypalLink}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={handlePayPalClick}
@@ -103,7 +124,7 @@ const PaiementManuelPage = () => {
                     <CreditCard className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <p className="font-bold text-blue-700 text-lg">💳 Payer 37€ avec PayPal</p>
+                    <p className="font-bold text-blue-700 text-lg">💳 Payer {plan.price}€ avec PayPal</p>
                     <p className="text-sm text-blue-600">Paiement sécurisé - PayPal ou carte bancaire</p>
                   </div>
                 </div>
