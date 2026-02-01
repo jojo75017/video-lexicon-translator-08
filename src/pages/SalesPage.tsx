@@ -240,8 +240,8 @@ const SalesPage = () => {
   ];
 
   const handlePlanClick = (planId: string) => {
-    // Redirection vers le paiement PayPal manuel avec le plan sélectionné
-    navigate(`/paiement-manuel?plan=${planId}`);
+    // Tous les boutons redirigent vers l'offre principale à 37€
+    navigate('/paiement-manuel');
   };
 
   const handleCheckout = async () => {
