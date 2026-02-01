@@ -15,8 +15,8 @@ interface StickyCtaBarProps {
 export const StickyCtaBar: React.FC<StickyCtaBarProps> = ({
   price = '37',
   originalPrice = '97',
-  spotsLeft = 39,
-  totalSpots = 50,
+  spotsLeft = 12,
+  totalSpots = 20,
   onCtaClick
 }) => {
   const [isVisible, setIsVisible] = useState(false);
