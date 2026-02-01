@@ -52,15 +52,15 @@ const SubscriptionPage = ({ subscriberEmail, subscriberData, onLogout }: Subscri
 
   const planLimits: Record<string, Record<string, number>> = {
     starter: { 
-      chapters_generated: 50, 
+      chapters_generated: 20, 
       ebook_plans_generated: 5, 
-      subchapters_generated: 100, 
-      covers_generated: 3 
+      subchapters_generated: 40, 
+      covers_generated: 0  // Pas de couvertures IA pour Starter
     },
     pro: { 
-      chapters_generated: 200, 
-      ebook_plans_generated: 20, 
-      subchapters_generated: 400, 
+      chapters_generated: 999999, 
+      ebook_plans_generated: 999999, 
+      subchapters_generated: 999999, 
       covers_generated: 10 
     },
     lifetime: { 
@@ -73,12 +73,12 @@ const SubscriptionPage = ({ subscriberEmail, subscriberData, onLogout }: Subscri
 
   const planFeatures: Record<string, { formations: string[]; features: string[] }> = {
     starter: {
-      formations: ['Formation Ebook (Texte)'],
-      features: ['5 ebooks/mois', '10 chapitres max', '3 couvertures/mois', 'Export PDF']
+      formations: ['Modules 1-4 de la formation'],
+      features: ['5 ebooks/mois', '20 chapitres/mois', 'Export PDF uniquement', 'Support email']
     },
     pro: {
-      formations: ['Formation Ebook (Texte + Audio)', 'Formation Séries (Texte)', 'Formation Séries (Audio)'],
-      features: ['20 ebooks/mois', '20 chapitres max', '10 couvertures/mois', 'Export PDF/EPUB', 'Gestionnaire Séries/Sagas', 'Outils KDP avancés']
+      formations: ['Toutes les formations (12 modules + audio)', 'Formation Séries complète', 'Futures formations incluses'],
+      features: ['Ebooks illimités à vie', 'Chapitres illimités', '10 couvertures IA/mois', 'Export PDF/EPUB/Word', 'Traduction multi-langues', 'Générateur Audiobooks', 'Outils KDP Premium', 'Mises à jour à vie']
     },
     lifetime: {
       formations: ['Toutes les formations (Texte + Audio)', 'Formation Séries complète', 'Futures formations incluses'],
@@ -109,17 +109,15 @@ const SubscriptionPage = ({ subscriberEmail, subscriberData, onLogout }: Subscri
       );
     }
     
-    if (plan === 'lifetime') {
+    if (plan === 'lifetime' || plan === 'pro') {
       return <LifetimeBadge size="md" />;
     }
     
     const colors: Record<string, string> = {
       starter: 'bg-blue-500',
-      pro: 'bg-purple-500',
     };
     const labels: Record<string, string> = {
-      starter: 'STARTER - 27€/mois',
-      pro: 'PRO - 67€/mois',
+      starter: 'STARTER - 47€',
     };
     return <Badge className={colors[plan] || 'bg-gray-500'}>{labels[plan] || plan.toUpperCase()}</Badge>;
   };
