@@ -333,7 +333,7 @@ const SalesPage = () => {
               🎁 Pour vous remercier : <span className="text-yellow-200">Accès à vie pour seulement 37€</span> au lieu de 97€
             </p>
             <p className="text-xs mt-1 opacity-90">
-              ⚡ Offre réservée aux <strong>50 premiers inscrits</strong> – Ensuite le prix remonte
+              ⚡ Offre réservée aux <strong>20 premiers inscrits</strong> – Ensuite le prix remonte
             </p>
           </div>
         </div>
@@ -637,14 +637,14 @@ const SalesPage = () => {
                 </div>
                 <div className="flex items-center justify-center gap-4">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-5xl font-black text-yellow-300 animate-pulse">39</span>
-                    <span className="text-2xl font-bold text-white/80">/ 50</span>
+                    <span className="text-5xl font-black text-yellow-300 animate-pulse">12</span>
+                    <span className="text-2xl font-bold text-white/80">/ 20</span>
                   </div>
                 </div>
                 <div className="mt-3 bg-white/20 rounded-full h-3 max-w-xs mx-auto overflow-hidden">
                   <div 
                     className="bg-gradient-to-r from-yellow-400 to-orange-400 h-full rounded-full transition-all duration-1000"
-                    style={{ width: '78%' }}
+                    style={{ width: '40%' }}
                   />
                 </div>
                 <p className="text-sm mt-2 text-white/80">
