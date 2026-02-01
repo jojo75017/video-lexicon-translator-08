@@ -67,7 +67,7 @@ serve(async (req) => {
       );
     }
 
-    const wordCount = Math.min(Math.max(Number(targetLength) || 2000, 500), 5000);
+    const wordCount = Math.min(Math.max(Number(targetLength) || 2000, 1500), 5000);
     const selectedTone = (tone || 'professionnel').substring(0, 50);
     const selectedAudience = (audience || 'experts').substring(0, 100);
     const selectedIntent = (intent || 'informationnel').substring(0, 50);

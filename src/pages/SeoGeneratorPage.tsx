@@ -68,7 +68,7 @@ const SeoGeneratorPage: React.FC = () => {
     topic: '',
     keyword: '',
     contentType: 'article',
-    targetLength: 2000,
+    targetLength: 1500, // Minimum 1500 mots pour un bon SEO
     tone: 'professionnel',
     audience: 'experts',
     intent: 'informationnel',
