@@ -52,9 +52,9 @@ const SubscriptionPage = ({ subscriberEmail, subscriberData, onLogout }: Subscri
 
   const planLimits: Record<string, Record<string, number>> = {
     starter: { 
-      chapters_generated: 20, 
-      ebook_plans_generated: 5, 
-      subchapters_generated: 40, 
+      chapters_generated: 100, 
+      ebook_plans_generated: 20, 
+      subchapters_generated: 200, 
       covers_generated: 0  // Pas de couvertures IA pour Starter
     },
     pro: { 
@@ -73,8 +73,8 @@ const SubscriptionPage = ({ subscriberEmail, subscriberData, onLogout }: Subscri
 
   const planFeatures: Record<string, { formations: string[]; features: string[] }> = {
     starter: {
-      formations: ['Modules 1-4 de la formation'],
-      features: ['5 ebooks/mois', '20 chapitres/mois', 'Export PDF uniquement', 'Support email']
+      formations: ['Modules 1-4 (suffisant pour créer votre livre)'],
+      features: ['20 ebooks/mois', 'Chapitres inclus', 'Export PDF', 'Support email']
     },
     pro: {
       formations: ['Toutes les formations (12 modules + audio)', 'Formation Séries complète', 'Futures formations incluses'],
