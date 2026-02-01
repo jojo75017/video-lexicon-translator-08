@@ -245,8 +245,42 @@ const SalesPage = () => {
   };
 
   const handleCheckout = async () => {
-    // Redirection vers paiement manuel
-    window.location.href = "/paiement-manuel";
+    if (!email || !email.includes("@")) {
+      toast.error("Veuillez entrer un email valide");
+      return;
+    }
+
+    if (!selectedPlan) {
+      toast.error("Veuillez sélectionner un plan");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("stripe-checkout", {
+        body: {
+          planId: selectedPlan,
+          email: email.trim().toLowerCase(),
+          successUrl: selectedPlan === "starter" 
+            ? `${window.location.origin}/upsell?email=${encodeURIComponent(email.trim().toLowerCase())}`
+            : `${window.location.origin}/paiement-succes`,
+          cancelUrl: `${window.location.origin}/offres`,
+        },
+      });
+
+      if (error) throw error;
+
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error("Pas d'URL de paiement reçue");
+      }
+    } catch (error: any) {
+      console.error("Checkout error:", error);
+      toast.error(error.message || "Erreur lors du paiement. Réessayez.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
