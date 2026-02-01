@@ -132,6 +132,13 @@ serve(async (req) => {
       );
     }
 
+    if (isRestrictedKey && configuredPriceId && configuredPriceId.startsWith("prod_")) {
+      // Common misconfiguration: product id (prod_) provided instead of price id (price_)
+      throw new Error(
+        "STRIPE_LIFETIME_PRICE_ID est invalide: vous avez fourni un ID produit (prod_...). Il faut l'ID de prix (price_...) associé au produit dans Stripe."
+      );
+    }
+
     let priceId: string;
     let sessionConfig: Stripe.Checkout.SessionCreateParams;
 
