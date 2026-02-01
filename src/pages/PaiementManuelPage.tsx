@@ -1,16 +1,26 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Check, Copy, CreditCard, ArrowLeft, ArrowRight } from "lucide-react";
+import { Check, Copy, CreditCard, ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Link, useNavigate } from "react-router-dom";
+import { useVipAvailability } from "@/hooks/useVipAvailability";
 
 const PaiementManuelPage = () => {
   const [email, setEmail] = useState("");
   const [copied, setCopied] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { isVipAvailable, isLoading: vipLoading } = useVipAvailability();
+
+  // Rediriger si les places VIP sont épuisées
+  useEffect(() => {
+    if (!vipLoading && isVipAvailable === false) {
+      toast.info("L'offre à 37€ n'est plus disponible. Découvrez nos autres offres !");
+      navigate('/upsell-paiement?plan=pro');
+    }
+  }, [vipLoading, isVipAvailable, navigate]);
 
   const paymentInfo = {
     price: "37",
@@ -19,6 +29,15 @@ const PaiementManuelPage = () => {
     paypalLink: "https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=37&currency_code=EUR&item_name=EbookStudio%20Pro%20-%20Acces%20a%20Vie",
     iban: "FR76 XXXX XXXX XXXX XXXX XXXX XXX",
   };
+
+  // Afficher un loader pendant la vérification
+  if (vipLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-violet-50 via-white to-emerald-50 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-violet-600" />
+      </div>
+    );
+  }
 
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
