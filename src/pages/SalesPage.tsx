@@ -245,7 +245,7 @@ const SalesPage = () => {
             className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white"
             onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
           >
-            Accès 37€
+            Offres dès 47€
           </Button>
         </div>
       </header>

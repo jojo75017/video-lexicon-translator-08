@@ -6,13 +6,26 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Plan configurations - Single plan at 37€
+// Plan configurations - Upsell system: Starter 47€, Pro 97€
 const PLANS = {
-  lifetime: {
-    name: "Ebook Generator - Accès Complet",
-    price: 3700, // 37€
+  starter: {
+    name: "Ebook Generator - Starter",
+    price: 4700, // 47€
     type: "one_time" as const,
-    features: ["Ebooks illimités à vie", "Chapitres illimités", "Couvertures illimitées", "Export PDF/EPUB/Word", "Toutes les formations", "Outils KDP Premium", "Mises à jour gratuites à vie", "Support prioritaire"],
+    features: ["5 ebooks/mois", "20 chapitres/mois", "Export PDF", "Modules 1-4 formation", "Support email"],
+  },
+  pro: {
+    name: "Ebook Generator - Pro Lifetime",
+    price: 9700, // 97€
+    type: "one_time" as const,
+    features: ["Ebooks illimités à vie", "Chapitres illimités", "10 couvertures IA/mois", "Export PDF/EPUB/Word", "Toutes les formations", "Outils KDP Premium", "Traduction multi-langues", "Générateur Audiobooks", "Mises à jour à vie", "Support prioritaire"],
+  },
+  // Keep lifetime as alias for pro (backwards compatibility)
+  lifetime: {
+    name: "Ebook Generator - Pro Lifetime",
+    price: 9700, // 97€
+    type: "one_time" as const,
+    features: ["Ebooks illimités à vie", "Chapitres illimités", "10 couvertures IA/mois", "Export PDF/EPUB/Word", "Toutes les formations", "Outils KDP Premium", "Traduction multi-langues", "Générateur Audiobooks", "Mises à jour à vie", "Support prioritaire"],
   },
 };
 
