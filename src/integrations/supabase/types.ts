@@ -490,6 +490,7 @@ export type Database = {
           email: string
           expires_at: string | null
           id: string
+          plan_tier: string
           plan_type: string
           status: string
           subchapters_generated: number
@@ -504,6 +505,7 @@ export type Database = {
           email: string
           expires_at?: string | null
           id?: string
+          plan_tier?: string
           plan_type?: string
           status?: string
           subchapters_generated?: number
@@ -518,6 +520,7 @@ export type Database = {
           email?: string
           expires_at?: string | null
           id?: string
+          plan_tier?: string
           plan_type?: string
           status?: string
           subchapters_generated?: number
@@ -551,6 +554,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_create_vip: { Args: never; Returns: boolean }
+      count_vip_subscribers: { Args: never; Returns: number }
       has_role:
         | {
             Args: {

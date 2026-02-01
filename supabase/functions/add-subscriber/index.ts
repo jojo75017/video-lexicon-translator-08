@@ -249,6 +249,18 @@ Deno.serve(async (req) => {
     let accessCode: string;
     let emailSent = false;
     let emailError = '';
+    let assignedTier = 'standard';
+
+    // Check if VIP slots are available (only for new subscribers)
+    if (!existingSubscriber) {
+      const { data: canCreateVip } = await supabaseAdmin.rpc('can_create_vip');
+      if (canCreateVip === true) {
+        assignedTier = 'vip';
+        console.log('VIP slot available - assigning VIP tier');
+      } else {
+        console.log('VIP slots full - assigning standard tier');
+      }
+    }
 
     if (existingSubscriber) {
       // Update existing subscriber
@@ -271,6 +283,7 @@ Deno.serve(async (req) => {
       }
 
       accessCode = existingSubscriber.access_code;
+      assignedTier = existingSubscriber.plan_tier;
       console.log('Subscriber updated:', email);
 
       // Send update email
@@ -289,6 +302,7 @@ Deno.serve(async (req) => {
           email,
           access_code: accessCode,
           plan_type,
+          plan_tier: assignedTier,
           status: 'active',
           expires_at: expires_at || null
         });
@@ -301,7 +315,7 @@ Deno.serve(async (req) => {
         );
       }
 
-      console.log('New subscriber created:', email);
+      console.log('New subscriber created:', email, 'with tier:', assignedTier);
 
       // Send welcome email
       const emailResult = await sendWelcomeEmail(email, accessCode, plan_type, true);
@@ -311,15 +325,23 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Get current VIP count
+    const { data: vipCount } = await supabaseAdmin.rpc('count_vip_subscribers');
+
     return new Response(
       JSON.stringify({
         success: true,
         accessCode,
         emailSent,
         emailError: emailSent ? undefined : emailError,
+        planTier: assignedTier,
+        vipCount: vipCount || 0,
+        vipSlotsRemaining: Math.max(0, 20 - (vipCount || 0)),
         message: existingSubscriber 
           ? 'Abonnement mis à jour avec succès' 
-          : 'Nouvel abonné créé avec succès'
+          : assignedTier === 'vip' 
+            ? `🎉 Nouvel abonné VIP créé ! (${vipCount}/20 places VIP)`
+            : 'Nouvel abonné créé avec succès'
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
