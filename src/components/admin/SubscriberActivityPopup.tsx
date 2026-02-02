@@ -125,11 +125,11 @@ export const SubscriberActivityPopup: React.FC = () => {
 
   return (
     <>
-      {/* Toggle Button */}
+      {/* Toggle Button - Top Right */}
       <motion.button
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="fixed bottom-4 right-4 z-50 p-3 rounded-full bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-lg hover:shadow-xl transition-shadow"
+        className="fixed top-4 right-4 z-50 p-3 rounded-full bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-lg hover:shadow-xl transition-shadow"
         onClick={() => setIsVisible(!isVisible)}
       >
         {isVisible ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
@@ -140,15 +140,15 @@ export const SubscriberActivityPopup: React.FC = () => {
         )}
       </motion.button>
 
-      {/* Popup Panel */}
+      {/* Popup Panel - Top Right */}
       <AnimatePresence>
         {isVisible && (
           <motion.div
-            initial={{ opacity: 0, y: 100, scale: 0.9 }}
+            initial={{ opacity: 0, y: -100, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 100, scale: 0.9 }}
+            exit={{ opacity: 0, y: -100, scale: 0.9 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed bottom-20 right-4 z-50 w-80 bg-slate-900 border border-violet-500/30 rounded-xl shadow-2xl overflow-hidden"
+            className="fixed top-16 right-4 z-50 w-80 bg-slate-900 border border-violet-500/30 rounded-xl shadow-2xl overflow-hidden"
           >
             {/* Header */}
             <div className="bg-gradient-to-r from-violet-600 to-purple-600 p-3 flex items-center justify-between">
