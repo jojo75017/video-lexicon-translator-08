@@ -125,16 +125,28 @@ export const SubscriberActivityPopup: React.FC = () => {
 
   return (
     <>
-      {/* Toggle Button - Top Right */}
+      {/* Toggle Button - Top Right with pulse animation */}
       <motion.button
         initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="fixed top-4 right-4 z-50 p-3 rounded-full bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-lg hover:shadow-xl transition-shadow"
+        animate={{ 
+          opacity: 1, 
+          scale: [1, 1.1, 1],
+          boxShadow: [
+            '0 0 0 0 rgba(168, 85, 247, 0.7)',
+            '0 0 0 10px rgba(168, 85, 247, 0)',
+            '0 0 0 0 rgba(168, 85, 247, 0)'
+          ]
+        }}
+        transition={{
+          scale: { repeat: Infinity, duration: 2, ease: 'easeInOut' },
+          boxShadow: { repeat: Infinity, duration: 2, ease: 'easeInOut' }
+        }}
+        className="fixed top-20 right-4 z-[9999] p-4 rounded-full bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white shadow-2xl hover:shadow-xl transition-shadow animate-pulse"
         onClick={() => setIsVisible(!isVisible)}
       >
-        {isVisible ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+        <Users className="w-6 h-6" />
         {totalCount > 0 && (
-          <span className="absolute -top-1 -right-1 w-5 h-5 bg-emerald-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+          <span className="absolute -top-2 -right-2 w-6 h-6 bg-emerald-500 text-white text-xs font-bold rounded-full flex items-center justify-center border-2 border-white animate-bounce">
             {totalCount > 99 ? '99+' : totalCount}
           </span>
         )}
