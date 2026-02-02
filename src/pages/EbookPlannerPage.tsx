@@ -114,6 +114,7 @@ import EbookHumanizer from '@/components/ebook/EbookHumanizer';
 import EbookArcManager from '@/components/ebook/EbookArcManager';
 import EbookDirectSales from '@/components/ebook/EbookDirectSales';
 import EbookBsrTracker from '@/components/ebook/EbookBsrTracker';
+import SubscriberActivityPopup from '@/components/admin/SubscriberActivityPopup';
 
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
 import { ebookTemplates } from '@/data/ebookTemplates';
@@ -2872,6 +2873,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           onClose={() => setShowPaywall(null)} 
         />
       )}
+
+      {/* Admin: Subscriber Activity Popup */}
+      <SubscriberActivityPopup />
     </div>
   );
 };
