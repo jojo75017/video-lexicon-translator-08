@@ -33,44 +33,69 @@ function cleanGeneratedText(text: string): string {
     // Supprimer les guillemets orphelins en début/fin de ligne
     .replace(/^"+/gm, '')
     .replace(/"+$/gm, '')
-    // Supprimer les guillemets isolés qui ne font pas partie de dialogues
-    .replace(/(?<![a-zA-ZÀ-ÿ])"(?![a-zA-ZÀ-ÿ])/g, '')
     // Nettoyer les doubles espaces
     .replace(/  +/g, ' ')
     // Nettoyer les espaces avant ponctuation
     .replace(/ ([.,;:!?])/g, '$1');
   
-  // ✅ CRITIQUE: Boucle pour garantir que TOUS les mots collés sont corrigés
+  // ✅ CRITIQUE: Boucle RENFORCÉE pour garantir que TOUS les mots collés sont corrigés
+  // Augmenté à 10 itérations pour couvrir tous les cas complexes
   let previousLength = 0;
   let iterations = 0;
-  const maxIterations = 5;
+  const maxIterations = 10;
   
   while (cleaned.length !== previousLength && iterations < maxIterations) {
     previousLength = cleaned.length;
     iterations++;
     
     cleaned = cleaned
-      // Cas 1: Point/exclamation/interrogation suivi d'une lettre minuscule ou majuscule
-      .replace(/\.([A-Za-zÀ-ÿ])/g, '. $1')
-      .replace(/!([A-Za-zÀ-ÿ])/g, '! $1')
-      .replace(/\?([A-Za-zÀ-ÿ])/g, '? $1')
-      .replace(/…([A-Za-zÀ-ÿ])/g, '… $1')
-      // Cas 2: Virgule/point-virgule/deux-points suivi d'une lettre
-      .replace(/,([A-Za-zÀ-ÿ])/g, ', $1')
-      .replace(/;([A-Za-zÀ-ÿ])/g, '; $1')
-      .replace(/:([A-Za-zÀ-ÿ])/g, ': $1')
-      // Cas 3: Ponctuation suivie d'un chiffre
+      // ========== CAS 1: PONCTUATION FORTE + LETTRE ==========
+      // Point suivi d'une lettre (minuscule ou majuscule, y compris accents)
+      .replace(/\.([A-Za-zÀ-ÖØ-öø-ÿ])/g, '. $1')
+      // Exclamation suivie d'une lettre
+      .replace(/!([A-Za-zÀ-ÖØ-öø-ÿ])/g, '! $1')
+      // Interrogation suivie d'une lettre
+      .replace(/\?([A-Za-zÀ-ÖØ-öø-ÿ])/g, '? $1')
+      // Points de suspension suivis d'une lettre
+      .replace(/…([A-Za-zÀ-ÖØ-öø-ÿ])/g, '… $1')
+      
+      // ========== CAS 2: PONCTUATION FAIBLE + LETTRE ==========
+      // Virgule suivie d'une lettre
+      .replace(/,([A-Za-zÀ-ÖØ-öø-ÿ])/g, ', $1')
+      // Point-virgule suivi d'une lettre
+      .replace(/;([A-Za-zÀ-ÖØ-öø-ÿ])/g, '; $1')
+      // Deux-points suivis d'une lettre (IMPORTANT pour les dialogues)
+      .replace(/:([A-Za-zÀ-ÖØ-öø-ÿ])/g, ': $1')
+      
+      // ========== CAS 3: PONCTUATION + CHIFFRE ==========
       .replace(/\.(\d)/g, '. $1')
       .replace(/,(\d)/g, ', $1')
-      // Cas 4: Guillemets après ponctuation puis mot
-      .replace(/\."/g, '." ')
-      .replace(/\."([A-Za-zÀ-ÿ])/g, '." $1')
-      .replace(/\.»([A-Za-zÀ-ÿ])/g, '.» $1')
-      .replace(/!"/g, '!" ')
-      .replace(/!"([A-Za-zÀ-ÿ])/g, '!" $1')
-      .replace(/\?"/g, '?" ')
-      .replace(/\?"([A-Za-zÀ-ÿ])/g, '?" $1');
+      .replace(/:(\d)/g, ': $1')
+      
+      // ========== CAS 4: GUILLEMETS FRANÇAIS ==========
+      // Après guillemet fermant français suivi d'une lettre
+      .replace(/»([A-Za-zÀ-ÖØ-öø-ÿ])/g, '» $1')
+      // Ponctuation + guillemet fermant + lettre
+      .replace(/\.»([A-Za-zÀ-ÖØ-öø-ÿ])/g, '.» $1')
+      .replace(/!»([A-Za-zÀ-ÖØ-öø-ÿ])/g, '!» $1')
+      .replace(/\?»([A-Za-zÀ-ÖØ-öø-ÿ])/g, '?» $1')
+      
+      // ========== CAS 5: GUILLEMETS ANGLAIS ==========
+      // Après guillemet fermant anglais suivi d'une lettre
+      .replace(/"([A-Za-zÀ-ÖØ-öø-ÿ])/g, '" $1')
+      // Ponctuation + guillemet fermant + lettre
+      .replace(/\."([A-Za-zÀ-ÖØ-öø-ÿ])/g, '." $1')
+      .replace(/!"([A-Za-zÀ-ÖØ-öø-ÿ])/g, '!" $1')
+      .replace(/\?"([A-Za-zÀ-ÖØ-öø-ÿ])/g, '?" $1')
+      
+      // ========== CAS 6: PARENTHÈSES ==========
+      // Après parenthèse fermante suivie d'une lettre
+      .replace(/\)([A-Za-zÀ-ÖØ-öø-ÿ])/g, ') $1')
+      // Ponctuation + parenthèse fermante + lettre
+      .replace(/\.\)([A-Za-zÀ-ÖØ-öø-ÿ])/g, '.) $1');
   }
+  
+  console.log(`🔧 [cleanGeneratedText] ${iterations} itérations effectuées`);
   
   // Nettoyage final
   return cleaned
