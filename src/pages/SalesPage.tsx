@@ -411,6 +411,52 @@ const SalesPage = () => {
             </p>
           </div>
 
+          {/* Bloc Démo - Résultat immédiat */}
+          <div className="max-w-3xl mx-auto mb-12 p-8 bg-gradient-to-br from-violet-50 via-purple-50 to-indigo-50 dark:from-violet-950/40 dark:via-purple-950/30 dark:to-indigo-950/40 rounded-3xl border border-violet-200 dark:border-violet-800 shadow-xl">
+            <h2 className="text-2xl md:text-3xl font-bold text-center mb-6 text-foreground">
+              Teste le générateur et vois ton ebook prendre forme en quelques minutes
+            </h2>
+            
+            <p className="text-lg text-muted-foreground text-center mb-6">
+              Tu n'as rien à installer, rien à apprendre.
+              <br />
+              Entre simplement ton idée, et le générateur crée pour toi :
+            </p>
+            
+            <div className="flex flex-col items-center gap-3 mb-8">
+              <div className="flex items-center gap-3 text-lg text-foreground">
+                <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" />
+                <span>le plan complet de ton ebook</span>
+              </div>
+              <div className="flex items-center gap-3 text-lg text-foreground">
+                <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" />
+                <span>une structure claire et logique</span>
+              </div>
+              <div className="flex items-center gap-3 text-lg text-foreground">
+                <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" />
+                <span>les premiers chapitres rédigés</span>
+              </div>
+            </div>
+            
+            <p className="text-center text-primary font-semibold mb-6 text-lg">
+              👉 Tu vois le résultat avant toute décision.
+            </p>
+            
+            <div className="flex flex-col items-center">
+              <Button 
+                size="lg" 
+                className="text-lg px-10 py-6 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 shadow-lg mb-4"
+                onClick={() => navigate('/demo')}
+              >
+                <Play className="w-5 h-5 mr-2" />
+                Accéder à la démo gratuite
+              </Button>
+              <p className="text-sm text-muted-foreground">
+                Accès immédiat • Aucune carte bancaire • Sans engagement
+              </p>
+            </div>
+          </div>
+
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <Button 
               size="lg" 
