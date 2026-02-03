@@ -23,12 +23,140 @@ import {
   User,
   Glasses,
   Layout,
-  Download
+  Download,
+  FileDown,
+  Loader2
 } from 'lucide-react';
 import { toast } from 'sonner';
+import jsPDF from 'jspdf';
 
 const EbookExportGuide: React.FC = () => {
   const [activeGuide, setActiveGuide] = useState('typography');
+  const [isExportingPdf, setIsExportingPdf] = useState(false);
+
+  // Liste de la checklist pour réutilisation
+  const checklistItems = [
+    'Vérifier l\'orthographe et la grammaire',
+    'Contrôler la numérotation des pages',
+    'Vérifier que chaque chapitre commence page impaire',
+    'Contrôler les veuves et orphelines',
+    'Vérifier la table des matières',
+    'Contrôler les marges (zone de sécurité KDP)',
+    'Vérifier la résolution des images (300 DPI min)',
+    'Contrôler la taille du fichier (< 650 Mo pour KDP)',
+    'Vérifier les polices intégrées (embed fonts)',
+    'Relire la page de copyright et ISBN',
+  ];
+
+  // Fonction pour télécharger la checklist en PDF
+  const downloadChecklistPDF = async () => {
+    setIsExportingPdf(true);
+    try {
+      const pdf = new jsPDF();
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      
+      // Titre principal
+      pdf.setFontSize(24);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('Checklist Export Ebook', pageWidth / 2, 30, { align: 'center' });
+      
+      // Sous-titre
+      pdf.setFontSize(12);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(100, 100, 100);
+      pdf.text('Guide des parametres d\'export - 2026', pageWidth / 2, 40, { align: 'center' });
+      
+      // Ligne séparatrice
+      pdf.setDrawColor(200, 200, 200);
+      pdf.line(20, 50, pageWidth - 20, 50);
+      
+      // Section checklist
+      pdf.setTextColor(0, 0, 0);
+      pdf.setFontSize(16);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('Checklist Avant Export', 20, 65);
+      
+      // Items de la checklist
+      pdf.setFontSize(11);
+      pdf.setFont('helvetica', 'normal');
+      let yPosition = 80;
+      
+      checklistItems.forEach((item, index) => {
+        // Case à cocher
+        pdf.setDrawColor(34, 197, 94);
+        pdf.setLineWidth(0.5);
+        pdf.rect(20, yPosition - 4, 5, 5);
+        
+        // Texte
+        pdf.text(`${item}`, 30, yPosition);
+        yPosition += 12;
+      });
+      
+      // Section conseils
+      yPosition += 10;
+      pdf.setFontSize(16);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('Conseils de Pagination', 20, yPosition);
+      
+      yPosition += 15;
+      pdf.setFontSize(11);
+      pdf.setFont('helvetica', 'normal');
+      
+      const conseils = [
+        'Numerotation romaine (i, ii, iii) pour les pages liminaires',
+        'Numerotation arabe (1, 2, 3) a partir du premier chapitre',
+        'En-tetes avec titre du livre (pages paires) et chapitre (pages impaires)',
+        'Page blanche avant chaque nouveau chapitre si necessaire',
+      ];
+      
+      conseils.forEach((conseil) => {
+        pdf.setFillColor(34, 197, 94);
+        pdf.circle(23, yPosition - 1.5, 1.5, 'F');
+        pdf.text(conseil, 30, yPosition);
+        yPosition += 10;
+      });
+      
+      // Section à éviter
+      yPosition += 10;
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(220, 38, 38);
+      pdf.text('A eviter', 20, yPosition);
+      
+      yPosition += 12;
+      pdf.setFontSize(11);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(0, 0, 0);
+      
+      const aEviter = [
+        'Numero de page sur la page de titre et copyright',
+        'Chapitre commencant sur une page paire (gauche)',
+        'En-tete/pied de page sur les pages de debut de chapitre',
+        'Moins de 100 pages pour KDP (cout d\'impression eleve)',
+      ];
+      
+      aEviter.forEach((item) => {
+        pdf.setFillColor(220, 38, 38);
+        pdf.circle(23, yPosition - 1.5, 1.5, 'F');
+        pdf.text(item, 30, yPosition);
+        yPosition += 10;
+      });
+      
+      // Footer
+      pdf.setFontSize(9);
+      pdf.setTextColor(150, 150, 150);
+      pdf.text('Genere par Ebook Generator Pro - ' + new Date().toLocaleDateString('fr-FR'), pageWidth / 2, 285, { align: 'center' });
+      
+      // Télécharger
+      pdf.save('checklist-export-ebook.pdf');
+      toast.success('Checklist PDF téléchargée avec succès !');
+    } catch (error) {
+      console.error('Erreur export PDF:', error);
+      toast.error('Erreur lors de l\'export PDF');
+    } finally {
+      setIsExportingPdf(false);
+    }
+  };
 
   // Fonction pour copier un paramètre
   const copyToClipboard = (text: string, label: string) => {
@@ -548,25 +676,33 @@ const EbookExportGuide: React.FC = () => {
           {/* Export checklist */}
           <Card className="border-2 border-emerald-200 dark:border-emerald-900">
             <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30">
-              <CardTitle className="flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                Checklist Avant Export
-              </CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                  Checklist Avant Export
+                </CardTitle>
+                <Button
+                  onClick={downloadChecklistPDF}
+                  disabled={isExportingPdf}
+                  className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white"
+                >
+                  {isExportingPdf ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Export...
+                    </>
+                  ) : (
+                    <>
+                      <FileDown className="w-4 h-4 mr-2" />
+                      Télécharger PDF
+                    </>
+                  )}
+                </Button>
+              </div>
             </CardHeader>
             <CardContent className="pt-4">
               <div className="grid sm:grid-cols-2 gap-3">
-                {[
-                  'Vérifier l\'orthographe et la grammaire',
-                  'Contrôler la numérotation des pages',
-                  'Vérifier que chaque chapitre commence page impaire',
-                  'Contrôler les veuves et orphelines',
-                  'Vérifier la table des matières',
-                  'Contrôler les marges (zone de sécurité KDP)',
-                  'Vérifier la résolution des images (300 DPI min)',
-                  'Contrôler la taille du fichier (< 650 Mo pour KDP)',
-                  'Vérifier les polices intégrées (embed fonts)',
-                  'Relire la page de copyright et ISBN',
-                ].map((item, index) => (
+                {checklistItems.map((item, index) => (
                   <div key={index} className="flex items-center gap-2 p-2 bg-background rounded-md">
                     <div className="w-5 h-5 rounded border-2 border-emerald-500" />
                     <span className="text-sm">{item}</span>
