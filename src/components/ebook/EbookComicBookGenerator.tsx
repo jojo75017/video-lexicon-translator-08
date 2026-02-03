@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Loader2, Layout, Download, RefreshCw, Sparkles, MessageSquare, ImagePlus, BookOpen, Wand2, FileDown, Users, Zap, Lightbulb, AlertTriangle, Save, FolderOpen, Trash2 } from 'lucide-react';
+import ExportSection from './ExportSection';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
@@ -1706,43 +1707,38 @@ Réponds en JSON:
               </Button>
             </div>
 
-            <Button
-              onClick={async () => {
-                setIsSavingProject(true);
-                const selectedGenre = GENRES.find(g => g.value === genre);
-                await saveSpecializedProject({
-                  title: title || `BD - ${selectedGenre?.label || genre}`,
-                  project_type: 'comic',
-                  target_audience: ageGroup,
-                  ebook_images: generatedPages.flatMap(p => p.panels.map(panel => ({ url: panel.imageUrl, title: panel.action }))),
-                  chapters: generatedPages.map(p => ({
-                    title: `Page ${p.pageNumber}`,
-                    content: p.panels.map(panel => `${panel.character}: ${panel.dialogue}`).join('\n'),
-                  })),
-                  number_of_chapters: generatedPages.length,
-                  book_summary: scenario ? `Scénario ${numberOfPages} pages - ${selectedGenre?.label}` : '',
-                  characters: mainCharacter ? [{ name: mainCharacter, description: characterDescription }] : [],
-                });
-                setIsSavingProject(false);
-              }}
-              disabled={generatedPages.length === 0 || isSavingProject}
-              variant="outline"
-              className="border-violet-500 text-violet-600 hover:bg-violet-50"
-            >
-              {isSavingProject ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-              Sauvegarder
-            </Button>
-
-            <Button
-              onClick={exportToPDF}
-              disabled={generatedPages.length === 0}
-              variant="outline"
-              className="border-green-500 text-green-600 hover:bg-green-50"
-            >
-              <Download className="mr-2 h-4 w-4" />
-              Exporter PDF ({generatedPages.length + 4} pages)
-            </Button>
           </div>
+          
+          {/* Section Export NOUVEAU 2026 */}
+          {generatedPages.length > 0 && (
+            <div className="mt-4">
+              <ExportSection
+                onExportPDF={exportToPDF}
+                onExportWord={exportToPDF}
+                onSave={async () => {
+                  setIsSavingProject(true);
+                  const selectedGenre = GENRES.find(g => g.value === genre);
+                  await saveSpecializedProject({
+                    title: title || `BD - ${selectedGenre?.label || genre}`,
+                    project_type: 'comic',
+                    target_audience: ageGroup,
+                    ebook_images: generatedPages.flatMap(p => p.panels.map(panel => ({ url: panel.imageUrl, title: panel.action }))),
+                    chapters: generatedPages.map(p => ({
+                      title: `Page ${p.pageNumber}`,
+                      content: p.panels.map(panel => `${panel.character}: ${panel.dialogue}`).join('\n'),
+                    })),
+                    number_of_chapters: generatedPages.length,
+                    book_summary: scenario ? `Scénario ${numberOfPages} pages - ${selectedGenre?.label}` : '',
+                    characters: mainCharacter ? [{ name: mainCharacter, description: characterDescription }] : [],
+                  });
+                  setIsSavingProject(false);
+                }}
+                isSaving={isSavingProject}
+                pdfLabel={`PDF (${generatedPages.length + 4} pages)`}
+                wordLabel="PDF HD"
+              />
+            </div>
+          )}
         </CardContent>
       </Card>
 

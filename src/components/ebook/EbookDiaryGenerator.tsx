@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import { toast } from 'sonner';
 import { Heart, Star, Sparkles, Download, Loader2, BookHeart, Calendar, Flower2, Moon, Sun, Rainbow, Crown, Save, FileText } from 'lucide-react';
+import ExportSection from './ExportSection';
 import { supabase } from '@/integrations/supabase/client';
 import jsPDF from 'jspdf';
 import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, PageBreak, BorderStyle } from 'docx';
@@ -1046,51 +1047,34 @@ High quality, professional book cover design, vertical format 6x9 inches.`;
               )}
             </Button>
 
-            {generatedPages.length > 0 && (
-              <>
-                <Button
-                  onClick={async () => {
-                    setIsSavingProject(true);
-                    const selectedTheme = DIARY_THEMES.find(t => t.id === theme);
-                    const selectedType = DIARY_TYPES.find(t => t.id === diaryType);
-                    await saveSpecializedProject({
-                      title: customTitle || `${selectedType?.label || 'Journal'} ${year}`,
-                      author_name: firstName || '',
-                      project_type: 'diary',
-                      target_audience: ageGroup,
-                      ebook_images: generatedCover ? [{ url: generatedCover, title: 'Couverture' }] : [],
-                      number_of_chapters: generatedPages.length,
-                      book_summary: `${selectedType?.label} - Thème: ${selectedTheme?.label}`,
-                      chapters: generatedPages,
-                    });
-                    setIsSavingProject(false);
-                  }}
-                  disabled={isSavingProject}
-                  variant="outline"
-                  className="border-violet-300 text-violet-700 hover:bg-violet-50"
-                >
-                  {isSavingProject ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
-                  Sauvegarder
-                </Button>
-                <Button
-                  onClick={exportToPDF}
-                  variant="outline"
-                  className="border-pink-300 text-pink-700 hover:bg-pink-50"
-                >
-                  <Download className="w-4 h-4 mr-2" />
-                  PDF KDP
-                </Button>
-                <Button
-                  onClick={exportToWord}
-                  variant="outline"
-                  className="border-blue-300 text-blue-700 hover:bg-blue-50"
-                >
-                  <FileText className="w-4 h-4 mr-2" />
-                  Word KDP
-                </Button>
-              </>
-            )}
           </div>
+
+          {/* Section Export NOUVEAU 2026 */}
+          {generatedPages.length > 0 && (
+            <ExportSection
+              onExportPDF={exportToPDF}
+              onExportWord={exportToWord}
+              onSave={async () => {
+                setIsSavingProject(true);
+                const selectedTheme = DIARY_THEMES.find(t => t.id === theme);
+                const selectedType = DIARY_TYPES.find(t => t.id === diaryType);
+                await saveSpecializedProject({
+                  title: customTitle || `${selectedType?.label || 'Journal'} ${year}`,
+                  author_name: firstName || '',
+                  project_type: 'diary',
+                  target_audience: ageGroup,
+                  ebook_images: generatedCover ? [{ url: generatedCover, title: 'Couverture' }] : [],
+                  number_of_chapters: generatedPages.length,
+                  book_summary: `${selectedType?.label} - Thème: ${selectedTheme?.label}`,
+                  chapters: generatedPages,
+                });
+                setIsSavingProject(false);
+              }}
+              isSaving={isSavingProject}
+              pdfLabel="PDF KDP"
+              wordLabel="Word KDP"
+            />
+          )}
 
           {/* Summary */}
           {generatedPages.length > 0 && (

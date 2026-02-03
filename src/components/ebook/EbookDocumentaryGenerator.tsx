@@ -17,6 +17,7 @@ import {
   Eye, Edit, Plus, Trash2, GripVertical, Lightbulb, Target, BookMarked,
   FileType, Save
 } from 'lucide-react';
+import ExportSection from './ExportSection';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
@@ -1660,56 +1661,44 @@ Inclus des faits marquants et des anecdotes.`;
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-3">
-                  <Button
-                    onClick={async () => {
-                      if (!book) return;
-                      setIsSavingProject(true);
-                      await saveSpecializedProject({
-                        title: book.title,
-                        author_name: book.author,
-                        project_type: 'documentary',
-                        target_audience: targetAudience,
-                        preface: book.introduction,
-                        conclusion: book.conclusion,
-                        chapters: book.chapters.map(ch => ({
-                          title: ch.title,
-                          content: ch.content,
-                          facts: ch.facts,
-                          sources: ch.sources,
-                        })),
-                        number_of_chapters: book.chapters.length,
-                        book_summary: book.subtitle,
-                      });
-                      setIsSavingProject(false);
-                    }}
-                    disabled={isSavingProject}
-                    className="w-full h-12 bg-violet-600 hover:bg-violet-700"
-                    size="lg"
-                  >
-                    {isSavingProject ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : <Save className="w-5 h-5 mr-2" />}
-                    Sauvegarder dans mes projets
-                  </Button>
-                  
-                  <Button onClick={exportToWord} className="w-full h-12 bg-blue-600 hover:bg-blue-700" size="lg">
-                    <FileType className="w-5 h-5 mr-2" />
-                    Télécharger en Word (.docx)
-                  </Button>
-                  
-                  <Button onClick={exportToPDF} variant="outline" className="w-full h-12" size="lg">
-                    <Download className="w-5 h-5 mr-2" />
-                    Télécharger en PDF
-                  </Button>
-                  
-                  <Button
-                    variant="ghost"
-                    onClick={() => setBook(null)}
-                    className="w-full"
-                  >
-                    <RefreshCw className="w-4 h-4 mr-2" />
-                    Créer un nouveau documentaire
-                  </Button>
-                </div>
+                {/* Section Export NOUVEAU 2026 */}
+                <ExportSection
+                  onExportPDF={exportToPDF}
+                  onExportWord={exportToWord}
+                  onSave={async () => {
+                    if (!book) return;
+                    setIsSavingProject(true);
+                    await saveSpecializedProject({
+                      title: book.title,
+                      author_name: book.author,
+                      project_type: 'documentary',
+                      target_audience: targetAudience,
+                      preface: book.introduction,
+                      conclusion: book.conclusion,
+                      chapters: book.chapters.map(ch => ({
+                        title: ch.title,
+                        content: ch.content,
+                        facts: ch.facts,
+                        sources: ch.sources,
+                      })),
+                      number_of_chapters: book.chapters.length,
+                      book_summary: book.subtitle,
+                    });
+                    setIsSavingProject(false);
+                  }}
+                  isSaving={isSavingProject}
+                  pdfLabel="PDF"
+                  wordLabel="Word (.docx)"
+                />
+
+                <Button
+                  variant="ghost"
+                  onClick={() => setBook(null)}
+                  className="w-full mt-3"
+                >
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Créer un nouveau documentaire
+                </Button>
               </CardContent>
             </Card>
           </TabsContent>
