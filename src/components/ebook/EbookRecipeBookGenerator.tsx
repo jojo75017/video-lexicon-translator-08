@@ -60,11 +60,24 @@ const recipeCategories = [
   { value: 'petit-dejeuner', label: '🥐 Petit-déjeuner' },
 ];
 
+// Exemples de titres pour inspirer les utilisateurs
+const exampleTitles = [
+  { title: "Les Délices de Grand-Mère", style: "française" },
+  { title: "Saveurs d'Italie", style: "italienne" },
+  { title: "Voyage Culinaire en Asie", style: "asiatique" },
+  { title: "Ma Cuisine Vegan au Quotidien", style: "vegan" },
+  { title: "Recettes Fitness & Protéinées", style: "healthy" },
+  { title: "Pâtisserie Maison Facile", style: "desserts" },
+  { title: "30 Minutes Chrono", style: "rapide" },
+  { title: "Recettes Méditerranéennes", style: "méditerranéenne" },
+];
+
 const EbookRecipeBookGenerator: React.FC<EbookRecipeBookGeneratorProps> = ({ ebookTitle = '' }) => {
-  const [bookTitle, setBookTitle] = useState(ebookTitle || 'Mon Livre de Recettes');
+  const [bookTitle, setBookTitle] = useState(ebookTitle || '');
   const [authorName, setAuthorName] = useState('');
   const [cuisineStyle, setCuisineStyle] = useState('française');
   const [numberOfRecipes, setNumberOfRecipes] = useState(10);
+  const [numberOfPhotos, setNumberOfPhotos] = useState(10);
   const [includeNutrition, setIncludeNutrition] = useState(true);
   const [includeImages, setIncludeImages] = useState(true);
   const [targetAudience, setTargetAudience] = useState('tous');
@@ -77,6 +90,11 @@ const EbookRecipeBookGenerator: React.FC<EbookRecipeBookGeneratorProps> = ({ ebo
   const [copiedId, setCopiedId] = useState<string | null>(null);
   
   const [selectedCategories, setSelectedCategories] = useState<string[]>(['entree', 'plat', 'dessert']);
+
+  const applyExampleTitle = (example: { title: string; style: string }) => {
+    setBookTitle(example.title);
+    setCuisineStyle(example.style);
+  };
 
   const toggleCategory = (category: string) => {
     setSelectedCategories(prev => 
@@ -186,10 +204,12 @@ Retourne les recettes au format JSON:
       setCurrentStep('Génération terminée !');
       toast.success(`${allRecipes.length} recettes générées avec succès !`);
 
-      // Générer les images si demandé
+      // Générer les images si demandé (nombre configurable)
       if (includeImages && allRecipes.length > 0) {
-        setCurrentStep('Génération des images...');
-        for (let i = 0; i < Math.min(allRecipes.length, 5); i++) {
+        const photosToGenerate = Math.min(allRecipes.length, numberOfPhotos);
+        setCurrentStep(`Génération des ${photosToGenerate} photos...`);
+        for (let i = 0; i < photosToGenerate; i++) {
+          setCurrentStep(`Génération photo ${i + 1}/${photosToGenerate}...`);
           await generateRecipeImage(allRecipes[i].id, allRecipes[i].title);
         }
       }
@@ -311,9 +331,25 @@ ${recipe.nutritionInfo ? `\n📊 Nutrition: ${recipe.nutritionInfo}` : ''}
               <Input
                 value={bookTitle}
                 onChange={(e) => setBookTitle(e.target.value)}
-                placeholder="ex: Les Délices de Grand-Mère"
+                placeholder="Cliquez sur un exemple ci-dessous ou tapez votre titre"
                 className="mt-1"
               />
+              {/* Exemples de titres cliquables */}
+              <div className="mt-2">
+                <p className="text-xs text-muted-foreground mb-1.5">💡 Exemples (cliquez pour utiliser) :</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {exampleTitles.map((example, idx) => (
+                    <Badge
+                      key={idx}
+                      variant="outline"
+                      className="cursor-pointer text-xs hover:bg-primary/10 transition-colors"
+                      onClick={() => applyExampleTitle(example)}
+                    >
+                      {example.title}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
             </div>
             <div>
               <Label>Auteur</Label>
@@ -418,10 +454,32 @@ ${recipe.nutritionInfo ? `\n📊 Nutrition: ${recipe.nutritionInfo}` : ''}
                 onCheckedChange={(checked) => setIncludeImages(!!checked)}
               />
               <Label htmlFor="includeImages" className="flex items-center gap-2 cursor-pointer">
-                <ImageIcon className="w-4 h-4 text-blue-500" />
-                Générer les photos (5 premières recettes)
+                <ImageIcon className="w-4 h-4 text-primary" />
+                Générer les photos des recettes
               </Label>
             </div>
+
+            {/* Slider nombre de photos - affiché seulement si includeImages est true */}
+            {includeImages && (
+              <div className="pl-6 border-l-2 border-primary/30">
+                <Label>Nombre de photos à générer : {numberOfPhotos}</Label>
+                <input
+                  type="range"
+                  min="5"
+                  max="30"
+                  value={numberOfPhotos}
+                  onChange={(e) => setNumberOfPhotos(parseInt(e.target.value))}
+                  className="w-full mt-2"
+                />
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>5 photos</span>
+                  <span>Toutes ({numberOfRecipes})</span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  ⚠️ Plus de photos = génération plus longue
+                </p>
+              </div>
+            )}
 
             <div>
               <Label>Instructions spéciales (optionnel)</Label>
