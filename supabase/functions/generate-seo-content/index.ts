@@ -176,7 +176,13 @@ Exemple de format: [texte d'ancre pertinent](URL)`
       : '';
 
     // Step 2: Generate full content with 12 editorial rules
+    // IMPORTANT: Pour 1500 mots minimum, on a besoin d'environ 2500-3000 tokens de sortie
     const contentPrompt = `Rédige un ${contentType || 'article'} SEO complet sur "${topic}" avec le mot-clé principal "${keyword}".
+
+=== CONTRAINTE DE LONGUEUR ABSOLUE ===
+⚠️ L'article DOIT contenir AU MINIMUM ${wordCount} MOTS.
+⚠️ Si tu n'atteins pas ${wordCount} mots, développe davantage chaque section avec plus d'exemples, de détails et d'explications.
+⚠️ Compte tes mots pendant la rédaction pour t'assurer d'atteindre l'objectif.
 
 === 12 RÈGLES ÉDITORIALES OBLIGATOIRES ===
 
@@ -200,12 +206,12 @@ Exemple de format: [texte d'ancre pertinent](URL)`
 
 10. STRUCTURE SOMMAIRE : Propose une structure détaillée H2/H3 claire pour permettre un sommaire automatique (table des matières).
 
-11. FAQ OBLIGATOIRE : L'article DOIT se terminer par une section "Foire Aux Questions" avec 3 à 5 questions/réponses courtes + 3 témoignages fictifs réalistes pour viser les requêtes longue traîne et la position Zéro.
+11. FAQ OBLIGATOIRE : L'article DOIT se terminer par une section "Foire Aux Questions" avec 5 questions/réponses détaillées + 3 témoignages fictifs réalistes pour viser les requêtes longue traîne et la position Zéro.
 
 12. CONCLUSION POSITIVE : Termine sur une note motivante ou un encouragement incitant le lecteur à passer immédiatement à l'action.
 ${internalLinksSection}
 === CONTRAINTES TECHNIQUES ===
-- Environ ${wordCount} mots
+- MINIMUM ${wordCount} mots (OBLIGATOIRE, ne pas terminer avant d'avoir atteint ce nombre)
 - Ton: ${selectedTone}
 - Audience: ${selectedAudience}
 - Intent: ${selectedIntent}
@@ -216,18 +222,23 @@ ${internalLinksSection}
 - Statistiques et exemples concrets
 ${internalLinksArray.length > 0 ? `- IMPORTANT: Intègre les ${internalLinksArray.length} liens internes fournis de manière naturelle` : ''}
 
-Structure suggérée:
-${seoAnalysis.structure?.map((s: any) => `${'#'.repeat(s.level)} ${s.title}`).join('\n') || '# Introduction\n## Section principale\n## Conseils\n# Conclusion'}
+Structure suggérée (développe CHAQUE section en profondeur pour atteindre ${wordCount} mots):
+${seoAnalysis.structure?.map((s: any) => `${'#'.repeat(s.level)} ${s.title} (${s.wordCount || 300} mots minimum)`).join('\n') || '# Introduction (250 mots)\n## Section principale (500 mots)\n## Conseils détaillés (400 mots)\n## Cas pratiques et exemples (300 mots)\n# Conclusion (150 mots)'}
 
-## FAQ (obligatoire à la fin)
+## FAQ (obligatoire à la fin - 5 questions minimum avec réponses détaillées de 50-100 mots chacune)
 ### Question 1 ?
-Réponse courte...
+Réponse développée...
 
-## Témoignages
-> "Témoignage 1..." - Prénom, Ville
+### Question 2 ?
+Réponse développée...
+
+## Témoignages (3 minimum)
+> "Témoignage détaillé 1..." - Prénom, Ville
 
 ## Conclusion
 Note motivante + call-to-action
+
+⚠️ RAPPEL FINAL: L'article DOIT faire AU MINIMUM ${wordCount} MOTS. Ne termine pas avant d'avoir atteint cet objectif.
 
 Rédige maintenant le contenu complet en respectant TOUTES les 12 règles${internalLinksArray.length > 0 ? ' et en intégrant les liens internes fournis' : ''}.`;
 
@@ -240,11 +251,11 @@ Rédige maintenant le contenu complet en respectant TOUTES les 12 règles${inter
       body: JSON.stringify({
         model: 'gpt-4o-mini',
         messages: [
-          { role: 'system', content: `Tu es un rédacteur web SEO expert. Rédige du contenu optimisé, engageant et informatif en ${selectedLanguage}.` },
+          { role: 'system', content: `Tu es un rédacteur web SEO expert. Tu rédiges TOUJOURS des articles de ${wordCount} mots minimum. Tu ne termines JAMAIS un article avant d'avoir atteint la longueur demandée. Rédige du contenu optimisé, engageant et informatif en ${selectedLanguage}.` },
           { role: 'user', content: contentPrompt }
         ],
         temperature: 0.8,
-        max_tokens: 4000,
+        max_tokens: 8000,
       }),
     });
 
