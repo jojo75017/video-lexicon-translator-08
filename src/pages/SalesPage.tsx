@@ -509,6 +509,16 @@ const SalesPage = () => {
             ✅ Aucune compétence technique requise • ✅ Résultats en quelques minutes
           </p>
 
+          {/* Phrase d'accroche au-dessus de la vidéo */}
+          <div className="text-center mb-6">
+            <p className="text-lg md:text-xl font-semibold text-foreground">
+              🎬 Regarde 3 minutes : tu verras exactement le résultat avant toute décision.
+            </p>
+            <p className="text-sm text-muted-foreground mt-1.5">
+              Sans carte bancaire • Sans engagement
+            </p>
+          </div>
+
           {/* Vidéo de présentation - Carte Premium */}
           <div className="max-w-4xl mx-auto mb-10">
             <div className="relative p-3 md:p-5 bg-gradient-to-br from-slate-50 via-violet-50/50 to-purple-50 dark:from-slate-900 dark:via-violet-950/30 dark:to-purple-950/30 rounded-3xl shadow-[0_8px_40px_-12px_rgba(139,92,246,0.25)] border border-violet-200/50 dark:border-violet-800/40">
