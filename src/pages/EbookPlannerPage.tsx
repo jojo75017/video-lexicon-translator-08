@@ -103,6 +103,7 @@ import EbookColoringBookGenerator from '@/components/ebook/EbookColoringBookGene
 import EbookComicBookGenerator from '@/components/ebook/EbookComicBookGenerator';
 import EbookDiaryGenerator from '@/components/ebook/EbookDiaryGenerator';
 import EbookDocumentaryGenerator from '@/components/ebook/EbookDocumentaryGenerator';
+import EbookRecipeBookGenerator from '@/components/ebook/EbookRecipeBookGenerator';
 
 // Composants 2026
 import EbookVideoTrailer from '@/components/ebook/EbookVideoTrailer';
@@ -2341,6 +2342,11 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       case 'diary-generator':
         return (
           <EbookDiaryGenerator ebookTitle={ebookTitle} />
+        );
+      
+      case 'recipe-book':
+        return (
+          <EbookRecipeBookGenerator ebookTitle={ebookTitle} />
         );
       
       case 'documentary':
