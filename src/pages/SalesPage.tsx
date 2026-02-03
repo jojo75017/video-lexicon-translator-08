@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, Sparkles, BookOpen, Zap, Download, Star, ArrowRight, Play, Loader2, Clock, HelpCircle, CheckCircle, Calculator, Gift, Mail, Send } from "lucide-react";
+import { Check, Sparkles, BookOpen, Zap, Download, Star, ArrowRight, Play, Loader2, Clock, HelpCircle, CheckCircle, CheckCircle2, Calculator, Gift, Mail, Send, Rocket } from "lucide-react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -563,6 +563,42 @@ const SalesPage = () => {
                 </Button>
                 <p className="text-xs text-muted-foreground mt-3">
                   ✅ Sans carte bancaire • ✅ Accès immédiat
+                </p>
+          </div>
+            </div>
+          </div>
+
+          {/* Section Tunnel de vente 2026 - Premium */}
+          <div className="max-w-3xl mx-auto mb-10">
+            <div className="relative p-6 md:p-8 bg-gradient-to-br from-slate-50 via-blue-50/40 to-indigo-50/50 dark:from-slate-900 dark:via-blue-950/20 dark:to-indigo-950/30 rounded-2xl border border-blue-200/60 dark:border-blue-800/40 shadow-lg">
+              {/* Icône décorative */}
+              <div className="absolute -top-4 left-6 md:left-8">
+                <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-2.5 rounded-xl shadow-lg">
+                  <Rocket className="w-5 h-5 text-white" />
+                </div>
+              </div>
+              
+              <div className="pt-2">
+                <h3 className="text-lg md:text-xl font-bold text-foreground mb-3 flex items-center gap-2">
+                  🔧 Tunnel de vente clé en main (2026)
+                </h3>
+                
+                <p className="text-sm md:text-base text-muted-foreground leading-relaxed mb-3">
+                  En 2026, EbookStudio Pro proposera un <strong className="text-foreground">tunnel de vente prêt à l'emploi</strong> pour vendre votre ebook, basé sur Systeme.io.
+                </p>
+                
+                <p className="text-sm md:text-base text-muted-foreground leading-relaxed mb-4">
+                  <span className="inline-flex items-center gap-1.5 mr-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Pages + emails déjà configurés</span>
+                  <span className="inline-flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Aucune compétence technique requise</span>
+                </p>
+                
+                <p className="text-sm text-foreground font-medium mb-3">
+                  👉 Il suffira de brancher votre ebook et vos liens.
+                </p>
+                
+                {/* Note discrète */}
+                <p className="text-xs text-muted-foreground/80 italic border-t border-blue-200/50 dark:border-blue-800/30 pt-3 mt-2">
+                  📌 Le tunnel sera fourni sous forme de liens et modèles compatibles Systeme.io (non intégré directement dans l'outil).
                 </p>
               </div>
             </div>
