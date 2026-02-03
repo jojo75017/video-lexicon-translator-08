@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import { Loader2, Palette, Download, RefreshCw, Sparkles, Baby, ImagePlus, BookOpen, Wand2, FileDown, AlertTriangle, Save, FileText } from 'lucide-react';
+import ExportSection from './ExportSection';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import jsPDF from 'jspdf';
@@ -1473,69 +1474,33 @@ CRITICAL REQUIREMENTS:
               <BookOpen className="h-5 w-5 text-green-500" />
               Pages générées ({generatedPages.length})
             </CardTitle>
-            <div className="flex gap-2 flex-wrap">
-              <Button
-                onClick={async () => {
-                  setIsSavingProject(true);
-                  const selectedTheme = THEMES.find(t => t.value === theme);
-                  await saveSpecializedProject({
-                    title: `Coloriage - ${selectedTheme?.label || theme}`,
-                    project_type: 'coloring',
-                    target_audience: ageGroup,
-                    ebook_images: generatedPages.map(p => ({ url: p.imageUrl, title: p.title })),
-                    number_of_chapters: generatedPages.length,
-                    book_summary: customPrompt || `Livre de coloriage thème ${selectedTheme?.label || theme}`,
-                  });
-                  setIsSavingProject(false);
-                }}
-                disabled={isSavingProject || isExporting}
-                variant="outline"
-                className="border-violet-500 text-violet-600 hover:bg-violet-50"
-              >
-                {isSavingProject ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Save className="mr-2 h-4 w-4" />
-                )}
-                Sauvegarder
-              </Button>
-              <Button
-                onClick={exportToPDF}
-                disabled={isExporting || isGenerating}
-                className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white"
-              >
-                {isExporting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Export en cours...
-                  </>
-                ) : (
-                  <>
-                    <FileDown className="mr-2 h-4 w-4" />
-                    PDF (impression)
-                  </>
-                )}
-              </Button>
-              <Button
-                onClick={exportToWord}
-                disabled={isExporting || isGenerating}
-                variant="outline"
-                className="border-blue-500 text-blue-600 hover:bg-blue-50"
-              >
-                {isExporting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Export...
-                  </>
-                ) : (
-                  <>
-                    <FileText className="mr-2 h-4 w-4" />
-                    Word (modifiable)
-                  </>
-                )}
-              </Button>
-            </div>
           </CardHeader>
+          
+          {/* Section Export NOUVEAU 2026 */}
+          <div className="px-6 pb-4">
+            <ExportSection
+              onExportPDF={exportToPDF}
+              onExportWord={exportToWord}
+              onSave={async () => {
+                setIsSavingProject(true);
+                const selectedTheme = THEMES.find(t => t.value === theme);
+                await saveSpecializedProject({
+                  title: `Coloriage - ${selectedTheme?.label || theme}`,
+                  project_type: 'coloring',
+                  target_audience: ageGroup,
+                  ebook_images: generatedPages.map(p => ({ url: p.imageUrl, title: p.title })),
+                  number_of_chapters: generatedPages.length,
+                  book_summary: customPrompt || `Livre de coloriage thème ${selectedTheme?.label || theme}`,
+                });
+                setIsSavingProject(false);
+              }}
+              isExporting={isExporting}
+              isSaving={isSavingProject}
+              disabled={isGenerating}
+              pdfLabel="PDF (impression)"
+              wordLabel="Word (modifiable)"
+            />
+          </div>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {generatedPages.map((page, index) => (

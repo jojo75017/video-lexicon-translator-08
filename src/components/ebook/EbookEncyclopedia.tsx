@@ -11,6 +11,7 @@ import {
   Plus, Trash2, Download, Copy, Sparkles, Search,
   TreeDeciduous, Waves, Info
 } from 'lucide-react';
+import ExportSection from './ExportSection';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -372,6 +373,17 @@ ${safeString(card.funFacts)}
         </Card>
       )}
 
+      {/* Section Export NOUVEAU 2026 */}
+      {cards.length > 0 && (
+        <ExportSection
+          onExportPDF={exportAllCards}
+          onExportWord={exportAllCards}
+          showSave={false}
+          pdfLabel="Export Markdown"
+          wordLabel="Export Texte"
+        />
+      )}
+
       {/* Fiches générées */}
       {cards.length > 0 && (
         <Card>
@@ -382,10 +394,6 @@ ${safeString(card.funFacts)}
                 Fiches générées ({cards.length})
               </CardTitle>
             </div>
-            <Button variant="outline" onClick={exportAllCards}>
-              <Download className="w-4 h-4 mr-2" />
-              Exporter tout
-            </Button>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
