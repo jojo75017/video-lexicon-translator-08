@@ -339,28 +339,68 @@ const SalesPage = () => {
         </div>
       </header>
 
-      {/* Bannière Lancement Spécial */}
-      <div className="bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-white py-5 px-4 text-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxjaXJjbGUgZmlsbD0iI2ZmZiIgZmlsbC1vcGFjaXR5PSIuMSIgY3g9IjIwIiBjeT0iMjAiIHI9IjIiLz48L2c+PC9zdmc+')] opacity-30" />
+      {/* Bannière Avant / Après */}
+      <div className="bg-gradient-to-r from-slate-900 via-violet-950 to-slate-900 text-white py-8 px-4 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxjaXJjbGUgZmlsbD0iI2ZmZiIgZmlsbC1vcGFjaXR5PSIuMDUiIGN4PSIyMCIgY3k9IjIwIiByPSIyIi8+PC9nPjwvc3ZnPg==')] opacity-50" />
         <div className="relative z-10 max-w-4xl mx-auto">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <span className="text-3xl">🙏</span>
-            <span className="font-bold text-xl md:text-2xl">
-              Merci d'être arrivé(e) jusqu'ici !
-            </span>
-            <span className="text-3xl">❤️</span>
+          <h2 className="text-center text-xl md:text-2xl font-bold mb-6">
+            🕐 Résultat en <span className="text-violet-400">5 minutes</span>
+          </h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* AVANT */}
+            <div className="bg-red-950/40 border border-red-500/30 rounded-xl p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-2xl">❌</span>
+                <span className="font-bold text-lg text-red-300">AVANT</span>
+              </div>
+              <ul className="space-y-2 text-sm text-red-200/90">
+                <li className="flex items-start gap-2">
+                  <span className="text-red-400 mt-0.5">•</span>
+                  <span>Page blanche pendant des heures</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-red-400 mt-0.5">•</span>
+                  <span>Pas d'idée de structure</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-red-400 mt-0.5">•</span>
+                  <span>Syndrome de l'imposteur</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-red-400 mt-0.5">•</span>
+                  <span>Projet abandonné en cours de route</span>
+                </li>
+              </ul>
+            </div>
+            {/* APRÈS */}
+            <div className="bg-emerald-950/40 border border-emerald-500/30 rounded-xl p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-2xl">✅</span>
+                <span className="font-bold text-lg text-emerald-300">APRÈS (5 min)</span>
+              </div>
+              <ul className="space-y-2 text-sm text-emerald-200/90">
+                <li className="flex items-start gap-2">
+                  <span className="text-emerald-400 mt-0.5">•</span>
+                  <span>Plan complet généré automatiquement</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-emerald-400 mt-0.5">•</span>
+                  <span>Structure claire chapitre par chapitre</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-emerald-400 mt-0.5">•</span>
+                  <span>Premiers contenus déjà rédigés</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-emerald-400 mt-0.5">•</span>
+                  <span>Prêt à exporter et publier</span>
+                </li>
+              </ul>
+            </div>
           </div>
-          <p className="text-base md:text-lg font-medium mb-3">
-            Vous faites partie des personnes qui veulent <strong>vraiment</strong> changer leur vie avec l'écriture.
+          <p className="text-center text-sm text-white/70 mt-5">
+            ⚡ Offre lancement : <span className="font-bold text-yellow-300">37€</span> au lieu de 97€ — Réservée aux 20 premiers
           </p>
-          <div className="bg-white/20 backdrop-blur-sm px-4 py-3 rounded-xl inline-block">
-            <p className="text-sm md:text-base font-bold">
-              🎁 Pour vous remercier : <span className="text-yellow-200">Accès à vie pour seulement 37€</span> au lieu de 97€
-            </p>
-            <p className="text-xs mt-1 opacity-90">
-              ⚡ Offre réservée aux <strong>20 premiers inscrits</strong> – Ensuite le prix remonte
-            </p>
-          </div>
         </div>
       </div>
 
@@ -424,6 +464,31 @@ const SalesPage = () => {
               <Play className="w-4 h-4" />
               Découvrez en 3 minutes comment créer votre premier ebook
             </p>
+          </div>
+
+          {/* Section "Tu obtiens exactement" */}
+          <div className="max-w-3xl mx-auto mb-8 p-6 bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/30 dark:to-yellow-950/30 rounded-2xl border border-amber-300 dark:border-amber-700">
+            <h3 className="text-xl md:text-2xl font-bold text-center mb-5 text-amber-900 dark:text-amber-100">
+              🎯 Tu obtiens exactement :
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-white/80 dark:bg-white/10 rounded-xl p-4 text-center border border-amber-200 dark:border-amber-700/50">
+                <div className="text-2xl mb-2">📋</div>
+                <span className="font-semibold text-sm text-foreground">Plan complet</span>
+              </div>
+              <div className="bg-white/80 dark:bg-white/10 rounded-xl p-4 text-center border border-amber-200 dark:border-amber-700/50">
+                <div className="text-2xl mb-2">🏗️</div>
+                <span className="font-semibold text-sm text-foreground">Structure détaillée</span>
+              </div>
+              <div className="bg-white/80 dark:bg-white/10 rounded-xl p-4 text-center border border-amber-200 dark:border-amber-700/50">
+                <div className="text-2xl mb-2">✍️</div>
+                <span className="font-semibold text-sm text-foreground">Premiers chapitres</span>
+              </div>
+              <div className="bg-white/80 dark:bg-white/10 rounded-xl p-4 text-center border border-amber-200 dark:border-amber-700/50">
+                <div className="text-2xl mb-2">📤</div>
+                <span className="font-semibold text-sm text-foreground">Export PDF/EPUB</span>
+              </div>
+            </div>
           </div>
 
           {/* Bloc Démo - Résultat immédiat */}
@@ -936,17 +1001,35 @@ const SalesPage = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Bouton bonus fallback (mobile) */}
+      {/* Bouton Sticky Démo Gratuite - Mobile (bottom) */}
       <div className="fixed bottom-4 left-4 right-4 z-40 md:hidden">
         <button
           onClick={() => {
-            generateKdpNichesPdf();
-            toast.success("🎉 Votre guide PDF a été téléchargé !");
+            const demoSection = document.getElementById('demo');
+            if (demoSection) {
+              demoSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
           }}
-          className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-medium py-3 px-4 rounded-full shadow-lg hover:shadow-xl transition-all"
+          className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-violet-600 to-purple-600 text-white text-sm font-bold py-4 px-4 rounded-full shadow-xl hover:shadow-2xl transition-all border-2 border-white/20"
         >
-          <Gift className="w-4 h-4" />
-          <span>🎁 Télécharger le Guide Gratuit (10 Niches KDP)</span>
+          <Play className="w-5 h-5" />
+          <span>Démo gratuite (sans email)</span>
+        </button>
+      </div>
+
+      {/* Bouton Sticky Démo Gratuite - Desktop (coin bas droit) */}
+      <div className="hidden md:block fixed bottom-6 right-6 z-40">
+        <button
+          onClick={() => {
+            const demoSection = document.getElementById('demo');
+            if (demoSection) {
+              demoSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          }}
+          className="flex items-center gap-2 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm text-violet-700 dark:text-violet-300 text-sm font-semibold py-3 px-5 rounded-full shadow-lg hover:shadow-xl transition-all border border-violet-200 dark:border-violet-700 hover:bg-violet-50 dark:hover:bg-violet-900/50"
+        >
+          <Play className="w-4 h-4" />
+          <span>Démo gratuite (sans email)</span>
         </button>
       </div>
 
