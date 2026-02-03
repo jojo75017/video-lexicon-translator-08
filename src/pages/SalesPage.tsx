@@ -509,11 +509,20 @@ const SalesPage = () => {
             ✅ Aucune compétence technique requise • ✅ Résultats en quelques minutes
           </p>
 
-          {/* Vidéo de présentation */}
-          <div className="max-w-3xl mx-auto mb-10">
-            <Card className="overflow-hidden border-2 border-primary/30 shadow-2xl">
-              <CardContent className="p-0">
-                <div className="relative aspect-video">
+          {/* Vidéo de présentation - Carte Premium */}
+          <div className="max-w-4xl mx-auto mb-10">
+            <div className="relative p-3 md:p-5 bg-gradient-to-br from-slate-50 via-violet-50/50 to-purple-50 dark:from-slate-900 dark:via-violet-950/30 dark:to-purple-950/30 rounded-3xl shadow-[0_8px_40px_-12px_rgba(139,92,246,0.25)] border border-violet-200/50 dark:border-violet-800/40">
+              {/* Badge premium */}
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
+                <Badge className="bg-gradient-to-r from-violet-600 to-purple-600 text-white border-0 shadow-lg px-4 py-1.5 text-sm">
+                  <Play className="w-3.5 h-3.5 mr-1.5" />
+                  Vidéo démo (3 min)
+                </Badge>
+              </div>
+              
+              {/* Conteneur vidéo agrandi */}
+              <div className="relative rounded-2xl overflow-hidden shadow-xl border border-violet-300/30 dark:border-violet-700/30">
+                <div className="relative" style={{ paddingBottom: '62.5%' }}> {/* Ratio 16:10 pour plus de hauteur */}
                   <iframe 
                     title="Présentation EbookStudio" 
                     src="https://player.vimeo.com/video/1153641502?h=d5388db3e9" 
@@ -524,12 +533,39 @@ const SalesPage = () => {
                     allowFullScreen
                   />
                 </div>
-              </CardContent>
-            </Card>
-            <p className="text-sm text-muted-foreground mt-3 flex items-center justify-center gap-2">
-              <Play className="w-4 h-4" />
-              Découvrez en 3 minutes comment créer votre premier ebook
-            </p>
+              </div>
+              
+              {/* Repères de timing */}
+              <div className="flex justify-center gap-4 md:gap-8 mt-4 text-xs md:text-sm text-muted-foreground">
+                <div className="flex items-center gap-1.5 bg-white/80 dark:bg-white/10 px-3 py-1.5 rounded-full border border-violet-200 dark:border-violet-700/50">
+                  <Clock className="w-3.5 h-3.5 text-violet-500" />
+                  <span><strong className="text-foreground">0:20</strong> – Présentation</span>
+                </div>
+                <div className="flex items-center gap-1.5 bg-white/80 dark:bg-white/10 px-3 py-1.5 rounded-full border border-violet-200 dark:border-violet-700/50">
+                  <Clock className="w-3.5 h-3.5 text-violet-500" />
+                  <span><strong className="text-foreground">1:10</strong> – Génération IA</span>
+                </div>
+                <div className="flex items-center gap-1.5 bg-white/80 dark:bg-white/10 px-3 py-1.5 rounded-full border border-violet-200 dark:border-violet-700/50">
+                  <Clock className="w-3.5 h-3.5 text-violet-500" />
+                  <span><strong className="text-foreground">2:15</strong> – Résultat</span>
+                </div>
+              </div>
+              
+              {/* CTA unique sous la vidéo */}
+              <div className="mt-5 text-center">
+                <Button 
+                  size="lg" 
+                  className="text-base md:text-lg px-8 py-6 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                  onClick={() => document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' })}
+                >
+                  <Play className="w-5 h-5 mr-2" />
+                  Accéder à la démo gratuite (sans carte bancaire)
+                </Button>
+                <p className="text-xs text-muted-foreground mt-3">
+                  ✅ Sans carte bancaire • ✅ Accès immédiat
+                </p>
+              </div>
+            </div>
           </div>
 
           {/* Section "Ce que la démo te montre en 5 minutes" */}
