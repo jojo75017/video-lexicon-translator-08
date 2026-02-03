@@ -115,6 +115,7 @@ import EbookHumanizer from '@/components/ebook/EbookHumanizer';
 import EbookArcManager from '@/components/ebook/EbookArcManager';
 import EbookDirectSales from '@/components/ebook/EbookDirectSales';
 import EbookBsrTracker from '@/components/ebook/EbookBsrTracker';
+import EbookExportGuide from '@/components/ebook/EbookExportGuide';
 import SubscriberActivityPopup from '@/components/admin/SubscriberActivityPopup';
 
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
@@ -2019,6 +2020,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             onInsertImageToChapter={handleInsertImageToChapter}
           />
         );
+      
+      case 'export-guide':
+        return <EbookExportGuide />;
       
       case 'export':
         // Bloquer l'export en mode démo
