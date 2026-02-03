@@ -398,9 +398,21 @@ const SalesPage = () => {
               </ul>
             </div>
           </div>
-          <p className="text-center text-sm text-white/70 mt-5">
-            ⚡ Offre lancement : <span className="font-bold text-yellow-300">37€</span> au lieu de 97€ — Réservée aux 20 premiers
-          </p>
+          
+          {/* CTA sous Avant/Après */}
+          <div className="mt-6 flex flex-col items-center">
+            <Button 
+              size="lg" 
+              className="text-base md:text-lg px-6 py-5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 shadow-lg mb-3"
+              onClick={() => document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' })}
+            >
+              <Play className="w-5 h-5 mr-2" />
+              Voir le résultat par moi-même (démo gratuite)
+            </Button>
+            <p className="text-xs text-white/70">
+              ✅ Sans carte bancaire • ✅ Résultat visible en 5 min
+            </p>
+          </div>
         </div>
       </div>
 
@@ -409,18 +421,72 @@ const SalesPage = () => {
         <div className="absolute inset-0 bg-grid-pattern opacity-5" />
         <div className="max-w-6xl mx-auto text-center relative z-10">
           
-          {/* Message personnel */}
-          <div className="max-w-3xl mx-auto mb-8 p-6 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 rounded-2xl border-2 border-amber-200 dark:border-amber-800">
-            <p className="text-lg md:text-xl text-amber-900 dark:text-amber-100 leading-relaxed">
-              <span className="text-2xl">👋</span> <strong>Salut !</strong> Si vous êtes ici, c'est que vous avez un rêve : 
-              <strong> écrire et publier votre propre livre</strong>. 
-              <br className="hidden md:block" />
-              Je sais à quel point ça peut sembler compliqué... C'est pour ça que j'ai créé cet outil.
-              <br />
-              <span className="text-amber-700 dark:text-amber-300 font-semibold">
-                En vous inscrivant aujourd'hui, vous rejoignez une communauté d'auteurs qui osent se lancer. 🚀
-              </span>
-            </p>
+          {/* Preuve concrète : exemple réel généré */}
+          <div className="max-w-4xl mx-auto mb-10 p-6 md:p-8 bg-gradient-to-br from-violet-50 via-indigo-50 to-purple-50 dark:from-violet-950/40 dark:via-indigo-950/30 dark:to-purple-950/40 rounded-2xl border-2 border-violet-300 dark:border-violet-700 shadow-xl">
+            <h2 className="text-xl md:text-2xl font-bold text-center mb-6 text-foreground">
+              📖 Exemple réel généré en 5 minutes
+            </h2>
+            
+            <div className="grid md:grid-cols-2 gap-6 mb-6">
+              {/* Plan généré */}
+              <div className="bg-white/80 dark:bg-white/10 rounded-xl p-5 border border-violet-200 dark:border-violet-700/50">
+                <h3 className="font-bold text-lg mb-3 text-foreground flex items-center gap-2">
+                  <span className="text-xl">📋</span> Plan généré :
+                </h3>
+                <p className="text-sm font-semibold text-violet-700 dark:text-violet-300 mb-3">
+                  "Créer un revenu avec un ebook"
+                </p>
+                <ol className="space-y-2 text-sm text-muted-foreground">
+                  <li className="flex items-start gap-2">
+                    <span className="bg-violet-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0 mt-0.5">1</span>
+                    <span>Introduction : pourquoi l'ebook reste rentable</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="bg-violet-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0 mt-0.5">2</span>
+                    <span>Choisir un sujet qui se vend</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="bg-violet-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0 mt-0.5">3</span>
+                    <span>Structurer un ebook clair et logique</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="bg-violet-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0 mt-0.5">4</span>
+                    <span>Rédiger rapidement sans blocage</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="bg-violet-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0 mt-0.5">5</span>
+                    <span>Publier et vendre son ebook</span>
+                  </li>
+                </ol>
+              </div>
+              
+              {/* Extrait de chapitre */}
+              <div className="bg-white/80 dark:bg-white/10 rounded-xl p-5 border border-emerald-200 dark:border-emerald-700/50">
+                <h3 className="font-bold text-lg mb-3 text-foreground flex items-start gap-2">
+                  <span className="text-xl">✍️</span> Extrait généré :
+                </h3>
+                <blockquote className="text-sm text-muted-foreground italic border-l-4 border-emerald-400 pl-4 py-2 bg-emerald-50/50 dark:bg-emerald-950/30 rounded-r-lg leading-relaxed">
+                  "Créer un ebook rentable ne demande pas d'être écrivain professionnel. La clé est d'avoir une structure claire, un objectif précis et une méthode simple. Dans ce chapitre, nous allons poser les bases pour passer de l'idée à un contenu concret…"
+                </blockquote>
+                <p className="text-xs text-muted-foreground mt-3 text-center">
+                  ⚡ Généré automatiquement en quelques secondes
+                </p>
+              </div>
+            </div>
+            
+            <div className="text-center">
+              <Button 
+                size="lg" 
+                className="text-lg px-8 py-6 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 shadow-lg mb-3"
+                onClick={() => document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' })}
+              >
+                <Play className="w-5 h-5 mr-2" />
+                Accéder à la démo gratuite (sans carte bancaire)
+              </Button>
+              <p className="text-sm text-muted-foreground">
+                ✅ Accès immédiat • ✅ Aucune inscription requise • ✅ Tu juges par toi-même
+              </p>
+            </div>
           </div>
           
           <Badge className="mb-6 bg-primary/10 text-primary border-primary/20 px-4 py-2">
@@ -466,25 +532,25 @@ const SalesPage = () => {
             </p>
           </div>
 
-          {/* Section "Tu obtiens exactement" */}
-          <div className="max-w-3xl mx-auto mb-8 p-6 bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/30 dark:to-yellow-950/30 rounded-2xl border border-amber-300 dark:border-amber-700">
-            <h3 className="text-xl md:text-2xl font-bold text-center mb-5 text-amber-900 dark:text-amber-100">
-              🎯 Tu obtiens exactement :
+          {/* Section "Ce que la démo te montre en 5 minutes" */}
+          <div className="max-w-3xl mx-auto mb-8 p-6 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 rounded-2xl border border-emerald-300 dark:border-emerald-700">
+            <h3 className="text-xl md:text-2xl font-bold text-center mb-5 text-emerald-800 dark:text-emerald-200">
+              🎯 Ce que la démo te montre en 5 minutes :
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-white/80 dark:bg-white/10 rounded-xl p-4 text-center border border-amber-200 dark:border-amber-700/50">
+              <div className="bg-white/80 dark:bg-white/10 rounded-xl p-4 text-center border border-emerald-200 dark:border-emerald-700/50">
                 <div className="text-2xl mb-2">📋</div>
                 <span className="font-semibold text-sm text-foreground">Plan complet</span>
               </div>
-              <div className="bg-white/80 dark:bg-white/10 rounded-xl p-4 text-center border border-amber-200 dark:border-amber-700/50">
+              <div className="bg-white/80 dark:bg-white/10 rounded-xl p-4 text-center border border-emerald-200 dark:border-emerald-700/50">
                 <div className="text-2xl mb-2">🏗️</div>
-                <span className="font-semibold text-sm text-foreground">Structure détaillée</span>
+                <span className="font-semibold text-sm text-foreground">Structure claire</span>
               </div>
-              <div className="bg-white/80 dark:bg-white/10 rounded-xl p-4 text-center border border-amber-200 dark:border-amber-700/50">
+              <div className="bg-white/80 dark:bg-white/10 rounded-xl p-4 text-center border border-emerald-200 dark:border-emerald-700/50">
                 <div className="text-2xl mb-2">✍️</div>
                 <span className="font-semibold text-sm text-foreground">Premiers chapitres</span>
               </div>
-              <div className="bg-white/80 dark:bg-white/10 rounded-xl p-4 text-center border border-amber-200 dark:border-amber-700/50">
+              <div className="bg-white/80 dark:bg-white/10 rounded-xl p-4 text-center border border-emerald-200 dark:border-emerald-700/50">
                 <div className="text-2xl mb-2">📤</div>
                 <span className="font-semibold text-sm text-foreground">Export PDF/EPUB</span>
               </div>
@@ -492,47 +558,22 @@ const SalesPage = () => {
           </div>
 
           {/* Bloc Démo - Résultat immédiat */}
-          <div id="demo" className="max-w-3xl mx-auto mb-12 p-8 bg-gradient-to-br from-violet-50 via-purple-50 to-indigo-50 dark:from-violet-950/40 dark:via-purple-950/30 dark:to-indigo-950/40 rounded-3xl border border-violet-200 dark:border-violet-800 shadow-xl">
-            <h2 className="text-2xl md:text-3xl font-bold text-center mb-6 text-foreground">
-              Teste le générateur et vois ton ebook prendre forme en quelques minutes
-            </h2>
-            
-            <p className="text-lg text-muted-foreground text-center mb-6">
-              Tu n'as rien à installer, rien à apprendre.
-              <br />
-              Entre simplement ton idée, et le générateur crée pour toi :
-            </p>
-            
-            <div className="flex flex-col items-center gap-3 mb-8">
-              <div className="flex items-center gap-3 text-lg text-foreground">
-                <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" />
-                <span>le plan complet de ton ebook</span>
-              </div>
-              <div className="flex items-center gap-3 text-lg text-foreground">
-                <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" />
-                <span>une structure claire et logique</span>
-              </div>
-              <div className="flex items-center gap-3 text-lg text-foreground">
-                <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" />
-                <span>les premiers chapitres rédigés</span>
-              </div>
-            </div>
-            
-            <p className="text-center text-primary font-semibold mb-6 text-lg">
-              👉 Tu vois le résultat avant toute décision.
+          <div id="demo" className="max-w-3xl mx-auto mb-12 p-8 bg-gradient-to-br from-violet-50 via-purple-50 to-indigo-50 dark:from-violet-950/40 dark:via-purple-950/30 dark:to-indigo-950/40 rounded-3xl border-2 border-violet-300 dark:border-violet-700 shadow-xl">
+            <p className="text-center text-lg text-foreground mb-6">
+              Entre ton idée, et vois le résultat en 5 minutes.
             </p>
             
             <div className="flex flex-col items-center">
               <Button 
                 size="lg" 
-                className="text-lg px-10 py-6 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 shadow-lg mb-4"
+                className="text-lg md:text-xl px-10 py-7 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 mb-4"
                 onClick={() => navigate('/demo')}
               >
-                <Play className="w-5 h-5 mr-2" />
+                <Play className="w-6 h-6 mr-2" />
                 Accéder à la démo gratuite
               </Button>
               <p className="text-sm text-muted-foreground">
-                Accès immédiat • Aucune carte bancaire • Sans engagement
+                ✅ Accès immédiat • ✅ Sans carte bancaire • ✅ Sans engagement
               </p>
             </div>
           </div>
