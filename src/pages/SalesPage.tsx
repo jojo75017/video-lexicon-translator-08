@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Check, Sparkles, BookOpen, Zap, Download, Star, ArrowRight, Play, Loader2, Clock, HelpCircle, CheckCircle, Calculator, Gift, Mail, Send } from "lucide-react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
@@ -90,6 +90,7 @@ const NewsletterForm = () => {
 
 const SalesPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [showDemo, setShowDemo] = useState(false);
   const [showEmailDialog, setShowEmailDialog] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
@@ -100,6 +101,20 @@ const SalesPage = () => {
   
   // Vérifier disponibilité VIP (20 places à 37€)
   const { isVipAvailable, remainingSpots, isLoading: vipLoading } = useVipAvailability();
+
+  // Scroll vers l'ancre #demo au chargement
+  useEffect(() => {
+    if (location.hash) {
+      const id = location.hash.replace('#', '');
+      // Petit délai pour laisser le DOM se charger
+      setTimeout(() => {
+        const element = document.getElementById(id);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+    }
+  }, [location.hash]);
 
   // SEO Meta Tags dynamiques pour la page /offres
   useEffect(() => {
