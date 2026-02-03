@@ -229,14 +229,17 @@ Retourne les recettes au format JSON:
     try {
       const { data, error } = await supabase.functions.invoke('generate-front-cover', {
         body: {
-          title: recipeTitle,
-          prompt: `Photo culinaire professionnelle de "${recipeTitle}". 
+          ebookTitle: recipeTitle, // Paramètre correct attendu par l'edge function
+          authorName: '',
+          genre: 'cooking',
+          style: 'cookbook',
+          customPrompt: `Photo culinaire professionnelle de "${recipeTitle}". 
 Style: photographie gastronomique haute qualité, éclairage naturel doux, 
 présentation soignée sur belle vaisselle, arrière-plan flou élégant,
 couleurs vives et appétissantes, vue plongeante ou 3/4.
-NO TEXT, NO WORDS, NO TITLE on the image.`,
-          style: 'photorealistic',
-          colorScheme: 'warm',
+IMPORTANT: NO TEXT, NO WORDS, NO TITLE, NO LETTERS on the image. Only the food.`,
+          showAuthorName: false,
+          showTitle: false,
         }
       });
 
@@ -248,9 +251,12 @@ NO TEXT, NO WORDS, NO TITLE on the image.`,
           r.id === recipeId ? { ...r, imageUrl, isGeneratingImage: false } : r
         ));
         toast.success(`Image générée pour "${recipeTitle}"`);
+      } else {
+        throw new Error('Aucune image retournée');
       }
     } catch (error) {
       console.error('Erreur génération image:', error);
+      toast.error(`Erreur pour "${recipeTitle}"`);
       setRecipes(prev => prev.map(r => 
         r.id === recipeId ? { ...r, isGeneratingImage: false } : r
       ));
