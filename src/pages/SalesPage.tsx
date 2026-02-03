@@ -412,7 +412,7 @@ const SalesPage = () => {
           </div>
 
           {/* Bloc Démo - Résultat immédiat */}
-          <div className="max-w-3xl mx-auto mb-12 p-8 bg-gradient-to-br from-violet-50 via-purple-50 to-indigo-50 dark:from-violet-950/40 dark:via-purple-950/30 dark:to-indigo-950/40 rounded-3xl border border-violet-200 dark:border-violet-800 shadow-xl">
+          <div id="demo" className="max-w-3xl mx-auto mb-12 p-8 bg-gradient-to-br from-violet-50 via-purple-50 to-indigo-50 dark:from-violet-950/40 dark:via-purple-950/30 dark:to-indigo-950/40 rounded-3xl border border-violet-200 dark:border-violet-800 shadow-xl">
             <h2 className="text-2xl md:text-3xl font-bold text-center mb-6 text-foreground">
               Teste le générateur et vois ton ebook prendre forme en quelques minutes
             </h2>
