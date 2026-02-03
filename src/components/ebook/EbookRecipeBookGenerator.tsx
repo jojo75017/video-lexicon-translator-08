@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,10 +8,12 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   ChefHat, UtensilsCrossed, Clock, Users, Flame, Sparkles, Plus, Trash2, 
   Image as ImageIcon, Download, BookOpen, Leaf, AlertTriangle, Heart,
-  Loader2, RefreshCw, Copy, Check, FileText, FileDown
+  Loader2, RefreshCw, Copy, Check, FileText, FileDown, ShoppingCart,
+  Printer, Wand2, ListChecks, Edit3, Star
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -91,6 +93,29 @@ const EbookRecipeBookGenerator: React.FC<EbookRecipeBookGeneratorProps> = ({ ebo
   const [progress, setProgress] = useState(0);
   const [currentStep, setCurrentStep] = useState('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState('recipes');
+  const [editingRecipeId, setEditingRecipeId] = useState<string | null>(null);
+
+  // Calculer la liste de courses groupée
+  const shoppingList = useMemo(() => {
+    const ingredientMap = new Map<string, { count: number; recipes: string[] }>();
+    recipes.forEach(recipe => {
+      recipe.ingredients.forEach(ing => {
+        const normalized = ing.toLowerCase().trim();
+        if (ingredientMap.has(normalized)) {
+          const existing = ingredientMap.get(normalized)!;
+          existing.count++;
+          if (!existing.recipes.includes(recipe.title)) {
+            existing.recipes.push(recipe.title);
+          }
+        } else {
+          ingredientMap.set(normalized, { count: 1, recipes: [recipe.title] });
+        }
+      });
+    });
+    return Array.from(ingredientMap.entries())
+      .sort((a, b) => b[1].count - a[1].count);
+  }, [recipes]);
   
   const [selectedCategories, setSelectedCategories] = useState<string[]>(['entree', 'plat', 'dessert']);
 
@@ -902,10 +927,11 @@ ${recipe.nutritionInfo ? `\n📊 Nutrition: ${recipe.nutritionInfo}` : ''}
         </Card>
       )}
 
-      {/* Recettes générées */}
+      {/* Recettes générées - Avec système d'onglets */}
       {recipes.length > 0 && (
         <div className="space-y-4">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          {/* Header avec titre et boutons export encadrés */}
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
             <div>
               <h2 className="text-xl font-bold flex items-center gap-2">
                 <ChefHat className="w-6 h-6 text-orange-500" />
@@ -916,31 +942,75 @@ ${recipe.nutritionInfo ? `\n📊 Nutrition: ${recipe.nutritionInfo}` : ''}
               </Badge>
             </div>
             
-            {/* Boutons d'export */}
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                onClick={exportToPDF}
-                disabled={isExporting}
-                className="border-red-500/50 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
-              >
-                {isExporting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <FileText className="w-4 h-4 mr-2" />}
-                Export PDF
-              </Button>
-              <Button
-                variant="outline"
-                onClick={exportToWord}
-                disabled={isExporting}
-                className="border-blue-500/50 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20"
-              >
-                {isExporting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <FileDown className="w-4 h-4 mr-2" />}
-                Export Word
-              </Button>
-            </div>
+            {/* Boutons d'export ENCADRÉS avec badge NOUVEAU */}
+            <Card className="border-2 border-dashed border-primary/50 bg-gradient-to-r from-primary/5 via-orange-500/5 to-red-500/5 relative overflow-hidden">
+              <div className="absolute top-0 right-0">
+                <Badge className="rounded-none rounded-bl-lg bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs px-2 py-1">
+                  ✨ NOUVEAU 2026
+                </Badge>
+              </div>
+              <CardContent className="p-4 pt-8">
+                <p className="text-xs text-muted-foreground mb-3 font-medium">
+                  📥 Exportez votre livre de recettes complet
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={exportToPDF}
+                    disabled={isExporting}
+                    className="border-red-500/50 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                  >
+                    {isExporting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <FileText className="w-4 h-4 mr-2" />}
+                    Export PDF
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={exportToWord}
+                    disabled={isExporting}
+                    className="border-blue-500/50 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                  >
+                    {isExporting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <FileDown className="w-4 h-4 mr-2" />}
+                    Export Word
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => window.print()}
+                    className="border-gray-500/50 text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-900/20"
+                  >
+                    <Printer className="w-4 h-4 mr-2" />
+                    Imprimer
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
-          <div className="grid gap-6">
-            {recipes.map((recipe, index) => (
+          {/* Système d'onglets */}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-3 lg:grid-cols-4">
+              <TabsTrigger value="recipes" className="flex items-center gap-2">
+                <ChefHat className="w-4 h-4" />
+                <span className="hidden sm:inline">Recettes</span>
+                <Badge variant="secondary" className="ml-1 text-xs">{recipes.length}</Badge>
+              </TabsTrigger>
+              <TabsTrigger value="shopping" className="flex items-center gap-2">
+                <ShoppingCart className="w-4 h-4" />
+                <span className="hidden sm:inline">Liste courses</span>
+              </TabsTrigger>
+              <TabsTrigger value="overview" className="flex items-center gap-2">
+                <ListChecks className="w-4 h-4" />
+                <span className="hidden sm:inline">Aperçu</span>
+              </TabsTrigger>
+              <TabsTrigger value="stats" className="flex items-center gap-2 hidden lg:flex">
+                <Star className="w-4 h-4" />
+                <span>Statistiques</span>
+              </TabsTrigger>
+            </TabsList>
+
+            {/* Onglet Recettes */}
+            <TabsContent value="recipes" className="mt-4">
+              <div className="grid gap-6">
+              {recipes.map((recipe, index) => (
               <Card key={recipe.id} className="overflow-hidden hover:shadow-lg transition-shadow">
                 <div className="flex flex-col md:flex-row">
                   {/* Image */}
@@ -1066,7 +1136,184 @@ ${recipe.nutritionInfo ? `\n📊 Nutrition: ${recipe.nutritionInfo}` : ''}
                 </div>
               </Card>
             ))}
-          </div>
+            </div>
+            </TabsContent>
+
+            {/* Onglet Liste de courses */}
+            <TabsContent value="shopping" className="mt-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <ShoppingCart className="w-5 h-5 text-green-500" />
+                    Liste de Courses Complète
+                  </CardTitle>
+                  <CardDescription>
+                    Tous les ingrédients nécessaires pour {recipes.length} recettes
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex justify-end">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => {
+                          const text = shoppingList.map(([ing, data]) => 
+                            `☐ ${ing} (x${data.count})`
+                          ).join('\n');
+                          navigator.clipboard.writeText(text);
+                          toast.success('Liste copiée !');
+                        }}
+                      >
+                        <Copy className="w-4 h-4 mr-2" />
+                        Copier la liste
+                      </Button>
+                    </div>
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-2">
+                      {shoppingList.map(([ingredient, data], index) => (
+                        <div 
+                          key={index}
+                          className="flex items-center gap-3 p-2 rounded-lg border hover:bg-muted/50 transition-colors"
+                        >
+                          <Checkbox id={`ing-${index}`} />
+                          <div className="flex-1">
+                            <label 
+                              htmlFor={`ing-${index}`} 
+                              className="text-sm font-medium cursor-pointer capitalize"
+                            >
+                              {ingredient}
+                            </label>
+                            {data.count > 1 && (
+                              <span className="ml-2 text-xs text-primary font-medium">
+                                (utilisé {data.count}x)
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="pt-4 border-t text-center text-sm text-muted-foreground">
+                      📊 Total: {shoppingList.length} ingrédients uniques pour {recipes.length} recettes
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Onglet Aperçu */}
+            <TabsContent value="overview" className="mt-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <ListChecks className="w-5 h-5 text-blue-500" />
+                    Aperçu du Livre
+                  </CardTitle>
+                  <CardDescription>
+                    Table des matières de votre livre "{bookTitle}"
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    {recipes.map((recipe, index) => (
+                      <div 
+                        key={recipe.id}
+                        className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50 transition-colors"
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-sm font-bold text-orange-600">
+                            {index + 1}
+                          </span>
+                          <div>
+                            <p className="font-medium">{recipe.title}</p>
+                            <div className="flex gap-2 text-xs text-muted-foreground">
+                              <span>⏱️ {recipe.prepTime}</span>
+                              <span>•</span>
+                              <span>👥 {recipe.servings} pers.</span>
+                              <span>•</span>
+                              <Badge variant="outline" className="text-xs">
+                                {recipe.difficulty}
+                              </Badge>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {recipe.imageUrl && (
+                            <img src={recipe.imageUrl} alt="" className="w-12 h-12 rounded-lg object-cover" />
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Onglet Statistiques */}
+            <TabsContent value="stats" className="mt-4">
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="text-center">
+                      <div className="text-4xl font-bold text-orange-500">{recipes.length}</div>
+                      <p className="text-sm text-muted-foreground mt-1">Recettes</p>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="text-center">
+                      <div className="text-4xl font-bold text-green-500">{shoppingList.length}</div>
+                      <p className="text-sm text-muted-foreground mt-1">Ingrédients uniques</p>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="text-center">
+                      <div className="text-4xl font-bold text-blue-500">
+                        {recipes.filter(r => r.imageUrl).length}
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-1">Photos générées</p>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="text-center">
+                      <div className="text-4xl font-bold text-purple-500">
+                        {recipes.reduce((acc, r) => acc + r.instructions.length, 0)}
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-1">Étapes totales</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+              
+              <Card className="mt-4">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <UtensilsCrossed className="w-5 h-5" />
+                    Répartition par difficulté
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex gap-4">
+                    {['facile', 'moyen', 'difficile'].map(diff => {
+                      const count = recipes.filter(r => r.difficulty === diff).length;
+                      const percent = recipes.length > 0 ? (count / recipes.length) * 100 : 0;
+                      return (
+                        <div key={diff} className="flex-1 text-center">
+                          <div className="text-2xl font-bold">{count}</div>
+                          <div className="text-sm text-muted-foreground capitalize">{diff}</div>
+                          <Progress value={percent} className="h-2 mt-2" />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
         </div>
       )}
 
