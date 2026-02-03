@@ -12,6 +12,18 @@ export function cleanGeneratedText(text: string): string {
   if (!text || typeof text !== 'string') return text || '';
   
   let cleaned = text
+    // ========== NETTOYAGE DES ENTITÉS HTML ==========
+    // Supprimer &nbsp; et variantes (avec ou sans point-virgule)
+    .replace(/&nbsp;?/gi, ' ')
+    .replace(/&#160;/gi, ' ')
+    .replace(/&#xa0;/gi, ' ')
+    // Autres entités HTML courantes
+    .replace(/&amp;/gi, '&')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&quot;/gi, '"')
+    .replace(/&apos;/gi, "'")
+    .replace(/&#39;/gi, "'")
     // Supprimer les guillemets échappés \" -> rien (pas de guillemet)
     .replace(/\\"/g, '')
     // Supprimer les backslashes échappés
@@ -61,6 +73,8 @@ export function cleanGeneratedText(text: string): string {
       .replace(/\?([A-Za-zÀ-ÖØ-öø-ÿ])/g, '? $1')
       // Points de suspension suivis d'une lettre
       .replace(/…([A-Za-zÀ-ÖØ-öø-ÿ])/g, '… $1')
+      // Trois points consécutifs suivis d'une lettre
+      .replace(/\.\.\.([A-Za-zÀ-ÖØ-öø-ÿ])/g, '... $1')
       
       // ========== CAS 2: PONCTUATION FAIBLE + LETTRE ==========
       // Virgule suivie d'une lettre
@@ -74,6 +88,8 @@ export function cleanGeneratedText(text: string): string {
       .replace(/\.(\d)/g, '. $1')
       .replace(/,(\d)/g, ', $1')
       .replace(/:(\d)/g, ': $1')
+      .replace(/!(\d)/g, '! $1')
+      .replace(/\?(\d)/g, '? $1')
       
       // ========== CAS 4: GUILLEMETS FRANÇAIS ==========
       // Après guillemet fermant français suivi d'une lettre
@@ -95,7 +111,15 @@ export function cleanGeneratedText(text: string): string {
       // Après parenthèse fermante suivie d'une lettre
       .replace(/\)([A-Za-zÀ-ÖØ-öø-ÿ])/g, ') $1')
       // Ponctuation + parenthèse fermante + lettre
-      .replace(/\.\)([A-Za-zÀ-ÖØ-öø-ÿ])/g, '.) $1');
+      .replace(/\.\)([A-Za-zÀ-ÖØ-öø-ÿ])/g, '.) $1')
+      
+      // ========== CAS 7: CROCHETS ==========
+      .replace(/\]([A-Za-zÀ-ÖØ-öø-ÿ])/g, '] $1')
+      
+      // ========== CAS 8: TIRETS LONGS (dialogues) ==========
+      // Tiret long suivi d'une lettre sans espace
+      .replace(/—([A-Za-zÀ-ÖØ-öø-ÿ])/g, '— $1')
+      .replace(/–([A-Za-zÀ-ÖØ-öø-ÿ])/g, '– $1');
   }
   
   // Nettoyage final
