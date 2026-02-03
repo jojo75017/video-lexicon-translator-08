@@ -11,10 +11,12 @@ import { Progress } from '@/components/ui/progress';
 import { 
   ChefHat, UtensilsCrossed, Clock, Users, Flame, Sparkles, Plus, Trash2, 
   Image as ImageIcon, Download, BookOpen, Leaf, AlertTriangle, Heart,
-  Loader2, RefreshCw, Copy, Check
+  Loader2, RefreshCw, Copy, Check, FileText, FileDown
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import jsPDF from 'jspdf';
+import { Document, Packer, Paragraph, TextRun, HeadingLevel, ImageRun, PageBreak, AlignmentType, BorderStyle } from 'docx';
 
 interface Recipe {
   id: string;
@@ -85,6 +87,7 @@ const EbookRecipeBookGenerator: React.FC<EbookRecipeBookGeneratorProps> = ({ ebo
   
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentStep, setCurrentStep] = useState('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -302,6 +305,367 @@ ${recipe.nutritionInfo ? `\n📊 Nutrition: ${recipe.nutritionInfo}` : ''}
 
   const getCategoryEmoji = (category: string) => {
     return recipeCategories.find(c => c.value === category)?.label.split(' ')[0] || '🍽️';
+  };
+
+  // ============= EXPORT PDF =============
+  const exportToPDF = async () => {
+    if (recipes.length === 0) {
+      toast.error('Aucune recette à exporter');
+      return;
+    }
+
+    setIsExporting(true);
+    toast.info('Génération du PDF en cours...');
+
+    try {
+      const pdf = new jsPDF();
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 20;
+      const contentWidth = pageWidth - 2 * margin;
+      let yPosition = margin;
+
+      // ===== PAGE DE TITRE =====
+      pdf.setFillColor(255, 165, 0);
+      pdf.rect(0, 0, pageWidth, 60, 'F');
+      
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(28);
+      pdf.setTextColor(255, 255, 255);
+      pdf.text(bookTitle || 'Mon Livre de Recettes', pageWidth / 2, 35, { align: 'center' });
+
+      if (authorName) {
+        pdf.setFontSize(14);
+        pdf.text(`par ${authorName}`, pageWidth / 2, 50, { align: 'center' });
+      }
+
+      pdf.setTextColor(0, 0, 0);
+      pdf.setFontSize(12);
+      pdf.text(`${recipes.length} recettes`, pageWidth / 2, 80, { align: 'center' });
+      pdf.text(`Style: ${cuisineStyles.find(s => s.value === cuisineStyle)?.label || cuisineStyle}`, pageWidth / 2, 90, { align: 'center' });
+
+      // ===== TABLE DES MATIÈRES =====
+      pdf.addPage();
+      yPosition = margin;
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(20);
+      pdf.setTextColor(255, 140, 0);
+      pdf.text('📖 Table des Matières', margin, yPosition);
+      yPosition += 15;
+
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(12);
+      pdf.setTextColor(0, 0, 0);
+      recipes.forEach((recipe, index) => {
+        if (yPosition > pageHeight - 20) {
+          pdf.addPage();
+          yPosition = margin;
+        }
+        const emoji = getCategoryEmoji(recipe.category);
+        pdf.text(`${emoji} ${index + 1}. ${recipe.title}`, margin, yPosition);
+        yPosition += 8;
+      });
+
+      // ===== RECETTES =====
+      for (let i = 0; i < recipes.length; i++) {
+        const recipe = recipes[i];
+        pdf.addPage();
+        yPosition = margin;
+
+        // Image si disponible
+        if (recipe.imageUrl) {
+          try {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            await new Promise<void>((resolve, reject) => {
+              img.onload = () => resolve();
+              img.onerror = reject;
+              img.src = recipe.imageUrl!;
+            });
+            
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            ctx?.drawImage(img, 0, 0);
+            const imgData = canvas.toDataURL('image/jpeg', 0.8);
+            
+            const imgWidth = contentWidth;
+            const imgHeight = (img.height / img.width) * imgWidth;
+            pdf.addImage(imgData, 'JPEG', margin, yPosition, imgWidth, Math.min(imgHeight, 80));
+            yPosition += Math.min(imgHeight, 80) + 10;
+          } catch (e) {
+            console.log('Impossible de charger l\'image pour le PDF');
+          }
+        }
+
+        // Titre recette
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(18);
+        pdf.setTextColor(255, 100, 0);
+        const titleLines = pdf.splitTextToSize(recipe.title, contentWidth);
+        pdf.text(titleLines, margin, yPosition);
+        yPosition += titleLines.length * 8 + 5;
+
+        // Métadonnées
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(10);
+        pdf.setTextColor(100, 100, 100);
+        pdf.text(`⏱️ Préparation: ${recipe.prepTime} | 🔥 Cuisson: ${recipe.cookTime} | 👥 ${recipe.servings} portions | ${recipe.difficulty}`, margin, yPosition);
+        yPosition += 10;
+
+        // Ingrédients
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(12);
+        pdf.setTextColor(0, 0, 0);
+        pdf.text('🥕 Ingrédients:', margin, yPosition);
+        yPosition += 7;
+
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(10);
+        recipe.ingredients.forEach(ing => {
+          if (yPosition > pageHeight - 20) {
+            pdf.addPage();
+            yPosition = margin;
+          }
+          pdf.text(`• ${ing}`, margin + 5, yPosition);
+          yPosition += 6;
+        });
+        yPosition += 5;
+
+        // Instructions
+        if (yPosition > pageHeight - 50) {
+          pdf.addPage();
+          yPosition = margin;
+        }
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(12);
+        pdf.text('📝 Instructions:', margin, yPosition);
+        yPosition += 7;
+
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(10);
+        recipe.instructions.forEach((step, idx) => {
+          if (yPosition > pageHeight - 20) {
+            pdf.addPage();
+            yPosition = margin;
+          }
+          const stepLines = pdf.splitTextToSize(`${idx + 1}. ${step}`, contentWidth - 10);
+          pdf.text(stepLines, margin + 5, yPosition);
+          yPosition += stepLines.length * 5 + 3;
+        });
+
+        // Conseils
+        if (recipe.tips) {
+          yPosition += 5;
+          if (yPosition > pageHeight - 30) {
+            pdf.addPage();
+            yPosition = margin;
+          }
+          pdf.setFillColor(255, 248, 220);
+          pdf.rect(margin, yPosition - 3, contentWidth, 15, 'F');
+          pdf.setFont('helvetica', 'italic');
+          pdf.setFontSize(9);
+          pdf.setTextColor(120, 90, 0);
+          const tipLines = pdf.splitTextToSize(`💡 Conseil: ${recipe.tips}`, contentWidth - 10);
+          pdf.text(tipLines, margin + 5, yPosition + 4);
+          yPosition += 20;
+        }
+
+        // Nutrition
+        if (recipe.nutritionInfo) {
+          if (yPosition > pageHeight - 20) {
+            pdf.addPage();
+            yPosition = margin;
+          }
+          pdf.setFont('helvetica', 'normal');
+          pdf.setFontSize(8);
+          pdf.setTextColor(80, 80, 80);
+          pdf.text(`❤️ ${recipe.nutritionInfo}`, margin, yPosition);
+        }
+      }
+
+      // Sauvegarder
+      const fileName = `${bookTitle || 'livre-recettes'}_${new Date().toISOString().split('T')[0]}.pdf`;
+      pdf.save(fileName);
+      toast.success('PDF téléchargé avec succès !');
+    } catch (error) {
+      console.error('Erreur export PDF:', error);
+      toast.error('Erreur lors de l\'export PDF');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  // ============= EXPORT WORD (DOCX) =============
+  const exportToWord = async () => {
+    if (recipes.length === 0) {
+      toast.error('Aucune recette à exporter');
+      return;
+    }
+
+    setIsExporting(true);
+    toast.info('Génération du document Word en cours...');
+
+    try {
+      const children: any[] = [];
+
+      // Page de titre
+      children.push(
+        new Paragraph({
+          children: [new TextRun({ text: bookTitle || 'Mon Livre de Recettes', bold: true, size: 56, color: 'FF6600' })],
+          heading: HeadingLevel.TITLE,
+          alignment: AlignmentType.CENTER,
+          spacing: { after: 400 }
+        })
+      );
+
+      if (authorName) {
+        children.push(
+          new Paragraph({
+            children: [new TextRun({ text: `par ${authorName}`, italics: true, size: 28 })],
+            alignment: AlignmentType.CENTER,
+            spacing: { after: 200 }
+          })
+        );
+      }
+
+      children.push(
+        new Paragraph({
+          children: [new TextRun({ text: `${recipes.length} recettes • ${cuisineStyles.find(s => s.value === cuisineStyle)?.label || cuisineStyle}`, size: 24 })],
+          alignment: AlignmentType.CENTER,
+          spacing: { after: 800 }
+        })
+      );
+
+      // Table des matières
+      children.push(
+        new Paragraph({ children: [new PageBreak()] }),
+        new Paragraph({
+          children: [new TextRun({ text: '📖 Table des Matières', bold: true, size: 36, color: 'FF8C00' })],
+          heading: HeadingLevel.HEADING_1,
+          spacing: { after: 300 }
+        })
+      );
+
+      recipes.forEach((recipe, index) => {
+        const emoji = getCategoryEmoji(recipe.category);
+        children.push(
+          new Paragraph({
+            children: [new TextRun({ text: `${emoji} ${index + 1}. ${recipe.title}`, size: 24 })],
+            spacing: { after: 100 }
+          })
+        );
+      });
+
+      // Recettes
+      for (const recipe of recipes) {
+        children.push(new Paragraph({ children: [new PageBreak()] }));
+
+        // Titre
+        children.push(
+          new Paragraph({
+            children: [new TextRun({ text: recipe.title, bold: true, size: 40, color: 'FF6400' })],
+            heading: HeadingLevel.HEADING_1,
+            spacing: { after: 200 }
+          })
+        );
+
+        // Métadonnées
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({ text: `⏱️ Préparation: ${recipe.prepTime}  |  `, size: 20 }),
+              new TextRun({ text: `🔥 Cuisson: ${recipe.cookTime}  |  `, size: 20 }),
+              new TextRun({ text: `👥 ${recipe.servings} portions  |  `, size: 20 }),
+              new TextRun({ text: recipe.difficulty, bold: true, size: 20 })
+            ],
+            spacing: { after: 300 }
+          })
+        );
+
+        // Ingrédients
+        children.push(
+          new Paragraph({
+            children: [new TextRun({ text: '🥕 Ingrédients', bold: true, size: 28, color: '228B22' })],
+            heading: HeadingLevel.HEADING_2,
+            spacing: { before: 200, after: 150 }
+          })
+        );
+
+        recipe.ingredients.forEach(ing => {
+          children.push(
+            new Paragraph({
+              children: [new TextRun({ text: `• ${ing}`, size: 22 })],
+              spacing: { after: 60 }
+            })
+          );
+        });
+
+        // Instructions
+        children.push(
+          new Paragraph({
+            children: [new TextRun({ text: '📝 Instructions', bold: true, size: 28, color: '4169E1' })],
+            heading: HeadingLevel.HEADING_2,
+            spacing: { before: 300, after: 150 }
+          })
+        );
+
+        recipe.instructions.forEach((step, idx) => {
+          children.push(
+            new Paragraph({
+              children: [
+                new TextRun({ text: `${idx + 1}. `, bold: true, size: 22 }),
+                new TextRun({ text: step, size: 22 })
+              ],
+              spacing: { after: 100 }
+            })
+          );
+        });
+
+        // Conseil
+        if (recipe.tips) {
+          children.push(
+            new Paragraph({
+              children: [new TextRun({ text: `💡 Conseil du chef: ${recipe.tips}`, italics: true, size: 20, color: '8B4513' })],
+              shading: { fill: 'FFF8DC' },
+              spacing: { before: 200, after: 100 }
+            })
+          );
+        }
+
+        // Nutrition
+        if (recipe.nutritionInfo) {
+          children.push(
+            new Paragraph({
+              children: [new TextRun({ text: `❤️ ${recipe.nutritionInfo}`, size: 18, color: '808080' })],
+              spacing: { before: 150 }
+            })
+          );
+        }
+      }
+
+      // Créer le document
+      const doc = new Document({
+        sections: [{ properties: {}, children }]
+      });
+
+      // Télécharger
+      const blob = await Packer.toBlob(doc);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${bookTitle || 'livre-recettes'}_${new Date().toISOString().split('T')[0]}.docx`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      toast.success('Document Word téléchargé avec succès !');
+    } catch (error) {
+      console.error('Erreur export Word:', error);
+      toast.error('Erreur lors de l\'export Word');
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   return (
@@ -541,14 +905,38 @@ ${recipe.nutritionInfo ? `\n📊 Nutrition: ${recipe.nutritionInfo}` : ''}
       {/* Recettes générées */}
       {recipes.length > 0 && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold flex items-center gap-2">
-              <ChefHat className="w-6 h-6 text-orange-500" />
-              {recipes.length} Recettes Générées
-            </h2>
-            <Badge variant="outline" className="text-lg px-4 py-1">
-              {bookTitle}
-            </Badge>
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div>
+              <h2 className="text-xl font-bold flex items-center gap-2">
+                <ChefHat className="w-6 h-6 text-orange-500" />
+                {recipes.length} Recettes Générées
+              </h2>
+              <Badge variant="outline" className="text-lg px-4 py-1 mt-1">
+                {bookTitle}
+              </Badge>
+            </div>
+            
+            {/* Boutons d'export */}
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={exportToPDF}
+                disabled={isExporting}
+                className="border-red-500/50 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+              >
+                {isExporting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <FileText className="w-4 h-4 mr-2" />}
+                Export PDF
+              </Button>
+              <Button
+                variant="outline"
+                onClick={exportToWord}
+                disabled={isExporting}
+                className="border-blue-500/50 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+              >
+                {isExporting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <FileDown className="w-4 h-4 mr-2" />}
+                Export Word
+              </Button>
+            </div>
           </div>
 
           <div className="grid gap-6">
