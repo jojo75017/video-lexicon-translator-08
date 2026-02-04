@@ -955,37 +955,73 @@ Format: Book cover 6x9 inches, portrait orientation.`,
                       <CardContent>
                         {coverImageUrl ? (
                           <div className="space-y-4">
-                            {/* 3D Book Mockup Effect */}
-                            <div className="relative flex justify-center items-center py-8 bg-gradient-to-br from-muted/50 to-muted rounded-xl">
+                            {/* 3D Book Mockup Effect - Transparent Background */}
+                            <div className="relative flex justify-center items-center py-10">
                               <div 
-                                className="relative transform transition-all duration-500 hover:scale-105"
+                                className="relative transform transition-all duration-500 hover:scale-105 hover:rotate-y-5"
                                 style={{
-                                  perspective: '1000px',
+                                  perspective: '1200px',
                                 }}
                               >
+                                {/* Shadow under the book */}
                                 <div 
-                                  className="relative shadow-2xl rounded-r-md"
+                                  className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-44 h-6 bg-black/20 blur-xl rounded-full"
                                   style={{
-                                    transform: 'rotateY(-15deg)',
+                                    transform: 'translateX(-50%) rotateX(80deg)',
+                                  }}
+                                />
+                                
+                                <div 
+                                  className="relative"
+                                  style={{
+                                    transform: 'rotateY(-20deg) rotateX(5deg)',
                                     transformStyle: 'preserve-3d',
                                   }}
                                 >
-                                  {/* Book spine effect */}
+                                  {/* Book spine - dark like reference */}
                                   <div 
-                                    className="absolute left-0 top-0 bottom-0 w-4 bg-gradient-to-r from-primary/80 to-primary rounded-l-sm"
+                                    className="absolute left-0 top-0 bottom-0 w-5 rounded-l-sm"
                                     style={{
-                                      transform: 'rotateY(90deg) translateX(-8px)',
+                                      background: 'linear-gradient(to right, #1a1a1a 0%, #333 50%, #1a1a1a 100%)',
+                                      transform: 'rotateY(-90deg) translateZ(2px)',
                                       transformOrigin: 'left center',
+                                      boxShadow: 'inset -2px 0 4px rgba(0,0,0,0.3)',
                                     }}
                                   />
-                                  {/* Cover image */}
-                                  <img
-                                    src={coverImageUrl}
-                                    alt="Couverture du guide"
-                                    className="w-48 h-72 object-cover rounded-r-md shadow-lg"
-                                  />
-                                  {/* Page effect */}
-                                  <div className="absolute right-0 top-1 bottom-1 w-1 bg-gradient-to-l from-gray-200 to-gray-100 rounded-r" />
+                                  
+                                  {/* Cover image container */}
+                                  <div className="relative">
+                                    <img
+                                      src={coverImageUrl}
+                                      alt="Couverture du guide"
+                                      className="w-52 h-[300px] object-cover rounded-r-md"
+                                      style={{
+                                        boxShadow: '10px 10px 30px rgba(0,0,0,0.4), -2px 0 10px rgba(0,0,0,0.2)',
+                                      }}
+                                    />
+                                    
+                                    {/* Pages effect on the right - multiple layers */}
+                                    <div className="absolute right-0 top-1 bottom-1 w-2 flex flex-col">
+                                      {[...Array(8)].map((_, i) => (
+                                        <div 
+                                          key={i}
+                                          className="flex-1"
+                                          style={{
+                                            background: i % 2 === 0 ? '#f5f5f0' : '#e8e8e3',
+                                            boxShadow: 'inset 1px 0 1px rgba(0,0,0,0.05)',
+                                          }}
+                                        />
+                                      ))}
+                                    </div>
+                                    
+                                    {/* Glossy overlay effect */}
+                                    <div 
+                                      className="absolute inset-0 pointer-events-none rounded-r-md"
+                                      style={{
+                                        background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%, rgba(0,0,0,0.1) 100%)',
+                                      }}
+                                    />
+                                  </div>
                                 </div>
                               </div>
                             </div>
