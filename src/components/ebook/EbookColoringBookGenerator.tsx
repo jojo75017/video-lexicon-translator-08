@@ -97,7 +97,7 @@ export const EbookColoringBookGenerator: React.FC<ColoringBookGeneratorProps> = 
   const [ageGroup, setAgeGroup] = useState('4-6');
   const [complexity, setComplexity] = useState([2]);
   const [numberOfPages, setNumberOfPages] = useState(25); // Défaut: 25 pages (KDP minimum 24)
-  const [bookFormat, setBookFormat] = useState('8.5x8.5-kdp'); // Format KDP par défaut
+  const [bookFormat, setBookFormat] = useState('8.5x11'); // Format KDP Letter par défaut (plus courant)
   const [customPrompt, setCustomPrompt] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedPages, setGeneratedPages] = useState<ColoringPage[]>([]);
@@ -600,31 +600,50 @@ CRITICAL REQUIREMENTS:
     toast.info('Création du PDF KDP en cours...');
 
     try {
-      // Déterminer les dimensions du PDF selon le format
+      // ============================================
+      // DIMENSIONS KDP CONFORMES (en mm)
+      // Format 8.5x11" = 215.9 x 279.4 mm
+      // Marges KDP minimum: 0.25" = 6.35mm (intérieur/gouttière)
+      // Marges recommandées: 0.5" = 12.7mm (top/bottom/extérieur)
+      // ============================================
       const formatDimensions: Record<string, { width: number; height: number }> = {
-        '6x6': { width: 152, height: 152 },
-        '7x7': { width: 178, height: 178 },
-        '8x8': { width: 203, height: 203 },
-        '5x7': { width: 127, height: 178 },
-        '8.5x8.5': { width: 216, height: 216 },
-        '8.5x8.5-kdp': { width: 216, height: 216 },
-        '8.5x11': { width: 216, height: 279 },
-        '8x10': { width: 203, height: 254 },
-        'a4': { width: 210, height: 297 },
+        '6x6': { width: 152.4, height: 152.4 },       // 6" exactement
+        '7x7': { width: 177.8, height: 177.8 },       // 7" exactement
+        '8x8': { width: 203.2, height: 203.2 },       // 8" exactement
+        '5x7': { width: 127, height: 177.8 },         // 5x7" exactement
+        '8.5x8.5': { width: 215.9, height: 215.9 },   // 8.5" exactement
+        '8.5x8.5-kdp': { width: 215.9, height: 215.9 },
+        '8.5x11': { width: 215.9, height: 279.4 },    // 8.5x11" Letter KDP exact
+        '8x10': { width: 203.2, height: 254 },        // 8x10" exactement
+        'a4': { width: 210, height: 297 },            // A4 standard
       };
 
-      const dimensions = formatDimensions[bookFormat] || { width: 203, height: 203 };
+      const dimensions = formatDimensions[bookFormat] || { width: 215.9, height: 279.4 };
       const pdf = new jsPDF({
         orientation: dimensions.width > dimensions.height ? 'landscape' : 'portrait',
         unit: 'mm',
         format: [dimensions.width, dimensions.height],
+        compress: true, // Compression pour réduire la taille
       });
 
       const pageWidth = dimensions.width;
       const pageHeight = dimensions.height;
-      const margin = 15;
-      const contentWidth = pageWidth - (margin * 2);
-      const contentHeight = pageHeight - (margin * 2);
+      
+      // ============================================
+      // MARGES KDP CONFORMES
+      // Top/Bottom: 0.5" = 12.7mm minimum
+      // Intérieur (gouttière): 0.375" = 9.5mm pour livres < 150 pages
+      // Extérieur: 0.25" = 6.35mm minimum, recommandé 0.5" = 12.7mm
+      // ============================================
+      const marginTop = 12.7;    // 0.5" - marge haute KDP
+      const marginBottom = 12.7; // 0.5" - marge basse KDP
+      const marginOuter = 12.7;  // 0.5" - marge extérieure KDP
+      const marginInner = 9.5;   // 0.375" - gouttière/reliure KDP
+      const margin = marginOuter; // Marge générale pour le contenu centré
+      
+      const contentWidth = pageWidth - marginOuter - marginInner;
+      const contentHeight = pageHeight - marginTop - marginBottom;
+      
       // Titre spécifique au livre de coloriage (pas le titre générique de l'ebook)
       const coloringBookTitle = 'Mon Livre de Coloriage';
       // Supprimer les emojis du thème (non supportés par jsPDF)
@@ -634,25 +653,32 @@ CRITICAL REQUIREMENTS:
 
       // ============================================
       // PAGE 1: PAGE DE TITRE (KDP obligatoire)
+      // Police Helvetica = police intégrée jsPDF compatible KDP
       // ============================================
-      pdf.setFontSize(24);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text(coloringBookTitle, pageWidth / 2, pageHeight / 3, { align: 'center' });
+      const safeAreaLeft = marginInner;
+      const safeAreaRight = pageWidth - marginOuter;
+      const safeAreaTop = marginTop;
+      const safeAreaBottom = pageHeight - marginBottom;
+      const centerX = pageWidth / 2;
       
-      pdf.setFontSize(18);
+      pdf.setFontSize(28);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text(coloringBookTitle, centerX, safeAreaTop + 60, { align: 'center' });
+      
+      pdf.setFontSize(20);
       pdf.setFont('helvetica', 'normal');
-      pdf.text(themeLabel, pageWidth / 2, pageHeight / 3 + 15, { align: 'center' });
+      pdf.text(themeLabel, centerX, safeAreaTop + 80, { align: 'center' });
+      
+      pdf.setFontSize(16);
+      pdf.text(`${generatedPages.length} dessins a colorier`, centerX, safeAreaTop + 110, { align: 'center' });
       
       pdf.setFontSize(14);
-      pdf.text(`${generatedPages.length} dessins a colorier`, pageWidth / 2, pageHeight / 2, { align: 'center' });
-      
-      pdf.setFontSize(12);
-      pdf.text(`Pour les ${ageGroup} ans`, pageWidth / 2, pageHeight / 2 + 15, { align: 'center' });
+      pdf.text(`Pour les ${ageGroup} ans`, centerX, safeAreaTop + 130, { align: 'center' });
 
-      // Décoration simple
-      pdf.setDrawColor(200, 200, 200);
+      // Décoration simple - dans la zone de sécurité
+      pdf.setDrawColor(180, 180, 180);
       pdf.setLineWidth(0.5);
-      pdf.line(margin + 20, pageHeight / 3 + 25, pageWidth - margin - 20, pageHeight / 3 + 25);
+      pdf.line(safeAreaLeft + 30, safeAreaTop + 90, safeAreaRight - 30, safeAreaTop + 90);
 
       // ============================================
       // PAGE 2: COPYRIGHT (KDP obligatoire)
@@ -686,9 +712,9 @@ CRITICAL REQUIREMENTS:
         'www.ebookstudio.fr',
       ];
 
-      let copyrightY = pageHeight / 4;
+      let copyrightY = safeAreaTop + 50;
       copyrightText.forEach(line => {
-        pdf.text(line, pageWidth / 2, copyrightY, { align: 'center' });
+        pdf.text(line, centerX, copyrightY, { align: 'center' });
         copyrightY += 7;
       });
 
@@ -699,11 +725,11 @@ CRITICAL REQUIREMENTS:
       
       pdf.setFontSize(20);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('Teste tes Couleurs !', pageWidth / 2, 20, { align: 'center' });
+      pdf.text('Teste tes Couleurs !', centerX, safeAreaTop + 15, { align: 'center' });
       
       pdf.setFontSize(11);
       pdf.setFont('helvetica', 'normal');
-      pdf.text('Avant de commencer, essaie tes crayons ici :', pageWidth / 2, 30, { align: 'center' });
+      pdf.text('Avant de commencer, essaie tes crayons ici :', centerX, safeAreaTop + 28, { align: 'center' });
 
       // Collecter toutes les couleurs uniques du livre
       const allColorsForTest: Map<string, { element: string; color: string; hexCode: string }> = new Map();
@@ -720,8 +746,8 @@ CRITICAL REQUIREMENTS:
       const colorsArray = Array.from(allColorsForTest.values()).slice(0, 12); // Max 12 couleurs
       const circleRadius = 12;
       const circlesPerRow = 3;
-      let circleY = 50;
-      let circleX = margin + 25;
+      let circleY = safeAreaTop + 45;
+      let circleX = safeAreaLeft + 35;
 
       colorsArray.forEach((color, idx) => {
         // Cercle vide (contour)
@@ -747,17 +773,17 @@ CRITICAL REQUIREMENTS:
 
         // Passer au suivant
         if ((idx + 1) % circlesPerRow === 0) {
-          circleY += 35;
-          circleX = margin + 25;
+          circleY += 40;
+          circleX = safeAreaLeft + 35;
         } else {
-          circleX += (contentWidth / circlesPerRow);
+          circleX += ((safeAreaRight - safeAreaLeft - 40) / circlesPerRow);
         }
       });
 
-      // Instructions en bas
+      // Instructions en bas - dans la zone de sécurité
       pdf.setFontSize(10);
       pdf.setFont('helvetica', 'italic');
-      pdf.text('Colorie chaque cercle avec la couleur indiquée !', pageWidth / 2, pageHeight - 20, { align: 'center' });
+      pdf.text('Colorie chaque cercle avec la couleur indiquee !', centerX, safeAreaBottom - 10, { align: 'center' });
 
       // ============================================
       // PAGE 4: SOMMAIRE / TABLE DES MATIÈRES
@@ -766,23 +792,24 @@ CRITICAL REQUIREMENTS:
       
       pdf.setFontSize(18);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('📖 Sommaire', pageWidth / 2, 20, { align: 'center' });
+      // Emoji supprimé pour compatibilité KDP
+      pdf.text('Sommaire', centerX, safeAreaTop + 15, { align: 'center' });
 
       pdf.setFontSize(10);
       pdf.setFont('helvetica', 'normal');
       
-      let sommY = 35;
+      let sommY = safeAreaTop + 30;
       const pagesPerColumn = Math.ceil(generatedPages.length / 2);
       
       generatedPages.forEach((page, idx) => {
-        const colOffset = idx >= pagesPerColumn ? contentWidth / 2 : 0;
+        const colOffset = idx >= pagesPerColumn ? (safeAreaRight - safeAreaLeft) / 2 : 0;
         const adjustedIdx = idx >= pagesPerColumn ? idx - pagesPerColumn : idx;
         const yOffset = sommY + (adjustedIdx * 8);
         
-        if (yOffset < pageHeight - 30) {
+        if (yOffset < safeAreaBottom - 10) {
           const pageNum = idx + 5; // Compte les pages légales avant
-          pdf.text(`${idx + 1}. ${page.title.substring(0, 30)}${page.title.length > 30 ? '...' : ''}`, margin + colOffset, yOffset);
-          pdf.text(`p.${pageNum}`, pageWidth - margin - colOffset - 10, yOffset, { align: 'right' });
+          pdf.text(`${idx + 1}. ${page.title.substring(0, 28)}${page.title.length > 28 ? '...' : ''}`, safeAreaLeft + colOffset, yOffset);
+          pdf.text(`p.${pageNum}`, safeAreaRight - colOffset - 5, yOffset, { align: 'right' });
         }
       });
 
@@ -802,25 +829,30 @@ CRITICAL REQUIREMENTS:
             reader.readAsDataURL(blob);
           });
 
-          // Calculer les dimensions pour centrer l'image (laisser de la place pour les couleurs en bas)
-          const colorSectionHeight = 25; // Espace pour les couleurs suggérées
-          const imgSize = Math.min(contentWidth, contentHeight - colorSectionHeight - 10);
+          // ============================================
+          // IMAGE CENTRÉE AVEC MARGES KDP
+          // L'image doit rester dans la zone de sécurité
+          // ============================================
+          const colorSectionHeight = 22; // Espace pour les couleurs suggérées
+          const availableWidth = safeAreaRight - safeAreaLeft;
+          const availableHeight = safeAreaBottom - safeAreaTop - colorSectionHeight - 10;
+          const imgSize = Math.min(availableWidth, availableHeight);
           const imgX = (pageWidth - imgSize) / 2;
-          const imgY = margin - 5;
+          const imgY = safeAreaTop + 2;
 
           pdf.addImage(base64, 'PNG', imgX, imgY, imgSize, imgSize);
 
           // ============================================
-          // COULEURS SUGGÉRÉES SOUS L'IMAGE
+          // COULEURS SUGGÉRÉES SOUS L'IMAGE (dans zone sécurité)
           // ============================================
-          const colorY = imgY + imgSize + 5;
-          pdf.setFontSize(8);
+          const colorY = imgY + imgSize + 3;
+          pdf.setFontSize(7);
           pdf.setFont('helvetica', 'bold');
-          pdf.text('Couleurs suggerees :', margin, colorY);
+          pdf.text('Couleurs suggerees :', safeAreaLeft, colorY);
 
           // Afficher les carrés de couleur avec les noms
-          let colorX = margin;
-          const colorRowY = colorY + 5;
+          let colorX = safeAreaLeft;
+          const colorRowY = colorY + 4;
           page.suggestedColors.slice(0, 5).forEach((color) => {
             const hexColor = color.hexCode.replace('#', '');
             const r = parseInt(hexColor.substring(0, 2), 16);
@@ -834,21 +866,21 @@ CRITICAL REQUIREMENTS:
             pdf.rect(colorX, colorRowY, 5, 5, 'S');
             
             // Nom de la couleur
-            pdf.setFontSize(6);
+            pdf.setFontSize(5);
             pdf.setFont('helvetica', 'normal');
-            pdf.text(color.color.substring(0, 10), colorX + 6, colorRowY + 4);
+            pdf.text(color.color.substring(0, 8), colorX + 5, colorRowY + 3);
             
             colorX += 35;
           });
 
-          // Numéro de page discret en bas
+          // Numéro de page discret en bas - dans zone de sécurité
           pdf.setFontSize(8);
           pdf.setFont('helvetica', 'normal');
-          pdf.text(`${i + 1}`, pageWidth / 2, pageHeight - 5, { align: 'center' });
+          pdf.text(`${i + 1}`, centerX, safeAreaBottom - 3, { align: 'center' });
         } catch (imgError) {
           console.error(`Erreur chargement image ${i}:`, imgError);
           pdf.setFontSize(12);
-          pdf.text(`[Image non disponible: ${page.title}]`, pageWidth / 2, pageHeight / 2, { align: 'center' });
+          pdf.text(`[Image non disponible: ${page.title}]`, centerX, pageHeight / 2, { align: 'center' });
         }
       }
 
@@ -858,29 +890,29 @@ CRITICAL REQUIREMENTS:
       pdf.addPage();
       pdf.setFontSize(18);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('Guide des Couleurs', pageWidth / 2, 20, { align: 'center' });
+      pdf.text('Guide des Couleurs', centerX, safeAreaTop + 15, { align: 'center' });
 
       pdf.setFontSize(10);
       pdf.setFont('helvetica', 'normal');
-      pdf.text('Retrouve ici toutes les couleurs utilisees dans ce livre !', pageWidth / 2, 30, { align: 'center' });
+      pdf.text('Retrouve ici toutes les couleurs utilisees dans ce livre !', centerX, safeAreaTop + 28, { align: 'center' });
 
       // Afficher les couleurs par page
-      let colorY = 45;
+      let guideColorY = safeAreaTop + 42;
       generatedPages.forEach((page, pageIdx) => {
-        if (colorY > pageHeight - 40) {
+        if (guideColorY > safeAreaBottom - 25) {
           pdf.addPage();
-          colorY = 20;
+          guideColorY = safeAreaTop + 15;
         }
 
         pdf.setFontSize(10);
         pdf.setFont('helvetica', 'bold');
-        pdf.text(`Page ${pageIdx + 1}: ${page.title.substring(0, 40)}`, margin, colorY);
-        colorY += 6;
+        pdf.text(`Page ${pageIdx + 1}: ${page.title.substring(0, 35)}`, safeAreaLeft, guideColorY);
+        guideColorY += 6;
 
         pdf.setFontSize(8);
         pdf.setFont('helvetica', 'normal');
         
-        let colorX = margin;
+        let guideColorX = safeAreaLeft;
         page.suggestedColors.slice(0, 5).forEach((color) => {
           const hexColor = color.hexCode.replace('#', '');
           const r = parseInt(hexColor.substring(0, 2), 16);
@@ -888,24 +920,25 @@ CRITICAL REQUIREMENTS:
           const b = parseInt(hexColor.substring(4, 6), 16);
           
           pdf.setFillColor(r, g, b);
-          pdf.rect(colorX, colorY, 6, 6, 'F');
+          pdf.rect(guideColorX, guideColorY, 6, 6, 'F');
           pdf.setDrawColor(100, 100, 100);
-          pdf.rect(colorX, colorY, 6, 6, 'S');
+          pdf.rect(guideColorX, guideColorY, 6, 6, 'S');
           
-          pdf.text(color.element.substring(0, 12), colorX + 8, colorY + 5);
-          colorX += 38;
+          pdf.text(color.element.substring(0, 10), guideColorX + 8, guideColorY + 5);
+          guideColorX += 36;
         });
-        colorY += 12;
+        guideColorY += 12;
       });
 
       // ============================================
       // À PROPOS DE L'AUTEUR (KDP recommandé)
+      // Emojis supprimés pour compatibilité PDF/KDP
       // ============================================
       pdf.addPage();
       
       pdf.setFontSize(18);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('À Propos de ce Livre', pageWidth / 2, 25, { align: 'center' });
+      pdf.text('A Propos de ce Livre', centerX, safeAreaTop + 20, { align: 'center' });
 
       pdf.setFontSize(11);
       pdf.setFont('helvetica', 'normal');
@@ -914,36 +947,36 @@ CRITICAL REQUIREMENTS:
         `Ce livre de coloriage "${coloringBookTitle}" a ete concu`,
         `avec amour pour les enfants de ${ageGroup} ans.`,
         '',
-        `Thème: ${themeLabel}`,
+        `Theme: ${themeLabel}`,
         `Contient ${generatedPages.length} dessins originaux`,
         '',
         '---',
         '',
-        '💡 Conseils pour les parents:',
+        'Conseils pour les parents:',
         '',
-        '• Utilisez des crayons de couleur ou des feutres lavables',
-        '• Laissez votre enfant choisir ses propres couleurs',
-        '• Félicitez les efforts, pas seulement le résultat',
-        '• Le coloriage développe la motricité fine',
-        '• Coloriez ensemble pour un moment de partage',
+        '* Utilisez des crayons de couleur ou des feutres lavables',
+        '* Laissez votre enfant choisir ses propres couleurs',
+        '* Felicitez les efforts, pas seulement le resultat',
+        '* Le coloriage developpe la motricite fine',
+        '* Coloriez ensemble pour un moment de partage',
         '',
         '---',
         '',
-        '📧 Contact & Retours:',
+        'Contact & Retours:',
         'Merci d\'avoir choisi ce livre !',
-        'Vos avis nous aident à créer de meilleurs contenus.',
+        'Vos avis nous aident a creer de meilleurs contenus.',
       ];
 
-      let aboutY = 40;
+      let aboutY = safeAreaTop + 38;
       aboutText.forEach(line => {
-        pdf.text(line, pageWidth / 2, aboutY, { align: 'center' });
+        pdf.text(line, centerX, aboutY, { align: 'center' });
         aboutY += 8;
       });
 
-      // Pied de page final
+      // Pied de page final - dans zone de sécurité
       pdf.setFontSize(9);
       pdf.setFont('helvetica', 'italic');
-      pdf.text('Créé avec EbookStudio Pro - www.ebookstudio.fr', pageWidth / 2, pageHeight - 10, { align: 'center' });
+      pdf.text('Cree avec EbookStudio Pro - www.ebookstudio.fr', centerX, safeAreaBottom - 5, { align: 'center' });
 
       // ============================================
       // TÉLÉCHARGEMENT
