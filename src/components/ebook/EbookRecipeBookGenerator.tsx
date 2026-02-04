@@ -15,19 +15,24 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import jsPDF from 'jspdf';
 
-// Interface pour une fiche recette
+// Interface pour une fiche recette (300+ mots par fiche)
 interface RecipeSheet {
   id: number;
   country: string;
   countryFlag: string;
   dishName: string;
-  description: string;
-  ingredients: string[];
-  steps: string[];
+  description: string;           // Description riche (3-4 phrases)
+  history: string;               // Histoire et origine du plat (2-3 phrases)
+  ingredients: string[];         // 10-12 ingrédients avec quantités
+  steps: string[];               // 8-10 étapes détaillées
+  chefTips: string;              // Conseils du chef (2-3 phrases)
+  variations: string;            // Variantes régionales (2 phrases)
   winePairing: string;
   wineReason: string;
+  servingSuggestion: string;     // Suggestion de présentation
   cookingTime: string;
   difficulty: string;
+  portions: string;              // Nombre de portions
   imageUrl?: string;
   isGeneratingImage?: boolean;
 }
@@ -179,40 +184,51 @@ const EbookRecipeBookGenerator: React.FC<EbookRecipeBookGeneratorProps> = ({ ebo
       const { data, error } = await supabase.functions.invoke('generate-content', {
         body: {
           type: 'recipe-sheets',
-          prompt: `Tu es un chef étoilé et sommelier expert. Génère exactement ${count} fiches recettes traditionnelles ${countryContext}.
+          prompt: `Tu es un chef étoilé Michelin et sommelier expert reconnu mondialement. Génère exactement ${count} FICHES RECETTES COMPLÈTES (minimum 300 mots chacune) de recettes traditionnelles ${countryContext}.
 
 Titre du livre: "${bookTitle}"
 ${customInstructions ? `Instructions spéciales: ${customInstructions}` : ''}
 
-IMPORTANT: Retourne UNIQUEMENT du JSON valide, sans texte avant ni après.
+IMPORTANT: Chaque fiche doit être TRÈS DÉTAILLÉE avec au moins 300 mots de contenu riche.
+Retourne UNIQUEMENT du JSON valide, sans texte avant ni après.
 
-Pour CHAQUE recette, fournis:
+Pour CHAQUE recette, fournis OBLIGATOIREMENT:
 - country: Le pays d'origine
-- dishName: Le nom authentique du plat
-- description: Une description appétissante (2-3 phrases)
-- ingredients: Liste de 6-8 ingrédients clés
-- steps: 4-5 étapes de préparation concises
-- winePairing: Le nom du vin ou boisson recommandé
-- wineReason: Pourquoi cet accord fonctionne (1 phrase)
-- cookingTime: Temps de préparation et cuisson
+- dishName: Le nom authentique et traditionnel du plat
+- description: Description gourmande et appétissante (3-4 phrases décrivant les saveurs, textures et arômes)
+- history: L'histoire et l'origine du plat (2-3 phrases sur la tradition culinaire, la région d'origine, le contexte culturel)
+- ingredients: Liste DÉTAILLÉE de 10-12 ingrédients avec quantités précises (ex: "500g de bœuf bourguignon bien persillé")
+- steps: 8-10 étapes DÉTAILLÉES de préparation avec temps et techniques précises
+- chefTips: 2-3 conseils de chef professionnel pour réussir parfaitement ce plat
+- variations: Variantes régionales ou saisonnières du plat (2 phrases)
+- winePairing: Le vin ou boisson spécifique recommandé (appellation précise)
+- wineReason: Explication détaillée de pourquoi cet accord fonctionne (2 phrases sur les arômes et la complémentarité)
+- servingSuggestion: Comment dresser et présenter le plat (1-2 phrases)
+- cookingTime: Temps détaillé (préparation + repos + cuisson)
 - difficulty: Facile, Moyen ou Difficile
+- portions: Nombre de personnes
 
-Varie les pays, les types de plats (entrées, plats, desserts) et les saveurs.
-Inclus des recettes emblématiques et authentiques.
+Varie les pays (5 continents), les types de plats (entrées, plats, desserts, accompagnements) et les profils de saveurs.
+Inclus des recettes emblématiques, authentiques et traditionnelles.
 
 Format JSON strict:
 {
   "recipes": [
     {
       "country": "France",
-      "dishName": "Coq au Vin",
-      "description": "Un grand classique de la cuisine bourguignonne...",
-      "ingredients": ["Poulet fermier", "Vin rouge Bourgogne", "Lardons", "Champignons", "Oignons grelots", "Thym frais"],
-      "steps": ["Mariner le poulet dans le vin rouge", "Faire revenir les lardons", "Braiser 2 heures à feu doux", "Servir avec des pommes de terre"],
-      "winePairing": "Bourgogne Pinot Noir",
-      "wineReason": "La finesse du vin complète parfaitement la sauce au vin rouge",
-      "cookingTime": "Préparation: 30 min | Cuisson: 2h",
-      "difficulty": "Moyen"
+      "dishName": "Coq au Vin de Bourgogne",
+      "description": "Un grand classique de la cuisine bourguignonne, ce plat rustique et généreux offre des saveurs profondes et réconfortantes. La chair du coq, longuement mijotée, devient incroyablement tendre et s'imprègne des arômes du vin rouge. Les champignons de Paris et les petits oignons grelots apportent une touche de douceur qui équilibre la richesse de la sauce.",
+      "history": "Cette recette emblématique trouve ses origines dans la Bourgogne médiévale, où les paysans cuisinaient les vieux coqs dans le vin local. Popularisé par Julia Child dans les années 1960, ce plat est devenu un symbole de la gastronomie française dans le monde entier.",
+      "ingredients": ["1 coq fermier de 2kg découpé en 8 morceaux", "1 bouteille de Bourgogne rouge (75cl)", "200g de lardons fumés", "300g de champignons de Paris", "20 petits oignons grelots", "3 gousses d'ail écrasées", "2 branches de thym frais", "2 feuilles de laurier", "3 cuillères à soupe de farine", "50g de beurre", "Sel et poivre du moulin", "Persil plat pour la finition"],
+      "steps": ["La veille, marinez les morceaux de coq dans le vin rouge avec le thym, le laurier et l'ail pendant 12 heures au réfrigérateur", "Égouttez et séchez soigneusement les morceaux, réservez la marinade", "Dans une cocotte, faites revenir les lardons jusqu'à ce qu'ils soient dorés, réservez", "Faites dorer les morceaux de coq dans le gras des lardons, 5 minutes de chaque côté", "Ajoutez les oignons grelots et les champignons, faites-les sauter 5 minutes", "Saupoudrez de farine, mélangez et versez la marinade filtrée", "Ajoutez les lardons, couvrez et laissez mijoter 2 heures à feu très doux", "Goûtez et ajustez l'assaisonnement en fin de cuisson", "Servez parsemé de persil frais haché"],
+      "chefTips": "Choisissez un vrai coq fermier pour une chair plus ferme et goûteuse qu'un poulet standard. N'hésitez pas à flamber les morceaux au cognac avant d'ajouter le vin pour intensifier les saveurs. La sauce doit napper la cuillère sans être trop épaisse.",
+      "variations": "Dans le Jura, on prépare une version au vin jaune avec des morilles. À Lyon, on ajoute parfois de la crème fraîche en fin de cuisson pour une sauce plus onctueuse.",
+      "winePairing": "Bourgogne Pinot Noir - Gevrey-Chambertin Village",
+      "wineReason": "La finesse et les tanins soyeux du Pinot Noir bourguignon complètent parfaitement la sauce au vin rouge. Les notes de cerise et de sous-bois du Gevrey-Chambertin se marient harmonieusement avec les champignons et les arômes de cuisson.",
+      "servingSuggestion": "Dressez dans un plat en terre cuite réchauffé, entouré de pommes de terre vapeur persillées. Décorez de quelques brins de thym frais.",
+      "cookingTime": "Préparation: 30 min | Marinade: 12h | Cuisson: 2h15",
+      "difficulty": "Moyen",
+      "portions": "6 personnes"
     }
   ]
 }`
@@ -239,13 +255,18 @@ Format JSON strict:
         country: recipe.country || 'International',
         countryFlag: countryFlags[recipe.country] || '🌍',
         dishName: recipe.dishName || `Recette ${index + 1}`,
-        description: recipe.description || 'Délicieuse recette traditionnelle.',
-        ingredients: Array.isArray(recipe.ingredients) ? recipe.ingredients : ['Ingrédients variés'],
-        steps: Array.isArray(recipe.steps) ? recipe.steps : ['Préparer les ingrédients', 'Cuisiner', 'Servir'],
-        winePairing: recipe.winePairing || 'Vin rouge ou blanc',
-        wineReason: recipe.wineReason || 'Accord harmonieux',
+        description: recipe.description || 'Délicieuse recette traditionnelle aux saveurs authentiques.',
+        history: recipe.history || 'Recette traditionnelle transmise de génération en génération.',
+        ingredients: Array.isArray(recipe.ingredients) ? recipe.ingredients : ['Ingrédients variés selon disponibilité'],
+        steps: Array.isArray(recipe.steps) ? recipe.steps : ['Préparer les ingrédients', 'Cuisiner selon la tradition', 'Servir chaud'],
+        chefTips: recipe.chefTips || 'Utilisez des ingrédients frais et de saison pour un résultat optimal.',
+        variations: recipe.variations || 'Ce plat peut être adapté selon les goûts de chacun.',
+        winePairing: recipe.winePairing || 'Vin rouge ou blanc selon préférence',
+        wineReason: recipe.wineReason || 'Accord harmonieux qui sublime les saveurs du plat.',
+        servingSuggestion: recipe.servingSuggestion || 'Servir dans un plat de présentation réchauffé.',
         cookingTime: recipe.cookingTime || '45 min',
         difficulty: recipe.difficulty || 'Moyen',
+        portions: recipe.portions || '4 personnes',
       }));
 
       setSheets(generatedSheets);
@@ -270,16 +291,56 @@ Format JSON strict:
   // Fallback recipes generator
   const generateFallbackRecipes = (count: number) => {
     const fallbackData = [
-      { country: 'France', dishName: 'Ratatouille', description: 'Légumes du soleil mijotés à la provençale', winePairing: 'Côtes de Provence Rosé' },
-      { country: 'Italie', dishName: 'Risotto alla Milanese', description: 'Riz crémeux au safran', winePairing: 'Barbera d\'Alba' },
-      { country: 'Japon', dishName: 'Ramen Tonkotsu', description: 'Bouillon de porc onctueux', winePairing: 'Bière japonaise Asahi' },
-      { country: 'Mexique', dishName: 'Tacos al Pastor', description: 'Porc mariné à l\'ananas', winePairing: 'Margarita classique' },
-      { country: 'Inde', dishName: 'Butter Chicken', description: 'Poulet dans une sauce tomate crémeuse', winePairing: 'Gewürztraminer' },
-      { country: 'Maroc', dishName: 'Tajine d\'Agneau', description: 'Agneau aux pruneaux et amandes', winePairing: 'Vin gris de Boulaouane' },
-      { country: 'Thaïlande', dishName: 'Pad Thai', description: 'Nouilles sautées aux crevettes', winePairing: 'Riesling demi-sec' },
-      { country: 'Grèce', dishName: 'Moussaka', description: 'Gratin d\'aubergines et viande', winePairing: 'Naoussa rouge' },
-      { country: 'Pérou', dishName: 'Ceviche', description: 'Poisson mariné au citron vert', winePairing: 'Pisco Sour' },
-      { country: 'Espagne', dishName: 'Paella Valenciana', description: 'Riz safrané aux fruits de mer', winePairing: 'Albariño' },
+      { 
+        country: 'France', 
+        dishName: 'Ratatouille Provençale', 
+        description: 'Les légumes du soleil mijotés lentement à la provençale, créant une symphonie de saveurs méditerranéennes. Chaque légume conserve sa texture tout en absorbant les arômes de l\'huile d\'olive et des herbes de Provence.',
+        history: 'Originaire de Nice au 18ème siècle, ce plat paysan est devenu un symbole de la cuisine provençale.',
+        winePairing: 'Côtes de Provence Rosé',
+        chefTips: 'Coupez tous les légumes en dés réguliers et faites-les revenir séparément avant de les réunir.',
+        variations: 'En Catalogne, on ajoute des anchois et des câpres.',
+        servingSuggestion: 'Servir tiède ou froid avec un filet d\'huile d\'olive.'
+      },
+      { 
+        country: 'Italie', 
+        dishName: 'Risotto alla Milanese', 
+        description: 'Le riz crémeux au safran, emblème de la cuisine milanaise, offre une texture onctueuse incomparable. Les fils de safran apportent une couleur dorée et un parfum subtil.',
+        history: 'Créé au 16ème siècle par un apprenti verrier qui utilisait le safran pour colorer le verre.',
+        winePairing: 'Barbera d\'Alba',
+        chefTips: 'Utilisez du riz Carnaroli et ajoutez le bouillon louche par louche.',
+        variations: 'À Venise, on y ajoute des fruits de mer.',
+        servingSuggestion: 'Servir immédiatement, le risotto n\'attend pas.'
+      },
+      { 
+        country: 'Japon', 
+        dishName: 'Ramen Tonkotsu', 
+        description: 'Le bouillon de porc onctueux mijoté pendant 12 heures, créant une texture laiteuse et des saveurs profondes. Les nouilles fraîches absorbent parfaitement ce nectar umami.',
+        history: 'Né à Fukuoka dans les années 1940, ce style de ramen est devenu culte dans le monde entier.',
+        winePairing: 'Bière japonaise Asahi ou Saké froid',
+        chefTips: 'Le secret est la cuisson très longue des os de porc à feu vif.',
+        variations: 'À Tokyo, on préfère un bouillon plus clair à base de sauce soja.',
+        servingSuggestion: 'Servir brûlant avec les garnitures disposées harmonieusement.'
+      },
+      { 
+        country: 'Mexique', 
+        dishName: 'Tacos al Pastor', 
+        description: 'Le porc mariné aux épices et à l\'ananas, inspiré des shawarma libanais. La viande caramélisée et l\'acidité du fruit créent un équilibre parfait.',
+        history: 'Créé par les immigrés libanais à Mexico dans les années 1930, fusionnant traditions moyen-orientales et mexicaines.',
+        winePairing: 'Margarita classique ou Cerveza Corona',
+        chefTips: 'La marinade doit contenir du achiote pour la couleur rouge caractéristique.',
+        variations: 'À Guadalajara, on utilise parfois du bœuf au lieu du porc.',
+        servingSuggestion: 'Servir sur tortillas de maïs avec oignon, coriandre et salsa verde.'
+      },
+      { 
+        country: 'Inde', 
+        dishName: 'Butter Chicken', 
+        description: 'Le poulet tendre nappé d\'une sauce tomate crémeuse aux épices douces. Ce plat emblématique de Delhi offre un équilibre parfait entre richesse et subtilité aromatique.',
+        history: 'Inventé dans les années 1950 au restaurant Moti Mahal de Delhi à partir de restes de tandoori.',
+        winePairing: 'Gewürztraminer ou Lassi à la mangue',
+        chefTips: 'Marinez le poulet dans le yaourt et les épices pendant au moins 4 heures.',
+        variations: 'Au Royaume-Uni, la version est souvent plus épicée.',
+        servingSuggestion: 'Servir avec du riz basmati et du naan fraîchement cuit.'
+      },
     ];
 
     const result = [];
@@ -287,11 +348,22 @@ Format JSON strict:
       const base = fallbackData[i % fallbackData.length];
       result.push({
         ...base,
-        ingredients: ['Ingrédient 1', 'Ingrédient 2', 'Ingrédient 3', 'Ingrédient 4'],
-        steps: ['Étape 1', 'Étape 2', 'Étape 3'],
-        wineReason: 'Accord parfait',
-        cookingTime: '45 min',
-        difficulty: 'Moyen'
+        ingredients: ['500g de protéine principale', '2 oignons émincés', '3 gousses d\'ail', 'Épices traditionnelles', 'Herbes fraîches', 'Huile d\'olive', 'Sel et poivre', '200ml de sauce', 'Légumes de saison', 'Accompagnement traditionnel'],
+        steps: [
+          'Préparer et découper tous les ingrédients en avance',
+          'Mariner la protéine pendant au moins 2 heures',
+          'Faire revenir les aromates dans l\'huile',
+          'Ajouter les épices et faire griller 30 secondes',
+          'Incorporer la protéine et saisir à feu vif',
+          'Ajouter les liquides et laisser mijoter',
+          'Cuire à feu doux jusqu\'à tendreté parfaite',
+          'Goûter et ajuster l\'assaisonnement',
+          'Laisser reposer 5 minutes avant de servir'
+        ],
+        wineReason: 'L\'accord parfait entre les arômes du plat et les notes du vin.',
+        cookingTime: 'Préparation: 30 min | Cuisson: 45 min',
+        difficulty: 'Moyen',
+        portions: '4 personnes'
       });
     }
     return result;
@@ -419,13 +491,17 @@ ${authorName ? `Author: ${authorName}` : ''}`,
     }
   };
 
-  // Copy sheet to clipboard
+  // Copy sheet to clipboard (300+ words)
   const copySheet = async (sheet: RecipeSheet, index: number) => {
     const text = `${sheet.countryFlag} ${sheet.country.toUpperCase()}
 
 🍽️ ${sheet.dishName}
+⏱️ ${sheet.cookingTime} | ${sheet.difficulty} | ${sheet.portions}
 
 ${sheet.description}
+
+📜 HISTOIRE & ORIGINE
+${sheet.history}
 
 📝 INGRÉDIENTS
 ${sheet.ingredients.map(i => `• ${i}`).join('\n')}
@@ -433,17 +509,24 @@ ${sheet.ingredients.map(i => `• ${i}`).join('\n')}
 👨‍🍳 PRÉPARATION
 ${sheet.steps.map((s, i) => `${i + 1}. ${s}`).join('\n')}
 
-🍷 ACCORD VIN
+💡 CONSEILS DU CHEF
+${sheet.chefTips}
+
+🌍 VARIANTES RÉGIONALES
+${sheet.variations}
+
+🍷 ACCORD METS-VINS
 ${sheet.winePairing}
 ${sheet.wineReason}
 
-⏱️ ${sheet.cookingTime} | ${sheet.difficulty}`;
+🍽️ PRÉSENTATION
+${sheet.servingSuggestion}`;
     
     try {
       await navigator.clipboard.writeText(text);
       setCopiedIndex(index);
       setTimeout(() => setCopiedIndex(null), 2000);
-      toast.success('Fiche copiée !');
+      toast.success('Fiche complète copiée ! (300+ mots)');
     } catch (err) {
       toast.error('Erreur lors de la copie');
     }
@@ -501,11 +584,14 @@ ${sheet.wineReason}
         }
       }
 
-      // Recipe sheets - one per page
+      // Recipe sheets - one per page with 300+ words content
       for (const sheet of sheets) {
         pdf.addPage();
         
         let yPos = margin;
+        const leftColumnWidth = 55; // For image and wine
+        const rightColumnStart = margin + leftColumnWidth + 5;
+        const rightColumnWidth = contentWidth - leftColumnWidth - 5;
         
         // Country header
         pdf.setFillColor(245, 245, 220);
@@ -513,21 +599,24 @@ ${sheet.wineReason}
         pdf.setTextColor(139, 69, 19);
         pdf.setFontSize(14);
         pdf.text(`${sheet.countryFlag} ${sheet.country}`, margin + 5, yPos + 8);
-        yPos += 18;
+        pdf.setFontSize(9);
+        pdf.text(`${sheet.portions}`, margin + contentWidth - 20, yPos + 8);
+        yPos += 16;
         
-        // Dish name
+        // Dish name and time
         pdf.setTextColor(0, 0, 0);
-        pdf.setFontSize(20);
-        pdf.text(sheet.dishName, margin, yPos);
-        yPos += 10;
+        pdf.setFontSize(18);
+        const titleLines = pdf.splitTextToSize(sheet.dishName, contentWidth);
+        pdf.text(titleLines, margin, yPos);
+        yPos += titleLines.length * 7 + 2;
         
-        // Difficulty and time
-        pdf.setFontSize(10);
+        pdf.setFontSize(9);
         pdf.setTextColor(100, 100, 100);
         pdf.text(`${sheet.difficulty} | ${sheet.cookingTime}`, margin, yPos);
-        yPos += 10;
+        yPos += 8;
         
-        // Image
+        // Left column - Image
+        const leftColStartY = yPos;
         if (sheet.imageUrl) {
           try {
             const response = await fetch(sheet.imageUrl);
@@ -536,63 +625,120 @@ ${sheet.wineReason}
             await new Promise<void>((resolve) => {
               reader.onloadend = () => {
                 const base64 = reader.result as string;
-                pdf.addImage(base64, 'PNG', margin, yPos, contentWidth, 60);
+                pdf.addImage(base64, 'PNG', margin, yPos, leftColumnWidth, 45);
                 resolve();
               };
               reader.readAsDataURL(blob);
             });
-            yPos += 65;
           } catch {
-            yPos += 5;
+            // Skip image on error
           }
         }
         
-        // Description
-        pdf.setFontSize(11);
+        // Right column - Description & History
+        let rightYPos = leftColStartY;
+        pdf.setFontSize(10);
         pdf.setTextColor(60, 60, 60);
-        const descLines = pdf.splitTextToSize(sheet.description, contentWidth);
-        pdf.text(descLines, margin, yPos);
-        yPos += descLines.length * 5 + 8;
+        const descLines = pdf.splitTextToSize(sheet.description, rightColumnWidth);
+        pdf.text(descLines, rightColumnStart, rightYPos);
+        rightYPos += descLines.length * 4 + 3;
         
-        // Ingredients
-        pdf.setFontSize(12);
-        pdf.setTextColor(139, 69, 19);
-        pdf.text('INGRÉDIENTS', margin, yPos);
-        yPos += 6;
-        
-        pdf.setFontSize(10);
-        pdf.setTextColor(0, 0, 0);
-        sheet.ingredients.forEach(ing => {
-          pdf.text(`• ${ing}`, margin + 3, yPos);
-          yPos += 5;
-        });
-        yPos += 5;
-        
-        // Steps
-        pdf.setFontSize(12);
-        pdf.setTextColor(139, 69, 19);
-        pdf.text('PRÉPARATION', margin, yPos);
-        yPos += 6;
-        
-        pdf.setFontSize(10);
-        pdf.setTextColor(0, 0, 0);
-        sheet.steps.forEach((step, i) => {
-          const stepLines = pdf.splitTextToSize(`${i + 1}. ${step}`, contentWidth - 5);
-          pdf.text(stepLines, margin + 3, yPos);
-          yPos += stepLines.length * 5;
-        });
-        yPos += 5;
-        
-        // Wine pairing
-        pdf.setFillColor(245, 230, 230);
-        pdf.rect(margin, yPos, contentWidth, 20, 'F');
-        pdf.setTextColor(139, 69, 19);
-        pdf.setFontSize(11);
-        pdf.text(`🍷 ${sheet.winePairing}`, margin + 5, yPos + 7);
+        // History (italic style)
         pdf.setFontSize(9);
         pdf.setTextColor(100, 100, 100);
-        const wineLines = pdf.splitTextToSize(sheet.wineReason, contentWidth - 10);
-        pdf.text(wineLines, margin + 5, yPos + 14);
+        const historyLines = pdf.splitTextToSize(`📜 ${sheet.history}`, rightColumnWidth);
+        pdf.text(historyLines, rightColumnStart, rightYPos);
+        rightYPos += historyLines.length * 4 + 5;
+        
+        // Move yPos to after left column image
+        yPos = Math.max(leftColStartY + 50, rightYPos);
+        
+        // Wine pairing box (under image)
+        pdf.setFillColor(245, 230, 245);
+        pdf.rect(margin, yPos, leftColumnWidth, 25, 'F');
+        pdf.setTextColor(128, 0, 128);
+        pdf.setFontSize(9);
+        pdf.text('🍷 Accord Mets-Vins', margin + 3, yPos + 6);
+        pdf.setFontSize(8);
+        pdf.setTextColor(100, 100, 100);
+        const wineName = pdf.splitTextToSize(sheet.winePairing, leftColumnWidth - 6);
+        pdf.text(wineName, margin + 3, yPos + 12);
+        const wineReason = pdf.splitTextToSize(sheet.wineReason, leftColumnWidth - 6);
+        pdf.text(wineReason.slice(0, 2), margin + 3, yPos + 18);
+        
+        // Ingredients (next to wine box)
+        let ingYPos = yPos;
+        pdf.setFontSize(11);
+        pdf.setTextColor(139, 69, 19);
+        pdf.text('📝 INGRÉDIENTS', rightColumnStart, ingYPos);
+        ingYPos += 5;
+        
+        pdf.setFontSize(9);
+        pdf.setTextColor(0, 0, 0);
+        const ingCols = Math.ceil(sheet.ingredients.length / 2);
+        const halfWidth = rightColumnWidth / 2;
+        sheet.ingredients.forEach((ing, i) => {
+          const col = i < ingCols ? 0 : 1;
+          const row = i < ingCols ? i : i - ingCols;
+          const ingText = pdf.splitTextToSize(`• ${ing}`, halfWidth - 2);
+          pdf.text(ingText[0], rightColumnStart + col * halfWidth, ingYPos + row * 4);
+        });
+        
+        yPos = Math.max(yPos + 28, ingYPos + Math.ceil(sheet.ingredients.length / 2) * 4 + 5);
+        
+        // Steps
+        pdf.setFontSize(11);
+        pdf.setTextColor(139, 69, 19);
+        pdf.text('👨‍🍳 PRÉPARATION', margin, yPos);
+        yPos += 5;
+        
+        pdf.setFontSize(9);
+        pdf.setTextColor(0, 0, 0);
+        sheet.steps.forEach((step, i) => {
+          if (yPos > pageHeight - 30) return; // Prevent overflow
+          const stepLines = pdf.splitTextToSize(`${i + 1}. ${step}`, contentWidth - 8);
+          pdf.text(stepLines, margin + 5, yPos);
+          yPos += stepLines.length * 4;
+        });
+        yPos += 4;
+        
+        // Chef tips & Variations (side by side)
+        if (yPos < pageHeight - 25) {
+          const boxWidth = (contentWidth - 5) / 2;
+          
+          // Chef tips
+          pdf.setFillColor(255, 250, 240);
+          pdf.rect(margin, yPos, boxWidth, 18, 'F');
+          pdf.setTextColor(180, 120, 0);
+          pdf.setFontSize(8);
+          pdf.text('💡 Conseils du Chef', margin + 2, yPos + 4);
+          pdf.setFontSize(7);
+          pdf.setTextColor(80, 80, 80);
+          const tipsLines = pdf.splitTextToSize(sheet.chefTips, boxWidth - 4);
+          pdf.text(tipsLines.slice(0, 3), margin + 2, yPos + 9);
+          
+          // Variations
+          pdf.setFillColor(240, 255, 240);
+          pdf.rect(margin + boxWidth + 5, yPos, boxWidth, 18, 'F');
+          pdf.setTextColor(0, 128, 0);
+          pdf.setFontSize(8);
+          pdf.text('🌍 Variantes', margin + boxWidth + 7, yPos + 4);
+          pdf.setFontSize(7);
+          pdf.setTextColor(80, 80, 80);
+          const varLines = pdf.splitTextToSize(sheet.variations, boxWidth - 4);
+          pdf.text(varLines.slice(0, 3), margin + boxWidth + 7, yPos + 9);
+          
+          yPos += 20;
+        }
+        
+        // Serving suggestion
+        if (yPos < pageHeight - 15) {
+          pdf.setFillColor(255, 248, 240);
+          pdf.rect(margin, yPos, contentWidth, 10, 'F');
+          pdf.setTextColor(139, 69, 19);
+          pdf.setFontSize(8);
+          pdf.text(`🍽️ Présentation: ${sheet.servingSuggestion}`, margin + 3, yPos + 6);
+        }
       }
 
       pdf.save(`${bookTitle.replace(/\s+/g, '-').toLowerCase()}-recettes.pdf`);
@@ -847,84 +993,154 @@ ${sheet.wineReason}
           </div>
         </TabsContent>
 
-        {/* Sheets Tab */}
+        {/* Sheets Tab - Full detailed view */}
         <TabsContent value="sheets" className="mt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="space-y-6">
             {sheets.map((sheet, index) => (
               <Card key={sheet.id} className="border-orange-200/50 overflow-hidden hover:shadow-lg transition-shadow">
-                {/* Image */}
-                {sheet.imageUrl ? (
-                  <div className="relative h-40 overflow-hidden">
-                    <img 
-                      src={sheet.imageUrl} 
-                      alt={sheet.dishName}
-                      className="w-full h-full object-cover"
-                    />
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => regenerateImage(sheet.id)}
-                      disabled={sheet.isGeneratingImage}
-                      className="absolute top-2 right-2 bg-white/80 hover:bg-white"
-                    >
-                      {sheet.isGeneratingImage ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
+                <CardContent className="p-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Left column: Image */}
+                    <div className="lg:col-span-1">
+                      {sheet.imageUrl ? (
+                        <div className="relative aspect-square rounded-xl overflow-hidden">
+                          <img 
+                            src={sheet.imageUrl} 
+                            alt={sheet.dishName}
+                            className="w-full h-full object-cover"
+                          />
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => regenerateImage(sheet.id)}
+                            disabled={sheet.isGeneratingImage}
+                            className="absolute top-2 right-2 bg-white/80 hover:bg-white"
+                          >
+                            {sheet.isGeneratingImage ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <RefreshCw className="w-4 h-4" />
+                            )}
+                          </Button>
+                        </div>
                       ) : (
-                        <RefreshCw className="w-4 h-4" />
+                        <div className="aspect-square bg-gradient-to-br from-orange-100 to-amber-100 dark:from-orange-900/30 dark:to-amber-900/30 rounded-xl flex items-center justify-center">
+                          {sheet.isGeneratingImage ? (
+                            <Loader2 className="w-12 h-12 text-orange-400 animate-spin" />
+                          ) : (
+                            <ImageIcon className="w-12 h-12 text-orange-300" />
+                          )}
+                        </div>
                       )}
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="h-40 bg-gradient-to-br from-orange-100 to-amber-100 dark:from-orange-900/30 dark:to-amber-900/30 flex items-center justify-center">
-                    {sheet.isGeneratingImage ? (
-                      <Loader2 className="w-8 h-8 text-orange-400 animate-spin" />
-                    ) : (
-                      <ImageIcon className="w-8 h-8 text-orange-300" />
-                    )}
-                  </div>
-                )}
-                
-                <CardContent className="p-4">
-                  {/* Country badge */}
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-lg">{sheet.countryFlag}</span>
-                    <Badge variant="outline" className="text-xs">{sheet.country}</Badge>
-                    <Badge variant="secondary" className="text-xs ml-auto">{sheet.difficulty}</Badge>
-                  </div>
-                  
-                  {/* Dish name */}
-                  <h3 className="font-bold text-lg text-orange-800 dark:text-orange-400 mb-1">
-                    {sheet.dishName}
-                  </h3>
-                  
-                  {/* Description */}
-                  <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                    {sheet.description}
-                  </p>
-                  
-                  {/* Wine pairing */}
-                  <div className="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-2 mb-3">
-                    <div className="flex items-center gap-1 text-orange-700 dark:text-orange-400">
-                      <Wine className="w-3 h-3" />
-                      <span className="text-xs font-medium">{sheet.winePairing}</span>
+                      
+                      {/* Wine pairing box */}
+                      <div className="mt-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl p-4 border border-purple-200/50">
+                        <div className="flex items-center gap-2 text-purple-700 dark:text-purple-400 font-semibold mb-2">
+                          <Wine className="w-5 h-5" />
+                          Accord Mets-Vins
+                        </div>
+                        <p className="font-bold text-purple-800 dark:text-purple-300">{sheet.winePairing}</p>
+                        <p className="text-sm text-muted-foreground mt-1">{sheet.wineReason}</p>
+                      </div>
+                      
+                      {/* Actions */}
+                      <div className="mt-4 flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => copySheet(sheet, index)}
+                          className="flex-1"
+                        >
+                          {copiedIndex === index ? (
+                            <CheckCircle className="w-4 h-4 mr-1 text-green-500" />
+                          ) : (
+                            <Copy className="w-4 h-4 mr-1" />
+                          )}
+                          Copier la fiche
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                  
-                  {/* Actions */}
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => copySheet(sheet, index)}
-                      className="flex-1"
-                    >
-                      {copiedIndex === index ? (
-                        <CheckCircle className="w-4 h-4 mr-1 text-green-500" />
-                      ) : (
-                        <Copy className="w-4 h-4 mr-1" />
-                      )}
-                      Copier
-                    </Button>
+
+                    {/* Right column: Content */}
+                    <div className="lg:col-span-2 space-y-4">
+                      {/* Header */}
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-2xl">{sheet.countryFlag}</span>
+                            <Badge variant="outline" className="bg-orange-50">{sheet.country}</Badge>
+                            <Badge variant="secondary">{sheet.difficulty}</Badge>
+                            <Badge variant="outline" className="text-xs">{sheet.portions}</Badge>
+                          </div>
+                          <h3 className="text-2xl font-bold text-orange-800 dark:text-orange-400">
+                            {sheet.dishName}
+                          </h3>
+                        </div>
+                        <div className="text-right text-sm text-muted-foreground">
+                          <span className="bg-orange-100 dark:bg-orange-900/30 px-2 py-1 rounded-lg">
+                            ⏱️ {sheet.cookingTime}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Description & History */}
+                      <div className="space-y-2">
+                        <p className="text-muted-foreground leading-relaxed">{sheet.description}</p>
+                        <p className="text-sm text-muted-foreground italic bg-orange-50/50 dark:bg-orange-900/10 p-3 rounded-lg border-l-4 border-orange-300">
+                          📜 {sheet.history}
+                        </p>
+                      </div>
+
+                      {/* Ingredients */}
+                      <div>
+                        <h4 className="font-semibold text-orange-700 dark:text-orange-400 mb-2 flex items-center gap-2">
+                          📝 Ingrédients
+                        </h4>
+                        <div className="grid grid-cols-2 gap-1">
+                          {sheet.ingredients.map((ing, i) => (
+                            <div key={i} className="flex items-start gap-2 text-sm">
+                              <span className="text-orange-500">•</span>
+                              <span>{ing}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Steps */}
+                      <div>
+                        <h4 className="font-semibold text-orange-700 dark:text-orange-400 mb-2 flex items-center gap-2">
+                          👨‍🍳 Préparation
+                        </h4>
+                        <div className="space-y-2">
+                          {sheet.steps.map((step, i) => (
+                            <div key={i} className="flex items-start gap-3 text-sm">
+                              <span className="flex-shrink-0 w-6 h-6 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center text-xs font-bold text-orange-700 dark:text-orange-400">
+                                {i + 1}
+                              </span>
+                              <span className="leading-relaxed">{step}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Chef Tips & Variations */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div className="bg-amber-50 dark:bg-amber-900/20 p-3 rounded-lg border border-amber-200/50">
+                          <h5 className="font-medium text-amber-700 dark:text-amber-400 text-sm mb-1">💡 Conseils du Chef</h5>
+                          <p className="text-xs text-muted-foreground">{sheet.chefTips}</p>
+                        </div>
+                        <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg border border-green-200/50">
+                          <h5 className="font-medium text-green-700 dark:text-green-400 text-sm mb-1">🌍 Variantes</h5>
+                          <p className="text-xs text-muted-foreground">{sheet.variations}</p>
+                        </div>
+                      </div>
+
+                      {/* Serving Suggestion */}
+                      <div className="bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-900/10 dark:to-amber-900/10 p-3 rounded-lg border border-orange-200/30">
+                        <h5 className="font-medium text-orange-700 dark:text-orange-400 text-sm mb-1">🍽️ Présentation</h5>
+                        <p className="text-sm text-muted-foreground">{sheet.servingSuggestion}</p>
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
