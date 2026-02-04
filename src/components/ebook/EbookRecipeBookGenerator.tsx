@@ -176,24 +176,75 @@ const EbookRecipeBookGenerator: React.FC<EbookRecipeBookGeneratorProps> = ({ ebo
       setCurrentStep('Génération des fiches recettes...');
       setProgress(10);
 
-      // Determine countries to use
-      const countryContext = selectedCountry === 'tour-du-monde' 
-        ? 'des pays du monde entier (variété des 5 continents)'
-        : `de ${selectedCountry}`;
+      // Analyse du titre pour extraire le contexte
+      const titleLower = bookTitle.toLowerCase();
+      let countryFromTitle = '';
+      let themeFromTitle = '';
+      
+      // Détection du pays dans le titre
+      const countryKeywords: Record<string, string> = {
+        'français': 'France', 'française': 'France', 'france': 'France',
+        'italien': 'Italie', 'italienne': 'Italie', 'italie': 'Italie',
+        'espagnol': 'Espagne', 'espagnole': 'Espagne', 'espagne': 'Espagne',
+        'japonais': 'Japon', 'japonaise': 'Japon', 'japon': 'Japon',
+        'chinois': 'Chine', 'chinoise': 'Chine', 'chine': 'Chine',
+        'thaïlandais': 'Thaïlande', 'thaïlandaise': 'Thaïlande', 'thaï': 'Thaïlande',
+        'indien': 'Inde', 'indienne': 'Inde', 'inde': 'Inde',
+        'mexicain': 'Mexique', 'mexicaine': 'Mexique', 'mexique': 'Mexique',
+        'marocain': 'Maroc', 'marocaine': 'Maroc', 'maroc': 'Maroc',
+        'grec': 'Grèce', 'grecque': 'Grèce', 'grèce': 'Grèce',
+        'libanais': 'Liban', 'libanaise': 'Liban', 'liban': 'Liban',
+        'vietnamien': 'Vietnam', 'vietnamienne': 'Vietnam', 'vietnam': 'Vietnam',
+        'coréen': 'Corée du Sud', 'coréenne': 'Corée du Sud', 'corée': 'Corée du Sud',
+        'américain': 'États-Unis', 'américaine': 'États-Unis',
+        'brésilien': 'Brésil', 'brésilienne': 'Brésil', 'brésil': 'Brésil',
+        'péruvien': 'Pérou', 'péruvienne': 'Pérou', 'pérou': 'Pérou',
+        'portugais': 'Portugal', 'portugaise': 'Portugal', 'portugal': 'Portugal',
+        'allemand': 'Allemagne', 'allemande': 'Allemagne', 'allemagne': 'Allemagne',
+        'belge': 'Belgique', 'belgique': 'Belgique',
+        'suisse': 'Suisse',
+        'tunisien': 'Tunisie', 'tunisienne': 'Tunisie', 'tunisie': 'Tunisie',
+        'algérien': 'Algérie', 'algérienne': 'Algérie', 'algérie': 'Algérie',
+      };
+      
+      for (const [keyword, country] of Object.entries(countryKeywords)) {
+        if (titleLower.includes(keyword)) {
+          countryFromTitle = country;
+          break;
+        }
+      }
+
+      // Determine the final country context
+      let finalCountry = countryFromTitle || (selectedCountry !== 'tour-du-monde' ? selectedCountry : '');
+      
+      const countryInstruction = finalCountry 
+        ? `OBLIGATOIRE: TOUTES les recettes doivent être EXCLUSIVEMENT des plats traditionnels de ${finalCountry}. NE PAS inclure de recettes d'autres pays.`
+        : 'Variété des 5 continents avec des plats emblématiques de différents pays.';
 
       const { data, error } = await supabase.functions.invoke('generate-content', {
         body: {
           type: 'recipe-sheets',
-          prompt: `Tu es un chef étoilé Michelin et sommelier expert reconnu mondialement. Génère exactement ${count} FICHES RECETTES COMPLÈTES (minimum 300 mots chacune) de recettes traditionnelles ${countryContext}.
+          prompt: `Tu es un chef étoilé Michelin et sommelier expert reconnu mondialement.
 
-Titre du livre: "${bookTitle}"
-${customInstructions ? `Instructions spéciales: ${customInstructions}` : ''}
+TITRE DU LIVRE: "${bookTitle}"
+${customInstructions ? `Instructions spéciales du client: ${customInstructions}` : ''}
+
+⚠️ RÈGLE ABSOLUE - COHÉRENCE AVEC LE TITRE:
+${countryInstruction}
+${finalCountry ? `Tous les ${count} plats DOIVENT être des plats 100% ${finalCountry.toLowerCase() === 'france' ? 'français' : `de ${finalCountry}`}. Aucune exception.` : ''}
+
+Génère exactement ${count} FICHES RECETTES COMPLÈTES (minimum 300 mots chacune).
+
+🍷 ACCORD METS-VIN OBLIGATOIRE:
+Pour CHAQUE recette, fournis un accord vin PRÉCIS avec:
+- winePairing: L'appellation exacte du vin (ex: "Saint-Émilion Grand Cru 2018" ou "Meursault 1er Cru")
+- wineReason: Explication détaillée de pourquoi cet accord fonctionne (les arômes, la complémentarité, les tanins, l'acidité)
 
 IMPORTANT: Chaque fiche doit être TRÈS DÉTAILLÉE avec au moins 300 mots de contenu riche.
 Retourne UNIQUEMENT du JSON valide, sans texte avant ni après.
 
 Pour CHAQUE recette, fournis OBLIGATOIREMENT:
-- country: Le pays d'origine
+- country: "${finalCountry || 'Le pays d\'origine'}"
 - dishName: Le nom authentique et traditionnel du plat
 - description: Description gourmande et appétissante (3-4 phrases décrivant les saveurs, textures et arômes)
 - history: L'histoire et l'origine du plat (2-3 phrases sur la tradition culinaire, la région d'origine, le contexte culturel)
@@ -201,34 +252,33 @@ Pour CHAQUE recette, fournis OBLIGATOIREMENT:
 - steps: 8-10 étapes DÉTAILLÉES de préparation avec temps et techniques précises
 - chefTips: 2-3 conseils de chef professionnel pour réussir parfaitement ce plat
 - variations: Variantes régionales ou saisonnières du plat (2 phrases)
-- winePairing: Le vin ou boisson spécifique recommandé (appellation précise)
+- winePairing: Le vin spécifique recommandé (appellation précise, millésime si pertinent)
 - wineReason: Explication détaillée de pourquoi cet accord fonctionne (2 phrases sur les arômes et la complémentarité)
 - servingSuggestion: Comment dresser et présenter le plat (1-2 phrases)
 - cookingTime: Temps détaillé (préparation + repos + cuisson)
 - difficulty: Facile, Moyen ou Difficile
 - portions: Nombre de personnes
 
-Varie les pays (5 continents), les types de plats (entrées, plats, desserts, accompagnements) et les profils de saveurs.
-Inclus des recettes emblématiques, authentiques et traditionnelles.
+${finalCountry ? `RAPPEL: Les ${count} recettes doivent TOUTES être des classiques de la cuisine ${finalCountry.toLowerCase() === 'france' ? 'française' : `de ${finalCountry}`} (ex: ${finalCountry === 'France' ? 'Coq au Vin, Boeuf Bourguignon, Cassoulet, Blanquette de Veau, Pot-au-Feu, Ratatouille, Bouillabaisse, Quiche Lorraine, Gratin Dauphinois, Tarte Tatin' : 'plats traditionnels emblématiques'}).` : 'Varie les pays (5 continents), les types de plats (entrées, plats, desserts) et les profils de saveurs.'}
 
 Format JSON strict:
 {
   "recipes": [
     {
-      "country": "France",
-      "dishName": "Coq au Vin de Bourgogne",
-      "description": "Un grand classique de la cuisine bourguignonne, ce plat rustique et généreux offre des saveurs profondes et réconfortantes. La chair du coq, longuement mijotée, devient incroyablement tendre et s'imprègne des arômes du vin rouge. Les champignons de Paris et les petits oignons grelots apportent une touche de douceur qui équilibre la richesse de la sauce.",
-      "history": "Cette recette emblématique trouve ses origines dans la Bourgogne médiévale, où les paysans cuisinaient les vieux coqs dans le vin local. Popularisé par Julia Child dans les années 1960, ce plat est devenu un symbole de la gastronomie française dans le monde entier.",
-      "ingredients": ["1 coq fermier de 2kg découpé en 8 morceaux", "1 bouteille de Bourgogne rouge (75cl)", "200g de lardons fumés", "300g de champignons de Paris", "20 petits oignons grelots", "3 gousses d'ail écrasées", "2 branches de thym frais", "2 feuilles de laurier", "3 cuillères à soupe de farine", "50g de beurre", "Sel et poivre du moulin", "Persil plat pour la finition"],
-      "steps": ["La veille, marinez les morceaux de coq dans le vin rouge avec le thym, le laurier et l'ail pendant 12 heures au réfrigérateur", "Égouttez et séchez soigneusement les morceaux, réservez la marinade", "Dans une cocotte, faites revenir les lardons jusqu'à ce qu'ils soient dorés, réservez", "Faites dorer les morceaux de coq dans le gras des lardons, 5 minutes de chaque côté", "Ajoutez les oignons grelots et les champignons, faites-les sauter 5 minutes", "Saupoudrez de farine, mélangez et versez la marinade filtrée", "Ajoutez les lardons, couvrez et laissez mijoter 2 heures à feu très doux", "Goûtez et ajustez l'assaisonnement en fin de cuisson", "Servez parsemé de persil frais haché"],
-      "chefTips": "Choisissez un vrai coq fermier pour une chair plus ferme et goûteuse qu'un poulet standard. N'hésitez pas à flamber les morceaux au cognac avant d'ajouter le vin pour intensifier les saveurs. La sauce doit napper la cuillère sans être trop épaisse.",
-      "variations": "Dans le Jura, on prépare une version au vin jaune avec des morilles. À Lyon, on ajoute parfois de la crème fraîche en fin de cuisson pour une sauce plus onctueuse.",
-      "winePairing": "Bourgogne Pinot Noir - Gevrey-Chambertin Village",
-      "wineReason": "La finesse et les tanins soyeux du Pinot Noir bourguignon complètent parfaitement la sauce au vin rouge. Les notes de cerise et de sous-bois du Gevrey-Chambertin se marient harmonieusement avec les champignons et les arômes de cuisson.",
-      "servingSuggestion": "Dressez dans un plat en terre cuite réchauffé, entouré de pommes de terre vapeur persillées. Décorez de quelques brins de thym frais.",
-      "cookingTime": "Préparation: 30 min | Marinade: 12h | Cuisson: 2h15",
+      "country": "${finalCountry || 'Pays'}",
+      "dishName": "Nom du plat traditionnel",
+      "description": "Description détaillée...",
+      "history": "Histoire et origine...",
+      "ingredients": ["Ingrédient 1 avec quantité", "Ingrédient 2..."],
+      "steps": ["Étape 1 détaillée...", "Étape 2..."],
+      "chefTips": "Conseils du chef...",
+      "variations": "Variantes régionales...",
+      "winePairing": "Appellation précise du vin",
+      "wineReason": "Explication de l'accord...",
+      "servingSuggestion": "Présentation...",
+      "cookingTime": "Préparation: X min | Cuisson: X min",
       "difficulty": "Moyen",
-      "portions": "6 personnes"
+      "portions": "4 personnes"
     }
   ]
 }`
