@@ -55,8 +55,9 @@ const PdfKdpReformatter: React.FC = () => {
     try {
       // Dynamically import pdf.js for PDF parsing
       const pdfjsLib = await import('pdfjs-dist');
-      // Use jsdelivr CDN which is more reliable for npm packages
-      pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
+      
+      // Disable worker for browser compatibility - runs on main thread
+      pdfjsLib.GlobalWorkerOptions.workerSrc = '';
 
       const arrayBuffer = await file.arrayBuffer();
       const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
