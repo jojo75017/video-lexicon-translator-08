@@ -13,9 +13,6 @@ import {
 import { toast } from 'sonner';
 import jsPDF from 'jspdf';
 import { saveAs } from 'file-saver';
-import * as pdfjsLib from 'pdfjs-dist';
-// Vite will bundle the worker and give us an URL we can safely load
-import pdfWorkerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 
 interface PageImage {
   dataUrl: string;
@@ -42,13 +39,6 @@ const PdfKdpReformatter: React.FC = () => {
   const [authorName, setAuthorName] = useState('');
   const [ageGroup, setAgeGroup] = useState('4-6 ans');
 
-  // Ensure PDF.js worker is configured (avoid external CDNs)
-  useEffect(() => {
-    if (pdfjsLib.GlobalWorkerOptions.workerSrc !== pdfWorkerSrc) {
-      pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerSrc;
-    }
-  }, []);
-
   const handleFileSelect = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -64,9 +54,17 @@ const PdfKdpReformatter: React.FC = () => {
     setImages([]);
 
     try {
+      // Dynamically import pdf.js
+      const pdfjsLib = await import('pdfjs-dist');
+      
+      // Use legacy build that doesn't require a worker
+      const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
+      
+      // Disable worker - use main thread (more compatible)
+      pdfjs.GlobalWorkerOptions.workerSrc = '';
 
       const arrayBuffer = await file.arrayBuffer();
-      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
       
       const extractedImages: PageImage[] = [];
       const totalPages = pdf.numPages;
