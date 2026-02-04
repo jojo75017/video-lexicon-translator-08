@@ -8,648 +8,781 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Slider } from '@/components/ui/slider';
 import { 
   MapPin, Plane, Camera, Sparkles, Image as ImageIcon, Download, BookOpen,
   Loader2, RefreshCw, FileText, Globe, Mountain, Building, Palmtree,
-  Compass, Sun, Moon, Sunrise, TreePine
+  Compass, Sun, Users, Languages, Utensils, Hotel, HelpCircle, Copy, CheckCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import jsPDF from 'jspdf';
-import { saveAs } from 'file-saver';
-import ExportSection from './ExportSection';
 
-interface TravelPage {
-  id: string;
-  pageNumber: number;
-  location1: {
-    name: string;
-    description: string;
-    imageUrl?: string;
-    isGeneratingImage?: boolean;
+// Interface pour une fiche destination (800+ mots par fiche)
+interface TravelSheet {
+  id: number;
+  destinationName: string;
+  country: string;
+  countryFlag: string;
+  region: string;
+  // Informations générales
+  population: string;
+  language: string;
+  currency: string;
+  climate: string;
+  bestSeason: string;
+  // Description riche
+  description: string;         // 3-4 phrases sur l'ambiance et l'attrait
+  history: string;             // Histoire et culture (2-3 phrases)
+  // Gastronomie
+  mainDish: string;            // Plat principal emblématique
+  dishDescription: string;     // Description du plat (2-3 phrases)
+  localSpecialties: string[];  // 3-4 spécialités locales
+  // Hébergement
+  accommodations: {
+    budget: string;
+    midRange: string;
+    luxury: string;
   };
-  location2: {
-    name: string;
-    description: string;
-    imageUrl?: string;
-    isGeneratingImage?: boolean;
-  };
+  whereToStay: string;         // Conseils sur les quartiers où loger
+  // Que visiter
+  mustSee: string[];           // 5-6 lieux incontournables
+  hiddenGems: string[];        // 2-3 trésors cachés
+  activities: string[];        // 3-4 activités recommandées
+  // Conseils pratiques
+  travelTips: string;          // Conseils de voyage (2-3 phrases)
+  transportation: string;      // Comment se déplacer
+  // FAQ
+  faq: {
+    question: string;
+    answer: string;
+  }[];
+  // Image
+  imageUrl?: string;
+  isGeneratingImage?: boolean;
 }
 
 interface EbookTravelGuideGeneratorProps {
   ebookTitle?: string;
 }
 
-const travelStyles = [
-  { value: 'aventure', label: '🏔️ Aventure & Nature', icon: Mountain },
-  { value: 'culture', label: '🏛️ Culture & Histoire', icon: Building },
-  { value: 'plage', label: '🏝️ Plages & Détente', icon: Palmtree },
-  { value: 'ville', label: '🌆 Villes & Urbain', icon: Building },
-  { value: 'road-trip', label: '🚗 Road Trip', icon: Compass },
-  { value: 'luxe', label: '✨ Voyage de Luxe', icon: Sun },
-  { value: 'backpacker', label: '🎒 Backpacking', icon: TreePine },
-  { value: 'famille', label: '👨‍👩‍👧‍👦 Voyage en Famille', icon: Sun },
-];
-
-const photoStyles = [
-  { value: 'realistic', label: '📷 Photo Réaliste' },
-  { value: 'cinematic', label: '🎬 Cinématique' },
-  { value: 'golden-hour', label: '🌅 Heure Dorée' },
-  { value: 'aerial', label: '🚁 Vue Aérienne' },
-  { value: 'postcard', label: '📮 Carte Postale' },
-];
-
-const exampleDestinations = [
-  { title: "Merveilles de l'Italie", destination: "Italie", style: "culture" },
-  { title: "Îles Paradisiaques de Thaïlande", destination: "Thaïlande", style: "plage" },
-  { title: "Road Trip sur la Route 66", destination: "États-Unis", style: "road-trip" },
-  { title: "Safari au Kenya", destination: "Kenya", style: "aventure" },
-  { title: "Découverte du Japon", destination: "Japon", style: "culture" },
-  { title: "Plages de Bali", destination: "Indonésie", style: "plage" },
-];
-
 // Liste complète des pays du monde par continent
 const worldCountries = {
   '🌍 Europe': [
-    'Allemagne', 'Autriche', 'Belgique', 'Bulgarie', 'Chypre', 'Croatie', 'Danemark', 
-    'Espagne', 'Estonie', 'Finlande', 'France', 'Grèce', 'Hongrie', 'Irlande', 
-    'Islande', 'Italie', 'Lettonie', 'Lituanie', 'Luxembourg', 'Malte', 'Monaco',
-    'Monténégro', 'Norvège', 'Pays-Bas', 'Pologne', 'Portugal', 'République Tchèque',
-    'Roumanie', 'Royaume-Uni', 'Serbie', 'Slovaquie', 'Slovénie', 'Suède', 'Suisse', 'Ukraine'
+    'France', 'Italie', 'Espagne', 'Allemagne', 'Grèce', 'Portugal', 'Belgique', 'Suisse',
+    'Autriche', 'Pays-Bas', 'Pologne', 'Hongrie', 'République Tchèque', 'Croatie', 'Roumanie',
+    'Irlande', 'Écosse', 'Danemark', 'Suède', 'Norvège', 'Finlande', 'Islande', 'Royaume-Uni'
   ],
   '🌎 Amérique du Nord': [
-    'Canada', 'États-Unis', 'Mexique', 'Costa Rica', 'Cuba', 'Guatemala', 'Haïti',
-    'Honduras', 'Jamaïque', 'Nicaragua', 'Panama', 'République Dominicaine', 'Salvador'
+    'États-Unis', 'Canada', 'Mexique', 'Cuba', 'Costa Rica', 'Guatemala', 'Panama'
   ],
   '🌎 Amérique du Sud': [
-    'Argentine', 'Bolivie', 'Brésil', 'Chili', 'Colombie', 'Équateur', 'Guyana',
-    'Paraguay', 'Pérou', 'Suriname', 'Uruguay', 'Venezuela'
+    'Argentine', 'Brésil', 'Pérou', 'Chili', 'Colombie', 'Équateur', 'Bolivie', 'Uruguay'
   ],
   '🌏 Asie': [
-    'Arabie Saoudite', 'Bangladesh', 'Cambodge', 'Chine', 'Corée du Sud', 'Émirats Arabes Unis',
-    'Inde', 'Indonésie', 'Israël', 'Japon', 'Jordanie', 'Kazakhstan', 'Laos', 'Liban',
-    'Malaisie', 'Maldives', 'Mongolie', 'Myanmar', 'Népal', 'Oman', 'Ouzbékistan',
-    'Pakistan', 'Philippines', 'Qatar', 'Singapour', 'Sri Lanka', 'Taïwan', 'Thaïlande',
-    'Turquie', 'Vietnam'
+    'Japon', 'Chine', 'Corée du Sud', 'Thaïlande', 'Vietnam', 'Inde', 'Indonésie',
+    'Malaisie', 'Singapour', 'Philippines', 'Cambodge', 'Népal', 'Sri Lanka', 'Maldives'
+  ],
+  '🌏 Moyen-Orient': [
+    'Turquie', 'Émirats Arabes Unis', 'Jordanie', 'Israël', 'Liban', 'Oman', 'Qatar'
   ],
   '🌍 Afrique': [
-    'Afrique du Sud', 'Algérie', 'Bénin', 'Botswana', 'Cameroun', 'Cap-Vert', 'Côte d\'Ivoire',
-    'Égypte', 'Éthiopie', 'Ghana', 'Kenya', 'Madagascar', 'Mali', 'Maroc', 'Maurice',
-    'Mozambique', 'Namibie', 'Nigeria', 'Ouganda', 'Rwanda', 'Sénégal', 'Seychelles',
-    'Tanzanie', 'Tunisie', 'Zambie', 'Zimbabwe'
+    'Maroc', 'Tunisie', 'Égypte', 'Sénégal', 'Kenya', 'Tanzanie', 'Afrique du Sud',
+    'Madagascar', 'Maurice', 'Seychelles', 'Cap-Vert'
   ],
   '🌏 Océanie': [
-    'Australie', 'Fidji', 'Nouvelle-Calédonie', 'Nouvelle-Zélande', 'Papouasie-Nouvelle-Guinée',
-    'Polynésie Française', 'Samoa', 'Tonga', 'Vanuatu'
+    'Australie', 'Nouvelle-Zélande', 'Fidji', 'Polynésie Française', 'Nouvelle-Calédonie'
   ]
 };
 
+// Drapeaux par pays
+const countryFlags: Record<string, string> = {
+  'France': '🇫🇷', 'Italie': '🇮🇹', 'Espagne': '🇪🇸', 'Allemagne': '🇩🇪', 'Grèce': '🇬🇷',
+  'Portugal': '🇵🇹', 'Belgique': '🇧🇪', 'Suisse': '🇨🇭', 'Autriche': '🇦🇹', 'Pays-Bas': '🇳🇱',
+  'Pologne': '🇵🇱', 'Hongrie': '🇭🇺', 'République Tchèque': '🇨🇿', 'Croatie': '🇭🇷',
+  'Roumanie': '🇷🇴', 'Irlande': '🇮🇪', 'Écosse': '🏴󠁧󠁢󠁳󠁣󠁴󠁿', 'Danemark': '🇩🇰',
+  'Suède': '🇸🇪', 'Norvège': '🇳🇴', 'Finlande': '🇫🇮', 'Islande': '🇮🇸', 'Royaume-Uni': '🇬🇧',
+  'États-Unis': '🇺🇸', 'Canada': '🇨🇦', 'Mexique': '🇲🇽', 'Cuba': '🇨🇺', 'Costa Rica': '🇨🇷',
+  'Guatemala': '🇬🇹', 'Panama': '🇵🇦', 'Argentine': '🇦🇷', 'Brésil': '🇧🇷', 'Pérou': '🇵🇪',
+  'Chili': '🇨🇱', 'Colombie': '🇨🇴', 'Équateur': '🇪🇨', 'Bolivie': '🇧🇴', 'Uruguay': '🇺🇾',
+  'Japon': '🇯🇵', 'Chine': '🇨🇳', 'Corée du Sud': '🇰🇷', 'Thaïlande': '🇹🇭', 'Vietnam': '🇻🇳',
+  'Inde': '🇮🇳', 'Indonésie': '🇮🇩', 'Malaisie': '🇲🇾', 'Singapour': '🇸🇬', 'Philippines': '🇵🇭',
+  'Cambodge': '🇰🇭', 'Népal': '🇳🇵', 'Sri Lanka': '🇱🇰', 'Maldives': '🇲🇻',
+  'Turquie': '🇹🇷', 'Émirats Arabes Unis': '🇦🇪', 'Jordanie': '🇯🇴', 'Israël': '🇮🇱',
+  'Liban': '🇱🇧', 'Oman': '🇴🇲', 'Qatar': '🇶🇦', 'Maroc': '🇲🇦', 'Tunisie': '🇹🇳',
+  'Égypte': '🇪🇬', 'Sénégal': '🇸🇳', 'Kenya': '🇰🇪', 'Tanzanie': '🇹🇿', 'Afrique du Sud': '🇿🇦',
+  'Madagascar': '🇲🇬', 'Maurice': '🇲🇺', 'Seychelles': '🇸🇨', 'Cap-Vert': '🇨🇻',
+  'Australie': '🇦🇺', 'Nouvelle-Zélande': '🇳🇿', 'Fidji': '🇫🇯', 'Polynésie Française': '🇵🇫',
+  'Nouvelle-Calédonie': '🇳🇨'
+};
+
+const PHOTO_STYLES = [
+  { id: 'realistic', label: '📷 Photo Réaliste', prompt: 'professional travel photography, high resolution, National Geographic style, vibrant colors, stunning landscape' },
+  { id: 'cinematic', label: '🎬 Cinématique', prompt: 'cinematic travel photography, wide angle, dramatic lighting, movie quality, epic landscape' },
+  { id: 'golden', label: '🌅 Heure Dorée', prompt: 'golden hour photography, warm sunset lighting, magical atmosphere, dreamy travel photo' },
+  { id: 'aerial', label: '🚁 Vue Aérienne', prompt: 'aerial drone photography, stunning bird eye view, landscape perspective, travel magazine' },
+];
+
 const EbookTravelGuideGenerator: React.FC<EbookTravelGuideGeneratorProps> = ({ ebookTitle = '' }) => {
+  // Configuration
   const [bookTitle, setBookTitle] = useState(ebookTitle || '');
-  const [destination, setDestination] = useState('');
   const [authorName, setAuthorName] = useState('');
-  const [travelStyle, setTravelStyle] = useState('aventure');
+  const [selectedCountry, setSelectedCountry] = useState('tour-du-monde');
+  const [numberOfSheets, setNumberOfSheets] = useState('20');
   const [photoStyle, setPhotoStyle] = useState('realistic');
-  const [numberOfPages, setNumberOfPages] = useState(20);
-  const [specialInstructions, setSpecialInstructions] = useState('');
+  const [customInstructions, setCustomInstructions] = useState('');
   
-  const [pages, setPages] = useState<TravelPage[]>([]);
+  // State
+  const [sheets, setSheets] = useState<TravelSheet[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isGeneratingImages, setIsGeneratingImages] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentStep, setCurrentStep] = useState('');
-  const [activeTab, setActiveTab] = useState('cover');
+  const [activeTab, setActiveTab] = useState('config');
+  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   
   // Cover state
   const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
   const [isGeneratingCover, setIsGeneratingCover] = useState(false);
 
-  const applyExample = (example: { title: string; destination: string; style: string }) => {
-    setBookTitle(example.title);
-    setDestination(example.destination);
-    setTravelStyle(example.style);
-  };
-
-  const getPhotoStylePrompt = (style: string): string => {
-    const styles: Record<string, string> = {
-      'realistic': 'professional travel photography, high resolution, natural lighting, vibrant colors, National Geographic style',
-      'cinematic': 'cinematic photography, wide angle, dramatic lighting, movie poster quality, epic landscape',
-      'golden-hour': 'golden hour photography, warm sunset/sunrise lighting, magical atmosphere, soft shadows, dreamy',
-      'aerial': 'aerial drone photography, bird eye view, stunning perspective, landscape photography',
-      'postcard': 'classic postcard style, saturated colors, iconic view, tourist photography, picturesque',
-    };
-    return styles[style] || styles['realistic'];
-  };
-
-  // Helper function to clean and parse JSON robustly
-  const cleanAndParseJSON = (content: string): { locations: { name: string; description: string }[] } | null => {
+  // Parse JSON with fallback
+  const cleanAndParseJSON = (content: string): any => {
     try {
-      // Try to find JSON block in the content
-      let jsonStr = content;
-      
-      // Remove markdown code blocks if present
-      jsonStr = jsonStr.replace(/```json\s*/gi, '').replace(/```\s*/g, '');
-      
-      // Try to find the JSON object with locations
-      const jsonMatch = jsonStr.match(/\{[\s\S]*"locations"[\s\S]*\}/);
+      let cleaned = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      return JSON.parse(cleaned);
+    } catch {
+      const jsonMatch = content.match(/\{[\s\S]*"destinations"[\s\S]*\}/);
       if (jsonMatch) {
-        jsonStr = jsonMatch[0];
-      }
-      
-      // Clean up common JSON issues
-      // Remove trailing commas before ] or }
-      jsonStr = jsonStr.replace(/,\s*([\]\}])/g, '$1');
-      
-      // Fix unterminated strings by finding unmatched quotes
-      // Replace any newlines within strings with spaces
-      jsonStr = jsonStr.replace(/"([^"]*)\n([^"]*)"/g, '"$1 $2"');
-      
-      // Try to parse
-      const parsed = JSON.parse(jsonStr);
-      return parsed;
-    } catch (firstError) {
-      console.log('First parse attempt failed, trying alternative cleanup...');
-      
-      try {
-        // More aggressive cleanup - extract locations array manually
-        const locationsMatch = content.match(/"locations"\s*:\s*\[([\s\S]*?)\]/);
-        if (locationsMatch) {
-          // Parse individual location objects
-          const locationsStr = locationsMatch[1];
-          const locations: { name: string; description: string }[] = [];
-          
-          // Match each location object
-          const objectMatches = locationsStr.matchAll(/\{\s*"name"\s*:\s*"([^"]+)"\s*,\s*"description"\s*:\s*"([^"]+)"\s*\}/g);
-          
-          for (const match of objectMatches) {
-            locations.push({
-              name: match[1].trim(),
-              description: match[2].trim()
-            });
-          }
-          
-          if (locations.length > 0) {
-            return { locations };
-          }
+        try {
+          return JSON.parse(jsonMatch[0]);
+        } catch {
+          return null;
         }
-      } catch (secondError) {
-        console.error('Second parse attempt also failed:', secondError);
       }
-      
       return null;
     }
   };
 
-  const generateTravelGuide = async () => {
-    if (!bookTitle.trim() || !destination.trim()) {
-      toast.error('Veuillez entrer un titre et une destination');
+  // Analyse du titre pour cohérence
+  const analyzeTitle = (title: string): string => {
+    const titleLower = title.toLowerCase();
+    const countryKeywords: Record<string, string> = {
+      'français': 'France', 'française': 'France', 'france': 'France', 'paris': 'France',
+      'italien': 'Italie', 'italienne': 'Italie', 'italie': 'Italie', 'rome': 'Italie', 'venise': 'Italie',
+      'espagnol': 'Espagne', 'espagnole': 'Espagne', 'espagne': 'Espagne', 'barcelone': 'Espagne', 'madrid': 'Espagne',
+      'japonais': 'Japon', 'japonaise': 'Japon', 'japon': 'Japon', 'tokyo': 'Japon', 'kyoto': 'Japon',
+      'thaïlandais': 'Thaïlande', 'thaïlandaise': 'Thaïlande', 'thaïlande': 'Thaïlande', 'bangkok': 'Thaïlande',
+      'grec': 'Grèce', 'grecque': 'Grèce', 'grèce': 'Grèce', 'athènes': 'Grèce', 'santorin': 'Grèce',
+      'marocain': 'Maroc', 'marocaine': 'Maroc', 'maroc': 'Maroc', 'marrakech': 'Maroc',
+      'portugais': 'Portugal', 'portugaise': 'Portugal', 'portugal': 'Portugal', 'lisbonne': 'Portugal',
+      'mexicain': 'Mexique', 'mexicaine': 'Mexique', 'mexique': 'Mexique',
+      'indien': 'Inde', 'indienne': 'Inde', 'inde': 'Inde',
+      'égyptien': 'Égypte', 'égyptienne': 'Égypte', 'égypte': 'Égypte', 'caire': 'Égypte',
+      'turc': 'Turquie', 'turque': 'Turquie', 'turquie': 'Turquie', 'istanbul': 'Turquie',
+      'australien': 'Australie', 'australienne': 'Australie', 'australie': 'Australie', 'sydney': 'Australie',
+      'brésilien': 'Brésil', 'brésilienne': 'Brésil', 'brésil': 'Brésil', 'rio': 'Brésil',
+      'vietnamien': 'Vietnam', 'vietnamienne': 'Vietnam', 'vietnam': 'Vietnam', 'hanoï': 'Vietnam',
+      'croate': 'Croatie', 'croatie': 'Croatie', 'dubrovnik': 'Croatie',
+      'islandais': 'Islande', 'islandaise': 'Islande', 'islande': 'Islande',
+      'péruvien': 'Pérou', 'péruvienne': 'Pérou', 'pérou': 'Pérou', 'machu picchu': 'Pérou',
+    };
+    
+    for (const [keyword, country] of Object.entries(countryKeywords)) {
+      if (titleLower.includes(keyword)) {
+        return country;
+      }
+    }
+    return '';
+  };
+
+  // Generate travel sheets
+  const generateTravelSheets = async () => {
+    if (!bookTitle.trim()) {
+      toast.error('Veuillez entrer un titre pour votre guide');
       return;
     }
 
     setIsGenerating(true);
     setProgress(0);
-    setPages([]);
+    setSheets([]);
     
     try {
-      // Total locations needed: 2 per page × numberOfPages
-      const totalLocations = numberOfPages * 2;
-      
-      setCurrentStep('Génération du plan de voyage...');
+      const count = parseInt(numberOfSheets);
+      setCurrentStep('Génération des fiches destinations...');
       setProgress(10);
 
-      // Generate locations list with clearer JSON instructions
-      const { data: planData, error: planError } = await supabase.functions.invoke('generate-content', {
+      // Analyse du titre pour cohérence
+      const countryFromTitle = analyzeTitle(bookTitle);
+      const finalCountry = countryFromTitle || (selectedCountry !== 'tour-du-monde' ? selectedCountry : '');
+      
+      const countryInstruction = finalCountry 
+        ? `OBLIGATOIRE: TOUTES les destinations doivent être EXCLUSIVEMENT dans ${finalCountry}. NE PAS inclure de destinations d'autres pays.`
+        : 'Variété des 5 continents avec des destinations emblématiques de différents pays.';
+
+      const { data, error } = await supabase.functions.invoke('generate-content', {
         body: {
-          type: 'travel-guide',
-          prompt: `Tu es un expert en voyages. Génère exactement ${totalLocations} lieux incontournables pour un guide de voyage sur "${destination}".
+          type: 'travel-sheets',
+          prompt: `Tu es un expert en voyages internationaux et guide touristique professionnel.
 
-Titre du guide: "${bookTitle}"
-Style de voyage: ${travelStyles.find(s => s.value === travelStyle)?.label || travelStyle}
-${specialInstructions ? `Instructions spéciales: ${specialInstructions}` : ''}
+TITRE DU GUIDE: "${bookTitle}"
+${customInstructions ? `Instructions spéciales: ${customInstructions}` : ''}
 
-Pour CHAQUE lieu, fournis:
-1. Le nom du lieu (max 50 caractères)
-2. Une description captivante (max 150 caractères, sans guillemets internes ni retours à la ligne)
+⚠️ RÈGLE ABSOLUE - COHÉRENCE AVEC LE TITRE:
+${countryInstruction}
+${finalCountry ? `Les ${count} destinations DOIVENT toutes être en ${finalCountry}. Aucune exception.` : ''}
 
-IMPORTANT: 
-- Génère EXACTEMENT ${totalLocations} lieux
-- Utilise uniquement des guillemets doubles standards
-- Pas de virgule après le dernier élément du tableau
-- Pas de caractères spéciaux dans les descriptions
+Génère exactement ${count} FICHES DESTINATIONS COMPLÈTES (minimum 800 mots chacune).
 
-Retourne UNIQUEMENT ce JSON valide, sans texte avant ni après:
+IMPORTANT: Chaque fiche doit être TRÈS DÉTAILLÉE avec au moins 800 mots de contenu riche.
+Retourne UNIQUEMENT du JSON valide, sans texte avant ni après.
+
+Pour CHAQUE destination, fournis OBLIGATOIREMENT:
+- destinationName: Nom de la ville/région/lieu
+- country: "${finalCountry || 'Pays d\'origine'}"
+- region: La région spécifique
+- population: Population approximative de la ville/région
+- language: Langue(s) parlée(s)
+- currency: Monnaie locale
+- climate: Type de climat
+- bestSeason: Meilleure période pour visiter
+- description: Description immersive et captivante (4-5 phrases sur l'ambiance, les paysages, l'atmosphère)
+- history: Histoire et contexte culturel (3-4 phrases sur le patrimoine, les traditions)
+- mainDish: Le plat emblématique local
+- dishDescription: Description appétissante du plat (3 phrases avec ingrédients et saveurs)
+- localSpecialties: ["Spécialité 1", "Spécialité 2", "Spécialité 3"] - 3 autres spécialités culinaires
+- accommodations: {"budget": "Nom et description hôtel économique", "midRange": "Nom et description hôtel milieu de gamme", "luxury": "Nom et description hôtel luxe"}
+- whereToStay: Conseils sur les quartiers où loger (3-4 phrases)
+- mustSee: ["Lieu 1 avec description courte", "Lieu 2...", ...] - 5-6 lieux incontournables
+- hiddenGems: ["Trésor 1", "Trésor 2"] - 2-3 trésors cachés
+- activities: ["Activité 1", "Activité 2", "Activité 3"] - 3-4 activités recommandées
+- travelTips: Conseils pratiques essentiels (3-4 phrases)
+- transportation: Comment se déplacer localement (2-3 phrases)
+- faq: [{"question": "Question 1?", "answer": "Réponse détaillée 1"}, {"question": "Question 2?", "answer": "Réponse 2"}, {"question": "Question 3?", "answer": "Réponse 3"}] - EXACTEMENT 3 questions-réponses pertinentes
+
+Format JSON strict:
 {
-  "locations": [
-    {"name": "Nom du lieu 1", "description": "Description courte du lieu 1"},
-    {"name": "Nom du lieu 2", "description": "Description courte du lieu 2"}
+  "destinations": [
+    {
+      "destinationName": "Paris",
+      "country": "France",
+      "region": "Île-de-France",
+      "population": "2,1 millions (12 millions avec l'agglomération)",
+      "language": "Français",
+      "currency": "Euro (€)",
+      "climate": "Océanique tempéré",
+      "bestSeason": "Avril à Juin et Septembre à Octobre",
+      "description": "La Ville Lumière enchante par son architecture haussmannienne et ses monuments emblématiques...",
+      "history": "Fondée il y a plus de 2000 ans, Paris a été le cœur de la monarchie française...",
+      "mainDish": "Bœuf Bourguignon",
+      "dishDescription": "Ce ragoût traditionnel marie des morceaux de bœuf tendres...",
+      "localSpecialties": ["Croissant au beurre", "Crêpes sucrées", "Macarons de Ladurée"],
+      "accommodations": {"budget": "Generator Paris - Auberge moderne et design...", "midRange": "Hôtel Le Marais - Charme parisien...", "luxury": "Le Bristol Paris - Palace 5 étoiles..."},
+      "whereToStay": "Le Marais offre une ambiance authentique... Saint-Germain-des-Prés pour les amateurs d'art...",
+      "mustSee": ["Tour Eiffel - Le symbole de Paris...", "Musée du Louvre - Le plus grand musée du monde...", "..."],
+      "hiddenGems": ["Le Marché aux Puces de Saint-Ouen", "La Coulée Verte René-Dumont"],
+      "activities": ["Croisière sur la Seine au coucher du soleil", "Cours de pâtisserie française", "..."],
+      "travelTips": "Privilégiez le métro pour vos déplacements...",
+      "transportation": "Le métro parisien est l'un des plus denses au monde...",
+      "faq": [
+        {"question": "Quelle est la meilleure période pour visiter Paris?", "answer": "Le printemps (avril-juin) et l'automne (septembre-octobre)..."},
+        {"question": "Comment éviter les files d'attente aux monuments?", "answer": "Achetez vos billets en ligne..."},
+        {"question": "Le Paris Museum Pass vaut-il le coup?", "answer": "Oui, si vous prévoyez de visiter plus de 3 musées..."}
+      ]
+    }
   ]
 }`
         }
       });
 
-      if (planError) throw planError;
+      if (error) throw error;
 
-      let locations: { name: string; description: string }[] = [];
-      const content = planData?.content || planData?.result || '';
-      
+      const content = data?.content || data?.result || '';
       const parsed = cleanAndParseJSON(content);
-      if (parsed && parsed.locations && parsed.locations.length > 0) {
-        locations = parsed.locations;
-      } else {
-        console.error('Échec du parsing JSON, génération de lieux de secours...');
-        // Generate fallback locations based on destination
-        const fallbackLocationNames = [
-          `Centre historique de ${destination}`,
-          `Marché local de ${destination}`,
-          `Plage principale`,
-          `Musée national`,
-          `Vieille ville`,
-          `Quartier des artisans`,
-          `Parc naturel`,
-          `Point de vue panoramique`,
-          `Temple ancien`,
-          `Place centrale`,
-          `Jardin botanique`,
-          `Port de pêche`,
-          `Forteresse historique`,
-          `Quartier gastronomique`,
-          `Site archéologique`,
-          `Cascade naturelle`,
-          `Village traditionnel`,
-          `Montagne sacrée`,
-          `Lac pittoresque`,
-          `Réserve naturelle`,
-          `Palais royal`,
-          `Cathédrale ancienne`,
-          `Rue commerçante`,
-          `Oasis secrète`,
-          `Plage cachée`,
-          `Vignoble local`,
-          `Grotte mystérieuse`,
-          `Pont historique`,
-          `Tour d'observation`,
-          `Sanctuaire naturel`,
-          `Quartier colonial`,
-          `Baie turquoise`,
-          `Vallée verdoyante`,
-          `Falaises spectaculaires`,
-          `Rizières en terrasses`,
-          `Temple bouddhiste`,
-          `Mosquée historique`,
-          `Synagogue ancienne`,
-          `Phare emblématique`,
-          `Île paradisiaque`
-        ];
-        
-        for (let i = 0; i < totalLocations; i++) {
-          locations.push({
-            name: fallbackLocationNames[i % fallbackLocationNames.length] || `Lieu ${i + 1}`,
-            description: `Un lieu incontournable à découvrir lors de votre voyage en ${destination}. Paysages magnifiques et expériences authentiques vous attendent.`
-          });
-        }
-        toast.warning('Utilisation de lieux de secours - le guide sera quand même généré');
+      
+      let destinations = parsed?.destinations || [];
+      
+      if (destinations.length < count) {
+        const fallbackDestinations = generateFallbackDestinations(count - destinations.length, finalCountry);
+        destinations = [...destinations, ...fallbackDestinations];
+        toast.warning(`${fallbackDestinations.length} fiches de secours ajoutées`);
       }
 
-      // Ensure we have enough locations
-      while (locations.length < totalLocations) {
-        locations.push({
-          name: `Lieu découverte ${locations.length + 1}`,
-          description: `Un endroit magnifique à découvrir lors de votre voyage en ${destination}.`
-        });
-      }
+      // Convert to sheets with flags
+      const generatedSheets: TravelSheet[] = destinations.slice(0, count).map((dest: any, index: number) => ({
+        id: index + 1,
+        destinationName: dest.destinationName || `Destination ${index + 1}`,
+        country: dest.country || finalCountry || 'International',
+        countryFlag: countryFlags[dest.country] || '🌍',
+        region: dest.region || 'Région à découvrir',
+        population: dest.population || 'Information non disponible',
+        language: dest.language || 'Langue locale',
+        currency: dest.currency || 'Monnaie locale',
+        climate: dest.climate || 'Climat tempéré',
+        bestSeason: dest.bestSeason || 'Toute l\'année',
+        description: dest.description || 'Une destination magnifique à découvrir.',
+        history: dest.history || 'Riche en histoire et en culture.',
+        mainDish: dest.mainDish || 'Spécialité locale',
+        dishDescription: dest.dishDescription || 'Un plat savoureux aux saveurs authentiques.',
+        localSpecialties: Array.isArray(dest.localSpecialties) ? dest.localSpecialties : ['Spécialité 1', 'Spécialité 2'],
+        accommodations: dest.accommodations || { budget: 'Auberge locale', midRange: 'Hôtel confortable', luxury: 'Palace 5 étoiles' },
+        whereToStay: dest.whereToStay || 'Le centre-ville offre les meilleures options.',
+        mustSee: Array.isArray(dest.mustSee) ? dest.mustSee : ['Site principal', 'Monument historique'],
+        hiddenGems: Array.isArray(dest.hiddenGems) ? dest.hiddenGems : ['Trésor caché'],
+        activities: Array.isArray(dest.activities) ? dest.activities : ['Activité locale'],
+        travelTips: dest.travelTips || 'Préparez bien votre voyage.',
+        transportation: dest.transportation || 'Transport local disponible.',
+        faq: Array.isArray(dest.faq) && dest.faq.length >= 3 ? dest.faq.slice(0, 3) : [
+          { question: 'Quelle est la meilleure période?', answer: 'Consultez les saisons locales.' },
+          { question: 'Quel budget prévoir?', answer: 'Dépend de votre style de voyage.' },
+          { question: 'Comment se déplacer?', answer: 'Transport local recommandé.' }
+        ],
+      }));
 
-      setProgress(30);
-      setCurrentStep('Organisation des pages...');
-
-      // Create pages with 2 locations each
-      const generatedPages: TravelPage[] = [];
-      for (let i = 0; i < numberOfPages; i++) {
-        const loc1Index = i * 2;
-        const loc2Index = i * 2 + 1;
-        generatedPages.push({
-          id: `page-${Date.now()}-${i}`,
-          pageNumber: i + 1,
-          location1: {
-            name: locations[loc1Index]?.name || `Lieu ${loc1Index + 1}`,
-            description: locations[loc1Index]?.description || 'Description à venir...',
-          },
-          location2: {
-            name: locations[loc2Index]?.name || `Lieu ${loc2Index + 1}`,
-            description: locations[loc2Index]?.description || 'Description à venir...',
-          }
-        });
-      }
-
-      setPages(generatedPages);
+      setSheets(generatedSheets);
       setProgress(40);
       
-      // Generate images for all locations (2 per page)
-      const totalImages = numberOfPages * 2;
-      setCurrentStep(`Génération des ${totalImages} photos...`);
+      // Generate images
+      await generateSheetImages(generatedSheets);
       
-      for (let pageIndex = 0; pageIndex < generatedPages.length; pageIndex++) {
-        const page = generatedPages[pageIndex];
-        
-        // Generate image for location 1
-        const img1Index = pageIndex * 2;
-        setCurrentStep(`Photo ${img1Index + 1}/${totalImages}: ${page.location1.name}...`);
-        await generateLocationImage(page.id, 'location1', page.location1.name, destination);
-        setProgress(40 + ((img1Index + 1) / totalImages) * 55);
-        
-        // Generate image for location 2
-        const img2Index = pageIndex * 2 + 1;
-        setCurrentStep(`Photo ${img2Index + 1}/${totalImages}: ${page.location2.name}...`);
-        await generateLocationImage(page.id, 'location2', page.location2.name, destination);
-        setProgress(40 + ((img2Index + 1) / totalImages) * 55);
-      }
-
       setProgress(100);
       setCurrentStep('Guide de voyage généré !');
-      toast.success(`Guide de voyage créé avec ${numberOfPages} pages et ${totalImages} photos !`);
+      setActiveTab('sheets');
+      toast.success(`${generatedSheets.length} fiches destinations générées !`);
       
     } catch (error) {
-      console.error('Erreur génération guide:', error);
-      toast.error('Erreur lors de la génération du guide. Réessayez.');
+      console.error('Erreur génération:', error);
+      toast.error('Erreur lors de la génération');
     } finally {
       setIsGenerating(false);
     }
   };
 
-  const generateLocationImage = async (
-    pageId: string, 
-    locationKey: 'location1' | 'location2', 
-    locationName: string,
-    destinationName: string
-  ) => {
-    setPages(prev => prev.map(p => {
-      if (p.id === pageId) {
-        return {
-          ...p,
-          [locationKey]: { ...p[locationKey], isGeneratingImage: true }
-        };
-      }
-      return p;
-    }));
+  // Fallback destinations generator
+  const generateFallbackDestinations = (count: number, country: string) => {
+    const fallbackData: any[] = [];
+    const genericDestinations = [
+      { name: 'Capitale historique', region: 'Centre' },
+      { name: 'Côte sauvage', region: 'Littoral' },
+      { name: 'Montagne majestueuse', region: 'Massif central' },
+      { name: 'Village pittoresque', region: 'Campagne' },
+      { name: 'Cité médiévale', region: 'Province' },
+    ];
+    
+    for (let i = 0; i < count; i++) {
+      const template = genericDestinations[i % genericDestinations.length];
+      fallbackData.push({
+        destinationName: `${template.name} de ${country || 'la région'}`,
+        country: country || 'International',
+        region: template.region,
+        population: 'Plusieurs milliers d\'habitants',
+        language: 'Langue locale',
+        currency: 'Monnaie locale',
+        climate: 'Climat agréable',
+        bestSeason: 'Printemps et automne',
+        description: `Une destination exceptionnelle offrant des paysages à couper le souffle et une culture riche.`,
+        history: 'Un lieu chargé d\'histoire et de traditions séculaires.',
+        mainDish: 'Spécialité traditionnelle locale',
+        dishDescription: 'Un plat savoureux préparé selon des recettes ancestrales.',
+        localSpecialties: ['Fromage local', 'Vin régional', 'Pâtisserie traditionnelle'],
+        accommodations: {
+          budget: 'Auberge de jeunesse accueillante',
+          midRange: 'Hôtel 3 étoiles confortable',
+          luxury: 'Hôtel de charme 5 étoiles'
+        },
+        whereToStay: 'Le centre historique est idéal pour séjourner.',
+        mustSee: ['Place centrale', 'Cathédrale historique', 'Musée local', 'Parc naturel', 'Marché traditionnel'],
+        hiddenGems: ['Ruelles secrètes', 'Point de vue panoramique'],
+        activities: ['Randonnée', 'Dégustation locale', 'Visite guidée'],
+        travelTips: 'Réservez vos hébergements à l\'avance en haute saison.',
+        transportation: 'Location de voiture recommandée pour explorer la région.',
+        faq: [
+          { question: 'Quel budget prévoir par jour?', answer: 'Comptez entre 80 et 150€ par jour selon votre style.' },
+          { question: 'La région est-elle sûre?', answer: 'Oui, c\'est une destination très sûre pour les touristes.' },
+          { question: 'Faut-il parler la langue locale?', answer: 'Les bases suffisent, l\'anglais est souvent compris.' }
+        ]
+      });
+    }
+    return fallbackData;
+  };
 
-    try {
-      const photoPrompt = getPhotoStylePrompt(photoStyle);
+  // Generate images for all sheets
+  const generateSheetImages = async (sheetsToProcess: TravelSheet[]) => {
+    setIsGeneratingImages(true);
+    const photoPrompt = PHOTO_STYLES.find(s => s.id === photoStyle)?.prompt || PHOTO_STYLES[0].prompt;
+    
+    for (let i = 0; i < sheetsToProcess.length; i++) {
+      const sheet = sheetsToProcess[i];
+      setCurrentStep(`Image ${i + 1}/${sheetsToProcess.length}: ${sheet.destinationName}...`);
       
+      try {
+        const { data, error } = await supabase.functions.invoke('generate-front-cover', {
+          body: {
+            ebookTitle: sheet.destinationName,
+            authorName: '',
+            genre: 'travel',
+            style: 'modern',
+            customPrompt: `${photoPrompt}. 
+Beautiful travel photograph of "${sheet.destinationName}" in ${sheet.country}.
+Stunning landscape, iconic landmark, or scenic view.
+Professional travel magazine quality.
+NO TEXT, NO WORDS, NO TITLE, NO LETTERS on the image.
+Pure photography only.`,
+            showAuthorName: false,
+            showTitle: false,
+          }
+        });
+
+        if (!error && data?.imageUrl) {
+          setSheets(prev => prev.map(s => 
+            s.id === sheet.id ? { ...s, imageUrl: data.imageUrl, isGeneratingImage: false } : s
+          ));
+        }
+      } catch (err) {
+        console.error(`Erreur image ${sheet.destinationName}:`, err);
+      }
+      
+      setProgress(40 + ((i + 1) / sheetsToProcess.length) * 55);
+    }
+    
+    setIsGeneratingImages(false);
+  };
+
+  // Regenerate single image
+  const regenerateImage = async (sheetId: number) => {
+    const sheet = sheets.find(s => s.id === sheetId);
+    if (!sheet) return;
+    
+    setSheets(prev => prev.map(s => 
+      s.id === sheetId ? { ...s, isGeneratingImage: true } : s
+    ));
+    
+    toast.info(`Regénération de l'image pour ${sheet.destinationName}...`);
+    
+    const photoPrompt = PHOTO_STYLES.find(s => s.id === photoStyle)?.prompt || PHOTO_STYLES[0].prompt;
+    
+    try {
       const { data, error } = await supabase.functions.invoke('generate-front-cover', {
         body: {
-          ebookTitle: locationName,
+          ebookTitle: sheet.destinationName,
           authorName: '',
           genre: 'travel',
           style: 'modern',
           customPrompt: `${photoPrompt}. 
-Beautiful travel photograph of "${locationName}" in ${destinationName}.
-Stunning landscape or architectural shot, professional quality.
-NO TEXT, NO WORDS, NO TITLE, NO LETTERS, NO WATERMARK on the image.
-Pure photography only, high resolution, magazine quality.`,
+Beautiful travel photograph of "${sheet.destinationName}" in ${sheet.country}.
+Stunning landscape, iconic landmark, or scenic view.
+NO TEXT, NO WORDS, NO TITLE on the image.`,
           showAuthorName: false,
           showTitle: false,
         }
       });
 
-      if (error) throw error;
-
-      const imageUrl = data?.imageUrl || data?.coverUrl;
-      if (imageUrl) {
-        setPages(prev => prev.map(p => {
-          if (p.id === pageId) {
-            return {
-              ...p,
-              [locationKey]: { ...p[locationKey], imageUrl, isGeneratingImage: false }
-            };
-          }
-          return p;
-        }));
+      if (!error && data?.imageUrl) {
+        setSheets(prev => prev.map(s => 
+          s.id === sheetId ? { ...s, imageUrl: data.imageUrl, isGeneratingImage: false } : s
+        ));
+        toast.success('Image regénérée !');
       } else {
-        throw new Error('Aucune image retournée');
+        throw new Error('Échec génération');
       }
-    } catch (error) {
-      console.error('Erreur génération image:', error);
-      setPages(prev => prev.map(p => {
-        if (p.id === pageId) {
-          return {
-            ...p,
-            [locationKey]: { ...p[locationKey], isGeneratingImage: false }
-          };
-        }
-        return p;
-      }));
+    } catch (err) {
+      setSheets(prev => prev.map(s => 
+        s.id === sheetId ? { ...s, isGeneratingImage: false } : s
+      ));
+      toast.error('Erreur lors de la regénération');
     }
   };
 
-  const regenerateImage = async (pageId: string, locationKey: 'location1' | 'location2') => {
-    const page = pages.find(p => p.id === pageId);
-    if (!page) return;
-    
-    const location = page[locationKey];
-    toast.info(`Regénération de l'image pour ${location.name}...`);
-    await generateLocationImage(pageId, locationKey, location.name, destination);
+  // Generate cover
+  const generateCover = async () => {
+    if (!bookTitle.trim()) {
+      toast.error('Veuillez d\'abord entrer un titre');
+      return;
+    }
+
+    setIsGeneratingCover(true);
+    try {
+      const photoPrompt = PHOTO_STYLES.find(s => s.id === photoStyle)?.prompt || PHOTO_STYLES[0].prompt;
+      
+      const { data, error } = await supabase.functions.invoke('generate-front-cover', {
+        body: {
+          ebookTitle: bookTitle,
+          authorName: authorName,
+          genre: 'travel',
+          style: 'modern',
+          customPrompt: `${photoPrompt}. 
+Epic travel book cover showing beautiful destinations.
+Professional travel photography, magazine quality, cinematic.
+Must include the title "${bookTitle}" prominently displayed.
+${authorName ? `Include author name: ${authorName}` : ''}`,
+          showTitle: true,
+          showAuthorName: !!authorName,
+        }
+      });
+
+      if (error) throw error;
+      
+      if (data?.imageUrl) {
+        setCoverImageUrl(data.imageUrl);
+        toast.success('Couverture générée !');
+      }
+    } catch (err) {
+      console.error('Erreur couverture:', err);
+      toast.error('Erreur lors de la génération de la couverture');
+    } finally {
+      setIsGeneratingCover(false);
+    }
   };
 
-  // Export PDF with embedded images
+  // Copy sheet content
+  const copySheet = async (sheet: TravelSheet) => {
+    const content = `
+${sheet.countryFlag} ${sheet.destinationName.toUpperCase()} - ${sheet.country}
+${sheet.region}
+
+📊 INFORMATIONS GÉNÉRALES
+• Population: ${sheet.population}
+• Langue: ${sheet.language}
+• Monnaie: ${sheet.currency}
+• Climat: ${sheet.climate}
+• Meilleure saison: ${sheet.bestSeason}
+
+📝 DESCRIPTION
+${sheet.description}
+
+📜 HISTOIRE & CULTURE
+${sheet.history}
+
+🍽️ GASTRONOMIE
+Plat emblématique: ${sheet.mainDish}
+${sheet.dishDescription}
+
+Spécialités locales:
+${sheet.localSpecialties.map(s => `• ${s}`).join('\n')}
+
+🏨 HÉBERGEMENT
+Budget: ${sheet.accommodations.budget}
+Milieu de gamme: ${sheet.accommodations.midRange}
+Luxe: ${sheet.accommodations.luxury}
+
+📍 Où loger: ${sheet.whereToStay}
+
+🏛️ INCONTOURNABLES
+${sheet.mustSee.map(m => `• ${m}`).join('\n')}
+
+💎 TRÉSORS CACHÉS
+${sheet.hiddenGems.map(g => `• ${g}`).join('\n')}
+
+🎯 ACTIVITÉS
+${sheet.activities.map(a => `• ${a}`).join('\n')}
+
+💡 CONSEILS PRATIQUES
+${sheet.travelTips}
+
+🚌 TRANSPORTS
+${sheet.transportation}
+
+❓ FAQ
+${sheet.faq.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}
+    `.trim();
+    
+    await navigator.clipboard.writeText(content);
+    setCopiedIndex(sheet.id);
+    setTimeout(() => setCopiedIndex(null), 2000);
+    toast.success('Fiche copiée !');
+  };
+
+  // Export to PDF
   const exportToPDF = async () => {
-    if (pages.length === 0) {
-      toast.error('Aucune page à exporter');
+    if (sheets.length === 0) {
+      toast.error('Générez d\'abord des fiches');
       return;
     }
 
     setIsExporting(true);
-    toast.info('Génération du PDF en cours...');
-
     try {
       const pdf = new jsPDF('p', 'mm', 'a4');
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
+      const pageWidth = 210;
+      const pageHeight = 297;
       const margin = 15;
-      const contentWidth = pageWidth - 2 * margin;
+      const contentWidth = pageWidth - (margin * 2);
 
-      // ===== COVER PAGE =====
-      pdf.setFillColor(30, 58, 95); // Deep blue
-      pdf.rect(0, 0, pageWidth, pageHeight, 'F');
-      
-      // Decorative elements
-      pdf.setFillColor(255, 193, 7); // Gold accent
-      pdf.rect(0, pageHeight - 30, pageWidth, 30, 'F');
-      
-      pdf.setFont('helvetica', 'bold');
-      pdf.setFontSize(32);
-      pdf.setTextColor(255, 255, 255);
-      const titleLines = pdf.splitTextToSize(bookTitle || 'Guide de Voyage', contentWidth);
-      pdf.text(titleLines, pageWidth / 2, 80, { align: 'center' });
-
-      pdf.setFontSize(18);
-      pdf.setTextColor(255, 193, 7);
-      pdf.text(destination, pageWidth / 2, 110, { align: 'center' });
-
-      if (authorName) {
-        pdf.setFontSize(14);
-        pdf.setTextColor(200, 200, 200);
-        pdf.text(`par ${authorName}`, pageWidth / 2, 130, { align: 'center' });
-      }
-
-      pdf.setFontSize(12);
-      pdf.setTextColor(30, 30, 30);
-      pdf.text(`${pages.length} pages • ${pages.length * 2} destinations`, pageWidth / 2, pageHeight - 15, { align: 'center' });
-
-      // ===== TABLE OF CONTENTS =====
-      pdf.addPage();
-      pdf.setFillColor(245, 245, 245);
-      pdf.rect(0, 0, pageWidth, 40, 'F');
-      
-      pdf.setFont('helvetica', 'bold');
-      pdf.setFontSize(24);
-      pdf.setTextColor(30, 58, 95);
-      pdf.text('📍 Sommaire', margin, 28);
-
-      let yPos = 55;
-      pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(11);
-      pdf.setTextColor(60, 60, 60);
-      
-      pages.forEach((page, index) => {
-        if (yPos > pageHeight - 30) {
-          pdf.addPage();
-          yPos = margin + 10;
+      // Cover page
+      if (coverImageUrl) {
+        try {
+          const coverImg = new Image();
+          coverImg.crossOrigin = 'anonymous';
+          await new Promise((resolve, reject) => {
+            coverImg.onload = resolve;
+            coverImg.onerror = reject;
+            coverImg.src = coverImageUrl;
+          });
+          pdf.addImage(coverImg, 'JPEG', 0, 0, pageWidth, pageHeight);
+        } catch {
+          // Fallback cover
+          pdf.setFillColor(20, 60, 100);
+          pdf.rect(0, 0, pageWidth, pageHeight, 'F');
+          pdf.setTextColor(255, 255, 255);
+          pdf.setFontSize(28);
+          pdf.text(bookTitle, pageWidth / 2, pageHeight / 2, { align: 'center' });
+          if (authorName) {
+            pdf.setFontSize(16);
+            pdf.text(authorName, pageWidth / 2, pageHeight / 2 + 20, { align: 'center' });
+          }
         }
-        pdf.text(`Page ${page.pageNumber}:`, margin, yPos);
-        pdf.setFont('helvetica', 'bold');
-        const loc1Text = pdf.splitTextToSize(page.location1.name, contentWidth / 2 - 10);
-        pdf.text(loc1Text[0], margin + 25, yPos);
-        pdf.setFont('helvetica', 'normal');
-        pdf.text('&', margin + 25 + pdf.getTextWidth(loc1Text[0]) + 3, yPos);
-        pdf.setFont('helvetica', 'bold');
-        const loc2Text = pdf.splitTextToSize(page.location2.name, contentWidth / 2 - 10);
-        pdf.text(loc2Text[0], margin + 35 + pdf.getTextWidth(loc1Text[0]), yPos);
-        pdf.setFont('helvetica', 'normal');
-        yPos += 10;
-      });
-
-      // ===== CONTENT PAGES =====
-      for (let i = 0; i < pages.length; i++) {
-        const page = pages[i];
-        pdf.addPage();
-
-        // Page header
-        pdf.setFillColor(30, 58, 95);
-        pdf.rect(0, 0, pageWidth, 20, 'F');
-        pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(10);
+      } else {
+        pdf.setFillColor(20, 60, 100);
+        pdf.rect(0, 0, pageWidth, pageHeight, 'F');
         pdf.setTextColor(255, 255, 255);
-        pdf.text(`Page ${page.pageNumber} • ${destination}`, pageWidth / 2, 13, { align: 'center' });
-
-        const halfWidth = (contentWidth - 10) / 2;
-        const imageHeight = 55;
-        const textStartY = 30;
-
-        // Location 1 (left side)
-        const leftX = margin;
-        let leftY = textStartY;
-
-        // Image 1
-        if (page.location1.imageUrl) {
-          try {
-            const img = new Image();
-            img.crossOrigin = 'anonymous';
-            await new Promise<void>((resolve, reject) => {
-              img.onload = () => resolve();
-              img.onerror = reject;
-              img.src = page.location1.imageUrl!;
-            });
-            
-            const canvas = document.createElement('canvas');
-            canvas.width = img.width;
-            canvas.height = img.height;
-            const ctx = canvas.getContext('2d');
-            ctx?.drawImage(img, 0, 0);
-            const imgData = canvas.toDataURL('image/jpeg', 0.85);
-            
-            pdf.addImage(imgData, 'JPEG', leftX, leftY, halfWidth, imageHeight);
-            leftY += imageHeight + 5;
-          } catch (e) {
-            console.log('Image 1 non chargée');
-            leftY += 5;
-          }
-        }
-
-        // Title 1
-        pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(12);
-        pdf.setTextColor(30, 58, 95);
-        const title1Lines = pdf.splitTextToSize(page.location1.name, halfWidth);
-        pdf.text(title1Lines, leftX, leftY);
-        leftY += title1Lines.length * 5 + 3;
-
-        // Description 1
-        pdf.setFont('helvetica', 'normal');
-        pdf.setFontSize(9);
-        pdf.setTextColor(60, 60, 60);
-        const desc1Lines = pdf.splitTextToSize(page.location1.description, halfWidth);
-        pdf.text(desc1Lines.slice(0, 8), leftX, leftY);
-
-        // Location 2 (right side)
-        const rightX = margin + halfWidth + 10;
-        let rightY = textStartY;
-
-        // Image 2
-        if (page.location2.imageUrl) {
-          try {
-            const img = new Image();
-            img.crossOrigin = 'anonymous';
-            await new Promise<void>((resolve, reject) => {
-              img.onload = () => resolve();
-              img.onerror = reject;
-              img.src = page.location2.imageUrl!;
-            });
-            
-            const canvas = document.createElement('canvas');
-            canvas.width = img.width;
-            canvas.height = img.height;
-            const ctx = canvas.getContext('2d');
-            ctx?.drawImage(img, 0, 0);
-            const imgData = canvas.toDataURL('image/jpeg', 0.85);
-            
-            pdf.addImage(imgData, 'JPEG', rightX, rightY, halfWidth, imageHeight);
-            rightY += imageHeight + 5;
-          } catch (e) {
-            console.log('Image 2 non chargée');
-            rightY += 5;
-          }
-        }
-
-        // Title 2
-        pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(12);
-        pdf.setTextColor(30, 58, 95);
-        const title2Lines = pdf.splitTextToSize(page.location2.name, halfWidth);
-        pdf.text(title2Lines, rightX, rightY);
-        rightY += title2Lines.length * 5 + 3;
-
-        // Description 2
-        pdf.setFont('helvetica', 'normal');
-        pdf.setFontSize(9);
-        pdf.setTextColor(60, 60, 60);
-        const desc2Lines = pdf.splitTextToSize(page.location2.description, halfWidth);
-        pdf.text(desc2Lines.slice(0, 8), rightX, rightY);
-
-        // Page footer
-        pdf.setFillColor(255, 193, 7);
-        pdf.rect(0, pageHeight - 10, pageWidth, 10, 'F');
-        pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(8);
-        pdf.setTextColor(30, 58, 95);
-        pdf.text(bookTitle, pageWidth / 2, pageHeight - 4, { align: 'center' });
+        pdf.setFontSize(28);
+        pdf.text(bookTitle, pageWidth / 2, pageHeight / 2, { align: 'center' });
       }
 
-      // Save PDF
-      const fileName = `${bookTitle.replace(/[^a-zA-Z0-9]/g, '_')}_Guide_Voyage.pdf`;
-      const blob = pdf.output('blob');
-      saveAs(blob, fileName);
-      toast.success('PDF téléchargé avec succès !');
+      // Generate each sheet as a page
+      for (const sheet of sheets) {
+        pdf.addPage();
+        let yPos = margin;
 
+        // Header with flag and name
+        pdf.setFillColor(245, 245, 245);
+        pdf.rect(0, 0, pageWidth, 45, 'F');
+        
+        pdf.setFontSize(24);
+        pdf.setTextColor(30, 30, 30);
+        pdf.text(`${sheet.countryFlag} ${sheet.destinationName}`, margin, 25);
+        
+        pdf.setFontSize(12);
+        pdf.setTextColor(100, 100, 100);
+        pdf.text(`${sheet.country} • ${sheet.region}`, margin, 38);
+        
+        yPos = 55;
+        
+        // Two-column layout
+        const colWidth = (contentWidth - 10) / 2;
+        const leftCol = margin;
+        const rightCol = margin + colWidth + 10;
+
+        // Left column - Image
+        if (sheet.imageUrl) {
+          try {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            await new Promise((resolve, reject) => {
+              img.onload = resolve;
+              img.onerror = reject;
+              img.src = sheet.imageUrl!;
+            });
+            pdf.addImage(img, 'JPEG', leftCol, yPos, colWidth, colWidth * 0.7);
+            yPos += colWidth * 0.7 + 5;
+          } catch {
+            // Skip image if failed
+          }
+        }
+
+        // Info box
+        const infoBoxY = yPos;
+        pdf.setFillColor(240, 248, 255);
+        pdf.roundedRect(leftCol, infoBoxY, colWidth, 45, 3, 3, 'F');
+        
+        pdf.setFontSize(8);
+        pdf.setTextColor(60, 60, 60);
+        pdf.text(`👥 ${sheet.population}`, leftCol + 5, infoBoxY + 10);
+        pdf.text(`🗣️ ${sheet.language}`, leftCol + 5, infoBoxY + 18);
+        pdf.text(`💰 ${sheet.currency}`, leftCol + 5, infoBoxY + 26);
+        pdf.text(`☀️ ${sheet.bestSeason}`, leftCol + 5, infoBoxY + 34);
+
+        // Right column - Content
+        let rightY = 55;
+        
+        // Description
+        pdf.setFontSize(10);
+        pdf.setTextColor(30, 30, 30);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('À DÉCOUVRIR', rightCol, rightY);
+        rightY += 5;
+        
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(8);
+        const descLines = pdf.splitTextToSize(sheet.description, colWidth);
+        pdf.text(descLines, rightCol, rightY);
+        rightY += descLines.length * 4 + 5;
+
+        // Main dish
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(`🍽️ ${sheet.mainDish}`, rightCol, rightY);
+        rightY += 5;
+        
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(8);
+        const dishLines = pdf.splitTextToSize(sheet.dishDescription, colWidth);
+        pdf.text(dishLines, rightCol, rightY);
+        rightY += dishLines.length * 4 + 5;
+
+        // Must see
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('🏛️ INCONTOURNABLES', rightCol, rightY);
+        rightY += 5;
+        
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(8);
+        sheet.mustSee.slice(0, 4).forEach(m => {
+          pdf.text(`• ${m.substring(0, 45)}${m.length > 45 ? '...' : ''}`, rightCol, rightY);
+          rightY += 4;
+        });
+        rightY += 3;
+
+        // Accommodations
+        if (rightY < 200) {
+          pdf.setFontSize(10);
+          pdf.setFont('helvetica', 'bold');
+          pdf.text('🏨 HÉBERGEMENT', rightCol, rightY);
+          rightY += 5;
+          
+          pdf.setFont('helvetica', 'normal');
+          pdf.setFontSize(8);
+          pdf.text(`Budget: ${sheet.accommodations.budget.substring(0, 40)}...`, rightCol, rightY);
+          rightY += 4;
+          pdf.text(`Milieu: ${sheet.accommodations.midRange.substring(0, 40)}...`, rightCol, rightY);
+          rightY += 4;
+          pdf.text(`Luxe: ${sheet.accommodations.luxury.substring(0, 40)}...`, rightCol, rightY);
+          rightY += 8;
+        }
+
+        // FAQ at bottom
+        const faqY = 230;
+        pdf.setFillColor(255, 250, 240);
+        pdf.roundedRect(margin, faqY, contentWidth, 55, 3, 3, 'F');
+        
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(30, 30, 30);
+        pdf.text('❓ FAQ', margin + 5, faqY + 8);
+        
+        let faqTextY = faqY + 15;
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(8);
+        
+        sheet.faq.forEach((f, i) => {
+          if (faqTextY < faqY + 50) {
+            pdf.setFont('helvetica', 'bold');
+            pdf.text(`Q: ${f.question.substring(0, 80)}`, margin + 5, faqTextY);
+            faqTextY += 4;
+            pdf.setFont('helvetica', 'normal');
+            const answerLines = pdf.splitTextToSize(`R: ${f.answer}`, contentWidth - 10);
+            pdf.text(answerLines.slice(0, 2), margin + 5, faqTextY);
+            faqTextY += 10;
+          }
+        });
+
+        // Page number
+        pdf.setFontSize(8);
+        pdf.setTextColor(150, 150, 150);
+        pdf.text(`${sheet.id}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+      }
+
+      pdf.save(`${bookTitle.replace(/[^a-zA-Z0-9]/g, '_')}_guide_voyage.pdf`);
+      toast.success('PDF exporté avec succès !');
     } catch (error) {
       console.error('Erreur export PDF:', error);
       toast.error('Erreur lors de l\'export PDF');
@@ -658,647 +791,537 @@ Pure photography only, high resolution, magazine quality.`,
     }
   };
 
-  // Generate book cover
-  const generateCover = async () => {
-    if (!bookTitle.trim() || !destination.trim()) {
-      toast.error('Veuillez entrer un titre et une destination');
-      return;
-    }
-
-    setIsGeneratingCover(true);
-    toast.info('Génération de la couverture...');
-
-    try {
-      const { data, error } = await supabase.functions.invoke('generate-front-cover', {
-        body: {
-          ebookTitle: bookTitle,
-          authorName: authorName || 'Guide de Voyage',
-          genre: 'travel',
-          style: 'modern',
-          customPrompt: `Stunning travel book cover for "${bookTitle}" featuring ${destination}.
-Epic landscape photography, professional travel magazine quality.
-Beautiful scenic view representing the destination.
-The title "${bookTitle}" should be prominently displayed with elegant typography.
-${authorName ? `Author name "${authorName}" at the bottom.` : ''}
-Style: Modern travel guide, vibrant colors, cinematic quality.
-Format: Book cover 6x9 inches, portrait orientation.`,
-          showAuthorName: !!authorName,
-          showTitle: true,
-          colorScheme: 'vibrant',
-        }
-      });
-
-      if (error) throw error;
-
-      const imageUrl = data?.imageUrl || data?.coverUrl;
-      if (imageUrl) {
-        setCoverImageUrl(imageUrl);
-        toast.success('Couverture générée !');
-      } else {
-        throw new Error('Aucune image retournée');
-      }
-    } catch (error) {
-      console.error('Erreur génération couverture:', error);
-      toast.error('Erreur lors de la génération de la couverture');
-    } finally {
-      setIsGeneratingCover(false);
-    }
+  // Count words in a sheet
+  const countWords = (sheet: TravelSheet): number => {
+    const allText = [
+      sheet.description,
+      sheet.history,
+      sheet.dishDescription,
+      sheet.localSpecialties.join(' '),
+      sheet.whereToStay,
+      sheet.mustSee.join(' '),
+      sheet.hiddenGems.join(' '),
+      sheet.activities.join(' '),
+      sheet.travelTips,
+      sheet.transportation,
+      sheet.faq.map(f => `${f.question} ${f.answer}`).join(' '),
+      sheet.accommodations.budget,
+      sheet.accommodations.midRange,
+      sheet.accommodations.luxury,
+    ].join(' ');
+    return allText.split(/\s+/).filter(w => w.length > 0).length;
   };
-
-  // Download cover image
-  const downloadCover = async () => {
-    if (!coverImageUrl) return;
-    
-    try {
-      // For base64 images
-      if (coverImageUrl.startsWith('data:')) {
-        const link = document.createElement('a');
-        link.href = coverImageUrl;
-        link.download = `${bookTitle.replace(/[^a-zA-Z0-9]/g, '_')}_Couverture.png`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        toast.success('Couverture téléchargée !');
-        return;
-      }
-      
-      // For URL images
-      const response = await fetch(coverImageUrl);
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `${bookTitle.replace(/[^a-zA-Z0-9]/g, '_')}_Couverture.png`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-      toast.success('Couverture téléchargée !');
-    } catch (error) {
-      console.error('Erreur téléchargement:', error);
-      toast.error('Erreur lors du téléchargement');
-    }
-  };
-
-  const imagesGenerated = pages.reduce((acc, p) => {
-    return acc + (p.location1.imageUrl ? 1 : 0) + (p.location2.imageUrl ? 1 : 0);
-  }, 0);
-  const totalImages = pages.length * 2;
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <Card className="border-2 border-primary/20 bg-gradient-to-br from-blue-500/5 via-cyan-500/5 to-teal-500/5">
+      <Card className="border-2 border-primary/20 bg-gradient-to-r from-blue-50 to-cyan-50">
         <CardHeader>
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl">
-              <Plane className="w-8 h-8 text-white" />
+            <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 text-white">
+              <Plane className="h-8 w-8" />
             </div>
             <div>
               <CardTitle className="text-2xl flex items-center gap-2">
-                Générateur de Guide de Voyage
+                Générateur de Guides de Voyage
                 <Badge className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white">
-                  <Sparkles className="w-3 h-3 mr-1" />
-                  IA Photo
+                  Fiches 800+ mots
                 </Badge>
               </CardTitle>
               <CardDescription>
-                Créez un guide de voyage illustré avec 2 photos réalistes par page
+                Créez des fiches destinations ultra-complètes avec population, langue, gastronomie, hébergements et FAQ
               </CardDescription>
             </div>
           </div>
         </CardHeader>
       </Card>
 
-      {/* Examples */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Globe className="w-5 h-5 text-primary" />
-            Exemples de guides
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-2">
-            {exampleDestinations.map((example, idx) => (
-              <Button
-                key={idx}
-                variant="outline"
-                size="sm"
-                onClick={() => applyExample(example)}
-                className="hover:bg-primary/10 hover:border-primary/50"
-              >
-                {example.title}
-              </Button>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* World Countries Selector */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <MapPin className="w-5 h-5 text-primary" />
-            Choisir un pays 🌍
-          </CardTitle>
-          <CardDescription>
-            Cliquez sur un pays pour le sélectionner comme destination
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="🌍 Europe" className="w-full">
-            <TabsList className="flex flex-wrap h-auto gap-1 bg-muted/50 p-1">
-              {Object.keys(worldCountries).map((continent) => (
-                <TabsTrigger key={continent} value={continent} className="text-xs px-2 py-1">
-                  {continent}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-            {Object.entries(worldCountries).map(([continent, countries]) => (
-              <TabsContent key={continent} value={continent} className="mt-4">
-                <div className="flex flex-wrap gap-1.5">
-                  {countries.map((country) => (
-                    <Button
-                      key={country}
-                      variant={destination === country ? "default" : "outline"}
-                      size="sm"
-                      className={`text-xs h-7 ${destination === country ? 'bg-primary text-primary-foreground' : 'hover:bg-primary/10'}`}
-                      onClick={() => {
-                        setDestination(country);
-                        if (!bookTitle) {
-                          setBookTitle(`Découverte de ${country}`);
-                        }
-                        toast.success(`${country} sélectionné !`);
-                      }}
-                    >
-                      {country}
-                    </Button>
-                  ))}
-                </div>
-              </TabsContent>
-            ))}
-          </Tabs>
-        </CardContent>
-      </Card>
-
-      {/* Configuration */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Compass className="w-5 h-5" />
-            Configuration du Guide
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="bookTitle">Titre du guide *</Label>
-              <Input
-                id="bookTitle"
-                placeholder="ex: Merveilles de l'Italie"
-                value={bookTitle}
-                onChange={(e) => setBookTitle(e.target.value)}
-              />
+      {/* Progress */}
+      {isGenerating && (
+        <Card className="border-blue-200 bg-blue-50">
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-3 mb-3">
+              <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
+              <span className="font-medium text-blue-700">{currentStep}</span>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="destination">Destination * <span className="text-xs text-muted-foreground">(ou choisissez ci-dessus)</span></Label>
-              <Input
-                id="destination"
-                placeholder="ex: Italie, Paris, Japon..."
-                value={destination}
-                onChange={(e) => setDestination(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="authorName">Nom de l'auteur</Label>
-              <Input
-                id="authorName"
-                placeholder="Votre nom"
-                value={authorName}
-                onChange={(e) => setAuthorName(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Style de voyage</Label>
-              <Select value={travelStyle} onValueChange={setTravelStyle}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {travelStyles.map((style) => (
-                    <SelectItem key={style.value} value={style.value}>
-                      {style.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label>Style photo</Label>
-              <Select value={photoStyle} onValueChange={setPhotoStyle}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {photoStyles.map((style) => (
-                    <SelectItem key={style.value} value={style.value}>
-                      {style.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          {/* Page count slider */}
-          <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <Label>Nombre de pages: {numberOfPages}</Label>
-              <Badge variant="secondary">{numberOfPages * 2} photos</Badge>
-            </div>
-            <Slider
-              value={[numberOfPages]}
-              onValueChange={(v) => setNumberOfPages(v[0])}
-              min={5}
-              max={30}
-              step={1}
-              className="w-full"
-            />
-            <p className="text-xs text-muted-foreground">
-              Chaque page contient 2 destinations avec photos. Estimation: ~{numberOfPages * 2 + 10} crédits utilisateur.
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Instructions spéciales (optionnel)</Label>
-            <Textarea
-              placeholder="ex: Mettre l'accent sur la gastronomie, inclure des plages secrètes..."
-              value={specialInstructions}
-              onChange={(e) => setSpecialInstructions(e.target.value)}
-              rows={2}
-            />
-          </div>
-
-          <Button
-            onClick={generateTravelGuide}
-            disabled={isGenerating || !bookTitle.trim() || !destination.trim()}
-            className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600"
-            size="lg"
-          >
-            {isGenerating ? (
-              <>
-                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                {currentStep}
-              </>
-            ) : (
-              <>
-                <Camera className="w-5 h-5 mr-2" />
-                Générer le Guide ({numberOfPages} pages, {numberOfPages * 2} photos)
-              </>
-            )}
-          </Button>
-
-          {isGenerating && (
-            <div className="space-y-2">
-              <Progress value={progress} className="h-3" />
-              <p className="text-sm text-center text-muted-foreground">{currentStep}</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Results */}
-      {pages.length > 0 && (
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <BookOpen className="w-5 h-5" />
-                Aperçu du Guide
-              </CardTitle>
-              <div className="flex items-center gap-2">
-                <Badge variant="outline">{pages.length} pages</Badge>
-                <Badge variant="secondary">{imagesGenerated}/{totalImages} photos</Badge>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="mb-4">
-                <TabsTrigger value="cover" className="flex items-center gap-2">
-                  <BookOpen className="w-4 h-4" />
-                  Couverture
-                </TabsTrigger>
-                <TabsTrigger value="pages" className="flex items-center gap-2">
-                  <FileText className="w-4 h-4" />
-                  Pages ({pages.length})
-                </TabsTrigger>
-                <TabsTrigger value="gallery" className="flex items-center gap-2">
-                  <ImageIcon className="w-4 h-4" />
-                  Galerie ({imagesGenerated})
-                </TabsTrigger>
-              </TabsList>
-
-              {/* Cover Tab */}
-              <TabsContent value="cover">
-                <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Cover Generation */}
-                    <Card className="border-2 border-dashed border-primary/30">
-                      <CardHeader>
-                        <CardTitle className="text-lg flex items-center gap-2">
-                          <Sparkles className="w-5 h-5 text-primary" />
-                          Générer la Couverture
-                        </CardTitle>
-                        <CardDescription>
-                          Créez une couverture professionnelle pour votre guide
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <Button
-                          onClick={generateCover}
-                          disabled={isGeneratingCover || !bookTitle.trim() || !destination.trim()}
-                          className="w-full bg-gradient-to-r from-primary to-primary/80"
-                        >
-                          {isGeneratingCover ? (
-                            <>
-                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                              Génération en cours...
-                            </>
-                          ) : (
-                            <>
-                              <Sparkles className="w-4 h-4 mr-2" />
-                              Générer la Couverture
-                            </>
-                          )}
-                        </Button>
-                        
-                        {coverImageUrl && (
-                          <Button
-                            onClick={generateCover}
-                            variant="outline"
-                            className="w-full"
-                            disabled={isGeneratingCover}
-                          >
-                            <RefreshCw className="w-4 h-4 mr-2" />
-                            Regénérer
-                          </Button>
-                        )}
-                      </CardContent>
-                    </Card>
-
-                    {/* Cover Preview / Mockup */}
-                    <Card className="border-2">
-                      <CardHeader>
-                        <CardTitle className="text-lg flex items-center gap-2">
-                          <BookOpen className="w-5 h-5" />
-                          Aperçu Mockup
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        {coverImageUrl ? (
-                          <div className="space-y-4">
-                            {/* 3D Book Mockup Effect - Transparent Background */}
-                            <div className="relative flex justify-center items-center py-10">
-                              <div 
-                                className="relative transform transition-all duration-500 hover:scale-105 hover:rotate-y-5"
-                                style={{
-                                  perspective: '1200px',
-                                }}
-                              >
-                                {/* Shadow under the book */}
-                                <div 
-                                  className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-44 h-6 bg-black/20 blur-xl rounded-full"
-                                  style={{
-                                    transform: 'translateX(-50%) rotateX(80deg)',
-                                  }}
-                                />
-                                
-                                <div 
-                                  className="relative"
-                                  style={{
-                                    transform: 'rotateY(-20deg) rotateX(5deg)',
-                                    transformStyle: 'preserve-3d',
-                                  }}
-                                >
-                                  {/* Book spine - dark like reference */}
-                                  <div 
-                                    className="absolute left-0 top-0 bottom-0 w-5 rounded-l-sm"
-                                    style={{
-                                      background: 'linear-gradient(to right, #1a1a1a 0%, #333 50%, #1a1a1a 100%)',
-                                      transform: 'rotateY(-90deg) translateZ(2px)',
-                                      transformOrigin: 'left center',
-                                      boxShadow: 'inset -2px 0 4px rgba(0,0,0,0.3)',
-                                    }}
-                                  />
-                                  
-                                  {/* Cover image container */}
-                                  <div className="relative">
-                                    <img
-                                      src={coverImageUrl}
-                                      alt="Couverture du guide"
-                                      className="w-52 h-[300px] object-cover rounded-r-md"
-                                      style={{
-                                        boxShadow: '10px 10px 30px rgba(0,0,0,0.4), -2px 0 10px rgba(0,0,0,0.2)',
-                                      }}
-                                    />
-                                    
-                                    {/* Pages effect on the right - multiple layers */}
-                                    <div className="absolute right-0 top-1 bottom-1 w-2 flex flex-col">
-                                      {[...Array(8)].map((_, i) => (
-                                        <div 
-                                          key={i}
-                                          className="flex-1"
-                                          style={{
-                                            background: i % 2 === 0 ? '#f5f5f0' : '#e8e8e3',
-                                            boxShadow: 'inset 1px 0 1px rgba(0,0,0,0.05)',
-                                          }}
-                                        />
-                                      ))}
-                                    </div>
-                                    
-                                    {/* Glossy overlay effect */}
-                                    <div 
-                                      className="absolute inset-0 pointer-events-none rounded-r-md"
-                                      style={{
-                                        background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%, rgba(0,0,0,0.1) 100%)',
-                                      }}
-                                    />
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                            
-                            {/* Download Button */}
-                            <Button
-                              onClick={downloadCover}
-                              className="w-full bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600"
-                            >
-                              <Download className="w-4 h-4 mr-2" />
-                              Télécharger la Couverture (PNG)
-                            </Button>
-                          </div>
-                        ) : (
-                          <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-                            <BookOpen className="w-16 h-16 mb-4 opacity-30" />
-                            <p className="text-center">
-                              Générez votre couverture pour voir le mockup
-                            </p>
-                          </div>
-                        )}
-                      </CardContent>
-                    </Card>
-                  </div>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="pages" className="space-y-6">
-                {pages.map((page) => (
-                  <Card key={page.id} className="border-2 border-dashed">
-                    <CardHeader className="pb-2">
-                      <div className="flex items-center justify-between">
-                        <Badge className="bg-blue-500">Page {page.pageNumber}</Badge>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Location 1 */}
-                        <div className="space-y-3">
-                          <div className="aspect-video bg-muted rounded-lg overflow-hidden relative">
-                            {page.location1.isGeneratingImage ? (
-                              <div className="absolute inset-0 flex items-center justify-center">
-                                <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
-                              </div>
-                            ) : page.location1.imageUrl ? (
-                              <img
-                                src={page.location1.imageUrl}
-                                alt={page.location1.name}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
-                                <Camera className="w-12 h-12" />
-                              </div>
-                            )}
-                          </div>
-                          <div>
-                            <h4 className="font-semibold text-blue-700 flex items-center gap-2">
-                              <MapPin className="w-4 h-4" />
-                              {page.location1.name}
-                            </h4>
-                            <p className="text-sm text-muted-foreground mt-1">
-                              {page.location1.description}
-                            </p>
-                          </div>
-                          {page.location1.imageUrl && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => regenerateImage(page.id, 'location1')}
-                              disabled={page.location1.isGeneratingImage}
-                            >
-                              <RefreshCw className="w-3 h-3 mr-1" />
-                              Regénérer
-                            </Button>
-                          )}
-                        </div>
-
-                        {/* Location 2 */}
-                        <div className="space-y-3">
-                          <div className="aspect-video bg-muted rounded-lg overflow-hidden relative">
-                            {page.location2.isGeneratingImage ? (
-                              <div className="absolute inset-0 flex items-center justify-center">
-                                <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
-                              </div>
-                            ) : page.location2.imageUrl ? (
-                              <img
-                                src={page.location2.imageUrl}
-                                alt={page.location2.name}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
-                                <Camera className="w-12 h-12" />
-                              </div>
-                            )}
-                          </div>
-                          <div>
-                            <h4 className="font-semibold text-cyan-700 flex items-center gap-2">
-                              <MapPin className="w-4 h-4" />
-                              {page.location2.name}
-                            </h4>
-                            <p className="text-sm text-muted-foreground mt-1">
-                              {page.location2.description}
-                            </p>
-                          </div>
-                          {page.location2.imageUrl && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => regenerateImage(page.id, 'location2')}
-                              disabled={page.location2.isGeneratingImage}
-                            >
-                              <RefreshCw className="w-3 h-3 mr-1" />
-                              Regénérer
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </TabsContent>
-
-              <TabsContent value="gallery">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {pages.flatMap(page => [
-                    page.location1.imageUrl && (
-                      <div key={`${page.id}-1`} className="space-y-2">
-                        <div className="aspect-video rounded-lg overflow-hidden">
-                          <img
-                            src={page.location1.imageUrl}
-                            alt={page.location1.name}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <p className="text-xs text-center truncate">{page.location1.name}</p>
-                      </div>
-                    ),
-                    page.location2.imageUrl && (
-                      <div key={`${page.id}-2`} className="space-y-2">
-                        <div className="aspect-video rounded-lg overflow-hidden">
-                          <img
-                            src={page.location2.imageUrl}
-                            alt={page.location2.name}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <p className="text-xs text-center truncate">{page.location2.name}</p>
-                      </div>
-                    )
-                  ]).filter(Boolean)}
-                </div>
-              </TabsContent>
-            </Tabs>
-
-            {/* Export Section */}
-            <div className="mt-6">
-              <ExportSection
-                onExportPDF={exportToPDF}
-                onExportWord={() => toast.info('Export Word bientôt disponible')}
-                isExporting={isExporting}
-                disabled={pages.length === 0 || imagesGenerated === 0}
-                pdfLabel="Télécharger PDF"
-                showSave={false}
-              />
-            </div>
+            <Progress value={progress} className="h-3" />
+            <p className="text-sm text-blue-600 mt-2">{Math.round(progress)}% complété</p>
           </CardContent>
         </Card>
       )}
+
+      {/* Main Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid grid-cols-4 w-full max-w-2xl">
+          <TabsTrigger value="config" className="flex items-center gap-2">
+            <Globe className="h-4 w-4" />
+            Configuration
+          </TabsTrigger>
+          <TabsTrigger value="cover" className="flex items-center gap-2">
+            <ImageIcon className="h-4 w-4" />
+            Couverture
+          </TabsTrigger>
+          <TabsTrigger value="sheets" className="flex items-center gap-2" disabled={sheets.length === 0}>
+            <FileText className="h-4 w-4" />
+            Fiches ({sheets.length})
+          </TabsTrigger>
+          <TabsTrigger value="export" className="flex items-center gap-2" disabled={sheets.length === 0}>
+            <Download className="h-4 w-4" />
+            Export
+          </TabsTrigger>
+        </TabsList>
+
+        {/* Configuration Tab */}
+        <TabsContent value="config">
+          <Card>
+            <CardContent className="pt-6 space-y-6">
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label>Titre du guide *</Label>
+                  <Input
+                    value={bookTitle}
+                    onChange={(e) => setBookTitle(e.target.value)}
+                    placeholder="Ex: Les plus belles destinations de France"
+                    className="text-lg"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    💡 Le titre détermine automatiquement le pays (ex: "destinations françaises" → France uniquement)
+                  </p>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Nom de l'auteur</Label>
+                  <Input
+                    value={authorName}
+                    onChange={(e) => setAuthorName(e.target.value)}
+                    placeholder="Votre nom"
+                  />
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-6">
+                <div className="space-y-2">
+                  <Label>Pays / Région</Label>
+                  <Select value={selectedCountry} onValueChange={setSelectedCountry}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner un pays" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-80">
+                      <SelectItem value="tour-du-monde">🌍 Tour du monde</SelectItem>
+                      {Object.entries(worldCountries).map(([continent, countries]) => (
+                        <React.Fragment key={continent}>
+                          <SelectItem value={`header-${continent}`} disabled className="font-bold bg-muted">
+                            {continent}
+                          </SelectItem>
+                          {countries.map(country => (
+                            <SelectItem key={country} value={country}>
+                              {countryFlags[country] || '🌍'} {country}
+                            </SelectItem>
+                          ))}
+                        </React.Fragment>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Nombre de fiches</Label>
+                  <Select value={numberOfSheets} onValueChange={setNumberOfSheets}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {[5, 10, 15, 20, 25, 30, 35, 40].map(n => (
+                        <SelectItem key={n} value={n.toString()}>
+                          {n} fiches destinations
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Style photo</Label>
+                  <Select value={photoStyle} onValueChange={setPhotoStyle}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PHOTO_STYLES.map(style => (
+                        <SelectItem key={style.id} value={style.id}>
+                          {style.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Instructions personnalisées (optionnel)</Label>
+                <Textarea
+                  value={customInstructions}
+                  onChange={(e) => setCustomInstructions(e.target.value)}
+                  placeholder="Ex: Focus sur les destinations romantiques, privilégier les endroits peu touristiques..."
+                  rows={3}
+                />
+              </div>
+
+              <Button
+                onClick={generateTravelSheets}
+                disabled={isGenerating || !bookTitle.trim()}
+                className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white py-6 text-lg"
+              >
+                {isGenerating ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Génération en cours...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="mr-2 h-5 w-5" />
+                    Générer {numberOfSheets} fiches destinations
+                  </>
+                )}
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Cover Tab */}
+        <TabsContent value="cover">
+          <Card>
+            <CardContent className="pt-6">
+              <div className="grid md:grid-cols-2 gap-8">
+                {/* Cover Preview with 3D Mockup */}
+                <div className="flex flex-col items-center">
+                  <div 
+                    className="relative"
+                    style={{
+                      perspective: '1200px',
+                      width: '320px',
+                      height: '420px',
+                    }}
+                  >
+                    <div
+                      style={{
+                        position: 'relative',
+                        width: '280px',
+                        height: '400px',
+                        transformStyle: 'preserve-3d',
+                        transform: 'rotateY(-20deg)',
+                      }}
+                    >
+                      {/* Book spine */}
+                      <div
+                        style={{
+                          position: 'absolute',
+                          left: '-30px',
+                          top: '0',
+                          width: '30px',
+                          height: '100%',
+                          background: 'linear-gradient(to right, #1a1a1a, #333)',
+                          transform: 'rotateY(90deg)',
+                          transformOrigin: 'right center',
+                          borderRadius: '2px 0 0 2px',
+                        }}
+                      />
+                      
+                      {/* Front cover */}
+                      <div
+                        className="absolute inset-0 rounded-r-lg overflow-hidden shadow-2xl"
+                        style={{
+                          background: coverImageUrl 
+                            ? `url(${coverImageUrl}) center/cover`
+                            : 'linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%)',
+                        }}
+                      >
+                        {!coverImageUrl && (
+                          <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-6 text-center">
+                            <Plane className="h-16 w-16 mb-4 opacity-80" />
+                            <h3 className="text-xl font-bold">{bookTitle || 'Titre du guide'}</h3>
+                            {authorName && <p className="mt-2 opacity-80">{authorName}</p>}
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* Page edges */}
+                      <div
+                        style={{
+                          position: 'absolute',
+                          right: '-8px',
+                          top: '2px',
+                          width: '8px',
+                          height: 'calc(100% - 4px)',
+                          background: 'repeating-linear-gradient(to bottom, #f5f5f5 0px, #e0e0e0 1px, #f5f5f5 2px)',
+                          borderRadius: '0 2px 2px 0',
+                        }}
+                      />
+                    </div>
+                    
+                    {/* Shadow */}
+                    <div
+                      style={{
+                        position: 'absolute',
+                        bottom: '-20px',
+                        left: '20px',
+                        right: '20px',
+                        height: '30px',
+                        background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.3) 0%, transparent 70%)',
+                        filter: 'blur(10px)',
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Cover controls */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">Générer la couverture</h3>
+                  <p className="text-sm text-muted-foreground">
+                    La couverture sera générée avec le titre et le style photo sélectionnés.
+                  </p>
+                  
+                  <Button
+                    onClick={generateCover}
+                    disabled={isGeneratingCover || !bookTitle.trim()}
+                    className="w-full bg-gradient-to-r from-blue-600 to-cyan-600"
+                  >
+                    {isGeneratingCover ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Génération...
+                      </>
+                    ) : (
+                      <>
+                        <Camera className="mr-2 h-4 w-4" />
+                        {coverImageUrl ? 'Regénérer la couverture' : 'Générer la couverture'}
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Sheets Tab */}
+        <TabsContent value="sheets">
+          <div className="space-y-6">
+            {sheets.map((sheet) => (
+              <Card key={sheet.id} className="overflow-hidden border-2 hover:border-primary/30 transition-colors">
+                <CardHeader className="bg-gradient-to-r from-blue-50 to-cyan-50 pb-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="text-4xl">{sheet.countryFlag}</span>
+                      <div>
+                        <CardTitle className="text-xl">{sheet.destinationName}</CardTitle>
+                        <p className="text-sm text-muted-foreground">{sheet.country} • {sheet.region}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="bg-white">
+                        {countWords(sheet)} mots
+                      </Badge>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => copySheet(sheet)}
+                      >
+                        {copiedIndex === sheet.id ? (
+                          <CheckCircle className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <Copy className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                
+                <CardContent className="pt-6">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {/* Left column - Image and quick info */}
+                    <div className="space-y-4">
+                      {/* Image */}
+                      <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-gradient-to-br from-blue-100 to-cyan-100">
+                        {sheet.imageUrl ? (
+                          <img 
+                            src={sheet.imageUrl} 
+                            alt={sheet.destinationName}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : sheet.isGeneratingImage ? (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+                          </div>
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <MapPin className="h-12 w-12 text-blue-300" />
+                          </div>
+                        )}
+                        
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          className="absolute bottom-2 right-2 opacity-90"
+                          onClick={() => regenerateImage(sheet.id)}
+                          disabled={sheet.isGeneratingImage}
+                        >
+                          <RefreshCw className={`h-3 w-3 mr-1 ${sheet.isGeneratingImage ? 'animate-spin' : ''}`} />
+                          Regénérer
+                        </Button>
+                      </div>
+
+                      {/* Quick info box */}
+                      <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 space-y-2">
+                        <h4 className="font-semibold flex items-center gap-2">
+                          <Globe className="h-4 w-4" /> Infos pratiques
+                        </h4>
+                        <div className="grid grid-cols-2 gap-2 text-sm">
+                          <div className="flex items-center gap-2">
+                            <Users className="h-4 w-4 text-blue-500" />
+                            <span className="text-muted-foreground">Pop:</span>
+                            <span className="font-medium truncate">{sheet.population}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Languages className="h-4 w-4 text-green-500" />
+                            <span className="text-muted-foreground">Langue:</span>
+                            <span className="font-medium">{sheet.language}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg">💰</span>
+                            <span className="text-muted-foreground">Monnaie:</span>
+                            <span className="font-medium">{sheet.currency}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Sun className="h-4 w-4 text-yellow-500" />
+                            <span className="text-muted-foreground">Saison:</span>
+                            <span className="font-medium truncate">{sheet.bestSeason}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Main dish */}
+                      <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl p-4">
+                        <h4 className="font-semibold flex items-center gap-2 mb-2">
+                          <Utensils className="h-4 w-4" /> Plat emblématique
+                        </h4>
+                        <p className="font-bold text-lg text-orange-700">{sheet.mainDish}</p>
+                        <p className="text-sm text-muted-foreground mt-1">{sheet.dishDescription}</p>
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {sheet.localSpecialties.map((spec, i) => (
+                            <Badge key={i} variant="outline" className="bg-white text-xs">
+                              {spec}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right column - Detailed content */}
+                    <div className="space-y-4">
+                      {/* Description */}
+                      <div>
+                        <h4 className="font-semibold mb-2">📝 Description</h4>
+                        <p className="text-sm text-muted-foreground leading-relaxed">{sheet.description}</p>
+                      </div>
+
+                      {/* History */}
+                      <div>
+                        <h4 className="font-semibold mb-2">📜 Histoire & Culture</h4>
+                        <p className="text-sm text-muted-foreground leading-relaxed">{sheet.history}</p>
+                      </div>
+
+                      {/* Must see */}
+                      <div>
+                        <h4 className="font-semibold mb-2">🏛️ Incontournables</h4>
+                        <ul className="space-y-1">
+                          {sheet.mustSee.map((place, i) => (
+                            <li key={i} className="text-sm flex items-start gap-2">
+                              <span className="text-blue-500">•</span>
+                              <span>{place}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      {/* Accommodations */}
+                      <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4">
+                        <h4 className="font-semibold flex items-center gap-2 mb-3">
+                          <Hotel className="h-4 w-4" /> Hébergement
+                        </h4>
+                        <div className="space-y-2 text-sm">
+                          <div>
+                            <Badge className="bg-green-100 text-green-700 mb-1">Budget</Badge>
+                            <p className="text-muted-foreground">{sheet.accommodations.budget}</p>
+                          </div>
+                          <div>
+                            <Badge className="bg-blue-100 text-blue-700 mb-1">Milieu de gamme</Badge>
+                            <p className="text-muted-foreground">{sheet.accommodations.midRange}</p>
+                          </div>
+                          <div>
+                            <Badge className="bg-purple-100 text-purple-700 mb-1">Luxe</Badge>
+                            <p className="text-muted-foreground">{sheet.accommodations.luxury}</p>
+                          </div>
+                        </div>
+                        <p className="text-sm mt-3 text-muted-foreground italic">{sheet.whereToStay}</p>
+                      </div>
+
+                      {/* FAQ */}
+                      <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-4">
+                        <h4 className="font-semibold flex items-center gap-2 mb-3">
+                          <HelpCircle className="h-4 w-4" /> FAQ
+                        </h4>
+                        <div className="space-y-3">
+                          {sheet.faq.map((item, i) => (
+                            <div key={i}>
+                              <p className="font-medium text-sm">Q: {item.question}</p>
+                              <p className="text-sm text-muted-foreground mt-1">R: {item.answer}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </TabsContent>
+
+        {/* Export Tab */}
+        <TabsContent value="export">
+          <Card className="border-2 border-dashed border-amber-400/50 bg-gradient-to-r from-amber-50/50 to-orange-50/50">
+            <CardContent className="pt-6">
+              <div className="text-center space-y-4">
+                <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white">
+                  NOUVEAU 2026
+                </Badge>
+                <h3 className="text-xl font-bold">Exporter votre guide de voyage</h3>
+                <p className="text-muted-foreground">
+                  {sheets.length} fiches destinations prêtes à exporter
+                </p>
+                <Button
+                  onClick={exportToPDF}
+                  disabled={isExporting || sheets.length === 0}
+                  className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white px-8 py-3"
+                >
+                  {isExporting ? (
+                    <>
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      Export en cours...
+                    </>
+                  ) : (
+                    <>
+                      <Download className="mr-2 h-5 w-5" />
+                      Télécharger le PDF
+                    </>
+                  )}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
