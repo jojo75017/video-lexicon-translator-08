@@ -165,6 +165,7 @@ const categories: Category[] = [
     items: [
       { id: 'niches', label: '💡 Niches Rentables', icon: Lightbulb, isLink: true, href: '/niches', isNew: true },
       { id: 'practical-sheets', label: '📋 Fiches Pratiques', icon: FileText, isLink: true, href: '/fiches-pratiques', isNew: true },
+      { id: 'travel-guide', label: '✈️ Guide de Voyage', icon: Globe, isNew: true },
       { id: 'recipe-book', label: '🍳 Livre de Recettes', icon: BookOpen, isNew: true },
       { id: 'coloring-book', label: '🖍️ Livre Coloriage', icon: Palette },
       { id: 'comic-book', label: '💬 Bande Dessinée', icon: LayoutTemplate },
