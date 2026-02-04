@@ -119,7 +119,11 @@ const EbookTravelGuideGenerator: React.FC<EbookTravelGuideGeneratorProps> = ({ e
   const [isExporting, setIsExporting] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentStep, setCurrentStep] = useState('');
-  const [activeTab, setActiveTab] = useState('pages');
+  const [activeTab, setActiveTab] = useState('cover');
+  
+  // Cover state
+  const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
+  const [isGeneratingCover, setIsGeneratingCover] = useState(false);
 
   const applyExample = (example: { title: string; destination: string; style: string }) => {
     setBookTitle(example.title);
@@ -547,6 +551,88 @@ Pure photography only, high resolution, magazine quality.`,
     }
   };
 
+  // Generate book cover
+  const generateCover = async () => {
+    if (!bookTitle.trim() || !destination.trim()) {
+      toast.error('Veuillez entrer un titre et une destination');
+      return;
+    }
+
+    setIsGeneratingCover(true);
+    toast.info('Génération de la couverture...');
+
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-front-cover', {
+        body: {
+          ebookTitle: bookTitle,
+          authorName: authorName || 'Guide de Voyage',
+          genre: 'travel',
+          style: 'modern',
+          customPrompt: `Stunning travel book cover for "${bookTitle}" featuring ${destination}.
+Epic landscape photography, professional travel magazine quality.
+Beautiful scenic view representing the destination.
+The title "${bookTitle}" should be prominently displayed with elegant typography.
+${authorName ? `Author name "${authorName}" at the bottom.` : ''}
+Style: Modern travel guide, vibrant colors, cinematic quality.
+Format: Book cover 6x9 inches, portrait orientation.`,
+          showAuthorName: !!authorName,
+          showTitle: true,
+          colorScheme: 'vibrant',
+        }
+      });
+
+      if (error) throw error;
+
+      const imageUrl = data?.imageUrl || data?.coverUrl;
+      if (imageUrl) {
+        setCoverImageUrl(imageUrl);
+        toast.success('Couverture générée !');
+      } else {
+        throw new Error('Aucune image retournée');
+      }
+    } catch (error) {
+      console.error('Erreur génération couverture:', error);
+      toast.error('Erreur lors de la génération de la couverture');
+    } finally {
+      setIsGeneratingCover(false);
+    }
+  };
+
+  // Download cover image
+  const downloadCover = async () => {
+    if (!coverImageUrl) return;
+    
+    try {
+      // For base64 images
+      if (coverImageUrl.startsWith('data:')) {
+        const link = document.createElement('a');
+        link.href = coverImageUrl;
+        link.download = `${bookTitle.replace(/[^a-zA-Z0-9]/g, '_')}_Couverture.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        toast.success('Couverture téléchargée !');
+        return;
+      }
+      
+      // For URL images
+      const response = await fetch(coverImageUrl);
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${bookTitle.replace(/[^a-zA-Z0-9]/g, '_')}_Couverture.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      toast.success('Couverture téléchargée !');
+    } catch (error) {
+      console.error('Erreur téléchargement:', error);
+      toast.error('Erreur lors du téléchargement');
+    }
+  };
+
   const imagesGenerated = pages.reduce((acc, p) => {
     return acc + (p.location1.imageUrl ? 1 : 0) + (p.location2.imageUrl ? 1 : 0);
   }, 0);
@@ -796,6 +882,10 @@ Pure photography only, high resolution, magazine quality.`,
           <CardContent>
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="mb-4">
+                <TabsTrigger value="cover" className="flex items-center gap-2">
+                  <BookOpen className="w-4 h-4" />
+                  Couverture
+                </TabsTrigger>
                 <TabsTrigger value="pages" className="flex items-center gap-2">
                   <FileText className="w-4 h-4" />
                   Pages ({pages.length})
@@ -805,6 +895,123 @@ Pure photography only, high resolution, magazine quality.`,
                   Galerie ({imagesGenerated})
                 </TabsTrigger>
               </TabsList>
+
+              {/* Cover Tab */}
+              <TabsContent value="cover">
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Cover Generation */}
+                    <Card className="border-2 border-dashed border-primary/30">
+                      <CardHeader>
+                        <CardTitle className="text-lg flex items-center gap-2">
+                          <Sparkles className="w-5 h-5 text-primary" />
+                          Générer la Couverture
+                        </CardTitle>
+                        <CardDescription>
+                          Créez une couverture professionnelle pour votre guide
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <Button
+                          onClick={generateCover}
+                          disabled={isGeneratingCover || !bookTitle.trim() || !destination.trim()}
+                          className="w-full bg-gradient-to-r from-primary to-primary/80"
+                        >
+                          {isGeneratingCover ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              Génération en cours...
+                            </>
+                          ) : (
+                            <>
+                              <Sparkles className="w-4 h-4 mr-2" />
+                              Générer la Couverture
+                            </>
+                          )}
+                        </Button>
+                        
+                        {coverImageUrl && (
+                          <Button
+                            onClick={generateCover}
+                            variant="outline"
+                            className="w-full"
+                            disabled={isGeneratingCover}
+                          >
+                            <RefreshCw className="w-4 h-4 mr-2" />
+                            Regénérer
+                          </Button>
+                        )}
+                      </CardContent>
+                    </Card>
+
+                    {/* Cover Preview / Mockup */}
+                    <Card className="border-2">
+                      <CardHeader>
+                        <CardTitle className="text-lg flex items-center gap-2">
+                          <BookOpen className="w-5 h-5" />
+                          Aperçu Mockup
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        {coverImageUrl ? (
+                          <div className="space-y-4">
+                            {/* 3D Book Mockup Effect */}
+                            <div className="relative flex justify-center items-center py-8 bg-gradient-to-br from-muted/50 to-muted rounded-xl">
+                              <div 
+                                className="relative transform transition-all duration-500 hover:scale-105"
+                                style={{
+                                  perspective: '1000px',
+                                }}
+                              >
+                                <div 
+                                  className="relative shadow-2xl rounded-r-md"
+                                  style={{
+                                    transform: 'rotateY(-15deg)',
+                                    transformStyle: 'preserve-3d',
+                                  }}
+                                >
+                                  {/* Book spine effect */}
+                                  <div 
+                                    className="absolute left-0 top-0 bottom-0 w-4 bg-gradient-to-r from-primary/80 to-primary rounded-l-sm"
+                                    style={{
+                                      transform: 'rotateY(90deg) translateX(-8px)',
+                                      transformOrigin: 'left center',
+                                    }}
+                                  />
+                                  {/* Cover image */}
+                                  <img
+                                    src={coverImageUrl}
+                                    alt="Couverture du guide"
+                                    className="w-48 h-72 object-cover rounded-r-md shadow-lg"
+                                  />
+                                  {/* Page effect */}
+                                  <div className="absolute right-0 top-1 bottom-1 w-1 bg-gradient-to-l from-gray-200 to-gray-100 rounded-r" />
+                                </div>
+                              </div>
+                            </div>
+                            
+                            {/* Download Button */}
+                            <Button
+                              onClick={downloadCover}
+                              className="w-full bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600"
+                            >
+                              <Download className="w-4 h-4 mr-2" />
+                              Télécharger la Couverture (PNG)
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+                            <BookOpen className="w-16 h-16 mb-4 opacity-30" />
+                            <p className="text-center">
+                              Générez votre couverture pour voir le mockup
+                            </p>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+              </TabsContent>
 
               <TabsContent value="pages" className="space-y-6">
                 {pages.map((page) => (
