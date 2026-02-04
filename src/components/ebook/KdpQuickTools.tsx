@@ -21,6 +21,7 @@ interface KdpQuickToolsProps {
   pageCount: number;
   targetAudience?: string;
   theme?: string;
+  defaultOpen?: boolean;
 }
 
 interface KdpData {
@@ -87,12 +88,20 @@ export const KdpQuickTools: React.FC<KdpQuickToolsProps> = ({
   pageCount,
   targetAudience,
   theme,
+  defaultOpen = false,
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(defaultOpen);
   const [isGenerating, setIsGenerating] = useState(false);
   const [kdpData, setKdpData] = useState<KdpData | null>(null);
   const [customKeywords, setCustomKeywords] = useState<string[]>([]);
   const [customDescription, setCustomDescription] = useState('');
+  
+  // Auto-générer les données KDP si ouvert par défaut
+  React.useEffect(() => {
+    if (defaultOpen && !kdpData && !isGenerating && title) {
+      generateKdpData();
+    }
+  }, [defaultOpen, title]);
 
   const generateKdpData = async () => {
     setIsGenerating(true);
