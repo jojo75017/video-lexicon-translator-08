@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import jsPDF from 'jspdf';
+import { saveAs } from 'file-saver';
 import * as pdfjsLib from 'pdfjs-dist';
 // Vite will bundle the worker and give us an URL we can safely load
 import pdfWorkerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
@@ -281,9 +282,16 @@ const PdfKdpReformatter: React.FC = () => {
         aboutY += 8;
       });
 
-      // Sauvegarder
+      // Télécharger (plus fiable que pdf.save() selon navigateurs)
       const fileName = `${bookTitle.replace(/[^a-zA-Z0-9]/g, '-')}-KDP-${targetFormat}-${Date.now()}.pdf`;
-      pdf.save(fileName);
+
+      try {
+        const blob = pdf.output('blob');
+        saveAs(blob, fileName);
+      } catch {
+        // Fallback
+        pdf.save(fileName);
+      }
       
       toast.success(`PDF KDP exporté : ${fileName}`);
     } catch (error) {
