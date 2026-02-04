@@ -69,6 +69,42 @@ const exampleDestinations = [
   { title: "Plages de Bali", destination: "Indonésie", style: "plage" },
 ];
 
+// Liste complète des pays du monde par continent
+const worldCountries = {
+  '🌍 Europe': [
+    'Allemagne', 'Autriche', 'Belgique', 'Bulgarie', 'Chypre', 'Croatie', 'Danemark', 
+    'Espagne', 'Estonie', 'Finlande', 'France', 'Grèce', 'Hongrie', 'Irlande', 
+    'Islande', 'Italie', 'Lettonie', 'Lituanie', 'Luxembourg', 'Malte', 'Monaco',
+    'Monténégro', 'Norvège', 'Pays-Bas', 'Pologne', 'Portugal', 'République Tchèque',
+    'Roumanie', 'Royaume-Uni', 'Serbie', 'Slovaquie', 'Slovénie', 'Suède', 'Suisse', 'Ukraine'
+  ],
+  '🌎 Amérique du Nord': [
+    'Canada', 'États-Unis', 'Mexique', 'Costa Rica', 'Cuba', 'Guatemala', 'Haïti',
+    'Honduras', 'Jamaïque', 'Nicaragua', 'Panama', 'République Dominicaine', 'Salvador'
+  ],
+  '🌎 Amérique du Sud': [
+    'Argentine', 'Bolivie', 'Brésil', 'Chili', 'Colombie', 'Équateur', 'Guyana',
+    'Paraguay', 'Pérou', 'Suriname', 'Uruguay', 'Venezuela'
+  ],
+  '🌏 Asie': [
+    'Arabie Saoudite', 'Bangladesh', 'Cambodge', 'Chine', 'Corée du Sud', 'Émirats Arabes Unis',
+    'Inde', 'Indonésie', 'Israël', 'Japon', 'Jordanie', 'Kazakhstan', 'Laos', 'Liban',
+    'Malaisie', 'Maldives', 'Mongolie', 'Myanmar', 'Népal', 'Oman', 'Ouzbékistan',
+    'Pakistan', 'Philippines', 'Qatar', 'Singapour', 'Sri Lanka', 'Taïwan', 'Thaïlande',
+    'Turquie', 'Vietnam'
+  ],
+  '🌍 Afrique': [
+    'Afrique du Sud', 'Algérie', 'Bénin', 'Botswana', 'Cameroun', 'Cap-Vert', 'Côte d\'Ivoire',
+    'Égypte', 'Éthiopie', 'Ghana', 'Kenya', 'Madagascar', 'Mali', 'Maroc', 'Maurice',
+    'Mozambique', 'Namibie', 'Nigeria', 'Ouganda', 'Rwanda', 'Sénégal', 'Seychelles',
+    'Tanzanie', 'Tunisie', 'Zambie', 'Zimbabwe'
+  ],
+  '🌏 Océanie': [
+    'Australie', 'Fidji', 'Nouvelle-Calédonie', 'Nouvelle-Zélande', 'Papouasie-Nouvelle-Guinée',
+    'Polynésie Française', 'Samoa', 'Tonga', 'Vanuatu'
+  ]
+};
+
 const EbookTravelGuideGenerator: React.FC<EbookTravelGuideGeneratorProps> = ({ ebookTitle = '' }) => {
   const [bookTitle, setBookTitle] = useState(ebookTitle || '');
   const [destination, setDestination] = useState('');
@@ -545,7 +581,7 @@ Pure photography only, high resolution, magazine quality.`,
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-lg flex items-center gap-2">
-            <Globe className="w-5 h-5 text-blue-500" />
+            <Globe className="w-5 h-5 text-primary" />
             Exemples de guides
           </CardTitle>
         </CardHeader>
@@ -557,7 +593,7 @@ Pure photography only, high resolution, magazine quality.`,
                 variant="outline"
                 size="sm"
                 onClick={() => applyExample(example)}
-                className="hover:bg-blue-50 hover:border-blue-300"
+                className="hover:bg-primary/10 hover:border-primary/50"
               >
                 {example.title}
               </Button>
@@ -566,11 +602,58 @@ Pure photography only, high resolution, magazine quality.`,
         </CardContent>
       </Card>
 
+      {/* World Countries Selector */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <MapPin className="w-5 h-5 text-primary" />
+            Choisir un pays 🌍
+          </CardTitle>
+          <CardDescription>
+            Cliquez sur un pays pour le sélectionner comme destination
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Tabs defaultValue="🌍 Europe" className="w-full">
+            <TabsList className="flex flex-wrap h-auto gap-1 bg-muted/50 p-1">
+              {Object.keys(worldCountries).map((continent) => (
+                <TabsTrigger key={continent} value={continent} className="text-xs px-2 py-1">
+                  {continent}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+            {Object.entries(worldCountries).map(([continent, countries]) => (
+              <TabsContent key={continent} value={continent} className="mt-4">
+                <div className="flex flex-wrap gap-1.5">
+                  {countries.map((country) => (
+                    <Button
+                      key={country}
+                      variant={destination === country ? "default" : "outline"}
+                      size="sm"
+                      className={`text-xs h-7 ${destination === country ? 'bg-primary text-primary-foreground' : 'hover:bg-primary/10'}`}
+                      onClick={() => {
+                        setDestination(country);
+                        if (!bookTitle) {
+                          setBookTitle(`Découverte de ${country}`);
+                        }
+                        toast.success(`${country} sélectionné !`);
+                      }}
+                    >
+                      {country}
+                    </Button>
+                  ))}
+                </div>
+              </TabsContent>
+            ))}
+          </Tabs>
+        </CardContent>
+      </Card>
+
       {/* Configuration */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <MapPin className="w-5 h-5" />
+            <Compass className="w-5 h-5" />
             Configuration du Guide
           </CardTitle>
         </CardHeader>
@@ -586,7 +669,7 @@ Pure photography only, high resolution, magazine quality.`,
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="destination">Destination *</Label>
+              <Label htmlFor="destination">Destination * <span className="text-xs text-muted-foreground">(ou choisissez ci-dessus)</span></Label>
               <Input
                 id="destination"
                 placeholder="ex: Italie, Paris, Japon..."
