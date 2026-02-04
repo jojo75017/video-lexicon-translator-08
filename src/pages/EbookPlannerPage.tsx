@@ -116,6 +116,7 @@ import EbookArcManager from '@/components/ebook/EbookArcManager';
 import EbookDirectSales from '@/components/ebook/EbookDirectSales';
 import EbookBsrTracker from '@/components/ebook/EbookBsrTracker';
 import EbookExportGuide from '@/components/ebook/EbookExportGuide';
+import PdfKdpReformatter from '@/components/ebook/PdfKdpReformatter';
 import SubscriberActivityPopup from '@/components/admin/SubscriberActivityPopup';
 
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
@@ -2750,6 +2751,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       
       case 'bsr-tracker':
         return <EbookBsrTracker />;
+
+      case 'pdf-reformatter':
+        return <PdfKdpReformatter />;
 
       case 'subscription':
         // Rediriger vers la page Abonnement

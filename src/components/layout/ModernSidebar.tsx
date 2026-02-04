@@ -197,6 +197,7 @@ const categories: Category[] = [
     color: 'from-orange-500 to-red-500',
     items: [
       { id: 'export-guide', label: '📖 Guide Export', icon: GraduationCap, isNew: true },
+      { id: 'pdf-reformatter', label: '📐 Reformateur PDF KDP', icon: FileEdit, isNew: true },
       { id: 'export', label: '💾 Exporter (PDF, Word)', icon: Download },
       { id: 'kdp', label: '📝 Description KDP', icon: TrendingUp },
       { id: 'amazon-simulator', label: '👀 Simulateur Amazon', icon: Eye },
