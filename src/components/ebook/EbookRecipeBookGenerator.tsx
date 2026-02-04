@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,271 +6,314 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
-  ChefHat, UtensilsCrossed, Clock, Users, Flame, Sparkles, Plus, Trash2, 
-  Image as ImageIcon, Download, BookOpen, Leaf, AlertTriangle, Heart,
-  Loader2, RefreshCw, Copy, Check, FileText, FileDown, ShoppingCart,
-  Printer, Wand2, ListChecks, Edit3, Star
+  ChefHat, UtensilsCrossed, Sparkles, Image as ImageIcon, Download, BookOpen,
+  Loader2, RefreshCw, FileText, Globe, Wine, Utensils
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import jsPDF from 'jspdf';
-import { Document, Packer, Paragraph, TextRun, HeadingLevel, ImageRun, PageBreak, AlignmentType, BorderStyle } from 'docx';
 import { saveAs } from 'file-saver';
 
-interface Recipe {
+interface RecipePage {
   id: string;
-  title: string;
-  category: string;
-  prepTime: string;
-  cookTime: string;
-  servings: number;
-  difficulty: 'facile' | 'moyen' | 'difficile';
-  ingredients: string[];
-  instructions: string[];
-  tips: string;
-  nutritionInfo?: string;
-  imageUrl?: string;
-  isGeneratingImage?: boolean;
+  pageNumber: number;
+  recipe1: {
+    country: string;
+    name: string;
+    description: string;
+    ingredients: string;
+    winePairing: string;
+    imageUrl?: string;
+    isGeneratingImage?: boolean;
+  };
+  recipe2: {
+    country: string;
+    name: string;
+    description: string;
+    ingredients: string;
+    winePairing: string;
+    imageUrl?: string;
+    isGeneratingImage?: boolean;
+  };
 }
 
 interface EbookRecipeBookGeneratorProps {
   ebookTitle?: string;
 }
 
-const cuisineStyles = [
-  { value: 'française', label: '🇫🇷 Cuisine Française' },
-  { value: 'italienne', label: '🇮🇹 Cuisine Italienne' },
-  { value: 'asiatique', label: '🥢 Cuisine Asiatique' },
-  { value: 'méditerranéenne', label: '🫒 Méditerranéenne' },
-  { value: 'américaine', label: '🇺🇸 Cuisine Américaine' },
-  { value: 'végétarienne', label: '🥗 Végétarienne' },
-  { value: 'vegan', label: '🌱 Vegan' },
-  { value: 'healthy', label: '💪 Healthy / Fitness' },
-  { value: 'desserts', label: '🍰 Pâtisserie & Desserts' },
-  { value: 'rapide', label: '⚡ Recettes Rapides (-30min)' },
+// Liste complète des pays du monde par continent (même que voyage)
+const worldCountries = {
+  '🌍 Europe': [
+    'Allemagne', 'Autriche', 'Belgique', 'Bulgarie', 'Chypre', 'Croatie', 'Danemark', 
+    'Espagne', 'Estonie', 'Finlande', 'France', 'Grèce', 'Hongrie', 'Irlande', 
+    'Islande', 'Italie', 'Lettonie', 'Lituanie', 'Luxembourg', 'Malte', 'Monaco',
+    'Monténégro', 'Norvège', 'Pays-Bas', 'Pologne', 'Portugal', 'République Tchèque',
+    'Roumanie', 'Royaume-Uni', 'Serbie', 'Slovaquie', 'Slovénie', 'Suède', 'Suisse', 'Ukraine'
+  ],
+  '🌎 Amérique du Nord': [
+    'Canada', 'États-Unis', 'Mexique', 'Costa Rica', 'Cuba', 'Guatemala', 'Haïti',
+    'Honduras', 'Jamaïque', 'Nicaragua', 'Panama', 'République Dominicaine', 'Salvador'
+  ],
+  '🌎 Amérique du Sud': [
+    'Argentine', 'Bolivie', 'Brésil', 'Chili', 'Colombie', 'Équateur', 'Guyana',
+    'Paraguay', 'Pérou', 'Suriname', 'Uruguay', 'Venezuela'
+  ],
+  '🌏 Asie': [
+    'Arabie Saoudite', 'Bangladesh', 'Cambodge', 'Chine', 'Corée du Sud', 'Émirats Arabes Unis',
+    'Inde', 'Indonésie', 'Israël', 'Japon', 'Jordanie', 'Kazakhstan', 'Laos', 'Liban',
+    'Malaisie', 'Maldives', 'Mongolie', 'Myanmar', 'Népal', 'Oman', 'Ouzbékistan',
+    'Pakistan', 'Philippines', 'Qatar', 'Singapour', 'Sri Lanka', 'Taïwan', 'Thaïlande',
+    'Turquie', 'Vietnam'
+  ],
+  '🌍 Afrique': [
+    'Afrique du Sud', 'Algérie', 'Bénin', 'Botswana', 'Cameroun', 'Cap-Vert', 'Côte d\'Ivoire',
+    'Égypte', 'Éthiopie', 'Ghana', 'Kenya', 'Madagascar', 'Mali', 'Maroc', 'Maurice',
+    'Mozambique', 'Namibie', 'Nigeria', 'Ouganda', 'Rwanda', 'Sénégal', 'Seychelles',
+    'Tanzanie', 'Tunisie', 'Zambie', 'Zimbabwe'
+  ],
+  '🌏 Océanie': [
+    'Australie', 'Fidji', 'Nouvelle-Calédonie', 'Nouvelle-Zélande', 'Papouasie-Nouvelle-Guinée',
+    'Polynésie Française', 'Samoa', 'Tonga', 'Vanuatu'
+  ]
+};
+
+const cuisineThemes = [
+  { value: 'tour-du-monde', label: '🌍 Tour du Monde Culinaire' },
+  { value: 'gastronomie', label: '🍽️ Haute Gastronomie' },
+  { value: 'traditionnel', label: '👵 Recettes Traditionnelles' },
+  { value: 'street-food', label: '🍜 Street Food du Monde' },
+  { value: 'festif', label: '🎉 Cuisine des Fêtes' },
 ];
 
-const recipeCategories = [
-  { value: 'entree', label: '🥗 Entrées' },
-  { value: 'plat', label: '🍽️ Plats principaux' },
-  { value: 'dessert', label: '🍰 Desserts' },
-  { value: 'aperitif', label: '🥂 Apéritifs' },
-  { value: 'soupe', label: '🍲 Soupes & Potages' },
-  { value: 'salade', label: '🥬 Salades' },
-  { value: 'boisson', label: '🍹 Boissons' },
-  { value: 'petit-dejeuner', label: '🥐 Petit-déjeuner' },
+const photoStyles = [
+  { value: 'gourmet', label: '🍽️ Photo Gastronomique' },
+  { value: 'rustic', label: '🏡 Style Rustique' },
+  { value: 'modern', label: '✨ Minimaliste Moderne' },
+  { value: 'colorful', label: '🎨 Couleurs Vives' },
 ];
 
-// Exemples de titres pour inspirer les utilisateurs
-const exampleTitles = [
-  { title: "Les Délices de Grand-Mère", style: "française" },
-  { title: "Saveurs d'Italie", style: "italienne" },
-  { title: "Voyage Culinaire en Asie", style: "asiatique" },
-  { title: "Ma Cuisine Vegan au Quotidien", style: "vegan" },
-  { title: "Recettes Fitness & Protéinées", style: "healthy" },
-  { title: "Pâtisserie Maison Facile", style: "desserts" },
-  { title: "30 Minutes Chrono", style: "rapide" },
-  { title: "Recettes Méditerranéennes", style: "méditerranéenne" },
+const exampleBooks = [
+  { title: "Les Saveurs du Monde", region: "Tour du monde", theme: "tour-du-monde" },
+  { title: "Voyage Culinaire en Europe", region: "Europe", theme: "traditionnel" },
+  { title: "Gastronomie d'Asie", region: "Asie", theme: "gastronomie" },
+  { title: "Street Food International", region: "Tous continents", theme: "street-food" },
+  { title: "Festins des 5 Continents", region: "Monde", theme: "festif" },
 ];
 
 const EbookRecipeBookGenerator: React.FC<EbookRecipeBookGeneratorProps> = ({ ebookTitle = '' }) => {
   const [bookTitle, setBookTitle] = useState(ebookTitle || '');
+  const [selectedCountry, setSelectedCountry] = useState('');
   const [authorName, setAuthorName] = useState('');
-  const [cuisineStyle, setCuisineStyle] = useState('française');
-  const [numberOfRecipes, setNumberOfRecipes] = useState(10);
-  const [numberOfPhotos, setNumberOfPhotos] = useState(10);
-  const [includeNutrition, setIncludeNutrition] = useState(true);
-  const [includeImages, setIncludeImages] = useState(true);
-  const [targetAudience, setTargetAudience] = useState('tous');
+  const [cuisineTheme, setCuisineTheme] = useState('tour-du-monde');
+  const [photoStyle, setPhotoStyle] = useState('gourmet');
+  const [numberOfPages, setNumberOfPages] = useState(20);
   const [specialInstructions, setSpecialInstructions] = useState('');
   
-  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [pages, setPages] = useState<RecipePage[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentStep, setCurrentStep] = useState('');
-  const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState('recipes');
-  const [editingRecipeId, setEditingRecipeId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState('cover');
   
   // Cover state
   const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
   const [isGeneratingCover, setIsGeneratingCover] = useState(false);
 
-  // Calculer la liste de courses groupée
-  const shoppingList = useMemo(() => {
-    const ingredientMap = new Map<string, { count: number; recipes: string[] }>();
-    recipes.forEach(recipe => {
-      recipe.ingredients.forEach(ing => {
-        const normalized = ing.toLowerCase().trim();
-        if (ingredientMap.has(normalized)) {
-          const existing = ingredientMap.get(normalized)!;
-          existing.count++;
-          if (!existing.recipes.includes(recipe.title)) {
-            existing.recipes.push(recipe.title);
-          }
-        } else {
-          ingredientMap.set(normalized, { count: 1, recipes: [recipe.title] });
-        }
-      });
-    });
-    return Array.from(ingredientMap.entries())
-      .sort((a, b) => b[1].count - a[1].count);
-  }, [recipes]);
-  
-  const [selectedCategories, setSelectedCategories] = useState<string[]>(['entree', 'plat', 'dessert']);
-
-  const applyExampleTitle = (example: { title: string; style: string }) => {
+  const applyExample = (example: { title: string; region: string; theme: string }) => {
     setBookTitle(example.title);
-    setCuisineStyle(example.style);
+    setCuisineTheme(example.theme);
   };
 
-  const toggleCategory = (category: string) => {
-    setSelectedCategories(prev => 
-      prev.includes(category) 
-        ? prev.filter(c => c !== category)
-        : [...prev, category]
-    );
+  const getPhotoStylePrompt = (style: string): string => {
+    const styles: Record<string, string> = {
+      'gourmet': 'professional food photography, michelin star presentation, elegant plating, soft natural lighting, shallow depth of field, magazine quality',
+      'rustic': 'rustic food photography, wooden table, natural ingredients, warm lighting, authentic presentation, homestyle cooking',
+      'modern': 'minimalist food photography, clean white background, elegant composition, modern plating, high contrast',
+      'colorful': 'vibrant food photography, colorful ingredients, bright lighting, appetizing presentation, saturated colors',
+    };
+    return styles[style] || styles['gourmet'];
   };
 
-  const generateRecipes = async () => {
+  const generateWorldCuisineBook = async () => {
     if (!bookTitle.trim()) {
       toast.error('Veuillez entrer un titre pour votre livre');
-      return;
-    }
-    if (selectedCategories.length === 0) {
-      toast.error('Sélectionnez au moins une catégorie de recettes');
       return;
     }
 
     setIsGenerating(true);
     setProgress(0);
-    setRecipes([]);
+    setPages([]);
     
     try {
-      const recipesPerCategory = Math.ceil(numberOfRecipes / selectedCategories.length);
-      const allRecipes: Recipe[] = [];
+      // Total recipes needed: 2 per page × numberOfPages
+      const totalRecipes = numberOfPages * 2;
       
-      for (let catIndex = 0; catIndex < selectedCategories.length; catIndex++) {
-        const category = selectedCategories[catIndex];
-        const categoryLabel = recipeCategories.find(c => c.value === category)?.label || category;
-        
-        setCurrentStep(`Génération des recettes ${categoryLabel}...`);
-        setProgress((catIndex / selectedCategories.length) * 80);
-        
-        const { data, error } = await supabase.functions.invoke('generate-content', {
-          body: {
-            type: 'recipe-book',
-            prompt: `Génère ${recipesPerCategory} recettes de la catégorie "${categoryLabel}" pour un livre de cuisine ${cuisineStyles.find(s => s.value === cuisineStyle)?.label || cuisineStyle}.
+      setCurrentStep('Génération des recettes du monde...');
+      setProgress(10);
+
+      // Determine which countries to include
+      const regionToUse = selectedCountry || 'les pays du monde entier';
+      
+      // Generate recipes list with wine pairings
+      const { data: planData, error: planError } = await supabase.functions.invoke('generate-content', {
+        body: {
+          type: 'world-cuisine-book',
+          prompt: `Tu es un chef étoilé et sommelier expert. Génère ${totalRecipes} recettes emblématiques de ${regionToUse} avec leurs accords mets-vins.
 
 Titre du livre: "${bookTitle}"
-Public cible: ${targetAudience}
+Thème culinaire: ${cuisineThemes.find(t => t.value === cuisineTheme)?.label || cuisineTheme}
 ${specialInstructions ? `Instructions spéciales: ${specialInstructions}` : ''}
-${includeNutrition ? 'Inclure les informations nutritionnelles approximatives.' : ''}
 
 Pour CHAQUE recette, fournis:
-1. Un titre créatif et appétissant
-2. Temps de préparation et de cuisson
-3. Nombre de portions
-4. Niveau de difficulté (facile/moyen/difficile)
-5. Liste complète des ingrédients avec quantités précises
-6. Instructions détaillées étape par étape (minimum 5 étapes)
-7. Conseils et astuces du chef
-${includeNutrition ? '8. Informations nutritionnelles (calories, protéines, glucides, lipides)' : ''}
+1. Le pays d'origine
+2. Le nom du plat traditionnel
+3. Une description appétissante de 2-3 phrases
+4. Les ingrédients principaux (5-7 ingrédients clés)
+5. L'accord vin/boisson recommandé (nom du vin, région, et pourquoi il s'accorde bien)
 
-Retourne les recettes au format JSON:
+Varie les pays et les types de plats: entrées, plats principaux, desserts, spécialités locales.
+Inclus des recettes de différents continents pour un vrai tour du monde.
+
+Retourne au format JSON:
 {
   "recipes": [
     {
-      "title": "Nom de la recette",
-      "prepTime": "15 min",
-      "cookTime": "30 min",
-      "servings": 4,
-      "difficulty": "moyen",
-      "ingredients": ["200g de farine", "3 oeufs", ...],
-      "instructions": ["Étape 1: ...", "Étape 2: ...", ...],
-      "tips": "Conseil du chef...",
-      "nutritionInfo": "Calories: 350 | Protéines: 12g | Glucides: 45g | Lipides: 15g"
+      "country": "France",
+      "name": "Coq au Vin",
+      "description": "Un classique de la cuisine bourguignonne...",
+      "ingredients": "Poulet, vin rouge, lardons, champignons, oignons grelots, thym",
+      "winePairing": "Bourgogne Pinot Noir - La finesse du vin complète la sauce au vin rouge"
     }
   ]
-}`,
+}`
+        }
+      });
+
+      if (planError) throw planError;
+
+      let recipes: { country: string; name: string; description: string; ingredients: string; winePairing: string }[] = [];
+      try {
+        const content = planData?.content || planData?.result || '';
+        const jsonMatch = content.match(/\{[\s\S]*"recipes"[\s\S]*\}/);
+        if (jsonMatch) {
+          const parsed = JSON.parse(jsonMatch[0]);
+          recipes = parsed.recipes || [];
+        }
+      } catch (parseError) {
+        console.error('Erreur parsing recettes:', parseError);
+        throw new Error('Erreur lors de la génération des recettes');
+      }
+
+      if (recipes.length < totalRecipes) {
+        // Pad with generic recipes if needed
+        while (recipes.length < totalRecipes) {
+          recipes.push({
+            country: 'International',
+            name: `Spécialité ${recipes.length + 1}`,
+            description: 'Une délicieuse recette à découvrir.',
+            ingredients: 'Ingrédients variés',
+            winePairing: 'Vin blanc ou rouge selon préférence'
+          });
+        }
+      }
+
+      setProgress(30);
+      setCurrentStep('Organisation des pages...');
+
+      // Create pages with 2 recipes each
+      const generatedPages: RecipePage[] = [];
+      for (let i = 0; i < numberOfPages; i++) {
+        const rec1Index = i * 2;
+        const rec2Index = i * 2 + 1;
+        generatedPages.push({
+          id: `page-${Date.now()}-${i}`,
+          pageNumber: i + 1,
+          recipe1: {
+            country: recipes[rec1Index]?.country || 'International',
+            name: recipes[rec1Index]?.name || `Recette ${rec1Index + 1}`,
+            description: recipes[rec1Index]?.description || 'Description à venir...',
+            ingredients: recipes[rec1Index]?.ingredients || 'Ingrédients variés',
+            winePairing: recipes[rec1Index]?.winePairing || 'À accorder selon vos goûts',
+          },
+          recipe2: {
+            country: recipes[rec2Index]?.country || 'International',
+            name: recipes[rec2Index]?.name || `Recette ${rec2Index + 1}`,
+            description: recipes[rec2Index]?.description || 'Description à venir...',
+            ingredients: recipes[rec2Index]?.ingredients || 'Ingrédients variés',
+            winePairing: recipes[rec2Index]?.winePairing || 'À accorder selon vos goûts',
           }
         });
-
-        if (error) throw error;
-
-        let parsedRecipes: any[] = [];
-        try {
-          const content = data?.content || data?.result || '';
-          const jsonMatch = content.match(/\{[\s\S]*"recipes"[\s\S]*\}/);
-          if (jsonMatch) {
-            const parsed = JSON.parse(jsonMatch[0]);
-            parsedRecipes = parsed.recipes || [];
-          }
-        } catch (parseError) {
-          console.error('Erreur parsing recettes:', parseError);
-        }
-
-        const formattedRecipes: Recipe[] = parsedRecipes.map((r: any, index: number) => ({
-          id: `${category}-${Date.now()}-${index}`,
-          title: r.title || `Recette ${index + 1}`,
-          category: category,
-          prepTime: r.prepTime || '20 min',
-          cookTime: r.cookTime || '30 min',
-          servings: r.servings || 4,
-          difficulty: r.difficulty || 'moyen',
-          ingredients: r.ingredients || [],
-          instructions: r.instructions || [],
-          tips: r.tips || '',
-          nutritionInfo: r.nutritionInfo,
-        }));
-
-        allRecipes.push(...formattedRecipes);
       }
 
-      setRecipes(allRecipes);
+      setPages(generatedPages);
+      setProgress(40);
+      
+      // Generate images for all recipes (2 per page)
+      const totalImages = numberOfPages * 2;
+      setCurrentStep(`Génération des ${totalImages} photos culinaires...`);
+      
+      for (let pageIndex = 0; pageIndex < generatedPages.length; pageIndex++) {
+        const page = generatedPages[pageIndex];
+        
+        // Generate image for recipe 1
+        const img1Index = pageIndex * 2;
+        setCurrentStep(`Photo ${img1Index + 1}/${totalImages}: ${page.recipe1.name}...`);
+        await generateRecipeImage(page.id, 'recipe1', page.recipe1.name, page.recipe1.country);
+        setProgress(40 + ((img1Index + 1) / totalImages) * 55);
+        
+        // Generate image for recipe 2
+        const img2Index = pageIndex * 2 + 1;
+        setCurrentStep(`Photo ${img2Index + 1}/${totalImages}: ${page.recipe2.name}...`);
+        await generateRecipeImage(page.id, 'recipe2', page.recipe2.name, page.recipe2.country);
+        setProgress(40 + ((img2Index + 1) / totalImages) * 55);
+      }
+
       setProgress(100);
-      setCurrentStep('Génération terminée !');
-      toast.success(`${allRecipes.length} recettes générées avec succès !`);
-
-      // Générer les images si demandé (nombre configurable)
-      if (includeImages && allRecipes.length > 0) {
-        const photosToGenerate = Math.min(allRecipes.length, numberOfPhotos);
-        setCurrentStep(`Génération des ${photosToGenerate} photos...`);
-        for (let i = 0; i < photosToGenerate; i++) {
-          setCurrentStep(`Génération photo ${i + 1}/${photosToGenerate}...`);
-          await generateRecipeImage(allRecipes[i].id, allRecipes[i].title);
-        }
-      }
+      setCurrentStep('Livre de recettes généré !');
+      toast.success(`Livre créé avec ${numberOfPages} pages et ${totalImages} recettes avec accords vins !`);
+      
     } catch (error) {
-      console.error('Erreur génération recettes:', error);
-      toast.error('Erreur lors de la génération des recettes');
+      console.error('Erreur génération livre:', error);
+      toast.error('Erreur lors de la génération du livre');
     } finally {
       setIsGenerating(false);
     }
   };
 
-  const generateRecipeImage = async (recipeId: string, recipeTitle: string) => {
-    setRecipes(prev => prev.map(r => 
-      r.id === recipeId ? { ...r, isGeneratingImage: true } : r
-    ));
+  const generateRecipeImage = async (
+    pageId: string, 
+    recipeKey: 'recipe1' | 'recipe2', 
+    recipeName: string,
+    countryName: string
+  ) => {
+    setPages(prev => prev.map(p => {
+      if (p.id === pageId) {
+        return {
+          ...p,
+          [recipeKey]: { ...p[recipeKey], isGeneratingImage: true }
+        };
+      }
+      return p;
+    }));
 
     try {
+      const photoPrompt = getPhotoStylePrompt(photoStyle);
+      
       const { data, error } = await supabase.functions.invoke('generate-front-cover', {
         body: {
-          ebookTitle: recipeTitle, // Paramètre correct attendu par l'edge function
+          ebookTitle: recipeName,
           authorName: '',
           genre: 'cooking',
           style: 'cookbook',
-          customPrompt: `Photo culinaire professionnelle de "${recipeTitle}". 
-Style: photographie gastronomique haute qualité, éclairage naturel doux, 
-présentation soignée sur belle vaisselle, arrière-plan flou élégant,
-couleurs vives et appétissantes, vue plongeante ou 3/4.
-IMPORTANT: NO TEXT, NO WORDS, NO TITLE, NO LETTERS on the image. Only the food.`,
+          customPrompt: `${photoPrompt}. 
+Beautiful food photograph of "${recipeName}" from ${countryName} cuisine.
+Professional culinary photography, appetizing presentation, authentic traditional dish.
+NO TEXT, NO WORDS, NO TITLE, NO LETTERS, NO WATERMARK on the image.
+Pure food photography only, high resolution, cookbook quality.`,
           showAuthorName: false,
           showTitle: false,
         }
@@ -280,23 +323,42 @@ IMPORTANT: NO TEXT, NO WORDS, NO TITLE, NO LETTERS on the image. Only the food.`
 
       const imageUrl = data?.imageUrl || data?.coverUrl;
       if (imageUrl) {
-        setRecipes(prev => prev.map(r => 
-          r.id === recipeId ? { ...r, imageUrl, isGeneratingImage: false } : r
-        ));
-        toast.success(`Image générée pour "${recipeTitle}"`);
+        setPages(prev => prev.map(p => {
+          if (p.id === pageId) {
+            return {
+              ...p,
+              [recipeKey]: { ...p[recipeKey], imageUrl, isGeneratingImage: false }
+            };
+          }
+          return p;
+        }));
       } else {
         throw new Error('Aucune image retournée');
       }
     } catch (error) {
       console.error('Erreur génération image:', error);
-      toast.error(`Erreur pour "${recipeTitle}"`);
-      setRecipes(prev => prev.map(r => 
-        r.id === recipeId ? { ...r, isGeneratingImage: false } : r
-      ));
+      setPages(prev => prev.map(p => {
+        if (p.id === pageId) {
+          return {
+            ...p,
+            [recipeKey]: { ...p[recipeKey], isGeneratingImage: false }
+          };
+        }
+        return p;
+      }));
     }
   };
 
-  // Generate book cover
+  const regenerateImage = async (pageId: string, recipeKey: 'recipe1' | 'recipe2') => {
+    const page = pages.find(p => p.id === pageId);
+    if (!page) return;
+    
+    const recipe = page[recipeKey];
+    toast.info(`Regénération de l'image pour ${recipe.name}...`);
+    await generateRecipeImage(pageId, recipeKey, recipe.name, recipe.country);
+  };
+
+  // Generate cover image
   const generateCover = async () => {
     if (!bookTitle.trim()) {
       toast.error('Veuillez entrer un titre pour le livre');
@@ -307,7 +369,7 @@ IMPORTANT: NO TEXT, NO WORDS, NO TITLE, NO LETTERS on the image. Only the food.`
     toast.info('Génération de la couverture...');
 
     try {
-      const cuisineLabel = cuisineStyles.find(s => s.value === cuisineStyle)?.label || cuisineStyle;
+      const themeLabel = cuisineThemes.find(t => t.value === cuisineTheme)?.label || cuisineTheme;
       
       const { data, error } = await supabase.functions.invoke('generate-front-cover', {
         body: {
@@ -316,11 +378,10 @@ IMPORTANT: NO TEXT, NO WORDS, NO TITLE, NO LETTERS on the image. Only the food.`
           genre: 'cookbook',
           style: 'modern',
           customPrompt: `Professional cookbook cover design for "${bookTitle}".
-Style: ${cuisineLabel}
-Create a stunning, appetizing food photography cover with elegant typography.
-The image should feature beautifully styled dishes with professional lighting.
-Modern cookbook aesthetic with clean design elements.
-High-end culinary magazine quality, warm inviting colors.
+Theme: ${themeLabel} - World cuisine and wine pairings.
+Create a stunning, elegant food photography cover with multiple dishes from around the world.
+Include wine glasses, elegant table setting, gourmet presentation.
+Warm, inviting colors with professional lighting. Magazine quality.
 IMPORTANT: Include elegant title "${bookTitle}" in stylish typography.
 ${authorName ? `Author name: ${authorName}` : ''}`,
           showAuthorName: !!authorName,
@@ -333,7 +394,7 @@ ${authorName ? `Author name: ${authorName}` : ''}`,
       const imageUrl = data?.imageUrl || data?.coverUrl;
       if (imageUrl) {
         setCoverImageUrl(imageUrl);
-        toast.success('Couverture générée avec succès !');
+        toast.success('Couverture générée !');
         setActiveTab('cover');
       } else {
         throw new Error('Aucune image retournée');
@@ -346,27 +407,25 @@ ${authorName ? `Author name: ${authorName}` : ''}`,
     }
   };
 
-  // Download cover image
+  // Download cover
   const downloadCover = async () => {
     if (!coverImageUrl) return;
     
     try {
-      // Handle both data URLs and external URLs
       if (coverImageUrl.startsWith('data:')) {
         const link = document.createElement('a');
         link.href = coverImageUrl;
-        link.download = `couverture-${bookTitle.replace(/\s+/g, '-').toLowerCase() || 'recettes'}.png`;
+        link.download = `couverture-${bookTitle.replace(/\s+/g, '-').toLowerCase() || 'recettes-monde'}.png`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
       } else {
-        // Fetch and convert external URL
         const response = await fetch(coverImageUrl);
         const blob = await response.blob();
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `couverture-${bookTitle.replace(/\s+/g, '-').toLowerCase() || 'recettes'}.png`;
+        link.download = `couverture-${bookTitle.replace(/\s+/g, '-').toLowerCase() || 'recettes-monde'}.png`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -379,246 +438,15 @@ ${authorName ? `Author name: ${authorName}` : ''}`,
     }
   };
 
-  const deleteRecipe = (id: string) => {
-    setRecipes(prev => prev.filter(r => r.id !== id));
-    toast.success('Recette supprimée');
-  };
-
-  const copyRecipeToClipboard = (recipe: Recipe) => {
-    const text = `
-# ${recipe.title}
-
-⏱️ Préparation: ${recipe.prepTime} | Cuisson: ${recipe.cookTime}
-👥 Portions: ${recipe.servings} | Difficulté: ${recipe.difficulty}
-
-## Ingrédients
-${recipe.ingredients.map(i => `- ${i}`).join('\n')}
-
-## Instructions
-${recipe.instructions.map((inst, i) => `${i + 1}. ${inst}`).join('\n')}
-
-💡 Conseil: ${recipe.tips}
-${recipe.nutritionInfo ? `\n📊 Nutrition: ${recipe.nutritionInfo}` : ''}
-    `.trim();
-    
-    navigator.clipboard.writeText(text);
-    setCopiedId(recipe.id);
-    setTimeout(() => setCopiedId(null), 2000);
-    toast.success('Recette copiée !');
-  };
-
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case 'facile': return 'bg-green-500';
-      case 'moyen': return 'bg-amber-500';
-      case 'difficile': return 'bg-red-500';
-      default: return 'bg-gray-500';
-    }
-  };
-
-  const getCategoryEmoji = (category: string) => {
-    return recipeCategories.find(c => c.value === category)?.label.split(' ')[0] || '🍽️';
-  };
-
-  // ============= EXPORT PDF =============
+  // Export PDF (same format as Travel Guide)
   const exportToPDF = async () => {
-    if (recipes.length === 0) {
-      toast.error('Aucune recette à exporter');
+    if (pages.length === 0) {
+      toast.error('Aucune page à exporter');
       return;
     }
 
     setIsExporting(true);
     toast.info('Génération du PDF en cours...');
-
-    try {
-      const pdf = new jsPDF();
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      const margin = 20;
-      const contentWidth = pageWidth - 2 * margin;
-      let yPosition = margin;
-
-      // ===== PAGE DE TITRE =====
-      pdf.setFillColor(255, 165, 0);
-      pdf.rect(0, 0, pageWidth, 60, 'F');
-      
-      pdf.setFont('helvetica', 'bold');
-      pdf.setFontSize(28);
-      pdf.setTextColor(255, 255, 255);
-      pdf.text(bookTitle || 'Mon Livre de Recettes', pageWidth / 2, 35, { align: 'center' });
-
-      if (authorName) {
-        pdf.setFontSize(14);
-        pdf.text(`par ${authorName}`, pageWidth / 2, 50, { align: 'center' });
-      }
-
-      pdf.setTextColor(0, 0, 0);
-      pdf.setFontSize(12);
-      pdf.text(`${recipes.length} recettes`, pageWidth / 2, 80, { align: 'center' });
-      pdf.text(`Style: ${cuisineStyles.find(s => s.value === cuisineStyle)?.label || cuisineStyle}`, pageWidth / 2, 90, { align: 'center' });
-
-      // ===== TABLE DES MATIÈRES =====
-      pdf.addPage();
-      yPosition = margin;
-      pdf.setFont('helvetica', 'bold');
-      pdf.setFontSize(20);
-      pdf.setTextColor(255, 140, 0);
-      pdf.text('📖 Table des Matières', margin, yPosition);
-      yPosition += 15;
-
-      pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(12);
-      pdf.setTextColor(0, 0, 0);
-      recipes.forEach((recipe, index) => {
-        if (yPosition > pageHeight - 20) {
-          pdf.addPage();
-          yPosition = margin;
-        }
-        const emoji = getCategoryEmoji(recipe.category);
-        pdf.text(`${emoji} ${index + 1}. ${recipe.title}`, margin, yPosition);
-        yPosition += 8;
-      });
-
-      // ===== RECETTES =====
-      for (let i = 0; i < recipes.length; i++) {
-        const recipe = recipes[i];
-        pdf.addPage();
-        yPosition = margin;
-
-        // Image si disponible
-        if (recipe.imageUrl) {
-          try {
-            const img = new Image();
-            img.crossOrigin = 'anonymous';
-            await new Promise<void>((resolve, reject) => {
-              img.onload = () => resolve();
-              img.onerror = reject;
-              img.src = recipe.imageUrl!;
-            });
-            
-            const canvas = document.createElement('canvas');
-            canvas.width = img.width;
-            canvas.height = img.height;
-            const ctx = canvas.getContext('2d');
-            ctx?.drawImage(img, 0, 0);
-            const imgData = canvas.toDataURL('image/jpeg', 0.8);
-            
-            const imgWidth = contentWidth;
-            const imgHeight = (img.height / img.width) * imgWidth;
-            pdf.addImage(imgData, 'JPEG', margin, yPosition, imgWidth, Math.min(imgHeight, 80));
-            yPosition += Math.min(imgHeight, 80) + 10;
-          } catch (e) {
-            console.log('Impossible de charger l\'image pour le PDF');
-          }
-        }
-
-        // Titre recette
-        pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(18);
-        pdf.setTextColor(255, 100, 0);
-        const titleLines = pdf.splitTextToSize(recipe.title, contentWidth);
-        pdf.text(titleLines, margin, yPosition);
-        yPosition += titleLines.length * 8 + 5;
-
-        // Métadonnées
-        pdf.setFont('helvetica', 'normal');
-        pdf.setFontSize(10);
-        pdf.setTextColor(100, 100, 100);
-        pdf.text(`⏱️ Préparation: ${recipe.prepTime} | 🔥 Cuisson: ${recipe.cookTime} | 👥 ${recipe.servings} portions | ${recipe.difficulty}`, margin, yPosition);
-        yPosition += 10;
-
-        // Ingrédients
-        pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(12);
-        pdf.setTextColor(0, 0, 0);
-        pdf.text('🥕 Ingrédients:', margin, yPosition);
-        yPosition += 7;
-
-        pdf.setFont('helvetica', 'normal');
-        pdf.setFontSize(10);
-        recipe.ingredients.forEach(ing => {
-          if (yPosition > pageHeight - 20) {
-            pdf.addPage();
-            yPosition = margin;
-          }
-          pdf.text(`• ${ing}`, margin + 5, yPosition);
-          yPosition += 6;
-        });
-        yPosition += 5;
-
-        // Instructions
-        if (yPosition > pageHeight - 50) {
-          pdf.addPage();
-          yPosition = margin;
-        }
-        pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(12);
-        pdf.text('📝 Instructions:', margin, yPosition);
-        yPosition += 7;
-
-        pdf.setFont('helvetica', 'normal');
-        pdf.setFontSize(10);
-        recipe.instructions.forEach((step, idx) => {
-          if (yPosition > pageHeight - 20) {
-            pdf.addPage();
-            yPosition = margin;
-          }
-          const stepLines = pdf.splitTextToSize(`${idx + 1}. ${step}`, contentWidth - 10);
-          pdf.text(stepLines, margin + 5, yPosition);
-          yPosition += stepLines.length * 5 + 3;
-        });
-
-        // Conseils
-        if (recipe.tips) {
-          yPosition += 5;
-          if (yPosition > pageHeight - 30) {
-            pdf.addPage();
-            yPosition = margin;
-          }
-          pdf.setFillColor(255, 248, 220);
-          pdf.rect(margin, yPosition - 3, contentWidth, 15, 'F');
-          pdf.setFont('helvetica', 'italic');
-          pdf.setFontSize(9);
-          pdf.setTextColor(120, 90, 0);
-          const tipLines = pdf.splitTextToSize(`💡 Conseil: ${recipe.tips}`, contentWidth - 10);
-          pdf.text(tipLines, margin + 5, yPosition + 4);
-          yPosition += 20;
-        }
-
-        // Nutrition
-        if (recipe.nutritionInfo) {
-          if (yPosition > pageHeight - 20) {
-            pdf.addPage();
-            yPosition = margin;
-          }
-          pdf.setFont('helvetica', 'normal');
-          pdf.setFontSize(8);
-          pdf.setTextColor(80, 80, 80);
-          pdf.text(`❤️ ${recipe.nutritionInfo}`, margin, yPosition);
-        }
-      }
-
-      // Sauvegarder
-      const fileName = `${bookTitle || 'livre-recettes'}_${new Date().toISOString().split('T')[0]}.pdf`;
-      pdf.save(fileName);
-      toast.success('PDF téléchargé avec succès !');
-    } catch (error) {
-      console.error('Erreur export PDF:', error);
-      toast.error('Erreur lors de l\'export PDF');
-    } finally {
-      setIsExporting(false);
-    }
-  };
-
-  // ============= EXPORT PDF MAGAZINE (2 recettes par page comme guide de voyage) =============
-  const exportToPDFMagazine = async () => {
-    if (recipes.length === 0) {
-      toast.error('Aucune recette à exporter');
-      return;
-    }
-
-    setIsExporting(true);
-    toast.info('Génération du PDF Magazine en cours...');
 
     try {
       const pdf = new jsPDF('p', 'mm', 'a4');
@@ -628,93 +456,96 @@ ${recipe.nutritionInfo ? `\n📊 Nutrition: ${recipe.nutritionInfo}` : ''}
       const contentWidth = pageWidth - 2 * margin;
 
       // ===== COVER PAGE =====
-      pdf.setFillColor(255, 100, 50); // Orange culinaire
+      pdf.setFillColor(139, 69, 19); // Warm brown
       pdf.rect(0, 0, pageWidth, pageHeight, 'F');
       
-      // Decorative elements
-      pdf.setFillColor(255, 220, 100); // Gold accent
+      // Decorative gold accent
+      pdf.setFillColor(218, 165, 32); // Gold
       pdf.rect(0, pageHeight - 30, pageWidth, 30, 'F');
       
       pdf.setFont('helvetica', 'bold');
       pdf.setFontSize(32);
       pdf.setTextColor(255, 255, 255);
-      const titleLines = pdf.splitTextToSize(bookTitle || 'Mon Livre de Recettes', contentWidth);
+      const titleLines = pdf.splitTextToSize(bookTitle || 'Recettes du Monde', contentWidth);
       pdf.text(titleLines, pageWidth / 2, 80, { align: 'center' });
 
-      const cuisineLabel = cuisineStyles.find(s => s.value === cuisineStyle)?.label || cuisineStyle;
       pdf.setFontSize(18);
-      pdf.setTextColor(255, 220, 100);
-      pdf.text(cuisineLabel, pageWidth / 2, 110, { align: 'center' });
+      pdf.setTextColor(218, 165, 32);
+      pdf.text('Recettes & Accords Vins', pageWidth / 2, 110, { align: 'center' });
 
       if (authorName) {
         pdf.setFontSize(14);
-        pdf.setTextColor(255, 255, 255);
+        pdf.setTextColor(200, 200, 200);
         pdf.text(`par ${authorName}`, pageWidth / 2, 130, { align: 'center' });
       }
 
       pdf.setFontSize(12);
-      pdf.setTextColor(80, 40, 0);
-      pdf.text(`${recipes.length} recettes delicieuses`, pageWidth / 2, pageHeight - 15, { align: 'center' });
+      pdf.setTextColor(60, 30, 10);
+      pdf.text(`${pages.length} pages • ${pages.length * 2} recettes du monde`, pageWidth / 2, pageHeight - 15, { align: 'center' });
 
       // ===== TABLE OF CONTENTS =====
       pdf.addPage();
-      pdf.setFillColor(255, 248, 240);
+      pdf.setFillColor(250, 245, 240);
       pdf.rect(0, 0, pageWidth, 40, 'F');
       
       pdf.setFont('helvetica', 'bold');
       pdf.setFontSize(24);
-      pdf.setTextColor(255, 100, 50);
-      pdf.text('Sommaire', margin, 28);
+      pdf.setTextColor(139, 69, 19);
+      pdf.text('🍽️ Sommaire', margin, 28);
 
       let yPos = 55;
       pdf.setFont('helvetica', 'normal');
       pdf.setFontSize(11);
       pdf.setTextColor(60, 60, 60);
       
-      recipes.forEach((recipe, index) => {
+      pages.forEach((page) => {
         if (yPos > pageHeight - 30) {
           pdf.addPage();
           yPos = margin + 10;
         }
-        const emoji = getCategoryEmoji(recipe.category);
-        pdf.text(`${emoji} ${recipe.title}`, margin, yPos);
-        pdf.setTextColor(150, 150, 150);
-        pdf.text(`p.${Math.floor(index / 2) + 3}`, pageWidth - margin - 10, yPos);
-        pdf.setTextColor(60, 60, 60);
-        yPos += 8;
+        pdf.text(`Page ${page.pageNumber}:`, margin, yPos);
+        pdf.setFont('helvetica', 'bold');
+        const rec1Text = pdf.splitTextToSize(`${page.recipe1.country} - ${page.recipe1.name}`, contentWidth / 2 - 10);
+        pdf.text(rec1Text[0], margin + 25, yPos);
+        pdf.setFont('helvetica', 'normal');
+        yPos += 6;
+        pdf.setFont('helvetica', 'bold');
+        const rec2Text = pdf.splitTextToSize(`${page.recipe2.country} - ${page.recipe2.name}`, contentWidth / 2 - 10);
+        pdf.text(rec2Text[0], margin + 25, yPos);
+        pdf.setFont('helvetica', 'normal');
+        yPos += 10;
       });
 
-      // ===== CONTENT PAGES (2 recipes per page) =====
-      for (let i = 0; i < recipes.length; i += 2) {
-        const recipe1 = recipes[i];
-        const recipe2 = recipes[i + 1]; // May be undefined if odd number
+      // ===== CONTENT PAGES =====
+      for (let i = 0; i < pages.length; i++) {
+        const page = pages[i];
         pdf.addPage();
 
         // Page header
-        pdf.setFillColor(255, 100, 50);
-        pdf.rect(0, 0, pageWidth, 18, 'F');
+        pdf.setFillColor(139, 69, 19);
+        pdf.rect(0, 0, pageWidth, 20, 'F');
         pdf.setFont('helvetica', 'bold');
         pdf.setFontSize(10);
         pdf.setTextColor(255, 255, 255);
-        pdf.text(`${bookTitle || 'Livre de Recettes'} - Page ${Math.floor(i / 2) + 1}`, pageWidth / 2, 12, { align: 'center' });
+        pdf.text(`Page ${page.pageNumber} • Recettes du Monde`, pageWidth / 2, 13, { align: 'center' });
 
         const halfWidth = (contentWidth - 10) / 2;
-        const imageHeight = 55;
-        const textStartY = 25;
+        const imageHeight = 50;
+        const textStartY = 28;
 
         // Recipe 1 (left side)
         const leftX = margin;
         let leftY = textStartY;
 
         // Image 1
-        if (recipe1.imageUrl) {
+        if (page.recipe1.imageUrl) {
           try {
             const img = new Image();
             img.crossOrigin = 'anonymous';
             await new Promise<void>((resolve, reject) => {
               img.onload = () => resolve();
               img.onerror = reject;
-              img.src = recipe1.imageUrl!;
+              img.src = page.recipe1.imageUrl!;
             });
             
             const canvas = document.createElement('canvas');
@@ -725,373 +556,210 @@ ${recipe.nutritionInfo ? `\n📊 Nutrition: ${recipe.nutritionInfo}` : ''}
             const imgData = canvas.toDataURL('image/jpeg', 0.85);
             
             pdf.addImage(imgData, 'JPEG', leftX, leftY, halfWidth, imageHeight);
-            leftY += imageHeight + 4;
+            leftY += imageHeight + 3;
           } catch (e) {
-            console.log('Image 1 non chargee');
-            leftY += 4;
+            console.log('Image 1 non chargée');
+            leftY += 3;
           }
         }
 
-        // Title 1
+        // Country flag + Name
         pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(12);
-        pdf.setTextColor(255, 100, 50);
-        const title1Lines = pdf.splitTextToSize(recipe1.title, halfWidth);
-        pdf.text(title1Lines, leftX, leftY);
-        leftY += title1Lines.length * 5 + 2;
-
-        // Category & time
-        pdf.setFont('helvetica', 'normal');
-        pdf.setFontSize(8);
-        pdf.setTextColor(120, 120, 120);
-        pdf.text(`${recipe1.prepTime} + ${recipe1.cookTime} | ${recipe1.servings} pers.`, leftX, leftY);
+        pdf.setFontSize(10);
+        pdf.setTextColor(139, 69, 19);
+        pdf.text(`🌍 ${page.recipe1.country}`, leftX, leftY);
         leftY += 5;
 
-        // Ingredients (compact)
-        pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(9);
-        pdf.setTextColor(60, 60, 60);
-        pdf.text('Ingredients:', leftX, leftY);
-        leftY += 4;
-        
+        // Recipe name
+        pdf.setFontSize(11);
+        pdf.setTextColor(60, 30, 10);
+        const name1Lines = pdf.splitTextToSize(page.recipe1.name, halfWidth);
+        pdf.text(name1Lines, leftX, leftY);
+        leftY += name1Lines.length * 4.5 + 2;
+
+        // Description
         pdf.setFont('helvetica', 'normal');
         pdf.setFontSize(8);
-        const ing1Text = recipe1.ingredients.slice(0, 5).join(', ') + (recipe1.ingredients.length > 5 ? '...' : '');
-        const ing1Lines = pdf.splitTextToSize(ing1Text, halfWidth);
+        pdf.setTextColor(80, 80, 80);
+        const desc1Lines = pdf.splitTextToSize(page.recipe1.description, halfWidth);
+        pdf.text(desc1Lines.slice(0, 3), leftX, leftY);
+        leftY += Math.min(desc1Lines.length, 3) * 3.5 + 3;
+
+        // Ingredients
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(8);
+        pdf.setTextColor(100, 60, 20);
+        pdf.text('🥕 Ingrédients:', leftX, leftY);
+        leftY += 3.5;
+        pdf.setFont('helvetica', 'normal');
+        const ing1Lines = pdf.splitTextToSize(page.recipe1.ingredients, halfWidth);
         pdf.text(ing1Lines.slice(0, 2), leftX, leftY);
-        leftY += ing1Lines.slice(0, 2).length * 3.5 + 3;
+        leftY += Math.min(ing1Lines.length, 2) * 3 + 3;
 
-        // Short instructions
+        // Wine pairing
         pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(9);
-        pdf.text('Preparation:', leftX, leftY);
-        leftY += 4;
-        
-        pdf.setFont('helvetica', 'normal');
         pdf.setFontSize(8);
-        const steps1 = recipe1.instructions.slice(0, 3).map((s, idx) => `${idx + 1}. ${s}`).join(' ');
-        const steps1Lines = pdf.splitTextToSize(steps1, halfWidth);
-        pdf.text(steps1Lines.slice(0, 4), leftX, leftY);
+        pdf.setTextColor(128, 0, 32); // Wine color
+        pdf.text('🍷 Accord vin:', leftX, leftY);
+        leftY += 3.5;
+        pdf.setFont('helvetica', 'italic');
+        const wine1Lines = pdf.splitTextToSize(page.recipe1.winePairing, halfWidth);
+        pdf.text(wine1Lines.slice(0, 2), leftX, leftY);
 
-        // Recipe 2 (right side) - only if exists
-        if (recipe2) {
-          const rightX = margin + halfWidth + 10;
-          let rightY = textStartY;
+        // Recipe 2 (right side)
+        const rightX = margin + halfWidth + 10;
+        let rightY = textStartY;
 
-          // Image 2
-          if (recipe2.imageUrl) {
-            try {
-              const img = new Image();
-              img.crossOrigin = 'anonymous';
-              await new Promise<void>((resolve, reject) => {
-                img.onload = () => resolve();
-                img.onerror = reject;
-                img.src = recipe2.imageUrl!;
-              });
-              
-              const canvas = document.createElement('canvas');
-              canvas.width = img.width;
-              canvas.height = img.height;
-              const ctx = canvas.getContext('2d');
-              ctx?.drawImage(img, 0, 0);
-              const imgData = canvas.toDataURL('image/jpeg', 0.85);
-              
-              pdf.addImage(imgData, 'JPEG', rightX, rightY, halfWidth, imageHeight);
-              rightY += imageHeight + 4;
-            } catch (e) {
-              console.log('Image 2 non chargee');
-              rightY += 4;
-            }
+        // Image 2
+        if (page.recipe2.imageUrl) {
+          try {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            await new Promise<void>((resolve, reject) => {
+              img.onload = () => resolve();
+              img.onerror = reject;
+              img.src = page.recipe2.imageUrl!;
+            });
+            
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            ctx?.drawImage(img, 0, 0);
+            const imgData = canvas.toDataURL('image/jpeg', 0.85);
+            
+            pdf.addImage(imgData, 'JPEG', rightX, rightY, halfWidth, imageHeight);
+            rightY += imageHeight + 3;
+          } catch (e) {
+            console.log('Image 2 non chargée');
+            rightY += 3;
           }
-
-          // Title 2
-          pdf.setFont('helvetica', 'bold');
-          pdf.setFontSize(12);
-          pdf.setTextColor(255, 100, 50);
-          const title2Lines = pdf.splitTextToSize(recipe2.title, halfWidth);
-          pdf.text(title2Lines, rightX, rightY);
-          rightY += title2Lines.length * 5 + 2;
-
-          // Category & time
-          pdf.setFont('helvetica', 'normal');
-          pdf.setFontSize(8);
-          pdf.setTextColor(120, 120, 120);
-          pdf.text(`${recipe2.prepTime} + ${recipe2.cookTime} | ${recipe2.servings} pers.`, rightX, rightY);
-          rightY += 5;
-
-          // Ingredients (compact)
-          pdf.setFont('helvetica', 'bold');
-          pdf.setFontSize(9);
-          pdf.setTextColor(60, 60, 60);
-          pdf.text('Ingredients:', rightX, rightY);
-          rightY += 4;
-          
-          pdf.setFont('helvetica', 'normal');
-          pdf.setFontSize(8);
-          const ing2Text = recipe2.ingredients.slice(0, 5).join(', ') + (recipe2.ingredients.length > 5 ? '...' : '');
-          const ing2Lines = pdf.splitTextToSize(ing2Text, halfWidth);
-          pdf.text(ing2Lines.slice(0, 2), rightX, rightY);
-          rightY += ing2Lines.slice(0, 2).length * 3.5 + 3;
-
-          // Short instructions
-          pdf.setFont('helvetica', 'bold');
-          pdf.setFontSize(9);
-          pdf.text('Preparation:', rightX, rightY);
-          rightY += 4;
-          
-          pdf.setFont('helvetica', 'normal');
-          pdf.setFontSize(8);
-          const steps2 = recipe2.instructions.slice(0, 3).map((s, idx) => `${idx + 1}. ${s}`).join(' ');
-          const steps2Lines = pdf.splitTextToSize(steps2, halfWidth);
-          pdf.text(steps2Lines.slice(0, 4), rightX, rightY);
         }
 
+        // Country + Name
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(10);
+        pdf.setTextColor(139, 69, 19);
+        pdf.text(`🌍 ${page.recipe2.country}`, rightX, rightY);
+        rightY += 5;
+
+        pdf.setFontSize(11);
+        pdf.setTextColor(60, 30, 10);
+        const name2Lines = pdf.splitTextToSize(page.recipe2.name, halfWidth);
+        pdf.text(name2Lines, rightX, rightY);
+        rightY += name2Lines.length * 4.5 + 2;
+
+        // Description
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(8);
+        pdf.setTextColor(80, 80, 80);
+        const desc2Lines = pdf.splitTextToSize(page.recipe2.description, halfWidth);
+        pdf.text(desc2Lines.slice(0, 3), rightX, rightY);
+        rightY += Math.min(desc2Lines.length, 3) * 3.5 + 3;
+
+        // Ingredients
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(8);
+        pdf.setTextColor(100, 60, 20);
+        pdf.text('🥕 Ingrédients:', rightX, rightY);
+        rightY += 3.5;
+        pdf.setFont('helvetica', 'normal');
+        const ing2Lines = pdf.splitTextToSize(page.recipe2.ingredients, halfWidth);
+        pdf.text(ing2Lines.slice(0, 2), rightX, rightY);
+        rightY += Math.min(ing2Lines.length, 2) * 3 + 3;
+
+        // Wine pairing
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(8);
+        pdf.setTextColor(128, 0, 32);
+        pdf.text('🍷 Accord vin:', rightX, rightY);
+        rightY += 3.5;
+        pdf.setFont('helvetica', 'italic');
+        const wine2Lines = pdf.splitTextToSize(page.recipe2.winePairing, halfWidth);
+        pdf.text(wine2Lines.slice(0, 2), rightX, rightY);
+
         // Page footer
-        pdf.setFillColor(255, 220, 100);
+        pdf.setFillColor(218, 165, 32);
         pdf.rect(0, pageHeight - 10, pageWidth, 10, 'F');
         pdf.setFont('helvetica', 'bold');
         pdf.setFontSize(8);
-        pdf.setTextColor(120, 60, 0);
-        pdf.text(bookTitle || 'Livre de Recettes', pageWidth / 2, pageHeight - 4, { align: 'center' });
+        pdf.setTextColor(60, 30, 10);
+        pdf.text(`${bookTitle || 'Recettes du Monde'} - Accords Mets & Vins`, pageWidth / 2, pageHeight - 4, { align: 'center' });
       }
 
       // Save PDF
-      const fileName = `${(bookTitle || 'recettes').replace(/[^a-zA-Z0-9]/g, '_')}_Magazine.pdf`;
+      const fileName = `${(bookTitle || 'recettes-monde').replace(/[^a-zA-Z0-9]/g, '_')}_Gastronomie.pdf`;
       const blob = pdf.output('blob');
       saveAs(blob, fileName);
-      toast.success('PDF Magazine telecharge !');
+      toast.success('PDF téléchargé !');
 
     } catch (error) {
-      console.error('Erreur export PDF Magazine:', error);
+      console.error('Erreur export PDF:', error);
       toast.error('Erreur lors de l\'export PDF');
     } finally {
       setIsExporting(false);
     }
   };
 
-  // ============= EXPORT WORD (DOCX) =============
-  const exportToWord = async () => {
-    if (recipes.length === 0) {
-      toast.error('Aucune recette à exporter');
-      return;
-    }
-
-    setIsExporting(true);
-    toast.info('Génération du document Word en cours...');
-
-    try {
-      const children: any[] = [];
-
-      // Page de titre
-      children.push(
-        new Paragraph({
-          children: [new TextRun({ text: bookTitle || 'Mon Livre de Recettes', bold: true, size: 56, color: 'FF6600' })],
-          heading: HeadingLevel.TITLE,
-          alignment: AlignmentType.CENTER,
-          spacing: { after: 400 }
-        })
-      );
-
-      if (authorName) {
-        children.push(
-          new Paragraph({
-            children: [new TextRun({ text: `par ${authorName}`, italics: true, size: 28 })],
-            alignment: AlignmentType.CENTER,
-            spacing: { after: 200 }
-          })
-        );
-      }
-
-      children.push(
-        new Paragraph({
-          children: [new TextRun({ text: `${recipes.length} recettes • ${cuisineStyles.find(s => s.value === cuisineStyle)?.label || cuisineStyle}`, size: 24 })],
-          alignment: AlignmentType.CENTER,
-          spacing: { after: 800 }
-        })
-      );
-
-      // Table des matières
-      children.push(
-        new Paragraph({ children: [new PageBreak()] }),
-        new Paragraph({
-          children: [new TextRun({ text: '📖 Table des Matières', bold: true, size: 36, color: 'FF8C00' })],
-          heading: HeadingLevel.HEADING_1,
-          spacing: { after: 300 }
-        })
-      );
-
-      recipes.forEach((recipe, index) => {
-        const emoji = getCategoryEmoji(recipe.category);
-        children.push(
-          new Paragraph({
-            children: [new TextRun({ text: `${emoji} ${index + 1}. ${recipe.title}`, size: 24 })],
-            spacing: { after: 100 }
-          })
-        );
-      });
-
-      // Recettes
-      for (const recipe of recipes) {
-        children.push(new Paragraph({ children: [new PageBreak()] }));
-
-        // Titre
-        children.push(
-          new Paragraph({
-            children: [new TextRun({ text: recipe.title, bold: true, size: 40, color: 'FF6400' })],
-            heading: HeadingLevel.HEADING_1,
-            spacing: { after: 200 }
-          })
-        );
-
-        // Métadonnées
-        children.push(
-          new Paragraph({
-            children: [
-              new TextRun({ text: `⏱️ Préparation: ${recipe.prepTime}  |  `, size: 20 }),
-              new TextRun({ text: `🔥 Cuisson: ${recipe.cookTime}  |  `, size: 20 }),
-              new TextRun({ text: `👥 ${recipe.servings} portions  |  `, size: 20 }),
-              new TextRun({ text: recipe.difficulty, bold: true, size: 20 })
-            ],
-            spacing: { after: 300 }
-          })
-        );
-
-        // Ingrédients
-        children.push(
-          new Paragraph({
-            children: [new TextRun({ text: '🥕 Ingrédients', bold: true, size: 28, color: '228B22' })],
-            heading: HeadingLevel.HEADING_2,
-            spacing: { before: 200, after: 150 }
-          })
-        );
-
-        recipe.ingredients.forEach(ing => {
-          children.push(
-            new Paragraph({
-              children: [new TextRun({ text: `• ${ing}`, size: 22 })],
-              spacing: { after: 60 }
-            })
-          );
-        });
-
-        // Instructions
-        children.push(
-          new Paragraph({
-            children: [new TextRun({ text: '📝 Instructions', bold: true, size: 28, color: '4169E1' })],
-            heading: HeadingLevel.HEADING_2,
-            spacing: { before: 300, after: 150 }
-          })
-        );
-
-        recipe.instructions.forEach((step, idx) => {
-          children.push(
-            new Paragraph({
-              children: [
-                new TextRun({ text: `${idx + 1}. `, bold: true, size: 22 }),
-                new TextRun({ text: step, size: 22 })
-              ],
-              spacing: { after: 100 }
-            })
-          );
-        });
-
-        // Conseil
-        if (recipe.tips) {
-          children.push(
-            new Paragraph({
-              children: [new TextRun({ text: `💡 Conseil du chef: ${recipe.tips}`, italics: true, size: 20, color: '8B4513' })],
-              shading: { fill: 'FFF8DC' },
-              spacing: { before: 200, after: 100 }
-            })
-          );
-        }
-
-        // Nutrition
-        if (recipe.nutritionInfo) {
-          children.push(
-            new Paragraph({
-              children: [new TextRun({ text: `❤️ ${recipe.nutritionInfo}`, size: 18, color: '808080' })],
-              spacing: { before: 150 }
-            })
-          );
-        }
-      }
-
-      // Créer le document
-      const doc = new Document({
-        sections: [{ properties: {}, children }]
-      });
-
-      // Télécharger
-      const blob = await Packer.toBlob(doc);
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${bookTitle || 'livre-recettes'}_${new Date().toISOString().split('T')[0]}.docx`;
-      a.click();
-      URL.revokeObjectURL(url);
-
-      toast.success('Document Word téléchargé avec succès !');
-    } catch (error) {
-      console.error('Erreur export Word:', error);
-      toast.error('Erreur lors de l\'export Word');
-    } finally {
-      setIsExporting(false);
-    }
-  };
-
   return (
-    <div className="space-y-6 p-4 md:p-6">
+    <div className="space-y-6">
       {/* Header */}
-      <Card className="border-orange-500/30 bg-gradient-to-r from-orange-500/10 via-red-500/5 to-amber-500/10">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-3 text-2xl">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center">
-              <ChefHat className="w-6 h-6 text-white" />
-            </div>
-            📚 Générateur de Livre de Recettes IA
+      <div className="text-center space-y-2">
+        <div className="flex items-center justify-center gap-3">
+          <ChefHat className="w-10 h-10 text-amber-600" />
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-amber-600 via-orange-500 to-red-500 bg-clip-text text-transparent">
+            Générateur de Livre de Recettes du Monde
+          </h1>
+          <Wine className="w-10 h-10 text-red-700" />
+        </div>
+        <p className="text-muted-foreground max-w-2xl mx-auto">
+          Créez un livre de cuisine gastronomique avec des recettes de tous les pays du monde et leurs accords mets-vins parfaits. Format 20 pages, 2 recettes par page.
+        </p>
+      </div>
+
+      {/* Exemples rapides */}
+      <Card className="border-amber-500/30">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-amber-500" />
+            Exemples de livres
           </CardTitle>
-          <CardDescription>
-            Créez un livre de cuisine complet avec recettes, ingrédients, instructions et photos générées par IA
-          </CardDescription>
         </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-2">
+            {exampleBooks.map((example, index) => (
+              <Badge
+                key={index}
+                variant="outline"
+                className="cursor-pointer hover:bg-amber-50 dark:hover:bg-amber-950 transition-colors px-3 py-1.5"
+                onClick={() => applyExample(example)}
+              >
+                {example.title}
+              </Badge>
+            ))}
+          </div>
+        </CardContent>
       </Card>
 
       {/* Configuration */}
-      <div className="grid md:grid-cols-2 gap-6">
-        {/* Infos générales */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Informations du livre */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
-              <BookOpen className="w-5 h-5 text-orange-500" />
+              <BookOpen className="w-5 h-5 text-amber-600" />
               Informations du livre
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label>Titre du livre de recettes</Label>
+              <Label>Titre du livre *</Label>
               <Input
                 value={bookTitle}
                 onChange={(e) => setBookTitle(e.target.value)}
-                placeholder="Cliquez sur un exemple ci-dessous ou tapez votre titre"
+                placeholder="ex: Saveurs du Monde"
                 className="mt-1"
               />
-              {/* Exemples de titres cliquables */}
-              <div className="mt-2">
-                <p className="text-xs text-muted-foreground mb-1.5">💡 Exemples (cliquez pour utiliser) :</p>
-                <div className="flex flex-wrap gap-1.5">
-                  {exampleTitles.map((example, idx) => (
-                    <Badge
-                      key={idx}
-                      variant="outline"
-                      className="cursor-pointer text-xs hover:bg-primary/10 transition-colors"
-                      onClick={() => applyExampleTitle(example)}
-                    >
-                      {example.title}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
             </div>
             <div>
               <Label>Auteur</Label>
@@ -1103,13 +771,28 @@ ${recipe.nutritionInfo ? `\n📊 Nutrition: ${recipe.nutritionInfo}` : ''}
               />
             </div>
             <div>
-              <Label>Style de cuisine</Label>
-              <Select value={cuisineStyle} onValueChange={setCuisineStyle}>
+              <Label>Thème culinaire</Label>
+              <Select value={cuisineTheme} onValueChange={setCuisineTheme}>
                 <SelectTrigger className="mt-1">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {cuisineStyles.map(style => (
+                  {cuisineThemes.map(theme => (
+                    <SelectItem key={theme.value} value={theme.value}>
+                      {theme.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Style photo</Label>
+              <Select value={photoStyle} onValueChange={setPhotoStyle}>
+                <SelectTrigger className="mt-1">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {photoStyles.map(style => (
                     <SelectItem key={style.value} value={style.value}>
                       {style.label}
                     </SelectItem>
@@ -1117,118 +800,67 @@ ${recipe.nutritionInfo ? `\n📊 Nutrition: ${recipe.nutritionInfo}` : ''}
                 </SelectContent>
               </Select>
             </div>
-            <div>
-              <Label>Public cible</Label>
-              <Select value={targetAudience} onValueChange={setTargetAudience}>
-                <SelectTrigger className="mt-1">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="tous">Tous publics</SelectItem>
-                  <SelectItem value="debutants">Débutants en cuisine</SelectItem>
-                  <SelectItem value="confirmes">Cuisiniers confirmés</SelectItem>
-                  <SelectItem value="familles">Familles avec enfants</SelectItem>
-                  <SelectItem value="etudiants">Étudiants / Budget serré</SelectItem>
-                  <SelectItem value="sportifs">Sportifs / Fitness</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
           </CardContent>
         </Card>
 
-        {/* Options de génération */}
+        {/* Sélection pays */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
-              <UtensilsCrossed className="w-5 h-5 text-orange-500" />
-              Options de génération
+              <Globe className="w-5 h-5 text-blue-500" />
+              Sélection de la région (optionnel)
             </CardTitle>
+            <CardDescription>
+              Laissez vide pour un tour du monde complet
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label>Nombre de recettes: {numberOfRecipes}</Label>
-              <input
-                type="range"
-                min="5"
-                max="30"
-                value={numberOfRecipes}
-                onChange={(e) => setNumberOfRecipes(parseInt(e.target.value))}
-                className="w-full mt-2"
-              />
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>5</span>
-                <span>30</span>
-              </div>
+              <Label>Pays / Région spécifique</Label>
+              <Select value={selectedCountry} onValueChange={setSelectedCountry}>
+                <SelectTrigger className="mt-1">
+                  <SelectValue placeholder="🌍 Tour du monde (tous les pays)" />
+                </SelectTrigger>
+                <SelectContent className="max-h-80">
+                  <SelectItem value="">🌍 Tour du monde (tous les pays)</SelectItem>
+                  {Object.entries(worldCountries).map(([continent, countries]) => (
+                    <React.Fragment key={continent}>
+                      <SelectItem value={continent} disabled className="font-bold text-primary">
+                        {continent}
+                      </SelectItem>
+                      {countries.map(country => (
+                        <SelectItem key={country} value={country} className="pl-6">
+                          {country}
+                        </SelectItem>
+                      ))}
+                    </React.Fragment>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div>
-              <Label className="mb-2 block">Catégories de recettes</Label>
-              <div className="flex flex-wrap gap-2">
-                {recipeCategories.map(cat => (
-                  <Badge
-                    key={cat.value}
-                    variant={selectedCategories.includes(cat.value) ? 'default' : 'outline'}
-                    className="cursor-pointer transition-all hover:scale-105"
-                    onClick={() => toggleCategory(cat.value)}
-                  >
-                    {cat.label}
-                  </Badge>
-                ))}
+              <Label>Nombre de pages : {numberOfPages}</Label>
+              <input
+                type="range"
+                min="10"
+                max="30"
+                value={numberOfPages}
+                onChange={(e) => setNumberOfPages(parseInt(e.target.value))}
+                className="w-full mt-2"
+              />
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>10 pages (20 recettes)</span>
+                <span>30 pages (60 recettes)</span>
               </div>
             </div>
-
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="includeNutrition"
-                checked={includeNutrition}
-                onCheckedChange={(checked) => setIncludeNutrition(!!checked)}
-              />
-              <Label htmlFor="includeNutrition" className="flex items-center gap-2 cursor-pointer">
-                <Leaf className="w-4 h-4 text-green-500" />
-                Inclure les infos nutritionnelles
-              </Label>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="includeImages"
-                checked={includeImages}
-                onCheckedChange={(checked) => setIncludeImages(!!checked)}
-              />
-              <Label htmlFor="includeImages" className="flex items-center gap-2 cursor-pointer">
-                <ImageIcon className="w-4 h-4 text-primary" />
-                Générer les photos des recettes
-              </Label>
-            </div>
-
-            {/* Slider nombre de photos - affiché seulement si includeImages est true */}
-            {includeImages && (
-              <div className="pl-6 border-l-2 border-primary/30">
-                <Label>Nombre de photos à générer : {numberOfPhotos}</Label>
-                <input
-                  type="range"
-                  min="5"
-                  max="30"
-                  value={numberOfPhotos}
-                  onChange={(e) => setNumberOfPhotos(parseInt(e.target.value))}
-                  className="w-full mt-2"
-                />
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>5 photos</span>
-                  <span>Toutes ({numberOfRecipes})</span>
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  ⚠️ Plus de photos = génération plus longue
-                </p>
-              </div>
-            )}
 
             <div>
               <Label>Instructions spéciales (optionnel)</Label>
               <Textarea
                 value={specialInstructions}
                 onChange={(e) => setSpecialInstructions(e.target.value)}
-                placeholder="ex: Sans gluten, recettes de saison, utiliser des produits locaux..."
+                placeholder="ex: Focus sur les plats végétariens, inclure des desserts, privilégier les recettes festives..."
                 className="mt-1"
                 rows={3}
               />
@@ -1240,10 +872,10 @@ ${recipe.nutritionInfo ? `\n📊 Nutrition: ${recipe.nutritionInfo}` : ''}
       {/* Bouton de génération */}
       <div className="flex justify-center">
         <Button
-          onClick={generateRecipes}
+          onClick={generateWorldCuisineBook}
           disabled={isGenerating}
           size="lg"
-          className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-8 py-6 text-lg"
+          className="bg-gradient-to-r from-amber-600 via-orange-500 to-red-600 hover:from-amber-700 hover:via-orange-600 hover:to-red-700 text-white px-10 py-6 text-lg shadow-lg"
         >
           {isGenerating ? (
             <>
@@ -1253,7 +885,7 @@ ${recipe.nutritionInfo ? `\n📊 Nutrition: ${recipe.nutritionInfo}` : ''}
           ) : (
             <>
               <Sparkles className="w-5 h-5 mr-2" />
-              🍳 Générer {numberOfRecipes} Recettes
+              🍳 Générer {numberOfPages * 2} Recettes + Accords Vins
             </>
           )}
         </Button>
@@ -1261,7 +893,7 @@ ${recipe.nutritionInfo ? `\n📊 Nutrition: ${recipe.nutritionInfo}` : ''}
 
       {/* Progress */}
       {isGenerating && (
-        <Card className="border-orange-500/30">
+        <Card className="border-amber-500/30">
           <CardContent className="pt-6">
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
@@ -1274,118 +906,98 @@ ${recipe.nutritionInfo ? `\n📊 Nutrition: ${recipe.nutritionInfo}` : ''}
         </Card>
       )}
 
-      {/* Recettes générées - Avec système d'onglets */}
-      {recipes.length > 0 && (
+      {/* Résultats */}
+      {pages.length > 0 && (
         <div className="space-y-4">
-          {/* Header avec titre et boutons export encadrés */}
+          {/* Header avec export */}
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
             <div>
               <h2 className="text-xl font-bold flex items-center gap-2">
-                <ChefHat className="w-6 h-6 text-orange-500" />
-                {recipes.length} Recettes Générées
+                <ChefHat className="w-6 h-6 text-amber-600" />
+                {pages.length * 2} Recettes du Monde
               </h2>
-              <Badge variant="outline" className="text-lg px-4 py-1 mt-1">
-                {bookTitle}
-              </Badge>
-            </div>
-            
-            {/* Boutons d'export ENCADRÉS avec badge NOUVEAU */}
-            <Card className="border-2 border-dashed border-primary/50 bg-gradient-to-r from-primary/5 via-orange-500/5 to-red-500/5 relative overflow-hidden">
-              <div className="absolute top-0 right-0">
-                <Badge className="rounded-none rounded-bl-lg bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs px-2 py-1">
-                  ✨ NOUVEAU 2026
+              <div className="flex items-center gap-2 mt-1">
+                <Badge variant="outline" className="text-lg px-4 py-1">
+                  {bookTitle}
+                </Badge>
+                <Badge className="bg-red-700 text-white">
+                  <Wine className="w-3 h-3 mr-1" />
+                  Avec Accords Vins
                 </Badge>
               </div>
-              <CardContent className="p-4 pt-8">
-                <p className="text-xs text-muted-foreground mb-3 font-medium">
-                  📥 Exportez votre livre de recettes complet
-                </p>
+            </div>
+            
+            {/* Export buttons */}
+            <Card className="border-2 border-dashed border-amber-400/50 bg-gradient-to-r from-amber-50/50 to-orange-50/50 dark:from-amber-950/20 dark:to-orange-950/20">
+              <CardContent className="p-4">
                 <div className="flex flex-wrap gap-2">
                   <Button
-                    variant="outline"
-                    onClick={exportToPDFMagazine}
-                    disabled={isExporting}
-                    className="border-orange-500/50 text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20"
-                  >
-                    {isExporting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <BookOpen className="w-4 h-4 mr-2" />}
-                    PDF Magazine (2/page)
-                  </Button>
-                  <Button
-                    variant="outline"
                     onClick={exportToPDF}
                     disabled={isExporting}
-                    className="border-red-500/50 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                    className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700"
                   >
-                    {isExporting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <FileText className="w-4 h-4 mr-2" />}
-                    PDF Complet
+                    {isExporting ? (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <FileText className="w-4 h-4 mr-2" />
+                    )}
+                    Export PDF Gastronomie
                   </Button>
                   <Button
+                    onClick={generateCover}
+                    disabled={isGeneratingCover}
                     variant="outline"
-                    onClick={exportToWord}
-                    disabled={isExporting}
-                    className="border-blue-500/50 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                    className="border-red-500 text-red-600"
                   >
-                    {isExporting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <FileDown className="w-4 h-4 mr-2" />}
-                    Export Word
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => window.print()}
-                    className="border-gray-500/50 text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-900/20"
-                  >
-                    <Printer className="w-4 h-4 mr-2" />
-                    Imprimer
+                    {isGeneratingCover ? (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <ImageIcon className="w-4 h-4 mr-2" />
+                    )}
+                    Générer Couverture
                   </Button>
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Système d'onglets */}
+          {/* Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-4 lg:grid-cols-5">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="cover" className="flex items-center gap-2">
                 <BookOpen className="w-4 h-4" />
-                <span className="hidden sm:inline">Couverture</span>
+                Couverture
               </TabsTrigger>
               <TabsTrigger value="recipes" className="flex items-center gap-2">
-                <ChefHat className="w-4 h-4" />
-                <span className="hidden sm:inline">Recettes</span>
-                <Badge variant="secondary" className="ml-1 text-xs">{recipes.length}</Badge>
+                <Utensils className="w-4 h-4" />
+                Recettes
+                <Badge variant="secondary" className="ml-1 text-xs">{pages.length * 2}</Badge>
               </TabsTrigger>
-              <TabsTrigger value="shopping" className="flex items-center gap-2">
-                <ShoppingCart className="w-4 h-4" />
-                <span className="hidden sm:inline">Courses</span>
-              </TabsTrigger>
-              <TabsTrigger value="overview" className="flex items-center gap-2">
-                <ListChecks className="w-4 h-4" />
-                <span className="hidden sm:inline">Aperçu</span>
-              </TabsTrigger>
-              <TabsTrigger value="stats" className="flex items-center gap-2 hidden lg:flex">
-                <Star className="w-4 h-4" />
-                <span>Stats</span>
+              <TabsTrigger value="wines" className="flex items-center gap-2">
+                <Wine className="w-4 h-4" />
+                Accords Vins
               </TabsTrigger>
             </TabsList>
 
-            {/* Onglet Couverture */}
+            {/* Tab Couverture */}
             <TabsContent value="cover" className="mt-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Cover Generation */}
-                <Card className="border-2 border-dashed border-orange-400/50">
+                <Card className="border-2 border-dashed border-amber-400/50">
                   <CardHeader>
                     <CardTitle className="text-lg flex items-center gap-2">
-                      <Sparkles className="w-5 h-5 text-orange-500" />
+                      <Sparkles className="w-5 h-5 text-amber-500" />
                       Générer la Couverture
                     </CardTitle>
                     <CardDescription>
-                      Créez une couverture professionnelle pour votre livre de recettes
+                      Créez une couverture professionnelle pour votre livre gastronomique
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <Button
                       onClick={generateCover}
                       disabled={isGeneratingCover || !bookTitle.trim()}
-                      className="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600"
+                      className="w-full bg-gradient-to-r from-amber-600 to-red-600 hover:from-amber-700 hover:to-red-700"
                     >
                       {isGeneratingCover ? (
                         <>
@@ -1414,18 +1026,18 @@ ${recipe.nutritionInfo ? `\n📊 Nutrition: ${recipe.nutritionInfo}` : ''}
                   </CardContent>
                 </Card>
 
-                {/* Cover Preview / Mockup */}
+                {/* 3D Mockup Preview */}
                 <Card className="border-2">
                   <CardHeader>
                     <CardTitle className="text-lg flex items-center gap-2">
                       <BookOpen className="w-5 h-5" />
-                      Aperçu Mockup
+                      Aperçu Mockup 3D
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     {coverImageUrl ? (
                       <div className="space-y-4">
-                        {/* 3D Book Mockup Effect - Transparent Background */}
+                        {/* 3D Book Mockup Effect */}
                         <div className="relative flex justify-center items-center py-10">
                           <div 
                             className="relative transform transition-all duration-500 hover:scale-105"
@@ -1433,7 +1045,7 @@ ${recipe.nutritionInfo ? `\n📊 Nutrition: ${recipe.nutritionInfo}` : ''}
                               perspective: '1200px',
                             }}
                           >
-                            {/* Shadow under the book */}
+                            {/* Shadow */}
                             <div 
                               className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-44 h-6 bg-black/20 blur-xl rounded-full"
                               style={{
@@ -1448,7 +1060,7 @@ ${recipe.nutritionInfo ? `\n📊 Nutrition: ${recipe.nutritionInfo}` : ''}
                                 transformStyle: 'preserve-3d',
                               }}
                             >
-                              {/* Book spine - dark like reference */}
+                              {/* Spine */}
                               <div 
                                 className="absolute left-0 top-0 bottom-0 w-5 rounded-l-sm"
                                 style={{
@@ -1459,18 +1071,18 @@ ${recipe.nutritionInfo ? `\n📊 Nutrition: ${recipe.nutritionInfo}` : ''}
                                 }}
                               />
                               
-                              {/* Cover image container */}
+                              {/* Cover */}
                               <div className="relative">
                                 <img
                                   src={coverImageUrl}
-                                  alt="Couverture du livre de recettes"
+                                  alt="Couverture du livre"
                                   className="w-52 h-[300px] object-cover rounded-r-md"
                                   style={{
                                     boxShadow: '10px 10px 30px rgba(0,0,0,0.4), -2px 0 10px rgba(0,0,0,0.2)',
                                   }}
                                 />
                                 
-                                {/* Pages effect on the right - multiple layers */}
+                                {/* Pages effect */}
                                 <div className="absolute right-0 top-1 bottom-1 w-2 flex flex-col">
                                   {[...Array(8)].map((_, i) => (
                                     <div 
@@ -1484,33 +1096,29 @@ ${recipe.nutritionInfo ? `\n📊 Nutrition: ${recipe.nutritionInfo}` : ''}
                                   ))}
                                 </div>
                                 
-                                {/* Glossy overlay effect */}
+                                {/* Glossy overlay */}
                                 <div 
-                                  className="absolute inset-0 pointer-events-none rounded-r-md"
+                                  className="absolute inset-0 rounded-r-md pointer-events-none"
                                   style={{
-                                    background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%, rgba(0,0,0,0.1) 100%)',
+                                    background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%, rgba(0,0,0,0.05) 100%)',
                                   }}
                                 />
                               </div>
                             </div>
                           </div>
                         </div>
-                        
-                        {/* Download Button */}
-                        <Button
-                          onClick={downloadCover}
-                          className="w-full bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600"
-                        >
+
+                        <Button onClick={downloadCover} className="w-full" variant="outline">
                           <Download className="w-4 h-4 mr-2" />
-                          Télécharger la Couverture (PNG)
+                          Télécharger la couverture
                         </Button>
                       </div>
                     ) : (
-                      <div className="flex flex-col items-center justify-center py-12 text-center">
-                        <BookOpen className="w-16 h-16 text-muted-foreground/30 mb-4" />
-                        <p className="text-muted-foreground">
-                          Générez une couverture pour voir l'aperçu 3D
-                        </p>
+                      <div className="flex items-center justify-center h-64 bg-muted/30 rounded-lg border-2 border-dashed">
+                        <div className="text-center text-muted-foreground">
+                          <BookOpen className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                          <p>Générez la couverture pour voir l'aperçu</p>
+                        </div>
                       </div>
                     )}
                   </CardContent>
@@ -1518,239 +1126,149 @@ ${recipe.nutritionInfo ? `\n📊 Nutrition: ${recipe.nutritionInfo}` : ''}
               </div>
             </TabsContent>
 
-            {/* Onglet Recettes */}
+            {/* Tab Recettes */}
             <TabsContent value="recipes" className="mt-4">
-              <div className="grid gap-6">
-              {recipes.map((recipe, index) => (
-              <Card key={recipe.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                <div className="flex flex-col md:flex-row">
-                  {/* Image */}
-                  <div className="md:w-64 h-48 md:h-auto bg-gradient-to-br from-orange-100 to-amber-100 dark:from-orange-900/20 dark:to-amber-900/20 flex items-center justify-center relative">
-                    {recipe.imageUrl ? (
-                      <img 
-                        src={recipe.imageUrl} 
-                        alt={recipe.title}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : recipe.isGeneratingImage ? (
-                      <div className="flex flex-col items-center gap-2">
-                        <Loader2 className="w-8 h-8 animate-spin text-orange-500" />
-                        <span className="text-sm text-muted-foreground">Génération...</span>
-                      </div>
-                    ) : (
-                      <div className="flex flex-col items-center gap-2">
-                        <span className="text-5xl">{getCategoryEmoji(recipe.category)}</span>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => generateRecipeImage(recipe.id, recipe.title)}
-                        >
-                          <ImageIcon className="w-4 h-4 mr-1" />
-                          Générer photo
-                        </Button>
-                      </div>
-                    )}
-                    <Badge className={`absolute top-2 left-2 ${getDifficultyColor(recipe.difficulty)} text-white`}>
-                      {recipe.difficulty}
-                    </Badge>
-                  </div>
-
-                  {/* Contenu */}
-                  <div className="flex-1 p-4">
-                    <div className="flex items-start justify-between mb-2">
-                      <div>
-                        <h3 className="text-lg font-bold">{recipe.title}</h3>
-                        <Badge variant="outline" className="mt-1">
-                          {recipeCategories.find(c => c.value === recipe.category)?.label}
-                        </Badge>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => copyRecipeToClipboard(recipe)}
-                        >
-                          {copiedId === recipe.id ? (
-                            <Check className="w-4 h-4 text-green-500" />
+              <div className="space-y-6">
+                {pages.map((page) => (
+                  <Card key={page.id} className="overflow-hidden">
+                    <CardHeader className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 py-3">
+                      <CardTitle className="text-base flex items-center justify-between">
+                        <span>📖 Page {page.pageNumber}</span>
+                        <Badge variant="secondary">{page.recipe1.country} & {page.recipe2.country}</Badge>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Recipe 1 */}
+                        <div className="space-y-3">
+                          {page.recipe1.imageUrl ? (
+                            <div className="relative group">
+                              <img
+                                src={page.recipe1.imageUrl}
+                                alt={page.recipe1.name}
+                                className="w-full h-40 object-cover rounded-lg"
+                              />
+                              <Button
+                                size="sm"
+                                variant="secondary"
+                                className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                                onClick={() => regenerateImage(page.id, 'recipe1')}
+                                disabled={page.recipe1.isGeneratingImage}
+                              >
+                                <RefreshCw className={`w-3 h-3 ${page.recipe1.isGeneratingImage ? 'animate-spin' : ''}`} />
+                              </Button>
+                            </div>
+                          ) : page.recipe1.isGeneratingImage ? (
+                            <div className="w-full h-40 bg-muted rounded-lg flex items-center justify-center">
+                              <Loader2 className="w-6 h-6 animate-spin" />
+                            </div>
                           ) : (
-                            <Copy className="w-4 h-4" />
+                            <div className="w-full h-40 bg-muted rounded-lg flex items-center justify-center">
+                              <ImageIcon className="w-8 h-8 opacity-30" />
+                            </div>
                           )}
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => deleteRecipe(recipe.id)}
-                          className="text-destructive hover:text-destructive"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
+                          <div>
+                            <Badge variant="outline" className="mb-1">🌍 {page.recipe1.country}</Badge>
+                            <h4 className="font-bold text-lg">{page.recipe1.name}</h4>
+                            <p className="text-sm text-muted-foreground mt-1">{page.recipe1.description}</p>
+                            <p className="text-xs text-amber-700 dark:text-amber-400 mt-2">
+                              <strong>🥕</strong> {page.recipe1.ingredients}
+                            </p>
+                            <p className="text-xs text-red-700 dark:text-red-400 mt-1 italic">
+                              <strong>🍷</strong> {page.recipe1.winePairing}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Recipe 2 */}
+                        <div className="space-y-3">
+                          {page.recipe2.imageUrl ? (
+                            <div className="relative group">
+                              <img
+                                src={page.recipe2.imageUrl}
+                                alt={page.recipe2.name}
+                                className="w-full h-40 object-cover rounded-lg"
+                              />
+                              <Button
+                                size="sm"
+                                variant="secondary"
+                                className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                                onClick={() => regenerateImage(page.id, 'recipe2')}
+                                disabled={page.recipe2.isGeneratingImage}
+                              >
+                                <RefreshCw className={`w-3 h-3 ${page.recipe2.isGeneratingImage ? 'animate-spin' : ''}`} />
+                              </Button>
+                            </div>
+                          ) : page.recipe2.isGeneratingImage ? (
+                            <div className="w-full h-40 bg-muted rounded-lg flex items-center justify-center">
+                              <Loader2 className="w-6 h-6 animate-spin" />
+                            </div>
+                          ) : (
+                            <div className="w-full h-40 bg-muted rounded-lg flex items-center justify-center">
+                              <ImageIcon className="w-8 h-8 opacity-30" />
+                            </div>
+                          )}
+                          <div>
+                            <Badge variant="outline" className="mb-1">🌍 {page.recipe2.country}</Badge>
+                            <h4 className="font-bold text-lg">{page.recipe2.name}</h4>
+                            <p className="text-sm text-muted-foreground mt-1">{page.recipe2.description}</p>
+                            <p className="text-xs text-amber-700 dark:text-amber-400 mt-2">
+                              <strong>🥕</strong> {page.recipe2.ingredients}
+                            </p>
+                            <p className="text-xs text-red-700 dark:text-red-400 mt-1 italic">
+                              <strong>🍷</strong> {page.recipe2.winePairing}
+                            </p>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-
-                    {/* Métadonnées */}
-                    <div className="flex flex-wrap gap-3 mb-3 text-sm">
-                      <span className="flex items-center gap-1 text-muted-foreground">
-                        <Clock className="w-4 h-4" />
-                        Prép: {recipe.prepTime}
-                      </span>
-                      <span className="flex items-center gap-1 text-muted-foreground">
-                        <Flame className="w-4 h-4" />
-                        Cuisson: {recipe.cookTime}
-                      </span>
-                      <span className="flex items-center gap-1 text-muted-foreground">
-                        <Users className="w-4 h-4" />
-                        {recipe.servings} portions
-                      </span>
-                    </div>
-
-                    {/* Ingrédients */}
-                    <div className="mb-3">
-                      <h4 className="font-semibold text-sm mb-1">Ingrédients:</h4>
-                      <div className="flex flex-wrap gap-1">
-                        {recipe.ingredients.slice(0, 6).map((ing, i) => (
-                          <Badge key={i} variant="secondary" className="text-xs">
-                            {ing}
-                          </Badge>
-                        ))}
-                        {recipe.ingredients.length > 6 && (
-                          <Badge variant="outline" className="text-xs">
-                            +{recipe.ingredients.length - 6} autres
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Instructions (aperçu) */}
-                    <div className="mb-2">
-                      <h4 className="font-semibold text-sm mb-1">Instructions:</h4>
-                      <p className="text-sm text-muted-foreground line-clamp-2">
-                        {recipe.instructions[0]}
-                      </p>
-                      <span className="text-xs text-primary">{recipe.instructions.length} étapes au total</span>
-                    </div>
-
-                    {/* Conseil */}
-                    {recipe.tips && (
-                      <div className="bg-amber-50 dark:bg-amber-900/20 p-2 rounded-lg text-sm">
-                        <span className="font-medium">💡 Conseil:</span> {recipe.tips}
-                      </div>
-                    )}
-
-                    {/* Nutrition */}
-                    {recipe.nutritionInfo && (
-                      <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
-                        <Heart className="w-3 h-3 text-red-500" />
-                        {recipe.nutritionInfo}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </Card>
-            ))}
-            </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
             </TabsContent>
 
-            {/* Onglet Liste de courses */}
-            <TabsContent value="shopping" className="mt-4">
+            {/* Tab Accords Vins */}
+            <TabsContent value="wines" className="mt-4">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <ShoppingCart className="w-5 h-5 text-green-500" />
-                    Liste de Courses Complète
+                    <Wine className="w-5 h-5 text-red-700" />
+                    Guide des Accords Mets-Vins
                   </CardTitle>
                   <CardDescription>
-                    Tous les ingrédients nécessaires pour {recipes.length} recettes
+                    Tous les accords vins recommandés pour vos {pages.length * 2} recettes
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="flex justify-end">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => {
-                          const text = shoppingList.map(([ing, data]) => 
-                            `☐ ${ing} (x${data.count})`
-                          ).join('\n');
-                          navigator.clipboard.writeText(text);
-                          toast.success('Liste copiée !');
-                        }}
-                      >
-                        <Copy className="w-4 h-4 mr-2" />
-                        Copier la liste
-                      </Button>
-                    </div>
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-2">
-                      {shoppingList.map(([ingredient, data], index) => (
-                        <div 
-                          key={index}
-                          className="flex items-center gap-3 p-2 rounded-lg border hover:bg-muted/50 transition-colors"
-                        >
-                          <Checkbox id={`ing-${index}`} />
-                          <div className="flex-1">
-                            <label 
-                              htmlFor={`ing-${index}`} 
-                              className="text-sm font-medium cursor-pointer capitalize"
-                            >
-                              {ingredient}
-                            </label>
-                            {data.count > 1 && (
-                              <span className="ml-2 text-xs text-primary font-medium">
-                                (utilisé {data.count}x)
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="pt-4 border-t text-center text-sm text-muted-foreground">
-                      📊 Total: {shoppingList.length} ingrédients uniques pour {recipes.length} recettes
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            {/* Onglet Aperçu */}
-            <TabsContent value="overview" className="mt-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <ListChecks className="w-5 h-5 text-blue-500" />
-                    Aperçu du Livre
-                  </CardTitle>
-                  <CardDescription>
-                    Table des matières de votre livre "{bookTitle}"
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    {recipes.map((recipe, index) => (
-                      <div 
-                        key={recipe.id}
-                        className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50 transition-colors"
-                      >
-                        <div className="flex items-center gap-3">
-                          <span className="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-sm font-bold text-orange-600">
-                            {index + 1}
-                          </span>
-                          <div>
-                            <p className="font-medium">{recipe.title}</p>
-                            <div className="flex gap-2 text-xs text-muted-foreground">
-                              <span>⏱️ {recipe.prepTime}</span>
-                              <span>•</span>
-                              <span>👥 {recipe.servings} pers.</span>
-                              <span>•</span>
-                              <Badge variant="outline" className="text-xs">
-                                {recipe.difficulty}
-                              </Badge>
+                    {pages.map((page) => (
+                      <div key={page.id} className="space-y-3">
+                        <h4 className="font-semibold text-sm text-muted-foreground">Page {page.pageNumber}</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          <div className="p-3 rounded-lg bg-gradient-to-r from-red-50 to-amber-50 dark:from-red-950/20 dark:to-amber-950/20 border">
+                            <div className="flex items-start gap-2">
+                              <span className="text-lg">🍷</span>
+                              <div>
+                                <p className="font-medium text-sm">{page.recipe1.name}</p>
+                                <p className="text-xs text-muted-foreground">({page.recipe1.country})</p>
+                                <p className="text-sm text-red-700 dark:text-red-400 mt-1 italic">
+                                  {page.recipe1.winePairing}
+                                </p>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {recipe.imageUrl && (
-                            <img src={recipe.imageUrl} alt="" className="w-12 h-12 rounded-lg object-cover" />
-                          )}
+                          <div className="p-3 rounded-lg bg-gradient-to-r from-red-50 to-amber-50 dark:from-red-950/20 dark:to-amber-950/20 border">
+                            <div className="flex items-start gap-2">
+                              <span className="text-lg">🍷</span>
+                              <div>
+                                <p className="font-medium text-sm">{page.recipe2.name}</p>
+                                <p className="text-xs text-muted-foreground">({page.recipe2.country})</p>
+                                <p className="text-sm text-red-700 dark:text-red-400 mt-1 italic">
+                                  {page.recipe2.winePairing}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -1758,100 +1276,8 @@ ${recipe.nutritionInfo ? `\n📊 Nutrition: ${recipe.nutritionInfo}` : ''}
                 </CardContent>
               </Card>
             </TabsContent>
-
-            {/* Onglet Statistiques */}
-            <TabsContent value="stats" className="mt-4">
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className="text-center">
-                      <div className="text-4xl font-bold text-orange-500">{recipes.length}</div>
-                      <p className="text-sm text-muted-foreground mt-1">Recettes</p>
-                    </div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className="text-center">
-                      <div className="text-4xl font-bold text-green-500">{shoppingList.length}</div>
-                      <p className="text-sm text-muted-foreground mt-1">Ingrédients uniques</p>
-                    </div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className="text-center">
-                      <div className="text-4xl font-bold text-blue-500">
-                        {recipes.filter(r => r.imageUrl).length}
-                      </div>
-                      <p className="text-sm text-muted-foreground mt-1">Photos générées</p>
-                    </div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className="text-center">
-                      <div className="text-4xl font-bold text-purple-500">
-                        {recipes.reduce((acc, r) => acc + r.instructions.length, 0)}
-                      </div>
-                      <p className="text-sm text-muted-foreground mt-1">Étapes totales</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-              
-              <Card className="mt-4">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <UtensilsCrossed className="w-5 h-5" />
-                    Répartition par difficulté
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex gap-4">
-                    {['facile', 'moyen', 'difficile'].map(diff => {
-                      const count = recipes.filter(r => r.difficulty === diff).length;
-                      const percent = recipes.length > 0 ? (count / recipes.length) * 100 : 0;
-                      return (
-                        <div key={diff} className="flex-1 text-center">
-                          <div className="text-2xl font-bold">{count}</div>
-                          <div className="text-sm text-muted-foreground capitalize">{diff}</div>
-                          <Progress value={percent} className="h-2 mt-2" />
-                        </div>
-                      );
-                    })}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
           </Tabs>
         </div>
-      )}
-
-      {/* Aide */}
-      {recipes.length === 0 && !isGenerating && (
-        <Card className="border-dashed">
-          <CardContent className="pt-6">
-            <div className="text-center space-y-4">
-              <div className="w-16 h-16 mx-auto rounded-full bg-orange-100 dark:bg-orange-900/20 flex items-center justify-center">
-                <ChefHat className="w-8 h-8 text-orange-500" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-lg">Créez votre livre de recettes</h3>
-                <p className="text-muted-foreground text-sm mt-1">
-                  Configurez les options ci-dessus puis cliquez sur "Générer" pour créer 
-                  automatiquement vos recettes avec ingrédients, instructions et photos.
-                </p>
-              </div>
-              <div className="flex flex-wrap justify-center gap-2">
-                <Badge variant="outline">🍳 Recettes détaillées</Badge>
-                <Badge variant="outline">📷 Photos IA</Badge>
-                <Badge variant="outline">📊 Infos nutrition</Badge>
-                <Badge variant="outline">💡 Conseils chef</Badge>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       )}
     </div>
   );
