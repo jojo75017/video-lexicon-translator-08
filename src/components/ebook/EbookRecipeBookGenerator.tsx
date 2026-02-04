@@ -95,6 +95,10 @@ const EbookRecipeBookGenerator: React.FC<EbookRecipeBookGeneratorProps> = ({ ebo
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('recipes');
   const [editingRecipeId, setEditingRecipeId] = useState<string | null>(null);
+  
+  // Cover state
+  const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
+  const [isGeneratingCover, setIsGeneratingCover] = useState(false);
 
   // Calculer la liste de courses groupée
   const shoppingList = useMemo(() => {
@@ -288,6 +292,89 @@ IMPORTANT: NO TEXT, NO WORDS, NO TITLE, NO LETTERS on the image. Only the food.`
       setRecipes(prev => prev.map(r => 
         r.id === recipeId ? { ...r, isGeneratingImage: false } : r
       ));
+    }
+  };
+
+  // Generate book cover
+  const generateCover = async () => {
+    if (!bookTitle.trim()) {
+      toast.error('Veuillez entrer un titre pour le livre');
+      return;
+    }
+
+    setIsGeneratingCover(true);
+    toast.info('Génération de la couverture...');
+
+    try {
+      const cuisineLabel = cuisineStyles.find(s => s.value === cuisineStyle)?.label || cuisineStyle;
+      
+      const { data, error } = await supabase.functions.invoke('generate-front-cover', {
+        body: {
+          ebookTitle: bookTitle,
+          authorName: authorName || '',
+          genre: 'cookbook',
+          style: 'modern',
+          customPrompt: `Professional cookbook cover design for "${bookTitle}".
+Style: ${cuisineLabel}
+Create a stunning, appetizing food photography cover with elegant typography.
+The image should feature beautifully styled dishes with professional lighting.
+Modern cookbook aesthetic with clean design elements.
+High-end culinary magazine quality, warm inviting colors.
+IMPORTANT: Include elegant title "${bookTitle}" in stylish typography.
+${authorName ? `Author name: ${authorName}` : ''}`,
+          showAuthorName: !!authorName,
+          showTitle: true,
+        }
+      });
+
+      if (error) throw error;
+
+      const imageUrl = data?.imageUrl || data?.coverUrl;
+      if (imageUrl) {
+        setCoverImageUrl(imageUrl);
+        toast.success('Couverture générée avec succès !');
+        setActiveTab('cover');
+      } else {
+        throw new Error('Aucune image retournée');
+      }
+    } catch (error) {
+      console.error('Erreur génération couverture:', error);
+      toast.error('Erreur lors de la génération de la couverture');
+    } finally {
+      setIsGeneratingCover(false);
+    }
+  };
+
+  // Download cover image
+  const downloadCover = async () => {
+    if (!coverImageUrl) return;
+    
+    try {
+      // Handle both data URLs and external URLs
+      if (coverImageUrl.startsWith('data:')) {
+        const link = document.createElement('a');
+        link.href = coverImageUrl;
+        link.download = `couverture-${bookTitle.replace(/\s+/g, '-').toLowerCase() || 'recettes'}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else {
+        // Fetch and convert external URL
+        const response = await fetch(coverImageUrl);
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `couverture-${bookTitle.replace(/\s+/g, '-').toLowerCase() || 'recettes'}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }
+      toast.success('Couverture téléchargée !');
+    } catch (error) {
+      console.error('Erreur téléchargement:', error);
+      toast.error('Erreur lors du téléchargement');
     }
   };
 
@@ -987,7 +1074,11 @@ ${recipe.nutritionInfo ? `\n📊 Nutrition: ${recipe.nutritionInfo}` : ''}
 
           {/* Système d'onglets */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-3 lg:grid-cols-4">
+            <TabsList className="grid w-full grid-cols-4 lg:grid-cols-5">
+              <TabsTrigger value="cover" className="flex items-center gap-2">
+                <BookOpen className="w-4 h-4" />
+                <span className="hidden sm:inline">Couverture</span>
+              </TabsTrigger>
               <TabsTrigger value="recipes" className="flex items-center gap-2">
                 <ChefHat className="w-4 h-4" />
                 <span className="hidden sm:inline">Recettes</span>
@@ -995,7 +1086,7 @@ ${recipe.nutritionInfo ? `\n📊 Nutrition: ${recipe.nutritionInfo}` : ''}
               </TabsTrigger>
               <TabsTrigger value="shopping" className="flex items-center gap-2">
                 <ShoppingCart className="w-4 h-4" />
-                <span className="hidden sm:inline">Liste courses</span>
+                <span className="hidden sm:inline">Courses</span>
               </TabsTrigger>
               <TabsTrigger value="overview" className="flex items-center gap-2">
                 <ListChecks className="w-4 h-4" />
@@ -1003,9 +1094,160 @@ ${recipe.nutritionInfo ? `\n📊 Nutrition: ${recipe.nutritionInfo}` : ''}
               </TabsTrigger>
               <TabsTrigger value="stats" className="flex items-center gap-2 hidden lg:flex">
                 <Star className="w-4 h-4" />
-                <span>Statistiques</span>
+                <span>Stats</span>
               </TabsTrigger>
             </TabsList>
+
+            {/* Onglet Couverture */}
+            <TabsContent value="cover" className="mt-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Cover Generation */}
+                <Card className="border-2 border-dashed border-orange-400/50">
+                  <CardHeader>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <Sparkles className="w-5 h-5 text-orange-500" />
+                      Générer la Couverture
+                    </CardTitle>
+                    <CardDescription>
+                      Créez une couverture professionnelle pour votre livre de recettes
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <Button
+                      onClick={generateCover}
+                      disabled={isGeneratingCover || !bookTitle.trim()}
+                      className="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600"
+                    >
+                      {isGeneratingCover ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Génération en cours...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="w-4 h-4 mr-2" />
+                          Générer la Couverture
+                        </>
+                      )}
+                    </Button>
+                    
+                    {coverImageUrl && (
+                      <Button
+                        onClick={generateCover}
+                        variant="outline"
+                        className="w-full"
+                        disabled={isGeneratingCover}
+                      >
+                        <RefreshCw className="w-4 h-4 mr-2" />
+                        Regénérer
+                      </Button>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Cover Preview / Mockup */}
+                <Card className="border-2">
+                  <CardHeader>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <BookOpen className="w-5 h-5" />
+                      Aperçu Mockup
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {coverImageUrl ? (
+                      <div className="space-y-4">
+                        {/* 3D Book Mockup Effect - Transparent Background */}
+                        <div className="relative flex justify-center items-center py-10">
+                          <div 
+                            className="relative transform transition-all duration-500 hover:scale-105"
+                            style={{
+                              perspective: '1200px',
+                            }}
+                          >
+                            {/* Shadow under the book */}
+                            <div 
+                              className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-44 h-6 bg-black/20 blur-xl rounded-full"
+                              style={{
+                                transform: 'translateX(-50%) rotateX(80deg)',
+                              }}
+                            />
+                            
+                            <div 
+                              className="relative"
+                              style={{
+                                transform: 'rotateY(-20deg) rotateX(5deg)',
+                                transformStyle: 'preserve-3d',
+                              }}
+                            >
+                              {/* Book spine - dark like reference */}
+                              <div 
+                                className="absolute left-0 top-0 bottom-0 w-5 rounded-l-sm"
+                                style={{
+                                  background: 'linear-gradient(to right, #1a1a1a 0%, #333 50%, #1a1a1a 100%)',
+                                  transform: 'rotateY(-90deg) translateZ(2px)',
+                                  transformOrigin: 'left center',
+                                  boxShadow: 'inset -2px 0 4px rgba(0,0,0,0.3)',
+                                }}
+                              />
+                              
+                              {/* Cover image container */}
+                              <div className="relative">
+                                <img
+                                  src={coverImageUrl}
+                                  alt="Couverture du livre de recettes"
+                                  className="w-52 h-[300px] object-cover rounded-r-md"
+                                  style={{
+                                    boxShadow: '10px 10px 30px rgba(0,0,0,0.4), -2px 0 10px rgba(0,0,0,0.2)',
+                                  }}
+                                />
+                                
+                                {/* Pages effect on the right - multiple layers */}
+                                <div className="absolute right-0 top-1 bottom-1 w-2 flex flex-col">
+                                  {[...Array(8)].map((_, i) => (
+                                    <div 
+                                      key={i}
+                                      className="flex-1"
+                                      style={{
+                                        background: i % 2 === 0 ? '#f5f5f0' : '#e8e8e3',
+                                        boxShadow: 'inset 1px 0 1px rgba(0,0,0,0.05)',
+                                      }}
+                                    />
+                                  ))}
+                                </div>
+                                
+                                {/* Glossy overlay effect */}
+                                <div 
+                                  className="absolute inset-0 pointer-events-none rounded-r-md"
+                                  style={{
+                                    background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%, rgba(0,0,0,0.1) 100%)',
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Download Button */}
+                        <Button
+                          onClick={downloadCover}
+                          className="w-full bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600"
+                        >
+                          <Download className="w-4 h-4 mr-2" />
+                          Télécharger la Couverture (PNG)
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center justify-center py-12 text-center">
+                        <BookOpen className="w-16 h-16 text-muted-foreground/30 mb-4" />
+                        <p className="text-muted-foreground">
+                          Générez une couverture pour voir l'aperçu 3D
+                        </p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
 
             {/* Onglet Recettes */}
             <TabsContent value="recipes" className="mt-4">
