@@ -142,6 +142,65 @@ const EbookTravelGuideGenerator: React.FC<EbookTravelGuideGeneratorProps> = ({ e
     return styles[style] || styles['realistic'];
   };
 
+  // Helper function to clean and parse JSON robustly
+  const cleanAndParseJSON = (content: string): { locations: { name: string; description: string }[] } | null => {
+    try {
+      // Try to find JSON block in the content
+      let jsonStr = content;
+      
+      // Remove markdown code blocks if present
+      jsonStr = jsonStr.replace(/```json\s*/gi, '').replace(/```\s*/g, '');
+      
+      // Try to find the JSON object with locations
+      const jsonMatch = jsonStr.match(/\{[\s\S]*"locations"[\s\S]*\}/);
+      if (jsonMatch) {
+        jsonStr = jsonMatch[0];
+      }
+      
+      // Clean up common JSON issues
+      // Remove trailing commas before ] or }
+      jsonStr = jsonStr.replace(/,\s*([\]\}])/g, '$1');
+      
+      // Fix unterminated strings by finding unmatched quotes
+      // Replace any newlines within strings with spaces
+      jsonStr = jsonStr.replace(/"([^"]*)\n([^"]*)"/g, '"$1 $2"');
+      
+      // Try to parse
+      const parsed = JSON.parse(jsonStr);
+      return parsed;
+    } catch (firstError) {
+      console.log('First parse attempt failed, trying alternative cleanup...');
+      
+      try {
+        // More aggressive cleanup - extract locations array manually
+        const locationsMatch = content.match(/"locations"\s*:\s*\[([\s\S]*?)\]/);
+        if (locationsMatch) {
+          // Parse individual location objects
+          const locationsStr = locationsMatch[1];
+          const locations: { name: string; description: string }[] = [];
+          
+          // Match each location object
+          const objectMatches = locationsStr.matchAll(/\{\s*"name"\s*:\s*"([^"]+)"\s*,\s*"description"\s*:\s*"([^"]+)"\s*\}/g);
+          
+          for (const match of objectMatches) {
+            locations.push({
+              name: match[1].trim(),
+              description: match[2].trim()
+            });
+          }
+          
+          if (locations.length > 0) {
+            return { locations };
+          }
+        }
+      } catch (secondError) {
+        console.error('Second parse attempt also failed:', secondError);
+      }
+      
+      return null;
+    }
+  };
+
   const generateTravelGuide = async () => {
     if (!bookTitle.trim() || !destination.trim()) {
       toast.error('Veuillez entrer un titre et une destination');
@@ -159,29 +218,31 @@ const EbookTravelGuideGenerator: React.FC<EbookTravelGuideGeneratorProps> = ({ e
       setCurrentStep('Génération du plan de voyage...');
       setProgress(10);
 
-      // Generate locations list
+      // Generate locations list with clearer JSON instructions
       const { data: planData, error: planError } = await supabase.functions.invoke('generate-content', {
         body: {
           type: 'travel-guide',
-          prompt: `Tu es un expert en voyages. Génère une liste de ${totalLocations} lieux incontournables pour un guide de voyage sur "${destination}".
+          prompt: `Tu es un expert en voyages. Génère exactement ${totalLocations} lieux incontournables pour un guide de voyage sur "${destination}".
 
 Titre du guide: "${bookTitle}"
 Style de voyage: ${travelStyles.find(s => s.value === travelStyle)?.label || travelStyle}
 ${specialInstructions ? `Instructions spéciales: ${specialInstructions}` : ''}
 
 Pour CHAQUE lieu, fournis:
-1. Le nom du lieu (monument, plage, quartier, site naturel, etc.)
-2. Une description captivante de 2-3 phrases qui donne envie de visiter
+1. Le nom du lieu (max 50 caractères)
+2. Une description captivante (max 150 caractères, sans guillemets internes ni retours à la ligne)
 
-Varie les types de lieux: sites touristiques majeurs, trésors cachés, restaurants, quartiers, plages, montagnes, musées, marchés, etc.
+IMPORTANT: 
+- Génère EXACTEMENT ${totalLocations} lieux
+- Utilise uniquement des guillemets doubles standards
+- Pas de virgule après le dernier élément du tableau
+- Pas de caractères spéciaux dans les descriptions
 
-Retourne au format JSON:
+Retourne UNIQUEMENT ce JSON valide, sans texte avant ni après:
 {
   "locations": [
-    {
-      "name": "Nom du lieu",
-      "description": "Description captivante du lieu..."
-    }
+    {"name": "Nom du lieu 1", "description": "Description courte du lieu 1"},
+    {"name": "Nom du lieu 2", "description": "Description courte du lieu 2"}
   ]
 }`
         }
@@ -190,26 +251,72 @@ Retourne au format JSON:
       if (planError) throw planError;
 
       let locations: { name: string; description: string }[] = [];
-      try {
-        const content = planData?.content || planData?.result || '';
-        const jsonMatch = content.match(/\{[\s\S]*"locations"[\s\S]*\}/);
-        if (jsonMatch) {
-          const parsed = JSON.parse(jsonMatch[0]);
-          locations = parsed.locations || [];
-        }
-      } catch (parseError) {
-        console.error('Erreur parsing locations:', parseError);
-        throw new Error('Erreur lors de la génération du plan');
-      }
-
-      if (locations.length < totalLocations) {
-        // Pad with generic locations if needed
-        while (locations.length < totalLocations) {
+      const content = planData?.content || planData?.result || '';
+      
+      const parsed = cleanAndParseJSON(content);
+      if (parsed && parsed.locations && parsed.locations.length > 0) {
+        locations = parsed.locations;
+      } else {
+        console.error('Échec du parsing JSON, génération de lieux de secours...');
+        // Generate fallback locations based on destination
+        const fallbackLocationNames = [
+          `Centre historique de ${destination}`,
+          `Marché local de ${destination}`,
+          `Plage principale`,
+          `Musée national`,
+          `Vieille ville`,
+          `Quartier des artisans`,
+          `Parc naturel`,
+          `Point de vue panoramique`,
+          `Temple ancien`,
+          `Place centrale`,
+          `Jardin botanique`,
+          `Port de pêche`,
+          `Forteresse historique`,
+          `Quartier gastronomique`,
+          `Site archéologique`,
+          `Cascade naturelle`,
+          `Village traditionnel`,
+          `Montagne sacrée`,
+          `Lac pittoresque`,
+          `Réserve naturelle`,
+          `Palais royal`,
+          `Cathédrale ancienne`,
+          `Rue commerçante`,
+          `Oasis secrète`,
+          `Plage cachée`,
+          `Vignoble local`,
+          `Grotte mystérieuse`,
+          `Pont historique`,
+          `Tour d'observation`,
+          `Sanctuaire naturel`,
+          `Quartier colonial`,
+          `Baie turquoise`,
+          `Vallée verdoyante`,
+          `Falaises spectaculaires`,
+          `Rizières en terrasses`,
+          `Temple bouddhiste`,
+          `Mosquée historique`,
+          `Synagogue ancienne`,
+          `Phare emblématique`,
+          `Île paradisiaque`
+        ];
+        
+        for (let i = 0; i < totalLocations; i++) {
           locations.push({
-            name: `Lieu ${locations.length + 1} de ${destination}`,
-            description: `Un endroit magnifique à découvrir lors de votre voyage.`
+            name: fallbackLocationNames[i % fallbackLocationNames.length] || `Lieu ${i + 1}`,
+            description: `Un lieu incontournable à découvrir lors de votre voyage en ${destination}. Paysages magnifiques et expériences authentiques vous attendent.`
           });
         }
+        toast.warning('Utilisation de lieux de secours - le guide sera quand même généré');
+      }
+
+      // Ensure we have enough locations
+      while (locations.length < totalLocations) {
+        locations.push({
+          name: `Lieu découverte ${locations.length + 1}`,
+          description: `Un endroit magnifique à découvrir lors de votre voyage en ${destination}.`
+        });
       }
 
       setProgress(30);
@@ -263,7 +370,7 @@ Retourne au format JSON:
       
     } catch (error) {
       console.error('Erreur génération guide:', error);
-      toast.error('Erreur lors de la génération du guide');
+      toast.error('Erreur lors de la génération du guide. Réessayez.');
     } finally {
       setIsGenerating(false);
     }
