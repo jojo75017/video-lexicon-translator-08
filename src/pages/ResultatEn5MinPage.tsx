@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { CheckCircle, XCircle, Shield, Play, BookOpen, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { trackDemoClick } from '@/utils/analytics';
 
 const ResultatEn5MinPage: React.FC = () => {
   const navigate = useNavigate();
@@ -102,7 +103,10 @@ const ResultatEn5MinPage: React.FC = () => {
           <Button 
             size="lg" 
             className="text-lg md:text-xl px-10 py-7 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
-            onClick={() => navigate('/demo')}
+            onClick={() => {
+              trackDemoClick("Accéder à la démo gratuite");
+              navigate('/demo');
+            }}
           >
             <Play className="w-6 h-6 mr-3" />
             Accéder à la démo gratuite
@@ -189,7 +193,7 @@ const ResultatEn5MinPage: React.FC = () => {
             </span>
           </div>
           <p className="text-sm text-muted-foreground">
-            Tu peux tester la <button onClick={() => navigate('/demo')} className="text-violet-600 dark:text-violet-400 underline hover:no-underline">démo gratuite</button> avant toute décision.
+            Tu peux tester la <button onClick={() => { trackDemoClick("démo gratuite - footer"); navigate('/demo'); }} className="text-violet-600 dark:text-violet-400 underline hover:no-underline">démo gratuite</button> avant toute décision.
           </p>
         </section>
 
