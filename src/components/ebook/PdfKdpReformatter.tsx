@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,6 +12,9 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import jsPDF from 'jspdf';
+import * as pdfjsLib from 'pdfjs-dist';
+// Vite will bundle the worker and give us an URL we can safely load
+import pdfWorkerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 
 interface PageImage {
   dataUrl: string;
@@ -38,6 +41,13 @@ const PdfKdpReformatter: React.FC = () => {
   const [authorName, setAuthorName] = useState('');
   const [ageGroup, setAgeGroup] = useState('4-6 ans');
 
+  // Ensure PDF.js worker is configured (avoid external CDNs)
+  useEffect(() => {
+    if (pdfjsLib.GlobalWorkerOptions.workerSrc !== pdfWorkerSrc) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerSrc;
+    }
+  }, []);
+
   const handleFileSelect = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -53,11 +63,6 @@ const PdfKdpReformatter: React.FC = () => {
     setImages([]);
 
     try {
-      // Dynamically import pdf.js for PDF parsing
-      const pdfjsLib = await import('pdfjs-dist');
-      
-      // Disable worker for browser compatibility - runs on main thread
-      pdfjsLib.GlobalWorkerOptions.workerSrc = '';
 
       const arrayBuffer = await file.arrayBuffer();
       const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
