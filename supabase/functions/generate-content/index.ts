@@ -455,6 +455,132 @@ Génère des données riches, variées et professionnelles.`;
       );
     }
 
+    // Handle KDP metadata generation (descriptions, keywords, categories)
+    if (type === 'kdp-metadata') {
+      console.log('Processing KDP metadata generation...');
+      const { title, productType, pageCount, targetAudience, theme, model } = await req.json();
+      
+      const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+      
+      if (!LOVABLE_API_KEY) {
+        return new Response(
+          JSON.stringify({ error: 'Lovable API key not configured' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const productTypeLabels: Record<string, string> = {
+        coloring: 'Livre de coloriage',
+        comic: 'Bande dessinée',
+        diary: 'Agenda / Journal intime',
+        documentary: 'Livre documentaire',
+        atlas: 'Atlas',
+        encyclopedia: 'Encyclopédie',
+      };
+
+      const productLabel = productTypeLabels[productType] || productType;
+
+      const systemPrompt = `Tu es un expert en marketing et SEO pour Amazon KDP.
+Tu génères des métadonnées optimisées qui maximisent la visibilité et les ventes sur Amazon.
+Réponds UNIQUEMENT avec un JSON valide, sans markdown, sans commentaires.`;
+
+      const userPrompt = `Génère les métadonnées KDP complètes pour ce livre:
+
+INFORMATIONS:
+- Titre: "${title || 'Sans Titre'}"
+- Type: ${productLabel}
+- Pages: ${pageCount || 50}
+- Public cible: ${targetAudience || 'Tous publics'}
+- Thème: ${theme || 'Non spécifié'}
+
+GÉNÈRE UN JSON avec:
+1. "description": Description Amazon engageante (1500-2000 caractères) avec:
+   - Accroche percutante
+   - Bénéfices pour le lecteur
+   - Appel à l'action
+   - Emojis appropriés
+
+2. "keywords": 7 mots-clés stratégiques pour Amazon (optimisés SEO)
+
+3. "categories": 3 catégories Amazon pertinentes
+
+4. "suggestedPrice": {"min": X, "max": Y, "optimal": Z}
+
+Format JSON attendu:
+{
+  "description": "...",
+  "keywords": ["kw1", "kw2", "kw3", "kw4", "kw5", "kw6", "kw7"],
+  "categories": ["cat1", "cat2", "cat3"],
+  "suggestedPrice": {"min": 5.99, "max": 12.99, "optimal": 8.99}
+}`;
+
+      try {
+        const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: model || 'google/gemini-2.5-flash',
+            messages: [
+              { role: 'system', content: systemPrompt },
+              { role: 'user', content: userPrompt }
+            ],
+          }),
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Lovable AI error (kdp-metadata):', response.status, errorText);
+          
+          const httpErr = lovableAiHttpError(response.status);
+          return new Response(
+            JSON.stringify({ error: httpErr.error }),
+            { status: httpErr.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        const data = await response.json();
+        const generatedContent = data.choices?.[0]?.message?.content;
+
+        if (!generatedContent) {
+          console.error('No content in response (kdp-metadata)');
+          return new Response(
+            JSON.stringify({ error: 'Réponse vide de l\'IA' }),
+            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        // Nettoyer et parser le JSON
+        let parsedData;
+        try {
+          const cleanJson = generatedContent.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+          parsedData = JSON.parse(cleanJson);
+        } catch (parseError) {
+          console.error('JSON parse error (kdp-metadata):', parseError, 'Raw:', generatedContent);
+          // Retourner le contenu brut si le parsing échoue
+          return new Response(
+            JSON.stringify({ content: generatedContent, result: generatedContent }),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        console.log('KDP metadata generated successfully');
+        return new Response(
+          JSON.stringify({ content: JSON.stringify(parsedData), result: JSON.stringify(parsedData) }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+
+      } catch (err) {
+        console.error('KDP metadata generation error:', err);
+        return new Response(
+          JSON.stringify({ error: (err instanceof Error) ? err.message : 'Erreur lors de la génération KDP' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+
     // Handle narrative analysis (uses Lovable AI - no API key needed)
     if (type === 'narrative-analysis') {
       console.log('Processing narrative analysis...');

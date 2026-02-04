@@ -96,12 +96,19 @@ export const KdpQuickTools: React.FC<KdpQuickToolsProps> = ({
   const [customKeywords, setCustomKeywords] = useState<string[]>([]);
   const [customDescription, setCustomDescription] = useState('');
   
+  // Synchroniser isOpen avec defaultOpen quand il change
+  React.useEffect(() => {
+    if (defaultOpen) {
+      setIsOpen(true);
+    }
+  }, [defaultOpen]);
+  
   // Auto-générer les données KDP si ouvert par défaut
   React.useEffect(() => {
-    if (defaultOpen && !kdpData && !isGenerating && title) {
+    if (isOpen && !kdpData && !isGenerating && title) {
       generateKdpData();
     }
-  }, [defaultOpen, title]);
+  }, [isOpen, title]);
 
   const generateKdpData = async () => {
     setIsGenerating(true);
