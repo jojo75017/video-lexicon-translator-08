@@ -105,7 +105,7 @@ const exampleBooks = [
 
 const EbookRecipeBookGenerator: React.FC<EbookRecipeBookGeneratorProps> = ({ ebookTitle = '' }) => {
   const [bookTitle, setBookTitle] = useState(ebookTitle || '');
-  const [selectedCountry, setSelectedCountry] = useState('');
+  const [selectedCountry, setSelectedCountry] = useState('tour-du-monde');
   const [authorName, setAuthorName] = useState('');
   const [cuisineTheme, setCuisineTheme] = useState('tour-du-monde');
   const [photoStyle, setPhotoStyle] = useState('gourmet');
@@ -156,7 +156,7 @@ const EbookRecipeBookGenerator: React.FC<EbookRecipeBookGeneratorProps> = ({ ebo
       setProgress(10);
 
       // Determine which countries to include
-      const regionToUse = selectedCountry || 'les pays du monde entier';
+      const regionToUse = selectedCountry === 'tour-du-monde' ? 'les pays du monde entier' : selectedCountry;
       
       // Generate recipes list with wine pairings
       const { data: planData, error: planError } = await supabase.functions.invoke('generate-content', {
@@ -822,10 +822,10 @@ ${authorName ? `Author name: ${authorName}` : ''}`,
                   <SelectValue placeholder="🌍 Tour du monde (tous les pays)" />
                 </SelectTrigger>
                 <SelectContent className="max-h-80">
-                  <SelectItem value="">🌍 Tour du monde (tous les pays)</SelectItem>
+                  <SelectItem value="tour-du-monde">🌍 Tour du monde (tous les pays)</SelectItem>
                   {Object.entries(worldCountries).map(([continent, countries]) => (
                     <React.Fragment key={continent}>
-                      <SelectItem value={continent} disabled className="font-bold text-primary">
+                      <SelectItem value={`continent-${continent}`} disabled className="font-bold text-primary">
                         {continent}
                       </SelectItem>
                       {countries.map(country => (
