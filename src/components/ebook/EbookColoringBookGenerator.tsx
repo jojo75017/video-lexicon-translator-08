@@ -1504,6 +1504,18 @@ CRITICAL REQUIREMENTS:
               wordLabel="Word (modifiable)"
             />
           </div>
+
+          {/* Outils KDP (mots-clés + description) - placé ici pour être visible juste après l'export */}
+          <div className="px-6 pb-6">
+            <KdpQuickTools
+              productType="coloring"
+              title={`Coloriage - ${THEMES.find(t => t.value === theme)?.label || theme}`}
+              pageCount={generatedPages.length + 3}
+              targetAudience={ageGroup}
+              theme={theme === 'custom' ? customTheme : theme}
+              defaultOpen={showKdpTools}
+            />
+          </div>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {generatedPages.map((page, index) => (
@@ -1600,17 +1612,7 @@ CRITICAL REQUIREMENTS:
         />
       )}
 
-      {/* Outils KDP */}
-      {generatedPages.length > 0 && (
-        <KdpQuickTools
-          productType="coloring"
-          title={`Coloriage - ${THEMES.find(t => t.value === theme)?.label || theme}`}
-          pageCount={generatedPages.length + 3}
-          targetAudience={ageGroup}
-          theme={theme === 'custom' ? customTheme : theme}
-          defaultOpen={showKdpTools}
-        />
-      )}
+      {/* (Déplacé plus haut sous la section Export pour que ce soit visible sans scroller) */}
     </div>
   );
 };
