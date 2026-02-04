@@ -103,6 +103,7 @@ export const EbookColoringBookGenerator: React.FC<ColoringBookGeneratorProps> = 
   const [generatedPages, setGeneratedPages] = useState<ColoringPage[]>([]);
   const [currentProgress, setCurrentProgress] = useState(0);
   const [isSavingProject, setIsSavingProject] = useState(false);
+  const [showKdpTools, setShowKdpTools] = useState(false);
 
   const generateColorPalette = (theme: string, subject: string): { element: string; color: string; hexCode: string }[] => {
     // Génération intelligente de palettes de couleurs suggérées
@@ -567,6 +568,8 @@ CRITICAL REQUIREMENTS:
     
     if (pages.length > 0) {
       toast.success(`${pages.length}/${numberOfPages} page(s) de coloriage générée(s) !`);
+      // Ouvrir automatiquement les outils KDP pour générer les descriptions
+      setShowKdpTools(true);
     } else {
       toast.error('Erreur lors de la génération');
     }
@@ -1572,11 +1575,12 @@ CRITICAL REQUIREMENTS:
                 Conseils pour un livre de coloriage réussi
               </h4>
               <ul className="text-sm text-yellow-700 dark:text-yellow-300 space-y-1">
-                <li>• <strong>Livre cartonné (Board Book)</strong> : Idéal pour 0-3 ans, pages épaisses et résistantes, format carré recommandé</li>
-                <li>• <strong>Impression</strong> : Papier épais 120-160 g/m² pour éviter que les feutres traversent</li>
+                <li>• <strong>📄 Export PDF</strong> : À IMPRIMER sur papier épais (120-160 g/m²), puis l'enfant colorie sur le papier</li>
+                <li>• <strong>📝 Export Word</strong> : Modifiable pour ajuster les textes, mais les images ne sont pas coloriables numériquement</li>
+                <li>• <strong>🎨 Pour colorier numériquement</strong> : Téléchargez chaque image PNG individuellement et utilisez un logiciel de dessin</li>
+                <li>• <strong>Livre cartonné (Board Book)</strong> : Idéal pour 0-3 ans, pages épaisses et résistantes</li>
                 <li>• <strong>KDP Amazon</strong> : Format 8.5x8.5" carré, intérieur noir et blanc, couverture brillante</li>
                 <li>• <strong>Page de test</strong> : Incluez une page avec tous les codes couleurs au début</li>
-                <li>• <strong>Conseil pro</strong> : Les formats carrés (15x15, 20x20 cm) sont les plus populaires pour les tout-petits</li>
               </ul>
             </div>
           </div>
@@ -1604,6 +1608,7 @@ CRITICAL REQUIREMENTS:
           pageCount={generatedPages.length + 3}
           targetAudience={ageGroup}
           theme={theme === 'custom' ? customTheme : theme}
+          defaultOpen={showKdpTools}
         />
       )}
     </div>
