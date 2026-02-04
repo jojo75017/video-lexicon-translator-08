@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { trackDemoClick } from "@/utils/analytics";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -404,7 +405,10 @@ const SalesPage = () => {
             <Button 
               size="lg" 
               className="text-base md:text-lg px-6 py-5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 shadow-lg mb-3"
-              onClick={() => document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={() => {
+                trackDemoClick("Voir le résultat par moi-même (démo gratuite)");
+                document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' });
+              }}
             >
               <Play className="w-5 h-5 mr-2" />
               Voir le résultat par moi-même (démo gratuite)
@@ -478,7 +482,10 @@ const SalesPage = () => {
               <Button 
                 size="lg" 
                 className="text-lg px-8 py-6 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 shadow-lg mb-3"
-                onClick={() => document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' })}
+                onClick={() => {
+                  trackDemoClick("Accéder à la démo gratuite (sans carte bancaire)");
+                  document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' });
+                }}
               >
                 <Play className="w-5 h-5 mr-2" />
                 Accéder à la démo gratuite (sans carte bancaire)
@@ -566,7 +573,10 @@ const SalesPage = () => {
                 <Button 
                   size="lg" 
                   className="text-base md:text-lg px-8 py-6 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-                  onClick={() => document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' })}
+                  onClick={() => {
+                    trackDemoClick("Accéder à la démo gratuite (sans carte bancaire)");
+                    document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
                 >
                   <Play className="w-5 h-5 mr-2" />
                   Accéder à la démo gratuite (sans carte bancaire)
@@ -649,7 +659,10 @@ const SalesPage = () => {
               <Button 
                 size="lg" 
                 className="text-lg md:text-xl px-10 py-7 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 mb-4"
-                onClick={() => navigate('/demo')}
+                onClick={() => {
+                  trackDemoClick("Accéder à la démo gratuite");
+                  navigate('/demo');
+                }}
               >
                 <Play className="w-6 h-6 mr-2" />
                 Accéder à la démo gratuite
@@ -673,7 +686,10 @@ const SalesPage = () => {
               size="lg" 
               variant="outline"
               className="text-lg px-8 py-6"
-              onClick={() => navigate('/demo')}
+              onClick={() => {
+                trackDemoClick("Essayer la Démo Gratuite");
+                navigate('/demo');
+              }}
             >
               <Play className="w-5 h-5 mr-2" />
               Essayer la Démo Gratuite
@@ -724,7 +740,10 @@ const SalesPage = () => {
                     <p className="text-muted-foreground mb-6">
                       Découvrez l'interface et testez la génération de plans
                     </p>
-                    <Button size="lg" onClick={() => navigate('/demo')}>
+                    <Button size="lg" onClick={() => {
+                      trackDemoClick("Accéder à la Démo");
+                      navigate('/demo');
+                    }}>
                       Accéder à la Démo
                       <ArrowRight className="w-5 h-5 ml-2" />
                     </Button>
@@ -1128,6 +1147,7 @@ const SalesPage = () => {
       <div className="fixed bottom-4 left-4 right-4 z-40 md:hidden">
         <button
           onClick={() => {
+            trackDemoClick("Démo gratuite (sans email) - Mobile");
             const demoSection = document.getElementById('demo');
             if (demoSection) {
               demoSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1144,6 +1164,7 @@ const SalesPage = () => {
       <div className="hidden md:block fixed bottom-6 right-6 z-40">
         <button
           onClick={() => {
+            trackDemoClick("Démo gratuite (sans email) - Desktop");
             const demoSection = document.getElementById('demo');
             if (demoSection) {
               demoSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
