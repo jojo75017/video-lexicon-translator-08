@@ -19,6 +19,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import jsPDF from 'jspdf';
 import { Document, Packer, Paragraph, TextRun, HeadingLevel, ImageRun, PageBreak, AlignmentType, BorderStyle } from 'docx';
+import { saveAs } from 'file-saver';
 
 interface Recipe {
   id: string;
@@ -609,6 +610,265 @@ ${recipe.nutritionInfo ? `\n📊 Nutrition: ${recipe.nutritionInfo}` : ''}
     }
   };
 
+  // ============= EXPORT PDF MAGAZINE (2 recettes par page comme guide de voyage) =============
+  const exportToPDFMagazine = async () => {
+    if (recipes.length === 0) {
+      toast.error('Aucune recette à exporter');
+      return;
+    }
+
+    setIsExporting(true);
+    toast.info('Génération du PDF Magazine en cours...');
+
+    try {
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 15;
+      const contentWidth = pageWidth - 2 * margin;
+
+      // ===== COVER PAGE =====
+      pdf.setFillColor(255, 100, 50); // Orange culinaire
+      pdf.rect(0, 0, pageWidth, pageHeight, 'F');
+      
+      // Decorative elements
+      pdf.setFillColor(255, 220, 100); // Gold accent
+      pdf.rect(0, pageHeight - 30, pageWidth, 30, 'F');
+      
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(32);
+      pdf.setTextColor(255, 255, 255);
+      const titleLines = pdf.splitTextToSize(bookTitle || 'Mon Livre de Recettes', contentWidth);
+      pdf.text(titleLines, pageWidth / 2, 80, { align: 'center' });
+
+      const cuisineLabel = cuisineStyles.find(s => s.value === cuisineStyle)?.label || cuisineStyle;
+      pdf.setFontSize(18);
+      pdf.setTextColor(255, 220, 100);
+      pdf.text(cuisineLabel, pageWidth / 2, 110, { align: 'center' });
+
+      if (authorName) {
+        pdf.setFontSize(14);
+        pdf.setTextColor(255, 255, 255);
+        pdf.text(`par ${authorName}`, pageWidth / 2, 130, { align: 'center' });
+      }
+
+      pdf.setFontSize(12);
+      pdf.setTextColor(80, 40, 0);
+      pdf.text(`${recipes.length} recettes delicieuses`, pageWidth / 2, pageHeight - 15, { align: 'center' });
+
+      // ===== TABLE OF CONTENTS =====
+      pdf.addPage();
+      pdf.setFillColor(255, 248, 240);
+      pdf.rect(0, 0, pageWidth, 40, 'F');
+      
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(24);
+      pdf.setTextColor(255, 100, 50);
+      pdf.text('Sommaire', margin, 28);
+
+      let yPos = 55;
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(11);
+      pdf.setTextColor(60, 60, 60);
+      
+      recipes.forEach((recipe, index) => {
+        if (yPos > pageHeight - 30) {
+          pdf.addPage();
+          yPos = margin + 10;
+        }
+        const emoji = getCategoryEmoji(recipe.category);
+        pdf.text(`${emoji} ${recipe.title}`, margin, yPos);
+        pdf.setTextColor(150, 150, 150);
+        pdf.text(`p.${Math.floor(index / 2) + 3}`, pageWidth - margin - 10, yPos);
+        pdf.setTextColor(60, 60, 60);
+        yPos += 8;
+      });
+
+      // ===== CONTENT PAGES (2 recipes per page) =====
+      for (let i = 0; i < recipes.length; i += 2) {
+        const recipe1 = recipes[i];
+        const recipe2 = recipes[i + 1]; // May be undefined if odd number
+        pdf.addPage();
+
+        // Page header
+        pdf.setFillColor(255, 100, 50);
+        pdf.rect(0, 0, pageWidth, 18, 'F');
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(10);
+        pdf.setTextColor(255, 255, 255);
+        pdf.text(`${bookTitle || 'Livre de Recettes'} - Page ${Math.floor(i / 2) + 1}`, pageWidth / 2, 12, { align: 'center' });
+
+        const halfWidth = (contentWidth - 10) / 2;
+        const imageHeight = 55;
+        const textStartY = 25;
+
+        // Recipe 1 (left side)
+        const leftX = margin;
+        let leftY = textStartY;
+
+        // Image 1
+        if (recipe1.imageUrl) {
+          try {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            await new Promise<void>((resolve, reject) => {
+              img.onload = () => resolve();
+              img.onerror = reject;
+              img.src = recipe1.imageUrl!;
+            });
+            
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            ctx?.drawImage(img, 0, 0);
+            const imgData = canvas.toDataURL('image/jpeg', 0.85);
+            
+            pdf.addImage(imgData, 'JPEG', leftX, leftY, halfWidth, imageHeight);
+            leftY += imageHeight + 4;
+          } catch (e) {
+            console.log('Image 1 non chargee');
+            leftY += 4;
+          }
+        }
+
+        // Title 1
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(12);
+        pdf.setTextColor(255, 100, 50);
+        const title1Lines = pdf.splitTextToSize(recipe1.title, halfWidth);
+        pdf.text(title1Lines, leftX, leftY);
+        leftY += title1Lines.length * 5 + 2;
+
+        // Category & time
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(8);
+        pdf.setTextColor(120, 120, 120);
+        pdf.text(`${recipe1.prepTime} + ${recipe1.cookTime} | ${recipe1.servings} pers.`, leftX, leftY);
+        leftY += 5;
+
+        // Ingredients (compact)
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(9);
+        pdf.setTextColor(60, 60, 60);
+        pdf.text('Ingredients:', leftX, leftY);
+        leftY += 4;
+        
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(8);
+        const ing1Text = recipe1.ingredients.slice(0, 5).join(', ') + (recipe1.ingredients.length > 5 ? '...' : '');
+        const ing1Lines = pdf.splitTextToSize(ing1Text, halfWidth);
+        pdf.text(ing1Lines.slice(0, 2), leftX, leftY);
+        leftY += ing1Lines.slice(0, 2).length * 3.5 + 3;
+
+        // Short instructions
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(9);
+        pdf.text('Preparation:', leftX, leftY);
+        leftY += 4;
+        
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(8);
+        const steps1 = recipe1.instructions.slice(0, 3).map((s, idx) => `${idx + 1}. ${s}`).join(' ');
+        const steps1Lines = pdf.splitTextToSize(steps1, halfWidth);
+        pdf.text(steps1Lines.slice(0, 4), leftX, leftY);
+
+        // Recipe 2 (right side) - only if exists
+        if (recipe2) {
+          const rightX = margin + halfWidth + 10;
+          let rightY = textStartY;
+
+          // Image 2
+          if (recipe2.imageUrl) {
+            try {
+              const img = new Image();
+              img.crossOrigin = 'anonymous';
+              await new Promise<void>((resolve, reject) => {
+                img.onload = () => resolve();
+                img.onerror = reject;
+                img.src = recipe2.imageUrl!;
+              });
+              
+              const canvas = document.createElement('canvas');
+              canvas.width = img.width;
+              canvas.height = img.height;
+              const ctx = canvas.getContext('2d');
+              ctx?.drawImage(img, 0, 0);
+              const imgData = canvas.toDataURL('image/jpeg', 0.85);
+              
+              pdf.addImage(imgData, 'JPEG', rightX, rightY, halfWidth, imageHeight);
+              rightY += imageHeight + 4;
+            } catch (e) {
+              console.log('Image 2 non chargee');
+              rightY += 4;
+            }
+          }
+
+          // Title 2
+          pdf.setFont('helvetica', 'bold');
+          pdf.setFontSize(12);
+          pdf.setTextColor(255, 100, 50);
+          const title2Lines = pdf.splitTextToSize(recipe2.title, halfWidth);
+          pdf.text(title2Lines, rightX, rightY);
+          rightY += title2Lines.length * 5 + 2;
+
+          // Category & time
+          pdf.setFont('helvetica', 'normal');
+          pdf.setFontSize(8);
+          pdf.setTextColor(120, 120, 120);
+          pdf.text(`${recipe2.prepTime} + ${recipe2.cookTime} | ${recipe2.servings} pers.`, rightX, rightY);
+          rightY += 5;
+
+          // Ingredients (compact)
+          pdf.setFont('helvetica', 'bold');
+          pdf.setFontSize(9);
+          pdf.setTextColor(60, 60, 60);
+          pdf.text('Ingredients:', rightX, rightY);
+          rightY += 4;
+          
+          pdf.setFont('helvetica', 'normal');
+          pdf.setFontSize(8);
+          const ing2Text = recipe2.ingredients.slice(0, 5).join(', ') + (recipe2.ingredients.length > 5 ? '...' : '');
+          const ing2Lines = pdf.splitTextToSize(ing2Text, halfWidth);
+          pdf.text(ing2Lines.slice(0, 2), rightX, rightY);
+          rightY += ing2Lines.slice(0, 2).length * 3.5 + 3;
+
+          // Short instructions
+          pdf.setFont('helvetica', 'bold');
+          pdf.setFontSize(9);
+          pdf.text('Preparation:', rightX, rightY);
+          rightY += 4;
+          
+          pdf.setFont('helvetica', 'normal');
+          pdf.setFontSize(8);
+          const steps2 = recipe2.instructions.slice(0, 3).map((s, idx) => `${idx + 1}. ${s}`).join(' ');
+          const steps2Lines = pdf.splitTextToSize(steps2, halfWidth);
+          pdf.text(steps2Lines.slice(0, 4), rightX, rightY);
+        }
+
+        // Page footer
+        pdf.setFillColor(255, 220, 100);
+        pdf.rect(0, pageHeight - 10, pageWidth, 10, 'F');
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(8);
+        pdf.setTextColor(120, 60, 0);
+        pdf.text(bookTitle || 'Livre de Recettes', pageWidth / 2, pageHeight - 4, { align: 'center' });
+      }
+
+      // Save PDF
+      const fileName = `${(bookTitle || 'recettes').replace(/[^a-zA-Z0-9]/g, '_')}_Magazine.pdf`;
+      const blob = pdf.output('blob');
+      saveAs(blob, fileName);
+      toast.success('PDF Magazine telecharge !');
+
+    } catch (error) {
+      console.error('Erreur export PDF Magazine:', error);
+      toast.error('Erreur lors de l\'export PDF');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   // ============= EXPORT WORD (DOCX) =============
   const exportToWord = async () => {
     if (recipes.length === 0) {
@@ -1043,12 +1303,21 @@ ${recipe.nutritionInfo ? `\n📊 Nutrition: ${recipe.nutritionInfo}` : ''}
                 <div className="flex flex-wrap gap-2">
                   <Button
                     variant="outline"
+                    onClick={exportToPDFMagazine}
+                    disabled={isExporting}
+                    className="border-orange-500/50 text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20"
+                  >
+                    {isExporting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <BookOpen className="w-4 h-4 mr-2" />}
+                    PDF Magazine (2/page)
+                  </Button>
+                  <Button
+                    variant="outline"
                     onClick={exportToPDF}
                     disabled={isExporting}
                     className="border-red-500/50 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
                   >
                     {isExporting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <FileText className="w-4 h-4 mr-2" />}
-                    Export PDF
+                    PDF Complet
                   </Button>
                   <Button
                     variant="outline"
