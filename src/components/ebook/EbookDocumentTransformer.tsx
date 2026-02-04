@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -13,9 +13,10 @@ import { cleanGeneratedText } from '@/utils/textCleaner';
 import { 
   Upload, FileText, Download, Loader2, Sparkles, 
   CheckCircle2, BookOpen, Wand2, RefreshCw, 
-  FileType, ArrowRight, Eye, Copy, Trash2
+  FileType, ArrowRight, Eye, Copy, Trash2, Palette
 } from 'lucide-react';
 import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } from 'docx';
+import { KdpQuickTools, KdpProductType } from './KdpQuickTools';
 
 interface Chapter {
   title: string;
@@ -32,6 +33,15 @@ interface TransformResult {
   chapterCount: number;
 }
 
+// Types de livres spécialisés détectés automatiquement
+type DetectedBookType = 'standard' | 'coloring' | 'comic' | 'diary' | 'documentary' | 'atlas' | 'encyclopedia';
+
+interface DetectionResult {
+  type: DetectedBookType;
+  confidence: number;
+  keywords: string[];
+}
+
 export const EbookDocumentTransformer: React.FC = () => {
   const [rawText, setRawText] = useState('');
   const [isExtracting, setIsExtracting] = useState(false);
@@ -42,6 +52,57 @@ export const EbookDocumentTransformer: React.FC = () => {
   const [bookTitle, setBookTitle] = useState('');
   const [authorName, setAuthorName] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Détection automatique du type de livre spécialisé
+  const detectBookType = useCallback((text: string): DetectionResult => {
+    const lowerText = text.toLowerCase();
+    
+    // Mots-clés pour chaque type
+    const coloringKeywords = ['coloriage', 'colorier', 'couleurs suggérées', 'dessins à colorier', 'coloring', 'crayons', 'feutres'];
+    const comicKeywords = ['bande dessinée', 'bd', 'comic', 'manga', 'bulle', 'vignette', 'planche'];
+    const diaryKeywords = ['journal intime', 'agenda', 'diary', 'planificateur', 'carnet de bord'];
+    const documentaryKeywords = ['documentaire', 'documentary', 'enquête', 'investigation', 'reportage'];
+    const atlasKeywords = ['atlas', 'carte', 'géographie', 'map', 'région', 'pays'];
+    const encyclopediaKeywords = ['encyclopédie', 'encyclopedia', 'dictionnaire', 'lexique', 'glossaire'];
+
+    const countMatches = (keywords: string[]) => 
+      keywords.filter(kw => lowerText.includes(kw)).length;
+
+    const coloringCount = countMatches(coloringKeywords);
+    const comicCount = countMatches(comicKeywords);
+    const diaryCount = countMatches(diaryKeywords);
+    const documentaryCount = countMatches(documentaryKeywords);
+    const atlasCount = countMatches(atlasKeywords);
+    const encyclopediaCount = countMatches(encyclopediaKeywords);
+
+    const maxCount = Math.max(coloringCount, comicCount, diaryCount, documentaryCount, atlasCount, encyclopediaCount);
+    
+    if (maxCount >= 2) {
+      if (coloringCount === maxCount) {
+        return { type: 'coloring', confidence: coloringCount / coloringKeywords.length, keywords: coloringKeywords.filter(kw => lowerText.includes(kw)) };
+      }
+      if (comicCount === maxCount) {
+        return { type: 'comic', confidence: comicCount / comicKeywords.length, keywords: comicKeywords.filter(kw => lowerText.includes(kw)) };
+      }
+      if (diaryCount === maxCount) {
+        return { type: 'diary', confidence: diaryCount / diaryKeywords.length, keywords: diaryKeywords.filter(kw => lowerText.includes(kw)) };
+      }
+      if (documentaryCount === maxCount) {
+        return { type: 'documentary', confidence: documentaryCount / documentaryKeywords.length, keywords: documentaryKeywords.filter(kw => lowerText.includes(kw)) };
+      }
+      if (atlasCount === maxCount) {
+        return { type: 'atlas', confidence: atlasCount / atlasKeywords.length, keywords: atlasKeywords.filter(kw => lowerText.includes(kw)) };
+      }
+      if (encyclopediaCount === maxCount) {
+        return { type: 'encyclopedia', confidence: encyclopediaCount / encyclopediaKeywords.length, keywords: encyclopediaKeywords.filter(kw => lowerText.includes(kw)) };
+      }
+    }
+
+    return { type: 'standard', confidence: 0, keywords: [] };
+  }, []);
+
+  // Détection mémoïsée basée sur le contenu brut
+  const detectedType = useMemo(() => detectBookType(rawText), [rawText, detectBookType]);
 
   // Extraction DOCX via JSZip
   const extractDocxText = async (arrayBuffer: ArrayBuffer): Promise<string> => {
@@ -639,6 +700,36 @@ Réponds UNIQUEMENT en JSON valide:
                 </div>
               </TabsContent>
             </Tabs>
+
+            {/* Outils KDP pour livres spécialisés détectés */}
+            {detectedType.type !== 'standard' && (
+              <div className="mt-6 space-y-4">
+                <div className="flex items-center gap-2 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg">
+                  <Palette className="w-5 h-5 text-amber-600" />
+                  <div>
+                    <p className="font-medium text-amber-700 dark:text-amber-300">
+                      Livre spécialisé détecté : {detectedType.type === 'coloring' ? 'Livre de Coloriage' : 
+                        detectedType.type === 'comic' ? 'Bande Dessinée' :
+                        detectedType.type === 'diary' ? 'Agenda/Journal' :
+                        detectedType.type === 'documentary' ? 'Documentaire' :
+                        detectedType.type === 'atlas' ? 'Atlas' : 'Encyclopédie'}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Mots-clés trouvés : {detectedType.keywords.join(', ')}
+                    </p>
+                  </div>
+                </div>
+                
+                <KdpQuickTools
+                  productType={detectedType.type as KdpProductType}
+                  title={result.title}
+                  pageCount={result.chapterCount + 4}
+                  targetAudience=""
+                  theme=""
+                  defaultOpen={true}
+                />
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
