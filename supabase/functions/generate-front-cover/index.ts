@@ -93,14 +93,19 @@ serve(async (req) => {
       );
     }
 
+    // Priorité : OpenAI > Lovable AI
+    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) {
-      console.error('LOVABLE_API_KEY not configured');
+
+    if (!OPENAI_API_KEY && !LOVABLE_API_KEY) {
+      console.error('No API key configured (neither OPENAI nor LOVABLE)');
       return new Response(
-        JSON.stringify({ error: 'Configuration manquante - Clé API requise' }),
+        JSON.stringify({ error: 'Aucune clé API configurée (OpenAI ou Lovable)' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    const useOpenAI = !!OPENAI_API_KEY;
 
     const styleDesc = stylePrompts[style] || stylePrompts.professional;
     const genreDesc = genrePrompts[genre] || genrePrompts['non-fiction'];
@@ -240,62 +245,84 @@ VARIATION ${variation}: Make this unique while maintaining the core design princ
 This must look like a REAL publishable book cover that would sell on Amazon.`;
     }
 
-    console.log('Calling Lovable AI for image generation...');
+    let imageUrl: string | undefined;
 
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'google/gemini-3-pro-image-preview',
-        messages: [
-          {
-            role: 'user',
-            content: imagePrompt
-          }
-        ],
-        modalities: ['image', 'text']
-      }),
-    });
+    if (useOpenAI) {
+      // ========== OpenAI DALL·E 3 ==========
+      console.log('Calling OpenAI DALL·E 3 for image generation...');
+      const dalleResponse = await fetch('https://api.openai.com/v1/images/generations', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${OPENAI_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'dall-e-3',
+          prompt: imagePrompt.slice(0, 4000), // DALL·E max 4000 chars
+          n: 1,
+          size: '1024x1792', // portrait book cover ratio
+          quality: 'hd',
+          response_format: 'url',
+        }),
+      });
 
-    if (!response.ok) {
-      if (response.status === 429) {
-        console.error('Rate limit reached');
-        return new Response(
-          JSON.stringify({ error: 'Limite de requêtes atteinte. Veuillez réessayer dans quelques instants.' }),
-          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
+      if (!dalleResponse.ok) {
+        const errText = await dalleResponse.text();
+        console.error('OpenAI DALL·E error:', dalleResponse.status, errText);
+        throw new Error(`OpenAI image error: ${dalleResponse.status}`);
       }
-      if (response.status === 402) {
-        console.error('Credits exhausted');
-        return new Response(
-          JSON.stringify({ error: 'Crédits épuisés. Veuillez ajouter des crédits à votre espace de travail Lovable.' }),
-          { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
+
+      const dalleData = await dalleResponse.json();
+      imageUrl = dalleData?.data?.[0]?.url;
+    } else {
+      // ========== Lovable AI (Gemini image) ==========
+      console.log('Calling Lovable AI for image generation...');
+      const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-3-pro-image-preview',
+          messages: [{ role: 'user', content: imagePrompt }],
+          modalities: ['image', 'text'],
+        }),
+      });
+
+      if (!response.ok) {
+        if (response.status === 429) {
+          console.error('Rate limit reached');
+          return new Response(
+            JSON.stringify({ error: 'Limite de requêtes atteinte. Veuillez réessayer dans quelques instants.' }),
+            { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        if (response.status === 402) {
+          console.error('Credits exhausted');
+          return new Response(
+            JSON.stringify({ error: 'Crédits épuisés. Veuillez ajouter des crédits à votre espace de travail Lovable.' }),
+            { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        const errorText = await response.text();
+        console.error('Lovable AI error:', response.status, errorText);
+        throw new Error(`Erreur API: ${response.status}`);
       }
-      const errorText = await response.text();
-      console.error('Lovable AI error:', response.status, errorText);
-      throw new Error(`Erreur API: ${response.status}`);
+
+      const data = await response.json();
+      imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
     }
 
-    const data = await response.json();
-    const imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-
     if (!imageUrl) {
-      console.error('No image in response:', JSON.stringify(data).slice(0, 500));
+      console.error('No image returned');
       throw new Error('Aucune image générée dans la réponse');
     }
 
-    console.log('Cover generated successfully, type:', coverType);
-    
+    console.log('Cover generated successfully, type:', coverType, 'provider:', useOpenAI ? 'OpenAI' : 'Lovable');
+
     return new Response(
-      JSON.stringify({ 
-        imageUrl,
-        coverType,
-        dimensions: dimensions || null
-      }),
+      JSON.stringify({ imageUrl, coverType, dimensions: dimensions || null }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
