@@ -195,7 +195,7 @@ const EbookTravelGuideGenerator: React.FC<EbookTravelGuideGeneratorProps> = ({ e
     return '';
   };
 
-  // Generate travel sheets
+  // Generate travel sheets - BATCH MODE (5 fiches par appel pour éviter les timeouts)
   const generateTravelSheets = async () => {
     if (!bookTitle.trim()) {
       toast.error('Veuillez entrer un titre pour votre guide');
@@ -207,10 +207,10 @@ const EbookTravelGuideGenerator: React.FC<EbookTravelGuideGeneratorProps> = ({ e
     setSheets([]);
     
     try {
-      const count = parseInt(numberOfSheets);
-      setCurrentStep('Génération des fiches destinations...');
-      setProgress(10);
-
+      const totalCount = parseInt(numberOfSheets);
+      const BATCH_SIZE = 5; // Maximum 5 fiches par appel API pour éviter timeout
+      const batches = Math.ceil(totalCount / BATCH_SIZE);
+      
       // Analyse du titre pour cohérence
       const countryFromTitle = analyzeTitle(bookTitle);
       const finalCountry = countryFromTitle || (selectedCountry !== 'tour-du-monde' ? selectedCountry : '');
@@ -219,25 +219,46 @@ const EbookTravelGuideGenerator: React.FC<EbookTravelGuideGeneratorProps> = ({ e
         ? `OBLIGATOIRE: TOUTES les destinations doivent être EXCLUSIVEMENT dans ${finalCountry}. NE PAS inclure de destinations d'autres pays.`
         : 'Variété des 5 continents avec des destinations emblématiques de différents pays.';
 
-      const { data, error } = await supabase.functions.invoke('generate-content', {
-        body: {
-          type: 'travel-sheets',
-          prompt: `Tu es un expert en voyages internationaux et guide touristique professionnel.
+      let allDestinations: any[] = [];
+      const alreadyGenerated: string[] = []; // Pour éviter les doublons
+
+      for (let batch = 0; batch < batches; batch++) {
+        const remaining = totalCount - allDestinations.length;
+        const batchCount = Math.min(BATCH_SIZE, remaining);
+        
+        if (batchCount <= 0) break;
+
+        const progressPercent = Math.round((batch / batches) * 35) + 5;
+        setProgress(progressPercent);
+        setCurrentStep(`Génération des fiches ${allDestinations.length + 1} à ${allDestinations.length + batchCount} sur ${totalCount}...`);
+
+        // Instruction anti-doublons
+        const excludeInstruction = alreadyGenerated.length > 0 
+          ? `\n\n⚠️ NE PAS RÉPÉTER ces destinations déjà générées: ${alreadyGenerated.join(', ')}`
+          : '';
+
+        try {
+          const { data, error } = await supabase.functions.invoke('generate-content', {
+            body: {
+              type: 'travel-sheets',
+              prompt: `Tu es un expert en voyages internationaux et guide touristique professionnel.
 
 TITRE DU GUIDE: "${bookTitle}"
 ${customInstructions ? `Instructions spéciales: ${customInstructions}` : ''}
 
 ⚠️ RÈGLE ABSOLUE - COHÉRENCE AVEC LE TITRE:
 ${countryInstruction}
-${finalCountry ? `Les ${count} destinations DOIVENT toutes être en ${finalCountry}. Aucune exception.` : ''}
+${finalCountry ? `Les destinations DOIVENT toutes être en ${finalCountry}. Aucune exception.` : ''}
+${excludeInstruction}
 
-Génère exactement ${count} FICHES DESTINATIONS COMPLÈTES (minimum 800 mots chacune).
+Génère exactement ${batchCount} FICHES DESTINATIONS COMPLÈTES (minimum 800 mots chacune).
+Ce sont les fiches ${allDestinations.length + 1} à ${allDestinations.length + batchCount} d'un guide de ${totalCount} destinations.
 
 IMPORTANT: Chaque fiche doit être TRÈS DÉTAILLÉE avec au moins 800 mots de contenu riche.
 Retourne UNIQUEMENT du JSON valide, sans texte avant ni après.
 
 Pour CHAQUE destination, fournis OBLIGATOIREMENT:
-- destinationName: Nom de la ville/région/lieu
+- destinationName: Nom de la ville/région/lieu (UNIQUE, pas de doublon)
 - country: "${finalCountry || 'Pays d\'origine'}"
 - region: La région spécifique
 - population: Population approximative de la ville/région
@@ -261,54 +282,49 @@ Pour CHAQUE destination, fournis OBLIGATOIREMENT:
 
 Format JSON strict:
 {
-  "destinations": [
-    {
-      "destinationName": "Paris",
-      "country": "France",
-      "region": "Île-de-France",
-      "population": "2,1 millions (12 millions avec l'agglomération)",
-      "language": "Français",
-      "currency": "Euro (€)",
-      "climate": "Océanique tempéré",
-      "bestSeason": "Avril à Juin et Septembre à Octobre",
-      "description": "La Ville Lumière enchante par son architecture haussmannienne et ses monuments emblématiques...",
-      "history": "Fondée il y a plus de 2000 ans, Paris a été le cœur de la monarchie française...",
-      "mainDish": "Bœuf Bourguignon",
-      "dishDescription": "Ce ragoût traditionnel marie des morceaux de bœuf tendres...",
-      "localSpecialties": ["Croissant au beurre", "Crêpes sucrées", "Macarons de Ladurée"],
-      "accommodations": {"budget": "Generator Paris - Auberge moderne et design...", "midRange": "Hôtel Le Marais - Charme parisien...", "luxury": "Le Bristol Paris - Palace 5 étoiles..."},
-      "whereToStay": "Le Marais offre une ambiance authentique... Saint-Germain-des-Prés pour les amateurs d'art...",
-      "mustSee": ["Tour Eiffel - Le symbole de Paris...", "Musée du Louvre - Le plus grand musée du monde...", "..."],
-      "hiddenGems": ["Le Marché aux Puces de Saint-Ouen", "La Coulée Verte René-Dumont"],
-      "activities": ["Croisière sur la Seine au coucher du soleil", "Cours de pâtisserie française", "..."],
-      "travelTips": "Privilégiez le métro pour vos déplacements...",
-      "transportation": "Le métro parisien est l'un des plus denses au monde...",
-      "faq": [
-        {"question": "Quelle est la meilleure période pour visiter Paris?", "answer": "Le printemps (avril-juin) et l'automne (septembre-octobre)..."},
-        {"question": "Comment éviter les files d'attente aux monuments?", "answer": "Achetez vos billets en ligne..."},
-        {"question": "Le Paris Museum Pass vaut-il le coup?", "answer": "Oui, si vous prévoyez de visiter plus de 3 musées..."}
-      ]
-    }
-  ]
+  "destinations": [...]
 }`
+            }
+          });
+
+          if (error) {
+            console.error(`Erreur batch ${batch + 1}:`, error);
+            toast.warning(`Batch ${batch + 1} échoué, utilisation de destinations de secours`);
+            const fallback = generateFallbackDestinations(batchCount, finalCountry);
+            allDestinations = [...allDestinations, ...fallback];
+          } else {
+            const content = data?.content || data?.result || '';
+            const parsed = cleanAndParseJSON(content);
+            const destinations = parsed?.destinations || [];
+            
+            if (destinations.length > 0) {
+              allDestinations = [...allDestinations, ...destinations];
+              // Mémoriser les noms pour éviter les doublons
+              destinations.forEach((d: any) => {
+                if (d.destinationName) alreadyGenerated.push(d.destinationName);
+              });
+              toast.success(`Batch ${batch + 1}/${batches} : ${destinations.length} fiches générées`);
+            } else {
+              const fallback = generateFallbackDestinations(batchCount, finalCountry);
+              allDestinations = [...allDestinations, ...fallback];
+              toast.warning(`Batch ${batch + 1} vide, ${fallback.length} fiches de secours ajoutées`);
+            }
+          }
+        } catch (batchError) {
+          console.error(`Erreur batch ${batch + 1}:`, batchError);
+          const fallback = generateFallbackDestinations(batchCount, finalCountry);
+          allDestinations = [...allDestinations, ...fallback];
+          toast.warning(`Erreur batch ${batch + 1}, ${fallback.length} fiches de secours`);
         }
-      });
 
-      if (error) throw error;
-
-      const content = data?.content || data?.result || '';
-      const parsed = cleanAndParseJSON(content);
-      
-      let destinations = parsed?.destinations || [];
-      
-      if (destinations.length < count) {
-        const fallbackDestinations = generateFallbackDestinations(count - destinations.length, finalCountry);
-        destinations = [...destinations, ...fallbackDestinations];
-        toast.warning(`${fallbackDestinations.length} fiches de secours ajoutées`);
+        // Petite pause entre les batches pour éviter le rate limiting
+        if (batch < batches - 1) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
       }
 
       // Convert to sheets with flags
-      const generatedSheets: TravelSheet[] = destinations.slice(0, count).map((dest: any, index: number) => ({
+      const generatedSheets: TravelSheet[] = allDestinations.slice(0, totalCount).map((dest: any, index: number) => ({
         id: index + 1,
         destinationName: dest.destinationName || `Destination ${index + 1}`,
         country: dest.country || finalCountry || 'International',
@@ -347,7 +363,7 @@ Format JSON strict:
       setProgress(100);
       setCurrentStep('Guide de voyage généré !');
       setActiveTab('sheets');
-      toast.success(`${generatedSheets.length} fiches destinations générées !`);
+      toast.success(`🎉 ${generatedSheets.length} fiches destinations générées !`);
       
     } catch (error) {
       console.error('Erreur génération:', error);
