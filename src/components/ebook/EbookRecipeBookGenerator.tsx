@@ -34,6 +34,12 @@ const fetchPexelsFoodImage = async (query: string): Promise<string | null> => {
   }
 };
 
+// Compteur de mots pour une fiche recette
+const countSheetWords = (sheet: { description: string; history: string; ingredients: string[]; steps: string[]; chefTips: string; variations: string; servingSuggestion: string }): number => {
+  const parts = [sheet.description || '', sheet.history || '', ...(sheet.ingredients || []), ...(sheet.steps || []), sheet.chefTips || '', sheet.variations || '', sheet.servingSuggestion || ''];
+  return parts.join(' ').split(/\s+/).filter(Boolean).length;
+};
+
 const normalizeDishName = (name: string) =>
   name
     .toLowerCase()
@@ -315,7 +321,7 @@ const EbookRecipeBookGenerator: React.FC<EbookRecipeBookGeneratorProps> = ({ ebo
       }
 
       // Determine the final country context
-      let finalCountry = countryFromTitle || (selectedCountry !== 'tour-du-monde' ? selectedCountry : '');
+      let finalCountry = selectedCountry !== 'tour-du-monde' ? selectedCountry : countryFromTitle || '';
 
       // Historique persistant (survivant à un refresh)
       const historyScopeKey = `${normalizeDishName(bookTitle)}|${normalizeDishName(finalCountry || 'global')}`;
@@ -599,23 +605,9 @@ Pure food photography only, high resolution, cookbook quality.`,
         if (!error && data?.imageUrl) {
           updatedSheets[i] = { ...updatedSheets[i], imageUrl: data.imageUrl };
           setSheets([...updatedSheets]);
-        } else {
-          // Fallback: si crédits épuisés (402) ou pas d'URL, on essaie une image stock
-          const fallbackUrl = await fetchPexelsFoodImage(updatedSheets[i].dishName);
-          if (fallbackUrl) {
-            updatedSheets[i] = { ...updatedSheets[i], imageUrl: fallbackUrl };
-            setSheets([...updatedSheets]);
-          }
         }
       } catch (err) {
         console.error(`Erreur image ${i + 1}:`, err);
-
-        // Fallback réseau/IA: Pexels
-        const fallbackUrl = await fetchPexelsFoodImage(updatedSheets[i].dishName);
-        if (fallbackUrl) {
-          updatedSheets[i] = { ...updatedSheets[i], imageUrl: fallbackUrl };
-          setSheets([...updatedSheets]);
-        }
       }
     }
     
@@ -653,14 +645,6 @@ Pure food photography only.`,
       if (!error && data?.imageUrl) {
         setSheets(prev => prev.map(s => s.id === sheetId ? { ...s, imageUrl: data.imageUrl, isGeneratingImage: false } : s));
         toast.success('Image régénérée !');
-        return;
-      }
-
-      // Fallback stock
-      const fallbackUrl = await fetchPexelsFoodImage(sheet.dishName);
-      if (fallbackUrl) {
-        setSheets(prev => prev.map(s => s.id === sheetId ? { ...s, imageUrl: fallbackUrl, isGeneratingImage: false } : s));
-        toast.warning('Crédits images épuisés: image stock utilisée.');
         return;
       }
 
@@ -1293,6 +1277,17 @@ ${sheet.servingSuggestion}`;
                             <Badge variant="outline" className="bg-orange-50">{sheet.country}</Badge>
                             <Badge variant="secondary">{sheet.difficulty}</Badge>
                             <Badge variant="outline" className="text-xs">{sheet.portions}</Badge>
+                            {(() => {
+                              const wc = countSheetWords(sheet);
+                              return (
+                                <Badge 
+                                  variant={wc >= 500 ? 'default' : 'destructive'} 
+                                  className={wc >= 500 ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : ''}
+                                >
+                                  {wc} mots {wc < 500 && '⚠️'}
+                                </Badge>
+                              );
+                            })()}
                           </div>
                           <h3 className="text-2xl font-bold text-orange-800 dark:text-orange-400">
                             {sheet.dishName}
