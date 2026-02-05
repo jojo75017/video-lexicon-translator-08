@@ -17,7 +17,7 @@ import jsPDF from 'jspdf';
 
 const RECIPE_HISTORY_STORAGE_KEY = 'recipe_generator:last_dish_names:v1';
 
-// Fallback images (quand la génération IA d'images renvoie 402 “crédits épuisés”)
+// Fallback images (historique). NOTE: le projet privilégie la génération IA; pas de fallback stock côté UI.
 const PEXELS_API_KEY = '563492ad6f91700001000001b3c9c2fb1df54302850f8185e752c274';
 const fetchPexelsFoodImage = async (query: string): Promise<string | null> => {
   try {
@@ -262,6 +262,11 @@ const EbookRecipeBookGenerator: React.FC<EbookRecipeBookGeneratorProps> = ({ ebo
     }
   };
 
+  const getInvokeStatus = (error: unknown): number | undefined => {
+    const anyErr = error as any;
+    return anyErr?.context?.status ?? anyErr?.status;
+  };
+
   // Generate recipe sheets
   const generateRecipeSheets = async () => {
     if (!bookTitle.trim()) {
@@ -474,16 +479,15 @@ Format JSON strict:
         portions: recipe.portions || '4 personnes',
       }));
 
+      // Afficher les fiches immédiatement (ne pas bloquer l'UI sur la génération d'images)
       setSheets(generatedSheets);
-      setProgress(40);
-      
-      // Generate images
-      await generateSheetImages(generatedSheets);
-      
-      setProgress(100);
-      setCurrentStep('Livre de recettes généré !');
       setActiveTab('sheets');
+      setProgress(60);
+      setCurrentStep('Fiches générées — génération des images en arrière-plan…');
       toast.success(`${generatedSheets.length} fiches recettes générées !`);
+
+      // Génération d'images en tâche de fond (peut échouer si crédits épuisés)
+      void generateSheetImages(generatedSheets);
       
     } catch (error) {
       console.error('Erreur génération:', error);
@@ -602,12 +606,33 @@ Pure food photography only, high resolution, cookbook quality.`,
           }
         });
 
+        if (error) {
+          const status = getInvokeStatus(error);
+          if (status === 402) {
+            toast.error("Crédits images épuisés — images non générées.");
+            break;
+          }
+          if (status === 429) {
+            toast.error('Trop de requêtes image — réessayez dans quelques instants.');
+            break;
+          }
+        }
+
         if (!error && data?.imageUrl) {
           updatedSheets[i] = { ...updatedSheets[i], imageUrl: data.imageUrl };
           setSheets([...updatedSheets]);
         }
       } catch (err) {
         console.error(`Erreur image ${i + 1}:`, err);
+        const status = getInvokeStatus(err);
+        if (status === 402) {
+          toast.error("Crédits images épuisés — images non générées.");
+          break;
+        }
+        if (status === 429) {
+          toast.error('Trop de requêtes image — réessayez dans quelques instants.');
+          break;
+        }
       }
     }
     
@@ -641,6 +666,20 @@ Pure food photography only.`,
           showTitle: false,
         }
       });
+
+      if (error) {
+        const status = getInvokeStatus(error);
+        if (status === 402) {
+          toast.error("Crédits images épuisés — impossible de régénérer l'image.");
+          setSheets(prev => prev.map(s => s.id === sheetId ? { ...s, isGeneratingImage: false } : s));
+          return;
+        }
+        if (status === 429) {
+          toast.error("Trop de requêtes image — réessayez dans quelques instants.");
+          setSheets(prev => prev.map(s => s.id === sheetId ? { ...s, isGeneratingImage: false } : s));
+          return;
+        }
+      }
 
       if (!error && data?.imageUrl) {
         setSheets(prev => prev.map(s => s.id === sheetId ? { ...s, imageUrl: data.imageUrl, isGeneratingImage: false } : s));
@@ -683,7 +722,12 @@ ${authorName ? `Author: ${authorName}` : ''}`,
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        const status = getInvokeStatus(error);
+        if (status === 402) throw new Error('Crédits images épuisés');
+        if (status === 429) throw new Error('Trop de requêtes');
+        throw error;
+      }
 
       if (data?.imageUrl) {
         setCoverImageUrl(data.imageUrl);
@@ -691,7 +735,8 @@ ${authorName ? `Author: ${authorName}` : ''}`,
       }
     } catch (error) {
       console.error('Erreur couverture:', error);
-      toast.error('Erreur lors de la génération de la couverture');
+      const msg = error instanceof Error ? error.message : 'Erreur lors de la génération de la couverture';
+      toast.error(msg);
     } finally {
       setIsGeneratingCover(false);
     }
@@ -1282,7 +1327,6 @@ ${sheet.servingSuggestion}`;
                               return (
                                 <Badge 
                                   variant={wc >= 500 ? 'default' : 'destructive'} 
-                                  className={wc >= 500 ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : ''}
                                 >
                                   {wc} mots {wc < 500 && '⚠️'}
                                 </Badge>
