@@ -72,8 +72,9 @@ const FISH_CATEGORIES = [
 const EbookAquariumGenerator: React.FC<EbookAquariumGeneratorProps> = ({ ebookTitle = '' }) => {
   const [bookTitle, setBookTitle] = useState(ebookTitle || 'Guide Complet des Poissons d\'Aquarium');
   const [authorName, setAuthorName] = useState('');
-  const [category, setCategory] = useState('tropical');
-  const [numberOfSheets, setNumberOfSheets] = useState('40');
+  // Defaults optimized for quick testing (user can increase later)
+  const [category, setCategory] = useState('mixed');
+  const [numberOfSheets, setNumberOfSheets] = useState('5');
   const [customInstructions, setCustomInstructions] = useState('');
   
   const [sheets, setSheets] = useState<FishSheet[]>([]);
@@ -550,6 +551,7 @@ Source: Guide Aquariophilie 2026 | ${authorName || 'Expert Aquariophile'}
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="5">5 fiches (test rapide)</SelectItem>
                       <SelectItem value="20">20 fiches (~60 pages)</SelectItem>
                       <SelectItem value="40">40 fiches (~120 pages)</SelectItem>
                       <SelectItem value="60">60 fiches (~180 pages)</SelectItem>
