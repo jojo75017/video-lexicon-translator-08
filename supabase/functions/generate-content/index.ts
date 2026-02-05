@@ -1498,9 +1498,10 @@ Réponds avec du texte formaté de manière professionnelle, bien structuré ave
 
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 180000); // 3 min timeout
+        // Timeout: 55 secondes pour rester sous la limite Supabase de 60s
+        const timeoutId = setTimeout(() => controller.abort(), 55000);
 
-        console.log('Calling OpenAI for travel-sheets with very high token limit...');
+        console.log('Calling OpenAI for travel-sheets with gpt-4o and maximum tokens...');
         
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',
@@ -1509,7 +1510,7 @@ Réponds avec du texte formaté de manière professionnelle, bien structuré ave
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            model: 'gpt-4o-mini',
+            model: 'gpt-4o', // Modèle plus puissant pour gérer le contexte long
             messages: [
               { 
                 role: 'system', 
@@ -1538,7 +1539,7 @@ Réponds UNIQUEMENT en JSON valide sans markdown ni backticks.`
               },
               { role: 'user', content: prompt }
             ],
-            max_tokens: 12000,
+            max_tokens: 16000, // Maximum tokens pour gpt-4o
             temperature: 0.85,
           }),
           signal: controller.signal,
