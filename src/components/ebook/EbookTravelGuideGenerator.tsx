@@ -208,7 +208,7 @@ const EbookTravelGuideGenerator: React.FC<EbookTravelGuideGeneratorProps> = ({ e
     
     try {
       const totalCount = parseInt(numberOfSheets);
-      const BATCH_SIZE = 3; // 3 fiches par batch pour rester sous le timeout Supabase
+      const BATCH_SIZE = 2; // 2 fiches par batch pour éviter absolument les timeouts
       const batches = Math.ceil(totalCount / BATCH_SIZE);
       
       // Analyse du titre pour cohérence
@@ -595,7 +595,7 @@ ${sheet.faq.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}
     toast.success('Fiche copiée !');
   };
 
-  // Export to PDF
+  // Export to PDF - Fixed for emoji support and cross-origin images
   const exportToPDF = async () => {
     if (sheets.length === 0) {
       toast.error('Générez d\'abord des fiches');
@@ -603,6 +603,8 @@ ${sheet.faq.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}
     }
 
     setIsExporting(true);
+    toast.info('Création du PDF en cours...');
+    
     try {
       const pdf = new jsPDF('p', 'mm', 'a4');
       const pageWidth = 210;
@@ -610,18 +612,38 @@ ${sheet.faq.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}
       const margin = 15;
       const contentWidth = pageWidth - (margin * 2);
 
+      // Helper: Convert image URL to base64 for cross-origin support
+      const loadImageAsBase64 = (url: string): Promise<string | null> => {
+        return new Promise((resolve) => {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = () => {
+            try {
+              const canvas = document.createElement('canvas');
+              canvas.width = img.width;
+              canvas.height = img.height;
+              const ctx = canvas.getContext('2d');
+              if (ctx) {
+                ctx.drawImage(img, 0, 0);
+                resolve(canvas.toDataURL('image/jpeg', 0.85));
+              } else {
+                resolve(null);
+              }
+            } catch {
+              resolve(null);
+            }
+          };
+          img.onerror = () => resolve(null);
+          img.src = url;
+        });
+      };
+
       // Cover page
       if (coverImageUrl) {
-        try {
-          const coverImg = new Image();
-          coverImg.crossOrigin = 'anonymous';
-          await new Promise((resolve, reject) => {
-            coverImg.onload = resolve;
-            coverImg.onerror = reject;
-            coverImg.src = coverImageUrl;
-          });
-          pdf.addImage(coverImg, 'JPEG', 0, 0, pageWidth, pageHeight);
-        } catch {
+        const coverBase64 = await loadImageAsBase64(coverImageUrl);
+        if (coverBase64) {
+          pdf.addImage(coverBase64, 'JPEG', 0, 0, pageWidth, pageHeight);
+        } else {
           // Fallback cover
           pdf.setFillColor(20, 60, 100);
           pdf.rect(0, 0, pageWidth, pageHeight, 'F');
@@ -639,24 +661,31 @@ ${sheet.faq.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}
         pdf.setTextColor(255, 255, 255);
         pdf.setFontSize(28);
         pdf.text(bookTitle, pageWidth / 2, pageHeight / 2, { align: 'center' });
+        if (authorName) {
+          pdf.setFontSize(16);
+          pdf.text(authorName, pageWidth / 2, pageHeight / 2 + 20, { align: 'center' });
+        }
       }
 
       // Generate each sheet as a page
-      for (const sheet of sheets) {
+      for (let sheetIdx = 0; sheetIdx < sheets.length; sheetIdx++) {
+        const sheet = sheets[sheetIdx];
         pdf.addPage();
         let yPos = margin;
 
-        // Header with flag and name
-        pdf.setFillColor(245, 245, 245);
+        // Header with flag and name (using text instead of emojis)
+        pdf.setFillColor(235, 245, 255);
         pdf.rect(0, 0, pageWidth, 45, 'F');
         
-        pdf.setFontSize(24);
-        pdf.setTextColor(30, 30, 30);
-        pdf.text(`${sheet.countryFlag} ${sheet.destinationName}`, margin, 25);
+        pdf.setFontSize(22);
+        pdf.setTextColor(30, 60, 100);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(sheet.destinationName.toUpperCase(), margin, 22);
         
-        pdf.setFontSize(12);
-        pdf.setTextColor(100, 100, 100);
-        pdf.text(`${sheet.country} • ${sheet.region}`, margin, 38);
+        pdf.setFontSize(11);
+        pdf.setTextColor(80, 80, 80);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(`${sheet.country} - ${sheet.region}`, margin, 35);
         
         yPos = 55;
         
@@ -667,126 +696,187 @@ ${sheet.faq.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}
 
         // Left column - Image
         if (sheet.imageUrl) {
-          try {
-            const img = new Image();
-            img.crossOrigin = 'anonymous';
-            await new Promise((resolve, reject) => {
-              img.onload = resolve;
-              img.onerror = reject;
-              img.src = sheet.imageUrl!;
-            });
-            pdf.addImage(img, 'JPEG', leftCol, yPos, colWidth, colWidth * 0.7);
-            yPos += colWidth * 0.7 + 5;
-          } catch {
-            // Skip image if failed
+          const imgBase64 = await loadImageAsBase64(sheet.imageUrl);
+          if (imgBase64) {
+            pdf.addImage(imgBase64, 'JPEG', leftCol, yPos, colWidth, colWidth * 0.65);
+            yPos += colWidth * 0.65 + 5;
           }
         }
 
-        // Info box
+        // Info box (without emojis)
         const infoBoxY = yPos;
-        pdf.setFillColor(240, 248, 255);
-        pdf.roundedRect(leftCol, infoBoxY, colWidth, 45, 3, 3, 'F');
+        pdf.setFillColor(245, 250, 255);
+        pdf.roundedRect(leftCol, infoBoxY, colWidth, 50, 3, 3, 'F');
+        pdf.setDrawColor(200, 220, 240);
+        pdf.roundedRect(leftCol, infoBoxY, colWidth, 50, 3, 3, 'S');
         
+        pdf.setFontSize(9);
+        pdf.setTextColor(50, 50, 50);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('INFOS PRATIQUES', leftCol + 5, infoBoxY + 8);
+        pdf.setFont('helvetica', 'normal');
         pdf.setFontSize(8);
-        pdf.setTextColor(60, 60, 60);
-        pdf.text(`👥 ${sheet.population}`, leftCol + 5, infoBoxY + 10);
-        pdf.text(`🗣️ ${sheet.language}`, leftCol + 5, infoBoxY + 18);
-        pdf.text(`💰 ${sheet.currency}`, leftCol + 5, infoBoxY + 26);
-        pdf.text(`☀️ ${sheet.bestSeason}`, leftCol + 5, infoBoxY + 34);
+        pdf.text(`Population: ${sheet.population}`, leftCol + 5, infoBoxY + 16);
+        pdf.text(`Langue: ${sheet.language}`, leftCol + 5, infoBoxY + 23);
+        pdf.text(`Monnaie: ${sheet.currency}`, leftCol + 5, infoBoxY + 30);
+        pdf.text(`Climat: ${sheet.climate}`, leftCol + 5, infoBoxY + 37);
+        pdf.text(`Meilleure saison: ${sheet.bestSeason}`, leftCol + 5, infoBoxY + 44);
+
+        // Transport & Tips box below
+        const tipsBoxY = infoBoxY + 55;
+        pdf.setFillColor(255, 252, 245);
+        pdf.roundedRect(leftCol, tipsBoxY, colWidth, 45, 3, 3, 'F');
+        pdf.setDrawColor(230, 220, 200);
+        pdf.roundedRect(leftCol, tipsBoxY, colWidth, 45, 3, 3, 'S');
+        
+        pdf.setFontSize(9);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('CONSEILS PRATIQUES', leftCol + 5, tipsBoxY + 8);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(7);
+        const tipsLines = pdf.splitTextToSize(sheet.travelTips, colWidth - 10);
+        pdf.text(tipsLines.slice(0, 4), leftCol + 5, tipsBoxY + 16);
+        
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Transport:', leftCol + 5, tipsBoxY + 35);
+        pdf.setFont('helvetica', 'normal');
+        const transLines = pdf.splitTextToSize(sheet.transportation, colWidth - 10);
+        pdf.text(transLines.slice(0, 2), leftCol + 25, tipsBoxY + 35);
 
         // Right column - Content
         let rightY = 55;
         
         // Description
         pdf.setFontSize(10);
-        pdf.setTextColor(30, 30, 30);
+        pdf.setTextColor(30, 60, 100);
         pdf.setFont('helvetica', 'bold');
-        pdf.text('À DÉCOUVRIR', rightCol, rightY);
-        rightY += 5;
+        pdf.text('A DECOUVRIR', rightCol, rightY);
+        rightY += 6;
         
         pdf.setFont('helvetica', 'normal');
+        pdf.setTextColor(40, 40, 40);
         pdf.setFontSize(8);
         const descLines = pdf.splitTextToSize(sheet.description, colWidth);
-        pdf.text(descLines, rightCol, rightY);
-        rightY += descLines.length * 4 + 5;
+        pdf.text(descLines.slice(0, 6), rightCol, rightY);
+        rightY += Math.min(descLines.length, 6) * 4 + 5;
 
-        // Main dish
-        pdf.setFontSize(10);
-        pdf.setFont('helvetica', 'bold');
-        pdf.text(`🍽️ ${sheet.mainDish}`, rightCol, rightY);
-        rightY += 5;
-        
-        pdf.setFont('helvetica', 'normal');
-        pdf.setFontSize(8);
-        const dishLines = pdf.splitTextToSize(sheet.dishDescription, colWidth);
-        pdf.text(dishLines, rightCol, rightY);
-        rightY += dishLines.length * 4 + 5;
-
-        // Must see
-        pdf.setFontSize(10);
-        pdf.setFont('helvetica', 'bold');
-        pdf.text('🏛️ INCONTOURNABLES', rightCol, rightY);
-        rightY += 5;
-        
-        pdf.setFont('helvetica', 'normal');
-        pdf.setFontSize(8);
-        sheet.mustSee.slice(0, 4).forEach(m => {
-          pdf.text(`• ${m.substring(0, 45)}${m.length > 45 ? '...' : ''}`, rightCol, rightY);
-          rightY += 4;
-        });
-        rightY += 3;
-
-        // Accommodations
-        if (rightY < 200) {
+        // History
+        if (sheet.history && rightY < 110) {
           pdf.setFontSize(10);
           pdf.setFont('helvetica', 'bold');
-          pdf.text('🏨 HÉBERGEMENT', rightCol, rightY);
-          rightY += 5;
+          pdf.setTextColor(30, 60, 100);
+          pdf.text('HISTOIRE & CULTURE', rightCol, rightY);
+          rightY += 6;
           
           pdf.setFont('helvetica', 'normal');
+          pdf.setTextColor(40, 40, 40);
           pdf.setFontSize(8);
-          pdf.text(`Budget: ${sheet.accommodations.budget.substring(0, 40)}...`, rightCol, rightY);
+          const histLines = pdf.splitTextToSize(sheet.history, colWidth);
+          pdf.text(histLines.slice(0, 4), rightCol, rightY);
+          rightY += Math.min(histLines.length, 4) * 4 + 5;
+        }
+
+        // Main dish
+        if (rightY < 145) {
+          pdf.setFontSize(10);
+          pdf.setFont('helvetica', 'bold');
+          pdf.setTextColor(30, 60, 100);
+          pdf.text(`GASTRONOMIE: ${sheet.mainDish}`, rightCol, rightY);
+          rightY += 6;
+          
+          pdf.setFont('helvetica', 'normal');
+          pdf.setTextColor(40, 40, 40);
+          pdf.setFontSize(8);
+          const dishLines = pdf.splitTextToSize(sheet.dishDescription, colWidth);
+          pdf.text(dishLines.slice(0, 4), rightCol, rightY);
+          rightY += Math.min(dishLines.length, 4) * 4 + 5;
+        }
+
+        // Must see
+        if (rightY < 180) {
+          pdf.setFontSize(10);
+          pdf.setFont('helvetica', 'bold');
+          pdf.setTextColor(30, 60, 100);
+          pdf.text('INCONTOURNABLES', rightCol, rightY);
+          rightY += 6;
+          
+          pdf.setFont('helvetica', 'normal');
+          pdf.setTextColor(40, 40, 40);
+          pdf.setFontSize(8);
+          sheet.mustSee.slice(0, 5).forEach(m => {
+            const truncated = m.length > 55 ? m.substring(0, 52) + '...' : m;
+            pdf.text(`- ${truncated}`, rightCol, rightY);
+            rightY += 4;
+          });
+          rightY += 3;
+        }
+
+        // Accommodations
+        if (rightY < 210) {
+          pdf.setFontSize(10);
+          pdf.setFont('helvetica', 'bold');
+          pdf.setTextColor(30, 60, 100);
+          pdf.text('HEBERGEMENT', rightCol, rightY);
+          rightY += 6;
+          
+          pdf.setFont('helvetica', 'normal');
+          pdf.setTextColor(40, 40, 40);
+          pdf.setFontSize(8);
+          const budgetText = sheet.accommodations.budget.length > 50 
+            ? sheet.accommodations.budget.substring(0, 47) + '...' 
+            : sheet.accommodations.budget;
+          const midText = sheet.accommodations.midRange.length > 50 
+            ? sheet.accommodations.midRange.substring(0, 47) + '...' 
+            : sheet.accommodations.midRange;
+          const luxText = sheet.accommodations.luxury.length > 50 
+            ? sheet.accommodations.luxury.substring(0, 47) + '...' 
+            : sheet.accommodations.luxury;
+          pdf.text(`Budget: ${budgetText}`, rightCol, rightY);
           rightY += 4;
-          pdf.text(`Milieu: ${sheet.accommodations.midRange.substring(0, 40)}...`, rightCol, rightY);
+          pdf.text(`Milieu de gamme: ${midText}`, rightCol, rightY);
           rightY += 4;
-          pdf.text(`Luxe: ${sheet.accommodations.luxury.substring(0, 40)}...`, rightCol, rightY);
+          pdf.text(`Luxe: ${luxText}`, rightCol, rightY);
           rightY += 8;
         }
 
         // FAQ at bottom
-        const faqY = 230;
-        pdf.setFillColor(255, 250, 240);
-        pdf.roundedRect(margin, faqY, contentWidth, 55, 3, 3, 'F');
+        const faqY = 238;
+        pdf.setFillColor(250, 252, 255);
+        pdf.roundedRect(margin, faqY, contentWidth, 48, 3, 3, 'F');
+        pdf.setDrawColor(200, 215, 230);
+        pdf.roundedRect(margin, faqY, contentWidth, 48, 3, 3, 'S');
         
         pdf.setFontSize(10);
         pdf.setFont('helvetica', 'bold');
-        pdf.setTextColor(30, 30, 30);
-        pdf.text('❓ FAQ', margin + 5, faqY + 8);
+        pdf.setTextColor(30, 60, 100);
+        pdf.text('QUESTIONS FREQUENTES', margin + 5, faqY + 8);
         
         let faqTextY = faqY + 15;
-        pdf.setFont('helvetica', 'normal');
-        pdf.setFontSize(8);
+        pdf.setTextColor(40, 40, 40);
         
-        sheet.faq.forEach((f, i) => {
-          if (faqTextY < faqY + 50) {
+        sheet.faq.slice(0, 3).forEach((f) => {
+          if (faqTextY < faqY + 45) {
             pdf.setFont('helvetica', 'bold');
-            pdf.text(`Q: ${f.question.substring(0, 80)}`, margin + 5, faqTextY);
+            pdf.setFontSize(8);
+            const question = f.question.length > 90 ? f.question.substring(0, 87) + '...' : f.question;
+            pdf.text(`Q: ${question}`, margin + 5, faqTextY);
             faqTextY += 4;
             pdf.setFont('helvetica', 'normal');
+            pdf.setFontSize(7);
             const answerLines = pdf.splitTextToSize(`R: ${f.answer}`, contentWidth - 10);
             pdf.text(answerLines.slice(0, 2), margin + 5, faqTextY);
-            faqTextY += 10;
+            faqTextY += 9;
           }
         });
 
         // Page number
-        pdf.setFontSize(8);
-        pdf.setTextColor(150, 150, 150);
-        pdf.text(`${sheet.id}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+        pdf.setFontSize(9);
+        pdf.setTextColor(120, 120, 120);
+        pdf.text(`- ${sheetIdx + 1} -`, pageWidth / 2, pageHeight - 8, { align: 'center' });
       }
 
       pdf.save(`${bookTitle.replace(/[^a-zA-Z0-9]/g, '_')}_guide_voyage.pdf`);
-      toast.success('PDF exporté avec succès !');
+      toast.success('PDF exporte avec succes !');
     } catch (error) {
       console.error('Erreur export PDF:', error);
       toast.error('Erreur lors de l\'export PDF');

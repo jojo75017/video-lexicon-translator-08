@@ -1498,10 +1498,10 @@ Réponds avec du texte formaté de manière professionnelle, bien structuré ave
 
       try {
         const controller = new AbortController();
-        // Timeout: 50 secondes pour rester bien sous la limite Supabase de 60s
-        const timeoutId = setTimeout(() => controller.abort(), 50000);
+        // Timeout: 45 secondes pour être safe sous la limite Supabase
+        const timeoutId = setTimeout(() => controller.abort(), 45000);
 
-        console.log('Calling OpenAI for travel-sheets with gpt-4o-mini (fast)...');
+        console.log('Calling OpenAI for travel-sheets with gpt-4o-mini (ultra-fast mode)...');
         
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',
@@ -1510,26 +1510,41 @@ Réponds avec du texte formaté de manière professionnelle, bien structuré ave
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            model: 'gpt-4o-mini', // Modèle rapide pour éviter timeout
+            model: 'gpt-4o-mini',
             messages: [
               { 
                 role: 'system', 
-                content: `Tu es un guide touristique professionnel. Génère des fiches destinations COMPLÈTES.
+                content: `Tu es un guide touristique. Génère des fiches destinations en JSON.
 
-RÈGLES:
-- Chaque fiche: minimum 600 mots de contenu riche
-- "description": 4-5 phrases immersives sur l'ambiance
-- "history": 3-4 phrases sur le patrimoine
-- "mustSee": 5-6 lieux avec descriptions courtes
-- "whereToStay": 3 phrases sur les quartiers
-- "faq": 3 questions-réponses détaillées
-
-Réponds UNIQUEMENT en JSON valide sans markdown.`
+FORMAT JSON STRICT (sans markdown):
+{"destinations": [{
+  "destinationName": "Nom",
+  "country": "Pays",
+  "region": "Région",
+  "population": "X habitants",
+  "language": "Langue",
+  "currency": "Monnaie",
+  "climate": "Type climat",
+  "bestSeason": "Période",
+  "description": "3-4 phrases sur l'ambiance",
+  "history": "2-3 phrases sur l'histoire",
+  "mainDish": "Plat local",
+  "dishDescription": "2 phrases sur le plat",
+  "localSpecialties": ["Spec1", "Spec2", "Spec3"],
+  "accommodations": {"budget": "Hotel eco", "midRange": "Hotel 3*", "luxury": "Hotel 5*"},
+  "whereToStay": "Conseils quartiers",
+  "mustSee": ["Lieu1", "Lieu2", "Lieu3", "Lieu4", "Lieu5"],
+  "hiddenGems": ["Secret1", "Secret2"],
+  "activities": ["Activité1", "Activité2", "Activité3"],
+  "travelTips": "Conseils pratiques",
+  "transportation": "Transports locaux",
+  "faq": [{"question": "Q1?", "answer": "R1"}, {"question": "Q2?", "answer": "R2"}, {"question": "Q3?", "answer": "R3"}]
+}]}`
               },
               { role: 'user', content: prompt }
             ],
-            max_tokens: 8000, // Tokens suffisants pour 3 fiches
-            temperature: 0.8,
+            max_tokens: 4000, // Réduit pour 2 fiches max
+            temperature: 0.7,
           }),
           signal: controller.signal,
         });
