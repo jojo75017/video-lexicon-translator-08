@@ -164,7 +164,7 @@ const categories: Category[] = [
     color: 'from-pink-500 to-rose-500',
     items: [
       { id: 'niches', label: '💡 Niches Rentables', icon: Lightbulb, isLink: true, href: '/niches', isNew: true },
-      { id: 'practical-sheets', label: '📋 Fiches Pratiques', icon: FileText, isLink: true, href: '/fiches-pratiques', isNew: true },
+      { id: 'practical-sheets', label: '💚 Fiches Bien-être & Santé', icon: FileText, isLink: true, href: '/fiches-pratiques', isNew: true },
       { id: 'travel-guide', label: '✈️ Guide de Voyage', icon: Globe, isNew: true },
       { id: 'recipe-book', label: '🍳 Livre de Recettes', icon: BookOpen, isNew: true },
       { id: 'aquarium-guide', label: '🐠 Aquariophilie', icon: BookOpen, isNew: true },

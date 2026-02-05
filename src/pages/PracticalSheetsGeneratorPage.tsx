@@ -241,9 +241,9 @@ ${sheet.imagePrompt ? `\n🎨 PROMPT IMAGE :\n${sheet.imagePrompt}\n` : ''}
         </Button>
         <div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
-            Générateur de Fiches Pratiques
+            Fiches Bien-être & Santé
           </h1>
-          <p className="text-muted-foreground">Créez des fiches illustrées pour vos ebooks bien-être</p>
+          <p className="text-muted-foreground">Créez des fiches illustrées pour vos ebooks santé et développement personnel</p>
         </div>
       </div>
 
