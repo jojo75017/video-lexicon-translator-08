@@ -106,6 +106,7 @@ import EbookDocumentaryGenerator from '@/components/ebook/EbookDocumentaryGenera
 import EbookRecipeBookGenerator from '@/components/ebook/EbookRecipeBookGenerator';
 import EbookTravelGuideGenerator from '@/components/ebook/EbookTravelGuideGenerator';
 import EbookAquariumGenerator from '@/components/ebook/EbookAquariumGenerator';
+import EbookBirdSheetGenerator from '@/components/ebook/EbookBirdSheetGenerator';
 
 // Composants 2026
 import EbookVideoTrailer from '@/components/ebook/EbookVideoTrailer';
@@ -2364,6 +2365,11 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       case 'aquarium-guide':
         return (
           <EbookAquariumGenerator ebookTitle={ebookTitle} />
+        );
+      
+      case 'bird-guide':
+        return (
+          <EbookBirdSheetGenerator ebookTitle={ebookTitle} />
         );
       
       case 'documentary':
