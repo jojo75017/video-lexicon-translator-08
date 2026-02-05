@@ -45,14 +45,81 @@ serve(async (req) => {
       ? `\nSujets IMPOSÉS pour les fiches (respecter cet ordre) :\n${customTopics}`
       : `\nGénère ${count} sujets logiques et progressifs pour ce thème.`;
 
-    const systemPrompt = `Tu es un auteur spécialisé en ${theme}.
+    // Detect if this is a recipe book
+    const isRecipeBook = theme.toLowerCase().includes('recette') || 
+                         theme.toLowerCase().includes('cuisine') ||
+                         theme.toLowerCase().includes('gastronomie') ||
+                         theme.toLowerCase().includes('culinaire');
+
+    let systemPrompt: string;
+    let userPrompt: string;
+
+    if (isRecipeBook) {
+      // RECIPE-SPECIFIC PROMPT - 300+ words per recipe
+      systemPrompt = `Tu es un chef cuisinier expert et auteur de livres de cuisine gastronomique.
+
+Ta mission : Créer ${count} fiches de recettes DÉTAILLÉES et COMPLÈTES pour un livre de cuisine premium.
+
+EXIGENCES DE LONGUEUR CRITIQUES :
+- Chaque fiche DOIT contenir MINIMUM 300 MOTS (objectif : 350-400 mots)
+- Le champ "content" doit être le plus long avec l'histoire, la culture et les détails gastronomiques
+- Ne jamais faire de contenu court ou résumé
+
+STRUCTURE OBLIGATOIRE pour chaque recette :
+1. "content" (MINIMUM 200 mots) : 
+   - Paragraphe 1 : Histoire et origine du plat (où, quand, pourquoi ce plat est né)
+   - Paragraphe 2 : Importance culturelle et traditions associées
+   - Paragraphe 3 : Description sensorielle détaillée (arômes, textures, saveurs, couleurs)
+   - Paragraphe 4 : Ingrédients clés avec leur rôle dans le plat
+
+2. "remember" (MINIMUM 60 mots) :
+   - 10 à 12 étapes de préparation NUMÉROTÉES et détaillées
+   - Temps de préparation et cuisson
+   - Astuces de chef pour chaque étape critique
+
+3. "exercise" (MINIMUM 40 mots) :
+   - Accord mets-vins précis avec cépage et région
+   - Suggestions d'accompagnements
+   - Variations possibles
+
+4. "closing" (20-30 mots) :
+   - Conseil final du chef ou anecdote
+
+${toneDesc}
+
+IMPORTANT: Réponds UNIQUEMENT en JSON valide :
+{
+  "sheets": [
+    {
+      "id": 1,
+      "title": "Nom du plat authentique",
+      "content": "MINIMUM 200 MOTS : Histoire complète, origine, importance culturelle, description sensorielle détaillée, ingrédients clés...",
+      "remember": "MINIMUM 60 MOTS : 1. Première étape... 2. Deuxième étape... [10-12 étapes numérotées]",
+      "exercise": "MINIMUM 40 MOTS : Accord vin + accompagnements + variations",
+      "closing": "Conseil du chef ou anecdote (20-30 mots)",
+      "imagePrompt": "Detailed food photography prompt in English: [dish name], professional food styling, ${visualStyle || 'warm ambient lighting, rustic wooden table, garnished presentation'}"
+    }
+  ]
+}`;
+
+      userPrompt = `Thème : ${theme}
+${topicsSection}
+
+RAPPEL CRITIQUE : Chaque fiche DOIT avoir MINIMUM 300 MOTS au total.
+Le champ "content" seul doit avoir minimum 200 mots.
+
+Génère exactement ${count} fiches de recettes COMPLÈTES et DÉTAILLÉES en JSON.`;
+
+    } else {
+      // STANDARD PROMPT for non-recipe books
+      systemPrompt = `Tu es un auteur spécialisé en ${theme}.
 
 Ta mission : Créer ${count} fiches pratiques destinées à un ebook illustré.
 
 Contraintes importantes :
 - ${toneDesc}
 - Pas de jargon technique
-- Chaque fiche doit tenir sur UNE page (texte concis)
+- Chaque fiche doit contenir un contenu riche et informatif (minimum 150 mots)
 - Structure claire et aérée
 
 IMPORTANT: Tu dois répondre UNIQUEMENT en JSON valide avec la structure suivante, sans aucun texte avant ou après :
@@ -61,19 +128,20 @@ IMPORTANT: Tu dois répondre UNIQUEMENT en JSON valide avec la structure suivant
     {
       "id": 1,
       "title": "Titre court et apaisant",
-      "content": "Texte principal (5 à 7 phrases max, explication simple et bienveillante)",
-      "remember": "1 à 2 phrases clés à retenir",
-      "exercise": "Action concrète et simple à faire",
+      "content": "Texte principal détaillé (minimum 100 mots, explication complète et bienveillante)",
+      "remember": "3 à 5 points clés à retenir",
+      "exercise": "Action concrète et simple à faire avec instructions détaillées",
       "closing": "Phrase de clôture douce et rassurante",
       "imagePrompt": "Prompt en anglais pour générer une illustration correspondant à cette fiche. Style: ${visualStyle || 'Soft watercolor illustration style.'}"
     }
   ]
 }`;
 
-    const userPrompt = `Thème principal : ${theme}
+      userPrompt = `Thème principal : ${theme}
 ${topicsSection}
 
 Génère exactement ${count} fiches pratiques complètes en JSON.`;
+    }
 
     console.log(`Generating ${count} practical sheets for theme: ${theme}`);
 
