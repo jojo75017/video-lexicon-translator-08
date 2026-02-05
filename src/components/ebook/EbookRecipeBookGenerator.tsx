@@ -119,6 +119,7 @@ const EbookRecipeBookGenerator: React.FC<EbookRecipeBookGeneratorProps> = ({ ebo
   const [numberOfSheets, setNumberOfSheets] = useState('20');
   const [photoStyle, setPhotoStyle] = useState('gourmet');
   const [customInstructions, setCustomInstructions] = useState('');
+  const [lastGeneratedDishNames, setLastGeneratedDishNames] = useState<string[]>([]);
   
   // State
   const [sheets, setSheets] = useState<RecipeSheet[]>([]);
@@ -176,6 +177,10 @@ const EbookRecipeBookGenerator: React.FC<EbookRecipeBookGeneratorProps> = ({ ebo
       setCurrentStep('Génération des fiches recettes...');
       setProgress(10);
 
+      // Nonce pour éviter des sorties identiques entre 2 générations (même prompt / même top)
+      // Important: sert uniquement à pousser l'IA à varier la sélection, ne doit pas être affiché.
+      const variationNonce = globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
       // Analyse du titre pour extraire le contexte
       const titleLower = bookTitle.toLowerCase();
       let countryFromTitle = '';
@@ -221,10 +226,16 @@ const EbookRecipeBookGenerator: React.FC<EbookRecipeBookGeneratorProps> = ({ ebo
         ? `OBLIGATOIRE: TOUTES les recettes doivent être EXCLUSIVEMENT des plats traditionnels de ${finalCountry}. NE PAS inclure de recettes d'autres pays.`
         : 'Variété des 5 continents avec des plats emblématiques de différents pays.';
 
+      const excludeDishesInstruction = lastGeneratedDishNames.length
+        ? `\n\n🚫 EXCLUSION (pour forcer une nouvelle sélection):\n- NE PAS générer (ni variantes) ces plats déjà utilisés: ${lastGeneratedDishNames.join(', ')}\n- Choisir des classiques différents, toujours 100% ${finalCountry || 'cohérents avec le titre'}.`
+        : '';
+
       const { data, error } = await supabase.functions.invoke('generate-content', {
         body: {
           type: 'recipe-sheets',
           prompt: `Tu es un chef étoilé Michelin et sommelier expert reconnu mondialement.
+
+ID DE VARIATION (ne pas afficher, juste pour varier la sélection): ${variationNonce}
 
 TITRE DU LIVRE: "${bookTitle}"
 ${customInstructions ? `Instructions spéciales du client: ${customInstructions}` : ''}
@@ -240,6 +251,7 @@ Génère exactement ${count} FICHES RECETTES COMPLÈTES ET UNIQUES (minimum 500 
 - NE JAMAIS répéter le même plat, même avec une variante
 - Varier OBLIGATOIREMENT les catégories: soupes, viandes, poissons, riz, nouilles, desserts
 ${finalCountry === 'Vietnam' ? `- Pour le VIETNAM, inclure des plats VARIÉS comme: Phở Bò, Bánh Mì, Bún Chả, Gỏi Cuốn, Cơm Tấm, Bánh Xèo, Chả Cá, Bún Bò Huế, Cao Lầu, Mì Quảng (tous DIFFÉRENTS!)` : ''}
+${excludeDishesInstruction}
 
 🍷 ACCORD METS-VIN OBLIGATOIRE:
 Pour CHAQUE recette, fournis un accord vin PRÉCIS avec:
@@ -297,6 +309,17 @@ Format JSON strict:
       const parsed = cleanAndParseJSON(content);
       
       let recipes = parsed?.recipes || [];
+
+      // Mémoriser les plats pour éviter de proposer la même sélection au prochain clic "Générer"
+      // (utile quand l'utilisateur regen plusieurs fois pour obtenir un autre "top")
+      try {
+        const dishNames = recipes
+          .map((r: any) => (typeof r?.dishName === 'string' ? r.dishName.trim() : ''))
+          .filter(Boolean);
+        if (dishNames.length) setLastGeneratedDishNames(dishNames);
+      } catch {
+        // no-op
+      }
       
       // Pad with fallback recipes if needed
       if (recipes.length < count) {
