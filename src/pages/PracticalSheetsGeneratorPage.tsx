@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, FileText, Copy, CheckCircle, Download, Sparkles, Image as ImageIcon, Loader2 } from 'lucide-react';
+import { ArrowLeft, FileText, Copy, CheckCircle, Download, Sparkles, Image as ImageIcon, Loader2, Link, Plus, X, ExternalLink } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -54,6 +54,23 @@ const PracticalSheetsGeneratorPage: React.FC = () => {
   const [tone, setTone] = useState('doux');
   const [visualStyle, setVisualStyle] = useState('watercolor');
   const [generateImages, setGenerateImages] = useState(false);
+  
+  // Liens promotionnels
+  const [promoLinks, setPromoLinks] = useState<{ label: string; url: string }[]>([]);
+  const [newLinkLabel, setNewLinkLabel] = useState('');
+  const [newLinkUrl, setNewLinkUrl] = useState('');
+
+  const addPromoLink = () => {
+    if (newLinkLabel.trim() && newLinkUrl.trim()) {
+      setPromoLinks([...promoLinks, { label: newLinkLabel.trim(), url: newLinkUrl.trim() }]);
+      setNewLinkLabel('');
+      setNewLinkUrl('');
+    }
+  };
+
+  const removePromoLink = (index: number) => {
+    setPromoLinks(promoLinks.filter((_, i) => i !== index));
+  };
 
   const getThemeLabel = () => {
     if (theme === 'custom') return customTheme;
@@ -134,7 +151,7 @@ const PracticalSheetsGeneratorPage: React.FC = () => {
   };
 
   const copySheet = async (sheet: PracticalSheet, index: number) => {
-    const text = `# ${sheet.title}
+    let text = `# ${sheet.title}
 
 ${sheet.content}
 
@@ -145,6 +162,14 @@ ${sheet.remember}
 ${sheet.exercise}
 
 💫 ${sheet.closing}`;
+
+    // Ajouter les liens promotionnels si présents
+    if (promoLinks.length > 0) {
+      text += `\n\n🔗 LIENS UTILES\n`;
+      promoLinks.forEach(link => {
+        text += `→ ${link.label}: ${link.url}\n`;
+      });
+    }
     
     try {
       await navigator.clipboard.writeText(text);
@@ -161,6 +186,11 @@ ${sheet.exercise}
       toast.error('Aucune fiche à exporter');
       return;
     }
+
+    // Section liens promotionnels
+    const linksSection = promoLinks.length > 0
+      ? `\n🔗 LIENS UTILES\n${promoLinks.map(link => `→ ${link.label}: ${link.url}`).join('\n')}\n`
+      : '';
     
     const content = sheets.map((sheet, index) => `
 ═══════════════════════════════════════════════════════════════
@@ -182,7 +212,7 @@ ${sheet.content}
 └─────────────────────────────────────────────────────────────┘
 
 💫 ${sheet.closing}
-
+${linksSection}
 ${sheet.imagePrompt ? `\n🎨 PROMPT IMAGE :\n${sheet.imagePrompt}\n` : ''}
 `).join('\n\n');
 
@@ -323,6 +353,65 @@ ${sheet.imagePrompt ? `\n🎨 PROMPT IMAGE :\n${sheet.imagePrompt}\n` : ''}
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+
+              {/* Promotional Links */}
+              <div className="space-y-3">
+                <label className="block text-sm font-medium flex items-center gap-2">
+                  <Link className="w-4 h-4 text-violet-500" />
+                  Liens promotionnels (optionnel)
+                </label>
+                
+                {/* Existing links */}
+                {promoLinks.length > 0 && (
+                  <div className="space-y-2">
+                    {promoLinks.map((link, index) => (
+                      <div key={index} className="flex items-center gap-2 p-2 bg-muted/50 rounded-lg text-sm">
+                        <ExternalLink className="w-3 h-3 text-muted-foreground flex-shrink-0" />
+                        <span className="font-medium truncate">{link.label}</span>
+                        <span className="text-muted-foreground truncate flex-1 text-xs">{link.url}</span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removePromoLink(index)}
+                          className="h-6 w-6 p-0 hover:bg-destructive/20"
+                        >
+                          <X className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
+                {/* Add new link */}
+                <div className="space-y-2 p-3 border border-dashed border-violet-200/50 dark:border-violet-800/30 rounded-lg">
+                  <Input
+                    value={newLinkLabel}
+                    onChange={(e) => setNewLinkLabel(e.target.value)}
+                    placeholder="Texte du lien (ex: Découvrir le programme)"
+                    className="text-sm"
+                  />
+                  <Input
+                    value={newLinkUrl}
+                    onChange={(e) => setNewLinkUrl(e.target.value)}
+                    placeholder="URL (ex: https://monsite.com/offre)"
+                    className="text-sm"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={addPromoLink}
+                    disabled={!newLinkLabel.trim() || !newLinkUrl.trim()}
+                    className="w-full"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Ajouter ce lien
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Ces liens seront ajoutés à la fin de chaque fiche
+                </p>
               </div>
 
               {/* Generate Images Toggle */}
@@ -487,6 +576,30 @@ ${sheet.imagePrompt ? `\n🎨 PROMPT IMAGE :\n${sheet.imagePrompt}\n` : ''}
                       <p className="text-sm italic text-violet-600 dark:text-violet-400">
                         💫 {sheet.closing}
                       </p>
+
+                      {/* Promotional Links */}
+                      {promoLinks.length > 0 && (
+                        <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200/50 dark:border-blue-800/30 rounded-lg">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Link className="w-4 h-4 text-blue-600" />
+                            <span className="font-medium text-sm text-blue-800 dark:text-blue-300">Liens utiles</span>
+                          </div>
+                          <div className="space-y-1">
+                            {promoLinks.map((link, linkIndex) => (
+                              <a
+                                key={linkIndex}
+                                href={link.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline"
+                              >
+                                <ExternalLink className="w-3 h-3" />
+                                {link.label}
+                              </a>
+                            ))}
+                          </div>
+                        </div>
+                      )}
 
                       {/* Image Prompt (collapsible) */}
                       {sheet.imagePrompt && (
