@@ -9,8 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
-  MapPin, Plane, Camera, Sparkles, Image as ImageIcon, Download, BookOpen,
-  Loader2, RefreshCw, FileText, Globe, Mountain, Building, Palmtree,
+  MapPin, Plane, Camera, Sparkles, Download, BookOpen,
+  Loader2, FileText, Globe,
   Compass, Sun, Users, Languages, Utensils, Hotel, HelpCircle, Copy, CheckCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -128,13 +128,11 @@ const EbookTravelGuideGenerator: React.FC<EbookTravelGuideGeneratorProps> = ({ e
   const [authorName, setAuthorName] = useState('');
   const [selectedCountry, setSelectedCountry] = useState('tour-du-monde');
   const [numberOfSheets, setNumberOfSheets] = useState('20');
-  const [photoStyle, setPhotoStyle] = useState('realistic');
   const [customInstructions, setCustomInstructions] = useState('');
   
   // State
   const [sheets, setSheets] = useState<TravelSheet[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [isGeneratingImages, setIsGeneratingImages] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentStep, setCurrentStep] = useState('');
@@ -413,13 +411,10 @@ Format JSON strict:
       }));
 
       setSheets(generatedSheets);
-      setProgress(40);
-      
-      // Generate images
-      await generateSheetImages(generatedSheets);
-      
       setProgress(100);
       setCurrentStep('Guide de voyage généré !');
+      setActiveTab('sheets');
+      toast.success(`🎉 ${generatedSheets.length} fiches destinations générées !`);
       setActiveTab('sheets');
       toast.success(`🎉 ${generatedSheets.length} fiches destinations générées !`);
       
@@ -479,80 +474,6 @@ Format JSON strict:
     return fallbackData;
   };
 
-  // Generate images for all sheets using dedicated travel image function
-  const generateSheetImages = async (sheetsToProcess: TravelSheet[]) => {
-    setIsGeneratingImages(true);
-    
-    for (let i = 0; i < sheetsToProcess.length; i++) {
-      const sheet = sheetsToProcess[i];
-      setCurrentStep(`Image ${i + 1}/${sheetsToProcess.length}: ${sheet.destinationName}...`);
-      
-      try {
-        const { data, error } = await supabase.functions.invoke('generate-travel-image', {
-          body: {
-            destinationName: sheet.destinationName,
-            country: sheet.country,
-            photoStyle: photoStyle
-          }
-        });
-
-        if (error) {
-          console.error(`Erreur image ${sheet.destinationName}:`, error);
-          if (error.message?.includes('429') || error.message?.includes('402')) {
-            toast.error(`Limite atteinte - images suivantes ignorées`);
-            break;
-          }
-        } else if (data?.imageUrl) {
-          setSheets(prev => prev.map(s => 
-            s.id === sheet.id ? { ...s, imageUrl: data.imageUrl, isGeneratingImage: false } : s
-          ));
-          toast.success(`Image générée: ${sheet.destinationName}`);
-        }
-      } catch (err) {
-        console.error(`Erreur image ${sheet.destinationName}:`, err);
-      }
-      
-      setProgress(40 + ((i + 1) / sheetsToProcess.length) * 55);
-    }
-    
-    setIsGeneratingImages(false);
-  };
-
-  // Regenerate single image using dedicated travel image function
-  const regenerateImage = async (sheetId: number) => {
-    const sheet = sheets.find(s => s.id === sheetId);
-    if (!sheet) return;
-    
-    setSheets(prev => prev.map(s => 
-      s.id === sheetId ? { ...s, isGeneratingImage: true } : s
-    ));
-    
-    toast.info(`Regénération de l'image pour ${sheet.destinationName}...`);
-    
-    try {
-      const { data, error } = await supabase.functions.invoke('generate-travel-image', {
-        body: {
-          destinationName: sheet.destinationName,
-          country: sheet.country,
-          photoStyle: photoStyle
-        }
-      });
-
-      if (!error && data?.imageUrl) {
-        setSheets(prev => prev.map(s => 
-          s.id === sheetId ? { ...s, imageUrl: data.imageUrl, isGeneratingImage: false } : s
-        ));
-        toast.success('Image regénérée !');
-      } else {
-        throw new Error(error?.message || 'Échec génération');
-      }
-    } catch (err) {
-      setSheets(prev => prev.map(s => 
-        s.id === sheetId ? { ...s, isGeneratingImage: false } : s
-      ));
-      toast.error('Erreur lors de la regénération');
-    }
-  };
 
   // Generate cover
   const generateCover = async () => {
@@ -563,7 +484,7 @@ Format JSON strict:
 
     setIsGeneratingCover(true);
     try {
-      const photoPrompt = PHOTO_STYLES.find(s => s.id === photoStyle)?.prompt || PHOTO_STYLES[0].prompt;
+      const photoPrompt = PHOTO_STYLES[0].prompt;
       
       const { data, error } = await supabase.functions.invoke('generate-front-cover', {
         body: {
@@ -747,154 +668,123 @@ ${sheet.faq.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}
         
         yPos = 55;
         
-        // Two-column layout
-        const colWidth = (contentWidth - 10) / 2;
-        const leftCol = margin;
-        const rightCol = margin + colWidth + 10;
+        // Full-width article layout (no images)
+        const fullWidth = contentWidth;
 
-        // Left column - Image
-        if (sheet.imageUrl) {
-          const imgBase64 = await loadImageAsBase64(sheet.imageUrl);
-          if (imgBase64) {
-            pdf.addImage(imgBase64, 'JPEG', leftCol, yPos, colWidth, colWidth * 0.65);
-            yPos += colWidth * 0.65 + 5;
-          }
-        }
-
-        // Info box (without emojis)
-        const infoBoxY = yPos;
+        // Info box at the top (full width)
         pdf.setFillColor(245, 250, 255);
-        pdf.roundedRect(leftCol, infoBoxY, colWidth, 50, 3, 3, 'F');
+        pdf.roundedRect(margin, yPos, fullWidth, 25, 3, 3, 'F');
         pdf.setDrawColor(200, 220, 240);
-        pdf.roundedRect(leftCol, infoBoxY, colWidth, 50, 3, 3, 'S');
+        pdf.roundedRect(margin, yPos, fullWidth, 25, 3, 3, 'S');
         
-        pdf.setFontSize(9);
-        pdf.setTextColor(50, 50, 50);
-        pdf.setFont('helvetica', 'bold');
-        pdf.text('INFOS PRATIQUES', leftCol + 5, infoBoxY + 8);
-        pdf.setFont('helvetica', 'normal');
         pdf.setFontSize(8);
-        pdf.text(`Population: ${sheet.population}`, leftCol + 5, infoBoxY + 16);
-        pdf.text(`Langue: ${sheet.language}`, leftCol + 5, infoBoxY + 23);
-        pdf.text(`Monnaie: ${sheet.currency}`, leftCol + 5, infoBoxY + 30);
-        pdf.text(`Climat: ${sheet.climate}`, leftCol + 5, infoBoxY + 37);
-        pdf.text(`Meilleure saison: ${sheet.bestSeason}`, leftCol + 5, infoBoxY + 44);
-
-        // Transport & Tips box below
-        const tipsBoxY = infoBoxY + 55;
-        pdf.setFillColor(255, 252, 245);
-        pdf.roundedRect(leftCol, tipsBoxY, colWidth, 45, 3, 3, 'F');
-        pdf.setDrawColor(230, 220, 200);
-        pdf.roundedRect(leftCol, tipsBoxY, colWidth, 45, 3, 3, 'S');
-        
-        pdf.setFontSize(9);
-        pdf.setFont('helvetica', 'bold');
-        pdf.text('CONSEILS PRATIQUES', leftCol + 5, tipsBoxY + 8);
+        pdf.setTextColor(50, 50, 50);
         pdf.setFont('helvetica', 'normal');
-        pdf.setFontSize(7);
-        const tipsLines = pdf.splitTextToSize(sheet.travelTips, colWidth - 10);
-        pdf.text(tipsLines.slice(0, 4), leftCol + 5, tipsBoxY + 16);
-        
-        pdf.setFont('helvetica', 'bold');
-        pdf.text('Transport:', leftCol + 5, tipsBoxY + 35);
-        pdf.setFont('helvetica', 'normal');
-        const transLines = pdf.splitTextToSize(sheet.transportation, colWidth - 10);
-        pdf.text(transLines.slice(0, 2), leftCol + 25, tipsBoxY + 35);
+        const infoLine1 = `Population: ${sheet.population} | Langue: ${sheet.language} | Monnaie: ${sheet.currency}`;
+        const infoLine2 = `Climat: ${sheet.climate} | Meilleure saison: ${sheet.bestSeason}`;
+        pdf.text(infoLine1, margin + 5, yPos + 9);
+        pdf.text(infoLine2, margin + 5, yPos + 18);
+        yPos += 30;
 
-        // Right column - Content
-        let rightY = 55;
-        
-        // Description
+        // Description section
         pdf.setFontSize(10);
         pdf.setTextColor(30, 60, 100);
         pdf.setFont('helvetica', 'bold');
-        pdf.text('A DECOUVRIR', rightCol, rightY);
-        rightY += 6;
+        pdf.text('DECOUVRIR', margin, yPos);
+        yPos += 5;
         
         pdf.setFont('helvetica', 'normal');
         pdf.setTextColor(40, 40, 40);
         pdf.setFontSize(8);
-        const descLines = pdf.splitTextToSize(sheet.description, colWidth);
-        pdf.text(descLines.slice(0, 6), rightCol, rightY);
-        rightY += Math.min(descLines.length, 6) * 4 + 5;
+        const descLines = pdf.splitTextToSize(sheet.description, fullWidth);
+        pdf.text(descLines.slice(0, 6), margin, yPos);
+        yPos += Math.min(descLines.length, 6) * 3.5 + 4;
 
-        // History
-        if (sheet.history && rightY < 110) {
+        // History section
+        if (sheet.history && yPos < 130) {
           pdf.setFontSize(10);
           pdf.setFont('helvetica', 'bold');
           pdf.setTextColor(30, 60, 100);
-          pdf.text('HISTOIRE & CULTURE', rightCol, rightY);
-          rightY += 6;
+          pdf.text('HISTOIRE & CULTURE', margin, yPos);
+          yPos += 5;
           
           pdf.setFont('helvetica', 'normal');
           pdf.setTextColor(40, 40, 40);
           pdf.setFontSize(8);
-          const histLines = pdf.splitTextToSize(sheet.history, colWidth);
-          pdf.text(histLines.slice(0, 4), rightCol, rightY);
-          rightY += Math.min(histLines.length, 4) * 4 + 5;
+          const histLines = pdf.splitTextToSize(sheet.history, fullWidth);
+          pdf.text(histLines.slice(0, 5), margin, yPos);
+          yPos += Math.min(histLines.length, 5) * 3.5 + 4;
         }
 
-        // Main dish
-        if (rightY < 145) {
+        // Gastronomy section
+        if (yPos < 155) {
           pdf.setFontSize(10);
           pdf.setFont('helvetica', 'bold');
           pdf.setTextColor(30, 60, 100);
-          pdf.text(`GASTRONOMIE: ${sheet.mainDish}`, rightCol, rightY);
-          rightY += 6;
+          pdf.text(`GASTRONOMIE: ${sheet.mainDish}`, margin, yPos);
+          yPos += 5;
           
           pdf.setFont('helvetica', 'normal');
           pdf.setTextColor(40, 40, 40);
           pdf.setFontSize(8);
-          const dishLines = pdf.splitTextToSize(sheet.dishDescription, colWidth);
-          pdf.text(dishLines.slice(0, 4), rightCol, rightY);
-          rightY += Math.min(dishLines.length, 4) * 4 + 5;
+          const dishLines = pdf.splitTextToSize(sheet.dishDescription, fullWidth);
+          pdf.text(dishLines.slice(0, 4), margin, yPos);
+          yPos += Math.min(dishLines.length, 4) * 3.5 + 4;
         }
 
-        // Must see
-        if (rightY < 180) {
+        // Must see section
+        if (yPos < 185) {
           pdf.setFontSize(10);
           pdf.setFont('helvetica', 'bold');
           pdf.setTextColor(30, 60, 100);
-          pdf.text('INCONTOURNABLES', rightCol, rightY);
-          rightY += 6;
+          pdf.text('INCONTOURNABLES', margin, yPos);
+          yPos += 5;
           
           pdf.setFont('helvetica', 'normal');
           pdf.setTextColor(40, 40, 40);
           pdf.setFontSize(8);
           sheet.mustSee.slice(0, 5).forEach(m => {
-            const truncated = m.length > 55 ? m.substring(0, 52) + '...' : m;
-            pdf.text(`- ${truncated}`, rightCol, rightY);
-            rightY += 4;
+            const truncated = m.length > 80 ? m.substring(0, 77) + '...' : m;
+            pdf.text(`- ${truncated}`, margin, yPos);
+            yPos += 3.5;
           });
-          rightY += 3;
+          yPos += 3;
         }
 
-        // Accommodations
-        if (rightY < 210) {
+        // Accommodations section
+        if (yPos < 210) {
           pdf.setFontSize(10);
           pdf.setFont('helvetica', 'bold');
           pdf.setTextColor(30, 60, 100);
-          pdf.text('HEBERGEMENT', rightCol, rightY);
-          rightY += 6;
+          pdf.text('HEBERGEMENT', margin, yPos);
+          yPos += 5;
           
           pdf.setFont('helvetica', 'normal');
           pdf.setTextColor(40, 40, 40);
           pdf.setFontSize(8);
-          const budgetText = sheet.accommodations.budget.length > 50 
-            ? sheet.accommodations.budget.substring(0, 47) + '...' 
-            : sheet.accommodations.budget;
-          const midText = sheet.accommodations.midRange.length > 50 
-            ? sheet.accommodations.midRange.substring(0, 47) + '...' 
-            : sheet.accommodations.midRange;
-          const luxText = sheet.accommodations.luxury.length > 50 
-            ? sheet.accommodations.luxury.substring(0, 47) + '...' 
-            : sheet.accommodations.luxury;
-          pdf.text(`Budget: ${budgetText}`, rightCol, rightY);
-          rightY += 4;
-          pdf.text(`Milieu de gamme: ${midText}`, rightCol, rightY);
-          rightY += 4;
-          pdf.text(`Luxe: ${luxText}`, rightCol, rightY);
-          rightY += 8;
+          pdf.text(`Budget: ${sheet.accommodations.budget.substring(0, 70)}`, margin, yPos);
+          yPos += 3.5;
+          pdf.text(`Milieu de gamme: ${sheet.accommodations.midRange.substring(0, 60)}`, margin, yPos);
+          yPos += 3.5;
+          pdf.text(`Luxe: ${sheet.accommodations.luxury.substring(0, 65)}`, margin, yPos);
+          yPos += 6;
+        }
+
+        // Travel tips section
+        if (yPos < 230) {
+          pdf.setFillColor(255, 252, 245);
+          pdf.roundedRect(margin, yPos, fullWidth, 20, 3, 3, 'F');
+          pdf.setDrawColor(230, 220, 200);
+          pdf.roundedRect(margin, yPos, fullWidth, 20, 3, 3, 'S');
+          
+          pdf.setFontSize(8);
+          pdf.setFont('helvetica', 'bold');
+          pdf.text('CONSEILS PRATIQUES', margin + 3, yPos + 6);
+          pdf.setFont('helvetica', 'normal');
+          pdf.setFontSize(7);
+          const tipsLines = pdf.splitTextToSize(`${sheet.travelTips} Transport: ${sheet.transportation}`, fullWidth - 6);
+          pdf.text(tipsLines.slice(0, 3), margin + 3, yPos + 11);
+          yPos += 25;
         }
 
         // FAQ at bottom
@@ -1010,7 +900,7 @@ ${sheet.faq.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}
             Configuration
           </TabsTrigger>
           <TabsTrigger value="cover" className="flex items-center gap-2">
-            <ImageIcon className="h-4 w-4" />
+            <Camera className="h-4 w-4" />
             Couverture
           </TabsTrigger>
           <TabsTrigger value="sheets" className="flex items-center gap-2" disabled={sheets.length === 0}>
@@ -1092,21 +982,6 @@ ${sheet.faq.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}
                   </Select>
                 </div>
 
-                <div className="space-y-2">
-                  <Label>Style photo</Label>
-                  <Select value={photoStyle} onValueChange={setPhotoStyle}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {PHOTO_STYLES.map(style => (
-                        <SelectItem key={style.id} value={style.id}>
-                          {style.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
               </div>
 
               <div className="space-y-2">
@@ -1254,38 +1129,8 @@ ${sheet.faq.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}
                 
                 <CardContent className="pt-6">
                   <div className="grid md:grid-cols-2 gap-6">
-                    {/* Left column - Image and quick info */}
+                    {/* Left column - Quick info and content */}
                     <div className="space-y-4">
-                      {/* Image */}
-                      <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-gradient-to-br from-blue-100 to-cyan-100">
-                        {sheet.imageUrl ? (
-                          <img 
-                            src={sheet.imageUrl} 
-                            alt={sheet.destinationName}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : sheet.isGeneratingImage ? (
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
-                          </div>
-                        ) : (
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <MapPin className="h-12 w-12 text-blue-300" />
-                          </div>
-                        )}
-                        
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          className="absolute bottom-2 right-2 opacity-90"
-                          onClick={() => regenerateImage(sheet.id)}
-                          disabled={sheet.isGeneratingImage}
-                        >
-                          <RefreshCw className={`h-3 w-3 mr-1 ${sheet.isGeneratingImage ? 'animate-spin' : ''}`} />
-                          Regénérer
-                        </Button>
-                      </div>
-
                       {/* Quick info box */}
                       <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 space-y-2">
                         <h4 className="font-semibold flex items-center gap-2">
