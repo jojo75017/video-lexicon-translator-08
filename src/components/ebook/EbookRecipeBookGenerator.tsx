@@ -233,7 +233,13 @@ ${customInstructions ? `Instructions spéciales du client: ${customInstructions}
 ${countryInstruction}
 ${finalCountry ? `Tous les ${count} plats DOIVENT être des plats 100% ${finalCountry.toLowerCase() === 'france' ? 'français' : `de ${finalCountry}`}. Aucune exception.` : ''}
 
-Génère exactement ${count} FICHES RECETTES COMPLÈTES (minimum 500 mots chacune).
+Génère exactement ${count} FICHES RECETTES COMPLÈTES ET UNIQUES (minimum 500 mots chacune).
+
+🚫 RÈGLE ANTI-DOUBLONS CRITIQUE:
+- CHAQUE recette DOIT être un plat DIFFÉRENT avec un nom UNIQUE
+- NE JAMAIS répéter le même plat, même avec une variante
+- Varier OBLIGATOIREMENT les catégories: soupes, viandes, poissons, riz, nouilles, desserts
+${finalCountry === 'Vietnam' ? `- Pour le VIETNAM, inclure des plats VARIÉS comme: Phở Bò, Bánh Mì, Bún Chả, Gỏi Cuốn, Cơm Tấm, Bánh Xèo, Chả Cá, Bún Bò Huế, Cao Lầu, Mì Quảng (tous DIFFÉRENTS!)` : ''}
 
 🍷 ACCORD METS-VIN OBLIGATOIRE:
 Pour CHAQUE recette, fournis un accord vin PRÉCIS avec:
