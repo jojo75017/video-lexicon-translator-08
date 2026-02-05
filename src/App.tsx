@@ -128,27 +128,10 @@ const App = () => {
             sessionStorage.removeItem('is_admin');
           }
         } else {
-          console.log('Aucune session Supabase - vérification admin permanent par email...');
-          
-          // FALLBACK: Check permanent admin by email (no session required)
-          const storedAdminEmail = localStorage.getItem('permanent_admin_email');
-          if (storedAdminEmail === PERMANENT_ADMIN_EMAIL) {
-            const { data, error } = await checkAdminByEmail(storedAdminEmail);
-            
-            if (!error && data?.isAdmin) {
-              console.log('Admin permanent confirmé par email:', storedAdminEmail);
-              setIsAdmin(true);
-              sessionStorage.setItem('is_admin', 'true');
-            } else {
-              console.log('Email admin non confirmé');
-              sessionStorage.removeItem('is_admin');
-              localStorage.removeItem('permanent_admin_email');
-              setIsAdmin(false);
-            }
-          } else {
-            sessionStorage.removeItem('is_admin');
-            setIsAdmin(false);
-          }
+          console.log('Aucune session Supabase');
+          sessionStorage.removeItem('is_admin');
+          localStorage.removeItem('permanent_admin_email');
+          setIsAdmin(false);
         }
       } catch (error) {
         console.error('Erreur lors de la vérification de la session admin:', error);
