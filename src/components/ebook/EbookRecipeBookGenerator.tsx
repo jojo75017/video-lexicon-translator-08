@@ -15,7 +15,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import jsPDF from 'jspdf';
 
-// Interface pour une fiche recette (300+ mots par fiche)
+// Interface pour une fiche recette (500+ mots par fiche)
 interface RecipeSheet {
   id: number;
   country: string;
@@ -233,28 +233,28 @@ ${customInstructions ? `Instructions spéciales du client: ${customInstructions}
 ${countryInstruction}
 ${finalCountry ? `Tous les ${count} plats DOIVENT être des plats 100% ${finalCountry.toLowerCase() === 'france' ? 'français' : `de ${finalCountry}`}. Aucune exception.` : ''}
 
-Génère exactement ${count} FICHES RECETTES COMPLÈTES (minimum 300 mots chacune).
+Génère exactement ${count} FICHES RECETTES COMPLÈTES (minimum 500 mots chacune).
 
 🍷 ACCORD METS-VIN OBLIGATOIRE:
 Pour CHAQUE recette, fournis un accord vin PRÉCIS avec:
 - winePairing: L'appellation exacte du vin (ex: "Saint-Émilion Grand Cru 2018" ou "Meursault 1er Cru")
 - wineReason: Explication détaillée de pourquoi cet accord fonctionne (les arômes, la complémentarité, les tanins, l'acidité)
 
-IMPORTANT: Chaque fiche doit être TRÈS DÉTAILLÉE avec au moins 300 mots de contenu riche.
+IMPORTANT: Chaque fiche doit être TRÈS DÉTAILLÉE avec au moins 500 mots de contenu riche.
 Retourne UNIQUEMENT du JSON valide, sans texte avant ni après.
 
 Pour CHAQUE recette, fournis OBLIGATOIREMENT:
 - country: "${finalCountry || 'Le pays d\'origine'}"
 - dishName: Le nom authentique et traditionnel du plat
-- description: Description gourmande et appétissante (3-4 phrases décrivant les saveurs, textures et arômes)
-- history: L'histoire et l'origine du plat (2-3 phrases sur la tradition culinaire, la région d'origine, le contexte culturel)
+- description: Description gourmande et appétissante (5-6 phrases décrivant les saveurs, textures, arômes et l'expérience gustative)
+- history: L'histoire et l'origine du plat (4-5 phrases sur la tradition culinaire, la région d'origine, le contexte culturel et les anecdotes)
 - ingredients: Liste DÉTAILLÉE de 10-12 ingrédients avec quantités précises (ex: "500g de bœuf bourguignon bien persillé")
-- steps: 8-10 étapes DÉTAILLÉES de préparation avec temps et techniques précises
-- chefTips: 2-3 conseils de chef professionnel pour réussir parfaitement ce plat
-- variations: Variantes régionales ou saisonnières du plat (2 phrases)
+- steps: 12-15 étapes TRÈS DÉTAILLÉES de préparation avec temps, techniques et astuces pour chaque étape
+- chefTips: 4-5 conseils de chef professionnel pour réussir parfaitement ce plat
+- variations: Variantes régionales ou saisonnières du plat (3-4 phrases avec détails)
 - winePairing: Le vin spécifique recommandé (appellation précise, millésime si pertinent)
-- wineReason: Explication détaillée de pourquoi cet accord fonctionne (2 phrases sur les arômes et la complémentarité)
-- servingSuggestion: Comment dresser et présenter le plat (1-2 phrases)
+- wineReason: Explication détaillée de pourquoi cet accord fonctionne (3-4 phrases sur les arômes, tanins et complémentarité)
+- servingSuggestion: Comment dresser et présenter le plat (2-3 phrases avec détails de garniture)
 - cookingTime: Temps détaillé (préparation + repos + cuisson)
 - difficulty: Facile, Moyen ou Difficile
 - portions: Nombre de personnes
