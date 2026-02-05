@@ -12,11 +12,31 @@ const AdminDirectPage = () => {
   const [message, setMessage] = useState("Vérification de la session...");
 
   useEffect(() => {
-    // En mode DEV → accès direct immédiat, pas de vérification
-    if (import.meta.env.DEV) {
+    // BYPASS TOTAL: Accès direct pour admin - fonctionne en DEV et PROD
+    // Ceci stocke l'email admin et redirige immédiatement
+    const enableAdminBypass = () => {
       sessionStorage.setItem('is_admin', 'true');
       localStorage.setItem('permanent_admin_email', ADMIN_EMAIL);
+      localStorage.setItem('subscriber_email', ADMIN_EMAIL);
+      localStorage.setItem('subscriber_data', JSON.stringify({
+        email: ADMIN_EMAIL,
+        plan_type: 'lifetime',
+        status: 'active',
+        access_code: 'ADMIN-BYPASS'
+      }));
       navigate('/ebook-planner', { replace: true });
+    };
+
+    // En mode DEV → accès direct immédiat
+    if (import.meta.env.DEV) {
+      enableAdminBypass();
+      return;
+    }
+
+    // EN PRODUCTION: Vérifier si l'email admin est déjà stocké = bypass direct
+    const storedAdminEmail = localStorage.getItem('permanent_admin_email');
+    if (storedAdminEmail === ADMIN_EMAIL) {
+      enableAdminBypass();
       return;
     }
 
