@@ -169,11 +169,26 @@ export const SubscriptionAuth = ({ onAuthenticated }: SubscriptionAuthProps) => 
       <Card className="w-full max-w-md p-8 space-y-6">
         <div className="text-center space-y-2">
           {hasAdminSession && (
-            <div className="flex flex-col items-center gap-2">
-              <Badge className="mb-0">Session admin active</Badge>
+            <div className="flex flex-col items-center gap-3 p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
+              <Badge className="bg-green-500">Session admin active</Badge>
+              <Button
+                type="button"
+                className="w-full bg-green-600 hover:bg-green-700"
+                onClick={() => navigate('/ebook-planner')}
+              >
+                Accéder au Planner (Admin)
+              </Button>
               <Button
                 type="button"
                 variant="outline"
+                size="sm"
+                onClick={() => navigate('/admin')}
+              >
+                Panel Admin
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
                 size="sm"
                 onClick={async () => {
                   try {
@@ -187,9 +202,6 @@ export const SubscriptionAuth = ({ onAuthenticated }: SubscriptionAuthProps) => 
               >
                 Se déconnecter (admin)
               </Button>
-              <p className="text-xs text-muted-foreground">
-                Important : tant qu'une session admin est active, l'accès au générateur est autorisé sans code.
-              </p>
             </div>
           )}
           <div className="flex justify-center mb-4">
