@@ -12,14 +12,6 @@ const AdminDirectPage = () => {
   const [message, setMessage] = useState("Vérification de la session...");
 
   useEffect(() => {
-    // En mode DEV → accès direct immédiat, pas de vérification
-    if (import.meta.env.DEV) {
-      sessionStorage.setItem('is_admin', 'true');
-      localStorage.setItem('permanent_admin_email', ADMIN_EMAIL);
-      navigate('/ebook-planner', { replace: true });
-      return;
-    }
-
     const handleAdminDirect = async () => {
       try {
         // Check if we have a session already
