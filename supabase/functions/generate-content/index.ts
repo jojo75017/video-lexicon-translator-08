@@ -1482,6 +1482,100 @@ Réponds avec du texte formaté de manière professionnelle, bien structuré ave
       }
     }
 
+    // ====== RECIPE SHEETS HANDLER ======
+    // Dedicated handler for recipe-sheets with high token limit for 300+ word recipes
+    if (type === 'recipe-sheets') {
+      console.log('Processing recipe-sheets generation (OpenAI - high tokens)...');
+      const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+      
+      if (!OPENAI_API_KEY) {
+        console.error('OPENAI_API_KEY not found for recipe-sheets');
+        return new Response(
+          JSON.stringify({ error: 'Clé API OpenAI non configurée' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 min timeout
+
+        console.log('Calling OpenAI for recipe-sheets with high token limit...');
+        
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${OPENAI_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'gpt-4o-mini',
+            messages: [
+              { 
+                role: 'system', 
+                content: `Tu es un chef étoilé Michelin et sommelier expert. Tu génères des fiches recettes TRÈS DÉTAILLÉES pour des livres de cuisine premium.
+
+RÈGLES CRITIQUES:
+- Chaque recette DOIT contenir MINIMUM 300 MOTS
+- Le champ "description" + "history" doit faire minimum 150 mots combinés
+- Les "steps" doivent être 10-12 étapes détaillées
+- Inclure des détails culturels, historiques et gastronomiques riches
+- Réponds UNIQUEMENT en JSON valide sans markdown ni backticks`
+              },
+              { role: 'user', content: prompt }
+            ],
+            max_tokens: 8000,
+            temperature: 0.8,
+          }),
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('OpenAI error for recipe-sheets:', response.status, errorText);
+          
+          if (response.status === 429) {
+            return new Response(
+              JSON.stringify({ error: 'Trop de requêtes. Réessayez dans quelques instants.' }),
+              { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
+          }
+          
+          return new Response(
+            JSON.stringify({ error: 'Erreur lors de la génération des recettes' }),
+            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        const data = await response.json();
+        const generatedContent = data.choices?.[0]?.message?.content;
+
+        if (!generatedContent) {
+          console.error('No content in recipe-sheets response');
+          return new Response(
+            JSON.stringify({ error: 'Réponse vide de l\'IA' }),
+            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        console.log('Recipe-sheets generated successfully, content length:', generatedContent.length);
+        return new Response(
+          JSON.stringify({ content: generatedContent }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+
+      } catch (err) {
+        console.error('Recipe-sheets generation error:', err);
+        const errorMessage = err?.name === 'AbortError' ? 'Timeout - génération trop longue' : err?.message;
+        return new Response(
+          JSON.stringify({ error: errorMessage || 'Erreur lors de la génération des recettes' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
