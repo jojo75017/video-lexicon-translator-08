@@ -37,16 +37,7 @@ const ADMIN_EMAIL = 'boubetgeorges@gmail.com';
 const SubscriptionPage = ({ subscriberEmail, subscriberData, onLogout }: SubscriptionPageProps) => {
   const navigate = useNavigate();
   
-  // Redirection automatique pour l'admin permanent
-  useEffect(() => {
-    const storedAdmin = (localStorage.getItem('permanent_admin_email') || '').toLowerCase();
-    if (storedAdmin === ADMIN_EMAIL || import.meta.env.DEV) {
-      // L'admin est reconnu, on le redirige directement
-      sessionStorage.setItem('is_admin', 'true');
-      localStorage.setItem('permanent_admin_email', ADMIN_EMAIL);
-      navigate('/ebook-planner', { replace: true });
-    }
-  }, [navigate]);
+  // NOTE: Pas de redirection admin via localStorage (non fiable / modifiable côté client).
 
   const isVip = subscriberData?.plan_tier === 'vip';
 
