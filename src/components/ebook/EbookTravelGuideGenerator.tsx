@@ -122,6 +122,57 @@ const PHOTO_STYLES = [
   { id: 'aerial', label: '🚁 Vue Aérienne', prompt: 'aerial drone photography, stunning bird eye view, landscape perspective, travel magazine' },
 ];
 
+// Pools de destinations RÉELLES par pays pour éviter les doublons et garantir la cohérence
+const realDestinationPools: Record<string, string[]> = {
+  'France': [
+    'Paris', 'Lyon', 'Marseille', 'Bordeaux', 'Nice', 'Strasbourg', 'Toulouse', 'Nantes',
+    'Montpellier', 'Lille', 'Rennes', 'Reims', 'Avignon', 'Aix-en-Provence', 'Cannes',
+    'Saint-Malo', 'Annecy', 'Colmar', 'Carcassonne', 'Mont-Saint-Michel', 'Chamonix',
+    'Biarritz', 'La Rochelle', 'Dijon', 'Grenoble', 'Rouen', 'Tours', 'Arles', 'Gordes',
+    'Étretat', 'Honfleur', 'Giverny', 'Rocamadour', 'Saint-Tropez', 'Menton', 'Èze'
+  ],
+  'Italie': [
+    'Rome', 'Venise', 'Florence', 'Milan', 'Naples', 'Turin', 'Bologne', 'Vérone',
+    'Sienne', 'Pise', 'Amalfi', 'Positano', 'Cinque Terre', 'Côme', 'Capri', 'Ravenne',
+    'Lucques', 'San Gimignano', 'Matera', 'Palerme', 'Catane', 'Syracuse', 'Taormine',
+    'Assise', 'Orvieto', 'Bergame', 'Padoue', 'Trieste', 'Gênes', 'Cagliari'
+  ],
+  'Espagne': [
+    'Barcelone', 'Madrid', 'Séville', 'Valence', 'Grenade', 'Bilbao', 'Malaga', 'Cordoue',
+    'Tolède', 'Saint-Sébastien', 'Salamanque', 'Ségovie', 'Ronda', 'Gérone', 'Marbella',
+    'Ibiza', 'Palma de Majorque', 'Las Palmas', 'Tenerife', 'Cadix', 'Alicante', 'Saragosse'
+  ],
+  'Portugal': [
+    'Lisbonne', 'Porto', 'Sintra', 'Cascais', 'Faro', 'Évora', 'Coimbra', 'Braga',
+    'Madère', 'Açores', 'Lagos', 'Tavira', 'Óbidos', 'Nazaré', 'Setúbal', 'Guimarães'
+  ],
+  'Grèce': [
+    'Athènes', 'Santorin', 'Mykonos', 'Rhodes', 'Crète', 'Corfou', 'Delphes', 'Meteora',
+    'Thessalonique', 'Naxos', 'Paros', 'Milos', 'Hydra', 'Zante', 'Céphalonie', 'Olympie'
+  ],
+  'Vietnam': [
+    'Hanoï', 'Hô Chi Minh-Ville', 'Hội An', 'Da Nang', 'Halong Bay', 'Huế', 'Sa Pa', 'Nha Trang',
+    'Dalat', 'Phú Quốc', 'Mũi Né', 'Ninh Binh', 'Can Tho', 'Mekong Delta', 'Cao Bang', 'Tam Cốc'
+  ],
+  'Japon': [
+    'Tokyo', 'Kyoto', 'Osaka', 'Nara', 'Hiroshima', 'Hakone', 'Nikko', 'Kanazawa',
+    'Takayama', 'Kamakura', 'Miyajima', 'Naoshima', 'Kobe', 'Nagoya', 'Sapporo', 'Okinawa'
+  ],
+  'Thaïlande': [
+    'Bangkok', 'Chiang Mai', 'Phuket', 'Krabi', 'Koh Samui', 'Koh Phi Phi', 'Ayutthaya',
+    'Sukhothai', 'Pai', 'Chiang Rai', 'Koh Lanta', 'Koh Tao', 'Hua Hin', 'Kanchanaburi'
+  ],
+  'Maroc': [
+    'Marrakech', 'Fès', 'Chefchaouen', 'Essaouira', 'Casablanca', 'Rabat', 'Merzouga',
+    'Ouarzazate', 'Tanger', 'Asilah', 'Meknès', 'Tétouan', 'Agadir', 'Dades Gorges'
+  ],
+  'États-Unis': [
+    'New York', 'Los Angeles', 'San Francisco', 'Las Vegas', 'Miami', 'Chicago', 'Boston',
+    'Washington DC', 'La Nouvelle-Orléans', 'Seattle', 'Honolulu', 'Grand Canyon', 
+    'Yosemite', 'Yellowstone', 'Monument Valley', 'Key West', 'Santa Fe', 'Savannah'
+  ]
+};
+
 const EbookTravelGuideGenerator: React.FC<EbookTravelGuideGeneratorProps> = ({ ebookTitle = '' }) => {
   // Configuration
   const [bookTitle, setBookTitle] = useState(ebookTitle || '');
@@ -264,7 +315,11 @@ const EbookTravelGuideGenerator: React.FC<EbookTravelGuideGeneratorProps> = ({ e
         : '';
 
       let allDestinations: any[] = [];
-      const alreadyGenerated: string[] = []; // Pour éviter les doublons
+      const alreadyGenerated: string[] = getUsedDestinations(finalCountry); // Récupérer les destinations déjà utilisées
+
+      // Obtenir le pool de destinations réelles pour ce pays
+      const countryPool = realDestinationPools[finalCountry] || [];
+      const availableFromPool = countryPool.filter(d => !alreadyGenerated.includes(d));
 
       for (let batch = 0; batch < batches; batch++) {
         const remaining = totalCount - allDestinations.length;
@@ -276,9 +331,14 @@ const EbookTravelGuideGenerator: React.FC<EbookTravelGuideGeneratorProps> = ({ e
         setProgress(progressPercent);
         setCurrentStep(`Génération des fiches ${allDestinations.length + 1} à ${allDestinations.length + batchCount} sur ${totalCount}...`);
 
-        // Instruction anti-doublons
+        // Instruction anti-doublons RENFORCÉE avec liste de destinations suggérées
         const excludeInstruction = alreadyGenerated.length > 0 
-          ? `\n\n⚠️ NE PAS RÉPÉTER ces destinations déjà générées: ${alreadyGenerated.join(', ')}`
+          ? `\n\n🚫 DESTINATIONS INTERDITES (déjà générées): ${alreadyGenerated.join(', ')}`
+          : '';
+        
+        // Suggestions de destinations réelles pour guider l'IA
+        const suggestedDestinations = availableFromPool.length > 0
+          ? `\n\n✅ DESTINATIONS SUGGÉRÉES (utiliser celles-ci en priorité): ${availableFromPool.slice(0, 10).join(', ')}`
           : '';
 
         try {
@@ -290,22 +350,23 @@ const EbookTravelGuideGenerator: React.FC<EbookTravelGuideGeneratorProps> = ({ e
 TITRE DU GUIDE: "${bookTitle}"
 ${customInstructions ? `Instructions spéciales: ${customInstructions}` : ''}
 
-⚠️ RÈGLES ABSOLUES - COHÉRENCE OBLIGATOIRE AVEC LE TITRE:
+🚨 RÈGLES CRITIQUES - À RESPECTER IMPÉRATIVEMENT:
 
-1. ANALYSE DU TITRE "${bookTitle}":
-${themeInstruction}
-${countryInstruction}
-${finalCountry ? `Les destinations DOIVENT toutes être en ${finalCountry}. Aucune exception.` : ''}
+1. NOMS DE DESTINATIONS OBLIGATOIRES:
+   - Utilise UNIQUEMENT des noms de lieux RÉELS et EXISTANTS
+   - JAMAIS de noms génériques comme "Côte sauvage", "Capitale historique", "Village pittoresque"
+   - Chaque destination doit avoir un NOM PROPRE reconnaissable (ex: "Paris", "Lyon", "Annecy")
 
-2. SI LE TITRE MENTIONNE UN THÈME SPÉCIFIQUE (parcs, zoos, plages, châteaux, etc.):
-   - Chaque fiche DOIT être un lieu correspondant à ce thème
-   - NE PAS générer de villes ou destinations touristiques génériques
-   - Par exemple: "Parcs et Zoos de France" = Zoo de Beauval, Parc Astérix, Bioparc de Doué-la-Fontaine, etc.
-   - Par exemple: "Châteaux de la Loire" = Chambord, Chenonceau, Amboise, etc.
-
+2. PAYS OBLIGATOIRE: ${finalCountry || 'Varie les pays du monde'}
+${finalCountry ? `   - TOUTES les destinations doivent être en ${finalCountry}. AUCUNE EXCEPTION.` : ''}
+${suggestedDestinations}
 ${excludeInstruction}
 
-Génère exactement ${batchCount} FICHES DESTINATIONS COMPLÈTES (minimum 800 mots chacune).
+3. SI LE TITRE "${bookTitle}" MENTIONNE UN THÈME SPÉCIFIQUE:
+${themeInstruction || '   - Génère des destinations touristiques variées'}
+   - NE PAS générer de contenu hors-sujet
+
+Génère exactement ${batchCount} FICHES DESTINATIONS avec des NOMS RÉELS (800 mots min chacune).
 Ce sont les fiches ${allDestinations.length + 1} à ${allDestinations.length + batchCount} d'un guide de ${totalCount} destinations.
 
 ⚠️ RAPPEL: Le contenu DOIT correspondre au titre "${bookTitle}". Analyse le titre et génère des lieux appropriés.
@@ -410,11 +471,14 @@ Format JSON strict:
         ],
       }));
 
+      // Sauvegarder les destinations générées dans le localStorage pour éviter les doublons futurs
+      if (finalCountry && alreadyGenerated.length > 0) {
+        saveUsedDestinations(finalCountry, alreadyGenerated);
+      }
+
       setSheets(generatedSheets);
       setProgress(100);
       setCurrentStep('Guide de voyage généré !');
-      setActiveTab('sheets');
-      toast.success(`🎉 ${generatedSheets.length} fiches destinations générées !`);
       setActiveTab('sheets');
       toast.success(`🎉 ${generatedSheets.length} fiches destinations générées !`);
       
@@ -426,48 +490,82 @@ Format JSON strict:
     }
   };
 
-  // Fallback destinations generator
+  // Récupérer les destinations déjà utilisées depuis localStorage
+  const getUsedDestinations = (country: string): string[] => {
+    try {
+      const key = `travel_used_${country.toLowerCase().replace(/\s/g, '_')}`;
+      const stored = localStorage.getItem(key);
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  };
+
+  // Sauvegarder les destinations utilisées
+  const saveUsedDestinations = (country: string, destinations: string[]) => {
+    try {
+      const key = `travel_used_${country.toLowerCase().replace(/\s/g, '_')}`;
+      localStorage.setItem(key, JSON.stringify(destinations));
+    } catch (e) {
+      console.error('Erreur sauvegarde destinations:', e);
+    }
+  };
+
+  // Fallback avec destinations RÉELLES
   const generateFallbackDestinations = (count: number, country: string) => {
     const fallbackData: any[] = [];
-    const genericDestinations = [
-      { name: 'Capitale historique', region: 'Centre' },
-      { name: 'Côte sauvage', region: 'Littoral' },
-      { name: 'Montagne majestueuse', region: 'Massif central' },
-      { name: 'Village pittoresque', region: 'Campagne' },
-      { name: 'Cité médiévale', region: 'Province' },
-    ];
+    
+    // Obtenir le pool de destinations réelles pour ce pays
+    const pool = realDestinationPools[country] || [];
+    const usedDestinations = getUsedDestinations(country);
+    
+    // Filtrer les destinations non utilisées
+    let availableDestinations = pool.filter(d => !usedDestinations.includes(d));
+    
+    // Si toutes utilisées, réinitialiser
+    if (availableDestinations.length < count) {
+      availableDestinations = [...pool];
+      saveUsedDestinations(country, []);
+    }
+    
+    // Sélectionner aléatoirement
+    const shuffled = availableDestinations.sort(() => Math.random() - 0.5);
+    const selected = shuffled.slice(0, count);
+    
+    // Sauvegarder les nouvelles utilisées
+    saveUsedDestinations(country, [...usedDestinations, ...selected]);
     
     for (let i = 0; i < count; i++) {
-      const template = genericDestinations[i % genericDestinations.length];
+      const destName = selected[i] || `${country} - Site ${i + 1}`;
       fallbackData.push({
-        destinationName: `${template.name} de ${country || 'la région'}`,
+        destinationName: destName,
         country: country || 'International',
-        region: template.region,
-        population: 'Plusieurs milliers d\'habitants',
+        region: `Région de ${destName}`,
+        population: 'Destination touristique majeure',
         language: 'Langue locale',
         currency: 'Monnaie locale',
         climate: 'Climat agréable',
         bestSeason: 'Printemps et automne',
-        description: `Une destination exceptionnelle offrant des paysages à couper le souffle et une culture riche.`,
-        history: 'Un lieu chargé d\'histoire et de traditions séculaires.',
+        description: `${destName} est une destination incontournable de ${country}, offrant un mélange unique de culture, d'histoire et de paysages exceptionnels. Cette ville/site attire des millions de visiteurs chaque année grâce à son patrimoine remarquable et son atmosphère authentique.`,
+        history: `${destName} possède une histoire riche remontant à plusieurs siècles. Son patrimoine architectural témoigne des différentes époques qui ont façonné son identité culturelle unique.`,
         mainDish: 'Spécialité traditionnelle locale',
-        dishDescription: 'Un plat savoureux préparé selon des recettes ancestrales.',
-        localSpecialties: ['Fromage local', 'Vin régional', 'Pâtisserie traditionnelle'],
+        dishDescription: 'Un plat emblématique préparé selon des recettes ancestrales transmises de génération en génération.',
+        localSpecialties: ['Spécialité régionale', 'Produit du terroir', 'Dessert traditionnel'],
         accommodations: {
-          budget: 'Auberge de jeunesse accueillante',
-          midRange: 'Hôtel 3 étoiles confortable',
-          luxury: 'Hôtel de charme 5 étoiles'
+          budget: 'Auberge de jeunesse ou chambre d\'hôte',
+          midRange: 'Hôtel 3-4 étoiles en centre-ville',
+          luxury: 'Palace ou hôtel de charme 5 étoiles'
         },
-        whereToStay: 'Le centre historique est idéal pour séjourner.',
-        mustSee: ['Place centrale', 'Cathédrale historique', 'Musée local', 'Parc naturel', 'Marché traditionnel'],
-        hiddenGems: ['Ruelles secrètes', 'Point de vue panoramique'],
-        activities: ['Randonnée', 'Dégustation locale', 'Visite guidée'],
-        travelTips: 'Réservez vos hébergements à l\'avance en haute saison.',
-        transportation: 'Location de voiture recommandée pour explorer la région.',
+        whereToStay: `Le centre historique de ${destName} offre les meilleures options d'hébergement, à proximité des attractions principales.`,
+        mustSee: [`Centre historique de ${destName}`, 'Monument principal', 'Musée local', 'Quartier pittoresque', 'Site panoramique'],
+        hiddenGems: ['Rue secrète locale', 'Point de vue méconnu'],
+        activities: ['Visite guidée du patrimoine', 'Dégustation culinaire', 'Balade découverte'],
+        travelTips: `Visitez ${destName} de préférence tôt le matin pour éviter la foule. Réservez vos hébergements à l'avance en haute saison.`,
+        transportation: 'Accessible en train/avion. Transport local disponible sur place.',
         faq: [
-          { question: 'Quel budget prévoir par jour?', answer: 'Comptez entre 80 et 150€ par jour selon votre style.' },
-          { question: 'La région est-elle sûre?', answer: 'Oui, c\'est une destination très sûre pour les touristes.' },
-          { question: 'Faut-il parler la langue locale?', answer: 'Les bases suffisent, l\'anglais est souvent compris.' }
+          { question: `Combien de jours prévoir à ${destName}?`, answer: 'Minimum 2-3 jours pour découvrir les incontournables.' },
+          { question: 'Quel budget quotidien prévoir?', answer: 'Entre 80 et 150€ par jour selon votre style de voyage.' },
+          { question: 'Quelle est la meilleure période?', answer: 'Printemps et automne pour un climat agréable et moins de touristes.' }
         ]
       });
     }
