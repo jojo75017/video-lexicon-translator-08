@@ -993,85 +993,26 @@ ${sheet.faq.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}
           <Card>
             <CardContent className="pt-6">
               <div className="grid md:grid-cols-2 gap-8">
-                {/* Cover Preview with 3D Mockup */}
+                {/* Cover Preview - Simple image display */}
                 <div className="flex flex-col items-center">
-                  <div 
-                    className="relative"
-                    style={{
-                      perspective: '1200px',
-                      width: '320px',
-                      height: '420px',
-                    }}
-                  >
-                    <div
-                      style={{
-                        position: 'relative',
-                        width: '280px',
-                        height: '400px',
-                        transformStyle: 'preserve-3d',
-                        transform: 'rotateY(-20deg)',
-                      }}
-                    >
-                      {/* Book spine */}
-                      <div
-                        style={{
-                          position: 'absolute',
-                          left: '-30px',
-                          top: '0',
-                          width: '30px',
-                          height: '100%',
-                          background: 'linear-gradient(to right, #1a1a1a, #333)',
-                          transform: 'rotateY(90deg)',
-                          transformOrigin: 'right center',
-                          borderRadius: '2px 0 0 2px',
-                        }}
-                      />
-                      
-                      {/* Front cover */}
-                      <div
-                        className="absolute inset-0 rounded-r-lg overflow-hidden shadow-2xl"
-                        style={{
-                          background: coverImageUrl 
-                            ? `url(${coverImageUrl}) center/cover`
-                            : 'linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%)',
-                        }}
-                      >
-                        {!coverImageUrl && (
-                          <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-6 text-center">
-                            <Plane className="h-16 w-16 mb-4 opacity-80" />
-                            <h3 className="text-xl font-bold">{bookTitle || 'Titre du guide'}</h3>
-                            {authorName && <p className="mt-2 opacity-80">{authorName}</p>}
-                          </div>
-                        )}
-                      </div>
-                      
-                      {/* Page edges */}
-                      <div
-                        style={{
-                          position: 'absolute',
-                          right: '-8px',
-                          top: '2px',
-                          width: '8px',
-                          height: 'calc(100% - 4px)',
-                          background: 'repeating-linear-gradient(to bottom, #f5f5f5 0px, #e0e0e0 1px, #f5f5f5 2px)',
-                          borderRadius: '0 2px 2px 0',
-                        }}
+                  {coverImageUrl ? (
+                    <div className="relative">
+                      <img 
+                        src={coverImageUrl} 
+                        alt="Couverture du guide" 
+                        className="max-h-[450px] w-auto rounded-lg shadow-2xl object-cover"
                       />
                     </div>
-                    
-                    {/* Shadow */}
-                    <div
-                      style={{
-                        position: 'absolute',
-                        bottom: '-20px',
-                        left: '20px',
-                        right: '20px',
-                        height: '30px',
-                        background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.3) 0%, transparent 70%)',
-                        filter: 'blur(10px)',
-                      }}
-                    />
-                  </div>
+                  ) : (
+                    <div className="w-full max-w-sm aspect-[3/4] bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-blue-900/30 dark:to-cyan-900/30 rounded-lg flex items-center justify-center border-2 border-dashed border-blue-300">
+                      <div className="text-center p-6">
+                        <Plane className="h-16 w-16 mx-auto text-blue-400 mb-4" />
+                        <h3 className="text-lg font-semibold text-blue-600">{bookTitle || 'Titre du guide'}</h3>
+                        {authorName && <p className="mt-2 text-sm text-muted-foreground">{authorName}</p>}
+                        <p className="mt-4 text-sm text-muted-foreground">Cliquez sur "Générer" pour créer votre couverture</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Cover controls */}
@@ -1098,6 +1039,22 @@ ${sheet.faq.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}
                       </>
                     )}
                   </Button>
+                  
+                  {coverImageUrl && (
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => {
+                        const link = document.createElement('a');
+                        link.href = coverImageUrl;
+                        link.download = `couverture-${bookTitle.replace(/\s+/g, '-')}.png`;
+                        link.click();
+                      }}
+                    >
+                      <Download className="mr-2 h-4 w-4" />
+                      Télécharger la couverture
+                    </Button>
+                  )}
                 </div>
               </div>
             </CardContent>
@@ -1119,8 +1076,14 @@ ${sheet.faq.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Badge variant="outline" className="bg-white">
-                        {countWords(sheet)} mots
+                      <Badge 
+                        variant="outline" 
+                        className={countWords(sheet) >= 800 
+                          ? "bg-green-100 text-green-700 border-green-300" 
+                          : "bg-red-100 text-red-700 border-red-300"
+                        }
+                      >
+                        {countWords(sheet)} mots {countWords(sheet) >= 800 ? '✓' : '⚠️'}
                       </Badge>
                       <Button
                         variant="ghost"

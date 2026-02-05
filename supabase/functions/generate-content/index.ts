@@ -1482,6 +1482,114 @@ Réponds avec du texte formaté de manière professionnelle, bien structuré ave
       }
     }
 
+    // ====== TRAVEL SHEETS HANDLER ======
+    // Dedicated handler for travel-sheets with very high token limit for 800+ word destinations
+    if (type === 'travel-sheets') {
+      console.log('Processing travel-sheets generation (OpenAI - very high tokens)...');
+      const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+      
+      if (!OPENAI_API_KEY) {
+        console.error('OPENAI_API_KEY not found for travel-sheets');
+        return new Response(
+          JSON.stringify({ error: 'Clé API OpenAI non configurée' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 180000); // 3 min timeout
+
+        console.log('Calling OpenAI for travel-sheets with very high token limit...');
+        
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${OPENAI_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'gpt-4o-mini',
+            messages: [
+              { 
+                role: 'system', 
+                content: `Tu es un guide touristique professionnel et rédacteur de guides de voyage premium.
+
+RÈGLES CRITIQUES OBLIGATOIRES:
+- Chaque fiche destination DOIT contenir MINIMUM 800 MOTS de texte
+- La "description" DOIT faire minimum 150 mots (5-6 phrases détaillées et immersives)
+- L'"history" DOIT faire minimum 100 mots (contexte historique riche)
+- "mustSee" doit contenir 6 lieux avec descriptions de 2-3 phrases chacun
+- "whereToStay" doit faire minimum 80 mots
+- "travelTips" et "transportation" doivent faire 60+ mots chacun
+- Les FAQ doivent avoir des réponses de 40+ mots chacune
+- Inclure des anecdotes, détails culturels, conseils pratiques précis
+
+STRUCTURE DE CHAQUE FICHE (800+ mots total):
+1. Description immersive (150+ mots)
+2. Histoire et culture (100+ mots)
+3. Gastronomie détaillée (100+ mots via dishDescription + specialties)
+4. 6 lieux incontournables avec descriptions (180+ mots)
+5. Hébergements détaillés par gamme (100+ mots)
+6. Conseils pratiques approfondis (100+ mots)
+7. 3 FAQ avec réponses complètes (120+ mots)
+
+Réponds UNIQUEMENT en JSON valide sans markdown ni backticks.`
+              },
+              { role: 'user', content: prompt }
+            ],
+            max_tokens: 12000,
+            temperature: 0.85,
+          }),
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('OpenAI error for travel-sheets:', response.status, errorText);
+          
+          if (response.status === 429) {
+            return new Response(
+              JSON.stringify({ error: 'Trop de requêtes. Réessayez dans quelques instants.' }),
+              { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
+          }
+          
+          return new Response(
+            JSON.stringify({ error: 'Erreur lors de la génération des fiches voyage' }),
+            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        const data = await response.json();
+        const generatedContent = data.choices?.[0]?.message?.content;
+
+        if (!generatedContent) {
+          console.error('No content in travel-sheets response');
+          return new Response(
+            JSON.stringify({ error: 'Réponse vide de l\'IA' }),
+            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        console.log('Travel-sheets generated successfully, content length:', generatedContent.length);
+        return new Response(
+          JSON.stringify({ content: generatedContent }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+
+      } catch (err) {
+        console.error('Travel-sheets generation error:', err);
+        const errorMessage = err?.name === 'AbortError' ? 'Timeout - génération trop longue' : err?.message;
+        return new Response(
+          JSON.stringify({ error: errorMessage || 'Erreur lors de la génération des fiches voyage' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+
     // ====== RECIPE SHEETS HANDLER ======
     // Dedicated handler for recipe-sheets with high token limit for 300+ word recipes
     if (type === 'recipe-sheets') {
