@@ -163,9 +163,11 @@ const EbookTravelGuideGenerator: React.FC<EbookTravelGuideGeneratorProps> = ({ e
     }
   };
 
-  // Analyse du titre pour cohérence
-  const analyzeTitle = (title: string): string => {
+  // Analyse du titre pour extraire le pays ET le thème spécifique
+  const analyzeTitle = (title: string): { country: string; theme: string } => {
     const titleLower = title.toLowerCase();
+    
+    // Détection du pays
     const countryKeywords: Record<string, string> = {
       'français': 'France', 'française': 'France', 'france': 'France', 'paris': 'France',
       'italien': 'Italie', 'italienne': 'Italie', 'italie': 'Italie', 'rome': 'Italie', 'venise': 'Italie',
@@ -187,12 +189,50 @@ const EbookTravelGuideGenerator: React.FC<EbookTravelGuideGeneratorProps> = ({ e
       'péruvien': 'Pérou', 'péruvienne': 'Pérou', 'pérou': 'Pérou', 'machu picchu': 'Pérou',
     };
     
+    // Détection du thème spécifique
+    const themeKeywords: Record<string, string> = {
+      'parc': 'parcs (parcs naturels, parcs animaliers, parcs d\'attractions, parcs régionaux)',
+      'zoo': 'zoos et parcs animaliers (zoos, aquariums, réserves animalières, safaris)',
+      'plage': 'plages et stations balnéaires',
+      'montagne': 'montagnes et stations de ski',
+      'château': 'châteaux et monuments historiques',
+      'musée': 'musées et galeries d\'art',
+      'jardin': 'jardins botaniques et espaces verts',
+      'île': 'îles et archipels',
+      'lac': 'lacs et plans d\'eau',
+      'village': 'villages pittoresques et de charme',
+      'cathédrale': 'cathédrales et édifices religieux',
+      'restaurant': 'restaurants gastronomiques',
+      'spa': 'spas et centres de bien-être',
+      'camping': 'campings et hébergements nature',
+      'vignoble': 'vignobles et routes des vins',
+      'aquarium': 'aquariums et centres marins',
+      'safari': 'safaris et réserves naturelles',
+      'randonnée': 'sentiers de randonnée',
+      'cascade': 'cascades et sites naturels',
+      'grotte': 'grottes et sites souterrains',
+      'temple': 'temples et sites spirituels',
+      'marché': 'marchés locaux et artisanaux',
+    };
+    
+    let detectedCountry = '';
+    let detectedTheme = '';
+    
     for (const [keyword, country] of Object.entries(countryKeywords)) {
       if (titleLower.includes(keyword)) {
-        return country;
+        detectedCountry = country;
+        break;
       }
     }
-    return '';
+    
+    for (const [keyword, theme] of Object.entries(themeKeywords)) {
+      if (titleLower.includes(keyword)) {
+        detectedTheme = theme;
+        break;
+      }
+    }
+    
+    return { country: detectedCountry, theme: detectedTheme };
   };
 
   // Generate travel sheets - BATCH MODE (5 fiches par appel pour éviter les timeouts)
@@ -211,13 +251,19 @@ const EbookTravelGuideGenerator: React.FC<EbookTravelGuideGeneratorProps> = ({ e
       const BATCH_SIZE = 2; // 2 fiches par batch pour éviter absolument les timeouts
       const batches = Math.ceil(totalCount / BATCH_SIZE);
       
-      // Analyse du titre pour cohérence
-      const countryFromTitle = analyzeTitle(bookTitle);
+      // Analyse du titre pour cohérence (pays + thème)
+      const { country: countryFromTitle, theme: themeFromTitle } = analyzeTitle(bookTitle);
       const finalCountry = countryFromTitle || (selectedCountry !== 'tour-du-monde' ? selectedCountry : '');
       
+      // Instructions obligatoires basées sur le pays
       const countryInstruction = finalCountry 
         ? `OBLIGATOIRE: TOUTES les destinations doivent être EXCLUSIVEMENT dans ${finalCountry}. NE PAS inclure de destinations d'autres pays.`
         : 'Variété des 5 continents avec des destinations emblématiques de différents pays.';
+      
+      // Instructions obligatoires basées sur le thème détecté dans le titre
+      const themeInstruction = themeFromTitle 
+        ? `⚠️ THÈME OBLIGATOIRE: Ce guide porte sur "${themeFromTitle}". CHAQUE fiche doit être un(e) ${themeFromTitle}. NE PAS générer des villes ou destinations génériques.`
+        : '';
 
       let allDestinations: any[] = [];
       const alreadyGenerated: string[] = []; // Pour éviter les doublons
@@ -246,38 +292,50 @@ const EbookTravelGuideGenerator: React.FC<EbookTravelGuideGeneratorProps> = ({ e
 TITRE DU GUIDE: "${bookTitle}"
 ${customInstructions ? `Instructions spéciales: ${customInstructions}` : ''}
 
-⚠️ RÈGLE ABSOLUE - COHÉRENCE AVEC LE TITRE:
+⚠️ RÈGLES ABSOLUES - COHÉRENCE OBLIGATOIRE AVEC LE TITRE:
+
+1. ANALYSE DU TITRE "${bookTitle}":
+${themeInstruction}
 ${countryInstruction}
 ${finalCountry ? `Les destinations DOIVENT toutes être en ${finalCountry}. Aucune exception.` : ''}
+
+2. SI LE TITRE MENTIONNE UN THÈME SPÉCIFIQUE (parcs, zoos, plages, châteaux, etc.):
+   - Chaque fiche DOIT être un lieu correspondant à ce thème
+   - NE PAS générer de villes ou destinations touristiques génériques
+   - Par exemple: "Parcs et Zoos de France" = Zoo de Beauval, Parc Astérix, Bioparc de Doué-la-Fontaine, etc.
+   - Par exemple: "Châteaux de la Loire" = Chambord, Chenonceau, Amboise, etc.
+
 ${excludeInstruction}
 
 Génère exactement ${batchCount} FICHES DESTINATIONS COMPLÈTES (minimum 800 mots chacune).
 Ce sont les fiches ${allDestinations.length + 1} à ${allDestinations.length + batchCount} d'un guide de ${totalCount} destinations.
 
+⚠️ RAPPEL: Le contenu DOIT correspondre au titre "${bookTitle}". Analyse le titre et génère des lieux appropriés.
+
 IMPORTANT: Chaque fiche doit être TRÈS DÉTAILLÉE avec au moins 800 mots de contenu riche.
 Retourne UNIQUEMENT du JSON valide, sans texte avant ni après.
 
 Pour CHAQUE destination, fournis OBLIGATOIREMENT:
-- destinationName: Nom de la ville/région/lieu (UNIQUE, pas de doublon)
+- destinationName: Nom du lieu CORRESPONDANT AU THÈME DU TITRE (UNIQUE, pas de doublon)
 - country: "${finalCountry || 'Pays d\'origine'}"
 - region: La région spécifique
-- population: Population approximative de la ville/région
+- population: Fréquentation annuelle ou info pertinente
 - language: Langue(s) parlée(s)
 - currency: Monnaie locale
 - climate: Type de climat
 - bestSeason: Meilleure période pour visiter
 - description: Description immersive et captivante (4-5 phrases sur l'ambiance, les paysages, l'atmosphère)
 - history: Histoire et contexte culturel (3-4 phrases sur le patrimoine, les traditions)
-- mainDish: Le plat emblématique local
+- mainDish: Le plat emblématique local ou du restaurant sur place
 - dishDescription: Description appétissante du plat (3 phrases avec ingrédients et saveurs)
 - localSpecialties: ["Spécialité 1", "Spécialité 2", "Spécialité 3"] - 3 autres spécialités culinaires
-- accommodations: {"budget": "Nom et description hôtel économique", "midRange": "Nom et description hôtel milieu de gamme", "luxury": "Nom et description hôtel luxe"}
-- whereToStay: Conseils sur les quartiers où loger (3-4 phrases)
-- mustSee: ["Lieu 1 avec description courte", "Lieu 2...", ...] - 5-6 lieux incontournables
-- hiddenGems: ["Trésor 1", "Trésor 2"] - 2-3 trésors cachés
-- activities: ["Activité 1", "Activité 2", "Activité 3"] - 3-4 activités recommandées
+- accommodations: {"budget": "Hébergement économique proche", "midRange": "Hôtel milieu de gamme à proximité", "luxury": "Hébergement luxe dans la région"}
+- whereToStay: Conseils sur où loger pour visiter ce lieu (3-4 phrases)
+- mustSee: ["Attraction 1 avec description courte", "Attraction 2...", ...] - 5-6 attractions incontournables DU LIEU
+- hiddenGems: ["Secret 1", "Secret 2"] - 2-3 secrets ou astuces pour ce lieu
+- activities: ["Activité 1", "Activité 2", "Activité 3"] - 3-4 activités recommandées SUR PLACE
 - travelTips: Conseils pratiques essentiels (3-4 phrases)
-- transportation: Comment se déplacer localement (2-3 phrases)
+- transportation: Comment se rendre et se déplacer (2-3 phrases)
 - faq: [{"question": "Question 1?", "answer": "Réponse détaillée 1"}, {"question": "Question 2?", "answer": "Réponse 2"}, {"question": "Question 3?", "answer": "Réponse 3"}] - EXACTEMENT 3 questions-réponses pertinentes
 
 Format JSON strict:
