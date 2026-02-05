@@ -46,6 +46,26 @@ export function SubscriberGate({
         return;
       }
 
+      // Double-check: if there's an active Supabase session, verify admin status
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          const { data } = await supabase.functions.invoke('check-admin', {
+            headers: { Authorization: `Bearer ${session.access_token}` }
+          });
+          if (data?.isAdmin) {
+            console.log('SubscriberGate: Admin confirmed via session check');
+            if (!cancelled) {
+              setAllowed(true);
+              setChecking(false);
+            }
+            return;
+          }
+        }
+      } catch (err) {
+        console.log('SubscriberGate: Session check failed, continuing with subscriber validation');
+      }
+
       const email = (subscriberEmail || "").trim().toLowerCase();
       const code = (accessCode || "").trim().toUpperCase();
 
