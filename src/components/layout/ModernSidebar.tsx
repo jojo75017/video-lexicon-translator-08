@@ -168,6 +168,7 @@ const categories: Category[] = [
       { id: 'travel-guide', label: '✈️ Guide de Voyage', icon: Globe, isNew: true },
       { id: 'recipe-book', label: '🍳 Livre de Recettes', icon: BookOpen, isNew: true },
       { id: 'aquarium-guide', label: '🐠 Aquariophilie', icon: BookOpen, isNew: true },
+      { id: 'bird-guide', label: '🐦 Oiseaux', icon: BookOpen, isNew: true },
       { id: 'coloring-book', label: '🖍️ Livre Coloriage', icon: Palette },
       { id: 'comic-book', label: '💬 Bande Dessinée', icon: LayoutTemplate },
       { id: 'diary-generator', label: '📔 Journal / Agenda', icon: BookHeart },
