@@ -122,8 +122,45 @@ const PHOTO_STYLES = [
   { id: 'aerial', label: '🚁 Vue Aérienne', prompt: 'aerial drone photography, stunning bird eye view, landscape perspective, travel magazine' },
 ];
 
-// Pools de destinations RÉELLES par pays pour éviter les doublons et garantir la cohérence
+// Pools de destinations RÉELLES par pays/région pour éviter les doublons et garantir la cohérence
 const realDestinationPools: Record<string, string[]> = {
+  // Pool spécial pour l'Europe (villes européennes uniquement)
+  'Europe': [
+    // France
+    'Paris', 'Lyon', 'Marseille', 'Bordeaux', 'Nice', 'Strasbourg',
+    // Italie
+    'Rome', 'Venise', 'Florence', 'Milan', 'Naples', 'Vérone',
+    // Espagne
+    'Barcelone', 'Madrid', 'Séville', 'Valence', 'Grenade', 'Bilbao',
+    // Portugal
+    'Lisbonne', 'Porto', 'Sintra',
+    // Grèce
+    'Athènes', 'Santorin', 'Mykonos',
+    // Allemagne
+    'Berlin', 'Munich', 'Hambourg', 'Cologne', 'Francfort',
+    // Royaume-Uni
+    'Londres', 'Édimbourg', 'Oxford', 'Cambridge', 'Bath',
+    // Pays-Bas
+    'Amsterdam', 'Rotterdam', 'La Haye',
+    // Belgique
+    'Bruxelles', 'Bruges', 'Gand', 'Anvers',
+    // Autriche
+    'Vienne', 'Salzbourg', 'Innsbruck',
+    // Suisse
+    'Zurich', 'Genève', 'Lucerne', 'Berne',
+    // République Tchèque
+    'Prague', 'Cesky Krumlov',
+    // Hongrie
+    'Budapest',
+    // Croatie
+    'Dubrovnik', 'Split', 'Zagreb',
+    // Pologne
+    'Cracovie', 'Varsovie', 'Gdansk',
+    // Irlande
+    'Dublin', 'Galway', 'Cork',
+    // Scandinavie
+    'Copenhague', 'Stockholm', 'Oslo', 'Helsinki', 'Reykjavik'
+  ],
   'France': [
     'Paris', 'Lyon', 'Marseille', 'Bordeaux', 'Nice', 'Strasbourg', 'Toulouse', 'Nantes',
     'Montpellier', 'Lille', 'Rennes', 'Reims', 'Avignon', 'Aix-en-Provence', 'Cannes',
@@ -236,6 +273,9 @@ const EbookTravelGuideGenerator: React.FC<EbookTravelGuideGeneratorProps> = ({ e
       'croate': 'Croatie', 'croatie': 'Croatie', 'dubrovnik': 'Croatie',
       'islandais': 'Islande', 'islandaise': 'Islande', 'islande': 'Islande',
       'péruvien': 'Pérou', 'péruvienne': 'Pérou', 'pérou': 'Pérou', 'machu picchu': 'Pérou',
+      // Détection des régions/continents
+      'europe': 'Europe', 'européen': 'Europe', 'européenne': 'Europe', 'européennes': 'Europe', 'européens': 'Europe',
+      'd\'europe': 'Europe', 'en europe': 'Europe',
     };
     
     // Détection du thème spécifique
