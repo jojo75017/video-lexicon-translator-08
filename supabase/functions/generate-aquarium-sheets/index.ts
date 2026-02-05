@@ -33,19 +33,22 @@ serve(async (req) => {
 
     const categoryDesc = categoryDescriptions[category] || categoryDescriptions['tropical'];
 
-    const systemPrompt = `Tu es un expert aquariophile avec 20 ans d'expérience. Tu génères des fiches techniques ULTRA-DÉTAILLÉES pour poissons d'aquarium.
+    const systemPrompt = `Tu es un expert aquariophile avec 20 ans d'expérience. Tu génères des fiches techniques ULTRA-DÉTAILLÉES et LONGUES pour poissons d'aquarium.
 
 RÈGLES ABSOLUES:
-- Chaque fiche doit contenir TOUTES les sections du template
+- Chaque fiche doit contenir MINIMUM 500 MOTS de contenu textuel
+- Les descriptions doivent être TRÈS DÉTAILLÉES et COMPLÈTES
+- Chaque champ de texte doit faire AU MOINS 2-3 phrases complètes
 - Données RÉALISTES et PRÉCISES (paramètres eau, tailles, comportements)
-- Informations COMPLÈTES pour chaque champ
 - Format JSON strict
 - ${numberOfSheets} poissons DIFFÉRENTS, aucun doublon
 - Privilégie les espèces POPULAIRES et ACCESSIBLES en animalerie
 
 ${customInstructions ? `INSTRUCTIONS SPÉCIALES: ${customInstructions}` : ''}`;
 
-    const userPrompt = `Génère exactement ${numberOfSheets} fiches techniques de ${categoryDesc}.
+    const userPrompt = `Génère exactement ${numberOfSheets} fiches techniques TRÈS DÉTAILLÉES (500+ mots chacune) de ${categoryDesc}.
+
+IMPORTANT - CHAQUE CHAMP DOIT ÊTRE LONG ET DÉTAILLÉ:
 
 Pour chaque poisson, retourne un objet JSON avec cette structure EXACTE:
 
@@ -55,52 +58,60 @@ Pour chaque poisson, retourne un objet JSON avec cette structure EXACTE:
       "id": 1,
       "scientificName": "Paracheirodon innesi",
       "commonName": "Néon bleu",
-      "origin": "Amérique du Sud, Amazonie, eaux noires et acides",
-      "adultSize": "3.5 cm",
-      "lifespan": "5-8 ans",
-      "behavior": "Paisible, grégaire",
-      "swimmingLevel": "Milieu",
-      "temperature": "22-26°C",
-      "ph": "5.5-7.0",
-      "gh": "2-10",
-      "kh": "1-5",
-      "minVolume": "60L",
-      "sensitivity": "Sensible aux nitrates, acclimatation lente nécessaire",
-      "aquariumType": "Communautaire, biotope amazonien",
-      "setup": "Sable fin sombre, racines, plantes denses (Echinodorus, Microsorum), éclairage tamisé",
-      "lighting": "Faible à modéré",
-      "filtration": "Douce, peu de courant",
-      "compatible": ["Corydoras", "Rasboras", "Crevettes Amano", "Otocinclus", "Apistogramma"],
-      "avoid": ["Cichlidés agressifs", "Gros poissons", "Bettas"],
-      "stockingRule": "1 poisson / 5L, groupe minimum 10 individus",
-      "dietType": "Omnivore à tendance carnivore",
-      "mealFrequency": "2x par jour, petites quantités",
-      "menu": ["Micro-granulés", "Artémias", "Daphnies", "Vers de vase congelés"],
-      "dietWarning": "Éviter suralimentation, sensible aux ballonnements",
-      "substrate": "Sable fin 0.5-1mm, couleur sombre",
-      "plants": ["Cabomba", "Limnophila", "Cryptocoryne", "Mousse de Java"],
-      "hideouts": "Racines de mangrove, feuilles de catappa, zones plantées denses",
-      "reproductionType": "Ovipare, ponte en pleine eau",
-      "reproductionConditions": "Eau très acide (pH 5.5), obscurité, retirer parents après ponte",
-      "commonDiseases": ["Maladie du néon (Pleistophora)", "Ichtyophthirius", "Pourriture des nageoires"],
-      "stressSigns": "Décoloration, nage erratique, isolement du groupe",
-      "prevention": "NO3 < 20ppm, changements 20%/semaine, quarantaine nouveaux poissons",
-      "difficulty": "Intermédiaire",
+      "origin": "Originaire d'Amérique du Sud, principalement des affluents du bassin amazonien au Pérou et en Colombie. On le trouve naturellement dans les eaux noires et acides, riches en tanins provenant des feuilles mortes et du bois en décomposition. Ces eaux sont généralement très douces avec une faible minéralisation.",
+      "adultSize": "3-4 cm en aquarium, peut atteindre 4.5 cm dans des conditions optimales avec une alimentation variée",
+      "lifespan": "5 à 8 ans en captivité avec des soins appropriés, certains spécimens dépassant les 10 ans dans des aquariums parfaitement entretenus",
+      "behavior": "Poisson extrêmement paisible et grégaire qui doit impérativement être maintenu en groupe d'au moins 10 individus pour exprimer son comportement naturel de banc. En groupe, les néons nagent de manière synchronisée et créent un spectacle visuel magnifique. Ils sont actifs principalement en journée et préfèrent nager dans la zone médiane de l'aquarium.",
+      "swimmingLevel": "Zone médiane principalement, avec des incursions occasionnelles vers la surface pour l'alimentation",
+      "temperature": "22-26°C, idéalement 24°C pour une activité optimale et une coloration intense",
+      "ph": "5.5-7.0, préférence pour les eaux légèrement acides autour de 6.5",
+      "gh": "2-10 °dGH, les eaux très douces sont préférables pour la reproduction",
+      "kh": "1-5 °dKH, une faible dureté carbonatée est essentielle",
+      "minVolume": "60 litres minimum pour un groupe de 10-15 individus, 100 litres recommandés pour un groupe plus important",
+      "sensitivity": "Espèce sensible aux fluctuations des paramètres d'eau, particulièrement aux nitrates qui doivent rester sous 20 ppm. L'acclimatation doit être très progressive (méthode goutte-à-goutte sur 2-3 heures). Sensible également aux métaux lourds et au chlore résiduel.",
+      "aquariumType": "Aquarium communautaire paisible ou biotope amazonien reconstitué avec d'autres espèces sud-américaines calmes",
+      "setup": "Substrat de sable fin de couleur sombre pour mettre en valeur les couleurs du poisson. Décor composé de racines de mangrove ou de mopani créant des zones ombragées. Plantation dense sur les côtés et l'arrière avec des espèces amazoniennes comme Echinodorus, Microsorum pteropus, et Cabomba. Quelques feuilles de catappa ou de chêne pour teinter légèrement l'eau.",
+      "lighting": "Éclairage faible à modéré, tamisé par des plantes flottantes comme Salvinia ou Limnobium. Les néons sont plus colorés et moins stressés sous un éclairage doux.",
+      "filtration": "Filtration douce avec un débit modéré pour éviter les courants trop forts. Un filtre cascade ou éponge avec une sortie bien orientée est idéal. Filtration sur tourbe recommandée pour acidifier naturellement l'eau.",
+      "compatible": ["Corydoras paleatus et aeneus", "Rasboras arlequin", "Crevettes Amano et Neocaridina", "Otocinclus affinis", "Apistogramma cacatuoides", "Cardinalis", "Hyphessobrycon herbertaxelrodi"],
+      "avoid": ["Cichlidés africains et américains de grande taille", "Scalaires adultes qui peuvent les considérer comme proies", "Bettas territoriaux", "Barbus tigre mordeurs de nageoires", "Poissons combattants"],
+      "stockingRule": "1 poisson pour 5 litres d'eau nette, groupe minimum de 10 individus fortement recommandé, idéalement 15-20 pour un effet banc naturel",
+      "dietType": "Omnivore à tendance carnivore, acceptant une grande variété d'aliments adaptés à sa petite bouche",
+      "mealFrequency": "2 à 3 fois par jour en très petites quantités, juste ce qu'ils peuvent consommer en 2-3 minutes",
+      "menu": ["Micro-granulés de haute qualité", "Artémias vivants ou congelés", "Daphnies", "Vers de vase congelés", "Cyclops", "Paillettes broyées finement", "Nourriture vivante variée"],
+      "dietWarning": "Éviter absolument la suralimentation qui peut provoquer des ballonnements mortels. Jeûner un jour par semaine est bénéfique. Varier les sources de protéines pour une nutrition optimale.",
+      "substrate": "Sable fin 0.5-1mm de couleur sombre (noir, brun foncé) qui met en valeur la bande bleue fluorescente du poisson",
+      "plants": ["Cabomba caroliniana", "Limnophila sessiliflora", "Cryptocoryne wendtii", "Mousse de Java (Taxiphyllum barbieri)", "Echinodorus bleheri", "Vallisneria spiralis"],
+      "hideouts": "Racines de mangrove formant des grottes, feuilles de catappa créant des zones sombres, zones densément plantées offrant un sentiment de sécurité",
+      "reproductionType": "Ovipare, ponte en pleine eau parmi les plantes à feuilles fines",
+      "reproductionConditions": "Reproduction difficile nécessitant une eau très acide (pH 5.0-5.5), très douce (GH < 2), température 24-25°C, et obscurité totale. Les parents doivent être retirés immédiatement après la ponte car ils dévorent les œufs. Les alevins sont minuscules et nécessitent des infusoires puis des nauplies d'artémias.",
+      "commonDiseases": ["Maladie du néon (Pleistophora hyphessobryconis) - incurable et contagieuse", "Ichtyophthirius multifiliis (points blancs)", "Pourriture des nageoires due au stress ou mauvaise qualité d'eau", "Columnaris", "Infections bactériennes diverses"],
+      "stressSigns": "Décoloration de la bande bleue, nage erratique ou statique, isolement du groupe, respiration rapide, perte d'appétit, nageoires serrées contre le corps",
+      "prevention": "Maintenir les nitrates sous 20 ppm avec des changements d'eau hebdomadaires de 20-25%. Quarantaine stricte de 4 semaines pour tout nouveau poisson. Éviter les variations brusques de température ou de paramètres. Alimentation variée et de qualité.",
+      "difficulty": "Intermédiaire - nécessite une attention particulière aux paramètres d'eau mais reste accessible aux aquariophiles ayant quelques mois d'expérience",
       "difficultyStars": 2,
       "tips": [
-        "Acclimatation goutte-à-goutte sur 2 heures minimum",
-        "Jamais moins de 10 individus pour leur bien-être",
-        "Éviter cohabitation avec poissons vifs ou stressants"
+        "L'acclimatation goutte-à-goutte sur minimum 2 heures est absolument essentielle pour éviter le choc osmotique qui peut être fatal",
+        "Ne jamais maintenir moins de 10 individus car le stress du groupe trop petit affaiblit leur système immunitaire",
+        "Les néons sont plus colorés et actifs dans une eau légèrement ambrée obtenue avec des feuilles de catappa ou de la tourbe",
+        "Éviter de les introduire dans un aquarium de moins de 3 mois car ils sont sensibles au syndrome du nouvel aquarium",
+        "Un éclairage tamisé par des plantes flottantes révèle la fluorescence naturelle de leur bande bleue"
       ]
     }
   ]
 }
 
-IMPORTANT: 
-- Génère EXACTEMENT ${numberOfSheets} poissons DIFFÉRENTS
-- Chaque champ doit être REMPLI avec des données RÉELLES
-- Les paramètres eau doivent être PRÉCIS et CORRECTS
-- Varie les familles: Characidés, Cichlidés nains, Cyprinidés, Loricariidés, Anabantidés, etc.`;
+CRITIQUE - CHAQUE FICHE DOIT AVOIR:
+- origin: minimum 3 phrases détaillées sur l'habitat naturel
+- behavior: minimum 3 phrases sur le comportement social et l'activité
+- sensitivity: minimum 2 phrases sur les sensibilités particulières
+- setup: minimum 3 phrases détaillées sur l'aménagement
+- compatible/avoid: minimum 5-7 espèces chacun avec noms complets
+- menu: minimum 6-8 types d'aliments différents
+- tips: minimum 5 conseils détaillés (2 phrases chacun minimum)
+- Tous les autres champs: 1-2 phrases complètes minimum
+
+GÉNÈRE EXACTEMENT ${numberOfSheets} poissons DIFFÉRENTS avec ce niveau de détail.`;
 
     console.log(`Generating ${numberOfSheets} aquarium fish sheets (${category})...`);
 
@@ -115,12 +126,12 @@ IMPORTANT:
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
+          model: 'gpt-4o',
           messages: [
             { role: 'system', content: systemPrompt },
             { role: 'user', content: userPrompt }
           ],
-          max_tokens: 16000,
+          max_tokens: 32000,
           temperature: 0.7,
         }),
       });
