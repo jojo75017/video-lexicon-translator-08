@@ -114,6 +114,40 @@ const VIETNAM_DISH_POOL = [
   'Bún Thịt Nướng',
   'Cà Phê Sữa Đá (version dessert/boisson)',
   'Chè Ba Màu (dessert)',
+  // Extension du pool (pour éviter les répétitions quand l'utilisateur génère 20+ fiches)
+  'Bánh Khọt',
+  'Bò Lúc Lắc',
+  'Bún Mắm',
+  'Bánh Canh',
+  'Bún Cá',
+  'Bún Đậu Mắm Tôm',
+  'Bánh Giò',
+  'Bánh Ít Trần',
+  'Xôi Gà',
+  'Xôi Xéo',
+  'Cơm Gà Hội An',
+  'Cơm Chiên Dương Châu',
+  'Cháo Lòng',
+  'Cháo Gà',
+  'Canh Chua Cá',
+  'Cá Kho Tộ',
+  'Thịt Kho Tàu',
+  'Nem Rán (Chả Giò)',
+  'Bún Nem',
+  'Bánh Bột Lọc',
+  'Bánh Da Lợn (dessert)',
+  'Chè Đậu Đỏ (dessert)',
+  'Chè Chuối (dessert)',
+  'Sữa Chua Nếp Cẩm (dessert)',
+  'Bánh Flan Caramel (dessert)',
+  'Trà Đá (boisson)',
+  'Bò Kho',
+  'Miến Gà',
+  'Miến Lươn',
+  'Bún Bò Nam Bộ',
+  'Bún Thang',
+  'Chả Giò Chay',
+  'Bún Chay',
 ];
 
 // Interface pour une fiche recette (500+ mots par fiche)
@@ -437,6 +471,21 @@ Format JSON strict:
       
       let recipes = parsed?.recipes || [];
 
+      // Sécurisation: si l'utilisateur a demandé Vietnam, on force les plats et le pays.
+      // (évite les sorties hors-sujet + rend la sélection vraiment anti-doublons)
+      if (finalCountry === 'Vietnam' && requiredVietnamDishes.length) {
+        recipes = Array.isArray(recipes) ? recipes : [];
+        recipes = recipes.slice(0, count);
+        recipes = Array.from({ length: Math.min(count, requiredVietnamDishes.length) }).map((_, i) => {
+          const base = recipes[i] || {};
+          return {
+            ...base,
+            country: 'Vietnam',
+            dishName: requiredVietnamDishes[i],
+          };
+        });
+      }
+
       // Mémoriser les plats pour éviter de proposer la même sélection au prochain clic "Générer"
       // (utile quand l'utilisateur regen plusieurs fois pour obtenir un autre "top")
       try {
@@ -454,7 +503,16 @@ Format JSON strict:
       
       // Pad with fallback recipes if needed
       if (recipes.length < count) {
-        const fallbackRecipes = generateFallbackRecipes(count - recipes.length);
+        const remaining = count - recipes.length;
+        const fallbackRecipes = generateFallbackRecipes({
+          count: remaining,
+          finalCountry,
+          // pour Vietnam: compléter avec la liste obligatoire déjà calculée
+          requiredDishNames:
+            finalCountry === 'Vietnam' && requiredVietnamDishes.length
+              ? requiredVietnamDishes.slice(recipes.length)
+              : undefined,
+        });
         recipes = [...recipes, ...fallbackRecipes];
         toast.warning(`${fallbackRecipes.length} fiches de secours ajoutées`);
       }
@@ -498,7 +556,63 @@ Format JSON strict:
   };
 
   // Fallback recipes generator
-  const generateFallbackRecipes = (count: number) => {
+  const generateFallbackRecipes = (args: {
+    count: number;
+    finalCountry?: string;
+    requiredDishNames?: string[];
+  }) => {
+    const { count, finalCountry, requiredDishNames } = args;
+
+    // Fallback Vietnam (respect strict du pays demandé)
+    if ((finalCountry || '').toLowerCase() === 'vietnam') {
+      const names = (requiredDishNames && requiredDishNames.length)
+        ? requiredDishNames
+        : pickUnique(VIETNAM_DISH_POOL, count);
+
+      return names.slice(0, count).map((dishName) => ({
+        country: 'Vietnam',
+        dishName,
+        description:
+          `Un grand classique de la cuisine vietnamienne, aux saveurs équilibrées entre fraîcheur, umami et herbes aromatiques. La recette met en valeur des ingrédients simples et très parfumés.`,
+        history:
+          `Plat emblématique au Vietnam, souvent associé à la cuisine de rue et aux recettes familiales transmises. Il existe de nombreuses variations régionales selon le Nord, le Centre et le Sud.`,
+        winePairing: 'Riesling sec (Alsace) ou Gewürztraminer sec',
+        chefTips:
+          `Travaille les bouillons/sauces avec patience, utilise des herbes très fraîches, et ajuste l’équilibre salé-acide-sucré en fin de cuisson.`,
+        variations:
+          `Selon les régions, on change les herbes, la base (riz/nouilles) et l’intensité des condiments. Variante possible avec une version plus légère ou plus relevée.`,
+        servingSuggestion:
+          `Servir bien chaud (ou très frais selon la recette) avec herbes, citron vert et condiments à part pour personnaliser.`,
+        ingredients: [
+          '500g de protéine principale (au choix)',
+          '200g de nouilles/riz (selon la recette)',
+          '2 oignons ou échalotes',
+          '3 gousses d’ail',
+          'Gingembre frais',
+          'Sauce de poisson (nuoc-mâm) ou sauce soja',
+          'Sucre (ou sucre de coco)',
+          'Citron vert',
+          'Herbes fraîches (coriandre, menthe, basilic thaï)',
+          'Piment (optionnel)',
+        ],
+        steps: [
+          'Préparer et peser tous les ingrédients (mise en place)',
+          'Préparer la base aromatique (ail, gingembre, oignon)',
+          'Lancer la cuisson principale (bouillon/sauce/poêlée)',
+          'Cuire l’accompagnement (riz/nouilles) selon indication',
+          'Assembler les éléments et rectifier l’assaisonnement',
+          'Ajuster l’équilibre salé-acide-sucré',
+          'Ajouter les herbes fraîches au dernier moment',
+          'Dresser proprement et servir immédiatement',
+        ],
+        wineReason:
+          `Un blanc aromatique et sec accompagne parfaitement les herbes, l’acidité du citron vert et les épices, sans écraser la finesse des saveurs vietnamiennes.`,
+        cookingTime: 'Préparation: 25 min | Cuisson: 35 min',
+        difficulty: 'Moyen',
+        portions: '4 personnes',
+      }));
+    }
+
     const fallbackData = [
       { 
         country: 'France', 
