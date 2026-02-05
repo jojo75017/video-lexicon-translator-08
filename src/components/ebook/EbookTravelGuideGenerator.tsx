@@ -511,13 +511,34 @@ Format JSON strict:
     }
   };
 
+  // Pool GLOBAL de villes mondiales pour les guides "Tour du monde" ou sans pays spécifique
+  const globalWorldCities = [
+    // Europe
+    'Paris', 'Rome', 'Barcelone', 'Amsterdam', 'Prague', 'Vienne', 'Lisbonne', 'Berlin',
+    'Londres', 'Dublin', 'Athènes', 'Budapest', 'Copenhague', 'Stockholm', 'Édimbourg',
+    // Asie
+    'Tokyo', 'Kyoto', 'Singapour', 'Bangkok', 'Hong Kong', 'Séoul', 'Hanoï', 'Bali',
+    'Dubaï', 'Istanbul', 'Pékin', 'Shanghai', 'Mumbai', 'Jaipur', 'Kuala Lumpur',
+    // Amérique
+    'New York', 'San Francisco', 'Los Angeles', 'Miami', 'La Havane', 'Mexico', 'Rio de Janeiro',
+    'Buenos Aires', 'Lima', 'Carthagène', 'Vancouver', 'Montréal', 'Chicago', 'La Nouvelle-Orléans',
+    // Afrique & Océanie
+    'Marrakech', 'Le Cap', 'Le Caire', 'Sydney', 'Melbourne', 'Auckland', 'Queenstown'
+  ];
+
   // Fallback avec destinations RÉELLES
   const generateFallbackDestinations = (count: number, country: string) => {
     const fallbackData: any[] = [];
     
-    // Obtenir le pool de destinations réelles pour ce pays
-    const pool = realDestinationPools[country] || [];
-    const usedDestinations = getUsedDestinations(country);
+    // Obtenir le pool de destinations réelles pour ce pays OU le pool mondial
+    let pool = realDestinationPools[country] || [];
+    
+    // Si pas de pool pour ce pays spécifique, utiliser le pool mondial
+    if (pool.length === 0) {
+      pool = globalWorldCities;
+    }
+    
+    const usedDestinations = getUsedDestinations(country || 'world');
     
     // Filtrer les destinations non utilisées
     let availableDestinations = pool.filter(d => !usedDestinations.includes(d));
@@ -525,7 +546,7 @@ Format JSON strict:
     // Si toutes utilisées, réinitialiser
     if (availableDestinations.length < count) {
       availableDestinations = [...pool];
-      saveUsedDestinations(country, []);
+      saveUsedDestinations(country || 'world', []);
     }
     
     // Sélectionner aléatoirement
@@ -533,20 +554,42 @@ Format JSON strict:
     const selected = shuffled.slice(0, count);
     
     // Sauvegarder les nouvelles utilisées
-    saveUsedDestinations(country, [...usedDestinations, ...selected]);
+    saveUsedDestinations(country || 'world', [...usedDestinations, ...selected]);
+    
+    // Mapping pays pour les villes mondiales
+    const cityCountryMap: Record<string, string> = {
+      'Paris': 'France', 'Rome': 'Italie', 'Barcelone': 'Espagne', 'Amsterdam': 'Pays-Bas',
+      'Prague': 'République Tchèque', 'Vienne': 'Autriche', 'Lisbonne': 'Portugal', 'Berlin': 'Allemagne',
+      'Londres': 'Royaume-Uni', 'Dublin': 'Irlande', 'Athènes': 'Grèce', 'Budapest': 'Hongrie',
+      'Copenhague': 'Danemark', 'Stockholm': 'Suède', 'Édimbourg': 'Écosse',
+      'Tokyo': 'Japon', 'Kyoto': 'Japon', 'Singapour': 'Singapour', 'Bangkok': 'Thaïlande',
+      'Hong Kong': 'Chine', 'Séoul': 'Corée du Sud', 'Hanoï': 'Vietnam', 'Bali': 'Indonésie',
+      'Dubaï': 'Émirats Arabes Unis', 'Istanbul': 'Turquie', 'Pékin': 'Chine', 'Shanghai': 'Chine',
+      'Mumbai': 'Inde', 'Jaipur': 'Inde', 'Kuala Lumpur': 'Malaisie',
+      'New York': 'États-Unis', 'San Francisco': 'États-Unis', 'Los Angeles': 'États-Unis',
+      'Miami': 'États-Unis', 'La Havane': 'Cuba', 'Mexico': 'Mexique', 'Rio de Janeiro': 'Brésil',
+      'Buenos Aires': 'Argentine', 'Lima': 'Pérou', 'Carthagène': 'Colombie',
+      'Vancouver': 'Canada', 'Montréal': 'Canada', 'Chicago': 'États-Unis', 'La Nouvelle-Orléans': 'États-Unis',
+      'Marrakech': 'Maroc', 'Le Cap': 'Afrique du Sud', 'Le Caire': 'Égypte',
+      'Sydney': 'Australie', 'Melbourne': 'Australie', 'Auckland': 'Nouvelle-Zélande', 'Queenstown': 'Nouvelle-Zélande'
+    };
     
     for (let i = 0; i < count; i++) {
-      const destName = selected[i] || `${country} - Site ${i + 1}`;
+      const destName = selected[i] || globalWorldCities[i % globalWorldCities.length];
+      const destCountry = country || cityCountryMap[destName] || 'International';
+      const destFlag = countryFlags[destCountry] || '🌍';
+      
       fallbackData.push({
         destinationName: destName,
-        country: country || 'International',
+        country: destCountry,
+        countryFlag: destFlag,
         region: `Région de ${destName}`,
         population: 'Destination touristique majeure',
         language: 'Langue locale',
         currency: 'Monnaie locale',
         climate: 'Climat agréable',
         bestSeason: 'Printemps et automne',
-        description: `${destName} est une destination incontournable de ${country}, offrant un mélange unique de culture, d'histoire et de paysages exceptionnels. Cette ville/site attire des millions de visiteurs chaque année grâce à son patrimoine remarquable et son atmosphère authentique.`,
+        description: `${destName} est une destination incontournable de ${destCountry}, offrant un mélange unique de culture, d'histoire et de paysages exceptionnels. Cette ville attire des millions de visiteurs chaque année grâce à son patrimoine remarquable et son atmosphère authentique.`,
         history: `${destName} possède une histoire riche remontant à plusieurs siècles. Son patrimoine architectural témoigne des différentes époques qui ont façonné son identité culturelle unique.`,
         mainDish: 'Spécialité traditionnelle locale',
         dishDescription: 'Un plat emblématique préparé selon des recettes ancestrales transmises de génération en génération.',
