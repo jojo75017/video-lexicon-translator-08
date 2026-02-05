@@ -405,37 +405,34 @@ Format JSON strict:
     return fallbackData;
   };
 
-  // Generate images for all sheets
+  // Generate images for all sheets using dedicated travel image function
   const generateSheetImages = async (sheetsToProcess: TravelSheet[]) => {
     setIsGeneratingImages(true);
-    const photoPrompt = PHOTO_STYLES.find(s => s.id === photoStyle)?.prompt || PHOTO_STYLES[0].prompt;
     
     for (let i = 0; i < sheetsToProcess.length; i++) {
       const sheet = sheetsToProcess[i];
       setCurrentStep(`Image ${i + 1}/${sheetsToProcess.length}: ${sheet.destinationName}...`);
       
       try {
-        const { data, error } = await supabase.functions.invoke('generate-front-cover', {
+        const { data, error } = await supabase.functions.invoke('generate-travel-image', {
           body: {
-            ebookTitle: sheet.destinationName,
-            authorName: '',
-            genre: 'travel',
-            style: 'modern',
-            customPrompt: `${photoPrompt}. 
-Beautiful travel photograph of "${sheet.destinationName}" in ${sheet.country}.
-Stunning landscape, iconic landmark, or scenic view.
-Professional travel magazine quality.
-NO TEXT, NO WORDS, NO TITLE, NO LETTERS on the image.
-Pure photography only.`,
-            showAuthorName: false,
-            showTitle: false,
+            destinationName: sheet.destinationName,
+            country: sheet.country,
+            photoStyle: photoStyle
           }
         });
 
-        if (!error && data?.imageUrl) {
+        if (error) {
+          console.error(`Erreur image ${sheet.destinationName}:`, error);
+          if (error.message?.includes('429') || error.message?.includes('402')) {
+            toast.error(`Limite atteinte - images suivantes ignorées`);
+            break;
+          }
+        } else if (data?.imageUrl) {
           setSheets(prev => prev.map(s => 
             s.id === sheet.id ? { ...s, imageUrl: data.imageUrl, isGeneratingImage: false } : s
           ));
+          toast.success(`Image générée: ${sheet.destinationName}`);
         }
       } catch (err) {
         console.error(`Erreur image ${sheet.destinationName}:`, err);
@@ -447,7 +444,7 @@ Pure photography only.`,
     setIsGeneratingImages(false);
   };
 
-  // Regenerate single image
+  // Regenerate single image using dedicated travel image function
   const regenerateImage = async (sheetId: number) => {
     const sheet = sheets.find(s => s.id === sheetId);
     if (!sheet) return;
@@ -458,21 +455,12 @@ Pure photography only.`,
     
     toast.info(`Regénération de l'image pour ${sheet.destinationName}...`);
     
-    const photoPrompt = PHOTO_STYLES.find(s => s.id === photoStyle)?.prompt || PHOTO_STYLES[0].prompt;
-    
     try {
-      const { data, error } = await supabase.functions.invoke('generate-front-cover', {
+      const { data, error } = await supabase.functions.invoke('generate-travel-image', {
         body: {
-          ebookTitle: sheet.destinationName,
-          authorName: '',
-          genre: 'travel',
-          style: 'modern',
-          customPrompt: `${photoPrompt}. 
-Beautiful travel photograph of "${sheet.destinationName}" in ${sheet.country}.
-Stunning landscape, iconic landmark, or scenic view.
-NO TEXT, NO WORDS, NO TITLE on the image.`,
-          showAuthorName: false,
-          showTitle: false,
+          destinationName: sheet.destinationName,
+          country: sheet.country,
+          photoStyle: photoStyle
         }
       });
 
@@ -482,7 +470,7 @@ NO TEXT, NO WORDS, NO TITLE on the image.`,
         ));
         toast.success('Image regénérée !');
       } else {
-        throw new Error('Échec génération');
+        throw new Error(error?.message || 'Échec génération');
       }
     } catch (err) {
       setSheets(prev => prev.map(s => 
