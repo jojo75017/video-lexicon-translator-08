@@ -168,12 +168,12 @@ export const SubscriptionAuth = ({ onAuthenticated }: SubscriptionAuthProps) => 
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 via-background to-secondary/10 p-4">
       <Card className="w-full max-w-md p-8 space-y-6">
         <div className="text-center space-y-2">
-          {hasAdminSession && (
-            <div className="flex flex-col items-center gap-3 p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
-              <Badge className="bg-green-500">Session admin active</Badge>
+          {hasAdminSession ? (
+            <div className="flex flex-col items-center gap-3 p-4 bg-primary/5 border border-border rounded-lg">
+              <Badge>Session admin active</Badge>
               <Button
                 type="button"
-                className="w-full bg-green-600 hover:bg-green-700"
+                className="w-full"
                 onClick={() => navigate('/ebook-planner')}
               >
                 Accéder au Planner (Admin)
@@ -181,7 +181,7 @@ export const SubscriptionAuth = ({ onAuthenticated }: SubscriptionAuthProps) => 
               <Button
                 type="button"
                 variant="outline"
-                size="sm"
+                className="w-full"
                 onClick={() => navigate('/admin')}
               >
                 Panel Admin
@@ -201,6 +201,28 @@ export const SubscriptionAuth = ({ onAuthenticated }: SubscriptionAuthProps) => 
                 }}
               >
                 Se déconnecter (admin)
+              </Button>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-3 p-4 bg-muted/40 border border-border rounded-lg">
+              <div className="text-sm font-medium">Administrateur ?</div>
+              <p className="text-xs text-muted-foreground">
+                Tu es actuellement <strong>déconnecté</strong> côté admin (c’est pour ça que tu ne vois pas les boutons).
+              </p>
+              <Button
+                type="button"
+                className="w-full"
+                onClick={() => navigate('/admin-direct')}
+              >
+                Connexion Admin (lien magique)
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={() => navigate('/auth')}
+              >
+                Connexion Admin (email/mot de passe)
               </Button>
             </div>
           )}
