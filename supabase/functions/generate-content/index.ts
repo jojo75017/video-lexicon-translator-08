@@ -1498,10 +1498,10 @@ Réponds avec du texte formaté de manière professionnelle, bien structuré ave
 
       try {
         const controller = new AbortController();
-        // Timeout: 55 secondes pour rester sous la limite Supabase de 60s
-        const timeoutId = setTimeout(() => controller.abort(), 55000);
+        // Timeout: 50 secondes pour rester bien sous la limite Supabase de 60s
+        const timeoutId = setTimeout(() => controller.abort(), 50000);
 
-        console.log('Calling OpenAI for travel-sheets with gpt-4o and maximum tokens...');
+        console.log('Calling OpenAI for travel-sheets with gpt-4o-mini (fast)...');
         
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',
@@ -1510,37 +1510,26 @@ Réponds avec du texte formaté de manière professionnelle, bien structuré ave
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            model: 'gpt-4o', // Modèle plus puissant pour gérer le contexte long
+            model: 'gpt-4o-mini', // Modèle rapide pour éviter timeout
             messages: [
               { 
                 role: 'system', 
-                content: `Tu es un guide touristique professionnel et rédacteur de guides de voyage premium.
+                content: `Tu es un guide touristique professionnel. Génère des fiches destinations COMPLÈTES.
 
-RÈGLES CRITIQUES OBLIGATOIRES:
-- Chaque fiche destination DOIT contenir MINIMUM 800 MOTS de texte
-- La "description" DOIT faire minimum 150 mots (5-6 phrases détaillées et immersives)
-- L'"history" DOIT faire minimum 100 mots (contexte historique riche)
-- "mustSee" doit contenir 6 lieux avec descriptions de 2-3 phrases chacun
-- "whereToStay" doit faire minimum 80 mots
-- "travelTips" et "transportation" doivent faire 60+ mots chacun
-- Les FAQ doivent avoir des réponses de 40+ mots chacune
-- Inclure des anecdotes, détails culturels, conseils pratiques précis
+RÈGLES:
+- Chaque fiche: minimum 600 mots de contenu riche
+- "description": 4-5 phrases immersives sur l'ambiance
+- "history": 3-4 phrases sur le patrimoine
+- "mustSee": 5-6 lieux avec descriptions courtes
+- "whereToStay": 3 phrases sur les quartiers
+- "faq": 3 questions-réponses détaillées
 
-STRUCTURE DE CHAQUE FICHE (800+ mots total):
-1. Description immersive (150+ mots)
-2. Histoire et culture (100+ mots)
-3. Gastronomie détaillée (100+ mots via dishDescription + specialties)
-4. 6 lieux incontournables avec descriptions (180+ mots)
-5. Hébergements détaillés par gamme (100+ mots)
-6. Conseils pratiques approfondis (100+ mots)
-7. 3 FAQ avec réponses complètes (120+ mots)
-
-Réponds UNIQUEMENT en JSON valide sans markdown ni backticks.`
+Réponds UNIQUEMENT en JSON valide sans markdown.`
               },
               { role: 'user', content: prompt }
             ],
-            max_tokens: 16000, // Maximum tokens pour gpt-4o
-            temperature: 0.85,
+            max_tokens: 8000, // Tokens suffisants pour 3 fiches
+            temperature: 0.8,
           }),
           signal: controller.signal,
         });
