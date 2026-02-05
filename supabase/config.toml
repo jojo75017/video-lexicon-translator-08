@@ -125,3 +125,6 @@ verify_jwt = false
 
 [functions.predict-trends]
 verify_jwt = false
+
+[functions.reset-admin-password]
+verify_jwt = false
