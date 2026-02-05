@@ -31,30 +31,41 @@ serve(async (req) => {
       );
     }
 
-    const imagePrompt = `Professional aquarium photography of a ${fishName} (${scientificName || 'tropical fish'}).
+    // Prompt optimisé pour des photos ultra-réalistes style National Geographic
+    const imagePrompt = `Ultra-realistic underwater photograph of a ${fishName} (${scientificName || 'tropical fish'}) in its natural aquarium habitat.
 
-REQUIREMENTS:
-- Beautiful specimen of ${fishName} in pristine aquarium conditions
-- Crystal clear water, professional aquarium lighting
-- Natural planted aquarium background with live plants
-- Fish swimming gracefully, showing full body and fins
-- Vibrant natural colors, sharp focus on the fish
-- Magazine quality aquarium photography
-- National Geographic style wildlife photography
+PHOTOGRAPHIC STYLE:
+- Award-winning underwater wildlife photography
+- National Geographic quality, professional DSLR shot
+- Crystal clear water with natural light rays penetrating the surface
+- Macro lens detail showing every scale, fin ray, and color gradient
+- Natural bokeh background with blurred aquatic plants
 
-CRITICAL - NO TEXT:
-- Absolutely NO text, NO words, NO labels anywhere in the image
-- Pure aquarium photography only
+SUBJECT REQUIREMENTS:
+- Single ${fishName} as the main subject, perfectly in focus
+- Fish displaying natural swimming posture, fins fully extended
+- Authentic species coloration at peak health
+- Catchlight visible in the eye for lifelike appearance
 
-${origin ? `Natural habitat inspiration: ${origin}` : ''}`;
+ENVIRONMENT:
+- Planted aquarium with lush green aquatic vegetation
+- Natural substrate (fine sand or smooth river pebbles)
+- Soft dappled lighting mimicking sunlight through water
+${origin ? `- Biotope inspiration: ${origin}` : ''}
 
-    console.log(`Generating aquarium image for: ${fishName}`);
+ABSOLUTE RESTRICTIONS:
+- NO text, watermarks, labels, or any written elements
+- NO artificial-looking renders or cartoon styles
+- NO composite images or collages
+- Pure photographic realism only`;
+
+    console.log(`Generating HIGH QUALITY aquarium image for: ${fishName}`);
 
     let imageUrl: string | undefined;
 
-    // Priorité OpenAI DALL-E
+    // Priorité OpenAI DALL-E 3 HD pour qualité maximale
     if (OPENAI_API_KEY) {
-      console.log('Using OpenAI DALL-E for aquarium image...');
+      console.log('Using OpenAI DALL-E 3 HD for premium aquarium image...');
       try {
         const dalleResponse = await fetch('https://api.openai.com/v1/images/generations', {
           method: 'POST',
@@ -67,7 +78,8 @@ ${origin ? `Natural habitat inspiration: ${origin}` : ''}`;
             prompt: imagePrompt.slice(0, 4000),
             n: 1,
             size: '1024x1024',
-            quality: 'standard',
+            quality: 'hd',  // HD quality for professional results
+            style: 'natural',  // Natural style for photorealism
             response_format: 'url',
           }),
         });
@@ -75,7 +87,7 @@ ${origin ? `Natural habitat inspiration: ${origin}` : ''}`;
         if (dalleResponse.ok) {
           const dalleData = await dalleResponse.json();
           imageUrl = dalleData?.data?.[0]?.url;
-          console.log('OpenAI DALL-E aquarium image generated successfully');
+          console.log('OpenAI DALL-E 3 HD aquarium image generated successfully');
         } else {
           const errText = await dalleResponse.text();
           console.error('OpenAI error:', dalleResponse.status, errText);
@@ -85,9 +97,9 @@ ${origin ? `Natural habitat inspiration: ${origin}` : ''}`;
       }
     }
 
-    // Fallback Lovable AI
+    // Fallback Lovable AI avec Gemini 3 Pro Image (meilleure qualité)
     if (!imageUrl && LOVABLE_API_KEY) {
-      console.log('Falling back to Lovable AI...');
+      console.log('Using Lovable AI Gemini 3 Pro Image for premium quality...');
       const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -95,7 +107,7 @@ ${origin ? `Natural habitat inspiration: ${origin}` : ''}`;
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'google/gemini-2.5-flash-image',
+          model: 'google/gemini-3-pro-image-preview',  // Modèle premium pour meilleure qualité
           messages: [{ role: 'user', content: imagePrompt }],
           modalities: ['image', 'text']
         }),
