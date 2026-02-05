@@ -1,5 +1,51 @@
 import jsPDF from "jspdf";
 
+// Fonction pour nettoyer les emojis et caractères spéciaux non supportés par jsPDF
+const cleanTextForPdf = (text: string): string => {
+  return text
+    // Supprimer les emojis courants
+    .replace(/💡/g, "[TIP]")
+    .replace(/🎉/g, "")
+    .replace(/✓/g, "-")
+    .replace(/✗/g, "x")
+    .replace(/→/g, ">")
+    .replace(/☐/g, "[ ]")
+    .replace(/•/g, "-")
+    // Supprimer tous les emojis Unicode restants
+    .replace(/[\u{1F600}-\u{1F64F}]/gu, "")
+    .replace(/[\u{1F300}-\u{1F5FF}]/gu, "")
+    .replace(/[\u{1F680}-\u{1F6FF}]/gu, "")
+    .replace(/[\u{1F1E0}-\u{1F1FF}]/gu, "")
+    .replace(/[\u{2600}-\u{26FF}]/gu, "")
+    .replace(/[\u{2700}-\u{27BF}]/gu, "")
+    .replace(/[\u{FE00}-\u{FE0F}]/gu, "")
+    .replace(/[\u{1F900}-\u{1F9FF}]/gu, "")
+    .replace(/[\u{1FA00}-\u{1FA6F}]/gu, "")
+    .replace(/[\u{1FA70}-\u{1FAFF}]/gu, "")
+    .replace(/[\u{231A}-\u{231B}]/gu, "")
+    .replace(/[\u{23E9}-\u{23F3}]/gu, "")
+    .replace(/[\u{23F8}-\u{23FA}]/gu, "")
+    .replace(/[\u{25AA}-\u{25AB}]/gu, "")
+    .replace(/[\u{25B6}]/gu, "")
+    .replace(/[\u{25C0}]/gu, "")
+    .replace(/[\u{25FB}-\u{25FE}]/gu, "")
+    .replace(/[\u{2614}-\u{2615}]/gu, "")
+    .replace(/[\u{2648}-\u{2653}]/gu, "")
+    .replace(/[\u{267F}]/gu, "")
+    .replace(/[\u{2693}]/gu, "")
+    .replace(/[\u{26A1}]/gu, "")
+    .replace(/[\u{26AA}-\u{26AB}]/gu, "")
+    .replace(/[\u{26BD}-\u{26BE}]/gu, "")
+    .replace(/[\u{26C4}-\u{26C5}]/gu, "")
+    .replace(/[\u{26CE}]/gu, "")
+    .replace(/[\u{26D4}]/gu, "")
+    .replace(/[\u{26EA}]/gu, "")
+    .replace(/[\u{26F2}-\u{26F3}]/gu, "")
+    .replace(/[\u{26F5}]/gu, "")
+    .replace(/[\u{26FA}]/gu, "")
+    .replace(/[\u{26FD}]/gu, "")
+    .trim();
+};
 interface KdpNiche {
   rank: number;
   name: string;
@@ -558,7 +604,8 @@ export const generateKdpNichesPdf = (): void => {
   };
 
   const writeWrappedText = (text: string, x: number, y: number, maxWidth: number, lineHeight: number = 5): number => {
-    const lines = doc.splitTextToSize(text, maxWidth);
+    const cleanText = cleanTextForPdf(text);
+    const lines = doc.splitTextToSize(cleanText, maxWidth);
     lines.forEach((line: string, index: number) => {
       if (y + (index * lineHeight) > pageHeight - margin) {
         doc.addPage();
@@ -711,21 +758,21 @@ export const generateKdpNichesPdf = (): void => {
     "",
     "Pour chaque niche, vous découvrirez :",
     "",
-    "  ✓ Le volume de recherches mensuelles (demande réelle)",
-    "  ✓ Le niveau de concurrence actuel",
-    "  ✓ Le prix de vente optimal",
-    "  ✓ Le potentiel de revenus estimé",
-    "  ✓ Les sous-niches cachées encore peu exploitées",
-    "  ✓ Les erreurs fatales à éviter absolument",
-    "  ✓ Un plan d'action semaine par semaine",
-    "  ✓ Un conseil de pro exclusif",
+    "  - Le volume de recherches mensuelles (demande reelle)",
+    "  - Le niveau de concurrence actuel",
+    "  - Le prix de vente optimal",
+    "  - Le potentiel de revenus estime",
+    "  - Les sous-niches cachees encore peu exploitees",
+    "  - Les erreurs fatales a eviter absolument",
+    "  - Un plan d'action semaine par semaine",
+    "  - Un conseil de pro exclusif",
     "",
     "Ce guide représente des dizaines d'heures de recherche condensées en 40+ pages",
     "actionnables. Utilisez-le comme votre feuille de route vers le succès sur KDP.",
     "",
     "Prêt(e) à transformer votre premier ebook en machine à revenus passifs ?",
     "",
-    "C'est parti ! 🚀"
+    "C'est parti !"
   ];
 
   introLines.forEach(line => {
@@ -766,9 +813,9 @@ export const generateKdpNichesPdf = (): void => {
     "",
     "ÉTAPE 3 : RECHERCHE APPROFONDIE (2-3 heures)",
     "Pour chaque niche sélectionnée, allez sur Amazon et analysez :",
-    "  • Les bestsellers actuels (couvertures, titres, prix)",
-    "  • Les avis clients (ce qu'ils aiment, ce qui manque)",
-    "  • Les opportunités d'amélioration",
+    "  - Les bestsellers actuels (couvertures, titres, prix)",
+    "  - Les avis clients (ce qu'ils aiment, ce qui manque)",
+    "  - Les opportunites d'amelioration",
     "",
     "ÉTAPE 4 : DÉCISION ET ACTION",
     "Choisissez UNE seule niche pour commencer.",
@@ -879,7 +926,7 @@ export const generateKdpNichesPdf = (): void => {
     doc.setFont("helvetica", "normal");
     doc.setTextColor(60, 60, 60);
     niche.whyItWorks.forEach((reason) => {
-      yPosition = writeWrappedText(`✓ ${reason}`, margin + 3, yPosition, contentWidth - 3, 5);
+      yPosition = writeWrappedText(`- ${reason}`, margin + 3, yPosition, contentWidth - 3, 5);
     });
     yPosition += 5;
 
@@ -910,7 +957,7 @@ export const generateKdpNichesPdf = (): void => {
     doc.setFont("helvetica", "normal");
     doc.setTextColor(60, 60, 60);
     niche.mistakesToAvoid.forEach((mistake) => {
-      yPosition = writeWrappedText(`✗ ${mistake}`, margin + 3, yPosition, contentWidth - 3, 5);
+      yPosition = writeWrappedText(`x ${mistake}`, margin + 3, yPosition, contentWidth - 3, 5);
     });
 
     // Page 2 de la niche
@@ -938,7 +985,7 @@ export const generateKdpNichesPdf = (): void => {
     doc.setFont("helvetica", "normal");
     doc.setTextColor(60, 60, 60);
     niche.exampleTitles.forEach((title) => {
-      doc.text(`• "${title}"`, margin + 3, yPosition);
+      doc.text(cleanTextForPdf(`- "${title}"`), margin + 3, yPosition);
       yPosition += 6;
     });
     yPosition += 5;
@@ -954,7 +1001,7 @@ export const generateKdpNichesPdf = (): void => {
     doc.setFont("helvetica", "normal");
     doc.setTextColor(60, 60, 60);
     niche.subNiches.forEach((subNiche) => {
-      doc.text(`→ ${subNiche}`, margin + 3, yPosition);
+      doc.text(cleanTextForPdf(`> ${subNiche}`), margin + 3, yPosition);
       yPosition += 6;
     });
     yPosition += 5;
@@ -970,7 +1017,7 @@ export const generateKdpNichesPdf = (): void => {
     doc.setFont("helvetica", "normal");
     doc.setTextColor(60, 60, 60);
     niche.actionPlan.forEach((step) => {
-      yPosition = writeWrappedText(`☐ ${step}`, margin + 3, yPosition, contentWidth - 6, 5);
+      yPosition = writeWrappedText(`[ ] ${step}`, margin + 3, yPosition, contentWidth - 6, 5);
     });
     yPosition += 8;
 
@@ -982,7 +1029,7 @@ export const generateKdpNichesPdf = (): void => {
     doc.setFontSize(10);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(180, 130, 0);
-    const proTipLines = doc.splitTextToSize(niche.proTip, contentWidth - 10);
+    const proTipLines = doc.splitTextToSize(cleanTextForPdf(niche.proTip), contentWidth - 10);
     proTipLines.forEach((line: string, i: number) => {
       doc.text(line, margin + 5, yPosition + 8 + (i * 5));
     });
@@ -1123,7 +1170,7 @@ export const generateKdpNichesPdf = (): void => {
     doc.setFont("helvetica", "normal");
     doc.setTextColor(60, 60, 60);
     week.tasks.forEach((task, i) => {
-      doc.text(`☐ ${task}`, margin + 5, yPosition + 17 + (i * 5));
+      doc.text(cleanTextForPdf(`[ ] ${task}`), margin + 5, yPosition + 17 + (i * 5));
     });
     
     yPosition += 52;
@@ -1150,11 +1197,11 @@ export const generateKdpNichesPdf = (): void => {
   const resources = [
     "OUTILS RECOMMANDÉS :",
     "",
-    "• EbookStudio.fr - Génération automatique d'ebooks avec l'IA",
-    "• Canva.com - Création de couvertures (templates gratuits disponibles)",
-    "• Publisher Rocket - Recherche de mots-clés Amazon (payant mais puissant)",
-    "• Kindlepreneur.com - Blog référence avec guides gratuits",
-    "• ChatGPT/Claude - Assistance à la rédaction et brainstorming",
+    "- EbookStudio.fr - Generation automatique d'ebooks avec l'IA",
+    "- Canva.com - Creation de couvertures (templates gratuits disponibles)",
+    "- Publisher Rocket - Recherche de mots-cles Amazon (payant mais puissant)",
+    "- Kindlepreneur.com - Blog reference avec guides gratuits",
+    "- ChatGPT/Claude - Assistance a la redaction et brainstorming",
     "",
     "FORMATION GRATUITE :",
     "",
@@ -1178,12 +1225,12 @@ export const generateKdpNichesPdf = (): void => {
     } else if (line.endsWith(":")) {
       doc.setFont("helvetica", "bold");
       doc.setTextColor(139, 92, 246);
-      doc.text(line, margin, yPosition);
+      doc.text(cleanTextForPdf(line), margin, yPosition);
       doc.setFont("helvetica", "normal");
       doc.setTextColor(60, 60, 60);
       yPosition += 7;
     } else {
-      doc.text(line, margin, yPosition);
+      doc.text(cleanTextForPdf(line), margin, yPosition);
       yPosition += 6;
     }
   });
