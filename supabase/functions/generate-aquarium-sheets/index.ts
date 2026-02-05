@@ -131,7 +131,8 @@ GÉNÈRE EXACTEMENT ${numberOfSheets} poissons DIFFÉRENTS avec ce niveau de dé
             { role: 'system', content: systemPrompt },
             { role: 'user', content: userPrompt }
           ],
-          max_tokens: 32000,
+          // gpt-4o supports up to 16384 completion tokens; keep margin for safety.
+          max_tokens: 14000,
           temperature: 0.7,
         }),
       });
