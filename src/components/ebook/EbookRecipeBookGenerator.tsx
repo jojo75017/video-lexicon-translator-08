@@ -11,6 +11,7 @@ import {
   ChefHat, Sparkles, Image as ImageIcon, Download, BookOpen,
   Loader2, RefreshCw, FileText, Globe, Wine, Copy, CheckCircle
 } from 'lucide-react';
+import { EbookBookMockup3D } from './EbookBookMockup3D';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import jsPDF from 'jspdf';
@@ -1526,69 +1527,12 @@ ${sheet.servingSuggestion}`;
         {/* Cover Tab */}
         <TabsContent value="cover" className="mt-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Cover preview with 3D mockup */}
-            <Card className="border-orange-200/50">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2">
-                  <BookOpen className="w-5 h-5 text-orange-500" />
-                  Couverture 3D
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="flex justify-center">
-                {coverImageUrl ? (
-                  <div className="relative" style={{ perspective: '1200px' }}>
-                    <div 
-                      className="relative shadow-2xl"
-                      style={{
-                        transform: 'rotateY(-15deg)',
-                        transformStyle: 'preserve-3d',
-                      }}
-                    >
-                      {/* Book cover */}
-                      <img 
-                        src={coverImageUrl} 
-                        alt="Couverture"
-                        className="max-h-[400px] w-auto rounded-r-md"
-                        style={{ 
-                          boxShadow: '20px 20px 60px rgba(0,0,0,0.4), -5px -5px 20px rgba(255,255,255,0.1)'
-                        }}
-                      />
-                      {/* Book spine */}
-                      <div 
-                        className="absolute top-0 left-0 h-full w-8"
-                        style={{
-                          background: 'linear-gradient(to right, #1a1a1a, #333)',
-                          transform: 'rotateY(-90deg) translateX(-16px)',
-                          transformOrigin: 'left',
-                          boxShadow: 'inset 0 0 10px rgba(0,0,0,0.5)'
-                        }}
-                      />
-                      {/* Pages effect */}
-                      <div 
-                        className="absolute top-1 bottom-1 -right-3 w-3"
-                        style={{
-                          background: 'linear-gradient(to right, #f5f5f0, #fff)',
-                          transform: 'rotateY(90deg) translateX(8px)',
-                          transformOrigin: 'left',
-                          boxShadow: 'inset 0 0 5px rgba(0,0,0,0.1)'
-                        }}
-                      />
-                    </div>
-                    {/* Shadow */}
-                    <div 
-                      className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-3/4 h-4 bg-black/20 blur-xl rounded-full"
-                    />
-                  </div>
-                ) : (
-                  <div className="w-full max-w-sm aspect-[3/4] bg-gradient-to-br from-orange-100 to-amber-100 dark:from-orange-900/30 dark:to-amber-900/30 rounded-lg flex items-center justify-center border-2 border-dashed border-orange-300">
-                    <div className="text-center">
-                      <ImageIcon className="w-12 h-12 mx-auto text-orange-300 mb-2" />
-                      <p className="text-sm text-muted-foreground">Générez votre couverture</p>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+            {/* Cover preview with premium 3D mockup */}
+            <EbookBookMockup3D 
+              coverUrl={coverImageUrl || undefined}
+              title={bookTitle || 'Mon Livre de Recettes'}
+              author={authorName || 'Chef Cuisinier'}
+            />
             
             {/* Cover actions */}
             <Card className="border-orange-200/50">
