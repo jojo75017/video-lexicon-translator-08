@@ -17,6 +17,23 @@ import jsPDF from 'jspdf';
 
 const RECIPE_HISTORY_STORAGE_KEY = 'recipe_generator:last_dish_names:v1';
 
+// Fallback images (quand la génération IA d'images renvoie 402 “crédits épuisés”)
+const PEXELS_API_KEY = '563492ad6f91700001000001b3c9c2fb1df54302850f8185e752c274';
+const fetchPexelsFoodImage = async (query: string): Promise<string | null> => {
+  try {
+    const url = `https://api.pexels.com/v1/search?query=${encodeURIComponent(
+      `${query} food dish`
+    )}&per_page=1`;
+    const res = await fetch(url, { headers: { Authorization: PEXELS_API_KEY } });
+    if (!res.ok) return null;
+    const json = await res.json();
+    const photo = json?.photos?.[0];
+    return photo?.src?.large2x || photo?.src?.large || photo?.src?.original || null;
+  } catch {
+    return null;
+  }
+};
+
 const normalizeDishName = (name: string) =>
   name
     .toLowerCase()
@@ -57,6 +74,18 @@ const pickUnique = (pool: string[], count: number) => {
     [copy[i], copy[j]] = [copy[j], copy[i]];
   }
   return copy.slice(0, Math.min(count, copy.length));
+};
+
+// Rotation “sans doublons” sur un pool: prend les prochains items non utilisés.
+// Si le pool est épuisé, on repart du début (mais ça n'arrive qu'après ~18 générations Vietnam).
+const pickNextFromPool = (pool: string[], used: string[], count: number) => {
+  const usedNorm = new Set(used.map(normalizeDishName));
+  const available = pool.filter((d) => !usedNorm.has(normalizeDishName(d)));
+  const chosen = available.slice(0, Math.min(count, available.length));
+  if (chosen.length >= count) return chosen;
+  // Pool épuisé: compléter avec le début du pool (rotation)
+  const remaining = count - chosen.length;
+  return [...chosen, ...pool.slice(0, remaining)];
 };
 
 // Pool “large” pour forcer une sélection différente même si le modèle tend à répéter.
@@ -307,12 +336,7 @@ const EbookRecipeBookGenerator: React.FC<EbookRecipeBookGeneratorProps> = ({ ebo
       // Forçage “hard” pour le Vietnam: on impose une short-list de plats à utiliser (différente à chaque run)
       const requiredVietnamDishes =
         finalCountry === 'Vietnam'
-          ? pickUnique(
-              VIETNAM_DISH_POOL.filter(
-                (d) => !mergedHistory.map(normalizeDishName).includes(normalizeDishName(d))
-              ),
-              count
-            )
+          ? pickNextFromPool(VIETNAM_DISH_POOL, mergedHistory, count)
           : [];
 
       const requiredDishesInstruction = requiredVietnamDishes.length
@@ -575,9 +599,23 @@ Pure food photography only, high resolution, cookbook quality.`,
         if (!error && data?.imageUrl) {
           updatedSheets[i] = { ...updatedSheets[i], imageUrl: data.imageUrl };
           setSheets([...updatedSheets]);
+        } else {
+          // Fallback: si crédits épuisés (402) ou pas d'URL, on essaie une image stock
+          const fallbackUrl = await fetchPexelsFoodImage(updatedSheets[i].dishName);
+          if (fallbackUrl) {
+            updatedSheets[i] = { ...updatedSheets[i], imageUrl: fallbackUrl };
+            setSheets([...updatedSheets]);
+          }
         }
       } catch (err) {
         console.error(`Erreur image ${i + 1}:`, err);
+
+        // Fallback réseau/IA: Pexels
+        const fallbackUrl = await fetchPexelsFoodImage(updatedSheets[i].dishName);
+        if (fallbackUrl) {
+          updatedSheets[i] = { ...updatedSheets[i], imageUrl: fallbackUrl };
+          setSheets([...updatedSheets]);
+        }
       }
     }
     
@@ -615,9 +653,18 @@ Pure food photography only.`,
       if (!error && data?.imageUrl) {
         setSheets(prev => prev.map(s => s.id === sheetId ? { ...s, imageUrl: data.imageUrl, isGeneratingImage: false } : s));
         toast.success('Image régénérée !');
-      } else {
-        throw new Error('Pas d\'image');
+        return;
       }
+
+      // Fallback stock
+      const fallbackUrl = await fetchPexelsFoodImage(sheet.dishName);
+      if (fallbackUrl) {
+        setSheets(prev => prev.map(s => s.id === sheetId ? { ...s, imageUrl: fallbackUrl, isGeneratingImage: false } : s));
+        toast.warning('Crédits images épuisés: image stock utilisée.');
+        return;
+      }
+
+      throw new Error('Pas d\'image');
     } catch (err) {
       console.error('Erreur régénération:', err);
       setSheets(prev => prev.map(s => s.id === sheetId ? { ...s, isGeneratingImage: false } : s));
