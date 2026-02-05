@@ -208,7 +208,7 @@ const EbookTravelGuideGenerator: React.FC<EbookTravelGuideGeneratorProps> = ({ e
     
     try {
       const totalCount = parseInt(numberOfSheets);
-      const BATCH_SIZE = 5; // Maximum 5 fiches par appel API pour éviter timeout
+      const BATCH_SIZE = 3; // 3 fiches par batch pour rester sous le timeout Supabase
       const batches = Math.ceil(totalCount / BATCH_SIZE);
       
       // Analyse du titre pour cohérence
