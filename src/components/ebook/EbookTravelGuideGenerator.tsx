@@ -11,7 +11,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   MapPin, Plane, Camera, Sparkles, Download, BookOpen,
   Loader2, FileText, Globe,
-  Compass, Sun, Users, Languages, Utensils, Hotel, HelpCircle, Copy, CheckCircle
+  Compass, Sun, Users, Languages, Utensils, Hotel, HelpCircle, Copy, CheckCircle,
+  Link, Plus, X, ExternalLink
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -218,6 +219,11 @@ const EbookTravelGuideGenerator: React.FC<EbookTravelGuideGeneratorProps> = ({ e
   const [numberOfSheets, setNumberOfSheets] = useState('20');
   const [customInstructions, setCustomInstructions] = useState('');
   
+  // Liens promotionnels
+  const [promoLinks, setPromoLinks] = useState<{ label: string; url: string }[]>([]);
+  const [newLinkLabel, setNewLinkLabel] = useState('');
+  const [newLinkUrl, setNewLinkUrl] = useState('');
+  
   // State
   const [sheets, setSheets] = useState<TravelSheet[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -230,6 +236,19 @@ const EbookTravelGuideGenerator: React.FC<EbookTravelGuideGeneratorProps> = ({ e
   // Cover state
   const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
   const [isGeneratingCover, setIsGeneratingCover] = useState(false);
+
+  // Helper functions for promo links
+  const addPromoLink = () => {
+    if (newLinkLabel.trim() && newLinkUrl.trim()) {
+      setPromoLinks([...promoLinks, { label: newLinkLabel.trim(), url: newLinkUrl.trim() }]);
+      setNewLinkLabel('');
+      setNewLinkUrl('');
+    }
+  };
+
+  const removePromoLink = (index: number) => {
+    setPromoLinks(promoLinks.filter((_, i) => i !== index));
+  };
 
   // Parse JSON with fallback
   const cleanAndParseJSON = (content: string): any => {
@@ -699,7 +718,7 @@ ${authorName ? `Include author name: ${authorName}` : ''}`,
 
   // Copy sheet content
   const copySheet = async (sheet: TravelSheet) => {
-    const content = `
+    let content = `
 ${sheet.countryFlag} ${sheet.destinationName.toUpperCase()} - ${sheet.country}
 ${sheet.region}
 
@@ -746,8 +765,15 @@ ${sheet.travelTips}
 ${sheet.transportation}
 
 ❓ FAQ
-${sheet.faq.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}
-    `.trim();
+${sheet.faq.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}`.trim();
+    
+    // Ajouter les liens promotionnels si présents
+    if (promoLinks.length > 0) {
+      content += `\n\n🔗 LIENS UTILES\n`;
+      promoLinks.forEach(link => {
+        content += `→ ${link.label}: ${link.url}\n`;
+      });
+    }
     
     await navigator.clipboard.writeText(content);
     setCopiedIndex(sheet.id);
@@ -1173,6 +1199,65 @@ ${sheet.faq.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}
                   placeholder="Ex: Focus sur les destinations romantiques, privilégier les endroits peu touristiques..."
                   rows={3}
                 />
+              </div>
+
+              {/* Liens promotionnels */}
+              <div className="space-y-3 p-4 border border-dashed border-blue-200 dark:border-blue-800/30 rounded-lg bg-blue-50/50 dark:bg-blue-900/10">
+                <Label className="flex items-center gap-2">
+                  <Link className="w-4 h-4 text-blue-500" />
+                  Liens promotionnels (optionnel)
+                </Label>
+                <p className="text-xs text-muted-foreground">
+                  Ces liens apparaîtront à la fin de chaque fiche (ex: lien d'affiliation, votre site, etc.)
+                </p>
+                
+                {/* Liens existants */}
+                {promoLinks.length > 0 && (
+                  <div className="space-y-2">
+                    {promoLinks.map((link, index) => (
+                      <div key={index} className="flex items-center gap-2 p-2 bg-background rounded-lg text-sm border">
+                        <ExternalLink className="w-3 h-3 text-muted-foreground flex-shrink-0" />
+                        <span className="font-medium truncate">{link.label}</span>
+                        <span className="text-muted-foreground truncate flex-1 text-xs">{link.url}</span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removePromoLink(index)}
+                          className="h-6 w-6 p-0 hover:bg-destructive/20"
+                        >
+                          <X className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
+                {/* Ajouter un nouveau lien */}
+                <div className="space-y-2">
+                  <Input
+                    value={newLinkLabel}
+                    onChange={(e) => setNewLinkLabel(e.target.value)}
+                    placeholder="Texte du lien (ex: Réservez votre voyage)"
+                    className="text-sm"
+                  />
+                  <Input
+                    value={newLinkUrl}
+                    onChange={(e) => setNewLinkUrl(e.target.value)}
+                    placeholder="URL (ex: https://monsite.com/reservation)"
+                    className="text-sm"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={addPromoLink}
+                    disabled={!newLinkLabel.trim() || !newLinkUrl.trim()}
+                    className="w-full"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Ajouter un lien
+                  </Button>
+                </div>
               </div>
 
               <Button
