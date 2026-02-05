@@ -12,16 +12,15 @@ serve(async (req) => {
   }
 
   try {
-    const { destinationName, country, photoStyle } = await req.json();
+    const { recipeName, country, cuisine, photoStyle } = await req.json();
 
-    if (!destinationName) {
+    if (!recipeName) {
       return new Response(
-        JSON.stringify({ error: 'Le nom de la destination est requis' }),
+        JSON.stringify({ error: 'Le nom de la recette est requis' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Priorité : OpenAI > Lovable AI (pour éviter les problèmes de crédits)
     const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 
@@ -32,53 +31,61 @@ serve(async (req) => {
       );
     }
 
-    // Photo style prompts optimisés pour qualité HD
+    // Styles de photographie culinaire premium
     const stylePrompts: Record<string, string> = {
-      'realistic': 'ultra high resolution professional travel photography, National Geographic cover quality, stunning colors, perfect exposure',
-      'cinematic': 'cinematic 4K travel photography, ultra wide angle lens, epic dramatic lighting, Hollywood blockbuster quality',
-      'golden': 'golden hour magic photography, warm honey-toned sunset, dreamy soft light, romantic travel atmosphere',
-      'aerial': 'professional drone photography 4K, breathtaking aerial perspective, Condé Nast Traveler quality'
+      'overhead': 'stunning overhead flat lay food photography, birds eye view, perfectly styled ingredients',
+      'closeup': 'macro food photography, extreme close-up details, steam rising, textures visible',
+      'rustic': 'rustic farmhouse food styling, wooden surfaces, natural linen, artisanal aesthetic',
+      'modern': 'minimalist modern food photography, clean white background, elegant plating',
+      'ambient': 'ambient lifestyle food photography, natural window light, cozy kitchen setting'
     };
 
-    const stylePrompt = stylePrompts[photoStyle] || stylePrompts['realistic'];
+    const stylePrompt = stylePrompts[photoStyle] || stylePrompts['overhead'];
 
-    // Prompt optimisé pour photos ultra-réalistes style magazine premium
+    // Prompt ultra-optimisé pour photos culinaires de qualité magazine
     const imagePrompt = `${stylePrompt}.
 
-Award-winning travel photograph of "${destinationName}" in ${country || 'this destination'}.
+Award-winning food photograph of "${recipeName}"${country ? ` from ${country}` : ''}${cuisine ? `, ${cuisine} cuisine` : ''}.
 
-PHOTOGRAPHIC EXCELLENCE:
-- Shot with professional full-frame DSLR or medium format camera
-- Perfect golden ratio composition, rule of thirds
-- Razor-sharp focus on main subject with natural depth of field
-- Rich, vibrant colors with perfect white balance
-- Magazine cover worthy, Condé Nast Traveler or Lonely Planet quality
+FOOD PHOTOGRAPHY EXCELLENCE:
+- Shot by a world-class food photographer for Bon Appétit or Food & Wine magazine
+- Professional Canon/Sony full-frame camera with macro lens
+- Perfect studio lighting with soft diffused natural light
+- Impeccable food styling with fresh, glistening ingredients
+- Steam, sauce drips, or garnish in motion for dynamic appeal
 
-SUBJECT & SCENE:
-- Iconic landmark or most photogenic view of ${destinationName}
-- Authentic local atmosphere and cultural elements
-- Perfect weather conditions, ideal lighting
-- Human element for scale if appropriate (local people, travelers)
+COMPOSITION & STYLING:
+- Magazine cover worthy composition
+- Beautiful ceramic plates, artisan bowls, or traditional serving ware
+- Fresh herbs, spices, and ingredients as props
+- Complementary napkins, cutlery, or textured background
+- Negative space for potential text overlay (but NO text in image)
 
-TECHNICAL QUALITY:
+FOOD DETAILS:
+- Perfect golden crust, caramelization, or char marks where appropriate
+- Glistening sauces, drizzles of olive oil, or melted butter
+- Fresh, vibrant vegetables and herbs
+- Authentic presentation true to ${cuisine || 'the dish'}'s culinary tradition
+
+TECHNICAL PERFECTION:
 - 8K resolution clarity
-- Professional color grading
-- Natural dynamic range
-- No lens flare or artifacts
+- Shallow depth of field with creamy bokeh
+- Professional color grading, warm appetizing tones
+- No harsh shadows, perfect exposure
 
 ABSOLUTE RESTRICTIONS:
 - NO text, NO watermarks, NO titles, NO letters, NO words anywhere
-- NO logos, NO stamps, NO copyright marks
-- NO AI artifacts, NO unnatural elements
-- Pure authentic travel photography only`;
+- NO logos, NO stamps, NO recipe cards visible
+- NO artificial-looking food, NO plastic props
+- Pure authentic food photography only`;
 
-    console.log(`Generating HIGH QUALITY travel image for: ${destinationName}, ${country}`);
+    console.log(`Generating HIGH QUALITY recipe image for: ${recipeName}`);
 
     let imageUrl: string | undefined;
 
-    // Essayer OpenAI DALL-E 3 HD d'abord si disponible
+    // Priorité OpenAI DALL-E 3 HD pour qualité maximale
     if (OPENAI_API_KEY) {
-      console.log('Using OpenAI DALL-E 3 HD for premium travel image...');
+      console.log('Using OpenAI DALL-E 3 HD for premium food photography...');
       try {
         const dalleResponse = await fetch('https://api.openai.com/v1/images/generations', {
           method: 'POST',
@@ -100,7 +107,7 @@ ABSOLUTE RESTRICTIONS:
         if (dalleResponse.ok) {
           const dalleData = await dalleResponse.json();
           imageUrl = dalleData?.data?.[0]?.url;
-          console.log('OpenAI DALL-E 3 HD travel image generated successfully');
+          console.log('OpenAI DALL-E 3 HD food image generated successfully');
         } else {
           const errText = await dalleResponse.text();
           console.error('OpenAI error:', dalleResponse.status, errText);
@@ -110,9 +117,9 @@ ABSOLUTE RESTRICTIONS:
       }
     }
 
-    // Fallback vers Lovable AI Gemini 3 Pro Image (qualité premium)
+    // Fallback Lovable AI avec Gemini 3 Pro Image (qualité premium)
     if (!imageUrl && LOVABLE_API_KEY) {
-      console.log('Using Lovable AI Gemini 3 Pro Image for premium quality...');
+      console.log('Using Lovable AI Gemini 3 Pro Image for premium food photography...');
       const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -129,13 +136,13 @@ ABSOLUTE RESTRICTIONS:
       if (!response.ok) {
         if (response.status === 429) {
           return new Response(
-            JSON.stringify({ error: 'Limite de requêtes atteinte. Réessayez plus tard.' }),
+            JSON.stringify({ error: 'Limite de requêtes atteinte' }),
             { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           );
         }
         if (response.status === 402) {
           return new Response(
-            JSON.stringify({ error: 'Crédits épuisés. Configurez une clé OpenAI dans les Paramètres.' }),
+            JSON.stringify({ error: 'Crédits épuisés' }),
             { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           );
         }
@@ -147,10 +154,10 @@ ABSOLUTE RESTRICTIONS:
     }
 
     if (!imageUrl) {
-      throw new Error('Aucune image générée. Configurez une clé OpenAI dans les Paramètres.');
+      throw new Error('Aucune image générée');
     }
 
-    console.log(`Travel image generated successfully for ${destinationName}`);
+    console.log(`Recipe image generated successfully for ${recipeName}`);
 
     return new Response(
       JSON.stringify({ imageUrl }),
@@ -158,7 +165,7 @@ ABSOLUTE RESTRICTIONS:
     );
 
   } catch (error) {
-    console.error('Error in generate-travel-image:', error);
+    console.error('Error in generate-recipe-image:', error);
     return new Response(
       JSON.stringify({ error: error instanceof Error ? error.message : 'Erreur inconnue' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
