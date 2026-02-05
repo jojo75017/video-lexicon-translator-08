@@ -18,9 +18,6 @@ type Props = {
  * Why: localStorage can be tampered with. We therefore re-validate the pair
  * (email + access_code) with the backend before granting access.
  */
-// Email admin permanent - bypass total même sans session
-const PERMANENT_ADMIN_EMAIL = 'boubetgeorges@gmail.com';
-
 export function SubscriberGate({
   isAdmin,
   subscriberEmail,
@@ -36,26 +33,12 @@ export function SubscriberGate({
     return typeof code === "string" ? code.trim() : "";
   }, [subscriberData]);
 
-  // Check if permanent admin via localStorage OR subscriberEmail (bypass session requirement)
-  const isPermanentAdmin = useMemo(() => {
-    const storedAdminEmail = localStorage.getItem('permanent_admin_email');
-    const emailToCheck = storedAdminEmail || subscriberEmail;
-    const isAdmin = emailToCheck?.toLowerCase() === PERMANENT_ADMIN_EMAIL.toLowerCase();
-    
-    // Auto-store admin email if detected
-    if (isAdmin && !storedAdminEmail) {
-      localStorage.setItem('permanent_admin_email', PERMANENT_ADMIN_EMAIL);
-    }
-    
-    return isAdmin;
-  }, [subscriberEmail]);
-
   useEffect(() => {
     let cancelled = false;
 
     const run = async () => {
-      // Admins bypass subscriber validation (via session OR permanent email).
-      if (isAdmin || isPermanentAdmin) {
+      // Admins bypass subscriber validation.
+      if (isAdmin) {
         if (!cancelled) {
           setAllowed(true);
           setChecking(false);
