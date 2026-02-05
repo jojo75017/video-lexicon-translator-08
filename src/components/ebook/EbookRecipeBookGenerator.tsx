@@ -15,6 +15,72 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import jsPDF from 'jspdf';
 
+const RECIPE_HISTORY_STORAGE_KEY = 'recipe_generator:last_dish_names:v1';
+
+const normalizeDishName = (name: string) =>
+  name
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+const readDishHistory = (scopeKey: string): string[] => {
+  try {
+    const raw = localStorage.getItem(RECIPE_HISTORY_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    const list = parsed?.[scopeKey];
+    return Array.isArray(list) ? list.filter((x) => typeof x === 'string') : [];
+  } catch {
+    return [];
+  }
+};
+
+const writeDishHistory = (scopeKey: string, dishNames: string[]) => {
+  try {
+    const raw = localStorage.getItem(RECIPE_HISTORY_STORAGE_KEY);
+    const parsed = raw ? JSON.parse(raw) : {};
+    parsed[scopeKey] = dishNames;
+    localStorage.setItem(RECIPE_HISTORY_STORAGE_KEY, JSON.stringify(parsed));
+  } catch {
+    // no-op
+  }
+};
+
+const pickUnique = (pool: string[], count: number) => {
+  const copy = [...pool];
+  // Fisher–Yates shuffle
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy.slice(0, Math.min(count, copy.length));
+};
+
+// Pool “large” pour forcer une sélection différente même si le modèle tend à répéter.
+const VIETNAM_DISH_POOL = [
+  'Phở Bò',
+  'Phở Gà',
+  'Bánh Mì',
+  'Bún Chả',
+  'Gỏi Cuốn',
+  'Cơm Tấm',
+  'Bánh Xèo',
+  'Bún Bò Huế',
+  'Cao Lầu',
+  'Mì Quảng',
+  'Chả Cá Lã Vọng',
+  'Bánh Cuốn',
+  'Bún Riêu',
+  'Hủ Tiếu',
+  'Bánh Bèo',
+  'Bún Thịt Nướng',
+  'Cà Phê Sữa Đá (version dessert/boisson)',
+  'Chè Ba Màu (dessert)',
+];
+
 // Interface pour une fiche recette (500+ mots par fiche)
 interface RecipeSheet {
   id: number;
@@ -221,13 +287,38 @@ const EbookRecipeBookGenerator: React.FC<EbookRecipeBookGeneratorProps> = ({ ebo
 
       // Determine the final country context
       let finalCountry = countryFromTitle || (selectedCountry !== 'tour-du-monde' ? selectedCountry : '');
+
+      // Historique persistant (survivant à un refresh)
+      const historyScopeKey = `${normalizeDishName(bookTitle)}|${normalizeDishName(finalCountry || 'global')}`;
+      const persistedHistory = readDishHistory(historyScopeKey);
+      const inMemoryHistory = lastGeneratedDishNames;
+      const mergedHistory = Array.from(
+        new Set([...persistedHistory, ...inMemoryHistory].map((x) => x.trim()).filter(Boolean))
+      );
       
       const countryInstruction = finalCountry 
         ? `OBLIGATOIRE: TOUTES les recettes doivent être EXCLUSIVEMENT des plats traditionnels de ${finalCountry}. NE PAS inclure de recettes d'autres pays.`
         : 'Variété des 5 continents avec des plats emblématiques de différents pays.';
 
-      const excludeDishesInstruction = lastGeneratedDishNames.length
-        ? `\n\n🚫 EXCLUSION (pour forcer une nouvelle sélection):\n- NE PAS générer (ni variantes) ces plats déjà utilisés: ${lastGeneratedDishNames.join(', ')}\n- Choisir des classiques différents, toujours 100% ${finalCountry || 'cohérents avec le titre'}.`
+      const excludeDishesInstruction = mergedHistory.length
+        ? `\n\n🚫 EXCLUSION (pour forcer une nouvelle sélection):\n- NE PAS générer (ni variantes) ces plats déjà utilisés: ${mergedHistory.join(', ')}\n- Choisir des classiques différents, toujours 100% ${finalCountry || 'cohérents avec le titre'}.`
+        : '';
+
+      // Forçage “hard” pour le Vietnam: on impose une short-list de plats à utiliser (différente à chaque run)
+      const requiredVietnamDishes =
+        finalCountry === 'Vietnam'
+          ? pickUnique(
+              VIETNAM_DISH_POOL.filter(
+                (d) => !mergedHistory.map(normalizeDishName).includes(normalizeDishName(d))
+              ),
+              count
+            )
+          : [];
+
+      const requiredDishesInstruction = requiredVietnamDishes.length
+        ? `\n\n✅ LISTE OBLIGATOIRE (anti-répétition):\n- Utilise EXACTEMENT ces plats (un par fiche, tous différents): ${requiredVietnamDishes.join(
+            ', '
+          )}\n- Ne pas remplacer par d'autres plats, ne pas fusionner, ne pas faire de variantes.`
         : '';
 
       const { data, error } = await supabase.functions.invoke('generate-content', {
@@ -252,6 +343,7 @@ Génère exactement ${count} FICHES RECETTES COMPLÈTES ET UNIQUES (minimum 500 
 - Varier OBLIGATOIREMENT les catégories: soupes, viandes, poissons, riz, nouilles, desserts
 ${finalCountry === 'Vietnam' ? `- Pour le VIETNAM, inclure des plats VARIÉS comme: Phở Bò, Bánh Mì, Bún Chả, Gỏi Cuốn, Cơm Tấm, Bánh Xèo, Chả Cá, Bún Bò Huế, Cao Lầu, Mì Quảng (tous DIFFÉRENTS!)` : ''}
 ${excludeDishesInstruction}
+ ${requiredDishesInstruction}
 
 🍷 ACCORD METS-VIN OBLIGATOIRE:
 Pour CHAQUE recette, fournis un accord vin PRÉCIS avec:
@@ -316,7 +408,11 @@ Format JSON strict:
         const dishNames = recipes
           .map((r: any) => (typeof r?.dishName === 'string' ? r.dishName.trim() : ''))
           .filter(Boolean);
-        if (dishNames.length) setLastGeneratedDishNames(dishNames);
+        if (dishNames.length) {
+          const nextHistory = Array.from(new Set([...mergedHistory, ...dishNames]));
+          setLastGeneratedDishNames(nextHistory);
+          writeDishHistory(historyScopeKey, nextHistory.slice(-80));
+        }
       } catch {
         // no-op
       }
