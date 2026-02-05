@@ -28,14 +28,14 @@ export const EbookBookMockup3D: React.FC<EbookBookMockup3DProps> = ({
   `)}`;
 
   return (
-    <Card className="border-orange-200/50 bg-white dark:bg-zinc-900 overflow-hidden">
+    <Card className="border-transparent bg-transparent shadow-none overflow-hidden">
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center gap-2 text-lg">
           <Eye className="h-5 w-5 text-orange-500" />
           Aperçu 3D du Livre
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex justify-center items-center py-12">
+      <CardContent className="flex justify-center items-center py-12 relative">
         <div 
           className="book-container"
           style={{ 
@@ -73,16 +73,15 @@ export const EbookBookMockup3D: React.FC<EbookBookMockup3DProps> = ({
               />
             </div>
 
-            {/* Tranche du livre */}
+            {/* Tranche du livre - simple sans texte */}
             <div 
-              className="spine"
               style={{
                 position: 'absolute',
                 top: 0,
                 left: 0,
                 width: '24px',
                 height: '340px',
-                background: 'linear-gradient(to right, #1f1f1f, #2d2d2d, #1f1f1f)',
+                background: 'linear-gradient(to right, #1a1a1a, #333, #1a1a1a)',
                 transform: 'rotateY(-90deg) translateX(-12px)',
                 transformOrigin: 'left center',
                 borderRadius: '4px 0 0 4px'
@@ -91,7 +90,6 @@ export const EbookBookMockup3D: React.FC<EbookBookMockup3DProps> = ({
 
             {/* Pages du livre (tranche droite) */}
             <div 
-              className="pages"
               style={{
                 position: 'absolute',
                 top: '3px',
@@ -107,15 +105,14 @@ export const EbookBookMockup3D: React.FC<EbookBookMockup3DProps> = ({
           </div>
         </div>
 
-        {/* Ombre portée */}
+        {/* Ombre portée douce */}
         <div 
-          className="absolute bottom-8 left-1/2 -translate-x-1/2"
+          className="absolute bottom-6 left-1/2 -translate-x-1/2"
           style={{
-            width: '180px',
-            height: '20px',
-            background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.15) 0%, transparent 70%)',
-            filter: 'blur(8px)',
-            transform: 'rotateX(80deg)'
+            width: '160px',
+            height: '16px',
+            background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.12) 0%, transparent 70%)',
+            filter: 'blur(6px)'
           }}
         />
       </CardContent>
