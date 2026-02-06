@@ -46,15 +46,20 @@ export function SubscriberGate({
         return;
       }
 
-      // Double-check: if there's an active Supabase session, verify admin status
+      // Double-check: if there's an active Supabase session, verify admin status directly via DB
       try {
         const { data: { session } } = await supabase.auth.getSession();
-        if (session) {
-          const { data } = await supabase.functions.invoke('check-admin', {
-            headers: { Authorization: `Bearer ${session.access_token}` }
-          });
-          if (data?.isAdmin) {
-            console.log('SubscriberGate: Admin confirmed via session check');
+        if (session?.user) {
+          // Check user_roles table directly (no edge function needed)
+          const { data: roleData } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', session.user.id)
+            .eq('role', 'admin')
+            .maybeSingle();
+          
+          if (roleData) {
+            console.log('SubscriberGate: Admin confirmed via direct DB check');
             if (!cancelled) {
               setAllowed(true);
               setChecking(false);
