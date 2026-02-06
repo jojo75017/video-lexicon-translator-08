@@ -11,23 +11,68 @@ const AdminDirectPage = () => {
   const [status, setStatus] = useState<"checking" | "sending" | "sent" | "authenticating" | "error">("checking");
   const [message, setMessage] = useState("Vérification de la session...");
 
+  const checkAdminAndRedirect = async (session: any) => {
+    try {
+      // Try with user_id first
+      const { data: isAdmin, error: rpcError } = await supabase.rpc("has_role", {
+        _user_id: session.user.id,
+        _role: "admin"
+      });
+
+      console.log("Admin check result:", { isAdmin, rpcError, email: session.user.email });
+
+      // If RPC fails (ambiguous function), check by email  
+      if (rpcError) {
+        console.warn("RPC has_role error, trying email check:", rpcError);
+        // Fallback: check if user email matches admin email
+        if (session.user.email === ADMIN_EMAIL) {
+          sessionStorage.setItem('is_admin', 'true');
+          localStorage.setItem('permanent_admin_email', session.user.email);
+          navigate("/ebook-planner", { replace: true });
+          return true;
+        }
+        return false;
+      }
+
+      if (isAdmin) {
+        sessionStorage.setItem('is_admin', 'true');
+        localStorage.setItem('permanent_admin_email', session.user.email || ADMIN_EMAIL);
+        navigate("/ebook-planner", { replace: true });
+        return true;
+      }
+
+      // Last resort: direct email match for admin
+      if (session.user.email === ADMIN_EMAIL) {
+        sessionStorage.setItem('is_admin', 'true');
+        localStorage.setItem('permanent_admin_email', session.user.email);
+        navigate("/ebook-planner", { replace: true });
+        return true;
+      }
+
+      return false;
+    } catch (err) {
+      console.error("Admin check error:", err);
+      // Fallback on email match
+      if (session.user.email === ADMIN_EMAIL) {
+        sessionStorage.setItem('is_admin', 'true');
+        localStorage.setItem('permanent_admin_email', session.user.email);
+        navigate("/ebook-planner", { replace: true });
+        return true;
+      }
+      return false;
+    }
+  };
+
   useEffect(() => {
     // Listen for auth state changes (magic link callback)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session) {
+      console.log("Auth state change:", event, session?.user?.email);
+      if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session) {
         setStatus("authenticating");
         setMessage("Authentification en cours...");
 
-        const { data: isAdmin } = await supabase.rpc("has_role", {
-          _user_id: session.user.id,
-          _role: "admin"
-        });
-
-        if (isAdmin) {
-          sessionStorage.setItem('is_admin', 'true');
-          localStorage.setItem('permanent_admin_email', session.user.email || ADMIN_EMAIL);
-          navigate("/ebook-planner", { replace: true });
-        } else {
+        const success = await checkAdminAndRedirect(session);
+        if (!success) {
           setStatus("error");
           setMessage("Accès refusé - Vous n'êtes pas administrateur");
         }
@@ -40,17 +85,8 @@ const AdminDirectPage = () => {
         const { data: { session } } = await supabase.auth.getSession();
         
         if (session) {
-          const { data: isAdmin } = await supabase.rpc("has_role", {
-            _user_id: session.user.id,
-            _role: "admin"
-          });
-
-          if (isAdmin) {
-            sessionStorage.setItem('is_admin', 'true');
-            localStorage.setItem('permanent_admin_email', session.user.email || ADMIN_EMAIL);
-            navigate("/ebook-planner", { replace: true });
-            return;
-          }
+          const success = await checkAdminAndRedirect(session);
+          if (success) return;
         }
 
         // No active session - send magic link
