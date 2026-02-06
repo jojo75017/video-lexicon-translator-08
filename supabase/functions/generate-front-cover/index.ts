@@ -149,85 +149,88 @@ serve(async (req) => {
 
     if (coverType === 'full') {
       // Full cover (front + spine + back)
-      imagePrompt = `Create a PREMIUM, AWARD-WINNING COMPLETE BOOK COVER for Amazon KDP print. This MUST include FRONT COVER + SPINE + BACK COVER in a single horizontal image.
+      imagePrompt = `ULTRA-REALISTIC, PHOTOREALISTIC complete book cover for Amazon KDP print-on-demand. FRONT COVER + SPINE + BACK COVER in a single seamless horizontal image.
 
-CRITICAL TEXT RENDERING:
-- TITLE "${ebookTitle}" must be CRISP, PERFECTLY LEGIBLE on the front - positioned ${titlePositionDesc[titlePosition] || titlePositionDesc['center']}
+ABSOLUTE REQUIREMENT - PHOTOREALISM:
+This image must be INDISTINGUISHABLE from a real photograph of a professionally designed book cover. Use REAL-WORLD photographic quality: natural lighting, realistic textures, authentic materials. NO cartoon, NO illustration, NO digital art, NO painterly effects. Think REAL PHOTOGRAPHY.
+
+TEXT RENDERING (CRITICAL):
+- TITLE "${ebookTitle}" must appear RAZOR-SHARP with professional kerning - positioned ${titlePositionDesc[titlePosition] || titlePositionDesc['center']}
 ${showAuthorOnCover ? `- AUTHOR "${authorName}" ${authorPositionDesc[authorNamePosition] || authorPositionDesc['bottom']} with ${authorStyleDesc[authorNameStyle] || authorStyleDesc['elegant']} font` : '- NO author name on front'}
-- Author name on spine (vertical)
-- All text: SHARP, HIGH CONTRAST, professional typography
+- Spine: "${ebookTitle}" vertical + "${authorName}" at bottom
 
-COLOR & ATMOSPHERE: ${colorSchemeDesc[colorScheme] || colorSchemeDesc['auto']}
+COLOR ATMOSPHERE: ${colorSchemeDesc[colorScheme] || colorSchemeDesc['auto']}
 
 LAYOUT (LEFT→RIGHT): BACK COVER | SPINE | FRONT COVER
 
-FRONT COVER (RIGHT - Hero):
-1. TITLE "${ebookTitle}" - dominant, cinematic typography
+FRONT COVER (RIGHT):
+1. TITLE "${ebookTitle}" - large, perfectly typeset, cinematic
 ${showAuthorOnCover ? `2. "${authorName}" - ${authorStyleDesc[authorNameStyle] || 'elegant'}` : ''}
 ${subtitle ? `3. "${subtitle}" below title` : ''}
-4. Breathtaking visual: ${genreDesc}, ${styleDesc}
-
-SPINE (CENTER STRIP):
-- "${ebookTitle}" vertical + "${authorName}" at bottom
+4. PHOTOREALISTIC scene: ${genreDesc}, ${styleDesc}
 
 BACK COVER (LEFT):
 ${backCoverText ? `- Synopsis: "${backCoverText.substring(0, 200)}"` : '- Clean synopsis area'}
-- Author bio section with "${authorName}"
-- Circular author photo placeholder
+- Author bio area
 
-VISUAL QUALITY (CRITICAL):
-- Photorealistic, magazine-quality rendering
-- Rich cinematic lighting, deep shadows, atmosphere
+VISUAL STANDARDS:
+- Shot as if by a Canon EOS R5 with 85mm f/1.4 lens
+- Dramatic natural lighting with soft shadows and bokeh where appropriate
+- Rich color depth, film-grain subtlety, ZERO plastic/CGI look
 - Seamless design flowing across all three sections
-- Full bleed, NO white borders
-- NO barcodes, NO ISBN, NO QR codes, NO fictitious faces
+- Full bleed, NO white borders, NO barcodes, NO ISBN
+- Print-ready CMYK-safe colors at 300 DPI equivalent
 
 ${customPrompt ? `CREATIVE DIRECTION: ${customPrompt}` : ''}
 
-This must rival covers from top publishers like Penguin Random House.`;
+QUALITY BENCHMARK: This must rival covers from Penguin Random House, HarperCollins, and Simon & Schuster.`;
 
     } else {
       // Front cover only
-      imagePrompt = `Create an AWARD-WINNING, BESTSELLER-QUALITY front book cover for Amazon KDP.
+      imagePrompt = `Create an ULTRA-REALISTIC, PHOTOREALISTIC front book cover for Amazon KDP.
 
-BOOK INFORMATION:
+ABSOLUTE REQUIREMENT - THIS MUST LOOK LIKE A REAL PHOTOGRAPH:
+Do NOT create illustrations, cartoons, digital paintings, or AI-looking art. The imagery must look like it was captured by a professional photographer with a high-end DSLR camera. Real textures, real lighting, real depth of field. Think stock photography from Getty Images or Shutterstock premium collections.
+
+BOOK DETAILS:
 - Title: "${ebookTitle}"
 - Author: "${authorName}"
 ${subtitle ? `- Subtitle: "${subtitle}"` : ''}
 - Genre: ${genreDesc}
 - Visual Style: ${styleDesc}
 
-MANDATORY DESIGN RULES:
-1. The TITLE "${ebookTitle}" MUST be rendered in LARGE, CRISP, PERFECTLY LEGIBLE typography - positioned ${titlePositionDesc[titlePosition] || 'centered'}
-${showAuthorOnCover ? `2. AUTHOR NAME "${authorName}" - ${authorPositionDesc[authorNamePosition] || 'at the bottom'}, ${authorStyleDesc[authorNameStyle] || 'elegant'} typography` : '2. NO author name'}
-${subtitle ? `3. SUBTITLE "${subtitle}" - elegantly placed below title` : ''}
+TYPOGRAPHY (CRITICAL - MUST BE PERFECT):
+1. TITLE "${ebookTitle}" - LARGE, crisp, professional font with perfect kerning and tracking - positioned ${titlePositionDesc[titlePosition] || 'centered'}
+${showAuthorOnCover ? `2. AUTHOR "${authorName}" - ${authorPositionDesc[authorNamePosition] || 'at the bottom'}, ${authorStyleDesc[authorNameStyle] || 'elegant'} typography, smaller than title` : '2. NO author name'}
+${subtitle ? `3. SUBTITLE "${subtitle}" - elegantly placed below title, lighter weight` : ''}
 
-VISUAL QUALITY STANDARDS (CRITICAL):
-- Photorealistic rendering quality, equivalent to professional studio photography
-- Rich, deep colors with perfect contrast - COLOR SCHEME: ${colorSchemeDesc[colorScheme] || colorSchemeDesc['auto']}
-- Dramatic cinematic lighting with depth and atmosphere
-- Sharp details, no blur, no artifacts, no noise
-- Professional typography with perfect kerning and weight
-- Visual composition following the rule of thirds
-- Depth of field creating a layered, immersive scene
+PHOTOGRAPHIC QUALITY STANDARDS:
+- Camera: As if shot on Canon EOS R5 or Sony A7R V, 85mm f/1.4 prime lens
+- Lighting: Professional studio or golden hour natural light, dramatic shadows
+- Color: Rich, deep, film-like color grading - ${colorSchemeDesc[colorScheme] || colorSchemeDesc['auto']}
+- Texture: Real materials (paper, fabric, wood, metal, skin) with visible grain
+- Depth: Shallow depth of field creating beautiful bokeh on backgrounds
+- Composition: Rule of thirds, leading lines, visual weight balance
 
 TECHNICAL SPECS:
 - Portrait 2:3 ratio (1024x1536 pixels)
-- Full bleed - ABSOLUTELY NO white borders or margins
-- Print-ready at 300 DPI quality
-- Colors within CMYK gamut for print accuracy
+- Full bleed - ABSOLUTELY NO white borders
+- Print-ready 300 DPI equivalent quality
+- CMYK-safe color gamut
 
-PROHIBITIONS:
-- NO watermarks, NO stock photo logos
-- NO blurry or low-resolution elements
-- NO generic clip-art style imagery
-- NO visible AI artifacts or distortions
+STRICT PROHIBITIONS:
+- NO cartoonish or illustrated look
+- NO plastic/CGI/3D-rendered appearance
+- NO watermarks, stock logos, or visible AI artifacts
+- NO flat colors or unrealistic lighting
+- NO generic clip-art or vector-style imagery
+- NO blurry elements or noise
 
 ${customPrompt ? `CREATIVE DIRECTION: ${customPrompt}` : ''}
 
-VARIATION ${variation}/3: Create a UNIQUE interpretation while maintaining top-tier quality.
+VARIATION ${variation}/3: Create a UNIQUE photorealistic interpretation.
 
-This cover must look INDISTINGUISHABLE from covers designed by top professional book designers like Chip Kidd or Peter Mendelsund.`;
+QUALITY BENCHMARK: This cover must be indistinguishable from a real professionally photographed and designed book cover by top designers at Penguin Random House.`;
     }
 
     let imageUrl: string | undefined;
