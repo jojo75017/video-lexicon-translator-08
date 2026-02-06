@@ -51,6 +51,38 @@ function getPlanLimits(planType: string) {
   return plans[planType] || plans.starter;
 }
 
+async function sendAdminNotification(subscriberEmail: string, planType: string, planTier: string, isNew: boolean) {
+  try {
+    const adminEmail = 'boubetgeorges@gmail.com';
+    const action = isNew ? '🆕 Nouvel abonné' : '🔄 Abonnement mis à jour';
+    const tierBadge = planTier === 'vip' ? '⭐ VIP' : 'Standard';
+    
+    const html = `
+      <div style="font-family:Arial,sans-serif;max-width:500px;margin:0 auto;padding:20px;">
+        <div style="background:linear-gradient(135deg,#10b981,#059669);color:white;padding:20px;border-radius:10px 10px 0 0;text-align:center;">
+          <h2 style="margin:0;">${action}</h2>
+        </div>
+        <div style="background:#f0fdf4;padding:20px;border-radius:0 0 10px 10px;border:1px solid #bbf7d0;">
+          <p><strong>📧 Email :</strong> ${subscriberEmail}</p>
+          <p><strong>📦 Plan :</strong> ${planType}</p>
+          <p><strong>🏷️ Tier :</strong> ${tierBadge}</p>
+          <p><strong>📅 Date :</strong> ${new Date().toLocaleString('fr-FR', { timeZone: 'Europe/Paris' })}</p>
+        </div>
+      </div>
+    `;
+
+    await resend.emails.send({
+      from: 'EbookStudio <onboarding@resend.dev>',
+      to: [adminEmail],
+      subject: `${action} — ${subscriberEmail} (${planType})`,
+      html,
+    });
+    console.log('Admin notification sent for:', subscriberEmail);
+  } catch (error) {
+    console.error('Failed to send admin notification:', error);
+  }
+}
+
 async function sendWelcomeEmail(email: string, accessCode: string, planType: string, isNewSubscriber: boolean) {
   try {
     const planDetails = getPlanLimits(planType);
@@ -286,12 +318,13 @@ Deno.serve(async (req) => {
       assignedTier = existingSubscriber.plan_tier;
       console.log('Subscriber updated:', email);
 
-      // Send update email
+      // Send update email + admin notification
       const emailResult = await sendWelcomeEmail(email, accessCode, plan_type, false);
       emailSent = emailResult.success;
       if (!emailResult.success) {
         emailError = emailResult.error || 'Erreur inconnue';
       }
+      await sendAdminNotification(email, plan_type, assignedTier, false);
     } else {
       // Create new subscriber
       accessCode = generateAccessCode();
@@ -317,12 +350,13 @@ Deno.serve(async (req) => {
 
       console.log('New subscriber created:', email, 'with tier:', assignedTier);
 
-      // Send welcome email
+      // Send welcome email + admin notification
       const emailResult = await sendWelcomeEmail(email, accessCode, plan_type, true);
       emailSent = emailResult.success;
       if (!emailResult.success) {
         emailError = emailResult.error || 'Erreur inconnue';
       }
+      await sendAdminNotification(email, plan_type, assignedTier, true);
     }
 
     // Get current VIP count
