@@ -985,118 +985,238 @@ export const EbookCoverGenerator: React.FC<EbookCoverGeneratorProps> = ({
 
           {/* Onglet Aperçu */}
           <TabsContent value="preview" className="space-y-4">
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <Button 
-                  onClick={generateCover}
-                  disabled={isGenerating || !ebookTitle}
-                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 shadow-lg"
-                  size="lg"
-                >
-                  {isGenerating ? (
-                    <>
-                      <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                      Génération en cours...
-                    </>
-                  ) : (
-                    <>
-                      <Wand2 className="h-5 w-5 mr-2" />
-                      Générer {coverType === 'full' ? 'couverture complète' : 'couverture avant'}
-                    </>
-                  )}
-                </Button>
-
-                {generatedCovers.length > 0 && (
-                  <Button 
-                    onClick={generateCover}
-                    disabled={isGenerating}
-                    variant="outline"
-                    className="w-full"
-                  >
-                    <RefreshCw className="h-4 w-4 mr-2" />
-                    Générer une variante ({generatedCovers.length})
-                  </Button>
-                )}
-
-                {/* Info dimensions */}
-                <div className="p-3 bg-purple-50 rounded-lg border border-purple-200 text-sm">
-                  <p className="font-medium text-purple-800 mb-1">Paramètres actuels:</p>
-                  <ul className="text-xs text-purple-700 space-y-1">
-                    <li>• Format: {currentFormat.label}</li>
-                    <li>• Type: {coverType === 'full' ? 'Couverture complète' : 'Avant seule'}</li>
-                    <li>• Pages: {pageCount} ({paperType === 'white' ? 'blanc' : 'crème'})</li>
-                    <li>• Tranche: {spineWidth.toFixed(3)}"</li>
-                    {coverType === 'full' && (
-                      <li>• Dimensions: {coverDimensions.totalWidthPx} x {coverDimensions.heightPx} px</li>
-                    )}
-                  </ul>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                {currentCover ? (
+            {/* Boutons de génération */}
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Button 
+                onClick={generateCover}
+                disabled={isGenerating || !ebookTitle}
+                className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg text-white h-12 text-base font-semibold"
+                size="lg"
+              >
+                {isGenerating ? (
                   <>
-                    <div className="rounded-xl overflow-hidden shadow-xl">
+                    <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                    Génération IA en cours...
+                  </>
+                ) : (
+                  <>
+                    <Wand2 className="h-5 w-5 mr-2" />
+                    {generatedCovers.length > 0 ? `Nouvelle variante (${generatedCovers.length + 1})` : `Générer ${coverType === 'full' ? 'couverture complète' : 'couverture avant'}`}
+                  </>
+                )}
+              </Button>
+
+              {generatedCovers.length > 0 && (
+                <Button 
+                  onClick={() => { setGeneratedCovers([]); setSelectedCover(0); setVariation(1); }}
+                  variant="outline"
+                  className="h-12"
+                >
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Reset galerie
+                </Button>
+              )}
+            </div>
+
+            {/* Info dimensions compacte */}
+            <div className="flex flex-wrap gap-2 text-xs">
+              <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
+                📐 {currentFormat.label}
+              </Badge>
+              <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
+                📄 {pageCount} pages ({paperType === 'white' ? 'blanc' : 'crème'})
+              </Badge>
+              <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
+                📏 Tranche: {spineWidth.toFixed(3)}"
+              </Badge>
+              {coverType === 'full' && (
+                <Badge variant="outline" className="bg-pink-50 text-pink-700 border-pink-200">
+                  📚 Couverture complète
+                </Badge>
+              )}
+            </div>
+
+            {currentCover ? (
+              <div className="space-y-6">
+                {/* Aperçu principal - Mockup 3D + Image pleine */}
+                <div className="grid lg:grid-cols-2 gap-6">
+                  {/* Mockup 3D */}
+                  <div className="flex flex-col items-center justify-center p-8 bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 rounded-2xl border shadow-inner min-h-[420px]">
+                    <div 
+                      style={{ 
+                        perspective: '1200px',
+                        perspectiveOrigin: '50% 40%'
+                      }}
+                    >
+                      <div 
+                        style={{
+                          position: 'relative',
+                          transformStyle: 'preserve-3d',
+                          transform: 'rotateY(-28deg) rotateX(3deg)',
+                          transition: 'transform 0.5s ease',
+                        }}
+                        className="hover:[transform:rotateY(-8deg)_rotateX(2deg)] cursor-pointer"
+                      >
+                        {/* Front cover */}
+                        <div 
+                          style={{
+                            width: '260px',
+                            height: '380px',
+                            position: 'relative',
+                            transformStyle: 'preserve-3d',
+                            transform: 'translateZ(15px)',
+                            borderRadius: '0 6px 6px 0',
+                            overflow: 'hidden',
+                            boxShadow: '0 25px 50px rgba(0,0,0,0.25), 0 10px 20px rgba(0,0,0,0.15), inset 0 0 0 1px rgba(255,255,255,0.1)'
+                          }}
+                        >
+                          <img 
+                            src={currentCover} 
+                            alt="Couverture KDP"
+                            className="w-full h-full object-cover"
+                          />
+                          {/* Reflet brillant */}
+                          <div 
+                            className="absolute inset-0 pointer-events-none"
+                            style={{
+                              background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 40%, transparent 60%, rgba(255,255,255,0.05) 100%)',
+                            }}
+                          />
+                        </div>
+
+                        {/* Spine */}
+                        <div 
+                          style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '30px',
+                            height: '380px',
+                            background: 'linear-gradient(to right, #1a1a2e, #2d2d44, #1a1a2e)',
+                            transform: 'rotateY(-90deg) translateX(-15px)',
+                            transformOrigin: 'left center',
+                            borderRadius: '6px 0 0 6px',
+                          }}
+                        />
+
+                        {/* Pages (right edge) */}
+                        <div 
+                          style={{
+                            position: 'absolute',
+                            top: '4px',
+                            right: '-12px',
+                            width: '24px',
+                            height: '372px',
+                            background: 'repeating-linear-gradient(to right, #fafaf8, #f5f5f0 1px, #fafaf8 1px, #fafaf8 3px)',
+                            transform: 'rotateY(90deg) translateX(12px)',
+                            transformOrigin: 'left center',
+                            borderRadius: '0 3px 3px 0',
+                            boxShadow: 'inset -2px 0 4px rgba(0,0,0,0.05)',
+                          }}
+                        />
+
+                        {/* Bottom edge shadow */}
+                        <div 
+                          style={{
+                            position: 'absolute',
+                            bottom: 0,
+                            left: 0,
+                            width: '260px',
+                            height: '5px',
+                            background: 'linear-gradient(to right, #2d2d44, #3d3d55, #2d2d44)',
+                            transform: 'rotateX(-90deg) translateY(2.5px)',
+                            transformOrigin: 'bottom center',
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Shadow beneath book */}
+                    <div 
+                      className="mt-4"
+                      style={{
+                        width: '180px',
+                        height: '20px',
+                        background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.15) 0%, transparent 70%)',
+                        filter: 'blur(8px)',
+                      }}
+                    />
+                    <p className="text-xs text-muted-foreground mt-2 italic">Survolez pour faire pivoter</p>
+                  </div>
+
+                  {/* Image pleine résolution */}
+                  <div className="space-y-3">
+                    <div className="rounded-2xl overflow-hidden shadow-2xl border-2 border-white ring-1 ring-black/5">
                       <img 
                         src={currentCover} 
-                        alt="Couverture générée"
+                        alt="Couverture générée haute résolution"
                         className="w-full h-auto block"
                       />
                     </div>
                     
-                    {generatedCovers.length > 1 && (
-                      <div className="flex gap-2 overflow-x-auto pb-2">
-                        {generatedCovers.map((cover, idx) => (
-                          <button
-                            key={idx}
-                            onClick={() => setSelectedCover(idx)}
-                            className={`flex-shrink-0 w-16 h-24 rounded-lg overflow-hidden border-2 transition-all ${
-                              selectedCover === idx 
-                                ? 'border-purple-500 ring-2 ring-purple-300' 
-                                : 'border-gray-200 hover:border-purple-300'
-                            }`}
-                          >
-                            <img src={cover} alt={`Variante ${idx + 1}`} className="w-full h-full object-cover" />
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                    
-                    <div className="flex gap-2">
+                    {/* Actions de téléchargement */}
+                    <div className="grid grid-cols-2 gap-2">
                       <Button 
                         onClick={() => downloadCover('jpeg')}
-                        variant="outline"
-                        className="flex-1"
+                        className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-md"
                       >
                         <Download className="h-4 w-4 mr-2" />
-                        JPEG
+                        JPEG HD
                       </Button>
                       <Button 
                         onClick={() => downloadCover('pdf')}
-                        variant="outline"
-                        className="flex-1"
+                        className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white shadow-md"
                       >
                         <FileText className="h-4 w-4 mr-2" />
-                        PDF
+                        PDF KDP
                       </Button>
                     </div>
-                  </>
-                ) : (
-                  <div className="border-2 border-dashed border-purple-200 rounded-xl h-80 flex flex-col items-center justify-center bg-purple-50/50">
-                    <ImageIcon className="w-16 h-16 text-purple-300 mb-4" />
-                    <p className="text-muted-foreground text-center px-4">
-                      Votre couverture apparaîtra ici
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      {coverType === 'full' 
-                        ? `${coverDimensions.totalWidthPx} x ${coverDimensions.heightPx} px`
-                        : `${coverDimensions.frontWidthPx} x ${coverDimensions.heightPx} px`
-                      }
-                    </p>
+                  </div>
+                </div>
+
+                {/* Galerie des variantes */}
+                {generatedCovers.length > 1 && (
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-semibold text-purple-800 flex items-center gap-2">
+                      <ImageIcon className="w-4 h-4" />
+                      Galerie des variantes ({generatedCovers.length})
+                    </h4>
+                    <div className="flex gap-3 overflow-x-auto pb-3 pt-1 px-1">
+                      {generatedCovers.map((cover, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => setSelectedCover(idx)}
+                          className={`flex-shrink-0 rounded-xl overflow-hidden border-2 transition-all duration-200 hover:scale-105 ${
+                            selectedCover === idx 
+                              ? 'border-purple-500 ring-2 ring-purple-300 shadow-lg scale-105' 
+                              : 'border-gray-200 hover:border-purple-300 shadow-sm'
+                          }`}
+                          style={{ width: '80px', height: '120px' }}
+                        >
+                          <img src={cover} alt={`Variante ${idx + 1}`} className="w-full h-full object-cover" />
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
-            </div>
+            ) : (
+              <div className="border-2 border-dashed border-purple-200 rounded-2xl h-96 flex flex-col items-center justify-center bg-gradient-to-br from-purple-50/50 to-pink-50/50">
+                <div className="w-20 h-20 rounded-full bg-purple-100 flex items-center justify-center mb-4">
+                  <ImageIcon className="w-10 h-10 text-purple-300" />
+                </div>
+                <p className="text-muted-foreground text-center font-medium">
+                  Votre couverture professionnelle apparaîtra ici
+                </p>
+                <p className="text-xs text-muted-foreground mt-2">
+                  {coverType === 'full' 
+                    ? `${coverDimensions.totalWidthPx} × ${coverDimensions.heightPx} px • Couverture complète`
+                    : `${coverDimensions.frontWidthPx} × ${coverDimensions.heightPx} px • Couverture avant`
+                  }
+                </p>
+                <p className="text-xs text-purple-400 mt-1">Qualité impression 300 DPI</p>
+              </div>
+            )}
           </TabsContent>
         </Tabs>
       </CardContent>
