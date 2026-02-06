@@ -47,6 +47,27 @@ interface NicheOpportunity {
   idealPrice: number;
   estimatedMonthlySales: number;
 }
+// Utility to safely parse AI JSON responses
+const cleanAndParseJSON = (content: string, type: string): any => {
+  try {
+    // Remove markdown code blocks
+    let cleaned = content.replace(/```json\s*/gi, '').replace(/```\s*/gi, '').trim();
+    
+    // Try to extract JSON object
+    const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      cleaned = jsonMatch[0];
+    }
+    
+    // Fix common JSON issues: trailing commas
+    cleaned = cleaned.replace(/,\s*([}\]])/g, '$1');
+    
+    return JSON.parse(cleaned);
+  } catch (e) {
+    console.error('JSON parse failed for', type, ':', e, 'Content:', content.substring(0, 200));
+    throw new Error(`Réponse AI mal formée pour ${type}. Réessayez.`);
+  }
+};
 
 const EbookKdpExplosiveSimulator: React.FC = () => {
   const [query, setQuery] = useState('');
@@ -200,18 +221,18 @@ RÈGLES:
       });
 
       if (error) throw error;
+      if (!data?.content) throw new Error('Pas de contenu dans la réponse');
 
-      const cleanContent = data.content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-      const parsed = JSON.parse(cleanContent);
+      const parsed = cleanAndParseJSON(data.content, type);
 
       if (type === 'keywords') setKeywords(parsed.keywords || []);
       if (type === 'titles') setTitles(parsed.titles || []);
       if (type === 'opportunities') setOpportunities(parsed.opportunities || []);
 
       toast.success(`🔥 ${type === 'keywords' ? 'Mots-clés explosifs' : type === 'titles' ? 'Titres viraux' : 'Opportunités'} générés !`);
-    } catch (err) {
-      console.error(err);
-      toast.error('Erreur lors de la génération');
+    } catch (err: any) {
+      console.error('KDP Simulator error:', err);
+      toast.error(err?.message || 'Erreur lors de la génération. Réessayez.');
     } finally {
       setIsLoading(false);
       setLoadingType('');
@@ -256,8 +277,8 @@ RÈGLES:
       body: { type: 'kdp-explosive-simulator', prompt }
     });
     if (error) throw error;
-    const cleanContent = data.content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-    const parsed = JSON.parse(cleanContent);
+    if (!data?.content) throw new Error('Pas de contenu');
+    const parsed = cleanAndParseJSON(data.content, type);
     if (type === 'keywords') setKeywords(parsed.keywords || []);
     if (type === 'titles') setTitles(parsed.titles || []);
     if (type === 'opportunities') setOpportunities(parsed.opportunities || []);
