@@ -58,6 +58,7 @@ import { EbookVoiceDictation } from '@/components/ebook/EbookVoiceDictation';
 import { EbookSeriesManager } from '@/components/ebook/EbookSeriesManager';
 import { EbookKdpMarketAnalysis } from '@/components/ebook/EbookKdpMarketAnalysis';
 import { EbookKdpResearch } from '@/components/ebook/EbookKdpResearch';
+import EbookKdpExplosiveSimulator from '@/components/ebook/EbookKdpExplosiveSimulator';
 import { EbookAudioGenerator } from '@/components/ebook/EbookAudioGenerator';
 import { EbookFormationPDF } from '@/components/ebook/EbookFormationPDF';
 import EbookKdpAnalytics from '@/components/ebook/EbookKdpAnalytics';
@@ -2399,6 +2400,11 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       case 'kdp-research':
         return (
           <EbookKdpResearch />
+        );
+      
+      case 'kdp-explosive':
+        return (
+          <EbookKdpExplosiveSimulator />
         );
       
       case 'amazon-simulator':
