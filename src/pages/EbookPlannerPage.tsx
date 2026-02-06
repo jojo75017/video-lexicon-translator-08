@@ -85,6 +85,8 @@ import EbookUltimateVerdict from '@/components/ebook/EbookUltimateVerdict';
 import EbookCompleteWorkflow from '@/components/ebook/EbookCompleteWorkflow';
 import { EbookInteractiveTutorial } from '@/components/ebook/EbookInteractiveTutorial';
 import { WorkflowStepWrapper } from '@/components/ebook/WorkflowStepWrapper';
+import { WorkflowDashboard } from '@/components/ebook/WorkflowDashboard';
+import { WorkflowExportCompiled } from '@/components/ebook/WorkflowExportCompiled';
 import { useConfetti } from '@/hooks/useConfetti';
 import { useDemoMode } from '@/hooks/useDemoMode';
 import { DemoBanner } from '@/components/ebook/DemoBanner';
@@ -972,6 +974,23 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             targetWordsPerChapter={targetWordsPerChapter}
             kdpDescription={kdpDescription}
             kdpKeywords={kdpKeywords}
+          />
+        );
+
+      case 'workflow-dashboard':
+        return (
+          <WorkflowDashboard
+            ebookTitle={ebookTitle}
+            onNavigate={(tabId) => setActiveTab(tabId)}
+            onStartAutoWorkflow={() => setActiveTab('complete-workflow')}
+          />
+        );
+
+      case 'workflow-export':
+        return (
+          <WorkflowExportCompiled
+            ebookTitle={ebookTitle}
+            authorName={authorName}
           />
         );
       
