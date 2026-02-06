@@ -359,26 +359,28 @@ RÉFÉRENCE VISUELLE:
 - Reproduire EXACTEMENT le même style que l'image de référence
 - Utiliser la même palette de couleurs et technique de rendu` : '';
 
-  const imagePrompt = `Contexte de l'ebook: "${ebookTitle}"
-Chapitre à illustrer: "${chapterTitle}"
-${chapterContent ? `Résumé du chapitre: ${chapterContent.substring(0, 300)}...` : ''}
+  const imagePrompt = `PROFESSIONAL ILLUSTRATION for published ebook "${ebookTitle}"
+Chapter: "${chapterTitle}"
+${chapterContent ? `Scene context: ${chapterContent.substring(0, 400)}` : ''}
 ${charactersContext}
 
-Style artistique demandé: ${style}
-Qualité: ${qualityDesc}
-${colorPrompt ? `Palette de couleurs: ${colorPrompt}` : ''}
+ARTISTIC STYLE: ${style}
+QUALITY LEVEL: ${qualityDesc}
+${colorPrompt ? `COLOR PALETTE: ${colorPrompt}` : ''}
 ${photorealisticEnhancement}
 ${coherencePrompt}
 ${referencePrompt}
 
-Instructions de génération:
-- Créer une illustration de haute qualité adaptée à un ebook professionnel
-- Composition claire et visuellement engageante
-- Si des personnages sont mentionnés ci-dessus, les représenter avec EXACTEMENT les mêmes caractéristiques physiques que décrites
-- COHÉRENCE VISUELLE ABSOLUE pour tous les personnages récurrents
-- L'illustration doit refléter le thème et l'atmosphère du titre de l'ebook "${ebookTitle}"`;
+QUALITY STANDARDS (CRITICAL):
+- Magazine-quality illustration (National Geographic, Condé Nast level)
+- Rich cinematic lighting with dramatic depth
+- Sharp details, professional composition following rule of thirds
+- NO text, NO watermarks, NO artifacts, NO blurriness
+- Vivid, immersive atmosphere matching the chapter mood
+- If characters are described above, reproduce them with EXACT visual consistency across all images
+- The illustration must feel like professional editorial artwork worthy of a bestselling book`;
 
-  console.log('Generating image with OpenAI:', imagePrompt);
+  console.log('Generating image with OpenAI:', imagePrompt.substring(0, 200) + '...');
 
   const generateViaImagesAPI = async (model: string): Promise<{ ok: boolean; status: number; data?: any; errorText?: string }> => {
     const payload: any = {
