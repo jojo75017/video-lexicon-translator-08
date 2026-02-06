@@ -12,13 +12,34 @@ const AdminDirectPage = () => {
   const [message, setMessage] = useState("Vérification de la session...");
 
   useEffect(() => {
-    const handleAdminDirect = async () => {
+    // Listen for auth state changes (magic link callback)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        setStatus("authenticating");
+        setMessage("Authentification en cours...");
+
+        const { data: isAdmin } = await supabase.rpc("has_role", {
+          _user_id: session.user.id,
+          _role: "admin"
+        });
+
+        if (isAdmin) {
+          sessionStorage.setItem('is_admin', 'true');
+          localStorage.setItem('permanent_admin_email', session.user.email || ADMIN_EMAIL);
+          navigate("/ebook-planner", { replace: true });
+        } else {
+          setStatus("error");
+          setMessage("Accès refusé - Vous n'êtes pas administrateur");
+        }
+      }
+    });
+
+    // Check existing session or send magic link
+    const init = async () => {
       try {
-        // Check if we have a session already
         const { data: { session } } = await supabase.auth.getSession();
         
         if (session) {
-          // Verify admin status
           const { data: isAdmin } = await supabase.rpc("has_role", {
             _user_id: session.user.id,
             _role: "admin"
@@ -32,48 +53,7 @@ const AdminDirectPage = () => {
           }
         }
 
-        // Check URL for magic link tokens (hash fragment)
-        const hashParams = new URLSearchParams(window.location.hash.substring(1));
-        const accessToken = hashParams.get("access_token");
-        const refreshToken = hashParams.get("refresh_token");
-
-        if (accessToken && refreshToken) {
-          setStatus("authenticating");
-          setMessage("Authentification en cours...");
-
-          const { data, error } = await supabase.auth.setSession({
-            access_token: accessToken,
-            refresh_token: refreshToken
-          });
-
-          if (error) {
-            console.error("Session error:", error);
-            setStatus("error");
-            setMessage("Erreur d'authentification");
-            return;
-          }
-
-          if (data.session) {
-            // Verify admin status
-            const { data: isAdmin } = await supabase.rpc("has_role", {
-              _user_id: data.session.user.id,
-              _role: "admin"
-            });
-
-            if (isAdmin) {
-              sessionStorage.setItem('is_admin', 'true');
-              localStorage.setItem('permanent_admin_email', data.session.user.email || ADMIN_EMAIL);
-              navigate("/ebook-planner", { replace: true });
-              return;
-            } else {
-              setStatus("error");
-              setMessage("Accès refusé - Vous n'êtes pas administrateur");
-              return;
-            }
-          }
-        }
-
-        // No session and no tokens - send magic link
+        // No active session - send magic link
         setStatus("sending");
         setMessage(`Envoi du lien magique à ${ADMIN_EMAIL}...`);
 
@@ -85,6 +65,11 @@ const AdminDirectPage = () => {
         });
 
         if (magicLinkError) {
+          if (magicLinkError.status === 429) {
+            setStatus("sent");
+            setMessage("Lien déjà envoyé récemment. Vérifiez votre boîte mail.");
+            return;
+          }
           console.error("Magic link error:", magicLinkError);
           setStatus("error");
           setMessage("Erreur lors de l'envoi du lien");
@@ -93,7 +78,6 @@ const AdminDirectPage = () => {
 
         setStatus("sent");
         setMessage("Lien magique envoyé ! Vérifiez votre boîte mail.");
-
       } catch (err) {
         console.error("Admin direct error:", err);
         setStatus("error");
@@ -101,7 +85,9 @@ const AdminDirectPage = () => {
       }
     };
 
-    handleAdminDirect();
+    init();
+
+    return () => subscription.unsubscribe();
   }, [navigate]);
 
   return (
