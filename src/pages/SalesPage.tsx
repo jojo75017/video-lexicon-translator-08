@@ -26,6 +26,9 @@ import PriceComparison from "@/components/sales/PriceComparison";
 import SalesFaq from "@/components/sales/SalesFaq";
 import StarTestimonials from "@/components/sales/StarTestimonials";
 import { useVipAvailability } from "@/hooks/useVipAvailability";
+import FloatingMobileCta from "@/components/sales/FloatingMobileCta";
+import LiveViewerCount from "@/components/sales/LiveViewerCount";
+import UrgencyBanner from "@/components/sales/UrgencyBanner";
 
 // Composant Newsletter inline pour le footer
 const NewsletterForm = () => {
@@ -339,6 +342,9 @@ const SalesPage = () => {
           </Button>
         </div>
       </header>
+
+      {/* Urgency Banner - rotating messages */}
+      <UrgencyBanner />
 
       {/* Bannière Avant / Après */}
       <div className="bg-gradient-to-r from-slate-900 via-violet-950 to-slate-900 text-white py-8 px-4 relative overflow-hidden">
@@ -696,8 +702,9 @@ const SalesPage = () => {
             </Button>
           </div>
 
-          {/* Compteur live */}
-          <div className="flex justify-center mb-8">
+          {/* Live viewer count + Compteur live */}
+          <div className="flex flex-col items-center gap-4 mb-8">
+            <LiveViewerCount />
             <LiveEbookCounter variant="compact" />
           </div>
 
@@ -957,7 +964,7 @@ const SalesPage = () => {
                   <div className="text-xs uppercase tracking-wide">Secondes</div>
                 </div>
               </div>
-              <p className="text-sm mt-3 text-white/80">Offre valable jusqu{"'"}au 31 janvier 2025</p>
+              <p className="text-sm mt-3 text-white/80">⏳ Cette offre peut être retirée à tout moment</p>
             </div>
           </div>
           
@@ -1284,6 +1291,9 @@ const SalesPage = () => {
 
       {/* Sticky CTA Bar */}
       <StickyCtaBar />
+
+      {/* Floating Mobile CTA */}
+      <FloatingMobileCta />
     </div>
   );
 };
