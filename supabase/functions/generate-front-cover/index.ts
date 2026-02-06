@@ -149,131 +149,148 @@ serve(async (req) => {
 
     if (coverType === 'full') {
       // Full cover (front + spine + back)
-      imagePrompt = `Create a COMPLETE BOOK COVER for Amazon KDP print publication. This must include FRONT COVER, SPINE, and BACK COVER in a single horizontal image.
+      imagePrompt = `Create a PREMIUM, AWARD-WINNING COMPLETE BOOK COVER for Amazon KDP print. This MUST include FRONT COVER + SPINE + BACK COVER in a single horizontal image.
 
-CRITICAL - TEXT REQUIREMENTS (MOST IMPORTANT):
-- The TITLE "${ebookTitle}" MUST be clearly visible and readable on the front cover, positioned ${titlePositionDesc[titlePosition] || titlePositionDesc['center']}
-${showAuthorOnCover ? `- The AUTHOR NAME "${authorName}" MUST appear ${authorPositionDesc[authorNamePosition] || authorPositionDesc['bottom']} with ${authorStyleDesc[authorNameStyle] || authorStyleDesc['elegant']} typography` : '- NO author name on front cover'}
-- The author name MUST also appear on the spine
-- All text must be LARGE, BOLD, and HIGH CONTRAST against the background
-- Use professional typography that stands out
+CRITICAL TEXT RENDERING:
+- TITLE "${ebookTitle}" must be CRISP, PERFECTLY LEGIBLE on the front - positioned ${titlePositionDesc[titlePosition] || titlePositionDesc['center']}
+${showAuthorOnCover ? `- AUTHOR "${authorName}" ${authorPositionDesc[authorNamePosition] || authorPositionDesc['bottom']} with ${authorStyleDesc[authorNameStyle] || authorStyleDesc['elegant']} font` : '- NO author name on front'}
+- Author name on spine (vertical)
+- All text: SHARP, HIGH CONTRAST, professional typography
 
-COLOR SCHEME: ${colorSchemeDesc[colorScheme] || colorSchemeDesc['auto']}
+COLOR & ATMOSPHERE: ${colorSchemeDesc[colorScheme] || colorSchemeDesc['auto']}
 
-BOOK DETAILS:
-- Title: "${ebookTitle}"
-- Author: "${authorName}"
-${subtitle ? `- Subtitle: "${subtitle}"` : ''}
-- Genre: ${genreDesc}
-- Style: ${styleDesc}
+LAYOUT (LEFT→RIGHT): BACK COVER | SPINE | FRONT COVER
 
-LAYOUT (LEFT TO RIGHT):
-BACK COVER (LEFT) | SPINE (CENTER) | FRONT COVER (RIGHT)
+FRONT COVER (RIGHT - Hero):
+1. TITLE "${ebookTitle}" - dominant, cinematic typography
+${showAuthorOnCover ? `2. "${authorName}" - ${authorStyleDesc[authorNameStyle] || 'elegant'}` : ''}
+${subtitle ? `3. "${subtitle}" below title` : ''}
+4. Breathtaking visual: ${genreDesc}, ${styleDesc}
 
-FRONT COVER (RIGHT SIDE - Most Important):
-1. TITLE "${ebookTitle}" - LARGE, PROMINENT, ${titlePositionDesc[titlePosition] || 'centered'}, must be clearly readable
-${showAuthorOnCover ? `2. Author name "${authorName}" - ${authorPositionDesc[authorNamePosition] || 'at bottom'}, ${authorStyleDesc[authorNameStyle] || 'elegant'} style` : '2. NO author name displayed'}
-${subtitle ? `3. Subtitle "${subtitle}" - Below title` : ''}
-4. Compelling visual illustration matching the ${genre} genre and ${style} style
+SPINE (CENTER STRIP):
+- "${ebookTitle}" vertical + "${authorName}" at bottom
 
-SPINE (CENTER - NARROW VERTICAL STRIP):
-1. Title "${ebookTitle}" - Rotated vertically
-2. Author name "${authorName}" - At bottom of spine
+BACK COVER (LEFT):
+${backCoverText ? `- Synopsis: "${backCoverText.substring(0, 200)}"` : '- Clean synopsis area'}
+- Author bio section with "${authorName}"
+- Circular author photo placeholder
 
-BACK COVER (LEFT SIDE):
-${backCoverText ? `1. Synopsis/marketing text: "${backCoverText.substring(0, 200)}"` : '1. Clean space for synopsis'}
-2. Author section with name "${authorName}" prominently displayed
-3. Leave space for author photo
+VISUAL QUALITY (CRITICAL):
+- Photorealistic, magazine-quality rendering
+- Rich cinematic lighting, deep shadows, atmosphere
+- Seamless design flowing across all three sections
+- Full bleed, NO white borders
+- NO barcodes, NO ISBN, NO QR codes, NO fictitious faces
 
-CRITICAL PROHIBITIONS - DO NOT INCLUDE:
-- NO ISBN barcode
-- NO barcode of any kind
-- NO QR codes
-- NO price tags
-- NO fictitious faces or people
-- NO publisher logos
+${customPrompt ? `CREATIVE DIRECTION: ${customPrompt}` : ''}
 
-DESIGN:
-- Professional ${style} aesthetic with ${colorSchemeDesc[colorScheme] || 'appropriate'} colors
-- Seamless design flowing across all sections
-- Full bleed - NO white borders
-- High contrast for readability
-
-${customPrompt ? `CUSTOMIZATION: ${customPrompt}` : ''}
-
-This MUST be a print-ready cover with CLEARLY READABLE title and author name.`;
+This must rival covers from top publishers like Penguin Random House.`;
 
     } else {
       // Front cover only
-      imagePrompt = `Create a stunning professional FRONT BOOK COVER for Amazon KDP publication.
+      imagePrompt = `Create an AWARD-WINNING, BESTSELLER-QUALITY front book cover for Amazon KDP.
 
-BOOK DETAILS:
+BOOK INFORMATION:
 - Title: "${ebookTitle}"
 - Author: "${authorName}"
 ${subtitle ? `- Subtitle: "${subtitle}"` : ''}
 - Genre: ${genreDesc}
-- Style: ${styleDesc}
-- Book format: ${bookFormat}
+- Visual Style: ${styleDesc}
 
-COLOR SCHEME: ${colorSchemeDesc[colorScheme] || colorSchemeDesc['auto']}
-Apply this color palette throughout the design for a cohesive look.
+MANDATORY DESIGN RULES:
+1. The TITLE "${ebookTitle}" MUST be rendered in LARGE, CRISP, PERFECTLY LEGIBLE typography - positioned ${titlePositionDesc[titlePosition] || 'centered'}
+${showAuthorOnCover ? `2. AUTHOR NAME "${authorName}" - ${authorPositionDesc[authorNamePosition] || 'at the bottom'}, ${authorStyleDesc[authorNameStyle] || 'elegant'} typography` : '2. NO author name'}
+${subtitle ? `3. SUBTITLE "${subtitle}" - elegantly placed below title` : ''}
 
-DESIGN REQUIREMENTS:
-1. TITLE "${ebookTitle}" must be prominently displayed, ${titlePositionDesc[titlePosition] || 'centered'}, large and clearly readable
-${showAuthorOnCover ? `2. AUTHOR NAME "${authorName}" positioned ${authorPositionDesc[authorNamePosition] || 'at the bottom'}, with ${authorStyleDesc[authorNameStyle] || 'elegant'} typography style` : '2. NO author name on this cover'}
-${subtitle ? `3. SUBTITLE "${subtitle}" below the main title, medium size` : ''}
-4. Create a compelling visual illustration that represents the book theme
-5. Use the ${colorSchemeDesc[colorScheme] || 'appropriate'} color palette
-6. Professional typography that fits the ${style} style
-7. High-quality book cover composition
+VISUAL QUALITY STANDARDS (CRITICAL):
+- Photorealistic rendering quality, equivalent to professional studio photography
+- Rich, deep colors with perfect contrast - COLOR SCHEME: ${colorSchemeDesc[colorScheme] || colorSchemeDesc['auto']}
+- Dramatic cinematic lighting with depth and atmosphere
+- Sharp details, no blur, no artifacts, no noise
+- Professional typography with perfect kerning and weight
+- Visual composition following the rule of thirds
+- Depth of field creating a layered, immersive scene
 
-TYPOGRAPHY SPECIFICATIONS:
-- Title: Large, bold, high contrast, ${titlePositionDesc[titlePosition] || 'centered'}
-${showAuthorOnCover ? `- Author name: ${authorStyleDesc[authorNameStyle] || 'Elegant'}, positioned ${authorPositionDesc[authorNamePosition] || 'at bottom'}` : ''}
+TECHNICAL SPECS:
+- Portrait 2:3 ratio (1024x1536 pixels)
+- Full bleed - ABSOLUTELY NO white borders or margins
+- Print-ready at 300 DPI quality
+- Colors within CMYK gamut for print accuracy
 
-TECHNICAL SPECIFICATIONS:
-- Portrait format (book cover standard ratio 2:3)
-- Full bleed design - NO white borders
-- Clear visual hierarchy: Image > Title > Subtitle > Author
-- Text must be integrated naturally into the design
-- Professional Amazon KDP quality
+PROHIBITIONS:
+- NO watermarks, NO stock photo logos
+- NO blurry or low-resolution elements
+- NO generic clip-art style imagery
+- NO visible AI artifacts or distortions
 
-${customPrompt ? `ADDITIONAL CUSTOMIZATION: ${customPrompt}` : ''}
+${customPrompt ? `CREATIVE DIRECTION: ${customPrompt}` : ''}
 
-VARIATION ${variation}: Make this unique while maintaining the core design principles.
+VARIATION ${variation}/3: Create a UNIQUE interpretation while maintaining top-tier quality.
 
-This must look like a REAL publishable book cover that would sell on Amazon.`;
+This cover must look INDISTINGUISHABLE from covers designed by top professional book designers like Chip Kidd or Peter Mendelsund.`;
     }
 
     let imageUrl: string | undefined;
 
     if (useOpenAI) {
-      // ========== OpenAI DALL·E 3 ==========
-      console.log('Calling OpenAI DALL·E 3 for image generation...');
-      const dalleResponse = await fetch('https://api.openai.com/v1/images/generations', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${OPENAI_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'dall-e-3',
-          prompt: imagePrompt.slice(0, 4000), // DALL·E max 4000 chars
+      // ========== OpenAI gpt-image-1 (best quality) with dall-e-3 fallback ==========
+      const generateViaImagesAPI = async (model: string): Promise<{ ok: boolean; status: number; data?: any; errorText?: string }> => {
+        const payload: any = {
+          model,
+          prompt: model === 'dall-e-3' ? imagePrompt.slice(0, 4000) : imagePrompt,
           n: 1,
-          size: '1024x1792', // portrait book cover ratio
-          quality: 'hd',
-          response_format: 'url',
-        }),
-      });
+          size: coverType === 'full' ? '1536x1024' : '1024x1536',
+        };
 
-      if (!dalleResponse.ok) {
-        const errText = await dalleResponse.text();
-        console.error('OpenAI DALL·E error:', dalleResponse.status, errText);
-        throw new Error(`OpenAI image error: ${dalleResponse.status}`);
+        if (model === 'dall-e-3') {
+          payload.response_format = 'b64_json';
+          payload.quality = 'hd';
+        } else if (model === 'gpt-image-1') {
+          payload.quality = 'high';
+          payload.output_format = 'png';
+          payload.background = 'opaque';
+        }
+
+        console.log(`Calling OpenAI ${model} for cover generation...`);
+        const resp = await fetch('https://api.openai.com/v1/images/generations', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${OPENAI_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (!resp.ok) {
+          const errorText = await resp.text();
+          return { ok: false, status: resp.status, errorText };
+        }
+
+        const data = await resp.json();
+        return { ok: true, status: resp.status, data };
+      };
+
+      // Try gpt-image-1 first (superior quality, native text rendering)
+      let result = await generateViaImagesAPI('gpt-image-1');
+
+      if (!result.ok) {
+        console.error('OpenAI gpt-image-1 error:', result.status, result.errorText);
+        if (result.status === 403 || result.status === 400 || /must be verified|permission|unknown_parameter/i.test(result.errorText || '')) {
+          console.log('Falling back to dall-e-3...');
+          result = await generateViaImagesAPI('dall-e-3');
+        }
       }
 
-      const dalleData = await dalleResponse.json();
-      imageUrl = dalleData?.data?.[0]?.url;
+      if (!result.ok) {
+        throw new Error(`OpenAI image error: ${result.status}`);
+      }
+
+      // Handle both base64 and URL responses
+      if (result.data?.data?.[0]?.b64_json) {
+        imageUrl = `data:image/png;base64,${result.data.data[0].b64_json}`;
+      } else if (result.data?.data?.[0]?.url) {
+        imageUrl = result.data.data[0].url;
+      }
     } else {
       // ========== Lovable AI (Gemini image) ==========
       console.log('Calling Lovable AI for image generation...');
