@@ -13,23 +13,25 @@ export interface WorkflowStep {
   shortLabel: string;
   description: string;
   requiredSteps?: string[];
+  estimatedMinutes?: number;
+  tip?: string;
 }
 
 export const WORKFLOW_STEPS: WorkflowStep[] = [
-  { id: 'P1', label: 'Directeur Éditorial', shortLabel: 'P1', description: 'Analyse du titre et positionnement stratégique', requiredSteps: [] },
-  { id: 'P2', label: 'Analyse Marché', shortLabel: 'P2', description: 'Mots-clés KDP et analyse concurrentielle', requiredSteps: ['P1'] },
-  { id: 'P3', label: 'Architecte Contenu', shortLabel: 'P3', description: 'Structure des chapitres et personnages', requiredSteps: ['P1', 'P2'] },
-  { id: 'P4', label: 'Rédaction Expert', shortLabel: 'P4', description: 'Génération du contenu des chapitres', requiredSteps: ['P3'] },
-  { id: 'P5', label: 'Réécriture Naturelle', shortLabel: 'P5', description: 'Humanisation du texte généré', requiredSteps: ['P4'] },
-  { id: 'P6', label: 'Qualité Éditoriale', shortLabel: 'P6', description: 'Analyse qualité et suggestions', requiredSteps: ['P4'] },
-  { id: 'P7', label: 'Packaging Éditorial', shortLabel: 'P7', description: 'Description et métadonnées KDP', requiredSteps: ['P1', 'P2'] },
-  { id: 'P8', label: 'Diagnostic Final', shortLabel: 'P8', description: 'Vérification complète avant publication', requiredSteps: ['P4', 'P7'] },
-  { id: 'P9', label: 'Mémoire Éditoriale', shortLabel: 'P9', description: 'Cohérence globale du projet', requiredSteps: ['P4'] },
-  { id: 'P10', label: 'Cohérence Chapitres', shortLabel: 'P10', description: 'Liens entre les chapitres', requiredSteps: ['P4'] },
-  { id: 'P11', label: 'Auto-Critique', shortLabel: 'P11', description: 'Analyse critique du manuscrit', requiredSteps: ['P4'] },
-  { id: 'P12', label: 'Boucle Itérative', shortLabel: 'P12', description: 'Amélioration continue', requiredSteps: ['P11'] },
-  { id: 'P13', label: 'Signature Style', shortLabel: 'P13', description: 'Cohérence stylistique', requiredSteps: ['P4'] },
-  { id: 'P14', label: 'Verdict Ultime', shortLabel: 'P14', description: 'Évaluation finale et recommandations', requiredSteps: ['P8'] },
+  { id: 'P1', label: 'Directeur Éditorial', shortLabel: 'P1', description: 'Analyse du titre et positionnement stratégique', requiredSteps: [], estimatedMinutes: 2, tip: "Définissez bien votre titre et sous-titre." },
+  { id: 'P2', label: 'Analyse Marché', shortLabel: 'P2', description: 'Mots-clés KDP et analyse concurrentielle', requiredSteps: ['P1'], estimatedMinutes: 3, tip: "Les 7 mots-clés KDP sont cruciaux." },
+  { id: 'P3', label: 'Architecte Contenu', shortLabel: 'P3', description: 'Structure des chapitres et personnages', requiredSteps: ['P1', 'P2'], estimatedMinutes: 3, tip: "Visez 8-15 chapitres." },
+  { id: 'P4', label: 'Rédaction Expert', shortLabel: 'P4', description: 'Génération du contenu des chapitres', requiredSteps: ['P3'], estimatedMinutes: 15, tip: "L'étape la plus longue." },
+  { id: 'P5', label: 'Réécriture Naturelle', shortLabel: 'P5', description: 'Humanisation du texte généré', requiredSteps: ['P4'], estimatedMinutes: 5, tip: "Rend votre texte naturel." },
+  { id: 'P6', label: 'Qualité Éditoriale', shortLabel: 'P6', description: 'Analyse qualité et suggestions', requiredSteps: ['P4'], estimatedMinutes: 3, tip: "Grammaire, cohérence et style." },
+  { id: 'P7', label: 'Packaging Éditorial', shortLabel: 'P7', description: 'Description et métadonnées KDP', requiredSteps: ['P1', 'P2'], estimatedMinutes: 2, tip: "Optimisé pour Amazon." },
+  { id: 'P8', label: 'Diagnostic Final', shortLabel: 'P8', description: 'Vérification complète avant publication', requiredSteps: ['P4', 'P7'], estimatedMinutes: 3, tip: "Vérification globale." },
+  { id: 'P9', label: 'Mémoire Éditoriale', shortLabel: 'P9', description: 'Cohérence globale du projet', requiredSteps: ['P4'], estimatedMinutes: 2, tip: "Votre voix d'auteur." },
+  { id: 'P10', label: 'Cohérence Chapitres', shortLabel: 'P10', description: 'Liens entre les chapitres', requiredSteps: ['P4'], estimatedMinutes: 3, tip: "Transitions fluides." },
+  { id: 'P11', label: 'Auto-Critique', shortLabel: 'P11', description: 'Analyse critique du manuscrit', requiredSteps: ['P4'], estimatedMinutes: 3, tip: "Analyse sans complaisance." },
+  { id: 'P12', label: 'Boucle Itérative', shortLabel: 'P12', description: 'Amélioration continue', requiredSteps: ['P11'], estimatedMinutes: 5, tip: "Améliorations auto." },
+  { id: 'P13', label: 'Signature Style', shortLabel: 'P13', description: 'Cohérence stylistique', requiredSteps: ['P4'], estimatedMinutes: 2, tip: "Style unifié." },
+  { id: 'P14', label: 'Verdict Ultime', shortLabel: 'P14', description: 'Évaluation finale et recommandations', requiredSteps: ['P8'], estimatedMinutes: 2, tip: "Validation finale." },
 ];
 
 // Mapping between workflow step IDs and tab IDs
@@ -227,6 +229,16 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
               <div className="min-w-0 flex-1">
                 <h4 className="font-medium text-sm text-foreground">{currentStep.label}</h4>
                 <p className="text-xs text-muted-foreground mt-0.5">{currentStep.description}</p>
+                {currentStep.estimatedMinutes && (
+                  <p className="text-xs text-primary mt-1 flex items-center gap-1">
+                    ⏱️ ~{currentStep.estimatedMinutes} min estimées
+                  </p>
+                )}
+                {currentStep.tip && (
+                  <p className="text-xs text-muted-foreground mt-1 italic">
+                    💡 {currentStep.tip}
+                  </p>
+                )}
                 {currentStep.requiredSteps && currentStep.requiredSteps.length > 0 && !hasStepResult(currentStepId) && (
                   <div className="mt-2 flex items-center gap-2 flex-wrap">
                     <span className="text-xs text-muted-foreground">Prérequis:</span>

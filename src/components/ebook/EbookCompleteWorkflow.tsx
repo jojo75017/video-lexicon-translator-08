@@ -19,6 +19,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useWorkflowResults } from '@/hooks/useWorkflowResults';
+import { useWorkflowCloudSync } from '@/hooks/useWorkflowCloudSync';
 import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 
 interface Character {
@@ -77,6 +78,7 @@ const workflowSteps = [
 const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplete, characters: externalCharacters = [] }) => {
   // Hook pour sauvegarder les résultats P1-P14 globalement
   const { saveStepResult, saveAllResults } = useWorkflowResults();
+  const { saveStepToCloud } = useWorkflowCloudSync();
   
   // Hook pour récupérer la clé API utilisateur
   const { apiKey: userApiKey, isValid: isUserKeyValid } = useOpenAIConfig();
@@ -447,6 +449,8 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             
             // Sauvegarder P4 dans le hook global (pour consultation dans onglet individuel)
             saveStepResult('P4', context.P4, p4DisplayContent);
+            // Sync cloud
+            if (title) saveStepToCloud(title, 'P4', context.P4, p4DisplayContent);
           }
 
           // Collapse previous step, keep current expanded
@@ -465,6 +469,8 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             
             // SAUVEGARDER dans le hook global pour consultation dans les onglets individuels
             saveStepResult(step.id, result.result, result.displayContent);
+            // Sync cloud
+            if (title) saveStepToCloud(title, step.id, result.result, result.displayContent);
 
             // Collapse previous step, keep current expanded
             if (i > 0) {
