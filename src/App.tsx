@@ -64,19 +64,20 @@ const App = () => {
   const PERMANENT_ADMIN_EMAIL = 'boubetgeorges@gmail.com';
 
   useEffect(() => {
-    const invokeCheckAdmin = (accessToken?: string) => {
-      return supabase.functions.invoke(
-        'check-admin',
-        accessToken ? { headers: { Authorization: `Bearer ${accessToken}` } } : undefined
-      );
+    const checkAdminDirect = async (userId: string): Promise<boolean> => {
+      try {
+        const { data } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', userId)
+          .eq('role', 'admin')
+          .maybeSingle();
+        return !!data;
+      } catch {
+        return false;
+      }
     };
 
-    // Check admin by email (no session required)
-    const checkAdminByEmail = async (email: string) => {
-      return supabase.functions.invoke('check-admin', {
-        body: { email }
-      });
-    };
 
     const initAuth = async () => {
       // Check subscriber auth (client cache)
@@ -111,17 +112,14 @@ const App = () => {
           data: { session },
         } = await supabase.auth.getSession();
 
-        if (session) {
+        if (session?.user) {
           console.log('Session admin trouvée dans App.tsx');
-          const { data, error } = await invokeCheckAdmin(session.access_token);
+          const adminStatus = await checkAdminDirect(session.user.id);
 
-          if (error) {
-            console.error('Erreur check-admin dans App.tsx:', error);
-          } else if (data?.isAdmin) {
+          if (adminStatus) {
             console.log('Statut admin confirmé dans App.tsx');
             setIsAdmin(true);
             sessionStorage.setItem('is_admin', 'true');
-            // Store admin email for permanent access
             localStorage.setItem('permanent_admin_email', session.user?.email || '');
           } else {
             console.log('Utilisateur non-admin dans App.tsx');
@@ -154,16 +152,9 @@ const App = () => {
         (event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') &&
         !!session;
 
-      if (shouldRecheckAdmin && session) {
+      if (shouldRecheckAdmin && session?.user) {
         setTimeout(async () => {
-          const { data, error } = await invokeCheckAdmin(session.access_token);
-          if (error) {
-            console.error("Erreur check-admin lors du changement d'état:", error);
-            // Don't reset admin on error - keep current state
-            return;
-          }
-
-          const adminStatus = !!data?.isAdmin;
+          const adminStatus = await checkAdminDirect(session.user.id);
           setIsAdmin(adminStatus);
           if (adminStatus) {
             sessionStorage.setItem('is_admin', 'true');
