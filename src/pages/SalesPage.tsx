@@ -338,7 +338,7 @@ const SalesPage = () => {
             className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white"
             onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
           >
-            Offres dès 47€
+            {isVipAvailable ? `Offre Fondateur ${remainingSpots} places` : 'Voir les offres'}
           </Button>
         </div>
       </header>
@@ -594,41 +594,7 @@ const SalesPage = () => {
             </div>
           </div>
 
-          {/* Section Tunnel de vente 2026 - Premium */}
-          <div className="max-w-3xl mx-auto mb-10">
-            <div className="relative p-6 md:p-8 bg-gradient-to-br from-slate-50 via-blue-50/40 to-indigo-50/50 dark:from-slate-900 dark:via-blue-950/20 dark:to-indigo-950/30 rounded-2xl border border-blue-200/60 dark:border-blue-800/40 shadow-lg">
-              {/* Icône décorative */}
-              <div className="absolute -top-4 left-6 md:left-8">
-                <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-2.5 rounded-xl shadow-lg">
-                  <Rocket className="w-5 h-5 text-white" />
-                </div>
-              </div>
-              
-              <div className="pt-2">
-                <h3 className="text-lg md:text-xl font-bold text-foreground mb-3 flex items-center gap-2">
-                  🔧 Tunnel de vente clé en main (2026)
-                </h3>
-                
-                <p className="text-sm md:text-base text-muted-foreground leading-relaxed mb-3">
-                  En 2026, EbookStudio Pro proposera un <strong className="text-foreground">tunnel de vente prêt à l'emploi</strong> pour vendre votre ebook, basé sur Systeme.io.
-                </p>
-                
-                <p className="text-sm md:text-base text-muted-foreground leading-relaxed mb-4">
-                  <span className="inline-flex items-center gap-1.5 mr-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Pages + emails déjà configurés</span>
-                  <span className="inline-flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Aucune compétence technique requise</span>
-                </p>
-                
-                <p className="text-sm text-foreground font-medium mb-3">
-                  👉 Il suffira de brancher votre ebook et vos liens.
-                </p>
-                
-                {/* Note discrète */}
-                <p className="text-xs text-muted-foreground/80 italic border-t border-blue-200/50 dark:border-blue-800/30 pt-3 mt-2">
-                  📌 Le tunnel sera fourni sous forme de liens et modèles compatibles Systeme.io (non intégré directement dans l'outil).
-                </p>
-              </div>
-            </div>
-          </div>
+          {/* Section supprimée : Tunnel 2026 - déplacée hors page de vente */}
 
           {/* Section "Ce que la démo te montre en 5 minutes" */}
           <div className="max-w-3xl mx-auto mb-8 p-6 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 rounded-2xl border border-emerald-300 dark:border-emerald-700">
@@ -686,7 +652,7 @@ const SalesPage = () => {
               onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
             >
               <Sparkles className="w-5 h-5 mr-2" />
-              Profiter de l'Offre à 37€
+              {isVipAvailable ? `Offre Fondateur à 37€ (${remainingSpots} places)` : 'Voir les offres dès 47€'}
             </Button>
             <Button 
               size="lg" 
@@ -911,33 +877,35 @@ const SalesPage = () => {
             </div>
           </div>
 
-          {/* Spots Counter */}
+          {/* Spots Counter - Dynamic */}
+          {isVipAvailable && (
           <div className="max-w-2xl mx-auto mb-6">
             <div className="bg-gradient-to-r from-violet-600 to-purple-600 rounded-xl p-4 text-white text-center shadow-lg relative overflow-hidden">
               <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iLjEiIGN4PSIxMCIgY3k9IjEwIiByPSIxIi8+PC9zdmc+')] opacity-30" />
               <div className="relative z-10">
                 <div className="flex items-center justify-center gap-3 mb-2">
                   <span className="text-2xl">🔥</span>
-                  <span className="font-bold text-lg">Places restantes à 37€</span>
+                  <span className="font-bold text-lg">Places Fondateur restantes à 37€</span>
                 </div>
                 <div className="flex items-center justify-center gap-4">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-5xl font-black text-yellow-300 animate-pulse">12</span>
+                    <span className="text-5xl font-black text-yellow-300 animate-pulse">{remainingSpots}</span>
                     <span className="text-2xl font-bold text-white/80">/ 20</span>
                   </div>
                 </div>
                 <div className="mt-3 bg-white/20 rounded-full h-3 max-w-xs mx-auto overflow-hidden">
                   <div 
                     className="bg-gradient-to-r from-yellow-400 to-orange-400 h-full rounded-full transition-all duration-1000"
-                    style={{ width: '40%' }}
+                    style={{ width: `${((20 - (remainingSpots ?? 20)) / 20) * 100}%` }}
                   />
                 </div>
                 <p className="text-sm mt-2 text-white/80">
-                  ⚡ 11 personnes ont déjà rejoint aujourd'hui
+                  ⚡ Places limitées — Offre Fondateur exclusive
                 </p>
               </div>
             </div>
           </div>
+          )}
 
           {/* Countdown Timer */}
           <div className="max-w-2xl mx-auto mb-12">
@@ -968,11 +936,11 @@ const SalesPage = () => {
             </div>
           </div>
           
-          <div className="flex justify-center">
+          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {plans.map((plan, index) => (
               <Card 
                 key={index} 
-                className="relative border-2 flex flex-col max-w-md w-full border-primary shadow-xl bg-gradient-to-br from-primary/5 to-primary/10"
+                className={`relative border-2 flex flex-col ${plan.popular ? 'border-primary shadow-xl bg-gradient-to-br from-primary/5 to-primary/10 scale-[1.02]' : 'border-border shadow-md'}`}
               >
                 {plan.badge && (
                   <Badge className={`absolute -top-3 left-1/2 -translate-x-1/2 ${plan.id === 'lifetime' ? 'bg-gradient-to-r from-red-500 to-orange-500' : 'bg-primary'}`}>
@@ -1089,14 +1057,14 @@ const SalesPage = () => {
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-4">Prêt à créer vos ebooks ?</h2>
           <p className="text-muted-foreground mb-8">
-            Rejoignez +5000 entrepreneurs qui utilisent notre générateur pour créer du contenu professionnel
+            Rejoignez les entrepreneurs qui utilisent notre générateur pour publier sur Amazon KDP
           </p>
           <Button 
             size="lg" 
             className="text-lg px-8 py-6"
-            onClick={() => handlePlanClick("lifetime")}
+            onClick={() => handlePlanClick("pro")}
           >
-            Accéder Maintenant – 37€
+            {isVipAvailable ? `Offre Fondateur – ${37}€` : 'Accéder maintenant – 47€'}
             <ArrowRight className="w-5 h-5 ml-2" />
           </Button>
           <p className="text-sm text-muted-foreground mt-4">
@@ -1150,37 +1118,14 @@ const SalesPage = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Bouton Sticky Démo Gratuite - Mobile (bottom) */}
+      {/* Bouton Sticky Achat - Mobile (bottom) */}
       <div className="fixed bottom-4 left-4 right-4 z-40 md:hidden">
         <button
-          onClick={() => {
-            trackDemoClick("Démo gratuite (sans email) - Mobile");
-            const demoSection = document.getElementById('demo');
-            if (demoSection) {
-              demoSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-          }}
-          className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-violet-600 to-purple-600 text-white text-sm font-bold py-4 px-4 rounded-full shadow-xl hover:shadow-2xl transition-all border-2 border-white/20"
+          onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
+          className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-orange-500 to-red-500 text-white text-sm font-bold py-4 px-4 rounded-full shadow-xl hover:shadow-2xl transition-all border-2 border-white/20"
         >
-          <Play className="w-5 h-5" />
-          <span>Démo gratuite (sans email)</span>
-        </button>
-      </div>
-
-      {/* Bouton Sticky Démo Gratuite - Desktop (coin bas droit) */}
-      <div className="hidden md:block fixed bottom-6 right-6 z-40">
-        <button
-          onClick={() => {
-            trackDemoClick("Démo gratuite (sans email) - Desktop");
-            const demoSection = document.getElementById('demo');
-            if (demoSection) {
-              demoSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-          }}
-          className="flex items-center gap-2 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm text-violet-700 dark:text-violet-300 text-sm font-semibold py-3 px-5 rounded-full shadow-lg hover:shadow-xl transition-all border border-violet-200 dark:border-violet-700 hover:bg-violet-50 dark:hover:bg-violet-900/50"
-        >
-          <Play className="w-4 h-4" />
-          <span>Démo gratuite (sans email)</span>
+          <Zap className="w-5 h-5" />
+          <span>{isVipAvailable ? `Offre Fondateur 37€ (${remainingSpots} places)` : 'Voir les offres dès 47€'}</span>
         </button>
       </div>
 
