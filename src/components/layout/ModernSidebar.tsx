@@ -227,6 +227,7 @@ const categories: Category[] = [
       { id: 'monetization', label: '💵 Monétisation', icon: DollarSign },
       { id: 'ab-testing', label: '🧪 A/B Testing', icon: FlaskConical, isNew: true },
       { id: 'marketing-plan', label: '📈 Plan Marketing', icon: TrendingUp, isLink: true, href: '/plan-marketing', isNew: true },
+      { id: 'blog', label: '📝 Blog SEO', icon: FileText, isLink: true, href: '/blog', isNew: true },
     ]
   },
   // ========== 8. OUTILS 2026 ==========
