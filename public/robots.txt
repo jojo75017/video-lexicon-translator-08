@@ -26,3 +26,4 @@ Allow: /generateur-ebook
 Allow: /ecrire-livre-chatgpt
 Allow: /valeur-offre
 Allow: /affiliation-formation
+Allow: /blog/
