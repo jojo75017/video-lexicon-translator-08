@@ -24,6 +24,7 @@ import SeoTutorialChatGptPage from './pages/SeoTutorialChatGptPage';
 import SeoCreerEbookIaPage from './pages/SeoCreerEbookIaPage';
 import SeoGenerateurEbookPage from './pages/SeoGenerateurEbookPage';
 import BlogPage from './pages/BlogPage';
+import BlogArticleTemplate from './components/blog/BlogArticleTemplate';
 import LogoutTotalPage from './pages/LogoutTotalPage';
 import PaiementManuelPage from './pages/PaiementManuelPage';
 import ConfirmationPaiementPage from './pages/ConfirmationPaiementPage';
@@ -228,6 +229,7 @@ const App = () => {
             <Route path="/offres" element={<SalesPage />} />
             <Route path="/logout-total" element={<LogoutTotalPage />} />
             <Route path="/blog" element={<BlogPage />} />
+            <Route path="/blog/:slug" element={<BlogArticleTemplate />} />
             <Route path="/ecrire-livre-chatgpt" element={<SeoTutorialChatGptPage />} />
             <Route path="/creer-ebook-ia" element={<SeoCreerEbookIaPage />} />
             <Route path="/generateur-ebook" element={<SeoGenerateurEbookPage />} />
