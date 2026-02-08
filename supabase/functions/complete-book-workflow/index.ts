@@ -73,13 +73,53 @@ async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000
 }
 
 function parseJSON(content: string): any {
+  if (!content || typeof content !== 'string') return null;
+  
+  // Nettoyer les blocs markdown ```json ... ```
+  let cleaned = content.replace(/```json\s*/gi, '').replace(/```\s*/g, '');
+  
+  // Méthode 1 : tenter de parser directement
   try {
-    const jsonMatch = content.match(/\{[\s\S]*\}/);
-    if (jsonMatch) return JSON.parse(jsonMatch[0]);
-    return null;
-  } catch {
-    return null;
+    return JSON.parse(cleaned.trim());
+  } catch {}
+  
+  // Méthode 2 : extraction par accolades avec compteur (gère les imbrications)
+  try {
+    const start = cleaned.indexOf('{');
+    if (start === -1) return null;
+    
+    let depth = 0;
+    let end = -1;
+    for (let i = start; i < cleaned.length; i++) {
+      if (cleaned[i] === '{') depth++;
+      else if (cleaned[i] === '}') {
+        depth--;
+        if (depth === 0) { end = i; break; }
+      }
+    }
+    
+    if (end > start) {
+      let jsonStr = cleaned.substring(start, end + 1);
+      try {
+        return JSON.parse(jsonStr);
+      } catch {
+        // Méthode 3 : tenter de réparer les erreurs courantes
+        // Supprimer les virgules avant }
+        jsonStr = jsonStr.replace(/,\s*([\]}])/g, '$1');
+        // Supprimer les retours à la ligne dans les valeurs de chaînes
+        jsonStr = jsonStr.replace(/(?<="[^"]*)\n(?=[^"]*")/g, '\\n');
+        try {
+          return JSON.parse(jsonStr);
+        } catch (e) {
+          console.error('JSON parse failed after repair:', e);
+        }
+      }
+    }
+  } catch (e) {
+    console.error('JSON extraction error:', e);
   }
+  
+  return null;
 }
 
 // Fonction pour nettoyer le texte généré - supprime les artefacts JSON/échappement
