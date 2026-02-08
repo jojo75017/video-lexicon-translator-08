@@ -160,6 +160,7 @@ serve(async (req) => {
       category = '',
       authorName,
       numberOfChapters = 8,
+      bookIntroduction = '',
       characters = [],
       previousContext = {},
       chapter,
@@ -197,11 +198,12 @@ serve(async (req) => {
 
     // Construire le contexte complet du livre
     const fullTitle = subtitle ? `${title} : ${subtitle}` : title;
+    const introContext = bookIntroduction ? `\nVISION DE L'AUTEUR : ${bookIntroduction}` : '';
     const bookContext = `
 TITRE COMPLET : "${fullTitle}"
 CATÉGORIE : ${category || 'Non spécifiée'}
 AUTEUR : ${authorName}
-CHAPITRES PRÉVUS : ${numberOfChapters}${charactersContext}
+CHAPITRES PRÉVUS : ${numberOfChapters}${introContext}${charactersContext}
 `.trim();
 
     console.log(`Step ${step} for: "${fullTitle}" (Category: ${category}, Characters: ${characters.length})`);
@@ -214,7 +216,8 @@ CHAPITRES PRÉVUS : ${numberOfChapters}${charactersContext}
         // DIRECTEUR ÉDITORIAL - Génère AUTOMATIQUEMENT la description + vision stratégique
         const content = await callAI(
           `Tu es un DIRECTEUR ÉDITORIAL avec 20 ans d'expérience. Tu analyses un projet de livre et donnes ta vision stratégique. 
-MISSION CRITIQUE : À partir du TITRE, SOUS-TITRE et CATÉGORIE, tu dois DEVINER et CRÉER une description précise du livre. 
+MISSION CRITIQUE : À partir du TITRE, SOUS-TITRE, CATÉGORIE et surtout de la VISION DE L'AUTEUR (son introduction décrivant ce qu'il veut pour ce livre), tu dois créer une analyse stratégique précise. 
+La vision de l'auteur est ta source principale d'information — respecte-la et enrichis-la.
 Sois direct, incisif, comme un vrai pro.`,
           `Analyse ce projet de livre :
 ${bookContext}

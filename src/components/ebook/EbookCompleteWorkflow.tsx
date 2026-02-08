@@ -88,7 +88,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   const [subtitle, setSubtitle] = useState('');
   const [category, setCategory] = useState('');
   const [generatedDescription, setGeneratedDescription] = useState('');
-  // Description sera générée automatiquement
+  const [bookIntroduction, setBookIntroduction] = useState('');
   const [authorName, setAuthorName] = useState('');
   const [numberOfChapters, setNumberOfChapters] = useState(8);
   const [hasReadSteps, setHasReadSteps] = useState(false);
@@ -111,7 +111,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   const progress = currentStepIndex >= 0 ? ((currentStepIndex + 1) / 14) * 100 : 0;
   // La clé API utilisateur est OBLIGATOIRE pour générer
   const hasValidApiKey = isUserKeyValid && !!userApiKey;
-  const canGenerate = title.trim() && authorName.trim() && category && hasReadSteps && hasValidApiKey;
+  const canGenerate = title.trim() && authorName.trim() && category && bookIntroduction.trim() && hasReadSteps && hasValidApiKey;
 
   // Load saved progress on mount
   useEffect(() => {
@@ -243,21 +243,22 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
       const previousContext = options.previousContextOverride ?? context;
 
       const { data, error: fnError } = await supabase.functions.invoke('complete-book-workflow', {
-        body: {
-          step: stepId,
-          title,
-          subtitle,
-          category,
-          authorName,
-          numberOfChapters,
-          characters: charactersForAI,
-          previousContext,
-          // Transmettre la clé API utilisateur si disponible et valide
-          userApiKey: isUserKeyValid ? userApiKey : undefined,
-          useUserKey: isUserKeyValid && !!userApiKey,
-          ...extraBody,
-        }
-      });
+          body: {
+            step: stepId,
+            title,
+            subtitle,
+            category,
+            authorName,
+            numberOfChapters,
+            bookIntroduction,
+            characters: charactersForAI,
+            previousContext,
+            // Transmettre la clé API utilisateur si disponible et valide
+            userApiKey: isUserKeyValid ? userApiKey : undefined,
+            useUserKey: isUserKeyValid && !!userApiKey,
+            ...extraBody,
+          }
+        });
 
       if (fnError) throw new Error(fnError.message);
       if (data?.error) throw new Error(data.error);
@@ -698,11 +699,23 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             </div>
           </div>
 
-          {/* Info description auto-générée */}
-          <div className="p-3 bg-primary/5 border border-primary/20 rounded-lg">
-            <p className="text-sm text-muted-foreground flex items-center gap-2">
+          {/* Introduction / Vision du livre */}
+          <div className="space-y-2">
+            <Label htmlFor="book-introduction" className="flex items-center gap-2">
               <Sparkles className="h-4 w-4 text-primary" />
-              💡 La description sera générée automatiquement par l'IA à partir du titre, sous-titre et catégorie
+              Introduction — Décrivez votre vision du livre *
+            </Label>
+            <Textarea
+              id="book-introduction"
+              placeholder="Décrivez ce que vous voulez pour ce livre : le thème principal, le message que vous souhaitez transmettre, le style d'écriture souhaité, les points clés à aborder, votre public cible, ce qui rend ce livre unique..."
+              value={bookIntroduction}
+              onChange={(e) => setBookIntroduction(e.target.value)}
+              disabled={isGenerating}
+              className="min-h-[120px] text-sm"
+              rows={5}
+            />
+            <p className="text-xs text-muted-foreground">
+              💡 Plus vous êtes précis ici, plus le résultat sera fidèle à votre vision. L'IA utilisera cette description pour guider chaque étape du workflow.
             </p>
           </div>
 
@@ -843,6 +856,10 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
               {!title.trim() || !authorName.trim() || !category ? (
                 <p className="text-sm text-destructive">
                   ⚠️ Veuillez remplir le titre, la catégorie et le nom d'auteur
+                </p>
+              ) : !bookIntroduction.trim() ? (
+                <p className="text-sm text-destructive">
+                  ⚠️ Veuillez décrire votre vision du livre dans le champ Introduction
                 </p>
               ) : !hasReadSteps ? (
                 <p className="text-sm text-amber-600">
