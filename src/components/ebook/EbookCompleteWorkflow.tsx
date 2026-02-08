@@ -402,8 +402,27 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
         if (step.id === 'P4') {
           const structure = context.P3?.chapitres || [];
           if (!Array.isArray(structure) || structure.length === 0) {
-            throw new Error("Structure P3 introuvable : impossible de rédiger les chapitres (P4)");
+            console.error('P3 context:', JSON.stringify(context.P3)?.substring(0, 500));
+            toast.error('⚠️ La structure P3 est vide. Veuillez relancer depuis P3.');
+            // Forcer un retry automatique de P3 avant d'abandonner
+            toast.info('🔄 Relance automatique de P3...');
+            try {
+              const p3Retry = await runStep('P3', context);
+              if (p3Retry?.result?.chapitres?.length > 0) {
+                context.P3 = p3Retry.result;
+                setAllContext(prev => ({ ...prev, P3: p3Retry.result }));
+                setStepResults(prev => ({ ...prev, P3: p3Retry }));
+                saveStepResult('P3', p3Retry.result, p3Retry.displayContent);
+                toast.success('✅ P3 re-généré avec succès, continuation vers P4...');
+              } else {
+                throw new Error("Structure P3 introuvable même après relance. Veuillez réessayer en cliquant sur 'Relancer'.");
+              }
+            } catch (retryErr: any) {
+              throw new Error("Structure P3 introuvable : impossible de rédiger les chapitres. Cliquez sur 'Relancer' pour réessayer.");
+            }
           }
+
+          const retryStructure = context.P3?.chapitres || [];
 
           // Récupérer les chapitres déjà générés (si reprise)
           const existingChapters = context.P4?.chapitres || [];
@@ -418,8 +437,8 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             P3: context.P3,
           };
 
-          for (let chIdx = startFromChapter; chIdx < structure.length; chIdx++) {
-            const chapitre = structure[chIdx];
+          for (let chIdx = startFromChapter; chIdx < retryStructure.length; chIdx++) {
+            const chapitre = retryStructure[chIdx];
 
             let partial: { result: any; displayContent: string } | null = null;
             try {
@@ -431,13 +450,13 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
                 3
               );
             } catch (err: any) {
-              throw new Error(`P4 — Chapitre ${chIdx + 1}/${structure.length} : ${err?.message || 'Erreur inconnue'}`);
+              throw new Error(`P4 — Chapitre ${chIdx + 1}/${retryStructure.length} : ${err?.message || 'Erreur inconnue'}`);
             }
             const chapitreGenere = partial?.result?.chapitre;
             if (chapitreGenere) chapitresComplets.push(chapitreGenere);
 
             // UI : on met à jour P4 au fil de l'eau
-            const p4DisplayContent = `**📄 Chapitres rédigés : ${chapitresComplets.length}/${structure.length}**\n\nDernier : ${partial?.displayContent || ''}`;
+            const p4DisplayContent = `**📄 Chapitres rédigés : ${chapitresComplets.length}/${retryStructure.length}**\n\nDernier : ${partial?.displayContent || ''}`;
             setStepResults(prev => ({
               ...prev,
               P4: {
