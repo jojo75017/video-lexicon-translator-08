@@ -388,8 +388,10 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
       : '🚀 Le Directeur Éditorial lance le workflow complet...'
     );
 
+    let lastStepI = resumeFromIndex;
     try {
       for (let i = resumeFromIndex; i < workflowSteps.length; i++) {
+        lastStepI = i;
         const step = workflowSteps[i];
         setCurrentStepIndex(i);
 
@@ -479,15 +481,17 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
               setExpandedSteps(prev => ({ ...prev, [prevStep.id]: false }));
             }
             
-            // APRÈS P3 : pause pour valider les personnages avant P4
-            // Important: ne pas bloquer le workflow si P3 renvoie `personnages: []` (sinon la carte n'apparaît pas)
-            if (step.id === 'P3' && Array.isArray(result.result?.personnages) && result.result.personnages.length > 0) {
-              const personnagesP3 = result.result.personnages;
+            // APRÈS P3 : TOUJOURS marquer une pause pour valider les personnages avant P4
+            // Même si 0 personnages, on laisse l'utilisateur vérifier et ajouter des personnages si besoin
+            if (step.id === 'P3') {
+              const personnagesP3 = Array.isArray(result.result?.personnages) ? result.result.personnages : [];
               setGeneratedCharacters(personnagesP3);
               setWaitingForCharacterValidation(true);
               setIsGenerating(false);
               saveProgress();
-              toast.info('🎭 Personnages générés ! Validez-les ou modifiez-les avant la rédaction.');
+              toast.info(personnagesP3.length > 0
+                ? '🎭 Personnages générés ! Validez-les ou modifiez-les avant la rédaction.'
+                : '✅ Structure générée ! Vous pouvez ajouter des personnages ou continuer directement.');
               return; // Pause le workflow - l'utilisateur doit cliquer pour continuer
             }
           }
@@ -539,11 +543,11 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
 
     } catch (err: any) {
       console.error('Workflow error:', err);
-      setFailedStepIndex(currentStepIndex);
+      setFailedStepIndex(lastStepI);
       setError(err.message || 'Erreur lors de la génération');
       // Save progress on error so user can resume
       saveProgress();
-      toast.error(`Erreur à l'étape ${workflowSteps[currentStepIndex]?.id}: ${err.message}`);
+      toast.error(`Erreur à l'étape ${workflowSteps[lastStepI]?.id}: ${err.message}`);
     } finally {
       setIsGenerating(false);
     }
