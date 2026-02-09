@@ -430,13 +430,14 @@ Crée la structure COMPLÈTE en JSON :
         result = parseJSON(content) || { raw: content };
         console.log(`Step P3 completed - Generated ${result.personnages?.length || 0} characters with KDP structure`);
         
+        // Format personnages lisiblement (jamais de JSON brut)
+        const personnagesDisplay = result.personnages?.length > 0
+          ? `\n\n**🎭 ${result.personnages.length} Personnages créés :**\n${result.personnages.map((p: any) => `- **${p.name}** (${p.role}) : ${p.description}${p.arc ? `\n  _Arc narratif :_ ${p.arc}` : ''}`).join('\n')}`
+          : '';
+
         if (result.chapitres) {
           const totalMotsPrevu = result.chapitres.reduce((acc: number, ch: any) => acc + (ch.nombreMotsPrevu || wordsPerChapter), 0);
           const pagesEstime = result.nombrePagesEstime || estimatedPages;
-          
-          const personnagesDisplay = result.personnages?.length > 0
-            ? `\n\n**🎭 ${result.personnages.length} Personnages créés :**\n${result.personnages.map((p: any) => `- **${p.name}** (${p.role}): ${p.description}`).join('\n')}`
-            : '';
           
           const introDisplay = result.introduction
             ? `\n\n**📖 Introduction :** ${result.introduction.promesse}`
@@ -450,10 +451,12 @@ Crée la structure COMPLÈTE en JSON :
             ? `\n\n**👤 À propos de l'auteur :** ${result.aproposAuteur.bio?.substring(0, 100)}...`
             : '';
           
-          displayContent = `**Structure KDP complète générée :** ${result.structureGlobale}${introDisplay}${personnagesDisplay}${blocsPratiquesDisplay}${aproposDisplay}\n\n**📖 ~${pagesEstime} pages prévues (~${totalMotsPrevu} mots)**\n\n**${result.chapitres.length} chapitres structurés :**\n\n` +
+          displayContent = `**Structure KDP complète générée :** ${result.structureGlobale || 'Structure générée'}${introDisplay}${personnagesDisplay}${blocsPratiquesDisplay}${aproposDisplay}\n\n**📖 ~${pagesEstime} pages prévues (~${totalMotsPrevu} mots)**\n\n**${result.chapitres.length} chapitres structurés :**\n\n` +
             result.chapitres.map((ch: any) => `**Ch.${ch.numero} - ${ch.titre}** (~${ch.nombreMotsPrevu || wordsPerChapter} mots)\n_Objectif :_ ${ch.objectif}`).join('\n\n');
         } else {
-          displayContent = content;
+          // Fallback lisible même sans chapitres
+          displayContent = `**Structure P3 générée**${personnagesDisplay}`;
+          if (result.structureGlobale) displayContent += `\n\n**Vue d'ensemble :** ${result.structureGlobale}`;
         }
         break;
       }
