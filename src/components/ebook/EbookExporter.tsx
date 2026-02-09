@@ -1,5 +1,6 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -13,6 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 import JSZip from 'jszip';
 import { Character } from './EbookCharacters';
 import { EbookExportPreview } from './EbookExportPreview';
+import { cleanGeneratedText } from '@/utils/textCleaner';
 import {
   Document, 
   Packer, 
@@ -83,6 +85,21 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
   characters = [],
   kdpStructure
 }) => {
+  // ✅ Nettoyage automatique de TOUT le contenu avant export
+  const cleanedPreface = useMemo(() => cleanGeneratedText(preface), [preface]);
+  const cleanedConclusion = useMemo(() => cleanGeneratedText(conclusion), [conclusion]);
+  const cleanedEpilogue = useMemo(() => epilogue ? cleanGeneratedText(epilogue) : '', [epilogue]);
+  const cleanedChapters = useMemo(() => chapters.map(ch => ({
+    ...ch,
+    title: cleanGeneratedText(ch.title || ''),
+    content: ch.content ? cleanGeneratedText(ch.content) : '',
+    subChapters: ch.subChapters.map(sub => ({
+      ...sub,
+      title: cleanGeneratedText(sub.title || ''),
+      content: sub.content ? cleanGeneratedText(sub.content) : '',
+    })),
+  })), [chapters]);
+
   const [exportFormat, setExportFormat] = useState<'pdf' | 'docx' | 'txt' | 'html' | 'epub' | 'googledocs' | 'idml'>('pdf');
   const [includeTableOfContents, setIncludeTableOfContents] = useState(true);
   const [includePageNumbers, setIncludePageNumbers] = useState(true);
@@ -133,10 +150,10 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
     content += `\n\n`;
 
     // 3. PRÉFACE
-    if (preface) {
+    if (cleanedPreface) {
       content += `📝 PRÉFACE\n`;
       content += `${'='.repeat(50)}\n\n`;
-      content += `${preface}\n\n`;
+      content += `${cleanedPreface}\n\n`;
       content += `${'='.repeat(50)}\n\n\n`;
     }
 
@@ -145,7 +162,7 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
       content += `📚 TABLE DES MATIÈRES\n`;
       content += `${'='.repeat(50)}\n\n`;
       
-      let currentPage = preface ? 5 : 3;
+      let currentPage = cleanedPreface ? 5 : 3;
       
       // Introduction
       if (kdpStructure?.introduction) {
@@ -154,7 +171,7 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
       }
       
       // Chapitres
-      chapters.forEach((chapter, index) => {
+      cleanedChapters.forEach((chapter, index) => {
         const chapterNumber = index + 1;
         content += `${chapterNumber}. ${chapter.title}`;
         const dots = Math.max(2, 45 - chapter.title.length - chapterNumber.toString().length);
@@ -178,7 +195,7 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
       }
       
       // Conclusion
-      if (conclusion) {
+      if (cleanedConclusion) {
         content += `Conclusion ................................ ${currentPage}\n`;
         currentPage += 3;
       }
@@ -220,7 +237,7 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
     }
 
     // 6. CHAPITRES PRINCIPAUX
-    chapters.forEach((chapter, index) => {
+    cleanedChapters.forEach((chapter, index) => {
       const chapterNumber = index + 1;
       
       content += `📖 CHAPITRE ${chapterNumber}: ${chapter.title.toUpperCase()}\n`;
@@ -290,10 +307,10 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
     }
 
     // 8. CONCLUSION
-    if (conclusion) {
+    if (cleanedConclusion) {
       content += `🎯 CONCLUSION\n`;
       content += `${'='.repeat(50)}\n\n`;
-      content += `${conclusion}\n\n`;
+      content += `${cleanedConclusion}\n\n`;
       content += `${'='.repeat(50)}\n\n\n`;
     }
 
@@ -438,12 +455,12 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
       pdf.setFontSize(12);
       pdf.setFont('helvetica', 'normal');
 
-      if (preface) {
+      if (cleanedPreface) {
         pdf.text('Préface', marginLeft, yPosition);
         yPosition += 8;
       }
 
-      chapters.forEach((chapter, index) => {
+      cleanedChapters.forEach((chapter, index) => {
         checkPageBreak(8);
         const chapterNumber = index + 1;
         pdf.text(`${chapterNumber}. ${chapter.title}`, marginLeft, yPosition);
@@ -457,7 +474,7 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
         });
       });
 
-      if (conclusion) {
+      if (cleanedConclusion) {
         checkPageBreak(8);
         pdf.text('Conclusion', marginLeft, yPosition);
         yPosition += 8;
@@ -468,7 +485,7 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
     }
 
     // Préface
-    if (preface) {
+    if (cleanedPreface) {
       pdf.setFontSize(16);
       pdf.setFont('helvetica', 'bold');
       pdf.text('PRÉFACE', marginLeft, yPosition);
@@ -476,7 +493,7 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
 
       pdf.setFontSize(11);
       pdf.setFont('helvetica', 'normal');
-      const prefaceLines = splitTextToSize(preface, pageWidth, 11);
+      const prefaceLines = splitTextToSize(cleanedPreface, pageWidth, 11);
       prefaceLines.forEach((line: string) => {
         checkPageBreak(6);
         pdf.text(line, marginLeft, yPosition);
@@ -488,7 +505,7 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
     }
 
     // Chapitres
-    chapters.forEach((chapter, index) => {
+    cleanedChapters.forEach((chapter, index) => {
       const chapterNumber = index + 1;
 
       // Titre du chapitre
@@ -547,14 +564,14 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
       });
 
       // Nouvelle page pour le chapitre suivant
-      if (index < chapters.length - 1) {
+      if (index < cleanedChapters.length - 1) {
         pdf.addPage();
         yPosition = 20;
       }
     });
 
     // Conclusion
-    if (conclusion) {
+    if (cleanedConclusion) {
       checkPageBreak(30);
       pdf.setFontSize(16);
       pdf.setFont('helvetica', 'bold');
@@ -563,7 +580,7 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
 
       pdf.setFontSize(11);
       pdf.setFont('helvetica', 'normal');
-      const conclusionLines = splitTextToSize(conclusion, pageWidth, 11);
+      const conclusionLines = splitTextToSize(cleanedConclusion, pageWidth, 11);
       conclusionLines.forEach((line: string) => {
         checkPageBreak(6);
         pdf.text(line, marginLeft, yPosition);
@@ -763,20 +780,20 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
       }
 
       // Préface
-      if (preface) {
+      if (cleanedPreface) {
         manifestItems += `    <item id="preface" href="preface.xhtml" media-type="application/xhtml+xml"/>\n`;
         spineItems += `    <itemref idref="preface"/>\n`;
       }
 
       // Chapitres
-      chapters.forEach((_, index) => {
+      cleanedChapters.forEach((_, index) => {
         const chapterId = `chapter${index + 1}`;
         manifestItems += `    <item id="${chapterId}" href="${chapterId}.xhtml" media-type="application/xhtml+xml"/>\n`;
         spineItems += `    <itemref idref="${chapterId}"/>\n`;
       });
 
       // Conclusion
-      if (conclusion) {
+      if (cleanedConclusion) {
         manifestItems += `    <item id="conclusion" href="conclusion.xhtml" media-type="application/xhtml+xml"/>\n`;
         spineItems += `    <itemref idref="conclusion"/>\n`;
       }
@@ -810,21 +827,21 @@ ${spineItems}  </spine>
     </navPoint>\n`;
       }
 
-      if (preface) {
+      if (cleanedPreface) {
         navPoints += `    <navPoint id="nav-preface" playOrder="${playOrder++}">
       <navLabel><text>Préface</text></navLabel>
       <content src="preface.xhtml"/>
     </navPoint>\n`;
       }
 
-      chapters.forEach((chapter, index) => {
+      cleanedChapters.forEach((chapter, index) => {
         navPoints += `    <navPoint id="nav-chapter${index + 1}" playOrder="${playOrder++}">
       <navLabel><text>${chapter.title}</text></navLabel>
       <content src="chapter${index + 1}.xhtml"/>
     </navPoint>\n`;
       });
 
-      if (conclusion) {
+      if (cleanedConclusion) {
         navPoints += `    <navPoint id="nav-conclusion" playOrder="${playOrder++}">
       <navLabel><text>Conclusion</text></navLabel>
       <content src="conclusion.xhtml"/>
@@ -849,11 +866,11 @@ ${navPoints}  </navMap>
       // OEBPS/nav.xhtml (EPUB 3 navigation)
       let navContent = '';
       if (includeCoverPage) navContent += `      <li><a href="cover.xhtml">Couverture</a></li>\n`;
-      if (preface) navContent += `      <li><a href="preface.xhtml">Préface</a></li>\n`;
-      chapters.forEach((chapter, index) => {
+      if (cleanedPreface) navContent += `      <li><a href="preface.xhtml">Préface</a></li>\n`;
+      cleanedChapters.forEach((chapter, index) => {
         navContent += `      <li><a href="chapter${index + 1}.xhtml">${chapter.title}</a></li>\n`;
       });
-      if (conclusion) navContent += `      <li><a href="conclusion.xhtml">Conclusion</a></li>\n`;
+      if (cleanedConclusion) navContent += `      <li><a href="conclusion.xhtml">Conclusion</a></li>\n`;
 
       const navXhtml = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
@@ -916,7 +933,7 @@ ${navContent}    </ol>
       }
 
       // OEBPS/preface.xhtml
-      if (preface) {
+      if (cleanedPreface) {
         const prefaceXhtml = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -952,14 +969,14 @@ ${navContent}    </ol>
 </head>
 <body>
   <h1>Préface</h1>
-  ${preface.split('\n\n').map(p => `  <p>${p.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>`).join('\n')}
+  ${cleanedPreface.split('\n\n').map(p => `  <p>${p.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>`).join('\n')}
 </body>
 </html>`;
         zip.file('OEBPS/preface.xhtml', prefaceXhtml);
       }
 
       // OEBPS/chapterX.xhtml
-      chapters.forEach((chapter, index) => {
+      cleanedChapters.forEach((chapter, index) => {
         let chapterHtml = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -1022,7 +1039,7 @@ ${navContent}    </ol>
       });
 
       // OEBPS/conclusion.xhtml
-      if (conclusion) {
+      if (cleanedConclusion) {
         const conclusionXhtml = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -1057,7 +1074,7 @@ ${navContent}    </ol>
 </head>
 <body>
   <h1>Conclusion</h1>
-  ${conclusion.split('\n\n').map(p => `  <p>${p.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>`).join('\n')}
+  ${cleanedConclusion.split('\n\n').map(p => `  <p>${p.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>`).join('\n')}
 </body>
 </html>`;
         zip.file('OEBPS/conclusion.xhtml', conclusionXhtml);
@@ -1154,13 +1171,13 @@ ${navContent}    </ol>
       }
 
       // Preface
-      if (preface) {
+      if (cleanedPreface) {
         storyContent += `<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/${chapterStyleId}">
   <Content>Préface</Content>
   <Br/>
 </ParagraphStyleRange>
 `;
-        preface.split('\n\n').forEach(para => {
+        cleanedPreface.split('\n\n').forEach(para => {
           if (para.trim()) {
             storyContent += `<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/${bodyStyleId}">
   <Content>${escapeXml(para)}</Content>
@@ -1172,7 +1189,7 @@ ${navContent}    </ol>
       }
 
       // Chapters
-      chapters.forEach((chapter, index) => {
+      cleanedChapters.forEach((chapter, index) => {
         storyContent += `<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/${chapterStyleId}">
   <Content>Chapitre ${index + 1}: ${escapeXml(chapter.title)}</Content>
   <Br/>
@@ -1211,13 +1228,13 @@ ${navContent}    </ol>
       });
 
       // Conclusion
-      if (conclusion) {
+      if (cleanedConclusion) {
         storyContent += `<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/${chapterStyleId}">
   <Content>Conclusion</Content>
   <Br/>
 </ParagraphStyleRange>
 `;
-        conclusion.split('\n\n').forEach(para => {
+        cleanedConclusion.split('\n\n').forEach(para => {
           if (para.trim()) {
             storyContent += `<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/${bodyStyleId}">
   <Content>${escapeXml(para)}</Content>
@@ -1463,7 +1480,7 @@ ${navContent}    </ol>
         );
 
         // Entrées de la TDM
-        if (preface) {
+        if (cleanedPreface) {
           children.push(
             new Paragraph({
             children: [
@@ -1474,7 +1491,7 @@ ${navContent}    </ol>
           );
         }
 
-        chapters.forEach((chapter, index) => {
+        cleanedChapters.forEach((chapter, index) => {
           children.push(
             new Paragraph({
               children: [
@@ -1505,7 +1522,7 @@ ${navContent}    </ol>
           });
         });
 
-        if (conclusion) {
+        if (cleanedConclusion) {
           children.push(
             new Paragraph({
             children: [
@@ -1520,7 +1537,7 @@ ${navContent}    </ol>
       }
 
       // === PRÉFACE ===
-      if (preface) {
+      if (cleanedPreface) {
         children.push(
           new Paragraph({
             children: [
@@ -1536,7 +1553,7 @@ ${navContent}    </ol>
           })
         );
 
-        preface.split('\n\n').forEach((para) => {
+        cleanedPreface.split('\n\n').forEach((para) => {
           if (para.trim()) {
             children.push(
               new Paragraph({
@@ -1553,7 +1570,7 @@ ${navContent}    </ol>
       }
 
       // === CHAPITRES ===
-      chapters.forEach((chapter, index) => {
+      cleanedChapters.forEach((chapter, index) => {
         // Titre du chapitre
         children.push(
           new Paragraph({
@@ -1637,13 +1654,13 @@ ${navContent}    </ol>
         });
 
         // Saut de page entre chapitres
-        if (index < chapters.length - 1) {
+        if (index < cleanedChapters.length - 1) {
           children.push(new Paragraph({ children: [new PageBreak()] }));
         }
       });
 
       // === CONCLUSION ===
-      if (conclusion) {
+      if (cleanedConclusion) {
         children.push(new Paragraph({ children: [new PageBreak()] }));
         
         children.push(
@@ -1661,7 +1678,7 @@ ${navContent}    </ol>
           })
         );
 
-        conclusion.split('\n\n').forEach((para) => {
+        cleanedConclusion.split('\n\n').forEach((para) => {
           if (para.trim()) {
             children.push(
               new Paragraph({
@@ -1676,7 +1693,7 @@ ${navContent}    </ol>
       }
 
       // === ÉPILOGUE ===
-      if (epilogue) {
+      if (cleanedEpilogue) {
         children.push(new Paragraph({ children: [new PageBreak()] }));
         
         children.push(
@@ -1694,7 +1711,7 @@ ${navContent}    </ol>
           })
         );
 
-        epilogue.split('\n\n').forEach((para) => {
+        cleanedEpilogue.split('\n\n').forEach((para) => {
           if (para.trim()) {
             children.push(
               new Paragraph({
@@ -1862,7 +1879,7 @@ Pages estimées: ${getStats().estimatedPages}
 
 📝 DESCRIPTION COURTE (pour Amazon)
 ─────────────────────────────────────────────────────────
-${preface.substring(0, 200)}...
+${cleanedPreface.substring(0, 200)}...
 
 🎯 MOTS-CLÉS SUGGÉRÉS (max 7 pour KDP)
 ─────────────────────────────────────────────────────────
@@ -1925,13 +1942,13 @@ Paperback: 9.99€ - 19.99€
     let content = '';
     
     // Préface
-    if (preface) {
+    if (cleanedPreface) {
       content += `PRÉFACE\n\n`;
-      content += `${preface}\n\n\n`;
+      content += `${cleanedPreface}\n\n\n`;
     }
 
     // Chapitres
-    chapters.forEach((chapter, index) => {
+    cleanedChapters.forEach((chapter, index) => {
       const chapterNumber = index + 1;
       
       content += `CHAPITRE ${chapterNumber}\n${chapter.title.toUpperCase()}\n\n`;
@@ -1954,15 +1971,15 @@ Paperback: 9.99€ - 19.99€
     });
 
     // Conclusion
-    if (conclusion) {
+    if (cleanedConclusion) {
       content += `CONCLUSION\n\n`;
-      content += `${conclusion}\n\n`;
+      content += `${cleanedConclusion}\n\n`;
     }
 
     // Épilogue
-    if (epilogue) {
+    if (cleanedEpilogue) {
       content += `ÉPILOGUE\n\n`;
-      content += `${epilogue}\n\n`;
+      content += `${cleanedEpilogue}\n\n`;
     }
 
     return content;
@@ -2006,7 +2023,7 @@ Paperback: 9.99€ - 19.99€
       toast.error('Veuillez ajouter un titre à votre ebook');
       return;
     }
-    if (chapters.length === 0) {
+    if (cleanedChapters.length === 0) {
       toast.error('Veuillez ajouter au moins un chapitre');
       return;
     }
@@ -2019,7 +2036,7 @@ Paperback: 9.99€ - 19.99€
       return;
     }
 
-    if (chapters.length === 0) {
+    if (cleanedChapters.length === 0) {
       toast.error('Veuillez ajouter au moins un chapitre');
       return;
     }
