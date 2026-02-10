@@ -462,15 +462,13 @@ Crée la structure COMPLÈTE en JSON :
       }
 
       case 'P4': {
-        // RÉDACTION EXPERTE
-        // IMPORTANT: cette étape est lourde. Pour éviter les timeouts, on supporte 2 modes :
-        // - Mode "un chapitre" (recommandé) via `chapter` dans le body
-        // - Mode legacy (tout d'un coup) si `chapter` n'est pas fourni
-
+        // RÉDACTION EXPERTE AVEC CONTEXTE INTER-CHAPITRES
         const structure = previousContext.P3?.chapitres || [];
         const descriptionGeneree = previousContext.P1?.descriptionGeneree || '';
         const tonEditorial = previousContext.P1?.tonEditorial || '';
         const lecteurCible = previousContext.P1?.lecteurCible || '';
+        const structureGlobale = previousContext.P3?.structureGlobale || '';
+        const introP3 = previousContext.P3?.introduction || {};
 
         // PRIORITÉ : utiliser les personnages générés en P3, sinon ceux passés en paramètre
         const personnagesP3 = previousContext.P3?.personnages || [];
@@ -480,14 +478,14 @@ Crée la structure COMPLÈTE en JSON :
 
         // Construire la section personnages pour P4
         const personnagesSection = personnagesAUtiliser.length > 0
-          ? `\n\nPERSONNAGES À UTILISER OBLIGATOIREMENT :\n${personnagesAUtiliser.map((c: any) => `- **${c.name}** (${c.role || 'personnage'}): ${c.description}${c.arc ? ` | Arc: ${c.arc}` : ''}`).join('\n')}\n\nATTENTION : Tu DOIS utiliser ces personnages et UNIQUEMENT ces personnages. N'invente PAS d'autres personnages principaux.`
+          ? `\n\nPERSONNAGES DU LIVRE (à utiliser OBLIGATOIREMENT, n'en invente PAS d'autres) :\n${personnagesAUtiliser.map((c: any) => `- ${c.name} (${c.role || 'personnage'}): ${c.description}${c.arc ? ` | Arc narratif: ${c.arc}` : ''}`).join('\n')}`
           : '';
 
-        // Nouveau: génération par chapitre (évite le timeout)
-        // `chapter` peut être soit un chapitre complet (numero/titre/...), soit juste { numero }
-        // Dans ce cas, on le retrouve depuis P3.
-        // IMPORTANT: on lit `chapter` depuis le body déjà parsé (payload), sinon Deno ne peut pas relire req.json() une 2e fois.
+        // Construire le plan complet des chapitres pour le contexte global
+        const planComplet = structure.map((ch: any) => `Ch.${ch.numero}: ${ch.titre} — ${ch.objectif || ''}`).join('\n');
 
+        // Récupérer les résumés des chapitres déjà générés (passés via previousContext.P4)
+        const chapitresDejaGeneres = previousContext.P4?.chapitres || [];
 
         if (chapter) {
           const chapitre = chapter?.titre ? chapter : structure.find((c: any) => c.numero === chapter.numero) || chapter;
@@ -499,36 +497,68 @@ Crée la structure COMPLÈTE en JSON :
             );
           }
 
-          console.log(`Step P4 (single): Generating chapter ${chapitre.numero}: ${chapitre.titre} with ${personnagesAUtiliser.length} characters`);
+          // Construire le résumé des chapitres précédents pour la cohérence
+          let resumeChapitresPrecedents = '';
+          if (chapitresDejaGeneres.length > 0) {
+            const resumesList = chapitresDejaGeneres
+              .filter((ch: any) => ch.numero < chapitre.numero)
+              .sort((a: any, b: any) => a.numero - b.numero)
+              .slice(-3) // Les 3 derniers chapitres pour garder le contexte sans exploser les tokens
+              .map((ch: any) => {
+                const contenuResume = (ch.contenu || '').substring(0, 400);
+                return `Ch.${ch.numero} "${ch.titre}": ${contenuResume}...`;
+              });
+            if (resumesList.length > 0) {
+              resumeChapitresPrecedents = `\n\nRÉSUMÉ DES CHAPITRES PRÉCÉDENTS (pour assurer la continuité narrative) :\n${resumesList.join('\n\n')}`;
+            }
+          }
+
+          // Identifier le chapitre suivant pour la transition
+          const chapSuivant = structure.find((c: any) => c.numero === chapitre.numero + 1);
+          const transitionVers = chapSuivant ? `\nTRANSITION : Termine en amenant naturellement vers le chapitre suivant "${chapSuivant.titre}".` : '\nCONCLUSION : C\'est le dernier chapitre, termine avec une conclusion forte.';
+
+          console.log(`Step P4 (single): Generating chapter ${chapitre.numero}: ${chapitre.titre} with ${personnagesAUtiliser.length} characters, ${chapitresDejaGeneres.length} previous chapters context`);
 
           const chapterContent = await callAI(
             `Tu es un AUTEUR PROFESSIONNEL avec 20 ans d'expérience. Tu rédiges des chapitres COMPLETS, captivants, dans le style du genre "${category}".
+
+RÈGLES DE COHÉRENCE ABSOLUES :
+- Tu écris un SEUL livre continu, pas des chapitres isolés
+- Chaque chapitre DOIT faire référence aux événements/concepts des chapitres précédents
+- Les personnages doivent évoluer de façon cohérente d'un chapitre à l'autre
+- Le ton et le style doivent être IDENTIQUES tout au long du livre
+- Pas de répétitions d'introductions déjà faites dans les chapitres précédents
+- Les transitions doivent être naturelles et fluides
 
 RÈGLES D'ÉCRITURE :
 - Style naturel et humain, JAMAIS robotique
 - Phrases variées (courtes et longues)
 - Dialogues si approprié au genre
 - Descriptions vivantes et immersives
-- Transitions fluides entre paragraphes
 - TON : ${tonEditorial}${personnagesSection}`,
             `Rédige le CHAPITRE COMPLET suivant (environ 2500-3500 mots) :
 
 LIVRE : "${fullTitle}"
 CATÉGORIE : ${category}
 DESCRIPTION : ${descriptionGeneree}
-LECTEUR CIBLE : ${lecteurCible}${personnagesSection}
+LECTEUR CIBLE : ${lecteurCible}
+ARC NARRATIF GLOBAL : ${structureGlobale}
 
-CHAPITRE ${chapitre.numero} : "${chapitre.titre}"
+PLAN COMPLET DU LIVRE :
+${planComplet}
+${resumeChapitresPrecedents}${personnagesSection}
+
+CHAPITRE ${chapitre.numero}/${structure.length} : "${chapitre.titre}"
 OBJECTIF DU CHAPITRE : ${chapitre.objectif || ''}
 SOUS-SECTIONS À COUVRIR : ${(chapitre.sousSections || []).join(', ')}
 POINTS CLÉS : ${(chapitre.pointsCles || []).join(', ')}
 ACCROCHE : ${chapitre.accroche || ''}
+${transitionVers}
 
 IMPORTANT :
-- Écris le contenu COMPLET du chapitre
-- Utilise UNIQUEMENT les personnages définis ci-dessus
+- Ce chapitre fait partie d'un TOUT cohérent, pas un texte isolé
+- Fais référence aux éléments des chapitres précédents quand c'est pertinent
 - Inclus des exemples concrets, anecdotes, ou dialogues selon le genre
-- Termine par une transition vers le chapitre suivant
 
 Retourne le contenu en JSON :
 {
@@ -541,7 +571,6 @@ Retourne le contenu en JSON :
           );
 
           const parsedChapter = parseJSON(chapterContent);
-          // Nettoyer le chapitre pour supprimer les artefacts d'échappement
           const chapitreGenere = cleanChapter(parsedChapter || {
             numero: chapitre.numero,
             titre: chapitre.titre,
@@ -560,21 +589,30 @@ Retourne le contenu en JSON :
           break;
         }
 
-        // Mode legacy: tout générer dans une seule requête (peut timeout sur de gros livres)
-        console.log(`Step P4 (legacy): Generating FULL CONTENT for ${structure.length} chapters with ${characters.length} characters`);
+        // Mode legacy: tout générer séquentiellement avec contexte
+        console.log(`Step P4 (legacy): Generating FULL CONTENT for ${structure.length} chapters with ${personnagesAUtiliser.length} characters`);
 
         const chapitresComplets: any[] = [];
         for (const chapitre of structure) {
           console.log(`Generating chapter ${chapitre.numero}: ${chapitre.titre}`);
 
+          // Résumé des chapitres déjà générés dans cette session
+          let resumePrecedents = '';
+          if (chapitresComplets.length > 0) {
+            const derniers = chapitresComplets.slice(-3);
+            resumePrecedents = `\n\nCHAPITRES DÉJÀ RÉDIGÉS (résumé pour continuité) :\n${derniers.map((ch: any) => `Ch.${ch.numero} "${ch.titre}": ${(ch.contenu || '').substring(0, 300)}...`).join('\n\n')}`;
+          }
+
+          const chapSuivant = structure.find((c: any) => c.numero === chapitre.numero + 1);
+          const transition = chapSuivant ? `Termine en amenant vers "${chapSuivant.titre}".` : 'Dernier chapitre, termine avec une conclusion forte.';
+
           const chapterContent = await callAI(
-            `Tu es un AUTEUR PROFESSIONNEL avec 20 ans d'expérience. Tu rédiges des chapitres COMPLETS, captivants, dans le style du genre "${category}".\n\nTON : ${tonEditorial}${personnagesSection}`,
-            `Rédige le CHAPITRE COMPLET suivant :\n\nLIVRE : "${fullTitle}"\nCATÉGORIE : ${category}\nDESCRIPTION : ${descriptionGeneree}\nLECTEUR CIBLE : ${lecteurCible}${personnagesSection}\n\nCHAPITRE ${chapitre.numero} : "${chapitre.titre}"\nSOUS-SECTIONS : ${(chapitre.sousSections || []).join(', ')}\n\nIMPORTANT : Utilise UNIQUEMENT les personnages définis ci-dessus.\n\nRetourne le contenu en JSON :\n{\n  "numero": ${chapitre.numero},\n  "titre": "${chapitre.titre}",\n  "contenu": "...",\n  "nombreMots": 3000\n}`,
+            `Tu es un AUTEUR PROFESSIONNEL. Tu rédiges des chapitres COMPLETS dans le style "${category}". Chaque chapitre doit être cohérent avec les précédents.\n\nTON : ${tonEditorial}${personnagesSection}`,
+            `Rédige le CHAPITRE COMPLET :\n\nLIVRE : "${fullTitle}"\nDESCRIPTION : ${descriptionGeneree}\nPLAN : ${planComplet}${resumePrecedents}${personnagesSection}\n\nCHAPITRE ${chapitre.numero}/${structure.length} : "${chapitre.titre}"\nSOUS-SECTIONS : ${(chapitre.sousSections || []).join(', ')}\n${transition}\n\nRetourne en JSON :\n{\n  "numero": ${chapitre.numero},\n  "titre": "${chapitre.titre}",\n  "contenu": "...",\n  "nombreMots": 3000\n}`,
             6000
           );
 
           const parsed = parseJSON(chapterContent);
-          // Nettoyer le chapitre pour supprimer les artefacts d'échappement
           chapitresComplets.push(cleanChapter(parsed || {
             numero: chapitre.numero,
             titre: chapitre.titre,
