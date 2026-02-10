@@ -429,16 +429,22 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
           const chapitresComplets: any[] = [...existingChapters];
           const startFromChapter = existingChapters.length;
 
-          // Contexte ultra-léger pour P4 afin d'éviter que la requête grossisse à chaque chapitre
-          // (sinon on renvoie à l'API tout le texte déjà généré et ça finit par casser).
-          const p4SlimContext: Record<string, any> = {
-            P1: context.P1,
-            P2: context.P2,
-            P3: context.P3,
-          };
-
           for (let chIdx = startFromChapter; chIdx < retryStructure.length; chIdx++) {
             const chapitre = retryStructure[chIdx];
+
+            // Contexte slim pour P4 : inclut les résumés des 3 derniers chapitres générés
+            // pour maintenir la cohérence narrative sans exploser la taille du payload
+            const derniersCh = chapitresComplets.slice(-3).map((ch: any) => ({
+              numero: ch.numero,
+              titre: ch.titre,
+              contenu: (ch.contenu || ch.content || '').substring(0, 400),
+            }));
+            const p4SlimContext: Record<string, any> = {
+              P1: context.P1,
+              P2: context.P2,
+              P3: context.P3,
+              P4: { chapitres: derniersCh },
+            };
 
             let partial: { result: any; displayContent: string } | null = null;
             try {
