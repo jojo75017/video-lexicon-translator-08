@@ -45,12 +45,23 @@ const CadeauPage = () => {
           <p className="text-gray-300 text-lg">
             Vérifiez votre boîte mail (et vos spams). Vous recevrez aussi des conseils exclusifs les jours suivants.
           </p>
-          <a
-            href="/offres"
-            className="inline-block mt-4 text-violet-400 hover:text-violet-300 underline"
-          >
-            Découvrir nos offres →
-          </a>
+          <div className="space-y-4 mt-6">
+            <a
+              href="/demo"
+              className="block w-full py-4 px-6 bg-gradient-to-r from-violet-600 to-pink-600 hover:from-violet-500 hover:to-pink-500 text-white font-semibold text-lg rounded-xl text-center transition-all"
+            >
+              <span className="flex items-center justify-center gap-2">
+                <Sparkles className="w-5 h-5" />
+                Essayer le générateur d'ebook gratuitement
+              </span>
+            </a>
+            <a
+              href="/offres"
+              className="inline-block text-violet-400 hover:text-violet-300 underline text-sm"
+            >
+              Voir toutes nos offres →
+            </a>
+          </div>
         </div>
       </div>
     );
