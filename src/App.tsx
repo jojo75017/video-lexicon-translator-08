@@ -37,6 +37,7 @@ import UpsellPaiementPage from './pages/UpsellPaiementPage';
 import SeoGeneratorPage from './pages/SeoGeneratorPage';
 import PracticalSheetsGeneratorPage from './pages/PracticalSheetsGeneratorPage';
 import ResultatEn5MinPage from './pages/ResultatEn5MinPage';
+import CadeauPage from './pages/CadeauPage';
 import { SubscriptionAuth } from '@/components/SubscriptionAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { SubscriberGate } from '@/components/auth/SubscriberGate';
@@ -250,6 +251,7 @@ const App = () => {
             <Route path="/arc-signup" element={<ArcSignupPage />} />
             <Route path="/plan-marketing" element={<MarketingPlanPage />} />
             <Route path="/resultat-en-5-min" element={<ResultatEn5MinPage />} />
+            <Route path="/cadeau" element={<CadeauPage />} />
             <Route 
               path="/seo-generator" 
               element={
