@@ -1100,41 +1100,41 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               </div>
             )}
 
-            {/* Background décoratif */}
-            <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 via-transparent to-fuchsia-500/5 pointer-events-none" />
-            <div className="absolute top-20 right-10 w-72 h-72 bg-violet-500/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute bottom-20 left-10 w-96 h-96 bg-fuchsia-500/10 rounded-full blur-3xl pointer-events-none" />
+            {/* Background décoratif — subtle */}
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="absolute top-20 right-10 w-72 h-72 bg-primary/5 rounded-full blur-[100px]" />
+              <div className="absolute bottom-20 left-10 w-96 h-96 bg-accent/5 rounded-full blur-[120px]" />
+            </div>
             
-            <div className="relative z-10 space-y-8">
-              {/* Header Hero Section */}
-              <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-violet-600 via-fuchsia-500 to-rose-500 p-8 shadow-2xl">
-                <div className="absolute inset-0 bg-grid-white opacity-10" />
-                <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl" />
-                <div className="absolute -bottom-10 -left-10 w-60 h-60 bg-white/10 rounded-full blur-2xl" />
+            <div className="relative z-10 space-y-6">
+              {/* Header Hero Section — 2026 Glass */}
+              <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[hsl(262,83%,20%)] via-[hsl(275,80%,25%)] to-[hsl(292,75%,20%)] p-8 shadow-2xl border border-white/10">
+                <div className="absolute -top-20 -right-20 w-60 h-60 bg-[hsl(292,84%,61%)] rounded-full blur-[100px] opacity-20" />
+                <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-[hsl(189,94%,43%)] rounded-full blur-[80px] opacity-15" />
                 
                 <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
                   <div className="space-y-3">
-                    <div className="flex items-center gap-3">
-                      <div className="p-3 bg-white/20 backdrop-blur-sm rounded-2xl">
+                    <div className="flex items-center gap-4">
+                      <div className="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 shadow-[0_0_30px_hsl(262,83%,58%,0.3)]">
                         <BookOpen className="w-8 h-8 text-white" />
                       </div>
                       <div>
-                        <h1 className="text-3xl font-bold text-white">
+                        <h1 className="text-3xl font-extrabold text-white tracking-tight">
                           {ebookTitle || "Votre prochain best-seller"}
                         </h1>
-                        <p className="text-white/80 text-sm mt-1">
+                        <p className="text-white/50 text-sm mt-1 font-medium">
                           {authorName ? `Par ${authorName}` : "Commencez à créer votre ebook"}
                         </p>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="flex flex-wrap gap-3">
+                  <div className="flex flex-wrap gap-2">
                     <Button 
                       type="button"
                       onClick={generateAutomaticPlan} 
                       disabled={!ebookTitle || isGenerating}
-                      className="bg-white text-violet-600 hover:bg-white/90 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                      className="bg-white text-[hsl(262,83%,35%)] hover:bg-white/90 shadow-lg hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] transition-all duration-300 hover:-translate-y-0.5 font-bold rounded-xl"
                       data-tutorial="generate-button"
                     >
                       <Wand2 className="h-5 w-5 mr-2" />
@@ -1143,73 +1143,63 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                     <Button 
                       type="button"
                       onClick={resetPlan}
-                      variant="outline"
-                      className="bg-white/90 border-violet-300 text-violet-700 hover:bg-white hover:border-violet-400"
+                      className="bg-white/10 backdrop-blur-md hover:bg-white/20 text-white border border-white/20 rounded-xl"
                     >
                       <RotateCcw className="h-4 w-4 mr-2" />
                       Nouveau
                     </Button>
                     <Button 
                       type="button"
-                      onClick={() => {
-                        setShowWelcome(true);
-                        setShowTutorial(true);
-                      }}
-                      variant="outline"
-                      className="bg-white/90 border-violet-300 text-violet-700 hover:bg-white hover:border-violet-400"
+                      onClick={() => { setShowWelcome(true); setShowTutorial(true); }}
+                      className="bg-white/10 backdrop-blur-md hover:bg-white/20 text-white border border-white/20 rounded-xl"
                     >
                       <HelpCircle className="h-4 w-4 mr-2" />
                       Aide
                     </Button>
-                    {/* Bouton Connexion Auth Admin pour récupérer les projets */}
                     {isAdminProp && (
                       <Button 
                         type="button"
                         onClick={async () => {
                           const { data: { session } } = await supabase.auth.getSession();
                           if (session) {
-                            toast.success('Session Auth active !', {
-                              description: `Connecté: ${session.user.email}`
-                            });
+                            toast.success('Session Auth active !', { description: `Connecté: ${session.user.email}` });
                             window.location.reload();
                           } else {
                             toast.info('Redirection vers connexion Auth...');
                             navigate('/auth?redirect=/ebook-planner');
                           }
                         }}
-                        variant="outline"
-                        className="bg-amber-500/20 border-amber-400 text-amber-700 hover:bg-amber-500/30"
+                        className="bg-[hsl(38,92%,50%)]/20 hover:bg-[hsl(38,92%,50%)]/30 text-[hsl(38,92%,70%)] border border-[hsl(38,92%,50%)]/30 rounded-xl"
                       >
                         <Crown className="h-4 w-4 mr-2" />
-                        Connexion Auth
+                        Auth
                       </Button>
                     )}
                   </div>
                 </div>
               </div>
 
-              {/* Quick Stats - Design Premium */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {/* Quick Stats — 2026 Glass Cards */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {[
-                  { label: 'Chapitres', value: chapters.length, icon: BookOpen, gradient: 'from-violet-500 to-purple-600', shadow: 'shadow-violet-500/20' },
-                  { label: 'Personnages', value: characters.length, icon: Users, gradient: 'from-cyan-500 to-blue-600', shadow: 'shadow-cyan-500/20' },
-                  { label: 'Images', value: ebookImages.length, icon: Palette, gradient: 'from-amber-500 to-orange-600', shadow: 'shadow-amber-500/20' },
-                  { label: 'Mots', value: chapters.reduce((acc, c) => acc + (c.content?.split(' ').length || 0) + c.subChapters.reduce((subAcc, sc) => subAcc + (sc.content?.split(' ').length || 0), 0), 0), icon: FileText, gradient: 'from-emerald-500 to-teal-600', shadow: 'shadow-emerald-500/20' },
+                  { label: 'Chapitres', value: chapters.length, icon: BookOpen, color: 'hsl(262,83%,58%)' },
+                  { label: 'Personnages', value: characters.length, icon: Users, color: 'hsl(189,94%,43%)' },
+                  { label: 'Images', value: ebookImages.length, icon: Palette, color: 'hsl(38,92%,50%)' },
+                  { label: 'Mots', value: chapters.reduce((acc, c) => acc + (c.content?.split(' ').length || 0) + c.subChapters.reduce((subAcc, sc) => subAcc + (sc.content?.split(' ').length || 0), 0), 0), icon: FileText, color: 'hsl(160,84%,39%)' },
                 ].map((stat, i) => (
                   <div 
                     key={i} 
-                    className={`group relative overflow-hidden rounded-2xl bg-card border border-border/50 p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${stat.shadow} animate-fade-in`}
-                    style={{ animationDelay: `${i * 100}ms` }}
+                    className="group relative overflow-hidden rounded-2xl bg-card/80 backdrop-blur-sm border border-border/50 p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl animate-fade-in"
+                    style={{ animationDelay: `${i * 80}ms` }}
                   >
-                    <div className="absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-5 transition-opacity" 
-                         style={{ background: `linear-gradient(135deg, var(--tw-gradient-stops))` }} />
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-[0.04] transition-opacity duration-500" style={{ background: `radial-gradient(circle at 30% 30%, ${stat.color}, transparent 70%)` }} />
                     <div className="flex items-center gap-4">
-                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${stat.gradient} flex items-center justify-center shadow-lg ${stat.shadow}`}>
-                        <stat.icon className="w-6 h-6 text-white" />
+                      <div className="w-11 h-11 rounded-xl flex items-center justify-center shadow-lg" style={{ backgroundColor: stat.color, boxShadow: `0 8px 25px -5px ${stat.color}40` }}>
+                        <stat.icon className="w-5 h-5 text-white" />
                       </div>
                       <div>
-                        <p className="text-3xl font-bold bg-gradient-to-r ${stat.gradient} bg-clip-text">{stat.value.toLocaleString()}</p>
-                        <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">{stat.label}</p>
+                        <p className="text-3xl font-extrabold tracking-tight text-foreground">{stat.value.toLocaleString()}</p>
+                        <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-widest">{stat.label}</p>
                       </div>
                     </div>
                   </div>
@@ -1219,27 +1209,27 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Colonne principale (2/3) */}
                 <div className="lg:col-span-2 space-y-6">
-                  {/* General Info Card */}
-                  <Card className="overflow-hidden border-0 shadow-xl bg-card/80 backdrop-blur-sm">
-                    <CardHeader className="bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10 border-b border-border/50">
+                  {/* General Info Card — 2026 */}
+                  <Card className="overflow-hidden border border-border/50 shadow-xl bg-card/90 backdrop-blur-sm rounded-2xl">
+                    <CardHeader className="bg-gradient-to-r from-primary/5 to-accent/5 border-b border-border/30">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center shadow-lg shadow-violet-500/30">
-                            <BookOpen className="w-6 h-6 text-white" />
+                          <div className="w-11 h-11 rounded-xl bg-primary flex items-center justify-center shadow-lg" style={{ boxShadow: '0 8px 25px -5px hsl(262 83% 58% / 0.4)' }}>
+                            <BookOpen className="w-5 h-5 text-primary-foreground" />
                           </div>
                           <div>
-                            <CardTitle className="text-xl">Informations générales</CardTitle>
-                            <CardDescription>Définissez les bases de votre ebook</CardDescription>
+                            <CardTitle className="text-lg font-bold tracking-tight">Informations générales</CardTitle>
+                            <CardDescription className="text-xs">Définissez les bases de votre ebook</CardDescription>
                           </div>
                         </div>
                         <Button
                           type="button"
-                          variant="outline"
+                          variant="ghost"
                           onClick={resetPlan}
-                          className="border-red-300 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-400"
+                          className="text-destructive/70 hover:text-destructive hover:bg-destructive/10 rounded-xl text-sm"
                         >
                           <Trash2 className="h-4 w-4 mr-2" />
-                          Réinitialiser tout
+                          Reset
                         </Button>
                       </div>
                     </CardHeader>
@@ -2827,75 +2817,79 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       />
 
       <main className="flex-1 overflow-y-auto">
-        {/* Hero Header */}
-        <div className="relative overflow-hidden bg-gradient-hero">
-          <div className="absolute inset-0 bg-grid-white opacity-10" />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/20" />
+        {/* Hero Header — 2026 Premium */}
+        <div className="relative overflow-hidden bg-gradient-to-br from-[hsl(262,83%,25%)] via-[hsl(275,80%,30%)] to-[hsl(292,75%,22%)]">
+          {/* Noise texture overlay */}
+          <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\' opacity=\'1\'/%3E%3C/svg%3E")' }} />
+          {/* Floating orbs */}
+          <div className="absolute -top-20 -right-20 w-80 h-80 bg-[hsl(292,84%,61%)] rounded-full blur-[120px] opacity-20" />
+          <div className="absolute -bottom-20 -left-20 w-60 h-60 bg-[hsl(189,94%,43%)] rounded-full blur-[100px] opacity-15" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[hsl(262,83%,58%)] rounded-full blur-[150px] opacity-10" />
           
-          <div className="relative container mx-auto px-6 py-8">
-            <div className="absolute top-4 left-4 flex gap-2">
+          <div className="relative container mx-auto px-6 py-6">
+            {/* Top bar */}
+            <div className="flex items-center justify-between mb-6">
               <Button
                 variant="ghost"
                 onClick={() => navigate('/ebook-ideas')}
-                className="text-white/80 hover:text-white hover:bg-white/10"
+                className="text-white/60 hover:text-white hover:bg-white/10 backdrop-blur-sm border border-white/10 rounded-xl text-sm"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Retour
               </Button>
+              
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  onClick={handleManualSave}
+                  disabled={isSaving || !ebookTitle}
+                  className="bg-white/10 backdrop-blur-md hover:bg-white/20 text-white border border-white/20 rounded-xl shadow-lg transition-all duration-300 hover:shadow-[0_0_30px_hsl(160,84%,39%,0.3)]"
+                >
+                  <Save className="h-4 w-4 mr-2" />
+                  {isSaving ? 'Sauvegarde...' : 'Sauvegarder'}
+                </Button>
+                <Button
+                  type="button"
+                  onClick={resetPlan}
+                  className="bg-white/10 backdrop-blur-md hover:bg-white/20 text-white border border-white/20 rounded-xl shadow-lg"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Nouveau
+                </Button>
+              </div>
             </div>
             
-            {/* Boutons d'action - bien visibles */}
-            <div className="absolute top-4 right-4 flex gap-2">
-              <Button
-                type="button"
-                onClick={handleManualSave}
-                disabled={isSaving || !ebookTitle}
-                className="bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg font-semibold"
-              >
-                <Save className="h-4 w-4 mr-2" />
-                {isSaving ? 'Sauvegarde...' : 'Sauvegarder'}
-              </Button>
-              <Button
-                type="button"
-                onClick={resetPlan}
-                className="bg-white text-primary hover:bg-white/90 shadow-lg font-semibold"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Nouveau projet
-              </Button>
-            </div>
-            
-            <div className="max-w-3xl mx-auto text-center pt-8 pb-4">
-              <div className="inline-flex items-center justify-center w-14 h-14 mb-4 rounded-2xl bg-white/20 backdrop-blur-sm border border-white/30 shadow-xl">
-                <Sparkles className="w-7 h-7 text-white" />
+            <div className="max-w-3xl mx-auto text-center pb-6">
+              <div className="inline-flex items-center justify-center w-16 h-16 mb-5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 shadow-[0_0_40px_hsl(262,83%,58%,0.3)]">
+                <Sparkles className="w-8 h-8 text-white" />
               </div>
               
-              <h1 className="text-3xl md:text-4xl font-bold mb-3 text-white">
+              <h1 className="text-4xl md:text-5xl font-extrabold mb-3 text-white tracking-tight">
                 {ebookTitle || 'Studio de Création'}
               </h1>
               
               {isSaving && (
-                <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
+                <Badge variant="secondary" className="bg-white/10 backdrop-blur-md text-white border-white/20">
                   <Save className="w-3 h-3 mr-1 animate-pulse" />
                   Sauvegarde...
                 </Badge>
               )}
               
-              <p className="text-white/80 max-w-xl mx-auto mt-2">
+              <p className="text-white/50 max-w-xl mx-auto mt-2 text-sm tracking-wide uppercase font-medium">
                 Créez des ebooks professionnels avec l'intelligence artificielle
               </p>
               
-              {/* Bouton spécial Import URL 2026 */}
+              {/* Import URL CTA */}
               <Button
                 type="button"
                 onClick={() => handleTabChange('url-import')}
-                className="mt-6 relative overflow-hidden bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 hover:from-violet-700 hover:via-purple-700 hover:to-fuchsia-700 text-white font-bold px-6 py-3 h-auto rounded-xl shadow-2xl shadow-purple-500/30 border border-white/20 group animate-pulse hover:animate-none"
+                className="mt-6 relative overflow-hidden bg-white/10 backdrop-blur-md hover:bg-white/20 text-white font-semibold px-8 py-3 h-auto rounded-2xl border border-white/20 group transition-all duration-500 hover:shadow-[0_0_40px_hsl(262,83%,58%,0.4)] hover:-translate-y-0.5"
               >
-                <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-                <span className="relative flex items-center gap-2">
+                <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+                <span className="relative flex items-center gap-3">
                   <span className="text-lg">🔗</span>
                   <span>Créer depuis YouTube / Article</span>
-                  <Badge className="bg-amber-400 text-amber-900 font-black text-[10px] px-1.5 py-0 animate-bounce">
+                  <Badge className="bg-white/20 text-white font-bold text-[10px] px-2 py-0.5 border border-white/30">
                     2026
                   </Badge>
                 </span>
