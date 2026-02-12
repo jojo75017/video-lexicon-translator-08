@@ -246,6 +246,7 @@ const categories: Category[] = [
       { id: 'direct-sales', label: '💰 Vente Directe', icon: DollarSign, isNew: true },
       { id: 'multi-translator', label: '🌍 Traduction Multi-Langues', icon: Languages, isNew: true },
       { id: 'trend-predictor', label: '🔮 Prédicteur Tendances', icon: TrendingUp, isNew: true },
+      { id: 'pen-name', label: '✒️ Nom de Plume', icon: PenTool, isNew: true },
     ]
   },
   // ========== 8. AUDIO ==========

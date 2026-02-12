@@ -131,3 +131,6 @@ verify_jwt = false
 
 [functions.generate-kdp-description]
 verify_jwt = false
+
+[functions.generate-pen-name]
+verify_jwt = false
