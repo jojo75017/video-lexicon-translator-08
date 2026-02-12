@@ -1,0 +1,372 @@
+import React, { useState, useRef, useCallback } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import { Upload, Loader2, Download, Sparkles, Monitor, Smartphone, BookOpen, Tablet, RefreshCw, X, Image as ImageIcon } from 'lucide-react';
+import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+
+type DeviceType = 'ipad' | 'ipad-hand' | 'kindle' | 'macbook' | 'iphone' | 'book-3d' | 'book-flat' | 'tablet-stand';
+type BackgroundType = 'transparent' | 'desk' | 'lifestyle' | 'studio' | 'dark';
+
+const deviceOptions: { value: DeviceType; label: string; icon: string }[] = [
+  { value: 'ipad', label: 'iPad Pro', icon: '📱' },
+  { value: 'ipad-hand', label: 'iPad (tenu en main)', icon: '🤳' },
+  { value: 'kindle', label: 'Kindle Paperwhite', icon: '📖' },
+  { value: 'macbook', label: 'MacBook Pro', icon: '💻' },
+  { value: 'iphone', label: 'iPhone 15 Pro', icon: '📲' },
+  { value: 'book-3d', label: 'Livre 3D flottant', icon: '📕' },
+  { value: 'book-flat', label: 'Livre à plat', icon: '📘' },
+  { value: 'tablet-stand', label: 'Tablette sur support', icon: '🖥️' },
+];
+
+const backgroundOptions: { value: BackgroundType; label: string; icon: string }[] = [
+  { value: 'transparent', label: 'Fond transparent', icon: '🔲' },
+  { value: 'desk', label: 'Bureau bois', icon: '🪵' },
+  { value: 'lifestyle', label: 'Lifestyle cozy', icon: '☕' },
+  { value: 'studio', label: 'Studio pro', icon: '📸' },
+  { value: 'dark', label: 'Sombre dramatique', icon: '🌙' },
+];
+
+export const EbookMockupStudio: React.FC = () => {
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [mockupResult, setMockupResult] = useState<string | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [deviceType, setDeviceType] = useState<DeviceType>('ipad');
+  const [background, setBackground] = useState<BackgroundType>('transparent');
+  const [isDragOver, setIsDragOver] = useState(false);
+  const [history, setHistory] = useState<{ url: string; device: string; bg: string }[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFile = useCallback((file: File) => {
+    if (!file.type.startsWith('image/')) {
+      toast.error('Veuillez sélectionner une image (JPG, PNG, WebP)');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('Image trop volumineuse (max 10 Mo)');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setUploadedImage(e.target?.result as string);
+      setMockupResult(null);
+      toast.success('Image chargée !');
+    };
+    reader.readAsDataURL(file);
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    const file = e.dataTransfer.files[0];
+    if (file) handleFile(file);
+  }, [handleFile]);
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  }, []);
+
+  const handleDragLeave = useCallback(() => setIsDragOver(false), []);
+
+  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) handleFile(file);
+  };
+
+  const generateMockup = async () => {
+    if (!uploadedImage) {
+      toast.error('Veuillez d\'abord charger une image');
+      return;
+    }
+    setIsGenerating(true);
+    toast.info('🎨 Génération du mockup en cours...');
+
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-mockup', {
+        body: { imageBase64: uploadedImage, deviceType, background }
+      });
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      if (data?.mockupUrl) {
+        setMockupResult(data.mockupUrl);
+        setHistory(prev => [{ url: data.mockupUrl, device: deviceType, bg: background }, ...prev].slice(0, 10));
+        toast.success('✨ Mockup généré avec succès !');
+      }
+    } catch (error: any) {
+      console.error('Mockup error:', error);
+      if (error.message?.includes('429')) toast.error('Limite atteinte. Réessayez dans quelques instants.');
+      else if (error.message?.includes('402')) toast.error('Crédits épuisés.');
+      else toast.error(error.message || 'Erreur lors de la génération');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const downloadMockup = () => {
+    if (!mockupResult) return;
+    const link = document.createElement('a');
+    link.href = mockupResult;
+    link.download = `mockup_${deviceType}_${Date.now()}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success('Mockup téléchargé !');
+  };
+
+  const clearImage = () => {
+    setUploadedImage(null);
+    setMockupResult(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Hero Header */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-orange-600 via-amber-600 to-yellow-500 p-8 text-white">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIj48Y2lyY2xlIGN4PSIyMCIgY3k9IjIwIiByPSIyIiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDgiLz48L2c+PC9zdmc+')] opacity-60" />
+        <div className="relative z-10 flex items-center gap-4">
+          <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-xl">
+            <Monitor className="h-7 w-7 text-white" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight">Mockup eBook Studio</h2>
+            <p className="text-orange-100 text-sm">Générez des mockups professionnels iPad, Kindle, MacBook & plus</p>
+          </div>
+          <Badge className="ml-auto bg-white/20 text-white border border-white/30 backdrop-blur-sm">
+            <Sparkles className="w-3 h-3 mr-1" />
+            IA Pro
+          </Badge>
+        </div>
+      </div>
+
+      <div className="grid lg:grid-cols-2 gap-6">
+        {/* Left: Upload & Settings */}
+        <div className="space-y-5">
+          {/* Upload Card */}
+          <Card className="border-0 shadow-xl overflow-hidden">
+            <div className="bg-gradient-to-r from-orange-500 to-amber-500 h-1" />
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Upload className="w-5 h-5 text-orange-500" />
+                Votre image
+              </CardTitle>
+              <CardDescription>Glissez-déposez votre couverture ou cliquez pour sélectionner</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <input
+                type="file"
+                ref={fileInputRef}
+                accept="image/*"
+                onChange={handleFileInput}
+                className="hidden"
+              />
+
+              {uploadedImage ? (
+                <div className="relative group">
+                  <div className="rounded-xl overflow-hidden border-2 border-orange-200 shadow-lg">
+                    <img src={uploadedImage} alt="Image uploadée" className="w-full h-auto max-h-[300px] object-contain bg-slate-50" />
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={clearImage}
+                    className="absolute top-2 right-2 bg-black/60 hover:bg-black/80 text-white rounded-full w-8 h-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="absolute bottom-2 right-2 bg-white/90 backdrop-blur-sm text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    Changer l'image
+                  </Button>
+                </div>
+              ) : (
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  onDrop={handleDrop}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  className={`cursor-pointer rounded-xl border-2 border-dashed p-10 flex flex-col items-center justify-center transition-all min-h-[220px] ${
+                    isDragOver
+                      ? 'border-orange-500 bg-orange-50 scale-[1.02]'
+                      : 'border-orange-300 bg-orange-50/30 hover:border-orange-400 hover:bg-orange-50/60'
+                  }`}
+                >
+                  <div className="w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center mb-4">
+                    <Upload className="w-8 h-8 text-orange-400" />
+                  </div>
+                  <p className="font-semibold text-slate-700">Déposer votre image ici</p>
+                  <p className="text-sm text-muted-foreground mt-1">ou cliquez pour sélectionner</p>
+                  <p className="text-xs text-muted-foreground mt-3">JPG, PNG, WebP • Max 10 Mo</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Settings Card */}
+          <Card className="border-0 shadow-xl overflow-hidden">
+            <div className="bg-gradient-to-r from-violet-500 to-purple-500 h-1" />
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Tablet className="w-5 h-5 text-violet-500" />
+                Type de mockup
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label className="text-sm font-semibold text-slate-700">Appareil / Format</Label>
+                <div className="grid grid-cols-2 gap-2 mt-2">
+                  {deviceOptions.map(opt => (
+                    <button
+                      key={opt.value}
+                      onClick={() => setDeviceType(opt.value)}
+                      className={`p-3 rounded-xl border-2 text-left transition-all text-sm ${
+                        deviceType === opt.value
+                          ? 'border-violet-500 bg-violet-50 ring-1 ring-violet-300 shadow-sm'
+                          : 'border-slate-200 bg-white hover:border-violet-300 hover:bg-violet-50/30'
+                      }`}
+                    >
+                      <span className="text-lg mr-1.5">{opt.icon}</span>
+                      <span className="font-medium text-slate-700">{opt.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <Label className="text-sm font-semibold text-slate-700">Arrière-plan</Label>
+                <Select value={background} onValueChange={v => setBackground(v as BackgroundType)}>
+                  <SelectTrigger className="mt-1.5 border-2 border-slate-200">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {backgroundOptions.map(opt => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.icon} {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <Button
+                onClick={generateMockup}
+                disabled={isGenerating || !uploadedImage}
+                className="w-full h-14 text-base font-bold bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500 hover:from-orange-600 hover:via-amber-600 hover:to-yellow-600 text-white shadow-xl shadow-orange-500/25 transition-all"
+                size="lg"
+              >
+                {isGenerating ? (
+                  <><Loader2 className="h-5 w-5 mr-2 animate-spin" />Génération du mockup...</>
+                ) : (
+                  <><Sparkles className="h-5 w-5 mr-2" />Générer le mockup {deviceOptions.find(d => d.value === deviceType)?.label}</>
+                )}
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Right: Result */}
+        <div className="space-y-5">
+          <Card className="border-0 shadow-xl overflow-hidden">
+            <div className="bg-gradient-to-r from-emerald-500 to-teal-500 h-1" />
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <ImageIcon className="w-5 h-5 text-emerald-500" />
+                Résultat
+              </CardTitle>
+              <CardDescription>
+                Le mockup {deviceOptions.find(d => d.value === deviceType)?.label} professionnel apparaîtra ici
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {mockupResult ? (
+                <div className="space-y-4">
+                  <div className="rounded-xl overflow-hidden border shadow-lg bg-[repeating-conic-gradient(#e5e7eb_0%_25%,transparent_0%_50%)] bg-[length:16px_16px]">
+                    <img
+                      src={mockupResult}
+                      alt="Mockup généré"
+                      className="w-full h-auto"
+                    />
+                  </div>
+
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={downloadMockup}
+                      className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-md"
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Télécharger PNG
+                    </Button>
+                    <Button
+                      onClick={generateMockup}
+                      variant="outline"
+                      disabled={isGenerating}
+                      className="border-2"
+                    >
+                      <RefreshCw className={`h-4 w-4 mr-2 ${isGenerating ? 'animate-spin' : ''}`} />
+                      Regénérer
+                    </Button>
+                  </div>
+
+                  {background === 'transparent' && (
+                    <div className="p-3 bg-emerald-50 rounded-lg border border-emerald-200">
+                      <p className="text-xs text-emerald-700 flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5" />
+                        <strong>Fond transparent</strong> — Idéal pour vos pages de vente, réseaux sociaux et présentations
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="border-2 border-dashed border-slate-200 rounded-2xl h-[380px] flex flex-col items-center justify-center bg-gradient-to-br from-slate-50/50 to-emerald-50/30">
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-emerald-100 to-teal-100 flex items-center justify-center mb-4">
+                    <Monitor className="w-10 h-10 text-emerald-300" />
+                  </div>
+                  <p className="text-muted-foreground font-medium">Aperçu du mockup</p>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Uploadez une image et cliquez "Générer" pour créer votre mockup
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* History */}
+          {history.length > 1 && (
+            <Card className="border-0 shadow-lg">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm flex items-center gap-2 text-slate-600">
+                  <BookOpen className="w-4 h-4" />
+                  Historique ({history.length})
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex gap-2 overflow-x-auto pb-2">
+                  {history.map((item, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setMockupResult(item.url)}
+                      className="flex-shrink-0 rounded-lg overflow-hidden border-2 border-slate-200 hover:border-orange-400 transition-all hover:scale-105 shadow-sm"
+                      style={{ width: '70px', height: '70px' }}
+                    >
+                      <img src={item.url} alt={`Mockup ${idx + 1}`} className="w-full h-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
