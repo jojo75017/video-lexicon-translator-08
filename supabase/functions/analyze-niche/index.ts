@@ -68,6 +68,16 @@ Sois précis et concret dans chaque point. Parle directement au lecteur avec "tu
 
     if (!response.ok) {
       const errText = await response.text();
+      if (response.status === 429) {
+        return new Response(JSON.stringify({ error: 'Trop de requêtes, réessayez dans quelques instants.' }), {
+          status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      if (response.status === 402) {
+        return new Response(JSON.stringify({ error: 'Crédits AI épuisés. Rechargez vos crédits dans Settings → Workspace → Usage.' }), {
+          status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
       throw new Error(`AI API error: ${response.status} - ${errText}`);
     }
 
