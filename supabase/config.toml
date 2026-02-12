@@ -134,3 +134,6 @@ verify_jwt = false
 
 [functions.generate-pen-name]
 verify_jwt = false
+
+[functions.generate-cover-prompt]
+verify_jwt = false
