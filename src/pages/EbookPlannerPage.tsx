@@ -50,6 +50,7 @@ import { EbookWritingAssistant } from '@/components/ebook/EbookWritingAssistant'
 import { EbookBackCoverGenerator } from '@/components/ebook/EbookBackCoverGenerator';
 import { EbookMockupStudio } from '@/components/ebook/EbookMockupStudio';
 import { CalibreStudioEpub } from '@/components/ebook/CalibreStudioEpub';
+import { PriceEbookStudio } from '@/components/ebook/PriceEbookStudio';
 import { EbookCharacters, type Character } from '@/components/ebook/EbookCharacters';
 import { EbookProjectsList } from '@/components/ebook/EbookProjectsList';
 import { EbookAiChat } from '@/components/ebook/EbookAiChat';
@@ -2135,6 +2136,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
 
       case 'calibre-epub':
         return <CalibreStudioEpub />;
+
+      case 'price-studio':
+        return <PriceEbookStudio />;
 
       case 'library':
         return (
