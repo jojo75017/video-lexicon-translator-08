@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Palette, Download, Wand2, RefreshCw, Loader2, Sparkles, Image as ImageIcon, BookOpen, Ruler, Info, FileText, Upload, X, User, Type, PaintBucket } from 'lucide-react';
+import { Palette, Download, Wand2, RefreshCw, Loader2, Sparkles, Image as ImageIcon, BookOpen, Ruler, Info, FileText, Upload, X, User, Type, PaintBucket, Lightbulb, Copy, Check, Camera } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import jsPDF from 'jspdf';
@@ -73,84 +73,57 @@ const genreOptions: { value: CoverGenre; label: string }[] = [
 ];
 
 const bookFormats: { value: BookFormat; label: string; width: number; height: number; category?: string }[] = [
-  // 📚 LIVRES DE POCHE (formats français standards)
   { value: '4.25x6.87', label: '📖 Poche Standard (11x17.5cm)', width: 4.25, height: 6.87, category: 'poche' },
   { value: '4.72x7.48', label: '📖 Poche Large (12x19cm)', width: 4.72, height: 7.48, category: 'poche' },
   { value: '5.12x7.87', label: '📖 Format Folio (13x20cm)', width: 5.12, height: 7.87, category: 'poche' },
   { value: '4.33x7.09', label: '📖 Livre de Poche (11x18cm)', width: 4.33, height: 7.09, category: 'poche' },
   { value: '5.51x8.27', label: '📖 Semi-Poche (14x21cm)', width: 5.51, height: 8.27, category: 'poche' },
-  
-  // 📕 FORMATS KDP STANDARDS
   { value: '5x8', label: '📕 5" x 8" (Petit format KDP)', width: 5, height: 8, category: 'kdp' },
   { value: '5.5x8.5', label: '📕 5.5" x 8.5" (Digest)', width: 5.5, height: 8.5, category: 'kdp' },
   { value: '6x9', label: '📕 6" x 9" (Standard KDP)', width: 6, height: 9, category: 'kdp' },
-  
-  // 📗 GRANDS FORMATS
   { value: '7x10', label: '📗 7" x 10" (Textbook)', width: 7, height: 10, category: 'grand' },
   { value: '8x10', label: '📗 8" x 10" (Large)', width: 8, height: 10, category: 'grand' },
   { value: '8.5x11', label: '📗 8.5" x 11" (Lettre US)', width: 8.5, height: 11, category: 'grand' },
 ];
 
-// Templates de couverture pré-conçus par genre
-interface CoverTemplate {
-  id: string;
-  name: string;
-  genre: CoverGenre;
-  style: CoverStyle;
-  colorPalette: string;
-  customPrompt: string;
-  preview: string;
+const SPINE_MULTIPLIERS = { white: 0.002252, cream: 0.0025 };
+const BLEED = 0.125;
+
+interface AiPromptResult {
+  prompt: string;
+  promptFr: string;
+  conceptTitle: string;
+  moodboard: string[];
+  colorPalette: string[];
+  photographyStyle: string;
+  lightingSetup: string;
 }
 
-const coverTemplates: CoverTemplate[] = [
-  // Non-fiction / Business
-  { id: 'business-pro', name: 'Business Pro', genre: 'business', style: 'professional', colorPalette: 'navy-gold', customPrompt: 'Fond bleu marine élégant avec accents dorés, typographie moderne et sobre, éléments graphiques minimalistes', preview: '💼' },
-  { id: 'coach-modern', name: 'Coach Moderne', genre: 'self-help', style: 'modern', colorPalette: 'gradient-purple', customPrompt: 'Gradient violet vers bleu, ambiance inspirante et motivante, typographie bold et impactante', preview: '🌟' },
-  { id: 'health-zen', name: 'Santé Zen', genre: 'health', style: 'minimalist', colorPalette: 'green-white', customPrompt: 'Design épuré vert et blanc, éléments naturels subtils, sensation de calme et bien-être', preview: '🧘' },
-  
-  // Fiction
-  { id: 'romance-soft', name: 'Romance Douce', genre: 'romance', style: 'romance', colorPalette: 'pink-gold', customPrompt: 'Tons roses et dorés, texture florale délicate, atmosphère romantique et élégante, silhouettes de couple', preview: '💕' },
-  { id: 'romance-dark', name: 'Dark Romance', genre: 'romance', style: 'thriller', colorPalette: 'black-red', customPrompt: 'Noir profond avec accents rouges, ambiance sensuelle et mystérieuse, typographie élégante', preview: '🖤' },
-  { id: 'thriller-noir', name: 'Thriller Noir', genre: 'thriller', style: 'thriller', colorPalette: 'black-red', customPrompt: 'Noir intense avec éclats de rouge sang, atmosphère oppressante, typographie bold et anxiogène', preview: '🔪' },
-  { id: 'mystery-classic', name: 'Mystère Classique', genre: 'mystery', style: 'detective', colorPalette: 'sepia-gold', customPrompt: 'Style film noir, tons sépia et or, silhouette mystérieuse, loupe ou indices visuels', preview: '🔍' },
-  { id: 'fantasy-epic', name: 'Fantasy Épique', genre: 'fantasy', style: 'fantasy', colorPalette: 'purple-gold', customPrompt: 'Univers magique grandiose, château ou dragon en arrière-plan, éléments lumineux mystiques, typographie médiévale', preview: '🐉' },
-  { id: 'fantasy-dark', name: 'Dark Fantasy', genre: 'fantasy', style: 'horror', colorPalette: 'black-purple', customPrompt: 'Forêt sombre enchantée, brume mystérieuse, créatures fantastiques menaçantes, lune rouge', preview: '🌙' },
-  { id: 'scifi-cyber', name: 'Sci-Fi Cyber', genre: 'sci-fi', style: 'modern', colorPalette: 'neon-dark', customPrompt: 'Ville futuriste néon, hologrammes et technologie avancée, couleurs cyan et magenta sur noir', preview: '🚀' },
-  { id: 'horror-gothic', name: 'Horreur Gothique', genre: 'horror', style: 'horror', colorPalette: 'black-blood', customPrompt: 'Manoir hanté, éclairs, ombres menaçantes, typographie craquelée et effrayante', preview: '👻' },
-  { id: 'historical-vintage', name: 'Historique Vintage', genre: 'historical', style: 'historical', colorPalette: 'sepia-cream', customPrompt: 'Texture parchemin ancien, éléments d\'époque, typographie classique, cadre ornemental', preview: '🏰' },
-  
-  // Jeunesse et autres
-  { id: 'children-fun', name: 'Jeunesse Fun', genre: 'children', style: 'artistic', colorPalette: 'rainbow', customPrompt: 'Illustrations colorées et joyeuses, personnages mignons, typographie ludique et arrondie', preview: '🧸' },
-  { id: 'cookbook-gourmet', name: 'Cuisine Gourmet', genre: 'cooking', style: 'cookbook', colorPalette: 'warm-food', customPrompt: 'Photo appétissante de plat, arrière-plan cuisine rustique, typographie élégante', preview: '🍳' },
-  { id: 'travel-adventure', name: 'Voyage Aventure', genre: 'travel', style: 'adventure', colorPalette: 'sunset', customPrompt: 'Paysage exotique époustouflant, couleurs de coucher de soleil, sensation d\'évasion', preview: '✈️' },
-  { id: 'poetry-literary', name: 'Poésie Littéraire', genre: 'poetry', style: 'literary', colorPalette: 'cream-ink', customPrompt: 'Design minimaliste et raffiné, plume d\'écriture, texture papier, typographie serif élégante', preview: '✒️' },
-  { id: 'bio-modern', name: 'Biographie Moderne', genre: 'biography', style: 'modern', colorPalette: 'monochrome', customPrompt: 'Portrait stylisé en arrière-plan, typographie bold et impactante, design contemporain', preview: '👤' },
-];
-
-// KDP spine calculation constants (in inches)
-const SPINE_MULTIPLIERS = {
-  white: 0.002252, // per page for white paper
-  cream: 0.0025,   // per page for cream paper
-};
-
-const BLEED = 0.125; // 1/8 inch bleed on all sides
-
 export const EbookCoverGenerator: React.FC<EbookCoverGeneratorProps> = ({
-  ebookTitle,
-  authorName,
+  ebookTitle: initialTitle,
+  authorName: initialAuthor,
   onCoverGenerated
 }) => {
+  // Editable fields
+  const [title, setTitle] = useState(initialTitle || '');
+  const [subtitle, setSubtitle] = useState('');
+  const [author, setAuthor] = useState(initialAuthor || '');
+  
   const [coverStyle, setCoverStyle] = useState<CoverStyle>('professional');
   const [genre, setGenre] = useState<CoverGenre>('non-fiction');
   const [customPrompt, setCustomPrompt] = useState('');
-  const [subtitle, setSubtitle] = useState('');
   const [backCoverText, setBackCoverText] = useState('');
   const [generatedCovers, setGeneratedCovers] = useState<string[]>([]);
   const [selectedCover, setSelectedCover] = useState<number>(0);
   const [isGenerating, setIsGenerating] = useState(false);
   const [variation, setVariation] = useState(1);
   
-  // KDP specific options
+  // AI Prompt
+  const [isGeneratingPrompt, setIsGeneratingPrompt] = useState(false);
+  const [aiPromptResult, setAiPromptResult] = useState<AiPromptResult | null>(null);
+  const [promptCopied, setPromptCopied] = useState(false);
+  
+  // KDP options
   const [bookFormat, setBookFormat] = useState<BookFormat>('6x9');
   const [pageCount, setPageCount] = useState<number>(200);
   const [paperType, setPaperType] = useState<PaperType>('white');
@@ -161,239 +134,134 @@ export const EbookCoverGenerator: React.FC<EbookCoverGeneratorProps> = ({
   const [authorPhoto, setAuthorPhoto] = useState<string | null>(null);
   const authorPhotoInputRef = useRef<HTMLInputElement>(null);
   
-  // Template selection
-  const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
-  
-  // Nouvelles options de personnalisation avancées
+  // Advanced customization
   const [authorNamePosition, setAuthorNamePosition] = useState<string>('bottom');
   const [authorNameStyle, setAuthorNameStyle] = useState<string>('elegant');
   const [colorScheme, setColorScheme] = useState<string>('auto');
   const [titlePosition, setTitlePosition] = useState<string>('center');
   const [showAuthorOnCover, setShowAuthorOnCover] = useState<boolean>(true);
-  
-  // Appliquer un template
-  const applyTemplate = (template: CoverTemplate) => {
-    setGenre(template.genre);
-    setCoverStyle(template.style);
-    setCustomPrompt(template.customPrompt);
-    setSelectedTemplate(template.id);
-    toast.success(`Template "${template.name}" appliqué !`, {
-      description: `Genre: ${template.genre}, Style: ${template.style}`
-    });
-  };
-  
-  // Templates filtrés par genre sélectionné
-  const filteredTemplates = coverTemplates.filter(t => t.genre === genre);
-  const allGenreTemplates = coverTemplates;
 
   const handleAuthorPhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error('La photo ne doit pas dépasser 5 Mo');
-        return;
-      }
+      if (file.size > 5 * 1024 * 1024) { toast.error('La photo ne doit pas dépasser 5 Mo'); return; }
       const reader = new FileReader();
-      reader.onload = (event) => {
-        setAuthorPhoto(event.target?.result as string);
-        toast.success('Photo de l\'auteur ajoutée');
-      };
+      reader.onload = (event) => { setAuthorPhoto(event.target?.result as string); toast.success('Photo ajoutée'); };
       reader.readAsDataURL(file);
     }
   };
 
-  const removeAuthorPhoto = () => {
-    setAuthorPhoto(null);
-    if (authorPhotoInputRef.current) {
-      authorPhotoInputRef.current.value = '';
-    }
-  };
+  const removeAuthorPhoto = () => { setAuthorPhoto(null); if (authorPhotoInputRef.current) authorPhotoInputRef.current.value = ''; };
 
-  // Calculate spine width based on page count and paper type
-  const spineWidth = useMemo(() => {
-    const multiplier = SPINE_MULTIPLIERS[paperType];
-    return Math.max(0.0625, pageCount * multiplier); // Minimum 1/16 inch
-  }, [pageCount, paperType]);
-
-  // Get current format dimensions
+  const spineWidth = useMemo(() => Math.max(0.0625, pageCount * SPINE_MULTIPLIERS[paperType]), [pageCount, paperType]);
   const currentFormat = bookFormats.find(f => f.value === bookFormat) || bookFormats[0];
 
-  // Calculate full cover dimensions with bleed
   const coverDimensions = useMemo(() => {
     const frontWidth = currentFormat.width + BLEED;
     const backWidth = currentFormat.width + BLEED;
     const height = currentFormat.height + (BLEED * 2);
     const totalWidth = frontWidth + spineWidth + backWidth;
-
-    // Convert to pixels at 300 DPI
     const dpi = 300;
     return {
-      frontWidthIn: frontWidth,
-      backWidthIn: backWidth,
-      spineWidthIn: spineWidth,
-      heightIn: height,
-      totalWidthIn: totalWidth,
-      frontWidthPx: Math.round(frontWidth * dpi),
-      backWidthPx: Math.round(backWidth * dpi),
-      spineWidthPx: Math.round(spineWidth * dpi),
-      heightPx: Math.round(height * dpi),
+      frontWidthIn: frontWidth, backWidthIn: backWidth, spineWidthIn: spineWidth,
+      heightIn: height, totalWidthIn: totalWidth,
+      frontWidthPx: Math.round(frontWidth * dpi), backWidthPx: Math.round(backWidth * dpi),
+      spineWidthPx: Math.round(spineWidth * dpi), heightPx: Math.round(height * dpi),
       totalWidthPx: Math.round(totalWidth * dpi),
     };
   }, [currentFormat, spineWidth]);
 
-  const generateCover = async () => {
-    if (!ebookTitle) {
-      toast.error('Veuillez entrer un titre pour votre ebook');
-      return;
+  // AI Prompt Generation
+  const generateAiPrompt = async () => {
+    if (!title) { toast.error('Entrez un titre pour générer le prompt'); return; }
+    setIsGeneratingPrompt(true);
+    toast.info('🎨 Création du concept artistique...');
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-cover-prompt', {
+        body: { title, subtitle, authorName: author, genre, style: coverStyle }
+      });
+      if (error) throw error;
+      setAiPromptResult(data);
+      setCustomPrompt(data.prompt || '');
+      toast.success('✨ Concept artistique généré !');
+    } catch (error: any) {
+      console.error('Error generating prompt:', error);
+      toast.error(error.message || 'Erreur lors de la génération du prompt');
+    } finally {
+      setIsGeneratingPrompt(false);
     }
+  };
 
+  const copyPrompt = () => {
+    if (customPrompt) {
+      navigator.clipboard.writeText(customPrompt);
+      setPromptCopied(true);
+      toast.success('Prompt copié !');
+      setTimeout(() => setPromptCopied(false), 2000);
+    }
+  };
+
+  const generateCover = async () => {
+    if (!title) { toast.error('Veuillez entrer un titre'); return; }
     setIsGenerating(true);
     toast.info(`Génération de la couverture ${coverType === 'full' ? 'complète' : 'avant'} en cours...`);
-
     try {
       const { data, error } = await supabase.functions.invoke('generate-front-cover', {
         body: {
-          ebookTitle,
-          authorName: authorName || 'Auteur',
-          subtitle,
-          genre,
-          style: coverStyle,
-          customPrompt,
-          variation,
-          // KDP specifics
-          coverType,
-          bookFormat,
-          pageCount,
-          paperType,
-          bindingType,
-          spineWidth: spineWidth.toFixed(4),
-          dimensions: coverDimensions,
-          backCoverText,
-          // Nouvelles options de personnalisation
-          authorNamePosition,
-          authorNameStyle,
-          colorScheme,
-          titlePosition,
-          showAuthorOnCover
+          ebookTitle: title, authorName: author || 'Auteur', subtitle, genre,
+          style: coverStyle, customPrompt, variation, coverType, bookFormat,
+          pageCount, paperType, bindingType, spineWidth: spineWidth.toFixed(4),
+          dimensions: coverDimensions, backCoverText, authorNamePosition,
+          authorNameStyle, colorScheme, titlePosition, showAuthorOnCover
         }
       });
-
       if (error) throw error;
-
       if (data?.imageUrl) {
         setGeneratedCovers(prev => [...prev, data.imageUrl]);
         setSelectedCover(generatedCovers.length);
         setVariation(prev => prev + 1);
         toast.success('Couverture générée avec succès !');
-        
-        if (onCoverGenerated) {
-          onCoverGenerated(data.imageUrl);
-        }
-      } else if (data?.error) {
-        throw new Error(data.error);
-      }
+        if (onCoverGenerated) onCoverGenerated(data.imageUrl);
+      } else if (data?.error) throw new Error(data.error);
     } catch (error: any) {
       console.error('Erreur génération couverture:', error);
-      if (error.message?.includes('429') || error.message?.includes('Rate')) {
-        toast.error('Limite de requêtes atteinte. Réessayez dans quelques instants.');
-      } else if (error.message?.includes('402')) {
-        toast.error('Crédits épuisés. Ajoutez des crédits à votre espace Lovable.');
-      } else {
-        toast.error(error.message || 'Erreur lors de la génération');
-      }
-    } finally {
-      setIsGenerating(false);
-    }
+      if (error.message?.includes('429')) toast.error('Limite de requêtes atteinte. Réessayez dans quelques instants.');
+      else if (error.message?.includes('402')) toast.error('Crédits épuisés.');
+      else toast.error(error.message || 'Erreur lors de la génération');
+    } finally { setIsGenerating(false); }
   };
 
-  // Helper function to composite author photo onto cover
   const compositeWithAuthorPhoto = async (coverUrl: string): Promise<string> => {
-    if (!authorPhoto || coverType !== 'full') {
-      console.log('Skipping photo composite: no photo or not full cover');
-      return coverUrl;
-    }
-
-    console.log('Starting photo composition...');
-
+    if (!authorPhoto || coverType !== 'full') return coverUrl;
     return new Promise((resolve, reject) => {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
-      if (!ctx) {
-        console.error('Canvas context not available');
-        reject(new Error('Canvas context not available'));
-        return;
-      }
-
+      if (!ctx) { reject(new Error('Canvas not available')); return; }
       const coverImg = new Image();
-      // Important: set crossOrigin before src for base64 images
       coverImg.crossOrigin = 'anonymous';
-      
       coverImg.onload = () => {
-        console.log('Cover image loaded:', coverImg.width, 'x', coverImg.height);
-        canvas.width = coverImg.width;
-        canvas.height = coverImg.height;
-        
-        // Draw the cover
+        canvas.width = coverImg.width; canvas.height = coverImg.height;
         ctx.drawImage(coverImg, 0, 0);
-        
-        // Load and draw author photo
         const authorImg = new Image();
         authorImg.onload = () => {
-          console.log('Author photo loaded, compositing...');
-          
-          // Position author photo on back cover (left side of full cover)
-          // Back cover takes approximately 48% of full width (front cover + spine = ~52%)
           const backCoverWidth = coverImg.width * 0.45;
-          
-          // Make photo more prominent - 20% of back cover width
           const photoSize = Math.min(backCoverWidth * 0.25, coverImg.height * 0.18);
-          
-          // Position in lower portion of back cover
-          const photoX = backCoverWidth * 0.15; // 15% from left edge
-          const photoY = coverImg.height * 0.65; // 65% from top
-          
-          // Draw circular clipping path for author photo
-          ctx.save();
-          ctx.beginPath();
+          const photoX = backCoverWidth * 0.15;
+          const photoY = coverImg.height * 0.65;
+          ctx.save(); ctx.beginPath();
           ctx.arc(photoX + photoSize / 2, photoY + photoSize / 2, photoSize / 2, 0, Math.PI * 2);
-          ctx.closePath();
-          ctx.clip();
-          
-          // Draw author photo fitted in circle
+          ctx.closePath(); ctx.clip();
           ctx.drawImage(authorImg, photoX, photoY, photoSize, photoSize);
           ctx.restore();
-          
-          // Add a white border around the photo for visibility
           ctx.beginPath();
           ctx.arc(photoX + photoSize / 2, photoY + photoSize / 2, photoSize / 2, 0, Math.PI * 2);
-          ctx.strokeStyle = 'white';
-          ctx.lineWidth = Math.max(4, photoSize * 0.04);
-          ctx.stroke();
-          
-          // Add subtle shadow
-          ctx.beginPath();
-          ctx.arc(photoX + photoSize / 2, photoY + photoSize / 2, photoSize / 2 + 2, 0, Math.PI * 2);
-          ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
-          ctx.lineWidth = 2;
-          ctx.stroke();
-          
-          console.log('Photo composited at:', photoX, photoY, 'size:', photoSize);
-          
-          const result = canvas.toDataURL('image/jpeg', 0.95);
-          resolve(result);
+          ctx.strokeStyle = 'white'; ctx.lineWidth = Math.max(4, photoSize * 0.04); ctx.stroke();
+          resolve(canvas.toDataURL('image/jpeg', 0.95));
         };
-        
-        authorImg.onerror = (e) => {
-          console.error('Failed to load author photo:', e);
-          resolve(coverUrl); // Fallback to original
-        };
+        authorImg.onerror = () => resolve(coverUrl);
         authorImg.src = authorPhoto;
       };
-      
-      coverImg.onerror = (e) => {
-        console.error('Failed to load cover image:', e);
-        reject(new Error('Failed to load cover image'));
-      };
+      coverImg.onerror = () => reject(new Error('Failed to load cover'));
       coverImg.src = coverUrl;
     });
   };
@@ -401,825 +269,565 @@ export const EbookCoverGenerator: React.FC<EbookCoverGeneratorProps> = ({
   const downloadCover = async (format: 'jpeg' | 'pdf' = 'jpeg') => {
     const coverUrl = generatedCovers[selectedCover];
     if (!coverUrl) return;
-
-    if (format === 'pdf') {
-      downloadAsPDF();
-      return;
-    }
-
+    if (format === 'pdf') { downloadAsPDF(); return; }
     try {
-      toast.info('Préparation de la couverture...');
-      const finalCoverUrl = await compositeWithAuthorPhoto(coverUrl);
-      
+      toast.info('Préparation...');
+      const finalUrl = await compositeWithAuthorPhoto(coverUrl);
       const link = document.createElement('a');
-      link.href = finalCoverUrl;
-      const suffix = coverType === 'full' ? 'full_cover' : 'front_cover';
-      link.download = `${ebookTitle.replace(/[^a-z0-9]/gi, '_')}_${suffix}_${selectedCover + 1}.jpg`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      link.href = finalUrl;
+      link.download = `${title.replace(/[^a-z0-9]/gi, '_')}_${coverType}_${selectedCover + 1}.jpg`;
+      document.body.appendChild(link); link.click(); document.body.removeChild(link);
       toast.success('Couverture JPEG téléchargée !');
-    } catch (error) {
-      console.error('Erreur téléchargement:', error);
-      toast.error('Erreur lors du téléchargement');
-    }
+    } catch { toast.error('Erreur téléchargement'); }
   };
 
   const downloadAsPDF = async () => {
     const coverUrl = generatedCovers[selectedCover];
     if (!coverUrl) return;
-
-    toast.info('Création du PDF en cours...');
-
+    toast.info('Création du PDF...');
     try {
-      // First composite author photo if needed
-      const finalCoverUrl = await compositeWithAuthorPhoto(coverUrl);
-      
-      // Create image element to get dimensions
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      
-      await new Promise<void>((resolve, reject) => {
-        img.onload = () => resolve();
-        img.onerror = () => reject(new Error('Impossible de charger l\'image'));
-        img.src = finalCoverUrl;
-      });
-
-      // Calculate PDF dimensions based on cover type and format
-      const dpi = 300;
-      let pdfWidth: number;
-      let pdfHeight: number;
-
-      if (coverType === 'full') {
-        // Full cover - use calculated dimensions
-        pdfWidth = coverDimensions.totalWidthIn * 72; // Convert inches to points (72 points per inch)
-        pdfHeight = coverDimensions.heightIn * 72;
-      } else {
-        // Front cover only
-        pdfWidth = (currentFormat.width + BLEED) * 72;
-        pdfHeight = (currentFormat.height + BLEED * 2) * 72;
-      }
-
-      // Create PDF with exact KDP dimensions
-      const pdf = new jsPDF({
-        orientation: pdfWidth > pdfHeight ? 'landscape' : 'portrait',
-        unit: 'pt',
-        format: [pdfWidth, pdfHeight]
-      });
-
-      // Add image to fill the entire page
-      pdf.addImage(finalCoverUrl, 'JPEG', 0, 0, pdfWidth, pdfHeight);
-
-      // Save PDF
-      const suffix = coverType === 'full' ? 'full_cover' : 'front_cover';
-      pdf.save(`${ebookTitle.replace(/[^a-z0-9]/gi, '_')}_${suffix}_${selectedCover + 1}.pdf`);
-
-      toast.success('Couverture PDF téléchargée !', {
-        description: `Dimensions: ${coverType === 'full' ? coverDimensions.totalWidthIn.toFixed(2) : currentFormat.width}"x${coverType === 'full' ? coverDimensions.heightIn.toFixed(2) : currentFormat.height}" à 300 DPI`
-      });
-    } catch (error) {
-      console.error('Erreur export PDF:', error);
-      toast.error('Erreur lors de la création du PDF');
-    }
+      const finalUrl = await compositeWithAuthorPhoto(coverUrl);
+      const img = new Image(); img.crossOrigin = 'anonymous';
+      await new Promise<void>((resolve, reject) => { img.onload = () => resolve(); img.onerror = () => reject(); img.src = finalUrl; });
+      const pdfWidth = coverType === 'full' ? coverDimensions.totalWidthIn * 72 : (currentFormat.width + BLEED) * 72;
+      const pdfHeight = coverType === 'full' ? coverDimensions.heightIn * 72 : (currentFormat.height + BLEED * 2) * 72;
+      const pdf = new jsPDF({ orientation: pdfWidth > pdfHeight ? 'landscape' : 'portrait', unit: 'pt', format: [pdfWidth, pdfHeight] });
+      pdf.addImage(finalUrl, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`${title.replace(/[^a-z0-9]/gi, '_')}_${coverType}_${selectedCover + 1}.pdf`);
+      toast.success('PDF KDP téléchargé !');
+    } catch { toast.error('Erreur PDF'); }
   };
 
   const currentCover = generatedCovers[selectedCover];
 
   return (
-    <Card className="shadow-xl border-0 bg-gradient-to-br from-white to-purple-50/30">
-      <CardHeader className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-b">
-        <CardTitle className="flex items-center gap-3 text-lg font-bold text-purple-700">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
-            <Palette className="h-5 w-5 text-white" />
-          </div>
-          Générateur de Couverture KDP
-          <Badge variant="secondary" className="ml-auto bg-purple-100 text-purple-700">
-            <Sparkles className="w-3 h-3 mr-1" />
-            Premium
-          </Badge>
-        </CardTitle>
-        <CardDescription>
-          Créez une couverture professionnelle aux dimensions exactes Amazon KDP
-        </CardDescription>
-      </CardHeader>
-      
-      <CardContent className="p-6">
-        <Tabs defaultValue="templates" className="space-y-6">
-          <TabsList className="grid grid-cols-4 w-full">
-            <TabsTrigger value="templates">🎯 Templates</TabsTrigger>
-            <TabsTrigger value="design">🎨 Design</TabsTrigger>
-            <TabsTrigger value="kdp">📐 Dimensions KDP</TabsTrigger>
-            <TabsTrigger value="preview">👁️ Aperçu</TabsTrigger>
-          </TabsList>
-          
-          {/* Onglet Templates */}
-          <TabsContent value="templates" className="space-y-4">
-            <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-4 border border-purple-200">
-              <h4 className="font-semibold text-purple-800 mb-3 flex items-center gap-2">
-                <Sparkles className="w-4 h-4" />
-                Templates pré-conçus par genre
-              </h4>
-              <p className="text-sm text-muted-foreground mb-4">
-                Sélectionnez un template pour appliquer automatiquement le style, les couleurs et les paramètres optimaux.
-              </p>
-              
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                {allGenreTemplates.map((template) => (
-                  <button
-                    key={template.id}
-                    onClick={() => applyTemplate(template)}
-                    className={`p-3 rounded-lg border-2 text-left transition-all hover:scale-105 ${
-                      selectedTemplate === template.id
-                        ? 'border-purple-500 bg-purple-100 ring-2 ring-purple-300'
-                        : 'border-gray-200 bg-white hover:border-purple-300 hover:bg-purple-50'
-                    }`}
-                  >
-                    <div className="text-2xl mb-1">{template.preview}</div>
-                    <div className="font-medium text-sm text-gray-800">{template.name}</div>
-                    <div className="text-xs text-muted-foreground capitalize">{template.genre}</div>
-                  </button>
-                ))}
-              </div>
-              
-              {selectedTemplate && (
-                <div className="mt-4 p-3 bg-white rounded-lg border border-purple-200">
-                  <p className="text-sm text-purple-700">
-                    <strong>Template actif:</strong> {coverTemplates.find(t => t.id === selectedTemplate)?.name}
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {coverTemplates.find(t => t.id === selectedTemplate)?.customPrompt}
-                  </p>
-                </div>
-              )}
+    <div className="space-y-6">
+      {/* Hero Header */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-8 text-white">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDE4YzAtOS45NC04LjA2LTE4LTE4LTE4UzAgOC4wNiAwIDE4czguMDYgMTggMTggMTggMTgtOC4wNiAxOC0xOHoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-50" />
+        <div className="relative z-10">
+          <div className="flex items-center gap-4 mb-3">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-2xl shadow-orange-500/30">
+              <Camera className="h-7 w-7 text-white" />
             </div>
-          </TabsContent>
-
-          {/* Onglet Design */}
-          <TabsContent value="design" className="space-y-4">
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <Label className="text-sm font-medium">Type de couverture</Label>
-                <Select value={coverType} onValueChange={(v) => setCoverType(v as CoverType)}>
-                  <SelectTrigger className="mt-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="front">📖 Couverture avant seule</SelectItem>
-                    <SelectItem value="full">📚 Couverture complète (avant + tranche + dos)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label className="text-sm font-medium">Genre du livre</Label>
-                <Select value={genre} onValueChange={(value) => setGenre(value as CoverGenre)}>
-                  <SelectTrigger className="mt-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {genreOptions.map(opt => (
-                      <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label className="text-sm font-medium">Style de couverture</Label>
-                <Select value={coverStyle} onValueChange={(value) => setCoverStyle(value as CoverStyle)}>
-                  <SelectTrigger className="mt-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-80">
-                    <SelectItem value="professional">📊 Professionnel</SelectItem>
-                    <SelectItem value="minimalist">⚪ Minimaliste</SelectItem>
-                    <SelectItem value="artistic">🎨 Artistique</SelectItem>
-                    <SelectItem value="modern">✨ Moderne</SelectItem>
-                    <SelectItem value="vintage">📜 Vintage</SelectItem>
-                    <SelectItem value="fantasy">🧙 Fantasy</SelectItem>
-                    <SelectItem value="thriller">🔪 Thriller</SelectItem>
-                    <SelectItem value="romance">💕 Romance</SelectItem>
-                    <SelectItem value="horror">👻 Horreur</SelectItem>
-                    <SelectItem value="detective">🔍 Policier / Détective</SelectItem>
-                    <SelectItem value="historical">🏰 Historique</SelectItem>
-                    <SelectItem value="literary">📖 Littéraire</SelectItem>
-                    <SelectItem value="comedy">😄 Comédie</SelectItem>
-                    <SelectItem value="adventure">⚔️ Aventure</SelectItem>
-                    <SelectItem value="dystopian">🌆 Dystopie</SelectItem>
-                    <SelectItem value="western">🤠 Western</SelectItem>
-                    <SelectItem value="spiritual">🕊️ Spirituel</SelectItem>
-                    <SelectItem value="cookbook">🍳 Cuisine</SelectItem>
-                  </SelectContent>
-                </Select>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {styleDescriptions[coverStyle]}
-                </p>
-              </div>
-
-              <div>
-                <Label className="text-sm font-medium">Sous-titre (optionnel)</Label>
-                <Input
-                  placeholder="Ex: Guide pratique pour..."
-                  value={subtitle}
-                  onChange={(e) => setSubtitle(e.target.value)}
-                  className="mt-1"
-                />
-              </div>
-            </div>
-
-            {/* Nouvelles options de personnalisation */}
-            <div className="p-4 bg-gradient-to-r from-violet-50 to-purple-50 rounded-xl border border-violet-200 space-y-4">
-              <h4 className="font-semibold text-violet-800 flex items-center gap-2">
-                <PaintBucket className="w-4 h-4" />
-                Personnalisation avancée
-              </h4>
-              
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div>
-                  <Label className="text-sm font-medium flex items-center gap-1.5">
-                    <Type className="w-3.5 h-3.5 text-violet-500" />
-                    Position du titre
-                  </Label>
-                  <Select value={titlePosition} onValueChange={setTitlePosition}>
-                    <SelectTrigger className="mt-1">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="top">📍 En haut</SelectItem>
-                      <SelectItem value="center">📍 Centré</SelectItem>
-                      <SelectItem value="bottom">📍 En bas</SelectItem>
-                      <SelectItem value="overlay">🎬 Superposé à l'image</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label className="text-sm font-medium flex items-center gap-1.5">
-                    <User className="w-3.5 h-3.5 text-violet-500" />
-                    Position nom auteur
-                  </Label>
-                  <Select value={authorNamePosition} onValueChange={setAuthorNamePosition}>
-                    <SelectTrigger className="mt-1">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="bottom">📍 En bas (classique)</SelectItem>
-                      <SelectItem value="top">📍 En haut</SelectItem>
-                      <SelectItem value="below-title">📍 Sous le titre</SelectItem>
-                      <SelectItem value="signature">✍️ Style signature</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label className="text-sm font-medium flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-violet-500" />
-                    Style du nom
-                  </Label>
-                  <Select value={authorNameStyle} onValueChange={setAuthorNameStyle}>
-                    <SelectTrigger className="mt-1">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="elegant">✨ Élégant</SelectItem>
-                      <SelectItem value="bold">💪 Gras impactant</SelectItem>
-                      <SelectItem value="script">✒️ Script manuscrit</SelectItem>
-                      <SelectItem value="minimal">◻️ Minimaliste</SelectItem>
-                      <SelectItem value="serif">📖 Serif classique</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label className="text-sm font-medium flex items-center gap-1.5">
-                    <Palette className="w-3.5 h-3.5 text-violet-500" />
-                    Palette de couleurs
-                  </Label>
-                  <Select value={colorScheme} onValueChange={setColorScheme}>
-                    <SelectTrigger className="mt-1">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="auto">🎯 Automatique (genre)</SelectItem>
-                      <SelectItem value="dark">🌙 Sombre</SelectItem>
-                      <SelectItem value="light">☀️ Clair</SelectItem>
-                      <SelectItem value="warm">🔥 Chaud (rouge/orange/or)</SelectItem>
-                      <SelectItem value="cold">❄️ Froid (bleu/violet)</SelectItem>
-                      <SelectItem value="nature">🌿 Nature (vert/brun)</SelectItem>
-                      <SelectItem value="monochrome">⚫ Monochrome</SelectItem>
-                      <SelectItem value="pastel">🎨 Pastel doux</SelectItem>
-                      <SelectItem value="vibrant">💥 Vibrant / Pop</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="flex items-center space-x-3 pt-6">
-                  <input
-                    type="checkbox"
-                    id="showAuthorOnCover"
-                    checked={showAuthorOnCover}
-                    onChange={(e) => setShowAuthorOnCover(e.target.checked)}
-                    className="w-4 h-4 rounded border-violet-300 text-violet-600 focus:ring-violet-500"
-                  />
-                  <Label htmlFor="showAuthorOnCover" className="text-sm cursor-pointer">
-                    Afficher le nom d'auteur sur la couverture
-                  </Label>
-                </div>
-              </div>
-            </div>
-
-            {coverType === 'full' && (
-              <div className="space-y-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <h4 className="font-medium text-blue-800 flex items-center gap-2">
-                  <BookOpen className="w-4 h-4" />
-                  Options couverture complète
-                </h4>
-                <div>
-                  <Label className="text-sm font-medium">Texte de 4ème de couverture</Label>
-                  <Textarea
-                    placeholder="Résumé du livre, accroche marketing..."
-                    value={backCoverText}
-                    onChange={(e) => setBackCoverText(e.target.value)}
-                    rows={4}
-                    className="mt-1"
-                  />
-                </div>
-                
-                {/* Author Photo Upload */}
-                <div>
-                  <Label className="text-sm font-medium flex items-center gap-2">
-                    <User className="w-4 h-4" />
-                    Photo de l'auteur (optionnel)
-                  </Label>
-                  <p className="text-xs text-muted-foreground mb-2">
-                    Votre photo sera ajoutée sur la 4ème de couverture lors du téléchargement
-                  </p>
-                  
-                  <input
-                    type="file"
-                    ref={authorPhotoInputRef}
-                    accept="image/*"
-                    onChange={handleAuthorPhotoUpload}
-                    className="hidden"
-                  />
-                  
-                  {authorPhoto ? (
-                    <div className="flex items-center gap-3 p-3 bg-white rounded-lg border">
-                      <img 
-                        src={authorPhoto} 
-                        alt="Photo auteur" 
-                        className="w-16 h-16 rounded-full object-cover border-2 border-purple-200"
-                      />
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-green-700">Photo ajoutée ✓</p>
-                        <p className="text-xs text-muted-foreground">Sera intégrée à la couverture</p>
-                      </div>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        onClick={removeAuthorPhoto}
-                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                      >
-                        <X className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  ) : (
-                    <Button
-                      variant="outline"
-                      onClick={() => authorPhotoInputRef.current?.click()}
-                      className="w-full border-dashed"
-                    >
-                      <Upload className="w-4 h-4 mr-2" />
-                      Ajouter votre photo
-                    </Button>
-                  )}
-                </div>
-              </div>
-            )}
-
             <div>
-              <Label className="text-sm font-medium">Personnalisation avancée (optionnel)</Label>
-              <Textarea
-                placeholder="Ex: Avec des éléments de nature, couleurs vertes et bleues, ambiance zen..."
-                value={customPrompt}
-                onChange={(e) => setCustomPrompt(e.target.value)}
-                rows={3}
-                className="mt-1"
+              <h2 className="text-2xl font-bold tracking-tight">Studio de Couverture KDP</h2>
+              <p className="text-purple-200 text-sm">Créez des couvertures photoréalistes dignes des plus grands éditeurs</p>
+            </div>
+            <Badge className="ml-auto bg-amber-500/20 text-amber-300 border border-amber-500/30 backdrop-blur-sm">
+              <Sparkles className="w-3 h-3 mr-1" />
+              IA Pro
+            </Badge>
+          </div>
+        </div>
+      </div>
+
+      {/* Book Identity Card */}
+      <Card className="border-0 shadow-xl bg-gradient-to-br from-white to-slate-50/80 overflow-hidden">
+        <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 h-1" />
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <BookOpen className="w-5 h-5 text-amber-600" />
+            Identité du Livre
+          </CardTitle>
+          <CardDescription>Renseignez les informations de votre livre pour générer la couverture parfaite</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="md:col-span-2">
+              <Label className="text-sm font-semibold text-slate-700">Titre du livre *</Label>
+              <Input
+                value={title}
+                onChange={e => setTitle(e.target.value)}
+                placeholder="Ex: Les Secrets de la Réussite Entrepreneuriale"
+                className="mt-1.5 h-12 text-base font-medium border-2 border-slate-200 focus:border-amber-500 transition-colors"
               />
             </div>
-          </TabsContent>
-
-          {/* Onglet Dimensions KDP */}
-          <TabsContent value="kdp" className="space-y-4">
-            {/* Catégorie Format - Mise en avant Poche */}
-            <div className="p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border border-amber-200">
-              <Label className="text-sm font-semibold text-amber-800 flex items-center gap-2 mb-3">
-                <BookOpen className="w-4 h-4" />
-                Format du livre
-                <Badge className="bg-amber-500 text-white text-[10px] animate-pulse">NOUVEAU : Poche!</Badge>
-              </Label>
-              <Select value={bookFormat} onValueChange={(v) => setBookFormat(v as BookFormat)}>
-                <SelectTrigger className="mt-1 bg-white">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="max-h-[400px]">
-                  {/* 📚 Livres de Poche */}
-                  <div className="px-2 py-1.5 text-xs font-semibold text-amber-700 bg-amber-100 border-b">
-                    📚 LIVRES DE POCHE (Formats français)
-                  </div>
-                  {bookFormats.filter(f => f.category === 'poche').map(format => (
-                    <SelectItem key={format.value} value={format.value} className="ml-2">
-                      {format.label}
-                    </SelectItem>
-                  ))}
-                  
-                  {/* 📕 KDP Standards */}
-                  <div className="px-2 py-1.5 text-xs font-semibold text-purple-700 bg-purple-100 border-b border-t mt-1">
-                    📕 FORMATS KDP STANDARDS
-                  </div>
-                  {bookFormats.filter(f => f.category === 'kdp').map(format => (
-                    <SelectItem key={format.value} value={format.value} className="ml-2">
-                      {format.label}
-                    </SelectItem>
-                  ))}
-                  
-                  {/* 📗 Grands Formats */}
-                  <div className="px-2 py-1.5 text-xs font-semibold text-green-700 bg-green-100 border-b border-t mt-1">
-                    📗 GRANDS FORMATS
-                  </div>
-                  {bookFormats.filter(f => f.category === 'grand').map(format => (
-                    <SelectItem key={format.value} value={format.value} className="ml-2">
-                      {format.label}
-                    </SelectItem>
-                  ))}
+            <div>
+              <Label className="text-sm font-semibold text-slate-700">Sous-titre (optionnel)</Label>
+              <Input
+                value={subtitle}
+                onChange={e => setSubtitle(e.target.value)}
+                placeholder="Ex: Guide pratique en 10 étapes"
+                className="mt-1.5 border-2 border-slate-200 focus:border-amber-500 transition-colors"
+              />
+            </div>
+            <div>
+              <Label className="text-sm font-semibold text-slate-700">Nom de l'auteur *</Label>
+              <Input
+                value={author}
+                onChange={e => setAuthor(e.target.value)}
+                placeholder="Ex: Jean Dupont"
+                className="mt-1.5 border-2 border-slate-200 focus:border-amber-500 transition-colors"
+              />
+            </div>
+            <div>
+              <Label className="text-sm font-semibold text-slate-700">Genre</Label>
+              <Select value={genre} onValueChange={v => setGenre(v as CoverGenre)}>
+                <SelectTrigger className="mt-1.5 border-2 border-slate-200"><SelectValue /></SelectTrigger>
+                <SelectContent>{genreOptions.map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}</SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-sm font-semibold text-slate-700">Style visuel</Label>
+              <Select value={coverStyle} onValueChange={v => setCoverStyle(v as CoverStyle)}>
+                <SelectTrigger className="mt-1.5 border-2 border-slate-200"><SelectValue /></SelectTrigger>
+                <SelectContent className="max-h-80">
+                  <SelectItem value="professional">📊 Professionnel</SelectItem>
+                  <SelectItem value="minimalist">⚪ Minimaliste</SelectItem>
+                  <SelectItem value="artistic">🎨 Artistique</SelectItem>
+                  <SelectItem value="modern">✨ Moderne</SelectItem>
+                  <SelectItem value="vintage">📜 Vintage</SelectItem>
+                  <SelectItem value="fantasy">🧙 Fantasy</SelectItem>
+                  <SelectItem value="thriller">🔪 Thriller</SelectItem>
+                  <SelectItem value="romance">💕 Romance</SelectItem>
+                  <SelectItem value="horror">👻 Horreur</SelectItem>
+                  <SelectItem value="detective">🔍 Policier</SelectItem>
+                  <SelectItem value="historical">🏰 Historique</SelectItem>
+                  <SelectItem value="literary">📖 Littéraire</SelectItem>
+                  <SelectItem value="comedy">😄 Comédie</SelectItem>
+                  <SelectItem value="adventure">⚔️ Aventure</SelectItem>
+                  <SelectItem value="dystopian">🌆 Dystopie</SelectItem>
+                  <SelectItem value="western">🤠 Western</SelectItem>
+                  <SelectItem value="spiritual">🕊️ Spirituel</SelectItem>
+                  <SelectItem value="cookbook">🍳 Cuisine</SelectItem>
+                  <SelectItem value="garden">🌿 Jardin</SelectItem>
                 </SelectContent>
               </Select>
-              
-              {/* Indication du format actuel */}
-              {bookFormats.find(f => f.value === bookFormat)?.category === 'poche' && (
-                <div className="mt-2 p-2 bg-amber-100 rounded-lg border border-amber-300 text-xs text-amber-800">
-                  ✨ <strong>Livre de poche :</strong> Format idéal pour les romans, guides pratiques et livres à emporter. 
-                  Compatible avec l'impression française et européenne.
-                </div>
-              )}
+              <p className="text-xs text-muted-foreground mt-1">{styleDescriptions[coverStyle]}</p>
             </div>
+          </div>
+        </CardContent>
+      </Card>
 
-            <div className="grid md:grid-cols-2 gap-4">
+      {/* AI Prompt Generator */}
+      <Card className="border-0 shadow-xl overflow-hidden bg-gradient-to-br from-violet-50 to-indigo-50">
+        <div className="bg-gradient-to-r from-violet-500 via-purple-500 to-indigo-500 h-1" />
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Lightbulb className="w-5 h-5 text-violet-600" />
+            Directeur Artistique IA
+          </CardTitle>
+          <CardDescription>L'IA analyse votre titre et crée un concept visuel unique pour votre couverture</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Button
+            onClick={generateAiPrompt}
+            disabled={isGeneratingPrompt || !title}
+            className="w-full h-14 text-base font-bold bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-700 hover:via-purple-700 hover:to-indigo-700 text-white shadow-xl shadow-purple-500/25 transition-all"
+            size="lg"
+          >
+            {isGeneratingPrompt ? (
+              <><Loader2 className="h-5 w-5 mr-2 animate-spin" />Création du concept artistique...</>
+            ) : (
+              <><Wand2 className="h-5 w-5 mr-2" />Générer le Prompt de Couverture IA</>
+            )}
+          </Button>
 
-              <div>
-                <Label className="text-sm font-medium">Type de reliure</Label>
-                <Select value={bindingType} onValueChange={(v) => setBindingType(v as BindingType)}>
-                  <SelectTrigger className="mt-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="paperback">📖 Broché (Paperback)</SelectItem>
-                    <SelectItem value="hardcover">📕 Relié (Hardcover)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label className="text-sm font-medium">Nombre de pages</Label>
-                <Input
-                  type="number"
-                  min={24}
-                  max={828}
-                  value={pageCount}
-                  onChange={(e) => setPageCount(Math.max(24, Math.min(828, parseInt(e.target.value) || 24)))}
-                  className="mt-1"
-                />
-                <p className="text-xs text-muted-foreground mt-1">
-                  KDP: minimum 24 pages, maximum 828 pages
-                </p>
-              </div>
-
-              <div>
-                <Label className="text-sm font-medium">Type de papier</Label>
-                <Select value={paperType} onValueChange={(v) => setPaperType(v as PaperType)}>
-                  <SelectTrigger className="mt-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="white">⬜ Papier blanc</SelectItem>
-                    <SelectItem value="cream">🟨 Papier crème</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            {/* Calcul des dimensions */}
-            <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-4 border border-purple-200">
-              <h4 className="font-semibold text-purple-800 flex items-center gap-2 mb-3">
-                <Ruler className="w-4 h-4" />
-                Dimensions calculées pour KDP
-              </h4>
-              
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                <div className="bg-white rounded-lg p-3 shadow-sm">
-                  <p className="text-muted-foreground text-xs">Largeur tranche</p>
-                  <p className="font-bold text-purple-700">{spineWidth.toFixed(3)}"</p>
-                  <p className="text-xs text-muted-foreground">{(spineWidth * 25.4).toFixed(1)} mm</p>
+          {aiPromptResult && (
+            <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              {/* Concept Header */}
+              <div className="bg-white rounded-xl p-5 border border-violet-200 shadow-sm">
+                <div className="flex items-start justify-between mb-3">
+                  <div>
+                    <h4 className="font-bold text-violet-900 text-lg">{aiPromptResult.conceptTitle}</h4>
+                    <p className="text-sm text-violet-600 mt-1">{aiPromptResult.promptFr}</p>
+                  </div>
+                  <Badge className="bg-violet-100 text-violet-700 border-violet-200">Concept IA</Badge>
                 </div>
                 
-                <div className="bg-white rounded-lg p-3 shadow-sm">
-                  <p className="text-muted-foreground text-xs">Hauteur totale</p>
-                  <p className="font-bold text-purple-700">{coverDimensions.heightIn.toFixed(3)}"</p>
-                  <p className="text-xs text-muted-foreground">{coverDimensions.heightPx} px</p>
-                </div>
-                
-                <div className="bg-white rounded-lg p-3 shadow-sm">
-                  <p className="text-muted-foreground text-xs">Largeur totale</p>
-                  <p className="font-bold text-purple-700">{coverDimensions.totalWidthIn.toFixed(3)}"</p>
-                  <p className="text-xs text-muted-foreground">{coverDimensions.totalWidthPx} px</p>
-                </div>
-
-                <div className="bg-white rounded-lg p-3 shadow-sm">
-                  <p className="text-muted-foreground text-xs">Fond perdu</p>
-                  <p className="font-bold text-purple-700">{BLEED}" (3.175 mm)</p>
-                  <p className="text-xs text-muted-foreground">sur tous les côtés</p>
-                </div>
-              </div>
-
-              <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <p className="text-xs text-yellow-800 flex items-start gap-2">
-                  <Info className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                  <span>
-                    <strong>Formule KDP tranche :</strong> Papier blanc = pages × 0.002252" | Papier crème = pages × 0.0025"
-                    <br />Pour {pageCount} pages en papier {paperType === 'white' ? 'blanc' : 'crème'} = <strong>{spineWidth.toFixed(4)}"</strong>
-                  </span>
-                </p>
-              </div>
-            </div>
-
-            {/* Schéma visuel */}
-            <div className="bg-gray-50 rounded-xl p-4 border">
-              <h4 className="font-medium text-gray-700 mb-3">Schéma de la couverture complète</h4>
-              <div className="flex items-center justify-center gap-0 h-32">
-                <div className="h-full bg-blue-100 border-2 border-blue-300 rounded-l-lg flex items-center justify-center px-4" 
-                     style={{ width: '35%' }}>
-                  <span className="text-xs text-blue-700 font-medium text-center">
-                    4ème de couverture<br/>
-                    {currentFormat.width}" + fond perdu
-                  </span>
-                </div>
-                <div className="h-full bg-purple-200 border-y-2 border-purple-400 flex items-center justify-center"
-                     style={{ width: '10%', minWidth: '40px' }}>
-                  <span className="text-xs text-purple-700 font-medium writing-mode-vertical" style={{ writingMode: 'vertical-rl' }}>
-                    Tranche {spineWidth.toFixed(2)}"
-                  </span>
-                </div>
-                <div className="h-full bg-green-100 border-2 border-green-300 rounded-r-lg flex items-center justify-center px-4"
-                     style={{ width: '35%' }}>
-                  <span className="text-xs text-green-700 font-medium text-center">
-                    Couverture avant<br/>
-                    {currentFormat.width}" + fond perdu
-                  </span>
-                </div>
-              </div>
-              <p className="text-xs text-center text-muted-foreground mt-2">
-                Hauteur totale: {currentFormat.height}" + {BLEED * 2}" fond perdu = {coverDimensions.heightIn}"
-              </p>
-            </div>
-          </TabsContent>
-
-          {/* Onglet Aperçu */}
-          <TabsContent value="preview" className="space-y-4">
-            {/* Boutons de génération */}
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Button 
-                onClick={generateCover}
-                disabled={isGenerating || !ebookTitle}
-                className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg text-white h-12 text-base font-semibold"
-                size="lg"
-              >
-                {isGenerating ? (
-                  <>
-                    <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                    Génération IA en cours...
-                  </>
-                ) : (
-                  <>
-                    <Wand2 className="h-5 w-5 mr-2" />
-                    {generatedCovers.length > 0 ? `Nouvelle variante (${generatedCovers.length + 1})` : `Générer ${coverType === 'full' ? 'couverture complète' : 'couverture avant'}`}
-                  </>
-                )}
-              </Button>
-
-              {generatedCovers.length > 0 && (
-                <Button 
-                  onClick={() => { setGeneratedCovers([]); setSelectedCover(0); setVariation(1); }}
-                  variant="outline"
-                  className="h-12"
-                >
-                  <RefreshCw className="h-4 w-4 mr-2" />
-                  Reset galerie
-                </Button>
-              )}
-            </div>
-
-            {/* Info dimensions compacte */}
-            <div className="flex flex-wrap gap-2 text-xs">
-              <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
-                📐 {currentFormat.label}
-              </Badge>
-              <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
-                📄 {pageCount} pages ({paperType === 'white' ? 'blanc' : 'crème'})
-              </Badge>
-              <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
-                📏 Tranche: {spineWidth.toFixed(3)}"
-              </Badge>
-              {coverType === 'full' && (
-                <Badge variant="outline" className="bg-pink-50 text-pink-700 border-pink-200">
-                  📚 Couverture complète
-                </Badge>
-              )}
-            </div>
-
-            {currentCover ? (
-              <div className="space-y-6">
-                {/* Aperçu principal - Mockup 3D + Image pleine */}
-                <div className="grid lg:grid-cols-2 gap-6">
-                  {/* Mockup 3D */}
-                  <div className="flex flex-col items-center justify-center p-8 bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 rounded-2xl border shadow-inner min-h-[420px]">
-                    <div 
-                      style={{ 
-                        perspective: '1200px',
-                        perspectiveOrigin: '50% 40%'
-                      }}
-                    >
-                      <div 
-                        style={{
-                          position: 'relative',
-                          transformStyle: 'preserve-3d',
-                          transform: 'rotateY(-28deg) rotateX(3deg)',
-                          transition: 'transform 0.5s ease',
-                        }}
-                        className="hover:[transform:rotateY(-8deg)_rotateX(2deg)] cursor-pointer"
-                      >
-                        {/* Front cover */}
-                        <div 
-                          style={{
-                            width: '260px',
-                            height: '380px',
-                            position: 'relative',
-                            transformStyle: 'preserve-3d',
-                            transform: 'translateZ(15px)',
-                            borderRadius: '0 6px 6px 0',
-                            overflow: 'hidden',
-                            boxShadow: '0 25px 50px rgba(0,0,0,0.25), 0 10px 20px rgba(0,0,0,0.15), inset 0 0 0 1px rgba(255,255,255,0.1)'
-                          }}
-                        >
-                          <img 
-                            src={currentCover} 
-                            alt="Couverture KDP"
-                            className="w-full h-full object-cover"
-                          />
-                          {/* Reflet brillant */}
-                          <div 
-                            className="absolute inset-0 pointer-events-none"
-                            style={{
-                              background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 40%, transparent 60%, rgba(255,255,255,0.05) 100%)',
-                            }}
-                          />
-                        </div>
-
-                        {/* Spine */}
-                        <div 
-                          style={{
-                            position: 'absolute',
-                            top: 0,
-                            left: 0,
-                            width: '30px',
-                            height: '380px',
-                            background: 'linear-gradient(to right, #1a1a2e, #2d2d44, #1a1a2e)',
-                            transform: 'rotateY(-90deg) translateX(-15px)',
-                            transformOrigin: 'left center',
-                            borderRadius: '6px 0 0 6px',
-                          }}
-                        />
-
-                        {/* Pages (right edge) */}
-                        <div 
-                          style={{
-                            position: 'absolute',
-                            top: '4px',
-                            right: '-12px',
-                            width: '24px',
-                            height: '372px',
-                            background: 'repeating-linear-gradient(to right, #fafaf8, #f5f5f0 1px, #fafaf8 1px, #fafaf8 3px)',
-                            transform: 'rotateY(90deg) translateX(12px)',
-                            transformOrigin: 'left center',
-                            borderRadius: '0 3px 3px 0',
-                            boxShadow: 'inset -2px 0 4px rgba(0,0,0,0.05)',
-                          }}
-                        />
-
-                        {/* Bottom edge shadow */}
-                        <div 
-                          style={{
-                            position: 'absolute',
-                            bottom: 0,
-                            left: 0,
-                            width: '260px',
-                            height: '5px',
-                            background: 'linear-gradient(to right, #2d2d44, #3d3d55, #2d2d44)',
-                            transform: 'rotateX(-90deg) translateY(2.5px)',
-                            transformOrigin: 'bottom center',
-                          }}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Shadow beneath book */}
-                    <div 
-                      className="mt-4"
-                      style={{
-                        width: '180px',
-                        height: '20px',
-                        background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.15) 0%, transparent 70%)',
-                        filter: 'blur(8px)',
-                      }}
-                    />
-                    <p className="text-xs text-muted-foreground mt-2 italic">Survolez pour faire pivoter</p>
-                  </div>
-
-                  {/* Image pleine résolution */}
-                  <div className="space-y-3">
-                    <div className="rounded-2xl overflow-hidden shadow-2xl border-2 border-white ring-1 ring-black/5">
-                      <img 
-                        src={currentCover} 
-                        alt="Couverture générée haute résolution"
-                        className="w-full h-auto block"
-                      />
-                    </div>
-                    
-                    {/* Actions de téléchargement */}
-                    <div className="grid grid-cols-2 gap-2">
-                      <Button 
-                        onClick={() => downloadCover('jpeg')}
-                        className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-md"
-                      >
-                        <Download className="h-4 w-4 mr-2" />
-                        JPEG HD
-                      </Button>
-                      <Button 
-                        onClick={() => downloadCover('pdf')}
-                        className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white shadow-md"
-                      >
-                        <FileText className="h-4 w-4 mr-2" />
-                        PDF KDP
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Galerie des variantes */}
-                {generatedCovers.length > 1 && (
-                  <div className="space-y-2">
-                    <h4 className="text-sm font-semibold text-purple-800 flex items-center gap-2">
-                      <ImageIcon className="w-4 h-4" />
-                      Galerie des variantes ({generatedCovers.length})
-                    </h4>
-                    <div className="flex gap-3 overflow-x-auto pb-3 pt-1 px-1">
-                      {generatedCovers.map((cover, idx) => (
-                        <button
-                          key={idx}
-                          onClick={() => setSelectedCover(idx)}
-                          className={`flex-shrink-0 rounded-xl overflow-hidden border-2 transition-all duration-200 hover:scale-105 ${
-                            selectedCover === idx 
-                              ? 'border-purple-500 ring-2 ring-purple-300 shadow-lg scale-105' 
-                              : 'border-gray-200 hover:border-purple-300 shadow-sm'
-                          }`}
-                          style={{ width: '80px', height: '120px' }}
-                        >
-                          <img src={cover} alt={`Variante ${idx + 1}`} className="w-full h-full object-cover" />
-                        </button>
+                {/* Moodboard & Colors */}
+                <div className="grid md:grid-cols-2 gap-4 mt-4">
+                  <div>
+                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Moodboard</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {aiPromptResult.moodboard?.map((word, i) => (
+                        <Badge key={i} variant="outline" className="bg-violet-50 text-violet-700 border-violet-200 text-xs">{word}</Badge>
                       ))}
                     </div>
                   </div>
+                  <div>
+                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Palette</p>
+                    <div className="flex gap-2">
+                      {aiPromptResult.colorPalette?.map((color, i) => (
+                        <div key={i} className="flex flex-col items-center gap-1">
+                          <div className="w-8 h-8 rounded-lg shadow-sm border border-white" style={{ backgroundColor: color }} />
+                          <span className="text-[10px] text-slate-400">{color}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Photography & Lighting */}
+                <div className="grid md:grid-cols-2 gap-3 mt-4 pt-4 border-t border-violet-100">
+                  <div className="flex items-start gap-2">
+                    <Camera className="w-4 h-4 text-violet-400 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-xs font-semibold text-slate-500">Style photo</p>
+                      <p className="text-sm text-slate-700">{aiPromptResult.photographyStyle}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Sparkles className="w-4 h-4 text-amber-400 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-xs font-semibold text-slate-500">Éclairage</p>
+                      <p className="text-sm text-slate-700">{aiPromptResult.lightingSetup}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Generated Prompt */}
+              <div className="relative">
+                <Label className="text-sm font-semibold text-slate-700 mb-1.5 flex items-center gap-2">
+                  <Type className="w-4 h-4 text-violet-500" />
+                  Prompt de couverture (modifiable)
+                </Label>
+                <Textarea
+                  value={customPrompt}
+                  onChange={e => setCustomPrompt(e.target.value)}
+                  rows={6}
+                  className="mt-1 text-sm font-mono bg-slate-900 text-green-300 border-slate-700 rounded-xl"
+                />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={copyPrompt}
+                  className="absolute top-8 right-2 text-slate-400 hover:text-white hover:bg-slate-700"
+                >
+                  {promptCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {!aiPromptResult && (
+            <div className="relative">
+              <Label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                <Type className="w-4 h-4 text-violet-500" />
+                Prompt personnalisé (optionnel)
+              </Label>
+              <Textarea
+                value={customPrompt}
+                onChange={e => setCustomPrompt(e.target.value)}
+                placeholder="Ex: Fond doré élégant avec des motifs géométriques, ambiance luxueuse et sophistiquée..."
+                rows={3}
+                className="mt-1.5"
+              />
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Main Tabs */}
+      <Card className="border-0 shadow-xl overflow-hidden">
+        <CardContent className="p-0">
+          <Tabs defaultValue="settings" className="w-full">
+            <TabsList className="grid grid-cols-3 w-full rounded-none bg-slate-100 h-12">
+              <TabsTrigger value="settings" className="text-sm font-medium">⚙️ Paramètres</TabsTrigger>
+              <TabsTrigger value="kdp" className="text-sm font-medium">📐 Dimensions KDP</TabsTrigger>
+              <TabsTrigger value="preview" className="text-sm font-medium">👁️ Aperçu & Export</TabsTrigger>
+            </TabsList>
+            
+            {/* Settings Tab */}
+            <TabsContent value="settings" className="p-6 space-y-5">
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-sm font-medium">Type de couverture</Label>
+                  <Select value={coverType} onValueChange={v => setCoverType(v as CoverType)}>
+                    <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="front">📖 Couverture avant seule</SelectItem>
+                      <SelectItem value="full">📚 Complète (avant + tranche + dos)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium">Palette de couleurs</Label>
+                  <Select value={colorScheme} onValueChange={setColorScheme}>
+                    <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="auto">🎯 Automatique</SelectItem>
+                      <SelectItem value="dark">🌙 Sombre</SelectItem>
+                      <SelectItem value="light">☀️ Clair</SelectItem>
+                      <SelectItem value="warm">🔥 Chaud</SelectItem>
+                      <SelectItem value="cold">❄️ Froid</SelectItem>
+                      <SelectItem value="nature">🌿 Nature</SelectItem>
+                      <SelectItem value="monochrome">⚫ Monochrome</SelectItem>
+                      <SelectItem value="pastel">🎨 Pastel</SelectItem>
+                      <SelectItem value="vibrant">💥 Vibrant</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {/* Typography Controls */}
+              <div className="p-4 bg-gradient-to-r from-slate-50 to-slate-100 rounded-xl border space-y-4">
+                <h4 className="font-semibold text-slate-700 flex items-center gap-2">
+                  <PaintBucket className="w-4 h-4 text-slate-500" />
+                  Typographie & Positionnement
+                </h4>
+                <div className="grid md:grid-cols-3 gap-4">
+                  <div>
+                    <Label className="text-xs font-medium">Position du titre</Label>
+                    <Select value={titlePosition} onValueChange={setTitlePosition}>
+                      <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="top">📍 En haut</SelectItem>
+                        <SelectItem value="center">📍 Centré</SelectItem>
+                        <SelectItem value="bottom">📍 En bas</SelectItem>
+                        <SelectItem value="overlay">🎬 Superposé</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label className="text-xs font-medium">Position nom auteur</Label>
+                    <Select value={authorNamePosition} onValueChange={setAuthorNamePosition}>
+                      <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="bottom">📍 En bas</SelectItem>
+                        <SelectItem value="top">📍 En haut</SelectItem>
+                        <SelectItem value="below-title">📍 Sous le titre</SelectItem>
+                        <SelectItem value="signature">✍️ Signature</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label className="text-xs font-medium">Style du nom</Label>
+                    <Select value={authorNameStyle} onValueChange={setAuthorNameStyle}>
+                      <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="elegant">✨ Élégant</SelectItem>
+                        <SelectItem value="bold">💪 Gras</SelectItem>
+                        <SelectItem value="script">✒️ Script</SelectItem>
+                        <SelectItem value="minimal">◻️ Minimal</SelectItem>
+                        <SelectItem value="serif">📖 Serif</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <input type="checkbox" id="showAuthor" checked={showAuthorOnCover} onChange={e => setShowAuthorOnCover(e.target.checked)} className="w-4 h-4 rounded border-slate-300 text-violet-600 focus:ring-violet-500" />
+                  <Label htmlFor="showAuthor" className="text-sm cursor-pointer">Afficher le nom d'auteur sur la couverture</Label>
+                </div>
+              </div>
+
+              {coverType === 'full' && (
+                <div className="space-y-4 p-4 bg-blue-50 rounded-xl border border-blue-200">
+                  <h4 className="font-medium text-blue-800 flex items-center gap-2"><BookOpen className="w-4 h-4" />Options couverture complète</h4>
+                  <div>
+                    <Label className="text-sm font-medium">Texte de 4ème de couverture</Label>
+                    <Textarea placeholder="Résumé, accroche marketing..." value={backCoverText} onChange={e => setBackCoverText(e.target.value)} rows={4} className="mt-1" />
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium flex items-center gap-2"><User className="w-4 h-4" />Photo de l'auteur (optionnel)</Label>
+                    <input type="file" ref={authorPhotoInputRef} accept="image/*" onChange={handleAuthorPhotoUpload} className="hidden" />
+                    {authorPhoto ? (
+                      <div className="flex items-center gap-3 p-3 bg-white rounded-lg border mt-2">
+                        <img src={authorPhoto} alt="Auteur" className="w-16 h-16 rounded-full object-cover border-2 border-purple-200" />
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-green-700">Photo ajoutée ✓</p>
+                        </div>
+                        <Button variant="ghost" size="sm" onClick={removeAuthorPhoto} className="text-red-500 hover:text-red-700"><X className="w-4 h-4" /></Button>
+                      </div>
+                    ) : (
+                      <Button variant="outline" onClick={() => authorPhotoInputRef.current?.click()} className="w-full border-dashed mt-2"><Upload className="w-4 h-4 mr-2" />Ajouter votre photo</Button>
+                    )}
+                  </div>
+                </div>
+              )}
+            </TabsContent>
+
+            {/* KDP Dimensions Tab */}
+            <TabsContent value="kdp" className="p-6 space-y-4">
+              <div className="p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border border-amber-200">
+                <Label className="text-sm font-semibold text-amber-800 flex items-center gap-2 mb-3"><BookOpen className="w-4 h-4" />Format du livre</Label>
+                <Select value={bookFormat} onValueChange={v => setBookFormat(v as BookFormat)}>
+                  <SelectTrigger className="bg-white"><SelectValue /></SelectTrigger>
+                  <SelectContent className="max-h-[400px]">
+                    <div className="px-2 py-1.5 text-xs font-semibold text-amber-700 bg-amber-100 border-b">📚 LIVRES DE POCHE</div>
+                    {bookFormats.filter(f => f.category === 'poche').map(f => <SelectItem key={f.value} value={f.value}>{f.label}</SelectItem>)}
+                    <div className="px-2 py-1.5 text-xs font-semibold text-purple-700 bg-purple-100 border-b border-t mt-1">📕 FORMATS KDP STANDARDS</div>
+                    {bookFormats.filter(f => f.category === 'kdp').map(f => <SelectItem key={f.value} value={f.value}>{f.label}</SelectItem>)}
+                    <div className="px-2 py-1.5 text-xs font-semibold text-green-700 bg-green-100 border-b border-t mt-1">📗 GRANDS FORMATS</div>
+                    {bookFormats.filter(f => f.category === 'grand').map(f => <SelectItem key={f.value} value={f.value}>{f.label}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-4">
+                <div>
+                  <Label className="text-sm font-medium">Reliure</Label>
+                  <Select value={bindingType} onValueChange={v => setBindingType(v as BindingType)}>
+                    <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="paperback">📖 Broché</SelectItem>
+                      <SelectItem value="hardcover">📕 Relié</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium">Pages</Label>
+                  <Input type="number" min={24} max={828} value={pageCount} onChange={e => setPageCount(Math.max(24, Math.min(828, parseInt(e.target.value) || 24)))} className="mt-1" />
+                </div>
+                <div>
+                  <Label className="text-sm font-medium">Papier</Label>
+                  <Select value={paperType} onValueChange={v => setPaperType(v as PaperType)}>
+                    <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="white">⬜ Blanc</SelectItem>
+                      <SelectItem value="cream">🟨 Crème</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {/* Calculated dimensions */}
+              <div className="bg-gradient-to-r from-slate-50 to-slate-100 rounded-xl p-4 border">
+                <h4 className="font-semibold text-slate-700 flex items-center gap-2 mb-3"><Ruler className="w-4 h-4" />Dimensions calculées</h4>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                  {[
+                    { label: 'Tranche', val: `${spineWidth.toFixed(3)}"`, sub: `${(spineWidth * 25.4).toFixed(1)} mm` },
+                    { label: 'Hauteur', val: `${coverDimensions.heightIn.toFixed(3)}"`, sub: `${coverDimensions.heightPx} px` },
+                    { label: 'Largeur totale', val: `${coverDimensions.totalWidthIn.toFixed(3)}"`, sub: `${coverDimensions.totalWidthPx} px` },
+                    { label: 'Fond perdu', val: `${BLEED}" (3.175mm)`, sub: 'tous les côtés' },
+                  ].map((d, i) => (
+                    <div key={i} className="bg-white rounded-lg p-3 shadow-sm">
+                      <p className="text-muted-foreground text-xs">{d.label}</p>
+                      <p className="font-bold text-slate-800">{d.val}</p>
+                      <p className="text-xs text-muted-foreground">{d.sub}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Visual schema */}
+              <div className="bg-white rounded-xl p-4 border">
+                <h4 className="font-medium text-slate-600 mb-3">Schéma de la couverture</h4>
+                <div className="flex items-center justify-center gap-0 h-28">
+                  <div className="h-full bg-blue-100 border-2 border-blue-300 rounded-l-lg flex items-center justify-center px-4" style={{ width: '35%' }}>
+                    <span className="text-xs text-blue-700 font-medium text-center">4ème de couverture</span>
+                  </div>
+                  <div className="h-full bg-purple-200 border-y-2 border-purple-400 flex items-center justify-center" style={{ width: '10%', minWidth: '35px' }}>
+                    <span className="text-[10px] text-purple-700 font-medium" style={{ writingMode: 'vertical-rl' }}>Tranche</span>
+                  </div>
+                  <div className="h-full bg-green-100 border-2 border-green-300 rounded-r-lg flex items-center justify-center px-4" style={{ width: '35%' }}>
+                    <span className="text-xs text-green-700 font-medium text-center">Couverture avant</span>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+
+            {/* Preview & Export Tab */}
+            <TabsContent value="preview" className="p-6 space-y-4">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Button
+                  onClick={generateCover}
+                  disabled={isGenerating || !title}
+                  className="flex-1 h-14 text-base font-bold bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 hover:from-amber-600 hover:via-orange-600 hover:to-red-600 text-white shadow-xl shadow-orange-500/25"
+                  size="lg"
+                >
+                  {isGenerating ? (
+                    <><Loader2 className="h-5 w-5 mr-2 animate-spin" />Génération en cours...</>
+                  ) : (
+                    <><Wand2 className="h-5 w-5 mr-2" />{generatedCovers.length > 0 ? `Nouvelle variante (${generatedCovers.length + 1})` : 'Générer la Couverture'}</>
+                  )}
+                </Button>
+                {generatedCovers.length > 0 && (
+                  <Button onClick={() => { setGeneratedCovers([]); setSelectedCover(0); setVariation(1); }} variant="outline" className="h-14">
+                    <RefreshCw className="h-4 w-4 mr-2" />Reset
+                  </Button>
                 )}
               </div>
-            ) : (
-              <div className="border-2 border-dashed border-purple-200 rounded-2xl h-96 flex flex-col items-center justify-center bg-gradient-to-br from-purple-50/50 to-pink-50/50">
-                <div className="w-20 h-20 rounded-full bg-purple-100 flex items-center justify-center mb-4">
-                  <ImageIcon className="w-10 h-10 text-purple-300" />
-                </div>
-                <p className="text-muted-foreground text-center font-medium">
-                  Votre couverture professionnelle apparaîtra ici
-                </p>
-                <p className="text-xs text-muted-foreground mt-2">
-                  {coverType === 'full' 
-                    ? `${coverDimensions.totalWidthPx} × ${coverDimensions.heightPx} px • Couverture complète`
-                    : `${coverDimensions.frontWidthPx} × ${coverDimensions.heightPx} px • Couverture avant`
-                  }
-                </p>
-                <p className="text-xs text-purple-400 mt-1">Qualité impression 300 DPI</p>
+
+              {/* Dimension badges */}
+              <div className="flex flex-wrap gap-2 text-xs">
+                <Badge variant="outline" className="bg-slate-50">📐 {currentFormat.label}</Badge>
+                <Badge variant="outline" className="bg-slate-50">📄 {pageCount} pages</Badge>
+                <Badge variant="outline" className="bg-slate-50">📏 Tranche: {spineWidth.toFixed(3)}"</Badge>
+                {coverType === 'full' && <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200">📚 Complète</Badge>}
               </div>
-            )}
-          </TabsContent>
-        </Tabs>
-      </CardContent>
-    </Card>
+
+              {currentCover ? (
+                <div className="space-y-6">
+                  <div className="grid lg:grid-cols-2 gap-6">
+                    {/* 3D Mockup */}
+                    <div className="flex flex-col items-center justify-center p-8 bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 rounded-2xl border shadow-inner min-h-[420px]">
+                      <div style={{ perspective: '1200px', perspectiveOrigin: '50% 40%' }}>
+                        <div
+                          style={{ position: 'relative', transformStyle: 'preserve-3d', transform: 'rotateY(-28deg) rotateX(3deg)', transition: 'transform 0.5s ease' }}
+                          className="hover:[transform:rotateY(-8deg)_rotateX(2deg)] cursor-pointer"
+                        >
+                          <div style={{ width: '260px', height: '380px', position: 'relative', transformStyle: 'preserve-3d', transform: 'translateZ(15px)', borderRadius: '0 6px 6px 0', overflow: 'hidden', boxShadow: '0 25px 50px rgba(0,0,0,0.25), 0 10px 20px rgba(0,0,0,0.15)' }}>
+                            <img src={currentCover} alt="Couverture KDP" className="w-full h-full object-cover" />
+                            <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 40%, transparent 60%, rgba(255,255,255,0.05) 100%)' }} />
+                          </div>
+                          <div style={{ position: 'absolute', top: 0, left: 0, width: '30px', height: '380px', background: 'linear-gradient(to right, #1a1a2e, #2d2d44, #1a1a2e)', transform: 'rotateY(-90deg) translateX(-15px)', transformOrigin: 'left center', borderRadius: '6px 0 0 6px' }} />
+                          <div style={{ position: 'absolute', top: '4px', right: '-12px', width: '24px', height: '372px', background: 'repeating-linear-gradient(to right, #fafaf8, #f5f5f0 1px, #fafaf8 1px, #fafaf8 3px)', transform: 'rotateY(90deg) translateX(12px)', transformOrigin: 'left center', borderRadius: '0 3px 3px 0' }} />
+                          <div style={{ position: 'absolute', bottom: 0, left: 0, width: '260px', height: '5px', background: 'linear-gradient(to right, #2d2d44, #3d3d55, #2d2d44)', transform: 'rotateX(-90deg) translateY(2.5px)', transformOrigin: 'bottom center' }} />
+                        </div>
+                      </div>
+                      <div className="mt-4" style={{ width: '180px', height: '20px', background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.15) 0%, transparent 70%)', filter: 'blur(8px)' }} />
+                      <p className="text-xs text-muted-foreground mt-2 italic">Survolez pour pivoter</p>
+                    </div>
+
+                    {/* Full resolution + downloads */}
+                    <div className="space-y-3">
+                      <div className="rounded-2xl overflow-hidden shadow-2xl border-2 border-white ring-1 ring-black/5">
+                        <img src={currentCover} alt="Couverture HD" className="w-full h-auto block" />
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button onClick={() => downloadCover('jpeg')} className="bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md">
+                          <Download className="h-4 w-4 mr-2" />JPEG HD
+                        </Button>
+                        <Button onClick={() => downloadCover('pdf')} className="bg-gradient-to-r from-red-500 to-red-600 text-white shadow-md">
+                          <FileText className="h-4 w-4 mr-2" />PDF KDP
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Gallery */}
+                  {generatedCovers.length > 1 && (
+                    <div className="space-y-2">
+                      <h4 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                        <ImageIcon className="w-4 h-4" />Galerie ({generatedCovers.length} variantes)
+                      </h4>
+                      <div className="flex gap-3 overflow-x-auto pb-3 pt-1 px-1">
+                        {generatedCovers.map((cover, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => setSelectedCover(idx)}
+                            className={`flex-shrink-0 rounded-xl overflow-hidden border-2 transition-all hover:scale-105 ${selectedCover === idx ? 'border-orange-500 ring-2 ring-orange-300 shadow-lg scale-105' : 'border-gray-200 hover:border-orange-300 shadow-sm'}`}
+                            style={{ width: '80px', height: '120px' }}
+                          >
+                            <img src={cover} alt={`Variante ${idx + 1}`} className="w-full h-full object-cover" />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="border-2 border-dashed border-slate-200 rounded-2xl h-96 flex flex-col items-center justify-center bg-gradient-to-br from-slate-50/50 to-orange-50/30">
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-amber-100 to-orange-100 flex items-center justify-center mb-4">
+                    <ImageIcon className="w-10 h-10 text-amber-400" />
+                  </div>
+                  <p className="text-muted-foreground text-center font-medium">Votre couverture professionnelle apparaîtra ici</p>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    {coverType === 'full'
+                      ? `${coverDimensions.totalWidthPx} × ${coverDimensions.heightPx} px • Complète`
+                      : `${coverDimensions.frontWidthPx} × ${coverDimensions.heightPx} px • Avant`
+                    }
+                  </p>
+                  <p className="text-xs text-amber-500 mt-1">Qualité impression 300 DPI</p>
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
