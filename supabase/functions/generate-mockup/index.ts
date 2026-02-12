@@ -7,21 +7,18 @@ const corsHeaders = {
 };
 
 const poseDescriptions: Record<string, string> = {
-  // Device poses
   'ipad-straight': 'a modern Apple iPad Pro (silver, thin bezels) held perfectly straight, facing the camera head-on, on a clean surface, the screen displays the image',
   'ipad-tilted-left': 'a modern Apple iPad Pro tilted 30 degrees to the left, showing a 3/4 perspective view from the right side, the screen displays the image clearly',
   'ipad-tilted-right': 'a modern Apple iPad Pro tilted 30 degrees to the right, showing a 3/4 perspective view from the left side, the screen displays the image clearly',
   'kindle-straight': 'an Amazon Kindle Paperwhite e-reader lying flat on a surface, front-facing view, the screen displays the image',
   'macbook-screen': 'a MacBook Pro laptop opened at 110 degrees on a minimalist desk, the screen displays the image in full',
   'iphone-stand': 'an Apple iPhone 15 Pro standing upright in a sleek phone stand, the screen displays the image',
-  // Book poses
   'ebook-floating': 'a realistic 3D hardcover book floating in mid-air at a slight angle, with the image as the front cover, soft shadow below, dramatic lighting',
   'ebook-tilted-left': 'a realistic 3D hardcover book tilted 25 degrees to the left, showing the front cover and spine, the image is the front cover, perspective view from the right',
   'ebook-tilted-right': 'a realistic 3D hardcover book tilted 25 degrees to the right, showing the front cover and spine, the image is the front cover, perspective view from the left',
   'book-3d-standing': 'a realistic 3D hardcover book standing upright on a surface, front cover facing camera with visible spine and page edges on the right side, the image is the cover',
   'book-3d-floating': 'a realistic 3D hardcover book floating at a dynamic 45-degree angle with dramatic shadow and rim lighting below, the image is the front cover',
   'book-open-flat': 'a printed book lying flat on a marble surface, top-down bird\'s eye view, the image is displayed as the book cover',
-  // Creative
   'multi-device': 'multiple devices arranged together - an iPad, iPhone, and MacBook - all displaying the same image on their screens, professional product photography arrangement',
   'book-stack': 'a stack of 3 identical hardcover books with the image as the cover, the top book slightly offset, on a clean surface with soft lighting',
 };
@@ -55,10 +52,10 @@ serve(async (req) => {
       );
     }
 
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) {
+    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+    if (!OPENAI_API_KEY) {
       return new Response(
-        JSON.stringify({ error: 'Clé API non configurée' }),
+        JSON.stringify({ error: 'Clé API OpenAI non configurée' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -79,61 +76,44 @@ Technical requirements:
 - The mockup must look completely photorealistic - indistinguishable from a real product photo
 - High-end commercial quality, suitable for Amazon KDP listings and professional marketing`;
 
-    console.log('Generating mockup:', { pose, viewMode });
+    console.log('Generating mockup with OpenAI:', { pose, viewMode });
 
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    const response = await fetch('https://api.openai.com/v1/images/edits', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
       },
-      body: JSON.stringify({
-        model: 'google/gemini-3-pro-image-preview',
-        messages: [
-          {
-            role: 'user',
-            content: [
-              { type: 'text', text: prompt },
-              {
-                type: 'image_url',
-                image_url: { url: imageBase64 }
-              }
-            ]
-          }
-        ],
-        modalities: ['image', 'text']
-      }),
+      body: await buildFormData(imageBase64, prompt),
     });
 
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error('OpenAI error:', response.status, errorText);
       if (response.status === 429) {
         return new Response(
           JSON.stringify({ error: 'Limite de requêtes atteinte. Réessayez dans quelques instants.' }),
           { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
-      if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ error: 'Crédits épuisés. Ajoutez des crédits à votre espace Lovable.' }),
-          { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-      const errorText = await response.text();
-      console.error('Lovable AI error:', response.status, errorText);
-      throw new Error(`Erreur API: ${response.status}`);
+      throw new Error(`Erreur API OpenAI: ${response.status}`);
     }
 
     const data = await response.json();
-    const mockupUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+    const mockupUrl = data.data?.[0]?.url || data.data?.[0]?.b64_json;
 
     if (!mockupUrl) {
       throw new Error('Aucune image générée');
     }
 
-    console.log('Mockup generated successfully');
+    // If b64_json, convert to data URL
+    const finalUrl = data.data?.[0]?.b64_json 
+      ? `data:image/png;base64,${data.data[0].b64_json}`
+      : mockupUrl;
+
+    console.log('Mockup generated successfully with OpenAI');
 
     return new Response(
-      JSON.stringify({ mockupUrl }),
+      JSON.stringify({ mockupUrl: finalUrl }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
@@ -144,3 +124,27 @@ Technical requirements:
     );
   }
 });
+
+async function buildFormData(imageBase64: string, prompt: string): Promise<FormData> {
+  // Convert base64 data URL to a Blob
+  const base64Data = imageBase64.split(',')[1] || imageBase64;
+  const binaryStr = atob(base64Data);
+  const bytes = new Uint8Array(binaryStr.length);
+  for (let i = 0; i < binaryStr.length; i++) {
+    bytes[i] = binaryStr.charCodeAt(i);
+  }
+  
+  const mimeMatch = imageBase64.match(/data:(image\/\w+);/);
+  const mimeType = mimeMatch?.[1] || 'image/png';
+  const blob = new Blob([bytes], { type: mimeType });
+
+  const formData = new FormData();
+  formData.append('image', blob, 'cover.png');
+  formData.append('prompt', prompt);
+  formData.append('model', 'gpt-image-1');
+  formData.append('n', '1');
+  formData.append('size', '1024x1024');
+  formData.append('response_format', 'b64_json');
+
+  return formData;
+}
