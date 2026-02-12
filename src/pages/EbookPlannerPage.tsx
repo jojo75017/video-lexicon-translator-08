@@ -110,6 +110,7 @@ import EbookRecipeBookGenerator from '@/components/ebook/EbookRecipeBookGenerato
 import EbookTravelGuideGenerator from '@/components/ebook/EbookTravelGuideGenerator';
 import EbookAquariumGenerator from '@/components/ebook/EbookAquariumGenerator';
 import EbookBirdSheetGenerator from '@/components/ebook/EbookBirdSheetGenerator';
+import EbookNicheAnalysis from '@/components/ebook/EbookNicheAnalysis';
 
 // Composants 2026
 import EbookVideoTrailer from '@/components/ebook/EbookVideoTrailer';
@@ -955,6 +956,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
         return (
           <EbookPresentation onNavigate={(tab) => setActiveTab(tab)} />
         );
+
+      case 'niche-analysis':
+        return <EbookNicheAnalysis />;
 
       case 'projects':
         return (
