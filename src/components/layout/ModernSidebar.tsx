@@ -54,7 +54,8 @@ import {
   Languages,
   Info,
   BarChart3,
-  Ruler
+  Ruler,
+  Monitor
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -194,6 +195,7 @@ const categories: Category[] = [
       { id: 'backcover', label: '📖 Couverture Arrière', icon: BookCopy },
       { id: 'images', label: '🎨 Images Chapitres', icon: Image },
       { id: 'imagebank', label: '🏦 Banque Images', icon: ImagePlus },
+      { id: 'mockup-studio', label: '🖥️ Mockup Studio', icon: Monitor },
     ]
   },
   // ========== 6. AMAZON KDP ==========
