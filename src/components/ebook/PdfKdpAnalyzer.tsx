@@ -191,7 +191,11 @@ const PdfKdpAnalyzer: React.FC = () => {
     setSelectedPage(0);
 
     try {
+      // Dynamically import pdf.js
+      const pdfjsLib = await import('pdfjs-dist');
       const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
+      
+      // Disable worker - use main thread
       pdfjs.GlobalWorkerOptions.workerSrc = '';
 
       const arrayBuffer = await file.arrayBuffer();
@@ -211,7 +215,12 @@ const PdfKdpAnalyzer: React.FC = () => {
         if (!ctx) continue;
         canvas.width = thumbVp.width;
         canvas.height = thumbVp.height;
-        await page.render({ canvasContext: ctx, viewport: thumbVp, canvas } as any).promise;
+        await page.render({
+          canvasContext: ctx,
+          viewport: thumbVp,
+          // @ts-ignore - pdfjs-dist types issue
+          canvas: canvas,
+        }).promise;
 
         extracted.push({
           number: i,
