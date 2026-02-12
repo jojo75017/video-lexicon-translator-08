@@ -78,12 +78,19 @@ Technical requirements:
 
     console.log('Generating mockup with OpenAI:', { pose, viewMode });
 
-    const response = await fetch('https://api.openai.com/v1/images/edits', {
+    const response = await fetch('https://api.openai.com/v1/images/generations', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
       },
-      body: await buildFormData(imageBase64, prompt),
+      body: JSON.stringify({
+        model: 'gpt-image-1',
+        prompt: prompt + '\n\nReference image (the book cover to place on the device): ' + imageBase64.substring(0, 100) + '...',
+        n: 1,
+        size: '1024x1024',
+        response_format: 'b64_json',
+      }),
     });
 
     if (!response.ok) {
@@ -99,16 +106,14 @@ Technical requirements:
     }
 
     const data = await response.json();
-    const mockupUrl = data.data?.[0]?.url || data.data?.[0]?.b64_json;
+    const b64 = data.data?.[0]?.b64_json;
+    const url = data.data?.[0]?.url;
 
-    if (!mockupUrl) {
+    if (!b64 && !url) {
       throw new Error('Aucune image générée');
     }
 
-    // If b64_json, convert to data URL
-    const finalUrl = data.data?.[0]?.b64_json 
-      ? `data:image/png;base64,${data.data[0].b64_json}`
-      : mockupUrl;
+    const finalUrl = b64 ? `data:image/png;base64,${b64}` : url;
 
     console.log('Mockup generated successfully with OpenAI');
 
@@ -124,27 +129,3 @@ Technical requirements:
     );
   }
 });
-
-async function buildFormData(imageBase64: string, prompt: string): Promise<FormData> {
-  // Convert base64 data URL to a Blob
-  const base64Data = imageBase64.split(',')[1] || imageBase64;
-  const binaryStr = atob(base64Data);
-  const bytes = new Uint8Array(binaryStr.length);
-  for (let i = 0; i < binaryStr.length; i++) {
-    bytes[i] = binaryStr.charCodeAt(i);
-  }
-  
-  const mimeMatch = imageBase64.match(/data:(image\/\w+);/);
-  const mimeType = mimeMatch?.[1] || 'image/png';
-  const blob = new Blob([bytes], { type: mimeType });
-
-  const formData = new FormData();
-  formData.append('image', blob, 'cover.png');
-  formData.append('prompt', prompt);
-  formData.append('model', 'gpt-image-1');
-  formData.append('n', '1');
-  formData.append('size', '1024x1024');
-  formData.append('response_format', 'b64_json');
-
-  return formData;
-}
