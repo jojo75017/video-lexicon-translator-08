@@ -196,6 +196,7 @@ const categories: Category[] = [
       { id: 'images', label: '🎨 Images Chapitres', icon: Image },
       { id: 'imagebank', label: '🏦 Banque Images', icon: ImagePlus },
       { id: 'mockup-studio', label: '🖥️ Mockup Studio', icon: Monitor },
+      { id: 'kdp-cover-studio', label: '📐 Studio Couverture KDP', icon: Ruler, isNew: true },
       { id: 'calibre-epub', label: '📚 Calibre Studio EPUB', icon: BookOpen, isNew: true },
     ]
   },

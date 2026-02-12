@@ -130,6 +130,7 @@ import EbookBsrTracker from '@/components/ebook/EbookBsrTracker';
 import EbookExportGuide from '@/components/ebook/EbookExportGuide';
 import PdfKdpReformatter from '@/components/ebook/PdfKdpReformatter';
 import PdfKdpAnalyzer from '@/components/ebook/PdfKdpAnalyzer';
+import KdpCoverStudio from '@/components/ebook/KdpCoverStudio';
 import SubscriberActivityPopup from '@/components/admin/SubscriberActivityPopup';
 
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
@@ -2139,6 +2140,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
 
       case 'price-studio':
         return <PriceEbookStudio />;
+
+      case 'kdp-cover-studio':
+        return <KdpCoverStudio />;
 
       case 'library':
         return (
