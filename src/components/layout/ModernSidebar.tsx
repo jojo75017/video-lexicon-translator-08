@@ -216,6 +216,7 @@ const categories: Category[] = [
       { id: 'bsr-tracker', label: '📊 BSR Multi-Pays', icon: BarChart3, isNew: true },
       { id: 'kdp-research', label: '🔍 Recherche Niche', icon: Search },
       { id: 'kdp-explosive', label: '💥 Simulateur Explosif', icon: Zap, isNew: true },
+      { id: 'price-studio', label: '💰 Price Master', icon: TrendingUp, isNew: true },
       { id: 'plagiarism-validator', label: '🛡️ Anti-Plagiat', icon: Shield },
     ]
   },
