@@ -49,6 +49,7 @@ import { EbookCoverGenerator } from '@/components/ebook/EbookCoverGenerator';
 import { EbookWritingAssistant } from '@/components/ebook/EbookWritingAssistant';
 import { EbookBackCoverGenerator } from '@/components/ebook/EbookBackCoverGenerator';
 import { EbookMockupStudio } from '@/components/ebook/EbookMockupStudio';
+import { CalibreStudioEpub } from '@/components/ebook/CalibreStudioEpub';
 import { EbookCharacters, type Character } from '@/components/ebook/EbookCharacters';
 import { EbookProjectsList } from '@/components/ebook/EbookProjectsList';
 import { EbookAiChat } from '@/components/ebook/EbookAiChat';
@@ -2131,6 +2132,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       
       case 'mockup-studio':
         return <EbookMockupStudio />;
+
+      case 'calibre-epub':
+        return <CalibreStudioEpub />;
 
       case 'library':
         return (
