@@ -21,9 +21,9 @@ serve(async (req) => {
       });
     }
 
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_AI_API_KEY');
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
-      throw new Error('LOVABLE_AI_API_KEY not configured');
+      throw new Error('LOVABLE_API_KEY not configured');
     }
 
     const prompt = `Tu es un expert en édition de livres et en marketing Amazon KDP. Analyse la niche suivante pour un ebook : "${niche.trim()}"
@@ -50,7 +50,7 @@ Réponds en JSON avec exactement cette structure :
 
 Sois précis et concret dans chaque point. Parle directement au lecteur avec "tu/ton". Chaque texte doit faire 1-3 phrases.`;
 
-    const response = await fetch('https://ai.lovable.dev/api/chat/completions', {
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
