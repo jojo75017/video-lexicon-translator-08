@@ -6,13 +6,47 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const poseDescriptions: Record<string, string> = {
+  // Device poses
+  'ipad-straight': 'a modern Apple iPad Pro (silver, thin bezels) held perfectly straight, facing the camera head-on, on a clean surface, the screen displays the image',
+  'ipad-tilted-left': 'a modern Apple iPad Pro tilted 30 degrees to the left, showing a 3/4 perspective view from the right side, the screen displays the image clearly',
+  'ipad-tilted-right': 'a modern Apple iPad Pro tilted 30 degrees to the right, showing a 3/4 perspective view from the left side, the screen displays the image clearly',
+  'kindle-straight': 'an Amazon Kindle Paperwhite e-reader lying flat on a surface, front-facing view, the screen displays the image',
+  'macbook-screen': 'a MacBook Pro laptop opened at 110 degrees on a minimalist desk, the screen displays the image in full',
+  'iphone-stand': 'an Apple iPhone 15 Pro standing upright in a sleek phone stand, the screen displays the image',
+  // Book poses
+  'ebook-floating': 'a realistic 3D hardcover book floating in mid-air at a slight angle, with the image as the front cover, soft shadow below, dramatic lighting',
+  'ebook-tilted-left': 'a realistic 3D hardcover book tilted 25 degrees to the left, showing the front cover and spine, the image is the front cover, perspective view from the right',
+  'ebook-tilted-right': 'a realistic 3D hardcover book tilted 25 degrees to the right, showing the front cover and spine, the image is the front cover, perspective view from the left',
+  'book-3d-standing': 'a realistic 3D hardcover book standing upright on a surface, front cover facing camera with visible spine and page edges on the right side, the image is the cover',
+  'book-3d-floating': 'a realistic 3D hardcover book floating at a dynamic 45-degree angle with dramatic shadow and rim lighting below, the image is the front cover',
+  'book-open-flat': 'a printed book lying flat on a marble surface, top-down bird\'s eye view, the image is displayed as the book cover',
+  // Creative
+  'multi-device': 'multiple devices arranged together - an iPad, iPhone, and MacBook - all displaying the same image on their screens, professional product photography arrangement',
+  'book-stack': 'a stack of 3 identical hardcover books with the image as the cover, the top book slightly offset, on a clean surface with soft lighting',
+};
+
+const viewModeInstructions: Record<string, string> = {
+  '3d': `Style: Ultra-realistic 3D render with volumetric lighting, realistic shadows, depth of field (f/2.8 bokeh), 
+and subtle reflections. The scene should have cinematic studio lighting with a key light, fill light, and rim light.
+Background: Professional studio setting with soft gradient backdrop.`,
+  'transparent': `Style: Product photography on a completely pure white/transparent background (#FFFFFF). 
+No other objects, no shadows on the background, only a very subtle contact shadow directly under the device.
+The device/book should be perfectly isolated as if cut out for compositing.
+Background: Pure white, transparent, isolated product shot.`,
+  'hd': `Style: Ultra high resolution 8K commercial photography. Shot with a Phase One IQ4 150MP medium format camera, 
+Schneider Kreuznach 80mm f/2.8 LS lens. Extreme sharpness, rich micro-contrast, professional color grading.
+Every texture detail must be razor sharp - screen pixels, book paper texture, device metal finish.
+Background: Premium studio setting with elegant gradient lighting and subtle reflections.`,
+};
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { imageBase64, deviceType = 'ipad', background = 'transparent' } = await req.json();
+    const { imageBase64, pose = 'ipad-straight', viewMode = '3d' } = await req.json();
 
     if (!imageBase64) {
       return new Response(
@@ -29,37 +63,23 @@ serve(async (req) => {
       );
     }
 
-    const deviceDescriptions: Record<string, string> = {
-      'ipad': 'a modern Apple iPad Pro (silver, thin bezels) held at a slight 3/4 angle on a clean surface',
-      'ipad-hand': 'a person holding a modern Apple iPad Pro in their hands, lifestyle photography style',
-      'kindle': 'an Amazon Kindle Paperwhite e-reader lying flat on a wooden desk',
-      'macbook': 'a MacBook Pro laptop screen showing the image, on a minimalist desk',
-      'iphone': 'an Apple iPhone 15 Pro standing upright in a phone stand, showing the image on screen',
-      'book-3d': 'a realistic 3D hardcover book with the image as the front cover, floating at an angle with dramatic lighting',
-      'book-flat': 'a printed book lying flat on a marble surface, top-down view, the image as the cover',
-      'tablet-stand': 'a tablet on a modern stand on a clean white desk, professional product photography',
-    };
+    const poseDesc = poseDescriptions[pose] || poseDescriptions['ipad-straight'];
+    const modeInstr = viewModeInstructions[viewMode] || viewModeInstructions['3d'];
 
-    const backgroundDescriptions: Record<string, string> = {
-      'transparent': 'on a completely transparent/white background with no other objects, product photography isolated',
-      'desk': 'on a clean minimalist wooden desk with soft natural lighting',
-      'lifestyle': 'in a cozy lifestyle setting with a coffee cup and plant nearby, warm lighting',
-      'studio': 'on a professional studio background with gradient lighting',
-      'dark': 'on a dark moody background with dramatic rim lighting',
-    };
+    const prompt = `Create a photorealistic mockup: Place this book cover / ebook cover image onto ${poseDesc}.
 
-    const deviceDesc = deviceDescriptions[deviceType] || deviceDescriptions['ipad'];
-    const bgDesc = backgroundDescriptions[background] || backgroundDescriptions['transparent'];
+The cover image MUST be clearly visible, perfectly displayed, and undistorted on the device screen or as the book cover.
+Preserve all text, graphics, and colors from the original image exactly.
 
-    const prompt = `Place this book cover / ebook cover image onto ${deviceDesc}. 
-The cover image should be clearly visible and perfectly displayed on the device screen or as the book cover.
-Setting: ${bgDesc}.
-Style: Ultra-realistic professional product photography, shot with a Canon EOS R5, 85mm f/1.4 lens, 
-perfect studio lighting, sharp details, high-end commercial quality.
-The mockup must look completely photorealistic - indistinguishable from a real product photo.
-Keep the original image content perfectly visible and undistorted on the device.`;
+${modeInstr}
 
-    console.log('Generating mockup:', { deviceType, background });
+Technical requirements:
+- Shot with Canon EOS R5, 85mm f/1.4 lens equivalent quality
+- Perfect studio lighting setup
+- The mockup must look completely photorealistic - indistinguishable from a real product photo
+- High-end commercial quality, suitable for Amazon KDP listings and professional marketing`;
+
+    console.log('Generating mockup:', { pose, viewMode });
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
