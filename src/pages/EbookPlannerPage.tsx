@@ -111,6 +111,7 @@ import EbookTravelGuideGenerator from '@/components/ebook/EbookTravelGuideGenera
 import EbookAquariumGenerator from '@/components/ebook/EbookAquariumGenerator';
 import EbookBirdSheetGenerator from '@/components/ebook/EbookBirdSheetGenerator';
 import EbookNicheAnalysis from '@/components/ebook/EbookNicheAnalysis';
+import EbookDescriptionMagnet from '@/components/ebook/EbookDescriptionMagnet';
 
 // Composants 2026
 import EbookVideoTrailer from '@/components/ebook/EbookVideoTrailer';
@@ -2016,6 +2017,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             bookSummary={bookSummary}
           />
         );
+
+      case 'description-magnet':
+        return <EbookDescriptionMagnet />;
       
       case 'images':
         return (
