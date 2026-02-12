@@ -53,7 +53,8 @@ import {
   FlaskConical,
   Languages,
   Info,
-  BarChart3
+  BarChart3,
+  Ruler
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -203,6 +204,7 @@ const categories: Category[] = [
     items: [
       { id: 'export-guide', label: '📖 Guide Export', icon: GraduationCap, isNew: true },
       { id: 'pdf-reformatter', label: '📐 Reformateur PDF KDP', icon: FileEdit, isNew: true },
+      { id: 'pdf-analyzer', label: '📏 Analyseur PDF KDP', icon: Ruler, isNew: true },
       { id: 'export', label: '💾 Exporter (PDF, Word)', icon: Download },
       { id: 'kdp', label: '📝 Description KDP', icon: TrendingUp },
       { id: 'amazon-simulator', label: '👀 Simulateur Amazon', icon: Eye },
