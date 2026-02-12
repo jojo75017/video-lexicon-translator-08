@@ -208,6 +208,7 @@ const categories: Category[] = [
       { id: 'pdf-analyzer', label: '📏 Analyseur PDF KDP', icon: Ruler, isNew: true },
       { id: 'export', label: '💾 Exporter (PDF, Word)', icon: Download },
       { id: 'kdp', label: '📝 Description KDP', icon: TrendingUp },
+      { id: 'description-magnet', label: '🧲 Description Magnet', icon: FileText, isNew: true },
       { id: 'amazon-simulator', label: '👀 Simulateur Amazon', icon: Eye },
       { id: 'bsr-tracker', label: '📊 BSR Multi-Pays', icon: BarChart3, isNew: true },
       { id: 'kdp-research', label: '🔍 Recherche Niche', icon: Search },
