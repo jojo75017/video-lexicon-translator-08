@@ -65,7 +65,9 @@ Réponds en JSON avec exactement cette structure :
     { "keyword": "mot-clé longue traîne 2", "volumeEstime": "Moyen", "difficulte": "Moyenne", "pertinence": 88 },
     { "keyword": "mot-clé longue traîne 3", "volumeEstime": "Moyen", "difficulte": "Faible", "pertinence": 82 },
     { "keyword": "mot-clé longue traîne 4", "volumeEstime": "Faible", "difficulte": "Faible", "pertinence": 78 },
-    { "keyword": "mot-clé longue traîne 5", "volumeEstime": "Élevé", "difficulte": "Élevée", "pertinence": 90 }
+    { "keyword": "mot-clé longue traîne 5", "volumeEstime": "Élevé", "difficulte": "Élevée", "pertinence": 90 },
+    { "keyword": "mot-clé longue traîne 6", "volumeEstime": "Moyen", "difficulte": "Faible", "pertinence": 85 },
+    { "keyword": "mot-clé longue traîne 7", "volumeEstime": "Élevé", "difficulte": "Moyenne", "pertinence": 80 }
   ],
   "estimationRevenus": {
     "prixRecommande": "9.99-14.99€",
