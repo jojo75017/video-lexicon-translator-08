@@ -3,7 +3,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
 serve(async (req) => {
@@ -21,9 +21,9 @@ serve(async (req) => {
       });
     }
 
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) {
-      throw new Error('LOVABLE_API_KEY not configured');
+    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+    if (!OPENAI_API_KEY) {
+      throw new Error('OPENAI_API_KEY not configured');
     }
 
     const prompt = `Tu es un expert en édition de livres et en marketing Amazon KDP. Analyse la niche suivante pour un ebook : "${niche.trim()}"
@@ -50,14 +50,14 @@ Réponds en JSON avec exactement cette structure :
 
 Sois précis et concret dans chaque point. Parle directement au lecteur avec "tu/ton". Chaque texte doit faire 1-3 phrases.`;
 
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: 'gpt-4o-mini',
         messages: [
           { role: 'system', content: 'Tu es un expert en édition de livres numériques et marketing KDP Amazon. Réponds uniquement en JSON valide.' },
           { role: 'user', content: prompt }
@@ -73,12 +73,7 @@ Sois précis et concret dans chaque point. Parle directement au lecteur avec "tu
           status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ error: 'Crédits AI épuisés. Rechargez vos crédits dans Settings → Workspace → Usage.' }), {
-          status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
-      throw new Error(`AI API error: ${response.status} - ${errText}`);
+      throw new Error(`OpenAI error: ${response.status} - ${errText}`);
     }
 
     const data = await response.json();
