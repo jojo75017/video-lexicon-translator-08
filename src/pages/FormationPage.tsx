@@ -11,7 +11,7 @@ import {
   Sparkles, GraduationCap, Trophy, Target, Zap, Layers, Settings,
   Image, TrendingUp, Megaphone, DollarSign, FileOutput, Rocket, HelpCircle,
   Link2, Shield, ShoppingCart, FileText, Mic, Globe, Volume2, Palette,
-  BarChart3, Users, Brain, Wand2, FileDown
+  BarChart3, Users, Brain, Wand2, FileDown, ChefHat, Map, Pencil
 } from 'lucide-react';
 import { toast } from 'sonner';
 import jsPDF from 'jspdf';
@@ -62,6 +62,62 @@ const FormationPage = () => {
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
 
   const modules: Module[] = [
+    {
+      id: 0,
+      title: "Étape 0 : Configurer votre Clé API",
+      description: "Connectez votre clé OpenAI pour activer la génération IA",
+      category: 'basics',
+      icon: Settings,
+      duration: '3 min',
+      difficulty: 'débutant',
+      content: `# Étape 0 : Configurer votre Clé API OpenAI
+
+## Pourquoi une clé API ?
+**EbookStudio utilise votre propre clé OpenAI** pour générer du contenu. Cela vous donne le contrôle total sur vos coûts.
+
+---
+
+## Comment obtenir votre clé :
+
+### 1. Créez un compte OpenAI
+- Rendez-vous sur **platform.openai.com**
+- Créez un compte gratuit ou connectez-vous
+
+### 2. Générez une clé API
+- Allez dans **Settings → API Keys**
+- Cliquez sur **"Create new secret key"**
+- Copiez la clé (commence par "sk-...")
+
+### 3. Ajoutez-la dans EbookStudio
+- Allez dans **Mon Compte → Paramètres**
+- Collez votre clé dans le champ dédié
+- Cliquez sur **"Valider"**
+
+---
+
+## 💰 Combien ça coûte ?
+
+| Action | Coût estimé |
+|--------|-------------|
+| Un ebook complet (8-12 chapitres) | **0,30€ à 0,80€** |
+| Une couverture IA | ~0,04€ |
+| Un plan éditorial (P1) | ~0,02€ |
+| Le workflow complet P1-P14 | ~0,50€ |
+
+### 💡 Budget recommandé :
+- **5€** suffisent pour créer ~10 ebooks complets
+- Rechargez votre compte OpenAI quand nécessaire
+- Aucun abonnement mensuel côté OpenAI
+
+---
+
+## Ce que vous obtenez :
+
+✅ Contrôle total de vos dépenses IA
+✅ Transparence sur chaque génération
+✅ Pas de surprise de facturation
+✅ Clé sécurisée et stockée localement`
+    },
     {
       id: 1,
       title: "Étape 1 : Choisir",
@@ -169,9 +225,9 @@ const FormationPage = () => {
 - Demandez des ajustements si besoin
 
 ### 3. Exportez votre livre
-- Choisissez le format (PDF, EPUB, MOBI...)
+- Choisissez le format (PDF, EPUB, Word, Google Docs)
 - Téléchargez votre fichier final
-- Publiez sur la plateforme de votre choix
+- Publiez sur Amazon KDP
 
 ---
 
@@ -541,17 +597,17 @@ ${module.content}
             Formation Complète
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent">
-            Créez votre livre en 3 étapes
+            Créez votre livre en 4 étapes
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-6">
-            Vous guidez l'intention, l'éditeur numérique fait le reste.
+            Configurez • Choisissez • Générez • Validez
           </p>
           <div className="bg-primary/10 border border-primary/20 rounded-xl p-6 max-w-xl mx-auto">
             <p className="text-lg font-medium text-primary">
               ✨ Vous ne rédigez aucune ligne.
             </p>
             <p className="text-muted-foreground mt-1">
-              Choisissez • Générez • Validez
+              Coût moyen : 0,30€ à 0,80€ par ebook complet
             </p>
           </div>
 
@@ -892,7 +948,7 @@ ${module.content}
           </Card>
         </motion.div>
 
-        {/* Section Formation Systeme.io avec 12 modules */}
+        {/* Section Formation Systeme.io avec 18 modules */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -948,6 +1004,34 @@ ${module.content}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {[
                   { 
+                    icon: ChefHat,
+                    title: 'Livres de Recettes', 
+                    desc: '40 recettes avec photos réalistes et accords vins — 125+ pays disponibles',
+                    color: 'from-amber-500 to-orange-500',
+                    badge: '2026'
+                  },
+                  { 
+                    icon: Map,
+                    title: 'Guides de Voyage', 
+                    desc: '40 destinations illustrées par pays avec photos réalistes et conseils',
+                    color: 'from-blue-500 to-indigo-500',
+                    badge: '2026'
+                  },
+                  { 
+                    icon: Pencil,
+                    title: 'Fiches Pratiques', 
+                    desc: 'Collections bien-être avec illustrations aquarelle : sommeil, stress, nutrition',
+                    color: 'from-emerald-500 to-teal-500',
+                    badge: '2026'
+                  },
+                  { 
+                    icon: BookOpen,
+                    title: 'Bandes Dessinées', 
+                    desc: 'BD avec cohérence personnages, bulles de dialogue et styles Manga/Comics',
+                    color: 'from-rose-500 to-pink-500',
+                    badge: '2026'
+                  },
+                  { 
                     icon: Link2,
                     title: 'Import URL', 
                     desc: 'Transformez vidéos YouTube et articles en ebooks structurés automatiquement',
@@ -976,17 +1060,17 @@ ${module.content}
                     badge: 'Nouveau'
                   },
                   { 
+                    icon: Sparkles, 
+                    title: 'Humaniseur IA', 
+                    desc: 'Rendez vos textes IA indétectables — anti-détection GPTZero/Originality',
+                    color: 'from-violet-500 to-purple-500',
+                    badge: '2026'
+                  },
+                  { 
                     icon: Globe, 
                     title: 'Encyclopédie IA', 
                     desc: 'Générez jusqu\'à 50 fiches encyclopédiques en une seule session',
                     color: 'from-teal-500 to-cyan-500',
-                    badge: 'Nouveau'
-                  },
-                  { 
-                    icon: FileText, 
-                    title: 'Atlas Géographique', 
-                    desc: 'Créez des guides de voyage et atlas thématiques complets',
-                    color: 'from-indigo-500 to-blue-500',
                     badge: 'Nouveau'
                   },
                   { 
@@ -1012,8 +1096,8 @@ ${module.content}
                   },
                   { 
                     icon: Palette, 
-                    title: 'Images Chapitres', 
-                    desc: 'Générez des illustrations cohérentes pour chaque chapitre',
+                    title: 'Images IA Pro', 
+                    desc: 'Couvertures, illustrations et photos réalistes avec cohérence visuelle',
                     color: 'from-fuchsia-500 to-purple-500',
                     badge: 'Premium'
                   },
@@ -1044,9 +1128,11 @@ ${module.content}
                     >
                       {/* Badge */}
                       <span className={`absolute top-3 right-3 text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                        feature.badge === 'Nouveau' 
-                          ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white' 
-                          : 'bg-gradient-to-r from-violet-500 to-purple-500 text-white'
+                        feature.badge === '2026' 
+                          ? 'bg-gradient-to-r from-red-500 to-orange-500 text-white animate-pulse'
+                          : feature.badge === 'Nouveau' 
+                            ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white' 
+                            : 'bg-gradient-to-r from-violet-500 to-purple-500 text-white'
                       }`}>
                         {feature.badge}
                       </span>
