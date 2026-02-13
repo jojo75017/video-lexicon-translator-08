@@ -21,6 +21,7 @@ import AuthorQuiz from "@/components/sales/AuthorQuiz";
 import SuccessGallery from "@/components/sales/SuccessGallery";
 import ScrollIntentPopup from "@/components/sales/ScrollIntentPopup";
 import VideoTestimonials from "@/components/sales/VideoTestimonials";
+import HeroVideoTeaser from "@/components/sales/HeroVideoTeaser";
 import TrustBadges from "@/components/sales/TrustBadges";
 import PriceComparison from "@/components/sales/PriceComparison";
 import SalesFaq from "@/components/sales/SalesFaq";
@@ -802,6 +803,9 @@ const SalesPage = () => {
 
       {/* Star Testimonials Carousel */}
       <StarTestimonials />
+
+      {/* Hero Video Teaser */}
+      <HeroVideoTeaser />
 
       {/* Video Testimonials Section */}
       <VideoTestimonials />
