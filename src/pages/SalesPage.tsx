@@ -103,7 +103,7 @@ const SalesPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   
-  // Vérifier disponibilité VIP (20 places à 37€)
+  // Vérifier disponibilité VIP (30 places à 37€)
   const { isVipAvailable, remainingSpots, isLoading: vipLoading } = useVipAvailability();
 
   // Scroll vers l'ancre #demo au chargement

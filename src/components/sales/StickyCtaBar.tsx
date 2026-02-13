@@ -52,7 +52,7 @@ export const StickyCtaBar: React.FC<StickyCtaBarProps> = ({ onCtaClick }) => {
   };
 
   const progressPercentage = isVipAvailable 
-    ? ((20 - spotsLeft) / 20) * 100 
+    ? ((30 - spotsLeft) / 30) * 100 
     : 100;
 
   return (
