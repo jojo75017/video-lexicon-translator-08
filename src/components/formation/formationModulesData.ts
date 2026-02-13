@@ -56,11 +56,24 @@ export const formationModules: FormationModule[] = [
 2. Entrez votre code d'accès (format EBK-XXXXXX)
 3. Accédez au tableau de bord principal
 
+### 🔑 Configuration de votre Clé API OpenAI :
+L'outil utilise votre propre clé API OpenAI pour la génération.
+1. Créez un compte sur **platform.openai.com**
+2. Générez une clé API dans Settings → API Keys
+3. Ajoutez-la dans **Mon Compte → Paramètres**
+4. Coût estimé : **0,30€ à 0,80€ par ebook complet**
+
+### 💰 Offre Fondateur (limitée) :
+- 🎯 **30 premières places à 37€** — Accès à vie
+- ⏳ Offre valable **60 jours** après le lancement
+- 📈 Ensuite : Starter 47€ ou Pro 97€
+
 ### Nouveautés 2026 :
 - 🍳 Générateur de livres de recettes avec accords vins
 - 🗺️ Générateur de guides de voyage illustrés
 - 📋 Générateur de fiches pratiques bien-être
-- 🤖 Moteur IA V2 avec mémoire éditoriale`
+- 🤖 Moteur IA V2 avec mémoire éditoriale
+- 🎨 18 modules de formation complets`
   },
   {
     id: 2,
@@ -325,8 +338,16 @@ Retrouvez tous vos ebooks en cours et terminés, classés par date.
 ### Dashboard
 Vue d'ensemble : statistiques d'utilisation, projets récents, quotas.
 
+### 🔑 Configuration Clé API OpenAI :
+Votre clé API personnelle vous permet de contrôler vos coûts.
+1. Allez sur **platform.openai.com** → API Keys
+2. Créez une nouvelle clé (commence par "sk-...")
+3. Collez-la dans **Paramètres → Clé API**
+4. 💡 Coût moyen : **0,30€ à 0,80€ par ebook**
+5. Vous gardez le contrôle total de votre budget
+
 ### Paramètres :
-- 🔑 Configurez votre clé OpenAI (optionnel)
+- 🔑 Configurez votre clé OpenAI (obligatoire pour générer)
 - 👤 Gérez votre profil auteur
 - 📤 Préférences d'export par défaut
 - 🔔 Notifications et alertes
@@ -334,8 +355,10 @@ Vue d'ensemble : statistiques d'utilisation, projets récents, quotas.
 ### Sauvegarde Automatique
 Vos projets sont sauvegardés en temps réel dans le cloud.
 
-### Important :
-Connectez-vous pour activer la sauvegarde automatique de vos projets !`
+### Votre Abonnement :
+- 🎯 **Fondateur (37€)** : Accès à vie — 30 premières places
+- 📦 **Starter (47€)** : Accès à vie — Toutes les fonctionnalités
+- 🚀 **Pro (97€)** : Accès à vie — Fonctionnalités premium + support VIP`
   },
   {
     id: 11,

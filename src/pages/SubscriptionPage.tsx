@@ -68,7 +68,7 @@ const SubscriptionPage = ({ subscriberEmail, subscriberData, onLogout }: Subscri
       features: ['20 ebooks/mois', 'Chapitres inclus', 'Export PDF', 'Support email']
     },
     pro: {
-      formations: ['Toutes les formations (12 modules + audio)', 'Formation Séries complète', 'Futures formations incluses'],
+      formations: ['Toutes les formations (18 modules + audio)', 'Formation Séries complète', 'Futures formations incluses'],
       features: ['Ebooks illimités à vie', 'Chapitres illimités', '10 couvertures IA/mois', 'Export PDF/EPUB/Word', 'Traduction multi-langues', 'Générateur Audiobooks', 'Outils KDP Premium', 'Mises à jour à vie']
     },
     lifetime: {
