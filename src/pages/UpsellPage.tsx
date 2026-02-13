@@ -2,15 +2,13 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, X, Sparkles, ArrowRight, Clock, Gift, Loader2, Crown, Zap, BookOpen } from "lucide-react";
+import { Check, X, Sparkles, ArrowRight, Clock, Gift, Crown, Zap, BookOpen } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const UpsellPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [isLoading, setIsLoading] = useState(false);
   const [countdown, setCountdown] = useState({ minutes: 15, seconds: 0 });
   const email = searchParams.get("email") || "";
 
@@ -55,34 +53,9 @@ const UpsellPage = () => {
     { text: "Mises à jour gratuites à vie", included: true },
   ];
 
-  const handleUpgrade = async () => {
-    if (!email) {
-      toast.error("Email manquant");
-      navigate("/offres");
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("stripe-checkout", {
-        body: {
-          planId: "pro",
-          email: email,
-          successUrl: `${window.location.origin}/paiement-succes?plan=pro&upgraded=true`,
-          cancelUrl: `${window.location.origin}/ebook-planner`,
-        },
-      });
-
-      if (error) throw error;
-      if (data?.url) {
-        window.location.href = data.url;
-      }
-    } catch (error: any) {
-      console.error("Upgrade error:", error);
-      toast.error("Erreur lors de l'upgrade");
-    } finally {
-      setIsLoading(false);
-    }
+  const handleUpgrade = () => {
+    // Rediriger vers la page de paiement PayPal pour le Pro
+    window.location.href = `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=147&currency_code=EUR&item_name=EbookStudio%20Pro%20Lifetime&return=${encodeURIComponent(window.location.origin + '/confirmation-paiement')}&cancel_return=${encodeURIComponent(window.location.origin + '/offres')}`;
   };
 
   const handleSkip = () => {
@@ -103,7 +76,7 @@ const UpsellPage = () => {
           <Gift className="w-5 h-5" />
         </div>
         <p className="text-sm font-medium mt-1">
-          Débloquez TOUT maintenant et économisez 100€ sur le prix standard !
+          Débloquez TOUT maintenant et économisez 150€ sur le prix standard !
         </p>
       </div>
 
@@ -119,11 +92,11 @@ const UpsellPage = () => {
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400">
               TOUT
             </span>{" "}
-            pour seulement 50€ de plus
+            pour seulement 100€ de plus
           </h1>
           <p className="text-xl text-gray-300 max-w-2xl mx-auto">
             Vous avez choisi Starter à 47€. Passez à Pro Lifetime pour{" "}
-            <strong className="text-white">+50€</strong> et débloquez l'accès complet à vie.
+            <strong className="text-white">+100€</strong> et débloquez l'accès complet à vie.
           </p>
         </div>
 
@@ -207,14 +180,9 @@ const UpsellPage = () => {
             size="lg"
             className="text-xl px-12 py-8 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-bold shadow-2xl shadow-amber-500/30"
             onClick={handleUpgrade}
-            disabled={isLoading}
           >
-            {isLoading ? (
-              <Loader2 className="w-6 h-6 animate-spin mr-2" />
-            ) : (
-              <Zap className="w-6 h-6 mr-2" />
-            )}
-            OUI ! Je passe à Pro Lifetime pour +50€
+            <Zap className="w-6 h-6 mr-2" />
+            OUI ! Je passe à Pro Lifetime pour 147€
           </Button>
 
           <div>
@@ -224,7 +192,7 @@ const UpsellPage = () => {
           </div>
 
           <p className="text-sm text-gray-500 max-w-md mx-auto">
-            🔒 Paiement 100% sécurisé par Stripe. Cette offre expire dans{" "}
+            🔒 Paiement 100% sécurisé par PayPal. Cette offre expire dans{" "}
             {countdown.minutes}:{countdown.seconds.toString().padStart(2, "0")}.
           </p>
         </div>
