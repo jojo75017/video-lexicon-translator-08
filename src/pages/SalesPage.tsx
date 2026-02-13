@@ -207,18 +207,20 @@ const SalesPage = () => {
       badge: "🚀 DÉMARRAGE",
       discount: "",
       features: [
-        "✨ 20 ebooks/mois",
-        "📝 Chapitres inclus",
-        "📄 Export PDF",
-        "🎓 Modules 1-4 (suffisant pour créer votre livre)",
-        "💬 Support email",
+        "✨ 50 ebooks/mois",
+        "📝 Chapitres illimités",
+        "📄 Export PDF + EPUB",
+        "🎓 Modules 1-8 (création + optimisation)",
+        "📊 Analyse de niche basique",
+        "🔍 Recherche de mots-clés KDP",
+        "📋 Description KDP optimisée",
+        "💬 Support email prioritaire",
       ],
       blocked: [
         "❌ Couvertures IA",
         "❌ Traduction multi-langues",
         "❌ Générateur Audiobooks",
-        "❌ Outils KDP Premium",
-        "❌ Modules 5-12",
+        "❌ Outils KDP Premium avancés",
       ],
       cta: "Commencer à 47€",
       popular: false,
@@ -291,6 +293,10 @@ const SalesPage = () => {
             <span className="text-lg font-bold text-white">EbookStudio Pro</span>
           </Link>
           <nav className="hidden md:flex items-center gap-6">
+            <Link to="/ebook" className="text-white/70 hover:text-violet-400 transition-colors font-medium flex items-center gap-1">
+              <Sparkles className="w-3.5 h-3.5" />
+              Découvrir KDP Studio
+            </Link>
             <Link to="/blog" className="text-white/70 hover:text-violet-400 transition-colors font-medium">Blog</Link>
             <Link to="/demo" className="text-white/70 hover:text-white transition-colors">Démo</Link>
             <Link to="/formation" className="text-white/70 hover:text-white transition-colors">Formation</Link>
