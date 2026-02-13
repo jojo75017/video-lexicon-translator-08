@@ -264,7 +264,7 @@ const SalesPage = () => {
     }
   };
 
-  const handleCheckout = async () => {
+  const handleCheckout = () => {
     if (!email || !email.includes("@")) {
       toast.error("Veuillez entrer un email valide");
       return;
@@ -275,32 +275,8 @@ const SalesPage = () => {
       return;
     }
 
-    setIsLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("stripe-checkout", {
-        body: {
-          planId: selectedPlan,
-          email: email.trim().toLowerCase(),
-          successUrl: selectedPlan === "starter" 
-            ? `${window.location.origin}/upsell?email=${encodeURIComponent(email.trim().toLowerCase())}`
-            : `${window.location.origin}/paiement-succes`,
-          cancelUrl: `${window.location.origin}/offres`,
-        },
-      });
-
-      if (error) throw error;
-
-      if (data?.url) {
-        window.location.href = data.url;
-      } else {
-        throw new Error("Pas d'URL de paiement reçue");
-      }
-    } catch (error: any) {
-      console.error("Checkout error:", error);
-      toast.error(error.message || "Erreur lors du paiement. Réessayez.");
-    } finally {
-      setIsLoading(false);
-    }
+    sessionStorage.setItem('payment_email', email.trim().toLowerCase());
+    navigate(`/upsell-paiement?plan=${selectedPlan}`);
   };
 
   return (
