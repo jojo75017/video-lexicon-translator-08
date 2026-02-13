@@ -207,7 +207,7 @@ const SalesPage = () => {
       badge: "🚀 DÉMARRAGE",
       discount: "",
       features: [
-        "✨ 50 ebooks/mois",
+        "✨ 30 ebooks/mois",
         "📝 Chapitres illimités",
         "📄 Export PDF + EPUB",
         "🎓 Modules 1-8 (création + optimisation)",
@@ -215,6 +215,7 @@ const SalesPage = () => {
         "🔍 Recherche de mots-clés KDP",
         "📋 Description KDP optimisée",
         "💬 Support email prioritaire",
+        "📹 1 session Zoom/mois incluse",
       ],
       blocked: [
         "❌ Couvertures IA",

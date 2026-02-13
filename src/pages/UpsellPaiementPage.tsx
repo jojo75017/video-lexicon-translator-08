@@ -15,14 +15,15 @@ const PLANS = {
     paypalLink: "https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=47&currency_code=EUR&item_name=EbookStudio%20Starter",
     description: "20 ebooks/mois • Export PDF • Modules 1-4",
     features: [
-      "50 ebooks par mois",
+      "30 ebooks par mois",
       "Chapitres illimités",
       "Export PDF + EPUB",
       "Modules de formation 1-8",
       "Analyse de niche basique",
       "Recherche de mots-clés KDP",
       "Description KDP optimisée",
-      "Support email prioritaire"
+      "Support email prioritaire",
+      "1 session Zoom/mois incluse"
     ],
     badge: "🚀 DÉMARRAGE",
     color: "from-blue-600 to-cyan-600"
