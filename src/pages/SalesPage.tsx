@@ -154,25 +154,14 @@ const SalesPage = () => {
     }
   }, []);
 
-  // Countdown to January 31, 2025
+  // Countdown Offre Fondateur : 60 jours à partir du lancement (13 février 2026)
+  const LAUNCH_DATE = new Date('2026-02-13T00:00:00+01:00');
+  const OFFER_END_DATE = new Date(LAUNCH_DATE.getTime() + 60 * 24 * 60 * 60 * 1000); // +60 jours
+
   useEffect(() => {
-    // Countdown dynamique : 3 jours à partir de maintenant (créant urgence permanente)
-    const getTargetDate = () => {
-      const stored = sessionStorage.getItem('countdown_target');
-      if (stored) {
-        return new Date(stored);
-      }
-      const newTarget = new Date();
-      newTarget.setDate(newTarget.getDate() + 3);
-      newTarget.setHours(23, 59, 59, 999);
-      sessionStorage.setItem('countdown_target', newTarget.toISOString());
-      return newTarget;
-    };
-    const targetDate = getTargetDate();
-    
     const updateCountdown = () => {
       const now = new Date();
-      const difference = targetDate.getTime() - now.getTime();
+      const difference = OFFER_END_DATE.getTime() - now.getTime();
       
       if (difference > 0) {
         setCountdown({
@@ -181,6 +170,8 @@ const SalesPage = () => {
           minutes: Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)),
           seconds: Math.floor((difference % (1000 * 60)) / 1000)
         });
+      } else {
+        setCountdown({ days: 0, hours: 0, minutes: 0, seconds: 0 });
       }
     };
     
@@ -912,7 +903,7 @@ const SalesPage = () => {
             <div className="bg-gradient-to-r from-red-500 to-orange-500 rounded-xl p-6 text-white text-center shadow-lg">
               <div className="flex items-center justify-center gap-2 mb-3">
                 <Clock className="w-5 h-5 animate-pulse" />
-                <span className="font-bold text-lg">🔥 Offre spéciale lancement – Prix réduit limité</span>
+                <span className="font-bold text-lg">🔥 Offre Fondateur 37€ — 30 places uniquement</span>
               </div>
               <div className="grid grid-cols-4 gap-4 max-w-md mx-auto">
                 <div className="bg-white/20 rounded-lg p-3">
@@ -932,7 +923,9 @@ const SalesPage = () => {
                   <div className="text-xs uppercase tracking-wide">Secondes</div>
                 </div>
               </div>
-              <p className="text-sm mt-3 text-white/80">⏳ Cette offre peut être retirée à tout moment</p>
+              <p className="text-sm mt-3 text-white/80">
+                ⏳ {isVipAvailable ? `Plus que ${remainingSpots ?? '...'} places Fondateur à 37€ — Ensuite le prix passe à 47€` : 'Les 30 places Fondateur sont épuisées — Profitez de nos offres actuelles'}
+              </p>
             </div>
           </div>
           
