@@ -435,9 +435,61 @@ const CoverTemplate: React.FC<{
   const fullH = props.totalHeight * scale;
   const bleedPx = props.bleed * scale;
 
+  const svgRef = React.useRef<SVGSVGElement>(null);
+
+  const handleDownload = async () => {
+    if (!svgRef.current) return;
+    try {
+      const svgData = new XMLSerializer().serializeToString(svgRef.current);
+      const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+      
+      // Create a canvas to convert SVG to PNG
+      const img = new Image();
+      const url = URL.createObjectURL(svgBlob);
+      
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const dpi = 2; // 2x for high quality
+        canvas.width = svgW * dpi;
+        canvas.height = svgH * dpi;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        ctx.scale(dpi, dpi);
+        ctx.drawImage(img, 0, 0, svgW, svgH);
+        
+        canvas.toBlob((blob) => {
+          if (!blob) return;
+          const link = document.createElement('a');
+          link.download = `gabarit-couverture-${props.trimW}x${props.trimH}-${props.pageCount}p.png`;
+          link.href = URL.createObjectURL(blob);
+          link.click();
+          URL.revokeObjectURL(link.href);
+          toast.success('Gabarit téléchargé !');
+        }, 'image/png');
+        
+        URL.revokeObjectURL(url);
+      };
+      img.src = url;
+    } catch {
+      toast.error('Erreur lors du téléchargement');
+    }
+  };
+
+  // ISBN barcode position: bottom-RIGHT of back cover
+  const barcodeW = 2 * scale;
+  const barcodeH = 1.2 * scale;
+  const barcodeX = ox + bleedPx + props.trimW * scale - barcodeW - 10;
+  const barcodeY = oy + fullH - bleedPx - barcodeH - 10;
+
   return (
     <div className="flex flex-col items-center gap-4">
-      <svg viewBox={`0 0 ${svgW} ${svgH}`} className="w-full max-w-4xl border rounded-lg bg-white dark:bg-gray-900" style={{ aspectRatio: `${svgW}/${svgH}` }}>
+      <div className="flex justify-end w-full max-w-4xl">
+        <Button onClick={handleDownload} variant="outline" size="sm" className="gap-2">
+          <Download className="w-4 h-4" />
+          Télécharger le gabarit
+        </Button>
+      </div>
+      <svg ref={svgRef} viewBox={`0 0 ${svgW} ${svgH}`} className="w-full max-w-4xl border rounded-lg bg-white dark:bg-gray-900" style={{ aspectRatio: `${svgW}/${svgH}` }}>
         {/* Bleed zone (red) */}
         <rect x={ox} y={oy} width={fullW} height={fullH} fill="#fecaca" stroke="#ef4444" strokeWidth="1" />
         
@@ -450,10 +502,10 @@ const CoverTemplate: React.FC<{
         {/* Safe zone - front cover */}
         <rect x={frontX} y={oy + bleedPx} width={props.trimW * scale} height={props.trimH * scale} fill="white" stroke="#000" strokeWidth="2" />
         
-        {/* Barcode area */}
-        <rect x={ox + bleedPx + 10} y={oy + fullH - bleedPx - 1.2 * scale - 10} width={2 * scale} height={1.2 * scale} fill="#fef08a" stroke="#ca8a04" strokeWidth="1" />
-        <text x={ox + bleedPx + 10 + scale} y={oy + fullH - bleedPx - 0.6 * scale - 5} textAnchor="middle" fontSize="8" fontWeight="bold" fill="#000">Code-barres</text>
-        <text x={ox + bleedPx + 10 + scale} y={oy + fullH - bleedPx - 0.6 * scale + 7} textAnchor="middle" fontSize="7" fill="#000">2" × 1.2"</text>
+        {/* Barcode area - bottom RIGHT of back cover */}
+        <rect x={barcodeX} y={barcodeY} width={barcodeW} height={barcodeH} fill="#fef08a" stroke="#ca8a04" strokeWidth="1" />
+        <text x={barcodeX + barcodeW / 2} y={barcodeY + barcodeH / 2 - 5} textAnchor="middle" fontSize="8" fontWeight="bold" fill="#000">Code-barres</text>
+        <text x={barcodeX + barcodeW / 2} y={barcodeY + barcodeH / 2 + 7} textAnchor="middle" fontSize="7" fill="#000">ISBN 2" × 1.2"</text>
         
         {/* Labels */}
         <text x={ox + bleedPx + props.trimW * scale / 2} y={oy + fullH - bleedPx - 5} textAnchor="middle" fontSize="9" fill="#666">
