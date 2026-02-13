@@ -48,7 +48,7 @@ const UpsellPage = () => {
     { text: "Chapitres ILLIMITÉS", included: true, highlight: true },
     { text: "10 couvertures IA/mois", included: true },
     { text: "Export PDF / EPUB / Word", included: true },
-    { text: "Toutes les formations (12 modules)", included: true },
+    { text: "Toutes les formations (18 modules)", included: true },
     { text: "Traduction multi-langues", included: true },
     { text: "Générateur Audiobooks", included: true },
     { text: "Outils KDP Premium complets", included: true },

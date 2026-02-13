@@ -35,7 +35,7 @@ const PLANS = {
       "Chapitres illimités",
       "10 couvertures IA/mois",
       "Export PDF/EPUB/Word",
-      "Toutes les formations (12 modules)",
+      "Toutes les formations (18 modules)",
       "Outils KDP Premium",
       "Traduction multi-langues",
       "Générateur Audiobooks",
