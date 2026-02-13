@@ -64,7 +64,7 @@ L'outil utilise votre propre clé API OpenAI pour la génération.
 4. Coût estimé : **0,30€ à 0,80€ par ebook complet**
 
 ### 💰 Offre Fondateur (limitée) :
-- 🎯 **30 premières places à 37€** — Accès à vie
+- 🎯 **Offre Fondateur à 37€** — Accès à vie
 - ⏳ Offre valable **60 jours** après le lancement
 - 📈 Ensuite : Starter 47€ ou Pro 147€
 
@@ -356,7 +356,7 @@ Votre clé API personnelle vous permet de contrôler vos coûts.
 Vos projets sont sauvegardés en temps réel dans le cloud.
 
 ### Votre Abonnement :
-- 🎯 **Fondateur (37€)** : Accès à vie — 30 premières places
+- 🎯 **Fondateur (37€)** : Accès à vie — Offre limitée 60 jours
 - 📦 **Starter (47€)** : Accès à vie — Toutes les fonctionnalités
 - 🚀 **Pro (147€)** : Accès à vie — Fonctionnalités premium + support VIP`
   },

@@ -103,8 +103,8 @@ const SalesPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   
-  // Vérifier disponibilité VIP (30 places à 37€)
-  const { isVipAvailable, remainingSpots, isLoading: vipLoading } = useVipAvailability();
+  // Vérifier disponibilité VIP (60 jours à 37€)
+  const { isVipAvailable, daysRemaining, isLoading: vipLoading } = useVipAvailability();
 
   // Scroll vers l'ancre #demo au chargement
   useEffect(() => {
@@ -305,7 +305,7 @@ const SalesPage = () => {
             className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white"
             onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
           >
-            {isVipAvailable ? `Offre Fondateur ${remainingSpots} places` : 'Voir les offres'}
+            {isVipAvailable ? `Offre Fondateur ${daysRemaining}j restants` : 'Voir les offres'}
           </Button>
         </div>
       </header>
@@ -619,7 +619,7 @@ const SalesPage = () => {
               onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
             >
               <Sparkles className="w-5 h-5 mr-2" />
-              {isVipAvailable ? `Offre Fondateur à 37€ (${remainingSpots} places)` : 'Voir les offres dès 47€'}
+              {isVipAvailable ? `Offre Fondateur à 37€ (${daysRemaining}j restants)` : 'Voir les offres dès 47€'}
             </Button>
             <Button 
               size="lg" 
@@ -852,22 +852,22 @@ const SalesPage = () => {
               <div className="relative z-10">
                 <div className="flex items-center justify-center gap-3 mb-2">
                   <span className="text-2xl">🔥</span>
-                  <span className="font-bold text-lg">Places Fondateur restantes à 37€</span>
+                  <span className="font-bold text-lg">Offre Fondateur à 37€ — Temps limité</span>
                 </div>
                 <div className="flex items-center justify-center gap-4">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-5xl font-black text-yellow-300 animate-pulse">{remainingSpots}</span>
-                    <span className="text-2xl font-bold text-white/80">/ 20</span>
+                    <span className="text-5xl font-black text-yellow-300 animate-pulse">{daysRemaining}</span>
+                    <span className="text-2xl font-bold text-white/80">jours</span>
                   </div>
                 </div>
                 <div className="mt-3 bg-white/20 rounded-full h-3 max-w-xs mx-auto overflow-hidden">
                   <div 
                     className="bg-gradient-to-r from-yellow-400 to-orange-400 h-full rounded-full transition-all duration-1000"
-                    style={{ width: `${((20 - (remainingSpots ?? 20)) / 20) * 100}%` }}
+                    style={{ width: `${((60 - (daysRemaining ?? 60)) / 60) * 100}%` }}
                   />
                 </div>
                 <p className="text-sm mt-2 text-white/80">
-                  ⚡ Places limitées — Offre Fondateur exclusive
+                  ⚡ Offre limitée dans le temps — Prix Fondateur exclusif
                 </p>
               </div>
             </div>
@@ -879,7 +879,7 @@ const SalesPage = () => {
             <div className="bg-gradient-to-r from-red-500 to-orange-500 rounded-xl p-6 text-white text-center shadow-lg">
               <div className="flex items-center justify-center gap-2 mb-3">
                 <Clock className="w-5 h-5 animate-pulse" />
-                <span className="font-bold text-lg">🔥 Offre Fondateur 37€ — 30 places uniquement</span>
+                <span className="font-bold text-lg">🔥 Offre Fondateur 37€ — Durée limitée</span>
               </div>
               <div className="grid grid-cols-4 gap-4 max-w-md mx-auto">
                 <div className="bg-white/20 rounded-lg p-3">
@@ -900,7 +900,7 @@ const SalesPage = () => {
                 </div>
               </div>
               <p className="text-sm mt-3 text-white/80">
-                ⏳ {isVipAvailable ? `Plus que ${remainingSpots ?? '...'} places Fondateur à 37€ — Ensuite le prix passe à 47€` : 'Les 30 places Fondateur sont épuisées — Profitez de nos offres actuelles'}
+                ⏳ {isVipAvailable ? `Plus que ${daysRemaining ?? '...'} jours pour profiter de l'offre Fondateur à 37€` : 'L\'offre Fondateur est terminée — Profitez de nos offres actuelles'}
               </p>
             </div>
           </div>
@@ -1094,7 +1094,7 @@ const SalesPage = () => {
           className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-orange-500 to-red-500 text-white text-sm font-bold py-4 px-4 rounded-full shadow-xl hover:shadow-2xl transition-all border-2 border-white/20"
         >
           <Zap className="w-5 h-5" />
-          <span>{isVipAvailable ? `Offre Fondateur 37€ (${remainingSpots} places)` : 'Voir les offres dès 47€'}</span>
+          <span>{isVipAvailable ? `Offre Fondateur 37€ (${daysRemaining}j restants)` : 'Voir les offres dès 47€'}</span>
         </button>
       </div>
 

@@ -203,19 +203,13 @@ export const SubscriberActivityPopup: React.FC = () => {
               </div>
             </div>
 
-            {/* Places VIP restantes */}
+            {/* Jours VIP restants */}
             <div className="px-3 py-2 bg-slate-800/30">
               <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-400">Places VIP restantes:</span>
-                <span className={`font-bold ${30 - vipCount <= 5 ? 'text-red-400' : 'text-emerald-400'}`}>
-                  {Math.max(0, 30 - vipCount)} / 30
+                <span className="text-slate-400">Offre Fondateur:</span>
+                <span className="font-bold text-emerald-400">
+                  Active (60 jours)
                 </span>
-              </div>
-              <div className="mt-1 h-1.5 bg-slate-700 rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-gradient-to-r from-amber-500 to-orange-500 transition-all duration-500"
-                  style={{ width: `${(vipCount / 30) * 100}%` }}
-                />
               </div>
             </div>
 

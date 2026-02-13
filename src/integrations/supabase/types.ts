@@ -607,6 +607,7 @@ export type Database = {
             }
             Returns: boolean
           }
+      vip_days_remaining: { Args: never; Returns: number }
     }
     Enums: {
       app_role: "admin" | "user"
