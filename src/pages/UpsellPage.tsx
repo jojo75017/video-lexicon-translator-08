@@ -173,12 +173,12 @@ const UpsellPage = () => {
                 Pro Lifetime
               </CardTitle>
               <div>
-                <p className="text-gray-400 line-through text-lg">197€</p>
+                <p className="text-gray-400 line-through text-lg">297€</p>
                 <p className="text-4xl font-bold text-white">
-                  97€ <span className="text-sm font-normal text-gray-400">unique à vie</span>
+                  147€ <span className="text-sm font-normal text-gray-400">unique à vie</span>
                 </p>
                 <Badge className="mt-2 bg-green-500/20 text-green-300">
-                  +50€ seulement (économie 100€)
+                  +100€ seulement (économie 150€)
                 </Badge>
               </div>
             </CardHeader>

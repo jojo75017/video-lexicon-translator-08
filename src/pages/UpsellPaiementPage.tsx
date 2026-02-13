@@ -11,7 +11,7 @@ const PLANS = {
   starter: {
     name: "Starter",
     price: "47",
-    originalPrice: "97",
+    originalPrice: "147",
     paypalLink: "https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=47&currency_code=EUR&item_name=EbookStudio%20Starter",
     description: "20 ebooks/mois • Export PDF • Modules 1-4",
     features: [
@@ -26,9 +26,9 @@ const PLANS = {
   },
   pro: {
     name: "Pro Lifetime",
-    price: "97",
-    originalPrice: "197",
-    paypalLink: "https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=97&currency_code=EUR&item_name=EbookStudio%20Pro%20Lifetime",
+    price: "147",
+    originalPrice: "297",
+    paypalLink: "https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=147&currency_code=EUR&item_name=EbookStudio%20Pro%20Lifetime",
     description: "Tout illimité à vie • Toutes les formations",
     features: [
       "Ebooks illimités à vie",
@@ -182,14 +182,14 @@ const UpsellPaiementPage = () => {
           <div className="mt-6 p-4 bg-gradient-to-r from-yellow-900/30 to-orange-900/30 border border-yellow-500/30 rounded-xl">
             <div className="flex items-center gap-2 mb-2">
               <Zap className="w-5 h-5 text-yellow-400" />
-              <span className="font-bold text-yellow-300">Passez à Pro pour seulement 50€ de plus !</span>
+              <span className="font-bold text-yellow-300">Passez à Pro pour seulement 100€ de plus !</span>
             </div>
             <p className="text-sm text-yellow-200/80 mb-3">
               Débloquez l'accès illimité à vie, les couvertures IA, l'audiobook et toutes les formations.
             </p>
             <Link to="/upsell-paiement?plan=pro">
               <Button variant="outline" className="border-yellow-500/50 text-yellow-300 hover:bg-yellow-900/30">
-                Voir l'offre Pro à 97€ →
+                Voir l'offre Pro à 147€ →
               </Button>
             </Link>
           </div>

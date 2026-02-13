@@ -201,7 +201,7 @@ const SalesPage = () => {
       id: "starter",
       name: "Starter",
       price: "47",
-      originalPrice: "97",
+      originalPrice: "147",
       period: "",
       description: "Idéal pour créer votre premier livre",
       badge: "🚀 DÉMARRAGE",
@@ -227,12 +227,12 @@ const SalesPage = () => {
     {
       id: "pro",
       name: "Pro Lifetime",
-      price: "97",
-      originalPrice: "197",
+      price: "147",
+      originalPrice: "297",
       period: "",
       description: "Tout débloqué à vie",
       badge: "⭐ MEILLEURE OFFRE",
-      discount: "🎯 Économie : 100€ (-51%)",
+      discount: "🎯 Économie : 150€ (-50%)",
       features: [
         "✨ Ebooks illimités à vie",
         "📝 Chapitres illimités",
@@ -247,7 +247,7 @@ const SalesPage = () => {
         "💬 Support prioritaire inclus",
       ],
       blocked: [],
-      cta: "🚀 Débloquer TOUT pour 97€",
+      cta: "🚀 Débloquer TOUT pour 147€",
       popular: true,
       footnote: "📌 Paiement unique – Accès complet à vie – Sans abonnement",
     },
@@ -255,7 +255,7 @@ const SalesPage = () => {
 
   const handlePlanClick = (planId: string) => {
     // Si VIP disponible (< 20 places), offre à 37€
-    // Sinon, rediriger vers les offres normales 47€/97€
+    // Sinon, rediriger vers les offres normales 47€/147€
     if (isVipAvailable) {
       navigate('/paiement-manuel');
     } else {

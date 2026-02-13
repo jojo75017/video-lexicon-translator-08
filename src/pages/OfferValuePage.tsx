@@ -505,10 +505,10 @@ const OfferValuePage = () => {
 
             <AccordionItem value="item-9" className="border rounded-lg px-4 bg-card">
               <AccordionTrigger className="text-left font-medium hover:no-underline">
-                Pourquoi le prix passera-t-il à 97€ ?
+                Pourquoi le prix passera-t-il à 147€ ?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground">
-                Le tarif actuel de 37€ est un prix de lancement exceptionnel pour remercier nos premiers utilisateurs. Une fois la période de lancement terminée, le prix reviendra à sa valeur normale de 97€ pour refléter la valeur réelle de l'outil.
+                Le tarif actuel de 37€ est un prix de lancement exceptionnel pour remercier nos premiers utilisateurs. Une fois la période de lancement terminée, le prix reviendra à sa valeur normale de 147€ pour refléter la valeur réelle de l'outil.
               </AccordionContent>
             </AccordionItem>
 

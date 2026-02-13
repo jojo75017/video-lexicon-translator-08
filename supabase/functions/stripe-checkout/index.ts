@@ -16,14 +16,14 @@ const PLANS = {
   },
   pro: {
     name: "Ebook Generator - Pro Lifetime",
-    price: 9700, // 97€
+    price: 14700, // 147€
     type: "one_time" as const,
     features: ["Ebooks illimités à vie", "Chapitres illimités", "10 couvertures IA/mois", "Export PDF/EPUB/Word", "Toutes les formations", "Outils KDP Premium", "Traduction multi-langues", "Générateur Audiobooks", "Mises à jour à vie", "Support prioritaire"],
   },
   // Keep lifetime as alias for pro (backwards compatibility)
   lifetime: {
     name: "Ebook Generator - Pro Lifetime",
-    price: 9700, // 97€
+    price: 14700, // 147€
     type: "one_time" as const,
     features: ["Ebooks illimités à vie", "Chapitres illimités", "10 couvertures IA/mois", "Export PDF/EPUB/Word", "Toutes les formations", "Outils KDP Premium", "Traduction multi-langues", "Générateur Audiobooks", "Mises à jour à vie", "Support prioritaire"],
   },
