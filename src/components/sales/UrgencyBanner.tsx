@@ -4,7 +4,7 @@ import { Flame, TrendingUp, Users } from 'lucide-react';
 
 const messages = [
   { icon: Flame, text: "3 personnes ont acheté dans la dernière heure", color: "text-orange-400" },
-  { icon: TrendingUp, text: "Le prix augmentera bientôt à 97€", color: "text-amber-400" },
+  { icon: TrendingUp, text: "Le prix augmentera bientôt à 147€", color: "text-amber-400" },
   { icon: Users, text: "Rejoignez +5000 auteurs satisfaits", color: "text-emerald-400" },
 ];
 

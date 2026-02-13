@@ -189,7 +189,7 @@ const ResultatEn5MinPage: React.FC = () => {
               puis 47 €
             </span>
             <span className="px-4 py-2 bg-muted rounded-full">
-              97 € pour l'accès complet
+              147 € pour l'accès complet
             </span>
           </div>
           <p className="text-sm text-muted-foreground">

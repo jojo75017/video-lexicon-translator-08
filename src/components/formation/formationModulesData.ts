@@ -66,7 +66,7 @@ L'outil utilise votre propre clé API OpenAI pour la génération.
 ### 💰 Offre Fondateur (limitée) :
 - 🎯 **30 premières places à 37€** — Accès à vie
 - ⏳ Offre valable **60 jours** après le lancement
-- 📈 Ensuite : Starter 47€ ou Pro 97€
+- 📈 Ensuite : Starter 47€ ou Pro 147€
 
 ### Nouveautés 2026 :
 - 🍳 Générateur de livres de recettes avec accords vins
@@ -358,7 +358,7 @@ Vos projets sont sauvegardés en temps réel dans le cloud.
 ### Votre Abonnement :
 - 🎯 **Fondateur (37€)** : Accès à vie — 30 premières places
 - 📦 **Starter (47€)** : Accès à vie — Toutes les fonctionnalités
-- 🚀 **Pro (97€)** : Accès à vie — Fonctionnalités premium + support VIP`
+- 🚀 **Pro (147€)** : Accès à vie — Fonctionnalités premium + support VIP`
   },
   {
     id: 11,
