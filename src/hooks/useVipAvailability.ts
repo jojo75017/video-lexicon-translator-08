@@ -41,7 +41,7 @@ export const useVipAvailability = () => {
   return {
     canCreateVip,
     vipCount,
-    remainingSpots: vipCount !== null ? Math.max(0, 20 - vipCount) : null,
+    remainingSpots: vipCount !== null ? Math.max(0, 30 - vipCount) : null,
     isLoading,
     isVipAvailable: canCreateVip === true
   };

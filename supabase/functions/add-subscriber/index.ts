@@ -370,11 +370,11 @@ Deno.serve(async (req) => {
         emailError: emailSent ? undefined : emailError,
         planTier: assignedTier,
         vipCount: vipCount || 0,
-        vipSlotsRemaining: Math.max(0, 20 - (vipCount || 0)),
+        vipSlotsRemaining: Math.max(0, 30 - (vipCount || 0)),
         message: existingSubscriber 
           ? 'Abonnement mis à jour avec succès' 
           : assignedTier === 'vip' 
-            ? `🎉 Nouvel abonné VIP créé ! (${vipCount}/20 places VIP)`
+            ? `🎉 Nouvel abonné VIP créé ! (${vipCount}/30 places VIP)`
             : 'Nouvel abonné créé avec succès'
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
