@@ -12,15 +12,15 @@ interface StickyCtaBarProps {
 
 export const StickyCtaBar: React.FC<StickyCtaBarProps> = ({ onCtaClick }) => {
   const navigate = useNavigate();
-  const { isVipAvailable, remainingSpots, vipCount } = useVipAvailability();
+  const { isVipAvailable, daysRemaining } = useVipAvailability();
   const [isVisible, setIsVisible] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
 
   // Déterminer le prix selon disponibilité VIP
   const price = isVipAvailable ? '37' : '47';
-  const originalPrice = isVipAvailable ? '97' : '97';
-  const discount = isVipAvailable ? '-62%' : '-52%';
-  const spotsLeft = 12; // Affichage fixe pour la rareté perçue
+  const originalPrice = isVipAvailable ? '147' : '147';
+  const discount = isVipAvailable ? '-75%' : '-68%';
+  const daysLeft = daysRemaining ?? 0;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -52,7 +52,7 @@ export const StickyCtaBar: React.FC<StickyCtaBarProps> = ({ onCtaClick }) => {
   };
 
   const progressPercentage = isVipAvailable 
-    ? ((30 - spotsLeft) / 30) * 100 
+    ? ((60 - daysLeft) / 60) * 100 
     : 100;
 
   return (
@@ -89,7 +89,7 @@ export const StickyCtaBar: React.FC<StickyCtaBarProps> = ({ onCtaClick }) => {
                         🔥 OFFRE FONDATEUR
                       </Badge>
                       <span className="text-white/60 text-sm hidden sm:inline">
-                        Plus que <strong className="text-amber-400">{spotsLeft} places</strong> à 37€
+                        Plus que <strong className="text-amber-400">{daysLeft} jours</strong> à 37€
                       </span>
                     </>
                   ) : (
