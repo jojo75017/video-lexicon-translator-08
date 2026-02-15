@@ -1,104 +1,82 @@
-import { useState, useRef } from "react";
-import { Play, Pause, Volume2, VolumeX } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
-import ebookTeaser from "@/assets/ebook-teaser.mp4";
+import { Play, Lightbulb, Layers } from "lucide-react";
+
+const videos = [
+  {
+    id: "pT9jMy7CwZA",
+    icon: Lightbulb,
+    title: "Pourquoi j'ai créé EbookStudio Pro",
+    description:
+      "Découvrez l'histoire derrière cet outil et comment il résout un vrai problème : créer un ebook pro sans passer 6 mois à écrire.",
+  },
+  {
+    id: "5qG4svJ-dfE",
+    icon: Layers,
+    title: "Les fonctionnalités en détail",
+    description:
+      "Tour complet des 14 modules IA : de la génération du plan à l'export KDP, chaque onglet expliqué pas à pas.",
+  },
+];
 
 const HeroVideoTeaser = () => {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
-
-  const togglePlay = () => {
-    if (!videoRef.current) return;
-    if (isPlaying) {
-      videoRef.current.pause();
-    } else {
-      videoRef.current.play();
-    }
-    setIsPlaying(!isPlaying);
-  };
-
-  const toggleMute = () => {
-    if (!videoRef.current) return;
-    videoRef.current.muted = !isMuted;
-    setIsMuted(!isMuted);
-  };
-
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
-      viewport={{ once: true }}
-      className="max-w-4xl mx-auto my-12 px-4"
-    >
-      <div className="text-center mb-6">
-        <Badge className="mb-3 bg-violet-500/10 text-violet-400 border-violet-500/30">
-          <Play className="w-3 h-3 mr-1" />
-          Aperçu en vidéo
-        </Badge>
-        <h3 className="text-2xl md:text-3xl font-bold text-foreground">
-          Découvrez{" "}
-          <span className="bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent">
-            EbookStudio Pro
-          </span>{" "}
-          en action
-        </h3>
+    <section className="py-16 px-4 bg-gradient-to-b from-muted/30 to-background">
+      <div className="max-w-5xl mx-auto">
+        <div className="text-center mb-10">
+          <Badge className="mb-3 bg-violet-500/10 text-violet-400 border-violet-500/30">
+            <Play className="w-3 h-3 mr-1" />
+            Vidéos explicatives
+          </Badge>
+          <h2 className="text-2xl md:text-3xl font-bold text-foreground">
+            Comprenez{" "}
+            <span className="bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent">
+              exactement ce que vous obtenez
+            </span>
+          </h2>
+          <p className="text-muted-foreground mt-3 max-w-2xl mx-auto">
+            Avant d'essayer, regardez ces 2 courtes vidéos. Vous verrez pourquoi
+            des centaines de créateurs utilisent déjà EbookStudio Pro pour
+            publier sur Amazon KDP.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-8">
+          {videos.map((video, idx) => (
+            <motion.div
+              key={video.id}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: idx * 0.15 }}
+              viewport={{ once: true }}
+              className="flex flex-col"
+            >
+              <div className="relative rounded-xl overflow-hidden shadow-xl shadow-violet-500/10 border border-border bg-card aspect-video">
+                <iframe
+                  src={`https://www.youtube.com/embed/${video.id}?rel=0`}
+                  title={video.title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="absolute inset-0 w-full h-full"
+                  loading="lazy"
+                />
+              </div>
+              <div className="mt-4 flex gap-3 items-start">
+                <div className="shrink-0 w-9 h-9 rounded-lg bg-violet-500/10 flex items-center justify-center mt-0.5">
+                  <video.icon className="w-4 h-4 text-violet-400" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground">{video.title}</h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {video.description}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
       </div>
-
-      <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-violet-500/20 border border-white/10 bg-slate-900 group">
-        <video
-          ref={videoRef}
-          src={ebookTeaser}
-          muted={isMuted}
-          loop
-          playsInline
-          className="w-full aspect-video object-cover"
-          onEnded={() => setIsPlaying(false)}
-        />
-
-        {/* Play/Pause overlay */}
-        {!isPlaying && (
-          <div
-            className="absolute inset-0 flex items-center justify-center bg-black/40 cursor-pointer transition-opacity"
-            onClick={togglePlay}
-          >
-            <div className="w-20 h-20 rounded-full bg-violet-600/80 backdrop-blur-sm flex items-center justify-center hover:bg-violet-500/90 transition-colors shadow-2xl">
-              <Play className="w-8 h-8 text-white ml-1" fill="white" />
-            </div>
-          </div>
-        )}
-
-        {/* Controls */}
-        {isPlaying && (
-          <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-            <div className="flex items-center gap-3">
-              <button
-                onClick={togglePlay}
-                className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 transition-colors"
-              >
-                <Pause className="w-4 h-4 text-white" />
-              </button>
-              <button
-                onClick={toggleMute}
-                className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 transition-colors"
-              >
-                {isMuted ? (
-                  <VolumeX className="w-4 h-4 text-white" />
-                ) : (
-                  <Volume2 className="w-4 h-4 text-white" />
-                )}
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-
-      <p className="text-center text-sm text-muted-foreground mt-4">
-        🎬 Créez des ebooks professionnels en quelques minutes avec l'IA
-      </p>
-    </motion.div>
+    </section>
   );
 };
 
