@@ -659,6 +659,7 @@ const SalesPage = () => {
           </div>
         </div>
       </footer>
+      <ExitIntentPopup />
     </div>
   );
 };
