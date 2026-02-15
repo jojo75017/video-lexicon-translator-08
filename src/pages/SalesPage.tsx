@@ -401,176 +401,54 @@ const SalesPage = () => {
         </div>
       </div>
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden py-16 px-4">
-        <div className="absolute inset-0 bg-grid-pattern opacity-5" />
-        <div className="max-w-6xl mx-auto text-center relative z-10">
-          
-          {/* Preuve concrète : exemple réel généré */}
-          <div className="max-w-4xl mx-auto mb-10 p-6 md:p-8 bg-gradient-to-br from-violet-50 via-indigo-50 to-purple-50 dark:from-violet-950/40 dark:via-indigo-950/30 dark:to-purple-950/40 rounded-2xl border-2 border-violet-300 dark:border-violet-700 shadow-xl">
-            <h2 className="text-xl md:text-2xl font-bold text-center mb-6 text-foreground">
-              📖 Exemple réel généré en 5 minutes
-            </h2>
-            
-            <div className="grid md:grid-cols-2 gap-6 mb-6">
-              {/* Plan généré */}
-              <div className="bg-white/80 dark:bg-white/10 rounded-xl p-5 border border-violet-200 dark:border-violet-700/50">
-                <h3 className="font-bold text-lg mb-3 text-foreground flex items-center gap-2">
-                  <span className="text-xl">📋</span> Plan généré :
-                </h3>
-                <p className="text-sm font-semibold text-violet-700 dark:text-violet-300 mb-3">
-                  "Créer un revenu avec un ebook"
-                </p>
-                <ol className="space-y-2 text-sm text-muted-foreground">
-                  <li className="flex items-start gap-2">
-                    <span className="bg-violet-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0 mt-0.5">1</span>
-                    <span>Introduction : pourquoi l'ebook reste rentable</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="bg-violet-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0 mt-0.5">2</span>
-                    <span>Choisir un sujet qui se vend</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="bg-violet-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0 mt-0.5">3</span>
-                    <span>Structurer un ebook clair et logique</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="bg-violet-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0 mt-0.5">4</span>
-                    <span>Rédiger rapidement sans blocage</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="bg-violet-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0 mt-0.5">5</span>
-                    <span>Publier et vendre son ebook</span>
-                  </li>
-                </ol>
-              </div>
-              
-              {/* Extrait de chapitre */}
-              <div className="bg-white/80 dark:bg-white/10 rounded-xl p-5 border border-emerald-200 dark:border-emerald-700/50">
-                <h3 className="font-bold text-lg mb-3 text-foreground flex items-start gap-2">
-                  <span className="text-xl">✍️</span> Extrait généré :
-                </h3>
-                <blockquote className="text-sm text-muted-foreground italic border-l-4 border-emerald-400 pl-4 py-2 bg-emerald-50/50 dark:bg-emerald-950/30 rounded-r-lg leading-relaxed">
-                  "Créer un ebook rentable ne demande pas d'être écrivain professionnel. La clé est d'avoir une structure claire, un objectif précis et une méthode simple. Dans ce chapitre, nous allons poser les bases pour passer de l'idée à un contenu concret…"
-                </blockquote>
-                <p className="text-xs text-muted-foreground mt-3 text-center">
-                  ⚡ Généré automatiquement en quelques secondes
-                </p>
-              </div>
-            </div>
-            
-            <div className="text-center">
-              <Button 
-                size="lg" 
-                className="text-lg px-8 py-6 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 shadow-lg mb-3"
-                onClick={() => {
-                  trackDemoClick("Accéder à la démo gratuite (sans carte bancaire)");
-                  document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' });
-                }}
-              >
-                <Play className="w-5 h-5 mr-2" />
-                Accéder à la démo gratuite (sans carte bancaire)
-              </Button>
-              <p className="text-sm text-muted-foreground">
-                ✅ Accès immédiat • ✅ Aucune inscription requise • ✅ Tu juges par toi-même
-              </p>
-            </div>
-          </div>
+      {/* Hero Section - Clean & Focused */}
+      <section className="relative overflow-hidden py-20 px-4">
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-background to-background" />
+        <div className="max-w-5xl mx-auto text-center relative z-10">
           
           <Badge className="mb-6 bg-primary/10 text-primary border-primary/20 px-4 py-2">
             <Sparkles className="w-4 h-4 mr-2" />
-            Générateur IA Professionnel
+            +5 000 ebooks créés avec EbookStudio Pro
           </Badge>
           
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent">
-            Votre Premier Ebook
+          <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+            <span className="text-foreground">Créez un ebook pro</span>
             <br />
-            <span className="text-primary">Publié Cette Semaine</span>
+            <span className="bg-gradient-to-r from-primary to-violet-500 bg-clip-text text-transparent">en 24h au lieu de 6 mois</span>
           </h1>
           
-          <p className="text-xl text-muted-foreground mb-4 max-w-2xl mx-auto">
-            Fini la page blanche et les heures de travail. L'IA fait 90% du travail, 
-            <strong className="text-foreground"> vous gardez 100% des droits et revenus</strong>.
+          <p className="text-xl text-muted-foreground mb-3 max-w-2xl mx-auto">
+            L'IA rédige, structure et formate votre livre. 
+            <strong className="text-foreground"> Vous gardez 100% des droits et revenus.</strong>
+          </p>
+
+          <p className="text-sm text-muted-foreground mb-8">
+            Aucune compétence technique • Résultat visible en 5 min • Sans carte bancaire
           </p>
           
-          <p className="text-lg text-primary font-semibold mb-8">
-            ✅ Aucune compétence technique requise • ✅ Résultats en quelques minutes
-          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-4">
+            <Button 
+              size="lg" 
+              className="text-lg px-10 py-6 bg-gradient-to-r from-primary to-violet-600 hover:from-primary/90 hover:to-violet-500 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
+              onClick={() => {
+                trackDemoClick("Essayer gratuitement");
+                document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
+              <Play className="w-5 h-5 mr-2" />
+              Essayer gratuitement — Résultat en 5 min
+            </Button>
+          </div>
+          
+          <div className="flex items-center justify-center gap-1 mb-12">
+            {[1,2,3,4,5].map(i => (
+              <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+            ))}
+            <span className="ml-2 text-sm text-muted-foreground">4.9/5 — 127 avis vérifiés</span>
+          </div>
 
           {/* Vidéos YouTube explicatives */}
           <HeroVideoTeaser />
-
-          {/* Phrase d'accroche au-dessus de la vidéo */}
-          <div className="text-center mb-6">
-            <p className="text-lg md:text-xl font-semibold text-foreground">
-              🎬 Regarde 3 minutes : tu verras exactement le résultat avant toute décision.
-            </p>
-            <p className="text-sm text-muted-foreground mt-1.5">
-              Sans carte bancaire • Sans engagement
-            </p>
-          </div>
-
-          {/* Vidéo de présentation - Carte Premium */}
-          <div className="max-w-4xl mx-auto mb-10">
-            <div className="relative p-3 md:p-5 bg-gradient-to-br from-slate-50 via-violet-50/50 to-purple-50 dark:from-slate-900 dark:via-violet-950/30 dark:to-purple-950/30 rounded-3xl shadow-[0_8px_40px_-12px_rgba(139,92,246,0.25)] border border-violet-200/50 dark:border-violet-800/40">
-              {/* Badge premium */}
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
-                <Badge className="bg-gradient-to-r from-violet-600 to-purple-600 text-white border-0 shadow-lg px-4 py-1.5 text-sm">
-                  <Play className="w-3.5 h-3.5 mr-1.5" />
-                  Vidéo démo (3 min)
-                </Badge>
-              </div>
-              
-              {/* Conteneur vidéo agrandi */}
-              <div className="relative rounded-2xl overflow-hidden shadow-xl border border-violet-300/30 dark:border-violet-700/30">
-                <div className="relative" style={{ paddingBottom: '62.5%' }}> {/* Ratio 16:10 pour plus de hauteur */}
-                  <iframe 
-                    title="Présentation EbookStudio" 
-                    src="https://player.vimeo.com/video/1153641502?h=d5388db3e9" 
-                    className="absolute inset-0 w-full h-full"
-                    frameBorder="0" 
-                    allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
-                    referrerPolicy="strict-origin-when-cross-origin"
-                    allowFullScreen
-                  />
-                </div>
-              </div>
-              
-              {/* Repères de timing */}
-              <div className="flex justify-center gap-4 md:gap-8 mt-4 text-xs md:text-sm text-muted-foreground">
-                <div className="flex items-center gap-1.5 bg-white/80 dark:bg-white/10 px-3 py-1.5 rounded-full border border-violet-200 dark:border-violet-700/50">
-                  <Clock className="w-3.5 h-3.5 text-violet-500" />
-                  <span><strong className="text-foreground">0:20</strong> – Présentation</span>
-                </div>
-                <div className="flex items-center gap-1.5 bg-white/80 dark:bg-white/10 px-3 py-1.5 rounded-full border border-violet-200 dark:border-violet-700/50">
-                  <Clock className="w-3.5 h-3.5 text-violet-500" />
-                  <span><strong className="text-foreground">1:10</strong> – Génération IA</span>
-                </div>
-                <div className="flex items-center gap-1.5 bg-white/80 dark:bg-white/10 px-3 py-1.5 rounded-full border border-violet-200 dark:border-violet-700/50">
-                  <Clock className="w-3.5 h-3.5 text-violet-500" />
-                  <span><strong className="text-foreground">2:15</strong> – Résultat</span>
-                </div>
-              </div>
-              
-              {/* CTA unique sous la vidéo */}
-              <div className="mt-5 text-center">
-                <Button 
-                  size="lg" 
-                  className="text-base md:text-lg px-8 py-6 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-                  onClick={() => {
-                    trackDemoClick("Accéder à la démo gratuite (sans carte bancaire)");
-                    document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                >
-                  <Play className="w-5 h-5 mr-2" />
-                  Accéder à la démo gratuite (sans carte bancaire)
-                </Button>
-                <p className="text-xs text-muted-foreground mt-3">
-                  ✅ Sans carte bancaire • ✅ Accès immédiat
-                </p>
-          </div>
-            </div>
-          </div>
 
           {/* Section supprimée : Tunnel 2026 - déplacée hors page de vente */}
 
