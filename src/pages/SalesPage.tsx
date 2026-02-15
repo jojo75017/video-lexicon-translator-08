@@ -497,6 +497,9 @@ const SalesPage = () => {
             ✅ Aucune compétence technique requise • ✅ Résultats en quelques minutes
           </p>
 
+          {/* Vidéos YouTube explicatives */}
+          <HeroVideoTeaser />
+
           {/* Phrase d'accroche au-dessus de la vidéo */}
           <div className="text-center mb-6">
             <p className="text-lg md:text-xl font-semibold text-foreground">
@@ -804,8 +807,6 @@ const SalesPage = () => {
       {/* Star Testimonials Carousel */}
       <StarTestimonials />
 
-      {/* Hero Video Teaser */}
-      <HeroVideoTeaser />
 
       {/* Video Testimonials Section */}
       <VideoTestimonials />
