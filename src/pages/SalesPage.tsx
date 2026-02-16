@@ -3,7 +3,7 @@ import { trackDemoClick } from "@/utils/analytics";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, Sparkles, BookOpen, Zap, Download, Star, ArrowRight, Play, Loader2, Clock, HelpCircle, CheckCircle, CheckCircle2, Calculator, Gift, Mail, Send, Rocket } from "lucide-react";
+import { Check, Sparkles, BookOpen, Zap, Download, Star, ArrowRight, Play, Loader2, Clock, HelpCircle, CheckCircle, CheckCircle2, Calculator, Gift, Mail, Send, Rocket, ShieldCheck } from "lucide-react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import ExitIntentPopup from "@/components/sales/ExitIntentPopup";
+import SocialProofBanner from "@/components/sales/SocialProofBanner";
 import { generateKdpNichesPdf } from "@/utils/generateKdpNichesPdf";
 import SocialProofNotifications from "@/components/sales/SocialProofNotifications";
 import KdpRoiCalculator from "@/components/sales/KdpRoiCalculator";
@@ -395,6 +396,9 @@ const SalesPage = () => {
         </div>
       </section>
 
+      {/* Social Proof Banner */}
+      <SocialProofBanner />
+
       {/* Testimonials */}
       <section className="py-16 px-4 bg-muted/30">
         <div className="max-w-6xl mx-auto">
@@ -437,10 +441,16 @@ const SalesPage = () => {
       {/* Pricing Section */}
       <section id="pricing" className="py-20 px-4 bg-muted/30">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-4">Une offre simple, tout inclus</h2>
-          <p className="text-muted-foreground text-center mb-6">
+          <h2 className="text-3xl font-bold text-center mb-3">Une offre simple, tout inclus</h2>
+          <p className="text-muted-foreground text-center mb-2">
             Paiement unique – Accès illimité à vie
           </p>
+          <div className="flex justify-center mb-8">
+            <div className="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-4 py-1.5 text-sm">
+              <ShieldCheck className="w-4 h-4 text-emerald-500" />
+              <span className="text-emerald-600 dark:text-emerald-400 font-medium">Garantie 30 jours satisfait ou remboursé</span>
+            </div>
+          </div>
 
           {/* Countdown Timer */}
           {isVipAvailable && (
@@ -472,58 +482,71 @@ const SalesPage = () => {
             </div>
           )}
           
-          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {plans.map((plan, index) => (
-              <Card 
-                key={index} 
-                className={`relative border-2 flex flex-col ${plan.popular ? 'border-primary shadow-xl bg-gradient-to-br from-primary/5 to-primary/10 scale-[1.02]' : 'border-border shadow-md'}`}
+              <div
+                key={index}
+                className={`relative rounded-2xl overflow-hidden ${plan.popular ? 'md:scale-105' : ''}`}
               >
-                {plan.badge && (
-                  <Badge className={`absolute -top-3 left-1/2 -translate-x-1/2 ${plan.id === 'lifetime' ? 'bg-gradient-to-r from-red-500 to-orange-500' : 'bg-primary'}`}>
-                    {plan.badge}
-                  </Badge>
-                )}
-                <CardHeader className="text-center pb-2">
-                  <CardTitle className="text-xl">{plan.name}</CardTitle>
-                  <div className="mt-4">
+                {/* Glassmorphism border gradient */}
+                <div className={`absolute inset-0 rounded-2xl ${plan.popular ? 'bg-gradient-to-br from-primary via-violet-500 to-purple-600 p-[2px]' : 'bg-gradient-to-br from-border to-border/50 p-[1px]'}`}>
+                  <div className="absolute inset-[1px] rounded-2xl bg-background" />
+                </div>
+
+                <div className="relative z-10 p-8">
+                  {plan.badge && (
+                    <div className={`inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-bold mb-6 ${plan.popular ? 'bg-primary/15 text-primary border border-primary/30' : 'bg-muted text-muted-foreground border border-border'}`}>
+                      {plan.popular && <Sparkles className="w-3.5 h-3.5" />}
+                      {plan.badge}
+                    </div>
+                  )}
+
+                  <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
+                  <p className="text-muted-foreground text-sm mb-6">{plan.description}</p>
+
+                  <div className="mb-8">
                     {plan.originalPrice && (
-                      <span className="text-xl text-muted-foreground line-through mr-2">{plan.originalPrice} €</span>
+                      <span className="text-lg text-muted-foreground line-through mr-2">{plan.originalPrice}€</span>
                     )}
-                    <span className="text-4xl font-bold">{plan.price} €</span>
-                    <div className="text-sm text-muted-foreground mt-1">(paiement unique)</div>
+                    <span className="text-5xl font-bold">{plan.price}</span>
+                    <span className="text-2xl font-bold">€</span>
+                    <p className="text-xs text-muted-foreground mt-1">Paiement unique • Accès à vie</p>
                   </div>
-                  <CardDescription className="mt-2 font-medium">{plan.description}</CardDescription>
-                </CardHeader>
-                <CardContent className="pt-4 flex-1">
-                  <ul className="space-y-3">
+
+                  {plan.discount && (
+                    <div className="mb-6 p-3 bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 rounded-xl text-center">
+                      <span className="font-bold text-amber-600 dark:text-amber-400 text-sm">{plan.discount}</span>
+                    </div>
+                  )}
+
+                  <ul className="space-y-3 mb-8">
                     {plan.features.map((feature, i) => (
-                      <li key={i} className="flex items-start gap-2">
-                        <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                        <span className="text-sm">{feature}</span>
+                      <li key={i} className="flex items-start gap-2.5">
+                        <Check className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+                        <span className="text-sm text-foreground/90">{feature}</span>
+                      </li>
+                    ))}
+                    {plan.blocked?.map((feature, i) => (
+                      <li key={`blocked-${i}`} className="flex items-start gap-2.5 opacity-50">
+                        <span className="text-sm text-muted-foreground">{feature}</span>
                       </li>
                     ))}
                   </ul>
-                  {plan.discount && (
-                    <div className="mt-4 p-3 bg-gradient-to-r from-red-500/10 to-orange-500/10 rounded-lg text-center">
-                      <span className="font-bold text-orange-600 dark:text-orange-400">{plan.discount}</span>
-                    </div>
-                  )}
-                </CardContent>
-                <CardFooter className="flex flex-col gap-3">
+
                   <Button 
-                    className={`w-full ${plan.id === 'lifetime' ? 'bg-gradient-to-r from-yellow-500 to-orange-500 hover:opacity-90 text-white' : ''}`}
+                    className={`w-full py-6 text-base font-bold rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-xl ${plan.popular ? 'bg-gradient-to-r from-primary to-violet-600 hover:from-primary/90 hover:to-violet-500 text-white shadow-lg shadow-primary/25' : ''}`}
                     size="lg"
-                    variant={plan.popular ? "default" : plan.id === 'lifetime' ? "default" : "outline"}
+                    variant={plan.popular ? "default" : "outline"}
                     onClick={() => handlePlanClick(plan.id)}
                   >
                     {plan.cta}
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                   {plan.footnote && (
-                    <p className="text-xs text-muted-foreground text-center">{plan.footnote}</p>
+                    <p className="text-xs text-muted-foreground text-center mt-3">{plan.footnote}</p>
                   )}
-                </CardFooter>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
 
