@@ -40,7 +40,7 @@ const ExitIntentPopup = ({ onContinueToOffer }: ExitIntentPopupProps) => {
       {/* Bouton flottant visible */}
       <button
         onClick={openPopup}
-        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 hover:from-amber-600 hover:via-orange-600 hover:to-red-600 text-white font-bold px-5 py-3 rounded-full shadow-2xl animate-bounce hover:animate-none transition-all duration-300 border-2 border-white/30"
+        className="fixed bottom-44 right-6 z-50 flex items-center gap-2 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 hover:from-amber-600 hover:via-orange-600 hover:to-red-600 text-white font-bold px-5 py-3 rounded-full shadow-2xl animate-bounce hover:animate-none transition-all duration-300 border-2 border-white/30"
       >
         <Gift className="w-5 h-5" />
         <span className="hidden sm:inline">N'oubliez pas votre cadeau !</span>
