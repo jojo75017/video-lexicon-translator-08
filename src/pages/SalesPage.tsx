@@ -303,6 +303,10 @@ const SalesPage = () => {
             <Link to="/blog" className="text-white/70 hover:text-violet-400 transition-colors font-medium">Blog</Link>
             <Link to="/demo" className="text-white/70 hover:text-white transition-colors">Démo</Link>
             <Link to="/formation" className="text-white/70 hover:text-white transition-colors">Formation</Link>
+            <a href="https://calendly.com/boubetgeorges/nouvelle-reunion" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-emerald-400 transition-colors flex items-center gap-1">
+              <Play className="w-3.5 h-3.5" />
+              Zoom Live
+            </a>
             <Link to="/valeur-offre" className="text-white/70 hover:text-white transition-colors">Valeur</Link>
             <Link to="/faq" className="text-white/70 hover:text-emerald-400 transition-colors flex items-center gap-1">
               <HelpCircle className="w-4 h-4" />
