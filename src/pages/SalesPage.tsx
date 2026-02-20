@@ -633,6 +633,27 @@ const SalesPage = () => {
         </DialogContent>
       </Dialog>
 
+      {/* Bannière Zoom / Calendly */}
+      <section className="py-10 bg-gradient-to-r from-violet-600/20 via-purple-600/20 to-violet-600/20 border-y border-violet-500/20">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <div className="flex items-center gap-2 text-white">
+              <Play className="w-5 h-5 text-violet-400" />
+              <span className="text-lg font-semibold">🎥 Je suis dispo en Zoom si vous voulez le voir en direct !</span>
+            </div>
+            <a
+              href="https://calendly.com/boubetgeorges/nouvelle-reunion"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Button className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white font-bold px-6">
+                📅 Réserver un créneau Zoom
+              </Button>
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* Footer avec liens SEO */}
       <footer className="py-12 border-t border-border/50 bg-slate-900 text-white">
         <div className="max-w-6xl mx-auto px-4">
