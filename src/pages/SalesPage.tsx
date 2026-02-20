@@ -286,8 +286,22 @@ const SalesPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+      {/* Zoom Live Banner */}
+      <a 
+        href="https://calendly.com/boubetgeorges/nouvelle-reunion" 
+        target="_blank" 
+        rel="noopener noreferrer"
+        className="block w-full bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-500 text-white text-center py-2.5 px-4 text-sm font-semibold hover:from-emerald-500 hover:via-emerald-400 hover:to-teal-400 transition-all sticky top-0 z-[60]"
+      >
+        <span className="flex items-center justify-center gap-2">
+          <Play className="w-4 h-4 fill-white" />
+          🎥 Je suis dispo en Zoom — Voyez l'outil en direct avant d'acheter !
+          <span className="hidden sm:inline border border-white/30 rounded-full px-3 py-0.5 text-xs ml-2">Réserver un créneau →</span>
+        </span>
+      </a>
+
       {/* Header Navigation */}
-      <header className="bg-slate-950/95 backdrop-blur-sm border-b border-white/10 sticky top-0 z-50">
+      <header className="bg-slate-950/95 backdrop-blur-sm border-b border-white/10 sticky top-[40px] z-50">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
           <Link to="/offres" className="flex items-center gap-2">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
@@ -303,29 +317,19 @@ const SalesPage = () => {
             <Link to="/blog" className="text-white/70 hover:text-violet-400 transition-colors font-medium">Blog</Link>
             <Link to="/demo" className="text-white/70 hover:text-white transition-colors">Démo</Link>
             <Link to="/formation" className="text-white/70 hover:text-white transition-colors">Formation</Link>
-            <a href="https://calendly.com/boubetgeorges/nouvelle-reunion" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-emerald-400 transition-colors flex items-center gap-1">
-              <Play className="w-3.5 h-3.5" />
-              Zoom Live
-            </a>
             <Link to="/valeur-offre" className="text-white/70 hover:text-white transition-colors">Valeur</Link>
             <Link to="/faq" className="text-white/70 hover:text-emerald-400 transition-colors flex items-center gap-1">
               <HelpCircle className="w-4 h-4" />
               FAQ
             </Link>
           </nav>
-          <div className="flex items-center gap-2">
-            <a href="https://calendly.com/boubetgeorges/nouvelle-reunion" target="_blank" rel="noopener noreferrer" className="md:hidden text-xs text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1 border border-emerald-400/30 rounded-full px-3 py-1.5">
-              <Play className="w-3 h-3" />
-              Zoom Live
-            </a>
-            <Button 
-              size="sm" 
-              className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white"
-              onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
-            >
-              {isVipAvailable ? `Offre Fondateur ${daysRemaining}j restants` : 'Voir les offres'}
-            </Button>
-          </div>
+          <Button 
+            size="sm" 
+            className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white"
+            onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
+          >
+            {isVipAvailable ? `Offre Fondateur ${daysRemaining}j restants` : 'Voir les offres'}
+          </Button>
         </div>
       </header>
 
