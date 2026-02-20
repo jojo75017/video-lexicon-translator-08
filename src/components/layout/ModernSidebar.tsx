@@ -273,6 +273,7 @@ const categories: Category[] = [
     items: [
       { id: 'projects', label: '📁 Mes Projets', icon: FolderOpen },
       { id: 'dashboard', label: '📊 Tableau de Bord', icon: LayoutDashboard },
+      { id: 'admin-panel', label: '👑 Gestion Abonnés', icon: Shield, isLink: true, href: '/admin' },
       { id: 'subscription', label: '💳 Abonnement', icon: CreditCard },
       { id: 'settings', label: '⚙️ Paramètres', icon: Settings },
       { id: 'formation-complete', label: '🎓 Formation', icon: GraduationCap, isLink: true, href: '/formation' },
@@ -410,19 +411,37 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
     categories.map(c => c.id) // Toutes les catégories ouvertes par défaut
   );
 
-  // Filtrer les items par recherche
+  // Check admin status
+  const [isAdmin, setIsAdmin] = useState(() => sessionStorage.getItem('is_admin') === 'true');
+  
+  React.useEffect(() => {
+    const checkAdmin = () => setIsAdmin(sessionStorage.getItem('is_admin') === 'true');
+    window.addEventListener('storage', checkAdmin);
+    return () => window.removeEventListener('storage', checkAdmin);
+  }, []);
+
+  // Filtrer les items par recherche et par rôle
   const filteredCategories = useMemo(() => {
-    if (!searchQuery.trim()) return categories;
+    let cats = categories.map(cat => ({
+      ...cat,
+      items: cat.items.filter(item => {
+        // Hide admin-only items for non-admins
+        if (item.id === 'admin-panel' && !isAdmin) return false;
+        return true;
+      })
+    }));
+    
+    if (!searchQuery.trim()) return cats;
     
     const query = searchQuery.toLowerCase();
-    return categories.map(cat => ({
+    return cats.map(cat => ({
       ...cat,
       items: cat.items.filter(item => 
         item.label.toLowerCase().includes(query) ||
         item.id.toLowerCase().includes(query)
       )
     })).filter(cat => cat.items.length > 0);
-  }, [searchQuery]);
+  }, [searchQuery, isAdmin]);
 
   const activeCategoryId = categories.find(cat => 
     cat.items.some(item => item.id === activeTab)
