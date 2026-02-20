@@ -26,9 +26,9 @@ const AdminDirectPage = () => {
         console.warn("RPC has_role error, trying email check:", rpcError);
         // Fallback: check if user email matches admin email
         if (session.user.email === ADMIN_EMAIL) {
-          sessionStorage.setItem('is_admin', 'true');
+        sessionStorage.setItem('is_admin', 'true');
           localStorage.setItem('permanent_admin_email', session.user.email);
-          navigate("/ebook-planner", { replace: true });
+          navigate("/admin", { replace: true });
           return true;
         }
         return false;
@@ -37,7 +37,7 @@ const AdminDirectPage = () => {
       if (isAdmin) {
         sessionStorage.setItem('is_admin', 'true');
         localStorage.setItem('permanent_admin_email', session.user.email || ADMIN_EMAIL);
-        navigate("/ebook-planner", { replace: true });
+        navigate("/admin", { replace: true });
         return true;
       }
 
@@ -45,7 +45,7 @@ const AdminDirectPage = () => {
       if (session.user.email === ADMIN_EMAIL) {
         sessionStorage.setItem('is_admin', 'true');
         localStorage.setItem('permanent_admin_email', session.user.email);
-        navigate("/ebook-planner", { replace: true });
+        navigate("/admin", { replace: true });
         return true;
       }
 
@@ -56,7 +56,7 @@ const AdminDirectPage = () => {
       if (session.user.email === ADMIN_EMAIL) {
         sessionStorage.setItem('is_admin', 'true');
         localStorage.setItem('permanent_admin_email', session.user.email);
-        navigate("/ebook-planner", { replace: true });
+        navigate("/admin", { replace: true });
         return true;
       }
       return false;
