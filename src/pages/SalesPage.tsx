@@ -313,13 +313,19 @@ const SalesPage = () => {
               FAQ
             </Link>
           </nav>
-          <Button 
-            size="sm" 
-            className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white"
-            onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
-          >
-            {isVipAvailable ? `Offre Fondateur ${daysRemaining}j restants` : 'Voir les offres'}
-          </Button>
+          <div className="flex items-center gap-2">
+            <a href="https://calendly.com/boubetgeorges/nouvelle-reunion" target="_blank" rel="noopener noreferrer" className="md:hidden text-xs text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1 border border-emerald-400/30 rounded-full px-3 py-1.5">
+              <Play className="w-3 h-3" />
+              Zoom Live
+            </a>
+            <Button 
+              size="sm" 
+              className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white"
+              onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
+            >
+              {isVipAvailable ? `Offre Fondateur ${daysRemaining}j restants` : 'Voir les offres'}
+            </Button>
+          </div>
         </div>
       </header>
 
