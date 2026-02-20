@@ -38,6 +38,7 @@ import SeoGeneratorPage from './pages/SeoGeneratorPage';
 import PracticalSheetsGeneratorPage from './pages/PracticalSheetsGeneratorPage';
 import ResultatEn5MinPage from './pages/ResultatEn5MinPage';
 import CadeauPage from './pages/CadeauPage';
+import ChecklistTournagePage from './pages/ChecklistTournagePage';
 import { SubscriptionAuth } from '@/components/SubscriptionAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { SubscriberGate } from '@/components/auth/SubscriberGate';
@@ -242,6 +243,7 @@ const App = () => {
             <Route path="/paiement-manuel" element={<PaiementManuelPage />} />
             <Route path="/confirmation-paiement" element={<ConfirmationPaiementPage />} />
             <Route path="/faq" element={<FaqAssistancePage />} />
+            <Route path="/checklist-tournage" element={<ChecklistTournagePage />} />
             <Route path="/assistance" element={<FaqAssistancePage />} />
             <Route path="/affiliation" element={<AffiliationFormationPage />} />
             <Route path="/auth" element={<AuthPage />} />
