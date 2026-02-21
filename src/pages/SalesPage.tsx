@@ -257,7 +257,7 @@ const SalesPage = () => {
           footnote: "📌 Paiement unique – Accès complet à vie – Sans abonnement",
           installments: [
             { label: "En 3 fois", price: "49", perMonth: "49€/mois pendant 3 mois" },
-            { label: "En 5 fois", price: "29", perMonth: "29€/mois pendant 5 mois" },
+            { label: "En 5 fois", price: "32", perMonth: "32€/mois pendant 5 mois" },
           ],
         },
   ];
