@@ -46,7 +46,7 @@ const UpsellPaiementPage = () => {
   const paymentOptions = [
     { id: 'full' as const, label: 'Paiement unique', price: '147€', detail: 'Paiement unique de 147€' },
     { id: 'installment3' as const, label: 'En 3 fois', price: '49€', detail: '49€/mois pendant 3 mois' },
-    { id: 'installment5' as const, label: 'En 5 fois', price: '29€', detail: '29€/mois pendant 5 mois' },
+    { id: 'installment5' as const, label: 'En 5 fois', price: '32€', detail: '32€/mois pendant 5 mois' },
   ];
 
   const handlePayPalClick = () => {
