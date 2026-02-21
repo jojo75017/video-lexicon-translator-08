@@ -198,7 +198,43 @@ const SalesPage = () => {
     { name: "Nicolas F.", role: "Blogueur Pro", text: "La qualité des contenus générés est bluffante. Mes lecteurs adorent mes ebooks.", rating: 5, avatar: "NF", color: "bg-cyan-500" },
   ];
 
-  const plans = [
+  // Plans post-VIP (après 30 avril) : Pro uniquement avec fractionnement
+  const postVipPlans = [
+    {
+      id: "pro",
+      name: "Pro Lifetime",
+      price: "147",
+      originalPrice: "297",
+      period: "",
+      description: "Tout débloqué à vie",
+      badge: "⭐ MEILLEURE OFFRE",
+      discount: "🎯 Économie : 150€ (-50%)",
+      features: [
+        "✨ Ebooks illimités à vie",
+        "📝 Chapitres illimités",
+        "🎨 10 couvertures IA/mois",
+        "📄 Export PDF / EPUB / Word / Google Docs",
+        "🎓 Toutes les formations (18 modules + audio)",
+        "📚 Gestionnaire Séries / Sagas",
+        "📊 Outils KDP Premium complets",
+        "🌍 Traduction multi-langues",
+        "🎧 Générateur Audiobooks",
+        "🔄 Mises à jour gratuites à vie",
+        "💬 Support prioritaire inclus",
+      ],
+      blocked: [],
+      cta: "🚀 Débloquer TOUT pour 147€",
+      popular: true,
+      footnote: "📌 Paiement unique – Accès complet à vie – Sans abonnement",
+      installments: [
+        { label: "En 3 fois", price: "49", perMonth: "49€/mois pendant 3 mois" },
+        { label: "En 5 fois", price: "29", perMonth: "29€/mois pendant 5 mois" },
+      ],
+    },
+  ];
+
+  // Plans VIP (avant 30 avril) : Starter + Pro
+  const vipPlans = [
     {
       id: "starter",
       name: "Starter",
@@ -228,6 +264,7 @@ const SalesPage = () => {
       cta: "Commencer à 47€",
       popular: false,
       footnote: "📌 Paiement unique – Accès immédiat",
+      installments: [],
     },
     {
       id: "pro",
@@ -255,17 +292,20 @@ const SalesPage = () => {
       cta: "🚀 Débloquer TOUT pour 147€",
       popular: true,
       footnote: "📌 Paiement unique – Accès complet à vie – Sans abonnement",
+      installments: [
+        { label: "En 3 fois", price: "49", perMonth: "49€/mois pendant 3 mois" },
+        { label: "En 5 fois", price: "29", perMonth: "29€/mois pendant 5 mois" },
+      ],
     },
   ];
 
+  const plans = isVipAvailable ? vipPlans : postVipPlans;
+
   const handlePlanClick = (planId: string) => {
-    // Si VIP disponible (< 20 places), offre à 37€
-    // Sinon, rediriger vers les offres normales 47€/147€
     if (isVipAvailable) {
       navigate('/paiement-manuel');
     } else {
-      // VIP épuisé → rediriger vers upsell avec le plan choisi
-      navigate(`/upsell-paiement?plan=${planId === 'starter' ? 'starter' : 'pro'}`);
+      navigate('/upsell-paiement?plan=pro');
     }
   };
 
@@ -455,9 +495,9 @@ const SalesPage = () => {
       {/* Pricing Section */}
       <section id="pricing" className="py-20 px-4 bg-muted/30">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-3">Une offre simple, tout inclus</h2>
+          <h2 className="text-3xl font-bold text-center mb-3">{isVipAvailable ? 'Une offre simple, tout inclus' : 'Accès Pro Lifetime — Tout inclus'}</h2>
           <p className="text-muted-foreground text-center mb-2">
-            Paiement unique – Accès illimité à vie
+            {isVipAvailable ? 'Paiement unique – Accès illimité à vie' : 'Paiement unique ou en plusieurs fois – Accès illimité à vie'}
           </p>
           <div className="flex justify-center mb-8">
             <div className="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-4 py-1.5 text-sm">
@@ -496,7 +536,7 @@ const SalesPage = () => {
             </div>
           )}
           
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div className={`grid ${plans.length === 1 ? 'max-w-xl' : 'md:grid-cols-2 max-w-4xl'} gap-8 mx-auto`}>
             {plans.map((plan, index) => (
               <div
                 key={index}
@@ -556,6 +596,27 @@ const SalesPage = () => {
                     {plan.cta}
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
+
+                  {/* Options de paiement fractionné */}
+                  {plan.installments && plan.installments.length > 0 && (
+                    <div className="mt-4 space-y-2">
+                      <p className="text-xs text-muted-foreground text-center mb-2">Ou payez en plusieurs fois :</p>
+                      {plan.installments.map((inst: { label: string; price: string; perMonth: string }, idx: number) => (
+                        <button
+                          key={idx}
+                          onClick={() => handlePlanClick(plan.id)}
+                          className="w-full flex items-center justify-between p-3 rounded-xl border border-border hover:border-primary/50 hover:bg-primary/5 transition-all"
+                        >
+                          <div className="text-left">
+                            <span className="font-semibold text-sm text-foreground">{inst.label}</span>
+                            <p className="text-xs text-muted-foreground">{inst.perMonth}</p>
+                          </div>
+                          <span className="text-lg font-bold text-foreground">{inst.price}€</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
                   {plan.footnote && (
                     <p className="text-xs text-muted-foreground text-center mt-3">{plan.footnote}</p>
                   )}
@@ -593,7 +654,7 @@ const SalesPage = () => {
             className="text-lg px-8 py-6"
             onClick={() => handlePlanClick("pro")}
           >
-            {isVipAvailable ? `Offre Fondateur – 37€` : 'Accéder maintenant – 47€'}
+            {isVipAvailable ? `Offre Fondateur – 37€` : 'Accéder maintenant – 147€'}
             <ArrowRight className="w-5 h-5 ml-2" />
           </Button>
           <p className="text-sm text-muted-foreground mt-4">
