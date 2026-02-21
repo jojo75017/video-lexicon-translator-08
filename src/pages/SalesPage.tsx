@@ -207,8 +207,8 @@ const SalesPage = () => {
             name: "Accès Fondateur",
             price: "37",
             originalPrice: "297",
-            description: "Tout débloqué à vie — Offre limitée aux premiers membres",
-            badge: "🔥 OFFRE FONDATEUR",
+            description: "Tout débloqué à vie — Jusqu'au 30 avril 2026",
+            badge: "🔥 OFFRE FONDATEUR — Jusqu'au 30 avril",
             discount: "🎯 Économie : 260€ (-87%)",
             features: [
               "✨ Ebooks illimités à vie",
