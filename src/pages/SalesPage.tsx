@@ -198,68 +198,69 @@ const SalesPage = () => {
     { name: "Nicolas F.", role: "Blogueur Pro", text: "La qualité des contenus générés est bluffante. Mes lecteurs adorent mes ebooks.", rating: 5, avatar: "NF", color: "bg-cyan-500" },
   ];
 
-  // Plan unique : VIP Fondateur 37€ avant le 30 avril, Pro 147€ après
+  // Toujours afficher les deux plans : Fondateur 37€ (tant que VIP dispo) + Pro 147€
   const plans = [
-    isVipAvailable
-      ? {
-          id: "vip",
-          name: "Accès Fondateur",
-          price: "37",
-          originalPrice: "297",
-          period: "",
-          description: "Tout débloqué à vie — Offre limitée aux premiers membres",
-          badge: "🔥 OFFRE FONDATEUR",
-          discount: "🎯 Économie : 260€ (-87%)",
-          features: [
-            "✨ Ebooks illimités à vie",
-            "📝 Chapitres illimités",
-            "🎨 10 couvertures IA/mois",
-            "📄 Export PDF / EPUB / Word / Google Docs",
-            "🎓 Toutes les formations (18 modules + audio)",
-            "📚 Gestionnaire Séries / Sagas",
-            "📊 Outils KDP Premium complets",
-            "🌍 Traduction multi-langues",
-            "🎧 Générateur Audiobooks",
-            "🔄 Mises à jour gratuites à vie",
-            "💬 Support prioritaire inclus",
-          ],
-          blocked: [],
-          cta: "🚀 Débloquer TOUT pour 37€",
-          popular: true,
-          footnote: "📌 Paiement unique – Accès complet à vie – Sans abonnement",
-          installments: [],
-        }
-      : {
-          id: "pro",
-          name: "Pro Lifetime",
-          price: "147",
-          originalPrice: "297",
-          period: "",
-          description: "Tout débloqué à vie",
-          badge: "⭐ MEILLEURE OFFRE",
-          discount: "🎯 Économie : 150€ (-50%)",
-          features: [
-            "✨ Ebooks illimités à vie",
-            "📝 Chapitres illimités",
-            "🎨 10 couvertures IA/mois",
-            "📄 Export PDF / EPUB / Word / Google Docs",
-            "🎓 Toutes les formations (18 modules + audio)",
-            "📚 Gestionnaire Séries / Sagas",
-            "📊 Outils KDP Premium complets",
-            "🌍 Traduction multi-langues",
-            "🎧 Générateur Audiobooks",
-            "🔄 Mises à jour gratuites à vie",
-            "💬 Support prioritaire inclus",
-          ],
-          blocked: [],
-          cta: "🚀 Débloquer TOUT pour 147€",
-          popular: true,
-          footnote: "📌 Paiement unique – Accès complet à vie – Sans abonnement",
-          installments: [
-            { label: "En 3 fois", price: "49", perMonth: "49€/mois pendant 3 mois" },
-            { label: "En 5 fois", price: "32", perMonth: "32€/mois pendant 5 mois" },
-          ],
-        },
+    ...(isVipAvailable
+      ? [
+          {
+            id: "vip",
+            name: "Accès Fondateur",
+            price: "37",
+            originalPrice: "297",
+            description: "Tout débloqué à vie — Offre limitée aux premiers membres",
+            badge: "🔥 OFFRE FONDATEUR",
+            discount: "🎯 Économie : 260€ (-87%)",
+            features: [
+              "✨ Ebooks illimités à vie",
+              "📝 Chapitres illimités",
+              "🎨 10 couvertures IA/mois",
+              "📄 Export PDF / EPUB / Word / Google Docs",
+              "🎓 Toutes les formations (18 modules + audio)",
+              "📚 Gestionnaire Séries / Sagas",
+              "📊 Outils KDP Premium complets",
+              "🌍 Traduction multi-langues",
+              "🎧 Générateur Audiobooks",
+              "🔄 Mises à jour gratuites à vie",
+              "💬 Support prioritaire inclus",
+            ],
+            blocked: [],
+            cta: "🚀 Débloquer TOUT pour 37€",
+            popular: true,
+            footnote: "📌 Paiement unique – Accès complet à vie – Sans abonnement",
+            installments: [],
+          },
+        ]
+      : []),
+    {
+      id: "pro",
+      name: "Pro Lifetime",
+      price: "147",
+      originalPrice: "297",
+      description: "Tout débloqué à vie",
+      badge: "⭐ PRIX STANDARD",
+      discount: "🎯 Économie : 150€ (-50%)",
+      features: [
+        "✨ Ebooks illimités à vie",
+        "📝 Chapitres illimités",
+        "🎨 10 couvertures IA/mois",
+        "📄 Export PDF / EPUB / Word / Google Docs",
+        "🎓 Toutes les formations (18 modules + audio)",
+        "📚 Gestionnaire Séries / Sagas",
+        "📊 Outils KDP Premium complets",
+        "🌍 Traduction multi-langues",
+        "🎧 Générateur Audiobooks",
+        "🔄 Mises à jour gratuites à vie",
+        "💬 Support prioritaire inclus",
+      ],
+      blocked: [],
+      cta: isVipAvailable ? "Ou payer 147€ plus tard" : "🚀 Débloquer TOUT pour 147€",
+      popular: !isVipAvailable,
+      footnote: "📌 Paiement unique ou en plusieurs fois – Accès à vie",
+      installments: [
+        { label: "En 3 fois", price: "49", perMonth: "49€/mois pendant 3 mois" },
+        { label: "En 5 fois", price: "32", perMonth: "32€/mois pendant 5 mois" },
+      ],
+    },
   ];
 
   const handlePlanClick = (planId: string) => {
@@ -497,92 +498,86 @@ const SalesPage = () => {
             </div>
           )}
           
-          <div className="max-w-3xl mx-auto">
+          <div className={`grid ${plans.length > 1 ? 'md:grid-cols-2 max-w-5xl' : 'max-w-3xl'} gap-8 mx-auto`}>
             {plans.map((plan, index) => (
               <div
                 key={index}
-                className="relative rounded-2xl overflow-hidden"
+                className={`relative rounded-2xl overflow-hidden ${plan.popular ? 'md:scale-[1.02]' : ''}`}
               >
                 {/* Glassmorphism border gradient */}
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary via-violet-500 to-purple-600 p-[2px]">
+                <div className={`absolute inset-0 rounded-2xl ${plan.popular ? 'bg-gradient-to-br from-primary via-violet-500 to-purple-600 p-[2px]' : 'bg-gradient-to-br from-border to-border/50 p-[1px]'}`}>
                   <div className="absolute inset-[1px] rounded-2xl bg-background" />
                 </div>
 
-                <div className="relative z-10 p-8 md:p-10">
-                  <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-8">
-                    {/* Left: Info + Features */}
-                    <div className="flex-1">
-                      <div className="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-bold mb-4 bg-primary/15 text-primary border border-primary/30">
-                        <Sparkles className="w-3.5 h-3.5" />
-                        {plan.badge}
-                      </div>
-
-                      <h3 className="text-2xl font-bold mb-1">{plan.name}</h3>
-                      <p className="text-muted-foreground text-sm mb-6">{plan.description}</p>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                        {plan.features.map((feature, i) => (
-                          <div key={i} className="flex items-start gap-2">
-                            <Check className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
-                            <span className="text-sm text-foreground/90">{feature}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Right: Pricing + CTA */}
-                    <div className="flex flex-col items-center text-center min-w-[220px]">
-                      <div className="mb-3">
-                        <span className="text-lg text-muted-foreground line-through mr-2">{plan.originalPrice}€</span>
-                      </div>
-                      <div className="text-6xl font-black text-primary leading-none mb-1">{plan.price}€</div>
-                      <p className="text-xs text-muted-foreground mb-3">Paiement unique • Accès à vie</p>
-
-                      {plan.discount && (
-                        <div className="mb-4 p-2.5 bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 rounded-xl text-center w-full">
-                          <span className="font-bold text-amber-600 dark:text-amber-400 text-sm">{plan.discount}</span>
-                        </div>
-                      )}
-
-                      <Button
-                        className="w-full py-6 text-base font-bold rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-xl bg-gradient-to-r from-primary to-violet-600 hover:from-primary/90 hover:to-violet-500 text-white shadow-lg shadow-primary/25"
-                        size="lg"
-                        onClick={() => handlePlanClick(plan.id)}
-                      >
-                        {plan.cta}
-                        <ArrowRight className="w-4 h-4 ml-2" />
-                      </Button>
-
-                      {/* Options de paiement fractionné */}
-                      {plan.installments && plan.installments.length > 0 && (
-                        <div className="mt-4 space-y-2 w-full">
-                          <p className="text-xs text-muted-foreground text-center mb-2">Ou payez en plusieurs fois :</p>
-                          {plan.installments.map((inst: { label: string; price: string; perMonth: string }, idx: number) => (
-                            <button
-                              key={idx}
-                              onClick={() => handlePlanClick(plan.id)}
-                              className="w-full flex items-center justify-between p-3 rounded-xl border border-border hover:border-primary/50 hover:bg-primary/5 transition-all"
-                            >
-                              <div className="text-left">
-                                <span className="font-semibold text-sm text-foreground">{inst.label}</span>
-                                <p className="text-xs text-muted-foreground">{inst.perMonth}</p>
-                              </div>
-                              <span className="text-lg font-bold text-foreground">{inst.price}€</span>
-                            </button>
-                          ))}
-                        </div>
-                      )}
-
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground mt-3">
-                        <ShieldCheck className="w-3.5 h-3.5" />
-                        <span>Paiement sécurisé • Accès immédiat</span>
-                      </div>
-
-                      {plan.footnote && (
-                        <p className="text-xs text-muted-foreground mt-2">{plan.footnote}</p>
-                      )}
-                    </div>
+                <div className="relative z-10 p-8">
+                  <div className={`inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-bold mb-4 ${plan.popular ? 'bg-primary/15 text-primary border border-primary/30' : 'bg-muted text-muted-foreground border border-border'}`}>
+                    {plan.popular && <Sparkles className="w-3.5 h-3.5" />}
+                    {plan.badge}
                   </div>
+
+                  <h3 className="text-2xl font-bold mb-1">{plan.name}</h3>
+                  <p className="text-muted-foreground text-sm mb-4">{plan.description}</p>
+
+                  <div className="mb-6">
+                    <span className="text-lg text-muted-foreground line-through mr-2">{plan.originalPrice}€</span>
+                    <span className="text-5xl font-bold">{plan.price}</span>
+                    <span className="text-2xl font-bold">€</span>
+                    <p className="text-xs text-muted-foreground mt-1">Paiement unique • Accès à vie</p>
+                  </div>
+
+                  {plan.discount && (
+                    <div className="mb-6 p-2.5 bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 rounded-xl text-center">
+                      <span className="font-bold text-amber-600 dark:text-amber-400 text-sm">{plan.discount}</span>
+                    </div>
+                  )}
+
+                  <ul className="space-y-2.5 mb-6">
+                    {plan.features.map((feature, i) => (
+                      <li key={i} className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+                        <span className="text-sm text-foreground/90">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <Button
+                    className={`w-full py-6 text-base font-bold rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-xl ${plan.popular ? 'bg-gradient-to-r from-primary to-violet-600 hover:from-primary/90 hover:to-violet-500 text-white shadow-lg shadow-primary/25' : ''}`}
+                    size="lg"
+                    variant={plan.popular ? "default" : "outline"}
+                    onClick={() => handlePlanClick(plan.id)}
+                  >
+                    {plan.cta}
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+
+                  {/* Options de paiement fractionné */}
+                  {plan.installments && plan.installments.length > 0 && (
+                    <div className="mt-4 space-y-2">
+                      <p className="text-xs text-muted-foreground text-center mb-2">Ou payez en plusieurs fois :</p>
+                      {plan.installments.map((inst: { label: string; price: string; perMonth: string }, idx: number) => (
+                        <button
+                          key={idx}
+                          onClick={() => handlePlanClick(plan.id)}
+                          className="w-full flex items-center justify-between p-3 rounded-xl border border-border hover:border-primary/50 hover:bg-primary/5 transition-all"
+                        >
+                          <div className="text-left">
+                            <span className="font-semibold text-sm text-foreground">{inst.label}</span>
+                            <p className="text-xs text-muted-foreground">{inst.perMonth}</p>
+                          </div>
+                          <span className="text-lg font-bold text-foreground">{inst.price}€</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground mt-3">
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    <span>Paiement sécurisé • Accès immédiat</span>
+                  </div>
+
+                  {plan.footnote && (
+                    <p className="text-xs text-muted-foreground text-center mt-2">{plan.footnote}</p>
+                  )}
                 </div>
               </div>
             ))}
