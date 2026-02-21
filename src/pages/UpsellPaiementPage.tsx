@@ -8,31 +8,15 @@ import { toast } from "sonner";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 const PLANS = {
-  starter: {
-    name: "Starter",
-    price: "47",
-    originalPrice: "147",
-    paypalLink: "https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=47&currency_code=EUR&item_name=EbookStudio%20Starter",
-    description: "20 ebooks/mois • Export PDF • Modules 1-4",
-    features: [
-      "30 ebooks par mois",
-      "Chapitres illimités",
-      "Export PDF + EPUB",
-      "Modules de formation 1-8",
-      "Analyse de niche basique",
-      "Recherche de mots-clés KDP",
-      "Description KDP optimisée",
-      "Support email prioritaire",
-      "1 session Zoom/mois incluse"
-    ],
-    badge: "🚀 DÉMARRAGE",
-    color: "from-blue-600 to-cyan-600"
-  },
   pro: {
     name: "Pro Lifetime",
     price: "147",
     originalPrice: "297",
-    paypalLink: "https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=147&currency_code=EUR&item_name=EbookStudio%20Pro%20Lifetime",
+    paypalLinks: {
+      full: "https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=147&currency_code=EUR&item_name=EbookStudio%20Pro%20Lifetime",
+      installment3: "https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=49&currency_code=EUR&item_name=EbookStudio%20Pro%20(1/3)",
+      installment5: "https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=29&currency_code=EUR&item_name=EbookStudio%20Pro%20(1/5)",
+    },
     description: "Tout illimité à vie • Toutes les formations",
     features: [
       "Ebooks illimités à vie",
@@ -53,11 +37,17 @@ const PLANS = {
 
 const UpsellPaiementPage = () => {
   const [searchParams] = useSearchParams();
-  const planId = searchParams.get('plan') || 'pro';
-  const plan = PLANS[planId as keyof typeof PLANS] || PLANS.pro;
+  const plan = PLANS.pro;
   
   const [email, setEmail] = useState("");
+  const [selectedPayment, setSelectedPayment] = useState<'full' | 'installment3' | 'installment5'>('full');
   const navigate = useNavigate();
+
+  const paymentOptions = [
+    { id: 'full' as const, label: 'Paiement unique', price: '147€', detail: 'Paiement unique de 147€' },
+    { id: 'installment3' as const, label: 'En 3 fois', price: '49€', detail: '49€/mois pendant 3 mois' },
+    { id: 'installment5' as const, label: 'En 5 fois', price: '29€', detail: '29€/mois pendant 5 mois' },
+  ];
 
   const handlePayPalClick = () => {
     if (email.trim()) {
@@ -129,14 +119,41 @@ const UpsellPaiementPage = () => {
               <p className="text-xs text-slate-400">Vous recevrez votre code d'accès à cette adresse</p>
             </div>
 
-            {/* PayPal Button */}
+            {/* Payment Options */}
             <div className="space-y-3">
               <label className="text-white font-medium flex items-center gap-2">
                 <span className="bg-purple-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm">2</span>
-                Payer {plan.price}€
+                Choisissez votre mode de paiement
+              </label>
+              <div className="space-y-2">
+                {paymentOptions.map((option) => (
+                  <button
+                    key={option.id}
+                    onClick={() => setSelectedPayment(option.id)}
+                    className={`w-full flex items-center justify-between p-4 rounded-xl border-2 transition-all ${
+                      selectedPayment === option.id 
+                        ? 'border-purple-400 bg-purple-900/30' 
+                        : 'border-slate-700 hover:border-slate-600 bg-slate-800/50'
+                    }`}
+                  >
+                    <div className="text-left">
+                      <span className="font-semibold text-white">{option.label}</span>
+                      <p className="text-xs text-slate-400">{option.detail}</p>
+                    </div>
+                    <span className="text-xl font-bold text-white">{option.price}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* PayPal Button */}
+            <div className="space-y-3">
+              <label className="text-white font-medium flex items-center gap-2">
+                <span className="bg-purple-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm">3</span>
+                Payer
               </label>
               <a 
-                href={plan.paypalLink}
+                href={plan.paypalLinks[selectedPayment]}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={handlePayPalClick}
@@ -147,7 +164,9 @@ const UpsellPaiementPage = () => {
                     <CreditCard className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <p className="font-bold text-white text-lg">💳 Payer {plan.price}€ avec PayPal</p>
+                    <p className="font-bold text-white text-lg">
+                      💳 Payer {paymentOptions.find(o => o.id === selectedPayment)?.price} avec PayPal
+                    </p>
                     <p className="text-sm text-blue-300">Paiement sécurisé - PayPal ou carte bancaire</p>
                   </div>
                 </div>
@@ -157,7 +176,7 @@ const UpsellPaiementPage = () => {
             {/* Confirmation */}
             <div className="space-y-3">
               <label className="text-white font-medium flex items-center gap-2">
-                <span className="bg-purple-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm">3</span>
+                <span className="bg-purple-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm">4</span>
                 Après paiement
               </label>
               <Button 
@@ -180,24 +199,6 @@ const UpsellPaiementPage = () => {
             </div>
           </CardContent>
         </Card>
-
-        {/* Comparaison rapide */}
-        {planId === 'starter' && (
-          <div className="mt-6 p-4 bg-gradient-to-r from-yellow-900/30 to-orange-900/30 border border-yellow-500/30 rounded-xl">
-            <div className="flex items-center gap-2 mb-2">
-              <Zap className="w-5 h-5 text-yellow-400" />
-              <span className="font-bold text-yellow-300">Passez à Pro pour seulement 100€ de plus !</span>
-            </div>
-            <p className="text-sm text-yellow-200/80 mb-3">
-              Débloquez l'accès illimité à vie, les couvertures IA, l'audiobook et toutes les formations.
-            </p>
-            <Link to="/upsell-paiement?plan=pro">
-              <Button variant="outline" className="border-yellow-500/50 text-yellow-300 hover:bg-yellow-900/30">
-                Voir l'offre Pro à 147€ →
-              </Button>
-            </Link>
-          </div>
-        )}
       </div>
     </div>
   );

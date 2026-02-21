@@ -8,7 +8,7 @@ import { useVipAvailability } from '@/hooks/useVipAvailability';
 const PriceComparison: React.FC = () => {
   const navigate = useNavigate();
   const { isVipAvailable } = useVipAvailability();
-  const price = isVipAvailable ? '37' : '47';
+  const price = isVipAvailable ? '37' : '147';
 
   const comparisons = [
     {
@@ -132,7 +132,7 @@ const PriceComparison: React.FC = () => {
                   <Sparkles className="w-6 h-6 text-yellow-300" />
                   <span className="font-bold text-2xl">EbookStudio Pro</span>
                 </div>
-                <p className="text-white/70 mb-5 text-sm">Accès à vie – Ebooks illimités – Tout inclus</p>
+                <p className="text-white/70 mb-5 text-sm">Accès à vie – Ebooks illimités – {isVipAvailable ? 'Offre Fondateur' : 'Paiement unique ou en 3x/5x'}</p>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {[
@@ -153,10 +153,10 @@ const PriceComparison: React.FC = () => {
 
               <div className="text-center flex flex-col items-center gap-3">
                 <div>
-                  <span className="text-xl text-white/50 line-through">147€</span>
+                  <span className="text-xl text-white/50 line-through">297€</span>
                 </div>
                 <div className="text-6xl font-black text-yellow-300 leading-none">{price}€</div>
-                <p className="text-sm text-white/70">Paiement unique</p>
+                <p className="text-sm text-white/70">{isVipAvailable ? 'Paiement unique' : 'Paiement unique ou en 3x49€ / 5x29€'}</p>
                 <div className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-medium">
                   💰 Économie : <span className="font-bold text-yellow-200">de 463€ à 9 963€</span>
                 </div>
