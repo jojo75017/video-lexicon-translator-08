@@ -236,8 +236,8 @@ const SalesPage = () => {
       name: "Pro Lifetime",
       price: "147",
       originalPrice: "297",
-      description: "Tout débloqué à vie",
-      badge: "⭐ PRIX STANDARD",
+      description: isVipAvailable ? "À partir du 1er mai 2026" : "Tout débloqué à vie",
+      badge: isVipAvailable ? "📅 À PARTIR DU 1ER MAI" : "⭐ MEILLEURE OFFRE",
       discount: "🎯 Économie : 150€ (-50%)",
       features: [
         "✨ Ebooks illimités à vie",
