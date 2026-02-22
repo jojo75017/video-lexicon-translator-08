@@ -253,41 +253,125 @@ CHAPITRES PRÉVUS : ${numberOfChapters}${introContext}${charactersContext}
 
     switch (step) {
       case 'P1': {
-        // DIRECTEUR ÉDITORIAL - Génère AUTOMATIQUEMENT la description + vision stratégique
+        // DIRECTEUR ÉDITORIAL PRO — Analyse titre + 5 alternatives best-seller avec scores
         const content = await callAI(
-          `Tu es un DIRECTEUR ÉDITORIAL avec 20 ans d'expérience. Tu analyses un projet de livre et donnes ta vision stratégique. 
-MISSION CRITIQUE : À partir du TITRE, SOUS-TITRE, CATÉGORIE et surtout de la VISION DE L'AUTEUR (son introduction décrivant ce qu'il veut pour ce livre), tu dois créer une analyse stratégique précise. 
-La vision de l'auteur est ta source principale d'information — respecte-la et enrichis-la.
-Sois direct, incisif, comme un vrai pro.`,
-          `Analyse ce projet de livre :
+          `Tu es un DIRECTEUR ÉDITORIAL avec 20 ans d'expérience chez Gallimard, Hachette et en auto-édition Amazon KDP. Tu as lancé plus de 200 best-sellers.
+
+MISSION CRITIQUE : 
+1. Analyser le titre proposé comme un vrai éditeur professionnel
+2. Donner un SCORE KDP IMPITOYABLE au titre original (0-100)
+3. Proposer 5 TITRES ALTERNATIFS best-seller avec sous-titres et scores
+4. Fournir ta vision éditoriale stratégique
+
+CRITÈRES DE NOTATION DES TITRES (score sur 100) :
+- Impact émotionnel & curiosité (20 pts) : le titre donne-t-il ENVIE de cliquer ?
+- Mots-clés recherchables Amazon (20 pts) : apparaît-il dans les recherches ?
+- Clarté de la promesse (20 pts) : le lecteur sait-il ce qu'il va obtenir ?
+- Mémorabilité & branding (15 pts) : le titre est-il unique et mémorable ?
+- Format KDP optimal (15 pts) : titre court (2-5 mots) + sous-titre explicatif
+- Différenciation concurrentielle (10 pts) : se démarque-t-il des concurrents ?
+
+RÈGLES TITRES BEST-SELLER :
+- Le TITRE doit être COURT (2-5 mots), percutant, brandable
+- Le SOUS-TITRE contient la promesse + mots-clés (5-15 mots)
+- Format : "Titre Court : Sous-titre avec promesse et mots-clés"
+- Exemples réels : "Atomic Habits : Tiny Changes, Remarkable Results" (score 95)
+- Un score ≥ 85 = potentiel best-seller. < 70 = titre à refaire.
+
+Sois BRUTAL et HONNÊTE. Un vrai éditeur ne flatte pas, il optimise.`,
+          `Analyse ce projet de livre et JUGE son titre comme un éditeur professionnel :
+
 ${bookContext}
 
-ÉTAPE 1 - INTERPRÉTATION DU TITRE :
-Analyse le titre "${fullTitle}" dans la catégorie "${category}".
-Devine quel est le VRAI sujet du livre. Par exemple :
-- "Elle faisait partie de la famille" + catégorie "Animaux" = histoire émouvante d'un animal de compagnie
-- "Les secrets du marketing digital" + catégorie "Business" = guide pratique sur le marketing en ligne
+ÉTAPE 1 — ÉVALUATION DU TITRE ORIGINAL :
+Analyse "${fullTitle}" dans la catégorie "${category}".
+Score-le impitoyablement selon les 6 critères (total /100).
+Identifie ses forces et faiblesses EXACTES.
 
-ÉTAPE 2 - GÉNÈRE UNE DESCRIPTION (tu dois la créer, personne ne te l'a fournie) :
-Crée une description de 2-3 phrases qui explique clairement le sujet du livre basée sur ton interprétation.
+ÉTAPE 2 — 5 TITRES BEST-SELLER ALTERNATIFS :
+Propose 5 titres avec sous-titres qui obtiendraient un score ≥ 85/100.
+Chaque titre doit avoir un ANGLE DIFFÉRENT (émotionnel, pratique, mystérieux, autoritaire, provocateur).
 
-Donne ta vision éditoriale en JSON :
+ÉTAPE 3 — VISION ÉDITORIALE :
+Crée la description et la stratégie complète.
+
+Réponds en JSON :
 {
-  "descriptionGeneree": "La description que TU as créée pour ce livre (2-3 phrases précises expliquant le sujet)",
-  "promesseCentrale": "la promesse unique de ce livre pour le lecteur",
-  "angleUnique": "ce qui le différencie de la concurrence",
-  "lecteurCible": "profil précis du lecteur idéal (qui il est, ses frustrations, ses désirs)",
-  "tonEditorial": "le ton recommandé pour ce livre",
+  "titreOriginal": {
+    "titre": "${title}",
+    "sousTitre": "${subtitle || 'Aucun'}",
+    "scoreTotal": 72,
+    "details": {
+      "impactEmotionnel": 15,
+      "motsClesAmazon": 12,
+      "clartePromesse": 16,
+      "memorabilite": 10,
+      "formatKDP": 10,
+      "differenciation": 9
+    },
+    "forces": ["force 1", "force 2"],
+    "faiblesses": ["faiblesse 1", "faiblesse 2"],
+    "verdict": "Analyse franche en 2 phrases"
+  },
+  "titresAlternatifs": [
+    {
+      "titre": "Titre Court",
+      "sousTitre": "Sous-titre optimisé avec promesse et mots-clés",
+      "scoreTotal": 90,
+      "angle": "émotionnel|pratique|mystérieux|autoritaire|provocateur",
+      "justification": "Pourquoi ce titre va performer (2 phrases)"
+    }
+  ],
+  "meilleurChoix": {
+    "index": 0,
+    "explication": "Pourquoi ce titre est le meilleur choix pour devenir un best-seller"
+  },
+  "descriptionGeneree": "Description de 2-3 phrases du livre",
+  "promesseCentrale": "la promesse unique",
+  "angleUnique": "ce qui le différencie",
+  "lecteurCible": "profil précis du lecteur idéal",
+  "tonEditorial": "le ton recommandé",
   "forcesProjet": ["force1", "force2", "force3"],
   "risques": ["risque1", "risque2"],
   "recommandation": "ton avis franc de professionnel"
-}`
+}`,
+          4000
         );
         result = parseJSON(content) || { raw: content };
-        displayContent = result.descriptionGeneree 
-          ? `**📖 Description générée :** ${result.descriptionGeneree}\n\n**Promesse centrale :** ${result.promesseCentrale}\n\n**Angle unique :** ${result.angleUnique}\n\n**Lecteur cible :** ${result.lecteurCible}\n\n**Ton éditorial :** ${result.tonEditorial}\n\n**Recommandation :** ${result.recommandation}`
-          : content;
-        console.log('Step P1 completed successfully - Description auto-générée');
+        
+        // Construire un affichage riche et détaillé
+        const to = result.titreOriginal;
+        const alts = result.titresAlternatifs || [];
+        const best = result.meilleurChoix;
+        
+        let titreSection = '';
+        if (to) {
+          const scoreEmoji = to.scoreTotal >= 85 ? '🟢' : to.scoreTotal >= 70 ? '🟡' : '🔴';
+          titreSection = `## 📊 Analyse du titre original\n\n**"${to.titre}"** ${to.sousTitre !== 'Aucun' ? `— ${to.sousTitre}` : ''}\n\n${scoreEmoji} **Score : ${to.scoreTotal}/100**\n\n`;
+          if (to.details) {
+            titreSection += `| Critère | Score |\n|---|---|\n| Impact émotionnel | ${to.details.impactEmotionnel}/20 |\n| Mots-clés Amazon | ${to.details.motsClesAmazon}/20 |\n| Clarté promesse | ${to.details.clartePromesse}/20 |\n| Mémorabilité | ${to.details.memorabilite}/15 |\n| Format KDP | ${to.details.formatKDP}/15 |\n| Différenciation | ${to.details.differenciation}/10 |\n\n`;
+          }
+          if (to.forces) titreSection += `**✅ Forces :** ${to.forces.join(' • ')}\n`;
+          if (to.faiblesses) titreSection += `**⚠️ Faiblesses :** ${to.faiblesses.join(' • ')}\n`;
+          if (to.verdict) titreSection += `\n**💬 Verdict :** ${to.verdict}\n`;
+        }
+        
+        let altSection = '';
+        if (alts.length > 0) {
+          altSection = `\n\n## 🏆 5 Titres Best-Seller Alternatifs\n\n`;
+          alts.forEach((alt: any, i: number) => {
+            const isBest = best && best.index === i;
+            const medal = isBest ? '👑 ' : '';
+            const scoreEmoji = alt.scoreTotal >= 90 ? '🟢' : alt.scoreTotal >= 80 ? '🟡' : '🔴';
+            altSection += `${medal}**${i + 1}. "${alt.titre}" : ${alt.sousTitre}**\n${scoreEmoji} Score : **${alt.scoreTotal}/100** | Angle : _${alt.angle}_\n_${alt.justification}_\n\n`;
+          });
+          if (best) altSection += `\n**👑 Recommandation :** ${best.explication}\n`;
+        }
+        
+        displayContent = titreSection + altSection + 
+          `\n\n---\n\n## 📖 Vision Éditoriale\n\n**Description :** ${result.descriptionGeneree || ''}\n\n**Promesse centrale :** ${result.promesseCentrale || ''}\n\n**Angle unique :** ${result.angleUnique || ''}\n\n**Lecteur cible :** ${result.lecteurCible || ''}\n\n**Ton éditorial :** ${result.tonEditorial || ''}\n\n**Recommandation :** ${result.recommandation || ''}`;
+        
+        console.log('Step P1 completed - Titre analysé avec 5 alternatives best-seller');
         break;
       }
 
