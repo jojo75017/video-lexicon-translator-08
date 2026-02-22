@@ -56,6 +56,10 @@ interface WorkflowProgress {
   savedAt: string;
   generatedCharacters?: GeneratedCharacter[];
   waitingForCharacterValidation?: boolean;
+  waitingForTitleValidation?: boolean;
+  titleSuggestions?: any[];
+  originalTitleScore?: any;
+  selectedTitleIndex?: number | null;
 }
 
 const workflowSteps = [
@@ -108,6 +112,12 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   const [generatedCharacters, setGeneratedCharacters] = useState<GeneratedCharacter[]>([]);
   const [waitingForCharacterValidation, setWaitingForCharacterValidation] = useState(false);
   const [editingCharacterIndex, setEditingCharacterIndex] = useState<number | null>(null);
+  
+  // État pour la validation du titre après P1
+  const [waitingForTitleValidation, setWaitingForTitleValidation] = useState(false);
+  const [titleSuggestions, setTitleSuggestions] = useState<any[]>([]);
+  const [originalTitleScore, setOriginalTitleScore] = useState<any>(null);
+  const [selectedTitleIndex, setSelectedTitleIndex] = useState<number | null>(null); // null = titre original
 
   const progress = currentStepIndex >= 0 ? ((currentStepIndex + 1) / 15) * 100 : 0;
   // La clé API utilisateur est OBLIGATOIRE pour générer
@@ -145,7 +155,11 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
       allContext,
       savedAt: new Date().toISOString(),
       generatedCharacters,
-      waitingForCharacterValidation
+      waitingForCharacterValidation,
+      waitingForTitleValidation,
+      titleSuggestions,
+      originalTitleScore,
+      selectedTitleIndex
     };
     
     try {
@@ -154,7 +168,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
     } catch (e) {
       console.error('Error saving progress:', e);
     }
-  }, [title, subtitle, category, authorName, numberOfChapters, currentStepIndex, stepResults, allContext, generatedCharacters, waitingForCharacterValidation]);
+  }, [title, subtitle, category, authorName, numberOfChapters, currentStepIndex, stepResults, allContext, generatedCharacters, waitingForCharacterValidation, waitingForTitleValidation, titleSuggestions, originalTitleScore, selectedTitleIndex]);
 
   // Auto-save whenever stepResults changes
   useEffect(() => {
@@ -193,6 +207,12 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
         }
         if (data.waitingForCharacterValidation) {
           setWaitingForCharacterValidation(true);
+        }
+        if (data.waitingForTitleValidation) {
+          setWaitingForTitleValidation(true);
+          if (data.titleSuggestions) setTitleSuggestions(data.titleSuggestions);
+          if (data.originalTitleScore) setOriginalTitleScore(data.originalTitleScore);
+          if (data.selectedTitleIndex !== undefined) setSelectedTitleIndex(data.selectedTitleIndex);
         }
         
         // Expand all completed steps
@@ -322,6 +342,20 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
     setAllContext(prev => ({ ...prev, P3: updatedP3 }));
     // Reprendre à partir de P4 (index 3)
     generateCompleteBook(3);
+  };
+
+  // Continuer le workflow après validation du titre P1
+  const continueAfterTitleValidation = () => {
+    // Si l'utilisateur a choisi un titre alternatif, on met à jour
+    if (selectedTitleIndex !== null && titleSuggestions[selectedTitleIndex]) {
+      const chosen = titleSuggestions[selectedTitleIndex];
+      setTitle(chosen.titre || chosen.title || title);
+      setSubtitle(chosen.sousTitre || chosen.subtitle || subtitle);
+      toast.success(`✅ Titre mis à jour : "${chosen.titre || chosen.title}"`);
+    }
+    setWaitingForTitleValidation(false);
+    // Reprendre à partir de P2 (index 1)
+    generateCompleteBook(1);
   };
 
   // Éditer un personnage
@@ -505,6 +539,20 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             if (i > 0) {
               const prevStep = workflowSteps[i - 1];
               setExpandedSteps(prev => ({ ...prev, [prevStep.id]: false }));
+            }
+            
+            // APRÈS P1 : Pause pour valider/choisir le titre best-seller
+            if (step.id === 'P1') {
+              const suggestions = Array.isArray(result.result?.titresAlternatifs) ? result.result.titresAlternatifs : [];
+              const origScore = result.result?.titreOriginal || null;
+              setTitleSuggestions(suggestions);
+              setOriginalTitleScore(origScore);
+              setSelectedTitleIndex(null);
+              setWaitingForTitleValidation(true);
+              setIsGenerating(false);
+              saveProgress();
+              toast.info('📊 Analyse du titre terminée ! Choisissez votre titre best-seller avant de continuer.');
+              return; // Pause le workflow
             }
             
             // APRÈS P3 : TOUJOURS marquer une pause pour valider les personnages avant P4
@@ -900,6 +948,148 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
           )}
         </CardContent>
       </Card>
+
+      {/* Title Validation Card - After P1 */}
+      {waitingForTitleValidation && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <Card className="border-2 border-primary/50 bg-gradient-to-br from-primary/10 via-background to-amber-500/10">
+            <CardHeader className="pb-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-full bg-primary/20">
+                    <Target className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg">📊 Choisissez votre titre best-seller</CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      Sélectionnez le titre qui fera décoller votre livre sur Amazon
+                    </p>
+                  </div>
+                </div>
+                <Badge variant="outline" className="text-primary border-primary">
+                  Étape P1 → P2
+                </Badge>
+              </div>
+            </CardHeader>
+            
+            <CardContent className="space-y-4">
+              {/* Titre original avec score */}
+              {originalTitleScore && (
+                <div 
+                  onClick={() => setSelectedTitleIndex(null)}
+                  className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                    selectedTitleIndex === null 
+                      ? 'border-primary bg-primary/10 shadow-md' 
+                      : 'border-border hover:border-primary/50'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      {selectedTitleIndex === null && <CheckCircle2 className="h-5 w-5 text-primary" />}
+                      <Badge variant="secondary">Votre titre actuel</Badge>
+                    </div>
+                    <Badge className={`text-lg px-3 py-1 ${
+                      (originalTitleScore.scoreTotal || 0) >= 80 ? 'bg-green-500' : 
+                      (originalTitleScore.scoreTotal || 0) >= 60 ? 'bg-amber-500' : 'bg-destructive'
+                    } text-white`}>
+                      {originalTitleScore.scoreTotal || '?'}/100
+                    </Badge>
+                  </div>
+                  <p className="font-bold text-lg">{originalTitleScore.titre || title}</p>
+                  {(originalTitleScore.sousTitre || subtitle) && (
+                    <p className="text-muted-foreground">{originalTitleScore.sousTitre || subtitle}</p>
+                  )}
+                  {originalTitleScore.verdict && (
+                    <p className="text-sm mt-2 text-muted-foreground italic">{originalTitleScore.verdict}</p>
+                  )}
+                </div>
+              )}
+
+              {/* Titres alternatifs */}
+              {titleSuggestions.length > 0 && (
+                <div className="space-y-3">
+                  <p className="text-sm font-semibold text-foreground">✨ Titres alternatifs suggérés :</p>
+                  {titleSuggestions.map((suggestion, index) => (
+                    <div 
+                      key={index}
+                      onClick={() => setSelectedTitleIndex(index)}
+                      className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                        selectedTitleIndex === index 
+                          ? 'border-primary bg-primary/10 shadow-md' 
+                          : 'border-border hover:border-primary/50'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          {selectedTitleIndex === index && <CheckCircle2 className="h-5 w-5 text-primary" />}
+                          <Badge variant="outline">Option {index + 1}</Badge>
+                          {suggestion.angle && <Badge variant="secondary" className="text-xs">{suggestion.angle}</Badge>}
+                        </div>
+                        <Badge className={`text-lg px-3 py-1 ${
+                          (suggestion.scoreTotal || 0) >= 80 ? 'bg-green-500' : 
+                          (suggestion.scoreTotal || 0) >= 60 ? 'bg-amber-500' : 'bg-destructive'
+                        } text-white`}>
+                          {suggestion.scoreTotal || '?'}/100
+                        </Badge>
+                      </div>
+                      <p className="font-bold text-lg">{suggestion.titre || suggestion.title}</p>
+                      {(suggestion.sousTitre || suggestion.subtitle) && (
+                        <p className="text-muted-foreground">{suggestion.sousTitre || suggestion.subtitle}</p>
+                      )}
+                      {suggestion.justification && (
+                        <p className="text-sm mt-2 text-muted-foreground italic">{suggestion.justification}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Ou saisir un titre personnalisé */}
+              <div className="p-4 bg-muted/30 rounded-lg space-y-3 border border-dashed border-muted-foreground/30">
+                <p className="text-sm font-medium text-foreground">✏️ Ou modifiez directement :</p>
+                <div className="grid gap-3 md:grid-cols-2">
+                  <div className="space-y-1">
+                    <Label className="text-xs text-muted-foreground">Titre</Label>
+                    <Input
+                      value={title}
+                      onChange={(e) => { setTitle(e.target.value); setSelectedTitleIndex(null); }}
+                      className="font-medium"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs text-muted-foreground">Sous-titre</Label>
+                    <Input
+                      value={subtitle}
+                      onChange={(e) => { setSubtitle(e.target.value); setSelectedTitleIndex(null); }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-4 border-t">
+                <Button
+                  size="lg"
+                  onClick={continueAfterTitleValidation}
+                  className="flex-1 gap-2 bg-gradient-to-r from-primary to-amber-500"
+                >
+                  <Rocket className="h-5 w-5" />
+                  {selectedTitleIndex !== null 
+                    ? `Utiliser "${(titleSuggestions[selectedTitleIndex]?.titre || '').substring(0, 30)}..." et continuer`
+                    : 'Garder mon titre et continuer (P2 → P15)'
+                  }
+                </Button>
+              </div>
+              
+              <p className="text-xs text-center text-muted-foreground">
+                Le titre choisi sera utilisé pour toute la suite du workflow (analyse marché, rédaction, packaging...)
+              </p>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
 
       {/* Character Validation Card - After P3 */}
       {waitingForCharacterValidation && (
