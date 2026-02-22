@@ -433,9 +433,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
   const navigate = useNavigate();
   const { isDark, toggleTheme } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
-  const [expandedCategories, setExpandedCategories] = useState<string[]>(
-    categories.map(c => c.id) // Toutes les catégories ouvertes par défaut
-  );
+  const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
 
   // Check admin status
   const [isAdmin, setIsAdmin] = useState(() => sessionStorage.getItem('is_admin') === 'true');
