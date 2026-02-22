@@ -93,6 +93,7 @@ interface Category {
 // Couleurs pastels par catégorie (light / dark)
 const categoryPastelColors: Record<string, { bg: string; border: string }> = {
   presentation: { bg: 'bg-cyan-50 dark:bg-cyan-950/30', border: 'border-cyan-200/60 dark:border-cyan-800/40' },
+  'cadeau-2026': { bg: 'bg-rose-50 dark:bg-rose-950/30', border: 'border-rose-200/60 dark:border-rose-800/40' },
   start: { bg: 'bg-violet-50 dark:bg-violet-950/30', border: 'border-violet-200/60 dark:border-violet-800/40' },
   redaction: { bg: 'bg-blue-50 dark:bg-blue-950/30', border: 'border-blue-200/60 dark:border-blue-800/40' },
   'workflow-p1-p8': { bg: 'bg-amber-50 dark:bg-amber-950/30', border: 'border-amber-200/60 dark:border-amber-800/40' },
@@ -115,6 +116,16 @@ const categories: Category[] = [
     color: 'from-cyan-500 to-blue-500',
     items: [
       { id: 'presentation', label: '🎯 Découvrir KDP Studio', icon: Info, isNew: true },
+    ]
+  },
+  // ========== 0.5 CADEAU 2026 ==========
+  {
+    id: 'cadeau-2026',
+    label: '🎁 Cadeau 2026',
+    emoji: '🎁',
+    color: 'from-rose-400 to-pink-500',
+    items: [
+      { id: 'niches', label: '💡 Niches Rentables', icon: Lightbulb, isLink: true, href: '/niches', isNew: true },
     ]
   },
   // ========== 1. DÉMARRAGE RAPIDE ==========
@@ -183,7 +194,6 @@ const categories: Category[] = [
     emoji: '🎨',
     color: 'from-pink-500 to-rose-500',
     items: [
-      { id: 'niches', label: '💡 Niches Rentables', icon: Lightbulb, isLink: true, href: '/niches', isNew: true },
       { id: 'niche-analysis', label: '🔎 Analyse de Niche', icon: Search, isNew: true },
       { id: 'practical-sheets', label: '💚 Fiches Bien-être & Santé', icon: FileText, isLink: true, href: '/fiches-pratiques', isNew: true },
       { id: 'travel-guide', label: '✈️ Guide de Voyage', icon: Globe, isNew: true },
