@@ -146,6 +146,13 @@ const NichesPage = () => {
             Plus de <span className="font-bold text-primary">{totalNiches}</span> idées de niches rentables pour créer votre ebook. 
             Cliquez sur "Utiliser" pour pré-remplir automatiquement votre projet.
           </p>
+          <Button
+            onClick={() => navigate('/ebook-planner')}
+            className="bg-gradient-to-r from-primary to-pink-500 hover:from-primary/90 hover:to-pink-500/90 text-white"
+          >
+            <ArrowRight className="w-4 h-4 mr-2" />
+            Retour au Générateur d'Ebook
+          </Button>
         </motion.div>
 
         {/* Search Bar */}
