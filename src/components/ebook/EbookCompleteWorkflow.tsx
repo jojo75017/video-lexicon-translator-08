@@ -10,7 +10,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
-  Sparkles, BookOpen, CheckCircle2, Loader2, AlertCircle,
+  Sparkles, BookOpen, CheckCircle2, Loader2, AlertCircle, Shield,
   Rocket, Target, TrendingUp, Layers, FileText, Award, User, Hash,
   ChevronDown, ChevronUp, Tag, AlignLeft, RotateCcw, Trash2, Plus, Key
 } from 'lucide-react';
@@ -73,6 +73,7 @@ const workflowSteps = [
   { id: 'P12', name: 'Boucle Itérative', icon: Sparkles, description: 'Améliorations automatiques' },
   { id: 'P13', name: 'Signature de Style', icon: Award, description: 'Voix d\'auteur unifiée et reconnaissable' },
   { id: 'P14', name: 'Verdict Ultime', icon: CheckCircle2, description: 'Validation finale par l\'éditeur professionnel' },
+  { id: 'P15', name: 'Humanisation Anti-IA', icon: Shield, description: '🎁 BONUS — Rend le texte indétectable par les outils anti-IA' },
 ];
 
 const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplete, characters: externalCharacters = [] }) => {
@@ -108,7 +109,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   const [waitingForCharacterValidation, setWaitingForCharacterValidation] = useState(false);
   const [editingCharacterIndex, setEditingCharacterIndex] = useState<number | null>(null);
 
-  const progress = currentStepIndex >= 0 ? ((currentStepIndex + 1) / 14) * 100 : 0;
+  const progress = currentStepIndex >= 0 ? ((currentStepIndex + 1) / 15) * 100 : 0;
   // La clé API utilisateur est OBLIGATOIRE pour générer
   const hasValidApiKey = isUserKeyValid && !!userApiKey;
   const canGenerate = title.trim() && authorName.trim() && category && bookIntroduction.trim() && hasReadSteps && hasValidApiKey;
@@ -529,7 +530,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
       }
 
       // All steps complete
-      setCurrentStepIndex(14);
+      setCurrentStepIndex(15);
       setFailedStepIndex(null);
       
       // Build final book data
