@@ -38,6 +38,35 @@ const categoryIcons: Record<string, any> = {
   'Mode & Style': Sparkles,
 };
 
+const categorySubtitles: Record<string, string> = {
+  'Romans & Fiction Populaires': 'Captivez vos lecteurs avec des histoires inoubliables',
+  'Romance': 'Le genre #1 sur Amazon KDP — potentiel illimité',
+  'Livres pour Enfants': 'Un marché en pleine croissance toute l\'année',
+  'Développement Personnel': 'Aidez vos lecteurs à transformer leur vie',
+  'Business & Entrepreneuriat': 'Des guides pratiques pour entrepreneurs ambitieux',
+  'Santé & Bien-être': 'Le bien-être, une niche evergreen incontournable',
+  'Cuisine & Gastronomie': 'Recettes et guides culinaires à fort potentiel',
+  'Technologie & Gadgets': 'Guides tech pour un public toujours connecté',
+  'Voyages & Aventure': 'Inspirez les voyageurs du monde entier',
+  'Animaux de compagnie': 'Les propriétaires d\'animaux adorent acheter des livres',
+  'Parentalité & Éducation': 'Accompagnez les parents dans leur quotidien',
+  'Finance & Investissement': 'L\'argent, un sujet qui passionne toujours',
+  'Mode & Style': 'Tendances et conseils pour un public fidèle',
+  'Spiritualité & Philosophie': 'Explorez les grandes questions de la vie',
+  'Sport & Fitness': 'Programmes et motivation pour sportifs passionnés',
+  'Écologie & Durabilité': 'Un sujet d\'avenir à fort engagement',
+  'Reconversion Professionnelle': 'Aidez ceux qui veulent changer de vie',
+  'Aquariophilie & Poissons': 'Une niche de passionnés très fidèles',
+  'Santé et bien-être': 'Remèdes naturels et conseils santé recherchés',
+  'Finances personnelles': 'Liberté financière et gestion de budget',
+  'Relations et rencontres': 'Amour, séduction et relations épanouies',
+  'Développement personnel': 'Confiance en soi et productivité au quotidien',
+  'Spiritualité': 'Méditation, éveil et paix intérieure',
+  'Business & Carrière': 'Réussite professionnelle et leadership',
+  'Parentalité et famille': 'Éducation bienveillante et vie de famille',
+  'Loisirs et compétences': 'Hobbies créatifs et nouvelles compétences',
+};
+
 const categoryColors: Record<string, string> = {
   'Santé et bien-être': 'from-emerald-500 to-green-600',
   'Finances personnelles': 'from-amber-500 to-orange-600',
@@ -186,18 +215,25 @@ const NichesPage = () => {
                   >
                     <Card className="overflow-hidden border-2 hover:border-primary/30 transition-all">
                       <CardHeader className={`bg-gradient-to-r ${color} text-white`}>
-                        <CardTitle className="flex items-center gap-3">
-                          <Icon className="w-6 h-6" />
-                          <span>{theme.category}</span>
-                          <Badge variant="secondary" className="ml-auto bg-white/20 text-white">
-                            {theme.ideas.length} niches
-                          </Badge>
-                          {theme.badge && (
-                            <Badge variant="outline" className="border-white/50 text-white">
-                              {theme.badge}
+                      <div>
+                          <CardTitle className="flex items-center gap-3">
+                            <Icon className="w-6 h-6" />
+                            <span>{theme.category}</span>
+                            <Badge variant="secondary" className="ml-auto bg-white/20 text-white">
+                              {theme.ideas.length} niches
                             </Badge>
+                            {theme.badge && (
+                              <Badge variant="outline" className="border-white/50 text-white">
+                                {theme.badge}
+                              </Badge>
+                            )}
+                          </CardTitle>
+                          {categorySubtitles[theme.category] && (
+                            <p className="text-white/80 text-sm mt-1 font-normal">
+                              {categorySubtitles[theme.category]}
+                            </p>
                           )}
-                        </CardTitle>
+                        </div>
                       </CardHeader>
                       <CardContent className="p-4">
                         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
