@@ -35,6 +35,7 @@ const STEP_ESTIMATES: Record<string, { minutes: number; tip: string }> = {
   P12: { minutes: 5, tip: "Améliorations automatiques basées sur P11." },
   P13: { minutes: 2, tip: "Unification du style sur l'ensemble du manuscrit." },
   P14: { minutes: 2, tip: "Validation finale par l'éditeur IA." },
+  P15: { minutes: 5, tip: "🎁 BONUS — Rend le texte indétectable par les outils anti-IA." },
 };
 
 export const WorkflowDashboard: React.FC<WorkflowDashboardProps> = ({

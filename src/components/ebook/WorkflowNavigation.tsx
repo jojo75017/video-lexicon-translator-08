@@ -32,6 +32,7 @@ export const WORKFLOW_STEPS: WorkflowStep[] = [
   { id: 'P12', label: 'Boucle Itérative', shortLabel: 'P12', description: 'Amélioration continue', requiredSteps: ['P11'], estimatedMinutes: 5, tip: "Améliorations auto." },
   { id: 'P13', label: 'Signature Style', shortLabel: 'P13', description: 'Cohérence stylistique', requiredSteps: ['P4'], estimatedMinutes: 2, tip: "Style unifié." },
   { id: 'P14', label: 'Verdict Ultime', shortLabel: 'P14', description: 'Évaluation finale et recommandations', requiredSteps: ['P8'], estimatedMinutes: 2, tip: "Validation finale." },
+  { id: 'P15', label: 'Humanisation Anti-IA', shortLabel: 'P15', description: '🎁 BONUS — Rend le texte indétectable', requiredSteps: ['P5'], estimatedMinutes: 5, tip: "Anti-détection IA." },
 ];
 
 // Mapping between workflow step IDs and tab IDs
@@ -50,6 +51,7 @@ export const STEP_TO_TAB: Record<string, string> = {
   'P12': 'iterative-loop',
   'P13': 'style-signature',
   'P14': 'ultimate-verdict',
+  'P15': 'humanize-anti-ia',
 };
 
 export const TAB_TO_STEP: Record<string, string> = Object.fromEntries(

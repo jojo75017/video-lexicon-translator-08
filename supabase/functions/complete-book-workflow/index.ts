@@ -933,6 +933,65 @@ Format JSON (VERDICT HONNÊTE - pas de flatterie) :
         break;
       }
 
+      case 'P15': {
+        // HUMANISATION ANTI-DÉTECTION IA (BONUS)
+        const chapitresP5 = previousContext.P5?.chapitresFinal || previousContext.P4?.chapitres || [];
+        const chapitresList = Array.isArray(chapitresP5) ? chapitresP5 : [];
+        
+        if (chapitresList.length === 0) {
+          result = { message: "Aucun chapitre à humaniser." };
+          displayContent = "⚠️ Aucun chapitre trouvé pour l'humanisation.";
+          break;
+        }
+
+        // Humaniser les 3 premiers chapitres comme échantillon + donner des consignes pour le reste
+        const echantillon = chapitresList.slice(0, 3).map((ch: any) => 
+          `### ${ch.titre || ch.title || 'Chapitre'}\n${(ch.contenu || ch.content || '').substring(0, 1500)}`
+        ).join('\n\n---\n\n');
+
+        const content = await callAI(
+          `Tu es un EXPERT EN HUMANISATION DE TEXTE. Ta mission : transformer un texte généré par IA pour le rendre INDÉTECTABLE par les outils anti-IA (GPTZero, Originality.ai, Turnitin).
+
+TECHNIQUES OBLIGATOIRES :
+1. VARIABILITÉ SYNTAXIQUE : Alterner phrases courtes et longues. Commencer des phrases par des adverbes, des compléments circonstanciels, pas toujours par le sujet.
+2. IMPERFECTIONS NATURELLES : Ajouter des tournures familières, des expressions idiomatiques, des incises.
+3. VOIX ACTIVE : Privilégier la voix active. Réduire les constructions passives.
+4. CONNECTEURS HUMAINS : Remplacer "De plus", "En outre", "Par ailleurs" par des transitions plus naturelles ("D'ailleurs", "Et puis", "Ce qui est intéressant aussi").
+5. TOUCHES PERSONNELLES : Ajouter des opinions, des anecdotes courtes, des questionnements rhétoriques.
+6. RYTHME : Casser les patterns réguliers. Un paragraphe de 1 ligne, puis un de 5, puis un de 3.
+7. LEXIQUE VARIÉ : Éviter la répétition des mêmes adjectifs/adverbes.`,
+          `Humanise ces extraits pour les rendre indétectables par les outils anti-IA.
+CONSERVE le sens et les informations. Change la FORME, pas le FOND.
+
+EXTRAITS À HUMANISER :
+${echantillon}
+
+Format JSON :
+{
+  "chapitresHumanises": [
+    {
+      "titre": "titre du chapitre",
+      "contenuHumanise": "le texte humanisé complet"
+    }
+  ],
+  "techniquesAppliquees": ["technique1", "technique2", "technique3"],
+  "scoreAntiDetection": 92,
+  "conseilsPourReste": ["conseil pour humaniser les autres chapitres manuellement"],
+  "avertissement": "note sur les limites de l'humanisation automatique"
+}`,
+          6000
+        );
+        result = parseJSON(content) || { raw: content };
+        
+        const score = result.scoreAntiDetection || 90;
+        const techniques = Array.isArray(result.techniquesAppliquees) ? result.techniquesAppliquees : [];
+        const conseils = Array.isArray(result.conseilsPourReste) ? result.conseilsPourReste : [];
+        const nbHumanises = Array.isArray(result.chapitresHumanises) ? result.chapitresHumanises.length : 0;
+        
+        displayContent = `# 🛡️ HUMANISATION ANTI-IA (BONUS)\n\n**Score anti-détection estimé : ${score}%**\n\n**${nbHumanises} chapitres humanisés** (échantillon)\n\n**Techniques appliquées :**\n${techniques.map((t: string) => `✦ ${t}`).join('\n')}\n\n**Conseils pour le reste du manuscrit :**\n${conseils.map((c: string) => `💡 ${c}`).join('\n')}\n\n${result.avertissement ? `\n⚠️ _${result.avertissement}_` : ''}`;
+        break;
+      }
+
       default:
         return new Response(
           JSON.stringify({ error: `Unknown step: ${step}` }),
