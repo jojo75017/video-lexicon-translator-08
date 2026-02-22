@@ -13,6 +13,8 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { ebookThemes } from '@/data/ebookIdeas';
+import { Crown } from 'lucide-react';
+import BestSellersTab from '@/components/niches/BestSellersTab';
 
 const categoryIcons: Record<string, any> = {
   'Santé et bien-être': Heart,
@@ -177,6 +179,13 @@ const NichesPage = () => {
           <div className="overflow-x-auto pb-2">
             <TabsList className="inline-flex h-auto p-1 bg-muted/50 rounded-xl gap-1 min-w-max">
               <TabsTrigger 
+                value="bestsellers" 
+                className="px-4 py-2 rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-500 data-[state=active]:text-black whitespace-nowrap font-bold"
+              >
+                <Crown className="w-4 h-4 mr-2" />
+                🏆 30 Best-Sellers
+              </TabsTrigger>
+              <TabsTrigger 
                 value="all" 
                 className="px-4 py-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               >
@@ -198,6 +207,11 @@ const NichesPage = () => {
               })}
             </TabsList>
           </div>
+
+          {/* Best-Sellers Tab */}
+          <TabsContent value="bestsellers" className="mt-6">
+            <BestSellersTab />
+          </TabsContent>
 
           {/* Content */}
           <TabsContent value={activeCategory} className="mt-6">
