@@ -90,6 +90,22 @@ interface Category {
   items: MenuItem[];
 }
 
+// Couleurs pastels par catégorie (light / dark)
+const categoryPastelColors: Record<string, { bg: string; border: string }> = {
+  presentation: { bg: 'bg-cyan-50 dark:bg-cyan-950/30', border: 'border-cyan-200/60 dark:border-cyan-800/40' },
+  start: { bg: 'bg-violet-50 dark:bg-violet-950/30', border: 'border-violet-200/60 dark:border-violet-800/40' },
+  redaction: { bg: 'bg-blue-50 dark:bg-blue-950/30', border: 'border-blue-200/60 dark:border-blue-800/40' },
+  'workflow-p1-p8': { bg: 'bg-amber-50 dark:bg-amber-950/30', border: 'border-amber-200/60 dark:border-amber-800/40' },
+  'workflow-p9-p14': { bg: 'bg-emerald-50 dark:bg-emerald-950/30', border: 'border-emerald-200/60 dark:border-emerald-800/40' },
+  special: { bg: 'bg-pink-50 dark:bg-pink-950/30', border: 'border-pink-200/60 dark:border-pink-800/40' },
+  visuels: { bg: 'bg-teal-50 dark:bg-teal-950/30', border: 'border-teal-200/60 dark:border-teal-800/40' },
+  amazon: { bg: 'bg-orange-50 dark:bg-orange-950/30', border: 'border-orange-200/60 dark:border-orange-800/40' },
+  'marketing-cat': { bg: 'bg-green-50 dark:bg-green-950/30', border: 'border-green-200/60 dark:border-green-800/40' },
+  'tools-2026': { bg: 'bg-fuchsia-50 dark:bg-fuchsia-950/30', border: 'border-fuchsia-200/60 dark:border-fuchsia-800/40' },
+  audio: { bg: 'bg-indigo-50 dark:bg-indigo-950/30', border: 'border-indigo-200/60 dark:border-indigo-800/40' },
+  compte: { bg: 'bg-slate-50 dark:bg-slate-950/30', border: 'border-slate-200/60 dark:border-slate-800/40' },
+};
+
 const categories: Category[] = [
   // ========== 0. PRÉSENTATION ==========
   {
@@ -546,7 +562,11 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                   "mb-3 rounded-2xl border-2 transition-all",
                   hasActiveItem 
                     ? "border-violet-400/60 dark:border-violet-500/50 bg-gradient-to-br from-violet-50/50 to-purple-50/30 dark:from-violet-950/30 dark:to-purple-950/20 shadow-lg shadow-violet-500/10" 
-                    : "border-violet-200/40 dark:border-violet-800/30 bg-white/30 dark:bg-white/5 hover:border-violet-300/60 dark:hover:border-violet-700/50",
+                    : cn(
+                        categoryPastelColors[category.id]?.bg || "bg-white/30 dark:bg-white/5",
+                        categoryPastelColors[category.id]?.border || "border-violet-200/40 dark:border-violet-800/30",
+                        "hover:shadow-md hover:scale-[1.01]"
+                      ),
                   isCollapsed ? "p-1" : "p-2"
                 )}
               >
