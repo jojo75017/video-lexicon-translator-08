@@ -5,20 +5,33 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// System prompts for each step - HUMAN VOICE, NO ROBOT
-const HUMAN_VOICE_RULES = `
-RÈGLES ABSOLUES POUR UNE VOIX HUMAINE :
-- Tu es un éditeur professionnel expérimenté, pas une IA
-- Jamais de langage robotique, générique ou corporate
-- Jamais de "dans ce chapitre nous allons explorer..."
-- Jamais de flatterie vide ou promesses creuses
-- Ton naturel, direct, comme une vraie conversation
-- Chaque phrase apporte de la valeur concrète
-- Utilise des exemples réels, des anecdotes, du vécu
-- Écris comme un auteur humain passionné par son sujet
+// STANDARDS ÉDITORIAUX PRO — Voix d'éditeur professionnel
+const EDITORIAL_PRO_RULES = `
+STANDARDS ÉDITORIAUX PROFESSIONNELS (niveau maison d'édition) :
+
+1. DENSITÉ INFORMATIONNELLE : Chaque phrase apporte une info nouvelle. Zéro remplissage, zéro phrase creuse.
+2. VOIX AUTHENTIQUE : Tu es un éditeur avec 20 ans d'expérience. Tu parles avec autorité et clarté.
+3. INTERDICTIONS ABSOLUES :
+   - "Dans ce chapitre, nous allons explorer..." → BANNI
+   - "Il est important de noter que..." → BANNI
+   - "Comme nous l'avons vu précédemment..." → BANNI
+   - Listes à puces sans contexte → BANNI
+   - Phrases de plus de 30 mots → À REFORMULER
+   - Adverbes inutiles (vraiment, très, absolument) → SUPPRIMER
+   - Tournures passives excessives → REMPLACER par actif
+4. STYLE BEST-SELLER :
+   - Accroche dès la première ligne
+   - Anecdotes concrètes, pas de théorie abstraite
+   - Exemples réels et vérifiables
+   - Rythme varié : phrases courtes percutantes + développements fluides
+   - Transitions naturelles entre les idées
+5. SCORING : Tu dois t'auto-évaluer honnêtement sur 10.
+   Score 9-10 = publiable tel quel par une maison d'édition
+   Score 7-8 = bon mais perfectible
+   Score < 7 = à refaire
 `;
 
-// Variable globale pour stocker la clé API (sera définie par le handler principal)
+// Variable globale pour stocker la clé API
 let activeApiKey: string | null = null;
 
 // Token tracking global
@@ -29,7 +42,6 @@ let totalTokenUsage = {
 };
 
 async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000): Promise<string> {
-  // Utiliser la clé active (utilisateur ou serveur)
   const apiKey = activeApiKey || Deno.env.get('OPENAI_API_KEY');
   
   if (!apiKey) {
@@ -45,7 +57,7 @@ async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000
     body: JSON.stringify({
       model: 'gpt-4o-mini',
       messages: [
-        { role: 'system', content: systemPrompt + HUMAN_VOICE_RULES },
+        { role: 'system', content: systemPrompt + EDITORIAL_PRO_RULES },
         { role: 'user', content: userPrompt }
       ],
       max_tokens: maxTokens,
@@ -61,7 +73,6 @@ async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000
 
   const data = await response.json();
   
-  // Track token usage
   if (data.usage) {
     totalTokenUsage.promptTokens += data.usage.prompt_tokens || 0;
     totalTokenUsage.completionTokens += data.usage.completion_tokens || 0;
@@ -72,18 +83,60 @@ async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000
   return data.choices?.[0]?.message?.content || '';
 }
 
+// BOUCLE QUALITÉ : appelle l'IA, évalue le score, relance si < seuil
+async function callAIWithQualityLoop(
+  systemPrompt: string, 
+  userPrompt: string, 
+  maxTokens: number,
+  minScore: number = 9,
+  maxRetries: number = 2,
+  stepName: string = ''
+): Promise<{ content: string; qualityScore: number; attempts: number }> {
+  let bestContent = '';
+  let bestScore = 0;
+  let attempts = 0;
+  
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    attempts = attempt + 1;
+    
+    // Ajouter la demande d'auto-évaluation au prompt
+    const qualityPrompt = attempt === 0 
+      ? userPrompt + `\n\nIMPORTANT : Ajoute un champ "qualityScore" (1-10) dans ton JSON. Sois HONNÊTE. Vise ${minScore}/10 minimum.`
+      : userPrompt + `\n\nATTENTION : Le résultat précédent n'a obtenu que ${bestScore}/10. Tu DOIS atteindre ${minScore}/10 minimum cette fois. Améliore la qualité, la profondeur et l'originalité. Ajoute "qualityScore" dans ton JSON.`;
+    
+    const content = await callAI(systemPrompt, qualityPrompt, maxTokens);
+    const parsed = parseJSON(content);
+    const score = parsed?.qualityScore || parsed?.scoreGlobal || parsed?.scoreReelEstime || 7;
+    
+    console.log(`🎯 ${stepName} - Attempt ${attempts}: score ${score}/${minScore}`);
+    
+    if (score > bestScore) {
+      bestScore = score;
+      bestContent = content;
+    }
+    
+    if (score >= minScore) {
+      console.log(`✅ ${stepName} - Quality target reached: ${score}/10`);
+      break;
+    }
+    
+    if (attempt < maxRetries) {
+      console.log(`🔄 ${stepName} - Score ${score}/10 < ${minScore}, retrying...`);
+    }
+  }
+  
+  return { content: bestContent, qualityScore: bestScore, attempts };
+}
+
 function parseJSON(content: string): any {
   if (!content || typeof content !== 'string') return null;
   
-  // Nettoyer les blocs markdown ```json ... ```
   let cleaned = content.replace(/```json\s*/gi, '').replace(/```\s*/g, '');
   
-  // Méthode 1 : tenter de parser directement
   try {
     return JSON.parse(cleaned.trim());
   } catch {}
   
-  // Méthode 2 : extraction par accolades avec compteur (gère les imbrications)
   try {
     const start = cleaned.indexOf('{');
     if (start === -1) return null;
@@ -103,10 +156,7 @@ function parseJSON(content: string): any {
       try {
         return JSON.parse(jsonStr);
       } catch {
-        // Méthode 3 : tenter de réparer les erreurs courantes
-        // Supprimer les virgules avant }
         jsonStr = jsonStr.replace(/,\s*([\]}])/g, '$1');
-        // Supprimer les retours à la ligne dans les valeurs de chaînes
         jsonStr = jsonStr.replace(/(?<="[^"]*)\n(?=[^"]*")/g, '\\n');
         try {
           return JSON.parse(jsonStr);
@@ -122,23 +172,16 @@ function parseJSON(content: string): any {
   return null;
 }
 
-// Fonction pour nettoyer le texte généré - supprime les artefacts JSON/échappement
 function cleanGeneratedText(text: string): string {
   if (!text || typeof text !== 'string') return text;
   
   return text
-    // Supprimer les guillemets échappés
     .replace(/\\"/g, '')
     .replace(/\\'/g, '')
-    // Supprimer les backslashes échappés
     .replace(/\\\\/g, '')
-    // Supprimer les retours à la ligne échappés \n -> nouvelle ligne
     .replace(/\\n/g, '\n')
-    // Supprimer les tabulations échappées
     .replace(/\\t/g, '\t')
-    // Supprimer les slashes échappés
     .replace(/\\\//g, '/')
-    // Supprimer les patterns JSON résiduels
     .replace(/^\s*{\s*"[^"]*"\s*:\s*"/gm, '')
     .replace(/"\s*}\s*$/gm, '')
     .replace(/^\s*\[\s*"/gm, '')
@@ -147,30 +190,22 @@ function cleanGeneratedText(text: string): string {
     .replace(/":\s*"/g, ': ')
     .replace(/{\s*"/g, '')
     .replace(/"\s*}/g, '')
-    // Supprimer les guillemets orphelins en début/fin de ligne
     .replace(/^"+/gm, '')
     .replace(/"+$/gm, '')
-    // Supprimer les guillemets isolés
     .replace(/(?<![a-zA-ZÀ-ÿ])"(?![a-zA-ZÀ-ÿ])/g, '')
-    // Nettoyer les doubles espaces
     .replace(/  +/g, ' ')
-    // Nettoyer les espaces avant ponctuation
     .replace(/ ([.,;:!?])/g, '$1')
-    // IMPORTANT: Ajouter un espace après la ponctuation de fin de phrase si suivi d'une lettre
     .replace(/\.([A-ZÀ-ÖØ-öø-ÿa-z])/g, '. $1')
     .replace(/\!([A-ZÀ-ÖØ-öø-ÿa-z])/g, '! $1')
     .replace(/\?([A-ZÀ-ÖØ-öø-ÿa-z])/g, '? $1')
     .replace(/,([A-ZÀ-ÖØ-öø-ÿa-z])/g, ', $1')
     .replace(/;([A-ZÀ-ÖØ-öø-ÿa-z])/g, '; $1')
     .replace(/:([A-ZÀ-ÖØ-öø-ÿa-z])/g, ': $1')
-    // Supprimer les caractères de contrôle Unicode indésirables
     .replace(/[\u0000-\u001F\u007F-\u009F]/g, '')
-    // Nettoyer les lignes vides multiples
     .replace(/\n{3,}/g, '\n\n')
     .trim();
 }
 
-// Fonction pour nettoyer un chapitre entier
 function cleanChapter(chapter: any): any {
   if (!chapter) return chapter;
   
@@ -188,7 +223,6 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Reset token tracking for each request
   totalTokenUsage = { promptTokens: 0, completionTokens: 0, totalTokens: 0 };
 
   try {
@@ -208,7 +242,6 @@ serve(async (req) => {
       useUserKey,
     } = payload;
 
-    // LOGIQUE CLÉ API : Priorité à la clé utilisateur si fournie et valide
     if (useUserKey && userApiKey) {
       activeApiKey = userApiKey;
       console.log(`Using USER API key for step ${step}`);
@@ -231,12 +264,10 @@ serve(async (req) => {
       );
     }
 
-    // Construire la liste des personnages pour le contexte
     const charactersContext = characters.length > 0
       ? `\n\nPERSONNAGES DU LIVRE (OBLIGATOIRES À UTILISER) :\n${characters.map((c: any) => `- ${c.name} (${c.role || 'personnage'}): ${c.description}`).join('\n')}`
       : '';
 
-    // Construire le contexte complet du livre
     const fullTitle = subtitle ? `${title} : ${subtitle}` : title;
     const introContext = bookIntroduction ? `\nVISION DE L'AUTEUR : ${bookIntroduction}` : '';
     const bookContext = `
@@ -253,8 +284,8 @@ CHAPITRES PRÉVUS : ${numberOfChapters}${introContext}${charactersContext}
 
     switch (step) {
       case 'P1': {
-        // DIRECTEUR ÉDITORIAL PRO — Analyse titre + 5 alternatives best-seller avec scores
-        const content = await callAI(
+        // DIRECTEUR ÉDITORIAL PRO — Analyse titre + 5 alternatives + INTRO AUTO
+        const { content, qualityScore, attempts } = await callAIWithQualityLoop(
           `Tu es un DIRECTEUR ÉDITORIAL avec 20 ans d'expérience chez Gallimard, Hachette et en auto-édition Amazon KDP. Tu as lancé plus de 200 best-sellers.
 
 MISSION CRITIQUE : 
@@ -262,38 +293,48 @@ MISSION CRITIQUE :
 2. Donner un SCORE KDP IMPITOYABLE au titre original (0-100)
 3. Proposer 5 TITRES ALTERNATIFS best-seller avec sous-titres et scores
 4. Fournir ta vision éditoriale stratégique
+5. GÉNÉRER UNE INTRODUCTION PROFESSIONNELLE adaptée au titre et au genre
 
 CRITÈRES DE NOTATION DES TITRES (score sur 100) :
-- Impact émotionnel & curiosité (20 pts) : le titre donne-t-il ENVIE de cliquer ?
-- Mots-clés recherchables Amazon (20 pts) : apparaît-il dans les recherches ?
-- Clarté de la promesse (20 pts) : le lecteur sait-il ce qu'il va obtenir ?
-- Mémorabilité & branding (15 pts) : le titre est-il unique et mémorable ?
-- Format KDP optimal (15 pts) : titre court (2-5 mots) + sous-titre explicatif
-- Différenciation concurrentielle (10 pts) : se démarque-t-il des concurrents ?
+- Impact émotionnel & curiosité (20 pts)
+- Mots-clés recherchables Amazon (20 pts)
+- Clarté de la promesse (20 pts)
+- Mémorabilité & branding (15 pts)
+- Format KDP optimal (15 pts)
+- Différenciation concurrentielle (10 pts)
 
 RÈGLES TITRES BEST-SELLER :
-- Le TITRE doit être COURT (2-5 mots), percutant, brandable
-- Le SOUS-TITRE contient la promesse + mots-clés (5-15 mots)
-- Format : "Titre Court : Sous-titre avec promesse et mots-clés"
+- TITRE court (2-5 mots), percutant, brandable
+- SOUS-TITRE avec promesse + mots-clés (5-15 mots)
 - Exemples réels : "Atomic Habits : Tiny Changes, Remarkable Results" (score 95)
-- Un score ≥ 85 = potentiel best-seller. < 70 = titre à refaire.
+- Score ≥ 85 = potentiel best-seller. < 70 = titre à refaire.
 
-Sois BRUTAL et HONNÊTE. Un vrai éditeur ne flatte pas, il optimise.`,
-          `Analyse ce projet de livre et JUGE son titre comme un éditeur professionnel :
+INTRODUCTION DU LIVRE :
+L'intro doit accrocher dès la première phrase. Pas de banalité.
+- Phrase d'ouverture percutante (question provocante, statistique choquante, ou anecdote)
+- Présentation du problème que le livre résout
+- Promesse claire de transformation pour le lecteur
+- Ton adapté au genre et à la catégorie
+- 300-500 mots, style professionnel
+
+Sois BRUTAL et HONNÊTE.`,
+          `Analyse ce projet et JUGE son titre :
 
 ${bookContext}
 
 ÉTAPE 1 — ÉVALUATION DU TITRE ORIGINAL :
 Analyse "${fullTitle}" dans la catégorie "${category}".
-Score-le impitoyablement selon les 6 critères (total /100).
-Identifie ses forces et faiblesses EXACTES.
+Score-le selon les 6 critères (total /100).
 
 ÉTAPE 2 — 5 TITRES BEST-SELLER ALTERNATIFS :
-Propose 5 titres avec sous-titres qui obtiendraient un score ≥ 85/100.
-Chaque titre doit avoir un ANGLE DIFFÉRENT (émotionnel, pratique, mystérieux, autoritaire, provocateur).
+Propose 5 titres avec sous-titres qui obtiendraient ≥ 85/100.
+Angles différents : émotionnel, pratique, mystérieux, autoritaire, provocateur.
 
-ÉTAPE 3 — VISION ÉDITORIALE :
-Crée la description et la stratégie complète.
+ÉTAPE 3 — INTRODUCTION PROFESSIONNELLE :
+Rédige une intro de 300-500 mots adaptée au titre et à la catégorie "${category}".
+
+ÉTAPE 4 — CONCLUSION PROFESSIONNELLE :
+Rédige une conclusion de 200-400 mots qui clôt le livre avec impact.
 
 Réponds en JSON :
 {
@@ -324,8 +365,10 @@ Réponds en JSON :
   ],
   "meilleurChoix": {
     "index": 0,
-    "explication": "Pourquoi ce titre est le meilleur choix pour devenir un best-seller"
+    "explication": "Pourquoi ce titre est le meilleur choix"
   },
+  "introductionGeneree": "L'introduction complète du livre (300-500 mots). Accroche dès la première phrase...",
+  "conclusionGeneree": "La conclusion complète du livre (200-400 mots). Synthèse puissante...",
   "descriptionGeneree": "Description de 2-3 phrases du livre",
   "promesseCentrale": "la promesse unique",
   "angleUnique": "ce qui le différencie",
@@ -333,13 +376,17 @@ Réponds en JSON :
   "tonEditorial": "le ton recommandé",
   "forcesProjet": ["force1", "force2", "force3"],
   "risques": ["risque1", "risque2"],
-  "recommandation": "ton avis franc de professionnel"
+  "recommandation": "ton avis franc de professionnel",
+  "qualityScore": 9
 }`,
-          4000
+          5000,
+          9, 2, 'P1'
         );
         result = parseJSON(content) || { raw: content };
+        result._qualityScore = qualityScore;
+        result._attempts = attempts;
         
-        // Construire un affichage riche et détaillé
+        // Construire l'affichage riche
         const to = result.titreOriginal;
         const alts = result.titresAlternatifs || [];
         const best = result.meilleurChoix;
@@ -367,106 +414,141 @@ Réponds en JSON :
           });
           if (best) altSection += `\n**👑 Recommandation :** ${best.explication}\n`;
         }
+
+        // Section introduction générée
+        let introSection = '';
+        if (result.introductionGeneree) {
+          introSection = `\n\n---\n\n## 📝 Introduction Générée\n\n${result.introductionGeneree}\n`;
+        }
+
+        // Section conclusion générée
+        let conclusionSection = '';
+        if (result.conclusionGeneree) {
+          conclusionSection = `\n\n## 🎯 Conclusion Générée\n\n${result.conclusionGeneree}\n`;
+        }
+
+        const qualityBadge = `\n\n---\n🎯 **Score qualité éditorial : ${qualityScore}/10** (${attempts} passage${attempts > 1 ? 's' : ''})`;
         
-        displayContent = titreSection + altSection + 
-          `\n\n---\n\n## 📖 Vision Éditoriale\n\n**Description :** ${result.descriptionGeneree || ''}\n\n**Promesse centrale :** ${result.promesseCentrale || ''}\n\n**Angle unique :** ${result.angleUnique || ''}\n\n**Lecteur cible :** ${result.lecteurCible || ''}\n\n**Ton éditorial :** ${result.tonEditorial || ''}\n\n**Recommandation :** ${result.recommandation || ''}`;
+        displayContent = titreSection + altSection + introSection + conclusionSection +
+          `\n\n---\n\n## 📖 Vision Éditoriale\n\n**Description :** ${result.descriptionGeneree || ''}\n\n**Promesse centrale :** ${result.promesseCentrale || ''}\n\n**Angle unique :** ${result.angleUnique || ''}\n\n**Lecteur cible :** ${result.lecteurCible || ''}\n\n**Ton éditorial :** ${result.tonEditorial || ''}\n\n**Recommandation :** ${result.recommandation || ''}` + qualityBadge;
         
-        console.log('Step P1 completed - Titre analysé avec 5 alternatives best-seller');
+        console.log(`Step P1 completed - Quality: ${qualityScore}/10, Attempts: ${attempts}`);
         break;
       }
 
       case 'P2': {
-        // ANALYSE DE MARCHÉ + 7 MOTS-CLÉS KDP OPTIMISÉS
-        const content = await callAI(
-          `Tu es un expert en SEO Amazon KDP et en analyse d'intention de recherche. Tu connais les tendances, les niches rentables, la concurrence. Parle comme un consultant business pragmatique. UTILISE LA CATÉGORIE fournie pour cibler la bonne niche.`,
-          `Analyse le marché pour ce livre et génère 7 mots-clés KDP très performants :
+        // ANALYSE DE MARCHÉ PRO + 7 MOTS-CLÉS KDP
+        const { content, qualityScore, attempts } = await callAIWithQualityLoop(
+          `Tu es un CONSULTANT en stratégie éditoriale Amazon KDP, ex-analyste chez Nielsen BookScan. Tu analyses les tendances de marché avec des données concrètes. Pas de généralités, que du spécifique.`,
+          `Analyse le marché pour ce livre et génère 7 mots-clés KDP ULTRA-PERFORMANTS :
 
 ${bookContext}
-VISION ÉDITORIALE : ${JSON.stringify(previousContext.P1 || {})}
+VISION ÉDITORIALE P1 : ${JSON.stringify(previousContext.P1 || {})}
 
-MISSION MOTS-CLÉS KDP :
-Trouve 7 mots-clés très performants pour Amazon KDP France basés sur le TITRE et la CATÉGORIE.
+MISSION — ANALYSE DE MARCHÉ PROFESSIONNELLE :
 
-CONTRAINTES OBLIGATOIRES pour les mots-clés :
-- Correspondre à des recherches réelles d'internautes (Amazon + Google)
-- Être strictement cohérents avec la CATÉGORIE "${category}"
-- Être adaptés à Amazon KDP (ni trop génériques, ni trop vagues)
+1. NICHE EXACTE : Identifie la micro-niche KDP précise (pas juste "développement personnel")
+2. CONCURRENCE : Cite 3 livres concurrents réels dans cette niche
+3. POSITIONNEMENT : Comment se différencier des concurrents
+4. 7 MOTS-CLÉS STRATÉGIQUES : Chaque mot-clé doit correspondre à une vraie recherche Amazon
+5. CATÉGORIES CACHÉES : Les catégories Amazon moins évidentes mais pertinentes
+6. STRATÉGIE DE PRIX : Prix optimal avec justification basée sur la concurrence
+
+CONTRAINTES :
+- Mots-clés cohérents avec la catégorie "${category}"
 - Pas de répétition exacte du titre
+- Chaque mot-clé = une intention de recherche réelle
 
-Donne ton analyse marché en JSON :
+Format JSON :
 {
-  "nichePrincipale": "la niche KDP précise basée sur la catégorie ${category}",
-  "tailleMarche": "estimation de la taille (grand/moyen/niche)",
+  "nichePrincipale": "micro-niche KDP précise",
+  "tailleMarche": "estimation avec chiffres",
   "concurrenceNiveau": "faible/moyenne/forte",
-  "opportunite": "l'opportunité identifiée",
+  "concurrentsDirects": [
+    {"titre": "Titre concurrent", "forces": "ce qu'il fait bien", "faiblesses": "ses lacunes"}
+  ],
+  "opportunite": "l'angle inexploité par la concurrence",
   "motsClésKDP": ["7 mots-clés classés du plus stratégique au plus secondaire"],
-  "justificationMotsCles": ["justification pour chaque mot-clé"],
+  "justificationMotsCles": ["justification détaillée pour chaque mot-clé"],
   "categoriesKDP": ["2 catégories Amazon principales recommandées"],
   "categoriesSecondaires": ["3 catégories cachées potentielles"],
-  "prixOptimal": "prix suggéré avec justification",
-  "potentielVentes": "estimation réaliste"
-}`
+  "prixOptimal": "prix suggéré avec justification basée sur la concurrence",
+  "potentielVentes": "estimation réaliste mensuelle",
+  "strategieLancement": "3 actions concrètes pour le lancement",
+  "qualityScore": 9
+}`,
+          4000, 9, 1, 'P2'
         );
         result = parseJSON(content) || { raw: content };
-        console.log('Step P2 completed successfully');
+        result._qualityScore = qualityScore;
+        result._attempts = attempts;
+        
+        const concurrents = result.concurrentsDirects || [];
+        const concurrentsDisplay = concurrents.length > 0
+          ? `\n\n**📚 Concurrents directs :**\n${concurrents.map((c: any) => `• _${c.titre}_ — Forces: ${c.forces} | Faiblesses: ${c.faiblesses}`).join('\n')}`
+          : '';
+        
+        const qualityBadge = `\n\n🎯 **Score qualité : ${qualityScore}/10** (${attempts} passage${attempts > 1 ? 's' : ''})`;
+        
         displayContent = result.nichePrincipale
-          ? `**Niche :** ${result.nichePrincipale}\n\n**Concurrence :** ${result.concurrenceNiveau}\n\n**Opportunité :** ${result.opportunite}\n\n**Prix optimal :** ${result.prixOptimal}\n\n**🔑 7 Mots-clés KDP stratégiques :**\n${(result.motsClésKDP || []).map((kw: string, i: number) => `${i + 1}. ${kw}`).join('\n')}\n\n**Catégories :** ${(result.categoriesKDP || []).join(', ')}\n**Catégories secondaires :** ${(result.categoriesSecondaires || []).join(', ')}`
+          ? `**Niche :** ${result.nichePrincipale}\n\n**Concurrence :** ${result.concurrenceNiveau}\n\n**Opportunité :** ${result.opportunite}${concurrentsDisplay}\n\n**Prix optimal :** ${result.prixOptimal}\n\n**🔑 7 Mots-clés KDP stratégiques :**\n${(result.motsClésKDP || []).map((kw: string, i: number) => `${i + 1}. **${kw}** — _${(result.justificationMotsCles || [])[i] || ''}_`).join('\n')}\n\n**Catégories :** ${(result.categoriesKDP || []).join(', ')}\n**Catégories secondaires :** ${(result.categoriesSecondaires || []).join(', ')}\n\n**🚀 Stratégie lancement :** ${result.strategieLancement || ''}` + qualityBadge
           : content;
         break;
       }
 
       case 'P3': {
-        // ARCHITECTE DE CONTENU - Structure + GÉNÉRATION AUTOMATIQUE DES PERSONNAGES
+        // ARCHITECTE DE CONTENU PRO
         const wordsPerChapter = 3500;
         const totalWords = numberOfChapters * wordsPerChapter;
         const estimatedPages = Math.ceil(totalWords / 250);
         const descriptionGeneree = previousContext.P1?.descriptionGeneree || '';
+        const introductionGeneree = previousContext.P1?.introductionGeneree || '';
+        const conclusionGeneree = previousContext.P1?.conclusionGeneree || '';
         
-        console.log(`Step P3: Structuring ${numberOfChapters} chapters + generating characters for "${fullTitle}"`);
+        console.log(`Step P3: Structuring ${numberOfChapters} chapters for "${fullTitle}"`);
         
-        const content = await callAI(
-          `Tu es un ARCHITECTE DE CONTENU et CRÉATEUR DE PERSONNAGES expert, spécialisé dans les livres publiés sur Amazon KDP.
+        const { content, qualityScore, attempts } = await callAIWithQualityLoop(
+          `Tu es un ARCHITECTE DE CONTENU expert, spécialisé dans les best-sellers Amazon KDP. Tu structures des livres qui se vendent.
           
-STRUCTURE KDP OBLIGATOIRE À RESPECTER (dans cet ordre) :
-1. PAGE DE TITRE (titre, sous-titre, auteur)
-2. PRÉFACE (pourquoi ce livre existe et à qui il s'adresse)
-3. TABLE DES MATIÈRES (générée automatiquement)
-4. INTRODUCTION (présentation du problème et promesse du livre)
-5. CHAPITRES PRINCIPAUX (le cœur du contenu)
-6. BLOCS PRATIQUES (checklist, FAQ, études de cas, plan d'action)
-7. CONCLUSION (synthèse et appel à l'action)
-8. À PROPOS DE L'AUTEUR (présentation professionnelle)
-9. ANNEXES (ressources et compléments utiles)
-10. NOTES ET PAGES DE TRAVAIL (pages pour prise de notes)
-11. PERSONNAGES (si applicable)
+STRUCTURE KDP PROFESSIONNELLE (dans cet ordre) :
+1. PAGE DE TITRE
+2. PRÉFACE (pourquoi ce livre existe)
+3. TABLE DES MATIÈRES
+4. INTRODUCTION (déjà pré-générée, à intégrer)
+5. CHAPITRES PRINCIPAUX (progression logique impeccable)
+6. BLOCS PRATIQUES (checklist, FAQ, études de cas)
+7. CONCLUSION (déjà pré-générée, à intégrer)
+8. À PROPOS DE L'AUTEUR
+9. ANNEXES
 
-CONTRAINTES KDP :
-- Pas de dédicace obligatoire
-- Pas de témoignages inventés
-- Pas de promesses financières ou miracles
-- Style lisible, compatible impression broché
-- Objectif : clarté, utilité, crédibilité`,
-          `Structure ce livre selon les normes KDP en ${numberOfChapters} chapitres ET crée les personnages adaptés :
+QUALITÉ DE STRUCTURE :
+- Chaque chapitre a un OBJECTIF CLAIR et MESURABLE
+- Progression pédagogique : du simple au complexe
+- Pas de redondance entre chapitres
+- Chaque chapitre amène naturellement au suivant
+- Sous-sections variées : concepts + exemples + exercices`,
+          `Structure ce livre selon les normes KDP PRO en ${numberOfChapters} chapitres ET crée les personnages :
 ${bookContext}
-DESCRIPTION DU LIVRE (générée en P1): ${descriptionGeneree}
-VISION : ${JSON.stringify(previousContext.P1 || {})}
-MARCHÉ : ${JSON.stringify(previousContext.P2 || {})}
+DESCRIPTION : ${descriptionGeneree}
+INTRODUCTION PRÉ-GÉNÉRÉE : ${introductionGeneree ? 'OUI (sera intégrée automatiquement)' : 'NON'}
+CONCLUSION PRÉ-GÉNÉRÉE : ${conclusionGeneree ? 'OUI (sera intégrée automatiquement)' : 'NON'}
+VISION P1 : ${JSON.stringify(previousContext.P1 || {})}
+MARCHÉ P2 : ${JSON.stringify(previousContext.P2 || {})}
 
 OBJECTIF : ~${totalWords} mots total (~${estimatedPages} pages)
-Chaque chapitre doit avoir ~${wordsPerChapter} mots avec 4-6 sous-sections.
+Chaque chapitre ~${wordsPerChapter} mots avec 4-6 sous-sections.
 
-MISSION CRITIQUE - PERSONNAGES :
-Crée 4-6 personnages UNIQUES et COHÉRENTS pour CE LIVRE SPÉCIFIQUE.
+MISSION PERSONNAGES : Crée 4-6 personnages UNIQUES et COHÉRENTS.
 
-Crée la structure COMPLÈTE en JSON :
+Format JSON :
 {
-  "structureGlobale": "description de l'arc narratif/pédagogique adapté à ${category}",
+  "structureGlobale": "description de l'arc narratif/pédagogique",
   "nombrePagesEstime": ${estimatedPages},
   "nombreMotsEstime": ${totalWords},
   "introduction": {
     "titre": "Introduction",
     "accroche": "Phrase d'ouverture captivante",
-    "promesse": "Ce que le lecteur va apprendre/vivre",
+    "promesse": "Ce que le lecteur va obtenir",
     "elements": ["élément clé 1", "élément clé 2", "élément clé 3"]
   },
   "personnages": [
@@ -474,50 +556,59 @@ Crée la structure COMPLÈTE en JSON :
       "name": "Nom du personnage",
       "role": "protagoniste/antagoniste/secondaire/mentor",
       "description": "Description physique et psychologique (2-3 phrases)",
-      "arc": "Son évolution au cours du récit"
+      "arc": "Son évolution"
     }
   ],
   "chapitres": [
     {
       "numero": 1,
       "titre": "Titre accrocheur du chapitre",
-      "objectif": "Ce que le lecteur maîtrisera",
+      "objectif": "Ce que le lecteur maîtrisera après ce chapitre",
       "nombreMotsPrevu": ${wordsPerChapter},
       "sousSections": ["sous-section 1", "sous-section 2", "sous-section 3", "sous-section 4"],
       "pointsCles": ["point1", "point2", "point3"],
-      "accroche": "Phrase d'ouverture captivante"
+      "accroche": "Phrase d'ouverture captivante",
+      "lienAvecPrecedent": "comment ce chapitre découle du précédent"
     }
   ],
   "blocsPratiques": {
-    "checklist": ["Point de vérification 1", "Point 2", "Point 3"],
-    "faq": [
-      {"question": "Question fréquente 1?", "reponse": "Réponse concise"},
-      {"question": "Question fréquente 2?", "reponse": "Réponse concise"}
-    ],
+    "checklist": ["Point 1", "Point 2", "Point 3"],
+    "faq": [{"question": "?", "reponse": "..."}],
     "etudeDeCas": "Description d'un scénario réaliste",
-    "planAction": ["Étape 1", "Étape 2", "Étape 3", "Étape 4", "Étape 5"]
+    "planAction": ["Étape 1", "Étape 2", "Étape 3"]
   },
   "aproposAuteur": {
-    "bio": "Présentation professionnelle courte de ${authorName}",
+    "bio": "Bio professionnelle de ${authorName}",
     "expertise": "Domaine d'expertise",
-    "contact": "Comment le contacter (placeholder)"
+    "contact": "Placeholder"
   },
   "annexes": {
-    "titre": "Annexes - Ressources complémentaires",
-    "ressources": ["Ressource 1", "Ressource 2", "Ressource 3"],
-    "references": ["Référence utile 1", "Référence 2"]
+    "titre": "Annexes",
+    "ressources": ["Ressource 1", "Ressource 2"],
+    "references": ["Référence 1", "Référence 2"]
   },
-  "progressionLogique": "explication de pourquoi cet ordre"
+  "progressionLogique": "explication de pourquoi cet ordre",
+  "qualityScore": 9
 }`,
-          12000
+          12000, 9, 1, 'P3'
         );
         result = parseJSON(content) || { raw: content };
-        console.log(`Step P3 completed - Generated ${result.personnages?.length || 0} characters with KDP structure`);
+        result._qualityScore = qualityScore;
+        result._attempts = attempts;
         
-        // Format personnages lisiblement (jamais de JSON brut)
+        // Intégrer intro/conclusion pré-générées dans le résultat
+        if (introductionGeneree && !result.introductionPreGeneree) {
+          result.introductionPreGeneree = introductionGeneree;
+        }
+        if (conclusionGeneree && !result.conclusionPreGeneree) {
+          result.conclusionPreGeneree = conclusionGeneree;
+        }
+        
         const personnagesDisplay = result.personnages?.length > 0
-          ? `\n\n**🎭 ${result.personnages.length} Personnages créés :**\n${result.personnages.map((p: any) => `- **${p.name}** (${p.role}) : ${p.description}${p.arc ? `\n  _Arc narratif :_ ${p.arc}` : ''}`).join('\n')}`
+          ? `\n\n**🎭 ${result.personnages.length} Personnages créés :**\n${result.personnages.map((p: any) => `- **${p.name}** (${p.role}) : ${p.description}${p.arc ? `\n  _Arc :_ ${p.arc}` : ''}`).join('\n')}`
           : '';
+
+        const qualityBadge = `\n\n🎯 **Score qualité : ${qualityScore}/10** (${attempts} passage${attempts > 1 ? 's' : ''})`;
 
         if (result.chapitres) {
           const totalMotsPrevu = result.chapitres.reduce((acc: number, ch: any) => acc + (ch.nombreMotsPrevu || wordsPerChapter), 0);
@@ -531,22 +622,16 @@ Crée la structure COMPLÈTE en JSON :
             ? `\n\n**🛠️ Blocs pratiques :** Checklist (${result.blocsPratiques.checklist?.length || 0} points), FAQ (${result.blocsPratiques.faq?.length || 0} questions), Plan d'action (${result.blocsPratiques.planAction?.length || 0} étapes)`
             : '';
           
-          const aproposDisplay = result.aproposAuteur
-            ? `\n\n**👤 À propos de l'auteur :** ${result.aproposAuteur.bio?.substring(0, 100)}...`
-            : '';
-          
-          displayContent = `**Structure KDP complète générée :** ${result.structureGlobale || 'Structure générée'}${introDisplay}${personnagesDisplay}${blocsPratiquesDisplay}${aproposDisplay}\n\n**📖 ~${pagesEstime} pages prévues (~${totalMotsPrevu} mots)**\n\n**${result.chapitres.length} chapitres structurés :**\n\n` +
-            result.chapitres.map((ch: any) => `**Ch.${ch.numero} - ${ch.titre}** (~${ch.nombreMotsPrevu || wordsPerChapter} mots)\n_Objectif :_ ${ch.objectif}`).join('\n\n');
+          displayContent = `**Structure KDP PRO générée :** ${result.structureGlobale || ''}${introDisplay}${personnagesDisplay}${blocsPratiquesDisplay}\n\n**📖 ~${pagesEstime} pages (~${totalMotsPrevu} mots)**\n\n**${result.chapitres.length} chapitres :**\n\n` +
+            result.chapitres.map((ch: any) => `**Ch.${ch.numero} - ${ch.titre}** (~${ch.nombreMotsPrevu || wordsPerChapter} mots)\n_Objectif :_ ${ch.objectif}${ch.lienAvecPrecedent ? `\n_Lien :_ ${ch.lienAvecPrecedent}` : ''}`).join('\n\n') + qualityBadge;
         } else {
-          // Fallback lisible même sans chapitres
-          displayContent = `**Structure P3 générée**${personnagesDisplay}`;
-          if (result.structureGlobale) displayContent += `\n\n**Vue d'ensemble :** ${result.structureGlobale}`;
+          displayContent = `**Structure P3 générée**${personnagesDisplay}` + qualityBadge;
         }
         break;
       }
 
       case 'P4': {
-        // RÉDACTION EXPERTE AVEC CONTEXTE INTER-CHAPITRES
+        // RÉDACTION PRO AVEC BOUCLE QUALITÉ
         const structure = previousContext.P3?.chapitres || [];
         const descriptionGeneree = previousContext.P1?.descriptionGeneree || '';
         const tonEditorial = previousContext.P1?.tonEditorial || '';
@@ -554,21 +639,14 @@ Crée la structure COMPLÈTE en JSON :
         const structureGlobale = previousContext.P3?.structureGlobale || '';
         const introP3 = previousContext.P3?.introduction || {};
 
-        // PRIORITÉ : utiliser les personnages générés en P3, sinon ceux passés en paramètre
         const personnagesP3 = previousContext.P3?.personnages || [];
         const personnagesAUtiliser = personnagesP3.length > 0 ? personnagesP3 : characters;
-        
-        console.log(`Step P4: Using ${personnagesAUtiliser.length} characters (from P3: ${personnagesP3.length}, from params: ${characters.length})`);
 
-        // Construire la section personnages pour P4
         const personnagesSection = personnagesAUtiliser.length > 0
-          ? `\n\nPERSONNAGES DU LIVRE (à utiliser OBLIGATOIREMENT, n'en invente PAS d'autres) :\n${personnagesAUtiliser.map((c: any) => `- ${c.name} (${c.role || 'personnage'}): ${c.description}${c.arc ? ` | Arc narratif: ${c.arc}` : ''}`).join('\n')}`
+          ? `\n\nPERSONNAGES (à utiliser OBLIGATOIREMENT) :\n${personnagesAUtiliser.map((c: any) => `- ${c.name} (${c.role}): ${c.description}${c.arc ? ` | Arc: ${c.arc}` : ''}`).join('\n')}`
           : '';
 
-        // Construire le plan complet des chapitres pour le contexte global
         const planComplet = structure.map((ch: any) => `Ch.${ch.numero}: ${ch.titre} — ${ch.objectif || ''}`).join('\n');
-
-        // Récupérer les résumés des chapitres déjà générés (passés via previousContext.P4)
         const chapitresDejaGeneres = previousContext.P4?.chapitres || [];
 
         if (chapter) {
@@ -581,77 +659,65 @@ Crée la structure COMPLÈTE en JSON :
             );
           }
 
-          // Construire le résumé des chapitres précédents pour la cohérence
           let resumeChapitresPrecedents = '';
           if (chapitresDejaGeneres.length > 0) {
             const resumesList = chapitresDejaGeneres
               .filter((ch: any) => ch.numero < chapitre.numero)
               .sort((a: any, b: any) => a.numero - b.numero)
-              .slice(-3) // Les 3 derniers chapitres pour garder le contexte sans exploser les tokens
-              .map((ch: any) => {
-                const contenuResume = (ch.contenu || '').substring(0, 400);
-                return `Ch.${ch.numero} "${ch.titre}": ${contenuResume}...`;
-              });
+              .slice(-3)
+              .map((ch: any) => `Ch.${ch.numero} "${ch.titre}": ${(ch.contenu || '').substring(0, 400)}...`);
             if (resumesList.length > 0) {
-              resumeChapitresPrecedents = `\n\nRÉSUMÉ DES CHAPITRES PRÉCÉDENTS (pour assurer la continuité narrative) :\n${resumesList.join('\n\n')}`;
+              resumeChapitresPrecedents = `\n\nCHAPITRES PRÉCÉDENTS (continuité narrative) :\n${resumesList.join('\n\n')}`;
             }
           }
 
-          // Identifier le chapitre suivant pour la transition
           const chapSuivant = structure.find((c: any) => c.numero === chapitre.numero + 1);
-          const transitionVers = chapSuivant ? `\nTRANSITION : Termine en amenant naturellement vers le chapitre suivant "${chapSuivant.titre}".` : '\nCONCLUSION : C\'est le dernier chapitre, termine avec une conclusion forte.';
+          const transitionVers = chapSuivant ? `\nTRANSITION : Amène naturellement vers "${chapSuivant.titre}".` : '\nDERNIER CHAPITRE : Conclusion forte.';
 
-          console.log(`Step P4 (single): Generating chapter ${chapitre.numero}: ${chapitre.titre} with ${personnagesAUtiliser.length} characters, ${chapitresDejaGeneres.length} previous chapters context`);
+          // Boucle qualité pour chaque chapitre
+          const { content: chapterContent, qualityScore, attempts } = await callAIWithQualityLoop(
+            `Tu es un AUTEUR BEST-SELLER avec 20 ans d'expérience. Tu rédiges des chapitres EXCEPTIONNELS dans le genre "${category}".
 
-          const chapterContent = await callAI(
-            `Tu es un AUTEUR PROFESSIONNEL avec 20 ans d'expérience. Tu rédiges des chapitres COMPLETS, captivants, dans le style du genre "${category}".
+EXIGENCES QUALITÉ BEST-SELLER :
+- Chaque paragraphe doit être INDISPENSABLE (pas de remplissage)
+- Phrases d'ouverture percutantes pour chaque section
+- Exemples concrets et vérifiables
+- Dialogues naturels si approprié
+- Rythme varié : tension → relâchement → insight
+- Transitions fluides entre sous-sections
+- Le lecteur ne doit JAMAIS s'ennuyer
 
-RÈGLES DE COHÉRENCE ABSOLUES :
-- Tu écris un SEUL livre continu, pas des chapitres isolés
-- Chaque chapitre DOIT faire référence aux événements/concepts des chapitres précédents
-- Les personnages doivent évoluer de façon cohérente d'un chapitre à l'autre
-- Le ton et le style doivent être IDENTIQUES tout au long du livre
-- Pas de répétitions d'introductions déjà faites dans les chapitres précédents
-- Les transitions doivent être naturelles et fluides
-
-RÈGLES D'ÉCRITURE :
-- Style naturel et humain, JAMAIS robotique
-- Phrases variées (courtes et longues)
-- Dialogues si approprié au genre
-- Descriptions vivantes et immersives
-- TON : ${tonEditorial}${personnagesSection}`,
-            `Rédige le CHAPITRE COMPLET suivant (environ 2500-3500 mots) :
+COHÉRENCE :
+- Références aux chapitres précédents
+- Personnages cohérents
+- Ton identique tout au long
+- Pas de répétitions${personnagesSection}`,
+            `Rédige le CHAPITRE COMPLET (2500-3500 mots, qualité best-seller) :
 
 LIVRE : "${fullTitle}"
 CATÉGORIE : ${category}
 DESCRIPTION : ${descriptionGeneree}
 LECTEUR CIBLE : ${lecteurCible}
-ARC NARRATIF GLOBAL : ${structureGlobale}
-
-PLAN COMPLET DU LIVRE :
-${planComplet}
+ARC GLOBAL : ${structureGlobale}
+PLAN : ${planComplet}
 ${resumeChapitresPrecedents}${personnagesSection}
 
 CHAPITRE ${chapitre.numero}/${structure.length} : "${chapitre.titre}"
-OBJECTIF DU CHAPITRE : ${chapitre.objectif || ''}
-SOUS-SECTIONS À COUVRIR : ${(chapitre.sousSections || []).join(', ')}
+OBJECTIF : ${chapitre.objectif || ''}
+SOUS-SECTIONS : ${(chapitre.sousSections || []).join(', ')}
 POINTS CLÉS : ${(chapitre.pointsCles || []).join(', ')}
 ACCROCHE : ${chapitre.accroche || ''}
 ${transitionVers}
 
-IMPORTANT :
-- Ce chapitre fait partie d'un TOUT cohérent, pas un texte isolé
-- Fais référence aux éléments des chapitres précédents quand c'est pertinent
-- Inclus des exemples concrets, anecdotes, ou dialogues selon le genre
-
-Retourne le contenu en JSON :
+Retourne en JSON :
 {
   "numero": ${chapitre.numero},
   "titre": "${chapitre.titre}",
-  "contenu": "LE CONTENU COMPLET DU CHAPITRE ICI",
-  "nombreMots": 3000
+  "contenu": "LE CONTENU COMPLET (2500-3500 mots minimum)",
+  "nombreMots": 3000,
+  "qualityScore": 9
 }`,
-            6000
+            6000, 8, 1, `P4-Ch${chapitre.numero}`
           );
 
           const parsedChapter = parseJSON(chapterContent);
@@ -667,35 +733,30 @@ Retourne le contenu en JSON :
             numero: chapitreGenere.numero,
             titre: chapitreGenere.titre,
             nombreMots: chapitreGenere.nombreMots,
+            _qualityScore: qualityScore,
+            _attempts: attempts,
           };
 
-          displayContent = `**Ch.${chapitreGenere.numero} - ${chapitreGenere.titre}** (~${chapitreGenere.nombreMots || 3000} mots)\n_${cleanGeneratedText((chapitreGenere.contenu || '').substring(0, 200))}..._`;
+          displayContent = `**Ch.${chapitreGenere.numero} - ${chapitreGenere.titre}** (~${chapitreGenere.nombreMots || 3000} mots) 🎯 ${qualityScore}/10\n_${cleanGeneratedText((chapitreGenere.contenu || '').substring(0, 200))}..._`;
           break;
         }
 
-        // Mode legacy: tout générer séquentiellement avec contexte
-        console.log(`Step P4 (legacy): Generating FULL CONTENT for ${structure.length} chapters with ${personnagesAUtiliser.length} characters`);
-
+        // Mode legacy
         const chapitresComplets: any[] = [];
         for (const chapitre of structure) {
-          console.log(`Generating chapter ${chapitre.numero}: ${chapitre.titre}`);
-
-          // Résumé des chapitres déjà générés dans cette session
           let resumePrecedents = '';
           if (chapitresComplets.length > 0) {
             const derniers = chapitresComplets.slice(-3);
-            resumePrecedents = `\n\nCHAPITRES DÉJÀ RÉDIGÉS (résumé pour continuité) :\n${derniers.map((ch: any) => `Ch.${ch.numero} "${ch.titre}": ${(ch.contenu || '').substring(0, 300)}...`).join('\n\n')}`;
+            resumePrecedents = `\n\nCHAPITRES RÉDIGÉS :\n${derniers.map((ch: any) => `Ch.${ch.numero} "${ch.titre}": ${(ch.contenu || '').substring(0, 300)}...`).join('\n\n')}`;
           }
-
           const chapSuivant = structure.find((c: any) => c.numero === chapitre.numero + 1);
-          const transition = chapSuivant ? `Termine en amenant vers "${chapSuivant.titre}".` : 'Dernier chapitre, termine avec une conclusion forte.';
+          const transition = chapSuivant ? `Termine en amenant vers "${chapSuivant.titre}".` : 'Dernier chapitre, conclusion forte.';
 
           const chapterContent = await callAI(
-            `Tu es un AUTEUR PROFESSIONNEL. Tu rédiges des chapitres COMPLETS dans le style "${category}". Chaque chapitre doit être cohérent avec les précédents.\n\nTON : ${tonEditorial}${personnagesSection}`,
-            `Rédige le CHAPITRE COMPLET :\n\nLIVRE : "${fullTitle}"\nDESCRIPTION : ${descriptionGeneree}\nPLAN : ${planComplet}${resumePrecedents}${personnagesSection}\n\nCHAPITRE ${chapitre.numero}/${structure.length} : "${chapitre.titre}"\nSOUS-SECTIONS : ${(chapitre.sousSections || []).join(', ')}\n${transition}\n\nRetourne en JSON :\n{\n  "numero": ${chapitre.numero},\n  "titre": "${chapitre.titre}",\n  "contenu": "...",\n  "nombreMots": 3000\n}`,
+            `Tu es un AUTEUR BEST-SELLER. Chapitres EXCEPTIONNELS dans "${category}". TON : ${tonEditorial}${personnagesSection}`,
+            `LIVRE : "${fullTitle}"\nDESCRIPTION : ${descriptionGeneree}\nPLAN : ${planComplet}${resumePrecedents}${personnagesSection}\n\nCHAPITRE ${chapitre.numero}/${structure.length} : "${chapitre.titre}"\nSOUS-SECTIONS : ${(chapitre.sousSections || []).join(', ')}\n${transition}\n\nJSON :\n{"numero": ${chapitre.numero}, "titre": "${chapitre.titre}", "contenu": "...", "nombreMots": 3000}`,
             6000
           );
-
           const parsed = parseJSON(chapterContent);
           chapitresComplets.push(cleanChapter(parsed || {
             numero: chapitre.numero,
@@ -712,279 +773,277 @@ Retourne le contenu en JSON :
           nombreMotsTotal: totalMots,
           pagesEstimees: Math.ceil(totalMots / 250),
         };
-
         displayContent = `**✅ ${chapitresComplets.length} chapitres rédigés** (~${totalMots} mots, ~${result.pagesEstimees} pages)`;
         break;
       }
 
       case 'P5': {
-        // RÉÉCRITURE NATURELLE - Analyse et améliore les chapitres complets
         const chapitres = previousContext.P4?.chapitres || [];
-        console.log(`Step P5: Analyzing ${chapitres.length} complete chapters for humanization`);
-        
-        // Prendre un échantillon du contenu de chaque chapitre pour l'analyse
         const echantillons = chapitres.slice(0, 5).map((ch: any) => 
           `Ch.${ch.numero} "${ch.titre}": ${(ch.contenu || '').substring(0, 500)}`
         ).join('\n\n');
         
-        const content = await callAI(
-          `Tu es un RÉÉCRIVAIN expert qui humanise les textes. Tu supprimes tout ce qui sonne "IA" ou "corporate". Tu ajoutes de la vie, des tournures naturelles, du rythme.`,
-          `Analyse ces extraits de chapitres et donne des conseils d'humanisation :
+        const { content, qualityScore, attempts } = await callAIWithQualityLoop(
+          `Tu es un RÉÉCRIVAIN expert. Tu détectes et élimines tout pattern "IA". Tu ajoutes de la vie, des tournures naturelles, du rythme humain.`,
+          `Analyse ces extraits et donne des conseils d'humanisation CONCRETS :
 
-EXTRAITS DES CHAPITRES :
+EXTRAITS :
 ${echantillons}
 
-Analyse et donne tes recommandations en JSON :
+JSON :
 {
-  "analyseGlobale": "ton évaluation du ton actuel et de la qualité d'écriture",
-  "pointsForts": ["ce qui fonctionne bien"],
-  "pointsAHumaniser": ["élément 1 à améliorer", "élément 2"],
-  "exemplesReformulation": [
-    {"avant": "phrase originale", "apres": "version humanisée"}
-  ],
-  "conseilsStyle": ["conseil 1", "conseil 2", "conseil 3"],
-  "scoreHumanite": 8
+  "analyseGlobale": "évaluation du ton et de la qualité",
+  "pointsForts": ["ce qui fonctionne"],
+  "pointsAHumaniser": ["élément à améliorer"],
+  "exemplesReformulation": [{"avant": "phrase originale", "apres": "version humanisée"}],
+  "conseilsStyle": ["conseil 1", "conseil 2"],
+  "scoreHumanite": 8,
+  "qualityScore": 9
 }`,
-          4000
+          4000, 9, 1, 'P5'
         );
         
         result = parseJSON(content) || { raw: content };
-        console.log('Step P5 completed successfully');
-        
-        // Transférer les chapitres complets de P4 vers le résultat final
         result.chapitresFinal = chapitres;
+        result._qualityScore = qualityScore;
         
+        const qualityBadge = `\n\n🎯 **Score qualité : ${qualityScore}/10**`;
         displayContent = result.analyseGlobale
-          ? `**Analyse d'humanisation :**\n\n${result.analyseGlobale}\n\n**Score d'humanité : ${result.scoreHumanite || '?'}/10**\n\n**Points forts :**\n${(result.pointsForts || []).map((p: string) => `✓ ${p}`).join('\n')}\n\n**Points à améliorer :**\n${(result.pointsAHumaniser || []).map((p: string) => `• ${p}`).join('\n')}\n\n**Conseils de style :**\n${(result.conseilsStyle || []).map((c: string) => `→ ${c}`).join('\n')}`
+          ? `**Analyse d'humanisation :**\n\n${result.analyseGlobale}\n\n**Score d'humanité : ${result.scoreHumanite || '?'}/10**\n\n**Points forts :**\n${(result.pointsForts || []).map((p: string) => `✓ ${p}`).join('\n')}\n\n**Points à améliorer :**\n${(result.pointsAHumaniser || []).map((p: string) => `• ${p}`).join('\n')}\n\n**Conseils de style :**\n${(result.conseilsStyle || []).map((c: string) => `→ ${c}`).join('\n')}` + qualityBadge
           : 'Analyse d\'humanisation effectuée';
         break;
       }
 
       case 'P6': {
-        // QUALITÉ ÉDITORIALE
-        const content = await callAI(
-          `Tu es un CORRECTEUR-ÉDITEUR professionnel. Tu vérifies la qualité, la cohérence, la grammaire. Tu es exigeant mais constructif.`,
-          `Analyse la qualité éditoriale de ce projet :
+        const { content, qualityScore } = await callAIWithQualityLoop(
+          `Tu es un CORRECTEUR-ÉDITEUR de maison d'édition. Exigeant, méthodique. Tu vérifies tout : grammaire, cohérence, style, rythme. Chaque faiblesse est identifiée avec une solution.`,
+          `Analyse la qualité éditoriale COMPLÈTE :
 TITRE : "${title}"
 VISION : ${JSON.stringify(previousContext.P1 || {})}
-NOMBRE DE CHAPITRES : ${(previousContext.P4?.chapitres || []).length}
+CHAPITRES : ${(previousContext.P4?.chapitres || []).length}
+STRUCTURE : ${JSON.stringify(previousContext.P3 || {})}
 
-Évalue en JSON :
+JSON :
 {
   "scoreGlobal": 8,
-  "grammaire": { "score": 9, "remarques": "..." },
-  "coherence": { "score": 8, "remarques": "..." },
-  "style": { "score": 8, "remarques": "..." },
-  "structure": { "score": 9, "remarques": "..." },
-  "correctionsEffectuees": ["correction1", "correction2"],
-  "recommandations": ["reco1", "reco2"]
-}`
+  "grammaire": { "score": 9, "remarques": "détails" },
+  "coherence": { "score": 8, "remarques": "détails" },
+  "style": { "score": 8, "remarques": "détails" },
+  "structure": { "score": 9, "remarques": "détails" },
+  "rythme": { "score": 8, "remarques": "détails" },
+  "originalite": { "score": 7, "remarques": "détails" },
+  "correctionsEffectuees": ["correction1"],
+  "recommandations": ["reco1"],
+  "qualityScore": 9
+}`,
+          4000, 9, 1, 'P6'
         );
         result = parseJSON(content) || { raw: content };
+        result._qualityScore = qualityScore;
         displayContent = result.scoreGlobal
           ? `**Score global : ${result.scoreGlobal}/10**\n\n` +
-            `📝 Grammaire : ${result.grammaire?.score}/10\n` +
-            `🔗 Cohérence : ${result.coherence?.score}/10\n` +
-            `✨ Style : ${result.style?.score}/10\n` +
-            `📐 Structure : ${result.structure?.score}/10\n\n` +
-            `**Recommandations :**\n${(result.recommandations || []).map((r: string) => `• ${r}`).join('\n')}`
+            `📝 Grammaire : ${result.grammaire?.score}/10 — _${result.grammaire?.remarques || ''}_\n` +
+            `🔗 Cohérence : ${result.coherence?.score}/10 — _${result.coherence?.remarques || ''}_\n` +
+            `✨ Style : ${result.style?.score}/10 — _${result.style?.remarques || ''}_\n` +
+            `📐 Structure : ${result.structure?.score}/10 — _${result.structure?.remarques || ''}_\n` +
+            `🎵 Rythme : ${result.rythme?.score || '?'}/10 — _${result.rythme?.remarques || ''}_\n` +
+            `💡 Originalité : ${result.originalite?.score || '?'}/10 — _${result.originalite?.remarques || ''}_\n\n` +
+            `**Recommandations :**\n${(result.recommandations || []).map((r: string) => `• ${r}`).join('\n')}\n\n🎯 **Qualité : ${qualityScore}/10**`
           : content;
         break;
       }
 
       case 'P7': {
-        // PACKAGING ÉDITORIAL
-        const content = await callAI(
-          `Tu es un expert en MARKETING ÉDITORIAL pour Amazon KDP. Tu crées des métadonnées qui convertissent. Tu connais les techniques de copywriting qui vendent.`,
-          `Crée le packaging marketing complet :
+        const { content, qualityScore } = await callAIWithQualityLoop(
+          `Tu es un COPYWRITER KDP expert. Tu crées des descriptions qui VENDENT. Chaque mot est choisi pour convertir un visiteur en acheteur.`,
+          `Crée le packaging marketing BEST-SELLER :
 TITRE : "${title}"
 AUTEUR : ${authorName}
 MARCHÉ : ${JSON.stringify(previousContext.P2 || {})}
 VISION : ${JSON.stringify(previousContext.P1 || {})}
 
-Format JSON :
+JSON :
 {
-  "sousTitre": "sous-titre accrocheur et SEO",
-  "descriptionKDP": "description de 150 mots maximum qui vend",
-  "bulletPoints": ["5 bénéfices clés pour l'acheteur"],
-  "accroche4emeCouverture": "phrase d'accroche percutante",
-  "biographieAuteur": "bio courte et crédible de ${authorName}",
-  "motsClésOptimises": ["7 mots-clés KDP finaux"]
-}`
+  "sousTitre": "sous-titre SEO + émotionnel",
+  "descriptionKDP": "description de 150 mots qui VEND (formule AIDA)",
+  "bulletPoints": ["5 bénéfices clés (pas des features, des BÉNÉFICES)"],
+  "accroche4emeCouverture": "phrase d'accroche 4e couverture",
+  "biographieAuteur": "bio crédible de ${authorName}",
+  "motsClésOptimises": ["7 mots-clés KDP finaux"],
+  "qualityScore": 9
+}`,
+          4000, 9, 1, 'P7'
         );
         result = parseJSON(content) || { raw: content };
+        result._qualityScore = qualityScore;
         displayContent = result.sousTitre
-          ? `**Sous-titre :** ${result.sousTitre}\n\n**Accroche :** ${result.accroche4emeCouverture}\n\n**Description KDP :**\n${result.descriptionKDP}\n\n**Points forts :**\n${(result.bulletPoints || []).map((b: string) => `✓ ${b}`).join('\n')}`
+          ? `**Sous-titre :** ${result.sousTitre}\n\n**Accroche :** ${result.accroche4emeCouverture}\n\n**Description KDP :**\n${result.descriptionKDP}\n\n**Points forts :**\n${(result.bulletPoints || []).map((b: string) => `✓ ${b}`).join('\n')}\n\n🎯 **Qualité : ${qualityScore}/10**`
           : content;
         break;
       }
 
       case 'P8': {
-        // DIAGNOSTIC FINAL
-        const content = await callAI(
-          `Tu es un DIAGNOSTIQUEUR ÉDITORIAL. Tu vérifies que tout le projet est cohérent du début à la fin. Tu cherches les incohérences, les contradictions, les faiblesses.`,
-          `Diagnostic complet du projet :
+        const { content, qualityScore } = await callAIWithQualityLoop(
+          `Tu es un DIAGNOSTIQUEUR ÉDITORIAL senior. Tu cherches les failles avec une précision chirurgicale. Chaque problème identifié est accompagné d'une solution.`,
+          `Diagnostic COMPLET du projet :
 TITRE : "${title}"
 VISION P1 : ${JSON.stringify(previousContext.P1 || {})}
 MARCHÉ P2 : ${JSON.stringify(previousContext.P2 || {})}
 STRUCTURE P3 : ${JSON.stringify(previousContext.P3 || {})}
 QUALITÉ P6 : ${JSON.stringify(previousContext.P6 || {})}
 
-Format JSON :
+JSON :
 {
   "coherenceGlobale": 9,
-  "alignementVisionContenu": "analyse",
+  "alignementVisionContenu": "analyse détaillée",
   "pointsForts": ["force1", "force2", "force3"],
-  "incoherencesDetectees": ["ou 'Aucune incohérence détectée'"],
-  "correctionsSuggérées": ["correction1"],
-  "verdict": "Le projet est cohérent / nécessite ajustements"
-}`
+  "incoherencesDetectees": ["incohérence ou 'Aucune'"],
+  "correctionsSuggérées": [{"probleme": "...", "solution": "..."}],
+  "verdict": "verdict clair",
+  "qualityScore": 9
+}`,
+          4000, 9, 1, 'P8'
         );
         result = parseJSON(content) || { raw: content };
+        result._qualityScore = qualityScore;
         displayContent = result.coherenceGlobale
-          ? `**Cohérence globale : ${result.coherenceGlobale}/10**\n\n**${result.verdict}**\n\n**Points forts :**\n${(result.pointsForts || []).map((p: string) => `✓ ${p}`).join('\n')}\n\n**Incohérences :**\n${(result.incoherencesDetectees || ['Aucune']).map((i: string) => `• ${i}`).join('\n')}`
+          ? `**Cohérence globale : ${result.coherenceGlobale}/10**\n\n**${result.verdict}**\n\n**Points forts :**\n${(result.pointsForts || []).map((p: string) => `✓ ${p}`).join('\n')}\n\n**Incohérences :**\n${(result.incoherencesDetectees || ['Aucune']).map((i: string) => `• ${i}`).join('\n')}\n\n🎯 **Qualité : ${qualityScore}/10**`
           : content;
         break;
       }
 
       case 'P9': {
-        // MÉMOIRE ÉDITORIALE
         const content = await callAI(
-          `Tu es un expert en IDENTITÉ D'AUTEUR. Tu captures l'essence de la voix unique d'un projet pour garantir sa cohérence à travers tous les textes.`,
-          `Capture la mémoire éditoriale de ce projet :
+          `Tu es un expert en IDENTITÉ D'AUTEUR. Tu captures l'essence d'une voix unique pour garantir la cohérence.`,
+          `Capture la mémoire éditoriale :
 TITRE : "${title}"
 AUTEUR : ${authorName}
-TON DÉFINI : ${previousContext.P1?.tonEditorial || 'Non défini'}
+TON : ${previousContext.P1?.tonEditorial || 'Non défini'}
 
-Format JSON :
+JSON :
 {
   "voixAuteur": "description de la voix unique",
-  "ticsDeLangage": ["expressions récurrentes à utiliser"],
-  "expressionsInterdites": ["formules à éviter absolument"],
+  "ticsDeLangage": ["expressions à utiliser"],
+  "expressionsInterdites": ["formules bannies"],
   "niveauLangue": "accessible/soutenu/technique",
-  "rythmePhrases": "description du rythme idéal",
-  "personnalité": "traits de personnalité qui transparaissent",
+  "rythmePhrases": "rythme idéal",
+  "personnalité": "traits qui transparaissent",
   "signature": "ce qui rend ce texte reconnaissable"
 }`
         );
         result = parseJSON(content) || { raw: content };
         displayContent = result.voixAuteur
-          ? `**Voix de l'auteur :** ${result.voixAuteur}\n\n**Niveau de langue :** ${result.niveauLangue}\n\n**Personnalité :** ${result.personnalité}\n\n**Signature unique :** ${result.signature}\n\n**Expressions à éviter :**\n${(result.expressionsInterdites || []).map((e: string) => `✗ ${e}`).join('\n')}`
+          ? `**Voix :** ${result.voixAuteur}\n\n**Niveau :** ${result.niveauLangue}\n\n**Personnalité :** ${result.personnalité}\n\n**Signature :** ${result.signature}\n\n**Expressions bannies :**\n${(result.expressionsInterdites || []).map((e: string) => `✗ ${e}`).join('\n')}`
           : content;
         break;
       }
 
       case 'P10': {
-        // COHÉRENCE CHAPITRES
         const content = await callAI(
-          `Tu es un expert en TRANSITIONS NARRATIVES. Tu vérifies que les chapitres s'enchaînent naturellement, que le fil conducteur est maintenu.`,
-          `Analyse les transitions entre chapitres :
+          `Tu es un expert en TRANSITIONS NARRATIVES. Tu vérifies que les chapitres s'enchaînent naturellement.`,
+          `Analyse les transitions :
 STRUCTURE : ${JSON.stringify(previousContext.P3?.chapitres || [])}
 MÉMOIRE : ${JSON.stringify(previousContext.P9 || {})}
 
-Format JSON :
+JSON :
 {
   "fluiditeGlobale": 9,
-  "transitionsAnalysees": [
-    { "de": 1, "vers": 2, "qualite": "fluide/acceptable/à améliorer", "suggestion": "..." }
-  ],
-  "filConducteur": "description du fil rouge qui lie tout",
-  "progressionNarrative": "analyse de la montée en puissance",
+  "transitionsAnalysees": [{"de": 1, "vers": 2, "qualite": "fluide/à améliorer", "suggestion": "..."}],
+  "filConducteur": "fil rouge",
+  "progressionNarrative": "montée en puissance",
   "recommandations": ["reco1", "reco2"]
 }`
         );
         result = parseJSON(content) || { raw: content };
         displayContent = result.fluiditeGlobale
-          ? `**Fluidité globale : ${result.fluiditeGlobale}/10**\n\n**Fil conducteur :** ${result.filConducteur}\n\n**Progression narrative :** ${result.progressionNarrative}\n\n**Recommandations :**\n${(result.recommandations || []).map((r: string) => `• ${r}`).join('\n')}`
+          ? `**Fluidité : ${result.fluiditeGlobale}/10**\n\n**Fil conducteur :** ${result.filConducteur}\n\n**Progression :** ${result.progressionNarrative}\n\n**Recommandations :**\n${(result.recommandations || []).map((r: string) => `• ${r}`).join('\n')}`
           : content;
         break;
       }
 
       case 'P11': {
-        // AUTO-CRITIQUE
-        const content = await callAI(
-          `Tu es un CRITIQUE LITTÉRAIRE exigeant mais juste. Tu identifies les faiblesses sans complaisance mais toujours de manière constructive. Pas de flatterie.`,
-          `Critique ce projet sans complaisance :
+        const { content, qualityScore } = await callAIWithQualityLoop(
+          `Tu es un CRITIQUE LITTÉRAIRE IMPITOYABLE. Zéro complaisance. Tu identifies TOUTES les faiblesses. Un vrai critique ne flatte jamais.`,
+          `Critique ce projet SANS AUCUNE COMPLAISANCE :
 TITRE : "${title}"
-SCORES QUALITÉ : ${JSON.stringify(previousContext.P6 || {})}
-DIAGNOSTIC : ${JSON.stringify(previousContext.P8 || {})}
+SCORES P6 : ${JSON.stringify(previousContext.P6 || {})}
+DIAGNOSTIC P8 : ${JSON.stringify(previousContext.P8 || {})}
 
-Format JSON (sois HONNÊTE, pas de flatterie) :
+JSON (sois BRUTAL) :
 {
-  "pointsFaibles": ["faiblesse1", "faiblesse2", "faiblesse3"],
-  "risquesCommercials": ["risque1", "risque2"],
-  "chapitresARetravailler": [{ "numero": 1, "raison": "..." }],
-  "manquesIdentifies": ["ce qui manque au projet"],
-  "critiqueHonnete": "ton avis franc de professionnel",
-  "scoreReelEstime": 7
-}`
+  "pointsFaibles": ["faiblesse 1 avec explication détaillée", "faiblesse 2", "faiblesse 3"],
+  "risquesCommercials": ["risque 1", "risque 2"],
+  "chapitresARetravailler": [{"numero": 1, "raison": "pourquoi", "priorite": "haute/moyenne"}],
+  "manquesIdentifies": ["ce qui manque"],
+  "critiqueHonnete": "avis FRANC de 3-4 phrases, pas de flatterie",
+  "scoreReelEstime": 7,
+  "qualityScore": 9
+}`,
+          4000, 9, 1, 'P11'
         );
         result = parseJSON(content) || { raw: content };
+        result._qualityScore = qualityScore;
         displayContent = result.critiqueHonnete
-          ? `**Score réel estimé : ${result.scoreReelEstime}/10**\n\n**Critique honnête :**\n${result.critiqueHonnete}\n\n**Points faibles identifiés :**\n${(result.pointsFaibles || []).map((p: string) => `⚠️ ${p}`).join('\n')}\n\n**Risques commerciaux :**\n${(result.risquesCommercials || []).map((r: string) => `• ${r}`).join('\n')}`
+          ? `**Score réel : ${result.scoreReelEstime}/10**\n\n**Critique :**\n${result.critiqueHonnete}\n\n**Faiblesses :**\n${(result.pointsFaibles || []).map((p: string) => `⚠️ ${p}`).join('\n')}\n\n**Risques :**\n${(result.risquesCommercials || []).map((r: string) => `• ${r}`).join('\n')}\n\n🎯 **Qualité critique : ${qualityScore}/10**`
           : content;
         break;
       }
 
       case 'P12': {
-        // BOUCLE ITÉRATIVE
-        const content = await callAI(
-          `Tu es un AMÉLIORATEUR DE CONTENU. Tu prends les critiques P11 et proposes des solutions concrètes pour chaque faiblesse identifiée.`,
-          `Propose des améliorations basées sur la critique :
+        const { content, qualityScore } = await callAIWithQualityLoop(
+          `Tu es un AMÉLIORATEUR DE CONTENU expert. Tu prends les critiques et proposes des solutions CONCRÈTES et APPLICABLES.`,
+          `Améliore basé sur la critique :
 CRITIQUE P11 : ${JSON.stringify(previousContext.P11 || {})}
 STRUCTURE P3 : ${JSON.stringify(previousContext.P3 || {})}
 
-Format JSON :
+JSON :
 {
   "ameliorationsProposees": [
-    {
-      "faiblesseCorrigee": "description de la faiblesse",
-      "solution": "solution concrète proposée",
-      "priorite": "haute/moyenne/basse"
-    }
+    {"faiblesseCorrigee": "...", "solution": "solution concrète et détaillée", "priorite": "haute/moyenne/basse", "impact": "fort/moyen/faible"}
   ],
-  "chapitresAmeliors": [{ "numero": 1, "amelioration": "..." }],
-  "nouveauScoreEstime": 8,
-  "tempsEstimeCorrections": "estimation du temps"
-}`
+  "chapitresAmeliors": [{"numero": 1, "amelioration": "..."}],
+  "nouveauScoreEstime": 9,
+  "tempsEstimeCorrections": "estimation",
+  "qualityScore": 9
+}`,
+          4000, 9, 1, 'P12'
         );
         result = parseJSON(content) || { raw: content };
+        result._qualityScore = qualityScore;
         displayContent = result.ameliorationsProposees
-          ? `**Nouveau score estimé : ${result.nouveauScoreEstime}/10**\n\n**Améliorations proposées :**\n\n${result.ameliorationsProposees.map((a: any) => `**[${a.priorite}]** ${a.faiblesseCorrigee}\n→ ${a.solution}`).join('\n\n')}`
+          ? `**Nouveau score : ${result.nouveauScoreEstime}/10**\n\n**Améliorations :**\n\n${result.ameliorationsProposees.map((a: any) => `**[${a.priorite}] [Impact: ${a.impact || '?'}]** ${a.faiblesseCorrigee}\n→ ${a.solution}`).join('\n\n')}\n\n🎯 **Qualité : ${qualityScore}/10**`
           : content;
         break;
       }
 
       case 'P13': {
-        // SIGNATURE DE STYLE
         const content = await callAI(
-          `Tu es un STYLISTE LITTÉRAIRE. Tu unifie la voix de l'auteur sur l'ensemble du texte pour créer une signature reconnaissable. Tu élimines les variations de ton involontaires.`,
-          `Définis et applique la signature de style finale :
+          `Tu es un STYLISTE LITTÉRAIRE. Tu unifie la voix de l'auteur pour créer une signature reconnaissable.`,
+          `Signature de style finale :
 MÉMOIRE P9 : ${JSON.stringify(previousContext.P9 || {})}
 AUTEUR : ${authorName}
 
-Format JSON :
+JSON :
 {
-  "signatureUnique": "description de ce qui rend ce texte unique",
-  "elementsRecurrents": ["élément1", "élément2", "élément3"],
-  "tonUnifie": "description du ton final cohérent",
+  "signatureUnique": "ce qui rend ce texte unique",
+  "elementsRecurrents": ["élément1", "élément2"],
+  "tonUnifie": "ton final cohérent",
   "marquesDeStyle": ["marque1", "marque2"],
-  "certificatStyle": "Ce texte porte la signature distinctive de ${authorName}",
+  "certificatStyle": "Ce texte porte la signature de ${authorName}",
   "coherenceVoix": 9
 }`
         );
         result = parseJSON(content) || { raw: content };
         displayContent = result.signatureUnique
-          ? `**Signature unique :** ${result.signatureUnique}\n\n**Ton unifié :** ${result.tonUnifie}\n\n**Cohérence de voix : ${result.coherenceVoix}/10**\n\n**Marques de style :**\n${(result.marquesDeStyle || []).map((m: string) => `✦ ${m}`).join('\n')}\n\n_${result.certificatStyle}_`
+          ? `**Signature :** ${result.signatureUnique}\n\n**Ton unifié :** ${result.tonUnifie}\n\n**Cohérence : ${result.coherenceVoix}/10**\n\n**Marques :**\n${(result.marquesDeStyle || []).map((m: string) => `✦ ${m}`).join('\n')}\n\n_${result.certificatStyle}_`
           : content;
         break;
       }
 
       case 'P14': {
-        // VERDICT ULTIME
-        const content = await callAI(
-          `Tu es le VERDICT FINAL. Tu donnes ton avis définitif en tant qu'éditeur senior. Sois honnête : ce livre est-il prêt à être publié ? Donne un vrai verdict professionnel, pas de la complaisance.`,
-          `Verdict final pour ce projet :
+        const { content, qualityScore } = await callAIWithQualityLoop(
+          `Tu es le VERDICT FINAL. Éditeur senior avec 25 ans d'expérience. Ton verdict est DÉFINITIF. Sois honnête : ce livre mérite-t-il d'être publié ? Un vrai éditeur ne flatte pas.`,
+          `Verdict FINAL et DÉFINITIF :
 TITRE : "${title}"
 AUTEUR : ${authorName}
 QUALITÉ P6 : ${JSON.stringify(previousContext.P6 || {})}
@@ -992,33 +1051,35 @@ CRITIQUE P11 : ${JSON.stringify(previousContext.P11 || {})}
 AMÉLIORATIONS P12 : ${JSON.stringify(previousContext.P12 || {})}
 STYLE P13 : ${JSON.stringify(previousContext.P13 || {})}
 
-Format JSON (VERDICT HONNÊTE - pas de flatterie) :
+JSON (VERDICT HONNÊTE) :
 {
   "publiable": true,
-  "scoreFinakl": 8,
-  "verdict": "Verdict honnête en 2-3 phrases",
+  "scoreFinal": 9,
+  "verdict": "Verdict en 3-4 phrases, HONNÊTE",
   "forcesFinales": ["force1", "force2", "force3"],
-  "reservesRestantes": ["réserve1 ou 'Aucune réserve majeure'"],
+  "reservesRestantes": ["réserve ou 'Aucune réserve majeure'"],
   "recommandationFinale": "Publier / Publier après corrections / Retravailler",
-  "potentielCommercial": "estimation honnête",
-  "certificat": "Validé par le système éditorial le ${new Date().toLocaleDateString('fr-FR')}"
-}`
+  "potentielCommercial": "estimation honnête avec chiffres",
+  "noteALAuteur": "message personnel à l'auteur ${authorName}",
+  "certificat": "Validé par le système éditorial le ${new Date().toLocaleDateString('fr-FR')}",
+  "qualityScore": 9
+}`,
+          4000, 9, 1, 'P14'
         );
         result = parseJSON(content) || { raw: content };
+        result._qualityScore = qualityScore;
         
-        // Sécurisation : s'assurer que les tableaux sont bien des tableaux
         const forces = Array.isArray(result.forcesFinales) ? result.forcesFinales : [];
         const reserves = Array.isArray(result.reservesRestantes) ? result.reservesRestantes : 
           (typeof result.reservesRestantes === 'string' ? [result.reservesRestantes] : []);
         
         displayContent = result.verdict
-          ? `# VERDICT FINAL\n\n**${result.recommandationFinale}**\n\n**Score final : ${result.scoreFinal}/10**\n\n${result.verdict}\n\n**Forces :**\n${forces.map((f: string) => `✓ ${f}`).join('\n')}\n\n**Réserves :**\n${reserves.map((r: string) => `• ${r}`).join('\n')}\n\n**Potentiel commercial :** ${result.potentielCommercial}\n\n---\n_${result.certificat}_`
+          ? `# VERDICT FINAL\n\n**${result.recommandationFinale}**\n\n**Score final : ${result.scoreFinal}/10**\n\n${result.verdict}\n\n**Forces :**\n${forces.map((f: string) => `✓ ${f}`).join('\n')}\n\n**Réserves :**\n${reserves.map((r: string) => `• ${r}`).join('\n')}\n\n**Potentiel :** ${result.potentielCommercial}\n\n${result.noteALAuteur ? `**📝 Note à ${authorName} :** ${result.noteALAuteur}\n\n` : ''}---\n_${result.certificat}_\n\n🎯 **Qualité verdict : ${qualityScore}/10**`
           : content;
         break;
       }
 
       case 'P15': {
-        // HUMANISATION ANTI-DÉTECTION IA (BONUS)
         const chapitresP5 = previousContext.P5?.chapitresFinal || previousContext.P4?.chapitres || [];
         const chapitresList = Array.isArray(chapitresP5) ? chapitresP5 : [];
         
@@ -1028,40 +1089,32 @@ Format JSON (VERDICT HONNÊTE - pas de flatterie) :
           break;
         }
 
-        // Humaniser les 3 premiers chapitres comme échantillon + donner des consignes pour le reste
         const echantillon = chapitresList.slice(0, 3).map((ch: any) => 
           `### ${ch.titre || ch.title || 'Chapitre'}\n${(ch.contenu || ch.content || '').substring(0, 1500)}`
         ).join('\n\n---\n\n');
 
         const content = await callAI(
-          `Tu es un EXPERT EN HUMANISATION DE TEXTE. Ta mission : transformer un texte généré par IA pour le rendre INDÉTECTABLE par les outils anti-IA (GPTZero, Originality.ai, Turnitin).
+          `Tu es un EXPERT EN HUMANISATION DE TEXTE. Mission : rendre le texte INDÉTECTABLE par GPTZero, Originality.ai, Turnitin.
 
-TECHNIQUES OBLIGATOIRES :
-1. VARIABILITÉ SYNTAXIQUE : Alterner phrases courtes et longues. Commencer des phrases par des adverbes, des compléments circonstanciels, pas toujours par le sujet.
-2. IMPERFECTIONS NATURELLES : Ajouter des tournures familières, des expressions idiomatiques, des incises.
-3. VOIX ACTIVE : Privilégier la voix active. Réduire les constructions passives.
-4. CONNECTEURS HUMAINS : Remplacer "De plus", "En outre", "Par ailleurs" par des transitions plus naturelles ("D'ailleurs", "Et puis", "Ce qui est intéressant aussi").
-5. TOUCHES PERSONNELLES : Ajouter des opinions, des anecdotes courtes, des questionnements rhétoriques.
-6. RYTHME : Casser les patterns réguliers. Un paragraphe de 1 ligne, puis un de 5, puis un de 3.
-7. LEXIQUE VARIÉ : Éviter la répétition des mêmes adjectifs/adverbes.`,
-          `Humanise ces extraits pour les rendre indétectables par les outils anti-IA.
-CONSERVE le sens et les informations. Change la FORME, pas le FOND.
+TECHNIQUES :
+1. VARIABILITÉ SYNTAXIQUE : phrases courtes et longues alternées
+2. IMPERFECTIONS NATURELLES : tournures familières, expressions idiomatiques
+3. VOIX ACTIVE prioritaire
+4. CONNECTEURS HUMAINS : "D'ailleurs", "Et puis", "Ce qui est intéressant"
+5. TOUCHES PERSONNELLES : opinions, anecdotes, questions rhétoriques
+6. RYTHME cassé : paragraphes de tailles variées
+7. LEXIQUE VARIÉ`,
+          `Humanise ces extraits pour les rendre indétectables :
 
-EXTRAITS À HUMANISER :
 ${echantillon}
 
-Format JSON :
+JSON :
 {
-  "chapitresHumanises": [
-    {
-      "titre": "titre du chapitre",
-      "contenuHumanise": "le texte humanisé complet"
-    }
-  ],
-  "techniquesAppliquees": ["technique1", "technique2", "technique3"],
+  "chapitresHumanises": [{"titre": "...", "contenuHumanise": "texte complet humanisé"}],
+  "techniquesAppliquees": ["technique1", "technique2"],
   "scoreAntiDetection": 92,
-  "conseilsPourReste": ["conseil pour humaniser les autres chapitres manuellement"],
-  "avertissement": "note sur les limites de l'humanisation automatique"
+  "conseilsPourReste": ["conseil1"],
+  "avertissement": "note sur les limites"
 }`,
           6000
         );
@@ -1072,7 +1125,7 @@ Format JSON :
         const conseils = Array.isArray(result.conseilsPourReste) ? result.conseilsPourReste : [];
         const nbHumanises = Array.isArray(result.chapitresHumanises) ? result.chapitresHumanises.length : 0;
         
-        displayContent = `# 🛡️ HUMANISATION ANTI-IA (BONUS)\n\n**Score anti-détection estimé : ${score}%**\n\n**${nbHumanises} chapitres humanisés** (échantillon)\n\n**Techniques appliquées :**\n${techniques.map((t: string) => `✦ ${t}`).join('\n')}\n\n**Conseils pour le reste du manuscrit :**\n${conseils.map((c: string) => `💡 ${c}`).join('\n')}\n\n${result.avertissement ? `\n⚠️ _${result.avertissement}_` : ''}`;
+        displayContent = `# 🛡️ HUMANISATION ANTI-IA (BONUS)\n\n**Score anti-détection : ${score}%**\n\n**${nbHumanises} chapitres humanisés**\n\n**Techniques :**\n${techniques.map((t: string) => `✦ ${t}`).join('\n')}\n\n**Conseils :**\n${conseils.map((c: string) => `💡 ${c}`).join('\n')}\n\n${result.avertissement ? `⚠️ _${result.avertissement}_` : ''}`;
         break;
       }
 
@@ -1083,9 +1136,8 @@ Format JSON :
         );
     }
 
-    console.log(`Step ${step} completed successfully - Total tokens: ${totalTokenUsage.totalTokens}`);
+    console.log(`Step ${step} completed - Total tokens: ${totalTokenUsage.totalTokens}`);
 
-    // Calculate estimated cost (gpt-4o-mini pricing: $0.15/$0.60 per 1M tokens)
     const estimatedCost = (
       (totalTokenUsage.promptTokens / 1_000_000) * 0.15 +
       (totalTokenUsage.completionTokens / 1_000_000) * 0.60

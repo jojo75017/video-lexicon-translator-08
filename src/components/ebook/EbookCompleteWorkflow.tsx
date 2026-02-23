@@ -118,6 +118,8 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   const [titleSuggestions, setTitleSuggestions] = useState<any[]>([]);
   const [originalTitleScore, setOriginalTitleScore] = useState<any>(null);
   const [selectedTitleIndex, setSelectedTitleIndex] = useState<number | null>(null); // null = titre original
+  const [generatedIntro, setGeneratedIntro] = useState('');
+  const [generatedConclusion, setGeneratedConclusion] = useState('');
 
   const progress = currentStepIndex >= 0 ? ((currentStepIndex + 1) / 15) * 100 : 0;
   // La clé API utilisateur est OBLIGATOIRE pour générer
@@ -353,6 +355,15 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
       setSubtitle(chosen.sousTitre || chosen.subtitle || subtitle);
       toast.success(`✅ Titre mis à jour : "${chosen.titre || chosen.title}"`);
     }
+    // Sauvegarder intro/conclusion dans le contexte P1
+    setAllContext(prev => ({
+      ...prev,
+      P1: {
+        ...prev.P1,
+        introductionGeneree: generatedIntro,
+        conclusionGeneree: generatedConclusion,
+      }
+    }));
     setWaitingForTitleValidation(false);
     // Reprendre à partir de P2 (index 1)
     generateCompleteBook(1);
@@ -539,6 +550,9 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
               setTitleSuggestions(suggestions);
               setOriginalTitleScore(origScore);
               setSelectedTitleIndex(null);
+              // Capturer intro/conclusion générées
+              if (result.result?.introductionGeneree) setGeneratedIntro(result.result.introductionGeneree);
+              if (result.result?.conclusionGeneree) setGeneratedConclusion(result.result.conclusionGeneree);
             }
             setWaitingForTitleValidation(true);
             setIsGenerating(false);
@@ -1078,6 +1092,41 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
                 </div>
               </div>
 
+              {/* Introduction générée - modifiable */}
+              {generatedIntro && (
+                <div className="p-4 bg-muted/30 rounded-lg space-y-2 border border-dashed border-primary/30">
+                  <div className="flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-primary" />
+                    <p className="text-sm font-semibold text-foreground">📝 Introduction générée (modifiable)</p>
+                  </div>
+                  <Textarea
+                    value={generatedIntro}
+                    onChange={(e) => setGeneratedIntro(e.target.value)}
+                    className="min-h-[150px] text-sm"
+                    placeholder="L'introduction de votre livre..."
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Cette introduction sera intégrée au début de votre livre. Modifiez-la librement.
+                  </p>
+                </div>
+              )}
+
+              {/* Conclusion générée - modifiable */}
+              {generatedConclusion && (
+                <div className="p-4 bg-muted/30 rounded-lg space-y-2 border border-dashed border-primary/30">
+                  <div className="flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-primary" />
+                    <p className="text-sm font-semibold text-foreground">🎯 Conclusion générée (modifiable)</p>
+                  </div>
+                  <Textarea
+                    value={generatedConclusion}
+                    onChange={(e) => setGeneratedConclusion(e.target.value)}
+                    className="min-h-[120px] text-sm"
+                    placeholder="La conclusion de votre livre..."
+                  />
+                </div>
+              )}
+
               <div className="flex gap-3 pt-4 border-t">
                 <Button
                   size="lg"
@@ -1093,7 +1142,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
               </div>
               
               <p className="text-xs text-center text-muted-foreground">
-                Le titre choisi sera utilisé pour toute la suite du workflow (analyse marché, rédaction, packaging...)
+                Le titre et l'introduction choisis seront utilisés pour toute la suite du workflow
               </p>
             </CardContent>
           </Card>
