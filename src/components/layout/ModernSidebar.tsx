@@ -135,9 +135,10 @@ const categories: Category[] = [
     emoji: '🚀',
     color: 'from-violet-500 to-purple-500',
     items: [
+      { id: 'onboarding', label: '🗺️ Par où commencer ?', icon: BookOpen, isNew: true },
       { id: 'complete-workflow', label: '⚡ Livre Complet (1 clic)', icon: Rocket, isPro: true },
-      { id: 'workflow-dashboard', label: '📊 Tableau de Bord', icon: BarChart3, isNew: true },
-      { id: 'workflow-export', label: '📥 Export Global', icon: Download, isNew: true },
+      { id: 'workflow-dashboard', label: '📊 Tableau de Bord', icon: BarChart3 },
+      { id: 'workflow-export', label: '📥 Export Global', icon: Download },
       { id: 'planner', label: '📋 Planificateur', icon: BookOpen },
     ]
   },

@@ -89,6 +89,7 @@ import EbookUltimateVerdict from '@/components/ebook/EbookUltimateVerdict';
 import EbookCompleteWorkflow from '@/components/ebook/EbookCompleteWorkflow';
 import { EbookInteractiveTutorial } from '@/components/ebook/EbookInteractiveTutorial';
 import { WorkflowStepWrapper } from '@/components/ebook/WorkflowStepWrapper';
+import { WorkflowOnboarding } from '@/components/ebook/WorkflowOnboarding';
 import { WorkflowDashboard } from '@/components/ebook/WorkflowDashboard';
 import { WorkflowExportCompiled } from '@/components/ebook/WorkflowExportCompiled';
 import { useConfetti } from '@/hooks/useConfetti';
@@ -226,7 +227,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   const [kdpKeywords, setKdpKeywords] = useState('');
   const [kdpCategories, setKdpCategories] = useState('');
   
-  const [activeTab, setActiveTab] = useState('planner');
+  const [activeTab, setActiveTab] = useState('onboarding');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showWelcome, setShowWelcome] = useState(location.state?.fromFormation || false);
   const [showTutorial, setShowTutorial] = useState(location.state?.fromFormation || false);
@@ -958,6 +959,16 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
 
   const renderContent = () => {
     switch (activeTab) {
+      case 'onboarding':
+        return (
+          <WorkflowOnboarding
+            onStartWorkflow={() => setActiveTab('complete-workflow')}
+            onNavigateToStep={(tabId) => setActiveTab(tabId)}
+            ebookTitle={ebookTitle}
+            hasExistingProject={chapters.length > 0}
+          />
+        );
+
       case 'presentation':
         return (
           <EbookPresentation onNavigate={(tab) => setActiveTab(tab)} />
