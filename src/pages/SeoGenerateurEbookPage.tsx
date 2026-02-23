@@ -147,7 +147,7 @@ const SeoGenerateurEbookPage: React.FC = () => {
                 {[1,2,3,4,5].map(i => (
                   <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />
                 ))}
-                <span className="ml-2 text-gray-600">4.8/5 (38 avis)</span>
+                <span className="ml-2 text-gray-600">Satisfaction garantie</span>
               </div>
             </div>
           </div>
