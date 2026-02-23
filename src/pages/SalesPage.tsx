@@ -389,7 +389,7 @@ const SalesPage = () => {
                   <div className="flex-1 space-y-4">
                     <Badge className="bg-emerald-500/15 text-emerald-500 border-emerald-500/30 mb-2">
                       <Eye className="w-3 h-3 mr-1" />
-                      Aperçu gratuit
+                      Aperçu du parcours
                     </Badge>
                     <h3 className="text-2xl md:text-3xl font-extrabold">
                       Curieux de voir le parcours ?
@@ -424,11 +424,11 @@ const SalesPage = () => {
                       onClick={() => navigate('/demo')}
                       className="text-base px-8 py-5 h-auto rounded-2xl bg-primary hover:bg-primary/90 shadow-lg shadow-primary/25 gap-2 group"
                     >
-                      Voir la démo gratuite
+                      Découvrir le parcours
                       <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </Button>
                     <p className="text-xs text-muted-foreground text-center">
-                      Sans inscription • 100% gratuit
+                      Sans inscription • Comprenez avant de commencer
                     </p>
                   </div>
                 </div>
