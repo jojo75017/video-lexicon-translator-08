@@ -571,11 +571,31 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
 
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto py-2 px-2 space-y-1">
-          {filteredCategories.map((category) => {
+          {filteredCategories.map((category, catIndex) => {
             const isExpanded = expandedCategories.includes(category.id);
             const hasActiveItem = category.items.some(item => item.id === activeTab);
 
+            // Séparateur "Outils complémentaires" avant les catégories secondaires
+            const secondaryIds = ['visuels', 'special', 'marketing-cat', 'tools-2026', 'audio', 'compte'];
+            const isFirstSecondary = secondaryIds.includes(category.id) && 
+              (catIndex === 0 || !secondaryIds.includes(filteredCategories[catIndex - 1]?.id));
+            
             return (
+              <React.Fragment key={category.id}>
+                {isFirstSecondary && !isCollapsed && (
+                  <div className="flex items-center gap-2 px-3 pt-4 pb-2">
+                    <div className="h-px flex-1 bg-violet-300/40 dark:bg-violet-700/30" />
+                    <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
+                      Outils complémentaires
+                    </span>
+                    <div className="h-px flex-1 bg-violet-300/40 dark:bg-violet-700/30" />
+                  </div>
+                )}
+                {isFirstSecondary && isCollapsed && (
+                  <div className="flex justify-center py-2">
+                    <div className="w-6 h-px bg-violet-300/40 dark:bg-violet-700/30" />
+                  </div>
+                )}
               <div 
                 key={category.id} 
                 className={cn(
@@ -722,6 +742,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                   </div>
                 )}
               </div>
+              </React.Fragment>
             );
           })}
         </nav>
