@@ -99,6 +99,7 @@ const categoryPastelColors: Record<string, { bg: string; border: string }> = {
   'workflow-p1-p8': { bg: 'bg-amber-50 dark:bg-amber-950/30', border: 'border-amber-200/60 dark:border-amber-800/40' },
   'workflow-p9-p14': { bg: 'bg-emerald-50 dark:bg-emerald-950/30', border: 'border-emerald-200/60 dark:border-emerald-800/40' },
   special: { bg: 'bg-pink-50 dark:bg-pink-950/30', border: 'border-pink-200/60 dark:border-pink-800/40' },
+  'bonus-p15': { bg: 'bg-rose-50 dark:bg-rose-950/30', border: 'border-rose-200/60 dark:border-rose-800/40' },
   visuels: { bg: 'bg-teal-50 dark:bg-teal-950/30', border: 'border-teal-200/60 dark:border-teal-800/40' },
   amazon: { bg: 'bg-orange-50 dark:bg-orange-950/30', border: 'border-orange-200/60 dark:border-orange-800/40' },
   'marketing-cat': { bg: 'bg-green-50 dark:bg-green-950/30', border: 'border-green-200/60 dark:border-green-800/40' },
@@ -173,10 +174,10 @@ const categories: Category[] = [
       { id: 'final-diagnosis', label: 'P8 🔍 Diagnostic', icon: Shield, isPro: true },
     ]
   },
-  // ========== 4. MOTEUR IA V2 (P9-P15) ==========
+  // ========== 4. MOTEUR IA V2 (P9-P14) ==========
   {
     id: 'workflow-p9-p14',
-    label: '🧬 Moteur IA V2 (P9-P15)',
+    label: '🧬 Moteur IA V2 (P9-P14)',
     emoji: '🧬',
     color: 'from-green-500 to-teal-500',
     items: [
@@ -186,7 +187,16 @@ const categories: Category[] = [
       { id: 'iterative-loop', label: 'P12 🔄 Boucle', icon: RefreshCw, isPro: true },
       { id: 'style-signature', label: 'P13 🎨 Style', icon: Fingerprint, isPro: true },
       { id: 'ultimate-verdict', label: 'P14 🏆 Verdict', icon: Award, isPro: true },
-      { id: 'humanize-anti-ia', label: 'P15 🎁 Anti-IA (BONUS)', icon: Shield, isPro: true, isNew: true },
+    ]
+  },
+  // ========== 4.5 BONUS P15 ==========
+  {
+    id: 'bonus-p15',
+    label: '🎁 BONUS Anti-IA (P15)',
+    emoji: '🎁',
+    color: 'from-rose-500 to-pink-500',
+    items: [
+      { id: 'humanize-anti-ia', label: 'P15 🛡️ Humanisation Anti-IA', icon: Shield, isPro: true, isNew: true },
     ]
   },
   // ========== 5. KDP ESSENTIEL ==========
