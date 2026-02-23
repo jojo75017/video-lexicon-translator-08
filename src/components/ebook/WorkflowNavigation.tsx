@@ -15,24 +15,32 @@ export interface WorkflowStep {
   requiredSteps?: string[];
   estimatedMinutes?: number;
   tip?: string;
+  phase?: number;
 }
 
 export const WORKFLOW_STEPS: WorkflowStep[] = [
-  { id: 'P1', label: 'Directeur Éditorial', shortLabel: 'P1', description: 'Analyse du titre et positionnement stratégique', requiredSteps: [], estimatedMinutes: 2, tip: "Définissez bien votre titre et sous-titre." },
-  { id: 'P2', label: 'Analyse Marché', shortLabel: 'P2', description: 'Mots-clés KDP et analyse concurrentielle', requiredSteps: ['P1'], estimatedMinutes: 3, tip: "Les 7 mots-clés KDP sont cruciaux." },
-  { id: 'P3', label: 'Architecte Contenu', shortLabel: 'P3', description: 'Structure des chapitres et personnages', requiredSteps: ['P1', 'P2'], estimatedMinutes: 3, tip: "Visez 8-15 chapitres." },
-  { id: 'P4', label: 'Rédaction Expert', shortLabel: 'P4', description: 'Génération du contenu des chapitres', requiredSteps: ['P3'], estimatedMinutes: 15, tip: "L'étape la plus longue." },
-  { id: 'P5', label: 'Réécriture Naturelle', shortLabel: 'P5', description: 'Humanisation du texte généré', requiredSteps: ['P4'], estimatedMinutes: 5, tip: "Rend votre texte naturel." },
-  { id: 'P6', label: 'Qualité Éditoriale', shortLabel: 'P6', description: 'Analyse qualité et suggestions', requiredSteps: ['P4'], estimatedMinutes: 3, tip: "Grammaire, cohérence et style." },
-  { id: 'P7', label: 'Packaging Éditorial', shortLabel: 'P7', description: 'Description et métadonnées KDP', requiredSteps: ['P1', 'P2'], estimatedMinutes: 2, tip: "Optimisé pour Amazon." },
-  { id: 'P8', label: 'Diagnostic Final', shortLabel: 'P8', description: 'Vérification complète avant publication', requiredSteps: ['P4', 'P7'], estimatedMinutes: 3, tip: "Vérification globale." },
-  { id: 'P9', label: 'Mémoire Éditoriale', shortLabel: 'P9', description: 'Cohérence globale du projet', requiredSteps: ['P4'], estimatedMinutes: 2, tip: "Votre voix d'auteur." },
-  { id: 'P10', label: 'Cohérence Chapitres', shortLabel: 'P10', description: 'Liens entre les chapitres', requiredSteps: ['P4'], estimatedMinutes: 3, tip: "Transitions fluides." },
-  { id: 'P11', label: 'Auto-Critique', shortLabel: 'P11', description: 'Analyse critique du manuscrit', requiredSteps: ['P4'], estimatedMinutes: 3, tip: "Analyse sans complaisance." },
-  { id: 'P12', label: 'Boucle Itérative', shortLabel: 'P12', description: 'Amélioration continue', requiredSteps: ['P11'], estimatedMinutes: 5, tip: "Améliorations auto." },
-  { id: 'P13', label: 'Signature Style', shortLabel: 'P13', description: 'Cohérence stylistique', requiredSteps: ['P4'], estimatedMinutes: 2, tip: "Style unifié." },
-  { id: 'P14', label: 'Verdict Ultime', shortLabel: 'P14', description: 'Évaluation finale et recommandations', requiredSteps: ['P8'], estimatedMinutes: 2, tip: "Validation finale." },
-  { id: 'P15', label: 'Humanisation Anti-IA', shortLabel: 'P15', description: '🎁 BONUS — Rend le texte indétectable', requiredSteps: ['P5'], estimatedMinutes: 5, tip: "Anti-détection IA." },
+  { id: 'P1', label: 'Directeur Éditorial', shortLabel: 'P1', description: 'Analyse du titre et positionnement stratégique', requiredSteps: [], estimatedMinutes: 2, tip: "Définissez bien votre titre et sous-titre.", phase: 1 },
+  { id: 'P2', label: 'Analyse Marché', shortLabel: 'P2', description: 'Mots-clés KDP et analyse concurrentielle', requiredSteps: ['P1'], estimatedMinutes: 3, tip: "Les 7 mots-clés KDP sont cruciaux.", phase: 1 },
+  { id: 'P3', label: 'Architecte Contenu', shortLabel: 'P3', description: 'Structure des chapitres et personnages', requiredSteps: ['P1', 'P2'], estimatedMinutes: 3, tip: "Visez 8-15 chapitres.", phase: 1 },
+  { id: 'P4', label: 'Rédaction Expert', shortLabel: 'P4', description: 'Génération du contenu des chapitres', requiredSteps: ['P3'], estimatedMinutes: 15, tip: "L'étape la plus longue.", phase: 2 },
+  { id: 'P5', label: 'Réécriture Naturelle', shortLabel: 'P5', description: 'Humanisation du texte généré', requiredSteps: ['P4'], estimatedMinutes: 5, tip: "Rend votre texte naturel.", phase: 2 },
+  { id: 'P6', label: 'Qualité Éditoriale', shortLabel: 'P6', description: 'Analyse qualité et suggestions', requiredSteps: ['P4'], estimatedMinutes: 3, tip: "Grammaire, cohérence et style.", phase: 2 },
+  { id: 'P7', label: 'Packaging Éditorial', shortLabel: 'P7', description: 'Description et métadonnées KDP', requiredSteps: ['P1', 'P2'], estimatedMinutes: 2, tip: "Optimisé pour Amazon.", phase: 2 },
+  { id: 'P8', label: 'Diagnostic Final', shortLabel: 'P8', description: 'Vérification complète avant publication', requiredSteps: ['P4', 'P7'], estimatedMinutes: 3, tip: "Vérification globale.", phase: 2 },
+  { id: 'P9', label: 'Mémoire Éditoriale', shortLabel: 'P9', description: 'Cohérence globale du projet', requiredSteps: ['P4'], estimatedMinutes: 2, tip: "Votre voix d'auteur.", phase: 3 },
+  { id: 'P10', label: 'Cohérence Chapitres', shortLabel: 'P10', description: 'Liens entre les chapitres', requiredSteps: ['P4'], estimatedMinutes: 3, tip: "Transitions fluides.", phase: 3 },
+  { id: 'P11', label: 'Auto-Critique', shortLabel: 'P11', description: 'Analyse critique du manuscrit', requiredSteps: ['P4'], estimatedMinutes: 3, tip: "Analyse sans complaisance.", phase: 3 },
+  { id: 'P12', label: 'Boucle Itérative', shortLabel: 'P12', description: 'Amélioration continue', requiredSteps: ['P11'], estimatedMinutes: 5, tip: "Améliorations auto.", phase: 3 },
+  { id: 'P13', label: 'Signature Style', shortLabel: 'P13', description: 'Cohérence stylistique', requiredSteps: ['P4'], estimatedMinutes: 2, tip: "Style unifié.", phase: 3 },
+  { id: 'P14', label: 'Verdict Ultime', shortLabel: 'P14', description: 'Évaluation finale et recommandations', requiredSteps: ['P8'], estimatedMinutes: 2, tip: "Validation finale.", phase: 3 },
+  { id: 'P15', label: 'Humanisation Anti-IA', shortLabel: 'P15', description: '🎁 BONUS — Rend le texte indétectable', requiredSteps: ['P5'], estimatedMinutes: 5, tip: "Anti-détection IA.", phase: 4 },
+];
+
+const PHASES = [
+  { id: 1, label: '📋 Préparation', color: 'bg-blue-500', steps: ['P1', 'P2', 'P3'] },
+  { id: 2, label: '✍️ Rédaction', color: 'bg-amber-500', steps: ['P4', 'P5', 'P6', 'P7', 'P8'] },
+  { id: 3, label: '🔍 Optimisation', color: 'bg-purple-500', steps: ['P9', 'P10', 'P11', 'P12', 'P13', 'P14'] },
+  { id: 4, label: '🎁 Bonus', color: 'bg-emerald-500', steps: ['P15'] },
 ];
 
 // Mapping between workflow step IDs and tab IDs
@@ -104,167 +112,180 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
     }
   };
 
+  const getPhaseCompletedCount = (phase: typeof PHASES[0]) => {
+    return phase.steps.filter(id => hasStepResult(id)).length;
+  };
+
   return (
     <TooltipProvider delayDuration={200}>
-      <div className={cn("space-y-4 mb-6", className)}>
-        {/* Progress Bar - Enhanced visibility */}
-        <div className="bg-gradient-to-br from-primary/10 via-card to-primary/5 border-2 border-primary/30 rounded-xl p-4 shadow-lg">
-          <div className="flex items-center justify-between mb-3">
+      <div className={cn("space-y-3 mb-6", className)}>
+        {/* Header with progress */}
+        <div className="bg-card border-2 border-border rounded-xl p-4 shadow-md">
+          <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
-                <span className="text-lg">🚀</span>
-              </div>
-              <div>
-                <span className="text-sm font-semibold text-foreground">Workflow Éditorial</span>
-                <Badge variant="outline" className="ml-2 text-xs bg-primary/10 border-primary/30">
-                  {completedCount}/{WORKFLOW_STEPS.length} étapes
-                </Badge>
-              </div>
+              <span className="text-lg">🚀</span>
+              <span className="text-sm font-bold text-foreground">Workflow Éditorial</span>
+              <Badge variant="outline" className="text-xs font-semibold">
+                {completedCount}/{WORKFLOW_STEPS.length}
+              </Badge>
             </div>
             <span className="text-lg font-bold text-primary">{Math.round(progressPercentage)}%</span>
           </div>
-          <Progress value={progressPercentage} className="h-3" />
-          
-          {/* Step Indicators */}
-          <div className="flex justify-between mt-3 overflow-x-auto pb-1">
-            {WORKFLOW_STEPS.map((step, idx) => {
-              const status = getStepStatus(step);
-              const tabId = STEP_TO_TAB[step.id];
-              
+          <Progress value={progressPercentage} className="h-2.5 mb-4" />
+
+          {/* Phases with steps — grouped visually */}
+          <div className="space-y-2">
+            {PHASES.map((phase) => {
+              const phaseCompleted = getPhaseCompletedCount(phase);
+              const phaseTotal = phase.steps.length;
+              const isPhaseComplete = phaseCompleted === phaseTotal;
+
               return (
-                <Tooltip key={step.id}>
-                  <TooltipTrigger asChild>
-                    <button
-                      onClick={() => status !== 'locked' && handleNavigate(tabId)}
-                      disabled={status === 'locked' || isGenerating}
-                      className={cn(
-                        "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-200 shrink-0",
-                        status === 'completed' && "bg-green-500 text-white shadow-md shadow-green-500/30",
-                        status === 'current' && "bg-primary text-primary-foreground ring-2 ring-primary/30 ring-offset-2 ring-offset-background",
-                        status === 'available' && "bg-muted hover:bg-muted-foreground/20 text-muted-foreground hover:text-foreground cursor-pointer",
-                        status === 'locked' && "bg-muted/50 text-muted-foreground/50 cursor-not-allowed"
-                      )}
-                    >
-                      {status === 'completed' ? (
-                        <Check className="w-4 h-4" />
-                      ) : status === 'locked' ? (
-                        <Lock className="w-3 h-3" />
-                      ) : (
-                        idx + 1
-                      )}
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom" className="max-w-xs">
-                    <div className="space-y-1">
-                      <p className="font-semibold">{step.id}: {step.label}</p>
-                      <p className="text-xs text-muted-foreground">{step.description}</p>
-                      {status === 'locked' && step.requiredSteps && step.requiredSteps.length > 0 && (
-                        <p className="text-xs text-orange-500 flex items-center gap-1">
-                          <AlertCircle className="w-3 h-3" />
-                          Requiert: {step.requiredSteps.join(', ')}
-                        </p>
-                      )}
-                      {status === 'completed' && (
-                        <p className="text-xs text-green-500 flex items-center gap-1">
-                          <Check className="w-3 h-3" />
-                          Complété
-                        </p>
-                      )}
-                    </div>
-                  </TooltipContent>
-                </Tooltip>
+                <div key={phase.id} className="flex items-center gap-2">
+                  {/* Phase label */}
+                  <div className={cn(
+                    "flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-semibold shrink-0 min-w-[120px]",
+                    isPhaseComplete ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "bg-muted text-muted-foreground"
+                  )}>
+                    <span>{phase.label}</span>
+                    <span className="text-[10px] opacity-70">({phaseCompleted}/{phaseTotal})</span>
+                  </div>
+
+                  {/* Step circles for this phase */}
+                  <div className="flex items-center gap-1 flex-wrap">
+                    {phase.steps.map((stepId) => {
+                      const step = WORKFLOW_STEPS.find(s => s.id === stepId)!;
+                      const status = getStepStatus(step);
+                      const tabId = STEP_TO_TAB[step.id];
+
+                      return (
+                        <Tooltip key={step.id}>
+                          <TooltipTrigger asChild>
+                            <button
+                              onClick={() => status !== 'locked' && handleNavigate(tabId)}
+                              disabled={status === 'locked' || isGenerating}
+                              className={cn(
+                                "flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium transition-all duration-200 border",
+                                status === 'completed' && "bg-green-500 text-white border-green-600 shadow-sm",
+                                status === 'current' && "bg-primary text-primary-foreground border-primary ring-2 ring-primary/30 ring-offset-1 ring-offset-background",
+                                status === 'available' && "bg-card hover:bg-muted text-muted-foreground border-border hover:text-foreground cursor-pointer",
+                                status === 'locked' && "bg-muted/40 text-muted-foreground/40 border-transparent cursor-not-allowed"
+                              )}
+                            >
+                              {status === 'completed' ? (
+                                <Check className="w-3 h-3" />
+                              ) : status === 'locked' ? (
+                                <Lock className="w-3 h-3" />
+                              ) : null}
+                              <span>{step.shortLabel}</span>
+                            </button>
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom" className="max-w-xs">
+                            <div className="space-y-1">
+                              <p className="font-semibold">{step.id}: {step.label}</p>
+                              <p className="text-xs text-muted-foreground">{step.description}</p>
+                              {step.estimatedMinutes && (
+                                <p className="text-xs">⏱️ ~{step.estimatedMinutes} min</p>
+                              )}
+                              {status === 'locked' && step.requiredSteps && step.requiredSteps.length > 0 && (
+                                <p className="text-xs text-orange-500 flex items-center gap-1">
+                                  <AlertCircle className="w-3 h-3" />
+                                  Requiert: {step.requiredSteps.join(', ')}
+                                </p>
+                              )}
+                              {status === 'completed' && (
+                                <p className="text-xs text-green-500 flex items-center gap-1">
+                                  <Check className="w-3 h-3" /> Complété
+                                </p>
+                              )}
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      );
+                    })}
+                  </div>
+                </div>
               );
             })}
           </div>
         </div>
 
-        {/* Navigation Buttons */}
-        <div className="flex items-center justify-between gap-4">
+        {/* Navigation Buttons + Current Step */}
+        <div className="flex items-center justify-between gap-3">
           <Button
             variant="outline"
+            size="sm"
             onClick={() => prevStep && handleNavigate(STEP_TO_TAB[prevStep.id])}
             disabled={!prevStep || isGenerating}
-            className="flex items-center gap-2"
+            className="flex items-center gap-1"
           >
             <ChevronLeft className="w-4 h-4" />
-            {prevStep ? (
-              <span className="hidden sm:inline">{prevStep.shortLabel}: {prevStep.label}</span>
-            ) : (
-              <span>Précédent</span>
-            )}
+            <span className="hidden sm:inline">{prevStep?.shortLabel || 'Préc.'}</span>
           </Button>
 
-          <div className="flex items-center gap-2 px-4 py-2 bg-muted/50 rounded-lg">
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-muted/60 rounded-lg border border-border">
             {isGenerating && <Loader2 className="w-4 h-4 animate-spin text-primary" />}
-            <span className="text-sm font-medium">
+            <span className="text-sm font-semibold text-foreground">
               {currentStep.shortLabel}: {currentStep.label}
             </span>
             {hasStepResult(currentStepId) && (
-              <Badge variant="default" className="bg-green-500 text-white text-xs">
-                <Check className="w-3 h-3 mr-1" />
-                Fait
+              <Badge className="bg-green-500 text-white text-[10px] px-1.5 py-0">
+                <Check className="w-3 h-3 mr-0.5" />Fait
               </Badge>
             )}
           </div>
 
           <Button
+            size="sm"
             onClick={() => nextStep && handleNavigate(STEP_TO_TAB[nextStep.id])}
             disabled={!nextStep || isGenerating || (nextStep && !canProceedToNext(nextStep))}
-            className="flex items-center gap-2"
+            className="flex items-center gap-1"
           >
-            {nextStep ? (
-              <span className="hidden sm:inline">{nextStep.shortLabel}: {nextStep.label}</span>
-            ) : (
-              <span>Suivant</span>
-            )}
+            <span className="hidden sm:inline">{nextStep?.shortLabel || 'Suiv.'}</span>
             <ChevronRight className="w-4 h-4" />
           </Button>
         </div>
 
-        {/* Current Step Guide */}
-        {currentStep && (
-          <div className="bg-primary/5 border border-primary/20 rounded-lg p-3">
-            <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                <span className="text-sm font-bold text-primary">{currentStepIndex + 1}</span>
-              </div>
-              <div className="min-w-0 flex-1">
-                <h4 className="font-medium text-sm text-foreground">{currentStep.label}</h4>
-                <p className="text-xs text-muted-foreground mt-0.5">{currentStep.description}</p>
+        {/* Current Step Details */}
+        <div className="bg-primary/5 border border-primary/20 rounded-lg p-3">
+          <div className="flex items-start gap-3">
+            <div className="w-7 h-7 rounded-full bg-primary/15 flex items-center justify-center shrink-0">
+              <span className="text-xs font-bold text-primary">{currentStepIndex + 1}</span>
+            </div>
+            <div className="min-w-0 flex-1">
+              <h4 className="font-semibold text-sm text-foreground">{currentStep.label}</h4>
+              <p className="text-xs text-muted-foreground mt-0.5">{currentStep.description}</p>
+              <div className="flex items-center gap-3 mt-1.5 flex-wrap">
                 {currentStep.estimatedMinutes && (
-                  <p className="text-xs text-primary mt-1 flex items-center gap-1">
-                    ⏱️ ~{currentStep.estimatedMinutes} min estimées
-                  </p>
+                  <span className="text-xs text-primary">⏱️ ~{currentStep.estimatedMinutes} min</span>
                 )}
                 {currentStep.tip && (
-                  <p className="text-xs text-muted-foreground mt-1 italic">
-                    💡 {currentStep.tip}
-                  </p>
-                )}
-                {currentStep.requiredSteps && currentStep.requiredSteps.length > 0 && !hasStepResult(currentStepId) && (
-                  <div className="mt-2 flex items-center gap-2 flex-wrap">
-                    <span className="text-xs text-muted-foreground">Prérequis:</span>
-                    {currentStep.requiredSteps.map(reqId => (
-                      <Badge
-                        key={reqId}
-                        variant={hasStepResult(reqId) ? "default" : "outline"}
-                        className={cn(
-                          "text-xs",
-                          hasStepResult(reqId) 
-                            ? "bg-green-500 text-white" 
-                            : "border-orange-300 text-orange-600"
-                        )}
-                      >
-                        {hasStepResult(reqId) && <Check className="w-3 h-3 mr-1" />}
-                        {reqId}
-                      </Badge>
-                    ))}
-                  </div>
+                  <span className="text-xs text-muted-foreground italic">💡 {currentStep.tip}</span>
                 )}
               </div>
+              {currentStep.requiredSteps && currentStep.requiredSteps.length > 0 && !hasStepResult(currentStepId) && (
+                <div className="mt-2 flex items-center gap-1.5 flex-wrap">
+                  <span className="text-xs text-muted-foreground">Prérequis:</span>
+                  {currentStep.requiredSteps.map(reqId => (
+                    <Badge
+                      key={reqId}
+                      variant={hasStepResult(reqId) ? "default" : "outline"}
+                      className={cn(
+                        "text-[10px] px-1.5 py-0",
+                        hasStepResult(reqId)
+                          ? "bg-green-500 text-white"
+                          : "border-orange-300 text-orange-600"
+                      )}
+                    >
+                      {hasStepResult(reqId) && <Check className="w-2.5 h-2.5 mr-0.5" />}
+                      {reqId}
+                    </Badge>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
-        )}
+        </div>
       </div>
     </TooltipProvider>
   );
