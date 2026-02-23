@@ -395,7 +395,7 @@ const SalesPage = () => {
                       Curieux de voir le parcours ?
                     </h3>
                     <p className="text-muted-foreground leading-relaxed">
-                      Explorez gratuitement la <span className="font-semibold text-foreground">roadmap interactive</span> : les 4 phases, les 15 étapes, et comprenez exactement comment votre ebook sera créé — avant même de commencer.
+                      Explorez la <span className="font-semibold text-foreground">roadmap interactive</span> : les 4 phases, les 15 étapes, et comprenez exactement comment votre ebook sera créé — avant même de commencer.
                     </p>
 
                     {/* Mini phases preview */}
