@@ -7,9 +7,6 @@ const avatars = [
   { initials: "SR", color: "from-violet-500 to-purple-500" },
   { initials: "JP", color: "from-emerald-500 to-teal-500" },
   { initials: "CB", color: "from-amber-500 to-orange-500" },
-  { initials: "NF", color: "from-cyan-500 to-blue-500" },
-  { initials: "LG", color: "from-rose-500 to-pink-500" },
-  { initials: "AB", color: "from-indigo-500 to-violet-500" },
 ];
 
 const SocialProofBanner = () => {
@@ -38,7 +35,7 @@ const SocialProofBanner = () => {
             viewport={{ once: true }}
             className="ml-4 text-sm text-muted-foreground font-medium"
           >
-            +5 000 utilisateurs
+            +230 auteurs actifs
           </motion.span>
         </div>
 
@@ -50,8 +47,8 @@ const SocialProofBanner = () => {
                 <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
               ))}
             </div>
-            <span className="font-semibold text-foreground">4.9/5</span>
-            <span>— 847 avis</span>
+            <span className="font-semibold text-foreground">4.8/5</span>
+            <span>— 38 avis</span>
           </div>
           <div className="h-4 w-px bg-border hidden sm:block" />
           <div className="flex items-center gap-1.5">

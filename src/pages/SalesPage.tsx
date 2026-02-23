@@ -273,7 +273,7 @@ const SalesPage = () => {
 
           <motion.div variants={fadeUp} custom={4} className="flex items-center justify-center gap-1.5">
             {[1,2,3,4,5].map(i => <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />)}
-            <span className="ml-2 text-sm text-muted-foreground font-medium">4.9/5 — 847 avis vérifiés</span>
+            <span className="ml-2 text-sm text-muted-foreground font-medium">4.8/5 — 38 avis vérifiés</span>
           </motion.div>
         </motion.div>
       </section>
