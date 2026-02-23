@@ -125,12 +125,12 @@ const SalesPage = () => {
   // SEO Meta Tags dynamiques pour la page /offres
   useEffect(() => {
     // Title optimisé pour le mot-clé principal
-    document.title = "Créer un Ebook avec l'IA - Générateur de Livres Amazon KDP | 37€";
+    document.title = "Workflow Éditorial IA en 14 Rôles - EbookStudio Pro Amazon KDP | 37€";
     
     // Meta description optimisée
     const metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription) {
-      metaDescription.setAttribute("content", "Créez un ebook professionnel avec l'intelligence artificielle. Générateur de livre IA complet pour autoédition Amazon KDP. Écrivez et publiez votre premier livre en quelques clics. Accès à vie pour seulement 37€.");
+      metaDescription.setAttribute("content", "Le premier workflow éditorial IA structuré en 14 rôles professionnels. Créez un ebook optimisé pour Amazon KDP avec un processus guidé de A à Z. Accès à vie pour seulement 37€.");
     }
     
     // Canonical URL
@@ -147,7 +147,7 @@ const SalesPage = () => {
     
     const ogDescription = document.querySelector('meta[property="og:description"]');
     if (ogDescription) {
-      ogDescription.setAttribute("content", "Générateur de livre IA pour Amazon KDP. Créez, écrivez et publiez votre ebook en autoédition facilement.");
+      ogDescription.setAttribute("content", "Workflow éditorial IA en 14 rôles professionnels pour Amazon KDP. Créez, structurez et publiez votre ebook avec un processus validé.");
     }
     
     const ogUrl = document.querySelector('meta[property="og:url"]');
@@ -183,19 +183,19 @@ const SalesPage = () => {
   }, []);
 
   const features = [
-    { icon: Sparkles, title: "Génération IA", description: "Plans d'ebook complets générés par intelligence artificielle" },
+    { icon: Sparkles, title: "Rédaction assistée par rôle éditorial", description: "14 rôles professionnels structurent chaque étape de votre ebook" },
     { icon: BookOpen, title: "300+ Idées de Titres", description: "Bibliothèque de titres rentables par catégorie" },
     { icon: Download, title: "Export Pro", description: "Export PDF et EPUB professionnel en un clic" },
     { icon: Zap, title: "Outils Amazon KDP", description: "Analyse de marché et optimisation pour KDP" },
   ];
 
   const testimonials = [
-    { name: "Marie D.", role: "Auteure Kindle", text: "J'ai créé 5 ebooks en 1 mois grâce à ce générateur. Mes revenus KDP ont triplé !", rating: 5, avatar: "MD", color: "bg-pink-500" },
+    { name: "Marie D.", role: "Auteure Kindle", text: "J'ai créé 5 ebooks en 1 mois grâce au workflow structuré. Mes revenus KDP ont triplé !", rating: 5, avatar: "MD", color: "bg-pink-500" },
     { name: "Thomas L.", role: "Entrepreneur", text: "L'outil parfait pour créer du contenu premium rapidement. ROI immédiat.", rating: 5, avatar: "TL", color: "bg-blue-500" },
     { name: "Sophie R.", role: "Coach Business", text: "La formation audio incluse m'a permis de comprendre toute la stratégie ebook.", rating: 5, avatar: "SR", color: "bg-purple-500" },
-    { name: "Jean-Marc P.", role: "Auteur Indépendant", text: "En 3 semaines, j'ai publié mon premier ebook sur Amazon. Les outils KDP sont incroyables !", rating: 5, avatar: "JP", color: "bg-green-500" },
-    { name: "Camille B.", role: "Formatrice en ligne", text: "J'utilise les ebooks générés comme lead magnets. Mon taux de conversion a doublé !", rating: 5, avatar: "CB", color: "bg-orange-500" },
-    { name: "Nicolas F.", role: "Blogueur Pro", text: "La qualité des contenus générés est bluffante. Mes lecteurs adorent mes ebooks.", rating: 5, avatar: "NF", color: "bg-cyan-500" },
+    { name: "Jean-Marc P.", role: "Auteur Indépendant", text: "En 3 semaines, j'ai publié mon premier ebook sur Amazon grâce au workflow structuré. Incroyable !", rating: 5, avatar: "JP", color: "bg-green-500" },
+    { name: "Camille B.", role: "Formatrice en ligne", text: "J'utilise les ebooks créés comme lead magnets. Mon taux de conversion a doublé !", rating: 5, avatar: "CB", color: "bg-orange-500" },
+    { name: "Nicolas F.", role: "Blogueur Pro", text: "La qualité des contenus est bluffante. Le workflow éditorial fait toute la différence.", rating: 5, avatar: "NF", color: "bg-cyan-500" },
   ];
 
   // Toujours afficher les deux plans : Fondateur 37€ (tant que VIP dispo) + Pro 147€
@@ -336,28 +336,29 @@ const SalesPage = () => {
       </header>
 
       {/* Hero Section - Clean & Focused */}
+      {/* Hero Section */}
       <section className="relative overflow-hidden py-20 px-4">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-background to-background" />
         <div className="max-w-5xl mx-auto text-center relative z-10">
           
           <Badge className="mb-6 bg-primary/10 text-primary border-primary/20 px-4 py-2">
             <Sparkles className="w-4 h-4 mr-2" />
-            +5 000 ebooks créés avec EbookStudio Pro
+            Plus de 5 000 ebooks créés avec EbookStudio Pro
           </Badge>
           
           <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-            <span className="text-foreground">Créez un ebook pro</span>
+            <span className="text-foreground">Le premier workflow éditorial IA</span>
             <br />
-            <span className="bg-gradient-to-r from-primary to-violet-500 bg-clip-text text-transparent">en 24h au lieu de 6 mois</span>
+            <span className="bg-gradient-to-r from-primary to-violet-500 bg-clip-text text-transparent">structuré en 14 rôles professionnels</span>
           </h1>
           
           <p className="text-xl text-muted-foreground mb-3 max-w-2xl mx-auto">
-            L'IA rédige, structure et formate votre livre. 
-            <strong className="text-foreground"> Vous gardez 100% des droits et revenus.</strong>
+            De l'analyse marché au verdict final, chaque étape de votre ebook est 
+            <strong className="text-foreground"> guidée, optimisée et validée</strong> pour Amazon KDP.
           </p>
 
           <p className="text-sm text-muted-foreground mb-8">
-            Aucune compétence technique • Résultat visible en 5 min • Sans carte bancaire
+            Plus de 5 000 ebooks créés • Résultat visible en 5 min • Sans carte bancaire
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-4">
@@ -365,12 +366,12 @@ const SalesPage = () => {
               size="lg" 
               className="text-lg px-10 py-6 bg-gradient-to-r from-primary to-violet-600 hover:from-primary/90 hover:to-violet-500 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
               onClick={() => {
-                trackDemoClick("Essayer gratuitement");
+                trackDemoClick("Découvrir le workflow");
                 navigate('/demo');
               }}
             >
               <Play className="w-5 h-5 mr-2" />
-              Essayer gratuitement — Résultat en 5 min
+              Découvrir le workflow en 14 étapes
             </Button>
           </div>
           
@@ -381,17 +382,85 @@ const SalesPage = () => {
             <span className="ml-2 text-sm text-muted-foreground">4.9/5 — 127 avis vérifiés</span>
           </div>
 
-          {/* Vidéos YouTube explicatives */}
           <HeroVideoTeaser />
+        </div>
+      </section>
+
+      {/* Section Différenciation — 14 Rôles */}
+      <section className="py-16 px-4 bg-muted/30">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-4">
+            Un système éditorial complet, pas un simple outil IA
+          </h2>
+          <p className="text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
+            EbookStudio Pro fonctionne comme une véritable équipe éditoriale intégrée.
+            Chaque rôle professionnel intervient à une étape précise pour structurer, améliorer et valider votre livre.
+          </p>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Direction & Stratégie */}
+            <Card className="border-2 border-primary/20 bg-primary/5">
+              <CardHeader className="pb-3">
+                <Badge className="w-fit mb-2 bg-primary/10 text-primary border-primary/20">Direction & Stratégie</Badge>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm">
+                <p>👑 <strong>P1</strong> — Directeur</p>
+                <p>📊 <strong>P2</strong> — Marché</p>
+                <p>🏗 <strong>P3</strong> — Architecte</p>
+              </CardContent>
+            </Card>
+
+            {/* Production */}
+            <Card className="border-2 border-violet-500/20 bg-violet-500/5">
+              <CardHeader className="pb-3">
+                <Badge className="w-fit mb-2 bg-violet-500/10 text-violet-500 border-violet-500/20">Production</Badge>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm">
+                <p>✍️ <strong>P4</strong> — Rédaction</p>
+                <p>✨ <strong>P5</strong> — Réécriture</p>
+                <p>✅ <strong>P6</strong> — Qualité</p>
+              </CardContent>
+            </Card>
+
+            {/* Publication */}
+            <Card className="border-2 border-emerald-500/20 bg-emerald-500/5">
+              <CardHeader className="pb-3">
+                <Badge className="w-fit mb-2 bg-emerald-500/10 text-emerald-500 border-emerald-500/20">Publication</Badge>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm">
+                <p>📦 <strong>P7</strong> — Packaging</p>
+                <p>🔍 <strong>P8</strong> — Diagnostic</p>
+              </CardContent>
+            </Card>
+
+            {/* Intelligence Avancée */}
+            <Card className="border-2 border-amber-500/20 bg-amber-500/5">
+              <CardHeader className="pb-3">
+                <Badge className="w-fit mb-2 bg-amber-500/10 text-amber-500 border-amber-500/20">Intelligence Avancée</Badge>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm">
+                <p>🧠 <strong>P9</strong> — Mémoire</p>
+                <p>🔗 <strong>P10</strong> — Cohérence</p>
+                <p>👁 <strong>P11</strong> — Critique</p>
+                <p>🔄 <strong>P12</strong> — Boucle</p>
+                <p>🎨 <strong>P13</strong> — Style</p>
+                <p>🏆 <strong>P14</strong> — Verdict</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <p className="text-center text-primary font-semibold mt-8 text-lg">
+            🔥 Ça, c'est votre avantage concurrentiel.
+          </p>
         </div>
       </section>
 
       {/* Features Section */}
       <section className="py-16 px-4">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-4">Tout ce dont vous avez besoin</h2>
+          <h2 className="text-3xl font-bold text-center mb-4">Tout le processus éditorial structuré en une seule interface</h2>
           <p className="text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
-            Un générateur complet avec tous les outils pour créer, optimiser et vendre vos ebooks
+            Stratégie, rédaction, amélioration, optimisation Amazon KDP et déploiement marketing : tout est intégré dans un workflow logique.
           </p>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -419,7 +488,7 @@ const SalesPage = () => {
       <section className="py-16 px-4 bg-muted/30">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-4">Ce qu'en disent nos utilisateurs</h2>
-          <p className="text-muted-foreground text-center mb-12">+5000 entrepreneurs utilisent déjà notre générateur</p>
+          <p className="text-muted-foreground text-center mb-12">+5000 entrepreneurs utilisent déjà notre workflow éditorial</p>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {testimonials.map((testimonial, index) => (
@@ -453,6 +522,38 @@ const SalesPage = () => {
 
       {/* Price Comparison Table */}
       <PriceComparison />
+
+      {/* Valeur réelle d'un ebook professionnel */}
+      <section className="py-16 px-4">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-8">
+            💰 Valeur réelle d'un ebook professionnel
+          </h2>
+          <div className="grid md:grid-cols-3 gap-6 mb-10">
+            <Card className="border-2 border-red-500/20 bg-red-500/5 text-center">
+              <CardContent className="pt-6">
+                <p className="text-lg font-semibold text-foreground mb-1">Rédacteur freelance</p>
+                <p className="text-3xl font-bold text-red-500">500 – 2 000€</p>
+              </CardContent>
+            </Card>
+            <Card className="border-2 border-orange-500/20 bg-orange-500/5 text-center">
+              <CardContent className="pt-6">
+                <p className="text-lg font-semibold text-foreground mb-1">Ghostwriter</p>
+                <p className="text-3xl font-bold text-orange-500">1 500 – 5 000€</p>
+              </CardContent>
+            </Card>
+            <Card className="border-2 border-amber-500/20 bg-amber-500/5 text-center">
+              <CardContent className="pt-6">
+                <p className="text-lg font-semibold text-foreground mb-1">Agence éditoriale</p>
+                <p className="text-3xl font-bold text-amber-500">jusqu'à 10 000€</p>
+              </CardContent>
+            </Card>
+          </div>
+          <p className="text-center text-xl text-muted-foreground mb-2">
+            EbookStudio Pro <strong className="text-foreground">remplace toute cette chaîne</strong>.
+          </p>
+        </div>
+      </section>
 
       {/* Pricing Section */}
       <section id="pricing" className="py-20 px-4 bg-muted/30">
@@ -696,7 +797,7 @@ const SalesPage = () => {
                 EbookStudio Pro
               </h3>
               <p className="text-gray-400 text-sm">
-                Le générateur d'ebook IA #1 en France. Créez et publiez votre livre sur Amazon KDP en 24h.
+                Le workflow éditorial IA #1 en France. Créez et publiez votre livre sur Amazon KDP.
               </p>
             </div>
             <div>
@@ -731,7 +832,7 @@ const SalesPage = () => {
           </div>
           <div className="border-t border-gray-800 pt-6 text-center">
             <p className="text-xs text-gray-500">
-              © 2025 EbookStudio Pro • Générateur de Livre IA pour Amazon KDP • Tous droits réservés
+              © 2025 EbookStudio Pro • Workflow Éditorial IA pour Amazon KDP • Tous droits réservés
             </p>
           </div>
         </div>
