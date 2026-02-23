@@ -451,6 +451,17 @@ const SalesPage = () => {
                 <p>🏆 <strong>P14</strong> — Verdict</p>
               </CardContent>
             </Card>
+
+            {/* Bonus — P15 */}
+            <Card className="border-2 border-rose-500/20 bg-rose-500/5 lg:col-span-4 md:col-span-2">
+              <CardHeader className="pb-3">
+                <Badge className="w-fit mb-2 bg-rose-500/10 text-rose-500 border-rose-500/20">🎁 BONUS — Humanisation</Badge>
+              </CardHeader>
+              <CardContent className="flex items-center gap-4 text-sm">
+                <p>🛡 <strong>P15</strong> — Humanisation Anti-Détection IA</p>
+                <span className="text-xs text-muted-foreground ml-auto">Offert avec votre accès</span>
+              </CardContent>
+            </Card>
           </div>
 
           <p className="text-center text-primary font-semibold mt-10 text-lg">
