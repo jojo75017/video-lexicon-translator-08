@@ -377,6 +377,7 @@ const SalesPage = () => {
       <section className="py-20 px-4">
         <div className="max-w-4xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={stagger}>
+            <motion.div variants={fadeUp}>
             <Card className="relative overflow-hidden border-2 border-primary/30 bg-gradient-to-br from-primary/5 via-card to-violet-500/5">
               {/* Decorative orbs */}
               <div className="absolute -top-20 -right-20 w-56 h-56 bg-primary/15 rounded-full blur-[80px]" />
@@ -433,6 +434,7 @@ const SalesPage = () => {
                 </div>
               </CardContent>
             </Card>
+            </motion.div>
           </motion.div>
         </div>
       </section>
