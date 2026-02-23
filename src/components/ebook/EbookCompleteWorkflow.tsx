@@ -524,6 +524,29 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
         } else {
           const result = await runStep(step.id, context);
 
+          // APRÈS P1 : TOUJOURS pause pour valider/choisir le titre best-seller
+          // On fait ce check AVANT le if(result) pour garantir l'arrêt même si result est null
+          if (step.id === 'P1') {
+            if (result) {
+              setStepResults(prev => ({ ...prev, [step.id]: result }));
+              context[step.id] = result.result;
+              setAllContext(prev => ({ ...prev, [step.id]: result.result }));
+              saveStepResult(step.id, result.result, result.displayContent);
+              if (title) saveStepToCloud(title, step.id, result.result, result.displayContent);
+              
+              const suggestions = Array.isArray(result.result?.titresAlternatifs) ? result.result.titresAlternatifs : [];
+              const origScore = result.result?.titreOriginal || null;
+              setTitleSuggestions(suggestions);
+              setOriginalTitleScore(origScore);
+              setSelectedTitleIndex(null);
+            }
+            setWaitingForTitleValidation(true);
+            setIsGenerating(false);
+            saveProgress();
+            toast.info('📊 Analyse du titre terminée ! Choisissez votre titre best-seller avant de continuer.');
+            return; // STOP — l'utilisateur doit valider avant P2
+          }
+
           if (result) {
             // Store result locally
             setStepResults(prev => ({ ...prev, [step.id]: result }));
@@ -539,20 +562,6 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             if (i > 0) {
               const prevStep = workflowSteps[i - 1];
               setExpandedSteps(prev => ({ ...prev, [prevStep.id]: false }));
-            }
-            
-            // APRÈS P1 : Pause pour valider/choisir le titre best-seller
-            if (step.id === 'P1') {
-              const suggestions = Array.isArray(result.result?.titresAlternatifs) ? result.result.titresAlternatifs : [];
-              const origScore = result.result?.titreOriginal || null;
-              setTitleSuggestions(suggestions);
-              setOriginalTitleScore(origScore);
-              setSelectedTitleIndex(null);
-              setWaitingForTitleValidation(true);
-              setIsGenerating(false);
-              saveProgress();
-              toast.info('📊 Analyse du titre terminée ! Choisissez votre titre best-seller avant de continuer.');
-              return; // Pause le workflow
             }
             
             // APRÈS P3 : TOUJOURS marquer une pause pour valider les personnages avant P4
