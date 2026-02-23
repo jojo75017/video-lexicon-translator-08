@@ -373,7 +373,70 @@ const SalesPage = () => {
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════ TÉMOIGNAGES ═══════════════════════════════ */}
+      {/* ═══════════════════════════════════════ APERÇU GRATUIT ═══════════════════════════ */}
+      <section className="py-20 px-4">
+        <div className="max-w-4xl mx-auto">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={stagger}>
+            <Card className="relative overflow-hidden border-2 border-primary/30 bg-gradient-to-br from-primary/5 via-card to-violet-500/5">
+              {/* Decorative orbs */}
+              <div className="absolute -top-20 -right-20 w-56 h-56 bg-primary/15 rounded-full blur-[80px]" />
+              <div className="absolute -bottom-16 -left-16 w-40 h-40 bg-violet-500/10 rounded-full blur-[60px]" />
+
+              <CardContent className="relative p-8 md:p-12">
+                <div className="flex flex-col md:flex-row items-center gap-8">
+                  {/* Left: Visual roadmap mini */}
+                  <div className="flex-1 space-y-4">
+                    <Badge className="bg-emerald-500/15 text-emerald-500 border-emerald-500/30 mb-2">
+                      <Eye className="w-3 h-3 mr-1" />
+                      Aperçu gratuit
+                    </Badge>
+                    <h3 className="text-2xl md:text-3xl font-extrabold">
+                      Curieux de voir le parcours ?
+                    </h3>
+                    <p className="text-muted-foreground leading-relaxed">
+                      Explorez gratuitement la <span className="font-semibold text-foreground">roadmap interactive</span> : les 4 phases, les 15 étapes, et comprenez exactement comment votre ebook sera créé — avant même de commencer.
+                    </p>
+
+                    {/* Mini phases preview */}
+                    <div className="grid grid-cols-2 gap-2 pt-2">
+                      {[
+                        { num: '1', label: 'Positionner', emoji: '🎯', color: 'bg-violet-500/10 border-violet-500/20 text-violet-500' },
+                        { num: '2', label: 'Produire', emoji: '✍️', color: 'bg-amber-500/10 border-amber-500/20 text-amber-500' },
+                        { num: '3', label: 'Optimiser', emoji: '📦', color: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' },
+                        { num: '4', label: 'Perfectionner', emoji: '🧠', color: 'bg-sky-500/10 border-sky-500/20 text-sky-500' },
+                      ].map((p) => (
+                        <div key={p.num} className={`flex items-center gap-2 px-3 py-2 rounded-xl border ${p.color} text-sm font-medium`}>
+                          <span>{p.emoji}</span>
+                          <span>{p.label}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Right: CTA */}
+                  <div className="flex flex-col items-center gap-4 shrink-0">
+                    <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-primary to-violet-600 flex items-center justify-center shadow-2xl shadow-primary/30">
+                      <Play className="w-10 h-10 text-white ml-1" />
+                    </div>
+                    <Button
+                      size="lg"
+                      onClick={() => navigate('/demo')}
+                      className="text-base px-8 py-5 h-auto rounded-2xl bg-primary hover:bg-primary/90 shadow-lg shadow-primary/25 gap-2 group"
+                    >
+                      Voir la démo gratuite
+                      <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    </Button>
+                    <p className="text-xs text-muted-foreground text-center">
+                      Sans inscription • 100% gratuit
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
+      </section>
+
       <section className="py-24 px-4">
         <div className="max-w-6xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-16">
