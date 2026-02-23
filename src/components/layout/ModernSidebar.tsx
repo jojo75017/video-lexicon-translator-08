@@ -583,17 +583,19 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
             return (
               <React.Fragment key={category.id}>
                 {isFirstSecondary && !isCollapsed && (
-                  <div className="flex items-center gap-2 px-3 pt-4 pb-2">
-                    <div className="h-px flex-1 bg-violet-300/40 dark:bg-violet-700/30" />
-                    <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
-                      Outils complémentaires
-                    </span>
-                    <div className="h-px flex-1 bg-violet-300/40 dark:bg-violet-700/30" />
+                  <div className="mx-1 my-3 px-3 py-2.5 rounded-xl bg-gradient-to-r from-slate-100 via-slate-50 to-slate-100 dark:from-slate-800/50 dark:via-slate-900/30 dark:to-slate-800/50 border border-slate-300/60 dark:border-slate-700/40">
+                    <div className="flex items-center gap-2 justify-center">
+                      <div className="h-0.5 w-6 rounded-full bg-slate-400/60 dark:bg-slate-600/60" />
+                      <span className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                        ⚙️ Outils complémentaires
+                      </span>
+                      <div className="h-0.5 w-6 rounded-full bg-slate-400/60 dark:bg-slate-600/60" />
+                    </div>
                   </div>
                 )}
                 {isFirstSecondary && isCollapsed && (
-                  <div className="flex justify-center py-2">
-                    <div className="w-6 h-px bg-violet-300/40 dark:bg-violet-700/30" />
+                  <div className="flex justify-center py-3">
+                    <div className="w-8 h-0.5 rounded-full bg-slate-400/60 dark:bg-slate-600/60" />
                   </div>
                 )}
               <div 
