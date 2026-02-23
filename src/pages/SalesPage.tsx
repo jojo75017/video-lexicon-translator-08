@@ -211,20 +211,20 @@ const SalesPage = () => {
             badge: "🔥 OFFRE FONDATEUR — Jusqu'au 30 avril",
             discount: "🎯 Économie : 260€ (-87%)",
             features: [
-              "✨ Ebooks illimités à vie",
-              "📝 Chapitres illimités",
+              "✨ Workflow éditorial complet à vie",
+              "📝 14 rôles professionnels intégrés",
               "🎨 10 couvertures IA/mois",
               "📄 Export PDF / EPUB / Word / Google Docs",
               "🎓 Toutes les formations (18 modules + audio)",
               "📚 Gestionnaire Séries / Sagas",
               "📊 Outils KDP Premium complets",
               "🌍 Traduction multi-langues",
-              "🎧 Générateur Audiobooks",
+              "🎧 Infrastructure Audiobooks",
               "🔄 Mises à jour gratuites à vie",
               "💬 Support prioritaire inclus",
             ],
             blocked: [],
-            cta: "🚀 Débloquer TOUT pour 37€",
+            cta: "🚀 Débloquer l'accès fondateur",
             popular: true,
             footnote: "📌 Paiement unique – Accès complet à vie – Sans abonnement",
             installments: [],
@@ -240,15 +240,15 @@ const SalesPage = () => {
       badge: isVipAvailable ? "📅 À PARTIR DU 1ER MAI" : "⭐ MEILLEURE OFFRE",
       discount: "🎯 Économie : 150€ (-50%)",
       features: [
-        "✨ Ebooks illimités à vie",
-        "📝 Chapitres illimités",
+        "✨ Workflow éditorial complet à vie",
+        "📝 14 rôles professionnels intégrés",
         "🎨 10 couvertures IA/mois",
         "📄 Export PDF / EPUB / Word / Google Docs",
         "🎓 Toutes les formations (18 modules + audio)",
         "📚 Gestionnaire Séries / Sagas",
         "📊 Outils KDP Premium complets",
         "🌍 Traduction multi-langues",
-        "🎧 Générateur Audiobooks",
+        "🎧 Infrastructure Audiobooks",
         "🔄 Mises à jour gratuites à vie",
         "💬 Support prioritaire inclus",
       ],
@@ -335,47 +335,51 @@ const SalesPage = () => {
         </div>
       </header>
 
-      {/* Hero Section - Clean & Focused */}
       {/* Hero Section */}
-      <section className="relative overflow-hidden py-20 px-4">
+      <section className="relative overflow-hidden py-24 px-4">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-background to-background" />
         <div className="max-w-5xl mx-auto text-center relative z-10">
           
-          <Badge className="mb-6 bg-primary/10 text-primary border-primary/20 px-4 py-2">
+          <Badge className="mb-8 bg-primary/10 text-primary border-primary/20 px-5 py-2.5 text-sm">
             <Sparkles className="w-4 h-4 mr-2" />
-            Plus de 5 000 ebooks créés avec EbookStudio Pro
+            5 000 ebooks créés avec EbookStudio Pro
           </Badge>
           
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+          <h1 className="text-4xl md:text-6xl font-bold mb-8 leading-tight tracking-tight">
             <span className="text-foreground">Le premier workflow éditorial IA</span>
             <br />
             <span className="bg-gradient-to-r from-primary to-violet-500 bg-clip-text text-transparent">structuré en 14 rôles professionnels</span>
           </h1>
           
-          <p className="text-xl text-muted-foreground mb-3 max-w-2xl mx-auto">
+          <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
             De l'analyse marché au verdict final, chaque étape de votre ebook est 
             <strong className="text-foreground"> guidée, optimisée et validée</strong> pour Amazon KDP.
           </p>
-
-          <p className="text-sm text-muted-foreground mb-8">
-            Plus de 5 000 ebooks créés • Résultat visible en 5 min • Sans carte bancaire
-          </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-4">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
             <Button 
               size="lg" 
               className="text-lg px-10 py-6 bg-gradient-to-r from-primary to-violet-600 hover:from-primary/90 hover:to-violet-500 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
+              onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
+            >
+              <Rocket className="w-5 h-5 mr-2" />
+              Découvrir le workflow complet
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="text-lg px-10 py-6 border-2 hover:bg-primary/5 transition-all duration-300"
               onClick={() => {
-                trackDemoClick("Découvrir le workflow");
+                trackDemoClick("Voir la démonstration");
                 navigate('/demo');
               }}
             >
               <Play className="w-5 h-5 mr-2" />
-              Découvrir le workflow en 14 étapes
+              Voir la démonstration
             </Button>
           </div>
           
-          <div className="flex items-center justify-center gap-1 mb-12">
+          <div className="flex items-center justify-center gap-1 mb-14">
             {[1,2,3,4,5].map(i => (
               <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
             ))}
@@ -387,58 +391,58 @@ const SalesPage = () => {
       </section>
 
       {/* Section Différenciation — 14 Rôles */}
-      <section className="py-16 px-4 bg-muted/30">
+      <section className="py-20 px-4 bg-muted/30">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-4">
-            Un système éditorial complet, pas un simple outil IA
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+            Un système éditorial complet. <span className="text-muted-foreground">Pas un simple générateur.</span>
           </h2>
-          <p className="text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
+          <p className="text-muted-foreground text-center mb-14 max-w-2xl mx-auto leading-relaxed">
             EbookStudio Pro fonctionne comme une véritable équipe éditoriale intégrée.
-            Chaque rôle professionnel intervient à une étape précise pour structurer, améliorer et valider votre livre.
+            Chaque rôle intervient à un moment précis pour structurer, améliorer et valider votre livre avant publication.
           </p>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Direction & Stratégie */}
+            {/* Phase 1 — Direction & Stratégie */}
             <Card className="border-2 border-primary/20 bg-primary/5">
               <CardHeader className="pb-3">
-                <Badge className="w-fit mb-2 bg-primary/10 text-primary border-primary/20">Direction & Stratégie</Badge>
+                <Badge className="w-fit mb-2 bg-primary/10 text-primary border-primary/20">🟣 Phase 1 — Direction & Stratégie</Badge>
               </CardHeader>
-              <CardContent className="space-y-2 text-sm">
+              <CardContent className="space-y-3 text-sm">
                 <p>👑 <strong>P1</strong> — Directeur</p>
                 <p>📊 <strong>P2</strong> — Marché</p>
                 <p>🏗 <strong>P3</strong> — Architecte</p>
               </CardContent>
             </Card>
 
-            {/* Production */}
+            {/* Phase 2 — Production */}
             <Card className="border-2 border-violet-500/20 bg-violet-500/5">
               <CardHeader className="pb-3">
-                <Badge className="w-fit mb-2 bg-violet-500/10 text-violet-500 border-violet-500/20">Production</Badge>
+                <Badge className="w-fit mb-2 bg-violet-500/10 text-violet-500 border-violet-500/20">🟡 Phase 2 — Production</Badge>
               </CardHeader>
-              <CardContent className="space-y-2 text-sm">
+              <CardContent className="space-y-3 text-sm">
                 <p>✍️ <strong>P4</strong> — Rédaction</p>
                 <p>✨ <strong>P5</strong> — Réécriture</p>
                 <p>✅ <strong>P6</strong> — Qualité</p>
               </CardContent>
             </Card>
 
-            {/* Publication */}
+            {/* Phase 3 — Publication */}
             <Card className="border-2 border-emerald-500/20 bg-emerald-500/5">
               <CardHeader className="pb-3">
-                <Badge className="w-fit mb-2 bg-emerald-500/10 text-emerald-500 border-emerald-500/20">Publication</Badge>
+                <Badge className="w-fit mb-2 bg-emerald-500/10 text-emerald-500 border-emerald-500/20">🟢 Phase 3 — Publication</Badge>
               </CardHeader>
-              <CardContent className="space-y-2 text-sm">
+              <CardContent className="space-y-3 text-sm">
                 <p>📦 <strong>P7</strong> — Packaging</p>
                 <p>🔍 <strong>P8</strong> — Diagnostic</p>
               </CardContent>
             </Card>
 
-            {/* Intelligence Avancée */}
+            {/* Phase 4 — Intelligence Avancée */}
             <Card className="border-2 border-amber-500/20 bg-amber-500/5">
               <CardHeader className="pb-3">
-                <Badge className="w-fit mb-2 bg-amber-500/10 text-amber-500 border-amber-500/20">Intelligence Avancée</Badge>
+                <Badge className="w-fit mb-2 bg-amber-500/10 text-amber-500 border-amber-500/20">🔵 Phase 4 — Intelligence Avancée</Badge>
               </CardHeader>
-              <CardContent className="space-y-2 text-sm">
+              <CardContent className="space-y-3 text-sm">
                 <p>🧠 <strong>P9</strong> — Mémoire</p>
                 <p>🔗 <strong>P10</strong> — Cohérence</p>
                 <p>👁 <strong>P11</strong> — Critique</p>
@@ -449,9 +453,48 @@ const SalesPage = () => {
             </Card>
           </div>
 
-          <p className="text-center text-primary font-semibold mt-8 text-lg">
+          <p className="text-center text-primary font-semibold mt-10 text-lg">
             🔥 Ça, c'est votre avantage concurrentiel.
           </p>
+        </div>
+      </section>
+
+      {/* Comment ça marche — 4 étapes */}
+      <section className="py-20 px-4">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-14">
+            ⚙️ Comment ça marche
+          </h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="text-center">
+              <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl font-bold text-primary">1</span>
+              </div>
+              <h3 className="font-bold text-lg mb-2">Positionner</h3>
+              <p className="text-sm text-muted-foreground">Analyse marché + promesse + architecture du livre</p>
+            </div>
+            <div className="text-center">
+              <div className="w-16 h-16 rounded-2xl bg-violet-500/10 flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl font-bold text-violet-500">2</span>
+              </div>
+              <h3 className="font-bold text-lg mb-2">Produire</h3>
+              <p className="text-sm text-muted-foreground">Rédaction guidée + amélioration + contrôle qualité</p>
+            </div>
+            <div className="text-center">
+              <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl font-bold text-emerald-500">3</span>
+              </div>
+              <h3 className="font-bold text-lg mb-2">Optimiser</h3>
+              <p className="text-sm text-muted-foreground">Mots-clés Amazon + packaging + export professionnel</p>
+            </div>
+            <div className="text-center">
+              <div className="w-16 h-16 rounded-2xl bg-amber-500/10 flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl font-bold text-amber-500">4</span>
+              </div>
+              <h3 className="font-bold text-lg mb-2">Déployer</h3>
+              <p className="text-sm text-muted-foreground">Marketing + audio + catalogue de publications</p>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -524,33 +567,33 @@ const SalesPage = () => {
       <PriceComparison />
 
       {/* Valeur réelle d'un ebook professionnel */}
-      <section className="py-16 px-4">
+      <section className="py-20 px-4">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-8">
-            💰 Valeur réelle d'un ebook professionnel
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-10">
+            💰 Combien coûte réellement un ebook professionnel ?
           </h2>
           <div className="grid md:grid-cols-3 gap-6 mb-10">
             <Card className="border-2 border-red-500/20 bg-red-500/5 text-center">
-              <CardContent className="pt-6">
-                <p className="text-lg font-semibold text-foreground mb-1">Rédacteur freelance</p>
+              <CardContent className="pt-6 pb-6">
+                <p className="text-lg font-semibold text-foreground mb-2">Rédacteur freelance</p>
                 <p className="text-3xl font-bold text-red-500">500 – 2 000€</p>
               </CardContent>
             </Card>
             <Card className="border-2 border-orange-500/20 bg-orange-500/5 text-center">
-              <CardContent className="pt-6">
-                <p className="text-lg font-semibold text-foreground mb-1">Ghostwriter</p>
+              <CardContent className="pt-6 pb-6">
+                <p className="text-lg font-semibold text-foreground mb-2">Ghostwriter</p>
                 <p className="text-3xl font-bold text-orange-500">1 500 – 5 000€</p>
               </CardContent>
             </Card>
             <Card className="border-2 border-amber-500/20 bg-amber-500/5 text-center">
-              <CardContent className="pt-6">
-                <p className="text-lg font-semibold text-foreground mb-1">Agence éditoriale</p>
+              <CardContent className="pt-6 pb-6">
+                <p className="text-lg font-semibold text-foreground mb-2">Agence éditoriale</p>
                 <p className="text-3xl font-bold text-amber-500">jusqu'à 10 000€</p>
               </CardContent>
             </Card>
           </div>
-          <p className="text-center text-xl text-muted-foreground mb-2">
-            EbookStudio Pro <strong className="text-foreground">remplace toute cette chaîne</strong>.
+          <p className="text-center text-xl text-muted-foreground">
+            EbookStudio Pro <strong className="text-foreground">remplace cette chaîne complète</strong>.
           </p>
         </div>
       </section>
@@ -704,16 +747,16 @@ const SalesPage = () => {
       {/* Final CTA */}
       <section className="py-20 px-4">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-3xl font-bold mb-4">Prêt à créer vos ebooks ?</h2>
+          <h2 className="text-3xl font-bold mb-4">Prêt à lancer votre workflow éditorial ?</h2>
           <p className="text-muted-foreground mb-8">
-            Rejoignez les entrepreneurs qui publient sur Amazon KDP
+            Rejoignez les auteurs qui publient sur Amazon KDP avec un système éditorial structuré
           </p>
           <Button 
             size="lg" 
-            className="text-lg px-8 py-6"
+            className="text-lg px-8 py-6 bg-gradient-to-r from-primary to-violet-600 hover:from-primary/90 hover:to-violet-500 text-white"
             onClick={() => handlePlanClick("pro")}
           >
-            {isVipAvailable ? `Offre Fondateur – 37€` : 'Accéder maintenant – 147€'}
+            {isVipAvailable ? `Débloquer l'accès fondateur – 37€` : 'Accéder maintenant – 147€'}
             <ArrowRight className="w-5 h-5 ml-2" />
           </Button>
           <p className="text-sm text-muted-foreground mt-4">
