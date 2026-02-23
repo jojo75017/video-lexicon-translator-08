@@ -35,7 +35,7 @@ const SocialProofBanner = () => {
             viewport={{ once: true }}
             className="ml-4 text-sm text-muted-foreground font-medium"
           >
-            +230 auteurs actifs
+            Utilisé par des auteurs KDP
           </motion.span>
         </div>
 
