@@ -445,7 +445,7 @@ const SalesPage = () => {
             <motion.h2 variants={fadeUp} className="text-3xl md:text-5xl font-extrabold mb-5">
               Ce qu'en disent nos utilisateurs
             </motion.h2>
-            <motion.p variants={fadeUp} custom={1} className="text-muted-foreground text-lg">+5 000 entrepreneurs utilisent déjà le workflow éditorial</motion.p>
+            <motion.p variants={fadeUp} custom={1} className="text-muted-foreground text-lg">Rejoignez les auteurs qui publient avec confiance</motion.p>
           </motion.div>
 
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={stagger}
