@@ -173,10 +173,10 @@ const categories: Category[] = [
       { id: 'final-diagnosis', label: 'P8 🔍 Diagnostic', icon: Shield, isPro: true },
     ]
   },
-  // ========== 4. MOTEUR IA V2 (P9-P14) ==========
+  // ========== 4. MOTEUR IA V2 (P9-P15) ==========
   {
     id: 'workflow-p9-p14',
-    label: '🧬 Moteur IA V2 (P9-P14)',
+    label: '🧬 Moteur IA V2 (P9-P15)',
     emoji: '🧬',
     color: 'from-green-500 to-teal-500',
     items: [
@@ -186,9 +186,47 @@ const categories: Category[] = [
       { id: 'iterative-loop', label: 'P12 🔄 Boucle', icon: RefreshCw, isPro: true },
       { id: 'style-signature', label: 'P13 🎨 Style', icon: Fingerprint, isPro: true },
       { id: 'ultimate-verdict', label: 'P14 🏆 Verdict', icon: Award, isPro: true },
+      { id: 'humanize-anti-ia', label: 'P15 🎁 Anti-IA (BONUS)', icon: Shield, isPro: true, isNew: true },
     ]
   },
-  // ========== 4. LIVRES SPÉCIAUX ==========
+  // ========== 5. KDP ESSENTIEL ==========
+  {
+    id: 'amazon',
+    label: '🛒 KDP Essentiel',
+    emoji: '🛒',
+    color: 'from-orange-500 to-red-500',
+    items: [
+      { id: 'export', label: '💾 Exporter (PDF, Word)', icon: Download },
+      { id: 'kdp', label: '📝 Description KDP', icon: TrendingUp },
+      { id: 'description-magnet', label: '🧲 Description Magnet', icon: FileText, isNew: true },
+      { id: 'export-guide', label: '📖 Guide Export', icon: GraduationCap, isNew: true },
+      { id: 'pdf-reformatter', label: '📐 Reformateur PDF', icon: FileEdit, isNew: true },
+      { id: 'pdf-analyzer', label: '📏 Analyseur PDF', icon: Ruler, isNew: true },
+      { id: 'amazon-simulator', label: '👀 Simulateur Amazon', icon: Eye },
+      { id: 'kdp-research', label: '🔍 Recherche Niche', icon: Search },
+      { id: 'kdp-explosive', label: '💥 Simulateur Explosif', icon: Zap, isNew: true },
+      { id: 'price-studio', label: '💰 Price Master', icon: TrendingUp, isNew: true },
+      { id: 'bsr-tracker', label: '📊 BSR Multi-Pays', icon: BarChart3, isNew: true },
+      { id: 'plagiarism-validator', label: '🛡️ Anti-Plagiat', icon: Shield },
+    ]
+  },
+  // ========== 6. COUVERTURES & IMAGES ==========
+  {
+    id: 'visuels',
+    label: '🖼️ Couvertures & Images',
+    emoji: '🖼️',
+    color: 'from-teal-500 to-cyan-500',
+    items: [
+      { id: 'cover', label: '📕 Couverture Avant', icon: Palette },
+      { id: 'backcover', label: '📖 Couverture Arrière', icon: BookCopy },
+      { id: 'images', label: '🎨 Images Chapitres', icon: Image },
+      { id: 'imagebank', label: '🏦 Banque Images', icon: ImagePlus },
+      { id: 'mockup-studio', label: '🖥️ Mockup Studio', icon: Monitor },
+      { id: 'kdp-cover-studio', label: '📐 Studio Couverture KDP', icon: Ruler, isNew: true },
+      { id: 'calibre-epub', label: '📚 Calibre Studio EPUB', icon: BookOpen, isNew: true },
+    ]
+  },
+  // ========== 7. LIVRES SPÉCIAUX ==========
   {
     id: 'special',
     label: '🎨 Livres Spéciaux',
@@ -211,44 +249,7 @@ const categories: Category[] = [
       { id: 'doc-transform', label: '📄 Importer Word', icon: FileText },
     ]
   },
-  // ========== 5. VISUELS ==========
-  {
-    id: 'visuels',
-    label: '🖼️ Couvertures & Images',
-    emoji: '🖼️',
-    color: 'from-teal-500 to-cyan-500',
-    items: [
-      { id: 'cover', label: '📕 Couverture Avant', icon: Palette },
-      { id: 'backcover', label: '📖 Couverture Arrière', icon: BookCopy },
-      { id: 'images', label: '🎨 Images Chapitres', icon: Image },
-      { id: 'imagebank', label: '🏦 Banque Images', icon: ImagePlus },
-      { id: 'mockup-studio', label: '🖥️ Mockup Studio', icon: Monitor },
-      { id: 'kdp-cover-studio', label: '📐 Studio Couverture KDP', icon: Ruler, isNew: true },
-      { id: 'calibre-epub', label: '📚 Calibre Studio EPUB', icon: BookOpen, isNew: true },
-    ]
-  },
-  // ========== 6. AMAZON KDP ==========
-  {
-    id: 'amazon',
-    label: '🛒 Amazon KDP',
-    emoji: '🛒',
-    color: 'from-orange-500 to-red-500',
-    items: [
-      { id: 'export-guide', label: '📖 Guide Export', icon: GraduationCap, isNew: true },
-      { id: 'pdf-reformatter', label: '📐 Reformateur PDF KDP', icon: FileEdit, isNew: true },
-      { id: 'pdf-analyzer', label: '📏 Analyseur PDF KDP', icon: Ruler, isNew: true },
-      { id: 'export', label: '💾 Exporter (PDF, Word)', icon: Download },
-      { id: 'kdp', label: '📝 Description KDP', icon: TrendingUp },
-      { id: 'description-magnet', label: '🧲 Description Magnet', icon: FileText, isNew: true },
-      { id: 'amazon-simulator', label: '👀 Simulateur Amazon', icon: Eye },
-      { id: 'bsr-tracker', label: '📊 BSR Multi-Pays', icon: BarChart3, isNew: true },
-      { id: 'kdp-research', label: '🔍 Recherche Niche', icon: Search },
-      { id: 'kdp-explosive', label: '💥 Simulateur Explosif', icon: Zap, isNew: true },
-      { id: 'price-studio', label: '💰 Price Master', icon: TrendingUp, isNew: true },
-      { id: 'plagiarism-validator', label: '🛡️ Anti-Plagiat', icon: Shield },
-    ]
-  },
-  // ========== 7. MARKETING ==========
+  // ========== 8. MARKETING ==========
   {
     id: 'marketing-cat',
     label: '📱 Marketing',
@@ -266,7 +267,7 @@ const categories: Category[] = [
       { id: 'blog', label: '📝 Blog SEO', icon: FileText, isLink: true, href: '/blog', isNew: true },
     ]
   },
-  // ========== 8. OUTILS 2026 ==========
+  // ========== 9. OUTILS 2026 ==========
   {
     id: 'tools-2026',
     label: '🚀 Outils 2026',
@@ -281,7 +282,7 @@ const categories: Category[] = [
       { id: 'pen-name', label: '✒️ Nom de Plume', icon: PenTool, isNew: true },
     ]
   },
-  // ========== 8. AUDIO ==========
+  // ========== 10. AUDIO ==========
   {
     id: 'audio',
     label: '🎧 Audio',
