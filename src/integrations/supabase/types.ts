@@ -426,6 +426,66 @@ export type Database = {
         }
         Relationships: []
       }
+      referral_codes: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      referrals: {
+        Row: {
+          commission_amount: number
+          commission_paid: boolean
+          converted_at: string | null
+          created_at: string
+          id: string
+          paid_at: string | null
+          referred_email: string
+          referred_user_id: string | null
+          referrer_id: string
+          status: string
+        }
+        Insert: {
+          commission_amount?: number
+          commission_paid?: boolean
+          converted_at?: string | null
+          created_at?: string
+          id?: string
+          paid_at?: string | null
+          referred_email: string
+          referred_user_id?: string | null
+          referrer_id: string
+          status?: string
+        }
+        Update: {
+          commission_amount?: number
+          commission_paid?: boolean
+          converted_at?: string | null
+          created_at?: string
+          id?: string
+          paid_at?: string | null
+          referred_email?: string
+          referred_user_id?: string | null
+          referrer_id?: string
+          status?: string
+        }
+        Relationships: []
+      }
       series_bibles: {
         Row: {
           characters: Json | null
@@ -592,6 +652,8 @@ export type Database = {
     Functions: {
       can_create_vip: { Args: never; Returns: boolean }
       count_vip_subscribers: { Args: never; Returns: number }
+      generate_referral_code: { Args: never; Returns: string }
+      get_referral_stats: { Args: { p_user_id: string }; Returns: Json }
       has_role:
         | {
             Args: {
