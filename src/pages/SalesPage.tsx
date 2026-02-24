@@ -654,6 +654,38 @@ const SalesPage = () => {
         </div>
       </section>
 
+      {/* Tutoriel Vidéo Clé API */}
+      <section className="py-16 px-4" id="tuto-api">
+        <div className="max-w-4xl mx-auto text-center">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
+            <motion.div variants={fadeUp}>
+              <Badge className="mb-4 bg-blue-500/10 text-blue-500 border-blue-500/20 px-4 py-2">
+                <Play className="w-4 h-4 mr-2" />
+                Tutoriel Vidéo — 2 min
+              </Badge>
+            </motion.div>
+            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-4xl font-extrabold mb-4">
+              🔑 Comment configurer votre clé API
+            </motion.h2>
+            <motion.p variants={fadeUp} custom={2} className="text-muted-foreground mb-8 text-lg max-w-2xl mx-auto">
+              Avant de créer votre premier ebook, configurez votre clé OpenAI en 2 minutes. 
+              Un ebook complet coûte entre 0,30€ et 0,80€.
+            </motion.p>
+            <motion.div variants={fadeUp} custom={3} className="rounded-xl overflow-hidden border border-border shadow-lg">
+              <video 
+                controls 
+                className="w-full aspect-video"
+                poster=""
+                preload="metadata"
+              >
+                <source src="/videos/tuto-cle-api.mp4" type="video/mp4" />
+                Votre navigateur ne supporte pas la vidéo.
+              </video>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* FAQ */}
       <SalesFaq />
 
