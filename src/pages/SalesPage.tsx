@@ -149,6 +149,15 @@ const SalesPage = () => {
   const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const { isVipAvailable, daysRemaining, isLoading: vipLoading } = useVipAvailability();
 
+  // Capture referral code from URL
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const ref = params.get('ref');
+    if (ref) {
+      sessionStorage.setItem('referral_code', ref);
+    }
+  }, [location.search]);
+
   useEffect(() => {
     if (location.hash) {
       const id = location.hash.replace('#', '');

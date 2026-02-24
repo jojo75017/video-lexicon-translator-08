@@ -12,6 +12,7 @@ import AuthPage from './pages/AuthPage';
 import AdminProfilePage from './pages/AdminProfilePage';
 import AdminDirectPage from './pages/AdminDirectPage';
 import AffiliationFormationPage from './pages/AffiliationFormationPage';
+import ParrainagePage from './pages/ParrainagePage';
 import FormationPage from './pages/FormationPage';
 import FormationSeriesPage from './pages/FormationSeriesPage';
 import FormationAudioPage from './pages/FormationAudioPage';
@@ -246,6 +247,7 @@ const App = () => {
             <Route path="/checklist-tournage" element={<ChecklistTournagePage />} />
             <Route path="/assistance" element={<FaqAssistancePage />} />
             <Route path="/affiliation" element={<AffiliationFormationPage />} />
+            <Route path="/parrainage" element={<ParrainagePage />} />
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/admin-direct" element={<AdminDirectPage />} />
             <Route path="/ai-chat" element={<AiChatPage />} />

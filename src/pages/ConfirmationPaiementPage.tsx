@@ -52,6 +52,18 @@ const ConfirmationPaiementPage = () => {
         body: { email: email.trim().toLowerCase(), timestamp: new Date().toISOString() }
       });
 
+      // Track referral conversion if there's a referral code
+      const referralCode = sessionStorage.getItem('referral_code');
+      if (referralCode) {
+        await supabase.functions.invoke('track-referral', {
+          body: { action: 'track', referral_code: referralCode, referred_email: email.trim().toLowerCase() }
+        });
+        await supabase.functions.invoke('track-referral', {
+          body: { action: 'convert', referred_email: email.trim().toLowerCase() }
+        });
+        sessionStorage.removeItem('referral_code');
+      }
+
       setIsSubmitted(true);
       toast.success("Confirmation envoyée ! Vous recevrez votre code sous peu.");
     } catch (error) {
