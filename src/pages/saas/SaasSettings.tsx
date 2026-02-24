@@ -13,6 +13,7 @@ import {
   AlertTriangle,
   Play
 } from 'lucide-react';
+import { OpenAIConfigPanel } from '@/components/shared/OpenAIConfigPanel';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -387,59 +388,11 @@ export const SaasSettings: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>API Keys</CardTitle>
-              <CardDescription>Manage your API keys for external integrations</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="p-4 border rounded-lg space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">Production Key</p>
-                    <p className="text-sm text-muted-foreground">Created on Jan 15, 2024</p>
-                  </div>
-                  <Badge>Active</Badge>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Input 
-                    value="sk_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxx" 
-                    readOnly 
-                    className="font-mono text-sm"
-                  />
-                  <Button variant="outline" size="icon">
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-
-              <div className="p-4 border rounded-lg space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">Development Key</p>
-                    <p className="text-sm text-muted-foreground">Created on Jan 10, 2024</p>
-                  </div>
-                  <Badge variant="secondary">Development</Badge>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Input 
-                    value="sk_test_xxxxxxxxxxxxxxxxxxxxxxxxxxxxx" 
-                    readOnly 
-                    className="font-mono text-sm"
-                  />
-                  <Button variant="outline" size="icon">
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button>
-                <Key className="mr-2 h-4 w-4" />
-                Generate New Key
-              </Button>
-            </CardFooter>
-          </Card>
+          <OpenAIConfigPanel 
+            title="🔑 Clé API OpenAI"
+            description="Entrez votre clé API OpenAI pour utiliser toutes les fonctionnalités IA"
+            showModelSelection={true}
+          />
         </TabsContent>
       </Tabs>
     </div>
