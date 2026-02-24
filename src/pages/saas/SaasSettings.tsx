@@ -10,7 +10,8 @@ import {
   Eye,
   EyeOff,
   Trash2,
-  AlertTriangle
+  AlertTriangle,
+  Play
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -361,6 +362,31 @@ export const SaasSettings: React.FC = () => {
 
         {/* API Keys Tab */}
         <TabsContent value="api" className="space-y-6">
+          {/* Tutoriel Vidéo */}
+          <Card className="border-blue-500/20 bg-blue-500/5">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Play className="h-5 w-5 text-blue-500" />
+                🔑 Tutoriel : Configurer votre clé API OpenAI
+              </CardTitle>
+              <CardDescription>
+                Regardez ce tutoriel de 2 minutes avant de commencer. Un ebook complet coûte entre 0,30€ et 0,80€.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="rounded-lg overflow-hidden border border-border">
+                <video 
+                  controls 
+                  className="w-full aspect-video"
+                  preload="metadata"
+                >
+                  <source src="/videos/tuto-cle-api.mp4" type="video/mp4" />
+                  Votre navigateur ne supporte pas la vidéo.
+                </video>
+              </div>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle>API Keys</CardTitle>
