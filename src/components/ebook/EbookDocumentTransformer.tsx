@@ -16,6 +16,7 @@ import {
   FileType, ArrowRight, Eye, Copy, Trash2, Palette
 } from 'lucide-react';
 import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } from 'docx';
+import { exportProfessionalDocx } from '@/utils/docxExportEngine';
 import { KdpQuickTools, KdpProductType } from './KdpQuickTools';
 
 interface Chapter {
@@ -312,71 +313,24 @@ Réponds UNIQUEMENT en JSON valide:
     if (!result) return;
 
     try {
-      const doc = new Document({
-        sections: [{
-          properties: {},
-          children: [
-            // Page de titre
-            new Paragraph({
-              children: [new TextRun({ text: result.title, bold: true, size: 56 })],
-              heading: HeadingLevel.TITLE,
-              alignment: AlignmentType.CENTER,
-              spacing: { after: 400 }
-            }),
-            new Paragraph({
-              children: [new TextRun({ text: `par ${result.author}`, italics: true, size: 28 })],
-              alignment: AlignmentType.CENTER,
-              spacing: { after: 800 }
-            }),
-            // Préface
-            new Paragraph({
-              children: [new TextRun({ text: 'Préface', bold: true, size: 32 })],
-              heading: HeadingLevel.HEADING_1,
-              spacing: { before: 400, after: 200 }
-            }),
-            new Paragraph({
-              children: [new TextRun({ text: result.preface, size: 24 })],
-              spacing: { after: 400 }
-            }),
-            // Chapitres
-            ...result.chapters.flatMap((chapter, index) => [
-              new Paragraph({
-                children: [new TextRun({ text: `Chapitre ${index + 1}: ${chapter.title}`, bold: true, size: 32 })],
-                heading: HeadingLevel.HEADING_1,
-                spacing: { before: 400, after: 200 }
-              }),
-              ...chapter.content.split('\n\n').map(para => 
-                new Paragraph({
-                  children: [new TextRun({ text: para, size: 24 })],
-                  spacing: { after: 200 }
-                })
-              )
-            ]),
-            // Conclusion
-            new Paragraph({
-              children: [new TextRun({ text: 'Conclusion', bold: true, size: 32 })],
-              heading: HeadingLevel.HEADING_1,
-              spacing: { before: 400, after: 200 }
-            }),
-            new Paragraph({
-              children: [new TextRun({ text: result.conclusion, size: 24 })],
-            })
-          ]
-        }]
+      await exportProfessionalDocx({
+        title: result.title,
+        authorName: result.author,
+        preface: result.preface,
+        conclusion: result.conclusion,
+        chapters: result.chapters.map((ch, i) => ({
+          title: ch.title,
+          content: ch.content,
+          subChapters: [],
+        })),
+        fontFamily: 'Georgia',
+        fontSize: 12,
+        pageFormat: '6x9',
       });
-
-      const blob = await Packer.toBlob(doc);
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${result.title.replace(/[^a-zA-Z0-9]/g, '_')}_ebook.docx`;
-      a.click();
-      URL.revokeObjectURL(url);
-
-      toast.success('Export DOCX réussi !');
+      toast.success('Export DOCX professionnel réussi !');
     } catch (error) {
       console.error('Export error:', error);
-      toast.error('Erreur d\'export');
+      toast.error("Erreur d'export");
     }
   };
 
