@@ -14,6 +14,7 @@ import ExitIntentPopup from "@/components/sales/ExitIntentPopup";
 import SocialProofBanner from "@/components/sales/SocialProofBanner";
 import SalesFaq from "@/components/sales/SalesFaq";
 import { useVipAvailability } from "@/hooks/useVipAvailability";
+import AuthorShowcase from "@/components/sales/AuthorShowcase";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -234,7 +235,7 @@ const SalesPage = () => {
             <span className="text-lg font-bold">EbookStudio Pro</span>
           </Link>
           <nav className="hidden md:flex items-center gap-6 text-sm">
-            <Link to="/ebook" className="text-muted-foreground hover:text-primary transition-colors font-medium">Découvrir</Link>
+            <a href="#author-showcase" onClick={(e) => { e.preventDefault(); document.getElementById('author-showcase')?.scrollIntoView({ behavior: 'smooth' }); }} className="text-muted-foreground hover:text-primary transition-colors font-medium cursor-pointer">📚 Mes créations</a>
             <Link to="/blog" className="text-muted-foreground hover:text-primary transition-colors">Blog</Link>
             <Link to="/demo" className="text-muted-foreground hover:text-primary transition-colors">Démo</Link>
             <Link to="/formation" className="text-muted-foreground hover:text-primary transition-colors">Formation</Link>
@@ -468,6 +469,11 @@ const SalesPage = () => {
           </motion.div>
         </div>
       </section>
+
+      {/* ═══════════════════════ AUTHOR SHOWCASE ═══════════════════════ */}
+      <div id="author-showcase">
+        <AuthorShowcase />
+      </div>
 
       <section className="py-24 px-4">
         <div className="max-w-6xl mx-auto">
