@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { X, Gift, Download, Sparkles, CheckCircle } from "lucide-react";
 import { generateKdpNichesPdf } from "@/utils/generateKdpNichesPdf";
 import { toast } from "sonner";
+import { trackExitIntent } from "@/utils/analytics";
 
 interface ExitIntentPopupProps {
   onContinueToOffer?: () => void;
@@ -13,13 +14,14 @@ const ExitIntentPopup = ({ onContinueToOffer }: ExitIntentPopupProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
 
-  const openPopup = () => setIsOpen(true);
+  const openPopup = () => { trackExitIntent('shown'); setIsOpen(true); };
 
   const handleDownloadBonus = async () => {
     setIsDownloading(true);
     try {
       await new Promise(resolve => setTimeout(resolve, 800));
       generateKdpNichesPdf();
+      trackExitIntent('converted');
       toast.success("🎉 Votre guide PDF a été téléchargé !");
       setTimeout(() => setIsOpen(false), 1500);
     } catch (error) {

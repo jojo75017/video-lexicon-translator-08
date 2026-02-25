@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { trackLeadMagnetDownload, trackCTAClick } from "@/utils/analytics";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -24,6 +25,7 @@ const CadeauPage = () => {
       await supabase.functions.invoke("add-to-email-sequence", {
         body: { email: emailLower }
       });
+      trackLeadMagnetDownload("10_niches_kdp_2026");
       setIsSuccess(true);
       toast.success("🎁 Votre guide arrive dans votre boîte mail !");
     } catch (error) {

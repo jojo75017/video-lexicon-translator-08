@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { trackDemoClick } from "@/utils/analytics";
+import { trackDemoClick, trackCTAClick, trackNewsletterSignup, trackPlanSelect, trackBeginCheckout, trackPricingView, trackZoomBooking } from "@/utils/analytics";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -39,6 +39,7 @@ const NewsletterForm = () => {
     setIsSubscribing(true);
     try {
       await supabase.functions.invoke("add-to-email-sequence", { body: { email: newsletterEmail.trim().toLowerCase() } });
+      trackNewsletterSignup("footer_offres");
       setIsSubscribed(true);
       toast.success("🎉 Inscrit ! Vérifiez votre boîte mail");
       setNewsletterEmail("");
@@ -192,6 +193,10 @@ const SalesPage = () => {
   }, []);
 
   const handlePlanClick = () => {
+    const planName = isVipAvailable ? 'fondateur' : 'pro';
+    const planPrice = isVipAvailable ? 37 : 147;
+    trackPlanSelect(planName, planPrice);
+    trackCTAClick('plan_click', isVipAvailable ? '/paiement-manuel' : '/upsell-paiement');
     if (isVipAvailable) navigate('/paiement-manuel');
     else navigate('/upsell-paiement?plan=pro');
   };
@@ -199,6 +204,7 @@ const SalesPage = () => {
   const handleCheckout = () => {
     if (!email || !email.includes("@")) { toast.error("Email invalide"); return; }
     if (!selectedPlan) { toast.error("Sélectionnez un plan"); return; }
+    trackBeginCheckout(selectedPlan, selectedPlan === 'fondateur' ? 37 : 147);
     sessionStorage.setItem('payment_email', email.trim().toLowerCase());
     navigate(`/upsell-paiement?plan=${selectedPlan}`);
   };
@@ -269,7 +275,7 @@ const SalesPage = () => {
 
           <motion.div variants={fadeUp} custom={3} className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
             <Button size="lg" className="text-base px-8 py-6 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-xl shadow-violet-500/25 hover:shadow-2xl hover:shadow-violet-500/30 transition-all duration-300 hover:-translate-y-0.5"
-              onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}>
+              onClick={() => { trackCTAClick('hero_pricing', '#pricing'); trackPricingView(); document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' }); }}>
               <Rocket className="w-5 h-5 mr-2" />
               Découvrir le workflow complet
             </Button>
