@@ -2938,6 +2938,10 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                   </Badge>
                 </span>
               </Button>
+
+              <p className="mt-5 text-white/60 text-sm italic">
+                🚀 1, 2, 3… Foncez ! Je suis toujours là pour vous accompagner en Zoom gratuit — Georges
+              </p>
             </div>
           </div>
         </div>
