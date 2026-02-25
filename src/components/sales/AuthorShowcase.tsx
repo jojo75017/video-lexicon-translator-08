@@ -76,7 +76,7 @@ const AuthorShowcase: React.FC = () => {
         {/* Stats */}
         <motion.div variants={fadeUp} custom={2} className="flex flex-wrap justify-center gap-6 mb-8 text-sm">
           {[
-            '+ de 15 ebooks publiés',
+            '+ de 35 ebooks publiés',
             'Succès sur Amazon KDP',
             'Créés avec EbookStudio Pro',
           ].map((text) => (
