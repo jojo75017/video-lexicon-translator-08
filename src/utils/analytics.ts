@@ -131,6 +131,14 @@ export const trackExitIntent = (action: 'shown' | 'converted' | 'dismissed') => 
   });
 };
 
+/** Clic vers la page /offres (bio, boutons, sections internes) */
+export const trackOffresClick = (source: string) => {
+  trackEvent('click_offres_link', {
+    source,
+    page_path: window.location.pathname,
+  });
+};
+
 /** Page vue (SPA navigation) */
 export const trackPageView = (pagePath: string, pageTitle?: string) => {
   trackEvent('page_view', {

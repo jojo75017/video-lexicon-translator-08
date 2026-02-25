@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { trackEvent, trackDemoClick, trackCTAClick, trackNewsletterSignup, trackPlanSelect, trackBeginCheckout, trackPricingView, trackZoomBooking } from "@/utils/analytics";
+import { trackEvent, trackDemoClick, trackCTAClick, trackNewsletterSignup, trackPlanSelect, trackBeginCheckout, trackPricingView, trackZoomBooking, trackOffresClick } from "@/utils/analytics";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -228,7 +228,7 @@ const SalesPage = () => {
       {/* Header */}
       <header className="bg-background/80 backdrop-blur-xl border-b border-border/50 sticky top-[40px] z-50">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-          <Link to="/offres" className="flex items-center gap-2.5">
+          <Link to="/offres" onClick={() => trackOffresClick('logo_header')} className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-500/20">
               <BookOpen className="w-5 h-5 text-white" />
             </div>
@@ -249,7 +249,7 @@ const SalesPage = () => {
       </header>
 
       {/* ═══════════════════════════════════════ HERO ═══════════════════════════════════════ */}
-      <section className="relative overflow-hidden pt-12 sm:pt-20 pb-16 sm:pb-24 px-4">
+      <section className="relative overflow-hidden pt-6 sm:pt-10 pb-12 sm:pb-20 px-4">
         {/* Gradient orbs */}
         <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-violet-500/10 rounded-full blur-[120px] pointer-events-none" />
         <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-purple-500/10 rounded-full blur-[100px] pointer-events-none" />
