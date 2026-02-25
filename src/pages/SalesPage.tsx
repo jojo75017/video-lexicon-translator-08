@@ -235,7 +235,7 @@ const SalesPage = () => {
             <span className="text-lg font-bold">EbookStudio Pro</span>
           </Link>
           <nav className="hidden md:flex items-center gap-6 text-sm">
-            <a href="#author-showcase" onClick={(e) => { e.preventDefault(); document.getElementById('author-showcase')?.scrollIntoView({ behavior: 'smooth' }); }} className="text-muted-foreground hover:text-primary transition-colors font-medium cursor-pointer">📚 Mes créations</a>
+            <a href="#author-showcase" onClick={(e) => { e.preventDefault(); document.getElementById('author-showcase')?.scrollIntoView({ behavior: 'smooth' }); }} className="text-muted-foreground hover:text-primary transition-colors font-medium cursor-pointer">📚 Ebooks créés</a>
             <Link to="/blog" className="text-muted-foreground hover:text-primary transition-colors">Blog</Link>
             <Link to="/demo" className="text-muted-foreground hover:text-primary transition-colors">Démo</Link>
             <Link to="/formation" className="text-muted-foreground hover:text-primary transition-colors">Formation</Link>
