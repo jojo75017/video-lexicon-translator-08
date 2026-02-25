@@ -87,6 +87,13 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   
   // Hook pour récupérer la clé API utilisateur
   const { apiKey: userApiKey, isValid: isUserKeyValid } = useOpenAIConfig();
+
+  // Compteur dynamique de projets
+  const [projectCount, setProjectCount] = useState<number | null>(null);
+  useEffect(() => {
+    supabase.from('ebook_projects').select('id', { count: 'exact', head: true })
+      .then(({ count }) => { if (count !== null) setProjectCount(count); });
+  }, []);
   
   // Form state
   const [title, setTitle] = useState('');
@@ -703,6 +710,14 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             <Sparkles className="h-4 w-4" />
             Workflow IA Éditorial Complet
           </div>
+          {/* Bandeau motivationnel */}
+          <div className="bg-gradient-to-r from-violet-600 to-purple-600 text-white rounded-lg px-4 py-3 mb-4 text-sm">
+            {projectCount !== null && projectCount > 0 ? (
+              <p>👉 {projectCount} projets créés — lancez le prochain 🚀</p>
+            ) : (
+              <p>✨ Votre ebook peut être prêt en quelques minutes — commencez maintenant.</p>
+            )}
+          </div>
            <CardTitle className="text-2xl font-bold text-foreground">
             Créer votre livre en 1 clic
           </CardTitle>
@@ -719,13 +734,14 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
               const titleInput = document.getElementById('title');
               if (titleInput) titleInput.focus();
             }}
-            className="w-full h-14 text-lg font-bold bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl shadow-lg animate-pulse hover:animate-none"
+            className="w-full h-14 text-lg font-bold bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl shadow-[0_0_20px_hsl(var(--primary)/0.4)] hover:shadow-[0_0_30px_hsl(var(--primary)/0.6)] transition-shadow duration-500"
           >
             🚀 Commencer mon ebook maintenant
           </Button>
+          <p className="text-xs text-muted-foreground text-center">Plan structuré + contenu généré automatiquement.</p>
 
           {/* Guidage visuel */}
-          <div className="flex items-center gap-2 text-sm font-medium text-primary bg-primary/10 border border-primary/20 rounded-lg px-4 py-2">
+          <div className="flex items-center gap-2 text-sm font-medium text-primary bg-primary/10 border border-primary/20 rounded-lg px-4 py-2 animate-fade-in">
             <span>👇</span>
             <span>Étape 1 — Entrez le titre pour lancer votre ebook</span>
           </div>
