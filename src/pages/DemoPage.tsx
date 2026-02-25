@@ -13,7 +13,7 @@ import { toast } from "sonner";
 
 const DEMO_STORAGE_KEY = "ebook_demo_count";
 const EMAIL_CAPTURED_KEY = "ebook_demo_email_captured";
-const MAX_DEMO_TRIES = 2;
+const MAX_DEMO_TRIES = 3;
 
 interface GeneratedChapter {
   title: string;
@@ -301,8 +301,8 @@ const DemoPage = () => {
                   Testez Gratuitement l'IA
                 </h1>
                 <p className="text-white/80">
-                  {remainingTries > 0 
-                    ? `🎁 ${remainingTries} génération${remainingTries > 1 ? 's' : ''} gratuite${remainingTries > 1 ? 's' : ''} restante${remainingTries > 1 ? 's' : ''}`
+                {remainingTries > 0 
+                    ? `🎁 ${remainingTries} essai${remainingTries > 1 ? 's' : ''} gratuit${remainingTries > 1 ? 's' : ''} pour découvrir l'IA`
                     : '⚡ Passez à la version complète'
                   }
                 </p>
