@@ -15,6 +15,7 @@ import SocialProofBanner from "@/components/sales/SocialProofBanner";
 import SalesFaq from "@/components/sales/SalesFaq";
 import { useVipAvailability } from "@/hooks/useVipAvailability";
 import AuthorShowcase from "@/components/sales/AuthorShowcase";
+import PassiveRevenueProof from "@/components/sales/PassiveRevenueProof";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -525,6 +526,9 @@ const SalesPage = () => {
       <div id="author-showcase">
         <AuthorShowcase />
       </div>
+
+      {/* ═══════════════════════ PREUVE REVENUS PASSIFS ═══════════════════════ */}
+      <PassiveRevenueProof />
 
       <section className="py-14 px-4">
         <div className="max-w-6xl mx-auto">
