@@ -329,7 +329,7 @@ const DemoPage = () => {
                   Créez votre Ebook
                 </CardTitle>
                 <CardDescription>
-                  Entrez un titre et voyez la magie opérer
+                  👇 Étape 1 — Entrez un titre et cliquez sur "Générer mon plan gratuit"
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -337,7 +337,7 @@ const DemoPage = () => {
                   <Label htmlFor="title" className="font-medium">Titre de l'ebook *</Label>
                   <Input
                     id="title"
-                    placeholder="Ex: Comment devenir riche en 2025"
+                    placeholder="Ex: Créer un ebook KDP rentable avec l'IA"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     disabled={demoUsed || isGenerating}
@@ -375,7 +375,7 @@ const DemoPage = () => {
                 </div>
 
                 <Button
-                  className="w-full bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-lg py-6"
+                  className="w-full bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-lg py-6 shadow-lg shadow-violet-500/25 animate-[pulse_3s_ease-in-out_infinite]"
                   size="lg"
                   onClick={handleGenerate}
                   disabled={demoUsed || isGenerating || !title.trim()}
@@ -393,10 +393,13 @@ const DemoPage = () => {
                   ) : (
                     <>
                       <Zap className="w-5 h-5 mr-2" />
-                      Générer mon plan gratuit
+                      ⚡ Générer mon plan gratuit
                     </>
                   )}
                 </Button>
+                <p className="text-xs text-center text-muted-foreground">
+                  ✨ Génération instantanée — aucune compétence technique requise.
+                </p>
 
                 {demoUsed && (
                   <div className="text-center pt-3 border-t">
