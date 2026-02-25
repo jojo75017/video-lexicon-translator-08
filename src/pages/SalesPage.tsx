@@ -274,15 +274,15 @@ const SalesPage = () => {
           </motion.p>
 
           <motion.div variants={fadeUp} custom={3} className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-            <Button size="lg" className="text-base px-8 py-6 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-xl shadow-violet-500/25 hover:shadow-2xl hover:shadow-violet-500/30 transition-all duration-300 hover:-translate-y-0.5"
+            <Button size="lg" className="text-lg px-10 py-7 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-xl shadow-violet-500/25 hover:shadow-2xl hover:shadow-violet-500/30 transition-all duration-300 hover:-translate-y-0.5"
+              onClick={() => { trackDemoClick("demo_hero"); navigate('/demo'); }}>
+              <Play className="w-5 h-5 mr-2" />
+              🎥 Voir la démo gratuite (créer un ebook en direct)
+            </Button>
+            <Button size="lg" variant="outline" className="text-base px-8 py-6 border-2 border-border hover:border-primary/50 hover:bg-primary/5 transition-all duration-300"
               onClick={() => { trackCTAClick('hero_pricing', '#pricing'); trackPricingView(); document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' }); }}>
               <Rocket className="w-5 h-5 mr-2" />
               Découvrir le workflow complet
-            </Button>
-            <Button size="lg" variant="outline" className="text-base px-8 py-6 border-2 border-border hover:border-primary/50 hover:bg-primary/5 transition-all duration-300"
-              onClick={() => { trackDemoClick("demo"); navigate('/demo'); }}>
-              <Play className="w-5 h-5 mr-2" />
-              Voir la démonstration
             </Button>
           </motion.div>
 
