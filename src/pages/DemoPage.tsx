@@ -308,14 +308,17 @@ const DemoPage = () => {
                 </p>
               </div>
             </div>
-            <Button 
-              size="lg"
-              className="bg-white text-violet-700 hover:bg-white/90 font-semibold shadow-lg"
-              onClick={() => navigate('/offres')}
-            >
-              <Crown className="w-5 h-5 mr-2" />
-              Débloquer tout pour 37€
-            </Button>
+            <div className="flex flex-col items-center md:items-end gap-2">
+              <Badge className="bg-amber-500/90 text-white border-0 text-xs">Offre fondateur jusqu'au 30 avril</Badge>
+              <Button 
+                size="lg"
+                className="bg-white text-violet-700 hover:bg-white/90 font-semibold shadow-lg"
+                onClick={() => navigate('/offres')}
+              >
+                <Crown className="w-5 h-5 mr-2" />
+                Débloquer tout pour 37€
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -343,6 +346,7 @@ const DemoPage = () => {
                     disabled={demoUsed || isGenerating}
                     className="text-lg py-5"
                   />
+                  <p className="text-xs text-muted-foreground">Plan structuré + mots-clés KDP générés automatiquement.</p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
@@ -386,7 +390,7 @@ const DemoPage = () => {
                   {isGenerating ? (
                     <>
                       <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                      L'IA travaille...
+                      ✨ Génération en cours…
                     </>
                   ) : demoUsed ? (
                     <>
@@ -594,8 +598,8 @@ const DemoPage = () => {
               </div>
             ) : (
               <Card className="border-2 border-dashed h-full flex items-center justify-center min-h-[500px]">
-                <div className="text-center p-8">
-                  <div className="w-20 h-20 bg-violet-100 dark:bg-violet-900/30 rounded-2xl mx-auto mb-6 flex items-center justify-center">
+                <div className="text-center p-8 animate-fade-in">
+                  <div className="w-20 h-20 bg-violet-100 dark:bg-violet-900/30 rounded-2xl mx-auto mb-6 flex items-center justify-center animate-[pulse_3s_ease-in-out_infinite]">
                     <BookOpen className="w-10 h-10 text-violet-500" />
                   </div>
                   <h3 className="text-xl font-semibold mb-2">✨ Votre ebook commence à se construire dès le clic</h3>
