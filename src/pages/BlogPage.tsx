@@ -130,12 +130,12 @@ const BlogPage = () => {
               <span className="text-xl font-bold text-white">EbookStudio Pro</span>
             </Link>
             <nav className="hidden md:flex items-center gap-6">
-              <Link to="/offres" className="text-white/70 hover:text-white transition-colors">Accueil</Link>
+              <Link to="/offres" onClick={() => { import('@/utils/analytics').then(m => m.trackOffresClick('blog_nav')); }} className="text-white/70 hover:text-white transition-colors">Accueil</Link>
               <Link to="/blog" className="text-violet-400 font-medium">Blog</Link>
               <Link to="/demo" className="text-white/70 hover:text-white transition-colors">Démo</Link>
               <Link to="/formation" className="text-white/70 hover:text-white transition-colors">Formation</Link>
             </nav>
-            <Link to="/offres">
+            <Link to="/offres" onClick={() => { import('@/utils/analytics').then(m => m.trackOffresClick('blog_cta')); }}>
               <Button className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500">
                 Accès Générateur
               </Button>
