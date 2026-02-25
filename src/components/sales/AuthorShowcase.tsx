@@ -48,6 +48,9 @@ const AuthorShowcase: React.FC = () => {
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
             Ces livres ont été créés à l'aide du workflow éditorial IA — et sont en vente sur Amazon.
           </p>
+          <p className="text-sm font-medium text-foreground/80 mt-2">
+            ✨ Vous pouvez créer le vôtre en quelques minutes.
+          </p>
         </motion.div>
 
         {/* Images */}
@@ -96,6 +99,9 @@ const AuthorShowcase: React.FC = () => {
           </Button>
           <p className="text-xs text-muted-foreground mt-2">
             S'ouvre dans un nouvel onglet — restez sur EbookStudio
+          </p>
+          <p className="text-xs text-muted-foreground/60 mt-1">
+            👉 Preuve réelle — résultats visibles publiquement.
           </p>
         </motion.div>
       </motion.div>
