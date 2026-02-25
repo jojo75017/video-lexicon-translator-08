@@ -3,6 +3,7 @@ import { Sparkles, ArrowRight, Crown, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { trackCTAClick } from '@/utils/analytics';
 
 interface DemoBannerProps {
   plansGenerated: number;
@@ -119,7 +120,7 @@ export const DemoBanner: React.FC<DemoBannerProps> = ({ plansGenerated, maxPlans
           <Button 
             size="sm"
             className="bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white shadow-lg shadow-emerald-500/25"
-            onClick={() => navigate('/offres')}
+            onClick={() => { trackCTAClick('demo_banner_upgrade', '/offres'); navigate('/offres'); }}
           >
             Débloquer tout <ArrowRight className="w-4 h-4 ml-1" />
           </Button>

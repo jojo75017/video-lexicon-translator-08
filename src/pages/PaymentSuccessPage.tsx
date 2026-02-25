@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle, Copy, Loader2, Mail, ArrowRight, AlertTriangle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { trackPurchase } from "@/utils/analytics";
 
 type VerifyResult = {
   ok: boolean;
@@ -55,6 +56,7 @@ const PaymentSuccessPage = () => {
         if (payload?.ok && payload.email && payload.subscriber) {
           localStorage.setItem("subscriber_email", payload.email);
           localStorage.setItem("subscriber_data", JSON.stringify(payload.subscriber));
+          trackPurchase(payload.subscriber?.plan_tier || 'pro', payload.subscriber?.plan_tier === 'fondateur' ? 37 : 147);
         }
       } catch (e: any) {
         if (cancelled) return;
