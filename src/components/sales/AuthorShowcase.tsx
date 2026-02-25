@@ -21,7 +21,7 @@ const stagger = {
 
 const AuthorShowcase: React.FC = () => {
   return (
-    <section className="py-20 px-4 relative overflow-hidden">
+    <section className="py-12 px-4 relative overflow-hidden">
       {/* Background glow */}
       <div className="absolute inset-0 bg-gradient-to-b from-violet-500/5 via-purple-500/8 to-transparent pointer-events-none" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-violet-600/8 rounded-full blur-[150px] pointer-events-none" />

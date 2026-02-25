@@ -357,9 +357,9 @@ const SalesPage = () => {
       <SocialProofBanner />
 
       {/* ═══════════════════════════════════════ 14 RÔLES ═══════════════════════════════════ */}
-      <section className="py-24 px-4">
+      <section className="py-14 px-4">
         <div className="max-w-6xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={stagger} className="text-center mb-16">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={stagger} className="text-center mb-10">
             <motion.h2 variants={fadeUp} className="text-3xl md:text-5xl font-extrabold mb-5">
               Un système éditorial complet.{" "}
               <span className="text-muted-foreground">Pas un simple générateur.</span>
@@ -419,9 +419,9 @@ const SalesPage = () => {
       </section>
 
       {/* ═══════════════════════════════════════ COMMENT ÇA MARCHE ═══════════════════════════ */}
-      <section className="py-24 px-4 bg-muted/30">
+      <section className="py-14 px-4 bg-muted/30">
         <div className="max-w-5xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={stagger} className="text-center mb-16">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={stagger} className="text-center mb-10">
             <motion.h2 variants={fadeUp} className="text-3xl md:text-5xl font-extrabold mb-5">
               Comment ça marche
             </motion.h2>
@@ -449,7 +449,7 @@ const SalesPage = () => {
       </section>
 
       {/* ═══════════════════════════════════════ APERÇU GRATUIT ═══════════════════════════ */}
-      <section className="py-20 px-4">
+      <section className="py-12 px-4">
         <div className="max-w-4xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={stagger}>
             <motion.div variants={fadeUp}>
@@ -519,9 +519,9 @@ const SalesPage = () => {
         <AuthorShowcase />
       </div>
 
-      <section className="py-24 px-4">
+      <section className="py-14 px-4">
         <div className="max-w-6xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-16">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-10">
             <motion.h2 variants={fadeUp} className="text-3xl md:text-5xl font-extrabold mb-5">
               Ce qu'en disent nos utilisateurs
             </motion.h2>
@@ -556,9 +556,9 @@ const SalesPage = () => {
       </section>
 
       {/* ═══════════════════════════════════════ VALEUR ═══════════════════════════════════ */}
-      <section className="py-24 px-4 bg-muted/30">
+      <section className="py-14 px-4 bg-muted/30">
         <div className="max-w-4xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-14">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-10">
             <motion.h2 variants={fadeUp} className="text-3xl md:text-5xl font-extrabold mb-5">
               Combien coûte réellement un ebook professionnel ?
             </motion.h2>
@@ -588,7 +588,7 @@ const SalesPage = () => {
       </section>
 
       {/* ═══════════════════════════════════════ PRICING ═══════════════════════════════════ */}
-      <section id="pricing" className="py-24 px-4">
+      <section id="pricing" className="py-14 px-4">
         <div className="max-w-3xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-6">
             <motion.h2 variants={fadeUp} className="text-3xl md:text-5xl font-extrabold mb-4">
@@ -761,7 +761,7 @@ const SalesPage = () => {
       <SalesFaq />
 
       {/* Final CTA */}
-      <section className="py-24 px-4">
+      <section className="py-14 px-4">
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}
           className="max-w-3xl mx-auto text-center">
           <motion.h2 variants={fadeUp} className="text-3xl md:text-4xl font-extrabold mb-4">
