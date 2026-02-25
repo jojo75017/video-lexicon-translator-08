@@ -137,7 +137,7 @@ const categories: Category[] = [
     color: 'from-violet-500 to-purple-500',
     items: [
       { id: 'onboarding', label: '🗺️ Par où commencer ?', icon: BookOpen, isNew: true },
-      { id: 'complete-workflow', label: '⚡ Livre Complet (1 clic)', icon: Rocket, isPro: true },
+      { id: 'complete-workflow', label: '👉 DÉBUTER ICI — Livre complet (1 clic)', icon: Rocket, isPro: true },
       { id: 'workflow-dashboard', label: '📊 Tableau de Bord', icon: BarChart3 },
       { id: 'workflow-export', label: '📥 Export Global', icon: Download },
       { id: 'planner', label: '📋 Planificateur', icon: BookOpen },
@@ -671,9 +671,11 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                             onClick={() => handleItemClick(item)}
                             className={cn(
                               "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-left group",
-                              isActive 
-                                ? "bg-white dark:bg-white/10 shadow-md border border-violet-200/60 dark:border-violet-700/40" 
-                                : "hover:bg-white/60 dark:hover:bg-white/5"
+                              item.label.includes('DÉBUTER ICI') && !isActive
+                                ? "bg-primary/10 border border-primary/30 hover:bg-primary/20 ring-1 ring-primary/20"
+                                : isActive 
+                                  ? "bg-white dark:bg-white/10 shadow-md border border-violet-200/60 dark:border-violet-700/40" 
+                                  : "hover:bg-white/60 dark:hover:bg-white/5"
                             )}
                           >
                             <div className={cn(

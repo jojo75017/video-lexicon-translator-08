@@ -703,7 +703,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             <Sparkles className="h-4 w-4" />
             Workflow IA Éditorial Complet
           </div>
-          <CardTitle className="text-2xl font-bold text-foreground">
+           <CardTitle className="text-2xl font-bold text-foreground">
             Créer votre livre en 1 clic
           </CardTitle>
           <p className="text-muted-foreground mt-2">
@@ -712,6 +712,24 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
         </CardHeader>
 
         <CardContent className="space-y-6">
+          {/* CTA Principal */}
+          <Button
+            type="button"
+            onClick={() => {
+              const titleInput = document.getElementById('title');
+              if (titleInput) titleInput.focus();
+            }}
+            className="w-full h-14 text-lg font-bold bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl shadow-lg animate-pulse hover:animate-none"
+          >
+            🚀 Commencer mon ebook maintenant
+          </Button>
+
+          {/* Guidage visuel */}
+          <div className="flex items-center gap-2 text-sm font-medium text-primary bg-primary/10 border border-primary/20 rounded-lg px-4 py-2">
+            <span>👇</span>
+            <span>Étape 1 — Entrez le titre pour lancer votre ebook</span>
+          </div>
+
           {/* Form Fields - Row 1: Title & Subtitle */}
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">

@@ -2927,7 +2927,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                 <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
                 <span className="relative flex items-center gap-3">
                   <span className="text-lg">🔗</span>
-                  <span>Créer depuis YouTube / Article</span>
+                  <span>Créer mon premier ebook</span>
                   <Badge className="bg-white/20 text-white font-bold text-[10px] px-2 py-0.5 border border-white/30">
                     2026
                   </Badge>
