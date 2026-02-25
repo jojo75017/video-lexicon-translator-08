@@ -1200,7 +1200,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                 </div>
                 <div className="mt-4 text-center">
                   <p className="text-white/70 text-sm italic">
-                    ✨ Je vous souhaite tout le succès dans la création de votre ebook — Georges, créateur d'EbookStudio
+                    🚀 1, 2, 3… Foncez ! Je suis toujours là pour vous accompagner en Zoom gratuit — Georges
                   </p>
                 </div>
               </div>
