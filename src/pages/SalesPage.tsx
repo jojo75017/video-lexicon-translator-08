@@ -279,7 +279,7 @@ const SalesPage = () => {
             <Button size="lg" variant="outline" className="w-full sm:w-auto text-sm sm:text-base px-6 sm:px-8 py-5 sm:py-6 border-2 border-border hover:border-primary/50 hover:bg-primary/5 transition-all duration-300"
               onClick={() => { trackCTAClick('hero_pricing', '#pricing'); trackPricingView(); document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' }); }}>
               <Rocket className="w-5 h-5 mr-2" />
-              Découvrir le workflow complet
+              Voir les offres
             </Button>
           </motion.div>
 

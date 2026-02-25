@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { BookOpen, Sparkles, Loader2, Lock, ArrowRight, CheckCircle2, Mail, Gift, Crown, Zap, Star, BookMarked, FileText, Image, Download, Target } from "lucide-react";
+import { BookOpen, Sparkles, Loader2, Lock, ArrowRight, ArrowLeft, CheckCircle2, Mail, Gift, Crown, Zap, Star, BookMarked, FileText, Image, Download, Target } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -278,6 +278,16 @@ const DemoPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-violet-50 via-background to-emerald-50 dark:from-violet-950/20 dark:via-background dark:to-emerald-950/20 py-8 px-4">
       <div className="max-w-6xl mx-auto">
+        {/* Back button */}
+        <Button
+          variant="ghost"
+          className="mb-4 text-muted-foreground hover:text-foreground"
+          onClick={() => navigate(-1)}
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Retour
+        </Button>
+
         {/* Hero Banner */}
         <div className="bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 text-white rounded-2xl p-6 mb-8 shadow-2xl relative overflow-hidden">
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxjaXJjbGUgc3Ryb2tlPSIjZmZmIiBzdHJva2Utb3BhY2l0eT0iLjEiIGN4PSIzMCIgY3k9IjMwIiByPSIyOSIvPjwvZz48L3N2Zz4=')] opacity-30" />
