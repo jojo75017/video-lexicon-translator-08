@@ -309,6 +309,24 @@ const SalesPage = () => {
         </motion.div>
       </section>
 
+      {/* ═══════════════════════════════════════ VIDÉO RAPPEL OFFRE ═══════════════════════════ */}
+      <section className="py-10 px-4">
+        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="max-w-xs mx-auto text-center">
+          <motion.p variants={fadeUp} className="text-sm font-semibold text-violet-400 mb-3">🎯 Rappel — Offre Fondateur à 37&nbsp;€</motion.p>
+          <motion.div variants={fadeUp} custom={1} className="rounded-xl overflow-hidden shadow-xl shadow-violet-500/10 border border-border bg-card aspect-[9/16]">
+            <video
+              src="/videos/rappel-offre-37.mp4"
+              controls
+              playsInline
+              preload="metadata"
+              className="w-full h-full object-cover"
+              title="Rappel offre fondateur EbookStudio 37€"
+            />
+          </motion.div>
+          <motion.p variants={fadeUp} custom={2} className="text-xs text-muted-foreground mt-2">📣 Pourquoi profiter de l'offre fondateur maintenant</motion.p>
+        </motion.div>
+      </section>
+
       {/* ═══════════════════════════════════════ SOCIAL PROOF ═══════════════════════════════ */}
       <SocialProofBanner />
 
