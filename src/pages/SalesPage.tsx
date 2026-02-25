@@ -248,48 +248,42 @@ const SalesPage = () => {
       </header>
 
       {/* ═══════════════════════════════════════ HERO ═══════════════════════════════════════ */}
-      <section className="relative overflow-hidden pt-20 pb-24 px-4">
+      <section className="relative overflow-hidden pt-12 sm:pt-20 pb-16 sm:pb-24 px-4">
         {/* Gradient orbs */}
         <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-violet-500/10 rounded-full blur-[120px] pointer-events-none" />
         <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-purple-500/10 rounded-full blur-[100px] pointer-events-none" />
 
         <motion.div initial="hidden" animate="visible" variants={stagger} className="max-w-4xl mx-auto text-center relative z-10">
-          <motion.div variants={fadeUp} custom={0}>
-            <Badge className="mb-8 bg-primary/10 text-primary border-primary/20 px-5 py-2 text-sm font-medium">
-              <Sparkles className="w-3.5 h-3.5 mr-2" />
-              5 000+ ebooks créés avec EbookStudio Pro
-            </Badge>
-          </motion.div>
 
-          <motion.h1 variants={fadeUp} custom={1} className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.1] tracking-tight mb-6">
+          <motion.h1 variants={fadeUp} custom={1} className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.1] tracking-tight mb-4 sm:mb-6">
             Créer un ebook complet{" "}
             <span className="bg-gradient-to-r from-violet-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
               en moins d'1 heure avec l'IA
             </span>
           </motion.h1>
 
-          <motion.p variants={fadeUp} custom={2} className="text-lg md:text-xl text-muted-foreground mb-6 max-w-2xl mx-auto leading-relaxed">
+          <motion.p variants={fadeUp} custom={2} className="text-base sm:text-lg md:text-xl text-muted-foreground mb-4 sm:mb-6 max-w-2xl mx-auto leading-relaxed">
             Sans écrire une seule ligne. <strong className="text-foreground">Regardez la démo gratuite.</strong>
           </motion.p>
 
-          <motion.p variants={fadeUp} custom={2.5} className="text-sm text-muted-foreground mb-8">
+          <motion.p variants={fadeUp} custom={2.5} className="text-sm text-muted-foreground mb-5 sm:mb-8 hidden sm:block">
             👇 Étape 1 — Regardez la démo pour comprendre comment créer votre ebook
           </motion.p>
 
-          <motion.div variants={fadeUp} custom={3} className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-            <Button size="lg" className="text-lg px-10 py-7 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-xl shadow-violet-500/25 hover:shadow-2xl hover:shadow-violet-500/30 transition-all duration-300 hover:-translate-y-0.5"
+          <motion.div variants={fadeUp} custom={3} className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-6 sm:mb-8">
+            <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg px-8 sm:px-10 py-6 sm:py-7 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-xl shadow-violet-500/25 hover:shadow-2xl hover:shadow-violet-500/30 transition-all duration-300 hover:-translate-y-0.5"
               onClick={() => { trackEvent('click_demo', { button_text: 'Voir comment créer un ebook en direct', page_path: '/offres' }); trackDemoClick("demo_hero"); navigate('/demo'); }}>
               <Play className="w-5 h-5 mr-2" />
               🎥 Voir comment créer un ebook en direct
             </Button>
-            <Button size="lg" variant="outline" className="text-base px-8 py-6 border-2 border-border hover:border-primary/50 hover:bg-primary/5 transition-all duration-300"
+            <Button size="lg" variant="outline" className="w-full sm:w-auto text-sm sm:text-base px-6 sm:px-8 py-5 sm:py-6 border-2 border-border hover:border-primary/50 hover:bg-primary/5 transition-all duration-300"
               onClick={() => { trackCTAClick('hero_pricing', '#pricing'); trackPricingView(); document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' }); }}>
               <Rocket className="w-5 h-5 mr-2" />
               Découvrir le workflow complet
             </Button>
           </motion.div>
 
-          <motion.div variants={fadeUp} custom={4} className="flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">
+          <motion.div variants={fadeUp} custom={4} className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-xs sm:text-sm text-muted-foreground">
             <span>✔️ Utilisé pour créer des ebooks avec l'IA</span>
             <span>✔️ Pensé pour les auteurs KDP et créateurs de contenu</span>
           </motion.div>
