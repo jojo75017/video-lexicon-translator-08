@@ -71,6 +71,47 @@ export interface DocxExportOptions {
 // ═══════════════════════════════════════════════════════════
 
 /**
+ * Décide si un saut de ligne simple doit être conservé
+ * (vrai paragraphe/transition) ou fusionné (ligne orpheline cassée).
+ */
+function shouldKeepSingleLineBreak(previousLine: string, nextLine: string): boolean {
+  const prev = previousLine.trim();
+  const next = nextLine.trim();
+
+  if (!prev || !next) return true;
+
+  // Conserver pour les structures explicites
+  if (/^#{1,6}\s/.test(next)) return true;
+  if (/^[-–—•●▪▸►]\s+/.test(next)) return true;
+  if (/^\d+[.)]\s+/.test(next)) return true;
+
+  // Conserver un vrai changement de bloc narratif
+  if (/[.!?…]$/.test(prev) && /^["'«(\[]?[A-ZÀ-ÖØ-Þ]/.test(next)) return true;
+
+  // Conserver les lignes très courtes (souvent titres/interludes)
+  if (prev.length <= 40 && !/[.!?…]$/.test(prev)) return true;
+
+  return false;
+}
+
+/**
+ * Normalise les espaces manquants entre phrases/mots collés.
+ */
+function normalizeBrokenSpacing(text: string): string {
+  return text
+    // caractères invisibles pouvant coller les mots
+    .replace(/[\u200B-\u200D\uFEFF]/g, '')
+    // "Phrase.suivante" => "Phrase. suivante"
+    .replace(/([.!?…])(?=[A-Za-zÀ-ÖØ-öø-ÿ«"'([{])/g, '$1 ')
+    // ",mot" ";mot" ":mot" => ajout d'espace après ponctuation
+    .replace(/([,;:])(?=[A-Za-zÀ-ÖØ-öø-ÿ«"'([{])/g, '$1 ')
+    // Collage type "motSuivant" (heuristique minimale)
+    .replace(/([a-zà-öø-ÿ])([A-ZÀ-ÖØ-Þ])/g, '$1 $2')
+    // éviter les espaces multiples recréés par les règles ci-dessus
+    .replace(/ {2,}/g, ' ');
+}
+
+/**
  * Nettoyage éditorial profond du texte avant insertion DOCX.
  * Va au-delà du textCleaner standard pour garantir la propreté typographique.
  */
@@ -79,13 +120,37 @@ function editorialClean(raw: string): string {
 
   let text = cleanGeneratedText(raw);
 
-  // 1. Supprimer les retours à la ligne simples au milieu des phrases
-  //    (conserver les doubles sauts = séparateurs de paragraphe)
+  // 1. Normaliser les retours Windows et les espaces cassés
   text = text.replace(/\r\n/g, '\n');
-  
-  // 2. Fusionner les lignes orphelines : un \n seul entre deux lignes de texte
-  //    → remplacer par un espace (sauf si la ligne suivante commence par un tiret/numéro/bullet)
-  text = text.replace(/([^\n])\n(?!\n)(?![-–—•●▪▸►]\s)(?!\d+[\.\)]\s)(?!\s*$)/g, '$1 ');
+  text = normalizeBrokenSpacing(text);
+
+  // 2. Fusionner intelligemment les lignes orphelines
+  const lines = text.split('\n');
+  const rebuilt: string[] = [];
+
+  for (const currentLine of lines) {
+    const normalizedLine = currentLine.replace(/^ +| +$/g, '');
+
+    if (rebuilt.length === 0) {
+      rebuilt.push(normalizedLine);
+      continue;
+    }
+
+    const previousLine = rebuilt[rebuilt.length - 1];
+
+    if (!previousLine || !normalizedLine) {
+      rebuilt.push(normalizedLine);
+      continue;
+    }
+
+    if (shouldKeepSingleLineBreak(previousLine, normalizedLine)) {
+      rebuilt.push(normalizedLine);
+    } else {
+      rebuilt[rebuilt.length - 1] = `${previousLine} ${normalizedLine}`;
+    }
+  }
+
+  text = rebuilt.join('\n');
 
   // 3. Supprimer les triples+ sauts de ligne
   text = text.replace(/\n{3,}/g, '\n\n');
@@ -112,11 +177,40 @@ function editorialClean(raw: string): string {
  */
 function splitIntoParagraphs(text: string): string[] {
   if (!text) return [];
+
   const cleaned = editorialClean(text);
-  return cleaned
-    .split('\n\n')
-    .map(p => p.trim())
-    .filter(p => p.length > 0 && p !== '---' && p !== '***' && !p.match(/^[=\-_]{3,}$/));
+  const lines = cleaned.split('\n');
+  const paragraphs: string[] = [];
+  let current = '';
+
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+
+    if (!line) {
+      if (current.trim()) paragraphs.push(current.trim());
+      current = '';
+      continue;
+    }
+
+    if (!current) {
+      current = line;
+      continue;
+    }
+
+    // Si une nouvelle phrase forte démarre sur une nouvelle ligne,
+    // on considère qu'il s'agit d'un nouveau paragraphe éditorial.
+    if (/[.!?…]$/.test(current) && /^["'«(\[]?[A-ZÀ-ÖØ-Þ]/.test(line)) {
+      paragraphs.push(current.trim());
+      current = line;
+      continue;
+    }
+
+    current = `${current} ${line}`;
+  }
+
+  if (current.trim()) paragraphs.push(current.trim());
+
+  return paragraphs.filter(p => p.length > 0 && p !== '---' && p !== '***' && !p.match(/^[=\-_]{3,}$/));
 }
 
 // ═══════════════════════════════════════════════════════════
