@@ -270,7 +270,7 @@ const SalesPage = () => {
             👇 Étape 1 — Regardez la démo pour comprendre comment créer votre ebook
           </motion.p>
 
-          <motion.div variants={fadeUp} custom={3} className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-6 sm:mb-8">
+          <motion.div variants={fadeUp} custom={3} className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-2 sm:mb-3">
             <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg px-8 sm:px-10 py-6 sm:py-7 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-xl shadow-violet-500/25 hover:shadow-2xl hover:shadow-violet-500/30 transition-all duration-300 hover:-translate-y-0.5"
               onClick={() => { trackEvent('click_demo', { button_text: 'Voir comment créer un ebook en direct', page_path: '/offres' }); trackDemoClick("demo_hero"); navigate('/demo'); }}>
               <Play className="w-5 h-5 mr-2" />
@@ -282,6 +282,9 @@ const SalesPage = () => {
               Voir les offres
             </Button>
           </motion.div>
+          <motion.p variants={fadeUp} custom={3.5} className="text-xs text-muted-foreground mb-6 sm:mb-8">
+            Démo réelle — ebook créé en conditions réelles
+          </motion.p>
 
           <motion.div variants={fadeUp} custom={4} className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-xs sm:text-sm text-muted-foreground">
             <span>✔️ Utilisé pour créer des ebooks avec l'IA</span>
