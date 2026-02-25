@@ -374,6 +374,9 @@ const DemoPage = () => {
                   </div>
                 </div>
 
+                <p className="text-xs text-center text-muted-foreground mb-1">
+                  ✨ Des ebooks sont générés chaque jour avec EbookStudio.
+                </p>
                 <Button
                   className="w-full bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-lg py-6 shadow-lg shadow-violet-500/25 animate-[pulse_3s_ease-in-out_infinite]"
                   size="lg"
@@ -595,7 +598,7 @@ const DemoPage = () => {
                   <div className="w-20 h-20 bg-violet-100 dark:bg-violet-900/30 rounded-2xl mx-auto mb-6 flex items-center justify-center">
                     <BookOpen className="w-10 h-10 text-violet-500" />
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">Votre ebook apparaîtra ici</h3>
+                  <h3 className="text-xl font-semibold mb-2">✨ Votre ebook commence à se construire dès le clic</h3>
                   <p className="text-muted-foreground mb-6 max-w-sm">
                     Entrez un titre et cliquez sur "Générer" pour voir la magie de l'IA en action
                   </p>
