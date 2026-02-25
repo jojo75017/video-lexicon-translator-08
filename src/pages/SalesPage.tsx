@@ -282,9 +282,24 @@ const SalesPage = () => {
               Voir les offres
             </Button>
           </motion.div>
-          <motion.p variants={fadeUp} custom={3.5} className="text-xs text-muted-foreground mb-6 sm:mb-8">
+          <motion.p variants={fadeUp} custom={3.5} className="text-xs text-muted-foreground mb-4 sm:mb-5">
             Démo réelle — ebook créé en conditions réelles
           </motion.p>
+
+          {/* Mini vidéo teaser */}
+          <motion.div variants={fadeUp} custom={3.7} className="mb-6 sm:mb-8 max-w-xs mx-auto">
+            <div className="relative rounded-xl overflow-hidden shadow-xl shadow-violet-500/10 border border-border bg-card aspect-[9/16]">
+              <iframe
+                src="https://www.youtube.com/embed/uzy5JX1zxOk?rel=0"
+                title="Créer un ebook en quelques secondes"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="absolute inset-0 w-full h-full"
+                loading="lazy"
+              />
+            </div>
+            <p className="text-xs text-muted-foreground mt-2 text-center">⏱ Moins de 40s — Création d'un ebook en accéléré</p>
+          </motion.div>
 
           <motion.div variants={fadeUp} custom={4} className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-xs sm:text-sm text-muted-foreground">
             <span>✔️ Utilisé pour créer des ebooks avec l'IA</span>
