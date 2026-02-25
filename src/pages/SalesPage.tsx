@@ -309,6 +309,13 @@ const SalesPage = () => {
         </motion.div>
       </section>
 
+      {/* Transition phrase */}
+      <div className="text-center py-4 px-4">
+        <p className="text-sm text-muted-foreground italic max-w-lg mx-auto">
+          ✨ Commencez par regarder la démo — puis voyez pourquoi l'offre fondateur se termine bientôt.
+        </p>
+      </div>
+
       {/* ═══════════════════════════════════════ VIDÉO RAPPEL OFFRE ═══════════════════════════ */}
       <section className="py-10 px-4">
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="max-w-xs mx-auto text-center">
