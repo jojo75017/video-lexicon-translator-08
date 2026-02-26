@@ -598,6 +598,32 @@ const SalesPage = () => {
         </div>
       </section>
 
+      {/* ═══════════════════════════════════════ GUIDE GRATUIT ═══════════════════════════════ */}
+      <section className="py-10 px-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="max-w-2xl mx-auto text-center rounded-2xl border border-violet-500/20 bg-gradient-to-br from-violet-500/10 via-purple-500/5 to-violet-500/10 p-8 shadow-lg shadow-violet-500/10"
+        >
+          <p className="text-3xl mb-3">🎁</p>
+          <h3 className="text-xl md:text-2xl font-bold text-foreground mb-3">
+            Nouveau sur EbookStudio ?
+          </h3>
+          <p className="text-muted-foreground text-sm md:text-base mb-6 max-w-lg mx-auto">
+            Commencez par le guide gratuit pour comprendre la méthode et avancer plus vite.
+          </p>
+          <Button
+            size="lg"
+            className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-lg shadow-violet-500/20 text-base px-8 py-6"
+            onClick={() => window.open('https://www.trafic-affiliation.com/captureebookstudio2026#formulaire', '_blank')}
+          >
+            🎁 Commencer par le guide gratuit
+          </Button>
+        </motion.div>
+      </section>
+
       {/* ═══════════════════════════════════════ PRICING ═══════════════════════════════════ */}
       <section id="pricing" className="py-14 px-4">
         <div className="max-w-3xl mx-auto">
