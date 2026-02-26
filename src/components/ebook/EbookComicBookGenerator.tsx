@@ -17,6 +17,8 @@ import { useProjectSave } from '@/hooks/useProjectSave';
 import jsPDF from 'jspdf';
 import { KdpQuickTools } from './KdpQuickTools';
 import SpecializedAmazonPreview from './SpecializedAmazonPreview';
+import { BDTemplatesSelector } from './BDTemplatesSelector';
+import { BD_ART_STYLES, BD_STORY_TEMPLATES, BDTemplate } from '@/data/bdTemplates';
 
 interface SavedComicBook {
   id: string;
@@ -94,6 +96,8 @@ const ART_STYLES = [
   { value: 'franco-belge', label: '🇫🇷 Franco-belge', description: 'Style classique européen' },
   { value: 'american', label: '🇺🇸 Comics américain', description: 'Style super-héros' },
   { value: 'minimal', label: '✨ Minimaliste', description: 'Lignes épurées, moderne' },
+  // BD Franco-Belges spécifiques
+  ...BD_ART_STYLES.map(s => ({ value: s.value, label: s.label, description: s.description })),
 ];
 
 const COLOR_MODES = [
@@ -134,6 +138,8 @@ const STORY_TEMPLATES = [
     description: "Deux personnages deviennent amis",
     structure: ['Rencontre maladroite', 'Malentendu', 'Épreuve commune', 'Compréhension mutuelle', 'Amitié scellée']
   },
+  // BD Franco-Belges
+  ...BD_STORY_TEMPLATES,
 ];
 
 export const EbookComicBookGenerator: React.FC<ComicBookGeneratorProps> = ({ ebookTitle }) => {
@@ -338,6 +344,26 @@ export const EbookComicBookGenerator: React.FC<ComicBookGeneratorProps> = ({ ebo
     setVisualSeed('');
     setTitleSuggestions([]);
     toast.info('Nouvelle BD créée');
+  };
+
+  const applyBDTemplate = (template: BDTemplate) => {
+    setTitle(template.title);
+    setMainCharacter(template.mainCharacter);
+    setCharacterDescription(template.characterDescription);
+    setSetting(template.setting);
+    setCustomPrompt(template.customPrompt);
+    setGenre(template.genre);
+    setAgeGroup(template.ageGroup);
+    setArtStyle(template.artStyle);
+    setColorMode(template.colorMode);
+    setPanelLayout(template.panelLayout);
+    setNumberOfPages(template.numberOfPages);
+    setStoryTemplate(template.storyTemplate);
+    setScenario(null);
+    setGeneratedPages([]);
+    setCurrentComicId(null);
+    setShowAdvanced(true);
+    toast.success(`Template "${template.title}" appliqué ! Style ${template.inspiration}`);
   };
 
   const getLayoutDescription = (layout: string): string => {
@@ -670,6 +696,10 @@ EXPRESSION STYLE: ${artStyle === 'manga' ? 'Large expressive eyes, anime style' 
   };
 
   const getArtStylePrompt = (): string => {
+    // Check BD-specific styles first
+    const bdStyle = BD_ART_STYLES.find(s => s.value === artStyle);
+    if (bdStyle) return bdStyle.prompt;
+    
     const styles: Record<string, string> = {
       'cartoon': 'Disney/Pixar inspired cartoon style, rounded shapes, big eyes, exaggerated expressions, clean vector-like lines',
       'manga': 'Japanese manga style, screentones, speed lines, large expressive eyes, dynamic poses, thin precise linework',
@@ -1346,6 +1376,9 @@ Réponds en JSON:
           </div>
         </CardContent>
       </Card>
+
+      {/* Templates BD Franco-Belges */}
+      <BDTemplatesSelector onApplyTemplate={applyBDTemplate} />
 
       {/* Avertissement si pas de clé OpenAI */}
       {!useOpenAI && (

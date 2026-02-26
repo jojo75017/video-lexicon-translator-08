@@ -40,6 +40,7 @@ import PracticalSheetsGeneratorPage from './pages/PracticalSheetsGeneratorPage';
 import ResultatEn5MinPage from './pages/ResultatEn5MinPage';
 import CadeauPage from './pages/CadeauPage';
 import ChecklistTournagePage from './pages/ChecklistTournagePage';
+import BDStudioPage from './pages/BDStudioPage';
 import { SubscriptionAuth } from '@/components/SubscriptionAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { SubscriberGate } from '@/components/auth/SubscriberGate';
@@ -247,6 +248,7 @@ const App = () => {
             <Route path="/checklist-tournage" element={<ChecklistTournagePage />} />
             <Route path="/assistance" element={<FaqAssistancePage />} />
             <Route path="/affiliation" element={<AffiliationFormationPage />} />
+            <Route path="/bd-studio" element={<BDStudioPage />} />
             <Route path="/parrainage" element={<ParrainagePage />} />
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/admin-direct" element={<AdminDirectPage />} />
