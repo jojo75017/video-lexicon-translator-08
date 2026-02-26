@@ -284,13 +284,13 @@ const SalesPage = () => {
               Voir les offres
             </Button>
           </motion.div>
-          <motion.p variants={fadeUp} custom={3.5} className="text-xs text-muted-foreground mb-1">
-            Démo réelle — ebook créé en conditions réelles
-          </motion.p>
-          <motion.p variants={fadeUp} custom={3.6} className="mb-4 sm:mb-5">
+          <motion.p variants={fadeUp} custom={3.5} className="mb-1">
             <a href="https://www.amazon.fr/Mr-Georges-Boubet/e/B0CGVLHNX7" target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:text-primary transition-colors">
               📚 Ebooks publiés en conditions réelles — voir ma page auteur Amazon
             </a>
+          </motion.p>
+          <motion.p variants={fadeUp} custom={3.6} className="text-xs text-muted-foreground mb-4 sm:mb-5">
+            Démo réelle — ebook créé en conditions réelles
           </motion.p>
 
           {/* Mini vidéo teaser */}
