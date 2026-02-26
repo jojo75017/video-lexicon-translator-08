@@ -285,7 +285,7 @@ const SalesPage = () => {
             </Button>
           </motion.div>
           <motion.p variants={fadeUp} custom={3.5} className="mb-1">
-            <a href="https://www.amazon.fr/Mr-Georges-Boubet/e/B0CGVLHNX7" target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:text-primary transition-colors">
+            <a href="https://www.amazon.fr/Mr-Georges-Boubet/e/B0CGVLHNX7" target="_blank" rel="noopener noreferrer" className="text-sm sm:text-base font-medium text-muted-foreground hover:text-primary transition-colors">
               📚 Ebooks publiés en conditions réelles — voir ma page auteur Amazon
             </a>
           </motion.p>
