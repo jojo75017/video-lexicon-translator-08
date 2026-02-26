@@ -250,7 +250,7 @@ const categories: Category[] = [
       { id: 'aquarium-guide', label: '🐠 Aquariophilie', icon: BookOpen, isNew: true },
       { id: 'bird-guide', label: '🐦 Oiseaux', icon: BookOpen, isNew: true },
       { id: 'coloring-book', label: '🖍️ Livre Coloriage', icon: Palette },
-      { id: 'comic-book', label: '💬 Bande Dessinée', icon: LayoutTemplate },
+      { id: 'comic-book', label: '💬 Bande Dessinée (BD Studio)', icon: LayoutTemplate, isLink: true, href: '/bd-studio', isNew: true },
       { id: 'diary-generator', label: '📔 Journal / Agenda', icon: BookHeart },
       { id: 'documentary', label: '🎬 Documentaire', icon: BookMarked },
       { id: 'encyclopedia', label: '📚 Encyclopédie', icon: BookMarked },
