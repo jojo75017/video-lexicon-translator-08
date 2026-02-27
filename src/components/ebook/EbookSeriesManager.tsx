@@ -173,33 +173,168 @@ const hasMeaningfulSeriesData = (value: SeriesBible): boolean => {
   );
 };
 
-const normalizeSeriesBible = (input: unknown): SeriesBible => {
-  const base = getEmptySeriesBible();
-  if (!input || typeof input !== 'object') return base;
+const isObject = (value: unknown): value is Record<string, unknown> => {
+  return typeof value === 'object' && value !== null;
+};
 
-  const data = input as Partial<SeriesBible>;
-  const ageCategoryValues: SeriesBible['ageCategory'][] = ['children', 'young-adult', 'adult', 'all-ages'];
-  const toStringArray = (value: unknown): string[] =>
-    Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
+const toStringArray = (value: unknown): string[] => {
+  return Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === 'string' && item.trim().length > 0)
+    : [];
+};
+
+const toNumberArray = (value: unknown): number[] => {
+  return Array.isArray(value)
+    ? value
+        .map((item) => Number(item))
+        .filter((item) => Number.isFinite(item))
+        .map((item) => Math.round(item))
+    : [];
+};
+
+const normalizeCharacter = (item: unknown, index: number): SeriesCharacter => {
+  const raw = isObject(item) ? item : {};
+  const relationTypes: CharacterRelation['type'][] = ['ally', 'enemy', 'family', 'romantic', 'mentor', 'rival'];
+
+  const relations: CharacterRelation[] = Array.isArray(raw.relations)
+    ? raw.relations
+        .map((rel) => {
+          const relation = isObject(rel) ? rel : {};
+          const relationType = relationTypes.includes(relation.type as CharacterRelation['type'])
+            ? (relation.type as CharacterRelation['type'])
+            : 'ally';
+
+          return {
+            characterId: typeof relation.characterId === 'string' ? relation.characterId : '',
+            type: relationType,
+            description: typeof relation.description === 'string' ? relation.description : '',
+          };
+        })
+    : [];
+
+  const arcPerTome: CharacterArcPerTome[] = Array.isArray(raw.arcPerTome)
+    ? raw.arcPerTome
+        .map((arc) => {
+          const arcValue = isObject(arc) ? arc : {};
+          const tomeValue = Number(arcValue.tome);
+
+          return {
+            tome: Number.isFinite(tomeValue) ? Math.max(1, Math.round(tomeValue)) : 1,
+            status: typeof arcValue.status === 'string' ? arcValue.status : '',
+            development: typeof arcValue.development === 'string' ? arcValue.development : '',
+            keyMoments: toStringArray(arcValue.keyMoments),
+          };
+        })
+    : [];
+
+  const role = typeof raw.role === 'string' && raw.role.trim().length > 0 ? raw.role : 'supporting';
 
   return {
-    seriesTitle: typeof data.seriesTitle === 'string' ? data.seriesTitle : base.seriesTitle,
-    authorName: typeof data.authorName === 'string' ? data.authorName : base.authorName,
-    genres: toStringArray(data.genres),
-    ageCategory: ageCategoryValues.includes(data.ageCategory as SeriesBible['ageCategory'])
-      ? (data.ageCategory as SeriesBible['ageCategory'])
+    id: typeof raw.id === 'string' && raw.id.trim().length > 0 ? raw.id : `char-${Date.now()}-${index}`,
+    name: typeof raw.name === 'string' ? raw.name : '',
+    role,
+    description: typeof raw.description === 'string' ? raw.description : '',
+    arc: typeof raw.arc === 'string' ? raw.arc : '',
+    appearances: toNumberArray(raw.appearances),
+    relations,
+    arcPerTome,
+    physicalDescription: typeof raw.physicalDescription === 'string' ? raw.physicalDescription : '',
+    personality: typeof raw.personality === 'string' ? raw.personality : '',
+    motivations: typeof raw.motivations === 'string' ? raw.motivations : '',
+    secrets: typeof raw.secrets === 'string' ? raw.secrets : '',
+  };
+};
+
+const normalizeLocation = (item: unknown, index: number): SeriesLocation => {
+  const raw = isObject(item) ? item : {};
+
+  return {
+    id: typeof raw.id === 'string' && raw.id.trim().length > 0 ? raw.id : `loc-${Date.now()}-${index}`,
+    name: typeof raw.name === 'string' ? raw.name : '',
+    description: typeof raw.description === 'string' ? raw.description : '',
+    significance: typeof raw.significance === 'string' ? raw.significance : '',
+    appearancesByTome: toNumberArray(raw.appearancesByTome),
+  };
+};
+
+const normalizeTimelineEvent = (item: unknown, index: number): SeriesTimeline => {
+  const raw = isObject(item) ? item : {};
+  const tomeValue = Number(raw.tome);
+
+  return {
+    id: typeof raw.id === 'string' && raw.id.trim().length > 0 ? raw.id : `time-${Date.now()}-${index}`,
+    event: typeof raw.event === 'string' ? raw.event : '',
+    tome: Number.isFinite(tomeValue) ? Math.max(1, Math.round(tomeValue)) : 1,
+    chapter: typeof raw.chapter === 'string' ? raw.chapter : '',
+    date: typeof raw.date === 'string' ? raw.date : '',
+    charactersInvolved: toStringArray(raw.charactersInvolved),
+  };
+};
+
+const normalizeTome = (item: unknown, index: number): SeriesTome => {
+  const raw = isObject(item) ? item : {};
+  const tomeStatuses: SeriesTome['status'][] = ['planned', 'writing', 'complete'];
+  const numberValue = Number(raw.number);
+  const wordCountValue = Number(raw.wordCount);
+
+  return {
+    id: typeof raw.id === 'string' && raw.id.trim().length > 0 ? raw.id : `tome-${Date.now()}-${index}`,
+    number: Number.isFinite(numberValue) ? Math.max(1, Math.round(numberValue)) : index + 1,
+    title: typeof raw.title === 'string' ? raw.title : `Tome ${index + 1}`,
+    synopsis: typeof raw.synopsis === 'string' ? raw.synopsis : '',
+    status: tomeStatuses.includes(raw.status as SeriesTome['status'])
+      ? (raw.status as SeriesTome['status'])
+      : 'planned',
+    wordCount: Number.isFinite(wordCountValue) ? Math.max(0, Math.round(wordCountValue)) : 0,
+    mainPlotPoints: toStringArray(raw.mainPlotPoints),
+    cliffhanger: typeof raw.cliffhanger === 'string' ? raw.cliffhanger : '',
+    previousTomeConnection: typeof raw.previousTomeConnection === 'string' ? raw.previousTomeConnection : '',
+  };
+};
+
+const normalizePlotThread = (item: unknown, index: number): PlotThread => {
+  const raw = isObject(item) ? item : {};
+  const threadStatuses: PlotThread['status'][] = ['open', 'ongoing', 'resolved'];
+  const introducedTome = Number(raw.introducedTome);
+  const resolvedTome = Number(raw.resolvedTome);
+
+  return {
+    id: typeof raw.id === 'string' && raw.id.trim().length > 0 ? raw.id : `plot-${Date.now()}-${index}`,
+    name: typeof raw.name === 'string' ? raw.name : '',
+    description: typeof raw.description === 'string' ? raw.description : '',
+    introducedTome: Number.isFinite(introducedTome) ? Math.max(1, Math.round(introducedTome)) : 1,
+    resolvedTome: Number.isFinite(resolvedTome) ? Math.max(1, Math.round(resolvedTome)) : undefined,
+    status: threadStatuses.includes(raw.status as PlotThread['status'])
+      ? (raw.status as PlotThread['status'])
+      : 'open',
+  };
+};
+
+const normalizeSeriesBible = (input: unknown): SeriesBible => {
+  const base = getEmptySeriesBible();
+  if (!isObject(input)) return base;
+
+  const ageCategoryValues: SeriesBible['ageCategory'][] = ['children', 'young-adult', 'adult', 'all-ages'];
+  const totalTomes = Number(input.totalTomes);
+
+  return {
+    seriesTitle: typeof input.seriesTitle === 'string' ? input.seriesTitle : base.seriesTitle,
+    authorName: typeof input.authorName === 'string' ? input.authorName : base.authorName,
+    genres: toStringArray(input.genres),
+    ageCategory: ageCategoryValues.includes(input.ageCategory as SeriesBible['ageCategory'])
+      ? (input.ageCategory as SeriesBible['ageCategory'])
       : base.ageCategory,
-    totalTomes: typeof data.totalTomes === 'number' && Number.isFinite(data.totalTomes)
-      ? Math.max(1, Math.round(data.totalTomes))
+    totalTomes: Number.isFinite(totalTomes)
+      ? Math.min(20, Math.max(1, Math.round(totalTomes)))
       : base.totalTomes,
-    synopsis: typeof data.synopsis === 'string' ? data.synopsis : base.synopsis,
-    themes: toStringArray(data.themes),
-    characters: Array.isArray(data.characters) ? (data.characters as SeriesCharacter[]) : base.characters,
-    locations: Array.isArray(data.locations) ? (data.locations as SeriesLocation[]) : base.locations,
-    timeline: Array.isArray(data.timeline) ? (data.timeline as SeriesTimeline[]) : base.timeline,
-    tomes: Array.isArray(data.tomes) ? (data.tomes as SeriesTome[]) : base.tomes,
-    writingRules: typeof data.writingRules === 'string' ? data.writingRules : base.writingRules,
-    plotThreads: Array.isArray(data.plotThreads) ? (data.plotThreads as PlotThread[]) : base.plotThreads,
+    synopsis: typeof input.synopsis === 'string' ? input.synopsis : base.synopsis,
+    themes: toStringArray(input.themes),
+    characters: Array.isArray(input.characters) ? input.characters.map(normalizeCharacter) : base.characters,
+    locations: Array.isArray(input.locations) ? input.locations.map(normalizeLocation) : base.locations,
+    timeline: Array.isArray(input.timeline) ? input.timeline.map(normalizeTimelineEvent) : base.timeline,
+    tomes: Array.isArray(input.tomes) ? input.tomes.map(normalizeTome) : base.tomes,
+    writingRules: typeof input.writingRules === 'string' ? input.writingRules : base.writingRules,
+    plotThreads: Array.isArray(input.plotThreads) ? input.plotThreads.map(normalizePlotThread) : base.plotThreads,
   };
 };
 
@@ -417,21 +552,23 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
         }
       }
       
-      setSeriesBible({
+      const loadedBible = normalizeSeriesBible({
         seriesTitle: data.title,
         authorName: (data as any).author_name || '',
         genres,
         ageCategory: (data as any).age_category || 'adult',
         totalTomes: data.total_tomes || 3,
         synopsis: data.narrative_style || '',
-        themes: (data.main_themes as unknown as string[]) || [],
-        characters: (data.characters as unknown as SeriesCharacter[]) || [],
-        locations: (data.locations as unknown as SeriesLocation[]) || [],
-        timeline: (data.timeline as unknown as SeriesTimeline[]) || [],
-        tomes: (data.tomes as unknown as SeriesTome[]) || [],
+        themes: data.main_themes,
+        characters: data.characters,
+        locations: data.locations,
+        timeline: data.timeline,
+        tomes: data.tomes,
         writingRules: data.world_rules || '',
-        plotThreads: (data.plot_threads as unknown as PlotThread[]) || []
+        plotThreads: data.plot_threads
       });
+
+      setSeriesBible(loadedBible);
       setCurrentSeriesId(id);
       setShowSavedSeries(false);
       toast.success('Série chargée !');
@@ -679,49 +816,31 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
 
       if (error) throw error;
 
-      let parsedData;
+      if (!data?.content || typeof data.content !== 'string') {
+        throw new Error('Réponse IA invalide');
+      }
+
+      let parsedData: unknown;
       try {
         parsedData = parseJsonFromModel(data.content);
       } catch {
         throw new Error('Erreur de parsing');
       }
 
-      setSeriesBible(prev => ({
+      if (!isObject(parsedData)) {
+        throw new Error('Structure IA invalide');
+      }
+
+      setSeriesBible(prev => normalizeSeriesBible({
         ...prev,
-        synopsis: parsedData.synopsis || '',
-        themes: parsedData.themes || [],
-        characters: (parsedData.characters || []).map((c: any, i: number) => ({
-          ...c,
-          id: `char-${Date.now()}-${i}`,
-          relations: c.relations || [],
-          arcPerTome: c.arcPerTome || [],
-          physicalDescription: c.physicalDescription || '',
-          personality: c.personality || '',
-          motivations: c.motivations || '',
-          secrets: c.secrets || ''
-        })),
-        locations: (parsedData.locations || []).map((l: any, i: number) => ({
-          ...l,
-          id: `loc-${Date.now()}-${i}`,
-          appearancesByTome: l.appearancesByTome || []
-        })),
-        timeline: (parsedData.timeline || []).map((t: any, i: number) => ({
-          ...t,
-          id: `time-${Date.now()}-${i}`,
-          charactersInvolved: t.charactersInvolved || []
-        })),
-        tomes: (parsedData.tomes || []).map((t: any, i: number) => ({
-          ...t,
-          id: `tome-${Date.now()}-${i}`,
-          mainPlotPoints: t.mainPlotPoints || [],
-          cliffhanger: t.cliffhanger || '',
-          previousTomeConnection: t.previousTomeConnection || ''
-        })),
-        plotThreads: (parsedData.plotThreads || []).map((p: any, i: number) => ({
-          ...p,
-          id: `plot-${Date.now()}-${i}`
-        })),
-        writingRules: parsedData.writingRules || ''
+        synopsis: typeof parsedData.synopsis === 'string' ? parsedData.synopsis : '',
+        themes: parsedData.themes,
+        characters: parsedData.characters,
+        locations: parsedData.locations,
+        timeline: parsedData.timeline,
+        tomes: parsedData.tomes,
+        plotThreads: parsedData.plotThreads,
+        writingRules: typeof parsedData.writingRules === 'string' ? parsedData.writingRules : ''
       }));
 
       toast.success('Bible de série générée avec cohérence inter-tomes !');
@@ -799,8 +918,12 @@ ${parsedData.characterDevelopments?.map((d: any) => `- ${d.character}: ${d.devel
 🔥 Cliffhanger: ${parsedData.cliffhanger || 'Non défini'}
       `;
       
-      navigator.clipboard.writeText(details);
-      toast.info('Détails copiés dans le presse-papier');
+      try {
+        await navigator.clipboard.writeText(details);
+        toast.info('Détails copiés dans le presse-papier');
+      } catch {
+        toast.warning('Copie impossible (autorisation presse-papier refusée)');
+      }
       
     } catch (error) {
       console.error('Erreur génération:', error);
@@ -1303,8 +1426,9 @@ ${seriesBible.tomes.map(t => `
 ${seriesBible.writingRules}
     `;
 
-    navigator.clipboard.writeText(bibleText);
-    toast.success('Bible de série copiée !');
+    void navigator.clipboard.writeText(bibleText)
+      .then(() => toast.success('Bible de série copiée !'))
+      .catch(() => toast.warning('Copie impossible (autorisation presse-papier refusée)'));
   };
 
   const [isImportingTome, setIsImportingTome] = useState<number | null>(null);
@@ -1598,7 +1722,10 @@ RÈGLES STRICTES:
                 min={2}
                 max={20}
                 value={seriesBible.totalTomes}
-                onChange={(e) => setSeriesBible(prev => ({ ...prev, totalTomes: parseInt(e.target.value) || 3 }))}
+                onChange={(e) => {
+                  const nextTotalTomes = Math.min(20, Math.max(2, Number.parseInt(e.target.value, 10) || 3));
+                  setSeriesBible(prev => ({ ...prev, totalTomes: nextTotalTomes }));
+                }}
               />
             </div>
           </div>
