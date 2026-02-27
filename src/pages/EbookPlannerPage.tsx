@@ -933,6 +933,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   };
 
   const handleProjectLoad = (project: any) => {
+    // Important: définir le projet actif pour que l'auto-save mette bien à jour CE projet
+    setCurrentProjectId(project.id);
+
     setEbookTitle(project.title);
     setAuthorName(project.author_name || '');
     setTargetAudience(project.target_audience || 'Adultes');
