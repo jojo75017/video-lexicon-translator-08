@@ -183,7 +183,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   const { saveProject, loadLatestProject, isSaving, currentProjectId, setCurrentProjectId, saveVersion, loadVersions, restoreVersion } = useEbookDatabase();
   const { fireStars } = useConfetti();
   const { limits: demoLimits, incrementPlanCount } = useDemoMode(!isDemo ? true : false);
-  const { getStepResult, clearResults: clearWorkflowResults } = useWorkflowResults();
+  const { getStepResult, clearResults: clearWorkflowResults, saveStepResult } = useWorkflowResults();
   const [showPaywall, setShowPaywall] = useState<'chapters' | 'export' | 'cover' | 'advanced' | null>(null);
   const [userProjectsCount, setUserProjectsCount] = useState(0);
   
@@ -2256,7 +2256,42 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
         );
       
       case 'doc-transform':
-        return <EbookDocumentTransformer />;
+        return (
+          <EbookDocumentTransformer 
+            onSendToWorkflow={(data) => {
+              // Inject into workflow: P1 (title/intro) and P4 (chapters)
+              
+              // P1 - Directeur Éditorial: titre, préface, conclusion
+              const p1Display = `# 📋 Directeur Éditorial (Import)\n\n**Titre validé:** ${data.title}\n**Auteur:** ${data.author}\n\n## Introduction\n${data.preface}\n\n## Conclusion\n${data.conclusion}`;
+              saveStepResult('P1', {
+                title: data.title,
+                author: data.author,
+                introduction: data.preface,
+                conclusion: data.conclusion,
+                source: 'document-import'
+              }, p1Display);
+              
+              // P4 - Rédaction Expert: chapitres
+              const chaptersContent = data.chapters.map((ch, i) => `## Chapitre ${i + 1}: ${ch.title}\n\n${ch.content}`).join('\n\n---\n\n');
+              const p4Display = `# ✍️ Rédaction (Import)\n\n${data.chapters.length} chapitres importés\n\n${chaptersContent}`;
+              saveStepResult('P4', {
+                chapters: data.chapters,
+                source: 'document-import'
+              }, p4Display);
+
+              // Update ebook title and chapters in the planner state
+              setEbookTitle(data.title);
+              setAuthorName(data.author);
+              setPreface(data.preface);
+              setConclusion(data.conclusion);
+              
+              toast.success(`"${data.title}" injecté dans l'Éditeur Éditorial !`, {
+                description: `${data.chapters.length} chapitres prêts pour le workflow P1-P15`
+              });
+              setActiveTab('workflow-dashboard');
+            }}
+          />
+        );
       
       case 'encyclopedia':
         return (

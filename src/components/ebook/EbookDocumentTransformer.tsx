@@ -43,7 +43,11 @@ interface DetectionResult {
   keywords: string[];
 }
 
-export const EbookDocumentTransformer: React.FC = () => {
+interface EbookDocumentTransformerProps {
+  onSendToWorkflow?: (data: { title: string; author: string; preface: string; conclusion: string; chapters: Chapter[] }) => void;
+}
+
+export const EbookDocumentTransformer: React.FC<EbookDocumentTransformerProps> = ({ onSendToWorkflow }) => {
   const [rawText, setRawText] = useState('');
   const [isExtracting, setIsExtracting] = useState(false);
   const [isTransforming, setIsTransforming] = useState(false);
@@ -546,7 +550,23 @@ Réponds UNIQUEMENT en JSON valide:
                   {result.chapterCount} chapitres • {result.wordCount.toLocaleString()} mots
                 </CardDescription>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-wrap">
+                {onSendToWorkflow && (
+                  <Button 
+                    size="sm" 
+                    onClick={() => onSendToWorkflow({ 
+                      title: result.title, 
+                      author: result.author, 
+                      preface: result.preface, 
+                      conclusion: result.conclusion, 
+                      chapters: result.chapters 
+                    })}
+                    className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500"
+                  >
+                    <ArrowRight className="w-4 h-4 mr-2" />
+                    Éditeur Éditorial
+                  </Button>
+                )}
                 <Button variant="outline" size="sm" onClick={reset}>
                   <RefreshCw className="w-4 h-4 mr-2" />
                   Nouveau
