@@ -876,6 +876,67 @@ ${parsedData.characterDevelopments?.map((d: any) => `- ${d.character}: ${d.devel
     }));
   };
 
+  // Renommage global d'un personnage dans toute la Bible de Série
+  const renameCharacterGlobally = (charId: string, newName: string) => {
+    const char = seriesBible.characters.find(c => c.id === charId);
+    if (!char || !char.name || !newName || char.name === newName) return;
+
+    const oldName = char.name;
+    const regex = new RegExp(`\\b${oldName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'gi');
+    const replaceInText = (text: string | undefined | null): string => {
+      if (!text) return text || '';
+      return text.replace(regex, newName);
+    };
+
+    setSeriesBible(prev => ({
+      ...prev,
+      synopsis: replaceInText(prev.synopsis),
+      writingRules: replaceInText(prev.writingRules),
+      characters: prev.characters.map(c => ({
+        ...c,
+        name: c.id === charId ? newName : c.name,
+        description: replaceInText(c.description),
+        arc: replaceInText(c.arc),
+        physicalDescription: replaceInText(c.physicalDescription),
+        personality: replaceInText(c.personality),
+        motivations: replaceInText(c.motivations),
+        secrets: replaceInText(c.secrets),
+        relations: c.relations.map(r => ({
+          ...r,
+          description: replaceInText(r.description),
+          characterId: r.characterId === oldName ? newName : r.characterId
+        })),
+        arcPerTome: c.arcPerTome.map(a => ({
+          ...a,
+          status: replaceInText(a.status),
+          development: replaceInText(a.development)
+        }))
+      })),
+      tomes: prev.tomes.map(t => ({
+        ...t,
+        title: replaceInText(t.title),
+        synopsis: replaceInText(t.synopsis),
+        mainPlotPoints: t.mainPlotPoints?.map(e => replaceInText(e)) || [],
+        previousTomeConnection: replaceInText(t.previousTomeConnection),
+        cliffhanger: replaceInText(t.cliffhanger)
+      })),
+      plotThreads: prev.plotThreads?.map(pt => ({
+        ...pt,
+        description: replaceInText(pt.description)
+      })) || [],
+      timeline: prev.timeline.map(tl => ({
+        ...tl,
+        event: replaceInText(tl.event)
+      })),
+      locations: prev.locations.map(loc => ({
+        ...loc,
+        description: replaceInText(loc.description)
+      }))
+    }));
+
+    toast.success(`"${oldName}" renommé en "${newName}" dans toute la série`);
+  };
+
   const addTome = () => {
     const nextNumber = seriesBible.tomes.length + 1;
     const previousTome = seriesBible.tomes[seriesBible.tomes.length - 1];
@@ -1421,10 +1482,25 @@ RÈGLES STRICTES:
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <div>
                         <Label>Nom</Label>
-                        <Input
-                          value={char.name}
-                          onChange={(e) => updateCharacter(char.id, { name: e.target.value })}
-                        />
+                        <div className="flex gap-1">
+                          <Input
+                            value={char.name}
+                            onChange={(e) => updateCharacter(char.id, { name: e.target.value })}
+                          />
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            title="Renommer partout dans la série"
+                            onClick={() => {
+                              const newName = prompt(`Renommer "${char.name}" en :`, char.name);
+                              if (newName && newName !== char.name) {
+                                renameCharacterGlobally(char.id, newName);
+                              }
+                            }}
+                          >
+                            <RefreshCw className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
                       <div>
                         <Label>Rôle</Label>
