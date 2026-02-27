@@ -1,32 +1,28 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Mail, CheckCircle, Shield } from "lucide-react";
+import { Loader2, Mail, Shield, AlertCircle, Send } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 const ADMIN_EMAIL = "boubetgeorges@gmail.com";
 
 const AdminDirectPage = () => {
   const navigate = useNavigate();
-  const [status, setStatus] = useState<"checking" | "sending" | "sent" | "authenticating" | "error">("checking");
+  const [status, setStatus] = useState<"checking" | "idle" | "sending" | "sent" | "authenticating" | "error">("checking");
   const [message, setMessage] = useState("Vérification de la session...");
 
-  const checkAdminAndRedirect = async (session: any) => {
+  const checkAdminAndRedirect = useCallback(async (session: any) => {
     try {
-      // Try with user_id first
       const { data: isAdmin, error: rpcError } = await supabase.rpc("has_role", {
         _user_id: session.user.id,
         _role: "admin"
       });
 
-      console.log("Admin check result:", { isAdmin, rpcError, email: session.user.email });
-
-      // If RPC fails (ambiguous function), check by email  
       if (rpcError) {
-        console.warn("RPC has_role error, trying email check:", rpcError);
-        // Fallback: check if user email matches admin email
+        console.warn("RPC has_role error:", rpcError);
         if (session.user.email === ADMIN_EMAIL) {
-        sessionStorage.setItem('is_admin', 'true');
+          sessionStorage.setItem('is_admin', 'true');
           localStorage.setItem('permanent_admin_email', session.user.email);
           navigate("/admin", { replace: true });
           return true;
@@ -34,17 +30,9 @@ const AdminDirectPage = () => {
         return false;
       }
 
-      if (isAdmin) {
+      if (isAdmin || session.user.email === ADMIN_EMAIL) {
         sessionStorage.setItem('is_admin', 'true');
         localStorage.setItem('permanent_admin_email', session.user.email || ADMIN_EMAIL);
-        navigate("/admin", { replace: true });
-        return true;
-      }
-
-      // Last resort: direct email match for admin
-      if (session.user.email === ADMIN_EMAIL) {
-        sessionStorage.setItem('is_admin', 'true');
-        localStorage.setItem('permanent_admin_email', session.user.email);
         navigate("/admin", { replace: true });
         return true;
       }
@@ -52,7 +40,6 @@ const AdminDirectPage = () => {
       return false;
     } catch (err) {
       console.error("Admin check error:", err);
-      // Fallback on email match
       if (session.user.email === ADMIN_EMAIL) {
         sessionStorage.setItem('is_admin', 'true');
         localStorage.setItem('permanent_admin_email', session.user.email);
@@ -61,10 +48,36 @@ const AdminDirectPage = () => {
       }
       return false;
     }
+  }, [navigate]);
+
+  const sendMagicLink = async () => {
+    setStatus("sending");
+    setMessage(`Envoi du lien magique à ${ADMIN_EMAIL}...`);
+
+    const { error: magicLinkError } = await supabase.auth.signInWithOtp({
+      email: ADMIN_EMAIL,
+      options: {
+        emailRedirectTo: `${window.location.origin}/admin-direct`
+      }
+    });
+
+    if (magicLinkError) {
+      if (magicLinkError.status === 429) {
+        setStatus("sent");
+        setMessage("Lien déjà envoyé récemment. Vérifiez votre boîte mail (et spams).");
+        return;
+      }
+      console.error("Magic link error:", magicLinkError);
+      setStatus("error");
+      setMessage("Erreur lors de l'envoi du lien");
+      return;
+    }
+
+    setStatus("sent");
+    setMessage("Lien magique envoyé ! Vérifiez votre boîte mail.");
   };
 
   useEffect(() => {
-    // Listen for auth state changes (magic link callback)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state change:", event, session?.user?.email);
       if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session) {
@@ -79,7 +92,7 @@ const AdminDirectPage = () => {
       }
     });
 
-    // Check existing session or send magic link
+    // Only check existing session, do NOT auto-send a new link
     const init = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
@@ -89,31 +102,9 @@ const AdminDirectPage = () => {
           if (success) return;
         }
 
-        // No active session - send magic link
-        setStatus("sending");
-        setMessage(`Envoi du lien magique à ${ADMIN_EMAIL}...`);
-
-        const { error: magicLinkError } = await supabase.auth.signInWithOtp({
-          email: ADMIN_EMAIL,
-          options: {
-            emailRedirectTo: `${window.location.origin}/admin-direct`
-          }
-        });
-
-        if (magicLinkError) {
-          if (magicLinkError.status === 429) {
-            setStatus("sent");
-            setMessage("Lien déjà envoyé récemment. Vérifiez votre boîte mail.");
-            return;
-          }
-          console.error("Magic link error:", magicLinkError);
-          setStatus("error");
-          setMessage("Erreur lors de l'envoi du lien");
-          return;
-        }
-
-        setStatus("sent");
-        setMessage("Lien magique envoyé ! Vérifiez votre boîte mail.");
+        // No session - show button to send link manually
+        setStatus("idle");
+        setMessage("Cliquez ci-dessous pour recevoir votre lien de connexion admin.");
       } catch (err) {
         console.error("Admin direct error:", err);
         setStatus("error");
@@ -124,7 +115,7 @@ const AdminDirectPage = () => {
     init();
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, checkAdminAndRedirect]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
@@ -133,33 +124,45 @@ const AdminDirectPage = () => {
           <div className="mx-auto mb-4 w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
             <Shield className="w-8 h-8 text-primary" />
           </div>
-          <CardTitle className="text-2xl">Accès Admin Direct</CardTitle>
+          <CardTitle className="text-2xl">Accès Admin</CardTitle>
         </CardHeader>
         <CardContent className="text-center space-y-4">
           <div className="flex items-center justify-center gap-3">
-            {status === "checking" && <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />}
-            {status === "sending" && <Loader2 className="w-5 h-5 animate-spin text-primary" />}
+            {(status === "checking" || status === "sending" || status === "authenticating") && (
+              <Loader2 className="w-5 h-5 animate-spin text-primary" />
+            )}
             {status === "sent" && <Mail className="w-5 h-5 text-green-500" />}
-            {status === "authenticating" && <Loader2 className="w-5 h-5 animate-spin text-primary" />}
-            {status === "error" && <CheckCircle className="w-5 h-5 text-destructive" />}
+            {status === "error" && <AlertCircle className="w-5 h-5 text-destructive" />}
             <p className="text-muted-foreground">{message}</p>
           </div>
 
+          {status === "idle" && (
+            <Button onClick={sendMagicLink} className="w-full mt-4" size="lg">
+              <Send className="w-4 h-4 mr-2" />
+              Envoyer le lien de connexion
+            </Button>
+          )}
+
           {status === "sent" && (
-            <div className="mt-6 p-4 bg-green-500/10 rounded-lg border border-green-500/20">
-              <p className="text-sm text-green-700 dark:text-green-300">
-                Cliquez sur le lien dans l'email pour vous connecter automatiquement.
-              </p>
+            <div className="mt-4 space-y-3">
+              <div className="p-4 bg-green-500/10 rounded-lg border border-green-500/20">
+                <p className="text-sm text-green-700 dark:text-green-300 font-medium">
+                  📧 Cliquez sur le lien dans l'email pour vous connecter.
+                </p>
+                <p className="text-xs text-muted-foreground mt-2">
+                  ⚠️ N'actualisez pas cette page avant d'avoir cliqué sur le lien, sinon il sera invalidé.
+                </p>
+              </div>
+              <Button variant="outline" onClick={sendMagicLink} size="sm">
+                Renvoyer un nouveau lien
+              </Button>
             </div>
           )}
 
           {status === "error" && (
-            <button
-              onClick={() => window.location.reload()}
-              className="mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
-            >
+            <Button onClick={() => { setStatus("idle"); setMessage(""); }} variant="outline" className="mt-4">
               Réessayer
-            </button>
+            </Button>
           )}
         </CardContent>
       </Card>
