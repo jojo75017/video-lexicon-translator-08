@@ -95,10 +95,18 @@ const AdminDirectPage = () => {
     // Only check existing session, do NOT auto-send a new link
     const init = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        console.log("[AdminDirect] Checking existing session...");
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
+        console.log("[AdminDirect] Session result:", { 
+          hasSession: !!session, 
+          email: session?.user?.email,
+          error: sessionError?.message 
+        });
+
         if (session) {
           const success = await checkAdminAndRedirect(session);
+          console.log("[AdminDirect] Admin check result:", success);
           if (success) return;
         }
 
@@ -106,7 +114,7 @@ const AdminDirectPage = () => {
         setStatus("idle");
         setMessage("Cliquez ci-dessous pour recevoir votre lien de connexion admin.");
       } catch (err) {
-        console.error("Admin direct error:", err);
+        console.error("[AdminDirect] Init error:", err);
         setStatus("error");
         setMessage("Une erreur est survenue");
       }
