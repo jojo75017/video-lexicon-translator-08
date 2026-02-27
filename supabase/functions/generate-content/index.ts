@@ -713,10 +713,10 @@ Le score overall_score doit être entre 0 et 100 (100 = parfaitement cohérent).
           body: JSON.stringify({
             model: 'gpt-4o-mini',
             messages: [
-              { role: 'system', content: 'Tu es un expert en création littéraire. Génère uniquement du JSON valide sans markdown.' },
+              { role: 'system', content: 'Tu es un expert en création littéraire. Génère uniquement du JSON valide sans markdown. Assure-toi que le JSON est COMPLET et bien fermé.' },
               { role: 'user', content: prompt }
             ],
-            max_tokens: 4000,
+            max_tokens: 8000,
           }),
           signal: controller.signal
         });
