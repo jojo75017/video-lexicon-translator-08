@@ -4,13 +4,6 @@ import { Play, Lightbulb, Layers } from "lucide-react";
 
 const videos = [
   {
-    id: "pT9jMy7CwZA",
-    icon: Lightbulb,
-    title: "Pourquoi j'ai créé EbookStudio Pro",
-    description:
-      "Découvrez l'histoire derrière cet outil et comment il résout un vrai problème : créer un ebook pro sans passer 6 mois à écrire.",
-  },
-  {
     id: "5qG4svJ-dfE",
     icon: Layers,
     title: "Les fonctionnalités en détail",
