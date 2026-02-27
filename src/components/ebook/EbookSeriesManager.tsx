@@ -177,6 +177,68 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
 
   const [newTheme, setNewTheme] = useState('');
   const [activeTab, setActiveTab] = useState('overview');
+  const SERIES_DRAFT_KEY = 'ebook-series-manager-draft-v1';
+  const [isDraftHydrated, setIsDraftHydrated] = useState(false);
+
+  // Restore local draft on mount (prevents data loss on refresh)
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      setIsDraftHydrated(true);
+      return;
+    }
+
+    try {
+      const raw = localStorage.getItem(SERIES_DRAFT_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+
+        if (parsed?.seriesBible && typeof parsed.seriesBible === 'object') {
+          setSeriesBible(parsed.seriesBible as SeriesBible);
+        }
+
+        if (typeof parsed?.currentSeriesId === 'string' || parsed?.currentSeriesId === null) {
+          setCurrentSeriesId(parsed.currentSeriesId);
+        }
+
+        if (parsed?.tomeCoverUrls && typeof parsed.tomeCoverUrls === 'object') {
+          setTomeCoverUrls(parsed.tomeCoverUrls as Record<string, string>);
+        }
+
+        if (typeof parsed?.coverStyle === 'string') {
+          setCoverStyle(parsed.coverStyle);
+        }
+
+        if (typeof parsed?.activeTab === 'string') {
+          setActiveTab(parsed.activeTab);
+        }
+      }
+    } catch (error) {
+      console.warn('Impossible de restaurer le brouillon de série:', error);
+    } finally {
+      setIsDraftHydrated(true);
+    }
+  }, []);
+
+  // Persist local draft on every change
+  useEffect(() => {
+    if (!isDraftHydrated || typeof window === 'undefined') return;
+
+    try {
+      localStorage.setItem(
+        SERIES_DRAFT_KEY,
+        JSON.stringify({
+          seriesBible,
+          currentSeriesId,
+          tomeCoverUrls,
+          coverStyle,
+          activeTab,
+          updatedAt: new Date().toISOString(),
+        })
+      );
+    } catch (error) {
+      console.warn('Impossible de sauvegarder le brouillon de série:', error);
+    }
+  }, [isDraftHydrated, seriesBible, currentSeriesId, tomeCoverUrls, coverStyle, activeTab]);
 
   // Auto-save when pendingAutoSave is triggered (after rename, etc.)
   // We need seriesBible in deps so the effect re-evaluates with latest data
