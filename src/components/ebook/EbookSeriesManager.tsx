@@ -980,9 +980,180 @@ ${parsedData.characterDevelopments?.map((d: any) => `- ${d.character}: ${d.devel
   };
 
   const removeCharacter = (id: string) => {
+    if (!confirm('Supprimer ce personnage ?')) return;
     setSeriesBible(prev => ({
       ...prev,
       characters: prev.characters.filter(c => c.id !== id)
+    }));
+  };
+
+  const addRelationToCharacter = (charId: string) => {
+    const otherChars = seriesBible.characters.filter(c => c.id !== charId);
+    if (otherChars.length === 0) {
+      toast.error('Ajoutez d\'abord d\'autres personnages');
+      return;
+    }
+    setSeriesBible(prev => ({
+      ...prev,
+      characters: prev.characters.map(c => 
+        c.id === charId ? {
+          ...c,
+          relations: [...(c.relations || []), {
+            characterId: otherChars[0].name,
+            type: 'ally' as const,
+            description: ''
+          }]
+        } : c
+      )
+    }));
+  };
+
+  const removeRelationFromCharacter = (charId: string, relIdx: number) => {
+    setSeriesBible(prev => ({
+      ...prev,
+      characters: prev.characters.map(c => 
+        c.id === charId ? {
+          ...c,
+          relations: c.relations.filter((_, i) => i !== relIdx)
+        } : c
+      )
+    }));
+  };
+
+  const updateRelation = (charId: string, relIdx: number, updates: Partial<CharacterRelation>) => {
+    setSeriesBible(prev => ({
+      ...prev,
+      characters: prev.characters.map(c => 
+        c.id === charId ? {
+          ...c,
+          relations: c.relations.map((r, i) => i === relIdx ? { ...r, ...updates } : r)
+        } : c
+      )
+    }));
+  };
+
+  const addArcPerTome = (charId: string) => {
+    const char = seriesBible.characters.find(c => c.id === charId);
+    if (!char) return;
+    const existingTomes = (char.arcPerTome || []).map(a => a.tome);
+    const nextTome = Array.from({ length: seriesBible.totalTomes }, (_, i) => i + 1)
+      .find(t => !existingTomes.includes(t)) || 1;
+    setSeriesBible(prev => ({
+      ...prev,
+      characters: prev.characters.map(c => 
+        c.id === charId ? {
+          ...c,
+          arcPerTome: [...(c.arcPerTome || []), { tome: nextTome, status: '', development: '', keyMoments: [] }]
+        } : c
+      )
+    }));
+  };
+
+  const updateArcPerTome = (charId: string, arcIdx: number, updates: Partial<CharacterArcPerTome>) => {
+    setSeriesBible(prev => ({
+      ...prev,
+      characters: prev.characters.map(c => 
+        c.id === charId ? {
+          ...c,
+          arcPerTome: (c.arcPerTome || []).map((a, i) => i === arcIdx ? { ...a, ...updates } : a)
+        } : c
+      )
+    }));
+  };
+
+  const removeArcPerTome = (charId: string, arcIdx: number) => {
+    setSeriesBible(prev => ({
+      ...prev,
+      characters: prev.characters.map(c => 
+        c.id === charId ? {
+          ...c,
+          arcPerTome: (c.arcPerTome || []).filter((_, i) => i !== arcIdx)
+        } : c
+      )
+    }));
+  };
+
+  const addLocation = () => {
+    setSeriesBible(prev => ({
+      ...prev,
+      locations: [...prev.locations, {
+        id: `loc-${Date.now()}`,
+        name: '',
+        description: '',
+        significance: '',
+        appearancesByTome: [1]
+      }]
+    }));
+  };
+
+  const removeLocation = (id: string) => {
+    if (!confirm('Supprimer ce lieu ?')) return;
+    setSeriesBible(prev => ({
+      ...prev,
+      locations: prev.locations.filter(l => l.id !== id)
+    }));
+  };
+
+  const addTimelineEvent = () => {
+    setSeriesBible(prev => ({
+      ...prev,
+      timeline: [...prev.timeline, {
+        id: `time-${Date.now()}`,
+        event: '',
+        tome: 1,
+        chapter: '',
+        date: '',
+        charactersInvolved: []
+      }]
+    }));
+  };
+
+  const updateTimelineEvent = (id: string, updates: Partial<SeriesTimeline>) => {
+    setSeriesBible(prev => ({
+      ...prev,
+      timeline: prev.timeline.map(t => t.id === id ? { ...t, ...updates } : t)
+    }));
+  };
+
+  const removeTimelineEvent = (id: string) => {
+    setSeriesBible(prev => ({
+      ...prev,
+      timeline: prev.timeline.filter(t => t.id !== id)
+    }));
+  };
+
+  const addPlotThread = () => {
+    setSeriesBible(prev => ({
+      ...prev,
+      plotThreads: [...(prev.plotThreads || []), {
+        id: `plot-${Date.now()}`,
+        name: '',
+        description: '',
+        introducedTome: 1,
+        status: 'open' as const
+      }]
+    }));
+  };
+
+  const updatePlotThread = (id: string, updates: Partial<PlotThread>) => {
+    setSeriesBible(prev => ({
+      ...prev,
+      plotThreads: (prev.plotThreads || []).map(p => p.id === id ? { ...p, ...updates } : p)
+    }));
+  };
+
+  const removePlotThread = (id: string) => {
+    setSeriesBible(prev => ({
+      ...prev,
+      plotThreads: (prev.plotThreads || []).filter(p => p.id !== id)
+    }));
+  };
+
+  const removeTome = (id: string) => {
+    if (!confirm('Supprimer ce tome ?')) return;
+    setSeriesBible(prev => ({
+      ...prev,
+      tomes: prev.tomes.filter(t => t.id !== id)
     }));
   };
 
@@ -1688,51 +1859,48 @@ RÈGLES STRICTES:
                         </div>
                       </div>
 
-                      {/* Relations avec autres personnages */}
-                      {char.relations && char.relations.length > 0 && (
-                        <div className="md:col-span-2">
-                          <Label className="mb-2 block">Relations</Label>
-                          <div className="flex flex-wrap gap-2">
-                            {char.relations.map((rel, idx) => {
-                              const relatedChar = seriesBible.characters.find(c => c.id === rel.characterId || c.name === rel.characterId);
-                              return (
-                                <Badge key={idx} variant="secondary" className="flex items-center gap-1">
-                                  {getRelationIcon(rel.type)}
-                                  {relatedChar?.name || rel.characterId}: {rel.description}
-                                </Badge>
-                              );
-                            })}
-                          </div>
+                      {/* Relations éditables */}
+                      <div className="md:col-span-2">
+                        <Label className="mb-2 block">Relations</Label>
+                        <div className="space-y-2">
+                          {(char.relations || []).map((rel, idx) => (
+                            <div key={idx} className="flex gap-2 items-center flex-wrap">
+                              <Select value={rel.type} onValueChange={(v) => updateRelation(char.id, idx, { type: v as CharacterRelation['type'] })}>
+                                <SelectTrigger className="w-[120px]"><SelectValue /></SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="ally">🤝 Allié</SelectItem>
+                                  <SelectItem value="enemy">⚔️ Ennemi</SelectItem>
+                                  <SelectItem value="family">👨‍👩‍👧 Famille</SelectItem>
+                                  <SelectItem value="romantic">💕 Amour</SelectItem>
+                                  <SelectItem value="mentor">🎓 Mentor</SelectItem>
+                                  <SelectItem value="rival">🥊 Rival</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <Input value={rel.description} onChange={(e) => updateRelation(char.id, idx, { description: e.target.value })} placeholder="Description..." className="flex-1 min-w-[150px]" />
+                              <Button size="icon" variant="ghost" onClick={() => removeRelationFromCharacter(char.id, idx)}><Trash2 className="h-3 w-3 text-destructive" /></Button>
+                            </div>
+                          ))}
                         </div>
-                      )}
+                        <Button size="sm" variant="outline" onClick={() => addRelationToCharacter(char.id)} className="mt-2"><Plus className="h-3 w-3 mr-1" />Relation</Button>
+                      </div>
 
-                      {/* Arc par tome */}
-                      {char.arcPerTome && char.arcPerTome.length > 0 && (
-                        <div className="md:col-span-2 bg-muted/50 p-3 rounded-lg">
-                          <Label className="mb-2 block flex items-center gap-2">
-                            <ArrowRight className="h-4 w-4" />
-                            Évolution par tome
-                          </Label>
-                          <div className="space-y-2">
-                            {char.arcPerTome.map((arc, idx) => (
-                              <div key={idx} className="text-sm border-l-2 border-primary/50 pl-3">
-                                <span className="font-semibold">Tome {arc.tome}:</span>{' '}
-                                <span className="text-muted-foreground">{arc.status}</span>
-                                <p className="text-xs mt-1">{arc.development}</p>
-                                {arc.keyMoments && arc.keyMoments.length > 0 && (
-                                  <div className="flex flex-wrap gap-1 mt-1">
-                                    {arc.keyMoments.map((moment, mIdx) => (
-                                      <Badge key={mIdx} variant="outline" className="text-xs">
-                                        {moment}
-                                      </Badge>
-                                    ))}
-                                  </div>
-                                )}
+                      {/* Arc par tome éditable */}
+                      <div className="md:col-span-2 bg-muted/50 p-3 rounded-lg">
+                        <Label className="mb-2 block flex items-center gap-2"><ArrowRight className="h-4 w-4" />Évolution par tome</Label>
+                        <div className="space-y-2">
+                          {(char.arcPerTome || []).map((arc, idx) => (
+                            <div key={idx} className="border-l-2 border-primary/50 pl-3 space-y-1">
+                              <div className="flex items-center gap-2">
+                                <Badge>Tome {arc.tome}</Badge>
+                                <Input value={arc.status} onChange={(e) => updateArcPerTome(char.id, idx, { status: e.target.value })} placeholder="État..." className="flex-1 h-7 text-sm" />
+                                <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => removeArcPerTome(char.id, idx)}><Trash2 className="h-3 w-3 text-destructive" /></Button>
                               </div>
-                            ))}
-                          </div>
+                              <Textarea value={arc.development} onChange={(e) => updateArcPerTome(char.id, idx, { development: e.target.value })} placeholder="Évolution..." className="min-h-[40px] text-sm" />
+                            </div>
+                          ))}
                         </div>
-                      )}
+                        <Button size="sm" variant="outline" onClick={() => addArcPerTome(char.id)} className="mt-2"><Plus className="h-3 w-3 mr-1" />Arc</Button>
+                      </div>
                     </div>
                     <Button
                       variant="ghost"
@@ -1765,17 +1933,22 @@ RÈGLES STRICTES:
                 {seriesBible.locations.map((loc) => (
                   <Card key={loc.id} className="p-4">
                     <div className="space-y-3">
-                      <Input
-                        value={loc.name}
-                        onChange={(e) => setSeriesBible(prev => ({
-                          ...prev,
-                          locations: prev.locations.map(l => 
-                            l.id === loc.id ? { ...l, name: e.target.value } : l
-                          )
-                        }))}
-                        placeholder="Nom du lieu"
-                        className="font-semibold"
-                      />
+                      <div className="flex items-center gap-2">
+                        <Input
+                          value={loc.name}
+                          onChange={(e) => setSeriesBible(prev => ({
+                            ...prev,
+                            locations: prev.locations.map(l => 
+                              l.id === loc.id ? { ...l, name: e.target.value } : l
+                            )
+                          }))}
+                          placeholder="Nom du lieu"
+                          className="font-semibold flex-1"
+                        />
+                        <Button size="icon" variant="ghost" onClick={() => removeLocation(loc.id)}>
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </div>
                       <Textarea
                         value={loc.description}
                         onChange={(e) => setSeriesBible(prev => ({
@@ -1797,9 +1970,37 @@ RÈGLES STRICTES:
                         }))}
                         placeholder="Importance pour l'intrigue"
                       />
+                      <div>
+                        <Label className="text-xs mb-1 block">Apparitions par tome</Label>
+                        <div className="flex flex-wrap gap-1">
+                          {Array.from({ length: seriesBible.totalTomes }, (_, i) => i + 1).map(tomeNum => (
+                            <Badge
+                              key={tomeNum}
+                              variant={(loc.appearancesByTome || []).includes(tomeNum) ? 'default' : 'outline'}
+                              className="cursor-pointer text-xs"
+                              onClick={() => {
+                                const current = loc.appearancesByTome || [];
+                                const newApp = current.includes(tomeNum)
+                                  ? current.filter(t => t !== tomeNum)
+                                  : [...current, tomeNum].sort((a, b) => a - b);
+                                setSeriesBible(prev => ({
+                                  ...prev,
+                                  locations: prev.locations.map(l => l.id === loc.id ? { ...l, appearancesByTome: newApp } : l)
+                                }));
+                              }}
+                            >
+                              T{tomeNum}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                   </Card>
                 ))}
+                <Button onClick={addLocation} variant="outline" className="w-full">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Ajouter un lieu
+                </Button>
               </CardContent>
             </Card>
           </TabsContent>
@@ -2065,33 +2266,57 @@ RÈGLES STRICTES:
                         className="min-h-[80px]"
                       />
                       
-                      {/* Points clés de l'intrigue */}
+                      {/* Points clés de l'intrigue - éditables */}
                       <div>
                         <Label className="text-xs mb-1 block">Points clés de l'intrigue</Label>
-                        <div className="flex flex-wrap gap-1">
-                          {tome.mainPlotPoints?.map((point, idx) => (
-                            <Badge key={idx} variant="outline" className="text-xs">
-                              {point}
-                            </Badge>
+                        <div className="space-y-1">
+                          {(tome.mainPlotPoints || []).map((point, idx) => (
+                            <div key={idx} className="flex gap-1 items-center">
+                              <Input
+                                value={point}
+                                onChange={(e) => {
+                                  const newPoints = [...(tome.mainPlotPoints || [])];
+                                  newPoints[idx] = e.target.value;
+                                  updateTome(tome.id, { mainPlotPoints: newPoints });
+                                }}
+                                className="flex-1 h-7 text-xs"
+                              />
+                              <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => {
+                                updateTome(tome.id, { mainPlotPoints: (tome.mainPlotPoints || []).filter((_, i) => i !== idx) });
+                              }}><Trash2 className="h-3 w-3 text-destructive" /></Button>
+                            </div>
                           ))}
                         </div>
+                        <Button size="sm" variant="ghost" className="mt-1 h-6 text-xs" onClick={() => {
+                          updateTome(tome.id, { mainPlotPoints: [...(tome.mainPlotPoints || []), ''] });
+                        }}><Plus className="h-3 w-3 mr-1" />Point clé</Button>
                       </div>
                       
-                      {/* Cliffhanger */}
-                      {tome.cliffhanger && (
-                        <div className="p-2 bg-destructive/10 border border-destructive/20 rounded-lg">
-                          <Label className="text-xs flex items-center gap-1 text-destructive">
-                            <Sparkles className="h-3 w-3" />
-                            Cliffhanger
-                          </Label>
-                          <p className="text-sm mt-1">{tome.cliffhanger}</p>
-                        </div>
-                      )}
+                      {/* Cliffhanger éditable */}
+                      <div className="p-2 bg-destructive/10 border border-destructive/20 rounded-lg">
+                        <Label className="text-xs flex items-center gap-1 text-destructive">
+                          <Sparkles className="h-3 w-3" />
+                          Cliffhanger
+                        </Label>
+                        <Textarea
+                          value={tome.cliffhanger || ''}
+                          onChange={(e) => updateTome(tome.id, { cliffhanger: e.target.value })}
+                          placeholder="Fin du tome et accroche pour le suivant..."
+                          className="min-h-[40px] text-sm mt-1"
+                        />
+                      </div>
                       
-                      <Progress value={(tome.wordCount / 50000) * 100} className="h-2" />
-                      <p className="text-xs text-muted-foreground">
-                        {tome.wordCount.toLocaleString()} / 50,000 mots
-                      </p>
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <Progress value={(tome.wordCount / 50000) * 100} className="h-2" />
+                          <p className="text-xs text-muted-foreground">
+                            {tome.wordCount.toLocaleString()} / 50,000 mots
+                          </p>
+                        </div>
+                        <Button size="sm" variant="ghost" className="text-destructive" onClick={() => removeTome(tome.id)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
                   </Card>
                 ))}
@@ -2194,30 +2419,36 @@ RÈGLES STRICTES:
                 </div>
 
                 {/* Fils narratifs */}
-                {seriesBible.plotThreads && seriesBible.plotThreads.length > 0 && (
                   <div className="mt-4">
                     <Label className="mb-2 block">Fils narratifs</Label>
                     <div className="space-y-2">
-                      {seriesBible.plotThreads.map((thread) => (
-                        <div key={thread.id} className="flex items-center justify-between p-2 bg-muted/50 rounded-lg">
-                          <div>
-                            <span className="font-medium">{thread.name}</span>
-                            <p className="text-xs text-muted-foreground">{thread.description}</p>
+                      {(seriesBible.plotThreads || []).map((thread) => (
+                        <div key={thread.id} className="flex items-center justify-between p-2 bg-muted/50 rounded-lg gap-2">
+                          <div className="flex-1 space-y-1">
+                            <Input value={thread.name} onChange={(e) => updatePlotThread(thread.id, { name: e.target.value })} placeholder="Nom du fil..." className="h-7 text-sm font-medium" />
+                            <Input value={thread.description} onChange={(e) => updatePlotThread(thread.id, { description: e.target.value })} placeholder="Description..." className="h-7 text-xs" />
                           </div>
-                          <div className="flex items-center gap-2">
-                            <Badge variant="outline">Tome {thread.introducedTome}</Badge>
-                            <ArrowRight className="h-3 w-3" />
-                            {thread.resolvedTome ? (
-                              <Badge variant="default">Tome {thread.resolvedTome}</Badge>
-                            ) : (
-                              <Badge variant="secondary">{thread.status === 'ongoing' ? 'En cours' : 'Ouvert'}</Badge>
-                            )}
+                          <div className="flex items-center gap-1">
+                            <Select value={thread.status} onValueChange={(v) => updatePlotThread(thread.id, { status: v as PlotThread['status'] })}>
+                              <SelectTrigger className="w-[100px] h-7 text-xs"><SelectValue /></SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="open">Ouvert</SelectItem>
+                                <SelectItem value="ongoing">En cours</SelectItem>
+                                <SelectItem value="resolved">Résolu</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <Input type="number" min={1} max={seriesBible.totalTomes} value={thread.introducedTome} onChange={(e) => updatePlotThread(thread.id, { introducedTome: parseInt(e.target.value) || 1 })} className="w-14 h-7 text-xs" title="Tome intro" />
+                            <Input type="number" min={1} max={seriesBible.totalTomes} value={thread.resolvedTome || ''} onChange={(e) => updatePlotThread(thread.id, { resolvedTome: e.target.value ? parseInt(e.target.value) : undefined })} className="w-14 h-7 text-xs" title="Tome résolu" placeholder="?" />
+                            <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => removePlotThread(thread.id)}><Trash2 className="h-3 w-3 text-destructive" /></Button>
                           </div>
                         </div>
                       ))}
                     </div>
+                    <Button size="sm" variant="outline" onClick={addPlotThread} className="mt-2">
+                      <Plus className="h-3 w-3 mr-1" />
+                      Fil narratif
+                    </Button>
                   </div>
-                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -2231,21 +2462,26 @@ RÈGLES STRICTES:
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="relative border-l-2 border-primary/30 pl-6 space-y-6">
-                  {seriesBible.timeline.map((event, index) => (
+                <div className="relative border-l-2 border-primary/30 pl-6 space-y-4">
+                  {seriesBible.timeline.map((event) => (
                     <div key={event.id} className="relative">
                       <div className="absolute -left-[29px] w-4 h-4 bg-primary rounded-full" />
-                      <Card className="p-3">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Badge>Tome {event.tome}</Badge>
-                          {event.chapter && <Badge variant="outline">{event.chapter}</Badge>}
-                          {event.date && <span className="text-xs text-muted-foreground">{event.date}</span>}
+                      <Card className="p-3 space-y-2">
+                        <div className="flex items-center gap-2">
+                          <Input type="number" min={1} max={seriesBible.totalTomes} value={event.tome} onChange={(e) => updateTimelineEvent(event.id, { tome: parseInt(e.target.value) || 1 })} className="w-16 h-7 text-xs" />
+                          <Input value={event.chapter || ''} onChange={(e) => updateTimelineEvent(event.id, { chapter: e.target.value })} placeholder="Chapitre..." className="w-24 h-7 text-xs" />
+                          <Input value={event.date || ''} onChange={(e) => updateTimelineEvent(event.id, { date: e.target.value })} placeholder="Date..." className="w-24 h-7 text-xs" />
+                          <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => removeTimelineEvent(event.id)}><Trash2 className="h-3 w-3 text-destructive" /></Button>
                         </div>
-                        <p className="text-sm">{event.event}</p>
+                        <Textarea value={event.event} onChange={(e) => updateTimelineEvent(event.id, { event: e.target.value })} placeholder="Événement..." className="min-h-[40px] text-sm" />
                       </Card>
                     </div>
                   ))}
                 </div>
+                <Button onClick={addTimelineEvent} variant="outline" className="w-full mt-4">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Ajouter un événement
+                </Button>
               </CardContent>
             </Card>
           </TabsContent>
