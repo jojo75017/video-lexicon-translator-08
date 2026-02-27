@@ -136,7 +136,7 @@ export const EbookChapter: React.FC<EbookChapterProps> = ({
             size="sm"
             onClick={() => onGenerateChapterContent(chapter.id)}
             disabled={isGenerating || !chapter.title}
-            title="Rédiger le chapitre (350 mots)"
+            title="Rédiger le chapitre complet"
             className="bg-primary text-primary-foreground hover:bg-primary/90"
           >
             <FileText className="h-4 w-4 mr-1" />

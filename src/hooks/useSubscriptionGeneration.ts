@@ -141,7 +141,11 @@ INSTRUCTIONS POUR LES PERSONNAGES:
     const audienceLine = targetAudience ? `\nPublic cible : ${targetAudience}. Adapte le vocabulaire, le style d'écriture, la complexité des concepts et les exemples utilisés pour correspondre parfaitement à ce public.` : '';
     const tomeLine = tomeNumber ? `\nCeci est le Tome ${tomeNumber} d'une série.` : '';
     const styleLine = writingStyle ? `\nStyle d'écriture : ${writingStyle}. Adopte ce style dans ta rédaction.` : '';
-    const lengthLine = chapterLength ? `\nLongueur souhaitée : ${chapterLength}.` : '';
+    // Mapper chapterLength vers des contraintes concrètes de mots
+    const lengthMultipliers: Record<string, number> = { 'court': 0.7, 'moyen': 1, 'long': 1.4, 'très long': 1.8 };
+    const lengthMultiplier = chapterLength ? (lengthMultipliers[chapterLength] || 1) : 1;
+    const effectiveWordCount = Math.round(wordsPerChapter * lengthMultiplier);
+    const lengthLine = chapterLength ? `\nLongueur souhaitée : ${chapterLength} (${effectiveWordCount} mots MINIMUM ABSOLU).` : '';
     const detailLine = detailLevel ? `\nNiveau de détail : ${detailLevel}. Fournis un contenu avec ce niveau de détail.` : '';
     const toneLine = tone ? `\nTon : ${tone}. Utilise ce ton tout au long du texte.` : '';
     const narrativeLine = narrativeFormat ? `\nFormat de narration : ${narrativeFormat}.` : '';
@@ -170,8 +174,15 @@ INSTRUCTIONS POUR LES PERSONNAGES:
       ? `\n\nRésumé du chapitre précédent (pour assurer la continuité):\n${previousChapterSummary}\n\nAssure une transition fluide depuis ce qui précède.` 
       : '';
     
-    const prompt = `Tu es un auteur expert. Rédige un chapitre complet d'environ ${wordsPerChapter} mots sur le sujet : "${chapter.title}".${contextLine}${audienceLine}${tomeLine}${genreLine}${styleLine}${lengthLine}${detailLine}${toneLine}${narrativeLine}${positionContext}${descriptionContext}${charactersContext}${synopsisContext}${previousContext}
+    const finalWordTarget = chapterLength ? effectiveWordCount : wordsPerChapter;
+    const prompt = `Tu es un auteur expert. Rédige un chapitre complet de MINIMUM ${finalWordTarget} mots sur le sujet : "${chapter.title}".${contextLine}${audienceLine}${tomeLine}${genreLine}${styleLine}${lengthLine}${detailLine}${toneLine}${narrativeLine}${positionContext}${descriptionContext}${charactersContext}${synopsisContext}${previousContext}
     
+⚠️ CONTRAINTE DE LONGUEUR ABSOLUE:
+- Ce chapitre DOIT contenir AU MINIMUM ${finalWordTarget} mots.
+- Si tu n'atteins pas ${finalWordTarget} mots, développe davantage avec plus d'exemples, de détails, de dialogues et d'explications.
+- Ne termine PAS le chapitre avant d'avoir atteint cet objectif de mots.
+- Compte tes mots pendant la rédaction.
+
 INSTRUCTIONS CRITIQUES:
 - Le contenu doit être informatif, engageant et COHÉRENT avec l'ensemble du livre
 - Adapte parfaitement le vocabulaire et le ton au public cible
@@ -180,6 +191,8 @@ INSTRUCTIONS CRITIQUES:
 - Fais référence aux éléments établis précédemment si pertinent
 - ${bookDescription ? 'RESPECTE LE CONTEXTE DU LIVRE fourni ci-dessus' : 'Sois créatif tout en restant cohérent'}
 - ${characters && characters.length > 0 ? 'UTILISE LES PERSONNAGES définis ci-dessus de manière cohérente et fidèle à leurs descriptions' : ''}
+
+⚠️ RAPPEL FINAL: Le chapitre DOIT faire AU MINIMUM ${finalWordTarget} mots. Ne termine pas avant d'avoir atteint cet objectif.
 
 Rédige directement le contenu du chapitre, sans titre ni numérotation.`;
 
@@ -205,14 +218,20 @@ Rédige directement le contenu du chapitre, sans titre ni numérotation.`;
     
     const prompt = `Rédige le contenu pour le sous-chapitre : "${subChapter.title}".${contextLine}${audienceLine}${tomeLine}${styleLine}${detailLine}${toneLine}${narrativeLine}${charactersContext}${synopsisContext}
     
-Le contenu doit faire environ ${wordsPerSubChapter} mots et être :
+⚠️ CONTRAINTE DE LONGUEUR ABSOLUE:
+- Ce sous-chapitre DOIT contenir AU MINIMUM ${wordsPerSubChapter} mots.
+- Ne termine PAS avant d'avoir atteint cet objectif.
+
+Le contenu doit être :
 - Informatif et pertinent
 - COHÉRENT avec la synopsis globale du livre
 - Parfaitement adapté au public cible (vocabulaire, ton, exemples)
-- Bien structuré
+- Bien structuré avec des paragraphes développés
 - Engageant pour le lecteur
 - Utiliser l'italique (*) pour les points importants
-${characters && characters.length > 0 ? '- UTILISER LES PERSONNAGES définis de manière cohérente et fidèle à leurs descriptions' : ''}`;
+${characters && characters.length > 0 ? '- UTILISER LES PERSONNAGES définis de manière cohérente et fidèle à leurs descriptions' : ''}
+
+⚠️ RAPPEL: MINIMUM ${wordsPerSubChapter} mots obligatoire.`;
 
     const content = await callGenerateContent('subchapters_generated', prompt);
     return content;
