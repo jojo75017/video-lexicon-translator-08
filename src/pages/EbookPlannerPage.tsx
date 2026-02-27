@@ -510,7 +510,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
     
     const chapter = chapters.find(c => c.id === chapterId);
     if (!chapter) return;
-    const content = await generateChapterContent(chapter);
+    const content = await generateChapterContent(chapter, targetWordsPerChapter);
     if (content) updateChapterContent(chapterId, content);
   };
 
