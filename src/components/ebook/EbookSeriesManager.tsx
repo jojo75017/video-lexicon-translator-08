@@ -173,9 +173,43 @@ const hasMeaningfulSeriesData = (value: SeriesBible): boolean => {
   );
 };
 
+const hasCoreSeriesContent = (value: SeriesBible): boolean => {
+  return Boolean(
+    value.synopsis?.trim() ||
+    value.writingRules?.trim() ||
+    value.characters.length ||
+    value.tomes.length ||
+    value.timeline.length ||
+    value.locations.length ||
+    value.themes.length ||
+    value.plotThreads.length
+  );
+};
+
 const isObject = (value: unknown): value is Record<string, unknown> => {
   return typeof value === 'object' && value !== null;
 };
+
+function extractItems<T>(response: unknown): T[] {
+  if (!response || typeof response !== 'object') {
+    return [];
+  }
+
+  const r = response as Record<string, unknown>;
+
+  if (Array.isArray(response)) return response as T[];
+  if (Array.isArray(r.data)) return r.data as T[];
+  if (Array.isArray(r.items)) return r.items as T[];
+  if (Array.isArray(r.results)) return r.results as T[];
+
+  if (r.data && typeof r.data === 'object') {
+    const d = r.data as Record<string, unknown>;
+    if (Array.isArray(d.items)) return d.items as T[];
+    if (Array.isArray(d.results)) return d.results as T[];
+  }
+
+  return [];
+}
 
 const toStringArray = (value: unknown): string[] => {
   return Array.isArray(value)
@@ -479,6 +513,12 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
       return;
     }
 
+    // Garde-fou: ne pas écraser une série existante avec une bible vide
+    if (currentSeriesId && !hasCoreSeriesContent(seriesBible)) {
+      toast.error('La bible est vide: chargez ou générez du contenu avant de mettre à jour.');
+      return;
+    }
+
     setIsSaving(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -559,13 +599,13 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
         ageCategory: (data as any).age_category || 'adult',
         totalTomes: data.total_tomes || 3,
         synopsis: data.narrative_style || '',
-        themes: data.main_themes,
-        characters: data.characters,
-        locations: data.locations,
-        timeline: data.timeline,
-        tomes: data.tomes,
+        themes: extractItems<string>(data.main_themes),
+        characters: extractItems<unknown>(data.characters),
+        locations: extractItems<unknown>(data.locations),
+        timeline: extractItems<unknown>(data.timeline),
+        tomes: extractItems<unknown>(data.tomes),
         writingRules: data.world_rules || '',
-        plotThreads: data.plot_threads
+        plotThreads: extractItems<unknown>(data.plot_threads)
       });
 
       setSeriesBible(loadedBible);
@@ -757,9 +797,15 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
 
   const pickFirstArray = (source: Record<string, unknown>, keys: string[]): unknown[] | undefined => {
     for (const key of keys) {
-      const value = source[key];
-      if (Array.isArray(value)) {
-        return value;
+      if (!(key in source)) continue;
+      const extracted = extractItems<unknown>(source[key]);
+      if (extracted.length > 0) {
+        return extracted;
+      }
+
+      // Accepte aussi explicitement les tableaux vides
+      if (Array.isArray(source[key])) {
+        return [];
       }
     }
     return undefined;
