@@ -716,7 +716,7 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
     }
   };
 
-  const parseJsonFromModel = (raw: string) => {
+  const parseJsonFromModel = (raw: string): unknown => {
     const cleaned = raw
       .replace(/```json\n?/g, '')
       .replace(/```\n?/g, '')
@@ -743,6 +743,62 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
 
       return JSON.parse(slice);
     }
+  };
+
+  const pickFirstString = (source: Record<string, unknown>, keys: string[]): string | undefined => {
+    for (const key of keys) {
+      const value = source[key];
+      if (typeof value === 'string' && value.trim().length > 0) {
+        return value;
+      }
+    }
+    return undefined;
+  };
+
+  const pickFirstArray = (source: Record<string, unknown>, keys: string[]): unknown[] | undefined => {
+    for (const key of keys) {
+      const value = source[key];
+      if (Array.isArray(value)) {
+        return value;
+      }
+    }
+    return undefined;
+  };
+
+  const extractSeriesBiblePayload = (parsed: unknown): Record<string, unknown> | null => {
+    if (!isObject(parsed)) return null;
+
+    const nestedCandidates = [
+      parsed.seriesBible,
+      parsed.series_bible,
+      parsed.bible,
+      parsed.data,
+      parsed.result,
+      parsed.payload,
+      parsed.output,
+    ];
+
+    for (const candidate of nestedCandidates) {
+      if (isObject(candidate)) {
+        return candidate;
+      }
+    }
+
+    return parsed;
+  };
+
+  const hasMeaningfulGeneratedPayload = (payload: Record<string, unknown>): boolean => {
+    const hasText = ['synopsis', 'writingRules'].some((key) => {
+      const value = payload[key];
+      return typeof value === 'string' && value.trim().length > 0;
+    });
+
+    const hasCollections = ['themes', 'characters', 'locations', 'timeline', 'tomes', 'plotThreads'].some((key) => {
+      const value = payload[key];
+      return Array.isArray(value) && value.length > 0;
+    });
+
+    return hasText || hasCollections;
   };
 
   const generateSeriesBible = async () => {
@@ -816,31 +872,54 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
 
       if (error) throw error;
 
-      if (!data?.content || typeof data.content !== 'string') {
+      const rawModelPayload =
+        typeof data?.content === 'string'
+          ? data.content
+          : isObject(data?.content)
+            ? JSON.stringify(data.content)
+            : null;
+
+      if (!rawModelPayload) {
         throw new Error('Réponse IA invalide');
       }
 
       let parsedData: unknown;
       try {
-        parsedData = parseJsonFromModel(data.content);
+        parsedData = parseJsonFromModel(rawModelPayload);
       } catch {
         throw new Error('Erreur de parsing');
       }
 
-      if (!isObject(parsedData)) {
+      const extractedPayload = extractSeriesBiblePayload(parsedData);
+      if (!extractedPayload) {
         throw new Error('Structure IA invalide');
       }
 
-      setSeriesBible(prev => normalizeSeriesBible({
+      const generatedPayload: Record<string, unknown> = {
+        synopsis: pickFirstString(extractedPayload, ['synopsis', 'summary', 'resume', 'narrative_style']),
+        themes: pickFirstArray(extractedPayload, ['themes', 'main_themes']),
+        characters: pickFirstArray(extractedPayload, ['characters', 'personnages']),
+        locations: pickFirstArray(extractedPayload, ['locations', 'lieux']),
+        timeline: pickFirstArray(extractedPayload, ['timeline', 'chronologie', 'events']),
+        tomes: pickFirstArray(extractedPayload, ['tomes', 'volumes', 'books']),
+        plotThreads: pickFirstArray(extractedPayload, ['plotThreads', 'plot_threads', 'filsNarratifs', 'threads']),
+        writingRules: pickFirstString(extractedPayload, ['writingRules', 'worldRules', 'world_rules', 'rules']),
+      };
+
+      if (!hasMeaningfulGeneratedPayload(generatedPayload)) {
+        throw new Error('Réponse IA vide ou format inattendu');
+      }
+
+      setSeriesBible((prev) => normalizeSeriesBible({
         ...prev,
-        synopsis: typeof parsedData.synopsis === 'string' ? parsedData.synopsis : '',
-        themes: parsedData.themes,
-        characters: parsedData.characters,
-        locations: parsedData.locations,
-        timeline: parsedData.timeline,
-        tomes: parsedData.tomes,
-        plotThreads: parsedData.plotThreads,
-        writingRules: typeof parsedData.writingRules === 'string' ? parsedData.writingRules : ''
+        synopsis: (generatedPayload.synopsis as string | undefined) ?? prev.synopsis,
+        themes: (generatedPayload.themes as unknown[] | undefined) ?? prev.themes,
+        characters: (generatedPayload.characters as unknown[] | undefined) ?? prev.characters,
+        locations: (generatedPayload.locations as unknown[] | undefined) ?? prev.locations,
+        timeline: (generatedPayload.timeline as unknown[] | undefined) ?? prev.timeline,
+        tomes: (generatedPayload.tomes as unknown[] | undefined) ?? prev.tomes,
+        plotThreads: (generatedPayload.plotThreads as unknown[] | undefined) ?? prev.plotThreads,
+        writingRules: (generatedPayload.writingRules as string | undefined) ?? prev.writingRules,
       }));
 
       toast.success('Bible de série générée avec cohérence inter-tomes !');
