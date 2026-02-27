@@ -765,7 +765,8 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
     // Try direct parse first
     try {
       return JSON.parse(cleaned);
-    } catch {
+    } catch (directError) {
+      console.warn('[Bible] Direct JSON parse failed, trying extraction...', (directError as Error).message);
       // Fallback: extract the first JSON object/array from mixed text
       const firstObj = cleaned.indexOf('{');
       const lastObj = cleaned.lastIndexOf('}');
@@ -781,8 +782,52 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
           ? cleaned.slice(firstArr, lastArr + 1)
           : cleaned;
 
-      return JSON.parse(slice);
+      try {
+        return JSON.parse(slice);
+      } catch (sliceError) {
+        console.warn('[Bible] Slice parse failed, attempting truncation repair...', (sliceError as Error).message);
+        // JSON truncated by token limit: try to repair by closing open braces/brackets
+        return repairTruncatedJson(slice);
+      }
     }
+  };
+
+  const repairTruncatedJson = (raw: string): unknown => {
+    let repaired = raw.trim();
+    // Remove trailing comma
+    repaired = repaired.replace(/,\s*$/, '');
+
+    // Count unclosed braces and brackets
+    let openBraces = 0;
+    let openBrackets = 0;
+    let inString = false;
+    let escaped = false;
+
+    for (const ch of repaired) {
+      if (escaped) { escaped = false; continue; }
+      if (ch === '\\') { escaped = true; continue; }
+      if (ch === '"') { inString = !inString; continue; }
+      if (inString) continue;
+      if (ch === '{') openBraces++;
+      if (ch === '}') openBraces--;
+      if (ch === '[') openBrackets++;
+      if (ch === ']') openBrackets--;
+    }
+
+    // If we're inside a string, close it
+    if (inString) repaired += '"';
+
+    // Remove trailing incomplete key-value (e.g. `"key": "incomple`)
+    repaired = repaired.replace(/,?\s*"[^"]*":\s*"[^"]*$/, '');
+    repaired = repaired.replace(/,?\s*"[^"]*":\s*$/, '');
+    repaired = repaired.replace(/,\s*$/, '');
+
+    // Close brackets/braces
+    for (let i = 0; i < openBrackets; i++) repaired += ']';
+    for (let i = 0; i < openBraces; i++) repaired += '}';
+
+    console.log('[Bible] Repaired JSON length:', repaired.length, 'added closers:', openBrackets + openBraces);
+    return JSON.parse(repaired);
   };
 
   const pickFirstString = (source: Record<string, unknown>, keys: string[]): string | undefined => {
@@ -970,8 +1015,9 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
 
       toast.success('Bible de série générée avec cohérence inter-tomes !');
     } catch (error) {
-      console.error('Erreur génération:', error);
-      toast.error('Erreur lors de la génération');
+      console.error('Erreur génération Bible:', error);
+      const msg = error instanceof Error ? error.message : 'Erreur inconnue';
+      toast.error(`Erreur: ${msg}`);
     } finally {
       setIsGenerating(false);
     }
