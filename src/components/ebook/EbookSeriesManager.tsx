@@ -156,6 +156,7 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
   const [currentSeriesId, setCurrentSeriesId] = useState<string | null>(null);
   const [savedSeries, setSavedSeries] = useState<SavedSeriesBible[]>([]);
   const [showSavedSeries, setShowSavedSeries] = useState(false);
+  const [pendingAutoSave, setPendingAutoSave] = useState(false);
   const [seriesBible, setSeriesBible] = useState<SeriesBible>({
     seriesTitle: '',
     authorName: '',
@@ -176,6 +177,14 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
 
   const [newTheme, setNewTheme] = useState('');
   const [activeTab, setActiveTab] = useState('overview');
+
+  // Auto-save when pendingAutoSave is triggered (after rename, etc.)
+  useEffect(() => {
+    if (pendingAutoSave && currentSeriesId && seriesBible.seriesTitle) {
+      setPendingAutoSave(false);
+      saveSeriesBible();
+    }
+  }, [pendingAutoSave]);
 
   // Load saved series on mount
   useEffect(() => {
@@ -935,6 +944,8 @@ ${parsedData.characterDevelopments?.map((d: any) => `- ${d.character}: ${d.devel
     }));
 
     toast.success(`"${oldName}" renommé en "${newName}" dans toute la série`);
+    // Auto-save after rename
+    setPendingAutoSave(true);
   };
 
   const addTome = () => {
