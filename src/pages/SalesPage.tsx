@@ -268,9 +268,25 @@ const SalesPage = () => {
             Sans écrire une seule ligne. <strong className="text-foreground">Regardez la démo gratuite.</strong>
           </motion.p>
 
-          <motion.p variants={fadeUp} custom={2.5} className="text-sm text-muted-foreground mb-5 sm:mb-8 hidden sm:block">
-            👇 Étape 1 — Regardez la démo pour comprendre comment créer votre ebook
-          </motion.p>
+          {/* Vidéo démo complète */}
+          <motion.div variants={fadeUp} custom={2.5} className="mb-6 sm:mb-8 max-w-3xl mx-auto">
+            <h2 className="text-lg sm:text-xl font-bold text-foreground mb-3">
+              🎬 Démo réelle — création d'un ebook complet
+            </h2>
+            <div className="relative rounded-xl overflow-hidden shadow-2xl shadow-violet-500/20 border border-border bg-card aspect-video">
+              <iframe
+                src="https://www.youtube.com/embed/JD0x6hDhBg0?rel=0"
+                title="Démo réelle — création d'un ebook complet"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="absolute inset-0 w-full h-full"
+                loading="lazy"
+              />
+            </div>
+            <p className="text-sm text-muted-foreground mt-3">
+              👉 Voir le workflow complet ci-dessous
+            </p>
+          </motion.div>
 
           <motion.div variants={fadeUp} custom={3} className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-2 sm:mb-3">
             <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg px-8 sm:px-10 py-6 sm:py-7 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-xl shadow-violet-500/25 hover:shadow-2xl hover:shadow-violet-500/30 transition-all duration-300 hover:-translate-y-0.5"
