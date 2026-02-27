@@ -179,12 +179,17 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
   const [activeTab, setActiveTab] = useState('overview');
 
   // Auto-save when pendingAutoSave is triggered (after rename, etc.)
+  // We need seriesBible in deps so the effect re-evaluates with latest data
   useEffect(() => {
     if (pendingAutoSave && currentSeriesId && seriesBible.seriesTitle) {
       setPendingAutoSave(false);
-      saveSeriesBible();
+      // Small delay to ensure React has fully committed the state update
+      const timer = setTimeout(() => {
+        saveSeriesBible();
+      }, 300);
+      return () => clearTimeout(timer);
     }
-  }, [pendingAutoSave]);
+  }, [pendingAutoSave, seriesBible, currentSeriesId]);
 
   // Load saved series on mount
   useEffect(() => {
