@@ -39,14 +39,13 @@ const ExitIntentPopup = ({ onContinueToOffer }: ExitIntentPopupProps) => {
 
   return (
     <>
-      {/* Bouton flottant visible */}
+      {/* Barre fixe en haut */}
       <button
         onClick={openPopup}
-        className="fixed bottom-44 right-6 z-50 flex items-center gap-2 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 hover:from-amber-600 hover:via-orange-600 hover:to-red-600 text-white font-bold px-5 py-3 rounded-full shadow-2xl animate-bounce hover:animate-none transition-all duration-300 border-2 border-white/30"
+        className="fixed top-0 left-0 right-0 z-[70] flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 hover:from-amber-600 hover:via-orange-600 hover:to-red-600 text-white font-bold px-4 py-2.5 shadow-lg transition-all duration-300 text-sm md:text-base"
       >
-        <Gift className="w-5 h-5" />
-        <span className="hidden sm:inline">N'oubliez pas votre cadeau !</span>
-        <span className="sm:hidden">Cadeau 🎁</span>
+        <Gift className="w-4 h-4 flex-shrink-0" />
+        <span>🎁 Guide GRATUIT : 10 Niches KDP Rentables → Cliquez ici !</span>
       </button>
 
       {/* Dialog popup */}
