@@ -140,6 +140,69 @@ interface EbookSeriesManagerProps {
   }) => void;
 }
 
+const SERIES_DRAFT_KEY = 'ebook-series-manager-draft-v1';
+const VALID_SERIES_TABS = new Set(['overview', 'characters', 'world', 'tomes', 'timeline', 'coherence', 'formation']);
+
+const getEmptySeriesBible = (): SeriesBible => ({
+  seriesTitle: '',
+  authorName: '',
+  genres: [],
+  ageCategory: 'adult',
+  totalTomes: 3,
+  synopsis: '',
+  themes: [],
+  characters: [],
+  locations: [],
+  timeline: [],
+  tomes: [],
+  writingRules: '',
+  plotThreads: []
+});
+
+const hasMeaningfulSeriesData = (value: SeriesBible): boolean => {
+  return Boolean(
+    value.seriesTitle?.trim() ||
+    value.synopsis?.trim() ||
+    value.writingRules?.trim() ||
+    value.characters.length ||
+    value.tomes.length ||
+    value.timeline.length ||
+    value.locations.length ||
+    value.themes.length ||
+    value.plotThreads.length
+  );
+};
+
+const normalizeSeriesBible = (input: unknown): SeriesBible => {
+  const base = getEmptySeriesBible();
+  if (!input || typeof input !== 'object') return base;
+
+  const data = input as Partial<SeriesBible>;
+  const ageCategoryValues: SeriesBible['ageCategory'][] = ['children', 'young-adult', 'adult', 'all-ages'];
+  const toStringArray = (value: unknown): string[] =>
+    Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
+
+  return {
+    seriesTitle: typeof data.seriesTitle === 'string' ? data.seriesTitle : base.seriesTitle,
+    authorName: typeof data.authorName === 'string' ? data.authorName : base.authorName,
+    genres: toStringArray(data.genres),
+    ageCategory: ageCategoryValues.includes(data.ageCategory as SeriesBible['ageCategory'])
+      ? (data.ageCategory as SeriesBible['ageCategory'])
+      : base.ageCategory,
+    totalTomes: typeof data.totalTomes === 'number' && Number.isFinite(data.totalTomes)
+      ? Math.max(1, Math.round(data.totalTomes))
+      : base.totalTomes,
+    synopsis: typeof data.synopsis === 'string' ? data.synopsis : base.synopsis,
+    themes: toStringArray(data.themes),
+    characters: Array.isArray(data.characters) ? (data.characters as SeriesCharacter[]) : base.characters,
+    locations: Array.isArray(data.locations) ? (data.locations as SeriesLocation[]) : base.locations,
+    timeline: Array.isArray(data.timeline) ? (data.timeline as SeriesTimeline[]) : base.timeline,
+    tomes: Array.isArray(data.tomes) ? (data.tomes as SeriesTome[]) : base.tomes,
+    writingRules: typeof data.writingRules === 'string' ? data.writingRules : base.writingRules,
+    plotThreads: Array.isArray(data.plotThreads) ? (data.plotThreads as PlotThread[]) : base.plotThreads,
+  };
+};
+
 export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
   currentTomeNumber,
   ebookTitle,
@@ -157,28 +220,14 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
   const [savedSeries, setSavedSeries] = useState<SavedSeriesBible[]>([]);
   const [showSavedSeries, setShowSavedSeries] = useState(false);
   const [pendingAutoSave, setPendingAutoSave] = useState(false);
-  const [seriesBible, setSeriesBible] = useState<SeriesBible>({
-    seriesTitle: '',
-    authorName: '',
-    genres: [],
-    ageCategory: 'adult',
-    totalTomes: 3,
-    synopsis: '',
-    themes: [],
-    characters: [],
-    locations: [],
-    timeline: [],
-    tomes: [],
-    writingRules: '',
-    plotThreads: []
-  });
+  const [seriesBible, setSeriesBible] = useState<SeriesBible>(() => getEmptySeriesBible());
   const [newGenre, setNewGenre] = useState('');
   const [targetWordsPerChapter, setTargetWordsPerChapter] = useState<number>(2500);
 
   const [newTheme, setNewTheme] = useState('');
   const [activeTab, setActiveTab] = useState('overview');
-  const SERIES_DRAFT_KEY = 'ebook-series-manager-draft-v1';
   const [isDraftHydrated, setIsDraftHydrated] = useState(false);
+  
 
   // Restore local draft on mount (prevents data loss on refresh)
   useEffect(() => {
@@ -191,12 +240,15 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
       const raw = localStorage.getItem(SERIES_DRAFT_KEY);
       if (raw) {
         const parsed = JSON.parse(raw);
+        const normalizedDraft = normalizeSeriesBible(parsed?.seriesBible);
+        const draftHasContent = hasMeaningfulSeriesData(normalizedDraft);
 
-        if (parsed?.seriesBible && typeof parsed.seriesBible === 'object') {
-          setSeriesBible(parsed.seriesBible as SeriesBible);
+        if (draftHasContent) {
+          setSeriesBible(normalizedDraft);
+          
         }
 
-        if (typeof parsed?.currentSeriesId === 'string' || parsed?.currentSeriesId === null) {
+        if (typeof parsed?.currentSeriesId === 'string' && parsed.currentSeriesId.trim()) {
           setCurrentSeriesId(parsed.currentSeriesId);
         }
 
@@ -209,7 +261,7 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
         }
 
         if (typeof parsed?.activeTab === 'string') {
-          setActiveTab(parsed.activeTab);
+          setActiveTab(VALID_SERIES_TABS.has(parsed.activeTab) ? parsed.activeTab : 'overview');
         }
       }
     } catch (error) {
@@ -222,6 +274,16 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
   // Persist local draft on every change
   useEffect(() => {
     if (!isDraftHydrated || typeof window === 'undefined') return;
+
+    const shouldPersistDraft =
+      hasMeaningfulSeriesData(seriesBible) ||
+      Boolean(currentSeriesId) ||
+      Object.keys(tomeCoverUrls).length > 0;
+
+    if (!shouldPersistDraft) {
+      localStorage.removeItem(SERIES_DRAFT_KEY);
+      return;
+    }
 
     try {
       localStorage.setItem(
@@ -394,21 +456,7 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
 
       if (currentSeriesId === id) {
         setCurrentSeriesId(null);
-        setSeriesBible({
-          seriesTitle: '',
-          authorName: '',
-          genres: [],
-          ageCategory: 'adult',
-          totalTomes: 3,
-          synopsis: '',
-          themes: [],
-          characters: [],
-          locations: [],
-          timeline: [],
-          tomes: [],
-          writingRules: '',
-          plotThreads: []
-        });
+        setSeriesBible(getEmptySeriesBible());
       }
 
       loadSavedSeriesList();
@@ -421,21 +469,7 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
 
   const newSeriesBible = () => {
     setCurrentSeriesId(null);
-    setSeriesBible({
-      seriesTitle: '',
-      authorName: '',
-      genres: [],
-      ageCategory: 'adult',
-      totalTomes: 3,
-      synopsis: '',
-      themes: [],
-      characters: [],
-      locations: [],
-      timeline: [],
-      tomes: [],
-      writingRules: '',
-      plotThreads: []
-    });
+    setSeriesBible(getEmptySeriesBible());
     setShowSavedSeries(false);
   };
 
@@ -1458,8 +1492,7 @@ RÈGLES STRICTES:
         </CardContent>
       </Card>
 
-      {seriesBible.synopsis && (
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid grid-cols-7 w-full">
             <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
             <TabsTrigger value="characters">Personnages</TabsTrigger>
@@ -2285,8 +2318,7 @@ RÈGLES STRICTES:
               </CardContent>
             </Card>
           </TabsContent>
-        </Tabs>
-      )}
+      </Tabs>
     </div>
   );
 };
