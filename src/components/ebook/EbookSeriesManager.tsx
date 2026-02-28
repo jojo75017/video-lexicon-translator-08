@@ -1606,11 +1606,66 @@ ${seriesBible.writingRules}
 
   const importTomeToPlanner = async (tome: SeriesTome) => {
     if (!onImportTome) {
-      toast.error('Fonction d\'import non disponible');
+      toast.error("Fonction d'import non disponible");
       return;
     }
 
     setIsImportingTome(tome.number);
+
+    const parseJsonString = (value: string): Record<string, any> => {
+      const cleaned = value
+        .replace(/```json\s*/gi, '')
+        .replace(/```\s*/g, '')
+        .trim();
+
+      const candidates: string[] = [cleaned];
+      const firstBrace = cleaned.indexOf('{');
+      const lastBrace = cleaned.lastIndexOf('}');
+      if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+        candidates.push(cleaned.slice(firstBrace, lastBrace + 1));
+      }
+
+      for (const candidate of candidates) {
+        try {
+          return JSON.parse(candidate);
+        } catch {
+          // continue
+        }
+      }
+
+      const repaired = cleaned
+        .replace(/,\s*}/g, '}')
+        .replace(/,\s*]/g, ']')
+        .replace(/[\x00-\x1F\x7F]/g, '');
+
+      return JSON.parse(repaired);
+    };
+
+    const extractPayloadObject = (response: unknown): Record<string, any> => {
+      if (!response) return {};
+
+      if (typeof response === 'string') {
+        return parseJsonString(response);
+      }
+
+      if (typeof response !== 'object') return {};
+
+      const r = response as Record<string, any>;
+
+      if (typeof r.content === 'string') return parseJsonString(r.content);
+      if (typeof r.text === 'string') return parseJsonString(r.text);
+      if (r.content && typeof r.content === 'object') return r.content as Record<string, any>;
+      if (r.result && typeof r.result === 'object') return r.result as Record<string, any>;
+
+      if (r.data && typeof r.data === 'object') {
+        const dataObj = r.data as Record<string, any>;
+        if (typeof dataObj.content === 'string') return parseJsonString(dataObj.content);
+        if (typeof dataObj.text === 'string') return parseJsonString(dataObj.text);
+        return dataObj;
+      }
+
+      return r;
+    };
 
     try {
       // Générer les chapitres détaillés pour ce tome via l'IA
@@ -1658,43 +1713,82 @@ RÈGLES STRICTES:
 
       if (error) throw error;
 
-      let parsedData;
-      try {
-        const cleanContent = data.content.replace(/\`\`\`json\n?/g, '').replace(/\`\`\`\n?/g, '').trim();
-        parsedData = JSON.parse(cleanContent);
-      } catch {
-        throw new Error('Erreur de parsing des chapitres');
-      }
+      const parsedData = extractPayloadObject(data);
+      const rawChapters = Array.isArray(parsedData.chapters)
+        ? parsedData.chapters
+        : Array.isArray(parsedData.chapitres)
+          ? parsedData.chapitres
+          : [];
 
-      // Formater les chapitres
-      const formattedChapters = (parsedData.chapters || []).map((ch: any, index: number) => ({
-        id: `chapter-${Date.now()}-${index}`,
-        title: ch.title,
-        content: '',
-        subChapters: (ch.subChapters || []).map((sub: string, subIndex: number) => ({
-          id: `subchapter-${Date.now()}-${index}-${subIndex}`,
-          title: sub,
-          content: ''
-        }))
-      }));
+      const fallbackChapterTitles = Array.from({ length: 8 }, (_, index) => tome.mainPlotPoints?.[index] || `Chapitre ${index + 1}`);
+      const chapterSource = rawChapters.length > 0
+        ? rawChapters
+        : fallbackChapterTitles.map((title) => ({ title, subChapters: [] }));
+
+      const formattedChapters = chapterSource.map((ch: any, index: number) => {
+        const safeTitle = typeof ch?.title === 'string' && ch.title.trim().length > 0
+          ? ch.title.trim()
+          : typeof ch?.titre === 'string' && ch.titre.trim().length > 0
+            ? ch.titre.trim()
+            : fallbackChapterTitles[index] || `Chapitre ${index + 1}`;
+
+        const rawSub = Array.isArray(ch?.subChapters)
+          ? ch.subChapters
+          : Array.isArray(ch?.sousChapitres)
+            ? ch.sousChapitres
+            : [];
+
+        const subChapters = rawSub.map((sub: any, subIndex: number) => {
+          const subTitle = typeof sub === 'string'
+            ? sub
+            : typeof sub?.title === 'string'
+              ? sub.title
+              : typeof sub?.titre === 'string'
+                ? sub.titre
+                : `Sous-chapitre ${subIndex + 1}`;
+
+          return {
+            id: `subchapter-${Date.now()}-${index}-${subIndex}`,
+            title: subTitle,
+            content: typeof sub?.content === 'string' ? sub.content : ''
+          };
+        });
+
+        return {
+          id: `chapter-${Date.now()}-${index}`,
+          title: safeTitle,
+          content: typeof ch?.content === 'string' ? ch.content : '',
+          subChapters
+        };
+      });
+
+      const safeTitle = tome.title?.trim() || `${seriesBible.seriesTitle || 'Série'} - Tome ${tome.number}`;
+      const safeAuthor = seriesBible.authorName?.trim() || 'Auteur inconnu';
+      const safeSynopsis = tome.synopsis?.trim() || seriesBible.synopsis || '';
+      const safePreface = typeof parsedData.preface === 'string'
+        ? parsedData.preface
+        : typeof parsedData.introduction === 'string'
+          ? parsedData.introduction
+          : '';
+      const safeConclusion = typeof parsedData.conclusion === 'string' ? parsedData.conclusion : '';
 
       // Appeler le callback pour importer dans le Workflow Éditorial
       onImportTome({
-        title: tome.title,
-        authorName: seriesBible.authorName,
+        title: safeTitle,
+        authorName: safeAuthor,
         tomeNumber: tome.number,
         seriesTitle: seriesBible.seriesTitle,
-        synopsis: tome.synopsis,
+        synopsis: safeSynopsis,
         chapters: formattedChapters,
-        preface: parsedData.preface || '',
-        conclusion: parsedData.conclusion || '',
+        preface: safePreface,
+        conclusion: safeConclusion,
         targetWordsPerChapter
       });
 
       toast.success(`Tome ${tome.number} envoyé vers l'Éditeur Éditorial ! (8 chapitres × ${targetWordsPerChapter.toLocaleString()} mots)`);
     } catch (error) {
       console.error('Erreur import tome:', error);
-      toast.error('Erreur lors de l\'import du tome');
+      toast.error("Erreur lors de l'import du tome");
     } finally {
       setIsImportingTome(null);
     }
