@@ -131,6 +131,7 @@ import EbookBsrTracker from '@/components/ebook/EbookBsrTracker';
 import EbookExportGuide from '@/components/ebook/EbookExportGuide';
 import PdfKdpReformatter from '@/components/ebook/PdfKdpReformatter';
 import PdfKdpAnalyzer from '@/components/ebook/PdfKdpAnalyzer';
+import EbookStrictProofreader from '@/components/ebook/EbookStrictProofreader';
 import KdpCoverStudio from '@/components/ebook/KdpCoverStudio';
 import SubscriberActivityPopup from '@/components/admin/SubscriberActivityPopup';
 
@@ -2913,6 +2914,20 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
 
       case 'pdf-analyzer':
         return <PdfKdpAnalyzer />;
+
+      case 'strict-proofread':
+        return (
+          <EbookStrictProofreader
+            chapters={chapters}
+            onApplyCorrections={(chapterIndex, correctedContent) => {
+              const updated = [...chapters];
+              if (updated[chapterIndex]) {
+                updated[chapterIndex] = { ...updated[chapterIndex], content: correctedContent };
+                setChapters(updated);
+              }
+            }}
+          />
+        );
 
       case 'subscription':
         // Rediriger vers la page Abonnement
