@@ -53,6 +53,7 @@ const sidebarItems: SidebarItem[] = [
   { id: 'export', label: 'Export', icon: Download, color: 'royal-purple' },
   { id: 'toc', label: 'Sommaire', icon: List, color: 'cobalt-blue' },
   { id: 'images', label: 'Images', icon: Image, color: 'coral-pink' },
+  { id: 'strict-proofread', label: 'Correcteur Strict', icon: Shield, color: 'emerald-500', badge: 'NEW' },
 ];
 
 export function MagazineSidebar({ 
