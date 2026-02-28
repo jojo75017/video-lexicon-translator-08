@@ -2417,6 +2417,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               toast.success(`Tome ${data.tomeNumber} configuré pour "${data.seriesTitle}"`);
             }}
             onImportTome={(data) => {
+              // Inject into Workflow Éditorial (P1 + P4) instead of Planificateur
               setEbookTitle(data.title);
               setAuthorName(data.authorName);
               setTomeNumber(data.tomeNumber);
@@ -2424,8 +2425,33 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               setConclusion(data.conclusion);
               setChapters(data.chapters);
               setTargetWordsPerChapter(data.targetWordsPerChapter);
-              setActiveTab('planner');
-              toast.success(`"${data.title}" importé avec ${data.chapters.length} chapitres ! (~${data.targetWordsPerChapter.toLocaleString()} mots/chapitre)`);
+
+              // P1 - Directeur Éditorial
+              const p1Display = `# 📋 Directeur Éditorial (Import Tome ${data.tomeNumber})\n\n**Titre :** ${data.title}\n**Auteur :** ${data.authorName}\n**Série :** ${data.seriesTitle}\n**Synopsis :** ${data.synopsis}\n\n## Introduction\n${data.preface}\n\n## Conclusion\n${data.conclusion}`;
+              saveStepResult('P1', {
+                title: data.title,
+                author: data.authorName,
+                introduction: data.preface,
+                conclusion: data.conclusion,
+                tomeNumber: data.tomeNumber,
+                seriesTitle: data.seriesTitle,
+                synopsis: data.synopsis,
+                source: 'series-bible-import'
+              }, p1Display);
+
+              // P4 - Rédaction Expert: chapitres
+              const chaptersContent = data.chapters.map((ch, i) => `## Chapitre ${i + 1}: ${ch.title}\n\n${ch.content || '(À rédiger via le workflow)'}`).join('\n\n---\n\n');
+              const p4Display = `# ✍️ Rédaction (Import Tome ${data.tomeNumber})\n\n${data.chapters.length} chapitres importés (~${data.targetWordsPerChapter.toLocaleString()} mots/chapitre)\n\n${chaptersContent}`;
+              saveStepResult('P4', {
+                chapters: data.chapters,
+                targetWordsPerChapter: data.targetWordsPerChapter,
+                source: 'series-bible-import'
+              }, p4Display);
+
+              setActiveTab('workflow-dashboard');
+              toast.success(`"${data.title}" (Tome ${data.tomeNumber}) injecté dans l'Éditeur Éditorial !`, {
+                description: `${data.chapters.length} chapitres prêts pour le workflow P1-P15`
+              });
             }}
           />
         );
