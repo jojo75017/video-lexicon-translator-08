@@ -2417,40 +2417,54 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               toast.success(`Tome ${data.tomeNumber} configuré pour "${data.seriesTitle}"`);
             }}
             onImportTome={(data) => {
+              const safeTitle = data.title?.trim() || `${data.seriesTitle || 'Série'} - Tome ${data.tomeNumber}`;
+              const safeAuthor = data.authorName?.trim() || authorName || 'Auteur inconnu';
+              const safeSynopsis = data.synopsis?.trim() || '';
+              const safePreface = data.preface?.trim() || (safeSynopsis ? `Introduction du tome ${data.tomeNumber}.\n\n${safeSynopsis}` : '');
+              const safeConclusion = data.conclusion?.trim() || '';
+              const safeChapters = Array.isArray(data.chapters) && data.chapters.length > 0
+                ? data.chapters
+                : Array.from({ length: 8 }, (_, index) => ({
+                    id: `chapter-fallback-${Date.now()}-${index}`,
+                    title: `Chapitre ${index + 1}`,
+                    content: '',
+                    subChapters: []
+                  }));
+
               // Inject into Workflow Éditorial (P1 + P4) instead of Planificateur
-              setEbookTitle(data.title);
-              setAuthorName(data.authorName);
+              setEbookTitle(safeTitle);
+              setAuthorName(safeAuthor);
               setTomeNumber(data.tomeNumber);
-              setPreface(data.preface);
-              setConclusion(data.conclusion);
-              setChapters(data.chapters);
+              setPreface(safePreface);
+              setConclusion(safeConclusion);
+              setChapters(safeChapters);
               setTargetWordsPerChapter(data.targetWordsPerChapter);
 
               // P1 - Directeur Éditorial
-              const p1Display = `# 📋 Directeur Éditorial (Import Tome ${data.tomeNumber})\n\n**Titre :** ${data.title}\n**Auteur :** ${data.authorName}\n**Série :** ${data.seriesTitle}\n**Synopsis :** ${data.synopsis}\n\n## Introduction\n${data.preface}\n\n## Conclusion\n${data.conclusion}`;
+              const p1Display = `# 📋 Directeur Éditorial (Import Tome ${data.tomeNumber})\n\n**Titre :** ${safeTitle}\n**Auteur :** ${safeAuthor}\n**Série :** ${data.seriesTitle}\n**Synopsis :** ${safeSynopsis}\n\n## Introduction\n${safePreface}\n\n## Conclusion\n${safeConclusion}`;
               saveStepResult('P1', {
-                title: data.title,
-                author: data.authorName,
-                introduction: data.preface,
-                conclusion: data.conclusion,
+                title: safeTitle,
+                author: safeAuthor,
+                introduction: safePreface,
+                conclusion: safeConclusion,
                 tomeNumber: data.tomeNumber,
                 seriesTitle: data.seriesTitle,
-                synopsis: data.synopsis,
+                synopsis: safeSynopsis,
                 source: 'series-bible-import'
               }, p1Display);
 
               // P4 - Rédaction Expert: chapitres
-              const chaptersContent = data.chapters.map((ch, i) => `## Chapitre ${i + 1}: ${ch.title}\n\n${ch.content || '(À rédiger via le workflow)'}`).join('\n\n---\n\n');
-              const p4Display = `# ✍️ Rédaction (Import Tome ${data.tomeNumber})\n\n${data.chapters.length} chapitres importés (~${data.targetWordsPerChapter.toLocaleString()} mots/chapitre)\n\n${chaptersContent}`;
+              const chaptersContent = safeChapters.map((ch, i) => `## Chapitre ${i + 1}: ${ch.title}\n\n${ch.content || '(À rédiger via le workflow)'}`).join('\n\n---\n\n');
+              const p4Display = `# ✍️ Rédaction (Import Tome ${data.tomeNumber})\n\n${safeChapters.length} chapitres importés (~${data.targetWordsPerChapter.toLocaleString()} mots/chapitre)\n\n${chaptersContent}`;
               saveStepResult('P4', {
-                chapters: data.chapters,
+                chapters: safeChapters,
                 targetWordsPerChapter: data.targetWordsPerChapter,
                 source: 'series-bible-import'
               }, p4Display);
 
               setActiveTab('workflow-dashboard');
-              toast.success(`"${data.title}" (Tome ${data.tomeNumber}) injecté dans l'Éditeur Éditorial !`, {
-                description: `${data.chapters.length} chapitres prêts pour le workflow P1-P15`
+              toast.success(`"${safeTitle}" (Tome ${data.tomeNumber}) injecté dans l'Éditeur Éditorial !`, {
+                description: `${safeChapters.length} chapitres prêts pour le workflow P1-P15`
               });
             }}
           />
