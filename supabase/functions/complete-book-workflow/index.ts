@@ -678,20 +678,42 @@ Format JSON :
           const { content: chapterContent, qualityScore, attempts } = await callAIWithQualityLoop(
             `Tu es un AUTEUR BEST-SELLER avec 20 ans d'expérience. Tu rédiges des chapitres EXCEPTIONNELS dans le genre "${category}".
 
-EXIGENCES QUALITÉ BEST-SELLER :
-- Chaque paragraphe doit être INDISPENSABLE (pas de remplissage)
+EXIGENCES QUALITÉ PUBLICATION PROFESSIONNELLE :
+- Chaque paragraphe doit être INDISPENSABLE (zéro remplissage, zéro redondance)
 - Phrases d'ouverture percutantes pour chaque section
 - Exemples concrets et vérifiables
-- Dialogues naturels si approprié
-- Rythme varié : tension → relâchement → insight
+- Dialogues naturels, crédibles, jamais explicatifs
+- Rythme varié : tension → relâchement → insight → cliffhanger
 - Transitions fluides entre sous-sections
 - Le lecteur ne doit JAMAIS s'ennuyer
 
-COHÉRENCE :
-- Références aux chapitres précédents
-- Personnages cohérents
-- Ton identique tout au long
-- Pas de répétitions${personnagesSection}`,
+ANTI-RÉPÉTITIONS (CRITIQUE) :
+- JAMAIS répéter une idée déjà exprimée dans un chapitre précédent
+- JAMAIS réintroduire un personnage déjà présenté (juste mentionner son nom)
+- JAMAIS utiliser deux fois la même tournure de phrase dans le chapitre
+- Varier systématiquement le vocabulaire : pas de mot-clé utilisé > 3 fois
+- Pas de résumés redondants du contenu précédent
+
+COHÉRENCE NARRATIVE STRICTE :
+- Vérifier les arcs personnages : pas de contradiction avec chapitres précédents
+- Un personnage secondaire introduit DOIT réapparaître ou être justifié
+- Temps narratifs cohérents (ne pas basculer entre passé et présent)
+- Les traits de caractère restent constants sauf évolution explicite
+- Les lieux et contextes restent fidèles aux descriptions établies
+
+TENSION & RYTHME (THRILLER/ENGAGEMENT) :
+- Chaque chapitre se termine par un micro-cliffhanger ou une question ouverte
+- Alterner chapitres de tension et chapitres de développement
+- Crescendo d'enjeux progressif
+- Éviter les résolutions trop faciles
+- Les révélations arrivent au bon moment, pas trop tôt
+
+STYLE PROFESSIONNEL :
+- Pas de "Il est important de noter", "Comme nous l'avons vu", "Dans ce chapitre"
+- Phrases courtes percutantes alternées avec développements fluides
+- Montrer (show) au lieu d'expliquer (tell)
+- Supprimer tout adverbe inutile (vraiment, absolument, totalement)
+- Aucune tournure passive excessive${personnagesSection}`,
             `Rédige le CHAPITRE COMPLET (2500-3500 mots, qualité best-seller) :
 
 LIVRE : "${fullTitle}"

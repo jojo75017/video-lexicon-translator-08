@@ -1678,7 +1678,7 @@ RÈGLES STRICTES:
         }))
       }));
 
-      // Appeler le callback pour importer dans le planificateur
+      // Appeler le callback pour importer dans le Workflow Éditorial
       onImportTome({
         title: tome.title,
         authorName: seriesBible.authorName,
@@ -1691,7 +1691,7 @@ RÈGLES STRICTES:
         targetWordsPerChapter
       });
 
-      toast.success(`Tome ${tome.number} importé ! (8 chapitres × ${targetWordsPerChapter.toLocaleString()} mots = ~${Math.round(targetWordsPerChapter * 8 / 250)} pages)`);
+      toast.success(`Tome ${tome.number} envoyé vers l'Éditeur Éditorial ! (8 chapitres × ${targetWordsPerChapter.toLocaleString()} mots)`);
     } catch (error) {
       console.error('Erreur import tome:', error);
       toast.error('Erreur lors de l\'import du tome');
@@ -2460,7 +2460,7 @@ RÈGLES STRICTES:
                             className="bg-gradient-to-r from-green-500 to-emerald-500 hover:opacity-90 text-white"
                             onClick={() => importTomeToPlanner(tome)}
                             disabled={isImportingTome !== null || isGenerating}
-                            title="Importer dans le planificateur"
+                            title="Envoyer vers l'Éditeur Éditorial (P1-P15)"
                           >
                             {isImportingTome === tome.number ? (
                               <Loader2 className="h-4 w-4 animate-spin" />
