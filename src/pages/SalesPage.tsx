@@ -264,8 +264,11 @@ const SalesPage = () => {
             </span>
           </motion.h1>
 
-          <motion.p variants={fadeUp} custom={1.5} className="text-lg sm:text-xl md:text-2xl text-muted-foreground mb-6 sm:mb-8">
+          <motion.p variants={fadeUp} custom={1.5} className="text-lg sm:text-xl md:text-2xl text-muted-foreground mb-2 sm:mb-3">
             Même si vous partez de zéro.
+          </motion.p>
+          <motion.p variants={fadeUp} custom={1.6} className="text-base sm:text-lg text-muted-foreground mb-6 sm:mb-8 font-medium">
+            Lancez votre premier ebook et créez un <span className="text-foreground">actif digital rentable</span>.
           </motion.p>
 
           <motion.div variants={fadeUp} custom={2} className="flex flex-col sm:flex-row gap-3 sm:gap-6 justify-center text-left mb-6 sm:mb-8 max-w-xl mx-auto">
@@ -281,6 +284,18 @@ const SalesPage = () => {
               <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" />
               <span>Publiez sur Amazon KDP</span>
             </div>
+          </motion.div>
+
+          <motion.p variants={fadeUp} custom={2.1} className="text-sm text-muted-foreground mb-5 sm:mb-6">
+            ✅ Déjà utilisé pour générer des ebooks publiés sur Amazon KDP.
+          </motion.p>
+
+          <motion.div variants={fadeUp} custom={2.2} className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-8 sm:mb-10">
+            <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg px-8 sm:px-10 py-6 sm:py-7 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-xl shadow-violet-500/25 hover:shadow-2xl hover:shadow-violet-500/30 transition-all duration-300 hover:-translate-y-0.5"
+              onClick={() => { trackCTAClick('hero_cta_top', '/paiement'); handlePlanClick(); }}>
+              <Rocket className="w-5 h-5 mr-2" />
+              {isVipAvailable ? `👉 Accès Fondateur – ${price}€` : '👉 Créer mon premier ebook maintenant'}
+            </Button>
           </motion.div>
 
           {/* Vidéo démo complète */}
