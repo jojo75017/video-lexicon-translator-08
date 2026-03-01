@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
+import { trackFormSubmit } from '@/utils/analytics';
 
 export const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -182,6 +183,7 @@ export const AuthPage = () => {
         console.log('Utilisateur admin confirmé');
         sessionStorage.setItem('is_admin', 'true');
         if (shouldToast) toast.success('Connexion admin réussie');
+        trackFormSubmit('admin_login', email);
         navigate('/admin');
       } else {
         const { error } = await supabase.auth.signUp({
@@ -199,6 +201,7 @@ export const AuthPage = () => {
             description: 'Veuillez vérifier votre email pour confirmer votre compte',
           });
         }
+        trackFormSubmit('signup', email);
       }
     } catch (error: any) {
       console.error('Auth error:', error);

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { trackLeadMagnetDownload, trackCTAClick } from "@/utils/analytics";
+import { trackLeadMagnetDownload, trackCTAClick, trackFormSubmit } from "@/utils/analytics";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -26,6 +26,7 @@ const CadeauPage = () => {
         body: { email: emailLower }
       });
       trackLeadMagnetDownload("10_niches_kdp_2026");
+      trackFormSubmit('cadeau_guide', emailLower);
       setIsSuccess(true);
       toast.success("🎁 Votre guide arrive dans votre boîte mail !");
     } catch (error) {

@@ -146,3 +146,16 @@ export const trackPageView = (pagePath: string, pageTitle?: string) => {
     ...(pageTitle && { page_title: pageTitle }),
   });
 };
+
+// ═══════════════════════════════════════
+// Form Submissions
+// ═══════════════════════════════════════
+
+/** Soumission de formulaire (inscription, email capture, etc.) */
+export const trackFormSubmit = (formName: string, email?: string) => {
+  trackEvent('submit_form', {
+    form_name: formName,
+    page_path: window.location.pathname,
+    ...(email && { user_email: email }),
+  });
+};

@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Gift, Mail, Loader2, Sparkles, ArrowRight, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { trackFormSubmit } from "@/utils/analytics";
 import { useNavigate } from "react-router-dom";
 
 interface ScrollIntentPopupProps {
@@ -59,6 +60,7 @@ const ScrollIntentPopup = ({ scrollThreshold = 50 }: ScrollIntentPopupProps) => 
         body: { email: emailLower }
       });
 
+      trackFormSubmit('scroll_intent_popup', emailLower);
       toast.success("🎁 Votre guide arrive dans votre boîte mail !");
       setIsOpen(false);
     } catch (error) {
