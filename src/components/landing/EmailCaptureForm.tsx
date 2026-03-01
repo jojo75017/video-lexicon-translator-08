@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Mail, Download } from 'lucide-react';
 import { toast } from 'sonner';
+import { trackFormSubmit } from '@/utils/analytics';
 
 interface EmailCaptureFormProps {
   onSubmit: (email: string) => void;
@@ -26,6 +27,7 @@ export const EmailCaptureForm: React.FC<EmailCaptureFormProps> = ({ onSubmit }) 
     // Simulation d'envoi
     setTimeout(() => {
       onSubmit(email);
+      trackFormSubmit('email_capture', email);
       setIsSubmitting(false);
       toast.success("Parfait ! Vérifiez votre boîte email dans quelques minutes.");
     }, 1500);

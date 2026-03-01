@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   User,
   Mail,
@@ -21,6 +22,11 @@ import {
   ArrowRight,
   Crown,
   Shield,
+  BarChart3,
+  TrendingUp,
+  Eye,
+  MousePointerClick,
+  Clock,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -191,6 +197,20 @@ const SubscriptionPage = ({ subscriberEmail, subscriberData, onLogout }: Subscri
             </Button>
           </div>
         </div>
+
+        <Tabs defaultValue="account" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="account">
+              <User className="w-4 h-4 mr-2" />
+              Mon Compte
+            </TabsTrigger>
+            <TabsTrigger value="analytics">
+              <BarChart3 className="w-4 h-4 mr-2" />
+              Analytics GA4
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="account" className="space-y-6">
 
         {/* Account Info */}
         <Card>
@@ -399,6 +419,101 @@ const SubscriptionPage = ({ subscriberEmail, subscriberData, onLogout }: Subscri
             </div>
           </CardContent>
         </Card>
+          </TabsContent>
+
+          <TabsContent value="analytics" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BarChart3 className="w-5 h-5" />
+                  Google Analytics 4 — Tableau de bord
+                </CardTitle>
+                <CardDescription>
+                  Données en temps réel depuis GA4 (ID: G-EK4JM3SWKL)
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* GA4 Embed Link */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Card className="border-primary/20">
+                    <CardContent className="pt-6 text-center">
+                      <Eye className="w-8 h-8 mx-auto text-primary mb-2" />
+                      <p className="text-sm text-muted-foreground">Pages vues</p>
+                      <p className="text-2xl font-bold">GA4 Live</p>
+                    </CardContent>
+                  </Card>
+                  <Card className="border-primary/20">
+                    <CardContent className="pt-6 text-center">
+                      <MousePointerClick className="w-8 h-8 mx-auto text-primary mb-2" />
+                      <p className="text-sm text-muted-foreground">Événements submit_form</p>
+                      <p className="text-2xl font-bold">GA4 Live</p>
+                    </CardContent>
+                  </Card>
+                  <Card className="border-primary/20">
+                    <CardContent className="pt-6 text-center">
+                      <Clock className="w-8 h-8 mx-auto text-primary mb-2" />
+                      <p className="text-sm text-muted-foreground">Temps moyen</p>
+                      <p className="text-2xl font-bold">GA4 Live</p>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <div className="bg-muted/50 rounded-lg p-6 space-y-4">
+                  <h3 className="font-semibold flex items-center gap-2">
+                    <TrendingUp className="w-5 h-5 text-primary" />
+                    Événements GA4 configurés
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {[
+                      { event: 'submit_form', desc: 'Inscription / capture email' },
+                      { event: 'cta_click', desc: 'Clic sur boutons CTA' },
+                      { event: 'demo_click', desc: 'Clic démonstration' },
+                      { event: 'newsletter_signup', desc: 'Inscription newsletter' },
+                      { event: 'lead_magnet_download', desc: 'Téléchargement guide gratuit' },
+                      { event: 'select_plan', desc: 'Sélection plan (Fondateur/Pro)' },
+                      { event: 'begin_checkout', desc: 'Début checkout' },
+                      { event: 'purchase', desc: 'Achat confirmé' },
+                      { event: 'exit_intent', desc: 'Popup exit intent' },
+                      { event: 'page_view', desc: 'Navigation SPA' },
+                    ].map((item) => (
+                      <div key={item.event} className="flex items-center gap-2 p-2 bg-background rounded border">
+                        <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
+                        <div>
+                          <code className="text-xs font-mono text-primary">{item.event}</code>
+                          <p className="text-xs text-muted-foreground">{item.desc}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Button
+                    variant="outline"
+                    onClick={() => window.open('https://analytics.google.com/analytics/web/#/p/G-EK4JM3SWKL', '_blank')}
+                    className="flex-1"
+                  >
+                    <BarChart3 className="w-4 h-4 mr-2" />
+                    Ouvrir Google Analytics 4
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => window.open('https://analytics.google.com/analytics/web/#/p/G-EK4JM3SWKL/reports/realtime', '_blank')}
+                    className="flex-1"
+                  >
+                    <TrendingUp className="w-4 h-4 mr-2" />
+                    Voir en temps réel
+                  </Button>
+                </div>
+
+                <p className="text-xs text-muted-foreground text-center">
+                  Les données détaillées sont disponibles directement sur votre tableau de bord Google Analytics 4.
+                  L'événement <code className="text-primary">submit_form</code> est déclenché à chaque inscription email.
+                </p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
