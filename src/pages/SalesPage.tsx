@@ -257,16 +257,31 @@ const SalesPage = () => {
 
         <motion.div initial="hidden" animate="visible" variants={stagger} className="max-w-4xl mx-auto text-center relative z-10">
 
-          <motion.h1 variants={fadeUp} custom={1} className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.1] tracking-tight mb-4 sm:mb-6">
-            Créer un ebook complet{" "}
+          <motion.h1 variants={fadeUp} custom={1} className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.1] tracking-tight mb-2 sm:mb-3">
+            Créer et publier un ebook rentable{" "}
             <span className="bg-gradient-to-r from-violet-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-              en moins d'1 heure avec l'IA
+              en moins d'1 heure
             </span>
           </motion.h1>
 
-          <motion.p variants={fadeUp} custom={2} className="text-base sm:text-lg md:text-xl text-muted-foreground mb-4 sm:mb-6 max-w-2xl mx-auto leading-relaxed">
-            Sans écrire une seule ligne. <strong className="text-foreground">Regardez la démo gratuite.</strong>
+          <motion.p variants={fadeUp} custom={1.5} className="text-lg sm:text-xl md:text-2xl text-muted-foreground mb-6 sm:mb-8">
+            Même si vous partez de zéro.
           </motion.p>
+
+          <motion.div variants={fadeUp} custom={2} className="flex flex-col sm:flex-row gap-3 sm:gap-6 justify-center text-left mb-6 sm:mb-8 max-w-xl mx-auto">
+            <div className="flex items-center gap-2 text-base sm:text-lg text-foreground font-medium">
+              <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" />
+              <span>Trouvez une niche rentable</span>
+            </div>
+            <div className="flex items-center gap-2 text-base sm:text-lg text-foreground font-medium">
+              <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" />
+              <span>Générez votre ebook complet</span>
+            </div>
+            <div className="flex items-center gap-2 text-base sm:text-lg text-foreground font-medium">
+              <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" />
+              <span>Publiez sur Amazon KDP</span>
+            </div>
+          </motion.div>
 
           {/* Vidéo démo complète */}
           <motion.div variants={fadeUp} custom={2.5} className="mb-6 sm:mb-8 max-w-3xl mx-auto">
@@ -288,31 +303,27 @@ const SalesPage = () => {
             </p>
           </motion.div>
 
-          <motion.div variants={fadeUp} custom={3} className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-2 sm:mb-3">
+          <motion.div variants={fadeUp} custom={3} className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-3 sm:mb-4">
             <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg px-8 sm:px-10 py-6 sm:py-7 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-xl shadow-violet-500/25 hover:shadow-2xl hover:shadow-violet-500/30 transition-all duration-300 hover:-translate-y-0.5"
-              onClick={() => { trackEvent('click_demo', { button_text: 'Voir comment créer un ebook en direct', page_path: '/offres' }); trackDemoClick("demo_hero"); navigate('/demo'); }}>
-              <Play className="w-5 h-5 mr-2" />
-              🎥 Voir comment créer un ebook en direct
+              onClick={() => { trackCTAClick('hero_cta_primary', '/paiement'); handlePlanClick(); }}>
+              <Rocket className="w-5 h-5 mr-2" />
+              👉 Créer mon premier ebook maintenant
             </Button>
             <Button size="lg" variant="outline" className="w-full sm:w-auto text-sm sm:text-base px-6 sm:px-8 py-5 sm:py-6 border-2 border-border hover:border-primary/50 hover:bg-primary/5 transition-all duration-300"
-              onClick={() => { trackCTAClick('hero_pricing', '#pricing'); trackPricingView(); document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' }); }}>
-              <Rocket className="w-5 h-5 mr-2" />
-              Voir les offres
+              onClick={() => { trackEvent('click_demo', { button_text: 'Voir la démonstration complète', page_path: '/offres' }); trackDemoClick("demo_hero"); navigate('/demo'); }}>
+              <Play className="w-5 h-5 mr-2" />
+              Voir la démonstration complète
             </Button>
           </motion.div>
-          <motion.p variants={fadeUp} custom={3.5} className="mb-1">
+
+          <motion.p variants={fadeUp} custom={3.5} className="text-sm text-muted-foreground mb-2">
+            Déjà utilisé par des auteurs indépendants pour générer leurs premiers ebooks.
+          </motion.p>
+          <motion.p variants={fadeUp} custom={3.6} className="mb-1">
             <a href="https://www.amazon.fr/Mr-Georges-Boubet/e/B0CGVLHNX7" target="_blank" rel="noopener noreferrer" className="text-sm sm:text-base font-medium text-muted-foreground hover:text-primary transition-colors">
               📚 Ebooks publiés en conditions réelles — voir ma page auteur Amazon
             </a>
           </motion.p>
-          <motion.p variants={fadeUp} custom={3.6} className="text-xs text-muted-foreground mb-4 sm:mb-5">
-            Démo réelle — ebook créé en conditions réelles
-          </motion.p>
-
-          <motion.div variants={fadeUp} custom={4} className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-xs sm:text-sm text-muted-foreground">
-            <span>✔️ Utilisé pour créer des ebooks avec l'IA</span>
-            <span>✔️ Pensé pour les auteurs KDP et créateurs de contenu</span>
-          </motion.div>
         </motion.div>
       </section>
 
