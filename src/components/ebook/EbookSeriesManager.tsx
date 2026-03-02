@@ -398,26 +398,29 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
   const [isDraftHydrated, setIsDraftHydrated] = useState(false);
   
 
-  // Restore local draft on mount (prevents data loss on refresh)
+  // Restore local draft on mount, then reconcile with DB if needed
   useEffect(() => {
     if (typeof window === 'undefined') {
       setIsDraftHydrated(true);
       return;
     }
 
+    let restoredSeriesId: string | null = null;
+    let draftHadContent = false;
+
     try {
       const raw = localStorage.getItem(SERIES_DRAFT_KEY);
       if (raw) {
         const parsed = JSON.parse(raw);
         const normalizedDraft = normalizeSeriesBible(parsed?.seriesBible);
-        const draftHasContent = hasMeaningfulSeriesData(normalizedDraft);
+        draftHadContent = hasMeaningfulSeriesData(normalizedDraft);
 
-        if (draftHasContent) {
+        if (draftHadContent) {
           setSeriesBible(normalizedDraft);
-          
         }
 
         if (typeof parsed?.currentSeriesId === 'string' && parsed.currentSeriesId.trim()) {
+          restoredSeriesId = parsed.currentSeriesId;
           setCurrentSeriesId(parsed.currentSeriesId);
         }
 
@@ -437,6 +440,55 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
       console.warn('Impossible de restaurer le brouillon de série:', error);
     } finally {
       setIsDraftHydrated(true);
+    }
+
+    // If we have a series ID but no meaningful draft content, reload from DB
+    if (restoredSeriesId && !draftHadContent) {
+      console.log('📥 [SeriesManager] Draft vide mais ID trouvé, rechargement depuis la base...');
+      (async () => {
+        try {
+          const { data, error } = await supabase
+            .from('series_bibles')
+            .select('*')
+            .eq('id', restoredSeriesId!)
+            .single();
+
+          if (error || !data) {
+            console.warn('Impossible de recharger la série depuis la base:', error);
+            return;
+          }
+
+          let genres: string[] = [];
+          if (data.genre) {
+            if (Array.isArray(data.genre)) {
+              genres = data.genre as string[];
+            } else if (typeof data.genre === 'string') {
+              genres = data.genre.split(',').map((g: string) => g.trim()).filter(Boolean);
+            }
+          }
+
+          const loadedBible = normalizeSeriesBible({
+            seriesTitle: data.title,
+            authorName: (data as any).author_name || '',
+            genres,
+            ageCategory: (data as any).age_category || 'adult',
+            totalTomes: data.total_tomes || 3,
+            synopsis: data.narrative_style || '',
+            themes: extractItems<string>(data.main_themes),
+            characters: extractItems<unknown>(data.characters),
+            locations: extractItems<unknown>(data.locations),
+            timeline: extractItems<unknown>(data.timeline),
+            tomes: extractItems<unknown>(data.tomes),
+            writingRules: data.world_rules || '',
+            plotThreads: extractItems<unknown>(data.plot_threads)
+          });
+
+          setSeriesBible(loadedBible);
+          console.log('✅ [SeriesManager] Série rechargée depuis la base avec', loadedBible.tomes.length, 'tomes');
+        } catch (err) {
+          console.error('Erreur rechargement série:', err);
+        }
+      })();
     }
   }, []);
 
