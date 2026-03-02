@@ -41,6 +41,7 @@ import ResultatEn5MinPage from './pages/ResultatEn5MinPage';
 import CadeauPage from './pages/CadeauPage';
 import ChecklistTournagePage from './pages/ChecklistTournagePage';
 import BDStudioPage from './pages/BDStudioPage';
+import SeriesTomesPage from './pages/SeriesTomesPage';
 import { SubscriptionAuth } from '@/components/SubscriptionAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { SubscriberGate } from '@/components/auth/SubscriberGate';
@@ -303,6 +304,19 @@ const App = () => {
                     isDemo={false}
                     isAdmin={isAdmin}
                   />
+                </SubscriberGate>
+              }
+            />
+            <Route
+              path="/series-tomes"
+              element={
+                <SubscriberGate
+                  isAdmin={isAdmin}
+                  subscriberEmail={subscriberEmail}
+                  subscriberData={subscriberData}
+                  onInvalid={handleLogout}
+                >
+                  <SeriesTomesPage />
                 </SubscriberGate>
               }
             />

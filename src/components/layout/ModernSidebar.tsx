@@ -55,7 +55,8 @@ import {
   Info,
   BarChart3,
   Ruler,
-  Monitor
+  Monitor,
+  Library
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -154,6 +155,7 @@ const categories: Category[] = [
       { id: 'aichat', label: '💬 Assistant IA', icon: Bot },
       { id: 'characters', label: '👥 Personnages', icon: Users },
       { id: 'series', label: '📚 Série / Saga', icon: BookCopy },
+      { id: 'series-tomes', label: '📖 Tomes de Séries', icon: Library, isLink: true, href: '/series-tomes', isNew: true },
       { id: 'voice', label: '🎤 Dictée Vocale', icon: Volume2 },
     ]
   },

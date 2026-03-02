@@ -2558,10 +2558,21 @@ RÈGLES STRICTES:
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center gap-2">
-                    <BookOpen className="h-5 w-5" />
-                    Tomes de la série
-                  </CardTitle>
+                  <div className="flex items-center gap-2">
+                    <CardTitle className="flex items-center gap-2">
+                      <BookOpen className="h-5 w-5" />
+                      Tomes de la série
+                    </CardTitle>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => navigate('/series-tomes')}
+                      className="ml-2 text-xs"
+                    >
+                      <FolderOpen className="h-3.5 w-3.5 mr-1" />
+                      Voir tous mes tomes
+                    </Button>
+                  </div>
                   <div className="flex items-center gap-2">
                     <Label className="text-sm whitespace-nowrap">Mots/chapitre:</Label>
                     <Select 
