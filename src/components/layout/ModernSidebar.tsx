@@ -215,6 +215,7 @@ const categories: Category[] = [
       { id: 'pdf-reformatter', label: '📐 Reformateur PDF', icon: FileEdit, isNew: true },
       { id: 'pdf-analyzer', label: '📏 Analyseur PDF', icon: Ruler, isNew: true },
       { id: 'amazon-simulator', label: '👀 Simulateur Amazon', icon: Eye },
+      { id: 'kdp-keywords', label: '🔥 Mots-Clés KDP Pro', icon: Search, isLink: true, href: '/kdp-keywords', isNew: true },
       { id: 'kdp-research', label: '🔍 Recherche Niche', icon: Search },
       { id: 'kdp-explosive', label: '💥 Simulateur Explosif', icon: Zap, isNew: true },
       { id: 'price-studio', label: '💰 Price Master', icon: TrendingUp, isNew: true },
