@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { 
   BookOpen, Tag, Globe, TrendingUp, DollarSign, 
   Star, Users, Target, Calendar, BarChart3, Sparkles,
-  CheckCircle, Quote, Zap
+  CheckCircle, Quote, Zap, Search, ExternalLink
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSubscriptionGeneration, Chapter } from '@/hooks/useSubscriptionGeneration';
@@ -40,6 +41,7 @@ export const EbookKdpTools: React.FC<EbookKdpToolsProps> = ({
   targetAudience,
   bookSummary
 }) => {
+  const navigate = useNavigate();
   const { 
     isGenerating,
     generateKDPDescription, 
@@ -203,6 +205,26 @@ export const EbookKdpTools: React.FC<EbookKdpToolsProps> = ({
               </SelectContent>
             </Select>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Lien vers Recherche Mots-Clés Pro */}
+      <Card className="border-2 border-orange-200/60 dark:border-orange-800/30 bg-gradient-to-r from-orange-500/5 to-rose-500/5 dark:from-orange-500/10 dark:to-rose-500/10">
+        <CardContent className="p-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">🔥</span>
+            <div>
+              <h4 className="font-bold text-foreground">Mots-Clés KDP Pro</h4>
+              <p className="text-sm text-muted-foreground">Recherche avancée avec volumes, difficulté et score d'opportunité</p>
+            </div>
+          </div>
+          <Button
+            onClick={() => navigate(`/kdp-keywords?title=${encodeURIComponent(ebookTitle)}`)}
+            className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white"
+          >
+            <Search className="w-4 h-4 mr-2" /> Rechercher pour "{ebookTitle}"
+            <ExternalLink className="w-3.5 h-3.5 ml-2" />
+          </Button>
         </CardContent>
       </Card>
 
