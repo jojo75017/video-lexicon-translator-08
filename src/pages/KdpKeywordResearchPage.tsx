@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft, Search, TrendingUp, Copy, Download, Sparkles, Target, BarChart3, Zap, ChevronUp, ChevronDown, Minus, Star } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -24,7 +24,8 @@ interface KdpKeyword {
 
 const KdpKeywordResearchPage: React.FC = () => {
   const navigate = useNavigate();
-  const [seedKeyword, setSeedKeyword] = useState('');
+  const [searchParams] = useSearchParams();
+  const [seedKeyword, setSeedKeyword] = useState(searchParams.get('title') || '');
   const [keywords, setKeywords] = useState<KdpKeyword[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedKeywords, setSelectedKeywords] = useState<Set<string>>(new Set());
