@@ -42,6 +42,7 @@ import CadeauPage from './pages/CadeauPage';
 import ChecklistTournagePage from './pages/ChecklistTournagePage';
 import BDStudioPage from './pages/BDStudioPage';
 import SeriesTomesPage from './pages/SeriesTomesPage';
+import KdpKeywordResearchPage from './pages/KdpKeywordResearchPage';
 import { SubscriptionAuth } from '@/components/SubscriptionAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { SubscriberGate } from '@/components/auth/SubscriberGate';
@@ -304,6 +305,19 @@ const App = () => {
                     isDemo={false}
                     isAdmin={isAdmin}
                   />
+                </SubscriberGate>
+              }
+            />
+            <Route
+              path="/kdp-keywords"
+              element={
+                <SubscriberGate
+                  isAdmin={isAdmin}
+                  subscriberEmail={subscriberEmail}
+                  subscriberData={subscriberData}
+                  onInvalid={handleLogout}
+                >
+                  <KdpKeywordResearchPage />
                 </SubscriberGate>
               }
             />
