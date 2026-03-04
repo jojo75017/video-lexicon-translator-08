@@ -707,7 +707,7 @@ const SalesPage = () => {
               <div className="relative z-10 p-8 md:p-10">
                 {isVipAvailable && (
                   <Badge className="bg-gradient-to-r from-violet-600 to-purple-600 text-white border-0 mb-6 px-4 py-1.5 text-sm font-bold">
-                    🔥 OFFRE FONDATEUR — Jusqu'au 30 avril
+                    🔥 OFFRE FONDATEUR — Jusqu'au 30 juin
                   </Badge>
                 )}
 
