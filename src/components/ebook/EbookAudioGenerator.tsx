@@ -13,12 +13,14 @@ import {
   Headphones, Music, Mic2, BookOpen, FileText, GraduationCap,
   SkipForward, SkipBack, ListOrdered, FileDown, Timer, RotateCcw,
   Bookmark, BookmarkCheck, Eye, EyeOff, ChevronDown, ChevronUp,
-  Download, Repeat, Shuffle
+  Download, Repeat, Shuffle, FileAudio
 } from 'lucide-react';
 import { toast } from 'sonner';
 import jsPDF from 'jspdf';
 import { Document, Packer, Paragraph, TextRun, HeadingLevel } from 'docx';
 import { saveAs } from 'file-saver';
+import JSZip from 'jszip';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Chapter {
   id: string;
@@ -91,7 +93,9 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
   const [customText, setCustomText] = useState('');
   const [isGeneratingCustom, setIsGeneratingCustom] = useState(false);
   const [isExportingScript, setIsExportingScript] = useState(false);
-
+  const [isGeneratingMp3, setIsGeneratingMp3] = useState(false);
+  const [mp3Progress, setMp3Progress] = useState(0);
+  const [mp3ProgressLabel, setMp3ProgressLabel] = useState('');
   // Timer
   useEffect(() => {
     if (isSpeaking && isPlaying) {
@@ -453,7 +457,117 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
     toast.success('Formation exportée en PDF !');
   };
 
-  // Voice config shared component
+  // Generate MP3 for a single section via ElevenLabs
+  const generateSectionMp3 = async (text: string): Promise<Blob | null> => {
+    const { data: sessionData } = await supabase.auth.getSession();
+    const token = sessionData?.session?.access_token;
+    if (!token) {
+      toast.error('Vous devez être connecté pour exporter en MP3');
+      return null;
+    }
+
+    // Split text into chunks of 5000 chars max
+    const chunks: string[] = [];
+    let remaining = text;
+    while (remaining.length > 0) {
+      chunks.push(remaining.substring(0, 5000));
+      remaining = remaining.substring(5000);
+    }
+
+    const audioBlobs: Blob[] = [];
+    for (const chunk of chunks) {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ text: chunk }),
+        }
+      );
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({ error: 'Erreur inconnue' }));
+        throw new Error(err.error || `Erreur ${response.status}`);
+      }
+
+      const data = await response.json();
+      const audioUrl = `data:audio/mpeg;base64,${data.audioContent}`;
+      const audioResponse = await fetch(audioUrl);
+      audioBlobs.push(await audioResponse.blob());
+    }
+
+    return new Blob(audioBlobs, { type: 'audio/mpeg' });
+  };
+
+  // Export a single section as MP3
+  const exportSectionMp3 = async (section: AudioSection) => {
+    setIsGeneratingMp3(true);
+    setMp3ProgressLabel(section.title);
+    setMp3Progress(10);
+    try {
+      const blob = await generateSectionMp3(section.content);
+      if (blob) {
+        const filename = `${(section.title || 'section').replace(/[^a-zA-Z0-9àâéèêëïîôùûüç\s-]/gi, '').replace(/\s+/g, '-')}.mp3`;
+        saveAs(blob, filename);
+        toast.success(`MP3 exporté : ${section.title}`);
+      }
+    } catch (error: any) {
+      console.error('MP3 export error:', error);
+      toast.error(`Erreur export MP3 : ${error.message}`);
+    } finally {
+      setIsGeneratingMp3(false);
+      setMp3Progress(0);
+      setMp3ProgressLabel('');
+    }
+  };
+
+  // Export all sections as a ZIP of MP3 files
+  const exportAllMp3 = async () => {
+    const sections = prepareSections();
+    if (sections.length === 0) {
+      toast.error('Aucun contenu à exporter');
+      return;
+    }
+
+    setIsGeneratingMp3(true);
+    setMp3Progress(0);
+
+    try {
+      const zip = new JSZip();
+      
+      for (let i = 0; i < sections.length; i++) {
+        const section = sections[i];
+        setMp3ProgressLabel(`${i + 1}/${sections.length} — ${section.title}`);
+        setMp3Progress(Math.round(((i) / sections.length) * 100));
+        
+        const blob = await generateSectionMp3(section.content);
+        if (blob) {
+          const filename = `${String(i + 1).padStart(2, '0')}-${(section.title || 'section').replace(/[^a-zA-Z0-9àâéèêëïîôùûüç\s-]/gi, '').replace(/\s+/g, '-')}.mp3`;
+          zip.file(filename, blob);
+        }
+      }
+
+      setMp3ProgressLabel('Création du ZIP...');
+      setMp3Progress(95);
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      const zipName = `audiobook-${(ebookTitle || 'ebook').replace(/\s+/g, '-')}.zip`;
+      saveAs(zipBlob, zipName);
+      toast.success(`Audiobook exporté ! ${sections.length} fichiers MP3`);
+    } catch (error: any) {
+      console.error('MP3 batch export error:', error);
+      toast.error(`Erreur export MP3 : ${error.message}`);
+    } finally {
+      setIsGeneratingMp3(false);
+      setMp3Progress(0);
+      setMp3ProgressLabel('');
+    }
+  };
+
+
   const VoiceConfig = ({ compact = false }: { compact?: boolean }) => (
     <Card className="bg-muted/30">
       <CardContent className="pt-4 space-y-4">
@@ -547,7 +661,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                 <Badge variant="secondary" className="ml-2 bg-emerald-500/20 text-emerald-700">Gratuit</Badge>
               </CardTitle>
               <CardDescription>
-                Écoutez votre ebook, naviguez entre les sections, exportez en PDF/Word
+                Écoutez votre ebook, exportez en MP3 pour votre bibliothèque audio
               </CardDescription>
             </div>
             <div className="flex gap-2">
@@ -917,13 +1031,89 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                 </CardContent>
               </Card>
 
+              {/* Export MP3 */}
+              <Card className="border-2 border-primary/40 bg-gradient-to-br from-primary/5 to-primary/10">
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <FileAudio className="h-5 w-5 text-primary" />
+                    Exporter en MP3 (Audiobook)
+                    <Badge variant="secondary" className="ml-2">ElevenLabs</Badge>
+                  </CardTitle>
+                  <CardDescription>
+                    Générez des fichiers MP3 haute qualité pour votre bibliothèque audio (type Audible)
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Button
+                      onClick={exportAllMp3}
+                      disabled={isGeneratingMp3 || totalWords === 0}
+                      className="flex-1 h-12 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+                      size="lg"
+                    >
+                      {isGeneratingMp3 ? (
+                        <><Loader2 className="h-5 w-5 mr-2 animate-spin" />Génération MP3...</>
+                      ) : (
+                        <><Download className="h-5 w-5 mr-2" />Exporter tout en MP3 (ZIP)</>
+                      )}
+                    </Button>
+                  </div>
+
+                  {isGeneratingMp3 && (
+                    <div className="space-y-2">
+                      <Progress value={mp3Progress} className="h-3" />
+                      <p className="text-sm text-center text-muted-foreground">
+                        {mp3ProgressLabel} — {mp3Progress}%
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Individual section export */}
+                  {audioSections.length > 0 && !isGeneratingMp3 && (
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">Ou exportez section par section :</Label>
+                      <div className="max-h-[300px] overflow-y-auto space-y-1">
+                        {audioSections.map((section, idx) => (
+                          <div key={section.id} className="flex items-center justify-between p-2 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+                            <div className="min-w-0 flex-1">
+                              <p className="text-sm font-medium truncate">{idx + 1}. {section.title}</p>
+                              <p className="text-xs text-muted-foreground">{section.wordCount} mots • ~{section.estimatedMinutes} min</p>
+                            </div>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => exportSectionMp3(section)}
+                              disabled={isGeneratingMp3}
+                              className="ml-2 flex-shrink-0"
+                            >
+                              <Download className="h-3.5 w-3.5 mr-1" />
+                              MP3
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="p-3 bg-muted/30 border border-border rounded-lg text-sm text-muted-foreground">
+                    <p className="font-medium mb-1">🎧 Idéal pour votre bibliothèque</p>
+                    <ul className="space-y-1 text-xs">
+                      <li>• Voix professionnelle IA haute qualité (ElevenLabs)</li>
+                      <li>• Fichiers MP3 prêts pour Audible, votre site, ou toute plateforme</li>
+                      <li>• Export ZIP avec tous les chapitres numérotés</li>
+                      <li>• Compatible avec tous les lecteurs audio</li>
+                    </ul>
+                  </div>
+                </CardContent>
+              </Card>
+
               <Card className="bg-gradient-to-r from-amber-50/50 to-orange-50/50 dark:from-amber-950/20 dark:to-orange-950/20">
                 <CardContent className="p-4">
                   <h4 className="font-medium mb-2">💡 Conseils d'export</h4>
                   <ul className="text-sm text-muted-foreground space-y-1">
                     <li>• Le <strong>PDF</strong> est idéal pour l'impression et l'archivage</li>
                     <li>• Le <strong>Word</strong> permet de modifier le texte facilement</li>
-                    <li>• Le script inclut le nombre de mots et la durée estimée par section</li>
+                    <li>• Le <strong>MP3</strong> crée un vrai audiobook pour votre bibliothèque</li>
                     <li>• Relisez le script avant de créer votre version audio finale</li>
                   </ul>
                 </CardContent>
