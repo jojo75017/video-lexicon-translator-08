@@ -48,6 +48,8 @@ import BDStudioPage from './pages/BDStudioPage';
 import SeriesTomesPage from './pages/SeriesTomesPage';
 import ForumPage from './pages/ForumPage';
 import KdpKeywordResearchPage from './pages/KdpKeywordResearchPage';
+import PublicAudiobookPage from './pages/PublicAudiobookPage';
+import AudiobookEmbedPage from './pages/AudiobookEmbedPage';
 import { SubscriptionAuth } from '@/components/SubscriptionAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { SubscriberGate } from '@/components/auth/SubscriberGate';
@@ -431,6 +433,10 @@ const App = () => {
                 )
               }
             />
+            
+            {/* Public audiobook routes */}
+            <Route path="/audiobook/:slug" element={<PublicAudiobookPage />} />
+            <Route path="/audiobook-embed/:slug" element={<AudiobookEmbedPage />} />
             
             {/* SaaS Routes */}
             <Route path="/saas/login" element={<SaasAuthPage />} />

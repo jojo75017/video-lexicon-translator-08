@@ -14,6 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
+      audiobooks: {
+        Row: {
+          audio_url: string | null
+          author_name: string | null
+          cover_url: string | null
+          created_at: string
+          description: string | null
+          duration_seconds: number | null
+          id: string
+          is_public: boolean
+          play_count: number
+          slug: string | null
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+          voice_name: string | null
+        }
+        Insert: {
+          audio_url?: string | null
+          author_name?: string | null
+          cover_url?: string | null
+          created_at?: string
+          description?: string | null
+          duration_seconds?: number | null
+          id?: string
+          is_public?: boolean
+          play_count?: number
+          slug?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+          voice_name?: string | null
+        }
+        Update: {
+          audio_url?: string | null
+          author_name?: string | null
+          cover_url?: string | null
+          created_at?: string
+          description?: string | null
+          duration_seconds?: number | null
+          id?: string
+          is_public?: boolean
+          play_count?: number
+          slug?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+          voice_name?: string | null
+        }
+        Relationships: []
+      }
       book_tracking_history: {
         Row: {
           book_id: string
