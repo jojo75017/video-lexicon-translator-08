@@ -164,7 +164,13 @@ const SalesPage = () => {
   useEffect(() => {
     if (location.hash) {
       const id = location.hash.replace('#', '');
-      setTimeout(() => { document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
+      setTimeout(() => {
+        const el = document.getElementById(id);
+        if (el) {
+          const y = el.getBoundingClientRect().top + window.scrollY - 20;
+          window.scrollTo({ top: y, behavior: 'smooth' });
+        }
+      }, 300);
     }
   }, [location.hash]);
 
@@ -474,11 +480,11 @@ const SalesPage = () => {
                   ))}
                 </div>
 
-                <Button size="lg" className="w-full py-7 text-lg font-bold bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-xl shadow-violet-500/25 hover:shadow-2xl transition-all duration-300 rounded-xl"
+                <Button size="lg" className="w-full py-8 text-xl font-extrabold bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-2xl shadow-violet-500/30 hover:shadow-violet-500/50 transition-all duration-300 rounded-xl animate-pulse hover:animate-none hover:scale-[1.02]"
                   onClick={handlePlanClick}>
-                  <Rocket className="w-5 h-5 mr-2" />
-                  Débloquer l'accès {isVipAvailable ? 'fondateur' : 'Pro'} — {price}€
-                  <ArrowRight className="w-5 h-5 ml-2" />
+                  <Rocket className="w-6 h-6 mr-2" />
+                  {isVipAvailable ? '🔥 Accès Fondateur — 37€ à vie' : `Débloquer l'accès Pro — ${price}€`}
+                  <ArrowRight className="w-6 h-6 ml-2" />
                 </Button>
 
                 {isVipAvailable && (
