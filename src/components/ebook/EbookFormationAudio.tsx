@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Download, Eye, ChevronLeft, ChevronRight, Headphones, BookOpen, Mic, Volume2, Settings, Zap, HelpCircle, Share2 } from 'lucide-react';
+import { Download, Headphones, BookOpen, Mic, Volume2, Settings, Zap, HelpCircle, Share2, ChevronDown, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 import jsPDF from 'jspdf';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 const audioModules = [
   { 
@@ -13,488 +13,301 @@ const audioModules = [
     title: "Introduction au Générateur Audio", 
     description: "Vue d'ensemble et technologie ElevenLabs",
     icon: Headphones,
-    color: "from-purple-500 to-violet-500"
+    color: "from-purple-500 to-violet-500",
+    content: [
+      {
+        subtitle: "🎧 Présentation",
+        text: "Le générateur de livres audio utilise la technologie ElevenLabs pour transformer vos textes en audio haute définition avec des voix ultra-réalistes. C'est l'outil idéal pour créer des audiobooks professionnels à partir de vos ebooks."
+      },
+      {
+        subtitle: "✨ Fonctionnalités principales",
+        items: [
+          "Aucune limite de caractères : Textes découpés automatiquement en segments de 5000 caractères",
+          "Assemblage automatique : Fusion intelligente en un seul fichier audio continu",
+          "Qualité HD : Audio MP3 professionnel 44.1kHz, 128kbps",
+          "20 voix disponibles : 9 féminines et 11 masculines, toutes en qualité studio",
+          "Multi-langue : Modèle multilingue v2 pour une prononciation parfaite du français"
+        ]
+      },
+      {
+        subtitle: "🚀 Avantages clés",
+        items: [
+          "Pas besoin de studio d'enregistrement ni de narrateur professionnel",
+          "Génération en quelques secondes par section",
+          "Résultat professionnel prêt pour la distribution",
+          "Coût réduit comparé à un enregistrement traditionnel (500-5000€)"
+        ]
+      }
+    ]
   },
   { 
     id: 2, 
     title: "Les 20 Voix Disponibles", 
     description: "Catalogue complet des voix féminines et masculines",
     icon: Mic,
-    color: "from-pink-500 to-rose-500"
+    color: "from-pink-500 to-rose-500",
+    content: [
+      {
+        subtitle: "👩 Voix Féminines (9)",
+        items: [
+          "Aria — Claire et polyvalente ✓ Pour enfants",
+          "Sarah — Douce et narrative ✓ Pour enfants",
+          "Laura — Chaleureuse et engageante ✓ Pour enfants",
+          "Charlotte — Britannique élégante",
+          "Alice — Britannique confiante",
+          "Matilda — Chaleureuse et américaine ✓ Pour enfants",
+          "Jessica — Expressive et américaine",
+          "Lily — Britannique narrative ✓ Pour enfants",
+          "River — Non-binaire américain"
+        ]
+      },
+      {
+        subtitle: "👨 Voix Masculines (11)",
+        items: [
+          "Roger — Profonde et autoritaire (Business, Thriller)",
+          "Charlie — Australien décontracté (Podcast, Blog)",
+          "George — Britannique chaleureux ✓ Pour enfants",
+          "Callum — Transatlantique (Documentaire)",
+          "Liam — Américain articulé ✓ Pour enfants",
+          "Will — Américain amical ✓ Pour enfants",
+          "Eric — Américain amical (Guide pratique)",
+          "Chris — Américain décontracté (Podcast)",
+          "Brian — Américain profond (Non-fiction)",
+          "Daniel — Britannique autoritaire (Business)",
+          "Bill — Américain fiable (Formation)"
+        ]
+      },
+      {
+        subtitle: "💡 Conseil",
+        text: "Testez toujours 2-3 voix sur un extrait de votre texte avant de générer l'intégralité du livre audio. Chaque voix a une personnalité unique qui convient mieux à certains genres."
+      }
+    ]
   },
   { 
     id: 3, 
     title: "Types de Contenu Audio", 
     description: "Sections, ebook complet et texte personnalisé",
     icon: BookOpen,
-    color: "from-blue-500 to-cyan-500"
+    color: "from-blue-500 to-cyan-500",
+    content: [
+      {
+        subtitle: "📚 Option A : Sections prédéfinies",
+        text: "Générez l'audio section par section à partir de votre ebook. Chaque chapitre, la préface et la conclusion sont convertis individuellement pour un contrôle précis.",
+        items: ["Préface et introduction", "Chapitres individuels avec sous-chapitres", "Conclusion et épilogue", "Lecture séquentielle automatique"]
+      },
+      {
+        subtitle: "📖 Option B : Ebook complet",
+        text: "Collez l'intégralité de votre texte et laissez le système le découper intelligemment en segments. Idéal pour les textes déjà finalisés.",
+        items: ["Découpage automatique aux fins de phrases", "Aucune perte de contexte entre les segments", "Assemblage transparent"]
+      },
+      {
+        subtitle: "✏️ Option C : Texte personnalisé",
+        text: "Idéal pour tester une voix, générer un extrait promotionnel ou créer un audio à partir d'un texte libre. Pas besoin d'avoir un ebook complet."
+      }
+    ]
   },
   { 
     id: 4, 
     title: "Guide d'Utilisation Étape par Étape", 
     description: "De l'accès au téléchargement final",
     icon: Zap,
-    color: "from-amber-500 to-orange-500"
+    color: "from-amber-500 to-orange-500",
+    content: [
+      {
+        subtitle: "Étape 1 — Accéder au générateur",
+        text: "Ouvrez votre projet ebook depuis le générateur, puis cliquez sur l'onglet « Audio ». Le contenu de votre ebook est automatiquement chargé."
+      },
+      {
+        subtitle: "Étape 2 — Choisir le type de contenu",
+        text: "Sélectionnez entre les sections prédéfinies (préface, chapitres, conclusion), l'ebook complet ou un texte personnalisé."
+      },
+      {
+        subtitle: "Étape 3 — Sélectionner une voix",
+        text: "Parcourez les 20 voix disponibles. Filtrez par genre (féminin/masculin) ou par compatibilité enfants. Écoutez un aperçu si possible."
+      },
+      {
+        subtitle: "Étape 4 — Générer l'audio",
+        text: "Cliquez sur « Générer ». Le texte est découpé automatiquement en segments de 5000 caractères maximum. Chaque segment prend 1-2 secondes."
+      },
+      {
+        subtitle: "Étape 5 — Écouter et télécharger",
+        text: "Utilisez le lecteur intégré pour écouter le résultat. Téléchargez en MP3 haute qualité. Vous pouvez aussi mettre en ligne votre livre audio directement depuis la plateforme."
+      }
+    ]
   },
   { 
     id: 5, 
     title: "Optimisation de la Qualité Audio", 
     description: "Ponctuation, structure et bonnes pratiques",
     icon: Settings,
-    color: "from-green-500 to-emerald-500"
+    color: "from-green-500 to-emerald-500",
+    content: [
+      {
+        subtitle: "📝 Ponctuation correcte",
+        items: [
+          "Points (.) = pauses longues et naturelles",
+          "Virgules (,) = pauses courtes pour reprendre son souffle",
+          "Points de suspension (...) = pauses dramatiques ou hésitations",
+          "Points d'exclamation (!) = emphase et émotion",
+          "Points d'interrogation (?) = intonation montante naturelle"
+        ]
+      },
+      {
+        subtitle: "📄 Structure du texte",
+        items: [
+          "Paragraphes courts et logiques (3-5 phrases)",
+          "Phrases de moins de 50 mots pour une diction claire",
+          "Utilisez des tirets (—) pour les dialogues",
+          "Évitez les parenthèses longues qui cassent le rythme"
+        ]
+      },
+      {
+        subtitle: "⚠️ À éviter absolument",
+        items: [
+          "Émojis (non prononcés, créent des silences)",
+          "Abréviations ambiguës (écrivez « Monsieur » pas « M. »)",
+          "URLs et adresses email (décrivez-les plutôt)",
+          "Tableaux et listes à puces (reformulez en prose)",
+          "Caractères spéciaux (@, #, %, etc.)"
+        ]
+      }
+    ]
   },
   { 
     id: 6, 
     title: "Choisir la Bonne Voix", 
     description: "Recommandations par type de contenu",
     icon: Volume2,
-    color: "from-indigo-500 to-purple-500"
+    color: "from-indigo-500 to-purple-500",
+    content: [
+      {
+        subtitle: "🎭 Recommandations par genre",
+        items: [
+          "Roman / Fiction → Sarah, Lily, George (voix narratives et immersives)",
+          "Guide pratique / How-to → Aria, Brian, Liam (voix claires et articulées)",
+          "Livre pour enfants → Matilda, Will, George (voix chaleureuses et rassurantes)",
+          "Business / Non-fiction → Roger, Daniel, Charlotte (voix autoritaires et crédibles)",
+          "Podcast / Blog → Charlie, Jessica, Chris (voix décontractées et engageantes)",
+          "Thriller / Suspense → Roger, Daniel (voix profondes et captivantes)",
+          "Romance → Sarah, Laura, Charlotte (voix douces et émotionnelles)",
+          "Développement personnel → Aria, Liam, Matilda (voix inspirantes)"
+        ]
+      },
+      {
+        subtitle: "🎯 Règle d'or",
+        text: "La voix doit correspondre à votre audience cible, pas à vos préférences personnelles. Un livre pour ados de 14 ans ne devrait pas avoir la voix grave de Roger, même si vous l'aimez bien !"
+      }
+    ]
   },
   { 
     id: 7, 
     title: "Spécifications Techniques", 
     description: "Limites, capacités et temps de génération",
     icon: Settings,
-    color: "from-slate-500 to-gray-500"
+    color: "from-slate-500 to-gray-500",
+    content: [
+      {
+        subtitle: "⚙️ Capacités techniques",
+        items: [
+          "Limite par requête : 5000 caractères (découpage automatique)",
+          "Découpage intelligent aux fins de phrases (pas de coupure en plein mot)",
+          "Format de sortie : MP3 haute qualité (44.1kHz, 128kbps)",
+          "Modèle IA : ElevenLabs Multilingual v2",
+          "Stockage cloud inclus pour mise en ligne"
+        ]
+      },
+      {
+        subtitle: "⏱️ Temps de génération estimés",
+        items: [
+          "< 5 000 caractères → 2-5 secondes",
+          "10 000 caractères → 5-10 secondes",
+          "50 000 caractères → 30-60 secondes",
+          "100 000 caractères → 1-2 minutes",
+          "Livre complet (200 pages) → 3-5 minutes"
+        ]
+      },
+      {
+        subtitle: "📊 Équivalences",
+        text: "1 page standard ≈ 2000 caractères ≈ 300 mots ≈ 2 minutes d'audio. Un livre de 200 pages = environ 6-7 heures d'écoute."
+      }
+    ]
   },
   { 
     id: 8, 
     title: "FAQ et Résolution des Problèmes", 
     description: "Questions fréquentes et solutions",
     icon: HelpCircle,
-    color: "from-red-500 to-pink-500"
+    color: "from-red-500 to-pink-500",
+    content: [
+      {
+        subtitle: "❓ Questions fréquentes",
+        items: [
+          "Q: Puis-je générer un livre audio complet ? → Oui ! Le découpage et l'assemblage sont automatiques.",
+          "Q: L'audio est-il professionnel ? → Oui, qualité studio ElevenLabs, identique aux audiobooks commerciaux.",
+          "Q: Comment améliorer la prononciation ? → Écrivez phonétiquement. Ex: « Lovable » → « Loveabeul ».",
+          "Q: Puis-je changer de voix en cours de route ? → Oui, mais gardez la même voix pour la cohérence.",
+          "Q: Les droits d'utilisation ? → Vous êtes propriétaire de l'audio généré, usage commercial inclus."
+        ]
+      },
+      {
+        subtitle: "🔧 Problèmes courants et solutions",
+        items: [
+          "L'audio ne se génère pas → Vérifiez votre connexion internet et réessayez",
+          "Qualité médiocre → Essayez une autre voix, vérifiez la ponctuation du texte",
+          "Prononciation incorrecte → Réécrivez le mot phonétiquement",
+          "Audio trop rapide → Ajoutez des pauses (points, virgules, points de suspension)",
+          "Coupure au milieu d'un mot → Le système coupe aux fins de phrases, vérifiez la ponctuation"
+        ]
+      }
+    ]
   },
   { 
     id: 9, 
-    title: "Distribution et Plateformes", 
-    description: "Audible, Apple Books, Spotify et plus",
+    title: "Distribution et Mise en Ligne", 
+    description: "Hébergement, partage et plateformes de distribution",
     icon: Share2,
-    color: "from-teal-500 to-cyan-500"
+    color: "from-teal-500 to-cyan-500",
+    content: [
+      {
+        subtitle: "🌐 Mise en ligne sur EbookStudio",
+        text: "Hébergez votre livre audio directement sur la plateforme ! Chaque audiobook obtient une page publique avec lecteur intégré et un code d'intégration pour l'embarquer sur votre site.",
+        items: [
+          "Page publique avec lecteur audio professionnel",
+          "Lien partageable sur les réseaux sociaux",
+          "Code embed pour intégrer le lecteur sur votre site",
+          "Statistiques de lecture (nombre d'écoutes)"
+        ]
+      },
+      {
+        subtitle: "📦 Distribution externe",
+        items: [
+          "Audible (Amazon) — La plus grande plateforme d'audiobooks",
+          "Apple Books — Écosystème Apple",
+          "Google Play Livres — Android et web",
+          "Kobo — International",
+          "Spotify (via distributeur type Findaway) — Streaming",
+          "Votre propre site web — Vente directe avec meilleure marge"
+        ]
+      },
+      {
+        subtitle: "🎯 Workflow recommandé",
+        text: "1. Finalisez votre texte → 2. Vérifiez la ponctuation → 3. Testez sur un extrait → 4. Choisissez la voix définitive → 5. Générez l'intégralité → 6. Mettez en ligne → 7. Distribuez et partagez !"
+      }
+    ]
   }
 ];
 
-const voicesFeminines = [
-  { name: "Aria", description: "Claire et polyvalente", forChildren: true },
-  { name: "Sarah", description: "Douce et narrative", forChildren: true },
-  { name: "Laura", description: "Chaleureuse et engageante", forChildren: true },
-  { name: "Charlotte", description: "Britannique élégante", forChildren: false },
-  { name: "Alice", description: "Britannique confiante", forChildren: false },
-  { name: "Matilda", description: "Chaleureuse et américaine", forChildren: true },
-  { name: "Jessica", description: "Expressive et américaine", forChildren: false },
-  { name: "Lily", description: "Britannique narrative", forChildren: true },
-  { name: "River", description: "Non-binaire américain", forChildren: false },
-];
-
-const voicesMasculines = [
-  { name: "Roger", description: "Profonde et autoritaire", forChildren: false },
-  { name: "Charlie", description: "Australien décontracté", forChildren: false },
-  { name: "George", description: "Britannique chaleureux", forChildren: true },
-  { name: "Callum", description: "Transatlantique", forChildren: false },
-  { name: "Liam", description: "Américain articulé", forChildren: true },
-  { name: "Will", description: "Américain amical", forChildren: true },
-  { name: "Eric", description: "Américain amical", forChildren: false },
-  { name: "Chris", description: "Américain décontracté", forChildren: false },
-  { name: "Brian", description: "Américain profond", forChildren: false },
-  { name: "Daniel", description: "Britannique autoritaire", forChildren: false },
-  { name: "Bill", description: "Américain fiable", forChildren: false },
-];
-
 export const EbookFormationAudio: React.FC = () => {
-  const [showPreview, setShowPreview] = useState(false);
-  const [previewPage, setPreviewPage] = useState(0);
-  const [selectedModule, setSelectedModule] = useState<number | null>(null);
+  const [openModules, setOpenModules] = useState<string[]>([]);
+  const [completedModules, setCompletedModules] = useState<number[]>([]);
 
-  const previewPages = [
-    {
-      title: "Page de Couverture",
-      content: (
-        <div className="bg-gradient-to-br from-purple-500/20 to-violet-500/10 h-full flex flex-col items-center justify-center p-8 rounded-lg">
-          <Headphones className="w-16 h-16 text-purple-500 mb-4" />
-          <h2 className="text-2xl font-bold text-center mb-4">Formation Complète</h2>
-          <h3 className="text-xl text-purple-600 dark:text-purple-400 mb-2">Générateur de Livres Audio</h3>
-          <p className="text-muted-foreground text-sm">Technologie ElevenLabs - 20 voix HD</p>
-        </div>
-      )
-    },
-    {
-      title: "Table des Matières",
-      content: (
-        <div className="p-6 h-full overflow-auto">
-          <h3 className="text-lg font-bold mb-4 border-b pb-2">TABLE DES MATIÈRES</h3>
-          <ul className="space-y-2 text-sm">
-            {audioModules.map((module, index) => (
-              <li key={module.id} className="flex gap-2">
-                <span className="font-semibold text-purple-600 dark:text-purple-400">Module {index + 1}:</span>
-                <span>{module.title}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )
-    },
-    // Module 1: Introduction
-    {
-      title: "Module 1: Introduction au Générateur Audio",
-      content: (
-        <div className="p-6 h-full overflow-auto">
-          <Badge className="mb-2 bg-gradient-to-r from-purple-500 to-violet-500">Module 1</Badge>
-          <h3 className="text-lg font-bold mb-2">INTRODUCTION AU GÉNÉRATEUR AUDIO</h3>
-          <p className="text-sm text-muted-foreground mb-4">Vue d'ensemble et technologie ElevenLabs</p>
-          
-          <div className="space-y-4 text-sm">
-            <div>
-              <h4 className="font-semibold mb-2">🎧 Présentation</h4>
-              <p className="text-muted-foreground">Le générateur de livres audio utilise la technologie ElevenLabs pour transformer vos textes en audio haute définition avec des voix ultra-réalistes.</p>
-            </div>
-            
-            <div>
-              <h4 className="font-semibold mb-2">✨ Fonctionnalités principales</h4>
-              <ul className="list-disc pl-4 space-y-1 text-muted-foreground">
-                <li><strong>Aucune limite de caractères</strong> : Textes découpés automatiquement</li>
-                <li><strong>Assemblage automatique</strong> : Fusion en un seul fichier audio</li>
-                <li><strong>Qualité HD</strong> : Audio MP3 professionnel</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      )
-    },
-    // Module 2: Les 20 Voix
-    {
-      title: "Module 2: Les 20 Voix Disponibles",
-      content: (
-        <div className="p-6 h-full overflow-auto">
-          <Badge className="mb-2 bg-gradient-to-r from-pink-500 to-rose-500">Module 2</Badge>
-          <h3 className="text-lg font-bold mb-2">LES 20 VOIX DISPONIBLES</h3>
-          
-          <div className="space-y-4 text-sm">
-            <div>
-              <h4 className="font-semibold mb-2">👩 Voix Féminines (9)</h4>
-              <div className="grid grid-cols-3 gap-1 text-xs">
-                {voicesFeminines.map(v => (
-                  <div key={v.name} className="p-1 bg-pink-50 dark:bg-pink-950/30 rounded">
-                    <span className="font-medium">{v.name}</span>
-                    {v.forChildren && <span className="text-green-500 ml-1">✓</span>}
-                  </div>
-                ))}
-              </div>
-            </div>
-            
-            <div>
-              <h4 className="font-semibold mb-2">👨 Voix Masculines (11)</h4>
-              <div className="grid grid-cols-3 gap-1 text-xs">
-                {voicesMasculines.map(v => (
-                  <div key={v.name} className="p-1 bg-blue-50 dark:bg-blue-950/30 rounded">
-                    <span className="font-medium">{v.name}</span>
-                    {v.forChildren && <span className="text-green-500 ml-1">✓</span>}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      )
-    },
-    // Module 3: Types de Contenu
-    {
-      title: "Module 3: Types de Contenu Audio",
-      content: (
-        <div className="p-6 h-full overflow-auto">
-          <Badge className="mb-2 bg-gradient-to-r from-blue-500 to-cyan-500">Module 3</Badge>
-          <h3 className="text-lg font-bold mb-2">TYPES DE CONTENU AUDIO</h3>
-          
-          <div className="space-y-4 text-sm">
-            <div className="p-3 border rounded-lg">
-              <h4 className="font-semibold mb-1">📚 Option A : Sections prédéfinies</h4>
-              <ul className="list-disc pl-4 text-muted-foreground text-xs">
-                <li>Préface</li>
-                <li>Chapitres individuels</li>
-                <li>Conclusion</li>
-              </ul>
-            </div>
-            
-            <div className="p-3 border rounded-lg">
-              <h4 className="font-semibold mb-1">📖 Option B : Ebook complet</h4>
-              <p className="text-muted-foreground text-xs">Collez l'intégralité de votre texte - découpage automatique</p>
-            </div>
-            
-            <div className="p-3 border rounded-lg">
-              <h4 className="font-semibold mb-1">✏️ Option C : Texte personnalisé</h4>
-              <p className="text-muted-foreground text-xs">Idéal pour des extraits ou tests</p>
-            </div>
-          </div>
-        </div>
-      )
-    },
-    // Module 4: Guide d'utilisation
-    {
-      title: "Module 4: Guide d'Utilisation",
-      content: (
-        <div className="p-6 h-full overflow-auto">
-          <Badge className="mb-2 bg-gradient-to-r from-amber-500 to-orange-500">Module 4</Badge>
-          <h3 className="text-lg font-bold mb-2">GUIDE D'UTILISATION ÉTAPE PAR ÉTAPE</h3>
-          
-          <div className="space-y-2 text-sm">
-            <div className="flex gap-3 items-start">
-              <span className="bg-amber-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs shrink-0">1</span>
-              <div>
-                <p className="font-medium">Accéder au générateur</p>
-                <p className="text-xs text-muted-foreground">Ouvrez votre projet → Onglet "Audio"</p>
-              </div>
-            </div>
-            <div className="flex gap-3 items-start">
-              <span className="bg-amber-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs shrink-0">2</span>
-              <div>
-                <p className="font-medium">Choisir le type de contenu</p>
-                <p className="text-xs text-muted-foreground">Sections, ebook complet ou texte libre</p>
-              </div>
-            </div>
-            <div className="flex gap-3 items-start">
-              <span className="bg-amber-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs shrink-0">3</span>
-              <div>
-                <p className="font-medium">Sélectionner une voix</p>
-                <p className="text-xs text-muted-foreground">Filtrez par genre ou "Pour enfants"</p>
-              </div>
-            </div>
-            <div className="flex gap-3 items-start">
-              <span className="bg-amber-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs shrink-0">4</span>
-              <div>
-                <p className="font-medium">Générer l'audio</p>
-                <p className="text-xs text-muted-foreground">1-2 secondes par partie de 4500 caractères</p>
-              </div>
-            </div>
-            <div className="flex gap-3 items-start">
-              <span className="bg-amber-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs shrink-0">5</span>
-              <div>
-                <p className="font-medium">Écouter et télécharger</p>
-                <p className="text-xs text-muted-foreground">Lecteur intégré + Export MP3</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )
-    },
-    // Module 5: Optimisation
-    {
-      title: "Module 5: Optimisation de la Qualité",
-      content: (
-        <div className="p-6 h-full overflow-auto">
-          <Badge className="mb-2 bg-gradient-to-r from-green-500 to-emerald-500">Module 5</Badge>
-          <h3 className="text-lg font-bold mb-2">OPTIMISATION DE LA QUALITÉ AUDIO</h3>
-          
-          <div className="space-y-4 text-sm">
-            <div>
-              <h4 className="font-semibold mb-2">📝 Ponctuation correcte</h4>
-              <ul className="list-disc pl-4 text-muted-foreground text-xs space-y-1">
-                <li>Points = pauses longues</li>
-                <li>Virgules = pauses courtes</li>
-                <li>Points de suspension = pauses dramatiques</li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="font-semibold mb-2">📄 Structure du texte</h4>
-              <ul className="list-disc pl-4 text-muted-foreground text-xs space-y-1">
-                <li>Paragraphes logiques</li>
-                <li>Phrases &lt;50 mots</li>
-                <li>Tirets pour les dialogues</li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="font-semibold mb-2">⚠️ À éviter</h4>
-              <ul className="list-disc pl-4 text-muted-foreground text-xs space-y-1">
-                <li>Émojis (non prononcés)</li>
-                <li>Abréviations mal interprétées</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      )
-    },
-    // Module 6: Choisir la voix
-    {
-      title: "Module 6: Choisir la Bonne Voix",
-      content: (
-        <div className="p-6 h-full overflow-auto">
-          <Badge className="mb-2 bg-gradient-to-r from-indigo-500 to-purple-500">Module 6</Badge>
-          <h3 className="text-lg font-bold mb-2">CHOISIR LA BONNE VOIX</h3>
-          
-          <div className="space-y-2 text-sm">
-            <div className="p-2 border rounded-lg flex justify-between items-center">
-              <span className="font-medium">Roman/Fiction</span>
-              <span className="text-xs text-muted-foreground">Sarah, Lily, George</span>
-            </div>
-            <div className="p-2 border rounded-lg flex justify-between items-center">
-              <span className="font-medium">Guide pratique</span>
-              <span className="text-xs text-muted-foreground">Aria, Brian, Liam</span>
-            </div>
-            <div className="p-2 border rounded-lg flex justify-between items-center">
-              <span className="font-medium">Livre enfant</span>
-              <span className="text-xs text-muted-foreground">Matilda, Will, George</span>
-            </div>
-            <div className="p-2 border rounded-lg flex justify-between items-center">
-              <span className="font-medium">Business</span>
-              <span className="text-xs text-muted-foreground">Roger, Daniel, Charlotte</span>
-            </div>
-            <div className="p-2 border rounded-lg flex justify-between items-center">
-              <span className="font-medium">Podcast/Blog</span>
-              <span className="text-xs text-muted-foreground">Charlie, Jessica, Chris</span>
-            </div>
-          </div>
-        </div>
-      )
-    },
-    // Module 7: Spécifications
-    {
-      title: "Module 7: Spécifications Techniques",
-      content: (
-        <div className="p-6 h-full overflow-auto">
-          <Badge className="mb-2 bg-gradient-to-r from-slate-500 to-gray-500">Module 7</Badge>
-          <h3 className="text-lg font-bold mb-2">SPÉCIFICATIONS TECHNIQUES</h3>
-          
-          <div className="space-y-4 text-sm">
-            <div>
-              <h4 className="font-semibold mb-2">⚙️ Capacités</h4>
-              <ul className="list-disc pl-4 text-muted-foreground text-xs space-y-1">
-                <li>Limite par requête : 5000 caractères (auto)</li>
-                <li>Découpage intelligent aux fins de phrases</li>
-                <li>Format : MP3 haute qualité</li>
-                <li>Modèle : ElevenLabs Multilingual v2</li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="font-semibold mb-2">⏱️ Temps de génération</h4>
-              <div className="space-y-1 text-xs">
-                <div className="flex justify-between p-1 bg-muted/50 rounded">
-                  <span>&lt;5 000 car.</span>
-                  <span>2-5 sec</span>
-                </div>
-                <div className="flex justify-between p-1 bg-muted/50 rounded">
-                  <span>10 000 car.</span>
-                  <span>5-10 sec</span>
-                </div>
-                <div className="flex justify-between p-1 bg-muted/50 rounded">
-                  <span>50 000 car.</span>
-                  <span>30-60 sec</span>
-                </div>
-                <div className="flex justify-between p-1 bg-muted/50 rounded">
-                  <span>100 000 car.</span>
-                  <span>1-2 min</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )
-    },
-    // Module 8: FAQ
-    {
-      title: "Module 8: FAQ et Résolution des Problèmes",
-      content: (
-        <div className="p-6 h-full overflow-auto">
-          <Badge className="mb-2 bg-gradient-to-r from-red-500 to-pink-500">Module 8</Badge>
-          <h3 className="text-lg font-bold mb-2">FAQ ET RÉSOLUTION DES PROBLÈMES</h3>
-          
-          <div className="space-y-3 text-sm">
-            <div className="p-2 border rounded-lg">
-              <p className="font-medium text-xs">Q: Puis-je générer un livre audio complet ?</p>
-              <p className="text-xs text-muted-foreground">R: Oui ! Découpage et assemblage automatiques.</p>
-            </div>
-            <div className="p-2 border rounded-lg">
-              <p className="font-medium text-xs">Q: L'audio est-il professionnel ?</p>
-              <p className="text-xs text-muted-foreground">R: Oui, qualité studio ElevenLabs.</p>
-            </div>
-            <div className="p-2 border rounded-lg">
-              <p className="font-medium text-xs">Q: Comment améliorer la prononciation ?</p>
-              <p className="text-xs text-muted-foreground">R: Écrivez phonétiquement. Ex: "Lovable" → "Loveabeul"</p>
-            </div>
-            
-            <h4 className="font-semibold mt-4 mb-2">🔧 Problèmes courants</h4>
-            <div className="text-xs space-y-1">
-              <div className="flex justify-between">
-                <span>Audio ne se génère pas</span>
-                <span className="text-muted-foreground">→ Vérifiez connexion</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Qualité médiocre</span>
-                <span className="text-muted-foreground">→ Essayez autre voix</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      )
-    },
-    // Module 9: Distribution
-    {
-      title: "Module 9: Distribution et Plateformes",
-      content: (
-        <div className="p-6 h-full overflow-auto">
-          <Badge className="mb-2 bg-gradient-to-r from-teal-500 to-cyan-500">Module 9</Badge>
-          <h3 className="text-lg font-bold mb-2">DISTRIBUTION ET PLATEFORMES</h3>
-          
-          <div className="space-y-4 text-sm">
-            <p className="text-muted-foreground text-xs">Distribuez votre livre audio sur :</p>
-            
-            <div className="grid grid-cols-2 gap-2">
-              <div className="p-2 border rounded-lg text-center">
-                <p className="font-medium text-xs">Audible</p>
-                <p className="text-[10px] text-muted-foreground">(Amazon)</p>
-              </div>
-              <div className="p-2 border rounded-lg text-center">
-                <p className="font-medium text-xs">Apple Books</p>
-              </div>
-              <div className="p-2 border rounded-lg text-center">
-                <p className="font-medium text-xs">Google Play</p>
-              </div>
-              <div className="p-2 border rounded-lg text-center">
-                <p className="font-medium text-xs">Kobo</p>
-              </div>
-              <div className="p-2 border rounded-lg text-center">
-                <p className="font-medium text-xs">Spotify</p>
-                <p className="text-[10px] text-muted-foreground">(via distributeur)</p>
-              </div>
-              <div className="p-2 border rounded-lg text-center">
-                <p className="font-medium text-xs">Votre site web</p>
-              </div>
-            </div>
-            
-            <div className="p-3 bg-gradient-to-r from-teal-500/10 to-cyan-500/10 rounded-lg mt-4">
-              <p className="text-xs font-medium text-center">🎯 Workflow recommandé</p>
-              <p className="text-[10px] text-muted-foreground text-center mt-1">
-                Finalisez texte → Ponctuation → Test extrait → Voix définitive → Génération → Téléchargement → Publication
-              </p>
-            </div>
-          </div>
-        </div>
-      )
-    },
-    // Récapitulatif
-    {
-      title: "Récapitulatif",
-      content: (
-        <div className="p-6 h-full">
-          <h3 className="text-lg font-bold mb-4">RÉCAPITULATIF DES COMPÉTENCES</h3>
-          <ul className="space-y-2 text-sm mb-6">
-            <li className="flex items-center gap-2"><span className="text-green-500">✓</span> Maîtrise du générateur audio ElevenLabs</li>
-            <li className="flex items-center gap-2"><span className="text-green-500">✓</span> Connaissance des 20 voix HD</li>
-            <li className="flex items-center gap-2"><span className="text-green-500">✓</span> Création de livres audio professionnels</li>
-            <li className="flex items-center gap-2"><span className="text-green-500">✓</span> Optimisation de la qualité audio</li>
-            <li className="flex items-center gap-2"><span className="text-green-500">✓</span> Choix stratégique des voix</li>
-            <li className="flex items-center gap-2"><span className="text-green-500">✓</span> Distribution multi-plateformes</li>
-          </ul>
-          <div className="text-center p-4 bg-gradient-to-r from-purple-500/10 to-violet-500/10 rounded-lg">
-            <Headphones className="w-8 h-8 mx-auto text-purple-500 mb-2" />
-            <p className="text-sm font-medium">Félicitations !</p>
-            <p className="text-xs text-muted-foreground">Vous êtes prêt à créer des livres audio de qualité professionnelle.</p>
-          </div>
-        </div>
-      )
-    }
-  ];
+  const toggleComplete = (moduleId: number) => {
+    setCompletedModules(prev => 
+      prev.includes(moduleId) ? prev.filter(id => id !== moduleId) : [...prev, moduleId]
+    );
+  };
 
-  const totalPages = previewPages.length;
+  const progress = Math.round((completedModules.length / audioModules.length) * 100);
 
   const exportFormationPDF = () => {
     const pdf = new jsPDF();
@@ -503,22 +316,19 @@ export const EbookFormationAudio: React.FC = () => {
     const maxWidth = pageWidth - margin * 2;
     let yPos = 20;
 
-    const addText = (text: string, fontSize: number = 10, isBold: boolean = false, isTitle: boolean = false) => {
+    const addText = (text: string, fontSize: number = 10, isBold: boolean = false) => {
       pdf.setFontSize(fontSize);
       pdf.setFont('helvetica', isBold ? 'bold' : 'normal');
       const lines = pdf.splitTextToSize(text, maxWidth);
       for (const line of lines) {
-        if (yPos > 275) {
-          pdf.addPage();
-          yPos = 20;
-        }
+        if (yPos > 275) { pdf.addPage(); yPos = 20; }
         pdf.text(line, margin, yPos);
         yPos += fontSize * 0.45;
       }
-      yPos += isTitle ? 6 : 3;
+      yPos += 3;
     };
 
-    // Page de titre
+    // Title page
     pdf.setFontSize(24);
     pdf.setFont('helvetica', 'bold');
     pdf.text('Formation Complete', pageWidth / 2, 60, { align: 'center' });
@@ -528,196 +338,172 @@ export const EbookFormationAudio: React.FC = () => {
     pdf.setFont('helvetica', 'normal');
     pdf.text('Technologie ElevenLabs - 20 voix HD', pageWidth / 2, 90, { align: 'center' });
     
-    // Table des matières
+    // TOC
     pdf.addPage();
     yPos = 20;
-    addText('TABLE DES MATIERES', 16, true, true);
+    addText('TABLE DES MATIERES', 16, true);
     yPos += 5;
-    
     audioModules.forEach((module, index) => {
       addText(`Module ${index + 1}: ${module.title}`, 11);
       addText(`   ${module.description}`, 9);
       yPos += 2;
     });
 
-    // Contenu des modules
+    // Module content
     audioModules.forEach((module, index) => {
       pdf.addPage();
       yPos = 20;
-      addText(`MODULE ${index + 1}`, 14, true, true);
-      addText(module.title.toUpperCase(), 16, true, true);
+      addText(`MODULE ${index + 1}`, 14, true);
+      addText(module.title.toUpperCase(), 16, true);
       yPos += 5;
       addText(module.description, 11);
-      yPos += 10;
-      addText('Contenu du module:', 12, true);
-      addText('- Guide complet et detaille', 10);
-      addText('- Captures d\'ecran explicatives', 10);
-      addText('- Conseils et astuces', 10);
-      addText('- Exercices pratiques', 10);
-    });
-
-    // Page finale
-    pdf.addPage();
-    yPos = 20;
-    addText('RECAPITULATIF DES COMPETENCES', 16, true, true);
-    yPos += 5;
-    
-    const competences = [
-      'Maitrise du generateur audio ElevenLabs',
-      'Connaissance des 20 voix HD',
-      'Creation de livres audio professionnels',
-      'Optimisation de la qualite audio',
-      'Choix strategique des voix',
-      'Distribution multi-plateformes'
-    ];
-    
-    competences.forEach(comp => {
-      addText('✓ ' + comp, 11);
+      yPos += 5;
+      
+      module.content.forEach(section => {
+        addText(section.subtitle, 12, true);
+        if (section.text) addText(section.text, 10);
+        if (section.items) {
+          section.items.forEach(item => addText('• ' + item, 10));
+        }
+        yPos += 3;
+      });
     });
 
     pdf.save('Formation_Complete_Generateur_Audio.pdf');
     toast.success('Formation Audio exportée en PDF !');
-    setShowPreview(false);
   };
 
   return (
     <div className="space-y-6">
-      <Card>
+      <Card className="border-2 border-purple-500/20 bg-gradient-to-br from-purple-500/5 via-background to-violet-500/5">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Headphones className="h-5 w-5 text-purple-500" />
-            Formation Complète - Générateur de Livres Audio
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <p className="text-muted-foreground">
-            Maîtrisez le générateur de livres audio avec la technologie ElevenLabs et ses 20 voix HD professionnelles.
-          </p>
-
-          {/* Liste des modules avec boutons */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            {audioModules.map((module, index) => {
-              const Icon = module.icon;
-              return (
-                <div 
-                  key={module.id} 
-                  className="p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
-                >
-                  <div className="flex items-start gap-3 mb-3">
-                    <div className={`p-2 rounded-lg bg-gradient-to-r ${module.color} shrink-0`}>
-                      <Icon className="h-4 w-4 text-white" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm truncate">{module.title}</p>
-                      <p className="text-xs text-muted-foreground">{module.description}</p>
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="flex-1 gap-1 h-7 text-xs"
-                      onClick={() => setSelectedModule(selectedModule === module.id ? null : module.id)}
-                    >
-                      <BookOpen className="h-3 w-3" />
-                      Détails
-                    </Button>
-                    <Button 
-                      size="sm" 
-                      className={`flex-1 gap-1 h-7 text-xs bg-gradient-to-r ${module.color} hover:opacity-90`}
-                      onClick={() => {
-                        setPreviewPage(index + 2);
-                        setShowPreview(true);
-                      }}
-                    >
-                      <Eye className="h-3 w-3" />
-                      Prévisualiser
-                    </Button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Bouton principal */}
-          <Button 
-            onClick={() => { setPreviewPage(0); setShowPreview(true); }}
-            size="lg"
-            className="w-full gap-2 bg-gradient-to-r from-purple-500 to-violet-500 hover:from-purple-600 hover:to-violet-600 text-white"
-          >
-            <Eye className="h-5 w-5" />
-            Prévisualiser et Télécharger le PDF
-          </Button>
-        </CardContent>
-      </Card>
-
-      {/* Dialog de prévisualisation */}
-      <Dialog open={showPreview} onOpenChange={setShowPreview}>
-        <DialogContent className="max-w-4xl max-h-[90vh]">
-          <DialogHeader>
-            <DialogTitle className="flex items-center justify-between">
-              <span>Prévisualisation - {previewPages[previewPage]?.title}</span>
-              <span className="text-sm font-normal text-muted-foreground">
-                Page {previewPage + 1} / {totalPages}
-              </span>
-            </DialogTitle>
-          </DialogHeader>
-          
-          {/* Aperçu de la page */}
-          <div className="border rounded-lg bg-white dark:bg-slate-950 text-foreground min-h-[400px] shadow-inner">
-            {previewPages[previewPage]?.content}
-          </div>
-
-          {/* Navigation et actions */}
-          <div className="flex items-center justify-between mt-4">
-            <div className="flex gap-2">
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setPreviewPage(Math.max(0, previewPage - 1))}
-                disabled={previewPage === 0}
-              >
-                <ChevronLeft className="h-4 w-4" />
-                Précédent
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setPreviewPage(Math.min(totalPages - 1, previewPage + 1))}
-                disabled={previewPage === totalPages - 1}
-              >
-                Suivant
-                <ChevronRight className="h-4 w-4" />
-              </Button>
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div>
+              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-500 to-violet-500 text-white px-4 py-1.5 rounded-full text-sm font-semibold mb-3">
+                <Headphones className="h-4 w-4" />
+                Formation Audio
+                <Badge variant="secondary" className="bg-white/20 text-white text-[10px]">
+                  {audioModules.length} Modules
+                </Badge>
+              </div>
+              <CardTitle className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-purple-600 to-violet-600 bg-clip-text text-transparent">
+                Maîtrisez le Générateur de Livres Audio
+              </CardTitle>
+              <p className="text-muted-foreground mt-1">
+                Technologie ElevenLabs • 20 voix HD • Mise en ligne incluse
+              </p>
             </div>
-
-            {/* Miniatures */}
-            <div className="flex gap-1 overflow-x-auto max-w-xs">
-              {previewPages.slice(0, 6).map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setPreviewPage(idx)}
-                  className={`w-8 h-10 rounded border text-xs flex items-center justify-center transition-all ${
-                    previewPage === idx 
-                      ? 'border-purple-500 bg-purple-500/10 text-purple-500 font-bold' 
-                      : 'border-muted hover:border-purple-500/50'
-                  }`}
-                >
-                  {idx + 1}
-                </button>
-              ))}
-              {previewPages.length > 6 && (
-                <span className="text-xs text-muted-foreground self-center">+{previewPages.length - 6}</span>
-              )}
-            </div>
-
-            <Button onClick={exportFormationPDF} className="gap-2 bg-gradient-to-r from-purple-500 to-violet-500 hover:from-purple-600 hover:to-violet-600">
+            <Button 
+              onClick={exportFormationPDF}
+              className="gap-2 bg-gradient-to-r from-purple-500 to-violet-500 hover:from-purple-600 hover:to-violet-600"
+            >
               <Download className="h-4 w-4" />
               Télécharger PDF
             </Button>
           </div>
-        </DialogContent>
-      </Dialog>
+
+          {/* Progress bar */}
+          <div className="mt-4">
+            <div className="flex items-center justify-between text-sm mb-1">
+              <span className="text-muted-foreground">Progression</span>
+              <span className="font-medium">{completedModules.length}/{audioModules.length} modules terminés</span>
+            </div>
+            <div className="w-full bg-muted rounded-full h-2.5">
+              <div 
+                className="bg-gradient-to-r from-purple-500 to-violet-500 h-2.5 rounded-full transition-all duration-500"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </div>
+        </CardHeader>
+
+        <CardContent>
+          <Accordion 
+            type="multiple" 
+            value={openModules}
+            onValueChange={setOpenModules}
+            className="space-y-3"
+          >
+            {audioModules.map((module, index) => {
+              const Icon = module.icon;
+              const isCompleted = completedModules.includes(module.id);
+              
+              return (
+                <AccordionItem 
+                  key={module.id} 
+                  value={module.id.toString()}
+                  className="border rounded-xl overflow-hidden bg-card shadow-sm hover:shadow-md transition-shadow"
+                >
+                  <AccordionTrigger className="hover:no-underline px-4 py-3">
+                    <div className="flex items-center gap-3 flex-1">
+                      <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${module.color} flex items-center justify-center shrink-0`}>
+                        <Icon className="h-5 w-5 text-white" />
+                      </div>
+                      <div className="flex-1 text-left">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-medium text-muted-foreground">Module {index + 1}</span>
+                          {isCompleted && (
+                            <Badge className="bg-green-500/10 text-green-600 text-[10px] px-1.5 py-0 border-green-500/20">
+                              <CheckCircle2 className="h-3 w-3 mr-0.5" />
+                              Terminé
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="font-semibold text-sm">{module.title}</p>
+                        <p className="text-xs text-muted-foreground">{module.description}</p>
+                      </div>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="px-4 pb-4 space-y-4">
+                      {module.content.map((section, sIdx) => (
+                        <div key={sIdx} className="space-y-2">
+                          <h4 className="font-semibold text-sm">{section.subtitle}</h4>
+                          {section.text && (
+                            <p className="text-sm text-muted-foreground leading-relaxed">{section.text}</p>
+                          )}
+                          {section.items && (
+                            <ul className="space-y-1.5 ml-1">
+                              {section.items.map((item, iIdx) => (
+                                <li key={iIdx} className="text-sm text-muted-foreground flex items-start gap-2">
+                                  <span className="text-purple-500 mt-1 shrink-0">•</span>
+                                  <span>{item}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      ))}
+                      
+                      {/* Mark as complete button */}
+                      <div className="pt-3 border-t">
+                        <Button 
+                          variant={isCompleted ? "outline" : "default"}
+                          size="sm"
+                          className={`gap-2 ${!isCompleted ? `bg-gradient-to-r ${module.color} hover:opacity-90` : ''}`}
+                          onClick={(e) => { e.stopPropagation(); toggleComplete(module.id); }}
+                        >
+                          <CheckCircle2 className="h-4 w-4" />
+                          {isCompleted ? 'Marquer non terminé' : 'Marquer comme terminé'}
+                        </Button>
+                      </div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              );
+            })}
+          </Accordion>
+
+          {/* Completion banner */}
+          {progress === 100 && (
+            <div className="mt-6 p-4 rounded-xl bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 text-center">
+              <Headphones className="w-8 h-8 mx-auto text-green-500 mb-2" />
+              <p className="font-semibold text-green-700 dark:text-green-400">🎉 Félicitations !</p>
+              <p className="text-sm text-muted-foreground">Vous avez terminé la formation complète. Vous êtes prêt à créer des livres audio professionnels !</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };
