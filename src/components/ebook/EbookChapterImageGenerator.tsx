@@ -37,7 +37,20 @@ interface EbookChapterImageGeneratorProps {
   ebookImages?: ChapterImage[];
   onImagesUpdate?: (images: ChapterImage[]) => void;
   onInsertImageToChapter?: (chapterId: string, imageUrl: string) => void;
+  subscriberEmail?: string;
 }
+
+const getStorageUserId = (email?: string): string | null => {
+  if (email) return email.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 60);
+  const saved = localStorage.getItem('subscriberData');
+  if (saved) {
+    try {
+      const data = JSON.parse(saved);
+      if (data.email) return data.email.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 60);
+    } catch {}
+  }
+  return null;
+};
 
 export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProps> = ({
   ebookTitle,
@@ -45,7 +58,8 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
   characters = [],
   ebookImages = [],
   onImagesUpdate,
-  onInsertImageToChapter
+  onInsertImageToChapter,
+  subscriberEmail
 }) => {
   const { hasValidApiKey, getConfig } = useOpenAIConfig();
   const [isGenerating, setIsGenerating] = useState(false);
@@ -193,9 +207,9 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
   // Auto-save image to library storage
   const saveImageToLibrary = async (imageUrl: string, chapterTitle: string) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        console.log('❌ Utilisateur non connecté - sauvegarde bibliothèque ignorée');
+      const userId = getStorageUserId(subscriberEmail);
+      if (!userId) {
+        console.log('❌ Utilisateur non identifié - sauvegarde bibliothèque ignorée');
         return;
       }
 
@@ -206,7 +220,7 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
       const timestamp = Date.now();
       const safeName = chapterTitle.replace(/[^a-zA-Z0-9À-ÿ\s-]/g, '').trim().replace(/\s+/g, '-').substring(0, 30);
       const fileName = `${timestamp}-${safeName}.png`;
-      const filePath = `${user.id}/${folderName}/${fileName}`;
+      const filePath = `${userId}/${folderName}/${fileName}`;
 
       // Fetch image and convert to blob
       const response = await fetch(imageUrl);

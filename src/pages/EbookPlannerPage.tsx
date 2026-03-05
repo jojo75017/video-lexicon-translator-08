@@ -2070,6 +2070,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               })));
             }}
             onInsertImageToChapter={handleInsertImageToChapter}
+            subscriberEmail={subscriberEmail}
           />
         );
       
@@ -2173,6 +2174,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           <EbookImageLibrary
             ebookId={currentProjectId || undefined}
             ebookTitle={ebookTitle}
+            subscriberEmail={subscriberEmail}
             onImageSelect={(url) => setEbookImages([...ebookImages, { url, title: 'Image sélectionnée' }])}
           />
         );
