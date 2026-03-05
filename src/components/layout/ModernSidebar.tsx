@@ -305,6 +305,7 @@ const categories: Category[] = [
     color: 'from-indigo-500 to-violet-500',
     items: [
       { id: 'audiobook', label: '🎙️ Livre Audio', icon: Headphones },
+      { id: 'formation-audiobook-distribution', label: '📚 Formation Distribution', icon: BookOpen, isNew: true },
     ]
   },
   // ========== 9. MON COMPTE ==========
