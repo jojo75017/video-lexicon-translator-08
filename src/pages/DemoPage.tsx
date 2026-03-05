@@ -309,7 +309,7 @@ const DemoPage = () => {
               </div>
             </div>
             <div className="flex flex-col items-center md:items-end gap-2">
-              <Badge className="bg-amber-500/90 text-white border-0 text-xs"><Badge className="bg-amber-500/90 text-white border-0 text-xs">Offre fondateur jusqu'au 30 juin</Badge></Badge>
+              <Badge className="bg-amber-500/90 text-white border-0 text-xs">Offre fondateur jusqu'au 30 juin</Badge>
               <Button 
                 size="lg"
                 className="bg-white text-violet-700 hover:bg-white/90 font-semibold shadow-lg"
