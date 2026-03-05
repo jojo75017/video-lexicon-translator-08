@@ -519,6 +519,9 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
       yPosition = 20;
     }
 
+    // Calculer l'interligne basé sur la taille de police utilisateur
+    const lineHeight = Math.round(fontSize * 0.55); // ~1.5x line spacing in mm
+
     // Préface
     if (cleanedPreface) {
       pdf.setFontSize(16);
@@ -526,13 +529,13 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
       pdf.text('PREFACE', pageWidth / 2, yPosition, { align: 'center' });
       yPosition += 15;
 
-      pdf.setFontSize(11);
+      pdf.setFontSize(fontSize);
       pdf.setFont('helvetica', 'normal');
-      const prefaceLines = splitTextToSize(cleanedPreface, usableWidth, 11);
+      const prefaceLines = splitTextToSize(cleanedPreface, usableWidth, fontSize);
       prefaceLines.forEach((line: string) => {
-        checkPageBreak(6);
+        checkPageBreak(lineHeight);
         pdf.text(line, marginLeft, yPosition);
-        yPosition += 6;
+        yPosition += lineHeight;
       });
 
       pdf.addPage();
@@ -558,13 +561,13 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
 
       // Contenu du chapitre
       if (chapter.content) {
-        pdf.setFontSize(11);
+        pdf.setFontSize(fontSize);
         pdf.setFont('helvetica', 'normal');
-        const contentLines = splitTextToSize(chapter.content, usableWidth, 11);
+        const contentLines = splitTextToSize(chapter.content, usableWidth, fontSize);
         contentLines.forEach((line: string) => {
-          checkPageBreak(6);
+          checkPageBreak(lineHeight);
           pdf.text(line, marginLeft, yPosition);
-          yPosition += 6;
+          yPosition += lineHeight;
         });
         yPosition += 10;
       }
@@ -573,10 +576,10 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
       chapter.subChapters.forEach((subChapter, subIndex) => {
         const subNumber = `${chapterNumber}.${subIndex + 1}`;
         
-        pdf.setFontSize(12);
+        pdf.setFontSize(Math.round(fontSize * 1.1));
         pdf.setFont('helvetica', 'bold');
         const subTitle = `${subNumber}. ${stripEmojis(subChapter.title)}`;
-        const subTitleLines = splitTextToSize(subTitle, usableWidth, 12);
+        const subTitleLines = splitTextToSize(subTitle, usableWidth, Math.round(fontSize * 1.1));
         
         checkPageBreak(subTitleLines.length * 7 + 10);
         subTitleLines.forEach((line: string) => {
@@ -586,13 +589,13 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
         yPosition += 8;
 
         if (subChapter.content) {
-          pdf.setFontSize(11);
+          pdf.setFontSize(fontSize);
           pdf.setFont('helvetica', 'normal');
-          const subContentLines = splitTextToSize(subChapter.content, usableWidth, 11);
+          const subContentLines = splitTextToSize(subChapter.content, usableWidth, fontSize);
           subContentLines.forEach((line: string) => {
-            checkPageBreak(6);
+            checkPageBreak(lineHeight);
             pdf.text(line, marginLeft, yPosition);
-            yPosition += 6;
+            yPosition += lineHeight;
           });
           yPosition += 10;
         }
@@ -607,19 +610,39 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
 
     // Conclusion
     if (cleanedConclusion) {
-      checkPageBreak(30);
+      pdf.addPage();
+      yPosition = 20;
       pdf.setFontSize(16);
       pdf.setFont('helvetica', 'bold');
       pdf.text('CONCLUSION', pageWidth / 2, yPosition, { align: 'center' });
       yPosition += 15;
 
-      pdf.setFontSize(11);
+      pdf.setFontSize(fontSize);
       pdf.setFont('helvetica', 'normal');
-      const conclusionLines = splitTextToSize(cleanedConclusion, usableWidth, 11);
+      const conclusionLines = splitTextToSize(cleanedConclusion, usableWidth, fontSize);
       conclusionLines.forEach((line: string) => {
-        checkPageBreak(6);
+        checkPageBreak(lineHeight);
         pdf.text(line, marginLeft, yPosition);
-        yPosition += 6;
+        yPosition += lineHeight;
+      });
+    }
+
+    // Épilogue
+    if (cleanedEpilogue) {
+      pdf.addPage();
+      yPosition = 20;
+      pdf.setFontSize(16);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('EPILOGUE', pageWidth / 2, yPosition, { align: 'center' });
+      yPosition += 15;
+
+      pdf.setFontSize(fontSize);
+      pdf.setFont('helvetica', 'normal');
+      const epilogueLines = splitTextToSize(cleanedEpilogue, usableWidth, fontSize);
+      epilogueLines.forEach((line: string) => {
+        checkPageBreak(lineHeight);
+        pdf.text(line, marginLeft, yPosition);
+        yPosition += lineHeight;
       });
     }
 
@@ -633,9 +656,9 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
       pdf.text('PERSONNAGES', marginLeft, yPosition);
       yPosition += 15;
       
-      pdf.setFontSize(11);
+      pdf.setFontSize(fontSize);
       pdf.setFont('helvetica', 'normal');
-      pdf.text('Liste des personnages et leurs rôles dans cette histoire', marginLeft, yPosition);
+      pdf.text('Liste des personnages et leurs roles dans cette histoire', marginLeft, yPosition);
       yPosition += 20;
 
       characters.forEach((character) => {
@@ -649,13 +672,13 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
         
         // Description/Rôle
         if (character.description) {
-          pdf.setFontSize(11);
+          pdf.setFontSize(fontSize);
           pdf.setFont('helvetica', 'italic');
-          const descLines = splitTextToSize(character.description, pageWidth, 11);
+          const descLines = splitTextToSize(character.description, usableWidth, fontSize);
           descLines.forEach((line: string) => {
-            checkPageBreak(6);
+            checkPageBreak(lineHeight);
             pdf.text(line, marginLeft, yPosition);
-            yPosition += 6;
+            yPosition += lineHeight;
           });
         }
         
@@ -663,14 +686,16 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
       });
     }
 
-    // Numérotation des pages
+    // Numérotation des pages (skip cover + copyright = first 2 pages)
     if (includePageNumbers) {
       const totalPages = pdf.getNumberOfPages();
-      for (let i = 1; i <= totalPages; i++) {
+      const startPage = includeCoverPage ? 3 : 1; // Skip cover + copyright
+      for (let i = startPage; i <= totalPages; i++) {
         pdf.setPage(i);
         pdf.setFontSize(10);
         pdf.setFont('helvetica', 'normal');
-        pdf.text(`${i}`, pdf.internal.pageSize.width / 2, pdf.internal.pageSize.height - 10, { align: 'center' });
+        const displayNumber = i - startPage + 1;
+        pdf.text(`${displayNumber}`, pdf.internal.pageSize.width / 2, pdf.internal.pageSize.height - 10, { align: 'center' });
       }
     }
 
@@ -1105,6 +1130,7 @@ ${navContent}    </ol>
     }
     p:first-of-type {
       text-indent: 0;
+    }
   </style>
 </head>
 <body>
@@ -1648,6 +1674,21 @@ Paperback: 9.99€ - 19.99€
     if (cleanedChapters.length === 0) {
       toast.error('Veuillez ajouter au moins un chapitre');
       return;
+    }
+
+    // Pre-export validation
+    const emptyChapters = cleanedChapters.filter(ch => {
+      const hasContent = ch.content && ch.content.trim().length > 0;
+      const hasSubContent = ch.subChapters.some(sub => sub.content && sub.content.trim().length > 0);
+      return !hasContent && !hasSubContent;
+    });
+
+    if (emptyChapters.length > 0) {
+      const names = emptyChapters.map(ch => ch.title || 'Sans titre').join(', ');
+      toast.warning(`${emptyChapters.length} chapitre(s) sans contenu : ${names}`, {
+        description: 'L\'export continuera mais ces chapitres seront vides.',
+        duration: 6000,
+      });
     }
 
     setIsExporting(true);
