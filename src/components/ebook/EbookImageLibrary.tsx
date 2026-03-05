@@ -66,16 +66,21 @@ interface EbookImageLibraryProps {
   subscriberEmail?: string;
 }
 
-const getUserStorageId = (email?: string): string | null => {
-  if (email) return email.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 60);
+const sanitizeStorageId = (value?: string): string | null => {
+  if (!value) return null;
+  const cleaned = value.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 60);
+  return cleaned || null;
+};
+
+const getStoredSubscriberEmail = (): string | null => {
   const saved = localStorage.getItem('subscriberData');
-  if (saved) {
-    try {
-      const data = JSON.parse(saved);
-      if (data.email) return data.email.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 60);
-    } catch {}
+  if (!saved) return null;
+  try {
+    const data = JSON.parse(saved);
+    return data?.email || null;
+  } catch {
+    return null;
   }
-  return null;
 };
 
 export const EbookImageLibrary: React.FC<EbookImageLibraryProps> = ({
@@ -99,6 +104,63 @@ export const EbookImageLibrary: React.FC<EbookImageLibraryProps> = ({
   const [exportProgress, setExportProgress] = useState<number>(0);
   const [isExporting, setIsExporting] = useState(false);
   const [totalStorageSize, setTotalStorageSize] = useState(0);
+  const [storageRoot, setStorageRoot] = useState<string | null>(localStorage.getItem('ebook_storage_root'));
+
+  const getActiveStorageRoot = async (): Promise<string | null> => {
+    if (storageRoot) return storageRoot;
+
+    const candidates = new Set<string>();
+    const persistedRoot = localStorage.getItem('ebook_storage_root');
+    if (persistedRoot) candidates.add(persistedRoot);
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.id) candidates.add(user.id);
+    } catch {
+      // ignore auth read errors
+    }
+
+    const fromProp = sanitizeStorageId(subscriberEmail);
+    if (fromProp) candidates.add(fromProp);
+
+    const fromLocalEmail = sanitizeStorageId(getStoredSubscriberEmail() || undefined);
+    if (fromLocalEmail) candidates.add(fromLocalEmail);
+
+    const { data: roots } = await supabase.storage.from('ebook-images').list('', { limit: 200 });
+    const rootFolders = (roots || [])
+      .map((item) => item.name)
+      .filter((name): name is string => !!name && !name.startsWith('.') && !name.includes('.'));
+
+    const matchingCandidate = Array.from(candidates).find((candidate) => rootFolders.includes(candidate));
+
+    let resolvedRoot: string | null = matchingCandidate || null;
+
+    if (!resolvedRoot) {
+      for (const root of rootFolders) {
+        const { data: children } = await supabase.storage.from('ebook-images').list(root, { limit: 50 });
+        const hasSubfolders = (children || []).some((child) => child.name && !child.name.startsWith('.') && !child.name.includes('.'));
+        if (hasSubfolders) {
+          resolvedRoot = root;
+          break;
+        }
+      }
+    }
+
+    if (!resolvedRoot && rootFolders.length === 1) {
+      resolvedRoot = rootFolders[0];
+    }
+
+    if (!resolvedRoot) {
+      resolvedRoot = Array.from(candidates)[0] || null;
+    }
+
+    if (resolvedRoot) {
+      localStorage.setItem('ebook_storage_root', resolvedRoot);
+      setStorageRoot(resolvedRoot);
+    }
+
+    return resolvedRoot;
+  };
 
   useEffect(() => {
     loadFolders();
@@ -114,7 +176,7 @@ export const EbookImageLibrary: React.FC<EbookImageLibraryProps> = ({
   const loadFolders = async () => {
     setIsLoading(true);
     try {
-      const userId = getUserStorageId(subscriberEmail);
+      const userId = await getActiveStorageRoot();
       if (!userId) {
         toast.error('Vous devez être connecté');
         return;
@@ -179,7 +241,7 @@ export const EbookImageLibrary: React.FC<EbookImageLibraryProps> = ({
   const loadImages = async (folderId: string) => {
     setIsLoading(true);
     try {
-      const userId = getUserStorageId(subscriberEmail);
+      const userId = await getActiveStorageRoot();
       if (!userId) return;
 
       const { data, error } = await supabase.storage
@@ -229,7 +291,7 @@ export const EbookImageLibrary: React.FC<EbookImageLibraryProps> = ({
     }
 
     try {
-      const userId = getUserStorageId(subscriberEmail);
+      const userId = await getActiveStorageRoot();
       if (!userId) return;
 
       const placeholderContent = new Blob([''], { type: 'text/plain' });
@@ -255,7 +317,7 @@ export const EbookImageLibrary: React.FC<EbookImageLibraryProps> = ({
 
     setIsUploading(true);
     try {
-      const userId = getUserStorageId(subscriberEmail);
+      const userId = await getActiveStorageRoot();
       if (!userId) { toast.error('Vous devez être connecté'); return; }
 
       let successCount = 0;
@@ -289,7 +351,7 @@ export const EbookImageLibrary: React.FC<EbookImageLibraryProps> = ({
 
     setIsUploading(true);
     try {
-      const userId = getUserStorageId(subscriberEmail);
+      const userId = await getActiveStorageRoot();
       if (!userId) { toast.error('Vous devez être connecté'); return; }
 
       toast.info('📦 Extraction du ZIP en cours...');
@@ -391,7 +453,7 @@ export const EbookImageLibrary: React.FC<EbookImageLibraryProps> = ({
     setExportProgress(0);
 
     try {
-      const userId = getUserStorageId(subscriberEmail);
+      const userId = await getActiveStorageRoot();
       if (!userId) return;
 
       const zip = new JSZip();
@@ -441,7 +503,7 @@ export const EbookImageLibrary: React.FC<EbookImageLibraryProps> = ({
   const deleteImage = async (imageName: string) => {
     if (!currentFolder) return;
     try {
-      const userId = getUserStorageId(subscriberEmail);
+      const userId = await getActiveStorageRoot();
       if (!userId) return;
       const { error } = await supabase.storage
         .from('ebook-images')
@@ -459,7 +521,7 @@ export const EbookImageLibrary: React.FC<EbookImageLibraryProps> = ({
   const deleteSelectedImages = async () => {
     if (!currentFolder || selectedImages.size === 0) return;
     try {
-      const userId = getUserStorageId(subscriberEmail);
+      const userId = await getActiveStorageRoot();
       if (!userId) return;
       const paths = Array.from(selectedImages).map(id => {
         const img = images.find(i => i.id === id);
@@ -479,7 +541,7 @@ export const EbookImageLibrary: React.FC<EbookImageLibraryProps> = ({
   const deleteFolder = async (folderId: string) => {
     if (!confirm(`Supprimer le dossier "${folderId}" et toutes ses images ?`)) return;
     try {
-      const userId = getUserStorageId(subscriberEmail);
+      const userId = await getActiveStorageRoot();
       if (!userId) return;
       const { data: files } = await supabase.storage.from('ebook-images').list(`${userId}/${folderId}`);
       if (files && files.length > 0) {
