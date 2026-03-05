@@ -41,6 +41,9 @@ interface EbookChapterImageGeneratorProps {
 }
 
 const getStorageUserId = (email?: string): string | null => {
+  const persistedRoot = localStorage.getItem('ebook_storage_root');
+  if (persistedRoot) return persistedRoot;
+
   if (email) return email.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 60);
   const saved = localStorage.getItem('subscriberData');
   if (saved) {
@@ -207,11 +210,19 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
   // Auto-save image to library storage
   const saveImageToLibrary = async (imageUrl: string, chapterTitle: string) => {
     try {
-      const userId = getStorageUserId(subscriberEmail);
+      let userId = getStorageUserId(subscriberEmail);
+
+      if (!userId) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user?.id) userId = user.id;
+      }
+
       if (!userId) {
         console.log('❌ Utilisateur non identifié - sauvegarde bibliothèque ignorée');
         return;
       }
+
+      localStorage.setItem('ebook_storage_root', userId);
 
       // Create folder name from ebook title (sanitize)
       const folderName = ebookTitle.replace(/[^a-zA-Z0-9À-ÿ\s-]/g, '').trim().replace(/\s+/g, '-').substring(0, 50) || 'Sans-titre';
