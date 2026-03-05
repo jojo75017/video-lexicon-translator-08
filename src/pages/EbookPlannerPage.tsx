@@ -63,6 +63,7 @@ import { EbookKdpMarketAnalysis } from '@/components/ebook/EbookKdpMarketAnalysi
 import { EbookKdpResearch } from '@/components/ebook/EbookKdpResearch';
 import EbookKdpExplosiveSimulator from '@/components/ebook/EbookKdpExplosiveSimulator';
 import { EbookAudioGenerator } from '@/components/ebook/EbookAudioGenerator';
+import FormationAudiobookDistribution from '@/components/ebook/FormationAudiobookDistribution';
 import { EbookFormationPDF } from '@/components/ebook/EbookFormationPDF';
 import EbookKdpAnalytics from '@/components/ebook/EbookKdpAnalytics';
 import { EbookImageLibrary } from '@/components/ebook/EbookImageLibrary';
@@ -2413,6 +2414,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             apiKey={apiKey}
           />
         );
+      
+      case 'formation-audiobook-distribution':
+        return <FormationAudiobookDistribution />;
       
       case 'series':
         return (
