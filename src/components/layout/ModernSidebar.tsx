@@ -320,6 +320,7 @@ const categories: Category[] = [
       { id: 'parrainage', label: '🤝 Parrainage', icon: Users, isLink: true, href: '/parrainage', isNew: true },
       { id: 'settings', label: '⚙️ Paramètres', icon: Settings },
       { id: 'formation-complete', label: '🎓 Formation', icon: GraduationCap, isLink: true, href: '/formation' },
+      { id: 'formation-videos', label: '🎬 Formation Vidéo', icon: GraduationCap, isLink: true, href: '/formation-videos', isNew: true },
     ]
   },
 ];
