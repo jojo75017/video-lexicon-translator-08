@@ -174,8 +174,7 @@ const SalesPage = () => {
     if (meta) meta.setAttribute("content", "Le premier workflow éditorial IA structuré en 14 rôles professionnels. Créez un ebook optimisé pour Amazon KDP. Accès à vie 37€.");
   }, []);
 
-  const LAUNCH_DATE = new Date('2026-02-13T00:00:00+01:00');
-  const OFFER_END_DATE = new Date(LAUNCH_DATE.getTime() + 60 * 24 * 60 * 60 * 1000);
+  const OFFER_END_DATE = new Date('2026-06-30T23:59:59+02:00');
 
   useEffect(() => {
     const update = () => {
@@ -391,6 +390,143 @@ const SalesPage = () => {
             </p>
           </div>
         </motion.div>
+      </section>
+
+      {/* ═══════════════════════════════════════ PRICING ═══════════════════════════════════ */}
+      <section id="pricing" className="py-14 px-4">
+        <div className="max-w-3xl mx-auto">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-6">
+            <motion.h2 variants={fadeUp} className="text-3xl md:text-5xl font-extrabold mb-4">
+              {isVipAvailable ? 'Offre Fondateur' : 'Accès Pro Lifetime'}
+            </motion.h2>
+            <motion.div variants={fadeUp} custom={1} className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-5 py-2 text-sm">
+              <ShieldCheck className="w-4 h-4 text-emerald-500" />
+              <span className="text-emerald-600 dark:text-emerald-400 font-medium">Garantie 30 jours satisfait ou remboursé</span>
+            </motion.div>
+          </motion.div>
+
+          {/* Countdown */}
+          {isVipAvailable && (
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }}
+              className="mb-12">
+              <div className="bg-gradient-to-r from-violet-600 to-purple-600 rounded-2xl p-6 text-white text-center shadow-2xl shadow-violet-500/20">
+                <div className="flex items-center justify-center gap-2 mb-4">
+                  <Clock className="w-5 h-5" />
+                  <span className="font-bold text-lg">Offre Fondateur — {daysLeft} jours restants</span>
+                </div>
+                <div className="grid grid-cols-4 gap-3 max-w-sm mx-auto">
+                  {[
+                    { val: countdown.days, label: "Jours" },
+                    { val: countdown.hours, label: "Heures" },
+                    { val: countdown.minutes, label: "Min" },
+                    { val: countdown.seconds, label: "Sec" },
+                  ].map((c, i) => (
+                    <div key={i} className="bg-white/15 backdrop-blur-sm rounded-xl p-3">
+                      <div className="text-3xl font-extrabold tabular-nums">{String(c.val).padStart(2, '0')}</div>
+                      <div className="text-[10px] uppercase tracking-wider opacity-80">{c.label}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Pricing Card */}
+          <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}>
+            <div className="relative rounded-3xl overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-violet-500 via-purple-500 to-pink-500 p-[2px] rounded-3xl">
+                <div className="absolute inset-[2px] rounded-[22px] bg-background" />
+              </div>
+
+              <div className="relative z-10 p-8 md:p-10">
+                {isVipAvailable && (
+                  <Badge className="bg-gradient-to-r from-violet-600 to-purple-600 text-white border-0 mb-6 px-4 py-1.5 text-sm font-bold">
+                    🔥 OFFRE FONDATEUR — Jusqu'au 30 juin
+                  </Badge>
+                )}
+
+                <div className="flex items-baseline gap-3 mb-1">
+                  <span className="text-lg text-muted-foreground line-through">297€</span>
+                  <span className="text-6xl md:text-7xl font-extrabold">{price}</span>
+                  <span className="text-3xl font-bold">€</span>
+                </div>
+                <p className="text-sm text-muted-foreground mb-8">Paiement unique • Accès à vie • Sans abonnement</p>
+
+                <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 mb-8">
+                  {[
+                    "Workflow éditorial complet à vie",
+                    "14 rôles professionnels intégrés",
+                    "P15 Humanisation Anti-IA offert",
+                    "Export PDF / EPUB / Word",
+                    "Toutes les formations (18 modules)",
+                    "Outils KDP Premium complets",
+                    "Gestionnaire Séries / Sagas",
+                    "Traduction multi-langues",
+                    "Infrastructure Audiobooks",
+                    "Mises à jour gratuites à vie",
+                    "Support prioritaire inclus",
+                  ].map((f, i) => (
+                    <div key={i} className="flex items-center gap-2.5">
+                      <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                      <span className="text-sm">{f}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <Button size="lg" className="w-full py-7 text-lg font-bold bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-xl shadow-violet-500/25 hover:shadow-2xl transition-all duration-300 rounded-xl"
+                  onClick={handlePlanClick}>
+                  <Rocket className="w-5 h-5 mr-2" />
+                  Débloquer l'accès {isVipAvailable ? 'fondateur' : 'Pro'} — {price}€
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+
+                {isVipAvailable && (
+                  <p className="text-center mt-4 text-sm text-muted-foreground">
+                    À partir du 1er juillet : <strong className="text-foreground text-base">147€</strong>
+                  </p>
+                )}
+
+                {!isVipAvailable && (
+                  <div className="mt-6 space-y-2">
+                    <p className="text-xs text-muted-foreground text-center mb-3">Ou payez en plusieurs fois :</p>
+                    {[
+                      { label: "En 3 fois", price: "49", per: "49€/mois × 3" },
+                      { label: "En 5 fois", price: "32", per: "32€/mois × 5" },
+                    ].map((inst, idx) => (
+                      <button key={idx} onClick={handlePlanClick}
+                        className="w-full flex items-center justify-between p-3.5 rounded-xl border border-border hover:border-primary/50 hover:bg-primary/5 transition-all">
+                        <div className="text-left">
+                          <span className="font-semibold text-sm">{inst.label}</span>
+                          <p className="text-xs text-muted-foreground">{inst.per}</p>
+                        </div>
+                        <span className="text-lg font-bold">{inst.price}€</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground mt-5">
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  <span>Paiement sécurisé • Accès immédiat</span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Garantie */}
+          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mt-10">
+            <div className="bg-emerald-500/5 border-2 border-emerald-500/20 rounded-2xl p-6 text-center">
+              <h3 className="text-lg font-bold text-emerald-600 dark:text-emerald-400 mb-2 flex items-center justify-center gap-2">
+                <ShieldCheck className="w-5 h-5" />
+                Garantie Satisfait ou Remboursé — 30 jours
+              </h3>
+              <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                Testez pendant 30 jours. Pas satisfait ? Un email et vous êtes remboursé intégralement.
+              </p>
+            </div>
+          </motion.div>
+        </div>
       </section>
 
       {/* ═══════════════════════════════════════ SOCIAL PROOF ═══════════════════════════════ */}
@@ -656,143 +792,8 @@ const SalesPage = () => {
         </motion.div>
       </section>
 
-      {/* ═══════════════════════════════════════ PRICING ═══════════════════════════════════ */}
-      <section id="pricing" className="py-14 px-4">
-        <div className="max-w-3xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-6">
-            <motion.h2 variants={fadeUp} className="text-3xl md:text-5xl font-extrabold mb-4">
-              {isVipAvailable ? 'Offre Fondateur' : 'Accès Pro Lifetime'}
-            </motion.h2>
-            <motion.div variants={fadeUp} custom={1} className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-5 py-2 text-sm">
-              <ShieldCheck className="w-4 h-4 text-emerald-500" />
-              <span className="text-emerald-600 dark:text-emerald-400 font-medium">Garantie 30 jours satisfait ou remboursé</span>
-            </motion.div>
-          </motion.div>
 
-          {/* Countdown */}
-          {isVipAvailable && (
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }}
-              className="mb-12">
-              <div className="bg-gradient-to-r from-violet-600 to-purple-600 rounded-2xl p-6 text-white text-center shadow-2xl shadow-violet-500/20">
-                <div className="flex items-center justify-center gap-2 mb-4">
-                  <Clock className="w-5 h-5" />
-                  <span className="font-bold text-lg">Offre Fondateur — {daysLeft} jours restants</span>
-                </div>
-                <div className="grid grid-cols-4 gap-3 max-w-sm mx-auto">
-                  {[
-                    { val: countdown.days, label: "Jours" },
-                    { val: countdown.hours, label: "Heures" },
-                    { val: countdown.minutes, label: "Min" },
-                    { val: countdown.seconds, label: "Sec" },
-                  ].map((c, i) => (
-                    <div key={i} className="bg-white/15 backdrop-blur-sm rounded-xl p-3">
-                      <div className="text-3xl font-extrabold tabular-nums">{String(c.val).padStart(2, '0')}</div>
-                      <div className="text-[10px] uppercase tracking-wider opacity-80">{c.label}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-          )}
 
-          {/* Pricing Card */}
-          <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}>
-            <div className="relative rounded-3xl overflow-hidden">
-              {/* Gradient border */}
-              <div className="absolute inset-0 bg-gradient-to-br from-violet-500 via-purple-500 to-pink-500 p-[2px] rounded-3xl">
-                <div className="absolute inset-[2px] rounded-[22px] bg-background" />
-              </div>
-
-              <div className="relative z-10 p-8 md:p-10">
-                {isVipAvailable && (
-                  <Badge className="bg-gradient-to-r from-violet-600 to-purple-600 text-white border-0 mb-6 px-4 py-1.5 text-sm font-bold">
-                    🔥 OFFRE FONDATEUR — Jusqu'au 30 juin
-                  </Badge>
-                )}
-
-                <div className="flex items-baseline gap-3 mb-1">
-                  <span className="text-lg text-muted-foreground line-through">297€</span>
-                  <span className="text-6xl md:text-7xl font-extrabold">{price}</span>
-                  <span className="text-3xl font-bold">€</span>
-                </div>
-                <p className="text-sm text-muted-foreground mb-8">Paiement unique • Accès à vie • Sans abonnement</p>
-
-                <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 mb-8">
-                  {[
-                    "Workflow éditorial complet à vie",
-                    "14 rôles professionnels intégrés",
-                    "P15 Humanisation Anti-IA offert",
-                    "Export PDF / EPUB / Word",
-                    "Toutes les formations (18 modules)",
-                    "Outils KDP Premium complets",
-                    "Gestionnaire Séries / Sagas",
-                    "Traduction multi-langues",
-                    "Infrastructure Audiobooks",
-                    "Mises à jour gratuites à vie",
-                    "Support prioritaire inclus",
-                  ].map((f, i) => (
-                    <div key={i} className="flex items-center gap-2.5">
-                      <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span className="text-sm">{f}</span>
-                    </div>
-                  ))}
-                </div>
-
-                <Button size="lg" className="w-full py-7 text-lg font-bold bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-xl shadow-violet-500/25 hover:shadow-2xl transition-all duration-300 rounded-xl"
-                  onClick={handlePlanClick}>
-                  <Rocket className="w-5 h-5 mr-2" />
-                  Débloquer l'accès {isVipAvailable ? 'fondateur' : 'Pro'} — {price}€
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </Button>
-
-                {isVipAvailable && (
-                  <p className="text-center mt-4 text-sm text-muted-foreground">
-                    À partir du 1er mai : <strong className="text-foreground text-base">147€</strong>
-                  </p>
-                )}
-
-                {!isVipAvailable && (
-                  <div className="mt-6 space-y-2">
-                    <p className="text-xs text-muted-foreground text-center mb-3">Ou payez en plusieurs fois :</p>
-                    {[
-                      { label: "En 3 fois", price: "49", per: "49€/mois × 3" },
-                      { label: "En 5 fois", price: "32", per: "32€/mois × 5" },
-                    ].map((inst, idx) => (
-                      <button key={idx} onClick={handlePlanClick}
-                        className="w-full flex items-center justify-between p-3.5 rounded-xl border border-border hover:border-primary/50 hover:bg-primary/5 transition-all">
-                        <div className="text-left">
-                          <span className="font-semibold text-sm">{inst.label}</span>
-                          <p className="text-xs text-muted-foreground">{inst.per}</p>
-                        </div>
-                        <span className="text-lg font-bold">{inst.price}€</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-
-                <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground mt-5">
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>Paiement sécurisé • Accès immédiat</span>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Garantie */}
-          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mt-10">
-            <div className="bg-emerald-500/5 border-2 border-emerald-500/20 rounded-2xl p-6 text-center">
-              <h3 className="text-lg font-bold text-emerald-600 dark:text-emerald-400 mb-2 flex items-center justify-center gap-2">
-                <ShieldCheck className="w-5 h-5" />
-                Garantie Satisfait ou Remboursé — 30 jours
-              </h3>
-              <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                Testez pendant 30 jours. Pas satisfait ? Un email et vous êtes remboursé intégralement.
-              </p>
-            </div>
-          </motion.div>
-        </div>
-      </section>
 
       {/* Tutoriel Vidéo Clé API */}
       <section className="py-16 px-4" id="tuto-api">
