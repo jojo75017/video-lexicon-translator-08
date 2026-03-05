@@ -505,6 +505,7 @@ const SalesPage = () => {
                     "14 rôles professionnels intégrés",
                     "P15 Humanisation Anti-IA offert",
                     "Export PDF / EPUB / Word",
+                    "🎓 Formation 15 modules vidéo offerte (valeur 197€)",
                     "Toutes les formations (18 modules)",
                     "Outils KDP Premium complets",
                     "Gestionnaire Séries / Sagas",
