@@ -50,6 +50,7 @@ import ForumPage from './pages/ForumPage';
 import KdpKeywordResearchPage from './pages/KdpKeywordResearchPage';
 import PublicAudiobookPage from './pages/PublicAudiobookPage';
 import AudiobookEmbedPage from './pages/AudiobookEmbedPage';
+import FormationEmbedPage from './pages/FormationEmbedPage';
 import { SubscriptionAuth } from '@/components/SubscriptionAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { SubscriberGate } from '@/components/auth/SubscriberGate';
@@ -437,6 +438,7 @@ const App = () => {
             {/* Public audiobook routes */}
             <Route path="/audiobook/:slug" element={<PublicAudiobookPage />} />
             <Route path="/audiobook-embed/:slug" element={<AudiobookEmbedPage />} />
+            <Route path="/formation-embed" element={<FormationEmbedPage />} />
             
             {/* SaaS Routes */}
             <Route path="/saas/login" element={<SaasAuthPage />} />
