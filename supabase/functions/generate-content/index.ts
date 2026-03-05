@@ -475,11 +475,33 @@ Génère des données riches, variées et professionnelles.`;
 
       const productLabel = productTypeLabels[productType] || productType;
 
-      const systemPrompt = `Tu es un expert en marketing et SEO pour Amazon KDP.
-Tu génères des métadonnées optimisées qui maximisent la visibilité et les ventes sur Amazon.
+      const systemPrompt = `Tu es un expert en marketing et SEO Amazon KDP avec une connaissance approfondie de l'algorithme A9.
+
+RÈGLES POUR DES MÉTADONNÉES EXPLOITABLES :
+
+DESCRIPTION (1500-4000 caractères) :
+- Hook percutant en première ligne (visible sans cliquer "Lire plus")
+- Structure AIDA : Attention → Intérêt → Désir → Action
+- Bullet points avec ✅ pour les bénéfices
+- HTML autorisé : <b>, <i>, <br>, <h2> UNIQUEMENT
+- INTERDIT : liens, prix, promotions, superlatifs non vérifiables
+- Intégrer naturellement 3-5 mots-clés SEO
+
+MOTS-CLÉS (7 exactement) :
+- Max 50 caractères par mot-clé
+- INTERDIT : "kindle", "ebook", "livre", "book", "gratuit", "best-seller"
+- Ne PAS répéter le titre
+- Couvrir : synonymes, sous-niches, public cible, bénéfices, tendances
+- Privilégier les termes ACHETEURS (pas informationnels)
+
+CATÉGORIES :
+- Utiliser les VRAIS chemins de catégories Amazon KDP
+- Format : "Livres > Sous-catégorie > Sous-sous-catégorie"
+- Choisir des catégories avec moins de concurrence quand possible
+
 Réponds UNIQUEMENT avec un JSON valide, sans markdown, sans commentaires.`;
 
-      const userPrompt = `Génère les métadonnées KDP complètes pour ce livre:
+      const userPrompt = `Génère les métadonnées KDP PRÊTES À COLLER dans le tableau de bord Amazon pour ce livre:
 
 INFORMATIONS:
 - Titre: "${title || 'Sans Titre'}"
@@ -489,23 +511,16 @@ INFORMATIONS:
 - Thème: ${theme || 'Non spécifié'}
 
 GÉNÈRE UN JSON avec:
-1. "description": Description Amazon engageante (1500-2000 caractères) avec:
-   - Accroche percutante
-   - Bénéfices pour le lecteur
-   - Appel à l'action
-   - Emojis appropriés
-
-2. "keywords": 7 mots-clés stratégiques pour Amazon (optimisés SEO)
-
-3. "categories": 3 catégories Amazon pertinentes
-
+1. "description": Description Amazon HTML (1500-3900 chars, structure AIDA, bullets ✅)
+2. "keywords": 7 mots-clés backend (≤50 chars chacun, termes acheteurs, pas de mots interdits)
+3. "categories": 3 chemins de catégories Amazon réels
 4. "suggestedPrice": {"min": X, "max": Y, "optimal": Z}
 
-Format JSON attendu:
+Format JSON:
 {
   "description": "...",
   "keywords": ["kw1", "kw2", "kw3", "kw4", "kw5", "kw6", "kw7"],
-  "categories": ["cat1", "cat2", "cat3"],
+  "categories": ["Livres > Cat1 > SubCat1", "Livres > Cat2 > SubCat2", "Livres > Cat3"],
   "suggestedPrice": {"min": 5.99, "max": 12.99, "optimal": 8.99}
 }`;
 
@@ -1675,6 +1690,185 @@ RÈGLES CRITIQUES:
       }
     }
 
+    // ====== KDP KEYWORD RESEARCH HANDLER (dedicated) ======
+    if (type === 'kdp-keyword-research') {
+      console.log('Processing KDP keyword research (dedicated handler)...');
+      const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+      
+      if (!OPENAI_API_KEY) {
+        return new Response(
+          JSON.stringify({ error: 'OpenAI API key not configured' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const kdpKeywordSystemPrompt = `Tu es un EXPERT SEO Amazon KDP avec 10 ans d'expérience en optimisation de fiches produits Kindle.
+
+RÈGLES CRITIQUES POUR DES MOTS-CLÉS AMAZON EXPLOITABLES :
+
+1. VOLUMES RÉALISTES : Amazon ≠ Google. Un volume de 5000/mois sur Amazon est ÉNORME. 
+   - Niche étroite : 50-500/mois
+   - Niche moyenne : 500-3000/mois  
+   - Niche large : 3000-15000/mois
+   - Ne JAMAIS dépasser 50000
+
+2. MOTS-CLÉS ACHETEURS : Priorise les termes que les ACHETEURS tapent, pas les curieux :
+   - "guide pratique [sujet]" > "qu'est-ce que [sujet]"
+   - "livre [sujet] débutant" > "[sujet] définition"
+   - Inclure des termes avec "livre", "guide", "méthode", "programme"
+
+3. CONCURRENCE RÉALISTE : 
+   - "low" = moins de 50 résultats KDP sur ce terme exact
+   - "medium" = 50-200 résultats
+   - "high" = 200+ résultats
+
+4. SCORE D'OPPORTUNITÉ = (volume × (100 - difficulty)) / 100
+   Un bon score > 30, excellent > 60
+
+5. DIVERSITÉ OBLIGATOIRE : Inclure un mix de :
+   - Termes exacts de la niche
+   - Variantes avec "livre", "ebook", "guide"
+   - Questions ("comment [sujet]")
+   - Termes émotionnels ("vaincre", "maîtriser", "secrets de")
+   - Termes de sous-niche spécifiques
+
+Réponds UNIQUEMENT avec un tableau JSON valide, sans markdown.`;
+
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 60000);
+
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${OPENAI_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'gpt-4o-mini',
+            messages: [
+              { role: 'system', content: kdpKeywordSystemPrompt },
+              { role: 'user', content: prompt }
+            ],
+            max_tokens: 4000,
+            temperature: 0.6,
+          }),
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('OpenAI error (kdp-keyword-research):', response.status, errorText);
+          const httpErr = lovableAiHttpError(response.status);
+          return new Response(
+            JSON.stringify({ error: httpErr.error }),
+            { status: httpErr.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        const data = await response.json();
+        const generatedContent = data.choices?.[0]?.message?.content;
+        console.log('KDP keyword research generated successfully');
+        return new Response(
+          JSON.stringify({ content: generatedContent }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      } catch (err) {
+        console.error('KDP keyword research error:', err);
+        return new Response(
+          JSON.stringify({ error: err?.name === 'AbortError' ? 'Timeout' : err?.message }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+
+    // ====== KDP BACKEND KEYWORDS HANDLER (dedicated) ======
+    if (type === 'kdp-backend-keywords') {
+      console.log('Processing KDP backend keywords (dedicated handler)...');
+      const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+      
+      if (!OPENAI_API_KEY) {
+        return new Response(
+          JSON.stringify({ error: 'OpenAI API key not configured' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const backendKeywordsSystemPrompt = `Tu es un EXPERT Amazon KDP spécialisé dans l'optimisation des 7 mots-clés backend du tableau de bord KDP.
+
+RÈGLES AMAZON STRICTES (non-respect = rejet du livre) :
+1. EXACTEMENT 7 mots-clés, ni plus ni moins
+2. Maximum 50 caractères par champ (espaces inclus)
+3. INTERDIT : "kindle", "ebook", "livre", "book", "free", "gratuit", "best-seller", "best seller", noms de marques
+4. INTERDIT : répéter des mots déjà dans le titre ou sous-titre
+5. INTERDIT : mettre des virgules dans un champ (Amazon sépare automatiquement les mots)
+6. Pas d'accents inutiles si la version sans accent est aussi cherchée
+7. Pas de fautes d'orthographe intentionnelles
+
+STRATÉGIE OPTIMALE :
+- Champ 1-2 : Synonymes directs du sujet principal
+- Champ 3-4 : Termes de sous-niche / audience cible  
+- Champ 5-6 : Termes émotionnels / bénéfices ("confiance en soi", "perte de poids rapide")
+- Champ 7 : Terme saisonnier ou tendance ("2026", "méthode complète")
+
+EXEMPLES DE BONS MOTS-CLÉS BACKEND :
+- Pour un livre sur le jardinage : "potager débutant", "permaculture balcon", "cultiver légumes maison", "jardinage urbain pratique", "autosuffisance alimentaire", "plantes aromatiques culture", "saison plantation guide"
+
+Réponds UNIQUEMENT avec un tableau JSON de 7 strings : ["mot-clé 1", "mot-clé 2", ...]
+Vérifie que CHAQUE string fait ≤ 50 caractères.`;
+
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 60000);
+
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${OPENAI_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'gpt-4o-mini',
+            messages: [
+              { role: 'system', content: backendKeywordsSystemPrompt },
+              { role: 'user', content: prompt }
+            ],
+            max_tokens: 1000,
+            temperature: 0.4,
+          }),
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('OpenAI error (kdp-backend-keywords):', response.status, errorText);
+          const httpErr = lovableAiHttpError(response.status);
+          return new Response(
+            JSON.stringify({ error: httpErr.error }),
+            { status: httpErr.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        const data = await response.json();
+        const generatedContent = data.choices?.[0]?.message?.content;
+        console.log('KDP backend keywords generated successfully');
+        return new Response(
+          JSON.stringify({ content: generatedContent }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      } catch (err) {
+        console.error('KDP backend keywords error:', err);
+        return new Response(
+          JSON.stringify({ error: err?.name === 'AbortError' ? 'Timeout' : err?.message }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
@@ -1690,11 +1884,8 @@ RÈGLES CRITIQUES:
 
     console.log(apiKey ? 'Using provided OpenAI API key for generation' : 'Using OPENAI_API_KEY secret for generation');
 
-    // Utilisation directe avec la clé API fournie - pas de vérification d'abonnement
-    console.log('Using provided OpenAI API key for generation');
-
     // Appeler OpenAI
-    console.log('Calling OpenAI API...');
+    console.log('Calling OpenAI API (generic handler)...');
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {

@@ -26,44 +26,71 @@ serve(async (req) => {
       throw new Error("OPENAI_API_KEY non configurée");
     }
 
-    const systemPrompt = `Tu es un rédacteur expert reconnu dans ton domaine. Tu rédiges des contenus de qualité professionnelle.
+    const systemPrompt = `Tu es un auteur professionnel publié sur Amazon KDP avec des milliers de ventes. Tu rédiges des chapitres de qualité PUBLICATION, prêts à être exportés en PDF et vendus.
 
-Règles de rédaction :
-- Clarté absolue : chaque phrase doit être immédiatement compréhensible
-- Précision : utilise des termes techniques appropriés sans jargon inutile
-- Exemples concrets : illustre chaque concept clé avec un exemple pratique
-- Ton naturel : écris comme si tu expliquais à un collègue intelligent
-- Zéro remplissage : chaque mot doit apporter de la valeur
+STANDARDS DE QUALITÉ KDP (score minimum 9/10) :
 
-Structure obligatoire :
-1. Introduction engageante (2-3 phrases max)
-2. Corps du chapitre avec sous-sections claires
-3. Synthèse claire (résumé des points clés)
-4. Action concrète (une tâche spécifique que le lecteur peut faire immédiatement)
+1. STRUCTURE PROFESSIONNELLE :
+   - Introduction engageante (2-3 phrases qui accrochent — PAS de "Dans ce chapitre, nous allons...")
+   - Corps structuré avec sous-sections titrées (H2/H3)
+   - Transitions fluides entre chaque section
+   - Conclusion qui donne envie de lire le chapitre suivant (micro-cliffhanger)
 
-Réponds en JSON avec cette structure :
+2. STYLE D'ÉCRITURE HUMAIN (ANTI-IA OBLIGATOIRE) :
+   - INTERDIT : "Il est important de noter que", "En effet", "De plus", "Par conséquent", "Il convient de", "Force est de constater", "Dans un monde où"
+   - INTERDIT : phrases de plus de 25 mots consécutives sans ponctuation
+   - INTERDIT : 3 phrases consécutives commençant par le même mot
+   - OBLIGATOIRE : varier la longueur des phrases (courtes percutantes + longues descriptives)
+   - OBLIGATOIRE : utiliser des métaphores originales (pas les clichés)
+   - OBLIGATOIRE : inclure au moins 1 anecdote ou cas concret par section
+   - Ton : conversationnel expert (comme un mentor qui partage son savoir)
+
+3. VALEUR ACTIONNABLE :
+   - Chaque section doit contenir au moins 1 conseil SPÉCIFIQUE et MESURABLE
+   - Pas de généralités ("il faut être motivé") → Du concret ("consacrez 20 minutes chaque matin à...")
+   - Inclure des exemples réels ou des études de cas
+   - Terminer par une action concrète que le lecteur peut faire IMMÉDIATEMENT
+
+4. LONGUEUR KDP :
+   - Minimum 1500 mots par chapitre (idéal : 2000-3000)
+   - Une page KDP ≈ 250 mots
+   - Viser 6-12 pages par chapitre
+
+5. FORMATAGE :
+   - Sous-titres clairs et engageants (pas "Section 1" → "Les 3 erreurs qui vous coûtent cher")
+   - Listes à puces pour les étapes/conseils
+   - Citations ou encadrés pour les points clés
+   - Espacement aéré pour la lisibilité sur Kindle
+
+Réponds en JSON :
 {
-  "introduction": "...",
+  "introduction": "Introduction engageante (2-3 phrases)",
   "sections": [
     {
-      "titre": "...",
-      "contenu": "...",
-      "exemple": "..."
+      "titre": "Sous-titre accrocheur",
+      "contenu": "Contenu détaillé avec exemples concrets (min 300 mots)",
+      "exemple": "Anecdote ou cas pratique illustrant le point"
     }
   ],
-  "synthese": "...",
-  "actionConcrete": "...",
-  "contenuComplet": "..."
+  "synthese": "Résumé des 3 points clés à retenir",
+  "actionConcrete": "UNE action spécifique à faire dans les 24h",
+  "contenuComplet": "Le chapitre complet formaté, prêt pour export",
+  "wordCount": 2000,
+  "qualityScore": 9
 }`;
 
-    const userPrompt = `Rédige le chapitre suivant comme un expert reconnu :
+    const userPrompt = `Rédige un chapitre PRÊT À PUBLIER sur Amazon KDP :
 
 Titre du chapitre : ${chapterTitle}
-${chapterContext ? `Contexte : ${chapterContext}` : ''}
+${chapterContext ? `Contexte du livre : ${chapterContext}` : ''}
 ${targetAudience ? `Public cible : ${targetAudience}` : ''}
 ${expertise ? `Domaine d'expertise : ${expertise}` : ''}
 
-Applique rigoureusement les règles de rédaction experte.`;
+RAPPELS CRITIQUES :
+- Minimum 1500 mots (idéal 2000+)
+- Style humain naturel — ZÉRO tic de langage IA
+- Exemples concrets et actionnables
+- Micro-cliffhanger en fin de chapitre`;
 
     console.log("Calling OpenAI for expert writing...");
 
@@ -82,7 +109,8 @@ Applique rigoureusement les règles de rédaction experte.`;
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt }
         ],
-        max_tokens: 3000,
+        max_tokens: 4000,
+        temperature: 0.8,
       }),
       signal: controller.signal
     });
