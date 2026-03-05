@@ -26,30 +26,44 @@ serve(async (req) => {
       throw new Error("OPENAI_API_KEY non configurée");
     }
 
-    const systemPrompt = `Tu es un expert en copywriting Amazon KDP. Tu crées des descriptions de livres qui CONVERTISSENT les visiteurs en acheteurs.
+    const systemPrompt = `Tu es un copywriter Amazon KDP avec 10 ans d'expérience en conversion de fiches produits Kindle. Tu crées des descriptions qui CONVERTISSENT les visiteurs en acheteurs.
 
-Règles Amazon KDP pour les descriptions :
-- Maximum 4000 caractères (espaces inclus)
-- HTML autorisé : <b>, <i>, <br>, <h2> uniquement
-- Pas de liens, pas d'images, pas de prix
-- Les 3 premières lignes sont CRITIQUES (visibles sans cliquer "Lire plus")
+CONTRAINTES TECHNIQUES AMAZON KDP (non-respect = suppression) :
+- Maximum 4000 caractères (espaces inclus) — COMPTE CHAQUE CARACTÈRE
+- HTML autorisé UNIQUEMENT : <b>, <i>, <br>, <h2>
+- INTERDIT : <p>, <ul>, <li>, <a>, <img>, <div>, <span>, liens, images, prix, promotions
+- Les 3 premières lignes sont visibles SANS cliquer "Lire plus" — elles doivent ACCROCHER
 
-Techniques de copywriting à utiliser :
-- Hook puissant dans les 2 premières phrases
-- Bénéfices > caractéristiques
-- Bullet points avec émojis pour la lisibilité
-- Preuve sociale implicite
-- Appel à l'action subtil en fin
+STRUCTURE DE CONVERSION ÉPROUVÉE (méthode AIDA adaptée Amazon) :
+1. HOOK (2 phrases max) : Question provocante ou stat choc liée au problème du lecteur
+2. PROBLÈME : Décris la douleur/frustration que le lecteur vit (empathie)
+3. SOLUTION : Présente le livre comme LA solution — utilise "Dans ce guide, vous découvrirez..."
+4. BÉNÉFICES : 5-7 bullet points commençant par ✅ — chaque point = un résultat CONCRET
+5. CRÉDIBILITÉ : Mention subtile d'expertise ou de résultats ("Basé sur X années de recherche...")
+6. CTA : "Scrollez vers le haut et cliquez sur ACHETER pour commencer dès aujourd'hui !"
 
-Génère le résultat en JSON strict avec cette structure :
+RÈGLES DE COPYWRITING AMAZON :
+- JAMAIS de superlatifs non vérifiables ("le meilleur livre du monde")
+- Utiliser le VOUS, pas le "on" ou le "nous"
+- Chaque bullet point = 1 bénéfice mesurable ou actionnable
+- Intégrer naturellement 3-5 mots-clés SEO dans le texte (pas de keyword stuffing)
+- Ton professionnel mais chaleureux — comme un expert qui aide un ami
+
+ANTI-PATTERNS À ÉVITER :
+- ❌ "Ce livre est parfait pour..." (trop générique)
+- ❌ Lister le sommaire (pas de valeur)
+- ❌ "Achetez maintenant" en premier (trop agressif)
+- ✅ Montrer le RÉSULTAT que le lecteur obtiendra
+
+Génère le résultat en JSON strict :
 {
-  "descriptionComplete": "La description complète formatée en HTML (max 4000 chars)",
-  "descriptionCourte": "Version courte pour les réseaux sociaux (max 300 chars)",
-  "hook": "L'accroche principale seule",
-  "bulletPoints": ["Bénéfice 1", "Bénéfice 2", "Bénéfice 3", "Bénéfice 4", "Bénéfice 5"],
-  "callToAction": "L'appel à l'action final",
+  "descriptionComplete": "Description HTML complète (max 4000 chars, vérifie le compte)",
+  "descriptionCourte": "Version réseaux sociaux (max 300 chars, sans HTML)",
+  "hook": "L'accroche seule (2 phrases max)",
+  "bulletPoints": ["✅ Bénéfice concret 1", "✅ Bénéfice concret 2", "✅ Bénéfice concret 3", "✅ Bénéfice concret 4", "✅ Bénéfice concret 5"],
+  "callToAction": "Le CTA final",
   "scorePersuasion": 85,
-  "conseilsAmelioration": ["Conseil 1", "Conseil 2", "Conseil 3"],
+  "conseilsAmelioration": ["Conseil actionnable 1", "Conseil actionnable 2", "Conseil actionnable 3"],
   "motsClesSeo": ["mot1", "mot2", "mot3", "mot4", "mot5", "mot6", "mot7"],
   "tonaliteDetectee": "Informatif / Inspirant / Autoritaire / etc.",
   "structureAnalysis": {
@@ -58,20 +72,26 @@ Génère le résultat en JSON strict avec cette structure :
     "ctaScore": 75,
     "seoScore": 90,
     "lisibiliteScore": 88
-  }
+  },
+  "charCount": 2500,
+  "amazonCompliant": true,
+  "complianceNotes": ["Note sur conformité"]
 }`;
 
-    const userPrompt = `Génère une description Amazon KDP ultra-persuasive pour ce livre :
+    const userPrompt = `Génère une description Amazon KDP PRÊTE À COLLER dans le tableau de bord KDP :
 
 Titre : ${title}
 ${subtitle ? `Sous-titre : ${subtitle}` : ''}
 ${genre ? `Genre : ${genre}` : ''}
 ${targetAudience ? `Public cible : ${targetAudience}` : ''}
-${keywords ? `Mots-clés à privilégier : ${keywords}` : ''}
-${additionalInfo ? `Informations supplémentaires : ${additionalInfo}` : ''}
+${keywords ? `Mots-clés SEO à intégrer naturellement : ${keywords}` : ''}
+${additionalInfo ? `Contexte supplémentaire : ${additionalInfo}` : ''}
 
-IMPORTANT : La description doit être optimisée pour la conversion Amazon ET le référencement.
-Utilise les 7 mots-clés naturellement dans la description.`;
+IMPORTANT : 
+- La description DOIT faire entre 1500 et 3900 caractères (marge de sécurité sous les 4000)
+- Utilise UNIQUEMENT <b>, <i>, <br>, <h2> comme balises HTML
+- Les 3 premières lignes doivent donner envie de cliquer "Lire plus"
+- Intègre les mots-clés naturellement, jamais de keyword stuffing`;
 
     console.log("Calling OpenAI for KDP description generation...");
 
@@ -91,7 +111,7 @@ Utilise les 7 mots-clés naturellement dans la description.`;
           { role: "user", content: userPrompt }
         ],
         max_tokens: 3000,
-        temperature: 0.8,
+        temperature: 0.7,
       }),
       signal: controller.signal
     });
@@ -133,7 +153,10 @@ Utilise les 7 mots-clés naturellement dans la description.`;
         conseilsAmelioration: [],
         motsClesSeo: [],
         tonaliteDetectee: "Non déterminée",
-        structureAnalysis: { hookScore: 70, beneficesScore: 70, ctaScore: 70, seoScore: 70, lisibiliteScore: 70 }
+        structureAnalysis: { hookScore: 70, beneficesScore: 70, ctaScore: 70, seoScore: 70, lisibiliteScore: 70 },
+        charCount: content.length,
+        amazonCompliant: false,
+        complianceNotes: ["Parsing échoué — vérifiez manuellement"]
       };
     }
 
