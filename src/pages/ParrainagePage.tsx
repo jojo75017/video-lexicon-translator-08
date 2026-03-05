@@ -43,9 +43,6 @@ const ParrainagePage = () => {
     );
   }
 
-  const commissionRate = 30; // 30%
-  const productPrice = 37;
-  const commissionPerSale = +(productPrice * commissionRate / 100).toFixed(2); // 11.10€
   const totalReferrals = stats?.total_referrals ?? 0;
   const converted = stats?.converted ?? 0;
   const conversionRate = totalReferrals > 0 ? ((converted / totalReferrals) * 100).toFixed(1) : '0';
@@ -61,8 +58,7 @@ const ParrainagePage = () => {
           <div>
             <h1 className="text-2xl md:text-3xl font-bold">Programme de Parrainage</h1>
             <p className="text-muted-foreground">
-              <Badge variant="secondary" className="mr-2">{commissionRate}% de commission</Badge>
-              soit {commissionPerSale}€ par vente
+              Gagnez des commissions sur chaque vente
             </p>
           </div>
         </div>
@@ -75,7 +71,7 @@ const ParrainagePage = () => {
               Votre lien de parrainage
             </CardTitle>
             <CardDescription>
-              Partagez ce lien — quand quelqu'un s'inscrit et paye, vous gagnez {commissionPerSale}€
+              Partagez ce lien — quand quelqu'un s'inscrit et paye, vous gagnez une commission
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -139,7 +135,7 @@ const ParrainagePage = () => {
             <CardContent className="pt-6 text-center">
               <DollarSign className="h-8 w-8 mx-auto mb-2 text-emerald-500" />
               <div className="text-3xl font-bold">{stats?.total_commission ?? 0}€</div>
-              <p className="text-sm text-muted-foreground">Commissions ({commissionRate}%)</p>
+              <p className="text-sm text-muted-foreground">Commissions</p>
             </CardContent>
           </Card>
         </div>
@@ -226,13 +222,26 @@ const ParrainagePage = () => {
                   <span className="font-bold text-primary">3</span>
                 </div>
                 <h4 className="font-semibold">Vous gagnez</h4>
-                <p className="text-sm text-muted-foreground">{commissionRate}% de commission = {commissionPerSale}€ par vente</p>
+                <p className="text-sm text-muted-foreground">De 1.85€ à 30€ par vente selon le palier</p>
               </div>
             </div>
-            <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg text-center">
-              <p className="text-green-800 font-medium">
-                💡 4 parrainages = votre accès remboursé !
-              </p>
+            <div className="mt-6 space-y-3">
+              <h4 className="font-semibold text-center">Barème des commissions</h4>
+              <div className="grid md:grid-cols-2 gap-3">
+                <div className="p-4 bg-muted/50 rounded-lg">
+                  <p className="font-semibold">Offre Fondateur (37€)</p>
+                  <ul className="text-sm text-muted-foreground mt-2 space-y-1">
+                    <li>• Filleuls 1 à 5 : <strong>5%</strong> = 1.85€/vente</li>
+                    <li>• Filleuls 6 à 25 : <strong>10€</strong>/vente</li>
+                  </ul>
+                </div>
+                <div className="p-4 bg-muted/50 rounded-lg">
+                  <p className="font-semibold">Offre Pro Lifetime (147€)</p>
+                  <ul className="text-sm text-muted-foreground mt-2 space-y-1">
+                    <li>• <strong>30€</strong> par vente (tous paliers)</li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>

@@ -113,9 +113,41 @@ Deno.serve(async (req) => {
         });
       }
 
-      const commissionRate = 0.30; // 30% commission
-      const saleAmount = 37; // Prix VIP
-      const commission = saleAmount * commissionRate;
+      // Determine sale amount from request body (default 37€ Fondateur)
+      const { sale_amount: saleAmount = 37 } = await req.json().catch(() => ({ sale_amount: 37 }));
+
+      // Get referrer's current converted count to determine commission tier
+      const { data: referral } = await supabase
+        .from("referrals")
+        .select("referrer_id")
+        .eq("referred_email", referred_email)
+        .eq("status", "pending")
+        .maybeSingle();
+
+      let commission = 0;
+      if (referral) {
+        const { count } = await supabase
+          .from("referrals")
+          .select("id", { count: "exact", head: true })
+          .eq("referrer_id", referral.referrer_id)
+          .eq("status", "converted");
+
+        const convertedCount = count ?? 0;
+
+        if (saleAmount >= 147) {
+          // Pro Lifetime: 30€ flat commission
+          commission = 30;
+        } else {
+          // Fondateur 37€: 5% for first 5, then 10€ for next 20
+          if (convertedCount < 5) {
+            commission = +(saleAmount * 0.05).toFixed(2); // ~1.85€
+          } else if (convertedCount < 25) {
+            commission = 10;
+          } else {
+            commission = 10; // keep 10€ beyond 25
+          }
+        }
+      }
 
       const { error } = await supabase
         .from("referrals")
