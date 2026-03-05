@@ -399,14 +399,7 @@ const SalesPage = () => {
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="max-w-xs mx-auto text-center">
           <motion.p variants={fadeUp} className="text-sm font-semibold text-violet-400 mb-3">🎯 Rappel — Offre Fondateur à 37&nbsp;€</motion.p>
           <motion.div variants={fadeUp} custom={1} className="rounded-xl overflow-hidden shadow-xl shadow-violet-500/10 border border-border bg-card aspect-[9/16]">
-            <video
-              src="/videos/annonce-ebookstudio.mp4"
-              controls
-              playsInline
-              preload="metadata"
-              className="w-full h-full object-cover"
-              title="Annonce offre fondateur EbookStudio 37€"
-            />
+            <video src="/videos/annonce-ebookstudio.mp4" controls playsInline preload="metadata" className="w-full h-full object-cover" title="Annonce offre fondateur EbookStudio 37€" />
           </motion.div>
           <motion.p variants={fadeUp} custom={2} className="text-xs text-muted-foreground mt-2">📣 Pourquoi profiter de l'offre fondateur maintenant</motion.p>
         </motion.div>
@@ -414,28 +407,173 @@ const SalesPage = () => {
 
       {/* ═══════════════════════════════════════ MESSAGE MOTIVATION ═══════════════════════════ */}
       <section className="py-8 px-4">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="max-w-3xl mx-auto relative overflow-hidden rounded-2xl bg-gradient-to-r from-violet-600 via-purple-600 to-violet-700 p-8 shadow-2xl shadow-violet-500/20 border border-white/10 text-center"
-        >
+        <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="max-w-3xl mx-auto relative overflow-hidden rounded-2xl bg-gradient-to-r from-violet-600 via-purple-600 to-violet-700 p-8 shadow-2xl shadow-violet-500/20 border border-white/10 text-center">
           <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-[60px]" />
           <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-pink-500/15 rounded-full blur-[50px]" />
           <div className="relative z-10">
             <p className="text-3xl mb-3">🚀</p>
-            <h3 className="text-xl md:text-2xl font-extrabold text-white mb-3">
-              1, 2, 3… Foncez !
-            </h3>
+            <h3 className="text-xl md:text-2xl font-extrabold text-white mb-3">1, 2, 3… Foncez !</h3>
             <p className="text-white/85 text-base md:text-lg leading-relaxed max-w-xl mx-auto">
               Et sachez que je suis <strong className="text-white">toujours là pour vous accompagner</strong> — avec un Zoom gratuit, à tout moment.
             </p>
-            <p className="text-white/50 text-sm mt-4 italic">
-              — Georges, créateur d'EbookStudio
-            </p>
+            <p className="text-white/50 text-sm mt-4 italic">— Georges, créateur d'EbookStudio</p>
           </div>
         </motion.div>
+      </section>
+
+      {/* ═══════════════════════════════════════ TÉMOIGNAGES (moved up) ═══════════════════════ */}
+      <section className="py-14 px-4">
+        <div className="max-w-6xl mx-auto">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-10">
+            <motion.h2 variants={fadeUp} className="text-3xl md:text-5xl font-extrabold mb-5">
+              Ce qu'en disent nos utilisateurs
+            </motion.h2>
+            <motion.p variants={fadeUp} custom={1} className="text-muted-foreground text-lg">Rejoignez les auteurs qui publient avec confiance</motion.p>
+          </motion.div>
+
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={stagger}
+            className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {testimonials.map((t, i) => (
+              <motion.div key={i} variants={fadeUp} custom={i}>
+                <Card className="h-full border hover:border-primary/30 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                  <CardContent className="pt-6 pb-6">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className={`w-11 h-11 rounded-full bg-gradient-to-br ${t.color} flex items-center justify-center text-white font-bold text-sm shadow-md`}>
+                        {t.avatar}
+                      </div>
+                      <div>
+                        <p className="font-semibold text-sm">{t.name}</p>
+                        <p className="text-xs text-muted-foreground">{t.role}</p>
+                      </div>
+                      <div className="ml-auto flex gap-0.5">
+                        {[1,2,3,4,5].map(s => <Star key={s} className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />)}
+                      </div>
+                    </div>
+                    <p className="text-foreground/85 text-sm leading-relaxed italic">"{t.text}"</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════ SOCIAL PROOF (moved up) ═══════════════════════ */}
+      <SocialProofBanner />
+
+      {/* ═══════════════════════════════════════ AVANT / APRÈS ═══════════════════════════════ */}
+      <section className="py-14 px-4">
+        <div className="max-w-5xl mx-auto">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-10">
+            <motion.h2 variants={fadeUp} className="text-3xl md:text-5xl font-extrabold mb-3">
+              Avant vs Après EbookStudio
+            </motion.h2>
+            <motion.p variants={fadeUp} custom={1} className="text-muted-foreground text-lg">La différence est immédiate</motion.p>
+          </motion.div>
+
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}
+            className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            {/* AVANT */}
+            <motion.div variants={fadeUp}>
+              <Card className="h-full border-2 border-red-500/20 bg-red-500/5">
+                <CardContent className="pt-8 pb-8">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-12 h-12 rounded-xl bg-red-500/10 flex items-center justify-center">
+                      <span className="text-2xl">😩</span>
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-red-500 uppercase tracking-wider">Avant</p>
+                      <p className="font-bold text-lg">Sans EbookStudio</p>
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    {[
+                      { text: "2 à 6 mois pour écrire un seul ebook", icon: "⏳" },
+                      { text: "0€ de revenus passifs", icon: "💸" },
+                      { text: "Syndrome de la page blanche permanent", icon: "📝" },
+                      { text: "Aucune idée des mots-clés Amazon qui vendent", icon: "🔍" },
+                      { text: "Mise en page amateur, refusée par KDP", icon: "❌" },
+                      { text: "Investissement freelance : 500€ à 5 000€", icon: "💰" },
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-start gap-3">
+                        <span className="text-lg shrink-0 mt-0.5">{item.icon}</span>
+                        <p className="text-sm text-foreground/80">{item.text}</p>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* APRÈS */}
+            <motion.div variants={fadeUp} custom={1}>
+              <Card className="h-full border-2 border-emerald-500/20 bg-emerald-500/5 relative overflow-hidden">
+                <div className="absolute top-3 right-3">
+                  <Badge className="bg-emerald-500 text-white border-0 text-xs">VOTRE FUTUR</Badge>
+                </div>
+                <CardContent className="pt-8 pb-8">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                      <span className="text-2xl">🚀</span>
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-emerald-500 uppercase tracking-wider">Après</p>
+                      <p className="font-bold text-lg">Avec EbookStudio</p>
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    {[
+                      { text: "Premier ebook publié en moins d'1 heure", icon: "⚡" },
+                      { text: "Revenus passifs dès le premier mois", icon: "💰" },
+                      { text: "14 rôles IA qui écrivent pour vous", icon: "🤖" },
+                      { text: "Mots-clés Amazon optimisés automatiquement", icon: "🎯" },
+                      { text: "Export PDF/Word professionnel, prêt pour KDP", icon: "✅" },
+                      { text: "Investissement unique : 37€ à vie", icon: "🏆" },
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-start gap-3">
+                        <span className="text-lg shrink-0 mt-0.5">{item.icon}</span>
+                        <p className="text-sm text-foreground/80 font-medium">{item.text}</p>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════ VALEUR (moved up) ═══════════════════════════ */}
+      <section className="py-14 px-4 bg-muted/30">
+        <div className="max-w-4xl mx-auto">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-10">
+            <motion.h2 variants={fadeUp} className="text-3xl md:text-5xl font-extrabold mb-5">
+              Combien coûte réellement un ebook professionnel ?
+            </motion.h2>
+          </motion.div>
+
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}
+            className="grid md:grid-cols-3 gap-6 mb-12">
+            {valuePrices.map((v, i) => (
+              <motion.div key={i} variants={fadeUp} custom={i}>
+                <Card className={`border-2 ${v.borderColor} ${v.bgColor} text-center hover:shadow-lg transition-shadow`}>
+                  <CardContent className="pt-8 pb-8">
+                    <p className="text-base font-semibold mb-3">{v.label}</p>
+                    <p className={`text-3xl font-extrabold ${v.color}`}>{v.price}</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center">
+            <div className="inline-flex items-center gap-3 bg-gradient-to-r from-violet-500/10 to-purple-500/10 border border-violet-500/20 rounded-2xl px-8 py-4">
+              <Sparkles className="w-5 h-5 text-violet-500" />
+              <p className="text-xl font-bold">EbookStudio Pro <span className="text-primary">remplace cette chaîne complète</span></p>
+            </div>
+          </motion.div>
+        </div>
       </section>
 
       {/* ═══════════════════════════════════════ PRICING ═══════════════════════════════════ */}
@@ -453,8 +591,7 @@ const SalesPage = () => {
 
           {/* Countdown */}
           {isVipAvailable && (
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }}
-              className="mb-12">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className="mb-12">
               <div className="bg-gradient-to-r from-violet-600 to-purple-600 rounded-2xl p-6 text-white text-center shadow-2xl shadow-violet-500/20">
                 <div className="flex items-center justify-center gap-2 mb-4">
                   <Clock className="w-5 h-5" />
@@ -576,9 +713,6 @@ const SalesPage = () => {
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════ SOCIAL PROOF ═══════════════════════════════ */}
-      <SocialProofBanner />
-
       {/* ═══════════════════════════════════════ 14 RÔLES ═══════════════════════════════════ */}
       <section className="py-14 px-4">
         <div className="max-w-6xl mx-auto">
@@ -604,7 +738,7 @@ const SalesPage = () => {
                   <CardContent className="space-y-3">
                     {phase.roles.map((role, ri) => (
                       <div key={ri} className="flex items-center gap-3 group">
-                        <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${phase.color} flex items-center justify-center shadow-sm`}>
+                        <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${phase.color} flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform`}>
                           <role.icon className="w-4 h-4 text-white" />
                         </div>
                         <div className="min-w-0">
@@ -645,9 +779,7 @@ const SalesPage = () => {
       <section className="py-14 px-4 bg-muted/30">
         <div className="max-w-5xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={stagger} className="text-center mb-10">
-            <motion.h2 variants={fadeUp} className="text-3xl md:text-5xl font-extrabold mb-5">
-              Comment ça marche
-            </motion.h2>
+            <motion.h2 variants={fadeUp} className="text-3xl md:text-5xl font-extrabold mb-5">Comment ça marche</motion.h2>
             <motion.p variants={fadeUp} custom={1} className="text-muted-foreground text-lg">4 étapes. Un seul workflow. Un ebook professionnel.</motion.p>
           </motion.div>
 
@@ -655,7 +787,6 @@ const SalesPage = () => {
             className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {steps.map((step, i) => (
               <motion.div key={i} variants={fadeUp} custom={i} className="relative text-center group">
-                {/* Connector line */}
                 {i < steps.length - 1 && (
                   <div className="hidden lg:block absolute top-10 left-[60%] w-[80%] h-px bg-border" />
                 )}
@@ -677,26 +808,19 @@ const SalesPage = () => {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={stagger}>
             <motion.div variants={fadeUp}>
             <Card className="relative overflow-hidden border-2 border-primary/30 bg-gradient-to-br from-primary/5 via-card to-violet-500/5">
-              {/* Decorative orbs */}
               <div className="absolute -top-20 -right-20 w-56 h-56 bg-primary/15 rounded-full blur-[80px]" />
               <div className="absolute -bottom-16 -left-16 w-40 h-40 bg-violet-500/10 rounded-full blur-[60px]" />
-
               <CardContent className="relative p-8 md:p-12">
                 <div className="flex flex-col md:flex-row items-center gap-8">
-                  {/* Left: Visual roadmap mini */}
                   <div className="flex-1 space-y-4">
                     <Badge className="bg-emerald-500/15 text-emerald-500 border-emerald-500/30 mb-2">
                       <Eye className="w-3 h-3 mr-1" />
                       Aperçu du parcours
                     </Badge>
-                    <h3 className="text-2xl md:text-3xl font-extrabold">
-                      Curieux de voir le parcours ?
-                    </h3>
+                    <h3 className="text-2xl md:text-3xl font-extrabold">Curieux de voir le parcours ?</h3>
                     <p className="text-muted-foreground leading-relaxed">
                       Explorez la <span className="font-semibold text-foreground">roadmap interactive</span> : les 4 phases, les 15 étapes, et comprenez exactement comment votre ebook sera créé — avant même de commencer.
                     </p>
-
-                    {/* Mini phases preview */}
                     <div className="grid grid-cols-2 gap-2 pt-2">
                       {[
                         { num: '1', label: 'Positionner', emoji: '🎯', color: 'bg-violet-500/10 border-violet-500/20 text-violet-500' },
@@ -711,23 +835,16 @@ const SalesPage = () => {
                       ))}
                     </div>
                   </div>
-
-                  {/* Right: CTA */}
                   <div className="flex flex-col items-center gap-4 shrink-0">
                     <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-primary to-violet-600 flex items-center justify-center shadow-2xl shadow-primary/30">
                       <Play className="w-10 h-10 text-white ml-1" />
                     </div>
-                    <Button
-                      size="lg"
-                      onClick={() => navigate('/demo')}
-                      className="text-base px-8 py-5 h-auto rounded-2xl bg-primary hover:bg-primary/90 shadow-lg shadow-primary/25 gap-2 group"
-                    >
+                    <Button size="lg" onClick={() => navigate('/demo')}
+                      className="text-base px-8 py-5 h-auto rounded-2xl bg-primary hover:bg-primary/90 shadow-lg shadow-primary/25 gap-2 group">
                       Découvrir le parcours
                       <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </Button>
-                    <p className="text-xs text-muted-foreground text-center">
-                      Sans inscription • Comprenez avant de commencer
-                    </p>
+                    <p className="text-xs text-muted-foreground text-center">Sans inscription • Comprenez avant de commencer</p>
                   </div>
                 </div>
               </CardContent>
@@ -745,102 +862,19 @@ const SalesPage = () => {
       {/* ═══════════════════════ PREUVE REVENUS PASSIFS ═══════════════════════ */}
       <PassiveRevenueProof />
 
-      <section className="py-14 px-4">
-        <div className="max-w-6xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-10">
-            <motion.h2 variants={fadeUp} className="text-3xl md:text-5xl font-extrabold mb-5">
-              Ce qu'en disent nos utilisateurs
-            </motion.h2>
-            <motion.p variants={fadeUp} custom={1} className="text-muted-foreground text-lg">Rejoignez les auteurs qui publient avec confiance</motion.p>
-          </motion.div>
-
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={stagger}
-            className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {testimonials.map((t, i) => (
-              <motion.div key={i} variants={fadeUp} custom={i}>
-                <Card className="h-full border hover:border-primary/30 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                  <CardContent className="pt-6 pb-6">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className={`w-11 h-11 rounded-full bg-gradient-to-br ${t.color} flex items-center justify-center text-white font-bold text-sm shadow-md`}>
-                        {t.avatar}
-                      </div>
-                      <div>
-                        <p className="font-semibold text-sm">{t.name}</p>
-                        <p className="text-xs text-muted-foreground">{t.role}</p>
-                      </div>
-                      <div className="ml-auto flex gap-0.5">
-                        {[1,2,3,4,5].map(s => <Star key={s} className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />)}
-                      </div>
-                    </div>
-                    <p className="text-foreground/85 text-sm leading-relaxed italic">"{t.text}"</p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════ VALEUR ═══════════════════════════════════ */}
-      <section className="py-14 px-4 bg-muted/30">
-        <div className="max-w-4xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-10">
-            <motion.h2 variants={fadeUp} className="text-3xl md:text-5xl font-extrabold mb-5">
-              Combien coûte réellement un ebook professionnel ?
-            </motion.h2>
-          </motion.div>
-
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}
-            className="grid md:grid-cols-3 gap-6 mb-12">
-            {valuePrices.map((v, i) => (
-              <motion.div key={i} variants={fadeUp} custom={i}>
-                <Card className={`border-2 ${v.borderColor} ${v.bgColor} text-center hover:shadow-lg transition-shadow`}>
-                  <CardContent className="pt-8 pb-8">
-                    <p className="text-base font-semibold mb-3">{v.label}</p>
-                    <p className={`text-3xl font-extrabold ${v.color}`}>{v.price}</p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </motion.div>
-
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center">
-            <div className="inline-flex items-center gap-3 bg-gradient-to-r from-violet-500/10 to-purple-500/10 border border-violet-500/20 rounded-2xl px-8 py-4">
-              <Sparkles className="w-5 h-5 text-violet-500" />
-              <p className="text-xl font-bold">EbookStudio Pro <span className="text-primary">remplace cette chaîne complète</span></p>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
       {/* ═══════════════════════════════════════ GUIDE GRATUIT ═══════════════════════════════ */}
       <section className="py-10 px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="max-w-2xl mx-auto text-center rounded-2xl border border-violet-500/20 bg-gradient-to-br from-violet-500/10 via-purple-500/5 to-violet-500/10 p-8 shadow-lg shadow-violet-500/10"
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}
+          className="max-w-2xl mx-auto text-center rounded-2xl border border-violet-500/20 bg-gradient-to-br from-violet-500/10 via-purple-500/5 to-violet-500/10 p-8 shadow-lg shadow-violet-500/10">
           <p className="text-3xl mb-3">🎁</p>
-          <h3 className="text-xl md:text-2xl font-bold text-foreground mb-3">
-            Nouveau sur EbookStudio ?
-          </h3>
-          <p className="text-muted-foreground text-sm md:text-base mb-6 max-w-lg mx-auto">
-            Commencez par le guide gratuit pour comprendre la méthode et avancer plus vite.
-          </p>
-          <Button
-            size="lg"
-            className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-lg shadow-violet-500/20 text-base px-8 py-6"
-            onClick={() => window.open('https://www.trafic-affiliation.com/captureebookstudio2026#formulaire', '_blank')}
-          >
+          <h3 className="text-xl md:text-2xl font-bold text-foreground mb-3">Nouveau sur EbookStudio ?</h3>
+          <p className="text-muted-foreground text-sm md:text-base mb-6 max-w-lg mx-auto">Commencez par le guide gratuit pour comprendre la méthode et avancer plus vite.</p>
+          <Button size="lg" className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-lg shadow-violet-500/20 text-base px-8 py-6"
+            onClick={() => window.open('https://www.trafic-affiliation.com/captureebookstudio2026#formulaire', '_blank')}>
             🎁 Commencer par le guide gratuit
           </Button>
         </motion.div>
       </section>
-
-
-
 
       {/* Tutoriel Vidéo Clé API */}
       <section className="py-16 px-4" id="tuto-api">
@@ -852,20 +886,12 @@ const SalesPage = () => {
                 Tutoriel Vidéo — 2 min
               </Badge>
             </motion.div>
-            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-4xl font-extrabold mb-4">
-              🔑 Comment configurer votre clé API
-            </motion.h2>
+            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-4xl font-extrabold mb-4">🔑 Comment configurer votre clé API</motion.h2>
             <motion.p variants={fadeUp} custom={2} className="text-muted-foreground mb-8 text-lg max-w-2xl mx-auto">
-              Avant de créer votre premier ebook, configurez votre clé OpenAI en 2 minutes. 
-              Un ebook complet coûte entre 0,30€ et 0,80€.
+              Avant de créer votre premier ebook, configurez votre clé OpenAI en 2 minutes. Un ebook complet coûte entre 0,30€ et 0,80€.
             </motion.p>
             <motion.div variants={fadeUp} custom={3} className="rounded-xl overflow-hidden border border-border shadow-lg">
-              <video 
-                controls 
-                className="w-full aspect-video"
-                poster=""
-                preload="metadata"
-              >
+              <video controls className="w-full aspect-video" poster="" preload="metadata">
                 <source src="/videos/tuto-cle-api.mp4" type="video/mp4" />
                 Votre navigateur ne supporte pas la vidéo.
               </video>
@@ -968,6 +994,12 @@ const SalesPage = () => {
                 <li><button onClick={() => navigate("/faq")} className="text-gray-400 hover:text-violet-400 transition-colors">FAQ</button></li>
                 <li><button onClick={() => navigate("/blog")} className="text-gray-400 hover:text-violet-400 transition-colors">Blog</button></li>
                 <li><button onClick={() => navigate("/affiliation")} className="text-gray-400 hover:text-violet-400 transition-colors">Affiliation</button></li>
+              </ul>
+              <h4 className="font-semibold mb-2 mt-4 text-gray-200">⚖️ Légal</h4>
+              <ul className="space-y-2 text-sm">
+                <li><button onClick={() => navigate("/mentions-legales")} className="text-gray-400 hover:text-violet-400 transition-colors">Mentions légales</button></li>
+                <li><button onClick={() => navigate("/cgv")} className="text-gray-400 hover:text-violet-400 transition-colors">CGV</button></li>
+                <li><button onClick={() => navigate("/politique-confidentialite")} className="text-gray-400 hover:text-violet-400 transition-colors">Confidentialité</button></li>
               </ul>
             </div>
             <div>
