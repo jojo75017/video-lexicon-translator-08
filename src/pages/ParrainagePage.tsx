@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { Copy, Users, DollarSign, Clock, CheckCircle, Gift, ArrowLeft, Share2, Link } from 'lucide-react';
+import { Copy, Users, DollarSign, Clock, CheckCircle, Gift, ArrowLeft, Share2, Link, TrendingUp } from 'lucide-react';
 import { useReferral } from '@/hooks/useReferral';
 
 const ParrainagePage = () => {
@@ -43,7 +43,12 @@ const ParrainagePage = () => {
     );
   }
 
-  const commissionPerSale = 11.10; // 30% of 37€
+  const commissionRate = 30; // 30%
+  const productPrice = 37;
+  const commissionPerSale = +(productPrice * commissionRate / 100).toFixed(2); // 11.10€
+  const totalReferrals = stats?.total_referrals ?? 0;
+  const converted = stats?.converted ?? 0;
+  const conversionRate = totalReferrals > 0 ? ((converted / totalReferrals) * 100).toFixed(1) : '0';
 
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
@@ -55,7 +60,10 @@ const ParrainagePage = () => {
           </Button>
           <div>
             <h1 className="text-2xl md:text-3xl font-bold">Programme de Parrainage</h1>
-            <p className="text-muted-foreground">Gagnez {commissionPerSale}€ par filleul converti</p>
+            <p className="text-muted-foreground">
+              <Badge variant="secondary" className="mr-2">{commissionRate}% de commission</Badge>
+              soit {commissionPerSale}€ par vente
+            </p>
           </div>
         </div>
 
@@ -98,11 +106,11 @@ const ParrainagePage = () => {
         </Card>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <Card>
             <CardContent className="pt-6 text-center">
               <Users className="h-8 w-8 mx-auto mb-2 text-blue-500" />
-              <div className="text-3xl font-bold">{stats?.total_referrals ?? 0}</div>
+              <div className="text-3xl font-bold">{totalReferrals}</div>
               <p className="text-sm text-muted-foreground">Total filleuls</p>
             </CardContent>
           </Card>
@@ -116,15 +124,22 @@ const ParrainagePage = () => {
           <Card>
             <CardContent className="pt-6 text-center">
               <CheckCircle className="h-8 w-8 mx-auto mb-2 text-green-500" />
-              <div className="text-3xl font-bold">{stats?.converted ?? 0}</div>
+              <div className="text-3xl font-bold">{converted}</div>
               <p className="text-sm text-muted-foreground">Convertis</p>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="border-2 border-primary/20">
+            <CardContent className="pt-6 text-center">
+              <TrendingUp className="h-8 w-8 mx-auto mb-2 text-primary" />
+              <div className="text-3xl font-bold">{conversionRate}%</div>
+              <p className="text-sm text-muted-foreground">Taux conversion</p>
+            </CardContent>
+          </Card>
+          <Card className="border-2 border-emerald-500/20 bg-emerald-500/5">
             <CardContent className="pt-6 text-center">
               <DollarSign className="h-8 w-8 mx-auto mb-2 text-emerald-500" />
               <div className="text-3xl font-bold">{stats?.total_commission ?? 0}€</div>
-              <p className="text-sm text-muted-foreground">Commissions</p>
+              <p className="text-sm text-muted-foreground">Commissions ({commissionRate}%)</p>
             </CardContent>
           </Card>
         </div>
@@ -211,7 +226,7 @@ const ParrainagePage = () => {
                   <span className="font-bold text-primary">3</span>
                 </div>
                 <h4 className="font-semibold">Vous gagnez</h4>
-                <p className="text-sm text-muted-foreground">{commissionPerSale}€ de commission par vente (30%)</p>
+                <p className="text-sm text-muted-foreground">{commissionRate}% de commission = {commissionPerSale}€ par vente</p>
               </div>
             </div>
             <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg text-center">
