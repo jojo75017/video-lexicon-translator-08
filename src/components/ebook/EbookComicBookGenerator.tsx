@@ -172,7 +172,7 @@ export const EbookComicBookGenerator: React.FC<ComicBookGeneratorProps> = ({ ebo
   const [isGeneratingScenario, setIsGeneratingScenario] = useState(false);
   const [isGeneratingAll, setIsGeneratingAll] = useState(false);
   const [generatedPages, setGeneratedPages] = useState<ComicPage[]>([]);
-  const [scenario, setScenario] = useState<{ pages: { description: string; dialogues: { character: string; text: string }[] }[] } | null>(null);
+  const [scenario, setScenario] = useState<{ pages: { panels?: { description: string; character: string; dialogue: string }[]; description?: string; dialogues?: { character: string; text: string }[] }[] } | null>(null);
   const [currentProgress, setCurrentProgress] = useState(0);
   
   // Suggestions de titres
@@ -383,79 +383,46 @@ export const EbookComicBookGenerator: React.FC<ComicBookGeneratorProps> = ({ ebo
     const heroName = (mainCharacter || 'Le héros').trim();
     const baseDesc = (customPrompt || setting || '').trim();
     const bookTitle = title || 'L\'Aventure';
+    const selectedLayout = PANEL_LAYOUTS.find(l => l.value === panelLayout);
+    const panelCount = selectedLayout?.panelsPerPage || 4;
 
-    // Bibliothèque de scènes variées par étape narrative
-    const sceneLibrary: Record<string, { descriptions: string[]; dialogues: { char: string; texts: string[] }[] }> = {
-      'Introduction du héros': {
-        descriptions: [
-          `${heroName} se réveille dans son monde paisible. Le soleil brille et une nouvelle journée commence.`,
-          `C'est un jour ordinaire pour ${heroName}. Mais quelque chose dans l'air semble différent aujourd'hui.`,
-          `${heroName} regarde par la fenêtre, rêvant d'aventures lointaines.`
-        ],
-        dialogues: [{ char: heroName, texts: ["Quelle belle journée !", "Je sens que quelque chose va se passer...", "Aujourd'hui sera spécial !"] }]
-      },
-      'Appel à l\'aventure': {
-        descriptions: [
-          `Un mystérieux message arrive ! ${heroName} découvre qu'une mission importante l'attend.`,
-          `Un vieil ami apparaît avec des nouvelles urgentes pour ${heroName}.`,
-          `Une carte au trésor tombe entre les mains de ${heroName}. L'aventure commence !`
-        ],
-        dialogues: [{ char: heroName, texts: ["Une mission pour moi ?", "Je dois y aller !", "C'est le moment d'agir !"] }]
-      },
-      'Défis et alliés': {
-        descriptions: [
-          `${heroName} rencontre un nouvel ami qui accepte de l'aider dans sa quête.`,
-          `Un obstacle se dresse sur le chemin. ${heroName} doit faire preuve d'intelligence.`,
-          `${heroName} traverse un lieu mystérieux rempli de surprises.`
-        ],
-        dialogues: [{ char: heroName, texts: ["Ensemble, on est plus forts !", "Je n'abandonnerai pas !", "Il doit y avoir une solution..."] }]
-      },
-      'Épreuve finale': {
-        descriptions: [
-          `Le moment décisif approche. ${heroName} fait face au plus grand défi de l'aventure.`,
-          `${heroName} rassemble tout son courage pour l'épreuve finale.`,
-          `C'est maintenant ou jamais ! ${heroName} donne tout ce qu'il a.`
-        ],
-        dialogues: [{ char: heroName, texts: ["Je peux le faire !", "Pour mes amis !", "C'est ma destinée !"] }]
-      },
-      'Victoire et retour': {
-        descriptions: [
-          `${heroName} a réussi ! La joie et la fierté illuminent son visage.`,
-          `Mission accomplie ! ${heroName} rentre chez lui, changé par cette aventure.`,
-          `Tout le monde célèbre la victoire de ${heroName}. C'est un jour de fête !`
-        ],
-        dialogues: [{ char: heroName, texts: ["On a réussi !", "Quelle aventure incroyable !", "Je suis prêt pour la prochaine !"] }]
-      }
-    };
+    const dialogueBank = [
+      "Allons-y !", "Regarde là-bas !", "Incroyable !", "Attention !",
+      "Je n'abandonnerai pas !", "Ensemble, on peut y arriver !",
+      "Quelle découverte !", "En avant !", "C'est notre chance !",
+      "Vite, par ici !", "Tu as vu ça ?", "Mission accomplie !",
+      "Quel mystère...", "Suivez-moi !", "On a réussi !",
+      "C'est parti !", "Ne baisse pas les bras !", "Fantastique !"
+    ];
 
-    // Structure par défaut
+    const actionBank = [
+      "arrive dans un nouveau lieu mystérieux",
+      "découvre un indice important",
+      "rencontre un nouvel allié",
+      "fait face à un obstacle",
+      "trouve une solution ingénieuse",
+      "court vers l'aventure",
+      "observe quelque chose d'étonnant",
+      "se prépare pour l'action",
+    ];
+
     const defaultSteps = ['Introduction du héros', 'Appel à l\'aventure', 'Défis et alliés', 'Épreuve finale', 'Victoire et retour'];
     const steps = selectedTemplate?.structure?.length ? selectedTemplate.structure : defaultSteps;
 
-    const pages = Array.from({ length: numberOfPages }, (_, i) => {
-      const stepIndex = Math.min(steps.length - 1, Math.floor((i / Math.max(1, numberOfPages - 1)) * steps.length));
+    const pages = Array.from({ length: numberOfPages }, (_, pageIdx) => {
+      const stepIndex = Math.min(steps.length - 1, Math.floor((pageIdx / Math.max(1, numberOfPages - 1)) * steps.length));
       const step = steps[stepIndex];
-      const pageNumber = i + 1;
 
-      // Trouver la scène correspondante ou fallback
-      const scene = sceneLibrary[step] || sceneLibrary[defaultSteps[Math.min(stepIndex, defaultSteps.length - 1)]];
-      const descIndex = i % scene.descriptions.length;
-      const dialogueIndex = i % scene.dialogues[0].texts.length;
+      const panels = Array.from({ length: panelCount }, (_, panelIdx) => {
+        const globalIdx = pageIdx * panelCount + panelIdx;
+        return {
+          description: `${step} — ${heroName} ${actionBank[globalIdx % actionBank.length]}. ${baseDesc ? `(${baseDesc})` : ''} [Style: ${selectedGenre?.label || 'Aventure'}]`.trim(),
+          character: panelIdx % 3 === 2 ? 'Ami' : heroName,
+          dialogue: dialogueBank[globalIdx % dialogueBank.length],
+        };
+      });
 
-      // Description variée avec contexte du titre
-      const description = `Page ${pageNumber} — ${step}. ${scene.descriptions[descIndex]} ${baseDesc ? `(${baseDesc})` : ''} [Style: ${selectedGenre?.label || 'Aventure'}]`.trim();
-
-      // Dialogues variés
-      const dialogues = [
-        { character: heroName, text: scene.dialogues[0].texts[dialogueIndex] },
-      ];
-
-      // Ajouter un second personnage occasionnellement
-      if (i > 0 && i < numberOfPages - 1 && i % 3 === 0) {
-        dialogues.push({ character: 'Ami', text: 'Je suis avec toi !' });
-      }
-
-      return { description, dialogues };
+      return { panels };
     });
 
     return { pages };
@@ -576,7 +543,10 @@ Réponds UNIQUEMENT avec un tableau JSON de 20 strings, sans explication:
       // Auto-générer la description si non fournie
       const autoDescription = customPrompt?.trim() || `Une aventure captivante intitulée "${title}" dans un style ${selectedGenre?.label || 'aventure'} pour ${selectedAge?.label || 'enfants'}`;
 
-      const prompt = `Tu es un scénariste de bandes dessinées pour enfants. Crée un scénario de BD en ${numberOfPages} pages.
+      const selectedLayout = PANEL_LAYOUTS.find(l => l.value === panelLayout);
+      const panelCount = selectedLayout?.panelsPerPage || 4;
+
+      const prompt = `Tu es un scénariste de bandes dessinées pour enfants. Crée un scénario de BD en ${numberOfPages} pages, avec EXACTEMENT ${panelCount} cases par page.
 
 INFORMATIONS:
 - Titre: "${title}"
@@ -588,21 +558,19 @@ ${characterDescription ? `- Description du personnage: ${characterDescription}` 
 ${setting ? `- Univers/Décor: ${setting}` : ''}
 - Structure narrative: ${selectedTemplate?.label} - ${selectedTemplate?.structure?.join(' → ')}
 
-MISSION: À partir du titre "${title}", invente une histoire complète et captivante. Crée les personnages, les péripéties, les dialogues.
+MISSION: Invente une histoire complète avec des dialogues pour CHAQUE case.
 
-Pour chaque page, fournis:
-1. Une description visuelle détaillée de la scène (pour générer l'image)
-2. Les dialogues des personnages (bulles de texte)
+IMPORTANT:
+- Chaque page DOIT avoir EXACTEMENT ${panelCount} objets dans "panels"
+- Chaque case a sa propre description visuelle ET son dialogue court (max 50 car.)
+- Varier les personnages qui parlent
 
-IMPORTANT: Les dialogues doivent être courts et adaptés à l'âge cible. Maximum 2-3 bulles par page.
-
-Réponds en JSON avec ce format exact:
+Réponds en JSON:
 {
   "pages": [
     {
-      "description": "Description visuelle détaillée de la scène...",
-      "dialogues": [
-        { "character": "Nom du personnage", "text": "Ce qu'il dit..." }
+      "panels": [
+        { "description": "Description visuelle...", "character": "Nom", "dialogue": "Ce qu'il dit" }
       ]
     }
   ]
@@ -710,82 +678,71 @@ EXPRESSION STYLE: ${artStyle === 'manga' ? 'Large expressive eyes, anime style' 
     return styles[artStyle] || styles['cartoon'];
   };
 
-  const generateComicPage = async (pageIndex: number, pageScenario: { description: string; dialogues: { character: string; text: string }[] }): Promise<ComicPage | null> => {
+  const generateComicPage = async (pageIndex: number, pageScenario: { panels?: { description: string; character: string; dialogue: string }[]; description?: string; dialogues?: { character: string; text: string }[] }): Promise<ComicPage | null> => {
     try {
       const selectedStyle = ART_STYLES.find(s => s.value === artStyle);
       const selectedGenre = GENRES.find(g => g.value === genre);
       const visualRef = generateVisualReference();
       const colorPrompt = getColorModePrompt();
 
-      // Seed visuel pour cohérence
       const seedInfo = visualSeed ? `[SEED:${visualSeed}] ` : '';
 
-      // Nombre de panels selon le layout choisi
       const layoutForPage = panelLayout;
       const selectedLayout = PANEL_LAYOUTS.find(l => l.value === layoutForPage) || PANEL_LAYOUTS.find(l => l.value === '4-panels');
       const panelCount = Number(selectedLayout?.panelsPerPage) || 4;
 
-      // Diviser la description en moments distincts selon le nombre de panels
-      const baseMoments = [
-        `Scene establishing shot: ${pageScenario.description} - Introduction of the scene, wide or medium angle`,
-        `Action beat: ${pageScenario.description} - Main action, character close-up or medium shot`,
-        `Dramatic moment: ${pageScenario.description} - Peak tension, dynamic angle or close-up on expression`,
-        `Resolution: ${pageScenario.description} - Scene conclusion, reaction shot or establishing return`,
-        `Character reaction: ${pageScenario.description} - Emotional close-up showing character feelings`,
-        `Environment detail: ${pageScenario.description} - Background or setting establishing context`,
-        `Secondary action: ${pageScenario.description} - Supporting action or secondary character`,
-        `Transition: ${pageScenario.description} - Bridge to next scene, movement or time passing`
-      ];
-      const sceneMoments = baseMoments.slice(0, panelCount);
+      // Normalize scenario data: support both new panel-based and old page-based format
+      const scenarioPanels: { description: string; character: string; dialogue: string }[] = [];
+      if (pageScenario.panels && pageScenario.panels.length > 0) {
+        // New format: panels array
+        for (let i = 0; i < panelCount; i++) {
+          const p = pageScenario.panels[i % pageScenario.panels.length];
+          scenarioPanels.push(p);
+        }
+      } else {
+        // Old format: single description + dialogues array
+        const desc = pageScenario.description || 'Action scene';
+        const dlgs = pageScenario.dialogues || [];
+        for (let i = 0; i < panelCount; i++) {
+          const dlg = dlgs[i % Math.max(1, dlgs.length)] || { character: mainCharacter || 'Héros', text: '' };
+          scenarioPanels.push({
+            description: desc,
+            character: dlg.character,
+            dialogue: dlg.text,
+          });
+        }
+      }
 
       const artStylePrompt = getArtStylePrompt();
 
-      // Génération SÉQUENTIELLE des panels pour éviter les erreurs de rate-limit
       const panels: ComicPanel[] = [];
       
       for (let panelIndex = 0; panelIndex < panelCount; panelIndex++) {
-        const dialogue = pageScenario.dialogues[panelIndex] || { character: mainCharacter, text: '' };
-        
-        // Construire le texte de la bulle de dialogue
-        const dialogueText = dialogue.text ? dialogue.text.substring(0, 60) : '';
+        const panelData = scenarioPanels[panelIndex];
+        const dialogueText = (panelData.dialogue || '').substring(0, 60);
         const hasSpeechBubble = dialogueText.length > 0;
         
-        // Prompt ultra-détaillé avec bulles de dialogue INTÉGRÉES dans l'image
-        const imagePrompt = `${seedInfo}SINGLE COMIC PANEL WITH SPEECH BUBBLE - Panel ${panelIndex + 1} of ${panelCount}
+        const imagePrompt = `${seedInfo}SINGLE COMIC PANEL - Panel ${panelIndex + 1}/${panelCount}, Page ${pageIndex + 1}
 
-=== MANDATORY STYLE RULES ===
+=== STYLE ===
 ${artStylePrompt}
 ${colorPrompt}
 ${visualRef}
 
-=== THIS PANEL ===
-${sceneMoments[panelIndex]}
+=== SCENE ===
+${panelData.description}
 
-${hasSpeechBubble ? `=== SPEECH BUBBLE (MUST BE INCLUDED) ===
-- Draw a WHITE speech bubble with BLACK outline pointing to the character
-- Inside the bubble, write in clear readable text: "${dialogueText}"
-- Position the bubble in the TOP portion of the panel, not covering the character's face
-- Use simple, clean comic book lettering style
-- The bubble tail points toward the speaking character` : '=== NO DIALOGUE ===\n- This panel has no speech bubble, pure action scene'}
+${hasSpeechBubble ? `=== SPEECH BUBBLE ===
+Draw a WHITE speech bubble with BLACK outline.
+Inside write: "${dialogueText}"
+Bubble points to ${panelData.character}.` : ''}
 
-=== TECHNICAL REQUIREMENTS ===
-- Single square illustration, professional comic art quality
-- Child-friendly, age-appropriate content
-- ${hasSpeechBubble ? 'INCLUDE the speech bubble with the exact text above' : 'No text in this panel'}
-- Clean panel composition with clear focal point
-- Consistent perspective and lighting with other panels
-- Same exact character design as reference sheet above
-
-=== CONSISTENCY CHECKLIST ===
-✓ Same character proportions and outfit
-✓ Same art style and line weight  
-✓ Same color palette and saturation
-✓ Same lighting direction (top-left)
-✓ Same level of background detail
-${hasSpeechBubble ? '✓ Speech bubble clearly readable with correct text' : ''}`;
+=== RULES ===
+- Professional comic art, child-friendly
+- Same character design on every panel
+- Clear composition, square format`;
 
         try {
-          // Délai entre les appels pour éviter le rate-limiting (sauf premier panel)
           if (panelIndex > 0) {
             await new Promise(resolve => setTimeout(resolve, 1500));
           }
@@ -808,48 +765,30 @@ ${hasSpeechBubble ? '✓ Speech bubble clearly readable with correct text' : ''}
           if (imageError) throw imageError;
 
           const url = imageData?.imageUrl || imageData?.url || '';
-          if (url.includes('placehold.co')) {
-            toast.warning('Images de BD en mode dégradé. Ajoutez votre clé OpenAI dans Paramètres.', { duration: 4000 });
-          }
 
           panels.push({
             id: `panel-${pageIndex}-${panelIndex}`,
             imageUrl: url,
-            dialogue: dialogue.text,
-            character: dialogue.character,
-            action: sceneMoments[panelIndex]
+            dialogue: panelData.dialogue,
+            character: panelData.character,
+            action: panelData.description,
           });
 
-          // Mise à jour de progression par panel
-          const progressPerPanel = 100 / (panelCount * scenario!.pages.length);
+          const progressPerPanel = 100 / (panelCount * (scenario?.pages?.length || numberOfPages));
           setCurrentProgress(prev => Math.min(prev + progressPerPanel / 2, 95));
 
         } catch (err) {
           console.error(`Erreur panel ${panelIndex + 1}:`, err);
-          // En cas d'erreur, ajouter un placeholder au lieu de rien
           panels.push({
             id: `panel-${pageIndex}-${panelIndex}`,
             imageUrl: '',
-            dialogue: dialogue.text,
-            character: dialogue.character,
-            action: sceneMoments[panelIndex]
+            dialogue: panelData.dialogue,
+            character: panelData.character,
+            action: panelData.description,
           });
         }
       }
 
-      // Sécurité: s'assurer qu'on a bien le bon nombre de panels (même si certains appels ont échoué)
-      while (panels.length < panelCount) {
-        const panelIdx = panels.length;
-        panels.push({
-          id: `panel-${pageIndex}-${panelIdx}`,
-          imageUrl: '',
-          dialogue: pageScenario.dialogues[panelIdx]?.text || '',
-          character: pageScenario.dialogues[panelIdx]?.character || (mainCharacter || 'Le héros'),
-          action: sceneMoments[panelIdx] || pageScenario.description,
-        });
-      }
-
-      // Générer seed si première page
       if (pageIndex === 0 && !visualSeed) {
         setVisualSeed(`comic-${Date.now()}`);
       }
@@ -928,13 +867,15 @@ ${hasSpeechBubble ? '✓ Speech bubble clearly readable with correct text' : ''}
       // Étape 1: Générer le scénario
       toast.info('🎬 Étape 1/2 : Écriture du scénario...');
       
+      const selectedLayout = PANEL_LAYOUTS.find(l => l.value === panelLayout);
+      const panelCount = selectedLayout?.panelsPerPage || 4;
       const selectedTemplate = STORY_TEMPLATES.find(t => t.value === storyTemplate);
       const selectedGenre = GENRES.find(g => g.value === genre);
       const selectedAge = AGE_GROUPS.find(a => a.value === ageGroup);
       const heroName = (mainCharacter || 'Le héros').trim();
       const autoDescription = customPrompt?.trim() || `Une aventure captivante intitulée "${title}" dans un style ${selectedGenre?.label || 'aventure'} pour ${selectedAge?.label || 'enfants'}`;
 
-      const prompt = `Tu es un scénariste de bandes dessinées pour enfants. Crée un scénario de BD en ${numberOfPages} pages.
+      const prompt = `Tu es un scénariste de bandes dessinées pour enfants. Crée un scénario de BD en ${numberOfPages} pages, avec EXACTEMENT ${panelCount} cases par page.
 
 INFORMATIONS:
 - Titre: "${title}"
@@ -946,18 +887,15 @@ ${characterDescription ? `- Description du personnage: ${characterDescription}` 
 ${setting ? `- Univers/Décor: ${setting}` : ''}
 - Structure narrative: ${selectedTemplate?.label} - ${selectedTemplate?.structure?.join(' → ')}
 
-MISSION: À partir du titre "${title}", invente une histoire complète et captivante. Crée les personnages, les péripéties, les dialogues.
-
-Pour chaque page, fournis:
-1. Une description visuelle détaillée de la scène (pour générer l'image)
-2. Les dialogues des personnages (bulles de texte)
+IMPORTANT: Chaque page DOIT avoir EXACTEMENT ${panelCount} cases avec description + dialogue court.
 
 Réponds en JSON:
 {
   "pages": [
     {
-      "description": "Description visuelle...",
-      "dialogues": [{ "character": "Nom", "text": "Ce qu'il dit" }]
+      "panels": [
+        { "description": "Description visuelle...", "character": "Nom", "dialogue": "Ce qu'il dit" }
+      ]
     }
   ]
 }`;
@@ -966,7 +904,7 @@ Réponds en JSON:
         body: { type: 'comic-scenario', prompt }
       });
 
-      let generatedScenario: { pages: { description: string; dialogues: { character: string; text: string }[] }[] };
+      let generatedScenario: typeof scenario;
 
       if (error || !data?.content) {
         console.warn('Scénario IA échoué, utilisation du fallback');
@@ -1793,16 +1731,28 @@ Réponds en JSON:
                 >
                   <div className="flex items-center justify-between mb-2">
                     <Badge variant="outline">Page {index + 1}</Badge>
+                    <Badge variant="secondary" className="text-[10px]">{page.panels?.length || 0} cases</Badge>
                   </div>
-                  <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
-                    {page.description}
-                  </p>
-                  {page.dialogues.map((d, dIndex) => (
-                    <div key={dIndex} className="text-xs mt-1">
-                      <span className="font-medium text-amber-600">{d.character}:</span>{' '}
-                      <span className="text-foreground">"{d.text}"</span>
-                    </div>
-                  ))}
+                  {page.panels ? (
+                    page.panels.map((p, pIdx) => (
+                      <div key={pIdx} className="text-xs mt-1 border-l-2 border-amber-500/30 pl-2">
+                        <p className="text-muted-foreground line-clamp-1">{p.description}</p>
+                        {p.dialogue && (
+                          <span className="text-foreground"><span className="font-medium text-amber-600">{p.character}:</span> "{p.dialogue}"</span>
+                        )}
+                      </div>
+                    ))
+                  ) : page.description ? (
+                    <>
+                      <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{page.description}</p>
+                      {page.dialogues?.map((d, dIndex) => (
+                        <div key={dIndex} className="text-xs mt-1">
+                          <span className="font-medium text-amber-600">{d.character}:</span>{' '}
+                          <span className="text-foreground">"{d.text}"</span>
+                        </div>
+                      ))}
+                    </>
+                  ) : null}
                 </div>
               ))}
             </div>
@@ -1859,17 +1809,26 @@ Réponds en JSON:
                             <img
                               src={panel.imageUrl}
                               alt={`Panel ${panelIdx + 1}`}
-                              className="w-full aspect-square object-cover rounded-md border-2 border-black shadow-md"
+                              className="w-full aspect-square object-cover rounded-t-md border-2 border-foreground/80 shadow-md"
                             />
                           ) : (
-                            <div className="w-full aspect-square bg-muted flex items-center justify-center rounded-md border-2 border-dashed border-black">
+                            <div className="w-full aspect-square bg-muted flex items-center justify-center rounded-t-md border-2 border-dashed border-foreground/40">
                               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
                             </div>
                           )}
                           {/* Badge numéro de case */}
-                          <div className="absolute top-1 left-1 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded">
+                          <div className="absolute top-1 left-1 bg-foreground/70 text-background text-xs px-1.5 py-0.5 rounded">
                             {panelIdx + 1}
                           </div>
+                          {/* Dialogue sous la case */}
+                          {panel.dialogue && (
+                            <div className="bg-background border-2 border-t-0 border-foreground/80 rounded-b-md px-2 py-1.5">
+                              <p className="text-[11px] leading-tight">
+                                <span className="font-bold text-amber-600">{panel.character}:</span>{' '}
+                                <span className="italic">"{panel.dialogue}"</span>
+                              </p>
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>
