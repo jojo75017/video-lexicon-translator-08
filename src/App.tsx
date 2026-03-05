@@ -46,6 +46,7 @@ import CadeauPage from './pages/CadeauPage';
 import ChecklistTournagePage from './pages/ChecklistTournagePage';
 import BDStudioPage from './pages/BDStudioPage';
 import SeriesTomesPage from './pages/SeriesTomesPage';
+import ForumPage from './pages/ForumPage';
 import KdpKeywordResearchPage from './pages/KdpKeywordResearchPage';
 import { SubscriptionAuth } from '@/components/SubscriptionAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -264,6 +265,7 @@ const App = () => {
             <Route path="/ai-chat" element={<AiChatPage />} />
             <Route path="/niches" element={<NichesPage />} />
             <Route path="/arc-signup" element={<ArcSignupPage />} />
+            <Route path="/communaute" element={<ForumPage />} />
             <Route path="/plan-marketing" element={<MarketingPlanPage />} />
             <Route path="/resultat-en-5-min" element={<ResultatEn5MinPage />} />
             <Route path="/cadeau" element={<CadeauPage />} />
