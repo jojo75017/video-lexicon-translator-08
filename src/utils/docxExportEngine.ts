@@ -164,7 +164,18 @@ function editorialClean(raw: string): string {
   // 6. Supprimer les lignes ne contenant que des espaces
   text = text.replace(/^\s+$/gm, '');
 
-  // 7. Typographie française : espace insécable avant ; : ! ?
+  // 7. Supprimer les artefacts markdown résiduels qui ne doivent pas apparaître dans le DOCX
+  // (les titres # sont traités séparément dans buildContentParagraphs)
+  // Supprimer les séparateurs --- *** ===
+  text = text.replace(/^[=\-_*]{3,}\s*$/gm, '');
+  // Supprimer les balises HTML résiduelles
+  text = text.replace(/<\/?(?:br|p|div|span|h[1-6])\s*\/?>/gi, '\n');
+  // Supprimer les images markdown résiduelles
+  text = text.replace(/!\[[^\]]*\]\([^)]*\)/g, '');
+  // Supprimer les liens markdown mais garder le texte
+  text = text.replace(/\[([^\]]+)\]\([^)]*\)/g, '$1');
+
+  // 8. Typographie française : espace insécable avant ; : ! ?
   text = text.replace(/ ([;:!?»])/g, '\u00A0$1');
   text = text.replace(/([«])\u00A0?/g, '$1\u00A0');
 
@@ -506,12 +517,32 @@ export async function generateProfessionalDocx(options: DocxExportOptions): Prom
     }));
 
     // Contenu du chapitre
-    if (chapter.content) {
+    if (chapter.content && chapter.content.trim().length > 0) {
       children.push(...buildContentParagraphs(chapter.content, baseSize, font));
     }
 
     // Sous-chapitres
     chapter.subChapters.forEach((sub, subIdx) => {
+      // Ne pas afficher les sous-chapitres vides (titre seul sans contenu)
+      if (!sub.content || sub.content.trim().length === 0) {
+        // Afficher quand même le titre du sous-chapitre comme repère
+        children.push(new Paragraph({
+          children: [new TextRun({
+            text: `${index + 1}.${subIdx + 1}  ${editorialClean(sub.title)}`,
+            bold: true,
+            size: subTitleSize,
+            font,
+          })],
+          heading: HeadingLevel.HEADING_2,
+          spacing: { before: 480, after: 120 },
+        }));
+        children.push(new Paragraph({
+          children: [new TextRun({ text: '[Contenu à rédiger]', italics: true, size: baseSize, font, color: 'AAAAAA' })],
+          spacing: { after: 200 },
+        }));
+        return;
+      }
+
       // Séparateur visuel subtil avant le sous-chapitre
       children.push(new Paragraph({ spacing: { before: 240 } }));
 
@@ -526,9 +557,7 @@ export async function generateProfessionalDocx(options: DocxExportOptions): Prom
         spacing: { before: 480, after: 240 },
       }));
 
-      if (sub.content) {
-        children.push(...buildContentParagraphs(sub.content, baseSize, font));
-      }
+      children.push(...buildContentParagraphs(sub.content, baseSize, font));
     });
 
     // Saut de page entre chapitres

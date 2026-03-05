@@ -24,8 +24,8 @@ export function cleanGeneratedText(text: string): string {
     .replace(/&quot;/gi, '"')
     .replace(/&apos;/gi, "'")
     .replace(/&#39;/gi, "'")
-    // Supprimer les guillemets échappés \" -> rien (pas de guillemet)
-    .replace(/\\"/g, '')
+    // Convertir les guillemets échappés \" -> guillemet réel
+    .replace(/\\"/g, '"')
     // Supprimer les backslashes échappés
     .replace(/\\\\/g, '')
     // Supprimer les retours à la ligne échappés \n -> nouvelle ligne
@@ -43,11 +43,9 @@ export function cleanGeneratedText(text: string): string {
     .replace(/":\s*"/g, ': ')
     .replace(/{\s*"/g, '')
     .replace(/"\s*}/g, '')
-    // Supprimer les guillemets orphelins en début/fin de ligne
-    .replace(/^"+/gm, '')
-    .replace(/"+$/gm, '')
-    // Supprimer les guillemets isolés
-    .replace(/(?<!\w)"(?!\w)/g, '')
+    // Supprimer les guillemets triples+ orphelins en début/fin de ligne (garder les simples/doubles)
+    .replace(/^"{3,}/gm, '"')
+    .replace(/"{3,}$/gm, '"')
     // Nettoyer les doubles espaces
     .replace(/  +/g, ' ')
     // Nettoyer les espaces avant ponctuation
@@ -124,8 +122,8 @@ export function cleanGeneratedText(text: string): string {
   
   // Nettoyage final
   cleaned = cleaned
-    // Supprimer les caractères de contrôle Unicode indésirables
-    .replace(/[\u0000-\u001F\u007F-\u009F]/g, '')
+    // Supprimer les caractères de contrôle Unicode indésirables (SAUF \n et \t)
+    .replace(/[\u0000-\u0009\u000B\u000C\u000E-\u001F\u007F-\u009F]/g, '')
     // Nettoyer les doubles espaces (réapparus après corrections)
     .replace(/  +/g, ' ')
     // Nettoyer les lignes vides multiples
