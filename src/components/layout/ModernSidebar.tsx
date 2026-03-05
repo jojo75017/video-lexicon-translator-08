@@ -318,6 +318,7 @@ const categories: Category[] = [
       { id: 'admin-panel', label: '👑 Gestion Abonnés', icon: Shield, isLink: true, href: '/admin' },
       { id: 'subscription', label: '💳 Abonnement', icon: CreditCard },
       { id: 'parrainage', label: '🤝 Parrainage', icon: Users, isLink: true, href: '/parrainage', isNew: true },
+      { id: 'communaute', label: '🏠 Communauté', icon: MessageSquare, isLink: true, href: '/communaute', isNew: true },
       { id: 'settings', label: '⚙️ Paramètres', icon: Settings },
       { id: 'formation-complete', label: '🎓 Formation', icon: GraduationCap, isLink: true, href: '/formation' },
       { id: 'formation-videos', label: '🎬 Formation Vidéo', icon: GraduationCap, isLink: true, href: '/formation-videos', isNew: true },
