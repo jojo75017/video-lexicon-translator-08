@@ -235,6 +235,7 @@ const categories: Category[] = [
       { id: 'backcover', label: '📖 Couverture Arrière', icon: BookCopy },
       { id: 'images', label: '🎨 Images Chapitres', icon: Image },
       { id: 'imagebank', label: '🏦 Banque Images', icon: ImagePlus },
+      { id: 'library', label: '📂 Bibliothèque d\'images', icon: FolderOpen },
       { id: 'mockup-studio', label: '🖥️ Mockup Studio', icon: Monitor },
       { id: 'kdp-cover-studio', label: '📐 Studio Couverture KDP', icon: Ruler, isNew: true },
       { id: 'calibre-epub', label: '📚 Calibre Studio EPUB', icon: BookOpen, isNew: true },
