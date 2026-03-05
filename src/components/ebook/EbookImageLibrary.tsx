@@ -63,12 +63,26 @@ interface EbookImageLibraryProps {
   ebookId?: string;
   ebookTitle?: string;
   onImageSelect?: (url: string) => void;
+  subscriberEmail?: string;
 }
+
+const getUserStorageId = (email?: string): string | null => {
+  if (email) return email.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 60);
+  const saved = localStorage.getItem('subscriberData');
+  if (saved) {
+    try {
+      const data = JSON.parse(saved);
+      if (data.email) return data.email.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 60);
+    } catch {}
+  }
+  return null;
+};
 
 export const EbookImageLibrary: React.FC<EbookImageLibraryProps> = ({
   ebookId,
   ebookTitle,
-  onImageSelect
+  onImageSelect,
+  subscriberEmail
 }) => {
   const [folders, setFolders] = useState<EbookFolder[]>([]);
   const [currentFolder, setCurrentFolder] = useState<string | null>(null);
@@ -100,15 +114,15 @@ export const EbookImageLibrary: React.FC<EbookImageLibraryProps> = ({
   const loadFolders = async () => {
     setIsLoading(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
+      const userId = getUserStorageId(subscriberEmail);
+      if (!userId) {
         toast.error('Vous devez être connecté');
         return;
       }
 
       const { data, error } = await supabase.storage
         .from('ebook-images')
-        .list(user.id, { limit: 100 });
+        .list(userId, { limit: 100 });
 
       if (error) throw error;
 
@@ -124,7 +138,7 @@ export const EbookImageLibrary: React.FC<EbookImageLibraryProps> = ({
           
           const { data: folderImages, error: listError } = await supabase.storage
             .from('ebook-images')
-            .list(`${user.id}/${item.name}`, { limit: 500 });
+            .list(`${userId}/${item.name}`, { limit: 500 });
           
           if (listError) continue;
 
@@ -165,12 +179,12 @@ export const EbookImageLibrary: React.FC<EbookImageLibraryProps> = ({
   const loadImages = async (folderId: string) => {
     setIsLoading(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      const userId = getUserStorageId(subscriberEmail);
+      if (!userId) return;
 
       const { data, error } = await supabase.storage
         .from('ebook-images')
-        .list(`${user.id}/${folderId}`, { limit: 500 });
+        .list(`${userId}/${folderId}`, { limit: 500 });
 
       if (error) throw error;
 
@@ -179,7 +193,7 @@ export const EbookImageLibrary: React.FC<EbookImageLibraryProps> = ({
         if (file.name && !file.name.startsWith('.') && file.name.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
           const { data: urlData } = supabase.storage
             .from('ebook-images')
-            .getPublicUrl(`${user.id}/${folderId}/${file.name}`);
+            .getPublicUrl(`${userId}/${folderId}/${file.name}`);
 
           imageList.push({
             id: file.id || file.name,
@@ -215,13 +229,13 @@ export const EbookImageLibrary: React.FC<EbookImageLibraryProps> = ({
     }
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      const userId = getUserStorageId(subscriberEmail);
+      if (!userId) return;
 
       const placeholderContent = new Blob([''], { type: 'text/plain' });
       const { error } = await supabase.storage
         .from('ebook-images')
-        .upload(`${user.id}/${newFolderName.trim()}/.placeholder`, placeholderContent);
+        .upload(`${userId}/${newFolderName.trim()}/.placeholder`, placeholderContent);
 
       if (error && !error.message.includes('already exists')) throw error;
 
@@ -241,15 +255,15 @@ export const EbookImageLibrary: React.FC<EbookImageLibraryProps> = ({
 
     setIsUploading(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { toast.error('Vous devez être connecté'); return; }
+      const userId = getUserStorageId(subscriberEmail);
+      if (!userId) { toast.error('Vous devez être connecté'); return; }
 
       let successCount = 0;
       for (const file of files) {
         const fileName = `${Date.now()}-${file.name}`;
         const { error } = await supabase.storage
           .from('ebook-images')
-          .upload(`${user.id}/${currentFolder}/${fileName}`, file);
+          .upload(`${userId}/${currentFolder}/${fileName}`, file);
         if (!error) successCount++;
       }
 
@@ -275,8 +289,8 @@ export const EbookImageLibrary: React.FC<EbookImageLibraryProps> = ({
 
     setIsUploading(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { toast.error('Vous devez être connecté'); return; }
+      const userId = getUserStorageId(subscriberEmail);
+      if (!userId) { toast.error('Vous devez être connecté'); return; }
 
       toast.info('📦 Extraction du ZIP en cours...');
       const zip = await JSZip.loadAsync(file);
@@ -304,7 +318,7 @@ export const EbookImageLibrary: React.FC<EbookImageLibraryProps> = ({
         const fileName = `${Date.now()}-${img.name}`;
         const { error } = await supabase.storage
           .from('ebook-images')
-          .upload(`${user.id}/${currentFolder}/${fileName}`, img.blob);
+          .upload(`${userId}/${currentFolder}/${fileName}`, img.blob);
         if (!error) successCount++;
         // Small delay to avoid rate limits
         if (i > 0 && i % 10 === 0) await new Promise(r => setTimeout(r, 100));
@@ -377,8 +391,8 @@ export const EbookImageLibrary: React.FC<EbookImageLibraryProps> = ({
     setExportProgress(0);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      const userId = getUserStorageId(subscriberEmail);
+      if (!userId) return;
 
       const zip = new JSZip();
       let totalImages = 0;
@@ -388,7 +402,7 @@ export const EbookImageLibrary: React.FC<EbookImageLibraryProps> = ({
       for (const folder of folders) {
         const { data: files } = await supabase.storage
           .from('ebook-images')
-          .list(`${user.id}/${folder.id}`, { limit: 500 });
+          .list(`${userId}/${folder.id}`, { limit: 500 });
 
         const folderZip = zip.folder(folder.name);
         if (!folderZip || !files) continue;
@@ -398,7 +412,7 @@ export const EbookImageLibrary: React.FC<EbookImageLibraryProps> = ({
 
           const { data: urlData } = supabase.storage
             .from('ebook-images')
-            .getPublicUrl(`${user.id}/${folder.id}/${file.name}`);
+            .getPublicUrl(`${userId}/${folder.id}/${file.name}`);
 
           try {
             const response = await fetch(urlData.publicUrl);
@@ -427,11 +441,11 @@ export const EbookImageLibrary: React.FC<EbookImageLibraryProps> = ({
   const deleteImage = async (imageName: string) => {
     if (!currentFolder) return;
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      const userId = getUserStorageId(subscriberEmail);
+      if (!userId) return;
       const { error } = await supabase.storage
         .from('ebook-images')
-        .remove([`${user.id}/${currentFolder}/${imageName}`]);
+        .remove([`${userId}/${currentFolder}/${imageName}`]);
       if (error) throw error;
       toast.success('Image supprimée');
       setSelectedImages(prev => { const n = new Set(prev); n.delete(imageName); return n; });
@@ -445,11 +459,11 @@ export const EbookImageLibrary: React.FC<EbookImageLibraryProps> = ({
   const deleteSelectedImages = async () => {
     if (!currentFolder || selectedImages.size === 0) return;
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      const userId = getUserStorageId(subscriberEmail);
+      if (!userId) return;
       const paths = Array.from(selectedImages).map(id => {
         const img = images.find(i => i.id === id);
-        return img ? `${user.id}/${currentFolder}/${img.name}` : null;
+        return img ? `${userId}/${currentFolder}/${img.name}` : null;
       }).filter(Boolean) as string[];
 
       const { error } = await supabase.storage.from('ebook-images').remove(paths);
@@ -465,11 +479,11 @@ export const EbookImageLibrary: React.FC<EbookImageLibraryProps> = ({
   const deleteFolder = async (folderId: string) => {
     if (!confirm(`Supprimer le dossier "${folderId}" et toutes ses images ?`)) return;
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      const { data: files } = await supabase.storage.from('ebook-images').list(`${user.id}/${folderId}`);
+      const userId = getUserStorageId(subscriberEmail);
+      if (!userId) return;
+      const { data: files } = await supabase.storage.from('ebook-images').list(`${userId}/${folderId}`);
       if (files && files.length > 0) {
-        const filePaths = files.map(f => `${user.id}/${folderId}/${f.name}`);
+        const filePaths = files.map(f => `${userId}/${folderId}/${f.name}`);
         await supabase.storage.from('ebook-images').remove(filePaths);
       }
       toast.success('Dossier supprimé');
