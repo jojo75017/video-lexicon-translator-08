@@ -295,11 +295,15 @@ const SalesPage = () => {
             ✅ Déjà utilisé pour générer des ebooks publiés sur Amazon KDP.
           </motion.p>
 
-          <motion.div variants={fadeUp} custom={2.2} className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-8 sm:mb-10">
-            <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg px-8 sm:px-10 py-6 sm:py-7 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-xl shadow-violet-500/25 hover:shadow-2xl hover:shadow-violet-500/30 transition-all duration-300 hover:-translate-y-0.5"
-              onClick={() => { trackCTAClick('hero_cta_top', '/paiement'); handlePlanClick(); }}>
+          <motion.div variants={fadeUp} custom={2.2} className="flex flex-col items-center gap-2 mb-8 sm:mb-10">
+            <p className="text-sm text-muted-foreground italic max-w-md text-center">
+              🎓 Vous avez vu la formation ? Alors passez à l'action — cette offre ne durera pas éternellement.
+            </p>
+            <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg px-8 sm:px-10 py-7 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-2xl shadow-violet-500/30 hover:shadow-violet-500/50 transition-all duration-300 hover:-translate-y-0.5 animate-pulse hover:animate-none hover:scale-[1.02]"
+              onClick={() => { trackCTAClick('hero_cta_top', '#pricing'); document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' }); }}>
               <Rocket className="w-5 h-5 mr-2" />
-              {isVipAvailable ? `👉 Accès Fondateur – ${price}€` : '👉 Créer mon premier ebook maintenant'}
+              🔥 Profiter de l'offre à {price}€ avant qu'elle disparaisse
+              <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
           </motion.div>
 
