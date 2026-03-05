@@ -129,6 +129,7 @@ import EbookArcManager from '@/components/ebook/EbookArcManager';
 import EbookDirectSales from '@/components/ebook/EbookDirectSales';
 import EbookBsrTracker from '@/components/ebook/EbookBsrTracker';
 import EbookExportGuide from '@/components/ebook/EbookExportGuide';
+import KdpGuideChecklist from '@/components/ebook/KdpGuideChecklist';
 import PdfKdpReformatter from '@/components/ebook/PdfKdpReformatter';
 import PdfKdpAnalyzer from '@/components/ebook/PdfKdpAnalyzer';
 import EbookStrictProofreader from '@/components/ebook/EbookStrictProofreader';
@@ -2074,6 +2075,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       
       case 'export-guide':
         return <EbookExportGuide />;
+      
+      case 'kdp-guide':
+        return <KdpGuideChecklist />;
       
       case 'export':
         // Bloquer l'export en mode démo
