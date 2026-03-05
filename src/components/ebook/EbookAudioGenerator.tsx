@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -10,8 +10,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Volume2, Play, Pause, Square, Loader2, 
-  Headphones, Music, Mic2, Settings2, BookOpen, FileText, GraduationCap,
-  SkipForward, SkipBack, ListOrdered, FileDown, Timer, RotateCcw
+  Headphones, Music, Mic2, BookOpen, FileText, GraduationCap,
+  SkipForward, SkipBack, ListOrdered, FileDown, Timer, RotateCcw,
+  Bookmark, BookmarkCheck, Eye, EyeOff, ChevronDown, ChevronUp,
+  Download, Repeat, Shuffle
 } from 'lucide-react';
 import { toast } from 'sonner';
 import jsPDF from 'jspdf';
@@ -77,6 +79,14 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const sequentialAbortRef = useRef(false);
 
+  // New state for enhanced features
+  const [bookmarks, setBookmarks] = useState<Set<string>>(new Set());
+  const [expandedSection, setExpandedSection] = useState<string | null>(null);
+  const [loopMode, setLoopMode] = useState(false);
+  const [activeTab, setActiveTab] = useState('ebook');
+  const [sectionProgress, setSectionProgress] = useState<Record<string, number>>({});
+  const [listenedSections, setListenedSections] = useState<Set<string>>(new Set());
+
   // Texte libre
   const [customText, setCustomText] = useState('');
   const [isGeneratingCustom, setIsGeneratingCustom] = useState(false);
@@ -139,28 +149,36 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
     
     if (ebookTitle) {
       const content = `${ebookTitle}. Par ${authorName || "l'auteur"}.`;
-      sections.push({ id: 'intro', title: 'Introduction', content, wordCount: countWords(content), estimatedMinutes: 0.5, status: 'pending' });
+      sections.push({ id: 'intro', title: 'Introduction', content, wordCount: countWords(content), estimatedMinutes: 0.5, status: 'done' });
     }
     if (preface) {
-      sections.push({ id: 'preface', title: 'Préface', content: preface, wordCount: countWords(preface), estimatedMinutes: Math.ceil(countWords(preface) / 150), status: 'pending' });
+      sections.push({ id: 'preface', title: 'Préface', content: preface, wordCount: countWords(preface), estimatedMinutes: Math.ceil(countWords(preface) / 150), status: 'done' });
     }
     chapters.forEach((chapter, index) => {
       const chapterContent = chapter.content || '';
-      const subContent = chapter.subChapters.map(sub => sub.content || '').filter(c => c).join('\n\n');
+      const subContent = chapter.subChapters.map(sub => `${sub.title}.\n\n${sub.content || ''}`).filter(c => c.trim().length > 5).join('\n\n');
       const fullContent = `Chapitre ${index + 1}: ${chapter.title}.\n\n${chapterContent}\n\n${subContent}`;
       if (fullContent.trim().length > 50) {
         const wc = countWords(fullContent);
-        sections.push({ id: `chapter-${chapter.id}`, title: `Chapitre ${index + 1}: ${chapter.title}`, content: fullContent, wordCount: wc, estimatedMinutes: Math.ceil(wc / 150), status: 'pending' });
+        sections.push({ id: `chapter-${chapter.id}`, title: `Chapitre ${index + 1}: ${chapter.title}`, content: fullContent, wordCount: wc, estimatedMinutes: Math.ceil(wc / 150), status: 'done' });
       }
     });
     if (conclusion) {
-      sections.push({ id: 'conclusion', title: 'Conclusion', content: conclusion, wordCount: countWords(conclusion), estimatedMinutes: Math.ceil(countWords(conclusion) / 150), status: 'pending' });
+      sections.push({ id: 'conclusion', title: 'Conclusion', content: conclusion, wordCount: countWords(conclusion), estimatedMinutes: Math.ceil(countWords(conclusion) / 150), status: 'done' });
     }
     if (epilogue) {
-      sections.push({ id: 'epilogue', title: 'Épilogue', content: epilogue, wordCount: countWords(epilogue), estimatedMinutes: Math.ceil(countWords(epilogue) / 150), status: 'pending' });
+      sections.push({ id: 'epilogue', title: 'Épilogue', content: epilogue, wordCount: countWords(epilogue), estimatedMinutes: Math.ceil(countWords(epilogue) / 150), status: 'done' });
     }
     return sections;
   }, [ebookTitle, authorName, preface, conclusion, epilogue, chapters]);
+
+  // Auto-load sections when ebook content changes
+  useEffect(() => {
+    const sections = prepareSections();
+    if (sections.length > 0) {
+      setAudioSections(sections);
+    }
+  }, [prepareSections]);
 
   const speakText = (text: string, onEnd?: () => void): Promise<void> => {
     return new Promise((resolve, reject) => {
@@ -196,20 +214,6 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
     else if (window.speechSynthesis.speaking) { window.speechSynthesis.pause(); setIsPlaying(false); }
   };
 
-  const generateFullAudiobook = async () => {
-    const sections = prepareSections();
-    if (sections.length === 0) { toast.error('Aucun contenu à lire'); return; }
-    if (!window.speechSynthesis) { toast.error('Votre navigateur ne supporte pas la synthèse vocale'); return; }
-    setIsGenerating(true);
-    setProgress(0);
-    setAudioSections(sections);
-    const updatedSections = sections.map(s => ({ ...s, status: 'done' as const }));
-    setAudioSections(updatedSections);
-    setProgress(100);
-    setIsGenerating(false);
-    toast.success(`${sections.length} sections prêtes à être lues !`);
-  };
-
   const playSection = async (sectionId: string) => {
     const section = audioSections.find(s => s.id === sectionId);
     if (!section) return;
@@ -219,7 +223,11 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
     setIsPlaying(true);
     setElapsedTime(0);
     try {
-      await speakText(section.content, () => { setCurrentPlaying(null); setIsPlaying(false); });
+      await speakText(section.content, () => { 
+        setCurrentPlaying(null); 
+        setIsPlaying(false);
+        setListenedSections(prev => new Set(prev).add(sectionId));
+      });
     } catch {
       toast.error('Erreur lors de la lecture');
       setCurrentPlaying(null);
@@ -228,21 +236,29 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
   };
 
   // Lecture séquentielle de toutes les sections
-  const playAllSequentially = async () => {
+  const playAllSequentially = async (startIndex = 0) => {
     if (audioSections.length === 0) return;
     setIsSequentialPlaying(true);
     sequentialAbortRef.current = false;
     setElapsedTime(0);
 
-    for (let i = currentSequentialIndex; i < audioSections.length; i++) {
+    for (let i = startIndex; i < audioSections.length; i++) {
       if (sequentialAbortRef.current) break;
       setCurrentSequentialIndex(i);
       setCurrentPlaying(audioSections[i].id);
       setIsPlaying(true);
       try {
         await speakText(audioSections[i].content);
+        setListenedSections(prev => new Set(prev).add(audioSections[i].id));
       } catch { break; }
     }
+
+    if (loopMode && !sequentialAbortRef.current) {
+      setCurrentSequentialIndex(0);
+      playAllSequentially(0);
+      return;
+    }
+
     setIsSequentialPlaying(false);
     setCurrentPlaying(null);
     setIsPlaying(false);
@@ -253,7 +269,6 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
     const nextIdx = currentSequentialIndex + 1;
     if (nextIdx < audioSections.length) {
       setCurrentSequentialIndex(nextIdx);
-      // Will be picked up by sequential loop
     }
   };
 
@@ -263,16 +278,32 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
     setCurrentSequentialIndex(prevIdx);
   };
 
-  const totalWords = (preface?.split(/\s+/).length || 0) + 
+  const totalWords = useMemo(() => 
+    (preface?.split(/\s+/).length || 0) + 
     (conclusion?.split(/\s+/).length || 0) +
     (epilogue?.split(/\s+/).length || 0) +
     chapters.reduce((acc, c) => {
       const chapterWords = c.content?.split(/\s+/).length || 0;
       const subWords = c.subChapters.reduce((a, s) => a + (s.content?.split(/\s+/).length || 0), 0);
       return acc + chapterWords + subWords;
-    }, 0);
+    }, 0)
+  , [preface, conclusion, epilogue, chapters]);
 
   const estimatedDuration = Math.ceil(totalWords / 150);
+
+  const listeningProgress = useMemo(() => {
+    if (audioSections.length === 0) return 0;
+    return Math.round((listenedSections.size / audioSections.length) * 100);
+  }, [listenedSections, audioSections]);
+
+  const toggleBookmark = (sectionId: string) => {
+    setBookmarks(prev => {
+      const next = new Set(prev);
+      if (next.has(sectionId)) next.delete(sectionId);
+      else next.add(sectionId);
+      return next;
+    });
+  };
 
   // Texte libre
   const generateCustomAudio = async () => {
@@ -299,7 +330,6 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
       const maxWidth = pageWidth - margin * 2;
       let y = 20;
 
-      // Title page
       pdf.setFontSize(22);
       pdf.text(ebookTitle || 'Script Livre Audio', pageWidth / 2, 50, { align: 'center' });
       pdf.setFontSize(14);
@@ -404,25 +434,21 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
     addText('- 100% gratuit : Utilise l\'API native du navigateur', 10);
     addText('- Controle de la vitesse, du ton et du volume', 10);
     addText('- Lecture sequentielle de tout l\'ebook', 10);
+    addText('- Marque-pages pour reprendre la lecture', 10);
+    addText('- Suivi de progression d\'ecoute', 10);
     addText('- Export du script en PDF et Word', 10);
     yPos += 3;
     addText('2. Voix disponibles', 12, true);
     addText('Les voix dependent de votre navigateur et systeme. Les voix francaises sont privilegiees.', 10);
     yPos += 5;
     addText('Guide d\'utilisation', 14, true, true);
-    addText('Etape 1: Accedez au generateur via l\'onglet "Audio"', 10);
-    addText('Etape 2: Choisissez le type de contenu (Texte libre ou Ebook complet)', 10);
-    addText('Etape 3: Selectionnez une voix et ajustez vitesse/ton/volume', 10);
-    addText('Etape 4: Cliquez sur "Lire" ou "Lecture continue"', 10);
-    addText('Etape 5: Exportez le script en PDF ou Word pour revision', 10);
+    addText('Etape 1: L\'ebook est automatiquement charge en sections', 10);
+    addText('Etape 2: Choisissez une voix et ajustez vitesse/ton/volume', 10);
+    addText('Etape 3: Cliquez sur une section pour la lire ou "Tout lire"', 10);
+    addText('Etape 4: Utilisez les marque-pages pour retrouver vos passages', 10);
+    addText('Etape 5: Exportez le script en PDF ou Word', 10);
     yPos += 5;
-    addText('Conseils et bonnes pratiques', 14, true, true);
-    addText('- Utilisez des points pour des pauses longues', 10);
-    addText('- Evitez les emojis (non prononces)', 10);
-    addText('- Divisez en paragraphes logiques', 10);
-    addText('- Ajustez le volume pour le confort d\'ecoute', 10);
-    yPos += 5;
-    addText('Version 4.0 - Mars 2026', 9);
+    addText('Version 5.0 - Mars 2026', 9);
     pdf.save('Formation_Livre_Audio.pdf');
     toast.success('Formation exportée en PDF !');
   };
@@ -430,7 +456,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
   // Voice config shared component
   const VoiceConfig = ({ compact = false }: { compact?: boolean }) => (
     <Card className="bg-muted/30">
-      <CardContent className={compact ? "pt-4 space-y-4" : "pt-4 space-y-4"}>
+      <CardContent className="pt-4 space-y-4">
         <div className={`grid grid-cols-1 ${compact ? 'md:grid-cols-2' : 'md:grid-cols-4'} gap-4`}>
           <div>
             <Label>Voix</Label>
@@ -469,6 +495,46 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
     </Card>
   );
 
+  // Mini player bar (fixed when playing)
+  const MiniPlayer = () => {
+    if (!isSpeaking && !currentPlaying) return null;
+    const currentSection = audioSections.find(s => s.id === currentPlaying);
+    return (
+      <div className="sticky bottom-0 z-10 bg-primary/10 backdrop-blur-sm border border-primary/20 rounded-lg p-3 mt-4">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
+            <Volume2 className="h-5 w-5 text-primary animate-pulse flex-shrink-0" />
+            <div className="min-w-0">
+              <p className="text-sm font-medium truncate">{currentSection?.title || 'Lecture en cours'}</p>
+              <p className="text-xs text-muted-foreground">
+                {formatTime(elapsedTime)} • {currentSection?.wordCount} mots
+                {isSequentialPlaying && ` • Section ${currentSequentialIndex + 1}/${audioSections.length}`}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-1">
+            {isSequentialPlaying && (
+              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={skipToPrev}>
+                <SkipBack className="h-4 w-4" />
+              </Button>
+            )}
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={togglePauseSpeaking}>
+              {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+            </Button>
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={stopSpeaking}>
+              <Square className="h-4 w-4" />
+            </Button>
+            {isSequentialPlaying && (
+              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={skipToNext}>
+                <SkipForward className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-6">
       <Card>
@@ -481,7 +547,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                 <Badge variant="secondary" className="ml-2 bg-emerald-500/20 text-emerald-700">Gratuit</Badge>
               </CardTitle>
               <CardDescription>
-                Lecture vocale, export du script en PDF/Word, lecture séquentielle
+                Écoutez votre ebook, naviguez entre les sections, exportez en PDF/Word
               </CardDescription>
             </div>
             <div className="flex gap-2">
@@ -493,23 +559,247 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
-          <Tabs defaultValue="custom" className="w-full">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="ebook">
+                <BookOpen className="h-4 w-4 mr-2" />
+                Écouter l'ebook
+              </TabsTrigger>
               <TabsTrigger value="custom">
                 <FileText className="h-4 w-4 mr-2" />
                 Texte libre
               </TabsTrigger>
-              <TabsTrigger value="ebook">
-                <BookOpen className="h-4 w-4 mr-2" />
-                Ebook complet
-              </TabsTrigger>
               <TabsTrigger value="export">
                 <FileDown className="h-4 w-4 mr-2" />
-                Export Script
+                Export
               </TabsTrigger>
             </TabsList>
 
-            {/* Texte libre */}
+            {/* ===== EBOOK COMPLET ===== */}
+            <TabsContent value="ebook" className="space-y-4 mt-4">
+              {/* Stats row */}
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                <div className="text-center p-3 bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10 rounded-lg">
+                  <BookOpen className="h-5 w-5 mx-auto mb-1 text-violet-500" />
+                  <div className="text-lg font-bold">{chapters.length}</div>
+                  <div className="text-xs text-muted-foreground">Chapitres</div>
+                </div>
+                <div className="text-center p-3 bg-gradient-to-br from-cyan-500/10 to-blue-500/10 rounded-lg">
+                  <Music className="h-5 w-5 mx-auto mb-1 text-cyan-500" />
+                  <div className="text-lg font-bold">{totalWords.toLocaleString()}</div>
+                  <div className="text-xs text-muted-foreground">Mots</div>
+                </div>
+                <div className="text-center p-3 bg-gradient-to-br from-amber-500/10 to-orange-500/10 rounded-lg">
+                  <Timer className="h-5 w-5 mx-auto mb-1 text-amber-500" />
+                  <div className="text-lg font-bold">~{estimatedDuration} min</div>
+                  <div className="text-xs text-muted-foreground">Durée</div>
+                </div>
+                <div className="text-center p-3 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 rounded-lg">
+                  <ListOrdered className="h-5 w-5 mx-auto mb-1 text-emerald-500" />
+                  <div className="text-lg font-bold">{audioSections.length}</div>
+                  <div className="text-xs text-muted-foreground">Sections</div>
+                </div>
+                <div className="text-center p-3 bg-gradient-to-br from-rose-500/10 to-pink-500/10 rounded-lg">
+                  <Headphones className="h-5 w-5 mx-auto mb-1 text-rose-500" />
+                  <div className="text-lg font-bold">{listeningProgress}%</div>
+                  <div className="text-xs text-muted-foreground">Écouté</div>
+                </div>
+              </div>
+
+              {/* Listening progress */}
+              {audioSections.length > 0 && (
+                <div className="space-y-1">
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>Progression d'écoute</span>
+                    <span>{listenedSections.size}/{audioSections.length} sections</span>
+                  </div>
+                  <Progress value={listeningProgress} className="h-2" />
+                </div>
+              )}
+
+              {/* Voice config */}
+              <VoiceConfig />
+
+              {/* Main controls */}
+              <div className="flex gap-2 flex-wrap">
+                <Button
+                  onClick={() => isSequentialPlaying ? stopSpeaking() : playAllSequentially(0)}
+                  variant={isSequentialPlaying ? "destructive" : "default"}
+                  className="flex-1 h-12 text-base"
+                  size="lg"
+                  disabled={audioSections.length === 0}
+                >
+                  {isSequentialPlaying ? (
+                    <><Square className="h-5 w-5 mr-2" />Arrêter</>
+                  ) : (
+                    <><Play className="h-5 w-5 mr-2" />Tout écouter</>
+                  )}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="h-12"
+                  onClick={() => setLoopMode(!loopMode)}
+                  title="Lecture en boucle"
+                >
+                  <Repeat className={`h-5 w-5 ${loopMode ? 'text-primary' : ''}`} />
+                </Button>
+              </div>
+
+              {audioSections.length === 0 && (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Volume2 className="h-12 w-12 mx-auto mb-3 opacity-30" />
+                  <p className="font-medium">Aucun contenu à écouter</p>
+                  <p className="text-sm mt-1">Rédigez d'abord le contenu de votre ebook (préface, chapitres, conclusion) pour pouvoir l'écouter.</p>
+                </div>
+              )}
+
+              {/* Sections list */}
+              {audioSections.length > 0 && (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-semibold flex items-center gap-2">
+                      <ListOrdered className="h-4 w-4" />
+                      Table des matières audio
+                    </h3>
+                    {bookmarks.size > 0 && (
+                      <Badge variant="outline" className="text-xs">
+                        <BookmarkCheck className="h-3 w-3 mr-1" />
+                        {bookmarks.size} marque-page{bookmarks.size > 1 ? 's' : ''}
+                      </Badge>
+                    )}
+                  </div>
+
+                  <div className="max-h-[500px] overflow-y-auto">
+                    <div className="space-y-2 pr-2">
+                      {audioSections.map((section, idx) => {
+                        const isActive = currentPlaying === section.id;
+                        const isBookmarked = bookmarks.has(section.id);
+                        const isListened = listenedSections.has(section.id);
+                        const isExpanded = expandedSection === section.id;
+
+                        return (
+                          <div key={section.id} className="space-y-0">
+                            <div 
+                              className={`flex items-center gap-2 p-3 rounded-lg border transition-all cursor-pointer ${
+                                isActive 
+                                  ? 'bg-primary/10 border-primary shadow-sm ring-1 ring-primary/20' 
+                                  : isListened
+                                    ? 'bg-emerald-500/5 border-emerald-500/20 hover:bg-emerald-500/10'
+                                    : 'bg-muted/30 hover:bg-muted/50'
+                              }`}
+                              onClick={() => {
+                                if (isActive) togglePauseSpeaking();
+                                else playSection(section.id);
+                              }}
+                            >
+                              {/* Number / status icon */}
+                              <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
+                                isActive ? 'bg-primary text-primary-foreground' : isListened ? 'bg-emerald-500/20 text-emerald-700' : 'bg-muted'
+                              }`}>
+                                {isActive ? (
+                                  <Volume2 className="h-4 w-4 animate-pulse" />
+                                ) : isListened ? (
+                                  <span>✓</span>
+                                ) : (
+                                  <span>{idx + 1}</span>
+                                )}
+                              </div>
+
+                              {/* Title & info */}
+                              <div className="min-w-0 flex-1">
+                                <p className={`text-sm truncate ${isActive ? 'font-semibold text-primary' : 'font-medium'}`}>
+                                  {section.title}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  {section.wordCount} mots • ~{section.estimatedMinutes} min
+                                </p>
+                              </div>
+
+                              {/* Actions */}
+                              <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
+                                <Button 
+                                  variant="ghost" 
+                                  size="icon" 
+                                  className="h-7 w-7"
+                                  onClick={() => toggleBookmark(section.id)}
+                                  title={isBookmarked ? 'Retirer le marque-page' : 'Ajouter un marque-page'}
+                                >
+                                  {isBookmarked ? (
+                                    <BookmarkCheck className="h-3.5 w-3.5 text-amber-500" />
+                                  ) : (
+                                    <Bookmark className="h-3.5 w-3.5" />
+                                  )}
+                                </Button>
+                                <Button 
+                                  variant="ghost" 
+                                  size="icon" 
+                                  className="h-7 w-7"
+                                  onClick={() => setExpandedSection(isExpanded ? null : section.id)}
+                                  title="Aperçu du texte"
+                                >
+                                  {isExpanded ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                                </Button>
+                                <Button
+                                  variant={isActive ? "secondary" : "ghost"}
+                                  size="icon"
+                                  className="h-7 w-7"
+                                  onClick={() => {
+                                    if (isActive) togglePauseSpeaking();
+                                    else playSection(section.id);
+                                  }}
+                                >
+                                  {isActive && isPlaying ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
+                                </Button>
+                              </div>
+                            </div>
+
+                            {/* Expanded preview */}
+                            {isExpanded && (
+                              <div className="ml-10 p-3 bg-muted/20 border-l-2 border-primary/20 rounded-b-lg text-sm text-muted-foreground leading-relaxed max-h-[200px] overflow-y-auto">
+                                {section.content.substring(0, 800)}
+                                {section.content.length > 800 && <span className="text-primary">... (suite)</span>}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Bookmarked sections shortcut */}
+                  {bookmarks.size > 0 && (
+                    <Card className="bg-amber-500/5 border-amber-500/20">
+                      <CardContent className="p-3">
+                        <h4 className="text-xs font-semibold mb-2 flex items-center gap-1">
+                          <BookmarkCheck className="h-3 w-3 text-amber-500" />
+                          Marque-pages
+                        </h4>
+                        <div className="flex flex-wrap gap-1">
+                          {audioSections.filter(s => bookmarks.has(s.id)).map(section => (
+                            <Button
+                              key={section.id}
+                              variant="outline"
+                              size="sm"
+                              className="text-xs h-7"
+                              onClick={() => playSection(section.id)}
+                            >
+                              <Play className="h-3 w-3 mr-1" />
+                              {section.title.length > 25 ? section.title.substring(0, 25) + '...' : section.title}
+                            </Button>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
+              )}
+
+              {/* Mini player */}
+              <MiniPlayer />
+            </TabsContent>
+
+            {/* ===== TEXTE LIBRE ===== */}
             <TabsContent value="custom" className="space-y-4 mt-4">
               <div className="space-y-3">
                 <Label>Entrez votre texte à lire</Label>
@@ -536,15 +826,9 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                   size="lg"
                 >
                   {isGeneratingCustom || (isSpeaking && currentPlaying === 'custom') ? (
-                    <>
-                      <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                      Lecture en cours...
-                    </>
+                    <><Loader2 className="h-5 w-5 mr-2 animate-spin" />Lecture en cours...</>
                   ) : (
-                    <>
-                      <Play className="h-5 w-5 mr-2" />
-                      Lire le texte
-                    </>
+                    <><Play className="h-5 w-5 mr-2" />Lire le texte</>
                   )}
                 </Button>
                 
@@ -573,96 +857,16 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
               </div>
             </TabsContent>
 
-            {/* Ebook complet */}
-            <TabsContent value="ebook" className="space-y-4 mt-4">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="text-center p-4 bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10 rounded-lg">
-                  <BookOpen className="h-6 w-6 mx-auto mb-2 text-violet-500" />
-                  <div className="text-xl font-bold">{chapters.length}</div>
-                  <div className="text-xs text-muted-foreground">Chapitres</div>
-                </div>
-                <div className="text-center p-4 bg-gradient-to-br from-cyan-500/10 to-blue-500/10 rounded-lg">
-                  <Music className="h-6 w-6 mx-auto mb-2 text-cyan-500" />
-                  <div className="text-xl font-bold">{totalWords.toLocaleString()}</div>
-                  <div className="text-xs text-muted-foreground">Mots</div>
-                </div>
-                <div className="text-center p-4 bg-gradient-to-br from-amber-500/10 to-orange-500/10 rounded-lg">
-                  <Volume2 className="h-6 w-6 mx-auto mb-2 text-amber-500" />
-                  <div className="text-xl font-bold">~{estimatedDuration} min</div>
-                  <div className="text-xs text-muted-foreground">Durée estimée</div>
-                </div>
-                <div className="text-center p-4 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 rounded-lg">
-                  <Mic2 className="h-6 w-6 mx-auto mb-2 text-emerald-500" />
-                  <div className="text-xl font-bold">{audioSections.filter(s => s.status === 'done').length}</div>
-                  <div className="text-xs text-muted-foreground">Sections prêtes</div>
-                </div>
-              </div>
-
-              <VoiceConfig />
-
-              <div className="flex gap-2">
-                <Button
-                  onClick={generateFullAudiobook}
-                  disabled={isGenerating || totalWords === 0}
-                  className="flex-1 h-12 text-lg"
-                  size="lg"
-                >
-                  {isGenerating ? (
-                    <><Loader2 className="h-5 w-5 mr-2 animate-spin" />Préparation...</>
-                  ) : (
-                    <><ListOrdered className="h-5 w-5 mr-2" />Préparer les sections</>
-                  )}
-                </Button>
-
-                {audioSections.length > 0 && (
-                  <Button
-                    onClick={isSequentialPlaying ? stopSpeaking : playAllSequentially}
-                    variant={isSequentialPlaying ? "destructive" : "default"}
-                    className="h-12"
-                    size="lg"
-                  >
-                    {isSequentialPlaying ? (
-                      <><Square className="h-5 w-5 mr-2" />Arrêter</>
-                    ) : (
-                      <><Play className="h-5 w-5 mr-2" />Lecture continue</>
-                    )}
-                  </Button>
-                )}
-              </div>
-
-              {isGenerating && (
-                <div className="space-y-2">
-                  <Progress value={progress} className="h-3" />
-                  <p className="text-sm text-center text-muted-foreground">{Math.round(progress)}% — Préparation des sections...</p>
-                </div>
-              )}
-
-              {isSpeaking && (
-                <div className="flex items-center justify-center gap-4 p-3 bg-primary/5 rounded-lg">
-                  <Button variant="ghost" size="sm" onClick={skipToPrev}><SkipBack className="h-4 w-4" /></Button>
-                  <Button variant="ghost" size="sm" onClick={togglePauseSpeaking}>
-                    {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
-                  </Button>
-                  <Button variant="ghost" size="sm" onClick={stopSpeaking}><Square className="h-4 w-4" /></Button>
-                  <Button variant="ghost" size="sm" onClick={skipToNext}><SkipForward className="h-4 w-4" /></Button>
-                  <div className="text-sm text-muted-foreground flex items-center gap-1">
-                    <Timer className="h-3 w-3" />
-                    {formatTime(elapsedTime)}
-                  </div>
-                </div>
-              )}
-            </TabsContent>
-
-            {/* Export Script */}
+            {/* ===== EXPORT ===== */}
             <TabsContent value="export" className="space-y-4 mt-4">
               <Card className="border-2 border-dashed border-primary/30">
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2">
                     <FileDown className="h-5 w-5 text-primary" />
-                    Exporter le script de votre ebook
+                    Exporter le contenu de votre ebook
                   </CardTitle>
                   <CardDescription>
-                    Téléchargez le texte complet de votre ebook en PDF ou Word pour relecture, impression ou partage
+                    Téléchargez le texte complet en PDF ou Word pour relecture, impression ou partage
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -691,11 +895,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                       disabled={isExportingScript || totalWords === 0}
                       className="flex-1 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white"
                     >
-                      {isExportingScript ? (
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      ) : (
-                        <FileDown className="h-4 w-4 mr-2" />
-                      )}
+                      {isExportingScript ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <FileDown className="h-4 w-4 mr-2" />}
                       Exporter en PDF
                     </Button>
                     <Button
@@ -704,11 +904,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                       variant="outline"
                       className="flex-1 border-blue-500 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950"
                     >
-                      {isExportingScript ? (
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      ) : (
-                        <FileText className="h-4 w-4 mr-2" />
-                      )}
+                      {isExportingScript ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <FileText className="h-4 w-4 mr-2" />}
                       Exporter en Word
                     </Button>
                   </div>
@@ -736,79 +932,6 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
           </Tabs>
         </CardContent>
       </Card>
-
-      {/* Liste des sections audio */}
-      {audioSections.length > 0 && (
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between flex-wrap gap-2">
-              <CardTitle className="text-base flex items-center gap-2">
-                <ListOrdered className="h-4 w-4" />
-                Sections ({audioSections.length})
-                {isSequentialPlaying && (
-                  <Badge variant="secondary" className="bg-primary/10 text-primary">
-                    Lecture continue — {currentSequentialIndex + 1}/{audioSections.length}
-                  </Badge>
-                )}
-              </CardTitle>
-              <div className="flex gap-2">
-                {!isSequentialPlaying && audioSections.length > 0 && (
-                  <Button size="sm" variant="outline" onClick={() => { setCurrentSequentialIndex(0); playAllSequentially(); }}>
-                    <RotateCcw className="h-3 w-3 mr-1" />
-                    Tout relire
-                  </Button>
-                )}
-                {isSpeaking && (
-                  <Button variant="destructive" size="sm" onClick={stopSpeaking}>
-                    <Square className="h-4 w-4 mr-2" />Arrêter
-                  </Button>
-                )}
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {audioSections.map((section, idx) => (
-              <div 
-                key={section.id}
-                className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
-                  currentPlaying === section.id ? 'bg-primary/10 border-primary shadow-sm' : 'bg-muted/30 hover:bg-muted/50'
-                }`}
-              >
-                <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold bg-muted">
-                    {currentPlaying === section.id ? (
-                      <Volume2 className="h-4 w-4 text-primary animate-pulse" />
-                    ) : (
-                      <span>{idx + 1}</span>
-                    )}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="font-medium text-sm truncate">{section.title}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {section.wordCount} mots — ~{section.estimatedMinutes} min
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  {section.status === 'done' && (
-                    <Button
-                      size="sm"
-                      variant={currentPlaying === section.id ? "secondary" : "outline"}
-                      onClick={() => {
-                        if (currentPlaying === section.id) togglePauseSpeaking();
-                        else playSection(section.id);
-                      }}
-                    >
-                      {currentPlaying === section.id && isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-                    </Button>
-                  )}
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 };
