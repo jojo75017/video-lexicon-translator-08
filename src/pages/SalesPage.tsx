@@ -302,14 +302,14 @@ const SalesPage = () => {
             <h2 className="text-lg sm:text-xl font-bold text-foreground mb-3">
               🎬 Démo réelle — création d'un ebook complet
             </h2>
-            <div className="relative rounded-xl overflow-hidden shadow-2xl shadow-violet-500/20 border border-border bg-card aspect-video">
-              <iframe
-                src="https://www.youtube.com/embed/JD0x6hDhBg0?rel=0"
+            <div className="relative rounded-xl overflow-hidden shadow-2xl shadow-violet-500/20 border border-border bg-card max-w-sm mx-auto" style={{ aspectRatio: '9/16' }}>
+              <video
+                src="/videos/annonce-ebookstudio.mp4"
                 title="Démo réelle — création d'un ebook complet"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                className="absolute inset-0 w-full h-full"
-                loading="lazy"
+                controls
+                playsInline
+                preload="metadata"
+                className="absolute inset-0 w-full h-full object-cover"
               />
             </div>
             <p className="text-sm text-muted-foreground mt-3">
