@@ -19,6 +19,9 @@ import FormationAudioPage from './pages/FormationAudioPage';
 import FormationSeriesAudioPage from './pages/FormationSeriesAudioPage';
 import FormationVideosPage from './pages/FormationVideosPage';
 import SalesPage from './pages/SalesPage';
+import MentionsLegales from './pages/MentionsLegales';
+import PolitiqueConfidentialite from './pages/PolitiqueConfidentialite';
+import CGV from './pages/CGV';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import DemoPage from './pages/DemoPage';
 import OfferValuePage from './pages/OfferValuePage';
@@ -234,6 +237,9 @@ const App = () => {
 
             <Route path="/" element={<Navigate to="/offres" replace />} />
             <Route path="/offres" element={<SalesPage />} />
+            <Route path="/mentions-legales" element={<MentionsLegales />} />
+            <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
+            <Route path="/cgv" element={<CGV />} />
             <Route path="/logout-total" element={<LogoutTotalPage />} />
             <Route path="/blog" element={<BlogPage />} />
             <Route path="/blog/:slug" element={<BlogArticleTemplate />} />
