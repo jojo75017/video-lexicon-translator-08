@@ -21,6 +21,7 @@ import { Document, Packer, Paragraph, TextRun, HeadingLevel } from 'docx';
 import { saveAs } from 'file-saver';
 import JSZip from 'jszip';
 import { supabase } from '@/integrations/supabase/client';
+import { generateIntroJingle } from '@/utils/audioIntroGenerator';
 
 interface Chapter {
   id: string;
@@ -591,10 +592,19 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
     try {
       const zip = new JSZip();
       
+      // Generate intro jingle as track 00
+      setMp3ProgressLabel('🔔 Génération du jingle d\'intro...');
+      setMp3Progress(2);
+      const introBlobs = await generateIntroJingle(generateSectionMp3);
+      if (introBlobs.length > 0) {
+        const introBlob = new Blob(introBlobs, { type: 'audio/mpeg' });
+        zip.file('00-Intro-Jingle.mp3', introBlob);
+      }
+      
       for (let i = 0; i < sections.length; i++) {
         const section = sections[i];
         setMp3ProgressLabel(`${i + 1}/${sections.length} — ${section.title}`);
-        setMp3Progress(Math.round(((i) / sections.length) * 100));
+        setMp3Progress(Math.round(5 + ((i) / sections.length) * 90));
         
         const blob = await generateSectionMp3(section.content);
         if (blob) {
@@ -608,7 +618,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
       const zipBlob = await zip.generateAsync({ type: 'blob' });
       const zipName = `audiobook-${(ebookTitle || 'ebook').replace(/\s+/g, '-')}.zip`;
       saveAs(zipBlob, zipName);
-      toast.success(`Audiobook exporté ! ${sections.length} fichiers MP3`);
+      toast.success(`Audiobook exporté avec intro ! ${sections.length + 1} fichiers MP3`);
     } catch (error: any) {
       console.error('MP3 batch export error:', error);
       toast.error(`Erreur export MP3 : ${error.message}`);
@@ -1158,16 +1168,23 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                   <div className="flex flex-col sm:flex-row gap-3">
                     {/* Export all as single concatenated MP3 */}
                     <Button
-                      onClick={async () => {
+                    onClick={async () => {
                         const sections = prepareSections();
                         if (sections.length === 0) { toast.error('Aucun contenu'); return; }
                         setIsGeneratingMp3(true);
                         setMp3Progress(0);
                         try {
                           const allBlobs: Blob[] = [];
+                          
+                          // Generate intro jingle (bell + TTS + silence)
+                          setMp3ProgressLabel('🔔 Génération du jingle d\'intro...');
+                          setMp3Progress(2);
+                          const introBlobs = await generateIntroJingle(generateSectionMp3);
+                          allBlobs.push(...introBlobs);
+                          
                           for (let i = 0; i < sections.length; i++) {
                             setMp3ProgressLabel(`${i + 1}/${sections.length} — ${sections[i].title}`);
-                            setMp3Progress(Math.round((i / sections.length) * 90));
+                            setMp3Progress(Math.round(5 + (i / sections.length) * 85));
                             const blob = await generateSectionMp3(sections[i].content);
                             if (blob) allBlobs.push(blob);
                           }
@@ -1176,7 +1193,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                           const finalBlob = new Blob(allBlobs, { type: 'audio/mpeg' });
                           const filename = `${(ebookTitle || 'audiobook').replace(/\s+/g, '-')}-complet.mp3`;
                           saveAs(finalBlob, filename);
-                          toast.success('Audiobook complet exporté en un seul fichier MP3 !');
+                          toast.success('Audiobook complet exporté avec intro jingle !');
                         } catch (error: any) {
                           toast.error(`Erreur : ${error.message}`);
                         } finally {
@@ -1248,6 +1265,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                   <div className="p-3 bg-muted/30 border border-border rounded-lg text-sm text-muted-foreground">
                     <p className="font-medium mb-1">🎧 Export Pro Azure Speech</p>
                     <ul className="space-y-1 text-xs">
+                      <li>• 🔔 Intro jingle automatique (cloche + message d'accueil)</li>
                       <li>• Voix neuronales Azure premium (7 voix par niche)</li>
                       <li>• Format MP3 192kbps / 48kHz — conforme KDP & Audible</li>
                       <li>• Fusion automatique en un seul fichier audiobook</li>
