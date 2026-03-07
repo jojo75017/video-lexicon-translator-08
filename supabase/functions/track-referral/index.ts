@@ -113,8 +113,8 @@ Deno.serve(async (req) => {
         });
       }
 
-      // Determine sale amount from request body (default 37€ Fondateur)
-      const { sale_amount: saleAmount = 37 } = await req.json().catch(() => ({ sale_amount: 37 }));
+      // Determine sale amount from request body (default 97€ Pro Lifetime)
+      const { sale_amount: saleAmount = 97 } = await req.json().catch(() => ({ sale_amount: 97 }));
 
       // Get referrer's current converted count to determine commission tier
       const { data: referral } = await supabase
@@ -134,18 +134,12 @@ Deno.serve(async (req) => {
 
         const convertedCount = count ?? 0;
 
-        if (saleAmount >= 147) {
+        if (saleAmount >= 97) {
           // Pro Lifetime: 30€ flat commission
           commission = 30;
         } else {
-          // Fondateur 37€: 5% for first 5, then 10€ for next 20
-          if (convertedCount < 5) {
-            commission = +(saleAmount * 0.05).toFixed(2); // ~1.85€
-          } else if (convertedCount < 25) {
-            commission = 10;
-          } else {
-            commission = 10; // keep 10€ beyond 25
-          }
+          // Fallback: 30€ commission
+          commission = 30;
         }
       }
 
