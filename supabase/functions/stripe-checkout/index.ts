@@ -6,26 +6,20 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Plan configurations - Upsell system: Starter 47€, Pro 97€
+// Plan configurations - Pro 97€ (launch), future 197€
 const PLANS = {
-  starter: {
-    name: "Ebook Generator - Starter",
-    price: 4700, // 47€
-    type: "one_time" as const,
-    features: ["20 ebooks/mois", "Chapitres inclus", "Export PDF", "Modules 1-4 formation", "Support email"],
-  },
   pro: {
-    name: "Ebook Generator - Pro Lifetime",
-    price: 14700, // 147€
+    name: "EbookStudio Pro Lifetime",
+    price: 9700, // 97€
     type: "one_time" as const,
-    features: ["Ebooks illimités à vie", "Chapitres illimités", "10 couvertures IA/mois", "Export PDF/EPUB/Word", "Toutes les formations", "Outils KDP Premium", "Traduction multi-langues", "Générateur Audiobooks", "Mises à jour à vie", "Support prioritaire"],
+    features: ["Workflow 15 rôles IA", "Gemini 2.5 Pro", "Imagen 3", "Azure Neural Voices", "Export PDF/EPUB/Word", "18 modules formation", "Outils KDP Premium", "Traduction multi-langues", "Audiobooks", "Mises à jour à vie", "Support prioritaire"],
   },
   // Keep lifetime as alias for pro (backwards compatibility)
   lifetime: {
-    name: "Ebook Generator - Pro Lifetime",
-    price: 14700, // 147€
+    name: "EbookStudio Pro Lifetime",
+    price: 9700, // 97€
     type: "one_time" as const,
-    features: ["Ebooks illimités à vie", "Chapitres illimités", "10 couvertures IA/mois", "Export PDF/EPUB/Word", "Toutes les formations", "Outils KDP Premium", "Traduction multi-langues", "Générateur Audiobooks", "Mises à jour à vie", "Support prioritaire"],
+    features: ["Workflow 15 rôles IA", "Gemini 2.5 Pro", "Imagen 3", "Azure Neural Voices", "Export PDF/EPUB/Word", "18 modules formation", "Outils KDP Premium", "Traduction multi-langues", "Audiobooks", "Mises à jour à vie", "Support prioritaire"],
   },
 };
 
