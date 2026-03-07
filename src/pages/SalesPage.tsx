@@ -951,51 +951,53 @@ const SalesPage = () => {
         </motion.div>
       </section>
 
-      {/* Tutoriel Vidéo Configuration */}
-      <section className="py-16 px-4" id="tuto-api">
-        <div className="max-w-4xl mx-auto text-center">
+      {/* Coût API rassurant — sans donner les clés */}
+      <section className="py-16 px-4" id="cout-api">
+        <div className="max-w-3xl mx-auto text-center">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
             <motion.div variants={fadeUp}>
-              <Badge className="mb-4 bg-blue-500/10 text-blue-500 border-blue-500/20 px-4 py-2">
+              <Badge className="mb-4 bg-emerald-500/10 text-emerald-500 border-emerald-500/20 px-4 py-2">
                 <Cpu className="w-4 h-4 mr-2" />
-                Configuration — 2 min
+                Transparence totale
               </Badge>
             </motion.div>
-            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-4xl font-extrabold mb-4">🔑 Obtenez votre clé Gemini 3 Flash gratuitement</motion.h2>
+            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-4xl font-extrabold mb-4">
+              Coût réel : moins de 0,50€ par ebook
+            </motion.h2>
             <motion.p variants={fadeUp} custom={2} className="text-muted-foreground mb-8 text-lg max-w-2xl mx-auto">
-              Google offre un accès gratuit à Gemini 3 Flash. Un ebook complet coûte entre 0,20€ et 0,50€ en coût API.
+              EbookStudio utilise l'IA Gemini 3 Flash de Google — vous ne payez que ce que vous consommez, directement à Google. Pas d'abonnement caché, pas de surcoût.
             </motion.p>
-            <motion.div variants={fadeUp} custom={3} className="grid md:grid-cols-3 gap-4 max-w-3xl mx-auto text-left mb-8">
+
+            <motion.div variants={fadeUp} custom={3} className="grid md:grid-cols-3 gap-5 max-w-3xl mx-auto mb-10">
               {[
-                { step: "1", title: "Créez un compte Google AI Studio", desc: "Rendez-vous sur aistudio.google.com et connectez-vous avec votre compte Google", icon: "🌐" },
-                { step: "2", title: "Générez votre clé API", desc: "Cliquez sur 'Get API Key' → 'Create API Key' → Copiez votre clé", icon: "🔑" },
-                { step: "3", title: "Collez dans EbookStudio", desc: "Allez dans Paramètres → Clés API → Collez votre clé Gemini", icon: "✅" },
+                { value: "~0,30€", label: "Coût moyen par ebook", sub: "Rédaction complète IA", icon: BookOpen },
+                { value: "Gratuit", label: "Clé API Google", sub: "On vous guide après l'achat", icon: Key },
+                { value: "2 min", label: "Configuration", sub: "Guide vidéo étape par étape", icon: Play },
               ].map((item, i) => (
-                <Card key={i} className="border hover:border-primary/30 transition-all">
-                  <CardContent className="pt-6 pb-6">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-lg shadow-md">
-                        {item.step}
-                      </div>
-                      <span className="text-2xl">{item.icon}</span>
-                    </div>
-                    <h3 className="font-bold text-sm mb-1">{item.title}</h3>
-                    <p className="text-xs text-muted-foreground">{item.desc}</p>
+                <Card key={i} className="border border-border/50 bg-card/50 backdrop-blur-sm">
+                  <CardContent className="pt-6 pb-6 text-center">
+                    <item.icon className="w-8 h-8 mx-auto mb-3 text-emerald-500" />
+                    <p className="text-2xl font-extrabold text-foreground">{item.value}</p>
+                    <p className="font-semibold text-sm mt-1">{item.label}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{item.sub}</p>
                   </CardContent>
                 </Card>
               ))}
             </motion.div>
-            <motion.div variants={fadeUp} custom={4} className="flex flex-wrap justify-center gap-4">
-              <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">
-                <Button variant="outline" className="gap-2 border-blue-500/30 text-blue-600 hover:bg-blue-500/10">
-                  <Cpu className="w-4 h-4" />
-                  Obtenir ma clé Gemini gratuite →
-                </Button>
-              </a>
-              <div className="flex items-center gap-2 bg-card border border-border rounded-full px-4 py-2 text-sm">
-                <Mic className="w-4 h-4 text-emerald-500" />
-                <span>Clé Azure Speech (audiobooks, optionnelle)</span>
+
+            <motion.div variants={fadeUp} custom={4} className="bg-gradient-to-r from-emerald-500/5 via-emerald-500/10 to-emerald-500/5 border border-emerald-500/20 rounded-2xl p-6 max-w-xl mx-auto">
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <CheckCircle className="w-5 h-5 text-emerald-500" />
+                <span className="font-bold text-sm">Tout est inclus après votre achat</span>
               </div>
+              <p className="text-sm text-muted-foreground mb-4">
+                Guide vidéo de configuration, tutoriel pas-à-pas pour obtenir votre clé gratuite, et support prioritaire. Vous serez opérationnel en 2 minutes.
+              </p>
+              <Button size="lg" className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white font-bold px-8 py-5 rounded-xl shadow-lg shadow-violet-500/20"
+                onClick={handlePlanClick}>
+                <Rocket className="w-5 h-5 mr-2" />
+                Commencer maintenant — {LAUNCH_PRICE}€
+              </Button>
             </motion.div>
           </motion.div>
         </div>
