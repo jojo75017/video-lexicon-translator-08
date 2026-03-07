@@ -156,13 +156,15 @@ La seule limite est votre imagination !`
     },
     {
       category: 'usage',
-      question: "Dois-je fournir ma propre clé API OpenAI ?",
-      answer: `Non, ce n'est pas obligatoire mais c'est possible :
+      question: "Comment fonctionne l'IA Gemini 3 Flash ?",
+      answer: `EbookStudio utilise l'IA Gemini 3 Flash de Google — plus rapide et moins chère que les alternatives :
 
-**Option 1 - Sans clé API** : Utilisez notre quota inclus (limité)
-**Option 2 - Avec votre clé** : Entrez votre clé OpenAI dans Paramètres pour un usage illimité
+**Configuration en 2 minutes :**
+1. Créez un compte gratuit sur Google AI Studio
+2. Générez votre clé API (gratuite)
+3. Collez-la dans Paramètres → Clés API
 
-Votre clé reste privée et stockée localement sur votre appareil uniquement.`
+**Coûts :** Vous payez directement Google, environ 0,20€ à 0,50€ par ebook complet. Un guide vidéo étape par étape est inclus dans votre espace membre.`
     },
     {
       category: 'technical',
