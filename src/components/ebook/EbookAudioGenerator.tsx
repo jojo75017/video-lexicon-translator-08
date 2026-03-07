@@ -620,7 +620,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
       // Generate intro jingle as track 00
       setMp3ProgressLabel('🔔 Génération du jingle d\'intro...');
       setMp3Progress(2);
-      const introBlobs = await generateIntroForExport(generateSectionMp3);
+      const introBlobs = await generateIntroForExport(generateSectionMp3, ebookTitle);
       if (introBlobs.length > 0) {
         const introBlob = new Blob(introBlobs, { type: 'audio/mpeg' });
         zip.file('00-Intro-Jingle.mp3', introBlob);
@@ -1208,7 +1208,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                         jingleAudioRef.current = audio;
                         setIsPreviewingJingle(true);
                         try {
-                          const introBlobs = await generateIntroJingle(generateSectionMp3);
+                          const introBlobs = await generateIntroJingle(generateSectionMp3, ebookTitle);
                           if (introBlobs.length === 0) {
                             toast.error('Impossible de générer le jingle');
                             setIsPreviewingJingle(false);
@@ -1275,7 +1275,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                           // Generate intro jingle (bell + TTS + silence)
                           setMp3ProgressLabel('🔔 Génération du jingle d\'intro...');
                           setMp3Progress(2);
-                          const introBlobs = await generateIntroForExport(generateSectionMp3);
+                          const introBlobs = await generateIntroForExport(generateSectionMp3, ebookTitle);
                           allBlobs.push(...introBlobs);
                           
                           for (let i = 0; i < sections.length; i++) {
