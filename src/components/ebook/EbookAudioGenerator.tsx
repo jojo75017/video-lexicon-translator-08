@@ -1265,6 +1265,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                   <div className="p-3 bg-muted/30 border border-border rounded-lg text-sm text-muted-foreground">
                     <p className="font-medium mb-1">🎧 Export Pro Azure Speech</p>
                     <ul className="space-y-1 text-xs">
+                      <li>• 🔔 Intro jingle automatique (cloche + message d'accueil)</li>
                       <li>• Voix neuronales Azure premium (7 voix par niche)</li>
                       <li>• Format MP3 192kbps / 48kHz — conforme KDP & Audible</li>
                       <li>• Fusion automatique en un seul fichier audiobook</li>
