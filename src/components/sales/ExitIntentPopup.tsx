@@ -135,7 +135,7 @@ const ExitIntentPopup = ({ onContinueToOffer }: ExitIntentPopupProps) => {
                     className="w-full border-violet-300 text-violet-700 hover:bg-violet-50 dark:border-violet-700 dark:text-violet-300 dark:hover:bg-violet-950/50 py-5"
                   >
                     <Sparkles className="w-4 h-4 mr-2" />
-                    Voir l'offre spéciale à 37€
+                    Voir l'offre spéciale à 97€
                   </Button>
 
                   <button

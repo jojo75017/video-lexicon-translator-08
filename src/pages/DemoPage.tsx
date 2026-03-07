@@ -316,7 +316,7 @@ const DemoPage = () => {
                 onClick={() => navigate('/offres')}
               >
                 <Crown className="w-5 h-5 mr-2" />
-                Débloquer tout pour 37€
+                Débloquer tout pour 97€
               </Button>
             </div>
           </div>
@@ -567,7 +567,7 @@ const DemoPage = () => {
                         <Lock className="w-6 h-6 text-white" />
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-bold text-lg mb-2">🔓 Débloquez la suite pour 37€</h3>
+                        <h3 className="font-bold text-lg mb-2">🔓 Débloquez la suite pour 97€</h3>
                         <div className="grid sm:grid-cols-2 gap-2 mb-4">
                           {[
                             { icon: "✍️", text: "Rédaction complète des chapitres" },
@@ -589,7 +589,7 @@ const DemoPage = () => {
                           onClick={() => navigate('/offres')}
                         >
                           <Crown className="w-5 h-5 mr-2" />
-                          Accéder à tout pour 37€
+                          Accéder à tout pour 97€
                         </Button>
                       </div>
                     </div>

@@ -1882,7 +1882,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                 onClick={() => setShowPaywall('chapters')}
               >
                 <Sparkles className="w-4 h-4 mr-2" />
-                Débloquer pour 37€
+                Débloquer pour 97€
               </Button>
             </div>
           );

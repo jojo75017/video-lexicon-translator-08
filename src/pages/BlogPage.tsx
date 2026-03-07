@@ -254,7 +254,7 @@ const BlogPage = () => {
               </Link>
               <Link to="/offres">
                 <Button size="lg" className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500">
-                  Accès complet à 37€
+                  Accès Pro — 97€ à vie
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>
