@@ -142,8 +142,15 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
 
   // Load available voices
   useEffect(() => {
+    const synth = typeof window !== 'undefined' ? window.speechSynthesis : undefined;
+
+    if (!synth) {
+      setAvailableVoices([]);
+      return;
+    }
+
     const loadVoices = () => {
-      const voices = window.speechSynthesis.getVoices();
+      const voices = synth.getVoices?.() || [];
       const frenchVoices = voices
         .filter(v => v.lang.startsWith('fr'))
         .map(v => ({
@@ -170,10 +177,20 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
         }
       }
     };
+
     loadVoices();
-    window.speechSynthesis.onvoiceschanged = loadVoices;
-    return () => { window.speechSynthesis.onvoiceschanged = null; };
+    synth.onvoiceschanged = loadVoices;
+    return () => {
+      if (synth.onvoiceschanged === loadVoices) {
+        synth.onvoiceschanged = null;
+      }
+    };
   }, [selectedVoice]);
+
+  const getSafeSubChapters = useCallback((chapter: Chapter | any) => {
+    const rawSubChapters = chapter?.subChapters ?? chapter?.subchapters ?? [];
+    return Array.isArray(rawSubChapters) ? rawSubChapters : [];
+  }, []);
 
   const prepareSections = useCallback((): AudioSection[] => {
     const sections: AudioSection[] = [];
@@ -188,7 +205,11 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
     }
     chapters.forEach((chapter, index) => {
       const chapterContent = chapter.content || '';
-      const subContent = chapter.subChapters.map(sub => `${sub.title}.\n\n${sub.content || ''}`).filter(c => c.trim().length > 5).join('\n\n');
+      const safeSubChapters = getSafeSubChapters(chapter);
+      const subContent = safeSubChapters
+        .map(sub => `${sub.title}.\n\n${sub.content || ''}`)
+        .filter(c => c.trim().length > 5)
+        .join('\n\n');
       const fullContent = `Chapitre ${index + 1}: ${chapter.title}.\n\n${chapterContent}\n\n${subContent}`;
       if (fullContent.trim().length > 50) {
         const wc = countWords(fullContent);
@@ -202,7 +223,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
       sections.push({ id: 'epilogue', title: 'Épilogue', content: epilogue, wordCount: countWords(epilogue), estimatedMinutes: Math.ceil(countWords(epilogue) / 150), status: 'done' });
     }
     return sections;
-  }, [ebookTitle, authorName, preface, conclusion, epilogue, chapters]);
+  }, [ebookTitle, authorName, preface, conclusion, epilogue, chapters, getSafeSubChapters]);
 
   // Auto-load sections when ebook content changes
   useEffect(() => {
@@ -316,10 +337,11 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
     (epilogue?.split(/\s+/).length || 0) +
     chapters.reduce((acc, c) => {
       const chapterWords = c.content?.split(/\s+/).length || 0;
-      const subWords = c.subChapters.reduce((a, s) => a + (s.content?.split(/\s+/).length || 0), 0);
+      const safeSubChapters = getSafeSubChapters(c);
+      const subWords = safeSubChapters.reduce((a, s) => a + (s.content?.split(/\s+/).length || 0), 0);
       return acc + chapterWords + subWords;
     }, 0)
-  , [preface, conclusion, epilogue, chapters]);
+  , [preface, conclusion, epilogue, chapters, getSafeSubChapters]);
 
   const estimatedDuration = Math.ceil(totalWords / 150);
 
