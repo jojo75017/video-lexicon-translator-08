@@ -1,4 +1,3 @@
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
@@ -6,25 +5,24 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+async function callGemini(systemPrompt: string, userPrompt: string, opts: { maxTokens?: number; temperature?: number; timeout?: number } = {}) {
+  const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
+  if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY non configurée.");
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), opts.timeout || 90000);
+  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ system_instruction: { parts: [{ text: systemPrompt }] }, contents: [{ role: "user", parts: [{ text: userPrompt }] }], generationConfig: { temperature: opts.temperature ?? 0.7, maxOutputTokens: opts.maxTokens ?? 4000 } }), signal: controller.signal });
+  clearTimeout(timeoutId);
+  if (!response.ok) { const e = await response.text(); console.error("Gemini error:", response.status, e); if (response.status === 429) throw { status: 429, message: "Limite Gemini atteinte." }; throw new Error(`Erreur Gemini: ${response.status}`); }
+  const data = await response.json();
+  return data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+}
+
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
   try {
     const { chapterTitle, chapterContext, targetAudience, expertise } = await req.json();
-
-    if (!chapterTitle) {
-      return new Response(
-        JSON.stringify({ error: "Le titre du chapitre est requis" }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
-    if (!OPENAI_API_KEY) {
-      throw new Error("OPENAI_API_KEY non configurée");
-    }
+    if (!chapterTitle) return new Response(JSON.stringify({ error: "Le titre du chapitre est requis" }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
     const systemPrompt = `Tu es un auteur professionnel publié sur Amazon KDP avec des milliers de ventes. Tu rédiges des chapitres de qualité PUBLICATION, prêts à être exportés en PDF et vendus.
 
@@ -92,80 +90,19 @@ RAPPELS CRITIQUES :
 - Exemples concrets et actionnables
 - Micro-cliffhanger en fin de chapitre`;
 
-    console.log("Calling OpenAI for expert writing...");
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 90000);
-
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${OPENAI_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "gpt-4o-mini",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt }
-        ],
-        max_tokens: 4000,
-        temperature: 0.8,
-      }),
-      signal: controller.signal
-    });
-
-    clearTimeout(timeoutId);
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("OpenAI error:", response.status, errorText);
-      
-      if (response.status === 429) {
-        return new Response(
-          JSON.stringify({ error: "Limite de requêtes atteinte, réessayez dans quelques instants." }),
-          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-      throw new Error(`OpenAI error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const content = data.choices[0].message.content;
-
-    console.log("OpenAI response received");
+    console.log("Gemini 3 Flash: expert writing...");
+    const content = await callGemini(systemPrompt, userPrompt, { maxTokens: 8000, temperature: 0.8, timeout: 120000 });
 
     let result;
     try {
       const jsonMatch = content.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        result = JSON.parse(jsonMatch[0]);
-      } else {
-        result = {
-          contenuComplet: content,
-          synthese: "",
-          actionConcrete: ""
-        };
-      }
-    } catch (e) {
-      console.log("JSON parsing failed, using raw content");
-      result = {
-        contenuComplet: content,
-        synthese: "",
-        actionConcrete: ""
-      };
-    }
+      if (jsonMatch) result = JSON.parse(jsonMatch[0]);
+      else result = { contenuComplet: content, synthese: "", actionConcrete: "" };
+    } catch { result = { contenuComplet: content, synthese: "", actionConcrete: "" }; }
 
-    return new Response(JSON.stringify(result), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
-
+    return new Response(JSON.stringify(result), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   } catch (error) {
     console.error("Error in expert-writing:", error);
-    const errorMessage = error.name === 'AbortError' ? 'Timeout - rédaction trop longue' : error.message;
-    return new Response(
-      JSON.stringify({ error: errorMessage }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    return new Response(JSON.stringify({ error: error.name === 'AbortError' ? 'Timeout - rédaction trop longue' : (error.message || 'Erreur') }), { status: error.status || 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   }
 });
