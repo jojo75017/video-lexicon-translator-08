@@ -112,28 +112,33 @@ function writeString(view: DataView, offset: number, str: string) {
 }
 
 /**
+ * Build the intro text with the ebook title injected.
+ */
+function buildIntroText(ebookTitle?: string): string {
+  const title = ebookTitle?.trim() || 'votre livre audio';
+  return DEFAULT_INTRO_TEXT.replace('{TITRE}', title);
+}
+
+/**
  * Generate the complete intro jingle.
  * Returns blobs that MUST be played sequentially (bell=WAV, rest=MP3).
- * For export/download, use generateIntroForExport() which is MP3-only.
  */
 export async function generateIntroJingle(
-  generateTts: (text: string) => Promise<Blob | null>
+  generateTts: (text: string) => Promise<Blob | null>,
+  ebookTitle?: string
 ): Promise<Blob[]> {
   const introBlobs: Blob[] = [];
 
-  // 1. Bell chime (WAV, generated locally — no API call)
   const bellBlob = await generateBellChimeWebAudio();
   if (bellBlob) {
     introBlobs.push(bellBlob);
   }
 
-  // 2. Welcome message (MP3 via TTS)
-  const ttsBlob = await generateTts(INTRO_TEXT);
+  const ttsBlob = await generateTts(buildIntroText(ebookTitle));
   if (ttsBlob && ttsBlob.size > 0) {
     introBlobs.push(ttsBlob);
   }
 
-  // 3. Short silence transition
   const silenceBlob = await generateTts('...');
   if (silenceBlob && silenceBlob.size > 0) {
     introBlobs.push(silenceBlob);
@@ -144,20 +149,18 @@ export async function generateIntroJingle(
 
 /**
  * Generate intro for file export (MP3-only, no WAV bell).
- * Safe to concatenate with other MP3 blobs.
  */
 export async function generateIntroForExport(
-  generateTts: (text: string) => Promise<Blob | null>
+  generateTts: (text: string) => Promise<Blob | null>,
+  ebookTitle?: string
 ): Promise<Blob[]> {
   const introBlobs: Blob[] = [];
 
-  // Welcome message (MP3)
-  const ttsBlob = await generateTts(INTRO_TEXT);
+  const ttsBlob = await generateTts(buildIntroText(ebookTitle));
   if (ttsBlob && ttsBlob.size > 0) {
     introBlobs.push(ttsBlob);
   }
 
-  // Short silence
   const silenceBlob = await generateTts('...');
   if (silenceBlob && silenceBlob.size > 0) {
     introBlobs.push(silenceBlob);
@@ -166,4 +169,4 @@ export async function generateIntroForExport(
   return introBlobs;
 }
 
-export { INTRO_TEXT };
+export { DEFAULT_INTRO_TEXT as INTRO_TEXT };
