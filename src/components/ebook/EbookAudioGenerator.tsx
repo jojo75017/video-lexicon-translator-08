@@ -55,6 +55,28 @@ interface WebSpeechVoice {
   description: string;
 }
 
+// Azure Neural Voices par niche
+const AZURE_VOICE_PRESETS = [
+  { id: 'enfants-3-6', label: '👶 Enfants (3-6 ans)', voice: 'fr-FR-EloiseNeural', description: 'Douce et joyeuse' },
+  { id: 'enfants-6-12', label: '🧒 Enfants (6-12 ans)', voice: 'fr-FR-BrigitteNeural', description: 'Narrative et entraînante' },
+  { id: 'thriller', label: '🔪 Thriller / Policier', voice: 'fr-FR-HenriNeural', description: 'Suspense, débit ralenti' },
+  { id: 'romance', label: '💕 Romance / Romans', voice: 'fr-FR-DeniseNeural', description: 'Chaleureuse et expressive' },
+  { id: 'spiritualite', label: '🧘 Spiritualité', voice: 'fr-FR-AlainNeural', description: 'Calme et apaisante' },
+  { id: 'business', label: '💼 Marketing / Business', voice: 'fr-FR-JeromeNeural', description: 'Dynamique et professionnelle' },
+  { id: 'histoire', label: '📚 Histoire', voice: 'fr-FR-CelesteNeural', description: 'Claire et éducative' },
+  { id: 'default', label: '🎙️ Voix par défaut', voice: 'fr-FR-DeniseNeural', description: 'Polyvalente' },
+] as const;
+
+const AZURE_VOICES_LIST = [
+  { id: 'fr-FR-EloiseNeural', name: 'Eloise (Enfantine)', lang: 'fr-FR' },
+  { id: 'fr-FR-BrigitteNeural', name: 'Brigitte (Narrative)', lang: 'fr-FR' },
+  { id: 'fr-FR-HenriNeural', name: 'Henri (Masculin grave)', lang: 'fr-FR' },
+  { id: 'fr-FR-DeniseNeural', name: 'Denise (Féminine chaleureuse)', lang: 'fr-FR' },
+  { id: 'fr-FR-AlainNeural', name: 'Alain (Masculin calme)', lang: 'fr-FR' },
+  { id: 'fr-FR-JeromeNeural', name: 'Jérôme (Dynamique)', lang: 'fr-FR' },
+  { id: 'fr-FR-CelesteNeural', name: 'Céleste (Éducative)', lang: 'fr-FR' },
+];
+
 export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
   ebookTitle,
   authorName,
