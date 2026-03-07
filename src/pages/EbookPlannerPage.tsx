@@ -2967,7 +2967,20 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
         return null;
       
       default:
-        return null;
+        return (
+          <div className="flex flex-col items-center justify-center py-20 space-y-4">
+            <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center">
+              <BookOpen className="w-8 h-8 text-muted-foreground" />
+            </div>
+            <h2 className="text-xl font-semibold text-foreground">Onglet non disponible</h2>
+            <p className="text-muted-foreground text-center max-w-md">
+              Cet onglet n'est pas encore disponible. Revenez au tableau de bord pour continuer.
+            </p>
+            <Button variant="outline" onClick={() => setActiveTab('onboarding')}>
+              Retour à l'accueil
+            </Button>
+          </div>
+        );
     }
   };
 
