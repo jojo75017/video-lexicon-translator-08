@@ -317,92 +317,104 @@ const SalesPage = () => {
       </header>
 
       {/* ═══════════════════════════════════════ HERO ═══════════════════════════════════════ */}
-      <section className="relative overflow-hidden pt-8 sm:pt-14 pb-14 sm:pb-24 px-4">
-        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-violet-500/10 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-purple-500/10 rounded-full blur-[100px] pointer-events-none" />
+      <section className="relative overflow-hidden pt-10 sm:pt-16 pb-16 sm:pb-28 px-4">
+        {/* Premium background effects */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,hsl(var(--primary)/0.15),transparent)]" />
+        <div className="absolute top-20 left-1/4 w-[500px] h-[500px] bg-violet-500/8 rounded-full blur-[150px] pointer-events-none" />
+        <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-purple-500/8 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/3 rounded-full blur-[200px] pointer-events-none" />
 
         <motion.div initial="hidden" animate="visible" variants={stagger} className="max-w-4xl mx-auto text-center relative z-10">
 
-          <motion.div variants={fadeUp} custom={0.5} className="mb-5">
-            <Badge className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 px-4 py-2 text-sm font-bold">
+          <motion.div variants={fadeUp} custom={0.5} className="mb-6">
+            <Badge className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 px-5 py-2.5 text-sm font-bold shadow-lg shadow-amber-500/5">
               <Sparkles className="w-4 h-4 mr-2" />
               OFFRE DE LANCEMENT — 97€ au lieu de 247€
             </Badge>
           </motion.div>
 
-          <motion.h1 variants={fadeUp} custom={1} className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.1] tracking-tight mb-4">
+          <motion.h1 variants={fadeUp} custom={1} className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.08] tracking-tight mb-5">
             Créez des ebooks{" "}
             <span className="bg-gradient-to-r from-violet-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
               haut de gamme
-            </span>{" "}
-            avec l'IA la plus puissante
+            </span>
+            <br className="hidden sm:block" />
+            <span className="text-foreground/80"> avec l'IA la plus puissante</span>
           </motion.h1>
 
-          <motion.p variants={fadeUp} custom={1.5} className="text-lg sm:text-xl md:text-2xl text-muted-foreground mb-3">
-            Gemini 3 Flash • Imagen 3 • Azure Neural Voices
+          <motion.p variants={fadeUp} custom={1.5} className="text-lg sm:text-xl md:text-2xl text-muted-foreground mb-3 font-light tracking-wide">
+            Gemini 3 Flash &bull; Imagen 3 &bull; Azure Neural Voices
           </motion.p>
-          <motion.p variants={fadeUp} custom={1.6} className="text-base sm:text-lg text-muted-foreground mb-8 font-medium">
+          <motion.p variants={fadeUp} custom={1.6} className="text-base sm:text-lg text-muted-foreground mb-8 font-medium max-w-2xl mx-auto">
             Le workflow IA en 15 rôles qui a déjà généré <span className="text-foreground font-bold">+35 ebooks publiés</span> sur Amazon KDP.
           </motion.p>
 
-          {/* Tech stack badges */}
+          {/* Tech stack badges - premium style */}
           <motion.div variants={fadeUp} custom={1.8} className="flex flex-wrap justify-center gap-3 mb-8">
             {techStack.map((tech, i) => (
-              <div key={i} className="flex items-center gap-2 bg-card border border-border rounded-full px-4 py-2 text-sm">
-                <div className={`w-6 h-6 rounded-full bg-gradient-to-br ${tech.color} flex items-center justify-center`}>
+              <div key={i} className="flex items-center gap-2.5 bg-card/80 backdrop-blur-sm border border-border/50 rounded-full px-5 py-2.5 text-sm shadow-sm hover:shadow-md hover:border-primary/30 transition-all duration-300">
+                <div className={`w-7 h-7 rounded-full bg-gradient-to-br ${tech.color} flex items-center justify-center shadow-sm`}>
                   <tech.icon className="w-3.5 h-3.5 text-white" />
                 </div>
-                <span className="font-medium">{tech.name}</span>
+                <span className="font-semibold">{tech.name}</span>
               </div>
             ))}
           </motion.div>
 
-          <motion.div variants={fadeUp} custom={2} className="flex flex-col sm:flex-row gap-3 sm:gap-6 justify-center text-left mb-8 max-w-xl mx-auto">
+          {/* 3 pillars - premium cards */}
+          <motion.div variants={fadeUp} custom={2} className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 max-w-2xl mx-auto">
             {[
-              "Trouvez une niche rentable",
-              "Générez votre ebook complet",
-              "Publiez sur Amazon KDP",
-            ].map((text, i) => (
-              <div key={i} className="flex items-center gap-2 text-base sm:text-lg text-foreground font-medium">
-                <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" />
-                <span>{text}</span>
+              { text: "Trouvez une niche rentable", emoji: "🎯" },
+              { text: "Générez votre ebook complet", emoji: "✍️" },
+              { text: "Publiez sur Amazon KDP", emoji: "🚀" },
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-2.5 bg-emerald-500/5 border border-emerald-500/15 rounded-xl px-4 py-3 text-sm font-medium">
+                <span className="text-lg">{item.emoji}</span>
+                <span>{item.text}</span>
               </div>
             ))}
           </motion.div>
 
-          <motion.div variants={fadeUp} custom={2.05} className="flex flex-wrap items-center justify-center gap-4 mb-4">
-            <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-              <div className="flex -space-x-2">
+          {/* Social proof bar - more credible */}
+          <motion.div variants={fadeUp} custom={2.05} className="flex flex-wrap items-center justify-center gap-6 mb-8 py-4 px-6 bg-card/50 backdrop-blur-sm rounded-2xl border border-border/30 max-w-lg mx-auto">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="flex -space-x-2.5">
                 {['MD','TL','SR','JP'].map((a, i) => (
-                  <div key={i} className="w-7 h-7 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-[10px] text-white font-bold border-2 border-background">{a}</div>
+                  <div key={i} className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-[10px] text-white font-bold border-2 border-background shadow-sm">{a}</div>
                 ))}
               </div>
-              <span className="ml-1">Utilisé par des auteurs indépendants</span>
+              <span className="ml-1.5 font-medium">Auteurs indépendants</span>
             </div>
-            <div className="flex items-center gap-1">
-              {[1,2,3,4,5].map(s => <Star key={s} className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />)}
-              <span className="text-xs text-muted-foreground ml-1">4.8/5</span>
+            <div className="h-6 w-px bg-border" />
+            <div className="flex items-center gap-1.5">
+              {[1,2,3,4,5].map(s => <Star key={s} className="w-4 h-4 fill-yellow-400 text-yellow-400" />)}
+              <span className="text-sm text-muted-foreground font-semibold ml-1">4.8/5</span>
             </div>
           </motion.div>
 
-          <motion.div variants={fadeUp} custom={2.2} className="flex flex-col items-center gap-3 mb-8">
-            <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg px-8 sm:px-10 py-7 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-2xl shadow-violet-500/30 hover:shadow-violet-500/50 transition-all duration-300 hover:-translate-y-0.5 hover:scale-[1.02]"
+          {/* CTA Button - bigger, bolder */}
+          <motion.div variants={fadeUp} custom={2.2} className="flex flex-col items-center gap-4 mb-10">
+            <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg px-10 sm:px-14 py-8 bg-gradient-to-r from-violet-600 via-purple-600 to-violet-700 hover:from-violet-500 hover:via-purple-500 hover:to-violet-600 text-white shadow-2xl shadow-violet-500/30 hover:shadow-violet-500/50 transition-all duration-500 hover:-translate-y-1 hover:scale-[1.02] rounded-2xl font-extrabold"
               onClick={() => { trackCTAClick('hero_cta_top', '#pricing'); scrollToPricing(); }}>
               <Rocket className="w-5 h-5 mr-2" />
               🔥 Offre de lancement — 97€ au lieu de 247€
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
-            <p className="text-sm text-muted-foreground">
-              ✅ +35 ebooks publiés • Coût moyen par ebook : 0,30€ • Temps moyen : 45 minutes
-            </p>
+            <div className="flex flex-wrap justify-center gap-4 text-sm text-muted-foreground">
+              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-emerald-500" />+35 ebooks publiés</span>
+              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-emerald-500" />~0,30€/ebook</span>
+              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-emerald-500" />45 min en moyenne</span>
+            </div>
           </motion.div>
 
-          {/* Vidéo démo */}
-          <motion.div variants={fadeUp} custom={2.5} className="mb-6 max-w-3xl mx-auto">
-            <h2 className="text-lg sm:text-xl font-bold text-foreground mb-3">
-              🎬 Démo réelle — création d'un ebook complet
+          {/* Vidéo démo - cinematic frame */}
+          <motion.div variants={fadeUp} custom={2.5} className="mb-8 max-w-3xl mx-auto">
+            <h2 className="text-lg sm:text-xl font-bold text-foreground mb-4 flex items-center justify-center gap-2">
+              <Play className="w-5 h-5 text-primary" />
+              Démo réelle — création d'un ebook complet
             </h2>
-            <div className="relative rounded-xl overflow-hidden shadow-2xl shadow-violet-500/20 border border-border bg-card aspect-video">
+            <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-violet-500/15 border border-border/50 bg-card aspect-video group">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
               <iframe
                 src="https://www.youtube.com/embed/JD0x6hDhBg0?rel=0"
                 title="Démo réelle — création d'un ebook complet"
@@ -414,22 +426,23 @@ const SalesPage = () => {
             </div>
           </motion.div>
 
-          <motion.div variants={fadeUp} custom={3} className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg px-8 py-6 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-xl shadow-violet-500/25 transition-all duration-300 hover:-translate-y-0.5"
+          <motion.div variants={fadeUp} custom={3} className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg px-8 py-7 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-xl shadow-violet-500/25 transition-all duration-300 hover:-translate-y-0.5 rounded-xl font-bold"
               onClick={() => { trackCTAClick('hero_cta_primary', '/paiement'); handlePlanClick(); }}>
               <Rocket className="w-5 h-5 mr-2" />
               👉 Créer mon premier ebook maintenant
             </Button>
-            <Button size="lg" variant="outline" className="w-full sm:w-auto text-sm sm:text-base px-6 py-5 border-2 border-border hover:border-primary/50 hover:bg-primary/5 transition-all duration-300"
+            <Button size="lg" variant="outline" className="w-full sm:w-auto text-sm sm:text-base px-6 py-6 border-2 border-border hover:border-primary/50 hover:bg-primary/5 transition-all duration-300 rounded-xl"
               onClick={() => { trackDemoClick("demo_hero"); navigate('/demo'); }}>
               <Play className="w-5 h-5 mr-2" />
               Voir la démonstration complète
             </Button>
           </motion.div>
 
-          <motion.p variants={fadeUp} custom={3.5} className="mt-4">
-            <a href="https://www.amazon.fr/Mr-Georges-Boubet/e/B0CGVLHNX7" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
+          <motion.p variants={fadeUp} custom={3.5} className="mt-5">
+            <a href="https://www.amazon.fr/Mr-Georges-Boubet/e/B0CGVLHNX7" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1.5">
               📚 Ebooks publiés en conditions réelles — voir ma page auteur Amazon
+              <ArrowRight className="w-3.5 h-3.5" />
             </a>
           </motion.p>
         </motion.div>
