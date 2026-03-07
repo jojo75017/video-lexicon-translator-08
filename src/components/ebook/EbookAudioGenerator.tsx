@@ -757,10 +757,10 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
               <CardTitle className="flex items-center gap-2">
                 <Headphones className="h-5 w-5 text-primary" />
                 Générateur de Livre Audio
-                <Badge variant="secondary" className="ml-2 bg-emerald-500/20 text-emerald-700">Gratuit</Badge>
+                <Badge variant="secondary" className="ml-2 bg-emerald-500/20 text-emerald-700">Azure Neural</Badge>
               </CardTitle>
               <CardDescription>
-                Écoutez votre ebook, exportez en MP3 pour votre bibliothèque audio
+                Écoutez votre ebook, exportez en MP3 Pro avec voix Azure par niche
               </CardDescription>
             </div>
             <div className="flex gap-2">
