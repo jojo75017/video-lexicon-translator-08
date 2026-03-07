@@ -55,6 +55,28 @@ interface WebSpeechVoice {
   description: string;
 }
 
+// Azure Neural Voices par niche
+const AZURE_VOICE_PRESETS = [
+  { id: 'enfants-3-6', label: '👶 Enfants (3-6 ans)', voice: 'fr-FR-EloiseNeural', description: 'Douce et joyeuse' },
+  { id: 'enfants-6-12', label: '🧒 Enfants (6-12 ans)', voice: 'fr-FR-BrigitteNeural', description: 'Narrative et entraînante' },
+  { id: 'thriller', label: '🔪 Thriller / Policier', voice: 'fr-FR-HenriNeural', description: 'Suspense, débit ralenti' },
+  { id: 'romance', label: '💕 Romance / Romans', voice: 'fr-FR-DeniseNeural', description: 'Chaleureuse et expressive' },
+  { id: 'spiritualite', label: '🧘 Spiritualité', voice: 'fr-FR-AlainNeural', description: 'Calme et apaisante' },
+  { id: 'business', label: '💼 Marketing / Business', voice: 'fr-FR-JeromeNeural', description: 'Dynamique et professionnelle' },
+  { id: 'histoire', label: '📚 Histoire', voice: 'fr-FR-CelesteNeural', description: 'Claire et éducative' },
+  { id: 'default', label: '🎙️ Voix par défaut', voice: 'fr-FR-DeniseNeural', description: 'Polyvalente' },
+] as const;
+
+const AZURE_VOICES_LIST = [
+  { id: 'fr-FR-EloiseNeural', name: 'Eloise (Enfantine)', lang: 'fr-FR' },
+  { id: 'fr-FR-BrigitteNeural', name: 'Brigitte (Narrative)', lang: 'fr-FR' },
+  { id: 'fr-FR-HenriNeural', name: 'Henri (Masculin grave)', lang: 'fr-FR' },
+  { id: 'fr-FR-DeniseNeural', name: 'Denise (Féminine chaleureuse)', lang: 'fr-FR' },
+  { id: 'fr-FR-AlainNeural', name: 'Alain (Masculin calme)', lang: 'fr-FR' },
+  { id: 'fr-FR-JeromeNeural', name: 'Jérôme (Dynamique)', lang: 'fr-FR' },
+  { id: 'fr-FR-CelesteNeural', name: 'Céleste (Éducative)', lang: 'fr-FR' },
+];
+
 export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
   ebookTitle,
   authorName,
@@ -96,6 +118,11 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
   const [isGeneratingMp3, setIsGeneratingMp3] = useState(false);
   const [mp3Progress, setMp3Progress] = useState(0);
   const [mp3ProgressLabel, setMp3ProgressLabel] = useState('');
+
+  // Azure Speech niche & voice
+  const [selectedNiche, setSelectedNiche] = useState('default');
+  const [selectedAzureVoice, setSelectedAzureVoice] = useState('');
+  const [useAzureForExport, setUseAzureForExport] = useState(true);
   // Timer
   useEffect(() => {
     if (isSpeaking && isPlaying) {
@@ -457,7 +484,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
     toast.success('Formation exportée en PDF !');
   };
 
-  // Generate MP3 for a single section via ElevenLabs
+  // Generate MP3 for a single section via Azure Speech (with ElevenLabs fallback)
   const generateSectionMp3 = async (text: string): Promise<Blob | null> => {
     const { data: sessionData } = await supabase.auth.getSession();
     const token = sessionData?.session?.access_token;
@@ -475,19 +502,43 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
     }
 
     const audioBlobs: Blob[] = [];
+    
     for (const chunk of chunks) {
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ text: chunk }),
-        }
-      );
+      let response: Response;
+      
+      if (useAzureForExport) {
+        // Use Azure Speech TTS
+        response = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/azure-speech-tts`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ 
+              text: chunk,
+              niche: selectedNiche,
+              voiceName: selectedAzureVoice || undefined,
+            }),
+          }
+        );
+      } else {
+        // Fallback to ElevenLabs
+        response = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ text: chunk }),
+          }
+        );
+      }
 
       if (!response.ok) {
         const err = await response.json().catch(() => ({ error: 'Erreur inconnue' }));
@@ -500,6 +551,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
       audioBlobs.push(await audioResponse.blob());
     }
 
+    // Concatenate all blobs into a single MP3 file
     return new Blob(audioBlobs, { type: 'audio/mpeg' });
   };
 
@@ -571,9 +623,56 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
   const VoiceConfig = ({ compact = false }: { compact?: boolean }) => (
     <Card className="bg-muted/30">
       <CardContent className="pt-4 space-y-4">
+        {/* Azure Voice by Niche */}
+        <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+          <Label className="text-sm font-semibold flex items-center gap-2 mb-2">
+            <Mic2 className="h-4 w-4 text-emerald-500" />
+            Voix Azure Neural (Export MP3)
+          </Label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <Label className="text-xs">Thématique / Niche</Label>
+              <Select value={selectedNiche} onValueChange={(val) => {
+                setSelectedNiche(val);
+                const preset = AZURE_VOICE_PRESETS.find(p => p.id === val);
+                if (preset) setSelectedAzureVoice(preset.voice);
+              }}>
+                <SelectTrigger className="mt-1">
+                  <SelectValue placeholder="Choisir une thématique" />
+                </SelectTrigger>
+                <SelectContent>
+                  {AZURE_VOICE_PRESETS.map(preset => (
+                    <SelectItem key={preset.id} value={preset.id}>
+                      <span>{preset.label}</span>
+                      <span className="text-xs text-muted-foreground ml-1">— {preset.description}</span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-xs">Voix manuelle (optionnel)</Label>
+              <Select value={selectedAzureVoice} onValueChange={setSelectedAzureVoice}>
+                <SelectTrigger className="mt-1">
+                  <SelectValue placeholder="Auto (selon niche)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Auto (selon niche)</SelectItem>
+                  {AZURE_VOICES_LIST.map(v => (
+                    <SelectItem key={v.id} value={v.id}>
+                      {v.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </div>
+
+        {/* Web Speech controls for preview */}
         <div className={`grid grid-cols-1 ${compact ? 'md:grid-cols-2' : 'md:grid-cols-4'} gap-4`}>
           <div>
-            <Label>Voix</Label>
+            <Label className="text-xs">Voix navigateur (aperçu)</Label>
             <Select value={selectedVoice} onValueChange={setSelectedVoice}>
               <SelectTrigger className="mt-1">
                 <SelectValue placeholder="Sélectionner une voix" />
@@ -658,10 +757,10 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
               <CardTitle className="flex items-center gap-2">
                 <Headphones className="h-5 w-5 text-primary" />
                 Générateur de Livre Audio
-                <Badge variant="secondary" className="ml-2 bg-emerald-500/20 text-emerald-700">Gratuit</Badge>
+                <Badge variant="secondary" className="ml-2 bg-emerald-500/20 text-emerald-700">Azure Neural</Badge>
               </CardTitle>
               <CardDescription>
-                Écoutez votre ebook, exportez en MP3 pour votre bibliothèque audio
+                Écoutez votre ebook, exportez en MP3 Pro avec voix Azure par niche
               </CardDescription>
             </div>
             <div className="flex gap-2">
@@ -1031,31 +1130,82 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                 </CardContent>
               </Card>
 
-              {/* Export MP3 */}
-              <Card className="border-2 border-primary/40 bg-gradient-to-br from-primary/5 to-primary/10">
+              {/* Export MP3 — Azure Speech */}
+              <Card className="border-2 border-emerald-500/40 bg-gradient-to-br from-emerald-500/5 to-teal-500/10">
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2">
-                    <FileAudio className="h-5 w-5 text-primary" />
-                    Exporter en MP3 (Audiobook)
-                    <Badge variant="secondary" className="ml-2">ElevenLabs</Badge>
+                    <FileAudio className="h-5 w-5 text-emerald-500" />
+                    Exporter en MP3 Pro (Audiobook)
+                    <Badge variant="secondary" className="ml-2 bg-emerald-500/20 text-emerald-700">Azure Neural</Badge>
                   </CardTitle>
                   <CardDescription>
-                    Générez des fichiers MP3 haute qualité pour votre bibliothèque audio (type Audible)
+                    Voix neuronales premium Azure • 192kbps / 48kHz • Conforme KDP/Audible
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                  {/* Niche voice selector in export context */}
+                  <div className="p-3 bg-muted/30 rounded-lg space-y-2">
+                    <Label className="text-sm font-medium flex items-center gap-2">
+                      <Mic2 className="h-4 w-4" />
+                      Voix sélectionnée : {AZURE_VOICE_PRESETS.find(p => p.id === selectedNiche)?.label || 'Par défaut'}
+                    </Label>
+                    <p className="text-xs text-muted-foreground">
+                      {selectedAzureVoice || AZURE_VOICE_PRESETS.find(p => p.id === selectedNiche)?.voice || 'fr-FR-DeniseNeural'}
+                      {' '} — Changez la voix dans le panneau de configuration ci-dessus
+                    </p>
+                  </div>
+
                   <div className="flex flex-col sm:flex-row gap-3">
+                    {/* Export all as single concatenated MP3 */}
                     <Button
-                      onClick={exportAllMp3}
+                      onClick={async () => {
+                        const sections = prepareSections();
+                        if (sections.length === 0) { toast.error('Aucun contenu'); return; }
+                        setIsGeneratingMp3(true);
+                        setMp3Progress(0);
+                        try {
+                          const allBlobs: Blob[] = [];
+                          for (let i = 0; i < sections.length; i++) {
+                            setMp3ProgressLabel(`${i + 1}/${sections.length} — ${sections[i].title}`);
+                            setMp3Progress(Math.round((i / sections.length) * 90));
+                            const blob = await generateSectionMp3(sections[i].content);
+                            if (blob) allBlobs.push(blob);
+                          }
+                          setMp3ProgressLabel('Fusion audio...');
+                          setMp3Progress(95);
+                          const finalBlob = new Blob(allBlobs, { type: 'audio/mpeg' });
+                          const filename = `${(ebookTitle || 'audiobook').replace(/\s+/g, '-')}-complet.mp3`;
+                          saveAs(finalBlob, filename);
+                          toast.success('Audiobook complet exporté en un seul fichier MP3 !');
+                        } catch (error: any) {
+                          toast.error(`Erreur : ${error.message}`);
+                        } finally {
+                          setIsGeneratingMp3(false);
+                          setMp3Progress(0);
+                          setMp3ProgressLabel('');
+                        }
+                      }}
                       disabled={isGeneratingMp3 || totalWords === 0}
-                      className="flex-1 h-12 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+                      className="flex-1 h-12 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white"
                       size="lg"
                     >
                       {isGeneratingMp3 ? (
-                        <><Loader2 className="h-5 w-5 mr-2 animate-spin" />Génération MP3...</>
+                        <><Loader2 className="h-5 w-5 mr-2 animate-spin" />Fusion en cours...</>
                       ) : (
-                        <><Download className="h-5 w-5 mr-2" />Exporter tout en MP3 (ZIP)</>
+                        <><FileAudio className="h-5 w-5 mr-2" />Audiobook complet (1 fichier MP3)</>
                       )}
+                    </Button>
+
+                    {/* Export all as ZIP */}
+                    <Button
+                      onClick={exportAllMp3}
+                      disabled={isGeneratingMp3 || totalWords === 0}
+                      variant="outline"
+                      className="flex-1 h-12 border-emerald-500/30 text-emerald-700 hover:bg-emerald-500/10"
+                      size="lg"
+                    >
+                      <Download className="h-5 w-5 mr-2" />
+                      Chapitres séparés (ZIP)
                     </Button>
                   </div>
 
@@ -1096,12 +1246,13 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                   )}
 
                   <div className="p-3 bg-muted/30 border border-border rounded-lg text-sm text-muted-foreground">
-                    <p className="font-medium mb-1">🎧 Idéal pour votre bibliothèque</p>
+                    <p className="font-medium mb-1">🎧 Export Pro Azure Speech</p>
                     <ul className="space-y-1 text-xs">
-                      <li>• Voix professionnelle IA haute qualité (ElevenLabs)</li>
-                      <li>• Fichiers MP3 prêts pour Audible, votre site, ou toute plateforme</li>
-                      <li>• Export ZIP avec tous les chapitres numérotés</li>
-                      <li>• Compatible avec tous les lecteurs audio</li>
+                      <li>• Voix neuronales Azure premium (7 voix par niche)</li>
+                      <li>• Format MP3 192kbps / 48kHz — conforme KDP & Audible</li>
+                      <li>• Fusion automatique en un seul fichier audiobook</li>
+                      <li>• Export chapitres séparés en archive ZIP</li>
+                      <li>• Compatible avec tous les lecteurs et plateformes</li>
                     </ul>
                   </div>
                 </CardContent>
@@ -1113,8 +1264,9 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                   <ul className="text-sm text-muted-foreground space-y-1">
                     <li>• Le <strong>PDF</strong> est idéal pour l'impression et l'archivage</li>
                     <li>• Le <strong>Word</strong> permet de modifier le texte facilement</li>
-                    <li>• Le <strong>MP3</strong> crée un vrai audiobook pour votre bibliothèque</li>
-                    <li>• Relisez le script avant de créer votre version audio finale</li>
+                    <li>• Le <strong>MP3 complet</strong> crée un vrai audiobook en un fichier</li>
+                    <li>• Le <strong>ZIP</strong> sépare les chapitres pour les distribuer individuellement</li>
+                    <li>• Choisissez la voix par niche pour un rendu adapté à votre public</li>
                   </ul>
                 </CardContent>
               </Card>
