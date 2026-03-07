@@ -407,22 +407,34 @@ const SalesPage = () => {
             </div>
           </motion.div>
 
-          {/* Vidéo démo - cinematic frame */}
+          {/* Vidéo présentation - cinematic frame */}
           <motion.div variants={fadeUp} custom={2.5} className="mb-8 max-w-3xl mx-auto">
             <h2 className="text-lg sm:text-xl font-bold text-foreground mb-4 flex items-center justify-center gap-2">
               <Play className="w-5 h-5 text-primary" />
-              Démo réelle — création d'un ebook complet
+              EbookStudio Pro 2026 — La Révolution Gemini 3 Flash & Azure Neural
             </h2>
             <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-violet-500/15 border border-border/50 bg-card aspect-video group">
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
-              <iframe
-                src="https://www.youtube.com/embed/JD0x6hDhBg0?rel=0"
-                title="Démo réelle — création d'un ebook complet"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                className="absolute inset-0 w-full h-full"
-                loading="lazy"
+              <video
+                src="/videos/ebook-studio-2026-gemini.mp4"
+                controls
+                playsInline
+                preload="metadata"
+                className="absolute inset-0 w-full h-full object-cover"
+                poster=""
               />
+            </div>
+            <div className="mt-4 text-center">
+              <a
+                href="https://www.trafic-affiliation.com/formationebookstudio2026"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/30 text-emerald-400 hover:text-emerald-300 hover:border-emerald-400/50 transition-all duration-300 font-semibold text-sm"
+              >
+                <GraduationCap className="w-4 h-4" />
+                🎓 Voir la formation complète gratuite — Gemini 3 Flash & Azure Neural
+                <ArrowRight className="w-4 h-4" />
+              </a>
             </div>
           </motion.div>
 
