@@ -22,10 +22,10 @@ const PLANS = {
       installment3: `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=33&currency_code=EUR&item_name=EbookStudio%20Pro%20(1/3)`,
       installment5: `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=20&currency_code=EUR&item_name=EbookStudio%20Pro%20(1/5)`,
     },
-    description: "Gemini 2.5 Pro • Imagen 3 • Azure Neural Voices • Tout illimité à vie",
+    description: "Gemini 3 Flash • Imagen 3 • Azure Neural Voices • Tout illimité à vie",
     features: [
       "Workflow éditorial 15 rôles IA",
-      "Gemini 2.5 Pro — contexte 1M tokens",
+      "Gemini 3 Flash — IA la plus rapide",
       "Imagen 3 — couvertures photoréalistes",
       "Azure Neural Voices — audiobooks",
       "Export PDF/EPUB/Word",
@@ -97,7 +97,7 @@ const UpsellPaiementPage = () => {
             {/* Tech stack */}
             <div className="flex flex-wrap justify-center gap-3 -mt-2">
               {[
-                { icon: Cpu, label: "Gemini 2.5 Pro", color: "bg-blue-500" },
+                { icon: Cpu, label: "Gemini 3 Flash", color: "bg-blue-500" },
                 { icon: Image, label: "Imagen 3", color: "bg-violet-500" },
                 { icon: Headphones, label: "Azure Speech", color: "bg-emerald-500" },
               ].map((tech, i) => (

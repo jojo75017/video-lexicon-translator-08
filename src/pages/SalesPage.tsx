@@ -140,7 +140,7 @@ const testimonials = [
 ];
 
 const techStack = [
-  { icon: Cpu, name: "Gemini 2.5 Pro", desc: "Rédaction IA de pointe, contexte 1M tokens", color: "from-blue-500 to-cyan-500" },
+  { icon: Cpu, name: "Gemini 3 Flash", desc: "IA la plus rapide de Google, rédaction instantanée", color: "from-blue-500 to-cyan-500" },
   { icon: Image, name: "Imagen 3", desc: "Couvertures photoréalistes professionnelles", color: "from-violet-500 to-purple-500" },
   { icon: Headphones, name: "Azure Neural Voices", desc: "Audiobooks avec voix neuronales premium", color: "from-emerald-500 to-teal-500" },
   { icon: Globe, name: "Multi-langues", desc: "Traduction et rédaction dans 30+ langues", color: "from-amber-500 to-orange-500" },
@@ -178,7 +178,7 @@ const SalesPage = () => {
   useEffect(() => {
     document.title = "EbookStudio Pro — Workflow IA Premium pour Amazon KDP | 97€ à vie";
     const meta = document.querySelector('meta[name="description"]');
-    if (meta) meta.setAttribute("content", "Créez des ebooks haut de gamme avec Gemini 2.5 Pro, Imagen 3 et Azure Neural Voices. Workflow éditorial 15 rôles IA. Accès à vie 97€. Garantie 30 jours.");
+    if (meta) meta.setAttribute("content", "Créez des ebooks haut de gamme avec Gemini 3 Flash, Imagen 3 et Azure Neural Voices. Workflow éditorial 15 rôles IA. Accès à vie 97€. Garantie 30 jours.");
   }, []);
 
   // JSON-LD structured data
@@ -196,7 +196,7 @@ const SalesPage = () => {
       "operatingSystem": "Web",
       "offers": { "@type": "Offer", "price": LAUNCH_PRICE, "priceCurrency": "EUR", "availability": "https://schema.org/InStock" },
       "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.8", "reviewCount": "47" },
-      "description": "Workflow éditorial IA premium avec Gemini 2.5 Pro pour créer et publier des ebooks sur Amazon KDP."
+      "description": "Workflow éditorial IA premium avec Gemini 3 Flash pour créer et publier des ebooks sur Amazon KDP."
     });
     document.head.appendChild(script);
     return () => { const ld = document.querySelector('script[data-ld="sales"]'); if (ld) ld.remove(); };
@@ -270,7 +270,7 @@ const SalesPage = () => {
           </motion.h1>
 
           <motion.p variants={fadeUp} custom={1.5} className="text-lg sm:text-xl md:text-2xl text-muted-foreground mb-3">
-            Gemini 2.5 Pro • Imagen 3 • Azure Neural Voices
+            Gemini 3 Flash • Imagen 3 • Azure Neural Voices
           </motion.p>
           <motion.p variants={fadeUp} custom={1.6} className="text-base sm:text-lg text-muted-foreground mb-8 font-medium">
             Le workflow IA en 15 rôles qui a déjà généré <span className="text-foreground font-bold">+35 ebooks publiés</span> sur Amazon KDP.
@@ -532,7 +532,7 @@ const SalesPage = () => {
                       { text: "Premier ebook publié en moins d'1 heure", icon: "⚡" },
                       { text: "Revenus passifs dès le premier mois", icon: "💰" },
                       { text: "15 rôles IA qui écrivent pour vous", icon: "🤖" },
-                      { text: "Gemini 2.5 Pro — contexte 1M tokens", icon: "🧠" },
+                      { text: "Gemini 3 Flash — IA la plus rapide", icon: "🧠" },
                       { text: "Export PDF/Word/EPUB professionnel", icon: "✅" },
                       { text: "Investissement unique : 97€ à vie", icon: "🏆" },
                     ].map((item, i) => (
@@ -623,7 +623,7 @@ const SalesPage = () => {
                 <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 mb-8">
                   {[
                     "Workflow éditorial complet 15 rôles",
-                    "Gemini 2.5 Pro — contexte 1M tokens",
+                    "Gemini 3 Flash — IA la plus rapide",
                     "Imagen 3 — couvertures photoréalistes",
                     "Azure Neural Voices — audiobooks",
                     "P15 Humanisation Anti-IA offert",
@@ -862,28 +862,44 @@ const SalesPage = () => {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
             <motion.div variants={fadeUp}>
               <Badge className="mb-4 bg-blue-500/10 text-blue-500 border-blue-500/20 px-4 py-2">
-                <Play className="w-4 h-4 mr-2" />
-                Tutoriel Vidéo — 2 min
+                <Cpu className="w-4 h-4 mr-2" />
+                Configuration — 2 min
               </Badge>
             </motion.div>
-            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-4xl font-extrabold mb-4">🔑 Comment configurer vos clés API</motion.h2>
+            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-4xl font-extrabold mb-4">🔑 Obtenez votre clé Gemini 3 Flash gratuitement</motion.h2>
             <motion.p variants={fadeUp} custom={2} className="text-muted-foreground mb-8 text-lg max-w-2xl mx-auto">
-              Configurez votre clé Gemini en 2 minutes. Un ebook complet coûte entre 0,20€ et 0,50€ en coût API.
+              Google offre un accès gratuit à Gemini 3 Flash. Un ebook complet coûte entre 0,20€ et 0,50€ en coût API.
             </motion.p>
-            <motion.div variants={fadeUp} custom={3} className="rounded-xl overflow-hidden border border-border shadow-lg">
-              <video controls className="w-full aspect-video" poster="" preload="metadata">
-                <source src="/videos/tuto-cle-api.mp4" type="video/mp4" />
-                Votre navigateur ne supporte pas la vidéo.
-              </video>
+            <motion.div variants={fadeUp} custom={3} className="grid md:grid-cols-3 gap-4 max-w-3xl mx-auto text-left mb-8">
+              {[
+                { step: "1", title: "Créez un compte Google AI Studio", desc: "Rendez-vous sur aistudio.google.com et connectez-vous avec votre compte Google", icon: "🌐" },
+                { step: "2", title: "Générez votre clé API", desc: "Cliquez sur 'Get API Key' → 'Create API Key' → Copiez votre clé", icon: "🔑" },
+                { step: "3", title: "Collez dans EbookStudio", desc: "Allez dans Paramètres → Clés API → Collez votre clé Gemini", icon: "✅" },
+              ].map((item, i) => (
+                <Card key={i} className="border hover:border-primary/30 transition-all">
+                  <CardContent className="pt-6 pb-6">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-lg shadow-md">
+                        {item.step}
+                      </div>
+                      <span className="text-2xl">{item.icon}</span>
+                    </div>
+                    <h3 className="font-bold text-sm mb-1">{item.title}</h3>
+                    <p className="text-xs text-muted-foreground">{item.desc}</p>
+                  </CardContent>
+                </Card>
+              ))}
             </motion.div>
-            <motion.div variants={fadeUp} custom={4} className="mt-6 flex flex-wrap justify-center gap-4">
-              <div className="flex items-center gap-2 bg-card border border-border rounded-full px-4 py-2 text-sm">
-                <Cpu className="w-4 h-4 text-blue-500" />
-                <span>Clé Gemini API</span>
-              </div>
+            <motion.div variants={fadeUp} custom={4} className="flex flex-wrap justify-center gap-4">
+              <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">
+                <Button variant="outline" className="gap-2 border-blue-500/30 text-blue-600 hover:bg-blue-500/10">
+                  <Cpu className="w-4 h-4" />
+                  Obtenir ma clé Gemini gratuite →
+                </Button>
+              </a>
               <div className="flex items-center gap-2 bg-card border border-border rounded-full px-4 py-2 text-sm">
                 <Mic className="w-4 h-4 text-emerald-500" />
-                <span>Clé Azure Speech (audiobooks)</span>
+                <span>Clé Azure Speech (audiobooks, optionnelle)</span>
               </div>
             </motion.div>
           </motion.div>
