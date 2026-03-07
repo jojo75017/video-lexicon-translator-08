@@ -5,6 +5,45 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+async function callGemini(systemPrompt: string, userPrompt: string, opts: { maxTokens?: number; temperature?: number; timeout?: number } = {}) {
+  const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
+  if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY non configurée. Ajoutez votre clé Gemini dans Paramètres.");
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), opts.timeout || 60000);
+
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        system_instruction: { parts: [{ text: systemPrompt }] },
+        contents: [{ role: "user", parts: [{ text: userPrompt }] }],
+        generationConfig: {
+          temperature: opts.temperature ?? 0.7,
+          maxOutputTokens: opts.maxTokens ?? 2000,
+        },
+      }),
+      signal: controller.signal,
+    }
+  );
+
+  clearTimeout(timeoutId);
+
+  if (!response.ok) {
+    const errText = await response.text();
+    console.error("Gemini error:", response.status, errText);
+    if (response.status === 429) throw { status: 429, message: "Limite de requêtes Gemini atteinte." };
+    throw new Error(`Erreur Gemini: ${response.status}`);
+  }
+
+  const data = await response.json();
+  const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!content) throw new Error("Aucune réponse de Gemini");
+  return content;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -18,11 +57,6 @@ serve(async (req) => {
         JSON.stringify({ error: "Le sujet est requis" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
-    }
-
-    const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
-    if (!OPENAI_API_KEY) {
-      throw new Error("OPENAI_API_KEY non configurée");
     }
 
     const systemPrompt = `Tu es un architecte éditorial expert spécialisé dans la conception de structures d'ebooks professionnels.
@@ -73,37 +107,9 @@ Optimise pour:
 
 Justifie brièvement chaque partie.`;
 
-    console.log("Architecture pour:", sujet, "avec", nombreChapitres, "chapitres");
+    console.log("Architecture pour:", sujet, "avec", nombreChapitres, "chapitres (Gemini 3 Flash)");
 
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${OPENAI_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "gpt-4o-mini",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-        temperature: 0.7,
-        max_tokens: 3000,
-      }),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Erreur OpenAI:", response.status, errorText);
-      throw new Error(`Erreur OpenAI: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const content = data.choices?.[0]?.message?.content;
-
-    if (!content) {
-      throw new Error("Pas de contenu dans la réponse");
-    }
+    const content = await callGemini(systemPrompt, userPrompt, { maxTokens: 3000 });
 
     console.log("Réponse brute:", content.substring(0, 200));
 
@@ -113,7 +119,6 @@ Justifie brièvement chaque partie.`;
       architecture = JSON.parse(cleanContent);
     } catch (parseError) {
       console.error("Erreur parsing JSON:", parseError);
-      // Fallback structure
       architecture = {
         introduction: {
           elements: ["Accroche captivante", "Promesse de valeur", "Feuille de route"],
@@ -141,9 +146,10 @@ Justifie brièvement chaque partie.`;
 
   } catch (error) {
     console.error("Erreur content-architect:", error);
+    const errorMessage = error.name === 'AbortError' ? 'Timeout - architecture trop longue' : (error.message || "Erreur interne");
     return new Response(
-      JSON.stringify({ error: error.message || "Erreur interne" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({ error: errorMessage }),
+      { status: error.status || 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });
