@@ -411,7 +411,7 @@ const SubscriptionPage = ({ subscriberEmail, subscriberData, onLogout }: Subscri
                     </p>
                     <Button onClick={() => navigate('/offres')} className="w-full">
                       <ArrowRight className="w-4 h-4 mr-2" />
-                      Accéder à l’offre 37€
+                      Accéder à l'offre 97€
                     </Button>
                   </>
                 )}
