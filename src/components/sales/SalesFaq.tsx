@@ -65,7 +65,7 @@ const SalesFaq: React.FC = () => {
         <div className="text-center mb-12">
           <Badge className="mb-4 bg-primary/10 text-primary border-primary/20 px-4 py-2">
             <HelpCircle className="w-4 h-4 mr-2" />
-            FAQ — 10 réponses essentielles
+            FAQ — 11 réponses essentielles
           </Badge>
           <h2 className="text-3xl md:text-4xl font-extrabold mb-4">
             Toutes vos questions,
