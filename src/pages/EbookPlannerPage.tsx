@@ -854,20 +854,24 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   // Fonction de changement d'onglet avec sauvegarde (utilise la ref pour avoir les dernières données)
   const handleTabChange = async (newTab: string) => {
     // Sauvegarder avant de changer d'onglet si on a un titre
-    const data = currentDataRef.current;
-    if (data.ebookTitle) {
-      console.log('💾 Sauvegarde avant changement onglet - chapters:', data.chapters.map(c => ({ id: c.id, title: c.title, hasContent: !!c.content, contentPreview: c.content?.slice(-50) })));
-      const projectData = {
-        title: data.ebookTitle, author_name: data.authorName, target_audience: data.targetAudience,
-        tome_number: data.tomeNumber, writing_style: data.writingStyle, chapter_length: data.chapterLength,
-        detail_level: data.detailLevel, tone: data.tone, narrative_format: data.narrativeFormat,
-        preface: data.preface, conclusion: data.conclusion, chapters: data.chapters, 
-        characters: data.characters, ebook_images: data.ebookImages,
-        number_of_chapters: data.numberOfChapters, book_summary: data.bookSummary,
-        cover_concepts: data.coverConcepts, seo_optimization: data.seoOptimization,
-        kdp_description: data.kdpDescription, kdp_keywords: data.kdpKeywords, kdp_categories: data.kdpCategories,
-      };
-      await saveProject(projectData);
+    try {
+      const data = currentDataRef.current;
+      if (data.ebookTitle) {
+        console.log('💾 Sauvegarde avant changement onglet - chapters:', data.chapters.map(c => ({ id: c.id, title: c.title, hasContent: !!c.content, contentPreview: c.content?.slice(-50) })));
+        const projectData = {
+          title: data.ebookTitle, author_name: data.authorName, target_audience: data.targetAudience,
+          tome_number: data.tomeNumber, writing_style: data.writingStyle, chapter_length: data.chapterLength,
+          detail_level: data.detailLevel, tone: data.tone, narrative_format: data.narrativeFormat,
+          preface: data.preface, conclusion: data.conclusion, chapters: data.chapters, 
+          characters: data.characters, ebook_images: data.ebookImages,
+          number_of_chapters: data.numberOfChapters, book_summary: data.bookSummary,
+          cover_concepts: data.coverConcepts, seo_optimization: data.seoOptimization,
+          kdp_description: data.kdpDescription, kdp_keywords: data.kdpKeywords, kdp_categories: data.kdpCategories,
+        };
+        await saveProject(projectData);
+      }
+    } catch (err) {
+      console.error('Erreur sauvegarde avant changement onglet:', err);
     }
     setActiveTab(newTab);
   };
