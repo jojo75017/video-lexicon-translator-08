@@ -8,7 +8,7 @@
  * since the bell is WAV and TTS segments are MP3.
  */
 
-const INTRO_TEXT = "Bienvenue dans votre livre audio produit par EbookStudio 2026. Installez-vous confortablement, nous commençons la lecture.";
+const DEFAULT_INTRO_TEXT = "Bienvenue. Vous vous apprêtez à écouter {TITRE}. Une production EbookStudio. Installez-vous confortablement, la lecture commence.";
 
 /**
  * Generate a synthetic bell chime using Web Audio API.
