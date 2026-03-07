@@ -363,34 +363,54 @@ export const SaasSettings: React.FC = () => {
 
         {/* API Keys Tab */}
         <TabsContent value="api" className="space-y-6">
-          {/* Tutoriel Vidéo */}
+          {/* Guide Gemini 3 Flash */}
           <Card className="border-blue-500/20 bg-blue-500/5">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Play className="h-5 w-5 text-blue-500" />
-                🔑 Tutoriel : Configurer votre clé API OpenAI
+                <Key className="h-5 w-5 text-blue-500" />
+                🔑 Obtenez votre clé Gemini 3 Flash gratuitement
               </CardTitle>
               <CardDescription>
-                Regardez ce tutoriel de 2 minutes avant de commencer. Un ebook complet coûte entre 0,30€ et 0,80€.
+                Google offre un accès gratuit. Un ebook complet coûte ~0,30€.
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="rounded-lg overflow-hidden border border-border">
-                <video 
-                  controls 
-                  className="w-full aspect-video"
-                  preload="metadata"
-                >
-                  <source src="/videos/tuto-cle-api.mp4" type="video/mp4" />
-                  Votre navigateur ne supporte pas la vidéo.
-                </video>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {[
+                  { step: "1", title: "Google AI Studio", desc: "Allez sur aistudio.google.com et connectez-vous avec votre compte Google", icon: "🌐" },
+                  { step: "2", title: "Créez une clé API", desc: "Cliquez sur 'Get API Key' → 'Create API Key' → Copiez la clé", icon: "🔑" },
+                  { step: "3", title: "Collez ci-dessous", desc: "Collez votre clé dans le champ 'Clé API' ci-dessous et validez", icon: "✅" },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-start gap-3 p-3 bg-card border border-border rounded-lg">
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                      {item.step}
+                    </div>
+                    <div>
+                      <p className="font-semibold text-sm">{item.title}</p>
+                      <p className="text-xs text-muted-foreground">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">
+                  <Button variant="outline" size="sm" className="gap-2 border-blue-500/30 text-blue-600 hover:bg-blue-500/10">
+                    <Key className="h-4 w-4" />
+                    Obtenir ma clé Gemini gratuite →
+                  </Button>
+                </a>
+                <a href="https://portal.azure.com/" target="_blank" rel="noopener noreferrer">
+                  <Button variant="outline" size="sm" className="gap-2 border-emerald-500/30 text-emerald-600 hover:bg-emerald-500/10">
+                    Clé Azure Speech (audiobooks) →
+                  </Button>
+                </a>
               </div>
             </CardContent>
           </Card>
 
           <OpenAIConfigPanel 
-            title="🔑 Clé API OpenAI"
-            description="Entrez votre clé API OpenAI pour utiliser toutes les fonctionnalités IA"
+            title="🔑 Clé API Gemini 3 Flash"
+            description="Entrez votre clé API Gemini pour utiliser toutes les fonctionnalités IA"
             showModelSelection={true}
           />
         </TabsContent>
