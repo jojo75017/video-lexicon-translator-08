@@ -1215,15 +1215,26 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                             jingleAudioRef.current = null;
                             return;
                           }
-                          const jingleBlob = new Blob(introBlobs, { type: 'audio/mpeg' });
-                          const url = URL.createObjectURL(jingleBlob);
-                          audio.src = url;
-                          audio.onended = () => {
-                            URL.revokeObjectURL(url);
-                            setIsPreviewingJingle(false);
-                            jingleAudioRef.current = null;
+                          // Play each blob sequentially (all MP3 format)
+                          const playBlobSequence = async (blobs: Blob[], index: number) => {
+                            if (index >= blobs.length || !jingleAudioRef.current) {
+                              setIsPreviewingJingle(false);
+                              jingleAudioRef.current = null;
+                              return;
+                            }
+                            const url = URL.createObjectURL(blobs[index]);
+                            audio.src = url;
+                            audio.onended = () => {
+                              URL.revokeObjectURL(url);
+                              playBlobSequence(blobs, index + 1);
+                            };
+                            audio.onerror = () => {
+                              URL.revokeObjectURL(url);
+                              playBlobSequence(blobs, index + 1);
+                            };
+                            await audio.play();
                           };
-                          await audio.play();
+                          await playBlobSequence(introBlobs, 0);
                         } catch (error: any) {
                           toast.error(`Erreur jingle : ${error.message}`);
                           setIsPreviewingJingle(false);
