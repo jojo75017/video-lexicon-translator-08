@@ -121,8 +121,9 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
   const [mp3ProgressLabel, setMp3ProgressLabel] = useState('');
 
   // Azure Speech niche & voice
+  const AUTO_AZURE_VOICE = '__auto_azure_voice__';
   const [selectedNiche, setSelectedNiche] = useState('default');
-  const [selectedAzureVoice, setSelectedAzureVoice] = useState('');
+  const [selectedAzureVoice, setSelectedAzureVoice] = useState(AUTO_AZURE_VOICE);
   const [useAzureForExport, setUseAzureForExport] = useState(true);
   // Timer
   useEffect(() => {
@@ -543,7 +544,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
             body: JSON.stringify({ 
               text: chunk,
               niche: selectedNiche,
-              voiceName: selectedAzureVoice || undefined,
+              voiceName: selectedAzureVoice === AUTO_AZURE_VOICE ? undefined : selectedAzureVoice,
             }),
           }
         );
@@ -689,7 +690,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                   <SelectValue placeholder="Auto (selon niche)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Auto (selon niche)</SelectItem>
+                  <SelectItem value={AUTO_AZURE_VOICE}>Auto (selon niche)</SelectItem>
                   {AZURE_VOICES_LIST.map(v => (
                     <SelectItem key={v.id} value={v.id}>
                       {v.name}
