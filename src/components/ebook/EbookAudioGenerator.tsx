@@ -142,8 +142,15 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
 
   // Load available voices
   useEffect(() => {
+    const synth = typeof window !== 'undefined' ? window.speechSynthesis : undefined;
+
+    if (!synth) {
+      setAvailableVoices([]);
+      return;
+    }
+
     const loadVoices = () => {
-      const voices = window.speechSynthesis.getVoices();
+      const voices = synth.getVoices?.() || [];
       const frenchVoices = voices
         .filter(v => v.lang.startsWith('fr'))
         .map(v => ({
@@ -170,9 +177,14 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
         }
       }
     };
+
     loadVoices();
-    window.speechSynthesis.onvoiceschanged = loadVoices;
-    return () => { window.speechSynthesis.onvoiceschanged = null; };
+    synth.onvoiceschanged = loadVoices;
+    return () => {
+      if (synth.onvoiceschanged === loadVoices) {
+        synth.onvoiceschanged = null;
+      }
+    };
   }, [selectedVoice]);
 
   const getSafeSubChapters = useCallback((chapter: Chapter | any) => {
