@@ -2900,6 +2900,19 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           />
         );
       
+      case 'humanize-anti-ia':
+        return (
+          <WorkflowStepWrapper currentTabId={activeTab} onNavigate={handleTabChange} isGenerating={isGenerating}>
+            <WorkflowResultViewer
+              stepId="P15"
+              stepName="Humanisation Anti-IA"
+              result={getStepResult('P15')}
+            >
+              <EbookHumanizer />
+            </WorkflowResultViewer>
+          </WorkflowStepWrapper>
+        );
+      
       case 'humanizer':
         return <EbookHumanizer />;
       
