@@ -273,15 +273,8 @@ serve(async (req) => {
       activeApiKey = userApiKey;
       console.log(`Using USER API key for step ${step}`);
     } else {
-      activeApiKey = Deno.env.get('OPENAI_API_KEY') || null;
-      console.log(`Using SERVER API key for step ${step}`);
-    }
-
-    if (!activeApiKey) {
-      return new Response(
-        JSON.stringify({ error: 'Aucune clé API OpenAI disponible. Veuillez configurer votre clé API dans les paramètres.' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      activeApiKey = null; // Lovable Gateway sera utilisé en priorité
+      console.log(`Using Lovable Gateway for step ${step}`);
     }
 
     if (!title) {
