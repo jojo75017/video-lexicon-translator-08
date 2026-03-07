@@ -43,7 +43,11 @@ const SalesFaq: React.FC = () => {
     },
     {
       question: "Le prix de 97€ va-t-il augmenter ?",
-      answer: "Oui. Le prix passera à 197€ après la période de lancement. Les premiers utilisateurs bénéficient du tarif fondateur à 97€ à vie, avec toutes les mises à jour futures incluses gratuitement."
+      answer: "Oui. Le prix normal est de 247€. Parce que j'accompagne les créateurs et que je veux rendre cet outil accessible, je vous offre une réduction de 50€ — soit 197€ au lieu de 247€ après le lancement. Mais en ce moment, le tarif fondateur est encore à 97€ à vie avec toutes les futures mises à jour incluses. Profitez-en avant l'augmentation !"
+    },
+    {
+      question: "Puis-je gagner de l'argent en recommandant EbookStudio ?",
+      answer: "Oui ! Notre programme de parrainage vous permet de gagner 30€ par vente pour chaque personne que vous recommandez. Vous recevez un lien unique dans votre espace membre, et vos commissions sont suivies en temps réel dans votre tableau de bord. C'est un excellent moyen de rentabiliser votre investissement dès les premières recommandations."
     },
     {
       question: "Comment fonctionne le paiement en plusieurs fois ?",
@@ -61,7 +65,7 @@ const SalesFaq: React.FC = () => {
         <div className="text-center mb-12">
           <Badge className="mb-4 bg-primary/10 text-primary border-primary/20 px-4 py-2">
             <HelpCircle className="w-4 h-4 mr-2" />
-            FAQ — 10 réponses essentielles
+            FAQ — 11 réponses essentielles
           </Badge>
           <h2 className="text-3xl md:text-4xl font-extrabold mb-4">
             Toutes vos questions,
