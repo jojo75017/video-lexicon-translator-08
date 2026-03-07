@@ -21,7 +21,7 @@ import { Document, Packer, Paragraph, TextRun, HeadingLevel } from 'docx';
 import { saveAs } from 'file-saver';
 import JSZip from 'jszip';
 import { supabase } from '@/integrations/supabase/client';
-import { generateIntroJingle } from '@/utils/audioIntroGenerator';
+import { generateIntroJingle, generateIntroForExport } from '@/utils/audioIntroGenerator';
 
 interface Chapter {
   id: string;
@@ -620,7 +620,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
       // Generate intro jingle as track 00
       setMp3ProgressLabel('🔔 Génération du jingle d\'intro...');
       setMp3Progress(2);
-      const introBlobs = await generateIntroJingle(generateSectionMp3);
+      const introBlobs = await generateIntroForExport(generateSectionMp3);
       if (introBlobs.length > 0) {
         const introBlob = new Blob(introBlobs, { type: 'audio/mpeg' });
         zip.file('00-Intro-Jingle.mp3', introBlob);
@@ -1275,7 +1275,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                           // Generate intro jingle (bell + TTS + silence)
                           setMp3ProgressLabel('🔔 Génération du jingle d\'intro...');
                           setMp3Progress(2);
-                          const introBlobs = await generateIntroJingle(generateSectionMp3);
+                          const introBlobs = await generateIntroForExport(generateSectionMp3);
                           allBlobs.push(...introBlobs);
                           
                           for (let i = 0; i < sections.length; i++) {
