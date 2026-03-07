@@ -21,6 +21,7 @@ import { Document, Packer, Paragraph, TextRun, HeadingLevel } from 'docx';
 import { saveAs } from 'file-saver';
 import JSZip from 'jszip';
 import { supabase } from '@/integrations/supabase/client';
+import { generateIntroJingle } from '@/utils/audioIntroGenerator';
 
 interface Chapter {
   id: string;
