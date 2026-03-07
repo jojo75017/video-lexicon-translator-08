@@ -497,18 +497,18 @@ const SalesPage = () => {
       </section>
 
       {/* ═══════════════════════════════════════ MESSAGE MOTIVATION ═══════════════════════════ */}
-      <section className="py-8 px-4">
+      <section className="py-10 px-4">
         <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="max-w-3xl mx-auto relative overflow-hidden rounded-2xl bg-gradient-to-r from-violet-600 via-purple-600 to-violet-700 p-8 shadow-2xl shadow-violet-500/20 border border-white/10 text-center">
-          <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-[60px]" />
-          <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-pink-500/15 rounded-full blur-[50px]" />
+          className="max-w-3xl mx-auto relative overflow-hidden rounded-3xl bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700 p-10 shadow-2xl shadow-violet-500/20 border border-white/10 text-center">
+          <div className="absolute -top-10 -right-10 w-48 h-48 bg-white/10 rounded-full blur-[70px]" />
+          <div className="absolute -bottom-10 -left-10 w-36 h-36 bg-pink-500/15 rounded-full blur-[60px]" />
           <div className="relative z-10">
-            <p className="text-3xl mb-3">🚀</p>
-            <h3 className="text-xl md:text-2xl font-extrabold text-white mb-3">1, 2, 3… Foncez !</h3>
+            <p className="text-4xl mb-4">🚀</p>
+            <h3 className="text-2xl md:text-3xl font-extrabold text-white mb-4">1, 2, 3… Foncez !</h3>
             <p className="text-white/85 text-base md:text-lg leading-relaxed max-w-xl mx-auto">
               Et sachez que je suis <strong className="text-white">toujours là pour vous accompagner</strong> — avec un Zoom gratuit, à tout moment.
             </p>
-            <p className="text-white/50 text-sm mt-4 italic">— Georges, créateur d'EbookStudio</p>
+            <p className="text-white/40 text-sm mt-5 italic">— Georges, créateur d'EbookStudio</p>
           </div>
         </motion.div>
       </section>
