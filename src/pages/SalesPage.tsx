@@ -1055,59 +1055,64 @@ const SalesPage = () => {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-12 border-t border-border/50 bg-slate-900 text-white">
+      {/* Footer - Premium */}
+      <footer className="py-16 border-t border-border/30 bg-gradient-to-b from-slate-900 to-slate-950 text-white">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="grid md:grid-cols-5 gap-8 mb-8">
+          <div className="grid md:grid-cols-5 gap-10 mb-10">
             <div className="md:col-span-1">
-              <h3 className="text-xl font-bold mb-3 bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">EbookStudio Pro</h3>
-              <p className="text-gray-400 text-sm">Le workflow éditorial IA #1 en France pour Amazon KDP.</p>
+              <div className="flex items-center gap-2.5 mb-4">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
+                  <BookOpen className="w-4.5 h-4.5 text-white" />
+                </div>
+                <h3 className="text-lg font-bold bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">EbookStudio Pro</h3>
+              </div>
+              <p className="text-gray-400 text-sm leading-relaxed">Le workflow éditorial IA #1 en France pour Amazon KDP.</p>
             </div>
             <div>
-              <h4 className="font-semibold mb-3 text-gray-200">📚 Guides</h4>
-              <ul className="space-y-2 text-sm">
+              <h4 className="font-semibold mb-4 text-gray-200 text-sm uppercase tracking-wider">📚 Guides</h4>
+              <ul className="space-y-2.5 text-sm">
                 <li><button onClick={() => navigate("/ecrire-livre-chatgpt")} className="text-gray-400 hover:text-violet-400 transition-colors">Écrire un livre avec ChatGPT</button></li>
                 <li><button onClick={() => navigate("/creer-ebook-ia")} className="text-gray-400 hover:text-violet-400 transition-colors">Créer un ebook avec l'IA</button></li>
                 <li><button onClick={() => navigate("/generateur-ebook")} className="text-gray-400 hover:text-violet-400 transition-colors">Générateur ebook IA</button></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-3 text-gray-200">🚀 Produit</h4>
-              <ul className="space-y-2 text-sm">
+              <h4 className="font-semibold mb-4 text-gray-200 text-sm uppercase tracking-wider">🚀 Produit</h4>
+              <ul className="space-y-2.5 text-sm">
                 <li><button onClick={() => navigate("/demo")} className="text-gray-400 hover:text-violet-400 transition-colors">Essai gratuit</button></li>
                 <li><button onClick={() => navigate("/valeur-offre")} className="text-gray-400 hover:text-violet-400 transition-colors">Valeur de l'offre</button></li>
                 <li><button onClick={() => navigate("/formation")} className="text-gray-400 hover:text-violet-400 transition-colors">Formation</button></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-3 text-gray-200">💡 Ressources</h4>
-              <ul className="space-y-2 text-sm">
+              <h4 className="font-semibold mb-4 text-gray-200 text-sm uppercase tracking-wider">💡 Ressources</h4>
+              <ul className="space-y-2.5 text-sm">
                 <li><button onClick={() => navigate("/faq")} className="text-gray-400 hover:text-violet-400 transition-colors">FAQ</button></li>
                 <li><button onClick={() => navigate("/blog")} className="text-gray-400 hover:text-violet-400 transition-colors">Blog</button></li>
                 <li><button onClick={() => navigate("/affiliation")} className="text-gray-400 hover:text-violet-400 transition-colors">Affiliation</button></li>
               </ul>
-              <h4 className="font-semibold mb-2 mt-4 text-gray-200">⚖️ Légal</h4>
-              <ul className="space-y-2 text-sm">
+              <h4 className="font-semibold mb-3 mt-6 text-gray-200 text-sm uppercase tracking-wider">⚖️ Légal</h4>
+              <ul className="space-y-2.5 text-sm">
                 <li><button onClick={() => navigate("/mentions-legales")} className="text-gray-400 hover:text-violet-400 transition-colors">Mentions légales</button></li>
                 <li><button onClick={() => navigate("/cgv")} className="text-gray-400 hover:text-violet-400 transition-colors">CGV</button></li>
                 <li><button onClick={() => navigate("/politique-confidentialite")} className="text-gray-400 hover:text-violet-400 transition-colors">Confidentialité</button></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-3 text-gray-200">📧 Newsletter</h4>
-              <p className="text-gray-400 text-sm mb-3">Conseils KDP gratuits</p>
+              <h4 className="font-semibold mb-4 text-gray-200 text-sm uppercase tracking-wider">📧 Newsletter</h4>
+              <p className="text-gray-400 text-sm mb-4">Conseils KDP et IA gratuits chaque semaine</p>
               <NewsletterForm />
             </div>
           </div>
-          <div className="border-t border-gray-800 pt-6 text-center">
-            <p className="text-xs text-gray-500">© 2026 EbookStudio Pro • Workflow Éditorial IA Premium pour Amazon KDP • Tous droits réservés</p>
+          <div className="border-t border-gray-800/50 pt-8 text-center">
+            <p className="text-xs text-gray-500">© 2026 EbookStudio Pro &bull; Workflow Éditorial IA Premium pour Amazon KDP &bull; Tous droits réservés</p>
           </div>
         </div>
       </footer>
 
-      {/* Sticky Mobile CTA */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-background/95 backdrop-blur-xl border-t border-border p-3">
-        <Button className="w-full py-5 text-base font-bold bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-lg rounded-xl"
+      {/* Sticky Mobile CTA - premium */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-background/95 backdrop-blur-2xl border-t border-border/30 p-3 safe-area-inset-bottom">
+        <Button className="w-full py-5 text-base font-extrabold bg-gradient-to-r from-violet-600 via-purple-600 to-violet-700 hover:from-violet-500 hover:to-violet-600 text-white shadow-xl shadow-violet-500/20 rounded-xl"
           onClick={handlePlanClick}>
           <Rocket className="w-4 h-4 mr-2" />
           Accès Pro — {LAUNCH_PRICE}€ à vie
