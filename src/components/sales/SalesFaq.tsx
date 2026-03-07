@@ -1,44 +1,74 @@
 import React from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { HelpCircle, MessageCircle } from 'lucide-react';
+import { HelpCircle, MessageCircle, Rocket, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
+import { Badge } from '@/components/ui/badge';
+import { Link, useNavigate } from 'react-router-dom';
 
 const SalesFaq: React.FC = () => {
+  const navigate = useNavigate();
+
   const faqs = [
     {
-      question: "Comment fonctionne le paiement unique ?",
-      answer: "Vous payez 37€ une seule fois et vous obtenez un accès à vie. Pas d'abonnement, pas de frais cachés. Vous recevez immédiatement votre code d'accès par email après le paiement."
+      question: "Comment fonctionne le paiement unique à 97€ ?",
+      answer: "Vous payez 97€ une seule fois via PayPal et vous obtenez un accès à vie à l'ensemble de la plateforme. Pas d'abonnement mensuel, pas de frais cachés. Vous recevez immédiatement votre code d'accès par email après le paiement. Des facilités sont disponibles : 3×35€ ou 5×22€."
     },
     {
-      question: "Ai-je besoin de compétences techniques ?",
-      answer: "Non ! EbookStudio Pro est conçu pour les débutants. L'interface est intuitive et l'IA fait 90% du travail. Vous guidez simplement le sujet et le style, le reste est automatisé."
+      question: "Ai-je besoin de compétences techniques ou de savoir écrire ?",
+      answer: "Absolument pas ! EbookStudio est conçu pour les débutants complets. L'IA Gemini 3 Flash rédige l'intégralité de votre ebook. Vous choisissez simplement le sujet, le ton et le style — l'IA s'occupe de tout le reste, de la structure aux chapitres en passant par la couverture."
+    },
+    {
+      question: "Qu'est-ce que Gemini 3 Flash et combien ça coûte ?",
+      answer: "Gemini 3 Flash est l'IA de Google, plus rapide et moins chère qu'OpenAI. Vous créez un compte gratuit sur Google AI Studio, générez votre clé API en 2 minutes, et ne payez que ce que vous consommez directement à Google. Coût moyen : 0,20€ à 0,50€ par ebook complet. Un guide vidéo étape par étape est inclus après l'achat."
     },
     {
       question: "Puis-je vendre les ebooks générés sur Amazon KDP ?",
-      answer: "Oui, absolument ! Vous gardez 100% des droits sur tout ce que vous créez. Nos outils KDP intégrés vous aident même à optimiser vos descriptions et mots-clés pour maximiser vos ventes."
+      answer: "Oui, vous gardez 100% des droits sur tout ce que vous créez. Nos outils KDP intégrés (optimisation de description, mots-clés, catégories, suivi BSR) vous aident à maximiser vos ventes et votre visibilité sur Amazon."
+    },
+    {
+      question: "Combien de temps faut-il pour créer un ebook complet ?",
+      answer: "Avec le workflow en 7 étapes guidées par l'IA, vous pouvez avoir un ebook complet (plan, chapitres, couverture, formatage KDP) en moins d'une heure. La rédaction d'un chapitre prend environ 30 secondes à l'IA."
     },
     {
       question: "Que se passe-t-il si je ne suis pas satisfait ?",
-      answer: "Nous offrons une garantie satisfait ou remboursé de 30 jours. Si l'outil ne vous convient pas, envoyez-nous un simple email et nous vous remboursons intégralement, sans question."
+      answer: "Nous offrons une garantie satisfait ou remboursé de 30 jours, sans condition. Si l'outil ne vous convient pas, envoyez-nous un simple email et nous vous remboursons intégralement. Vous ne prenez aucun risque."
     },
     {
-      question: "Les formations sont-elles vraiment incluses ?",
-      answer: "Oui ! Toutes les formations (texte + audio) sont directement intégrées dans l'outil. Vous ne serez jamais perdu : des guides étape par étape vous accompagnent dans chaque module."
+      question: "Les formations et le support sont-ils inclus ?",
+      answer: "Oui ! Tout est inclus dans votre accès : formations vidéo intégrées à chaque module, guides pas-à-pas, tutoriels de configuration API, et accès au forum communautaire. Vous ne serez jamais seul."
+    },
+    {
+      question: "Puis-je créer des audiobooks et des BD ?",
+      answer: "Oui ! EbookStudio inclut un module audiobook (via Azure Speech, optionnel et gratuit jusqu'à 5 audiobooks/mois) et un module BD/Comics avec génération de scénarios et mise en page automatique. Tout est inclus sans surcoût."
+    },
+    {
+      question: "Le prix de 97€ va-t-il augmenter ?",
+      answer: "Oui. Le prix passera à 197€ après la période de lancement. Les premiers utilisateurs bénéficient du tarif fondateur à 97€ à vie, avec toutes les mises à jour futures incluses gratuitement."
+    },
+    {
+      question: "Comment fonctionne le paiement en plusieurs fois ?",
+      answer: "Vous pouvez choisir de payer en 3 fois (3×35€) ou en 5 fois (5×22€) via PayPal. Vous obtenez un accès immédiat dès le premier paiement. Les prélèvements suivants sont automatiques, sans aucune action de votre part."
     }
   ];
 
   return (
-    <section className="py-16 px-4 bg-muted/30">
-      <div className="max-w-3xl mx-auto">
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-4">
-            <HelpCircle className="w-4 h-4" />
-            Questions fréquentes
-          </div>
-          <h2 className="text-3xl font-bold mb-4">Vous hésitez encore ?</h2>
-          <p className="text-muted-foreground">
-            Voici les réponses aux questions les plus posées
+    <section className="relative py-20 px-4 overflow-hidden">
+      {/* Background premium */}
+      <div className="absolute inset-0 bg-gradient-to-b from-background via-muted/40 to-background" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_0%,hsl(var(--primary)/0.05),transparent)]" />
+
+      <div className="max-w-3xl mx-auto relative z-10">
+        <div className="text-center mb-12">
+          <Badge className="mb-4 bg-primary/10 text-primary border-primary/20 px-4 py-2">
+            <HelpCircle className="w-4 h-4 mr-2" />
+            FAQ — 10 réponses essentielles
+          </Badge>
+          <h2 className="text-3xl md:text-4xl font-extrabold mb-4">
+            Toutes vos questions,
+            <span className="text-muted-foreground"> nos réponses.</span>
+          </h2>
+          <p className="text-muted-foreground text-lg max-w-xl mx-auto">
+            Nous avons rassemblé les questions les plus posées par nos utilisateurs avant de se lancer.
           </p>
         </div>
 
@@ -47,33 +77,48 @@ const SalesFaq: React.FC = () => {
             <AccordionItem 
               key={index} 
               value={`faq-${index}`}
-              className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 px-6 shadow-sm"
+              className="bg-card/80 backdrop-blur-sm rounded-xl border border-border/60 px-6 shadow-sm hover:border-primary/20 transition-colors duration-300 data-[state=open]:border-primary/30 data-[state=open]:shadow-md data-[state=open]:shadow-primary/5"
             >
-              <AccordionTrigger className="text-left font-medium hover:no-underline py-5">
+              <AccordionTrigger className="text-left font-semibold hover:no-underline py-5 text-sm md:text-base">
                 <span className="flex items-start gap-3">
-                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-sm font-bold shrink-0">
-                    {index + 1}
+                  <span className="flex items-center justify-center w-7 h-7 rounded-lg bg-primary/10 text-primary text-xs font-bold shrink-0 mt-0.5">
+                    {String(index + 1).padStart(2, '0')}
                   </span>
                   <span>{faq.question}</span>
                 </span>
               </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground pb-5 pl-9">
+              <AccordionContent className="text-muted-foreground pb-5 pl-10 text-sm leading-relaxed">
                 {faq.answer}
               </AccordionContent>
             </AccordionItem>
           ))}
         </Accordion>
 
-        <div className="mt-8 text-center">
-          <p className="text-muted-foreground text-sm mb-4">
-            Vous avez d'autres questions ?
-          </p>
-          <Link to="/faq">
-            <Button variant="outline" size="lg">
-              <MessageCircle className="w-4 h-4 mr-2" />
-              Voir toutes les FAQ
-            </Button>
-          </Link>
+        {/* CTA sous la FAQ */}
+        <div className="mt-12 text-center">
+          <div className="bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 border border-primary/20 rounded-2xl p-8">
+            <p className="font-bold text-lg mb-2">Encore des doutes ?</p>
+            <p className="text-muted-foreground text-sm mb-6">
+              Réservez un appel Zoom gratuit pour voir l'outil en direct, ou lancez-vous directement.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <Button 
+                size="lg" 
+                className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white font-bold px-8 py-5 rounded-xl shadow-lg shadow-violet-500/20"
+                onClick={() => navigate('/upsell-paiement?plan=pro')}
+              >
+                <Rocket className="w-5 h-5 mr-2" />
+                Accès Pro — 97€ à vie
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+              <a href="https://calendly.com/boubetgeorges/nouvelle-reunion" target="_blank" rel="noopener noreferrer">
+                <Button variant="outline" size="lg" className="gap-2">
+                  <MessageCircle className="w-4 h-4" />
+                  Réserver un Zoom gratuit
+                </Button>
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </section>
