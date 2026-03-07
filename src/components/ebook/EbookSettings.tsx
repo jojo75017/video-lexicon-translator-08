@@ -50,7 +50,6 @@ export const EbookSettings: React.FC<EbookSettingsProps> = ({
   narrativeFormat,
   onUpdateNarrativeFormat
 }) => {
-  // Utiliser le hook centralisé pour la gestion de la clé API
   const {
     apiKey: configApiKey,
     model,
@@ -85,68 +84,61 @@ export const EbookSettings: React.FC<EbookSettingsProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Section Configuration OpenAI - EN PREMIER */}
-      <Card className="border-2 border-orange-200 bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20">
+      {/* Section Configuration Gemini */}
+      <Card className="border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-orange-700 dark:text-orange-300">
+          <CardTitle className="flex items-center gap-2 text-blue-700 dark:text-blue-300">
             <Key className="h-5 w-5" />
-            🔑 Configuration Clé API OpenAI
+            🔑 Configuration Clé API Gemini 3 Flash
           </CardTitle>
-          <CardDescription className="text-orange-600 dark:text-orange-400">
-            Votre clé personnelle est <strong>obligatoire</strong> pour utiliser le générateur. Les coûts (~0.50€ - 2€ par livre) sont facturés sur votre compte OpenAI.
+          <CardDescription className="text-blue-600 dark:text-blue-400">
+            Votre clé personnelle est <strong>obligatoire</strong> pour utiliser le générateur. Les coûts (~0,20€ - 0,50€ par livre) sont facturés sur votre compte Google.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Info sur les offres OpenAI */}
-          <div className="bg-gradient-to-r from-blue-50 to-violet-50 dark:from-blue-950/30 dark:to-violet-950/30 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
+          {/* Info sur Gemini */}
+          <div className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/30 dark:to-cyan-950/30 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
             <div className="flex items-start gap-3">
               <span className="text-2xl">💡</span>
               <div className="space-y-3">
                 <p className="text-sm font-semibold text-blue-800 dark:text-blue-200">
-                  Offre gratuite ou payante ? À vous de choisir !
+                  Gemini 3 Flash — Plus rapide et moins cher qu'OpenAI !
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
                   <div className="bg-white/60 dark:bg-white/5 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
-                    <p className="font-semibold text-gray-700 dark:text-gray-300 mb-1">🆓 Offre Gratuite (Tier 1)</p>
-                    <p className="text-gray-600 dark:text-gray-400">Crédits limités, modèles standards, parfait pour tester</p>
+                    <p className="font-semibold text-gray-700 dark:text-gray-300 mb-1">🆓 Offre Gratuite</p>
+                    <p className="text-gray-600 dark:text-gray-400">Clé API gratuite sur Google AI Studio, crédits généreux pour démarrer</p>
                   </div>
-                  <div className="bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20 rounded-lg p-3 border border-amber-300 dark:border-amber-700">
-                    <p className="font-semibold text-amber-700 dark:text-amber-300 mb-1">⭐ Offre Payante (Tier 2+)</p>
-                    <p className="text-amber-600 dark:text-amber-400">Meilleurs modèles, réponses plus riches, résultats supérieurs</p>
+                  <div className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-lg p-3 border border-blue-300 dark:border-blue-700">
+                    <p className="font-semibold text-blue-700 dark:text-blue-300 mb-1">⭐ Usage intensif</p>
+                    <p className="text-blue-600 dark:text-blue-400">~0,20€ à 0,50€ par ebook complet, facturation directe Google</p>
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-2 text-xs mt-2">
                   <a 
-                    href="https://platform.openai.com/api-keys" 
+                    href="https://aistudio.google.com/apikey" 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 px-3 py-1.5 rounded-full hover:bg-blue-200 dark:hover:bg-blue-800/60 transition-colors"
                   >
-                    🔑 Créer ma clé API
+                    🔑 Créer ma clé API Gemini
                   </a>
                   <a 
-                    href="https://platform.openai.com/settings/organization/billing/overview" 
+                    href="https://aistudio.google.com/" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 px-3 py-1.5 rounded-full hover:bg-amber-200 dark:hover:bg-amber-800/60 transition-colors"
+                    className="inline-flex items-center gap-1 bg-cyan-100 dark:bg-cyan-900/40 text-cyan-700 dark:text-cyan-300 px-3 py-1.5 rounded-full hover:bg-cyan-200 dark:hover:bg-cyan-800/60 transition-colors"
                   >
-                    📊 Voir mon tier actuel
-                  </a>
-                  <a 
-                    href="https://platform.openai.com/settings/organization/billing/overview" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 px-3 py-1.5 rounded-full hover:bg-green-200 dark:hover:bg-green-800/60 transition-colors"
-                  >
-                    💳 Ajouter du crédit
+                    📊 Google AI Studio
                   </a>
                 </div>
               </div>
             </div>
           </div>
+
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="openai-api-key" className="font-medium">Clé API OpenAI</Label>
+              <Label htmlFor="gemini-api-key" className="font-medium">Clé API Gemini</Label>
               <Badge variant={getStatusVariant()} className="flex items-center gap-1">
                 {getStatusIcon()}
                 {getStatusText()}
@@ -154,9 +146,9 @@ export const EbookSettings: React.FC<EbookSettingsProps> = ({
             </div>
             <div className="flex gap-2">
               <Input
-                id="openai-api-key"
+                id="gemini-api-key"
                 type="password"
-                placeholder="sk-proj-..."
+                placeholder="AIza..."
                 value={configApiKey}
                 onChange={(e) => updateApiKey(e.target.value)}
                 className="flex-1 font-mono text-sm"
@@ -179,8 +171,8 @@ export const EbookSettings: React.FC<EbookSettingsProps> = ({
                   <div className="text-xs text-green-700 dark:text-green-300">
                     <p className="font-semibold mb-1">Clé validée ! Tout est automatique maintenant :</p>
                     <ul className="space-y-0.5 text-green-600 dark:text-green-400">
-                      <li>✓ Vos générations utilisent votre clé personnelle</li>
-                      <li>✓ La facturation va directement sur votre compte OpenAI</li>
+                      <li>✓ Vos générations utilisent Gemini 3 Flash</li>
+                      <li>✓ La facturation va directement sur votre compte Google</li>
                       <li>✓ Aucune autre configuration nécessaire</li>
                     </ul>
                   </div>
@@ -190,24 +182,22 @@ export const EbookSettings: React.FC<EbookSettingsProps> = ({
               <p className="text-xs text-muted-foreground">
                 {configApiKey ? 
                   "✓ Votre clé est stockée localement dans votre navigateur (sécurisée)" : 
-                  "⚠️ Obtenez votre clé sur platform.openai.com/api-keys"
+                  "⚠️ Obtenez votre clé gratuite sur aistudio.google.com/apikey"
                 }
               </p>
             )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="openai-model">Modèle OpenAI</Label>
+            <Label htmlFor="gemini-model">Modèle Gemini</Label>
             <Select value={model} onValueChange={updateModel}>
-              <SelectTrigger id="openai-model">
+              <SelectTrigger id="gemini-model">
                 <SelectValue placeholder="Sélectionner un modèle" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="gpt-4.1-2025-04-14">GPT-4.1 (Recommandé)</SelectItem>
-                <SelectItem value="gpt-4o">GPT-4o (Vision)</SelectItem>
-                <SelectItem value="gpt-4.1-mini-2025-04-14">GPT-4.1 Mini (Économique)</SelectItem>
-                <SelectItem value="o3-2025-04-16">O3 (Raisonnement avancé)</SelectItem>
-                <SelectItem value="o4-mini-2025-04-16">O4 Mini (Rapide)</SelectItem>
+                <SelectItem value="gemini-2.5-flash">Gemini 2.5 Flash (Recommandé)</SelectItem>
+                <SelectItem value="gemini-2.5-pro">Gemini 2.5 Pro (Premium)</SelectItem>
+                <SelectItem value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite (Économique)</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -221,12 +211,12 @@ export const EbookSettings: React.FC<EbookSettingsProps> = ({
               <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">
                 Sans clé API valide, le générateur de livre complet ne fonctionnera pas. 
                 <a 
-                  href="https://platform.openai.com/api-keys" 
+                  href="https://aistudio.google.com/apikey" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="ml-1 underline font-medium hover:text-amber-900"
                 >
-                  Créer une clé API →
+                  Créer une clé API Gemini →
                 </a>
               </p>
             </div>
@@ -236,7 +226,7 @@ export const EbookSettings: React.FC<EbookSettingsProps> = ({
             <div className="bg-green-100 dark:bg-green-950/30 border border-green-300 dark:border-green-700 rounded-lg p-3">
               <div className="flex items-center gap-2 text-green-800 dark:text-green-200">
                 <CheckCircle className="h-4 w-4" />
-                <span className="text-sm font-medium">Clé API configurée et validée</span>
+                <span className="text-sm font-medium">Clé API Gemini configurée et validée</span>
               </div>
               <p className="text-xs text-green-700 dark:text-green-300 mt-1">
                 Vous pouvez maintenant utiliser le générateur de livre complet (14 étapes).
@@ -247,104 +237,82 @@ export const EbookSettings: React.FC<EbookSettingsProps> = ({
           {/* Guide pas-à-pas */}
           <div className="border-t pt-4 mt-4">
             <details className="group">
-              <summary className="cursor-pointer flex items-center gap-2 text-sm font-semibold text-orange-700 dark:text-orange-300 hover:text-orange-800 dark:hover:text-orange-200 transition-colors">
+              <summary className="cursor-pointer flex items-center gap-2 text-sm font-semibold text-blue-700 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-200 transition-colors">
                 <span className="text-lg">📖</span>
-                Guide pas-à-pas : Créer et configurer votre clé API OpenAI
-                <span className="ml-auto text-xs text-orange-500 group-open:hidden">▼ Voir le guide</span>
-                <span className="ml-auto text-xs text-orange-500 hidden group-open:inline">▲ Masquer</span>
+                Guide pas-à-pas : Créer et configurer votre clé API Gemini
+                <span className="ml-auto text-xs text-blue-500 group-open:hidden">▼ Voir le guide</span>
+                <span className="ml-auto text-xs text-blue-500 hidden group-open:inline">▲ Masquer</span>
               </summary>
               
               <div className="mt-4 space-y-4 text-sm">
                 {/* Étape 1 */}
-                <div className="bg-white dark:bg-gray-900 rounded-lg p-4 border border-orange-200 dark:border-orange-800">
+                <div className="bg-white dark:bg-gray-900 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
                   <div className="flex items-start gap-3">
-                    <span className="flex-shrink-0 w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center font-bold text-sm">1</span>
+                    <span className="flex-shrink-0 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold text-sm">1</span>
                     <div className="space-y-2">
-                      <h4 className="font-semibold text-gray-800 dark:text-gray-200">Créer un compte OpenAI</h4>
+                      <h4 className="font-semibold text-gray-800 dark:text-gray-200">Accéder à Google AI Studio</h4>
                       <p className="text-gray-600 dark:text-gray-400">
                         Rendez-vous sur{' '}
                         <a 
-                          href="https://platform.openai.com/signup" 
+                          href="https://aistudio.google.com/" 
                           target="_blank" 
                           rel="noopener noreferrer"
                           className="text-blue-600 dark:text-blue-400 underline hover:text-blue-700"
                         >
-                          platform.openai.com/signup
+                          aistudio.google.com
                         </a>
-                        {' '}et créez un compte gratuit avec votre email ou compte Google.
+                        {' '}et connectez-vous avec votre compte Google (Gmail).
                       </p>
                     </div>
                   </div>
                 </div>
 
                 {/* Étape 2 */}
-                <div className="bg-white dark:bg-gray-900 rounded-lg p-4 border border-orange-200 dark:border-orange-800">
+                <div className="bg-white dark:bg-gray-900 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
                   <div className="flex items-start gap-3">
-                    <span className="flex-shrink-0 w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center font-bold text-sm">2</span>
+                    <span className="flex-shrink-0 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold text-sm">2</span>
                     <div className="space-y-2">
-                      <h4 className="font-semibold text-gray-800 dark:text-gray-200">Accéder aux clés API</h4>
+                      <h4 className="font-semibold text-gray-800 dark:text-gray-200">Créer une clé API</h4>
                       <p className="text-gray-600 dark:text-gray-400">
-                        Une fois connecté, allez dans{' '}
+                        Cliquez sur{' '}
                         <a 
-                          href="https://platform.openai.com/api-keys" 
+                          href="https://aistudio.google.com/apikey" 
                           target="_blank" 
                           rel="noopener noreferrer"
                           className="text-blue-600 dark:text-blue-400 underline hover:text-blue-700"
                         >
-                          API Keys
+                          « Get API Key »
                         </a>
-                        {' '}(menu de gauche → API Keys).
+                        {' '}puis sur <strong>« Create API Key »</strong>. C'est 100% gratuit !
                       </p>
                     </div>
                   </div>
                 </div>
 
                 {/* Étape 3 */}
-                <div className="bg-white dark:bg-gray-900 rounded-lg p-4 border border-orange-200 dark:border-orange-800">
+                <div className="bg-white dark:bg-gray-900 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
                   <div className="flex items-start gap-3">
-                    <span className="flex-shrink-0 w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center font-bold text-sm">3</span>
+                    <span className="flex-shrink-0 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold text-sm">3</span>
                     <div className="space-y-2">
-                      <h4 className="font-semibold text-gray-800 dark:text-gray-200">Créer une nouvelle clé</h4>
+                      <h4 className="font-semibold text-gray-800 dark:text-gray-200">Copier la clé</h4>
                       <p className="text-gray-600 dark:text-gray-400">
-                        Cliquez sur <strong>"+ Create new secret key"</strong>, donnez-lui un nom (ex: "EbookStudio"), puis copiez la clé affichée.
+                        Copiez la clé générée (commence par <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">AIza...</code>).
                       </p>
                       <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-700 rounded p-2 text-xs text-amber-700 dark:text-amber-300">
-                        ⚠️ <strong>Important :</strong> La clé ne sera affichée qu'une seule fois ! Copiez-la immédiatement.
+                        ⚠️ <strong>Important :</strong> Vous pouvez retrouver cette clé à tout moment sur aistudio.google.com/apikey
                       </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Étape 4 */}
-                <div className="bg-white dark:bg-gray-900 rounded-lg p-4 border border-orange-200 dark:border-orange-800">
-                  <div className="flex items-start gap-3">
-                    <span className="flex-shrink-0 w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center font-bold text-sm">4</span>
-                    <div className="space-y-2">
-                      <h4 className="font-semibold text-gray-800 dark:text-gray-200">Ajouter du crédit (optionnel mais recommandé)</h4>
-                      <p className="text-gray-600 dark:text-gray-400">
-                        Pour de meilleurs résultats, ajoutez du crédit sur{' '}
-                        <a 
-                          href="https://platform.openai.com/settings/organization/billing/overview" 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-blue-600 dark:text-blue-400 underline hover:text-blue-700"
-                        >
-                          Billing → Add payment details
-                        </a>
-                        . Un crédit de <strong>5€</strong> suffit pour générer environ <strong>10-15 livres complets</strong>.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Étape 5 */}
                 <div className="bg-white dark:bg-gray-900 rounded-lg p-4 border border-green-200 dark:border-green-800">
                   <div className="flex items-start gap-3">
-                    <span className="flex-shrink-0 w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center font-bold text-sm">5</span>
+                    <span className="flex-shrink-0 w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center font-bold text-sm">4</span>
                     <div className="space-y-2">
                       <h4 className="font-semibold text-gray-800 dark:text-gray-200">Coller votre clé ci-dessus</h4>
                       <p className="text-gray-600 dark:text-gray-400">
-                        Collez votre clé (commence par <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">sk-proj-...</code>) dans le champ ci-dessus et cliquez sur <strong>"Valider"</strong>.
+                        Collez votre clé (commence par <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">AIza...</code>) dans le champ ci-dessus et cliquez sur <strong>"Valider"</strong>.
                       </p>
                       <div className="bg-green-50 dark:bg-green-950/30 border border-green-300 dark:border-green-700 rounded p-2 text-xs text-green-700 dark:text-green-300">
                         ✅ <strong>C'est tout !</strong> Votre clé est stockée localement et sécurisée. Vous pouvez maintenant générer vos livres.
@@ -354,22 +322,22 @@ export const EbookSettings: React.FC<EbookSettingsProps> = ({
                 </div>
 
                 {/* FAQ rapide */}
-                <div className="bg-gradient-to-r from-violet-50 to-purple-50 dark:from-violet-950/30 dark:to-purple-950/30 rounded-lg p-4 border border-violet-200 dark:border-violet-700">
-                  <h4 className="font-semibold text-violet-800 dark:text-violet-200 mb-3 flex items-center gap-2">
+                <div className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/30 dark:to-cyan-950/30 rounded-lg p-4 border border-blue-200 dark:border-blue-700">
+                  <h4 className="font-semibold text-blue-800 dark:text-blue-200 mb-3 flex items-center gap-2">
                     <span>❓</span> Questions fréquentes
                   </h4>
                   <div className="space-y-3 text-xs">
                     <div>
-                      <p className="font-medium text-violet-700 dark:text-violet-300">Combien ça coûte par livre ?</p>
-                      <p className="text-violet-600 dark:text-violet-400">Entre 0,30€ et 2€ selon la longueur du livre (10 à 50 chapitres).</p>
+                      <p className="font-medium text-blue-700 dark:text-blue-300">Combien ça coûte par livre ?</p>
+                      <p className="text-blue-600 dark:text-blue-400">Entre 0,20€ et 0,50€ selon la longueur du livre. Beaucoup moins cher qu'OpenAI !</p>
                     </div>
                     <div>
-                      <p className="font-medium text-violet-700 dark:text-violet-300">Ma clé est-elle sécurisée ?</p>
-                      <p className="text-violet-600 dark:text-violet-400">Oui, elle est stockée uniquement dans votre navigateur (localStorage), jamais sur nos serveurs.</p>
+                      <p className="font-medium text-blue-700 dark:text-blue-300">Ma clé est-elle sécurisée ?</p>
+                      <p className="text-blue-600 dark:text-blue-400">Oui, elle est stockée uniquement dans votre navigateur (localStorage), jamais sur nos serveurs.</p>
                     </div>
                     <div>
-                      <p className="font-medium text-violet-700 dark:text-violet-300">Puis-je utiliser le tier gratuit d'OpenAI ?</p>
-                      <p className="text-violet-600 dark:text-violet-400">Oui, mais les limites sont strictes. Pour un usage fluide, 5€ de crédit suffisent pour plusieurs semaines.</p>
+                      <p className="font-medium text-blue-700 dark:text-blue-300">La clé Gemini est-elle gratuite ?</p>
+                      <p className="text-blue-600 dark:text-blue-400">Oui ! Google offre des crédits gratuits généreux. Pour un usage intensif, les coûts restent très faibles.</p>
                     </div>
                   </div>
                 </div>
