@@ -369,56 +369,259 @@ export const SaasSettings: React.FC = () => {
 
         {/* API Keys Tab */}
         <TabsContent value="api" className="space-y-6">
-          {/* Guide Gemini 3 Flash */}
-          <Card className="border-blue-500/20 bg-blue-500/5">
+          {/* Résumé des clés nécessaires */}
+          <Card className="border-primary/20 bg-primary/5">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Key className="h-5 w-5 text-blue-500" />
-                🔑 Obtenez votre clé Gemini 3 Flash gratuitement
+              <CardTitle className="flex items-center gap-2 text-xl">
+                <Key className="h-5 w-5 text-primary" />
+                🔑 Vos Clés API — Ce qu'il faut savoir
               </CardTitle>
+              <CardDescription className="text-base">
+                EbookStudio Pro fonctionne avec vos propres clés API. Vous ne payez que ce que vous utilisez, sans intermédiaire.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Gemini Card */}
+                <div className="p-4 rounded-xl border-2 border-blue-500/30 bg-blue-500/5 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
+                        <Cpu className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="font-bold text-sm">Gemini 3 Flash</p>
+                        <p className="text-xs text-muted-foreground">Moteur IA principal</p>
+                      </div>
+                    </div>
+                    <Badge className="bg-green-500/20 text-green-600 border-green-500/30">
+                      <CheckCircle2 className="w-3 h-3 mr-1" />
+                      OBLIGATOIRE
+                    </Badge>
+                  </div>
+                  <div className="text-sm space-y-1 text-muted-foreground">
+                    <p>✅ Clé <strong className="text-foreground">100% gratuite</strong> à obtenir</p>
+                    <p>✅ ~0,20 à 0,30€ par ebook complet</p>
+                    <p>✅ Utilisée par les 21 fonctions IA : rédaction, réécriture, analyse marché, SEO, couvertures…</p>
+                  </div>
+                </div>
+
+                {/* Azure Card */}
+                <div className="p-4 rounded-xl border border-border bg-card space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
+                        <Headphones className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="font-bold text-sm">Azure Speech</p>
+                        <p className="text-xs text-muted-foreground">Voix neuronales audiobooks</p>
+                      </div>
+                    </div>
+                    <Badge variant="outline" className="text-muted-foreground">
+                      <Info className="w-3 h-3 mr-1" />
+                      OPTIONNELLE
+                    </Badge>
+                  </div>
+                  <div className="text-sm space-y-1 text-muted-foreground">
+                    <p>🎙️ Uniquement pour créer des <strong className="text-foreground">livres audio</strong></p>
+                    <p>💰 ~0,01€ par minute d'audio généré</p>
+                    <p>🗣️ 7 voix françaises : Denise, Henri, Celeste, Brigitte, Alain, Jérôme, Eloise</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-start gap-2">
+                <Info className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
+                <p className="text-sm text-muted-foreground">
+                  <strong className="text-foreground">En résumé :</strong> Pour écrire et publier des ebooks, vous n'avez besoin que de la clé Gemini (gratuite). 
+                  La clé Azure n'est nécessaire que si vous souhaitez transformer vos livres en audiobooks.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* ═══ GUIDE 1 : GEMINI ═══ */}
+          <Card className="border-blue-500/20">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <Cpu className="h-5 w-5 text-blue-500" />
+                  Guide : Obtenir votre clé Gemini 3 Flash (gratuite)
+                </CardTitle>
+                <Badge className="bg-blue-500/10 text-blue-600 border-blue-500/30">Obligatoire</Badge>
+              </div>
               <CardDescription>
-                Google offre un accès gratuit. Un ebook complet coûte ~0,30€.
+                3 étapes simples — moins de 2 minutes
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {[
-                  { step: "1", title: "Google AI Studio", desc: "Allez sur aistudio.google.com et connectez-vous avec votre compte Google", icon: "🌐" },
-                  { step: "2", title: "Créez une clé API", desc: "Cliquez sur 'Get API Key' → 'Create API Key' → Copiez la clé", icon: "🔑" },
-                  { step: "3", title: "Collez ci-dessous", desc: "Collez votre clé dans le champ 'Clé API' ci-dessous et validez", icon: "✅" },
+                  { step: "1", title: "Créez un compte Google AI Studio", desc: "Rendez-vous sur aistudio.google.com et connectez-vous avec votre compte Google (celui de Gmail suffit)", icon: "🌐", color: "from-blue-500 to-cyan-500" },
+                  { step: "2", title: "Générez votre clé API", desc: "Cliquez sur 'Get API Key' en haut à gauche → 'Create API Key' → Copiez la clé qui commence par 'AIza...'", icon: "🔑", color: "from-indigo-500 to-blue-500" },
+                  { step: "3", title: "Collez dans EbookStudio", desc: "Collez votre clé dans le champ ci-dessous et cliquez Valider. Le badge passe au vert = vous êtes prêt !", icon: "✅", color: "from-green-500 to-emerald-500" },
                 ].map((item, i) => (
-                  <div key={i} className="flex items-start gap-3 p-3 bg-card border border-border rounded-lg">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                  <div key={i} className="flex items-start gap-3 p-4 bg-card border border-border rounded-xl hover:border-blue-500/30 transition-colors">
+                    <div className={`w-9 h-9 rounded-lg bg-gradient-to-br ${item.color} flex items-center justify-center text-white font-bold text-sm flex-shrink-0`}>
                       {item.step}
                     </div>
                     <div>
                       <p className="font-semibold text-sm">{item.title}</p>
-                      <p className="text-xs text-muted-foreground">{item.desc}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{item.desc}</p>
                     </div>
                   </div>
                 ))}
               </div>
-              <div className="flex gap-2">
-                <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">
-                  <Button variant="outline" size="sm" className="gap-2 border-blue-500/30 text-blue-600 hover:bg-blue-500/10">
-                    <Key className="h-4 w-4" />
-                    Obtenir ma clé Gemini gratuite →
-                  </Button>
-                </a>
-                <a href="https://portal.azure.com/" target="_blank" rel="noopener noreferrer">
-                  <Button variant="outline" size="sm" className="gap-2 border-emerald-500/30 text-emerald-600 hover:bg-emerald-500/10">
-                    Clé Azure Speech (audiobooks) →
-                  </Button>
-                </a>
-              </div>
+              <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">
+                <Button variant="outline" size="sm" className="gap-2 border-blue-500/30 text-blue-600 hover:bg-blue-500/10">
+                  <ExternalLink className="h-4 w-4" />
+                  Ouvrir Google AI Studio →
+                </Button>
+              </a>
             </CardContent>
           </Card>
 
+          {/* Champ Gemini */}
           <OpenAIConfigPanel 
             title="🔑 Clé API Gemini 3 Flash"
-            description="Entrez votre clé API Gemini pour utiliser toutes les fonctionnalités IA"
+            description="Entrez votre clé API Gemini pour utiliser toutes les fonctionnalités IA (rédaction, analyse, réécriture, couvertures…)"
             showModelSelection={true}
           />
+
+          {/* ═══ GUIDE 2 : AZURE SPEECH ═══ */}
+          <Card className="border-emerald-500/20">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <Mic className="h-5 w-5 text-emerald-500" />
+                  Guide : Obtenir votre clé Azure Speech (optionnelle)
+                </CardTitle>
+                <Badge variant="outline" className="text-muted-foreground">Audiobooks uniquement</Badge>
+              </div>
+              <CardDescription>
+                Nécessaire uniquement si vous souhaitez transformer vos ebooks en livres audio avec des voix françaises naturelles.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {[
+                  { step: "1", title: "Créez un compte Azure", desc: "Rendez-vous sur portal.azure.com et créez un compte gratuit (Microsoft offre 200$ de crédits le premier mois)", icon: "☁️", color: "from-emerald-500 to-teal-500" },
+                  { step: "2", title: "Créez une ressource Speech", desc: "Cherchez 'Speech' dans la barre de recherche → Créer → Choisissez la région 'France Central' → Tarif gratuit (F0) ou Standard", icon: "🎙️", color: "from-teal-500 to-cyan-500" },
+                  { step: "3", title: "Copiez la clé et la région", desc: "Dans votre ressource Speech → 'Keys and Endpoint' → Copiez Key 1 et la région (ex: francecentral). Collez ci-dessous.", icon: "📋", color: "from-cyan-500 to-blue-500" },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-start gap-3 p-4 bg-card border border-border rounded-xl hover:border-emerald-500/30 transition-colors">
+                    <div className={`w-9 h-9 rounded-lg bg-gradient-to-br ${item.color} flex items-center justify-center text-white font-bold text-sm flex-shrink-0`}>
+                      {item.step}
+                    </div>
+                    <div>
+                      <p className="font-semibold text-sm">{item.title}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                <p className="text-sm text-muted-foreground">
+                  <strong className="text-foreground">💡 Bon à savoir :</strong> Azure offre un tier gratuit (F0) avec 500 000 caractères/mois — 
+                  soit environ <strong className="text-foreground">5 audiobooks complets gratuits par mois</strong>. 
+                  Au-delà, le tarif Standard coûte ~0,01€ par minute d'audio.
+                </p>
+              </div>
+
+              <div className="flex gap-2">
+                <a href="https://portal.azure.com/#create/Microsoft.CognitiveServicesSpeechServices" target="_blank" rel="noopener noreferrer">
+                  <Button variant="outline" size="sm" className="gap-2 border-emerald-500/30 text-emerald-600 hover:bg-emerald-500/10">
+                    <ExternalLink className="h-4 w-4" />
+                    Créer une ressource Azure Speech →
+                  </Button>
+                </a>
+              </div>
+
+              {/* Azure Key Input */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                <div className="space-y-2">
+                  <Label htmlFor="azureKey" className="flex items-center gap-2">
+                    <Key className="h-3.5 w-3.5 text-emerald-500" />
+                    Clé Azure Speech
+                  </Label>
+                  <Input 
+                    id="azureKey" 
+                    type="password" 
+                    placeholder="Collez votre clé Azure Speech ici..."
+                    defaultValue={localStorage.getItem('azure_speech_key') || ''}
+                    onChange={(e) => localStorage.setItem('azure_speech_key', e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="azureRegion" className="flex items-center gap-2">
+                    <Globe className="h-3.5 w-3.5 text-emerald-500" />
+                    Région Azure
+                  </Label>
+                  <Input 
+                    id="azureRegion" 
+                    placeholder="ex: francecentral"
+                    defaultValue={localStorage.getItem('azure_speech_region') || 'francecentral'}
+                    onChange={(e) => localStorage.setItem('azure_speech_region', e.target.value)}
+                  />
+                </div>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="gap-2"
+                onClick={() => {
+                  const key = (document.getElementById('azureKey') as HTMLInputElement)?.value;
+                  const region = (document.getElementById('azureRegion') as HTMLInputElement)?.value;
+                  if (key) {
+                    localStorage.setItem('azure_speech_key', key);
+                    localStorage.setItem('azure_speech_region', region || 'francecentral');
+                    alert('✅ Clé Azure Speech enregistrée avec succès !');
+                  } else {
+                    alert('⚠️ Veuillez entrer votre clé Azure Speech.');
+                  }
+                }}
+              >
+                <Save className="h-4 w-4" />
+                Enregistrer la clé Azure
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Voix disponibles */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Headphones className="h-5 w-5 text-primary" />
+                🗣️ Voix Azure disponibles par thématique
+              </CardTitle>
+              <CardDescription>
+                EbookStudio sélectionne automatiquement la meilleure voix selon votre genre littéraire, mais vous pouvez aussi la choisir manuellement.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                {[
+                  { voice: "Eloise", genre: "Enfants 3-6 ans", emoji: "🧸" },
+                  { voice: "Brigitte", genre: "Enfants 6-12 ans", emoji: "📚" },
+                  { voice: "Henri", genre: "Thriller / Policier", emoji: "🔍" },
+                  { voice: "Denise", genre: "Romance", emoji: "💕" },
+                  { voice: "Alain", genre: "Spiritualité", emoji: "🧘" },
+                  { voice: "Jérôme", genre: "Marketing / Business", emoji: "💼" },
+                  { voice: "Celeste", genre: "Histoire", emoji: "🏛️" },
+                ].map((v, i) => (
+                  <div key={i} className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
+                    <span className="text-xl">{v.emoji}</span>
+                    <div>
+                      <p className="font-semibold text-sm">{v.voice}</p>
+                      <p className="text-xs text-muted-foreground">{v.genre}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>
