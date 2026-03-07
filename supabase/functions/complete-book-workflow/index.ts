@@ -42,45 +42,72 @@ let totalTokenUsage = {
 };
 
 async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000): Promise<string> {
-  const apiKey = activeApiKey || Deno.env.get('OPENAI_API_KEY');
+  // Priorité : Lovable Gateway (pas besoin de clé utilisateur)
+  const lovableKey = Deno.env.get('LOVABLE_API_KEY');
+  const userKey = activeApiKey;
+  const geminiKey = Deno.env.get('GEMINI_API_KEY');
   
-  if (!apiKey) {
-    throw new Error('NO_API_KEY: Aucune clé API OpenAI disponible. Veuillez configurer votre clé dans les paramètres.');
-  }
-  
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: 'gpt-4o-mini',
-      messages: [
-        { role: 'system', content: systemPrompt + EDITORIAL_PRO_RULES },
-        { role: 'user', content: userPrompt }
-      ],
-      max_tokens: maxTokens,
-    }),
-  });
+  // Stratégie 1: Lovable Gateway (recommandé)
+  if (lovableKey) {
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${lovableKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-flash',
+        messages: [
+          { role: 'system', content: systemPrompt + EDITORIAL_PRO_RULES },
+          { role: 'user', content: userPrompt }
+        ],
+        max_tokens: maxTokens,
+      }),
+    });
 
-  if (!response.ok) {
-    const status = response.status;
-    if (status === 429) throw new Error('RATE_LIMIT');
-    if (status === 401) throw new Error('INVALID_API_KEY: Clé API OpenAI invalide. Veuillez vérifier votre clé.');
-    throw new Error(`AI Error: ${status}`);
+    if (!response.ok) {
+      const status = response.status;
+      const errorText = await response.text();
+      console.error(`Lovable Gateway error ${status}: ${errorText}`);
+      if (status === 429) throw new Error('RATE_LIMIT');
+      if (status === 402) throw new Error('QUOTA_EXCEEDED: Quota dépassé. Réessayez plus tard.');
+      throw new Error(`AI Error: ${status} - ${errorText}`);
+    }
+
+    const data = await response.json();
+    if (data.usage) {
+      totalTokenUsage.promptTokens += data.usage.prompt_tokens || 0;
+      totalTokenUsage.completionTokens += data.usage.completion_tokens || 0;
+      totalTokenUsage.totalTokens += data.usage.total_tokens || 0;
+      console.log(`📊 Tokens used: +${data.usage.total_tokens} (cumulative: ${totalTokenUsage.totalTokens})`);
+    }
+    return data.choices?.[0]?.message?.content || '';
+  }
+  
+  // Stratégie 2: Gemini API directe (clé utilisateur ou serveur)
+  const geminiApiKey = userKey || geminiKey;
+  if (geminiApiKey) {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${geminiApiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: `${systemPrompt}\n${EDITORIAL_PRO_RULES}\n\n${userPrompt}` }] }],
+        generationConfig: { maxOutputTokens: maxTokens, temperature: 0.7 },
+      }),
+    });
+
+    if (!response.ok) {
+      const status = response.status;
+      if (status === 429) throw new Error('RATE_LIMIT');
+      if (status === 401 || status === 403) throw new Error('INVALID_API_KEY: Clé API Gemini invalide.');
+      throw new Error(`Gemini Error: ${status}`);
+    }
+
+    const data = await response.json();
+    return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
   }
 
-  const data = await response.json();
-  
-  if (data.usage) {
-    totalTokenUsage.promptTokens += data.usage.prompt_tokens || 0;
-    totalTokenUsage.completionTokens += data.usage.completion_tokens || 0;
-    totalTokenUsage.totalTokens += data.usage.total_tokens || 0;
-    console.log(`📊 Tokens used: +${data.usage.total_tokens} (cumulative: ${totalTokenUsage.totalTokens})`);
-  }
-  
-  return data.choices?.[0]?.message?.content || '';
+  throw new Error('NO_API_KEY: Aucune clé API disponible. Le système utilise automatiquement le serveur IA intégré.');
 }
 
 // BOUCLE QUALITÉ : appelle l'IA, évalue le score, relance si < seuil
@@ -246,15 +273,8 @@ serve(async (req) => {
       activeApiKey = userApiKey;
       console.log(`Using USER API key for step ${step}`);
     } else {
-      activeApiKey = Deno.env.get('OPENAI_API_KEY') || null;
-      console.log(`Using SERVER API key for step ${step}`);
-    }
-
-    if (!activeApiKey) {
-      return new Response(
-        JSON.stringify({ error: 'Aucune clé API OpenAI disponible. Veuillez configurer votre clé API dans les paramètres.' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      activeApiKey = null; // Lovable Gateway sera utilisé en priorité
+      console.log(`Using Lovable Gateway for step ${step}`);
     }
 
     if (!title) {
