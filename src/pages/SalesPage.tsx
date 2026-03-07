@@ -246,145 +246,175 @@ const SalesPage = () => {
         </span>
       </a>
 
-      {/* ═══ COMPTEUR DE LANCEMENT ═══ */}
-      <div className="w-full bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 text-white py-3 px-4">
-        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6">
-          <div className="flex items-center gap-2 text-sm font-semibold">
-            <Clock className="w-4 h-4 animate-pulse" />
-            <span>⏰ OFFRE DE LANCEMENT — Fin le 30 juin 2026</span>
+      {/* ═══ COMPTEUR DE LANCEMENT PREMIUM ═══ */}
+      <div className="w-full bg-gradient-to-r from-slate-900 via-violet-950 to-slate-900 text-white py-4 px-4 border-b border-violet-500/20">
+        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8">
+          <div className="flex items-center gap-2.5">
+            <div className="relative">
+              <div className="absolute inset-0 bg-amber-400/30 rounded-full blur-md animate-pulse" />
+              <Clock className="w-5 h-5 text-amber-400 relative z-10" />
+            </div>
+            <span className="text-sm font-bold tracking-wide uppercase text-amber-300">Offre de lancement — Fin le 30 juin 2026</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             {[
-              { value: countdown.days, label: 'J' },
-              { value: countdown.hours, label: 'H' },
-              { value: countdown.minutes, label: 'M' },
-              { value: countdown.seconds, label: 'S' },
+              { value: countdown.days, label: 'Jours' },
+              { value: countdown.hours, label: 'Heures' },
+              { value: countdown.minutes, label: 'Min' },
+              { value: countdown.seconds, label: 'Sec' },
             ].map((unit, i) => (
-              <div key={i} className="flex items-center gap-1">
-                <span className="bg-white/20 backdrop-blur-sm rounded-lg px-2.5 py-1 text-lg font-bold tabular-nums min-w-[2.5rem] text-center">
-                  {unit.value.toString().padStart(2, '0')}
-                </span>
-                <span className="text-xs text-white/70 font-medium">{unit.label}</span>
-                {i < 3 && <span className="text-white/40 mx-0.5">:</span>}
+              <div key={i} className="flex items-center gap-1.5">
+                <div className="flex flex-col items-center">
+                  <span className="bg-gradient-to-b from-white/15 to-white/5 backdrop-blur-sm border border-white/10 rounded-xl px-3 py-1.5 text-xl font-extrabold tabular-nums min-w-[3rem] text-center shadow-inner">
+                    {unit.value.toString().padStart(2, '0')}
+                  </span>
+                  <span className="text-[10px] text-white/50 font-medium mt-1 uppercase tracking-wider">{unit.label}</span>
+                </div>
+                {i < 3 && <span className="text-white/20 text-xl font-light mb-4">:</span>}
               </div>
             ))}
           </div>
-          <Badge className="bg-white/20 text-white border-white/30 text-xs">
-            97€ au lieu de 247€
+          <Badge className="bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-300 border-amber-500/30 text-xs font-bold px-3 py-1">
+            −{NORMAL_PRICE - LAUNCH_PRICE}€
           </Badge>
         </div>
       </div>
 
-      {/* Header */}
-      <header className="bg-background/80 backdrop-blur-xl border-b border-border/50 sticky top-[40px] z-50">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-          <Link to="/offres" onClick={() => trackOffresClick('logo_header')} className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-500/20">
+      {/* Header Premium */}
+      <header className="bg-background/60 backdrop-blur-2xl border-b border-border/30 sticky top-[40px] z-50">
+        <div className="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between">
+          <Link to="/offres" onClick={() => trackOffresClick('logo_header')} className="flex items-center gap-2.5 group">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-500/25 group-hover:shadow-violet-500/40 transition-shadow">
               <BookOpen className="w-5 h-5 text-white" />
             </div>
-            <span className="text-lg font-bold">EbookStudio Pro</span>
+            <div>
+              <span className="text-lg font-bold block leading-tight">EbookStudio Pro</span>
+              <span className="text-[10px] text-muted-foreground font-medium tracking-widest uppercase">Workflow IA Premium</span>
+            </div>
           </Link>
-          <nav className="hidden md:flex items-center gap-6 text-sm">
-            <a href="#author-showcase" onClick={(e) => { e.preventDefault(); document.getElementById('author-showcase')?.scrollIntoView({ behavior: 'smooth' }); }} className="text-muted-foreground hover:text-primary transition-colors font-medium cursor-pointer">📚 Ebooks créés</a>
-            <Link to="/blog" className="text-muted-foreground hover:text-primary transition-colors">Blog</Link>
-            <Link to="/demo" className="text-muted-foreground hover:text-primary transition-colors">Démo</Link>
-            <Link to="/formation" className="text-muted-foreground hover:text-primary transition-colors">Formation</Link>
-            <Link to="/faq" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"><HelpCircle className="w-3.5 h-3.5" />FAQ</Link>
+          <nav className="hidden md:flex items-center gap-1 text-sm">
+            {[
+              { href: "#author-showcase", label: "📚 Ebooks créés", scroll: true },
+              { to: "/blog", label: "Blog" },
+              { to: "/demo", label: "Démo" },
+              { to: "/formation", label: "Formation" },
+            ].map((item, i) => (
+              'scroll' in item ? (
+                <a key={i} href={item.href} onClick={(e) => { e.preventDefault(); document.getElementById('author-showcase')?.scrollIntoView({ behavior: 'smooth' }); }}
+                  className="text-muted-foreground hover:text-primary transition-all font-medium cursor-pointer px-3 py-1.5 rounded-lg hover:bg-primary/5">{item.label}</a>
+              ) : (
+                <Link key={i} to={item.to!} className="text-muted-foreground hover:text-primary transition-all px-3 py-1.5 rounded-lg hover:bg-primary/5">{item.label}</Link>
+              )
+            ))}
+            <Link to="/faq" className="text-muted-foreground hover:text-primary transition-all flex items-center gap-1 px-3 py-1.5 rounded-lg hover:bg-primary/5"><HelpCircle className="w-3.5 h-3.5" />FAQ</Link>
           </nav>
-          <Button size="sm" className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-lg shadow-violet-500/20"
+          <Button size="sm" className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-lg shadow-violet-500/20 font-bold"
             onClick={scrollToPricing}>
+            <Sparkles className="w-3.5 h-3.5 mr-1.5" />
             Offre de lancement
           </Button>
         </div>
       </header>
 
       {/* ═══════════════════════════════════════ HERO ═══════════════════════════════════════ */}
-      <section className="relative overflow-hidden pt-8 sm:pt-14 pb-14 sm:pb-24 px-4">
-        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-violet-500/10 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-purple-500/10 rounded-full blur-[100px] pointer-events-none" />
+      <section className="relative overflow-hidden pt-10 sm:pt-16 pb-16 sm:pb-28 px-4">
+        {/* Premium background effects */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,hsl(var(--primary)/0.15),transparent)]" />
+        <div className="absolute top-20 left-1/4 w-[500px] h-[500px] bg-violet-500/8 rounded-full blur-[150px] pointer-events-none" />
+        <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-purple-500/8 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/3 rounded-full blur-[200px] pointer-events-none" />
 
         <motion.div initial="hidden" animate="visible" variants={stagger} className="max-w-4xl mx-auto text-center relative z-10">
 
-          <motion.div variants={fadeUp} custom={0.5} className="mb-5">
-            <Badge className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 px-4 py-2 text-sm font-bold">
+          <motion.div variants={fadeUp} custom={0.5} className="mb-6">
+            <Badge className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 px-5 py-2.5 text-sm font-bold shadow-lg shadow-amber-500/5">
               <Sparkles className="w-4 h-4 mr-2" />
               OFFRE DE LANCEMENT — 97€ au lieu de 247€
             </Badge>
           </motion.div>
 
-          <motion.h1 variants={fadeUp} custom={1} className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.1] tracking-tight mb-4">
+          <motion.h1 variants={fadeUp} custom={1} className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.08] tracking-tight mb-5">
             Créez des ebooks{" "}
             <span className="bg-gradient-to-r from-violet-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
               haut de gamme
-            </span>{" "}
-            avec l'IA la plus puissante
+            </span>
+            <br className="hidden sm:block" />
+            <span className="text-foreground/80"> avec l'IA la plus puissante</span>
           </motion.h1>
 
-          <motion.p variants={fadeUp} custom={1.5} className="text-lg sm:text-xl md:text-2xl text-muted-foreground mb-3">
-            Gemini 3 Flash • Imagen 3 • Azure Neural Voices
+          <motion.p variants={fadeUp} custom={1.5} className="text-lg sm:text-xl md:text-2xl text-muted-foreground mb-3 font-light tracking-wide">
+            Gemini 3 Flash &bull; Imagen 3 &bull; Azure Neural Voices
           </motion.p>
-          <motion.p variants={fadeUp} custom={1.6} className="text-base sm:text-lg text-muted-foreground mb-8 font-medium">
+          <motion.p variants={fadeUp} custom={1.6} className="text-base sm:text-lg text-muted-foreground mb-8 font-medium max-w-2xl mx-auto">
             Le workflow IA en 15 rôles qui a déjà généré <span className="text-foreground font-bold">+35 ebooks publiés</span> sur Amazon KDP.
           </motion.p>
 
-          {/* Tech stack badges */}
+          {/* Tech stack badges - premium style */}
           <motion.div variants={fadeUp} custom={1.8} className="flex flex-wrap justify-center gap-3 mb-8">
             {techStack.map((tech, i) => (
-              <div key={i} className="flex items-center gap-2 bg-card border border-border rounded-full px-4 py-2 text-sm">
-                <div className={`w-6 h-6 rounded-full bg-gradient-to-br ${tech.color} flex items-center justify-center`}>
+              <div key={i} className="flex items-center gap-2.5 bg-card/80 backdrop-blur-sm border border-border/50 rounded-full px-5 py-2.5 text-sm shadow-sm hover:shadow-md hover:border-primary/30 transition-all duration-300">
+                <div className={`w-7 h-7 rounded-full bg-gradient-to-br ${tech.color} flex items-center justify-center shadow-sm`}>
                   <tech.icon className="w-3.5 h-3.5 text-white" />
                 </div>
-                <span className="font-medium">{tech.name}</span>
+                <span className="font-semibold">{tech.name}</span>
               </div>
             ))}
           </motion.div>
 
-          <motion.div variants={fadeUp} custom={2} className="flex flex-col sm:flex-row gap-3 sm:gap-6 justify-center text-left mb-8 max-w-xl mx-auto">
+          {/* 3 pillars - premium cards */}
+          <motion.div variants={fadeUp} custom={2} className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 max-w-2xl mx-auto">
             {[
-              "Trouvez une niche rentable",
-              "Générez votre ebook complet",
-              "Publiez sur Amazon KDP",
-            ].map((text, i) => (
-              <div key={i} className="flex items-center gap-2 text-base sm:text-lg text-foreground font-medium">
-                <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" />
-                <span>{text}</span>
+              { text: "Trouvez une niche rentable", emoji: "🎯" },
+              { text: "Générez votre ebook complet", emoji: "✍️" },
+              { text: "Publiez sur Amazon KDP", emoji: "🚀" },
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-2.5 bg-emerald-500/5 border border-emerald-500/15 rounded-xl px-4 py-3 text-sm font-medium">
+                <span className="text-lg">{item.emoji}</span>
+                <span>{item.text}</span>
               </div>
             ))}
           </motion.div>
 
-          <motion.div variants={fadeUp} custom={2.05} className="flex flex-wrap items-center justify-center gap-4 mb-4">
-            <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-              <div className="flex -space-x-2">
+          {/* Social proof bar - more credible */}
+          <motion.div variants={fadeUp} custom={2.05} className="flex flex-wrap items-center justify-center gap-6 mb-8 py-4 px-6 bg-card/50 backdrop-blur-sm rounded-2xl border border-border/30 max-w-lg mx-auto">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="flex -space-x-2.5">
                 {['MD','TL','SR','JP'].map((a, i) => (
-                  <div key={i} className="w-7 h-7 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-[10px] text-white font-bold border-2 border-background">{a}</div>
+                  <div key={i} className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-[10px] text-white font-bold border-2 border-background shadow-sm">{a}</div>
                 ))}
               </div>
-              <span className="ml-1">Utilisé par des auteurs indépendants</span>
+              <span className="ml-1.5 font-medium">Auteurs indépendants</span>
             </div>
-            <div className="flex items-center gap-1">
-              {[1,2,3,4,5].map(s => <Star key={s} className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />)}
-              <span className="text-xs text-muted-foreground ml-1">4.8/5</span>
+            <div className="h-6 w-px bg-border" />
+            <div className="flex items-center gap-1.5">
+              {[1,2,3,4,5].map(s => <Star key={s} className="w-4 h-4 fill-yellow-400 text-yellow-400" />)}
+              <span className="text-sm text-muted-foreground font-semibold ml-1">4.8/5</span>
             </div>
           </motion.div>
 
-          <motion.div variants={fadeUp} custom={2.2} className="flex flex-col items-center gap-3 mb-8">
-            <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg px-8 sm:px-10 py-7 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-2xl shadow-violet-500/30 hover:shadow-violet-500/50 transition-all duration-300 hover:-translate-y-0.5 hover:scale-[1.02]"
+          {/* CTA Button - bigger, bolder */}
+          <motion.div variants={fadeUp} custom={2.2} className="flex flex-col items-center gap-4 mb-10">
+            <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg px-10 sm:px-14 py-8 bg-gradient-to-r from-violet-600 via-purple-600 to-violet-700 hover:from-violet-500 hover:via-purple-500 hover:to-violet-600 text-white shadow-2xl shadow-violet-500/30 hover:shadow-violet-500/50 transition-all duration-500 hover:-translate-y-1 hover:scale-[1.02] rounded-2xl font-extrabold"
               onClick={() => { trackCTAClick('hero_cta_top', '#pricing'); scrollToPricing(); }}>
               <Rocket className="w-5 h-5 mr-2" />
               🔥 Offre de lancement — 97€ au lieu de 247€
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
-            <p className="text-sm text-muted-foreground">
-              ✅ +35 ebooks publiés • Coût moyen par ebook : 0,30€ • Temps moyen : 45 minutes
-            </p>
+            <div className="flex flex-wrap justify-center gap-4 text-sm text-muted-foreground">
+              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-emerald-500" />+35 ebooks publiés</span>
+              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-emerald-500" />~0,30€/ebook</span>
+              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-emerald-500" />45 min en moyenne</span>
+            </div>
           </motion.div>
 
-          {/* Vidéo démo */}
-          <motion.div variants={fadeUp} custom={2.5} className="mb-6 max-w-3xl mx-auto">
-            <h2 className="text-lg sm:text-xl font-bold text-foreground mb-3">
-              🎬 Démo réelle — création d'un ebook complet
+          {/* Vidéo démo - cinematic frame */}
+          <motion.div variants={fadeUp} custom={2.5} className="mb-8 max-w-3xl mx-auto">
+            <h2 className="text-lg sm:text-xl font-bold text-foreground mb-4 flex items-center justify-center gap-2">
+              <Play className="w-5 h-5 text-primary" />
+              Démo réelle — création d'un ebook complet
             </h2>
-            <div className="relative rounded-xl overflow-hidden shadow-2xl shadow-violet-500/20 border border-border bg-card aspect-video">
+            <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-violet-500/15 border border-border/50 bg-card aspect-video group">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
               <iframe
                 src="https://www.youtube.com/embed/JD0x6hDhBg0?rel=0"
                 title="Démo réelle — création d'un ebook complet"
@@ -396,68 +426,70 @@ const SalesPage = () => {
             </div>
           </motion.div>
 
-          <motion.div variants={fadeUp} custom={3} className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg px-8 py-6 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-xl shadow-violet-500/25 transition-all duration-300 hover:-translate-y-0.5"
+          <motion.div variants={fadeUp} custom={3} className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg px-8 py-7 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-xl shadow-violet-500/25 transition-all duration-300 hover:-translate-y-0.5 rounded-xl font-bold"
               onClick={() => { trackCTAClick('hero_cta_primary', '/paiement'); handlePlanClick(); }}>
               <Rocket className="w-5 h-5 mr-2" />
               👉 Créer mon premier ebook maintenant
             </Button>
-            <Button size="lg" variant="outline" className="w-full sm:w-auto text-sm sm:text-base px-6 py-5 border-2 border-border hover:border-primary/50 hover:bg-primary/5 transition-all duration-300"
+            <Button size="lg" variant="outline" className="w-full sm:w-auto text-sm sm:text-base px-6 py-6 border-2 border-border hover:border-primary/50 hover:bg-primary/5 transition-all duration-300 rounded-xl"
               onClick={() => { trackDemoClick("demo_hero"); navigate('/demo'); }}>
               <Play className="w-5 h-5 mr-2" />
               Voir la démonstration complète
             </Button>
           </motion.div>
 
-          <motion.p variants={fadeUp} custom={3.5} className="mt-4">
-            <a href="https://www.amazon.fr/Mr-Georges-Boubet/e/B0CGVLHNX7" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
+          <motion.p variants={fadeUp} custom={3.5} className="mt-5">
+            <a href="https://www.amazon.fr/Mr-Georges-Boubet/e/B0CGVLHNX7" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1.5">
               📚 Ebooks publiés en conditions réelles — voir ma page auteur Amazon
+              <ArrowRight className="w-3.5 h-3.5" />
             </a>
           </motion.p>
         </motion.div>
       </section>
 
       {/* ═══════════════════════ TECHNOLOGIE PREMIUM ═══════════════════════ */}
-      <section className="py-14 px-4 bg-muted/30">
-        <div className="max-w-5xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-10">
+      <section className="py-16 px-4 bg-muted/30 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,hsl(var(--primary)/0.05),transparent_50%)]" />
+        <div className="max-w-5xl mx-auto relative z-10">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-12">
             <motion.div variants={fadeUp}>
-              <Badge className="mb-4 bg-blue-500/10 text-blue-500 border-blue-500/20 px-4 py-2">
+              <Badge className="mb-5 bg-blue-500/10 text-blue-500 border-blue-500/20 px-5 py-2.5 text-sm font-bold">
                 <Cpu className="w-4 h-4 mr-2" />
-                Technologie de pointe
+                Technologie de pointe 2026
               </Badge>
             </motion.div>
-            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-5xl font-extrabold mb-4">
+            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-5xl font-extrabold mb-5 leading-tight">
               Propulsé par les{" "}
-              <span className="bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">meilleurs modèles IA</span>{" "}
-              du marché
+              <span className="bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">meilleurs modèles IA</span>
+              <br className="hidden md:block" /> du marché
             </motion.h2>
-            <motion.p variants={fadeUp} custom={2} className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Vous utilisez vos propres clés API pour un accès direct aux modèles les plus puissants — sans intermédiaire, sans limite imposée.
+            <motion.p variants={fadeUp} custom={2} className="text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed">
+              Vos propres clés API pour un accès direct — sans intermédiaire, sans limite imposée.
             </motion.p>
           </motion.div>
 
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {techStack.map((tech, i) => (
               <motion.div key={i} variants={fadeUp} custom={i}>
-                <Card className="h-full border hover:border-primary/30 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center">
-                  <CardContent className="pt-8 pb-6">
-                    <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${tech.color} flex items-center justify-center mx-auto mb-4 shadow-lg`}>
-                      <tech.icon className="w-7 h-7 text-white" />
+                <Card className="h-full border hover:border-primary/30 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 hover:-translate-y-2 text-center group bg-card/80 backdrop-blur-sm">
+                  <CardContent className="pt-10 pb-8">
+                    <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${tech.color} flex items-center justify-center mx-auto mb-5 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                      <tech.icon className="w-8 h-8 text-white" />
                     </div>
                     <h3 className="font-bold text-lg mb-2">{tech.name}</h3>
-                    <p className="text-sm text-muted-foreground">{tech.desc}</p>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{tech.desc}</p>
                   </CardContent>
                 </Card>
               </motion.div>
             ))}
           </motion.div>
 
-          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mt-8 text-center">
-            <div className="inline-flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl px-6 py-3 text-sm">
-              <ShieldCheck className="w-4 h-4 text-emerald-500" />
-              <span className="text-emerald-600 dark:text-emerald-400 font-medium">
-                BYOK (Bring Your Own Key) — Vos clés API, votre contrôle total, coût moyen ~0,30€/ebook
+          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mt-10 text-center">
+            <div className="inline-flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl px-8 py-4 text-sm shadow-sm">
+              <ShieldCheck className="w-5 h-5 text-emerald-500" />
+              <span className="text-emerald-600 dark:text-emerald-400 font-semibold">
+                BYOK (Bring Your Own Key) — Vos clés API, votre contrôle total, ~0,30€/ebook
               </span>
             </div>
           </motion.div>
@@ -465,18 +497,18 @@ const SalesPage = () => {
       </section>
 
       {/* ═══════════════════════════════════════ MESSAGE MOTIVATION ═══════════════════════════ */}
-      <section className="py-8 px-4">
+      <section className="py-10 px-4">
         <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="max-w-3xl mx-auto relative overflow-hidden rounded-2xl bg-gradient-to-r from-violet-600 via-purple-600 to-violet-700 p-8 shadow-2xl shadow-violet-500/20 border border-white/10 text-center">
-          <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-[60px]" />
-          <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-pink-500/15 rounded-full blur-[50px]" />
+          className="max-w-3xl mx-auto relative overflow-hidden rounded-3xl bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700 p-10 shadow-2xl shadow-violet-500/20 border border-white/10 text-center">
+          <div className="absolute -top-10 -right-10 w-48 h-48 bg-white/10 rounded-full blur-[70px]" />
+          <div className="absolute -bottom-10 -left-10 w-36 h-36 bg-pink-500/15 rounded-full blur-[60px]" />
           <div className="relative z-10">
-            <p className="text-3xl mb-3">🚀</p>
-            <h3 className="text-xl md:text-2xl font-extrabold text-white mb-3">1, 2, 3… Foncez !</h3>
+            <p className="text-4xl mb-4">🚀</p>
+            <h3 className="text-2xl md:text-3xl font-extrabold text-white mb-4">1, 2, 3… Foncez !</h3>
             <p className="text-white/85 text-base md:text-lg leading-relaxed max-w-xl mx-auto">
               Et sachez que je suis <strong className="text-white">toujours là pour vous accompagner</strong> — avec un Zoom gratuit, à tout moment.
             </p>
-            <p className="text-white/50 text-sm mt-4 italic">— Georges, créateur d'EbookStudio</p>
+            <p className="text-white/40 text-sm mt-5 italic">— Georges, créateur d'EbookStudio</p>
           </div>
         </motion.div>
       </section>
@@ -633,45 +665,52 @@ const SalesPage = () => {
       </section>
 
       {/* ═══════════════════════════════════════ PRICING ═══════════════════════════════════ */}
-      <section id="pricing" className="py-16 px-4">
-        <div className="max-w-3xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-8">
+      <section id="pricing" className="py-20 px-4 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_100%,hsl(var(--primary)/0.08),transparent)]" />
+        <div className="max-w-3xl mx-auto relative z-10">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-10">
             <motion.div variants={fadeUp}>
-              <Badge className="mb-4 bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 px-5 py-2 text-sm font-bold">
+              <Badge className="mb-5 bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 px-6 py-2.5 text-sm font-bold shadow-lg shadow-amber-500/5">
                 <Gift className="w-4 h-4 mr-2" />
                 OFFRE DE LANCEMENT — Prix réduit temporaire
               </Badge>
             </motion.div>
-            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-5xl font-extrabold mb-4">
+            <motion.h2 variants={fadeUp} custom={1} className="text-4xl md:text-6xl font-extrabold mb-5">
               Accès Pro Lifetime
             </motion.h2>
-            <motion.div variants={fadeUp} custom={2} className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-5 py-2 text-sm">
+            <motion.div variants={fadeUp} custom={2} className="inline-flex items-center gap-2.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-6 py-2.5 text-sm shadow-sm">
               <ShieldCheck className="w-4 h-4 text-emerald-500" />
-              <span className="text-emerald-600 dark:text-emerald-400 font-medium">Garantie 30 jours satisfait ou remboursé</span>
+              <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Garantie 30 jours satisfait ou remboursé</span>
             </motion.div>
           </motion.div>
 
-          {/* Pricing Card */}
+          {/* Pricing Card - Ultra premium */}
           <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}>
-            <div className="relative rounded-3xl overflow-hidden">
+            <div className="relative rounded-3xl overflow-hidden shadow-2xl shadow-violet-500/10">
               <div className="absolute inset-0 bg-gradient-to-br from-violet-500 via-purple-500 to-pink-500 p-[2px] rounded-3xl">
                 <div className="absolute inset-[2px] rounded-[22px] bg-background" />
               </div>
 
-              <div className="relative z-10 p-8 md:p-10">
-                <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0 mb-6 px-4 py-1.5 text-sm font-bold">
-                  🔥 LANCEMENT — Économisez {NORMAL_PRICE - LAUNCH_PRICE}€
-                </Badge>
-
-                <div className="flex items-baseline gap-3 mb-1">
-                  <span className="text-lg text-muted-foreground line-through">{NORMAL_PRICE}€</span>
-                  <span className="text-6xl md:text-7xl font-extrabold">{LAUNCH_PRICE}</span>
-                  <span className="text-3xl font-bold">€</span>
+              <div className="relative z-10 p-8 md:p-12">
+                <div className="flex items-center justify-between mb-8">
+                  <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0 px-5 py-2 text-sm font-bold shadow-lg shadow-amber-500/20">
+                    🔥 LANCEMENT — Économisez {NORMAL_PRICE - LAUNCH_PRICE}€
+                  </Badge>
+                  <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                    <Clock className="w-4 h-4" />
+                    <span>Offre limitée</span>
+                  </div>
                 </div>
-                <p className="text-sm text-muted-foreground mb-8">Paiement unique • Accès à vie • Sans abonnement</p>
 
-                <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 mb-8">
+                <div className="flex items-baseline gap-3 mb-2">
+                  <span className="text-xl text-muted-foreground line-through opacity-60">{NORMAL_PRICE}€</span>
+                  <span className="text-7xl md:text-8xl font-extrabold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">{LAUNCH_PRICE}</span>
+                  <span className="text-3xl font-bold text-muted-foreground">€</span>
+                </div>
+                <p className="text-sm text-muted-foreground mb-10 font-medium">Paiement unique &bull; Accès à vie &bull; Sans abonnement</p>
+
+                <div className="grid sm:grid-cols-2 gap-x-8 gap-y-4 mb-10">
                   {[
                     "Workflow éditorial complet 15 rôles",
                     "Gemini 3 Flash — IA la plus rapide",
@@ -679,66 +718,71 @@ const SalesPage = () => {
                     "Azure Neural Voices — audiobooks",
                     "P15 Humanisation Anti-IA offert",
                     "Export PDF / EPUB / Word",
-                    "🎓 Formation 18 modules vidéo (valeur 297€)",
+                    "🎓 Formation 18 modules (valeur 297€)",
                     "Outils KDP Premium complets",
                     "Gestionnaire Séries / Sagas",
                     "Traduction multi-langues (30+)",
                     "Mises à jour gratuites à vie",
                     "Support prioritaire + Zoom gratuit",
                   ].map((f, i) => (
-                    <div key={i} className="flex items-center gap-2.5">
-                      <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span className="text-sm">{f}</span>
+                    <div key={i} className="flex items-center gap-3">
+                      <div className="w-5 h-5 rounded-full bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
+                        <Check className="w-3.5 h-3.5 text-emerald-500" />
+                      </div>
+                      <span className="text-sm font-medium">{f}</span>
                     </div>
                   ))}
                 </div>
 
-                <Button size="lg" className="w-full py-8 text-xl font-extrabold bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-2xl shadow-violet-500/30 hover:shadow-violet-500/50 transition-all duration-300 rounded-xl hover:scale-[1.02]"
+                <Button size="lg" className="w-full py-8 text-xl font-extrabold bg-gradient-to-r from-violet-600 via-purple-600 to-violet-700 hover:from-violet-500 hover:via-purple-500 hover:to-violet-600 text-white shadow-2xl shadow-violet-500/30 hover:shadow-violet-500/50 transition-all duration-500 rounded-2xl hover:scale-[1.02] hover:-translate-y-0.5"
                   onClick={handlePlanClick}>
                   <Rocket className="w-6 h-6 mr-2" />
                   🔥 Accès Pro Lifetime — {LAUNCH_PRICE}€ à vie
                   <ArrowRight className="w-6 h-6 ml-2" />
                 </Button>
 
-                <p className="text-center mt-4 text-sm text-muted-foreground">
+                <p className="text-center mt-5 text-sm text-muted-foreground">
                   Après la période de lancement : <strong className="text-foreground text-base">{FUTURE_PRICE}€</strong>{" "}
-                  <span className="text-xs">({NORMAL_PRICE}€ - {PROMO_DISCOUNT}€ de promo)</span>
+                  <span className="text-xs opacity-75">({NORMAL_PRICE}€ - {PROMO_DISCOUNT}€ de promo)</span>
                 </p>
 
-                <div className="mt-6 space-y-2">
-                  <p className="text-xs text-muted-foreground text-center mb-3">Ou payez en plusieurs fois :</p>
-                  {[
-                    { label: "En 3 fois", price: "33", per: "33€/mois × 3" },
-                    { label: "En 5 fois", price: "20", per: "20€/mois × 5" },
-                  ].map((inst, idx) => (
-                    <button key={idx} onClick={handlePlanClick}
-                      className="w-full flex items-center justify-between p-3.5 rounded-xl border border-border hover:border-primary/50 hover:bg-primary/5 transition-all">
-                      <div className="text-left">
-                        <span className="font-semibold text-sm">{inst.label}</span>
-                        <p className="text-xs text-muted-foreground">{inst.per}</p>
-                      </div>
-                      <span className="text-lg font-bold">{inst.price}€</span>
-                    </button>
-                  ))}
+                {/* Facilités de paiement */}
+                <div className="mt-8 pt-6 border-t border-border/50">
+                  <p className="text-xs text-muted-foreground text-center mb-4 uppercase tracking-wider font-semibold">Ou payez en plusieurs fois</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      { label: "En 3 fois", price: "33", per: "33€/mois × 3", popular: true },
+                      { label: "En 5 fois", price: "20", per: "20€/mois × 5", popular: false },
+                    ].map((inst, idx) => (
+                      <button key={idx} onClick={handlePlanClick}
+                        className={`flex flex-col items-center p-4 rounded-2xl border-2 transition-all duration-300 hover:scale-[1.02] ${inst.popular ? 'border-primary/30 bg-primary/5 hover:border-primary/50' : 'border-border hover:border-primary/30 hover:bg-primary/5'}`}>
+                        <span className="font-bold text-2xl">{inst.price}€</span>
+                        <span className="text-xs text-muted-foreground mt-1">{inst.per}</span>
+                        {inst.popular && <Badge className="mt-2 text-[10px] bg-primary/10 text-primary border-primary/20">Populaire</Badge>}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
-                <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground mt-5">
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>Paiement sécurisé • Accès immédiat</span>
+                <div className="flex items-center justify-center gap-3 text-xs text-muted-foreground mt-6">
+                  <ShieldCheck className="w-4 h-4" />
+                  <span>Paiement sécurisé &bull; Accès immédiat &bull; Garantie 30 jours</span>
                 </div>
               </div>
             </div>
           </motion.div>
 
-          {/* Garantie */}
-          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mt-10">
-            <div className="bg-emerald-500/5 border-2 border-emerald-500/20 rounded-2xl p-6 text-center">
-              <h3 className="text-lg font-bold text-emerald-600 dark:text-emerald-400 mb-2 flex items-center justify-center gap-2">
-                <ShieldCheck className="w-5 h-5" />
+          {/* Garantie - premium */}
+          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mt-12">
+            <div className="bg-emerald-500/5 border-2 border-emerald-500/20 rounded-3xl p-8 text-center shadow-sm">
+              <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center mx-auto mb-4">
+                <ShieldCheck className="w-7 h-7 text-emerald-500" />
+              </div>
+              <h3 className="text-xl font-bold text-emerald-600 dark:text-emerald-400 mb-3">
                 Garantie Satisfait ou Remboursé — 30 jours
               </h3>
-              <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                Testez pendant 30 jours. Pas satisfait ? Un email et vous êtes remboursé intégralement.
+              <p className="text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
+                Testez pendant 30 jours. Pas satisfait ? Un email et vous êtes remboursé intégralement. Aucune question posée.
               </p>
             </div>
           </motion.div>
@@ -959,46 +1003,51 @@ const SalesPage = () => {
 
       <SalesFaq />
 
-      {/* Final CTA */}
-      <section className="py-14 px-4">
+      {/* Final CTA - dramatic */}
+      <section className="py-20 px-4 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_50%,hsl(var(--primary)/0.06),transparent)]" />
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}
-          className="max-w-3xl mx-auto text-center">
-          <motion.h2 variants={fadeUp} className="text-3xl md:text-4xl font-extrabold mb-4">
-            Chaque jour sans ebook publié est un jour de revenus passifs perdu.
+          className="max-w-3xl mx-auto text-center relative z-10">
+          <motion.h2 variants={fadeUp} className="text-3xl md:text-5xl font-extrabold mb-5 leading-tight">
+            Chaque jour sans ebook publié
+            <br />
+            <span className="text-muted-foreground">est un jour de revenus passifs perdu.</span>
           </motion.h2>
-          <motion.p variants={fadeUp} custom={1} className="text-muted-foreground mb-4 text-lg">
+          <motion.p variants={fadeUp} custom={1} className="text-muted-foreground mb-5 text-lg font-medium">
             Votre premier ebook peut être en ligne sur Amazon ce soir.
           </motion.p>
-          <motion.div variants={fadeUp} custom={1.5} className="flex flex-wrap justify-center gap-4 text-sm text-muted-foreground mb-8">
-            <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-emerald-500" />Pas besoin de savoir écrire</span>
-            <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-emerald-500" />Pas besoin de compétence technique</span>
-            <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-emerald-500" />Résultats dès le premier jour</span>
+          <motion.div variants={fadeUp} custom={1.5} className="flex flex-wrap justify-center gap-5 text-sm text-muted-foreground mb-10">
+            <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-500" />Pas besoin de savoir écrire</span>
+            <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-500" />Pas besoin de compétence technique</span>
+            <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-500" />Résultats dès le premier jour</span>
           </motion.div>
           <motion.div variants={fadeUp} custom={2}>
-            <Button size="lg" className="text-lg px-10 py-7 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-xl shadow-violet-500/25 hover:scale-[1.02] transition-all"
+            <Button size="lg" className="text-lg px-12 py-8 bg-gradient-to-r from-violet-600 via-purple-600 to-violet-700 hover:from-violet-500 hover:via-purple-500 hover:to-violet-600 text-white shadow-2xl shadow-violet-500/25 hover:scale-[1.02] hover:-translate-y-0.5 transition-all duration-500 rounded-2xl font-extrabold"
               onClick={handlePlanClick}>
-              <Rocket className="w-5 h-5 mr-2" />
+              <Rocket className="w-6 h-6 mr-2" />
               Accès Pro Lifetime — {LAUNCH_PRICE}€ à vie
-              <ArrowRight className="w-5 h-5 ml-2" />
+              <ArrowRight className="w-6 h-6 ml-2" />
             </Button>
-            <p className="text-sm text-muted-foreground mt-4">Paiement unique • Accès à vie • Garantie 30 jours</p>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-sm text-muted-foreground mt-5 font-medium">Paiement unique &bull; Accès à vie &bull; Garantie 30 jours</p>
+            <p className="text-xs text-muted-foreground mt-1 opacity-75">
               Prix après lancement : {FUTURE_PRICE}€ ({NORMAL_PRICE}€ - {PROMO_DISCOUNT}€ promo)
             </p>
           </motion.div>
         </motion.div>
       </section>
 
-      {/* Zoom Calendly */}
-      <section className="py-10 bg-gradient-to-r from-violet-500/10 via-purple-500/10 to-violet-500/10 border-y border-violet-500/20">
+      {/* Zoom Calendly - premium */}
+      <section className="py-12 bg-gradient-to-r from-violet-500/5 via-purple-500/10 to-violet-500/5 border-y border-violet-500/10">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <div className="flex items-center gap-2">
-              <Play className="w-5 h-5 text-violet-500" />
-              <span className="text-lg font-semibold">🎥 Dispo en Zoom — Voyez l'outil en direct !</span>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-5">
+            <div className="flex items-center gap-2.5">
+              <div className="w-10 h-10 rounded-xl bg-violet-500/10 flex items-center justify-center">
+                <Play className="w-5 h-5 text-violet-500" />
+              </div>
+              <span className="text-lg font-bold">Dispo en Zoom — Voyez l'outil en direct</span>
             </div>
             <a href="https://calendly.com/boubetgeorges/nouvelle-reunion" target="_blank" rel="noopener noreferrer">
-              <Button className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white font-bold px-6">
+              <Button className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white font-bold px-8 py-5 rounded-xl shadow-lg shadow-violet-500/20">
                 📅 Réserver un créneau
               </Button>
             </a>
@@ -1006,59 +1055,64 @@ const SalesPage = () => {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-12 border-t border-border/50 bg-slate-900 text-white">
+      {/* Footer - Premium */}
+      <footer className="py-16 border-t border-border/30 bg-gradient-to-b from-slate-900 to-slate-950 text-white">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="grid md:grid-cols-5 gap-8 mb-8">
+          <div className="grid md:grid-cols-5 gap-10 mb-10">
             <div className="md:col-span-1">
-              <h3 className="text-xl font-bold mb-3 bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">EbookStudio Pro</h3>
-              <p className="text-gray-400 text-sm">Le workflow éditorial IA #1 en France pour Amazon KDP.</p>
+              <div className="flex items-center gap-2.5 mb-4">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
+                  <BookOpen className="w-4.5 h-4.5 text-white" />
+                </div>
+                <h3 className="text-lg font-bold bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">EbookStudio Pro</h3>
+              </div>
+              <p className="text-gray-400 text-sm leading-relaxed">Le workflow éditorial IA #1 en France pour Amazon KDP.</p>
             </div>
             <div>
-              <h4 className="font-semibold mb-3 text-gray-200">📚 Guides</h4>
-              <ul className="space-y-2 text-sm">
+              <h4 className="font-semibold mb-4 text-gray-200 text-sm uppercase tracking-wider">📚 Guides</h4>
+              <ul className="space-y-2.5 text-sm">
                 <li><button onClick={() => navigate("/ecrire-livre-chatgpt")} className="text-gray-400 hover:text-violet-400 transition-colors">Écrire un livre avec ChatGPT</button></li>
                 <li><button onClick={() => navigate("/creer-ebook-ia")} className="text-gray-400 hover:text-violet-400 transition-colors">Créer un ebook avec l'IA</button></li>
                 <li><button onClick={() => navigate("/generateur-ebook")} className="text-gray-400 hover:text-violet-400 transition-colors">Générateur ebook IA</button></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-3 text-gray-200">🚀 Produit</h4>
-              <ul className="space-y-2 text-sm">
+              <h4 className="font-semibold mb-4 text-gray-200 text-sm uppercase tracking-wider">🚀 Produit</h4>
+              <ul className="space-y-2.5 text-sm">
                 <li><button onClick={() => navigate("/demo")} className="text-gray-400 hover:text-violet-400 transition-colors">Essai gratuit</button></li>
                 <li><button onClick={() => navigate("/valeur-offre")} className="text-gray-400 hover:text-violet-400 transition-colors">Valeur de l'offre</button></li>
                 <li><button onClick={() => navigate("/formation")} className="text-gray-400 hover:text-violet-400 transition-colors">Formation</button></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-3 text-gray-200">💡 Ressources</h4>
-              <ul className="space-y-2 text-sm">
+              <h4 className="font-semibold mb-4 text-gray-200 text-sm uppercase tracking-wider">💡 Ressources</h4>
+              <ul className="space-y-2.5 text-sm">
                 <li><button onClick={() => navigate("/faq")} className="text-gray-400 hover:text-violet-400 transition-colors">FAQ</button></li>
                 <li><button onClick={() => navigate("/blog")} className="text-gray-400 hover:text-violet-400 transition-colors">Blog</button></li>
                 <li><button onClick={() => navigate("/affiliation")} className="text-gray-400 hover:text-violet-400 transition-colors">Affiliation</button></li>
               </ul>
-              <h4 className="font-semibold mb-2 mt-4 text-gray-200">⚖️ Légal</h4>
-              <ul className="space-y-2 text-sm">
+              <h4 className="font-semibold mb-3 mt-6 text-gray-200 text-sm uppercase tracking-wider">⚖️ Légal</h4>
+              <ul className="space-y-2.5 text-sm">
                 <li><button onClick={() => navigate("/mentions-legales")} className="text-gray-400 hover:text-violet-400 transition-colors">Mentions légales</button></li>
                 <li><button onClick={() => navigate("/cgv")} className="text-gray-400 hover:text-violet-400 transition-colors">CGV</button></li>
                 <li><button onClick={() => navigate("/politique-confidentialite")} className="text-gray-400 hover:text-violet-400 transition-colors">Confidentialité</button></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-3 text-gray-200">📧 Newsletter</h4>
-              <p className="text-gray-400 text-sm mb-3">Conseils KDP gratuits</p>
+              <h4 className="font-semibold mb-4 text-gray-200 text-sm uppercase tracking-wider">📧 Newsletter</h4>
+              <p className="text-gray-400 text-sm mb-4">Conseils KDP et IA gratuits chaque semaine</p>
               <NewsletterForm />
             </div>
           </div>
-          <div className="border-t border-gray-800 pt-6 text-center">
-            <p className="text-xs text-gray-500">© 2026 EbookStudio Pro • Workflow Éditorial IA Premium pour Amazon KDP • Tous droits réservés</p>
+          <div className="border-t border-gray-800/50 pt-8 text-center">
+            <p className="text-xs text-gray-500">© 2026 EbookStudio Pro &bull; Workflow Éditorial IA Premium pour Amazon KDP &bull; Tous droits réservés</p>
           </div>
         </div>
       </footer>
 
-      {/* Sticky Mobile CTA */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-background/95 backdrop-blur-xl border-t border-border p-3">
-        <Button className="w-full py-5 text-base font-bold bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-lg rounded-xl"
+      {/* Sticky Mobile CTA - premium */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-background/95 backdrop-blur-2xl border-t border-border/30 p-3 safe-area-inset-bottom">
+        <Button className="w-full py-5 text-base font-extrabold bg-gradient-to-r from-violet-600 via-purple-600 to-violet-700 hover:from-violet-500 hover:to-violet-600 text-white shadow-xl shadow-violet-500/20 rounded-xl"
           onClick={handlePlanClick}>
           <Rocket className="w-4 h-4 mr-2" />
           Accès Pro — {LAUNCH_PRICE}€ à vie
