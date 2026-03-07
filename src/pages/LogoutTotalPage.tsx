@@ -9,12 +9,8 @@ const STORAGE_KEYS_TO_CLEAR = [
   "subscriber_data",
   "demo_plans_generated",
   "ebook-planner-autosave",
-  "OPENAI_API_KEY",
-  "OPENAI_MODEL",
-  "openai_api_key",
-  "openai_model",
-  "user_openai_key",
-  "user_openai_model",
+  // NOTE: On ne supprime PAS openai_api_key / openai_model
+  // pour que la clé Gemini persiste entre les sessions
 ];
 
 export default function LogoutTotalPage() {
