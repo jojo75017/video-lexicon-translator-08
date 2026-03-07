@@ -304,7 +304,7 @@ const SeoTutorialChatGptPage = () => {
             {[
               { title: "14 étapes éditoriales", desc: "Workflow complet automatisé" },
               { title: "Export KDP Ready", desc: "PDF, EPUB, Word optimisés" },
-              { title: "37€ accès à vie", desc: "Ebooks illimités" }
+              { title: "97€ accès à vie", desc: "Ebooks illimités" }
             ].map((item, i) => (
               <div key={i} className="bg-white/10 rounded-lg p-4 backdrop-blur-sm">
                 <div className="font-bold text-lg">{item.title}</div>
@@ -378,7 +378,7 @@ const SeoTutorialChatGptPage = () => {
               className="bg-violet-600 hover:bg-violet-700"
               onClick={() => navigate("/offres")}
             >
-              Accès Complet 37€
+              Accès Complet 97€
             </Button>
             <Button 
               size="lg" 
