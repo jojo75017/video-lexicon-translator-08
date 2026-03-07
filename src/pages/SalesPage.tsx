@@ -151,9 +151,31 @@ const NORMAL_PRICE = 247;
 const PROMO_DISCOUNT = 50;
 const FUTURE_PRICE = NORMAL_PRICE - PROMO_DISCOUNT; // 197€
 
+const LAUNCH_END = new Date('2026-06-30T23:59:59').getTime();
+
+const useCountdown = (targetDate: number) => {
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+  useEffect(() => {
+    const tick = () => {
+      const diff = Math.max(0, targetDate - Date.now());
+      setTimeLeft({
+        days: Math.floor(diff / 86400000),
+        hours: Math.floor((diff % 86400000) / 3600000),
+        minutes: Math.floor((diff % 3600000) / 60000),
+        seconds: Math.floor((diff % 60000) / 1000),
+      });
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [targetDate]);
+  return timeLeft;
+};
+
 const SalesPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const countdown = useCountdown(LAUNCH_END);
 
   // Capture referral code from URL
   useEffect(() => {
@@ -223,6 +245,35 @@ const SalesPage = () => {
           <span className="hidden sm:inline border border-white/30 rounded-full px-3 py-0.5 text-xs ml-2">Réserver →</span>
         </span>
       </a>
+
+      {/* ═══ COMPTEUR DE LANCEMENT ═══ */}
+      <div className="w-full bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 text-white py-3 px-4">
+        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6">
+          <div className="flex items-center gap-2 text-sm font-semibold">
+            <Clock className="w-4 h-4 animate-pulse" />
+            <span>⏰ OFFRE DE LANCEMENT — Fin le 30 juin 2026</span>
+          </div>
+          <div className="flex items-center gap-2">
+            {[
+              { value: countdown.days, label: 'J' },
+              { value: countdown.hours, label: 'H' },
+              { value: countdown.minutes, label: 'M' },
+              { value: countdown.seconds, label: 'S' },
+            ].map((unit, i) => (
+              <div key={i} className="flex items-center gap-1">
+                <span className="bg-white/20 backdrop-blur-sm rounded-lg px-2.5 py-1 text-lg font-bold tabular-nums min-w-[2.5rem] text-center">
+                  {unit.value.toString().padStart(2, '0')}
+                </span>
+                <span className="text-xs text-white/70 font-medium">{unit.label}</span>
+                {i < 3 && <span className="text-white/40 mx-0.5">:</span>}
+              </div>
+            ))}
+          </div>
+          <Badge className="bg-white/20 text-white border-white/30 text-xs">
+            97€ au lieu de 247€
+          </Badge>
+        </div>
+      </div>
 
       {/* Header */}
       <header className="bg-background/80 backdrop-blur-xl border-b border-border/50 sticky top-[40px] z-50">
