@@ -449,46 +449,47 @@ const SalesPage = () => {
       </section>
 
       {/* ═══════════════════════ TECHNOLOGIE PREMIUM ═══════════════════════ */}
-      <section className="py-14 px-4 bg-muted/30">
-        <div className="max-w-5xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-10">
+      <section className="py-16 px-4 bg-muted/30 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,hsl(var(--primary)/0.05),transparent_50%)]" />
+        <div className="max-w-5xl mx-auto relative z-10">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-12">
             <motion.div variants={fadeUp}>
-              <Badge className="mb-4 bg-blue-500/10 text-blue-500 border-blue-500/20 px-4 py-2">
+              <Badge className="mb-5 bg-blue-500/10 text-blue-500 border-blue-500/20 px-5 py-2.5 text-sm font-bold">
                 <Cpu className="w-4 h-4 mr-2" />
-                Technologie de pointe
+                Technologie de pointe 2026
               </Badge>
             </motion.div>
-            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-5xl font-extrabold mb-4">
+            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-5xl font-extrabold mb-5 leading-tight">
               Propulsé par les{" "}
-              <span className="bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">meilleurs modèles IA</span>{" "}
-              du marché
+              <span className="bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">meilleurs modèles IA</span>
+              <br className="hidden md:block" /> du marché
             </motion.h2>
-            <motion.p variants={fadeUp} custom={2} className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Vous utilisez vos propres clés API pour un accès direct aux modèles les plus puissants — sans intermédiaire, sans limite imposée.
+            <motion.p variants={fadeUp} custom={2} className="text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed">
+              Vos propres clés API pour un accès direct — sans intermédiaire, sans limite imposée.
             </motion.p>
           </motion.div>
 
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {techStack.map((tech, i) => (
               <motion.div key={i} variants={fadeUp} custom={i}>
-                <Card className="h-full border hover:border-primary/30 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center">
-                  <CardContent className="pt-8 pb-6">
-                    <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${tech.color} flex items-center justify-center mx-auto mb-4 shadow-lg`}>
-                      <tech.icon className="w-7 h-7 text-white" />
+                <Card className="h-full border hover:border-primary/30 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 hover:-translate-y-2 text-center group bg-card/80 backdrop-blur-sm">
+                  <CardContent className="pt-10 pb-8">
+                    <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${tech.color} flex items-center justify-center mx-auto mb-5 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                      <tech.icon className="w-8 h-8 text-white" />
                     </div>
                     <h3 className="font-bold text-lg mb-2">{tech.name}</h3>
-                    <p className="text-sm text-muted-foreground">{tech.desc}</p>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{tech.desc}</p>
                   </CardContent>
                 </Card>
               </motion.div>
             ))}
           </motion.div>
 
-          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mt-8 text-center">
-            <div className="inline-flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl px-6 py-3 text-sm">
-              <ShieldCheck className="w-4 h-4 text-emerald-500" />
-              <span className="text-emerald-600 dark:text-emerald-400 font-medium">
-                BYOK (Bring Your Own Key) — Vos clés API, votre contrôle total, coût moyen ~0,30€/ebook
+          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mt-10 text-center">
+            <div className="inline-flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl px-8 py-4 text-sm shadow-sm">
+              <ShieldCheck className="w-5 h-5 text-emerald-500" />
+              <span className="text-emerald-600 dark:text-emerald-400 font-semibold">
+                BYOK (Bring Your Own Key) — Vos clés API, votre contrôle total, ~0,30€/ebook
               </span>
             </div>
           </motion.div>
