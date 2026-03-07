@@ -151,9 +151,31 @@ const NORMAL_PRICE = 247;
 const PROMO_DISCOUNT = 50;
 const FUTURE_PRICE = NORMAL_PRICE - PROMO_DISCOUNT; // 197€
 
+const LAUNCH_END = new Date('2026-06-30T23:59:59').getTime();
+
+const useCountdown = (targetDate: number) => {
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+  useEffect(() => {
+    const tick = () => {
+      const diff = Math.max(0, targetDate - Date.now());
+      setTimeLeft({
+        days: Math.floor(diff / 86400000),
+        hours: Math.floor((diff % 86400000) / 3600000),
+        minutes: Math.floor((diff % 3600000) / 60000),
+        seconds: Math.floor((diff % 60000) / 1000),
+      });
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [targetDate]);
+  return timeLeft;
+};
+
 const SalesPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const countdown = useCountdown(LAUNCH_END);
 
   // Capture referral code from URL
   useEffect(() => {
