@@ -900,34 +900,84 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
     toast.success('Table des matières copiée !');
   };
 
-  const resetPlan = () => {
-    if (!confirm('⚠️ RÉINITIALISATION COMPLÈTE\n\nCette action va effacer :\n• Le titre et l\'auteur\n• Tous les chapitres\n• Tous les personnages\n• La préface et conclusion\n• Toutes les images\n\nVoulez-vous vraiment tout supprimer et repartir de zéro ?')) {
-      return;
-    }
-    
+  const clearCurrentEditorState = () => {
     // Réinitialiser TOUS les états (y compris bookDescription et genre)
-    setEbookTitle(''); setAuthorName(''); setPreface(''); setConclusion(''); setEpilogue('');
-    setChapters([]); setNumberOfChapters(8); setSelectedChapters([]);
-    setImportText(''); setEbookImages([]); setTargetAudience('Adultes');
-    setTomeNumber(null); setWritingStyle('narratif'); setChapterLength('moyen');
-    setDetailLevel('détaillé'); setTone('professionnel');
-    setNarrativeFormat('troisième personne'); setCharacters([]);
-    setBookSummary(''); setCoverConcepts(''); setSeoOptimization('');
-    setKdpDescription(''); setKdpKeywords(''); setKdpCategories('');
-    setBookDescription(''); setGenre(''); // ← AJOUT: reset description et genre
-    
-    // IMPORTANT: Réinitialiser l'ID du projet pour créer un nouveau projet lors de la prochaine sauvegarde
+    setEbookTitle('');
+    setAuthorName('');
+    setPreface('');
+    setConclusion('');
+    setEpilogue('');
+    setChapters([]);
+    setNumberOfChapters(8);
+    setSelectedChapters([]);
+    setImportText('');
+    setEbookImages([]);
+    setTargetAudience('Adultes');
+    setTomeNumber(null);
+    setWritingStyle('narratif');
+    setChapterLength('moyen');
+    setDetailLevel('détaillé');
+    setTone('professionnel');
+    setNarrativeFormat('troisième personne');
+    setCharacters([]);
+    setBookSummary('');
+    setCoverConcepts('');
+    setSeoOptimization('');
+    setKdpDescription('');
+    setKdpKeywords('');
+    setKdpCategories('');
+    setBookDescription('');
+    setGenre('');
+
+    // IMPORTANT: Réinitialiser l'ID du projet pour forcer la création d'un nouveau projet
     setCurrentProjectId(null);
-    
-    // Rediriger vers l'onglet planificateur
-    setActiveTab('planner');
-    
+
     try {
       localStorage.removeItem(STORAGE_KEY);
     } catch (error) {
       console.error('Erreur localStorage:', error);
     }
-    
+
+    setActiveTab('planner');
+  };
+
+  const handleCreateNewProject = () => {
+    const hasExistingContent = Boolean(
+      ebookTitle.trim() ||
+      authorName.trim() ||
+      preface.trim() ||
+      conclusion.trim() ||
+      chapters.length > 0 ||
+      characters.length > 0 ||
+      ebookImages.length > 0 ||
+      bookSummary.trim() ||
+      coverConcepts.trim() ||
+      seoOptimization.trim() ||
+      kdpDescription.trim() ||
+      kdpKeywords.trim() ||
+      kdpCategories.trim() ||
+      bookDescription.trim() ||
+      genre.trim()
+    );
+
+    if (hasExistingContent) {
+      const confirmed = confirm(
+        'Créer un nouveau projet ?\n\nLe projet actuellement affiché sera réinitialisé dans l’éditeur, mais restera sauvegardé dans la base si vous l’avez déjà enregistré.'
+      );
+      if (!confirmed) return;
+    }
+
+    clearCurrentEditorState();
+    toast.success('Nouveau projet prêt : aucune sauvegarde existante ne sera écrasée.');
+  };
+
+  const resetPlan = () => {
+    if (!confirm('⚠️ RÉINITIALISATION COMPLÈTE\n\nCette action va effacer :\n• Le titre et l\'auteur\n• Tous les chapitres\n• Tous les personnages\n• La préface et conclusion\n• Toutes les images\n\nVoulez-vous vraiment tout supprimer et repartir de zéro ?')) {
+      return;
+    }
+
+    clearCurrentEditorState();
+
     toast.success('🧹 Projet réinitialisé !', {
       description: 'Toutes les données ont été effacées. Vous repartez de zéro.',
       duration: 4000,
@@ -991,7 +1041,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
         return (
           <EbookProjectsList 
             onProjectLoad={handleProjectLoad}
-            onCreateNew={() => setActiveTab('planner')}
+            onCreateNew={handleCreateNewProject}
             currentProject={{ title: ebookTitle, hasContent: chapters.length > 0 || preface.length > 0 || conclusion.length > 0 }}
           />
         );
