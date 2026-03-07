@@ -2613,63 +2613,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           </div>
         );
       
-      case 'complete-workflow':
-        // Bloquer en mode démo
-        if (isDemo) {
-          return (
-            <div className="flex flex-col items-center justify-center py-20 space-y-6">
-              <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center">
-                <Rocket className="w-10 h-10 text-primary" />
-              </div>
-              <h2 className="text-2xl font-bold text-center">⚡ Générer le livre complet</h2>
-              <p className="text-muted-foreground text-center max-w-md">
-                La génération complète (P1→P14) est disponible avec l'accès complet.
-              </p>
-              <Button
-                className="bg-gradient-to-r from-primary to-primary/80"
-                onClick={() => setShowPaywall('chapters')}
-              >
-                <Sparkles className="w-4 h-4 mr-2" />
-                Débloquer pour 97€
-              </Button>
-            </div>
-          );
-        }
-
-        return (
-          <EbookCompleteWorkflow
-            characters={characters}
-            onComplete={(bookData) => {
-              // Appliquer le résultat au projet courant
-              if (bookData?.title) setEbookTitle(bookData.title);
-              if (bookData?.authorName) setAuthorName(bookData.authorName);
-              if (typeof bookData?.bookDescription === 'string' && bookData.bookDescription.trim()) {
-                setBookDescription(bookData.bookDescription);
-              }
-              if (typeof bookData?.preface === 'string') setPreface(bookData.preface);
-              if (typeof bookData?.conclusion === 'string') setConclusion(bookData.conclusion);
-
-              const generatedChapters: Chapter[] = Array.isArray(bookData?.chapters)
-                ? bookData.chapters.map((ch: any, index: number) => ({
-                    id: `cw-${Date.now()}-${index}`,
-                    // Nettoyer le titre et le contenu pour supprimer les artefacts d'échappement JSON
-                    title: cleanGeneratedText(ch?.title) || `Chapitre ${index + 1}`,
-                    content: cleanGeneratedText(ch?.content) || '',
-                    subChapters: [],
-                  }))
-                : [];
-
-              if (generatedChapters.length > 0) {
-                setChapters(generatedChapters);
-                setActiveTab('writing');
-                fireStars();
-                toast.success(`✅ ${generatedChapters.length} chapitres importés dans l'onglet Rédaction`);
-              } else {
-                toast.error("La génération s'est terminée, mais aucun chapitre n'a été renvoyé.");
-              }
-            }}
-          />
-        );
+      
       
       case 'plagiarism-validator':
         return (
