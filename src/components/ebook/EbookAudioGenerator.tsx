@@ -484,7 +484,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
     toast.success('Formation exportée en PDF !');
   };
 
-  // Generate MP3 for a single section via ElevenLabs
+  // Generate MP3 for a single section via Azure Speech (with ElevenLabs fallback)
   const generateSectionMp3 = async (text: string): Promise<Blob | null> => {
     const { data: sessionData } = await supabase.auth.getSession();
     const token = sessionData?.session?.access_token;
@@ -502,19 +502,43 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
     }
 
     const audioBlobs: Blob[] = [];
+    
     for (const chunk of chunks) {
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ text: chunk }),
-        }
-      );
+      let response: Response;
+      
+      if (useAzureForExport) {
+        // Use Azure Speech TTS
+        response = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/azure-speech-tts`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ 
+              text: chunk,
+              niche: selectedNiche,
+              voiceName: selectedAzureVoice || undefined,
+            }),
+          }
+        );
+      } else {
+        // Fallback to ElevenLabs
+        response = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ text: chunk }),
+          }
+        );
+      }
 
       if (!response.ok) {
         const err = await response.json().catch(() => ({ error: 'Erreur inconnue' }));
@@ -527,6 +551,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
       audioBlobs.push(await audioResponse.blob());
     }
 
+    // Concatenate all blobs into a single MP3 file
     return new Blob(audioBlobs, { type: 'audio/mpeg' });
   };
 
