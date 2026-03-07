@@ -246,31 +246,36 @@ const SalesPage = () => {
         </span>
       </a>
 
-      {/* ═══ COMPTEUR DE LANCEMENT ═══ */}
-      <div className="w-full bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 text-white py-3 px-4">
-        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6">
-          <div className="flex items-center gap-2 text-sm font-semibold">
-            <Clock className="w-4 h-4 animate-pulse" />
-            <span>⏰ OFFRE DE LANCEMENT — Fin le 30 juin 2026</span>
+      {/* ═══ COMPTEUR DE LANCEMENT PREMIUM ═══ */}
+      <div className="w-full bg-gradient-to-r from-slate-900 via-violet-950 to-slate-900 text-white py-4 px-4 border-b border-violet-500/20">
+        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8">
+          <div className="flex items-center gap-2.5">
+            <div className="relative">
+              <div className="absolute inset-0 bg-amber-400/30 rounded-full blur-md animate-pulse" />
+              <Clock className="w-5 h-5 text-amber-400 relative z-10" />
+            </div>
+            <span className="text-sm font-bold tracking-wide uppercase text-amber-300">Offre de lancement — Fin le 30 juin 2026</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             {[
-              { value: countdown.days, label: 'J' },
-              { value: countdown.hours, label: 'H' },
-              { value: countdown.minutes, label: 'M' },
-              { value: countdown.seconds, label: 'S' },
+              { value: countdown.days, label: 'Jours' },
+              { value: countdown.hours, label: 'Heures' },
+              { value: countdown.minutes, label: 'Min' },
+              { value: countdown.seconds, label: 'Sec' },
             ].map((unit, i) => (
-              <div key={i} className="flex items-center gap-1">
-                <span className="bg-white/20 backdrop-blur-sm rounded-lg px-2.5 py-1 text-lg font-bold tabular-nums min-w-[2.5rem] text-center">
-                  {unit.value.toString().padStart(2, '0')}
-                </span>
-                <span className="text-xs text-white/70 font-medium">{unit.label}</span>
-                {i < 3 && <span className="text-white/40 mx-0.5">:</span>}
+              <div key={i} className="flex items-center gap-1.5">
+                <div className="flex flex-col items-center">
+                  <span className="bg-gradient-to-b from-white/15 to-white/5 backdrop-blur-sm border border-white/10 rounded-xl px-3 py-1.5 text-xl font-extrabold tabular-nums min-w-[3rem] text-center shadow-inner">
+                    {unit.value.toString().padStart(2, '0')}
+                  </span>
+                  <span className="text-[10px] text-white/50 font-medium mt-1 uppercase tracking-wider">{unit.label}</span>
+                </div>
+                {i < 3 && <span className="text-white/20 text-xl font-light mb-4">:</span>}
               </div>
             ))}
           </div>
-          <Badge className="bg-white/20 text-white border-white/30 text-xs">
-            97€ au lieu de 247€
+          <Badge className="bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-300 border-amber-500/30 text-xs font-bold px-3 py-1">
+            −{NORMAL_PRICE - LAUNCH_PRICE}€
           </Badge>
         </div>
       </div>
