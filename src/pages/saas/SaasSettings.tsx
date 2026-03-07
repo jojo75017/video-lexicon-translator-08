@@ -11,7 +11,6 @@ import {
   EyeOff,
   Trash2,
   AlertTriangle,
-  } from 'lucide-react';
 } from 'lucide-react';
 import { OpenAIConfigPanel } from '@/components/shared/OpenAIConfigPanel';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
