@@ -623,9 +623,56 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
   const VoiceConfig = ({ compact = false }: { compact?: boolean }) => (
     <Card className="bg-muted/30">
       <CardContent className="pt-4 space-y-4">
+        {/* Azure Voice by Niche */}
+        <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+          <Label className="text-sm font-semibold flex items-center gap-2 mb-2">
+            <Mic2 className="h-4 w-4 text-emerald-500" />
+            Voix Azure Neural (Export MP3)
+          </Label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <Label className="text-xs">Thématique / Niche</Label>
+              <Select value={selectedNiche} onValueChange={(val) => {
+                setSelectedNiche(val);
+                const preset = AZURE_VOICE_PRESETS.find(p => p.id === val);
+                if (preset) setSelectedAzureVoice(preset.voice);
+              }}>
+                <SelectTrigger className="mt-1">
+                  <SelectValue placeholder="Choisir une thématique" />
+                </SelectTrigger>
+                <SelectContent>
+                  {AZURE_VOICE_PRESETS.map(preset => (
+                    <SelectItem key={preset.id} value={preset.id}>
+                      <span>{preset.label}</span>
+                      <span className="text-xs text-muted-foreground ml-1">— {preset.description}</span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-xs">Voix manuelle (optionnel)</Label>
+              <Select value={selectedAzureVoice} onValueChange={setSelectedAzureVoice}>
+                <SelectTrigger className="mt-1">
+                  <SelectValue placeholder="Auto (selon niche)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Auto (selon niche)</SelectItem>
+                  {AZURE_VOICES_LIST.map(v => (
+                    <SelectItem key={v.id} value={v.id}>
+                      {v.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </div>
+
+        {/* Web Speech controls for preview */}
         <div className={`grid grid-cols-1 ${compact ? 'md:grid-cols-2' : 'md:grid-cols-4'} gap-4`}>
           <div>
-            <Label>Voix</Label>
+            <Label className="text-xs">Voix navigateur (aperçu)</Label>
             <Select value={selectedVoice} onValueChange={setSelectedVoice}>
               <SelectTrigger className="mt-1">
                 <SelectValue placeholder="Sélectionner une voix" />
