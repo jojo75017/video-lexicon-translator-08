@@ -11,6 +11,13 @@ import {
   EyeOff,
   Trash2,
   AlertTriangle,
+  Headphones,
+  Cpu,
+  CheckCircle2,
+  Info,
+  ExternalLink,
+  Globe,
+  Mic,
 } from 'lucide-react';
 import { OpenAIConfigPanel } from '@/components/shared/OpenAIConfigPanel';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
