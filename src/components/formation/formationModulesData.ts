@@ -57,16 +57,16 @@ export const formationModules: FormationModule[] = [
 3. Accédez au tableau de bord principal
 
 ### 🔑 Configuration de votre Clé API OpenAI :
-L'outil utilise votre propre clé API OpenAI pour la génération.
-1. Créez un compte sur **platform.openai.com**
-2. Générez une clé API dans Settings → API Keys
-3. Ajoutez-la dans **Mon Compte → Paramètres**
-4. Coût estimé : **0,30€ à 0,80€ par ebook complet**
+L'outil utilise votre propre clé API Gemini 3 Flash (gratuite) pour la génération.
+1. Créez un compte sur **aistudio.google.com**
+2. Générez une clé API en cliquant sur "Get API Key"
+3. Ajoutez-la dans **Mon Compte → Paramètres → Clés API**
+4. Coût estimé : **0,20€ à 0,50€ par ebook complet**
 
-### 💰 Offre Fondateur (limitée) :
-- 🎯 **Offre Fondateur à 37€** — Accès à vie
-- ⏳ Offre valable **60 jours** après le lancement
-- 📈 Ensuite : Starter 47€ ou Pro 147€
+### 💰 Offre Pro Lifetime :
+- 🎯 **Accès Pro à 97€** — Accès à vie
+- ⏳ Prix de lancement limité
+- 📈 Ensuite : 197€ (réduction 50€ sur 247€)
 
 ### Nouveautés 2026 :
 - 🍳 Générateur de livres de recettes avec accords vins
@@ -356,9 +356,9 @@ Votre clé API personnelle vous permet de contrôler vos coûts.
 Vos projets sont sauvegardés en temps réel dans le cloud.
 
 ### Votre Abonnement :
-- 🎯 **Fondateur (37€)** : Accès à vie — Offre limitée 60 jours
-- 📦 **Starter (47€)** : Accès à vie — Toutes les fonctionnalités
-- 🚀 **Pro (147€)** : Accès à vie — Fonctionnalités premium + support VIP`
+- 🎯 **Pro Lifetime (97€)** : Accès à vie — Toutes les fonctionnalités
+- 📈 Après lancement : 197€ (réduction 50€ sur 247€)
+- 🚀 Mises à jour gratuites à vie + support inclus`
   },
   {
     id: 11,

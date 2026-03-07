@@ -42,7 +42,7 @@ const SeoGenerateurEbookPage: React.FC = () => {
 
   const comparisons = [
     { feature: "Temps de création", traditional: "3-6 mois", ebookiapro: "24-48 heures" },
-    { feature: "Coût ghostwriter", traditional: "2000-5000€", ebookiapro: "37€ (à vie)" },
+    { feature: "Coût ghostwriter", traditional: "2000-5000€", ebookiapro: "97€ (à vie)" },
     { feature: "Couverture pro", traditional: "150-500€", ebookiapro: "Inclus" },
     { feature: "Optimisation KDP", traditional: "Formation 300€+", ebookiapro: "Automatique" },
     { feature: "Corrections & relecture", traditional: "500-1500€", ebookiapro: "IA intégrée" },
@@ -61,7 +61,7 @@ const SeoGenerateurEbookPage: React.FC = () => {
     },
     {
       question: "Le générateur est-il vraiment gratuit ?",
-      answer: "EbookStudio Pro propose un essai gratuit avec 3 plans d'ebooks. L'accès complet à vie est ensuite à 37€, incluant toutes les fonctionnalités et mises à jour futures."
+      answer: "EbookStudio Pro propose un essai gratuit avec 3 plans d'ebooks. L'accès complet à vie est ensuite à 97€, incluant toutes les fonctionnalités et mises à jour futures."
     },
     {
       question: "Les ebooks générés sont-ils uniques ?",
@@ -323,7 +323,7 @@ const SeoGenerateurEbookPage: React.FC = () => {
             Essayez le meilleur générateur d'ebook IA
           </h2>
           <p className="text-xl opacity-90 mb-8">
-            3 plans gratuits pour tester • Accès complet à 37€ à vie
+            3 plans gratuits pour tester • Accès complet à 97€ à vie
           </p>
           
           <Button 

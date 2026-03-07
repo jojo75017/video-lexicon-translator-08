@@ -64,8 +64,8 @@ export const DemoPaywall: React.FC<DemoPaywallProps> = ({ feature, onClose }) =>
           <div className="space-y-3">
             <h4 className="font-medium text-center">Débloquez tout pour seulement</h4>
             <div className="text-center">
-              <span className="text-4xl font-bold text-primary">37€</span>
-              <span className="text-muted-foreground ml-2 line-through">147€</span>
+              <span className="text-4xl font-bold text-primary">97€</span>
+              <span className="text-muted-foreground ml-2 line-through">247€</span>
               <p className="text-sm text-muted-foreground mt-1">Accès à vie • Paiement unique</p>
             </div>
           </div>

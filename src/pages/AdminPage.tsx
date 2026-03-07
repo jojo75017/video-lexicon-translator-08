@@ -395,7 +395,7 @@ export const AdminPage = () => {
                 onChange={(e) => setPlanType(e.target.value)}
                 disabled={isLoading}
               >
-                <option value="lifetime">🌟 Lifetime - 37€ (Accès à vie)</option>
+                <option value="lifetime">🌟 Lifetime - 97€ (Accès à vie)</option>
                 <option value="starter">Starter - 27€/mois</option>
                 <option value="pro">Pro - 67€/mois</option>
                 <option value="enterprise">Enterprise</option>
@@ -800,7 +800,7 @@ export const AdminPage = () => {
           </div>
           
           <p className="text-sm text-muted-foreground mt-4">
-            💡 <strong>Lors d'un achat (37€) :</strong> Ajoutez l'abonné ci-dessus, puis cliquez sur "Envoyer" pour lui envoyer son code par email automatiquement.
+            💡 <strong>Lors d'un achat (97€) :</strong> Ajoutez l'abonné ci-dessus, puis cliquez sur "Envoyer" pour lui envoyer son code par email automatiquement.
           </p>
         </Card>
 

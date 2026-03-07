@@ -301,7 +301,7 @@ const SeoCreerEbookIaPage: React.FC = () => {
             onClick={() => navigate('/offres')}
           >
             <Sparkles className="w-5 h-5 mr-2" />
-            Commencer maintenant - 37€ à vie
+            Commencer maintenant - 97€ à vie
             <ArrowRight className="w-5 h-5 ml-2" />
           </Button>
 

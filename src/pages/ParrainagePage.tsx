@@ -229,14 +229,13 @@ const ParrainagePage = () => {
               <h4 className="font-semibold text-center">Barème des commissions</h4>
               <div className="grid md:grid-cols-2 gap-3">
                 <div className="p-4 bg-muted/50 rounded-lg">
-                  <p className="font-semibold">Offre Fondateur (37€)</p>
+                  <p className="font-semibold">Offre Pro Lifetime (97€)</p>
                   <ul className="text-sm text-muted-foreground mt-2 space-y-1">
-                    <li>• Filleuls 1 à 5 : <strong>5%</strong> = 1.85€/vente</li>
-                    <li>• Filleuls 6 à 25 : <strong>10€</strong>/vente</li>
+                    <li>• <strong>30€</strong> par vente (tous paliers)</li>
                   </ul>
                 </div>
                 <div className="p-4 bg-muted/50 rounded-lg">
-                  <p className="font-semibold">Offre Pro Lifetime (147€)</p>
+                  <p className="font-semibold">Offre après lancement (197€)</p>
                   <ul className="text-sm text-muted-foreground mt-2 space-y-1">
                     <li>• <strong>30€</strong> par vente (tous paliers)</li>
                   </ul>
