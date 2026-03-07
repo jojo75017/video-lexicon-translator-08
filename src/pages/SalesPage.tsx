@@ -1,19 +1,17 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { trackEvent, trackDemoClick, trackCTAClick, trackNewsletterSignup, trackPlanSelect, trackBeginCheckout, trackPricingView, trackZoomBooking, trackOffresClick } from "@/utils/analytics";
+import { trackEvent, trackCTAClick, trackNewsletterSignup, trackPlanSelect, trackBeginCheckout, trackDemoClick, trackOffresClick } from "@/utils/analytics";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, Sparkles, BookOpen, Zap, Download, Star, ArrowRight, Play, Loader2, Clock, HelpCircle, CheckCircle, Calculator, Gift, Mail, Send, Rocket, ShieldCheck, Crown, BarChart3, Landmark, PenTool, RefreshCw, BadgeCheck, Package, Search, Brain, Link2, Eye, RotateCcw, Palette, Trophy, Shield } from "lucide-react";
+import { Check, Sparkles, BookOpen, Zap, Star, ArrowRight, Play, Loader2, Clock, HelpCircle, CheckCircle, Gift, Send, Rocket, ShieldCheck, Crown, BarChart3, Landmark, PenTool, BadgeCheck, Package, Search, Brain, Link2, Eye, RotateCcw, Palette, Trophy, Shield, Cpu, Mic, Image, Globe, Headphones } from "lucide-react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import ExitIntentPopup from "@/components/sales/ExitIntentPopup";
 import SocialProofBanner from "@/components/sales/SocialProofBanner";
 import SalesFaq from "@/components/sales/SalesFaq";
-import { useVipAvailability } from "@/hooks/useVipAvailability";
 import AuthorShowcase from "@/components/sales/AuthorShowcase";
 import PassiveRevenueProof from "@/components/sales/PassiveRevenueProof";
 
@@ -141,24 +139,27 @@ const testimonials = [
   { name: "Nicolas F.", role: "Blogueur Pro — Revenus passifs", text: "De 0€ à 850€/mois de revenus passifs KDP en 6 mois. Le secret : le workflow qui structure tout. Je ne reviendrais jamais en arrière.", avatar: "NF", color: "from-cyan-500 to-blue-500" },
 ];
 
+const techStack = [
+  { icon: Cpu, name: "Gemini 2.5 Pro", desc: "Rédaction IA de pointe, contexte 1M tokens", color: "from-blue-500 to-cyan-500" },
+  { icon: Image, name: "Imagen 3", desc: "Couvertures photoréalistes professionnelles", color: "from-violet-500 to-purple-500" },
+  { icon: Headphones, name: "Azure Neural Voices", desc: "Audiobooks avec voix neuronales premium", color: "from-emerald-500 to-teal-500" },
+  { icon: Globe, name: "Multi-langues", desc: "Traduction et rédaction dans 30+ langues", color: "from-amber-500 to-orange-500" },
+];
+
+const LAUNCH_PRICE = 97;
+const NORMAL_PRICE = 247;
+const PROMO_DISCOUNT = 50;
+const FUTURE_PRICE = NORMAL_PRICE - PROMO_DISCOUNT; // 197€
+
 const SalesPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [showEmailDialog, setShowEmailDialog] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
-  const [email, setEmail] = useState("");
-  const emailInputRef = useRef<HTMLInputElement | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-  const { isVipAvailable, daysRemaining, isLoading: vipLoading } = useVipAvailability();
 
   // Capture referral code from URL
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const ref = params.get('ref');
-    if (ref) {
-      sessionStorage.setItem('referral_code', ref);
-    }
+    if (ref) sessionStorage.setItem('referral_code', ref);
   }, [location.search]);
 
   useEffect(() => {
@@ -175,49 +176,10 @@ const SalesPage = () => {
   }, [location.hash]);
 
   useEffect(() => {
-    document.title = "Publiez votre premier ebook sur Amazon KDP en 1 heure — EbookStudio Pro | 37€";
+    document.title = "EbookStudio Pro — Workflow IA Premium pour Amazon KDP | 97€ à vie";
     const meta = document.querySelector('meta[name="description"]');
-    if (meta) meta.setAttribute("content", "Créez et publiez un ebook rentable sur Amazon KDP en moins d'1 heure grâce au workflow IA en 14 rôles. +35 ebooks publiés. Accès à vie 37€. Garantie 30 jours.");
+    if (meta) meta.setAttribute("content", "Créez des ebooks haut de gamme avec Gemini 2.5 Pro, Imagen 3 et Azure Neural Voices. Workflow éditorial 15 rôles IA. Accès à vie 97€. Garantie 30 jours.");
   }, []);
-
-  const OFFER_END_DATE = new Date('2026-06-30T23:59:59+02:00');
-
-  useEffect(() => {
-    const update = () => {
-      const diff = OFFER_END_DATE.getTime() - Date.now();
-      if (diff > 0) {
-        setCountdown({
-          days: Math.floor(diff / 86400000),
-          hours: Math.floor((diff % 86400000) / 3600000),
-          minutes: Math.floor((diff % 3600000) / 60000),
-          seconds: Math.floor((diff % 60000) / 1000)
-        });
-      }
-    };
-    update();
-    const i = setInterval(update, 1000);
-    return () => clearInterval(i);
-  }, []);
-
-  const handlePlanClick = () => {
-    const planName = isVipAvailable ? 'fondateur' : 'pro';
-    const planPrice = isVipAvailable ? 37 : 147;
-    trackPlanSelect(planName, planPrice);
-    trackCTAClick('plan_click', isVipAvailable ? '/paiement-manuel' : '/upsell-paiement');
-    if (isVipAvailable) navigate('/paiement-manuel');
-    else navigate('/upsell-paiement?plan=pro');
-  };
-
-  const handleCheckout = () => {
-    if (!email || !email.includes("@")) { toast.error("Email invalide"); return; }
-    if (!selectedPlan) { toast.error("Sélectionnez un plan"); return; }
-    trackBeginCheckout(selectedPlan, selectedPlan === 'fondateur' ? 37 : 147);
-    sessionStorage.setItem('payment_email', email.trim().toLowerCase());
-    navigate(`/upsell-paiement?plan=${selectedPlan}`);
-  };
-
-  const price = isVipAvailable ? '37' : '147';
-  const daysLeft = daysRemaining ?? 0;
 
   // JSON-LD structured data
   useEffect(() => {
@@ -232,13 +194,23 @@ const SalesPage = () => {
       "name": "EbookStudio Pro",
       "applicationCategory": "ProductivityApplication",
       "operatingSystem": "Web",
-      "offers": { "@type": "Offer", "price": price, "priceCurrency": "EUR", "availability": "https://schema.org/InStock", "priceValidUntil": "2026-06-30" },
+      "offers": { "@type": "Offer", "price": LAUNCH_PRICE, "priceCurrency": "EUR", "availability": "https://schema.org/InStock" },
       "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.8", "reviewCount": "47" },
-      "description": "Workflow éditorial IA en 14 rôles pour créer et publier des ebooks sur Amazon KDP."
+      "description": "Workflow éditorial IA premium avec Gemini 2.5 Pro pour créer et publier des ebooks sur Amazon KDP."
     });
     document.head.appendChild(script);
     return () => { const ld = document.querySelector('script[data-ld="sales"]'); if (ld) ld.remove(); };
-  }, [price]);
+  }, []);
+
+  const handlePlanClick = () => {
+    trackPlanSelect('pro', LAUNCH_PRICE);
+    trackCTAClick('plan_click', '/upsell-paiement');
+    navigate('/upsell-paiement?plan=pro');
+  };
+
+  const scrollToPricing = () => {
+    document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -269,47 +241,64 @@ const SalesPage = () => {
             <Link to="/faq" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"><HelpCircle className="w-3.5 h-3.5" />FAQ</Link>
           </nav>
           <Button size="sm" className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-lg shadow-violet-500/20"
-            onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}>
-            {isVipAvailable ? `Fondateur — ${daysLeft}j` : 'Voir l\'offre'}
+            onClick={scrollToPricing}>
+            Offre de lancement
           </Button>
         </div>
       </header>
 
       {/* ═══════════════════════════════════════ HERO ═══════════════════════════════════════ */}
-      <section className="relative overflow-hidden pt-6 sm:pt-10 pb-12 sm:pb-20 px-4">
-        {/* Gradient orbs */}
+      <section className="relative overflow-hidden pt-8 sm:pt-14 pb-14 sm:pb-24 px-4">
         <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-violet-500/10 rounded-full blur-[120px] pointer-events-none" />
         <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-purple-500/10 rounded-full blur-[100px] pointer-events-none" />
 
         <motion.div initial="hidden" animate="visible" variants={stagger} className="max-w-4xl mx-auto text-center relative z-10">
 
-          <motion.h1 variants={fadeUp} custom={1} className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.1] tracking-tight mb-2 sm:mb-3">
-            Votre premier ebook publié sur Amazon{" "}
+          <motion.div variants={fadeUp} custom={0.5} className="mb-5">
+            <Badge className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 px-4 py-2 text-sm font-bold">
+              <Sparkles className="w-4 h-4 mr-2" />
+              OFFRE DE LANCEMENT — 97€ au lieu de 247€
+            </Badge>
+          </motion.div>
+
+          <motion.h1 variants={fadeUp} custom={1} className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.1] tracking-tight mb-4">
+            Créez des ebooks{" "}
             <span className="bg-gradient-to-r from-violet-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-              en moins d'1 heure
-            </span>
+              haut de gamme
+            </span>{" "}
+            avec l'IA la plus puissante
           </motion.h1>
 
-          <motion.p variants={fadeUp} custom={1.5} className="text-lg sm:text-xl md:text-2xl text-muted-foreground mb-2 sm:mb-3">
-            Sans écrire une seule ligne. Sans compétence technique.
+          <motion.p variants={fadeUp} custom={1.5} className="text-lg sm:text-xl md:text-2xl text-muted-foreground mb-3">
+            Gemini 2.5 Pro • Imagen 3 • Azure Neural Voices
           </motion.p>
-          <motion.p variants={fadeUp} custom={1.6} className="text-base sm:text-lg text-muted-foreground mb-6 sm:mb-8 font-medium">
-            Le workflow IA qui a déjà généré <span className="text-foreground font-bold">+35 ebooks publiés</span> sur Amazon KDP.
+          <motion.p variants={fadeUp} custom={1.6} className="text-base sm:text-lg text-muted-foreground mb-8 font-medium">
+            Le workflow IA en 15 rôles qui a déjà généré <span className="text-foreground font-bold">+35 ebooks publiés</span> sur Amazon KDP.
           </motion.p>
 
-          <motion.div variants={fadeUp} custom={2} className="flex flex-col sm:flex-row gap-3 sm:gap-6 justify-center text-left mb-6 sm:mb-8 max-w-xl mx-auto">
-            <div className="flex items-center gap-2 text-base sm:text-lg text-foreground font-medium">
-              <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" />
-              <span>Trouvez une niche rentable</span>
-            </div>
-            <div className="flex items-center gap-2 text-base sm:text-lg text-foreground font-medium">
-              <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" />
-              <span>Générez votre ebook complet</span>
-            </div>
-            <div className="flex items-center gap-2 text-base sm:text-lg text-foreground font-medium">
-              <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" />
-              <span>Publiez sur Amazon KDP</span>
-            </div>
+          {/* Tech stack badges */}
+          <motion.div variants={fadeUp} custom={1.8} className="flex flex-wrap justify-center gap-3 mb-8">
+            {techStack.map((tech, i) => (
+              <div key={i} className="flex items-center gap-2 bg-card border border-border rounded-full px-4 py-2 text-sm">
+                <div className={`w-6 h-6 rounded-full bg-gradient-to-br ${tech.color} flex items-center justify-center`}>
+                  <tech.icon className="w-3.5 h-3.5 text-white" />
+                </div>
+                <span className="font-medium">{tech.name}</span>
+              </div>
+            ))}
+          </motion.div>
+
+          <motion.div variants={fadeUp} custom={2} className="flex flex-col sm:flex-row gap-3 sm:gap-6 justify-center text-left mb-8 max-w-xl mx-auto">
+            {[
+              "Trouvez une niche rentable",
+              "Générez votre ebook complet",
+              "Publiez sur Amazon KDP",
+            ].map((text, i) => (
+              <div key={i} className="flex items-center gap-2 text-base sm:text-lg text-foreground font-medium">
+                <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" />
+                <span>{text}</span>
+              </div>
+            ))}
           </motion.div>
 
           <motion.div variants={fadeUp} custom={2.05} className="flex flex-wrap items-center justify-center gap-4 mb-4">
@@ -327,24 +316,20 @@ const SalesPage = () => {
             </div>
           </motion.div>
 
-          <motion.p variants={fadeUp} custom={2.1} className="text-sm text-muted-foreground mb-5 sm:mb-6">
-            ✅ +35 ebooks publiés en conditions réelles sur Amazon KDP.
-          </motion.p>
-
-          <motion.div variants={fadeUp} custom={2.2} className="flex flex-col items-center gap-2 mb-8 sm:mb-10">
-            <p className="text-sm text-muted-foreground italic max-w-md text-center">
-              🎓 Vous avez vu la formation ? Alors passez à l'action — cette offre ne durera pas éternellement.
-            </p>
-            <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg px-8 sm:px-10 py-7 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-2xl shadow-violet-500/30 hover:shadow-violet-500/50 transition-all duration-300 hover:-translate-y-0.5 animate-pulse hover:animate-none hover:scale-[1.02]"
-              onClick={() => { trackCTAClick('hero_cta_top', '#pricing'); document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' }); }}>
+          <motion.div variants={fadeUp} custom={2.2} className="flex flex-col items-center gap-3 mb-8">
+            <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg px-8 sm:px-10 py-7 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-2xl shadow-violet-500/30 hover:shadow-violet-500/50 transition-all duration-300 hover:-translate-y-0.5 hover:scale-[1.02]"
+              onClick={() => { trackCTAClick('hero_cta_top', '#pricing'); scrollToPricing(); }}>
               <Rocket className="w-5 h-5 mr-2" />
-              🔥 Profiter de l'offre à {price}€ avant qu'elle disparaisse
+              🔥 Offre de lancement — 97€ au lieu de 247€
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
+            <p className="text-sm text-muted-foreground">
+              ✅ +35 ebooks publiés • Coût moyen par ebook : 0,30€ • Temps moyen : 45 minutes
+            </p>
           </motion.div>
 
-          {/* Vidéo démo complète */}
-          <motion.div variants={fadeUp} custom={2.5} className="mb-6 sm:mb-8 max-w-3xl mx-auto">
+          {/* Vidéo démo */}
+          <motion.div variants={fadeUp} custom={2.5} className="mb-6 max-w-3xl mx-auto">
             <h2 className="text-lg sm:text-xl font-bold text-foreground mb-3">
               🎬 Démo réelle — création d'un ebook complet
             </h2>
@@ -358,51 +343,74 @@ const SalesPage = () => {
                 loading="lazy"
               />
             </div>
-            <p className="text-sm text-muted-foreground mt-3">
-              👉 Voir le workflow complet ci-dessous
-            </p>
           </motion.div>
 
-          <motion.div variants={fadeUp} custom={3} className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-3 sm:mb-4">
-            <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg px-8 sm:px-10 py-6 sm:py-7 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-xl shadow-violet-500/25 hover:shadow-2xl hover:shadow-violet-500/30 transition-all duration-300 hover:-translate-y-0.5"
+          <motion.div variants={fadeUp} custom={3} className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg px-8 py-6 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-xl shadow-violet-500/25 transition-all duration-300 hover:-translate-y-0.5"
               onClick={() => { trackCTAClick('hero_cta_primary', '/paiement'); handlePlanClick(); }}>
               <Rocket className="w-5 h-5 mr-2" />
               👉 Créer mon premier ebook maintenant
             </Button>
-            <Button size="lg" variant="outline" className="w-full sm:w-auto text-sm sm:text-base px-6 sm:px-8 py-5 sm:py-6 border-2 border-border hover:border-primary/50 hover:bg-primary/5 transition-all duration-300"
-              onClick={() => { trackEvent('click_demo', { button_text: 'Voir la démonstration complète', page_path: '/offres' }); trackDemoClick("demo_hero"); navigate('/demo'); }}>
+            <Button size="lg" variant="outline" className="w-full sm:w-auto text-sm sm:text-base px-6 py-5 border-2 border-border hover:border-primary/50 hover:bg-primary/5 transition-all duration-300"
+              onClick={() => { trackDemoClick("demo_hero"); navigate('/demo'); }}>
               <Play className="w-5 h-5 mr-2" />
               Voir la démonstration complète
             </Button>
           </motion.div>
 
-          <motion.p variants={fadeUp} custom={3.5} className="text-sm text-muted-foreground mb-2">
-            +35 ebooks publiés • Coût moyen par ebook : 0,50€ • Temps moyen : 45 minutes
-          </motion.p>
-          <motion.p variants={fadeUp} custom={3.6} className="mb-1">
-            <a href="https://www.amazon.fr/Mr-Georges-Boubet/e/B0CGVLHNX7" target="_blank" rel="noopener noreferrer" className="text-sm sm:text-base font-medium text-muted-foreground hover:text-primary transition-colors">
+          <motion.p variants={fadeUp} custom={3.5} className="mt-4">
+            <a href="https://www.amazon.fr/Mr-Georges-Boubet/e/B0CGVLHNX7" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
               📚 Ebooks publiés en conditions réelles — voir ma page auteur Amazon
             </a>
           </motion.p>
         </motion.div>
       </section>
 
-      {/* Transition phrase */}
-      <div className="text-center py-4 px-4">
-        <p className="text-sm text-muted-foreground italic max-w-lg mx-auto">
-          ✨ Commencez par regarder la démo — puis voyez pourquoi l'offre fondateur se termine bientôt.
-        </p>
-      </div>
-
-      {/* ═══════════════════════════════════════ VIDÉO RAPPEL OFFRE ═══════════════════════════ */}
-      <section className="py-10 px-4">
-        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="max-w-xs mx-auto text-center">
-          <motion.p variants={fadeUp} className="text-sm font-semibold text-violet-400 mb-3">🎯 Rappel — Offre Fondateur à 37&nbsp;€</motion.p>
-          <motion.div variants={fadeUp} custom={1} className="rounded-xl overflow-hidden shadow-xl shadow-violet-500/10 border border-border bg-card aspect-[9/16]">
-            <video src="/videos/annonce-ebookstudio.mp4" controls playsInline preload="metadata" className="w-full h-full object-cover" title="Annonce offre fondateur EbookStudio 37€" />
+      {/* ═══════════════════════ TECHNOLOGIE PREMIUM ═══════════════════════ */}
+      <section className="py-14 px-4 bg-muted/30">
+        <div className="max-w-5xl mx-auto">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-10">
+            <motion.div variants={fadeUp}>
+              <Badge className="mb-4 bg-blue-500/10 text-blue-500 border-blue-500/20 px-4 py-2">
+                <Cpu className="w-4 h-4 mr-2" />
+                Technologie de pointe
+              </Badge>
+            </motion.div>
+            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-5xl font-extrabold mb-4">
+              Propulsé par les{" "}
+              <span className="bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">meilleurs modèles IA</span>{" "}
+              du marché
+            </motion.h2>
+            <motion.p variants={fadeUp} custom={2} className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              Vous utilisez vos propres clés API pour un accès direct aux modèles les plus puissants — sans intermédiaire, sans limite imposée.
+            </motion.p>
           </motion.div>
-          <motion.p variants={fadeUp} custom={2} className="text-xs text-muted-foreground mt-2">📣 Pourquoi profiter de l'offre fondateur maintenant</motion.p>
-        </motion.div>
+
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {techStack.map((tech, i) => (
+              <motion.div key={i} variants={fadeUp} custom={i}>
+                <Card className="h-full border hover:border-primary/30 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center">
+                  <CardContent className="pt-8 pb-6">
+                    <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${tech.color} flex items-center justify-center mx-auto mb-4 shadow-lg`}>
+                      <tech.icon className="w-7 h-7 text-white" />
+                    </div>
+                    <h3 className="font-bold text-lg mb-2">{tech.name}</h3>
+                    <p className="text-sm text-muted-foreground">{tech.desc}</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mt-8 text-center">
+            <div className="inline-flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl px-6 py-3 text-sm">
+              <ShieldCheck className="w-4 h-4 text-emerald-500" />
+              <span className="text-emerald-600 dark:text-emerald-400 font-medium">
+                BYOK (Bring Your Own Key) — Vos clés API, votre contrôle total, coût moyen ~0,30€/ebook
+              </span>
+            </div>
+          </motion.div>
+        </div>
       </section>
 
       {/* ═══════════════════════════════════════ MESSAGE MOTIVATION ═══════════════════════════ */}
@@ -422,7 +430,7 @@ const SalesPage = () => {
         </motion.div>
       </section>
 
-      {/* ═══════════════════════════════════════ TÉMOIGNAGES (moved up) ═══════════════════════ */}
+      {/* ═══════════════════════════════════════ TÉMOIGNAGES ═══════════════════════════════ */}
       <section className="py-14 px-4">
         <div className="max-w-6xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-10">
@@ -459,7 +467,6 @@ const SalesPage = () => {
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════ SOCIAL PROOF (moved up) ═══════════════════════ */}
       <SocialProofBanner />
 
       {/* ═══════════════════════════════════════ AVANT / APRÈS ═══════════════════════════════ */}
@@ -474,7 +481,6 @@ const SalesPage = () => {
 
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}
             className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            {/* AVANT */}
             <motion.div variants={fadeUp}>
               <Card className="h-full border-2 border-red-500/20 bg-red-500/5">
                 <CardContent className="pt-8 pb-8">
@@ -492,9 +498,9 @@ const SalesPage = () => {
                       { text: "2 à 6 mois pour écrire un seul ebook", icon: "⏳" },
                       { text: "0€ de revenus passifs", icon: "💸" },
                       { text: "Syndrome de la page blanche permanent", icon: "📝" },
-                      { text: "Aucune idée des mots-clés Amazon qui vendent", icon: "🔍" },
+                      { text: "Aucune idée des mots-clés Amazon", icon: "🔍" },
                       { text: "Mise en page amateur, refusée par KDP", icon: "❌" },
-                      { text: "Investissement freelance : 500€ à 5 000€", icon: "💰" },
+                      { text: "Freelance : 500€ à 5 000€ par ebook", icon: "💰" },
                     ].map((item, i) => (
                       <div key={i} className="flex items-start gap-3">
                         <span className="text-lg shrink-0 mt-0.5">{item.icon}</span>
@@ -506,7 +512,6 @@ const SalesPage = () => {
               </Card>
             </motion.div>
 
-            {/* APRÈS */}
             <motion.div variants={fadeUp} custom={1}>
               <Card className="h-full border-2 border-emerald-500/20 bg-emerald-500/5 relative overflow-hidden">
                 <div className="absolute top-3 right-3">
@@ -519,17 +524,17 @@ const SalesPage = () => {
                     </div>
                     <div>
                       <p className="text-xs font-bold text-emerald-500 uppercase tracking-wider">Après</p>
-                      <p className="font-bold text-lg">Avec EbookStudio</p>
+                      <p className="font-bold text-lg">Avec EbookStudio Pro</p>
                     </div>
                   </div>
                   <div className="space-y-4">
                     {[
                       { text: "Premier ebook publié en moins d'1 heure", icon: "⚡" },
                       { text: "Revenus passifs dès le premier mois", icon: "💰" },
-                      { text: "14 rôles IA qui écrivent pour vous", icon: "🤖" },
-                      { text: "Mots-clés Amazon optimisés automatiquement", icon: "🎯" },
-                      { text: "Export PDF/Word professionnel, prêt pour KDP", icon: "✅" },
-                      { text: "Investissement unique : 37€ à vie", icon: "🏆" },
+                      { text: "15 rôles IA qui écrivent pour vous", icon: "🤖" },
+                      { text: "Gemini 2.5 Pro — contexte 1M tokens", icon: "🧠" },
+                      { text: "Export PDF/Word/EPUB professionnel", icon: "✅" },
+                      { text: "Investissement unique : 97€ à vie", icon: "🏆" },
                     ].map((item, i) => (
                       <div key={i} className="flex items-start gap-3">
                         <span className="text-lg shrink-0 mt-0.5">{item.icon}</span>
@@ -544,7 +549,7 @@ const SalesPage = () => {
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════ VALEUR (moved up) ═══════════════════════════ */}
+      {/* ═══════════════════════════════════════ VALEUR ═══════════════════════════════════ */}
       <section className="py-14 px-4 bg-muted/30">
         <div className="max-w-4xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-10">
@@ -577,42 +582,23 @@ const SalesPage = () => {
       </section>
 
       {/* ═══════════════════════════════════════ PRICING ═══════════════════════════════════ */}
-      <section id="pricing" className="py-14 px-4">
+      <section id="pricing" className="py-16 px-4">
         <div className="max-w-3xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-6">
-            <motion.h2 variants={fadeUp} className="text-3xl md:text-5xl font-extrabold mb-4">
-              {isVipAvailable ? 'Offre Fondateur' : 'Accès Pro Lifetime'}
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-8">
+            <motion.div variants={fadeUp}>
+              <Badge className="mb-4 bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 px-5 py-2 text-sm font-bold">
+                <Gift className="w-4 h-4 mr-2" />
+                OFFRE DE LANCEMENT — Prix réduit temporaire
+              </Badge>
+            </motion.div>
+            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-5xl font-extrabold mb-4">
+              Accès Pro Lifetime
             </motion.h2>
-            <motion.div variants={fadeUp} custom={1} className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-5 py-2 text-sm">
+            <motion.div variants={fadeUp} custom={2} className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-5 py-2 text-sm">
               <ShieldCheck className="w-4 h-4 text-emerald-500" />
               <span className="text-emerald-600 dark:text-emerald-400 font-medium">Garantie 30 jours satisfait ou remboursé</span>
             </motion.div>
           </motion.div>
-
-          {/* Countdown */}
-          {isVipAvailable && (
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className="mb-12">
-              <div className="bg-gradient-to-r from-violet-600 to-purple-600 rounded-2xl p-6 text-white text-center shadow-2xl shadow-violet-500/20">
-                <div className="flex items-center justify-center gap-2 mb-4">
-                  <Clock className="w-5 h-5" />
-                  <span className="font-bold text-lg">Offre Fondateur — {daysLeft} jours restants</span>
-                </div>
-                <div className="grid grid-cols-4 gap-3 max-w-sm mx-auto">
-                  {[
-                    { val: countdown.days, label: "Jours" },
-                    { val: countdown.hours, label: "Heures" },
-                    { val: countdown.minutes, label: "Min" },
-                    { val: countdown.seconds, label: "Sec" },
-                  ].map((c, i) => (
-                    <div key={i} className="bg-white/15 backdrop-blur-sm rounded-xl p-3">
-                      <div className="text-3xl font-extrabold tabular-nums">{String(c.val).padStart(2, '0')}</div>
-                      <div className="text-[10px] uppercase tracking-wider opacity-80">{c.label}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-          )}
 
           {/* Pricing Card */}
           <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
@@ -623,33 +609,31 @@ const SalesPage = () => {
               </div>
 
               <div className="relative z-10 p-8 md:p-10">
-                {isVipAvailable && (
-                  <Badge className="bg-gradient-to-r from-violet-600 to-purple-600 text-white border-0 mb-6 px-4 py-1.5 text-sm font-bold">
-                    🔥 OFFRE FONDATEUR — Jusqu'au 30 juin
-                  </Badge>
-                )}
+                <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0 mb-6 px-4 py-1.5 text-sm font-bold">
+                  🔥 LANCEMENT — Économisez {NORMAL_PRICE - LAUNCH_PRICE}€
+                </Badge>
 
                 <div className="flex items-baseline gap-3 mb-1">
-                  <span className="text-lg text-muted-foreground line-through">297€</span>
-                  <span className="text-6xl md:text-7xl font-extrabold">{price}</span>
+                  <span className="text-lg text-muted-foreground line-through">{NORMAL_PRICE}€</span>
+                  <span className="text-6xl md:text-7xl font-extrabold">{LAUNCH_PRICE}</span>
                   <span className="text-3xl font-bold">€</span>
                 </div>
                 <p className="text-sm text-muted-foreground mb-8">Paiement unique • Accès à vie • Sans abonnement</p>
 
                 <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 mb-8">
                   {[
-                    "Workflow éditorial complet à vie",
-                    "14 rôles professionnels intégrés",
+                    "Workflow éditorial complet 15 rôles",
+                    "Gemini 2.5 Pro — contexte 1M tokens",
+                    "Imagen 3 — couvertures photoréalistes",
+                    "Azure Neural Voices — audiobooks",
                     "P15 Humanisation Anti-IA offert",
                     "Export PDF / EPUB / Word",
-                    "🎓 Formation 15 modules vidéo offerte (valeur 197€)",
-                    "Toutes les formations (18 modules)",
+                    "🎓 Formation 18 modules vidéo (valeur 297€)",
                     "Outils KDP Premium complets",
                     "Gestionnaire Séries / Sagas",
-                    "Traduction multi-langues",
-                    "Infrastructure Audiobooks",
+                    "Traduction multi-langues (30+)",
                     "Mises à jour gratuites à vie",
-                    "Support prioritaire inclus",
+                    "Support prioritaire + Zoom gratuit",
                   ].map((f, i) => (
                     <div key={i} className="flex items-center gap-2.5">
                       <Check className="w-4 h-4 text-emerald-500 shrink-0" />
@@ -658,37 +642,34 @@ const SalesPage = () => {
                   ))}
                 </div>
 
-                <Button size="lg" className="w-full py-8 text-xl font-extrabold bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-2xl shadow-violet-500/30 hover:shadow-violet-500/50 transition-all duration-300 rounded-xl animate-pulse hover:animate-none hover:scale-[1.02]"
+                <Button size="lg" className="w-full py-8 text-xl font-extrabold bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-2xl shadow-violet-500/30 hover:shadow-violet-500/50 transition-all duration-300 rounded-xl hover:scale-[1.02]"
                   onClick={handlePlanClick}>
                   <Rocket className="w-6 h-6 mr-2" />
-                  {isVipAvailable ? '🔥 Accès Fondateur — 37€ à vie' : `Débloquer l'accès Pro — ${price}€`}
+                  🔥 Accès Pro Lifetime — {LAUNCH_PRICE}€ à vie
                   <ArrowRight className="w-6 h-6 ml-2" />
                 </Button>
 
-                {isVipAvailable && (
-                  <p className="text-center mt-4 text-sm text-muted-foreground">
-                    À partir du 1er juillet : <strong className="text-foreground text-base">147€</strong>
-                  </p>
-                )}
+                <p className="text-center mt-4 text-sm text-muted-foreground">
+                  Après la période de lancement : <strong className="text-foreground text-base">{FUTURE_PRICE}€</strong>{" "}
+                  <span className="text-xs">({NORMAL_PRICE}€ - {PROMO_DISCOUNT}€ de promo)</span>
+                </p>
 
-                {!isVipAvailable && (
-                  <div className="mt-6 space-y-2">
-                    <p className="text-xs text-muted-foreground text-center mb-3">Ou payez en plusieurs fois :</p>
-                    {[
-                      { label: "En 3 fois", price: "49", per: "49€/mois × 3" },
-                      { label: "En 5 fois", price: "32", per: "32€/mois × 5" },
-                    ].map((inst, idx) => (
-                      <button key={idx} onClick={handlePlanClick}
-                        className="w-full flex items-center justify-between p-3.5 rounded-xl border border-border hover:border-primary/50 hover:bg-primary/5 transition-all">
-                        <div className="text-left">
-                          <span className="font-semibold text-sm">{inst.label}</span>
-                          <p className="text-xs text-muted-foreground">{inst.per}</p>
-                        </div>
-                        <span className="text-lg font-bold">{inst.price}€</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
+                <div className="mt-6 space-y-2">
+                  <p className="text-xs text-muted-foreground text-center mb-3">Ou payez en plusieurs fois :</p>
+                  {[
+                    { label: "En 3 fois", price: "33", per: "33€/mois × 3" },
+                    { label: "En 5 fois", price: "20", per: "20€/mois × 5" },
+                  ].map((inst, idx) => (
+                    <button key={idx} onClick={handlePlanClick}
+                      className="w-full flex items-center justify-between p-3.5 rounded-xl border border-border hover:border-primary/50 hover:bg-primary/5 transition-all">
+                      <div className="text-left">
+                        <span className="font-semibold text-sm">{inst.label}</span>
+                        <p className="text-xs text-muted-foreground">{inst.per}</p>
+                      </div>
+                      <span className="text-lg font-bold">{inst.price}€</span>
+                    </button>
+                  ))}
+                </div>
 
                 <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground mt-5">
                   <ShieldCheck className="w-3.5 h-3.5" />
@@ -819,7 +800,7 @@ const SalesPage = () => {
                     </Badge>
                     <h3 className="text-2xl md:text-3xl font-extrabold">Curieux de voir le parcours ?</h3>
                     <p className="text-muted-foreground leading-relaxed">
-                      Explorez la <span className="font-semibold text-foreground">roadmap interactive</span> : les 4 phases, les 15 étapes, et comprenez exactement comment votre ebook sera créé — avant même de commencer.
+                      Explorez la <span className="font-semibold text-foreground">roadmap interactive</span> : les 4 phases, les 15 étapes, et comprenez exactement comment votre ebook sera créé.
                     </p>
                     <div className="grid grid-cols-2 gap-2 pt-2">
                       {[
@@ -859,7 +840,6 @@ const SalesPage = () => {
         <AuthorShowcase />
       </div>
 
-      {/* ═══════════════════════ PREUVE REVENUS PASSIFS ═══════════════════════ */}
       <PassiveRevenueProof />
 
       {/* ═══════════════════════════════════════ GUIDE GRATUIT ═══════════════════════════════ */}
@@ -876,7 +856,7 @@ const SalesPage = () => {
         </motion.div>
       </section>
 
-      {/* Tutoriel Vidéo Clé API */}
+      {/* Tutoriel Vidéo Configuration */}
       <section className="py-16 px-4" id="tuto-api">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
@@ -886,9 +866,9 @@ const SalesPage = () => {
                 Tutoriel Vidéo — 2 min
               </Badge>
             </motion.div>
-            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-4xl font-extrabold mb-4">🔑 Comment configurer votre clé API</motion.h2>
+            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-4xl font-extrabold mb-4">🔑 Comment configurer vos clés API</motion.h2>
             <motion.p variants={fadeUp} custom={2} className="text-muted-foreground mb-8 text-lg max-w-2xl mx-auto">
-              Avant de créer votre premier ebook, configurez votre clé OpenAI en 2 minutes. Un ebook complet coûte entre 0,30€ et 0,80€.
+              Configurez votre clé Gemini en 2 minutes. Un ebook complet coûte entre 0,20€ et 0,50€ en coût API.
             </motion.p>
             <motion.div variants={fadeUp} custom={3} className="rounded-xl overflow-hidden border border-border shadow-lg">
               <video controls className="w-full aspect-video" poster="" preload="metadata">
@@ -896,11 +876,20 @@ const SalesPage = () => {
                 Votre navigateur ne supporte pas la vidéo.
               </video>
             </motion.div>
+            <motion.div variants={fadeUp} custom={4} className="mt-6 flex flex-wrap justify-center gap-4">
+              <div className="flex items-center gap-2 bg-card border border-border rounded-full px-4 py-2 text-sm">
+                <Cpu className="w-4 h-4 text-blue-500" />
+                <span>Clé Gemini API</span>
+              </div>
+              <div className="flex items-center gap-2 bg-card border border-border rounded-full px-4 py-2 text-sm">
+                <Mic className="w-4 h-4 text-emerald-500" />
+                <span>Clé Azure Speech (audiobooks)</span>
+              </div>
+            </motion.div>
           </motion.div>
         </div>
       </section>
 
-      {/* FAQ */}
       <SalesFaq />
 
       {/* Final CTA */}
@@ -919,33 +908,19 @@ const SalesPage = () => {
             <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-emerald-500" />Résultats dès le premier jour</span>
           </motion.div>
           <motion.div variants={fadeUp} custom={2}>
-            <Button size="lg" className="text-lg px-10 py-7 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-xl shadow-violet-500/25 animate-pulse hover:animate-none hover:scale-[1.02]"
+            <Button size="lg" className="text-lg px-10 py-7 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-xl shadow-violet-500/25 hover:scale-[1.02] transition-all"
               onClick={handlePlanClick}>
               <Rocket className="w-5 h-5 mr-2" />
-              {isVipAvailable ? `Publier mon premier ebook — 37€` : `Débloquer l'accès — ${price}€`}
+              Accès Pro Lifetime — {LAUNCH_PRICE}€ à vie
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
             <p className="text-sm text-muted-foreground mt-4">Paiement unique • Accès à vie • Garantie 30 jours</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Prix après lancement : {FUTURE_PRICE}€ ({NORMAL_PRICE}€ - {PROMO_DISCOUNT}€ promo)
+            </p>
           </motion.div>
         </motion.div>
       </section>
-
-      {/* Email Dialog */}
-      <Dialog open={showEmailDialog} onOpenChange={setShowEmailDialog}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Finaliser votre commande</DialogTitle>
-            <DialogDescription>Entrez votre email pour accéder au paiement sécurisé</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 pt-4">
-            <Input ref={emailInputRef} type="email" placeholder="votre@email.com" value={email} onChange={(e) => setEmail(e.target.value)} disabled={isLoading} autoComplete="email" />
-            <Button className="w-full" size="lg" onClick={handleCheckout} disabled={isLoading}>
-              {isLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Redirection...</> : <>Passer au paiement<ArrowRight className="w-4 h-4 ml-2" /></>}
-            </Button>
-            <p className="text-xs text-muted-foreground text-center">Paiement sécurisé • Garantie 30 jours</p>
-          </div>
-        </DialogContent>
-      </Dialog>
 
       {/* Zoom Calendly */}
       <section className="py-10 bg-gradient-to-r from-violet-500/10 via-purple-500/10 to-violet-500/10 border-y border-violet-500/20">
@@ -1009,16 +984,17 @@ const SalesPage = () => {
             </div>
           </div>
           <div className="border-t border-gray-800 pt-6 text-center">
-            <p className="text-xs text-gray-500">© 2026 EbookStudio Pro • Workflow Éditorial IA pour Amazon KDP • Tous droits réservés</p>
+            <p className="text-xs text-gray-500">© 2026 EbookStudio Pro • Workflow Éditorial IA Premium pour Amazon KDP • Tous droits réservés</p>
           </div>
         </div>
       </footer>
+
       {/* Sticky Mobile CTA */}
       <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-background/95 backdrop-blur-xl border-t border-border p-3">
         <Button className="w-full py-5 text-base font-bold bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-lg rounded-xl"
           onClick={handlePlanClick}>
           <Rocket className="w-4 h-4 mr-2" />
-          {isVipAvailable ? `Offre Fondateur — ${price}€ à vie` : `Accès Pro — ${price}€`}
+          Accès Pro — {LAUNCH_PRICE}€ à vie
         </Button>
       </div>
 
