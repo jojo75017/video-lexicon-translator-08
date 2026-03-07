@@ -838,7 +838,7 @@ Accédez à cette formation directement depuis l'outil.
 
 Gérez votre accès.
 
-### Avec l'accès Lifetime à 37€ :
+### Avec l'accès Pro Lifetime à 97€ :
 - ✅ Tous les modules inclus
 - ✅ Mises à jour gratuites à vie
 - ✅ Support inclus
@@ -973,7 +973,7 @@ Vous maîtrisez maintenant EbookStudio Pro. Vous avez toutes les clés pour cré
 - ✅ Support par email
 - ✅ Pas d'abonnement mensuel
 
-### Prix exceptionnel : 37€ (au lieu de 197€)
+### Prix de lancement : 97€ (au lieu de 247€)
 
 ### Garantie 30 jours :
 Si vous n'êtes pas satisfait, remboursement intégral sans questions.
@@ -982,14 +982,14 @@ Si vous n'êtes pas satisfait, remboursement intégral sans questions.
 
 ## Questions fréquentes
 
-**Q : Ai-je besoin d'une clé API OpenAI ?**
-R : Non, tout est inclus. Vous pouvez ajouter la vôtre si vous le souhaitez.
+**Q : Ai-je besoin d'une clé API ?**
+R : Oui, vous utilisez votre propre clé Gemini 3 Flash (gratuite). Un guide vidéo est inclus.
 
 **Q : Combien d'ebooks puis-je créer ?**
 R : Illimité avec l'accès Lifetime.
 
 **Q : Y a-t-il des frais cachés ?**
-R : Non, 37€ une seule fois, accès à vie.
+R : Non, 97€ une seule fois, accès à vie.
 
 **Q : Le support est-il inclus ?**
 R : Oui, par email et dans l'outil.
