@@ -119,6 +119,8 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
   const [isGeneratingMp3, setIsGeneratingMp3] = useState(false);
   const [mp3Progress, setMp3Progress] = useState(0);
   const [mp3ProgressLabel, setMp3ProgressLabel] = useState('');
+  const [isPreviewingJingle, setIsPreviewingJingle] = useState(false);
+  const jingleAudioRef = useRef<HTMLAudioElement | null>(null);
 
   // Azure Speech niche & voice
   const AUTO_AZURE_VOICE = '__auto_azure_voice__';
@@ -1186,6 +1188,66 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                       {selectedAzureVoice || AZURE_VOICE_PRESETS.find(p => p.id === selectedNiche)?.voice || 'fr-FR-DeniseNeural'}
                       {' '} — Changez la voix dans le panneau de configuration ci-dessus
                     </p>
+                  </div>
+
+                  {/* Preview Jingle Button */}
+                  <div className="flex items-center gap-3">
+                    <Button
+                      variant="outline"
+                      onClick={async () => {
+                        // Stop if already playing
+                        if (jingleAudioRef.current) {
+                          jingleAudioRef.current.pause();
+                          jingleAudioRef.current = null;
+                          setIsPreviewingJingle(false);
+                          return;
+                        }
+                        // Create audio element immediately for user gesture
+                        const audio = new Audio();
+                        audio.play().catch(() => {});
+                        jingleAudioRef.current = audio;
+                        setIsPreviewingJingle(true);
+                        try {
+                          const introBlobs = await generateIntroJingle(generateSectionMp3);
+                          if (introBlobs.length === 0) {
+                            toast.error('Impossible de générer le jingle');
+                            setIsPreviewingJingle(false);
+                            jingleAudioRef.current = null;
+                            return;
+                          }
+                          const jingleBlob = new Blob(introBlobs, { type: 'audio/mpeg' });
+                          const url = URL.createObjectURL(jingleBlob);
+                          audio.src = url;
+                          audio.onended = () => {
+                            URL.revokeObjectURL(url);
+                            setIsPreviewingJingle(false);
+                            jingleAudioRef.current = null;
+                          };
+                          await audio.play();
+                        } catch (error: any) {
+                          toast.error(`Erreur jingle : ${error.message}`);
+                          setIsPreviewingJingle(false);
+                          jingleAudioRef.current = null;
+                        }
+                      }}
+                      disabled={isGeneratingMp3}
+                      className="h-10"
+                    >
+                      {isPreviewingJingle ? (
+                        <>
+                          <Square className="h-4 w-4 mr-2" />
+                          Arrêter le jingle
+                        </>
+                      ) : (
+                        <>
+                          <Play className="h-4 w-4 mr-2" />
+                          🔔 Prévisualiser le jingle d'intro
+                        </>
+                      )}
+                    </Button>
+                    {isPreviewingJingle && (
+                      <span className="text-xs text-muted-foreground animate-pulse">🔊 Lecture en cours...</span>
+                    )}
                   </div>
 
                   <div className="flex flex-col sm:flex-row gap-3">
