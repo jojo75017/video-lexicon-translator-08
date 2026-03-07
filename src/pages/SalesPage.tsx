@@ -665,45 +665,52 @@ const SalesPage = () => {
       </section>
 
       {/* ═══════════════════════════════════════ PRICING ═══════════════════════════════════ */}
-      <section id="pricing" className="py-16 px-4">
-        <div className="max-w-3xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-8">
+      <section id="pricing" className="py-20 px-4 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_100%,hsl(var(--primary)/0.08),transparent)]" />
+        <div className="max-w-3xl mx-auto relative z-10">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-10">
             <motion.div variants={fadeUp}>
-              <Badge className="mb-4 bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 px-5 py-2 text-sm font-bold">
+              <Badge className="mb-5 bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 px-6 py-2.5 text-sm font-bold shadow-lg shadow-amber-500/5">
                 <Gift className="w-4 h-4 mr-2" />
                 OFFRE DE LANCEMENT — Prix réduit temporaire
               </Badge>
             </motion.div>
-            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-5xl font-extrabold mb-4">
+            <motion.h2 variants={fadeUp} custom={1} className="text-4xl md:text-6xl font-extrabold mb-5">
               Accès Pro Lifetime
             </motion.h2>
-            <motion.div variants={fadeUp} custom={2} className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-5 py-2 text-sm">
+            <motion.div variants={fadeUp} custom={2} className="inline-flex items-center gap-2.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-6 py-2.5 text-sm shadow-sm">
               <ShieldCheck className="w-4 h-4 text-emerald-500" />
-              <span className="text-emerald-600 dark:text-emerald-400 font-medium">Garantie 30 jours satisfait ou remboursé</span>
+              <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Garantie 30 jours satisfait ou remboursé</span>
             </motion.div>
           </motion.div>
 
-          {/* Pricing Card */}
+          {/* Pricing Card - Ultra premium */}
           <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}>
-            <div className="relative rounded-3xl overflow-hidden">
+            <div className="relative rounded-3xl overflow-hidden shadow-2xl shadow-violet-500/10">
               <div className="absolute inset-0 bg-gradient-to-br from-violet-500 via-purple-500 to-pink-500 p-[2px] rounded-3xl">
                 <div className="absolute inset-[2px] rounded-[22px] bg-background" />
               </div>
 
-              <div className="relative z-10 p-8 md:p-10">
-                <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0 mb-6 px-4 py-1.5 text-sm font-bold">
-                  🔥 LANCEMENT — Économisez {NORMAL_PRICE - LAUNCH_PRICE}€
-                </Badge>
-
-                <div className="flex items-baseline gap-3 mb-1">
-                  <span className="text-lg text-muted-foreground line-through">{NORMAL_PRICE}€</span>
-                  <span className="text-6xl md:text-7xl font-extrabold">{LAUNCH_PRICE}</span>
-                  <span className="text-3xl font-bold">€</span>
+              <div className="relative z-10 p-8 md:p-12">
+                <div className="flex items-center justify-between mb-8">
+                  <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0 px-5 py-2 text-sm font-bold shadow-lg shadow-amber-500/20">
+                    🔥 LANCEMENT — Économisez {NORMAL_PRICE - LAUNCH_PRICE}€
+                  </Badge>
+                  <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                    <Clock className="w-4 h-4" />
+                    <span>Offre limitée</span>
+                  </div>
                 </div>
-                <p className="text-sm text-muted-foreground mb-8">Paiement unique • Accès à vie • Sans abonnement</p>
 
-                <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 mb-8">
+                <div className="flex items-baseline gap-3 mb-2">
+                  <span className="text-xl text-muted-foreground line-through opacity-60">{NORMAL_PRICE}€</span>
+                  <span className="text-7xl md:text-8xl font-extrabold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">{LAUNCH_PRICE}</span>
+                  <span className="text-3xl font-bold text-muted-foreground">€</span>
+                </div>
+                <p className="text-sm text-muted-foreground mb-10 font-medium">Paiement unique &bull; Accès à vie &bull; Sans abonnement</p>
+
+                <div className="grid sm:grid-cols-2 gap-x-8 gap-y-4 mb-10">
                   {[
                     "Workflow éditorial complet 15 rôles",
                     "Gemini 3 Flash — IA la plus rapide",
@@ -711,66 +718,71 @@ const SalesPage = () => {
                     "Azure Neural Voices — audiobooks",
                     "P15 Humanisation Anti-IA offert",
                     "Export PDF / EPUB / Word",
-                    "🎓 Formation 18 modules vidéo (valeur 297€)",
+                    "🎓 Formation 18 modules (valeur 297€)",
                     "Outils KDP Premium complets",
                     "Gestionnaire Séries / Sagas",
                     "Traduction multi-langues (30+)",
                     "Mises à jour gratuites à vie",
                     "Support prioritaire + Zoom gratuit",
                   ].map((f, i) => (
-                    <div key={i} className="flex items-center gap-2.5">
-                      <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span className="text-sm">{f}</span>
+                    <div key={i} className="flex items-center gap-3">
+                      <div className="w-5 h-5 rounded-full bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
+                        <Check className="w-3.5 h-3.5 text-emerald-500" />
+                      </div>
+                      <span className="text-sm font-medium">{f}</span>
                     </div>
                   ))}
                 </div>
 
-                <Button size="lg" className="w-full py-8 text-xl font-extrabold bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-2xl shadow-violet-500/30 hover:shadow-violet-500/50 transition-all duration-300 rounded-xl hover:scale-[1.02]"
+                <Button size="lg" className="w-full py-8 text-xl font-extrabold bg-gradient-to-r from-violet-600 via-purple-600 to-violet-700 hover:from-violet-500 hover:via-purple-500 hover:to-violet-600 text-white shadow-2xl shadow-violet-500/30 hover:shadow-violet-500/50 transition-all duration-500 rounded-2xl hover:scale-[1.02] hover:-translate-y-0.5"
                   onClick={handlePlanClick}>
                   <Rocket className="w-6 h-6 mr-2" />
                   🔥 Accès Pro Lifetime — {LAUNCH_PRICE}€ à vie
                   <ArrowRight className="w-6 h-6 ml-2" />
                 </Button>
 
-                <p className="text-center mt-4 text-sm text-muted-foreground">
+                <p className="text-center mt-5 text-sm text-muted-foreground">
                   Après la période de lancement : <strong className="text-foreground text-base">{FUTURE_PRICE}€</strong>{" "}
-                  <span className="text-xs">({NORMAL_PRICE}€ - {PROMO_DISCOUNT}€ de promo)</span>
+                  <span className="text-xs opacity-75">({NORMAL_PRICE}€ - {PROMO_DISCOUNT}€ de promo)</span>
                 </p>
 
-                <div className="mt-6 space-y-2">
-                  <p className="text-xs text-muted-foreground text-center mb-3">Ou payez en plusieurs fois :</p>
-                  {[
-                    { label: "En 3 fois", price: "33", per: "33€/mois × 3" },
-                    { label: "En 5 fois", price: "20", per: "20€/mois × 5" },
-                  ].map((inst, idx) => (
-                    <button key={idx} onClick={handlePlanClick}
-                      className="w-full flex items-center justify-between p-3.5 rounded-xl border border-border hover:border-primary/50 hover:bg-primary/5 transition-all">
-                      <div className="text-left">
-                        <span className="font-semibold text-sm">{inst.label}</span>
-                        <p className="text-xs text-muted-foreground">{inst.per}</p>
-                      </div>
-                      <span className="text-lg font-bold">{inst.price}€</span>
-                    </button>
-                  ))}
+                {/* Facilités de paiement */}
+                <div className="mt-8 pt-6 border-t border-border/50">
+                  <p className="text-xs text-muted-foreground text-center mb-4 uppercase tracking-wider font-semibold">Ou payez en plusieurs fois</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      { label: "En 3 fois", price: "33", per: "33€/mois × 3", popular: true },
+                      { label: "En 5 fois", price: "20", per: "20€/mois × 5", popular: false },
+                    ].map((inst, idx) => (
+                      <button key={idx} onClick={handlePlanClick}
+                        className={`flex flex-col items-center p-4 rounded-2xl border-2 transition-all duration-300 hover:scale-[1.02] ${inst.popular ? 'border-primary/30 bg-primary/5 hover:border-primary/50' : 'border-border hover:border-primary/30 hover:bg-primary/5'}`}>
+                        <span className="font-bold text-2xl">{inst.price}€</span>
+                        <span className="text-xs text-muted-foreground mt-1">{inst.per}</span>
+                        {inst.popular && <Badge className="mt-2 text-[10px] bg-primary/10 text-primary border-primary/20">Populaire</Badge>}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
-                <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground mt-5">
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>Paiement sécurisé • Accès immédiat</span>
+                <div className="flex items-center justify-center gap-3 text-xs text-muted-foreground mt-6">
+                  <ShieldCheck className="w-4 h-4" />
+                  <span>Paiement sécurisé &bull; Accès immédiat &bull; Garantie 30 jours</span>
                 </div>
               </div>
             </div>
           </motion.div>
 
-          {/* Garantie */}
-          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mt-10">
-            <div className="bg-emerald-500/5 border-2 border-emerald-500/20 rounded-2xl p-6 text-center">
-              <h3 className="text-lg font-bold text-emerald-600 dark:text-emerald-400 mb-2 flex items-center justify-center gap-2">
-                <ShieldCheck className="w-5 h-5" />
+          {/* Garantie - premium */}
+          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mt-12">
+            <div className="bg-emerald-500/5 border-2 border-emerald-500/20 rounded-3xl p-8 text-center shadow-sm">
+              <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center mx-auto mb-4">
+                <ShieldCheck className="w-7 h-7 text-emerald-500" />
+              </div>
+              <h3 className="text-xl font-bold text-emerald-600 dark:text-emerald-400 mb-3">
                 Garantie Satisfait ou Remboursé — 30 jours
               </h3>
-              <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                Testez pendant 30 jours. Pas satisfait ? Un email et vous êtes remboursé intégralement.
+              <p className="text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
+                Testez pendant 30 jours. Pas satisfait ? Un email et vous êtes remboursé intégralement. Aucune question posée.
               </p>
             </div>
           </motion.div>
