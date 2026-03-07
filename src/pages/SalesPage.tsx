@@ -532,7 +532,7 @@ const SalesPage = () => {
                       { text: "Premier ebook publié en moins d'1 heure", icon: "⚡" },
                       { text: "Revenus passifs dès le premier mois", icon: "💰" },
                       { text: "15 rôles IA qui écrivent pour vous", icon: "🤖" },
-                      { text: "Gemini 2.5 Pro — contexte 1M tokens", icon: "🧠" },
+                      { text: "Gemini 3 Flash — IA la plus rapide", icon: "🧠" },
                       { text: "Export PDF/Word/EPUB professionnel", icon: "✅" },
                       { text: "Investissement unique : 97€ à vie", icon: "🏆" },
                     ].map((item, i) => (
@@ -623,7 +623,7 @@ const SalesPage = () => {
                 <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 mb-8">
                   {[
                     "Workflow éditorial complet 15 rôles",
-                    "Gemini 2.5 Pro — contexte 1M tokens",
+                    "Gemini 3 Flash — IA la plus rapide",
                     "Imagen 3 — couvertures photoréalistes",
                     "Azure Neural Voices — audiobooks",
                     "P15 Humanisation Anti-IA offert",

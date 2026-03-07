@@ -42,7 +42,7 @@ const UpsellPage = () => {
 
   const proFeatures = [
     { text: "Workflow 15 rôles IA complet", included: true, highlight: true },
-    { text: "Gemini 2.5 Pro — contexte 1M tokens", included: true, highlight: true },
+    { text: "Gemini 3 Flash — IA la plus rapide", included: true, highlight: true },
     { text: "Imagen 3 — couvertures photoréalistes", included: true },
     { text: "Azure Neural Voices — audiobooks", included: true },
     { text: "Export PDF / EPUB / Word", included: true },
@@ -86,7 +86,7 @@ const UpsellPage = () => {
             pour vos ebooks
           </h1>
           <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-            Gemini 2.5 Pro, Imagen 3, Azure Neural Voices — tout inclus à vie pour seulement{" "}
+            Gemini 3 Flash, Imagen 3, Azure Neural Voices — tout inclus à vie pour seulement{" "}
             <strong className="text-white">{LAUNCH_PRICE}€</strong>.
           </p>
         </div>
@@ -94,7 +94,7 @@ const UpsellPage = () => {
         {/* Tech stack */}
         <div className="flex flex-wrap justify-center gap-4 mb-10">
           {[
-            { icon: Cpu, name: "Gemini 2.5 Pro", desc: "Rédaction IA premium", color: "from-blue-500 to-cyan-500" },
+            { icon: Cpu, name: "Gemini 3 Flash", desc: "Rédaction IA ultra-rapide", color: "from-blue-500 to-cyan-500" },
             { icon: ImageIcon, name: "Imagen 3", desc: "Couvertures pro", color: "from-violet-500 to-purple-500" },
             { icon: Headphones, name: "Azure Speech", desc: "Voix neuronales", color: "from-emerald-500 to-teal-500" },
           ].map((tech, i) => (
