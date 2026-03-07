@@ -1003,46 +1003,51 @@ const SalesPage = () => {
 
       <SalesFaq />
 
-      {/* Final CTA */}
-      <section className="py-14 px-4">
+      {/* Final CTA - dramatic */}
+      <section className="py-20 px-4 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_50%,hsl(var(--primary)/0.06),transparent)]" />
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}
-          className="max-w-3xl mx-auto text-center">
-          <motion.h2 variants={fadeUp} className="text-3xl md:text-4xl font-extrabold mb-4">
-            Chaque jour sans ebook publié est un jour de revenus passifs perdu.
+          className="max-w-3xl mx-auto text-center relative z-10">
+          <motion.h2 variants={fadeUp} className="text-3xl md:text-5xl font-extrabold mb-5 leading-tight">
+            Chaque jour sans ebook publié
+            <br />
+            <span className="text-muted-foreground">est un jour de revenus passifs perdu.</span>
           </motion.h2>
-          <motion.p variants={fadeUp} custom={1} className="text-muted-foreground mb-4 text-lg">
+          <motion.p variants={fadeUp} custom={1} className="text-muted-foreground mb-5 text-lg font-medium">
             Votre premier ebook peut être en ligne sur Amazon ce soir.
           </motion.p>
-          <motion.div variants={fadeUp} custom={1.5} className="flex flex-wrap justify-center gap-4 text-sm text-muted-foreground mb-8">
-            <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-emerald-500" />Pas besoin de savoir écrire</span>
-            <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-emerald-500" />Pas besoin de compétence technique</span>
-            <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-emerald-500" />Résultats dès le premier jour</span>
+          <motion.div variants={fadeUp} custom={1.5} className="flex flex-wrap justify-center gap-5 text-sm text-muted-foreground mb-10">
+            <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-500" />Pas besoin de savoir écrire</span>
+            <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-500" />Pas besoin de compétence technique</span>
+            <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-500" />Résultats dès le premier jour</span>
           </motion.div>
           <motion.div variants={fadeUp} custom={2}>
-            <Button size="lg" className="text-lg px-10 py-7 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-xl shadow-violet-500/25 hover:scale-[1.02] transition-all"
+            <Button size="lg" className="text-lg px-12 py-8 bg-gradient-to-r from-violet-600 via-purple-600 to-violet-700 hover:from-violet-500 hover:via-purple-500 hover:to-violet-600 text-white shadow-2xl shadow-violet-500/25 hover:scale-[1.02] hover:-translate-y-0.5 transition-all duration-500 rounded-2xl font-extrabold"
               onClick={handlePlanClick}>
-              <Rocket className="w-5 h-5 mr-2" />
+              <Rocket className="w-6 h-6 mr-2" />
               Accès Pro Lifetime — {LAUNCH_PRICE}€ à vie
-              <ArrowRight className="w-5 h-5 ml-2" />
+              <ArrowRight className="w-6 h-6 ml-2" />
             </Button>
-            <p className="text-sm text-muted-foreground mt-4">Paiement unique • Accès à vie • Garantie 30 jours</p>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-sm text-muted-foreground mt-5 font-medium">Paiement unique &bull; Accès à vie &bull; Garantie 30 jours</p>
+            <p className="text-xs text-muted-foreground mt-1 opacity-75">
               Prix après lancement : {FUTURE_PRICE}€ ({NORMAL_PRICE}€ - {PROMO_DISCOUNT}€ promo)
             </p>
           </motion.div>
         </motion.div>
       </section>
 
-      {/* Zoom Calendly */}
-      <section className="py-10 bg-gradient-to-r from-violet-500/10 via-purple-500/10 to-violet-500/10 border-y border-violet-500/20">
+      {/* Zoom Calendly - premium */}
+      <section className="py-12 bg-gradient-to-r from-violet-500/5 via-purple-500/10 to-violet-500/5 border-y border-violet-500/10">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <div className="flex items-center gap-2">
-              <Play className="w-5 h-5 text-violet-500" />
-              <span className="text-lg font-semibold">🎥 Dispo en Zoom — Voyez l'outil en direct !</span>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-5">
+            <div className="flex items-center gap-2.5">
+              <div className="w-10 h-10 rounded-xl bg-violet-500/10 flex items-center justify-center">
+                <Play className="w-5 h-5 text-violet-500" />
+              </div>
+              <span className="text-lg font-bold">Dispo en Zoom — Voyez l'outil en direct</span>
             </div>
             <a href="https://calendly.com/boubetgeorges/nouvelle-reunion" target="_blank" rel="noopener noreferrer">
-              <Button className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white font-bold px-6">
+              <Button className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white font-bold px-8 py-5 rounded-xl shadow-lg shadow-violet-500/20">
                 📅 Réserver un créneau
               </Button>
             </a>
