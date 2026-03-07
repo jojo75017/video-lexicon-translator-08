@@ -16,8 +16,8 @@ interface OpenAIConfigPanelProps {
 }
 
 export const OpenAIConfigPanel: React.FC<OpenAIConfigPanelProps> = ({
-  title = "⚙️ Configuration OpenAI",
-  description = "Configurez votre clé API OpenAI pour utiliser l'IA avancée",
+  title = "🔑 Configuration Gemini 3 Flash",
+  description = "Configurez votre clé API Gemini pour utiliser l'IA avancée",
   showModelSelection = true,
   compact = false
 }) => {
@@ -65,7 +65,7 @@ export const OpenAIConfigPanel: React.FC<OpenAIConfigPanelProps> = ({
       <CardContent className="space-y-4">
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <Label htmlFor="openai-api-key">Clé API OpenAI</Label>
+            <Label htmlFor="gemini-api-key">Clé API Gemini</Label>
             <Badge variant={getStatusVariant()} className="flex items-center gap-1">
               {getStatusIcon()}
               {getStatusText()}
@@ -73,9 +73,9 @@ export const OpenAIConfigPanel: React.FC<OpenAIConfigPanelProps> = ({
           </div>
           <div className="flex gap-2">
             <Input
-              id="openai-api-key"
+              id="gemini-api-key"
               type="password"
-              placeholder="sk-..."
+              placeholder="AIza..."
               value={apiKey}
               onChange={(e) => updateApiKey(e.target.value)}
               className="flex-1"
@@ -92,24 +92,22 @@ export const OpenAIConfigPanel: React.FC<OpenAIConfigPanelProps> = ({
           <p className="text-xs text-muted-foreground">
             {apiKey ? 
               "Votre clé API est stockée localement et sécurisée" : 
-              "Sans clé API, des données fictives seront utilisées"
+              "Obtenez votre clé gratuite sur aistudio.google.com/apikey"
             }
           </p>
         </div>
 
         {showModelSelection && (
           <div className="space-y-2">
-            <Label htmlFor="openai-model">Modèle OpenAI</Label>
+            <Label htmlFor="gemini-model">Modèle Gemini</Label>
             <Select value={model} onValueChange={updateModel}>
               <SelectTrigger>
                 <SelectValue placeholder="Sélectionner un modèle" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="gpt-4.1-2025-04-14">GPT-4.1 (Recommandé)</SelectItem>
-                <SelectItem value="gpt-4o">GPT-4o (Vision)</SelectItem>
-                <SelectItem value="gpt-4.1-mini-2025-04-14">GPT-4.1 Mini</SelectItem>
-                <SelectItem value="o3-2025-04-16">O3 (Raisonnement)</SelectItem>
-                <SelectItem value="o4-mini-2025-04-16">O4 Mini (Rapide)</SelectItem>
+                <SelectItem value="gemini-2.5-flash">Gemini 2.5 Flash (Recommandé)</SelectItem>
+                <SelectItem value="gemini-2.5-pro">Gemini 2.5 Pro (Premium)</SelectItem>
+                <SelectItem value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite (Économique)</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -119,10 +117,13 @@ export const OpenAIConfigPanel: React.FC<OpenAIConfigPanelProps> = ({
           <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
             <div className="flex items-center gap-2 text-blue-800 dark:text-blue-200">
               <AlertCircle className="h-4 w-4" />
-              <span className="text-sm font-medium">Mode démo</span>
+              <span className="text-sm font-medium">Clé API requise</span>
             </div>
             <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
-              Sans clé API valide, l'application utilisera des données fictives pour la démonstration.
+              Sans clé API valide, l'application utilisera des données fictives.{' '}
+              <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" className="underline">
+                Créer une clé Gemini →
+              </a>
             </p>
           </div>
         )}
