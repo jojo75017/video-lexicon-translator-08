@@ -134,11 +134,10 @@ function cleanGeneratedText(text: string): string {
 
 // Corrige la grammaire et l'orthographe d'un texte
 async function correctGrammar(text: string): Promise<string> {
-  const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
-  if (!openAIApiKey || !text || text.length < 50) return text;
+  const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
+  if (!GEMINI_API_KEY || !text || text.length < 50) return text;
 
   try {
-    // Diviser en chunks de 4000 caractères max pour éviter les timeouts
     const chunks: string[] = [];
     const maxChunkSize = 4000;
     let remaining = text;
@@ -148,7 +147,6 @@ async function correctGrammar(text: string): Promise<string> {
         chunks.push(remaining);
         break;
       }
-      // Trouver une coupure naturelle (fin de phrase ou paragraphe)
       let cutPoint = remaining.lastIndexOf('\n\n', maxChunkSize);
       if (cutPoint < maxChunkSize / 2) cutPoint = remaining.lastIndexOf('. ', maxChunkSize);
       if (cutPoint < maxChunkSize / 2) cutPoint = maxChunkSize;
@@ -164,36 +162,34 @@ async function correctGrammar(text: string): Promise<string> {
       const chunk = chunks[i];
       console.log(`📝 Correction chunk ${i + 1}/${chunks.length} (${chunk.length} chars)`);
       
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${openAIApiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: [
-            {
-              role: 'system',
-              content: `Tu es un correcteur professionnel. Corrige UNIQUEMENT les fautes d'orthographe et de grammaire du texte suivant. 
+      try {
+        const response = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              system_instruction: { parts: [{ text: `Tu es un correcteur professionnel. Corrige UNIQUEMENT les fautes d'orthographe et de grammaire du texte suivant. 
 RÈGLES STRICTES:
 - NE MODIFIE PAS le style, le ton ou le contenu
 - NE REFORMULE PAS les phrases
 - Conserve EXACTEMENT la mise en forme (sauts de ligne, titres, etc.)
-- Retourne UNIQUEMENT le texte corrigé, sans commentaires ni explications`
-            },
-            { role: 'user', content: chunk }
-          ],
-          temperature: 0.1,
-          max_tokens: 4096,
-        }),
-      });
+- Retourne UNIQUEMENT le texte corrigé, sans commentaires ni explications` }] },
+              contents: [{ role: 'user', parts: [{ text: chunk }] }],
+              generationConfig: { temperature: 0.1, maxOutputTokens: 4096 },
+            }),
+          }
+        );
 
-      if (response.ok) {
-        const data = await response.json();
-        correctedChunks.push(data.choices[0]?.message?.content || chunk);
-      } else {
-        console.error(`❌ Erreur correction chunk ${i + 1}:`, await response.text());
+        if (response.ok) {
+          const data = await response.json();
+          correctedChunks.push(data.candidates?.[0]?.content?.parts?.[0]?.text || chunk);
+        } else {
+          console.error(`❌ Erreur correction chunk ${i + 1}:`, await response.text());
+          correctedChunks.push(chunk);
+        }
+      } catch (chunkErr) {
+        console.error(`❌ Erreur correction chunk ${i + 1}:`, chunkErr);
         correctedChunks.push(chunk);
       }
     }
