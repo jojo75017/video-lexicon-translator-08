@@ -171,7 +171,7 @@ const OfferValuePage = () => {
   const totalModulesValue = modules.reduce((sum, m) => sum + m.marketValue, 0);
   const totalBonusesValue = bonuses.reduce((sum, b) => sum + b.marketValue, 0);
   const totalValue = totalModulesValue + totalBonusesValue;
-  const currentPrice = 37;
+  const currentPrice = 97;
   const savings = totalValue - currentPrice;
 
   return (
@@ -505,7 +505,7 @@ const OfferValuePage = () => {
 
             <AccordionItem value="item-9" className="border rounded-lg px-4 bg-card">
               <AccordionTrigger className="text-left font-medium hover:no-underline">
-                Pourquoi le prix passera-t-il à 147€ ?
+                Pourquoi le prix passera-t-il à 247€ ?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground">
                 Le tarif actuel de 97€ est un prix de lancement exceptionnel pour remercier nos premiers utilisateurs. Une fois la période de lancement terminée, le prix passera à 197€ (247€ avec une réduction de 50€ offerte) pour refléter la valeur réelle de l'outil.
