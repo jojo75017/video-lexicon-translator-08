@@ -280,24 +280,37 @@ const SalesPage = () => {
         </div>
       </div>
 
-      {/* Header */}
-      <header className="bg-background/80 backdrop-blur-xl border-b border-border/50 sticky top-[40px] z-50">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-          <Link to="/offres" onClick={() => trackOffresClick('logo_header')} className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-500/20">
+      {/* Header Premium */}
+      <header className="bg-background/60 backdrop-blur-2xl border-b border-border/30 sticky top-[40px] z-50">
+        <div className="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between">
+          <Link to="/offres" onClick={() => trackOffresClick('logo_header')} className="flex items-center gap-2.5 group">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-500/25 group-hover:shadow-violet-500/40 transition-shadow">
               <BookOpen className="w-5 h-5 text-white" />
             </div>
-            <span className="text-lg font-bold">EbookStudio Pro</span>
+            <div>
+              <span className="text-lg font-bold block leading-tight">EbookStudio Pro</span>
+              <span className="text-[10px] text-muted-foreground font-medium tracking-widest uppercase">Workflow IA Premium</span>
+            </div>
           </Link>
-          <nav className="hidden md:flex items-center gap-6 text-sm">
-            <a href="#author-showcase" onClick={(e) => { e.preventDefault(); document.getElementById('author-showcase')?.scrollIntoView({ behavior: 'smooth' }); }} className="text-muted-foreground hover:text-primary transition-colors font-medium cursor-pointer">📚 Ebooks créés</a>
-            <Link to="/blog" className="text-muted-foreground hover:text-primary transition-colors">Blog</Link>
-            <Link to="/demo" className="text-muted-foreground hover:text-primary transition-colors">Démo</Link>
-            <Link to="/formation" className="text-muted-foreground hover:text-primary transition-colors">Formation</Link>
-            <Link to="/faq" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"><HelpCircle className="w-3.5 h-3.5" />FAQ</Link>
+          <nav className="hidden md:flex items-center gap-1 text-sm">
+            {[
+              { href: "#author-showcase", label: "📚 Ebooks créés", scroll: true },
+              { to: "/blog", label: "Blog" },
+              { to: "/demo", label: "Démo" },
+              { to: "/formation", label: "Formation" },
+            ].map((item, i) => (
+              'scroll' in item ? (
+                <a key={i} href={item.href} onClick={(e) => { e.preventDefault(); document.getElementById('author-showcase')?.scrollIntoView({ behavior: 'smooth' }); }}
+                  className="text-muted-foreground hover:text-primary transition-all font-medium cursor-pointer px-3 py-1.5 rounded-lg hover:bg-primary/5">{item.label}</a>
+              ) : (
+                <Link key={i} to={item.to!} className="text-muted-foreground hover:text-primary transition-all px-3 py-1.5 rounded-lg hover:bg-primary/5">{item.label}</Link>
+              )
+            ))}
+            <Link to="/faq" className="text-muted-foreground hover:text-primary transition-all flex items-center gap-1 px-3 py-1.5 rounded-lg hover:bg-primary/5"><HelpCircle className="w-3.5 h-3.5" />FAQ</Link>
           </nav>
-          <Button size="sm" className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-lg shadow-violet-500/20"
+          <Button size="sm" className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-lg shadow-violet-500/20 font-bold"
             onClick={scrollToPricing}>
+            <Sparkles className="w-3.5 h-3.5 mr-1.5" />
             Offre de lancement
           </Button>
         </div>
