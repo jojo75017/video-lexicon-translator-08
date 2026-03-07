@@ -3,34 +3,40 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Check, CreditCard, ArrowLeft, ArrowRight, Sparkles, Zap } from "lucide-react";
+import { Check, CreditCard, ArrowLeft, ArrowRight, Sparkles, Cpu, Headphones, Image } from "lucide-react";
 import { toast } from "sonner";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
+
+const LAUNCH_PRICE = 97;
+const NORMAL_PRICE = 247;
+const PROMO_DISCOUNT = 50;
+const FUTURE_PRICE = NORMAL_PRICE - PROMO_DISCOUNT;
 
 const PLANS = {
   pro: {
     name: "Pro Lifetime",
-    price: "147",
-    originalPrice: "297",
+    price: String(LAUNCH_PRICE),
+    originalPrice: String(NORMAL_PRICE),
     paypalLinks: {
-      full: "https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=147&currency_code=EUR&item_name=EbookStudio%20Pro%20Lifetime",
-      installment3: "https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=49&currency_code=EUR&item_name=EbookStudio%20Pro%20(1/3)",
-      installment5: "https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=29&currency_code=EUR&item_name=EbookStudio%20Pro%20(1/5)",
+      full: `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=${LAUNCH_PRICE}&currency_code=EUR&item_name=EbookStudio%20Pro%20Lifetime`,
+      installment3: `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=33&currency_code=EUR&item_name=EbookStudio%20Pro%20(1/3)`,
+      installment5: `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=20&currency_code=EUR&item_name=EbookStudio%20Pro%20(1/5)`,
     },
-    description: "Tout illimité à vie • Toutes les formations",
+    description: "Gemini 2.5 Pro • Imagen 3 • Azure Neural Voices • Tout illimité à vie",
     features: [
-      "Ebooks illimités à vie",
-      "Chapitres illimités",
-      "10 couvertures IA/mois",
+      "Workflow éditorial 15 rôles IA",
+      "Gemini 2.5 Pro — contexte 1M tokens",
+      "Imagen 3 — couvertures photoréalistes",
+      "Azure Neural Voices — audiobooks",
       "Export PDF/EPUB/Word",
       "Toutes les formations (18 modules)",
       "Outils KDP Premium",
-      "Traduction multi-langues",
-      "Générateur Audiobooks",
+      "Traduction multi-langues (30+)",
+      "P15 Humanisation Anti-IA",
       "Mises à jour à vie",
-      "Support prioritaire"
+      "Support prioritaire + Zoom gratuit"
     ],
-    badge: "⭐ MEILLEURE OFFRE",
+    badge: "🔥 OFFRE DE LANCEMENT",
     color: "from-violet-600 to-purple-600"
   }
 };
@@ -44,9 +50,9 @@ const UpsellPaiementPage = () => {
   const navigate = useNavigate();
 
   const paymentOptions = [
-    { id: 'full' as const, label: 'Paiement unique', price: '147€', detail: 'Paiement unique de 147€' },
-    { id: 'installment3' as const, label: 'En 3 fois', price: '49€', detail: '49€/mois pendant 3 mois' },
-    { id: 'installment5' as const, label: 'En 5 fois', price: '32€', detail: '32€/mois pendant 5 mois' },
+    { id: 'full' as const, label: 'Paiement unique', price: `${LAUNCH_PRICE}€`, detail: `Paiement unique de ${LAUNCH_PRICE}€` },
+    { id: 'installment3' as const, label: 'En 3 fois', price: '33€', detail: '33€/mois pendant 3 mois' },
+    { id: 'installment5' as const, label: 'En 5 fois', price: '20€', detail: '20€/mois pendant 5 mois' },
   ];
 
   const handlePayPalClick = () => {
@@ -83,10 +89,25 @@ const UpsellPaiementPage = () => {
               <span className="text-2xl text-white/50 line-through">{plan.originalPrice}€</span>
               <span className="text-5xl font-black text-white">{plan.price}€</span>
             </div>
-            <p className="text-sm text-white/70 mt-2">Paiement unique • Accès immédiat</p>
+            <p className="text-sm text-white/70 mt-2">Paiement unique • Accès immédiat à vie</p>
+            <p className="text-xs text-white/50 mt-1">Prix après lancement : {FUTURE_PRICE}€</p>
           </CardHeader>
 
           <CardContent className="p-6 space-y-6">
+            {/* Tech stack */}
+            <div className="flex flex-wrap justify-center gap-3 -mt-2">
+              {[
+                { icon: Cpu, label: "Gemini 2.5 Pro", color: "bg-blue-500" },
+                { icon: Image, label: "Imagen 3", color: "bg-violet-500" },
+                { icon: Headphones, label: "Azure Speech", color: "bg-emerald-500" },
+              ].map((tech, i) => (
+                <div key={i} className="flex items-center gap-1.5 bg-slate-800/80 rounded-full px-3 py-1.5 text-xs text-white/80">
+                  <tech.icon className="w-3.5 h-3.5" />
+                  <span>{tech.label}</span>
+                </div>
+              ))}
+            </div>
+
             {/* Features */}
             <div className="bg-slate-800/50 rounded-xl p-4">
               <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
