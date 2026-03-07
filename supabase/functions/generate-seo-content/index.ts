@@ -6,6 +6,40 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+async function callGemini(
+  systemPrompt: string,
+  userPrompt: string,
+  options: { maxOutputTokens?: number; temperature?: number } = {}
+): Promise<string> {
+  const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
+  if (!GEMINI_API_KEY) throw new Error('GEMINI_API_KEY non configurée');
+
+  const { maxOutputTokens = 4000, temperature = 0.7 } = options;
+
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        system_instruction: { parts: [{ text: systemPrompt }] },
+        contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+        generationConfig: { temperature, maxOutputTokens },
+      }),
+    }
+  );
+
+  if (!response.ok) {
+    const errText = await response.text();
+    console.error('Gemini API error:', response.status, errText);
+    if (response.status === 429) throw new Error('Trop de requêtes. Réessayez dans quelques instants.');
+    throw new Error(`Erreur Gemini: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -59,14 +93,6 @@ serve(async (req) => {
       );
     }
 
-    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
-    if (!OPENAI_API_KEY) {
-      return new Response(
-        JSON.stringify({ error: 'Clé API OpenAI non configurée sur le serveur' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
     const wordCount = Math.min(Math.max(Number(targetLength) || 2000, 1500), 5000);
     const selectedTone = (tone || 'professionnel').substring(0, 50);
     const selectedAudience = (audience || 'experts').substring(0, 100);
@@ -92,61 +118,27 @@ Réponds UNIQUEMENT en JSON valide avec cette structure exacte:
   "metaDescription": "Meta description optimisée (max 155 caractères)",
   "seoScore": 85,
   "readabilityScore": 80,
-  "keywords": [
-    {"keyword": "mot-clé 1", "difficulty": 45, "volume": 1200, "intent": "informational"},
-    {"keyword": "mot-clé 2", "difficulty": 35, "volume": 800, "intent": "commercial"}
-  ],
-  "structure": [
-    {"level": 1, "title": "Introduction", "wordCount": 200},
-    {"level": 2, "title": "Section H2", "wordCount": 400},
-    {"level": 3, "title": "Sous-section H3", "wordCount": 250}
-  ],
-  "faq": [
-    {"question": "Question FAQ 1", "answer": "Réponse courte"},
-    {"question": "Question FAQ 2", "answer": "Réponse courte"}
-  ],
-  "images": [
-    {"title": "Image 1", "alt": "Description alt", "suggestion": "Idée d'image"}
-  ]
+  "keywords": [{"keyword": "mot-clé 1", "difficulty": 45, "volume": 1200, "intent": "informational"}],
+  "structure": [{"level": 1, "title": "Introduction", "wordCount": 200}],
+  "faq": [{"question": "Question FAQ 1", "answer": "Réponse courte"}],
+  "images": [{"title": "Image 1", "alt": "Description alt", "suggestion": "Idée d'image"}]
 }`;
 
-    const analysisResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${OPENAI_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          { role: 'system', content: 'Tu es un expert SEO. Réponds UNIQUEMENT en JSON valide sans markdown ni commentaires.' },
-          { role: 'user', content: analysisPrompt }
-        ],
-        temperature: 0.7,
-        max_tokens: 2000,
-      }),
-    });
-
-    if (!analysisResponse.ok) {
-      const errorText = await analysisResponse.text();
-      console.error('OpenAI API error (analysis):', errorText);
-      throw new Error('Erreur lors de l\'analyse SEO');
-    }
-
-    const analysisData = await analysisResponse.json();
     let seoAnalysis;
-    
     try {
-      const rawContent = analysisData.choices?.[0]?.message?.content || '{}';
-      const cleanedContent = rawContent.replace(/```json\n?|\n?```/g, '').trim();
+      const analysisText = await callGemini(
+        'Tu es un expert SEO. Réponds UNIQUEMENT en JSON valide sans markdown ni commentaires.',
+        analysisPrompt,
+        { maxOutputTokens: 2000 }
+      );
+      const cleanedContent = analysisText.replace(/```json\n?|\n?```/g, '').trim();
       seoAnalysis = JSON.parse(cleanedContent);
     } catch (parseError) {
       console.error('Failed to parse SEO analysis:', parseError);
       seoAnalysis = {
         title: `${keyword} : Guide Complet`,
         metaDescription: `Découvrez tout sur ${keyword}. Guide expert avec conseils pratiques.`,
-        seoScore: 75,
-        readabilityScore: 70,
+        seoScore: 75, readabilityScore: 70,
         keywords: [{ keyword, difficulty: 50, volume: 1000, intent: 'informational' }],
         structure: [
           { level: 1, title: 'Introduction', wordCount: 200 },
@@ -154,137 +146,52 @@ Réponds UNIQUEMENT en JSON valide avec cette structure exacte:
           { level: 2, title: 'Conseils pratiques', wordCount: 400 },
           { level: 1, title: 'Conclusion', wordCount: 200 }
         ],
-        faq: [],
-        images: []
+        faq: [], images: []
       };
     }
 
-    // Préparer les liens internes pour le prompt
+    // Préparer les liens internes
     const internalLinksArray: string[] = Array.isArray(internalLinks) ? internalLinks : [];
     const internalLinksSection = internalLinksArray.length > 0 
       ? `
 === LIENS INTERNES (MAILLAGE SEO) ===
 Tu DOIS intégrer naturellement ces liens internes dans le contenu pour améliorer le maillage SEO du site.
-Utilise des ancres textuelles pertinentes et contextuelles (pas "cliquez ici").
-Répartis les liens de manière équilibrée dans le contenu.
-
 Liens à intégrer:
-${internalLinksArray.map((link, i) => `${i + 1}. ${link}`).join('\n')}
-
-Pour chaque lien, crée une ancre textuelle descriptive en rapport avec le contenu de la page liée.
-Exemple de format: [texte d'ancre pertinent](URL)`
+${internalLinksArray.map((link, i) => `${i + 1}. ${link}`).join('\n')}`
       : '';
 
     // Step 2: Generate full content with 12 editorial rules
-    // IMPORTANT: Pour 1500 mots minimum, on a besoin d'environ 2500-3000 tokens de sortie
     const contentPrompt = `Rédige un ${contentType || 'article'} SEO complet sur "${topic}" avec le mot-clé principal "${keyword}".
 
 === CONTRAINTE DE LONGUEUR ABSOLUE ===
 ⚠️ L'article DOIT contenir AU MINIMUM ${wordCount} MOTS.
-⚠️ Si tu n'atteins pas ${wordCount} mots, développe davantage chaque section avec plus d'exemples, de détails et d'explications.
-⚠️ Compte tes mots pendant la rédaction pour t'assurer d'atteindre l'objectif.
 
 === 12 RÈGLES ÉDITORIALES OBLIGATOIRES ===
-
-1. TON CONVERSATIONNEL : Adopte un ton amical et chaleureux, comme si tu parles à un ami autour d'un café.
-
-2. CLARTÉ MAXIMALE : Utilise des phrases courtes et simples, faciles à comprendre pour un néophyte.
-
-3. ILLUSTRATIONS : Emploie des exemples concrets, des métaphores ou des analogies pour expliquer les concepts complexes.
-
-4. ADRESSE DIRECTE : Adresse-toi directement au lecteur ('vous') et intègre des questions rhétoriques pour le maintenir actif.
-
-5. RELATIBILITÉ : Utilise des anecdotes du quotidien ou des scénarios communs pour que le contenu résonne personnellement avec le lecteur.
-
-6. AMBIANCE POSITIVE : Injecte une touche d'humour léger ou d'enthousiasme pour rendre la lecture agréable.
-
-7. ÉVITE LE JARGON : Si un terme technique est nécessaire, explique-le immédiatement et simplement.
-
-8. INTENTION SEO : Le mot-clé principal "${keyword}" doit être naturellement inséré dans le premier paragraphe ET dans au moins deux titres H2.
-
-9. TITRES À DOUBLE GÂCHETTE : Chaque titre H2/H3 doit être à la fois accrocheur pour le lecteur (pour le sommaire) ET optimisé SEO avec des mots-clés secondaires.
-
-10. STRUCTURE SOMMAIRE : Propose une structure détaillée H2/H3 claire pour permettre un sommaire automatique (table des matières).
-
-11. FAQ OBLIGATOIRE : L'article DOIT se terminer par une section "Foire Aux Questions" avec 5 questions/réponses détaillées + 3 témoignages fictifs réalistes pour viser les requêtes longue traîne et la position Zéro.
-
-12. CONCLUSION POSITIVE : Termine sur une note motivante ou un encouragement incitant le lecteur à passer immédiatement à l'action.
+1. TON CONVERSATIONNEL 2. CLARTÉ MAXIMALE 3. ILLUSTRATIONS 4. ADRESSE DIRECTE
+5. RELATIBILITÉ 6. AMBIANCE POSITIVE 7. ÉVITE LE JARGON
+8. INTENTION SEO : Le mot-clé "${keyword}" dans le premier paragraphe ET dans au moins deux titres H2.
+9. TITRES À DOUBLE GÂCHETTE 10. STRUCTURE SOMMAIRE 11. FAQ OBLIGATOIRE (5 questions + 3 témoignages)
+12. CONCLUSION POSITIVE
 ${internalLinksSection}
 === CONTRAINTES TECHNIQUES ===
-- MINIMUM ${wordCount} mots (OBLIGATOIRE, ne pas terminer avant d'avoir atteint ce nombre)
-- Ton: ${selectedTone}
-- Audience: ${selectedAudience}
-- Intent: ${selectedIntent}
-- Langue: ${selectedLanguage}
-- Densité mot-clé: 1-2%
+- MINIMUM ${wordCount} mots - Ton: ${selectedTone} - Audience: ${selectedAudience}
+- Intent: ${selectedIntent} - Langue: ${selectedLanguage} - Densité mot-clé: 1-2%
 - Format: Markdown avec # H1, ## H2, ### H3
-- Listes à puces pour la lisibilité
-- Statistiques et exemples concrets
-${internalLinksArray.length > 0 ? `- IMPORTANT: Intègre les ${internalLinksArray.length} liens internes fournis de manière naturelle` : ''}
 
-Structure suggérée (développe CHAQUE section en profondeur pour atteindre ${wordCount} mots):
-${seoAnalysis.structure?.map((s: any) => `${'#'.repeat(s.level)} ${s.title} (${s.wordCount || 300} mots minimum)`).join('\n') || '# Introduction (250 mots)\n## Section principale (500 mots)\n## Conseils détaillés (400 mots)\n## Cas pratiques et exemples (300 mots)\n# Conclusion (150 mots)'}
+Structure suggérée:
+${seoAnalysis.structure?.map((s: any) => `${'#'.repeat(s.level)} ${s.title} (${s.wordCount || 300} mots minimum)`).join('\n') || '# Introduction\n## Section principale\n# Conclusion'}
 
-## FAQ (obligatoire à la fin - 5 questions minimum avec réponses détaillées de 50-100 mots chacune)
-### Question 1 ?
-Réponse développée...
+## FAQ (5 questions minimum) + ## Témoignages (3 minimum) + ## Conclusion`;
 
-### Question 2 ?
-Réponse développée...
+    const generatedContent = await callGemini(
+      `Tu es un rédacteur web SEO expert. Tu rédiges TOUJOURS des articles de ${wordCount} mots minimum. Rédige du contenu optimisé, engageant et informatif en ${selectedLanguage}.`,
+      contentPrompt,
+      { maxOutputTokens: 8000, temperature: 0.8 }
+    );
 
-## Témoignages (3 minimum)
-> "Témoignage détaillé 1..." - Prénom, Ville
-
-## Conclusion
-Note motivante + call-to-action
-
-⚠️ RAPPEL FINAL: L'article DOIT faire AU MINIMUM ${wordCount} MOTS. Ne termine pas avant d'avoir atteint cet objectif.
-
-Rédige maintenant le contenu complet en respectant TOUTES les 12 règles${internalLinksArray.length > 0 ? ' et en intégrant les liens internes fournis' : ''}.`;
-
-    const contentResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${OPENAI_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          { role: 'system', content: `Tu es un rédacteur web SEO expert. Tu rédiges TOUJOURS des articles de ${wordCount} mots minimum. Tu ne termines JAMAIS un article avant d'avoir atteint la longueur demandée. Rédige du contenu optimisé, engageant et informatif en ${selectedLanguage}.` },
-          { role: 'user', content: contentPrompt }
-        ],
-        temperature: 0.8,
-        max_tokens: 8000,
-      }),
-    });
-
-    if (!contentResponse.ok) {
-      const errorText = await contentResponse.text();
-      console.error('OpenAI API error (content):', errorText);
-      throw new Error('Erreur lors de la génération du contenu');
-    }
-
-    const contentData = await contentResponse.json();
-    const generatedContent = contentData.choices?.[0]?.message?.content || '';
-
-    // Extract token usage from both API calls
-    const analysisTokens = analysisData.usage || { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 };
-    const contentTokens = contentData.usage || { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 };
-    
-    const totalTokenUsage = {
-      promptTokens: analysisTokens.prompt_tokens + contentTokens.prompt_tokens,
-      completionTokens: analysisTokens.completion_tokens + contentTokens.completion_tokens,
-      totalTokens: analysisTokens.total_tokens + contentTokens.total_tokens
-    };
-
-    console.log(`Token usage - Prompt: ${totalTokenUsage.promptTokens}, Completion: ${totalTokenUsage.completionTokens}, Total: ${totalTokenUsage.totalTokens}`);
-
-    // Calculate actual word count
     const actualWordCount = generatedContent.split(/\s+/).filter((w: string) => w.length > 0).length;
     const estimatedReadTime = Math.ceil(actualWordCount / 200);
 
-    // Build final response
     const result = {
       title: seoAnalysis.title || `${keyword} : Guide Complet`,
       metaDescription: seoAnalysis.metaDescription || `Découvrez tout sur ${keyword}.`,
@@ -297,15 +204,8 @@ Rédige maintenant le contenu complet en respectant TOUTES les 12 règles${inter
       keywords: seoAnalysis.keywords || [{ keyword, difficulty: 50, volume: 1000, intent: 'informational' }],
       faq: seoAnalysis.faq || [],
       images: seoAnalysis.images || [],
-      competitorAnalysis: {
-        topCompetitors: [],
-        opportunities: ['Contenu unique généré par IA', 'Structure optimisée pour le SEO']
-      },
-      technicalSEO: {
-        pagespeed: { mobile: 85, desktop: 92 },
-        mobileOptimization: { score: 88 }
-      },
-      tokenUsage: totalTokenUsage
+      competitorAnalysis: { topCompetitors: [], opportunities: ['Contenu unique généré par IA', 'Structure optimisée pour le SEO'] },
+      technicalSEO: { pagespeed: { mobile: 85, desktop: 92 }, mobileOptimization: { score: 88 } },
     };
 
     console.log(`SEO content generated successfully: ${actualWordCount} words, score: ${result.seoScore}`);
