@@ -6,13 +6,13 @@ import {
   getApiKeySecurityWarning 
 } from '@/utils/security/secureStorage';
 
-const OPENAI_API_KEY = 'openai_api_key';
-const OPENAI_MODEL = 'openai_model';
+const GEMINI_API_KEY = 'openai_api_key'; // Keep same localStorage key for backward compat
+const GEMINI_MODEL = 'openai_model';
 
 // Security: Log warning about localStorage API key storage
 const logSecurityWarning = () => {
   console.warn(
-    '[Security] OpenAI API key is stored in localStorage. ' +
+    '[Security] Gemini API key is stored in localStorage. ' +
     'This is accessible to any JavaScript code on this page. ' +
     'Avoid using this on shared or public computers.'
   );
@@ -20,27 +20,26 @@ const logSecurityWarning = () => {
 
 export const useOpenAIConfig = () => {
   const [apiKey, setApiKey] = useState<string>('');
-  const [model, setModel] = useState<string>('gpt-4.1-2025-04-14');
+  const [model, setModel] = useState<string>('gemini-2.5-flash');
   const [isValidating, setIsValidating] = useState(false);
   const [isValid, setIsValid] = useState<boolean | null>(null);
   const [securityWarningShown, setSecurityWarningShown] = useState(false);
 
   // Charger la configuration depuis localStorage
   useEffect(() => {
-    const savedApiKey = localStorage.getItem(OPENAI_API_KEY);
-    const savedModel = localStorage.getItem(OPENAI_MODEL);
+    const savedApiKey = localStorage.getItem(GEMINI_API_KEY);
+    const savedModel = localStorage.getItem(GEMINI_MODEL);
     
     if (savedApiKey) {
-      // Security: Validate format before using
-      if (isValidApiKeyFormat(savedApiKey, 'sk-')) {
+      // Accept both sk- (legacy OpenAI) and AIza (Gemini) format keys
+      const isValidFormat = isValidApiKeyFormat(savedApiKey, 'AIza') || isValidApiKeyFormat(savedApiKey, 'sk-');
+      if (isValidFormat) {
         setApiKey(savedApiKey);
         logSecurityWarning();
-        // Valider automatiquement la clé sauvegardée
         setTimeout(() => validateApiKey(savedApiKey), 100);
       } else {
-        // Remove potentially malicious key
         console.warn('[Security] Stored API key has invalid format, removing.');
-        localStorage.removeItem(OPENAI_API_KEY);
+        localStorage.removeItem(GEMINI_API_KEY);
       }
     }
     if (savedModel) {
@@ -53,40 +52,38 @@ export const useOpenAIConfig = () => {
     setIsValid(null);
     
     if (newApiKey) {
-      // Security: Validate format before storing
-      if (!isValidApiKeyFormat(newApiKey, 'sk-')) {
+      const isValidFormat = isValidApiKeyFormat(newApiKey, 'AIza') || isValidApiKeyFormat(newApiKey, 'sk-');
+      if (!isValidFormat) {
         console.warn('[Security] API key has invalid format');
         setIsValid(false);
         return;
       }
       
-      localStorage.setItem(OPENAI_API_KEY, newApiKey);
+      localStorage.setItem(GEMINI_API_KEY, newApiKey);
       logSecurityWarning();
       
-      // Show security warning to user once
       if (!securityWarningShown) {
         setSecurityWarningShown(true);
       }
       
-      // Valider automatiquement la nouvelle clé
       await validateApiKey(newApiKey);
     } else {
-      localStorage.removeItem(OPENAI_API_KEY);
+      localStorage.removeItem(GEMINI_API_KEY);
     }
   };
 
   const updateModel = (newModel: string) => {
     setModel(newModel);
-    localStorage.setItem(OPENAI_MODEL, newModel);
-    setIsValid(null); // Reset validation status when model changes
+    localStorage.setItem(GEMINI_MODEL, newModel);
+    setIsValid(null);
   };
 
   const validateApiKey = async (keyToValidate?: string) => {
     const key = keyToValidate || apiKey;
     if (!key) return false;
 
-    // Security: Pre-validate format
-    if (!isValidApiKeyFormat(key, 'sk-')) {
+    const isValidFormat = isValidApiKeyFormat(key, 'AIza') || isValidApiKeyFormat(key, 'sk-');
+    if (!isValidFormat) {
       setIsValid(false);
       return false;
     }
@@ -114,21 +111,18 @@ export const useOpenAIConfig = () => {
     hasValidKey: hasValidApiKey()
   });
 
-  // Security: Get masked version of API key for display
   const getMaskedApiKey = () => {
     return apiKey ? maskApiKey(apiKey) : '';
   };
 
-  // Security: Get warning message
   const getSecurityWarning = () => {
     return getApiKeySecurityWarning();
   };
 
-  // Security: Clear stored API key
   const clearApiKey = () => {
     setApiKey('');
     setIsValid(null);
-    localStorage.removeItem(OPENAI_API_KEY);
+    localStorage.removeItem(GEMINI_API_KEY);
     console.log('[Security] API key cleared from storage');
   };
 
