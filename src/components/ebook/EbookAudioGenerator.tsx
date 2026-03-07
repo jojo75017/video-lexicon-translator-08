@@ -118,6 +118,11 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
   const [isGeneratingMp3, setIsGeneratingMp3] = useState(false);
   const [mp3Progress, setMp3Progress] = useState(0);
   const [mp3ProgressLabel, setMp3ProgressLabel] = useState('');
+
+  // Azure Speech niche & voice
+  const [selectedNiche, setSelectedNiche] = useState('default');
+  const [selectedAzureVoice, setSelectedAzureVoice] = useState('');
+  const [useAzureForExport, setUseAzureForExport] = useState(true);
   // Timer
   useEffect(() => {
     if (isSpeaking && isPlaying) {
