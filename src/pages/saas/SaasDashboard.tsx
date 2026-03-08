@@ -70,8 +70,8 @@ const QuickAction: React.FC<QuickActionProps> = ({ title, description, icon: Ico
       <Icon className="h-6 w-6 text-primary-foreground" />
     </div>
     <div>
-      <p className="font-medium">{title}</p>
-      <p className="text-sm text-muted-foreground">{description}</p>
+      <p className="font-medium text-white">{title}</p>
+      <p className="text-sm text-white/60">{description}</p>
     </div>
   </button>
 );
