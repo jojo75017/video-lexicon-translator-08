@@ -760,6 +760,57 @@ export type Database = {
         }
         Relationships: []
       }
+      sales_prospects: {
+        Row: {
+          auto_send: boolean | null
+          completed: boolean | null
+          created_at: string | null
+          current_step: number | null
+          email: string
+          first_name: string | null
+          id: string
+          imported_at: string | null
+          last_email_sent_at: string | null
+          next_email_at: string | null
+          source: string | null
+          status: string | null
+          unsubscribed: boolean | null
+          updated_at: string | null
+        }
+        Insert: {
+          auto_send?: boolean | null
+          completed?: boolean | null
+          created_at?: string | null
+          current_step?: number | null
+          email: string
+          first_name?: string | null
+          id?: string
+          imported_at?: string | null
+          last_email_sent_at?: string | null
+          next_email_at?: string | null
+          source?: string | null
+          status?: string | null
+          unsubscribed?: boolean | null
+          updated_at?: string | null
+        }
+        Update: {
+          auto_send?: boolean | null
+          completed?: boolean | null
+          created_at?: string | null
+          current_step?: number | null
+          email?: string
+          first_name?: string | null
+          id?: string
+          imported_at?: string | null
+          last_email_sent_at?: string | null
+          next_email_at?: string | null
+          source?: string | null
+          status?: string | null
+          unsubscribed?: boolean | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       series_bibles: {
         Row: {
           characters: Json | null
