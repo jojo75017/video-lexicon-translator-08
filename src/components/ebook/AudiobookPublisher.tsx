@@ -317,10 +317,16 @@ export const AudiobookPublisher: React.FC<AudiobookPublisherProps> = ({
       {audiobooks.length > 0 && (
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Headphones className="h-5 w-5 text-purple-500" />
-              Mes livres audio en ligne ({audiobooks.length})
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Headphones className="h-5 w-5 text-purple-500" />
+                Mes livres audio en ligne ({audiobooks.length})
+              </CardTitle>
+              <Button variant="outline" size="sm" className="gap-1.5 text-xs" onClick={() => exportWooCommerce()}>
+                <ShoppingBag className="h-3.5 w-3.5" />
+                Exporter WooCommerce
+              </Button>
+            </div>
           </CardHeader>
           <CardContent className="space-y-3">
             {audiobooks.map((book) => (
