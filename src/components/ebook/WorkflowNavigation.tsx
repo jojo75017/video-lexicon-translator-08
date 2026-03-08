@@ -226,17 +226,17 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
         </div>
 
         {/* Current Step Details */}
-        <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-lg p-3">
+        <div className="bg-gold/10 border border-gold/20 rounded-lg p-3">
           <div className="flex items-start gap-3">
-            <div className="w-7 h-7 rounded-full bg-cyan-500/20 flex items-center justify-center shrink-0">
-              <span className="text-xs font-bold text-cyan-400">{currentStepIndex + 1}</span>
+            <div className="w-7 h-7 rounded-full bg-gold/20 flex items-center justify-center shrink-0">
+              <span className="text-xs font-bold text-gold">{currentStepIndex + 1}</span>
             </div>
             <div className="min-w-0 flex-1">
               <h4 className="font-semibold text-sm text-white">{currentStep.label}</h4>
               <p className="text-xs text-white/50 mt-0.5">{currentStep.description}</p>
               <div className="flex items-center gap-3 mt-1.5 flex-wrap">
                 {currentStep.estimatedMinutes && (
-                  <span className="text-xs text-cyan-400">⏱️ ~{currentStep.estimatedMinutes} min</span>
+                  <span className="text-xs text-gold">⏱️ ~{currentStep.estimatedMinutes} min</span>
                 )}
                 {currentStep.tip && (
                   <span className="text-xs text-white/40 italic">💡 {currentStep.tip}</span>
