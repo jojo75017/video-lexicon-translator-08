@@ -58,7 +58,9 @@ import {
   Monitor,
   Library,
   Music,
-  CalendarDays
+  CalendarDays,
+  Contact,
+  Mail
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -348,6 +350,8 @@ const categories: Category[] = [
       { id: 'dashboard', label: 'Tableau de Bord', icon: LayoutDashboard },
       { id: 'marketing-dashboard', label: 'Dashboard Marketing', icon: TrendingUp, isLink: true, href: '/dashboard-marketing', isNew: true },
       { id: 'admin-panel', label: 'Gestion Abonnés', icon: Shield, isLink: true, href: '/admin' },
+      { id: 'crm-page', label: 'CRM', icon: Contact, isLink: true, href: '/crm', isNew: true },
+      { id: 'email-preview', label: 'Aperçu Emails', icon: Mail, isLink: true, href: '/apercu-emails', isNew: true },
       { id: 'prospect-manager', label: 'Prospects & Emails', icon: Target, isLink: true, href: '/gestion-prospects', isNew: true },
       { id: 'social-marketing', label: 'Suite Marketing', icon: BarChart3, isLink: true, href: '/generateur-posts', isNew: true },
       { id: 'subscription', label: 'Abonnement', icon: CreditCard },
@@ -502,7 +506,8 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
       ...cat,
       items: cat.items.filter(item => {
         // Hide admin-only items for non-admins
-        if (item.id === 'admin-panel' && !isAdmin) return false;
+        const adminOnlyIds = ['admin-panel', 'crm-page', 'email-preview', 'prospect-manager'];
+        if (adminOnlyIds.includes(item.id) && !isAdmin) return false;
         return true;
       })
     }));
