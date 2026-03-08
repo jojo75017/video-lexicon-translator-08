@@ -21,6 +21,9 @@ interface GeneratedPost {
   hashtags: string[];
 }
 
+const LINKEDIN_PROFILE = 'https://www.linkedin.com/in/consultantwebmaster/';
+const FACEBOOK_PAGE = 'https://www.facebook.com/formationenaffiliation/';
+
 const FACEBOOK_TEMPLATES: GeneratedPost[] = [
   {
     id: 'fb-gen-1', platform: 'facebook', type: 'Post groupe "Revenus Passifs"',
@@ -44,6 +47,8 @@ Coût par ebook : ~0,30€
 
 🆓 Démo gratuite : https://ebookstudio.fr/demo
 💰 Offre Fondateur 97€ (au lieu de 297€) : https://ebookstudio.fr/offres
+
+📌 Suivez ma page pour plus d'astuces KDP : https://www.facebook.com/formationenaffiliation/
 
 Questions en commentaire ! 👇`,
     hashtags: ['revenuspassifs', 'kdp', 'amazon', 'ebook', 'ia', 'autoedition']
@@ -171,7 +176,9 @@ Un export KDP prêt à publier.
 Si vous êtes entrepreneur, freelance, coach, ou expert...
 Vous avez un livre en vous. Cet outil le fait sortir.
 
-🔗 Lien en commentaire pour tester gratuitement.`,
+🔗 Lien en commentaire pour tester gratuitement.
+
+👤 Mon profil : https://www.linkedin.com/in/consultantwebmaster/`,
     hashtags: ['IA', 'KDP', 'Amazon', 'Entrepreneuriat', 'SelfPublishing', 'Innovation']
   },
   {
@@ -332,6 +339,8 @@ Liens à inclure :
 - Démo gratuite : https://ebookstudio.fr/demo
 - Offres : https://ebookstudio.fr/offres
 - Profil Amazon : https://www.amazon.fr/Mr-Georges-Boubet/e/B0CGVLHNX7
+- Pour les posts Facebook, inclure le lien de la page : https://www.facebook.com/formationenaffiliation/
+- Pour les posts LinkedIn, inclure le profil : https://www.linkedin.com/in/consultantwebmaster/
 
 Sujet/Angle demandé : ${customTopic}
 Ton : ${customTone}
