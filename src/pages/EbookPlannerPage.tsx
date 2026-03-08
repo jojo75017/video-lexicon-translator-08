@@ -3158,7 +3158,6 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             ebookTitle={ebookTitle}
             authorName={authorName}
             bookSummary={bookSummary}
-            coverImage={coverImage}
             kdpDescription={kdpDescription}
           />
         );
