@@ -305,7 +305,19 @@ const categories: Category[] = [
     color: 'from-indigo-500 to-violet-500',
     items: [
       { id: 'audiobook', label: '🎙️ Livre Audio', icon: Headphones },
+      { id: 'audio-express', label: '⚡ Audio Express (9 étapes)', icon: Zap, isNew: true },
       { id: 'formation-audiobook-distribution', label: '📚 Formation Distribution', icon: BookOpen, isNew: true },
+    ]
+  },
+  // ========== 11. BIBLIOTHÈQUE ==========
+  {
+    id: 'bibliotheque',
+    label: '📚 Bibliothèque',
+    emoji: '📚',
+    color: 'from-emerald-500 to-green-500',
+    items: [
+      { id: 'ebook-library', label: '📚 Ma Bibliothèque', icon: Library, isNew: true },
+      { id: 'projects', label: '📁 Mes Projets', icon: FolderOpen },
     ]
   },
   // ========== 9. MON COMPTE ==========
@@ -315,7 +327,7 @@ const categories: Category[] = [
     emoji: '⚙️',
     color: 'from-gray-500 to-slate-500',
     items: [
-      { id: 'projects', label: '📁 Mes Projets', icon: FolderOpen },
+      { id: 'dashboard', label: '📊 Tableau de Bord', icon: LayoutDashboard },
       { id: 'dashboard', label: '📊 Tableau de Bord', icon: LayoutDashboard },
       { id: 'admin-panel', label: '👑 Gestion Abonnés', icon: Shield, isLink: true, href: '/admin' },
       { id: 'subscription', label: '💳 Abonnement', icon: CreditCard },
