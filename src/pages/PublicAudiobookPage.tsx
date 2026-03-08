@@ -373,6 +373,7 @@ h1{font-size:2.5rem;font-weight:800;margin-bottom:8px;line-height:1.1}
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#3a4a5c] via-[#1e2a38] to-[#0f1319] text-white">
       {audiobook.audio_url && <audio ref={audioRef} src={audiobook.audio_url} preload="metadata" />}
+      {(audiobook as any).excerpt_url && <audio ref={excerptRef} src={(audiobook as any).excerpt_url} preload="metadata" />}
 
       {/* ===== HERO HEADER (Audible-style) ===== */}
       <div className="relative overflow-hidden">
