@@ -148,10 +148,10 @@ const SalesPage = () => {
           </Link>
           
           <nav className="hidden md:flex items-center gap-6 text-sm">
-            <a href="#features" className="text-slate-400 hover:text-white transition-colors">Fonctionnalités</a>
-            <a href="#pricing" className="text-slate-400 hover:text-white transition-colors">Tarif</a>
-            <Link to="/demo" className="text-slate-400 hover:text-white transition-colors">Démo</Link>
-            <Link to="/faq" className="text-slate-400 hover:text-white transition-colors">FAQ</Link>
+            <a href="#features" className="text-slate-300 hover:text-white transition-colors">Fonctionnalités</a>
+            <a href="#pricing" className="text-slate-300 hover:text-white transition-colors">Tarif</a>
+            <Link to="/demo" className="text-slate-300 hover:text-white transition-colors">Démo</Link>
+            <Link to="/faq" className="text-slate-300 hover:text-white transition-colors">FAQ</Link>
           </nav>
 
           <Button onClick={scrollToPricing} className="bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold rounded-xl px-5">
