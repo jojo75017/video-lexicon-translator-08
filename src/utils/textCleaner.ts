@@ -12,12 +12,27 @@ export function cleanGeneratedText(text: string): string {
   if (!text || typeof text !== 'string') return text || '';
   
   let cleaned = text
+    // ========== NETTOYAGE MARKDOWN / ASTÉRISQUES ==========
+    // Supprimer gras+italique ***text*** ou ___text___
+    .replace(/\*{3}(.+?)\*{3}/g, '$1')
+    .replace(/_{3}(.+?)_{3}/g, '$1')
+    // Supprimer gras **text** ou __text__
+    .replace(/\*{2}(.+?)\*{2}/g, '$1')
+    .replace(/_{2}(.+?)_{2}/g, '$1')
+    // Supprimer italique *text* ou _text_ (pas les underscores dans les mots)
+    .replace(/\*(.+?)\*/g, '$1')
+    // Supprimer les astérisques orphelins restants
+    .replace(/\*+/g, '')
+    // Supprimer les titres markdown # ## ### etc.
+    .replace(/^#{1,6}\s+/gm, '')
+    // Supprimer les séparateurs markdown --- *** ===
+    .replace(/^[=\-*_]{3,}\s*$/gm, '')
+    // Supprimer les balises de liste markdown - ou *
+    .replace(/^\s*[-*]\s+/gm, '• ')
     // ========== NETTOYAGE DES ENTITÉS HTML ==========
-    // Supprimer &nbsp; et variantes (avec ou sans point-virgule)
     .replace(/&nbsp;?/gi, ' ')
     .replace(/&#160;/gi, ' ')
     .replace(/&#xa0;/gi, ' ')
-    // Autres entités HTML courantes
     .replace(/&amp;/gi, '&')
     .replace(/&lt;/gi, '<')
     .replace(/&gt;/gi, '>')
@@ -26,13 +41,9 @@ export function cleanGeneratedText(text: string): string {
     .replace(/&#39;/gi, "'")
     // Convertir les guillemets échappés \" -> guillemet réel
     .replace(/\\"/g, '"')
-    // Supprimer les backslashes échappés
     .replace(/\\\\/g, '')
-    // Supprimer les retours à la ligne échappés \n -> nouvelle ligne
     .replace(/\\n/g, '\n')
-    // Supprimer les tabulations échappées
     .replace(/\\t/g, '\t')
-    // Supprimer les slashes échappés
     .replace(/\\\//g, '/')
     // Supprimer les patterns JSON résiduels
     .replace(/^\s*{\s*"[^"]*"\s*:\s*"/gm, '')
@@ -43,12 +54,9 @@ export function cleanGeneratedText(text: string): string {
     .replace(/":\s*"/g, ': ')
     .replace(/{\s*"/g, '')
     .replace(/"\s*}/g, '')
-    // Supprimer les guillemets triples+ orphelins en début/fin de ligne (garder les simples/doubles)
     .replace(/^"{3,}/gm, '"')
     .replace(/"{3,}$/gm, '"')
-    // Nettoyer les doubles espaces
     .replace(/  +/g, ' ')
-    // Nettoyer les espaces avant ponctuation
     .replace(/ ([.,;:!?])/g, '$1');
   
   // ✅ CRITIQUE: Boucle RENFORCÉE pour garantir que TOUS les mots collés sont corrigés
