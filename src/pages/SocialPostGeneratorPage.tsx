@@ -48,6 +48,8 @@ Coût par ebook : ~0,30€
 🆓 Démo gratuite : https://ebookstudio.fr/demo
 💰 Offre Fondateur 97€ (au lieu de 297€) : https://ebookstudio.fr/offres
 
+📌 Suivez ma page pour plus d'astuces KDP : https://www.facebook.com/formationenaffiliation/
+
 Questions en commentaire ! 👇`,
     hashtags: ['revenuspassifs', 'kdp', 'amazon', 'ebook', 'ia', 'autoedition']
   },
