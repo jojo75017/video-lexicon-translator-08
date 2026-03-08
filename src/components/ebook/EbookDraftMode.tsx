@@ -117,7 +117,7 @@ export const EbookDraftMode: React.FC<EbookDraftModeProps> = ({
 
           {/* Options */}
           <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-            <Switch id="skip" checked={skipExisting} onCheckedChange={setSkipExisting} />
+            <input type="checkbox" id="skip" checked={skipExisting} onChange={(e) => setSkipExisting(e.target.checked)} className="rounded" />
             <Label htmlFor="skip" className="text-sm cursor-pointer">Passer les chapitres déjà rédigés</Label>
           </div>
         </CardContent>
