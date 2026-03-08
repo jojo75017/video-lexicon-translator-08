@@ -497,7 +497,7 @@ const SalesPage = () => {
 
                 {/* Paiement fractionné */}
                 <div className="mt-8 pt-6 border-t border-slate-800">
-                  <p className="text-center text-slate-500 text-sm mb-4">Ou payez en plusieurs fois</p>
+                  <p className="text-center text-white/60 text-sm mb-4">Ou payez en plusieurs fois</p>
                   <div className="grid grid-cols-2 gap-4">
                     {[
                       { label: "En 3 fois", price: "33€/mois" },
