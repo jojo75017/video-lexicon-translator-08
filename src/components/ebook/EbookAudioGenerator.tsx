@@ -648,6 +648,22 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
       const zipName = `audiobook-${(ebookTitle || 'ebook').replace(/\s+/g, '-')}.zip`;
       saveAs(zipBlob, zipName);
       toast.success(`Audiobook exporté avec intro ! ${sections.length + 1} fichiers MP3`);
+
+      // Save merged audio to library
+      setMp3ProgressLabel('Sauvegarde en bibliothèque...');
+      const allMp3Files = Object.values(zip.files);
+      const mp3Blobs: Blob[] = [];
+      for (const file of allMp3Files) {
+        if (!file.dir) {
+          const content = await file.async('blob');
+          mp3Blobs.push(content);
+        }
+      }
+      if (mp3Blobs.length > 0) {
+        const mergedBlob = new Blob(mp3Blobs, { type: 'audio/mpeg' });
+        const totalMinutes = sections.reduce((sum, s) => sum + s.estimatedMinutes, 0);
+        await saveToLibrary(mergedBlob, ebookTitle || 'Audiobook', totalMinutes * 60);
+      }
     } catch (error: any) {
       console.error('MP3 batch export error:', error);
       toast.error(`Erreur export MP3 : ${error.message}`);
