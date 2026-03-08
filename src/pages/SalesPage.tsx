@@ -442,7 +442,7 @@ const SalesPage = () => {
             <motion.h2 variants={fadeIn} custom={1} className="text-4xl sm:text-5xl md:text-6xl font-black mb-4">
               Accès Pro Lifetime
             </motion.h2>
-            <motion.p variants={fadeIn} custom={2} className="text-slate-400 text-lg">
+            <motion.p variants={fadeIn} custom={2} className="text-white/80 text-lg">
               Un paiement unique. Accès à vie. Sans abonnement.
             </motion.p>
           </motion.div>
