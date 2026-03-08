@@ -151,6 +151,10 @@ import { EbookWritingIntelligence } from '@/components/ebook/EbookWritingIntelli
 import { EbookPublicationPlanner } from '@/components/ebook/EbookPublicationPlanner';
 import { EbookRoyaltyDashboard } from '@/components/ebook/EbookRoyaltyDashboard';
 import { EbookUXEnhancements } from '@/components/ebook/EbookUXEnhancements';
+import { EbookKdpPrePublishChecklist } from '@/components/ebook/EbookKdpPrePublishChecklist';
+import { EbookPromptChainGenerator } from '@/components/ebook/EbookPromptChainGenerator';
+import { EbookCompetitorDashboard } from '@/components/ebook/EbookCompetitorDashboard';
+import { EbookBetaReaderHub } from '@/components/ebook/EbookBetaReaderHub';
 
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
 import { ebookTemplates } from '@/data/ebookTemplates';

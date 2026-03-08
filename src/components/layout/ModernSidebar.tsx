@@ -299,6 +299,10 @@ const categories: Category[] = [
     emoji: '🚀',
     color: 'from-purple-500 to-pink-500',
     items: [
+      { id: 'kdp-prepublish-checklist', label: '✅ Checklist Pré-Publication', icon: Shield, isNew: true },
+      { id: 'prompt-chain-generator', label: '⛓️ Chaînes de Prompts', icon: Zap, isNew: true },
+      { id: 'competitor-dashboard', label: '🏆 Tableau Concurrentiel', icon: Search, isNew: true },
+      { id: 'beta-reader-hub', label: '👥 Hub Bêta-Lecteurs', icon: Users, isNew: true },
       { id: 'publication-planner', label: '📅 Planificateur Publication', icon: Target, isNew: true },
       { id: 'royalty-dashboard', label: '💰 Dashboard Revenus', icon: DollarSign, isNew: true },
       { id: 'ux-center', label: '⚡ Centre Productivité', icon: Zap, isNew: true },
