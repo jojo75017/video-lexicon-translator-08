@@ -310,7 +310,7 @@ const SalesPage = () => {
             <motion.h2 variants={fadeIn} className="text-3xl sm:text-4xl md:text-5xl font-black mb-4">
               La différence EbookStudio
             </motion.h2>
-            <motion.p variants={fadeIn} custom={1} className="text-slate-400 text-lg">Comparez vous-même</motion.p>
+            <motion.p variants={fadeIn} custom={1} className="text-white/80 text-lg">Comparez vous-même</motion.p>
           </motion.div>
 
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}
