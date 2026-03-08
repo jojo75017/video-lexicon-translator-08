@@ -401,29 +401,29 @@ const AudiobookDemoPage = () => {
 
         {/* ===== REVIEWS ===== */}
         <div className="mt-12">
-          <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-            <Star className="w-6 h-6 text-amber-400 fill-amber-400" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+            <Star className="w-6 h-6 text-orange-500 fill-orange-500" />
             Avis des auditeurs
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {getRandomReviews(audiobook.slug || audiobook.title).map((review, i) => (
-              <div key={i} className="bg-white/[0.04] border border-white/[0.08] rounded-2xl p-5">
+              <div key={i} className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center font-bold text-sm text-white shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center font-bold text-sm text-white shrink-0">
                     {review.initial}
                   </div>
                   <div>
-                    <p className="font-semibold text-sm text-white">{review.name}</p>
-                    <p className="text-[11px] text-white/35">A écouté ce titre</p>
+                    <p className="font-semibold text-sm text-gray-900">{review.name}</p>
+                    <p className="text-[11px] text-gray-400">A écouté ce titre</p>
                   </div>
                 </div>
                 <div className="flex gap-0.5 mb-2">
                   {[1,2,3,4,5].map(s => (
-                    <Star key={s} className={`w-3.5 h-3.5 ${s <= review.stars ? 'text-amber-400 fill-amber-400' : 'text-white/20'}`} />
+                    <Star key={s} className={`w-3.5 h-3.5 ${s <= review.stars ? 'text-orange-500 fill-orange-500' : 'text-gray-200'}`} />
                   ))}
                 </div>
-                <p className="text-white/60 text-sm leading-relaxed">{review.text}</p>
-                <div className="mt-3 inline-flex items-center gap-1 bg-amber-500/10 text-amber-400 text-[11px] font-semibold px-2 py-0.5 rounded-full">
+                <p className="text-gray-500 text-sm leading-relaxed">{review.text}</p>
+                <div className="mt-3 inline-flex items-center gap-1 bg-orange-50 text-orange-600 text-[11px] font-semibold px-2 py-0.5 rounded-full">
                   <Headphones className="w-3 h-3" /> Avis spontané
                 </div>
               </div>
