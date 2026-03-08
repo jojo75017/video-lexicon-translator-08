@@ -36,7 +36,7 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, change, changeType, i
       </div>
     </CardHeader>
     <CardContent>
-      <div className="text-2xl font-bold">{value}</div>
+      <div className="text-2xl font-bold text-white">{value}</div>
       <div className="flex items-center gap-2 mt-1">
         <div className={`flex items-center text-xs ${changeType === 'positive' ? 'text-green-600' : 'text-red-600'}`}>
           {changeType === 'positive' ? (
