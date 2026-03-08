@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { X, Gift, Download, Sparkles, CheckCircle } from "lucide-react";
+import { Gift, Download, Sparkles, CheckCircle } from "lucide-react";
 import { generateKdpNichesPdf } from "@/utils/generateKdpNichesPdf";
 import { toast } from "sonner";
 import { trackExitIntent } from "@/utils/analytics";
@@ -10,18 +10,16 @@ interface ExitIntentPopupProps {
   onContinueToOffer?: () => void;
 }
 
-const EXIT_INTENT_KEY = "exit_intent_shown";
-
 const ExitIntentPopup = ({ onContinueToOffer }: ExitIntentPopupProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const hasAutoShownRef = useRef(false);
 
   const openPopup = useCallback(() => {
-    const alreadyShown = sessionStorage.getItem(EXIT_INTENT_KEY);
-    if (alreadyShown) return;
+    if (hasAutoShownRef.current) return;
+    hasAutoShownRef.current = true;
     trackExitIntent('shown');
     setIsOpen(true);
-    sessionStorage.setItem(EXIT_INTENT_KEY, "true");
   }, []);
 
   // Exit-intent detection: mouse leaves viewport OR scroll-up rapide OR inactivité
