@@ -121,6 +121,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
   const [mp3Progress, setMp3Progress] = useState(0);
   const [mp3ProgressLabel, setMp3ProgressLabel] = useState('');
   const [isPreviewingJingle, setIsPreviewingJingle] = useState(false);
+  const [isDownloadingIntro, setIsDownloadingIntro] = useState(false);
   const jingleAudioRef = useRef<HTMLAudioElement | null>(null);
 
   // Azure Speech niche & voice
