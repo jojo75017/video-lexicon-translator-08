@@ -135,13 +135,14 @@ const categories: Category[] = [
     emoji: '✍️',
     color: 'from-blue-500 to-indigo-500',
     items: [
+      { id: 'focus-mode', label: 'Mode Focus / Zen', icon: Eye, isNew: true },
       { id: 'draft-mode', label: 'Brouillon Rapide', icon: Zap },
       { id: 'rich-editor', label: 'Éditeur Enrichi', icon: PenTool },
       { id: 'writing', label: 'Écrire les Chapitres', icon: PenTool },
       { id: 'aichat', label: 'Assistant IA', icon: Bot },
       { id: 'writing-intelligence', label: 'Assistant Intelligent', icon: Brain },
       { id: 'prompt-library', label: 'Bibliothèque Prompts', icon: Library },
-      { id: 'prompt-chain-generator', label: 'Chaînes de Prompts', icon: Zap, isNew: true },
+      { id: 'prompt-chain-generator', label: 'Chaînes de Prompts', icon: Zap },
       { id: 'characters', label: 'Personnages', icon: Users },
       { id: 'voice', label: 'Dictée Vocale', icon: Volume2 },
     ]
