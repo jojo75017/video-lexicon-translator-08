@@ -607,8 +607,8 @@ const SalesPage = () => {
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4 text-slate-300 text-sm uppercase tracking-wider">Newsletter</h4>
-              <p className="text-slate-500 text-sm mb-4">Conseils KDP et IA gratuits</p>
+              <h4 className="font-semibold mb-4 text-white text-sm uppercase tracking-wider">Newsletter</h4>
+              <p className="text-white/60 text-sm mb-4">Conseils KDP et IA gratuits</p>
               <NewsletterForm />
             </div>
           </div>
