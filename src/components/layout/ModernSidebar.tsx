@@ -570,20 +570,20 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
         {!isCollapsed && (
           <div className="p-3">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-violet-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
               <Input
                 type="text"
                 placeholder="Rechercher un outil..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-8 h-10 text-sm bg-white/60 dark:bg-white/5 border-violet-200/60 dark:border-violet-800/40 rounded-xl focus:border-violet-400 focus:ring-violet-400/20"
+                className="w-full pl-10 pr-8 h-10 text-sm bg-slate-900/50 border-slate-800 text-white placeholder:text-slate-600 rounded-xl focus:border-cyan-500/50 focus:ring-cyan-500/20"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-violet-100 dark:hover:bg-violet-900/30"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-slate-800"
                 >
-                  <X className="w-3 h-3 text-muted-foreground" />
+                  <X className="w-3 h-3 text-slate-500" />
                 </button>
               )}
             </div>
