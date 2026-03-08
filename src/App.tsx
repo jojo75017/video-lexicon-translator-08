@@ -446,6 +446,7 @@ const App = () => {
             />
             
             {/* Public audiobook routes */}
+            <Route path="/audiobook-demo" element={<AudiobookDemoPage />} />
             <Route path="/audiobook/:slug" element={<PublicAudiobookPage />} />
             <Route path="/audiobook-embed/:slug" element={<AudiobookEmbedPage />} />
             <Route path="/formation-embed" element={<FormationEmbedPage />} />
