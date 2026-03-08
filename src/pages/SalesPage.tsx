@@ -482,7 +482,7 @@ const SalesPage = () => {
                       <div className="w-5 h-5 rounded-full bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
                         <Check className="w-3 h-3 text-cyan-400" />
                       </div>
-                      <span className="text-sm text-slate-300">{f}</span>
+                      <span className="text-sm text-white">{f}</span>
                     </div>
                   ))}
                 </div>
