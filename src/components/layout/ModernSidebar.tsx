@@ -120,9 +120,11 @@ const categories: Category[] = [
     color: 'from-violet-500 to-purple-500',
     items: [
       { id: 'presentation', label: 'Découvrir KDP Studio', icon: Info },
+      { id: 'global-dashboard', label: 'Vue d\'ensemble', icon: LayoutDashboard, isNew: true },
       { id: 'onboarding', label: 'Par où commencer ?', icon: BookOpen },
       { id: 'complete-workflow', label: 'Créer un livre (1 clic)', icon: Rocket, isPro: true },
       { id: 'workflow-dashboard', label: 'Tableau de Bord', icon: BarChart3 },
+      { id: 'niche-templates', label: 'Templates par Niche', icon: Library, isNew: true },
       { id: 'niches', label: 'Niches Rentables', icon: Lightbulb, isLink: true, href: '/niches' },
     ]
   },

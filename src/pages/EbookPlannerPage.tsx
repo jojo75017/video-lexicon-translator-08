@@ -3132,6 +3132,38 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       case 'competitor-spy':
         return <EbookCompetitorSpy />;
 
+      case 'global-dashboard':
+        return (
+          <EbookGlobalDashboard
+            ebookTitle={ebookTitle}
+            authorName={authorName}
+            chapters={chapters}
+            preface={preface}
+            conclusion={conclusion}
+            coverImage={coverImage}
+            kdpDescription={kdpDescription}
+            kdpKeywords={kdpKeywords}
+            onNavigate={(tab) => setActiveTab(tab)}
+          />
+        );
+
+      case 'niche-templates':
+        return <EbookNicheTemplates />;
+
+      case 'focus-mode':
+        return <EbookFocusMode onClose={() => setActiveTab('writing')} initialContent="" wordGoal={1000} />;
+
+      case 'landing-page-generator':
+        return (
+          <EbookLandingPageGenerator
+            ebookTitle={ebookTitle}
+            authorName={authorName}
+            bookSummary={bookSummary}
+            coverImage={coverImage}
+            kdpDescription={kdpDescription}
+          />
+        );
+
       case 'arc-manager':
         return (
           <EbookArcManager
