@@ -7,7 +7,7 @@ import {
   Play, Pause, Volume2, VolumeX, Headphones, Share2, Code, Copy, Check, 
   SkipBack, SkipForward, BookOpen, Clock, Star, Users, Download, 
   ChevronDown, ChevronUp, Mic2, Sparkles, Link2, Calendar, Globe, 
-  FileAudio, Building2, Tag
+  FileAudio, Building2, Tag, ShoppingCart, CreditCard
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
