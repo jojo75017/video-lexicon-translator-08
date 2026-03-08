@@ -3040,7 +3040,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             ebookTitle={ebookTitle}
             authorName={authorName}
             onCoverGenerated={(url) => {
-              setEbookImages(prev => [{ url, description: 'Couverture IA' }, ...prev]);
+              setEbookImages(prev => [{ url, title: 'Couverture IA' }, ...prev]);
               toast.success('Couverture ajoutée à votre projet');
             }}
           />
