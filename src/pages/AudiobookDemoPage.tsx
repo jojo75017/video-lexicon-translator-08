@@ -11,17 +11,22 @@ import {
 import { toast } from 'sonner';
 
 const DEMO_DATA = {
-  title: "Les Secrets du Marketing Digital",
-  author_name: "Marie Dupont",
-  voice_name: "Éloise (IA Premium)",
-  description: "Découvrez les stratégies les plus efficaces du marketing digital dans ce guide audio complet. De la création de contenu viral aux techniques de conversion avancées, ce livre audio vous accompagne pas à pas vers la maîtrise du marketing en ligne. Apprenez à construire une audience fidèle, à optimiser vos campagnes publicitaires et à transformer vos visiteurs en clients fidèles. Un must-have pour tout entrepreneur souhaitant développer sa présence en ligne et maximiser son retour sur investissement. Ce guide couvre également les dernières tendances en matière de SEO, de réseaux sociaux et d'email marketing.",
+  title: "Le Cow-Boy le Plus Rapide",
+  subtitle: "Une aventure de Far West drôle, rythmée et pleine de rebondissements",
+  author_name: "EbookStudio",
+  voice_name: "Brigitte (IA Premium)",
+  description: "Plongez dans une aventure hilarante au cœur du Far West ! Billy le cow-boy rêve de devenir le plus rapide de l'Ouest, mais entre ses bottes trop grandes, son cheval têtu et un bandit pas si méchant que ça, rien ne se passe comme prévu. Une histoire drôle, rythmée et pleine de rebondissements qui captivera les jeunes lecteurs et les fera rire du début à la fin. Idéal pour les trajets en voiture ou le rituel du coucher !",
   cover_url: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=400&h=400&fit=crop",
-  play_count: 1247,
-  duration_seconds: 14400,
-  price: 12.99,
+  play_count: 342,
+  duration_seconds: 1500, // ~25 min
+  price: 4.99,
   paypal_link: "https://paypal.me/example",
+  stripe_link: "https://buy.stripe.com/example",
   created_at: "2026-03-01T10:00:00Z",
-  slug: "secrets-marketing-digital"
+  slug: "cow-boy-le-plus-rapide",
+  genre: "Aventure Western Humoristique",
+  target_audience: "Enfants de 6 à 10 ans",
+  chapters: 8,
 };
 
 const MetaRow = ({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) => (
@@ -96,9 +101,12 @@ const AudiobookDemoPage = () => {
             
             {/* LEFT */}
             <div className="flex-1 text-center lg:text-left order-2 lg:order-1 min-w-0">
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-2 leading-tight tracking-tight">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-1 leading-tight tracking-tight">
                 {audiobook.title}
               </h1>
+              {audiobook.subtitle && (
+                <p className="text-white/50 text-base md:text-lg italic mb-2">{audiobook.subtitle}</p>
+              )}
 
               <div className="space-y-1 mb-4">
                 <p className="text-white/70 text-base">
@@ -249,10 +257,24 @@ const AudiobookDemoPage = () => {
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <Badge variant="outline" className="border-white/20 text-white/70 bg-white/5 hover:bg-white/10 rounded-full px-4 py-1.5">Livre Audio</Badge>
-              <Badge variant="outline" className="border-white/20 text-white/70 bg-white/5 hover:bg-white/10 rounded-full px-4 py-1.5">Marketing Digital</Badge>
-              <Badge variant="outline" className="border-white/20 text-white/70 bg-white/5 hover:bg-white/10 rounded-full px-4 py-1.5">Audio IA</Badge>
-              <Badge variant="outline" className="border-white/20 text-white/70 bg-white/5 hover:bg-white/10 rounded-full px-4 py-1.5">{audiobook.voice_name}</Badge>
+              <Badge variant="outline" className="border-white/20 text-white/70 bg-white/5 hover:bg-white/10 rounded-full px-4 py-1.5">📖 Livre Audio</Badge>
+              <Badge variant="outline" className="border-white/20 text-white/70 bg-white/5 hover:bg-white/10 rounded-full px-4 py-1.5">🤠 {audiobook.genre}</Badge>
+              <Badge variant="outline" className="border-white/20 text-white/70 bg-white/5 hover:bg-white/10 rounded-full px-4 py-1.5">🎙️ Audio IA</Badge>
+              <Badge variant="outline" className="border-white/20 text-white/70 bg-white/5 hover:bg-white/10 rounded-full px-4 py-1.5">🗣️ {audiobook.voice_name}</Badge>
+            </div>
+
+            {/* Pour qui est ce livre ? */}
+            <div className="bg-amber-500/[0.06] border border-amber-500/15 rounded-2xl p-6">
+              <h3 className="text-lg font-bold text-amber-400 mb-3 flex items-center gap-2">
+                <Users className="w-5 h-5" />
+                Pour qui est ce livre audio ?
+              </h3>
+              <ul className="space-y-2 text-white/70 text-sm">
+                <li className="flex items-start gap-2"><span className="text-amber-400 mt-0.5">✓</span> {audiobook.target_audience}</li>
+                <li className="flex items-start gap-2"><span className="text-amber-400 mt-0.5">✓</span> Parents cherchant des histoires captivantes pour le coucher ou les trajets</li>
+                <li className="flex items-start gap-2"><span className="text-amber-400 mt-0.5">✓</span> Enseignants souhaitant des supports audio ludiques</li>
+                <li className="flex items-start gap-2"><span className="text-amber-400 mt-0.5">✓</span> Amateurs d'aventures western drôles et familiales</li>
+              </ul>
             </div>
 
             {/* Full Player */}
@@ -283,7 +305,7 @@ const AudiobookDemoPage = () => {
               </div>
             )}
             {!showFullPlayer && (
-              <Button variant="outline" onClick={() => setShowFullPlayer(true)} className="gap-2 border-white/15 text-white/70 hover:bg-white/10 hover:text-white rounded-full">
+              <Button variant="outline" onClick={() => setShowFullPlayer(true)} className="gap-2 border-white/15 text-white/70 hover:bg-white/10 hover:text-white rounded-full bg-white/[0.04]">
                 <Headphones className="w-4 h-4" />
                 Ouvrir le lecteur complet
               </Button>
@@ -293,16 +315,20 @@ const AudiobookDemoPage = () => {
           {/* Sidebar */}
           <div className="lg:w-80 shrink-0">
             <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-6 space-y-5 sticky top-6">
-              <h3 className="text-white font-semibold text-base border-b border-white/10 pb-3">Détails du produit</h3>
+              <h3 className="text-white font-semibold text-base border-b border-white/10 pb-3">📋 Informations produit</h3>
               <MetaRow icon={<CreditCard className="w-4 h-4 text-emerald-400/70" />} label="Prix" value={`${audiobook.price.toFixed(2)} €`} />
+              <MetaRow icon={<BookOpen className="w-4 h-4 text-amber-400/70" />} label="Titre" value={audiobook.title} />
               <MetaRow icon={<Users className="w-4 h-4 text-amber-400/70" />} label="Auteur" value={audiobook.author_name} />
               <MetaRow icon={<Mic2 className="w-4 h-4 text-purple-400/70" />} label="Narrateur" value={audiobook.voice_name} />
-              <MetaRow icon={<Calendar className="w-4 h-4 text-blue-400/70" />} label="Date de publication" value={createdDate} />
+              <MetaRow icon={<Tag className="w-4 h-4 text-orange-400/70" />} label="Genre" value={audiobook.genre} />
+              <MetaRow icon={<Users className="w-4 h-4 text-pink-400/70" />} label="Public" value={audiobook.target_audience} />
               <MetaRow icon={<Globe className="w-4 h-4 text-green-400/70" />} label="Langue" value="Français" />
-              <MetaRow icon={<FileAudio className="w-4 h-4 text-cyan-400/70" />} label="Format" value="Version intégrale · MP3" />
-              <MetaRow icon={<Clock className="w-4 h-4 text-orange-400/70" />} label="Durée" value={formatDuration(audiobook.duration_seconds)} />
+              <MetaRow icon={<Clock className="w-4 h-4 text-cyan-400/70" />} label="Durée estimée" value={formatDuration(audiobook.duration_seconds)} />
+              <MetaRow icon={<BookOpen className="w-4 h-4 text-blue-400/70" />} label="Chapitres" value={`${audiobook.chapters}`} />
+              <MetaRow icon={<FileAudio className="w-4 h-4 text-cyan-400/70" />} label="Format audio" value="MP3 · HD" />
+              <MetaRow icon={<Download className="w-4 h-4 text-emerald-400/70" />} label="Accès" value="Téléchargement immédiat" />
+              <MetaRow icon={<Calendar className="w-4 h-4 text-blue-400/70" />} label="Publication" value={createdDate} />
               <MetaRow icon={<Building2 className="w-4 h-4 text-pink-400/70" />} label="Éditeur" value="EbookStudio" />
-              <MetaRow icon={<Tag className="w-4 h-4 text-amber-400/70" />} label="Catégories" value="Marketing · Business" />
               <MetaRow icon={<Headphones className="w-4 h-4 text-emerald-400/70" />} label="Écoutes" value={`${audiobook.play_count}`} />
               <MetaRow icon={<Star className="w-4 h-4 text-amber-400 fill-amber-400" />} label="Qualité" value="HD 192 kbps" />
             </div>
