@@ -101,9 +101,12 @@ const AudiobookDemoPage = () => {
             
             {/* LEFT */}
             <div className="flex-1 text-center lg:text-left order-2 lg:order-1 min-w-0">
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-2 leading-tight tracking-tight">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-1 leading-tight tracking-tight">
                 {audiobook.title}
               </h1>
+              {audiobook.subtitle && (
+                <p className="text-white/50 text-base md:text-lg italic mb-2">{audiobook.subtitle}</p>
+              )}
 
               <div className="space-y-1 mb-4">
                 <p className="text-white/70 text-base">
