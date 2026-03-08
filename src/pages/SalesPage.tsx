@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { Helmet } from "react-helmet";
 import { motion } from "framer-motion";
 import { trackEvent, trackCTAClick, trackNewsletterSignup, trackPlanSelect, trackBeginCheckout, trackDemoClick, trackOffresClick } from "@/utils/analytics";
 import { Button } from "@/components/ui/button";
@@ -125,6 +126,22 @@ const SalesPage = () => {
 
   return (
     <div className="min-h-screen bg-slate-950 text-white overflow-x-hidden">
+      <Helmet>
+        <title>EbookStudio Pro — Créez des Ebooks avec l'IA | 97€ à Vie</title>
+        <meta name="description" content="Créez un ebook complet en moins d'une heure avec l'IA. Plan structuré, rédaction, couverture, audiobook et export KDP. Accès à vie pour 97€." />
+        <meta property="og:title" content="EbookStudio Pro — Créez des Ebooks avec l'IA" />
+        <meta property="og:description" content="Générez des ebooks professionnels avec l'IA : plan, rédaction, couverture, audiobook. 97€ accès à vie." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://video-lexicon-translator-08.lovable.app/offres" />
+        <link rel="canonical" href="https://video-lexicon-translator-08.lovable.app/offres" />
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Product",
+          "name": "EbookStudio Pro",
+          "description": "Plateforme de création d'ebooks et audiobooks par IA",
+          "offers": { "@type": "Offer", "price": "97", "priceCurrency": "EUR", "availability": "https://schema.org/InStock" }
+        })}</script>
+      </Helmet>
       
       {/* ═══════════════════════════════════════ URGENCY BANNER ═══════════════════════════════════════ */}
       <UrgencyBanner />

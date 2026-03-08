@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -171,6 +172,13 @@ const DemoPage = () => {
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
+      <Helmet>
+        <title>Démo Gratuite — Testez le Générateur d'Ebook IA | EbookStudio</title>
+        <meta name="description" content="Testez gratuitement notre IA : générez un plan d'ebook structuré avec chapitres et mots-clés Amazon KDP en 30 secondes. Sans inscription." />
+        <meta property="og:title" content="Démo Gratuite — Générateur d'Ebook IA" />
+        <meta property="og:description" content="Générez un plan d'ebook complet gratuitement avec l'IA. Chapitres, sous-sections et mots-clés KDP en 30 secondes." />
+        <link rel="canonical" href="https://video-lexicon-translator-08.lovable.app/demo" />
+      </Helmet>
       {/* Header */}
       <header className="sticky top-0 z-50 bg-slate-950/90 backdrop-blur-xl border-b border-slate-800/50">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">

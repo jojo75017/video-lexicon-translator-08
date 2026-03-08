@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { X, Gift, Download, Sparkles, CheckCircle } from "lucide-react";
@@ -10,11 +10,38 @@ interface ExitIntentPopupProps {
   onContinueToOffer?: () => void;
 }
 
+const EXIT_INTENT_KEY = "exit_intent_shown";
+
 const ExitIntentPopup = ({ onContinueToOffer }: ExitIntentPopupProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
 
-  const openPopup = () => { trackExitIntent('shown'); setIsOpen(true); };
+  const openPopup = useCallback(() => {
+    const alreadyShown = sessionStorage.getItem(EXIT_INTENT_KEY);
+    if (alreadyShown) return;
+    trackExitIntent('shown');
+    setIsOpen(true);
+    sessionStorage.setItem(EXIT_INTENT_KEY, "true");
+  }, []);
+
+  // Exit-intent detection: mouse leaves viewport from top
+  useEffect(() => {
+    const handleMouseLeave = (e: MouseEvent) => {
+      if (e.clientY <= 0) {
+        openPopup();
+      }
+    };
+    // Delay activation to avoid false triggers on page load
+    const timer = setTimeout(() => {
+      document.addEventListener("mouseleave", handleMouseLeave);
+    }, 5000);
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener("mouseleave", handleMouseLeave);
+    };
+  }, [openPopup]);
+
+  const handleManualOpen = () => { trackExitIntent('shown'); setIsOpen(true); };
 
   const handleDownloadBonus = async () => {
     setIsDownloading(true);
@@ -41,7 +68,7 @@ const ExitIntentPopup = ({ onContinueToOffer }: ExitIntentPopupProps) => {
     <>
       {/* Barre fixe en haut */}
       <button
-        onClick={openPopup}
+        onClick={handleManualOpen}
         className="fixed top-0 left-0 right-0 z-[70] flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 hover:from-amber-600 hover:via-orange-600 hover:to-red-600 text-white font-bold px-4 py-2.5 shadow-lg transition-all duration-300 text-sm md:text-base"
       >
         <Gift className="w-4 h-4 flex-shrink-0" />
