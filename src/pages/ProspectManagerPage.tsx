@@ -41,6 +41,8 @@ const ProspectManagerPage = () => {
   const navigate = useNavigate();
   const [prospects, setProspects] = useState<Prospect[]>([]);
   const [loading, setLoading] = useState(true);
+  const [authReady, setAuthReady] = useState(false);
+  const [hasSession, setHasSession] = useState(false);
   const [sending, setSending] = useState(false);
   const [importing, setImporting] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
