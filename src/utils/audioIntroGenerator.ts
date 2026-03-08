@@ -48,16 +48,28 @@ function buildPremiumIntroScript(options: IntroPremiumOptions): string[] {
 }
 
 /**
- * Extract the first 50 words from an introduction text.
+ * Extract the first ~50 words from an introduction text,
+ * cutting at the last complete sentence to avoid mid-sentence breaks.
  */
 function extractFirst50Words(text: string): string {
   if (!text || !text.trim()) return '';
   const words = text.trim().split(/\s+/).filter(w => w.length > 0);
-  const selected = words.slice(0, 50);
-  let result = selected.join(' ');
-  // Ensure it ends with proper punctuation
+  if (words.length === 0) return '';
+  
+  const selected = words.slice(0, 50).join(' ');
+  
+  // Find the last sentence-ending punctuation within the selected text
+  const sentenceEndMatch = selected.match(/^([\s\S]*[.!?])\s*/);
+  if (sentenceEndMatch && sentenceEndMatch[1].trim().length > 20) {
+    return sentenceEndMatch[1].trim();
+  }
+  
+  // If no complete sentence found, take the whole chunk and end cleanly
+  const result = selected.trim();
   if (result && !result.match(/[.!?]$/)) {
-    result += '...';
+    return result + '.';
+  }
+  return result;
   }
   return result;
 }
