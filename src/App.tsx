@@ -65,6 +65,7 @@ import SaasSettings from '@/pages/saas/SaasSettings';
 import SaasAuthPage from '@/pages/saas/SaasAuthPage';
 import SalesCampaignPage from '@/pages/SalesCampaignPage';
 import ProspectManagerPage from '@/pages/ProspectManagerPage';
+import SocialPostGeneratorPage from '@/pages/SocialPostGeneratorPage';
 const queryClient = new QueryClient();
 
 const App = () => {
