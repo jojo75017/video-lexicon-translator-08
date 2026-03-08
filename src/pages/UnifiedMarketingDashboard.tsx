@@ -155,9 +155,9 @@ const UnifiedMarketingDashboard = () => {
           {[
             { label: 'Prospects', value: prospectStats.total, icon: Users, color: 'text-blue-400' },
             { label: 'Emails envoyés', value: estimatedEmailsSent, icon: Send, color: 'text-emerald-400' },
-            { label: 'Auto-envoi actif', value: prospectStats.autoSendActive, icon: Clock, color: 'text-amber-400' },
-            { label: 'Posts créés', value: socialStats.totalPosts, icon: BarChart3, color: 'text-violet-400' },
-            { label: 'Engagement total', value: totalEngagement, icon: Heart, color: 'text-pink-400' },
+            { label: 'Emails ouverts', value: emailOpens.total, icon: Eye, color: 'text-orange-400' },
+            { label: 'Taux ouverture', value: estimatedEmailsSent > 0 ? `${Math.round((emailOpens.uniqueEmails / prospectStats.total) * 100)}%` : '—', icon: TrendingUp, color: 'text-amber-400', isText: true },
+            { label: 'Engagement social', value: totalEngagement, icon: Heart, color: 'text-pink-400' },
             { label: 'Clics total', value: socialStats.totalClicks, icon: MousePointerClick, color: 'text-cyan-400' },
           ].map((kpi, i) => (
             <Card key={i} className="bg-slate-900/60 border-slate-800">
