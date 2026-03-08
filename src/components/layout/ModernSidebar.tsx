@@ -604,13 +604,13 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
             return (
               <React.Fragment key={category.id}>
                 {isFirstSecondary && !isCollapsed && (
-                  <div className="mx-1 my-3 px-3 py-2.5 rounded-xl bg-gradient-to-r from-slate-100 via-slate-50 to-slate-100 dark:from-slate-800/50 dark:via-slate-900/30 dark:to-slate-800/50 border border-slate-300/60 dark:border-slate-700/40">
+                   <div className="mx-1 my-3 px-3 py-2.5 rounded-xl bg-gradient-gold-subtle border border-gold/20">
                     <div className="flex items-center gap-2 justify-center">
-                      <div className="h-0.5 w-6 rounded-full bg-slate-400/60 dark:bg-slate-600/60" />
-                      <span className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                      <div className="h-0.5 w-6 rounded-full bg-gold/40" />
+                      <span className="text-xs font-bold uppercase tracking-widest text-gold">
                         ⚙️ Outils complémentaires
                       </span>
-                      <div className="h-0.5 w-6 rounded-full bg-slate-400/60 dark:bg-slate-600/60" />
+                      <div className="h-0.5 w-6 rounded-full bg-gold/40" />
                     </div>
                   </div>
                 )}
