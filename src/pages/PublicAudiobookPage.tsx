@@ -442,6 +442,9 @@ h1{font-size:2.5rem;font-weight:800;margin-bottom:8px;line-height:1.1}
                 <button onClick={() => setShowEmbed(!showEmbed)} className="text-white/40 hover:text-white/70 transition-colors" title="Code embed">
                   <Code className="w-5 h-5" />
                 </button>
+                <button onClick={generateStandaloneHtml} className="text-white/40 hover:text-white/70 transition-colors" title="Télécharger la fiche HTML pour WordPress">
+                  <Download className="w-5 h-5" />
+                </button>
               </div>
 
               {/* Embed code (collapsed) */}
