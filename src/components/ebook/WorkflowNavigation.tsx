@@ -196,14 +196,14 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
             size="sm"
             onClick={() => prevStep && handleNavigate(STEP_TO_TAB[prevStep.id])}
             disabled={!prevStep || isGenerating}
-            className="flex items-center gap-1 border-white/20 text-white/70 hover:text-white bg-slate-800/50"
+            className="flex items-center gap-1 border-gold/30 text-gold/70 hover:text-gold bg-slate-800/50"
           >
             <ChevronLeft className="w-4 h-4" />
             <span className="hidden sm:inline">{prevStep?.shortLabel || 'Préc.'}</span>
           </Button>
 
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-800/60 rounded-lg border border-white/10">
-            {isGenerating && <Loader2 className="w-4 h-4 animate-spin text-cyan-400" />}
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-800/60 rounded-lg border border-gold/20">
+            {isGenerating && <Loader2 className="w-4 h-4 animate-spin text-gold" />}
             <span className="text-sm font-semibold text-white">
               {currentStep.shortLabel}: {currentStep.label}
             </span>
@@ -218,7 +218,7 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
             size="sm"
             onClick={() => nextStep && handleNavigate(STEP_TO_TAB[nextStep.id])}
             disabled={!nextStep || isGenerating || (nextStep && !canProceedToNext(nextStep))}
-            className="flex items-center gap-1 bg-cyan-600 hover:bg-cyan-700 text-white"
+            className="flex items-center gap-1 bg-gold hover:bg-gold-dark text-slate-900 font-semibold"
           >
             <span className="hidden sm:inline">{nextStep?.shortLabel || 'Suiv.'}</span>
             <ChevronRight className="w-4 h-4" />
