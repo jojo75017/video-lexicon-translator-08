@@ -134,7 +134,7 @@ export const EbookLibrary: React.FC<EbookLibraryProps> = ({ onLoadProject }) => 
   const formatDate = (d: string) => new Date(d).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
   const formatDuration = (s: number | null) => s ? `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, '0')}` : '--:--';
 
-  if (isLoading) {
+  if (!isAuthenticated) {
   if (!isAuthenticated) {
     return (
       <div className="flex flex-col items-center justify-center py-20 space-y-4">
