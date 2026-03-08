@@ -507,16 +507,16 @@ const AudiobookDemoPage = () => {
 const FaqItem = ({ question, answer, defaultOpen = false }: { question: string; answer: string; defaultOpen?: boolean }) => {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className={`border border-white/[0.08] rounded-xl overflow-hidden transition-colors ${open ? 'bg-white/[0.03]' : ''}`}>
+    <div className={`border border-gray-200 rounded-xl overflow-hidden transition-colors bg-white shadow-sm ${open ? 'bg-gray-50' : ''}`}>
       <button 
         onClick={() => setOpen(!open)} 
-        className="w-full flex justify-between items-center p-4 text-left font-semibold text-sm text-white hover:bg-white/[0.04] transition-colors"
+        className="w-full flex justify-between items-center p-4 text-left font-semibold text-sm text-gray-900 hover:bg-gray-50 transition-colors"
       >
         {question}
-        <ChevronDown className={`w-4 h-4 text-white/30 transition-transform shrink-0 ml-2 ${open ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform shrink-0 ml-2 ${open ? 'rotate-180' : ''}`} />
       </button>
       {open && (
-        <div className="px-4 pb-4 text-sm text-white/55 leading-relaxed">
+        <div className="px-4 pb-4 text-sm text-gray-500 leading-relaxed">
           {answer}
         </div>
       )}
