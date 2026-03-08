@@ -135,7 +135,7 @@ export const EbookUXEnhancements: React.FC<EbookUXEnhancementsProps> = ({
           <CardContent className="space-y-3">
             <div className="flex items-center justify-between">
               <Label className="text-sm">Activer (toutes les 30s)</Label>
-              <Switch checked={autoSave} onCheckedChange={setAutoSave} />
+              <Checkbox checked={autoSave} onCheckedChange={(v) => setAutoSave(!!v)} />
             </div>
             <div className="text-xs text-muted-foreground">
               {lastSaved ? `Dernière sauvegarde: ${lastSaved.toLocaleTimeString()}` : 'Pas encore sauvegardé'}
