@@ -159,6 +159,10 @@ import { EbookTitleABTest } from '@/components/ebook/EbookTitleABTest';
 import { EbookEditorialCalendar } from '@/components/ebook/EbookEditorialCalendar';
 import { EbookBackMatterGenerator } from '@/components/ebook/EbookBackMatterGenerator';
 import { EbookCompetitorSpy } from '@/components/ebook/EbookCompetitorSpy';
+import { EbookGlobalDashboard } from '@/components/ebook/EbookGlobalDashboard';
+import { EbookNicheTemplates } from '@/components/ebook/EbookNicheTemplates';
+import { EbookFocusMode } from '@/components/ebook/EbookFocusMode';
+import { EbookLandingPageGenerator } from '@/components/ebook/EbookLandingPageGenerator';
 
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
 import { ebookTemplates } from '@/data/ebookTemplates';
