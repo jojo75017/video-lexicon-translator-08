@@ -180,6 +180,27 @@ const PublicAudiobookPage = () => {
     return () => { audio.removeEventListener('timeupdate', onTime); audio.removeEventListener('loadedmetadata', onLoaded); audio.removeEventListener('ended', onEnded); };
   }, [audiobook]);
 
+  useEffect(() => {
+    const audio = excerptRef.current;
+    if (!audio) return;
+    const onTime = () => setExcerptTime(audio.currentTime);
+    const onLoaded = () => setExcerptDuration(audio.duration);
+    const onEnded = () => setExcerptPlaying(false);
+    audio.addEventListener('timeupdate', onTime);
+    audio.addEventListener('loadedmetadata', onLoaded);
+    audio.addEventListener('ended', onEnded);
+    return () => { audio.removeEventListener('timeupdate', onTime); audio.removeEventListener('loadedmetadata', onLoaded); audio.removeEventListener('ended', onEnded); };
+  }, [audiobook]);
+
+  const toggleExcerpt = () => {
+    if (!excerptRef.current) return;
+    // Pause full player if playing
+    if (isPlaying && audioRef.current) { audioRef.current.pause(); setIsPlaying(false); }
+    excerptPlaying ? excerptRef.current.pause() : excerptRef.current.play();
+    setExcerptPlaying(!excerptPlaying);
+  };
+  const seekExcerpt = (v: number[]) => { if (!excerptRef.current) return; excerptRef.current.currentTime = v[0]; setExcerptTime(v[0]); };
+
   const togglePlay = () => {
     if (!audioRef.current) return;
     isPlaying ? audioRef.current.pause() : audioRef.current.play();
