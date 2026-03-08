@@ -554,7 +554,7 @@ const SalesPage = () => {
           <motion.h2 variants={fadeIn} className="text-3xl sm:text-4xl md:text-5xl font-black mb-5 leading-tight">
             Chaque jour sans ebook publié
             <br />
-            <span className="text-slate-500">est un jour de revenus perdu.</span>
+            <span className="text-white/60">est un jour de revenus perdu.</span>
           </motion.h2>
           <motion.p variants={fadeIn} custom={1} className="text-slate-400 mb-8 text-lg">
             Votre premier ebook peut être en ligne sur Amazon ce soir.
