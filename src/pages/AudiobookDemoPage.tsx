@@ -286,29 +286,29 @@ const AudiobookDemoPage = () => {
         </div>
       </div>
 
-      {/* ===== CONTENT ===== */}
+      {/* ===== CONTENT (Light) ===== */}
       <div className="max-w-6xl mx-auto px-4 py-10">
         <div className="flex flex-col lg:flex-row gap-10">
           
           <div className="flex-1 min-w-0 space-y-8">
             <div>
-              <h2 className="text-2xl font-bold text-white mb-4">À propos de ce contenu audio</h2>
-              <p className="text-white/70 leading-relaxed text-[15px]">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">À propos de ce contenu audio</h2>
+              <p className="text-gray-600 leading-relaxed text-[15px]">
                 {showFullDesc ? audiobook.description : descriptionShort}
                 {hasLongDesc && !showFullDesc && '...'}
               </p>
               {hasLongDesc && (
-                <button onClick={() => setShowFullDesc(!showFullDesc)} className="text-amber-400 text-sm mt-2 flex items-center gap-1 hover:text-amber-300 transition-colors font-medium">
+                <button onClick={() => setShowFullDesc(!showFullDesc)} className="text-orange-600 text-sm mt-2 flex items-center gap-1 hover:text-orange-500 transition-colors font-medium">
                   {showFullDesc ? <><ChevronUp className="w-4 h-4" /> Afficher moins</> : <><ChevronDown className="w-4 h-4" /> Afficher plus</>}
                 </button>
               )}
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <Badge variant="outline" className="border-white/20 text-white/70 bg-white/5 hover:bg-white/10 rounded-full px-4 py-1.5">📖 Livre Audio</Badge>
-              <Badge variant="outline" className="border-white/20 text-white/70 bg-white/5 hover:bg-white/10 rounded-full px-4 py-1.5">🤠 {audiobook.genre}</Badge>
-              <Badge variant="outline" className="border-white/20 text-white/70 bg-white/5 hover:bg-white/10 rounded-full px-4 py-1.5">🎙️ Audio IA</Badge>
-              <Badge variant="outline" className="border-white/20 text-white/70 bg-white/5 hover:bg-white/10 rounded-full px-4 py-1.5">🗣️ {audiobook.voice_name}</Badge>
+              <Badge variant="outline" className="border-gray-300 text-gray-600 bg-white hover:bg-gray-50 rounded-full px-4 py-1.5">📖 Livre Audio</Badge>
+              <Badge variant="outline" className="border-gray-300 text-gray-600 bg-white hover:bg-gray-50 rounded-full px-4 py-1.5">🤠 {audiobook.genre}</Badge>
+              <Badge variant="outline" className="border-gray-300 text-gray-600 bg-white hover:bg-gray-50 rounded-full px-4 py-1.5">🎙️ Audio IA</Badge>
+              <Badge variant="outline" className="border-gray-300 text-gray-600 bg-white hover:bg-gray-50 rounded-full px-4 py-1.5">🗣️ {audiobook.voice_name}</Badge>
             </div>
 
             {/* Pour qui est ce livre ? */}
