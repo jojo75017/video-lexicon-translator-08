@@ -137,8 +137,8 @@ export const WorkflowDashboard: React.FC<WorkflowDashboardProps> = ({
                 {completedCount}/{totalSteps} étapes complétées
               </p>
             </div>
-            <div className="text-center p-4 bg-slate-800/60 rounded-lg border border-white/10">
-              <Clock className="h-6 w-6 mx-auto mb-1 text-cyan-400" />
+            <div className="text-center p-4 bg-slate-800/60 rounded-lg border border-gold/10">
+              <Clock className="h-6 w-6 mx-auto mb-1 text-gold" />
               <p className="text-2xl font-bold text-white">{remainingMinutes}</p>
               <p className="text-xs text-white/50">min restantes</p>
             </div>
