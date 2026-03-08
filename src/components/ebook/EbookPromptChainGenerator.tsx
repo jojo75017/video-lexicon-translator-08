@@ -167,7 +167,7 @@ export const EbookPromptChainGenerator: React.FC = () => {
             <p className="text-sm text-muted-foreground">{selected.description}</p>
           </CardHeader>
           <CardContent>
-            <ScrollArea className="max-h-[600px]">
+            <div className="max-h-[600px] overflow-y-auto">
               <div className="space-y-4">
                 {selected.steps.map((step, idx) => {
                   const key = `${selected.genre}-${idx}`;
