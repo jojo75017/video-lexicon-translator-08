@@ -582,7 +582,7 @@ const SalesPage = () => {
                 </div>
                 <h3 className="text-lg font-bold text-white">EbookStudio Pro</h3>
               </div>
-              <p className="text-slate-500 text-sm leading-relaxed">Le workflow IA #1 en France pour Amazon KDP.</p>
+              <p className="text-white/60 text-sm leading-relaxed">Le workflow IA #1 en France pour Amazon KDP.</p>
             </div>
             <div>
               <h4 className="font-semibold mb-4 text-slate-300 text-sm uppercase tracking-wider">Guides</h4>
