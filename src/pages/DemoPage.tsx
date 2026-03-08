@@ -696,7 +696,7 @@ const DemoPage = () => {
           <h2 className="text-2xl font-bold text-white text-center mb-8">Questions fréquentes</h2>
           <div className="grid md:grid-cols-2 gap-4 max-w-4xl mx-auto">
             {[
-              { q: "La démo est-elle vraiment gratuite ?", a: "Oui, 100% gratuit. Vous pouvez générer jusqu'à 3 plans complets sans carte bancaire ni inscription. L'IA structure votre ebook avec chapitres, sous-sections et mots-clés Amazon KDP." },
+              { q: "La démo est-elle vraiment gratuite ?", a: "Oui, 100% gratuit. Vous pouvez générer 1 plan complet de 3 chapitres sans carte bancaire ni inscription. L'IA structure votre ebook avec chapitres, sous-sections et mots-clés Amazon KDP." },
               { q: "Quelle est la qualité du contenu généré ?", a: "Notre IA utilise les derniers modèles de langage (Gemini 3 Flash) pour produire du contenu professionnel, structuré et optimisé pour le marché Amazon KDP." },
               { q: "Combien de temps faut-il pour créer un ebook complet ?", a: "Avec la version complète, un ebook de 10 chapitres peut être entièrement rédigé, illustré et exporté en PDF/EPUB en moins de 60 minutes." },
               { q: "Est-ce que 97€ c'est un paiement unique ?", a: "Oui, c'est un accès à vie. Pas d'abonnement, pas de frais cachés. Vous payez une fois et vous générez autant d'ebooks que vous voulez, pour toujours." },
