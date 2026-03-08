@@ -622,14 +622,10 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
               <div 
                 key={category.id} 
                 className={cn(
-                  "mb-3 rounded-2xl border-2 transition-all",
+                  "mb-3 rounded-2xl border transition-all",
                   hasActiveItem 
-                    ? "border-violet-400/60 dark:border-violet-500/50 bg-gradient-to-br from-violet-50/50 to-purple-50/30 dark:from-violet-950/30 dark:to-purple-950/20 shadow-lg shadow-violet-500/10" 
-                    : cn(
-                        categoryPastelColors[category.id]?.bg || "bg-white/30 dark:bg-white/5",
-                        categoryPastelColors[category.id]?.border || "border-violet-200/40 dark:border-violet-800/30",
-                        "hover:shadow-md hover:scale-[1.01]"
-                      ),
+                    ? "border-cyan-500/30 bg-slate-900/50 shadow-lg shadow-cyan-500/5" 
+                    : "border-slate-800/50 bg-slate-900/30 hover:bg-slate-900/50 hover:shadow-md",
                   isCollapsed ? "p-1" : "p-2"
                 )}
               >
@@ -641,18 +637,18 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                       "w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all group",
                       hasActiveItem 
                         ? `bg-gradient-to-r ${category.color} text-white shadow-md` 
-                        : "hover:bg-violet-100/80 dark:hover:bg-violet-900/30"
+                        : "hover:bg-slate-800/50"
                     )}
                   >
                     <span className={cn(
                       "text-sm font-semibold",
-                      hasActiveItem ? "text-white" : "text-foreground"
+                      hasActiveItem ? "text-white" : "text-slate-300"
                     )}>
                       {category.label}
                     </span>
                     <ChevronDown className={cn(
                       "w-4 h-4 transition-transform",
-                      hasActiveItem ? "text-white/80" : "text-muted-foreground",
+                      hasActiveItem ? "text-white/80" : "text-slate-500",
                       isExpanded ? "rotate-0" : "-rotate-90"
                     )} />
                   </button>
@@ -663,7 +659,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                         "flex justify-center py-2 mb-1 rounded-xl cursor-pointer",
                         hasActiveItem 
                           ? `bg-gradient-to-r ${category.color} shadow-md` 
-                          : "hover:bg-violet-100/80 dark:hover:bg-violet-900/30"
+                          : "hover:bg-slate-800/50"
                       )}>
                         <span className="text-lg">{category.emoji}</span>
                       </div>
@@ -692,26 +688,26 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                             className={cn(
                               "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-left group",
                               item.label.includes('DÉBUTER ICI') && !isActive
-                                ? "bg-primary/10 border border-primary/30 hover:bg-primary/20 ring-1 ring-primary/20"
+                                ? "bg-cyan-500/10 border border-cyan-500/30 hover:bg-cyan-500/20 ring-1 ring-cyan-500/20"
                                 : isActive 
-                                  ? "bg-white dark:bg-white/10 shadow-md border border-violet-200/60 dark:border-violet-700/40" 
-                                  : "hover:bg-white/60 dark:hover:bg-white/5"
+                                  ? "bg-slate-800 shadow-md border border-slate-700" 
+                                  : "hover:bg-slate-800/50"
                             )}
                           >
                             <div className={cn(
                               "w-8 h-8 rounded-lg flex items-center justify-center transition-all",
                               isActive 
                                 ? `bg-gradient-to-br ${category.color} shadow-sm` 
-                                : "bg-violet-100/80 dark:bg-violet-900/40 group-hover:bg-violet-200/80 dark:group-hover:bg-violet-800/40"
+                                : "bg-slate-800/80 group-hover:bg-slate-700/80"
                             )}>
                               <Icon className={cn(
                                 "w-4 h-4",
-                                isActive ? "text-white" : "text-violet-600 dark:text-violet-400"
+                                isActive ? "text-white" : "text-slate-400"
                               )} />
                             </div>
                             <span className={cn(
                               "text-sm font-medium flex-1",
-                              isActive ? "text-foreground" : "text-foreground/80"
+                              isActive ? "text-white" : "text-slate-400"
                             )}>
                               {item.label}
                             </span>
@@ -723,7 +719,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                             )}
                             
                             {item.isPro && !item.isNew && (
-                              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-violet-500 text-white">
+                              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-cyan-500 text-slate-900 font-bold">
                                 PRO
                               </span>
                             )}
