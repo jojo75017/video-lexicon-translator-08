@@ -146,6 +146,8 @@ export const EbookLibrary: React.FC<EbookLibraryProps> = ({ onLoadProject }) => 
     );
   }
 
+  if (isLoading) {
+    return (
       <div className="flex items-center justify-center py-20">
         <RefreshCw className="h-8 w-8 animate-spin text-primary" />
         <span className="ml-3 text-lg">Chargement de la bibliothèque...</span>
