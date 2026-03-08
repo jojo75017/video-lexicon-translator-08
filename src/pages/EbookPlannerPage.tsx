@@ -143,6 +143,10 @@ import { EbookDraftMode } from '@/components/ebook/EbookDraftMode';
 import { EbookPromptLibrary } from '@/components/ebook/EbookPromptLibrary';
 import { EbookManuscriptDashboard } from '@/components/ebook/EbookManuscriptDashboard';
 import { EbookRichEditor } from '@/components/ebook/EbookRichEditor';
+import { EbookAIDetectorScore } from '@/components/ebook/EbookAIDetectorScore';
+import { EbookAICoverStudio } from '@/components/ebook/EbookAICoverStudio';
+import { EbookMultiTomeHub } from '@/components/ebook/EbookMultiTomeHub';
+import { EbookAdvancedExport } from '@/components/ebook/EbookAdvancedExport';
 
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
 import { ebookTemplates } from '@/data/ebookTemplates';
