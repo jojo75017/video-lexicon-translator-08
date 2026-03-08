@@ -86,11 +86,11 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
   const [bookSubtitle, setBookSubtitle] = useState('');
   const [authorNameState, setAuthorNameState] = useState(propAuthorName || '');
   const [category, setCategory] = useState('enfants-3-8');
-  const buildDefaultIntro = (title: string) => {
-    const t = title.trim() || 'votre livre audio';
-    return `Bienvenue. Vous vous apprêtez à écouter ${t}. Une production EbookStudio. Installez-vous confortablement, la lecture commence.
-
-Découvrez ${t}, une aventure captivante à écouter en famille ou en solo. Plongez dans un univers riche en émotions, en rebondissements et en personnages attachants. Une expérience audio immersive qui saura vous transporter du début à la fin.`;
+  const buildDefaultIntro = (title: string, author?: string) => {
+    return buildIntroDisplayText({
+      ebookTitle: title,
+      authorName: author || authorNameState || 'Georges Boubet',
+    });
   };
   const [introduction, setIntroduction] = useState(preface || buildDefaultIntro(ebookTitle || ''));
 
