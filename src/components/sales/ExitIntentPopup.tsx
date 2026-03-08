@@ -68,7 +68,7 @@ const ExitIntentPopup = ({ onContinueToOffer }: ExitIntentPopupProps) => {
     <>
       {/* Barre fixe en haut */}
       <button
-        onClick={openPopup}
+        onClick={handleManualOpen}
         className="fixed top-0 left-0 right-0 z-[70] flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 hover:from-amber-600 hover:via-orange-600 hover:to-red-600 text-white font-bold px-4 py-2.5 shadow-lg transition-all duration-300 text-sm md:text-base"
       >
         <Gift className="w-4 h-4 flex-shrink-0" />
