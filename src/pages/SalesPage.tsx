@@ -229,6 +229,32 @@ const SalesPage = () => {
         </motion.div>
       </section>
 
+      {/* ═══════════════════════════════════════ VIDEO PRÉSENTATION ═══════════════════════════════════════ */}
+      <section className="py-16 px-4">
+        <div className="max-w-4xl mx-auto">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-8">
+            <motion.p variants={fadeIn} className="text-cyan-400 font-semibold mb-3 uppercase tracking-wider text-sm">Présentation vidéo</motion.p>
+            <motion.h2 variants={fadeIn} custom={1} className="text-3xl sm:text-4xl font-black mb-3">
+              Découvrez l'Offre Fondatrice
+            </motion.h2>
+            <motion.p variants={fadeIn} custom={2} className="text-white/70">Tout ce qui est inclus, en moins de 3 minutes</motion.p>
+          </motion.div>
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+            className="rounded-2xl overflow-hidden border-2 border-cyan-500/20 shadow-2xl shadow-cyan-500/10">
+            <video
+              controls
+              preload="metadata"
+              poster=""
+              className="w-full aspect-video bg-slate-900"
+              playsInline
+            >
+              <source src="/videos/ebookstudio-offre-fondatrice.mp4" type="video/mp4" />
+              Votre navigateur ne supporte pas la lecture vidéo.
+            </video>
+          </motion.div>
+        </div>
+      </section>
+
       {/* ═══════════════════════════════════════ SOCIAL PROOF ═══════════════════════════════════════ */}
       <section className="py-12 border-y border-slate-800/50 bg-slate-900/30">
         <div className="max-w-6xl mx-auto px-4">

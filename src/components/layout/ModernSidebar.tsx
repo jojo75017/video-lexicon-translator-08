@@ -330,6 +330,7 @@ const categories: Category[] = [
     color: 'from-gray-500 to-slate-500',
     items: [
       { id: 'dashboard', label: '📊 Tableau de Bord', icon: LayoutDashboard },
+      { id: 'marketing-dashboard', label: '📈 Dashboard Marketing', icon: TrendingUp, isLink: true, href: '/dashboard-marketing', isNew: true },
       { id: 'admin-panel', label: '👑 Gestion Abonnés', icon: Shield, isLink: true, href: '/admin' },
       { id: 'prospect-manager', label: '📋 Prospects & Emails', icon: Target, isLink: true, href: '/gestion-prospects', isNew: true },
       { id: 'social-marketing', label: '📣 Suite Marketing', icon: BarChart3, isLink: true, href: '/generateur-posts', isNew: true },
