@@ -56,7 +56,8 @@ import {
   BarChart3,
   Ruler,
   Monitor,
-  Library
+  Library,
+  Music
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -306,6 +307,7 @@ const categories: Category[] = [
     items: [
       { id: 'audiobook', label: '🎙️ Livre Audio', icon: Headphones },
       { id: 'audio-express', label: '⚡ Audio Express (9 étapes)', icon: Zap, isNew: true },
+      { id: 'audiobook-library', label: '🎧 Mes Livres Audio', icon: Music, isNew: true },
       { id: 'formation-audiobook-distribution', label: '📚 Formation Distribution', icon: BookOpen, isNew: true },
     ]
   },

@@ -138,6 +138,7 @@ import KdpCoverStudio from '@/components/ebook/KdpCoverStudio';
 import SubscriberActivityPopup from '@/components/admin/SubscriberActivityPopup';
 import { EbookLibrary } from '@/components/ebook/EbookLibrary';
 import { AudioExpressWorkflow } from '@/components/ebook/AudioExpressWorkflow';
+import { AudiobookLibrary } from '@/components/ebook/AudiobookLibrary';
 
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
 import { ebookTemplates } from '@/data/ebookTemplates';
@@ -2522,6 +2523,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
         return (
           <EbookLibrary onLoadProject={(project) => handleProjectLoad(project)} />
         );
+
+      case 'audiobook-library':
+        return <AudiobookLibrary />;
       
       case 'series':
         return (
