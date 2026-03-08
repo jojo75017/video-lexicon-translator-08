@@ -6,7 +6,8 @@ import {
   Play, Pause, Volume2, VolumeX, Headphones, Code, Copy, Check, 
   SkipBack, SkipForward, BookOpen, Clock, Star, Users, Download, 
   ChevronDown, ChevronUp, Mic2, Sparkles, Link2, Calendar, Globe, 
-  FileAudio, Building2, Tag, ShoppingCart, CreditCard, Shield, HelpCircle, Library
+  FileAudio, Building2, Tag, ShoppingCart, CreditCard, Shield, HelpCircle, Library,
+  Zap, Lock, RefreshCw, MessageCircle, Timer
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { getRandomReviews } from '@/utils/reviewPool';
