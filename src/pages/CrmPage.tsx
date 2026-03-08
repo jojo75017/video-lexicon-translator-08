@@ -6,6 +6,8 @@ import { CrmStats } from '@/components/crm/CrmStats';
 import { CrmContactList } from '@/components/crm/CrmContactList';
 import { CrmContactDialog } from '@/components/crm/CrmContactDialog';
 import { CrmActivityPanel } from '@/components/crm/CrmActivityPanel';
+import { CrmKanban } from '@/components/crm/CrmKanban';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export interface CrmContact {
   id: string;
@@ -302,36 +304,67 @@ const CrmPage: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
         <CrmStats stats={stats} />
 
-        <div className="flex gap-6">
-          <div className={`flex-1 ${showActivityPanel ? 'max-w-[60%]' : ''}`}>
-            <CrmContactList
-              contacts={filteredContacts}
-              loading={loading}
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              filterTemperature={filterTemperature}
-              onFilterTemperatureChange={setFilterTemperature}
-              filterStatus={filterStatus}
-              onFilterStatusChange={setFilterStatus}
-              onSelectContact={openContactDetail}
-              onUpdateContact={updateContact}
-              onDeleteContact={deleteContact}
-              selectedContactId={selectedContact?.id}
-            />
-          </div>
+        <Tabs defaultValue="kanban" className="w-full">
+          <TabsList>
+            <TabsTrigger value="kanban">📋 Pipeline Kanban</TabsTrigger>
+            <TabsTrigger value="list">📃 Liste</TabsTrigger>
+          </TabsList>
 
-          {showActivityPanel && selectedContact && (
-            <div className="w-[40%]">
-              <CrmActivityPanel
-                contact={selectedContact}
-                activities={activities}
-                onClose={() => { setShowActivityPanel(false); setSelectedContact(null); }}
-                onAddActivity={addActivity}
-                onUpdateContact={updateContact}
-              />
+          <TabsContent value="kanban" className="mt-4">
+            <div className="flex gap-6">
+              <div className={`flex-1 ${showActivityPanel ? 'max-w-[65%]' : ''}`}>
+                <CrmKanban
+                  contacts={filteredContacts}
+                  onUpdateContact={updateContact}
+                  onSelectContact={openContactDetail}
+                />
+              </div>
+              {showActivityPanel && selectedContact && (
+                <div className="w-[35%]">
+                  <CrmActivityPanel
+                    contact={selectedContact}
+                    activities={activities}
+                    onClose={() => { setShowActivityPanel(false); setSelectedContact(null); }}
+                    onAddActivity={addActivity}
+                    onUpdateContact={updateContact}
+                  />
+                </div>
+              )}
             </div>
-          )}
-        </div>
+          </TabsContent>
+
+          <TabsContent value="list" className="mt-4">
+            <div className="flex gap-6">
+              <div className={`flex-1 ${showActivityPanel ? 'max-w-[60%]' : ''}`}>
+                <CrmContactList
+                  contacts={filteredContacts}
+                  loading={loading}
+                  searchQuery={searchQuery}
+                  onSearchChange={setSearchQuery}
+                  filterTemperature={filterTemperature}
+                  onFilterTemperatureChange={setFilterTemperature}
+                  filterStatus={filterStatus}
+                  onFilterStatusChange={setFilterStatus}
+                  onSelectContact={openContactDetail}
+                  onUpdateContact={updateContact}
+                  onDeleteContact={deleteContact}
+                  selectedContactId={selectedContact?.id}
+                />
+              </div>
+              {showActivityPanel && selectedContact && (
+                <div className="w-[40%]">
+                  <CrmActivityPanel
+                    contact={selectedContact}
+                    activities={activities}
+                    onClose={() => { setShowActivityPanel(false); setSelectedContact(null); }}
+                    onAddActivity={addActivity}
+                    onUpdateContact={updateContact}
+                  />
+                </div>
+              )}
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
 
       <CrmContactDialog
