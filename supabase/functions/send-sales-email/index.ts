@@ -210,7 +210,8 @@ ${htmlBody}
 <hr style="border-color:#D4A017;margin-top:32px;">
 <p style="font-size:12px;color:#888;">
 Vous recevez cet email car vous avez manifesté un intérêt pour EbookStudio Pro.<br>
-<a href="${OFFRES_LINK}" style="color:#D4A017;">Se désinscrire</a>
+<a href="${OFFRES_LINK}" style="color:#D4A017;">Voir l'offre</a> · <a href="${DEMO_LINK}" style="color:#D4A017;">Tester la démo</a><br>
+Pour ne plus recevoir ces emails, répondez "STOP" à cet email.
 </p>
 </body></html>`;
 }
