@@ -7,6 +7,7 @@ import { CrmContactList } from '@/components/crm/CrmContactList';
 import { CrmContactDialog } from '@/components/crm/CrmContactDialog';
 import { CrmActivityPanel } from '@/components/crm/CrmActivityPanel';
 import { CrmKanban } from '@/components/crm/CrmKanban';
+import { CrmAnalytics } from '@/components/crm/CrmAnalytics';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export interface CrmContact {
@@ -306,8 +307,9 @@ const CrmPage: React.FC = () => {
 
         <Tabs defaultValue="kanban" className="w-full">
           <TabsList>
-            <TabsTrigger value="kanban">📋 Pipeline Kanban</TabsTrigger>
+            <TabsTrigger value="kanban">📋 Pipeline</TabsTrigger>
             <TabsTrigger value="list">📃 Liste</TabsTrigger>
+            <TabsTrigger value="analytics">📊 Analytics</TabsTrigger>
           </TabsList>
 
           <TabsContent value="kanban" className="mt-4">
@@ -363,6 +365,10 @@ const CrmPage: React.FC = () => {
                 </div>
               )}
             </div>
+          </TabsContent>
+
+          <TabsContent value="analytics" className="mt-4">
+            <CrmAnalytics contacts={contacts} />
           </TabsContent>
         </Tabs>
       </div>
