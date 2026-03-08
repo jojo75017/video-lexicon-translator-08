@@ -208,7 +208,7 @@ Découvrez ${t}, une aventure captivante à écouter en famille ou en solo. Plon
             </div>
             <div className="space-y-2">
               <Label>📖 Introduction / Résumé</Label>
-              <Textarea value={introduction} onChange={e => setIntroduction(e.target.value)} rows={4} placeholder="Résumé ou introduction du livre audio..." />
+              <Textarea value={introduction} onChange={e => { setIntroduction(e.target.value); setIntroManuallyEdited(true); }} rows={6} placeholder="Résumé ou introduction du livre audio..." />
             </div>
             <div className="space-y-2">
               <Label>📚 Contenu des Chapitres</Label>
