@@ -155,11 +155,11 @@ const SalesCampaignPage = () => {
                     </p>
                   </CardHeader>
                   <CardContent>
-                    <ScrollArea className="max-h-80">
+                    <div className="max-h-80 overflow-y-auto">
                       <pre className="whitespace-pre-wrap text-sm text-foreground/85 font-sans leading-relaxed">
                         {email.body}
                       </pre>
-                    </ScrollArea>
+                    </div>
                   </CardContent>
                 </Card>
               ))}
