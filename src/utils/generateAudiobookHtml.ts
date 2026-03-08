@@ -3,6 +3,8 @@
  * Ready to paste into an Elementor HTML widget or any WordPress page.
  */
 
+import { getRandomReviews } from './reviewPool';
+
 interface AudiobookData {
   title: string;
   author_name?: string | null;
