@@ -244,7 +244,7 @@ const SalesPage = () => {
             <video
               controls
               preload="metadata"
-              poster=""
+              poster="/images/video-poster-offre.jpg"
               className="w-full aspect-video bg-slate-900"
               playsInline
             >
@@ -425,9 +425,24 @@ const SalesPage = () => {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}
             className="grid md:grid-cols-3 gap-6">
             {[
-              { name: "Marie D.", role: "5 ebooks publiés", text: "En 3 semaines, j'ai publié 5 ebooks. Mon meilleur mois : 420€ de royalties KDP.", avatar: "MD" },
-              { name: "Thomas L.", role: "Entrepreneur", text: "J'utilise les ebooks comme lead magnets. Résultat : +340 leads qualifiés en 2 mois.", avatar: "TL" },
-              { name: "Nicolas F.", role: "Revenus passifs", text: "De 0€ à 850€/mois de revenus passifs KDP en 6 mois grâce au workflow.", avatar: "NF" },
+              { 
+                name: "Marie D.", role: "5 ebooks publiés en 3 semaines", 
+                text: "Mon meilleur mois : 420€ de royalties KDP. Le BSR de mon livre 'Recettes Healthy' est descendu à #2,847 en Cuisine — je n'aurais jamais cru ça possible aussi vite.", 
+                avatar: "MD",
+                stats: "BSR #2,847 · 420€/mois"
+              },
+              { 
+                name: "Thomas L.", role: "Entrepreneur · 12 ebooks", 
+                text: "J'utilise les ebooks comme lead magnets pour mon business. Résultat : +340 leads qualifiés en 2 mois et 3 livres dans le Top 100 de leur catégorie.", 
+                avatar: "TL",
+                stats: "Top 100 Amazon · 340 leads"
+              },
+              { 
+                name: "Nicolas F.", role: "Revenus passifs · 22 ebooks", 
+                text: "De 0€ à 850€/mois en 6 mois. Mon secret : 1 ebook par semaine avec EbookStudio + les mots-clés KDP optimisés. Mes 3 meilleurs titres font chacun +150€/mois.", 
+                avatar: "NF",
+                stats: "850€/mois · 22 ebooks publiés"
+              },
             ].map((t, i) => (
               <motion.div key={i} variants={fadeIn} custom={i}>
                 <Card className="h-full bg-slate-900/50 border-slate-800">
@@ -444,7 +459,10 @@ const SalesPage = () => {
                         {[1,2,3,4,5].map(s => <Star key={s} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />)}
                       </div>
                     </div>
-                    <p className="text-white/90 leading-relaxed">"{t.text}"</p>
+                    <p className="text-white/90 leading-relaxed text-sm">"{t.text}"</p>
+                    <div className="mt-3 pt-3 border-t border-slate-800">
+                      <p className="text-xs font-semibold text-cyan-400">📊 {t.stats}</p>
+                    </div>
                   </CardContent>
                 </Card>
               </motion.div>

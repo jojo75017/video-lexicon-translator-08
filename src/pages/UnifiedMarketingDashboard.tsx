@@ -53,6 +53,7 @@ const UnifiedMarketingDashboard = () => {
   const [socialStats, setSocialStats] = useState<SocialStats>({ totalPosts: 0, published: 0, totalLikes: 0, totalComments: 0, totalShares: 0, totalClicks: 0, byPlatform: {} });
   const [recentProspects, setRecentProspects] = useState<any[]>([]);
   const [recentPosts, setRecentPosts] = useState<any[]>([]);
+  const [emailOpens, setEmailOpens] = useState<{ total: number; byStep: Record<number, number>; uniqueEmails: number }>({ total: 0, byStep: {}, uniqueEmails: 0 });
 
   const fetchAll = useCallback(async () => {
     setLoading(true);
@@ -99,6 +100,18 @@ const UnifiedMarketingDashboard = () => {
         });
         setRecentPosts(posts.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).slice(0, 5));
       }
+
+      // Fetch email opens
+      const { data: opens } = await supabase.from('email_opens').select('*');
+      if (opens) {
+        const byStep: Record<number, number> = {};
+        const uniqueSet = new Set<string>();
+        opens.forEach((o: any) => {
+          byStep[o.email_step] = (byStep[o.email_step] || 0) + 1;
+          uniqueSet.add(o.prospect_email);
+        });
+        setEmailOpens({ total: opens.length, byStep, uniqueEmails: uniqueSet.size });
+      }
     } catch (err) {
       console.error('Dashboard fetch error:', err);
     }
@@ -142,9 +155,9 @@ const UnifiedMarketingDashboard = () => {
           {[
             { label: 'Prospects', value: prospectStats.total, icon: Users, color: 'text-blue-400' },
             { label: 'Emails envoyés', value: estimatedEmailsSent, icon: Send, color: 'text-emerald-400' },
-            { label: 'Auto-envoi actif', value: prospectStats.autoSendActive, icon: Clock, color: 'text-amber-400' },
-            { label: 'Posts créés', value: socialStats.totalPosts, icon: BarChart3, color: 'text-violet-400' },
-            { label: 'Engagement total', value: totalEngagement, icon: Heart, color: 'text-pink-400' },
+            { label: 'Emails ouverts', value: emailOpens.total, icon: Eye, color: 'text-orange-400' },
+            { label: 'Taux ouverture', value: estimatedEmailsSent > 0 ? `${Math.round((emailOpens.uniqueEmails / prospectStats.total) * 100)}%` : '—', icon: TrendingUp, color: 'text-amber-400', isText: true },
+            { label: 'Engagement social', value: totalEngagement, icon: Heart, color: 'text-pink-400' },
             { label: 'Clics total', value: socialStats.totalClicks, icon: MousePointerClick, color: 'text-cyan-400' },
           ].map((kpi, i) => (
             <Card key={i} className="bg-slate-900/60 border-slate-800">
@@ -153,7 +166,7 @@ const UnifiedMarketingDashboard = () => {
                   <kpi.icon className={`w-5 h-5 ${kpi.color}`} />
                   <ArrowUpRight className="w-3 h-3 text-emerald-400" />
                 </div>
-                <p className="text-2xl font-black">{kpi.value.toLocaleString('fr-FR')}</p>
+                <p className="text-2xl font-black">{typeof kpi.value === 'string' ? kpi.value : kpi.value.toLocaleString('fr-FR')}</p>
                 <p className="text-xs text-white/50 mt-1">{kpi.label}</p>
               </CardContent>
             </Card>
