@@ -273,6 +273,7 @@ const App = () => {
             <Route path="/communaute" element={<ForumPage />} />
             <Route path="/plan-marketing" element={<MarketingPlanPage />} />
             <Route path="/campagne-vente" element={<SalesCampaignPage />} />
+            <Route path="/gestion-prospects" element={<AdminGate><ProspectManagerPage /></AdminGate>} />
             <Route path="/resultat-en-5-min" element={<ResultatEn5MinPage />} />
             <Route path="/cadeau" element={<CadeauPage />} />
             <Route 
