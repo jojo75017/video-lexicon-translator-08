@@ -257,10 +257,24 @@ const AudiobookDemoPage = () => {
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <Badge variant="outline" className="border-white/20 text-white/70 bg-white/5 hover:bg-white/10 rounded-full px-4 py-1.5">Livre Audio</Badge>
-              <Badge variant="outline" className="border-white/20 text-white/70 bg-white/5 hover:bg-white/10 rounded-full px-4 py-1.5">Marketing Digital</Badge>
-              <Badge variant="outline" className="border-white/20 text-white/70 bg-white/5 hover:bg-white/10 rounded-full px-4 py-1.5">Audio IA</Badge>
-              <Badge variant="outline" className="border-white/20 text-white/70 bg-white/5 hover:bg-white/10 rounded-full px-4 py-1.5">{audiobook.voice_name}</Badge>
+              <Badge variant="outline" className="border-white/20 text-white/70 bg-white/5 hover:bg-white/10 rounded-full px-4 py-1.5">📖 Livre Audio</Badge>
+              <Badge variant="outline" className="border-white/20 text-white/70 bg-white/5 hover:bg-white/10 rounded-full px-4 py-1.5">🤠 {audiobook.genre}</Badge>
+              <Badge variant="outline" className="border-white/20 text-white/70 bg-white/5 hover:bg-white/10 rounded-full px-4 py-1.5">🎙️ Audio IA</Badge>
+              <Badge variant="outline" className="border-white/20 text-white/70 bg-white/5 hover:bg-white/10 rounded-full px-4 py-1.5">🗣️ {audiobook.voice_name}</Badge>
+            </div>
+
+            {/* Pour qui est ce livre ? */}
+            <div className="bg-amber-500/[0.06] border border-amber-500/15 rounded-2xl p-6">
+              <h3 className="text-lg font-bold text-amber-400 mb-3 flex items-center gap-2">
+                <Users className="w-5 h-5" />
+                Pour qui est ce livre audio ?
+              </h3>
+              <ul className="space-y-2 text-white/70 text-sm">
+                <li className="flex items-start gap-2"><span className="text-amber-400 mt-0.5">✓</span> {audiobook.target_audience}</li>
+                <li className="flex items-start gap-2"><span className="text-amber-400 mt-0.5">✓</span> Parents cherchant des histoires captivantes pour le coucher ou les trajets</li>
+                <li className="flex items-start gap-2"><span className="text-amber-400 mt-0.5">✓</span> Enseignants souhaitant des supports audio ludiques</li>
+                <li className="flex items-start gap-2"><span className="text-amber-400 mt-0.5">✓</span> Amateurs d'aventures western drôles et familiales</li>
+              </ul>
             </div>
 
             {/* Full Player */}
