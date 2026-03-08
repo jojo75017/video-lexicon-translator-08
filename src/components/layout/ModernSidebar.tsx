@@ -296,6 +296,7 @@ const categories: Category[] = [
       { id: 'royalty-dashboard', label: 'Dashboard Revenus', icon: DollarSign },
       { id: 'direct-sales', label: 'Vente Directe', icon: DollarSign },
       { id: 'arc-manager', label: 'Gestionnaire ARC', icon: Users },
+      { id: 'landing-page-generator', label: 'Landing Page', icon: Globe, isNew: true },
     ]
   },
   // ========== 11. PRODUCTIVITÉ ==========
