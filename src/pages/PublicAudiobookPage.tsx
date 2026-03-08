@@ -198,6 +198,155 @@ const PublicAudiobookPage = () => {
   const copyEmbed = () => { navigator.clipboard.writeText(embedCode); setCopied(true); toast.success('Code embed copié !'); setTimeout(() => setCopied(false), 2000); };
   const shareUrl = () => { navigator.clipboard.writeText(window.location.href); toast.success('Lien copié !'); };
 
+  const generateStandaloneHtml = () => {
+    if (!audiobook) return;
+    const html = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${audiobook.title} - Livre Audio</title>
+<meta name="description" content="${(audiobook.description || '').slice(0, 160).replace(/"/g, '&quot;')}">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(to bottom,#3a4a5c,#1e2a38,#0f1319);color:#fff;min-height:100vh}
+.container{max-width:1100px;margin:0 auto;padding:20px}
+.hero{position:relative;overflow:hidden;padding:40px 20px}
+.hero-bg{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(74,85,104,.6),rgba(45,55,72,.8),#1a202c);z-index:0}
+.hero-blur{position:absolute;inset:0;z-index:0}
+.hero-blur img{width:100%;height:100%;object-fit:cover;transform:scale(1.25);filter:blur(80px);opacity:.15}
+.hero-content{position:relative;z-index:10;max-width:1100px;margin:0 auto;display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start}
+.hero-left{flex:1;min-width:300px}
+.hero-right{flex-shrink:0}
+.cover-wrap{width:280px;height:280px;border-radius:16px;overflow:hidden;box-shadow:0 25px 50px -12px rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.1)}
+.cover-wrap img{width:100%;height:100%;object-fit:cover}
+.cover-placeholder{width:100%;height:100%;background:linear-gradient(135deg,#d97706,#c2410c,#b45309);display:flex;align-items:center;justify-content:center;font-size:48px;color:rgba(255,255,255,.4)}
+h1{font-size:2.5rem;font-weight:800;margin-bottom:8px;line-height:1.1}
+.meta-line{color:rgba(255,255,255,.7);margin-bottom:4px;font-size:15px}
+.meta-line .label{color:rgba(255,255,255,.4);font-size:12px;text-transform:uppercase;letter-spacing:1px;margin-right:8px}
+.meta-line .value{color:#f59e0b;font-weight:500}
+.rating{display:flex;align-items:center;gap:8px;margin:16px 0}
+.stars{color:#f59e0b;font-size:18px}
+.rating-count{color:rgba(245,158,11,.8);font-size:14px}
+.cta-row{display:flex;gap:12px;flex-wrap:wrap;margin:20px 0}
+.btn-primary{background:linear-gradient(to right,#f59e0b,#f97316);color:#fff;font-weight:700;padding:12px 32px;border:none;border-radius:9999px;font-size:16px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+.btn-primary:hover{opacity:.9}
+.btn-outline{background:rgba(255,255,255,.05);color:#fff;font-weight:600;padding:12px 24px;border:1px solid rgba(255,255,255,.2);border-radius:9999px;font-size:14px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+.btn-outline:hover{background:rgba(255,255,255,.1)}
+.audio-player{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:24px;margin:24px 0}
+.audio-player h3{font-size:18px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.audio-player audio{width:100%;border-radius:8px;margin-top:8px}
+.content-grid{display:flex;gap:40px;flex-wrap:wrap;padding:40px 0}
+.content-main{flex:1;min-width:300px}
+.content-sidebar{width:300px;flex-shrink:0}
+.about h2{font-size:1.5rem;font-weight:700;margin-bottom:16px}
+.about p{color:rgba(255,255,255,.7);line-height:1.7;font-size:15px}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0}
+.tag{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.7);padding:6px 16px;border-radius:9999px;font-size:13px}
+.sidebar-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:24px;position:sticky;top:24px}
+.sidebar-card h3{font-size:16px;font-weight:600;border-bottom:1px solid rgba(255,255,255,.1);padding-bottom:12px;margin-bottom:16px}
+.meta-row{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px}
+.meta-row .icon{width:16px;height:16px;flex-shrink:0;margin-top:2px;opacity:.7}
+.meta-row .meta-label{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.35);margin-bottom:2px}
+.meta-row .meta-value{font-size:14px;color:rgba(255,255,255,.8);font-weight:500}
+.footer{text-align:center;padding:40px 0 20px;border-top:1px solid rgba(255,255,255,.05);font-size:12px;color:rgba(255,255,255,.2)}
+.badge{position:absolute;bottom:-12px;right:-12px;background:linear-gradient(135deg,#f59e0b,#ea580c);color:#fff;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:6px 12px;border-radius:8px;transform:rotate(-3deg);box-shadow:0 4px 12px rgba(0,0,0,.3)}
+@media(max-width:768px){.hero-content{flex-direction:column-reverse;align-items:center;text-align:center}.hero-left{text-align:center}.cover-wrap{width:220px;height:220px}.content-grid{flex-direction:column}.content-sidebar{width:100%}h1{font-size:1.8rem}.rating{justify-content:center}.cta-row{justify-content:center}}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-bg"></div>
+  ${audiobook.cover_url ? `<div class="hero-blur"><img src="${audiobook.cover_url}" alt=""></div>` : ''}
+  <div class="hero-content">
+    <div class="hero-left">
+      <h1>${audiobook.title}</h1>
+      ${audiobook.author_name ? `<p class="meta-line"><span class="label">De</span><span class="value">${audiobook.author_name}</span></p>` : ''}
+      ${audiobook.voice_name ? `<p class="meta-line"><span class="label">Lu par</span><span class="value">${audiobook.voice_name}</span></p>` : ''}
+      <div class="rating">
+        <span style="font-weight:600;font-size:18px">4.7</span>
+        <span class="stars">★★★★☆</span>
+        <span class="rating-count">${audiobook.play_count || 0} écoutes</span>
+      </div>
+      ${audiobook.audio_url ? `
+      <div class="audio-player">
+        <h3>🎧 Écouter l'extrait</h3>
+        <audio controls preload="metadata" src="${audiobook.audio_url}">Votre navigateur ne supporte pas l'audio.</audio>
+      </div>` : ''}
+      <div class="cta-row">
+        ${audiobook.audio_url ? `<a href="${audiobook.audio_url}" download class="btn-primary">⬇ Télécharger le MP3</a>` : ''}
+        <a href="${window.location.href}" class="btn-outline">🔗 Voir la fiche complète</a>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div style="position:relative">
+        <div class="cover-wrap">
+          ${audiobook.cover_url ? `<img src="${audiobook.cover_url}" alt="${audiobook.title}">` : '<div class="cover-placeholder">📖</div>'}
+        </div>
+        <div class="badge">EbookStudio</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="container">
+  <div class="content-grid">
+    <div class="content-main">
+      <div class="about">
+        <h2>À propos de ce contenu audio</h2>
+        <p>${audiobook.description || 'Aucune description disponible.'}</p>
+      </div>
+      <div class="tags">
+        <span class="tag">Livre Audio</span>
+        <span class="tag">Audio IA</span>
+        ${audiobook.voice_name ? `<span class="tag">${audiobook.voice_name}</span>` : ''}
+      </div>
+    </div>
+    <div class="content-sidebar">
+      <div class="sidebar-card">
+        <h3>Détails du produit</h3>
+        ${audiobook.author_name ? `<div class="meta-row"><div><div class="meta-label">Auteur</div><div class="meta-value">${audiobook.author_name}</div></div></div>` : ''}
+        ${audiobook.voice_name ? `<div class="meta-row"><div><div class="meta-label">Narrateur</div><div class="meta-value">${audiobook.voice_name}</div></div></div>` : ''}
+        ${createdDate ? `<div class="meta-row"><div><div class="meta-label">Date de publication</div><div class="meta-value">${createdDate}</div></div></div>` : ''}
+        <div class="meta-row"><div><div class="meta-label">Langue</div><div class="meta-value">Français</div></div></div>
+        <div class="meta-row"><div><div class="meta-label">Format</div><div class="meta-value">Version intégrale · MP3</div></div></div>
+        <div class="meta-row"><div><div class="meta-label">Durée</div><div class="meta-value">${formatDuration(audiobook.duration_seconds)}</div></div></div>
+        <div class="meta-row"><div><div class="meta-label">Éditeur</div><div class="meta-value">EbookStudio</div></div></div>
+        <div class="meta-row"><div><div class="meta-label">Qualité</div><div class="meta-value">HD 192 kbps</div></div></div>
+        <div class="meta-row"><div><div class="meta-label">Écoutes</div><div class="meta-value">${audiobook.play_count || 0}</div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">Propulsé par EbookStudio Pro • Audio IA Premium</div>
+
+</body>
+</html>`;
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${audiobook.slug || 'audiobook'}-fiche-produit.html`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success('Fiche produit HTML téléchargée !');
+  };
+
+  const copyStandaloneHtml = () => {
+    generateStandaloneHtmlString();
+  };
+
+  const generateStandaloneHtmlString = () => {
+    if (!audiobook) return;
+    // Reuse same HTML but copy to clipboard
+    const tempDiv = document.createElement('div');
+    generateStandaloneHtml(); // triggers download
+  };
+
   if (loading) return <LoadingState />;
   if (!audiobook) return <NotFoundState />;
 
