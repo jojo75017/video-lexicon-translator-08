@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Flame, TrendingUp, Users } from 'lucide-react';
+import { Flame, TrendingUp, Users, ShieldCheck, Zap, Clock } from 'lucide-react';
 
 const messages = [
   { icon: Flame, text: "3 personnes ont acheté dans la dernière heure", color: "text-orange-400" },
   { icon: TrendingUp, text: "Le prix augmentera bientôt à 147€", color: "text-amber-400" },
   { icon: Users, text: "Rejoignez +5000 auteurs satisfaits", color: "text-emerald-400" },
+  { icon: ShieldCheck, text: "Garantie 30 jours — 0 risque pour vous", color: "text-cyan-400" },
+  { icon: Zap, text: "Votre 1er ebook publié ce soir sur Amazon", color: "text-violet-400" },
+  { icon: Clock, text: "Places Fondateur limitées — ne tardez pas", color: "text-red-400" },
 ];
 
 export const UrgencyBanner: React.FC = () => {
@@ -14,7 +17,7 @@ export const UrgencyBanner: React.FC = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIndex(prev => (prev + 1) % messages.length);
-    }, 5000);
+    }, 4000);
     return () => clearInterval(interval);
   }, []);
 

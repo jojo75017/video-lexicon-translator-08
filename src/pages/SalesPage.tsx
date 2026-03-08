@@ -16,6 +16,10 @@ import SpotsCounter from "@/components/sales/SpotsCounter";
 import RoiCalculator from "@/components/sales/RoiCalculator";
 import SocialProofToast from "@/components/sales/SocialProofToast";
 import PriceComparison from "@/components/sales/PriceComparison";
+import CountdownTimer from "@/components/sales/CountdownTimer";
+import UrgencyBanner from "@/components/sales/UrgencyBanner";
+import GuaranteeSection from "@/components/sales/GuaranteeSection";
+import ProgressEngagement from "@/components/sales/ProgressEngagement";
 
 // ════════════════════════════════════════════════════════════════════════════════
 // DESIGN SYSTEM 2026 — Palette Premium
@@ -122,6 +126,9 @@ const SalesPage = () => {
   return (
     <div className="min-h-screen bg-slate-950 text-white overflow-x-hidden">
       
+      {/* ═══════════════════════════════════════ URGENCY BANNER ═══════════════════════════════════════ */}
+      <UrgencyBanner />
+
       {/* ═══════════════════════════════════════ TOP BAR ═══════════════════════════════════════ */}
       <div className="bg-gradient-to-r from-cyan-600 via-cyan-500 to-emerald-500 text-slate-900 py-2.5 px-4">
         <div className="max-w-6xl mx-auto flex items-center justify-center gap-4 text-sm font-semibold">
@@ -594,6 +601,11 @@ const SalesPage = () => {
             </Card>
           </motion.div>
 
+          {/* Countdown Timer */}
+          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mt-6">
+            <CountdownTimer />
+          </motion.div>
+
           {/* Spots Counter */}
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mt-6">
             <SpotsCounter />
@@ -605,6 +617,9 @@ const SalesPage = () => {
       <div id="author-showcase">
         <AuthorShowcase />
       </div>
+
+      {/* ═══════════════════════════════════════ GARANTIE ═══════════════════════════════════════ */}
+      <GuaranteeSection />
 
       {/* ═══════════════════════════════════════ FAQ ═══════════════════════════════════════ */}
       <SalesFaq />
@@ -692,6 +707,7 @@ const SalesPage = () => {
 
       <ExitIntentPopup />
       <SocialProofToast />
+      <ProgressEngagement />
     </div>
   );
 };
