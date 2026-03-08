@@ -60,7 +60,8 @@ import {
   Music,
   CalendarDays,
   Contact,
-  Mail
+  Mail,
+  Code
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
