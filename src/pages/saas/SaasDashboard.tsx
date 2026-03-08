@@ -47,7 +47,7 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, change, changeType, i
           {change}
         </div>
         {description && (
-          <span className="text-xs text-muted-foreground">{description}</span>
+          <span className="text-xs text-white/60">{description}</span>
         )}
       </div>
     </CardContent>
