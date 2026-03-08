@@ -378,6 +378,13 @@ export const AudiobookPublisher: React.FC<AudiobookPublisherProps> = ({
                       WooCommerce
                     </Button>
                     <Button
+                      variant="outline" size="sm" className="gap-1.5 text-xs h-7"
+                      onClick={() => { downloadAudiobookHtml(book); toast.success('HTML Elementor téléchargé !'); }}
+                    >
+                      <FileCode className="h-3 w-3" />
+                      HTML Elementor
+                    </Button>
+                    <Button
                       variant="ghost" size="sm" className="gap-1.5 text-xs h-7"
                       onClick={() => togglePublic(book.id, book.is_public)}
                     >
