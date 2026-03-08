@@ -50,6 +50,7 @@ import ForumPage from './pages/ForumPage';
 import KdpKeywordResearchPage from './pages/KdpKeywordResearchPage';
 import PublicAudiobookPage from './pages/PublicAudiobookPage';
 import AudiobookEmbedPage from './pages/AudiobookEmbedPage';
+import AudiobookDemoPage from './pages/AudiobookDemoPage';
 import FormationEmbedPage from './pages/FormationEmbedPage';
 import { SubscriptionAuth } from '@/components/SubscriptionAuth';
 import { supabase } from '@/integrations/supabase/client';
