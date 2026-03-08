@@ -307,8 +307,9 @@ const CrmPage: React.FC = () => {
 
         <Tabs defaultValue="kanban" className="w-full">
           <TabsList>
-            <TabsTrigger value="kanban">📋 Pipeline Kanban</TabsTrigger>
+            <TabsTrigger value="kanban">📋 Pipeline</TabsTrigger>
             <TabsTrigger value="list">📃 Liste</TabsTrigger>
+            <TabsTrigger value="analytics">📊 Analytics</TabsTrigger>
           </TabsList>
 
           <TabsContent value="kanban" className="mt-4">
