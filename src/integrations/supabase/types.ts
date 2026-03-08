@@ -357,6 +357,33 @@ export type Database = {
         }
         Relationships: []
       }
+      email_opens: {
+        Row: {
+          email_step: number
+          id: string
+          ip_address: string | null
+          opened_at: string
+          prospect_email: string
+          user_agent: string | null
+        }
+        Insert: {
+          email_step: number
+          id?: string
+          ip_address?: string | null
+          opened_at?: string
+          prospect_email: string
+          user_agent?: string | null
+        }
+        Update: {
+          email_step?: number
+          id?: string
+          ip_address?: string | null
+          opened_at?: string
+          prospect_email?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       email_sequences: {
         Row: {
           completed: boolean
