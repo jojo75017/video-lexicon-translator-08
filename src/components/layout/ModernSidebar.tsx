@@ -576,7 +576,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                 placeholder="Rechercher un outil..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-8 h-10 text-sm bg-slate-900/50 border-slate-800 text-white placeholder:text-slate-600 rounded-xl focus:border-cyan-500/50 focus:ring-cyan-500/20"
+                className="w-full pl-10 pr-8 h-10 text-sm bg-slate-900/50 border-slate-800 text-white placeholder:text-slate-600 rounded-xl focus:border-gold/50 focus:ring-gold/20"
               />
               {searchQuery && (
                 <button
