@@ -159,6 +159,10 @@ import { EbookTitleABTest } from '@/components/ebook/EbookTitleABTest';
 import { EbookEditorialCalendar } from '@/components/ebook/EbookEditorialCalendar';
 import { EbookBackMatterGenerator } from '@/components/ebook/EbookBackMatterGenerator';
 import { EbookCompetitorSpy } from '@/components/ebook/EbookCompetitorSpy';
+import { EbookGlobalDashboard } from '@/components/ebook/EbookGlobalDashboard';
+import { EbookNicheTemplates } from '@/components/ebook/EbookNicheTemplates';
+import { EbookFocusMode } from '@/components/ebook/EbookFocusMode';
+import { EbookLandingPageGenerator } from '@/components/ebook/EbookLandingPageGenerator';
 
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
 import { ebookTemplates } from '@/data/ebookTemplates';
@@ -3127,6 +3131,36 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
 
       case 'competitor-spy':
         return <EbookCompetitorSpy />;
+
+      case 'global-dashboard':
+        return (
+          <EbookGlobalDashboard
+            ebookTitle={ebookTitle}
+            authorName={authorName}
+            chapters={chapters}
+            preface={preface}
+            conclusion={conclusion}
+            kdpDescription={kdpDescription}
+            kdpKeywords={kdpKeywords}
+            onNavigate={(tab) => setActiveTab(tab)}
+          />
+        );
+
+      case 'niche-templates':
+        return <EbookNicheTemplates />;
+
+      case 'focus-mode':
+        return <EbookFocusMode onClose={() => setActiveTab('writing')} initialContent="" wordGoal={1000} />;
+
+      case 'landing-page-generator':
+        return (
+          <EbookLandingPageGenerator
+            ebookTitle={ebookTitle}
+            authorName={authorName}
+            bookSummary={bookSummary}
+            kdpDescription={kdpDescription}
+          />
+        );
 
       case 'arc-manager':
         return (

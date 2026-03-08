@@ -120,9 +120,11 @@ const categories: Category[] = [
     color: 'from-violet-500 to-purple-500',
     items: [
       { id: 'presentation', label: 'Découvrir KDP Studio', icon: Info },
+      { id: 'global-dashboard', label: 'Vue d\'ensemble', icon: LayoutDashboard, isNew: true },
       { id: 'onboarding', label: 'Par où commencer ?', icon: BookOpen },
       { id: 'complete-workflow', label: 'Créer un livre (1 clic)', icon: Rocket, isPro: true },
       { id: 'workflow-dashboard', label: 'Tableau de Bord', icon: BarChart3 },
+      { id: 'niche-templates', label: 'Templates par Niche', icon: Library, isNew: true },
       { id: 'niches', label: 'Niches Rentables', icon: Lightbulb, isLink: true, href: '/niches' },
     ]
   },
@@ -133,13 +135,14 @@ const categories: Category[] = [
     emoji: '✍️',
     color: 'from-blue-500 to-indigo-500',
     items: [
+      { id: 'focus-mode', label: 'Mode Focus / Zen', icon: Eye, isNew: true },
       { id: 'draft-mode', label: 'Brouillon Rapide', icon: Zap },
       { id: 'rich-editor', label: 'Éditeur Enrichi', icon: PenTool },
       { id: 'writing', label: 'Écrire les Chapitres', icon: PenTool },
       { id: 'aichat', label: 'Assistant IA', icon: Bot },
       { id: 'writing-intelligence', label: 'Assistant Intelligent', icon: Brain },
       { id: 'prompt-library', label: 'Bibliothèque Prompts', icon: Library },
-      { id: 'prompt-chain-generator', label: 'Chaînes de Prompts', icon: Zap, isNew: true },
+      { id: 'prompt-chain-generator', label: 'Chaînes de Prompts', icon: Zap },
       { id: 'characters', label: 'Personnages', icon: Users },
       { id: 'voice', label: 'Dictée Vocale', icon: Volume2 },
     ]
@@ -293,6 +296,7 @@ const categories: Category[] = [
       { id: 'royalty-dashboard', label: 'Dashboard Revenus', icon: DollarSign },
       { id: 'direct-sales', label: 'Vente Directe', icon: DollarSign },
       { id: 'arc-manager', label: 'Gestionnaire ARC', icon: Users },
+      { id: 'landing-page-generator', label: 'Landing Page', icon: Globe, isNew: true },
     ]
   },
   // ========== 11. PRODUCTIVITÉ ==========
