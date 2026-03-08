@@ -64,6 +64,7 @@ import SaasBilling from '@/pages/saas/SaasBilling';
 import SaasSettings from '@/pages/saas/SaasSettings';
 import SaasAuthPage from '@/pages/saas/SaasAuthPage';
 import SalesCampaignPage from '@/pages/SalesCampaignPage';
+import EmailPreviewPage from '@/pages/EmailPreviewPage';
 import ProspectManagerPage from '@/pages/ProspectManagerPage';
 import SocialPostGeneratorPage from '@/pages/SocialPostGeneratorPage';
 import UnifiedMarketingDashboard from '@/pages/UnifiedMarketingDashboard';
@@ -275,6 +276,7 @@ const App = () => {
             <Route path="/communaute" element={<ForumPage />} />
             <Route path="/plan-marketing" element={<MarketingPlanPage />} />
             <Route path="/campagne-vente" element={<SalesCampaignPage />} />
+            <Route path="/apercu-emails" element={<AdminGate><EmailPreviewPage /></AdminGate>} />
             <Route path="/generateur-posts" element={<AdminGate><SocialPostGeneratorPage /></AdminGate>} />
             <Route path="/gestion-prospects" element={<AdminGate><ProspectManagerPage /></AdminGate>} />
             <Route path="/dashboard-marketing" element={<AdminGate><UnifiedMarketingDashboard /></AdminGate>} />
