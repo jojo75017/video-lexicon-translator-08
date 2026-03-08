@@ -85,10 +85,21 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
   const [bookSubtitle, setBookSubtitle] = useState('');
   const [authorNameState, setAuthorNameState] = useState(propAuthorName || '');
   const [category, setCategory] = useState('enfants-3-8');
-  const defaultIntro = `Bienvenue. Vous vous apprêtez à écouter Le Village Irrésistible. Une production EbookStudio. Installez-vous confortablement, la lecture commence.
+  const buildDefaultIntro = (title: string) => {
+    const t = title.trim() || 'votre livre audio';
+    return `Bienvenue. Vous vous apprêtez à écouter ${t}. Une production EbookStudio. Installez-vous confortablement, la lecture commence.
 
-Dans un petit village gaulois, une bande d'irréductibles héros vit des aventures hilarantes où le courage et l'amitié triomphent toujours. Entre potions magiques, banquets légendaires et plans farfelus, découvrez une histoire captivante qui fera rire et rêver les enfants. Une épopée drôle et tendre à écouter en famille.`;
-  const [introduction, setIntroduction] = useState(preface || defaultIntro);
+Découvrez ${t}, une aventure captivante à écouter en famille ou en solo. Plongez dans un univers riche en émotions, en rebondissements et en personnages attachants. Une expérience audio immersive qui saura vous transporter du début à la fin.`;
+  };
+  const [introduction, setIntroduction] = useState(preface || buildDefaultIntro(ebookTitle || ''));
+
+  // Update intro when title changes (only if user hasn't manually edited)
+  const [introManuallyEdited, setIntroManuallyEdited] = useState(false);
+  useEffect(() => {
+    if (!introManuallyEdited && !preface) {
+      setIntroduction(buildDefaultIntro(bookTitle));
+    }
+  }, [bookTitle, introManuallyEdited, preface]);
   const [chapterContent, setChapterContent] = useState('');
 
   // A4 cleaned text
@@ -197,7 +208,7 @@ Dans un petit village gaulois, une bande d'irréductibles héros vit des aventur
             </div>
             <div className="space-y-2">
               <Label>📖 Introduction / Résumé</Label>
-              <Textarea value={introduction} onChange={e => setIntroduction(e.target.value)} rows={4} placeholder="Résumé ou introduction du livre audio..." />
+              <Textarea value={introduction} onChange={e => { setIntroduction(e.target.value); setIntroManuallyEdited(true); }} rows={6} placeholder="Résumé ou introduction du livre audio..." />
             </div>
             <div className="space-y-2">
               <Label>📚 Contenu des Chapitres</Label>
