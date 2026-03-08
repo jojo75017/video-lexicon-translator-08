@@ -302,6 +302,11 @@ export const AudiobookPublisher: React.FC<AudiobookPublisherProps> = ({
                     <Input value={paypalLink} onChange={(e) => setPaypalLink(e.target.value)} placeholder="https://paypal.me/..." />
                   </div>
                 </div>
+                <div>
+                  <Label>Lien Stripe (page de paiement)</Label>
+                  <Input value={stripeLink} onChange={(e) => setStripeLink(e.target.value)} placeholder="https://buy.stripe.com/..." />
+                  <p className="text-xs text-muted-foreground mt-1">Créez un lien de paiement sur stripe.com → Liens de paiement</p>
+                </div>
                 <div className="flex items-center gap-2">
                   <Checkbox id="is-public" checked={isPublic} onCheckedChange={(v) => setIsPublic(!!v)} />
                   <Label htmlFor="is-public">Page publique (visible par tous)</Label>
