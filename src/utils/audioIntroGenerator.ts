@@ -70,8 +70,6 @@ function extractFirst50Words(text: string): string {
     return result + '.';
   }
   return result;
-  }
-  return result;
 }
 
 /**
