@@ -187,7 +187,7 @@ const SalesPage = () => {
             en moins d'une heure
           </motion.h1>
 
-          <motion.p variants={fadeIn} custom={2} className="text-lg sm:text-xl text-slate-400 mb-8 max-w-2xl mx-auto leading-relaxed">
+          <motion.p variants={fadeIn} custom={2} className="text-lg sm:text-xl text-white/80 mb-8 max-w-2xl mx-auto leading-relaxed">
             Le workflow IA complet qui a déjà généré <span className="text-white font-semibold">+35 ebooks publiés</span> sur Amazon KDP.
             Rédaction, couvertures, audiobooks — tout en un.
           </motion.p>
