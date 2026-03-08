@@ -624,7 +624,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                 className={cn(
                   "mb-3 rounded-2xl border transition-all",
                   hasActiveItem 
-                    ? "border-cyan-500/30 bg-slate-900/50 shadow-lg shadow-cyan-500/5" 
+                    ? "border-gold/30 bg-slate-900/50 shadow-lg shadow-gold/5" 
                     : "border-slate-800/50 bg-slate-900/30 hover:bg-slate-900/50 hover:shadow-md",
                   isCollapsed ? "p-1" : "p-2"
                 )}
