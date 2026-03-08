@@ -119,10 +119,9 @@ const AudiobookDemoPage = () => {
       </div>
 
       {/* ===== HERO HEADER ===== */}
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#4a5568]/60 via-[#2d3748]/80 to-[#1a202c] z-0" />
+      <div className="relative overflow-hidden bg-[#232F3E] text-white">
         <div className="absolute inset-0 z-0">
-          <img src={audiobook.cover_url} alt="" className="w-full h-full object-cover scale-125 blur-[80px] opacity-15" />
+          <img src={audiobook.cover_url} alt="" className="w-full h-full object-cover scale-125 blur-[80px] opacity-10" />
         </div>
 
         <div className="relative z-10 max-w-6xl mx-auto px-4 pt-10 pb-10">
