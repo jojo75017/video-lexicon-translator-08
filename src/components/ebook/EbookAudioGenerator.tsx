@@ -1317,7 +1317,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                           // Generate intro jingle (bell + TTS + silence)
                           setMp3ProgressLabel('🔔 Génération du jingle d\'intro...');
                           setMp3Progress(2);
-                          const introBlobs = await generateIntroForExport(generateSectionMp3, ebookTitle, authorName, preface);
+                          const introBlobs = await generateIntroForExport(generateSectionMp3, ebookTitle, authorName, preface, selectedNiche);
                           allBlobs.push(...introBlobs);
                           
                           for (let i = 0; i < sections.length; i++) {
