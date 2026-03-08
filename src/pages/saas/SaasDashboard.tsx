@@ -238,8 +238,8 @@ export const SaasDashboard: React.FC = () => {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Activité Récente</CardTitle>
-              <CardDescription>Dernières actions de votre équipe</CardDescription>
+              <CardTitle className="text-white">Activité Récente</CardTitle>
+              <CardDescription className="text-white/60">Dernières actions de votre équipe</CardDescription>
             </div>
             <Button variant="ghost" size="sm">
               Voir tout
