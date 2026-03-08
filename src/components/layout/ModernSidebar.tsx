@@ -424,15 +424,15 @@ const QuotaDisplay: React.FC<{ isCollapsed: boolean }> = ({ isCollapsed }) => {
           </TooltipContent>
         </Tooltip>
       ) : (
-        <div className="p-3 rounded-xl bg-gradient-to-br from-violet-500/10 to-purple-500/10 dark:from-violet-500/20 dark:to-purple-500/20 border border-violet-200/50 dark:border-violet-700/30">
+        <div className="p-3 rounded-xl bg-slate-900/50 border border-slate-800">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <Star className="w-4 h-4 text-violet-500" />
-              <span className="text-xs font-semibold text-foreground">Mon Plan</span>
+              <Star className="w-4 h-4 text-cyan-400" />
+              <span className="text-xs font-semibold text-white">Mon Plan</span>
             </div>
             <span className={cn(
               "text-[10px] font-bold px-2 py-0.5 rounded-full",
-              quotas.plan === 'lifetime' ? 'bg-violet-500 text-white' :
+              quotas.plan === 'lifetime' ? 'bg-cyan-500 text-slate-900' :
               quotas.plan === 'pro' ? 'bg-amber-500 text-white' :
               'bg-emerald-500 text-white'
             )}>
@@ -441,7 +441,7 @@ const QuotaDisplay: React.FC<{ isCollapsed: boolean }> = ({ isCollapsed }) => {
           </div>
           {isUnlimited ? (
             <div className="text-center py-1">
-              <span className="text-sm font-bold text-violet-600 dark:text-violet-400">∞ Accès illimité</span>
+              <span className="text-sm font-bold text-cyan-400">∞ Accès illimité</span>
             </div>
           ) : (
             <>
