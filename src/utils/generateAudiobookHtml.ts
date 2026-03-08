@@ -219,7 +219,7 @@ export function generateAudiobookHtml(book: AudiobookData): string {
       <div class="ab-review">
         <div class="ab-review-header">
           <div class="ab-review-avatar">${r.initial}</div>
-          <div><div class="ab-review-name">${escHtml(r.name)}</div><div class="ab-review-date">Achat vérifié</div></div>
+          <div><div class="ab-review-name">${escHtml(r.name)}</div><div class="ab-review-date">Auditeur vérifié</div></div>
         </div>
         <div class="ab-review-stars">${'★'.repeat(r.stars)}${'☆'.repeat(5 - r.stars)}</div>
         <div class="ab-review-text">${escHtml(r.text)}</div>
