@@ -64,6 +64,7 @@ import SaasBilling from '@/pages/saas/SaasBilling';
 import SaasSettings from '@/pages/saas/SaasSettings';
 import SaasAuthPage from '@/pages/saas/SaasAuthPage';
 import SalesCampaignPage from '@/pages/SalesCampaignPage';
+import ProspectManagerPage from '@/pages/ProspectManagerPage';
 const queryClient = new QueryClient();
 
 const App = () => {
