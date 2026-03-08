@@ -276,6 +276,7 @@ const App = () => {
             <Route path="/communaute" element={<ForumPage />} />
             <Route path="/plan-marketing" element={<MarketingPlanPage />} />
             <Route path="/campagne-vente" element={<SalesCampaignPage />} />
+            <Route path="/apercu-emails" element={<AdminGate><EmailPreviewPage /></AdminGate>} />
             <Route path="/generateur-posts" element={<AdminGate><SocialPostGeneratorPage /></AdminGate>} />
             <Route path="/gestion-prospects" element={<AdminGate><ProspectManagerPage /></AdminGate>} />
             <Route path="/dashboard-marketing" element={<AdminGate><UnifiedMarketingDashboard /></AdminGate>} />
