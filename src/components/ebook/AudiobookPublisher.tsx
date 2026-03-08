@@ -129,6 +129,7 @@ export const AudiobookPublisher: React.FC<AudiobookPublisherProps> = ({
         is_public: isPublic,
         price: price ? parseFloat(price) : null,
         paypal_link: paypalLink.trim() || null,
+        stripe_link: stripeLink.trim() || null,
         slug,
         status: audioUrl ? 'published' : 'draft'
       } as any);
