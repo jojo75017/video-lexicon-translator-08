@@ -414,7 +414,15 @@ Découvrez ${t}, une aventure captivante à écouter en famille ou en solo. Plon
               <p className="text-muted-foreground">Auteur : {brief.authorName}</p>
               <p className="text-muted-foreground">Catégorie : {CATEGORIES.find(c => c.value === brief.category)?.label}</p>
             </div>
-            <Button onClick={() => markStepDone('A8')}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <Button variant="outline" onClick={handleDownloadIntro}>
+                <Download className="h-4 w-4 mr-2" /> 📥 Télécharger l'Intro
+              </Button>
+              <Button variant="outline" onClick={handleDownloadFullExport}>
+                <Download className="h-4 w-4 mr-2" /> 📥 Télécharger le Livre Complet
+              </Button>
+            </div>
+            <Button onClick={() => markStepDone('A8')} className="w-full">
               <CheckCircle2 className="h-4 w-4 mr-2" /> Fusion terminée
             </Button>
           </div>
@@ -429,7 +437,15 @@ Découvrez ${t}, une aventure captivante à écouter en famille ou en solo. Plon
                 « <strong>{brief.bookTitle}</strong> » par <strong>{brief.authorName}</strong> est prêt. Retrouvez-le dans la 📚 Bibliothèque.
               </p>
             </div>
-            <Button onClick={() => markStepDone('A9')}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <Button variant="outline" onClick={handleDownloadIntro}>
+                <Download className="h-4 w-4 mr-2" /> 📥 Intro seule
+              </Button>
+              <Button variant="outline" onClick={handleDownloadFullExport}>
+                <Download className="h-4 w-4 mr-2" /> 📥 Export complet
+              </Button>
+            </div>
+            <Button onClick={() => markStepDone('A9')} className="w-full">
               <Archive className="h-4 w-4 mr-2" /> Archiver et terminer
             </Button>
           </div>
