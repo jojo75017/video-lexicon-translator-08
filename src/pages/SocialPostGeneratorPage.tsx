@@ -21,6 +21,9 @@ interface GeneratedPost {
   hashtags: string[];
 }
 
+const LINKEDIN_PROFILE = 'https://www.linkedin.com/in/consultantwebmaster/';
+const FACEBOOK_PAGE = 'https://www.facebook.com/formationenaffiliation/';
+
 const FACEBOOK_TEMPLATES: GeneratedPost[] = [
   {
     id: 'fb-gen-1', platform: 'facebook', type: 'Post groupe "Revenus Passifs"',
