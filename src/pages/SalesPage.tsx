@@ -101,6 +101,7 @@ const SalesPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const countdown = useCountdown(LAUNCH_END);
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -114,6 +115,13 @@ const SalesPage = () => {
     if (meta) meta.setAttribute("content", "Workflow IA complet pour créer et publier des ebooks sur Amazon KDP. Gemini 3 Flash, couvertures IA, audiobooks. 97€ à vie.");
   }, []);
 
+  useEffect(() => {
+    const onScroll = () => setShowScrollTop(window.scrollY > 500);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   const handlePlanClick = () => {
     trackPlanSelect('pro', LAUNCH_PRICE);
     trackCTAClick('plan_click', '/upsell-paiement');
@@ -122,6 +130,10 @@ const SalesPage = () => {
 
   const scrollToPricing = () => {
     document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (

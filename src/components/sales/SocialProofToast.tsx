@@ -27,47 +27,46 @@ const SocialProofToast = () => {
   const [current, setCurrent] = useState({ name: '', city: '', minutes: 0 });
 
   useEffect(() => {
-    // First show after 8-15s
-    const firstDelay = 8000 + Math.random() * 7000;
-    
+    let hideTimer: ReturnType<typeof setTimeout> | undefined;
+
     const showToast = () => {
       const buyer = BUYERS[Math.floor(Math.random() * BUYERS.length)];
       setCurrent({ name: buyer.name, city: buyer.city, minutes: getRandomMinutes() });
       setVisible(true);
-      
-      // Hide after 5s
-      setTimeout(() => setVisible(false), 5000);
+
+      if (hideTimer) clearTimeout(hideTimer);
+      hideTimer = setTimeout(() => setVisible(false), 6500);
     };
 
-    const firstTimer = setTimeout(() => {
-      showToast();
-      // Then show every 30-60s
-      const interval = setInterval(showToast, 30000 + Math.random() * 30000);
-      return () => clearInterval(interval);
-    }, firstDelay);
+    const firstTimer = setTimeout(showToast, 2500);
+    const interval = setInterval(showToast, 22000);
 
-    return () => clearTimeout(firstTimer);
+    return () => {
+      clearTimeout(firstTimer);
+      clearInterval(interval);
+      if (hideTimer) clearTimeout(hideTimer);
+    };
   }, []);
 
   return (
     <AnimatePresence>
       {visible && (
         <motion.div
-          initial={{ x: -100, opacity: 0 }}
+          initial={{ x: -90, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
-          exit={{ x: -100, opacity: 0 }}
-          transition={{ type: 'spring', damping: 20, stiffness: 200 }}
-          className="fixed bottom-20 md:bottom-6 left-4 z-40 max-w-xs"
+          exit={{ x: -90, opacity: 0 }}
+          transition={{ type: 'spring', damping: 22, stiffness: 230 }}
+          className="fixed bottom-24 md:bottom-6 left-4 z-[80] max-w-xs"
         >
-          <div className="flex items-center gap-3 bg-slate-900/95 backdrop-blur-xl border border-emerald-500/30 rounded-2xl p-4 shadow-2xl shadow-emerald-500/10">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center flex-shrink-0">
-              <ShoppingCart className="w-5 h-5 text-slate-900" />
+          <div className="flex items-center gap-3 bg-card/95 backdrop-blur-xl border border-border rounded-2xl p-4 shadow-xl">
+            <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center flex-shrink-0">
+              <ShoppingCart className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-sm text-white font-semibold">
-                {current.name} <span className="text-white/50 font-normal">de {current.city}</span>
+              <p className="text-sm text-foreground font-semibold">
+                {current.name} <span className="text-muted-foreground font-normal">de {current.city}</span>
               </p>
-              <p className="text-xs text-emerald-400">
+              <p className="text-xs text-primary">
                 A rejoint les Fondateurs il y a {current.minutes} min
               </p>
             </div>
