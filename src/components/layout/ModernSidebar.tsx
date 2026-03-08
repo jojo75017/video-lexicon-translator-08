@@ -412,8 +412,8 @@ const QuotaDisplay: React.FC<{ isCollapsed: boolean }> = ({ isCollapsed }) => {
       {isCollapsed ? (
         <Tooltip>
           <TooltipTrigger asChild>
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500/20 to-purple-500/20 dark:from-violet-500/30 dark:to-purple-500/30 flex items-center justify-center border border-violet-300/30 dark:border-violet-600/30">
-              <Zap className="w-4 h-4 text-violet-600 dark:text-violet-400" />
+            <div className="w-10 h-10 rounded-xl bg-cyan-500/10 flex items-center justify-center border border-cyan-500/20">
+              <Zap className="w-4 h-4 text-cyan-400" />
             </div>
           </TooltipTrigger>
           <TooltipContent side="right">
