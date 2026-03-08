@@ -150,7 +150,12 @@ const PublicAudiobookPage = () => {
   const [showFullDesc, setShowFullDesc] = useState(false);
   const [copied, setCopied] = useState(false);
   const [showFullPlayer, setShowFullPlayer] = useState(false);
+  // Excerpt state
+  const [excerptPlaying, setExcerptPlaying] = useState(false);
+  const [excerptTime, setExcerptTime] = useState(0);
+  const [excerptDuration, setExcerptDuration] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const excerptRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => { if (slug) fetchAudiobook(); }, [slug]);
 
@@ -174,6 +179,27 @@ const PublicAudiobookPage = () => {
     audio.addEventListener('ended', onEnded);
     return () => { audio.removeEventListener('timeupdate', onTime); audio.removeEventListener('loadedmetadata', onLoaded); audio.removeEventListener('ended', onEnded); };
   }, [audiobook]);
+
+  useEffect(() => {
+    const audio = excerptRef.current;
+    if (!audio) return;
+    const onTime = () => setExcerptTime(audio.currentTime);
+    const onLoaded = () => setExcerptDuration(audio.duration);
+    const onEnded = () => setExcerptPlaying(false);
+    audio.addEventListener('timeupdate', onTime);
+    audio.addEventListener('loadedmetadata', onLoaded);
+    audio.addEventListener('ended', onEnded);
+    return () => { audio.removeEventListener('timeupdate', onTime); audio.removeEventListener('loadedmetadata', onLoaded); audio.removeEventListener('ended', onEnded); };
+  }, [audiobook]);
+
+  const toggleExcerpt = () => {
+    if (!excerptRef.current) return;
+    // Pause full player if playing
+    if (isPlaying && audioRef.current) { audioRef.current.pause(); setIsPlaying(false); }
+    excerptPlaying ? excerptRef.current.pause() : excerptRef.current.play();
+    setExcerptPlaying(!excerptPlaying);
+  };
+  const seekExcerpt = (v: number[]) => { if (!excerptRef.current) return; excerptRef.current.currentTime = v[0]; setExcerptTime(v[0]); };
 
   const togglePlay = () => {
     if (!audioRef.current) return;
@@ -347,6 +373,7 @@ h1{font-size:2.5rem;font-weight:800;margin-bottom:8px;line-height:1.1}
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#3a4a5c] via-[#1e2a38] to-[#0f1319] text-white">
       {audiobook.audio_url && <audio ref={audioRef} src={audiobook.audio_url} preload="metadata" />}
+      {(audiobook as any).excerpt_url && <audio ref={excerptRef} src={(audiobook as any).excerpt_url} preload="metadata" />}
 
       {/* ===== HERO HEADER (Audible-style) ===== */}
       <div className="relative overflow-hidden">
@@ -396,16 +423,16 @@ h1{font-size:2.5rem;font-weight:800;margin-bottom:8px;line-height:1.1}
                 <span className="text-amber-400/80 text-sm hover:underline cursor-pointer">{audiobook.play_count || 0} écoutes</span>
               </div>
 
-              {/* Excerpt player */}
-              {audiobook.audio_url && (
+              {/* Excerpt player - uses dedicated excerpt if available, otherwise full audio */}
+              {((audiobook as any).excerpt_url || audiobook.audio_url) && (
                 <div className="mb-6">
                   <ExcerptPlayer
-                    audioRef={audioRef}
-                    isPlaying={isPlaying}
-                    currentTime={currentTime}
-                    duration={duration}
-                    onTogglePlay={togglePlay}
-                    onSeek={seek}
+                    audioRef={(audiobook as any).excerpt_url ? excerptRef : audioRef}
+                    isPlaying={(audiobook as any).excerpt_url ? excerptPlaying : isPlaying}
+                    currentTime={(audiobook as any).excerpt_url ? excerptTime : currentTime}
+                    duration={(audiobook as any).excerpt_url ? excerptDuration : duration}
+                    onTogglePlay={(audiobook as any).excerpt_url ? toggleExcerpt : togglePlay}
+                    onSeek={(audiobook as any).excerpt_url ? seekExcerpt : seek}
                     formatTime={formatTime}
                   />
                 </div>

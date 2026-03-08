@@ -37,6 +37,7 @@ export const AudiobookPublisher: React.FC<AudiobookPublisherProps> = ({
   const [voiceName, setVoiceName] = useState('');
   const [isPublic, setIsPublic] = useState(true);
   const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [excerptFile, setExcerptFile] = useState<File | null>(null);
 
   useEffect(() => {
     fetchAudiobooks();
@@ -84,6 +85,7 @@ export const AudiobookPublisher: React.FC<AudiobookPublisherProps> = ({
     setUploading(true);
     try {
       let audioUrl = '';
+      let excerptUrl = '';
       
       // Upload audio file
       const fileToUpload = audioFile || (audioBlob ? new File([audioBlob], 'audiobook.mp3', { type: 'audio/mpeg' }) : null);
@@ -93,11 +95,20 @@ export const AudiobookPublisher: React.FC<AudiobookPublisherProps> = ({
         const { error: uploadError } = await supabase.storage
           .from('audiobooks')
           .upload(filePath, fileToUpload);
-        
         if (uploadError) throw uploadError;
-        
         const { data: urlData } = supabase.storage.from('audiobooks').getPublicUrl(filePath);
         audioUrl = urlData.publicUrl;
+      }
+
+      // Upload excerpt file
+      if (excerptFile) {
+        const excerptPath = `${user.id}/${Date.now()}-extrait-${excerptFile.name}`;
+        const { error: excerptError } = await supabase.storage
+          .from('audiobooks')
+          .upload(excerptPath, excerptFile);
+        if (excerptError) throw excerptError;
+        const { data: excerptData } = supabase.storage.from('audiobooks').getPublicUrl(excerptPath);
+        excerptUrl = excerptData.publicUrl;
       }
 
       const slug = generateSlug(title);
@@ -109,11 +120,12 @@ export const AudiobookPublisher: React.FC<AudiobookPublisherProps> = ({
         description: description.trim() || null,
         voice_name: voiceName.trim() || null,
         audio_url: audioUrl || null,
+        excerpt_url: excerptUrl || null,
         cover_url: coverUrl || null,
         is_public: isPublic,
         slug,
         status: audioUrl ? 'published' : 'draft'
-      });
+      } as any);
 
       if (error) throw error;
       
@@ -202,11 +214,16 @@ export const AudiobookPublisher: React.FC<AudiobookPublisherProps> = ({
                   <Input value={voiceName} onChange={(e) => setVoiceName(e.target.value)} placeholder="Ex: Sarah, Roger..." />
                 </div>
                 <div>
-                  <Label>Fichier audio (MP3)</Label>
+                  <Label>Fichier audio complet (MP3)</Label>
                   <Input type="file" accept="audio/*" onChange={(e) => setAudioFile(e.target.files?.[0] || null)} />
                   {audioBlob && !audioFile && (
                     <p className="text-xs text-green-600 mt-1">✓ Audio généré détecté, sera utilisé automatiquement</p>
                   )}
+                </div>
+                <div>
+                  <Label>Extrait audio (MP3) — aperçu sur la fiche produit</Label>
+                  <Input type="file" accept="audio/*" onChange={(e) => setExcerptFile(e.target.files?.[0] || null)} />
+                  <p className="text-xs text-muted-foreground mt-1">Court extrait (30s à 2min) pour donner envie d'écouter</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <Checkbox id="is-public" checked={isPublic} onCheckedChange={(v) => setIsPublic(!!v)} />
