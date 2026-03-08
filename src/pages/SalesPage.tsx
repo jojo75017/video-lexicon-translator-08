@@ -506,7 +506,7 @@ const SalesPage = () => {
                       <button key={i} onClick={handlePlanClick}
                         className="p-4 rounded-xl border border-slate-800 hover:border-cyan-500/50 transition-colors text-center group">
                         <p className="font-bold text-white group-hover:text-cyan-400 transition-colors">{opt.label}</p>
-                        <p className="text-sm text-slate-500">{opt.price}</p>
+                        <p className="text-sm text-white/60">{opt.price}</p>
                       </button>
                     ))}
                   </div>
