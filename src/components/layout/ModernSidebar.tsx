@@ -56,7 +56,8 @@ import {
   BarChart3,
   Ruler,
   Monitor,
-  Library
+  Library,
+  Music
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
