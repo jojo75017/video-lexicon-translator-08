@@ -475,6 +475,16 @@ const SalesPage = () => {
         </div>
       </section>
 
+      {/* ═══════════════════════════════════════ COMPARATIF PRIX ═══════════════════════════════════════ */}
+      <PriceComparison />
+
+      {/* ═══════════════════════════════════════ ROI CALCULATOR ═══════════════════════════════════════ */}
+      <section className="py-16 px-4 bg-slate-900/30">
+        <div className="max-w-3xl mx-auto">
+          <RoiCalculator />
+        </div>
+      </section>
+
       {/* ═══════════════════════════════════════ PRICING ═══════════════════════════════════════ */}
       <section id="pricing" className="py-20 px-4 relative">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_50%,rgba(6,182,212,0.08),transparent)]" />
