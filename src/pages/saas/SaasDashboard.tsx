@@ -253,9 +253,9 @@ export const SaasDashboard: React.FC = () => {
                 <div className={`w-2 h-2 rounded-full ${getActivityColor(activity.type)}`} />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm">
-                    <span className="font-medium">{activity.user}</span>
-                    <span className="text-muted-foreground"> {activity.action} </span>
-                    <span className="font-medium">{activity.target}</span>
+                    <span className="font-medium text-white">{activity.user}</span>
+                    <span className="text-white/60"> {activity.action} </span>
+                    <span className="font-medium text-white">{activity.target}</span>
                   </p>
                 </div>
                 <Badge variant="secondary" className="text-xs">
