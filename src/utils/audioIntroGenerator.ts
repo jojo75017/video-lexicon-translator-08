@@ -300,11 +300,12 @@ export async function generateIntroForExport(
   generateTts: (text: string) => Promise<Blob | null>,
   ebookTitle?: string,
   authorName?: string,
-  introductionText?: string
+  introductionText?: string,
+  genre?: string
 ): Promise<Blob[]> {
   const introBlobs: Blob[] = [];
 
-  const segments = buildPremiumIntroScript({ ebookTitle, authorName, introductionText });
+  const segments = buildPremiumIntroScript({ ebookTitle, authorName, introductionText, genre });
   for (const segment of segments) {
     const ttsBlob = await generateTts(segment);
     if (ttsBlob && ttsBlob.size > 0) {
