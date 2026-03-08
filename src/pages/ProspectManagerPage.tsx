@@ -324,8 +324,13 @@ const ProspectManagerPage = () => {
               Format Excel : colonnes <code>email</code> et <code>prenom</code> (ou <code>first_name</code>, <code>nom</code>)
             </p>
 
-            {loading ? (
+            {!authReady || loading ? (
               <div className="text-center py-12 text-muted-foreground">Chargement...</div>
+            ) : !hasSession ? (
+              <div className="text-center py-12 text-muted-foreground">
+                <AlertCircle className="h-12 w-12 mx-auto mb-3 opacity-40" />
+                <p>Session admin non détectée. Reconnectez-vous via /admin-direct.</p>
+              </div>
             ) : prospects.length === 0 ? (
               <div className="text-center py-12 text-muted-foreground">
                 <Upload className="h-12 w-12 mx-auto mb-3 opacity-40" />
