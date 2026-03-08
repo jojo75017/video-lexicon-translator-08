@@ -98,9 +98,9 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
   const [introManuallyEdited, setIntroManuallyEdited] = useState(false);
   useEffect(() => {
     if (!introManuallyEdited && !preface) {
-      setIntroduction(buildDefaultIntro(bookTitle));
+      setIntroduction(buildDefaultIntro(bookTitle, authorNameState));
     }
-  }, [bookTitle, introManuallyEdited, preface]);
+  }, [bookTitle, authorNameState, introManuallyEdited, preface]);
   const [chapterContent, setChapterContent] = useState('');
 
   // A4 cleaned text
