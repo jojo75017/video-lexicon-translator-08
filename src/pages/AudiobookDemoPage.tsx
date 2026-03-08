@@ -342,11 +342,7 @@ const AudiobookDemoPage = () => {
             Avis des auditeurs
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[
-              { initial: 'M', name: 'Marie L.', stars: 5, text: "Excellente qualité audio ! La narration est fluide et agréable. Je recommande vivement ce livre audio." },
-              { initial: 'P', name: 'Pierre D.', stars: 5, text: "Parfait pour écouter pendant mes trajets. La voix est très naturelle, on oublie que c'est de l'IA !" },
-              { initial: 'S', name: 'Sophie R.', stars: 4, text: "Très bonne découverte, le contenu est riche et bien structuré. J'attends la suite avec impatience." },
-            ].map((review, i) => (
+            {getRandomReviews(audiobook.slug || audiobook.title).map((review, i) => (
               <div key={i} className="bg-white/[0.04] border border-white/[0.08] rounded-2xl p-5">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center font-bold text-sm text-white shrink-0">
