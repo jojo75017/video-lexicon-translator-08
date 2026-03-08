@@ -330,7 +330,6 @@ const categories: Category[] = [
     color: 'from-gray-500 to-slate-500',
     items: [
       { id: 'dashboard', label: '📊 Tableau de Bord', icon: LayoutDashboard },
-      { id: 'dashboard', label: '📊 Tableau de Bord', icon: LayoutDashboard },
       { id: 'admin-panel', label: '👑 Gestion Abonnés', icon: Shield, isLink: true, href: '/admin' },
       { id: 'subscription', label: '💳 Abonnement', icon: CreditCard },
       { id: 'parrainage', label: '🤝 Parrainage', icon: Users, isLink: true, href: '/parrainage', isNew: true },
