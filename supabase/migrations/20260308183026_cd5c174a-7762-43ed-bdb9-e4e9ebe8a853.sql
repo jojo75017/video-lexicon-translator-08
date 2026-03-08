@@ -1,0 +1,1 @@
+ALTER TABLE public.audiobooks ADD COLUMN excerpt_url text DEFAULT NULL;

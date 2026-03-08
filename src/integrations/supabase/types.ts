@@ -22,6 +22,7 @@ export type Database = {
           created_at: string
           description: string | null
           duration_seconds: number | null
+          excerpt_url: string | null
           id: string
           is_public: boolean
           play_count: number
@@ -39,6 +40,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           duration_seconds?: number | null
+          excerpt_url?: string | null
           id?: string
           is_public?: boolean
           play_count?: number
@@ -56,6 +58,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           duration_seconds?: number | null
+          excerpt_url?: string | null
           id?: string
           is_public?: boolean
           play_count?: number
