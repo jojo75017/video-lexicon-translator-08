@@ -10,6 +10,7 @@ import { Upload, Globe, Link2, Code, Copy, Check, Trash2, Headphones, ExternalLi
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { downloadAudiobookHtml } from '@/utils/generateAudiobookHtml';
 
 interface AudiobookPublisherProps {
   ebookTitle?: string;
