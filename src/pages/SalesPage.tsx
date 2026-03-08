@@ -244,7 +244,7 @@ const SalesPage = () => {
             <video
               controls
               preload="metadata"
-              poster=""
+              poster="/images/video-poster-offre.jpg"
               className="w-full aspect-video bg-slate-900"
               playsInline
             >
