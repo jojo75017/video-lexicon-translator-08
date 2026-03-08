@@ -241,7 +241,7 @@ const SalesPage = () => {
               </div>
               <div>
                 <p className="font-semibold text-white">47+ auteurs</p>
-                <p className="text-xs text-slate-500">utilisent EbookStudio</p>
+                <p className="text-xs text-white/60">utilisent EbookStudio</p>
               </div>
             </div>
             <div className="h-10 w-px bg-slate-800 hidden sm:block" />
