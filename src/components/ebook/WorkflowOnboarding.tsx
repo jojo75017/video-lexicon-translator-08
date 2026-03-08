@@ -159,7 +159,7 @@ export const WorkflowOnboarding: React.FC<WorkflowOnboardingProps> = ({
             <Button
               size="lg"
               onClick={() => onNavigateToStep(nextStep.tabId)}
-              className="text-lg px-8 py-6 h-auto rounded-2xl bg-cyan-600 hover:bg-cyan-700 text-white shadow-lg shadow-cyan-500/25 gap-3 group"
+              className="text-lg px-8 py-6 h-auto rounded-2xl bg-gold hover:bg-gold-dark text-slate-900 font-bold shadow-lg shadow-gold/25 gap-3 group"
             >
               {isFirstTime ? (
                 <>
