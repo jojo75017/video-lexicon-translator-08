@@ -191,7 +191,7 @@ Georges
   return bodies[step] || "";
 }
 
-function buildHtmlEmail(body: string): string {
+function buildHtmlEmail(body: string, email?: string, step?: number): string {
   const htmlBody = body
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
@@ -200,6 +200,11 @@ function buildHtmlEmail(body: string): string {
     .replace(/→/g, "→")
     .replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" style="color:#D4A017;">$1</a>')
     .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+
+  const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
+  const trackingPixel = email && step
+    ? `<img src="${supabaseUrl}/functions/v1/track-email-open?e=${encodeURIComponent(email)}&s=${step}" width="1" height="1" alt="" style="display:none;" />`
+    : "";
 
   return `<!DOCTYPE html>
 <html><head><meta charset="utf-8"></head>
@@ -213,6 +218,7 @@ Vous recevez cet email car vous avez manifesté un intérêt pour EbookStudio Pr
 <a href="${OFFRES_LINK}" style="color:#D4A017;">Voir l'offre</a> · <a href="${DEMO_LINK}" style="color:#D4A017;">Tester la démo</a><br>
 Pour ne plus recevoir ces emails, répondez "STOP" à cet email.
 </p>
+${trackingPixel}
 </body></html>`;
 }
 
