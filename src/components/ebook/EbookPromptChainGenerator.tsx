@@ -203,7 +203,7 @@ export const EbookPromptChainGenerator: React.FC = () => {
                   );
                 })}
               </div>
-            </ScrollArea>
+            </div>
           </CardContent>
         </Card>
       )}
