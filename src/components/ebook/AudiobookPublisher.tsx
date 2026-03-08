@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Upload, Globe, Link2, Code, Copy, Check, Trash2, Headphones, ExternalLink, Eye, Loader2 } from 'lucide-react';
+import { Upload, Globe, Link2, Code, Copy, Check, Trash2, Headphones, ExternalLink, Eye, Loader2, ShoppingBag, Download } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
