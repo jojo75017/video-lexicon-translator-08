@@ -152,7 +152,11 @@ const categories: Category[] = [
     emoji: '✍️',
     color: 'from-blue-500 to-indigo-500',
     items: [
+      { id: 'draft-mode', label: '⚡ Brouillon Rapide', icon: Zap, isNew: true },
+      { id: 'rich-editor', label: '📝 Éditeur Enrichi', icon: PenTool, isNew: true },
       { id: 'writing', label: '✏️ Écrire les Chapitres', icon: PenTool },
+      { id: 'prompt-library', label: '📚 Bibliothèque Prompts', icon: Library, isNew: true },
+      { id: 'manuscript-dashboard', label: '📊 Dashboard Manuscrit', icon: BarChart3, isNew: true },
       { id: 'aichat', label: '💬 Assistant IA', icon: Bot },
       { id: 'characters', label: '👥 Personnages', icon: Users },
       { id: 'series', label: '📚 Série / Saga', icon: BookCopy },

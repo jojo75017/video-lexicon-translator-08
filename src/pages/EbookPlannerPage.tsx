@@ -139,6 +139,10 @@ import SubscriberActivityPopup from '@/components/admin/SubscriberActivityPopup'
 import { EbookLibrary } from '@/components/ebook/EbookLibrary';
 import { AudioExpressWorkflow } from '@/components/ebook/AudioExpressWorkflow';
 import { AudiobookLibrary } from '@/components/ebook/AudiobookLibrary';
+import { EbookDraftMode } from '@/components/ebook/EbookDraftMode';
+import { EbookPromptLibrary } from '@/components/ebook/EbookPromptLibrary';
+import { EbookManuscriptDashboard } from '@/components/ebook/EbookManuscriptDashboard';
+import { EbookRichEditor } from '@/components/ebook/EbookRichEditor';
 
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
 import { ebookTemplates } from '@/data/ebookTemplates';
@@ -1063,7 +1067,65 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           />
         );
 
-      case 'workflow-dashboard':
+      case 'draft-mode':
+        if (isDemo) {
+          setShowPaywall('chapters');
+          return null;
+        }
+        return (
+          <EbookDraftMode
+            chapters={chapters}
+            ebookTitle={ebookTitle}
+            authorName={authorName}
+            isGenerating={isGeneratingComplete}
+            onGenerateAll={generateCompleteEbook}
+            generationProgress={generationProgress}
+          />
+        );
+
+      case 'prompt-library':
+        return (
+          <EbookPromptLibrary
+            currentGenre={genre}
+            onApplyTemplate={(template) => {
+              setWritingStyle(template.writingStyle);
+              setTone(template.tone);
+              setNarrativeFormat(template.narrativeFormat);
+              setGenre(template.genre);
+            }}
+          />
+        );
+
+      case 'manuscript-dashboard':
+        return (
+          <EbookManuscriptDashboard
+            ebookTitle={ebookTitle}
+            authorName={authorName}
+            chapters={chapters}
+            preface={preface}
+            conclusion={conclusion}
+            targetWordsPerChapter={targetWordsPerChapter}
+            kdpDescription={kdpDescription}
+            kdpKeywords={kdpKeywords}
+            kdpCategories={kdpCategories}
+          />
+        );
+
+      case 'rich-editor':
+        if (isDemo) {
+          setShowPaywall('chapters');
+          return null;
+        }
+        return (
+          <EbookRichEditor
+            chapters={chapters}
+            onUpdateChapterContent={updateChapterContent}
+            onUpdateSubChapterContent={updateSubChapterContent}
+            targetWordsPerChapter={targetWordsPerChapter}
+          />
+        );
+
+
         return (
           <WorkflowDashboard
             ebookTitle={ebookTitle}
