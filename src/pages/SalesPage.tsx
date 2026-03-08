@@ -12,6 +12,10 @@ import { Input } from "@/components/ui/input";
 import ExitIntentPopup from "@/components/sales/ExitIntentPopup";
 import SalesFaq from "@/components/sales/SalesFaq";
 import AuthorShowcase from "@/components/sales/AuthorShowcase";
+import SpotsCounter from "@/components/sales/SpotsCounter";
+import RoiCalculator from "@/components/sales/RoiCalculator";
+import SocialProofToast from "@/components/sales/SocialProofToast";
+import PriceComparison from "@/components/sales/PriceComparison";
 
 // ════════════════════════════════════════════════════════════════════════════════
 // DESIGN SYSTEM 2026 — Palette Premium
@@ -471,6 +475,16 @@ const SalesPage = () => {
         </div>
       </section>
 
+      {/* ═══════════════════════════════════════ COMPARATIF PRIX ═══════════════════════════════════════ */}
+      <PriceComparison />
+
+      {/* ═══════════════════════════════════════ ROI CALCULATOR ═══════════════════════════════════════ */}
+      <section className="py-16 px-4 bg-slate-900/30">
+        <div className="max-w-3xl mx-auto">
+          <RoiCalculator />
+        </div>
+      </section>
+
       {/* ═══════════════════════════════════════ PRICING ═══════════════════════════════════════ */}
       <section id="pricing" className="py-20 px-4 relative">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_50%,rgba(6,182,212,0.08),transparent)]" />
@@ -572,12 +586,17 @@ const SalesPage = () => {
                 <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center mx-auto mb-4">
                   <ShieldCheck className="w-7 h-7 text-emerald-400" />
                 </div>
-                <h3 className="text-xl font-bold text-emerald-400 mb-2">Garantie 30 jours</h3>
+                <h3 className="text-xl font-bold text-emerald-400 mb-2">Garantie 30 jours — Satisfait ou remboursé</h3>
                 <p className="text-white/80 text-sm">
-                  Testez pendant 30 jours. Pas satisfait ? Remboursé intégralement. Aucune question.
+                  Testez pendant 30 jours. Si vous ne publiez pas votre 1er ebook, on vous rembourse intégralement. <strong className="text-emerald-400">Aucune question posée.</strong>
                 </p>
               </CardContent>
             </Card>
+          </motion.div>
+
+          {/* Spots Counter */}
+          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mt-6">
+            <SpotsCounter />
           </motion.div>
         </div>
       </section>
@@ -672,6 +691,7 @@ const SalesPage = () => {
       </div>
 
       <ExitIntentPopup />
+      <SocialProofToast />
     </div>
   );
 };
