@@ -53,6 +53,7 @@ const UnifiedMarketingDashboard = () => {
   const [socialStats, setSocialStats] = useState<SocialStats>({ totalPosts: 0, published: 0, totalLikes: 0, totalComments: 0, totalShares: 0, totalClicks: 0, byPlatform: {} });
   const [recentProspects, setRecentProspects] = useState<any[]>([]);
   const [recentPosts, setRecentPosts] = useState<any[]>([]);
+  const [emailOpens, setEmailOpens] = useState<{ total: number; byStep: Record<number, number>; uniqueEmails: number }>({ total: 0, byStep: {}, uniqueEmails: 0 });
 
   const fetchAll = useCallback(async () => {
     setLoading(true);
