@@ -257,7 +257,7 @@ const SalesPage = () => {
               </div>
               <div>
                 <p className="font-semibold text-white">#1 en France</p>
-                <p className="text-xs text-slate-500">Workflow KDP IA</p>
+                <p className="text-xs text-white/60">Workflow KDP IA</p>
               </div>
             </div>
           </div>
