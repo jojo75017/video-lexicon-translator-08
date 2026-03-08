@@ -660,6 +660,9 @@ h1{font-size:2.5rem;font-weight:800;margin-bottom:8px;line-height:1.1}
             <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-6 space-y-5 sticky top-6">
               <h3 className="text-white font-semibold text-base border-b border-white/10 pb-3">Détails du produit</h3>
               
+              {(audiobook as any).price && (audiobook as any).price > 0 && (
+                <MetaRow icon={<CreditCard className="w-4 h-4 text-emerald-400/70" />} label="Prix" value={`${Number((audiobook as any).price).toFixed(2)} €`} />
+              )}
               {audiobook.author_name && (
                 <MetaRow icon={<Users className="w-4 h-4 text-amber-400/70" />} label="Auteur" value={audiobook.author_name} />
               )}
