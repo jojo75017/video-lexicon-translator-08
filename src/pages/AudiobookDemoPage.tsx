@@ -359,8 +359,8 @@ const AudiobookDemoPage = () => {
                   ))}
                 </div>
                 <p className="text-white/60 text-sm leading-relaxed">{review.text}</p>
-                <div className="mt-3 inline-flex items-center gap-1 bg-emerald-500/10 text-emerald-400 text-[11px] font-semibold px-2 py-0.5 rounded-full">
-                  <Check className="w-3 h-3" /> Auditeur vérifié
+                <div className="mt-3 inline-flex items-center gap-1 bg-amber-500/10 text-amber-400 text-[11px] font-semibold px-2 py-0.5 rounded-full">
+                  <Headphones className="w-3 h-3" /> Avis spontané
                 </div>
               </div>
             ))}
