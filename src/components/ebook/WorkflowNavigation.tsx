@@ -107,18 +107,18 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
     <TooltipProvider delayDuration={200}>
       <div className={cn("space-y-3 mb-6", className)}>
         {/* Header with progress */}
-        <div className="bg-slate-900/80 border-2 border-white/10 rounded-xl p-4 shadow-lg backdrop-blur-sm">
+        <div className="bg-slate-900/80 border-2 border-gold/20 rounded-xl p-4 shadow-lg shadow-gold/5 backdrop-blur-sm">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <span className="text-lg">🚀</span>
-              <span className="text-sm font-bold text-white">Workflow Éditorial</span>
-              <Badge className="text-xs font-semibold bg-cyan-500/20 text-cyan-400 border-cyan-500/30">
+              <span className="text-sm font-bold text-gradient-gold">Workflow Éditorial</span>
+              <Badge className="text-xs font-semibold bg-gold/20 text-gold border-gold/30">
                 {completedCount}/{WORKFLOW_STEPS.length}
               </Badge>
             </div>
-            <span className="text-lg font-bold text-cyan-400">{Math.round(progressPercentage)}%</span>
+            <span className="text-lg font-bold text-gold">{Math.round(progressPercentage)}%</span>
           </div>
-          <Progress value={progressPercentage} className="h-2.5 mb-4" />
+          <Progress value={progressPercentage} className="h-2.5 mb-4 gold-progress" />
 
           {/* Phases with steps */}
           <div className="space-y-2">
@@ -152,7 +152,7 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
                               className={cn(
                                 "flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium transition-all duration-200 border",
                                 status === 'completed' && "bg-emerald-500 text-white border-emerald-600 shadow-sm",
-                                status === 'current' && "bg-cyan-600 text-white border-cyan-500 ring-2 ring-cyan-500/30 ring-offset-1 ring-offset-slate-900",
+                                status === 'current' && "bg-gold text-slate-900 border-gold shadow-sm ring-2 ring-gold/30 ring-offset-1 ring-offset-slate-900",
                                 status === 'available' && "bg-slate-800/60 hover:bg-slate-700/60 text-white/60 border-white/10 hover:text-white cursor-pointer",
                                 status === 'locked' && "bg-slate-800/30 text-white/20 border-transparent cursor-not-allowed"
                               )}
@@ -196,14 +196,14 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
             size="sm"
             onClick={() => prevStep && handleNavigate(STEP_TO_TAB[prevStep.id])}
             disabled={!prevStep || isGenerating}
-            className="flex items-center gap-1 border-white/20 text-white/70 hover:text-white bg-slate-800/50"
+            className="flex items-center gap-1 border-gold/30 text-gold/70 hover:text-gold bg-slate-800/50"
           >
             <ChevronLeft className="w-4 h-4" />
             <span className="hidden sm:inline">{prevStep?.shortLabel || 'Préc.'}</span>
           </Button>
 
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-800/60 rounded-lg border border-white/10">
-            {isGenerating && <Loader2 className="w-4 h-4 animate-spin text-cyan-400" />}
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-800/60 rounded-lg border border-gold/20">
+            {isGenerating && <Loader2 className="w-4 h-4 animate-spin text-gold" />}
             <span className="text-sm font-semibold text-white">
               {currentStep.shortLabel}: {currentStep.label}
             </span>
@@ -218,7 +218,7 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
             size="sm"
             onClick={() => nextStep && handleNavigate(STEP_TO_TAB[nextStep.id])}
             disabled={!nextStep || isGenerating || (nextStep && !canProceedToNext(nextStep))}
-            className="flex items-center gap-1 bg-cyan-600 hover:bg-cyan-700 text-white"
+            className="flex items-center gap-1 bg-gold hover:bg-gold-dark text-slate-900 font-semibold"
           >
             <span className="hidden sm:inline">{nextStep?.shortLabel || 'Suiv.'}</span>
             <ChevronRight className="w-4 h-4" />
@@ -226,17 +226,17 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
         </div>
 
         {/* Current Step Details */}
-        <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-lg p-3">
+        <div className="bg-gold/10 border border-gold/20 rounded-lg p-3">
           <div className="flex items-start gap-3">
-            <div className="w-7 h-7 rounded-full bg-cyan-500/20 flex items-center justify-center shrink-0">
-              <span className="text-xs font-bold text-cyan-400">{currentStepIndex + 1}</span>
+            <div className="w-7 h-7 rounded-full bg-gold/20 flex items-center justify-center shrink-0">
+              <span className="text-xs font-bold text-gold">{currentStepIndex + 1}</span>
             </div>
             <div className="min-w-0 flex-1">
               <h4 className="font-semibold text-sm text-white">{currentStep.label}</h4>
               <p className="text-xs text-white/50 mt-0.5">{currentStep.description}</p>
               <div className="flex items-center gap-3 mt-1.5 flex-wrap">
                 {currentStep.estimatedMinutes && (
-                  <span className="text-xs text-cyan-400">⏱️ ~{currentStep.estimatedMinutes} min</span>
+                  <span className="text-xs text-gold">⏱️ ~{currentStep.estimatedMinutes} min</span>
                 )}
                 {currentStep.tip && (
                   <span className="text-xs text-white/40 italic">💡 {currentStep.tip}</span>

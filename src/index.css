@@ -46,6 +46,16 @@
     --indigo: 239 84% 67%;
     --sky: 199 89% 48%;
     
+    /* Gold Luxe Palette */
+    --gold: 43 96% 56%;
+    --gold-light: 45 93% 65%;
+    --gold-dark: 40 90% 45%;
+    --gold-muted: 43 50% 50%;
+    --gradient-gold: linear-gradient(135deg, hsl(43 96% 56%) 0%, hsl(30 90% 50%) 50%, hsl(45 93% 65%) 100%);
+    --gradient-gold-subtle: linear-gradient(135deg, hsl(43 96% 56% / 0.15) 0%, hsl(30 90% 50% / 0.05) 100%);
+    --shadow-gold: 0 10px 40px -10px hsl(43 96% 56% / 0.4);
+    --shadow-gold-glow: 0 0 30px hsl(43 96% 56% / 0.25);
+    
     /* Legacy Colors (for existing pages) */
     --coral-pink: 12 76% 61%;
     --royal-purple: 271 81% 56%;
@@ -110,6 +120,16 @@
     --gradient-subtle: linear-gradient(135deg, hsl(250 25% 12%) 0%, hsl(262 60% 55% / 0.15) 100%);
     --gradient-card: linear-gradient(145deg, rgba(35,30,55,0.95) 0%, rgba(35,30,55,0.8) 100%);
     --gradient-glass: linear-gradient(145deg, rgba(35,30,55,0.7) 0%, rgba(35,30,55,0.4) 100%);
+    
+    /* Dark Gold Luxe */
+    --gold: 43 96% 58%;
+    --gold-light: 45 93% 68%;
+    --gold-dark: 40 90% 48%;
+    --gold-muted: 43 40% 45%;
+    --gradient-gold: linear-gradient(135deg, hsl(43 96% 58%) 0%, hsl(30 85% 52%) 50%, hsl(45 93% 68%) 100%);
+    --gradient-gold-subtle: linear-gradient(135deg, hsl(43 96% 58% / 0.12) 0%, hsl(30 85% 52% / 0.04) 100%);
+    --shadow-gold: 0 10px 40px -10px hsl(43 96% 58% / 0.5);
+    --shadow-gold-glow: 0 0 30px hsl(43 96% 58% / 0.3);
   }
 }
 
@@ -191,6 +211,61 @@ body {
 
 .glow-cyan {
   box-shadow: var(--shadow-cyan);
+}
+
+.glow-gold {
+  box-shadow: var(--shadow-gold);
+}
+
+/* Gold Luxe Utilities */
+.text-gradient-gold {
+  background: var(--gradient-gold);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-gold {
+  background: var(--gradient-gold);
+}
+
+.gradient-gold-subtle {
+  background: var(--gradient-gold-subtle);
+}
+
+.border-gold {
+  border-color: hsl(var(--gold));
+}
+
+.ring-gold {
+  --tw-ring-color: hsl(var(--gold) / 0.5);
+}
+
+/* Gold heading styles for generator */
+.gold-heading {
+  background: var(--gradient-gold);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 1px 2px hsl(var(--gold) / 0.3));
+}
+
+/* Gold progress bar */
+.gold-progress [data-state] {
+  background: var(--gradient-gold) !important;
+  box-shadow: 0 0 10px hsl(var(--gold) / 0.4);
+}
+
+/* Gold focus ring for inputs */
+.gold-focus:focus-within {
+  box-shadow: 0 0 0 2px hsl(var(--gold) / 0.3);
+  border-color: hsl(var(--gold));
+}
+
+/* Gold icon accent */
+.gold-icon {
+  color: hsl(var(--gold));
+  filter: drop-shadow(0 0 4px hsl(var(--gold) / 0.3));
 }
 
 /* Animations */

@@ -36,6 +36,12 @@ export default {
         rose: "hsl(var(--rose))",
         indigo: "hsl(var(--indigo))",
         sky: "hsl(var(--sky))",
+        gold: {
+          DEFAULT: "hsl(var(--gold))",
+          light: "hsl(var(--gold-light))",
+          dark: "hsl(var(--gold-dark))",
+          muted: "hsl(var(--gold-muted))",
+        },
         
         // Legacy colors
         "coral-pink": "hsl(var(--coral-pink))",
@@ -82,6 +88,8 @@ export default {
         'gradient-card': 'var(--gradient-card)',
         'gradient-glass': 'var(--gradient-glass)',
         'gradient-magazine-hero': 'linear-gradient(135deg, hsl(271 81% 56%) 0%, hsl(12 76% 61%) 100%)',
+        'gradient-gold': 'var(--gradient-gold)',
+        'gradient-gold-subtle': 'var(--gradient-gold-subtle)',
       },
       fontFamily: {
         'sans': ['Inter', 'system-ui', 'sans-serif'],
@@ -93,6 +101,8 @@ export default {
         'violet': 'var(--shadow-violet)',
         'fuchsia': 'var(--shadow-fuchsia)',
         'cyan': 'var(--shadow-cyan)',
+        'gold': 'var(--shadow-gold)',
+        'gold-glow': 'var(--shadow-gold-glow)',
       },
       borderRadius: {
         lg: "var(--radius)",

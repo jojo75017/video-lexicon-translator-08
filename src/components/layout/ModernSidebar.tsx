@@ -389,7 +389,7 @@ const QuotaDisplay: React.FC<{ isCollapsed: boolean }> = ({ isCollapsed }) => {
           size="sm"
           onClick={() => navigate('/offres')}
           className={cn(
-            "bg-gradient-to-r from-cyan-500 to-emerald-500 text-slate-900 hover:from-cyan-400 hover:to-emerald-400 shadow-lg shadow-cyan-500/25",
+            "bg-gradient-gold text-slate-900 hover:opacity-90 shadow-lg shadow-gold/25",
             isCollapsed ? "w-10 h-10 p-0 rounded-xl" : "w-full rounded-xl"
           )}
         >
@@ -412,8 +412,8 @@ const QuotaDisplay: React.FC<{ isCollapsed: boolean }> = ({ isCollapsed }) => {
       {isCollapsed ? (
         <Tooltip>
           <TooltipTrigger asChild>
-            <div className="w-10 h-10 rounded-xl bg-cyan-500/10 flex items-center justify-center border border-cyan-500/20">
-              <Zap className="w-4 h-4 text-cyan-400" />
+            <div className="w-10 h-10 rounded-xl bg-gold/10 flex items-center justify-center border border-gold/20">
+              <Zap className="w-4 h-4 text-gold" />
             </div>
           </TooltipTrigger>
           <TooltipContent side="right">
@@ -427,12 +427,12 @@ const QuotaDisplay: React.FC<{ isCollapsed: boolean }> = ({ isCollapsed }) => {
         <div className="p-3 rounded-xl bg-slate-900/50 border border-slate-800">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <Star className="w-4 h-4 text-cyan-400" />
+              <Star className="w-4 h-4 text-gold" />
               <span className="text-xs font-semibold text-white">Mon Plan</span>
             </div>
             <span className={cn(
               "text-[10px] font-bold px-2 py-0.5 rounded-full",
-              quotas.plan === 'lifetime' ? 'bg-cyan-500 text-slate-900' :
+              quotas.plan === 'lifetime' ? 'bg-gold text-slate-900' :
               quotas.plan === 'pro' ? 'bg-amber-500 text-white' :
               'bg-emerald-500 text-white'
             )}>
@@ -441,7 +441,7 @@ const QuotaDisplay: React.FC<{ isCollapsed: boolean }> = ({ isCollapsed }) => {
           </div>
           {isUnlimited ? (
             <div className="text-center py-1">
-              <span className="text-sm font-bold text-cyan-400">∞ Accès illimité</span>
+              <span className="text-sm font-bold text-gold">∞ Accès illimité</span>
             </div>
           ) : (
             <>
@@ -541,14 +541,14 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
           "flex items-center gap-3 p-4 border-b border-slate-800/50",
           isCollapsed && "justify-center p-3"
         )}>
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-emerald-400 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+          <div className="w-10 h-10 rounded-xl bg-gradient-gold flex items-center justify-center shadow-lg shadow-gold">
             <Sparkles className="w-5 h-5 text-slate-900" />
           </div>
           {!isCollapsed && (
             <>
               <div className="min-w-0 flex-1">
-                <h1 className="font-bold text-white">EbookStudio</h1>
-                <p className="text-xs text-slate-500">Pro Edition 2026</p>
+                <h1 className="font-bold text-gradient-gold">EbookStudio</h1>
+                <p className="text-xs text-gold-muted">Pro Edition 2026</p>
               </div>
               <Button
                 variant="ghost"
@@ -576,7 +576,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                 placeholder="Rechercher un outil..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-8 h-10 text-sm bg-slate-900/50 border-slate-800 text-white placeholder:text-slate-600 rounded-xl focus:border-cyan-500/50 focus:ring-cyan-500/20"
+                className="w-full pl-10 pr-8 h-10 text-sm bg-slate-900/50 border-slate-800 text-white placeholder:text-slate-600 rounded-xl focus:border-gold/50 focus:ring-gold/20"
               />
               {searchQuery && (
                 <button
@@ -604,13 +604,13 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
             return (
               <React.Fragment key={category.id}>
                 {isFirstSecondary && !isCollapsed && (
-                  <div className="mx-1 my-3 px-3 py-2.5 rounded-xl bg-gradient-to-r from-slate-100 via-slate-50 to-slate-100 dark:from-slate-800/50 dark:via-slate-900/30 dark:to-slate-800/50 border border-slate-300/60 dark:border-slate-700/40">
+                   <div className="mx-1 my-3 px-3 py-2.5 rounded-xl bg-gradient-gold-subtle border border-gold/20">
                     <div className="flex items-center gap-2 justify-center">
-                      <div className="h-0.5 w-6 rounded-full bg-slate-400/60 dark:bg-slate-600/60" />
-                      <span className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                      <div className="h-0.5 w-6 rounded-full bg-gold/40" />
+                      <span className="text-xs font-bold uppercase tracking-widest text-gold">
                         ⚙️ Outils complémentaires
                       </span>
-                      <div className="h-0.5 w-6 rounded-full bg-slate-400/60 dark:bg-slate-600/60" />
+                      <div className="h-0.5 w-6 rounded-full bg-gold/40" />
                     </div>
                   </div>
                 )}
@@ -624,7 +624,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                 className={cn(
                   "mb-3 rounded-2xl border transition-all",
                   hasActiveItem 
-                    ? "border-cyan-500/30 bg-slate-900/50 shadow-lg shadow-cyan-500/5" 
+                    ? "border-gold/30 bg-slate-900/50 shadow-lg shadow-gold/5" 
                     : "border-slate-800/50 bg-slate-900/30 hover:bg-slate-900/50 hover:shadow-md",
                   isCollapsed ? "p-1" : "p-2"
                 )}

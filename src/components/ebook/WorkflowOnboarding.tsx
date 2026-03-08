@@ -112,28 +112,28 @@ export const WorkflowOnboarding: React.FC<WorkflowOnboardingProps> = ({
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900/95 to-cyan-950/30 border-2 border-cyan-500/20 p-8 md:p-12"
+        className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900/95 to-amber-950/20 border-2 border-gold/20 p-8 md:p-12"
       >
         {/* Decorative orbs */}
-        <div className="absolute -top-16 -right-16 w-48 h-48 bg-cyan-500/15 rounded-full blur-[80px]" />
-        <div className="absolute -bottom-16 -left-16 w-40 h-40 bg-violet-500/10 rounded-full blur-[60px]" />
+        <div className="absolute -top-16 -right-16 w-48 h-48 bg-gold/10 rounded-full blur-[80px]" />
+        <div className="absolute -bottom-16 -left-16 w-40 h-40 bg-gold-dark/10 rounded-full blur-[60px]" />
 
         <div className="relative text-center space-y-6">
           <motion.div
             initial={{ scale: 0.8 }}
             animate={{ scale: 1 }}
             transition={{ type: 'spring', delay: 0.2 }}
-            className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-cyan-500/15 border border-cyan-500/30"
+            className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gold/15 border border-gold/30"
           >
             {isFirstTime ? (
-              <Rocket className="w-10 h-10 text-cyan-400" />
+              <Rocket className="w-10 h-10 text-gold" />
             ) : (
-              <BookOpen className="w-10 h-10 text-cyan-400" />
+              <BookOpen className="w-10 h-10 text-gold" />
             )}
           </motion.div>
 
           <div className="space-y-3">
-            <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">
+            <h1 className="text-3xl md:text-4xl font-extrabold text-gradient-gold tracking-tight">
               {isFirstTime 
                 ? "Créez votre ebook en 4 étapes simples"
                 : ebookTitle 
@@ -159,7 +159,7 @@ export const WorkflowOnboarding: React.FC<WorkflowOnboardingProps> = ({
             <Button
               size="lg"
               onClick={() => onNavigateToStep(nextStep.tabId)}
-              className="text-lg px-8 py-6 h-auto rounded-2xl bg-cyan-600 hover:bg-cyan-700 text-white shadow-lg shadow-cyan-500/25 gap-3 group"
+              className="text-lg px-8 py-6 h-auto rounded-2xl bg-gold hover:bg-gold-dark text-slate-900 font-bold shadow-lg shadow-gold/25 gap-3 group"
             >
               {isFirstTime ? (
                 <>
