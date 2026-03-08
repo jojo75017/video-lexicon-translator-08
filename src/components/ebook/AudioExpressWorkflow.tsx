@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cleanForAudio } from '@/utils/textCleaner';
-import { INTRO_TEXT } from '@/utils/audioIntroGenerator';
+import { buildIntroDisplayText } from '@/utils/audioIntroGenerator';
 
 // --- Constants ---
 
