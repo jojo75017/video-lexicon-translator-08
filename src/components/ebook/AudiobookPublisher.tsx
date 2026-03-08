@@ -172,6 +172,65 @@ export const AudiobookPublisher: React.FC<AudiobookPublisherProps> = ({
   const getPublicUrl = (slug: string) => `${window.location.origin}/audiobook/${slug}`;
   const getEmbedCode = (slug: string) => `<iframe src="${window.location.origin}/audiobook-embed/${slug}" width="100%" height="180" frameborder="0" allow="autoplay" style="border-radius: 12px;"></iframe>`;
 
+  const exportWooCommerce = (book?: any) => {
+    const books = book ? [book] : audiobooks;
+    if (books.length === 0) { toast.error('Aucun audiobook à exporter'); return; }
+
+    const escCsv = (val: string) => `"${(val || '').replace(/"/g, '""')}"`;
+    
+    const headers = [
+      'Type','SKU','Name','Published','Is featured?','Short description','Description',
+      'Regular price','Sale price','Categories','Tags','Images','Download 1 name',
+      'Download 1 URL','Meta: _excerpt_audio_url','Meta: _voice_name','Meta: _duration_seconds',
+      'Meta: _play_count','Meta: _embed_code','Meta: _public_page_url'
+    ];
+
+    const rows = books.map((b: any) => {
+      const publicUrl = getPublicUrl(b.slug || '');
+      const embedCode = getEmbedCode(b.slug || '');
+      const excerptUrl = b.excerpt_url || '';
+      const audioPlayerHtml = excerptUrl 
+        ? `<h3>🎧 Écouter l'extrait</h3>[audio src="${excerptUrl}"]` 
+        : (b.audio_url ? `<h3>🎧 Écouter un extrait</h3>[audio src="${b.audio_url}"]` : '');
+      const fullDesc = (b.description || '') + '\n\n' + audioPlayerHtml;
+      const shortDesc = (b.description || '').slice(0, 200) + (audioPlayerHtml ? `\n\n${audioPlayerHtml}` : '');
+
+      return [
+        'simple',                                    // Type
+        `audiobook-${b.slug || b.id}`,               // SKU
+        b.title,                                      // Name
+        b.is_public ? '1' : '0',                     // Published
+        '0',                                          // Is featured
+        shortDesc,                                    // Short description
+        fullDesc,                                     // Description
+        b.price || '',                                // Regular price
+        '',                                           // Sale price
+        'Livres Audio, Audio IA',                     // Categories
+        `${b.voice_name || 'Audio IA'},Livre Audio,EbookStudio`, // Tags
+        b.cover_url || '',                            // Images
+        b.audio_url ? 'MP3 Complet' : '',            // Download 1 name
+        b.audio_url || '',                            // Download 1 URL
+        excerptUrl,                                   // Meta: excerpt
+        b.voice_name || '',                           // Meta: voice
+        b.duration_seconds || '',                     // Meta: duration
+        b.play_count || 0,                            // Meta: plays
+        embedCode,                                    // Meta: embed
+        publicUrl                                     // Meta: public url
+      ].map(v => escCsv(String(v)));
+    });
+
+    const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const bom = '\uFEFF';
+    const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `woocommerce-audiobooks-${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success(`${books.length} audiobook(s) exporté(s) pour WooCommerce !`);
+  };
+
   return (
     <div className="space-y-4">
       {/* Publish button */}
