@@ -656,6 +656,60 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
     }
   };
 
+  // Save audiobook to library (storage + database)
+  const saveToLibrary = async (audioBlob: Blob, title: string, durationEstimate: number) => {
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData?.user) return;
+
+      const userId = userData.user.id;
+      const fileName = `${userId}/${Date.now()}-${title.replace(/[^a-zA-Z0-9àâéèêëïîôùûüç\s-]/gi, '').replace(/\s+/g, '-')}.mp3`;
+
+      // Upload to storage
+      const { error: uploadError } = await supabase.storage
+        .from('audiobooks')
+        .upload(fileName, audioBlob, {
+          contentType: 'audio/mpeg',
+          cacheControl: '3600',
+        });
+
+      if (uploadError) {
+        console.error('Storage upload error:', uploadError);
+        toast.error('Erreur upload du fichier audio');
+        return;
+      }
+
+      const { data: urlData } = supabase.storage.from('audiobooks').getPublicUrl(fileName);
+
+      // Determine voice name
+      const voiceName = selectedAzureVoice === AUTO_AZURE_VOICE
+        ? AZURE_VOICE_PRESETS.find(p => p.id === selectedNiche)?.voice || 'fr-FR-DeniseNeural'
+        : selectedAzureVoice;
+
+      // Insert into audiobooks table
+      const { error: dbError } = await supabase.from('audiobooks').insert({
+        user_id: userId,
+        title: title.trim(),
+        author_name: authorName || null,
+        audio_url: urlData.publicUrl,
+        voice_name: voiceName,
+        duration_seconds: Math.round(durationEstimate),
+        status: 'published',
+        is_public: false,
+      });
+
+      if (dbError) {
+        console.error('DB insert error:', dbError);
+        toast.error('Erreur sauvegarde en bibliothèque');
+        return;
+      }
+
+      toast.success('📚 Livre audio sauvegardé dans votre bibliothèque !');
+    } catch (err: any) {
+      console.error('Save to library error:', err);
+    }
+  };
+
 
   const VoiceConfig = ({ compact = false }: { compact?: boolean }) => (
     <Card className="bg-muted/30">
