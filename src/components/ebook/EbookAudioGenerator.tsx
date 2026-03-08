@@ -594,6 +594,8 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
         const filename = `${(section.title || 'section').replace(/[^a-zA-Z0-9àâéèêëïîôùûüç\s-]/gi, '').replace(/\s+/g, '-')}.mp3`;
         saveAs(blob, filename);
         toast.success(`MP3 exporté : ${section.title}`);
+        // Save to library
+        await saveToLibrary(blob, `${ebookTitle} - ${section.title}`, section.estimatedMinutes * 60);
       }
     } catch (error: any) {
       console.error('MP3 export error:', error);
@@ -646,6 +648,22 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
       const zipName = `audiobook-${(ebookTitle || 'ebook').replace(/\s+/g, '-')}.zip`;
       saveAs(zipBlob, zipName);
       toast.success(`Audiobook exporté avec intro ! ${sections.length + 1} fichiers MP3`);
+
+      // Save merged audio to library
+      setMp3ProgressLabel('Sauvegarde en bibliothèque...');
+      const allMp3Files = Object.values(zip.files);
+      const mp3Blobs: Blob[] = [];
+      for (const file of allMp3Files) {
+        if (!file.dir) {
+          const content = await file.async('blob');
+          mp3Blobs.push(content);
+        }
+      }
+      if (mp3Blobs.length > 0) {
+        const mergedBlob = new Blob(mp3Blobs, { type: 'audio/mpeg' });
+        const totalMinutes = sections.reduce((sum, s) => sum + s.estimatedMinutes, 0);
+        await saveToLibrary(mergedBlob, ebookTitle || 'Audiobook', totalMinutes * 60);
+      }
     } catch (error: any) {
       console.error('MP3 batch export error:', error);
       toast.error(`Erreur export MP3 : ${error.message}`);
@@ -653,6 +671,60 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
       setIsGeneratingMp3(false);
       setMp3Progress(0);
       setMp3ProgressLabel('');
+    }
+  };
+
+  // Save audiobook to library (storage + database)
+  const saveToLibrary = async (audioBlob: Blob, title: string, durationEstimate: number) => {
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData?.user) return;
+
+      const userId = userData.user.id;
+      const fileName = `${userId}/${Date.now()}-${title.replace(/[^a-zA-Z0-9àâéèêëïîôùûüç\s-]/gi, '').replace(/\s+/g, '-')}.mp3`;
+
+      // Upload to storage
+      const { error: uploadError } = await supabase.storage
+        .from('audiobooks')
+        .upload(fileName, audioBlob, {
+          contentType: 'audio/mpeg',
+          cacheControl: '3600',
+        });
+
+      if (uploadError) {
+        console.error('Storage upload error:', uploadError);
+        toast.error('Erreur upload du fichier audio');
+        return;
+      }
+
+      const { data: urlData } = supabase.storage.from('audiobooks').getPublicUrl(fileName);
+
+      // Determine voice name
+      const voiceName = selectedAzureVoice === AUTO_AZURE_VOICE
+        ? AZURE_VOICE_PRESETS.find(p => p.id === selectedNiche)?.voice || 'fr-FR-DeniseNeural'
+        : selectedAzureVoice;
+
+      // Insert into audiobooks table
+      const { error: dbError } = await supabase.from('audiobooks').insert({
+        user_id: userId,
+        title: title.trim(),
+        author_name: authorName || null,
+        audio_url: urlData.publicUrl,
+        voice_name: voiceName,
+        duration_seconds: Math.round(durationEstimate),
+        status: 'published',
+        is_public: false,
+      });
+
+      if (dbError) {
+        console.error('DB insert error:', dbError);
+        toast.error('Erreur sauvegarde en bibliothèque');
+        return;
+      }
+
+      toast.success('📚 Livre audio sauvegardé dans votre bibliothèque !');
+    } catch (err: any) {
+      console.error('Save to library error:', err);
     }
   };
 
