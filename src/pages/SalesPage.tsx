@@ -613,7 +613,7 @@ const SalesPage = () => {
             </div>
           </div>
           <div className="border-t border-slate-800 pt-8 text-center">
-            <p className="text-xs text-slate-600">© 2026 EbookStudio Pro — Tous droits réservés</p>
+            <p className="text-xs text-white/40">© 2026 EbookStudio Pro — Tous droits réservés</p>
           </div>
         </div>
       </footer>
