@@ -83,12 +83,39 @@ const AudiobookDemoPage = () => {
     return () => clearInterval(interval);
   }, [isPlaying]);
 
+  // Urgency countdown (2h30 from page load)
+  const [urgencyEnd] = useState(() => Date.now() + 2.5 * 60 * 60 * 1000);
+  const [timeLeft, setTimeLeft] = useState({ h: 2, m: 30, s: 0 });
+  useEffect(() => {
+    const tick = setInterval(() => {
+      const diff = Math.max(0, urgencyEnd - Date.now());
+      setTimeLeft({ h: Math.floor(diff / 3600000), m: Math.floor((diff % 3600000) / 60000), s: Math.floor((diff % 60000) / 1000) });
+      if (diff <= 0) clearInterval(tick);
+    }, 1000);
+    return () => clearInterval(tick);
+  }, [urgencyEnd]);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#3a4a5c] via-[#1e2a38] to-[#0f1319] text-white">
       
       {/* Demo banner */}
       <div className="bg-amber-500/90 text-black text-center py-2 text-sm font-semibold">
         🎯 PAGE DÉMO — Voici à quoi ressemble la fiche produit de vos audiobooks
+      </div>
+
+      {/* ===== URGENCY BANNER ===== */}
+      <div className="bg-gradient-to-r from-red-600/90 via-orange-500/90 to-red-600/90 text-white text-center py-3 px-4">
+        <div className="flex items-center justify-center gap-3 flex-wrap">
+          <Timer className="w-5 h-5 animate-pulse" />
+          <span className="font-bold text-sm">🔥 Offre de lancement — Prix réduit pendant encore</span>
+          <div className="flex gap-1.5">
+            <span className="bg-black/30 px-2.5 py-1 rounded-lg font-mono font-bold text-base min-w-[2.5rem] text-center">{String(timeLeft.h).padStart(2, '0')}</span>
+            <span className="font-bold text-lg">:</span>
+            <span className="bg-black/30 px-2.5 py-1 rounded-lg font-mono font-bold text-base min-w-[2.5rem] text-center">{String(timeLeft.m).padStart(2, '0')}</span>
+            <span className="font-bold text-lg">:</span>
+            <span className="bg-black/30 px-2.5 py-1 rounded-lg font-mono font-bold text-base min-w-[2.5rem] text-center">{String(timeLeft.s).padStart(2, '0')}</span>
+          </div>
+        </div>
       </div>
 
       {/* ===== HERO HEADER ===== */}
