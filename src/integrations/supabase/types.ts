@@ -865,6 +865,63 @@ export type Database = {
         }
         Relationships: []
       }
+      social_posts: {
+        Row: {
+          clicks_count: number | null
+          comments_count: number | null
+          content: string
+          created_at: string
+          hashtags: string[] | null
+          id: string
+          likes_count: number | null
+          notes: string | null
+          platform: string
+          post_type: string
+          scheduled_date: string | null
+          scheduled_time: string | null
+          shares_count: number | null
+          status: string
+          updated_at: string
+          visual_description: string | null
+        }
+        Insert: {
+          clicks_count?: number | null
+          comments_count?: number | null
+          content: string
+          created_at?: string
+          hashtags?: string[] | null
+          id?: string
+          likes_count?: number | null
+          notes?: string | null
+          platform?: string
+          post_type?: string
+          scheduled_date?: string | null
+          scheduled_time?: string | null
+          shares_count?: number | null
+          status?: string
+          updated_at?: string
+          visual_description?: string | null
+        }
+        Update: {
+          clicks_count?: number | null
+          comments_count?: number | null
+          content?: string
+          created_at?: string
+          hashtags?: string[] | null
+          id?: string
+          likes_count?: number | null
+          notes?: string | null
+          platform?: string
+          post_type?: string
+          scheduled_date?: string | null
+          scheduled_time?: string | null
+          shares_count?: number | null
+          status?: string
+          updated_at?: string
+          visual_description?: string | null
+        }
+        Relationships: []
+      }
       subscribers: {
         Row: {
           access_code: string | null
