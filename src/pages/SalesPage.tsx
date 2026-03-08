@@ -592,10 +592,10 @@ const SalesPage = () => {
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4 text-slate-300 text-sm uppercase tracking-wider">Produit</h4>
+              <h4 className="font-semibold mb-4 text-white text-sm uppercase tracking-wider">Produit</h4>
               <ul className="space-y-2.5 text-sm">
-                <li><button onClick={() => navigate("/demo")} className="text-slate-500 hover:text-cyan-400 transition-colors">Démo gratuite</button></li>
-                <li><button onClick={() => navigate("/formation")} className="text-slate-500 hover:text-cyan-400 transition-colors">Formation</button></li>
+                <li><button onClick={() => navigate("/demo")} className="text-white/60 hover:text-cyan-400 transition-colors">Démo gratuite</button></li>
+                <li><button onClick={() => navigate("/formation")} className="text-white/60 hover:text-cyan-400 transition-colors">Formation</button></li>
               </ul>
             </div>
             <div>
