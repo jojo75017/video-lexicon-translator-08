@@ -601,6 +601,11 @@ const SalesPage = () => {
             </Card>
           </motion.div>
 
+          {/* Countdown Timer */}
+          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mt-6">
+            <CountdownTimer />
+          </motion.div>
+
           {/* Spots Counter */}
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mt-6">
             <SpotsCounter />
