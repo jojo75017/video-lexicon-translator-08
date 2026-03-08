@@ -513,7 +513,7 @@ const SalesPage = () => {
                 </div>
 
                 {/* Garantie */}
-                <div className="flex items-center justify-center gap-3 mt-8 text-slate-500 text-sm">
+                <div className="flex items-center justify-center gap-3 mt-8 text-white/60 text-sm">
                   <ShieldCheck className="w-5 h-5 text-emerald-500" />
                   <span>Paiement sécurisé • Accès immédiat • Garantie 30 jours</span>
                 </div>
