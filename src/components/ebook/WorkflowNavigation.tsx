@@ -107,18 +107,18 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
     <TooltipProvider delayDuration={200}>
       <div className={cn("space-y-3 mb-6", className)}>
         {/* Header with progress */}
-        <div className="bg-slate-900/80 border-2 border-white/10 rounded-xl p-4 shadow-lg backdrop-blur-sm">
+        <div className="bg-slate-900/80 border-2 border-gold/20 rounded-xl p-4 shadow-lg shadow-gold/5 backdrop-blur-sm">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <span className="text-lg">🚀</span>
-              <span className="text-sm font-bold text-white">Workflow Éditorial</span>
-              <Badge className="text-xs font-semibold bg-cyan-500/20 text-cyan-400 border-cyan-500/30">
+              <span className="text-sm font-bold text-gradient-gold">Workflow Éditorial</span>
+              <Badge className="text-xs font-semibold bg-gold/20 text-gold border-gold/30">
                 {completedCount}/{WORKFLOW_STEPS.length}
               </Badge>
             </div>
-            <span className="text-lg font-bold text-cyan-400">{Math.round(progressPercentage)}%</span>
+            <span className="text-lg font-bold text-gold">{Math.round(progressPercentage)}%</span>
           </div>
-          <Progress value={progressPercentage} className="h-2.5 mb-4" />
+          <Progress value={progressPercentage} className="h-2.5 mb-4 gold-progress" />
 
           {/* Phases with steps */}
           <div className="space-y-2">
