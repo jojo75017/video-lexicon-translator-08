@@ -69,6 +69,7 @@ import EmailPreviewPage from '@/pages/EmailPreviewPage';
 import ProspectManagerPage from '@/pages/ProspectManagerPage';
 import SocialPostGeneratorPage from '@/pages/SocialPostGeneratorPage';
 import UnifiedMarketingDashboard from '@/pages/UnifiedMarketingDashboard';
+import CrmPage from '@/pages/CrmPage';
 const queryClient = new QueryClient();
 
 const App = () => {
@@ -281,6 +282,7 @@ const App = () => {
             <Route path="/generateur-posts" element={<AdminGate><SocialPostGeneratorPage /></AdminGate>} />
             <Route path="/gestion-prospects" element={<AdminGate><ProspectManagerPage /></AdminGate>} />
             <Route path="/dashboard-marketing" element={<AdminGate><UnifiedMarketingDashboard /></AdminGate>} />
+            <Route path="/crm" element={<AdminGate><CrmPage /></AdminGate>} />
             <Route path="/resultat-en-5-min" element={<ResultatEn5MinPage />} />
             <Route path="/cadeau" element={<CadeauPage />} />
             <Route 

@@ -187,6 +187,107 @@ export type Database = {
         }
         Relationships: []
       }
+      crm_activities: {
+        Row: {
+          activity_type: string
+          contact_id: string
+          created_at: string
+          description: string | null
+          id: string
+          metadata: Json | null
+          user_id: string
+        }
+        Insert: {
+          activity_type?: string
+          contact_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          user_id: string
+        }
+        Update: {
+          activity_type?: string
+          contact_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_activities_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "crm_contacts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_contacts: {
+        Row: {
+          company: string | null
+          created_at: string
+          email: string
+          first_name: string | null
+          id: string
+          last_interaction_at: string | null
+          last_name: string | null
+          lifetime_value: number | null
+          notes: string | null
+          phone: string | null
+          source: string | null
+          status: string
+          tags: string[] | null
+          temperature: string
+          total_clicks: number | null
+          total_emails_opened: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company?: string | null
+          created_at?: string
+          email: string
+          first_name?: string | null
+          id?: string
+          last_interaction_at?: string | null
+          last_name?: string | null
+          lifetime_value?: number | null
+          notes?: string | null
+          phone?: string | null
+          source?: string | null
+          status?: string
+          tags?: string[] | null
+          temperature?: string
+          total_clicks?: number | null
+          total_emails_opened?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company?: string | null
+          created_at?: string
+          email?: string
+          first_name?: string | null
+          id?: string
+          last_interaction_at?: string | null
+          last_name?: string | null
+          lifetime_value?: number | null
+          notes?: string | null
+          phone?: string | null
+          source?: string | null
+          status?: string
+          tags?: string[] | null
+          temperature?: string
+          total_clicks?: number | null
+          total_emails_opened?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       ebook_project_versions: {
         Row: {
           author_name: string | null
