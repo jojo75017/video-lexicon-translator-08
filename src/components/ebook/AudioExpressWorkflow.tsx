@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cleanForAudio } from '@/utils/textCleaner';
-import { INTRO_TEXT } from '@/utils/audioIntroGenerator';
+import { buildIntroDisplayText } from '@/utils/audioIntroGenerator';
 
 // --- Constants ---
 
@@ -86,11 +86,11 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
   const [bookSubtitle, setBookSubtitle] = useState('');
   const [authorNameState, setAuthorNameState] = useState(propAuthorName || '');
   const [category, setCategory] = useState('enfants-3-8');
-  const buildDefaultIntro = (title: string) => {
-    const t = title.trim() || 'votre livre audio';
-    return `Bienvenue. Vous vous apprêtez à écouter ${t}. Une production EbookStudio. Installez-vous confortablement, la lecture commence.
-
-Découvrez ${t}, une aventure captivante à écouter en famille ou en solo. Plongez dans un univers riche en émotions, en rebondissements et en personnages attachants. Une expérience audio immersive qui saura vous transporter du début à la fin.`;
+  const buildDefaultIntro = (title: string, author?: string) => {
+    return buildIntroDisplayText({
+      ebookTitle: title,
+      authorName: author || authorNameState || 'Georges Boubet',
+    });
   };
   const [introduction, setIntroduction] = useState(preface || buildDefaultIntro(ebookTitle || ''));
 
@@ -98,9 +98,9 @@ Découvrez ${t}, une aventure captivante à écouter en famille ou en solo. Plon
   const [introManuallyEdited, setIntroManuallyEdited] = useState(false);
   useEffect(() => {
     if (!introManuallyEdited && !preface) {
-      setIntroduction(buildDefaultIntro(bookTitle));
+      setIntroduction(buildDefaultIntro(bookTitle, authorNameState));
     }
-  }, [bookTitle, introManuallyEdited, preface]);
+  }, [bookTitle, authorNameState, introManuallyEdited, preface]);
   const [chapterContent, setChapterContent] = useState('');
 
   // A4 cleaned text
@@ -393,7 +393,15 @@ Découvrez ${t}, une aventure captivante à écouter en famille ou en solo. Plon
               <p>✅ Auteur : <strong>{brief.authorName}</strong></p>
               <p>✅ Voix : <strong>{AZURE_VOICES.find(v => v.id === selectedVoice)?.label}</strong></p>
               <p>✅ Texte nettoyé & ponctuation optimisée</p>
-              <p className="text-xs text-muted-foreground mt-2">L'intro audio inclura : « Bienvenue. Vous vous apprêtez à écouter {brief.bookTitle}. Une production EbookStudio. »</p>
+              <div className="text-xs text-muted-foreground mt-2 space-y-1">
+                <p className="font-medium">🎬 Structure de l'intro Premium :</p>
+                <p>1. 🎵 Jingle musical (3s)</p>
+                <p>2. 📢 « Vous êtes bien sur EbookStudio 2026. »</p>
+                <p>3. ✍️ « Ce livre audio est rédigé par {brief.authorName || 'l\'auteur'}. »</p>
+                <p>4. 📖 « Nous avons le plaisir de vous présenter : {brief.bookTitle}. »</p>
+                <p>5. 🎧 Extrait de mise en bouche (50 mots max)</p>
+                <p>6. ⏸️ Silence de transition (2s)</p>
+              </div>
             </div>
             <Button onClick={handleGoToAudioGenerator} className="w-full">
               <Headphones className="h-4 w-4 mr-2" /> 🎙️ Lancer la Production Audio

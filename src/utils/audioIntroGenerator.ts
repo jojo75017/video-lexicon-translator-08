@@ -1,70 +1,173 @@
 /**
- * Generates the audiobook intro jingle:
- * 1. A bell/chime sound generated via Web Audio API (played as separate WAV blob)
- * 2. TTS intro message via Azure Speech (MP3)
- * 3. Short silence transition via TTS
+ * Generates the audiobook PREMIUM intro:
  * 
- * Returns an array of blobs to be played SEQUENTIALLY (not concatenated),
- * since the bell is WAV and TTS segments are MP3.
+ * Structure (Position 0 — avant le Chapitre 1) :
+ * 1. Ouverture Musicale : Jingle/nappe sonore de 3 secondes (Web Audio API → WAV)
+ * 2. Annonce Marque : "Vous êtes bien sur EbookStudio 2026."
+ * 3. Crédits Auteur : "Ce livre audio est rédigé par {AUTEUR}."
+ * 4. Annonce Titre : "Nous avons le plaisir de vous présenter : {TITRE}."
+ * 5. Extrait Mise en Bouche : 50 mots max tirés de l'introduction
+ * 6. Transition : Silence de 2 secondes avant le Chapitre 1
+ * 
+ * Returns an array of blobs to be played SEQUENTIALLY (bell=WAV, rest=MP3).
  */
 
-const DEFAULT_INTRO_TEXT = "Bienvenue. Vous vous apprêtez à écouter {TITRE}. Une production EbookStudio. Installez-vous confortablement, la lecture commence.";
+export interface IntroPremiumOptions {
+  ebookTitle?: string;
+  authorName?: string;
+  introductionText?: string;
+}
+
+// ─── Premium intro script builder ───
+
+function buildPremiumIntroScript(options: IntroPremiumOptions): string[] {
+  const title = options.ebookTitle?.trim() || 'votre livre audio';
+  const author = options.authorName?.trim() || 'l\'auteur';
+  const extract = extractFirst50Words(options.introductionText || '');
+
+  const segments: string[] = [];
+
+  // Segment 1: Annonce de la Marque
+  segments.push(`Vous êtes bien sur EbookStudio 2026.`);
+
+  // Segment 2: Crédits Auteur
+  segments.push(`Ce livre audio est rédigé par ${author}.`);
+
+  // Segment 3: Annonce du Titre
+  segments.push(`Nous avons le plaisir de vous présenter : ${title}.`);
+
+  // Segment 4: Extrait de Mise en Bouche (50 mots max)
+  if (extract) {
+    segments.push(extract);
+  }
+
+  return segments;
+}
 
 /**
- * Generate a synthetic bell chime using Web Audio API.
+ * Extract the first 50 words from an introduction text.
+ */
+function extractFirst50Words(text: string): string {
+  if (!text || !text.trim()) return '';
+  const words = text.trim().split(/\s+/).filter(w => w.length > 0);
+  const selected = words.slice(0, 50);
+  let result = selected.join(' ');
+  // Ensure it ends with proper punctuation
+  if (result && !result.match(/[.!?]$/)) {
+    result += '...';
+  }
+  return result;
+}
+
+/**
+ * Build a single combined intro text (for display/preview purposes).
+ */
+export function buildIntroDisplayText(options: IntroPremiumOptions): string {
+  const segments = buildPremiumIntroScript(options);
+  return segments.join('\n\n');
+}
+
+// ─── Legacy flat intro text (kept for backward compatibility) ───
+
+const DEFAULT_INTRO_TEXT = "Vous êtes bien sur EbookStudio 2026. Ce livre audio est rédigé par {AUTEUR}. Nous avons le plaisir de vous présenter : {TITRE}.";
+
+function buildIntroText(ebookTitle?: string, authorName?: string): string {
+  const title = ebookTitle?.trim() || 'votre livre audio';
+  const author = authorName?.trim() || 'l\'auteur';
+  return DEFAULT_INTRO_TEXT.replace('{TITRE}', title).replace('{AUTEUR}', author);
+}
+
+// ─── Audio generation (Web Audio API) ───
+
+/**
+ * Generate a professional opening jingle using Web Audio API.
+ * Duration: 3 seconds (as specified).
  * Returns a WAV Blob.
  */
-async function generateBellChimeWebAudio(): Promise<Blob | null> {
+async function generatePremiumJingle(): Promise<Blob | null> {
   try {
     const sampleRate = 44100;
-    const duration = 2.5;
+    const duration = 3.0; // 3 seconds as requested
     const length = sampleRate * duration;
     const offlineCtx = new OfflineAudioContext(1, length, sampleRate);
 
-    // Fundamental bell tone (523 Hz - C5)
+    // Rich warm pad — Fundamental (C4 = 261 Hz)
     const osc1 = offlineCtx.createOscillator();
     osc1.type = 'sine';
-    osc1.frequency.value = 523.25;
+    osc1.frequency.value = 261.63;
     const gain1 = offlineCtx.createGain();
-    gain1.gain.setValueAtTime(0.4, 0);
+    gain1.gain.setValueAtTime(0, 0);
+    gain1.gain.linearRampToValueAtTime(0.35, 0.4); // fade in
+    gain1.gain.setValueAtTime(0.35, duration - 0.8);
     gain1.gain.exponentialRampToValueAtTime(0.001, duration);
     osc1.connect(gain1).connect(offlineCtx.destination);
     osc1.start(0);
     osc1.stop(duration);
 
-    // Harmonic overtone (1046 Hz - C6)
+    // Harmonic sparkle (E5 = 659 Hz)
     const osc2 = offlineCtx.createOscillator();
     osc2.type = 'sine';
-    osc2.frequency.value = 1046.5;
+    osc2.frequency.value = 659.25;
     const gain2 = offlineCtx.createGain();
-    gain2.gain.setValueAtTime(0.2, 0);
-    gain2.gain.exponentialRampToValueAtTime(0.001, duration * 0.6);
+    gain2.gain.setValueAtTime(0, 0);
+    gain2.gain.linearRampToValueAtTime(0.2, 0.3);
+    gain2.gain.exponentialRampToValueAtTime(0.001, duration * 0.7);
     osc2.connect(gain2).connect(offlineCtx.destination);
     osc2.start(0);
     osc2.stop(duration);
 
-    // Soft shimmer (1568 Hz - G6)
+    // Bell chime accent (G5 = 784 Hz) — delayed start for "ding" effect
     const osc3 = offlineCtx.createOscillator();
     osc3.type = 'sine';
-    osc3.frequency.value = 1567.98;
+    osc3.frequency.value = 783.99;
     const gain3 = offlineCtx.createGain();
-    gain3.gain.setValueAtTime(0.1, 0);
-    gain3.gain.exponentialRampToValueAtTime(0.001, duration * 0.4);
+    gain3.gain.setValueAtTime(0, 0);
+    gain3.gain.setValueAtTime(0, 0.15);
+    gain3.gain.linearRampToValueAtTime(0.25, 0.25);
+    gain3.gain.exponentialRampToValueAtTime(0.001, duration * 0.5);
     osc3.connect(gain3).connect(offlineCtx.destination);
     osc3.start(0);
     osc3.stop(duration);
 
+    // High shimmer (C6 = 1046 Hz) — soft ethereal touch
+    const osc4 = offlineCtx.createOscillator();
+    osc4.type = 'sine';
+    osc4.frequency.value = 1046.5;
+    const gain4 = offlineCtx.createGain();
+    gain4.gain.setValueAtTime(0, 0);
+    gain4.gain.linearRampToValueAtTime(0.08, 0.5);
+    gain4.gain.exponentialRampToValueAtTime(0.001, duration * 0.6);
+    osc4.connect(gain4).connect(offlineCtx.destination);
+    osc4.start(0);
+    osc4.stop(duration);
+
     const renderedBuffer = await offlineCtx.startRendering();
     return audioBufferToWav(renderedBuffer);
   } catch (error) {
-    console.warn('Web Audio bell chime generation failed:', error);
+    console.warn('Premium jingle generation failed:', error);
     return null;
   }
 }
 
 /**
- * Convert an AudioBuffer to a WAV Blob
+ * Generate a 2-second silence WAV for transition before Chapter 1.
  */
+async function generateSilenceWav(durationSec: number = 2): Promise<Blob | null> {
+  try {
+    const sampleRate = 44100;
+    const length = sampleRate * durationSec;
+    const offlineCtx = new OfflineAudioContext(1, length, sampleRate);
+    // No oscillators → pure silence
+    const renderedBuffer = await offlineCtx.startRendering();
+    return audioBufferToWav(renderedBuffer);
+  } catch (error) {
+    console.warn('Silence generation failed:', error);
+    return null;
+  }
+}
+
+// ─── WAV encoding ───
+
 function audioBufferToWav(buffer: AudioBuffer): Blob {
   const numChannels = buffer.numberOfChannels;
   const sampleRate = buffer.sampleRate;
@@ -111,36 +214,43 @@ function writeString(view: DataView, offset: number, str: string) {
   }
 }
 
-/**
- * Build the intro text with the ebook title injected.
- */
-function buildIntroText(ebookTitle?: string): string {
-  const title = ebookTitle?.trim() || 'votre livre audio';
-  return DEFAULT_INTRO_TEXT.replace('{TITRE}', title);
-}
+// ─── Public API ───
 
 /**
- * Generate the complete intro jingle.
- * Returns blobs that MUST be played sequentially (bell=WAV, rest=MP3).
+ * Generate the PREMIUM intro jingle (for in-browser playback).
+ * Returns blobs that MUST be played sequentially:
+ *   [0] WAV jingle (3s)
+ *   [1..N] MP3 TTS segments (brand, author, title, extract)
+ *   [N+1] WAV silence (2s transition)
+ * 
+ * The generateTts function should use the SAME voice as the book.
  */
 export async function generateIntroJingle(
   generateTts: (text: string) => Promise<Blob | null>,
-  ebookTitle?: string
+  ebookTitle?: string,
+  authorName?: string,
+  introductionText?: string
 ): Promise<Blob[]> {
   const introBlobs: Blob[] = [];
 
-  const bellBlob = await generateBellChimeWebAudio();
-  if (bellBlob) {
-    introBlobs.push(bellBlob);
+  // 1. Opening jingle (3s WAV)
+  const jingleBlob = await generatePremiumJingle();
+  if (jingleBlob) {
+    introBlobs.push(jingleBlob);
   }
 
-  const ttsBlob = await generateTts(buildIntroText(ebookTitle));
-  if (ttsBlob && ttsBlob.size > 0) {
-    introBlobs.push(ttsBlob);
+  // 2-5. TTS segments (same voice as book)
+  const segments = buildPremiumIntroScript({ ebookTitle, authorName, introductionText });
+  for (const segment of segments) {
+    const ttsBlob = await generateTts(segment);
+    if (ttsBlob && ttsBlob.size > 0) {
+      introBlobs.push(ttsBlob);
+    }
   }
 
-  const silenceBlob = await generateTts('...');
-  if (silenceBlob && silenceBlob.size > 0) {
+  // 6. Transition silence (2s WAV)
+  const silenceBlob = await generateSilenceWav(2);
+  if (silenceBlob) {
     introBlobs.push(silenceBlob);
   }
 
@@ -148,19 +258,26 @@ export async function generateIntroJingle(
 }
 
 /**
- * Generate intro for file export (MP3-only, no WAV bell).
+ * Generate intro for file export (MP3-only, no WAV segments).
+ * TTS segments only — compatible with MP3 concatenation.
  */
 export async function generateIntroForExport(
   generateTts: (text: string) => Promise<Blob | null>,
-  ebookTitle?: string
+  ebookTitle?: string,
+  authorName?: string,
+  introductionText?: string
 ): Promise<Blob[]> {
   const introBlobs: Blob[] = [];
 
-  const ttsBlob = await generateTts(buildIntroText(ebookTitle));
-  if (ttsBlob && ttsBlob.size > 0) {
-    introBlobs.push(ttsBlob);
+  const segments = buildPremiumIntroScript({ ebookTitle, authorName, introductionText });
+  for (const segment of segments) {
+    const ttsBlob = await generateTts(segment);
+    if (ttsBlob && ttsBlob.size > 0) {
+      introBlobs.push(ttsBlob);
+    }
   }
 
+  // Add a TTS silence for transition
   const silenceBlob = await generateTts('...');
   if (silenceBlob && silenceBlob.size > 0) {
     introBlobs.push(silenceBlob);
