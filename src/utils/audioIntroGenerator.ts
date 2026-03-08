@@ -263,7 +263,8 @@ export async function generateIntroJingle(
   generateTts: (text: string) => Promise<Blob | null>,
   ebookTitle?: string,
   authorName?: string,
-  introductionText?: string
+  introductionText?: string,
+  genre?: string
 ): Promise<Blob[]> {
   const introBlobs: Blob[] = [];
 
@@ -274,7 +275,7 @@ export async function generateIntroJingle(
   }
 
   // 2-5. TTS segments (same voice as book)
-  const segments = buildPremiumIntroScript({ ebookTitle, authorName, introductionText });
+  const segments = buildPremiumIntroScript({ ebookTitle, authorName, introductionText, genre });
   for (const segment of segments) {
     const ttsBlob = await generateTts(segment);
     if (ttsBlob && ttsBlob.size > 0) {
