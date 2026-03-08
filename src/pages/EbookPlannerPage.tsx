@@ -1067,7 +1067,65 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           />
         );
 
-      case 'workflow-dashboard':
+      case 'draft-mode':
+        if (isDemo) {
+          setShowPaywall('chapters');
+          return null;
+        }
+        return (
+          <EbookDraftMode
+            chapters={chapters}
+            ebookTitle={ebookTitle}
+            authorName={authorName}
+            isGenerating={isGeneratingComplete}
+            onGenerateAll={generateCompleteEbook}
+            generationProgress={generationProgress}
+          />
+        );
+
+      case 'prompt-library':
+        return (
+          <EbookPromptLibrary
+            currentGenre={genre}
+            onApplyTemplate={(template) => {
+              setWritingStyle(template.writingStyle);
+              setTone(template.tone);
+              setNarrativeFormat(template.narrativeFormat);
+              setGenre(template.genre);
+            }}
+          />
+        );
+
+      case 'manuscript-dashboard':
+        return (
+          <EbookManuscriptDashboard
+            ebookTitle={ebookTitle}
+            authorName={authorName}
+            chapters={chapters}
+            preface={preface}
+            conclusion={conclusion}
+            targetWordsPerChapter={targetWordsPerChapter}
+            kdpDescription={kdpDescription}
+            kdpKeywords={kdpKeywords}
+            kdpCategories={kdpCategories}
+          />
+        );
+
+      case 'rich-editor':
+        if (isDemo) {
+          setShowPaywall('chapters');
+          return null;
+        }
+        return (
+          <EbookRichEditor
+            chapters={chapters}
+            onUpdateChapterContent={updateChapterContent}
+            onUpdateSubChapterContent={updateSubChapterContent}
+            targetWordsPerChapter={targetWordsPerChapter}
+          />
+        );
+
+
         return (
           <WorkflowDashboard
             ebookTitle={ebookTitle}
