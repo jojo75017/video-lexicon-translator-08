@@ -24,20 +24,48 @@ const ExitIntentPopup = ({ onContinueToOffer }: ExitIntentPopupProps) => {
     sessionStorage.setItem(EXIT_INTENT_KEY, "true");
   }, []);
 
-  // Exit-intent detection: mouse leaves viewport from top
+  // Exit-intent detection: mouse leaves viewport OR scroll-up rapide OR inactivité
   useEffect(() => {
+    let lastScrollY = window.scrollY;
+    let inactivityTimer: ReturnType<typeof setTimeout>;
+
+    // 1) Mouse quitte le viewport (desktop)
     const handleMouseLeave = (e: MouseEvent) => {
-      if (e.clientY <= 0) {
+      if (e.clientY <= 0) openPopup();
+    };
+
+    // 2) Scroll-up rapide (signe de départ)
+    const handleScroll = () => {
+      const currentY = window.scrollY;
+      if (lastScrollY - currentY > 300 && currentY < 200) {
         openPopup();
       }
+      lastScrollY = currentY;
+
+      // Reset inactivity timer on scroll
+      clearTimeout(inactivityTimer);
+      inactivityTimer = setTimeout(() => openPopup(), 45000);
     };
-    // Delay activation to avoid false triggers on page load
-    const timer = setTimeout(() => {
+
+    // 3) Inactivité de 45s
+    const handleActivity = () => {
+      clearTimeout(inactivityTimer);
+      inactivityTimer = setTimeout(() => openPopup(), 45000);
+    };
+
+    const activationTimer = setTimeout(() => {
       document.addEventListener("mouseleave", handleMouseLeave);
+      window.addEventListener("scroll", handleScroll, { passive: true });
+      document.addEventListener("mousemove", handleActivity, { passive: true });
+      inactivityTimer = setTimeout(() => openPopup(), 45000);
     }, 5000);
+
     return () => {
-      clearTimeout(timer);
+      clearTimeout(activationTimer);
+      clearTimeout(inactivityTimer);
       document.removeEventListener("mouseleave", handleMouseLeave);
+      window.removeEventListener("scroll", handleScroll);
+      document.removeEventListener("mousemove", handleActivity);
     };
   }, [openPopup]);
 
