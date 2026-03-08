@@ -85,7 +85,10 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
   const [bookSubtitle, setBookSubtitle] = useState('');
   const [authorNameState, setAuthorNameState] = useState(propAuthorName || '');
   const [category, setCategory] = useState('enfants-3-8');
-  const [introduction, setIntroduction] = useState(preface || '');
+  const defaultIntro = `Bienvenue. Vous vous apprêtez à écouter Le Village Irrésistible. Une production EbookStudio. Installez-vous confortablement, la lecture commence.
+
+Dans un petit village gaulois, une bande d'irréductibles héros vit des aventures hilarantes où le courage et l'amitié triomphent toujours. Entre potions magiques, banquets légendaires et plans farfelus, découvrez une histoire captivante qui fera rire et rêver les enfants. Une épopée drôle et tendre à écouter en famille.`;
+  const [introduction, setIntroduction] = useState(preface || defaultIntro);
   const [chapterContent, setChapterContent] = useState('');
 
   // A4 cleaned text
