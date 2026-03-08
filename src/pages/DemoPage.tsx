@@ -168,15 +168,21 @@ const DemoPage = () => {
       {/* Header */}
       <header className="sticky top-0 z-50 bg-slate-950/90 backdrop-blur-xl border-b border-slate-800/50">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to="/offres" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-emerald-400 flex items-center justify-center">
-              <BookOpen className="w-5 h-5 text-slate-900" />
-            </div>
-            <div>
-              <span className="font-bold text-lg">EbookStudio</span>
-              <span className="text-cyan-400 font-bold ml-1">Pro</span>
-            </div>
-          </Link>
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="sm" onClick={() => navigate('/offres')} className="text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-xl gap-2">
+              <ArrowLeft className="w-4 h-4" />
+              <span className="hidden sm:inline">Retour</span>
+            </Button>
+            <Link to="/offres" className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-emerald-400 flex items-center justify-center">
+                <BookOpen className="w-5 h-5 text-slate-900" />
+              </div>
+              <div>
+                <span className="font-bold text-lg">EbookStudio</span>
+                <span className="text-cyan-400 font-bold ml-1">Pro</span>
+              </div>
+            </Link>
+          </div>
           <Button onClick={() => navigate('/offres')} className="bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold rounded-xl px-5">
             <Sparkles className="w-4 h-4 mr-2" />
             97€ à vie
