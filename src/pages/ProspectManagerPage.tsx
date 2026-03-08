@@ -326,9 +326,11 @@ const ProspectManagerPage = () => {
                             </Badge>
                           </td>
                           <td className="px-3 py-2 text-center">
-                            <Switch
+                            <input
+                              type="checkbox"
                               checked={p.auto_send}
-                              onCheckedChange={(v) => toggleAutoSend(p.id, v)}
+                              onChange={(e) => toggleAutoSend(p.id, e.target.checked)}
+                              className="accent-gold h-4 w-4 cursor-pointer"
                             />
                           </td>
                           <td className="px-3 py-2 text-center">
