@@ -599,11 +599,11 @@ const SalesPage = () => {
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4 text-slate-300 text-sm uppercase tracking-wider">Légal</h4>
+              <h4 className="font-semibold mb-4 text-white text-sm uppercase tracking-wider">Légal</h4>
               <ul className="space-y-2.5 text-sm">
-                <li><button onClick={() => navigate("/mentions-legales")} className="text-slate-500 hover:text-cyan-400 transition-colors">Mentions légales</button></li>
-                <li><button onClick={() => navigate("/cgv")} className="text-slate-500 hover:text-cyan-400 transition-colors">CGV</button></li>
-                <li><button onClick={() => navigate("/politique-confidentialite")} className="text-slate-500 hover:text-cyan-400 transition-colors">Confidentialité</button></li>
+                <li><button onClick={() => navigate("/mentions-legales")} className="text-white/60 hover:text-cyan-400 transition-colors">Mentions légales</button></li>
+                <li><button onClick={() => navigate("/cgv")} className="text-white/60 hover:text-cyan-400 transition-colors">CGV</button></li>
+                <li><button onClick={() => navigate("/politique-confidentialite")} className="text-white/60 hover:text-cyan-400 transition-colors">Confidentialité</button></li>
               </ul>
             </div>
             <div>
