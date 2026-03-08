@@ -294,7 +294,7 @@ const SalesPage = () => {
                       <feature.icon className="w-7 h-7 text-white" />
                     </div>
                     <h3 className="font-bold text-xl text-white mb-2">{feature.title}</h3>
-                    <p className="text-slate-400 leading-relaxed">{feature.desc}</p>
+                    <p className="text-white/70 leading-relaxed">{feature.desc}</p>
                   </CardContent>
                 </Card>
               </motion.div>
