@@ -15,6 +15,7 @@ import { toast } from 'sonner';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { ModernSidebar } from '@/components/layout/ModernSidebar';
+import { OnboardingGuide } from '@/components/onboarding/OnboardingGuide';
 import { useEbookDatabase } from '@/hooks/useEbookDatabase';
 import EbookImageBank from '@/components/ebook/EbookImageBank';
 import { EbookMarketing } from '@/components/ebook/EbookMarketing';
