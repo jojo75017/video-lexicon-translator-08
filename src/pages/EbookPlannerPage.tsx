@@ -2609,6 +2609,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
 
       case 'audiobook-library':
         return <AudiobookLibrary />;
+
+      case 'elementor-export':
+        return <ElementorExportPage />;
       
       case 'series':
         return (
