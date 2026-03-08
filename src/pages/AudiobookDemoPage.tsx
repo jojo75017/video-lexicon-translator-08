@@ -31,12 +31,12 @@ const DEMO_DATA = {
   chapters: 8,
 };
 
-const MetaRow = ({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) => (
+const MetaRow = ({ icon, label, value, dark = false }: { icon: React.ReactNode; label: string; value: string; dark?: boolean }) => (
   <div className="flex items-start gap-3">
     <div className="mt-0.5 shrink-0">{icon}</div>
     <div className="min-w-0">
-      <p className="text-[11px] uppercase tracking-wider text-white/35 mb-0.5">{label}</p>
-      <p className="text-sm text-white/80 font-medium">{value}</p>
+      <p className={`text-[11px] uppercase tracking-wider mb-0.5 ${dark ? 'text-gray-400' : 'text-white/35'}`}>{label}</p>
+      <p className={`text-sm font-medium ${dark ? 'text-gray-700' : 'text-white/80'}`}>{value}</p>
     </div>
   </div>
 );
@@ -96,7 +96,7 @@ const AudiobookDemoPage = () => {
   }, [urgencyEnd]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#3a4a5c] via-[#1e2a38] to-[#0f1319] text-white">
+    <div className="min-h-screen bg-[#F7F3EB] text-gray-900">
       
       {/* Demo banner */}
       <div className="bg-amber-500/90 text-black text-center py-2 text-sm font-semibold">
@@ -119,10 +119,9 @@ const AudiobookDemoPage = () => {
       </div>
 
       {/* ===== HERO HEADER ===== */}
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#4a5568]/60 via-[#2d3748]/80 to-[#1a202c] z-0" />
+      <div className="relative overflow-hidden bg-[#232F3E] text-white">
         <div className="absolute inset-0 z-0">
-          <img src={audiobook.cover_url} alt="" className="w-full h-full object-cover scale-125 blur-[80px] opacity-15" />
+          <img src={audiobook.cover_url} alt="" className="w-full h-full object-cover scale-125 blur-[80px] opacity-10" />
         </div>
 
         <div className="relative z-10 max-w-6xl mx-auto px-4 pt-10 pb-10">
@@ -287,74 +286,74 @@ const AudiobookDemoPage = () => {
         </div>
       </div>
 
-      {/* ===== CONTENT ===== */}
+      {/* ===== CONTENT (Light) ===== */}
       <div className="max-w-6xl mx-auto px-4 py-10">
         <div className="flex flex-col lg:flex-row gap-10">
           
           <div className="flex-1 min-w-0 space-y-8">
             <div>
-              <h2 className="text-2xl font-bold text-white mb-4">À propos de ce contenu audio</h2>
-              <p className="text-white/70 leading-relaxed text-[15px]">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">À propos de ce contenu audio</h2>
+              <p className="text-gray-600 leading-relaxed text-[15px]">
                 {showFullDesc ? audiobook.description : descriptionShort}
                 {hasLongDesc && !showFullDesc && '...'}
               </p>
               {hasLongDesc && (
-                <button onClick={() => setShowFullDesc(!showFullDesc)} className="text-amber-400 text-sm mt-2 flex items-center gap-1 hover:text-amber-300 transition-colors font-medium">
+                <button onClick={() => setShowFullDesc(!showFullDesc)} className="text-orange-600 text-sm mt-2 flex items-center gap-1 hover:text-orange-500 transition-colors font-medium">
                   {showFullDesc ? <><ChevronUp className="w-4 h-4" /> Afficher moins</> : <><ChevronDown className="w-4 h-4" /> Afficher plus</>}
                 </button>
               )}
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <Badge variant="outline" className="border-white/20 text-white/70 bg-white/5 hover:bg-white/10 rounded-full px-4 py-1.5">📖 Livre Audio</Badge>
-              <Badge variant="outline" className="border-white/20 text-white/70 bg-white/5 hover:bg-white/10 rounded-full px-4 py-1.5">🤠 {audiobook.genre}</Badge>
-              <Badge variant="outline" className="border-white/20 text-white/70 bg-white/5 hover:bg-white/10 rounded-full px-4 py-1.5">🎙️ Audio IA</Badge>
-              <Badge variant="outline" className="border-white/20 text-white/70 bg-white/5 hover:bg-white/10 rounded-full px-4 py-1.5">🗣️ {audiobook.voice_name}</Badge>
+              <Badge variant="outline" className="border-gray-300 text-gray-600 bg-white hover:bg-gray-50 rounded-full px-4 py-1.5">📖 Livre Audio</Badge>
+              <Badge variant="outline" className="border-gray-300 text-gray-600 bg-white hover:bg-gray-50 rounded-full px-4 py-1.5">🤠 {audiobook.genre}</Badge>
+              <Badge variant="outline" className="border-gray-300 text-gray-600 bg-white hover:bg-gray-50 rounded-full px-4 py-1.5">🎙️ Audio IA</Badge>
+              <Badge variant="outline" className="border-gray-300 text-gray-600 bg-white hover:bg-gray-50 rounded-full px-4 py-1.5">🗣️ {audiobook.voice_name}</Badge>
             </div>
 
             {/* Pour qui est ce livre ? */}
-            <div className="bg-amber-500/[0.06] border border-amber-500/15 rounded-2xl p-6">
-              <h3 className="text-lg font-bold text-amber-400 mb-3 flex items-center gap-2">
+            <div className="bg-orange-50 border border-orange-200 rounded-2xl p-6">
+              <h3 className="text-lg font-bold text-orange-600 mb-3 flex items-center gap-2">
                 <Users className="w-5 h-5" />
                 Pour qui est ce livre audio ?
               </h3>
-              <ul className="space-y-2 text-white/70 text-sm">
-                <li className="flex items-start gap-2"><span className="text-amber-400 mt-0.5">✓</span> {audiobook.target_audience}</li>
-                <li className="flex items-start gap-2"><span className="text-amber-400 mt-0.5">✓</span> Parents cherchant des histoires captivantes pour le coucher ou les trajets</li>
-                <li className="flex items-start gap-2"><span className="text-amber-400 mt-0.5">✓</span> Enseignants souhaitant des supports audio ludiques</li>
-                <li className="flex items-start gap-2"><span className="text-amber-400 mt-0.5">✓</span> Amateurs d'aventures western drôles et familiales</li>
+              <ul className="space-y-2 text-gray-600 text-sm">
+                <li className="flex items-start gap-2"><span className="text-orange-500 mt-0.5">✓</span> {audiobook.target_audience}</li>
+                <li className="flex items-start gap-2"><span className="text-orange-500 mt-0.5">✓</span> Parents cherchant des histoires captivantes pour le coucher ou les trajets</li>
+                <li className="flex items-start gap-2"><span className="text-orange-500 mt-0.5">✓</span> Enseignants souhaitant des supports audio ludiques</li>
+                <li className="flex items-start gap-2"><span className="text-orange-500 mt-0.5">✓</span> Amateurs d'aventures western drôles et familiales</li>
               </ul>
             </div>
 
             {/* Full Player */}
             {showFullPlayer && (
-              <div className="bg-white/[0.04] backdrop-blur-xl border border-white/10 rounded-2xl p-6 md:p-8">
-                <h3 className="text-white font-semibold text-lg mb-5 flex items-center gap-2">
-                  <FileAudio className="w-5 h-5 text-amber-400" />
+              <div className="bg-white border border-gray-200 rounded-2xl p-6 md:p-8 shadow-sm">
+                <h3 className="text-gray-900 font-semibold text-lg mb-5 flex items-center gap-2">
+                  <FileAudio className="w-5 h-5 text-orange-500" />
                   Lecteur complet
                 </h3>
                 <div className="mb-6">
                   <Slider value={[currentTime]} max={duration} step={1} onValueChange={(v) => setCurrentTime(v[0])} className="cursor-pointer" />
-                  <div className="flex justify-between text-xs text-white/40 mt-2 font-mono">
+                  <div className="flex justify-between text-xs text-gray-400 mt-2 font-mono">
                     <span>{formatTime(currentTime)}</span>
                     <span>-{formatTime(Math.max(0, duration - currentTime))}</span>
                   </div>
                 </div>
                 <div className="flex items-center justify-center gap-6">
-                  <Button variant="ghost" size="icon" className="text-white/60 hover:text-white hover:bg-white/10 h-12 w-12 rounded-full">
-                    <div className="relative"><SkipBack className="h-5 w-5" /><span className="absolute -bottom-3 left-1/2 -translate-x-1/2 text-[9px] text-white/40">15s</span></div>
+                  <Button variant="ghost" size="icon" className="text-gray-400 hover:text-gray-700 hover:bg-gray-100 h-12 w-12 rounded-full">
+                    <div className="relative"><SkipBack className="h-5 w-5" /><span className="absolute -bottom-3 left-1/2 -translate-x-1/2 text-[9px] text-gray-400">15s</span></div>
                   </Button>
-                  <Button onClick={() => setIsPlaying(!isPlaying)} className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:via-orange-400 hover:to-amber-500 shadow-xl shadow-amber-500/25 transition-all hover:scale-105 active:scale-95">
+                  <Button onClick={() => setIsPlaying(!isPlaying)} className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 shadow-xl shadow-orange-500/25 transition-all hover:scale-105 active:scale-95">
                     {isPlaying ? <Pause className="h-7 w-7 text-white" /> : <Play className="h-7 w-7 ml-0.5 text-white" />}
                   </Button>
-                  <Button variant="ghost" size="icon" className="text-white/60 hover:text-white hover:bg-white/10 h-12 w-12 rounded-full">
-                    <div className="relative"><SkipForward className="h-5 w-5" /><span className="absolute -bottom-3 left-1/2 -translate-x-1/2 text-[9px] text-white/40">30s</span></div>
+                  <Button variant="ghost" size="icon" className="text-gray-400 hover:text-gray-700 hover:bg-gray-100 h-12 w-12 rounded-full">
+                    <div className="relative"><SkipForward className="h-5 w-5" /><span className="absolute -bottom-3 left-1/2 -translate-x-1/2 text-[9px] text-gray-400">30s</span></div>
                   </Button>
                 </div>
               </div>
             )}
             {!showFullPlayer && (
-              <Button variant="outline" onClick={() => setShowFullPlayer(true)} className="gap-2 border-white/15 text-white/70 hover:bg-white/10 hover:text-white rounded-full bg-white/[0.04]">
+              <Button variant="outline" onClick={() => setShowFullPlayer(true)} className="gap-2 border-gray-300 text-gray-600 hover:bg-gray-100 hover:text-gray-900 rounded-full bg-white">
                 <Headphones className="w-4 h-4" />
                 Ouvrir le lecteur complet
               </Button>
@@ -363,68 +362,68 @@ const AudiobookDemoPage = () => {
 
           {/* Sidebar */}
           <div className="lg:w-80 shrink-0">
-            <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-6 space-y-5 sticky top-6">
-              <h3 className="text-white font-semibold text-base border-b border-white/10 pb-3">📋 Informations produit</h3>
-              <MetaRow icon={<CreditCard className="w-4 h-4 text-emerald-400/70" />} label="Prix" value={`${audiobook.price.toFixed(2)} €`} />
-              <MetaRow icon={<FileAudio className="w-4 h-4 text-amber-400/70" />} label="Format" value="Livre audio" />
-              <MetaRow icon={<Tag className="w-4 h-4 text-orange-400/70" />} label="Genre" value={audiobook.genre} />
-              <MetaRow icon={<Users className="w-4 h-4 text-pink-400/70" />} label="Public" value={audiobook.target_audience} />
-              <MetaRow icon={<Globe className="w-4 h-4 text-green-400/70" />} label="Langue" value="Français" />
-              <MetaRow icon={<Clock className="w-4 h-4 text-cyan-400/70" />} label="Durée estimée" value={formatDuration(audiobook.duration_seconds)} />
-              <MetaRow icon={<BookOpen className="w-4 h-4 text-blue-400/70" />} label="Chapitres" value={`${audiobook.chapters}`} />
-              <MetaRow icon={<FileAudio className="w-4 h-4 text-cyan-400/70" />} label="Format audio" value="MP3 · HD" />
-              <MetaRow icon={<Download className="w-4 h-4 text-emerald-400/70" />} label="Accès" value="Téléchargement immédiat après achat" />
-              <MetaRow icon={<Users className="w-4 h-4 text-amber-400/70" />} label="Auteur" value={audiobook.author_name} />
-              <MetaRow icon={<Mic2 className="w-4 h-4 text-purple-400/70" />} label="Narrateur" value={audiobook.voice_name} />
-              <MetaRow icon={<Calendar className="w-4 h-4 text-blue-400/70" />} label="Publication" value={createdDate} />
-              <MetaRow icon={<Building2 className="w-4 h-4 text-pink-400/70" />} label="Éditeur" value="EbookStudio" />
-              <MetaRow icon={<Headphones className="w-4 h-4 text-emerald-400/70" />} label="Écoutes" value={`${audiobook.play_count}`} />
+            <div className="bg-white border border-gray-200 rounded-2xl p-6 space-y-5 sticky top-6 shadow-sm">
+              <h3 className="text-gray-900 font-semibold text-base border-b border-gray-200 pb-3">📋 Informations produit</h3>
+              <MetaRow dark icon={<CreditCard className="w-4 h-4 text-emerald-600" />} label="Prix" value={`${audiobook.price.toFixed(2)} €`} />
+              <MetaRow dark icon={<FileAudio className="w-4 h-4 text-orange-500" />} label="Format" value="Livre audio" />
+              <MetaRow dark icon={<Tag className="w-4 h-4 text-orange-500" />} label="Genre" value={audiobook.genre} />
+              <MetaRow dark icon={<Users className="w-4 h-4 text-pink-500" />} label="Public" value={audiobook.target_audience} />
+              <MetaRow dark icon={<Globe className="w-4 h-4 text-green-600" />} label="Langue" value="Français" />
+              <MetaRow dark icon={<Clock className="w-4 h-4 text-cyan-600" />} label="Durée estimée" value={formatDuration(audiobook.duration_seconds)} />
+              <MetaRow dark icon={<BookOpen className="w-4 h-4 text-blue-600" />} label="Chapitres" value={`${audiobook.chapters}`} />
+              <MetaRow dark icon={<FileAudio className="w-4 h-4 text-cyan-600" />} label="Format audio" value="MP3 · HD" />
+              <MetaRow dark icon={<Download className="w-4 h-4 text-emerald-600" />} label="Accès" value="Téléchargement immédiat après achat" />
+              <MetaRow dark icon={<Users className="w-4 h-4 text-orange-500" />} label="Auteur" value={audiobook.author_name} />
+              <MetaRow dark icon={<Mic2 className="w-4 h-4 text-purple-500" />} label="Narrateur" value={audiobook.voice_name} />
+              <MetaRow dark icon={<Calendar className="w-4 h-4 text-blue-600" />} label="Publication" value={createdDate} />
+              <MetaRow dark icon={<Building2 className="w-4 h-4 text-pink-500" />} label="Éditeur" value="EbookStudio" />
+              <MetaRow dark icon={<Headphones className="w-4 h-4 text-emerald-600" />} label="Écoutes" value={`${audiobook.play_count}`} />
             </div>
           </div>
         </div>
 
         {/* ===== TEXT EXCERPT ===== */}
-        <div className="mt-12 bg-gradient-to-br from-amber-500/[0.06] to-transparent border border-amber-500/15 rounded-2xl p-7">
-          <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-            <BookOpen className="w-5 h-5 text-amber-400" />
+        <div className="mt-12 bg-white border border-gray-200 rounded-2xl p-7 shadow-sm">
+          <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <BookOpen className="w-5 h-5 text-orange-500" />
             Extrait du livre
           </h2>
           <div className="relative">
-            <blockquote className="text-white/60 text-[15px] leading-relaxed italic border-l-2 border-amber-500/40 pl-5 space-y-3">
+            <blockquote className="text-gray-500 text-[15px] leading-relaxed italic border-l-2 border-orange-400 pl-5 space-y-3">
               <p>« Le soleil tapait fort sur la petite ville de Cactus Valley. Tellement fort que même les cactus avaient l'air de transpirer. Au milieu de la rue principale — qui était aussi la seule rue — un garçon de dix ans se tenait debout, les pouces glissés dans les passants de sa ceinture, un chapeau de cow-boy beaucoup trop grand sur la tête. »</p>
               <p>« — Je suis Billy le Kid… enfin, Billy tout court, marmonna-t-il en plissant les yeux comme il avait vu faire dans les films. Et aujourd'hui, je deviens le cow-boy le plus rapide de tout l'Ouest ! »</p>
               <p>« Son cheval, Tornado — qui était en réalité un poney assez grassouillet — leva à peine la tête de son seau d'avoine et souffla un bruit qui ressemblait beaucoup à un rire... »</p>
             </blockquote>
-            <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[#0f1319] to-transparent pointer-events-none" />
+            <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent pointer-events-none" />
           </div>
-          <p className="text-amber-400/70 text-xs mt-4 font-medium">— Extrait du Chapitre 1 : « L'Arrivée à Cactus Valley »</p>
+          <p className="text-orange-500/80 text-xs mt-4 font-medium">— Extrait du Chapitre 1 : « L'Arrivée à Cactus Valley »</p>
         </div>
 
         {/* ===== REVIEWS ===== */}
         <div className="mt-12">
-          <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-            <Star className="w-6 h-6 text-amber-400 fill-amber-400" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+            <Star className="w-6 h-6 text-orange-500 fill-orange-500" />
             Avis des auditeurs
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {getRandomReviews(audiobook.slug || audiobook.title).map((review, i) => (
-              <div key={i} className="bg-white/[0.04] border border-white/[0.08] rounded-2xl p-5">
+              <div key={i} className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center font-bold text-sm text-white shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center font-bold text-sm text-white shrink-0">
                     {review.initial}
                   </div>
                   <div>
-                    <p className="font-semibold text-sm text-white">{review.name}</p>
-                    <p className="text-[11px] text-white/35">A écouté ce titre</p>
+                    <p className="font-semibold text-sm text-gray-900">{review.name}</p>
+                    <p className="text-[11px] text-gray-400">A écouté ce titre</p>
                   </div>
                 </div>
                 <div className="flex gap-0.5 mb-2">
                   {[1,2,3,4,5].map(s => (
-                    <Star key={s} className={`w-3.5 h-3.5 ${s <= review.stars ? 'text-amber-400 fill-amber-400' : 'text-white/20'}`} />
+                    <Star key={s} className={`w-3.5 h-3.5 ${s <= review.stars ? 'text-orange-500 fill-orange-500' : 'text-gray-200'}`} />
                   ))}
                 </div>
-                <p className="text-white/60 text-sm leading-relaxed">{review.text}</p>
-                <div className="mt-3 inline-flex items-center gap-1 bg-amber-500/10 text-amber-400 text-[11px] font-semibold px-2 py-0.5 rounded-full">
+                <p className="text-gray-500 text-sm leading-relaxed">{review.text}</p>
+                <div className="mt-3 inline-flex items-center gap-1 bg-orange-50 text-orange-600 text-[11px] font-semibold px-2 py-0.5 rounded-full">
                   <Headphones className="w-3 h-3" /> Avis spontané
                 </div>
               </div>
@@ -433,11 +432,11 @@ const AudiobookDemoPage = () => {
         </div>
 
         {/* ===== GUARANTEE ===== */}
-        <div className="mt-12 bg-gradient-to-r from-emerald-500/[0.08] to-emerald-500/[0.02] border border-emerald-500/20 rounded-2xl p-7 flex flex-col sm:flex-row items-center gap-6">
-          <Shield className="w-16 h-16 text-emerald-400 shrink-0" />
+        <div className="mt-12 bg-emerald-50 border border-emerald-200 rounded-2xl p-7 flex flex-col sm:flex-row items-center gap-6">
+          <Shield className="w-16 h-16 text-emerald-600 shrink-0" />
           <div className="text-center sm:text-left">
-            <h3 className="text-lg font-bold text-emerald-400 mb-2">Garantie Satisfait ou Remboursé — 30 jours</h3>
-            <p className="text-white/60 text-sm leading-relaxed">
+            <h3 className="text-lg font-bold text-emerald-700 mb-2">Garantie Satisfait ou Remboursé — 30 jours</h3>
+            <p className="text-gray-500 text-sm leading-relaxed">
               Vous n'êtes pas satisfait ? Nous vous remboursons intégralement, sans conditions et sans questions. Votre satisfaction est notre priorité absolue.
             </p>
           </div>
@@ -445,8 +444,8 @@ const AudiobookDemoPage = () => {
 
         {/* ===== FAQ ===== */}
         <div className="mt-12">
-          <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-            <HelpCircle className="w-6 h-6 text-amber-400" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+            <HelpCircle className="w-6 h-6 text-orange-500" />
             Questions fréquentes
           </h2>
           <div className="space-y-2">
@@ -463,8 +462,8 @@ const AudiobookDemoPage = () => {
 
         {/* ===== SIMILAR BOOKS ===== */}
         <div className="mt-12">
-          <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-            <Library className="w-6 h-6 text-amber-400" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+            <Library className="w-6 h-6 text-orange-500" />
             Vous aimerez aussi
           </h2>
           <div className="flex gap-4 overflow-x-auto pb-2">
@@ -474,22 +473,32 @@ const AudiobookDemoPage = () => {
               { title: "SEO Masterclass", price: "14.99" },
               { title: "Réseaux Sociaux Pro", price: "8.99" },
             ].map((book, i) => (
-              <div key={i} className="shrink-0 w-40 bg-white/[0.04] border border-white/[0.08] rounded-xl overflow-hidden hover:-translate-y-1 transition-transform cursor-pointer group">
-                <div className="w-40 h-40 bg-gradient-to-br from-white/[0.06] to-white/[0.02] flex items-center justify-center">
-                  <Headphones className="w-10 h-10 text-white/15 group-hover:text-amber-400/30 transition-colors" />
+              <div key={i} className="shrink-0 w-40 bg-white border border-gray-200 rounded-xl overflow-hidden hover:-translate-y-1 transition-transform cursor-pointer group shadow-sm">
+                <div className="w-40 h-40 bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center">
+                  <Headphones className="w-10 h-10 text-gray-200 group-hover:text-orange-300 transition-colors" />
                 </div>
                 <div className="p-3">
-                  <p className="text-sm font-semibold text-white truncate">{book.title}</p>
-                  <p className="text-xs font-bold text-amber-400 mt-1">{book.price} €</p>
+                  <p className="text-sm font-semibold text-gray-900 truncate">{book.title}</p>
+                  <p className="text-xs font-bold text-orange-500 mt-1">{book.price} €</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
+
+        {/* ===== EBOOK LINK ===== */}
+        <div className="mt-12 text-center bg-[#232F3E] rounded-2xl p-8">
+          <h3 className="text-white text-lg font-bold mb-2">📚 Découvrez aussi nos ebooks</h3>
+          <p className="text-white/60 text-sm mb-4">Retrouvez toute notre collection de livres numériques sur notre boutique</p>
+          <a href="https://ebookcluster.com" target="_blank" rel="noopener" className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 text-white font-bold px-8 py-3 rounded-full shadow-lg shadow-orange-500/20 transition-all hover:scale-105">
+            <Globe className="w-5 h-5" />
+            Visiter ebookcluster.com
+          </a>
+        </div>
       </div>
 
-      <div className="text-center pb-10 pt-4 border-t border-white/5">
-        <p className="text-xs text-white/20">Propulsé par EbookStudio Pro • Audio IA Premium</p>
+      <div className="text-center pb-10 pt-6 border-t border-gray-200">
+        <p className="text-xs text-gray-400">Propulsé par EbookStudio Pro • Audio IA Premium</p>
       </div>
     </div>
   );
@@ -498,16 +507,16 @@ const AudiobookDemoPage = () => {
 const FaqItem = ({ question, answer, defaultOpen = false }: { question: string; answer: string; defaultOpen?: boolean }) => {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className={`border border-white/[0.08] rounded-xl overflow-hidden transition-colors ${open ? 'bg-white/[0.03]' : ''}`}>
+    <div className={`border border-gray-200 rounded-xl overflow-hidden transition-colors bg-white shadow-sm ${open ? 'bg-gray-50' : ''}`}>
       <button 
         onClick={() => setOpen(!open)} 
-        className="w-full flex justify-between items-center p-4 text-left font-semibold text-sm text-white hover:bg-white/[0.04] transition-colors"
+        className="w-full flex justify-between items-center p-4 text-left font-semibold text-sm text-gray-900 hover:bg-gray-50 transition-colors"
       >
         {question}
-        <ChevronDown className={`w-4 h-4 text-white/30 transition-transform shrink-0 ml-2 ${open ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform shrink-0 ml-2 ${open ? 'rotate-180' : ''}`} />
       </button>
       {open && (
-        <div className="px-4 pb-4 text-sm text-white/55 leading-relaxed">
+        <div className="px-4 pb-4 text-sm text-gray-500 leading-relaxed">
           {answer}
         </div>
       )}
