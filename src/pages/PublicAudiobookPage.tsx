@@ -336,16 +336,6 @@ h1{font-size:2.5rem;font-weight:800;margin-bottom:8px;line-height:1.1}
     toast.success('Fiche produit HTML téléchargée !');
   };
 
-  const copyStandaloneHtml = () => {
-    generateStandaloneHtmlString();
-  };
-
-  const generateStandaloneHtmlString = () => {
-    if (!audiobook) return;
-    // Reuse same HTML but copy to clipboard
-    const tempDiv = document.createElement('div');
-    generateStandaloneHtml(); // triggers download
-  };
 
   if (loading) return <LoadingState />;
   if (!audiobook) return <NotFoundState />;
