@@ -52,10 +52,9 @@ export const EbookAnalyticsDashboard: React.FC<EbookAnalyticsDashboardProps> = (
       (ch.subChapters?.some(sub => sub.content && sub.content.trim().length > 50))
     ).length;
 
-    const estimatedPages = Math.ceil(totalWords / 250); // ~250 words per page
-    const estimatedReadingTime = Math.ceil(totalWords / 200); // ~200 words per minute
+    const estimatedPages = Math.ceil(totalWords / 250);
+    const estimatedReadingTime = Math.ceil(totalWords / 200);
 
-    // Calculate per-chapter stats
     const chapterStats = chapters.map((ch, index) => {
       const words = (ch.content || '').split(/\s+/).filter(w => w.length > 0).length +
         (ch.subChapters || []).reduce((acc, sub) => 
@@ -70,10 +69,9 @@ export const EbookAnalyticsDashboard: React.FC<EbookAnalyticsDashboardProps> = (
       };
     });
 
-    // KDP Revenue estimation
-    const pricePoint = 4.99; // Average ebook price
-    const royaltyRate = 0.7; // 70% royalty
-    const estimatedMonthlySales = Math.floor(estimatedPages * 0.5); // Rough estimate based on content
+    const pricePoint = 4.99;
+    const royaltyRate = 0.7;
+    const estimatedMonthlySales = Math.floor(estimatedPages * 0.5);
     const estimatedMonthlyRevenue = estimatedMonthlySales * pricePoint * royaltyRate;
 
     return {
@@ -91,7 +89,7 @@ export const EbookAnalyticsDashboard: React.FC<EbookAnalyticsDashboardProps> = (
     };
   }, [chapters, targetWordsPerChapter]);
 
-  const COLORS = ['hsl(var(--primary))', 'hsl(var(--muted))'];
+  const COLORS = ['#06b6d4', 'rgba(255,255,255,0.1)'];
   const CHART_COLORS = ['#8b5cf6', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#6366f1', '#84cc16'];
 
   const pieData = [
@@ -103,57 +101,57 @@ export const EbookAnalyticsDashboard: React.FC<EbookAnalyticsDashboardProps> = (
     <div className="space-y-6 animate-fade-in">
       {/* Header Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="bg-gradient-to-br from-violet-500/20 to-purple-500/10 border-violet-500/30 hover:scale-105 transition-transform duration-300">
+        <Card className="bg-slate-900/80 border-violet-500/30 hover:scale-105 transition-transform duration-300 backdrop-blur-sm">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-violet-500/20 rounded-lg">
                 <BookOpen className="h-5 w-5 text-violet-400" />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Total Mots</p>
-                <p className="text-2xl font-bold text-violet-400">{analytics.totalWords.toLocaleString()}</p>
+                <p className="text-xs text-white/50">Total Mots</p>
+                <p className="text-2xl font-bold text-white">{analytics.totalWords.toLocaleString()}</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-cyan-500/20 to-blue-500/10 border-cyan-500/30 hover:scale-105 transition-transform duration-300">
+        <Card className="bg-slate-900/80 border-cyan-500/30 hover:scale-105 transition-transform duration-300 backdrop-blur-sm">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-cyan-500/20 rounded-lg">
                 <Target className="h-5 w-5 text-cyan-400" />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Pages estimées</p>
-                <p className="text-2xl font-bold text-cyan-400">{analytics.estimatedPages}</p>
+                <p className="text-xs text-white/50">Pages estimées</p>
+                <p className="text-2xl font-bold text-white">{analytics.estimatedPages}</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-emerald-500/20 to-green-500/10 border-emerald-500/30 hover:scale-105 transition-transform duration-300">
+        <Card className="bg-slate-900/80 border-emerald-500/30 hover:scale-105 transition-transform duration-300 backdrop-blur-sm">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-emerald-500/20 rounded-lg">
                 <Clock className="h-5 w-5 text-emerald-400" />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Temps de lecture</p>
-                <p className="text-2xl font-bold text-emerald-400">{analytics.estimatedReadingTime} min</p>
+                <p className="text-xs text-white/50">Temps de lecture</p>
+                <p className="text-2xl font-bold text-white">{analytics.estimatedReadingTime} min</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-amber-500/20 to-orange-500/10 border-amber-500/30 hover:scale-105 transition-transform duration-300">
+        <Card className="bg-slate-900/80 border-amber-500/30 hover:scale-105 transition-transform duration-300 backdrop-blur-sm">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-amber-500/20 rounded-lg">
                 <Award className="h-5 w-5 text-amber-400" />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Chapitres rédigés</p>
-                <p className="text-2xl font-bold text-amber-400">{analytics.chaptersWithContent}/{analytics.totalChapters}</p>
+                <p className="text-xs text-white/50">Chapitres rédigés</p>
+                <p className="text-2xl font-bold text-white">{analytics.chaptersWithContent}/{analytics.totalChapters}</p>
               </div>
             </div>
           </CardContent>
@@ -163,10 +161,10 @@ export const EbookAnalyticsDashboard: React.FC<EbookAnalyticsDashboardProps> = (
       {/* Progress & Charts Row */}
       <div className="grid md:grid-cols-2 gap-6">
         {/* Completion Pie Chart */}
-        <Card className="border-primary/20 bg-gradient-to-br from-card to-card/80">
+        <Card className="border-cyan-500/20 bg-slate-900/80 backdrop-blur-sm">
           <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Sparkles className="h-5 w-5 text-primary" />
+            <CardTitle className="flex items-center gap-2 text-lg text-white">
+              <Sparkles className="h-5 w-5 text-cyan-400" />
               Progression globale
             </CardTitle>
           </CardHeader>
@@ -192,8 +190,8 @@ export const EbookAnalyticsDashboard: React.FC<EbookAnalyticsDashboardProps> = (
                 </ResponsiveContainer>
               </div>
               <div className="flex-1">
-                <p className="text-4xl font-bold text-primary">{Math.round(analytics.completionPercent)}%</p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-4xl font-bold text-cyan-400">{Math.round(analytics.completionPercent)}%</p>
+                <p className="text-sm text-white/60">
                   {analytics.totalWords.toLocaleString()} / {analytics.targetTotalWords.toLocaleString()} mots
                 </p>
                 <Progress value={analytics.completionPercent} className="mt-3 h-2" />
@@ -203,24 +201,24 @@ export const EbookAnalyticsDashboard: React.FC<EbookAnalyticsDashboardProps> = (
         </Card>
 
         {/* KDP Revenue Estimator */}
-        <Card className="border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 to-green-500/5">
+        <Card className="border-emerald-500/30 bg-slate-900/80 backdrop-blur-sm">
           <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-lg">
+            <CardTitle className="flex items-center gap-2 text-lg text-white">
               <DollarSign className="h-5 w-5 text-emerald-400" />
               Estimation revenus KDP
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="flex justify-between items-center p-3 bg-emerald-500/10 rounded-lg">
-                <span className="text-sm">Ventes estimées/mois</span>
+              <div className="flex justify-between items-center p-3 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
+                <span className="text-sm text-white/70">Ventes estimées/mois</span>
                 <span className="text-xl font-bold text-emerald-400">{analytics.estimatedMonthlySales}</span>
               </div>
-              <div className="flex justify-between items-center p-3 bg-emerald-500/20 rounded-lg">
-                <span className="text-sm">Revenus estimés/mois</span>
+              <div className="flex justify-between items-center p-3 bg-emerald-500/15 rounded-lg border border-emerald-500/20">
+                <span className="text-sm text-white/70">Revenus estimés/mois</span>
                 <span className="text-2xl font-bold text-emerald-400">${analytics.estimatedMonthlyRevenue.toFixed(2)}</span>
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-white/40">
                 * Basé sur un prix de 4.99$ et 70% de royalties. Les résultats réels peuvent varier.
               </p>
             </div>
@@ -229,10 +227,10 @@ export const EbookAnalyticsDashboard: React.FC<EbookAnalyticsDashboardProps> = (
       </div>
 
       {/* Chapter Progress Bar Chart */}
-      <Card className="border-primary/20 bg-gradient-to-br from-card to-card/80">
+      <Card className="border-cyan-500/20 bg-slate-900/80 backdrop-blur-sm">
         <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <BarChart3 className="h-5 w-5 text-primary" />
+          <CardTitle className="flex items-center gap-2 text-lg text-white">
+            <BarChart3 className="h-5 w-5 text-cyan-400" />
             Progression par chapitre
           </CardTitle>
         </CardHeader>
@@ -240,13 +238,14 @@ export const EbookAnalyticsDashboard: React.FC<EbookAnalyticsDashboardProps> = (
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={analytics.chapterStats} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <XAxis dataKey="name" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} />
-                <YAxis tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} />
+                <XAxis dataKey="name" tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 12 }} />
+                <YAxis tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 12 }} />
                 <Tooltip 
                   contentStyle={{ 
-                    backgroundColor: 'hsl(var(--card))', 
-                    border: '1px solid hsl(var(--border))',
-                    borderRadius: '8px'
+                    backgroundColor: '#0f172a', 
+                    border: '1px solid rgba(6,182,212,0.3)',
+                    borderRadius: '8px',
+                    color: '#fff'
                   }}
                   formatter={(value: number, name: string) => [
                     `${value.toLocaleString()} mots`,
@@ -257,8 +256,8 @@ export const EbookAnalyticsDashboard: React.FC<EbookAnalyticsDashboardProps> = (
                     return chapter?.fullName || label;
                   }}
                 />
-                <Bar dataKey="words" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="target" fill="hsl(var(--muted))" radius={[4, 4, 0, 0]} opacity={0.3} />
+                <Bar dataKey="words" fill="#06b6d4" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="target" fill="rgba(255,255,255,0.1)" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -266,10 +265,10 @@ export const EbookAnalyticsDashboard: React.FC<EbookAnalyticsDashboardProps> = (
       </Card>
 
       {/* Writing Stats Area Chart */}
-      <Card className="border-primary/20 bg-gradient-to-br from-card to-card/80">
+      <Card className="border-cyan-500/20 bg-slate-900/80 backdrop-blur-sm">
         <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <TrendingUp className="h-5 w-5 text-primary" />
+          <CardTitle className="flex items-center gap-2 text-lg text-white">
+            <TrendingUp className="h-5 w-5 text-cyan-400" />
             Distribution du contenu
           </CardTitle>
         </CardHeader>
@@ -279,23 +278,24 @@ export const EbookAnalyticsDashboard: React.FC<EbookAnalyticsDashboardProps> = (
               <AreaChart data={analytics.chapterStats} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorWords" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8}/>
-                    <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0.1}/>
+                    <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.6}/>
+                    <stop offset="95%" stopColor="#06b6d4" stopOpacity={0.05}/>
                   </linearGradient>
                 </defs>
-                <XAxis dataKey="name" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} />
-                <YAxis tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} />
+                <XAxis dataKey="name" tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 12 }} />
+                <YAxis tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 12 }} />
                 <Tooltip 
                   contentStyle={{ 
-                    backgroundColor: 'hsl(var(--card))', 
-                    border: '1px solid hsl(var(--border))',
-                    borderRadius: '8px'
+                    backgroundColor: '#0f172a', 
+                    border: '1px solid rgba(6,182,212,0.3)',
+                    borderRadius: '8px',
+                    color: '#fff'
                   }}
                 />
                 <Area 
                   type="monotone" 
                   dataKey="words" 
-                  stroke="hsl(var(--primary))" 
+                  stroke="#06b6d4" 
                   fillOpacity={1} 
                   fill="url(#colorWords)" 
                 />
@@ -306,9 +306,9 @@ export const EbookAnalyticsDashboard: React.FC<EbookAnalyticsDashboardProps> = (
       </Card>
 
       {/* Achievement Badges */}
-      <Card className="border-primary/20 bg-gradient-to-br from-card to-card/80">
+      <Card className="border-amber-500/20 bg-slate-900/80 backdrop-blur-sm">
         <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-lg">
+          <CardTitle className="flex items-center gap-2 text-lg text-white">
             <Star className="h-5 w-5 text-amber-400" />
             Badges de réussite
           </CardTitle>
@@ -316,43 +316,43 @@ export const EbookAnalyticsDashboard: React.FC<EbookAnalyticsDashboardProps> = (
         <CardContent>
           <div className="flex flex-wrap gap-3">
             {analytics.totalWords >= 1000 && (
-              <div className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-amber-500/20 to-orange-500/20 rounded-full border border-amber-500/30 animate-scale-in">
+              <div className="flex items-center gap-2 px-3 py-2 bg-amber-500/15 rounded-full border border-amber-500/30 animate-scale-in">
                 <Zap className="h-4 w-4 text-amber-400" />
-                <span className="text-sm font-medium">1000 mots</span>
+                <span className="text-sm font-medium text-white/90">1000 mots</span>
               </div>
             )}
             {analytics.totalWords >= 5000 && (
-              <div className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-violet-500/20 to-purple-500/20 rounded-full border border-violet-500/30 animate-scale-in">
+              <div className="flex items-center gap-2 px-3 py-2 bg-violet-500/15 rounded-full border border-violet-500/30 animate-scale-in">
                 <Star className="h-4 w-4 text-violet-400" />
-                <span className="text-sm font-medium">5000 mots</span>
+                <span className="text-sm font-medium text-white/90">5000 mots</span>
               </div>
             )}
             {analytics.totalWords >= 10000 && (
-              <div className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-full border border-cyan-500/30 animate-scale-in">
+              <div className="flex items-center gap-2 px-3 py-2 bg-cyan-500/15 rounded-full border border-cyan-500/30 animate-scale-in">
                 <Award className="h-4 w-4 text-cyan-400" />
-                <span className="text-sm font-medium">10000 mots</span>
+                <span className="text-sm font-medium text-white/90">10000 mots</span>
               </div>
             )}
             {analytics.chaptersWithContent >= 3 && (
-              <div className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-emerald-500/20 to-green-500/20 rounded-full border border-emerald-500/30 animate-scale-in">
+              <div className="flex items-center gap-2 px-3 py-2 bg-emerald-500/15 rounded-full border border-emerald-500/30 animate-scale-in">
                 <BookOpen className="h-4 w-4 text-emerald-400" />
-                <span className="text-sm font-medium">3 chapitres</span>
+                <span className="text-sm font-medium text-white/90">3 chapitres</span>
               </div>
             )}
             {analytics.completionPercent >= 50 && (
-              <div className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-pink-500/20 to-rose-500/20 rounded-full border border-pink-500/30 animate-scale-in">
+              <div className="flex items-center gap-2 px-3 py-2 bg-pink-500/15 rounded-full border border-pink-500/30 animate-scale-in">
                 <Target className="h-4 w-4 text-pink-400" />
-                <span className="text-sm font-medium">50% complété</span>
+                <span className="text-sm font-medium text-white/90">50% complété</span>
               </div>
             )}
             {analytics.completionPercent >= 100 && (
-              <div className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-yellow-400/30 to-amber-400/30 rounded-full border border-yellow-400/50 animate-scale-in shadow-lg shadow-yellow-500/20">
+              <div className="flex items-center gap-2 px-3 py-2 bg-yellow-400/20 rounded-full border border-yellow-400/50 animate-scale-in shadow-lg shadow-yellow-500/20">
                 <Sparkles className="h-4 w-4 text-yellow-400" />
                 <span className="text-sm font-bold text-yellow-400">Livre terminé ! 🎉</span>
               </div>
             )}
             {analytics.totalWords === 0 && (
-              <p className="text-sm text-muted-foreground">Commencez à écrire pour débloquer des badges !</p>
+              <p className="text-sm text-white/40">Commencez à écrire pour débloquer des badges !</p>
             )}
           </div>
         </CardContent>

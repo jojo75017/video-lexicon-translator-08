@@ -43,23 +43,12 @@ const PHASES = [
   { id: 4, label: '🎁 Bonus', color: 'bg-emerald-500', steps: ['P15'] },
 ];
 
-// Mapping between workflow step IDs and tab IDs
 export const STEP_TO_TAB: Record<string, string> = {
-  'P1': 'editorial-director',
-  'P2': 'market-analysis',
-  'P3': 'content-architect',
-  'P4': 'expert-writing',
-  'P5': 'natural-rewrite',
-  'P6': 'editorial-quality',
-  'P7': 'editorial-packaging',
-  'P8': 'final-diagnosis',
-  'P9': 'editorial-memory',
-  'P10': 'chapter-coherence',
-  'P11': 'self-critique',
-  'P12': 'iterative-loop',
-  'P13': 'style-signature',
-  'P14': 'ultimate-verdict',
-  'P15': 'humanize-anti-ia',
+  'P1': 'editorial-director', 'P2': 'market-analysis', 'P3': 'content-architect',
+  'P4': 'expert-writing', 'P5': 'natural-rewrite', 'P6': 'editorial-quality',
+  'P7': 'editorial-packaging', 'P8': 'final-diagnosis', 'P9': 'editorial-memory',
+  'P10': 'chapter-coherence', 'P11': 'self-critique', 'P12': 'iterative-loop',
+  'P13': 'style-signature', 'P14': 'ultimate-verdict', 'P15': 'humanize-anti-ia',
 };
 
 export const TAB_TO_STEP: Record<string, string> = Object.fromEntries(
@@ -107,9 +96,7 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
   };
 
   const handleNavigate = (tabId: string) => {
-    if (!isGenerating) {
-      onNavigate(tabId);
-    }
+    if (!isGenerating) onNavigate(tabId);
   };
 
   const getPhaseCompletedCount = (phase: typeof PHASES[0]) => {
@@ -120,20 +107,20 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
     <TooltipProvider delayDuration={200}>
       <div className={cn("space-y-3 mb-6", className)}>
         {/* Header with progress */}
-        <div className="bg-card border-2 border-border rounded-xl p-4 shadow-md">
+        <div className="bg-slate-900/80 border-2 border-white/10 rounded-xl p-4 shadow-lg backdrop-blur-sm">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <span className="text-lg">🚀</span>
-              <span className="text-sm font-bold text-foreground">Workflow Éditorial</span>
-              <Badge variant="outline" className="text-xs font-semibold">
+              <span className="text-sm font-bold text-white">Workflow Éditorial</span>
+              <Badge className="text-xs font-semibold bg-cyan-500/20 text-cyan-400 border-cyan-500/30">
                 {completedCount}/{WORKFLOW_STEPS.length}
               </Badge>
             </div>
-            <span className="text-lg font-bold text-primary">{Math.round(progressPercentage)}%</span>
+            <span className="text-lg font-bold text-cyan-400">{Math.round(progressPercentage)}%</span>
           </div>
           <Progress value={progressPercentage} className="h-2.5 mb-4" />
 
-          {/* Phases with steps — grouped visually */}
+          {/* Phases with steps */}
           <div className="space-y-2">
             {PHASES.map((phase) => {
               const phaseCompleted = getPhaseCompletedCount(phase);
@@ -142,16 +129,14 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
 
               return (
                 <div key={phase.id} className="flex items-center gap-2">
-                  {/* Phase label */}
                   <div className={cn(
                     "flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-semibold shrink-0 min-w-[120px]",
-                    isPhaseComplete ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "bg-muted text-muted-foreground"
+                    isPhaseComplete ? "bg-emerald-500/20 text-emerald-400" : "bg-slate-800/60 text-white/50"
                   )}>
                     <span>{phase.label}</span>
                     <span className="text-[10px] opacity-70">({phaseCompleted}/{phaseTotal})</span>
                   </div>
 
-                  {/* Step circles for this phase */}
                   <div className="flex items-center gap-1 flex-wrap">
                     {phase.steps.map((stepId) => {
                       const step = WORKFLOW_STEPS.find(s => s.id === stepId)!;
@@ -166,35 +151,29 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
                               disabled={status === 'locked' || isGenerating}
                               className={cn(
                                 "flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium transition-all duration-200 border",
-                                status === 'completed' && "bg-green-500 text-white border-green-600 shadow-sm",
-                                status === 'current' && "bg-primary text-primary-foreground border-primary ring-2 ring-primary/30 ring-offset-1 ring-offset-background",
-                                status === 'available' && "bg-card hover:bg-muted text-muted-foreground border-border hover:text-foreground cursor-pointer",
-                                status === 'locked' && "bg-muted/40 text-muted-foreground/40 border-transparent cursor-not-allowed"
+                                status === 'completed' && "bg-emerald-500 text-white border-emerald-600 shadow-sm",
+                                status === 'current' && "bg-cyan-600 text-white border-cyan-500 ring-2 ring-cyan-500/30 ring-offset-1 ring-offset-slate-900",
+                                status === 'available' && "bg-slate-800/60 hover:bg-slate-700/60 text-white/60 border-white/10 hover:text-white cursor-pointer",
+                                status === 'locked' && "bg-slate-800/30 text-white/20 border-transparent cursor-not-allowed"
                               )}
                             >
-                              {status === 'completed' ? (
-                                <Check className="w-3 h-3" />
-                              ) : status === 'locked' ? (
-                                <Lock className="w-3 h-3" />
-                              ) : null}
+                              {status === 'completed' ? <Check className="w-3 h-3" /> : status === 'locked' ? <Lock className="w-3 h-3" /> : null}
                               <span>{step.shortLabel}</span>
                             </button>
                           </TooltipTrigger>
-                          <TooltipContent side="bottom" className="max-w-xs">
+                          <TooltipContent side="bottom" className="max-w-xs bg-slate-800 border-white/10 text-white">
                             <div className="space-y-1">
                               <p className="font-semibold">{step.id}: {step.label}</p>
-                              <p className="text-xs text-muted-foreground">{step.description}</p>
-                              {step.estimatedMinutes && (
-                                <p className="text-xs">⏱️ ~{step.estimatedMinutes} min</p>
-                              )}
+                              <p className="text-xs text-white/60">{step.description}</p>
+                              {step.estimatedMinutes && <p className="text-xs">⏱️ ~{step.estimatedMinutes} min</p>}
                               {status === 'locked' && step.requiredSteps && step.requiredSteps.length > 0 && (
-                                <p className="text-xs text-orange-500 flex items-center gap-1">
+                                <p className="text-xs text-amber-400 flex items-center gap-1">
                                   <AlertCircle className="w-3 h-3" />
                                   Requiert: {step.requiredSteps.join(', ')}
                                 </p>
                               )}
                               {status === 'completed' && (
-                                <p className="text-xs text-green-500 flex items-center gap-1">
+                                <p className="text-xs text-emerald-400 flex items-center gap-1">
                                   <Check className="w-3 h-3" /> Complété
                                 </p>
                               )}
@@ -217,19 +196,19 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
             size="sm"
             onClick={() => prevStep && handleNavigate(STEP_TO_TAB[prevStep.id])}
             disabled={!prevStep || isGenerating}
-            className="flex items-center gap-1"
+            className="flex items-center gap-1 border-white/20 text-white/70 hover:text-white bg-slate-800/50"
           >
             <ChevronLeft className="w-4 h-4" />
             <span className="hidden sm:inline">{prevStep?.shortLabel || 'Préc.'}</span>
           </Button>
 
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-muted/60 rounded-lg border border-border">
-            {isGenerating && <Loader2 className="w-4 h-4 animate-spin text-primary" />}
-            <span className="text-sm font-semibold text-foreground">
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-800/60 rounded-lg border border-white/10">
+            {isGenerating && <Loader2 className="w-4 h-4 animate-spin text-cyan-400" />}
+            <span className="text-sm font-semibold text-white">
               {currentStep.shortLabel}: {currentStep.label}
             </span>
             {hasStepResult(currentStepId) && (
-              <Badge className="bg-green-500 text-white text-[10px] px-1.5 py-0">
+              <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 text-[10px] px-1.5 py-0">
                 <Check className="w-3 h-3 mr-0.5" />Fait
               </Badge>
             )}
@@ -239,7 +218,7 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
             size="sm"
             onClick={() => nextStep && handleNavigate(STEP_TO_TAB[nextStep.id])}
             disabled={!nextStep || isGenerating || (nextStep && !canProceedToNext(nextStep))}
-            className="flex items-center gap-1"
+            className="flex items-center gap-1 bg-cyan-600 hover:bg-cyan-700 text-white"
           >
             <span className="hidden sm:inline">{nextStep?.shortLabel || 'Suiv.'}</span>
             <ChevronRight className="w-4 h-4" />
@@ -247,34 +226,33 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
         </div>
 
         {/* Current Step Details */}
-        <div className="bg-primary/5 border border-primary/20 rounded-lg p-3">
+        <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-lg p-3">
           <div className="flex items-start gap-3">
-            <div className="w-7 h-7 rounded-full bg-primary/15 flex items-center justify-center shrink-0">
-              <span className="text-xs font-bold text-primary">{currentStepIndex + 1}</span>
+            <div className="w-7 h-7 rounded-full bg-cyan-500/20 flex items-center justify-center shrink-0">
+              <span className="text-xs font-bold text-cyan-400">{currentStepIndex + 1}</span>
             </div>
             <div className="min-w-0 flex-1">
-              <h4 className="font-semibold text-sm text-foreground">{currentStep.label}</h4>
-              <p className="text-xs text-muted-foreground mt-0.5">{currentStep.description}</p>
+              <h4 className="font-semibold text-sm text-white">{currentStep.label}</h4>
+              <p className="text-xs text-white/50 mt-0.5">{currentStep.description}</p>
               <div className="flex items-center gap-3 mt-1.5 flex-wrap">
                 {currentStep.estimatedMinutes && (
-                  <span className="text-xs text-primary">⏱️ ~{currentStep.estimatedMinutes} min</span>
+                  <span className="text-xs text-cyan-400">⏱️ ~{currentStep.estimatedMinutes} min</span>
                 )}
                 {currentStep.tip && (
-                  <span className="text-xs text-muted-foreground italic">💡 {currentStep.tip}</span>
+                  <span className="text-xs text-white/40 italic">💡 {currentStep.tip}</span>
                 )}
               </div>
               {currentStep.requiredSteps && currentStep.requiredSteps.length > 0 && !hasStepResult(currentStepId) && (
                 <div className="mt-2 flex items-center gap-1.5 flex-wrap">
-                  <span className="text-xs text-muted-foreground">Prérequis:</span>
+                  <span className="text-xs text-white/40">Prérequis:</span>
                   {currentStep.requiredSteps.map(reqId => (
                     <Badge
                       key={reqId}
-                      variant={hasStepResult(reqId) ? "default" : "outline"}
                       className={cn(
                         "text-[10px] px-1.5 py-0",
                         hasStepResult(reqId)
-                          ? "bg-green-500 text-white"
-                          : "border-orange-300 text-orange-600"
+                          ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
+                          : "bg-amber-500/20 text-amber-400 border-amber-500/30"
                       )}
                     >
                       {hasStepResult(reqId) && <Check className="w-2.5 h-2.5 mr-0.5" />}
