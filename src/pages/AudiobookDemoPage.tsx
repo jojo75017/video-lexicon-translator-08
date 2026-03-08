@@ -96,7 +96,7 @@ const AudiobookDemoPage = () => {
   }, [urgencyEnd]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#3a4a5c] via-[#1e2a38] to-[#0f1319] text-white">
+    <div className="min-h-screen bg-[#F7F3EB] text-gray-900">
       
       {/* Demo banner */}
       <div className="bg-amber-500/90 text-black text-center py-2 text-sm font-semibold">
