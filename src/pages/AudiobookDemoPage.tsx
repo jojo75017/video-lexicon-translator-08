@@ -31,12 +31,12 @@ const DEMO_DATA = {
   chapters: 8,
 };
 
-const MetaRow = ({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) => (
+const MetaRow = ({ icon, label, value, dark = false }: { icon: React.ReactNode; label: string; value: string; dark?: boolean }) => (
   <div className="flex items-start gap-3">
     <div className="mt-0.5 shrink-0">{icon}</div>
     <div className="min-w-0">
-      <p className="text-[11px] uppercase tracking-wider text-white/35 mb-0.5">{label}</p>
-      <p className="text-sm text-white/80 font-medium">{value}</p>
+      <p className={`text-[11px] uppercase tracking-wider mb-0.5 ${dark ? 'text-gray-400' : 'text-white/35'}`}>{label}</p>
+      <p className={`text-sm font-medium ${dark ? 'text-gray-700' : 'text-white/80'}`}>{value}</p>
     </div>
   </div>
 );
