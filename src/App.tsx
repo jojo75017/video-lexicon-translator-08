@@ -69,6 +69,7 @@ import EmailPreviewPage from '@/pages/EmailPreviewPage';
 import ProspectManagerPage from '@/pages/ProspectManagerPage';
 import SocialPostGeneratorPage from '@/pages/SocialPostGeneratorPage';
 import UnifiedMarketingDashboard from '@/pages/UnifiedMarketingDashboard';
+import CrmPage from '@/pages/CrmPage';
 const queryClient = new QueryClient();
 
 const App = () => {
