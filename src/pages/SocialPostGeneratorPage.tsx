@@ -176,7 +176,9 @@ Un export KDP prêt à publier.
 Si vous êtes entrepreneur, freelance, coach, ou expert...
 Vous avez un livre en vous. Cet outil le fait sortir.
 
-🔗 Lien en commentaire pour tester gratuitement.`,
+🔗 Lien en commentaire pour tester gratuitement.
+
+👤 Mon profil : https://www.linkedin.com/in/consultantwebmaster/`,
     hashtags: ['IA', 'KDP', 'Amazon', 'Entrepreneuriat', 'SelfPublishing', 'Innovation']
   },
   {
