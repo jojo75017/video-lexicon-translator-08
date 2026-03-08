@@ -6,7 +6,7 @@ import {
   Play, Pause, Volume2, VolumeX, Headphones, Code, Copy, Check, 
   SkipBack, SkipForward, BookOpen, Clock, Star, Users, Download, 
   ChevronDown, ChevronUp, Mic2, Sparkles, Link2, Calendar, Globe, 
-  FileAudio, Building2, Tag, ShoppingCart, CreditCard
+  FileAudio, Building2, Tag, ShoppingCart, CreditCard, Shield, HelpCircle, Library
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -308,11 +308,122 @@ const AudiobookDemoPage = () => {
             </div>
           </div>
         </div>
+
+        {/* ===== REVIEWS ===== */}
+        <div className="mt-12">
+          <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+            <Star className="w-6 h-6 text-amber-400 fill-amber-400" />
+            Avis des auditeurs
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[
+              { initial: 'M', name: 'Marie L.', stars: 5, text: "Excellente qualité audio ! La narration est fluide et agréable. Je recommande vivement ce livre audio." },
+              { initial: 'P', name: 'Pierre D.', stars: 5, text: "Parfait pour écouter pendant mes trajets. La voix est très naturelle, on oublie que c'est de l'IA !" },
+              { initial: 'S', name: 'Sophie R.', stars: 4, text: "Très bonne découverte, le contenu est riche et bien structuré. J'attends la suite avec impatience." },
+            ].map((review, i) => (
+              <div key={i} className="bg-white/[0.04] border border-white/[0.08] rounded-2xl p-5">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center font-bold text-sm text-white shrink-0">
+                    {review.initial}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-sm text-white">{review.name}</p>
+                    <p className="text-[11px] text-white/35">Achat vérifié</p>
+                  </div>
+                </div>
+                <div className="flex gap-0.5 mb-2">
+                  {[1,2,3,4,5].map(s => (
+                    <Star key={s} className={`w-3.5 h-3.5 ${s <= review.stars ? 'text-amber-400 fill-amber-400' : 'text-white/20'}`} />
+                  ))}
+                </div>
+                <p className="text-white/60 text-sm leading-relaxed">{review.text}</p>
+                <div className="mt-3 inline-flex items-center gap-1 bg-emerald-500/10 text-emerald-400 text-[11px] font-semibold px-2 py-0.5 rounded-full">
+                  <Check className="w-3 h-3" /> Achat vérifié
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ===== GUARANTEE ===== */}
+        <div className="mt-12 bg-gradient-to-r from-emerald-500/[0.08] to-emerald-500/[0.02] border border-emerald-500/20 rounded-2xl p-7 flex flex-col sm:flex-row items-center gap-6">
+          <Shield className="w-16 h-16 text-emerald-400 shrink-0" />
+          <div className="text-center sm:text-left">
+            <h3 className="text-lg font-bold text-emerald-400 mb-2">Garantie Satisfait ou Remboursé — 30 jours</h3>
+            <p className="text-white/60 text-sm leading-relaxed">
+              Vous n'êtes pas satisfait ? Nous vous remboursons intégralement, sans conditions et sans questions. Votre satisfaction est notre priorité absolue.
+            </p>
+          </div>
+        </div>
+
+        {/* ===== FAQ ===== */}
+        <div className="mt-12">
+          <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+            <HelpCircle className="w-6 h-6 text-amber-400" />
+            Questions fréquentes
+          </h2>
+          <div className="space-y-2">
+            {[
+              { q: "Dans quel format est le livre audio ?", a: "Le livre audio est au format MP3 haute définition, compatible avec tous les appareils : smartphone, tablette, ordinateur, enceinte connectée." },
+              { q: "Comment accéder à mon achat ?", a: "Après le paiement, vous recevrez un lien de téléchargement par email. Vous pourrez écouter votre livre audio immédiatement sur n'importe quel appareil." },
+              { q: "La voix est-elle naturelle ?", a: "Oui ! Nous utilisons une technologie de synthèse vocale de dernière génération qui produit une narration fluide, expressive et très naturelle." },
+              { q: "Puis-je être remboursé ?", a: "Absolument. Vous bénéficiez d'une garantie satisfait ou remboursé de 30 jours. Contactez-nous simplement par email." },
+            ].map((faq, i) => (
+              <FaqItem key={i} question={faq.q} answer={faq.a} defaultOpen={i === 0} />
+            ))}
+          </div>
+        </div>
+
+        {/* ===== SIMILAR BOOKS ===== */}
+        <div className="mt-12">
+          <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+            <Library className="w-6 h-6 text-amber-400" />
+            Vous aimerez aussi
+          </h2>
+          <div className="flex gap-4 overflow-x-auto pb-2">
+            {[
+              { title: "Copywriting Avancé", price: "9.99" },
+              { title: "Mindset Entrepreneur", price: "11.99" },
+              { title: "SEO Masterclass", price: "14.99" },
+              { title: "Réseaux Sociaux Pro", price: "8.99" },
+            ].map((book, i) => (
+              <div key={i} className="shrink-0 w-40 bg-white/[0.04] border border-white/[0.08] rounded-xl overflow-hidden hover:-translate-y-1 transition-transform cursor-pointer group">
+                <div className="w-40 h-40 bg-gradient-to-br from-white/[0.06] to-white/[0.02] flex items-center justify-center">
+                  <Headphones className="w-10 h-10 text-white/15 group-hover:text-amber-400/30 transition-colors" />
+                </div>
+                <div className="p-3">
+                  <p className="text-sm font-semibold text-white truncate">{book.title}</p>
+                  <p className="text-xs font-bold text-amber-400 mt-1">{book.price} €</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
       <div className="text-center pb-10 pt-4 border-t border-white/5">
         <p className="text-xs text-white/20">Propulsé par EbookStudio Pro • Audio IA Premium</p>
       </div>
+    </div>
+  );
+};
+
+const FaqItem = ({ question, answer, defaultOpen = false }: { question: string; answer: string; defaultOpen?: boolean }) => {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div className={`border border-white/[0.08] rounded-xl overflow-hidden transition-colors ${open ? 'bg-white/[0.03]' : ''}`}>
+      <button 
+        onClick={() => setOpen(!open)} 
+        className="w-full flex justify-between items-center p-4 text-left font-semibold text-sm text-white hover:bg-white/[0.04] transition-colors"
+      >
+        {question}
+        <ChevronDown className={`w-4 h-4 text-white/30 transition-transform shrink-0 ml-2 ${open ? 'rotate-180' : ''}`} />
+      </button>
+      {open && (
+        <div className="px-4 pb-4 text-sm text-white/55 leading-relaxed">
+          {answer}
+        </div>
+      )}
     </div>
   );
 };
