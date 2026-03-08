@@ -155,6 +155,10 @@ import { EbookKdpPrePublishChecklist } from '@/components/ebook/EbookKdpPrePubli
 import { EbookPromptChainGenerator } from '@/components/ebook/EbookPromptChainGenerator';
 import { EbookCompetitorDashboard } from '@/components/ebook/EbookCompetitorDashboard';
 import { EbookBetaReaderHub } from '@/components/ebook/EbookBetaReaderHub';
+import { EbookTitleABTest } from '@/components/ebook/EbookTitleABTest';
+import { EbookEditorialCalendar } from '@/components/ebook/EbookEditorialCalendar';
+import { EbookBackMatterGenerator } from '@/components/ebook/EbookBackMatterGenerator';
+import { EbookCompetitorSpy } from '@/components/ebook/EbookCompetitorSpy';
 
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
 import { ebookTemplates } from '@/data/ebookTemplates';

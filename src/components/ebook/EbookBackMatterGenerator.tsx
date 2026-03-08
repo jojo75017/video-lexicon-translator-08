@@ -122,7 +122,7 @@ export const EbookBackMatterGenerator: React.FC<EbookBackMatterGeneratorProps> =
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
               {sections.map(s => (
                 <div key={s.key} className="flex items-center gap-2">
-                  <Switch checked={settings[s.key as keyof typeof settings]} onCheckedChange={v => setSettings(p => ({ ...p, [s.key]: v }))} />
+                  <Checkbox checked={settings[s.key as keyof typeof settings]} onCheckedChange={v => setSettings(p => ({ ...p, [s.key]: !!v }))} />
                   <span className="text-xs">{s.label}</span>
                 </div>
               ))}
