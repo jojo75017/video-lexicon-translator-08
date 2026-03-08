@@ -678,7 +678,10 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
   const saveToLibrary = async (audioBlob: Blob, title: string, durationEstimate: number) => {
     try {
       const { data: userData } = await supabase.auth.getUser();
-      if (!userData?.user) return;
+      if (!userData?.user) {
+        toast.warning('⚠️ Connectez-vous pour sauvegarder vos livres audio dans la bibliothèque !');
+        return;
+      }
 
       const userId = userData.user.id;
       const fileName = `${userId}/${Date.now()}-${title.replace(/[^a-zA-Z0-9àâéèêëïîôùûüç\s-]/gi, '').replace(/\s+/g, '-')}.mp3`;
