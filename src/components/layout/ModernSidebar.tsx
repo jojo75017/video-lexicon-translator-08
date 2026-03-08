@@ -157,9 +157,11 @@ const categories: Category[] = [
       { id: 'writing', label: '✏️ Écrire les Chapitres', icon: PenTool },
       { id: 'prompt-library', label: '📚 Bibliothèque Prompts', icon: Library, isNew: true },
       { id: 'manuscript-dashboard', label: '📊 Dashboard Manuscrit', icon: BarChart3, isNew: true },
+      { id: 'ai-detector', label: '🛡️ Détecteur Anti-IA', icon: Shield, isNew: true },
       { id: 'aichat', label: '💬 Assistant IA', icon: Bot },
       { id: 'characters', label: '👥 Personnages', icon: Users },
       { id: 'series', label: '📚 Série / Saga', icon: BookCopy },
+      { id: 'multi-tome-hub', label: '📖 Hub Multi-Tomes', icon: BookCopy, isNew: true },
       { id: 'series-tomes', label: '📖 Tomes de Séries', icon: Library, isLink: true, href: '/series-tomes', isNew: true },
       { id: 'voice', label: '🎤 Dictée Vocale', icon: Volume2 },
     ]
