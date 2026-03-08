@@ -305,7 +305,7 @@ const AudiobookDemoPage = () => {
               </div>
             )}
             {!showFullPlayer && (
-              <Button variant="outline" onClick={() => setShowFullPlayer(true)} className="gap-2 border-white/15 text-white/70 hover:bg-white/10 hover:text-white rounded-full">
+              <Button variant="outline" onClick={() => setShowFullPlayer(true)} className="gap-2 border-white/15 text-white/70 hover:bg-white/10 hover:text-white rounded-full bg-white/[0.04]">
                 <Headphones className="w-4 h-4" />
                 Ouvrir le lecteur complet
               </Button>
