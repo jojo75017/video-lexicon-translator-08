@@ -327,33 +327,33 @@ const AudiobookDemoPage = () => {
 
             {/* Full Player */}
             {showFullPlayer && (
-              <div className="bg-white/[0.04] backdrop-blur-xl border border-white/10 rounded-2xl p-6 md:p-8">
-                <h3 className="text-white font-semibold text-lg mb-5 flex items-center gap-2">
-                  <FileAudio className="w-5 h-5 text-amber-400" />
+              <div className="bg-white border border-gray-200 rounded-2xl p-6 md:p-8 shadow-sm">
+                <h3 className="text-gray-900 font-semibold text-lg mb-5 flex items-center gap-2">
+                  <FileAudio className="w-5 h-5 text-orange-500" />
                   Lecteur complet
                 </h3>
                 <div className="mb-6">
                   <Slider value={[currentTime]} max={duration} step={1} onValueChange={(v) => setCurrentTime(v[0])} className="cursor-pointer" />
-                  <div className="flex justify-between text-xs text-white/40 mt-2 font-mono">
+                  <div className="flex justify-between text-xs text-gray-400 mt-2 font-mono">
                     <span>{formatTime(currentTime)}</span>
                     <span>-{formatTime(Math.max(0, duration - currentTime))}</span>
                   </div>
                 </div>
                 <div className="flex items-center justify-center gap-6">
-                  <Button variant="ghost" size="icon" className="text-white/60 hover:text-white hover:bg-white/10 h-12 w-12 rounded-full">
-                    <div className="relative"><SkipBack className="h-5 w-5" /><span className="absolute -bottom-3 left-1/2 -translate-x-1/2 text-[9px] text-white/40">15s</span></div>
+                  <Button variant="ghost" size="icon" className="text-gray-400 hover:text-gray-700 hover:bg-gray-100 h-12 w-12 rounded-full">
+                    <div className="relative"><SkipBack className="h-5 w-5" /><span className="absolute -bottom-3 left-1/2 -translate-x-1/2 text-[9px] text-gray-400">15s</span></div>
                   </Button>
-                  <Button onClick={() => setIsPlaying(!isPlaying)} className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:via-orange-400 hover:to-amber-500 shadow-xl shadow-amber-500/25 transition-all hover:scale-105 active:scale-95">
+                  <Button onClick={() => setIsPlaying(!isPlaying)} className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 shadow-xl shadow-orange-500/25 transition-all hover:scale-105 active:scale-95">
                     {isPlaying ? <Pause className="h-7 w-7 text-white" /> : <Play className="h-7 w-7 ml-0.5 text-white" />}
                   </Button>
-                  <Button variant="ghost" size="icon" className="text-white/60 hover:text-white hover:bg-white/10 h-12 w-12 rounded-full">
-                    <div className="relative"><SkipForward className="h-5 w-5" /><span className="absolute -bottom-3 left-1/2 -translate-x-1/2 text-[9px] text-white/40">30s</span></div>
+                  <Button variant="ghost" size="icon" className="text-gray-400 hover:text-gray-700 hover:bg-gray-100 h-12 w-12 rounded-full">
+                    <div className="relative"><SkipForward className="h-5 w-5" /><span className="absolute -bottom-3 left-1/2 -translate-x-1/2 text-[9px] text-gray-400">30s</span></div>
                   </Button>
                 </div>
               </div>
             )}
             {!showFullPlayer && (
-              <Button variant="outline" onClick={() => setShowFullPlayer(true)} className="gap-2 border-white/15 text-white/70 hover:bg-white/10 hover:text-white rounded-full bg-white/[0.04]">
+              <Button variant="outline" onClick={() => setShowFullPlayer(true)} className="gap-2 border-gray-300 text-gray-600 hover:bg-gray-100 hover:text-gray-900 rounded-full bg-white">
                 <Headphones className="w-4 h-4" />
                 Ouvrir le lecteur complet
               </Button>
