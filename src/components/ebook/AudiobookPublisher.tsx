@@ -370,6 +370,12 @@ export const AudiobookPublisher: React.FC<AudiobookPublisherProps> = ({
                       Code embed
                     </Button>
                     <Button
+                      variant="outline" size="sm" className="gap-1.5 text-xs h-7"
+                      onClick={() => exportWooCommerce(book)}
+                    >
+                      <ShoppingBag className="h-3 w-3" />
+                      WooCommerce
+                    <Button
                       variant="ghost" size="sm" className="gap-1.5 text-xs h-7"
                       onClick={() => togglePublic(book.id, book.is_public)}
                     >
