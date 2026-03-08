@@ -206,7 +206,7 @@ const DemoPage = () => {
         >
           <Badge className="bg-cyan-500/10 text-cyan-400 border-cyan-500/30 px-4 py-2 mb-6 text-sm">
             <Zap className="w-4 h-4 mr-2" />
-            {remainingTries > 0 ? `${remainingTries} essai${remainingTries > 1 ? 's' : ''} gratuit${remainingTries > 1 ? 's' : ''} restant${remainingTries > 1 ? 's' : ''}` : 'Essais utilisés — Passez à la version complète'}
+            {remainingTries > 0 ? '1 essai gratuit • 3 chapitres • Sans inscription' : 'Essai utilisé — Passez à la version complète'}
           </Badge>
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-5 leading-tight">
             Créez un ebook complet en{' '}
