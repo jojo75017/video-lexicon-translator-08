@@ -213,6 +213,62 @@ body {
   box-shadow: var(--shadow-cyan);
 }
 
+.glow-gold {
+  box-shadow: var(--shadow-gold);
+}
+
+/* Gold Luxe Utilities */
+.text-gradient-gold {
+  background: var(--gradient-gold);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-gold {
+  background: var(--gradient-gold);
+}
+
+.gradient-gold-subtle {
+  background: var(--gradient-gold-subtle);
+}
+
+.border-gold {
+  border-color: hsl(var(--gold));
+}
+
+.ring-gold {
+  --tw-ring-color: hsl(var(--gold) / 0.5);
+}
+
+/* Gold heading styles for generator */
+.gold-heading {
+  background: var(--gradient-gold);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 1px 2px hsl(var(--gold) / 0.3));
+}
+
+/* Gold progress bar */
+.gold-progress [data-state="complete"],
+.gold-progress .bg-primary {
+  background: var(--gradient-gold) !important;
+  box-shadow: 0 0 10px hsl(var(--gold) / 0.4);
+}
+
+/* Gold focus ring for inputs */
+.gold-focus:focus-within {
+  box-shadow: 0 0 0 2px hsl(var(--gold) / 0.3);
+  border-color: hsl(var(--gold));
+}
+
+/* Gold icon accent */
+.gold-icon {
+  color: hsl(var(--gold));
+  filter: drop-shadow(0 0 4px hsl(var(--gold) / 0.3));
+}
+
 /* Animations */
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
