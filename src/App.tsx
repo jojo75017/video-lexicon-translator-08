@@ -52,6 +52,7 @@ import PublicAudiobookPage from './pages/PublicAudiobookPage';
 import AudiobookEmbedPage from './pages/AudiobookEmbedPage';
 import AudiobookDemoPage from './pages/AudiobookDemoPage';
 import FormationEmbedPage from './pages/FormationEmbedPage';
+import ElementorExportPage from './pages/ElementorExportPage';
 import { SubscriptionAuth } from '@/components/SubscriptionAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { SubscriberGate } from '@/components/auth/SubscriberGate';
@@ -453,6 +454,7 @@ const App = () => {
             <Route path="/audiobook/:slug" element={<PublicAudiobookPage />} />
             <Route path="/audiobook-embed/:slug" element={<AudiobookEmbedPage />} />
             <Route path="/formation-embed" element={<FormationEmbedPage />} />
+            <Route path="/elementor-export" element={<ElementorExportPage />} />
             
             {/* SaaS Routes */}
             <Route path="/saas/login" element={<SaasAuthPage />} />
