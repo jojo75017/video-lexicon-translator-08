@@ -6,6 +6,8 @@ import { CrmStats } from '@/components/crm/CrmStats';
 import { CrmContactList } from '@/components/crm/CrmContactList';
 import { CrmContactDialog } from '@/components/crm/CrmContactDialog';
 import { CrmActivityPanel } from '@/components/crm/CrmActivityPanel';
+import { CrmKanban } from '@/components/crm/CrmKanban';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export interface CrmContact {
   id: string;
