@@ -125,6 +125,8 @@ export const AudiobookPublisher: React.FC<AudiobookPublisherProps> = ({
         excerpt_url: excerptUrl || null,
         cover_url: coverUrl || null,
         is_public: isPublic,
+        price: price ? parseFloat(price) : null,
+        paypal_link: paypalLink.trim() || null,
         slug,
         status: audioUrl ? 'published' : 'draft'
       } as any);
