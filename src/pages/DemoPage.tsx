@@ -14,7 +14,7 @@ import { motion } from "framer-motion";
 
 const DEMO_STORAGE_KEY = "ebook_demo_count";
 const EMAIL_CAPTURED_KEY = "ebook_demo_email_captured";
-const MAX_DEMO_TRIES = 3;
+const MAX_DEMO_TRIES = 1;
 
 interface GeneratedChapter {
   title: string;
