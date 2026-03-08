@@ -217,3 +217,42 @@ export function countAllStuckWords(
   
   return total;
 }
+
+/**
+ * Nettoie le texte spécifiquement pour la synthèse vocale (TTS).
+ * Supprime tout le markdown, les astérisques, les balises, et optimise pour la lecture audio.
+ */
+export function cleanForAudio(text: string): string {
+  if (!text || typeof text !== 'string') return text || '';
+  
+  let cleaned = cleanGeneratedText(text);
+  
+  cleaned = cleaned
+    // Supprimer TOUT astérisque restant
+    .replace(/\*/g, '')
+    // Supprimer underscores de mise en forme
+    .replace(/_([^_]+)_/g, '$1')
+    // Supprimer les balises HTML résiduelles
+    .replace(/<[^>]*>/g, '')
+    // Supprimer les crochets markdown [texte](url)
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    // Supprimer les crochets simples [texte]
+    .replace(/\[([^\]]*)\]/g, '$1')
+    // Supprimer les backticks
+    .replace(/`+/g, '')
+    // Remplacer les puces par des pauses naturelles
+    .replace(/^•\s*/gm, '')
+    // Supprimer les numéros de liste (1. 2. etc.) en début de ligne
+    .replace(/^\d+\.\s+/gm, '')
+    // Ajouter des pauses naturelles (points de suspension → pause)
+    .replace(/\.{3,}/g, '...')
+    // Supprimer les doubles tirets
+    .replace(/--+/g, ', ')
+    // Nettoyer les lignes vides multiples
+    .replace(/\n{3,}/g, '\n\n')
+    // Nettoyer les espaces multiples
+    .replace(/  +/g, ' ')
+    .trim();
+  
+  return cleaned;
+}

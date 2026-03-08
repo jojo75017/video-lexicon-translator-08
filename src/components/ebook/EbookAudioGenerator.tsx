@@ -22,6 +22,7 @@ import { saveAs } from 'file-saver';
 import JSZip from 'jszip';
 import { supabase } from '@/integrations/supabase/client';
 import { generateIntroJingle, generateIntroForExport } from '@/utils/audioIntroGenerator';
+import { cleanForAudio } from '@/utils/textCleaner';
 
 interface Chapter {
   id: string;
