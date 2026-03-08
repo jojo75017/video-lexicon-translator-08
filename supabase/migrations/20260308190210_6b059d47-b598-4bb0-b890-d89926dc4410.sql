@@ -1,0 +1,1 @@
+ALTER TABLE public.audiobooks ADD COLUMN IF NOT EXISTS stripe_link TEXT DEFAULT NULL;
