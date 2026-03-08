@@ -135,7 +135,6 @@ export const EbookLibrary: React.FC<EbookLibraryProps> = ({ onLoadProject }) => 
   const formatDuration = (s: number | null) => s ? `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, '0')}` : '--:--';
 
   if (!isAuthenticated) {
-  if (!isAuthenticated) {
     return (
       <div className="flex flex-col items-center justify-center py-20 space-y-4">
         <FolderOpen className="h-12 w-12 text-muted-foreground opacity-50" />
