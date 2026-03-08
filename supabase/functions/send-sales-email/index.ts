@@ -246,6 +246,8 @@ Deno.serve(async (req) => {
     const targetStep = body.step; // for manual: which step to send
     const prospectIds = body.prospect_ids; // for manual: specific prospects
 
+    const batchSize = body.batch_size || 30; // Limit batch to avoid timeout
+
     let query = supabase
       .from("sales_prospects")
       .select("*")
@@ -258,6 +260,8 @@ Deno.serve(async (req) => {
     } else if (mode === "auto") {
       query = query.eq("auto_send", true).lte("next_email_at", new Date().toISOString());
     }
+
+    query = query.order("next_email_at", { ascending: true }).limit(batchSize);
 
     const { data: prospects, error: fetchErr } = await query;
     if (fetchErr) throw fetchErr;
