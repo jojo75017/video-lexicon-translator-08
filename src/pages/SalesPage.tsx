@@ -16,6 +16,10 @@ import SpotsCounter from "@/components/sales/SpotsCounter";
 import RoiCalculator from "@/components/sales/RoiCalculator";
 import SocialProofToast from "@/components/sales/SocialProofToast";
 import PriceComparison from "@/components/sales/PriceComparison";
+import CountdownTimer from "@/components/sales/CountdownTimer";
+import UrgencyBanner from "@/components/sales/UrgencyBanner";
+import GuaranteeSection from "@/components/sales/GuaranteeSection";
+import ProgressEngagement from "@/components/sales/ProgressEngagement";
 
 // ════════════════════════════════════════════════════════════════════════════════
 // DESIGN SYSTEM 2026 — Palette Premium
