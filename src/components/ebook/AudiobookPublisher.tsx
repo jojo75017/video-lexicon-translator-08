@@ -41,6 +41,7 @@ export const AudiobookPublisher: React.FC<AudiobookPublisherProps> = ({
   const [excerptFile, setExcerptFile] = useState<File | null>(null);
   const [price, setPrice] = useState('');
   const [paypalLink, setPaypalLink] = useState('');
+  const [stripeLink, setStripeLink] = useState('');
 
   useEffect(() => {
     fetchAudiobooks();
