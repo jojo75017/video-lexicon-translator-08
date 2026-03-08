@@ -36,7 +36,7 @@ const DemoPage = () => {
   const [title, setTitle] = useState("");
   const [genre, setGenre] = useState("");
   const [targetAudience, setTargetAudience] = useState("");
-  const [numberOfChapters, setNumberOfChapters] = useState("5");
+  const [numberOfChapters] = useState("3");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedPlan, setGeneratedPlan] = useState<GeneratedPlan | null>(null);
   const [rawPlan, setRawPlan] = useState<string | null>(null);
