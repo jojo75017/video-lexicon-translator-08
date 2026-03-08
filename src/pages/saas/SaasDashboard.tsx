@@ -123,8 +123,8 @@ export const SaasDashboard: React.FC = () => {
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Tableau de bord</h1>
-          <p className="text-muted-foreground">Bon retour ! Voici ce qui se passe aujourd'hui.</p>
+          <h1 className="text-3xl font-bold text-white">Tableau de bord</h1>
+          <p className="text-white/70">Bon retour ! Voici ce qui se passe aujourd'hui.</p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline">
