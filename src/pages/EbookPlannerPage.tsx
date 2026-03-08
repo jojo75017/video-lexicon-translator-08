@@ -3030,6 +3030,37 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       
       case 'humanizer':
         return <EbookHumanizer />;
+
+      case 'ai-detector':
+        return <EbookAIDetectorScore />;
+
+      case 'ai-cover-studio':
+        return (
+          <EbookAICoverStudio
+            ebookTitle={ebookTitle}
+            authorName={authorName}
+            onCoverGenerated={(url) => {
+              setEbookImages(prev => [{ url, description: 'Couverture IA' }, ...prev]);
+              toast.success('Couverture ajoutée à votre projet');
+            }}
+          />
+        );
+
+      case 'multi-tome-hub':
+        return <EbookMultiTomeHub />;
+
+      case 'advanced-export':
+        return (
+          <EbookAdvancedExport
+            ebookTitle={ebookTitle}
+            authorName={authorName}
+            chapters={chapters}
+            preface={preface}
+            conclusion={conclusion}
+            characters={characters}
+            coverImage={ebookImages[0]?.url}
+          />
+        );
       
       case 'arc-manager':
         return (
