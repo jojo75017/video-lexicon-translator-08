@@ -251,8 +251,7 @@ body {
 }
 
 /* Gold progress bar */
-.gold-progress [data-state="complete"],
-.gold-progress .bg-primary {
+.gold-progress [data-state] {
   background: var(--gradient-gold) !important;
   box-shadow: 0 0 10px hsl(var(--gold) / 0.4);
 }
