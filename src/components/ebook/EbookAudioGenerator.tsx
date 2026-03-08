@@ -1266,7 +1266,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                         setIsDownloadingIntro(true);
                         try {
                           toast.info('Génération de l\'intro en cours...');
-                          const introBlobs = await generateIntroForExport(generateSectionMp3, ebookTitle, authorName, preface);
+                          const introBlobs = await generateIntroForExport(generateSectionMp3, ebookTitle, authorName, preface, selectedNiche);
                           if (introBlobs.length === 0) {
                             toast.error('Impossible de générer l\'intro');
                             setIsDownloadingIntro(false);
