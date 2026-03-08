@@ -3140,7 +3140,6 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             chapters={chapters}
             preface={preface}
             conclusion={conclusion}
-            coverImage={coverImage}
             kdpDescription={kdpDescription}
             kdpKeywords={kdpKeywords}
             onNavigate={(tab) => setActiveTab(tab)}
