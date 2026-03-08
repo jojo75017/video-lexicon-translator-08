@@ -135,7 +135,17 @@ export const EbookLibrary: React.FC<EbookLibraryProps> = ({ onLoadProject }) => 
   const formatDuration = (s: number | null) => s ? `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, '0')}` : '--:--';
 
   if (isLoading) {
+  if (!isAuthenticated) {
     return (
+      <div className="flex flex-col items-center justify-center py-20 space-y-4">
+        <FolderOpen className="h-12 w-12 text-muted-foreground opacity-50" />
+        <p className="text-lg font-medium">Connexion requise</p>
+        <p className="text-sm text-muted-foreground">Connectez-vous pour retrouver vos ebooks et livres audio sauvegardés.</p>
+        <Button onClick={fetchAll}><RefreshCw className="h-4 w-4 mr-2" /> Réessayer</Button>
+      </div>
+    );
+  }
+
       <div className="flex items-center justify-center py-20">
         <RefreshCw className="h-8 w-8 animate-spin text-primary" />
         <span className="ml-3 text-lg">Chargement de la bibliothèque...</span>
