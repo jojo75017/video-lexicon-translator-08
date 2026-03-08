@@ -412,7 +412,7 @@ const SalesPage = () => {
                       </div>
                       <div>
                         <p className="font-semibold text-white">{t.name}</p>
-                        <p className="text-xs text-slate-500">{t.role}</p>
+                        <p className="text-xs text-white/60">{t.role}</p>
                       </div>
                       <div className="ml-auto flex gap-0.5">
                         {[1,2,3,4,5].map(s => <Star key={s} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />)}
