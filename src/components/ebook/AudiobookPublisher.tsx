@@ -85,6 +85,7 @@ export const AudiobookPublisher: React.FC<AudiobookPublisherProps> = ({
     setUploading(true);
     try {
       let audioUrl = '';
+      let excerptUrl = '';
       
       // Upload audio file
       const fileToUpload = audioFile || (audioBlob ? new File([audioBlob], 'audiobook.mp3', { type: 'audio/mpeg' }) : null);
@@ -94,11 +95,20 @@ export const AudiobookPublisher: React.FC<AudiobookPublisherProps> = ({
         const { error: uploadError } = await supabase.storage
           .from('audiobooks')
           .upload(filePath, fileToUpload);
-        
         if (uploadError) throw uploadError;
-        
         const { data: urlData } = supabase.storage.from('audiobooks').getPublicUrl(filePath);
         audioUrl = urlData.publicUrl;
+      }
+
+      // Upload excerpt file
+      if (excerptFile) {
+        const excerptPath = `${user.id}/${Date.now()}-extrait-${excerptFile.name}`;
+        const { error: excerptError } = await supabase.storage
+          .from('audiobooks')
+          .upload(excerptPath, excerptFile);
+        if (excerptError) throw excerptError;
+        const { data: excerptData } = supabase.storage.from('audiobooks').getPublicUrl(excerptPath);
+        excerptUrl = excerptData.publicUrl;
       }
 
       const slug = generateSlug(title);
@@ -110,11 +120,12 @@ export const AudiobookPublisher: React.FC<AudiobookPublisherProps> = ({
         description: description.trim() || null,
         voice_name: voiceName.trim() || null,
         audio_url: audioUrl || null,
+        excerpt_url: excerptUrl || null,
         cover_url: coverUrl || null,
         is_public: isPublic,
         slug,
         status: audioUrl ? 'published' : 'draft'
-      });
+      } as any);
 
       if (error) throw error;
       
