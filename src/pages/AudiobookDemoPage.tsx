@@ -9,6 +9,7 @@ import {
   FileAudio, Building2, Tag, ShoppingCart, CreditCard, Shield, HelpCircle, Library
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { getRandomReviews } from '@/utils/reviewPool';
 
 const DEMO_DATA = {
   title: "Le Cow-Boy le Plus Rapide",
