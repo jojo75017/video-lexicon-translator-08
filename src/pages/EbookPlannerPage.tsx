@@ -3034,7 +3034,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   };
 
   return (
-    <div className="min-h-screen flex bg-gradient-subtle">
+    <div className="min-h-screen flex bg-slate-950">
       <ModernSidebar 
         activeTab={activeTab}
         onTabChange={handleTabChange}
@@ -3043,14 +3043,12 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       />
 
       <main className="flex-1 overflow-y-auto">
-        {/* Hero Header — 2026 Premium */}
-        <div className="relative overflow-hidden bg-gradient-to-br from-[hsl(262,83%,25%)] via-[hsl(275,80%,30%)] to-[hsl(292,75%,22%)]">
-          {/* Noise texture overlay */}
-          <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\' opacity=\'1\'/%3E%3C/svg%3E")' }} />
-          {/* Floating orbs */}
-          <div className="absolute -top-20 -right-20 w-80 h-80 bg-[hsl(292,84%,61%)] rounded-full blur-[120px] opacity-20" />
-          <div className="absolute -bottom-20 -left-20 w-60 h-60 bg-[hsl(189,94%,43%)] rounded-full blur-[100px] opacity-15" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[hsl(262,83%,58%)] rounded-full blur-[150px] opacity-10" />
+        {/* Hero Header — Dark Premium 2026 */}
+        <div className="relative overflow-hidden bg-slate-950 border-b border-slate-800/50">
+          {/* Subtle glow effects */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(6,182,212,0.1),transparent)]" />
+          <div className="absolute -top-20 -right-20 w-80 h-80 bg-cyan-500/8 rounded-full blur-[120px]" />
+          <div className="absolute -bottom-20 -left-20 w-60 h-60 bg-emerald-500/8 rounded-full blur-[100px]" />
           
           <div className="relative container mx-auto px-6 py-6">
             {/* Top bar */}
@@ -3058,7 +3056,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               <Button
                 variant="ghost"
                 onClick={() => navigate('/ebook-ideas')}
-                className="text-white/60 hover:text-white hover:bg-white/10 backdrop-blur-sm border border-white/10 rounded-xl text-sm"
+                className="text-slate-400 hover:text-white hover:bg-slate-800/50 border border-slate-800 rounded-xl text-sm"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Retour
@@ -3069,7 +3067,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                   type="button"
                   onClick={handleManualSave}
                   disabled={isSaving || !ebookTitle}
-                  className="bg-white/10 backdrop-blur-md hover:bg-white/20 text-white border border-white/20 rounded-xl shadow-lg transition-all duration-300 hover:shadow-[0_0_30px_hsl(160,84%,39%,0.3)]"
+                  className="bg-slate-800/50 hover:bg-slate-700/50 text-white border border-slate-700 rounded-xl transition-all duration-300"
                 >
                   <Save className="h-4 w-4 mr-2" />
                   {isSaving ? 'Sauvegarde...' : 'Sauvegarder'}
@@ -3077,7 +3075,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                 <Button
                   type="button"
                   onClick={resetPlan}
-                  className="bg-white/10 backdrop-blur-md hover:bg-white/20 text-white border border-white/20 rounded-xl shadow-lg"
+                  className="bg-slate-800/50 hover:bg-slate-700/50 text-white border border-slate-700 rounded-xl"
                 >
                   <Plus className="h-4 w-4 mr-2" />
                   Nouveau
@@ -3086,8 +3084,8 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             </div>
             
             <div className="max-w-3xl mx-auto text-center pb-6">
-              <div className="inline-flex items-center justify-center w-16 h-16 mb-5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 shadow-[0_0_40px_hsl(262,83%,58%,0.3)]">
-                <Sparkles className="w-8 h-8 text-white" />
+              <div className="inline-flex items-center justify-center w-16 h-16 mb-5 rounded-2xl bg-gradient-to-br from-cyan-500 to-emerald-500 shadow-lg shadow-cyan-500/20">
+                <Sparkles className="w-8 h-8 text-slate-900" />
               </div>
               
               <h1 className="text-4xl md:text-5xl font-extrabold mb-3 text-white tracking-tight">
@@ -3095,13 +3093,13 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               </h1>
               
               {isSaving && (
-                <Badge variant="secondary" className="bg-white/10 backdrop-blur-md text-white border-white/20">
+                <Badge className="bg-slate-800/50 text-cyan-400 border-slate-700">
                   <Save className="w-3 h-3 mr-1 animate-pulse" />
                   Sauvegarde...
                 </Badge>
               )}
               
-              <p className="text-white/50 max-w-xl mx-auto mt-2 text-sm tracking-wide uppercase font-medium">
+              <p className="text-slate-500 max-w-xl mx-auto mt-2 text-sm tracking-wide uppercase font-medium">
                 Créez des ebooks professionnels avec l'intelligence artificielle
               </p>
               
@@ -3109,19 +3107,19 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               <Button
                 type="button"
                 onClick={() => handleTabChange('url-import')}
-                className="mt-6 relative overflow-hidden bg-white/10 backdrop-blur-md hover:bg-white/20 text-white font-semibold px-8 py-3 h-auto rounded-2xl border border-white/20 group transition-all duration-500 hover:shadow-[0_0_40px_hsl(262,83%,58%,0.4)] hover:-translate-y-0.5"
+                className="mt-6 relative overflow-hidden bg-gradient-to-r from-cyan-500/10 to-emerald-500/10 hover:from-cyan-500/20 hover:to-emerald-500/20 text-white font-semibold px-8 py-3 h-auto rounded-2xl border border-cyan-500/20 group transition-all duration-500 hover:shadow-[0_0_40px_rgba(6,182,212,0.2)] hover:-translate-y-0.5"
               >
-                <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+                <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/5 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
                 <span className="relative flex items-center gap-3">
                   <span className="text-lg">🔗</span>
                   <span>Créer mon premier ebook</span>
-                  <Badge className="bg-white/20 text-white font-bold text-[10px] px-2 py-0.5 border border-white/30">
+                  <Badge className="bg-cyan-500/20 text-cyan-400 font-bold text-[10px] px-2 py-0.5 border border-cyan-500/30">
                     2026
                   </Badge>
                 </span>
               </Button>
 
-              <p className="mt-5 text-white/60 text-sm italic">
+              <p className="mt-5 text-slate-600 text-sm italic">
                 🚀 1, 2, 3… Foncez ! Je suis toujours là pour vous accompagner en Zoom gratuit — Georges
               </p>
             </div>
