@@ -3084,6 +3084,31 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       case 'royalty-dashboard':
         return <EbookRoyaltyDashboard />;
 
+      case 'kdp-prepublish-checklist':
+        return (
+          <EbookKdpPrePublishChecklist
+            ebookTitle={ebookTitle}
+            chapters={chapters}
+            authorName={authorName}
+            kdpDescription={kdpDescription}
+            kdpKeywords={kdpKeywords}
+          />
+        );
+
+      case 'prompt-chain-generator':
+        return <EbookPromptChainGenerator />;
+
+      case 'competitor-dashboard':
+        return <EbookCompetitorDashboard />;
+
+      case 'beta-reader-hub':
+        return (
+          <EbookBetaReaderHub
+            ebookTitle={ebookTitle}
+            chapters={chapters}
+          />
+        );
+
       case 'ux-center':
         return <EbookUXEnhancements />;
 
