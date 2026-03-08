@@ -205,7 +205,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
       sections.push({ id: 'intro', title: 'Introduction', content, wordCount: countWords(content), estimatedMinutes: 0.5, status: 'done' });
     }
     if (preface) {
-      sections.push({ id: 'preface', title: 'Préface', content: preface, wordCount: countWords(preface), estimatedMinutes: Math.ceil(countWords(preface) / 150), status: 'done' });
+      sections.push({ id: 'preface', title: 'Préface', content: cleanForAudio(preface), wordCount: countWords(preface), estimatedMinutes: Math.ceil(countWords(preface) / 150), status: 'done' });
     }
     chapters.forEach((chapter, index) => {
       const chapterContent = chapter.content || '';
@@ -214,17 +214,17 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
         .map(sub => `${sub.title}.\n\n${sub.content || ''}`)
         .filter(c => c.trim().length > 5)
         .join('\n\n');
-      const fullContent = `Chapitre ${index + 1}: ${chapter.title}.\n\n${chapterContent}\n\n${subContent}`;
+      const fullContent = cleanForAudio(`Chapitre ${index + 1}: ${chapter.title}.\n\n${chapterContent}\n\n${subContent}`);
       if (fullContent.trim().length > 50) {
         const wc = countWords(fullContent);
         sections.push({ id: `chapter-${chapter.id}`, title: `Chapitre ${index + 1}: ${chapter.title}`, content: fullContent, wordCount: wc, estimatedMinutes: Math.ceil(wc / 150), status: 'done' });
       }
     });
     if (conclusion) {
-      sections.push({ id: 'conclusion', title: 'Conclusion', content: conclusion, wordCount: countWords(conclusion), estimatedMinutes: Math.ceil(countWords(conclusion) / 150), status: 'done' });
+      sections.push({ id: 'conclusion', title: 'Conclusion', content: cleanForAudio(conclusion), wordCount: countWords(conclusion), estimatedMinutes: Math.ceil(countWords(conclusion) / 150), status: 'done' });
     }
     if (epilogue) {
-      sections.push({ id: 'epilogue', title: 'Épilogue', content: epilogue, wordCount: countWords(epilogue), estimatedMinutes: Math.ceil(countWords(epilogue) / 150), status: 'done' });
+      sections.push({ id: 'epilogue', title: 'Épilogue', content: cleanForAudio(epilogue), wordCount: countWords(epilogue), estimatedMinutes: Math.ceil(countWords(epilogue) / 150), status: 'done' });
     }
     return sections;
   }, [ebookTitle, authorName, preface, conclusion, epilogue, chapters, getSafeSubChapters]);
