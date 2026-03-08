@@ -139,6 +139,7 @@ import SubscriberActivityPopup from '@/components/admin/SubscriberActivityPopup'
 import { EbookLibrary } from '@/components/ebook/EbookLibrary';
 import { AudioExpressWorkflow } from '@/components/ebook/AudioExpressWorkflow';
 import { AudiobookLibrary } from '@/components/ebook/AudiobookLibrary';
+import ElementorExportPage from '@/pages/ElementorExportPage';
 import { EbookDraftMode } from '@/components/ebook/EbookDraftMode';
 import { EbookPromptLibrary } from '@/components/ebook/EbookPromptLibrary';
 import { EbookManuscriptDashboard } from '@/components/ebook/EbookManuscriptDashboard';
@@ -2608,6 +2609,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
 
       case 'audiobook-library':
         return <AudiobookLibrary />;
+
+      case 'elementor-export':
+        return <ElementorExportPage />;
       
       case 'series':
         return (

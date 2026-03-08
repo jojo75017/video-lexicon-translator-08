@@ -60,7 +60,8 @@ import {
   Music,
   CalendarDays,
   Contact,
-  Mail
+  Mail,
+  Code
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -326,6 +327,7 @@ const categories: Category[] = [
       { id: 'audiobook', label: 'Livre Audio', icon: Headphones, isNew: true },
       { id: 'audio-express', label: 'Audio Express', icon: Zap, isNew: true },
       { id: 'audiobook-library', label: 'Mes Livres Audio', icon: Music, isNew: true },
+      { id: 'elementor-export', label: 'Export Elementor', icon: Code, isNew: true },
       { id: 'formation-audiobook-distribution', label: 'Formation Distribution', icon: BookOpen },
     ]
   },
