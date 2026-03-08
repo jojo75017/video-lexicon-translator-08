@@ -216,6 +216,7 @@ const categories: Category[] = [
     color: 'from-orange-500 to-red-500',
     items: [
       { id: 'export', label: '💾 Exporter (PDF, Word)', icon: Download },
+      { id: 'advanced-export', label: '📦 Export Multi-Format', icon: Download, isNew: true },
       { id: 'kdp', label: '📝 Description KDP', icon: TrendingUp },
       { id: 'description-magnet', label: '🧲 Description Magnet', icon: FileText, isNew: true },
       { id: 'export-guide', label: '📖 Guide Export', icon: GraduationCap, isNew: true },
