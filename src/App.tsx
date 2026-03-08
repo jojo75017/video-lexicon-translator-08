@@ -52,6 +52,7 @@ import PublicAudiobookPage from './pages/PublicAudiobookPage';
 import AudiobookEmbedPage from './pages/AudiobookEmbedPage';
 import AudiobookDemoPage from './pages/AudiobookDemoPage';
 import FormationEmbedPage from './pages/FormationEmbedPage';
+import ElementorExportPage from './pages/ElementorExportPage';
 import { SubscriptionAuth } from '@/components/SubscriptionAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { SubscriberGate } from '@/components/auth/SubscriberGate';
