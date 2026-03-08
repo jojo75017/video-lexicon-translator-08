@@ -63,6 +63,7 @@ import SaasAnalytics from '@/pages/saas/SaasAnalytics';
 import SaasBilling from '@/pages/saas/SaasBilling';
 import SaasSettings from '@/pages/saas/SaasSettings';
 import SaasAuthPage from '@/pages/saas/SaasAuthPage';
+import SalesCampaignPage from '@/pages/SalesCampaignPage';
 const queryClient = new QueryClient();
 
 const App = () => {
@@ -270,6 +271,7 @@ const App = () => {
             <Route path="/arc-signup" element={<ArcSignupPage />} />
             <Route path="/communaute" element={<ForumPage />} />
             <Route path="/plan-marketing" element={<MarketingPlanPage />} />
+            <Route path="/campagne-vente" element={<SalesCampaignPage />} />
             <Route path="/resultat-en-5-min" element={<ResultatEn5MinPage />} />
             <Route path="/cadeau" element={<CadeauPage />} />
             <Route 
