@@ -64,7 +64,44 @@ const ProspectManagerPage = () => {
   }, []);
 
   useEffect(() => {
-    fetchProspects();
+    let isMounted = true;
+
+    const initializeAuth = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (!isMounted) return;
+
+      const connected = !!data.session;
+      setHasSession(connected);
+      setAuthReady(true);
+
+      if (connected) {
+        fetchProspects();
+      } else {
+        setLoading(false);
+      }
+    };
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!isMounted) return;
+
+      const connected = !!session;
+      setHasSession(connected);
+      setAuthReady(true);
+
+      if (connected) {
+        fetchProspects();
+      } else {
+        setProspects([]);
+        setLoading(false);
+      }
+    });
+
+    initializeAuth();
+
+    return () => {
+      isMounted = false;
+      authListener.subscription.unsubscribe();
+    };
   }, [fetchProspects]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
