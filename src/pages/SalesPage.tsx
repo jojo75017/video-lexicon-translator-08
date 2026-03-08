@@ -12,6 +12,10 @@ import { Input } from "@/components/ui/input";
 import ExitIntentPopup from "@/components/sales/ExitIntentPopup";
 import SalesFaq from "@/components/sales/SalesFaq";
 import AuthorShowcase from "@/components/sales/AuthorShowcase";
+import SpotsCounter from "@/components/sales/SpotsCounter";
+import RoiCalculator from "@/components/sales/RoiCalculator";
+import SocialProofToast from "@/components/sales/SocialProofToast";
+import PriceComparison from "@/components/sales/PriceComparison";
 
 // ════════════════════════════════════════════════════════════════════════════════
 // DESIGN SYSTEM 2026 — Palette Premium
