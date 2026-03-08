@@ -529,7 +529,7 @@ const SalesPage = () => {
                   <ShieldCheck className="w-7 h-7 text-emerald-400" />
                 </div>
                 <h3 className="text-xl font-bold text-emerald-400 mb-2">Garantie 30 jours</h3>
-                <p className="text-slate-400 text-sm">
+                <p className="text-white/80 text-sm">
                   Testez pendant 30 jours. Pas satisfait ? Remboursé intégralement. Aucune question.
                 </p>
               </CardContent>
