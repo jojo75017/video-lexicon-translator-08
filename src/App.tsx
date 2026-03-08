@@ -65,6 +65,7 @@ import SaasSettings from '@/pages/saas/SaasSettings';
 import SaasAuthPage from '@/pages/saas/SaasAuthPage';
 import SalesCampaignPage from '@/pages/SalesCampaignPage';
 import ProspectManagerPage from '@/pages/ProspectManagerPage';
+import SocialPostGeneratorPage from '@/pages/SocialPostGeneratorPage';
 const queryClient = new QueryClient();
 
 const App = () => {
@@ -273,6 +274,7 @@ const App = () => {
             <Route path="/communaute" element={<ForumPage />} />
             <Route path="/plan-marketing" element={<MarketingPlanPage />} />
             <Route path="/campagne-vente" element={<SalesCampaignPage />} />
+            <Route path="/generateur-posts" element={<AdminGate><SocialPostGeneratorPage /></AdminGate>} />
             <Route path="/gestion-prospects" element={<AdminGate><ProspectManagerPage /></AdminGate>} />
             <Route path="/resultat-en-5-min" element={<ResultatEn5MinPage />} />
             <Route path="/cadeau" element={<CadeauPage />} />
