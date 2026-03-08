@@ -350,7 +350,7 @@ const AudiobookDemoPage = () => {
                   </div>
                   <div>
                     <p className="font-semibold text-sm text-white">{review.name}</p>
-                    <p className="text-[11px] text-white/35">Auditeur vérifié</p>
+                    <p className="text-[11px] text-white/35">A écouté ce titre</p>
                   </div>
                 </div>
                 <div className="flex gap-0.5 mb-2">
