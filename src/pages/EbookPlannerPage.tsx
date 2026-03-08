@@ -2523,6 +2523,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
         return (
           <EbookLibrary onLoadProject={(project) => handleProjectLoad(project)} />
         );
+
+      case 'audiobook-library':
+        return <AudiobookLibrary />;
       
       case 'series':
         return (
