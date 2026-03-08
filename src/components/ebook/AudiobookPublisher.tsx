@@ -6,10 +6,11 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Upload, Globe, Link2, Code, Copy, Check, Trash2, Headphones, ExternalLink, Eye, Loader2, ShoppingBag, Download } from 'lucide-react';
+import { Upload, Globe, Link2, Code, Copy, Check, Trash2, Headphones, ExternalLink, Eye, Loader2, ShoppingBag, Download, FileCode } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { downloadAudiobookHtml } from '@/utils/generateAudiobookHtml';
 
 interface AudiobookPublisherProps {
   ebookTitle?: string;
@@ -375,6 +376,13 @@ export const AudiobookPublisher: React.FC<AudiobookPublisherProps> = ({
                     >
                       <ShoppingBag className="h-3 w-3" />
                       WooCommerce
+                    </Button>
+                    <Button
+                      variant="outline" size="sm" className="gap-1.5 text-xs h-7"
+                      onClick={() => { downloadAudiobookHtml(book); toast.success('HTML Elementor téléchargé !'); }}
+                    >
+                      <FileCode className="h-3 w-3" />
+                      HTML Elementor
                     </Button>
                     <Button
                       variant="ghost" size="sm" className="gap-1.5 text-xs h-7"
