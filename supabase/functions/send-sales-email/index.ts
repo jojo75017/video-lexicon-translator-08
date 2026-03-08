@@ -284,7 +284,7 @@ Deno.serve(async (req) => {
 
       const seqInfo = EMAIL_SEQUENCE[stepToSend - 1];
       const emailBody = getEmailBody(stepToSend, prospect.first_name);
-      const htmlContent = buildHtmlEmail(emailBody);
+      const htmlContent = buildHtmlEmail(emailBody, prospect.email, stepToSend);
 
       try {
         const res = await fetch("https://api.resend.com/emails", {
