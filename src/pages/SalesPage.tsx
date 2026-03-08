@@ -585,10 +585,10 @@ const SalesPage = () => {
               <p className="text-white/60 text-sm leading-relaxed">Le workflow IA #1 en France pour Amazon KDP.</p>
             </div>
             <div>
-              <h4 className="font-semibold mb-4 text-slate-300 text-sm uppercase tracking-wider">Guides</h4>
+              <h4 className="font-semibold mb-4 text-white text-sm uppercase tracking-wider">Guides</h4>
               <ul className="space-y-2.5 text-sm">
-                <li><button onClick={() => navigate("/ecrire-livre-chatgpt")} className="text-slate-500 hover:text-cyan-400 transition-colors">Écrire avec l'IA</button></li>
-                <li><button onClick={() => navigate("/creer-ebook-ia")} className="text-slate-500 hover:text-cyan-400 transition-colors">Créer un ebook IA</button></li>
+                <li><button onClick={() => navigate("/ecrire-livre-chatgpt")} className="text-white/60 hover:text-cyan-400 transition-colors">Écrire avec l'IA</button></li>
+                <li><button onClick={() => navigate("/creer-ebook-ia")} className="text-white/60 hover:text-cyan-400 transition-colors">Créer un ebook IA</button></li>
               </ul>
             </div>
             <div>
