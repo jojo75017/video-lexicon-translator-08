@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { X, Gift, Download, Sparkles, CheckCircle } from "lucide-react";
+import { Gift, Download, Sparkles, CheckCircle } from "lucide-react";
 import { generateKdpNichesPdf } from "@/utils/generateKdpNichesPdf";
 import { toast } from "sonner";
 import { trackExitIntent } from "@/utils/analytics";
@@ -10,55 +10,52 @@ interface ExitIntentPopupProps {
   onContinueToOffer?: () => void;
 }
 
-const EXIT_INTENT_KEY = "exit_intent_shown";
-
 const ExitIntentPopup = ({ onContinueToOffer }: ExitIntentPopupProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const hasAutoShownRef = useRef(false);
 
   const openPopup = useCallback(() => {
-    const alreadyShown = sessionStorage.getItem(EXIT_INTENT_KEY);
-    if (alreadyShown) return;
+    if (hasAutoShownRef.current) return;
+    hasAutoShownRef.current = true;
     trackExitIntent('shown');
     setIsOpen(true);
-    sessionStorage.setItem(EXIT_INTENT_KEY, "true");
   }, []);
 
-  // Exit-intent detection: mouse leaves viewport OR scroll-up rapide OR inactivité
+  // Exit-intent detection: mouse leaves viewport OR retour rapide vers le haut OR inactivité
   useEffect(() => {
     let lastScrollY = window.scrollY;
     let inactivityTimer: ReturnType<typeof setTimeout>;
 
-    // 1) Mouse quitte le viewport (desktop)
     const handleMouseLeave = (e: MouseEvent) => {
       if (e.clientY <= 0) openPopup();
     };
 
-    // 2) Scroll-up rapide (signe de départ)
     const handleScroll = () => {
       const currentY = window.scrollY;
-      if (lastScrollY - currentY > 300 && currentY < 200) {
-        openPopup();
-      }
-      lastScrollY = currentY;
+      const deltaUp = lastScrollY - currentY;
 
-      // Reset inactivity timer on scroll
+      // Déclenchement plus tolérant quand on remonte vers le haut de la page
+      const reachedTopZone = lastScrollY > 260 && currentY < 120;
+      const fastUpNearTop = deltaUp > 120 && currentY < 220;
+      if (reachedTopZone || fastUpNearTop) openPopup();
+
+      lastScrollY = currentY;
       clearTimeout(inactivityTimer);
-      inactivityTimer = setTimeout(() => openPopup(), 45000);
+      inactivityTimer = setTimeout(() => openPopup(), 30000);
     };
 
-    // 3) Inactivité de 45s
     const handleActivity = () => {
       clearTimeout(inactivityTimer);
-      inactivityTimer = setTimeout(() => openPopup(), 45000);
+      inactivityTimer = setTimeout(() => openPopup(), 30000);
     };
 
     const activationTimer = setTimeout(() => {
       document.addEventListener("mouseleave", handleMouseLeave);
       window.addEventListener("scroll", handleScroll, { passive: true });
       document.addEventListener("mousemove", handleActivity, { passive: true });
-      inactivityTimer = setTimeout(() => openPopup(), 45000);
-    }, 5000);
+      inactivityTimer = setTimeout(() => openPopup(), 30000);
+    }, 1000);
 
     return () => {
       clearTimeout(activationTimer);
