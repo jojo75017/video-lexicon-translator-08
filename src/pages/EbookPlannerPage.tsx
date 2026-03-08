@@ -3066,6 +3066,23 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           />
         );
       
+      case 'writing-intelligence':
+        return (
+          <EbookWritingIntelligence
+            chapters={chapters}
+            onUpdateChapterContent={handleUpdateChapterContent}
+          />
+        );
+
+      case 'publication-planner':
+        return <EbookPublicationPlanner />;
+
+      case 'royalty-dashboard':
+        return <EbookRoyaltyDashboard />;
+
+      case 'ux-center':
+        return <EbookUXEnhancements />;
+
       case 'arc-manager':
         return (
           <EbookArcManager
