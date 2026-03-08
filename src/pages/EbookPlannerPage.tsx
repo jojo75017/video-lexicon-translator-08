@@ -2513,6 +2513,8 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             chapters={chapters}
             preface={preface}
             conclusion={conclusion}
+            authorName={authorName}
+            onNavigateToAudio={() => handleTabChange('audiobook')}
           />
         );
 
