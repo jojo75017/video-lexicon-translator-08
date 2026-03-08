@@ -240,6 +240,7 @@ const categories: Category[] = [
     color: 'from-teal-500 to-cyan-500',
     items: [
       { id: 'cover', label: '📕 Couverture Avant', icon: Palette },
+      { id: 'ai-cover-studio', label: '🎨 Couverture IA Pro', icon: Sparkles, isNew: true },
       { id: 'backcover', label: '📖 Couverture Arrière', icon: BookCopy },
       { id: 'images', label: '🎨 Images Chapitres', icon: Image },
       { id: 'imagebank', label: '🏦 Banque Images', icon: ImagePlus },
