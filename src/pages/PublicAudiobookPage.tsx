@@ -423,16 +423,16 @@ h1{font-size:2.5rem;font-weight:800;margin-bottom:8px;line-height:1.1}
                 <span className="text-amber-400/80 text-sm hover:underline cursor-pointer">{audiobook.play_count || 0} écoutes</span>
               </div>
 
-              {/* Excerpt player */}
-              {audiobook.audio_url && (
+              {/* Excerpt player - uses dedicated excerpt if available, otherwise full audio */}
+              {((audiobook as any).excerpt_url || audiobook.audio_url) && (
                 <div className="mb-6">
                   <ExcerptPlayer
-                    audioRef={audioRef}
-                    isPlaying={isPlaying}
-                    currentTime={currentTime}
-                    duration={duration}
-                    onTogglePlay={togglePlay}
-                    onSeek={seek}
+                    audioRef={(audiobook as any).excerpt_url ? excerptRef : audioRef}
+                    isPlaying={(audiobook as any).excerpt_url ? excerptPlaying : isPlaying}
+                    currentTime={(audiobook as any).excerpt_url ? excerptTime : currentTime}
+                    duration={(audiobook as any).excerpt_url ? excerptDuration : duration}
+                    onTogglePlay={(audiobook as any).excerpt_url ? toggleExcerpt : togglePlay}
+                    onSeek={(audiobook as any).excerpt_url ? seekExcerpt : seek}
                     formatTime={formatTime}
                   />
                 </div>
