@@ -3,6 +3,8 @@
  * Ready to paste into an Elementor HTML widget or any WordPress page.
  */
 
+import { getRandomReviews } from './reviewPool';
+
 interface AudiobookData {
   title: string;
   author_name?: string | null;
@@ -213,33 +215,16 @@ export function generateAudiobookHtml(book: AudiobookData): string {
   <div class="ab-reviews">
     <h2>⭐ Avis des auditeurs</h2>
     <div class="ab-reviews-grid">
+      ${getRandomReviews(book.slug || book.title || 'default').map(r => `
       <div class="ab-review">
         <div class="ab-review-header">
-          <div class="ab-review-avatar">M</div>
-          <div><div class="ab-review-name">Marie L.</div><div class="ab-review-date">Achat vérifié</div></div>
+          <div class="ab-review-avatar">${r.initial}</div>
+          <div><div class="ab-review-name">${escHtml(r.name)}</div><div class="ab-review-date">Achat vérifié</div></div>
         </div>
-        <div class="ab-review-stars">★★★★★</div>
-        <div class="ab-review-text">Excellente qualité audio ! La narration est fluide et agréable. Je recommande vivement ce livre audio.</div>
+        <div class="ab-review-stars">${'★'.repeat(r.stars)}${'☆'.repeat(5 - r.stars)}</div>
+        <div class="ab-review-text">${escHtml(r.text)}</div>
         <div class="ab-review-badge">✓ Achat vérifié</div>
-      </div>
-      <div class="ab-review">
-        <div class="ab-review-header">
-          <div class="ab-review-avatar">P</div>
-          <div><div class="ab-review-name">Pierre D.</div><div class="ab-review-date">Achat vérifié</div></div>
-        </div>
-        <div class="ab-review-stars">★★★★★</div>
-        <div class="ab-review-text">Parfait pour écouter pendant mes trajets. La voix est très naturelle, on oublie que c'est de l'IA !</div>
-        <div class="ab-review-badge">✓ Achat vérifié</div>
-      </div>
-      <div class="ab-review">
-        <div class="ab-review-header">
-          <div class="ab-review-avatar">S</div>
-          <div><div class="ab-review-name">Sophie R.</div><div class="ab-review-date">Achat vérifié</div></div>
-        </div>
-        <div class="ab-review-stars">★★★★⭐</div>
-        <div class="ab-review-text">Très bonne découverte, le contenu est riche et bien structuré. J'attends la suite avec impatience.</div>
-        <div class="ab-review-badge">✓ Achat vérifié</div>
-      </div>
+      </div>`).join('')}
     </div>
   </div>
 
