@@ -229,6 +229,17 @@ export const AudiobookPublisher: React.FC<AudiobookPublisherProps> = ({
                   <Input type="file" accept="audio/*" onChange={(e) => setExcerptFile(e.target.files?.[0] || null)} />
                   <p className="text-xs text-muted-foreground mt-1">Court extrait (30s à 2min) pour donner envie d'écouter</p>
                 </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label>Prix (€)</Label>
+                    <Input type="number" step="0.01" min="0" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Ex: 9.99" />
+                    <p className="text-xs text-muted-foreground mt-1">Laisser vide = gratuit</p>
+                  </div>
+                  <div>
+                    <Label>Lien PayPal</Label>
+                    <Input value={paypalLink} onChange={(e) => setPaypalLink(e.target.value)} placeholder="https://paypal.me/..." />
+                  </div>
+                </div>
                 <div className="flex items-center gap-2">
                   <Checkbox id="is-public" checked={isPublic} onCheckedChange={(v) => setIsPublic(!!v)} />
                   <Label htmlFor="is-public">Page publique (visible par tous)</Label>
