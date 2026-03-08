@@ -148,10 +148,10 @@ const SalesPage = () => {
           </Link>
           
           <nav className="hidden md:flex items-center gap-6 text-sm">
-            <a href="#features" className="text-slate-400 hover:text-white transition-colors">Fonctionnalités</a>
-            <a href="#pricing" className="text-slate-400 hover:text-white transition-colors">Tarif</a>
-            <Link to="/demo" className="text-slate-400 hover:text-white transition-colors">Démo</Link>
-            <Link to="/faq" className="text-slate-400 hover:text-white transition-colors">FAQ</Link>
+            <a href="#features" className="text-slate-300 hover:text-white transition-colors">Fonctionnalités</a>
+            <a href="#pricing" className="text-slate-300 hover:text-white transition-colors">Tarif</a>
+            <Link to="/demo" className="text-slate-300 hover:text-white transition-colors">Démo</Link>
+            <Link to="/faq" className="text-slate-300 hover:text-white transition-colors">FAQ</Link>
           </nav>
 
           <Button onClick={scrollToPricing} className="bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold rounded-xl px-5">
@@ -187,7 +187,7 @@ const SalesPage = () => {
             en moins d'une heure
           </motion.h1>
 
-          <motion.p variants={fadeIn} custom={2} className="text-lg sm:text-xl text-slate-400 mb-8 max-w-2xl mx-auto leading-relaxed">
+          <motion.p variants={fadeIn} custom={2} className="text-lg sm:text-xl text-white/80 mb-8 max-w-2xl mx-auto leading-relaxed">
             Le workflow IA complet qui a déjà généré <span className="text-white font-semibold">+35 ebooks publiés</span> sur Amazon KDP.
             Rédaction, couvertures, audiobooks — tout en un.
           </motion.p>
@@ -201,7 +201,7 @@ const SalesPage = () => {
             ].map((stat, i) => (
               <div key={i} className="text-center">
                 <p className="text-3xl sm:text-4xl font-black text-white">{stat.value}</p>
-                <p className="text-sm text-slate-500 mt-1">{stat.label}</p>
+                <p className="text-sm text-white/70 mt-1">{stat.label}</p>
               </div>
             ))}
           </motion.div>
@@ -215,13 +215,13 @@ const SalesPage = () => {
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
             <Button size="lg" variant="outline" onClick={() => navigate('/demo')}
-              className="w-full sm:w-auto text-base px-8 py-6 border-slate-700 text-slate-300 hover:text-white hover:border-slate-600 hover:bg-slate-800/50 rounded-2xl">
+              className="w-full sm:w-auto text-base px-8 py-6 border-slate-700 text-white hover:text-white hover:border-slate-600 hover:bg-slate-800/50 rounded-2xl">
               <Play className="w-5 h-5 mr-2" />
               Voir la démo
             </Button>
           </motion.div>
 
-          <motion.div variants={fadeIn} custom={5} className="flex flex-wrap justify-center gap-4 text-sm text-slate-500">
+          <motion.div variants={fadeIn} custom={5} className="flex flex-wrap justify-center gap-4 text-sm text-white/70">
             <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-500" />Paiement unique</span>
             <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-500" />Accès à vie</span>
             <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-500" />Garantie 30 jours</span>
@@ -241,14 +241,14 @@ const SalesPage = () => {
               </div>
               <div>
                 <p className="font-semibold text-white">47+ auteurs</p>
-                <p className="text-xs text-slate-500">utilisent EbookStudio</p>
+                <p className="text-xs text-white/60">utilisent EbookStudio</p>
               </div>
             </div>
             <div className="h-10 w-px bg-slate-800 hidden sm:block" />
             <div className="flex items-center gap-2">
               {[1,2,3,4,5].map(i => <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />)}
               <span className="font-bold text-white ml-2">4.8/5</span>
-              <span className="text-slate-500 text-sm">(47 avis)</span>
+              <span className="text-white/60 text-sm">(47 avis)</span>
             </div>
             <div className="h-10 w-px bg-slate-800 hidden sm:block" />
             <div className="flex items-center gap-3">
@@ -257,7 +257,7 @@ const SalesPage = () => {
               </div>
               <div>
                 <p className="font-semibold text-white">#1 en France</p>
-                <p className="text-xs text-slate-500">Workflow KDP IA</p>
+                <p className="text-xs text-white/60">Workflow KDP IA</p>
               </div>
             </div>
           </div>
@@ -272,7 +272,7 @@ const SalesPage = () => {
             <motion.h2 variants={fadeIn} custom={1} className="text-3xl sm:text-4xl md:text-5xl font-black mb-5">
               Tout ce dont vous avez besoin
             </motion.h2>
-            <motion.p variants={fadeIn} custom={2} className="text-slate-400 text-lg max-w-2xl mx-auto">
+            <motion.p variants={fadeIn} custom={2} className="text-white/80 text-lg max-w-2xl mx-auto">
               Un écosystème complet pour créer, optimiser et publier vos ebooks sur Amazon KDP
             </motion.p>
           </motion.div>
@@ -294,7 +294,7 @@ const SalesPage = () => {
                       <feature.icon className="w-7 h-7 text-white" />
                     </div>
                     <h3 className="font-bold text-xl text-white mb-2">{feature.title}</h3>
-                    <p className="text-slate-400 leading-relaxed">{feature.desc}</p>
+                    <p className="text-white/70 leading-relaxed">{feature.desc}</p>
                   </CardContent>
                 </Card>
               </motion.div>
@@ -310,7 +310,7 @@ const SalesPage = () => {
             <motion.h2 variants={fadeIn} className="text-3xl sm:text-4xl md:text-5xl font-black mb-4">
               La différence EbookStudio
             </motion.h2>
-            <motion.p variants={fadeIn} custom={1} className="text-slate-400 text-lg">Comparez vous-même</motion.p>
+            <motion.p variants={fadeIn} custom={1} className="text-white/80 text-lg">Comparez vous-même</motion.p>
           </motion.div>
 
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}
@@ -336,7 +336,7 @@ const SalesPage = () => {
                       "Aucune idée des mots-clés Amazon",
                       "Mise en page amateur, refusée par KDP",
                     ].map((item, i) => (
-                      <div key={i} className="flex items-center gap-3 text-slate-400">
+                      <div key={i} className="flex items-center gap-3 text-white/80">
                         <div className="w-5 h-5 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0">
                           <span className="text-red-400 text-xs">✕</span>
                         </div>
@@ -412,13 +412,13 @@ const SalesPage = () => {
                       </div>
                       <div>
                         <p className="font-semibold text-white">{t.name}</p>
-                        <p className="text-xs text-slate-500">{t.role}</p>
+                        <p className="text-xs text-white/60">{t.role}</p>
                       </div>
                       <div className="ml-auto flex gap-0.5">
                         {[1,2,3,4,5].map(s => <Star key={s} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />)}
                       </div>
                     </div>
-                    <p className="text-slate-300 leading-relaxed">"{t.text}"</p>
+                    <p className="text-white/90 leading-relaxed">"{t.text}"</p>
                   </CardContent>
                 </Card>
               </motion.div>
@@ -442,7 +442,7 @@ const SalesPage = () => {
             <motion.h2 variants={fadeIn} custom={1} className="text-4xl sm:text-5xl md:text-6xl font-black mb-4">
               Accès Pro Lifetime
             </motion.h2>
-            <motion.p variants={fadeIn} custom={2} className="text-slate-400 text-lg">
+            <motion.p variants={fadeIn} custom={2} className="text-white/80 text-lg">
               Un paiement unique. Accès à vie. Sans abonnement.
             </motion.p>
           </motion.div>
@@ -455,11 +455,11 @@ const SalesPage = () => {
                 {/* Price */}
                 <div className="text-center mb-10">
                   <div className="flex items-baseline justify-center gap-3 mb-2">
-                    <span className="text-2xl text-slate-500 line-through">{NORMAL_PRICE}€</span>
+                    <span className="text-2xl text-white/50 line-through">{NORMAL_PRICE}€</span>
                     <span className="text-7xl md:text-8xl font-black text-white">{LAUNCH_PRICE}</span>
-                    <span className="text-3xl font-bold text-slate-400">€</span>
+                    <span className="text-3xl font-bold text-white/70">€</span>
                   </div>
-                  <p className="text-slate-500">Paiement unique • Accès à vie</p>
+                  <p className="text-white/60">Paiement unique • Accès à vie</p>
                 </div>
 
                 {/* Features */}
@@ -482,7 +482,7 @@ const SalesPage = () => {
                       <div className="w-5 h-5 rounded-full bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
                         <Check className="w-3 h-3 text-cyan-400" />
                       </div>
-                      <span className="text-sm text-slate-300">{f}</span>
+                      <span className="text-sm text-white">{f}</span>
                     </div>
                   ))}
                 </div>
@@ -497,7 +497,7 @@ const SalesPage = () => {
 
                 {/* Paiement fractionné */}
                 <div className="mt-8 pt-6 border-t border-slate-800">
-                  <p className="text-center text-slate-500 text-sm mb-4">Ou payez en plusieurs fois</p>
+                  <p className="text-center text-white/60 text-sm mb-4">Ou payez en plusieurs fois</p>
                   <div className="grid grid-cols-2 gap-4">
                     {[
                       { label: "En 3 fois", price: "33€/mois" },
@@ -506,14 +506,14 @@ const SalesPage = () => {
                       <button key={i} onClick={handlePlanClick}
                         className="p-4 rounded-xl border border-slate-800 hover:border-cyan-500/50 transition-colors text-center group">
                         <p className="font-bold text-white group-hover:text-cyan-400 transition-colors">{opt.label}</p>
-                        <p className="text-sm text-slate-500">{opt.price}</p>
+                        <p className="text-sm text-white/60">{opt.price}</p>
                       </button>
                     ))}
                   </div>
                 </div>
 
                 {/* Garantie */}
-                <div className="flex items-center justify-center gap-3 mt-8 text-slate-500 text-sm">
+                <div className="flex items-center justify-center gap-3 mt-8 text-white/60 text-sm">
                   <ShieldCheck className="w-5 h-5 text-emerald-500" />
                   <span>Paiement sécurisé • Accès immédiat • Garantie 30 jours</span>
                 </div>
@@ -529,7 +529,7 @@ const SalesPage = () => {
                   <ShieldCheck className="w-7 h-7 text-emerald-400" />
                 </div>
                 <h3 className="text-xl font-bold text-emerald-400 mb-2">Garantie 30 jours</h3>
-                <p className="text-slate-400 text-sm">
+                <p className="text-white/80 text-sm">
                   Testez pendant 30 jours. Pas satisfait ? Remboursé intégralement. Aucune question.
                 </p>
               </CardContent>
@@ -554,9 +554,9 @@ const SalesPage = () => {
           <motion.h2 variants={fadeIn} className="text-3xl sm:text-4xl md:text-5xl font-black mb-5 leading-tight">
             Chaque jour sans ebook publié
             <br />
-            <span className="text-slate-500">est un jour de revenus perdu.</span>
+            <span className="text-white/60">est un jour de revenus perdu.</span>
           </motion.h2>
-          <motion.p variants={fadeIn} custom={1} className="text-slate-400 mb-8 text-lg">
+          <motion.p variants={fadeIn} custom={1} className="text-white/80 mb-8 text-lg">
             Votre premier ebook peut être en ligne sur Amazon ce soir.
           </motion.p>
           <motion.div variants={fadeIn} custom={2}>
@@ -566,7 +566,7 @@ const SalesPage = () => {
               Commencer maintenant — {LAUNCH_PRICE}€
               <ArrowRight className="w-6 h-6 ml-2" />
             </Button>
-            <p className="text-slate-500 text-sm mt-5">Paiement unique • Accès à vie • Garantie 30 jours</p>
+            <p className="text-white/60 text-sm mt-5">Paiement unique • Accès à vie • Garantie 30 jours</p>
           </motion.div>
         </motion.div>
       </section>
@@ -582,38 +582,38 @@ const SalesPage = () => {
                 </div>
                 <h3 className="text-lg font-bold text-white">EbookStudio Pro</h3>
               </div>
-              <p className="text-slate-500 text-sm leading-relaxed">Le workflow IA #1 en France pour Amazon KDP.</p>
+              <p className="text-white/60 text-sm leading-relaxed">Le workflow IA #1 en France pour Amazon KDP.</p>
             </div>
             <div>
-              <h4 className="font-semibold mb-4 text-slate-300 text-sm uppercase tracking-wider">Guides</h4>
+              <h4 className="font-semibold mb-4 text-white text-sm uppercase tracking-wider">Guides</h4>
               <ul className="space-y-2.5 text-sm">
-                <li><button onClick={() => navigate("/ecrire-livre-chatgpt")} className="text-slate-500 hover:text-cyan-400 transition-colors">Écrire avec l'IA</button></li>
-                <li><button onClick={() => navigate("/creer-ebook-ia")} className="text-slate-500 hover:text-cyan-400 transition-colors">Créer un ebook IA</button></li>
+                <li><button onClick={() => navigate("/ecrire-livre-chatgpt")} className="text-white/60 hover:text-cyan-400 transition-colors">Écrire avec l'IA</button></li>
+                <li><button onClick={() => navigate("/creer-ebook-ia")} className="text-white/60 hover:text-cyan-400 transition-colors">Créer un ebook IA</button></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4 text-slate-300 text-sm uppercase tracking-wider">Produit</h4>
+              <h4 className="font-semibold mb-4 text-white text-sm uppercase tracking-wider">Produit</h4>
               <ul className="space-y-2.5 text-sm">
-                <li><button onClick={() => navigate("/demo")} className="text-slate-500 hover:text-cyan-400 transition-colors">Démo gratuite</button></li>
-                <li><button onClick={() => navigate("/formation")} className="text-slate-500 hover:text-cyan-400 transition-colors">Formation</button></li>
+                <li><button onClick={() => navigate("/demo")} className="text-white/60 hover:text-cyan-400 transition-colors">Démo gratuite</button></li>
+                <li><button onClick={() => navigate("/formation")} className="text-white/60 hover:text-cyan-400 transition-colors">Formation</button></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4 text-slate-300 text-sm uppercase tracking-wider">Légal</h4>
+              <h4 className="font-semibold mb-4 text-white text-sm uppercase tracking-wider">Légal</h4>
               <ul className="space-y-2.5 text-sm">
-                <li><button onClick={() => navigate("/mentions-legales")} className="text-slate-500 hover:text-cyan-400 transition-colors">Mentions légales</button></li>
-                <li><button onClick={() => navigate("/cgv")} className="text-slate-500 hover:text-cyan-400 transition-colors">CGV</button></li>
-                <li><button onClick={() => navigate("/politique-confidentialite")} className="text-slate-500 hover:text-cyan-400 transition-colors">Confidentialité</button></li>
+                <li><button onClick={() => navigate("/mentions-legales")} className="text-white/60 hover:text-cyan-400 transition-colors">Mentions légales</button></li>
+                <li><button onClick={() => navigate("/cgv")} className="text-white/60 hover:text-cyan-400 transition-colors">CGV</button></li>
+                <li><button onClick={() => navigate("/politique-confidentialite")} className="text-white/60 hover:text-cyan-400 transition-colors">Confidentialité</button></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4 text-slate-300 text-sm uppercase tracking-wider">Newsletter</h4>
-              <p className="text-slate-500 text-sm mb-4">Conseils KDP et IA gratuits</p>
+              <h4 className="font-semibold mb-4 text-white text-sm uppercase tracking-wider">Newsletter</h4>
+              <p className="text-white/60 text-sm mb-4">Conseils KDP et IA gratuits</p>
               <NewsletterForm />
             </div>
           </div>
           <div className="border-t border-slate-800 pt-8 text-center">
-            <p className="text-xs text-slate-600">© 2026 EbookStudio Pro — Tous droits réservés</p>
+            <p className="text-xs text-white/40">© 2026 EbookStudio Pro — Tous droits réservés</p>
           </div>
         </div>
       </footer>
