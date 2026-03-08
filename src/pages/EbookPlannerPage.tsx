@@ -151,6 +151,10 @@ import { EbookWritingIntelligence } from '@/components/ebook/EbookWritingIntelli
 import { EbookPublicationPlanner } from '@/components/ebook/EbookPublicationPlanner';
 import { EbookRoyaltyDashboard } from '@/components/ebook/EbookRoyaltyDashboard';
 import { EbookUXEnhancements } from '@/components/ebook/EbookUXEnhancements';
+import { EbookKdpPrePublishChecklist } from '@/components/ebook/EbookKdpPrePublishChecklist';
+import { EbookPromptChainGenerator } from '@/components/ebook/EbookPromptChainGenerator';
+import { EbookCompetitorDashboard } from '@/components/ebook/EbookCompetitorDashboard';
+import { EbookBetaReaderHub } from '@/components/ebook/EbookBetaReaderHub';
 
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
 import { ebookTemplates } from '@/data/ebookTemplates';
@@ -3079,6 +3083,31 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
 
       case 'royalty-dashboard':
         return <EbookRoyaltyDashboard />;
+
+      case 'kdp-prepublish-checklist':
+        return (
+          <EbookKdpPrePublishChecklist
+            ebookTitle={ebookTitle}
+            chapters={chapters}
+            authorName={authorName}
+            kdpDescription={kdpDescription}
+            kdpKeywords={kdpKeywords}
+          />
+        );
+
+      case 'prompt-chain-generator':
+        return <EbookPromptChainGenerator />;
+
+      case 'competitor-dashboard':
+        return <EbookCompetitorDashboard />;
+
+      case 'beta-reader-hub':
+        return (
+          <EbookBetaReaderHub
+            ebookTitle={ebookTitle}
+            chapters={chapters}
+          />
+        );
 
       case 'ux-center':
         return <EbookUXEnhancements />;
