@@ -1209,7 +1209,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                         jingleAudioRef.current = audio;
                         setIsPreviewingJingle(true);
                         try {
-                          const introBlobs = await generateIntroJingle(generateSectionMp3, ebookTitle);
+                          const introBlobs = await generateIntroJingle(generateSectionMp3, ebookTitle, authorName, preface);
                           if (introBlobs.length === 0) {
                             toast.error('Impossible de générer le jingle');
                             setIsPreviewingJingle(false);
