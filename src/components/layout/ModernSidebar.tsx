@@ -506,7 +506,8 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
       ...cat,
       items: cat.items.filter(item => {
         // Hide admin-only items for non-admins
-        if (item.id === 'admin-panel' && !isAdmin) return false;
+        const adminOnlyIds = ['admin-panel', 'crm-page', 'email-preview', 'prospect-manager'];
+        if (adminOnlyIds.includes(item.id) && !isAdmin) return false;
         return true;
       })
     }));
