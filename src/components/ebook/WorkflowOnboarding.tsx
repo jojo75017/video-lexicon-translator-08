@@ -133,7 +133,7 @@ export const WorkflowOnboarding: React.FC<WorkflowOnboardingProps> = ({
           </motion.div>
 
           <div className="space-y-3">
-            <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">
+            <h1 className="text-3xl md:text-4xl font-extrabold text-gradient-gold tracking-tight">
               {isFirstTime 
                 ? "Créez votre ebook en 4 étapes simples"
                 : ebookTitle 
