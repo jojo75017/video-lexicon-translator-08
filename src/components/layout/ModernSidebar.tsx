@@ -427,7 +427,7 @@ const QuotaDisplay: React.FC<{ isCollapsed: boolean }> = ({ isCollapsed }) => {
         <div className="p-3 rounded-xl bg-slate-900/50 border border-slate-800">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <Star className="w-4 h-4 text-cyan-400" />
+              <Star className="w-4 h-4 text-gold" />
               <span className="text-xs font-semibold text-white">Mon Plan</span>
             </div>
             <span className={cn(
