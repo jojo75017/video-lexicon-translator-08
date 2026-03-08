@@ -10,10 +10,11 @@ import { Label } from '@/components/ui/label';
 import {
   Target, ListOrdered, PenTool, Sparkles, Clock, Mic2,
   Volume2, Combine, Archive, ChevronRight, ChevronLeft,
-  CheckCircle2, Lock, Loader2, Headphones
+  CheckCircle2, Lock, Loader2, Headphones, Download
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cleanForAudio } from '@/utils/textCleaner';
+import { INTRO_TEXT } from '@/utils/audioIntroGenerator';
 
 // --- Constants ---
 
@@ -169,6 +170,52 @@ Découvrez ${t}, une aventure captivante à écouter en famille ou en solo. Plon
       toast.info('🎙️ Redirection vers le générateur audio...');
       setTimeout(() => onNavigateToAudio(), 500);
     }
+  };
+
+  // Download intro as text file (for TTS or site usage)
+  const handleDownloadIntro = () => {
+    const brief = getBriefData();
+    const title = brief.bookTitle || bookTitle || 'livre-audio';
+    const introText = brief.introduction || introduction;
+    const blob = new Blob([introText], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `intro-${title.replace(/\s+/g, '-').toLowerCase()}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success('📥 Introduction téléchargée');
+  };
+
+  // Download full cleaned text for export
+  const handleDownloadFullExport = () => {
+    const brief = getBriefData();
+    const title = brief.bookTitle || bookTitle || 'livre-audio';
+    const author = brief.authorName || authorNameState || 'Auteur';
+    const introText = brief.introduction || introduction;
+    
+    let fullContent = `=== ${title} ===\n`;
+    if (brief.bookSubtitle || bookSubtitle) fullContent += `${brief.bookSubtitle || bookSubtitle}\n`;
+    fullContent += `Par ${author}\n`;
+    fullContent += `${'='.repeat(40)}\n\n`;
+    fullContent += `--- INTRODUCTION ---\n${introText}\n\n`;
+    
+    const text = cleanedText || brief.chapterContent || chapterContent;
+    if (text) {
+      fullContent += `--- CONTENU ---\n${text}\n\n`;
+    }
+    if (conclusion) {
+      fullContent += `--- CONCLUSION ---\n${conclusion}\n`;
+    }
+
+    const blob = new Blob([fullContent], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${title.replace(/\s+/g, '-').toLowerCase()}-complet.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success('📥 Livre complet téléchargé');
   };
 
   const renderStepContent = (idx: number) => {
@@ -367,7 +414,15 @@ Découvrez ${t}, une aventure captivante à écouter en famille ou en solo. Plon
               <p className="text-muted-foreground">Auteur : {brief.authorName}</p>
               <p className="text-muted-foreground">Catégorie : {CATEGORIES.find(c => c.value === brief.category)?.label}</p>
             </div>
-            <Button onClick={() => markStepDone('A8')}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <Button variant="outline" onClick={handleDownloadIntro}>
+                <Download className="h-4 w-4 mr-2" /> 📥 Télécharger l'Intro
+              </Button>
+              <Button variant="outline" onClick={handleDownloadFullExport}>
+                <Download className="h-4 w-4 mr-2" /> 📥 Télécharger le Livre Complet
+              </Button>
+            </div>
+            <Button onClick={() => markStepDone('A8')} className="w-full">
               <CheckCircle2 className="h-4 w-4 mr-2" /> Fusion terminée
             </Button>
           </div>
@@ -382,7 +437,15 @@ Découvrez ${t}, une aventure captivante à écouter en famille ou en solo. Plon
                 « <strong>{brief.bookTitle}</strong> » par <strong>{brief.authorName}</strong> est prêt. Retrouvez-le dans la 📚 Bibliothèque.
               </p>
             </div>
-            <Button onClick={() => markStepDone('A9')}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <Button variant="outline" onClick={handleDownloadIntro}>
+                <Download className="h-4 w-4 mr-2" /> 📥 Intro seule
+              </Button>
+              <Button variant="outline" onClick={handleDownloadFullExport}>
+                <Download className="h-4 w-4 mr-2" /> 📥 Export complet
+              </Button>
+            </div>
+            <Button onClick={() => markStepDone('A9')} className="w-full">
               <Archive className="h-4 w-4 mr-2" /> Archiver et terminer
             </Button>
           </div>
