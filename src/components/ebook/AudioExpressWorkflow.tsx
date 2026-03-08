@@ -172,6 +172,52 @@ Découvrez ${t}, une aventure captivante à écouter en famille ou en solo. Plon
     }
   };
 
+  // Download intro as text file (for TTS or site usage)
+  const handleDownloadIntro = () => {
+    const brief = getBriefData();
+    const title = brief.bookTitle || bookTitle || 'livre-audio';
+    const introText = brief.introduction || introduction;
+    const blob = new Blob([introText], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `intro-${title.replace(/\s+/g, '-').toLowerCase()}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success('📥 Introduction téléchargée');
+  };
+
+  // Download full cleaned text for export
+  const handleDownloadFullExport = () => {
+    const brief = getBriefData();
+    const title = brief.bookTitle || bookTitle || 'livre-audio';
+    const author = brief.authorName || authorNameState || 'Auteur';
+    const introText = brief.introduction || introduction;
+    
+    let fullContent = `=== ${title} ===\n`;
+    if (brief.bookSubtitle || bookSubtitle) fullContent += `${brief.bookSubtitle || bookSubtitle}\n`;
+    fullContent += `Par ${author}\n`;
+    fullContent += `${'='.repeat(40)}\n\n`;
+    fullContent += `--- INTRODUCTION ---\n${introText}\n\n`;
+    
+    const text = cleanedText || brief.chapterContent || chapterContent;
+    if (text) {
+      fullContent += `--- CONTENU ---\n${text}\n\n`;
+    }
+    if (conclusion) {
+      fullContent += `--- CONCLUSION ---\n${conclusion}\n`;
+    }
+
+    const blob = new Blob([fullContent], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${title.replace(/\s+/g, '-').toLowerCase()}-complet.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success('📥 Livre complet téléchargé');
+  };
+
   const renderStepContent = (idx: number) => {
     const step = AUDIO_STEPS[idx];
     const brief = getBriefData();
