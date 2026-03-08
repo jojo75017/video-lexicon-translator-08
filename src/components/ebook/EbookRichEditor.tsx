@@ -160,7 +160,7 @@ export const EbookRichEditor: React.FC<EbookRichEditorProps> = ({
         <div className="flex items-center gap-1 p-2 border-b flex-wrap">
           {formatActions.map((action, i) => {
             if ('type' in action && action.type === 'separator') {
-              return <Separator key={i} orientation="vertical" className="h-6 mx-1" />;
+              return <div key={i} className="w-px h-6 mx-1 bg-border" />;
             }
             const Icon = (action as any).icon;
             return (
