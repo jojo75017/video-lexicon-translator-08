@@ -147,6 +147,10 @@ import { EbookAIDetectorScore } from '@/components/ebook/EbookAIDetectorScore';
 import { EbookAICoverStudio } from '@/components/ebook/EbookAICoverStudio';
 import { EbookMultiTomeHub } from '@/components/ebook/EbookMultiTomeHub';
 import { EbookAdvancedExport } from '@/components/ebook/EbookAdvancedExport';
+import { EbookWritingIntelligence } from '@/components/ebook/EbookWritingIntelligence';
+import { EbookPublicationPlanner } from '@/components/ebook/EbookPublicationPlanner';
+import { EbookRoyaltyDashboard } from '@/components/ebook/EbookRoyaltyDashboard';
+import { EbookUXEnhancements } from '@/components/ebook/EbookUXEnhancements';
 
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
 import { ebookTemplates } from '@/data/ebookTemplates';
