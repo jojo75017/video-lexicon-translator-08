@@ -37,6 +37,7 @@ export const AudiobookPublisher: React.FC<AudiobookPublisherProps> = ({
   const [voiceName, setVoiceName] = useState('');
   const [isPublic, setIsPublic] = useState(true);
   const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [excerptFile, setExcerptFile] = useState<File | null>(null);
 
   useEffect(() => {
     fetchAudiobooks();
