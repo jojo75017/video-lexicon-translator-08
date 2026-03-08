@@ -157,9 +157,11 @@ const categories: Category[] = [
       { id: 'writing', label: '✏️ Écrire les Chapitres', icon: PenTool },
       { id: 'prompt-library', label: '📚 Bibliothèque Prompts', icon: Library, isNew: true },
       { id: 'manuscript-dashboard', label: '📊 Dashboard Manuscrit', icon: BarChart3, isNew: true },
+      { id: 'ai-detector', label: '🛡️ Détecteur Anti-IA', icon: Shield, isNew: true },
       { id: 'aichat', label: '💬 Assistant IA', icon: Bot },
       { id: 'characters', label: '👥 Personnages', icon: Users },
       { id: 'series', label: '📚 Série / Saga', icon: BookCopy },
+      { id: 'multi-tome-hub', label: '📖 Hub Multi-Tomes', icon: BookCopy, isNew: true },
       { id: 'series-tomes', label: '📖 Tomes de Séries', icon: Library, isLink: true, href: '/series-tomes', isNew: true },
       { id: 'voice', label: '🎤 Dictée Vocale', icon: Volume2 },
     ]
@@ -214,6 +216,7 @@ const categories: Category[] = [
     color: 'from-orange-500 to-red-500',
     items: [
       { id: 'export', label: '💾 Exporter (PDF, Word)', icon: Download },
+      { id: 'advanced-export', label: '📦 Export Multi-Format', icon: Download, isNew: true },
       { id: 'kdp', label: '📝 Description KDP', icon: TrendingUp },
       { id: 'description-magnet', label: '🧲 Description Magnet', icon: FileText, isNew: true },
       { id: 'export-guide', label: '📖 Guide Export', icon: GraduationCap, isNew: true },
@@ -237,6 +240,7 @@ const categories: Category[] = [
     color: 'from-teal-500 to-cyan-500',
     items: [
       { id: 'cover', label: '📕 Couverture Avant', icon: Palette },
+      { id: 'ai-cover-studio', label: '🎨 Couverture IA Pro', icon: Sparkles, isNew: true },
       { id: 'backcover', label: '📖 Couverture Arrière', icon: BookCopy },
       { id: 'images', label: '🎨 Images Chapitres', icon: Image },
       { id: 'imagebank', label: '🏦 Banque Images', icon: ImagePlus },

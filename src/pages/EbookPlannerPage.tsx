@@ -143,6 +143,10 @@ import { EbookDraftMode } from '@/components/ebook/EbookDraftMode';
 import { EbookPromptLibrary } from '@/components/ebook/EbookPromptLibrary';
 import { EbookManuscriptDashboard } from '@/components/ebook/EbookManuscriptDashboard';
 import { EbookRichEditor } from '@/components/ebook/EbookRichEditor';
+import { EbookAIDetectorScore } from '@/components/ebook/EbookAIDetectorScore';
+import { EbookAICoverStudio } from '@/components/ebook/EbookAICoverStudio';
+import { EbookMultiTomeHub } from '@/components/ebook/EbookMultiTomeHub';
+import { EbookAdvancedExport } from '@/components/ebook/EbookAdvancedExport';
 
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
 import { ebookTemplates } from '@/data/ebookTemplates';
@@ -3026,6 +3030,37 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       
       case 'humanizer':
         return <EbookHumanizer />;
+
+      case 'ai-detector':
+        return <EbookAIDetectorScore />;
+
+      case 'ai-cover-studio':
+        return (
+          <EbookAICoverStudio
+            ebookTitle={ebookTitle}
+            authorName={authorName}
+            onCoverGenerated={(url) => {
+              setEbookImages(prev => [{ url, title: 'Couverture IA' }, ...prev]);
+              toast.success('Couverture ajoutée à votre projet');
+            }}
+          />
+        );
+
+      case 'multi-tome-hub':
+        return <EbookMultiTomeHub />;
+
+      case 'advanced-export':
+        return (
+          <EbookAdvancedExport
+            ebookTitle={ebookTitle}
+            authorName={authorName}
+            chapters={chapters}
+            preface={preface}
+            conclusion={conclusion}
+            characters={characters}
+            coverImage={ebookImages[0]?.url}
+          />
+        );
       
       case 'arc-manager':
         return (
