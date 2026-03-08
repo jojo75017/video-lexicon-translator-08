@@ -211,8 +211,8 @@ export const SaasDashboard: React.FC = () => {
         {/* Usage Overview */}
         <Card>
           <CardHeader>
-            <CardTitle>Utilisation</CardTitle>
-            <CardDescription>Limites actuelles de votre plan</CardDescription>
+            <CardTitle className="text-white">Utilisation</CardTitle>
+            <CardDescription className="text-white/60">Limites actuelles de votre plan</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {usageMetrics.map((metric) => (
