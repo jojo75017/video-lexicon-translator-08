@@ -101,6 +101,7 @@ const SalesPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const countdown = useCountdown(LAUNCH_END);
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -114,6 +115,13 @@ const SalesPage = () => {
     if (meta) meta.setAttribute("content", "Workflow IA complet pour créer et publier des ebooks sur Amazon KDP. Gemini 3 Flash, couvertures IA, audiobooks. 97€ à vie.");
   }, []);
 
+  useEffect(() => {
+    const onScroll = () => setShowScrollTop(window.scrollY > 500);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   const handlePlanClick = () => {
     trackPlanSelect('pro', LAUNCH_PRICE);
     trackCTAClick('plan_click', '/upsell-paiement');
@@ -122,6 +130,10 @@ const SalesPage = () => {
 
   const scrollToPricing = () => {
     document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
@@ -721,6 +733,17 @@ const SalesPage = () => {
           Accès Pro — {LAUNCH_PRICE}€ à vie
         </Button>
       </div>
+
+      {showScrollTop && (
+        <button
+          type="button"
+          onClick={scrollToTop}
+          aria-label="Remonter en haut"
+          className="fixed right-4 bottom-28 md:bottom-8 z-[85] h-11 w-11 rounded-full bg-primary text-primary-foreground shadow-lg hover:opacity-90 transition"
+        >
+          ↑
+        </button>
+      )}
 
       <ExitIntentPopup />
       <SocialProofToast />
