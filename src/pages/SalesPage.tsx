@@ -707,6 +707,7 @@ const SalesPage = () => {
 
       <ExitIntentPopup />
       <SocialProofToast />
+      <ProgressEngagement />
     </div>
   );
 };
