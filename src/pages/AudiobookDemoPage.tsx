@@ -432,11 +432,11 @@ const AudiobookDemoPage = () => {
         </div>
 
         {/* ===== GUARANTEE ===== */}
-        <div className="mt-12 bg-gradient-to-r from-emerald-500/[0.08] to-emerald-500/[0.02] border border-emerald-500/20 rounded-2xl p-7 flex flex-col sm:flex-row items-center gap-6">
-          <Shield className="w-16 h-16 text-emerald-400 shrink-0" />
+        <div className="mt-12 bg-emerald-50 border border-emerald-200 rounded-2xl p-7 flex flex-col sm:flex-row items-center gap-6">
+          <Shield className="w-16 h-16 text-emerald-600 shrink-0" />
           <div className="text-center sm:text-left">
-            <h3 className="text-lg font-bold text-emerald-400 mb-2">Garantie Satisfait ou Remboursé — 30 jours</h3>
-            <p className="text-white/60 text-sm leading-relaxed">
+            <h3 className="text-lg font-bold text-emerald-700 mb-2">Garantie Satisfait ou Remboursé — 30 jours</h3>
+            <p className="text-gray-500 text-sm leading-relaxed">
               Vous n'êtes pas satisfait ? Nous vous remboursons intégralement, sans conditions et sans questions. Votre satisfaction est notre priorité absolue.
             </p>
           </div>
@@ -444,8 +444,8 @@ const AudiobookDemoPage = () => {
 
         {/* ===== FAQ ===== */}
         <div className="mt-12">
-          <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-            <HelpCircle className="w-6 h-6 text-amber-400" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+            <HelpCircle className="w-6 h-6 text-orange-500" />
             Questions fréquentes
           </h2>
           <div className="space-y-2">
@@ -462,8 +462,8 @@ const AudiobookDemoPage = () => {
 
         {/* ===== SIMILAR BOOKS ===== */}
         <div className="mt-12">
-          <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-            <Library className="w-6 h-6 text-amber-400" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+            <Library className="w-6 h-6 text-orange-500" />
             Vous aimerez aussi
           </h2>
           <div className="flex gap-4 overflow-x-auto pb-2">
@@ -473,22 +473,32 @@ const AudiobookDemoPage = () => {
               { title: "SEO Masterclass", price: "14.99" },
               { title: "Réseaux Sociaux Pro", price: "8.99" },
             ].map((book, i) => (
-              <div key={i} className="shrink-0 w-40 bg-white/[0.04] border border-white/[0.08] rounded-xl overflow-hidden hover:-translate-y-1 transition-transform cursor-pointer group">
-                <div className="w-40 h-40 bg-gradient-to-br from-white/[0.06] to-white/[0.02] flex items-center justify-center">
-                  <Headphones className="w-10 h-10 text-white/15 group-hover:text-amber-400/30 transition-colors" />
+              <div key={i} className="shrink-0 w-40 bg-white border border-gray-200 rounded-xl overflow-hidden hover:-translate-y-1 transition-transform cursor-pointer group shadow-sm">
+                <div className="w-40 h-40 bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center">
+                  <Headphones className="w-10 h-10 text-gray-200 group-hover:text-orange-300 transition-colors" />
                 </div>
                 <div className="p-3">
-                  <p className="text-sm font-semibold text-white truncate">{book.title}</p>
-                  <p className="text-xs font-bold text-amber-400 mt-1">{book.price} €</p>
+                  <p className="text-sm font-semibold text-gray-900 truncate">{book.title}</p>
+                  <p className="text-xs font-bold text-orange-500 mt-1">{book.price} €</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
+
+        {/* ===== EBOOK LINK ===== */}
+        <div className="mt-12 text-center bg-[#232F3E] rounded-2xl p-8">
+          <h3 className="text-white text-lg font-bold mb-2">📚 Découvrez aussi nos ebooks</h3>
+          <p className="text-white/60 text-sm mb-4">Retrouvez toute notre collection de livres numériques sur notre boutique</p>
+          <a href="https://ebookcluster.com" target="_blank" rel="noopener" className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 text-white font-bold px-8 py-3 rounded-full shadow-lg shadow-orange-500/20 transition-all hover:scale-105">
+            <Globe className="w-5 h-5" />
+            Visiter ebookcluster.com
+          </a>
+        </div>
       </div>
 
-      <div className="text-center pb-10 pt-4 border-t border-white/5">
-        <p className="text-xs text-white/20">Propulsé par EbookStudio Pro • Audio IA Premium</p>
+      <div className="text-center pb-10 pt-6 border-t border-gray-200">
+        <p className="text-xs text-gray-400">Propulsé par EbookStudio Pro • Audio IA Premium</p>
       </div>
     </div>
   );
