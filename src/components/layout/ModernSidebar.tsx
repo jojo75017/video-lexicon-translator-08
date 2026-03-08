@@ -155,6 +155,7 @@ const categories: Category[] = [
       { id: 'draft-mode', label: '⚡ Brouillon Rapide', icon: Zap, isNew: true },
       { id: 'rich-editor', label: '📝 Éditeur Enrichi', icon: PenTool, isNew: true },
       { id: 'writing', label: '✏️ Écrire les Chapitres', icon: PenTool },
+      { id: 'writing-intelligence', label: '🧠 Assistant Intelligent', icon: Brain, isNew: true },
       { id: 'prompt-library', label: '📚 Bibliothèque Prompts', icon: Library, isNew: true },
       { id: 'manuscript-dashboard', label: '📊 Dashboard Manuscrit', icon: BarChart3, isNew: true },
       { id: 'ai-detector', label: '🛡️ Détecteur Anti-IA', icon: Shield, isNew: true },
@@ -298,6 +299,9 @@ const categories: Category[] = [
     emoji: '🚀',
     color: 'from-purple-500 to-pink-500',
     items: [
+      { id: 'publication-planner', label: '📅 Planificateur Publication', icon: Target, isNew: true },
+      { id: 'royalty-dashboard', label: '💰 Dashboard Revenus', icon: DollarSign, isNew: true },
+      { id: 'ux-center', label: '⚡ Centre Productivité', icon: Zap, isNew: true },
       { id: 'humanizer', label: '🛡️ Humaniseur IA', icon: Shield, isNew: true },
       { id: 'arc-manager', label: '👥 Gestionnaire ARC', icon: Users, isNew: true },
       { id: 'direct-sales', label: '💰 Vente Directe', icon: DollarSign, isNew: true },

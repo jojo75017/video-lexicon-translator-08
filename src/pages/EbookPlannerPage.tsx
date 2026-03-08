@@ -147,6 +147,10 @@ import { EbookAIDetectorScore } from '@/components/ebook/EbookAIDetectorScore';
 import { EbookAICoverStudio } from '@/components/ebook/EbookAICoverStudio';
 import { EbookMultiTomeHub } from '@/components/ebook/EbookMultiTomeHub';
 import { EbookAdvancedExport } from '@/components/ebook/EbookAdvancedExport';
+import { EbookWritingIntelligence } from '@/components/ebook/EbookWritingIntelligence';
+import { EbookPublicationPlanner } from '@/components/ebook/EbookPublicationPlanner';
+import { EbookRoyaltyDashboard } from '@/components/ebook/EbookRoyaltyDashboard';
+import { EbookUXEnhancements } from '@/components/ebook/EbookUXEnhancements';
 
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
 import { ebookTemplates } from '@/data/ebookTemplates';
@@ -3062,6 +3066,23 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           />
         );
       
+      case 'writing-intelligence':
+        return (
+          <EbookWritingIntelligence
+            chapters={chapters}
+            onUpdateChapterContent={updateChapterContent}
+          />
+        );
+
+      case 'publication-planner':
+        return <EbookPublicationPlanner />;
+
+      case 'royalty-dashboard':
+        return <EbookRoyaltyDashboard />;
+
+      case 'ux-center':
+        return <EbookUXEnhancements />;
+
       case 'arc-manager':
         return (
           <EbookArcManager
