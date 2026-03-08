@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { 
-  Rocket, Target, PenTool, Package, Brain, ChevronRight, 
+  Rocket, Target, PenTool, Package, Brain, 
   Sparkles, Play, BookOpen, CheckCircle2, ArrowRight, Zap,
   TrendingUp, Shield, Star
 } from 'lucide-react';
@@ -94,13 +94,10 @@ export const WorkflowOnboarding: React.FC<WorkflowOnboardingProps> = ({
   const completedCount = getCompletedStepsCount();
   const [hoveredPhase, setHoveredPhase] = useState<string | null>(null);
 
-  // Find the next available step
   const getNextStep = () => {
     for (const phase of PHASES) {
       for (const step of phase.steps) {
-        if (!hasStepResult(step.id)) {
-          return step;
-        }
+        if (!hasStepResult(step.id)) return step;
       }
     }
     return PHASES[0].steps[0];
@@ -115,28 +112,28 @@ export const WorkflowOnboarding: React.FC<WorkflowOnboardingProps> = ({
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/15 via-card to-primary/5 border-2 border-primary/20 p-8 md:p-12"
+        className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900/95 to-cyan-950/30 border-2 border-cyan-500/20 p-8 md:p-12"
       >
         {/* Decorative orbs */}
-        <div className="absolute -top-16 -right-16 w-48 h-48 bg-primary/20 rounded-full blur-[80px]" />
-        <div className="absolute -bottom-16 -left-16 w-40 h-40 bg-violet-500/15 rounded-full blur-[60px]" />
+        <div className="absolute -top-16 -right-16 w-48 h-48 bg-cyan-500/15 rounded-full blur-[80px]" />
+        <div className="absolute -bottom-16 -left-16 w-40 h-40 bg-violet-500/10 rounded-full blur-[60px]" />
 
         <div className="relative text-center space-y-6">
           <motion.div
             initial={{ scale: 0.8 }}
             animate={{ scale: 1 }}
             transition={{ type: 'spring', delay: 0.2 }}
-            className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-primary/20 border border-primary/30"
+            className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-cyan-500/15 border border-cyan-500/30"
           >
             {isFirstTime ? (
-              <Rocket className="w-10 h-10 text-primary" />
+              <Rocket className="w-10 h-10 text-cyan-400" />
             ) : (
-              <BookOpen className="w-10 h-10 text-primary" />
+              <BookOpen className="w-10 h-10 text-cyan-400" />
             )}
           </motion.div>
 
           <div className="space-y-3">
-            <h1 className="text-3xl md:text-4xl font-extrabold text-foreground tracking-tight">
+            <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">
               {isFirstTime 
                 ? "Créez votre ebook en 4 étapes simples"
                 : ebookTitle 
@@ -144,7 +141,7 @@ export const WorkflowOnboarding: React.FC<WorkflowOnboardingProps> = ({
                   : "Votre Workflow Éditorial"
               }
             </h1>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+            <p className="text-white/50 text-lg max-w-2xl mx-auto">
               {isFirstTime 
                 ? "15 experts IA travaillent pour vous. Suivez le chemin, cliquez, c'est fait."
                 : `${completedCount}/15 étapes complétées — Continuez là où vous en étiez.`
@@ -162,7 +159,7 @@ export const WorkflowOnboarding: React.FC<WorkflowOnboardingProps> = ({
             <Button
               size="lg"
               onClick={() => onNavigateToStep(nextStep.tabId)}
-              className="text-lg px-8 py-6 h-auto rounded-2xl bg-primary hover:bg-primary/90 shadow-lg shadow-primary/25 gap-3 group"
+              className="text-lg px-8 py-6 h-auto rounded-2xl bg-cyan-600 hover:bg-cyan-700 text-white shadow-lg shadow-cyan-500/25 gap-3 group"
             >
               {isFirstTime ? (
                 <>
@@ -183,7 +180,7 @@ export const WorkflowOnboarding: React.FC<WorkflowOnboardingProps> = ({
               variant="outline"
               size="lg"
               onClick={onStartWorkflow}
-              className="rounded-2xl px-6 py-6 h-auto gap-2"
+              className="rounded-2xl px-6 py-6 h-auto gap-2 border-white/20 text-white/70 hover:text-white bg-slate-800/50"
             >
               <Sparkles className="w-5 h-5" />
               Tout automatiser (P1→P15)
@@ -191,17 +188,17 @@ export const WorkflowOnboarding: React.FC<WorkflowOnboardingProps> = ({
           </motion.div>
 
           {/* Trust indicators */}
-          <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground pt-2">
-            <span className="flex items-center gap-1.5"><Shield className="w-4 h-4 text-emerald-500" /> Score qualité 9/10</span>
-            <span className="flex items-center gap-1.5"><TrendingUp className="w-4 h-4 text-blue-500" /> Optimisé KDP</span>
-            <span className="flex items-center gap-1.5"><Star className="w-4 h-4 text-amber-500" /> Anti-détection IA</span>
+          <div className="flex items-center justify-center gap-6 text-sm text-white/40 pt-2">
+            <span className="flex items-center gap-1.5"><Shield className="w-4 h-4 text-emerald-400" /> Score qualité 9/10</span>
+            <span className="flex items-center gap-1.5"><TrendingUp className="w-4 h-4 text-cyan-400" /> Optimisé KDP</span>
+            <span className="flex items-center gap-1.5"><Star className="w-4 h-4 text-amber-400" /> Anti-détection IA</span>
           </div>
         </div>
       </motion.div>
 
       {/* 4 Phases Roadmap */}
       <div className="space-y-4">
-        <h2 className="text-xl font-bold text-foreground text-center">
+        <h2 className="text-xl font-bold text-white text-center">
           Le chemin vers votre livre publié
         </h2>
 
@@ -222,10 +219,10 @@ export const WorkflowOnboarding: React.FC<WorkflowOnboardingProps> = ({
                 onMouseLeave={() => setHoveredPhase(null)}
               >
                 <Card className={cn(
-                  "relative overflow-hidden transition-all duration-300 border-2 p-5",
-                  isActive && "ring-2 ring-primary/30 ring-offset-2 ring-offset-background",
-                  phaseCompleted ? "border-emerald-500/40 bg-emerald-500/5" : phase.borderColor,
-                  hoveredPhase === phase.id && "shadow-lg -translate-y-0.5"
+                  "relative overflow-hidden transition-all duration-300 border-2 p-5 bg-slate-900/80 backdrop-blur-sm",
+                  isActive && "ring-2 ring-cyan-500/30 ring-offset-2 ring-offset-slate-950",
+                  phaseCompleted ? "border-emerald-500/40" : phase.borderColor,
+                  hoveredPhase === phase.id && "shadow-lg shadow-cyan-500/10 -translate-y-0.5"
                 )}>
                   {/* Phase Header */}
                   <div className="flex items-center gap-3 mb-4">
@@ -241,18 +238,18 @@ export const WorkflowOnboarding: React.FC<WorkflowOnboardingProps> = ({
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <h3 className="font-bold text-foreground text-lg">
+                        <h3 className="font-bold text-white text-lg">
                           {phaseIdx + 1}. {phase.title}
                         </h3>
                         {isActive && !phaseCompleted && (
-                          <Badge className="bg-primary/20 text-primary border-primary/30 text-xs animate-pulse">
+                          <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/30 text-xs animate-pulse">
                             En cours
                           </Badge>
                         )}
                       </div>
-                      <p className="text-sm text-muted-foreground">{phase.subtitle}</p>
+                      <p className="text-sm text-white/40">{phase.subtitle}</p>
                     </div>
-                    <span className="text-sm font-medium text-muted-foreground">
+                    <span className="text-sm font-medium text-white/40">
                       {phaseProgress}/{phase.steps.length}
                     </span>
                   </div>
@@ -270,45 +267,42 @@ export const WorkflowOnboarding: React.FC<WorkflowOnboardingProps> = ({
                           className={cn(
                             "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-left group",
                             isDone && "bg-emerald-500/10 hover:bg-emerald-500/15",
-                            isNext && "bg-primary/10 hover:bg-primary/15 ring-1 ring-primary/30",
-                            !isDone && !isNext && "hover:bg-muted/50"
+                            isNext && "bg-cyan-500/10 hover:bg-cyan-500/15 ring-1 ring-cyan-500/30",
+                            !isDone && !isNext && "hover:bg-slate-800/50"
                           )}
                         >
-                          {/* Status indicator */}
                           <div className={cn(
                             "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-all",
                             isDone && "bg-emerald-500 text-white",
-                            isNext && "bg-primary text-primary-foreground shadow-md shadow-primary/30",
-                            !isDone && !isNext && "bg-muted text-muted-foreground"
+                            isNext && "bg-cyan-600 text-white shadow-md shadow-cyan-500/30",
+                            !isDone && !isNext && "bg-slate-800 text-white/40"
                           )}>
                             {isDone ? <CheckCircle2 className="w-4 h-4" /> : step.id.replace('P', '')}
                           </div>
 
-                          {/* Step info */}
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2">
                               <span className={cn(
                                 "font-medium text-sm truncate",
-                                isDone && "text-emerald-600 dark:text-emerald-400",
-                                isNext && "text-primary font-semibold",
-                                !isDone && !isNext && "text-muted-foreground"
+                                isDone && "text-emerald-400",
+                                isNext && "text-cyan-400 font-semibold",
+                                !isDone && !isNext && "text-white/40"
                               )}>
                                 {step.label}
                               </span>
                               {step.id === 'P15' && (
-                                <Badge className="bg-rose-500/20 text-rose-500 border-rose-500/30 text-[10px] px-1.5">
+                                <Badge className="bg-rose-500/20 text-rose-400 border-rose-500/30 text-[10px] px-1.5">
                                   BONUS
                                 </Badge>
                               )}
                             </div>
-                            <span className="text-xs text-muted-foreground">{step.desc}</span>
+                            <span className="text-xs text-white/30">{step.desc}</span>
                           </div>
 
-                          {/* Time & arrow */}
                           <div className="flex items-center gap-2 shrink-0">
-                            <span className="text-[11px] text-muted-foreground/60">{step.time}</span>
+                            <span className="text-[11px] text-white/20">{step.time}</span>
                             {isNext && (
-                              <ArrowRight className="w-4 h-4 text-primary group-hover:translate-x-0.5 transition-transform" />
+                              <ArrowRight className="w-4 h-4 text-cyan-400 group-hover:translate-x-0.5 transition-transform" />
                             )}
                           </div>
                         </button>
@@ -329,8 +323,8 @@ export const WorkflowOnboarding: React.FC<WorkflowOnboardingProps> = ({
         transition={{ delay: 0.6 }}
         className="text-center pb-8"
       >
-        <p className="text-sm text-muted-foreground mb-3">
-          Temps estimé total : <span className="font-semibold text-foreground">~55 minutes</span> • Entièrement guidé par l'IA
+        <p className="text-sm text-white/30 mb-3">
+          Temps estimé total : <span className="font-semibold text-white/60">~55 minutes</span> • Entièrement guidé par l'IA
         </p>
       </motion.div>
     </div>
