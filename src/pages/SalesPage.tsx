@@ -418,7 +418,7 @@ const SalesPage = () => {
                         {[1,2,3,4,5].map(s => <Star key={s} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />)}
                       </div>
                     </div>
-                    <p className="text-slate-300 leading-relaxed">"{t.text}"</p>
+                    <p className="text-white/90 leading-relaxed">"{t.text}"</p>
                   </CardContent>
                 </Card>
               </motion.div>
