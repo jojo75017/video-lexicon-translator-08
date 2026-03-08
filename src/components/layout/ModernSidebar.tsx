@@ -532,35 +532,34 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
       <aside 
         className={cn(
           "relative flex flex-col h-screen transition-all duration-300 ease-out",
-          "bg-gradient-to-b from-violet-50 via-purple-50/80 to-fuchsia-50/60 border-r border-violet-200/60",
-          "dark:from-[#0d0a14] dark:via-[#0a0810] dark:to-[#08060c] dark:border-violet-900/40",
+          "bg-slate-950 border-r border-slate-800/50",
           isCollapsed ? "w-[72px]" : "w-72"
         )}
       >
         {/* Header */}
         <div className={cn(
-          "flex items-center gap-3 p-4 border-b border-violet-200/50 dark:border-violet-900/30",
+          "flex items-center gap-3 p-4 border-b border-slate-800/50",
           isCollapsed && "justify-center p-3"
         )}>
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 via-purple-500 to-fuchsia-500 flex items-center justify-center shadow-lg shadow-violet-500/30">
-            <Sparkles className="w-5 h-5 text-white" />
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-emerald-400 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+            <Sparkles className="w-5 h-5 text-slate-900" />
           </div>
           {!isCollapsed && (
             <>
               <div className="min-w-0 flex-1">
-                <h1 className="font-bold text-foreground">EbookStudio</h1>
-                <p className="text-xs text-muted-foreground">Pro Edition 2026</p>
+                <h1 className="font-bold text-white">EbookStudio</h1>
+                <p className="text-xs text-slate-500">Pro Edition 2026</p>
               </div>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={toggleTheme}
-                className="h-9 w-9 rounded-xl hover:bg-violet-100 dark:hover:bg-violet-900/30"
+                className="h-9 w-9 rounded-xl hover:bg-slate-800/50"
               >
                 {isDark ? (
                   <Sun className="w-4 h-4 text-amber-500" />
                 ) : (
-                  <Moon className="w-4 h-4 text-violet-600" />
+                  <Moon className="w-4 h-4 text-slate-400" />
                 )}
               </Button>
             </>
