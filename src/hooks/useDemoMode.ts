@@ -19,13 +19,13 @@ export const useDemoMode = (isAuthenticated: boolean) => {
   const isDemo = !isAuthenticated;
 
   const limits: DemoLimits = {
-    canGeneratePlan: isDemo ? plansGenerated < 3 : true,
+    canGeneratePlan: isDemo ? plansGenerated < 1 : true,
     canViewChapters: !isDemo,
     canExport: !isDemo,
     canGenerateCover: !isDemo,
     canUseAdvancedFeatures: !isDemo,
     plansGenerated,
-    maxPlansInDemo: 3,
+    maxPlansInDemo: 1,
   };
 
   const incrementPlanCount = useCallback(() => {

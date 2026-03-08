@@ -14,7 +14,7 @@ import { motion } from "framer-motion";
 
 const DEMO_STORAGE_KEY = "ebook_demo_count";
 const EMAIL_CAPTURED_KEY = "ebook_demo_email_captured";
-const MAX_DEMO_TRIES = 3;
+const MAX_DEMO_TRIES = 1;
 
 interface GeneratedChapter {
   title: string;
@@ -36,7 +36,7 @@ const DemoPage = () => {
   const [title, setTitle] = useState("");
   const [genre, setGenre] = useState("");
   const [targetAudience, setTargetAudience] = useState("");
-  const [numberOfChapters, setNumberOfChapters] = useState("5");
+  const [numberOfChapters] = useState("3");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedPlan, setGeneratedPlan] = useState<GeneratedPlan | null>(null);
   const [rawPlan, setRawPlan] = useState<string | null>(null);
@@ -206,7 +206,7 @@ const DemoPage = () => {
         >
           <Badge className="bg-cyan-500/10 text-cyan-400 border-cyan-500/30 px-4 py-2 mb-6 text-sm">
             <Zap className="w-4 h-4 mr-2" />
-            {remainingTries > 0 ? `${remainingTries} essai${remainingTries > 1 ? 's' : ''} gratuit${remainingTries > 1 ? 's' : ''} restant${remainingTries > 1 ? 's' : ''}` : 'Essais utilisés — Passez à la version complète'}
+            {remainingTries > 0 ? '1 essai gratuit • 3 chapitres • Sans inscription' : 'Essai utilisé — Passez à la version complète'}
           </Badge>
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-5 leading-tight">
             Créez un ebook complet en{' '}
@@ -318,19 +318,13 @@ const DemoPage = () => {
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label className="text-slate-300 text-sm">Nombre de chapitres</Label>
-                  <Select value={numberOfChapters} onValueChange={setNumberOfChapters} disabled={demoUsed || isGenerating}>
-                    <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-slate-900 border-slate-800">
-                      {[3, 5, 7, 10].map((n) => (
-                        <SelectItem key={n} value={n.toString()} className="text-white hover:bg-slate-800">{n} chapitres</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                {/* Chapitres fixés à 3 en démo */}
+                <div className="flex items-center gap-2 p-3 bg-slate-800/30 rounded-lg border border-slate-800/50">
+                  <BookMarked className="w-4 h-4 text-cyan-400" />
+                  <span className="text-sm text-slate-300">3 chapitres générés</span>
+                  <Badge className="ml-auto bg-slate-800 text-slate-400 border-slate-700 text-xs">Démo</Badge>
                 </div>
+                <p className="text-xs text-slate-500">💡 La version complète permet jusqu'à 20 chapitres avec rédaction intégrale</p>
 
                 <Button
                   className="w-full py-6 text-lg font-bold bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-900 rounded-xl shadow-lg shadow-cyan-500/20"
