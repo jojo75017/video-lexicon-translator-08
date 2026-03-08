@@ -331,6 +331,8 @@ const categories: Category[] = [
     items: [
       { id: 'dashboard', label: '📊 Tableau de Bord', icon: LayoutDashboard },
       { id: 'admin-panel', label: '👑 Gestion Abonnés', icon: Shield, isLink: true, href: '/admin' },
+      { id: 'prospect-manager', label: '📋 Prospects & Emails', icon: Target, isLink: true, href: '/gestion-prospects', isNew: true },
+      { id: 'social-marketing', label: '📣 Suite Marketing', icon: BarChart3, isLink: true, href: '/generateur-posts', isNew: true },
       { id: 'subscription', label: '💳 Abonnement', icon: CreditCard },
       { id: 'parrainage', label: '🤝 Parrainage', icon: Users, isLink: true, href: '/parrainage', isNew: true },
       { id: 'communaute', label: '🏠 Communauté', icon: MessageSquare, isLink: true, href: '/communaute', isNew: true },
