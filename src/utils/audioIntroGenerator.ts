@@ -41,6 +41,9 @@ function buildPremiumIntroScript(options: IntroPremiumOptions): string[] {
     segments.push(extract);
   }
 
+  // Segment 5: Phrase de clôture engageante
+  segments.push(`Bonne écoute, et laissez-vous porter par cette aventure.`);
+
   return segments;
 }
 
