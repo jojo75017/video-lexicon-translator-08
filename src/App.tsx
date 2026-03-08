@@ -64,6 +64,7 @@ import SaasBilling from '@/pages/saas/SaasBilling';
 import SaasSettings from '@/pages/saas/SaasSettings';
 import SaasAuthPage from '@/pages/saas/SaasAuthPage';
 import SalesCampaignPage from '@/pages/SalesCampaignPage';
+import EmailPreviewPage from '@/pages/EmailPreviewPage';
 import ProspectManagerPage from '@/pages/ProspectManagerPage';
 import SocialPostGeneratorPage from '@/pages/SocialPostGeneratorPage';
 import UnifiedMarketingDashboard from '@/pages/UnifiedMarketingDashboard';
