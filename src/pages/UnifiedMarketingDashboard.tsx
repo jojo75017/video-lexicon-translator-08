@@ -166,7 +166,7 @@ const UnifiedMarketingDashboard = () => {
                   <kpi.icon className={`w-5 h-5 ${kpi.color}`} />
                   <ArrowUpRight className="w-3 h-3 text-emerald-400" />
                 </div>
-                <p className="text-2xl font-black">{kpi.value.toLocaleString('fr-FR')}</p>
+                <p className="text-2xl font-black">{typeof kpi.value === 'string' ? kpi.value : kpi.value.toLocaleString('fr-FR')}</p>
                 <p className="text-xs text-white/50 mt-1">{kpi.label}</p>
               </CardContent>
             </Card>
