@@ -432,7 +432,7 @@ const QuotaDisplay: React.FC<{ isCollapsed: boolean }> = ({ isCollapsed }) => {
             </div>
             <span className={cn(
               "text-[10px] font-bold px-2 py-0.5 rounded-full",
-              quotas.plan === 'lifetime' ? 'bg-cyan-500 text-slate-900' :
+              quotas.plan === 'lifetime' ? 'bg-gold text-slate-900' :
               quotas.plan === 'pro' ? 'bg-amber-500 text-white' :
               'bg-emerald-500 text-white'
             )}>
