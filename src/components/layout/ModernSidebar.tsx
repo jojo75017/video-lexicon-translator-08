@@ -327,7 +327,7 @@ const categories: Category[] = [
     emoji: '⚙️',
     color: 'from-gray-500 to-slate-500',
     items: [
-      { id: 'projects', label: '📁 Mes Projets', icon: FolderOpen },
+      { id: 'dashboard', label: '📊 Tableau de Bord', icon: LayoutDashboard },
       { id: 'dashboard', label: '📊 Tableau de Bord', icon: LayoutDashboard },
       { id: 'admin-panel', label: '👑 Gestion Abonnés', icon: Shield, isLink: true, href: '/admin' },
       { id: 'subscription', label: '💳 Abonnement', icon: CreditCard },
