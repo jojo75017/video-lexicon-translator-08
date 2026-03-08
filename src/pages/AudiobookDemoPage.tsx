@@ -362,22 +362,22 @@ const AudiobookDemoPage = () => {
 
           {/* Sidebar */}
           <div className="lg:w-80 shrink-0">
-            <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-6 space-y-5 sticky top-6">
-              <h3 className="text-white font-semibold text-base border-b border-white/10 pb-3">📋 Informations produit</h3>
-              <MetaRow icon={<CreditCard className="w-4 h-4 text-emerald-400/70" />} label="Prix" value={`${audiobook.price.toFixed(2)} €`} />
-              <MetaRow icon={<FileAudio className="w-4 h-4 text-amber-400/70" />} label="Format" value="Livre audio" />
-              <MetaRow icon={<Tag className="w-4 h-4 text-orange-400/70" />} label="Genre" value={audiobook.genre} />
-              <MetaRow icon={<Users className="w-4 h-4 text-pink-400/70" />} label="Public" value={audiobook.target_audience} />
-              <MetaRow icon={<Globe className="w-4 h-4 text-green-400/70" />} label="Langue" value="Français" />
-              <MetaRow icon={<Clock className="w-4 h-4 text-cyan-400/70" />} label="Durée estimée" value={formatDuration(audiobook.duration_seconds)} />
-              <MetaRow icon={<BookOpen className="w-4 h-4 text-blue-400/70" />} label="Chapitres" value={`${audiobook.chapters}`} />
-              <MetaRow icon={<FileAudio className="w-4 h-4 text-cyan-400/70" />} label="Format audio" value="MP3 · HD" />
-              <MetaRow icon={<Download className="w-4 h-4 text-emerald-400/70" />} label="Accès" value="Téléchargement immédiat après achat" />
-              <MetaRow icon={<Users className="w-4 h-4 text-amber-400/70" />} label="Auteur" value={audiobook.author_name} />
-              <MetaRow icon={<Mic2 className="w-4 h-4 text-purple-400/70" />} label="Narrateur" value={audiobook.voice_name} />
-              <MetaRow icon={<Calendar className="w-4 h-4 text-blue-400/70" />} label="Publication" value={createdDate} />
-              <MetaRow icon={<Building2 className="w-4 h-4 text-pink-400/70" />} label="Éditeur" value="EbookStudio" />
-              <MetaRow icon={<Headphones className="w-4 h-4 text-emerald-400/70" />} label="Écoutes" value={`${audiobook.play_count}`} />
+            <div className="bg-white border border-gray-200 rounded-2xl p-6 space-y-5 sticky top-6 shadow-sm">
+              <h3 className="text-gray-900 font-semibold text-base border-b border-gray-200 pb-3">📋 Informations produit</h3>
+              <MetaRow dark icon={<CreditCard className="w-4 h-4 text-emerald-600" />} label="Prix" value={`${audiobook.price.toFixed(2)} €`} />
+              <MetaRow dark icon={<FileAudio className="w-4 h-4 text-orange-500" />} label="Format" value="Livre audio" />
+              <MetaRow dark icon={<Tag className="w-4 h-4 text-orange-500" />} label="Genre" value={audiobook.genre} />
+              <MetaRow dark icon={<Users className="w-4 h-4 text-pink-500" />} label="Public" value={audiobook.target_audience} />
+              <MetaRow dark icon={<Globe className="w-4 h-4 text-green-600" />} label="Langue" value="Français" />
+              <MetaRow dark icon={<Clock className="w-4 h-4 text-cyan-600" />} label="Durée estimée" value={formatDuration(audiobook.duration_seconds)} />
+              <MetaRow dark icon={<BookOpen className="w-4 h-4 text-blue-600" />} label="Chapitres" value={`${audiobook.chapters}`} />
+              <MetaRow dark icon={<FileAudio className="w-4 h-4 text-cyan-600" />} label="Format audio" value="MP3 · HD" />
+              <MetaRow dark icon={<Download className="w-4 h-4 text-emerald-600" />} label="Accès" value="Téléchargement immédiat après achat" />
+              <MetaRow dark icon={<Users className="w-4 h-4 text-orange-500" />} label="Auteur" value={audiobook.author_name} />
+              <MetaRow dark icon={<Mic2 className="w-4 h-4 text-purple-500" />} label="Narrateur" value={audiobook.voice_name} />
+              <MetaRow dark icon={<Calendar className="w-4 h-4 text-blue-600" />} label="Publication" value={createdDate} />
+              <MetaRow dark icon={<Building2 className="w-4 h-4 text-pink-500" />} label="Éditeur" value="EbookStudio" />
+              <MetaRow dark icon={<Headphones className="w-4 h-4 text-emerald-600" />} label="Écoutes" value={`${audiobook.play_count}`} />
             </div>
           </div>
         </div>
