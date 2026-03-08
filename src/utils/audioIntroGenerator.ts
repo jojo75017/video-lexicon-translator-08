@@ -16,6 +16,27 @@ export interface IntroPremiumOptions {
   ebookTitle?: string;
   authorName?: string;
   introductionText?: string;
+  genre?: string;
+}
+
+// ─── Phrases de clôture par genre ───
+
+const CLOSING_PHRASES: Record<string, string> = {
+  'enfants-3-6': 'Installez-vous confortablement, et laissez la magie opérer.',
+  'enfants-6-12': 'Préparez-vous pour une aventure incroyable. C\'est parti !',
+  'thriller': 'Éteignez les lumières, et préparez-vous à retenir votre souffle.',
+  'romance': 'Laissez-vous emporter par cette histoire, et ouvrez grand votre cœur.',
+  'spiritualite': 'Respirez profondément, et laissez ces mots guider votre chemin intérieur.',
+  'business': 'Prenez des notes, et transformez ces idées en résultats concrets.',
+  'histoire': 'Voyagez dans le temps, et découvrez les secrets du passé.',
+  'default': 'Bonne écoute, et laissez-vous porter par cette aventure.',
+};
+
+function getClosingPhrase(genre?: string): string {
+  if (genre && CLOSING_PHRASES[genre]) {
+    return CLOSING_PHRASES[genre];
+  }
+  return CLOSING_PHRASES['default'];
 }
 
 // ─── Premium intro script builder ───
@@ -41,8 +62,8 @@ function buildPremiumIntroScript(options: IntroPremiumOptions): string[] {
     segments.push(extract);
   }
 
-  // Segment 5: Phrase de clôture engageante
-  segments.push(`Bonne écoute, et laissez-vous porter par cette aventure.`);
+  // Segment 5: Phrase de clôture adaptée au genre
+  segments.push(getClosingPhrase(options.genre));
 
   return segments;
 }
