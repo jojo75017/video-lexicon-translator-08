@@ -221,7 +221,7 @@ const SalesPage = () => {
             </Button>
           </motion.div>
 
-          <motion.div variants={fadeIn} custom={5} className="flex flex-wrap justify-center gap-4 text-sm text-slate-500">
+          <motion.div variants={fadeIn} custom={5} className="flex flex-wrap justify-center gap-4 text-sm text-white/70">
             <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-500" />Paiement unique</span>
             <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-500" />Accès à vie</span>
             <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-500" />Garantie 30 jours</span>
