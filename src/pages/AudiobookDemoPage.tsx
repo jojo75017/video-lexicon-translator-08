@@ -208,6 +208,26 @@ const AudiobookDemoPage = () => {
                 </Button>
               </div>
 
+              {/* Trust Badges */}
+              <div className="grid grid-cols-2 gap-3 mb-6">
+                <div className="flex items-center gap-2 bg-white/[0.04] border border-white/[0.08] rounded-xl px-3 py-2.5">
+                  <Lock className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span className="text-[11px] text-white/60 font-medium">Paiement 100% sécurisé</span>
+                </div>
+                <div className="flex items-center gap-2 bg-white/[0.04] border border-white/[0.08] rounded-xl px-3 py-2.5">
+                  <Zap className="w-4 h-4 text-amber-400 shrink-0" />
+                  <span className="text-[11px] text-white/60 font-medium">Téléchargement immédiat</span>
+                </div>
+                <div className="flex items-center gap-2 bg-white/[0.04] border border-white/[0.08] rounded-xl px-3 py-2.5">
+                  <RefreshCw className="w-4 h-4 text-blue-400 shrink-0" />
+                  <span className="text-[11px] text-white/60 font-medium">Remboursé sous 30 jours</span>
+                </div>
+                <div className="flex items-center gap-2 bg-white/[0.04] border border-white/[0.08] rounded-xl px-3 py-2.5">
+                  <MessageCircle className="w-4 h-4 text-purple-400 shrink-0" />
+                  <span className="text-[11px] text-white/60 font-medium">Support réactif 7j/7</span>
+                </div>
+              </div>
+
               {/* Listen row */}
               <div className="flex flex-wrap gap-3 justify-center lg:justify-start mb-6">
                 <Button 
