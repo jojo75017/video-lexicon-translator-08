@@ -332,6 +332,8 @@ Liens à inclure :
 - Démo gratuite : https://ebookstudio.fr/demo
 - Offres : https://ebookstudio.fr/offres
 - Profil Amazon : https://www.amazon.fr/Mr-Georges-Boubet/e/B0CGVLHNX7
+- Pour les posts Facebook, inclure le lien de la page : https://www.facebook.com/formationenaffiliation/
+- Pour les posts LinkedIn, inclure le profil : https://www.linkedin.com/in/consultantwebmaster/
 
 Sujet/Angle demandé : ${customTopic}
 Ton : ${customTone}
