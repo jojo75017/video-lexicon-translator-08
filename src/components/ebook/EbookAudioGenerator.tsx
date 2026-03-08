@@ -594,6 +594,8 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
         const filename = `${(section.title || 'section').replace(/[^a-zA-Z0-9àâéèêëïîôùûüç\s-]/gi, '').replace(/\s+/g, '-')}.mp3`;
         saveAs(blob, filename);
         toast.success(`MP3 exporté : ${section.title}`);
+        // Save to library
+        await saveToLibrary(blob, `${ebookTitle} - ${section.title}`, section.estimatedMinutes * 60);
       }
     } catch (error: any) {
       console.error('MP3 export error:', error);
