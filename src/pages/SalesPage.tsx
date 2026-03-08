@@ -201,7 +201,7 @@ const SalesPage = () => {
             ].map((stat, i) => (
               <div key={i} className="text-center">
                 <p className="text-3xl sm:text-4xl font-black text-white">{stat.value}</p>
-                <p className="text-sm text-slate-500 mt-1">{stat.label}</p>
+                <p className="text-sm text-white/70 mt-1">{stat.label}</p>
               </div>
             ))}
           </motion.div>
