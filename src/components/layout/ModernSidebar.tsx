@@ -389,7 +389,7 @@ const QuotaDisplay: React.FC<{ isCollapsed: boolean }> = ({ isCollapsed }) => {
           size="sm"
           onClick={() => navigate('/offres')}
           className={cn(
-            "bg-gradient-to-r from-cyan-500 to-emerald-500 text-slate-900 hover:from-cyan-400 hover:to-emerald-400 shadow-lg shadow-cyan-500/25",
+            "bg-gradient-gold text-slate-900 hover:opacity-90 shadow-lg shadow-gold/25",
             isCollapsed ? "w-10 h-10 p-0 rounded-xl" : "w-full rounded-xl"
           )}
         >
