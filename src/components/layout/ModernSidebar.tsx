@@ -299,6 +299,9 @@ const categories: Category[] = [
     emoji: '🚀',
     color: 'from-purple-500 to-pink-500',
     items: [
+      { id: 'publication-planner', label: '📅 Planificateur Publication', icon: Target, isNew: true },
+      { id: 'royalty-dashboard', label: '💰 Dashboard Revenus', icon: DollarSign, isNew: true },
+      { id: 'ux-center', label: '⚡ Centre Productivité', icon: Zap, isNew: true },
       { id: 'humanizer', label: '🛡️ Humaniseur IA', icon: Shield, isNew: true },
       { id: 'arc-manager', label: '👥 Gestionnaire ARC', icon: Users, isNew: true },
       { id: 'direct-sales', label: '💰 Vente Directe', icon: DollarSign, isNew: true },
