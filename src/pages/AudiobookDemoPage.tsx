@@ -312,16 +312,16 @@ const AudiobookDemoPage = () => {
             </div>
 
             {/* Pour qui est ce livre ? */}
-            <div className="bg-amber-500/[0.06] border border-amber-500/15 rounded-2xl p-6">
-              <h3 className="text-lg font-bold text-amber-400 mb-3 flex items-center gap-2">
+            <div className="bg-orange-50 border border-orange-200 rounded-2xl p-6">
+              <h3 className="text-lg font-bold text-orange-600 mb-3 flex items-center gap-2">
                 <Users className="w-5 h-5" />
                 Pour qui est ce livre audio ?
               </h3>
-              <ul className="space-y-2 text-white/70 text-sm">
-                <li className="flex items-start gap-2"><span className="text-amber-400 mt-0.5">✓</span> {audiobook.target_audience}</li>
-                <li className="flex items-start gap-2"><span className="text-amber-400 mt-0.5">✓</span> Parents cherchant des histoires captivantes pour le coucher ou les trajets</li>
-                <li className="flex items-start gap-2"><span className="text-amber-400 mt-0.5">✓</span> Enseignants souhaitant des supports audio ludiques</li>
-                <li className="flex items-start gap-2"><span className="text-amber-400 mt-0.5">✓</span> Amateurs d'aventures western drôles et familiales</li>
+              <ul className="space-y-2 text-gray-600 text-sm">
+                <li className="flex items-start gap-2"><span className="text-orange-500 mt-0.5">✓</span> {audiobook.target_audience}</li>
+                <li className="flex items-start gap-2"><span className="text-orange-500 mt-0.5">✓</span> Parents cherchant des histoires captivantes pour le coucher ou les trajets</li>
+                <li className="flex items-start gap-2"><span className="text-orange-500 mt-0.5">✓</span> Enseignants souhaitant des supports audio ludiques</li>
+                <li className="flex items-start gap-2"><span className="text-orange-500 mt-0.5">✓</span> Amateurs d'aventures western drôles et familiales</li>
               </ul>
             </div>
 
