@@ -152,7 +152,7 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
                               className={cn(
                                 "flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium transition-all duration-200 border",
                                 status === 'completed' && "bg-emerald-500 text-white border-emerald-600 shadow-sm",
-                                status === 'current' && "bg-cyan-600 text-white border-cyan-500 ring-2 ring-cyan-500/30 ring-offset-1 ring-offset-slate-900",
+                                status === 'current' && "bg-gold text-slate-900 border-gold shadow-sm ring-2 ring-gold/30 ring-offset-1 ring-offset-slate-900",
                                 status === 'available' && "bg-slate-800/60 hover:bg-slate-700/60 text-white/60 border-white/10 hover:text-white cursor-pointer",
                                 status === 'locked' && "bg-slate-800/30 text-white/20 border-transparent cursor-not-allowed"
                               )}
