@@ -318,19 +318,13 @@ const DemoPage = () => {
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label className="text-slate-300 text-sm">Nombre de chapitres</Label>
-                  <Select value={numberOfChapters} onValueChange={setNumberOfChapters} disabled={demoUsed || isGenerating}>
-                    <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-slate-900 border-slate-800">
-                      {[3, 5, 7, 10].map((n) => (
-                        <SelectItem key={n} value={n.toString()} className="text-white hover:bg-slate-800">{n} chapitres</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                {/* Chapitres fixés à 3 en démo */}
+                <div className="flex items-center gap-2 p-3 bg-slate-800/30 rounded-lg border border-slate-800/50">
+                  <BookMarked className="w-4 h-4 text-cyan-400" />
+                  <span className="text-sm text-slate-300">3 chapitres générés</span>
+                  <Badge className="ml-auto bg-slate-800 text-slate-400 border-slate-700 text-xs">Démo</Badge>
                 </div>
+                <p className="text-xs text-slate-500">💡 La version complète permet jusqu'à 20 chapitres avec rédaction intégrale</p>
 
                 <Button
                   className="w-full py-6 text-lg font-bold bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-900 rounded-xl shadow-lg shadow-cyan-500/20"
