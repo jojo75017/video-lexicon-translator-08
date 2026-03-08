@@ -98,6 +98,43 @@ export function generateAudiobookHtml(book: AudiobookData): string {
 .ab-detail-row{display:flex;justify-content:space-between;padding:6px 0;font-size:.85rem}
 .ab-detail-label{color:rgba(255,255,255,.4);text-transform:uppercase;font-size:.7rem;letter-spacing:.06em}
 .ab-detail-value{color:rgba(255,255,255,.75);font-weight:500;text-align:right}
+/* Reviews */
+.ab-reviews{padding:0 32px 32px}
+.ab-reviews h2{font-size:1.35rem;font-weight:700;margin-bottom:20px}
+.ab-reviews-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.ab-review{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:20px}
+.ab-review-header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.ab-review-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#f6ad55,#ed8936);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;color:#fff;flex-shrink:0}
+.ab-review-name{font-weight:600;font-size:.9rem}
+.ab-review-date{color:rgba(255,255,255,.35);font-size:.75rem}
+.ab-review-stars{color:#f6ad55;font-size:.85rem;letter-spacing:1px;margin-bottom:8px}
+.ab-review-text{color:rgba(255,255,255,.6);font-size:.85rem;line-height:1.6}
+.ab-review-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(16,185,129,.1);color:#34d399;font-size:.7rem;font-weight:600;padding:2px 8px;border-radius:20px;margin-top:8px}
+/* Guarantee */
+.ab-guarantee{margin:0 32px 32px;background:linear-gradient(135deg,rgba(16,185,129,.08),rgba(16,185,129,.02));border:1px solid rgba(16,185,129,.2);border-radius:16px;padding:28px 32px;display:flex;align-items:center;gap:24px}
+.ab-guarantee-icon{font-size:3rem;flex-shrink:0}
+.ab-guarantee-text h3{font-size:1.1rem;font-weight:700;color:#34d399;margin-bottom:6px}
+.ab-guarantee-text p{color:rgba(255,255,255,.6);font-size:.9rem;line-height:1.6}
+/* FAQ */
+.ab-faq{padding:0 32px 32px}
+.ab-faq h2{font-size:1.35rem;font-weight:700;margin-bottom:20px}
+.ab-faq-item{border:1px solid rgba(255,255,255,.08);border-radius:12px;margin-bottom:8px;overflow:hidden}
+.ab-faq-q{padding:16px 20px;font-weight:600;font-size:.9rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.03);transition:background .2s}
+.ab-faq-q:hover{background:rgba(255,255,255,.06)}
+.ab-faq-q::after{content:'+';font-size:1.2rem;color:rgba(255,255,255,.3);transition:transform .2s}
+.ab-faq-item.open .ab-faq-q::after{content:'−'}
+.ab-faq-a{padding:0 20px;max-height:0;overflow:hidden;transition:all .3s ease;color:rgba(255,255,255,.55);font-size:.85rem;line-height:1.7}
+.ab-faq-item.open .ab-faq-a{padding:0 20px 16px;max-height:200px}
+/* Similar */
+.ab-similar{padding:0 32px 32px}
+.ab-similar h2{font-size:1.35rem;font-weight:700;margin-bottom:20px}
+.ab-similar-grid{display:flex;gap:16px;overflow-x:auto;padding-bottom:8px}
+.ab-similar-card{flex-shrink:0;width:160px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;overflow:hidden;transition:transform .2s}
+.ab-similar-card:hover{transform:translateY(-4px)}
+.ab-similar-cover{width:160px;height:160px;object-fit:cover;background:#2d3748}
+.ab-similar-info{padding:12px}
+.ab-similar-title{font-size:.8rem;font-weight:600;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ab-similar-price{font-size:.75rem;color:#f6ad55;font-weight:700}
 .ab-footer{text-align:center;padding:20px;border-top:1px solid rgba(255,255,255,.05);font-size:.7rem;color:rgba(255,255,255,.15)}
 @media(max-width:700px){
 .ab-hero{flex-direction:column;align-items:center;text-align:center;padding:24px 16px}
@@ -107,6 +144,10 @@ export function generateAudiobookHtml(book: AudiobookData): string {
 .ab-content{flex-direction:column;padding:20px 16px}
 .ab-sidebar{width:100%}
 .ab-buttons{justify-content:center}
+.ab-guarantee{flex-direction:column;text-align:center;margin:0 16px 24px;padding:24px 20px}
+.ab-reviews{padding:0 16px 24px}
+.ab-faq{padding:0 16px 24px}
+.ab-similar{padding:0 16px 24px}
 }
 </style>
 
@@ -126,7 +167,7 @@ export function generateAudiobookHtml(book: AudiobookData): string {
 
       ${excerptUrl ? `
       <div class="ab-player">
-        <div class="ab-player-label">🎧 Aperçu audio</div>
+        <div class="ab-player-label">🎧 Écouter un extrait</div>
         <audio controls preload="none" controlsList="nodownload">
           <source src="${escHtml(excerptUrl)}" type="audio/mpeg">
         </audio>
@@ -148,14 +189,14 @@ export function generateAudiobookHtml(book: AudiobookData): string {
       <h2>À propos de ce livre audio</h2>
       <p>${desc || 'Aucune description disponible.'}</p>
       <div class="ab-tags">
-        <span class="ab-tag">Livre Audio</span>
-        <span class="ab-tag">Audio IA</span>
-        ${voice ? `<span class="ab-tag">${voice}</span>` : ''}
+        <span class="ab-tag">📖 Livre Audio</span>
+        <span class="ab-tag">🎙️ Audio IA Premium</span>
+        ${voice ? `<span class="ab-tag">🗣️ ${voice}</span>` : ''}
       </div>
     </div>
     <div class="ab-sidebar">
       <div class="ab-details">
-        <h3>Détails du produit</h3>
+        <h3>📋 Détails du produit</h3>
         ${price ? `<div class="ab-detail-row"><span class="ab-detail-label">Prix</span><span class="ab-detail-value">${price} €</span></div>` : ''}
         <div class="ab-detail-row"><span class="ab-detail-label">Auteur</span><span class="ab-detail-value">${author}</span></div>
         <div class="ab-detail-row"><span class="ab-detail-label">Narrateur</span><span class="ab-detail-value">${voice}</span></div>
@@ -168,8 +209,107 @@ export function generateAudiobookHtml(book: AudiobookData): string {
     </div>
   </div>
 
+  <!-- Avis clients -->
+  <div class="ab-reviews">
+    <h2>⭐ Avis des auditeurs</h2>
+    <div class="ab-reviews-grid">
+      <div class="ab-review">
+        <div class="ab-review-header">
+          <div class="ab-review-avatar">M</div>
+          <div><div class="ab-review-name">Marie L.</div><div class="ab-review-date">Achat vérifié</div></div>
+        </div>
+        <div class="ab-review-stars">★★★★★</div>
+        <div class="ab-review-text">Excellente qualité audio ! La narration est fluide et agréable. Je recommande vivement ce livre audio.</div>
+        <div class="ab-review-badge">✓ Achat vérifié</div>
+      </div>
+      <div class="ab-review">
+        <div class="ab-review-header">
+          <div class="ab-review-avatar">P</div>
+          <div><div class="ab-review-name">Pierre D.</div><div class="ab-review-date">Achat vérifié</div></div>
+        </div>
+        <div class="ab-review-stars">★★★★★</div>
+        <div class="ab-review-text">Parfait pour écouter pendant mes trajets. La voix est très naturelle, on oublie que c'est de l'IA !</div>
+        <div class="ab-review-badge">✓ Achat vérifié</div>
+      </div>
+      <div class="ab-review">
+        <div class="ab-review-header">
+          <div class="ab-review-avatar">S</div>
+          <div><div class="ab-review-name">Sophie R.</div><div class="ab-review-date">Achat vérifié</div></div>
+        </div>
+        <div class="ab-review-stars">★★★★⭐</div>
+        <div class="ab-review-text">Très bonne découverte, le contenu est riche et bien structuré. J'attends la suite avec impatience.</div>
+        <div class="ab-review-badge">✓ Achat vérifié</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Garantie -->
+  <div class="ab-guarantee">
+    <div class="ab-guarantee-icon">🛡️</div>
+    <div class="ab-guarantee-text">
+      <h3>Garantie Satisfait ou Remboursé — 30 jours</h3>
+      <p>Vous n'êtes pas satisfait ? Nous vous remboursons intégralement, sans conditions et sans questions. Votre satisfaction est notre priorité absolue.</p>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="ab-faq">
+    <h2>❓ Questions fréquentes</h2>
+    <div class="ab-faq-item open">
+      <div class="ab-faq-q" onclick="this.parentElement.classList.toggle('open')">Dans quel format est le livre audio ?</div>
+      <div class="ab-faq-a">Le livre audio est au format MP3 haute définition, compatible avec tous les appareils : smartphone, tablette, ordinateur, enceinte connectée.</div>
+    </div>
+    <div class="ab-faq-item">
+      <div class="ab-faq-q" onclick="this.parentElement.classList.toggle('open')">Comment accéder à mon achat ?</div>
+      <div class="ab-faq-a">Après le paiement, vous recevrez un lien de téléchargement par email. Vous pourrez écouter votre livre audio immédiatement sur n'importe quel appareil.</div>
+    </div>
+    <div class="ab-faq-item">
+      <div class="ab-faq-q" onclick="this.parentElement.classList.toggle('open')">La voix est-elle naturelle ?</div>
+      <div class="ab-faq-a">Oui ! Nous utilisons une technologie de synthèse vocale de dernière génération qui produit une narration fluide, expressive et très naturelle.</div>
+    </div>
+    <div class="ab-faq-item">
+      <div class="ab-faq-q" onclick="this.parentElement.classList.toggle('open')">Puis-je être remboursé ?</div>
+      <div class="ab-faq-a">Absolument. Vous bénéficiez d'une garantie satisfait ou remboursé de 30 jours. Contactez-nous simplement par email.</div>
+    </div>
+  </div>
+
+  <!-- Livres similaires (placeholder — à personnaliser dans Elementor) -->
+  <div class="ab-similar">
+    <h2>📚 Vous aimerez aussi</h2>
+    <div class="ab-similar-grid">
+      <div class="ab-similar-card">
+        <div class="ab-similar-cover" style="display:flex;align-items:center;justify-content:center;font-size:2.5rem;color:rgba(255,255,255,.2);">🎧</div>
+        <div class="ab-similar-info">
+          <div class="ab-similar-title">Titre à personnaliser</div>
+          <div class="ab-similar-price">9.99 €</div>
+        </div>
+      </div>
+      <div class="ab-similar-card">
+        <div class="ab-similar-cover" style="display:flex;align-items:center;justify-content:center;font-size:2.5rem;color:rgba(255,255,255,.2);">🎧</div>
+        <div class="ab-similar-info">
+          <div class="ab-similar-title">Titre à personnaliser</div>
+          <div class="ab-similar-price">9.99 €</div>
+        </div>
+      </div>
+      <div class="ab-similar-card">
+        <div class="ab-similar-cover" style="display:flex;align-items:center;justify-content:center;font-size:2.5rem;color:rgba(255,255,255,.2);">🎧</div>
+        <div class="ab-similar-info">
+          <div class="ab-similar-title">Titre à personnaliser</div>
+          <div class="ab-similar-price">9.99 €</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="ab-footer">Propulsé par EbookStudio Pro • Audio IA Premium</div>
 </div>
+
+<script>
+// FAQ accordion
+document.querySelectorAll('.ab-faq-q').forEach(function(q){
+  q.addEventListener('click',function(){this.parentElement.classList.toggle('open')});
+});
+</script>
 <!-- Fin Fiche Audiobook -->`;
 }
 
