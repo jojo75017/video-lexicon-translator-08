@@ -126,6 +126,9 @@ const SalesPage = () => {
   return (
     <div className="min-h-screen bg-slate-950 text-white overflow-x-hidden">
       
+      {/* ═══════════════════════════════════════ URGENCY BANNER ═══════════════════════════════════════ */}
+      <UrgencyBanner />
+
       {/* ═══════════════════════════════════════ TOP BAR ═══════════════════════════════════════ */}
       <div className="bg-gradient-to-r from-cyan-600 via-cyan-500 to-emerald-500 text-slate-900 py-2.5 px-4">
         <div className="max-w-6xl mx-auto flex items-center justify-center gap-4 text-sm font-semibold">
