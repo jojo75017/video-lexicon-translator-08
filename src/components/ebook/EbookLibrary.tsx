@@ -67,7 +67,7 @@ export const EbookLibrary: React.FC<EbookLibraryProps> = ({ onLoadProject }) => 
           .eq('user_id', user.id).order('created_at', { ascending: false }),
       ]);
 
-      if (ebooksRes.data) setProjects(ebooksRes.data);
+      if (ebooksRes.data) setProjects(ebooksRes.data as any);
       if (audioRes.data) setAudiobooks(audioRes.data);
     } catch (e) {
       console.error('Library fetch error:', e);
