@@ -3070,7 +3070,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
         return (
           <EbookWritingIntelligence
             chapters={chapters}
-            onUpdateChapterContent={handleUpdateChapterContent}
+            onUpdateChapterContent={updateChapterContent}
           />
         );
 
