@@ -25,7 +25,9 @@ export type Database = {
           excerpt_url: string | null
           id: string
           is_public: boolean
+          paypal_link: string | null
           play_count: number
+          price: number | null
           slug: string | null
           status: string
           title: string
@@ -43,7 +45,9 @@ export type Database = {
           excerpt_url?: string | null
           id?: string
           is_public?: boolean
+          paypal_link?: string | null
           play_count?: number
+          price?: number | null
           slug?: string | null
           status?: string
           title: string
@@ -61,7 +65,9 @@ export type Database = {
           excerpt_url?: string | null
           id?: string
           is_public?: boolean
+          paypal_link?: string | null
           play_count?: number
+          price?: number | null
           slug?: string | null
           status?: string
           title?: string
