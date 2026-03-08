@@ -218,8 +218,8 @@ export const SaasDashboard: React.FC = () => {
             {usageMetrics.map((metric) => (
               <div key={metric.name} className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">{metric.name}</span>
-                  <span className="font-medium">
+                  <span className="text-white/70">{metric.name}</span>
+                  <span className="font-medium text-white">
                     {metric.current} / {metric.max} {metric.unit}
                   </span>
                 </div>
