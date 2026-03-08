@@ -139,6 +139,10 @@ import SubscriberActivityPopup from '@/components/admin/SubscriberActivityPopup'
 import { EbookLibrary } from '@/components/ebook/EbookLibrary';
 import { AudioExpressWorkflow } from '@/components/ebook/AudioExpressWorkflow';
 import { AudiobookLibrary } from '@/components/ebook/AudiobookLibrary';
+import { EbookDraftMode } from '@/components/ebook/EbookDraftMode';
+import { EbookPromptLibrary } from '@/components/ebook/EbookPromptLibrary';
+import { EbookManuscriptDashboard } from '@/components/ebook/EbookManuscriptDashboard';
+import { EbookRichEditor } from '@/components/ebook/EbookRichEditor';
 
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
 import { ebookTemplates } from '@/data/ebookTemplates';
