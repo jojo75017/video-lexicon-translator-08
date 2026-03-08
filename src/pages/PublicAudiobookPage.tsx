@@ -150,7 +150,12 @@ const PublicAudiobookPage = () => {
   const [showFullDesc, setShowFullDesc] = useState(false);
   const [copied, setCopied] = useState(false);
   const [showFullPlayer, setShowFullPlayer] = useState(false);
+  // Excerpt state
+  const [excerptPlaying, setExcerptPlaying] = useState(false);
+  const [excerptTime, setExcerptTime] = useState(0);
+  const [excerptDuration, setExcerptDuration] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const excerptRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => { if (slug) fetchAudiobook(); }, [slug]);
 
