@@ -56,7 +56,7 @@ const AdminDirectPage = () => {
 
     const redirectTo = typeof window !== 'undefined'
       ? window.location.href.split('#')[0]
-      : `${window.location.origin}/admin-direct`;
+      : '/admin-direct';
 
     const { error: magicLinkError } = await supabase.auth.signInWithOtp({
       email: ADMIN_EMAIL,
