@@ -158,7 +158,7 @@ export const EbookUXEnhancements: React.FC<EbookUXEnhancementsProps> = ({
           <CardContent className="space-y-3">
             <div className="flex items-center justify-between">
               <Label className="text-sm">Sans distraction</Label>
-              <Switch checked={focusMode} onCheckedChange={(v) => { setFocusMode(v); onToggleFocus?.(); }} />
+              <Checkbox checked={focusMode} onCheckedChange={(v) => { setFocusMode(!!v); onToggleFocus?.(); }} />
             </div>
             <p className="text-xs text-muted-foreground">
               Masque la sidebar, les notifications et les barres d'outils secondaires
