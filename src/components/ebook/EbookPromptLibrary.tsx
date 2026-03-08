@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
   Library, Search, Copy, Star, BookOpen, Swords, Heart, Brain, 
   ChefHat, Plane, Briefcase, Baby, Sparkles, Check

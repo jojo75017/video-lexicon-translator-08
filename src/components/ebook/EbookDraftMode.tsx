@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Zap, Play, Pause, RotateCcw, CheckCircle2, Clock, BookOpen, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
