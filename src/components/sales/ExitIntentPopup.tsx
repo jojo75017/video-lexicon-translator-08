@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { X, Gift, Download, Sparkles, CheckCircle } from "lucide-react";
@@ -10,11 +10,38 @@ interface ExitIntentPopupProps {
   onContinueToOffer?: () => void;
 }
 
+const EXIT_INTENT_KEY = "exit_intent_shown";
+
 const ExitIntentPopup = ({ onContinueToOffer }: ExitIntentPopupProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
 
-  const openPopup = () => { trackExitIntent('shown'); setIsOpen(true); };
+  const openPopup = useCallback(() => {
+    const alreadyShown = sessionStorage.getItem(EXIT_INTENT_KEY);
+    if (alreadyShown) return;
+    trackExitIntent('shown');
+    setIsOpen(true);
+    sessionStorage.setItem(EXIT_INTENT_KEY, "true");
+  }, []);
+
+  // Exit-intent detection: mouse leaves viewport from top
+  useEffect(() => {
+    const handleMouseLeave = (e: MouseEvent) => {
+      if (e.clientY <= 0) {
+        openPopup();
+      }
+    };
+    // Delay activation to avoid false triggers on page load
+    const timer = setTimeout(() => {
+      document.addEventListener("mouseleave", handleMouseLeave);
+    }, 5000);
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener("mouseleave", handleMouseLeave);
+    };
+  }, [openPopup]);
+
+  const handleManualOpen = () => { trackExitIntent('shown'); setIsOpen(true); };
 
   const handleDownloadBonus = async () => {
     setIsDownloading(true);
