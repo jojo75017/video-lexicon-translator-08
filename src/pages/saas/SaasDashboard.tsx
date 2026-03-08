@@ -179,8 +179,8 @@ export const SaasDashboard: React.FC = () => {
         {/* Quick Actions */}
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle>Actions Rapides</CardTitle>
-            <CardDescription>Raccourcis courants pour accélérer votre workflow</CardDescription>
+            <CardTitle className="text-white">Actions Rapides</CardTitle>
+            <CardDescription className="text-white/60">Raccourcis courants pour accélérer votre workflow</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 sm:grid-cols-2">
