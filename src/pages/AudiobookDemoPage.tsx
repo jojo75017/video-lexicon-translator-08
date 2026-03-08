@@ -383,20 +383,20 @@ const AudiobookDemoPage = () => {
         </div>
 
         {/* ===== TEXT EXCERPT ===== */}
-        <div className="mt-12 bg-gradient-to-br from-amber-500/[0.06] to-transparent border border-amber-500/15 rounded-2xl p-7">
-          <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-            <BookOpen className="w-5 h-5 text-amber-400" />
+        <div className="mt-12 bg-white border border-gray-200 rounded-2xl p-7 shadow-sm">
+          <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <BookOpen className="w-5 h-5 text-orange-500" />
             Extrait du livre
           </h2>
           <div className="relative">
-            <blockquote className="text-white/60 text-[15px] leading-relaxed italic border-l-2 border-amber-500/40 pl-5 space-y-3">
+            <blockquote className="text-gray-500 text-[15px] leading-relaxed italic border-l-2 border-orange-400 pl-5 space-y-3">
               <p>« Le soleil tapait fort sur la petite ville de Cactus Valley. Tellement fort que même les cactus avaient l'air de transpirer. Au milieu de la rue principale — qui était aussi la seule rue — un garçon de dix ans se tenait debout, les pouces glissés dans les passants de sa ceinture, un chapeau de cow-boy beaucoup trop grand sur la tête. »</p>
               <p>« — Je suis Billy le Kid… enfin, Billy tout court, marmonna-t-il en plissant les yeux comme il avait vu faire dans les films. Et aujourd'hui, je deviens le cow-boy le plus rapide de tout l'Ouest ! »</p>
               <p>« Son cheval, Tornado — qui était en réalité un poney assez grassouillet — leva à peine la tête de son seau d'avoine et souffla un bruit qui ressemblait beaucoup à un rire... »</p>
             </blockquote>
-            <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[#0f1319] to-transparent pointer-events-none" />
+            <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent pointer-events-none" />
           </div>
-          <p className="text-amber-400/70 text-xs mt-4 font-medium">— Extrait du Chapitre 1 : « L'Arrivée à Cactus Valley »</p>
+          <p className="text-orange-500/80 text-xs mt-4 font-medium">— Extrait du Chapitre 1 : « L'Arrivée à Cactus Valley »</p>
         </div>
 
         {/* ===== REVIEWS ===== */}
