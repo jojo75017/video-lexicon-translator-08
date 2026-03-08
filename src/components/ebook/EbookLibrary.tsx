@@ -54,18 +54,32 @@ export const EbookLibrary: React.FC<EbookLibraryProps> = ({ onLoadProject }) => 
   const [activeTab, setActiveTab] = useState('all');
   const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; id: string; type: 'ebook' | 'audio' } | null>(null);
 
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
+
   const fetchAll = async () => {
     setIsLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { setIsLoading(false); return; }
+      if (!user) {
+        setIsAuthenticated(false);
+        setIsLoading(false);
+        toast.error('⚠️ Vous devez être connecté pour accéder à votre bibliothèque');
+        return;
+      }
+      setIsAuthenticated(true);
+      console.log('📚 [Library] Chargement pour user:', user.id);
 
       const [ebooksRes, audioRes] = await Promise.all([
         supabase.from('ebook_projects').select('id, title, author_name, project_type, created_at, updated_at, chapters, preface, conclusion, kdp_keywords, kdp_categories')
-          .eq('user_id', user.id).order('updated_at', { ascending: false }),
+          .eq('user_id', user.id).order('updated_at', { ascending: false }).limit(100),
         supabase.from('audiobooks').select('*')
-          .eq('user_id', user.id).order('created_at', { ascending: false }),
+          .eq('user_id', user.id).order('created_at', { ascending: false }).limit(100),
       ]);
+
+      console.log('📚 [Library] Résultats:', { ebooks: ebooksRes.data?.length, audio: audioRes.data?.length, ebookError: ebooksRes.error, audioError: audioRes.error });
+      
+      if (ebooksRes.error) { console.error('❌ Ebook fetch error:', ebooksRes.error); toast.error('Erreur chargement ebooks: ' + ebooksRes.error.message); }
+      if (audioRes.error) { console.error('❌ Audio fetch error:', audioRes.error); toast.error('Erreur chargement audio: ' + audioRes.error.message); }
 
       if (ebooksRes.data) setProjects(ebooksRes.data as any);
       if (audioRes.data) setAudiobooks(audioRes.data);
@@ -119,6 +133,17 @@ export const EbookLibrary: React.FC<EbookLibraryProps> = ({ onLoadProject }) => 
 
   const formatDate = (d: string) => new Date(d).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
   const formatDuration = (s: number | null) => s ? `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, '0')}` : '--:--';
+
+  if (!isAuthenticated) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 space-y-4">
+        <FolderOpen className="h-12 w-12 text-muted-foreground opacity-50" />
+        <p className="text-lg font-medium">Connexion requise</p>
+        <p className="text-sm text-muted-foreground">Connectez-vous pour retrouver vos ebooks et livres audio sauvegardés.</p>
+        <Button onClick={fetchAll}><RefreshCw className="h-4 w-4 mr-2" /> Réessayer</Button>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
