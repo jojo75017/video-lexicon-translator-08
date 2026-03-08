@@ -248,7 +248,7 @@ const SalesPage = () => {
             <div className="flex items-center gap-2">
               {[1,2,3,4,5].map(i => <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />)}
               <span className="font-bold text-white ml-2">4.8/5</span>
-              <span className="text-slate-500 text-sm">(47 avis)</span>
+              <span className="text-white/60 text-sm">(47 avis)</span>
             </div>
             <div className="h-10 w-px bg-slate-800 hidden sm:block" />
             <div className="flex items-center gap-3">
