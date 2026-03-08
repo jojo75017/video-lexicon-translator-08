@@ -41,6 +41,7 @@ export const AudiobookPublisher: React.FC<AudiobookPublisherProps> = ({
   const [excerptFile, setExcerptFile] = useState<File | null>(null);
   const [price, setPrice] = useState('');
   const [paypalLink, setPaypalLink] = useState('');
+  const [stripeLink, setStripeLink] = useState('');
 
   useEffect(() => {
     fetchAudiobooks();
@@ -128,6 +129,7 @@ export const AudiobookPublisher: React.FC<AudiobookPublisherProps> = ({
         is_public: isPublic,
         price: price ? parseFloat(price) : null,
         paypal_link: paypalLink.trim() || null,
+        stripe_link: stripeLink.trim() || null,
         slug,
         status: audioUrl ? 'published' : 'draft'
       } as any);
@@ -299,6 +301,11 @@ export const AudiobookPublisher: React.FC<AudiobookPublisherProps> = ({
                     <Label>Lien PayPal</Label>
                     <Input value={paypalLink} onChange={(e) => setPaypalLink(e.target.value)} placeholder="https://paypal.me/..." />
                   </div>
+                </div>
+                <div>
+                  <Label>Lien Stripe (page de paiement)</Label>
+                  <Input value={stripeLink} onChange={(e) => setStripeLink(e.target.value)} placeholder="https://buy.stripe.com/..." />
+                  <p className="text-xs text-muted-foreground mt-1">Créez un lien de paiement sur stripe.com → Liens de paiement</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <Checkbox id="is-public" checked={isPublic} onCheckedChange={(v) => setIsPublic(!!v)} />

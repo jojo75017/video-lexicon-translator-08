@@ -30,6 +30,7 @@ export type Database = {
           price: number | null
           slug: string | null
           status: string
+          stripe_link: string | null
           title: string
           updated_at: string
           user_id: string
@@ -50,6 +51,7 @@ export type Database = {
           price?: number | null
           slug?: string | null
           status?: string
+          stripe_link?: string | null
           title: string
           updated_at?: string
           user_id: string
@@ -70,6 +72,7 @@ export type Database = {
           price?: number | null
           slug?: string | null
           status?: string
+          stripe_link?: string | null
           title?: string
           updated_at?: string
           user_id?: string
