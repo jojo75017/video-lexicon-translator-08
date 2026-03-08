@@ -41,6 +41,8 @@ const ProspectManagerPage = () => {
   const navigate = useNavigate();
   const [prospects, setProspects] = useState<Prospect[]>([]);
   const [loading, setLoading] = useState(true);
+  const [authReady, setAuthReady] = useState(false);
+  const [hasSession, setHasSession] = useState(false);
   const [sending, setSending] = useState(false);
   const [importing, setImporting] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -62,7 +64,44 @@ const ProspectManagerPage = () => {
   }, []);
 
   useEffect(() => {
-    fetchProspects();
+    let isMounted = true;
+
+    const initializeAuth = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (!isMounted) return;
+
+      const connected = !!data.session;
+      setHasSession(connected);
+      setAuthReady(true);
+
+      if (connected) {
+        fetchProspects();
+      } else {
+        setLoading(false);
+      }
+    };
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!isMounted) return;
+
+      const connected = !!session;
+      setHasSession(connected);
+      setAuthReady(true);
+
+      if (connected) {
+        fetchProspects();
+      } else {
+        setProspects([]);
+        setLoading(false);
+      }
+    });
+
+    initializeAuth();
+
+    return () => {
+      isMounted = false;
+      authListener.subscription.unsubscribe();
+    };
   }, [fetchProspects]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -285,8 +324,13 @@ const ProspectManagerPage = () => {
               Format Excel : colonnes <code>email</code> et <code>prenom</code> (ou <code>first_name</code>, <code>nom</code>)
             </p>
 
-            {loading ? (
+            {!authReady || loading ? (
               <div className="text-center py-12 text-muted-foreground">Chargement...</div>
+            ) : !hasSession ? (
+              <div className="text-center py-12 text-muted-foreground">
+                <AlertCircle className="h-12 w-12 mx-auto mb-3 opacity-40" />
+                <p>Session admin non détectée. Reconnectez-vous via /admin-direct.</p>
+              </div>
             ) : prospects.length === 0 ? (
               <div className="text-center py-12 text-muted-foreground">
                 <Upload className="h-12 w-12 mx-auto mb-3 opacity-40" />
