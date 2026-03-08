@@ -769,12 +769,12 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
         </nav>
 
         {/* Quota */}
-        <div className="border-t border-violet-200/50 dark:border-violet-900/30">
+        <div className="border-t border-slate-800/50">
           <QuotaDisplay isCollapsed={isCollapsed} />
         </div>
 
         {/* Footer */}
-        <div className="p-2 border-t border-violet-200/50 dark:border-violet-900/30 flex gap-1">
+        <div className="p-2 border-t border-slate-800/50 flex gap-1">
           {isCollapsed && (
             <Tooltip>
               <TooltipTrigger asChild>
@@ -782,12 +782,12 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                   variant="ghost"
                   size="sm"
                   onClick={toggleTheme}
-                  className="flex-1 h-10 rounded-xl hover:bg-violet-100 dark:hover:bg-violet-900/30"
+                  className="flex-1 h-10 rounded-xl hover:bg-slate-800/50"
                 >
                   {isDark ? (
                     <Sun className="w-4 h-4 text-amber-500" />
                   ) : (
-                    <Moon className="w-4 h-4 text-violet-600" />
+                    <Moon className="w-4 h-4 text-slate-400" />
                   )}
                 </Button>
               </TooltipTrigger>
@@ -801,16 +801,16 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
             size="sm"
             onClick={onToggleCollapse}
             className={cn(
-              "h-10 flex items-center gap-2 rounded-xl hover:bg-violet-100 dark:hover:bg-violet-900/30",
+              "h-10 flex items-center gap-2 rounded-xl hover:bg-slate-800/50",
               isCollapsed ? "flex-1 justify-center" : "w-full"
             )}
           >
             {isCollapsed ? (
-              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+              <ChevronRight className="w-4 h-4 text-slate-500" />
             ) : (
               <>
-                <ChevronLeft className="w-4 h-4 text-muted-foreground" />
-                <span className="text-xs text-muted-foreground">Réduire le menu</span>
+                <ChevronLeft className="w-4 h-4 text-slate-500" />
+                <span className="text-xs text-slate-500">Réduire le menu</span>
               </>
             )}
           </Button>
