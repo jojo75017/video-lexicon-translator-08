@@ -4,153 +4,34 @@ import { trackEvent, trackCTAClick, trackNewsletterSignup, trackPlanSelect, trac
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, Sparkles, BookOpen, Zap, Star, ArrowRight, Play, Loader2, Clock, HelpCircle, CheckCircle, Gift, Send, Rocket, ShieldCheck, Crown, BarChart3, Landmark, PenTool, BadgeCheck, Package, Search, Brain, Link2, Eye, RotateCcw, Palette, Trophy, Shield, Cpu, Mic, Image, Globe, Headphones, Key, GraduationCap } from "lucide-react";
+import { Check, Sparkles, BookOpen, Zap, Star, ArrowRight, Play, Loader2, Clock, HelpCircle, CheckCircle, Gift, Send, Rocket, ShieldCheck, Crown, BarChart3, Landmark, PenTool, BadgeCheck, Package, Search, Brain, Link2, Eye, RotateCcw, Palette, Trophy, Shield, Cpu, Mic, Image, Globe, Headphones, Key, GraduationCap, Users, TrendingUp, Award, Timer, Flame } from "lucide-react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import ExitIntentPopup from "@/components/sales/ExitIntentPopup";
-import SocialProofBanner from "@/components/sales/SocialProofBanner";
 import SalesFaq from "@/components/sales/SalesFaq";
 import AuthorShowcase from "@/components/sales/AuthorShowcase";
-import PassiveRevenueProof from "@/components/sales/PassiveRevenueProof";
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
+// ════════════════════════════════════════════════════════════════════════════════
+// DESIGN SYSTEM 2026 — Palette Premium
+// ════════════════════════════════════════════════════════════════════════════════
+
+const fadeIn = {
+  hidden: { opacity: 0, y: 20 },
   visible: (i: number = 0) => ({
     opacity: 1, y: 0,
-    transition: { duration: 0.6, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }
+    transition: { duration: 0.5, delay: i * 0.1, ease: [0.25, 0.46, 0.45, 0.94] }
   })
 };
 
 const stagger = {
-  visible: { transition: { staggerChildren: 0.08 } }
+  visible: { transition: { staggerChildren: 0.06 } }
 };
 
-// Newsletter inline
-const NewsletterForm = () => {
-  const [newsletterEmail, setNewsletterEmail] = useState("");
-  const [isSubscribing, setIsSubscribing] = useState(false);
-  const [isSubscribed, setIsSubscribed] = useState(false);
-
-  const handleNewsletterSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newsletterEmail || !newsletterEmail.includes("@")) { toast.error("Email invalide"); return; }
-    setIsSubscribing(true);
-    try {
-      await supabase.functions.invoke("add-to-email-sequence", { body: { email: newsletterEmail.trim().toLowerCase() } });
-      trackNewsletterSignup("footer_offres");
-      setIsSubscribed(true);
-      toast.success("🎉 Inscrit ! Vérifiez votre boîte mail");
-      setNewsletterEmail("");
-    } catch { toast.error("Erreur, réessayez"); }
-    finally { setIsSubscribing(false); }
-  };
-
-  if (isSubscribed) return <div className="flex items-center gap-2 text-emerald-400 text-sm"><CheckCircle className="w-4 h-4" /><span>Inscrit !</span></div>;
-
-  return (
-    <form onSubmit={handleNewsletterSubmit} className="flex gap-2">
-      <Input type="email" placeholder="votre@email.com" value={newsletterEmail} onChange={(e) => setNewsletterEmail(e.target.value)} className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500 text-sm h-9" disabled={isSubscribing} />
-      <Button type="submit" size="sm" disabled={isSubscribing} className="bg-violet-600 hover:bg-violet-700 h-9 px-3">
-        {isSubscribing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-      </Button>
-    </form>
-  );
-};
-
-// Data
-const phases = [
-  {
-    title: "Direction & Stratégie",
-    phase: "Phase 1",
-    color: "from-violet-500 to-purple-600",
-    borderColor: "border-violet-500/30",
-    bgColor: "bg-violet-500/5",
-    badgeColor: "bg-violet-500/10 text-violet-400 border-violet-500/20",
-    roles: [
-      { icon: Crown, label: "P1", name: "Directeur", desc: "Vision globale du projet" },
-      { icon: BarChart3, label: "P2", name: "Marché", desc: "Analyse concurrentielle" },
-      { icon: Landmark, label: "P3", name: "Architecte", desc: "Structure du livre" },
-    ]
-  },
-  {
-    title: "Production",
-    phase: "Phase 2",
-    color: "from-amber-500 to-orange-500",
-    borderColor: "border-amber-500/30",
-    bgColor: "bg-amber-500/5",
-    badgeColor: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-    roles: [
-      { icon: PenTool, label: "P4", name: "Rédaction", desc: "Écriture guidée" },
-      { icon: Sparkles, label: "P5", name: "Réécriture", desc: "Amélioration du style" },
-      { icon: BadgeCheck, label: "P6", name: "Qualité", desc: "Contrôle éditorial" },
-    ]
-  },
-  {
-    title: "Publication",
-    phase: "Phase 3",
-    color: "from-emerald-500 to-teal-500",
-    borderColor: "border-emerald-500/30",
-    bgColor: "bg-emerald-500/5",
-    badgeColor: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-    roles: [
-      { icon: Package, label: "P7", name: "Packaging", desc: "Mise en forme finale" },
-      { icon: Search, label: "P8", name: "Diagnostic", desc: "Vérification complète" },
-    ]
-  },
-  {
-    title: "Intelligence Avancée",
-    phase: "Phase 4",
-    color: "from-sky-500 to-blue-600",
-    borderColor: "border-sky-500/30",
-    bgColor: "bg-sky-500/5",
-    badgeColor: "bg-sky-500/10 text-sky-400 border-sky-500/20",
-    roles: [
-      { icon: Brain, label: "P9", name: "Mémoire", desc: "Contexte persistant" },
-      { icon: Link2, label: "P10", name: "Cohérence", desc: "Fil narratif" },
-      { icon: Eye, label: "P11", name: "Critique", desc: "Regard externe" },
-      { icon: RotateCcw, label: "P12", name: "Boucle", desc: "Itération continue" },
-      { icon: Palette, label: "P13", name: "Style", desc: "Ton & voix" },
-      { icon: Trophy, label: "P14", name: "Verdict", desc: "Validation finale" },
-    ]
-  },
-];
-
-const steps = [
-  { num: "01", title: "Positionner", desc: "Analyse marché, promesse unique et architecture complète du livre", icon: BarChart3, color: "from-violet-500 to-purple-600" },
-  { num: "02", title: "Produire", desc: "Rédaction guidée par rôle, amélioration itérative et contrôle qualité", icon: PenTool, color: "from-amber-500 to-orange-500" },
-  { num: "03", title: "Optimiser", desc: "Mots-clés Amazon, packaging professionnel et export multi-format", icon: Zap, color: "from-emerald-500 to-teal-500" },
-  { num: "04", title: "Déployer", desc: "Marketing automatisé, audiobook et catalogue de publications", icon: Rocket, color: "from-sky-500 to-blue-600" },
-];
-
-const valuePrices = [
-  { label: "Rédacteur freelance", price: "500 – 2 000€", color: "text-red-500", borderColor: "border-red-500/20", bgColor: "bg-red-500/5" },
-  { label: "Ghostwriter", price: "1 500 – 5 000€", color: "text-orange-500", borderColor: "border-orange-500/20", bgColor: "bg-orange-500/5" },
-  { label: "Agence éditoriale", price: "jusqu'à 10 000€", color: "text-amber-500", borderColor: "border-amber-500/20", bgColor: "bg-amber-500/5" },
-];
-
-const testimonials = [
-  { name: "Marie D.", role: "Auteure Kindle — 5 ebooks publiés", text: "En 3 semaines, j'ai publié 5 ebooks avec le workflow. Mon meilleur mois : 420€ de royalties KDP. Avant, je mettais 2 mois par livre.", avatar: "MD", color: "from-pink-500 to-rose-500" },
-  { name: "Thomas L.", role: "Entrepreneur — Lead magnets", text: "J'utilise les ebooks comme lead magnets B2B. Résultat : +340 leads qualifiés en 2 mois. Le ROI est immédiat, l'outil se rembourse en 1 semaine.", avatar: "TL", color: "from-blue-500 to-cyan-500" },
-  { name: "Sophie R.", role: "Coach Business — Formation", text: "La formation audio m'a fait gagner 6 mois d'apprentissage. Mon premier ebook s'est vendu à 127 exemplaires le premier mois sur Amazon.", avatar: "SR", color: "from-violet-500 to-purple-500" },
-  { name: "Jean-Marc P.", role: "Retraité — Premier ebook à 62 ans", text: "Zéro compétence technique au départ. Le workflow m'a guidé étape par étape. Mon ebook sur le jardinage est à 4.3 étoiles sur Amazon.", avatar: "JP", color: "from-emerald-500 to-teal-500" },
-  { name: "Camille B.", role: "Formatrice — Catalogue de 12 ebooks", text: "J'ai automatisé ma création de contenu. 12 ebooks en 4 mois, tous avec 4+ étoiles. Mon taux de conversion email a doublé grâce aux lead magnets.", avatar: "CB", color: "from-amber-500 to-orange-500" },
-  { name: "Nicolas F.", role: "Blogueur Pro — Revenus passifs", text: "De 0€ à 850€/mois de revenus passifs KDP en 6 mois. Le secret : le workflow qui structure tout. Je ne reviendrais jamais en arrière.", avatar: "NF", color: "from-cyan-500 to-blue-500" },
-];
-
-const techStack = [
-  { icon: Cpu, name: "Gemini 3 Flash", desc: "IA la plus rapide de Google, rédaction instantanée", color: "from-blue-500 to-cyan-500" },
-  { icon: Image, name: "Imagen 3", desc: "Couvertures photoréalistes professionnelles", color: "from-violet-500 to-purple-500" },
-  { icon: Headphones, name: "Azure Neural Voices", desc: "Audiobooks avec voix neuronales premium", color: "from-emerald-500 to-teal-500" },
-  { icon: Globe, name: "Multi-langues", desc: "Traduction et rédaction dans 30+ langues", color: "from-amber-500 to-orange-500" },
-];
-
+// Prix
 const LAUNCH_PRICE = 97;
 const NORMAL_PRICE = 247;
-const PROMO_DISCOUNT = 50;
-const FUTURE_PRICE = NORMAL_PRICE - PROMO_DISCOUNT; // 197€
-
 const LAUNCH_END = new Date('2026-06-30T23:59:59').getTime();
 
 const useCountdown = (targetDate: number) => {
@@ -172,12 +53,46 @@ const useCountdown = (targetDate: number) => {
   return timeLeft;
 };
 
+// Newsletter Form
+const NewsletterForm = () => {
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [done, setDone] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.includes("@")) return;
+    setLoading(true);
+    try {
+      await supabase.functions.invoke("add-to-email-sequence", { body: { email: email.trim().toLowerCase() } });
+      trackNewsletterSignup("footer");
+      setDone(true);
+    } catch { toast.error("Erreur"); }
+    setLoading(false);
+  };
+
+  if (done) return <p className="text-emerald-400 text-sm flex items-center gap-2"><CheckCircle className="w-4 h-4" />Inscrit !</p>;
+
+  return (
+    <form onSubmit={handleSubmit} className="flex gap-2">
+      <Input type="email" placeholder="votre@email.com" value={email} onChange={e => setEmail(e.target.value)} 
+        className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 h-10 rounded-xl" />
+      <Button type="submit" disabled={loading} className="bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold h-10 px-4 rounded-xl">
+        {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+      </Button>
+    </form>
+  );
+};
+
+// ════════════════════════════════════════════════════════════════════════════════
+// MAIN COMPONENT
+// ════════════════════════════════════════════════════════════════════════════════
+
 const SalesPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const countdown = useCountdown(LAUNCH_END);
 
-  // Capture referral code from URL
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const ref = params.get('ref');
@@ -185,43 +100,9 @@ const SalesPage = () => {
   }, [location.search]);
 
   useEffect(() => {
-    if (location.hash) {
-      const id = location.hash.replace('#', '');
-      setTimeout(() => {
-        const el = document.getElementById(id);
-        if (el) {
-          const y = el.getBoundingClientRect().top + window.scrollY - 20;
-          window.scrollTo({ top: y, behavior: 'smooth' });
-        }
-      }, 300);
-    }
-  }, [location.hash]);
-
-  useEffect(() => {
-    document.title = "EbookStudio Pro — Workflow IA Premium pour Amazon KDP | 97€ à vie";
+    document.title = "EbookStudio Pro 2026 — Créez des ebooks professionnels avec l'IA";
     const meta = document.querySelector('meta[name="description"]');
-    if (meta) meta.setAttribute("content", "Créez des ebooks haut de gamme avec Gemini 3 Flash, Imagen 3 et Azure Neural Voices. Workflow éditorial 15 rôles IA. Accès à vie 97€. Garantie 30 jours.");
-  }, []);
-
-  // JSON-LD structured data
-  useEffect(() => {
-    const existingLd = document.querySelector('script[data-ld="sales"]');
-    if (existingLd) existingLd.remove();
-    const script = document.createElement('script');
-    script.type = 'application/ld+json';
-    script.setAttribute('data-ld', 'sales');
-    script.textContent = JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
-      "name": "EbookStudio Pro",
-      "applicationCategory": "ProductivityApplication",
-      "operatingSystem": "Web",
-      "offers": { "@type": "Offer", "price": LAUNCH_PRICE, "priceCurrency": "EUR", "availability": "https://schema.org/InStock" },
-      "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.8", "reviewCount": "47" },
-      "description": "Workflow éditorial IA premium avec Gemini 3 Flash pour créer et publier des ebooks sur Amazon KDP."
-    });
-    document.head.appendChild(script);
-    return () => { const ld = document.querySelector('script[data-ld="sales"]'); if (ld) ld.remove(); };
+    if (meta) meta.setAttribute("content", "Workflow IA complet pour créer et publier des ebooks sur Amazon KDP. Gemini 3 Flash, couvertures IA, audiobooks. 97€ à vie.");
   }, []);
 
   const handlePlanClick = () => {
@@ -235,325 +116,185 @@ const SalesPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      {/* Zoom Banner */}
-      <a href="https://calendly.com/boubetgeorges/nouvelle-reunion" target="_blank" rel="noopener noreferrer"
-        className="block w-full bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-500 text-white text-center py-2.5 px-4 text-sm font-semibold hover:brightness-110 transition-all sticky top-0 z-[60]">
-        <span className="flex items-center justify-center gap-2">
-          <Play className="w-4 h-4 fill-white" />
-          🎥 Dispo en Zoom — Voyez l'outil en direct
-          <span className="hidden sm:inline border border-white/30 rounded-full px-3 py-0.5 text-xs ml-2">Réserver →</span>
-        </span>
-      </a>
-
-      {/* ═══ COMPTEUR DE LANCEMENT PREMIUM ═══ */}
-      <div className="w-full bg-gradient-to-r from-slate-900 via-violet-950 to-slate-900 text-white py-4 px-4 border-b border-violet-500/20">
-        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8">
-          <div className="flex items-center gap-2.5">
-            <div className="relative">
-              <div className="absolute inset-0 bg-amber-400/30 rounded-full blur-md animate-pulse" />
-              <Clock className="w-5 h-5 text-amber-400 relative z-10" />
-            </div>
-            <span className="text-sm font-bold tracking-wide uppercase text-amber-300">Offre de lancement — Fin le 30 juin 2026</span>
+    <div className="min-h-screen bg-slate-950 text-white overflow-x-hidden">
+      
+      {/* ═══════════════════════════════════════ TOP BAR ═══════════════════════════════════════ */}
+      <div className="bg-gradient-to-r from-cyan-600 via-cyan-500 to-emerald-500 text-slate-900 py-2.5 px-4">
+        <div className="max-w-6xl mx-auto flex items-center justify-center gap-4 text-sm font-semibold">
+          <Flame className="w-4 h-4" />
+          <span>OFFRE DE LANCEMENT — Fin le 30 juin 2026</span>
+          <div className="hidden sm:flex items-center gap-1.5 bg-slate-900/20 rounded-lg px-3 py-1">
+            <span className="tabular-nums font-bold">{countdown.days}j</span>
+            <span>:</span>
+            <span className="tabular-nums font-bold">{countdown.hours}h</span>
+            <span>:</span>
+            <span className="tabular-nums font-bold">{countdown.minutes}m</span>
           </div>
-          <div className="flex items-center gap-1.5">
-            {[
-              { value: countdown.days, label: 'Jours' },
-              { value: countdown.hours, label: 'Heures' },
-              { value: countdown.minutes, label: 'Min' },
-              { value: countdown.seconds, label: 'Sec' },
-            ].map((unit, i) => (
-              <div key={i} className="flex items-center gap-1.5">
-                <div className="flex flex-col items-center">
-                  <span className="bg-gradient-to-b from-white/15 to-white/5 backdrop-blur-sm border border-white/10 rounded-xl px-3 py-1.5 text-xl font-extrabold tabular-nums min-w-[3rem] text-center shadow-inner">
-                    {unit.value.toString().padStart(2, '0')}
-                  </span>
-                  <span className="text-[10px] text-white/50 font-medium mt-1 uppercase tracking-wider">{unit.label}</span>
-                </div>
-                {i < 3 && <span className="text-white/20 text-xl font-light mb-4">:</span>}
-              </div>
-            ))}
-          </div>
-          <Badge className="bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-300 border-amber-500/30 text-xs font-bold px-3 py-1">
-            −{NORMAL_PRICE - LAUNCH_PRICE}€
-          </Badge>
+          <Badge className="bg-slate-900 text-cyan-400 border-0 font-bold">−150€</Badge>
         </div>
       </div>
 
-      {/* Header Premium */}
-      <header className="bg-background/60 backdrop-blur-2xl border-b border-border/30 sticky top-[40px] z-50">
-        <div className="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between">
-          <Link to="/offres" onClick={() => trackOffresClick('logo_header')} className="flex items-center gap-2.5 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-500/25 group-hover:shadow-violet-500/40 transition-shadow">
-              <BookOpen className="w-5 h-5 text-white" />
+      {/* ═══════════════════════════════════════ HEADER ═══════════════════════════════════════ */}
+      <header className="sticky top-0 z-50 bg-slate-950/90 backdrop-blur-xl border-b border-slate-800/50">
+        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+          <Link to="/offres" className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-emerald-400 flex items-center justify-center">
+              <BookOpen className="w-5 h-5 text-slate-900" />
             </div>
             <div>
-              <span className="text-lg font-bold block leading-tight">EbookStudio Pro</span>
-              <span className="text-[10px] text-muted-foreground font-medium tracking-widest uppercase">Workflow IA Premium</span>
+              <span className="font-bold text-lg">EbookStudio</span>
+              <span className="text-cyan-400 font-bold ml-1">Pro</span>
             </div>
           </Link>
-          <nav className="hidden md:flex items-center gap-1 text-sm">
-            {[
-              { href: "#author-showcase", label: "📚 Ebooks créés", scroll: true },
-              { to: "/blog", label: "Blog" },
-              { to: "/demo", label: "Démo" },
-              { to: "/formation", label: "Formation" },
-            ].map((item, i) => (
-              'scroll' in item ? (
-                <a key={i} href={item.href} onClick={(e) => { e.preventDefault(); document.getElementById('author-showcase')?.scrollIntoView({ behavior: 'smooth' }); }}
-                  className="text-muted-foreground hover:text-primary transition-all font-medium cursor-pointer px-3 py-1.5 rounded-lg hover:bg-primary/5">{item.label}</a>
-              ) : (
-                <Link key={i} to={item.to!} className="text-muted-foreground hover:text-primary transition-all px-3 py-1.5 rounded-lg hover:bg-primary/5">{item.label}</Link>
-              )
-            ))}
-            <Link to="/faq" className="text-muted-foreground hover:text-primary transition-all flex items-center gap-1 px-3 py-1.5 rounded-lg hover:bg-primary/5"><HelpCircle className="w-3.5 h-3.5" />FAQ</Link>
+          
+          <nav className="hidden md:flex items-center gap-6 text-sm">
+            <a href="#features" className="text-slate-400 hover:text-white transition-colors">Fonctionnalités</a>
+            <a href="#pricing" className="text-slate-400 hover:text-white transition-colors">Tarif</a>
+            <Link to="/demo" className="text-slate-400 hover:text-white transition-colors">Démo</Link>
+            <Link to="/faq" className="text-slate-400 hover:text-white transition-colors">FAQ</Link>
           </nav>
-          <Button size="sm" className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-lg shadow-violet-500/20 font-bold"
-            onClick={scrollToPricing}>
-            <Sparkles className="w-3.5 h-3.5 mr-1.5" />
-            Offre de lancement
+
+          <Button onClick={scrollToPricing} className="bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold rounded-xl px-5">
+            <Sparkles className="w-4 h-4 mr-2" />
+            97€ à vie
           </Button>
         </div>
       </header>
 
       {/* ═══════════════════════════════════════ HERO ═══════════════════════════════════════ */}
-      <section className="relative overflow-hidden pt-10 sm:pt-16 pb-16 sm:pb-28 px-4">
-        {/* Premium background effects */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,hsl(var(--primary)/0.15),transparent)]" />
-        <div className="absolute top-20 left-1/4 w-[500px] h-[500px] bg-violet-500/8 rounded-full blur-[150px] pointer-events-none" />
-        <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-purple-500/8 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/3 rounded-full blur-[200px] pointer-events-none" />
-
+      <section className="relative py-20 sm:py-28 px-4">
+        {/* Background effects */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(6,182,212,0.15),transparent)]" />
+        <div className="absolute top-40 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-20 right-1/4 w-80 h-80 bg-emerald-500/10 rounded-full blur-[100px] pointer-events-none" />
+        
         <motion.div initial="hidden" animate="visible" variants={stagger} className="max-w-4xl mx-auto text-center relative z-10">
-
-          <motion.div variants={fadeUp} custom={0.5} className="mb-6">
-            <Badge className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 px-5 py-2.5 text-sm font-bold shadow-lg shadow-amber-500/5">
-              <Sparkles className="w-4 h-4 mr-2" />
-              OFFRE DE LANCEMENT — 97€ au lieu de 247€
+          
+          <motion.div variants={fadeIn} className="mb-6">
+            <Badge className="bg-cyan-500/10 text-cyan-400 border-cyan-500/30 px-4 py-2 text-sm font-semibold">
+              <Cpu className="w-4 h-4 mr-2" />
+              Propulsé par Gemini 3 Flash & Imagen 3
             </Badge>
           </motion.div>
 
-          <motion.h1 variants={fadeUp} custom={1} className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.08] tracking-tight mb-5">
-            Créez des ebooks{" "}
-            <span className="bg-gradient-to-r from-violet-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-              haut de gamme
+          <motion.h1 variants={fadeIn} custom={1} className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-[1.1] tracking-tight mb-6">
+            Créez des ebooks
+            <br />
+            <span className="bg-gradient-to-r from-cyan-400 via-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+              professionnels
             </span>
-            <br className="hidden sm:block" />
-            <span className="text-foreground/80"> avec l'IA la plus puissante</span>
+            <br />
+            en moins d'une heure
           </motion.h1>
 
-          <motion.p variants={fadeUp} custom={1.5} className="text-lg sm:text-xl md:text-2xl text-muted-foreground mb-3 font-light tracking-wide">
-            Gemini 3 Flash &bull; Imagen 3 &bull; Azure Neural Voices
-          </motion.p>
-          <motion.p variants={fadeUp} custom={1.6} className="text-base sm:text-lg text-muted-foreground mb-8 font-medium max-w-2xl mx-auto">
-            Le workflow IA en 15 rôles qui a déjà généré <span className="text-foreground font-bold">+35 ebooks publiés</span> sur Amazon KDP.
+          <motion.p variants={fadeIn} custom={2} className="text-lg sm:text-xl text-slate-400 mb-8 max-w-2xl mx-auto leading-relaxed">
+            Le workflow IA complet qui a déjà généré <span className="text-white font-semibold">+35 ebooks publiés</span> sur Amazon KDP.
+            Rédaction, couvertures, audiobooks — tout en un.
           </motion.p>
 
-          {/* Tech stack badges - premium style */}
-          <motion.div variants={fadeUp} custom={1.8} className="flex flex-wrap justify-center gap-3 mb-8">
-            {techStack.map((tech, i) => (
-              <div key={i} className="flex items-center gap-2.5 bg-card/80 backdrop-blur-sm border border-border/50 rounded-full px-5 py-2.5 text-sm shadow-sm hover:shadow-md hover:border-primary/30 transition-all duration-300">
-                <div className={`w-7 h-7 rounded-full bg-gradient-to-br ${tech.color} flex items-center justify-center shadow-sm`}>
-                  <tech.icon className="w-3.5 h-3.5 text-white" />
-                </div>
-                <span className="font-semibold">{tech.name}</span>
-              </div>
-            ))}
-          </motion.div>
-
-          {/* 3 pillars - premium cards */}
-          <motion.div variants={fadeUp} custom={2} className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 max-w-2xl mx-auto">
+          {/* Stats */}
+          <motion.div variants={fadeIn} custom={3} className="flex flex-wrap justify-center gap-6 sm:gap-10 mb-10">
             {[
-              { text: "Trouvez une niche rentable", emoji: "🎯" },
-              { text: "Générez votre ebook complet", emoji: "✍️" },
-              { text: "Publiez sur Amazon KDP", emoji: "🚀" },
-            ].map((item, i) => (
-              <div key={i} className="flex items-center gap-2.5 bg-emerald-500/5 border border-emerald-500/15 rounded-xl px-4 py-3 text-sm font-medium">
-                <span className="text-lg">{item.emoji}</span>
-                <span>{item.text}</span>
+              { value: "35+", label: "Ebooks publiés" },
+              { value: "~0,30€", label: "Coût par ebook" },
+              { value: "45 min", label: "Temps moyen" },
+            ].map((stat, i) => (
+              <div key={i} className="text-center">
+                <p className="text-3xl sm:text-4xl font-black text-white">{stat.value}</p>
+                <p className="text-sm text-slate-500 mt-1">{stat.label}</p>
               </div>
             ))}
           </motion.div>
 
-          {/* Social proof bar - more credible */}
-          <motion.div variants={fadeUp} custom={2.05} className="flex flex-wrap items-center justify-center gap-6 mb-8 py-4 px-6 bg-card/50 backdrop-blur-sm rounded-2xl border border-border/30 max-w-lg mx-auto">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <div className="flex -space-x-2.5">
-                {['MD','TL','SR','JP'].map((a, i) => (
-                  <div key={i} className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-[10px] text-white font-bold border-2 border-background shadow-sm">{a}</div>
-                ))}
-              </div>
-              <span className="ml-1.5 font-medium">Auteurs indépendants</span>
-            </div>
-            <div className="h-6 w-px bg-border" />
-            <div className="flex items-center gap-1.5">
-              {[1,2,3,4,5].map(s => <Star key={s} className="w-4 h-4 fill-yellow-400 text-yellow-400" />)}
-              <span className="text-sm text-muted-foreground font-semibold ml-1">4.8/5</span>
-            </div>
-          </motion.div>
-
-          {/* CTA Button - bigger, bolder */}
-          <motion.div variants={fadeUp} custom={2.2} className="flex flex-col items-center gap-4 mb-10">
-            <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg px-10 sm:px-14 py-8 bg-gradient-to-r from-violet-600 via-purple-600 to-violet-700 hover:from-violet-500 hover:via-purple-500 hover:to-violet-600 text-white shadow-2xl shadow-violet-500/30 hover:shadow-violet-500/50 transition-all duration-500 hover:-translate-y-1 hover:scale-[1.02] rounded-2xl font-extrabold"
-              onClick={() => { trackCTAClick('hero_cta_top', '#pricing'); scrollToPricing(); }}>
+          {/* CTA Principal */}
+          <motion.div variants={fadeIn} custom={4} className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
+            <Button size="lg" onClick={handlePlanClick}
+              className="w-full sm:w-auto text-lg px-10 py-7 bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-900 font-bold rounded-2xl shadow-2xl shadow-cyan-500/25 hover:shadow-cyan-500/40 transition-all duration-300 hover:-translate-y-1">
               <Rocket className="w-5 h-5 mr-2" />
-              🔥 Offre de lancement — 97€ au lieu de 247€
+              Commencer — 97€ à vie
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
-            <div className="flex flex-wrap justify-center gap-4 text-sm text-muted-foreground">
-              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-emerald-500" />+35 ebooks publiés</span>
-              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-emerald-500" />~0,30€/ebook</span>
-              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-emerald-500" />45 min en moyenne</span>
-            </div>
-          </motion.div>
-
-          {/* Vidéo présentation - cinematic frame */}
-          <motion.div variants={fadeUp} custom={2.5} className="mb-8 max-w-3xl mx-auto">
-            <h2 className="text-lg sm:text-xl font-bold text-foreground mb-4 flex items-center justify-center gap-2">
-              <Play className="w-5 h-5 text-primary" />
-              EbookStudio Pro 2026 — La Révolution Gemini 3 Flash & Azure Neural
-            </h2>
-            <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-violet-500/15 border border-border/50 bg-card aspect-video group">
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
-              <video
-                src="/videos/ebook-studio-2026-gemini.mp4"
-                controls
-                playsInline
-                preload="metadata"
-                className="absolute inset-0 w-full h-full object-cover"
-                poster=""
-              />
-            </div>
-            <div className="mt-4 text-center">
-              <a
-                href="https://www.trafic-affiliation.com/formationebookstudio2026"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/30 text-emerald-400 hover:text-emerald-300 hover:border-emerald-400/50 transition-all duration-300 font-semibold text-sm"
-              >
-                <GraduationCap className="w-4 h-4" />
-                🎓 Voir la formation complète gratuite — Gemini 3 Flash & Azure Neural
-                <ArrowRight className="w-4 h-4" />
-              </a>
-            </div>
-          </motion.div>
-
-          <motion.div variants={fadeUp} custom={3} className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg px-8 py-7 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-xl shadow-violet-500/25 transition-all duration-300 hover:-translate-y-0.5 rounded-xl font-bold"
-              onClick={() => { trackCTAClick('hero_cta_primary', '/paiement'); handlePlanClick(); }}>
-              <Rocket className="w-5 h-5 mr-2" />
-              👉 Créer mon premier ebook maintenant
-            </Button>
-            <Button size="lg" variant="outline" className="w-full sm:w-auto text-sm sm:text-base px-6 py-6 border-2 border-border hover:border-primary/50 hover:bg-primary/5 transition-all duration-300 rounded-xl"
-              onClick={() => { trackDemoClick("demo_hero"); navigate('/demo'); }}>
+            <Button size="lg" variant="outline" onClick={() => navigate('/demo')}
+              className="w-full sm:w-auto text-base px-8 py-6 border-slate-700 text-slate-300 hover:text-white hover:border-slate-600 hover:bg-slate-800/50 rounded-2xl">
               <Play className="w-5 h-5 mr-2" />
-              Voir la démonstration complète
+              Voir la démo
             </Button>
           </motion.div>
 
-          <motion.p variants={fadeUp} custom={3.5} className="mt-5">
-            <a href="https://www.amazon.fr/Mr-Georges-Boubet/e/B0CGVLHNX7" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1.5">
-              📚 Ebooks publiés en conditions réelles — voir ma page auteur Amazon
-              <ArrowRight className="w-3.5 h-3.5" />
-            </a>
-          </motion.p>
+          <motion.div variants={fadeIn} custom={5} className="flex flex-wrap justify-center gap-4 text-sm text-slate-500">
+            <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-500" />Paiement unique</span>
+            <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-500" />Accès à vie</span>
+            <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-500" />Garantie 30 jours</span>
+          </motion.div>
         </motion.div>
       </section>
 
-      {/* ═══════════════════════ TECHNOLOGIE PREMIUM ═══════════════════════ */}
-      <section className="py-16 px-4 bg-muted/30 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,hsl(var(--primary)/0.05),transparent_50%)]" />
-        <div className="max-w-5xl mx-auto relative z-10">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-12">
-            <motion.div variants={fadeUp}>
-              <Badge className="mb-5 bg-blue-500/10 text-blue-500 border-blue-500/20 px-5 py-2.5 text-sm font-bold">
-                <Cpu className="w-4 h-4 mr-2" />
-                Technologie de pointe 2026
-              </Badge>
-            </motion.div>
-            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-5xl font-extrabold mb-5 leading-tight">
-              Propulsé par les{" "}
-              <span className="bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">meilleurs modèles IA</span>
-              <br className="hidden md:block" /> du marché
+      {/* ═══════════════════════════════════════ SOCIAL PROOF ═══════════════════════════════════════ */}
+      <section className="py-12 border-y border-slate-800/50 bg-slate-900/30">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-16">
+            <div className="flex items-center gap-3">
+              <div className="flex -space-x-3">
+                {['MD','TL','SR','JP','CB'].map((a, i) => (
+                  <div key={i} className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-emerald-500 flex items-center justify-center text-xs text-slate-900 font-bold border-2 border-slate-900">{a}</div>
+                ))}
+              </div>
+              <div>
+                <p className="font-semibold text-white">47+ auteurs</p>
+                <p className="text-xs text-slate-500">utilisent EbookStudio</p>
+              </div>
+            </div>
+            <div className="h-10 w-px bg-slate-800 hidden sm:block" />
+            <div className="flex items-center gap-2">
+              {[1,2,3,4,5].map(i => <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />)}
+              <span className="font-bold text-white ml-2">4.8/5</span>
+              <span className="text-slate-500 text-sm">(47 avis)</span>
+            </div>
+            <div className="h-10 w-px bg-slate-800 hidden sm:block" />
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
+                <Trophy className="w-5 h-5 text-amber-400" />
+              </div>
+              <div>
+                <p className="font-semibold text-white">#1 en France</p>
+                <p className="text-xs text-slate-500">Workflow KDP IA</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════ FEATURES ═══════════════════════════════════════ */}
+      <section id="features" className="py-20 px-4">
+        <div className="max-w-6xl mx-auto">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-16">
+            <motion.p variants={fadeIn} className="text-cyan-400 font-semibold mb-3 uppercase tracking-wider text-sm">Technologie 2026</motion.p>
+            <motion.h2 variants={fadeIn} custom={1} className="text-3xl sm:text-4xl md:text-5xl font-black mb-5">
+              Tout ce dont vous avez besoin
             </motion.h2>
-            <motion.p variants={fadeUp} custom={2} className="text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed">
-              Vos propres clés API pour un accès direct — sans intermédiaire, sans limite imposée.
+            <motion.p variants={fadeIn} custom={2} className="text-slate-400 text-lg max-w-2xl mx-auto">
+              Un écosystème complet pour créer, optimiser et publier vos ebooks sur Amazon KDP
             </motion.p>
           </motion.div>
 
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {techStack.map((tech, i) => (
-              <motion.div key={i} variants={fadeUp} custom={i}>
-                <Card className="h-full border hover:border-primary/30 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 hover:-translate-y-2 text-center group bg-card/80 backdrop-blur-sm">
-                  <CardContent className="pt-10 pb-8">
-                    <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${tech.color} flex items-center justify-center mx-auto mb-5 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                      <tech.icon className="w-8 h-8 text-white" />
-                    </div>
-                    <h3 className="font-bold text-lg mb-2">{tech.name}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{tech.desc}</p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mt-10 text-center">
-            <div className="inline-flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl px-8 py-4 text-sm shadow-sm">
-              <ShieldCheck className="w-5 h-5 text-emerald-500" />
-              <span className="text-emerald-600 dark:text-emerald-400 font-semibold">
-                BYOK (Bring Your Own Key) — Vos clés API, votre contrôle total, ~0,30€/ebook
-              </span>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════ MESSAGE MOTIVATION ═══════════════════════════ */}
-      <section className="py-10 px-4">
-        <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="max-w-3xl mx-auto relative overflow-hidden rounded-3xl bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700 p-10 shadow-2xl shadow-violet-500/20 border border-white/10 text-center">
-          <div className="absolute -top-10 -right-10 w-48 h-48 bg-white/10 rounded-full blur-[70px]" />
-          <div className="absolute -bottom-10 -left-10 w-36 h-36 bg-pink-500/15 rounded-full blur-[60px]" />
-          <div className="relative z-10">
-            <p className="text-4xl mb-4">🚀</p>
-            <h3 className="text-2xl md:text-3xl font-extrabold text-white mb-4">1, 2, 3… Foncez !</h3>
-            <p className="text-white/85 text-base md:text-lg leading-relaxed max-w-xl mx-auto">
-              Et sachez que je suis <strong className="text-white">toujours là pour vous accompagner</strong> — avec un Zoom gratuit, à tout moment.
-            </p>
-            <p className="text-white/40 text-sm mt-5 italic">— Georges, créateur d'EbookStudio</p>
-          </div>
-        </motion.div>
-      </section>
-
-      {/* ═══════════════════════════════════════ TÉMOIGNAGES ═══════════════════════════════ */}
-      <section className="py-14 px-4">
-        <div className="max-w-6xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-10">
-            <motion.h2 variants={fadeUp} className="text-3xl md:text-5xl font-extrabold mb-5">
-              Ce qu'en disent nos utilisateurs
-            </motion.h2>
-            <motion.p variants={fadeUp} custom={1} className="text-muted-foreground text-lg">Rejoignez les auteurs qui publient avec confiance</motion.p>
-          </motion.div>
-
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={stagger}
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}
             className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {testimonials.map((t, i) => (
-              <motion.div key={i} variants={fadeUp} custom={i}>
-                <Card className="h-full border hover:border-primary/30 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                  <CardContent className="pt-6 pb-6">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className={`w-11 h-11 rounded-full bg-gradient-to-br ${t.color} flex items-center justify-center text-white font-bold text-sm shadow-md`}>
-                        {t.avatar}
-                      </div>
-                      <div>
-                        <p className="font-semibold text-sm">{t.name}</p>
-                        <p className="text-xs text-muted-foreground">{t.role}</p>
-                      </div>
-                      <div className="ml-auto flex gap-0.5">
-                        {[1,2,3,4,5].map(s => <Star key={s} className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />)}
-                      </div>
+            {[
+              { icon: Cpu, title: "Gemini 3 Flash", desc: "IA la plus rapide de Google pour une rédaction instantanée", color: "from-blue-500 to-cyan-500" },
+              { icon: Image, title: "Imagen 3", desc: "Couvertures photoréalistes générées en quelques secondes", color: "from-violet-500 to-purple-500" },
+              { icon: Headphones, title: "Azure Neural Voices", desc: "Audiobooks avec 7 voix neuronales premium", color: "from-emerald-500 to-teal-500" },
+              { icon: Globe, title: "Multi-langues", desc: "Rédaction et traduction dans 30+ langues", color: "from-amber-500 to-orange-500" },
+              { icon: Search, title: "SEO Amazon", desc: "Mots-clés optimisés pour le référencement KDP", color: "from-pink-500 to-rose-500" },
+              { icon: Package, title: "Export Pro", desc: "PDF, EPUB, Word — formats KDP et distribution", color: "from-indigo-500 to-blue-500" },
+            ].map((feature, i) => (
+              <motion.div key={i} variants={fadeIn} custom={i}>
+                <Card className="h-full bg-slate-900/50 border-slate-800 hover:border-slate-700 transition-all duration-300 hover:-translate-y-1 group">
+                  <CardContent className="pt-8 pb-8">
+                    <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300`}>
+                      <feature.icon className="w-7 h-7 text-white" />
                     </div>
-                    <p className="text-foreground/85 text-sm leading-relaxed italic">"{t.text}"</p>
+                    <h3 className="font-bold text-xl text-white mb-2">{feature.title}</h3>
+                    <p className="text-slate-400 leading-relaxed">{feature.desc}</p>
                   </CardContent>
                 </Card>
               </motion.div>
@@ -562,44 +303,44 @@ const SalesPage = () => {
         </div>
       </section>
 
-      <SocialProofBanner />
-
-      {/* ═══════════════════════════════════════ AVANT / APRÈS ═══════════════════════════════ */}
-      <section className="py-14 px-4">
+      {/* ═══════════════════════════════════════ AVANT/APRÈS ═══════════════════════════════════════ */}
+      <section className="py-20 px-4 bg-slate-900/50">
         <div className="max-w-5xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-10">
-            <motion.h2 variants={fadeUp} className="text-3xl md:text-5xl font-extrabold mb-3">
-              Avant vs Après EbookStudio
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-12">
+            <motion.h2 variants={fadeIn} className="text-3xl sm:text-4xl md:text-5xl font-black mb-4">
+              La différence EbookStudio
             </motion.h2>
-            <motion.p variants={fadeUp} custom={1} className="text-muted-foreground text-lg">La différence est immédiate</motion.p>
+            <motion.p variants={fadeIn} custom={1} className="text-slate-400 text-lg">Comparez vous-même</motion.p>
           </motion.div>
 
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}
-            className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            <motion.div variants={fadeUp}>
-              <Card className="h-full border-2 border-red-500/20 bg-red-500/5">
+            className="grid md:grid-cols-2 gap-6">
+            {/* AVANT */}
+            <motion.div variants={fadeIn}>
+              <Card className="h-full bg-red-950/30 border-red-900/50">
                 <CardContent className="pt-8 pb-8">
                   <div className="flex items-center gap-3 mb-6">
                     <div className="w-12 h-12 rounded-xl bg-red-500/10 flex items-center justify-center">
                       <span className="text-2xl">😩</span>
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-red-500 uppercase tracking-wider">Avant</p>
-                      <p className="font-bold text-lg">Sans EbookStudio</p>
+                      <p className="text-xs font-bold text-red-400 uppercase tracking-wider">Avant</p>
+                      <p className="font-bold text-xl text-white">Sans EbookStudio</p>
                     </div>
                   </div>
                   <div className="space-y-4">
                     {[
-                      { text: "2 à 6 mois pour écrire un seul ebook", icon: "⏳" },
-                      { text: "0€ de revenus passifs", icon: "💸" },
-                      { text: "Syndrome de la page blanche permanent", icon: "📝" },
-                      { text: "Aucune idée des mots-clés Amazon", icon: "🔍" },
-                      { text: "Mise en page amateur, refusée par KDP", icon: "❌" },
-                      { text: "Freelance : 500€ à 5 000€ par ebook", icon: "💰" },
+                      "2 à 6 mois pour écrire un ebook",
+                      "Freelance : 500€ à 5 000€ par livre",
+                      "Syndrome de la page blanche",
+                      "Aucune idée des mots-clés Amazon",
+                      "Mise en page amateur, refusée par KDP",
                     ].map((item, i) => (
-                      <div key={i} className="flex items-start gap-3">
-                        <span className="text-lg shrink-0 mt-0.5">{item.icon}</span>
-                        <p className="text-sm text-foreground/80">{item.text}</p>
+                      <div key={i} className="flex items-center gap-3 text-slate-400">
+                        <div className="w-5 h-5 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0">
+                          <span className="text-red-400 text-xs">✕</span>
+                        </div>
+                        <span>{item}</span>
                       </div>
                     ))}
                   </div>
@@ -607,10 +348,11 @@ const SalesPage = () => {
               </Card>
             </motion.div>
 
-            <motion.div variants={fadeUp} custom={1}>
-              <Card className="h-full border-2 border-emerald-500/20 bg-emerald-500/5 relative overflow-hidden">
+            {/* APRÈS */}
+            <motion.div variants={fadeIn} custom={1}>
+              <Card className="h-full bg-emerald-950/30 border-emerald-900/50 relative overflow-hidden">
                 <div className="absolute top-3 right-3">
-                  <Badge className="bg-emerald-500 text-white border-0 text-xs">VOTRE FUTUR</Badge>
+                  <Badge className="bg-emerald-500 text-slate-900 border-0 font-bold">VOTRE FUTUR</Badge>
                 </div>
                 <CardContent className="pt-8 pb-8">
                   <div className="flex items-center gap-3 mb-6">
@@ -618,22 +360,23 @@ const SalesPage = () => {
                       <span className="text-2xl">🚀</span>
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-emerald-500 uppercase tracking-wider">Après</p>
-                      <p className="font-bold text-lg">Avec EbookStudio Pro</p>
+                      <p className="text-xs font-bold text-emerald-400 uppercase tracking-wider">Après</p>
+                      <p className="font-bold text-xl text-white">Avec EbookStudio Pro</p>
                     </div>
                   </div>
                   <div className="space-y-4">
                     {[
-                      { text: "Premier ebook publié en moins d'1 heure", icon: "⚡" },
-                      { text: "Revenus passifs dès le premier mois", icon: "💰" },
-                      { text: "15 rôles IA qui écrivent pour vous", icon: "🤖" },
-                      { text: "Gemini 3 Flash — IA la plus rapide", icon: "🧠" },
-                      { text: "Export PDF/Word/EPUB professionnel", icon: "✅" },
-                      { text: "Investissement unique : 97€ à vie", icon: "🏆" },
+                      "Premier ebook en moins d'1 heure",
+                      "Coût total : ~0,30€ par ebook",
+                      "15 rôles IA qui écrivent pour vous",
+                      "SEO Amazon automatiquement optimisé",
+                      "Export professionnel PDF/EPUB/Word",
                     ].map((item, i) => (
-                      <div key={i} className="flex items-start gap-3">
-                        <span className="text-lg shrink-0 mt-0.5">{item.icon}</span>
-                        <p className="text-sm text-foreground/80 font-medium">{item.text}</p>
+                      <div key={i} className="flex items-center gap-3 text-white">
+                        <div className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                          <Check className="w-3 h-3 text-emerald-400" />
+                        </div>
+                        <span>{item}</span>
                       </div>
                     ))}
                   </div>
@@ -644,490 +387,241 @@ const SalesPage = () => {
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════ VALEUR ═══════════════════════════════════ */}
-      <section className="py-14 px-4 bg-muted/30">
-        <div className="max-w-4xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-10">
-            <motion.h2 variants={fadeUp} className="text-3xl md:text-5xl font-extrabold mb-5">
-              Combien coûte réellement un ebook professionnel ?
+      {/* ═══════════════════════════════════════ TÉMOIGNAGES ═══════════════════════════════════════ */}
+      <section className="py-20 px-4">
+        <div className="max-w-6xl mx-auto">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-12">
+            <motion.h2 variants={fadeIn} className="text-3xl sm:text-4xl md:text-5xl font-black mb-4">
+              Ils ont publié avec EbookStudio
             </motion.h2>
           </motion.div>
 
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}
-            className="grid md:grid-cols-3 gap-6 mb-12">
-            {valuePrices.map((v, i) => (
-              <motion.div key={i} variants={fadeUp} custom={i}>
-                <Card className={`border-2 ${v.borderColor} ${v.bgColor} text-center hover:shadow-lg transition-shadow`}>
-                  <CardContent className="pt-8 pb-8">
-                    <p className="text-base font-semibold mb-3">{v.label}</p>
-                    <p className={`text-3xl font-extrabold ${v.color}`}>{v.price}</p>
+            className="grid md:grid-cols-3 gap-6">
+            {[
+              { name: "Marie D.", role: "5 ebooks publiés", text: "En 3 semaines, j'ai publié 5 ebooks. Mon meilleur mois : 420€ de royalties KDP.", avatar: "MD" },
+              { name: "Thomas L.", role: "Entrepreneur", text: "J'utilise les ebooks comme lead magnets. Résultat : +340 leads qualifiés en 2 mois.", avatar: "TL" },
+              { name: "Nicolas F.", role: "Revenus passifs", text: "De 0€ à 850€/mois de revenus passifs KDP en 6 mois grâce au workflow.", avatar: "NF" },
+            ].map((t, i) => (
+              <motion.div key={i} variants={fadeIn} custom={i}>
+                <Card className="h-full bg-slate-900/50 border-slate-800">
+                  <CardContent className="pt-6 pb-6">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500 to-emerald-500 flex items-center justify-center text-slate-900 font-bold">
+                        {t.avatar}
+                      </div>
+                      <div>
+                        <p className="font-semibold text-white">{t.name}</p>
+                        <p className="text-xs text-slate-500">{t.role}</p>
+                      </div>
+                      <div className="ml-auto flex gap-0.5">
+                        {[1,2,3,4,5].map(s => <Star key={s} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />)}
+                      </div>
+                    </div>
+                    <p className="text-slate-300 leading-relaxed">"{t.text}"</p>
                   </CardContent>
                 </Card>
               </motion.div>
             ))}
           </motion.div>
-
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center">
-            <div className="inline-flex items-center gap-3 bg-gradient-to-r from-violet-500/10 to-purple-500/10 border border-violet-500/20 rounded-2xl px-8 py-4">
-              <Sparkles className="w-5 h-5 text-violet-500" />
-              <p className="text-xl font-bold">EbookStudio Pro <span className="text-primary">remplace cette chaîne complète</span></p>
-            </div>
-          </motion.div>
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════ PRICING ═══════════════════════════════════ */}
-      <section id="pricing" className="py-20 px-4 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_100%,hsl(var(--primary)/0.08),transparent)]" />
+      {/* ═══════════════════════════════════════ PRICING ═══════════════════════════════════════ */}
+      <section id="pricing" className="py-20 px-4 relative">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_50%,rgba(6,182,212,0.08),transparent)]" />
+        
         <div className="max-w-3xl mx-auto relative z-10">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-10">
-            <motion.div variants={fadeUp}>
-              <Badge className="mb-5 bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 px-6 py-2.5 text-sm font-bold shadow-lg shadow-amber-500/5">
+            <motion.div variants={fadeIn}>
+              <Badge className="bg-amber-500/10 text-amber-400 border-amber-500/30 px-5 py-2 font-semibold mb-5">
                 <Gift className="w-4 h-4 mr-2" />
-                OFFRE DE LANCEMENT — Prix réduit temporaire
+                OFFRE DE LANCEMENT — Économisez 150€
               </Badge>
             </motion.div>
-            <motion.h2 variants={fadeUp} custom={1} className="text-4xl md:text-6xl font-extrabold mb-5">
+            <motion.h2 variants={fadeIn} custom={1} className="text-4xl sm:text-5xl md:text-6xl font-black mb-4">
               Accès Pro Lifetime
             </motion.h2>
-            <motion.div variants={fadeUp} custom={2} className="inline-flex items-center gap-2.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-6 py-2.5 text-sm shadow-sm">
-              <ShieldCheck className="w-4 h-4 text-emerald-500" />
-              <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Garantie 30 jours satisfait ou remboursé</span>
-            </motion.div>
+            <motion.p variants={fadeIn} custom={2} className="text-slate-400 text-lg">
+              Un paiement unique. Accès à vie. Sans abonnement.
+            </motion.p>
           </motion.div>
 
-          {/* Pricing Card - Ultra premium */}
-          <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}>
-            <div className="relative rounded-3xl overflow-hidden shadow-2xl shadow-violet-500/10">
-              <div className="absolute inset-0 bg-gradient-to-br from-violet-500 via-purple-500 to-pink-500 p-[2px] rounded-3xl">
-                <div className="absolute inset-[2px] rounded-[22px] bg-background" />
-              </div>
-
-              <div className="relative z-10 p-8 md:p-12">
-                <div className="flex items-center justify-between mb-8">
-                  <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0 px-5 py-2 text-sm font-bold shadow-lg shadow-amber-500/20">
-                    🔥 LANCEMENT — Économisez {NORMAL_PRICE - LAUNCH_PRICE}€
-                  </Badge>
-                  <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                    <Clock className="w-4 h-4" />
-                    <span>Offre limitée</span>
+          {/* Pricing Card */}
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+            transition={{ duration: 0.6 }}>
+            <Card className="bg-gradient-to-b from-slate-900 to-slate-950 border-2 border-cyan-500/30 rounded-3xl overflow-hidden shadow-2xl shadow-cyan-500/10">
+              <CardContent className="p-8 md:p-12">
+                {/* Price */}
+                <div className="text-center mb-10">
+                  <div className="flex items-baseline justify-center gap-3 mb-2">
+                    <span className="text-2xl text-slate-500 line-through">{NORMAL_PRICE}€</span>
+                    <span className="text-7xl md:text-8xl font-black text-white">{LAUNCH_PRICE}</span>
+                    <span className="text-3xl font-bold text-slate-400">€</span>
                   </div>
+                  <p className="text-slate-500">Paiement unique • Accès à vie</p>
                 </div>
 
-                <div className="flex items-baseline gap-3 mb-2">
-                  <span className="text-xl text-muted-foreground line-through opacity-60">{NORMAL_PRICE}€</span>
-                  <span className="text-7xl md:text-8xl font-extrabold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">{LAUNCH_PRICE}</span>
-                  <span className="text-3xl font-bold text-muted-foreground">€</span>
-                </div>
-                <p className="text-sm text-muted-foreground mb-10 font-medium">Paiement unique &bull; Accès à vie &bull; Sans abonnement</p>
-
-                <div className="grid sm:grid-cols-2 gap-x-8 gap-y-4 mb-10">
+                {/* Features */}
+                <div className="grid sm:grid-cols-2 gap-4 mb-10">
                   {[
-                    "Workflow éditorial complet 15 rôles",
-                    "Gemini 3 Flash — IA la plus rapide",
+                    "Workflow 15 rôles IA complet",
+                    "Gemini 3 Flash — rédaction ultra-rapide",
                     "Imagen 3 — couvertures photoréalistes",
-                    "Azure Neural Voices — audiobooks",
-                    "P15 Humanisation Anti-IA offert",
+                    "Azure Neural — audiobooks premium",
+                    "P15 Humanisation Anti-IA",
                     "Export PDF / EPUB / Word",
-                    "🎓 Formation 18 modules (valeur 297€)",
-                    "Outils KDP Premium complets",
-                    "Gestionnaire Séries / Sagas",
-                    "Traduction multi-langues (30+)",
+                    "🎓 Formation 18 modules (297€ offerts)",
+                    "SEO Amazon automatisé",
+                    "Traduction 30+ langues",
                     "Mises à jour gratuites à vie",
-                    "Support prioritaire + Zoom gratuit",
+                    "Support prioritaire",
+                    "Zoom gratuit avec le créateur",
                   ].map((f, i) => (
                     <div key={i} className="flex items-center gap-3">
-                      <div className="w-5 h-5 rounded-full bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
-                        <Check className="w-3.5 h-3.5 text-emerald-500" />
+                      <div className="w-5 h-5 rounded-full bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
+                        <Check className="w-3 h-3 text-cyan-400" />
                       </div>
-                      <span className="text-sm font-medium">{f}</span>
+                      <span className="text-sm text-slate-300">{f}</span>
                     </div>
                   ))}
                 </div>
 
-                <Button size="lg" className="w-full py-8 text-xl font-extrabold bg-gradient-to-r from-violet-600 via-purple-600 to-violet-700 hover:from-violet-500 hover:via-purple-500 hover:to-violet-600 text-white shadow-2xl shadow-violet-500/30 hover:shadow-violet-500/50 transition-all duration-500 rounded-2xl hover:scale-[1.02] hover:-translate-y-0.5"
-                  onClick={handlePlanClick}>
+                {/* CTA */}
+                <Button size="lg" onClick={handlePlanClick}
+                  className="w-full py-8 text-xl font-bold bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-900 rounded-2xl shadow-xl shadow-cyan-500/20">
                   <Rocket className="w-6 h-6 mr-2" />
-                  🔥 Accès Pro Lifetime — {LAUNCH_PRICE}€ à vie
+                  Accès Pro Lifetime — {LAUNCH_PRICE}€
                   <ArrowRight className="w-6 h-6 ml-2" />
                 </Button>
 
-                <p className="text-center mt-5 text-sm text-muted-foreground">
-                  Après la période de lancement : <strong className="text-foreground text-base">{FUTURE_PRICE}€</strong>{" "}
-                  <span className="text-xs opacity-75">({NORMAL_PRICE}€ - {PROMO_DISCOUNT}€ de promo)</span>
-                </p>
-
-                {/* Facilités de paiement */}
-                <div className="mt-8 pt-6 border-t border-border/50">
-                  <p className="text-xs text-muted-foreground text-center mb-4 uppercase tracking-wider font-semibold">Ou payez en plusieurs fois</p>
-                  <div className="grid grid-cols-2 gap-3">
+                {/* Paiement fractionné */}
+                <div className="mt-8 pt-6 border-t border-slate-800">
+                  <p className="text-center text-slate-500 text-sm mb-4">Ou payez en plusieurs fois</p>
+                  <div className="grid grid-cols-2 gap-4">
                     {[
-                      { label: "En 3 fois", price: "33", per: "33€/mois × 3", popular: true },
-                      { label: "En 5 fois", price: "20", per: "20€/mois × 5", popular: false },
-                    ].map((inst, idx) => (
-                      <button key={idx} onClick={handlePlanClick}
-                        className={`flex flex-col items-center p-4 rounded-2xl border-2 transition-all duration-300 hover:scale-[1.02] ${inst.popular ? 'border-primary/30 bg-primary/5 hover:border-primary/50' : 'border-border hover:border-primary/30 hover:bg-primary/5'}`}>
-                        <span className="font-bold text-2xl">{inst.price}€</span>
-                        <span className="text-xs text-muted-foreground mt-1">{inst.per}</span>
-                        {inst.popular && <Badge className="mt-2 text-[10px] bg-primary/10 text-primary border-primary/20">Populaire</Badge>}
+                      { label: "En 3 fois", price: "33€/mois" },
+                      { label: "En 5 fois", price: "20€/mois" },
+                    ].map((opt, i) => (
+                      <button key={i} onClick={handlePlanClick}
+                        className="p-4 rounded-xl border border-slate-800 hover:border-cyan-500/50 transition-colors text-center group">
+                        <p className="font-bold text-white group-hover:text-cyan-400 transition-colors">{opt.label}</p>
+                        <p className="text-sm text-slate-500">{opt.price}</p>
                       </button>
                     ))}
                   </div>
                 </div>
 
-                <div className="flex items-center justify-center gap-3 text-xs text-muted-foreground mt-6">
-                  <ShieldCheck className="w-4 h-4" />
-                  <span>Paiement sécurisé &bull; Accès immédiat &bull; Garantie 30 jours</span>
+                {/* Garantie */}
+                <div className="flex items-center justify-center gap-3 mt-8 text-slate-500 text-sm">
+                  <ShieldCheck className="w-5 h-5 text-emerald-500" />
+                  <span>Paiement sécurisé • Accès immédiat • Garantie 30 jours</span>
                 </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           </motion.div>
 
-          {/* Garantie - premium */}
-          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mt-12">
-            <div className="bg-emerald-500/5 border-2 border-emerald-500/20 rounded-3xl p-8 text-center shadow-sm">
-              <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center mx-auto mb-4">
-                <ShieldCheck className="w-7 h-7 text-emerald-500" />
-              </div>
-              <h3 className="text-xl font-bold text-emerald-600 dark:text-emerald-400 mb-3">
-                Garantie Satisfait ou Remboursé — 30 jours
-              </h3>
-              <p className="text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
-                Testez pendant 30 jours. Pas satisfait ? Un email et vous êtes remboursé intégralement. Aucune question posée.
-              </p>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════ 14 RÔLES ═══════════════════════════════════ */}
-      <section className="py-14 px-4">
-        <div className="max-w-6xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={stagger} className="text-center mb-10">
-            <motion.h2 variants={fadeUp} className="text-3xl md:text-5xl font-extrabold mb-5">
-              Un système éditorial complet.{" "}
-              <span className="text-muted-foreground">Pas un simple générateur.</span>
-            </motion.h2>
-            <motion.p variants={fadeUp} custom={1} className="text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed">
-              Chaque rôle intervient à un moment précis pour structurer, améliorer et valider votre livre avant publication.
-            </motion.p>
-          </motion.div>
-
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={stagger}
-            className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {phases.map((phase, pi) => (
-              <motion.div key={pi} variants={fadeUp} custom={pi}>
-                <Card className={`h-full border-2 ${phase.borderColor} ${phase.bgColor} hover:shadow-lg transition-shadow duration-300`}>
-                  <CardHeader className="pb-4">
-                    <Badge className={`w-fit text-xs font-semibold ${phase.badgeColor}`}>{phase.phase}</Badge>
-                    <CardTitle className="text-base font-bold mt-2">{phase.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    {phase.roles.map((role, ri) => (
-                      <div key={ri} className="flex items-center gap-3 group">
-                        <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${phase.color} flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform`}>
-                          <role.icon className="w-4 h-4 text-white" />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-sm font-semibold leading-tight">{role.label} — {role.name}</p>
-                          <p className="text-xs text-muted-foreground">{role.desc}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </motion.div>
-
-          {/* Bonus P15 */}
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="mt-8">
-            <Card className="border-2 border-rose-500/30 bg-gradient-to-r from-rose-500/5 via-pink-500/5 to-rose-500/5 overflow-hidden relative">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/10 rounded-full blur-[60px] pointer-events-none" />
-              <CardContent className="flex flex-col sm:flex-row items-center justify-between gap-4 py-6 relative z-10">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center shadow-lg shadow-rose-500/20">
-                    <Shield className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <Badge className="bg-rose-500/10 text-rose-500 border-rose-500/20 mb-1">🎁 BONUS OFFERT</Badge>
-                    <p className="font-bold text-lg">P15 — Humanisation Anti-Détection IA</p>
-                    <p className="text-sm text-muted-foreground">Rendez votre contenu indétectable par les outils anti-IA</p>
-                  </div>
+          {/* Garantie */}
+          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mt-8">
+            <Card className="bg-emerald-950/30 border-emerald-900/50">
+              <CardContent className="p-6 text-center">
+                <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center mx-auto mb-4">
+                  <ShieldCheck className="w-7 h-7 text-emerald-400" />
                 </div>
-                <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-sm px-4 py-1.5 shrink-0">Inclus gratuitement</Badge>
+                <h3 className="text-xl font-bold text-emerald-400 mb-2">Garantie 30 jours</h3>
+                <p className="text-slate-400 text-sm">
+                  Testez pendant 30 jours. Pas satisfait ? Remboursé intégralement. Aucune question.
+                </p>
               </CardContent>
             </Card>
           </motion.div>
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════ COMMENT ÇA MARCHE ═══════════════════════════ */}
-      <section className="py-14 px-4 bg-muted/30">
-        <div className="max-w-5xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={stagger} className="text-center mb-10">
-            <motion.h2 variants={fadeUp} className="text-3xl md:text-5xl font-extrabold mb-5">Comment ça marche</motion.h2>
-            <motion.p variants={fadeUp} custom={1} className="text-muted-foreground text-lg">4 étapes. Un seul workflow. Un ebook professionnel.</motion.p>
-          </motion.div>
-
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={stagger}
-            className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {steps.map((step, i) => (
-              <motion.div key={i} variants={fadeUp} custom={i} className="relative text-center group">
-                {i < steps.length - 1 && (
-                  <div className="hidden lg:block absolute top-10 left-[60%] w-[80%] h-px bg-border" />
-                )}
-                <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${step.color} flex items-center justify-center mx-auto mb-5 shadow-lg group-hover:scale-105 transition-transform duration-300`}>
-                  <step.icon className="w-8 h-8 text-white" />
-                </div>
-                <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Étape {step.num}</span>
-                <h3 className="font-bold text-xl mt-1 mb-2">{step.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{step.desc}</p>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════ APERÇU GRATUIT ═══════════════════════════ */}
-      <section className="py-12 px-4">
-        <div className="max-w-4xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={stagger}>
-            <motion.div variants={fadeUp}>
-            <Card className="relative overflow-hidden border-2 border-primary/30 bg-gradient-to-br from-primary/5 via-card to-violet-500/5">
-              <div className="absolute -top-20 -right-20 w-56 h-56 bg-primary/15 rounded-full blur-[80px]" />
-              <div className="absolute -bottom-16 -left-16 w-40 h-40 bg-violet-500/10 rounded-full blur-[60px]" />
-              <CardContent className="relative p-8 md:p-12">
-                <div className="flex flex-col md:flex-row items-center gap-8">
-                  <div className="flex-1 space-y-4">
-                    <Badge className="bg-emerald-500/15 text-emerald-500 border-emerald-500/30 mb-2">
-                      <Eye className="w-3 h-3 mr-1" />
-                      Aperçu du parcours
-                    </Badge>
-                    <h3 className="text-2xl md:text-3xl font-extrabold">Curieux de voir le parcours ?</h3>
-                    <p className="text-muted-foreground leading-relaxed">
-                      Explorez la <span className="font-semibold text-foreground">roadmap interactive</span> : les 4 phases, les 15 étapes, et comprenez exactement comment votre ebook sera créé.
-                    </p>
-                    <div className="grid grid-cols-2 gap-2 pt-2">
-                      {[
-                        { num: '1', label: 'Positionner', emoji: '🎯', color: 'bg-violet-500/10 border-violet-500/20 text-violet-500' },
-                        { num: '2', label: 'Produire', emoji: '✍️', color: 'bg-amber-500/10 border-amber-500/20 text-amber-500' },
-                        { num: '3', label: 'Optimiser', emoji: '📦', color: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' },
-                        { num: '4', label: 'Perfectionner', emoji: '🧠', color: 'bg-sky-500/10 border-sky-500/20 text-sky-500' },
-                      ].map((p) => (
-                        <div key={p.num} className={`flex items-center gap-2 px-3 py-2 rounded-xl border ${p.color} text-sm font-medium`}>
-                          <span>{p.emoji}</span>
-                          <span>{p.label}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-center gap-4 shrink-0">
-                    <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-primary to-violet-600 flex items-center justify-center shadow-2xl shadow-primary/30">
-                      <Play className="w-10 h-10 text-white ml-1" />
-                    </div>
-                    <Button size="lg" onClick={() => navigate('/demo')}
-                      className="text-base px-8 py-5 h-auto rounded-2xl bg-primary hover:bg-primary/90 shadow-lg shadow-primary/25 gap-2 group">
-                      Découvrir le parcours
-                      <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                    </Button>
-                    <p className="text-xs text-muted-foreground text-center">Sans inscription • Comprenez avant de commencer</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════ AUTHOR SHOWCASE ═══════════════════════ */}
+      {/* ═══════════════════════════════════════ AUTHOR SHOWCASE ═══════════════════════════════════════ */}
       <div id="author-showcase">
         <AuthorShowcase />
       </div>
 
-      <PassiveRevenueProof />
-
-      {/* ═══════════════════════════════════════ GUIDE GRATUIT ═══════════════════════════════ */}
-      <section className="py-10 px-4">
-        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}
-          className="max-w-2xl mx-auto text-center rounded-2xl border border-violet-500/20 bg-gradient-to-br from-violet-500/10 via-purple-500/5 to-violet-500/10 p-8 shadow-lg shadow-violet-500/10">
-          <p className="text-3xl mb-3">🎁</p>
-          <h3 className="text-xl md:text-2xl font-bold text-foreground mb-3">Nouveau sur EbookStudio ?</h3>
-          <p className="text-muted-foreground text-sm md:text-base mb-6 max-w-lg mx-auto">Commencez par le guide gratuit pour comprendre la méthode et avancer plus vite.</p>
-          <Button size="lg" className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-lg shadow-violet-500/20 text-base px-8 py-6"
-            onClick={() => window.open('https://www.trafic-affiliation.com/captureebookstudio2026#formulaire', '_blank')}>
-            🎁 Commencer par le guide gratuit
-          </Button>
-        </motion.div>
-      </section>
-
-      {/* Coût API rassurant — sans donner les clés */}
-      <section className="py-16 px-4" id="cout-api">
-        <div className="max-w-3xl mx-auto text-center">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
-            <motion.div variants={fadeUp}>
-              <Badge className="mb-4 bg-emerald-500/10 text-emerald-500 border-emerald-500/20 px-4 py-2">
-                <Cpu className="w-4 h-4 mr-2" />
-                Transparence totale
-              </Badge>
-            </motion.div>
-            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-4xl font-extrabold mb-4">
-              Coût réel : moins de 0,50€ par ebook
-            </motion.h2>
-            <motion.p variants={fadeUp} custom={2} className="text-muted-foreground mb-8 text-lg max-w-2xl mx-auto">
-              EbookStudio utilise l'IA Gemini 3 Flash de Google — vous ne payez que ce que vous consommez, directement à Google. Pas d'abonnement caché, pas de surcoût.
-            </motion.p>
-
-            <motion.div variants={fadeUp} custom={3} className="grid md:grid-cols-3 gap-5 max-w-3xl mx-auto mb-10">
-              {[
-                { value: "~0,30€", label: "Coût moyen par ebook", sub: "Rédaction complète IA", icon: BookOpen },
-                { value: "Gratuit", label: "Clé API Google", sub: "On vous guide après l'achat", icon: Key },
-                { value: "2 min", label: "Configuration", sub: "Guide vidéo étape par étape", icon: Play },
-              ].map((item, i) => (
-                <Card key={i} className="border border-border/50 bg-card/50 backdrop-blur-sm">
-                  <CardContent className="pt-6 pb-6 text-center">
-                    <item.icon className="w-8 h-8 mx-auto mb-3 text-emerald-500" />
-                    <p className="text-2xl font-extrabold text-foreground">{item.value}</p>
-                    <p className="font-semibold text-sm mt-1">{item.label}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{item.sub}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </motion.div>
-
-            <motion.div variants={fadeUp} custom={4} className="bg-gradient-to-r from-emerald-500/5 via-emerald-500/10 to-emerald-500/5 border border-emerald-500/20 rounded-2xl p-6 max-w-xl mx-auto">
-              <div className="flex items-center justify-center gap-2 mb-3">
-                <CheckCircle className="w-5 h-5 text-emerald-500" />
-                <span className="font-bold text-sm">Tout est inclus après votre achat</span>
-              </div>
-              <p className="text-sm text-muted-foreground mb-4">
-                Guide vidéo de configuration, tutoriel pas-à-pas pour obtenir votre clé gratuite, et support prioritaire. Vous serez opérationnel en 2 minutes.
-              </p>
-              <Button size="lg" className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white font-bold px-8 py-5 rounded-xl shadow-lg shadow-violet-500/20"
-                onClick={handlePlanClick}>
-                <Rocket className="w-5 h-5 mr-2" />
-                Commencer maintenant — {LAUNCH_PRICE}€
-              </Button>
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
+      {/* ═══════════════════════════════════════ FAQ ═══════════════════════════════════════ */}
       <SalesFaq />
 
-      {/* Final CTA - dramatic */}
-      <section className="py-20 px-4 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_50%,hsl(var(--primary)/0.06),transparent)]" />
+      {/* ═══════════════════════════════════════ FINAL CTA ═══════════════════════════════════════ */}
+      <section className="py-20 px-4 relative">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_50%,rgba(6,182,212,0.06),transparent)]" />
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}
           className="max-w-3xl mx-auto text-center relative z-10">
-          <motion.h2 variants={fadeUp} className="text-3xl md:text-5xl font-extrabold mb-5 leading-tight">
+          <motion.h2 variants={fadeIn} className="text-3xl sm:text-4xl md:text-5xl font-black mb-5 leading-tight">
             Chaque jour sans ebook publié
             <br />
-            <span className="text-muted-foreground">est un jour de revenus passifs perdu.</span>
+            <span className="text-slate-500">est un jour de revenus perdu.</span>
           </motion.h2>
-          <motion.p variants={fadeUp} custom={1} className="text-muted-foreground mb-5 text-lg font-medium">
+          <motion.p variants={fadeIn} custom={1} className="text-slate-400 mb-8 text-lg">
             Votre premier ebook peut être en ligne sur Amazon ce soir.
           </motion.p>
-          <motion.div variants={fadeUp} custom={1.5} className="flex flex-wrap justify-center gap-5 text-sm text-muted-foreground mb-10">
-            <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-500" />Pas besoin de savoir écrire</span>
-            <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-500" />Pas besoin de compétence technique</span>
-            <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-500" />Résultats dès le premier jour</span>
-          </motion.div>
-          <motion.div variants={fadeUp} custom={2}>
-            <Button size="lg" className="text-lg px-12 py-8 bg-gradient-to-r from-violet-600 via-purple-600 to-violet-700 hover:from-violet-500 hover:via-purple-500 hover:to-violet-600 text-white shadow-2xl shadow-violet-500/25 hover:scale-[1.02] hover:-translate-y-0.5 transition-all duration-500 rounded-2xl font-extrabold"
-              onClick={handlePlanClick}>
+          <motion.div variants={fadeIn} custom={2}>
+            <Button size="lg" onClick={handlePlanClick}
+              className="text-lg px-12 py-8 bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-900 font-bold rounded-2xl shadow-2xl shadow-cyan-500/25 hover:shadow-cyan-500/40 transition-all duration-300 hover:-translate-y-1">
               <Rocket className="w-6 h-6 mr-2" />
-              Accès Pro Lifetime — {LAUNCH_PRICE}€ à vie
+              Commencer maintenant — {LAUNCH_PRICE}€
               <ArrowRight className="w-6 h-6 ml-2" />
             </Button>
-            <p className="text-sm text-muted-foreground mt-5 font-medium">Paiement unique &bull; Accès à vie &bull; Garantie 30 jours</p>
-            <p className="text-xs text-muted-foreground mt-1 opacity-75">
-              Prix après lancement : {FUTURE_PRICE}€ ({NORMAL_PRICE}€ - {PROMO_DISCOUNT}€ promo)
-            </p>
+            <p className="text-slate-500 text-sm mt-5">Paiement unique • Accès à vie • Garantie 30 jours</p>
           </motion.div>
         </motion.div>
       </section>
 
-      {/* Zoom Calendly - premium */}
-      <section className="py-12 bg-gradient-to-r from-violet-500/5 via-purple-500/10 to-violet-500/5 border-y border-violet-500/10">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-5">
-            <div className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-xl bg-violet-500/10 flex items-center justify-center">
-                <Play className="w-5 h-5 text-violet-500" />
-              </div>
-              <span className="text-lg font-bold">Dispo en Zoom — Voyez l'outil en direct</span>
-            </div>
-            <a href="https://calendly.com/boubetgeorges/nouvelle-reunion" target="_blank" rel="noopener noreferrer">
-              <Button className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white font-bold px-8 py-5 rounded-xl shadow-lg shadow-violet-500/20">
-                📅 Réserver un créneau
-              </Button>
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer - Premium */}
-      <footer className="py-16 border-t border-border/30 bg-gradient-to-b from-slate-900 to-slate-950 text-white">
+      {/* ═══════════════════════════════════════ FOOTER ═══════════════════════════════════════ */}
+      <footer className="py-16 border-t border-slate-800 bg-slate-950">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid md:grid-cols-5 gap-10 mb-10">
             <div className="md:col-span-1">
               <div className="flex items-center gap-2.5 mb-4">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
-                  <BookOpen className="w-4.5 h-4.5 text-white" />
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-400 to-emerald-400 flex items-center justify-center">
+                  <BookOpen className="w-4 h-4 text-slate-900" />
                 </div>
-                <h3 className="text-lg font-bold bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">EbookStudio Pro</h3>
+                <h3 className="text-lg font-bold text-white">EbookStudio Pro</h3>
               </div>
-              <p className="text-gray-400 text-sm leading-relaxed">Le workflow éditorial IA #1 en France pour Amazon KDP.</p>
+              <p className="text-slate-500 text-sm leading-relaxed">Le workflow IA #1 en France pour Amazon KDP.</p>
             </div>
             <div>
-              <h4 className="font-semibold mb-4 text-gray-200 text-sm uppercase tracking-wider">📚 Guides</h4>
+              <h4 className="font-semibold mb-4 text-slate-300 text-sm uppercase tracking-wider">Guides</h4>
               <ul className="space-y-2.5 text-sm">
-                <li><button onClick={() => navigate("/ecrire-livre-chatgpt")} className="text-gray-400 hover:text-violet-400 transition-colors">Écrire un livre avec ChatGPT</button></li>
-                <li><button onClick={() => navigate("/creer-ebook-ia")} className="text-gray-400 hover:text-violet-400 transition-colors">Créer un ebook avec l'IA</button></li>
-                <li><button onClick={() => navigate("/generateur-ebook")} className="text-gray-400 hover:text-violet-400 transition-colors">Générateur ebook IA</button></li>
+                <li><button onClick={() => navigate("/ecrire-livre-chatgpt")} className="text-slate-500 hover:text-cyan-400 transition-colors">Écrire avec l'IA</button></li>
+                <li><button onClick={() => navigate("/creer-ebook-ia")} className="text-slate-500 hover:text-cyan-400 transition-colors">Créer un ebook IA</button></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4 text-gray-200 text-sm uppercase tracking-wider">🚀 Produit</h4>
+              <h4 className="font-semibold mb-4 text-slate-300 text-sm uppercase tracking-wider">Produit</h4>
               <ul className="space-y-2.5 text-sm">
-                <li><button onClick={() => navigate("/demo")} className="text-gray-400 hover:text-violet-400 transition-colors">Essai gratuit</button></li>
-                <li><button onClick={() => navigate("/valeur-offre")} className="text-gray-400 hover:text-violet-400 transition-colors">Valeur de l'offre</button></li>
-                <li><button onClick={() => navigate("/formation")} className="text-gray-400 hover:text-violet-400 transition-colors">Formation</button></li>
+                <li><button onClick={() => navigate("/demo")} className="text-slate-500 hover:text-cyan-400 transition-colors">Démo gratuite</button></li>
+                <li><button onClick={() => navigate("/formation")} className="text-slate-500 hover:text-cyan-400 transition-colors">Formation</button></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4 text-gray-200 text-sm uppercase tracking-wider">💡 Ressources</h4>
+              <h4 className="font-semibold mb-4 text-slate-300 text-sm uppercase tracking-wider">Légal</h4>
               <ul className="space-y-2.5 text-sm">
-                <li><button onClick={() => navigate("/faq")} className="text-gray-400 hover:text-violet-400 transition-colors">FAQ</button></li>
-                <li><button onClick={() => navigate("/blog")} className="text-gray-400 hover:text-violet-400 transition-colors">Blog</button></li>
-                <li><button onClick={() => navigate("/affiliation")} className="text-gray-400 hover:text-violet-400 transition-colors">Affiliation</button></li>
-              </ul>
-              <h4 className="font-semibold mb-3 mt-6 text-gray-200 text-sm uppercase tracking-wider">⚖️ Légal</h4>
-              <ul className="space-y-2.5 text-sm">
-                <li><button onClick={() => navigate("/mentions-legales")} className="text-gray-400 hover:text-violet-400 transition-colors">Mentions légales</button></li>
-                <li><button onClick={() => navigate("/cgv")} className="text-gray-400 hover:text-violet-400 transition-colors">CGV</button></li>
-                <li><button onClick={() => navigate("/politique-confidentialite")} className="text-gray-400 hover:text-violet-400 transition-colors">Confidentialité</button></li>
+                <li><button onClick={() => navigate("/mentions-legales")} className="text-slate-500 hover:text-cyan-400 transition-colors">Mentions légales</button></li>
+                <li><button onClick={() => navigate("/cgv")} className="text-slate-500 hover:text-cyan-400 transition-colors">CGV</button></li>
+                <li><button onClick={() => navigate("/politique-confidentialite")} className="text-slate-500 hover:text-cyan-400 transition-colors">Confidentialité</button></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4 text-gray-200 text-sm uppercase tracking-wider">📧 Newsletter</h4>
-              <p className="text-gray-400 text-sm mb-4">Conseils KDP et IA gratuits chaque semaine</p>
+              <h4 className="font-semibold mb-4 text-slate-300 text-sm uppercase tracking-wider">Newsletter</h4>
+              <p className="text-slate-500 text-sm mb-4">Conseils KDP et IA gratuits</p>
               <NewsletterForm />
             </div>
           </div>
-          <div className="border-t border-gray-800/50 pt-8 text-center">
-            <p className="text-xs text-gray-500">© 2026 EbookStudio Pro &bull; Workflow Éditorial IA Premium pour Amazon KDP &bull; Tous droits réservés</p>
+          <div className="border-t border-slate-800 pt-8 text-center">
+            <p className="text-xs text-slate-600">© 2026 EbookStudio Pro — Tous droits réservés</p>
           </div>
         </div>
       </footer>
 
-      {/* Sticky Mobile CTA - premium */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-background/95 backdrop-blur-2xl border-t border-border/30 p-3 safe-area-inset-bottom">
-        <Button className="w-full py-5 text-base font-extrabold bg-gradient-to-r from-violet-600 via-purple-600 to-violet-700 hover:from-violet-500 hover:to-violet-600 text-white shadow-xl shadow-violet-500/20 rounded-xl"
-          onClick={handlePlanClick}>
+      {/* ═══════════════════════════════════════ STICKY MOBILE CTA ═══════════════════════════════════════ */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-slate-950/95 backdrop-blur-xl border-t border-slate-800 p-3 safe-area-inset-bottom">
+        <Button onClick={handlePlanClick}
+          className="w-full py-5 text-base font-bold bg-gradient-to-r from-cyan-500 to-emerald-500 text-slate-900 rounded-xl">
           <Rocket className="w-4 h-4 mr-2" />
           Accès Pro — {LAUNCH_PRICE}€ à vie
         </Button>
