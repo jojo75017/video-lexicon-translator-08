@@ -272,7 +272,7 @@ const SalesPage = () => {
             <motion.h2 variants={fadeIn} custom={1} className="text-3xl sm:text-4xl md:text-5xl font-black mb-5">
               Tout ce dont vous avez besoin
             </motion.h2>
-            <motion.p variants={fadeIn} custom={2} className="text-slate-400 text-lg max-w-2xl mx-auto">
+            <motion.p variants={fadeIn} custom={2} className="text-white/80 text-lg max-w-2xl mx-auto">
               Un écosystème complet pour créer, optimiser et publier vos ebooks sur Amazon KDP
             </motion.p>
           </motion.div>
