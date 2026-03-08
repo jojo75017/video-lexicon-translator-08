@@ -366,6 +366,10 @@ const CrmPage: React.FC = () => {
               )}
             </div>
           </TabsContent>
+
+          <TabsContent value="analytics" className="mt-4">
+            <CrmAnalytics contacts={contacts} />
+          </TabsContent>
         </Tabs>
       </div>
 
