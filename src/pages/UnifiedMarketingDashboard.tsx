@@ -100,6 +100,18 @@ const UnifiedMarketingDashboard = () => {
         });
         setRecentPosts(posts.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).slice(0, 5));
       }
+
+      // Fetch email opens
+      const { data: opens } = await supabase.from('email_opens').select('*');
+      if (opens) {
+        const byStep: Record<number, number> = {};
+        const uniqueSet = new Set<string>();
+        opens.forEach((o: any) => {
+          byStep[o.email_step] = (byStep[o.email_step] || 0) + 1;
+          uniqueSet.add(o.prospect_email);
+        });
+        setEmailOpens({ total: opens.length, byStep, uniqueEmails: uniqueSet.size });
+      }
     } catch (err) {
       console.error('Dashboard fetch error:', err);
     }
