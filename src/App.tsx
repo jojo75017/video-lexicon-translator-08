@@ -270,6 +270,7 @@ const App = () => {
             <Route path="/arc-signup" element={<ArcSignupPage />} />
             <Route path="/communaute" element={<ForumPage />} />
             <Route path="/plan-marketing" element={<MarketingPlanPage />} />
+            <Route path="/campagne-vente" element={<SalesCampaignPage />} />
             <Route path="/resultat-en-5-min" element={<ResultatEn5MinPage />} />
             <Route path="/cadeau" element={<CadeauPage />} />
             <Route 
