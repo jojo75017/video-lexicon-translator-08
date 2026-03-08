@@ -1258,6 +1258,46 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                         </>
                       )}
                     </Button>
+                    
+                    {/* Download Intro as separate MP3 */}
+                    <Button
+                      variant="outline"
+                      onClick={async () => {
+                        setIsDownloadingIntro(true);
+                        try {
+                          toast.info('Génération de l\'intro en cours...');
+                          const introBlobs = await generateIntroForExport(generateSectionMp3, ebookTitle, authorName, preface);
+                          if (introBlobs.length === 0) {
+                            toast.error('Impossible de générer l\'intro');
+                            setIsDownloadingIntro(false);
+                            return;
+                          }
+                          const introBlob = new Blob(introBlobs, { type: 'audio/mpeg' });
+                          const filename = `Intro-Premium-${ebookTitle?.replace(/[^a-zA-Z0-9]/g, '_') || 'Extrait'}.mp3`;
+                          saveAs(introBlob, filename);
+                          toast.success('Intro téléchargée ! 🎧');
+                        } catch (error: any) {
+                          toast.error(`Erreur : ${error.message}`);
+                        } finally {
+                          setIsDownloadingIntro(false);
+                        }
+                      }}
+                      disabled={isGeneratingMp3 || isDownloadingIntro}
+                      className="h-10"
+                    >
+                      {isDownloadingIntro ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Génération...
+                        </>
+                      ) : (
+                        <>
+                          <Download className="h-4 w-4 mr-2" />
+                          📥 Télécharger l'intro seule
+                        </>
+                      )}
+                    </Button>
+                    
                     {isPreviewingJingle && (
                       <span className="text-xs text-muted-foreground animate-pulse">🔊 Lecture en cours...</span>
                     )}
