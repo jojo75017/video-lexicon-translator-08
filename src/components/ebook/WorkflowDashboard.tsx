@@ -87,8 +87,8 @@ export const WorkflowDashboard: React.FC<WorkflowDashboardProps> = ({
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h2 className="text-2xl font-bold flex items-center gap-2 text-white">
-            <BarChart3 className="h-6 w-6 text-cyan-400" />
-            Tableau de Bord Workflow
+            <BarChart3 className="h-6 w-6 text-gold gold-icon" />
+            <span className="text-gradient-gold">Tableau de Bord Workflow</span>
           </h2>
           <p className="text-white/50 text-sm mt-1">
             Vue d'ensemble de votre processus éditorial
@@ -100,7 +100,7 @@ export const WorkflowDashboard: React.FC<WorkflowDashboardProps> = ({
             size="sm"
             onClick={handleCloudSync}
             disabled={isSyncing || completedCount === 0}
-            className="gap-2 border-white/20 text-white/70 hover:text-white bg-slate-800/50"
+            className="gap-2 border-gold/20 text-gold/70 hover:text-gold bg-slate-800/50"
           >
             {isSyncing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Cloud className="h-4 w-4" />}
             Sauvegarder Cloud
@@ -109,13 +109,13 @@ export const WorkflowDashboard: React.FC<WorkflowDashboardProps> = ({
             variant="outline"
             size="sm"
             onClick={handleCloudRestore}
-            className="gap-2 border-white/20 text-white/70 hover:text-white bg-slate-800/50"
+            className="gap-2 border-gold/20 text-gold/70 hover:text-gold bg-slate-800/50"
           >
             <RefreshCw className="h-4 w-4" />
             Restaurer
           </Button>
           {onStartAutoWorkflow && (
-            <Button onClick={onStartAutoWorkflow} className="gap-2 bg-cyan-600 hover:bg-cyan-700 text-white" disabled={completedCount === totalSteps}>
+            <Button onClick={onStartAutoWorkflow} className="gap-2 bg-gold hover:bg-gold-dark text-slate-900 font-semibold" disabled={completedCount === totalSteps}>
               <Play className="h-4 w-4" />
               Lancer Auto P1→P14
             </Button>
@@ -124,15 +124,15 @@ export const WorkflowDashboard: React.FC<WorkflowDashboardProps> = ({
       </div>
 
       {/* Progress Overview */}
-      <Card className="border-2 border-cyan-500/20 bg-slate-900/80 backdrop-blur-sm">
+      <Card className="border-2 border-gold/20 bg-slate-900/80 backdrop-blur-sm">
         <CardContent className="pt-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="md:col-span-2">
               <div className="flex justify-between mb-2">
                 <span className="text-sm font-medium text-white/70">Progression globale</span>
-                <span className="text-sm font-bold text-cyan-400">{Math.round(progressPercent)}%</span>
+                <span className="text-sm font-bold text-gold">{Math.round(progressPercent)}%</span>
               </div>
-              <Progress value={progressPercent} className="h-4 mb-3" />
+              <Progress value={progressPercent} className="h-4 mb-3 gold-progress" />
               <p className="text-xs text-white/50">
                 {completedCount}/{totalSteps} étapes complétées
               </p>
