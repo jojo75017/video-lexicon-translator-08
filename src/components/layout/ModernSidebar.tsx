@@ -441,7 +441,7 @@ const QuotaDisplay: React.FC<{ isCollapsed: boolean }> = ({ isCollapsed }) => {
           </div>
           {isUnlimited ? (
             <div className="text-center py-1">
-              <span className="text-sm font-bold text-cyan-400">∞ Accès illimité</span>
+              <span className="text-sm font-bold text-gold">∞ Accès illimité</span>
             </div>
           ) : (
             <>
