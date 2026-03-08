@@ -99,6 +99,8 @@ export default {
         'violet': 'var(--shadow-violet)',
         'fuchsia': 'var(--shadow-fuchsia)',
         'cyan': 'var(--shadow-cyan)',
+        'gold': 'var(--shadow-gold)',
+        'gold-glow': 'var(--shadow-gold-glow)',
       },
       borderRadius: {
         lg: "var(--radius)",
