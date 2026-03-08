@@ -3116,6 +3116,18 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       case 'ux-center':
         return <EbookUXEnhancements />;
 
+      case 'title-ab-test':
+        return <EbookTitleABTest currentTitle={ebookTitle} />;
+
+      case 'editorial-calendar':
+        return <EbookEditorialCalendar chapters={chapters} />;
+
+      case 'back-matter-generator':
+        return <EbookBackMatterGenerator authorName={authorName} ebookTitle={ebookTitle} bookSummary={bookSummary} />;
+
+      case 'competitor-spy':
+        return <EbookCompetitorSpy />;
+
       case 'arc-manager':
         return (
           <EbookArcManager

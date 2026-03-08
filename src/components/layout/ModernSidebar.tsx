@@ -312,6 +312,10 @@ const categories: Category[] = [
       { id: 'multi-translator', label: '🌍 Traduction Multi-Langues', icon: Languages, isNew: true },
       { id: 'trend-predictor', label: '🔮 Prédicteur Tendances', icon: TrendingUp, isNew: true },
       { id: 'pen-name', label: '✒️ Nom de Plume', icon: PenTool, isNew: true },
+      { id: 'title-ab-test', label: '🧪 A/B Test Titres', icon: FlaskConical, isNew: true },
+      { id: 'editorial-calendar', label: '📅 Calendrier Éditorial', icon: CalendarDays, isNew: true },
+      { id: 'back-matter-generator', label: '📄 Back Matter', icon: FileText, isNew: true },
+      { id: 'competitor-spy', label: '🕵️ Espion Concurrentiel', icon: Eye, isNew: true },
     ]
   },
   // ========== 10. AUDIO ==========
