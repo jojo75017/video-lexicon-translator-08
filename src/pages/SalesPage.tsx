@@ -556,7 +556,7 @@ const SalesPage = () => {
             <br />
             <span className="text-white/60">est un jour de revenus perdu.</span>
           </motion.h2>
-          <motion.p variants={fadeIn} custom={1} className="text-slate-400 mb-8 text-lg">
+          <motion.p variants={fadeIn} custom={1} className="text-white/80 mb-8 text-lg">
             Votre premier ebook peut être en ligne sur Amazon ce soir.
           </motion.p>
           <motion.div variants={fadeIn} custom={2}>
