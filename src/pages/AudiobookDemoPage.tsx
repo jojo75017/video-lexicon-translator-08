@@ -6,7 +6,8 @@ import {
   Play, Pause, Volume2, VolumeX, Headphones, Code, Copy, Check, 
   SkipBack, SkipForward, BookOpen, Clock, Star, Users, Download, 
   ChevronDown, ChevronUp, Mic2, Sparkles, Link2, Calendar, Globe, 
-  FileAudio, Building2, Tag, ShoppingCart, CreditCard, Shield, HelpCircle, Library
+  FileAudio, Building2, Tag, ShoppingCart, CreditCard, Shield, HelpCircle, Library,
+  Zap, Lock, RefreshCw, MessageCircle, Timer
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { getRandomReviews } from '@/utils/reviewPool';
@@ -82,12 +83,39 @@ const AudiobookDemoPage = () => {
     return () => clearInterval(interval);
   }, [isPlaying]);
 
+  // Urgency countdown (2h30 from page load)
+  const [urgencyEnd] = useState(() => Date.now() + 2.5 * 60 * 60 * 1000);
+  const [timeLeft, setTimeLeft] = useState({ h: 2, m: 30, s: 0 });
+  useEffect(() => {
+    const tick = setInterval(() => {
+      const diff = Math.max(0, urgencyEnd - Date.now());
+      setTimeLeft({ h: Math.floor(diff / 3600000), m: Math.floor((diff % 3600000) / 60000), s: Math.floor((diff % 60000) / 1000) });
+      if (diff <= 0) clearInterval(tick);
+    }, 1000);
+    return () => clearInterval(tick);
+  }, [urgencyEnd]);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#3a4a5c] via-[#1e2a38] to-[#0f1319] text-white">
       
       {/* Demo banner */}
       <div className="bg-amber-500/90 text-black text-center py-2 text-sm font-semibold">
         🎯 PAGE DÉMO — Voici à quoi ressemble la fiche produit de vos audiobooks
+      </div>
+
+      {/* ===== URGENCY BANNER ===== */}
+      <div className="bg-gradient-to-r from-red-600/90 via-orange-500/90 to-red-600/90 text-white text-center py-3 px-4">
+        <div className="flex items-center justify-center gap-3 flex-wrap">
+          <Timer className="w-5 h-5 animate-pulse" />
+          <span className="font-bold text-sm">🔥 Offre de lancement — Prix réduit pendant encore</span>
+          <div className="flex gap-1.5">
+            <span className="bg-black/30 px-2.5 py-1 rounded-lg font-mono font-bold text-base min-w-[2.5rem] text-center">{String(timeLeft.h).padStart(2, '0')}</span>
+            <span className="font-bold text-lg">:</span>
+            <span className="bg-black/30 px-2.5 py-1 rounded-lg font-mono font-bold text-base min-w-[2.5rem] text-center">{String(timeLeft.m).padStart(2, '0')}</span>
+            <span className="font-bold text-lg">:</span>
+            <span className="bg-black/30 px-2.5 py-1 rounded-lg font-mono font-bold text-base min-w-[2.5rem] text-center">{String(timeLeft.s).padStart(2, '0')}</span>
+          </div>
+        </div>
       </div>
 
       {/* ===== HERO HEADER ===== */}
@@ -178,6 +206,26 @@ const AudiobookDemoPage = () => {
                   <CreditCard className="h-4 w-4" />
                   Payer via PayPal
                 </Button>
+              </div>
+
+              {/* Trust Badges */}
+              <div className="grid grid-cols-2 gap-3 mb-6">
+                <div className="flex items-center gap-2 bg-white/[0.04] border border-white/[0.08] rounded-xl px-3 py-2.5">
+                  <Lock className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span className="text-[11px] text-white/60 font-medium">Paiement 100% sécurisé</span>
+                </div>
+                <div className="flex items-center gap-2 bg-white/[0.04] border border-white/[0.08] rounded-xl px-3 py-2.5">
+                  <Zap className="w-4 h-4 text-amber-400 shrink-0" />
+                  <span className="text-[11px] text-white/60 font-medium">Téléchargement immédiat</span>
+                </div>
+                <div className="flex items-center gap-2 bg-white/[0.04] border border-white/[0.08] rounded-xl px-3 py-2.5">
+                  <RefreshCw className="w-4 h-4 text-blue-400 shrink-0" />
+                  <span className="text-[11px] text-white/60 font-medium">Remboursé sous 30 jours</span>
+                </div>
+                <div className="flex items-center gap-2 bg-white/[0.04] border border-white/[0.08] rounded-xl px-3 py-2.5">
+                  <MessageCircle className="w-4 h-4 text-purple-400 shrink-0" />
+                  <span className="text-[11px] text-white/60 font-medium">Support réactif 7j/7</span>
+                </div>
               </div>
 
               {/* Listen row */}
@@ -333,6 +381,23 @@ const AudiobookDemoPage = () => {
               <MetaRow icon={<Headphones className="w-4 h-4 text-emerald-400/70" />} label="Écoutes" value={`${audiobook.play_count}`} />
             </div>
           </div>
+        </div>
+
+        {/* ===== TEXT EXCERPT ===== */}
+        <div className="mt-12 bg-gradient-to-br from-amber-500/[0.06] to-transparent border border-amber-500/15 rounded-2xl p-7">
+          <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+            <BookOpen className="w-5 h-5 text-amber-400" />
+            Extrait du livre
+          </h2>
+          <div className="relative">
+            <blockquote className="text-white/60 text-[15px] leading-relaxed italic border-l-2 border-amber-500/40 pl-5 space-y-3">
+              <p>« Le soleil tapait fort sur la petite ville de Cactus Valley. Tellement fort que même les cactus avaient l'air de transpirer. Au milieu de la rue principale — qui était aussi la seule rue — un garçon de dix ans se tenait debout, les pouces glissés dans les passants de sa ceinture, un chapeau de cow-boy beaucoup trop grand sur la tête. »</p>
+              <p>« — Je suis Billy le Kid… enfin, Billy tout court, marmonna-t-il en plissant les yeux comme il avait vu faire dans les films. Et aujourd'hui, je deviens le cow-boy le plus rapide de tout l'Ouest ! »</p>
+              <p>« Son cheval, Tornado — qui était en réalité un poney assez grassouillet — leva à peine la tête de son seau d'avoine et souffla un bruit qui ressemblait beaucoup à un rire... »</p>
+            </blockquote>
+            <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[#0f1319] to-transparent pointer-events-none" />
+          </div>
+          <p className="text-amber-400/70 text-xs mt-4 font-medium">— Extrait du Chapitre 1 : « L'Arrivée à Cactus Valley »</p>
         </div>
 
         {/* ===== REVIEWS ===== */}
