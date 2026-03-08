@@ -11,17 +11,22 @@ import {
 import { toast } from 'sonner';
 
 const DEMO_DATA = {
-  title: "Les Secrets du Marketing Digital",
-  author_name: "Marie Dupont",
-  voice_name: "Éloise (IA Premium)",
-  description: "Découvrez les stratégies les plus efficaces du marketing digital dans ce guide audio complet. De la création de contenu viral aux techniques de conversion avancées, ce livre audio vous accompagne pas à pas vers la maîtrise du marketing en ligne. Apprenez à construire une audience fidèle, à optimiser vos campagnes publicitaires et à transformer vos visiteurs en clients fidèles. Un must-have pour tout entrepreneur souhaitant développer sa présence en ligne et maximiser son retour sur investissement. Ce guide couvre également les dernières tendances en matière de SEO, de réseaux sociaux et d'email marketing.",
+  title: "Le Cow-Boy le Plus Rapide",
+  subtitle: "Une aventure de Far West drôle, rythmée et pleine de rebondissements",
+  author_name: "EbookStudio",
+  voice_name: "Brigitte (IA Premium)",
+  description: "Plongez dans une aventure hilarante au cœur du Far West ! Billy le cow-boy rêve de devenir le plus rapide de l'Ouest, mais entre ses bottes trop grandes, son cheval têtu et un bandit pas si méchant que ça, rien ne se passe comme prévu. Une histoire drôle, rythmée et pleine de rebondissements qui captivera les jeunes lecteurs et les fera rire du début à la fin. Idéal pour les trajets en voiture ou le rituel du coucher !",
   cover_url: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=400&h=400&fit=crop",
-  play_count: 1247,
-  duration_seconds: 14400,
-  price: 12.99,
+  play_count: 342,
+  duration_seconds: 1500, // ~25 min
+  price: 4.99,
   paypal_link: "https://paypal.me/example",
+  stripe_link: "https://buy.stripe.com/example",
   created_at: "2026-03-01T10:00:00Z",
-  slug: "secrets-marketing-digital"
+  slug: "cow-boy-le-plus-rapide",
+  genre: "Aventure Western Humoristique",
+  target_audience: "Enfants de 6 à 10 ans",
+  chapters: 8,
 };
 
 const MetaRow = ({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) => (
