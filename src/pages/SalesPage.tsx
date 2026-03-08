@@ -734,6 +734,17 @@ const SalesPage = () => {
         </Button>
       </div>
 
+      {showScrollTop && (
+        <button
+          type="button"
+          onClick={scrollToTop}
+          aria-label="Remonter en haut"
+          className="fixed right-4 bottom-28 md:bottom-8 z-[85] h-11 w-11 rounded-full bg-primary text-primary-foreground shadow-lg hover:opacity-90 transition"
+        >
+          ↑
+        </button>
+      )}
+
       <ExitIntentPopup />
       <SocialProofToast />
       <ProgressEngagement />
