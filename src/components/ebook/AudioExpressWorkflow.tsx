@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import {
   Target, ListOrdered, PenTool, Sparkles, Clock, Mic2,
   Volume2, Combine, Archive, ChevronRight, ChevronLeft,
-  CheckCircle2, Lock, Play, Loader2, FileText
+  CheckCircle2, Lock, Loader2
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cleanForAudio } from '@/utils/textCleaner';
@@ -24,7 +24,7 @@ interface AudioExpressStep {
 }
 
 const AUDIO_STEPS: AudioExpressStep[] = [
-  { id: 'A1', label: 'Brief Directeur', description: 'Définir la cible, la niche et le ton du livre audio', icon: Target, estimatedMinutes: 3 },
+  { id: 'A1', label: 'Brief Directeur', description: 'Titre, auteur, catégorie, introduction et contenu des chapitres', icon: Target, estimatedMinutes: 3 },
   { id: 'A2', label: 'Structure Audible', description: 'Plan optimisé pour l\'écoute (chapitres courts, transitions)', icon: ListOrdered, estimatedMinutes: 5 },
   { id: 'A3', label: 'Rédaction Voix Haute', description: 'Phrases courtes, ton amical et conversationnel', icon: PenTool, estimatedMinutes: 15 },
   { id: 'A4', label: 'Nettoyage & Polissage', description: 'Retrait des astérisques, markdown et défauts', icon: Sparkles, estimatedMinutes: 2 },
@@ -33,6 +33,16 @@ const AUDIO_STEPS: AudioExpressStep[] = [
   { id: 'A7', label: 'Production Audio', description: 'Synthèse vocale par chapitre via Azure Neural', icon: Volume2, estimatedMinutes: 10 },
   { id: 'A8', label: 'Fusion Master', description: 'Assemblage Intro + Chapitres + Outro en 1 MP3', icon: Combine, estimatedMinutes: 5 },
   { id: 'A9', label: 'Archivage & Export', description: 'Sauvegarde en bibliothèque et téléchargement final', icon: Archive, estimatedMinutes: 2 },
+];
+
+const CATEGORIES = [
+  { value: 'enfants-3-8', label: '👶 Enfants 3-8 ans' },
+  { value: 'ados-12-16', label: '🧒 Ados 12-16 ans' },
+  { value: 'thriller', label: '🔪 Thriller' },
+  { value: 'romance', label: '💕 Romance' },
+  { value: 'saga', label: '📖 Saga' },
+  { value: 'spiritualite', label: '🧘 Spiritualité' },
+  { value: 'marketing', label: '💼 Marketing' },
 ];
 
 const AZURE_VOICES = [
@@ -62,19 +72,27 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
   const [stepResults, setStepResults] = useState<Record<string, any>>({});
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // A1 state
-  const [niche, setNiche] = useState('');
-  const [targetAudience, setTargetAudience] = useState('');
-  const [tone, setTone] = useState('conversationnel');
+  // A1 — Brief Directeur (production fields)
+  const [bookTitle, setBookTitle] = useState(ebookTitle || 'Le Village Irrésistible');
+  const [bookSubtitle, setBookSubtitle] = useState('Aventure gauloise drôle');
+  const [authorName, setAuthorName] = useState('Georges');
+  const [category, setCategory] = useState('enfants-3-8');
+  const [introduction, setIntroduction] = useState(
+    preface || "Bienvenue dans Le Village Irrésistible, un livre audio plein d'aventures inspiré des épopées gauloises. Entre plans farfelus et bagarres mémorables, cette histoire entraîne les enfants dans un univers captivant sur le courage et l'amitié."
+  );
+  const [chapterContent, setChapterContent] = useState('');
 
   // A4 cleaned text
   const [cleanedText, setCleanedText] = useState('');
 
   // A6 voice
-  const [selectedVoice, setSelectedVoice] = useState('fr-FR-DeniseNeural');
+  const [selectedVoice, setSelectedVoice] = useState('fr-FR-EloiseNeural');
 
   const completedSteps = Object.keys(stepResults).length;
   const progressPercent = (completedSteps / AUDIO_STEPS.length) * 100;
+
+  // Helper to get the A1 brief data used by all subsequent steps
+  const getBriefData = () => stepResults['A1'] || {};
 
   const markStepDone = (stepId: string, result: any = true) => {
     setStepResults(prev => ({ ...prev, [stepId]: result }));
@@ -84,47 +102,97 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
   const isStepCompleted = (idx: number) => !!stepResults[AUDIO_STEPS[idx].id];
   const canGoToStep = (idx: number) => idx === 0 || isStepCompleted(idx - 1);
 
-  // A4: Auto-clean text
+  // A4: Auto-clean text using brief data
   const handleCleanText = useCallback(() => {
     setIsProcessing(true);
+    const brief = getBriefData();
     let fullText = '';
-    if (preface) fullText += preface + '\n\n';
-    chapters.forEach((ch: any, i: number) => {
-      fullText += `Chapitre ${i + 1}: ${ch.title || ''}\n\n${ch.content || ''}\n\n`;
-      const subs = ch.subChapters || ch.subchapters || [];
-      subs.forEach((s: any) => { fullText += `${s.title || ''}\n\n${s.content || ''}\n\n`; });
-    });
+
+    // Use introduction from brief
+    if (brief.introduction) fullText += brief.introduction + '\n\n';
+
+    // Use chapter content from brief, or fallback to props
+    if (brief.chapterContent) {
+      fullText += brief.chapterContent;
+    } else {
+      chapters.forEach((ch: any, i: number) => {
+        fullText += `Chapitre ${i + 1}: ${ch.title || ''}\n\n${ch.content || ''}\n\n`;
+        const subs = ch.subChapters || ch.subchapters || [];
+        subs.forEach((s: any) => { fullText += `${s.title || ''}\n\n${s.content || ''}\n\n`; });
+      });
+    }
+
     if (conclusion) fullText += conclusion;
 
     const cleaned = cleanForAudio(fullText);
     setCleanedText(cleaned);
     setIsProcessing(false);
     markStepDone('A4', cleaned);
-  }, [preface, chapters, conclusion]);
+  }, [chapters, conclusion, stepResults]);
 
   const renderStepContent = (idx: number) => {
     const step = AUDIO_STEPS[idx];
+    const brief = getBriefData();
 
     switch (step.id) {
       case 'A1':
         return (
           <div className="space-y-4">
-            <div><Label>📌 Niche / Thématique</Label><Input value={niche} onChange={e => setNiche(e.target.value)} placeholder="Ex: Développement personnel, Thriller..." /></div>
-            <div><Label>🎯 Public cible</Label><Input value={targetAudience} onChange={e => setTargetAudience(e.target.value)} placeholder="Ex: Femmes 25-45 ans, Entrepreneurs..." /></div>
-            <div><Label>🎤 Ton</Label>
-              <Select value={tone} onValueChange={setTone}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="conversationnel">💬 Conversationnel</SelectItem>
-                  <SelectItem value="professionnel">💼 Professionnel</SelectItem>
-                  <SelectItem value="intime">🤫 Intime</SelectItem>
-                  <SelectItem value="energique">⚡ Énergique</SelectItem>
-                  <SelectItem value="narratif">📖 Narratif</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>📕 Titre du Livre</Label>
+                <Input value={bookTitle} onChange={e => setBookTitle(e.target.value)} placeholder="Ex: Le Village Irrésistible" />
+              </div>
+              <div className="space-y-2">
+                <Label>📝 Sous-titre</Label>
+                <Input value={bookSubtitle} onChange={e => setBookSubtitle(e.target.value)} placeholder="Ex: Aventure gauloise drôle" />
+              </div>
             </div>
-            <Button onClick={() => markStepDone('A1', { niche, targetAudience, tone })} disabled={!niche || !targetAudience}>
-              <CheckCircle2 className="h-4 w-4 mr-2" /> Valider le Brief
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>✍️ Auteur</Label>
+                <Input value={authorName} onChange={e => setAuthorName(e.target.value)} placeholder="Ex: Georges" />
+              </div>
+              <div className="space-y-2">
+                <Label>🎯 Catégorie / Public</Label>
+                <Select value={category} onValueChange={setCategory}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {CATEGORIES.map(c => (
+                      <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>📖 Introduction / Résumé</Label>
+              <Textarea value={introduction} onChange={e => setIntroduction(e.target.value)} rows={4} placeholder="Résumé ou introduction du livre audio..." />
+            </div>
+
+            <div className="space-y-2">
+              <Label>📚 Contenu des Chapitres</Label>
+              <Textarea value={chapterContent} onChange={e => setChapterContent(e.target.value)} rows={8} placeholder="Collez ici le texte complet de vos chapitres..." className="font-mono text-sm" />
+              <p className="text-xs text-muted-foreground">
+                {chapterContent ? `${chapterContent.split(/\s+/).filter(w => w).length} mots` : 'Collez le texte intégral ou générez-le via le workflow P1-P5'}
+              </p>
+            </div>
+
+            <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 text-sm">
+              <p className="font-medium">📋 Récapitulatif du Brief</p>
+              <p className="text-muted-foreground mt-1">
+                <strong>{bookTitle}</strong> {bookSubtitle && `— ${bookSubtitle}`} par <strong>{authorName}</strong> • {CATEGORIES.find(c => c.value === category)?.label}
+              </p>
+            </div>
+
+            <Button
+              onClick={() => markStepDone('A1', { bookTitle, bookSubtitle, authorName, category, introduction, chapterContent })}
+              disabled={!bookTitle || !authorName}
+              className="w-full"
+            >
+              <CheckCircle2 className="h-4 w-4 mr-2" /> Valider le Brief de Production
             </Button>
           </div>
         );
@@ -132,18 +200,28 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
       case 'A2':
         return (
           <div className="space-y-4">
-            <p className="text-muted-foreground text-sm">Vos {chapters.length} chapitres seront optimisés pour l'écoute : titres lus à voix haute, transitions naturelles entre sections.</p>
-            <div className="border rounded-lg p-4 bg-muted/30 max-h-60 overflow-auto text-sm space-y-1">
-              {chapters.map((ch: any, i: number) => (
-                <div key={i} className="flex items-center gap-2">
-                  <Badge variant="outline" className="shrink-0">{i + 1}</Badge>
-                  <span>{ch.title || `Chapitre ${i + 1}`}</span>
-                  <span className="text-muted-foreground text-xs">({(ch.content || '').split(/\s+/).length} mots)</span>
-                </div>
-              ))}
+            <div className="bg-muted/30 border rounded-lg p-4 text-sm space-y-2">
+              <p className="font-medium">📕 {brief.bookTitle} — {brief.bookSubtitle}</p>
+              <p className="text-muted-foreground">Par {brief.authorName} • {CATEGORIES.find(c => c.value === brief.category)?.label}</p>
             </div>
-            <Button onClick={() => markStepDone('A2')} disabled={chapters.length === 0}>
-              <CheckCircle2 className="h-4 w-4 mr-2" /> Structure validée ({chapters.length} chapitres)
+            <p className="text-muted-foreground text-sm">La structure sera optimisée pour l'écoute : chapitres courts, transitions naturelles, titres lus à voix haute.</p>
+            {brief.chapterContent ? (
+              <div className="border rounded-lg p-4 bg-muted/30 max-h-40 overflow-auto text-sm">
+                <p className="text-muted-foreground">{brief.chapterContent.slice(0, 500)}...</p>
+                <p className="text-xs mt-2">{brief.chapterContent.split(/\s+/).filter((w: string) => w).length} mots au total</p>
+              </div>
+            ) : chapters.length > 0 ? (
+              <div className="border rounded-lg p-4 bg-muted/30 max-h-60 overflow-auto text-sm space-y-1">
+                {chapters.map((ch: any, i: number) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <Badge variant="outline" className="shrink-0">{i + 1}</Badge>
+                    <span>{ch.title || `Chapitre ${i + 1}`}</span>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+            <Button onClick={() => markStepDone('A2')}>
+              <CheckCircle2 className="h-4 w-4 mr-2" /> Structure validée
             </Button>
           </div>
         );
@@ -151,10 +229,11 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
       case 'A3':
         return (
           <div className="space-y-4">
-            <p className="text-muted-foreground text-sm">La rédaction est optimisée pour l'écoute : phrases courtes, ton {tone}, vocabulaire accessible.</p>
             <div className="bg-muted/30 border rounded-lg p-4 text-sm">
-              <p>💡 <strong>Conseil :</strong> Utilisez le workflow P1-P5 pour générer le contenu textuel, puis revenez ici pour la production audio.</p>
+              <p className="font-medium">📕 {brief.bookTitle}</p>
+              <p className="text-muted-foreground">Rédaction optimisée : phrases courtes, ton amical pour {CATEGORIES.find(c => c.value === brief.category)?.label}</p>
             </div>
+            <p className="text-muted-foreground text-sm">💡 Utilisez le workflow P1-P5 pour générer le contenu textuel, puis revenez ici.</p>
             <Button onClick={() => markStepDone('A3')}>
               <CheckCircle2 className="h-4 w-4 mr-2" /> Rédaction prête
             </Button>
@@ -164,7 +243,7 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
       case 'A4':
         return (
           <div className="space-y-4">
-            <p className="text-muted-foreground text-sm">Suppression automatique de tous les astérisques, balises Markdown, et caractères parasites.</p>
+            <p className="text-muted-foreground text-sm">Suppression automatique des astérisques, balises Markdown, et caractères parasites du texte de <strong>{brief.bookTitle}</strong>.</p>
             <Button onClick={handleCleanText} disabled={isProcessing}>
               {isProcessing ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Sparkles className="h-4 w-4 mr-2" />}
               🧹 Nettoyer le texte automatiquement
@@ -182,7 +261,7 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
       case 'A5':
         return (
           <div className="space-y-4">
-            <p className="text-muted-foreground text-sm">Ajout de micro-pauses naturelles via la ponctuation pour un rendu vocal fluide et agréable.</p>
+            <p className="text-muted-foreground text-sm">Ajout de micro-pauses naturelles pour <strong>{brief.bookTitle}</strong>.</p>
             <div className="bg-muted/30 border rounded-lg p-4 text-sm space-y-2">
               <p>🔸 Virgules → pause courte (0.3s)</p>
               <p>🔸 Points → pause moyenne (0.6s)</p>
@@ -198,7 +277,7 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
       case 'A6':
         return (
           <div className="space-y-4">
-            <Label>🎙️ Choisissez votre voix Azure Neural</Label>
+            <Label>🎙️ Voix Azure pour « {brief.bookTitle} » ({CATEGORIES.find(c => c.value === brief.category)?.label})</Label>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {AZURE_VOICES.map(v => (
                 <Card key={v.id} className={`cursor-pointer transition-all ${selectedVoice === v.id ? 'ring-2 ring-primary bg-primary/5' : 'hover:bg-muted/50'}`} onClick={() => setSelectedVoice(v.id)}>
@@ -222,11 +301,12 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
       case 'A7':
         return (
           <div className="space-y-4">
-            <p className="text-muted-foreground text-sm">Rendez-vous dans l'onglet <strong>🎙️ Livre Audio</strong> de la barre latérale pour lancer la synthèse vocale Azure chapitre par chapitre.</p>
-            <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 text-sm">
-              <p>✅ Votre texte est nettoyé (A4)</p>
-              <p>✅ Voix sélectionnée : {AZURE_VOICES.find(v => v.id === selectedVoice)?.label}</p>
-              <p>✅ Ponctuation optimisée (A5)</p>
+            <p className="text-muted-foreground text-sm">Lancez la synthèse vocale pour <strong>{brief.bookTitle}</strong> dans l'onglet 🎙️ Livre Audio.</p>
+            <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 text-sm space-y-1">
+              <p>✅ Titre : {brief.bookTitle}</p>
+              <p>✅ Auteur : {brief.authorName}</p>
+              <p>✅ Voix : {AZURE_VOICES.find(v => v.id === selectedVoice)?.label}</p>
+              <p>✅ Texte nettoyé & ponctuation optimisée</p>
             </div>
             <Button onClick={() => markStepDone('A7')}>
               <CheckCircle2 className="h-4 w-4 mr-2" /> Production terminée
@@ -237,7 +317,13 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
       case 'A8':
         return (
           <div className="space-y-4">
-            <p className="text-muted-foreground text-sm">Utilisez le bouton "Fusion Audio" dans le lecteur audio pour assembler l'intro, les chapitres et l'outro en un seul fichier MP3.</p>
+            <p className="text-muted-foreground text-sm">Fusion de l'intro + chapitres + outro en un seul MP3 pour <strong>{brief.bookTitle}</strong>.</p>
+            <div className="bg-muted/30 border rounded-lg p-4 text-sm">
+              <p>📋 Métadonnées du fichier audio :</p>
+              <p className="text-muted-foreground">Titre : {brief.bookTitle} {brief.bookSubtitle && `— ${brief.bookSubtitle}`}</p>
+              <p className="text-muted-foreground">Auteur : {brief.authorName}</p>
+              <p className="text-muted-foreground">Catégorie : {CATEGORIES.find(c => c.value === brief.category)?.label}</p>
+            </div>
             <Button onClick={() => markStepDone('A8')}>
               <CheckCircle2 className="h-4 w-4 mr-2" /> Fusion terminée
             </Button>
@@ -247,10 +333,11 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
       case 'A9':
         return (
           <div className="space-y-4">
-            <p className="text-muted-foreground text-sm">Téléchargez votre MP3 final et archivez-le dans la Bibliothèque pour un accès permanent.</p>
             <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
               <p className="font-medium">🎉 Félicitations !</p>
-              <p className="text-sm text-muted-foreground mt-1">Votre livre audio est prêt. Retrouvez-le dans l'onglet 📚 Bibliothèque.</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                « <strong>{brief.bookTitle}</strong> » par <strong>{brief.authorName}</strong> est prêt. Retrouvez-le dans la 📚 Bibliothèque.
+              </p>
             </div>
             <Button onClick={() => markStepDone('A9')}>
               <Archive className="h-4 w-4 mr-2" /> Archiver et terminer
