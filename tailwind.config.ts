@@ -36,6 +36,12 @@ export default {
         rose: "hsl(var(--rose))",
         indigo: "hsl(var(--indigo))",
         sky: "hsl(var(--sky))",
+        gold: {
+          DEFAULT: "hsl(var(--gold))",
+          light: "hsl(var(--gold-light))",
+          dark: "hsl(var(--gold-dark))",
+          muted: "hsl(var(--gold-muted))",
+        },
         
         // Legacy colors
         "coral-pink": "hsl(var(--coral-pink))",
