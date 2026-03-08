@@ -3237,6 +3237,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
 
   return (
     <div className="min-h-screen flex bg-slate-950">
+      <OnboardingGuide />
       <ModernSidebar 
         activeTab={activeTab}
         onTabChange={handleTabChange}
