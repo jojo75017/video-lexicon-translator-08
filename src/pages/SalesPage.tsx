@@ -566,7 +566,7 @@ const SalesPage = () => {
               Commencer maintenant — {LAUNCH_PRICE}€
               <ArrowRight className="w-6 h-6 ml-2" />
             </Button>
-            <p className="text-slate-500 text-sm mt-5">Paiement unique • Accès à vie • Garantie 30 jours</p>
+            <p className="text-white/60 text-sm mt-5">Paiement unique • Accès à vie • Garantie 30 jours</p>
           </motion.div>
         </motion.div>
       </section>
