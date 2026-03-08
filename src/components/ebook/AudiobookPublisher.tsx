@@ -38,6 +38,8 @@ export const AudiobookPublisher: React.FC<AudiobookPublisherProps> = ({
   const [isPublic, setIsPublic] = useState(true);
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const [excerptFile, setExcerptFile] = useState<File | null>(null);
+  const [price, setPrice] = useState('');
+  const [paypalLink, setPaypalLink] = useState('');
 
   useEffect(() => {
     fetchAudiobooks();
@@ -123,6 +125,8 @@ export const AudiobookPublisher: React.FC<AudiobookPublisherProps> = ({
         excerpt_url: excerptUrl || null,
         cover_url: coverUrl || null,
         is_public: isPublic,
+        price: price ? parseFloat(price) : null,
+        paypal_link: paypalLink.trim() || null,
         slug,
         status: audioUrl ? 'published' : 'draft'
       } as any);
@@ -224,6 +228,17 @@ export const AudiobookPublisher: React.FC<AudiobookPublisherProps> = ({
                   <Label>Extrait audio (MP3) — aperçu sur la fiche produit</Label>
                   <Input type="file" accept="audio/*" onChange={(e) => setExcerptFile(e.target.files?.[0] || null)} />
                   <p className="text-xs text-muted-foreground mt-1">Court extrait (30s à 2min) pour donner envie d'écouter</p>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label>Prix (€)</Label>
+                    <Input type="number" step="0.01" min="0" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Ex: 9.99" />
+                    <p className="text-xs text-muted-foreground mt-1">Laisser vide = gratuit</p>
+                  </div>
+                  <div>
+                    <Label>Lien PayPal</Label>
+                    <Input value={paypalLink} onChange={(e) => setPaypalLink(e.target.value)} placeholder="https://paypal.me/..." />
+                  </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <Checkbox id="is-public" checked={isPublic} onCheckedChange={(v) => setIsPublic(!!v)} />

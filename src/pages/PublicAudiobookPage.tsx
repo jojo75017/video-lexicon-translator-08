@@ -7,7 +7,7 @@ import {
   Play, Pause, Volume2, VolumeX, Headphones, Share2, Code, Copy, Check, 
   SkipBack, SkipForward, BookOpen, Clock, Star, Users, Download, 
   ChevronDown, ChevronUp, Mic2, Sparkles, Link2, Calendar, Globe, 
-  FileAudio, Building2, Tag
+  FileAudio, Building2, Tag, ShoppingCart, CreditCard
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -438,24 +438,78 @@ h1{font-size:2.5rem;font-weight:800;margin-bottom:8px;line-height:1.1}
                 </div>
               )}
 
+              {/* Price display */}
+              {(audiobook as any).price && (audiobook as any).price > 0 && (
+                <div className="flex items-baseline gap-3 justify-center lg:justify-start mb-4">
+                  <span className="text-4xl font-extrabold text-white">{Number((audiobook as any).price).toFixed(2)} €</span>
+                  <span className="text-white/40 text-sm line-through">{(Number((audiobook as any).price) * 1.5).toFixed(2)} €</span>
+                  <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 text-xs">-33%</Badge>
+                </div>
+              )}
+              {!(audiobook as any).price && (
+                <div className="flex items-baseline gap-2 justify-center lg:justify-start mb-4">
+                  <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 px-4 py-1 text-sm font-bold">GRATUIT</Badge>
+                </div>
+              )}
+
               {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mb-6">
+              <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mb-4">
+                {(audiobook as any).price && (audiobook as any).price > 0 ? (
+                  <>
+                    <Button 
+                      onClick={() => {
+                        // Stripe checkout
+                        toast.info('Redirection vers le paiement Stripe...');
+                        // TODO: integrate stripe checkout session
+                      }}
+                      className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-bold gap-2 px-8 h-12 rounded-full shadow-lg shadow-amber-500/20 text-base"
+                    >
+                      <ShoppingCart className="h-5 w-5" />
+                      Acheter maintenant — {Number((audiobook as any).price).toFixed(2)} €
+                    </Button>
+                    {(audiobook as any).paypal_link && (
+                      <Button 
+                        variant="outline" 
+                        asChild
+                        className="gap-2 border-blue-400/30 bg-blue-500/10 text-blue-300 hover:bg-blue-500/20 hover:text-blue-200 rounded-full h-12 font-semibold"
+                      >
+                        <a href={(audiobook as any).paypal_link} target="_blank" rel="noopener noreferrer">
+                          <CreditCard className="h-4 w-4" />
+                          Payer via PayPal
+                        </a>
+                      </Button>
+                    )}
+                  </>
+                ) : (
+                  <Button 
+                    onClick={() => { setShowFullPlayer(true); togglePlay(); }}
+                    className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-bold gap-2 px-8 h-12 rounded-full shadow-lg shadow-amber-500/20 text-base"
+                  >
+                    {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
+                    {isPlaying ? 'Pause' : 'Écouter maintenant'}
+                  </Button>
+                )}
+              </div>
+
+              {/* Listen + Download row */}
+              <div className="flex flex-wrap gap-3 justify-center lg:justify-start mb-6">
                 <Button 
+                  variant="outline"
                   onClick={() => { setShowFullPlayer(true); togglePlay(); }}
-                  className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-bold gap-2 px-8 h-12 rounded-full shadow-lg shadow-amber-500/20 text-base"
+                  className="gap-2 border-white/20 bg-white/5 text-white hover:bg-white/10 hover:text-white rounded-full h-10 font-medium text-sm"
                 >
-                  {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
-                  {isPlaying ? 'Pause' : 'Écouter maintenant'}
+                  <Headphones className="h-4 w-4" />
+                  {isPlaying ? 'Pause' : 'Écouter'}
                 </Button>
-                {audiobook.audio_url && (
+                {audiobook.audio_url && !(audiobook as any).price && (
                   <Button 
                     variant="outline" 
                     asChild
-                    className="gap-2 border-white/20 bg-white/5 text-white hover:bg-white/10 hover:text-white rounded-full h-12 font-semibold"
+                    className="gap-2 border-white/20 bg-white/5 text-white hover:bg-white/10 hover:text-white rounded-full h-10 font-medium text-sm"
                   >
                     <a href={audiobook.audio_url} download>
                       <Download className="h-4 w-4" />
-                      Télécharger le MP3
+                      Télécharger MP3
                     </a>
                   </Button>
                 )}
@@ -606,6 +660,9 @@ h1{font-size:2.5rem;font-weight:800;margin-bottom:8px;line-height:1.1}
             <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-6 space-y-5 sticky top-6">
               <h3 className="text-white font-semibold text-base border-b border-white/10 pb-3">Détails du produit</h3>
               
+              {(audiobook as any).price && (audiobook as any).price > 0 && (
+                <MetaRow icon={<CreditCard className="w-4 h-4 text-emerald-400/70" />} label="Prix" value={`${Number((audiobook as any).price).toFixed(2)} €`} />
+              )}
               {audiobook.author_name && (
                 <MetaRow icon={<Users className="w-4 h-4 text-amber-400/70" />} label="Auteur" value={audiobook.author_name} />
               )}
