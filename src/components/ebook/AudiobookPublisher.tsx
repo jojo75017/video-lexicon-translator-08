@@ -214,11 +214,16 @@ export const AudiobookPublisher: React.FC<AudiobookPublisherProps> = ({
                   <Input value={voiceName} onChange={(e) => setVoiceName(e.target.value)} placeholder="Ex: Sarah, Roger..." />
                 </div>
                 <div>
-                  <Label>Fichier audio (MP3)</Label>
+                  <Label>Fichier audio complet (MP3)</Label>
                   <Input type="file" accept="audio/*" onChange={(e) => setAudioFile(e.target.files?.[0] || null)} />
                   {audioBlob && !audioFile && (
                     <p className="text-xs text-green-600 mt-1">✓ Audio généré détecté, sera utilisé automatiquement</p>
                   )}
+                </div>
+                <div>
+                  <Label>Extrait audio (MP3) — aperçu sur la fiche produit</Label>
+                  <Input type="file" accept="audio/*" onChange={(e) => setExcerptFile(e.target.files?.[0] || null)} />
+                  <p className="text-xs text-muted-foreground mt-1">Court extrait (30s à 2min) pour donner envie d'écouter</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <Checkbox id="is-public" checked={isPublic} onCheckedChange={(v) => setIsPublic(!!v)} />
