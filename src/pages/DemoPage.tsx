@@ -6,10 +6,11 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { BookOpen, Sparkles, Loader2, Lock, ArrowRight, ArrowLeft, CheckCircle2, Mail, Gift, Crown, Zap, Star, BookMarked, FileText, Image, Download, Target, Rocket, Play } from "lucide-react";
+import { BookOpen, Sparkles, Loader2, Lock, ArrowRight, ArrowLeft, CheckCircle2, Mail, Gift, Crown, Zap, Star, BookMarked, FileText, Image, Download, Target, Rocket, Play, Users, Clock, Shield, TrendingUp, Headphones, Palette, Layers, ChevronRight, Quote, Timer, Award, BarChart3 } from "lucide-react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { motion } from "framer-motion";
 
 const DEMO_STORAGE_KEY = "ebook_demo_count";
 const EMAIL_CAPTURED_KEY = "ebook_demo_email_captured";
@@ -163,6 +164,11 @@ const DemoPage = () => {
 
   const genres = ["Développement personnel", "Business & Entrepreneuriat", "Finance & Investissement", "Santé & Bien-être", "Cuisine & Recettes", "Guide pratique", "Livres pour enfants", "Romance", "Thriller & Policier", "Science-Fiction", "Fantasy", "Autre"];
 
+  const fadeUp = {
+    hidden: { opacity: 0, y: 20 },
+    visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.1, duration: 0.5 } })
+  };
+
   return (
     <div className="min-h-screen bg-slate-950 text-white">
       {/* Header */}
@@ -191,19 +197,75 @@ const DemoPage = () => {
       </header>
 
       <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* Hero */}
-        <div className="text-center mb-10">
-          <Badge className="bg-cyan-500/10 text-cyan-400 border-cyan-500/30 px-4 py-2 mb-4">
+        {/* Hero Section */}
+        <motion.div 
+          className="text-center mb-12"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <Badge className="bg-cyan-500/10 text-cyan-400 border-cyan-500/30 px-4 py-2 mb-6 text-sm">
             <Zap className="w-4 h-4 mr-2" />
-            {remainingTries > 0 ? `${remainingTries} essai${remainingTries > 1 ? 's' : ''} gratuit${remainingTries > 1 ? 's' : ''}` : 'Essais utilisés'}
+            {remainingTries > 0 ? `${remainingTries} essai${remainingTries > 1 ? 's' : ''} gratuit${remainingTries > 1 ? 's' : ''} restant${remainingTries > 1 ? 's' : ''}` : 'Essais utilisés — Passez à la version complète'}
           </Badge>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black mb-4">
-            Testez <span className="bg-gradient-to-r from-cyan-400 to-emerald-400 bg-clip-text text-transparent">gratuitement</span> l'IA
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-5 leading-tight">
+            Créez un ebook complet en{' '}
+            <span className="bg-gradient-to-r from-cyan-400 to-emerald-400 bg-clip-text text-transparent">
+              moins de 60 minutes
+            </span>
           </h1>
-          <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-            Entrez un titre et générez instantanément un plan structuré avec mots-clés Amazon KDP
+          <p className="text-slate-300 text-lg md:text-xl max-w-3xl mx-auto mb-6 leading-relaxed">
+            Notre IA analyse votre sujet, structure un plan professionnel avec chapitres détaillés, 
+            et génère les mots-clés Amazon KDP pour maximiser vos ventes.{' '}
+            <span className="text-white font-semibold">Testez gratuitement ci-dessous.</span>
           </p>
-        </div>
+          
+          {/* Trust Indicators */}
+          <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-slate-400">
+            <div className="flex items-center gap-2">
+              <Users className="w-4 h-4 text-cyan-400" />
+              <span>+2 400 ebooks créés</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Star className="w-4 h-4 text-amber-400" />
+              <span>4.9/5 satisfaction</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Clock className="w-4 h-4 text-emerald-400" />
+              <span>Résultat en ~30 secondes</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Shield className="w-4 h-4 text-purple-400" />
+              <span>Aucune carte requise</span>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* What You'll Get - Before the form */}
+        <motion.div 
+          className="mb-10"
+          initial="hidden"
+          animate="visible"
+          variants={fadeUp}
+          custom={1}
+        >
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {[
+              { icon: FileText, label: "Plan structuré", desc: "Chapitres & sous-sections", color: "cyan" },
+              { icon: Target, label: "Mots-clés KDP", desc: "Optimisés pour Amazon", color: "emerald" },
+              { icon: BarChart3, label: "Estimation pages", desc: "Volume automatique", color: "amber" },
+              { icon: BookMarked, label: "Résumé du livre", desc: "Pitch professionnel", color: "purple" },
+            ].map((item, i) => (
+              <div key={i} className="bg-slate-900/50 border border-slate-800 rounded-xl p-4 text-center hover:border-slate-700 transition-colors">
+                <div className={`w-10 h-10 mx-auto mb-2 rounded-lg bg-${item.color}-500/10 flex items-center justify-center`}>
+                  <item.icon className={`w-5 h-5 text-${item.color}-400`} />
+                </div>
+                <p className="font-semibold text-white text-sm">{item.label}</p>
+                <p className="text-xs text-slate-500">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </motion.div>
 
         <div className="grid lg:grid-cols-5 gap-6">
           {/* Form */}
@@ -215,48 +277,59 @@ const DemoPage = () => {
                   Créez votre Ebook
                 </CardTitle>
                 <CardDescription className="text-slate-400">
-                  Étape 1 — Entrez un titre et cliquez sur "Générer"
+                  Remplissez le formulaire et laissez l'IA faire le reste
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label className="text-slate-300">Titre de l'ebook *</Label>
                   <Input
-                    placeholder="Ex: Créer un ebook KDP rentable avec l'IA"
+                    placeholder="Ex: Les secrets du marketing digital en 2026"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     disabled={demoUsed || isGenerating}
                     className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 text-lg py-5"
                   />
+                  <p className="text-xs text-slate-500">Astuce : un titre précis donne un meilleur plan</p>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-2">
-                    <Label className="text-slate-300 text-sm">Genre</Label>
-                    <Select value={genre} onValueChange={setGenre} disabled={demoUsed || isGenerating}>
-                      <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white h-9">
-                        <SelectValue placeholder="Choisir" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-slate-900 border-slate-800">
-                        {genres.map((g) => (
-                          <SelectItem key={g} value={g} className="text-white hover:bg-slate-800">{g}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-slate-300 text-sm">Chapitres</Label>
-                    <Select value={numberOfChapters} onValueChange={setNumberOfChapters} disabled={demoUsed || isGenerating}>
-                      <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white h-9">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-slate-900 border-slate-800">
-                        {[3, 5, 7, 10].map((n) => (
-                          <SelectItem key={n} value={n.toString()} className="text-white hover:bg-slate-800">{n}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                <div className="space-y-2">
+                  <Label className="text-slate-300 text-sm">Genre / Catégorie</Label>
+                  <Select value={genre} onValueChange={setGenre} disabled={demoUsed || isGenerating}>
+                    <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
+                      <SelectValue placeholder="Choisir un genre" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-slate-900 border-slate-800">
+                      {genres.map((g) => (
+                        <SelectItem key={g} value={g} className="text-white hover:bg-slate-800">{g}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-slate-300 text-sm">Public cible (optionnel)</Label>
+                  <Input
+                    placeholder="Ex: Entrepreneurs débutants"
+                    value={targetAudience}
+                    onChange={(e) => setTargetAudience(e.target.value)}
+                    disabled={demoUsed || isGenerating}
+                    className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-slate-300 text-sm">Nombre de chapitres</Label>
+                  <Select value={numberOfChapters} onValueChange={setNumberOfChapters} disabled={demoUsed || isGenerating}>
+                    <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-slate-900 border-slate-800">
+                      {[3, 5, 7, 10].map((n) => (
+                        <SelectItem key={n} value={n.toString()} className="text-white hover:bg-slate-800">{n} chapitres</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <Button
@@ -266,23 +339,38 @@ const DemoPage = () => {
                   disabled={demoUsed || isGenerating || !title.trim()}
                 >
                   {isGenerating ? (
-                    <><Loader2 className="w-5 h-5 mr-2 animate-spin" />Génération en cours…</>
+                    <><Loader2 className="w-5 h-5 mr-2 animate-spin" />L'IA structure votre livre…</>
                   ) : demoUsed ? (
-                    <><Lock className="w-5 h-5 mr-2" />Essais utilisés</>
+                    <><Lock className="w-5 h-5 mr-2" />Essais gratuits utilisés</>
                   ) : (
-                    <><Zap className="w-5 h-5 mr-2" />Générer mon plan gratuit</>
+                    <><Zap className="w-5 h-5 mr-2" />Générer mon plan gratuitement</>
                   )}
                 </Button>
 
+                {/* Progress bar essais */}
+                <div className="space-y-1.5">
+                  <div className="flex justify-between text-xs text-slate-500">
+                    <span>Essais utilisés</span>
+                    <span>{demoCount}/{MAX_DEMO_TRIES}</span>
+                  </div>
+                  <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-gradient-to-r from-cyan-500 to-emerald-500 rounded-full transition-all duration-500"
+                      style={{ width: `${(demoCount / MAX_DEMO_TRIES) * 100}%` }}
+                    />
+                  </div>
+                </div>
+
                 {demoUsed && (
-                  <div className="text-center pt-4 border-t border-slate-800">
-                    <p className="text-slate-400 text-sm mb-3">Vous avez vu la puissance de l'IA !</p>
+                  <div className="text-center pt-4 border-t border-slate-800 space-y-3">
+                    <p className="text-slate-300 text-sm font-medium">🚀 Vous avez vu la puissance de l'IA !</p>
+                    <p className="text-slate-500 text-xs">Débloquez la rédaction complète, les couvertures IA, l'export et bien plus encore.</p>
                     <Button 
-                      className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-900 font-bold rounded-xl"
+                      className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-900 font-bold rounded-xl py-5"
                       onClick={() => navigate("/offres")}
                     >
                       <Crown className="w-5 h-5 mr-2" />
-                      Débloquer tout pour 97€
+                      Débloquer tout pour 97€ à vie
                     </Button>
                   </div>
                 )}
@@ -301,8 +389,13 @@ const DemoPage = () => {
                       <Sparkles className="w-10 h-10 text-slate-900 animate-pulse" />
                     </div>
                   </div>
-                  <h3 className="text-xl font-semibold text-white mb-2">L'IA génère votre plan...</h3>
-                  <p className="text-slate-400">Structure, chapitres et mots-clés KDP</p>
+                  <h3 className="text-xl font-semibold text-white mb-2">L'IA analyse votre sujet...</h3>
+                  <p className="text-slate-400 mb-4">Structure, chapitres, sous-sections et mots-clés KDP</p>
+                  <div className="flex flex-col gap-2 text-sm text-slate-500 max-w-xs mx-auto">
+                    <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Analyse du sujet et du genre</div>
+                    <div className="flex items-center gap-2"><Loader2 className="w-4 h-4 text-cyan-400 animate-spin" /> Structuration des chapitres</div>
+                    <div className="flex items-center gap-2 text-slate-600"><Clock className="w-4 h-4" /> Optimisation mots-clés Amazon</div>
+                  </div>
                 </div>
               </Card>
             ) : generatedPlan ? (
@@ -313,6 +406,9 @@ const DemoPage = () => {
                     <div className="flex items-center gap-3">
                       <CheckCircle2 className="w-6 h-6" />
                       <span className="font-semibold text-lg">Plan Généré avec Succès !</span>
+                      <Badge className="bg-white/20 text-white border-0 ml-auto">
+                        <Timer className="w-3 h-3 mr-1" /> ~30s
+                      </Badge>
                     </div>
                   </div>
                   
@@ -327,13 +423,13 @@ const DemoPage = () => {
                       {/* Stats */}
                       <div className="flex-1">
                         <h2 className="text-2xl font-bold text-white mb-2">{title}</h2>
-                        <p className="text-slate-400 mb-4 line-clamp-2">{generatedPlan.summary}</p>
+                        <p className="text-slate-400 mb-4 line-clamp-3">{generatedPlan.summary}</p>
                         
                         <div className="grid grid-cols-3 gap-3">
                           {[
                             { icon: FileText, value: generatedPlan.chapters.length, label: "Chapitres", color: "cyan" },
-                            { icon: BookOpen, value: `~${generatedPlan.estimatedPages}`, label: "Pages", color: "emerald" },
-                            { icon: Target, value: "5", label: "Mots-clés", color: "amber" },
+                            { icon: BookOpen, value: `~${generatedPlan.estimatedPages}`, label: "Pages estimées", color: "emerald" },
+                            { icon: Target, value: generatedPlan.kdpKeywords.length, label: "Mots-clés KDP", color: "amber" },
                           ].map((stat, i) => (
                             <div key={i} className={`bg-${stat.color}-500/10 rounded-xl p-3 text-center`}>
                               <stat.icon className={`w-5 h-5 mx-auto text-${stat.color}-400 mb-1`} />
@@ -348,19 +444,20 @@ const DemoPage = () => {
                     {/* KDP Keywords */}
                     <div className="mb-6">
                       <h4 className="text-sm font-semibold text-slate-400 mb-2 flex items-center gap-2">
-                        <Target className="w-4 h-4" /> Mots-clés Amazon KDP
+                        <Target className="w-4 h-4" /> Mots-clés Amazon KDP optimisés
                       </h4>
                       <div className="flex flex-wrap gap-2">
                         {generatedPlan.kdpKeywords.map((kw, i) => (
                           <Badge key={i} className="bg-amber-500/10 text-amber-400 border-amber-500/30">{kw}</Badge>
                         ))}
                       </div>
+                      <p className="text-xs text-slate-600 mt-2">Ces mots-clés sont sélectionnés pour maximiser la visibilité sur Amazon KDP</p>
                     </div>
                     
                     {/* Chapters */}
                     <div>
                       <h4 className="text-sm font-semibold text-slate-400 mb-3 flex items-center gap-2">
-                        <BookMarked className="w-4 h-4" /> Structure des chapitres
+                        <BookMarked className="w-4 h-4" /> Structure détaillée des chapitres
                       </h4>
                       <div className="space-y-2">
                         {generatedPlan.chapters.map((chapter, i) => (
@@ -377,26 +474,68 @@ const DemoPage = () => {
                               </div>
                               <div className="flex-1 min-w-0">
                                 <p className="font-medium text-white truncate">{chapter.title}</p>
+                                {chapter.description && expandedChapter !== i && (
+                                  <p className="text-xs text-slate-500 truncate">{chapter.description}</p>
+                                )}
                               </div>
                               <Badge variant="outline" className="text-xs border-slate-700 text-slate-400">
                                 {chapter.subSections.length} sections
                               </Badge>
+                              <ChevronRight className={`w-4 h-4 text-slate-600 transition-transform ${expandedChapter === i ? 'rotate-90' : ''}`} />
                             </div>
-                            {expandedChapter === i && chapter.subSections.length > 0 && (
+                            {expandedChapter === i && (
                               <div className="px-3 pb-3 border-t border-slate-800">
-                                <ul className="space-y-1 mt-2">
-                                  {chapter.subSections.map((sub, j) => (
-                                    <li key={j} className="text-sm text-slate-400 flex items-start gap-2">
-                                      <span className="text-cyan-400">•</span>
-                                      <span>{sub}</span>
-                                    </li>
-                                  ))}
-                                </ul>
+                                {chapter.description && (
+                                  <p className="text-sm text-slate-400 mt-2 mb-2">{chapter.description}</p>
+                                )}
+                                {chapter.subSections.length > 0 && (
+                                  <ul className="space-y-1 mt-2">
+                                    {chapter.subSections.map((sub, j) => (
+                                      <li key={j} className="text-sm text-slate-400 flex items-start gap-2">
+                                        <span className="text-cyan-400 mt-0.5">•</span>
+                                        <span>{sub}</span>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                )}
                               </div>
                             )}
                           </div>
                         ))}
                       </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Locked Features Preview */}
+                <Card className="bg-slate-900/50 border-slate-800">
+                  <CardContent className="p-6">
+                    <h4 className="font-semibold text-white mb-4 flex items-center gap-2">
+                      <Lock className="w-4 h-4 text-slate-500" />
+                      Fonctionnalités disponibles dans la version complète
+                    </h4>
+                    <div className="grid sm:grid-cols-2 gap-3">
+                      {[
+                        { icon: FileText, label: "Rédaction complète", desc: "Chaque chapitre rédigé en entier par l'IA", locked: true },
+                        { icon: Palette, label: "Couverture IA", desc: "Générée automatiquement en haute définition", locked: true },
+                        { icon: Download, label: "Export multi-format", desc: "PDF, EPUB, Word — prêt pour KDP", locked: true },
+                        { icon: Headphones, label: "Audiobook", desc: "Narration vocale Azure Neural réaliste", locked: true },
+                        { icon: Image, label: "Illustrations IA", desc: "Images générées pour enrichir le livre", locked: true },
+                        { icon: Layers, label: "Séries & tomes", desc: "Créez des séries cohérentes multi-tomes", locked: true },
+                      ].map((feat, i) => (
+                        <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-slate-800/30 border border-slate-800/50">
+                          <div className="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center flex-shrink-0">
+                            <feat.icon className="w-4 h-4 text-slate-500" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-slate-300 flex items-center gap-1.5">
+                              {feat.label}
+                              <Lock className="w-3 h-3 text-slate-600" />
+                            </p>
+                            <p className="text-xs text-slate-600">{feat.desc}</p>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </CardContent>
                 </Card>
@@ -409,13 +548,14 @@ const DemoPage = () => {
                         <Crown className="w-7 h-7 text-slate-900" />
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-bold text-xl text-white mb-2">Débloquez la suite pour 97€</h3>
+                        <h3 className="font-bold text-xl text-white mb-1">Passez à la version complète</h3>
+                        <p className="text-slate-400 text-sm mb-4">Accès à vie pour 97€ — pas d'abonnement, pas de limites</p>
                         <div className="grid sm:grid-cols-2 gap-2 mb-4">
                           {[
                             "✍️ Rédaction complète des chapitres",
                             "🎨 Couvertures générées par IA",
                             "📄 Export PDF / EPUB / Word",
-                            "🎧 Audiobooks Azure Neural",
+                            "🎧 Audiobooks voix neurale",
                             "🎓 Formation 18 modules incluse",
                             "♾️ Générations illimitées à vie",
                           ].map((f, i) => (
@@ -437,25 +577,172 @@ const DemoPage = () => {
                 </Card>
               </div>
             ) : (
-              <Card className="bg-slate-900/50 border-slate-800 border-dashed h-full flex items-center justify-center min-h-[500px]">
-                <div className="text-center p-8">
-                  <div className="w-20 h-20 bg-cyan-500/10 rounded-2xl mx-auto mb-6 flex items-center justify-center">
-                    <BookOpen className="w-10 h-10 text-cyan-400" />
+              /* Empty State - Before Generation */
+              <div className="space-y-6">
+                <Card className="bg-slate-900/50 border-slate-800 border-dashed flex items-center justify-center min-h-[300px]">
+                  <div className="text-center p-8">
+                    <motion.div 
+                      className="w-20 h-20 bg-cyan-500/10 rounded-2xl mx-auto mb-6 flex items-center justify-center"
+                      animate={{ scale: [1, 1.05, 1] }}
+                      transition={{ duration: 3, repeat: Infinity }}
+                    >
+                      <BookOpen className="w-10 h-10 text-cyan-400" />
+                    </motion.div>
+                    <h3 className="text-xl font-semibold text-white mb-2">Votre ebook commence ici</h3>
+                    <p className="text-slate-400 mb-6 max-w-sm mx-auto">
+                      Entrez un titre à gauche et cliquez sur <span className="text-cyan-400 font-medium">"Générer"</span> pour voir la puissance de l'IA en action
+                    </p>
+                    <div className="flex flex-wrap justify-center gap-2">
+                      <Badge className="bg-slate-800 text-slate-300 border-slate-700">📖 Plan structuré</Badge>
+                      <Badge className="bg-slate-800 text-slate-300 border-slate-700">🎯 Mots-clés KDP</Badge>
+                      <Badge className="bg-slate-800 text-slate-300 border-slate-700">📊 Estimation pages</Badge>
+                      <Badge className="bg-slate-800 text-slate-300 border-slate-700">📝 Résumé du livre</Badge>
+                    </div>
                   </div>
-                  <h3 className="text-xl font-semibold text-white mb-2">Votre ebook commence ici</h3>
-                  <p className="text-slate-400 mb-6 max-w-sm">
-                    Entrez un titre et cliquez sur "Générer" pour voir la magie de l'IA
-                  </p>
-                  <div className="flex flex-wrap justify-center gap-2">
-                    <Badge className="bg-slate-800 text-slate-300 border-slate-700">📖 Plan structuré</Badge>
-                    <Badge className="bg-slate-800 text-slate-300 border-slate-700">🎯 Mots-clés KDP</Badge>
-                    <Badge className="bg-slate-800 text-slate-300 border-slate-700">📊 Estimation pages</Badge>
-                  </div>
-                </div>
-              </Card>
+                </Card>
+
+                {/* How it works */}
+                <Card className="bg-slate-900/50 border-slate-800">
+                  <CardContent className="p-6">
+                    <h3 className="font-bold text-white text-lg mb-4 flex items-center gap-2">
+                      <Sparkles className="w-5 h-5 text-cyan-400" />
+                      Comment ça fonctionne ?
+                    </h3>
+                    <div className="grid gap-4">
+                      {[
+                        { step: "1", title: "Entrez votre titre", desc: "Décrivez le sujet de votre ebook. Plus c'est précis, meilleur sera le résultat.", icon: BookOpen },
+                        { step: "2", title: "L'IA structure votre livre", desc: "En quelques secondes, l'intelligence artificielle analyse votre sujet, crée un plan avec chapitres et sous-sections.", icon: Sparkles },
+                        { step: "3", title: "Obtenez votre plan complet", desc: "Visualisez la structure, les mots-clés KDP optimisés et l'estimation du nombre de pages.", icon: CheckCircle2 },
+                      ].map((item, i) => (
+                        <div key={i} className="flex items-start gap-4">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-r from-cyan-500 to-emerald-500 flex items-center justify-center text-slate-900 text-sm font-bold flex-shrink-0">
+                            {item.step}
+                          </div>
+                          <div>
+                            <p className="font-semibold text-white">{item.title}</p>
+                            <p className="text-sm text-slate-400">{item.desc}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Social Proof */}
+                <Card className="bg-slate-900/50 border-slate-800">
+                  <CardContent className="p-6">
+                    <h3 className="font-bold text-white text-lg mb-4 flex items-center gap-2">
+                      <Quote className="w-5 h-5 text-amber-400" />
+                      Ce que disent nos utilisateurs
+                    </h3>
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      {[
+                        { name: "Marie L.", text: "J'ai publié mon premier ebook en 3 jours grâce à cet outil. Les mots-clés KDP m'ont permis d'avoir 15 ventes dès la première semaine.", rating: 5 },
+                        { name: "Thomas B.", text: "Impressionnant. Le plan généré était tellement bien structuré que je n'ai eu qu'à rédiger les chapitres. Un gain de temps énorme.", rating: 5 },
+                        { name: "Sophie R.", text: "La fonctionnalité audiobook est incroyable. Mon ebook se vend à la fois en format écrit et audio sur Amazon.", rating: 5 },
+                        { name: "Julien M.", text: "J'ai testé la démo et j'ai été convaincu en 30 secondes. L'investissement de 97€ est rentabilisé dès le premier ebook vendu.", rating: 5 },
+                      ].map((review, i) => (
+                        <div key={i} className="bg-slate-800/30 rounded-xl p-4 border border-slate-800/50">
+                          <div className="flex items-center gap-1 mb-2">
+                            {Array(review.rating).fill(0).map((_, j) => (
+                              <Star key={j} className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                            ))}
+                          </div>
+                          <p className="text-sm text-slate-300 mb-2 italic">"{review.text}"</p>
+                          <p className="text-xs text-slate-500 font-medium">— {review.name}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* What's included in full version */}
+                <Card className="bg-gradient-to-br from-cyan-950/30 to-emerald-950/30 border-cyan-800/30">
+                  <CardContent className="p-6">
+                    <h3 className="font-bold text-white text-lg mb-2 flex items-center gap-2">
+                      <TrendingUp className="w-5 h-5 text-emerald-400" />
+                      La démo, c'est 5% de la puissance
+                    </h3>
+                    <p className="text-slate-400 text-sm mb-4">
+                      Avec la version complète, vous passez du plan à un ebook publié sur Amazon en moins d'une heure.
+                    </p>
+                    <div className="grid sm:grid-cols-3 gap-3 mb-4">
+                      {[
+                        { label: "Rédaction IA", desc: "Chapitres entiers rédigés automatiquement", icon: FileText },
+                        { label: "Couverture Pro", desc: "Design professionnel généré par IA", icon: Palette },
+                        { label: "Audiobook", desc: "Voix neurale réaliste intégrée", icon: Headphones },
+                      ].map((item, i) => (
+                        <div key={i} className="bg-slate-900/50 rounded-xl p-4 border border-slate-800/50 text-center">
+                          <item.icon className="w-6 h-6 mx-auto text-cyan-400 mb-2" />
+                          <p className="font-semibold text-white text-sm">{item.label}</p>
+                          <p className="text-xs text-slate-500 mt-1">{item.desc}</p>
+                        </div>
+                      ))}
+                    </div>
+                    <Button 
+                      className="w-full bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-900 font-bold rounded-xl"
+                      onClick={() => navigate('/offres')}
+                    >
+                      Voir toutes les fonctionnalités <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
             )}
           </div>
         </div>
+
+        {/* Bottom FAQ Section */}
+        <motion.div 
+          className="mt-16 mb-8"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+        >
+          <h2 className="text-2xl font-bold text-white text-center mb-8">Questions fréquentes</h2>
+          <div className="grid md:grid-cols-2 gap-4 max-w-4xl mx-auto">
+            {[
+              { q: "La démo est-elle vraiment gratuite ?", a: "Oui, 100% gratuit. Vous pouvez générer jusqu'à 3 plans complets sans carte bancaire ni inscription. L'IA structure votre ebook avec chapitres, sous-sections et mots-clés Amazon KDP." },
+              { q: "Quelle est la qualité du contenu généré ?", a: "Notre IA utilise les derniers modèles de langage (Gemini 3 Flash) pour produire du contenu professionnel, structuré et optimisé pour le marché Amazon KDP." },
+              { q: "Combien de temps faut-il pour créer un ebook complet ?", a: "Avec la version complète, un ebook de 10 chapitres peut être entièrement rédigé, illustré et exporté en PDF/EPUB en moins de 60 minutes." },
+              { q: "Est-ce que 97€ c'est un paiement unique ?", a: "Oui, c'est un accès à vie. Pas d'abonnement, pas de frais cachés. Vous payez une fois et vous générez autant d'ebooks que vous voulez, pour toujours." },
+              { q: "Puis-je vendre les ebooks créés ?", a: "Absolument. Vous êtes propriétaire de tout le contenu généré. Vous pouvez le publier sur Amazon KDP, le vendre sur votre site, ou le distribuer comme bon vous semble." },
+              { q: "L'audiobook est-il inclus ?", a: "Oui, la version complète inclut la génération d'audiobooks avec des voix neurales Azure ultra-réalistes. Vous pouvez vendre votre livre en format audio sur Audible/Amazon." },
+            ].map((faq, i) => (
+              <div key={i} className="bg-slate-900/50 border border-slate-800 rounded-xl p-5">
+                <h4 className="font-semibold text-white mb-2 text-sm">{faq.q}</h4>
+                <p className="text-slate-400 text-sm leading-relaxed">{faq.a}</p>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Final CTA */}
+        <motion.div 
+          className="text-center py-12 border-t border-slate-800"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+        >
+          <Award className="w-12 h-12 text-amber-400 mx-auto mb-4" />
+          <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">
+            Prêt à créer votre premier ebook ?
+          </h2>
+          <p className="text-slate-400 max-w-lg mx-auto mb-6">
+            Rejoignez +2 400 créateurs qui utilisent EbookStudio Pro pour publier sur Amazon KDP et générer des revenus passifs.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Button 
+              size="lg"
+              className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-900 font-bold rounded-xl px-8 py-6 text-lg"
+              onClick={() => navigate('/offres')}
+            >
+              <Crown className="w-5 h-5 mr-2" />
+              Débloquer tout pour 97€
+            </Button>
+            <p className="text-xs text-slate-600">Paiement unique • Accès à vie • Garantie 30 jours</p>
+          </div>
+        </motion.div>
       </div>
 
       {/* Email Popup */}
@@ -467,7 +754,7 @@ const DemoPage = () => {
               🎉 Votre plan est prêt !
             </DialogTitle>
             <DialogDescription className="text-slate-400">
-              Recevez gratuitement "10 Niches KDP Rentables 2026"
+              Recevez gratuitement notre guide <span className="text-white font-medium">"10 Niches KDP Rentables 2026"</span> avec des stratégies concrètes pour vos premiers revenus.
             </DialogDescription>
           </DialogHeader>
           
