@@ -514,11 +514,10 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
 
   // Generate MP3 for a single section via Azure Speech (with ElevenLabs fallback)
   const generateSectionMp3 = async (text: string): Promise<Blob | null> => {
-    const { data: sessionData } = await supabase.auth.getSession();
-    const token = sessionData?.session?.access_token;
+    const { data: { session } } = await supabase.auth.getSession();
+    const token = session?.access_token;
     if (!token) {
-      toast.error('Vous devez être connecté pour exporter en MP3');
-      return null;
+      throw new Error('Vous devez être connecté pour exporter et sauvegarder en MP3');
     }
 
     // Split text into chunks of 5000 chars max
