@@ -57,8 +57,10 @@ const ElementorExportPage = () => {
 
   const generateElementorHtml = (book: any) => {
     const origin = window.location.origin;
-    const publicUrl = `${origin}/audiobook/${book.slug}`;
-    const embedUrl = `${origin}/audiobook-embed/${book.slug}`;
+    const safeSlug = book.slug || '';
+    const hasSlug = Boolean(safeSlug);
+    const publicUrl = hasSlug ? `${origin}/audiobook/${safeSlug}` : '#';
+    const embedUrl = hasSlug ? `${origin}/audiobook-embed/${safeSlug}` : '';
     const price = book.price ? `${Number(book.price).toFixed(2)} €` : 'Gratuit';
     const desc = (book.description || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     const descShort = desc.slice(0, 300) + (desc.length > 300 ? '...' : '');
