@@ -534,7 +534,15 @@ const ElementorExportPage = () => {
                     Télécharger .html
                   </Button>
                   {selectedBook.slug && (
-                    <Button variant="ghost" onClick={() => window.open(`/audiobook/${selectedBook.slug}`, '_blank')} className="text-slate-400 hover:text-white rounded-xl gap-2">
+                    <Button
+                      variant="ghost"
+                      onClick={async () => {
+                        const exportableBook = await ensureBookPublicForExport(selectedBook);
+                        if (!exportableBook?.slug) return;
+                        window.open(`/audiobook/${exportableBook.slug}`, '_blank');
+                      }}
+                      className="text-slate-400 hover:text-white rounded-xl gap-2"
+                    >
                       <Eye className="w-4 h-4" />
                       Voir la fiche
                     </Button>
