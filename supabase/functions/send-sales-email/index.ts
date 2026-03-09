@@ -276,7 +276,14 @@ Deno.serve(async (req) => {
     let sent = 0;
     let errors = 0;
 
-    for (const prospect of prospects) {
+    for (let i = 0; i < prospects.length; i++) {
+      const prospect = prospects[i];
+      
+      // Rate limit: max 2 emails/sec, wait 600ms between each
+      if (i > 0) {
+        await new Promise(resolve => setTimeout(resolve, 600));
+      }
+
       const stepToSend = mode === "manual" && targetStep
         ? targetStep
         : prospect.current_step + 1;
