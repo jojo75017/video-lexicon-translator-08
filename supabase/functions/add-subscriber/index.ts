@@ -72,7 +72,7 @@ async function sendAdminNotification(subscriberEmail: string, planType: string, 
     `;
 
     await resend.emails.send({
-      from: 'EbookStudio <onboarding@resend.dev>',
+      from: 'EbookStudio <noreply@ebookstudio.fr>',
       to: [adminEmail],
       subject: `${action} — ${subscriberEmail} (${planType})`,
       html,
