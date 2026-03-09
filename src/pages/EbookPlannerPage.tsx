@@ -259,7 +259,20 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   const [kdpKeywords, setKdpKeywords] = useState('');
   const [kdpCategories, setKdpCategories] = useState('');
   
-  const [activeTab, setActiveTab] = useState('onboarding');
+  const [activeTab, setActiveTab] = useState(() => {
+    try {
+      const saved = localStorage.getItem('ebook_planner_active_tab');
+      if (saved && saved !== 'onboarding') return saved;
+    } catch {}
+    return 'onboarding';
+  });
+
+  // Persist activeTab to localStorage so workflow isn't lost on re-render
+  useEffect(() => {
+    try {
+      localStorage.setItem('ebook_planner_active_tab', activeTab);
+    } catch {}
+  }, [activeTab]);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showWelcome, setShowWelcome] = useState(location.state?.fromFormation || false);
   const [showTutorial, setShowTutorial] = useState(location.state?.fromFormation || false);
