@@ -172,7 +172,7 @@ async function sendEmail(email: string, accessCode: string, planType: string, is
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "EbookStudio Pro <onboarding@resend.dev>",
+      from: "EbookStudio Pro <noreply@ebookstudio.fr>",
       to: [email],
       subject,
       html: `

@@ -28,7 +28,7 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     const emailResponse = await resend.emails.send({
-      from: "EbookStudio Pro <onboarding@resend.dev>",
+      from: "EbookStudio Pro <noreply@ebookstudio.fr>",
       to: [adminEmail],
       subject: `🎉 Nouvelle confirmation de paiement - ${email}`,
       html: `

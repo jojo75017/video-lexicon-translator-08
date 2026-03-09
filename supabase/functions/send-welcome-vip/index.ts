@@ -142,7 +142,7 @@ const handler = async (req: Request): Promise<Response> => {
         'Authorization': `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: 'EbookStudio <onboarding@resend.dev>',
+        from: 'EbookStudio <noreply@ebookstudio.fr>',
         to: [email],
         subject: '🎉 Bienvenue VIP ! Voici votre code d\'accès EbookStudio',
         html: htmlContent,

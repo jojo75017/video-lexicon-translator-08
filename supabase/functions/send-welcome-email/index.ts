@@ -23,7 +23,7 @@ const handler = async (req: Request): Promise<Response> => {
     console.log(`Sending welcome email with KDP guide to ${email}`);
 
     const emailResponse = await resend.emails.send({
-      from: "Ebook Studio <onboarding@resend.dev>",
+      from: "EbookStudio <noreply@ebookstudio.fr>",
       to: [email],
       subject: "🎁 Votre Guide KDP Gratuit - Bienvenue chez Ebook Studio AI !",
       html: `
