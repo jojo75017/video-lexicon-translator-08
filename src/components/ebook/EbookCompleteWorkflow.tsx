@@ -405,7 +405,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
 
     // Vérifier que l'utilisateur a configuré sa clé API
     if (!hasValidApiKey) {
-      toast.error('🔑 Veuillez configurer votre clé API OpenAI dans l\'onglet "Paramètres" avant de générer.');
+      toast.error('🔑 Veuillez configurer votre clé API Gemini dans l\'onglet "Paramètres" avant de générer.');
       return;
     }
 
