@@ -685,9 +685,12 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
       }
 
       if (!userId) {
-        toast.warning('⚠️ Connectez-vous pour sauvegarder vos livres audio dans la bibliothèque !');
+        toast.error('❌ ERREUR SESSION : Vous n\'êtes pas connecté ! Allez sur /auth pour vous connecter, puis relancez l\'export.');
+        console.error('saveToLibrary: NO USER ID - session missing');
         return;
       }
+      
+      console.log('saveToLibrary: userId =', userId, '| title =', title, '| blob size =', audioBlob.size);
 
       const fileName = `${userId}/${Date.now()}-${title.replace(/[^a-zA-Z0-9àâéèêëïîôùûüç\s-]/gi, '').replace(/\s+/g, '-')}.mp3`;
 
