@@ -13,15 +13,38 @@ const ElementorExportPage = () => {
   const [selectedBook, setSelectedBook] = useState<any>(null);
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [authMissing, setAuthMissing] = useState(false);
 
   useEffect(() => {
     const fetchBooks = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      const { data } = await supabase.from('audiobooks').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
-      setAudiobooks(data || []);
-      setLoading(false);
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const user = session?.user;
+
+        if (!user) {
+          setAuthMissing(true);
+          setAudiobooks([]);
+          return;
+        }
+
+        const { data, error } = await supabase
+          .from('audiobooks')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        setAuthMissing(false);
+        setAudiobooks(data || []);
+      } catch (error: any) {
+        console.error('Elementor fetch error:', error);
+        toast.error('Impossible de charger vos audiobooks');
+      } finally {
+        setLoading(false);
+      }
     };
+
     fetchBooks();
   }, []);
 
@@ -400,6 +423,10 @@ const ElementorExportPage = () => {
             <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wide">Vos audiobooks</h2>
             {loading ? (
               <div className="text-slate-500 text-sm animate-pulse">Chargement...</div>
+            ) : authMissing ? (
+              <Card className="bg-slate-900/50 border-slate-800 p-4">
+                <p className="text-slate-400 text-sm">Vous devez être connecté à votre compte pour voir les audiobooks sauvegardés.</p>
+              </Card>
             ) : audiobooks.length === 0 ? (
               <Card className="bg-slate-900/50 border-slate-800 p-4">
                 <p className="text-slate-500 text-sm">Aucun audiobook trouvé. Allez dans le Générateur Audio et cliquez sur "Exporter en MP3" ou "Fusionner" pour sauvegarder un livre dans votre bibliothèque.</p>
