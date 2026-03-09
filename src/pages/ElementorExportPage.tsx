@@ -337,14 +337,17 @@ const ElementorExportPage = () => {
           : `<span class="free-badge">✓ GRATUIT</span>`
         }
       </div>
-      <a href="${publicUrl}" class="eb-cta" target="_blank" rel="noopener">
-        🎧 Écouter maintenant
-      </a>
+      ${hasSlug
+        ? `<a href="${publicUrl}" class="eb-cta" target="_blank" rel="noopener">
+            🎧 Écouter maintenant
+          </a>`
+        : `<span class="eb-cta" style="opacity:.6;cursor:not-allowed">🎧 Lien indisponible</span>`
+      }
     </div>
   </div>
 
   <!-- PLAYER EMBED -->
-  ${book.slug ? `
+  ${hasSlug ? `
   <div class="eb-player-section">
     <h3>🎵 Extrait audio</h3>
     <div class="eb-player-iframe">
