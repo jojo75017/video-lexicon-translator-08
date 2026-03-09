@@ -58,22 +58,24 @@ const AdminDirectPage = () => {
       ? window.location.href.split('#')[0]
       : '/admin-direct';
 
-    const { error: magicLinkError } = await supabase.auth.signInWithOtp({
+    console.log("[AdminDirect] Sending OTP to:", ADMIN_EMAIL, "redirectTo:", redirectTo);
+    const { data: otpData, error: magicLinkError } = await supabase.auth.signInWithOtp({
       email: ADMIN_EMAIL,
       options: {
         emailRedirectTo: redirectTo
       }
     });
+    console.log("[AdminDirect] OTP response:", { data: otpData, error: magicLinkError });
 
     if (magicLinkError) {
       if (magicLinkError.status === 429) {
         setStatus("sent");
-        setMessage("Lien déjà envoyé récemment. Vérifiez votre boîte mail (et spams).");
+        setMessage("⚠️ Rate limit atteint. Attendez quelques minutes puis réessayez. Vérifiez aussi vos spams.");
         return;
       }
-      console.error("Magic link error:", magicLinkError);
+      console.error("Magic link error:", JSON.stringify(magicLinkError));
       setStatus("error");
-      setMessage("Erreur lors de l'envoi du lien");
+      setMessage(`Erreur: ${magicLinkError.message || "Erreur inconnue"}`);
       return;
     }
 
