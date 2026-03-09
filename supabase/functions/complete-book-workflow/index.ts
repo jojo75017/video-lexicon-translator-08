@@ -948,8 +948,10 @@ JSON :
         );
         result = parseJSON(content) || { raw: content };
         result._qualityScore = qualityScore;
+        const pointsForts = Array.isArray(result.pointsForts) ? result.pointsForts : [];
+        const incoherences = Array.isArray(result.incoherencesDetectees) ? result.incoherencesDetectees : (typeof result.incoherencesDetectees === 'string' ? [result.incoherencesDetectees] : ['Aucune']);
         displayContent = result.coherenceGlobale
-          ? `**Cohérence globale : ${result.coherenceGlobale}/10**\n\n**${result.verdict}**\n\n**Points forts :**\n${(result.pointsForts || []).map((p: string) => `✓ ${p}`).join('\n')}\n\n**Incohérences :**\n${(result.incoherencesDetectees || ['Aucune']).map((i: string) => `• ${i}`).join('\n')}\n\n🎯 **Qualité : ${qualityScore}/10**`
+          ? `**Cohérence globale : ${result.coherenceGlobale}/10**\n\n**${result.verdict}**\n\n**Points forts :**\n${pointsForts.map((p: string) => `✓ ${p}`).join('\n')}\n\n**Incohérences :**\n${incoherences.map((i: string) => `• ${i}`).join('\n')}\n\n🎯 **Qualité : ${qualityScore}/10**`
           : content;
         break;
       }
