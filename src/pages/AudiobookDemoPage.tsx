@@ -121,10 +121,10 @@ const AudiobookDemoPage = () => {
           <span className="font-semibold text-sm">🔥 Offre de lancement — Prix réduit pendant encore</span>
           <div className="flex gap-1.5">
             {[String(timeLeft.h).padStart(2, '0'), String(timeLeft.m).padStart(2, '0'), String(timeLeft.s).padStart(2, '0')].map((v, i) => (
-              <React.Fragment key={i}>
+              <div key={i} className="flex gap-1.5 items-center">
                 {i > 0 && <span className="font-bold text-lg text-red-300">:</span>}
                 <span className="bg-black/40 px-2.5 py-1 rounded-lg font-mono font-bold text-base min-w-[2.5rem] text-center text-white">{v}</span>
-              </React.Fragment>
+              </div>
             ))}
           </div>
         </div>
