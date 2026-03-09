@@ -402,7 +402,7 @@ const ElementorExportPage = () => {
               <div className="text-slate-500 text-sm animate-pulse">Chargement...</div>
             ) : audiobooks.length === 0 ? (
               <Card className="bg-slate-900/50 border-slate-800 p-4">
-                <p className="text-slate-500 text-sm">Aucun audiobook trouvé. Créez-en un d'abord.</p>
+                <p className="text-slate-500 text-sm">Aucun audiobook trouvé. Allez dans le Générateur Audio et cliquez sur "Exporter en MP3" ou "Fusionner" pour sauvegarder un livre dans votre bibliothèque.</p>
               </Card>
             ) : audiobooks.map((book) => (
               <Card 
