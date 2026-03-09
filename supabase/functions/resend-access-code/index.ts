@@ -108,7 +108,7 @@ Deno.serve(async (req) => {
     // Send email with access code
     try {
       const emailResponse = await resend.emails.send({
-        from: 'Générateur Ebook <onboarding@resend.dev>',
+        from: 'EbookStudio <noreply@ebookstudio.fr>',
         to: [subscriber.email],
         subject: 'Votre code d\'accès - Générateur Ebook',
         html: `

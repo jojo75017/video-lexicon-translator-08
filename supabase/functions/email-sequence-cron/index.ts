@@ -229,7 +229,7 @@ const handler = async (req: Request): Promise<Response> => {
         const emailHtml = getEmailContent(currentStep);
         
         const { error: sendError } = await resend.emails.send({
-          from: "EbookStudio Pro <onboarding@resend.dev>",
+          from: "EbookStudio Pro <noreply@ebookstudio.fr>",
           to: [sequence.email],
           subject: emailConfig.subject,
           html: emailHtml,

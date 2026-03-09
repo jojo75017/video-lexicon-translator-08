@@ -72,7 +72,7 @@ async function sendAdminNotification(subscriberEmail: string, planType: string, 
     `;
 
     await resend.emails.send({
-      from: 'EbookStudio <onboarding@resend.dev>',
+      from: 'EbookStudio <noreply@ebookstudio.frr>',
       to: [adminEmail],
       subject: `${action} — ${subscriberEmail} (${planType})`,
       html,
@@ -180,7 +180,7 @@ async function sendWelcomeEmail(email: string, accessCode: string, planType: str
     console.log('Sending welcome email to:', email);
 
     const emailResponse = await resend.emails.send({
-      from: 'Générateur Ebook <onboarding@resend.dev>',
+      from: EbookStudio <noreply@ebookstudio.frv>',
       to: [email],
       subject: subject,
       html: html,

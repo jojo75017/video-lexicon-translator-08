@@ -72,7 +72,7 @@ const handler = async (req: Request): Promise<Response> => {
     console.log(`Sending access code to ${email}`);
 
     const emailResponse = await resend.emails.send({
-      from: "Ebook Studio <onboarding@resend.dev>",
+      from: "EbookStudio <noreply@ebookstudio.fr>",
       to: [email],
       subject: "🎉 Votre accès à Ebook Studio AI",
       html: `
