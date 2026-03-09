@@ -405,7 +405,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
 
     // Vérifier que l'utilisateur a configuré sa clé API
     if (!hasValidApiKey) {
-      toast.error('🔑 Veuillez configurer votre clé API OpenAI dans l\'onglet "Paramètres" avant de générer.');
+      toast.error('🔑 Veuillez configurer votre clé API Gemini dans l\'onglet "Paramètres" avant de générer.');
       return;
     }
 
@@ -891,7 +891,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             <div className="space-y-1 flex-1">
               <div className="flex items-center justify-between">
                 <span className={`text-sm font-medium ${hasValidApiKey ? 'text-green-700' : 'text-red-600'}`}>
-                  {hasValidApiKey ? '🔑 Votre clé API OpenAI est active' : '🔑 Clé API OpenAI requise'}
+                  {hasValidApiKey ? '🔑 Votre clé API Gemini est active' : '🔑 Clé API Gemini requise'}
                 </span>
                 {hasValidApiKey && (
                   <Badge variant="outline" className="bg-green-100 text-green-700 border-green-300">
@@ -901,8 +901,8 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
               </div>
               <p className="text-xs text-muted-foreground">
                 {hasValidApiKey 
-                  ? 'Les coûts de génération seront facturés directement sur votre compte OpenAI.'
-                  : 'Configurez votre clé API OpenAI dans l\'onglet "Paramètres" pour générer votre livre. Les coûts (~0.50€ - 2€ par livre) seront facturés sur votre compte OpenAI.'
+                  ? 'Les coûts de génération seront facturés directement sur votre compte Gemini (~0,30€ par livre).'
+                  : 'Configurez votre clé API Gemini dans l\'onglet "Paramètres" pour générer votre livre. Les coûts (~0,20€ - 0,50€ par livre) seront facturés sur votre compte Google AI.'
                 }
               </p>
             </div>
