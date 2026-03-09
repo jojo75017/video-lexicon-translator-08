@@ -41,7 +41,9 @@ let totalTokenUsage = {
   totalTokens: 0
 };
 
-async function callGeminiDirect(systemPrompt: string, userPrompt: string, maxTokens: number, apiKey: string): Promise<string> {
+async function callGeminiDirect(systemPrompt: string, userPrompt: string, maxTokens: number, apiKey: string, retryCount = 0): Promise<string> {
+  const MAX_RETRIES = 3;
+  
   const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -56,7 +58,18 @@ async function callGeminiDirect(systemPrompt: string, userPrompt: string, maxTok
     const status = response.status;
     const errText = await response.text();
     console.error(`Gemini direct error ${status}: ${errText}`);
-    if (status === 429) throw new Error('RATE_LIMIT: Limite Gemini atteinte. Réessayez dans quelques minutes.');
+    
+    // Retry automatique sur 429 avec délai exponentiel
+    if (status === 429 && retryCount < MAX_RETRIES) {
+      // Extraire le délai suggéré par Google ou utiliser un backoff exponentiel
+      const retryMatch = errText.match(/retry in (\d+)/i);
+      const waitSeconds = retryMatch ? parseInt(retryMatch[1]) + 5 : Math.min(15 * Math.pow(2, retryCount), 120);
+      console.log(`⏳ Rate limit Gemini - retry ${retryCount + 1}/${MAX_RETRIES} dans ${waitSeconds}s...`);
+      await new Promise(resolve => setTimeout(resolve, waitSeconds * 1000));
+      return await callGeminiDirect(systemPrompt, userPrompt, maxTokens, apiKey, retryCount + 1);
+    }
+    
+    if (status === 429) throw new Error('RATE_LIMIT: Limite Gemini atteinte après 3 tentatives. Activez la facturation sur votre projet Google Cloud pour supprimer cette limite.');
     if (status === 401 || status === 403) throw new Error('INVALID_API_KEY: Clé API Gemini invalide.');
     throw new Error(`Gemini Error: ${status}`);
   }
