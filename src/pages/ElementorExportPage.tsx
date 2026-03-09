@@ -57,8 +57,10 @@ const ElementorExportPage = () => {
 
   const generateElementorHtml = (book: any) => {
     const origin = window.location.origin;
-    const publicUrl = `${origin}/audiobook/${book.slug}`;
-    const embedUrl = `${origin}/audiobook-embed/${book.slug}`;
+    const safeSlug = book.slug || '';
+    const hasSlug = Boolean(safeSlug);
+    const publicUrl = hasSlug ? `${origin}/audiobook/${safeSlug}` : '#';
+    const embedUrl = hasSlug ? `${origin}/audiobook-embed/${safeSlug}` : '';
     const price = book.price ? `${Number(book.price).toFixed(2)} €` : 'Gratuit';
     const desc = (book.description || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     const descShort = desc.slice(0, 300) + (desc.length > 300 ? '...' : '');
@@ -335,14 +337,17 @@ const ElementorExportPage = () => {
           : `<span class="free-badge">✓ GRATUIT</span>`
         }
       </div>
-      <a href="${publicUrl}" class="eb-cta" target="_blank" rel="noopener">
-        🎧 Écouter maintenant
-      </a>
+      ${hasSlug
+        ? `<a href="${publicUrl}" class="eb-cta" target="_blank" rel="noopener">
+            🎧 Écouter maintenant
+          </a>`
+        : `<span class="eb-cta" style="opacity:.6;cursor:not-allowed">🎧 Lien indisponible</span>`
+      }
     </div>
   </div>
 
   <!-- PLAYER EMBED -->
-  ${book.slug ? `
+  ${hasSlug ? `
   <div class="eb-player-section">
     <h3>🎵 Extrait audio</h3>
     <div class="eb-player-iframe">
@@ -373,22 +378,75 @@ const ElementorExportPage = () => {
 </div>`;
   };
 
-  const handleCopy = () => {
+  const slugifyTitle = (value: string) =>
+    value
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9\s-]/g, '')
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-');
+
+  const ensureBookPublicForExport = async (book: any) => {
+    if (book.slug && book.is_public) return book;
+
+    const { data: { session } } = await supabase.auth.getSession();
+    const userId = session?.user?.id;
+
+    if (!userId) {
+      toast.error('Vous devez être connecté pour publier la fiche.');
+      return null;
+    }
+
+    const fallbackSlugBase = slugifyTitle(book.title || 'audiobook') || 'audiobook';
+    const fallbackSlug = `${fallbackSlugBase}-${book.id.slice(0, 8)}`;
+
+    const { data, error } = await supabase
+      .from('audiobooks')
+      .update({
+        is_public: true,
+        slug: book.slug || fallbackSlug,
+      })
+      .eq('id', book.id)
+      .eq('user_id', userId)
+      .select('*')
+      .single();
+
+    if (error) {
+      console.error('Elementor publish error:', error);
+      toast.error('Impossible de publier ce livre pour la fiche Elementor.');
+      return null;
+    }
+
+    setAudiobooks((prev) => prev.map((item) => (item.id === data.id ? data : item)));
+    setSelectedBook(data);
+    toast.success('Livre publié pour la fiche Elementor ✅');
+    return data;
+  };
+
+  const handleCopy = async () => {
     if (!selectedBook) return;
-    navigator.clipboard.writeText(generateElementorHtml(selectedBook));
+    const exportableBook = await ensureBookPublicForExport(selectedBook);
+    if (!exportableBook) return;
+
+    navigator.clipboard.writeText(generateElementorHtml(exportableBook));
     setCopied(true);
     toast.success('HTML copié ! Collez-le dans un widget HTML Elementor.');
     setTimeout(() => setCopied(false), 3000);
   };
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     if (!selectedBook) return;
-    const html = generateElementorHtml(selectedBook);
+    const exportableBook = await ensureBookPublicForExport(selectedBook);
+    if (!exportableBook) return;
+
+    const html = generateElementorHtml(exportableBook);
     const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${selectedBook.slug || 'audiobook'}-elementor.html`;
+    a.download = `${exportableBook.slug || 'audiobook'}-elementor.html`;
     a.click();
     URL.revokeObjectURL(url);
     toast.success('Fichier HTML téléchargé !');
@@ -476,7 +534,15 @@ const ElementorExportPage = () => {
                     Télécharger .html
                   </Button>
                   {selectedBook.slug && (
-                    <Button variant="ghost" onClick={() => window.open(`/audiobook/${selectedBook.slug}`, '_blank')} className="text-slate-400 hover:text-white rounded-xl gap-2">
+                    <Button
+                      variant="ghost"
+                      onClick={async () => {
+                        const exportableBook = await ensureBookPublicForExport(selectedBook);
+                        if (!exportableBook?.slug) return;
+                        window.open(`/audiobook/${exportableBook.slug}`, '_blank');
+                      }}
+                      className="text-slate-400 hover:text-white rounded-xl gap-2"
+                    >
                       <Eye className="w-4 h-4" />
                       Voir la fiche
                     </Button>
