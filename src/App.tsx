@@ -464,6 +464,9 @@ const App = () => {
               <Route path="billing" element={<SaasBilling />} />
               <Route path="settings" element={<SaasSettings />} />
             </Route>
+            
+            {/* Catch-all : redirige vers /offres */}
+            <Route path="*" element={<Navigate to="/offres" replace />} />
           </Routes>
           <Toaster />
         </div>
