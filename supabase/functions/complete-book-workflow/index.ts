@@ -41,73 +41,95 @@ let totalTokenUsage = {
   totalTokens: 0
 };
 
+async function callGeminiDirect(systemPrompt: string, userPrompt: string, maxTokens: number, apiKey: string): Promise<string> {
+  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      system_instruction: { parts: [{ text: systemPrompt + EDITORIAL_PRO_RULES }] },
+      contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+      generationConfig: { maxOutputTokens: maxTokens, temperature: 0.7 },
+    }),
+  });
+
+  if (!response.ok) {
+    const status = response.status;
+    const errText = await response.text();
+    console.error(`Gemini direct error ${status}: ${errText}`);
+    if (status === 429) throw new Error('RATE_LIMIT: Limite Gemini atteinte. Réessayez dans quelques minutes.');
+    if (status === 401 || status === 403) throw new Error('INVALID_API_KEY: Clé API Gemini invalide.');
+    throw new Error(`Gemini Error: ${status}`);
+  }
+
+  const data = await response.json();
+  return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+}
+
 async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000): Promise<string> {
-  // Priorité : Lovable Gateway (pas besoin de clé utilisateur)
   const lovableKey = Deno.env.get('LOVABLE_API_KEY');
   const userKey = activeApiKey;
   const geminiKey = Deno.env.get('GEMINI_API_KEY');
+  const directKey = userKey || geminiKey;
   
-  // Stratégie 1: Lovable Gateway (recommandé)
+  // Stratégie 1: Essayer Lovable Gateway d'abord
   if (lovableKey) {
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${lovableKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
-        messages: [
-          { role: 'system', content: systemPrompt + EDITORIAL_PRO_RULES },
-          { role: 'user', content: userPrompt }
-        ],
-        max_tokens: maxTokens,
-      }),
-    });
+    try {
+      const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${lovableKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-2.5-flash',
+          messages: [
+            { role: 'system', content: systemPrompt + EDITORIAL_PRO_RULES },
+            { role: 'user', content: userPrompt }
+          ],
+          max_tokens: maxTokens,
+        }),
+      });
 
-    if (!response.ok) {
+      if (response.ok) {
+        const data = await response.json();
+        if (data.usage) {
+          totalTokenUsage.promptTokens += data.usage.prompt_tokens || 0;
+          totalTokenUsage.completionTokens += data.usage.completion_tokens || 0;
+          totalTokenUsage.totalTokens += data.usage.total_tokens || 0;
+          console.log(`📊 Tokens used: +${data.usage.total_tokens} (cumulative: ${totalTokenUsage.totalTokens})`);
+        }
+        return data.choices?.[0]?.message?.content || '';
+      }
+
       const status = response.status;
       const errorText = await response.text();
       console.error(`Lovable Gateway error ${status}: ${errorText}`);
+      
+      // Pour 402/429, tenter le fallback vers Gemini direct
+      if ((status === 402 || status === 429) && directKey) {
+        console.log(`⚡ Fallback vers Gemini API directe (clé ${userKey ? 'utilisateur' : 'serveur'})`);
+        return await callGeminiDirect(systemPrompt, userPrompt, maxTokens, directKey);
+      }
+      
       if (status === 429) throw new Error('RATE_LIMIT');
-      if (status === 402) throw new Error('QUOTA_EXCEEDED: Quota dépassé. Réessayez plus tard.');
+      if (status === 402) throw new Error('QUOTA_EXCEEDED: Quota dépassé et aucune clé Gemini de secours.');
       throw new Error(`AI Error: ${status} - ${errorText}`);
+    } catch (e) {
+      // Si c'est une erreur réseau et qu'on a une clé directe, fallback
+      if (directKey && !e.message?.startsWith('RATE_LIMIT') && !e.message?.startsWith('QUOTA_EXCEEDED') && !e.message?.startsWith('INVALID_API_KEY')) {
+        console.log(`⚡ Fallback réseau vers Gemini API directe`);
+        return await callGeminiDirect(systemPrompt, userPrompt, maxTokens, directKey);
+      }
+      throw e;
     }
-
-    const data = await response.json();
-    if (data.usage) {
-      totalTokenUsage.promptTokens += data.usage.prompt_tokens || 0;
-      totalTokenUsage.completionTokens += data.usage.completion_tokens || 0;
-      totalTokenUsage.totalTokens += data.usage.total_tokens || 0;
-      console.log(`📊 Tokens used: +${data.usage.total_tokens} (cumulative: ${totalTokenUsage.totalTokens})`);
-    }
-    return data.choices?.[0]?.message?.content || '';
   }
   
-  // Stratégie 2: Gemini API directe (clé utilisateur ou serveur)
-  const geminiApiKey = userKey || geminiKey;
-  if (geminiApiKey) {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${geminiApiKey}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: `${systemPrompt}\n${EDITORIAL_PRO_RULES}\n\n${userPrompt}` }] }],
-        generationConfig: { maxOutputTokens: maxTokens, temperature: 0.7 },
-      }),
-    });
-
-    if (!response.ok) {
-      const status = response.status;
-      if (status === 429) throw new Error('RATE_LIMIT');
-      if (status === 401 || status === 403) throw new Error('INVALID_API_KEY: Clé API Gemini invalide.');
-      throw new Error(`Gemini Error: ${status}`);
-    }
-
-    const data = await response.json();
-    return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  // Stratégie 2: Gemini API directe uniquement
+  if (directKey) {
+    return await callGeminiDirect(systemPrompt, userPrompt, maxTokens, directKey);
   }
 
-  throw new Error('NO_API_KEY: Aucune clé API disponible. Le système utilise automatiquement le serveur IA intégré.');
+  throw new Error('NO_API_KEY: Aucune clé API disponible. Configurez votre clé Gemini dans les Paramètres.');
 }
 
 // BOUCLE QUALITÉ : appelle l'IA, évalue le score, relance si < seuil
