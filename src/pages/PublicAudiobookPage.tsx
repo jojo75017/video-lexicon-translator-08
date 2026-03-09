@@ -692,12 +692,88 @@ const PublicAudiobookPage = () => {
               ))}
             </div>
           </div>
+
+          {/* ===== SIMILAR BOOKS ===== */}
+          <div className="mt-14">
+            <h2 className="text-2xl font-bold text-white/90 mb-6 flex items-center gap-2">
+              <Library className="w-6 h-6 text-amber-400" />
+              Vous aimerez aussi
+            </h2>
+            <div className="flex gap-4 overflow-x-auto pb-2">
+              {[
+                { title: "Copywriting Avancé", price: "9.99", genre: "Business" },
+                { title: "Mindset Entrepreneur", price: "11.99", genre: "Dev. Perso" },
+                { title: "SEO Masterclass", price: "14.99", genre: "Marketing" },
+                { title: "Réseaux Sociaux Pro", price: "8.99", genre: "Digital" },
+              ].map((book, i) => (
+                <div key={i} className="shrink-0 w-44 bg-white/[0.03] border border-white/[0.06] rounded-xl overflow-hidden hover:-translate-y-1 transition-transform cursor-pointer group">
+                  <div className="w-44 h-44 bg-gradient-to-br from-white/[0.02] to-white/[0.05] flex items-center justify-center">
+                    <Headphones className="w-10 h-10 text-white/10 group-hover:text-amber-400/40 transition-colors" />
+                  </div>
+                  <div className="p-3">
+                    <p className="text-sm font-semibold text-white/70 truncate">{book.title}</p>
+                    <div className="flex items-center justify-between mt-1">
+                      <p className="text-xs font-bold text-amber-400">{book.price} €</p>
+                      <Badge className="text-[9px] bg-white/5 text-white/30 border-white/10">{book.genre}</Badge>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ===== CTA FINAL ===== */}
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+            className="mt-14 text-center bg-gradient-to-br from-amber-500/10 via-orange-500/5 to-amber-500/10 border border-amber-500/15 rounded-2xl p-10"
+          >
+            <h3 className="text-2xl font-bold mb-2 bg-gradient-to-r from-amber-300 to-orange-300 bg-clip-text text-transparent">
+              Prêt à découvrir ce livre audio ?
+            </h3>
+            <p className="text-white/40 text-sm mb-6 max-w-md mx-auto">
+              Téléchargez l'audiobook dès maintenant et profitez d'une expérience audio immersive. 
+              Satisfait ou remboursé sous 30 jours.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              {hasPrice && audiobook.stripe_link && (
+                <Button asChild className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-bold gap-2 px-10 h-13 rounded-full shadow-xl shadow-amber-500/25 text-base transition-all hover:scale-[1.02]">
+                  <a href={audiobook.stripe_link} target="_blank" rel="noopener noreferrer">
+                    <ShoppingCart className="h-5 w-5" />
+                    Acheter maintenant — {Number(audiobook.price).toFixed(2)} €
+                  </a>
+                </Button>
+              )}
+              {hasPrice && audiobook.paypal_link && (
+                <Button variant="outline" asChild className="gap-2 border-blue-400/30 bg-blue-500/10 text-blue-300 hover:bg-blue-500/20 hover:text-blue-200 rounded-full h-13 font-semibold px-8">
+                  <a href={audiobook.paypal_link} target="_blank" rel="noopener noreferrer">
+                    <CreditCard className="h-4 w-4" />
+                    Payer via PayPal — {Number(audiobook.price).toFixed(2)} €
+                  </a>
+                </Button>
+              )}
+              {!hasPrice && (
+                <Button onClick={() => { setShowFullPlayer(true); togglePlay(); }} className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-bold gap-2 px-10 h-13 rounded-full shadow-xl shadow-amber-500/25 text-base transition-all hover:scale-[1.02]">
+                  <Play className="h-5 w-5" />
+                  Écouter maintenant
+                </Button>
+              )}
+            </div>
+          </motion.div>
+
+          {/* ===== EBOOK LINK ===== */}
+          <div className="mt-14 text-center bg-white/[0.02] border border-white/[0.06] rounded-2xl p-8">
+            <h3 className="text-white/80 text-lg font-bold mb-2">📚 Découvrez aussi nos ebooks</h3>
+            <p className="text-white/35 text-sm mb-4">Retrouvez toute notre collection de livres numériques sur notre boutique</p>
+            <a href="https://ebookcluster.com" target="_blank" rel="noopener" className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white font-bold px-8 py-3 rounded-full shadow-lg shadow-amber-500/20 transition-all hover:scale-105">
+              <Globe className="w-5 h-5" />
+              Visiter ebookcluster.com
+            </a>
+          </div>
         </div>
       </div>
 
       {/* Footer */}
-      <div className="text-center pb-10 pt-4 border-t border-white/5">
-        <p className="text-xs text-white/20">Propulsé par EbookStudio Pro • Audio IA Premium</p>
+      <div className="text-center pb-10 pt-6 border-t border-white/[0.04]">
+        <p className="text-xs text-white/20">Propulsé par EbookStudio Pro 2026 • Audio IA Premium</p>
       </div>
     </div>
   );
