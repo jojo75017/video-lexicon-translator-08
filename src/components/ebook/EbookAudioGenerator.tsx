@@ -677,13 +677,19 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
   // Save audiobook to library (storage + database)
   const saveToLibrary = async (audioBlob: Blob, title: string, durationEstimate: number) => {
     try {
-      const { data: userData } = await supabase.auth.getUser();
-      if (!userData?.user) {
+      const { data: { session } } = await supabase.auth.getSession();
+      let userId = session?.user?.id;
+
+      if (!userId) {
+        const { data: userData } = await supabase.auth.getUser();
+        userId = userData?.user?.id;
+      }
+
+      if (!userId) {
         toast.warning('⚠️ Connectez-vous pour sauvegarder vos livres audio dans la bibliothèque !');
         return;
       }
 
-      const userId = userData.user.id;
       const fileName = `${userId}/${Date.now()}-${title.replace(/[^a-zA-Z0-9àâéèêëïîôùûüç\s-]/gi, '').replace(/\s+/g, '-')}.mp3`;
 
       // Upload to storage
@@ -696,7 +702,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
 
       if (uploadError) {
         console.error('Storage upload error:', uploadError);
-        toast.error('Erreur upload du fichier audio');
+        toast.error(`Erreur upload du fichier audio: ${uploadError.message}`);
         return;
       }
 
@@ -721,7 +727,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
 
       if (dbError) {
         console.error('DB insert error:', dbError);
-        toast.error('Erreur sauvegarde en bibliothèque');
+        toast.error(`Erreur sauvegarde en bibliothèque: ${dbError.message}`);
         return;
       }
 

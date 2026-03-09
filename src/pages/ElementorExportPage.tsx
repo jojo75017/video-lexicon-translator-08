@@ -13,15 +13,38 @@ const ElementorExportPage = () => {
   const [selectedBook, setSelectedBook] = useState<any>(null);
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [authMissing, setAuthMissing] = useState(false);
 
   useEffect(() => {
     const fetchBooks = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      const { data } = await supabase.from('audiobooks').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
-      setAudiobooks(data || []);
-      setLoading(false);
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const user = session?.user;
+
+        if (!user) {
+          setAuthMissing(true);
+          setAudiobooks([]);
+          return;
+        }
+
+        const { data, error } = await supabase
+          .from('audiobooks')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        setAuthMissing(false);
+        setAudiobooks(data || []);
+      } catch (error: any) {
+        console.error('Elementor fetch error:', error);
+        toast.error('Impossible de charger vos audiobooks');
+      } finally {
+        setLoading(false);
+      }
     };
+
     fetchBooks();
   }, []);
 
