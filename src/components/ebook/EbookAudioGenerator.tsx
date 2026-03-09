@@ -1412,6 +1412,11 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                           const finalBlob = new Blob(allBlobs, { type: 'audio/mpeg' });
                           const filename = `${(ebookTitle || 'audiobook').replace(/\s+/g, '-')}-complet.mp3`;
                           saveAs(finalBlob, filename);
+
+                          // Persist in audiobook library for Elementor export
+                          const totalMinutes = sections.reduce((sum, s) => sum + s.estimatedMinutes, 0);
+                          await saveToLibrary(finalBlob, ebookTitle || 'Audiobook', totalMinutes * 60);
+
                           toast.success('Audiobook complet exporté avec intro jingle !');
                         } catch (error: any) {
                           toast.error(`Erreur : ${error.message}`);
