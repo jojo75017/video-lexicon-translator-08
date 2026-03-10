@@ -33,8 +33,13 @@ function buildPremiumIntroScript(options: IntroPremiumOptions): string[] {
   );
 
   // Segment 2: Extrait "Teaser" (50 mots max tirés de l'introduction)
+  // Toujours inclure un extrait — si pas de texte d'intro, générer un teaser générique
   if (extract) {
     segments.push(extract);
+  } else {
+    segments.push(
+      `Découvrez ${title}, une œuvre captivante qui vous transportera dans un univers unique. Chaque page a été pensée pour vous offrir une expérience de lecture immersive et inoubliable.`
+    );
   }
 
   // Segment 3: Le Mot de la Fin (Intro)
