@@ -535,9 +535,12 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
       throw new Error('Vous devez être connecté pour exporter et sauvegarder en MP3');
     }
 
+    // Nettoyage final de sécurité avant envoi à l'API vocale
+    const cleanText = cleanForAudio(text);
+    
     // Split text into chunks of 5000 chars max
     const chunks: string[] = [];
-    let remaining = text;
+    let remaining = cleanText;
     while (remaining.length > 0) {
       chunks.push(remaining.substring(0, 5000));
       remaining = remaining.substring(5000);
