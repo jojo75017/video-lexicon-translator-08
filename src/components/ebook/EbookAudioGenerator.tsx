@@ -965,6 +965,33 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                 </div>
               )}
 
+              {/* Alerte artefacts markdown */}
+              {audioArtifacts.count > 0 && (
+                <div className="flex items-start gap-3 p-4 bg-destructive/10 border border-destructive/30 rounded-lg">
+                  <span className="text-destructive text-xl mt-0.5">⚠️</span>
+                  <div className="flex-1 space-y-1">
+                    <p className="text-sm font-semibold text-destructive">
+                      {audioArtifacts.count} caractère{audioArtifacts.count > 1 ? 's' : ''} de formatage détecté{audioArtifacts.count > 1 ? 's' : ''}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {audioArtifacts.types.join(' · ')}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Ces symboles peuvent provoquer des bafouillements ou pauses incohérentes lors de la synthèse vocale.
+                    </p>
+                  </div>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={forceCleanAllSections}
+                    className="shrink-0"
+                  >
+                    <RotateCcw className="h-4 w-4 mr-1" />
+                    Nettoyer maintenant
+                  </Button>
+                </div>
+              )}
+
               {/* Voice config */}
               <VoiceConfig />
 
