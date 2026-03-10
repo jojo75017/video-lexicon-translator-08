@@ -228,10 +228,13 @@ export function cleanForAudio(text: string): string {
   let cleaned = cleanGeneratedText(text);
   
   cleaned = cleaned
-    // Supprimer TOUT astérisque restant
+    // Supprimer TOUT astérisque restant (gras, italique, orphelins)
     .replace(/\*/g, '')
     // Supprimer underscores de mise en forme
     .replace(/_([^_]+)_/g, '$1')
+    .replace(/_+/g, ' ')
+    // Supprimer les titres markdown # ## ### etc.
+    .replace(/^#{1,6}\s*/gm, '')
     // Supprimer les balises HTML résiduelles
     .replace(/<[^>]*>/g, '')
     // Supprimer les crochets markdown [texte](url)
@@ -242,17 +245,64 @@ export function cleanForAudio(text: string): string {
     .replace(/`+/g, '')
     // Remplacer les puces par des pauses naturelles
     .replace(/^•\s*/gm, '')
+    .replace(/^[-–—]\s+/gm, '')
     // Supprimer les numéros de liste (1. 2. etc.) en début de ligne
     .replace(/^\d+\.\s+/gm, '')
     // Ajouter des pauses naturelles (points de suspension → pause)
     .replace(/\.{3,}/g, '...')
     // Supprimer les doubles tirets
     .replace(/--+/g, ', ')
+    // Supprimer les séparateurs markdown --- *** ===
+    .replace(/^[=\-*_]{3,}\s*$/gm, '')
     // Nettoyer les lignes vides multiples
     .replace(/\n{3,}/g, '\n\n')
     // Nettoyer les espaces multiples
     .replace(/  +/g, ' ')
     .trim();
   
+  // POST-PROCESSING DE FORCE : boucle pour garantir zéro artefact
+  let prev = '';
+  let iterations = 0;
+  while (cleaned !== prev && iterations < 5) {
+    prev = cleaned;
+    iterations++;
+    cleaned = cleaned
+      .replace(/\*/g, '')
+      .replace(/#/g, '')
+      .replace(/`/g, '')
+      .replace(/^_+|_+$/gm, '')
+      .replace(/  +/g, ' ');
+  }
+  
   return cleaned;
+}
+
+/**
+ * Détecte les caractères spéciaux markdown interdits dans un texte audio.
+ * Retourne un objet avec le nombre d'artefacts et les types trouvés.
+ */
+export function detectAudioArtifacts(text: string): { count: number; types: string[] } {
+  if (!text || typeof text !== 'string') return { count: 0, types: [] };
+  
+  const checks: Array<{ pattern: RegExp; label: string }> = [
+    { pattern: /\*+/g, label: 'Astérisques (*)' },
+    { pattern: /#{1,6}\s/g, label: 'Titres markdown (#)' },
+    { pattern: /`+/g, label: 'Backticks (`)' },
+    { pattern: /__+/g, label: 'Underscores doubles (__)' },
+    { pattern: /^[-–—]{3,}\s*$/gm, label: 'Séparateurs (---)' },
+    { pattern: /<[^>]+>/g, label: 'Balises HTML' },
+  ];
+  
+  let count = 0;
+  const types: string[] = [];
+  
+  for (const { pattern, label } of checks) {
+    const matches = text.match(pattern);
+    if (matches && matches.length > 0) {
+      count += matches.length;
+      types.push(`${label} (×${matches.length})`);
+    }
+  }
+  
+  return { count, types };
 }
