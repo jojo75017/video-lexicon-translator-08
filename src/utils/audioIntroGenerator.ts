@@ -1,15 +1,14 @@
 /**
- * Generates the audiobook PREMIUM intro:
+ * Generates the audiobook IMMERSIVE intro (Jingle):
  * 
  * Structure (Position 0 — avant le Chapitre 1) :
- * 1. Ouverture Musicale : Jingle/nappe sonore de 3 secondes (Web Audio API → WAV)
- * 2. Annonce Marque : "Vous êtes bien sur EbookStudio 2026."
- * 3. Crédits Auteur : "Ce livre audio est rédigé par {AUTEUR}."
- * 4. Annonce Titre : "Nous avons le plaisir de vous présenter : {TITRE}."
- * 5. Extrait Mise en Bouche : 50 mots max tirés de l'introduction
- * 6. Transition : Silence de 2 secondes avant le Chapitre 1
+ * 1. Ambiance Sonore : Effet sonore de 3s (type annonce de gare/aéroport → sensation de départ en voyage)
+ * 2. Présentation Officielle : "Bienvenue sur EbookStudio 2026. Ce livre audio est rédigé par Georges Boubet. Nous vous présentons aujourd'hui : {TITRE}."
+ * 3. Extrait "Teaser" : 50 mots max tirés de l'introduction
+ * 4. Mot de la Fin : "Attachez vos ceintures, l'aventure commence maintenant."
+ * 5. Transition : Silence de 2 secondes avant le Chapitre 1
  * 
- * Returns an array of blobs to be played SEQUENTIALLY (bell=WAV, rest=MP3).
+ * Consigne : Utilise la MÊME voix Azure (ex: Denise ou Henri) pour toute l'introduction.
  */
 
 export interface IntroPremiumOptions {
@@ -19,51 +18,27 @@ export interface IntroPremiumOptions {
   genre?: string;
 }
 
-// ─── Phrases de clôture par genre ───
-
-const CLOSING_PHRASES: Record<string, string> = {
-  'enfants-3-6': 'Installez-vous confortablement, et laissez la magie opérer.',
-  'enfants-6-12': 'Préparez-vous pour une aventure incroyable. C\'est parti !',
-  'thriller': 'Éteignez les lumières, et préparez-vous à retenir votre souffle.',
-  'romance': 'Laissez-vous emporter par cette histoire, et ouvrez grand votre cœur.',
-  'spiritualite': 'Respirez profondément, et laissez ces mots guider votre chemin intérieur.',
-  'business': 'Prenez des notes, et transformez ces idées en résultats concrets.',
-  'histoire': 'Voyagez dans le temps, et découvrez les secrets du passé.',
-  'default': 'Bonne écoute, et laissez-vous porter par cette aventure.',
-};
-
-function getClosingPhrase(genre?: string): string {
-  if (genre && CLOSING_PHRASES[genre]) {
-    return CLOSING_PHRASES[genre];
-  }
-  return CLOSING_PHRASES['default'];
-}
-
-// ─── Premium intro script builder ───
+// ─── Script builder (structure immersive) ───
 
 function buildPremiumIntroScript(options: IntroPremiumOptions): string[] {
   const title = options.ebookTitle?.trim() || 'votre livre audio';
-  const author = options.authorName?.trim() || 'l\'auteur';
+  const author = options.authorName?.trim() || 'Georges Boubet';
   const extract = extractFirst50Words(options.introductionText || '');
 
   const segments: string[] = [];
 
-  // Segment 1: Annonce de la Marque
-  segments.push(`Vous êtes bien sur EbookStudio 2026.`);
+  // Segment 1: Présentation Officielle (voix unique, cohérente)
+  segments.push(
+    `Bienvenue sur EbookStudio 2026. Ce livre audio est rédigé par ${author}. Nous vous présentons aujourd'hui : ${title}.`
+  );
 
-  // Segment 2: Crédits Auteur
-  segments.push(`Ce livre audio est rédigé par ${author}.`);
-
-  // Segment 3: Annonce du Titre
-  segments.push(`Nous avons le plaisir de vous présenter : ${title}.`);
-
-  // Segment 4: Extrait de Mise en Bouche (50 mots max)
+  // Segment 2: Extrait "Teaser" (50 mots max tirés de l'introduction)
   if (extract) {
     segments.push(extract);
   }
 
-  // Segment 5: Phrase de clôture adaptée au genre
-  segments.push(getClosingPhrase(options.genre));
+  // Segment 3: Le Mot de la Fin (Intro)
+  segments.push(`Attachez vos ceintures, l'aventure commence maintenant.`);
 
   return segments;
 }
@@ -85,7 +60,6 @@ function extractFirst50Words(text: string): string {
     return sentenceEndMatch[1].trim();
   }
   
-  // If no complete sentence found, take the whole chunk and end cleanly
   const result = selected.trim();
   if (result && !result.match(/[.!?]$/)) {
     return result + '.';
@@ -98,82 +72,95 @@ function extractFirst50Words(text: string): string {
  */
 export function buildIntroDisplayText(options: IntroPremiumOptions): string {
   const segments = buildPremiumIntroScript(options);
-  return segments.join('\n\n');
+  return '🔊 [Ambiance sonore — annonce de gare — 3 secondes]\n\n' + segments.join('\n\n') + '\n\n⏸️ [Silence de 2 secondes — transition vers le Chapitre 1]';
 }
 
 // ─── Legacy flat intro text (kept for backward compatibility) ───
 
-const DEFAULT_INTRO_TEXT = "Vous êtes bien sur EbookStudio 2026. Ce livre audio est rédigé par {AUTEUR}. Nous avons le plaisir de vous présenter : {TITRE}.";
+const DEFAULT_INTRO_TEXT = "Bienvenue sur EbookStudio 2026. Ce livre audio est rédigé par {AUTEUR}. Nous vous présentons aujourd'hui : {TITRE}.";
 
 function buildIntroText(ebookTitle?: string, authorName?: string): string {
   const title = ebookTitle?.trim() || 'votre livre audio';
-  const author = authorName?.trim() || 'l\'auteur';
+  const author = authorName?.trim() || 'Georges Boubet';
   return DEFAULT_INTRO_TEXT.replace('{TITRE}', title).replace('{AUTEUR}', author);
 }
 
 // ─── Audio generation (Web Audio API) ───
 
 /**
- * Generate a professional opening jingle using Web Audio API.
- * Duration: 3 seconds (as specified).
+ * Generate an immersive "train station / airport announcement" ambiance.
+ * Duration: 3 seconds. Creates a reverberant chime + ambient pad.
  * Returns a WAV Blob.
  */
 async function generatePremiumJingle(): Promise<Blob | null> {
   try {
     const sampleRate = 44100;
-    const duration = 3.0; // 3 seconds as requested
+    const duration = 3.0;
     const length = sampleRate * duration;
     const offlineCtx = new OfflineAudioContext(1, length, sampleRate);
 
-    // Rich warm pad — Fundamental (C4 = 261 Hz)
-    const osc1 = offlineCtx.createOscillator();
-    osc1.type = 'sine';
-    osc1.frequency.value = 261.63;
-    const gain1 = offlineCtx.createGain();
-    gain1.gain.setValueAtTime(0, 0);
-    gain1.gain.linearRampToValueAtTime(0.35, 0.4); // fade in
-    gain1.gain.setValueAtTime(0.35, duration - 0.8);
-    gain1.gain.exponentialRampToValueAtTime(0.001, duration);
-    osc1.connect(gain1).connect(offlineCtx.destination);
-    osc1.start(0);
-    osc1.stop(duration);
+    // Deep ambient pad (low drone — simulates station ambiance)
+    const padOsc = offlineCtx.createOscillator();
+    padOsc.type = 'sine';
+    padOsc.frequency.value = 130.81; // C3 — warm, low
+    const padGain = offlineCtx.createGain();
+    padGain.gain.setValueAtTime(0, 0);
+    padGain.gain.linearRampToValueAtTime(0.2, 0.5);
+    padGain.gain.setValueAtTime(0.2, duration - 1.0);
+    padGain.gain.exponentialRampToValueAtTime(0.001, duration);
+    padOsc.connect(padGain).connect(offlineCtx.destination);
+    padOsc.start(0);
+    padOsc.stop(duration);
 
-    // Harmonic sparkle (E5 = 659 Hz)
-    const osc2 = offlineCtx.createOscillator();
-    osc2.type = 'sine';
-    osc2.frequency.value = 659.25;
-    const gain2 = offlineCtx.createGain();
-    gain2.gain.setValueAtTime(0, 0);
-    gain2.gain.linearRampToValueAtTime(0.2, 0.3);
-    gain2.gain.exponentialRampToValueAtTime(0.001, duration * 0.7);
-    osc2.connect(gain2).connect(offlineCtx.destination);
-    osc2.start(0);
-    osc2.stop(duration);
+    // Second harmonic pad (fifth — G3 = 196 Hz)
+    const pad2 = offlineCtx.createOscillator();
+    pad2.type = 'sine';
+    pad2.frequency.value = 196.0;
+    const pad2Gain = offlineCtx.createGain();
+    pad2Gain.gain.setValueAtTime(0, 0);
+    pad2Gain.gain.linearRampToValueAtTime(0.12, 0.6);
+    pad2Gain.gain.setValueAtTime(0.12, duration - 1.2);
+    pad2Gain.gain.exponentialRampToValueAtTime(0.001, duration);
+    pad2.connect(pad2Gain).connect(offlineCtx.destination);
+    pad2.start(0);
+    pad2.stop(duration);
 
-    // Bell chime accent (G5 = 784 Hz) — delayed start for "ding" effect
-    const osc3 = offlineCtx.createOscillator();
-    osc3.type = 'sine';
-    osc3.frequency.value = 783.99;
-    const gain3 = offlineCtx.createGain();
-    gain3.gain.setValueAtTime(0, 0);
-    gain3.gain.setValueAtTime(0, 0.15);
-    gain3.gain.linearRampToValueAtTime(0.25, 0.25);
-    gain3.gain.exponentialRampToValueAtTime(0.001, duration * 0.5);
-    osc3.connect(gain3).connect(offlineCtx.destination);
-    osc3.start(0);
-    osc3.stop(duration);
+    // Announcement chime — two-tone "ding-dong" (like train station)
+    // First tone (high) — G5
+    const chime1 = offlineCtx.createOscillator();
+    chime1.type = 'sine';
+    chime1.frequency.value = 783.99; // G5
+    const chime1Gain = offlineCtx.createGain();
+    chime1Gain.gain.setValueAtTime(0, 0);
+    chime1Gain.gain.linearRampToValueAtTime(0.4, 0.05);
+    chime1Gain.gain.exponentialRampToValueAtTime(0.001, 0.8);
+    chime1.connect(chime1Gain).connect(offlineCtx.destination);
+    chime1.start(0.1);
+    chime1.stop(1.0);
 
-    // High shimmer (C6 = 1046 Hz) — soft ethereal touch
-    const osc4 = offlineCtx.createOscillator();
-    osc4.type = 'sine';
-    osc4.frequency.value = 1046.5;
-    const gain4 = offlineCtx.createGain();
-    gain4.gain.setValueAtTime(0, 0);
-    gain4.gain.linearRampToValueAtTime(0.08, 0.5);
-    gain4.gain.exponentialRampToValueAtTime(0.001, duration * 0.6);
-    osc4.connect(gain4).connect(offlineCtx.destination);
-    osc4.start(0);
-    osc4.stop(duration);
+    // Second tone (lower) — E5 (classic ding-dong interval)
+    const chime2 = offlineCtx.createOscillator();
+    chime2.type = 'sine';
+    chime2.frequency.value = 659.25; // E5
+    const chime2Gain = offlineCtx.createGain();
+    chime2Gain.gain.setValueAtTime(0, 0);
+    chime2Gain.gain.linearRampToValueAtTime(0.35, 0.05);
+    chime2Gain.gain.exponentialRampToValueAtTime(0.001, 0.9);
+    chime2.connect(chime2Gain).connect(offlineCtx.destination);
+    chime2.start(0.55);
+    chime2.stop(1.5);
+
+    // Subtle high shimmer for "travel" atmosphere
+    const shimmer = offlineCtx.createOscillator();
+    shimmer.type = 'sine';
+    shimmer.frequency.value = 1318.5; // E6
+    const shimmerGain = offlineCtx.createGain();
+    shimmerGain.gain.setValueAtTime(0, 0);
+    shimmerGain.gain.linearRampToValueAtTime(0.06, 0.8);
+    shimmerGain.gain.exponentialRampToValueAtTime(0.001, 2.0);
+    shimmer.connect(shimmerGain).connect(offlineCtx.destination);
+    shimmer.start(0.3);
+    shimmer.stop(2.2);
 
     const renderedBuffer = await offlineCtx.startRendering();
     return audioBufferToWav(renderedBuffer);
@@ -184,14 +171,13 @@ async function generatePremiumJingle(): Promise<Blob | null> {
 }
 
 /**
- * Generate a 2-second silence WAV for transition before Chapter 1.
+ * Generate a silence WAV for transition before Chapter 1.
  */
 async function generateSilenceWav(durationSec: number = 2): Promise<Blob | null> {
   try {
     const sampleRate = 44100;
     const length = sampleRate * durationSec;
     const offlineCtx = new OfflineAudioContext(1, length, sampleRate);
-    // No oscillators → pure silence
     const renderedBuffer = await offlineCtx.startRendering();
     return audioBufferToWav(renderedBuffer);
   } catch (error) {
@@ -219,7 +205,7 @@ function audioBufferToWav(buffer: AudioBuffer): Blob {
   writeString(view, 8, 'WAVE');
   writeString(view, 12, 'fmt ');
   view.setUint32(16, 16, true);
-  view.setUint16(20, 1, true); // PCM
+  view.setUint16(20, 1, true);
   view.setUint16(22, numChannels, true);
   view.setUint32(24, sampleRate, true);
   view.setUint32(28, sampleRate * blockAlign, true);
@@ -251,13 +237,15 @@ function writeString(view: DataView, offset: number, str: string) {
 // ─── Public API ───
 
 /**
- * Generate the PREMIUM intro jingle (for in-browser playback).
- * Returns blobs that MUST be played sequentially:
- *   [0] WAV jingle (3s)
- *   [1..N] MP3 TTS segments (brand, author, title, extract)
- *   [N+1] WAV silence (2s transition)
+ * Generate the IMMERSIVE intro jingle (for in-browser playback).
+ * Returns blobs played sequentially:
+ *   [0] WAV ambiance sonore (3s — ding-dong gare)
+ *   [1] MP3 TTS: Présentation officielle
+ *   [2] MP3 TTS: Extrait teaser (50 mots)
+ *   [3] MP3 TTS: "Attachez vos ceintures..."
+ *   [4] WAV silence (2s transition)
  * 
- * The generateTts function should use the SAME voice as the book.
+ * Uses the SAME Azure voice throughout for coherence.
  */
 export async function generateIntroJingle(
   generateTts: (text: string) => Promise<Blob | null>,
@@ -268,13 +256,13 @@ export async function generateIntroJingle(
 ): Promise<Blob[]> {
   const introBlobs: Blob[] = [];
 
-  // 1. Opening jingle (3s WAV)
+  // 1. Ambiance sonore (3s WAV — ding-dong type gare/aéroport)
   const jingleBlob = await generatePremiumJingle();
   if (jingleBlob) {
     introBlobs.push(jingleBlob);
   }
 
-  // 2-5. TTS segments (same voice as book)
+  // 2-4. TTS segments (même voix Azure pour cohérence)
   const segments = buildPremiumIntroScript({ ebookTitle, authorName, introductionText, genre });
   for (const segment of segments) {
     const ttsBlob = await generateTts(segment);
@@ -283,7 +271,7 @@ export async function generateIntroJingle(
     }
   }
 
-  // 6. Transition silence (2s WAV)
+  // 5. Transition silence (2s WAV)
   const silenceBlob = await generateSilenceWav(2);
   if (silenceBlob) {
     introBlobs.push(silenceBlob);
@@ -313,7 +301,7 @@ export async function generateIntroForExport(
     }
   }
 
-  // Add a TTS silence for transition
+  // Silence de transition (2s via TTS)
   const silenceBlob = await generateTts('...');
   if (silenceBlob && silenceBlob.size > 0) {
     introBlobs.push(silenceBlob);
