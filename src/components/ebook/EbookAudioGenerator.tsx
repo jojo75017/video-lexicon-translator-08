@@ -238,6 +238,21 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
     }
   }, [prepareSections]);
 
+  // Détection des artefacts markdown dans les sections audio
+  const audioArtifacts = useMemo(() => {
+    const allText = audioSections.map(s => s.content).join(' ');
+    return detectAudioArtifacts(allText);
+  }, [audioSections]);
+
+  // Nettoyage forcé de toutes les sections
+  const forceCleanAllSections = useCallback(() => {
+    setAudioSections(prev => prev.map(section => ({
+      ...section,
+      content: cleanForAudio(section.content),
+    })));
+    toast.success('✅ Toutes les sections ont été nettoyées !');
+  }, []);
+
   const speakText = (text: string, onEnd?: () => void): Promise<void> => {
     return new Promise((resolve, reject) => {
       if (!window.speechSynthesis) { reject(new Error('Web Speech API non supportée')); return; }
