@@ -22,7 +22,7 @@ import { saveAs } from 'file-saver';
 import JSZip from 'jszip';
 import { supabase } from '@/integrations/supabase/client';
 import { generateIntroJingle, generateIntroForExport } from '@/utils/audioIntroGenerator';
-import { cleanForAudio } from '@/utils/textCleaner';
+import { cleanForAudio, detectAudioArtifacts } from '@/utils/textCleaner';
 
 interface Chapter {
   id: string;
@@ -237,6 +237,21 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
       setAudioSections(sections);
     }
   }, [prepareSections]);
+
+  // Détection des artefacts markdown dans les sections audio
+  const audioArtifacts = useMemo(() => {
+    const allText = audioSections.map(s => s.content).join(' ');
+    return detectAudioArtifacts(allText);
+  }, [audioSections]);
+
+  // Nettoyage forcé de toutes les sections
+  const forceCleanAllSections = useCallback(() => {
+    setAudioSections(prev => prev.map(section => ({
+      ...section,
+      content: cleanForAudio(section.content),
+    })));
+    toast.success('✅ Toutes les sections ont été nettoyées !');
+  }, []);
 
   const speakText = (text: string, onEnd?: () => void): Promise<void> => {
     return new Promise((resolve, reject) => {
@@ -520,9 +535,12 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
       throw new Error('Vous devez être connecté pour exporter et sauvegarder en MP3');
     }
 
+    // Nettoyage final de sécurité avant envoi à l'API vocale
+    const cleanText = cleanForAudio(text);
+    
     // Split text into chunks of 5000 chars max
     const chunks: string[] = [];
-    let remaining = text;
+    let remaining = cleanText;
     while (remaining.length > 0) {
       chunks.push(remaining.substring(0, 5000));
       remaining = remaining.substring(5000);
@@ -947,6 +965,33 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                     <span>{listenedSections.size}/{audioSections.length} sections</span>
                   </div>
                   <Progress value={listeningProgress} className="h-2" />
+                </div>
+              )}
+
+              {/* Alerte artefacts markdown */}
+              {audioArtifacts.count > 0 && (
+                <div className="flex items-start gap-3 p-4 bg-destructive/10 border border-destructive/30 rounded-lg">
+                  <span className="text-destructive text-xl mt-0.5">⚠️</span>
+                  <div className="flex-1 space-y-1">
+                    <p className="text-sm font-semibold text-destructive">
+                      {audioArtifacts.count} caractère{audioArtifacts.count > 1 ? 's' : ''} de formatage détecté{audioArtifacts.count > 1 ? 's' : ''}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {audioArtifacts.types.join(' · ')}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Ces symboles peuvent provoquer des bafouillements ou pauses incohérentes lors de la synthèse vocale.
+                    </p>
+                  </div>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={forceCleanAllSections}
+                    className="shrink-0"
+                  >
+                    <RotateCcw className="h-4 w-4 mr-1" />
+                    Nettoyer maintenant
+                  </Button>
                 </div>
               )}
 
