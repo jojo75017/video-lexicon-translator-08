@@ -258,33 +258,6 @@ export function generateAudiobookHtml(book: AudiobookData): string {
     </div>
   </div>
 
-  <!-- Livres similaires (placeholder — à personnaliser dans Elementor) -->
-  <div class="ab-similar">
-    <h2>📚 Vous aimerez aussi</h2>
-    <div class="ab-similar-grid">
-      <div class="ab-similar-card">
-        <div class="ab-similar-cover" style="display:flex;align-items:center;justify-content:center;font-size:2.5rem;color:rgba(255,255,255,.2);">🎧</div>
-        <div class="ab-similar-info">
-          <div class="ab-similar-title">Titre à personnaliser</div>
-          <div class="ab-similar-price">9.99 €</div>
-        </div>
-      </div>
-      <div class="ab-similar-card">
-        <div class="ab-similar-cover" style="display:flex;align-items:center;justify-content:center;font-size:2.5rem;color:rgba(255,255,255,.2);">🎧</div>
-        <div class="ab-similar-info">
-          <div class="ab-similar-title">Titre à personnaliser</div>
-          <div class="ab-similar-price">9.99 €</div>
-        </div>
-      </div>
-      <div class="ab-similar-card">
-        <div class="ab-similar-cover" style="display:flex;align-items:center;justify-content:center;font-size:2.5rem;color:rgba(255,255,255,.2);">🎧</div>
-        <div class="ab-similar-info">
-          <div class="ab-similar-title">Titre à personnaliser</div>
-          <div class="ab-similar-price">9.99 €</div>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <div class="ab-footer">Propulsé par EbookStudio Pro • Audio IA Premium</div>
 </div>
