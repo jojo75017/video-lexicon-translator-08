@@ -499,7 +499,7 @@ const PublicAudiobookPage = () => {
               {audiobook.audio_url && (
                 <div>
                   {!showFullPlayer ? (
-                    <Button variant="outline" onClick={() => setShowFullPlayer(true)} className="gap-2 border-white/10 text-white/60 hover:bg-white/5 hover:text-white/80 rounded-full">
+                    <Button variant="outline" onClick={() => setShowFullPlayer(true)} className="gap-2 border-amber-500/30 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 hover:text-amber-200 rounded-full">
                       <Headphones className="w-4 h-4" />
                       Ouvrir le lecteur complet
                     </Button>
