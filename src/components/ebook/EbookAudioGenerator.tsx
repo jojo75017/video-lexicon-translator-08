@@ -1420,9 +1420,41 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                             setIsDownloadingIntro(false);
                             return;
                           }
-                          const introBlob = new Blob(introBlobs, { type: 'audio/mpeg' });
-                          const filename = `Intro-Premium-${ebookTitle?.replace(/[^a-zA-Z0-9]/g, '_') || 'Extrait'}.mp3`;
-                          saveAs(introBlob, filename);
+                          // Decode all blobs (mix of WAV + MP3) to PCM, concatenate, and export as WAV
+                          const audioCtx = new AudioContext();
+                          const decodedBuffers: AudioBuffer[] = [];
+                          for (const blob of introBlobs) {
+                            try {
+                              const arrayBuf = await blob.arrayBuffer();
+                              const decoded = await audioCtx.decodeAudioData(arrayBuf);
+                              decodedBuffers.push(decoded);
+                            } catch (e) {
+                              console.warn('Skipping undecodable audio blob:', e);
+                            }
+                          }
+                          await audioCtx.close();
+                          if (decodedBuffers.length === 0) {
+                            toast.error('Impossible de fusionner l\'intro');
+                            setIsDownloadingIntro(false);
+                            return;
+                          }
+                          // Concatenate all decoded buffers into one
+                          const sampleRate = decodedBuffers[0].sampleRate;
+                          const totalLength = decodedBuffers.reduce((sum, b) => sum + b.length, 0);
+                          const offlineCtx = new OfflineAudioContext(1, totalLength, sampleRate);
+                          let offset = 0;
+                          for (const buf of decodedBuffers) {
+                            const source = offlineCtx.createBufferSource();
+                            source.buffer = buf;
+                            source.connect(offlineCtx.destination);
+                            source.start(offset / sampleRate);
+                            offset += buf.length;
+                          }
+                          const rendered = await offlineCtx.startRendering();
+                          // Encode as WAV
+                          const wavBlob = audioBufferToWavBlob(rendered);
+                          const filename = `Intro-Premium-${ebookTitle?.replace(/[^a-zA-Z0-9]/g, '_') || 'Extrait'}.wav`;
+                          saveAs(wavBlob, filename);
                           toast.success('Intro téléchargée ! 🎧');
                         } catch (error: any) {
                           toast.error(`Erreur : ${error.message}`);
