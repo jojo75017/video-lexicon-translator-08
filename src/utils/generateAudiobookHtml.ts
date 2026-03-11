@@ -28,7 +28,7 @@ export function generateAudiobookHtml(book: AudiobookData): string {
   const title = escHtml(book.title || 'Livre Audio');
   const author = escHtml(book.author_name || 'Auteur inconnu');
   const voice = escHtml(book.voice_name || 'Voix IA');
-  const desc = escHtml(book.description || '');
+  const desc = escHtml(book.description || `Plongez dans « ${book.title || 'ce livre audio'} », une expérience audio captivante ${book.author_name ? `signée ${book.author_name}` : ''} et produite avec la technologie de narration vocale IA de dernière génération${book.voice_name ? `, interprétée par la voix ${book.voice_name}` : ''}. Ce livre audio a été conçu pour offrir une immersion totale : chaque chapitre a été soigneusement structuré, chaque phrase optimisée pour l'écoute. Qualité studio, format MP3 haute définition, compatible avec tous vos appareils.`);
   const cover = book.cover_url || '';
   const price = book.price ? book.price.toFixed(2) : null;
   const oldPrice = book.price ? (book.price * 1.5).toFixed(2) : null;
