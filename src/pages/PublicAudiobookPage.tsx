@@ -463,36 +463,52 @@ const PublicAudiobookPage = () => {
             
             <div className="flex-1 min-w-0 space-y-10">
               
-              {/* Synopsis */}
-              <div>
-                <h2 className="text-2xl font-bold text-white/90 mb-4 flex items-center gap-2">
-                  <BookHeart className="w-6 h-6 text-amber-400" />
+              {/* Synopsis — Section professionnelle */}
+              <div className="bg-white/[0.02] border border-white/[0.06] rounded-2xl p-6 md:p-8">
+                <h2 className="text-xl md:text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 border border-amber-500/20 flex items-center justify-center">
+                    <BookHeart className="w-5 h-5 text-amber-400" />
+                  </div>
                   À propos de ce livre audio
                 </h2>
                 {audiobook.description ? (
-                  <>
-                    <p className="text-white/50 leading-relaxed text-[15px]">
+                  <div className="space-y-4">
+                    <p className="text-white/60 leading-relaxed text-[15px] border-l-2 border-amber-500/30 pl-4">
                       {showFullDesc ? audiobook.description : descriptionShort}
                       {hasLongDesc && !showFullDesc && '...'}
                     </p>
                     {hasLongDesc && (
-                      <button onClick={() => setShowFullDesc(!showFullDesc)} className="text-amber-400 text-sm mt-3 flex items-center gap-1 hover:text-amber-300 transition-colors font-medium">
-                        {showFullDesc ? <><ChevronUp className="w-4 h-4" /> Afficher moins</> : <><ChevronDown className="w-4 h-4" /> Lire la suite</>}
+                      <button onClick={() => setShowFullDesc(!showFullDesc)} className="text-amber-400 text-sm flex items-center gap-1.5 hover:text-amber-300 transition-colors font-semibold group">
+                        {showFullDesc ? <><ChevronUp className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" /> Afficher moins</> : <><ChevronDown className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" /> Lire la suite</>}
                       </button>
                     )}
-                  </>
+                  </div>
                 ) : (
-                  <p className="text-white/40 italic">Découvrez ce livre audio créé avec la technologie EbookStudio Pro.</p>
+                  <p className="text-white/40 italic text-sm">Aucune description disponible pour ce livre audio.</p>
                 )}
-              </div>
 
-              {/* Tags */}
-              <div className="flex flex-wrap gap-2">
-                {['📖 Livre Audio', '🎙️ Audio IA Premium', audiobook.voice_name ? `🗣️ ${audiobook.voice_name}` : null].filter(Boolean).map((tag, i) => (
-                  <Badge key={i} variant="outline" className="border-white/10 text-white/50 bg-white/[0.03] hover:bg-white/[0.06] rounded-full px-4 py-1.5 text-xs">
-                    {tag}
+                {/* Tags professionnels */}
+                <div className="flex flex-wrap gap-2 mt-6 pt-6 border-t border-white/[0.06]">
+                  <Badge variant="outline" className="border-amber-500/20 text-amber-300/70 bg-amber-500/5 rounded-full px-4 py-1.5 text-xs font-medium">
+                    📖 Livre Audio
                   </Badge>
-                ))}
+                  <Badge variant="outline" className="border-purple-500/20 text-purple-300/70 bg-purple-500/5 rounded-full px-4 py-1.5 text-xs font-medium">
+                    🎙️ Audio IA Premium
+                  </Badge>
+                  {audiobook.voice_name && (
+                    <Badge variant="outline" className="border-cyan-500/20 text-cyan-300/70 bg-cyan-500/5 rounded-full px-4 py-1.5 text-xs font-medium">
+                      🗣️ {audiobook.voice_name}
+                    </Badge>
+                  )}
+                  <Badge variant="outline" className="border-emerald-500/20 text-emerald-300/70 bg-emerald-500/5 rounded-full px-4 py-1.5 text-xs font-medium">
+                    ✅ Téléchargement immédiat
+                  </Badge>
+                  {audiobook.duration_seconds && audiobook.duration_seconds > 3600 && (
+                    <Badge variant="outline" className="border-pink-500/20 text-pink-300/70 bg-pink-500/5 rounded-full px-4 py-1.5 text-xs font-medium">
+                      ⭐ Format long
+                    </Badge>
+                  )}
+                </div>
               </div>
 
 

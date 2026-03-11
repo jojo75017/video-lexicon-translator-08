@@ -338,46 +338,63 @@ const AudiobookDemoPage = () => {
             
             <div className="flex-1 min-w-0 space-y-10">
               
-              {/* Synopsis */}
-              <div>
-                <h2 className="text-2xl font-bold text-white/90 mb-4 flex items-center gap-2">
-                  <BookHeart className="w-6 h-6 text-amber-400" />
+              {/* Synopsis — Section professionnelle */}
+              <div className="bg-white/[0.02] border border-white/[0.06] rounded-2xl p-6 md:p-8">
+                <h2 className="text-xl md:text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 border border-amber-500/20 flex items-center justify-center">
+                    <BookHeart className="w-5 h-5 text-amber-400" />
+                  </div>
                   À propos de cette histoire
                 </h2>
-                <p className="text-white/50 leading-relaxed text-[15px]">
-                  {showFullDesc ? audiobook.description : descriptionShort}
-                  {hasLongDesc && !showFullDesc && '...'}
-                </p>
-                {hasLongDesc && (
-                  <button onClick={() => setShowFullDesc(!showFullDesc)} className="text-amber-400 text-sm mt-3 flex items-center gap-1 hover:text-amber-300 transition-colors font-medium">
-                    {showFullDesc ? <><ChevronUp className="w-4 h-4" /> Afficher moins</> : <><ChevronDown className="w-4 h-4" /> Lire la suite</>}
-                  </button>
-                )}
+                <div className="space-y-4">
+                  <p className="text-white/60 leading-relaxed text-[15px] border-l-2 border-amber-500/30 pl-4">
+                    {showFullDesc ? audiobook.description : descriptionShort}
+                    {hasLongDesc && !showFullDesc && '...'}
+                  </p>
+                  {hasLongDesc && (
+                    <button onClick={() => setShowFullDesc(!showFullDesc)} className="text-amber-400 text-sm flex items-center gap-1.5 hover:text-amber-300 transition-colors font-semibold group">
+                      {showFullDesc ? <><ChevronUp className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" /> Afficher moins</> : <><ChevronDown className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" /> Lire la suite</>}
+                    </button>
+                  )}
+                </div>
                 
-                {/* Long description/pitch */}
-                <div className="mt-6 space-y-4 text-white/45 text-sm leading-relaxed">
+                {/* Extended pitch */}
+                <div className="mt-6 pt-6 border-t border-white/[0.06] space-y-4 text-white/50 text-sm leading-relaxed">
                   <p>
-                    <strong className="text-white/70">Billy a 10 ans</strong> et un rêve aussi grand que le ciel du Texas : devenir le cow-boy le plus rapide de tout l'Ouest sauvage. 
+                    <strong className="text-white/75 font-semibold">Billy a 10 ans</strong> et un rêve aussi grand que le ciel du Texas : devenir le cow-boy le plus rapide de tout l'Ouest sauvage. 
                     Armé d'un chapeau trois fois trop grand et d'une paire de bottes qui font « flouich-flouich » à chaque pas, il est prêt à conquérir Cactus Valley.
                   </p>
                   <p>
-                    Mais voilà : son fidèle destrier <strong className="text-white/70">Tornado</strong> préfère les siestes aux galopades, le bandit du coin est en réalité 
+                    Mais voilà : son fidèle destrier <strong className="text-white/75 font-semibold">Tornado</strong> préfère les siestes aux galopades, le bandit du coin est en réalité 
                     un ancien professeur de piano, et le shérif local a tellement la flemme qu'il dort sur son rocking-chair à longueur de journée.
                   </p>
                   <p>
-                    À travers <strong className="text-white/70">8 chapitres truffés de gags</strong>, de rebondissements et de moments tendres, cette aventure 
+                    À travers <strong className="text-white/75 font-semibold">8 chapitres truffés de gags</strong>, de rebondissements et de moments tendres, cette aventure 
                     emmène les jeunes auditeurs dans un Far West décalé où le courage, l'amitié et la persévérance triomphent toujours — même quand tout part de travers.
                   </p>
                 </div>
-              </div>
 
-              {/* Tags */}
-              <div className="flex flex-wrap gap-2">
-                {['📖 Livre Audio', `🤠 ${audiobook.genre}`, '🎙️ Audio IA Premium', `🗣️ ${audiobook.voice_name}`, '👶 6-10 ans', '⭐ Best-seller'].map((tag, i) => (
-                  <Badge key={i} variant="outline" className="border-white/10 text-white/50 bg-white/[0.03] hover:bg-white/[0.06] rounded-full px-4 py-1.5 text-xs">
-                    {tag}
+                {/* Tags professionnels */}
+                <div className="flex flex-wrap gap-2 mt-6 pt-6 border-t border-white/[0.06]">
+                  <Badge variant="outline" className="border-amber-500/20 text-amber-300/70 bg-amber-500/5 rounded-full px-4 py-1.5 text-xs font-medium">
+                    📖 Livre Audio
                   </Badge>
-                ))}
+                  <Badge variant="outline" className="border-pink-500/20 text-pink-300/70 bg-pink-500/5 rounded-full px-4 py-1.5 text-xs font-medium">
+                    🤠 {audiobook.genre}
+                  </Badge>
+                  <Badge variant="outline" className="border-purple-500/20 text-purple-300/70 bg-purple-500/5 rounded-full px-4 py-1.5 text-xs font-medium">
+                    🎙️ Audio IA Premium
+                  </Badge>
+                  <Badge variant="outline" className="border-cyan-500/20 text-cyan-300/70 bg-cyan-500/5 rounded-full px-4 py-1.5 text-xs font-medium">
+                    🗣️ {audiobook.voice_name}
+                  </Badge>
+                  <Badge variant="outline" className="border-emerald-500/20 text-emerald-300/70 bg-emerald-500/5 rounded-full px-4 py-1.5 text-xs font-medium">
+                    👶 6-10 ans
+                  </Badge>
+                  <Badge variant="outline" className="border-yellow-500/20 text-yellow-300/70 bg-yellow-500/5 rounded-full px-4 py-1.5 text-xs font-medium">
+                    ⭐ Best-seller
+                  </Badge>
+                </div>
               </div>
 
               {/* Chapter list */}
