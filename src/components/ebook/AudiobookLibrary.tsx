@@ -27,6 +27,20 @@ interface LibraryAudiobook {
   is_public: boolean;
   play_count: number;
   slug: string | null;
+  excerpt_url: string | null;
+  paypal_link: string | null;
+  price: number | null;
+}
+
+interface EditDialogState {
+  open: boolean;
+  book: LibraryAudiobook;
+  coverUrl: string;
+  paypalLink: string;
+  excerptUrl: string;
+  price: string;
+  isPublic: boolean;
+  slug: string;
 }
 
 export const AudiobookLibrary: React.FC = () => {
