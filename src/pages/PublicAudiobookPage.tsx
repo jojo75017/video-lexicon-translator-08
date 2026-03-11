@@ -191,7 +191,6 @@ const PublicAudiobookPage = () => {
 
   return (
     <div className="min-h-screen bg-[#0A0A0F] text-white">
-      {audiobook.audio_url && <audio ref={audioRef} src={audiobook.audio_url} preload="metadata" />}
       {audiobook.excerpt_url && <audio ref={excerptRef} src={audiobook.excerpt_url} preload="metadata" />}
 
       {/* Urgency Banner */}
