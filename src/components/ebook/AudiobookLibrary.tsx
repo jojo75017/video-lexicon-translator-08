@@ -49,6 +49,7 @@ export const AudiobookLibrary: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('created_at');
   const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; id: string } | null>(null);
+  const [editDialog, setEditDialog] = useState<EditDialogState | null>(null);
   const [playingId, setPlayingId] = useState<string | null>(null);
   const [audioRef] = useState(() => new Audio());
 
