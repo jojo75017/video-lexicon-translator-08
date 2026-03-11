@@ -159,7 +159,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
   const [isPreviewingJingle, setIsPreviewingJingle] = useState(false);
   const [isDownloadingIntro, setIsDownloadingIntro] = useState(false);
   const jingleAudioRef = useRef<HTMLAudioElement | null>(null);
-
+  const guestExportNoticeShownRef = useRef(false);
   // ElevenLabs Premium voice selection
   const AUTO_VOICE = '__auto_voice__';
   const [selectedNiche, setSelectedNiche] = useState('default');
