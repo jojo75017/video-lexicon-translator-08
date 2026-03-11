@@ -184,14 +184,27 @@ const PublicAudiobookPage = () => {
   if (loading) return <LoadingState />;
   if (!audiobook) return <NotFoundState />;
 
+  // Use excerpt_url if available, otherwise fall back to full audio for preview
+  const excerptSrc = audiobook.excerpt_url || audiobook.audio_url;
+  const hasExcerpt = !!excerptSrc;
+
   const descriptionShort = audiobook.description?.slice(0, 300);
   const hasLongDesc = audiobook.description && audiobook.description.length > 300;
   const createdDate = audiobook.created_at ? new Date(audiobook.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }) : null;
   const hasPrice = audiobook.price && audiobook.price > 0;
 
+  // Format PayPal link: if it's an email, convert to paypal.me URL
+  const formatPaypalLink = (link: string | null) => {
+    if (!link) return null;
+    if (link.startsWith('http')) return link;
+    if (link.includes('@')) return `https://www.paypal.com/paypalme/${link}`;
+    return `https://www.paypal.me/${link}`;
+  };
+  const paypalUrl = formatPaypalLink(audiobook.paypal_link);
+
   return (
     <div className="min-h-screen bg-[#0A0A0F] text-white">
-      {audiobook.excerpt_url && <audio ref={excerptRef} src={audiobook.excerpt_url} preload="metadata" />}
+      {hasExcerpt && <audio ref={excerptRef} src={excerptSrc} preload="metadata" />}
 
       {/* Urgency Banner */}
       {hasPrice && (
@@ -273,8 +286,8 @@ const PublicAudiobookPage = () => {
                 <span className="text-white/50 text-sm">{audiobook.play_count || 0} écoutes</span>
               </motion.div>
 
-              {/* Excerpt player — only if a real excerpt exists */}
-              {audiobook.excerpt_url && (
+              {/* Excerpt player — uses excerpt_url or falls back to full audio */}
+              {hasExcerpt && (
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
                   className="bg-white/[0.04] border border-white/[0.08] backdrop-blur-sm rounded-2xl p-5 md:p-6 mb-7"
                 >
@@ -340,9 +353,9 @@ const PublicAudiobookPage = () => {
                         Écouter maintenant
                       </Button>
                     )}
-                    {audiobook.paypal_link && (
+                    {paypalUrl && (
                       <Button variant="outline" asChild className="gap-2 border-blue-400/30 bg-blue-500/10 text-blue-300 hover:bg-blue-500/20 hover:text-blue-200 rounded-full h-13 font-semibold">
-                        <a href={audiobook.paypal_link} target="_blank" rel="noopener noreferrer">
+                        <a href={paypalUrl} target="_blank" rel="noopener noreferrer">
                           <CreditCard className="h-4 w-4" />
                           Payer via PayPal
                         </a>
