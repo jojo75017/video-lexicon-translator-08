@@ -495,55 +495,6 @@ const PublicAudiobookPage = () => {
                 ))}
               </div>
 
-              {/* Full Player */}
-              {audiobook.audio_url && (
-                <div>
-                  {!showFullPlayer ? (
-                    <Button variant="outline" onClick={() => setShowFullPlayer(true)} className="gap-2 border-amber-500/30 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 hover:text-amber-200 rounded-full">
-                      <Headphones className="w-4 h-4" />
-                      Ouvrir le lecteur complet
-                    </Button>
-                  ) : (
-                    <div className="bg-white/[0.04] backdrop-blur-xl border border-white/10 rounded-2xl p-6 md:p-8">
-                      <h3 className="text-white font-semibold text-lg mb-5 flex items-center gap-2">
-                        <FileAudio className="w-5 h-5 text-amber-400" />
-                        Lecteur complet
-                      </h3>
-                      <div className="mb-6">
-                        <Slider value={[currentTime]} max={duration || 100} step={1} onValueChange={seek} className="cursor-pointer" />
-                        <div className="flex justify-between text-xs text-white/40 mt-2 font-mono">
-                          <span>{formatTime(currentTime)}</span>
-                          <span>-{formatTime(Math.max(0, duration - currentTime))}</span>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-center gap-6">
-                        <Button variant="ghost" size="icon" onClick={() => skip(-15)} className="text-white/60 hover:text-white hover:bg-white/10 h-12 w-12 rounded-full">
-                          <div className="relative"><SkipBack className="h-5 w-5" /><span className="absolute -bottom-3 left-1/2 -translate-x-1/2 text-[9px] text-white/40">15s</span></div>
-                        </Button>
-                        <Button onClick={togglePlay} className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:via-orange-400 hover:to-amber-500 shadow-xl shadow-amber-500/25 transition-all hover:scale-105 active:scale-95">
-                          {isPlaying ? <Pause className="h-7 w-7 text-white" /> : <Play className="h-7 w-7 ml-0.5 text-white" />}
-                        </Button>
-                        <Button variant="ghost" size="icon" onClick={() => skip(30)} className="text-white/60 hover:text-white hover:bg-white/10 h-12 w-12 rounded-full">
-                          <div className="relative"><SkipForward className="h-5 w-5" /><span className="absolute -bottom-3 left-1/2 -translate-x-1/2 text-[9px] text-white/40">30s</span></div>
-                        </Button>
-                      </div>
-                      <div className="flex items-center gap-3 mt-6 max-w-[200px] mx-auto">
-                        <Button variant="ghost" size="icon" onClick={() => { setIsMuted(!isMuted); if (audioRef.current) audioRef.current.muted = !isMuted; }} className="text-white/40 hover:text-white hover:bg-white/10 shrink-0 h-8 w-8">
-                          {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
-                        </Button>
-                        <Slider value={[isMuted ? 0 : volume]} max={1} step={0.01} onValueChange={changeVolume} />
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {!audiobook.audio_url && (
-                <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-10 text-center">
-                  <Headphones className="w-14 h-14 mx-auto mb-3 text-white/20" />
-                  <p className="text-white/40">L'audio n'est pas encore disponible pour ce livre.</p>
-                </div>
-              )}
 
               {/* Target audience */}
               <div className="bg-gradient-to-br from-amber-500/5 to-orange-500/5 border border-amber-500/10 rounded-2xl p-6">

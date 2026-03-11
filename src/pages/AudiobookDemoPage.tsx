@@ -436,39 +436,6 @@ const AudiobookDemoPage = () => {
                 </ul>
               </div>
 
-              {/* Full Player */}
-              {showFullPlayer && (
-                <div className="bg-white/[0.03] border border-white/[0.08] rounded-2xl p-6 md:p-8">
-                  <h3 className="text-white/90 font-semibold text-lg mb-5 flex items-center gap-2">
-                    <FileAudio className="w-5 h-5 text-amber-400" />
-                    Lecteur complet
-                  </h3>
-                  <div className="mb-6">
-                    <Slider value={[currentTime]} max={duration} step={1} onValueChange={(v) => setCurrentTime(v[0])} className="cursor-pointer" />
-                    <div className="flex justify-between text-xs text-white/30 mt-2 font-mono">
-                      <span>{formatTime(currentTime)}</span>
-                      <span>-{formatTime(Math.max(0, duration - currentTime))}</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-center gap-6">
-                    <Button variant="ghost" size="icon" className="text-white/30 hover:text-white/70 hover:bg-white/5 h-12 w-12 rounded-full">
-                      <div className="relative"><SkipBack className="h-5 w-5" /><span className="absolute -bottom-3 left-1/2 -translate-x-1/2 text-[9px]">15s</span></div>
-                    </Button>
-                    <Button onClick={() => setIsPlaying(!isPlaying)} className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 shadow-xl shadow-amber-500/25 transition-all hover:scale-105 active:scale-95">
-                      {isPlaying ? <Pause className="h-7 w-7 text-white" /> : <Play className="h-7 w-7 ml-0.5 text-white" />}
-                    </Button>
-                    <Button variant="ghost" size="icon" className="text-white/30 hover:text-white/70 hover:bg-white/5 h-12 w-12 rounded-full">
-                      <div className="relative"><SkipForward className="h-5 w-5" /><span className="absolute -bottom-3 left-1/2 -translate-x-1/2 text-[9px]">30s</span></div>
-                    </Button>
-                  </div>
-                </div>
-              )}
-              {!showFullPlayer && (
-                <Button variant="outline" onClick={() => setShowFullPlayer(true)} className="gap-2 border-amber-500/30 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 hover:text-amber-200 rounded-full">
-                  <Headphones className="w-4 h-4" />
-                  Ouvrir le lecteur complet
-                </Button>
-              )}
             </div>
 
             {/* Sidebar */}
