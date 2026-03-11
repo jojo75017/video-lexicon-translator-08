@@ -246,7 +246,7 @@ Deno.serve(async (req) => {
     const targetStep = body.step; // for manual: which step to send
     const prospectIds = body.prospect_ids; // for manual: specific prospects
 
-    const batchSize = body.batch_size || 30; // Limit batch to avoid timeout
+    const batchSize = body.batch_size || 50; // Increased batch for faster processing
 
     let query = supabase
       .from("sales_prospects")
