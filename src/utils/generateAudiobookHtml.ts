@@ -89,11 +89,12 @@ export function generateAudiobookHtml(book: AudiobookData): string {
 .ab-btn-paypal{background:rgba(59,130,246,.12);color:#93c5fd;border:1px solid rgba(59,130,246,.25)}
 .ab-btn-paypal:hover{background:rgba(59,130,246,.2)}
 .ab-content{padding:32px;display:flex;flex-wrap:wrap;gap:32px}
-.ab-desc{flex:1;min-width:280px}
-.ab-desc h2{font-size:1.35rem;font-weight:700;margin-bottom:16px}
-.ab-desc p{color:rgba(255,255,255,.65);line-height:1.7;font-size:.95rem}
-.ab-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
-.ab-tag{border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6);font-size:.8rem;padding:6px 16px;border-radius:999px;background:rgba(255,255,255,.04)}
+.ab-desc{flex:1;min-width:280px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:24px 28px}
+.ab-desc h2{font-size:1.35rem;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:12px}
+.ab-desc-icon{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,rgba(246,173,85,.15),rgba(237,137,54,.15));border:1px solid rgba(246,173,85,.2);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+.ab-desc p{color:rgba(255,255,255,.6);line-height:1.8;font-size:.95rem;border-left:2px solid rgba(246,173,85,.3);padding-left:16px}
+.ab-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px;padding-top:20px;border-top:1px solid rgba(255,255,255,.08)}
+.ab-tag{border:1px solid rgba(246,173,85,.15);color:rgba(246,173,85,.6);font-size:.8rem;padding:6px 16px;border-radius:999px;background:rgba(246,173,85,.04);font-weight:500}
 .ab-sidebar{width:280px;flex-shrink:0}
 .ab-details{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:24px}
 .ab-details h3{font-size:1rem;font-weight:600;border-bottom:1px solid rgba(255,255,255,.1);padding-bottom:12px;margin-bottom:16px}
