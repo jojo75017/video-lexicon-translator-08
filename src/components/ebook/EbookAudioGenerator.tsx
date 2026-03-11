@@ -773,6 +773,33 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
     }
   };
 
+// Helper: encode AudioBuffer to WAV Blob for download
+function audioBufferToWavBlob(buffer: AudioBuffer): Blob {
+  const numCh = buffer.numberOfChannels;
+  const sr = buffer.sampleRate;
+  const bps = 16;
+  const blockAlign = numCh * (bps / 8);
+  const dataLen = buffer.length * blockAlign;
+  const arrBuf = new ArrayBuffer(44 + dataLen);
+  const v = new DataView(arrBuf);
+  const w = (o: number, s: string) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+  w(0, 'RIFF'); v.setUint32(4, 36 + dataLen, true); w(8, 'WAVE'); w(12, 'fmt ');
+  v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, numCh, true);
+  v.setUint32(24, sr, true); v.setUint32(28, sr * blockAlign, true);
+  v.setUint16(32, blockAlign, true); v.setUint16(34, bps, true); w(36, 'data'); v.setUint32(40, dataLen, true);
+  const ch0 = buffer.getChannelData(0);
+  let off = 44;
+  for (let i = 0; i < buffer.length; i++) {
+    for (let c = 0; c < numCh; c++) {
+      const s = c === 0 ? ch0[i] : buffer.getChannelData(c)[i];
+      const cl = Math.max(-1, Math.min(1, s));
+      v.setInt16(off, cl < 0 ? cl * 0x8000 : cl * 0x7FFF, true);
+      off += 2;
+    }
+  }
+  return new Blob([arrBuf], { type: 'audio/wav' });
+}
+
 
 
   const VoiceConfig = ({ compact = false }: { compact?: boolean }) => (
