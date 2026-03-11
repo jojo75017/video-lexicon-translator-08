@@ -754,8 +754,8 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
       }
 
       if (!userId) {
-        toast.error('❌ ERREUR SESSION : Vous n\'êtes pas connecté ! Allez sur /auth pour vous connecter, puis relancez l\'export.');
-        console.error('saveToLibrary: NO USER ID - session missing');
+        toast.info('Téléchargement terminé. Connectez-vous pour enregistrer automatiquement dans Mes Livres Audio.');
+        console.warn('saveToLibrary skipped: NO USER ID');
         return;
       }
       
