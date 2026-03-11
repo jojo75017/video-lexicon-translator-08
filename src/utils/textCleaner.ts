@@ -54,10 +54,14 @@ export function cleanGeneratedText(text: string): string {
     .replace(/":\s*"/g, ': ')
     .replace(/{\s*"/g, '')
     .replace(/"\s*}/g, '')
-    // Supprimer les fragments JSON qui fuient dans le texte (ex: jsonnumero": 3, "titre:")
-    .replace(/\bjson\s*"?numero"?\s*:\s*\d+\s*,\s*"?titre"?\s*:\s*/gi, '')
-    .replace(/(^|\s)"?(numero|titre|title|content|chapters|subChapters)"?\s*:\s*/gi, '$1')
-    .replace(/^[\[{,\s]+"?(numero|titre|title|content|chapters|subChapters)"?\s*:\s*/gim, '')
+    // Supprimer les fragments JSON qui fuient dans le texte
+    // Cas exact: jsonnumero": 3, " titre:  ou  json"numero": 3, "
+    .replace(/json\s*"?\s*numero\s*"?\s*:\s*\d+\s*,?\s*"?\s*(titre)?\s*"?\s*:?\s*/gi, '')
+    // Cas: "numero": 3, "titre":  ou numero": 3, "
+    .replace(/"?\s*numero\s*"?\s*:\s*\d+\s*,?\s*"?\s*(titre)?\s*"?\s*:?\s*/gi, '')
+    // Cas génériques de clés JSON orphelines
+    .replace(/(^|\s)"?(titre|title|content|chapters|subChapters|contenu|numero)"?\s*:\s*/gi, '$1')
+    .replace(/^[\[{,\s]+"?(numero|titre|title|content|chapters|subChapters|contenu)"?\s*:\s*/gim, '')
     .replace(/^"{3,}/gm, '"')
     .replace(/"{3,}$/gm, '"')
     .replace(/  +/g, ' ')
