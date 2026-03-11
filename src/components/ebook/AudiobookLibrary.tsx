@@ -339,6 +339,92 @@ export const AudiobookLibrary: React.FC = () => {
         ))}
       </div>
 
+      {/* Edit product sheet dialog */}
+      <Dialog open={!!editDialog?.open} onOpenChange={() => setEditDialog(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Modifier la fiche produit</DialogTitle>
+            <DialogDescription>
+              Ajoutez votre image, votre prix et votre lien PayPal pour la vente du livre complet.
+            </DialogDescription>
+          </DialogHeader>
+
+          {editDialog && (
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm font-medium mb-1">Image de couverture (URL)</p>
+                <Input
+                  placeholder="https://..."
+                  value={editDialog.coverUrl}
+                  onChange={(e) => setEditDialog({ ...editDialog, coverUrl: e.target.value })}
+                />
+              </div>
+
+              <div>
+                <p className="text-sm font-medium mb-1">Extrait audio (URL)</p>
+                <Input
+                  placeholder="https://.../extrait.mp3"
+                  value={editDialog.excerptUrl}
+                  onChange={(e) => setEditDialog({ ...editDialog, excerptUrl: e.target.value })}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <p className="text-sm font-medium mb-1">Prix (€)</p>
+                  <Input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    placeholder="9.99"
+                    value={editDialog.price}
+                    onChange={(e) => setEditDialog({ ...editDialog, price: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <p className="text-sm font-medium mb-1">Visibilité</p>
+                  <Select
+                    value={editDialog.isPublic ? 'public' : 'private'}
+                    onValueChange={(value) => setEditDialog({ ...editDialog, isPublic: value === 'public' })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="public">Public</SelectItem>
+                      <SelectItem value="private">Privé</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-sm font-medium mb-1">Lien PayPal (livre complet)</p>
+                <Input
+                  placeholder="https://paypal.me/..."
+                  value={editDialog.paypalLink}
+                  onChange={(e) => setEditDialog({ ...editDialog, paypalLink: e.target.value })}
+                />
+              </div>
+
+              <div>
+                <p className="text-sm font-medium mb-1">Slug public</p>
+                <Input
+                  placeholder="mon-livre-audio"
+                  value={editDialog.slug}
+                  onChange={(e) => setEditDialog({ ...editDialog, slug: e.target.value })}
+                />
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditDialog(null)}>Annuler</Button>
+            <Button onClick={saveMetadata}>Enregistrer</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Delete dialog */}
       <Dialog open={!!deleteDialog?.open} onOpenChange={() => setDeleteDialog(null)}>
         <DialogContent>
