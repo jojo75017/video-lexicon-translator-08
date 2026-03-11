@@ -88,6 +88,33 @@ const ELEVENLABS_VOICES_LIST = [
   { id: 'SAz9YHcvj6GT2YYXdXww', name: 'River (Non-binaire)', lang: 'fr' },
 ];
 
+// Helper: encode AudioBuffer to WAV Blob for download
+function audioBufferToWavBlob(buffer: AudioBuffer): Blob {
+  const numCh = buffer.numberOfChannels;
+  const sr = buffer.sampleRate;
+  const bps = 16;
+  const blockAlign = numCh * (bps / 8);
+  const dataLen = buffer.length * blockAlign;
+  const arrBuf = new ArrayBuffer(44 + dataLen);
+  const v = new DataView(arrBuf);
+  const w = (o: number, s: string) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+  w(0, 'RIFF'); v.setUint32(4, 36 + dataLen, true); w(8, 'WAVE'); w(12, 'fmt ');
+  v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, numCh, true);
+  v.setUint32(24, sr, true); v.setUint32(28, sr * blockAlign, true);
+  v.setUint16(32, blockAlign, true); v.setUint16(34, bps, true); w(36, 'data'); v.setUint32(40, dataLen, true);
+  const ch0 = buffer.getChannelData(0);
+  let off = 44;
+  for (let i = 0; i < buffer.length; i++) {
+    for (let c = 0; c < numCh; c++) {
+      const s = c === 0 ? ch0[i] : buffer.getChannelData(c)[i];
+      const cl = Math.max(-1, Math.min(1, s));
+      v.setInt16(off, cl < 0 ? cl * 0x8000 : cl * 0x7FFF, true);
+      off += 2;
+    }
+  }
+  return new Blob([arrBuf], { type: 'audio/wav' });
+}
+
 export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
   ebookTitle,
   authorName,
@@ -1420,9 +1447,41 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                             setIsDownloadingIntro(false);
                             return;
                           }
-                          const introBlob = new Blob(introBlobs, { type: 'audio/mpeg' });
-                          const filename = `Intro-Premium-${ebookTitle?.replace(/[^a-zA-Z0-9]/g, '_') || 'Extrait'}.mp3`;
-                          saveAs(introBlob, filename);
+                          // Decode all blobs (mix of WAV + MP3) to PCM, concatenate, and export as WAV
+                          const audioCtx = new AudioContext();
+                          const decodedBuffers: AudioBuffer[] = [];
+                          for (const blob of introBlobs) {
+                            try {
+                              const arrayBuf = await blob.arrayBuffer();
+                              const decoded = await audioCtx.decodeAudioData(arrayBuf);
+                              decodedBuffers.push(decoded);
+                            } catch (e) {
+                              console.warn('Skipping undecodable audio blob:', e);
+                            }
+                          }
+                          await audioCtx.close();
+                          if (decodedBuffers.length === 0) {
+                            toast.error('Impossible de fusionner l\'intro');
+                            setIsDownloadingIntro(false);
+                            return;
+                          }
+                          // Concatenate all decoded buffers into one
+                          const sampleRate = decodedBuffers[0].sampleRate;
+                          const totalLength = decodedBuffers.reduce((sum, b) => sum + b.length, 0);
+                          const offlineCtx = new OfflineAudioContext(1, totalLength, sampleRate);
+                          let offset = 0;
+                          for (const buf of decodedBuffers) {
+                            const source = offlineCtx.createBufferSource();
+                            source.buffer = buf;
+                            source.connect(offlineCtx.destination);
+                            source.start(offset / sampleRate);
+                            offset += buf.length;
+                          }
+                          const rendered = await offlineCtx.startRendering();
+                          // Encode as WAV
+                          const wavBlob = audioBufferToWavBlob(rendered);
+                          const filename = `Intro-Premium-${ebookTitle?.replace(/[^a-zA-Z0-9]/g, '_') || 'Extrait'}.wav`;
+                          saveAs(wavBlob, filename);
                           toast.success('Intro téléchargée ! 🎧');
                         } catch (error: any) {
                           toast.error(`Erreur : ${error.message}`);
