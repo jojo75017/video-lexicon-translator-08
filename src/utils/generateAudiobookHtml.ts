@@ -189,12 +189,13 @@ export function generateAudiobookHtml(book: AudiobookData): string {
 
   <div class="ab-content">
     <div class="ab-desc">
-      <h2>À propos de ce livre audio</h2>
+      <h2><div class="ab-desc-icon">📖</div> À propos de ce livre audio</h2>
       <p>${desc || 'Aucune description disponible.'}</p>
       <div class="ab-tags">
         <span class="ab-tag">📖 Livre Audio</span>
         <span class="ab-tag">🎙️ Audio IA Premium</span>
         ${voice ? `<span class="ab-tag">🗣️ ${voice}</span>` : ''}
+        <span class="ab-tag">✅ Téléchargement immédiat</span>
       </div>
     </div>
     <div class="ab-sidebar">
