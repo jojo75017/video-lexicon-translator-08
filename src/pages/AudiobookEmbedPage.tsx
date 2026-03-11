@@ -128,7 +128,7 @@ const AudiobookEmbedPage = () => {
         <div style={{ padding: 32, display: 'flex', flexWrap: 'wrap', gap: 32 }}>
           <div style={{ flex: 1, minWidth: 280 }}>
             <h2 style={{ fontSize: '1.35rem', fontWeight: 700, marginBottom: 16 }}>À propos de ce livre audio</h2>
-            <p style={{ color: 'rgba(255,255,255,.65)', lineHeight: 1.7, fontSize: '.95rem' }}>{desc || 'Aucune description disponible.'}</p>
+            <p style={{ color: 'rgba(255,255,255,.65)', lineHeight: 1.7, fontSize: '.95rem', borderLeft: '2px solid rgba(246,173,85,0.3)', paddingLeft: 14 }}>{desc}</p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 20 }}>
               <span style={{ border: '1px solid rgba(255,255,255,.15)', color: 'rgba(255,255,255,.6)', fontSize: '.8rem', padding: '6px 16px', borderRadius: 999, background: 'rgba(255,255,255,.04)' }}>📖 Livre Audio</span>
               <span style={{ border: '1px solid rgba(255,255,255,.15)', color: 'rgba(255,255,255,.6)', fontSize: '.8rem', padding: '6px 16px', borderRadius: 999, background: 'rgba(255,255,255,.04)' }}>🎙️ Audio IA Premium</span>
