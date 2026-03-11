@@ -165,8 +165,8 @@ const ElementorExportPage = () => {
     const publicUrl = hasSlug ? `${origin}/audiobook/${safeSlug}` : '#';
     const embedUrl = hasSlug ? `${origin}/audiobook-embed/${safeSlug}` : '';
     const price = book.price ? `${Number(book.price).toFixed(2)} €` : 'Gratuit';
-    const desc = (book.description || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-    const descShort = desc.slice(0, 300) + (desc.length > 300 ? '...' : '');
+    const desc = (book.description || `Plongez dans « ${book.title || 'ce livre audio'} », une expérience audio captivante ${book.author_name ? `signée ${book.author_name}` : ''} et produite avec la technologie de narration vocale IA de dernière génération${book.voice_name ? `, interprétée par la voix ${book.voice_name}` : ''}. Ce livre audio a été conçu pour offrir une immersion totale : chaque chapitre a été soigneusement structuré, chaque phrase optimisée pour l'écoute. Qualité studio, format MP3 haute définition, compatible avec tous vos appareils.`).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    const descShort = desc.slice(0, 400) + (desc.length > 400 ? '...' : '');
 
     return `<!-- ========================================
      FICHE PRODUIT AUDIOBOOK - ELEMENTOR
