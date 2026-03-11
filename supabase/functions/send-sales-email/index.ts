@@ -39,8 +39,8 @@ const EMAIL_SEQUENCE = [
   },
 ];
 
-const DEMO_LINK = "https://ebookstudio.fr/demo";
-const OFFRES_LINK = "https://ebookstudio.fr/offres";
+const DEMO_LINK = "https://video-lexicon-translator-08.lovable.app/demo";
+const OFFRES_LINK = "https://video-lexicon-translator-08.lovable.app/offres";
 
 function getEmailBody(step: number, firstName: string): string {
   const name = firstName || "cher lecteur";
