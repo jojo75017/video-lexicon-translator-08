@@ -693,34 +693,6 @@ const PublicAudiobookPage = () => {
             </div>
           </div>
 
-          {/* ===== SIMILAR BOOKS ===== */}
-          <div className="mt-14">
-            <h2 className="text-2xl font-bold text-white/90 mb-6 flex items-center gap-2">
-              <Library className="w-6 h-6 text-amber-400" />
-              Vous aimerez aussi
-            </h2>
-            <div className="flex gap-4 overflow-x-auto pb-2">
-              {[
-                { title: "Copywriting Avancé", price: "9.99", genre: "Business" },
-                { title: "Mindset Entrepreneur", price: "11.99", genre: "Dev. Perso" },
-                { title: "SEO Masterclass", price: "14.99", genre: "Marketing" },
-                { title: "Réseaux Sociaux Pro", price: "8.99", genre: "Digital" },
-              ].map((book, i) => (
-                <div key={i} className="shrink-0 w-44 bg-white/[0.03] border border-white/[0.06] rounded-xl overflow-hidden hover:-translate-y-1 transition-transform cursor-pointer group">
-                  <div className="w-44 h-44 bg-gradient-to-br from-white/[0.02] to-white/[0.05] flex items-center justify-center">
-                    <Headphones className="w-10 h-10 text-white/10 group-hover:text-amber-400/40 transition-colors" />
-                  </div>
-                  <div className="p-3">
-                    <p className="text-sm font-semibold text-white/70 truncate">{book.title}</p>
-                    <div className="flex items-center justify-between mt-1">
-                      <p className="text-xs font-bold text-amber-400">{book.price} €</p>
-                      <Badge className="text-[9px] bg-white/5 text-white/30 border-white/10">{book.genre}</Badge>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
 
           {/* ===== CTA FINAL ===== */}
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
