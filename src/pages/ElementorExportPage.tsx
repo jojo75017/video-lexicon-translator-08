@@ -454,11 +454,13 @@ const ElementorExportPage = () => {
   </div>
 
   <!-- PLAYER EMBED -->
-  ${hasSlug ? `
+  ${book.excerpt_url ? `
   <div class="eb-player-section">
-    <h3>🎵 Extrait audio</h3>
-    <div class="eb-player-iframe">
-      <iframe src="${embedUrl}" width="100%" height="140" frameborder="0" allow="autoplay" style="border-radius:12px;display:block"></iframe>
+    <h3>🎧 Écouter un extrait</h3>
+    <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px 20px;">
+      <audio controls preload="none" controlsList="nodownload" style="width:100%;border-radius:8px;outline:none;">
+        <source src="${book.excerpt_url}" type="audio/mpeg">
+      </audio>
     </div>
   </div>
   ` : ''}
