@@ -9,7 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import {
   Headphones, Search, Download, Trash2, Play,
-  Calendar, Music, RefreshCw, Clock, Volume2, Globe, Lock
+  Calendar, Music, RefreshCw, Clock, Volume2, Globe, Lock, Pencil
 } from 'lucide-react';
 
 interface LibraryAudiobook {
@@ -27,6 +27,20 @@ interface LibraryAudiobook {
   is_public: boolean;
   play_count: number;
   slug: string | null;
+  excerpt_url: string | null;
+  paypal_link: string | null;
+  price: number | null;
+}
+
+interface EditDialogState {
+  open: boolean;
+  book: LibraryAudiobook;
+  coverUrl: string;
+  paypalLink: string;
+  excerptUrl: string;
+  price: string;
+  isPublic: boolean;
+  slug: string;
 }
 
 export const AudiobookLibrary: React.FC = () => {
@@ -35,6 +49,7 @@ export const AudiobookLibrary: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('created_at');
   const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; id: string } | null>(null);
+  const [editDialog, setEditDialog] = useState<EditDialogState | null>(null);
   const [playingId, setPlayingId] = useState<string | null>(null);
   const [audioRef] = useState(() => new Audio());
 
@@ -121,6 +136,67 @@ export const AudiobookLibrary: React.FC = () => {
     return h > 0
       ? `${h}h${m.toString().padStart(2, '0')}m`
       : `${m}:${sec.toString().padStart(2, '0')}`;
+  };
+
+  const generateSlug = (text: string) => {
+    const base = text
+      .toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '')
+      .substring(0, 60);
+    return `${base}-${Math.random().toString(36).substring(2, 7)}`;
+  };
+
+  const openEditDialog = (book: LibraryAudiobook) => {
+    setEditDialog({
+      open: true,
+      book,
+      coverUrl: book.cover_url || '',
+      paypalLink: book.paypal_link || '',
+      excerptUrl: book.excerpt_url || '',
+      price: typeof book.price === 'number' ? String(book.price) : '',
+      isPublic: !!book.is_public,
+      slug: book.slug || '',
+    });
+  };
+
+  const saveMetadata = async () => {
+    if (!editDialog?.book) return;
+
+    const normalizedPrice = editDialog.price.trim();
+    const parsedPrice = normalizedPrice ? Number.parseFloat(normalizedPrice) : null;
+
+    if (normalizedPrice && Number.isNaN(parsedPrice)) {
+      toast.error('Prix invalide');
+      return;
+    }
+
+    const shouldBePublic = editDialog.isPublic;
+    const finalSlug = shouldBePublic
+      ? (editDialog.slug.trim() || editDialog.book.slug || generateSlug(editDialog.book.title))
+      : (editDialog.slug.trim() || editDialog.book.slug || null);
+
+    const { error } = await supabase
+      .from('audiobooks')
+      .update({
+        cover_url: editDialog.coverUrl.trim() || null,
+        paypal_link: editDialog.paypalLink.trim() || null,
+        excerpt_url: editDialog.excerptUrl.trim() || null,
+        price: parsedPrice,
+        is_public: shouldBePublic,
+        slug: finalSlug,
+      })
+      .eq('id', editDialog.book.id);
+
+    if (error) {
+      toast.error(`Erreur de mise à jour: ${error.message}`);
+      return;
+    }
+
+    toast.success('Fiche mise à jour !');
+    setEditDialog(null);
+    fetchAudiobooks();
   };
 
   if (isLoading) {
@@ -224,10 +300,10 @@ export const AudiobookLibrary: React.FC = () => {
               </Badge>
 
               {/* Actions */}
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-wrap">
                 {audiobook.audio_url && (
                   <>
-                    <Button size="sm" variant="outline" onClick={() => togglePlay(audiobook)} className="flex-1">
+                    <Button size="sm" variant="outline" onClick={() => togglePlay(audiobook)} className="flex-1 min-w-[120px]">
                       {playingId === audiobook.id ? (
                         <><Volume2 className="h-3 w-3 mr-1 animate-pulse" /> Pause</>
                       ) : (
@@ -241,6 +317,19 @@ export const AudiobookLibrary: React.FC = () => {
                     </Button>
                   </>
                 )}
+
+                <Button size="sm" variant="outline" onClick={() => openEditDialog(audiobook)}>
+                  <Pencil className="h-3 w-3 mr-1" /> Fiche
+                </Button>
+
+                {audiobook.is_public && audiobook.slug && (
+                  <Button size="sm" variant="outline" asChild>
+                    <a href={`${window.location.origin}/audiobook/${audiobook.slug}`} target="_blank" rel="noreferrer">
+                      <Globe className="h-3 w-3 mr-1" /> Page
+                    </a>
+                  </Button>
+                )}
+
                 <Button size="sm" variant="destructive" onClick={() => setDeleteDialog({ open: true, id: audiobook.id })}>
                   <Trash2 className="h-3 w-3" />
                 </Button>
@@ -249,6 +338,92 @@ export const AudiobookLibrary: React.FC = () => {
           </Card>
         ))}
       </div>
+
+      {/* Edit product sheet dialog */}
+      <Dialog open={!!editDialog?.open} onOpenChange={() => setEditDialog(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Modifier la fiche produit</DialogTitle>
+            <DialogDescription>
+              Ajoutez votre image, votre prix et votre lien PayPal pour la vente du livre complet.
+            </DialogDescription>
+          </DialogHeader>
+
+          {editDialog && (
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm font-medium mb-1">Image de couverture (URL)</p>
+                <Input
+                  placeholder="https://..."
+                  value={editDialog.coverUrl}
+                  onChange={(e) => setEditDialog({ ...editDialog, coverUrl: e.target.value })}
+                />
+              </div>
+
+              <div>
+                <p className="text-sm font-medium mb-1">Extrait audio (URL)</p>
+                <Input
+                  placeholder="https://.../extrait.mp3"
+                  value={editDialog.excerptUrl}
+                  onChange={(e) => setEditDialog({ ...editDialog, excerptUrl: e.target.value })}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <p className="text-sm font-medium mb-1">Prix (€)</p>
+                  <Input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    placeholder="9.99"
+                    value={editDialog.price}
+                    onChange={(e) => setEditDialog({ ...editDialog, price: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <p className="text-sm font-medium mb-1">Visibilité</p>
+                  <Select
+                    value={editDialog.isPublic ? 'public' : 'private'}
+                    onValueChange={(value) => setEditDialog({ ...editDialog, isPublic: value === 'public' })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="public">Public</SelectItem>
+                      <SelectItem value="private">Privé</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-sm font-medium mb-1">Lien PayPal (livre complet)</p>
+                <Input
+                  placeholder="https://paypal.me/..."
+                  value={editDialog.paypalLink}
+                  onChange={(e) => setEditDialog({ ...editDialog, paypalLink: e.target.value })}
+                />
+              </div>
+
+              <div>
+                <p className="text-sm font-medium mb-1">Slug public</p>
+                <Input
+                  placeholder="mon-livre-audio"
+                  value={editDialog.slug}
+                  onChange={(e) => setEditDialog({ ...editDialog, slug: e.target.value })}
+                />
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditDialog(null)}>Annuler</Button>
+            <Button onClick={saveMetadata}>Enregistrer</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Delete dialog */}
       <Dialog open={!!deleteDialog?.open} onOpenChange={() => setDeleteDialog(null)}>

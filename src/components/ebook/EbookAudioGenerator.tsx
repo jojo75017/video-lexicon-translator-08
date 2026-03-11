@@ -159,7 +159,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
   const [isPreviewingJingle, setIsPreviewingJingle] = useState(false);
   const [isDownloadingIntro, setIsDownloadingIntro] = useState(false);
   const jingleAudioRef = useRef<HTMLAudioElement | null>(null);
-
+  const guestExportNoticeShownRef = useRef(false);
   // ElevenLabs Premium voice selection
   const AUTO_VOICE = '__auto_voice__';
   const [selectedNiche, setSelectedNiche] = useState('default');
@@ -567,8 +567,12 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
   const generateSectionMp3 = async (text: string): Promise<Blob | null> => {
     const { data: { session } } = await supabase.auth.getSession();
     const token = session?.access_token;
-    if (!token) {
-      throw new Error('Vous devez être connecté pour exporter et sauvegarder en MP3');
+
+    // ElevenLabs nécessite une session active; sinon bascule automatique sur Azure/OpenAI
+    const canUseElevenLabs = useElevenLabsForExport && !!token;
+    if (useElevenLabsForExport && !token && !guestExportNoticeShownRef.current) {
+      guestExportNoticeShownRef.current = true;
+      toast.info('Mode invité: export MP3 via Azure/OpenAI. Connectez-vous pour le mode ElevenLabs et la sauvegarde auto.');
     }
 
     // Nettoyage final de sécurité avant envoi à l'API vocale
@@ -586,23 +590,25 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
     
     for (const chunk of chunks) {
       let response: Response;
-      
-      if (useElevenLabsForExport) {
+
+      if (canUseElevenLabs) {
         // Use ElevenLabs Premium TTS (primary)
         const voiceId = selectedPremiumVoice === AUTO_VOICE
           ? VOICE_PRESETS.find(p => p.id === selectedNiche)?.voiceId || 'pFZP5JQG7iQjIQuC4Bku'
           : selectedPremiumVoice;
-        
+
+        const headers: Record<string, string> = {
+          'Content-Type': 'application/json',
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          Authorization: `Bearer ${token}`,
+        };
+
         response = await fetch(
           `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`,
           {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ 
+            headers,
+            body: JSON.stringify({
               text: chunk,
               voiceId,
               modelId: 'eleven_multilingual_v2',
@@ -610,17 +616,19 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
           }
         );
       } else {
-        // Fallback to Azure Speech
+        // Azure/OpenAI fallback available even without user session
+        const headers: Record<string, string> = {
+          'Content-Type': 'application/json',
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        };
+        if (token) headers.Authorization = `Bearer ${token}`;
+
         response = await fetch(
           `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/azure-speech-tts`,
           {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ 
+            headers,
+            body: JSON.stringify({
               text: chunk,
               niche: selectedNiche,
             }),
@@ -746,8 +754,8 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
       }
 
       if (!userId) {
-        toast.error('❌ ERREUR SESSION : Vous n\'êtes pas connecté ! Allez sur /auth pour vous connecter, puis relancez l\'export.');
-        console.error('saveToLibrary: NO USER ID - session missing');
+        toast.info('Téléchargement terminé. Connectez-vous pour enregistrer automatiquement dans Mes Livres Audio.');
+        console.warn('saveToLibrary skipped: NO USER ID');
         return;
       }
       
