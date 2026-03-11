@@ -353,9 +353,9 @@ const PublicAudiobookPage = () => {
                         Écouter maintenant
                       </Button>
                     )}
-                    {audiobook.paypal_link && (
+                    {paypalUrl && (
                       <Button variant="outline" asChild className="gap-2 border-blue-400/30 bg-blue-500/10 text-blue-300 hover:bg-blue-500/20 hover:text-blue-200 rounded-full h-13 font-semibold">
-                        <a href={audiobook.paypal_link} target="_blank" rel="noopener noreferrer">
+                        <a href={paypalUrl} target="_blank" rel="noopener noreferrer">
                           <CreditCard className="h-4 w-4" />
                           Payer via PayPal
                         </a>
