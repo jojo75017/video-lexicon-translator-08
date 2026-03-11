@@ -177,6 +177,29 @@ const ElementorExportPage = () => {
       slug: book.slug,
     });
   };
+
+  const slugifyTitle = (value: string) =>
+    value
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9\s-]/g, '')
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-');
+
+  const ensureBookPublicForExport = async (book: any) => {
+    if (book.slug && book.is_public) return book;
+
+    const { data: { session } } = await supabase.auth.getSession();
+    const userId = session?.user?.id;
+
+    if (!userId) {
+      toast.error('Vous devez être connecté pour publier la fiche.');
+      return null;
+    }
+
+    const fallbackSlugBase = slugifyTitle(book.title || 'audiobook') || 'audiobook';
     const fallbackSlug = `${fallbackSlugBase}-${book.id.slice(0, 8)}`;
 
     const { data, error } = await supabase
