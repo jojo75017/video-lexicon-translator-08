@@ -468,8 +468,17 @@ const ElementorExportPage = () => {
   <!-- DESCRIPTION & META -->
   <div class="eb-body">
     <div class="eb-desc">
-      <h3>À propos</h3>
-      <p>${descShort || 'Découvrez ce livre audio créé avec EbookStudio Pro.'}</p>
+      <h3 style="display:flex;align-items:center;gap:10px;">
+        <span style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,rgba(245,158,11,0.15),rgba(249,115,22,0.15));border:1px solid rgba(245,158,11,0.2);display:inline-flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">📖</span>
+        À propos de ce livre audio
+      </h3>
+      <p style="border-left:2px solid rgba(245,158,11,0.3);padding-left:14px;">${descShort}</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.06);">
+        <span style="border:1px solid rgba(245,158,11,0.15);color:rgba(245,158,11,0.6);font-size:12px;padding:5px 14px;border-radius:999px;background:rgba(245,158,11,0.04);">📖 Livre Audio</span>
+        <span style="border:1px solid rgba(168,85,247,0.15);color:rgba(168,85,247,0.6);font-size:12px;padding:5px 14px;border-radius:999px;background:rgba(168,85,247,0.04);">🎙️ Audio IA Premium</span>
+        ${book.voice_name ? `<span style="border:1px solid rgba(6,182,212,0.15);color:rgba(6,182,212,0.6);font-size:12px;padding:5px 14px;border-radius:999px;background:rgba(6,182,212,0.04);">🗣️ ${book.voice_name}</span>` : ''}
+        <span style="border:1px solid rgba(16,185,129,0.15);color:rgba(16,185,129,0.6);font-size:12px;padding:5px 14px;border-radius:999px;background:rgba(16,185,129,0.04);">✅ Téléchargement immédiat</span>
+      </div>
     </div>
     <div class="eb-meta-card">
       <h4>Détails</h4>
@@ -480,6 +489,32 @@ const ElementorExportPage = () => {
       <div class="eb-meta-row"><span class="label">Langue</span><span class="value">Français</span></div>
       <div class="eb-meta-row"><span class="label">Qualité</span><span class="value">192 kbps</span></div>
       <div class="eb-meta-row"><span class="label">Écoutes</span><span class="value">${book.play_count || 0}</span></div>
+    </div>
+  </div>
+
+  <!-- GARANTIE -->
+  <div style="margin:0 40px 32px;background:linear-gradient(135deg,rgba(16,185,129,0.08),rgba(16,185,129,0.02));border:1px solid rgba(16,185,129,0.2);border-radius:16px;padding:24px 28px;display:flex;align-items:center;gap:20px;">
+    <div style="font-size:2.5rem;flex-shrink:0;">🛡️</div>
+    <div>
+      <h4 style="font-size:15px;font-weight:700;color:#34d399;margin:0 0 4px;">Garantie Satisfait ou Remboursé — 30 jours</h4>
+      <p style="color:rgba(255,255,255,0.5);font-size:13px;line-height:1.6;margin:0;">Vous n'êtes pas satisfait ? Remboursement intégral, sans conditions.</p>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div style="padding:0 40px 32px;">
+    <h3 style="font-size:18px;font-weight:700;color:#fff;margin-bottom:16px;">❓ Questions fréquentes</h3>
+    <div style="border:1px solid rgba(255,255,255,0.08);border-radius:12px;margin-bottom:8px;padding:14px 18px;">
+      <div style="font-weight:600;font-size:14px;color:rgba(255,255,255,0.8);margin-bottom:8px;">Dans quel format est le livre audio ?</div>
+      <div style="color:rgba(255,255,255,0.45);font-size:13px;line-height:1.6;">Format MP3 haute définition, compatible tous appareils : smartphone, tablette, ordinateur, enceinte connectée.</div>
+    </div>
+    <div style="border:1px solid rgba(255,255,255,0.08);border-radius:12px;margin-bottom:8px;padding:14px 18px;">
+      <div style="font-weight:600;font-size:14px;color:rgba(255,255,255,0.8);margin-bottom:8px;">Comment accéder à mon achat ?</div>
+      <div style="color:rgba(255,255,255,0.45);font-size:13px;line-height:1.6;">Après paiement, vous recevrez un lien de téléchargement par email pour écouter immédiatement.</div>
+    </div>
+    <div style="border:1px solid rgba(255,255,255,0.08);border-radius:12px;margin-bottom:8px;padding:14px 18px;">
+      <div style="font-weight:600;font-size:14px;color:rgba(255,255,255,0.8);margin-bottom:8px;">Puis-je être remboursé ?</div>
+      <div style="color:rgba(255,255,255,0.45);font-size:13px;line-height:1.6;">Garantie satisfait ou remboursé de 30 jours. Contactez-nous par email.</div>
     </div>
   </div>
 
