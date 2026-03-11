@@ -221,12 +221,16 @@ export const AudiobookPublisher: React.FC<AudiobookPublisherProps> = ({
         audioUrl = urlData.publicUrl;
       }
 
-      // Upload excerpt file
+      // Upload excerpt file (with optional jingle fusion)
       if (excerptFile) {
-        const excerptPath = `${user.id}/${Date.now()}-extrait-${excerptFile.name}`;
+        let fileToUploadExcerpt: File = excerptFile;
+        if (addJingle) {
+          fileToUploadExcerpt = await prependJingleToExcerpt(excerptFile);
+        }
+        const excerptPath = `${user.id}/${Date.now()}-extrait-${fileToUploadExcerpt.name}`;
         const { error: excerptError } = await supabase.storage
           .from('audiobooks')
-          .upload(excerptPath, excerptFile);
+          .upload(excerptPath, fileToUploadExcerpt);
         if (excerptError) throw excerptError;
         const { data: excerptData } = supabase.storage.from('audiobooks').getPublicUrl(excerptPath);
         excerptUrl = excerptData.publicUrl;
