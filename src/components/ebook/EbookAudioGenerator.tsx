@@ -745,9 +745,9 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
       const { data: urlData } = supabase.storage.from('audiobooks').getPublicUrl(fileName);
 
       // Determine voice name
-      const voiceName = selectedAzureVoice === AUTO_AZURE_VOICE
-        ? AZURE_VOICE_PRESETS.find(p => p.id === selectedNiche)?.voice || 'fr-FR-DeniseNeural'
-        : selectedAzureVoice;
+      const voiceName = selectedPremiumVoice === AUTO_VOICE
+        ? VOICE_PRESETS.find(p => p.id === selectedNiche)?.voiceName || 'Lily (ElevenLabs)'
+        : ELEVENLABS_VOICES_LIST.find(v => v.id === selectedPremiumVoice)?.name || selectedPremiumVoice;
 
       // Insert into audiobooks table
       const { error: dbError } = await supabase.from('audiobooks').insert({
