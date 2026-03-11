@@ -74,6 +74,123 @@ export const AudiobookPublisher: React.FC<AudiobookPublisherProps> = ({
       .substring(0, 60) + '-' + Math.random().toString(36).substring(2, 8);
   };
 
+  /**
+   * Generate a 3s chime jingle (Web Audio API) and prepend it to an audio file.
+   * Returns a new Blob with jingle + original audio merged.
+   */
+  const prependJingleToExcerpt = async (excerptFile: File): Promise<File> => {
+    try {
+      toast.info('🔔 Fusion du jingle avec l\'extrait...');
+      const audioCtx = new AudioContext();
+      
+      // Generate 3s chime jingle
+      const sampleRate = 44100;
+      const jingleDuration = 3;
+      const jingleLength = sampleRate * jingleDuration;
+      const offlineCtx = new OfflineAudioContext(1, jingleLength, sampleRate);
+      
+      // Chime frequencies (pleasant bell-like chord)
+      const frequencies = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+      frequencies.forEach((freq, i) => {
+        const osc = offlineCtx.createOscillator();
+        const gain = offlineCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0, 0);
+        gain.gain.linearRampToValueAtTime(0.15 / (i + 1), 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.001, jingleDuration - 0.1);
+        osc.connect(gain);
+        gain.connect(offlineCtx.destination);
+        osc.start(i * 0.15);
+        osc.stop(jingleDuration);
+      });
+      
+      const jingleBuffer = await offlineCtx.startRendering();
+      
+      // Decode the excerpt file
+      const excerptArrayBuffer = await excerptFile.arrayBuffer();
+      const excerptBuffer = await audioCtx.decodeAudioData(excerptArrayBuffer);
+      
+      // Merge: jingle (3s) + silence (1s) + excerpt
+      const silenceDuration = 1;
+      const totalLength = jingleBuffer.length + (sampleRate * silenceDuration) + excerptBuffer.length;
+      const mergedBuffer = audioCtx.createBuffer(1, totalLength, sampleRate);
+      const output = mergedBuffer.getChannelData(0);
+      
+      // Copy jingle
+      const jingleData = jingleBuffer.getChannelData(0);
+      output.set(jingleData, 0);
+      
+      // Silence gap (already zeros)
+      
+      // Copy excerpt (mono mix if stereo)
+      const excerptOffset = jingleBuffer.length + (sampleRate * silenceDuration);
+      if (excerptBuffer.numberOfChannels > 1) {
+        const ch0 = excerptBuffer.getChannelData(0);
+        const ch1 = excerptBuffer.getChannelData(1);
+        for (let i = 0; i < excerptBuffer.length; i++) {
+          output[excerptOffset + i] = (ch0[i] + ch1[i]) / 2;
+        }
+      } else {
+        output.set(excerptBuffer.getChannelData(0), excerptOffset);
+      }
+      
+      // Encode to WAV
+      const wavBlob = audioBufferToWav(mergedBuffer);
+      audioCtx.close();
+      
+      return new File([wavBlob], excerptFile.name.replace(/\.\w+$/, '.wav'), { type: 'audio/wav' });
+    } catch (error: any) {
+      console.error('Jingle fusion error:', error);
+      toast.error('Impossible de fusionner le jingle, upload de l\'extrait sans jingle');
+      return excerptFile;
+    }
+  };
+
+  /** Convert AudioBuffer to WAV Blob */
+  const audioBufferToWav = (buffer: AudioBuffer): Blob => {
+    const numChannels = buffer.numberOfChannels;
+    const sampleRate = buffer.sampleRate;
+    const format = 1; // PCM
+    const bitDepth = 16;
+    const bytesPerSample = bitDepth / 8;
+    const blockAlign = numChannels * bytesPerSample;
+    const dataLength = buffer.length * blockAlign;
+    const headerLength = 44;
+    const totalLength = headerLength + dataLength;
+    const arrayBuffer = new ArrayBuffer(totalLength);
+    const view = new DataView(arrayBuffer);
+    
+    const writeString = (offset: number, str: string) => {
+      for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
+    };
+    
+    writeString(0, 'RIFF');
+    view.setUint32(4, totalLength - 8, true);
+    writeString(8, 'WAVE');
+    writeString(12, 'fmt ');
+    view.setUint32(16, 16, true);
+    view.setUint16(20, format, true);
+    view.setUint16(22, numChannels, true);
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * blockAlign, true);
+    view.setUint16(32, blockAlign, true);
+    view.setUint16(34, bitDepth, true);
+    writeString(36, 'data');
+    view.setUint32(40, dataLength, true);
+    
+    let offset = 44;
+    for (let i = 0; i < buffer.length; i++) {
+      for (let ch = 0; ch < numChannels; ch++) {
+        const sample = Math.max(-1, Math.min(1, buffer.getChannelData(ch)[i]));
+        view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
+        offset += 2;
+      }
+    }
+    
+    return new Blob([arrayBuffer], { type: 'audio/wav' });
+  };
+
   const handlePublish = async () => {
     if (!title.trim()) {
       toast.error('Le titre est requis');
