@@ -300,10 +300,10 @@ export const AudiobookLibrary: React.FC = () => {
               </Badge>
 
               {/* Actions */}
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-wrap">
                 {audiobook.audio_url && (
                   <>
-                    <Button size="sm" variant="outline" onClick={() => togglePlay(audiobook)} className="flex-1">
+                    <Button size="sm" variant="outline" onClick={() => togglePlay(audiobook)} className="flex-1 min-w-[120px]">
                       {playingId === audiobook.id ? (
                         <><Volume2 className="h-3 w-3 mr-1 animate-pulse" /> Pause</>
                       ) : (
@@ -317,6 +317,19 @@ export const AudiobookLibrary: React.FC = () => {
                     </Button>
                   </>
                 )}
+
+                <Button size="sm" variant="outline" onClick={() => openEditDialog(audiobook)}>
+                  <Pencil className="h-3 w-3 mr-1" /> Fiche
+                </Button>
+
+                {audiobook.is_public && audiobook.slug && (
+                  <Button size="sm" variant="outline" asChild>
+                    <a href={`${window.location.origin}/audiobook/${audiobook.slug}`} target="_blank" rel="noreferrer">
+                      <Globe className="h-3 w-3 mr-1" /> Page
+                    </a>
+                  </Button>
+                )}
+
                 <Button size="sm" variant="destructive" onClick={() => setDeleteDialog({ open: true, id: audiobook.id })}>
                   <Trash2 className="h-3 w-3" />
                 </Button>
