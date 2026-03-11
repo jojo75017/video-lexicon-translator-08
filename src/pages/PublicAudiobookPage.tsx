@@ -470,21 +470,24 @@ const PublicAudiobookPage = () => {
                   </div>
                   À propos de ce livre audio
                 </h2>
-                {audiobook.description ? (
-                  <div className="space-y-4">
-                    <p className="text-white/60 leading-relaxed text-[15px] border-l-2 border-amber-500/30 pl-4">
-                      {showFullDesc ? audiobook.description : descriptionShort}
-                      {hasLongDesc && !showFullDesc && '...'}
-                    </p>
-                    {hasLongDesc && (
-                      <button onClick={() => setShowFullDesc(!showFullDesc)} className="text-amber-400 text-sm flex items-center gap-1.5 hover:text-amber-300 transition-colors font-semibold group">
-                        {showFullDesc ? <><ChevronUp className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" /> Afficher moins</> : <><ChevronDown className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" /> Lire la suite</>}
-                      </button>
-                    )}
-                  </div>
-                ) : (
-                  <p className="text-white/40 italic text-sm">Aucune description disponible pour ce livre audio.</p>
-                )}
+                {(() => {
+                  const descText = audiobook.description || `Plongez dans « ${audiobook.title} », une expérience audio captivante ${audiobook.author_name ? `signée ${audiobook.author_name}` : ''} et produite avec la technologie de narration vocale IA de dernière génération${audiobook.voice_name ? `, interprétée par la voix ${audiobook.voice_name}` : ''}. Ce livre audio a été conçu pour offrir une immersion totale : chaque chapitre a été soigneusement structuré, chaque phrase optimisée pour l'écoute. Que vous soyez en déplacement, en pause ou confortablement installé, laissez-vous porter par une narration fluide et naturelle. Qualité studio, format MP3 haute définition, compatible avec tous vos appareils.`;
+                  const shortDesc = descText.slice(0, 300);
+                  const isLong = descText.length > 300;
+                  return (
+                    <div className="space-y-4">
+                      <p className="text-white/60 leading-relaxed text-[15px] border-l-2 border-amber-500/30 pl-4">
+                        {showFullDesc ? descText : shortDesc}
+                        {isLong && !showFullDesc && '...'}
+                      </p>
+                      {isLong && (
+                        <button onClick={() => setShowFullDesc(!showFullDesc)} className="text-amber-400 text-sm flex items-center gap-1.5 hover:text-amber-300 transition-colors font-semibold group">
+                          {showFullDesc ? <><ChevronUp className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" /> Afficher moins</> : <><ChevronDown className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" /> Lire la suite</>}
+                        </button>
+                      )}
+                    </div>
+                  );
+                })()}
 
                 {/* Tags professionnels */}
                 <div className="flex flex-wrap gap-2 mt-6 pt-6 border-t border-white/[0.06]">
