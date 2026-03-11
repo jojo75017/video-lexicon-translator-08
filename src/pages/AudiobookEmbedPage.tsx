@@ -45,7 +45,7 @@ const AudiobookEmbedPage = () => {
   const cover = book.cover_url || '';
   const price = book.price ? book.price.toFixed(2) : null;
   const oldPrice = book.price ? (book.price * 1.5).toFixed(2) : null;
-  const excerptUrl = book.excerpt_url || book.audio_url || '';
+  const excerptUrl = book.excerpt_url || '';
   const paypalLink = book.paypal_link || '';
   const stripeLink = book.stripe_link || '';
   const playCount = book.play_count || 0;
