@@ -165,6 +165,11 @@ const ElementorExportPage = () => {
     const publicUrl = hasSlug ? `${origin}/audiobook/${safeSlug}` : '#';
     const embedUrl = hasSlug ? `${origin}/audiobook-embed/${safeSlug}` : '';
     const price = book.price ? `${Number(book.price).toFixed(2)} €` : 'Gratuit';
+    // Use excerpt_url or fall back to full audio
+    const playerSrc = book.excerpt_url || book.audio_url || '';
+    // Format PayPal link properly
+    const rawPaypal = book.paypal_link || '';
+    const paypalHref = rawPaypal.startsWith('http') ? rawPaypal : rawPaypal.includes('@') ? `https://www.paypal.com/paypalme/${rawPaypal}` : rawPaypal ? `https://www.paypal.me/${rawPaypal}` : '';
     const desc = (book.description || `Plongez dans « ${book.title || 'ce livre audio'} », une expérience audio captivante ${book.author_name ? `signée ${book.author_name}` : ''} et produite avec la technologie de narration vocale IA de dernière génération${book.voice_name ? `, interprétée par la voix ${book.voice_name}` : ''}. Ce livre audio a été conçu pour offrir une immersion totale : chaque chapitre a été soigneusement structuré, chaque phrase optimisée pour l'écoute. Qualité studio, format MP3 haute définition, compatible avec tous vos appareils.`).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     const descShort = desc.slice(0, 400) + (desc.length > 400 ? '...' : '');
 
@@ -440,8 +445,8 @@ const ElementorExportPage = () => {
           : `<span class="free-badge">✓ GRATUIT</span>`
         }
       </div>
-      ${book.paypal_link
-        ? `<a href="${book.paypal_link}" class="eb-cta" target="_blank" rel="noopener">
+      ${paypalHref
+        ? `<a href="${paypalHref}" class="eb-cta" target="_blank" rel="noopener">
             💳 Acheter maintenant — ${price}
           </a>`
         : hasSlug
@@ -454,12 +459,12 @@ const ElementorExportPage = () => {
   </div>
 
   <!-- PLAYER EMBED -->
-  ${book.excerpt_url ? `
+  ${playerSrc ? `
   <div class="eb-player-section">
     <h3>🎧 Écouter un extrait</h3>
     <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px 20px;">
       <audio controls preload="none" controlsList="nodownload" style="width:100%;border-radius:8px;outline:none;">
-        <source src="${book.excerpt_url}" type="audio/mpeg">
+        <source src="${playerSrc}" type="audio/mpeg">
       </audio>
     </div>
   </div>
