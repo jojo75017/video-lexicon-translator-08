@@ -154,12 +154,12 @@ const AudiobookDemoPage = () => {
 
               <motion.h1 
                 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-                className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-3 leading-[1.1] tracking-tight bg-gradient-to-r from-white via-amber-100 to-amber-200 bg-clip-text text-transparent"
+                className="text-3xl md:text-4xl lg:text-5xl font-extrabold mb-2 leading-[1.15] tracking-tight text-white"
               >
                 {audiobook.title}
               </motion.h1>
               
-              <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="text-white/40 text-lg md:text-xl italic mb-5 max-w-lg">
+              <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="text-amber-400/60 text-base md:text-lg font-medium mb-5 max-w-lg">
                 {audiobook.subtitle}
               </motion.p>
 
