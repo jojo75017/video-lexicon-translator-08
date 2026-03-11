@@ -1331,10 +1331,10 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                   <div className="p-3 bg-muted/30 rounded-lg space-y-2">
                     <Label className="text-sm font-medium flex items-center gap-2">
                       <Mic2 className="h-4 w-4" />
-                      Voix sélectionnée : {AZURE_VOICE_PRESETS.find(p => p.id === selectedNiche)?.label || 'Par défaut'}
+                      Voix sélectionnée : {VOICE_PRESETS.find(p => p.id === selectedNiche)?.label || 'Par défaut'}
                     </Label>
                     <p className="text-xs text-muted-foreground">
-                      {selectedAzureVoice || AZURE_VOICE_PRESETS.find(p => p.id === selectedNiche)?.voice || 'fr-FR-DeniseNeural'}
+                      🎤 {VOICE_PRESETS.find(p => p.id === selectedNiche)?.voiceName || 'Lily'} (ElevenLabs Premium)
                       {' '} — Changez la voix dans le panneau de configuration ci-dessus
                     </p>
                   </div>

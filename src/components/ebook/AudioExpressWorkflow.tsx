@@ -39,13 +39,13 @@ const AUDIO_STEPS: AudioExpressStep[] = [
 ];
 
 const CATEGORIES = [
-  { value: 'enfants-3-8', label: '👶 Enfants 3-8 ans', voiceId: 'fr-FR-EloiseNeural' },
-  { value: 'ados-12-16', label: '🧒 Ados 12-16 ans', voiceId: 'fr-FR-BrigitteNeural' },
-  { value: 'thriller', label: '🔪 Thriller', voiceId: 'fr-FR-HenriNeural' },
-  { value: 'romance', label: '💕 Romance', voiceId: 'fr-FR-DeniseNeural' },
-  { value: 'saga', label: '📖 Saga', voiceId: 'fr-FR-DeniseNeural' },
-  { value: 'spiritualite', label: '🧘 Spiritualité', voiceId: 'fr-FR-AlainNeural' },
-  { value: 'marketing', label: '💼 Marketing', voiceId: 'fr-FR-JeromeNeural' },
+  { value: 'enfants-3-8', label: '👶 Enfants 3-8 ans', voiceId: 'FGY2WhTYpPnrIDTdsKH5', voiceName: 'Laura' },
+  { value: 'ados-12-16', label: '🧒 Ados 12-16 ans', voiceId: 'XrExE9yKIg1WjnnlVkGX', voiceName: 'Matilda' },
+  { value: 'thriller', label: '🔪 Thriller', voiceId: 'onwK4e9ZLuTAKqWW03F9', voiceName: 'Daniel' },
+  { value: 'romance', label: '💕 Romance', voiceId: 'EXAVITQu4vr4xnSDxMaL', voiceName: 'Sarah' },
+  { value: 'saga', label: '📖 Saga', voiceId: 'N2lVS1w4EtoT3dr4eOWO', voiceName: 'Callum' },
+  { value: 'spiritualite', label: '🧘 Spiritualité', voiceId: 'Xb7hH8MSUJpSbSDYk0k2', voiceName: 'Alice' },
+  { value: 'marketing', label: '💼 Marketing', voiceId: 'cjVigY5qzO86Huf0OWal', voiceName: 'Eric' },
 ];
 
 const AZURE_VOICES = [
