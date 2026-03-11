@@ -286,8 +286,8 @@ const PublicAudiobookPage = () => {
                 <span className="text-white/50 text-sm">{audiobook.play_count || 0} écoutes</span>
               </motion.div>
 
-              {/* Excerpt player — only if a real excerpt exists */}
-              {audiobook.excerpt_url && (
+              {/* Excerpt player — uses excerpt_url or falls back to full audio */}
+              {hasExcerpt && (
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
                   className="bg-white/[0.04] border border-white/[0.08] backdrop-blur-sm rounded-2xl p-5 md:p-6 mb-7"
                 >
