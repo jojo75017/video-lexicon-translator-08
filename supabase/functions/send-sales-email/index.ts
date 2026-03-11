@@ -39,8 +39,8 @@ const EMAIL_SEQUENCE = [
   },
 ];
 
-const DEMO_LINK = "https://ebookstudio.fr/demo";
-const OFFRES_LINK = "https://ebookstudio.fr/offres";
+const DEMO_LINK = "https://video-lexicon-translator-08.lovable.app/demo";
+const OFFRES_LINK = "https://video-lexicon-translator-08.lovable.app/offres";
 
 function getEmailBody(step: number, firstName: string): string {
   const name = firstName || "cher lecteur";
@@ -246,7 +246,7 @@ Deno.serve(async (req) => {
     const targetStep = body.step; // for manual: which step to send
     const prospectIds = body.prospect_ids; // for manual: specific prospects
 
-    const batchSize = body.batch_size || 30; // Limit batch to avoid timeout
+    const batchSize = body.batch_size || 50; // Increased batch for faster processing
 
     let query = supabase
       .from("sales_prospects")
@@ -279,7 +279,7 @@ Deno.serve(async (req) => {
     for (let i = 0; i < prospects.length; i++) {
       const prospect = prospects[i];
       
-      // Rate limit: max 2 emails/sec, wait 600ms between each
+      // Rate limit: max 2 emails/sec per Resend, use 600ms spacing
       if (i > 0) {
         await new Promise(resolve => setTimeout(resolve, 600));
       }
