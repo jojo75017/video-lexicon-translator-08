@@ -9,7 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import {
   Headphones, Search, Download, Trash2, Play,
-  Calendar, Music, RefreshCw, Clock, Volume2, Globe, Lock
+  Calendar, Music, RefreshCw, Clock, Volume2, Globe, Lock, Pencil
 } from 'lucide-react';
 
 interface LibraryAudiobook {
