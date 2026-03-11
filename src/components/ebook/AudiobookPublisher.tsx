@@ -411,6 +411,13 @@ export const AudiobookPublisher: React.FC<AudiobookPublisherProps> = ({
                   <Label>Extrait audio (MP3) — aperçu sur la fiche produit</Label>
                   <Input type="file" accept="audio/*" onChange={(e) => setExcerptFile(e.target.files?.[0] || null)} />
                   <p className="text-xs text-muted-foreground mt-1">Court extrait (30s à 2min) pour donner envie d'écouter</p>
+                  <div className="flex items-center gap-2 mt-2">
+                    <Checkbox id="add-jingle" checked={addJingle} onCheckedChange={(v) => setAddJingle(!!v)} />
+                    <Label htmlFor="add-jingle" className="text-xs flex items-center gap-1.5 cursor-pointer">
+                      <Music className="h-3.5 w-3.5 text-amber-500" />
+                      Ajouter le jingle d'intro (carillon 3s) avant l'extrait
+                    </Label>
+                  </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
