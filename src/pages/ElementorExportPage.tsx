@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { Copy, Check, Download, Code, Headphones, ArrowLeft, Eye } from 'lucide-react';
+import { Copy, Check, Download, Code, Headphones, ArrowLeft, Eye, Upload, Save, Image, DollarSign } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const ElementorExportPage = () => {
@@ -14,6 +15,14 @@ const ElementorExportPage = () => {
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(true);
   const [authMissing, setAuthMissing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Edit fields
+  const [editPrice, setEditPrice] = useState('');
+  const [editPaypal, setEditPaypal] = useState('');
+  const [editCoverUrl, setEditCoverUrl] = useState('');
 
   useEffect(() => {
     const fetchBooks = async () => {
@@ -48,11 +57,105 @@ const ElementorExportPage = () => {
     fetchBooks();
   }, []);
 
+  // Sync edit fields when a book is selected
+  useEffect(() => {
+    if (selectedBook) {
+      setEditPrice(selectedBook.price != null ? String(selectedBook.price) : '');
+      setEditPaypal(selectedBook.paypal_link || '');
+      setEditCoverUrl(selectedBook.cover_url || '');
+    }
+  }, [selectedBook?.id]);
+
   const formatDuration = (s: number | null) => {
     if (!s) return 'Durée inconnue';
     const h = Math.floor(s / 3600);
     const m = Math.floor((s % 3600) / 60);
     return h > 0 ? `${h}h${m}min` : `${m}min`;
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !selectedBook) return;
+
+    setUploading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) {
+        toast.error('Vous devez être connecté');
+        return;
+      }
+
+      const ext = file.name.split('.').pop();
+      const path = `${session.user.id}/covers/${selectedBook.id}.${ext}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('audiobooks')
+        .upload(path, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('audiobooks')
+        .getPublicUrl(path);
+
+      // Update DB
+      const { error: updateError } = await supabase
+        .from('audiobooks')
+        .update({ cover_url: publicUrl })
+        .eq('id', selectedBook.id);
+
+      if (updateError) throw updateError;
+
+      setEditCoverUrl(publicUrl);
+      const updated = { ...selectedBook, cover_url: publicUrl };
+      setSelectedBook(updated);
+      setAudiobooks(prev => prev.map(b => b.id === updated.id ? updated : b));
+      toast.success('Image de couverture uploadée ✅');
+    } catch (err: any) {
+      console.error('Upload error:', err);
+      toast.error('Erreur upload: ' + err.message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleSaveMetadata = async () => {
+    if (!selectedBook) return;
+    setSaving(true);
+
+    try {
+      const parsedPrice = editPrice.trim() ? Number.parseFloat(editPrice) : null;
+      if (editPrice.trim() && Number.isNaN(parsedPrice)) {
+        toast.error('Prix invalide');
+        setSaving(false);
+        return;
+      }
+
+      const { error } = await supabase
+        .from('audiobooks')
+        .update({
+          price: parsedPrice,
+          paypal_link: editPaypal.trim() || null,
+          cover_url: editCoverUrl.trim() || null,
+        })
+        .eq('id', selectedBook.id);
+
+      if (error) throw error;
+
+      const updated = {
+        ...selectedBook,
+        price: parsedPrice,
+        paypal_link: editPaypal.trim() || null,
+        cover_url: editCoverUrl.trim() || null,
+      };
+      setSelectedBook(updated);
+      setAudiobooks(prev => prev.map(b => b.id === updated.id ? updated : b));
+      toast.success('Fiche mise à jour ✅');
+    } catch (err: any) {
+      toast.error('Erreur: ' + err.message);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const generateElementorHtml = (book: any) => {
@@ -337,11 +440,15 @@ const ElementorExportPage = () => {
           : `<span class="free-badge">✓ GRATUIT</span>`
         }
       </div>
-      ${hasSlug
-        ? `<a href="${publicUrl}" class="eb-cta" target="_blank" rel="noopener">
-            🎧 Écouter maintenant
+      ${book.paypal_link
+        ? `<a href="${book.paypal_link}" class="eb-cta" target="_blank" rel="noopener">
+            💳 Acheter maintenant — ${price}
           </a>`
-        : `<span class="eb-cta" style="opacity:.6;cursor:not-allowed">🎧 Lien indisponible</span>`
+        : hasSlug
+          ? `<a href="${publicUrl}" class="eb-cta" target="_blank" rel="noopener">
+              🎧 Écouter maintenant
+            </a>`
+          : `<span class="eb-cta" style="opacity:.6;cursor:not-allowed">🎧 Lien indisponible</span>`
       }
     </div>
   </div>
@@ -471,7 +578,7 @@ const ElementorExportPage = () => {
       <div className="max-w-5xl mx-auto px-4 py-8">
         <div className="mb-6">
           <p className="text-slate-400 text-sm">
-            Sélectionnez un audiobook puis copiez le code HTML dans un widget <strong className="text-white">HTML personnalisé</strong> d'Elementor.
+            Sélectionnez un audiobook, configurez l'image / prix / PayPal, puis copiez le code HTML dans un widget <strong className="text-white">HTML personnalisé</strong> d'Elementor.
           </p>
         </div>
 
@@ -510,6 +617,11 @@ const ElementorExportPage = () => {
                   <div className="min-w-0">
                     <p className="font-medium text-white text-sm truncate">{book.title}</p>
                     <p className="text-xs text-slate-500">{book.author_name || 'Sans auteur'}</p>
+                    {book.price ? (
+                      <p className="text-xs text-amber-400 font-medium">{Number(book.price).toFixed(2)} €</p>
+                    ) : (
+                      <p className="text-xs text-slate-600">Pas de prix</p>
+                    )}
                   </div>
                   {selectedBook?.id === book.id && (
                     <Check className="w-4 h-4 text-amber-400 ml-auto flex-shrink-0" />
@@ -523,8 +635,93 @@ const ElementorExportPage = () => {
           <div className="lg:col-span-2 space-y-4">
             {selectedBook ? (
               <>
+                {/* ====== EDIT PANEL: Image, Prix, PayPal ====== */}
+                <Card className="bg-slate-900/50 border-amber-500/20 border">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm text-amber-400 flex items-center gap-2">
+                      ⚙️ Configurer la fiche produit
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {/* Image upload */}
+                    <div>
+                      <label className="text-xs text-slate-400 font-medium mb-1.5 flex items-center gap-1.5">
+                        <Image className="w-3.5 h-3.5" /> Image de couverture
+                      </label>
+                      <div className="flex gap-2 items-center">
+                        {editCoverUrl && (
+                          <img src={editCoverUrl} alt="Cover" className="w-14 h-14 rounded-lg object-cover border border-slate-700" />
+                        )}
+                        <div className="flex-1 flex gap-2">
+                          <Input
+                            placeholder="URL de l'image ou uploadez →"
+                            value={editCoverUrl}
+                            onChange={e => setEditCoverUrl(e.target.value)}
+                            className="bg-slate-800/50 border-slate-700 text-white text-sm"
+                          />
+                          <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={handleImageUpload}
+                          />
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={uploading}
+                            className="border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800 whitespace-nowrap"
+                          >
+                            <Upload className="w-3.5 h-3.5 mr-1" />
+                            {uploading ? 'Upload...' : 'Uploader'}
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Price + PayPal */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="text-xs text-slate-400 font-medium mb-1.5 flex items-center gap-1.5">
+                          <DollarSign className="w-3.5 h-3.5" /> Prix (€)
+                        </label>
+                        <Input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          placeholder="9.99"
+                          value={editPrice}
+                          onChange={e => setEditPrice(e.target.value)}
+                          className="bg-slate-800/50 border-slate-700 text-white text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs text-slate-400 font-medium mb-1.5 flex items-center gap-1.5">
+                          💳 Lien PayPal
+                        </label>
+                        <Input
+                          placeholder="https://paypal.me/..."
+                          value={editPaypal}
+                          onChange={e => setEditPaypal(e.target.value)}
+                          className="bg-slate-800/50 border-slate-700 text-white text-sm"
+                        />
+                      </div>
+                    </div>
+
+                    <Button
+                      onClick={handleSaveMetadata}
+                      disabled={saving}
+                      className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-900 font-bold rounded-xl gap-2 w-full"
+                    >
+                      <Save className="w-4 h-4" />
+                      {saving ? 'Enregistrement...' : 'Enregistrer la fiche'}
+                    </Button>
+                  </CardContent>
+                </Card>
+
                 {/* Actions */}
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 flex-wrap">
                   <Button onClick={handleCopy} className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-900 font-bold rounded-xl gap-2">
                     {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                     {copied ? 'Copié !' : 'Copier le HTML'}
@@ -533,20 +730,18 @@ const ElementorExportPage = () => {
                     <Download className="w-4 h-4" />
                     Télécharger .html
                   </Button>
-                  {selectedBook.slug && (
-                    <Button
-                      variant="ghost"
-                      onClick={async () => {
-                        const exportableBook = await ensureBookPublicForExport(selectedBook);
-                        if (!exportableBook?.slug) return;
-                        window.open(`/audiobook/${exportableBook.slug}`, '_blank');
-                      }}
-                      className="text-slate-400 hover:text-white rounded-xl gap-2"
-                    >
-                      <Eye className="w-4 h-4" />
-                      Voir la fiche
-                    </Button>
-                  )}
+                  <Button
+                    variant="ghost"
+                    onClick={async () => {
+                      const exportableBook = await ensureBookPublicForExport(selectedBook);
+                      if (!exportableBook?.slug) return;
+                      window.open(`/audiobook/${exportableBook.slug}`, '_blank');
+                    }}
+                    className="text-slate-400 hover:text-white rounded-xl gap-2"
+                  >
+                    <Eye className="w-4 h-4" />
+                    Voir la page publique
+                  </Button>
                 </div>
 
                 {/* Instructions */}
@@ -557,10 +752,11 @@ const ElementorExportPage = () => {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-2 text-sm text-slate-400">
-                    <p><span className="text-white font-medium">1.</span> Copiez le code HTML ci-dessous</p>
-                    <p><span className="text-white font-medium">2.</span> Dans Elementor, ajoutez un widget <strong className="text-amber-400">HTML</strong></p>
-                    <p><span className="text-white font-medium">3.</span> Collez le code dans le champ HTML du widget</p>
-                    <p><span className="text-white font-medium">4.</span> Publiez votre page — c'est prêt !</p>
+                    <p><span className="text-white font-medium">1.</span> Configurez l'image, le prix et le lien PayPal ci-dessus</p>
+                    <p><span className="text-white font-medium">2.</span> Copiez le code HTML ci-dessous</p>
+                    <p><span className="text-white font-medium">3.</span> Dans Elementor, ajoutez un widget <strong className="text-amber-400">HTML</strong></p>
+                    <p><span className="text-white font-medium">4.</span> Collez le code dans le champ HTML du widget</p>
+                    <p><span className="text-white font-medium">5.</span> Publiez votre page — c'est prêt !</p>
                   </CardContent>
                 </Card>
 
@@ -598,7 +794,7 @@ const ElementorExportPage = () => {
                 <div className="text-center p-8">
                   <Code className="w-12 h-12 text-slate-700 mx-auto mb-4" />
                   <h3 className="text-lg font-semibold text-white mb-2">Sélectionnez un audiobook</h3>
-                  <p className="text-slate-500 text-sm">Choisissez un livre audio à gauche pour générer le code HTML Elementor</p>
+                  <p className="text-slate-500 text-sm">Choisissez un livre audio à gauche pour configurer et générer le code HTML Elementor</p>
                 </div>
               </Card>
             )}
