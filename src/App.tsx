@@ -453,6 +453,7 @@ const App = () => {
             <Route path="/audiobook-demo" element={<AudiobookDemoPage />} />
             <Route path="/audiobook/:slug" element={<PublicAudiobookPage />} />
             <Route path="/audiobook-embed/:slug" element={<AudiobookEmbedPage />} />
+            <Route path="/audiobook-merci/:slug" element={<AudiobookThankYouPage />} />
             <Route path="/formation-embed" element={<FormationEmbedPage />} />
             <Route path="/elementor-export" element={<ElementorExportPage />} />
             
