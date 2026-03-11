@@ -57,26 +57,35 @@ interface WebSpeechVoice {
   description: string;
 }
 
-// Azure Neural Voices par niche
-const AZURE_VOICE_PRESETS = [
-  { id: 'enfants-3-6', label: '👶 Enfants (3-6 ans)', voice: 'fr-FR-EloiseNeural', description: 'Douce et joyeuse' },
-  { id: 'enfants-6-12', label: '🧒 Enfants (6-12 ans)', voice: 'fr-FR-BrigitteNeural', description: 'Narrative et entraînante' },
-  { id: 'thriller', label: '🔪 Thriller / Policier', voice: 'fr-FR-HenriNeural', description: 'Suspense, débit ralenti' },
-  { id: 'romance', label: '💕 Romance / Romans', voice: 'fr-FR-DeniseNeural', description: 'Chaleureuse et expressive' },
-  { id: 'spiritualite', label: '🧘 Spiritualité', voice: 'fr-FR-AlainNeural', description: 'Calme et apaisante' },
-  { id: 'business', label: '💼 Marketing / Business', voice: 'fr-FR-JeromeNeural', description: 'Dynamique et professionnelle' },
-  { id: 'histoire', label: '📚 Histoire', voice: 'fr-FR-CelesteNeural', description: 'Claire et éducative' },
-  { id: 'default', label: '🎙️ Voix par défaut', voice: 'fr-FR-DeniseNeural', description: 'Polyvalente' },
+// ElevenLabs Premium Voices par niche (moteur principal)
+const VOICE_PRESETS = [
+  { id: 'enfants-3-6', label: '👶 Enfants (3-6 ans)', voiceId: 'FGY2WhTYpPnrIDTdsKH5', voiceName: 'Laura', description: 'Douce, chaleureuse et rassurante', engine: 'elevenlabs' },
+  { id: 'enfants-6-12', label: '🧒 Enfants (6-12 ans)', voiceId: 'XrExE9yKIg1WjnnlVkGX', voiceName: 'Matilda', description: 'Narrative et entraînante', engine: 'elevenlabs' },
+  { id: 'thriller', label: '🔪 Thriller / Policier', voiceId: 'onwK4e9ZLuTAKqWW03F9', voiceName: 'Daniel', description: 'Voix grave, suspense intense', engine: 'elevenlabs' },
+  { id: 'romance', label: '💕 Romance / Romans', voiceId: 'EXAVITQu4vr4xnSDxMaL', voiceName: 'Sarah', description: 'Sensuelle et expressive', engine: 'elevenlabs' },
+  { id: 'spiritualite', label: '🧘 Spiritualité', voiceId: 'Xb7hH8MSUJpSbSDYk0k2', voiceName: 'Alice', description: 'Calme, apaisante et profonde', engine: 'elevenlabs' },
+  { id: 'business', label: '💼 Marketing / Business', voiceId: 'cjVigY5qzO86Huf0OWal', voiceName: 'Eric', description: 'Dynamique et professionnel', engine: 'elevenlabs' },
+  { id: 'histoire', label: '📚 Histoire / Éducation', voiceId: 'JBFqnCBsd6RMkjVDRZzb', voiceName: 'George', description: 'Claire, posée et éducative', engine: 'elevenlabs' },
+  { id: 'saga', label: '⚔️ Saga / Fantasy', voiceId: 'N2lVS1w4EtoT3dr4eOWO', voiceName: 'Callum', description: 'Épique et immersive', engine: 'elevenlabs' },
+  { id: 'default', label: '🎙️ Voix Premium (défaut)', voiceId: 'pFZP5JQG7iQjIQuC4Bku', voiceName: 'Lily', description: 'Polyvalente, naturelle et fluide', engine: 'elevenlabs' },
 ] as const;
 
-const AZURE_VOICES_LIST = [
-  { id: 'fr-FR-EloiseNeural', name: 'Eloise (Enfantine)', lang: 'fr-FR' },
-  { id: 'fr-FR-BrigitteNeural', name: 'Brigitte (Narrative)', lang: 'fr-FR' },
-  { id: 'fr-FR-HenriNeural', name: 'Henri (Masculin grave)', lang: 'fr-FR' },
-  { id: 'fr-FR-DeniseNeural', name: 'Denise (Féminine chaleureuse)', lang: 'fr-FR' },
-  { id: 'fr-FR-AlainNeural', name: 'Alain (Masculin calme)', lang: 'fr-FR' },
-  { id: 'fr-FR-JeromeNeural', name: 'Jérôme (Dynamique)', lang: 'fr-FR' },
-  { id: 'fr-FR-CelesteNeural', name: 'Céleste (Éducative)', lang: 'fr-FR' },
+const ELEVENLABS_VOICES_LIST = [
+  { id: 'EXAVITQu4vr4xnSDxMaL', name: 'Sarah (Narrative douce)', lang: 'fr' },
+  { id: 'FGY2WhTYpPnrIDTdsKH5', name: 'Laura (Chaleureuse)', lang: 'fr' },
+  { id: 'XrExE9yKIg1WjnnlVkGX', name: 'Matilda (Entraînante)', lang: 'fr' },
+  { id: 'Xb7hH8MSUJpSbSDYk0k2', name: 'Alice (Apaisante)', lang: 'fr' },
+  { id: 'pFZP5JQG7iQjIQuC4Bku', name: 'Lily (Polyvalente)', lang: 'fr' },
+  { id: 'cgSgspJ2msm6clMCkdW9', name: 'Jessica (Expressive)', lang: 'fr' },
+  { id: 'onwK4e9ZLuTAKqWW03F9', name: 'Daniel (Masculin profond)', lang: 'fr' },
+  { id: 'cjVigY5qzO86Huf0OWal', name: 'Eric (Dynamique)', lang: 'fr' },
+  { id: 'JBFqnCBsd6RMkjVDRZzb', name: 'George (Posé)', lang: 'fr' },
+  { id: 'N2lVS1w4EtoT3dr4eOWO', name: 'Callum (Épique)', lang: 'fr' },
+  { id: 'nPczCjzI2devNBz1zQrb', name: 'Brian (Narrateur)', lang: 'fr' },
+  { id: 'TX3LPaxmHKxFdv7VOQHJ', name: 'Liam (Jeune)', lang: 'fr' },
+  { id: 'IKne3meq5aSn9XLyUdCD', name: 'Charlie (Conversationnel)', lang: 'fr' },
+  { id: 'CwhRBWXzGAHq8TQ4Fs17', name: 'Roger (Classique)', lang: 'fr' },
+  { id: 'SAz9YHcvj6GT2YYXdXww', name: 'River (Non-binaire)', lang: 'fr' },
 ];
 
 export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
