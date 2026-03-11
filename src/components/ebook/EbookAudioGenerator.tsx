@@ -57,26 +57,35 @@ interface WebSpeechVoice {
   description: string;
 }
 
-// Azure Neural Voices par niche
-const AZURE_VOICE_PRESETS = [
-  { id: 'enfants-3-6', label: '👶 Enfants (3-6 ans)', voice: 'fr-FR-EloiseNeural', description: 'Douce et joyeuse' },
-  { id: 'enfants-6-12', label: '🧒 Enfants (6-12 ans)', voice: 'fr-FR-BrigitteNeural', description: 'Narrative et entraînante' },
-  { id: 'thriller', label: '🔪 Thriller / Policier', voice: 'fr-FR-HenriNeural', description: 'Suspense, débit ralenti' },
-  { id: 'romance', label: '💕 Romance / Romans', voice: 'fr-FR-DeniseNeural', description: 'Chaleureuse et expressive' },
-  { id: 'spiritualite', label: '🧘 Spiritualité', voice: 'fr-FR-AlainNeural', description: 'Calme et apaisante' },
-  { id: 'business', label: '💼 Marketing / Business', voice: 'fr-FR-JeromeNeural', description: 'Dynamique et professionnelle' },
-  { id: 'histoire', label: '📚 Histoire', voice: 'fr-FR-CelesteNeural', description: 'Claire et éducative' },
-  { id: 'default', label: '🎙️ Voix par défaut', voice: 'fr-FR-DeniseNeural', description: 'Polyvalente' },
+// ElevenLabs Premium Voices par niche (moteur principal)
+const VOICE_PRESETS = [
+  { id: 'enfants-3-6', label: '👶 Enfants (3-6 ans)', voiceId: 'FGY2WhTYpPnrIDTdsKH5', voiceName: 'Laura', description: 'Douce, chaleureuse et rassurante', engine: 'elevenlabs' },
+  { id: 'enfants-6-12', label: '🧒 Enfants (6-12 ans)', voiceId: 'XrExE9yKIg1WjnnlVkGX', voiceName: 'Matilda', description: 'Narrative et entraînante', engine: 'elevenlabs' },
+  { id: 'thriller', label: '🔪 Thriller / Policier', voiceId: 'onwK4e9ZLuTAKqWW03F9', voiceName: 'Daniel', description: 'Voix grave, suspense intense', engine: 'elevenlabs' },
+  { id: 'romance', label: '💕 Romance / Romans', voiceId: 'EXAVITQu4vr4xnSDxMaL', voiceName: 'Sarah', description: 'Sensuelle et expressive', engine: 'elevenlabs' },
+  { id: 'spiritualite', label: '🧘 Spiritualité', voiceId: 'Xb7hH8MSUJpSbSDYk0k2', voiceName: 'Alice', description: 'Calme, apaisante et profonde', engine: 'elevenlabs' },
+  { id: 'business', label: '💼 Marketing / Business', voiceId: 'cjVigY5qzO86Huf0OWal', voiceName: 'Eric', description: 'Dynamique et professionnel', engine: 'elevenlabs' },
+  { id: 'histoire', label: '📚 Histoire / Éducation', voiceId: 'JBFqnCBsd6RMkjVDRZzb', voiceName: 'George', description: 'Claire, posée et éducative', engine: 'elevenlabs' },
+  { id: 'saga', label: '⚔️ Saga / Fantasy', voiceId: 'N2lVS1w4EtoT3dr4eOWO', voiceName: 'Callum', description: 'Épique et immersive', engine: 'elevenlabs' },
+  { id: 'default', label: '🎙️ Voix Premium (défaut)', voiceId: 'pFZP5JQG7iQjIQuC4Bku', voiceName: 'Lily', description: 'Polyvalente, naturelle et fluide', engine: 'elevenlabs' },
 ] as const;
 
-const AZURE_VOICES_LIST = [
-  { id: 'fr-FR-EloiseNeural', name: 'Eloise (Enfantine)', lang: 'fr-FR' },
-  { id: 'fr-FR-BrigitteNeural', name: 'Brigitte (Narrative)', lang: 'fr-FR' },
-  { id: 'fr-FR-HenriNeural', name: 'Henri (Masculin grave)', lang: 'fr-FR' },
-  { id: 'fr-FR-DeniseNeural', name: 'Denise (Féminine chaleureuse)', lang: 'fr-FR' },
-  { id: 'fr-FR-AlainNeural', name: 'Alain (Masculin calme)', lang: 'fr-FR' },
-  { id: 'fr-FR-JeromeNeural', name: 'Jérôme (Dynamique)', lang: 'fr-FR' },
-  { id: 'fr-FR-CelesteNeural', name: 'Céleste (Éducative)', lang: 'fr-FR' },
+const ELEVENLABS_VOICES_LIST = [
+  { id: 'EXAVITQu4vr4xnSDxMaL', name: 'Sarah (Narrative douce)', lang: 'fr' },
+  { id: 'FGY2WhTYpPnrIDTdsKH5', name: 'Laura (Chaleureuse)', lang: 'fr' },
+  { id: 'XrExE9yKIg1WjnnlVkGX', name: 'Matilda (Entraînante)', lang: 'fr' },
+  { id: 'Xb7hH8MSUJpSbSDYk0k2', name: 'Alice (Apaisante)', lang: 'fr' },
+  { id: 'pFZP5JQG7iQjIQuC4Bku', name: 'Lily (Polyvalente)', lang: 'fr' },
+  { id: 'cgSgspJ2msm6clMCkdW9', name: 'Jessica (Expressive)', lang: 'fr' },
+  { id: 'onwK4e9ZLuTAKqWW03F9', name: 'Daniel (Masculin profond)', lang: 'fr' },
+  { id: 'cjVigY5qzO86Huf0OWal', name: 'Eric (Dynamique)', lang: 'fr' },
+  { id: 'JBFqnCBsd6RMkjVDRZzb', name: 'George (Posé)', lang: 'fr' },
+  { id: 'N2lVS1w4EtoT3dr4eOWO', name: 'Callum (Épique)', lang: 'fr' },
+  { id: 'nPczCjzI2devNBz1zQrb', name: 'Brian (Narrateur)', lang: 'fr' },
+  { id: 'TX3LPaxmHKxFdv7VOQHJ', name: 'Liam (Jeune)', lang: 'fr' },
+  { id: 'IKne3meq5aSn9XLyUdCD', name: 'Charlie (Conversationnel)', lang: 'fr' },
+  { id: 'CwhRBWXzGAHq8TQ4Fs17', name: 'Roger (Classique)', lang: 'fr' },
+  { id: 'SAz9YHcvj6GT2YYXdXww', name: 'River (Non-binaire)', lang: 'fr' },
 ];
 
 export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
@@ -124,11 +133,11 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
   const [isDownloadingIntro, setIsDownloadingIntro] = useState(false);
   const jingleAudioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Azure Speech niche & voice
-  const AUTO_AZURE_VOICE = '__auto_azure_voice__';
+  // ElevenLabs Premium voice selection
+  const AUTO_VOICE = '__auto_voice__';
   const [selectedNiche, setSelectedNiche] = useState('default');
-  const [selectedAzureVoice, setSelectedAzureVoice] = useState(AUTO_AZURE_VOICE);
-  const [useAzureForExport, setUseAzureForExport] = useState(true);
+  const [selectedPremiumVoice, setSelectedPremiumVoice] = useState(AUTO_VOICE);
+  const [useElevenLabsForExport, setUseElevenLabsForExport] = useState(true);
   // Timer
   useEffect(() => {
     if (isSpeaking && isPlaying) {
@@ -551,8 +560,30 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
     for (const chunk of chunks) {
       let response: Response;
       
-      if (useAzureForExport) {
-        // Use Azure Speech TTS
+      if (useElevenLabsForExport) {
+        // Use ElevenLabs Premium TTS (primary)
+        const voiceId = selectedPremiumVoice === AUTO_VOICE
+          ? VOICE_PRESETS.find(p => p.id === selectedNiche)?.voiceId || 'pFZP5JQG7iQjIQuC4Bku'
+          : selectedPremiumVoice;
+        
+        response = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ 
+              text: chunk,
+              voiceId,
+              modelId: 'eleven_multilingual_v2',
+            }),
+          }
+        );
+      } else {
+        // Fallback to Azure Speech
         response = await fetch(
           `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/azure-speech-tts`,
           {
@@ -565,22 +596,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
             body: JSON.stringify({ 
               text: chunk,
               niche: selectedNiche,
-              voiceName: selectedAzureVoice === AUTO_AZURE_VOICE ? undefined : selectedAzureVoice,
             }),
-          }
-        );
-      } else {
-        // Fallback to ElevenLabs
-        response = await fetch(
-          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ text: chunk }),
           }
         );
       }
@@ -729,9 +745,9 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
       const { data: urlData } = supabase.storage.from('audiobooks').getPublicUrl(fileName);
 
       // Determine voice name
-      const voiceName = selectedAzureVoice === AUTO_AZURE_VOICE
-        ? AZURE_VOICE_PRESETS.find(p => p.id === selectedNiche)?.voice || 'fr-FR-DeniseNeural'
-        : selectedAzureVoice;
+      const voiceName = selectedPremiumVoice === AUTO_VOICE
+        ? VOICE_PRESETS.find(p => p.id === selectedNiche)?.voiceName || 'Lily (ElevenLabs)'
+        : ELEVENLABS_VOICES_LIST.find(v => v.id === selectedPremiumVoice)?.name || selectedPremiumVoice;
 
       // Insert into audiobooks table
       const { error: dbError } = await supabase.from('audiobooks').insert({
@@ -762,27 +778,27 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
     <Card className="bg-muted/30">
       <CardContent className="pt-4 space-y-4">
         {/* Azure Voice by Niche */}
-        <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+        <div className="p-3 bg-primary/10 border border-primary/20 rounded-lg">
           <Label className="text-sm font-semibold flex items-center gap-2 mb-2">
-            <Mic2 className="h-4 w-4 text-emerald-500" />
-            Voix Azure Neural (Export MP3)
+            <Mic2 className="h-4 w-4 text-primary" />
+            🎧 Voix Premium ElevenLabs (Export MP3)
           </Label>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <Label className="text-xs">Thématique / Niche</Label>
               <Select value={selectedNiche} onValueChange={(val) => {
                 setSelectedNiche(val);
-                const preset = AZURE_VOICE_PRESETS.find(p => p.id === val);
-                if (preset) setSelectedAzureVoice(preset.voice);
+                const preset = VOICE_PRESETS.find(p => p.id === val);
+                if (preset) setSelectedPremiumVoice(preset.voiceId);
               }}>
                 <SelectTrigger className="mt-1">
                   <SelectValue placeholder="Choisir une thématique" />
                 </SelectTrigger>
                 <SelectContent>
-                  {AZURE_VOICE_PRESETS.map(preset => (
+                  {VOICE_PRESETS.map(preset => (
                     <SelectItem key={preset.id} value={preset.id}>
                       <span>{preset.label}</span>
-                      <span className="text-xs text-muted-foreground ml-1">— {preset.description}</span>
+                      <span className="text-xs text-muted-foreground ml-1">— {preset.voiceName} · {preset.description}</span>
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -790,21 +806,24 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
             </div>
             <div>
               <Label className="text-xs">Voix manuelle (optionnel)</Label>
-              <Select value={selectedAzureVoice} onValueChange={setSelectedAzureVoice}>
+              <Select value={selectedPremiumVoice} onValueChange={setSelectedPremiumVoice}>
                 <SelectTrigger className="mt-1">
                   <SelectValue placeholder="Auto (selon niche)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={AUTO_AZURE_VOICE}>Auto (selon niche)</SelectItem>
-                  {AZURE_VOICES_LIST.map(v => (
+                  <SelectItem value={AUTO_VOICE}>🎯 Auto (selon niche)</SelectItem>
+                  {ELEVENLABS_VOICES_LIST.map(v => (
                     <SelectItem key={v.id} value={v.id}>
-                      {v.name}
+                      🎤 {v.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
           </div>
+          <p className="text-xs text-muted-foreground mt-2">
+            ✨ Moteur ElevenLabs Multilingual v2 — Voix ultra-réalistes, émotions naturelles. Azure en fallback automatique.
+          </p>
         </div>
 
         {/* Web Speech controls for preview */}
@@ -1312,10 +1331,10 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                   <div className="p-3 bg-muted/30 rounded-lg space-y-2">
                     <Label className="text-sm font-medium flex items-center gap-2">
                       <Mic2 className="h-4 w-4" />
-                      Voix sélectionnée : {AZURE_VOICE_PRESETS.find(p => p.id === selectedNiche)?.label || 'Par défaut'}
+                      Voix sélectionnée : {VOICE_PRESETS.find(p => p.id === selectedNiche)?.label || 'Par défaut'}
                     </Label>
                     <p className="text-xs text-muted-foreground">
-                      {selectedAzureVoice || AZURE_VOICE_PRESETS.find(p => p.id === selectedNiche)?.voice || 'fr-FR-DeniseNeural'}
+                      🎤 {VOICE_PRESETS.find(p => p.id === selectedNiche)?.voiceName || 'Lily'} (ElevenLabs Premium)
                       {' '} — Changez la voix dans le panneau de configuration ci-dessus
                     </p>
                   </div>
