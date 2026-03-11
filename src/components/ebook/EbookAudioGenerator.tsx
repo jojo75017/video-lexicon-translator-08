@@ -133,11 +133,11 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
   const [isDownloadingIntro, setIsDownloadingIntro] = useState(false);
   const jingleAudioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Azure Speech niche & voice
-  const AUTO_AZURE_VOICE = '__auto_azure_voice__';
+  // ElevenLabs Premium voice selection
+  const AUTO_VOICE = '__auto_voice__';
   const [selectedNiche, setSelectedNiche] = useState('default');
-  const [selectedAzureVoice, setSelectedAzureVoice] = useState(AUTO_AZURE_VOICE);
-  const [useAzureForExport, setUseAzureForExport] = useState(true);
+  const [selectedPremiumVoice, setSelectedPremiumVoice] = useState(AUTO_VOICE);
+  const [useElevenLabsForExport, setUseElevenLabsForExport] = useState(true);
   // Timer
   useEffect(() => {
     if (isSpeaking && isPlaying) {
