@@ -771,7 +771,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
     } catch (err: any) {
       console.error('Save to library error:', err);
     }
-
+  };
 
 
   const VoiceConfig = ({ compact = false }: { compact?: boolean }) => (
