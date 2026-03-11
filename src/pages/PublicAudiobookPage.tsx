@@ -184,14 +184,27 @@ const PublicAudiobookPage = () => {
   if (loading) return <LoadingState />;
   if (!audiobook) return <NotFoundState />;
 
+  // Use excerpt_url if available, otherwise fall back to full audio for preview
+  const excerptSrc = audiobook.excerpt_url || audiobook.audio_url;
+  const hasExcerpt = !!excerptSrc;
+
   const descriptionShort = audiobook.description?.slice(0, 300);
   const hasLongDesc = audiobook.description && audiobook.description.length > 300;
   const createdDate = audiobook.created_at ? new Date(audiobook.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }) : null;
   const hasPrice = audiobook.price && audiobook.price > 0;
 
+  // Format PayPal link: if it's an email, convert to paypal.me URL
+  const formatPaypalLink = (link: string | null) => {
+    if (!link) return null;
+    if (link.startsWith('http')) return link;
+    if (link.includes('@')) return `https://www.paypal.com/paypalme/${link}`;
+    return `https://www.paypal.me/${link}`;
+  };
+  const paypalUrl = formatPaypalLink(audiobook.paypal_link);
+
   return (
     <div className="min-h-screen bg-[#0A0A0F] text-white">
-      {audiobook.excerpt_url && <audio ref={excerptRef} src={audiobook.excerpt_url} preload="metadata" />}
+      {hasExcerpt && <audio ref={excerptRef} src={excerptSrc} preload="metadata" />}
 
       {/* Urgency Banner */}
       {hasPrice && (
