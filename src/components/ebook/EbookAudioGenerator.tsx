@@ -560,8 +560,30 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
     for (const chunk of chunks) {
       let response: Response;
       
-      if (useAzureForExport) {
-        // Use Azure Speech TTS
+      if (useElevenLabsForExport) {
+        // Use ElevenLabs Premium TTS (primary)
+        const voiceId = selectedPremiumVoice === AUTO_VOICE
+          ? VOICE_PRESETS.find(p => p.id === selectedNiche)?.voiceId || 'pFZP5JQG7iQjIQuC4Bku'
+          : selectedPremiumVoice;
+        
+        response = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ 
+              text: chunk,
+              voiceId,
+              modelId: 'eleven_multilingual_v2',
+            }),
+          }
+        );
+      } else {
+        // Fallback to Azure Speech
         response = await fetch(
           `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/azure-speech-tts`,
           {
@@ -574,22 +596,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
             body: JSON.stringify({ 
               text: chunk,
               niche: selectedNiche,
-              voiceName: selectedAzureVoice === AUTO_AZURE_VOICE ? undefined : selectedAzureVoice,
             }),
-          }
-        );
-      } else {
-        // Fallback to ElevenLabs
-        response = await fetch(
-          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ text: chunk }),
           }
         );
       }
