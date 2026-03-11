@@ -138,6 +138,67 @@ export const AudiobookLibrary: React.FC = () => {
       : `${m}:${sec.toString().padStart(2, '0')}`;
   };
 
+  const generateSlug = (text: string) => {
+    const base = text
+      .toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '')
+      .substring(0, 60);
+    return `${base}-${Math.random().toString(36).substring(2, 7)}`;
+  };
+
+  const openEditDialog = (book: LibraryAudiobook) => {
+    setEditDialog({
+      open: true,
+      book,
+      coverUrl: book.cover_url || '',
+      paypalLink: book.paypal_link || '',
+      excerptUrl: book.excerpt_url || '',
+      price: typeof book.price === 'number' ? String(book.price) : '',
+      isPublic: !!book.is_public,
+      slug: book.slug || '',
+    });
+  };
+
+  const saveMetadata = async () => {
+    if (!editDialog?.book) return;
+
+    const normalizedPrice = editDialog.price.trim();
+    const parsedPrice = normalizedPrice ? Number.parseFloat(normalizedPrice) : null;
+
+    if (normalizedPrice && Number.isNaN(parsedPrice)) {
+      toast.error('Prix invalide');
+      return;
+    }
+
+    const shouldBePublic = editDialog.isPublic;
+    const finalSlug = shouldBePublic
+      ? (editDialog.slug.trim() || editDialog.book.slug || generateSlug(editDialog.book.title))
+      : (editDialog.slug.trim() || editDialog.book.slug || null);
+
+    const { error } = await supabase
+      .from('audiobooks')
+      .update({
+        cover_url: editDialog.coverUrl.trim() || null,
+        paypal_link: editDialog.paypalLink.trim() || null,
+        excerpt_url: editDialog.excerptUrl.trim() || null,
+        price: parsedPrice,
+        is_public: shouldBePublic,
+        slug: finalSlug,
+      })
+      .eq('id', editDialog.book.id);
+
+    if (error) {
+      toast.error(`Erreur de mise à jour: ${error.message}`);
+      return;
+    }
+
+    toast.success('Fiche mise à jour !');
+    setEditDialog(null);
+    fetchAudiobooks();
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
