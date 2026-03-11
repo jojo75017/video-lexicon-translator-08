@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { Copy, Check, Download, Code, Headphones, ArrowLeft, Eye, Upload, Save, Image, DollarSign } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { generateAudiobookHtml } from '@/utils/generateAudiobookHtml';
 
 const ElementorExportPage = () => {
   const navigate = useNavigate();
