@@ -459,12 +459,12 @@ const ElementorExportPage = () => {
   </div>
 
   <!-- PLAYER EMBED -->
-  ${book.excerpt_url ? `
+  ${playerSrc ? `
   <div class="eb-player-section">
     <h3>🎧 Écouter un extrait</h3>
     <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px 20px;">
       <audio controls preload="none" controlsList="nodownload" style="width:100%;border-radius:8px;outline:none;">
-        <source src="${book.excerpt_url}" type="audio/mpeg">
+        <source src="${playerSrc}" type="audio/mpeg">
       </audio>
     </div>
   </div>
