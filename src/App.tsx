@@ -51,6 +51,7 @@ import KdpKeywordResearchPage from './pages/KdpKeywordResearchPage';
 import PublicAudiobookPage from './pages/PublicAudiobookPage';
 import AudiobookEmbedPage from './pages/AudiobookEmbedPage';
 import AudiobookDemoPage from './pages/AudiobookDemoPage';
+import AudiobookThankYouPage from './pages/AudiobookThankYouPage';
 import FormationEmbedPage from './pages/FormationEmbedPage';
 import ElementorExportPage from './pages/ElementorExportPage';
 import { SubscriptionAuth } from '@/components/SubscriptionAuth';
@@ -453,6 +454,7 @@ const App = () => {
             <Route path="/audiobook-demo" element={<AudiobookDemoPage />} />
             <Route path="/audiobook/:slug" element={<PublicAudiobookPage />} />
             <Route path="/audiobook-embed/:slug" element={<AudiobookEmbedPage />} />
+            <Route path="/audiobook-merci/:slug" element={<AudiobookThankYouPage />} />
             <Route path="/formation-embed" element={<FormationEmbedPage />} />
             <Route path="/elementor-export" element={<ElementorExportPage />} />
             
