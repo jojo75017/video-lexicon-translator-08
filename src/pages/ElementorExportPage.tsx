@@ -160,6 +160,23 @@ const ElementorExportPage = () => {
   };
 
   const generateElementorHtml = (book: any) => {
+    return generateAudiobookHtml({
+      title: book.title,
+      author_name: book.author_name,
+      voice_name: book.voice_name,
+      description: book.description,
+      cover_url: book.cover_url,
+      price: book.price,
+      paypal_link: book.paypal_link,
+      stripe_link: book.stripe_link,
+      excerpt_url: book.excerpt_url,
+      audio_url: book.audio_url,
+      duration_seconds: book.duration_seconds,
+      play_count: book.play_count,
+      created_at: book.created_at,
+      slug: book.slug,
+    });
+  
     const origin = window.location.origin;
     const safeSlug = book.slug || '';
     const hasSlug = Boolean(safeSlug);

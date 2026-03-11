@@ -59,10 +59,12 @@ export function generateAudiobookHtml(book: AudiobookData): string {
   const buyButtons = [];
   if (stripeLink) {
     buyButtons.push(`<a href="${escHtml(stripeLink)}" target="_blank" rel="noopener" class="ab-btn ab-btn-primary">🛒 Acheter — ${price} €</a>`);
+  } else if (price && paypalLink) {
+    buyButtons.push(`<a href="${escHtml(paypalLink)}" target="_blank" rel="noopener" class="ab-btn ab-btn-primary">🛒 Acheter — ${price} €</a>`);
   } else if (price) {
     buyButtons.push(`<span class="ab-btn ab-btn-primary" style="cursor:default;">🛒 ${price} €</span>`);
   }
-  if (paypalLink) {
+  if (paypalLink && !stripeLink) {
     buyButtons.push(`<a href="${escHtml(paypalLink)}" target="_blank" rel="noopener" class="ab-btn ab-btn-paypal">💳 Payer via PayPal</a>`);
   }
 
