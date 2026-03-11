@@ -191,7 +191,6 @@ const PublicAudiobookPage = () => {
 
   return (
     <div className="min-h-screen bg-[#0A0A0F] text-white">
-      {audiobook.audio_url && <audio ref={audioRef} src={audiobook.audio_url} preload="metadata" />}
       {audiobook.excerpt_url && <audio ref={excerptRef} src={audiobook.excerpt_url} preload="metadata" />}
 
       {/* Urgency Banner */}
@@ -274,8 +273,8 @@ const PublicAudiobookPage = () => {
                 <span className="text-white/50 text-sm">{audiobook.play_count || 0} écoutes</span>
               </motion.div>
 
-              {/* Excerpt player */}
-              {(audiobook.excerpt_url || audiobook.audio_url) && (
+              {/* Excerpt player — only if a real excerpt exists */}
+              {audiobook.excerpt_url && (
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
                   className="bg-white/[0.04] border border-white/[0.08] backdrop-blur-sm rounded-2xl p-5 md:p-6 mb-7"
                 >
@@ -286,24 +285,24 @@ const PublicAudiobookPage = () => {
                   </div>
                   <div className="flex items-center gap-4">
                     <Button
-                      onClick={audiobook.excerpt_url ? toggleExcerpt : togglePlay}
+                      onClick={toggleExcerpt}
                       className="w-14 h-14 shrink-0 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 shadow-lg shadow-amber-500/25 transition-all hover:scale-105 active:scale-95"
                     >
-                      {(audiobook.excerpt_url ? excerptPlaying : isPlaying) 
+                      {excerptPlaying 
                         ? <Pause className="h-6 w-6 text-white" /> 
                         : <Play className="h-6 w-6 ml-0.5 text-white" />}
                     </Button>
                     <div className="flex-1 min-w-0">
                       <Slider 
-                        value={[audiobook.excerpt_url ? excerptTime : currentTime]} 
-                        max={(audiobook.excerpt_url ? excerptDuration : duration) || 100} 
+                        value={[excerptTime]} 
+                        max={excerptDuration || 100} 
                         step={1} 
-                        onValueChange={audiobook.excerpt_url ? seekExcerpt : seek} 
+                        onValueChange={seekExcerpt} 
                         className="cursor-pointer" 
                       />
                       <div className="flex justify-between text-[11px] text-white/30 mt-1.5 font-mono">
-                        <span>{formatTime(audiobook.excerpt_url ? excerptTime : currentTime)}</span>
-                        <span>{formatTime(audiobook.excerpt_url ? excerptDuration : duration)}</span>
+                        <span>{formatTime(excerptTime)}</span>
+                        <span>{formatTime(excerptDuration)}</span>
                       </div>
                     </div>
                   </div>
