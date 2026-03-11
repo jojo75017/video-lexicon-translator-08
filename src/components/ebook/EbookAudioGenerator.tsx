@@ -778,27 +778,27 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
     <Card className="bg-muted/30">
       <CardContent className="pt-4 space-y-4">
         {/* Azure Voice by Niche */}
-        <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+        <div className="p-3 bg-primary/10 border border-primary/20 rounded-lg">
           <Label className="text-sm font-semibold flex items-center gap-2 mb-2">
-            <Mic2 className="h-4 w-4 text-emerald-500" />
-            Voix Azure Neural (Export MP3)
+            <Mic2 className="h-4 w-4 text-primary" />
+            🎧 Voix Premium ElevenLabs (Export MP3)
           </Label>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <Label className="text-xs">Thématique / Niche</Label>
               <Select value={selectedNiche} onValueChange={(val) => {
                 setSelectedNiche(val);
-                const preset = AZURE_VOICE_PRESETS.find(p => p.id === val);
-                if (preset) setSelectedAzureVoice(preset.voice);
+                const preset = VOICE_PRESETS.find(p => p.id === val);
+                if (preset) setSelectedPremiumVoice(preset.voiceId);
               }}>
                 <SelectTrigger className="mt-1">
                   <SelectValue placeholder="Choisir une thématique" />
                 </SelectTrigger>
                 <SelectContent>
-                  {AZURE_VOICE_PRESETS.map(preset => (
+                  {VOICE_PRESETS.map(preset => (
                     <SelectItem key={preset.id} value={preset.id}>
                       <span>{preset.label}</span>
-                      <span className="text-xs text-muted-foreground ml-1">— {preset.description}</span>
+                      <span className="text-xs text-muted-foreground ml-1">— {preset.voiceName} · {preset.description}</span>
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -806,21 +806,24 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
             </div>
             <div>
               <Label className="text-xs">Voix manuelle (optionnel)</Label>
-              <Select value={selectedAzureVoice} onValueChange={setSelectedAzureVoice}>
+              <Select value={selectedPremiumVoice} onValueChange={setSelectedPremiumVoice}>
                 <SelectTrigger className="mt-1">
                   <SelectValue placeholder="Auto (selon niche)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={AUTO_AZURE_VOICE}>Auto (selon niche)</SelectItem>
-                  {AZURE_VOICES_LIST.map(v => (
+                  <SelectItem value={AUTO_VOICE}>🎯 Auto (selon niche)</SelectItem>
+                  {ELEVENLABS_VOICES_LIST.map(v => (
                     <SelectItem key={v.id} value={v.id}>
-                      {v.name}
+                      🎤 {v.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
           </div>
+          <p className="text-xs text-muted-foreground mt-2">
+            ✨ Moteur ElevenLabs Multilingual v2 — Voix ultra-réalistes, émotions naturelles. Azure en fallback automatique.
+          </p>
         </div>
 
         {/* Web Speech controls for preview */}
