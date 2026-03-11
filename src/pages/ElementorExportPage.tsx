@@ -445,8 +445,8 @@ const ElementorExportPage = () => {
           : `<span class="free-badge">✓ GRATUIT</span>`
         }
       </div>
-      ${book.paypal_link
-        ? `<a href="${book.paypal_link}" class="eb-cta" target="_blank" rel="noopener">
+      ${paypalHref
+        ? `<a href="${paypalHref}" class="eb-cta" target="_blank" rel="noopener">
             💳 Acheter maintenant — ${price}
           </a>`
         : hasSlug
