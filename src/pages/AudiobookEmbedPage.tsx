@@ -1,165 +1,215 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Slider } from '@/components/ui/slider';
-import { Play, Pause, Volume2, VolumeX, Headphones, SkipBack, SkipForward, Mic2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { getRandomReviews } from '@/utils/reviewPool';
 
 const AudiobookEmbedPage = () => {
   const { slug } = useParams<{ slug: string }>();
-  const [audiobook, setAudiobook] = useState<any>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(0.8);
-  const [isMuted, setIsMuted] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [book, setBook] = useState<any>(null);
+  const [faqOpen, setFaqOpen] = useState<number>(0);
 
   useEffect(() => {
     if (slug) {
       supabase.from('audiobooks').select('*').eq('slug', slug).eq('is_public', true).single()
-        .then(({ data }) => setAudiobook(data));
+        .then(({ data }) => setBook(data));
     }
   }, [slug]);
 
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    const onTime = () => setCurrentTime(audio.currentTime);
-    const onLoaded = () => setDuration(audio.duration);
-    const onEnded = () => setIsPlaying(false);
-    audio.addEventListener('timeupdate', onTime);
-    audio.addEventListener('loadedmetadata', onLoaded);
-    audio.addEventListener('ended', onEnded);
-    return () => { audio.removeEventListener('timeupdate', onTime); audio.removeEventListener('loadedmetadata', onLoaded); audio.removeEventListener('ended', onEnded); };
-  }, [audiobook]);
+  const reviews = useMemo(() => getRandomReviews(book?.slug || book?.title || 'default', 3), [book]);
 
-  const togglePlay = () => {
-    if (!audioRef.current) return;
-    isPlaying ? audioRef.current.pause() : audioRef.current.play();
-    setIsPlaying(!isPlaying);
-  };
-
-  const toggleMute = () => {
-    if (!audioRef.current) return;
-    audioRef.current.muted = !isMuted;
-    setIsMuted(!isMuted);
-  };
-
-  const formatTime = (s: number) => {
+  const formatDuration = (s: number | null) => {
+    if (!s) return 'Durée inconnue';
     const h = Math.floor(s / 3600);
     const m = Math.floor((s % 3600) / 60);
-    const sec = Math.floor(s % 60);
-    return h > 0 ? `${h}:${m.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}` : `${m}:${sec.toString().padStart(2, '0')}`;
+    return h > 0 ? `${h}h ${m}min` : `${m} min`;
   };
 
-  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+  const formatDate = (d: string | null) => {
+    if (!d) return '';
+    return new Date(d).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
+  };
 
-  if (!audiobook) {
+  if (!book) {
     return (
-      <div className="h-full flex items-center justify-center bg-gradient-to-br from-[#0c0a1d] to-[#1a1035] text-white p-4">
-        <Headphones className="w-6 h-6 text-amber-400 animate-pulse" />
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0f1319', color: '#fff', fontFamily: "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif" }}>
+        <span style={{ fontSize: '2rem' }}>🎧</span>
+        <span style={{ marginLeft: 12, opacity: 0.5 }}>Chargement…</span>
       </div>
     );
   }
 
+  const title = book.title || 'Livre Audio';
+  const author = book.author_name || 'Auteur inconnu';
+  const voice = book.voice_name || 'Voix IA';
+  const desc = book.description || '';
+  const cover = book.cover_url || '';
+  const price = book.price ? book.price.toFixed(2) : null;
+  const oldPrice = book.price ? (book.price * 1.5).toFixed(2) : null;
+  const excerptUrl = book.excerpt_url || book.audio_url || '';
+  const paypalLink = book.paypal_link || '';
+  const stripeLink = book.stripe_link || '';
+  const playCount = book.play_count || 0;
+  const duration = formatDuration(book.duration_seconds);
+  const date = formatDate(book.created_at);
+
+  const faqs = [
+    { q: 'Dans quel format est le livre audio ?', a: 'Le livre audio est au format MP3 haute définition, compatible avec tous les appareils : smartphone, tablette, ordinateur, enceinte connectée.' },
+    { q: 'Comment accéder à mon achat ?', a: 'Après le paiement, vous recevrez un lien de téléchargement par email. Vous pourrez écouter votre livre audio immédiatement sur n\'importe quel appareil.' },
+    { q: 'La voix est-elle naturelle ?', a: 'Oui ! Nous utilisons une technologie de synthèse vocale de dernière génération qui produit une narration fluide, expressive et très naturelle.' },
+    { q: 'Puis-je être remboursé ?', a: 'Absolument. Vous bénéficiez d\'une garantie satisfait ou remboursé de 30 jours. Contactez-nous simplement par email.' },
+  ];
+
   return (
-    <div className="h-full bg-gradient-to-br from-[#0c0a1d] via-[#12102a] to-[#1a1035] text-white p-4 flex flex-col justify-center overflow-hidden relative">
-      {audiobook.audio_url && <audio ref={audioRef} src={audiobook.audio_url} preload="metadata" />}
-      
-      {/* Subtle background glow */}
-      {audiobook.cover_url && (
-        <div className="absolute inset-0 z-0 overflow-hidden">
-          <img src={audiobook.cover_url} alt="" className="w-full h-full object-cover blur-3xl opacity-10 scale-150" />
-        </div>
-      )}
+    <div style={{ minHeight: '100vh', background: '#0f1319', fontFamily: "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif" }}>
+      <div style={{ maxWidth: 960, margin: '0 auto', color: '#fff', background: 'linear-gradient(180deg,#3a4a5c 0%,#1e2a38 40%,#0f1319 100%)', borderRadius: 20, overflow: 'hidden', position: 'relative' }}>
 
-      <div className="flex items-center gap-4 relative z-10">
-        {/* Cover */}
-        <button onClick={togglePlay} className="w-20 h-20 rounded-xl shrink-0 overflow-hidden shadow-xl shadow-black/30 ring-1 ring-white/10 relative group transition-transform hover:scale-[1.03] active:scale-95">
-          {audiobook.cover_url ? (
-            <img src={audiobook.cover_url} alt={audiobook.title} className="w-full h-full object-cover" />
-          ) : (
-            <div className="w-full h-full bg-gradient-to-br from-amber-600 to-orange-700 flex items-center justify-center">
-              <Headphones className="w-9 h-9 text-white/70" />
-            </div>
-          )}
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center">
-            <div className="w-9 h-9 rounded-full bg-amber-500/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
-              {isPlaying ? <Pause className="h-4 w-4 text-white" /> : <Play className="h-4 w-4 ml-0.5 text-white" />}
-            </div>
-          </div>
-        </button>
-
-        {/* Info + Controls */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-2 mb-1">
-            <div className="min-w-0">
-              <p className="font-bold text-sm truncate text-white/90">{audiobook.title}</p>
-              {audiobook.author_name && (
-                <p className="text-xs text-amber-400/70 truncate">{audiobook.author_name}</p>
-              )}
-            </div>
-            {audiobook.voice_name && (
-              <div className="flex items-center gap-1 text-[10px] text-white/30 shrink-0 bg-white/5 px-2 py-0.5 rounded-full">
-                <Mic2 className="w-2.5 h-2.5" />
-                {audiobook.voice_name}
-              </div>
+        {/* HERO */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 32, padding: '40px 32px 32px', position: 'relative' }}>
+          {cover && <div style={{ position: 'absolute', inset: 0, background: `url(${cover}) center/cover`, filter: 'blur(80px)', opacity: 0.12, zIndex: 0 }} />}
+          
+          <div style={{ flexShrink: 0, alignSelf: 'center', position: 'relative', zIndex: 1 }}>
+            {cover ? (
+              <img src={cover} alt={title} style={{ width: 260, height: 260, borderRadius: 16, objectFit: 'cover', boxShadow: '0 25px 50px -12px rgba(0,0,0,.5)', border: '1px solid rgba(255,255,255,.1)' }} />
+            ) : (
+              <div style={{ width: 260, height: 260, borderRadius: 16, background: '#2d3748', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3rem' }}>🎧</div>
             )}
           </div>
-          
-          <div className="flex items-center gap-2 mt-2.5">
-            <Button 
-              variant="ghost" size="icon" 
-              className="h-7 w-7 text-white/50 hover:text-white hover:bg-white/10 rounded-full" 
-              onClick={() => audioRef.current && (audioRef.current.currentTime -= 15)}
-            >
-              <SkipBack className="h-3 w-3" />
-            </Button>
-            <Button 
-              onClick={togglePlay} size="icon" 
-              className="h-10 w-10 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 shadow-lg shadow-amber-500/20"
-            >
-              {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4 ml-0.5" />}
-            </Button>
-            <Button 
-              variant="ghost" size="icon" 
-              className="h-7 w-7 text-white/50 hover:text-white hover:bg-white/10 rounded-full" 
-              onClick={() => audioRef.current && (audioRef.current.currentTime += 30)}
-            >
-              <SkipForward className="h-3 w-3" />
-            </Button>
-            
-            <div className="flex-1 mx-1.5">
-              <Slider 
-                value={[currentTime]} 
-                max={duration || 100} 
-                step={1} 
-                onValueChange={(v) => { if (audioRef.current) audioRef.current.currentTime = v[0]; }} 
-              />
-            </div>
-            
-            <span className="text-[10px] text-white/30 shrink-0 font-mono tabular-nums">
-              {formatTime(currentTime)}/{formatTime(duration)}
-            </span>
 
-            <Button 
-              variant="ghost" size="icon" 
-              className="h-6 w-6 text-white/30 hover:text-white hover:bg-white/10 rounded-full shrink-0" 
-              onClick={toggleMute}
-            >
-              {isMuted ? <VolumeX className="h-3 w-3" /> : <Volume2 className="h-3 w-3" />}
-            </Button>
+          <div style={{ flex: 1, minWidth: 280, position: 'relative', zIndex: 1 }}>
+            <h1 style={{ fontSize: '2rem', fontWeight: 800, lineHeight: 1.15, marginBottom: 8, letterSpacing: '-0.02em' }}>{title}</h1>
+            <p style={{ color: 'rgba(255,255,255,.6)', fontSize: '.95rem', marginBottom: 2 }}>De <span style={{ color: '#f6ad55', fontWeight: 600 }}>{author}</span></p>
+            <p style={{ color: 'rgba(255,255,255,.6)', fontSize: '.95rem', marginBottom: 2 }}>Lu par <span style={{ color: '#f6ad55', fontWeight: 600 }}>{voice}</span></p>
+            
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, margin: '16px 0' }}>
+              <span style={{ color: '#f6ad55', fontSize: '1rem', letterSpacing: 2 }}>★★★★★</span>
+              <span style={{ color: 'rgba(246,173,85,.7)', fontSize: '.85rem' }}>{playCount} écoutes</span>
+            </div>
+
+            {excerptUrl && (
+              <div style={{ background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 16, padding: '20px 24px', margin: '20px 0' }}>
+                <div style={{ fontSize: '.9rem', fontWeight: 600, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>🎧 Écouter un extrait</div>
+                <audio controls preload="none" controlsList="nodownload" style={{ width: '100%', borderRadius: 8 }}>
+                  <source src={excerptUrl} type="audio/mpeg" />
+                </audio>
+              </div>
+            )}
+
+            {price ? (
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, margin: '16px 0' }}>
+                <span style={{ fontSize: '2.2rem', fontWeight: 800 }}>{price} €</span>
+                {oldPrice && <span style={{ color: 'rgba(255,255,255,.35)', textDecoration: 'line-through', fontSize: '.95rem' }}>{oldPrice} €</span>}
+                <span style={{ background: 'rgba(16,185,129,.15)', color: '#34d399', border: '1px solid rgba(16,185,129,.25)', fontSize: '.75rem', fontWeight: 700, padding: '3px 10px', borderRadius: 20 }}>-33%</span>
+              </div>
+            ) : (
+              <div style={{ margin: '16px 0' }}><span style={{ fontSize: '2.2rem', fontWeight: 800, color: '#34d399' }}>Gratuit</span></div>
+            )}
+
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, margin: '12px 0' }}>
+              {stripeLink && (
+                <a href={stripeLink} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 28px', borderRadius: 999, fontWeight: 700, fontSize: '.95rem', textDecoration: 'none', background: 'linear-gradient(135deg,#f6ad55,#ed8936)', color: '#fff', boxShadow: '0 8px 24px rgba(246,173,85,.25)', border: 'none', cursor: 'pointer' }}>
+                  🛒 Acheter — {price} €
+                </a>
+              )}
+              {!stripeLink && price && (
+                <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 28px', borderRadius: 999, fontWeight: 700, fontSize: '.95rem', background: 'linear-gradient(135deg,#f6ad55,#ed8936)', color: '#fff' }}>
+                  🛒 {price} €
+                </span>
+              )}
+              {paypalLink && (
+                <a href={paypalLink} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 28px', borderRadius: 999, fontWeight: 700, fontSize: '.95rem', textDecoration: 'none', background: 'rgba(59,130,246,.12)', color: '#93c5fd', border: '1px solid rgba(59,130,246,.25)', cursor: 'pointer' }}>
+                  💳 Payer via PayPal
+                </a>
+              )}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Progress bar at bottom */}
-      <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-white/5">
-        <div 
-          className="h-full bg-gradient-to-r from-amber-500 to-orange-500 transition-all duration-300" 
-          style={{ width: `${progress}%` }} 
-        />
+        {/* CONTENT + SIDEBAR */}
+        <div style={{ padding: 32, display: 'flex', flexWrap: 'wrap', gap: 32 }}>
+          <div style={{ flex: 1, minWidth: 280 }}>
+            <h2 style={{ fontSize: '1.35rem', fontWeight: 700, marginBottom: 16 }}>À propos de ce livre audio</h2>
+            <p style={{ color: 'rgba(255,255,255,.65)', lineHeight: 1.7, fontSize: '.95rem' }}>{desc || 'Aucune description disponible.'}</p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 20 }}>
+              <span style={{ border: '1px solid rgba(255,255,255,.15)', color: 'rgba(255,255,255,.6)', fontSize: '.8rem', padding: '6px 16px', borderRadius: 999, background: 'rgba(255,255,255,.04)' }}>📖 Livre Audio</span>
+              <span style={{ border: '1px solid rgba(255,255,255,.15)', color: 'rgba(255,255,255,.6)', fontSize: '.8rem', padding: '6px 16px', borderRadius: 999, background: 'rgba(255,255,255,.04)' }}>🎙️ Audio IA Premium</span>
+              {voice && <span style={{ border: '1px solid rgba(255,255,255,.15)', color: 'rgba(255,255,255,.6)', fontSize: '.8rem', padding: '6px 16px', borderRadius: 999, background: 'rgba(255,255,255,.04)' }}>🗣️ {voice}</span>}
+            </div>
+          </div>
+          <div style={{ width: 280, flexShrink: 0 }}>
+            <div style={{ background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 16, padding: 24 }}>
+              <h3 style={{ fontSize: '1rem', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,.1)', paddingBottom: 12, marginBottom: 16 }}>📋 Détails du produit</h3>
+              {[
+                price && ['Prix', `${price} €`],
+                ['Auteur', author],
+                ['Narrateur', voice],
+                ['Durée', duration],
+                date && ['Publication', date],
+                ['Format', 'MP3 · HD'],
+                ['Écoutes', String(playCount)],
+                ['Éditeur', 'EbookStudio'],
+              ].filter(Boolean).map((row: any, i) => (
+                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', fontSize: '.85rem' }}>
+                  <span style={{ color: 'rgba(255,255,255,.4)', textTransform: 'uppercase', fontSize: '.7rem', letterSpacing: '.06em' }}>{row[0]}</span>
+                  <span style={{ color: 'rgba(255,255,255,.75)', fontWeight: 500, textAlign: 'right' }}>{row[1]}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* REVIEWS */}
+        <div style={{ padding: '0 32px 32px' }}>
+          <h2 style={{ fontSize: '1.35rem', fontWeight: 700, marginBottom: 20 }}>⭐ Avis des auditeurs</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: 16 }}>
+            {reviews.map((r, i) => (
+              <div key={i} style={{ background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.08)', borderRadius: 16, padding: 20 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+                  <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'linear-gradient(135deg,#f6ad55,#ed8936)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '.9rem', color: '#fff', flexShrink: 0 }}>{r.initial}</div>
+                  <div>
+                    <div style={{ fontWeight: 600, fontSize: '.9rem' }}>{r.name}</div>
+                    <div style={{ color: 'rgba(255,255,255,.35)', fontSize: '.75rem' }}>A écouté ce titre</div>
+                  </div>
+                </div>
+                <div style={{ color: '#f6ad55', fontSize: '.85rem', letterSpacing: 1, marginBottom: 8 }}>{'★'.repeat(r.stars)}{'☆'.repeat(5 - r.stars)}</div>
+                <div style={{ color: 'rgba(255,255,255,.6)', fontSize: '.85rem', lineHeight: 1.6 }}>{r.text}</div>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: 'rgba(16,185,129,.1)', color: '#34d399', fontSize: '.7rem', fontWeight: 600, padding: '2px 8px', borderRadius: 20, marginTop: 8 }}>🎧 Avis spontané</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* GUARANTEE */}
+        <div style={{ margin: '0 32px 32px', background: 'linear-gradient(135deg,rgba(16,185,129,.08),rgba(16,185,129,.02))', border: '1px solid rgba(16,185,129,.2)', borderRadius: 16, padding: '28px 32px', display: 'flex', alignItems: 'center', gap: 24 }}>
+          <div style={{ fontSize: '3rem', flexShrink: 0 }}>🛡️</div>
+          <div>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#34d399', marginBottom: 6 }}>Garantie Satisfait ou Remboursé — 30 jours</h3>
+            <p style={{ color: 'rgba(255,255,255,.6)', fontSize: '.9rem', lineHeight: 1.6 }}>Vous n'êtes pas satisfait ? Nous vous remboursons intégralement, sans conditions et sans questions. Votre satisfaction est notre priorité absolue.</p>
+          </div>
+        </div>
+
+        {/* FAQ */}
+        <div style={{ padding: '0 32px 32px' }}>
+          <h2 style={{ fontSize: '1.35rem', fontWeight: 700, marginBottom: 20 }}>❓ Questions fréquentes</h2>
+          {faqs.map((f, i) => (
+            <div key={i} style={{ border: '1px solid rgba(255,255,255,.08)', borderRadius: 12, marginBottom: 8, overflow: 'hidden' }}>
+              <div
+                onClick={() => setFaqOpen(faqOpen === i ? -1 : i)}
+                style={{ padding: '16px 20px', fontWeight: 600, fontSize: '.9rem', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,.03)' }}
+              >
+                {f.q}
+                <span style={{ fontSize: '1.2rem', color: 'rgba(255,255,255,.3)' }}>{faqOpen === i ? '−' : '+'}</span>
+              </div>
+              {faqOpen === i && (
+                <div style={{ padding: '0 20px 16px', color: 'rgba(255,255,255,.55)', fontSize: '.85rem', lineHeight: 1.7 }}>{f.a}</div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* FOOTER */}
+        <div style={{ textAlign: 'center', padding: 20, borderTop: '1px solid rgba(255,255,255,.05)', fontSize: '.7rem', color: 'rgba(255,255,255,.15)' }}>
+          Propulsé par EbookStudio Pro • Audio IA Premium
+        </div>
       </div>
     </div>
   );
