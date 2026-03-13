@@ -605,22 +605,41 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
       case 'A8':
         return (
           <div className="space-y-4">
-            <p className="text-muted-foreground text-sm">Fusion de l'intro + chapitres + outro en un seul MP3 pour <strong>{brief.bookTitle}</strong>.</p>
+            <p className="text-muted-foreground text-sm">Fusion de l'intro + chapitres en MP3 pour <strong>{brief.bookTitle}</strong>.</p>
             <div className="bg-muted/30 border rounded-lg p-4 text-sm">
               <p>📋 Métadonnées du fichier audio :</p>
               <p className="text-muted-foreground">Titre : {brief.bookTitle} {brief.bookSubtitle && `— ${brief.bookSubtitle}`}</p>
               <p className="text-muted-foreground">Auteur : {brief.authorName}</p>
               <p className="text-muted-foreground">Catégorie : {CATEGORIES.find(c => c.value === brief.category)?.label}</p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <Button variant="outline" onClick={handleDownloadIntro}>
-                <Download className="h-4 w-4 mr-2" /> 📥 Télécharger l'Intro
-              </Button>
-              <Button variant="outline" onClick={handleDownloadFullExport}>
-                <Download className="h-4 w-4 mr-2" /> 📥 Télécharger le Livre Complet
-              </Button>
-            </div>
-            <Button onClick={() => markStepDone('A8')} className="w-full">
+            {introBlob && (
+              <div className="flex gap-2 items-center p-3 bg-muted/30 rounded-lg">
+                <Music className="h-4 w-4 text-primary" />
+                <span className="text-sm flex-1">Intro MP3</span>
+                <Button size="sm" variant="outline" onClick={() => togglePlay('intro')}>
+                  {playingType === 'intro' ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
+                </Button>
+                <Button size="sm" variant="outline" onClick={handleDownloadIntro}>
+                  <Download className="h-3 w-3 mr-1" /> Intro
+                </Button>
+              </div>
+            )}
+            {fullBlob && (
+              <div className="flex gap-2 items-center p-3 bg-muted/30 rounded-lg">
+                <Headphones className="h-4 w-4 text-primary" />
+                <span className="text-sm flex-1">Livre complet MP3</span>
+                <Button size="sm" variant="outline" onClick={() => togglePlay('full')}>
+                  {playingType === 'full' ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
+                </Button>
+                <Button size="sm" variant="outline" onClick={handleDownloadFullExport}>
+                  <Download className="h-3 w-3 mr-1" /> Complet
+                </Button>
+              </div>
+            )}
+            {!introBlob && !fullBlob && (
+              <p className="text-sm text-amber-600">⚠️ Aucun MP3 généré. Retournez à l'étape A7 pour lancer la production audio.</p>
+            )}
+            <Button onClick={() => markStepDone('A8')} className="w-full" disabled={!fullBlob}>
               <CheckCircle2 className="h-4 w-4 mr-2" /> Fusion terminée
             </Button>
           </div>
