@@ -2590,7 +2590,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
         );
       
       case 'audio-direct':
-        return <AudioDirectMode />;
+        return null;
 
       case 'audiobook':
         return (
