@@ -10,11 +10,15 @@ import { Label } from '@/components/ui/label';
 import {
   Target, ListOrdered, PenTool, Sparkles, Clock, Mic2,
   Volume2, Combine, Archive, ChevronRight, ChevronLeft,
-  CheckCircle2, Lock, Loader2, Headphones, Download
+  CheckCircle2, Lock, Loader2, Headphones, Download, Play, Pause, Music
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cleanForAudio } from '@/utils/textCleaner';
 import { buildIntroDisplayText } from '@/utils/audioIntroGenerator';
+import { generateIntroForExport } from '@/utils/audioIntroGenerator';
+import { supabase } from '@/integrations/supabase/client';
+import { saveAs } from 'file-saver';
+import JSZip from 'jszip';
 
 // --- Constants ---
 
