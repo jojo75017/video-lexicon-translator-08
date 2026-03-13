@@ -2589,6 +2589,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           />
         );
       
+      case 'audio-direct':
+        return <AudioDirectMode />;
+
       case 'audiobook':
         return (
           <EbookAudioGenerator
