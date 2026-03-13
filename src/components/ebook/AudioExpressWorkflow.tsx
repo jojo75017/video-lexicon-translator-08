@@ -113,6 +113,15 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
   // A6 voice — auto-mapped from category
   const [selectedVoice, setSelectedVoice] = useState('fr-FR-EloiseNeural');
 
+  // MP3 generation state
+  const [introBlob, setIntroBlob] = useState<Blob | null>(null);
+  const [fullBlob, setFullBlob] = useState<Blob | null>(null);
+  const [generationProgress, setGenerationProgress] = useState(0);
+  const [generationLabel, setGenerationLabel] = useState('');
+  const [isGeneratingAudio, setIsGeneratingAudio] = useState(false);
+  const audioRef = React.useRef<HTMLAudioElement | null>(null);
+  const [playingType, setPlayingType] = useState<'intro' | 'full' | null>(null);
+
   // Sync voice when category changes
   useEffect(() => {
     const cat = CATEGORIES.find(c => c.value === category);
