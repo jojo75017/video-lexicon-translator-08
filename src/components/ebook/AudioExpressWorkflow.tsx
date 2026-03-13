@@ -651,16 +651,20 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
             <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
               <p className="font-medium">🎉 Félicitations !</p>
               <p className="text-sm text-muted-foreground mt-1">
-                « <strong>{brief.bookTitle}</strong> » par <strong>{brief.authorName}</strong> est prêt. Retrouvez-le dans la 📚 Bibliothèque.
+                « <strong>{brief.bookTitle}</strong> » par <strong>{brief.authorName}</strong> est prêt et sauvegardé dans la 📚 Bibliothèque.
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <Button variant="outline" onClick={handleDownloadIntro}>
-                <Download className="h-4 w-4 mr-2" /> 📥 Intro seule
-              </Button>
-              <Button variant="outline" onClick={handleDownloadFullExport}>
-                <Download className="h-4 w-4 mr-2" /> 📥 Export complet
-              </Button>
+              {introBlob && (
+                <Button variant="outline" onClick={handleDownloadIntro}>
+                  <Download className="h-4 w-4 mr-2" /> 📥 Intro MP3
+                </Button>
+              )}
+              {fullBlob && (
+                <Button variant="outline" onClick={handleDownloadFullExport}>
+                  <Download className="h-4 w-4 mr-2" /> 📥 Livre Complet MP3
+                </Button>
+              )}
             </div>
             <Button onClick={() => markStepDone('A9')} className="w-full">
               <Archive className="h-4 w-4 mr-2" /> Archiver et terminer
