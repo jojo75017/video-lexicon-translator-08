@@ -176,59 +176,204 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
     markStepDone('A4', cleaned);
   }, [chapters, conclusion, stepResults]);
 
-  // A7: Navigate to audio generator
-  const handleGoToAudioGenerator = () => {
-    markStepDone('A7');
-    if (onNavigateToAudio) {
-      toast.info('🎙️ Redirection vers le générateur audio...');
-      setTimeout(() => onNavigateToAudio(), 500);
+  // TTS generation via edge function
+  const generateTts = async (text: string): Promise<Blob | null> => {
+    const { data: { session } } = await supabase.auth.getSession();
+    const token = session?.access_token;
+    const clean = cleanForAudio(text);
+    const chunks: string[] = [];
+    let remaining = clean;
+    while (remaining.length > 0) {
+      chunks.push(remaining.substring(0, 5000));
+      remaining = remaining.substring(5000);
+    }
+    const audioBlobs: Blob[] = [];
+    for (const chunk of chunks) {
+      const catData = CATEGORIES.find(c => c.value === category);
+      let response: Response;
+      if (token) {
+        response = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY, Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ text: chunk, voiceId: catData?.voiceId || 'pFZP5JQG7iQjIQuC4Bku', modelId: 'eleven_multilingual_v2' }),
+          }
+        );
+      } else {
+        response = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/azure-speech-tts`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
+            body: JSON.stringify({ text: chunk, niche: category }),
+          }
+        );
+      }
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({ error: 'Erreur inconnue' }));
+        throw new Error(err.error || `Erreur ${response.status}`);
+      }
+      const data = await response.json();
+      const audioUrl = `data:audio/mpeg;base64,${data.audioContent}`;
+      const audioResponse = await fetch(audioUrl);
+      audioBlobs.push(await audioResponse.blob());
+    }
+    return new Blob(audioBlobs, { type: 'audio/mpeg' });
+  };
+
+  // Split text into chapters
+  const splitIntoChapters = (text: string): { title: string; content: string }[] => {
+    const chapterRegex = /(?:^|\n)(Chapitre\s+\d+[^\n]*)/gi;
+    const matches = [...text.matchAll(chapterRegex)];
+    if (matches.length >= 2) {
+      const chapters: { title: string; content: string }[] = [];
+      for (let i = 0; i < matches.length; i++) {
+        const startIdx = matches[i].index!;
+        const endIdx = i + 1 < matches.length ? matches[i + 1].index! : text.length;
+        chapters.push({ title: matches[i][1].trim(), content: text.substring(startIdx, endIdx).trim() });
+      }
+      return chapters;
+    }
+    const sections: { title: string; content: string }[] = [];
+    const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim().length > 20);
+    let currentContent = '';
+    let sectionIndex = 1;
+    for (const para of paragraphs) {
+      if (currentContent.length + para.length > 5000 && currentContent.length > 500) {
+        sections.push({ title: `Section ${sectionIndex}`, content: currentContent.trim() });
+        currentContent = para;
+        sectionIndex++;
+      } else {
+        currentContent += '\n\n' + para;
+      }
+    }
+    if (currentContent.trim()) sections.push({ title: `Section ${sectionIndex}`, content: currentContent.trim() });
+    return sections.length > 0 ? sections : [{ title: 'Livre complet', content: text }];
+  };
+
+  // A7: Generate full audiobook (intro + chapters) as MP3
+  const handleGenerateAudio = async () => {
+    const brief = getBriefData();
+    const textToConvert = cleanedText || brief.chapterContent || chapterContent;
+    if (!textToConvert?.trim()) {
+      toast.error('Aucun texte à convertir. Complétez les étapes précédentes.');
+      return;
+    }
+    setIsGeneratingAudio(true);
+    setGenerationProgress(0);
+    try {
+      const zip = new JSZip();
+
+      // Intro MP3
+      setGenerationLabel('🎵 Génération de l\'intro...');
+      setGenerationProgress(5);
+      const introBlobs = await generateIntroForExport(
+        generateTts, brief.bookTitle || bookTitle, brief.authorName || authorNameState,
+        brief.introduction || introduction, category
+      );
+      if (introBlobs.length > 0) {
+        const iBlob = new Blob(introBlobs, { type: 'audio/mpeg' });
+        zip.file('00-Intro-Jingle.mp3', iBlob);
+        setIntroBlob(iBlob);
+      }
+
+      // Chapters
+      const chaps = splitIntoChapters(textToConvert);
+      for (let i = 0; i < chaps.length; i++) {
+        setGenerationLabel(`📖 ${i + 1}/${chaps.length} — ${chaps[i].title}`);
+        setGenerationProgress(Math.round(10 + ((i) / chaps.length) * 80));
+        const blob = await generateTts(chaps[i].content);
+        if (blob) {
+          const fname = `${String(i + 1).padStart(2, '0')}-${chaps[i].title.replace(/[^a-zA-Z0-9àâéèêëïîôùûüç\s-]/gi, '').replace(/\s+/g, '-').substring(0, 60)}.mp3`;
+          zip.file(fname, blob);
+        }
+      }
+
+      // ZIP download
+      setGenerationLabel('📦 Création du ZIP...');
+      setGenerationProgress(95);
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      saveAs(zipBlob, `audiobook-${(brief.bookTitle || bookTitle).replace(/\s+/g, '-')}.zip`);
+
+      // Merge for full preview
+      const allFiles = Object.values(zip.files);
+      const mp3Blobs: Blob[] = [];
+      for (const file of allFiles) {
+        if (!file.dir) mp3Blobs.push(await file.async('blob'));
+      }
+      if (mp3Blobs.length > 0) {
+        const mergedBlob = new Blob(mp3Blobs, { type: 'audio/mpeg' });
+        setFullBlob(mergedBlob);
+        await saveToLibrary(mergedBlob, brief.bookTitle || bookTitle, brief.authorName || authorNameState);
+      }
+
+      markStepDone('A7');
+      markStepDone('A8');
+      toast.success(`🎉 Audiobook généré ! ${chaps.length + 1} fichiers MP3`);
+      setTimeout(() => setCurrentStep(8), 500);
+    } catch (error: any) {
+      console.error('Audio generation error:', error);
+      toast.error(`Erreur : ${error.message}`);
+    } finally {
+      setIsGeneratingAudio(false);
+      setGenerationProgress(0);
+      setGenerationLabel('');
     }
   };
 
-  // Download intro as text file (for TTS or site usage)
+  // Save to library
+  const saveToLibrary = async (audioBlob: Blob, titleStr: string, authorStr: string) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user?.id;
+      if (!userId) return;
+      const fileName = `${userId}/${Date.now()}-${titleStr.replace(/[^a-zA-Z0-9àâéèêëïîôùûüç\s-]/gi, '').replace(/\s+/g, '-')}.mp3`;
+      const { error: uploadError } = await supabase.storage.from('audiobooks').upload(fileName, audioBlob, { contentType: 'audio/mpeg' });
+      if (uploadError) { console.error('Upload error:', uploadError); return; }
+      const { data: urlData } = supabase.storage.from('audiobooks').getPublicUrl(fileName);
+      const wordCount = (cleanedText || chapterContent).split(/\s+/).filter(w => w).length;
+      await supabase.from('audiobooks').insert({
+        user_id: userId, title: titleStr.trim(), author_name: authorStr || null,
+        description: introduction || null, audio_url: urlData.publicUrl,
+        voice_name: CATEGORIES.find(c => c.value === category)?.voiceName || 'Auto',
+        duration_seconds: Math.round((wordCount / 150) * 60), status: 'published', is_public: false,
+      });
+      toast.success('💾 Sauvegardé dans Mes Livres Audio');
+    } catch (e) { console.error('saveToLibrary error:', e); }
+  };
+
+  // Play/pause preview
+  const togglePlay = (type: 'intro' | 'full') => {
+    const blob = type === 'intro' ? introBlob : fullBlob;
+    if (!blob) return;
+    if (playingType === type && audioRef.current) {
+      audioRef.current.pause(); audioRef.current = null; setPlayingType(null); return;
+    }
+    if (audioRef.current) audioRef.current.pause();
+    const url = URL.createObjectURL(blob);
+    const audio = new Audio(url);
+    audio.onended = () => { setPlayingType(null); URL.revokeObjectURL(url); };
+    audio.play(); audioRef.current = audio; setPlayingType(type);
+  };
+
+  // Download MP3 blob
   const handleDownloadIntro = () => {
-    const brief = getBriefData();
-    const title = brief.bookTitle || bookTitle || 'livre-audio';
-    const introText = brief.introduction || introduction;
-    const blob = new Blob([introText], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `intro-${title.replace(/\s+/g, '-').toLowerCase()}.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
-    toast.success('📥 Introduction téléchargée');
+    if (introBlob) {
+      saveAs(introBlob, `${(bookTitle || 'livre-audio').replace(/\s+/g, '-')}-intro.mp3`);
+      toast.success('📥 Intro MP3 téléchargée');
+    } else {
+      toast.info('Générez d\'abord l\'audio à l\'étape A7');
+    }
   };
 
-  // Download full cleaned text for export
   const handleDownloadFullExport = () => {
-    const brief = getBriefData();
-    const title = brief.bookTitle || bookTitle || 'livre-audio';
-    const author = brief.authorName || authorNameState || 'Auteur';
-    const introText = brief.introduction || introduction;
-    
-    let fullContent = `=== ${title} ===\n`;
-    if (brief.bookSubtitle || bookSubtitle) fullContent += `${brief.bookSubtitle || bookSubtitle}\n`;
-    fullContent += `Par ${author}\n`;
-    fullContent += `${'='.repeat(40)}\n\n`;
-    fullContent += `--- INTRODUCTION ---\n${introText}\n\n`;
-    
-    const text = cleanedText || brief.chapterContent || chapterContent;
-    if (text) {
-      fullContent += `--- CONTENU ---\n${text}\n\n`;
+    if (fullBlob) {
+      saveAs(fullBlob, `${(bookTitle || 'livre-audio').replace(/\s+/g, '-')}-complet.mp3`);
+      toast.success('📥 Livre complet MP3 téléchargé');
+    } else {
+      toast.info('Générez d\'abord l\'audio à l\'étape A7');
     }
-    if (conclusion) {
-      fullContent += `--- CONCLUSION ---\n${conclusion}\n`;
-    }
-
-    const blob = new Blob([fullContent], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${title.replace(/\s+/g, '-').toLowerCase()}-complet.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
-    toast.success('📥 Livre complet téléchargé');
   };
 
   const renderStepContent = (idx: number) => {
