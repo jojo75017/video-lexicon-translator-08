@@ -549,23 +549,55 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
             <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 text-sm space-y-1">
               <p>✅ Titre : <strong>{brief.bookTitle}</strong></p>
               <p>✅ Auteur : <strong>{brief.authorName}</strong></p>
-              <p>✅ Voix : <strong>{AZURE_VOICES.find(v => v.id === selectedVoice)?.label}</strong></p>
+              <p>✅ Voix : <strong>{CATEGORIES.find(c => c.value === brief.category)?.voiceName}</strong></p>
               <p>✅ Texte nettoyé & ponctuation optimisée</p>
               <div className="text-xs text-muted-foreground mt-2 space-y-1">
-                <p className="font-medium">🎬 Structure de l'intro Premium :</p>
-                <p>1. 🎵 Jingle musical (3s)</p>
-                <p>2. 📢 « Vous êtes bien sur EbookStudio 2026. »</p>
-                <p>3. ✍️ « Ce livre audio est rédigé par {brief.authorName || 'l\'auteur'}. »</p>
-                <p>4. 📖 « Nous avons le plaisir de vous présenter : {brief.bookTitle}. »</p>
-                <p>5. 🎧 Extrait de mise en bouche (50 mots max)</p>
-                <p>6. ⏸️ Silence de transition (2s)</p>
+                <p className="font-medium">🎬 Ce qui sera généré :</p>
+                <p>1. 🎵 Intro Premium (jingle + présentation + teaser)</p>
+                <p>2. 📖 Tous les chapitres en MP3 séparés</p>
+                <p>3. 📦 Archive ZIP complète téléchargée automatiquement</p>
+                <p>4. 💾 Sauvegarde automatique dans Mes Livres Audio</p>
               </div>
             </div>
-            <Button onClick={handleGoToAudioGenerator} className="w-full">
-              <Headphones className="h-4 w-4 mr-2" /> 🎙️ Lancer la Production Audio
-            </Button>
-            <Button variant="outline" onClick={() => markStepDone('A7')} className="w-full">
-              <CheckCircle2 className="h-4 w-4 mr-2" /> Marquer comme terminé (production manuelle)
+            {isGeneratingAudio && (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                  <span className="text-sm font-medium">{generationLabel}</span>
+                </div>
+                <Progress value={generationProgress} className="h-2" />
+              </div>
+            )}
+            {introBlob && (
+              <div className="flex gap-2 items-center p-3 bg-muted/30 rounded-lg">
+                <Music className="h-4 w-4 text-primary" />
+                <span className="text-sm font-medium flex-1">Intro MP3 prête</span>
+                <Button size="sm" variant="outline" onClick={() => togglePlay('intro')}>
+                  {playingType === 'intro' ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
+                </Button>
+                <Button size="sm" variant="outline" onClick={handleDownloadIntro}>
+                  <Download className="h-3 w-3" />
+                </Button>
+              </div>
+            )}
+            {fullBlob && (
+              <div className="flex gap-2 items-center p-3 bg-muted/30 rounded-lg">
+                <Headphones className="h-4 w-4 text-primary" />
+                <span className="text-sm font-medium flex-1">Livre complet MP3 prêt</span>
+                <Button size="sm" variant="outline" onClick={() => togglePlay('full')}>
+                  {playingType === 'full' ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
+                </Button>
+                <Button size="sm" variant="outline" onClick={handleDownloadFullExport}>
+                  <Download className="h-3 w-3" />
+                </Button>
+              </div>
+            )}
+            <Button onClick={handleGenerateAudio} disabled={isGeneratingAudio} className="w-full">
+              {isGeneratingAudio ? (
+                <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Génération en cours...</>
+              ) : (
+                <><Headphones className="h-4 w-4 mr-2" /> 🎙️ Générer l'Intro + Livre Complet en MP3</>
+              )}
             </Button>
           </div>
         );
