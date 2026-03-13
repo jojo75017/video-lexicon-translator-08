@@ -483,9 +483,9 @@ export const AudioDirectMode: React.FC = () => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          {artifacts.length > 0 && (
+          {artifacts.count > 0 && (
             <div className="p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg text-sm">
-              ⚠️ {artifacts.length} artéfact(s) Markdown détecté(s). Le texte sera nettoyé automatiquement avant la génération.
+              ⚠️ {artifacts.count} artéfact(s) Markdown détecté(s). Le texte sera nettoyé automatiquement avant la génération.
             </div>
           )}
           <Textarea
