@@ -140,6 +140,7 @@ import SubscriberActivityPopup from '@/components/admin/SubscriberActivityPopup'
 import { EbookLibrary } from '@/components/ebook/EbookLibrary';
 import { AudioExpressWorkflow } from '@/components/ebook/AudioExpressWorkflow';
 import { AudiobookLibrary } from '@/components/ebook/AudiobookLibrary';
+import { AudioDirectMode } from '@/components/ebook/AudioDirectMode';
 import ElementorExportPage from '@/pages/ElementorExportPage';
 import { EbookDraftMode } from '@/components/ebook/EbookDraftMode';
 import { EbookPromptLibrary } from '@/components/ebook/EbookPromptLibrary';
