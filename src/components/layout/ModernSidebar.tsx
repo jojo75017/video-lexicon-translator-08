@@ -324,7 +324,6 @@ const categories: Category[] = [
     emoji: '🎧',
     color: 'from-indigo-500 to-violet-500',
     items: [
-      { id: 'audio-direct', label: 'Audio Direct', icon: Zap, isNew: true },
       { id: 'audiobook', label: 'Livre Audio', icon: Headphones, isNew: true },
       { id: 'audio-express', label: 'Audio Express', icon: Zap },
       { id: 'audiobook-library', label: 'Mes Livres Audio', icon: Music, isNew: true },

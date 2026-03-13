@@ -10,11 +10,15 @@ import { Label } from '@/components/ui/label';
 import {
   Target, ListOrdered, PenTool, Sparkles, Clock, Mic2,
   Volume2, Combine, Archive, ChevronRight, ChevronLeft,
-  CheckCircle2, Lock, Loader2, Headphones, Download
+  CheckCircle2, Lock, Loader2, Headphones, Download, Play, Pause, Music
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cleanForAudio } from '@/utils/textCleaner';
 import { buildIntroDisplayText } from '@/utils/audioIntroGenerator';
+import { generateIntroForExport } from '@/utils/audioIntroGenerator';
+import { supabase } from '@/integrations/supabase/client';
+import { saveAs } from 'file-saver';
+import JSZip from 'jszip';
 
 // --- Constants ---
 
@@ -109,6 +113,15 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
   // A6 voice — auto-mapped from category
   const [selectedVoice, setSelectedVoice] = useState('fr-FR-EloiseNeural');
 
+  // MP3 generation state
+  const [introBlob, setIntroBlob] = useState<Blob | null>(null);
+  const [fullBlob, setFullBlob] = useState<Blob | null>(null);
+  const [generationProgress, setGenerationProgress] = useState(0);
+  const [generationLabel, setGenerationLabel] = useState('');
+  const [isGeneratingAudio, setIsGeneratingAudio] = useState(false);
+  const audioRef = React.useRef<HTMLAudioElement | null>(null);
+  const [playingType, setPlayingType] = useState<'intro' | 'full' | null>(null);
+
   // Sync voice when category changes
   useEffect(() => {
     const cat = CATEGORIES.find(c => c.value === category);
@@ -163,59 +176,204 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
     markStepDone('A4', cleaned);
   }, [chapters, conclusion, stepResults]);
 
-  // A7: Navigate to audio generator
-  const handleGoToAudioGenerator = () => {
-    markStepDone('A7');
-    if (onNavigateToAudio) {
-      toast.info('🎙️ Redirection vers le générateur audio...');
-      setTimeout(() => onNavigateToAudio(), 500);
+  // TTS generation via edge function
+  const generateTts = async (text: string): Promise<Blob | null> => {
+    const { data: { session } } = await supabase.auth.getSession();
+    const token = session?.access_token;
+    const clean = cleanForAudio(text);
+    const chunks: string[] = [];
+    let remaining = clean;
+    while (remaining.length > 0) {
+      chunks.push(remaining.substring(0, 5000));
+      remaining = remaining.substring(5000);
+    }
+    const audioBlobs: Blob[] = [];
+    for (const chunk of chunks) {
+      const catData = CATEGORIES.find(c => c.value === category);
+      let response: Response;
+      if (token) {
+        response = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY, Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ text: chunk, voiceId: catData?.voiceId || 'pFZP5JQG7iQjIQuC4Bku', modelId: 'eleven_multilingual_v2' }),
+          }
+        );
+      } else {
+        response = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/azure-speech-tts`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
+            body: JSON.stringify({ text: chunk, niche: category }),
+          }
+        );
+      }
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({ error: 'Erreur inconnue' }));
+        throw new Error(err.error || `Erreur ${response.status}`);
+      }
+      const data = await response.json();
+      const audioUrl = `data:audio/mpeg;base64,${data.audioContent}`;
+      const audioResponse = await fetch(audioUrl);
+      audioBlobs.push(await audioResponse.blob());
+    }
+    return new Blob(audioBlobs, { type: 'audio/mpeg' });
+  };
+
+  // Split text into chapters
+  const splitIntoChapters = (text: string): { title: string; content: string }[] => {
+    const chapterRegex = /(?:^|\n)(Chapitre\s+\d+[^\n]*)/gi;
+    const matches = [...text.matchAll(chapterRegex)];
+    if (matches.length >= 2) {
+      const chapters: { title: string; content: string }[] = [];
+      for (let i = 0; i < matches.length; i++) {
+        const startIdx = matches[i].index!;
+        const endIdx = i + 1 < matches.length ? matches[i + 1].index! : text.length;
+        chapters.push({ title: matches[i][1].trim(), content: text.substring(startIdx, endIdx).trim() });
+      }
+      return chapters;
+    }
+    const sections: { title: string; content: string }[] = [];
+    const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim().length > 20);
+    let currentContent = '';
+    let sectionIndex = 1;
+    for (const para of paragraphs) {
+      if (currentContent.length + para.length > 5000 && currentContent.length > 500) {
+        sections.push({ title: `Section ${sectionIndex}`, content: currentContent.trim() });
+        currentContent = para;
+        sectionIndex++;
+      } else {
+        currentContent += '\n\n' + para;
+      }
+    }
+    if (currentContent.trim()) sections.push({ title: `Section ${sectionIndex}`, content: currentContent.trim() });
+    return sections.length > 0 ? sections : [{ title: 'Livre complet', content: text }];
+  };
+
+  // A7: Generate full audiobook (intro + chapters) as MP3
+  const handleGenerateAudio = async () => {
+    const brief = getBriefData();
+    const textToConvert = cleanedText || brief.chapterContent || chapterContent;
+    if (!textToConvert?.trim()) {
+      toast.error('Aucun texte à convertir. Complétez les étapes précédentes.');
+      return;
+    }
+    setIsGeneratingAudio(true);
+    setGenerationProgress(0);
+    try {
+      const zip = new JSZip();
+
+      // Intro MP3
+      setGenerationLabel('🎵 Génération de l\'intro...');
+      setGenerationProgress(5);
+      const introBlobs = await generateIntroForExport(
+        generateTts, brief.bookTitle || bookTitle, brief.authorName || authorNameState,
+        brief.introduction || introduction, category
+      );
+      if (introBlobs.length > 0) {
+        const iBlob = new Blob(introBlobs, { type: 'audio/mpeg' });
+        zip.file('00-Intro-Jingle.mp3', iBlob);
+        setIntroBlob(iBlob);
+      }
+
+      // Chapters
+      const chaps = splitIntoChapters(textToConvert);
+      for (let i = 0; i < chaps.length; i++) {
+        setGenerationLabel(`📖 ${i + 1}/${chaps.length} — ${chaps[i].title}`);
+        setGenerationProgress(Math.round(10 + ((i) / chaps.length) * 80));
+        const blob = await generateTts(chaps[i].content);
+        if (blob) {
+          const fname = `${String(i + 1).padStart(2, '0')}-${chaps[i].title.replace(/[^a-zA-Z0-9àâéèêëïîôùûüç\s-]/gi, '').replace(/\s+/g, '-').substring(0, 60)}.mp3`;
+          zip.file(fname, blob);
+        }
+      }
+
+      // ZIP download
+      setGenerationLabel('📦 Création du ZIP...');
+      setGenerationProgress(95);
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      saveAs(zipBlob, `audiobook-${(brief.bookTitle || bookTitle).replace(/\s+/g, '-')}.zip`);
+
+      // Merge for full preview
+      const allFiles = Object.values(zip.files);
+      const mp3Blobs: Blob[] = [];
+      for (const file of allFiles) {
+        if (!file.dir) mp3Blobs.push(await file.async('blob'));
+      }
+      if (mp3Blobs.length > 0) {
+        const mergedBlob = new Blob(mp3Blobs, { type: 'audio/mpeg' });
+        setFullBlob(mergedBlob);
+        await saveToLibrary(mergedBlob, brief.bookTitle || bookTitle, brief.authorName || authorNameState);
+      }
+
+      markStepDone('A7');
+      markStepDone('A8');
+      toast.success(`🎉 Audiobook généré ! ${chaps.length + 1} fichiers MP3`);
+      setTimeout(() => setCurrentStep(8), 500);
+    } catch (error: any) {
+      console.error('Audio generation error:', error);
+      toast.error(`Erreur : ${error.message}`);
+    } finally {
+      setIsGeneratingAudio(false);
+      setGenerationProgress(0);
+      setGenerationLabel('');
     }
   };
 
-  // Download intro as text file (for TTS or site usage)
+  // Save to library
+  const saveToLibrary = async (audioBlob: Blob, titleStr: string, authorStr: string) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user?.id;
+      if (!userId) return;
+      const fileName = `${userId}/${Date.now()}-${titleStr.replace(/[^a-zA-Z0-9àâéèêëïîôùûüç\s-]/gi, '').replace(/\s+/g, '-')}.mp3`;
+      const { error: uploadError } = await supabase.storage.from('audiobooks').upload(fileName, audioBlob, { contentType: 'audio/mpeg' });
+      if (uploadError) { console.error('Upload error:', uploadError); return; }
+      const { data: urlData } = supabase.storage.from('audiobooks').getPublicUrl(fileName);
+      const wordCount = (cleanedText || chapterContent).split(/\s+/).filter(w => w).length;
+      await supabase.from('audiobooks').insert({
+        user_id: userId, title: titleStr.trim(), author_name: authorStr || null,
+        description: introduction || null, audio_url: urlData.publicUrl,
+        voice_name: CATEGORIES.find(c => c.value === category)?.voiceName || 'Auto',
+        duration_seconds: Math.round((wordCount / 150) * 60), status: 'published', is_public: false,
+      });
+      toast.success('💾 Sauvegardé dans Mes Livres Audio');
+    } catch (e) { console.error('saveToLibrary error:', e); }
+  };
+
+  // Play/pause preview
+  const togglePlay = (type: 'intro' | 'full') => {
+    const blob = type === 'intro' ? introBlob : fullBlob;
+    if (!blob) return;
+    if (playingType === type && audioRef.current) {
+      audioRef.current.pause(); audioRef.current = null; setPlayingType(null); return;
+    }
+    if (audioRef.current) audioRef.current.pause();
+    const url = URL.createObjectURL(blob);
+    const audio = new Audio(url);
+    audio.onended = () => { setPlayingType(null); URL.revokeObjectURL(url); };
+    audio.play(); audioRef.current = audio; setPlayingType(type);
+  };
+
+  // Download MP3 blob
   const handleDownloadIntro = () => {
-    const brief = getBriefData();
-    const title = brief.bookTitle || bookTitle || 'livre-audio';
-    const introText = brief.introduction || introduction;
-    const blob = new Blob([introText], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `intro-${title.replace(/\s+/g, '-').toLowerCase()}.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
-    toast.success('📥 Introduction téléchargée');
+    if (introBlob) {
+      saveAs(introBlob, `${(bookTitle || 'livre-audio').replace(/\s+/g, '-')}-intro.mp3`);
+      toast.success('📥 Intro MP3 téléchargée');
+    } else {
+      toast.info('Générez d\'abord l\'audio à l\'étape A7');
+    }
   };
 
-  // Download full cleaned text for export
   const handleDownloadFullExport = () => {
-    const brief = getBriefData();
-    const title = brief.bookTitle || bookTitle || 'livre-audio';
-    const author = brief.authorName || authorNameState || 'Auteur';
-    const introText = brief.introduction || introduction;
-    
-    let fullContent = `=== ${title} ===\n`;
-    if (brief.bookSubtitle || bookSubtitle) fullContent += `${brief.bookSubtitle || bookSubtitle}\n`;
-    fullContent += `Par ${author}\n`;
-    fullContent += `${'='.repeat(40)}\n\n`;
-    fullContent += `--- INTRODUCTION ---\n${introText}\n\n`;
-    
-    const text = cleanedText || brief.chapterContent || chapterContent;
-    if (text) {
-      fullContent += `--- CONTENU ---\n${text}\n\n`;
+    if (fullBlob) {
+      saveAs(fullBlob, `${(bookTitle || 'livre-audio').replace(/\s+/g, '-')}-complet.mp3`);
+      toast.success('📥 Livre complet MP3 téléchargé');
+    } else {
+      toast.info('Générez d\'abord l\'audio à l\'étape A7');
     }
-    if (conclusion) {
-      fullContent += `--- CONCLUSION ---\n${conclusion}\n`;
-    }
-
-    const blob = new Blob([fullContent], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${title.replace(/\s+/g, '-').toLowerCase()}-complet.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
-    toast.success('📥 Livre complet téléchargé');
   };
 
   const renderStepContent = (idx: number) => {
@@ -391,23 +549,55 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
             <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 text-sm space-y-1">
               <p>✅ Titre : <strong>{brief.bookTitle}</strong></p>
               <p>✅ Auteur : <strong>{brief.authorName}</strong></p>
-              <p>✅ Voix : <strong>{AZURE_VOICES.find(v => v.id === selectedVoice)?.label}</strong></p>
+              <p>✅ Voix : <strong>{CATEGORIES.find(c => c.value === brief.category)?.voiceName}</strong></p>
               <p>✅ Texte nettoyé & ponctuation optimisée</p>
               <div className="text-xs text-muted-foreground mt-2 space-y-1">
-                <p className="font-medium">🎬 Structure de l'intro Premium :</p>
-                <p>1. 🎵 Jingle musical (3s)</p>
-                <p>2. 📢 « Vous êtes bien sur EbookStudio 2026. »</p>
-                <p>3. ✍️ « Ce livre audio est rédigé par {brief.authorName || 'l\'auteur'}. »</p>
-                <p>4. 📖 « Nous avons le plaisir de vous présenter : {brief.bookTitle}. »</p>
-                <p>5. 🎧 Extrait de mise en bouche (50 mots max)</p>
-                <p>6. ⏸️ Silence de transition (2s)</p>
+                <p className="font-medium">🎬 Ce qui sera généré :</p>
+                <p>1. 🎵 Intro Premium (jingle + présentation + teaser)</p>
+                <p>2. 📖 Tous les chapitres en MP3 séparés</p>
+                <p>3. 📦 Archive ZIP complète téléchargée automatiquement</p>
+                <p>4. 💾 Sauvegarde automatique dans Mes Livres Audio</p>
               </div>
             </div>
-            <Button onClick={handleGoToAudioGenerator} className="w-full">
-              <Headphones className="h-4 w-4 mr-2" /> 🎙️ Lancer la Production Audio
-            </Button>
-            <Button variant="outline" onClick={() => markStepDone('A7')} className="w-full">
-              <CheckCircle2 className="h-4 w-4 mr-2" /> Marquer comme terminé (production manuelle)
+            {isGeneratingAudio && (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                  <span className="text-sm font-medium">{generationLabel}</span>
+                </div>
+                <Progress value={generationProgress} className="h-2" />
+              </div>
+            )}
+            {introBlob && (
+              <div className="flex gap-2 items-center p-3 bg-muted/30 rounded-lg">
+                <Music className="h-4 w-4 text-primary" />
+                <span className="text-sm font-medium flex-1">Intro MP3 prête</span>
+                <Button size="sm" variant="outline" onClick={() => togglePlay('intro')}>
+                  {playingType === 'intro' ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
+                </Button>
+                <Button size="sm" variant="outline" onClick={handleDownloadIntro}>
+                  <Download className="h-3 w-3" />
+                </Button>
+              </div>
+            )}
+            {fullBlob && (
+              <div className="flex gap-2 items-center p-3 bg-muted/30 rounded-lg">
+                <Headphones className="h-4 w-4 text-primary" />
+                <span className="text-sm font-medium flex-1">Livre complet MP3 prêt</span>
+                <Button size="sm" variant="outline" onClick={() => togglePlay('full')}>
+                  {playingType === 'full' ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
+                </Button>
+                <Button size="sm" variant="outline" onClick={handleDownloadFullExport}>
+                  <Download className="h-3 w-3" />
+                </Button>
+              </div>
+            )}
+            <Button onClick={handleGenerateAudio} disabled={isGeneratingAudio} className="w-full">
+              {isGeneratingAudio ? (
+                <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Génération en cours...</>
+              ) : (
+                <><Headphones className="h-4 w-4 mr-2" /> 🎙️ Générer l'Intro + Livre Complet en MP3</>
+              )}
             </Button>
           </div>
         );
@@ -415,22 +605,41 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
       case 'A8':
         return (
           <div className="space-y-4">
-            <p className="text-muted-foreground text-sm">Fusion de l'intro + chapitres + outro en un seul MP3 pour <strong>{brief.bookTitle}</strong>.</p>
+            <p className="text-muted-foreground text-sm">Fusion de l'intro + chapitres en MP3 pour <strong>{brief.bookTitle}</strong>.</p>
             <div className="bg-muted/30 border rounded-lg p-4 text-sm">
               <p>📋 Métadonnées du fichier audio :</p>
               <p className="text-muted-foreground">Titre : {brief.bookTitle} {brief.bookSubtitle && `— ${brief.bookSubtitle}`}</p>
               <p className="text-muted-foreground">Auteur : {brief.authorName}</p>
               <p className="text-muted-foreground">Catégorie : {CATEGORIES.find(c => c.value === brief.category)?.label}</p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <Button variant="outline" onClick={handleDownloadIntro}>
-                <Download className="h-4 w-4 mr-2" /> 📥 Télécharger l'Intro
-              </Button>
-              <Button variant="outline" onClick={handleDownloadFullExport}>
-                <Download className="h-4 w-4 mr-2" /> 📥 Télécharger le Livre Complet
-              </Button>
-            </div>
-            <Button onClick={() => markStepDone('A8')} className="w-full">
+            {introBlob && (
+              <div className="flex gap-2 items-center p-3 bg-muted/30 rounded-lg">
+                <Music className="h-4 w-4 text-primary" />
+                <span className="text-sm flex-1">Intro MP3</span>
+                <Button size="sm" variant="outline" onClick={() => togglePlay('intro')}>
+                  {playingType === 'intro' ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
+                </Button>
+                <Button size="sm" variant="outline" onClick={handleDownloadIntro}>
+                  <Download className="h-3 w-3 mr-1" /> Intro
+                </Button>
+              </div>
+            )}
+            {fullBlob && (
+              <div className="flex gap-2 items-center p-3 bg-muted/30 rounded-lg">
+                <Headphones className="h-4 w-4 text-primary" />
+                <span className="text-sm flex-1">Livre complet MP3</span>
+                <Button size="sm" variant="outline" onClick={() => togglePlay('full')}>
+                  {playingType === 'full' ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
+                </Button>
+                <Button size="sm" variant="outline" onClick={handleDownloadFullExport}>
+                  <Download className="h-3 w-3 mr-1" /> Complet
+                </Button>
+              </div>
+            )}
+            {!introBlob && !fullBlob && (
+              <p className="text-sm text-amber-600">⚠️ Aucun MP3 généré. Retournez à l'étape A7 pour lancer la production audio.</p>
+            )}
+            <Button onClick={() => markStepDone('A8')} className="w-full" disabled={!fullBlob}>
               <CheckCircle2 className="h-4 w-4 mr-2" /> Fusion terminée
             </Button>
           </div>
@@ -442,16 +651,20 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
             <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
               <p className="font-medium">🎉 Félicitations !</p>
               <p className="text-sm text-muted-foreground mt-1">
-                « <strong>{brief.bookTitle}</strong> » par <strong>{brief.authorName}</strong> est prêt. Retrouvez-le dans la 📚 Bibliothèque.
+                « <strong>{brief.bookTitle}</strong> » par <strong>{brief.authorName}</strong> est prêt et sauvegardé dans la 📚 Bibliothèque.
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <Button variant="outline" onClick={handleDownloadIntro}>
-                <Download className="h-4 w-4 mr-2" /> 📥 Intro seule
-              </Button>
-              <Button variant="outline" onClick={handleDownloadFullExport}>
-                <Download className="h-4 w-4 mr-2" /> 📥 Export complet
-              </Button>
+              {introBlob && (
+                <Button variant="outline" onClick={handleDownloadIntro}>
+                  <Download className="h-4 w-4 mr-2" /> 📥 Intro MP3
+                </Button>
+              )}
+              {fullBlob && (
+                <Button variant="outline" onClick={handleDownloadFullExport}>
+                  <Download className="h-4 w-4 mr-2" /> 📥 Livre Complet MP3
+                </Button>
+              )}
             </div>
             <Button onClick={() => markStepDone('A9')} className="w-full">
               <Archive className="h-4 w-4 mr-2" /> Archiver et terminer
