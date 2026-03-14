@@ -6,7 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   BarChart3, CheckCircle2, Clock, Eye, AlertCircle, Lock, Play, 
-  Trash2, Cloud, RefreshCw, Loader2
+  Trash2, Cloud, RefreshCw, Loader2, Headphones
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useWorkflowResults } from '@/hooks/useWorkflowResults';
@@ -118,6 +118,15 @@ export const WorkflowDashboard: React.FC<WorkflowDashboardProps> = ({
             <Button onClick={onStartAutoWorkflow} className="gap-2 bg-gold hover:bg-gold-dark text-slate-900 font-semibold" disabled={completedCount === totalSteps}>
               <Play className="h-4 w-4" />
               Lancer Auto P1→P14
+            </Button>
+          )}
+          {(hasStepResult('P4') || hasStepResult('P5')) && (
+            <Button 
+              onClick={() => onNavigate('audio-express')} 
+              className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold"
+            >
+              <Headphones className="h-4 w-4" />
+              Exporter vers Audio Express
             </Button>
           )}
         </div>
