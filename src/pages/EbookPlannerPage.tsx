@@ -1161,7 +1161,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           />
         );
 
-
+      case 'workflow-dashboard':
         return (
           <WorkflowDashboard
             ebookTitle={ebookTitle}
