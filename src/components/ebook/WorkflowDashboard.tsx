@@ -120,6 +120,15 @@ export const WorkflowDashboard: React.FC<WorkflowDashboardProps> = ({
               Lancer Auto P1→P14
             </Button>
           )}
+          {(hasStepResult('P4') || hasStepResult('P5')) && (
+            <Button 
+              onClick={() => onNavigate('audio-express')} 
+              className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold"
+            >
+              <Headphones className="h-4 w-4" />
+              Exporter vers Audio Express
+            </Button>
+          )}
         </div>
       </div>
 
