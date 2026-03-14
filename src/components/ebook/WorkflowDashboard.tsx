@@ -6,7 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   BarChart3, CheckCircle2, Clock, Eye, AlertCircle, Lock, Play, 
-  Trash2, Cloud, RefreshCw, Loader2
+  Trash2, Cloud, RefreshCw, Loader2, Headphones
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useWorkflowResults } from '@/hooks/useWorkflowResults';
