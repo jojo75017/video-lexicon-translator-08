@@ -133,13 +133,15 @@ Rappel : ta réponse doit être UNIQUEMENT du JSON valide, spécifique à "${suj
 
     let analysis;
     try {
-      // Try direct JSON parse first
-      const cleaned = content.trim();
+      // Clean markdown fences and extract JSON
+      let cleaned = content.trim();
+      cleaned = cleaned.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '');
+      cleaned = cleaned.trim();
+      
       if (cleaned.startsWith('{')) {
         analysis = JSON.parse(cleaned);
       } else {
-        // Extract JSON from response
-        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
           analysis = JSON.parse(jsonMatch[0]);
         } else {
