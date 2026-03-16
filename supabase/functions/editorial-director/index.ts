@@ -86,22 +86,22 @@ RÈGLES ABSOLUES :
 3. Les suggestions de titres doivent rester dans la MÊME thématique que le sujet original.
 4. Réponds UNIQUEMENT en JSON valide, sans texte avant ou après.
 
-FORMAT DE RÉPONSE (JSON strict) :
+FORMAT DE RÉPONSE (JSON strict, sois CONCIS - max 1-2 phrases par champ) :
 {
-  "promesseCentrale": "La promesse unique et spécifique que CE livre fait au lecteur (1-2 phrases, directement liée au sujet)",
-  "angleEditorial": "L'angle différenciant qui distingue CE livre de la concurrence existante sur CE sujet (2-3 phrases concrètes)",
-  "cibleIdeale": "Description précise du lecteur idéal pour CE sujet : son profil, ses besoins spécifiques, ses frustrations actuelles (3-4 phrases)",
-  "erreursCourantes": ["Erreur spécifique au marché de CE sujet 1", "Erreur 2", "Erreur 3", "Erreur 4", "Erreur 5"],
-  "visionGlobale": "Positionnement stratégique de CE livre sur le marché Amazon KDP, comment il se différencie et pourquoi il réussira (3-4 phrases)",
+  "promesseCentrale": "1-2 phrases courtes",
+  "angleEditorial": "1-2 phrases courtes",
+  "cibleIdeale": "2-3 phrases courtes",
+  "erreursCourantes": ["Erreur 1 (5-10 mots)", "Erreur 2", "Erreur 3", "Erreur 4", "Erreur 5"],
+  "visionGlobale": "2-3 phrases courtes",
   "suggestionsTitle": [
-    {"titre": "Titre Court (2-4 mots)", "sousTitre": "Sous-titre avec promesse et mots-clés (8-15 mots)", "scoreKdp": 85, "raison": "Justification du score en 1 phrase"},
-    {"titre": "Titre Court 2", "sousTitre": "Sous-titre accrocheur", "scoreKdp": 78, "raison": "Justification"},
-    {"titre": "Titre Court 3", "sousTitre": "Sous-titre avec bénéfice clair", "scoreKdp": 92, "raison": "Justification"},
-    {"titre": "Titre Court 4", "sousTitre": "Sous-titre émotionnel", "scoreKdp": 70, "raison": "Justification"},
-    {"titre": "Titre Court 5", "sousTitre": "Sous-titre pratique", "scoreKdp": 88, "raison": "Justification"}
+    {"titre": "2-4 mots", "sousTitre": "8-12 mots", "scoreKdp": 85, "raison": "1 phrase courte"},
+    {"titre": "2-4 mots", "sousTitre": "8-12 mots", "scoreKdp": 78, "raison": "1 phrase courte"},
+    {"titre": "2-4 mots", "sousTitre": "8-12 mots", "scoreKdp": 92, "raison": "1 phrase courte"},
+    {"titre": "2-4 mots", "sousTitre": "8-12 mots", "scoreKdp": 70, "raison": "1 phrase courte"},
+    {"titre": "2-4 mots", "sousTitre": "8-12 mots", "scoreKdp": 88, "raison": "1 phrase courte"}
   ],
-  "meilleurTitre": {"index": 2, "explication": "Pourquoi ce titre est le meilleur choix (2-3 phrases)"},
-  "titreOriginalScore": {"scoreKdp": 65, "forces": "Points forts concrets du titre actuel", "faiblesses": "Points faibles précis à améliorer"}
+  "meilleurTitre": {"index": 2, "explication": "1-2 phrases courtes"},
+  "titreOriginalScore": {"scoreKdp": 65, "forces": "1 phrase", "faiblesses": "1 phrase"}
 }
 
 CRITÈRES DE SCORING KDP (0-100) :
