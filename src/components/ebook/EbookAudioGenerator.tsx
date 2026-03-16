@@ -23,6 +23,7 @@ import JSZip from 'jszip';
 import { supabase } from '@/integrations/supabase/client';
 import { generateIntroJingle, generateIntroForExport } from '@/utils/audioIntroGenerator';
 import { cleanForAudio, detectAudioArtifacts } from '@/utils/textCleaner';
+import { splitTextForTts } from '@/utils/ttsChunker';
 
 interface Chapter {
   id: string;
@@ -578,13 +579,8 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
     // Nettoyage final de sécurité avant envoi à l'API vocale
     const cleanText = cleanForAudio(text);
     
-    // Split text into chunks of 5000 chars max
-    const chunks: string[] = [];
-    let remaining = cleanText;
-    while (remaining.length > 0) {
-      chunks.push(remaining.substring(0, 5000));
-      remaining = remaining.substring(5000);
-    }
+    // Split text into chunks at sentence boundaries for natural audio
+    const chunks = splitTextForTts(cleanText);
 
     const audioBlobs: Blob[] = [];
     

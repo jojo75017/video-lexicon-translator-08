@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cleanForAudio } from '@/utils/textCleaner';
+import { splitTextForTts } from '@/utils/ttsChunker';
 import { buildIntroDisplayText } from '@/utils/audioIntroGenerator';
 import { generateIntroForExport } from '@/utils/audioIntroGenerator';
 import { supabase } from '@/integrations/supabase/client';
@@ -181,12 +182,7 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
     const { data: { session } } = await supabase.auth.getSession();
     const token = session?.access_token;
     const clean = cleanForAudio(text);
-    const chunks: string[] = [];
-    let remaining = clean;
-    while (remaining.length > 0) {
-      chunks.push(remaining.substring(0, 5000));
-      remaining = remaining.substring(5000);
-    }
+    const chunks = splitTextForTts(clean);
     const audioBlobs: Blob[] = [];
     for (const chunk of chunks) {
       const catData = CATEGORIES.find(c => c.value === category);
