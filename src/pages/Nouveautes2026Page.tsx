@@ -246,7 +246,7 @@ export default function Nouveautes2026Page() {
         <section className="border-t border-border/40 bg-card/30">
           <div className="mx-auto max-w-4xl px-4 py-16 text-center">
             <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-              <Badge className="mb-4 bg-emerald-500/10 text-emerald-400 border-emerald-500/30">
+              <Badge className="mb-4 bg-accent/10 text-accent border-accent/30">
                 <Globe className="w-3 h-3 mr-1" /> En construction
               </Badge>
               <h2 className="text-2xl md:text-3xl font-bold mb-4">
