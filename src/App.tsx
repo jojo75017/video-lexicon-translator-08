@@ -458,6 +458,7 @@ const App = () => {
             <Route path="/audiobook-merci/:slug" element={<AudiobookThankYouPage />} />
             <Route path="/formation-embed" element={<FormationEmbedPage />} />
             <Route path="/elementor-export" element={<ElementorExportPage />} />
+            <Route path="/nouveautes-2026" element={<Nouveautes2026Page />} />
             
             {/* SaaS Routes */}
             <Route path="/saas/login" element={<SaasAuthPage />} />
