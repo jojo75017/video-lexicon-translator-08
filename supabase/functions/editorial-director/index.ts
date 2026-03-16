@@ -6,14 +6,14 @@ const corsHeaders = {
 };
 
 async function callAI(systemPrompt: string, userPrompt: string, opts: { maxTokens?: number; temperature?: number; timeout?: number } = {}) {
-  const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-  
-  // Fallback to GEMINI_API_KEY if LOVABLE_API_KEY not available
-  if (!LOVABLE_API_KEY) {
-    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-    if (!GEMINI_API_KEY) throw new Error("Aucune clé API configurée.");
+  // Prefer GEMINI_API_KEY (user's own key), fallback to Lovable Gateway
+  const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
+  if (GEMINI_API_KEY) {
     return callGeminiFallback(GEMINI_API_KEY, systemPrompt, userPrompt, opts);
   }
+
+  const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+  if (!LOVABLE_API_KEY) throw new Error("Aucune clé API configurée.");
 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), opts.timeout || 90000);
