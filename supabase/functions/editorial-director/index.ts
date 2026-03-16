@@ -129,7 +129,7 @@ Rappel : UNIQUEMENT du JSON valide sans balises markdown, sois CONCIS, spécifiq
 
     console.log("Editorial Director - Analyse pour:", sujet);
 
-    const content = await callAI(systemPrompt, userPrompt, { maxTokens: 3000, temperature: 0.6 });
+    const content = await callAI(systemPrompt, userPrompt, { maxTokens: 4500, temperature: 0.6 });
 
     let analysis;
     try {
