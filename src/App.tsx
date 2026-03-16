@@ -53,6 +53,7 @@ import AudiobookEmbedPage from './pages/AudiobookEmbedPage';
 import AudiobookDemoPage from './pages/AudiobookDemoPage';
 import AudiobookThankYouPage from './pages/AudiobookThankYouPage';
 import FormationEmbedPage from './pages/FormationEmbedPage';
+import Nouveautes2026Page from './pages/Nouveautes2026Page';
 import ElementorExportPage from './pages/ElementorExportPage';
 import { SubscriptionAuth } from '@/components/SubscriptionAuth';
 import { supabase } from '@/integrations/supabase/client';
