@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cleanForAudio } from '@/utils/textCleaner';
+import { splitTextForTts } from '@/utils/ttsChunker';
 import { buildIntroDisplayText } from '@/utils/audioIntroGenerator';
 import { generateIntroForExport } from '@/utils/audioIntroGenerator';
 import { supabase } from '@/integrations/supabase/client';
