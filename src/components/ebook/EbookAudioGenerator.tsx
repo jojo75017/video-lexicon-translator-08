@@ -23,6 +23,7 @@ import JSZip from 'jszip';
 import { supabase } from '@/integrations/supabase/client';
 import { generateIntroJingle, generateIntroForExport } from '@/utils/audioIntroGenerator';
 import { cleanForAudio, detectAudioArtifacts } from '@/utils/textCleaner';
+import { splitTextForTts } from '@/utils/ttsChunker';
 
 interface Chapter {
   id: string;
