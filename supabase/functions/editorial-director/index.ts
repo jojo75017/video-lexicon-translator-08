@@ -125,7 +125,7 @@ IMPORTANT : Les 5 suggestions doivent toutes traiter du MÊME sujet que celui do
 SUJET/TITRE : "${sujet}"
 ${contexte ? `\nCONTEXTE : ${contexte}` : ""}
 
-Rappel : ta réponse doit être UNIQUEMENT du JSON valide, spécifique à "${sujet}".`;
+Rappel : UNIQUEMENT du JSON valide sans balises markdown, sois CONCIS, spécifique à "${sujet}".`;
 
     console.log("Editorial Director - Analyse pour:", sujet);
 
