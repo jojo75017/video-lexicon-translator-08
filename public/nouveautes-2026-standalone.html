@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nouveautés 2026 — EbookStudio Pro | Toutes les fonctionnalités</title>
+  <meta name="description" content="Découvrez toutes les nouveautés 2026 d'EbookStudio Pro : moteur IA Gemini 3 Flash, livres audio professionnels, 7 générateurs spécialisés et outils marketing KDP intégrés.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --bg-card: rgba(255,255,255,0.04);
+      --text: #f0f0f5;
+      --text-muted: #9ca3af;
+      --primary: #a78bfa;
+      --primary-glow: rgba(167,139,250,0.15);
+      --accent: #22d3ee;
+      --border: rgba(255,255,255,0.08);
+      --border-hover: rgba(167,139,250,0.3);
+      --radius: 16px;
+      --radius-sm: 12px;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: var(--primary); text-decoration: none; transition: opacity 0.2s; }
+    a:hover { opacity: 0.8; }
+
+    /* ── Header ── */
+    .header {
+      position: sticky; top: 0; z-index: 50;
+      border-bottom: 1px solid var(--border);
+      background: rgba(10,10,15,0.8);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+    .header-inner {
+      max-width: 1200px; margin: 0 auto;
+      padding: 12px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .header-brand { font-size: 1.1rem; font-weight: 700; color: var(--primary); }
+    .header-badge {
+      font-size: 0.75rem; font-weight: 600;
+      padding: 4px 12px; border-radius: 999px;
+      border: 1px solid rgba(167,139,250,0.4);
+      color: var(--primary);
+    }
+
+    /* ── Hero ── */
+    .hero {
+      position: relative; overflow: hidden;
+      padding: 80px 20px 60px;
+      text-align: center;
+      background:
+        radial-gradient(circle at 25% 25%, rgba(167,139,250,0.1) 0%, transparent 50%),
+        radial-gradient(circle at 75% 75%, rgba(34,211,238,0.08) 0%, transparent 50%),
+        linear-gradient(135deg, rgba(167,139,250,0.06), transparent, rgba(34,211,238,0.06));
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 0.85rem; font-weight: 600;
+      padding: 6px 18px; border-radius: 999px;
+      background: rgba(167,139,250,0.1);
+      border: 1px solid rgba(167,139,250,0.25);
+      color: var(--primary);
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: clamp(2.2rem, 5vw, 3.8rem);
+      font-weight: 800; letter-spacing: -0.03em;
+      line-height: 1.15; margin-bottom: 20px;
+    }
+    .hero h1 .gradient {
+      background: linear-gradient(135deg, var(--primary), var(--accent), var(--primary));
+      background-size: 200% 200%;
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: gradientShift 4s ease infinite;
+    }
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    .hero-desc {
+      font-size: 1.1rem; color: var(--text-muted);
+      max-width: 720px; margin: 0 auto 48px;
+    }
+
+    /* ── Stats ── */
+    .stats {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+      max-width: 700px; margin: 0 auto 48px;
+    }
+    @media (max-width: 640px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+    .stat-card {
+      padding: 20px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      backdrop-filter: blur(8px);
+      text-align: center;
+    }
+    .stat-value {
+      font-size: clamp(1.8rem, 3vw, 2.5rem);
+      font-weight: 900; color: var(--primary);
+    }
+    .stat-label { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
+
+    /* ── Video ── */
+    .video-wrapper {
+      max-width: 900px; margin: 0 auto;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      box-shadow: 0 20px 60px -15px rgba(167,139,250,0.08);
+    }
+    .video-wrapper video { width: 100%; display: block; aspect-ratio: 16/9; }
+    .video-caption {
+      font-size: 0.85rem; color: var(--text-muted);
+      text-align: center; margin-top: 12px;
+    }
+
+    /* ── Categories ── */
+    .categories { max-width: 1200px; margin: 0 auto; padding: 60px 20px 80px; }
+    .category { margin-bottom: 56px; }
+    .cat-header { display: flex; align-items: center; gap: 16px; margin-bottom: 28px; }
+    .cat-icon {
+      width: 56px; height: 56px;
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 1.6rem; flex-shrink: 0;
+    }
+    .cat-title { font-size: 1.5rem; font-weight: 700; }
+    .cat-badge {
+      font-size: 0.7rem; font-weight: 700;
+      padding: 3px 10px; border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+    .cat-subtitle { font-size: 0.95rem; color: var(--text-muted); margin-top: 2px; }
+
+    .features-grid {
+      display: grid; gap: 16px;
+      grid-template-columns: repeat(3, 1fr);
+    }
+    @media (max-width: 900px) { .features-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 580px) { .features-grid { grid-template-columns: 1fr; } }
+
+    .feature-card {
+      padding: 20px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      backdrop-filter: blur(8px);
+      display: flex; gap: 14px;
+      transition: all 0.3s ease;
+    }
+    .feature-card:hover {
+      border-color: var(--border-hover);
+      box-shadow: 0 8px 30px -8px var(--primary-glow);
+      transform: translateY(-2px);
+    }
+    .feature-icon {
+      width: 40px; height: 40px; flex-shrink: 0;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      color: rgba(255,255,255,0.9); font-size: 1.1rem;
+      transition: transform 0.3s;
+    }
+    .feature-card:hover .feature-icon { transform: scale(1.1); }
+    .feature-title { font-size: 0.95rem; font-weight: 600; margin-bottom: 4px; }
+    .feature-desc { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; }
+
+    /* Gradient backgrounds */
+    .grad-violet { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+    .grad-amber  { background: linear-gradient(135deg, #f59e0b, #ea580c); }
+    .grad-cyan   { background: linear-gradient(135deg, #06b6d4, #2563eb); }
+    .grad-green  { background: linear-gradient(135deg, #10b981, #16a34a); }
+    .grad-rose   { background: linear-gradient(135deg, #f43f5e, #ec4899); }
+    .grad-slate  { background: linear-gradient(135deg, #64748b, #4b5563); }
+
+    /* ── BlogCluster CTA ── */
+    .cta-section {
+      border-top: 1px solid var(--border);
+      background: rgba(255,255,255,0.02);
+      padding: 64px 20px; text-align: center;
+    }
+    .cta-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 0.8rem; font-weight: 600;
+      padding: 4px 14px; border-radius: 999px;
+      background: rgba(34,211,238,0.08);
+      border: 1px solid rgba(34,211,238,0.25);
+      color: var(--accent); margin-bottom: 16px;
+    }
+    .cta-section h2 { font-size: 1.6rem; font-weight: 700; margin-bottom: 16px; }
+    .cta-section p { color: var(--text-muted); max-width: 600px; margin: 0 auto 32px; }
+    .cta-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 28px; border-radius: 10px;
+      font-size: 0.95rem; font-weight: 600;
+      border: none; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-outline {
+      background: transparent; color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-outline:hover { border-color: var(--border-hover); }
+
+    /* ── Pricing ── */
+    .pricing {
+      border-top: 1px solid var(--border);
+      padding: 64px 20px; text-align: center;
+    }
+    .pricing h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 12px; }
+    .price-row { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 16px; }
+    .price-old { text-decoration: line-through; color: var(--text-muted); font-size: 1.1rem; }
+    .price-new { font-size: 3.2rem; font-weight: 900; color: var(--primary); }
+    .pricing .sub { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px; }
+    .pricing .guarantee { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 32px; }
+    .guarantee .check { color: var(--accent); }
+
+    /* ── Footer ── */
+    .footer {
+      border-top: 1px solid var(--border);
+      padding: 24px 20px; text-align: center;
+      font-size: 0.75rem; color: var(--text-muted);
+    }
+
+    /* ── Animations ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-in { animation: fadeUp 0.5s ease forwards; opacity: 0; }
+    .delay-1 { animation-delay: 0.08s; }
+    .delay-2 { animation-delay: 0.16s; }
+    .delay-3 { animation-delay: 0.24s; }
+    .delay-4 { animation-delay: 0.32s; }
+    .delay-5 { animation-delay: 0.4s; }
+    .delay-6 { animation-delay: 0.48s; }
+    .delay-7 { animation-delay: 0.56s; }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <div class="header-inner">
+    <a href="/offres" class="header-brand">← EbookStudio Pro</a>
+    <span class="header-badge">✨ Mise à jour 2026</span>
+  </div>
+</header>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-badge">🚀 Version 2026 — La plus grosse mise à jour</div>
+  <h1>
+    Toutes les <span class="gradient">Nouveautés 2026</span>
+  </h1>
+  <p class="hero-desc">
+    Moteur IA Gemini 3 Flash, livres audio professionnels, 7 générateurs spécialisés,
+    outils marketing KDP et bien plus. La machine éditoriale la plus complète du marché.
+  </p>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat-card animate-in"><div class="stat-value">21</div><div class="stat-label">Fonctions IA Gemini</div></div>
+    <div class="stat-card animate-in delay-1"><div class="stat-value">7</div><div class="stat-label">Générateurs Spécialisés</div></div>
+    <div class="stat-card animate-in delay-2"><div class="stat-value">14</div><div class="stat-label">Modules Workflow Pro</div></div>
+    <div class="stat-card animate-in delay-3"><div class="stat-value">0,30€</div><div class="stat-label">Coût par ebook</div></div>
+  </div>
+
+  <!-- Video -->
+  <div class="video-wrapper animate-in delay-4">
+    <video controls preload="metadata">
+      <source src="videos/nouveautes-2026.mp4" type="video/mp4">
+    </video>
+  </div>
+  <p class="video-caption">▶ Toutes les nouveautés EbookStudio Pro 2026 en vidéo</p>
+</section>
+
+<!-- Categories -->
+<section class="categories">
+
+  <!-- 1. Moteur IA Gemini 3 Flash -->
+  <div class="category">
+    <div class="cat-header">
+      <div class="cat-icon grad-violet">🧠</div>
+      <div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span class="cat-title">Moteur IA Gemini 3 Flash</span>
+          <span class="cat-badge">RÉVOLUTION</span>
+        </div>
+        <div class="cat-subtitle">21 fonctions migrées vers le modèle le plus rapide de Google</div>
+      </div>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card animate-in">
+        <div class="feature-icon grad-violet">⚡</div>
+        <div><div class="feature-title">Directeur Éditorial P1</div><div class="feature-desc">5 suggestions de titres avec scores KDP, analyse du marché et promesse centrale</div></div>
+      </div>
+      <div class="feature-card animate-in delay-1">
+        <div class="feature-icon grad-violet">🎯</div>
+        <div><div class="feature-title">Analyse de Marché P2</div><div class="feature-desc">Mots-clés, concurrence, pricing optimal et positionnement stratégique</div></div>
+      </div>
+      <div class="feature-card animate-in delay-2">
+        <div class="feature-icon grad-violet">📚</div>
+        <div><div class="feature-title">Architecte de Contenu P3</div><div class="feature-desc">Structure intelligente, création de personnages et plan détaillé</div></div>
+      </div>
+      <div class="feature-card animate-in delay-3">
+        <div class="feature-icon grad-violet">✏️</div>
+        <div><div class="feature-title">Rédaction Experte P4</div><div class="feature-desc">Génération de contenu professionnel avec style adapté au genre</div></div>
+      </div>
+      <div class="feature-card animate-in delay-4">
+        <div class="feature-icon grad-violet">🪄</div>
+        <div><div class="feature-title">Réécriture Naturelle P5</div><div class="feature-desc">Humanisation anti-détection IA pour un texte 100% naturel</div></div>
+      </div>
+      <div class="feature-card animate-in delay-5">
+        <div class="feature-icon grad-violet">🛡️</div>
+        <div><div class="feature-title">Qualité Éditoriale P6</div><div class="feature-desc">Contrôle qualité du manuscrit et corrections automatiques</div></div>
+      </div>
+      <div class="feature-card animate-in delay-6">
+        <div class="feature-icon grad-violet">📖</div>
+        <div><div class="feature-title">Packaging Éditorial P7</div><div class="feature-desc">Titre final, description marketing, biographie auteur</div></div>
+      </div>
+      <div class="feature-card animate-in delay-7">
+        <div class="feature-icon grad-violet">🏆</div>
+        <div><div class="feature-title">Diagnostic Final P8</div><div class="feature-desc">Score global de qualité et axes d'amélioration</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Moteur IA V2 -->
+  <div class="category">
+    <div class="cat-header">
+      <div class="cat-icon grad-amber">✨</div>
+      <div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span class="cat-title">Moteur IA V2 — Modules P9 à P14</span>
+          <span class="cat-badge">PREMIUM</span>
+        </div>
+        <div class="cat-subtitle">Intelligence éditoriale avancée pour une qualité premium</div>
+      </div>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card animate-in">
+        <div class="feature-icon grad-amber">🧠</div>
+        <div><div class="feature-title">Mémoire Éditoriale P9</div><div class="feature-desc">Contexte persistant entre les chapitres pour une cohérence parfaite</div></div>
+      </div>
+      <div class="feature-card animate-in delay-1">
+        <div class="feature-icon grad-amber">📚</div>
+        <div><div class="feature-title">Cohérence Chapitres P10</div><div class="feature-desc">Alignement narratif automatique entre tous les chapitres</div></div>
+      </div>
+      <div class="feature-card animate-in delay-2">
+        <div class="feature-icon grad-amber">🤖</div>
+        <div><div class="feature-title">Auto-Critique IA P11</div><div class="feature-desc">L'IA évalue et améliore son propre travail</div></div>
+      </div>
+      <div class="feature-card animate-in delay-3">
+        <div class="feature-icon grad-amber">📈</div>
+        <div><div class="feature-title">Boucle Itérative P12</div><div class="feature-desc">Amélioration multi-passes pour un texte toujours meilleur</div></div>
+      </div>
+      <div class="feature-card animate-in delay-4">
+        <div class="feature-icon grad-amber">✏️</div>
+        <div><div class="feature-title">Signature Stylistique P13</div><div class="feature-desc">Création d'une voix unique et reconnaissable</div></div>
+      </div>
+      <div class="feature-card animate-in delay-5">
+        <div class="feature-icon grad-amber">⭐</div>
+        <div><div class="feature-title">Verdict Ultime P14</div><div class="feature-desc">Évaluation finale et validation avant publication</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Livres Audio -->
+  <div class="category">
+    <div class="cat-header">
+      <div class="cat-icon grad-cyan">🎙️</div>
+      <div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span class="cat-title">Livres Audio Professionnels</span>
+          <span class="cat-badge">NOUVEAU</span>
+        </div>
+        <div class="cat-subtitle">Studio audio complet avec voix neurales Azure</div>
+      </div>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card animate-in">
+        <div class="feature-icon grad-cyan">🔊</div>
+        <div><div class="feature-title">Voix Neurales Azure</div><div class="feature-desc">Denise, Henri, Celeste — des voix françaises naturelles et expressives</div></div>
+      </div>
+      <div class="feature-card animate-in delay-1">
+        <div class="feature-icon grad-cyan">🎵</div>
+        <div><div class="feature-title">Jingles Automatiques</div><div class="feature-desc">Introduction avec cloche cristalline et transitions entre chapitres</div></div>
+      </div>
+      <div class="feature-card animate-in delay-2">
+        <div class="feature-icon grad-cyan">📄</div>
+        <div><div class="feature-title">Découpage Intelligent</div><div class="feature-desc">Chunking au niveau des phrases pour un audio sans coupures</div></div>
+      </div>
+      <div class="feature-card animate-in delay-3">
+        <div class="feature-icon grad-cyan">✨</div>
+        <div><div class="feature-title">Nettoyage Audio</div><div class="feature-desc">Conversion des abréviations, suppression emojis, ponctuation optimisée</div></div>
+      </div>
+      <div class="feature-card animate-in delay-4">
+        <div class="feature-icon grad-cyan">⏱️</div>
+        <div><div class="feature-title">Export MP3 & ZIP</div><div class="feature-desc">Export complet ou chapitré pour toutes les plateformes</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Générateurs Spécialisés -->
+  <div class="category">
+    <div class="cat-header">
+      <div class="cat-icon grad-green">📖</div>
+      <div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span class="cat-title">Générateurs Spécialisés</span>
+          <span class="cat-badge">×7</span>
+        </div>
+        <div class="cat-subtitle">7 nouveaux types de livres en un clic</div>
+      </div>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card animate-in">
+        <div class="feature-icon grad-green">📖</div>
+        <div><div class="feature-title">Livre Complet IA</div><div class="feature-desc">Workflow 14 étapes du titre à l'export</div></div>
+      </div>
+      <div class="feature-card animate-in delay-1">
+        <div class="feature-icon grad-green">🎨</div>
+        <div><div class="feature-title">Bandes Dessinées</div><div class="feature-desc">Scénario, dialogues et descriptions de planches</div></div>
+      </div>
+      <div class="feature-card animate-in delay-2">
+        <div class="feature-icon grad-green">🖼️</div>
+        <div><div class="feature-title">Livres de Coloriage</div><div class="feature-desc">Génération de pages à colorier par thème</div></div>
+      </div>
+      <div class="feature-card animate-in delay-3">
+        <div class="feature-icon grad-green">🌍</div>
+        <div><div class="feature-title">Documentaires</div><div class="feature-desc">Recherche, structure et rédaction factuelle</div></div>
+      </div>
+      <div class="feature-card animate-in delay-4">
+        <div class="feature-icon grad-green">📋</div>
+        <div><div class="feature-title">Planners & Journaux</div><div class="feature-desc">Agendas, trackers et journaux thématiques</div></div>
+      </div>
+      <div class="feature-card animate-in delay-5">
+        <div class="feature-icon grad-green">💡</div>
+        <div><div class="feature-title">Encyclopédies</div><div class="feature-desc">Organisation et rédaction encyclopédique</div></div>
+      </div>
+      <div class="feature-card animate-in delay-6">
+        <div class="feature-icon grad-green">🗺️</div>
+        <div><div class="feature-title">Atlas</div><div class="feature-desc">Création d'atlas géographiques et thématiques</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Marketing & KDP -->
+  <div class="category">
+    <div class="cat-header">
+      <div class="cat-icon grad-rose">📈</div>
+      <div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span class="cat-title">Marketing & KDP Intégrés</span>
+          <span class="cat-badge">BUSINESS</span>
+        </div>
+        <div class="cat-subtitle">Outils de vente et référencement Amazon</div>
+      </div>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card animate-in">
+        <div class="feature-icon grad-rose">🔍</div>
+        <div><div class="feature-title">Recherche KDP</div><div class="feature-desc">Analyse de niches, mots-clés et opportunités Amazon</div></div>
+      </div>
+      <div class="feature-card animate-in delay-1">
+        <div class="feature-icon grad-rose">🛒</div>
+        <div><div class="feature-title">Simulateur Amazon</div><div class="feature-desc">Prévisualisation de votre fiche produit</div></div>
+      </div>
+      <div class="feature-card animate-in delay-2">
+        <div class="feature-icon grad-rose">📊</div>
+        <div><div class="feature-title">Amazon Ads</div><div class="feature-desc">Planification de campagnes publicitaires</div></div>
+      </div>
+      <div class="feature-card animate-in delay-3">
+        <div class="feature-icon grad-rose">📄</div>
+        <div><div class="feature-title">Générateur SEO</div><div class="feature-desc">Articles optimisés pour le trafic organique</div></div>
+      </div>
+      <div class="feature-card animate-in delay-4">
+        <div class="feature-icon grad-rose">💬</div>
+        <div><div class="feature-title">Posts Réseaux Sociaux</div><div class="feature-desc">Contenu marketing multi-plateforme</div></div>
+      </div>
+      <div class="feature-card animate-in delay-5">
+        <div class="feature-icon grad-rose">🛡️</div>
+        <div><div class="feature-title">Anti-Plagiat</div><div class="feature-desc">Vérification d'originalité du contenu</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. Améliorations Techniques -->
+  <div class="category">
+    <div class="cat-header">
+      <div class="cat-icon grad-slate">🚀</div>
+      <div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span class="cat-title">Améliorations Techniques</span>
+          <span class="cat-badge">TECH</span>
+        </div>
+        <div class="cat-subtitle">Robustesse, performance et nouvelles capacités</div>
+      </div>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card animate-in">
+        <div class="feature-icon grad-slate">📚</div>
+        <div><div class="feature-title">Séries Multi-Tomes</div><div class="feature-desc">Bible de série, personnages persistants et cohérence narrative</div></div>
+      </div>
+      <div class="feature-card animate-in delay-1">
+        <div class="feature-icon grad-slate">👥</div>
+        <div><div class="feature-title">CRM Intégré</div><div class="feature-desc">Gestion des contacts et suivi des prospects</div></div>
+      </div>
+      <div class="feature-card animate-in delay-2">
+        <div class="feature-icon grad-slate">📄</div>
+        <div><div class="feature-title">Import Word/URL</div><div class="feature-desc">Convertissez vos documents existants en ebooks</div></div>
+      </div>
+      <div class="feature-card animate-in delay-3">
+        <div class="feature-icon grad-slate">🖼️</div>
+        <div><div class="feature-title">Couvertures Imagen 3</div><div class="feature-desc">Génération de couvertures IA de qualité professionnelle</div></div>
+      </div>
+      <div class="feature-card animate-in delay-4">
+        <div class="feature-icon grad-slate">🌐</div>
+        <div><div class="feature-title">BlogCluster.com</div><div class="feature-desc">Nouveau site vitrine avec articles et ressources KDP (en construction)</div></div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- BlogCluster CTA -->
+<section class="cta-section">
+  <div class="cta-badge">🌐 En construction</div>
+  <h2>BlogCluster.com — Le Hub des Auteurs KDP</h2>
+  <p>
+    Un nouveau site qui retracera tous nos livres (ou presque), avec de nombreux articles,
+    des ressources KDP exclusives et des guides pratiques pour maximiser vos ventes sur Amazon.
+  </p>
+  <div class="cta-buttons">
+    <a href="/offres" class="btn btn-primary">Découvrir EbookStudio Pro →</a>
+    <a href="/demo" class="btn btn-outline">Voir la démo gratuite ›</a>
+  </div>
+</section>
+
+<!-- Pricing -->
+<section class="pricing">
+  <h2>Tout cet arsenal — Accès à vie</h2>
+  <div class="price-row">
+    <span class="price-old">247€</span>
+    <span class="price-new">97€</span>
+  </div>
+  <div class="sub">ou 3×35€ · ou 5×22€</div>
+  <div class="guarantee">
+    <span class="check">✓</span> 30 jours satisfait ou remboursé · Clé Gemini gratuite · ~0,30€ par ebook
+  </div>
+  <a href="/offres" class="btn btn-primary">Accéder maintenant →</a>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <p>© 2026 EbookStudio Pro — Tous droits réservés</p>
+</footer>
+
+<!-- Scroll animations -->
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.style.animationPlayState = 'running'; observer.unobserve(e.target); } });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.animate-in').forEach(el => { el.style.animationPlayState = 'paused'; observer.observe(el); });
+</script>
+
+</body>
+</html>
