@@ -186,6 +186,28 @@ export default function Nouveautes2026Page() {
                 </motion.div>
               ))}
             </div>
+
+            {/* Video */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="mt-12 max-w-4xl mx-auto"
+            >
+              <div className="rounded-2xl overflow-hidden border border-border/50 bg-card/50 shadow-xl shadow-primary/5">
+                <video
+                  controls
+                  preload="metadata"
+                  poster=""
+                  className="w-full aspect-video"
+                >
+                  <source src="/videos/nouveautes-2026.mp4" type="video/mp4" />
+                </video>
+              </div>
+              <p className="text-sm text-muted-foreground mt-3">
+                <Play className="w-4 h-4 inline mr-1" /> Toutes les nouveautés EbookStudio Pro 2026 en vidéo
+              </p>
+            </motion.div>
           </div>
         </section>
 
