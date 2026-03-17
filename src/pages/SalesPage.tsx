@@ -190,6 +190,7 @@ const SalesPage = () => {
           <nav className="hidden md:flex items-center gap-6 text-sm">
             <a href="#features" className="text-slate-300 hover:text-white transition-colors">Fonctionnalités</a>
             <a href="#pricing" className="text-slate-300 hover:text-white transition-colors">Tarif</a>
+            <Link to="/nouveautes-2026" className="text-cyan-400 hover:text-cyan-300 transition-colors font-medium">Nouveautés 2026</Link>
             <Link to="/demo" className="text-slate-300 hover:text-white transition-colors">Démo</Link>
             <Link to="/faq" className="text-slate-300 hover:text-white transition-colors">FAQ</Link>
           </nav>
