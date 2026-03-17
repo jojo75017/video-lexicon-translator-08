@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import {
   Zap, Brain, Mic, BookOpen, Palette, Target, TrendingUp,
   Layers, Shield, PenTool, BarChart3, Globe, Music, Sparkles,
-  ChevronRight, Star, Rocket, Award, CheckCircle2, ArrowRight,
+  ChevronRight, Star, Rocket, Award, CheckCircle2, ArrowRight, Play,
   BookMarked, Users, Search, FileText, Volume2, Wand2, Bot,
   Image, ShoppingCart, MessageSquare, Lightbulb, Clock
 } from 'lucide-react';
