@@ -418,17 +418,17 @@ const EbookVideoCreator: React.FC<EbookVideoCreatorProps> = ({
 
             {/* Toggles */}
             <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <Label>Intro (titre du livre)</Label>
-                <Switch checked={showIntro} onCheckedChange={setShowIntro} />
+              <div className="flex items-center gap-2">
+                <Checkbox id="intro" checked={showIntro} onCheckedChange={(v) => setShowIntro(!!v)} />
+                <Label htmlFor="intro">Intro (titre du livre)</Label>
               </div>
-              <div className="flex items-center justify-between">
-                <Label>Titre sur les images</Label>
-                <Switch checked={showTitle} onCheckedChange={setShowTitle} />
+              <div className="flex items-center gap-2">
+                <Checkbox id="titles" checked={showTitle} onCheckedChange={(v) => setShowTitle(!!v)} />
+                <Label htmlFor="titles">Titre sur les images</Label>
               </div>
-              <div className="flex items-center justify-between">
-                <Label>Outro (fin)</Label>
-                <Switch checked={showOutro} onCheckedChange={setShowOutro} />
+              <div className="flex items-center gap-2">
+                <Checkbox id="outro" checked={showOutro} onCheckedChange={(v) => setShowOutro(!!v)} />
+                <Label htmlFor="outro">Outro (fin)</Label>
               </div>
             </div>
 
