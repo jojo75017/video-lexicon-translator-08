@@ -122,6 +122,7 @@ import EbookPenNameGenerator from '@/components/ebook/EbookPenNameGenerator';
 
 // Composants 2026
 import EbookVideoTrailer from '@/components/ebook/EbookVideoTrailer';
+import EbookVideoCreator from '@/components/ebook/EbookVideoCreator';
 import EbookMultiTranslator from '@/components/ebook/EbookMultiTranslator';
 import EbookTrendPredictor from '@/components/ebook/EbookTrendPredictor';
 import EbookABTesting from '@/components/ebook/EbookABTesting';
