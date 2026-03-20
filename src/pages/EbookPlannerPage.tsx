@@ -3032,6 +3032,17 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             coverImage={ebookImages[0]?.url}
           />
         );
+
+      case 'video-creator':
+        return (
+          <EbookVideoCreator
+            ebookTitle={ebookTitle}
+            authorName={authorName}
+            chapters={chapters}
+            ebookImages={ebookImages}
+            coverImage={ebookImages[0]?.url}
+          />
+        );
       
       case 'multi-translator':
         return (
