@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EbookStudio Pro — Créez des Ebooks avec l'IA | 97€ à Vie</title>
+  <meta name="description" content="Créez un ebook complet en moins d'une heure avec l'IA. Plan structuré, rédaction, couverture, audiobook et export KDP. Accès à vie pour 97€." />
+  <meta property="og:title" content="EbookStudio Pro — Créez des Ebooks avec l'IA" />
+  <meta property="og:description" content="Générez des ebooks professionnels avec l'IA : plan, rédaction, couverture, audiobook. 97€ accès à vie." />
+  <meta property="og:type" content="website" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"EbookStudio Pro","description":"Plateforme de création d'ebooks et audiobooks par IA","offers":{"@type":"Offer","price":"97","priceCurrency":"EUR","availability":"https://schema.org/InStock"}}</script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --slate-950: #020617;
+      --slate-900: #0f172a;
+      --slate-800: #1e293b;
+      --slate-700: #334155;
+      --cyan-500: #06b6d4;
+      --cyan-400: #22d3ee;
+      --emerald-500: #10b981;
+      --emerald-400: #34d399;
+      --amber-400: #fbbf24;
+      --amber-500: #f59e0b;
+      --red-400: #f87171;
+      --red-500: #ef4444;
+      --red-900: #7f1d1d;
+      --violet-500: #8b5cf6;
+      --purple-500: #a855f7;
+      --pink-500: #ec4899;
+      --rose-500: #f43f5e;
+      --indigo-500: #6366f1;
+      --blue-500: #3b82f6;
+      --teal-500: #14b8a6;
+      --orange-400: #fb923c;
+    }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--slate-950);
+      color: #fff;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    .max-w-6xl { max-width: 72rem; margin: 0 auto; }
+    .max-w-5xl { max-width: 64rem; margin: 0 auto; }
+    .max-w-4xl { max-width: 56rem; margin: 0 auto; }
+    .max-w-3xl { max-width: 48rem; margin: 0 auto; }
+    .max-w-2xl { max-width: 42rem; margin: 0 auto; }
+
+    /* ═══ URGENCY BANNER ═══ */
+    .urgency-banner {
+      background: rgba(15, 23, 42, 0.9);
+      border-top: 1px solid rgba(245, 158, 11, 0.2);
+      border-bottom: 1px solid rgba(245, 158, 11, 0.2);
+      padding: 10px 16px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.8);
+    }
+    .urgency-banner span.icon { margin-right: 8px; }
+
+    /* ═══ TOP BAR ═══ */
+    .top-bar {
+      background: linear-gradient(90deg, #0891b2, #06b6d4, #10b981);
+      color: var(--slate-950);
+      padding: 10px 16px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .top-bar .badge {
+      display: inline-block;
+      background: var(--slate-900);
+      color: var(--cyan-400);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: 9999px;
+      margin-left: 12px;
+    }
+    .top-bar .countdown {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(15, 23, 42, 0.2);
+      border-radius: 8px;
+      padding: 4px 12px;
+      margin-left: 12px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ═══ HEADER ═══ */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(2, 6, 23, 0.9);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(30, 41, 59, 0.5);
+      padding: 16px;
+    }
+    .header-inner {
+      max-width: 72rem;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo { display: flex; align-items: center; gap: 12px; }
+    .logo-icon {
+      width: 40px; height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--cyan-400), var(--emerald-400));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .logo-text { font-size: 18px; font-weight: 700; }
+    .logo-text span { color: var(--cyan-400); }
+    .header nav { display: flex; align-items: center; gap: 24px; font-size: 14px; }
+    .header nav a { color: rgba(255,255,255,0.7); transition: color 0.2s; }
+    .header nav a:hover { color: #fff; }
+    .header nav a.highlight { color: var(--cyan-400); font-weight: 500; }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--cyan-500);
+      color: var(--slate-950);
+      font-weight: 700;
+      padding: 10px 20px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .btn-primary:hover { background: var(--cyan-400); }
+    .btn-cta {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: linear-gradient(90deg, var(--cyan-500), var(--emerald-500));
+      color: var(--slate-950);
+      font-weight: 700;
+      padding: 16px 40px;
+      border-radius: 16px;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      box-shadow: 0 25px 50px -12px rgba(6, 182, 212, 0.25);
+      transition: all 0.3s;
+    }
+    .btn-cta:hover { transform: translateY(-2px); box-shadow: 0 25px 50px -12px rgba(6, 182, 212, 0.4); }
+    .btn-outline {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: transparent;
+      color: var(--cyan-400);
+      border: 1px solid rgba(6, 182, 212, 0.5);
+      font-weight: 600;
+      padding: 12px 32px;
+      border-radius: 16px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.2s;
+    }
+    .btn-outline:hover { background: rgba(6, 182, 212, 0.1); border-color: var(--cyan-400); color: #fff; }
+
+    /* ═══ HERO ═══ */
+    .hero {
+      position: relative;
+      padding: 80px 16px 60px;
+      text-align: center;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(6,182,212,0.15), transparent);
+      pointer-events: none;
+    }
+    .hero .badge-tech {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(6, 182, 212, 0.1);
+      color: var(--cyan-400);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      padding: 8px 16px;
+      border-radius: 9999px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 24px;
+    }
+    .hero h1 .gradient {
+      background: linear-gradient(90deg, var(--cyan-400), var(--emerald-400), var(--cyan-400));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p.sub { font-size: 18px; color: rgba(255,255,255,0.8); max-width: 640px; margin: 0 auto 32px; line-height: 1.7; }
+    .hero p.sub strong { color: #fff; font-weight: 600; }
+    .stats-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 40px; margin-bottom: 40px; }
+    .stats-row .stat-value { font-size: clamp(1.8rem, 3vw, 2.5rem); font-weight: 900; }
+    .stats-row .stat-label { font-size: 14px; color: rgba(255,255,255,0.7); margin-top: 4px; }
+    .cta-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; margin-bottom: 32px; }
+    .trust-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; font-size: 14px; color: rgba(255,255,255,0.7); }
+    .trust-row .item { display: flex; align-items: center; gap: 8px; }
+    .trust-row .check { color: var(--emerald-500); font-weight: 700; }
+
+    /* ═══ SOCIAL PROOF ═══ */
+    .social-proof {
+      padding: 48px 16px;
+      border-top: 1px solid rgba(30, 41, 59, 0.5);
+      border-bottom: 1px solid rgba(30, 41, 59, 0.5);
+      background: rgba(15, 23, 42, 0.3);
+    }
+    .social-proof-inner {
+      max-width: 72rem; margin: 0 auto;
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 32px;
+    }
+    .avatars { display: flex; }
+    .avatars .av {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--cyan-500), var(--emerald-500));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; color: var(--slate-950);
+      border: 2px solid var(--slate-900);
+      margin-left: -12px;
+    }
+    .avatars .av:first-child { margin-left: 0; }
+    .stars { display: flex; gap: 2px; color: var(--amber-400); }
+    .divider { width: 1px; height: 40px; background: var(--slate-800); }
+
+    /* ═══ FEATURES ═══ */
+    .features { padding: 80px 16px; }
+    .features .label { color: var(--cyan-400); font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; font-size: 14px; margin-bottom: 12px; }
+    .features h2 { font-size: clamp(1.5rem, 3.5vw, 3rem); font-weight: 900; margin-bottom: 20px; }
+    .features p.sub { color: rgba(255,255,255,0.8); font-size: 18px; max-width: 640px; margin: 0 auto 48px; }
+    .feature-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; max-width: 72rem; margin: 0 auto; }
+    .feature-card {
+      background: rgba(15, 23, 42, 0.5);
+      border: 1px solid var(--slate-800);
+      border-radius: 16px;
+      padding: 32px;
+      transition: all 0.3s;
+    }
+    .feature-card:hover { border-color: var(--slate-700); transform: translateY(-4px); }
+    .feature-icon {
+      width: 56px; height: 56px; border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 20px;
+      font-size: 28px;
+      transition: transform 0.3s;
+    }
+    .feature-card:hover .feature-icon { transform: scale(1.1); }
+    .feature-card h3 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+    .feature-card p { color: rgba(255,255,255,0.7); line-height: 1.6; }
+
+    /* ═══ AVANT/APRÈS ═══ */
+    .comparison { padding: 80px 16px; background: rgba(15, 23, 42, 0.5); }
+    .comparison h2 { font-size: clamp(1.5rem, 3.5vw, 3rem); font-weight: 900; margin-bottom: 16px; text-align: center; }
+    .comparison p.sub { color: rgba(255,255,255,0.8); font-size: 18px; text-align: center; margin-bottom: 48px; }
+    .comparison-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 64rem; margin: 0 auto; }
+    .comp-card { border-radius: 16px; padding: 32px; }
+    .comp-card.before { background: rgba(127, 29, 29, 0.3); border: 1px solid rgba(127, 29, 29, 0.5); }
+    .comp-card.after { background: rgba(6, 78, 59, 0.3); border: 1px solid rgba(6, 78, 59, 0.5); position: relative; overflow: hidden; }
+    .comp-card .badge-future {
+      position: absolute; top: 12px; right: 12px;
+      background: var(--emerald-500); color: var(--slate-950);
+      font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 9999px;
+    }
+    .comp-card .header-row { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+    .comp-card .emoji-box {
+      width: 48px; height: 48px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center; font-size: 24px;
+    }
+    .comp-card.before .emoji-box { background: rgba(239, 68, 68, 0.1); }
+    .comp-card.after .emoji-box { background: rgba(16, 185, 129, 0.1); }
+    .comp-card .tag { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; }
+    .comp-card.before .tag { color: var(--red-400); }
+    .comp-card.after .tag { color: var(--emerald-400); }
+    .comp-card .title { font-size: 20px; font-weight: 700; }
+    .comp-card .items { display: flex; flex-direction: column; gap: 16px; }
+    .comp-card .item { display: flex; align-items: center; gap: 12px; }
+    .comp-card .item .dot {
+      width: 20px; height: 20px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: 12px;
+    }
+    .comp-card.before .dot { background: rgba(239, 68, 68, 0.2); color: var(--red-400); }
+    .comp-card.after .dot { background: rgba(16, 185, 129, 0.2); color: var(--emerald-400); }
+    .comp-card.before .item span { color: rgba(255,255,255,0.8); }
+    .comp-card.after .item span { color: #fff; }
+
+    /* ═══ TESTIMONIALS ═══ */
+    .testimonials { padding: 80px 16px; }
+    .testimonials h2 { font-size: clamp(1.5rem, 3.5vw, 3rem); font-weight: 900; margin-bottom: 48px; text-align: center; }
+    .testimonial-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; max-width: 72rem; margin: 0 auto; }
+    .testimonial-card {
+      background: rgba(15, 23, 42, 0.5);
+      border: 1px solid var(--slate-800);
+      border-radius: 16px;
+      padding: 24px;
+    }
+    .testimonial-card .top { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+    .testimonial-card .av {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--cyan-500), var(--emerald-500));
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; color: var(--slate-950);
+    }
+    .testimonial-card .name { font-weight: 600; }
+    .testimonial-card .role { font-size: 12px; color: rgba(255,255,255,0.6); }
+    .testimonial-card .stars-sm { display: flex; gap: 2px; margin-left: auto; }
+    .testimonial-card .stars-sm span { color: var(--amber-400); font-size: 14px; }
+    .testimonial-card .quote { color: rgba(255,255,255,0.9); font-size: 14px; line-height: 1.7; }
+    .testimonial-card .stat-line {
+      margin-top: 12px; padding-top: 12px;
+      border-top: 1px solid var(--slate-800);
+      font-size: 12px; font-weight: 600; color: var(--cyan-400);
+    }
+
+    /* ═══ PRICING ═══ */
+    .pricing { padding: 80px 16px; position: relative; }
+    .pricing::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse 80% 50% at 50% 50%, rgba(6,182,212,0.08), transparent);
+      pointer-events: none;
+    }
+    .pricing .badge-offer {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(245, 158, 11, 0.1);
+      color: var(--amber-400);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      padding: 8px 20px;
+      border-radius: 9999px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+    .pricing h2 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 900; margin-bottom: 16px; }
+    .pricing p.sub { color: rgba(255,255,255,0.8); font-size: 18px; margin-bottom: 40px; }
+    .pricing-card {
+      background: linear-gradient(180deg, var(--slate-900), var(--slate-950));
+      border: 2px solid rgba(6, 182, 212, 0.3);
+      border-radius: 24px;
+      padding: 48px;
+      box-shadow: 0 25px 50px -12px rgba(6, 182, 212, 0.1);
+      position: relative;
+      z-index: 1;
+    }
+    .price-display { text-align: center; margin-bottom: 40px; }
+    .price-display .old { font-size: 24px; color: rgba(255,255,255,0.5); text-decoration: line-through; margin-right: 12px; }
+    .price-display .amount { font-size: clamp(4rem, 8vw, 6rem); font-weight: 900; }
+    .price-display .currency { font-size: 2rem; font-weight: 700; color: rgba(255,255,255,0.7); }
+    .price-display .note { color: rgba(255,255,255,0.6); font-size: 14px; margin-top: 8px; }
+    .features-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 40px; }
+    .features-grid .item { display: flex; align-items: center; gap: 12px; font-size: 14px; }
+    .features-grid .check-icon {
+      width: 20px; height: 20px; border-radius: 50%;
+      background: rgba(6, 182, 212, 0.2);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; color: var(--cyan-400); font-size: 12px;
+    }
+    .btn-pricing {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%;
+      background: linear-gradient(90deg, var(--cyan-500), var(--emerald-500));
+      color: var(--slate-950);
+      font-weight: 700;
+      padding: 24px;
+      border-radius: 16px;
+      border: none;
+      cursor: pointer;
+      font-size: 20px;
+      box-shadow: 0 20px 40px -12px rgba(6, 182, 212, 0.2);
+      transition: all 0.3s;
+    }
+    .btn-pricing:hover { transform: translateY(-2px); }
+    .installments { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--slate-800); }
+    .installments p { text-align: center; color: rgba(255,255,255,0.6); font-size: 14px; margin-bottom: 16px; }
+    .installments-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .installment-btn {
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid var(--slate-800);
+      background: transparent;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s;
+      color: #fff;
+    }
+    .installment-btn:hover { border-color: rgba(6, 182, 212, 0.5); }
+    .installment-btn .label { font-weight: 700; }
+    .installment-btn .price { font-size: 14px; color: rgba(255,255,255,0.6); }
+    .guarantee-line {
+      display: flex; align-items: center; justify-content: center; gap: 12px;
+      margin-top: 32px; color: rgba(255,255,255,0.6); font-size: 14px;
+    }
+    .guarantee-line .icon { color: var(--emerald-500); }
+
+    /* ═══ GUARANTEE BOX ═══ */
+    .guarantee-box {
+      background: rgba(6, 78, 59, 0.3);
+      border: 1px solid rgba(6, 78, 59, 0.5);
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      margin-top: 32px;
+    }
+    .guarantee-box .icon-wrap {
+      width: 56px; height: 56px; border-radius: 16px;
+      background: rgba(16, 185, 129, 0.1);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px; font-size: 28px; color: var(--emerald-400);
+    }
+    .guarantee-box h3 { font-size: 20px; font-weight: 700; color: var(--emerald-400); margin-bottom: 8px; }
+    .guarantee-box p { color: rgba(255,255,255,0.8); font-size: 14px; }
+    .guarantee-box strong { color: var(--emerald-400); }
+
+    /* ═══ FINAL CTA ═══ */
+    .final-cta {
+      padding: 80px 16px;
+      text-align: center;
+      position: relative;
+    }
+    .final-cta::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse 80% 50% at 50% 50%, rgba(6,182,212,0.06), transparent);
+      pointer-events: none;
+    }
+    .final-cta h2 { font-size: clamp(1.5rem, 3.5vw, 3rem); font-weight: 900; margin-bottom: 20px; line-height: 1.2; }
+    .final-cta h2 .muted { color: rgba(255,255,255,0.6); }
+    .final-cta p { color: rgba(255,255,255,0.8); font-size: 18px; margin-bottom: 32px; }
+    .final-cta .note { color: rgba(255,255,255,0.6); font-size: 14px; margin-top: 20px; }
+
+    /* ═══ FOOTER ═══ */
+    .footer {
+      padding: 64px 16px;
+      border-top: 1px solid var(--slate-800);
+      background: var(--slate-950);
+    }
+    .footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 40px; max-width: 72rem; margin: 0 auto 40px; }
+    .footer h4 { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px; }
+    .footer ul { list-style: none; }
+    .footer ul li { margin-bottom: 10px; }
+    .footer ul li a { color: rgba(255,255,255,0.6); font-size: 14px; transition: color 0.2s; }
+    .footer ul li a:hover { color: var(--cyan-400); }
+    .footer .bottom { border-top: 1px solid var(--slate-800); padding-top: 32px; text-align: center; font-size: 12px; color: rgba(255,255,255,0.4); }
+
+    /* ═══ ANIMATIONS ═══ */
+    .animate-in { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .animate-in.visible { opacity: 1; transform: translateY(0); }
+    .delay-1 { transition-delay: 0.1s; }
+    .delay-2 { transition-delay: 0.2s; }
+    .delay-3 { transition-delay: 0.3s; }
+
+    /* ═══ RESPONSIVE ═══ */
+    @media (max-width: 768px) {
+      .comparison-grid { grid-template-columns: 1fr; }
+      .features-grid { grid-template-columns: 1fr; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .testimonial-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .header nav { display: none; }
+      .top-bar .countdown { display: none; }
+      .pricing-card { padding: 24px; }
+      .divider { display: none; }
+      .installments-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- URGENCY BANNER -->
+  <div class="urgency-banner">
+    🔥 3 personnes ont acheté dans la dernière heure
+  </div>
+
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    🔥 OFFRE DE LANCEMENT — Fin le 30 juin 2026
+    <span class="countdown" id="countdown"></span>
+    <span class="badge">−150€</span>
+  </div>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-inner">
+      <a href="/offres" class="logo">
+        <div class="logo-icon">📖</div>
+        <div class="logo-text">EbookStudio <span>Pro</span></div>
+      </a>
+      <nav>
+        <a href="#features">Fonctionnalités</a>
+        <a href="#pricing">Tarif</a>
+        <a href="/nouveautes-2026" class="highlight">Nouveautés 2026</a>
+        <a href="/demo">Démo</a>
+        <a href="/faq">FAQ</a>
+      </nav>
+      <button class="btn-primary" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">
+        ✨ 97€ à vie
+      </button>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div style="position:relative;z-index:1;">
+      <div class="badge-tech animate-in">⚡ Propulsé par Gemini 3 Flash & Imagen 3</div>
+      <h1 class="animate-in delay-1">
+        Créez des ebooks<br>
+        <span class="gradient">professionnels</span><br>
+        en moins d'une heure
+      </h1>
+      <p class="sub animate-in delay-2">
+        Le workflow IA complet qui a déjà généré <strong>+35 ebooks publiés</strong> sur Amazon KDP.
+        Rédaction, couvertures, audiobooks — tout en un.
+      </p>
+      <div class="stats-row animate-in delay-2">
+        <div class="text-center"><p class="stat-value">35+</p><p class="stat-label">Ebooks publiés</p></div>
+        <div class="text-center"><p class="stat-value">~0,30€</p><p class="stat-label">Coût par ebook</p></div>
+        <div class="text-center"><p class="stat-value">45 min</p><p class="stat-label">Temps moyen</p></div>
+      </div>
+      <div class="cta-row animate-in delay-3">
+        <button class="btn-cta" onclick="window.location.href='/upsell-paiement?plan=pro'">🚀 Commencer — 97€ à vie →</button>
+        <button class="btn-outline" onclick="window.location.href='/demo'">▶ Voir la démo</button>
+      </div>
+      <div class="trust-row animate-in delay-3">
+        <span class="item"><span class="check">✓</span> Paiement unique</span>
+        <span class="item"><span class="check">✓</span> Accès à vie</span>
+        <span class="item"><span class="check">✓</span> Garantie 30 jours</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOCIAL PROOF -->
+  <section class="social-proof">
+    <div class="social-proof-inner">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div class="avatars">
+          <div class="av">MD</div><div class="av">TL</div><div class="av">SR</div><div class="av">JP</div><div class="av">CB</div>
+        </div>
+        <div><p style="font-weight:600;">47+ auteurs</p><p style="font-size:12px;color:rgba(255,255,255,0.6);">utilisent EbookStudio</p></div>
+      </div>
+      <div class="divider"></div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div class="stars">★★★★★</div>
+        <span style="font-weight:700;margin-left:8px;">4.8/5</span>
+        <span style="color:rgba(255,255,255,0.6);font-size:14px;">(47 avis)</span>
+      </div>
+      <div class="divider"></div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="width:40px;height:40px;border-radius:12px;background:rgba(245,158,11,0.1);display:flex;align-items:center;justify-content:center;">🏆</div>
+        <div><p style="font-weight:600;">#1 en France</p><p style="font-size:12px;color:rgba(255,255,255,0.6);">Workflow KDP IA</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features" class="features" style="text-align:center;">
+    <p class="label animate-in">Technologie 2026</p>
+    <h2 class="animate-in delay-1">Tout ce dont vous avez besoin</h2>
+    <p class="sub animate-in delay-2">Un écosystème complet pour créer, optimiser et publier vos ebooks sur Amazon KDP</p>
+    <div class="feature-grid">
+      <div class="feature-card animate-in">
+        <div class="feature-icon" style="background:linear-gradient(135deg,#3b82f6,#06b6d4);">🧠</div>
+        <h3>Gemini 3 Flash</h3>
+        <p>IA la plus rapide de Google pour une rédaction instantanée</p>
+      </div>
+      <div class="feature-card animate-in delay-1">
+        <div class="feature-icon" style="background:linear-gradient(135deg,#8b5cf6,#a855f7);">🖼️</div>
+        <h3>Imagen 3</h3>
+        <p>Couvertures photoréalistes générées en quelques secondes</p>
+      </div>
+      <div class="feature-card animate-in delay-2">
+        <div class="feature-icon" style="background:linear-gradient(135deg,#10b981,#14b8a6);">🎧</div>
+        <h3>Azure Neural Voices</h3>
+        <p>Audiobooks avec 7 voix neuronales premium</p>
+      </div>
+      <div class="feature-card animate-in delay-3">
+        <div class="feature-icon" style="background:linear-gradient(135deg,#f59e0b,#fb923c);">🌍</div>
+        <h3>Multi-langues</h3>
+        <p>Rédaction et traduction dans 30+ langues</p>
+      </div>
+      <div class="feature-card animate-in">
+        <div class="feature-icon" style="background:linear-gradient(135deg,#ec4899,#f43f5e);">🔍</div>
+        <h3>SEO Amazon</h3>
+        <p>Mots-clés optimisés pour le référencement KDP</p>
+      </div>
+      <div class="feature-card animate-in delay-1">
+        <div class="feature-icon" style="background:linear-gradient(135deg,#6366f1,#3b82f6);">📦</div>
+        <h3>Export Pro</h3>
+        <p>PDF, EPUB, Word — formats KDP et distribution</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- AVANT / APRÈS -->
+  <section class="comparison">
+    <h2 class="animate-in">La différence EbookStudio</h2>
+    <p class="sub animate-in delay-1">Comparez vous-même</p>
+    <div class="comparison-grid">
+      <div class="comp-card before animate-in">
+        <div class="header-row">
+          <div class="emoji-box">😩</div>
+          <div><p class="tag">Avant</p><p class="title">Sans EbookStudio</p></div>
+        </div>
+        <div class="items">
+          <div class="item"><div class="dot">✕</div><span>2 à 6 mois pour écrire un ebook</span></div>
+          <div class="item"><div class="dot">✕</div><span>Freelance : 500€ à 5 000€ par livre</span></div>
+          <div class="item"><div class="dot">✕</div><span>Syndrome de la page blanche</span></div>
+          <div class="item"><div class="dot">✕</div><span>Aucune idée des mots-clés Amazon</span></div>
+          <div class="item"><div class="dot">✕</div><span>Mise en page amateur, refusée par KDP</span></div>
+        </div>
+      </div>
+      <div class="comp-card after animate-in delay-1">
+        <div class="badge-future">VOTRE FUTUR</div>
+        <div class="header-row">
+          <div class="emoji-box">🚀</div>
+          <div><p class="tag">Après</p><p class="title">Avec EbookStudio Pro</p></div>
+        </div>
+        <div class="items">
+          <div class="item"><div class="dot">✓</div><span>Premier ebook en moins d'1 heure</span></div>
+          <div class="item"><div class="dot">✓</div><span>Coût total : ~0,30€ par ebook</span></div>
+          <div class="item"><div class="dot">✓</div><span>15 rôles IA qui écrivent pour vous</span></div>
+          <div class="item"><div class="dot">✓</div><span>SEO Amazon automatiquement optimisé</span></div>
+          <div class="item"><div class="dot">✓</div><span>Export professionnel PDF/EPUB/Word</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="testimonials">
+    <h2 class="animate-in">Ils ont publié avec EbookStudio</h2>
+    <div class="testimonial-grid">
+      <div class="testimonial-card animate-in">
+        <div class="top">
+          <div class="av">MD</div>
+          <div><p class="name">Marie D.</p><p class="role">5 ebooks publiés en 3 semaines</p></div>
+          <div class="stars-sm"><span>★★★★★</span></div>
+        </div>
+        <p class="quote">"Mon meilleur mois : 420€ de royalties KDP. Le BSR de mon livre 'Recettes Healthy' est descendu à #2,847 en Cuisine — je n'aurais jamais cru ça possible aussi vite."</p>
+        <div class="stat-line">📊 BSR #2,847 · 420€/mois</div>
+      </div>
+      <div class="testimonial-card animate-in delay-1">
+        <div class="top">
+          <div class="av">TL</div>
+          <div><p class="name">Thomas L.</p><p class="role">Entrepreneur · 12 ebooks</p></div>
+          <div class="stars-sm"><span>★★★★★</span></div>
+        </div>
+        <p class="quote">"J'utilise les ebooks comme lead magnets pour mon business. Résultat : +340 leads qualifiés en 2 mois et 3 livres dans le Top 100 de leur catégorie."</p>
+        <div class="stat-line">📊 Top 100 Amazon · 340 leads</div>
+      </div>
+      <div class="testimonial-card animate-in delay-2">
+        <div class="top">
+          <div class="av">NF</div>
+          <div><p class="name">Nicolas F.</p><p class="role">Revenus passifs · 22 ebooks</p></div>
+          <div class="stars-sm"><span>★★★★★</span></div>
+        </div>
+        <p class="quote">"De 0€ à 850€/mois en 6 mois. Mon secret : 1 ebook par semaine avec EbookStudio + les mots-clés KDP optimisés. Mes 3 meilleurs titres font chacun +150€/mois."</p>
+        <div class="stat-line">📊 850€/mois · 22 ebooks publiés</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section id="pricing" class="pricing" style="text-align:center;">
+    <div class="max-w-3xl" style="position:relative;z-index:1;">
+      <div class="badge-offer animate-in">🎁 OFFRE DE LANCEMENT — Économisez 150€</div>
+      <h2 class="animate-in delay-1">Accès Pro Lifetime</h2>
+      <p class="sub animate-in delay-2">Un paiement unique. Accès à vie. Sans abonnement.</p>
+
+      <div class="pricing-card animate-in delay-2">
+        <div class="price-display">
+          <span class="old">247€</span>
+          <span class="amount">97</span>
+          <span class="currency">€</span>
+          <p class="note">Paiement unique • Accès à vie</p>
+        </div>
+
+        <div class="features-grid">
+          <div class="item"><div class="check-icon">✓</div><span>Workflow 15 rôles IA complet</span></div>
+          <div class="item"><div class="check-icon">✓</div><span>Gemini 3 Flash — rédaction ultra-rapide</span></div>
+          <div class="item"><div class="check-icon">✓</div><span>Imagen 3 — couvertures photoréalistes</span></div>
+          <div class="item"><div class="check-icon">✓</div><span>Azure Neural — audiobooks premium</span></div>
+          <div class="item"><div class="check-icon">✓</div><span>P15 Humanisation Anti-IA</span></div>
+          <div class="item"><div class="check-icon">✓</div><span>Export PDF / EPUB / Word</span></div>
+          <div class="item"><div class="check-icon">✓</div><span>🎓 Formation 18 modules (297€ offerts)</span></div>
+          <div class="item"><div class="check-icon">✓</div><span>SEO Amazon automatisé</span></div>
+          <div class="item"><div class="check-icon">✓</div><span>Traduction 30+ langues</span></div>
+          <div class="item"><div class="check-icon">✓</div><span>Mises à jour gratuites à vie</span></div>
+          <div class="item"><div class="check-icon">✓</div><span>Support prioritaire</span></div>
+          <div class="item"><div class="check-icon">✓</div><span>Zoom gratuit avec le créateur</span></div>
+        </div>
+
+        <button class="btn-pricing" onclick="window.location.href='/upsell-paiement?plan=pro'">
+          🚀 Accès Pro Lifetime — 97€ →
+        </button>
+
+        <div class="installments">
+          <p>Ou payez en plusieurs fois</p>
+          <div class="installments-grid">
+            <button class="installment-btn" onclick="window.location.href='/upsell-paiement?plan=pro'">
+              <p class="label">En 3 fois</p><p class="price">33€/mois</p>
+            </button>
+            <button class="installment-btn" onclick="window.location.href='/upsell-paiement?plan=pro'">
+              <p class="label">En 5 fois</p><p class="price">20€/mois</p>
+            </button>
+          </div>
+        </div>
+
+        <div class="guarantee-line">
+          <span class="icon">🛡️</span>
+          <span>Paiement sécurisé • Accès immédiat • Garantie 30 jours</span>
+        </div>
+      </div>
+
+      <div class="guarantee-box animate-in">
+        <div class="icon-wrap">🛡️</div>
+        <h3>Garantie 30 jours — Satisfait ou remboursé</h3>
+        <p>Testez pendant 30 jours. Si vous ne publiez pas votre 1er ebook, on vous rembourse intégralement. <strong>Aucune question posée.</strong></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="final-cta">
+    <div class="max-w-3xl" style="position:relative;z-index:1;">
+      <h2 class="animate-in">
+        Chaque jour sans ebook publié<br>
+        <span class="muted">est un jour de revenus perdu.</span>
+      </h2>
+      <p class="animate-in delay-1">Votre premier ebook peut être en ligne sur Amazon ce soir.</p>
+      <div class="animate-in delay-2">
+        <button class="btn-cta" onclick="window.location.href='/upsell-paiement?plan=pro'">
+          🚀 Commencer maintenant — 97€ →
+        </button>
+        <p class="note">Paiement unique • Accès à vie • Garantie 30 jours</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-grid">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+          <div style="width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,var(--cyan-400),var(--emerald-400));display:flex;align-items:center;justify-content:center;">📖</div>
+          <h3 style="font-size:18px;font-weight:700;">EbookStudio Pro</h3>
+        </div>
+        <p style="color:rgba(255,255,255,0.6);font-size:14px;line-height:1.6;">Le workflow IA #1 en France pour Amazon KDP.</p>
+      </div>
+      <div>
+        <h4>Guides</h4>
+        <ul>
+          <li><a href="/ecrire-livre-chatgpt">Écrire avec l'IA</a></li>
+          <li><a href="/creer-ebook-ia">Créer un ebook IA</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Produit</h4>
+        <ul>
+          <li><a href="/demo">Démo gratuite</a></li>
+          <li><a href="/formation">Formation</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Légal</h4>
+        <ul>
+          <li><a href="/mentions-legales">Mentions légales</a></li>
+          <li><a href="/cgv">CGV</a></li>
+          <li><a href="/politique-confidentialite">Confidentialité</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="bottom">
+      <p>© 2026 EbookStudio Pro — Tous droits réservés</p>
+    </div>
+  </footer>
+
+  <script>
+    // Countdown
+    const LAUNCH_END = new Date('2026-06-30T23:59:59').getTime();
+    function updateCountdown() {
+      const diff = Math.max(0, LAUNCH_END - Date.now());
+      const d = Math.floor(diff / 86400000);
+      const h = Math.floor((diff % 86400000) / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      document.getElementById('countdown').textContent = d + 'j : ' + h + 'h : ' + m + 'm';
+    }
+    updateCountdown();
+    setInterval(updateCountdown, 60000);
+
+    // Scroll animations
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('visible');
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.animate-in').forEach(el => observer.observe(el));
+
+    // Urgency banner rotation
+    const msgs = [
+      "🔥 3 personnes ont acheté dans la dernière heure",
+      "📈 Le prix augmentera bientôt à 147€",
+      "👥 Rejoignez +5000 auteurs satisfaits",
+      "🛡️ Garantie 30 jours — 0 risque pour vous",
+      "⚡ Votre 1er ebook publié ce soir sur Amazon",
+      "⏰ Places Fondateur limitées — ne tardez pas"
+    ];
+    let msgIdx = 0;
+    setInterval(() => {
+      msgIdx = (msgIdx + 1) % msgs.length;
+      document.querySelector('.urgency-banner').innerHTML = msgs[msgIdx];
+    }, 4000);
+  </script>
+</body>
+</html>
