@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -54,12 +54,26 @@ const EbookVideoCreator: React.FC<EbookVideoCreatorProps> = ({
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [isGeneratingImages, setIsGeneratingImages] = useState(false);
   const [imageGenProgress, setImageGenProgress] = useState(0);
+  const [brokenImages, setBrokenImages] = useState<Set<string>>(new Set());
 
   const videoRef = useRef<HTMLVideoElement>(null);
 
   // Helper: find image for a chapter
   const getImageForChapter = (ch: { id: string; title: string }, index: number): ChapterImageData | undefined => {
-    return ebookImages.find(img => img.chapterId === ch.id) || ebookImages[index];
+    // Try matching by chapterId first
+    const byId = ebookImages.find(img => img.chapterId === ch.id);
+    if (byId && !brokenImages.has(byId.url)) return byId;
+    // Fallback: match by title
+    const byTitle = ebookImages.find(img => img.title === ch.title);
+    if (byTitle && !brokenImages.has(byTitle.url)) return byTitle;
+    // Fallback: by index
+    const byIndex = ebookImages[index];
+    if (byIndex && !brokenImages.has(byIndex.url)) return byIndex;
+    return undefined;
+  };
+
+  const handleImageError = (url: string) => {
+    setBrokenImages(prev => new Set(prev).add(url));
   };
 
   // Build slide list
@@ -643,11 +657,12 @@ const EbookVideoCreator: React.FC<EbookVideoCreatorProps> = ({
                             src={img.url}
                             alt={ch.title}
                             className="w-full aspect-video object-cover"
+                            onError={() => handleImageError(img.url)}
                           />
                         ) : (
-                          <div className="w-full aspect-video flex flex-col items-center justify-center text-amber-500">
-                            <Image className="h-8 w-8 opacity-40" />
-                            <span className="text-[10px] mt-1">Pas d'image</span>
+                          <div className="w-full aspect-video flex flex-col items-center justify-center text-amber-500 bg-muted/50">
+                            <AlertCircle className="h-8 w-8 opacity-40" />
+                            <span className="text-[10px] mt-1">Image manquante</span>
                           </div>
                         )}
                         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-2">
