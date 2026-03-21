@@ -8,20 +8,28 @@ import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
-import { Film, Download, Play, Pause, Image, Music, Settings2, Loader2, CheckCircle2 } from 'lucide-react';
+import { Film, Download, Play, Pause, Image, Music, Settings2, Loader2, CheckCircle2, Sparkles, AlertCircle } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ChapterSlide {
   title: string;
   imageUrl: string;
-  duration: number; // seconds
+  duration: number;
+}
+
+interface ChapterImageData {
+  url: string;
+  title: string;
+  chapterId?: string;
 }
 
 interface EbookVideoCreatorProps {
   ebookTitle: string;
   authorName?: string;
   chapters: Array<{ id: string; title: string; content?: string }>;
-  ebookImages: Array<{ url: string; title: string; chapterId?: string }>;
+  ebookImages: Array<ChapterImageData>;
   coverImage?: string;
+  onImagesUpdate?: (images: Array<ChapterImageData>) => void;
 }
 
 const EbookVideoCreator: React.FC<EbookVideoCreatorProps> = ({
@@ -30,6 +38,7 @@ const EbookVideoCreator: React.FC<EbookVideoCreatorProps> = ({
   chapters,
   ebookImages,
   coverImage,
+  onImagesUpdate,
 }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -43,19 +52,27 @@ const EbookVideoCreator: React.FC<EbookVideoCreatorProps> = ({
   const [resolution, setResolution] = useState<'1280x720' | '1920x1080'>('1280x720');
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [isGeneratingImages, setIsGeneratingImages] = useState(false);
+  const [imageGenProgress, setImageGenProgress] = useState(0);
 
   const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // Build slide list from chapters + images
+  // Helper: find image for a chapter
+  const getImageForChapter = (ch: { id: string; title: string }, index: number): ChapterImageData | undefined => {
+    return ebookImages.find(img => img.chapterId === ch.id) || ebookImages[index];
+  };
+
+  // Build slide list
   const slides: ChapterSlide[] = chapters.map((ch, i) => {
-    const img = ebookImages.find(img => img.chapterId === ch.id) || ebookImages[i];
+    const img = getImageForChapter(ch, i);
     return {
       title: ch.title,
       imageUrl: img?.url || '',
       duration: defaultDuration,
     };
   }).filter(s => s.imageUrl);
+
+  const chaptersWithoutImages = chapters.filter((ch, i) => !getImageForChapter(ch, i));
 
   const totalDuration = (showIntro ? 5 : 0) + slides.reduce((a, s) => a + s.duration, 0) + (showOutro ? 5 : 0);
 
@@ -66,6 +83,64 @@ const EbookVideoCreator: React.FC<EbookVideoCreatorProps> = ({
       setAudioUrl(URL.createObjectURL(file));
       toast.success('Audio chargé !');
     }
+  };
+
+  // Generate missing chapter images via edge function
+  const generateMissingImages = async () => {
+    if (chaptersWithoutImages.length === 0) {
+      toast.info('Tous les chapitres ont déjà une image !');
+      return;
+    }
+
+    setIsGeneratingImages(true);
+    setImageGenProgress(0);
+    const newImages: ChapterImageData[] = [...ebookImages];
+    let generated = 0;
+
+    for (const chapter of chaptersWithoutImages) {
+      try {
+        toast.loading(`Génération image: ${chapter.title}...`, { id: `img-${chapter.id}` });
+
+        const { data, error } = await supabase.functions.invoke('generate-chapter-images', {
+          body: {
+            chapterTitle: chapter.title,
+            chapterContent: chapter.content?.substring(0, 500) || chapter.title,
+            ebookTitle,
+            style: 'professional illustration',
+            characters: [],
+            ratio: 'landscape',
+            quality: 'standard',
+          },
+        });
+
+        if (error) throw error;
+
+        const imageUrl = data?.imageUrl;
+        if (imageUrl && !imageUrl.includes('placeholder')) {
+          newImages.push({
+            url: imageUrl,
+            title: chapter.title,
+            chapterId: chapter.id,
+          });
+          generated++;
+          toast.success(`Image générée: ${chapter.title}`, { id: `img-${chapter.id}` });
+        } else {
+          toast.error(`Pas d'image pour: ${chapter.title}`, { id: `img-${chapter.id}` });
+        }
+      } catch (err: any) {
+        console.error('Image generation error:', err);
+        toast.error(`Erreur: ${chapter.title}`, { id: `img-${chapter.id}` });
+      }
+
+      setImageGenProgress(((generated + (chaptersWithoutImages.length - chaptersWithoutImages.indexOf(chapter) > 0 ? 0 : 1)) / chaptersWithoutImages.length) * 100);
+    }
+
+    if (generated > 0) {
+      onImagesUpdate?.(newImages);
+      toast.success(`${generated} image(s) générée(s) avec succès !`);
+    }
+
+    setIsGeneratingImages(false);
   };
 
   const loadImage = (src: string): Promise<HTMLImageElement> => {
@@ -85,13 +160,11 @@ const EbookVideoCreator: React.FC<EbookVideoCreatorProps> = ({
     h: number,
     title: string,
     showTitleOverlay: boolean,
-    transitionProgress: number // 0-1, for fade-in
+    transitionProgress: number
   ) => {
-    // Black background
     ctx.fillStyle = '#0f0f0f';
     ctx.fillRect(0, 0, w, h);
 
-    // Draw image centered/cover
     const imgRatio = img.width / img.height;
     const canvasRatio = w / h;
     let drawW: number, drawH: number, drawX: number, drawY: number;
@@ -112,9 +185,7 @@ const EbookVideoCreator: React.FC<EbookVideoCreatorProps> = ({
     ctx.drawImage(img, drawX, drawY, drawW, drawH);
     ctx.globalAlpha = 1;
 
-    // Title overlay
     if (showTitleOverlay && title) {
-      // Bottom gradient
       const grad = ctx.createLinearGradient(0, h - 140, 0, h);
       grad.addColorStop(0, 'rgba(0,0,0,0)');
       grad.addColorStop(1, 'rgba(0,0,0,0.85)');
@@ -137,7 +208,6 @@ const EbookVideoCreator: React.FC<EbookVideoCreatorProps> = ({
     subLines: string[],
     progress: number
   ) => {
-    // Dark gradient background
     const grad = ctx.createLinearGradient(0, 0, w, h);
     grad.addColorStop(0, '#1a1a2e');
     grad.addColorStop(1, '#16213e');
@@ -176,7 +246,7 @@ const EbookVideoCreator: React.FC<EbookVideoCreatorProps> = ({
 
   const generateVideo = useCallback(async () => {
     if (slides.length === 0) {
-      toast.error('Aucune image de chapitre disponible. Ajoutez des images d\'abord.');
+      toast.error('Aucune image de chapitre disponible. Générez des images d\'abord.');
       return;
     }
 
@@ -193,7 +263,6 @@ const EbookVideoCreator: React.FC<EbookVideoCreatorProps> = ({
       canvas.height = h;
       const ctx = canvas.getContext('2d')!;
 
-      // Preload all images
       setProgressLabel('Chargement des images...');
       const images: HTMLImageElement[] = [];
       for (let i = 0; i < slides.length; i++) {
@@ -208,14 +277,12 @@ const EbookVideoCreator: React.FC<EbookVideoCreatorProps> = ({
         setProgress(((i + 1) / slides.length) * 20);
       }
 
-      // Setup MediaRecorder
       const stream = canvas.captureStream(fps);
 
-      // Add audio track if available
       let audioElement: HTMLAudioElement | null = null;
       if (audioFile) {
         audioElement = new Audio(URL.createObjectURL(audioFile));
-        audioElement.muted = true; // Will unmute when ready
+        audioElement.muted = true;
         try {
           const audioCtx = new AudioContext();
           const source = audioCtx.createMediaElementSource(audioElement);
@@ -255,7 +322,6 @@ const EbookVideoCreator: React.FC<EbookVideoCreatorProps> = ({
         audioElement.play().catch(() => {});
       }
 
-      // Build timeline
       const timeline: Array<{ type: 'intro' | 'slide' | 'outro'; index?: number; duration: number }> = [];
 
       if (showIntro) {
@@ -294,7 +360,6 @@ const EbookVideoCreator: React.FC<EbookVideoCreatorProps> = ({
           } else if (segment.type === 'slide' && segment.index !== undefined) {
             const slide = slides[segment.index];
             const img = images[segment.index];
-            // Ken Burns: slow zoom effect
             const scale = 1 + segProgress * 0.05;
             ctx.save();
             ctx.translate(w / 2, h / 2);
@@ -305,7 +370,6 @@ const EbookVideoCreator: React.FC<EbookVideoCreatorProps> = ({
           }
 
           currentFrame++;
-          // Yield to allow the recorder to capture the frame
           await new Promise(r => setTimeout(r, 1000 / fps / 4));
 
           if (currentFrame % (fps * 2) === 0) {
@@ -314,7 +378,6 @@ const EbookVideoCreator: React.FC<EbookVideoCreatorProps> = ({
         }
       }
 
-      // Stop recording
       setProgressLabel('Finalisation...');
       recorder.stop();
       if (audioElement) {
@@ -373,6 +436,48 @@ const EbookVideoCreator: React.FC<EbookVideoCreatorProps> = ({
           </CardTitle>
         </CardHeader>
       </Card>
+
+      {/* Missing images alert + generator */}
+      {chaptersWithoutImages.length > 0 && (
+        <Card className="border-amber-300/50 bg-amber-50/50 dark:bg-amber-950/20">
+          <CardContent className="pt-5">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="h-5 w-5 text-amber-500 mt-0.5 shrink-0" />
+              <div className="flex-1 space-y-3">
+                <div>
+                  <p className="font-medium text-amber-800 dark:text-amber-200">
+                    {chaptersWithoutImages.length} chapitre(s) sans image
+                  </p>
+                  <p className="text-sm text-amber-600 dark:text-amber-400 mt-1">
+                    Chapitres manquants : {chaptersWithoutImages.map(c => c.title).join(', ')}
+                  </p>
+                </div>
+                <Button
+                  onClick={generateMissingImages}
+                  disabled={isGeneratingImages}
+                  variant="default"
+                  className="gap-2"
+                >
+                  {isGeneratingImages ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Génération en cours...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="h-4 w-4" />
+                      Générer les {chaptersWithoutImages.length} image(s) manquante(s)
+                    </>
+                  )}
+                </Button>
+                {isGeneratingImages && (
+                  <Progress value={imageGenProgress} className="h-2" />
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Settings */}
@@ -521,51 +626,61 @@ const EbookVideoCreator: React.FC<EbookVideoCreatorProps> = ({
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {slides.length === 0 ? (
+              {chapters.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
                   <Image className="h-12 w-12 mx-auto mb-3 opacity-30" />
-                  <p className="font-medium">Aucune image de chapitre</p>
-                  <p className="text-sm mt-1">
-                    Générez des images dans l'onglet "Images IA" pour créer votre vidéo
-                  </p>
+                  <p className="font-medium">Aucun chapitre dans votre ebook</p>
+                  <p className="text-sm mt-1">Créez d'abord des chapitres dans l'onglet Plan</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {slides.map((slide, i) => (
-                    <div key={i} className="relative group rounded-lg overflow-hidden border">
-                      <img
-                        src={slide.imageUrl}
-                        alt={slide.title}
-                        className="w-full aspect-video object-cover"
-                      />
-                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-2">
-                        <p className="text-white text-xs font-medium truncate">{slide.title}</p>
-                        <Badge variant="secondary" className="text-[10px] mt-1">
-                          {defaultDuration}s
+                  {chapters.map((ch, i) => {
+                    const img = getImageForChapter(ch, i);
+                    return (
+                      <div key={ch.id} className={`relative group rounded-lg overflow-hidden border ${!img ? 'border-dashed border-amber-300 bg-amber-50/30 dark:bg-amber-950/20' : ''}`}>
+                        {img ? (
+                          <img
+                            src={img.url}
+                            alt={ch.title}
+                            className="w-full aspect-video object-cover"
+                          />
+                        ) : (
+                          <div className="w-full aspect-video flex flex-col items-center justify-center text-amber-500">
+                            <Image className="h-8 w-8 opacity-40" />
+                            <span className="text-[10px] mt-1">Pas d'image</span>
+                          </div>
+                        )}
+                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-2">
+                          <p className="text-white text-xs font-medium truncate">{ch.title}</p>
+                          {img && (
+                            <Badge variant="secondary" className="text-[10px] mt-1">
+                              {defaultDuration}s
+                            </Badge>
+                          )}
+                        </div>
+                        <Badge
+                          className="absolute top-1 left-1 text-[10px]"
+                          variant={img ? 'secondary' : 'destructive'}
+                        >
+                          Ch.{i + 1}
                         </Badge>
                       </div>
-                      <Badge
-                        className="absolute top-1 left-1 text-[10px]"
-                        variant="secondary"
-                      >
-                        Ch.{i + 1}
-                      </Badge>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </CardContent>
           </Card>
 
           {/* Tips */}
-          <Card className="border-amber-200/50 bg-amber-50/30">
+          <Card className="border-amber-200/50 bg-amber-50/30 dark:bg-amber-950/10">
             <CardContent className="pt-4">
               <h4 className="font-medium text-sm mb-2">💡 Conseils</h4>
               <ul className="text-xs text-muted-foreground space-y-1">
-                <li>• Générez d'abord des images pour chaque chapitre via "Images IA"</li>
+                <li>• Cliquez sur "Générer les images manquantes" pour créer automatiquement les images</li>
+                <li>• Vous pouvez aussi générer des images dans l'onglet "Images IA" pour plus d'options</li>
                 <li>• Ajoutez votre audiobook en MP3 pour une vidéo complète avec narration</li>
                 <li>• La vidéo est au format WebM, convertible en MP4 avec un outil en ligne</li>
-                <li>• Pour YouTube, 720p est suffisant ; 1080p pour une qualité supérieure</li>
                 <li>• Chaque image affichera un effet Ken Burns (léger zoom progressif)</li>
               </ul>
             </CardContent>
