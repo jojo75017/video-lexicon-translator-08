@@ -657,11 +657,12 @@ const EbookVideoCreator: React.FC<EbookVideoCreatorProps> = ({
                             src={img.url}
                             alt={ch.title}
                             className="w-full aspect-video object-cover"
+                            onError={() => handleImageError(img.url)}
                           />
                         ) : (
-                          <div className="w-full aspect-video flex flex-col items-center justify-center text-amber-500">
-                            <Image className="h-8 w-8 opacity-40" />
-                            <span className="text-[10px] mt-1">Pas d'image</span>
+                          <div className="w-full aspect-video flex flex-col items-center justify-center text-amber-500 bg-muted/50">
+                            <AlertCircle className="h-8 w-8 opacity-40" />
+                            <span className="text-[10px] mt-1">Image manquante</span>
                           </div>
                         )}
                         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-2">
