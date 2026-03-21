@@ -52,14 +52,26 @@ const EbookVideoCreator: React.FC<EbookVideoCreatorProps> = ({
   const [resolution, setResolution] = useState<'1280x720' | '1920x1080'>('1280x720');
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  const [isGeneratingImages, setIsGeneratingImages] = useState(false);
-  const [imageGenProgress, setImageGenProgress] = useState(0);
+  const [brokenImages, setBrokenImages] = useState<Set<string>>(new Set());
 
   const videoRef = useRef<HTMLVideoElement>(null);
 
   // Helper: find image for a chapter
   const getImageForChapter = (ch: { id: string; title: string }, index: number): ChapterImageData | undefined => {
-    return ebookImages.find(img => img.chapterId === ch.id) || ebookImages[index];
+    // Try matching by chapterId first
+    const byId = ebookImages.find(img => img.chapterId === ch.id);
+    if (byId && !brokenImages.has(byId.url)) return byId;
+    // Fallback: match by title
+    const byTitle = ebookImages.find(img => img.title === ch.title);
+    if (byTitle && !brokenImages.has(byTitle.url)) return byTitle;
+    // Fallback: by index
+    const byIndex = ebookImages[index];
+    if (byIndex && !brokenImages.has(byIndex.url)) return byIndex;
+    return undefined;
+  };
+
+  const handleImageError = (url: string) => {
+    setBrokenImages(prev => new Set(prev).add(url));
   };
 
   // Build slide list
