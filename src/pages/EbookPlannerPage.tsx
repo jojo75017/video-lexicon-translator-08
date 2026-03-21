@@ -3041,6 +3041,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             chapters={chapters}
             ebookImages={ebookImages}
             coverImage={ebookImages[0]?.url}
+            onImagesUpdate={(images) => setEbookImages(images)}
           />
         );
       
