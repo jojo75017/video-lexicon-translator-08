@@ -52,6 +52,8 @@ const EbookVideoCreator: React.FC<EbookVideoCreatorProps> = ({
   const [resolution, setResolution] = useState<'1280x720' | '1920x1080'>('1280x720');
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [isGeneratingImages, setIsGeneratingImages] = useState(false);
+  const [imageGenProgress, setImageGenProgress] = useState(0);
   const [brokenImages, setBrokenImages] = useState<Set<string>>(new Set());
 
   const videoRef = useRef<HTMLVideoElement>(null);
