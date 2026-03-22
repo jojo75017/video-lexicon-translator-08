@@ -17,17 +17,27 @@ interface ChapterSlide {
   duration: number;
 }
 
+interface RawChapterImageData {
+  url?: string;
+  title?: string;
+  chapterId?: string;
+  chapterIndex?: number;
+  imageUrl?: string;
+  chapterTitle?: string;
+}
+
 interface ChapterImageData {
   url: string;
   title: string;
   chapterId?: string;
+  chapterIndex?: number;
 }
 
 interface EbookVideoCreatorProps {
   ebookTitle: string;
   authorName?: string;
   chapters: Array<{ id: string; title: string; content?: string }>;
-  ebookImages: Array<ChapterImageData>;
+  ebookImages: Array<RawChapterImageData>;
   coverImage?: string;
   onImagesUpdate?: (images: Array<ChapterImageData>) => void;
 }
@@ -58,16 +68,33 @@ const EbookVideoCreator: React.FC<EbookVideoCreatorProps> = ({
 
   const videoRef = useRef<HTMLVideoElement>(null);
 
+  const normalizedImages = ebookImages
+    .map<ChapterImageData | null>((image, index) => {
+      const url = image.url || image.imageUrl || '';
+
+      if (!url) return null;
+
+      return {
+        url,
+        title: image.title || image.chapterTitle || chapters[index]?.title || `Chapitre ${index + 1}`,
+        chapterId: image.chapterId,
+        chapterIndex: image.chapterIndex ?? index,
+      };
+    })
+    .filter((image): image is ChapterImageData => Boolean(image));
+
   // Helper: find image for a chapter
   const getImageForChapter = (ch: { id: string; title: string }, index: number): ChapterImageData | undefined => {
     // Try matching by chapterId first
-    const byId = ebookImages.find(img => img.chapterId === ch.id);
+    const byId = normalizedImages.find(img => img.chapterId === ch.id);
     if (byId && !brokenImages.has(byId.url)) return byId;
     // Fallback: match by title
-    const byTitle = ebookImages.find(img => img.title === ch.title);
+    const byTitle = normalizedImages.find(img => img.title === ch.title);
     if (byTitle && !brokenImages.has(byTitle.url)) return byTitle;
-    // Fallback: by index
-    const byIndex = ebookImages[index];
+    // Fallback: by explicit index, then array order
+    const byChapterIndex = normalizedImages.find(img => img.chapterIndex === index);
+    if (byChapterIndex && !brokenImages.has(byChapterIndex.url)) return byChapterIndex;
+    const byIndex = normalizedImages[index];
     if (byIndex && !brokenImages.has(byIndex.url)) return byIndex;
     return undefined;
   };
@@ -108,7 +135,7 @@ const EbookVideoCreator: React.FC<EbookVideoCreatorProps> = ({
 
     setIsGeneratingImages(true);
     setImageGenProgress(0);
-    const newImages: ChapterImageData[] = [...ebookImages];
+    const newImages: ChapterImageData[] = [...normalizedImages];
     let generated = 0;
 
     for (const chapter of chaptersWithoutImages) {

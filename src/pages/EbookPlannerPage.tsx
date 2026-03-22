@@ -251,7 +251,37 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   const [targetWordsPerChapter, setTargetWordsPerChapter] = useState(savedData?.targetWordsPerChapter || 2500);
   const [selectedChapters, setSelectedChapters] = useState<string[]>([]);
   const [importText, setImportText] = useState('');
-  const [ebookImages, setEbookImages] = useState<Array<{url: string, title: string, chapterId?: string}>>(savedData?.ebookImages || []);
+
+  const normalizeEbookImages = (images: unknown): Array<{url: string; title: string; chapterId?: string; chapterIndex?: number}> => {
+    if (!Array.isArray(images)) return [];
+
+    return images
+      .map<{url: string; title: string; chapterId?: string; chapterIndex?: number} | null>((image, index) => {
+        if (!image || typeof image !== 'object') return null;
+
+        const raw = image as {
+          url?: string;
+          title?: string;
+          chapterId?: string;
+          chapterIndex?: number;
+          imageUrl?: string;
+          chapterTitle?: string;
+        };
+
+        const url = raw.url || raw.imageUrl || '';
+        if (!url) return null;
+
+        return {
+          url,
+          title: raw.title || raw.chapterTitle || `Chapitre ${index + 1}`,
+          chapterId: raw.chapterId,
+          chapterIndex: raw.chapterIndex ?? index,
+        };
+      })
+      .filter((image): image is {url: string; title: string; chapterId?: string; chapterIndex?: number} => image !== null);
+  };
+
+  const [ebookImages, setEbookImages] = useState<Array<{url: string, title: string, chapterId?: string; chapterIndex?: number}>>(normalizeEbookImages(savedData?.ebookImages));
   const [generatingImageForCharacter, setGeneratingImageForCharacter] = useState<string | null>(null);
   
   const [bookSummary, setBookSummary] = useState('');
@@ -317,7 +347,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
         setConclusion(dbProject.conclusion || '');
         setChapters(Array.isArray(dbProject.chapters) ? dbProject.chapters as unknown as Chapter[] : []);
         setCharacters(Array.isArray(dbProject.characters) ? dbProject.characters as unknown as EbookCharacter[] : []);
-        setEbookImages(Array.isArray(dbProject.ebook_images) ? dbProject.ebook_images as unknown as Array<{url: string, title: string, chapterIndex?: number}> : []);
+        setEbookImages(normalizeEbookImages(dbProject.ebook_images));
         setNumberOfChapters(dbProject.number_of_chapters || 8);
         setBookSummary(dbProject.book_summary || '');
         setCoverConcepts(dbProject.cover_concepts || '');
@@ -1050,7 +1080,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
     setConclusion(project.conclusion || '');
     setChapters(Array.isArray(project.chapters) ? project.chapters as unknown as Chapter[] : []);
     setCharacters(Array.isArray(project.characters) ? project.characters as unknown as EbookCharacter[] : []);
-    setEbookImages(Array.isArray(project.ebook_images) ? project.ebook_images as unknown as Array<{url: string, title: string, chapterIndex?: number}> : []);
+    setEbookImages(normalizeEbookImages(project.ebook_images));
     setNumberOfChapters(project.number_of_chapters || 8);
     setBookSummary(project.book_summary || '');
     setCoverConcepts(project.cover_concepts || '');
@@ -3041,7 +3071,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             chapters={chapters}
             ebookImages={ebookImages}
             coverImage={ebookImages[0]?.url}
-            onImagesUpdate={(images) => setEbookImages(images)}
+            onImagesUpdate={(images) => setEbookImages(normalizeEbookImages(images))}
           />
         );
       
