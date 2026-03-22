@@ -17,7 +17,7 @@ interface ChapterSlide {
   duration: number;
 }
 
-interface ChapterImageData {
+interface RawChapterImageData {
   url?: string;
   title?: string;
   chapterId?: string;
@@ -26,7 +26,7 @@ interface ChapterImageData {
   chapterTitle?: string;
 }
 
-interface NormalizedChapterImageData {
+interface ChapterImageData {
   url: string;
   title: string;
   chapterId?: string;
@@ -37,7 +37,7 @@ interface EbookVideoCreatorProps {
   ebookTitle: string;
   authorName?: string;
   chapters: Array<{ id: string; title: string; content?: string }>;
-  ebookImages: Array<ChapterImageData>;
+  ebookImages: Array<RawChapterImageData>;
   coverImage?: string;
   onImagesUpdate?: (images: Array<ChapterImageData>) => void;
 }
@@ -68,8 +68,8 @@ const EbookVideoCreator: React.FC<EbookVideoCreatorProps> = ({
 
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  const normalizedImages: NormalizedChapterImageData[] = ebookImages
-    .map((image, index) => {
+  const normalizedImages = ebookImages
+    .map<ChapterImageData | null>((image, index) => {
       const url = image.url || image.imageUrl || '';
 
       if (!url) return null;
@@ -81,10 +81,10 @@ const EbookVideoCreator: React.FC<EbookVideoCreatorProps> = ({
         chapterIndex: image.chapterIndex ?? index,
       };
     })
-    .filter((image): image is NormalizedChapterImageData => Boolean(image?.url));
+    .filter((image): image is ChapterImageData => Boolean(image));
 
   // Helper: find image for a chapter
-  const getImageForChapter = (ch: { id: string; title: string }, index: number): NormalizedChapterImageData | undefined => {
+  const getImageForChapter = (ch: { id: string; title: string }, index: number): ChapterImageData | undefined => {
     // Try matching by chapterId first
     const byId = normalizedImages.find(img => img.chapterId === ch.id);
     if (byId && !brokenImages.has(byId.url)) return byId;
