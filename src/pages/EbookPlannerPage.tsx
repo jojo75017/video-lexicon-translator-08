@@ -256,7 +256,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
     if (!Array.isArray(images)) return [];
 
     return images
-      .map((image, index) => {
+      .map<{url: string; title: string; chapterId?: string; chapterIndex?: number} | null>((image, index) => {
         if (!image || typeof image !== 'object') return null;
 
         const raw = image as {
@@ -278,7 +278,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           chapterIndex: raw.chapterIndex ?? index,
         };
       })
-      .filter((image): image is {url: string; title: string; chapterId?: string; chapterIndex?: number} => Boolean(image));
+      .filter((image): image is {url: string; title: string; chapterId?: string; chapterIndex?: number} => image !== null);
   };
 
   const [ebookImages, setEbookImages] = useState<Array<{url: string, title: string, chapterId?: string; chapterIndex?: number}>>(normalizeEbookImages(savedData?.ebookImages));
