@@ -13,6 +13,7 @@ import { OpenAIConfigPanel } from '@/components/shared/OpenAIConfigPanel';
 import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 import JSZip from 'jszip';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { detectPlaceholderImage } from '@/lib/ebookImageValidation';
 
 interface Chapter {
   id: string;
@@ -210,6 +211,11 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
   // Auto-save image to library storage
   const saveImageToLibrary = async (imageUrl: string, chapterTitle: string) => {
     try {
+      if (await detectPlaceholderImage(imageUrl)) {
+        console.log('⚠️ Placeholder ignoré, non sauvegardé dans la bibliothèque');
+        return;
+      }
+
       let userId = getStorageUserId(subscriberEmail);
 
       if (!userId) {
@@ -322,6 +328,11 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
           if (error) throw error;
 
           if (data?.imageUrl) {
+            const isPlaceholder = await detectPlaceholderImage(data.imageUrl);
+            if (isPlaceholder) {
+              throw new Error('L’IA a renvoyé un placeholder au lieu d’une image exploitable');
+            }
+
             // Sauvegarder le seed si retourné
             if (data.seed) {
               setLastSeed(data.seed);
@@ -483,6 +494,11 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
       if (error) throw error;
 
       if (data?.imageUrl) {
+        const isPlaceholder = await detectPlaceholderImage(data.imageUrl);
+        if (isPlaceholder) {
+          throw new Error('L’IA a renvoyé un placeholder au lieu d’une image exploitable');
+        }
+
         // Sauvegarder le seed si retourné
         if (data.seed) {
           setLastSeed(data.seed);
@@ -606,10 +622,22 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
       return;
     }
 
-    toast.info(`📤 Synchronisation de ${generatedImages.length} image(s)...`);
+    const validImages: ChapterImage[] = [];
+    for (const img of generatedImages) {
+      if (!(await detectPlaceholderImage(img.imageUrl))) {
+        validImages.push(img);
+      }
+    }
+
+    if (validImages.length === 0) {
+      toast.error('Aucune vraie image à synchroniser');
+      return;
+    }
+
+    toast.info(`📤 Synchronisation de ${validImages.length} image(s)...`);
     let successCount = 0;
 
-    for (const img of generatedImages) {
+    for (const img of validImages) {
       try {
         await saveImageToLibrary(img.imageUrl, img.chapterTitle);
         successCount++;
@@ -618,7 +646,7 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
       }
     }
 
-    toast.success(`✅ ${successCount}/${generatedImages.length} image(s) synchronisée(s)`, {
+    toast.success(`✅ ${successCount}/${validImages.length} image(s) synchronisée(s)`, {
       description: `Dossier: ${ebookTitle}`
     });
   };

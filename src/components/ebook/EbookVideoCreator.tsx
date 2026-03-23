@@ -10,6 +10,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
 import { Film, Download, Play, Pause, Image, Music, Settings2, Loader2, CheckCircle2, Sparkles, AlertCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { detectPlaceholderImage } from '@/lib/ebookImageValidation';
 
 interface ChapterSlide {
   title: string;
@@ -65,6 +66,7 @@ const EbookVideoCreator: React.FC<EbookVideoCreatorProps> = ({
   const [isGeneratingImages, setIsGeneratingImages] = useState(false);
   const [imageGenProgress, setImageGenProgress] = useState(0);
   const [brokenImages, setBrokenImages] = useState<Set<string>>(new Set());
+  const [placeholderImages, setPlaceholderImages] = useState<Set<string>>(new Set());
 
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -83,19 +85,57 @@ const EbookVideoCreator: React.FC<EbookVideoCreatorProps> = ({
     })
     .filter((image): image is ChapterImageData => Boolean(image));
 
+  useEffect(() => {
+    let isCancelled = false;
+
+    const inspectImages = async () => {
+      const uniqueUrls = [...new Set(normalizedImages.map((image) => image.url).filter(Boolean))];
+
+      if (uniqueUrls.length === 0) {
+        if (!isCancelled) setPlaceholderImages(new Set());
+        return;
+      }
+
+      const results = await Promise.all(
+        uniqueUrls.map(async (url) => ({
+          url,
+          isPlaceholder: await detectPlaceholderImage(url),
+        }))
+      );
+
+      if (isCancelled) return;
+
+      setPlaceholderImages(
+        new Set(results.filter((result) => result.isPlaceholder).map((result) => result.url))
+      );
+    };
+
+    inspectImages();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [normalizedImages]);
+
+  const usableImages = normalizedImages.filter(
+    (image) => !brokenImages.has(image.url) && !placeholderImages.has(image.url)
+  );
+
   // Helper: find image for a chapter
   const getImageForChapter = (ch: { id: string; title: string }, index: number): ChapterImageData | undefined => {
     // Try matching by chapterId first
-    const byId = normalizedImages.find(img => img.chapterId === ch.id);
-    if (byId && !brokenImages.has(byId.url)) return byId;
+    const byId = usableImages.find(img => img.chapterId === ch.id);
+    if (byId) return byId;
     // Fallback: match by title
-    const byTitle = normalizedImages.find(img => img.title === ch.title);
-    if (byTitle && !brokenImages.has(byTitle.url)) return byTitle;
+    const byTitle = usableImages.find(img => img.title === ch.title);
+    if (byTitle) return byTitle;
     // Fallback: by explicit index, then array order
-    const byChapterIndex = normalizedImages.find(img => img.chapterIndex === index);
-    if (byChapterIndex && !brokenImages.has(byChapterIndex.url)) return byChapterIndex;
-    const byIndex = normalizedImages[index];
-    if (byIndex && !brokenImages.has(byIndex.url)) return byIndex;
+    const byChapterIndex = usableImages.find(img => img.chapterIndex === index);
+    if (byChapterIndex) return byChapterIndex;
+    if (usableImages.length === chapters.length) {
+      const byIndex = usableImages[index];
+      if (byIndex) return byIndex;
+    }
     return undefined;
   };
 
@@ -157,7 +197,9 @@ const EbookVideoCreator: React.FC<EbookVideoCreatorProps> = ({
         if (error) throw error;
 
         const imageUrl = data?.imageUrl;
-        if (imageUrl && !imageUrl.includes('placeholder')) {
+        const isPlaceholder = imageUrl ? await detectPlaceholderImage(imageUrl) : true;
+
+        if (imageUrl && !isPlaceholder) {
           newImages.push({
             url: imageUrl,
             title: chapter.title,
@@ -492,6 +534,11 @@ const EbookVideoCreator: React.FC<EbookVideoCreatorProps> = ({
                   <p className="text-sm text-amber-600 dark:text-amber-400 mt-1">
                     Chapitres manquants : {chaptersWithoutImages.map(c => c.title).join(', ')}
                   </p>
+                  {placeholderImages.size > 0 && (
+                    <p className="text-sm text-amber-600 dark:text-amber-400 mt-1">
+                      {placeholderImages.size} placeholder(s) détecté(s) et exclus automatiquement.
+                    </p>
+                  )}
                 </div>
                 <Button
                   onClick={generateMissingImages}
