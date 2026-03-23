@@ -119,6 +119,7 @@ import EbookBirdSheetGenerator from '@/components/ebook/EbookBirdSheetGenerator'
 import EbookNicheAnalysis from '@/components/ebook/EbookNicheAnalysis';
 import EbookDescriptionMagnet from '@/components/ebook/EbookDescriptionMagnet';
 import EbookPenNameGenerator from '@/components/ebook/EbookPenNameGenerator';
+import { detectPlaceholderImage, isExternalPlaceholderUrl } from '@/lib/ebookImageValidation';
 
 // Composants 2026
 import EbookVideoTrailer from '@/components/ebook/EbookVideoTrailer';
@@ -308,6 +309,43 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showWelcome, setShowWelcome] = useState(location.state?.fromFormation || false);
   const [showTutorial, setShowTutorial] = useState(location.state?.fromFormation || false);
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    const cleanupPlaceholderImages = async () => {
+      const directPlaceholders = ebookImages.filter((image) => isExternalPlaceholderUrl(image.url));
+      if (directPlaceholders.length > 0) {
+        const cleaned = ebookImages.filter((image) => !isExternalPlaceholderUrl(image.url));
+        if (!isCancelled && cleaned.length !== ebookImages.length) {
+          setEbookImages(cleaned);
+        }
+        return;
+      }
+
+      const results = await Promise.all(
+        ebookImages.map(async (image) => ({
+          image,
+          isPlaceholder: await detectPlaceholderImage(image.url),
+        }))
+      );
+
+      if (isCancelled) return;
+
+      const cleaned = results.filter((result) => !result.isPlaceholder).map((result) => result.image);
+      if (cleaned.length !== ebookImages.length) {
+        setEbookImages(cleaned);
+      }
+    };
+
+    if (ebookImages.length > 0) {
+      cleanupPlaceholderImages();
+    }
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [ebookImages]);
 
   // Ref pour toujours avoir les dernières données (évite les problèmes de closure)
   const currentDataRef = useRef({

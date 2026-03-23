@@ -40,6 +40,7 @@ import {
 } from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
+import { isSuspiciousRasterPlaceholder } from '@/lib/ebookImageValidation';
 
 interface EbookFolder {
   id: string;
@@ -105,6 +106,7 @@ export const EbookImageLibrary: React.FC<EbookImageLibraryProps> = ({
   const [isExporting, setIsExporting] = useState(false);
   const [totalStorageSize, setTotalStorageSize] = useState(0);
   const [storageRoot, setStorageRoot] = useState<string | null>(localStorage.getItem('ebook_storage_root'));
+  const [ignoredPlaceholderCount, setIgnoredPlaceholderCount] = useState(0);
 
   const getActiveStorageRoot = async (): Promise<string | null> => {
     if (storageRoot) return storageRoot;
@@ -251,8 +253,14 @@ export const EbookImageLibrary: React.FC<EbookImageLibraryProps> = ({
       if (error) throw error;
 
       const imageList: StoredImage[] = [];
+      let skippedPlaceholders = 0;
       for (const file of data || []) {
         if (file.name && !file.name.startsWith('.') && file.name.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+          if (isSuspiciousRasterPlaceholder(file.name, file.metadata?.mimetype)) {
+            skippedPlaceholders++;
+            continue;
+          }
+
           const { data: urlData } = supabase.storage
             .from('ebook-images')
             .getPublicUrl(`${userId}/${folderId}/${file.name}`);
@@ -276,6 +284,7 @@ export const EbookImageLibrary: React.FC<EbookImageLibraryProps> = ({
       });
 
       setImages(imageList);
+      setIgnoredPlaceholderCount(skippedPlaceholders);
     } catch (error) {
       console.error('Error loading images:', error);
       toast.error('Erreur lors du chargement des images');
@@ -806,27 +815,33 @@ export const EbookImageLibrary: React.FC<EbookImageLibraryProps> = ({
 
           {/* Images View */}
           {currentFolder && !isLoading && (
-            <div className={`grid ${viewMode === 'grid' ? 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4' : 'grid-cols-1'} gap-4`}>
-              {filteredImages.length === 0 ? (
-                <div className="col-span-full text-center py-12 text-muted-foreground">
-                  <ImageIcon className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p className="font-medium mb-1">Aucune image dans ce dossier</p>
-                  <p className="text-sm mb-4">Uploadez des images ou importez un fichier ZIP</p>
-                  <div className="flex gap-2 justify-center">
-                    <label htmlFor="image-upload-lib">
-                      <Button variant="outline" size="sm" asChild>
-                        <span className="cursor-pointer"><Upload className="h-4 w-4 mr-1" /> Images</span>
-                      </Button>
-                    </label>
-                    <label htmlFor="zip-upload-lib">
-                      <Button variant="outline" size="sm" asChild>
-                        <span className="cursor-pointer"><PackageOpen className="h-4 w-4 mr-1" /> Import ZIP</span>
-                      </Button>
-                    </label>
-                  </div>
+            <div className="space-y-4">
+              {ignoredPlaceholderCount > 0 && (
+                <div className="rounded-lg border border-amber-300/50 bg-amber-50/40 p-3 text-sm text-amber-700">
+                  {ignoredPlaceholderCount} placeholder(s) ont été ignorés dans ce dossier. Régénérez-les pour afficher de vrais visuels.
                 </div>
-              ) : (
-                filteredImages.map((image) => {
+              )}
+              <div className={`grid ${viewMode === 'grid' ? 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4' : 'grid-cols-1'} gap-4`}>
+                {filteredImages.length === 0 ? (
+                  <div className="col-span-full text-center py-12 text-muted-foreground">
+                    <ImageIcon className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p className="font-medium mb-1">Aucune image dans ce dossier</p>
+                    <p className="text-sm mb-4">Uploadez des images ou importez un fichier ZIP</p>
+                    <div className="flex gap-2 justify-center">
+                      <label htmlFor="image-upload-lib">
+                        <Button variant="outline" size="sm" asChild>
+                          <span className="cursor-pointer"><Upload className="h-4 w-4 mr-1" /> Images</span>
+                        </Button>
+                      </label>
+                      <label htmlFor="zip-upload-lib">
+                        <Button variant="outline" size="sm" asChild>
+                          <span className="cursor-pointer"><PackageOpen className="h-4 w-4 mr-1" /> Import ZIP</span>
+                        </Button>
+                      </label>
+                    </div>
+                  </div>
+                ) : (
+                  filteredImages.map((image) => {
                   const isSelected = selectedImages.has(image.id);
                   return (
                     <div
@@ -935,8 +950,9 @@ export const EbookImageLibrary: React.FC<EbookImageLibraryProps> = ({
                       )}
                     </div>
                   );
-                })
-              )}
+                  })
+                )}
+              </div>
             </div>
           )}
 
