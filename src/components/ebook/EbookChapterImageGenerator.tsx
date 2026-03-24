@@ -14,6 +14,7 @@ import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 import JSZip from 'jszip';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { detectPlaceholderImage } from '@/lib/ebookImageValidation';
+import { persistEbookImageToLibrary } from '@/lib/ebookImageStorage';
 
 interface Chapter {
   id: string;
@@ -40,21 +41,6 @@ interface EbookChapterImageGeneratorProps {
   onInsertImageToChapter?: (chapterId: string, imageUrl: string) => void;
   subscriberEmail?: string;
 }
-
-const getStorageUserId = (email?: string): string | null => {
-  const persistedRoot = localStorage.getItem('ebook_storage_root');
-  if (persistedRoot) return persistedRoot;
-
-  if (email) return email.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 60);
-  const saved = localStorage.getItem('subscriberData');
-  if (saved) {
-    try {
-      const data = JSON.parse(saved);
-      if (data.email) return data.email.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 60);
-    } catch {}
-  }
-  return null;
-};
 
 export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProps> = ({
   ebookTitle,
@@ -213,49 +199,24 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
     try {
       if (await detectPlaceholderImage(imageUrl)) {
         console.log('⚠️ Placeholder ignoré, non sauvegardé dans la bibliothèque');
-        return;
+        return imageUrl;
       }
 
-      let userId = getStorageUserId(subscriberEmail);
+      const storedUrl = await persistEbookImageToLibrary({
+        imageUrl,
+        ebookTitle,
+        chapterTitle,
+        subscriberEmail,
+      });
 
-      if (!userId) {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user?.id) userId = user.id;
+      if (storedUrl !== imageUrl) {
+        console.log(`✅ Image sauvegardée dans la bibliothèque: ${chapterTitle}`);
       }
 
-      if (!userId) {
-        console.log('❌ Utilisateur non identifié - sauvegarde bibliothèque ignorée');
-        return;
-      }
-
-      localStorage.setItem('ebook_storage_root', userId);
-
-      // Create folder name from ebook title (sanitize)
-      const folderName = ebookTitle.replace(/[^a-zA-Z0-9À-ÿ\s-]/g, '').trim().replace(/\s+/g, '-').substring(0, 50) || 'Sans-titre';
-      
-      // Create unique filename
-      const timestamp = Date.now();
-      const safeName = chapterTitle.replace(/[^a-zA-Z0-9À-ÿ\s-]/g, '').trim().replace(/\s+/g, '-').substring(0, 30);
-      const fileName = `${timestamp}-${safeName}.png`;
-      const filePath = `${userId}/${folderName}/${fileName}`;
-
-      // Fetch image and convert to blob
-      const response = await fetch(imageUrl);
-      if (!response.ok) throw new Error('Impossible de télécharger l\'image');
-      const blob = await response.blob();
-
-      // Upload to storage
-      const { error } = await supabase.storage
-        .from('ebook-images')
-        .upload(filePath, blob, { contentType: 'image/png' });
-
-      if (error && !error.message.includes('already exists')) {
-        console.error('❌ Erreur upload bibliothèque:', error);
-      } else {
-        console.log(`✅ Image sauvegardée dans la bibliothèque: ${folderName}/${fileName}`);
-      }
+      return storedUrl;
     } catch (error) {
       console.error('❌ Erreur sauvegarde bibliothèque:', error);
+      return imageUrl;
     }
   };
 
@@ -338,15 +299,15 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
               setLastSeed(data.seed);
             }
             
+            const finalImageUrl = await saveImageToLibrary(data.imageUrl, chapter.title);
+
             newImages.push({
               chapterId: chapter.id,
               chapterTitle: chapter.title,
-              imageUrl: data.imageUrl,
+              imageUrl: finalImageUrl,
               style: visualCoherence && coherenceStyle ? coherenceStyle : imageStyle,
               seed: data.seed
             });
-            // Auto-save to library
-            saveImageToLibrary(data.imageUrl, chapter.title);
             success = true;
             
             // Activer automatiquement la cohérence après la première image
@@ -354,7 +315,7 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
               setCoherenceStyle(imageStyle);
               setCoherenceColorScheme(colorScheme);
               if (!referenceImageUrl) {
-                setReferenceImageUrl(data.imageUrl);
+                setReferenceImageUrl(finalImageUrl);
               }
               if (!visualCoherence) {
                 setVisualCoherence(true);
@@ -504,10 +465,12 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
           setLastSeed(data.seed);
         }
         
+        const finalImageUrl = await saveImageToLibrary(data.imageUrl, chapter.title);
+
         const newImage: ChapterImage = {
           chapterId: chapter.id,
           chapterTitle: chapter.title,
-          imageUrl: data.imageUrl,
+          imageUrl: finalImageUrl,
           style: visualCoherence && coherenceStyle ? coherenceStyle : imageStyle,
           seed: data.seed
         };
@@ -517,8 +480,9 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
           return [...filtered, newImage];
         });
 
-        // Auto-save to library
-        saveImageToLibrary(data.imageUrl, chapter.title);
+        if (!referenceImageUrl && autoCoherenceFromFirst) {
+          setReferenceImageUrl(finalImageUrl);
+        }
       } else {
         throw new Error('Pas d\'URL d\'image dans la réponse');
       }

@@ -33,20 +33,22 @@ interface EbookWritingProps {
 // Fonction de rendu du texte avec style (identique au planificateur)
 const renderStyledText = (content: string) => {
   // Séparer d'abord par les images pour les traiter correctement
-  const parts = content.split(/(\[IMAGE_URL:[^\]]+\])/g);
+  const parts = content.split(/(\[IMAGE_URL:[^\]]+\]|\[IMAGE:\d+:[^\]]+\])/g);
   
   return parts.flatMap((part, partIndex) => {
-    // Images [IMAGE_URL:url]
-    const imageMatch = part.match(/\[IMAGE_URL:(https?:\/\/[^\]]+)\]/);
+    // Images [IMAGE_URL:url] ou [IMAGE:id:data-url]
+    const imageMatch = part.match(/\[IMAGE_URL:([^\]]+)\]|\[IMAGE:\d+:([^\]]+)\]/);
     if (imageMatch) {
+      const imageUrl = imageMatch[1] || imageMatch[2];
+
       return (
         <div key={`img-${partIndex}`} className="my-4">
           <img 
-            src={imageMatch[1]} 
+            src={imageUrl} 
             alt="Image du chapitre"
             className="max-w-full h-auto rounded-lg shadow-md border"
             onError={(e) => {
-              console.error('Erreur chargement image:', imageMatch[1]);
+              console.error('Erreur chargement image:', imageUrl);
               e.currentTarget.style.display = 'none';
             }}
           />

@@ -120,6 +120,7 @@ import EbookNicheAnalysis from '@/components/ebook/EbookNicheAnalysis';
 import EbookDescriptionMagnet from '@/components/ebook/EbookDescriptionMagnet';
 import EbookPenNameGenerator from '@/components/ebook/EbookPenNameGenerator';
 import { detectPlaceholderImage, isExternalPlaceholderUrl } from '@/lib/ebookImageValidation';
+import { isDataImageUrl, persistEbookImageToLibrary } from '@/lib/ebookImageStorage';
 
 // Composants 2026
 import EbookVideoTrailer from '@/components/ebook/EbookVideoTrailer';
@@ -346,6 +347,48 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       isCancelled = true;
     };
   }, [ebookImages]);
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    const migrateLegacyDataImages = async () => {
+      if (!ebookTitle || ebookImages.length === 0) return;
+
+      const hasLegacyDataImages = ebookImages.some((image) => isDataImageUrl(image.url));
+      if (!hasLegacyDataImages) return;
+
+      const migratedImages = await Promise.all(
+        ebookImages.map(async (image) => {
+          if (!isDataImageUrl(image.url)) return image;
+
+          try {
+            const storedUrl = await persistEbookImageToLibrary({
+              imageUrl: image.url,
+              ebookTitle,
+              chapterTitle: image.title,
+              subscriberEmail,
+            });
+
+            return storedUrl === image.url ? image : { ...image, url: storedUrl };
+          } catch (error) {
+            console.error('Migration image legacy échouée:', error);
+            return image;
+          }
+        })
+      );
+
+      const hasChanges = migratedImages.some((image, index) => image.url !== ebookImages[index]?.url);
+      if (!isCancelled && hasChanges) {
+        setEbookImages(migratedImages);
+      }
+    };
+
+    migrateLegacyDataImages();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [ebookImages, ebookTitle, subscriberEmail]);
 
   // Ref pour toujours avoir les dernières données (évite les problèmes de closure)
   const currentDataRef = useRef({
