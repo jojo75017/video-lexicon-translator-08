@@ -460,6 +460,7 @@ const App = () => {
             <Route path="/formation-embed" element={<FormationEmbedPage />} />
             <Route path="/elementor-export" element={<ElementorExportPage />} />
             <Route path="/nouveautes-2026" element={<Nouveautes2026Page />} />
+            <Route path="/install" element={<InstallPage />} />
             
             {/* SaaS Routes */}
             <Route path="/saas/login" element={<SaasAuthPage />} />
