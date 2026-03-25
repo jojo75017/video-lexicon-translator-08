@@ -54,6 +54,7 @@ import AudiobookDemoPage from './pages/AudiobookDemoPage';
 import AudiobookThankYouPage from './pages/AudiobookThankYouPage';
 import FormationEmbedPage from './pages/FormationEmbedPage';
 import Nouveautes2026Page from './pages/Nouveautes2026Page';
+import InstallPage from './pages/InstallPage';
 import ElementorExportPage from './pages/ElementorExportPage';
 import { SubscriptionAuth } from '@/components/SubscriptionAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -459,6 +460,7 @@ const App = () => {
             <Route path="/formation-embed" element={<FormationEmbedPage />} />
             <Route path="/elementor-export" element={<ElementorExportPage />} />
             <Route path="/nouveautes-2026" element={<Nouveautes2026Page />} />
+            <Route path="/install" element={<InstallPage />} />
             
             {/* SaaS Routes */}
             <Route path="/saas/login" element={<SaasAuthPage />} />
