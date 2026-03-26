@@ -270,6 +270,19 @@ function checkEstimatedFileSize(totalWords: number): KdpCheck {
   return { id: 'filesize', label: 'Taille estimée du fichier', status: 'pass', message: `~${estimatedKB < 1024 ? estimatedKB + ' KB' : estimatedMB + ' MB'}`, category: 'format' };
 }
 
+function checkPageCount(pageCount?: number): KdpCheck {
+  if (!pageCount || pageCount <= 0) {
+    return { id: 'pages', label: 'Nombre de pages', status: 'warning', message: 'Non calculé', category: 'format' };
+  }
+  if (pageCount < 24) {
+    return { id: 'pages', label: 'Nombre de pages', status: 'fail', message: `${pageCount} pages — Minimum KDP broché : 24 pages`, category: 'format' };
+  }
+  if (pageCount > 828) {
+    return { id: 'pages', label: 'Nombre de pages', status: 'fail', message: `${pageCount} pages — Maximum KDP broché : 828 pages`, category: 'format' };
+  }
+  return { id: 'pages', label: 'Nombre de pages', status: 'pass', message: `${pageCount} pages`, category: 'format' };
+}
+
 function countTotalWords(input: KdpCheckInput): number {
   const allText = [
     ...(input.chapters || []).flatMap(c => [
