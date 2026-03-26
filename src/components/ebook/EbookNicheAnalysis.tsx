@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 
 interface NicheAnalysis {
   scoreRentabilite: number;
@@ -45,6 +46,8 @@ interface NicheAnalysis {
 }
 
 const getScoreColor = (score: number) => {
+  const { apiKey: userGeminiKey } = useOpenAIConfig();
+
   if (score >= 75) return 'text-green-500';
   if (score >= 50) return 'text-amber-500';
   return 'text-red-500';
@@ -82,7 +85,7 @@ const EbookNicheAnalysis: React.FC = () => {
     setIsAnalyzing(true);
     try {
       const { data, error } = await supabase.functions.invoke('analyze-niche', {
-        body: { niche: niche.trim() }
+        body: { userApiKey: userGeminiKey, niche: niche.trim() }
       });
 
       if (error) throw error;

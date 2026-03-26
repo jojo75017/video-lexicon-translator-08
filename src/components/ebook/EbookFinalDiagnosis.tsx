@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Loader2, Award, CheckCircle2, AlertCircle, Target, Sparkles, TrendingUp } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 
 interface Diagnosis {
   verdictGlobal: 'pret' | 'a_ameliorer';
@@ -38,7 +39,7 @@ export const EbookFinalDiagnosis: React.FC = () => {
 
     try {
       const { data, error } = await supabase.functions.invoke('final-diagnosis', {
-        body: { 
+        body: { userApiKey: userGeminiKey, 
           title,
           author: author || 'Auteur'
         }
@@ -57,6 +58,8 @@ export const EbookFinalDiagnosis: React.FC = () => {
   };
 
   const getImpactColor = (impact: string) => {
+  const { apiKey: userGeminiKey } = useOpenAIConfig();
+
     switch (impact) {
       case 'critique': return 'bg-red-500/10 border-red-500/30 text-red-600';
       case 'important': return 'bg-orange-500/10 border-orange-500/30 text-orange-600';

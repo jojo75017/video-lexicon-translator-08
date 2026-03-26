@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, LayoutGrid, BookOpen, GraduationCap, Heart, Sparkles, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 
 interface ChapterStructure {
   numero: number;
@@ -35,6 +36,8 @@ interface EbookContentArchitectProps {
 }
 
 export const EbookContentArchitect = ({ onArchitectureComplete, onApplyStructure }: EbookContentArchitectProps) => {
+  const { apiKey: userGeminiKey } = useOpenAIConfig();
+
   const [sujet, setSujet] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [architecture, setArchitecture] = useState<ContentArchitecture | null>(null);

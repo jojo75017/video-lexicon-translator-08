@@ -7,6 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { Search, TrendingUp, BookOpen, DollarSign, Star, Loader2, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 
 interface CompetitorBook {
   id: string;
@@ -44,7 +45,7 @@ export const EbookCompetitorDashboard: React.FC = () => {
     setIsAnalyzing(true);
     try {
       const { data, error } = await supabase.functions.invoke('analyze-niche', {
-        body: { niche: niche.trim() }
+        body: { userApiKey: userGeminiKey, niche: niche.trim() }
       });
       if (error) throw error;
 
@@ -120,6 +121,8 @@ export const EbookCompetitorDashboard: React.FC = () => {
   };
 
   const getOpportunityColor = (score: number) => {
+  const { apiKey: userGeminiKey } = useOpenAIConfig();
+
     if (score >= 70) return 'text-green-500';
     if (score >= 40) return 'text-yellow-500';
     return 'text-red-500';

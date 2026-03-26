@@ -7,8 +7,11 @@ import { Input } from '@/components/ui/input';
 import { Eye, Loader2, AlertCircle, Lightbulb } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 
 const EbookSelfCritique = () => {
+  const { apiKey: userGeminiKey } = useOpenAIConfig();
+
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -29,7 +32,7 @@ const EbookSelfCritique = () => {
     setIsAnalyzing(true);
     try {
       const { data, error } = await supabase.functions.invoke('self-critique', {
-        body: { 
+        body: { userApiKey: userGeminiKey, 
           title: title.trim(),
           content: content.trim() || undefined
         }

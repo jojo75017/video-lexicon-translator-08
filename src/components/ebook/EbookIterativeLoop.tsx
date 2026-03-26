@@ -7,8 +7,11 @@ import { Input } from '@/components/ui/input';
 import { RefreshCw, Loader2, ArrowRight, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 
 const EbookIterativeLoop = () => {
+  const { apiKey: userGeminiKey } = useOpenAIConfig();
+
   const [title, setTitle] = useState('');
   const [originalContent, setOriginalContent] = useState('');
   const [recommendations, setRecommendations] = useState('');
@@ -33,7 +36,7 @@ const EbookIterativeLoop = () => {
     setIsImproving(true);
     try {
       const { data, error } = await supabase.functions.invoke('iterative-loop', {
-        body: { 
+        body: { userApiKey: userGeminiKey, 
           title: title.trim(),
           originalContent: originalContent.trim() || undefined,
           recommendations: recommendations.trim() || undefined

@@ -7,8 +7,11 @@ import { Input } from '@/components/ui/input';
 import { Fingerprint, Loader2, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 
 const EbookStyleSignature = () => {
+  const { apiKey: userGeminiKey } = useOpenAIConfig();
+
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [isUnifying, setIsUnifying] = useState(false);
@@ -33,7 +36,7 @@ const EbookStyleSignature = () => {
     setIsUnifying(true);
     try {
       const { data, error } = await supabase.functions.invoke('style-signature', {
-        body: { 
+        body: { userApiKey: userGeminiKey, 
           title: title.trim(),
           content: content.trim() || undefined
         }

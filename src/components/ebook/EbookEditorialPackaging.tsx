@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Loader2, Package, Copy, FileText, User, Megaphone, ShieldCheck, Twitter, Linkedin, Instagram } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 
 interface PackagingResult {
   descriptionPersuasive: {
@@ -40,6 +41,8 @@ interface PackagingResult {
 }
 
 const EbookEditorialPackaging = () => {
+  const { apiKey: userGeminiKey } = useOpenAIConfig();
+
   const [bookTitle, setBookTitle] = useState('');
   const [authorName, setAuthorName] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -54,7 +57,7 @@ const EbookEditorialPackaging = () => {
     setIsGenerating(true);
     try {
       const { data, error } = await supabase.functions.invoke('editorial-packaging', {
-        body: { 
+        body: { userApiKey: userGeminiKey, 
           bookTitle, 
           bookSummary: `Livre complet sur "${bookTitle}" - génération automatique du résumé`,
           authorName: authorName || 'Auteur expert',

@@ -8,6 +8,7 @@ import { Loader2, BookOpen, Target, Lightbulb, AlertTriangle, Eye, Sparkles, Pen
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Progress } from "@/components/ui/progress";
+import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 
 interface CibleIdealeObject {
   profil?: string;
@@ -86,6 +87,8 @@ export const EbookEditorialDirector = ({
   subject,
   onSubjectChange,
 }: EbookEditorialDirectorProps) => {
+  const { apiKey: userGeminiKey } = useOpenAIConfig();
+
   const [localSujet, setLocalSujet] = useState("");
   const sujet = subject ?? localSujet;
   const setSujet = onSubjectChange ?? setLocalSujet;

@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 
 const genres = [
   'Business & Entrepreneuriat', 'Romance', 'Fantasy', 'Science-fiction',
@@ -46,6 +47,8 @@ interface DescriptionResult {
 }
 
 const getScoreColor = (score: number) => {
+  const { apiKey: userGeminiKey } = useOpenAIConfig();
+
   if (score >= 80) return 'text-emerald-500';
   if (score >= 60) return 'text-amber-500';
   return 'text-red-500';
@@ -103,7 +106,7 @@ const EbookDescriptionMagnet: React.FC = () => {
     setIsGenerating(true);
     try {
       const { data, error } = await supabase.functions.invoke('generate-kdp-description', {
-        body: { title, subtitle, genre, targetAudience, keywords, additionalInfo }
+        body: { userApiKey: userGeminiKey, title, subtitle, genre, targetAudience, keywords, additionalInfo }
       });
 
       if (error) throw error;

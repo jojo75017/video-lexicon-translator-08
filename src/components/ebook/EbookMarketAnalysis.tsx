@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, Search, Users, Frown, Lightbulb, AlertTriangle, Key, Tag, DollarSign, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 
 interface MarketInsight {
   element: string;
@@ -41,6 +42,8 @@ const impactColors = {
 };
 
 export const EbookMarketAnalysis = ({ onAnalysisComplete }: EbookMarketAnalysisProps) => {
+  const { apiKey: userGeminiKey } = useOpenAIConfig();
+
   const [sujet, setSujet] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState<MarketAnalysis | null>(null);

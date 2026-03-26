@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Loader2, PenTool, Copy, CheckCircle, BookOpen, Target, Lightbulb } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 
 interface Section {
   titre: string;
@@ -23,6 +24,8 @@ interface ExpertWritingResult {
 }
 
 const EbookExpertWriting = () => {
+  const { apiKey: userGeminiKey } = useOpenAIConfig();
+
   const [chapterTitle, setChapterTitle] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [result, setResult] = useState<ExpertWritingResult | null>(null);
@@ -36,7 +39,7 @@ const EbookExpertWriting = () => {
     setIsGenerating(true);
     try {
       const { data, error } = await supabase.functions.invoke('expert-writing', {
-        body: { 
+        body: { userApiKey: userGeminiKey, 
           chapterTitle,
           chapterContext: `Générer automatiquement un chapitre complet et professionnel sur "${chapterTitle}"`,
           targetAudience: 'Grand public intéressé par le sujet',
