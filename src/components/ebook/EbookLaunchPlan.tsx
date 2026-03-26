@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import EbookLaunchSocialPosts from './EbookLaunchSocialPosts';
 
 interface LaunchTask {
   id: string;
@@ -82,6 +83,7 @@ const EbookLaunchPlan: React.FC = () => {
   });
   const [selectedPhase, setSelectedPhase] = useState<string>('all');
   const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set());
+  const [activeTab, setActiveTab] = useState<string>('checklist');
   const [launchDate, setLaunchDate] = useState<Date | null>(() => {
     const saved = localStorage.getItem('ebook_launch_date');
     return saved ? new Date(saved) : null;
@@ -148,8 +150,20 @@ const EbookLaunchPlan: React.FC = () => {
   };
 
   return (
+    <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+      <TabsList className="grid w-full grid-cols-2">
+        <TabsTrigger value="checklist" className="flex items-center gap-2">
+          <Rocket className="h-4 w-4" />
+          Plan de Lancement
+        </TabsTrigger>
+        <TabsTrigger value="social" className="flex items-center gap-2">
+          <Megaphone className="h-4 w-4" />
+          Posts Réseaux Sociaux
+        </TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="checklist">
     <div className="space-y-6">
-      {/* Header avec progression globale */}
       <Card className="bg-gradient-to-br from-violet-900/30 to-purple-900/20 border-violet-500/30">
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -420,6 +434,12 @@ const EbookLaunchPlan: React.FC = () => {
         </CardContent>
       </Card>
     </div>
+      </TabsContent>
+
+      <TabsContent value="social">
+        <EbookLaunchSocialPosts />
+      </TabsContent>
+    </Tabs>
   );
 };
 
