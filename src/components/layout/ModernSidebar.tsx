@@ -662,19 +662,19 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                     className={cn(
                       "w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all group",
                       hasActiveItem 
-                        ? `bg-gradient-to-r ${category.color} text-white shadow-md` 
+                        ? "bg-gradient-to-r from-amber-500 via-yellow-500 to-orange-500 text-white shadow-md shadow-amber-500/30" 
                         : "hover:bg-card"
                     )}
                   >
                     <span className={cn(
                       "text-sm font-semibold",
-                      hasActiveItem ? "text-white" : "text-slate-300"
+                      hasActiveItem ? "text-white" : "text-amber-400"
                     )}>
-                      {category.label}
+                      {category.emoji} {category.label}
                     </span>
                     <ChevronDown className={cn(
                       "w-4 h-4 transition-transform",
-                      hasActiveItem ? "text-white/80" : "text-muted-foreground",
+                      hasActiveItem ? "text-white/80" : "text-amber-400/60",
                       isExpanded ? "rotate-0" : "-rotate-90"
                     )} />
                   </button>
