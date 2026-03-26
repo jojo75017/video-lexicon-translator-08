@@ -381,8 +381,25 @@ function parseAmazonBookPage(
   const reviewMatch = combinedText.match(/(\d[\d\s,.]*)\s*(?:évaluations|ratings|avis|reviews|commentaires)/i);
   const reviews = reviewMatch ? parseInt(reviewMatch[1].replace(/[\s,.]/g, ''), 10) : null;
 
-  const bsrMatch = combinedText.match(/(?:Best Sellers Rank|Classement des meilleures ventes|Rang des ventes)[^\d#]*#?([\d\s,.]+)/i);
-  const bsr = bsrMatch ? parseInt(bsrMatch[1].replace(/[\s,.]/g, ''), 10) : null;
+  // Multiple BSR extraction patterns
+  const bsrPatterns = [
+    /(?:Best Sellers Rank|Classement des meilleures ventes|Rang des ventes|Amazon Bestseller-Rang|Classement)[^\d#]*#?([\d\s,.]+)/i,
+    /n[°º]?\s*([\d\s,.]+)\s*(?:dans|in|en)\s/i,
+    /#([\d\s,.]+)\s*(?:dans|in|en)\s/i,
+    /classement[^\d]*([\d\s,.]+)/i,
+    /rank[^\d]*([\d\s,.]+)/i,
+  ];
+  let bsr: number | null = null;
+  for (const pattern of bsrPatterns) {
+    const match = combinedText.match(pattern);
+    if (match) {
+      const parsed = parseInt(match[1].replace(/[\s,.]/g, ''), 10);
+      if (parsed > 0 && parsed < 10000000) {
+        bsr = parsed;
+        break;
+      }
+    }
+  }
 
   const pagesMatch = combinedText.match(/(\d+)\s*(?:pages|page)/i);
   const pages = pagesMatch ? parseInt(pagesMatch[1], 10) : null;
