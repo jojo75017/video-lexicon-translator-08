@@ -56,7 +56,7 @@ const OfferValuePage = () => {
       name: "Rédaction de Chapitres IA",
       description: "Génération de contenu de qualité professionnelle pour chaque chapitre",
       marketValue: 147,
-      color: "from-purple-500 to-purple-600"
+      color: "from-primary to-accent"
     },
     {
       icon: Image,
@@ -84,7 +84,7 @@ const OfferValuePage = () => {
       name: "Gestionnaire Séries/Sagas",
       description: "Organisation multi-tomes avec bible de série et continuité",
       marketValue: 67,
-      color: "from-violet-500 to-violet-600"
+      color: "from-primary to-accent"
     },
     {
       icon: Globe,
@@ -112,7 +112,7 @@ const OfferValuePage = () => {
       name: "Export Multi-Formats",
       description: "Export PDF, EPUB, Word, Google Docs en un clic",
       marketValue: 47,
-      color: "from-cyan-500 to-cyan-600"
+      color: "from-primary to-accent"
     },
     {
       icon: Bot,

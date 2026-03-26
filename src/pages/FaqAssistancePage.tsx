@@ -227,9 +227,9 @@ Vos ebooks vous appartiennent à 100%.`
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-violet-50 via-white to-fuchsia-50">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
       {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b sticky top-0 z-10">
+      <div className="bg-card/80 backdrop-blur-sm border-b border-border sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Button variant="ghost" onClick={() => navigate(-1)} className="gap-2">
             <ArrowLeft className="h-4 w-4" />
@@ -255,7 +255,7 @@ Vos ebooks vous appartiennent à 100%.`
         </div>
 
         {/* Resend Code Card */}
-        <Card className="border-2 border-primary/20 bg-gradient-to-r from-primary/5 to-fuchsia-500/5">
+        <Card className="border-2 border-primary/20 bg-gradient-to-r from-primary/5 to-accent/5">
           <CardHeader>
             <CardTitle className="flex items-center gap-3">
               <div className="p-2 bg-primary/10 rounded-lg">
@@ -373,11 +373,11 @@ Vos ebooks vous appartiennent à 100%.`
         </Card>
 
         {/* Contact Card */}
-        <Card className="bg-gradient-to-r from-slate-900 to-slate-800 text-white">
+        <Card className="bg-gradient-to-r from-card to-background text-white">
           <CardContent className="p-8 text-center space-y-4">
             <AlertCircle className="h-10 w-10 mx-auto text-amber-400" />
             <h3 className="text-2xl font-bold">Vous n'avez pas trouvé votre réponse ?</h3>
-            <p className="text-slate-300">
+            <p className="text-muted-foreground">
               Contactez-nous directement, nous répondons sous 24h maximum
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
