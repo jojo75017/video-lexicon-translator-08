@@ -572,7 +572,7 @@ ${module.content}
                       {' '}Pro
                     </span>
                   </h1>
-                  <p className="text-slate-400 text-sm font-medium tracking-widest">
+                  <p className="text-muted-foreground text-sm font-medium tracking-widest">
                     MOTEUR IA ÉDITORIAL
                   </p>
                 </div>
@@ -1476,7 +1476,7 @@ ${module.content}
             </DialogTitle>
           </DialogHeader>
           
-          <div className="border rounded-lg bg-white text-foreground min-h-[400px] shadow-inner">
+          <div className="border rounded-lg bg-card text-foreground min-h-[400px] shadow-inner">
             {previewPages[previewPage]?.content}
           </div>
 

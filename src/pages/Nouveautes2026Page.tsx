@@ -26,7 +26,7 @@ const categories = [
     title: 'Moteur IA Gemini 3 Flash',
     subtitle: '21 fonctions migrées vers le modèle le plus rapide de Google',
     icon: Brain,
-    gradient: 'from-violet-500 to-purple-600',
+    gradient: 'from-primary to-accent',
     badge: 'RÉVOLUTION',
     features: [
       { icon: Zap, title: 'Directeur Éditorial P1', desc: '5 suggestions de titres avec scores KDP, analyse du marché et promesse centrale' },
@@ -60,7 +60,7 @@ const categories = [
     title: 'Livres Audio Professionnels',
     subtitle: 'Studio audio complet avec voix neurales Azure',
     icon: Mic,
-    gradient: 'from-cyan-500 to-blue-600',
+    gradient: 'from-primary to-accent',
     badge: 'NOUVEAU',
     features: [
       { icon: Volume2, title: 'Voix Neurales Azure', desc: 'Denise, Henri, Celeste — des voix françaises naturelles et expressives' },
