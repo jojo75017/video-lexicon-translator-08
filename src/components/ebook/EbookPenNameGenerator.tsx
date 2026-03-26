@@ -45,8 +45,6 @@ interface PenNameResult {
 }
 
 const getScoreColor = (score: number) => {
-  const { apiKey: userGeminiKey } = useOpenAIConfig();
-
   if (score >= 85) return 'text-emerald-500';
   if (score >= 70) return 'text-amber-500';
   return 'text-orange-500';
@@ -63,6 +61,7 @@ const getStyleBadgeClass = (style: string) => {
 };
 
 const EbookPenNameGenerator: React.FC = () => {
+  const { apiKey: userGeminiKey } = useOpenAIConfig();
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('');
   const [tone, setTone] = useState('');
