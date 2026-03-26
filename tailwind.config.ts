@@ -87,7 +87,7 @@ export default {
         'gradient-subtle': 'var(--gradient-subtle)',
         'gradient-card': 'var(--gradient-card)',
         'gradient-glass': 'var(--gradient-glass)',
-        'gradient-magazine-hero': 'linear-gradient(135deg, hsl(271 81% 56%) 0%, hsl(12 76% 61%) 100%)',
+        'gradient-magazine-hero': 'linear-gradient(135deg, hsl(210 100% 62%) 0%, hsl(216 100% 40%) 100%)',
         'gradient-gold': 'var(--gradient-gold)',
         'gradient-gold-subtle': 'var(--gradient-gold-subtle)',
       },
@@ -125,8 +125,8 @@ export default {
           "50%": { transform: "translateY(-10px)" },
         },
         "pulse-glow": {
-          "0%, 100%": { boxShadow: "0 0 20px hsl(262 83% 58% / 0.3)" },
-          "50%": { boxShadow: "0 0 40px hsl(262 83% 58% / 0.5)" },
+          "0%, 100%": { boxShadow: "0 0 20px hsl(210 100% 62% / 0.3)" },
+          "50%": { boxShadow: "0 0 40px hsl(210 100% 62% / 0.5)" },
         },
         "shimmer": {
           "0%": { backgroundPosition: "-200% 0" },

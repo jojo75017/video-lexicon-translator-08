@@ -13,7 +13,7 @@
 
 /* Design professionnel amélioré */
 .gradient-text {
-  background: linear-gradient(135deg, #2563eb, #9333ea);
+  background: linear-gradient(135deg, #3B9EFF, #0052CC);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-size: 200% auto;
@@ -68,7 +68,7 @@
 
 /* Gradient animé */
 .animated-gradient {
-  background: linear-gradient(270deg, #2563eb, #9333ea, #ec4899);
+  background: linear-gradient(270deg, #3B9EFF, #0052CC, #3B9EFF);
   background-size: 200% 200%;
   animation: gradient 6s ease infinite;
 }
@@ -87,7 +87,7 @@
 
 /* Boutons élégants */
 .elegant-button {
-  background: linear-gradient(to right, #2563eb, #9333ea);
+  background: linear-gradient(to right, #3B9EFF, #0052CC);
   color: white;
   padding: 0.75rem 1.5rem;
   border-radius: 0.5rem;
@@ -145,7 +145,7 @@
 
 /* Design professionnel amélioré pour les boutons */
 .elegant-button-v2 {
-  background: linear-gradient(to right, #2563eb, #9333ea);
+  background: linear-gradient(to right, #3B9EFF, #0052CC);
   color: white;
   padding: 0.75rem 1.75rem;
   border-radius: 0.6rem;
@@ -156,12 +156,12 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+  box-shadow: 0 4px 10px rgba(59, 158, 255, 0.2);
 }
 
 .elegant-button-v2:hover {
   transform: translateY(-3px);
-  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25);
+  box-shadow: 0 10px 25px rgba(59, 158, 255, 0.25);
 }
 
 /* Ajout d'effets de glassmorphisme avancés */
