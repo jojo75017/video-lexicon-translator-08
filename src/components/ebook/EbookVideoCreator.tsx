@@ -453,7 +453,10 @@ const EbookVideoCreator: React.FC<EbookVideoCreatorProps> = ({
           }
 
           currentFrame++;
-          await new Promise(r => setTimeout(r, 1000 / fps / 4));
+          // Yield to UI thread periodically (every 5 frames) for smoother rendering
+          if (f % 5 === 0) {
+            await new Promise(r => setTimeout(r, 0));
+          }
 
           if (currentFrame % (fps * 2) === 0) {
             setProgress(20 + (currentFrame / totalFrames) * 75);
