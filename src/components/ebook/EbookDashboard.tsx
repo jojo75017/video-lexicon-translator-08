@@ -145,7 +145,7 @@ const ResponsivePreview = ({
         style={{ width, height }}
       >
         <div className={`p-2 h-full overflow-y-auto ${fontSizes[device]} leading-relaxed`}>
-          <div className={device === 'kindle' ? 'text-gray-800' : 'text-foreground'}>
+          <div className={device === 'kindle' ? 'text-foreground' : 'text-foreground'}>
             {content || 'Prévisualisez votre contenu ici...'}
           </div>
         </div>

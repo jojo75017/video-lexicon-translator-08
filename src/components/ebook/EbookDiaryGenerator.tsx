@@ -830,7 +830,7 @@ High quality, professional book cover design, vertical format 6x9 inches.`;
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Personalization Section */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-white/60 rounded-lg border border-pink-100">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-card rounded-lg border border-border">
             <div className="space-y-2">
               <Label className="flex items-center gap-2">
                 <Heart className="w-4 h-4 text-pink-500" />
@@ -932,7 +932,7 @@ High quality, professional book cover design, vertical format 6x9 inches.`;
           </div>
 
           {/* Title customization */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-white/60 rounded-lg border border-purple-100">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-card rounded-lg border border-border">
             <div className="space-y-2">
               <Label>Titre personnalisé (optionnel)</Label>
               <Input
@@ -993,7 +993,7 @@ High quality, professional book cover design, vertical format 6x9 inches.`;
             <Label className="text-lg font-semibold flex items-center gap-2">
               📖 Sections intérieures
             </Label>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 p-4 bg-white/60 rounded-lg border">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 p-4 bg-card rounded-lg border">
               {INTERIOR_SECTIONS.map(section => (
                 <div key={section.id} className="flex items-center space-x-2">
                   <Checkbox

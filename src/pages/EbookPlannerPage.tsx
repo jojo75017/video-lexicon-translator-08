@@ -1367,9 +1367,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           <div className="relative animate-fade-in">
             {/* Indicateur de bienvenue pour les utilisateurs venant de la formation */}
             {showWelcome && (
-              <div className="mb-8 relative overflow-hidden rounded-2xl bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 p-6 shadow-2xl animate-scale-in">
+              <div className="mb-8 relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary via-[#0052CC] to-accent p-6 shadow-2xl animate-scale-in">
                 <div className="absolute inset-0 bg-grid-white opacity-10" />
-                <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/20 rounded-full blur-2xl" />
+                <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl" />
                 
                 <button 
                   onClick={() => setShowWelcome(false)}
@@ -1434,14 +1434,14 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             
             <div className="relative z-10 space-y-6">
               {/* Header Hero Section — 2026 Glass */}
-              <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[hsl(262,83%,20%)] via-[hsl(275,80%,25%)] to-[hsl(292,75%,20%)] p-8 shadow-2xl border border-white/10">
-                <div className="absolute -top-20 -right-20 w-60 h-60 bg-[hsl(292,84%,61%)] rounded-full blur-[100px] opacity-20" />
-                <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-[hsl(189,94%,43%)] rounded-full blur-[80px] opacity-15" />
+              <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0d1a2e] via-[#0d2444] to-[#0d0820] p-8 shadow-2xl border border-primary/20">
+                <div className="absolute -top-20 -right-20 w-60 h-60 bg-primary rounded-full blur-[100px] opacity-20" />
+                <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-accent rounded-full blur-[80px] opacity-15" />
                 
                 <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
                   <div className="space-y-3">
                     <div className="flex items-center gap-4">
-                      <div className="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 shadow-[0_0_30px_hsl(262,83%,58%,0.3)]">
+                      <div className="p-3 bg-primary/10 backdrop-blur-md rounded-2xl border border-primary/20 shadow-[0_0_30px_rgba(59,158,255,0.3)]">
                         <BookOpen className="w-8 h-8 text-white" />
                       </div>
                       <div>
@@ -1460,7 +1460,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                       type="button"
                       onClick={generateAutomaticPlan} 
                       disabled={!ebookTitle || isGenerating}
-                      className="bg-white text-[hsl(262,83%,35%)] hover:bg-white/90 shadow-lg hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] transition-all duration-300 hover:-translate-y-0.5 font-bold rounded-xl"
+                      className="bg-primary text-white hover:bg-primary/90 shadow-lg hover:shadow-[0_0_30px_rgba(59,158,255,0.3)] transition-all duration-300 hover:-translate-y-0.5 font-bold rounded-xl"
                       data-tutorial="generate-button"
                     >
                       <Wand2 className="h-5 w-5 mr-2" />
@@ -1495,7 +1495,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                             navigate('/auth?redirect=/ebook-planner');
                           }
                         }}
-                        className="bg-[hsl(38,92%,50%)]/20 hover:bg-[hsl(38,92%,50%)]/30 text-[hsl(38,92%,70%)] border border-[hsl(38,92%,50%)]/30 rounded-xl"
+                        className="bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border border-amber-500/30 rounded-xl"
                       >
                         <Crown className="h-4 w-4 mr-2" />
                         Auth
@@ -1513,10 +1513,10 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               {/* Quick Stats — 2026 Glass Cards */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {[
-                  { label: 'Chapitres', value: chapters.length, icon: BookOpen, color: 'hsl(262,83%,58%)' },
-                  { label: 'Personnages', value: characters.length, icon: Users, color: 'hsl(189,94%,43%)' },
-                  { label: 'Images', value: ebookImages.length, icon: Palette, color: 'hsl(38,92%,50%)' },
-                  { label: 'Mots', value: chapters.reduce((acc, c) => acc + (c.content?.split(' ').length || 0) + c.subChapters.reduce((subAcc, sc) => subAcc + (sc.content?.split(' ').length || 0), 0), 0), icon: FileText, color: 'hsl(160,84%,39%)' },
+                  { label: 'Chapitres', value: chapters.length, icon: BookOpen, color: '#3B9EFF' },
+                  { label: 'Personnages', value: characters.length, icon: Users, color: '#0052CC' },
+                  { label: 'Images', value: ebookImages.length, icon: Palette, color: '#3B9EFF' },
+                  { label: 'Mots', value: chapters.reduce((acc, c) => acc + (c.content?.split(' ').length || 0) + c.subChapters.reduce((subAcc, sc) => subAcc + (sc.content?.split(' ').length || 0), 0), 0), icon: FileText, color: '#0052CC' },
                 ].map((stat, i) => (
                   <div 
                     key={i} 
@@ -1545,7 +1545,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                     <CardHeader className="bg-gradient-to-r from-primary/5 to-accent/5 border-b border-border/30">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="w-11 h-11 rounded-xl bg-primary flex items-center justify-center shadow-lg" style={{ boxShadow: '0 8px 25px -5px hsl(262 83% 58% / 0.4)' }}>
+                          <div className="w-11 h-11 rounded-xl bg-primary flex items-center justify-center shadow-lg" style={{ boxShadow: '0 8px 25px -5px rgba(59,158,255,0.4)' }}>
                             <BookOpen className="w-5 h-5 text-primary-foreground" />
                           </div>
                           <div>
@@ -1572,7 +1572,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                             placeholder="Mon Ebook Extraordinaire"
                             value={ebookTitle}
                             onChange={(e) => setEbookTitle(e.target.value)}
-                            className="h-12 text-lg border-2 focus:border-violet-500 transition-colors"
+                            className="h-12 text-lg border-2 focus:border-primary transition-colors"
                             data-tutorial="title-input"
                           />
                         </div>
@@ -1582,7 +1582,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                             placeholder="Votre nom"
                             value={authorName}
                             onChange={(e) => setAuthorName(e.target.value)}
-                            className="h-12 text-lg border-2 focus:border-violet-500 transition-colors"
+                            className="h-12 text-lg border-2 focus:border-primary transition-colors"
                           />
                         </div>
                       </div>
@@ -1609,7 +1609,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                         <div className="space-y-2" data-tutorial="genre-select">
                           <Label className="text-sm font-medium">Genre / Catégorie</Label>
                           <Select value={genre} onValueChange={setGenre}>
-                            <SelectTrigger className="h-12 border-2 focus:border-violet-500">
+                            <SelectTrigger className="h-12 border-2 focus:border-primary">
                               <SelectValue placeholder="Sélectionner" />
                             </SelectTrigger>
                             <SelectContent>
@@ -1641,7 +1641,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                         <div className="space-y-2">
                           <Label className="text-sm font-medium">Public cible</Label>
                           <Select value={targetAudience} onValueChange={setTargetAudience}>
-                            <SelectTrigger className="h-12 border-2 focus:border-violet-500">
+                            <SelectTrigger className="h-12 border-2 focus:border-primary">
                               <SelectValue placeholder="Sélectionner" />
                             </SelectTrigger>
                             <SelectContent>
@@ -1664,7 +1664,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                             max="100"
                             value={numberOfChapters}
                             onChange={(e) => setNumberOfChapters(parseInt(e.target.value) || 8)}
-                            className="h-12 border-2 focus:border-violet-500"
+                            className="h-12 border-2 focus:border-primary"
                           />
                         </div>
                         <div className="space-y-2">
@@ -1674,34 +1674,34 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                             placeholder="sk-..."
                             value={apiKey}
                             onChange={(e) => setApiKey(e.target.value)}
-                            className="h-12 border-2 focus:border-violet-500"
+                            className="h-12 border-2 focus:border-primary"
                           />
                         </div>
                       </div>
 
                       {/* Section Personnages Principaux */}
-                      <Card className="border-2 border-dashed border-purple-300 bg-gradient-to-r from-purple-50 to-fuchsia-50">
+                      <Card className="border-2 border-dashed border-primary/30 bg-card">
                         <CardContent className="p-6">
                           <div className="flex items-center gap-3 mb-4">
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-fuchsia-500 flex items-center justify-center shadow-md">
+                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-md">
                               <Users className="w-5 h-5 text-white" />
                             </div>
                             <div>
-                              <h3 className="text-lg font-bold text-purple-800">Personnages principaux</h3>
-                              <p className="text-sm text-purple-600">Définissez vos personnages pour une histoire cohérente</p>
+                              <h3 className="text-lg font-bold text-foreground">Personnages principaux</h3>
+                              <p className="text-sm text-muted-foreground">Définissez vos personnages pour une histoire cohérente</p>
                             </div>
                           </div>
                           
                           <div className="space-y-4">
                             {characters.map((character, index) => (
-                              <div key={character.id} className="p-4 bg-white/70 rounded-xl border border-purple-200 space-y-3">
+                              <div key={character.id} className="p-4 bg-background rounded-xl border border-border space-y-3">
                                 <div className="flex items-center justify-between">
-                                  <span className="text-sm font-semibold text-purple-700">Personnage {index + 1}</span>
+                                  <span className="text-sm font-semibold text-primary">Personnage {index + 1}</span>
                                   <Button
                                     variant="ghost"
                                     size="sm"
                                     onClick={() => setCharacters(prev => prev.filter(c => c.id !== character.id))}
-                                    className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                                    className="h-8 w-8 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/10"
                                   >
                                     <Trash2 className="h-4 w-4" />
                                   </Button>
@@ -1715,7 +1715,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                                         c.id === character.id ? { ...c, name: e.target.value } : c
                                       ));
                                     }}
-                                    className="border-purple-200 focus:border-purple-400"
+                                    className="border-border focus:border-primary"
                                   />
                                   <Select 
                                     value={character.role || ''} 
@@ -1725,7 +1725,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                                       ));
                                     }}
                                   >
-                                    <SelectTrigger className="border-purple-200 focus:border-purple-400">
+                                    <SelectTrigger className="border-border focus:border-primary">
                                       <SelectValue placeholder="Rôle" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -1746,17 +1746,17 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                                       c.id === character.id ? { ...c, description: e.target.value } : c
                                     ));
                                   }}
-                                  className="min-h-[100px] border-purple-200 focus:border-purple-400"
+                                  className="min-h-[100px] border-border focus:border-primary"
                                 />
                                 
                                 {/* Image de référence */}
-                                <div className="flex items-start gap-3 pt-2 border-t border-purple-100">
+                                <div className="flex items-start gap-3 pt-2 border-t border-border">
                                   {character.referenceImageUrl ? (
                                     <div className="relative group">
                                       <img 
                                         src={character.referenceImageUrl} 
                                         alt={`Portrait de ${character.name}`}
-                                        className="w-24 h-24 object-cover rounded-lg border-2 border-purple-300 shadow-md"
+                                        className="w-24 h-24 object-cover rounded-lg border-2 border-primary/30 shadow-md"
                                       />
                                       <Button
                                         variant="destructive"
@@ -1772,18 +1772,18 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                                       </Button>
                                     </div>
                                   ) : (
-                                    <div className="w-24 h-24 rounded-lg border-2 border-dashed border-purple-200 flex items-center justify-center bg-purple-50">
-                                      <ImageIcon className="h-8 w-8 text-purple-300" />
+                                    <div className="w-24 h-24 rounded-lg border-2 border-dashed border-border flex items-center justify-center bg-card">
+                                      <ImageIcon className="h-8 w-8 text-muted-foreground" />
                                     </div>
                                   )}
                                   <div className="flex-1">
-                                    <p className="text-xs text-purple-600 mb-2">Image de référence IA</p>
+                                    <p className="text-xs text-muted-foreground mb-2">Image de référence IA</p>
                                     <Button
                                       variant="outline"
                                       size="sm"
                                       onClick={() => generateCharacterImage(character.id)}
                                       disabled={generatingImageForCharacter === character.id || !character.name || !character.description}
-                                      className="border-purple-300 text-purple-700 hover:bg-purple-100"
+                                      className="border-primary/30 text-primary hover:bg-primary/10"
                                     >
                                       {generatingImageForCharacter === character.id ? (
                                         <>
@@ -1812,7 +1812,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                                   role: ''
                                 }]);
                               }}
-                              className="w-full border-purple-300 text-purple-700 hover:bg-purple-100"
+                              className="w-full border-primary/30 text-primary hover:bg-primary/10"
                             >
                               <Plus className="h-4 w-4 mr-2" />
                               Ajouter un personnage
@@ -1822,17 +1822,17 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                       </Card>
 
                       {/* Bouton Générer l'ebook complet */}
-                      <Card className="border-2 border-dashed border-green-400 bg-gradient-to-r from-green-50 to-emerald-50">
+                      <Card className="border-2 border-dashed border-primary/40 bg-gradient-to-r from-card to-card">
                         <CardContent className="p-6">
                           <div className="flex flex-col gap-4">
                             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                               <div className="flex items-center gap-4">
-                                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-lg shadow-green-500/30">
+                                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg shadow-primary/30">
                                   <Zap className="w-7 h-7 text-white" />
                                 </div>
                                 <div>
-                                  <h3 className="text-lg font-bold text-green-800">Générer l'ebook complet</h3>
-                                  <p className="text-sm text-green-600">
+                                  <h3 className="text-lg font-bold text-foreground">Générer l'ebook complet</h3>
+                                  <p className="text-sm text-muted-foreground">
                                     Génère automatiquement le plan, tous les chapitres, sous-chapitres, préface et conclusion
                                   </p>
                                 </div>
@@ -1841,7 +1841,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                                 onClick={generateCompleteEbook}
                                 disabled={isGeneratingComplete || isGenerating || !ebookTitle || !apiKey}
                                 size="lg"
-                                className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5 min-w-[200px]"
+                                className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5 min-w-[200px]"
                               >
                                 {isGeneratingComplete ? (
                                   <>
@@ -1858,11 +1858,11 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                             </div>
                             
                             {/* Options de génération */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-green-200">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-border">
                               <div className="space-y-2">
-                                <Label className="text-sm font-medium text-green-700">Mots par chapitre</Label>
+                                <Label className="text-sm font-medium text-foreground">Mots par chapitre</Label>
                                 <Select value={targetWordsPerChapter.toString()} onValueChange={(v) => setTargetWordsPerChapter(parseInt(v))}>
-                                  <SelectTrigger className="h-10 border-green-200 focus:border-green-500">
+                                  <SelectTrigger className="h-10 border-border focus:border-primary">
                                     <SelectValue placeholder="Mots par chapitre" />
                                   </SelectTrigger>
                                   <SelectContent>
@@ -1878,7 +1878,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                                 </Select>
                               </div>
                               <div className="flex items-end">
-                                <p className="text-xs text-green-600 italic">
+                                <p className="text-xs text-muted-foreground italic">
                                   📖 Estimation: ~{Math.round(targetWordsPerChapter * numberOfChapters / 250)} pages pour {numberOfChapters} chapitres
                                 </p>
                               </div>
@@ -1889,14 +1889,14 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                           {isGeneratingComplete && generationProgress.total > 0 && (
                             <div className="mt-4 space-y-2">
                               <div className="flex justify-between text-sm">
-                                <span className="text-green-700 font-medium">{generationProgress.currentItem}</span>
-                                <span className="text-green-600">
+                                <span className="text-foreground font-medium">{generationProgress.currentItem}</span>
+                                <span className="text-muted-foreground">
                                   {generationProgress.current}/{generationProgress.total}
                                 </span>
                               </div>
-                              <div className="w-full h-3 bg-green-100 rounded-full overflow-hidden">
+                              <div className="w-full h-3 bg-primary/10 rounded-full overflow-hidden">
                                 <div 
-                                  className="h-full bg-gradient-to-r from-green-500 to-green-600 transition-all duration-500 ease-out"
+                                  className="h-full bg-gradient-to-r from-primary to-accent transition-all duration-500 ease-out"
                                   style={{ width: `${(generationProgress.current / generationProgress.total) * 100}%` }}
                                 />
                               </div>
@@ -1908,7 +1908,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
                           <Label className="text-sm font-medium flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-violet-500" />
+                            <span className="w-2 h-2 rounded-full bg-primary" />
                             Préface / Introduction
                           </Label>
                           <Button
@@ -1922,7 +1922,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                               }
                             }}
                             disabled={isGenerating || !ebookTitle}
-                            className="text-xs text-violet-600 hover:text-violet-700 hover:bg-violet-50"
+                            className="text-xs text-primary hover:text-primary hover:bg-primary/10"
                           >
                             <Sparkles className="h-3 w-3 mr-1" />
                             Générer avec l'IA
@@ -1933,7 +1933,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                           value={preface}
                           onChange={(e) => setPreface(e.target.value)}
                           rows={6}
-                          className="resize-y min-h-[120px] border-2 focus:border-violet-500 transition-colors"
+                          className="resize-y min-h-[120px] border-2 focus:border-primary transition-colors"
                         />
                       </div>
 
@@ -2027,7 +2027,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                               Fusionner ({selectedChapters.length})
                             </Button>
                           )}
-                          <Button onClick={addChapter} size="sm" className="bg-gradient-to-r from-cyan-500 to-blue-600 shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5">
+                          <Button onClick={addChapter} size="sm" className="bg-gradient-to-r from-primary to-accent shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5">
                             <Plus className="h-4 w-4 mr-1" />
                             Ajouter
                           </Button>
@@ -2232,7 +2232,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               <Card className="glass-card border-0">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Eye className="h-5 w-5 text-violet-500" />
+                    <Eye className="h-5 w-5 text-primary" />
                     Résumé du livre
                   </CardTitle>
                 </CardHeader>
@@ -3377,7 +3377,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   };
 
   return (
-    <div className="min-h-screen flex bg-slate-950">
+    <div className="min-h-screen flex bg-background">
       <OnboardingGuide />
       <ModernSidebar 
         activeTab={activeTab}
@@ -3388,11 +3388,11 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
 
       <main className="flex-1 overflow-y-auto">
         {/* Hero Header — Dark Premium 2026 */}
-        <div className="relative overflow-hidden bg-slate-950 border-b border-slate-800/50">
+        <div className="relative overflow-hidden bg-background border-b border-border">
           {/* Subtle glow effects */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(6,182,212,0.1),transparent)]" />
-          <div className="absolute -top-20 -right-20 w-80 h-80 bg-cyan-500/8 rounded-full blur-[120px]" />
-          <div className="absolute -bottom-20 -left-20 w-60 h-60 bg-emerald-500/8 rounded-full blur-[100px]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(59,158,255,0.1),transparent)]" />
+          <div className="absolute -top-20 -right-20 w-80 h-80 bg-primary/8 rounded-full blur-[120px]" />
+          <div className="absolute -bottom-20 -left-20 w-60 h-60 bg-accent/8 rounded-full blur-[100px]" />
           
           <div className="relative container mx-auto px-6 py-6">
             {/* Top bar */}
@@ -3400,7 +3400,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               <Button
                 variant="ghost"
                 onClick={() => navigate('/ebook-ideas')}
-                className="text-slate-400 hover:text-white hover:bg-slate-800/50 border border-slate-800 rounded-xl text-sm"
+                className="text-muted-foreground hover:text-foreground hover:bg-card border border-border rounded-xl text-sm"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Retour
@@ -3411,7 +3411,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                   type="button"
                   onClick={handleManualSave}
                   disabled={isSaving || !ebookTitle}
-                  className="bg-slate-800/50 hover:bg-slate-700/50 text-white border border-slate-700 rounded-xl transition-all duration-300"
+                  className="bg-card hover:bg-card/80 text-foreground border border-border rounded-xl transition-all duration-300"
                 >
                   <Save className="h-4 w-4 mr-2" />
                   {isSaving ? 'Sauvegarde...' : 'Sauvegarder'}
@@ -3419,7 +3419,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                 <Button
                   type="button"
                   onClick={resetPlan}
-                  className="bg-slate-800/50 hover:bg-slate-700/50 text-white border border-slate-700 rounded-xl"
+                  className="bg-card hover:bg-card/80 text-foreground border border-border rounded-xl"
                 >
                   <Plus className="h-4 w-4 mr-2" />
                   Nouveau
@@ -3428,22 +3428,22 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             </div>
             
             <div className="max-w-3xl mx-auto text-center pb-6">
-              <div className="inline-flex items-center justify-center w-16 h-16 mb-5 rounded-2xl bg-gradient-to-br from-cyan-500 to-emerald-500 shadow-lg shadow-cyan-500/20">
-                <Sparkles className="w-8 h-8 text-slate-900" />
+              <div className="inline-flex items-center justify-center w-16 h-16 mb-5 rounded-2xl bg-gradient-to-br from-primary to-accent shadow-lg shadow-primary/20">
+                <Sparkles className="w-8 h-8 text-background" />
               </div>
               
-              <h1 className="text-4xl md:text-5xl font-extrabold mb-3 text-white tracking-tight">
+              <h1 className="text-4xl md:text-5xl font-extrabold mb-3 text-foreground tracking-tight font-display italic">
                 {ebookTitle || 'Studio de Création'}
               </h1>
               
               {isSaving && (
-                <Badge className="bg-slate-800/50 text-cyan-400 border-slate-700">
+                <Badge className="bg-card text-primary border-border">
                   <Save className="w-3 h-3 mr-1 animate-pulse" />
                   Sauvegarde...
                 </Badge>
               )}
               
-              <p className="text-slate-500 max-w-xl mx-auto mt-2 text-sm tracking-wide uppercase font-medium">
+              <p className="text-muted-foreground max-w-xl mx-auto mt-2 text-sm tracking-wide uppercase font-medium">
                 Créez des ebooks professionnels avec l'intelligence artificielle
               </p>
               
@@ -3451,19 +3451,19 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               <Button
                 type="button"
                 onClick={() => handleTabChange('url-import')}
-                className="mt-6 relative overflow-hidden bg-gradient-to-r from-cyan-500/10 to-emerald-500/10 hover:from-cyan-500/20 hover:to-emerald-500/20 text-white font-semibold px-8 py-3 h-auto rounded-2xl border border-cyan-500/20 group transition-all duration-500 hover:shadow-[0_0_40px_rgba(6,182,212,0.2)] hover:-translate-y-0.5"
+                className="mt-6 relative overflow-hidden bg-gradient-to-r from-primary/10 to-accent/10 hover:from-primary/20 hover:to-accent/20 text-foreground font-semibold px-8 py-3 h-auto rounded-2xl border border-primary/20 group transition-all duration-500 hover:shadow-[0_0_40px_rgba(59,158,255,0.2)] hover:-translate-y-0.5"
               >
                 <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/5 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
                 <span className="relative flex items-center gap-3">
                   <span className="text-lg">🔗</span>
                   <span>Créer mon premier ebook</span>
-                  <Badge className="bg-cyan-500/20 text-cyan-400 font-bold text-[10px] px-2 py-0.5 border border-cyan-500/30">
+                  <Badge className="bg-primary/20 text-primary font-bold text-[10px] px-2 py-0.5 border border-primary/30">
                     2026
                   </Badge>
                 </span>
               </Button>
 
-              <p className="mt-5 text-slate-600 text-sm italic">
+              <p className="mt-5 text-muted-foreground text-sm italic">
                 🚀 1, 2, 3… Foncez ! Je suis toujours là pour vous accompagner en Zoom gratuit — Georges
               </p>
             </div>

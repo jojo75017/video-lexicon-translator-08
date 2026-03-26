@@ -101,11 +101,11 @@ export const EbookAnalyticsDashboard: React.FC<EbookAnalyticsDashboardProps> = (
     <div className="space-y-6 animate-fade-in">
       {/* Header Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="bg-slate-900/80 border-violet-500/30 hover:scale-105 transition-transform duration-300 backdrop-blur-sm">
+        <Card className="bg-card border-primary/30 hover:scale-105 transition-transform duration-300 backdrop-blur-sm">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-violet-500/20 rounded-lg">
-                <BookOpen className="h-5 w-5 text-violet-400" />
+              <div className="p-2 bg-primary/20 rounded-lg">
+                <BookOpen className="h-5 w-5 text-primary" />
               </div>
               <div>
                 <p className="text-xs text-white/50">Total Mots</p>
@@ -115,7 +115,7 @@ export const EbookAnalyticsDashboard: React.FC<EbookAnalyticsDashboardProps> = (
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-900/80 border-cyan-500/30 hover:scale-105 transition-transform duration-300 backdrop-blur-sm">
+        <Card className="bg-card border-primary/30 hover:scale-105 transition-transform duration-300 backdrop-blur-sm">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-cyan-500/20 rounded-lg">
@@ -129,7 +129,7 @@ export const EbookAnalyticsDashboard: React.FC<EbookAnalyticsDashboardProps> = (
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-900/80 border-emerald-500/30 hover:scale-105 transition-transform duration-300 backdrop-blur-sm">
+        <Card className="bg-card border-emerald-500/30 hover:scale-105 transition-transform duration-300 backdrop-blur-sm">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-emerald-500/20 rounded-lg">
@@ -143,7 +143,7 @@ export const EbookAnalyticsDashboard: React.FC<EbookAnalyticsDashboardProps> = (
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-900/80 border-amber-500/30 hover:scale-105 transition-transform duration-300 backdrop-blur-sm">
+        <Card className="bg-card border-amber-500/30 hover:scale-105 transition-transform duration-300 backdrop-blur-sm">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-amber-500/20 rounded-lg">
@@ -161,7 +161,7 @@ export const EbookAnalyticsDashboard: React.FC<EbookAnalyticsDashboardProps> = (
       {/* Progress & Charts Row */}
       <div className="grid md:grid-cols-2 gap-6">
         {/* Completion Pie Chart */}
-        <Card className="border-cyan-500/20 bg-slate-900/80 backdrop-blur-sm">
+        <Card className="border-primary/20 bg-card backdrop-blur-sm">
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-lg text-white">
               <Sparkles className="h-5 w-5 text-cyan-400" />
@@ -201,7 +201,7 @@ export const EbookAnalyticsDashboard: React.FC<EbookAnalyticsDashboardProps> = (
         </Card>
 
         {/* KDP Revenue Estimator */}
-        <Card className="border-emerald-500/30 bg-slate-900/80 backdrop-blur-sm">
+        <Card className="border-emerald-500/30 bg-card backdrop-blur-sm">
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-lg text-white">
               <DollarSign className="h-5 w-5 text-emerald-400" />
@@ -227,7 +227,7 @@ export const EbookAnalyticsDashboard: React.FC<EbookAnalyticsDashboardProps> = (
       </div>
 
       {/* Chapter Progress Bar Chart */}
-      <Card className="border-cyan-500/20 bg-slate-900/80 backdrop-blur-sm">
+      <Card className="border-primary/20 bg-card backdrop-blur-sm">
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2 text-lg text-white">
             <BarChart3 className="h-5 w-5 text-cyan-400" />
@@ -265,7 +265,7 @@ export const EbookAnalyticsDashboard: React.FC<EbookAnalyticsDashboardProps> = (
       </Card>
 
       {/* Writing Stats Area Chart */}
-      <Card className="border-cyan-500/20 bg-slate-900/80 backdrop-blur-sm">
+      <Card className="border-primary/20 bg-card backdrop-blur-sm">
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2 text-lg text-white">
             <TrendingUp className="h-5 w-5 text-cyan-400" />
@@ -306,7 +306,7 @@ export const EbookAnalyticsDashboard: React.FC<EbookAnalyticsDashboardProps> = (
       </Card>
 
       {/* Achievement Badges */}
-      <Card className="border-amber-500/20 bg-slate-900/80 backdrop-blur-sm">
+      <Card className="border-amber-500/20 bg-card backdrop-blur-sm">
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2 text-lg text-white">
             <Star className="h-5 w-5 text-amber-400" />
@@ -322,13 +322,13 @@ export const EbookAnalyticsDashboard: React.FC<EbookAnalyticsDashboardProps> = (
               </div>
             )}
             {analytics.totalWords >= 5000 && (
-              <div className="flex items-center gap-2 px-3 py-2 bg-violet-500/15 rounded-full border border-violet-500/30 animate-scale-in">
-                <Star className="h-4 w-4 text-violet-400" />
+              <div className="flex items-center gap-2 px-3 py-2 bg-primary/15 rounded-full border border-primary/30 animate-scale-in">
+                <Star className="h-4 w-4 text-primary" />
                 <span className="text-sm font-medium text-white/90">5000 mots</span>
               </div>
             )}
             {analytics.totalWords >= 10000 && (
-              <div className="flex items-center gap-2 px-3 py-2 bg-cyan-500/15 rounded-full border border-cyan-500/30 animate-scale-in">
+              <div className="flex items-center gap-2 px-3 py-2 bg-cyan-500/15 rounded-full border border-primary/30 animate-scale-in">
                 <Award className="h-4 w-4 text-cyan-400" />
                 <span className="text-sm font-medium text-white/90">10000 mots</span>
               </div>

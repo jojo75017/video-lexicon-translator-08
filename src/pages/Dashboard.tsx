@@ -308,8 +308,8 @@ const Dashboard: React.FC = () => {
       case 'complete': return 'bg-green-500';
       case 'updated': return 'bg-blue-500';
       case 'new': return 'bg-violet-500';
-      case 'active': return 'bg-gray-500';
-      default: return 'bg-gray-400';
+      case 'active': return 'bg-primary/50';
+      default: return 'bg-muted-foreground';
     }
   };
 
@@ -325,10 +325,10 @@ const Dashboard: React.FC = () => {
 
   const getPriorityColor = (priority) => {
     switch (priority) {
-      case 'high': return 'text-red-600 bg-red-50';
-      case 'medium': return 'text-orange-600 bg-orange-50';
-      case 'low': return 'text-green-600 bg-green-50';
-      default: return 'text-gray-600 bg-gray-50';
+      case 'high': return 'text-red-400 bg-red-500/10';
+      case 'medium': return 'text-orange-400 bg-orange-500/10';
+      case 'low': return 'text-green-400 bg-green-500/10';
+      default: return 'text-muted-foreground bg-muted';
     }
   };
 
@@ -373,7 +373,7 @@ const Dashboard: React.FC = () => {
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-blue-100 text-blue-600">
+                  <div className="p-2 rounded-lg bg-primary/10 text-primary">
                     <BarChart3 className="h-5 w-5" />
                   </div>
                   <div>
@@ -387,7 +387,7 @@ const Dashboard: React.FC = () => {
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-green-100 text-green-600">
+                  <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
                     <TrendingUp className="h-5 w-5" />
                   </div>
                   <div>
@@ -404,7 +404,7 @@ const Dashboard: React.FC = () => {
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-purple-100 text-purple-600">
+                  <div className="p-2 rounded-lg bg-purple-500/10 text-purple-400">
                     <Search className="h-5 w-5" />
                   </div>
                   <div>
@@ -418,7 +418,7 @@ const Dashboard: React.FC = () => {
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-orange-100 text-orange-600">
+                  <div className="p-2 rounded-lg bg-orange-500/10 text-orange-400">
                     <Clock className="h-5 w-5" />
                   </div>
                   <div>
@@ -463,7 +463,7 @@ const Dashboard: React.FC = () => {
                       <div className="flex items-center gap-3 flex-1">
                         <div className="relative">
                           {/* Icône bot personnalisée */}
-                          <div className="w-16 h-16 rounded-xl overflow-hidden shadow-lg border-2 border-white/50">
+                          <div className="w-16 h-16 rounded-xl overflow-hidden shadow-lg border-2 border-border">
                             <img 
                               src={feature.customIcon} 
                               alt={feature.botName}

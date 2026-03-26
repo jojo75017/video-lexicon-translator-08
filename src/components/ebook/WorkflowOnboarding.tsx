@@ -180,7 +180,7 @@ export const WorkflowOnboarding: React.FC<WorkflowOnboardingProps> = ({
               variant="outline"
               size="lg"
               onClick={onStartWorkflow}
-              className="rounded-2xl px-6 py-6 h-auto gap-2 border-white/20 text-white/70 hover:text-white bg-slate-800/50"
+              className="rounded-2xl px-6 py-6 h-auto gap-2 border-white/20 text-white/70 hover:text-white bg-card"
             >
               <Sparkles className="w-5 h-5" />
               Tout automatiser (P1→P15)
@@ -219,8 +219,8 @@ export const WorkflowOnboarding: React.FC<WorkflowOnboardingProps> = ({
                 onMouseLeave={() => setHoveredPhase(null)}
               >
                 <Card className={cn(
-                  "relative overflow-hidden transition-all duration-300 border-2 p-5 bg-slate-900/80 backdrop-blur-sm",
-                  isActive && "ring-2 ring-cyan-500/30 ring-offset-2 ring-offset-slate-950",
+                  "relative overflow-hidden transition-all duration-300 border-2 p-5 bg-card backdrop-blur-sm",
+                  isActive && "ring-2 ring-cyan-500/30 ring-offset-2 ring-offset-background",
                   phaseCompleted ? "border-emerald-500/40" : phase.borderColor,
                   hoveredPhase === phase.id && "shadow-lg shadow-cyan-500/10 -translate-y-0.5"
                 )}>
@@ -268,14 +268,14 @@ export const WorkflowOnboarding: React.FC<WorkflowOnboardingProps> = ({
                             "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-left group",
                             isDone && "bg-emerald-500/10 hover:bg-emerald-500/15",
                             isNext && "bg-cyan-500/10 hover:bg-cyan-500/15 ring-1 ring-cyan-500/30",
-                            !isDone && !isNext && "hover:bg-slate-800/50"
+                            !isDone && !isNext && "hover:bg-card"
                           )}
                         >
                           <div className={cn(
                             "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-all",
                             isDone && "bg-emerald-500 text-white",
                             isNext && "bg-cyan-600 text-white shadow-md shadow-cyan-500/30",
-                            !isDone && !isNext && "bg-slate-800 text-white/40"
+                            !isDone && !isNext && "bg-muted text-muted-foreground"
                           )}>
                             {isDone ? <CheckCircle2 className="w-4 h-4" /> : step.id.replace('P', '')}
                           </div>
