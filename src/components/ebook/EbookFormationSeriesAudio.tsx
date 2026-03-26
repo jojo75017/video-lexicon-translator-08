@@ -286,10 +286,9 @@ export const EbookFormationSeriesAudio: React.FC = () => {
       if (error) throw error;
       if (!data?.audioContent) throw new Error('No audio content received');
 
-      const audioBlob = new Blob(
-        [Uint8Array.from(atob(data.audioContent), c => c.charCodeAt(0))],
-        { type: 'audio/mpeg' }
-      );
+      const audioDataUrl = `data:audio/mpeg;base64,${data.audioContent}`;
+      const audioResponse = await fetch(audioDataUrl);
+      const audioBlob = await audioResponse.blob();
       const url = URL.createObjectURL(audioBlob);
       setAudioUrl(url);
       
