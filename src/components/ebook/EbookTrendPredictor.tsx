@@ -7,6 +7,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from 'sonner';
 import { TrendingUp, Sparkles, RefreshCw, Target, DollarSign, Users, Calendar, Zap, BarChart3, ArrowUp, ArrowDown, Minus } from 'lucide-react';
 
+interface RealBookData {
+  title: string;
+  author: string;
+  price: number | null;
+  bsr: number | null;
+  estimatedDailySales: number;
+  asin: string;
+  imageUrl: string | null;
+}
+
 interface TrendPrediction {
   niche: string;
   category: string;
@@ -18,6 +28,12 @@ interface TrendPrediction {
   bestTimeToPublish: string;
   keywordsToTarget: string[];
   reasoning: string;
+  realData?: {
+    topBooks: RealBookData[];
+    averagePrice: number | null;
+    averageBsr: number | null;
+    totalResults: number;
+  };
 }
 
 const EbookTrendPredictor: React.FC = () => {
