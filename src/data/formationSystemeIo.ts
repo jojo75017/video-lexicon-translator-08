@@ -838,7 +838,7 @@ Accédez à cette formation directement depuis l'outil.
 
 Gérez votre accès.
 
-### Avec l'accès Pro Lifetime à 97€ :
+### Avec l'accès Pro Lifetime à 67€ :
 - ✅ Tous les modules inclus
 - ✅ Mises à jour gratuites à vie
 - ✅ Support inclus

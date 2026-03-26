@@ -10,8 +10,8 @@ const SalesFaq: React.FC = () => {
 
   const faqs = [
     {
-      question: "Comment fonctionne le paiement unique à 97€ ?",
-      answer: "Vous payez 97€ une seule fois via PayPal et vous obtenez un accès à vie à l'ensemble de la plateforme. Pas d'abonnement mensuel, pas de frais cachés. Vous recevez immédiatement votre code d'accès par email après le paiement. Des facilités sont disponibles : 3×35€ ou 5×22€."
+      question: "Comment fonctionne le paiement unique à 67€ ?",
+      answer: "Vous payez 67€ une seule fois via PayPal et vous obtenez un accès à vie à l'ensemble de la plateforme. Pas d'abonnement mensuel, pas de frais cachés. Vous recevez immédiatement votre code d'accès par email après le paiement. Des facilités sont disponibles : 3×23€ ou 5×14€."
     },
     {
       question: "Ai-je besoin de compétences techniques ou de savoir écrire ?",
@@ -42,8 +42,8 @@ const SalesFaq: React.FC = () => {
       answer: "Oui ! EbookStudio inclut un module audiobook (via Azure Speech, optionnel et gratuit jusqu'à 5 audiobooks/mois) et un module BD/Comics avec génération de scénarios et mise en page automatique. Tout est inclus sans surcoût."
     },
     {
-      question: "Le prix de 97€ va-t-il augmenter ?",
-      answer: "Oui. Le prix normal est de 247€. Parce que j'accompagne les créateurs et que je veux rendre cet outil accessible, je vous offre une réduction de 50€ — soit 197€ au lieu de 247€ après le lancement. Mais en ce moment, le tarif fondateur est encore à 97€ à vie avec toutes les futures mises à jour incluses. Profitez-en avant l'augmentation !"
+      question: "Le prix de 67€ va-t-il augmenter ?",
+      answer: "Oui. Le prix normal est de 197€. Parce que j'accompagne les créateurs et que je veux rendre cet outil accessible, le tarif de lancement est à 67€ à vie avec toutes les futures mises à jour incluses. Profitez-en avant l'augmentation !"
     },
     {
       question: "Puis-je gagner de l'argent en recommandant EbookStudio ?",
@@ -51,7 +51,7 @@ const SalesFaq: React.FC = () => {
     },
     {
       question: "Comment fonctionne le paiement en plusieurs fois ?",
-      answer: "Vous pouvez choisir de payer en 3 fois (3×35€) ou en 5 fois (5×22€) via PayPal. Vous obtenez un accès immédiat dès le premier paiement. Les prélèvements suivants sont automatiques, sans aucune action de votre part."
+      answer: "Vous pouvez choisir de payer en 3 fois (3×23€) ou en 5 fois (5×14€) via PayPal. Vous obtenez un accès immédiat dès le premier paiement. Les prélèvements suivants sont automatiques, sans aucune action de votre part."
     }
   ];
 
@@ -112,7 +112,7 @@ const SalesFaq: React.FC = () => {
                 onClick={() => navigate('/upsell-paiement?plan=pro')}
               >
                 <Rocket className="w-5 h-5 mr-2" />
-                Accès Pro — 97€ à vie
+                Accès Pro — 67€ à vie
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
               <a href="https://calendly.com/boubetgeorges/nouvelle-reunion" target="_blank" rel="noopener noreferrer">
