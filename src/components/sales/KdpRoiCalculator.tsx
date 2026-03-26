@@ -135,7 +135,7 @@ export const KdpRoiCalculator: React.FC<KdpRoiCalculatorProps> = ({ onCtaClick }
         </div>
 
         {/* Results */}
-        <div className="bg-white dark:bg-slate-800 rounded-xl p-5 border border-emerald-200 dark:border-emerald-700">
+        <div className="bg-card rounded-xl p-5 border border-emerald-700/40">
           <h4 className="font-semibold text-sm text-muted-foreground mb-4 flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-amber-500" />
             VOS REVENUS ESTIMÉS APRÈS 1 AN
