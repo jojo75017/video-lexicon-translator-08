@@ -153,8 +153,8 @@ Après ? Le prix passe à 197€.
 - Templates email (47€)
 - Optimisateur KDP (97€)
 
-Votre prix aujourd'hui : 97€ (-87%)
-💳 Ou 3×35€ / 5×22€
+Votre prix aujourd'hui : 67€ (-66%)
+💳 Ou 3×23€ / 5×14€
 
 🎁 BONUS inclus : Pack 300+ idées, Guide 10 Niches KDP 2026, Groupe privé, MAJ à vie, Support Zoom.
 
