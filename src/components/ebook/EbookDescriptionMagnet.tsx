@@ -47,8 +47,6 @@ interface DescriptionResult {
 }
 
 const getScoreColor = (score: number) => {
-  const { apiKey: userGeminiKey } = useOpenAIConfig();
-
   if (score >= 80) return 'text-emerald-500';
   if (score >= 60) return 'text-amber-500';
   return 'text-red-500';
@@ -87,6 +85,7 @@ const ScoreCircle = ({ score, label, size = 'md' }: { score: number; label: stri
 };
 
 const EbookDescriptionMagnet: React.FC = () => {
+  const { apiKey: userGeminiKey } = useOpenAIConfig();
   const [title, setTitle] = useState('');
   const [subtitle, setSubtitle] = useState('');
   const [genre, setGenre] = useState('');
