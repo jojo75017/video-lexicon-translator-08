@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 
 interface PriceStrategy {
   ebookPrice: {
@@ -59,6 +60,7 @@ export const PriceEbookStudio: React.FC = () => {
   const [targetAudience, setTargetAudience] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [strategy, setStrategy] = useState<PriceStrategy | null>(null);
+  const { apiKey: userGeminiKey } = useOpenAIConfig();
 
   const generateStrategy = async () => {
     if (!title || !category || !pages) {
@@ -70,7 +72,7 @@ export const PriceEbookStudio: React.FC = () => {
 
     try {
       const { data, error } = await supabase.functions.invoke('generate-price-strategy', {
-        body: { title, subtitle, category, pages: parseInt(pages), format, targetAudience }
+        body: { userApiKey: userGeminiKey, title, subtitle, category, pages: parseInt(pages), format, targetAudience }
       });
 
       if (error) throw error;
