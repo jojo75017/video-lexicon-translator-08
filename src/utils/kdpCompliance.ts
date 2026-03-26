@@ -74,6 +74,8 @@ export function runKdpComplianceCheck(input: KdpCheckInput): KdpComplianceResult
   checks.push(checkForbiddenCharacters(input));
   // Taille estimée du fichier
   checks.push(checkEstimatedFileSize(totalWords));
+  // Nombre de pages (broché)
+  checks.push(checkPageCount(input.pageCount || Math.ceil(totalWords / 250)));
 
   // Calcul du score
   const passCount = checks.filter(c => c.status === 'pass').length;
@@ -268,6 +270,19 @@ function checkEstimatedFileSize(totalWords: number): KdpCheck {
     return { id: 'filesize', label: 'Taille estimée du fichier', status: 'fail', message: `~${estimatedMB} MB — Dépasse la limite KDP de 650 MB`, category: 'format' };
   }
   return { id: 'filesize', label: 'Taille estimée du fichier', status: 'pass', message: `~${estimatedKB < 1024 ? estimatedKB + ' KB' : estimatedMB + ' MB'}`, category: 'format' };
+}
+
+function checkPageCount(pageCount?: number): KdpCheck {
+  if (!pageCount || pageCount <= 0) {
+    return { id: 'pages', label: 'Nombre de pages', status: 'warning', message: 'Non calculé', category: 'format' };
+  }
+  if (pageCount < 24) {
+    return { id: 'pages', label: 'Nombre de pages', status: 'fail', message: `${pageCount} pages — Minimum KDP broché : 24 pages`, category: 'format' };
+  }
+  if (pageCount > 828) {
+    return { id: 'pages', label: 'Nombre de pages', status: 'fail', message: `${pageCount} pages — Maximum KDP broché : 828 pages`, category: 'format' };
+  }
+  return { id: 'pages', label: 'Nombre de pages', status: 'pass', message: `${pageCount} pages`, category: 'format' };
 }
 
 function countTotalWords(input: KdpCheckInput): number {
