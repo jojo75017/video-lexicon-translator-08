@@ -1270,7 +1270,7 @@ export const generateKdpNichesPdf = (): void => {
   doc.setFontSize(14);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(139, 92, 246);
-  doc.text("Accès à vie : 97€ seulement", pageWidth / 2, 218, { align: "center" });
+  doc.text("Accès à vie : 67€ seulement", pageWidth / 2, 218, { align: "center" });
   
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(11);
