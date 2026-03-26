@@ -27,14 +27,11 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY not configured");
     }
 
-    // Build enhanced prompt for book trailer
     const enhancedPrompt = buildTrailerPrompt(prompt, ebookTitle, clipType);
-    
     console.log("Generating video with prompt:", enhancedPrompt);
-    console.log("Aspect ratio:", aspectRatio, "Duration:", duration);
 
     // Use Lovable AI gateway for video generation
-    const response = await fetch("https://ai.lovable.dev/api/v1/video/generate", {
+    const response = await fetch("https://api.lovable.dev/v1/video/generate", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${lovableApiKey}`,
@@ -43,38 +40,25 @@ serve(async (req) => {
       body: JSON.stringify({
         prompt: enhancedPrompt,
         aspect_ratio: aspectRatio || "16:9",
-        duration: duration || 5,
+        duration: Math.min(duration || 5, 10),
         resolution: "1080p",
-        camera_fixed: false
       }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Lovable AI error:", response.status, errorText);
-      
-      // Fallback: return a demo video URL for testing
-      console.log("Using fallback demo video");
+      console.error("Lovable AI video error:", response.status, errorText);
       return new Response(
         JSON.stringify({ 
-          success: true,
-          videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-          status: "demo",
-          message: "Mode démo - La génération vidéo IA sera disponible prochainement",
-          metadata: {
-            prompt: enhancedPrompt,
-            aspectRatio,
-            duration,
-            ebookTitle,
-            clipType
-          }
+          error: `Génération vidéo échouée (${response.status}). La génération vidéo IA est en cours de déploiement.`,
+          status: "error",
         }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
     const result = await response.json();
-    console.log("Video generated successfully:", result);
+    console.log("Video generated successfully");
 
     return new Response(
       JSON.stringify({ 
@@ -93,17 +77,12 @@ serve(async (req) => {
     );
   } catch (error) {
     console.error("Video trailer generation error:", error);
-    
-    // Return demo video on any error
     return new Response(
       JSON.stringify({ 
-        success: true,
-        videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-        status: "demo",
-        message: "Mode démo activé",
-        error: error instanceof Error ? error.message : "Unknown error"
+        error: error instanceof Error ? error.message : "Erreur lors de la génération vidéo",
+        status: "error",
       }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });
