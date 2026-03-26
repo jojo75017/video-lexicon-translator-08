@@ -170,6 +170,10 @@ import { EbookGlobalDashboard } from '@/components/ebook/EbookGlobalDashboard';
 import { EbookNicheTemplates } from '@/components/ebook/EbookNicheTemplates';
 import { EbookFocusMode } from '@/components/ebook/EbookFocusMode';
 import { EbookLandingPageGenerator } from '@/components/ebook/EbookLandingPageGenerator';
+import { EbookReadabilityAnalyzer } from '@/components/ebook/EbookReadabilityAnalyzer';
+import { EbookChapterWordCount } from '@/components/ebook/EbookChapterWordCount';
+import { EbookKindlePreview } from '@/components/ebook/EbookKindlePreview';
+import { EbookAutoSaveIndicator } from '@/components/ebook/EbookAutoSaveIndicator';
 
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
 import { ebookTemplates } from '@/data/ebookTemplates';
