@@ -75,6 +75,7 @@ serve(async (req) => {
 
       console.log('Scraping ASIN:', cleanAsin, 'URL:', `https://www.${domain}/dp/${cleanAsin}`);
       const resolved = await resolveAmazonBook(firecrawlApiKey, cleanAsin, marketplace, domain);
+      console.log('Extracted BSR:', resolved.book.bsr, 'Price:', resolved.book.price, 'Rating:', resolved.book.rating, 'Reviews:', resolved.book.reviews);
 
       return jsonResponse({ success: true, data: resolved.book });
     }
@@ -381,14 +382,45 @@ function parseAmazonBookPage(
   const reviewMatch = combinedText.match(/(\d[\d\s,.]*)\s*(?:évaluations|ratings|avis|reviews|commentaires)/i);
   const reviews = reviewMatch ? parseInt(reviewMatch[1].replace(/[\s,.]/g, ''), 10) : null;
 
-  const bsrMatch = combinedText.match(/(?:Best Sellers Rank|Classement des meilleures ventes|Rang des ventes)[^\d#]*#?([\d\s,.]+)/i);
-  const bsr = bsrMatch ? parseInt(bsrMatch[1].replace(/[\s,.]/g, ''), 10) : null;
+  // Multiple BSR extraction patterns
+  const bsrPatterns = [
+    /(?:Best Sellers Rank|Classement des meilleures ventes|Rang des ventes|Amazon Bestseller-Rang|Classement)[^\d#]*#?([\d\s,.]+)/i,
+    /n[°º]?\s*([\d\s,.]+)\s*(?:dans|in|en)\s/i,
+    /#([\d\s,.]+)\s*(?:dans|in|en)\s/i,
+    /classement[^\d]*([\d\s,.]+)/i,
+    /rank[^\d]*([\d\s,.]+)/i,
+  ];
+  let bsr: number | null = null;
+  for (const pattern of bsrPatterns) {
+    const match = combinedText.match(pattern);
+    if (match) {
+      const parsed = parseInt(match[1].replace(/[\s,.]/g, ''), 10);
+      if (parsed > 0 && parsed < 10000000) {
+        bsr = parsed;
+        break;
+      }
+    }
+  }
 
   const pagesMatch = combinedText.match(/(\d+)\s*(?:pages|page)/i);
   const pages = pagesMatch ? parseInt(pagesMatch[1], 10) : null;
 
-  const categoryMatches = combinedText.match(/(?:in|dans)\s+(?:Kindle Store|Boutique Kindle)\s*>\s*([^\n]+)/gi) || [];
-  const categories = [...new Set(categoryMatches.map((item) => cleanText(item.replace(/^(?:in|dans)\s+/i, ''))))];
+  const categoryPatterns = [
+    /(?:in|dans)\s+(?:Kindle Store|Boutique Kindle|Books|Livres)\s*>\s*([^\n]+)/gi,
+    /(?:Catégorie|Category)\s*:\s*([^\n]+)/gi,
+    />\s*([^>\n]{4,60})\s*>\s*([^>\n]{4,60})/g,
+  ];
+  const categorySet = new Set<string>();
+  for (const pattern of categoryPatterns) {
+    const matches = combinedText.matchAll(pattern);
+    for (const m of matches) {
+      const cat = cleanText(m[1] || m[0]).replace(/^(?:in|dans)\s+/i, '');
+      if (cat && !isGenericAmazonContent(cat) && cat.length < 120) {
+        categorySet.add(cat);
+      }
+    }
+  }
+  const categories = [...categorySet].slice(0, 8);
 
   const author = extractAuthor(markdown, metadata, searchHit);
   const description = extractDescription(markdown, metadata, searchHit);
@@ -417,14 +449,22 @@ function parseAmazonBookPage(
 }
 
 function estimateSalesFromBsr(bsr: number) {
+  // More granular estimation using logarithmic curve
+  // Based on industry data: BSR 1 ≈ 200/day, BSR 100k ≈ 0.3/day
+  if (bsr <= 50) return 100;
   if (bsr <= 100) return 50;
-  if (bsr <= 500) return 25;
-  if (bsr <= 1000) return 15;
-  if (bsr <= 5000) return 8;
-  if (bsr <= 10000) return 5;
-  if (bsr <= 50000) return 2;
+  if (bsr <= 300) return 30;
+  if (bsr <= 500) return 20;
+  if (bsr <= 1000) return 12;
+  if (bsr <= 2000) return 8;
+  if (bsr <= 5000) return 5;
+  if (bsr <= 10000) return 3;
+  if (bsr <= 20000) return 2;
+  if (bsr <= 50000) return 1.5;
   if (bsr <= 100000) return 1;
-  return 0.5;
+  if (bsr <= 200000) return 0.5;
+  if (bsr <= 500000) return 0.3;
+  return 0.1;
 }
 
 function extractKeywords(sourceText: string, title: string, description: string) {
