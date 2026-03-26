@@ -268,6 +268,14 @@ export function cleanForAudio(text: string): string {
     .replace(/\[([^\]]*)\]/g, '$1')
     // Supprimer les backticks
     .replace(/`+/g, '')
+    // ========== NETTOYAGE DES MÉTADONNÉES AUDIO ==========
+    // Supprimer "Nombre de mots : 1234", "Export EPUB natif", compteurs etc.
+    .replace(/\b(?:nombre\s+de\s+mots|word\s*count|mots?\s*:?\s*total)\s*[:=]\s*\d[\d\s.,]*/gi, '')
+    .replace(/export\s+epub\s*(?:natif|native)?[^.\n]*/gi, '')
+    .replace(/\b(?:pages?\s+estim[ée]e?s?|estimated\s+pages?)\s*[:=]\s*\d[\d\s.,]*/gi, '')
+    .replace(/[~≈]?\s*\d{3,5}\s*mots?\b/gi, '')
+    .replace(/\(\s*\d{3,5}\s*mots?\s*\)/gi, '')
+    .replace(/\[(?:note|remarque|ndlr|instruction)[^\]]*\]/gi, '')
     // Remplacer les puces par des pauses naturelles
     .replace(/^•\s*/gm, '')
     .replace(/^[-–—]\s+/gm, '')
