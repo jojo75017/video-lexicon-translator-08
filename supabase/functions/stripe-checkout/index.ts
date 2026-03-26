@@ -10,14 +10,14 @@ const corsHeaders = {
 const PLANS = {
   pro: {
     name: "EbookStudio Pro Lifetime",
-    price: 9700, // 97€
+    price: 6700, // 67€
     type: "one_time" as const,
     features: ["Workflow 15 rôles IA", "Gemini 2.5 Pro", "Imagen 3", "Azure Neural Voices", "Export PDF/EPUB/Word", "18 modules formation", "Outils KDP Premium", "Traduction multi-langues", "Audiobooks", "Mises à jour à vie", "Support prioritaire"],
   },
   // Keep lifetime as alias for pro (backwards compatibility)
   lifetime: {
     name: "EbookStudio Pro Lifetime",
-    price: 9700, // 97€
+    price: 6700, // 67€
     type: "one_time" as const,
     features: ["Workflow 15 rôles IA", "Gemini 2.5 Pro", "Imagen 3", "Azure Neural Voices", "Export PDF/EPUB/Word", "18 modules formation", "Outils KDP Premium", "Traduction multi-langues", "Audiobooks", "Mises à jour à vie", "Support prioritaire"],
   },

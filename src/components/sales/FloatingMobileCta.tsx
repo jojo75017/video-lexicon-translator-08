@@ -9,7 +9,7 @@ export const FloatingMobileCta: React.FC = () => {
   const { isVipAvailable } = useVipAvailability();
   const [isVisible, setIsVisible] = useState(false);
 
-  const price = isVipAvailable ? '37' : '47';
+  const price = isVipAvailable ? '37' : '67';
 
   useEffect(() => {
     const handleScroll = () => {

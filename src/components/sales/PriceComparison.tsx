@@ -8,7 +8,7 @@ import { useVipAvailability } from '@/hooks/useVipAvailability';
 const PriceComparison: React.FC = () => {
   const navigate = useNavigate();
   const { isVipAvailable } = useVipAvailability();
-  const price = isVipAvailable ? '37' : '147';
+  const price = isVipAvailable ? '37' : '67';
 
   const comparisons = [
     {

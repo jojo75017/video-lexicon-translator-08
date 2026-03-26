@@ -89,7 +89,7 @@ const SeoGenerateurEbookPage: React.FC = () => {
           "operatingSystem": "Web",
           "offers": {
             "@type": "Offer",
-            "price": "37",
+            "price": "67",
             "priceCurrency": "EUR"
           },
           "aggregateRating": {

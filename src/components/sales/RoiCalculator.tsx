@@ -7,7 +7,7 @@ import { Slider } from '@/components/ui/slider';
 
 const ROI_PER_EBOOK_MONTH = 25; // avg €25/month per ebook
 const COST_PER_EBOOK = 0.30;
-const TOOL_PRICE = 97;
+const TOOL_PRICE = 67;
 
 const RoiCalculator = () => {
   const [ebooksPerMonth, setEbooksPerMonth] = useState([4]);

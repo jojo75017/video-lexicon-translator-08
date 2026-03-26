@@ -164,7 +164,7 @@ export const KdpRoiCalculator: React.FC<KdpRoiCalculatorProps> = ({ onCtaClick }
           </div>
 
           <p className="text-xs text-center text-muted-foreground mt-3">
-            💡 Investissement : <strong>97€ une seule fois</strong> → ROI en {Math.ceil(97 / monthlyPassiveIncome * 30)} jours
+            💡 Investissement : <strong>67€ une seule fois</strong> → ROI en {Math.ceil(67 / monthlyPassiveIncome * 30)} jours
           </p>
         </div>
 
