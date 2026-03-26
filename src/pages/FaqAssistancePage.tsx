@@ -144,7 +144,7 @@ Tout est automatisé. Vous entrez votre sujet, l'IA fait le reste !`
     {
       category: 'usage',
       question: "Combien d'ebooks puis-je créer ?",
-      answer: `Avec l'accès Pro Lifetime à 97€, vous avez un accès **illimité** :
+      answer: `Avec l'accès Pro Lifetime à 67€, vous avez un accès **illimité** :
 
 ✅ Nombre d'ebooks illimité
 ✅ Générations de chapitres illimitées  
@@ -402,7 +402,7 @@ Vos ebooks vous appartiennent à 100%.`
             onClick={() => navigate('/offres')}
             className="bg-gradient-to-r from-primary to-fuchsia-500 hover:opacity-90"
           >
-            Découvrir EbookStudio Pro → 97€ à vie
+            Découvrir EbookStudio Pro → 67€ à vie
           </Button>
         </div>
       </div>

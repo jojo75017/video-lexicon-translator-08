@@ -139,10 +139,10 @@ const SalesPage = () => {
   return (
     <div className="min-h-screen bg-slate-950 text-white overflow-x-hidden">
       <Helmet>
-        <title>EbookStudio Pro — Créez des Ebooks avec l'IA | 97€ à Vie</title>
-        <meta name="description" content="Créez un ebook complet en moins d'une heure avec l'IA. Plan structuré, rédaction, couverture, audiobook et export KDP. Accès à vie pour 97€." />
+        <title>EbookStudio Pro — Créez des Ebooks avec l'IA | 67€ à Vie</title>
+        <meta name="description" content="Créez un ebook complet en moins d'une heure avec l'IA. Plan structuré, rédaction, couverture, audiobook et export KDP. Accès à vie pour 67€." />
         <meta property="og:title" content="EbookStudio Pro — Créez des Ebooks avec l'IA" />
-        <meta property="og:description" content="Générez des ebooks professionnels avec l'IA : plan, rédaction, couverture, audiobook. 97€ accès à vie." />
+        <meta property="og:description" content="Générez des ebooks professionnels avec l'IA : plan, rédaction, couverture, audiobook. 67€ accès à vie." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://video-lexicon-translator-08.lovable.app/offres" />
         <link rel="canonical" href="https://video-lexicon-translator-08.lovable.app/offres" />

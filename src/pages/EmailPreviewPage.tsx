@@ -146,12 +146,12 @@ Après ? Le prix passe à 197€.
 
 🧮 Ce que vous obtenez (valeur 749€) :
 - Générateur IA illimité (197€)
-- Créateur de couvertures (97€)
+- Créateur de couvertures (67€)
 - Convertisseur livre audio (147€)
-- Dashboard marketing (97€)
-- Outils réseaux sociaux (67€)
-- Templates email (47€)
-- Optimisateur KDP (97€)
+- Dashboard marketing (67€)
+- Outils réseaux sociaux (47€)
+- Templates email (37€)
+- Optimisateur KDP (67€)
 
 Votre prix aujourd'hui : 67€ (-66%)
 💳 Ou 3×23€ / 5×14€

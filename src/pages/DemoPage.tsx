@@ -372,7 +372,7 @@ const DemoPage = () => {
                       onClick={() => navigate("/offres")}
                     >
                       <Crown className="w-5 h-5 mr-2" />
-                      Débloquer tout pour 97€ à vie
+                      Débloquer tout pour 67€ à vie
                     </Button>
                   </div>
                 )}
@@ -551,7 +551,7 @@ const DemoPage = () => {
                       </div>
                       <div className="flex-1">
                         <h3 className="font-bold text-xl text-white mb-1">Passez à la version complète</h3>
-                        <p className="text-slate-400 text-sm mb-4">Accès à vie pour 97€ — pas d'abonnement, pas de limites</p>
+                        <p className="text-slate-400 text-sm mb-4">Accès à vie pour 67€ — pas d'abonnement, pas de limites</p>
                         <div className="grid sm:grid-cols-2 gap-2 mb-4">
                           {[
                             "✍️ Rédaction complète des chapitres",
@@ -570,7 +570,7 @@ const DemoPage = () => {
                           onClick={() => navigate('/offres')}
                         >
                           <Rocket className="w-5 h-5 mr-2" />
-                          Accéder à tout pour 97€
+                          Accéder à tout pour 67€
                           <ArrowRight className="w-5 h-5 ml-2" />
                         </Button>
                       </div>
@@ -740,7 +740,7 @@ const DemoPage = () => {
               onClick={() => navigate('/offres')}
             >
               <Crown className="w-5 h-5 mr-2" />
-              Débloquer tout pour 97€
+              Débloquer tout pour 67€
             </Button>
             <p className="text-xs text-slate-600">Paiement unique • Accès à vie • Garantie 30 jours</p>
           </div>

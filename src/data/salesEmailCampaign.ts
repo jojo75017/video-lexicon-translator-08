@@ -59,7 +59,7 @@ Je ne vous demande pas de me croire sur parole.
 
 Vous verrez un plan complet généré sous vos yeux en temps réel. Pas de carte bancaire, pas d'engagement.
 
-Et si ça vous plaît (spoiler : ça va vous plaire), l'offre Fondateur à **97€** ne durera pas éternellement.
+Et si ça vous plaît (spoiler : ça va vous plaire), l'offre Fondateur à **67€** ne durera pas éternellement.
 
 À vous de jouer,
 **Georges**
@@ -194,10 +194,10 @@ Après ? Le prix passe à **197€**. Et ce n'est pas du marketing. C'est la val
 | Optimisateur KDP complet | 97€ |
 | **TOTAL** | **749€** |
 
-**Votre prix aujourd'hui : 97€** (soit -87%)
+**Votre prix aujourd'hui : 67€** (soit -91%)
 
-Et si 97€ d'un coup c'est trop :
-💳 3 × 35€ ou 5 × 22€
+Et si 67€ d'un coup c'est trop :
+💳 3 × 23€ ou 5 × 14€
 
 🎁 **BONUS inclus (valeur 394€)** :
 • Pack 300+ idées de titres rentables
@@ -207,7 +207,7 @@ Et si 97€ d'un coup c'est trop :
 • Support par visioconférence Zoom
 
 ⚡ **Rappel** : Le coût par ebook généré est d'environ 0,30€.
-Votre investissement de 97€ est rentabilisé dès votre premier livre vendu.
+Votre investissement de 67€ est rentabilisé dès votre premier livre vendu.
 
 👉 **J'accède à l'offre Fondateur** : [LIEN OFFRES]
 
@@ -423,7 +423,7 @@ Publier des ebooks sur Amazon KDP.
 
 Voici pourquoi (avec des vrais chiffres) :
 
-💰 Investissement initial : 97€ (outil) + ~0,30€/livre (API)
+💰 Investissement initial : 67€ (outil) + ~0,30€/livre (API)
 📈 Potentiel : 500€ à 5000€/mois en revenus passifs
 ⏱️ Temps par livre : 47 minutes
 📚 Pas de stock, pas de logistique, pas de SAV
