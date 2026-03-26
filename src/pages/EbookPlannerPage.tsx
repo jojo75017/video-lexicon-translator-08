@@ -1293,6 +1293,14 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           />
         );
 
+      case 'consistency-detector':
+        return (
+          <EbookConsistencyDetector
+            chapters={chapters}
+            characters={characters as any}
+          />
+        );
+
       case 'rich-editor':
         if (isDemo) {
           setShowPaywall('chapters');
