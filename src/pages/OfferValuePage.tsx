@@ -171,7 +171,7 @@ const OfferValuePage = () => {
   const totalModulesValue = modules.reduce((sum, m) => sum + m.marketValue, 0);
   const totalBonusesValue = bonuses.reduce((sum, b) => sum + b.marketValue, 0);
   const totalValue = totalModulesValue + totalBonusesValue;
-  const currentPrice = 97;
+  const currentPrice = 67;
   const savings = totalValue - currentPrice;
 
   return (
@@ -200,7 +200,7 @@ const OfferValuePage = () => {
           
           <h1 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent">
             Ce que vous obtenez pour
-            <span className="block text-5xl md:text-7xl text-primary mt-2">seulement 97€</span>
+            <span className="block text-5xl md:text-7xl text-primary mt-2">seulement 67€</span>
           </h1>
           
           <p className="text-xl text-muted-foreground mb-8">
@@ -417,7 +417,7 @@ const OfferValuePage = () => {
           <p className="text-xl text-muted-foreground">
             <strong className="text-foreground">Pour un seul ebook</strong>, vous dépenseriez entre <strong className="text-red-500">850€ et 3300€</strong>.
             <br />
-            Avec notre générateur, créez des <strong className="text-primary">ebooks illimités</strong> pour seulement <strong className="text-green-500">97€</strong>.
+            Avec notre générateur, créez des <strong className="text-primary">ebooks illimités</strong> pour seulement <strong className="text-green-500">67€</strong>.
           </p>
         </div>
       </section>
@@ -436,7 +436,7 @@ const OfferValuePage = () => {
                 Est-ce vraiment un paiement unique sans abonnement ?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground">
-                Oui, absolument ! Vous payez une seule fois 97€ et vous avez accès à vie à tous les modules, bonus et mises à jour futures. Aucun abonnement, aucun frais caché, aucune limite d'utilisation.
+                Oui, absolument ! Vous payez une seule fois 67€ et vous avez accès à vie à tous les modules, bonus et mises à jour futures. Aucun abonnement, aucun frais caché, aucune limite d'utilisation.
               </AccordionContent>
             </AccordionItem>
 
@@ -508,7 +508,7 @@ const OfferValuePage = () => {
                 Pourquoi le prix passera-t-il à 247€ ?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground">
-                Le tarif actuel de 97€ est un prix de lancement exceptionnel pour remercier nos premiers utilisateurs. Une fois la période de lancement terminée, le prix passera à 197€ (247€ avec une réduction de 50€ offerte) pour refléter la valeur réelle de l'outil.
+                Le tarif actuel de 67€ est un prix de lancement exceptionnel pour remercier nos premiers utilisateurs. Une fois la période de lancement terminée, le prix passera à 197€ pour refléter la valeur réelle de l'outil.
               </AccordionContent>
             </AccordionItem>
 
@@ -531,7 +531,7 @@ const OfferValuePage = () => {
               onClick={() => navigate('/offres')}
             >
               <Sparkles className="w-5 h-5 mr-2" />
-              Accéder pour 97€
+              Accéder pour 67€
             </Button>
           </div>
         </div>

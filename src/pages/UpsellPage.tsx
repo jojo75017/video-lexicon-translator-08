@@ -6,8 +6,8 @@ import { Check, X, Sparkles, ArrowRight, Clock, Gift, Crown, Zap, Cpu, Headphone
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 
-const LAUNCH_PRICE = 97;
-const NORMAL_PRICE = 247;
+const LAUNCH_PRICE = 67;
+const NORMAL_PRICE = 197;
 
 const UpsellPage = () => {
   const navigate = useNavigate();
