@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { Smartphone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { 
   BookOpen, 
@@ -805,6 +806,33 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
         {/* Quota */}
         <div className="border-t border-border">
           <QuotaDisplay isCollapsed={isCollapsed} />
+        </div>
+
+        {/* Install App Button */}
+        <div className="px-3 py-2 border-t border-border">
+          {isCollapsed ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate('/install')}
+                  className="w-full h-10 rounded-xl hover:bg-amber-500/10"
+                >
+                  <Smartphone className="w-5 h-5 text-amber-400" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="right">Installer l'App Mobile</TooltipContent>
+            </Tooltip>
+          ) : (
+            <Button
+              onClick={() => navigate('/install')}
+              className="w-full h-10 rounded-xl bg-gradient-to-r from-amber-500 via-yellow-500 to-orange-500 hover:from-amber-600 hover:via-yellow-600 hover:to-orange-600 text-white font-semibold shadow-md shadow-amber-500/20 gap-2"
+            >
+              <Smartphone className="w-4 h-4" />
+              Installer l'App Mobile
+            </Button>
+          )}
         </div>
 
         {/* Footer */}
