@@ -114,7 +114,7 @@ const getEmailContent = (step: number): string => {
       <p>Bonjour,</p>
       <p>C'est mon dernier email de cette série.</p>
       <p>Je voulais vous rappeler que le <strong>prix de lancement de 67€ est temporaire</strong>.</p>
-      <p>Après le lancement, le prix passera à 197€.</p>
+      <p>Après le lancement, le prix passera à 147€.</p>
       <div style="background: #fef3c7; border: 2px solid #f59e0b; padding: 20px; border-radius: 10px; margin: 20px 0;">
         <h3 style="color: #d97706; margin: 0 0 15px 0;">Pour 67€, vous obtenez :</h3>
         <ul style="margin: 0; padding-left: 20px;">

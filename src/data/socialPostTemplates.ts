@@ -130,7 +130,7 @@ Pour 67€ (valeur 749€) :
 
 + BONUS : Pack 300+ idées, Guide niches, Groupe privé, MAJ à vie
 
-💳 Paiement en 3x23€ ou 5x14€
+💳 Paiement en 2x35€ ou 3x25€
 
 👉 ${OFFRES_LINK}
 🆓 Tester d'abord : ${DEMO_LINK}`,

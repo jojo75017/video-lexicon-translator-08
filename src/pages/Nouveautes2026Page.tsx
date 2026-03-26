@@ -302,7 +302,7 @@ export default function Nouveautes2026Page() {
               <span className="text-muted-foreground line-through text-lg">247€</span>
               <span className="text-5xl font-black text-primary">67€</span>
             </div>
-            <p className="text-sm text-muted-foreground mb-2">ou 3×23€ · ou 5×14€</p>
+            <p className="text-sm text-muted-foreground mb-2">ou 2×35€ · ou 3×25€</p>
             <p className="text-sm text-muted-foreground mb-8">
               <CheckCircle2 className="w-4 h-4 inline mr-1 text-accent" />
               30 jours satisfait ou remboursé · Clé Gemini gratuite · ~0,30€ par ebook

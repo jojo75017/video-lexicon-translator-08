@@ -19,8 +19,8 @@ const PLANS = {
     originalPrice: String(NORMAL_PRICE),
     paypalLinks: {
       full: `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=${LAUNCH_PRICE}&currency_code=EUR&item_name=EbookStudio%20Pro%20Lifetime`,
-      installment3: `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=23&currency_code=EUR&item_name=EbookStudio%20Pro%20(1/3)`,
-      installment5: `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=14&currency_code=EUR&item_name=EbookStudio%20Pro%20(1/5)`,
+      installment2: `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=35&currency_code=EUR&item_name=EbookStudio%20Pro%20(1/2)`,
+      installment3: `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=25&currency_code=EUR&item_name=EbookStudio%20Pro%20(1/3)`,
     },
     description: "Gemini 3 Flash • Imagen 3 • Azure Neural Voices • Tout illimité à vie",
     features: [
@@ -46,13 +46,13 @@ const UpsellPaiementPage = () => {
   const plan = PLANS.pro;
   
   const [email, setEmail] = useState("");
-  const [selectedPayment, setSelectedPayment] = useState<'full' | 'installment3' | 'installment5'>('full');
+  const [selectedPayment, setSelectedPayment] = useState<'full' | 'installment2' | 'installment3'>('full');
   const navigate = useNavigate();
 
   const paymentOptions = [
     { id: 'full' as const, label: 'Paiement unique', price: `${LAUNCH_PRICE}€`, detail: `Paiement unique de ${LAUNCH_PRICE}€` },
-    { id: 'installment3' as const, label: 'En 3 fois', price: '23€', detail: '23€/mois pendant 3 mois' },
-    { id: 'installment5' as const, label: 'En 5 fois', price: '14€', detail: '14€/mois pendant 5 mois' },
+    { id: 'installment2' as const, label: 'En 2 fois', price: '35€', detail: '35€/mois pendant 2 mois' },
+    { id: 'installment3' as const, label: 'En 3 fois', price: '25€', detail: '25€/mois pendant 3 mois' },
   ];
 
   const handlePayPalClick = () => {
