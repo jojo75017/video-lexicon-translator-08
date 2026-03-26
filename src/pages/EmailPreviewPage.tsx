@@ -150,7 +150,7 @@ Après ? Le prix passe à 197€.
 - Convertisseur livre audio (147€)
 - Dashboard marketing (67€)
 - Outils réseaux sociaux (47€)
-- Templates email (37€)
+- Templates email (67€)
 - Optimisateur KDP (67€)
 
 Votre prix aujourd'hui : 67€ (-66%)

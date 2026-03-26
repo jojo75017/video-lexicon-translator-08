@@ -56,7 +56,7 @@ const PaymentSuccessPage = () => {
         if (payload?.ok && payload.email && payload.subscriber) {
           localStorage.setItem("subscriber_email", payload.email);
           localStorage.setItem("subscriber_data", JSON.stringify(payload.subscriber));
-          trackPurchase(payload.subscriber?.plan_tier || 'pro', payload.subscriber?.plan_tier === 'fondateur' ? 37 : 67);
+          trackPurchase(payload.subscriber?.plan_tier || 'pro', 67);
         }
       } catch (e: any) {
         if (cancelled) return;
