@@ -142,21 +142,21 @@ export const KdpRoiCalculator: React.FC<KdpRoiCalculatorProps> = ({ onCtaClick }
           </h4>
           
           <div className="grid grid-cols-2 gap-4">
-            <div className="text-center p-4 bg-emerald-50 dark:bg-emerald-900/30 rounded-lg">
-              <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">
+            <div className="text-center p-4 bg-emerald-900/30 rounded-lg">
+              <p className="text-3xl font-bold text-emerald-400">
                 {totalEbooks}
               </p>
               <p className="text-xs text-muted-foreground mt-1">Ebooks publiés</p>
             </div>
-            <div className="text-center p-4 bg-amber-50 dark:bg-amber-900/30 rounded-lg">
-              <p className="text-3xl font-bold text-amber-600 dark:text-amber-400">
+            <div className="text-center p-4 bg-amber-900/30 rounded-lg">
+              <p className="text-3xl font-bold text-amber-400">
                 {monthlyPassiveIncome.toLocaleString('fr-FR', { maximumFractionDigits: 0 })}€
               </p>
               <p className="text-xs text-muted-foreground mt-1">Revenus mensuels</p>
             </div>
           </div>
 
-          <div className="mt-4 p-4 bg-gradient-to-r from-violet-100 to-purple-100 dark:from-violet-900/30 dark:to-purple-900/30 rounded-lg text-center">
+          <div className="mt-4 p-4 bg-gradient-to-r from-violet-900/30 to-purple-900/30 rounded-lg text-center">
             <p className="text-sm text-muted-foreground mb-1">Revenus annuels potentiels</p>
             <p className="text-4xl font-bold bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
               {yearlyRevenue.toLocaleString('fr-FR', { maximumFractionDigits: 0 })}€
