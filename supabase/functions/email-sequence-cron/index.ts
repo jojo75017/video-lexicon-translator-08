@@ -150,7 +150,7 @@ const getEmailContent = (step: number): string => {
         <h2 style="margin: 0 0 15px 0; font-size: 24px;">🎯 Offre VIP 48h</h2>
         <p style="margin: 0 0 15px 0; font-size: 18px;">Accès à vie à EbookStudio Pro</p>
         <div style="background: white; color: #8b5cf6; display: inline-block; padding: 10px 25px; border-radius: 10px; font-weight: bold;">
-          <span style="text-decoration: line-through; opacity: 0.6;">197€</span> → <span style="font-size: 28px;">67€</span>
+          <span style="text-decoration: line-through; opacity: 0.6;">147€</span> → <span style="font-size: 28px;">67€</span>
         </div>
         <p style="margin: 15px 0 0 0; font-size: 14px; opacity: 0.9;">Cette offre expire dans 48 heures</p>
       </div>

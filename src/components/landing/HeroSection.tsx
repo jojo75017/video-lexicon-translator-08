@@ -59,7 +59,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onCtaClick }) => {
           🎯 Testés & Optimisés
         </Badge>
         <Badge className="bg-vibrant-purple/10 text-vibrant-purple border-vibrant-purple/20 px-4 py-2">
-          💎 Valeur 197€ - GRATUIT
+          💎 Valeur 147€ - GRATUIT
         </Badge>
       </div>
     </div>

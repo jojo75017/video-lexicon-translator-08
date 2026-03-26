@@ -16,7 +16,7 @@ export const WhatsIncludedSection: React.FC = () => {
     <Card className="mb-12 bg-gradient-success/10 border-success/20">
       <CardHeader>
         <CardTitle className="text-2xl text-center text-foreground">
-          🎁 Ce que vous recevez (Valeur 197€)
+          🎁 Ce que vous recevez (Valeur 147€)
         </CardTitle>
       </CardHeader>
       <CardContent>

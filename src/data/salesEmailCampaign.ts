@@ -112,7 +112,7 @@ Comparez avec un ghostwriter à 500€... ou un designer à 150€ la couverture
 
 👉 **Découvrir EbookStudio Pro** : [LIEN OFFRES]
 
-L'offre Fondateur à 67€ (au lieu de 197€) est disponible quelques jours encore.
+L'offre Fondateur à 67€ (au lieu de 147€) est disponible jusqu'au 1er juillet.
 
 Georges
 
@@ -349,7 +349,7 @@ J'ai ouvert l'accès au public pour la première fois.
 
 Si ça intéresse quelqu'un :
 🆓 Démo gratuite (sans CB) : [LIEN]
-💰 Offre Fondateur à 67€ (au lieu de 197€) : [LIEN]
+💰 Offre Fondateur à 67€ (au lieu de 147€) : [LIEN]
 
 Posez vos questions en commentaire, je réponds à tout ! 👇`,
     hashtags: ['revenus passifs', 'kdp', 'amazon', 'ebook', 'ia', 'autoedition']

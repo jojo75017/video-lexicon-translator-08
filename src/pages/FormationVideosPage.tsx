@@ -30,7 +30,7 @@ const FormationVideosPage = () => {
               15 modules vidéo pour maîtriser chaque fonctionnalité et publier votre premier ebook rapidement.
             </p>
             <p className="text-sm text-muted-foreground mt-2">
-              Valeur : <span className="line-through">197€</span> — <span className="font-bold text-primary">Offerte</span> avec votre accès à 67€
+              Valeur : <span className="line-through">147€</span> — <span className="font-bold text-primary">Offerte</span> avec votre accès à 67€
             </p>
           </div>
         </div>

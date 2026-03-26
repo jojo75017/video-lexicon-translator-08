@@ -117,10 +117,10 @@ Avec EbookStudio Pro, un ebook par niche en ~47 min.
   },
   {
     id: 'fb-5', platform: 'facebook', type: 'Post urgence/FOMO',
-    visualDescription: 'Bandeau rouge "DERNIÈRE SEMAINE", prix barré 197€ → 67€, timer visuel.',
+    visualDescription: 'Bandeau rouge "DERNIÈRE SEMAINE", prix barré 147€ → 67€, timer visuel.',
     content: `⏰ [DERNIÈRE SEMAINE] Offre Fondateur EbookStudio Pro
 
-66% de réduction. Après ? 197€.
+Le 1er juillet, le prix passe à 147€.
 
 Pour 67€ (valeur 749€) :
 🔥 Générateur IA illimité

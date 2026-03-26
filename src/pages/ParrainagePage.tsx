@@ -235,7 +235,7 @@ const ParrainagePage = () => {
                   </ul>
                 </div>
                 <div className="p-4 bg-muted/50 rounded-lg">
-                  <p className="font-semibold">Offre après lancement (197€)</p>
+                  <p className="font-semibold">Offre après lancement (147€)</p>
                   <ul className="text-sm text-muted-foreground mt-2 space-y-1">
                     <li>• <strong>30€</strong> par vente (tous paliers)</li>
                   </ul>

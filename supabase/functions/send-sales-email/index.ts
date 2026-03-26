@@ -98,7 +98,7 @@ Le tout pour ~0,30€ par livre.
 
 👉 Découvrir EbookStudio Pro : ${OFFRES_LINK}
 
-L'offre Fondateur à 67€ (au lieu de 197€) est disponible quelques jours encore.
+L'offre Fondateur à 67€ (au lieu de 147€) est disponible jusqu'au 1er juillet.
 
 Georges
 
