@@ -2027,7 +2027,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                               Fusionner ({selectedChapters.length})
                             </Button>
                           )}
-                          <Button onClick={addChapter} size="sm" className="bg-gradient-to-r from-cyan-500 to-blue-600 shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5">
+                          <Button onClick={addChapter} size="sm" className="bg-gradient-to-r from-primary to-accent shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5">
                             <Plus className="h-4 w-4 mr-1" />
                             Ajouter
                           </Button>
