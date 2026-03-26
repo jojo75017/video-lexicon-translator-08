@@ -92,7 +92,9 @@ export const KdpAmazonResearch: React.FC = () => {
 
   // Keywords tab
   const [keywordAsin, setKeywordAsin] = useState('');
-  const [keywordData, setKeywordData] = useState<KeywordData | null>(null);
+  // Audit
+  const [auditData, setAuditData] = useState<AuditData | null>(null);
+  const [isAuditing, setIsAuditing] = useState(false);
 
   const callScraper = async (body: Record<string, any>) => {
     const { data, error } = await supabase.functions.invoke('kdp-asin-scraper', { body });
