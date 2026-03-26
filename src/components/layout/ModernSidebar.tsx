@@ -667,10 +667,18 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                     )}
                   >
                     <span className={cn(
-                      "text-sm font-semibold",
+                      "text-sm font-semibold flex items-center gap-2",
                       hasActiveItem ? "text-white" : "text-amber-400"
                     )}>
                       {category.emoji} {category.label}
+                      <span className={cn(
+                        "inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[10px] font-bold",
+                        hasActiveItem 
+                          ? "bg-white/25 text-white" 
+                          : "bg-amber-500/20 text-amber-400"
+                      )}>
+                        {category.items.length}
+                      </span>
                     </span>
                     <ChevronDown className={cn(
                       "w-4 h-4 transition-transform",
