@@ -112,7 +112,6 @@ export const EbookEditorialQuality: React.FC = () => {
   };
   
   const handleReloadFromWorkflow = () => {
-  const { apiKey: userGeminiKey } = useOpenAIConfig();
 
     setHasAutoLoadedContent(false);
   };

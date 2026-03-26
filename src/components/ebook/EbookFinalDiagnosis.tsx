@@ -59,7 +59,6 @@ export const EbookFinalDiagnosis: React.FC = () => {
   };
 
   const getImpactColor = (impact: string) => {
-  const { apiKey: userGeminiKey } = useOpenAIConfig();
 
     switch (impact) {
       case 'critique': return 'bg-red-500/10 border-red-500/30 text-red-600';

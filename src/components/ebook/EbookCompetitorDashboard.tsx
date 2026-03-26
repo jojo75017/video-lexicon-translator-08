@@ -122,7 +122,6 @@ export const EbookCompetitorDashboard: React.FC = () => {
   };
 
   const getOpportunityColor = (score: number) => {
-  const { apiKey: userGeminiKey } = useOpenAIConfig();
 
     if (score >= 70) return 'text-green-500';
     if (score >= 40) return 'text-yellow-500';
