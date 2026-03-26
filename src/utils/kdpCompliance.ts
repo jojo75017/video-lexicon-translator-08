@@ -74,6 +74,8 @@ export function runKdpComplianceCheck(input: KdpCheckInput): KdpComplianceResult
   checks.push(checkForbiddenCharacters(input));
   // Taille estimée du fichier
   checks.push(checkEstimatedFileSize(totalWords));
+  // Nombre de pages (broché)
+  checks.push(checkPageCount(input.pageCount || Math.ceil(totalWords / 250)));
 
   // Calcul du score
   const passCount = checks.filter(c => c.status === 'pass').length;
