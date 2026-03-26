@@ -140,6 +140,7 @@ export const EbookSettings: React.FC<EbookSettingsProps> = ({
                     📄 Guide PDF : obtenir sa clé
                   </a>
                 </div>
+              </div>
             </div>
           </div>
 
