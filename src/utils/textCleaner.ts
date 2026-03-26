@@ -186,6 +186,15 @@ export function cleanGeneratedText(text: string): string {
 }
 
 /**
+ * Nettoie le texte ET applique la typographie française professionnelle.
+ * À utiliser pour les exports (DOCX, EPUB, PDF).
+ */
+export function cleanAndTypographize(text: string): string {
+  const cleaned = cleanGeneratedText(text);
+  return applyFrenchTypography(cleaned);
+}
+
+/**
  * Nettoie un chapitre entier (titre et contenu)
  * @param chapter L'objet chapitre à nettoyer
  * @returns Le chapitre avec le texte nettoyé
