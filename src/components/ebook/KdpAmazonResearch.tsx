@@ -602,11 +602,15 @@ const BookDataCard: React.FC<{ book: BookData; onCopy: (t: string) => void }> = 
         <StatCard icon={Users} label="Avis" value={book.reviews?.toLocaleString() || 'N/A'} color="text-purple-600" />
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-        <StatCard icon={BarChart3} label="Ventes/jour" value={book.estimatedDailySales?.toString() || 'N/A'} color="text-orange-600" />
-        <StatCard icon={BarChart3} label="Ventes/mois" value={book.estimatedMonthlySales?.toString() || 'N/A'} color="text-orange-600" />
-        <StatCard icon={DollarSign} label="Revenus/mois" value={book.estimatedMonthlyRevenue ? `${book.estimatedMonthlyRevenue}€` : 'N/A'} color="text-emerald-600" />
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-2">
+        <StatCard icon={BarChart3} label="~Ventes/jour (est.)" value={book.estimatedDailySales?.toString() || 'N/A'} color="text-orange-600" />
+        <StatCard icon={BarChart3} label="~Ventes/mois (est.)" value={book.estimatedMonthlySales?.toString() || 'N/A'} color="text-orange-600" />
+        <StatCard icon={DollarSign} label="~Revenus/mois (est.)" value={book.estimatedMonthlyRevenue ? `${book.estimatedMonthlyRevenue}€` : 'N/A'} color="text-emerald-600" />
       </div>
+      <p className="text-xs text-muted-foreground mb-6 italic">
+        ⚠️ Estimations basées sur le BSR{book.bsr ? ` (#${book.bsr.toLocaleString()})` : ' (non détecté)'} — les ventes réelles peuvent varier significativement.
+        {!book.bsr && ' Le BSR n\'a pas pu être extrait de la page Amazon, les données de ventes ne sont pas disponibles.'}
+      </p>
 
       {book.categories.length > 0 && (
         <div className="mb-4">
