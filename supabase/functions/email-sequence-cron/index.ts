@@ -114,7 +114,7 @@ const getEmailContent = (step: number): string => {
       <p>Bonjour,</p>
       <p>C'est mon dernier email de cette série.</p>
       <p>Je voulais vous rappeler que le <strong>prix de lancement de 67€ est temporaire</strong>.</p>
-      <p>Après le lancement, le prix passera à 197€.</p>
+      <p>Après le lancement, le prix passera à 147€.</p>
       <div style="background: #fef3c7; border: 2px solid #f59e0b; padding: 20px; border-radius: 10px; margin: 20px 0;">
         <h3 style="color: #d97706; margin: 0 0 15px 0;">Pour 67€, vous obtenez :</h3>
         <ul style="margin: 0; padding-left: 20px;">
@@ -150,7 +150,7 @@ const getEmailContent = (step: number): string => {
         <h2 style="margin: 0 0 15px 0; font-size: 24px;">🎯 Offre VIP 48h</h2>
         <p style="margin: 0 0 15px 0; font-size: 18px;">Accès à vie à EbookStudio Pro</p>
         <div style="background: white; color: #8b5cf6; display: inline-block; padding: 10px 25px; border-radius: 10px; font-weight: bold;">
-          <span style="text-decoration: line-through; opacity: 0.6;">197€</span> → <span style="font-size: 28px;">67€</span>
+          <span style="text-decoration: line-through; opacity: 0.6;">147€</span> → <span style="font-size: 28px;">67€</span>
         </div>
         <p style="margin: 15px 0 0 0; font-size: 14px; opacity: 0.9;">Cette offre expire dans 48 heures</p>
       </div>

@@ -112,7 +112,7 @@ Comparez avec un ghostwriter à 500€... ou un designer à 150€ la couverture
 
 👉 **Découvrir EbookStudio Pro** : [LIEN OFFRES]
 
-L'offre Fondateur à 67€ (au lieu de 197€) est disponible quelques jours encore.
+L'offre Fondateur à 67€ (au lieu de 147€) est disponible jusqu'au 1er juillet.
 
 Georges
 
@@ -156,7 +156,7 @@ Et je n'ai pas gardé cet outil pour moi. Je l'ai transformé en plateforme comp
 
 **Le tout à 67€** (paiement unique, pas d'abonnement).
 
-Ou en facilités : 3×23€ ou 5×14€.
+Ou en facilités : 2×35€ ou 3×25€.
 
 👉 **Accéder à l'offre Fondateur** : [LIEN OFFRES]
 
@@ -171,7 +171,7 @@ https://www.amazon.fr/Mr-Georges-Boubet/e/B0CGVLHNX7`
     id: 'email-4-urgence',
     day: 'J+6',
     subject: '⏰ [Dernière chance] L\'offre Fondateur disparaît dans 48h',
-    preheader: 'Après ça, le prix passe à 197€. Point final.',
+    preheader: 'Après ça, le prix passe à 147€. Point final.',
     strategy: 'URGENCE + FOMO — Créer un sentiment d\'urgence légitime',
     body: `[PRÉNOM],
 
@@ -179,7 +179,7 @@ Je serai bref.
 
 L'offre **Fondateur EbookStudio Pro** à 67€ se termine dans **48 heures**.
 
-Après ? Le prix passe à **197€**. Et ce n'est pas du marketing. C'est la valeur réelle de l'outil.
+Après ? Le prix passe à **147€**. Et ce n'est pas du marketing. C'est la valeur réelle de l'outil.
 
 🧮 **Faisons les comptes ensemble** :
 
@@ -197,7 +197,7 @@ Après ? Le prix passe à **197€**. Et ce n'est pas du marketing. C'est la val
 **Votre prix aujourd'hui : 67€** (soit -91%)
 
 Et si 67€ d'un coup c'est trop :
-💳 3 × 23€ ou 5 × 14€
+💳 2 × 35€ ou 3 × 25€
 
 🎁 **BONUS inclus (valeur 394€)** :
 • Pack 300+ idées de titres rentables
@@ -349,7 +349,7 @@ J'ai ouvert l'accès au public pour la première fois.
 
 Si ça intéresse quelqu'un :
 🆓 Démo gratuite (sans CB) : [LIEN]
-💰 Offre Fondateur à 67€ (au lieu de 197€) : [LIEN]
+💰 Offre Fondateur à 67€ (au lieu de 147€) : [LIEN]
 
 Posez vos questions en commentaire, je réponds à tout ! 👇`,
     hashtags: ['revenus passifs', 'kdp', 'amazon', 'ebook', 'ia', 'autoedition']

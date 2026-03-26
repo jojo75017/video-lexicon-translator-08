@@ -6,7 +6,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Plan configurations - Pro 67€ (launch), future 197€
+// Plan configurations - Pro 67€ (launch), future 147€ (1er juillet)
 const PLANS = {
   pro: {
     name: "EbookStudio Pro Lifetime",

@@ -11,7 +11,7 @@ const SalesFaq: React.FC = () => {
   const faqs = [
     {
       question: "Comment fonctionne le paiement unique à 67€ ?",
-      answer: "Vous payez 67€ une seule fois via PayPal et vous obtenez un accès à vie à l'ensemble de la plateforme. Pas d'abonnement mensuel, pas de frais cachés. Vous recevez immédiatement votre code d'accès par email après le paiement. Des facilités sont disponibles : 3×23€ ou 5×14€."
+      answer: "Vous payez 67€ une seule fois via PayPal et vous obtenez un accès à vie à l'ensemble de la plateforme. Pas d'abonnement mensuel, pas de frais cachés. Vous recevez immédiatement votre code d'accès par email après le paiement. Des facilités sont disponibles : 2×35€ ou 3×25€."
     },
     {
       question: "Ai-je besoin de compétences techniques ou de savoir écrire ?",
@@ -43,7 +43,7 @@ const SalesFaq: React.FC = () => {
     },
     {
       question: "Le prix de 67€ va-t-il augmenter ?",
-      answer: "Oui. Le prix normal est de 197€. Parce que j'accompagne les créateurs et que je veux rendre cet outil accessible, le tarif de lancement est à 67€ à vie avec toutes les futures mises à jour incluses. Profitez-en avant l'augmentation !"
+      answer: "Oui. Le prix normal passera à 147€ le 1er juillet. Parce que j'accompagne les créateurs et que je veux rendre cet outil accessible, le tarif de lancement est à 67€ à vie avec toutes les futures mises à jour incluses. Profitez-en avant l'augmentation !"
     },
     {
       question: "Puis-je gagner de l'argent en recommandant EbookStudio ?",
@@ -51,7 +51,7 @@ const SalesFaq: React.FC = () => {
     },
     {
       question: "Comment fonctionne le paiement en plusieurs fois ?",
-      answer: "Vous pouvez choisir de payer en 3 fois (3×23€) ou en 5 fois (5×14€) via PayPal. Vous obtenez un accès immédiat dès le premier paiement. Les prélèvements suivants sont automatiques, sans aucune action de votre part."
+      answer: "Vous pouvez choisir de payer en 2 fois (2×35€) ou en 3 fois (3×25€) via PayPal. Vous obtenez un accès immédiat dès le premier paiement. Les prélèvements suivants sont automatiques, sans aucune action de votre part."
     }
   ];
 

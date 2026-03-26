@@ -89,7 +89,7 @@ Le tout pour ~0,30€ par livre.
 
 👉 Découvrir EbookStudio Pro : ${OFFRES_LINK}
 
-L'offre Fondateur à 67€ (au lieu de 197€) est disponible quelques jours encore.
+L'offre Fondateur à 67€ (au lieu de 147€) est disponible jusqu'au 1er juillet.
 
 Georges
 
@@ -120,7 +120,7 @@ EbookStudio Pro 2026 inclut :
 📧 Système email marketing inclus
 
 Le tout à 67€ (paiement unique).
-Ou en facilités : 3×23€ ou 5×14€.
+Ou en facilités : 2×35€ ou 3×25€.
 
 👉 Accéder à l'offre Fondateur : ${OFFRES_LINK}
 
@@ -135,14 +135,14 @@ https://www.amazon.fr/Mr-Georges-Boubet/e/B0CGVLHNX7`,
     dayOffset: 6,
     dayLabel: "J+6",
     subject: "⏰ [Dernière chance] L'offre Fondateur disparaît dans 48h",
-    preheader: "Après ça, le prix passe à 197€. Point final.",
+    preheader: "Après ça, le prix passe à 147€. Point final.",
     strategy: "URGENCE",
     strategyColor: "bg-amber-500/20 text-amber-400 border-amber-500/30",
     body: `[PRÉNOM],
 
 L'offre Fondateur EbookStudio Pro à 67€ se termine dans 48 heures.
 
-Après ? Le prix passe à 197€.
+Après ? Le prix passe à 147€.
 
 🧮 Ce que vous obtenez (valeur 749€) :
 - Générateur IA illimité (197€)
@@ -154,7 +154,7 @@ Après ? Le prix passe à 197€.
 - Optimisateur KDP (67€)
 
 Votre prix aujourd'hui : 67€ (-66%)
-💳 Ou 3×23€ / 5×14€
+💳 Ou 2×35€ / 3×25€
 
 🎁 BONUS inclus : Pack 300+ idées, Guide 10 Niches KDP 2026, Groupe privé, MAJ à vie, Support Zoom.
 

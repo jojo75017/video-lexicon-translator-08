@@ -79,7 +79,7 @@ L'intelligence artificielle fonctionne avec votre propre clé Gemini 3 Flash (gr
 
 ### Offre Pro Lifetime
 - 🎯 **Accès Pro à 67€** — Paiement unique, accès à vie
-- 📈 Tarif de lancement limité (ensuite 197€)
+- 📈 Tarif de lancement limité (ensuite 147€ le 1er juillet)
 - 🚀 Toutes les mises à jour futures incluses gratuitement
 - 💬 Support prioritaire par email 7j/7`
   },
@@ -635,7 +635,7 @@ Votre clé API personnelle vous donne le contrôle total sur les coûts :
 | Plan | Prix | Inclus |
 |------|------|--------|
 | **Pro Lifetime** | 67€ (unique) | Tous les outils, mises à jour à vie, support 7j/7 |
-| Tarif futur | 197€ | Même contenu, prix normal après le lancement |
+| Tarif futur (1er juillet) | 147€ | Même contenu, prix normal après le lancement |
 
 > 💰 L'abonnement couvre l'accès à la plateforme. Les coûts API Gemini sont à votre charge mais restent très faibles (~0,30€/ebook).`
   },

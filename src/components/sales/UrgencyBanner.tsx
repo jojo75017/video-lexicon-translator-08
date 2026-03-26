@@ -4,7 +4,7 @@ import { Flame, TrendingUp, Users, ShieldCheck, Zap, Clock } from 'lucide-react'
 
 const messages = [
   { icon: Flame, text: "3 personnes ont acheté dans la dernière heure", color: "text-orange-400" },
-  { icon: TrendingUp, text: "Le prix augmentera bientôt à 197€", color: "text-amber-400" },
+  { icon: TrendingUp, text: "Le prix passera à 147€ le 1er juillet", color: "text-amber-400" },
   { icon: Users, text: "Rejoignez +5000 auteurs satisfaits", color: "text-emerald-400" },
   { icon: ShieldCheck, text: "Garantie 30 jours — 0 risque pour vous", color: "text-cyan-400" },
   { icon: Zap, text: "Votre 1er ebook publié ce soir sur Amazon", color: "text-violet-400" },

@@ -973,7 +973,7 @@ Vous maîtrisez maintenant EbookStudio Pro. Vous avez toutes les clés pour cré
 - ✅ Support par email
 - ✅ Pas d'abonnement mensuel
 
-### Prix de lancement : 67€ (au lieu de 197€)
+### Prix de lancement : 67€ (au lieu de 147€)
 
 ### Garantie 30 jours :
 Si vous n'êtes pas satisfait, remboursement intégral sans questions.

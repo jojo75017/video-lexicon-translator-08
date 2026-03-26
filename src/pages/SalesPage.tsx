@@ -40,7 +40,7 @@ const stagger = {
 
 // Prix
 const LAUNCH_PRICE = 67;
-const NORMAL_PRICE = 197;
+const NORMAL_PRICE = 147;
 const LAUNCH_END = new Date('2026-06-30T23:59:59').getTime();
 
 const useCountdown = (targetDate: number) => {
@@ -566,7 +566,7 @@ const SalesPage = () => {
                     "Azure Neural — audiobooks premium",
                     "P15 Humanisation Anti-IA",
                     "Export PDF / EPUB / Word",
-                    "🎓 Formation 18 modules (197€ offerts)",
+                    "🎓 Formation 18 modules (147€ offerts)",
                     "SEO Amazon automatisé",
                     "Traduction 30+ langues",
                     "Mises à jour gratuites à vie",
@@ -595,8 +595,8 @@ const SalesPage = () => {
                   <p className="text-center text-white/60 text-sm mb-4">Ou payez en plusieurs fois</p>
                   <div className="grid grid-cols-2 gap-4">
                     {[
-                      { label: "En 3 fois", price: "33€/mois" },
-                      { label: "En 5 fois", price: "20€/mois" },
+                      { label: "En 2 fois", price: "35€/mois" },
+                      { label: "En 3 fois", price: "25€/mois" },
                     ].map((opt, i) => (
                       <button key={i} onClick={handlePlanClick}
                         className="p-4 rounded-xl border border-slate-800 hover:border-cyan-500/50 transition-colors text-center group">
