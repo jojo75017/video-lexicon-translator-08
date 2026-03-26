@@ -228,6 +228,7 @@ const categories: Category[] = [
     emoji: '🔍',
     color: 'from-cyan-500 to-teal-500',
     items: [
+      { id: 'kdp-amazon-research', label: 'Recherche KDP Amazon', icon: Search, isNew: true },
       { id: 'niche-analysis', label: 'Analyse de Niche', icon: Search, isNew: true },
       { id: 'kdp-research', label: 'Recherche Niche', icon: Search },
       { id: 'competitor-dashboard', label: 'Tableau Concurrentiel', icon: Search, isNew: true },
