@@ -27,6 +27,7 @@ export const EbookFinalDiagnosis: React.FC = () => {
   const [author, setAuthor] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [diagnosis, setDiagnosis] = useState<Diagnosis | null>(null);
+  const { apiKey: userGeminiKey } = useOpenAIConfig();
 
   const handleDiagnose = async () => {
     if (!title.trim()) {

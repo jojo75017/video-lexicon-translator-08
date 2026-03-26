@@ -39,6 +39,7 @@ export const EbookCompetitorDashboard: React.FC = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [competitors, setCompetitors] = useState<CompetitorBook[]>([]);
   const [analysis, setAnalysis] = useState<NicheAnalysis | null>(null);
+  const { apiKey: userGeminiKey } = useOpenAIConfig();
 
   const analyzeNiche = async () => {
     if (!niche.trim()) { toast.error('Entrez une niche à analyser'); return; }

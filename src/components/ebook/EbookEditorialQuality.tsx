@@ -37,6 +37,7 @@ export const EbookEditorialQuality: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [analysis, setAnalysis] = useState<QualityAnalysis | null>(null);
   const [hasAutoLoadedContent, setHasAutoLoadedContent] = useState(false);
+  const { apiKey: userGeminiKey } = useOpenAIConfig();
   
   const { getStepResult, hasStepResult } = useWorkflowResults();
 
