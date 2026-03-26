@@ -47,7 +47,7 @@ Mon secret ? Un générateur d'ebooks propulsé par l'IA (Gemini 3 Flash).
 Coût par ebook : ~0,30€
 
 🆓 Démo gratuite : ${DEMO_LINK}
-💰 Offre Fondateur 97€ : ${OFFRES_LINK}
+💰 Offre Fondateur 67€ : ${OFFRES_LINK}
 📌 Ma page : ${FACEBOOK_PAGE}
 
 Questions en commentaire ! 👇`,
@@ -171,7 +171,7 @@ Vous avez un livre en vous.
 
 Publier des ebooks sur Amazon KDP.
 
-💰 Investissement : 97€ + ~0,30€/livre
+💰 Investissement : 67€ + ~0,30€/livre
 📈 Potentiel : 500€ à 5000€/mois passifs
 ⏱️ Temps/livre : 47 minutes
 📚 Pas de stock, pas de SAV

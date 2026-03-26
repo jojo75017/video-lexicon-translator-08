@@ -72,7 +72,7 @@ Ce qui a changé ? J'ai construit un outil. Un vrai générateur d'ebooks propul
 
 Pas de carte bancaire, pas d'engagement.
 
-L'offre Fondateur à 97€ ne durera pas éternellement.
+L'offre Fondateur à 67€ ne durera pas éternellement.
 
 À vous de jouer,
 Georges
@@ -120,8 +120,8 @@ EbookStudio Pro 2026 inclut :
 📊 Dashboard marketing complet
 📧 Système email marketing inclus
 
-Le tout à 97€ (paiement unique).
-Ou en facilités : 3×35€ ou 5×22€.
+Le tout à 67€ (paiement unique).
+Ou en facilités : 3×23€ ou 5×14€.
 
 👉 Accéder à l'offre Fondateur : ${OFFRES_LINK}
 
@@ -139,12 +139,12 @@ Après ? Le prix passe à 197€.
 
 🧮 Ce que vous obtenez (valeur 749€) :
 - Générateur IA illimité (197€)
-- Créateur de couvertures (97€)
+- Créateur de couvertures (67€)
 - Convertisseur livre audio (147€)
-- Dashboard marketing (97€)
-- Outils réseaux sociaux (67€)
-- Templates email (47€)
-- Optimisateur KDP (97€)
+- Dashboard marketing (67€)
+- Outils réseaux sociaux (47€)
+- Templates email (37€)
+- Optimisateur KDP (67€)
 
 Votre prix aujourd'hui : 67€ (-66%)
 💳 Ou 3×23€ / 5×14€
