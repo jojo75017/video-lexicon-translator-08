@@ -62,7 +62,8 @@ import {
   CalendarDays,
   Contact,
   Mail,
-  Code
+  Code,
+  Activity
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -199,6 +200,7 @@ const categories: Category[] = [
       { id: 'chapter-word-count', label: 'Mots par Chapitre', icon: BarChart3, isNew: true },
       { id: 'kindle-preview', label: 'Prévisualisation Kindle', icon: Monitor, isNew: true },
       { id: 'consistency-detector', label: 'Détecteur Cohérence', icon: Search, isNew: true },
+      { id: 'rhythm-analyzer', label: 'Analyseur Rythme', icon: Activity, isNew: true },
       { id: 'ai-detector', label: 'Détecteur Anti-IA', icon: Shield, isNew: true },
       { id: 'humanizer', label: 'Humaniseur IA', icon: Shield, isNew: true },
       { id: 'plagiarism-validator', label: 'Anti-Plagiat', icon: Shield, isNew: true },
@@ -302,6 +304,7 @@ const categories: Category[] = [
       { id: 'marketing-plan', label: 'Plan Marketing', icon: TrendingUp, isLink: true, href: '/plan-marketing', isNew: true },
       { id: 'blog', label: 'Blog SEO', icon: FileText, isLink: true, href: '/blog' },
       { id: 'monetization', label: 'Monétisation', icon: DollarSign, isNew: true },
+      { id: 'kdp-revenue-simulator', label: 'Simulateur Revenus KDP', icon: DollarSign, isNew: true },
       { id: 'royalty-dashboard', label: 'Dashboard Revenus', icon: DollarSign, isNew: true },
       { id: 'direct-sales', label: 'Vente Directe', icon: DollarSign, isNew: true },
       { id: 'arc-manager', label: 'Gestionnaire ARC', icon: Users, isNew: true },

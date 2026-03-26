@@ -176,6 +176,8 @@ import { EbookKindlePreview } from '@/components/ebook/EbookKindlePreview';
 import { EbookAutoSaveIndicator } from '@/components/ebook/EbookAutoSaveIndicator';
 import { EbookConsistencyDetector } from '@/components/ebook/EbookConsistencyDetector';
 import { EbookFloatingAIEditor } from '@/components/ebook/EbookFloatingAIEditor';
+import { EbookRhythmAnalyzer } from '@/components/ebook/EbookRhythmAnalyzer';
+import { EbookKdpRevenueSimulator } from '@/components/ebook/EbookKdpRevenueSimulator';
 
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
 import { ebookTemplates } from '@/data/ebookTemplates';
@@ -1300,6 +1302,21 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           <EbookConsistencyDetector
             chapters={chapters}
             characters={characters as any}
+          />
+        );
+
+      case 'rhythm-analyzer':
+        return (
+          <EbookRhythmAnalyzer
+            chapters={chapters}
+            ebookTitle={ebookTitle}
+          />
+        );
+
+      case 'kdp-revenue-simulator':
+        return (
+          <EbookKdpRevenueSimulator
+            ebookTitle={ebookTitle}
           />
         );
 
