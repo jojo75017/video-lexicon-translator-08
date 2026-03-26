@@ -1513,10 +1513,10 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               {/* Quick Stats — 2026 Glass Cards */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {[
-                  { label: 'Chapitres', value: chapters.length, icon: BookOpen, color: 'hsl(262,83%,58%)' },
-                  { label: 'Personnages', value: characters.length, icon: Users, color: 'hsl(189,94%,43%)' },
-                  { label: 'Images', value: ebookImages.length, icon: Palette, color: 'hsl(38,92%,50%)' },
-                  { label: 'Mots', value: chapters.reduce((acc, c) => acc + (c.content?.split(' ').length || 0) + c.subChapters.reduce((subAcc, sc) => subAcc + (sc.content?.split(' ').length || 0), 0), 0), icon: FileText, color: 'hsl(160,84%,39%)' },
+                  { label: 'Chapitres', value: chapters.length, icon: BookOpen, color: '#3B9EFF' },
+                  { label: 'Personnages', value: characters.length, icon: Users, color: '#0052CC' },
+                  { label: 'Images', value: ebookImages.length, icon: Palette, color: '#3B9EFF' },
+                  { label: 'Mots', value: chapters.reduce((acc, c) => acc + (c.content?.split(' ').length || 0) + c.subChapters.reduce((subAcc, sc) => subAcc + (sc.content?.split(' ').length || 0), 0), 0), icon: FileText, color: '#0052CC' },
                 ].map((stat, i) => (
                   <div 
                     key={i} 
@@ -1545,7 +1545,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                     <CardHeader className="bg-gradient-to-r from-primary/5 to-accent/5 border-b border-border/30">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="w-11 h-11 rounded-xl bg-primary flex items-center justify-center shadow-lg" style={{ boxShadow: '0 8px 25px -5px hsl(262 83% 58% / 0.4)' }}>
+                          <div className="w-11 h-11 rounded-xl bg-primary flex items-center justify-center shadow-lg" style={{ boxShadow: '0 8px 25px -5px rgba(59,158,255,0.4)' }}>
                             <BookOpen className="w-5 h-5 text-primary-foreground" />
                           </div>
                           <div>
@@ -1572,7 +1572,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                             placeholder="Mon Ebook Extraordinaire"
                             value={ebookTitle}
                             onChange={(e) => setEbookTitle(e.target.value)}
-                            className="h-12 text-lg border-2 focus:border-violet-500 transition-colors"
+                            className="h-12 text-lg border-2 focus:border-primary transition-colors"
                             data-tutorial="title-input"
                           />
                         </div>
@@ -1582,7 +1582,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                             placeholder="Votre nom"
                             value={authorName}
                             onChange={(e) => setAuthorName(e.target.value)}
-                            className="h-12 text-lg border-2 focus:border-violet-500 transition-colors"
+                            className="h-12 text-lg border-2 focus:border-primary transition-colors"
                           />
                         </div>
                       </div>
