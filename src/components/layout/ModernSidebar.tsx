@@ -195,6 +195,9 @@ const categories: Category[] = [
     color: 'from-emerald-500 to-green-500',
     items: [
       { id: 'manuscript-dashboard', label: 'Dashboard Manuscrit', icon: BarChart3, isNew: true },
+      { id: 'readability-analyzer', label: 'Analyseur Lisibilité', icon: BookOpen, isNew: true },
+      { id: 'chapter-word-count', label: 'Mots par Chapitre', icon: BarChart3, isNew: true },
+      { id: 'kindle-preview', label: 'Prévisualisation Kindle', icon: Monitor, isNew: true },
       { id: 'ai-detector', label: 'Détecteur Anti-IA', icon: Shield, isNew: true },
       { id: 'humanizer', label: 'Humaniseur IA', icon: Shield, isNew: true },
       { id: 'plagiarism-validator', label: 'Anti-Plagiat', icon: Shield, isNew: true },
