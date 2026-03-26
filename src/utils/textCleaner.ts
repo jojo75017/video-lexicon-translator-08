@@ -3,6 +3,8 @@
  * Supprime les artefacts JSON/échappement indésirables
  */
 
+import { applyFrenchTypography } from './frenchTypography';
+
 /**
  * Nettoie le texte généré pour supprimer les artefacts d'échappement JSON
  * @param text Le texte à nettoyer
@@ -181,6 +183,15 @@ export function cleanGeneratedText(text: string): string {
     .trim();
 
   return cleaned;
+}
+
+/**
+ * Nettoie le texte ET applique la typographie française professionnelle.
+ * À utiliser pour les exports (DOCX, EPUB, PDF).
+ */
+export function cleanAndTypographize(text: string): string {
+  const cleaned = cleanGeneratedText(text);
+  return applyFrenchTypography(cleaned);
 }
 
 /**
