@@ -189,6 +189,26 @@ export const KdpAmazonResearch: React.FC = () => {
     }
   };
 
+  // ——— Book Audit ———
+  const handleAudit = async () => {
+    if (!bookData) return;
+    setIsAuditing(true);
+    setAuditData(null);
+    try {
+      const { data, error } = await supabase.functions.invoke('kdp-book-audit', {
+        body: { bookData },
+      });
+      if (error) throw new Error(error.message);
+      if (!data?.success) throw new Error(data?.error || 'Erreur d\'audit');
+      setAuditData(data.data);
+      toast.success('Audit terminé !');
+    } catch (err: any) {
+      toast.error(err.message || 'Erreur lors de l\'audit');
+    } finally {
+      setIsAuditing(false);
+    }
+  };
+
   const copyText = (text: string) => {
     navigator.clipboard.writeText(text);
     toast.success('Copié !');
