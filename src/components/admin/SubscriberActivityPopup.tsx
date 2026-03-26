@@ -112,7 +112,7 @@ export const SubscriberActivityPopup: React.FC = () => {
 
   const getPlanBadge = (planType: string, planTier: string) => {
     if (planTier === 'vip') {
-      return <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[10px]">VIP 97€</Badge>;
+      return <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[10px]">VIP 67€</Badge>;
     }
     if (planType === 'lifetime') {
       return <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-[10px]">Lifetime</Badge>;
@@ -199,7 +199,7 @@ export const SubscriberActivityPopup: React.FC = () => {
                   <Crown className="w-4 h-4" />
                   {vipCount}
                 </div>
-                <div className="text-xs text-amber-300/70">VIP (97€)</div>
+                <div className="text-xs text-amber-300/70">VIP (67€)</div>
               </div>
             </div>
 

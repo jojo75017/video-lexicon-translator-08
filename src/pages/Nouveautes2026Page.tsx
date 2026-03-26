@@ -300,9 +300,9 @@ export default function Nouveautes2026Page() {
             <h2 className="text-2xl font-bold mb-3">Tout cet arsenal — Accès à vie</h2>
             <div className="flex items-center justify-center gap-3 mb-4">
               <span className="text-muted-foreground line-through text-lg">247€</span>
-              <span className="text-5xl font-black text-primary">97€</span>
+              <span className="text-5xl font-black text-primary">67€</span>
             </div>
-            <p className="text-sm text-muted-foreground mb-2">ou 3×35€ · ou 5×22€</p>
+            <p className="text-sm text-muted-foreground mb-2">ou 3×23€ · ou 5×14€</p>
             <p className="text-sm text-muted-foreground mb-8">
               <CheckCircle2 className="w-4 h-4 inline mr-1 text-accent" />
               30 jours satisfait ou remboursé · Clé Gemini gratuite · ~0,30€ par ebook
