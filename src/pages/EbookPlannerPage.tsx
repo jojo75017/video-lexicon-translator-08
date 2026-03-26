@@ -174,6 +174,8 @@ import { EbookReadabilityAnalyzer } from '@/components/ebook/EbookReadabilityAna
 import { EbookChapterWordCount } from '@/components/ebook/EbookChapterWordCount';
 import { EbookKindlePreview } from '@/components/ebook/EbookKindlePreview';
 import { EbookAutoSaveIndicator } from '@/components/ebook/EbookAutoSaveIndicator';
+import { EbookConsistencyDetector } from '@/components/ebook/EbookConsistencyDetector';
+import { EbookFloatingAIEditor } from '@/components/ebook/EbookFloatingAIEditor';
 
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
 import { ebookTemplates } from '@/data/ebookTemplates';
@@ -207,7 +209,8 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       (subscriberData?.status === 'active' || subscriberData?.plan_type === 'lifetime'));
 
   const isDemo = isDemoProp || !hasValidSubscriber;
-  
+  const contentContainerRef = useRef<HTMLDivElement>(null);
+
   const STORAGE_KEY = 'ebook-planner-autosave';
   
   const loadSavedData = () => {
@@ -1289,6 +1292,14 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             chapters={chapters}
             preface={preface}
             conclusion={conclusion}
+          />
+        );
+
+      case 'consistency-detector':
+        return (
+          <EbookConsistencyDetector
+            chapters={chapters}
+            characters={characters as any}
           />
         );
 
@@ -3509,7 +3520,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
         </div>
 
         {/* Content */}
-        <div className="container mx-auto px-6 py-8">
+        <div ref={contentContainerRef} className="container mx-auto px-6 py-8">
           <DemoBanner 
             plansGenerated={demoLimits.plansGenerated} 
             maxPlans={demoLimits.maxPlansInDemo} 
@@ -3525,6 +3536,23 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           </div>
           {renderContent()}
         </div>
+
+        {/* Floating AI Editor */}
+        <EbookFloatingAIEditor
+          containerRef={contentContainerRef}
+          onReplaceText={(original, replacement) => {
+            // Replace text in all chapters
+            const updatedChapters = chapters.map(ch => {
+              let newContent = ch.content?.replace(original, replacement) || ch.content;
+              const newSubChapters = ch.subChapters.map(sc => ({
+                ...sc,
+                content: sc.content?.replace(original, replacement) || sc.content,
+              }));
+              return { ...ch, content: newContent, subChapters: newSubChapters };
+            });
+            setChapters(updatedChapters);
+          }}
+        />
       </main>
 
       {/* Tutoriel interactif */}

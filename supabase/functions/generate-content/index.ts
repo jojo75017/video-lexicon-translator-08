@@ -92,6 +92,19 @@ serve(async (req) => {
     const { email, actionType, prompt, numberOfChapters, ebookTitle, authorName, apiKey, type, content, openaiApiKey, useOpenAI, maxTokens } = body;
     console.log('Content generation request:', { email, actionType, type });
 
+    // ====== FLOATING AI EDIT ======
+    if (type === 'floating-ai-edit') {
+      console.log('Processing floating AI edit...');
+      const instruction = body.instruction || 'Reformule ce texte.';
+      const res = await callGemini(
+        `Tu es un éditeur littéraire expert. L'utilisateur va te donner un extrait de texte et une instruction. Applique l'instruction et retourne UNIQUEMENT le texte modifié, sans explication, sans guillemets, sans préfixe.`,
+        `Instruction: ${instruction}\n\nTexte à modifier:\n${content}`,
+        { maxOutputTokens: 2000, temperature: 0.8 }
+      );
+      if (res.error) return geminiError(res);
+      return jsonSuccess({ content: res.text.trim() });
+    }
+
     // ====== KDP ANALYTICS ======
     if (type === 'kdp-analytics') {
       console.log('Processing KDP analytics (Gemini)...');
