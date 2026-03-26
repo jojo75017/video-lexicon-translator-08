@@ -112,6 +112,7 @@ export const KdpAmazonResearch: React.FC = () => {
 
     setIsLoading(true);
     setBookData(null);
+    setAuditData(null);
     try {
       const result = await callScraper({ mode: 'asin', asin: targetAsin, marketplace });
       setAsinInput(targetAsin);
