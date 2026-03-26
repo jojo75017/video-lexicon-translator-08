@@ -434,6 +434,12 @@ const EbookLaunchPlan: React.FC = () => {
         </CardContent>
       </Card>
     </div>
+      </TabsContent>
+
+      <TabsContent value="social">
+        <EbookLaunchSocialPosts />
+      </TabsContent>
+    </Tabs>
   );
 };
 
