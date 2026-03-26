@@ -32,10 +32,10 @@ interface Invoice {
 }
 
 const invoices: Invoice[] = [
-  { id: 'INV-001', date: '1 Jan 2024', amount: '97€', status: 'payée' },
-  { id: 'INV-002', date: '1 Déc 2023', amount: '97€', status: 'payée' },
-  { id: 'INV-003', date: '1 Nov 2023', amount: '97€', status: 'payée' },
-  { id: 'INV-004', date: '1 Oct 2023', amount: '97€', status: 'payée' },
+  { id: 'INV-001', date: '1 Jan 2024', amount: '67€', status: 'payée' },
+  { id: 'INV-002', date: '1 Déc 2023', amount: '67€', status: 'payée' },
+  { id: 'INV-003', date: '1 Nov 2023', amount: '67€', status: 'payée' },
+  { id: 'INV-004', date: '1 Oct 2023', amount: '67€', status: 'payée' },
 ];
 
 interface PlanFeature {
@@ -113,7 +113,7 @@ export const SaasBilling: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="space-y-2">
               <p className="text-sm text-muted-foreground">Coût</p>
-              <p className="text-2xl font-bold">97€<span className="text-sm font-normal text-muted-foreground"> unique</span></p>
+              <p className="text-2xl font-bold">67€<span className="text-sm font-normal text-muted-foreground"> unique</span></p>
             </div>
             <div className="space-y-2">
               <p className="text-sm text-muted-foreground">Date d'achat</p>
@@ -251,7 +251,7 @@ export const SaasBilling: React.FC = () => {
                 Pro
               </CardTitle>
               <div className="mt-4">
-                <span className="text-4xl font-bold">97€</span>
+                <span className="text-4xl font-bold">67€</span>
                 <span className="text-muted-foreground"> unique</span>
               </div>
               <CardDescription>Pour les équipes en croissance</CardDescription>

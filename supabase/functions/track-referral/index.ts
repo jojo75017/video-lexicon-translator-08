@@ -113,8 +113,8 @@ Deno.serve(async (req) => {
         });
       }
 
-      // Determine sale amount from request body (default 97€ Pro Lifetime)
-      const { sale_amount: saleAmount = 97 } = await req.json().catch(() => ({ sale_amount: 97 }));
+      // Determine sale amount from request body (default 67€ Pro Lifetime)
+      const { sale_amount: saleAmount = 67 } = await req.json().catch(() => ({ sale_amount: 67 }));
 
       // Get referrer's current converted count to determine commission tier
       const { data: referral } = await supabase

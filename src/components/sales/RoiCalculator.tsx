@@ -92,7 +92,7 @@ const RoiCalculator = () => {
         <div className="p-4 rounded-xl bg-gradient-to-r from-cyan-500/10 to-emerald-500/10 border border-cyan-500/20">
           <p className="text-sm text-white/90 text-center leading-relaxed">
             À <strong className="text-cyan-400">{ebooksPerMonth[0]} ebook{ebooksPerMonth[0] > 1 ? 's' : ''}/mois</strong>, 
-            votre investissement de <strong>97€</strong> est rentabilisé dès le <strong className="text-emerald-400">{paybackBooks}ème ebook vendu</strong>.
+            votre investissement de <strong>67€</strong> est rentabilisé dès le <strong className="text-emerald-400">{paybackBooks}ème ebook vendu</strong>.
             <br />
             Profit net estimé sur 12 mois : <strong className="text-amber-400">{netProfit.toLocaleString('fr-FR')}€</strong>
           </p>

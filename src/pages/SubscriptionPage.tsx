@@ -385,7 +385,7 @@ const SubscriptionPage = ({ subscriberEmail, subscriberData, onLogout }: Subscri
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
                   <LifetimeBadge size="md" />
-                  <Badge variant="outline">97€</Badge>
+                  <Badge variant="outline">67€</Badge>
                 </div>
                 <ul className="space-y-2 text-sm">
                   <li>✅ Ebooks illimités</li>
@@ -411,7 +411,7 @@ const SubscriptionPage = ({ subscriberEmail, subscriberData, onLogout }: Subscri
                     </p>
                     <Button onClick={() => navigate('/offres')} className="w-full">
                       <ArrowRight className="w-4 h-4 mr-2" />
-                      Accéder à l'offre 97€
+                      Accéder à l'offre 67€
                     </Button>
                   </>
                 )}

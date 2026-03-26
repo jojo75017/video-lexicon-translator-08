@@ -112,7 +112,7 @@ const SalesPage = () => {
   useEffect(() => {
     document.title = "EbookStudio Pro 2026 — Créez des ebooks professionnels avec l'IA";
     const meta = document.querySelector('meta[name="description"]');
-    if (meta) meta.setAttribute("content", "Workflow IA complet pour créer et publier des ebooks sur Amazon KDP. Gemini 3 Flash, couvertures IA, audiobooks. 97€ à vie.");
+    if (meta) meta.setAttribute("content", "Workflow IA complet pour créer et publier des ebooks sur Amazon KDP. Gemini 3 Flash, couvertures IA, audiobooks. 67€ à vie.");
   }, []);
 
   useEffect(() => {
@@ -139,10 +139,10 @@ const SalesPage = () => {
   return (
     <div className="min-h-screen bg-slate-950 text-white overflow-x-hidden">
       <Helmet>
-        <title>EbookStudio Pro — Créez des Ebooks avec l'IA | 97€ à Vie</title>
-        <meta name="description" content="Créez un ebook complet en moins d'une heure avec l'IA. Plan structuré, rédaction, couverture, audiobook et export KDP. Accès à vie pour 97€." />
+        <title>EbookStudio Pro — Créez des Ebooks avec l'IA | 67€ à Vie</title>
+        <meta name="description" content="Créez un ebook complet en moins d'une heure avec l'IA. Plan structuré, rédaction, couverture, audiobook et export KDP. Accès à vie pour 67€." />
         <meta property="og:title" content="EbookStudio Pro — Créez des Ebooks avec l'IA" />
-        <meta property="og:description" content="Générez des ebooks professionnels avec l'IA : plan, rédaction, couverture, audiobook. 97€ accès à vie." />
+        <meta property="og:description" content="Générez des ebooks professionnels avec l'IA : plan, rédaction, couverture, audiobook. 67€ accès à vie." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://video-lexicon-translator-08.lovable.app/offres" />
         <link rel="canonical" href="https://video-lexicon-translator-08.lovable.app/offres" />
@@ -197,7 +197,7 @@ const SalesPage = () => {
 
           <Button onClick={scrollToPricing} className="bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold rounded-xl px-5">
             <Sparkles className="w-4 h-4 mr-2" />
-            97€ à vie
+            67€ à vie
           </Button>
         </div>
       </header>
@@ -252,7 +252,7 @@ const SalesPage = () => {
             <Button size="lg" onClick={handlePlanClick}
               className="w-full sm:w-auto text-lg px-10 py-7 bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-900 font-bold rounded-2xl shadow-2xl shadow-cyan-500/25 hover:shadow-cyan-500/40 transition-all duration-300 hover:-translate-y-1">
               <Rocket className="w-5 h-5 mr-2" />
-              Commencer — 97€ à vie
+              Commencer — 67€ à vie
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
             <Button size="lg" variant="outline" onClick={() => navigate('/demo')}

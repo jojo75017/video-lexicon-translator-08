@@ -42,7 +42,7 @@ const SeoGenerateurEbookPage: React.FC = () => {
 
   const comparisons = [
     { feature: "Temps de création", traditional: "3-6 mois", ebookiapro: "24-48 heures" },
-    { feature: "Coût ghostwriter", traditional: "2000-5000€", ebookiapro: "97€ (à vie)" },
+    { feature: "Coût ghostwriter", traditional: "2000-5000€", ebookiapro: "67€ (à vie)" },
     { feature: "Couverture pro", traditional: "150-500€", ebookiapro: "Inclus" },
     { feature: "Optimisation KDP", traditional: "Formation 300€+", ebookiapro: "Automatique" },
     { feature: "Corrections & relecture", traditional: "500-1500€", ebookiapro: "IA intégrée" },

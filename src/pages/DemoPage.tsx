@@ -199,7 +199,7 @@ const DemoPage = () => {
           </div>
           <Button onClick={() => navigate('/offres')} className="bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold rounded-xl px-5">
             <Sparkles className="w-4 h-4 mr-2" />
-            97€ à vie
+            67€ à vie
           </Button>
         </div>
       </header>
@@ -372,7 +372,7 @@ const DemoPage = () => {
                       onClick={() => navigate("/offres")}
                     >
                       <Crown className="w-5 h-5 mr-2" />
-                      Débloquer tout pour 97€ à vie
+                      Débloquer tout pour 67€ à vie
                     </Button>
                   </div>
                 )}
@@ -551,7 +551,7 @@ const DemoPage = () => {
                       </div>
                       <div className="flex-1">
                         <h3 className="font-bold text-xl text-white mb-1">Passez à la version complète</h3>
-                        <p className="text-slate-400 text-sm mb-4">Accès à vie pour 97€ — pas d'abonnement, pas de limites</p>
+                        <p className="text-slate-400 text-sm mb-4">Accès à vie pour 67€ — pas d'abonnement, pas de limites</p>
                         <div className="grid sm:grid-cols-2 gap-2 mb-4">
                           {[
                             "✍️ Rédaction complète des chapitres",
@@ -570,7 +570,7 @@ const DemoPage = () => {
                           onClick={() => navigate('/offres')}
                         >
                           <Rocket className="w-5 h-5 mr-2" />
-                          Accéder à tout pour 97€
+                          Accéder à tout pour 67€
                           <ArrowRight className="w-5 h-5 ml-2" />
                         </Button>
                       </div>
@@ -642,7 +642,7 @@ const DemoPage = () => {
                         { name: "Marie L.", text: "J'ai publié mon premier ebook en 3 jours grâce à cet outil. Les mots-clés KDP m'ont permis d'avoir 15 ventes dès la première semaine.", rating: 5 },
                         { name: "Thomas B.", text: "Impressionnant. Le plan généré était tellement bien structuré que je n'ai eu qu'à rédiger les chapitres. Un gain de temps énorme.", rating: 5 },
                         { name: "Sophie R.", text: "La fonctionnalité audiobook est incroyable. Mon ebook se vend à la fois en format écrit et audio sur Amazon.", rating: 5 },
-                        { name: "Julien M.", text: "J'ai testé la démo et j'ai été convaincu en 30 secondes. L'investissement de 97€ est rentabilisé dès le premier ebook vendu.", rating: 5 },
+                        { name: "Julien M.", text: "J'ai testé la démo et j'ai été convaincu en 30 secondes. L'investissement de 67€ est rentabilisé dès le premier ebook vendu.", rating: 5 },
                       ].map((review, i) => (
                         <div key={i} className="bg-slate-800/30 rounded-xl p-4 border border-slate-800/50">
                           <div className="flex items-center gap-1 mb-2">
@@ -707,7 +707,7 @@ const DemoPage = () => {
               { q: "La démo est-elle vraiment gratuite ?", a: "Oui, 100% gratuit. Vous pouvez générer 1 plan complet de 3 chapitres sans carte bancaire ni inscription. L'IA structure votre ebook avec chapitres, sous-sections et mots-clés Amazon KDP." },
               { q: "Quelle est la qualité du contenu généré ?", a: "Notre IA utilise les derniers modèles de langage (Gemini 3 Flash) pour produire du contenu professionnel, structuré et optimisé pour le marché Amazon KDP." },
               { q: "Combien de temps faut-il pour créer un ebook complet ?", a: "Avec la version complète, un ebook de 10 chapitres peut être entièrement rédigé, illustré et exporté en PDF/EPUB en moins de 60 minutes." },
-              { q: "Est-ce que 97€ c'est un paiement unique ?", a: "Oui, c'est un accès à vie. Pas d'abonnement, pas de frais cachés. Vous payez une fois et vous générez autant d'ebooks que vous voulez, pour toujours." },
+              { q: "Est-ce que 67€ c'est un paiement unique ?", a: "Oui, c'est un accès à vie. Pas d'abonnement, pas de frais cachés. Vous payez une fois et vous générez autant d'ebooks que vous voulez, pour toujours." },
               { q: "Puis-je vendre les ebooks créés ?", a: "Absolument. Vous êtes propriétaire de tout le contenu généré. Vous pouvez le publier sur Amazon KDP, le vendre sur votre site, ou le distribuer comme bon vous semble." },
               { q: "L'audiobook est-il inclus ?", a: "Oui, la version complète inclut la génération d'audiobooks avec des voix neurales Azure ultra-réalistes. Vous pouvez vendre votre livre en format audio sur Audible/Amazon." },
             ].map((faq, i) => (
@@ -740,7 +740,7 @@ const DemoPage = () => {
               onClick={() => navigate('/offres')}
             >
               <Crown className="w-5 h-5 mr-2" />
-              Débloquer tout pour 97€
+              Débloquer tout pour 67€
             </Button>
             <p className="text-xs text-slate-600">Paiement unique • Accès à vie • Garantie 30 jours</p>
           </div>

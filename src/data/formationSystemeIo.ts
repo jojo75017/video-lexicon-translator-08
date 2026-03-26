@@ -973,7 +973,7 @@ Vous maîtrisez maintenant EbookStudio Pro. Vous avez toutes les clés pour cré
 - ✅ Support par email
 - ✅ Pas d'abonnement mensuel
 
-### Prix de lancement : 97€ (au lieu de 247€)
+### Prix de lancement : 67€ (au lieu de 197€)
 
 ### Garantie 30 jours :
 Si vous n'êtes pas satisfait, remboursement intégral sans questions.
@@ -989,7 +989,7 @@ R : Oui, vous utilisez votre propre clé Gemini 3 Flash (gratuite). Un guide vid
 R : Illimité avec l'accès Lifetime.
 
 **Q : Y a-t-il des frais cachés ?**
-R : Non, 97€ une seule fois, accès à vie.
+R : Non, 67€ une seule fois, accès à vie.
 
 **Q : Le support est-il inclus ?**
 R : Oui, par email et dans l'outil.
