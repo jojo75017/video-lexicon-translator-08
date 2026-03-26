@@ -93,8 +93,10 @@ export default {
       },
       fontFamily: {
         'sans': ['Inter', 'system-ui', 'sans-serif'],
-        'display': ['Cal Sans', 'Inter', 'system-ui', 'sans-serif'],
+        'display': ['Playfair Display', 'serif'],
         'mono': ['JetBrains Mono', 'monospace'],
+        'serif': ['Playfair Display', 'serif'],
+        'body': ['Inter', 'system-ui', 'sans-serif'],
       },
       boxShadow: {
         'glow': 'var(--shadow-glow)',
