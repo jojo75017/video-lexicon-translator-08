@@ -304,7 +304,7 @@ const categories: Category[] = [
       { id: 'marketing-plan', label: 'Plan Marketing', icon: TrendingUp, isLink: true, href: '/plan-marketing', isNew: true },
       { id: 'blog', label: 'Blog SEO', icon: FileText, isLink: true, href: '/blog' },
       { id: 'monetization', label: 'Monétisation', icon: DollarSign, isNew: true },
-      { id: 'kdp-revenue-simulator', label: 'Simulateur Revenus KDP', icon: Calculator, isNew: true },
+      { id: 'kdp-revenue-simulator', label: 'Simulateur Revenus KDP', icon: DollarSign, isNew: true },
       { id: 'royalty-dashboard', label: 'Dashboard Revenus', icon: DollarSign, isNew: true },
       { id: 'direct-sales', label: 'Vente Directe', icon: DollarSign, isNew: true },
       { id: 'arc-manager', label: 'Gestionnaire ARC', icon: Users, isNew: true },
