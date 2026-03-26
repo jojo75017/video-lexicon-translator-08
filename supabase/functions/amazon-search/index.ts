@@ -5,124 +5,181 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-// PA-API 5.0 signing utilities
-async function hmacSHA256(key: Uint8Array, message: string): Promise<Uint8Array> {
-  const cryptoKey = await crypto.subtle.importKey(
-    "raw", key, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]
-  );
-  const sig = await crypto.subtle.sign("HMAC", cryptoKey, new TextEncoder().encode(message));
-  return new Uint8Array(sig);
-}
-
-async function sha256(message: string): Promise<string> {
-  const hash = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(message));
-  return [...new Uint8Array(hash)].map(b => b.toString(16).padStart(2, "0")).join("");
-}
-
-function toHex(arr: Uint8Array): string {
-  return [...arr].map(b => b.toString(16).padStart(2, "0")).join("");
-}
-
-async function getSignatureKey(key: string, dateStamp: string, region: string, service: string) {
-  let k = await hmacSHA256(new TextEncoder().encode("AWS4" + key), dateStamp);
-  k = await hmacSHA256(k, region);
-  k = await hmacSHA256(k, service);
-  k = await hmacSHA256(k, "aws4_request");
-  return k;
-}
-
-interface PaApiRequest {
-  operation: "SearchItems" | "GetItems" | "GetBrowseNodes";
-  payload: Record<string, unknown>;
-  marketplace?: string; // us, uk, de, fr
-}
-
-const MARKETPLACE_CONFIG: Record<string, { host: string; region: string }> = {
-  us: { host: "webservices.amazon.com", region: "us-east-1" },
-  uk: { host: "webservices.amazon.co.uk", region: "eu-west-1" },
-  de: { host: "webservices.amazon.de", region: "eu-west-1" },
-  fr: { host: "webservices.amazon.fr", region: "eu-west-1" },
-};
-
-async function callPaApi(accessKey: string, secretKey: string, partnerTag: string, request: PaApiRequest) {
-  const marketplace = request.marketplace || "fr";
-  const config = MARKETPLACE_CONFIG[marketplace] || MARKETPLACE_CONFIG.fr;
-  const host = config.host;
-  const region = config.region;
-  const service = "ProductAdvertisingAPI";
-  const path = "/paapi5/" + request.operation.toLowerCase();
-
-  const body: Record<string, unknown> = {
-    ...request.payload,
-    PartnerTag: partnerTag,
-    PartnerType: "Associates",
-    Marketplace: `www.amazon.${marketplace === "us" ? "com" : marketplace === "uk" ? "co.uk" : marketplace}`,
-  };
-
-  const bodyStr = JSON.stringify(body);
-  const now = new Date();
-  const amzDate = now.toISOString().replace(/[:\-]|\.\d{3}/g, "").slice(0, 15) + "Z";
-  const dateStamp = amzDate.slice(0, 8);
-
-  const headers: Record<string, string> = {
-    "content-type": "application/json; charset=utf-8",
-    host: host,
-    "x-amz-date": amzDate,
-    "x-amz-target": `com.amazon.paapi5.v1.ProductAdvertisingAPIv1.${request.operation}`,
-    "content-encoding": "amz-1.0",
-  };
-
-  // Canonical request
-  const signedHeaders = Object.keys(headers).sort().join(";");
-  const canonicalHeaders = Object.keys(headers).sort().map(k => `${k}:${headers[k]}\n`).join("");
-  const payloadHash = await sha256(bodyStr);
-  const canonicalRequest = `POST\n${path}\n\n${canonicalHeaders}\n${signedHeaders}\n${payloadHash}`;
-
-  const credentialScope = `${dateStamp}/${region}/${service}/aws4_request`;
-  const stringToSign = `AWS4-HMAC-SHA256\n${amzDate}\n${credentialScope}\n${await sha256(canonicalRequest)}`;
-
-  const signingKey = await getSignatureKey(secretKey, dateStamp, region, service);
-  const signature = toHex(await hmacSHA256(signingKey, stringToSign));
-
-  const authorization = `AWS4-HMAC-SHA256 Credential=${accessKey}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
-
-  const response = await fetch(`https://${host}${path}`, {
+async function firecrawlSearch(query: string, apiKey: string, limit = 10) {
+  const response = await fetch("https://api.firecrawl.dev/v1/search", {
     method: "POST",
     headers: {
-      ...headers,
-      Authorization: authorization,
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
     },
-    body: bodyStr,
+    body: JSON.stringify({
+      query,
+      limit,
+      scrapeOptions: { formats: ["markdown"] },
+    }),
   });
 
-  const data = await response.json();
   if (!response.ok) {
-    console.error("PA-API error:", JSON.stringify(data));
-    throw new Error(`PA-API ${response.status}: ${data?.Errors?.[0]?.Message || JSON.stringify(data)}`);
+    const err = await response.text();
+    throw new Error(`Firecrawl search failed (${response.status}): ${err}`);
   }
-  return data;
+  return await response.json();
 }
 
-function extractBookData(item: any) {
-  const info = item.ItemInfo || {};
-  const offers = item.Offers?.Listings?.[0] || {};
-  const browseNodes = item.BrowseNodeInfo?.BrowseNodes || [];
+async function firecrawlScrape(url: string, apiKey: string) {
+  const response = await fetch("https://api.firecrawl.dev/v1/scrape", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      url,
+      formats: ["markdown"],
+      onlyMainContent: true,
+    }),
+  });
+
+  if (!response.ok) {
+    const err = await response.text();
+    throw new Error(`Firecrawl scrape failed (${response.status}): ${err}`);
+  }
+  return await response.json();
+}
+
+function extractBsr(text: string): number | null {
+  // Match patterns like "Best Sellers Rank: #1,234" or "Classement des meilleures ventes : n°1 234"
+  const patterns = [
+    /Best\s*Sellers?\s*Rank[:\s]*#?([\d,.\s]+)/i,
+    /Classement.*meilleures\s*ventes[:\s]*n°?\s*([\d\s,.]+)/i,
+    /Amazon\s*Best\s*Sellers?\s*Rank[:\s]*#?([\d,.\s]+)/i,
+    /BSR[:\s]*#?([\d,.\s]+)/i,
+  ];
+  for (const p of patterns) {
+    const m = text.match(p);
+    if (m) {
+      const num = parseInt(m[1].replace(/[\s,.]/g, ""), 10);
+      if (!isNaN(num) && num > 0) return num;
+    }
+  }
+  return null;
+}
+
+function extractPrice(text: string): number | null {
+  // Match "9,99 €" or "€9.99" or "$12.99" or "9.99€"
+  const patterns = [
+    /([\d]+[,.][\d]{2})\s*€/,
+    /€\s*([\d]+[,.][\d]{2})/,
+    /\$([\d]+[,.][\d]{2})/,
+    /Prix[:\s]*([\d]+[,.][\d]{2})/i,
+    /Kindle[:\s]*([\d]+[,.][\d]{2})/i,
+  ];
+  for (const p of patterns) {
+    const m = text.match(p);
+    if (m) {
+      const num = parseFloat(m[1].replace(",", "."));
+      if (!isNaN(num) && num > 0 && num < 500) return num;
+    }
+  }
+  return null;
+}
+
+function extractRating(text: string): { rating: number | null; reviewCount: number | null } {
+  let rating: number | null = null;
+  let reviewCount: number | null = null;
+
+  // "4.5 out of 5 stars" or "4,5 sur 5 étoiles"
+  const ratingMatch = text.match(/([\d][,.][\d])\s*(?:out of|sur)\s*5/i);
+  if (ratingMatch) {
+    rating = parseFloat(ratingMatch[1].replace(",", "."));
+  }
+
+  // "1,234 ratings" or "1 234 évaluations" or "1.234 Bewertungen"
+  const reviewMatch = text.match(/([\d\s,.]+)\s*(?:ratings?|évaluations?|avis|Bewertungen|customer reviews)/i);
+  if (reviewMatch) {
+    reviewCount = parseInt(reviewMatch[1].replace(/[\s,.]/g, ""), 10);
+  }
+
+  return { rating, reviewCount };
+}
+
+function extractPages(text: string): number | null {
+  const m = text.match(/([\d]+)\s*(?:pages|Seiten)/i);
+  if (m) {
+    const n = parseInt(m[1], 10);
+    if (!isNaN(n) && n > 0 && n < 10000) return n;
+  }
+  return null;
+}
+
+function extractAsin(url: string): string | null {
+  const m = url.match(/\/(?:dp|gp\/product)\/([A-Z0-9]{10})/i);
+  return m ? m[1] : null;
+}
+
+function estimateDailySales(bsr: number | null): number {
+  if (!bsr || bsr <= 0) return 0;
+  if (bsr <= 100) return 50;
+  if (bsr <= 500) return 25;
+  if (bsr <= 1000) return 15;
+  if (bsr <= 5000) return 8;
+  if (bsr <= 10000) return 4;
+  if (bsr <= 50000) return 2;
+  if (bsr <= 100000) return 1;
+  return 0.5;
+}
+
+interface BookResult {
+  title: string;
+  author: string;
+  price: number | null;
+  bsr: number | null;
+  rating: number | null;
+  reviewCount: number | null;
+  pages: number | null;
+  estimatedDailySales: number;
+  asin: string | null;
+  imageUrl: string | null;
+  url: string | null;
+}
+
+function parseBookFromMarkdown(markdown: string, url: string): BookResult {
+  const lines = markdown.split("\n").filter(l => l.trim());
   
+  // Title: usually the first heading
+  let title = "N/A";
+  const titleMatch = markdown.match(/^#\s+(.+)/m);
+  if (titleMatch) title = titleMatch[1].trim();
+  else if (lines[0]) title = lines[0].replace(/^[#\s*]+/, "").trim();
+
+  // Author
+  let author = "Inconnu";
+  const authorMatch = markdown.match(/(?:by|de|par|Auteur)\s*[:\s]*([^\n|]+)/i);
+  if (authorMatch) author = authorMatch[1].trim().replace(/\[|\]/g, "").substring(0, 80);
+
+  const bsr = extractBsr(markdown);
+  const price = extractPrice(markdown);
+  const { rating, reviewCount } = extractRating(markdown);
+  const pages = extractPages(markdown);
+  const asin = extractAsin(url);
+
+  // Try to find an image
+  let imageUrl: string | null = null;
+  const imgMatch = markdown.match(/!\[.*?\]\((https:\/\/[^\s)]+(?:jpg|jpeg|png|webp)[^\s)]*)\)/i);
+  if (imgMatch) imageUrl = imgMatch[1];
+
   return {
-    asin: item.ASIN,
-    title: info.Title?.DisplayValue || "N/A",
-    author: info.ByLineInfo?.Contributors?.[0]?.Name || "Inconnu",
-    price: offers.Price?.Amount || null,
-    currency: offers.Price?.Currency || "EUR",
-    rating: null, // PA-API v5 doesn't return rating directly
-    reviewCount: null,
-    bsr: item.BrowseNodeInfo?.WebsiteSalesRank?.SalesRank || null,
-    categories: browseNodes.map((n: any) => n.DisplayValues?.DisplayValue).filter(Boolean),
-    imageUrl: item.Images?.Primary?.Large?.URL || item.Images?.Primary?.Medium?.URL || null,
-    pages: info.TechnicalInfo?.Formats?.find((f: any) => f.Type === "Kindle eBook")?.PageCount || 
-           info.ContentInfo?.PagesCount?.DisplayValue || null,
-    publicationDate: info.ContentInfo?.PublicationDate?.DisplayValue || null,
-    detailPageUrl: item.DetailPageURL || null,
+    title: title.substring(0, 200),
+    author: author.substring(0, 100),
+    price,
+    bsr,
+    rating,
+    reviewCount,
+    pages,
+    estimatedDailySales: estimateDailySales(bsr),
+    asin,
+    imageUrl,
+    url,
   };
 }
 
@@ -132,83 +189,70 @@ serve(async (req) => {
   }
 
   try {
-    const accessKey = Deno.env.get("AMAZON_ACCESS_KEY");
-    const secretKey = Deno.env.get("AMAZON_SECRET_KEY");
-    const partnerTag = Deno.env.get("AMAZON_PARTNER_TAG");
-
-    if (!accessKey || !secretKey || !partnerTag) {
+    const firecrawlKey = Deno.env.get("FIRECRAWL_API_KEY");
+    if (!firecrawlKey) {
       return new Response(
-        JSON.stringify({ error: "Amazon API credentials not configured" }),
+        JSON.stringify({ error: "Firecrawl API key not configured" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    const { action, keywords, asins, category, marketplace, maxResults } = await req.json();
+    const { action, keywords, asins, marketplace, maxResults } = await req.json();
 
     if (action === "search" && keywords) {
-      const searchPayload: Record<string, unknown> = {
-        Keywords: keywords,
-        SearchIndex: category || "KindleStore",
-        ItemCount: Math.min(maxResults || 10, 10),
-        Resources: [
-          "ItemInfo.Title",
-          "ItemInfo.ByLineInfo",
-          "ItemInfo.ContentInfo",
-          "ItemInfo.TechnicalInfo",
-          "Offers.Listings.Price",
-          "Images.Primary.Large",
-          "Images.Primary.Medium",
-          "BrowseNodeInfo.BrowseNodes",
-          "BrowseNodeInfo.WebsiteSalesRank",
-        ],
-        SortBy: "Relevance",
-      };
+      const domain = marketplace === "us" ? "amazon.com" : marketplace === "uk" ? "amazon.co.uk" : marketplace === "de" ? "amazon.de" : "amazon.fr";
+      const query = `site:${domain} ${keywords} Kindle ebook`;
+      
+      const searchResults = await firecrawlSearch(query, firecrawlKey, Math.min(maxResults || 10, 10));
+      
+      const items: BookResult[] = [];
+      const results = searchResults?.data || searchResults?.results || [];
 
-      const data = await callPaApi(accessKey, secretKey, partnerTag, {
-        operation: "SearchItems",
-        payload: searchPayload,
-        marketplace: marketplace || "fr",
-      });
-
-      const items = (data.SearchResult?.Items || []).map(extractBookData);
+      for (const result of results) {
+        const url = result.url || "";
+        const markdown = result.markdown || result.description || "";
+        
+        if (!url.includes("amazon.") && !url.includes("/dp/")) continue;
+        
+        const book = parseBookFromMarkdown(markdown, url);
+        if (book.title !== "N/A") {
+          items.push(book);
+        }
+      }
 
       return new Response(
-        JSON.stringify({ 
-          success: true, 
-          items, 
-          totalResults: data.SearchResult?.TotalResultCount || items.length 
-        }),
+        JSON.stringify({ success: true, items, totalResults: items.length, source: "firecrawl" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
     if (action === "lookup" && asins && Array.isArray(asins)) {
-      const lookupPayload: Record<string, unknown> = {
-        ItemIds: asins.slice(0, 10),
-        ItemIdType: "ASIN",
-        Resources: [
-          "ItemInfo.Title",
-          "ItemInfo.ByLineInfo",
-          "ItemInfo.ContentInfo",
-          "ItemInfo.TechnicalInfo",
-          "Offers.Listings.Price",
-          "Images.Primary.Large",
-          "Images.Primary.Medium",
-          "BrowseNodeInfo.BrowseNodes",
-          "BrowseNodeInfo.WebsiteSalesRank",
-        ],
-      };
-
-      const data = await callPaApi(accessKey, secretKey, partnerTag, {
-        operation: "GetItems",
-        payload: lookupPayload,
-        marketplace: marketplace || "fr",
+      const domain = marketplace === "us" ? "amazon.com" : marketplace === "uk" ? "amazon.co.uk" : marketplace === "de" ? "amazon.de" : "amazon.fr";
+      
+      const items: BookResult[] = [];
+      
+      // Scrape each ASIN page directly
+      const scrapePromises = asins.slice(0, 5).map(async (asin: string) => {
+        try {
+          const url = `https://www.${domain}/dp/${asin}`;
+          const scrapeResult = await firecrawlScrape(url, firecrawlKey);
+          const markdown = scrapeResult?.data?.markdown || scrapeResult?.markdown || "";
+          if (markdown) {
+            return parseBookFromMarkdown(markdown, url);
+          }
+        } catch (e) {
+          console.error(`Failed to scrape ASIN ${asin}:`, e);
+        }
+        return null;
       });
 
-      const items = (data.ItemsResult?.Items || []).map(extractBookData);
+      const results = await Promise.all(scrapePromises);
+      for (const r of results) {
+        if (r) items.push(r);
+      }
 
       return new Response(
-        JSON.stringify({ success: true, items }),
+        JSON.stringify({ success: true, items, source: "firecrawl" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
