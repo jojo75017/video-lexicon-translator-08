@@ -18,18 +18,36 @@ serve(async (req) => {
       });
     }
 
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) {
-      return new Response(JSON.stringify({ success: false, error: 'LOVABLE_API_KEY non configurée' }), {
+    const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
+    if (!GEMINI_API_KEY) {
+      return new Response(JSON.stringify({ success: false, error: 'Clé Gemini non configurée. Ajoutez votre clé dans les paramètres.' }), {
         status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    const systemPrompt = `Tu es un expert KDP Amazon spécialisé dans l'optimisation de fiches produit. Tu dois analyser un livre et donner des scores de 0 à 100 et des recommandations concrètes pour chaque critère. Sois précis, actionnable et bienveillant. Réponds TOUJOURS en français.`;
+    const systemPrompt = `Tu es un expert KDP Amazon spécialisé dans l'optimisation de fiches produit. Tu dois analyser un livre et donner des scores de 0 à 100 et des recommandations concrètes pour chaque critère. Sois précis, actionnable et bienveillant. Réponds TOUJOURS en français.
 
-    const userPrompt = `Analyse cette fiche de livre Amazon KDP et donne un audit complet avec des scores de 0 à 100 et des recommandations d'amélioration pour chaque critère :
+Tu DOIS retourner un JSON valide avec cette structure exacte :
+{
+  "overall_score": number (0-100),
+  "overall_verdict": "string verdict global",
+  "criteria": [
+    {
+      "name": "Nom du critère",
+      "score": number (0-100),
+      "status": "excellent" | "bon" | "moyen" | "faible" | "critique",
+      "recommendation": "Recommandation concrète",
+      "priority": "haute" | "moyenne" | "basse"
+    }
+  ],
+  "quick_wins": ["action rapide 1", "action rapide 2", ...]
+}
 
-DONNÉES DU LIVRE :
+Les critères à évaluer sont : Titre, Description, Prix, Catégories, Mots-clés potentiels, Couverture (basé sur les avis), Note & Avis, Positionnement BSR.
+Retourne UNIQUEMENT le JSON, sans markdown ni texte autour.`;
+
+    const userPrompt = `Analyse cette fiche de livre Amazon KDP :
+
 - Titre : ${bookData.title || 'Non disponible'}
 - Auteur : ${bookData.author || 'Non disponible'}
 - Prix : ${bookData.price ? bookData.price + '€' : 'Non disponible'}
@@ -41,89 +59,56 @@ DONNÉES DU LIVRE :
 - Description : ${bookData.description || 'Non disponible'}
 - Ventes estimées/mois : ${bookData.estimatedMonthlySales || 'Non disponible'}
 
-Analyse les critères suivants et retourne ton évaluation.`;
+Retourne le JSON d'audit complet.`;
 
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'google/gemini-3-flash-preview',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt },
-        ],
-        tools: [{
-          type: 'function',
-          function: {
-            name: 'book_audit',
-            description: 'Retourne l\'audit complet d\'un livre KDP avec scores et recommandations',
-            parameters: {
-              type: 'object',
-              properties: {
-                overall_score: { type: 'number', description: 'Score global de 0 à 100' },
-                overall_verdict: { type: 'string', description: 'Verdict global en 1-2 phrases' },
-                criteria: {
-                  type: 'array',
-                  items: {
-                    type: 'object',
-                    properties: {
-                      name: { type: 'string', description: 'Nom du critère (ex: Titre, Description, Prix, Catégories, Mots-clés, Couverture, Note & Avis, Positionnement BSR)' },
-                      score: { type: 'number', description: 'Score de 0 à 100' },
-                      status: { type: 'string', enum: ['excellent', 'bon', 'moyen', 'faible', 'critique'], description: 'Niveau de performance' },
-                      recommendation: { type: 'string', description: 'Recommandation concrète d\'amélioration en 1-3 phrases' },
-                      priority: { type: 'string', enum: ['haute', 'moyenne', 'basse'], description: 'Priorité d\'action' },
-                    },
-                    required: ['name', 'score', 'status', 'recommendation', 'priority'],
-                    additionalProperties: false,
-                  },
-                },
-                quick_wins: {
-                  type: 'array',
-                  items: { type: 'string' },
-                  description: '3-5 actions rapides à mettre en place immédiatement',
-                },
-              },
-              required: ['overall_score', 'overall_verdict', 'criteria', 'quick_wins'],
-              additionalProperties: false,
-            },
+    console.log('Calling Gemini for audit...');
+
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [
+            { role: 'user', parts: [{ text: systemPrompt + '\n\n' + userPrompt }] },
+          ],
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 4096,
+            responseMimeType: 'application/json',
           },
-        }],
-        tool_choice: { type: 'function', function: { name: 'book_audit' } },
-      }),
-    });
+        }),
+      }
+    );
 
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Gemini API error:', response.status, errorText);
       if (response.status === 429) {
-        return new Response(JSON.stringify({ success: false, error: 'Trop de requêtes, réessayez dans quelques secondes.' }), {
+        return new Response(JSON.stringify({ success: false, error: 'Trop de requêtes Gemini, réessayez dans quelques secondes.' }), {
           status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ success: false, error: 'Crédits AI insuffisants.' }), {
-          status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
-      const errorText = await response.text();
-      console.error('AI gateway error:', response.status, errorText);
-      return new Response(JSON.stringify({ success: false, error: 'Erreur du service AI' }), {
+      return new Response(JSON.stringify({ success: false, error: 'Erreur Gemini: ' + response.status }), {
         status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
     const aiData = await response.json();
-    const toolCall = aiData.choices?.[0]?.message?.tool_calls?.[0];
+    const rawText = aiData?.candidates?.[0]?.content?.parts?.[0]?.text;
 
-    if (!toolCall?.function?.arguments) {
-      console.error('No tool call in AI response:', JSON.stringify(aiData));
-      return new Response(JSON.stringify({ success: false, error: 'Réponse AI invalide' }), {
+    if (!rawText) {
+      console.error('No text in Gemini response:', JSON.stringify(aiData));
+      return new Response(JSON.stringify({ success: false, error: 'Réponse Gemini vide' }), {
         status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    const audit = JSON.parse(toolCall.function.arguments);
+    console.log('Gemini response received, parsing...');
+
+    // Clean and parse JSON
+    const cleaned = rawText.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+    const audit = JSON.parse(cleaned);
 
     return new Response(JSON.stringify({ success: true, data: audit }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
