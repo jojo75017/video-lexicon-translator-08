@@ -405,8 +405,22 @@ function parseAmazonBookPage(
   const pagesMatch = combinedText.match(/(\d+)\s*(?:pages|page)/i);
   const pages = pagesMatch ? parseInt(pagesMatch[1], 10) : null;
 
-  const categoryMatches = combinedText.match(/(?:in|dans)\s+(?:Kindle Store|Boutique Kindle)\s*>\s*([^\n]+)/gi) || [];
-  const categories = [...new Set(categoryMatches.map((item) => cleanText(item.replace(/^(?:in|dans)\s+/i, ''))))];
+  const categoryPatterns = [
+    /(?:in|dans)\s+(?:Kindle Store|Boutique Kindle|Books|Livres)\s*>\s*([^\n]+)/gi,
+    /(?:Catégorie|Category)\s*:\s*([^\n]+)/gi,
+    />\s*([^>\n]{4,60})\s*>\s*([^>\n]{4,60})/g,
+  ];
+  const categorySet = new Set<string>();
+  for (const pattern of categoryPatterns) {
+    const matches = combinedText.matchAll(pattern);
+    for (const m of matches) {
+      const cat = cleanText(m[1] || m[0]).replace(/^(?:in|dans)\s+/i, '');
+      if (cat && !isGenericAmazonContent(cat) && cat.length < 120) {
+        categorySet.add(cat);
+      }
+    }
+  }
+  const categories = [...categorySet].slice(0, 8);
 
   const author = extractAuthor(markdown, metadata, searchHit);
   const description = extractDescription(markdown, metadata, searchHit);
