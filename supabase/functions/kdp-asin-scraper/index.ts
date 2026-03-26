@@ -326,8 +326,13 @@ function extractAuthor(markdown: string, metadata: Record<string, unknown>, sear
   );
   if (authorFromTitle?.[1]) return cleanText(authorFromTitle[1]);
 
-  const markdownAuthor = markdown.match(/(?:de|by)\s+\[?([^\]\n]{3,80})\]?/i);
-  return markdownAuthor?.[1] ? cleanText(markdownAuthor[1]) : null;
+  const markdownAuthor = markdown.match(/(?:de|by)\s+\[?([^\]\n]{3,80})\]?/i)?.[1];
+  const candidate = cleanText(markdownAuthor);
+  if (!candidate || /^(vente|publication|taille|accessibilité|langue|fichier)$/i.test(candidate)) {
+    return null;
+  }
+
+  return candidate;
 }
 
 function extractDescription(markdown: string, metadata: Record<string, unknown>, searchHit?: ResolvedSearchHit | null) {
@@ -440,13 +445,14 @@ function extractKeywords(sourceText: string, title: string, description: string)
     'https', 'http', 'www', 'help', 'customer', 'display', 'html', 'footer', 'nodeid', 'requestid', 'privacy', 'cookies',
     'advertising', 'choices', 'continuer', 'achats', 'conditions', 'générales', 'vente', 'informations', 'personnelles',
     'cliquez', 'bouton', 'dessous', 'filiales', 'produit', 'asin', 'date', 'publication', 'savoir', 'plus', 'taille', 'fichier',
+    'accessibilité', 'langue', 'janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre',
   ]);
 
   const words = fullText
     .toLowerCase()
     .replace(/[^a-zà-ÿ0-9\s-]/g, ' ')
     .split(/\s+/)
-    .filter((word) => word.length > 3 && !stopWords.has(word) && !/^\d+$/.test(word));
+    .filter((word) => word.length > 3 && !stopWords.has(word) && !/^\d+$/.test(word) && !/^b[0-9a-z]{9,12}$/i.test(word));
 
   const frequency: Record<string, number> = {};
   for (const word of words) {
