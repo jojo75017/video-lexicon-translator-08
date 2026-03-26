@@ -1214,7 +1214,7 @@ Réponds en JSON:
             {/* Compteur de pages */}
             <div className="flex flex-col items-end gap-1">
               <div className="flex items-center gap-2">
-                <Badge variant="outline" className={colorMode === 'bw' ? 'bg-gray-100 border-gray-400' : 'bg-gradient-to-r from-pink-100 to-purple-100 border-pink-300'}>
+                <Badge variant="outline" className={colorMode === 'bw' ? 'bg-card border-border' : 'bg-gradient-to-r from-pink-100 to-purple-100 border-pink-300'}>
                   {COLOR_MODES.find(c => c.value === colorMode)?.label || '🌈 Couleur'}
                 </Badge>
                 <Badge variant="outline" className="bg-amber-50 border-amber-300 text-amber-700">

@@ -138,7 +138,7 @@ export const EbookLandingPageGenerator: React.FC<EbookLandingPageGeneratorProps>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="border rounded-lg overflow-hidden bg-white">
+            <div className="border rounded-lg overflow-hidden bg-card">
               <iframe
                 srcDoc={generatedHtml}
                 className="w-full h-[600px] border-0"

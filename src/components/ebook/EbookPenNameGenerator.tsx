@@ -53,7 +53,7 @@ const getStyleBadgeClass = (style: string) => {
   const s = style.toLowerCase();
   if (s.includes('classique') || s.includes('élégant')) return 'bg-blue-500/10 text-blue-600 border-blue-500/20';
   if (s.includes('moderne') || s.includes('dynamique')) return 'bg-purple-500/10 text-purple-600 border-purple-500/20';
-  if (s.includes('mystérieux')) return 'bg-slate-500/10 text-slate-600 border-slate-500/20';
+  if (s.includes('mystérieux')) return 'bg-muted text-muted-foreground border-border';
   if (s.includes('autoritaire') || s.includes('expert')) return 'bg-red-500/10 text-red-600 border-red-500/20';
   if (s.includes('créatif') || s.includes('original')) return 'bg-pink-500/10 text-pink-600 border-pink-500/20';
   return 'bg-muted text-muted-foreground';

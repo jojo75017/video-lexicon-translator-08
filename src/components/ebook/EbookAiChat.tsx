@@ -189,7 +189,7 @@ export const EbookAiChat: React.FC<{ isDemo?: boolean }> = ({ isDemo = false }) 
                   className={`${
                     apiKey 
                       ? 'bg-green-500/20 border-green-500/50 text-green-700 hover:bg-green-500/30' 
-                      : 'bg-white/10 border-white/30 text-white hover:bg-white/20'
+                      : 'bg-card border-border text-foreground hover:bg-card/80'
                   }`}
                 >
                   {apiKey ? (
@@ -209,7 +209,7 @@ export const EbookAiChat: React.FC<{ isDemo?: boolean }> = ({ isDemo = false }) 
                     onClick={() => setIsExpanded(false)}
                     variant="outline"
                     size="sm"
-                    className="bg-white/10 border-white/30 text-white hover:bg-white/20"
+                    className="bg-card border-border text-foreground hover:bg-card/80"
                   >
                     <X className="h-4 w-4" />
                   </Button>
@@ -237,7 +237,7 @@ export const EbookAiChat: React.FC<{ isDemo?: boolean }> = ({ isDemo = false }) 
                   className={`max-w-[80%] p-4 rounded-2xl ${
                     message.role === 'user'
                       ? 'bg-gradient-primary text-white'
-                      : 'bg-white shadow-md'
+                      : 'bg-card shadow-md'
                   }`}
                 >
                   <p className="whitespace-pre-wrap text-sm">{message.content}</p>
@@ -256,7 +256,7 @@ export const EbookAiChat: React.FC<{ isDemo?: boolean }> = ({ isDemo = false }) 
                 <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-primary flex items-center justify-center">
                   <Bot className="h-5 w-5 text-white" />
                 </div>
-                <div className="bg-white shadow-md p-4 rounded-2xl">
+                <div className="bg-card shadow-md p-4 rounded-2xl">
                   <Loader2 className="h-5 w-5 animate-spin" />
                 </div>
               </div>
@@ -288,7 +288,7 @@ export const EbookAiChat: React.FC<{ isDemo?: boolean }> = ({ isDemo = false }) 
           )}
 
           {/* Input */}
-          <div className="border-t p-4 bg-white">
+          <div className="border-t p-4 bg-card">
             <div className="flex gap-2">
               <Textarea
                 value={input}
