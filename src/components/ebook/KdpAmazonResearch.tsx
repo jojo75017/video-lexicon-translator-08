@@ -753,6 +753,7 @@ const AuditResultsCard: React.FC<{ audit: AuditData }> = ({ audit }) => (
   </div>
 );
 
+const StatCard: React.FC<{ icon: any; label: string; value: string; color: string }> = ({ icon: Icon, label, value, color }) => (
   <div className="p-3 rounded-lg border bg-card">
     <div className="flex items-center gap-2 mb-1">
       <Icon className={`h-4 w-4 ${color}`} />
