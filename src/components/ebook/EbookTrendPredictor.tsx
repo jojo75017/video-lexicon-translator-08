@@ -7,6 +7,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from 'sonner';
 import { TrendingUp, Sparkles, RefreshCw, Target, DollarSign, Users, Calendar, Zap, BarChart3, ArrowUp, ArrowDown, Minus } from 'lucide-react';
 
+interface RealBookData {
+  title: string;
+  author: string;
+  price: number | null;
+  bsr: number | null;
+  estimatedDailySales: number;
+  asin: string;
+  imageUrl: string | null;
+}
+
 interface TrendPrediction {
   niche: string;
   category: string;
@@ -18,6 +28,12 @@ interface TrendPrediction {
   bestTimeToPublish: string;
   keywordsToTarget: string[];
   reasoning: string;
+  realData?: {
+    topBooks: RealBookData[];
+    averagePrice: number | null;
+    averageBsr: number | null;
+    totalResults: number;
+  };
 }
 
 const EbookTrendPredictor: React.FC = () => {
@@ -349,6 +365,39 @@ const EbookTrendPredictor: React.FC = () => {
                       </p>
                     </div>
 
+                    {/* Real Amazon Data */}
+                    {prediction.realData && prediction.realData.topBooks.length > 0 && (
+                      <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
+                        <p className="text-xs font-semibold text-blue-700 dark:text-blue-300 mb-2 flex items-center gap-1">
+                          📊 Données réelles Amazon
+                          {prediction.realData.averagePrice && (
+                            <Badge variant="secondary" className="text-xs ml-auto">
+                              Prix moy: {prediction.realData.averagePrice}€
+                            </Badge>
+                          )}
+                        </p>
+                        <div className="space-y-1.5">
+                          {prediction.realData.topBooks.slice(0, 3).map((book, bi) => (
+                            <div key={bi} className="flex items-center gap-2 text-xs">
+                              <span className="font-medium text-muted-foreground w-4">#{bi + 1}</span>
+                              <span className="truncate flex-1">{book.title}</span>
+                              {book.price && (
+                                <span className="text-green-600 font-medium whitespace-nowrap">{book.price}€</span>
+                              )}
+                              {book.bsr && (
+                                <span className="text-muted-foreground whitespace-nowrap">BSR {book.bsr.toLocaleString()}</span>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                        {prediction.realData.averageBsr && (
+                          <p className="text-xs text-muted-foreground mt-2">
+                            BSR moyen: {prediction.realData.averageBsr.toLocaleString()} • ~{Math.round(prediction.realData.topBooks.reduce((s, b) => s + b.estimatedDailySales, 0) / prediction.realData.topBooks.length)} ventes/jour estimées
+                          </p>
+                        )}
+                      </div>
+                    )}
+
                     {/* Confidence Bar */}
                     <div className="mt-4">
                       <div className="flex justify-between text-xs text-muted-foreground mb-1">
@@ -370,7 +419,7 @@ const EbookTrendPredictor: React.FC = () => {
           <TrendingUp className="h-16 w-16 mx-auto text-muted-foreground/50 mb-4" />
           <h3 className="text-xl font-medium mb-2">Prêt à analyser les tendances</h3>
           <p className="text-muted-foreground mb-4">
-            Cliquez sur "Analyser les Tendances" pour découvrir les niches à fort potentiel
+            Cliquez sur "Analyser les Tendances" pour découvrir les niches à fort potentiel avec des données réelles Amazon
           </p>
         </Card>
       )}
