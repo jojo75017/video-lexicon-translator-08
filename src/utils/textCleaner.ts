@@ -64,6 +64,23 @@ export function cleanGeneratedText(text: string): string {
     .replace(/^[\[{,\s]+"?(numero|titre|title|content|chapters|subChapters|contenu)"?\s*:\s*/gim, '')
     .replace(/^"{3,}/gm, '"')
     .replace(/"{3,}$/gm, '"')
+    // ========== NETTOYAGE DES MÉTADONNÉES / ARTEFACTS DE STATS ==========
+    // Supprimer les lignes de stats "Nombre de mots : 1234" ou "Nombre de mots = 1234"
+    .replace(/\b(?:nombre\s+de\s+mots|word\s*count|mots?\s*:?\s*total)\s*[:=]\s*\d[\d\s.,]*/gi, '')
+    // Supprimer "Export EPUB natif" et variantes
+    .replace(/export\s+epub\s*(?:natif|native)?[^.\n]*/gi, '')
+    // Supprimer "Pages estimées : 123" ou "Estimated pages: 123"
+    .replace(/\b(?:pages?\s+estim[ée]e?s?|estimated\s+pages?)\s*[:=]\s*\d[\d\s.,]*/gi, '')
+    // Supprimer "Chapitre X - Nombre de mots : Y"
+    .replace(/chapitre\s+\d+\s*[-–—]\s*nombre\s+de\s+mots\s*[:=]\s*\d[\d\s.,]*/gi, '')
+    // Supprimer les lignes "Score :" "Lisibilité :" etc. isolées avec un nombre
+    .replace(/\b(?:score|lisibilit[ée]|readability|flesch)\s*[:=]\s*\d[\d.,]*\s*(?:\/\s*\d+)?/gi, '')
+    // Supprimer les annotations IA résiduelles type "[Note: ...]" ou "(Note de l'auteur: ...)"
+    .replace(/\[(?:note|remarque|ndlr|instruction)[^\]]*\]/gi, '')
+    .replace(/\((?:note\s+de\s+l'auteur|note\s+de\s+l'éditeur)[^)]*\)/gi, '')
+    // Supprimer les compteurs de mots en fin de section "~1500 mots" ou "(2000 mots)"
+    .replace(/[~≈]?\s*\d{3,5}\s*mots?\b/gi, '')
+    .replace(/\(\s*\d{3,5}\s*mots?\s*\)/gi, '')
     .replace(/  +/g, ' ')
     .replace(/ ([.,;:!?])/g, '$1');
   
@@ -251,6 +268,14 @@ export function cleanForAudio(text: string): string {
     .replace(/\[([^\]]*)\]/g, '$1')
     // Supprimer les backticks
     .replace(/`+/g, '')
+    // ========== NETTOYAGE DES MÉTADONNÉES AUDIO ==========
+    // Supprimer "Nombre de mots : 1234", "Export EPUB natif", compteurs etc.
+    .replace(/\b(?:nombre\s+de\s+mots|word\s*count|mots?\s*:?\s*total)\s*[:=]\s*\d[\d\s.,]*/gi, '')
+    .replace(/export\s+epub\s*(?:natif|native)?[^.\n]*/gi, '')
+    .replace(/\b(?:pages?\s+estim[ée]e?s?|estimated\s+pages?)\s*[:=]\s*\d[\d\s.,]*/gi, '')
+    .replace(/[~≈]?\s*\d{3,5}\s*mots?\b/gi, '')
+    .replace(/\(\s*\d{3,5}\s*mots?\s*\)/gi, '')
+    .replace(/\[(?:note|remarque|ndlr|instruction)[^\]]*\]/gi, '')
     // Remplacer les puces par des pauses naturelles
     .replace(/^•\s*/gm, '')
     .replace(/^[-–—]\s+/gm, '')

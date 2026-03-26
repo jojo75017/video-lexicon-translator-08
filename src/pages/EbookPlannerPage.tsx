@@ -170,6 +170,10 @@ import { EbookGlobalDashboard } from '@/components/ebook/EbookGlobalDashboard';
 import { EbookNicheTemplates } from '@/components/ebook/EbookNicheTemplates';
 import { EbookFocusMode } from '@/components/ebook/EbookFocusMode';
 import { EbookLandingPageGenerator } from '@/components/ebook/EbookLandingPageGenerator';
+import { EbookReadabilityAnalyzer } from '@/components/ebook/EbookReadabilityAnalyzer';
+import { EbookChapterWordCount } from '@/components/ebook/EbookChapterWordCount';
+import { EbookKindlePreview } from '@/components/ebook/EbookKindlePreview';
+import { EbookAutoSaveIndicator } from '@/components/ebook/EbookAutoSaveIndicator';
 
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
 import { ebookTemplates } from '@/data/ebookTemplates';
@@ -1257,6 +1261,34 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             kdpDescription={kdpDescription}
             kdpKeywords={kdpKeywords}
             kdpCategories={kdpCategories}
+          />
+        );
+
+      case 'readability-analyzer':
+        return (
+          <EbookReadabilityAnalyzer
+            chapters={chapters}
+            preface={preface}
+            conclusion={conclusion}
+          />
+        );
+
+      case 'chapter-word-count':
+        return (
+          <EbookChapterWordCount
+            chapters={chapters}
+            targetWordsPerChapter={targetWordsPerChapter}
+          />
+        );
+
+      case 'kindle-preview':
+        return (
+          <EbookKindlePreview
+            title={ebookTitle}
+            authorName={authorName}
+            chapters={chapters}
+            preface={preface}
+            conclusion={conclusion}
           />
         );
 
@@ -3485,6 +3517,12 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             userName={subscriberEmail}
             projectsCount={userProjectsCount}
           />
+          <div className="flex justify-end mb-2">
+            <EbookAutoSaveIndicator
+              data={{ ebookTitle, authorName, chapters, preface, conclusion, epilogue, characters, targetAudience, writingStyle, chapterLength, detailLevel, tone, narrativeFormat, bookDescription, genre, numberOfChapters, targetWordsPerChapter, ebookImages, tomeNumber }}
+              storageKey="ebook-planner-autosave"
+            />
+          </div>
           {renderContent()}
         </div>
       </main>
