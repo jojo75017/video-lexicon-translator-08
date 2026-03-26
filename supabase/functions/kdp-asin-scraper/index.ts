@@ -75,6 +75,7 @@ serve(async (req) => {
 
       console.log('Scraping ASIN:', cleanAsin, 'URL:', `https://www.${domain}/dp/${cleanAsin}`);
       const resolved = await resolveAmazonBook(firecrawlApiKey, cleanAsin, marketplace, domain);
+      console.log('Extracted BSR:', resolved.book.bsr, 'Price:', resolved.book.price, 'Rating:', resolved.book.rating, 'Reviews:', resolved.book.reviews);
 
       return jsonResponse({ success: true, data: resolved.book });
     }
