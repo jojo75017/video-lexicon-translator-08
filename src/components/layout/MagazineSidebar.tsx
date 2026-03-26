@@ -67,17 +67,17 @@ export function MagazineSidebar({
   return (
     <aside 
       className={cn(
-        "sticky top-0 h-screen bg-white border-r border-gray-200 transition-all duration-300 flex flex-col",
+        "sticky top-0 h-screen bg-card border-r border-border transition-all duration-300 flex flex-col",
         isCollapsed ? "w-20" : "w-64"
       )}
     >
       {/* Header */}
-      <div className="p-6 border-b border-gray-200">
+      <div className="p-6 border-b border-border">
         <div className="flex items-center justify-between">
           {!isCollapsed && (
             <div>
-              <h2 className="font-playfair text-xl font-bold text-navy-deep">Ebook Studio</h2>
-              <p className="text-xs text-gray-cool mt-1">Création professionnelle</p>
+              <h2 className="font-playfair text-xl font-bold text-foreground">Ebook Studio</h2>
+              <p className="text-xs text-muted-foreground mt-1">Création professionnelle</p>
             </div>
           )}
           {onToggleCollapse && (
@@ -106,16 +106,13 @@ export function MagazineSidebar({
               className={cn(
                 "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group relative overflow-hidden",
                 isActive
-                  ? `bg-gradient-magazine text-white shadow-lg shadow-${item.color}/20`
-                  : "text-gray-700 hover:bg-gray-50 hover:text-navy-deep"
+                  ? "bg-gradient-to-r from-amber-500 via-yellow-500 to-orange-500 text-white shadow-lg shadow-amber-500/30"
+                  : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
               )}
             >
               {/* Background gradient on hover */}
               {!isActive && (
-                <div className={cn(
-                  "absolute inset-0 bg-gradient-to-r opacity-0 group-hover:opacity-5 transition-opacity",
-                  `from-${item.color} to-transparent`
-                )} />
+              <div className="absolute inset-0 bg-gradient-to-r from-amber-500/0 to-transparent opacity-0 group-hover:opacity-10 transition-opacity" />
               )}
               
               {/* Icon */}
@@ -125,7 +122,7 @@ export function MagazineSidebar({
               )}>
                 <Icon className={cn(
                   "h-5 w-5 transition-transform group-hover:scale-110",
-                  isActive ? "text-white" : `text-${item.color}`
+                  isActive ? "text-white" : "text-amber-400"
                 )} />
               </div>
               
@@ -133,7 +130,7 @@ export function MagazineSidebar({
               {!isCollapsed && (
                 <span className={cn(
                   "relative z-10 font-inter font-medium text-sm transition-all",
-                  isActive ? "text-white" : "text-gray-700 group-hover:text-navy-deep"
+                  isActive ? "text-white" : "text-muted-foreground group-hover:text-foreground"
                 )}>
                   {item.label}
                 </span>
@@ -157,7 +154,7 @@ export function MagazineSidebar({
 
       {/* Footer - Subscription & Admin Buttons */}
       {!isCollapsed && (
-        <div className="p-6 border-t border-gray-200 space-y-2">
+        <div className="p-6 border-t border-border space-y-2">
           <Button
             onClick={() => navigate('/subscription')}
             className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
