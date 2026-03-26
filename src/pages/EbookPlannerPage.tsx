@@ -3520,7 +3520,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
         </div>
 
         {/* Content */}
-        <div className="container mx-auto px-6 py-8">
+        <div ref={contentContainerRef} className="container mx-auto px-6 py-8">
           <DemoBanner 
             plansGenerated={demoLimits.plansGenerated} 
             maxPlans={demoLimits.maxPlansInDemo} 
@@ -3536,6 +3536,23 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           </div>
           {renderContent()}
         </div>
+
+        {/* Floating AI Editor */}
+        <EbookFloatingAIEditor
+          containerRef={contentContainerRef}
+          onReplaceText={(original, replacement) => {
+            // Replace text in all chapters
+            const updatedChapters = chapters.map(ch => {
+              let newContent = ch.content?.replace(original, replacement) || ch.content;
+              const newSubChapters = ch.subChapters.map(sc => ({
+                ...sc,
+                content: sc.content?.replace(original, replacement) || sc.content,
+              }));
+              return { ...ch, content: newContent, subChapters: newSubChapters };
+            });
+            setChapters(updatedChapters);
+          }}
+        />
       </main>
 
       {/* Tutoriel interactif */}
