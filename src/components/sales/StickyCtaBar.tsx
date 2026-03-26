@@ -18,8 +18,8 @@ export const StickyCtaBar: React.FC<StickyCtaBarProps> = ({ onCtaClick }) => {
 
   // Tarif unique affiché partout
   const price = '67';
-  const originalPrice = '197';
-  const discount = '-66%';
+  const originalPrice = '147';
+  const discount = '-54%';
   const daysLeft = daysRemaining ?? 0;
 
   useEffect(() => {

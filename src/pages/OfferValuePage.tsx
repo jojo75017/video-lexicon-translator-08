@@ -163,7 +163,7 @@ const OfferValuePage = () => {
       icon: Zap,
       name: "Mises à Jour à Vie",
       description: "Toutes les nouvelles fonctionnalités gratuitement",
-      marketValue: 197,
+      marketValue: 147,
       color: "from-lime-500 to-lime-600"
     },
   ];

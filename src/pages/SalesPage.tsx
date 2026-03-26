@@ -40,7 +40,7 @@ const stagger = {
 
 // Prix
 const LAUNCH_PRICE = 67;
-const NORMAL_PRICE = 197;
+const NORMAL_PRICE = 147;
 const LAUNCH_END = new Date('2026-06-30T23:59:59').getTime();
 
 const useCountdown = (targetDate: number) => {

@@ -7,7 +7,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 
 const LAUNCH_PRICE = 67;
-const NORMAL_PRICE = 197;
+const NORMAL_PRICE = 147;
 
 const UpsellPage = () => {
   const navigate = useNavigate();

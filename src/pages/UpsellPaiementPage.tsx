@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 const LAUNCH_PRICE = 67;
-const NORMAL_PRICE = 197;
+const NORMAL_PRICE = 147;
 const PROMO_DISCOUNT = 50;
 const FUTURE_PRICE = NORMAL_PRICE - PROMO_DISCOUNT;
 
