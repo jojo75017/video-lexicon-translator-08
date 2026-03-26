@@ -1434,14 +1434,14 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             
             <div className="relative z-10 space-y-6">
               {/* Header Hero Section — 2026 Glass */}
-              <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[hsl(262,83%,20%)] via-[hsl(275,80%,25%)] to-[hsl(292,75%,20%)] p-8 shadow-2xl border border-white/10">
-                <div className="absolute -top-20 -right-20 w-60 h-60 bg-[hsl(292,84%,61%)] rounded-full blur-[100px] opacity-20" />
-                <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-[hsl(189,94%,43%)] rounded-full blur-[80px] opacity-15" />
+              <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0d1a2e] via-[#0d2444] to-[#0d0820] p-8 shadow-2xl border border-primary/20">
+                <div className="absolute -top-20 -right-20 w-60 h-60 bg-primary rounded-full blur-[100px] opacity-20" />
+                <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-accent rounded-full blur-[80px] opacity-15" />
                 
                 <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
                   <div className="space-y-3">
                     <div className="flex items-center gap-4">
-                      <div className="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 shadow-[0_0_30px_hsl(262,83%,58%,0.3)]">
+                      <div className="p-3 bg-primary/10 backdrop-blur-md rounded-2xl border border-primary/20 shadow-[0_0_30px_rgba(59,158,255,0.3)]">
                         <BookOpen className="w-8 h-8 text-white" />
                       </div>
                       <div>
@@ -1460,7 +1460,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                       type="button"
                       onClick={generateAutomaticPlan} 
                       disabled={!ebookTitle || isGenerating}
-                      className="bg-white text-[hsl(262,83%,35%)] hover:bg-white/90 shadow-lg hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] transition-all duration-300 hover:-translate-y-0.5 font-bold rounded-xl"
+                      className="bg-primary text-white hover:bg-primary/90 shadow-lg hover:shadow-[0_0_30px_rgba(59,158,255,0.3)] transition-all duration-300 hover:-translate-y-0.5 font-bold rounded-xl"
                       data-tutorial="generate-button"
                     >
                       <Wand2 className="h-5 w-5 mr-2" />
@@ -1680,28 +1680,28 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                       </div>
 
                       {/* Section Personnages Principaux */}
-                      <Card className="border-2 border-dashed border-purple-300 bg-gradient-to-r from-purple-50 to-fuchsia-50">
+                      <Card className="border-2 border-dashed border-primary/30 bg-card">
                         <CardContent className="p-6">
                           <div className="flex items-center gap-3 mb-4">
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-fuchsia-500 flex items-center justify-center shadow-md">
+                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-md">
                               <Users className="w-5 h-5 text-white" />
                             </div>
                             <div>
-                              <h3 className="text-lg font-bold text-purple-800">Personnages principaux</h3>
-                              <p className="text-sm text-purple-600">Définissez vos personnages pour une histoire cohérente</p>
+                              <h3 className="text-lg font-bold text-foreground">Personnages principaux</h3>
+                              <p className="text-sm text-muted-foreground">Définissez vos personnages pour une histoire cohérente</p>
                             </div>
                           </div>
                           
                           <div className="space-y-4">
                             {characters.map((character, index) => (
-                              <div key={character.id} className="p-4 bg-white/70 rounded-xl border border-purple-200 space-y-3">
+                              <div key={character.id} className="p-4 bg-background rounded-xl border border-border space-y-3">
                                 <div className="flex items-center justify-between">
-                                  <span className="text-sm font-semibold text-purple-700">Personnage {index + 1}</span>
+                                  <span className="text-sm font-semibold text-primary">Personnage {index + 1}</span>
                                   <Button
                                     variant="ghost"
                                     size="sm"
                                     onClick={() => setCharacters(prev => prev.filter(c => c.id !== character.id))}
-                                    className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                                    className="h-8 w-8 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/10"
                                   >
                                     <Trash2 className="h-4 w-4" />
                                   </Button>
