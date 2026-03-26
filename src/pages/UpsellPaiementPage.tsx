@@ -7,8 +7,8 @@ import { Check, CreditCard, ArrowLeft, ArrowRight, Sparkles, Cpu, Headphones, Im
 import { toast } from "sonner";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
-const LAUNCH_PRICE = 97;
-const NORMAL_PRICE = 247;
+const LAUNCH_PRICE = 67;
+const NORMAL_PRICE = 197;
 const PROMO_DISCOUNT = 50;
 const FUTURE_PRICE = NORMAL_PRICE - PROMO_DISCOUNT;
 
@@ -19,8 +19,8 @@ const PLANS = {
     originalPrice: String(NORMAL_PRICE),
     paypalLinks: {
       full: `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=${LAUNCH_PRICE}&currency_code=EUR&item_name=EbookStudio%20Pro%20Lifetime`,
-      installment3: `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=33&currency_code=EUR&item_name=EbookStudio%20Pro%20(1/3)`,
-      installment5: `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=20&currency_code=EUR&item_name=EbookStudio%20Pro%20(1/5)`,
+      installment3: `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=23&currency_code=EUR&item_name=EbookStudio%20Pro%20(1/3)`,
+      installment5: `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=14&currency_code=EUR&item_name=EbookStudio%20Pro%20(1/5)`,
     },
     description: "Gemini 3 Flash • Imagen 3 • Azure Neural Voices • Tout illimité à vie",
     features: [
