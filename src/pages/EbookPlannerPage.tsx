@@ -3377,7 +3377,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   };
 
   return (
-    <div className="min-h-screen flex bg-slate-950">
+    <div className="min-h-screen flex bg-background">
       <OnboardingGuide />
       <ModernSidebar 
         activeTab={activeTab}
@@ -3388,11 +3388,11 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
 
       <main className="flex-1 overflow-y-auto">
         {/* Hero Header — Dark Premium 2026 */}
-        <div className="relative overflow-hidden bg-slate-950 border-b border-slate-800/50">
+        <div className="relative overflow-hidden bg-background border-b border-border">
           {/* Subtle glow effects */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(6,182,212,0.1),transparent)]" />
-          <div className="absolute -top-20 -right-20 w-80 h-80 bg-cyan-500/8 rounded-full blur-[120px]" />
-          <div className="absolute -bottom-20 -left-20 w-60 h-60 bg-emerald-500/8 rounded-full blur-[100px]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(59,158,255,0.1),transparent)]" />
+          <div className="absolute -top-20 -right-20 w-80 h-80 bg-primary/8 rounded-full blur-[120px]" />
+          <div className="absolute -bottom-20 -left-20 w-60 h-60 bg-accent/8 rounded-full blur-[100px]" />
           
           <div className="relative container mx-auto px-6 py-6">
             {/* Top bar */}
@@ -3400,7 +3400,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               <Button
                 variant="ghost"
                 onClick={() => navigate('/ebook-ideas')}
-                className="text-slate-400 hover:text-white hover:bg-slate-800/50 border border-slate-800 rounded-xl text-sm"
+                className="text-muted-foreground hover:text-foreground hover:bg-card border border-border rounded-xl text-sm"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Retour
@@ -3411,7 +3411,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                   type="button"
                   onClick={handleManualSave}
                   disabled={isSaving || !ebookTitle}
-                  className="bg-slate-800/50 hover:bg-slate-700/50 text-white border border-slate-700 rounded-xl transition-all duration-300"
+                  className="bg-card hover:bg-card/80 text-foreground border border-border rounded-xl transition-all duration-300"
                 >
                   <Save className="h-4 w-4 mr-2" />
                   {isSaving ? 'Sauvegarde...' : 'Sauvegarder'}
@@ -3419,7 +3419,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                 <Button
                   type="button"
                   onClick={resetPlan}
-                  className="bg-slate-800/50 hover:bg-slate-700/50 text-white border border-slate-700 rounded-xl"
+                  className="bg-card hover:bg-card/80 text-foreground border border-border rounded-xl"
                 >
                   <Plus className="h-4 w-4 mr-2" />
                   Nouveau
@@ -3428,22 +3428,22 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             </div>
             
             <div className="max-w-3xl mx-auto text-center pb-6">
-              <div className="inline-flex items-center justify-center w-16 h-16 mb-5 rounded-2xl bg-gradient-to-br from-cyan-500 to-emerald-500 shadow-lg shadow-cyan-500/20">
-                <Sparkles className="w-8 h-8 text-slate-900" />
+              <div className="inline-flex items-center justify-center w-16 h-16 mb-5 rounded-2xl bg-gradient-to-br from-primary to-accent shadow-lg shadow-primary/20">
+                <Sparkles className="w-8 h-8 text-background" />
               </div>
               
-              <h1 className="text-4xl md:text-5xl font-extrabold mb-3 text-white tracking-tight">
+              <h1 className="text-4xl md:text-5xl font-extrabold mb-3 text-foreground tracking-tight font-display italic">
                 {ebookTitle || 'Studio de Création'}
               </h1>
               
               {isSaving && (
-                <Badge className="bg-slate-800/50 text-cyan-400 border-slate-700">
+                <Badge className="bg-card text-primary border-border">
                   <Save className="w-3 h-3 mr-1 animate-pulse" />
                   Sauvegarde...
                 </Badge>
               )}
               
-              <p className="text-slate-500 max-w-xl mx-auto mt-2 text-sm tracking-wide uppercase font-medium">
+              <p className="text-muted-foreground max-w-xl mx-auto mt-2 text-sm tracking-wide uppercase font-medium">
                 Créez des ebooks professionnels avec l'intelligence artificielle
               </p>
               
@@ -3451,19 +3451,19 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               <Button
                 type="button"
                 onClick={() => handleTabChange('url-import')}
-                className="mt-6 relative overflow-hidden bg-gradient-to-r from-cyan-500/10 to-emerald-500/10 hover:from-cyan-500/20 hover:to-emerald-500/20 text-white font-semibold px-8 py-3 h-auto rounded-2xl border border-cyan-500/20 group transition-all duration-500 hover:shadow-[0_0_40px_rgba(6,182,212,0.2)] hover:-translate-y-0.5"
+                className="mt-6 relative overflow-hidden bg-gradient-to-r from-primary/10 to-accent/10 hover:from-primary/20 hover:to-accent/20 text-foreground font-semibold px-8 py-3 h-auto rounded-2xl border border-primary/20 group transition-all duration-500 hover:shadow-[0_0_40px_rgba(59,158,255,0.2)] hover:-translate-y-0.5"
               >
                 <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/5 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
                 <span className="relative flex items-center gap-3">
                   <span className="text-lg">🔗</span>
                   <span>Créer mon premier ebook</span>
-                  <Badge className="bg-cyan-500/20 text-cyan-400 font-bold text-[10px] px-2 py-0.5 border border-cyan-500/30">
+                  <Badge className="bg-primary/20 text-primary font-bold text-[10px] px-2 py-0.5 border border-primary/30">
                     2026
                   </Badge>
                 </span>
               </Button>
 
-              <p className="mt-5 text-slate-600 text-sm italic">
+              <p className="mt-5 text-muted-foreground text-sm italic">
                 🚀 1, 2, 3… Foncez ! Je suis toujours là pour vous accompagner en Zoom gratuit — Georges
               </p>
             </div>
