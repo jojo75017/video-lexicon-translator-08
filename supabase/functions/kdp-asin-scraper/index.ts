@@ -236,8 +236,7 @@ function mapSearchResults(items: FirecrawlSearchItem[]) {
         url,
       } satisfies ResolvedSearchHit;
     })
-    .filter((item) => item.asin && item.url.includes('amazon.') && item.title)
-    .filter((item) => !looksLikeInterstitial(item.markdown, { title: item.title, description: item.description }))
+    .filter((item) => item.asin && item.url.includes('amazon.') && item.title && !/^amazon\.[a-z.]+$/i.test(item.title))
     .filter((item) => {
       const key = item.asin as string;
       if (seen.has(key)) return false;
@@ -424,7 +423,13 @@ function estimateSalesFromBsr(bsr: number) {
 }
 
 function extractKeywords(sourceText: string, title: string, description: string) {
-  const fullText = `${title} ${description} ${sourceText}`;
+  const sanitizedSource = sourceText
+    .replace(/https?:\/\/\S+/g, ' ')
+    .replace(/\[[^\]]*\]\([^)]*\)/g, ' ')
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
+    .replace(/#+\s*/g, ' ');
+
+  const fullText = `${title} ${description} ${sanitizedSource}`;
 
   const stopWords = new Set([
     'le', 'la', 'les', 'de', 'du', 'des', 'un', 'une', 'et', 'en', 'à', 'pour', 'par', 'sur', 'avec', 'dans',
@@ -432,13 +437,16 @@ function extractKeywords(sourceText: string, title: string, description: string)
     'for', 'of', 'with', 'by', 'from', 'is', 'are', 'was', 'were', 'be', 'been', 'has', 'have', 'had', 'do', 'does',
     'did', 'will', 'would', 'could', 'should', 'may', 'might', 'it', 'its', 'this', 'that', 'these', 'those', 'amazon',
     'kindle', 'ebook', 'broché', 'relié', 'store', 'boutique', 'livre', 'edition', 'format', 'paperback', 'hardcover',
+    'https', 'http', 'www', 'help', 'customer', 'display', 'html', 'footer', 'nodeid', 'requestid', 'privacy', 'cookies',
+    'advertising', 'choices', 'continuer', 'achats', 'conditions', 'générales', 'vente', 'informations', 'personnelles',
+    'cliquez', 'bouton', 'dessous', 'filiales', 'produit', 'asin', 'date', 'publication', 'savoir', 'plus', 'taille', 'fichier',
   ]);
 
   const words = fullText
     .toLowerCase()
     .replace(/[^a-zà-ÿ0-9\s-]/g, ' ')
     .split(/\s+/)
-    .filter((word) => word.length > 3 && !stopWords.has(word));
+    .filter((word) => word.length > 3 && !stopWords.has(word) && !/^\d+$/.test(word));
 
   const frequency: Record<string, number> = {};
   for (const word of words) {
