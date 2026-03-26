@@ -51,6 +51,21 @@ interface KeywordData {
   titleKeywords: string[];
 }
 
+interface AuditCriterion {
+  name: string;
+  score: number;
+  status: 'excellent' | 'bon' | 'moyen' | 'faible' | 'critique';
+  recommendation: string;
+  priority: 'haute' | 'moyenne' | 'basse';
+}
+
+interface AuditData {
+  overall_score: number;
+  overall_verdict: string;
+  criteria: AuditCriterion[];
+  quick_wins: string[];
+}
+
 const MARKETPLACES = [
   { value: 'fr', label: '🇫🇷 France', domain: 'amazon.fr' },
   { value: 'us', label: '🇺🇸 USA', domain: 'amazon.com' },
