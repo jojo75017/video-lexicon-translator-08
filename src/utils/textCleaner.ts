@@ -3,6 +3,8 @@
  * Supprime les artefacts JSON/échappement indésirables
  */
 
+import { applyFrenchTypography } from './frenchTypography';
+
 /**
  * Nettoie le texte généré pour supprimer les artefacts d'échappement JSON
  * @param text Le texte à nettoyer
