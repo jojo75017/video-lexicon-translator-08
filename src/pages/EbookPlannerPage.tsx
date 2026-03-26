@@ -1715,7 +1715,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                                         c.id === character.id ? { ...c, name: e.target.value } : c
                                       ));
                                     }}
-                                    className="border-purple-200 focus:border-purple-400"
+                                    className="border-border focus:border-primary"
                                   />
                                   <Select 
                                     value={character.role || ''} 
@@ -1725,7 +1725,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                                       ));
                                     }}
                                   >
-                                    <SelectTrigger className="border-purple-200 focus:border-purple-400">
+                                    <SelectTrigger className="border-border focus:border-primary">
                                       <SelectValue placeholder="Rôle" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -1746,17 +1746,17 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                                       c.id === character.id ? { ...c, description: e.target.value } : c
                                     ));
                                   }}
-                                  className="min-h-[100px] border-purple-200 focus:border-purple-400"
+                                  className="min-h-[100px] border-border focus:border-primary"
                                 />
                                 
                                 {/* Image de référence */}
-                                <div className="flex items-start gap-3 pt-2 border-t border-purple-100">
+                                <div className="flex items-start gap-3 pt-2 border-t border-border">
                                   {character.referenceImageUrl ? (
                                     <div className="relative group">
                                       <img 
                                         src={character.referenceImageUrl} 
                                         alt={`Portrait de ${character.name}`}
-                                        className="w-24 h-24 object-cover rounded-lg border-2 border-purple-300 shadow-md"
+                                        className="w-24 h-24 object-cover rounded-lg border-2 border-primary/30 shadow-md"
                                       />
                                       <Button
                                         variant="destructive"
@@ -1772,18 +1772,18 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                                       </Button>
                                     </div>
                                   ) : (
-                                    <div className="w-24 h-24 rounded-lg border-2 border-dashed border-purple-200 flex items-center justify-center bg-purple-50">
-                                      <ImageIcon className="h-8 w-8 text-purple-300" />
+                                    <div className="w-24 h-24 rounded-lg border-2 border-dashed border-border flex items-center justify-center bg-card">
+                                      <ImageIcon className="h-8 w-8 text-muted-foreground" />
                                     </div>
                                   )}
                                   <div className="flex-1">
-                                    <p className="text-xs text-purple-600 mb-2">Image de référence IA</p>
+                                    <p className="text-xs text-muted-foreground mb-2">Image de référence IA</p>
                                     <Button
                                       variant="outline"
                                       size="sm"
                                       onClick={() => generateCharacterImage(character.id)}
                                       disabled={generatingImageForCharacter === character.id || !character.name || !character.description}
-                                      className="border-purple-300 text-purple-700 hover:bg-purple-100"
+                                      className="border-primary/30 text-primary hover:bg-primary/10"
                                     >
                                       {generatingImageForCharacter === character.id ? (
                                         <>
