@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Award, Loader2, CheckCircle2, AlertTriangle, Shield, BookOpen, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 
 interface Verdict {
   publiable: boolean;
@@ -24,6 +25,8 @@ interface Verdict {
 }
 
 const EbookUltimateVerdict = () => {
+  const { apiKey: userGeminiKey } = useOpenAIConfig();
+
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [isJudging, setIsJudging] = useState(false);
@@ -38,7 +41,7 @@ const EbookUltimateVerdict = () => {
     setIsJudging(true);
     try {
       const { data, error } = await supabase.functions.invoke('ultimate-verdict', {
-        body: { 
+        body: { userApiKey: userGeminiKey, 
           title: title.trim(),
           content: content.trim() || undefined
         }

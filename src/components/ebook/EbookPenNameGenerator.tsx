@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 
 const categories = [
   'Business & Entrepreneuriat', 'Romance', 'Fantasy', 'Science-fiction',
@@ -44,6 +45,8 @@ interface PenNameResult {
 }
 
 const getScoreColor = (score: number) => {
+  const { apiKey: userGeminiKey } = useOpenAIConfig();
+
   if (score >= 85) return 'text-emerald-500';
   if (score >= 70) return 'text-amber-500';
   return 'text-orange-500';
@@ -78,7 +81,7 @@ const EbookPenNameGenerator: React.FC = () => {
     setIsGenerating(true);
     try {
       const { data, error } = await supabase.functions.invoke('generate-pen-name', {
-        body: { title, category, tone, targetMarket }
+        body: { userApiKey: userGeminiKey, title, category, tone, targetMarket }
       });
       if (error) throw error;
       setResult(data);

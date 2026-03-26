@@ -8,6 +8,7 @@ import { Loader2, RefreshCw, Copy, Sparkles, AlertCircle, CheckCircle2 } from 'l
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { Progress } from '@/components/ui/progress';
+import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 
 interface RewriteResult {
   texteReecrit: string;
@@ -17,6 +18,8 @@ interface RewriteResult {
 }
 
 const EbookNaturalRewrite = () => {
+  const { apiKey: userGeminiKey } = useOpenAIConfig();
+
   const [text, setText] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [result, setResult] = useState<RewriteResult | null>(null);
@@ -30,7 +33,7 @@ const EbookNaturalRewrite = () => {
     setIsGenerating(true);
     try {
       const { data, error } = await supabase.functions.invoke('natural-rewrite', {
-        body: { 
+        body: { userApiKey: userGeminiKey, 
           text, 
           style: 'conversationnel',
           preserveStructure: true

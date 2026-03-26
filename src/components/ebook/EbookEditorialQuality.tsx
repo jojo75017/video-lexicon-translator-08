@@ -7,6 +7,7 @@ import { Loader2, CheckCircle2, AlertTriangle, Sparkles, BookOpen, RefreshCw } f
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useWorkflowResults } from '@/hooks/useWorkflowResults';
+import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 
 interface QualityAnalysis {
   clarteGlobale: {
@@ -36,6 +37,7 @@ export const EbookEditorialQuality: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [analysis, setAnalysis] = useState<QualityAnalysis | null>(null);
   const [hasAutoLoadedContent, setHasAutoLoadedContent] = useState(false);
+  const { apiKey: userGeminiKey } = useOpenAIConfig();
   
   const { getStepResult, hasStepResult } = useWorkflowResults();
 
@@ -91,7 +93,7 @@ export const EbookEditorialQuality: React.FC = () => {
 
     try {
       const { data, error } = await supabase.functions.invoke('editorial-quality', {
-        body: { 
+        body: { userApiKey: userGeminiKey, 
           title,
           content: content
         }
@@ -110,6 +112,7 @@ export const EbookEditorialQuality: React.FC = () => {
   };
   
   const handleReloadFromWorkflow = () => {
+
     setHasAutoLoadedContent(false);
   };
 

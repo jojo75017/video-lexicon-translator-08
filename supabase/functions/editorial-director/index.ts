@@ -5,53 +5,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-async function callAI(systemPrompt: string, userPrompt: string, opts: { maxTokens?: number; temperature?: number; timeout?: number } = {}) {
-  // Prefer GEMINI_API_KEY (user's own key), fallback to Lovable Gateway
-  const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-  if (GEMINI_API_KEY) {
-    return callGeminiFallback(GEMINI_API_KEY, systemPrompt, userPrompt, opts);
-  }
-
-  const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-  if (!LOVABLE_API_KEY) throw new Error("Aucune clé API configurée.");
-
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), opts.timeout || 90000);
-
-  const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${LOVABLE_API_KEY}`,
-    },
-    body: JSON.stringify({
-      model: "google/gemini-2.5-flash",
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt },
-      ],
-      temperature: opts.temperature ?? 0.6,
-      max_tokens: opts.maxTokens ?? 3000,
-    }),
-    signal: controller.signal,
-  });
-
-  clearTimeout(timeoutId);
-
-  if (!response.ok) {
-    const errText = await response.text();
-    console.error("AI Gateway error:", response.status, errText);
-    if (response.status === 429) throw { status: 429, message: "Limite de requêtes atteinte. Réessayez dans quelques secondes." };
-    throw new Error(`Erreur AI: ${response.status}`);
-  }
-
-  const data = await response.json();
-  const content = data.choices?.[0]?.message?.content;
-  if (!content) throw new Error("Aucune réponse de l'IA");
-  return content;
-}
-
-async function callGeminiFallback(apiKey: string, systemPrompt: string, userPrompt: string, opts: any) {
+async function callGemini(apiKey: string, systemPrompt: string, userPrompt: string, opts: { maxTokens?: number; temperature?: number; timeout?: number } = {}) {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), opts.timeout || 90000);
   const response = await fetch(
@@ -70,7 +24,11 @@ serve(async (req) => {
   }
 
   try {
-    const { sujet, contexte } = await req.json();
+    const { sujet, contexte, userApiKey } = await req.json();
+
+    if (!userApiKey) {
+      return new Response(JSON.stringify({ error: "Clé API Gemini requise. Configurez votre clé dans Paramètres > Clés API." }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
 
     if (!sujet) {
       return new Response(JSON.stringify({ error: "Le sujet est requis" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
@@ -129,11 +87,10 @@ Rappel : UNIQUEMENT du JSON valide sans balises markdown, sois CONCIS, spécifiq
 
     console.log("Editorial Director - Analyse pour:", sujet);
 
-    const content = await callAI(systemPrompt, userPrompt, { maxTokens: 4500, temperature: 0.6 });
+    const content = await callGemini(userApiKey, systemPrompt, userPrompt, { maxTokens: 4500, temperature: 0.6 });
 
     let analysis;
     try {
-      // Clean markdown fences and extract JSON
       let cleaned = content.trim();
       cleaned = cleaned.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '');
       cleaned = cleaned.trim();
@@ -149,12 +106,10 @@ Rappel : UNIQUEMENT du JSON valide sans balises markdown, sois CONCIS, spécifiq
         }
       }
 
-      // Validate required fields
       if (!analysis.promesseCentrale || !analysis.angleEditorial) {
         throw new Error("Missing required fields");
       }
 
-      // Ensure arrays exist
       if (!Array.isArray(analysis.erreursCourantes)) {
         analysis.erreursCourantes = ["Contenu trop générique", "Manque de profondeur", "Pas de différenciation"];
       }
@@ -163,7 +118,6 @@ Rappel : UNIQUEMENT du JSON valide sans balises markdown, sois CONCIS, spécifiq
       }
     } catch (parseError) {
       console.error("JSON parse error:", parseError, "Content:", content.substring(0, 500));
-      // Build a structured fallback from the text
       analysis = {
         promesseCentrale: "Analyse en cours de traitement. Veuillez relancer l'analyse.",
         angleEditorial: content.substring(0, 400) || "Angle à déterminer",

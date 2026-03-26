@@ -7,6 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { Loader2, Search, TrendingUp, DollarSign, BookOpen, Star, BarChart3, Eye, Target, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 
 interface CompetitorBook {
   title: string;
@@ -41,13 +42,14 @@ export const EbookCompetitorSpy: React.FC = () => {
   const [niche, setNiche] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState<NicheAnalysis | null>(null);
+  const { apiKey: userGeminiKey } = useOpenAIConfig();
 
   const analyzeNiche = async () => {
     if (!niche.trim()) { toast.error('Entrez une niche à analyser'); return; }
     setIsAnalyzing(true);
     try {
       const { data, error } = await supabase.functions.invoke('analyze-niche', {
-        body: { niche: niche.trim() }
+        body: { userApiKey: userGeminiKey, niche: niche.trim() }
       });
       if (error) throw error;
       const raw = data?.analysis || data;

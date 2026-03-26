@@ -7,8 +7,11 @@ import { Input } from '@/components/ui/input';
 import { GitBranch, Loader2, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 
 const EbookChapterCoherence = () => {
+  const { apiKey: userGeminiKey } = useOpenAIConfig();
+
   const [title, setTitle] = useState('');
   const [chaptersContent, setChaptersContent] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -30,7 +33,7 @@ const EbookChapterCoherence = () => {
     setIsAnalyzing(true);
     try {
       const { data, error } = await supabase.functions.invoke('chapter-coherence', {
-        body: { 
+        body: { userApiKey: userGeminiKey, 
           title: title.trim(),
           chaptersContent: chaptersContent.trim() || undefined
         }

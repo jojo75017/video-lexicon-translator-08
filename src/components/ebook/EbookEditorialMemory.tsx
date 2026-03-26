@@ -7,8 +7,11 @@ import { Label } from '@/components/ui/label';
 import { Brain, Loader2, Save, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 
 const EbookEditorialMemory = () => {
+  const { apiKey: userGeminiKey } = useOpenAIConfig();
+
   const [title, setTitle] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [memory, setMemory] = useState<{
@@ -29,7 +32,7 @@ const EbookEditorialMemory = () => {
     setIsGenerating(true);
     try {
       const { data, error } = await supabase.functions.invoke('editorial-memory', {
-        body: { title: title.trim() }
+        body: { userApiKey: userGeminiKey, title: title.trim() }
       });
 
       if (error) throw error;

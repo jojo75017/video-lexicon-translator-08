@@ -5,12 +5,10 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-async function callGemini(systemPrompt: string, userPrompt: string, opts: { maxTokens?: number; temperature?: number; timeout?: number } = {}) {
-  const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-  if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY non configurée.");
+async function callGemini(apiKey: string, systemPrompt: string, userPrompt: string, opts: { maxTokens?: number; temperature?: number; timeout?: number } = {}) {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), opts.timeout || 60000);
-  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ system_instruction: { parts: [{ text: systemPrompt }] }, contents: [{ role: "user", parts: [{ text: userPrompt }] }], generationConfig: { temperature: opts.temperature ?? 0.7, maxOutputTokens: opts.maxTokens ?? 2000 } }), signal: controller.signal });
+  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ system_instruction: { parts: [{ text: systemPrompt }] }, contents: [{ role: "user", parts: [{ text: userPrompt }] }], generationConfig: { temperature: opts.temperature ?? 0.7, maxOutputTokens: opts.maxTokens ?? 2000 } }), signal: controller.signal });
   clearTimeout(timeoutId);
   if (!response.ok) { const e = await response.text(); console.error("Gemini error:", response.status, e); if (response.status === 429) throw { status: 429, message: "Limite Gemini atteinte." }; throw new Error(`Erreur Gemini: ${response.status}`); }
   const data = await response.json();
@@ -21,7 +19,8 @@ serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
   try {
-    const { title, content } = await req.json();
+    const { title, content, userApiKey} = await req.json();
+    if (!userApiKey) return new Response(JSON.stringify({ error: "Clé API Gemini requise. Configurez votre clé dans Paramètres > Clés API." }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     if (!title) return new Response(JSON.stringify({ error: "Le titre est requis" }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
     const systemPrompt = `Tu es un éditeur exigeant spécialisé dans l'analyse de qualité éditoriale.
@@ -53,7 +52,7 @@ Réponds UNIQUEMENT en JSON valide avec cette structure exacte :
     const userPrompt = `Analyse ce contenu comme un éditeur exigeant :\n\nTitre : ${title}\n${content ? `\nContenu :\n${content}` : ''}\n\nÉvalue la clarté, la cohérence, la valeur perçue et l'utilité pour le lecteur.`;
 
     console.log("Gemini 3 Flash: editorial-quality analysis...");
-    const responseContent = await callGemini(systemPrompt, userPrompt);
+    const responseContent = await callGemini(userApiKey, systemPrompt, userPrompt);
 
     let result;
     try {

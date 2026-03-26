@@ -79,70 +79,14 @@ async function callGeminiDirect(systemPrompt: string, userPrompt: string, maxTok
 }
 
 async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000): Promise<string> {
-  const lovableKey = Deno.env.get('LOVABLE_API_KEY');
+  // BYOK OBLIGATOIRE : seule la clé de l'utilisateur est acceptée
   const userKey = activeApiKey;
-  const geminiKey = Deno.env.get('GEMINI_API_KEY');
-  const directKey = userKey || geminiKey;
   
-  // Stratégie 1: Essayer Lovable Gateway d'abord
-  if (lovableKey) {
-    try {
-      const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${lovableKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'google/gemini-2.5-flash',
-          messages: [
-            { role: 'system', content: systemPrompt + EDITORIAL_PRO_RULES },
-            { role: 'user', content: userPrompt }
-          ],
-          max_tokens: maxTokens,
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.usage) {
-          totalTokenUsage.promptTokens += data.usage.prompt_tokens || 0;
-          totalTokenUsage.completionTokens += data.usage.completion_tokens || 0;
-          totalTokenUsage.totalTokens += data.usage.total_tokens || 0;
-          console.log(`📊 Tokens used: +${data.usage.total_tokens} (cumulative: ${totalTokenUsage.totalTokens})`);
-        }
-        return data.choices?.[0]?.message?.content || '';
-      }
-
-      const status = response.status;
-      const errorText = await response.text();
-      console.error(`Lovable Gateway error ${status}: ${errorText}`);
-      
-      // Pour 402/429, tenter le fallback vers Gemini direct
-      if ((status === 402 || status === 429) && directKey) {
-        console.log(`⚡ Fallback vers Gemini API directe (clé ${userKey ? 'utilisateur' : 'serveur'})`);
-        return await callGeminiDirect(systemPrompt, userPrompt, maxTokens, directKey);
-      }
-      
-      if (status === 429) throw new Error('RATE_LIMIT');
-      if (status === 402) throw new Error('QUOTA_EXCEEDED: Quota dépassé et aucune clé Gemini de secours.');
-      throw new Error(`AI Error: ${status} - ${errorText}`);
-    } catch (e) {
-      // Si c'est une erreur réseau et qu'on a une clé directe, fallback
-      if (directKey && !e.message?.startsWith('RATE_LIMIT') && !e.message?.startsWith('QUOTA_EXCEEDED') && !e.message?.startsWith('INVALID_API_KEY')) {
-        console.log(`⚡ Fallback réseau vers Gemini API directe`);
-        return await callGeminiDirect(systemPrompt, userPrompt, maxTokens, directKey);
-      }
-      throw e;
-    }
-  }
-  
-  // Stratégie 2: Gemini API directe uniquement
-  if (directKey) {
-    return await callGeminiDirect(systemPrompt, userPrompt, maxTokens, directKey);
+  if (!userKey) {
+    throw new Error('NO_API_KEY: Clé API Gemini requise. Configurez votre propre clé Gemini dans les Paramètres avant de générer.');
   }
 
-  throw new Error('NO_API_KEY: Aucune clé API disponible. Configurez votre clé Gemini dans les Paramètres.');
+  return await callGeminiDirect(systemPrompt + EDITORIAL_PRO_RULES, userPrompt, maxTokens, userKey);
 }
 
 // BOUCLE QUALITÉ : appelle l'IA, évalue le score, relance si < seuil
@@ -304,13 +248,14 @@ serve(async (req) => {
       useUserKey,
     } = payload;
 
-    if (useUserKey && userApiKey) {
-      activeApiKey = userApiKey;
-      console.log(`Using USER API key for step ${step}`);
-    } else {
-      activeApiKey = null; // Lovable Gateway sera utilisé en priorité
-      console.log(`Using Lovable Gateway for step ${step}`);
+    if (!userApiKey) {
+      return new Response(
+        JSON.stringify({ error: 'NO_API_KEY: Clé API Gemini requise. Configurez votre propre clé dans Paramètres > Clés API.' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
+    activeApiKey = userApiKey;
+    console.log(`Using USER API key for step ${step}`);
 
     if (!title) {
       return new Response(
