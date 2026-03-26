@@ -1,19 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { 
   Copy, Loader2, Sparkles, Facebook, Linkedin, Instagram, Twitter,
-  Share2, Users, MessageSquare, Hash, Megaphone, RefreshCw
+  Share2, Users, Hash, Megaphone, RefreshCw, Save, Pencil, Check,
+  AlertTriangle, CheckCircle2, Download
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import PostCard from './social/PostCard';
+import { PLATFORMS, PHASES, Platform, LaunchPhase, GeneratedPost } from './social/socialPostTypes';
 
 interface EbookLaunchSocialPostsProps {
   ebookTitle?: string;
@@ -21,35 +22,6 @@ interface EbookLaunchSocialPostsProps {
   genre?: string;
   amazonLink?: string;
 }
-
-type Platform = 'facebook-group' | 'facebook-page' | 'linkedin' | 'instagram' | 'twitter' | 'tiktok' | 'pinterest';
-type LaunchPhase = 'teaser' | 'launch-day' | 'social-proof' | 'promo' | 'storytelling';
-
-interface GeneratedPost {
-  platform: Platform;
-  phase: LaunchPhase;
-  content: string;
-  hashtags: string[];
-  visualTip: string;
-}
-
-const PLATFORMS: { id: Platform; label: string; icon: React.ElementType; color: string; maxChars: number }[] = [
-  { id: 'facebook-group', label: 'Groupes Facebook', icon: Users, color: 'from-blue-600 to-blue-500', maxChars: 2000 },
-  { id: 'facebook-page', label: 'Page Facebook', icon: Facebook, color: 'from-blue-700 to-blue-600', maxChars: 2000 },
-  { id: 'linkedin', label: 'LinkedIn', icon: Linkedin, color: 'from-sky-700 to-sky-600', maxChars: 3000 },
-  { id: 'instagram', label: 'Instagram', icon: Instagram, color: 'from-pink-600 to-purple-600', maxChars: 2200 },
-  { id: 'twitter', label: 'X (Twitter)', icon: Twitter, color: 'from-zinc-800 to-zinc-700', maxChars: 280 },
-  { id: 'tiktok', label: 'TikTok', icon: Share2, color: 'from-zinc-900 to-pink-600', maxChars: 2200 },
-  { id: 'pinterest', label: 'Pinterest', icon: Hash, color: 'from-red-600 to-red-500', maxChars: 500 },
-];
-
-const PHASES: { id: LaunchPhase; label: string; emoji: string; description: string }[] = [
-  { id: 'teaser', label: 'Teaser (J-7 à J-1)', emoji: '🔮', description: 'Créer l\'attente et la curiosité' },
-  { id: 'launch-day', label: 'Jour de lancement', emoji: '🚀', description: 'Annonce officielle avec lien' },
-  { id: 'social-proof', label: 'Preuve sociale', emoji: '⭐', description: 'Partager reviews et témoignages' },
-  { id: 'promo', label: 'Promotion', emoji: '🎁', description: 'Offres spéciales et urgence' },
-  { id: 'storytelling', label: 'Storytelling', emoji: '📖', description: 'L\'histoire derrière le livre' },
-];
 
 const EbookLaunchSocialPosts: React.FC<EbookLaunchSocialPostsProps> = ({
   ebookTitle = '',
@@ -66,19 +38,11 @@ const EbookLaunchSocialPosts: React.FC<EbookLaunchSocialPostsProps> = ({
   const [selectedPhase, setSelectedPhase] = useState<LaunchPhase>('launch-day');
   const [generatedPosts, setGeneratedPosts] = useState<GeneratedPost[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [regeneratingIndex, setRegeneratingIndex] = useState<number | null>(null);
 
-  const handleGenerate = async () => {
-    if (!title.trim()) {
-      toast.error('Titre du livre requis');
-      return;
-    }
-
-    setIsGenerating(true);
-    try {
-      const platform = PLATFORMS.find(p => p.id === selectedPlatform)!;
-      const phase = PHASES.find(p => p.id === selectedPhase)!;
-
-      const prompt = `Tu es un expert en marketing littéraire et réseaux sociaux. Génère 3 posts ${platform.label} pour un livre intitulé "${title}"${author ? ` par ${author}` : ''}${bookGenre ? ` (genre: ${bookGenre})` : ''}${targetAudience ? ` ciblant: ${targetAudience}` : ''}.
+  const buildPrompt = useCallback((platform: typeof PLATFORMS[number], phase: typeof PHASES[number], count: number = 3) => {
+    return `Tu es un expert en marketing littéraire et réseaux sociaux. Génère ${count} post${count > 1 ? 's' : ''} ${platform.label} pour un livre intitulé "${title}"${author ? ` par ${author}` : ''}${bookGenre ? ` (genre: ${bookGenre})` : ''}${targetAudience ? ` ciblant: ${targetAudience}` : ''}.
 
 Phase de lancement : ${phase.label} — ${phase.description}
 ${link ? `Lien Amazon : ${link}` : ''}
@@ -103,94 +67,121 @@ Réponds en JSON strict :
     }
   ]
 }`;
+  }, [title, author, bookGenre, targetAudience, link]);
 
-      const { data, error } = await supabase.functions.invoke('generate-content', {
-        body: { 
-          type: 'social-launch-posts',
-          prompt,
-          maxOutputTokens: 3000,
-          temperature: 0.85,
-        },
-      });
-
-      if (error) throw error;
-
-      const text = data?.content || data?.text || '';
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[0]);
-        const posts: GeneratedPost[] = (parsed.posts || []).map((p: any) => ({
-          platform: selectedPlatform,
-          phase: selectedPhase,
-          content: p.content || '',
-          hashtags: p.hashtags || [],
-          visualTip: p.visualTip || '',
-        }));
-        setGeneratedPosts(posts);
-        toast.success(`${posts.length} posts générés pour ${platform.label}`);
-      } else {
-        toast.error('Format de réponse inattendu');
-      }
-    } catch (err: any) {
-      console.error('Erreur génération posts:', err);
-      toast.error('Erreur lors de la génération');
-    } finally {
-      setIsGenerating(false);
+  const parseResponse = (text: string): Array<{ content: string; hashtags: string[]; visualTip: string }> => {
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) return [];
+    try {
+      const parsed = JSON.parse(jsonMatch[0]);
+      if (parsed.posts) return parsed.posts;
+      if (parsed.content) return [parsed];
+      return [];
+    } catch {
+      return [];
     }
   };
 
-  const handleGenerateAll = async () => {
-    if (!title.trim()) {
-      toast.error('Titre du livre requis');
-      return;
-    }
+  const handleGenerate = async () => {
+    if (!title.trim()) { toast.error('Titre du livre requis'); return; }
+    setIsGenerating(true);
+    try {
+      const platform = PLATFORMS.find(p => p.id === selectedPlatform)!;
+      const phase = PHASES.find(p => p.id === selectedPhase)!;
+      const prompt = buildPrompt(platform, phase, 3);
 
+      const { data, error } = await supabase.functions.invoke('generate-content', {
+        body: { type: 'social-launch-posts', prompt, maxOutputTokens: 3000, temperature: 0.85 },
+      });
+      if (error) throw error;
+
+      const items = parseResponse(data?.content || data?.text || '');
+      const posts: GeneratedPost[] = items.map(p => ({
+        platform: selectedPlatform, phase: selectedPhase,
+        content: p.content || '', hashtags: p.hashtags || [], visualTip: p.visualTip || '',
+      }));
+      setGeneratedPosts(posts);
+      toast.success(`${posts.length} posts générés pour ${platform.label}`);
+    } catch (err) {
+      console.error('Erreur génération posts:', err);
+      toast.error('Erreur lors de la génération');
+    } finally { setIsGenerating(false); }
+  };
+
+  const handleGenerateAll = async () => {
+    if (!title.trim()) { toast.error('Titre du livre requis'); return; }
     setIsGenerating(true);
     const allPosts: GeneratedPost[] = [];
-
     try {
-      for (const platform of PLATFORMS.slice(0, 4)) { // FB group, FB page, LinkedIn, Instagram
+      for (const platform of PLATFORMS.slice(0, 5)) {
         const phase = PHASES.find(p => p.id === selectedPhase)!;
-
-        const prompt = `Tu es un expert en marketing littéraire. Génère 1 post ${platform.label} optimisé pour un livre "${title}"${author ? ` par ${author}` : ''}${bookGenre ? ` (genre: ${bookGenre})` : ''}.
-
-Phase : ${phase.label} — ${phase.description}
-${link ? `Lien Amazon : ${link}` : ''}
-Max ${platform.maxChars} caractères. Ton adapté à ${platform.label}.
-${platform.id === 'facebook-group' ? 'Finir par une question ouverte pour engager.' : ''}
-${platform.id === 'instagram' ? 'Ajouter 15 hashtags.' : ''}
-Français uniquement. Pas de markdown.
-
-Réponds en JSON : {"content": "...", "hashtags": [...], "visualTip": "..."}`;
-
+        const prompt = buildPrompt(platform, phase, 1);
         const { data, error } = await supabase.functions.invoke('generate-content', {
           body: { type: 'social-launch-posts', prompt, maxOutputTokens: 1500, temperature: 0.85 },
         });
-
         if (!error && data) {
-          const text = data?.content || data?.text || '';
-          const jsonMatch = text.match(/\{[\s\S]*\}/);
-          if (jsonMatch) {
-            const parsed = JSON.parse(jsonMatch[0]);
+          const items = parseResponse(data?.content || data?.text || '');
+          if (items.length > 0) {
             allPosts.push({
-              platform: platform.id,
-              phase: selectedPhase,
-              content: parsed.content || '',
-              hashtags: parsed.hashtags || [],
-              visualTip: parsed.visualTip || '',
+              platform: platform.id, phase: selectedPhase,
+              content: items[0].content || '', hashtags: items[0].hashtags || [], visualTip: items[0].visualTip || '',
             });
           }
         }
       }
-
       setGeneratedPosts(allPosts);
       toast.success(`${allPosts.length} posts générés pour toutes les plateformes`);
     } catch (err) {
       console.error('Erreur génération multiple:', err);
       toast.error('Erreur lors de la génération');
-    } finally {
-      setIsGenerating(false);
-    }
+    } finally { setIsGenerating(false); }
+  };
+
+  const handleRegenerateOne = async (index: number) => {
+    setRegeneratingIndex(index);
+    try {
+      const post = generatedPosts[index];
+      const platform = PLATFORMS.find(p => p.id === post.platform)!;
+      const phase = PHASES.find(p => p.id === post.phase)!;
+      const prompt = buildPrompt(platform, phase, 1);
+      const { data, error } = await supabase.functions.invoke('generate-content', {
+        body: { type: 'social-launch-posts', prompt, maxOutputTokens: 1500, temperature: 0.9 },
+      });
+      if (error) throw error;
+      const items = parseResponse(data?.content || data?.text || '');
+      if (items.length > 0) {
+        setGeneratedPosts(prev => prev.map((p, i) => i === index ? {
+          ...p, content: items[0].content || '', hashtags: items[0].hashtags || [], visualTip: items[0].visualTip || '',
+        } : p));
+        toast.success('Post régénéré');
+      }
+    } catch { toast.error('Erreur régénération'); }
+    finally { setRegeneratingIndex(null); }
+  };
+
+  const handleUpdatePost = (index: number, field: keyof GeneratedPost, value: any) => {
+    setGeneratedPosts(prev => prev.map((p, i) => i === index ? { ...p, [field]: value } : p));
+  };
+
+  const handleSaveAll = async () => {
+    if (generatedPosts.length === 0) return;
+    setIsSaving(true);
+    try {
+      const rows = generatedPosts.map(post => ({
+        platform: post.platform,
+        post_type: `launch-${post.phase}`,
+        content: post.content,
+        hashtags: post.hashtags,
+        visual_description: post.visualTip,
+        status: 'draft' as const,
+      }));
+      const { error } = await supabase.from('social_posts').insert(rows);
+      if (error) throw error;
+      toast.success(`${rows.length} posts sauvegardés dans votre calendrier`);
+    } catch (err) {
+      console.error('Erreur sauvegarde:', err);
+      toast.error('Erreur lors de la sauvegarde');
+    } finally { setIsSaving(false); }
   };
 
   const copyPost = (post: GeneratedPost) => {
@@ -198,11 +189,11 @@ Réponds en JSON : {"content": "...", "hashtags": [...], "visualTip": "..."}`;
       ? `${post.content}\n\n${post.hashtags.map(h => `#${h}`).join(' ')}`
       : post.content;
     navigator.clipboard.writeText(fullText);
-    toast.success('Post copié dans le presse-papier !');
+    toast.success('Post copié !');
   };
 
   const copyAll = () => {
-    const allText = generatedPosts.map((post, i) => {
+    const allText = generatedPosts.map(post => {
       const platform = PLATFORMS.find(p => p.id === post.platform);
       const header = `═══ ${platform?.label?.toUpperCase()} ═══`;
       const hashtags = post.hashtags.length > 0 ? `\n\n${post.hashtags.map(h => `#${h}`).join(' ')}` : '';
@@ -210,6 +201,24 @@ Réponds en JSON : {"content": "...", "hashtags": [...], "visualTip": "..."}`;
     }).join('\n\n\n');
     navigator.clipboard.writeText(allText);
     toast.success('Tous les posts copiés !');
+  };
+
+  const exportAsText = () => {
+    const allText = generatedPosts.map(post => {
+      const platform = PLATFORMS.find(p => p.id === post.platform);
+      const phase = PHASES.find(p => p.id === post.phase);
+      const header = `═══ ${platform?.label?.toUpperCase()} — ${phase?.label} ═══`;
+      const hashtags = post.hashtags.length > 0 ? `\n\nHashtags: ${post.hashtags.map(h => `#${h}`).join(' ')}` : '';
+      const visual = post.visualTip ? `\n\n🎨 Visuel: ${post.visualTip}` : '';
+      return `${header}\n\n${post.content}${hashtags}${visual}`;
+    }).join('\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n');
+    
+    const blob = new Blob([`📚 Posts de lancement — ${title}\n\n${allText}`], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `posts-lancement-${title.replace(/\s+/g, '-').toLowerCase()}.txt`;
+    a.click(); URL.revokeObjectURL(url);
+    toast.success('Fichier exporté');
   };
 
   return (
@@ -224,12 +233,10 @@ Réponds en JSON : {"content": "...", "hashtags": [...], "visualTip": "..."}`;
             <div>
               <CardTitle className="text-xl flex items-center gap-2">
                 Posts de Lancement
-                <Badge className="bg-gradient-to-r from-indigo-500 to-violet-500 text-white text-xs">
-                  IA Pro
-                </Badge>
+                <Badge className="bg-gradient-to-r from-indigo-500 to-violet-500 text-white text-xs">IA Pro</Badge>
               </CardTitle>
               <p className="text-sm text-muted-foreground mt-1">
-                Générez des posts optimisés pour chaque réseau et phase de lancement
+                Générez, éditez et sauvegardez vos posts pour chaque réseau et phase
               </p>
             </div>
           </div>
@@ -273,9 +280,7 @@ Réponds en JSON : {"content": "...", "hashtags": [...], "visualTip": "..."}`;
                 onClick={() => setSelectedPhase(phase.id)}
                 className={cn(
                   "w-full text-left p-3 rounded-lg border transition-all flex items-center gap-3",
-                  selectedPhase === phase.id
-                    ? "border-indigo-500 bg-indigo-500/15"
-                    : "border-border/50 hover:bg-card"
+                  selectedPhase === phase.id ? "border-indigo-500 bg-indigo-500/15" : "border-border/50 hover:bg-card"
                 )}
               >
                 <span className="text-lg">{phase.emoji}</span>
@@ -301,9 +306,7 @@ Réponds en JSON : {"content": "...", "hashtags": [...], "visualTip": "..."}`;
                   onClick={() => setSelectedPlatform(platform.id)}
                   className={cn(
                     "w-full text-left p-3 rounded-lg border transition-all flex items-center gap-3",
-                    selectedPlatform === platform.id
-                      ? "border-indigo-500 bg-indigo-500/15"
-                      : "border-border/50 hover:bg-card"
+                    selectedPlatform === platform.id ? "border-indigo-500 bg-indigo-500/15" : "border-border/50 hover:bg-card"
                   )}
                 >
                   <div className={cn("p-1.5 rounded-md bg-gradient-to-r text-white", platform.color)}>
@@ -330,86 +333,41 @@ Réponds en JSON : {"content": "...", "hashtags": [...], "visualTip": "..."}`;
           {isGenerating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Sparkles className="h-4 w-4 mr-2" />}
           Générer 3 posts ({PLATFORMS.find(p => p.id === selectedPlatform)?.label})
         </Button>
-        <Button
-          variant="outline"
-          onClick={handleGenerateAll}
-          disabled={isGenerating || !title.trim()}
-        >
+        <Button variant="outline" onClick={handleGenerateAll} disabled={isGenerating || !title.trim()}>
           {isGenerating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Share2 className="h-4 w-4 mr-2" />}
-          Générer pour toutes les plateformes
+          Toutes les plateformes
         </Button>
         {generatedPosts.length > 0 && (
-          <Button variant="outline" onClick={copyAll}>
-            <Copy className="h-4 w-4 mr-2" />
-            Copier tout
-          </Button>
+          <>
+            <Button variant="outline" onClick={copyAll}>
+              <Copy className="h-4 w-4 mr-2" /> Copier tout
+            </Button>
+            <Button variant="outline" onClick={exportAsText}>
+              <Download className="h-4 w-4 mr-2" /> Exporter .txt
+            </Button>
+            <Button variant="outline" onClick={handleSaveAll} disabled={isSaving}>
+              {isSaving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
+              Sauvegarder
+            </Button>
+          </>
         )}
       </div>
 
       {/* Résultats */}
       <AnimatePresence>
         {generatedPosts.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-4"
-          >
-            {generatedPosts.map((post, index) => {
-              const platform = PLATFORMS.find(p => p.id === post.platform)!;
-              const Icon = platform.icon;
-
-              return (
-                <motion.div
-                  key={`${post.platform}-${index}`}
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <Card className="bg-card/50 border-border/50 hover:border-indigo-500/30 transition-all">
-                    <CardContent className="p-5">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2">
-                          <div className={cn("p-1.5 rounded-md bg-gradient-to-r text-white", platform.color)}>
-                            <Icon className="h-4 w-4" />
-                          </div>
-                          <span className="font-medium text-sm">{platform.label}</span>
-                          <Badge variant="outline" className="text-xs">
-                            {post.content.length}/{platform.maxChars} car.
-                          </Badge>
-                        </div>
-                        <Button size="sm" variant="ghost" onClick={() => copyPost(post)}>
-                          <Copy className="h-4 w-4 mr-1" />
-                          Copier
-                        </Button>
-                      </div>
-
-                      <div className="p-4 rounded-lg bg-background/50 border border-border/30 whitespace-pre-wrap text-sm leading-relaxed">
-                        {post.content}
-                      </div>
-
-                      {post.hashtags.length > 0 && (
-                        <div className="mt-3 flex flex-wrap gap-1.5">
-                          {post.hashtags.map((tag, i) => (
-                            <Badge key={i} variant="secondary" className="text-xs">
-                              #{tag}
-                            </Badge>
-                          ))}
-                        </div>
-                      )}
-
-                      {post.visualTip && (
-                        <div className="mt-3 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
-                          <p className="text-xs text-amber-300 flex items-start gap-2">
-                            <Sparkles className="h-3 w-3 mt-0.5 shrink-0" />
-                            <span><strong>Visuel suggéré :</strong> {post.visualTip}</span>
-                          </p>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              );
-            })}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+            {generatedPosts.map((post, index) => (
+              <PostCard
+                key={`${post.platform}-${index}`}
+                post={post}
+                index={index}
+                isRegenerating={regeneratingIndex === index}
+                onCopy={() => copyPost(post)}
+                onRegenerate={() => handleRegenerateOne(index)}
+                onUpdate={(field, value) => handleUpdatePost(index, field, value)}
+              />
+            ))}
           </motion.div>
         )}
       </AnimatePresence>
