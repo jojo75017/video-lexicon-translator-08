@@ -92,6 +92,8 @@ export const KdpAmazonResearch: React.FC = () => {
 
   // Keywords tab
   const [keywordAsin, setKeywordAsin] = useState('');
+  const [keywordData, setKeywordData] = useState<KeywordData | null>(null);
+
   // Audit
   const [auditData, setAuditData] = useState<AuditData | null>(null);
   const [isAuditing, setIsAuditing] = useState(false);
