@@ -48,7 +48,7 @@ const PassiveRevenueProof: React.FC = () => {
 
         {/* Screenshot */}
         <motion.div variants={fadeUp} custom={1} className="mb-8">
-          <div className="rounded-2xl overflow-hidden border border-emerald-500/20 shadow-2xl shadow-emerald-500/10 bg-white">
+          <div className="rounded-2xl overflow-hidden border border-emerald-500/20 shadow-2xl shadow-emerald-500/10 bg-card">
             <img
               src={kdpProof}
               alt="Tableau de bord Amazon KDP montrant les revenus passifs — graphique des redevances sur 30 jours et livres les plus rémunérateurs"

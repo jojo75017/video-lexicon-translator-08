@@ -54,7 +54,7 @@ const PriceComparison: React.FC = () => {
   };
 
   return (
-    <section className="py-20 px-4 bg-gradient-to-br from-violet-50/50 via-background to-purple-50/50 dark:from-violet-950/20 dark:via-background dark:to-purple-950/20">
+    <section className="py-20 px-4 bg-background">
       <div className="max-w-5xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -62,7 +62,7 @@ const PriceComparison: React.FC = () => {
           viewport={{ once: true }}
           className="text-center mb-14"
         >
-          <span className="inline-block bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 text-sm font-semibold px-4 py-1.5 rounded-full mb-4">
+          <span className="inline-block bg-red-900/30 text-red-300 text-sm font-semibold px-4 py-1.5 rounded-full mb-4">
             💸 COMPARATIF PRIX DU MARCHÉ
           </span>
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
@@ -81,7 +81,7 @@ const PriceComparison: React.FC = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.08 }}
-              className="bg-white dark:bg-gray-900 rounded-xl p-5 border border-red-200/60 dark:border-red-800/30 shadow-sm hover:shadow-md transition-shadow"
+              className="bg-card rounded-xl p-5 border border-red-800/30 shadow-sm hover:shadow-md hover:border-red-700/40 transition-all"
             >
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-2">
@@ -111,7 +111,7 @@ const PriceComparison: React.FC = () => {
         {/* VS Separator */}
         <div className="flex items-center justify-center gap-4 my-8">
           <div className="h-px flex-1 bg-gradient-to-r from-transparent via-violet-300 dark:via-violet-700 to-transparent" />
-          <span className="text-2xl font-black text-violet-600 bg-violet-100 dark:bg-violet-900/50 px-5 py-2 rounded-full">VS</span>
+          <span className="text-2xl font-black text-primary bg-primary/10 px-5 py-2 rounded-full border border-primary/20">VS</span>
           <div className="h-px flex-1 bg-gradient-to-r from-transparent via-violet-300 dark:via-violet-700 to-transparent" />
         </div>
 
@@ -132,7 +132,7 @@ const PriceComparison: React.FC = () => {
                   <Sparkles className="w-6 h-6 text-yellow-300" />
                   <span className="font-bold text-2xl">EbookStudio Pro</span>
                 </div>
-                <p className="text-white/70 mb-5 text-sm">Accès à vie – Ebooks illimités – {isVipAvailable ? 'Offre Fondateur' : 'Paiement unique ou en 3x/5x'}</p>
+                <p className="text-white/70 mb-5 text-sm">Accès à vie – Ebooks illimités – {isVipAvailable ? 'Offre Fondateur' : 'Paiement unique ou en 2×35€ / 3×25€'}</p>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {[
