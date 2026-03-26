@@ -308,8 +308,8 @@ const Dashboard: React.FC = () => {
       case 'complete': return 'bg-green-500';
       case 'updated': return 'bg-blue-500';
       case 'new': return 'bg-violet-500';
-      case 'active': return 'bg-gray-500';
-      default: return 'bg-gray-400';
+      case 'active': return 'bg-primary/50';
+      default: return 'bg-muted-foreground';
     }
   };
 
@@ -325,10 +325,10 @@ const Dashboard: React.FC = () => {
 
   const getPriorityColor = (priority) => {
     switch (priority) {
-      case 'high': return 'text-red-600 bg-red-50';
-      case 'medium': return 'text-orange-600 bg-orange-50';
-      case 'low': return 'text-green-600 bg-green-50';
-      default: return 'text-gray-600 bg-gray-50';
+      case 'high': return 'text-red-400 bg-red-500/10';
+      case 'medium': return 'text-orange-400 bg-orange-500/10';
+      case 'low': return 'text-green-400 bg-green-500/10';
+      default: return 'text-muted-foreground bg-muted';
     }
   };
 
