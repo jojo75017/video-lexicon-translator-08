@@ -174,6 +174,7 @@ import { EbookReadabilityAnalyzer } from '@/components/ebook/EbookReadabilityAna
 import { EbookChapterWordCount } from '@/components/ebook/EbookChapterWordCount';
 import { EbookKindlePreview } from '@/components/ebook/EbookKindlePreview';
 import { EbookAutoSaveIndicator } from '@/components/ebook/EbookAutoSaveIndicator';
+import { EbookConsistencyDetector } from '@/components/ebook/EbookConsistencyDetector';
 
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
 import { ebookTemplates } from '@/data/ebookTemplates';
