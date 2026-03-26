@@ -2,16 +2,16 @@
   max-width: 100%;
   margin: 0 auto;
   padding: 0;
-  text-align: center;
 }
 
+/* ── CHARTER: Grid pattern ── */
 .bg-grid-pattern {
-  background-image: linear-gradient(to right, #f0f0f0 1px, transparent 1px),
-    linear-gradient(to bottom, #f0f0f0 1px, transparent 1px);
+  background-image: linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
-/* Design professionnel amélioré */
+/* ── CHARTER: Gradient text ── */
 .gradient-text {
   background: linear-gradient(135deg, #3B9EFF, #0052CC);
   -webkit-background-clip: text;
@@ -21,52 +21,43 @@
 }
 
 @keyframes shine {
-  from {
-    background-position: 0% center;
-  }
-  to {
-    background-position: 200% center;
-  }
+  from { background-position: 0% center; }
+  to { background-position: 200% center; }
 }
 
+/* ── CHARTER: Feature card ── */
 .feature-card {
   transition: all 0.3s ease;
-  border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .feature-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(59, 158, 255, 0.3);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
 }
 
-/* Effets de glassmorphisme */
+/* ── CHARTER: Glass card ── */
 .glass-card {
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
-/* Animations améliorées */
+/* ── CHARTER: Fade in ── */
 .fade-in {
   animation: fadeIn 0.5s ease-out;
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* Gradient animé */
+/* ── CHARTER: Animated gradient ── */
 .animated-gradient {
   background: linear-gradient(270deg, #3B9EFF, #0052CC, #3B9EFF);
   background-size: 200% 200%;
@@ -74,111 +65,100 @@
 }
 
 @keyframes gradient {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
-/* Boutons élégants */
+/* ── CHARTER: Elegant button ── */
 .elegant-button {
-  background: linear-gradient(to right, #3B9EFF, #0052CC);
+  background: linear-gradient(135deg, #3B9EFF, #0052CC);
   color: white;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
+  padding: 13px 26px;
+  border-radius: 10px;
   transition: all 0.3s ease;
   border: none;
   cursor: pointer;
+  font-weight: 700;
+  box-shadow: 0 6px 24px rgba(59, 158, 255, 0.35);
 }
 
 .elegant-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px rgba(59, 158, 255, 0.45);
 }
 
-/* Navigation moderne */
+/* ── CHARTER: Modern nav ── */
 .modern-nav {
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(13, 8, 32, 0.95);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* Conteneurs avec ombres douces */
+/* ── CHARTER: Soft shadow ── */
 .soft-shadow {
-  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3);
 }
 
-/* Animations pour les icônes */
+/* ── CHARTER: Floating animation ── */
 @keyframes floating {
-  0% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-  100% {
-    transform: translateY(0px);
-  }
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
 }
 
 .floating {
   animation: floating 3s ease-in-out infinite;
 }
 
-/* Styles spécifiques pour Quora */
-.quora-gradient-button {
-  background: linear-gradient(to right, #b92b27, #8B5CF6);
-  color: white;
-  transition: all 0.3s ease;
-}
-
-.quora-gradient-button:hover {
-  background: linear-gradient(to right, #a72724, #7849e0);
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(139, 92, 246, 0.2);
-}
-
-/* Design professionnel amélioré pour les boutons */
+/* ── CHARTER: Elegant button v2 ── */
 .elegant-button-v2 {
-  background: linear-gradient(to right, #3B9EFF, #0052CC);
+  background: linear-gradient(135deg, #3B9EFF, #0052CC);
   color: white;
-  padding: 0.75rem 1.75rem;
-  border-radius: 0.6rem;
+  padding: 13px 26px;
+  border-radius: 10px;
   transition: all 0.3s ease;
   border: none;
   cursor: pointer;
-  font-weight: 500;
+  font-weight: 700;
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  box-shadow: 0 4px 10px rgba(59, 158, 255, 0.2);
+  gap: 8px;
+  box-shadow: 0 6px 24px rgba(59, 158, 255, 0.35);
 }
 
 .elegant-button-v2:hover {
   transform: translateY(-3px);
-  box-shadow: 0 10px 25px rgba(59, 158, 255, 0.25);
+  box-shadow: 0 8px 32px rgba(59, 158, 255, 0.45);
 }
 
-/* Ajout d'effets de glassmorphisme avancés */
+/* ── CHARTER: Glass card v2 ── */
 .glass-card-v2 {
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
 }
 
-/* Animations améliorées pour les éléments interactifs */
+/* ── CHARTER: Pulse on hover ── */
 .pulse-on-hover {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .pulse-on-hover:hover {
   transform: scale(1.02);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+  border-color: rgba(59, 158, 255, 0.3);
+}
+
+/* ── CHARTER: Quora gradient ── */
+.quora-gradient-button {
+  background: linear-gradient(135deg, #3B9EFF, #0052CC);
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.quora-gradient-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(59, 158, 255, 0.25);
 }
