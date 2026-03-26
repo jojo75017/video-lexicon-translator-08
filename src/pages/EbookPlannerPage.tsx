@@ -209,7 +209,8 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       (subscriberData?.status === 'active' || subscriberData?.plan_type === 'lifetime'));
 
   const isDemo = isDemoProp || !hasValidSubscriber;
-  
+  const contentContainerRef = useRef<HTMLDivElement>(null);
+
   const STORAGE_KEY = 'ebook-planner-autosave';
   
   const loadSavedData = () => {
