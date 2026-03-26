@@ -86,11 +86,15 @@ export const KdpAmazonResearch: React.FC = () => {
   };
 
   // ——— ASIN Lookup ———
-  const handleAsinLookup = async () => {
-    if (!asinInput.trim()) { toast.error('Entrez un ASIN'); return; }
+  const handleAsinLookup = async (asinOverride?: string) => {
+    const targetAsin = (asinOverride ?? asinInput).trim();
+    if (!targetAsin) { toast.error('Entrez un ASIN'); return; }
+
     setIsLoading(true);
+    setBookData(null);
     try {
-      const result = await callScraper({ mode: 'asin', asin: asinInput, marketplace });
+      const result = await callScraper({ mode: 'asin', asin: targetAsin, marketplace });
+      setAsinInput(targetAsin);
       setBookData(result);
       toast.success('Fiche produit récupérée !');
     } catch (err: any) {
@@ -102,10 +106,13 @@ export const KdpAmazonResearch: React.FC = () => {
 
   // ——— Niche Analysis ———
   const handleNicheSearch = async () => {
-    if (!nicheQuery.trim()) { toast.error('Entrez une niche à analyser'); return; }
+    const targetQuery = nicheQuery.trim();
+    if (!targetQuery) { toast.error('Entrez une niche à analyser'); return; }
+
     setIsLoading(true);
+    setNicheResults([]);
     try {
-      const results = await callScraper({ mode: 'niche', query: nicheQuery, marketplace });
+      const results = await callScraper({ mode: 'niche', query: targetQuery, marketplace });
       setNicheResults(results);
       toast.success(`${results.length} livre(s) trouvé(s) !`);
     } catch (err: any) {
@@ -117,7 +124,7 @@ export const KdpAmazonResearch: React.FC = () => {
 
   // ——— Competitor Spy ———
   const handleCompetitorSpy = async () => {
-    const asins = competitorAsins.split(/[,\s\n]+/).map(a => a.trim()).filter(a => a.length > 5);
+    const asins = competitorAsins.split(/[\s,\n]+/).map(a => a.trim()).filter(a => a.length > 5);
     if (asins.length === 0) { toast.error('Entrez au moins un ASIN'); return; }
     if (asins.length > 5) { toast.error('Maximum 5 ASINs à la fois'); return; }
     
@@ -129,7 +136,7 @@ export const KdpAmazonResearch: React.FC = () => {
         try {
           const result = await callScraper({ mode: 'asin', asin, marketplace });
           results.push(result);
-        } catch { 
+        } catch {
           toast.error(`Impossible de scraper ${asin}`);
         }
       }
@@ -144,10 +151,14 @@ export const KdpAmazonResearch: React.FC = () => {
 
   // ——— Keyword Extraction ———
   const handleKeywordExtract = async () => {
-    if (!keywordAsin.trim()) { toast.error('Entrez un ASIN'); return; }
+    const targetAsin = keywordAsin.trim();
+    if (!targetAsin) { toast.error('Entrez un ASIN'); return; }
+
     setIsLoading(true);
+    setKeywordData(null);
     try {
-      const result = await callScraper({ mode: 'keywords', asin: keywordAsin, marketplace });
+      const result = await callScraper({ mode: 'keywords', asin: targetAsin, marketplace });
+      setKeywordAsin(targetAsin);
       setKeywordData(result);
       toast.success('Mots-clés extraits !');
     } catch (err: any) {
@@ -230,7 +241,7 @@ export const KdpAmazonResearch: React.FC = () => {
                   onKeyDown={e => e.key === 'Enter' && handleAsinLookup()}
                   className="flex-1"
                 />
-                <Button onClick={handleAsinLookup} disabled={isLoading}>
+                <Button onClick={() => handleAsinLookup()} disabled={isLoading}>
                   {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
                   <span className="ml-2">Analyser</span>
                 </Button>
@@ -287,7 +298,11 @@ export const KdpAmazonResearch: React.FC = () => {
                             variant="ghost"
                             size="sm"
                             className="h-6 text-xs"
-                            onClick={() => { setAsinInput(result.asin!); setActiveTab('asin'); handleAsinLookup(); }}
+                            onClick={() => {
+                              setAsinInput(result.asin!);
+                              setActiveTab('asin');
+                              handleAsinLookup(result.asin!);
+                            }}
                           >
                             <ArrowRight className="h-3 w-3 mr-1" />
                             Voir la fiche
