@@ -534,7 +534,7 @@ ${module.content}
             
             {/* Logo container */}
             <motion.div
-              className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl p-8 border border-amber-500/30 shadow-2xl shadow-amber-500/20"
+              className="relative bg-gradient-to-br from-card via-card to-card rounded-2xl p-8 border border-amber-500/30 shadow-2xl shadow-amber-500/20"
               whileHover={{ scale: 1.02 }}
               transition={{ type: "spring", stiffness: 300 }}
             >
@@ -568,7 +568,7 @@ ${module.content}
                     <span className="bg-gradient-to-r from-amber-300 via-orange-400 to-amber-300 bg-clip-text text-transparent">
                       EbookStudio
                     </span>
-                    <span className="bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
+                    <span className="bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
                       {' '}Pro
                     </span>
                   </h1>
@@ -891,16 +891,16 @@ ${module.content}
                 {[
                   { num: 'P1', title: 'Directeur Éditorial', desc: 'Analyse stratégique de votre projet', icon: Target, color: 'from-blue-500 to-blue-600' },
                   { num: 'P2', title: 'Analyse de Marché', desc: 'Positionnement et niche idéale', icon: TrendingUp, color: 'from-green-500 to-green-600' },
-                  { num: 'P3', title: 'Architecte de Contenu', desc: 'Structure optimale de votre livre', icon: Layers, color: 'from-purple-500 to-purple-600' },
+                  { num: 'P3', title: 'Architecte de Contenu', desc: 'Structure optimale de votre livre', icon: Layers, color: 'from-primary to-accent' },
                   { num: 'P4', title: 'Rédaction Experte', desc: 'Écriture professionnelle IA', icon: BookOpen, color: 'from-indigo-500 to-indigo-600' },
                   { num: 'P5', title: 'Réécriture Naturelle', desc: 'Humanisation du texte', icon: Sparkles, color: 'from-pink-500 to-pink-600' },
                   { num: 'P6', title: 'Qualité Éditoriale', desc: 'Vérification orthographe & style', icon: CheckCircle2, color: 'from-teal-500 to-teal-600' },
                   { num: 'P7', title: 'Packaging Éditorial', desc: 'Couverture, titre, 4ème de couverture', icon: Image, color: 'from-orange-500 to-orange-600' },
                   { num: 'P8', title: 'Diagnostic Final', desc: 'Analyse complète avant publication', icon: Target, color: 'from-red-500 to-red-600' },
-                  { num: 'P9', title: 'Mémoire Éditoriale', desc: 'Conservation de votre voix unique', icon: BookOpen, color: 'from-cyan-500 to-cyan-600' },
+                  { num: 'P9', title: 'Mémoire Éditoriale', desc: 'Conservation de votre voix unique', icon: BookOpen, color: 'from-primary to-accent' },
                   { num: 'P10', title: 'Cohérence Globale', desc: 'Vérification narrative inter-chapitres', icon: Layers, color: 'from-amber-500 to-amber-600' },
                   { num: 'P11', title: 'Auto-Critique IA', desc: 'Détection des faiblesses', icon: HelpCircle, color: 'from-rose-500 to-rose-600' },
-                  { num: 'P12', title: 'Boucle Itérative', desc: 'Amélioration continue automatique', icon: Zap, color: 'from-violet-500 to-violet-600' },
+                  { num: 'P12', title: 'Boucle Itérative', desc: 'Amélioration continue automatique', icon: Zap, color: 'from-primary to-accent' },
                   { num: 'P13', title: 'Signature de Style', desc: 'Votre empreinte unique', icon: Sparkles, color: 'from-emerald-500 to-emerald-600' },
                   { num: 'P14', title: 'Verdict Ultime', desc: 'Validation finale professionnelle', icon: Trophy, color: 'from-yellow-500 to-yellow-600' },
                 ].map((item, index) => {
@@ -1035,7 +1035,7 @@ ${module.content}
                     icon: Link2,
                     title: 'Import URL', 
                     desc: 'Transformez vidéos YouTube et articles en ebooks structurés automatiquement',
-                    color: 'from-blue-500 to-cyan-500',
+                    color: 'from-primary to-accent',
                     badge: 'Nouveau'
                   },
                   { 
@@ -1056,21 +1056,21 @@ ${module.content}
                     icon: BarChart3, 
                     title: 'Comparateur KDP', 
                     desc: 'Analysez les bestsellers et identifiez les opportunités de marché',
-                    color: 'from-purple-500 to-violet-500',
+                    color: 'from-primary to-accent',
                     badge: 'Nouveau'
                   },
                   { 
                     icon: Sparkles, 
                     title: 'Humaniseur IA', 
                     desc: 'Rendez vos textes IA indétectables — anti-détection GPTZero/Originality',
-                    color: 'from-violet-500 to-purple-500',
+                    color: 'from-primary to-accent',
                     badge: '2026'
                   },
                   { 
                     icon: Globe, 
                     title: 'Encyclopédie IA', 
                     desc: 'Générez jusqu\'à 50 fiches encyclopédiques en une seule session',
-                    color: 'from-teal-500 to-cyan-500',
+                    color: 'from-primary to-accent',
                     badge: 'Nouveau'
                   },
                   { 
@@ -1098,14 +1098,14 @@ ${module.content}
                     icon: Palette, 
                     title: 'Images IA Pro', 
                     desc: 'Couvertures, illustrations et photos réalistes avec cohérence visuelle',
-                    color: 'from-fuchsia-500 to-purple-500',
+                    color: 'from-primary to-accent',
                     badge: 'Premium'
                   },
                   { 
                     icon: Brain, 
                     title: 'Dictaphone IA', 
                     desc: 'Dictez vos idées, l\'IA les transcrit et améliore en temps réel',
-                    color: 'from-cyan-500 to-blue-500',
+                    color: 'from-primary to-accent',
                     badge: 'Premium'
                   },
                   { 
@@ -1132,7 +1132,7 @@ ${module.content}
                           ? 'bg-gradient-to-r from-red-500 to-orange-500 text-white animate-pulse'
                           : feature.badge === 'Nouveau' 
                             ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white' 
-                            : 'bg-gradient-to-r from-violet-500 to-purple-500 text-white'
+                            : 'bg-gradient-to-r from-primary to-accent text-white'
                       }`}>
                         {feature.badge}
                       </span>
@@ -1400,7 +1400,7 @@ ${module.content}
                   </div>
                 </CardHeader>
                 <CardContent className="pt-6">
-                  <div className="prose prose-slate dark:prose-invert max-w-none">
+                  <div className="prose prose-invert dark:prose-invert max-w-none">
                     <ReactMarkdown>
                       {modules.find(m => m.id === selectedModule)?.content || ''}
                     </ReactMarkdown>

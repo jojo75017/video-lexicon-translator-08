@@ -108,7 +108,7 @@ const categories = [
     title: 'Améliorations Techniques',
     subtitle: 'Robustesse, performance et nouvelles capacités',
     icon: Rocket,
-    gradient: 'from-slate-500 to-gray-600',
+    gradient: 'from-primary/60 to-accent/60',
     badge: 'TECH',
     features: [
       { icon: Layers, title: 'Séries Multi-Tomes', desc: 'Bible de série, personnages persistants et cohérence narrative' },

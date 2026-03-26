@@ -373,7 +373,7 @@ Vos ebooks vous appartiennent à 100%.`
         </Card>
 
         {/* Contact Card */}
-        <Card className="bg-gradient-to-r from-slate-900 to-slate-800 text-white">
+        <Card className="bg-gradient-to-r from-card to-background text-white">
           <CardContent className="p-8 text-center space-y-4">
             <AlertCircle className="h-10 w-10 mx-auto text-amber-400" />
             <h3 className="text-2xl font-bold">Vous n'avez pas trouvé votre réponse ?</h3>
