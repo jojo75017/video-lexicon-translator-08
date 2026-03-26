@@ -1264,6 +1264,34 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           />
         );
 
+      case 'readability-analyzer':
+        return (
+          <EbookReadabilityAnalyzer
+            chapters={chapters}
+            preface={preface}
+            conclusion={conclusion}
+          />
+        );
+
+      case 'chapter-word-count':
+        return (
+          <EbookChapterWordCount
+            chapters={chapters}
+            targetWordsPerChapter={targetWordsPerChapter}
+          />
+        );
+
+      case 'kindle-preview':
+        return (
+          <EbookKindlePreview
+            title={ebookTitle}
+            authorName={authorName}
+            chapters={chapters}
+            preface={preface}
+            conclusion={conclusion}
+          />
+        );
+
       case 'rich-editor':
         if (isDemo) {
           setShowPaywall('chapters');
