@@ -16,10 +16,10 @@ export const StickyCtaBar: React.FC<StickyCtaBarProps> = ({ onCtaClick }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
 
-  // Déterminer le prix selon disponibilité VIP
-  const price = isVipAvailable ? '37' : '67';
-  const originalPrice = isVipAvailable ? '197' : '197';
-  const discount = isVipAvailable ? '-81%' : '-66%';
+  // Tarif unique affiché partout
+  const price = '67';
+  const originalPrice = '197';
+  const discount = '-66%';
   const daysLeft = daysRemaining ?? 0;
 
   useEffect(() => {

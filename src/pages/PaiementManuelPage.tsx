@@ -17,16 +17,16 @@ const PaiementManuelPage = () => {
   // Rediriger si les places VIP sont épuisées
   useEffect(() => {
     if (!vipLoading && isVipAvailable === false) {
-      toast.info("L'offre à 67€ n'est plus disponible. Découvrez nos autres offres !");
+      toast.info("Le paiement manuel n'est plus disponible. Retrouvez l'offre à 67€ sur la page de paiement.");
       navigate('/upsell-paiement?plan=pro');
     }
   }, [vipLoading, isVipAvailable, navigate]);
 
   const paymentInfo = {
-    price: "37",
+    price: "67",
     name: "EbookStudio Pro - Accès à Vie",
-    description: "Offre spéciale fondateur • Accès complet à vie",
-    paypalLink: "https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=37&currency_code=EUR&item_name=EbookStudio%20Pro%20-%20Acces%20a%20Vie",
+    description: "Offre de lancement • Accès complet à vie",
+    paypalLink: "https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=67&currency_code=EUR&item_name=EbookStudio%20Pro%20-%20Acces%20a%20Vie",
     iban: "FR76 XXXX XXXX XXXX XXXX XXXX XXX",
   };
 
