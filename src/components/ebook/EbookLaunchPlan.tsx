@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import EbookLaunchSocialPosts from './EbookLaunchSocialPosts';
 
 interface LaunchTask {
   id: string;
