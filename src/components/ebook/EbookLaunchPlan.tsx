@@ -83,6 +83,7 @@ const EbookLaunchPlan: React.FC = () => {
   });
   const [selectedPhase, setSelectedPhase] = useState<string>('all');
   const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set());
+  const [activeTab, setActiveTab] = useState<string>('checklist');
   const [launchDate, setLaunchDate] = useState<Date | null>(() => {
     const saved = localStorage.getItem('ebook_launch_date');
     return saved ? new Date(saved) : null;
