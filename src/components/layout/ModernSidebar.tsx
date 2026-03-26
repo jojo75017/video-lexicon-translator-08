@@ -98,7 +98,7 @@ interface Category {
 
 // Couleurs pastels par catégorie (light / dark)
 const categoryPastelColors: Record<string, { bg: string; border: string }> = {
-  start: { bg: 'bg-violet-50 dark:bg-violet-950/30', border: 'border-violet-200/60 dark:border-violet-800/40' },
+  start: { bg: 'bg-primary/5', border: 'border-primary/20' },
   redaction: { bg: 'bg-blue-50 dark:bg-blue-950/30', border: 'border-blue-200/60 dark:border-blue-800/40' },
   series: { bg: 'bg-indigo-50 dark:bg-indigo-950/30', border: 'border-indigo-200/60 dark:border-indigo-800/40' },
   workflow: { bg: 'bg-amber-50 dark:bg-amber-950/30', border: 'border-amber-200/60 dark:border-amber-800/40' },
@@ -111,7 +111,7 @@ const categoryPastelColors: Record<string, { bg: string; border: string }> = {
   productivity: { bg: 'bg-fuchsia-50 dark:bg-fuchsia-950/30', border: 'border-fuchsia-200/60 dark:border-fuchsia-800/40' },
   audio: { bg: 'bg-indigo-50 dark:bg-indigo-950/30', border: 'border-indigo-200/60 dark:border-indigo-800/40' },
   bibliotheque: { bg: 'bg-emerald-50 dark:bg-emerald-950/30', border: 'border-emerald-200/60 dark:border-emerald-800/40' },
-  compte: { bg: 'bg-slate-50 dark:bg-slate-950/30', border: 'border-slate-200/60 dark:border-slate-800/40' },
+  compte: { bg: 'bg-card/50', border: 'border-border' },
 };
 
 const categories: Category[] = [
@@ -120,7 +120,7 @@ const categories: Category[] = [
     id: 'start',
     label: 'Démarrage',
     emoji: '🚀',
-    color: 'from-violet-500 to-purple-500',
+    color: 'from-primary to-accent',
     items: [
       { id: 'presentation', label: 'Découvrir KDP Studio', icon: Info },
       { id: 'global-dashboard', label: 'Vue d\'ensemble', icon: LayoutDashboard, isNew: true },
@@ -307,7 +307,7 @@ const categories: Category[] = [
     id: 'productivity',
     label: 'Productivité',
     emoji: '⚡',
-    color: 'from-fuchsia-500 to-purple-500',
+    color: 'from-primary to-accent',
     items: [
       { id: 'planner', label: 'Planificateur Projet', icon: BookOpen },
       { id: 'publication-planner', label: 'Planificateur Publication', icon: Target, isNew: true },
@@ -322,7 +322,7 @@ const categories: Category[] = [
     id: 'audio',
     label: 'Audio',
     emoji: '🎧',
-    color: 'from-indigo-500 to-violet-500',
+    color: 'from-primary to-accent',
     items: [
       { id: 'audiobook', label: 'Livre Audio', icon: Headphones, isNew: true },
       { id: 'audio-express', label: 'Audio Express', icon: Zap },
@@ -348,7 +348,7 @@ const categories: Category[] = [
     id: 'compte',
     label: 'Mon Compte',
     emoji: '⚙️',
-    color: 'from-gray-500 to-slate-500',
+    color: 'from-muted-foreground to-muted-foreground',
     items: [
       { id: 'dashboard', label: 'Tableau de Bord', icon: LayoutDashboard },
       { id: 'marketing-dashboard', label: 'Dashboard Marketing', icon: TrendingUp, isLink: true, href: '/dashboard-marketing', isNew: true },
@@ -414,7 +414,7 @@ const QuotaDisplay: React.FC<{ isCollapsed: boolean }> = ({ isCollapsed }) => {
           size="sm"
           onClick={() => navigate('/offres')}
           className={cn(
-            "bg-gradient-gold text-slate-900 hover:opacity-90 shadow-lg shadow-gold/25",
+            "bg-gradient-gold text-background hover:opacity-90 shadow-lg shadow-gold/25",
             isCollapsed ? "w-10 h-10 p-0 rounded-xl" : "w-full rounded-xl"
           )}
         >
@@ -449,7 +449,7 @@ const QuotaDisplay: React.FC<{ isCollapsed: boolean }> = ({ isCollapsed }) => {
           </TooltipContent>
         </Tooltip>
       ) : (
-        <div className="p-3 rounded-xl bg-slate-900/50 border border-slate-800">
+        <div className="p-3 rounded-xl bg-card border border-border">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <Star className="w-4 h-4 text-gold" />
@@ -457,7 +457,7 @@ const QuotaDisplay: React.FC<{ isCollapsed: boolean }> = ({ isCollapsed }) => {
             </div>
             <span className={cn(
               "text-[10px] font-bold px-2 py-0.5 rounded-full",
-              quotas.plan === 'lifetime' ? 'bg-gold text-slate-900' :
+              quotas.plan === 'lifetime' ? 'bg-gold text-background' :
               quotas.plan === 'pro' ? 'bg-amber-500 text-white' :
               'bg-emerald-500 text-white'
             )}>
@@ -558,17 +558,17 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
       <aside 
         className={cn(
           "relative flex flex-col h-screen transition-all duration-300 ease-out",
-          "bg-slate-950 border-r border-slate-800/50",
+          "bg-background border-r border-border",
           isCollapsed ? "w-[72px]" : "w-72"
         )}
       >
         {/* Header */}
         <div className={cn(
-          "flex items-center gap-3 p-4 border-b border-slate-800/50",
+          "flex items-center gap-3 p-4 border-b border-border",
           isCollapsed && "justify-center p-3"
         )}>
           <div className="w-10 h-10 rounded-xl bg-gradient-gold flex items-center justify-center shadow-lg shadow-gold">
-            <Sparkles className="w-5 h-5 text-slate-900" />
+            <Sparkles className="w-5 h-5 text-background" />
           </div>
           {!isCollapsed && (
             <>
@@ -580,12 +580,12 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                 variant="ghost"
                 size="icon"
                 onClick={toggleTheme}
-                className="h-9 w-9 rounded-xl hover:bg-slate-800/50"
+                className="h-9 w-9 rounded-xl hover:bg-card"
               >
                 {isDark ? (
                   <Sun className="w-4 h-4 text-amber-500" />
                 ) : (
-                  <Moon className="w-4 h-4 text-slate-400" />
+                  <Moon className="w-4 h-4 text-muted-foreground" />
                 )}
               </Button>
             </>
@@ -596,20 +596,20 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
         {!isCollapsed && (
           <div className="p-3">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 type="text"
                 placeholder="Rechercher un outil..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-8 h-10 text-sm bg-slate-900/50 border-slate-800 text-white placeholder:text-slate-600 rounded-xl focus:border-gold/50 focus:ring-gold/20"
+                className="w-full pl-10 pr-8 h-10 text-sm bg-card border-border text-white placeholder:text-muted-foreground rounded-xl focus:border-gold/50 focus:ring-gold/20"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-slate-800"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-card"
                 >
-                  <X className="w-3 h-3 text-slate-500" />
+                  <X className="w-3 h-3 text-muted-foreground" />
                 </button>
               )}
             </div>
@@ -642,7 +642,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                 )}
                 {isFirstSecondary && isCollapsed && (
                   <div className="flex justify-center py-3">
-                    <div className="w-8 h-0.5 rounded-full bg-slate-400/60 dark:bg-slate-600/60" />
+                    <div className="w-8 h-0.5 rounded-full bg-muted-foreground/40" />
                   </div>
                 )}
               <div 
@@ -650,8 +650,8 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                 className={cn(
                   "mb-3 rounded-2xl border transition-all",
                   hasActiveItem 
-                    ? "border-gold/30 bg-slate-900/50 shadow-lg shadow-gold/5" 
-                    : "border-slate-800/50 bg-slate-900/30 hover:bg-slate-900/50 hover:shadow-md",
+                    ? "border-gold/30 bg-card shadow-lg shadow-gold/5" 
+                    : "border-border bg-slate-900/30 hover:bg-card hover:shadow-md",
                   isCollapsed ? "p-1" : "p-2"
                 )}
               >
@@ -663,7 +663,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                       "w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all group",
                       hasActiveItem 
                         ? `bg-gradient-to-r ${category.color} text-white shadow-md` 
-                        : "hover:bg-slate-800/50"
+                        : "hover:bg-card"
                     )}
                   >
                     <span className={cn(
@@ -674,7 +674,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                     </span>
                     <ChevronDown className={cn(
                       "w-4 h-4 transition-transform",
-                      hasActiveItem ? "text-white/80" : "text-slate-500",
+                      hasActiveItem ? "text-white/80" : "text-muted-foreground",
                       isExpanded ? "rotate-0" : "-rotate-90"
                     )} />
                   </button>
@@ -685,7 +685,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                         "flex justify-center py-2 mb-1 rounded-xl cursor-pointer",
                         hasActiveItem 
                           ? `bg-gradient-to-r ${category.color} shadow-md` 
-                          : "hover:bg-slate-800/50"
+                          : "hover:bg-card"
                       )}>
                         <span className="text-lg">{category.emoji}</span>
                       </div>
@@ -717,7 +717,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                                 ? "bg-cyan-500/10 border border-cyan-500/30 hover:bg-cyan-500/20 ring-1 ring-cyan-500/20"
                                 : isActive 
                                   ? "bg-slate-800 shadow-md border border-slate-700" 
-                                  : "hover:bg-slate-800/50"
+                                  : "hover:bg-card"
                             )}
                           >
                             <div className={cn(
@@ -728,12 +728,12 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                             )}>
                               <Icon className={cn(
                                 "w-4 h-4",
-                                isActive ? "text-white" : "text-slate-400"
+                                isActive ? "text-white" : "text-muted-foreground"
                               )} />
                             </div>
                             <span className={cn(
                               "text-sm font-medium flex-1",
-                              isActive ? "text-white" : "text-slate-400"
+                              isActive ? "text-white" : "text-muted-foreground"
                             )}>
                               {item.label}
                             </span>
@@ -745,7 +745,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                             )}
                             
                             {item.isPro && !item.isNew && (
-                              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-cyan-500 text-slate-900 font-bold">
+                              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-cyan-500 text-background font-bold">
                                 PRO
                               </span>
                             )}
@@ -795,12 +795,12 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
         </nav>
 
         {/* Quota */}
-        <div className="border-t border-slate-800/50">
+        <div className="border-t border-border">
           <QuotaDisplay isCollapsed={isCollapsed} />
         </div>
 
         {/* Footer */}
-        <div className="p-2 border-t border-slate-800/50 flex gap-1">
+        <div className="p-2 border-t border-border flex gap-1">
           {isCollapsed && (
             <Tooltip>
               <TooltipTrigger asChild>
@@ -808,12 +808,12 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                   variant="ghost"
                   size="sm"
                   onClick={toggleTheme}
-                  className="flex-1 h-10 rounded-xl hover:bg-slate-800/50"
+                  className="flex-1 h-10 rounded-xl hover:bg-card"
                 >
                   {isDark ? (
                     <Sun className="w-4 h-4 text-amber-500" />
                   ) : (
-                    <Moon className="w-4 h-4 text-slate-400" />
+                    <Moon className="w-4 h-4 text-muted-foreground" />
                   )}
                 </Button>
               </TooltipTrigger>
@@ -827,16 +827,16 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
             size="sm"
             onClick={onToggleCollapse}
             className={cn(
-              "h-10 flex items-center gap-2 rounded-xl hover:bg-slate-800/50",
+              "h-10 flex items-center gap-2 rounded-xl hover:bg-card",
               isCollapsed ? "flex-1 justify-center" : "w-full"
             )}
           >
             {isCollapsed ? (
-              <ChevronRight className="w-4 h-4 text-slate-500" />
+              <ChevronRight className="w-4 h-4 text-muted-foreground" />
             ) : (
               <>
-                <ChevronLeft className="w-4 h-4 text-slate-500" />
-                <span className="text-xs text-slate-500">Réduire le menu</span>
+                <ChevronLeft className="w-4 h-4 text-muted-foreground" />
+                <span className="text-xs text-muted-foreground">Réduire le menu</span>
               </>
             )}
           </Button>
