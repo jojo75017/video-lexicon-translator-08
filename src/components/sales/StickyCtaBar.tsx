@@ -89,7 +89,7 @@ export const StickyCtaBar: React.FC<StickyCtaBarProps> = ({ onCtaClick }) => {
                         🔥 OFFRE FONDATEUR
                       </Badge>
                       <span className="text-white/60 text-sm hidden sm:inline">
-                        Plus que <strong className="text-amber-400">{daysLeft} jours</strong> à 97€
+                        Plus que <strong className="text-amber-400">{daysLeft} jours</strong> à 67€
                       </span>
                     </>
                   ) : (

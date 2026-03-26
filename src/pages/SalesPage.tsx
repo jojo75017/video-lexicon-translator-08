@@ -566,7 +566,7 @@ const SalesPage = () => {
                     "Azure Neural — audiobooks premium",
                     "P15 Humanisation Anti-IA",
                     "Export PDF / EPUB / Word",
-                    "🎓 Formation 18 modules (297€ offerts)",
+                    "🎓 Formation 18 modules (197€ offerts)",
                     "SEO Amazon automatisé",
                     "Traduction 30+ langues",
                     "Mises à jour gratuites à vie",

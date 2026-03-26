@@ -181,7 +181,7 @@ const CrmPage: React.FC = () => {
         temperature: 'hot',
         tags: [s.plan_type, s.plan_tier].filter(Boolean),
         notes: `Abonné ${s.plan_type} (${s.plan_tier}). Code: ${s.access_code || 'N/A'}`,
-        lifetime_value: s.plan_tier === 'vip' ? 97 : s.plan_type === 'lifetime' ? 47 : 0,
+        lifetime_value: s.plan_tier === 'vip' ? 67 : s.plan_type === 'lifetime' ? 47 : 0,
       }));
 
     if (newContacts.length === 0) {

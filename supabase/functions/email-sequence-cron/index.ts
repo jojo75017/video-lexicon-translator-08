@@ -57,7 +57,7 @@ const getEmailContent = (step: number): string => {
         <li>✅ Créer des couvertures pro en 1 clic</li>
         <li>✅ Optimiser vos mots-clés Amazon</li>
       </ul>
-      <p>Le tout pour <strong>97€ une seule fois</strong> (accès à vie).</p>
+      <p>Le tout pour <strong>67€ une seule fois</strong> (accès à vie).</p>
       <p style="text-align: center;">
         <a href="https://ebookstudio.fr/offres" style="display: inline-block; background: #8b5cf6; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold;">👉 Découvrez comment ça marche</a>
       </p>
@@ -85,7 +85,7 @@ const getEmailContent = (step: number): string => {
       <p style="text-align: center;">
         <a href="https://ebookstudio.fr/offres" style="display: inline-block; background: #8b5cf6; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold;">👉 Testez par vous-même</a>
       </p>
-      <p>Le prix de lancement à 97€ ne durera pas éternellement.</p>
+      <p>Le prix de lancement à 67€ ne durera pas éternellement.</p>
       <p><strong>Georges</strong></p>
       <p style="color: #666; font-size: 14px;">PS : N'oubliez pas de récupérer le guide gratuit sur la page !</p>
     </div>`,
@@ -113,10 +113,10 @@ const getEmailContent = (step: number): string => {
     `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
       <p>Bonjour,</p>
       <p>C'est mon dernier email de cette série.</p>
-      <p>Je voulais vous rappeler que le <strong>prix de lancement de 97€ est temporaire</strong>.</p>
-      <p>Après le lancement, le prix passera à 197€ (247€ avec 50€ de réduction).</p>
+      <p>Je voulais vous rappeler que le <strong>prix de lancement de 67€ est temporaire</strong>.</p>
+      <p>Après le lancement, le prix passera à 197€.</p>
       <div style="background: #fef3c7; border: 2px solid #f59e0b; padding: 20px; border-radius: 10px; margin: 20px 0;">
-        <h3 style="color: #d97706; margin: 0 0 15px 0;">Pour 97€, vous obtenez :</h3>
+        <h3 style="color: #d97706; margin: 0 0 15px 0;">Pour 67€, vous obtenez :</h3>
         <ul style="margin: 0; padding-left: 20px;">
           <li>✅ Accès à vie au générateur d'ebooks</li>
           <li>✅ Créations illimitées</li>

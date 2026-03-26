@@ -17,7 +17,7 @@ const PaiementManuelPage = () => {
   // Rediriger si les places VIP sont épuisées
   useEffect(() => {
     if (!vipLoading && isVipAvailable === false) {
-      toast.info("L'offre à 97€ n'est plus disponible. Découvrez nos autres offres !");
+      toast.info("L'offre à 67€ n'est plus disponible. Découvrez nos autres offres !");
       navigate('/upsell-paiement?plan=pro');
     }
   }, [vipLoading, isVipAvailable, navigate]);

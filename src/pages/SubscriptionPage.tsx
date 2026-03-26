@@ -375,9 +375,9 @@ const SubscriptionPage = ({ subscriberEmail, subscriberData, onLogout }: Subscri
         {/* Offre unique */}
         <Card>
           <CardHeader>
-            <CardTitle>Offre unique : Accès Pro Lifetime (97€)</CardTitle>
+            <CardTitle>Offre unique : Accès Pro Lifetime (67€)</CardTitle>
             <CardDescription>
-              EbookStudio Pro fonctionne désormais avec une seule offre à 97€ (accès à vie + mises à jour).
+              EbookStudio Pro fonctionne désormais avec une seule offre à 67€ (accès à vie + mises à jour).
             </CardDescription>
           </CardHeader>
           <CardContent>
