@@ -9,7 +9,8 @@ import { Progress } from '@/components/ui/progress';
 import { 
   Search, Loader2, Copy, BookOpen, DollarSign, Star, 
   TrendingUp, BarChart3, Eye, Key, Sparkles, ExternalLink,
-  Users, Target, ArrowRight, Hash, Globe
+  Users, Target, ArrowRight, Hash, Globe, ClipboardCheck,
+  AlertTriangle, CheckCircle2, XCircle, Zap, ShieldCheck
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
