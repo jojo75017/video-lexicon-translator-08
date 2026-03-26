@@ -29,7 +29,7 @@ const EMAIL_SEQUENCE = [
     step: 4,
     day_offset: 6,
     subject: "⏰ [Dernière chance] L'offre Fondateur disparaît dans 48h",
-    preheader: "Après ça, le prix passe à 297€. Point final.",
+    preheader: "Après ça, le prix passe à 197€. Point final.",
   },
   {
     step: 5,
@@ -98,7 +98,7 @@ Le tout pour ~0,30€ par livre.
 
 👉 Découvrir EbookStudio Pro : ${OFFRES_LINK}
 
-L'offre Fondateur à 97€ (au lieu de 297€) est disponible quelques jours encore.
+L'offre Fondateur à 67€ (au lieu de 197€) est disponible quelques jours encore.
 
 Georges
 
@@ -133,9 +133,9 @@ https://www.amazon.fr/Mr-Georges-Boubet/e/B0CGVLHNX7`,
 
     4: `${name},
 
-L'offre Fondateur EbookStudio Pro à 97€ se termine dans 48 heures.
+L'offre Fondateur EbookStudio Pro à 67€ se termine dans 48 heures.
 
-Après ? Le prix passe à 297€.
+Après ? Le prix passe à 197€.
 
 🧮 Ce que vous obtenez (valeur 749€) :
 - Générateur IA illimité (197€)
@@ -146,8 +146,8 @@ Après ? Le prix passe à 297€.
 - Templates email (47€)
 - Optimisateur KDP (97€)
 
-Votre prix aujourd'hui : 97€ (-87%)
-💳 Ou 3×35€ / 5×22€
+Votre prix aujourd'hui : 67€ (-66%)
+💳 Ou 3×23€ / 5×14€
 
 🎁 BONUS inclus : Pack 300+ idées, Guide 10 Niches KDP 2026, Groupe privé, MAJ à vie, Support Zoom.
 
@@ -163,7 +163,7 @@ P.S: Je ne relancerai pas après cet email.`,
 
 Dernier email. Dernier appel.
 
-Ce soir à minuit, l'offre Fondateur à 97€ se ferme définitivement.
+Ce soir à minuit, l'offre Fondateur à 67€ se ferme définitivement.
 
 Où serez-vous dans 90 jours ?
 

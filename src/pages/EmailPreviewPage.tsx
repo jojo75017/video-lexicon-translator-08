@@ -55,7 +55,7 @@ Ce qui a changé ? J'ai construit un outil. Un vrai générateur d'ebooks propul
 
 Pas de carte bancaire, pas d'engagement.
 
-L'offre Fondateur à 97€ ne durera pas éternellement.
+L'offre Fondateur à 67€ ne durera pas éternellement.
 
 À vous de jouer,
 Georges
@@ -89,7 +89,7 @@ Le tout pour ~0,30€ par livre.
 
 👉 Découvrir EbookStudio Pro : ${OFFRES_LINK}
 
-L'offre Fondateur à 97€ (au lieu de 297€) est disponible quelques jours encore.
+L'offre Fondateur à 67€ (au lieu de 197€) est disponible quelques jours encore.
 
 Georges
 
@@ -119,8 +119,8 @@ EbookStudio Pro 2026 inclut :
 📊 Dashboard marketing complet
 📧 Système email marketing inclus
 
-Le tout à 97€ (paiement unique).
-Ou en facilités : 3×35€ ou 5×22€.
+Le tout à 67€ (paiement unique).
+Ou en facilités : 3×23€ ou 5×14€.
 
 👉 Accéder à l'offre Fondateur : ${OFFRES_LINK}
 
@@ -135,14 +135,14 @@ https://www.amazon.fr/Mr-Georges-Boubet/e/B0CGVLHNX7`,
     dayOffset: 6,
     dayLabel: "J+6",
     subject: "⏰ [Dernière chance] L'offre Fondateur disparaît dans 48h",
-    preheader: "Après ça, le prix passe à 297€. Point final.",
+    preheader: "Après ça, le prix passe à 197€. Point final.",
     strategy: "URGENCE",
     strategyColor: "bg-amber-500/20 text-amber-400 border-amber-500/30",
     body: `[PRÉNOM],
 
-L'offre Fondateur EbookStudio Pro à 97€ se termine dans 48 heures.
+L'offre Fondateur EbookStudio Pro à 67€ se termine dans 48 heures.
 
-Après ? Le prix passe à 297€.
+Après ? Le prix passe à 197€.
 
 🧮 Ce que vous obtenez (valeur 749€) :
 - Générateur IA illimité (197€)
@@ -178,7 +178,7 @@ P.S: Je ne relancerai pas après cet email.`,
 
 Dernier email. Dernier appel.
 
-Ce soir à minuit, l'offre Fondateur à 97€ se ferme définitivement.
+Ce soir à minuit, l'offre Fondateur à 67€ se ferme définitivement.
 
 Où serez-vous dans 90 jours ?
 
