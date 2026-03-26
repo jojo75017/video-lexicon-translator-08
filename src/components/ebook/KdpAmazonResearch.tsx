@@ -9,7 +9,8 @@ import { Progress } from '@/components/ui/progress';
 import { 
   Search, Loader2, Copy, BookOpen, DollarSign, Star, 
   TrendingUp, BarChart3, Eye, Key, Sparkles, ExternalLink,
-  Users, Target, ArrowRight, Hash, Globe
+  Users, Target, ArrowRight, Hash, Globe, ClipboardCheck,
+  AlertTriangle, CheckCircle2, XCircle, Zap, ShieldCheck
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -50,6 +51,21 @@ interface KeywordData {
   titleKeywords: string[];
 }
 
+interface AuditCriterion {
+  name: string;
+  score: number;
+  status: 'excellent' | 'bon' | 'moyen' | 'faible' | 'critique';
+  recommendation: string;
+  priority: 'haute' | 'moyenne' | 'basse';
+}
+
+interface AuditData {
+  overall_score: number;
+  overall_verdict: string;
+  criteria: AuditCriterion[];
+  quick_wins: string[];
+}
+
 const MARKETPLACES = [
   { value: 'fr', label: '🇫🇷 France', domain: 'amazon.fr' },
   { value: 'us', label: '🇺🇸 USA', domain: 'amazon.com' },
@@ -78,6 +94,10 @@ export const KdpAmazonResearch: React.FC = () => {
   const [keywordAsin, setKeywordAsin] = useState('');
   const [keywordData, setKeywordData] = useState<KeywordData | null>(null);
 
+  // Audit
+  const [auditData, setAuditData] = useState<AuditData | null>(null);
+  const [isAuditing, setIsAuditing] = useState(false);
+
   const callScraper = async (body: Record<string, any>) => {
     const { data, error } = await supabase.functions.invoke('kdp-asin-scraper', { body });
     if (error) throw new Error(error.message);
@@ -92,6 +112,7 @@ export const KdpAmazonResearch: React.FC = () => {
 
     setIsLoading(true);
     setBookData(null);
+    setAuditData(null);
     try {
       const result = await callScraper({ mode: 'asin', asin: targetAsin, marketplace });
       setAsinInput(targetAsin);
@@ -165,6 +186,26 @@ export const KdpAmazonResearch: React.FC = () => {
       toast.error(err.message || 'Erreur d\'extraction');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // ——— Book Audit ———
+  const handleAudit = async () => {
+    if (!bookData) return;
+    setIsAuditing(true);
+    setAuditData(null);
+    try {
+      const { data, error } = await supabase.functions.invoke('kdp-book-audit', {
+        body: { bookData },
+      });
+      if (error) throw new Error(error.message);
+      if (!data?.success) throw new Error(data?.error || 'Erreur d\'audit');
+      setAuditData(data.data);
+      toast.success('Audit terminé !');
+    } catch (err: any) {
+      toast.error(err.message || 'Erreur lors de l\'audit');
+    } finally {
+      setIsAuditing(false);
     }
   };
 
@@ -249,7 +290,38 @@ export const KdpAmazonResearch: React.FC = () => {
             </CardContent>
           </Card>
 
-          {bookData && <BookDataCard book={bookData} onCopy={copyText} />}
+          {bookData && (
+            <>
+              <BookDataCard book={bookData} onCopy={copyText} />
+              
+              {/* Audit Button */}
+              <Card className="border-dashed border-2 border-primary/30 bg-primary/5">
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2.5 rounded-lg bg-primary/10">
+                        <ClipboardCheck className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-foreground">Audit & Améliorations IA</h3>
+                        <p className="text-sm text-muted-foreground">Scores 0-100 et recommandations pour optimiser votre fiche</p>
+                      </div>
+                    </div>
+                    <Button onClick={handleAudit} disabled={isAuditing} className="bg-gradient-to-r from-primary to-[#8B5CF6] hover:opacity-90">
+                      {isAuditing ? (
+                        <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Analyse en cours...</>
+                      ) : (
+                        <><ShieldCheck className="h-4 w-4 mr-2" /> Lancer l'audit</>
+                      )}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Audit Results */}
+              {auditData && <AuditResultsCard audit={auditData} />}
+            </>
+          )}
         </TabsContent>
 
         {/* ——— TAB 2: NICHE ——— */}
@@ -567,6 +639,118 @@ const BookDataCard: React.FC<{ book: BookData; onCopy: (t: string) => void }> = 
       </div>
     </CardContent>
   </Card>
+);
+
+const getScoreColor = (score: number) => {
+  if (score >= 80) return 'text-emerald-500';
+  if (score >= 60) return 'text-blue-500';
+  if (score >= 40) return 'text-amber-500';
+  if (score >= 20) return 'text-orange-500';
+  return 'text-red-500';
+};
+
+const getScoreBg = (score: number) => {
+  if (score >= 80) return 'bg-emerald-500';
+  if (score >= 60) return 'bg-blue-500';
+  if (score >= 40) return 'bg-amber-500';
+  if (score >= 20) return 'bg-orange-500';
+  return 'bg-red-500';
+};
+
+const getStatusIcon = (status: string) => {
+  switch (status) {
+    case 'excellent': return <CheckCircle2 className="h-4 w-4 text-emerald-500" />;
+    case 'bon': return <CheckCircle2 className="h-4 w-4 text-blue-500" />;
+    case 'moyen': return <AlertTriangle className="h-4 w-4 text-amber-500" />;
+    case 'faible': return <AlertTriangle className="h-4 w-4 text-orange-500" />;
+    case 'critique': return <XCircle className="h-4 w-4 text-red-500" />;
+    default: return null;
+  }
+};
+
+const getPriorityBadge = (priority: string) => {
+  const colors: Record<string, string> = {
+    haute: 'bg-red-500/10 text-red-500 border-red-500/20',
+    moyenne: 'bg-amber-500/10 text-amber-500 border-amber-500/20',
+    basse: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
+  };
+  return colors[priority] || colors.basse;
+};
+
+const AuditResultsCard: React.FC<{ audit: AuditData }> = ({ audit }) => (
+  <div className="space-y-4">
+    {/* Overall Score */}
+    <Card className="overflow-hidden">
+      <div className="relative">
+        <div className={`absolute inset-0 opacity-10 ${getScoreBg(audit.overall_score)}`} />
+        <CardContent className="pt-6 relative">
+          <div className="flex items-center gap-6">
+            <div className="relative">
+              <svg className="w-28 h-28 -rotate-90" viewBox="0 0 120 120">
+                <circle cx="60" cy="60" r="52" fill="none" stroke="currentColor" strokeWidth="8" className="text-muted/20" />
+                <circle cx="60" cy="60" r="52" fill="none" strokeWidth="8" strokeDasharray={`${audit.overall_score * 3.27} 327`} strokeLinecap="round" className={getScoreColor(audit.overall_score)} stroke="currentColor" />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className={`text-3xl font-black ${getScoreColor(audit.overall_score)}`}>{audit.overall_score}</span>
+              </div>
+            </div>
+            <div className="flex-1">
+              <h3 className="text-xl font-bold text-foreground mb-1">Score Global</h3>
+              <p className="text-muted-foreground">{audit.overall_verdict}</p>
+            </div>
+          </div>
+        </CardContent>
+      </div>
+    </Card>
+
+    {/* Criteria Grid */}
+    <div className="grid gap-3 md:grid-cols-2">
+      {audit.criteria.map((criterion, i) => (
+        <Card key={i} className="hover:border-primary/30 transition-colors">
+          <CardContent className="pt-4 pb-4">
+            <div className="flex items-start justify-between mb-2">
+              <div className="flex items-center gap-2">
+                {getStatusIcon(criterion.status)}
+                <span className="font-semibold text-foreground text-sm">{criterion.name}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className={`text-xs ${getPriorityBadge(criterion.priority)}`}>
+                  {criterion.priority}
+                </Badge>
+                <span className={`text-lg font-black ${getScoreColor(criterion.score)}`}>{criterion.score}</span>
+              </div>
+            </div>
+            <div className="w-full h-2 rounded-full bg-muted/30 mb-2">
+              <div className={`h-2 rounded-full transition-all ${getScoreBg(criterion.score)}`} style={{ width: `${criterion.score}%` }} />
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">{criterion.recommendation}</p>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+
+    {/* Quick Wins */}
+    {audit.quick_wins.length > 0 && (
+      <Card className="border-amber-500/30 bg-amber-500/5">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Zap className="h-5 w-5 text-amber-500" />
+            Actions Rapides
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ul className="space-y-2">
+            {audit.quick_wins.map((win, i) => (
+              <li key={i} className="flex items-start gap-2 text-sm text-foreground">
+                <span className="text-amber-500 font-bold mt-0.5">→</span>
+                {win}
+              </li>
+            ))}
+          </ul>
+        </CardContent>
+      </Card>
+    )}
+  </div>
 );
 
 const StatCard: React.FC<{ icon: any; label: string; value: string; color: string }> = ({ icon: Icon, label, value, color }) => (
