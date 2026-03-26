@@ -150,8 +150,20 @@ const EbookLaunchPlan: React.FC = () => {
   };
 
   return (
+    <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+      <TabsList className="grid w-full grid-cols-2">
+        <TabsTrigger value="checklist" className="flex items-center gap-2">
+          <Rocket className="h-4 w-4" />
+          Plan de Lancement
+        </TabsTrigger>
+        <TabsTrigger value="social" className="flex items-center gap-2">
+          <Megaphone className="h-4 w-4" />
+          Posts Réseaux Sociaux
+        </TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="checklist">
     <div className="space-y-6">
-      {/* Header avec progression globale */}
       <Card className="bg-gradient-to-br from-violet-900/30 to-purple-900/20 border-violet-500/30">
         <CardHeader>
           <div className="flex items-center justify-between">
