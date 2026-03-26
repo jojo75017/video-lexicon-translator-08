@@ -5,15 +5,12 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-async function callGemini(systemPrompt: string, userPrompt: string, opts: { maxTokens?: number; temperature?: number; timeout?: number } = {}) {
-  const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-  if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY non configurée. Ajoutez votre clé Gemini dans Paramètres.");
-
+async function callGemini(apiKey: string, systemPrompt: string, userPrompt: string, opts: { maxTokens?: number; temperature?: number; timeout?: number } = {}) {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), opts.timeout || 60000);
 
   const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -50,8 +47,15 @@ serve(async (req) => {
   }
 
   try {
-    const { sujet, objectif, nombreChapitres = 8 } = await req.json();
+    const { sujet, objectif, nombreChapitres = 8, userApiKey } = await req.json();
     
+    if (!userApiKey) {
+      return new Response(
+        JSON.stringify({ error: "Clé API Gemini requise. Configurez votre clé dans Paramètres > Clés API." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     if (!sujet) {
       return new Response(
         JSON.stringify({ error: "Le sujet est requis" }),
@@ -109,7 +113,7 @@ Justifie brièvement chaque partie.`;
 
     console.log("Architecture pour:", sujet, "avec", nombreChapitres, "chapitres (Gemini 3 Flash)");
 
-    const content = await callGemini(systemPrompt, userPrompt, { maxTokens: 3000 });
+    const content = await callGemini(userApiKey, systemPrompt, userPrompt, { maxTokens: 3000 });
 
     console.log("Réponse brute:", content.substring(0, 200));
 
