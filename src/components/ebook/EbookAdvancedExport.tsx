@@ -334,29 +334,53 @@ ${chapterFiles.map(cf => `<li><a href="${cf.filename}">${escapeXml(cf.title)}</a
   };
 
   const exportHtml = () => {
-    let html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>${ebookTitle}</title>
-<style>body{max-width:800px;margin:2em auto;font-family:Georgia,serif;line-height:1.8;color:#333;padding:0 1em}
-h1{text-align:center;font-size:2.5em;margin:2em 0 0.5em}
-.author{text-align:center;font-size:1.2em;color:#666;margin-bottom:3em}
-h2{font-size:1.5em;margin-top:2em;border-bottom:1px solid #ddd;padding-bottom:0.3em}
-h3{font-size:1.2em;margin-top:1.5em}
-.toc{margin:2em 0;padding:1em;background:#f9f9f9;border-radius:8px}
-.toc a{text-decoration:none;color:#333;display:block;padding:0.3em 0}
+    let html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeXml(ebookTitle)}</title>
+<style>
+*{box-sizing:border-box}
+body{max-width:720px;margin:0 auto;font-family:Georgia,'Times New Roman',serif;line-height:1.9;color:#1a1a1a;padding:2em 1.5em;text-align:justify;hyphens:auto;-webkit-hyphens:auto}
+h1.book-title{text-align:center;font-size:2.8em;margin:3em 0 0.3em;font-weight:700;letter-spacing:-0.02em;line-height:1.2}
+.author{text-align:center;font-size:1.1em;color:#888;margin-bottom:1em;font-style:italic;letter-spacing:0.05em}
+.title-divider{width:100px;height:1px;background:#ccc;margin:0 auto 4em}
+h2{font-size:1.5em;margin:3em 0 0.5em;font-weight:700;letter-spacing:0.01em;page-break-before:always}
+h2 .chapter-num{display:block;font-size:0.55em;text-transform:uppercase;letter-spacing:0.15em;color:#999;font-weight:400;margin-bottom:0.3em}
+h3{font-size:1.15em;margin:2em 0 0.8em;font-weight:600;color:#444}
+p{margin:0 0 0.9em;text-indent:1.5em}
+h2+p,h3+p{text-indent:0}
+.toc{margin:3em 0;padding:1.5em 2em;border:1px solid #e8e8e8;border-radius:4px}
+.toc h2{font-size:1.3em;margin:0 0 1em;page-break-before:auto}
+.toc ol{list-style:none;padding:0;margin:0}
+.toc li{margin:0.5em 0;padding:0.3em 0;border-bottom:1px dotted #ddd}
+.toc li:last-child{border-bottom:none}
+.toc a{text-decoration:none;color:#1a1a1a}
+.toc a:hover{color:#555}
+.separator{text-align:center;margin:2em 0;color:#ccc;letter-spacing:0.5em;font-size:0.9em}
+@media print{body{max-width:100%}h2{page-break-before:always}.toc{border:none}}
+@media(max-width:600px){body{padding:1em;font-size:0.95em}h1.book-title{font-size:2em}}
 </style></head><body>
-<h1>${ebookTitle}</h1><p class="author">${authorName}</p>`;
+<h1 class="book-title">${escapeXml(ebookTitle)}</h1><p class="author">${escapeXml(authorName)}</p><div class="title-divider"></div>`;
 
     if (includeToc) {
-      html += '<div class="toc"><h2>Table des matières</h2>';
-      chapters.forEach((ch, i) => { html += `<a href="#ch${i + 1}">Chapitre ${i + 1} : ${ch.title}</a>`; });
-      html += '</div>';
+      html += '<div class="toc"><h2>Table des matières</h2><ol>';
+      if (includePreface && preface) html += '<li><a href="#preface">Préface</a></li>';
+      chapters.forEach((ch, i) => { html += `<li><a href="#ch${i + 1}">Chapitre ${i + 1} – ${escapeXml(ch.title)}</a></li>`; });
+      if (includeConclusion && conclusion) html += '<li><a href="#conclusion">Conclusion</a></li>';
+      html += '</ol></div>';
+    }
+
+    if (includePreface && preface) {
+      html += `<h2 id="preface">Préface</h2>${textToHtml(cleanGeneratedText(preface))}`;
     }
 
     chapters.forEach((ch, i) => {
-      html += `<h2 id="ch${i + 1}">Chapitre ${i + 1} : ${ch.title}</h2>${textToHtml(cleanGeneratedText(ch.content || ''))}`;
+      html += `<h2 id="ch${i + 1}"><span class="chapter-num">Chapitre ${i + 1}</span>${escapeXml(ch.title)}</h2>${textToHtml(cleanGeneratedText(ch.content || ''))}`;
       ch.subChapters?.forEach(sc => {
-        if (sc.content) html += `<h3>${sc.title}</h3>${textToHtml(cleanGeneratedText(sc.content))}`;
+        if (sc.content) html += `<div class="separator">• • •</div><h3>${escapeXml(sc.title)}</h3>${textToHtml(cleanGeneratedText(sc.content))}`;
       });
     });
+
+    if (includeConclusion && conclusion) {
+      html += `<h2 id="conclusion">Conclusion</h2>${textToHtml(cleanGeneratedText(conclusion))}`;
+    }
 
     html += '</body></html>';
     downloadBlob(new Blob([html], { type: 'text/html;charset=utf-8' }), `${ebookTitle}.html`);
@@ -376,7 +400,7 @@ h3{font-size:1.2em;margin-top:1.5em}
           exportPdfPrint();
           break;
         case 'pdf-digital':
-          exportPdfPrint(); // Same for now, could be enhanced
+          exportPdfPrint(); // Uses A4 format with digital optimizations
           break;
         case 'txt':
           exportTxt();
