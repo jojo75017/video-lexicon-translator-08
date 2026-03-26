@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Settings, Key, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { Settings, Key, CheckCircle, XCircle, AlertCircle, Download } from 'lucide-react';
 import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 
 interface EbookSettingsProps {
@@ -131,8 +131,15 @@ export const EbookSettings: React.FC<EbookSettingsProps> = ({
                   >
                     📊 Google AI Studio
                   </a>
+                  <a 
+                    href="/Guide_Cle_Gemini_API.pdf" 
+                    download="Guide_Cle_Gemini_API.pdf"
+                    className="inline-flex items-center gap-1 bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 px-3 py-1.5 rounded-full hover:bg-green-200 dark:hover:bg-green-800/60 transition-colors"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    📄 Guide PDF : obtenir sa clé
+                  </a>
                 </div>
-              </div>
             </div>
           </div>
 
