@@ -188,24 +188,24 @@ export const KdpAmazonResearch: React.FC = () => {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-5 w-full">
-          <TabsTrigger value="asin" className="flex items-center gap-1.5">
+        <TabsList className="grid grid-cols-5 w-full bg-secondary/50 p-1.5 gap-1">
+          <TabsTrigger value="asin" className="flex items-center gap-1.5 data-[state=active]:bg-[hsl(210,100%,62%)] data-[state=active]:text-white data-[state=active]:shadow-[0_0_12px_hsl(210,100%,62%,0.4)] text-muted-foreground transition-all">
             <BookOpen className="h-4 w-4" />
             <span className="hidden sm:inline">Fiche ASIN</span>
           </TabsTrigger>
-          <TabsTrigger value="niche" className="flex items-center gap-1.5">
+          <TabsTrigger value="niche" className="flex items-center gap-1.5 data-[state=active]:bg-[hsl(160,84%,39%)] data-[state=active]:text-white data-[state=active]:shadow-[0_0_12px_hsl(160,84%,39%,0.4)] text-muted-foreground transition-all">
             <BarChart3 className="h-4 w-4" />
             <span className="hidden sm:inline">Analyse Niche</span>
           </TabsTrigger>
-          <TabsTrigger value="competitors" className="flex items-center gap-1.5">
+          <TabsTrigger value="competitors" className="flex items-center gap-1.5 data-[state=active]:bg-[hsl(38,92%,50%)] data-[state=active]:text-white data-[state=active]:shadow-[0_0_12px_hsl(38,92%,50%,0.4)] text-muted-foreground transition-all">
             <Eye className="h-4 w-4" />
             <span className="hidden sm:inline">Espion</span>
           </TabsTrigger>
-          <TabsTrigger value="keywords" className="flex items-center gap-1.5">
+          <TabsTrigger value="keywords" className="flex items-center gap-1.5 data-[state=active]:bg-[hsl(270,70%,55%)] data-[state=active]:text-white data-[state=active]:shadow-[0_0_12px_hsl(270,70%,55%,0.4)] text-muted-foreground transition-all">
             <Key className="h-4 w-4" />
             <span className="hidden sm:inline">Mots-Clés</span>
           </TabsTrigger>
-          <TabsTrigger value="studio" className="flex items-center gap-1.5">
+          <TabsTrigger value="studio" className="flex items-center gap-1.5 data-[state=active]:bg-[hsl(346,77%,50%)] data-[state=active]:text-white data-[state=active]:shadow-[0_0_12px_hsl(346,77%,50%,0.4)] text-muted-foreground transition-all">
             <Sparkles className="h-4 w-4" />
             <span className="hidden sm:inline">Studio KDP</span>
           </TabsTrigger>
