@@ -1367,9 +1367,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           <div className="relative animate-fade-in">
             {/* Indicateur de bienvenue pour les utilisateurs venant de la formation */}
             {showWelcome && (
-              <div className="mb-8 relative overflow-hidden rounded-2xl bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 p-6 shadow-2xl animate-scale-in">
+              <div className="mb-8 relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary via-[#0052CC] to-accent p-6 shadow-2xl animate-scale-in">
                 <div className="absolute inset-0 bg-grid-white opacity-10" />
-                <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/20 rounded-full blur-2xl" />
+                <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl" />
                 
                 <button 
                   onClick={() => setShowWelcome(false)}
@@ -1495,7 +1495,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                             navigate('/auth?redirect=/ebook-planner');
                           }
                         }}
-                        className="bg-[hsl(38,92%,50%)]/20 hover:bg-[hsl(38,92%,50%)]/30 text-[hsl(38,92%,70%)] border border-[hsl(38,92%,50%)]/30 rounded-xl"
+                        className="bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border border-amber-500/30 rounded-xl"
                       >
                         <Crown className="h-4 w-4 mr-2" />
                         Auth
