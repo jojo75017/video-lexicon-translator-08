@@ -609,67 +609,79 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
               })}
             </div>
           ) : (
-            /* ── TOP 10 tools (default view) ── */
-            <div className="space-y-1">
-              {!isCollapsed && (
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-amber-400 px-2 mb-2">
-                  ⭐ Outils principaux
-                </p>
-              )}
+            /* ── All 5 categories, always visible, collapsible ── */
+            <div className="space-y-1.5">
+              {allToolGroups.map(group => {
+                const isExpanded = expandedGroups.includes(group.label);
+                const visibleItems = group.items.filter(filterAdmin);
+                const hasActive = visibleItems.some(i => i.id === activeTab);
 
-              {topTools.map(item => (
-                <MenuItemButton
-                  key={item.id}
-                  item={item}
-                  isActive={activeTab === item.id}
-                  onClick={() => handleItemClick(item)}
-                  isCollapsed={isCollapsed}
-                />
-              ))}
+                if (isCollapsed) {
+                  // In collapsed mode, show just the emoji as a group indicator
+                  return (
+                    <Tooltip key={group.label}>
+                      <TooltipTrigger asChild>
+                        <button
+                          onClick={() => {
+                            onToggleCollapse();
+                            setTimeout(() => setExpandedGroups([group.label]), 300);
+                          }}
+                          className={cn(
+                            "w-full flex items-center justify-center p-2.5 rounded-xl transition-all",
+                            hasActive
+                              ? "bg-gradient-to-r from-amber-500/20 to-orange-500/15 border border-amber-500/30"
+                              : "hover:bg-card text-muted-foreground"
+                          )}
+                        >
+                          <span className="text-base">{group.emoji}</span>
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="right" className="font-medium">
+                        {group.label} ({visibleItems.length})
+                      </TooltipContent>
+                    </Tooltip>
+                  );
+                }
 
-              {/* Show current active tool if it's NOT in the top 10 */}
-              {activeToolInfo && !isCollapsed && (
-                <>
-                  <div className="flex items-center gap-2 px-2 pt-3 pb-1">
-                    <div className="h-px flex-1 bg-border" />
-                    <span className="text-[10px] text-muted-foreground">actif</span>
-                    <div className="h-px flex-1 bg-border" />
-                  </div>
-                  <MenuItemButton
-                    item={activeToolInfo}
-                    isActive={true}
-                    onClick={() => handleItemClick(activeToolInfo)}
-                    isCollapsed={false}
-                  />
-                </>
-              )}
-
-              {/* "Voir tout" button */}
-              {!isCollapsed && (
-                <button
-                  onClick={() => setShowAllTools(true)}
-                  className="w-full flex items-center justify-center gap-2 px-3 py-2.5 mt-3 rounded-xl border border-dashed border-border text-sm text-muted-foreground hover:text-foreground hover:border-amber-500/40 hover:bg-card/60 transition-all"
-                >
-                  <ChevronDown className="w-4 h-4" />
-                  Voir tous les outils
-                </button>
-              )}
-              {isCollapsed && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
+                return (
+                  <div key={group.label} className="rounded-xl overflow-hidden">
                     <button
-                      onClick={() => {
-                        onToggleCollapse();
-                        setTimeout(() => setShowAllTools(true), 300);
-                      }}
-                      className="w-full flex items-center justify-center p-2.5 rounded-xl hover:bg-card text-muted-foreground mt-2"
+                      onClick={() => toggleGroup(group.label)}
+                      className={cn(
+                        "w-full flex items-center justify-between px-3 py-2 rounded-xl transition-all",
+                        hasActive ? "bg-amber-500/10" : "hover:bg-card/60"
+                      )}
                     >
-                      <ChevronDown className="w-4 h-4" />
+                      <span className={cn(
+                        "text-sm font-semibold flex items-center gap-2",
+                        hasActive ? "text-amber-400" : "text-foreground"
+                      )}>
+                        {group.emoji} {group.label}
+                        <span className="text-[10px] font-normal text-muted-foreground">
+                          {visibleItems.length}
+                        </span>
+                      </span>
+                      <ChevronDown className={cn(
+                        "w-3.5 h-3.5 text-muted-foreground transition-transform duration-200",
+                        isExpanded ? "rotate-0" : "-rotate-90"
+                      )} />
                     </button>
-                  </TooltipTrigger>
-                  <TooltipContent side="right">Voir tous les outils</TooltipContent>
-                </Tooltip>
-              )}
+                    {isExpanded && (
+                      <div className="pl-1 pr-1 pb-1 space-y-0.5">
+                        {visibleItems.map(item => (
+                          <MenuItemButton
+                            key={item.id}
+                            item={item}
+                            isActive={activeTab === item.id}
+                            onClick={() => handleItemClick(item)}
+                            isCollapsed={false}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           )}
         </nav>
