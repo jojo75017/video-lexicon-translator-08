@@ -24,24 +24,24 @@ export const ExclusiveFlashBanner: React.FC = () => {
               animate={{ rotate: [0, -10, 10, -10, 0] }}
               transition={{ duration: 0.6, repeat: Infinity, repeatDelay: 3 }}
             >
-              <Zap className="w-6 h-6 text-amber-400 fill-amber-400" />
+              <Zap className="w-6 h-6 text-primary fill-primary drop-shadow-sm" />
             </motion.div>
-            <span className="bg-gradient-to-r from-amber-400 to-orange-400 text-slate-900 font-extrabold text-xs sm:text-sm tracking-widest uppercase px-4 py-1.5 rounded-full">
+            <span className="bg-primary text-primary-foreground font-extrabold text-xs sm:text-sm tracking-widest uppercase px-4 py-1.5 rounded-full shadow-lg shadow-primary/20">
               ⚡ Flash Exclusif
             </span>
             <motion.div
               animate={{ rotate: [0, 10, -10, 10, 0] }}
               transition={{ duration: 0.6, repeat: Infinity, repeatDelay: 3 }}
             >
-              <Zap className="w-6 h-6 text-amber-400 fill-amber-400" />
+              <Zap className="w-6 h-6 text-primary fill-primary drop-shadow-sm" />
             </motion.div>
           </div>
 
           {/* Main headline */}
           <h3 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-center leading-tight mb-4">
-            <span className="text-white">Ce que vous allez découvrir ici,</span>
+            <span className="text-foreground drop-shadow-sm">Ce que vous allez découvrir ici,</span>
             <br />
-            <span className="bg-gradient-to-r from-amber-400 via-orange-400 to-red-400 bg-clip-text text-transparent">
+            <span className="text-primary drop-shadow-sm">
               vous ne le trouverez nulle part ailleurs à ce prix.
             </span>
           </h3>
@@ -53,22 +53,22 @@ export const ExclusiveFlashBanner: React.FC = () => {
                 icon: Diamond,
                 title: "Suite IA Complète",
                 desc: "Rédaction, couvertures, audiobooks — tout en un seul outil",
-                color: "text-cyan-400",
-                border: "border-cyan-500/20",
+                 color: "text-primary",
+                 border: "border-border",
               },
               {
                 icon: AlertTriangle,
                 title: "Prix Introuvable",
                 desc: "67€ à vie au lieu de 500-2000€ chez les concurrents",
-                color: "text-amber-400",
-                border: "border-amber-500/20",
+                 color: "text-primary",
+                 border: "border-border",
               },
               {
                 icon: Zap,
                 title: "Résultats ce soir",
                 desc: "Votre 1er ebook publié sur Amazon en moins d'1h",
-                color: "text-emerald-400",
-                border: "border-emerald-500/20",
+                 color: "text-primary",
+                 border: "border-border",
               },
             ].map((item, i) => (
               <motion.div
@@ -77,11 +77,11 @@ export const ExclusiveFlashBanner: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.2 + i * 0.1 }}
-                className={`bg-slate-800/50 ${item.border} border rounded-xl p-4 text-center`}
+                 className={`bg-card/80 ${item.border} border rounded-xl p-4 text-center backdrop-blur-sm`}
               >
                 <item.icon className={`w-7 h-7 ${item.color} mx-auto mb-2`} />
-                <p className="font-bold text-white text-sm">{item.title}</p>
-                <p className="text-slate-400 text-xs mt-1">{item.desc}</p>
+                 <p className="font-bold text-foreground text-sm">{item.title}</p>
+                 <p className="text-muted-foreground text-xs mt-1">{item.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -92,7 +92,7 @@ export const ExclusiveFlashBanner: React.FC = () => {
             transition={{ duration: 1.5, repeat: Infinity }}
             className="flex justify-center mt-6"
           >
-            <ArrowDown className="w-5 h-5 text-amber-400/60" />
+            <ArrowDown className="w-5 h-5 text-primary/70" />
           </motion.div>
         </div>
       </div>
