@@ -157,8 +157,44 @@ const SalesPage = () => {
           "@context": "https://schema.org",
           "@type": "Product",
           "name": "EbookStudio Pro",
-          "description": "Plateforme de création d'ebooks et audiobooks par IA",
-          "offers": { "@type": "Offer", "price": "97", "priceCurrency": "EUR", "availability": "https://schema.org/InStock" }
+          "description": "Plateforme de création d'ebooks et audiobooks par IA avec Gemini 3 Flash. Créez, publiez et vendez sur Amazon KDP.",
+          "brand": { "@type": "Brand", "name": "EbookStudio" },
+          "image": "https://ebookstudio.fr/og-image.png",
+          "offers": {
+            "@type": "Offer",
+            "price": "67",
+            "priceCurrency": "EUR",
+            "availability": "https://schema.org/InStock",
+            "priceValidUntil": "2026-06-30",
+            "url": "https://ebookstudio.fr/offres"
+          },
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.8",
+            "reviewCount": "127",
+            "bestRating": "5",
+            "worstRating": "1"
+          },
+          "review": [
+            { "@type": "Review", "author": { "@type": "Person", "name": "Marie D." }, "reviewRating": { "@type": "Rating", "ratingValue": "5" }, "reviewBody": "J'ai publié 3 ebooks en 2 semaines. Le workflow IA est incroyable, tout est guidé étape par étape." },
+            { "@type": "Review", "author": { "@type": "Person", "name": "Thomas L." }, "reviewRating": { "@type": "Rating", "ratingValue": "5" }, "reviewBody": "BSR passé de 890 000 à 12 400. 1 847€/mois de revenus passifs grâce aux outils KDP intégrés." },
+            { "@type": "Review", "author": { "@type": "Person", "name": "Sophie R." }, "reviewRating": { "@type": "Rating", "ratingValue": "5" }, "reviewBody": "Même sans savoir écrire, l'IA génère des chapitres de qualité pro. Mon premier ebook publié en 45 minutes." }
+          ]
+        })}</script>
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": [
+            { "@type": "Question", "name": "Comment fonctionne le paiement unique à 67€ ?", "acceptedAnswer": { "@type": "Answer", "text": "Vous payez 67€ une seule fois via PayPal et vous obtenez un accès à vie à l'ensemble de la plateforme. Pas d'abonnement mensuel, pas de frais cachés. Des facilités sont disponibles : 2×35€ ou 3×25€." } },
+            { "@type": "Question", "name": "Ai-je besoin de compétences techniques ou de savoir écrire ?", "acceptedAnswer": { "@type": "Answer", "text": "Absolument pas ! EbookStudio est conçu pour les débutants complets. L'IA Gemini 3 Flash rédige l'intégralité de votre ebook." } },
+            { "@type": "Question", "name": "Qu'est-ce que Gemini 3 Flash et combien ça coûte ?", "acceptedAnswer": { "@type": "Answer", "text": "Gemini 3 Flash est l'IA de Google. Coût moyen : 0,20€ à 0,50€ par ebook complet. Un guide vidéo est inclus après l'achat." } },
+            { "@type": "Question", "name": "Puis-je vendre les ebooks générés sur Amazon KDP ?", "acceptedAnswer": { "@type": "Answer", "text": "Oui, vous gardez 100% des droits sur tout ce que vous créez. Nos outils KDP intégrés vous aident à maximiser vos ventes." } },
+            { "@type": "Question", "name": "Combien de temps faut-il pour créer un ebook complet ?", "acceptedAnswer": { "@type": "Answer", "text": "Avec le workflow en 7 étapes guidées par l'IA, vous pouvez avoir un ebook complet en moins d'une heure." } },
+            { "@type": "Question", "name": "Que se passe-t-il si je ne suis pas satisfait ?", "acceptedAnswer": { "@type": "Answer", "text": "Nous offrons une garantie satisfait ou remboursé de 30 jours, sans condition." } },
+            { "@type": "Question", "name": "Le prix de 67€ va-t-il augmenter ?", "acceptedAnswer": { "@type": "Answer", "text": "Oui. Le prix normal passera à 147€ le 1er juillet. Le tarif de lancement est à 67€ à vie avec toutes les futures mises à jour incluses." } },
+            { "@type": "Question", "name": "Puis-je créer des audiobooks et des BD ?", "acceptedAnswer": { "@type": "Answer", "text": "Oui ! EbookStudio inclut un module audiobook et un module BD/Comics. Tout est inclus sans surcoût." } },
+            { "@type": "Question", "name": "Comment fonctionne le paiement en plusieurs fois ?", "acceptedAnswer": { "@type": "Answer", "text": "Vous pouvez payer en 2 fois (2×35€) ou 3 fois (3×25€) via PayPal. Accès immédiat dès le premier paiement." } }
+          ]
         })}</script>
       </Helmet>
       
