@@ -618,9 +618,9 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                 const isExpanded = expandedGroups.includes(group.label);
                 const visibleItems = group.items.filter(filterAdmin);
                 const hasActive = visibleItems.some(i => i.id === activeTab);
+                const colors = colorMap[group.color] || colorMap.blue;
 
                 if (isCollapsed) {
-                  // In collapsed mode, show just the emoji as a group indicator
                   return (
                     <Tooltip key={group.label}>
                       <TooltipTrigger asChild>
@@ -632,7 +632,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                           className={cn(
                             "w-full flex items-center justify-center p-2.5 rounded-xl transition-all",
                             hasActive
-                              ? "bg-gradient-to-r from-amber-500/20 to-orange-500/15 border border-amber-500/30"
+                              ? cn(colors.bg, "border", colors.border)
                               : "hover:bg-card text-muted-foreground"
                           )}
                         >
@@ -651,26 +651,38 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                     <button
                       onClick={() => toggleGroup(group.label)}
                       className={cn(
-                        "w-full flex items-center justify-between px-3 py-2 rounded-xl transition-all",
-                        hasActive ? "bg-amber-500/10" : "hover:bg-card/60"
+                        "w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all",
+                        hasActive ? colors.bg : "hover:bg-card/60"
                       )}
                     >
-                      <span className={cn(
-                        "text-sm font-semibold flex items-center gap-2",
-                        hasActive ? "text-amber-400" : "text-foreground"
-                      )}>
-                        {group.emoji} {group.label}
-                        <span className="text-[10px] font-normal text-muted-foreground">
+                      <span className="flex items-center gap-2.5">
+                        <span className={cn(
+                          "w-7 h-7 rounded-lg flex items-center justify-center text-sm",
+                          isExpanded || hasActive ? colors.iconBg : "bg-muted/50"
+                        )}>
+                          <span className="text-white text-xs">{group.emoji}</span>
+                        </span>
+                        <span className={cn(
+                          "text-sm font-semibold",
+                          hasActive ? colors.text : "text-foreground"
+                        )}>
+                          {group.label}
+                        </span>
+                        <span className={cn(
+                          "text-[10px] font-medium px-1.5 py-0.5 rounded-full",
+                          colors.bg, colors.text
+                        )}>
                           {visibleItems.length}
                         </span>
                       </span>
                       <ChevronDown className={cn(
-                        "w-3.5 h-3.5 text-muted-foreground transition-transform duration-200",
-                        isExpanded ? "rotate-0" : "-rotate-90"
+                        "w-3.5 h-3.5 transition-transform duration-200",
+                        isExpanded ? "rotate-0" : "-rotate-90",
+                        hasActive ? colors.text : "text-muted-foreground"
                       )} />
                     </button>
                     {isExpanded && (
-                      <div className="pl-1 pr-1 pb-1 space-y-0.5">
+                      <div className={cn("pl-1 pr-1 pb-1 space-y-0.5 mt-0.5 ml-2 border-l-2", colors.border)}>
                         {visibleItems.map(item => (
                           <MenuItemButton
                             key={item.id}
@@ -678,6 +690,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                             isActive={activeTab === item.id}
                             onClick={() => handleItemClick(item)}
                             isCollapsed={false}
+                            groupColor={group.color}
                           />
                         ))}
                       </div>
