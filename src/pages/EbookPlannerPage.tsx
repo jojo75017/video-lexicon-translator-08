@@ -152,6 +152,7 @@ import { EbookManuscriptDashboard } from '@/components/ebook/EbookManuscriptDash
 import { EbookRichEditor } from '@/components/ebook/EbookRichEditor';
 import { EbookAIDetectorScore } from '@/components/ebook/EbookAIDetectorScore';
 import { EbookAICoverStudio } from '@/components/ebook/EbookAICoverStudio';
+import { CoverDesignEditor } from '@/components/ebook/CoverDesignEditor';
 import { EbookMultiTomeHub } from '@/components/ebook/EbookMultiTomeHub';
 import { EbookAdvancedExport } from '@/components/ebook/EbookAdvancedExport';
 import { EbookWritingIntelligence } from '@/components/ebook/EbookWritingIntelligence';
