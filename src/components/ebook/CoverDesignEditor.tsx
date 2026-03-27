@@ -660,8 +660,9 @@ export const CoverDesignEditor: React.FC<CoverDesignEditorProps> = ({
         <div className="w-72 flex-shrink-0">
           <div className="h-[calc(100vh-220px)] overflow-y-auto pr-1">
             <Tabs defaultValue="templates" className="w-full">
-              <TabsList className="w-full grid grid-cols-3">
+              <TabsList className="w-full grid grid-cols-4">
                 <TabsTrigger value="templates" className="text-xs">Templates</TabsTrigger>
+                <TabsTrigger value="library" className="text-xs">Biblio</TabsTrigger>
                 <TabsTrigger value="elements" className="text-xs">Éléments</TabsTrigger>
                 <TabsTrigger value="fond" className="text-xs">Fond</TabsTrigger>
               </TabsList>
@@ -689,6 +690,10 @@ export const CoverDesignEditor: React.FC<CoverDesignEditorProps> = ({
                     </div>
                   );
                 })}
+              </TabsContent>
+
+              <TabsContent value="library" className="mt-2">
+                <CoverElementLibrary onAddElement={addLibraryElement} />
               </TabsContent>
 
               <TabsContent value="elements" className="space-y-3 mt-2">
