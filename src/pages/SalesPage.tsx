@@ -24,6 +24,7 @@ import ProgressEngagement from "@/components/sales/ProgressEngagement";
 import InteractiveDemo from "@/components/sales/InteractiveDemo";
 import WhoIsThisFor from "@/components/sales/WhoIsThisFor";
 import TonightOutcomes from "@/components/sales/TonightOutcomes";
+import ExclusiveFlashBanner from "@/components/sales/ExclusiveFlashBanner";
 
 // ════════════════════════════════════════════════════════════════════════════════
 // DESIGN SYSTEM 2026 — Palette Premium
@@ -204,6 +205,9 @@ const SalesPage = () => {
           </Button>
         </div>
       </header>
+
+      {/* ═══════════════════════════════════════ FLASH EXCLUSIF ═══════════════════════════════════════ */}
+      <ExclusiveFlashBanner />
 
       {/* ═══════════════════════════════════════ HERO ═══════════════════════════════════════ */}
       <section className="relative py-20 sm:py-28 px-4">
