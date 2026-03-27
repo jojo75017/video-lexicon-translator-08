@@ -353,6 +353,32 @@ Réponds en JSON strict :
         )}
       </div>
 
+      {/* Skeleton loader */}
+      {isGenerating && generatedPosts.length === 0 && (
+        <div className="space-y-3">
+          {[1, 2, 3].map(i => (
+            <Card key={i} className="bg-card/50 border-border/50">
+              <CardContent className="p-5">
+                <div className="animate-pulse space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="h-8 w-8 rounded-lg bg-muted" />
+                    <div className="h-4 w-40 rounded bg-muted" />
+                    <div className="h-5 w-20 rounded-full bg-muted" />
+                  </div>
+                  <div className="h-1.5 w-full rounded-full bg-muted" />
+                  <div className="h-20 w-full rounded-lg bg-muted" />
+                  <div className="flex gap-2">
+                    <div className="h-5 w-16 rounded-full bg-muted" />
+                    <div className="h-5 w-20 rounded-full bg-muted" />
+                    <div className="h-5 w-14 rounded-full bg-muted" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+
       {/* Résultats */}
       <AnimatePresence>
         {generatedPosts.length > 0 && (

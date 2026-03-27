@@ -14,6 +14,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import EbookLaunchSocialPosts from './EbookLaunchSocialPosts';
+import LaunchEmailGenerator from './social/LaunchEmailGenerator';
 
 interface LaunchTask {
   id: string;
@@ -151,14 +152,18 @@ const EbookLaunchPlan: React.FC = () => {
 
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-      <TabsList className="grid w-full grid-cols-2">
+      <TabsList className="grid w-full grid-cols-3">
         <TabsTrigger value="checklist" className="flex items-center gap-2">
           <Rocket className="h-4 w-4" />
           Plan de Lancement
         </TabsTrigger>
         <TabsTrigger value="social" className="flex items-center gap-2">
           <Megaphone className="h-4 w-4" />
-          Posts Réseaux Sociaux
+          Posts Sociaux
+        </TabsTrigger>
+        <TabsTrigger value="emails" className="flex items-center gap-2">
+          <Mail className="h-4 w-4" />
+          Emails de Lancement
         </TabsTrigger>
       </TabsList>
 
@@ -438,6 +443,10 @@ const EbookLaunchPlan: React.FC = () => {
 
       <TabsContent value="social">
         <EbookLaunchSocialPosts />
+      </TabsContent>
+
+      <TabsContent value="emails">
+        <LaunchEmailGenerator />
       </TabsContent>
     </Tabs>
   );
