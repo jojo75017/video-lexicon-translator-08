@@ -6,9 +6,8 @@ export const ExclusiveFlashBanner: React.FC = () => {
   return (
     <motion.section
       initial={{ opacity: 0, scale: 0.95 }}
-      whileInView={{ opacity: 1, scale: 1 }}
-      viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.6, delay: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
       className="relative mx-4 sm:mx-auto max-w-4xl my-10"
     >
       {/* Glow effect */}
