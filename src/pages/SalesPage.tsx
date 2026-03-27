@@ -248,7 +248,7 @@ const SalesPage = () => {
           </motion.div>
 
           {/* CTA Principal */}
-          <motion.div variants={fadeIn} custom={4} className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
+          <motion.div variants={fadeIn} custom={4} className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-5">
             <Button size="lg" onClick={handlePlanClick}
               className="w-full sm:w-auto text-lg px-10 py-7 bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-900 font-bold rounded-2xl shadow-2xl shadow-cyan-500/25 hover:shadow-cyan-500/40 transition-all duration-300 hover:-translate-y-1">
               <Rocket className="w-5 h-5 mr-2" />
@@ -260,6 +260,21 @@ const SalesPage = () => {
               <Play className="w-5 h-5 mr-2" />
               Voir la démo
             </Button>
+          </motion.div>
+
+          {/* CTA Gratuit — capture de leads */}
+          <motion.div variants={fadeIn} custom={4.5} className="mb-6">
+            <a
+              href="https://www.trafic-affiliation.com/ebookstudio_capture"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => trackCTAClick('hero_free_guide', 'capture_tunnel')}
+              className="inline-flex items-center gap-2 text-amber-400 hover:text-amber-300 font-semibold text-sm transition-colors group"
+            >
+              <Gift className="w-4 h-4 group-hover:animate-bounce" />
+              Pas encore prêt ? Recevez notre guide gratuit : 10 Niches KDP Rentables
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </a>
           </motion.div>
 
           <motion.div variants={fadeIn} custom={5} className="flex flex-wrap justify-center gap-4 text-sm text-white/70">
@@ -514,6 +529,47 @@ const SalesPage = () => {
 
       {/* ═══════════════════════════════════════ COMPARATIF PRIX ═══════════════════════════════════════ */}
       <PriceComparison />
+
+      {/* ═══════════════════════════════════════ LEAD CAPTURE GRATUIT ═══════════════════════════════════════ */}
+      <section className="py-16 px-4 bg-gradient-to-b from-slate-950 to-slate-900">
+        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="max-w-3xl mx-auto">
+          <Card className="bg-gradient-to-br from-amber-950/40 to-slate-900 border-2 border-amber-500/30 rounded-3xl overflow-hidden shadow-2xl shadow-amber-500/10">
+            <CardContent className="p-8 md:p-10">
+              <div className="text-center space-y-4">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center mx-auto">
+                  <Gift className="w-8 h-8 text-white" />
+                </div>
+                <motion.h2 variants={fadeIn} className="text-2xl sm:text-3xl font-black text-white">
+                  Pas encore décidé ?
+                </motion.h2>
+                <motion.p variants={fadeIn} custom={1} className="text-white/80 text-lg max-w-xl mx-auto">
+                  Recevez <span className="text-amber-400 font-bold">10 niches KDP rentables</span> gratuitement et commencez à valider votre marché avant de vous lancer.
+                </motion.p>
+                <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-white/70 pt-2">
+                  <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-500" />Guide PDF offert</span>
+                  <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-500" />Niches validées 2026</span>
+                  <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-500" />Accès immédiat</span>
+                </div>
+                <motion.div variants={fadeIn} custom={2} className="pt-4">
+                  <a
+                    href="https://www.trafic-affiliation.com/ebookstudio_capture"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => trackCTAClick('mid_page_free_guide', 'capture_tunnel')}
+                  >
+                    <Button size="lg" className="text-lg px-10 py-7 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-900 font-bold rounded-2xl shadow-2xl shadow-amber-500/25 hover:shadow-amber-500/40 transition-all duration-300 hover:-translate-y-1">
+                      <Gift className="w-5 h-5 mr-2" />
+                      Recevoir les 10 niches gratuites
+                      <ArrowRight className="w-5 h-5 ml-2" />
+                    </Button>
+                  </a>
+                  <p className="text-white/40 text-xs mt-3">🔒 Aucune carte bancaire requise • Accès instantané</p>
+                </motion.div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </section>
 
       {/* ═══════════════════════════════════════ ROI CALCULATOR ═══════════════════════════════════════ */}
       <section className="py-16 px-4 bg-slate-900/30">
