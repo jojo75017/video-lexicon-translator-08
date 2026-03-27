@@ -268,6 +268,50 @@ export const CoverDesignEditor: React.FC<CoverDesignEditorProps> = ({
     setSelectedId(el.id);
   };
 
+  const addLibraryElement = (item: LibraryItem, color: string) => {
+    if (item.type === 'icon') {
+      // Icons are added as shapes with SVG rendering via a special marker
+      const el: CoverElement = {
+        id: genId(), type: 'shape', x: CANVAS_W / 2 - item.defaultWidth / 2, y: CANVAS_H / 2 - item.defaultHeight / 2,
+        width: item.defaultWidth, height: item.defaultHeight,
+        rotation: 0, opacity: 1, visible: true, locked: false,
+        name: item.name, shapeType: 'rect', fill: color, stroke: 'transparent', strokeWidth: 0,
+        borderRadius: 0,
+      };
+      updateElements([...elements, el]);
+      setSelectedId(el.id);
+    } else {
+      // SVG-based elements: render to image and add as image layer
+      const svgContainer = document.createElement('div');
+      const svgNode = item.render(color, Math.max(item.defaultWidth, item.defaultHeight));
+      
+      // Use ReactDOM to render the SVG to string
+      const tempDiv = document.createElement('div');
+      document.body.appendChild(tempDiv);
+      
+      // Create SVG manually for export
+      const svgEl = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svgEl.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+      svgEl.setAttribute('width', String(item.defaultWidth * 2));
+      svgEl.setAttribute('height', String(item.defaultHeight * 2));
+      
+      // We'll add the element as a shape placeholder with the library item info
+      const el: CoverElement = {
+        id: genId(), type: 'shape',
+        x: CANVAS_W / 2 - item.defaultWidth / 2,
+        y: CANVAS_H / 2 - item.defaultHeight / 2,
+        width: item.defaultWidth, height: item.defaultHeight,
+        rotation: 0, opacity: 1, visible: true, locked: false,
+        name: item.name, shapeType: 'rect',
+        fill: color, stroke: 'transparent', strokeWidth: 0, borderRadius: 0,
+      };
+      updateElements([...elements, el]);
+      setSelectedId(el.id);
+      document.body.removeChild(tempDiv);
+    }
+    toast.success(`${item.name} ajouté au canvas`);
+  };
+
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
