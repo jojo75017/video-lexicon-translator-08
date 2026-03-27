@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Button } from "@/components/ui/button";
 import { Gift, Download, Sparkles, CheckCircle } from "lucide-react";
 import { generateKdpNichesPdf } from "@/utils/generateKdpNichesPdf";
@@ -102,7 +103,11 @@ const ExitIntentPopup = ({ onContinueToOffer }: ExitIntentPopupProps) => {
 
       {/* Dialog popup */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="sm:max-w-lg p-0 overflow-hidden border-2 border-amber-500/50 bg-background shadow-2xl z-[100]">
+        <DialogContent className="sm:max-w-lg p-0 overflow-hidden border-2 border-amber-500/50 bg-background text-foreground shadow-2xl z-[100]">
+          <VisuallyHidden>
+            <DialogTitle>Cadeau exclusif - Guide KDP gratuit</DialogTitle>
+            <DialogDescription>Téléchargez gratuitement notre guide des 10 niches KDP rentables en 2026</DialogDescription>
+          </VisuallyHidden>
           {/* Header */}
           <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 p-5 text-center">
             <div className="flex items-center justify-center gap-2 mb-1">
