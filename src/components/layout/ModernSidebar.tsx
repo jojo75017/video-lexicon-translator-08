@@ -60,10 +60,18 @@ interface ToolGroup {
   items: MenuItem[];
 }
 
+interface ToolGroup {
+  label: string;
+  emoji: string;
+  color: string; // tailwind color key
+  items: MenuItem[];
+}
+
 const allToolGroups: ToolGroup[] = [
   {
     label: 'Créer',
     emoji: '✍️',
+    color: 'emerald',
     items: [
       { id: 'presentation', label: 'Découvrir KDP Studio', icon: Info },
       { id: 'onboarding', label: 'Par où commencer ?', icon: BookOpen },
@@ -102,6 +110,7 @@ const allToolGroups: ToolGroup[] = [
   {
     label: 'Optimiser',
     emoji: '⚡',
+    color: 'violet',
     items: [
       { id: 'editorial-director', label: 'P1 — Directeur Éditorial', icon: Crown, isPro: true },
       { id: 'market-analysis', label: 'P2 — Analyse Marché', icon: Search, isPro: true },
@@ -144,6 +153,7 @@ const allToolGroups: ToolGroup[] = [
   {
     label: 'Publier',
     emoji: '📦',
+    color: 'blue',
     items: [
       { id: 'export', label: 'Exporter (PDF, Word)', icon: Download },
       { id: 'advanced-export', label: 'Export Multi-Format', icon: Download },
@@ -178,6 +188,7 @@ const allToolGroups: ToolGroup[] = [
   {
     label: 'Vendre',
     emoji: '📣',
+    color: 'orange',
     items: [
       { id: 'marketing', label: 'Posts Réseaux Sociaux', icon: MessageSquare },
       { id: 'seo-generator', label: 'Générateur SEO IA', icon: FileEdit, isLink: true, href: '/seo-generator' },
@@ -204,6 +215,7 @@ const allToolGroups: ToolGroup[] = [
   {
     label: 'Mon Compte',
     emoji: '⚙️',
+    color: 'slate',
     items: [
       { id: 'ebook-library', label: 'Ma Bibliothèque', icon: Library },
       { id: 'projects', label: 'Mes Projets', icon: FolderOpen },
