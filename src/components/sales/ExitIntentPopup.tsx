@@ -126,10 +126,10 @@ const ExitIntentPopup = ({ onContinueToOffer }: ExitIntentPopupProps) => {
               Recevez GRATUITEMENT
             </h3>
             
-            <div className="bg-violet-50 dark:bg-violet-950/40 border-2 border-violet-300 dark:border-violet-700 rounded-xl p-4 mb-4">
+            <div className="bg-violet-950/40 border-2 border-violet-700 rounded-xl p-4 mb-4">
               <div className="flex items-center justify-center gap-2 mb-2">
-                <Sparkles className="w-5 h-5 text-violet-600 dark:text-violet-400" />
-                <span className="font-bold text-violet-700 dark:text-violet-300 text-lg">
+                <Sparkles className="w-5 h-5 text-violet-400" />
+                <span className="font-bold text-violet-300 text-lg">
                   Guide PDF Exclusif
                 </span>
               </div>
@@ -137,7 +137,7 @@ const ExitIntentPopup = ({ onContinueToOffer }: ExitIntentPopupProps) => {
                 "10 Niches KDP Rentables en 2026"
               </h4>
               <p className="text-sm text-muted-foreground">
-                Valeur : <span className="line-through">47€</span> → <span className="text-emerald-600 dark:text-emerald-400 font-bold">GRATUIT</span>
+                Valeur : <span className="line-through">47€</span> → <span className="text-emerald-400 font-bold">GRATUIT</span>
               </p>
             </div>
 
@@ -184,7 +184,7 @@ const ExitIntentPopup = ({ onContinueToOffer }: ExitIntentPopupProps) => {
               <Button
                 onClick={handleContinueToOffer}
                 variant="outline"
-                className="w-full border-violet-300 dark:border-violet-700 text-violet-700 dark:text-violet-300 hover:bg-violet-50 dark:hover:bg-violet-950/50 py-5"
+                className="w-full border-violet-700 text-violet-300 hover:bg-violet-950/50 py-5"
               >
                 <Sparkles className="w-4 h-4 mr-2" />
                 Voir l'offre spéciale à 67€
