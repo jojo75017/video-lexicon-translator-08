@@ -551,63 +551,6 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                 <p className="text-sm text-muted-foreground text-center py-6">Aucun outil trouvé</p>
               )}
             </div>
-          ) : showAllTools && !isCollapsed ? (
-            /* ── All tools (grouped) ── */
-            <div className="space-y-2">
-              <div className="flex items-center justify-between px-2 mb-1">
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-amber-400">Tous les outils</p>
-                <button
-                  onClick={() => setShowAllTools(false)}
-                  className="text-[10px] font-medium text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  ← Retour
-                </button>
-              </div>
-              {allToolGroups.map(group => {
-                const isExpanded = expandedGroups.includes(group.label);
-                const visibleItems = group.items.filter(filterAdmin);
-                const hasActive = visibleItems.some(i => i.id === activeTab);
-
-                return (
-                  <div key={group.label} className="rounded-xl border border-border bg-card/30 overflow-hidden">
-                    <button
-                      onClick={() => toggleGroup(group.label)}
-                      className={cn(
-                        "w-full flex items-center justify-between px-3 py-2.5 transition-all",
-                        hasActive ? "bg-amber-500/10" : "hover:bg-card/60"
-                      )}
-                    >
-                      <span className={cn(
-                        "text-sm font-semibold flex items-center gap-2",
-                        hasActive ? "text-amber-400" : "text-foreground"
-                      )}>
-                        {group.emoji} {group.label}
-                        <span className="text-[10px] font-normal text-muted-foreground">
-                          ({visibleItems.length})
-                        </span>
-                      </span>
-                      <ChevronDown className={cn(
-                        "w-3.5 h-3.5 text-muted-foreground transition-transform",
-                        isExpanded ? "rotate-0" : "-rotate-90"
-                      )} />
-                    </button>
-                    {isExpanded && (
-                      <div className="px-1 pb-1 space-y-0.5">
-                        {visibleItems.map(item => (
-                          <MenuItemButton
-                            key={item.id}
-                            item={item}
-                            isActive={activeTab === item.id}
-                            onClick={() => handleItemClick(item)}
-                            isCollapsed={false}
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
           ) : (
             /* ── All 5 categories, always visible, collapsible ── */
             <div className="space-y-1.5">
