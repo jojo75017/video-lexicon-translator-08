@@ -255,7 +255,7 @@ const SalesPage = () => {
             <Button size="lg" onClick={handlePlanClick}
               className="w-full sm:w-auto text-lg px-10 py-7 bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-900 font-bold rounded-2xl shadow-2xl shadow-cyan-500/25 hover:shadow-cyan-500/40 transition-all duration-300 hover:-translate-y-1">
               <Rocket className="w-5 h-5 mr-2" />
-              Commencer — 67€ à vie
+              Je publie mon 1er ebook — 67€ à vie
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
             <Button size="lg" variant="outline" onClick={() => navigate('/demo')}
@@ -390,6 +390,9 @@ const SalesPage = () => {
 
       {/* ═══════════════════════════════════════ DÉMO INTERACTIVE ═══════════════════════════════════════ */}
       <InteractiveDemo />
+
+      {/* ═══════════════════════════════════════ POUR QUI ? ═══════════════════════════════════════ */}
+      <WhoIsThisFor />
 
       {/* ═══════════════════════════════════════ AVANT/APRÈS ═══════════════════════════════════════ */}
       <section className="py-20 px-4 bg-slate-900/50">
@@ -576,6 +579,9 @@ const SalesPage = () => {
           </Card>
         </motion.div>
       </section>
+
+      {/* ═══════════════════════════════════════ CE SOIR VOUS AUREZ ═══════════════════════════════════════ */}
+      <TonightOutcomes />
 
       {/* ═══════════════════════════════════════ ROI CALCULATOR ═══════════════════════════════════════ */}
       <section className="py-16 px-4 bg-slate-900/30">
