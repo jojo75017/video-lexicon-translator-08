@@ -2,68 +2,16 @@ import React, { useState, useMemo } from 'react';
 import { Smartphone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  BookOpen, 
-  Settings, 
-  Image, 
-  Users, 
-  Download, 
-  TrendingUp,
-  LayoutDashboard,
-  Palette,
-  ChevronLeft,
-  ChevronRight,
-  ChevronDown,
-  Sparkles,
-  PenTool,
-  FolderOpen,
-  MessageSquare,
-  DollarSign,
-  ImagePlus,
-  Bot,
-  BookCopy,
-  CreditCard,
-  LayoutTemplate,
-  FileEdit,
-  Volume2,
-  BookHeart,
-  Shield,
-  Headphones,
-  FileText,
-  GraduationCap,
-  Zap,
-  Crown,
-  BookMarked,
-  Map,
-  Search,
-  Brain,
-  GitBranch,
-  Eye,
-  RefreshCw,
-  Fingerprint,
-  Award,
-  Rocket,
-  Link,
-  Globe,
-  Target,
-  Sun,
-  Moon,
-  X,
-  Star,
-  Lightbulb,
-  Video,
-  FlaskConical,
-  Languages,
-  Info,
-  BarChart3,
-  Ruler,
-  Monitor,
-  Library,
-  Music,
-  CalendarDays,
-  Contact,
-  Mail,
-  Code,
-  Activity
+  BookOpen, Settings, Image, Users, Download, TrendingUp,
+  LayoutDashboard, Palette, ChevronLeft, ChevronRight, ChevronDown,
+  Sparkles, PenTool, FolderOpen, MessageSquare, DollarSign,
+  ImagePlus, Bot, BookCopy, CreditCard, LayoutTemplate, FileEdit,
+  Volume2, BookHeart, Shield, Headphones, FileText, GraduationCap,
+  Zap, Crown, BookMarked, Map, Search, Brain, GitBranch, Eye,
+  RefreshCw, Fingerprint, Award, Rocket, Link, Globe, Target,
+  Sun, Moon, X, Star, Lightbulb, Video, FlaskConical, Languages,
+  Info, BarChart3, Ruler, Monitor, Library, Music, CalendarDays,
+  Contact, Mail, Code, Activity, Pin
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -90,293 +38,283 @@ interface MenuItem {
   isPro?: boolean;
 }
 
-interface Category {
+interface SubGroup {
+  label: string;
+  items: MenuItem[];
+}
+
+interface MegaCategory {
   id: string;
   label: string;
   emoji: string;
   color: string;
-  items: MenuItem[];
+  subGroups: SubGroup[];
 }
 
-// Couleurs pastels par catégorie (light / dark)
-const categoryPastelColors: Record<string, { bg: string; border: string }> = {
-  start: { bg: 'bg-primary/5', border: 'border-primary/20' },
-  redaction: { bg: 'bg-blue-50 dark:bg-blue-950/30', border: 'border-blue-200/60 dark:border-blue-800/40' },
-  series: { bg: 'bg-indigo-50 dark:bg-indigo-950/30', border: 'border-indigo-200/60 dark:border-indigo-800/40' },
-  workflow: { bg: 'bg-amber-50 dark:bg-amber-950/30', border: 'border-amber-200/60 dark:border-amber-800/40' },
-  quality: { bg: 'bg-emerald-50 dark:bg-emerald-950/30', border: 'border-emerald-200/60 dark:border-emerald-800/40' },
-  export: { bg: 'bg-orange-50 dark:bg-orange-950/30', border: 'border-orange-200/60 dark:border-orange-800/40' },
-  research: { bg: 'bg-cyan-50 dark:bg-cyan-950/30', border: 'border-cyan-200/60 dark:border-cyan-800/40' },
-  visuels: { bg: 'bg-teal-50 dark:bg-teal-950/30', border: 'border-teal-200/60 dark:border-teal-800/40' },
-  special: { bg: 'bg-pink-50 dark:bg-pink-950/30', border: 'border-pink-200/60 dark:border-pink-800/40' },
-  'marketing-cat': { bg: 'bg-green-50 dark:bg-green-950/30', border: 'border-green-200/60 dark:border-green-800/40' },
-  productivity: { bg: 'bg-fuchsia-50 dark:bg-fuchsia-950/30', border: 'border-fuchsia-200/60 dark:border-fuchsia-800/40' },
-  audio: { bg: 'bg-indigo-50 dark:bg-indigo-950/30', border: 'border-indigo-200/60 dark:border-indigo-800/40' },
-  bibliotheque: { bg: 'bg-emerald-50 dark:bg-emerald-950/30', border: 'border-emerald-200/60 dark:border-emerald-800/40' },
-  compte: { bg: 'bg-card/50', border: 'border-border' },
-};
+// ─── Accès rapide (5 favoris permanents) ───
+const quickAccessItems: MenuItem[] = [
+  { id: 'global-dashboard', label: 'Vue d\'ensemble', icon: LayoutDashboard },
+  { id: 'complete-workflow', label: 'Créer un livre', icon: Rocket, isPro: true },
+  { id: 'writing', label: 'Écrire', icon: PenTool },
+  { id: 'export', label: 'Exporter', icon: Download },
+  { id: 'cover-design-editor', label: 'Couverture', icon: Palette },
+];
 
-const categories: Category[] = [
-  // ========== 1. DÉMARRAGE ==========
+// ─── 5 Mega-catégories ───
+const megaCategories: MegaCategory[] = [
+  // ══════ 1. CRÉER ══════
   {
-    id: 'start',
-    label: 'Démarrage',
-    emoji: '🚀',
-    color: 'from-primary to-accent',
-    items: [
-      { id: 'presentation', label: 'Découvrir KDP Studio', icon: Info },
-      { id: 'global-dashboard', label: 'Vue d\'ensemble', icon: LayoutDashboard, isNew: true },
-      { id: 'onboarding', label: 'Par où commencer ?', icon: BookOpen },
-      { id: 'complete-workflow', label: 'Créer un livre (1 clic)', icon: Rocket, isPro: true },
-      { id: 'workflow-dashboard', label: 'Tableau de Bord', icon: BarChart3, isNew: true },
-      { id: 'niche-templates', label: 'Templates par Niche', icon: Library, isNew: true },
-      { id: 'niches', label: 'Niches Rentables', icon: Lightbulb, isLink: true, href: '/niches' },
-    ]
-  },
-  // ========== 2. RÉDACTION ==========
-  {
-    id: 'redaction',
-    label: 'Rédaction',
+    id: 'creer',
+    label: 'Créer',
     emoji: '✍️',
     color: 'from-blue-500 to-indigo-500',
-    items: [
-      { id: 'focus-mode', label: 'Mode Focus / Zen', icon: Eye, isNew: true },
-      { id: 'draft-mode', label: 'Brouillon Rapide', icon: Zap, isNew: true },
-      { id: 'rich-editor', label: 'Éditeur Enrichi', icon: PenTool, isNew: true },
-      { id: 'writing', label: 'Écrire les Chapitres', icon: PenTool },
-      { id: 'aichat', label: 'Assistant IA', icon: Bot, isNew: true },
-      { id: 'writing-intelligence', label: 'Assistant Intelligent', icon: Brain, isNew: true },
-      { id: 'prompt-library', label: 'Bibliothèque Prompts', icon: Library, isNew: true },
-      { id: 'prompt-chain-generator', label: 'Chaînes de Prompts', icon: Zap, isNew: true },
-      { id: 'characters', label: 'Personnages', icon: Users },
-      { id: 'voice', label: 'Dictée Vocale', icon: Volume2, isNew: true },
+    subGroups: [
+      {
+        label: 'Démarrage',
+        items: [
+          { id: 'presentation', label: 'Découvrir KDP Studio', icon: Info },
+          { id: 'onboarding', label: 'Par où commencer ?', icon: BookOpen },
+          { id: 'workflow-dashboard', label: 'Tableau de Bord', icon: BarChart3, isNew: true },
+          { id: 'niche-templates', label: 'Templates par Niche', icon: Library, isNew: true },
+          { id: 'niches', label: 'Niches Rentables', icon: Lightbulb, isLink: true, href: '/niches' },
+        ]
+      },
+      {
+        label: 'Rédaction',
+        items: [
+          { id: 'focus-mode', label: 'Mode Focus / Zen', icon: Eye },
+          { id: 'draft-mode', label: 'Brouillon Rapide', icon: Zap },
+          { id: 'rich-editor', label: 'Éditeur Enrichi', icon: PenTool },
+          { id: 'writing', label: 'Écrire les Chapitres', icon: PenTool },
+          { id: 'aichat', label: 'Assistant IA', icon: Bot },
+          { id: 'writing-intelligence', label: 'Assistant Intelligent', icon: Brain },
+          { id: 'prompt-library', label: 'Bibliothèque Prompts', icon: Library },
+          { id: 'prompt-chain-generator', label: 'Chaînes de Prompts', icon: Zap },
+          { id: 'characters', label: 'Personnages', icon: Users },
+          { id: 'voice', label: 'Dictée Vocale', icon: Volume2 },
+        ]
+      },
+      {
+        label: 'Séries & Tomes',
+        items: [
+          { id: 'series', label: 'Série / Saga', icon: BookCopy },
+          { id: 'multi-tome-hub', label: 'Hub Multi-Tomes', icon: BookCopy, isNew: true },
+          { id: 'series-tomes', label: 'Tomes de Séries', icon: Library, isLink: true, href: '/series-tomes' },
+        ]
+      },
+      {
+        label: 'Livres Spéciaux',
+        items: [
+          { id: 'practical-sheets', label: 'Fiches Bien-être', icon: FileText, isLink: true, href: '/fiches-pratiques' },
+          { id: 'travel-guide', label: 'Guide de Voyage', icon: Globe },
+          { id: 'recipe-book', label: 'Livre de Recettes', icon: BookOpen },
+          { id: 'aquarium-guide', label: 'Aquariophilie', icon: BookOpen },
+          { id: 'bird-guide', label: 'Oiseaux', icon: BookOpen },
+          { id: 'coloring-book', label: 'Livre Coloriage', icon: Palette },
+          { id: 'comic-book', label: 'Bande Dessinée', icon: LayoutTemplate, isLink: true, href: '/bd-studio' },
+          { id: 'diary-generator', label: 'Journal / Agenda', icon: BookHeart },
+          { id: 'documentary', label: 'Documentaire', icon: BookMarked },
+          { id: 'encyclopedia', label: 'Encyclopédie', icon: BookMarked },
+          { id: 'atlas', label: 'Atlas', icon: Map },
+          { id: 'url-import', label: 'Créer depuis URL', icon: Link },
+          { id: 'doc-transform', label: 'Importer Word', icon: FileText },
+        ]
+      },
     ]
   },
-  // ========== 3. SÉRIES & TOMES ==========
+  // ══════ 2. OPTIMISER ══════
   {
-    id: 'series',
-    label: 'Séries & Tomes',
-    emoji: '📚',
-    color: 'from-indigo-500 to-blue-500',
-    items: [
-      { id: 'series', label: 'Série / Saga', icon: BookCopy },
-      { id: 'multi-tome-hub', label: 'Hub Multi-Tomes', icon: BookCopy, isNew: true },
-      { id: 'series-tomes', label: 'Tomes de Séries', icon: Library, isLink: true, href: '/series-tomes' },
-    ]
-  },
-  // ========== 4. WORKFLOW IA (P1-P15) ==========
-  {
-    id: 'workflow',
-    label: 'Workflow IA (P1-P15)',
+    id: 'optimiser',
+    label: 'Optimiser',
     emoji: '⚡',
     color: 'from-amber-500 to-orange-500',
-    items: [
-      { id: 'editorial-director', label: 'P1 — Directeur Éditorial', icon: Crown, isPro: true, isNew: true },
-      { id: 'market-analysis', label: 'P2 — Analyse Marché', icon: Search, isPro: true, isNew: true },
-      { id: 'content-architect', label: 'P3 — Architecte', icon: LayoutDashboard, isPro: true, isNew: true },
-      { id: 'expert-writing', label: 'P4 — Rédaction Expert', icon: PenTool, isPro: true, isNew: true },
-      { id: 'natural-rewrite', label: 'P5 — Réécriture', icon: Sparkles, isPro: true, isNew: true },
-      { id: 'editorial-quality', label: 'P6 — Qualité', icon: FileEdit, isPro: true, isNew: true },
-      { id: 'editorial-packaging', label: 'P7 — Packaging', icon: FileText, isPro: true, isNew: true },
-      { id: 'final-diagnosis', label: 'P8 — Diagnostic', icon: Shield, isPro: true, isNew: true },
-      { id: 'editorial-memory', label: 'P9 — Mémoire', icon: Brain, isPro: true, isNew: true },
-      { id: 'chapter-coherence', label: 'P10 — Cohérence', icon: GitBranch, isPro: true, isNew: true },
-      { id: 'self-critique', label: 'P11 — Critique', icon: Eye, isPro: true, isNew: true },
-      { id: 'iterative-loop', label: 'P12 — Boucle', icon: RefreshCw, isPro: true, isNew: true },
-      { id: 'style-signature', label: 'P13 — Style', icon: Fingerprint, isPro: true, isNew: true },
-      { id: 'ultimate-verdict', label: 'P14 — Verdict', icon: Award, isPro: true, isNew: true },
-      { id: 'humanize-anti-ia', label: 'P15 — Humanisation Anti-IA', icon: Shield, isPro: true, isNew: true },
+    subGroups: [
+      {
+        label: 'Workflow IA (P1-P15)',
+        items: [
+          { id: 'editorial-director', label: 'P1 — Directeur Éditorial', icon: Crown, isPro: true },
+          { id: 'market-analysis', label: 'P2 — Analyse Marché', icon: Search, isPro: true },
+          { id: 'content-architect', label: 'P3 — Architecte', icon: LayoutDashboard, isPro: true },
+          { id: 'expert-writing', label: 'P4 — Rédaction Expert', icon: PenTool, isPro: true },
+          { id: 'natural-rewrite', label: 'P5 — Réécriture', icon: Sparkles, isPro: true },
+          { id: 'editorial-quality', label: 'P6 — Qualité', icon: FileEdit, isPro: true },
+          { id: 'editorial-packaging', label: 'P7 — Packaging', icon: FileText, isPro: true },
+          { id: 'final-diagnosis', label: 'P8 — Diagnostic', icon: Shield, isPro: true },
+          { id: 'editorial-memory', label: 'P9 — Mémoire', icon: Brain, isPro: true },
+          { id: 'chapter-coherence', label: 'P10 — Cohérence', icon: GitBranch, isPro: true },
+          { id: 'self-critique', label: 'P11 — Critique', icon: Eye, isPro: true },
+          { id: 'iterative-loop', label: 'P12 — Boucle', icon: RefreshCw, isPro: true },
+          { id: 'style-signature', label: 'P13 — Style', icon: Fingerprint, isPro: true },
+          { id: 'ultimate-verdict', label: 'P14 — Verdict', icon: Award, isPro: true },
+          { id: 'humanize-anti-ia', label: 'P15 — Humanisation', icon: Shield, isPro: true },
+        ]
+      },
+      {
+        label: 'Qualité & Relecture',
+        items: [
+          { id: 'manuscript-dashboard', label: 'Dashboard Manuscrit', icon: BarChart3 },
+          { id: 'readability-analyzer', label: 'Analyseur Lisibilité', icon: BookOpen },
+          { id: 'chapter-word-count', label: 'Mots par Chapitre', icon: BarChart3 },
+          { id: 'kindle-preview', label: 'Prévisualisation Kindle', icon: Monitor },
+          { id: 'consistency-detector', label: 'Détecteur Cohérence', icon: Search },
+          { id: 'rhythm-analyzer', label: 'Analyseur Rythme', icon: Activity },
+          { id: 'ai-detector', label: 'Détecteur Anti-IA', icon: Shield },
+          { id: 'humanizer', label: 'Humaniseur IA', icon: Shield },
+          { id: 'plagiarism-validator', label: 'Anti-Plagiat', icon: Shield },
+          { id: 'title-ab-test', label: 'A/B Test Titres', icon: FlaskConical },
+          { id: 'beta-reader-hub', label: 'Hub Bêta-Lecteurs', icon: Users },
+          { id: 'back-matter-generator', label: 'Générateur Back Matter', icon: FileText },
+        ]
+      },
+      {
+        label: 'Visuels & Couvertures',
+        items: [
+          { id: 'cover-design-editor', label: 'Éditeur Couverture', icon: Palette, isNew: true },
+          { id: 'cover', label: 'Couverture Avant', icon: Palette },
+          { id: 'ai-cover-studio', label: 'Couverture IA Pro', icon: Sparkles },
+          { id: 'backcover', label: 'Couverture Arrière', icon: BookCopy },
+          { id: 'kdp-cover-studio', label: 'Studio Couverture KDP', icon: Ruler },
+          { id: 'images', label: 'Images Chapitres', icon: Image },
+          { id: 'imagebank', label: 'Banque Images', icon: ImagePlus },
+          { id: 'library', label: 'Bibliothèque d\'images', icon: FolderOpen },
+          { id: 'mockup-studio', label: 'Mockup Studio', icon: Monitor },
+        ]
+      },
     ]
   },
-  // ========== 5. QUALITÉ & RELECTURE ==========
+  // ══════ 3. PUBLIER ══════
   {
-    id: 'quality',
-    label: 'Qualité & Relecture',
-    emoji: '✅',
-    color: 'from-emerald-500 to-green-500',
-    items: [
-      { id: 'manuscript-dashboard', label: 'Dashboard Manuscrit', icon: BarChart3, isNew: true },
-      { id: 'readability-analyzer', label: 'Analyseur Lisibilité', icon: BookOpen, isNew: true },
-      { id: 'chapter-word-count', label: 'Mots par Chapitre', icon: BarChart3, isNew: true },
-      { id: 'kindle-preview', label: 'Prévisualisation Kindle', icon: Monitor, isNew: true },
-      { id: 'consistency-detector', label: 'Détecteur Cohérence', icon: Search, isNew: true },
-      { id: 'rhythm-analyzer', label: 'Analyseur Rythme', icon: Activity, isNew: true },
-      { id: 'ai-detector', label: 'Détecteur Anti-IA', icon: Shield, isNew: true },
-      { id: 'humanizer', label: 'Humaniseur IA', icon: Shield, isNew: true },
-      { id: 'plagiarism-validator', label: 'Anti-Plagiat', icon: Shield, isNew: true },
-      { id: 'title-ab-test', label: 'A/B Test Titres', icon: FlaskConical, isNew: true },
-      { id: 'beta-reader-hub', label: 'Hub Bêta-Lecteurs', icon: Users, isNew: true },
-      { id: 'back-matter-generator', label: 'Générateur Back Matter', icon: FileText, isNew: true },
-    ]
-  },
-  // ========== 6. EXPORT & PUBLICATION ==========
-  {
-    id: 'export',
-    label: 'Export & Publication',
+    id: 'publier',
+    label: 'Publier',
     emoji: '📦',
-    color: 'from-orange-500 to-red-500',
-    items: [
-      { id: 'export', label: 'Exporter (PDF, Word)', icon: Download },
-      { id: 'advanced-export', label: 'Export Multi-Format', icon: Download, isNew: true },
-      { id: 'workflow-export', label: 'Export Global Workflow', icon: Download, isNew: true },
-      { id: 'export-guide', label: 'Guide Export', icon: GraduationCap },
-      { id: 'pdf-reformatter', label: 'Reformateur PDF', icon: FileEdit, isNew: true },
-      { id: 'pdf-analyzer', label: 'Analyseur PDF', icon: Ruler, isNew: true },
-      { id: 'calibre-epub', label: 'Calibre Studio EPUB', icon: BookOpen, isNew: true },
-      { id: 'kdp-prepublish-checklist', label: 'Checklist Pré-Publication', icon: Shield, isNew: true },
-      { id: 'kdp-guide', label: 'Guide KDP Officiel', icon: Shield },
+    color: 'from-emerald-500 to-teal-500',
+    subGroups: [
+      {
+        label: 'Export & Publication',
+        items: [
+          { id: 'export', label: 'Exporter (PDF, Word)', icon: Download },
+          { id: 'advanced-export', label: 'Export Multi-Format', icon: Download },
+          { id: 'workflow-export', label: 'Export Global Workflow', icon: Download },
+          { id: 'export-guide', label: 'Guide Export', icon: GraduationCap },
+          { id: 'pdf-reformatter', label: 'Reformateur PDF', icon: FileEdit },
+          { id: 'pdf-analyzer', label: 'Analyseur PDF', icon: Ruler },
+          { id: 'calibre-epub', label: 'Calibre Studio EPUB', icon: BookOpen },
+          { id: 'kdp-prepublish-checklist', label: 'Checklist Pré-Publication', icon: Shield },
+          { id: 'kdp-guide', label: 'Guide KDP Officiel', icon: Shield },
+        ]
+      },
+      {
+        label: 'Recherche & Marché',
+        items: [
+          { id: 'kdp-amazon-research', label: 'Recherche KDP Amazon', icon: Search },
+          { id: 'niche-analysis', label: 'Analyse de Niche', icon: Search },
+          { id: 'kdp-research', label: 'Recherche Niche', icon: Search },
+          { id: 'competitor-dashboard', label: 'Tableau Concurrentiel', icon: Search },
+          { id: 'competitor-spy', label: 'Espion Concurrentiel', icon: Eye },
+          { id: 'kdp-keywords', label: 'Mots-Clés KDP Pro', icon: Search, isLink: true, href: '/kdp-keywords' },
+          { id: 'kdp', label: 'Description KDP', icon: TrendingUp },
+          { id: 'description-magnet', label: 'Description Magnet', icon: FileText },
+          { id: 'trend-predictor', label: 'Prédicteur Tendances', icon: TrendingUp },
+          { id: 'amazon-simulator', label: 'Simulateur Amazon', icon: Eye },
+          { id: 'kdp-explosive', label: 'Simulateur Explosif', icon: Zap },
+          { id: 'bsr-tracker', label: 'BSR Multi-Pays', icon: BarChart3 },
+          { id: 'price-studio', label: 'Price Master', icon: TrendingUp },
+        ]
+      },
+      {
+        label: 'Audio & Vidéo',
+        items: [
+          { id: 'audiobook', label: 'Livre Audio', icon: Headphones },
+          { id: 'audio-express', label: 'Audio Express', icon: Zap },
+          { id: 'video-creator', label: 'Vidéo YouTube', icon: Video },
+          { id: 'audiobook-library', label: 'Mes Livres Audio', icon: Music },
+          { id: 'elementor-export', label: 'Export Elementor', icon: Code },
+          { id: 'formation-audiobook-distribution', label: 'Formation Distribution', icon: BookOpen },
+        ]
+      },
     ]
   },
-  // ========== 7. RECHERCHE & MARCHÉ ==========
+  // ══════ 4. VENDRE ══════
   {
-    id: 'research',
-    label: 'Recherche & Marché',
-    emoji: '🔍',
-    color: 'from-cyan-500 to-teal-500',
-    items: [
-      { id: 'kdp-amazon-research', label: 'Recherche KDP Amazon', icon: Search, isNew: true },
-      { id: 'niche-analysis', label: 'Analyse de Niche', icon: Search, isNew: true },
-      { id: 'kdp-research', label: 'Recherche Niche', icon: Search },
-      { id: 'competitor-dashboard', label: 'Tableau Concurrentiel', icon: Search, isNew: true },
-      { id: 'competitor-spy', label: 'Espion Concurrentiel', icon: Eye, isNew: true },
-      { id: 'kdp-keywords', label: 'Mots-Clés KDP Pro', icon: Search, isLink: true, href: '/kdp-keywords' },
-      { id: 'kdp', label: 'Description KDP', icon: TrendingUp },
-      { id: 'description-magnet', label: 'Description Magnet', icon: FileText, isNew: true },
-      { id: 'trend-predictor', label: 'Prédicteur Tendances', icon: TrendingUp, isNew: true },
-      { id: 'amazon-simulator', label: 'Simulateur Amazon', icon: Eye, isNew: true },
-      { id: 'kdp-explosive', label: 'Simulateur Explosif', icon: Zap, isNew: true },
-      { id: 'bsr-tracker', label: 'BSR Multi-Pays', icon: BarChart3, isNew: true },
-      { id: 'price-studio', label: 'Price Master', icon: TrendingUp, isNew: true },
-    ]
-  },
-  // ========== 8. VISUELS & COUVERTURES ==========
-  {
-    id: 'visuels',
-    label: 'Visuels & Couvertures',
-    emoji: '🖼️',
-    color: 'from-teal-500 to-cyan-500',
-    items: [
-      { id: 'cover-design-editor', label: 'Éditeur Couverture', icon: Palette, isNew: true },
-      { id: 'cover', label: 'Couverture Avant', icon: Palette },
-      { id: 'ai-cover-studio', label: 'Couverture IA Pro', icon: Sparkles, isNew: true },
-      { id: 'backcover', label: 'Couverture Arrière', icon: BookCopy, isNew: true },
-      { id: 'kdp-cover-studio', label: 'Studio Couverture KDP', icon: Ruler, isNew: true },
-      { id: 'images', label: 'Images Chapitres', icon: Image },
-      { id: 'imagebank', label: 'Banque Images', icon: ImagePlus, isNew: true },
-      { id: 'library', label: 'Bibliothèque d\'images', icon: FolderOpen },
-      { id: 'mockup-studio', label: 'Mockup Studio', icon: Monitor, isNew: true },
-    ]
-  },
-  // ========== 9. LIVRES SPÉCIAUX ==========
-  {
-    id: 'special',
-    label: 'Livres Spéciaux',
-    emoji: '🎨',
-    color: 'from-pink-500 to-rose-500',
-    items: [
-      { id: 'practical-sheets', label: 'Fiches Bien-être & Santé', icon: FileText, isLink: true, href: '/fiches-pratiques', isNew: true },
-      { id: 'travel-guide', label: 'Guide de Voyage', icon: Globe, isNew: true },
-      { id: 'recipe-book', label: 'Livre de Recettes', icon: BookOpen, isNew: true },
-      { id: 'aquarium-guide', label: 'Aquariophilie', icon: BookOpen, isNew: true },
-      { id: 'bird-guide', label: 'Oiseaux', icon: BookOpen, isNew: true },
-      { id: 'coloring-book', label: 'Livre Coloriage', icon: Palette, isNew: true },
-      { id: 'comic-book', label: 'Bande Dessinée', icon: LayoutTemplate, isLink: true, href: '/bd-studio', isNew: true },
-      { id: 'diary-generator', label: 'Journal / Agenda', icon: BookHeart, isNew: true },
-      { id: 'documentary', label: 'Documentaire', icon: BookMarked, isNew: true },
-      { id: 'encyclopedia', label: 'Encyclopédie', icon: BookMarked, isNew: true },
-      { id: 'atlas', label: 'Atlas', icon: Map, isNew: true },
-      { id: 'url-import', label: 'Créer depuis URL', icon: Link, isNew: true },
-      { id: 'doc-transform', label: 'Importer Word', icon: FileText, isNew: true },
-    ]
-  },
-  // ========== 10. MARKETING & VENTES ==========
-  {
-    id: 'marketing-cat',
-    label: 'Marketing & Ventes',
+    id: 'vendre',
+    label: 'Vendre',
     emoji: '📣',
-    color: 'from-green-500 to-emerald-500',
-    items: [
-      { id: 'marketing', label: 'Posts Réseaux Sociaux', icon: MessageSquare, isNew: true },
-      { id: 'seo-generator', label: 'Générateur SEO IA', icon: FileEdit, isLink: true, href: '/seo-generator', isNew: true },
-      { id: 'seo-articles', label: 'Articles SEO', icon: Globe, isNew: true },
-      { id: 'amazon-ads', label: 'Amazon Ads', icon: Target, isNew: true },
-      { id: 'launch-plan', label: 'Plan Lancement', icon: Rocket, isNew: true },
-      { id: 'ab-testing', label: 'A/B Testing', icon: FlaskConical, isNew: true },
-      { id: 'marketing-plan', label: 'Plan Marketing', icon: TrendingUp, isLink: true, href: '/plan-marketing', isNew: true },
-      { id: 'blog', label: 'Blog SEO', icon: FileText, isLink: true, href: '/blog' },
-      { id: 'monetization', label: 'Monétisation', icon: DollarSign, isNew: true },
-      { id: 'kdp-revenue-simulator', label: 'Simulateur Revenus KDP', icon: DollarSign, isNew: true },
-      { id: 'royalty-dashboard', label: 'Dashboard Revenus', icon: DollarSign, isNew: true },
-      { id: 'direct-sales', label: 'Vente Directe', icon: DollarSign, isNew: true },
-      { id: 'arc-manager', label: 'Gestionnaire ARC', icon: Users, isNew: true },
-      { id: 'landing-page-generator', label: 'Landing Page', icon: Globe, isNew: true },
+    color: 'from-pink-500 to-rose-500',
+    subGroups: [
+      {
+        label: 'Marketing',
+        items: [
+          { id: 'marketing', label: 'Posts Réseaux Sociaux', icon: MessageSquare },
+          { id: 'seo-generator', label: 'Générateur SEO IA', icon: FileEdit, isLink: true, href: '/seo-generator' },
+          { id: 'seo-articles', label: 'Articles SEO', icon: Globe },
+          { id: 'amazon-ads', label: 'Amazon Ads', icon: Target },
+          { id: 'launch-plan', label: 'Plan Lancement', icon: Rocket },
+          { id: 'ab-testing', label: 'A/B Testing', icon: FlaskConical },
+          { id: 'marketing-plan', label: 'Plan Marketing', icon: TrendingUp, isLink: true, href: '/plan-marketing' },
+          { id: 'blog', label: 'Blog SEO', icon: FileText, isLink: true, href: '/blog' },
+          { id: 'arc-manager', label: 'Gestionnaire ARC', icon: Users },
+          { id: 'landing-page-generator', label: 'Landing Page', icon: Globe },
+        ]
+      },
+      {
+        label: 'Monétisation',
+        items: [
+          { id: 'monetization', label: 'Monétisation', icon: DollarSign },
+          { id: 'kdp-revenue-simulator', label: 'Simulateur Revenus KDP', icon: DollarSign },
+          { id: 'royalty-dashboard', label: 'Dashboard Revenus', icon: DollarSign },
+          { id: 'direct-sales', label: 'Vente Directe', icon: DollarSign },
+        ]
+      },
+      {
+        label: 'Productivité',
+        items: [
+          { id: 'planner', label: 'Planificateur Projet', icon: BookOpen },
+          { id: 'publication-planner', label: 'Planificateur Publication', icon: Target },
+          { id: 'editorial-calendar', label: 'Calendrier Éditorial', icon: CalendarDays },
+          { id: 'ux-center', label: 'Centre Productivité', icon: Zap },
+          { id: 'multi-translator', label: 'Traduction Multi-Langues', icon: Languages },
+          { id: 'pen-name', label: 'Nom de Plume', icon: PenTool },
+        ]
+      },
     ]
   },
-  // ========== 11. PRODUCTIVITÉ ==========
-  {
-    id: 'productivity',
-    label: 'Productivité',
-    emoji: '⚡',
-    color: 'from-primary to-accent',
-    items: [
-      { id: 'planner', label: 'Planificateur Projet', icon: BookOpen },
-      { id: 'publication-planner', label: 'Planificateur Publication', icon: Target, isNew: true },
-      { id: 'editorial-calendar', label: 'Calendrier Éditorial', icon: CalendarDays, isNew: true },
-      { id: 'ux-center', label: 'Centre Productivité', icon: Zap, isNew: true },
-      { id: 'multi-translator', label: 'Traduction Multi-Langues', icon: Languages, isNew: true },
-      { id: 'pen-name', label: 'Nom de Plume', icon: PenTool, isNew: true },
-    ]
-  },
-  // ========== 12. AUDIO ==========
-  {
-    id: 'audio',
-    label: 'Audio',
-    emoji: '🎧',
-    color: 'from-primary to-accent',
-    items: [
-      { id: 'audiobook', label: 'Livre Audio', icon: Headphones, isNew: true },
-      { id: 'audio-express', label: 'Audio Express', icon: Zap },
-      { id: 'video-creator', label: 'Vidéo YouTube', icon: Video, isNew: true },
-      { id: 'audiobook-library', label: 'Mes Livres Audio', icon: Music, isNew: true },
-      { id: 'elementor-export', label: 'Export Elementor', icon: Code, isNew: true },
-      { id: 'formation-audiobook-distribution', label: 'Formation Distribution', icon: BookOpen },
-    ]
-  },
-  // ========== 13. BIBLIOTHÈQUE ==========
-  {
-    id: 'bibliotheque',
-    label: 'Bibliothèque',
-    emoji: '📚',
-    color: 'from-emerald-500 to-green-500',
-    items: [
-      { id: 'ebook-library', label: 'Ma Bibliothèque', icon: Library, isNew: true },
-      { id: 'projects', label: 'Mes Projets', icon: FolderOpen },
-    ]
-  },
-  // ========== 14. MON COMPTE ==========
+  // ══════ 5. MON COMPTE ══════
   {
     id: 'compte',
     label: 'Mon Compte',
     emoji: '⚙️',
     color: 'from-muted-foreground to-muted-foreground',
-    items: [
-      { id: 'dashboard', label: 'Tableau de Bord', icon: LayoutDashboard },
-      { id: 'marketing-dashboard', label: 'Dashboard Marketing', icon: TrendingUp, isLink: true, href: '/dashboard-marketing', isNew: true },
-      { id: 'admin-panel', label: 'Gestion Abonnés', icon: Shield, isLink: true, href: '/admin' },
-      { id: 'crm-page', label: 'CRM', icon: Contact, isLink: true, href: '/crm', isNew: true },
-      { id: 'email-preview', label: 'Aperçu Emails', icon: Mail, isLink: true, href: '/apercu-emails', isNew: true },
-      { id: 'prospect-manager', label: 'Prospects & Emails', icon: Target, isLink: true, href: '/gestion-prospects', isNew: true },
-      { id: 'social-marketing', label: 'Suite Marketing', icon: BarChart3, isLink: true, href: '/generateur-posts', isNew: true },
-      { id: 'subscription', label: 'Abonnement', icon: CreditCard },
-      { id: 'parrainage', label: 'Parrainage', icon: Users, isLink: true, href: '/parrainage', isNew: true },
-      { id: 'communaute', label: 'Communauté', icon: MessageSquare, isLink: true, href: '/communaute', isNew: true },
-      { id: 'settings', label: 'Paramètres', icon: Settings },
-      { id: 'formation-complete', label: 'Formation', icon: GraduationCap, isLink: true, href: '/formation' },
-      { id: 'formation-videos', label: 'Formation Vidéo', icon: GraduationCap, isLink: true, href: '/formation-videos', isNew: true },
+    subGroups: [
+      {
+        label: 'Bibliothèque',
+        items: [
+          { id: 'ebook-library', label: 'Ma Bibliothèque', icon: Library },
+          { id: 'projects', label: 'Mes Projets', icon: FolderOpen },
+        ]
+      },
+      {
+        label: 'Compte & Admin',
+        items: [
+          { id: 'dashboard', label: 'Tableau de Bord', icon: LayoutDashboard },
+          { id: 'marketing-dashboard', label: 'Dashboard Marketing', icon: TrendingUp, isLink: true, href: '/dashboard-marketing' },
+          { id: 'admin-panel', label: 'Gestion Abonnés', icon: Shield, isLink: true, href: '/admin' },
+          { id: 'crm-page', label: 'CRM', icon: Contact, isLink: true, href: '/crm' },
+          { id: 'email-preview', label: 'Aperçu Emails', icon: Mail, isLink: true, href: '/apercu-emails' },
+          { id: 'prospect-manager', label: 'Prospects & Emails', icon: Target, isLink: true, href: '/gestion-prospects' },
+          { id: 'social-marketing', label: 'Suite Marketing', icon: BarChart3, isLink: true, href: '/generateur-posts' },
+          { id: 'subscription', label: 'Abonnement', icon: CreditCard },
+          { id: 'parrainage', label: 'Parrainage', icon: Users, isLink: true, href: '/parrainage' },
+          { id: 'communaute', label: 'Communauté', icon: MessageSquare, isLink: true, href: '/communaute' },
+          { id: 'settings', label: 'Paramètres', icon: Settings },
+          { id: 'formation-complete', label: 'Formation', icon: GraduationCap, isLink: true, href: '/formation' },
+          { id: 'formation-videos', label: 'Formation Vidéo', icon: GraduationCap, isLink: true, href: '/formation-videos' },
+        ]
+      },
     ]
   },
 ];
-// Hook pour le thème
+
+// ─── Theme hook ───
 const useTheme = () => {
   const [isDark, setIsDark] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -411,7 +349,7 @@ const useTheme = () => {
   return { isDark, toggleTheme };
 };
 
-// Composant Quota compact
+// ─── Quota Display ───
 const QuotaDisplay: React.FC<{ isCollapsed: boolean }> = ({ isCollapsed }) => {
   const navigate = useNavigate();
   const { quotas, isLoading, hasSubscription } = useUserQuotas();
@@ -463,7 +401,7 @@ const QuotaDisplay: React.FC<{ isCollapsed: boolean }> = ({ isCollapsed }) => {
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <Star className="w-4 h-4 text-gold" />
-              <span className="text-xs font-semibold text-white">Mon Plan</span>
+              <span className="text-xs font-semibold text-foreground">Mon Plan</span>
             </div>
             <span className={cn(
               "text-[10px] font-bold px-2 py-0.5 rounded-full",
@@ -493,6 +431,7 @@ const QuotaDisplay: React.FC<{ isCollapsed: boolean }> = ({ isCollapsed }) => {
   );
 };
 
+// ─── Main Component ───
 export const ModernSidebar: React.FC<ModernSidebarProps> = ({
   activeTab,
   onTabChange,
@@ -503,55 +442,80 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
   const { isDark, toggleTheme } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
+  const [expandedSubGroups, setExpandedSubGroups] = useState<string[]>([]);
 
-  // Check admin status
+  // Admin check
   const [isAdmin, setIsAdmin] = useState(() => sessionStorage.getItem('is_admin') === 'true');
-  
   React.useEffect(() => {
     const checkAdmin = () => setIsAdmin(sessionStorage.getItem('is_admin') === 'true');
     window.addEventListener('storage', checkAdmin);
     return () => window.removeEventListener('storage', checkAdmin);
   }, []);
 
-  // Filtrer les items par recherche et par rôle
+  // Filter by search & role
   const filteredCategories = useMemo(() => {
-    let cats = categories.map(cat => ({
+    const adminOnlyIds = ['admin-panel', 'crm-page', 'email-preview', 'prospect-manager'];
+    let cats = megaCategories.map(cat => ({
       ...cat,
-      items: cat.items.filter(item => {
-        // Hide admin-only items for non-admins
-        const adminOnlyIds = ['admin-panel', 'crm-page', 'email-preview', 'prospect-manager'];
-        if (adminOnlyIds.includes(item.id) && !isAdmin) return false;
-        return true;
-      })
+      subGroups: cat.subGroups.map(sg => ({
+        ...sg,
+        items: sg.items.filter(item => {
+          if (adminOnlyIds.includes(item.id) && !isAdmin) return false;
+          return true;
+        })
+      })).filter(sg => sg.items.length > 0)
     }));
-    
+
     if (!searchQuery.trim()) return cats;
-    
+
     const query = searchQuery.toLowerCase();
     return cats.map(cat => ({
       ...cat,
-      items: cat.items.filter(item => 
-        item.label.toLowerCase().includes(query) ||
-        item.id.toLowerCase().includes(query)
-      )
-    })).filter(cat => cat.items.length > 0);
+      subGroups: cat.subGroups.map(sg => ({
+        ...sg,
+        items: sg.items.filter(item =>
+          item.label.toLowerCase().includes(query) ||
+          item.id.toLowerCase().includes(query)
+        )
+      })).filter(sg => sg.items.length > 0)
+    })).filter(cat => cat.subGroups.length > 0);
   }, [searchQuery, isAdmin]);
 
-  const activeCategoryId = categories.find(cat => 
-    cat.items.some(item => item.id === activeTab)
+  // Find active category
+  const activeCategoryId = megaCategories.find(cat =>
+    cat.subGroups.some(sg => sg.items.some(item => item.id === activeTab))
   )?.id;
 
+  const activeSubGroupLabel = megaCategories
+    .flatMap(c => c.subGroups)
+    .find(sg => sg.items.some(i => i.id === activeTab))?.label;
+
+  // Auto-expand active category & subgroup
   React.useEffect(() => {
     if (activeCategoryId && !expandedCategories.includes(activeCategoryId)) {
       setExpandedCategories(prev => [...prev, activeCategoryId]);
     }
-  }, [activeCategoryId]);
+    if (activeSubGroupLabel) {
+      const key = `${activeCategoryId}__${activeSubGroupLabel}`;
+      if (!expandedSubGroups.includes(key)) {
+        setExpandedSubGroups(prev => [...prev, key]);
+      }
+    }
+  }, [activeCategoryId, activeSubGroupLabel]);
 
   const toggleCategory = (categoryId: string) => {
-    setExpandedCategories(prev => 
-      prev.includes(categoryId) 
+    setExpandedCategories(prev =>
+      prev.includes(categoryId)
         ? prev.filter(id => id !== categoryId)
         : [...prev, categoryId]
+    );
+  };
+
+  const toggleSubGroup = (key: string) => {
+    setExpandedSubGroups(prev =>
+      prev.includes(key)
+        ? prev.filter(id => id !== key)
+        : [...prev, key]
     );
   };
 
@@ -563,9 +527,11 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
     }
   };
 
+  const totalItems = (cat: MegaCategory) => cat.subGroups.reduce((sum, sg) => sum + sg.items.length, 0);
+
   return (
     <TooltipProvider delayDuration={0}>
-      <aside 
+      <aside
         className={cn(
           "relative flex flex-col h-screen transition-all duration-300 ease-out",
           "bg-background border-r border-border",
@@ -602,7 +568,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
           )}
         </div>
 
-        {/* Recherche */}
+        {/* Search */}
         {!isCollapsed && (
           <div className="p-3">
             <div className="relative">
@@ -612,7 +578,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                 placeholder="Rechercher un outil..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-8 h-10 text-sm bg-card border-border text-white placeholder:text-muted-foreground rounded-xl focus:border-gold/50 focus:ring-gold/20"
+                className="w-full pl-10 pr-8 h-10 text-sm bg-card border-border placeholder:text-muted-foreground rounded-xl focus:border-gold/50 focus:ring-gold/20"
               />
               {searchQuery && (
                 <button
@@ -626,53 +592,93 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
           </div>
         )}
 
+        {/* Quick Access */}
+        {!isCollapsed && !searchQuery && (
+          <div className="px-3 pb-2">
+            <div className="flex items-center gap-2 mb-2 px-1">
+              <Pin className="w-3 h-3 text-amber-400" />
+              <span className="text-[10px] font-bold uppercase tracking-widest text-amber-400">Accès rapide</span>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {quickAccessItems.map(item => {
+                const Icon = item.icon;
+                const isActive = activeTab === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => handleItemClick(item)}
+                    className={cn(
+                      "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all",
+                      isActive
+                        ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-sm"
+                        : "bg-card border border-border text-muted-foreground hover:text-foreground hover:border-amber-500/30"
+                    )}
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                    {item.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Collapsed Quick Access */}
+        {isCollapsed && !searchQuery && (
+          <div className="px-2 py-2 space-y-1">
+            {quickAccessItems.map(item => {
+              const Icon = item.icon;
+              const isActive = activeTab === item.id;
+              return (
+                <Tooltip key={item.id}>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={() => handleItemClick(item)}
+                      className={cn(
+                        "w-full flex items-center justify-center p-2.5 rounded-xl transition-all",
+                        isActive
+                          ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md"
+                          : "hover:bg-card text-muted-foreground"
+                      )}
+                    >
+                      <Icon className="w-4 h-4" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="right" className="font-medium">{item.label}</TooltipContent>
+                </Tooltip>
+              );
+            })}
+            <div className="flex justify-center py-1">
+              <div className="w-8 h-0.5 rounded-full bg-border" />
+            </div>
+          </div>
+        )}
+
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto py-2 px-2 space-y-1">
-          {filteredCategories.map((category, catIndex) => {
+          {filteredCategories.map((category) => {
             const isExpanded = expandedCategories.includes(category.id);
-            const hasActiveItem = category.items.some(item => item.id === activeTab);
+            const hasActiveItem = category.subGroups.some(sg => sg.items.some(i => i.id === activeTab));
 
-            // Séparateur "Outils complémentaires" avant les catégories secondaires
-            const secondaryIds = ['visuels', 'special', 'marketing-cat', 'tools-2026', 'audio', 'compte'];
-            const isFirstSecondary = secondaryIds.includes(category.id) && 
-              (catIndex === 0 || !secondaryIds.includes(filteredCategories[catIndex - 1]?.id));
-            
             return (
-              <React.Fragment key={category.id}>
-                {isFirstSecondary && !isCollapsed && (
-                   <div className="mx-1 my-3 px-3 py-2.5 rounded-xl bg-gradient-gold-subtle border border-gold/20">
-                    <div className="flex items-center gap-2 justify-center">
-                      <div className="h-0.5 w-6 rounded-full bg-gold/40" />
-                      <span className="text-xs font-bold uppercase tracking-widest text-gold">
-                        ⚙️ Outils complémentaires
-                      </span>
-                      <div className="h-0.5 w-6 rounded-full bg-gold/40" />
-                    </div>
-                  </div>
-                )}
-                {isFirstSecondary && isCollapsed && (
-                  <div className="flex justify-center py-3">
-                    <div className="w-8 h-0.5 rounded-full bg-muted-foreground/40" />
-                  </div>
-                )}
-              <div 
-                key={category.id} 
+              <div
+                key={category.id}
                 className={cn(
-                  "mb-3 rounded-2xl border transition-all",
-                  hasActiveItem 
-                    ? "border-gold/30 bg-card shadow-lg shadow-gold/5" 
-                    : "border-border bg-slate-900/30 hover:bg-card hover:shadow-md",
+                  "mb-2 rounded-2xl border transition-all",
+                  hasActiveItem
+                    ? "border-gold/30 bg-card shadow-lg shadow-gold/5"
+                    : "border-border bg-card/30 hover:bg-card hover:shadow-md",
                   isCollapsed ? "p-1" : "p-2"
                 )}
               >
-                {/* Titre catégorie */}
+                {/* Category Header */}
                 {!isCollapsed ? (
                   <button
                     onClick={() => toggleCategory(category.id)}
                     className={cn(
                       "w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all group",
-                      hasActiveItem 
-                        ? "bg-gradient-to-r from-amber-500 via-yellow-500 to-orange-500 text-white shadow-md shadow-amber-500/30" 
+                      hasActiveItem
+                        ? "bg-gradient-to-r from-amber-500 via-yellow-500 to-orange-500 text-white shadow-md shadow-amber-500/30"
                         : "hover:bg-card"
                     )}
                   >
@@ -683,11 +689,11 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                       {category.emoji} {category.label}
                       <span className={cn(
                         "inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[10px] font-bold",
-                        hasActiveItem 
-                          ? "bg-white/25 text-white" 
+                        hasActiveItem
+                          ? "bg-white/25 text-white"
                           : "bg-amber-500/20 text-amber-400"
                       )}>
-                        {category.items.length}
+                        {totalItems(category)}
                       </span>
                     </span>
                     <ChevronDown className={cn(
@@ -699,98 +705,134 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                 ) : (
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <div className={cn(
-                        "flex justify-center py-2 mb-1 rounded-xl cursor-pointer",
-                        hasActiveItem 
-                          ? `bg-gradient-to-r ${category.color} shadow-md` 
-                          : "hover:bg-card"
-                      )}>
+                      <div
+                        onClick={() => toggleCategory(category.id)}
+                        className={cn(
+                          "flex justify-center py-2 mb-1 rounded-xl cursor-pointer",
+                          hasActiveItem
+                            ? `bg-gradient-to-r ${category.color} shadow-md`
+                            : "hover:bg-card"
+                        )}
+                      >
                         <span className="text-lg">{category.emoji}</span>
                       </div>
                     </TooltipTrigger>
                     <TooltipContent side="right" className="font-medium">
-                      {category.label}
+                      {category.label} ({totalItems(category)})
                     </TooltipContent>
                   </Tooltip>
                 )}
 
-                {/* Items */}
+                {/* SubGroups */}
                 {!isCollapsed && (
                   <div className={cn(
                     "overflow-hidden transition-all duration-200",
-                    isExpanded ? "max-h-[800px] opacity-100 mt-1" : "max-h-0 opacity-0"
+                    isExpanded ? "max-h-[2000px] opacity-100 mt-1" : "max-h-0 opacity-0"
                   )}>
-                    <div className="space-y-0.5 pl-1">
-                      {category.items.map(item => {
-                        const isActive = activeTab === item.id;
-                        const Icon = item.icon;
-                        
-                        return (
+                    {category.subGroups.map((sg) => {
+                      const sgKey = `${category.id}__${sg.label}`;
+                      const isSgExpanded = expandedSubGroups.includes(sgKey);
+                      const sgHasActive = sg.items.some(i => i.id === activeTab);
+
+                      return (
+                        <div key={sg.label} className="mb-1">
+                          {/* SubGroup header */}
                           <button
-                            key={item.id}
-                            onClick={() => handleItemClick(item)}
+                            onClick={() => toggleSubGroup(sgKey)}
                             className={cn(
-                              "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-left group",
-                              item.label.includes('DÉBUTER ICI') && !isActive
-                                ? "bg-cyan-500/10 border border-cyan-500/30 hover:bg-cyan-500/20 ring-1 ring-cyan-500/20"
-                                : isActive 
-                                  ? "bg-slate-800 shadow-md border border-slate-700" 
-                                  : "hover:bg-card"
+                              "w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-xs transition-all",
+                              sgHasActive
+                                ? "text-amber-400 font-bold"
+                                : "text-muted-foreground hover:text-foreground font-semibold"
                             )}
                           >
-                            <div className={cn(
-                              "w-8 h-8 rounded-lg flex items-center justify-center transition-all",
-                              isActive 
-                                ? `bg-gradient-to-br ${category.color} shadow-sm` 
-                                : "bg-slate-800/80 group-hover:bg-slate-700/80"
-                            )}>
-                              <Icon className={cn(
-                                "w-4 h-4",
-                                isActive ? "text-white" : "text-muted-foreground"
-                              )} />
-                            </div>
-                            <span className={cn(
-                              "text-sm font-medium flex-1",
-                              isActive ? "text-white" : "text-muted-foreground"
-                            )}>
-                              {item.label}
+                            <span className="flex items-center gap-1.5">
+                              {sgHasActive && <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />}
+                              {sg.label}
                             </span>
-                            
-                            {item.isNew && (
-                              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-gradient-to-r from-amber-400 to-orange-500 text-white">
-                                NEW
-                              </span>
-                            )}
-                            
-                            {item.isPro && !item.isNew && (
-                              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-cyan-500 text-background font-bold">
-                                PRO
-                              </span>
-                            )}
+                            <ChevronDown className={cn(
+                              "w-3 h-3 transition-transform",
+                              isSgExpanded ? "rotate-0" : "-rotate-90"
+                            )} />
                           </button>
-                        );
-                      })}
-                    </div>
+
+                          {/* SubGroup items */}
+                          <div className={cn(
+                            "overflow-hidden transition-all duration-150",
+                            isSgExpanded ? "max-h-[800px] opacity-100" : "max-h-0 opacity-0"
+                          )}>
+                            <div className="space-y-0.5 pl-1">
+                              {sg.items.map(item => {
+                                const isActive = activeTab === item.id;
+                                const Icon = item.icon;
+
+                                return (
+                                  <button
+                                    key={item.id}
+                                    onClick={() => handleItemClick(item)}
+                                    className={cn(
+                                      "w-full flex items-center gap-3 px-3 py-2 rounded-xl transition-all text-left group",
+                                      isActive
+                                        ? "bg-card shadow-md border border-border"
+                                        : "hover:bg-card/80"
+                                    )}
+                                  >
+                                    <div className={cn(
+                                      "w-7 h-7 rounded-lg flex items-center justify-center transition-all flex-shrink-0",
+                                      isActive
+                                        ? `bg-gradient-to-br ${category.color} shadow-sm`
+                                        : "bg-muted/50 group-hover:bg-muted"
+                                    )}>
+                                      <Icon className={cn(
+                                        "w-3.5 h-3.5",
+                                        isActive ? "text-white" : "text-muted-foreground"
+                                      )} />
+                                    </div>
+                                    <span className={cn(
+                                      "text-sm font-medium flex-1 truncate",
+                                      isActive ? "text-foreground" : "text-muted-foreground"
+                                    )}>
+                                      {item.label}
+                                    </span>
+
+                                    {/* Discreet dot for new items */}
+                                    {item.isNew && (
+                                      <span className="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0" />
+                                    )}
+
+                                    {/* PRO badge - small and subtle */}
+                                    {item.isPro && (
+                                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-primary/20 text-primary flex-shrink-0">
+                                        PRO
+                                      </span>
+                                    )}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
 
-                {/* Items collapsed */}
-                {isCollapsed && (
+                {/* Collapsed items */}
+                {isCollapsed && isExpanded && (
                   <div className="space-y-1">
-                    {category.items.map(item => {
+                    {category.subGroups.flatMap(sg => sg.items).map(item => {
                       const isActive = activeTab === item.id;
                       const Icon = item.icon;
-                      
                       return (
                         <Tooltip key={item.id}>
                           <TooltipTrigger asChild>
                             <button
                               onClick={() => handleItemClick(item)}
                               className={cn(
-                                "w-full flex items-center justify-center p-2.5 rounded-xl transition-all",
-                                isActive 
-                                  ? `bg-gradient-to-br ${category.color} text-white shadow-md` 
-                                  : "hover:bg-violet-100/80 dark:hover:bg-violet-900/30 text-violet-600 dark:text-violet-400"
+                                "w-full flex items-center justify-center p-2 rounded-xl transition-all",
+                                isActive
+                                  ? `bg-gradient-to-br ${category.color} text-white shadow-md`
+                                  : "hover:bg-muted text-muted-foreground"
                               )}
                             >
                               <Icon className="w-4 h-4" />
@@ -798,8 +840,6 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                           </TooltipTrigger>
                           <TooltipContent side="right" className="font-medium">
                             {item.label}
-                            {item.isNew && <span className="ml-2 text-amber-500 text-xs">NEW</span>}
-                            {item.isPro && !item.isNew && <span className="ml-2 text-violet-400 text-xs">PRO</span>}
                           </TooltipContent>
                         </Tooltip>
                       );
@@ -807,7 +847,6 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                   </div>
                 )}
               </div>
-              </React.Fragment>
             );
           })}
         </nav>
@@ -817,7 +856,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
           <QuotaDisplay isCollapsed={isCollapsed} />
         </div>
 
-        {/* Install App Button */}
+        {/* Install App */}
         <div className="px-3 py-2 border-t border-border">
           {isCollapsed ? (
             <Tooltip>
