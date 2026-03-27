@@ -12,9 +12,11 @@ import {
   Type, Square, Circle, Image as ImageIcon, Download, Trash2, Copy,
   ChevronUp, ChevronDown, Plus, Palette, Bold, Italic, AlignLeft,
   AlignCenter, AlignRight, Undo2, Redo2, ZoomIn, ZoomOut, Move,
-  Layers, Eye, EyeOff, Lock, Unlock, RotateCcw, Upload, Sparkles
+  Layers, Eye, EyeOff, Lock, Unlock, RotateCcw, Upload, Sparkles,
+  Library
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { CoverElementLibrary, type LibraryItem } from './CoverElementLibrary';
 
 // ===================== TYPES =====================
 
