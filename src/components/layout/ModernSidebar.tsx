@@ -449,18 +449,15 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
     return true;
   };
 
-  // Check if active tab is in the top 10
-  const isActiveInTop = topTools.some(t => t.id === activeTab);
-
-  // Find active tool info for display when not in top 10
-  const activeToolInfo = useMemo(() => {
-    if (isActiveInTop) return null;
+  // Auto-expand the group containing the active tab
+  React.useEffect(() => {
     for (const group of allToolGroups) {
-      const found = group.items.find(i => i.id === activeTab);
-      if (found) return found;
+      if (group.items.some(i => i.id === activeTab)) {
+        setExpandedGroups(prev => prev.includes(group.label) ? prev : [...prev, group.label]);
+        break;
+      }
     }
-    return null;
-  }, [activeTab, isActiveInTop]);
+  }, [activeTab]);
 
   // Search results
   const searchResults = useMemo(() => {
