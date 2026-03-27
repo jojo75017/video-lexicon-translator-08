@@ -21,6 +21,7 @@ import CountdownTimer from "@/components/sales/CountdownTimer";
 import UrgencyBanner from "@/components/sales/UrgencyBanner";
 import GuaranteeSection from "@/components/sales/GuaranteeSection";
 import ProgressEngagement from "@/components/sales/ProgressEngagement";
+import InteractiveDemo from "@/components/sales/InteractiveDemo";
 
 // ════════════════════════════════════════════════════════════════════════════════
 // DESIGN SYSTEM 2026 — Palette Premium
@@ -384,6 +385,9 @@ const SalesPage = () => {
           </motion.div>
         </div>
       </section>
+
+      {/* ═══════════════════════════════════════ DÉMO INTERACTIVE ═══════════════════════════════════════ */}
+      <InteractiveDemo />
 
       {/* ═══════════════════════════════════════ AVANT/APRÈS ═══════════════════════════════════════ */}
       <section className="py-20 px-4 bg-slate-900/50">
