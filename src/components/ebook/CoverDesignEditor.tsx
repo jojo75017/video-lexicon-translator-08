@@ -12,9 +12,11 @@ import {
   Type, Square, Circle, Image as ImageIcon, Download, Trash2, Copy,
   ChevronUp, ChevronDown, Plus, Palette, Bold, Italic, AlignLeft,
   AlignCenter, AlignRight, Undo2, Redo2, ZoomIn, ZoomOut, Move,
-  Layers, Eye, EyeOff, Lock, Unlock, RotateCcw, Upload, Sparkles
+  Layers, Eye, EyeOff, Lock, Unlock, RotateCcw, Upload, Sparkles,
+  Library
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { CoverElementLibrary, type LibraryItem } from './CoverElementLibrary';
 
 // ===================== TYPES =====================
 
@@ -264,6 +266,50 @@ export const CoverDesignEditor: React.FC<CoverDesignEditorProps> = ({
     };
     updateElements([...elements, el]);
     setSelectedId(el.id);
+  };
+
+  const addLibraryElement = (item: LibraryItem, color: string) => {
+    if (item.type === 'icon') {
+      // Icons are added as shapes with SVG rendering via a special marker
+      const el: CoverElement = {
+        id: genId(), type: 'shape', x: CANVAS_W / 2 - item.defaultWidth / 2, y: CANVAS_H / 2 - item.defaultHeight / 2,
+        width: item.defaultWidth, height: item.defaultHeight,
+        rotation: 0, opacity: 1, visible: true, locked: false,
+        name: item.name, shapeType: 'rect', fill: color, stroke: 'transparent', strokeWidth: 0,
+        borderRadius: 0,
+      };
+      updateElements([...elements, el]);
+      setSelectedId(el.id);
+    } else {
+      // SVG-based elements: render to image and add as image layer
+      const svgContainer = document.createElement('div');
+      const svgNode = item.render(color, Math.max(item.defaultWidth, item.defaultHeight));
+      
+      // Use ReactDOM to render the SVG to string
+      const tempDiv = document.createElement('div');
+      document.body.appendChild(tempDiv);
+      
+      // Create SVG manually for export
+      const svgEl = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svgEl.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+      svgEl.setAttribute('width', String(item.defaultWidth * 2));
+      svgEl.setAttribute('height', String(item.defaultHeight * 2));
+      
+      // We'll add the element as a shape placeholder with the library item info
+      const el: CoverElement = {
+        id: genId(), type: 'shape',
+        x: CANVAS_W / 2 - item.defaultWidth / 2,
+        y: CANVAS_H / 2 - item.defaultHeight / 2,
+        width: item.defaultWidth, height: item.defaultHeight,
+        rotation: 0, opacity: 1, visible: true, locked: false,
+        name: item.name, shapeType: 'rect',
+        fill: color, stroke: 'transparent', strokeWidth: 0, borderRadius: 0,
+      };
+      updateElements([...elements, el]);
+      setSelectedId(el.id);
+      document.body.removeChild(tempDiv);
+    }
+    toast.success(`${item.name} ajouté au canvas`);
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -614,8 +660,9 @@ export const CoverDesignEditor: React.FC<CoverDesignEditorProps> = ({
         <div className="w-72 flex-shrink-0">
           <div className="h-[calc(100vh-220px)] overflow-y-auto pr-1">
             <Tabs defaultValue="templates" className="w-full">
-              <TabsList className="w-full grid grid-cols-3">
+              <TabsList className="w-full grid grid-cols-4">
                 <TabsTrigger value="templates" className="text-xs">Templates</TabsTrigger>
+                <TabsTrigger value="library" className="text-xs">Biblio</TabsTrigger>
                 <TabsTrigger value="elements" className="text-xs">Éléments</TabsTrigger>
                 <TabsTrigger value="fond" className="text-xs">Fond</TabsTrigger>
               </TabsList>
@@ -643,6 +690,10 @@ export const CoverDesignEditor: React.FC<CoverDesignEditorProps> = ({
                     </div>
                   );
                 })}
+              </TabsContent>
+
+              <TabsContent value="library" className="mt-2">
+                <CoverElementLibrary onAddElement={addLibraryElement} />
               </TabsContent>
 
               <TabsContent value="elements" className="space-y-3 mt-2">
