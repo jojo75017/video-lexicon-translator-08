@@ -3263,6 +3263,17 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       case 'ai-detector':
         return <EbookAIDetectorScore />;
 
+      case 'cover-design-editor':
+        return (
+          <CoverDesignEditor
+            ebookTitle={ebookTitle}
+            authorName={authorName}
+            onCoverExported={(url) => {
+              setEbookImages(prev => [{ url, title: 'Couverture Design' }, ...prev]);
+            }}
+          />
+        );
+
       case 'ai-cover-studio':
         return (
           <EbookAICoverStudio
