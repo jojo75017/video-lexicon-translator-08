@@ -140,7 +140,7 @@ const SalesPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white overflow-x-hidden">
+    <div className="min-h-screen bg-slate-950 text-white overflow-x-hidden pt-[42px]">
       <Helmet>
         <title>EbookStudio Pro — Créez des Ebooks avec l'IA | 67€ à Vie</title>
         <meta name="description" content="Créez un ebook complet en moins d'une heure avec l'IA. Plan structuré, rédaction, couverture, audiobook et export KDP. Accès à vie pour 67€." />
@@ -178,7 +178,7 @@ const SalesPage = () => {
       </div>
 
       {/* ═══════════════════════════════════════ HEADER ═══════════════════════════════════════ */}
-      <header className="sticky top-0 z-50 bg-slate-950/90 backdrop-blur-xl border-b border-slate-800/50">
+      <header className="sticky top-[42px] z-50 bg-slate-950/90 backdrop-blur-xl border-b border-slate-800/50">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link to="/offres" className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-emerald-400 flex items-center justify-center">
