@@ -60,10 +60,18 @@ interface ToolGroup {
   items: MenuItem[];
 }
 
+interface ToolGroup {
+  label: string;
+  emoji: string;
+  color: string; // tailwind color key
+  items: MenuItem[];
+}
+
 const allToolGroups: ToolGroup[] = [
   {
     label: 'Créer',
     emoji: '✍️',
+    color: 'emerald',
     items: [
       { id: 'presentation', label: 'Découvrir KDP Studio', icon: Info },
       { id: 'onboarding', label: 'Par où commencer ?', icon: BookOpen },
@@ -102,6 +110,7 @@ const allToolGroups: ToolGroup[] = [
   {
     label: 'Optimiser',
     emoji: '⚡',
+    color: 'violet',
     items: [
       { id: 'editorial-director', label: 'P1 — Directeur Éditorial', icon: Crown, isPro: true },
       { id: 'market-analysis', label: 'P2 — Analyse Marché', icon: Search, isPro: true },
@@ -144,6 +153,7 @@ const allToolGroups: ToolGroup[] = [
   {
     label: 'Publier',
     emoji: '📦',
+    color: 'blue',
     items: [
       { id: 'export', label: 'Exporter (PDF, Word)', icon: Download },
       { id: 'advanced-export', label: 'Export Multi-Format', icon: Download },
@@ -178,6 +188,7 @@ const allToolGroups: ToolGroup[] = [
   {
     label: 'Vendre',
     emoji: '📣',
+    color: 'orange',
     items: [
       { id: 'marketing', label: 'Posts Réseaux Sociaux', icon: MessageSquare },
       { id: 'seo-generator', label: 'Générateur SEO IA', icon: FileEdit, isLink: true, href: '/seo-generator' },
@@ -204,6 +215,7 @@ const allToolGroups: ToolGroup[] = [
   {
     label: 'Mon Compte',
     emoji: '⚙️',
+    color: 'slate',
     items: [
       { id: 'ebook-library', label: 'Ma Bibliothèque', icon: Library },
       { id: 'projects', label: 'Mes Projets', icon: FolderOpen },
@@ -341,14 +353,65 @@ const QuotaDisplay: React.FC<{ isCollapsed: boolean }> = ({ isCollapsed }) => {
   );
 };
 
+// ─── Color map for category theming ───
+const colorMap: Record<string, { bg: string; bgActive: string; border: string; text: string; icon: string; iconBg: string; dot: string }> = {
+  emerald: {
+    bg: 'bg-emerald-500/10',
+    bgActive: 'bg-gradient-to-r from-emerald-500/15 to-emerald-400/10',
+    border: 'border-emerald-500/30',
+    text: 'text-emerald-400',
+    icon: 'text-emerald-300',
+    iconBg: 'bg-gradient-to-br from-emerald-500 to-emerald-600',
+    dot: 'bg-emerald-400',
+  },
+  violet: {
+    bg: 'bg-violet-500/10',
+    bgActive: 'bg-gradient-to-r from-violet-500/15 to-violet-400/10',
+    border: 'border-violet-500/30',
+    text: 'text-violet-400',
+    icon: 'text-violet-300',
+    iconBg: 'bg-gradient-to-br from-violet-500 to-violet-600',
+    dot: 'bg-violet-400',
+  },
+  blue: {
+    bg: 'bg-blue-500/10',
+    bgActive: 'bg-gradient-to-r from-blue-500/15 to-blue-400/10',
+    border: 'border-blue-500/30',
+    text: 'text-blue-400',
+    icon: 'text-blue-300',
+    iconBg: 'bg-gradient-to-br from-blue-500 to-blue-600',
+    dot: 'bg-blue-400',
+  },
+  orange: {
+    bg: 'bg-orange-500/10',
+    bgActive: 'bg-gradient-to-r from-orange-500/15 to-orange-400/10',
+    border: 'border-orange-500/30',
+    text: 'text-orange-400',
+    icon: 'text-orange-300',
+    iconBg: 'bg-gradient-to-br from-orange-500 to-orange-600',
+    dot: 'bg-orange-400',
+  },
+  slate: {
+    bg: 'bg-slate-500/10',
+    bgActive: 'bg-gradient-to-r from-slate-500/15 to-slate-400/10',
+    border: 'border-slate-500/30',
+    text: 'text-slate-400',
+    icon: 'text-slate-300',
+    iconBg: 'bg-gradient-to-br from-slate-500 to-slate-600',
+    dot: 'bg-slate-400',
+  },
+};
+
 // ─── Single menu item renderer ───
 const MenuItemButton: React.FC<{
   item: MenuItem;
   isActive: boolean;
   onClick: () => void;
   isCollapsed: boolean;
-}> = ({ item, isActive, onClick, isCollapsed }) => {
+  groupColor?: string;
+}> = ({ item, isActive, onClick, isCollapsed, groupColor = 'blue' }) => {
   const Icon = item.icon;
+  const colors = colorMap[groupColor] || colorMap.blue;
 
   if (isCollapsed) {
     return (
@@ -359,7 +422,7 @@ const MenuItemButton: React.FC<{
             className={cn(
               "w-full flex items-center justify-center p-2.5 rounded-xl transition-all",
               isActive
-                ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md"
+                ? cn(colors.iconBg, "text-white shadow-md")
                 : "hover:bg-card text-muted-foreground"
             )}
           >
@@ -377,27 +440,27 @@ const MenuItemButton: React.FC<{
       className={cn(
         "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-left group",
         isActive
-          ? "bg-gradient-to-r from-amber-500/15 to-orange-500/10 border border-amber-500/30 shadow-sm"
+          ? cn(colors.bgActive, "border", colors.border, "shadow-sm")
           : "hover:bg-card/80"
       )}
     >
       <div className={cn(
         "w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-all",
         isActive
-          ? "bg-gradient-to-br from-amber-500 to-orange-500 shadow-sm"
+          ? cn(colors.iconBg, "shadow-sm")
           : "bg-muted/50 group-hover:bg-muted"
       )}>
         <Icon className={cn("w-4 h-4", isActive ? "text-white" : "text-muted-foreground")} />
       </div>
       <span className={cn(
         "text-sm font-medium flex-1",
-        isActive ? "text-foreground font-semibold" : "text-muted-foreground"
+        isActive ? cn("font-semibold", colors.text) : "text-muted-foreground"
       )}>
         {item.label}
       </span>
-      {item.isNew && <span className="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0" />}
+      {item.isNew && <span className={cn("w-2 h-2 rounded-full flex-shrink-0", colors.dot)} />}
       {item.isPro && (
-        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-primary/20 text-primary flex-shrink-0">
+        <span className={cn("text-[9px] font-bold px-1.5 py-0.5 rounded-md flex-shrink-0", colors.bg, colors.text)}>
           PRO
         </span>
       )}
@@ -555,9 +618,9 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                 const isExpanded = expandedGroups.includes(group.label);
                 const visibleItems = group.items.filter(filterAdmin);
                 const hasActive = visibleItems.some(i => i.id === activeTab);
+                const colors = colorMap[group.color] || colorMap.blue;
 
                 if (isCollapsed) {
-                  // In collapsed mode, show just the emoji as a group indicator
                   return (
                     <Tooltip key={group.label}>
                       <TooltipTrigger asChild>
@@ -569,7 +632,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                           className={cn(
                             "w-full flex items-center justify-center p-2.5 rounded-xl transition-all",
                             hasActive
-                              ? "bg-gradient-to-r from-amber-500/20 to-orange-500/15 border border-amber-500/30"
+                              ? cn(colors.bg, "border", colors.border)
                               : "hover:bg-card text-muted-foreground"
                           )}
                         >
@@ -588,26 +651,38 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                     <button
                       onClick={() => toggleGroup(group.label)}
                       className={cn(
-                        "w-full flex items-center justify-between px-3 py-2 rounded-xl transition-all",
-                        hasActive ? "bg-amber-500/10" : "hover:bg-card/60"
+                        "w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all",
+                        hasActive ? colors.bg : "hover:bg-card/60"
                       )}
                     >
-                      <span className={cn(
-                        "text-sm font-semibold flex items-center gap-2",
-                        hasActive ? "text-amber-400" : "text-foreground"
-                      )}>
-                        {group.emoji} {group.label}
-                        <span className="text-[10px] font-normal text-muted-foreground">
+                      <span className="flex items-center gap-2.5">
+                        <span className={cn(
+                          "w-7 h-7 rounded-lg flex items-center justify-center text-sm",
+                          isExpanded || hasActive ? colors.iconBg : "bg-muted/50"
+                        )}>
+                          <span className="text-white text-xs">{group.emoji}</span>
+                        </span>
+                        <span className={cn(
+                          "text-sm font-semibold",
+                          hasActive ? colors.text : "text-foreground"
+                        )}>
+                          {group.label}
+                        </span>
+                        <span className={cn(
+                          "text-[10px] font-medium px-1.5 py-0.5 rounded-full",
+                          colors.bg, colors.text
+                        )}>
                           {visibleItems.length}
                         </span>
                       </span>
                       <ChevronDown className={cn(
-                        "w-3.5 h-3.5 text-muted-foreground transition-transform duration-200",
-                        isExpanded ? "rotate-0" : "-rotate-90"
+                        "w-3.5 h-3.5 transition-transform duration-200",
+                        isExpanded ? "rotate-0" : "-rotate-90",
+                        hasActive ? colors.text : "text-muted-foreground"
                       )} />
                     </button>
                     {isExpanded && (
-                      <div className="pl-1 pr-1 pb-1 space-y-0.5">
+                      <div className={cn("pl-1 pr-1 pb-1 space-y-0.5 mt-0.5 ml-2 border-l-2", colors.border)}>
                         {visibleItems.map(item => (
                           <MenuItemButton
                             key={item.id}
@@ -615,6 +690,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                             isActive={activeTab === item.id}
                             onClick={() => handleItemClick(item)}
                             isCollapsed={false}
+                            groupColor={group.color}
                           />
                         ))}
                       </div>
