@@ -431,8 +431,6 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
     } else {
       onTabChange(item.id);
     }
-    // Close "voir tout" after selection
-    if (showAllTools) setShowAllTools(false);
     if (searchQuery) setSearchQuery('');
   };
 
