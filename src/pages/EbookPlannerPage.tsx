@@ -152,6 +152,7 @@ import { EbookManuscriptDashboard } from '@/components/ebook/EbookManuscriptDash
 import { EbookRichEditor } from '@/components/ebook/EbookRichEditor';
 import { EbookAIDetectorScore } from '@/components/ebook/EbookAIDetectorScore';
 import { EbookAICoverStudio } from '@/components/ebook/EbookAICoverStudio';
+import { CoverDesignEditor } from '@/components/ebook/CoverDesignEditor';
 import { EbookMultiTomeHub } from '@/components/ebook/EbookMultiTomeHub';
 import { EbookAdvancedExport } from '@/components/ebook/EbookAdvancedExport';
 import { EbookWritingIntelligence } from '@/components/ebook/EbookWritingIntelligence';
@@ -3261,6 +3262,17 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
 
       case 'ai-detector':
         return <EbookAIDetectorScore />;
+
+      case 'cover-design-editor':
+        return (
+          <CoverDesignEditor
+            ebookTitle={ebookTitle}
+            authorName={authorName}
+            onCoverExported={(url) => {
+              setEbookImages(prev => [{ url, title: 'Couverture Design' }, ...prev]);
+            }}
+          />
+        );
 
       case 'ai-cover-studio':
         return (

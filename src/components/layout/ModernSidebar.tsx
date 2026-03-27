@@ -256,6 +256,7 @@ const categories: Category[] = [
     emoji: '🖼️',
     color: 'from-teal-500 to-cyan-500',
     items: [
+      { id: 'cover-design-editor', label: 'Éditeur Couverture', icon: Palette, isNew: true },
       { id: 'cover', label: 'Couverture Avant', icon: Palette },
       { id: 'ai-cover-studio', label: 'Couverture IA Pro', icon: Sparkles, isNew: true },
       { id: 'backcover', label: 'Couverture Arrière', icon: BookCopy, isNew: true },
