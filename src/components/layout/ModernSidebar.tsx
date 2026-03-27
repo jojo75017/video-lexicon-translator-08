@@ -414,7 +414,6 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
 }) => {
   const navigate = useNavigate();
   const { isDark, toggleTheme } = useTheme();
-  const [showAllTools, setShowAllTools] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedGroups, setExpandedGroups] = useState<string[]>([]);
 
@@ -432,8 +431,6 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
     } else {
       onTabChange(item.id);
     }
-    // Close "voir tout" after selection
-    if (showAllTools) setShowAllTools(false);
     if (searchQuery) setSearchQuery('');
   };
 
@@ -449,18 +446,15 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
     return true;
   };
 
-  // Check if active tab is in the top 10
-  const isActiveInTop = topTools.some(t => t.id === activeTab);
-
-  // Find active tool info for display when not in top 10
-  const activeToolInfo = useMemo(() => {
-    if (isActiveInTop) return null;
+  // Auto-expand the group containing the active tab
+  React.useEffect(() => {
     for (const group of allToolGroups) {
-      const found = group.items.find(i => i.id === activeTab);
-      if (found) return found;
+      if (group.items.some(i => i.id === activeTab)) {
+        setExpandedGroups(prev => prev.includes(group.label) ? prev : [...prev, group.label]);
+        break;
+      }
     }
-    return null;
-  }, [activeTab, isActiveInTop]);
+  }, [activeTab]);
 
   // Search results
   const searchResults = useMemo(() => {
@@ -554,29 +548,47 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                 <p className="text-sm text-muted-foreground text-center py-6">Aucun outil trouvé</p>
               )}
             </div>
-          ) : showAllTools && !isCollapsed ? (
-            /* ── All tools (grouped) ── */
-            <div className="space-y-2">
-              <div className="flex items-center justify-between px-2 mb-1">
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-amber-400">Tous les outils</p>
-                <button
-                  onClick={() => setShowAllTools(false)}
-                  className="text-[10px] font-medium text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  ← Retour
-                </button>
-              </div>
+          ) : (
+            /* ── All 5 categories, always visible, collapsible ── */
+            <div className="space-y-1.5">
               {allToolGroups.map(group => {
                 const isExpanded = expandedGroups.includes(group.label);
                 const visibleItems = group.items.filter(filterAdmin);
                 const hasActive = visibleItems.some(i => i.id === activeTab);
 
+                if (isCollapsed) {
+                  // In collapsed mode, show just the emoji as a group indicator
+                  return (
+                    <Tooltip key={group.label}>
+                      <TooltipTrigger asChild>
+                        <button
+                          onClick={() => {
+                            onToggleCollapse();
+                            setTimeout(() => setExpandedGroups([group.label]), 300);
+                          }}
+                          className={cn(
+                            "w-full flex items-center justify-center p-2.5 rounded-xl transition-all",
+                            hasActive
+                              ? "bg-gradient-to-r from-amber-500/20 to-orange-500/15 border border-amber-500/30"
+                              : "hover:bg-card text-muted-foreground"
+                          )}
+                        >
+                          <span className="text-base">{group.emoji}</span>
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="right" className="font-medium">
+                        {group.label} ({visibleItems.length})
+                      </TooltipContent>
+                    </Tooltip>
+                  );
+                }
+
                 return (
-                  <div key={group.label} className="rounded-xl border border-border bg-card/30 overflow-hidden">
+                  <div key={group.label} className="rounded-xl overflow-hidden">
                     <button
                       onClick={() => toggleGroup(group.label)}
                       className={cn(
-                        "w-full flex items-center justify-between px-3 py-2.5 transition-all",
+                        "w-full flex items-center justify-between px-3 py-2 rounded-xl transition-all",
                         hasActive ? "bg-amber-500/10" : "hover:bg-card/60"
                       )}
                     >
@@ -586,16 +598,16 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                       )}>
                         {group.emoji} {group.label}
                         <span className="text-[10px] font-normal text-muted-foreground">
-                          ({visibleItems.length})
+                          {visibleItems.length}
                         </span>
                       </span>
                       <ChevronDown className={cn(
-                        "w-3.5 h-3.5 text-muted-foreground transition-transform",
+                        "w-3.5 h-3.5 text-muted-foreground transition-transform duration-200",
                         isExpanded ? "rotate-0" : "-rotate-90"
                       )} />
                     </button>
                     {isExpanded && (
-                      <div className="px-1 pb-1 space-y-0.5">
+                      <div className="pl-1 pr-1 pb-1 space-y-0.5">
                         {visibleItems.map(item => (
                           <MenuItemButton
                             key={item.id}
@@ -610,69 +622,6 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                   </div>
                 );
               })}
-            </div>
-          ) : (
-            /* ── TOP 10 tools (default view) ── */
-            <div className="space-y-1">
-              {!isCollapsed && (
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-amber-400 px-2 mb-2">
-                  ⭐ Outils principaux
-                </p>
-              )}
-
-              {topTools.map(item => (
-                <MenuItemButton
-                  key={item.id}
-                  item={item}
-                  isActive={activeTab === item.id}
-                  onClick={() => handleItemClick(item)}
-                  isCollapsed={isCollapsed}
-                />
-              ))}
-
-              {/* Show current active tool if it's NOT in the top 10 */}
-              {activeToolInfo && !isCollapsed && (
-                <>
-                  <div className="flex items-center gap-2 px-2 pt-3 pb-1">
-                    <div className="h-px flex-1 bg-border" />
-                    <span className="text-[10px] text-muted-foreground">actif</span>
-                    <div className="h-px flex-1 bg-border" />
-                  </div>
-                  <MenuItemButton
-                    item={activeToolInfo}
-                    isActive={true}
-                    onClick={() => handleItemClick(activeToolInfo)}
-                    isCollapsed={false}
-                  />
-                </>
-              )}
-
-              {/* "Voir tout" button */}
-              {!isCollapsed && (
-                <button
-                  onClick={() => setShowAllTools(true)}
-                  className="w-full flex items-center justify-center gap-2 px-3 py-2.5 mt-3 rounded-xl border border-dashed border-border text-sm text-muted-foreground hover:text-foreground hover:border-amber-500/40 hover:bg-card/60 transition-all"
-                >
-                  <ChevronDown className="w-4 h-4" />
-                  Voir tous les outils
-                </button>
-              )}
-              {isCollapsed && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button
-                      onClick={() => {
-                        onToggleCollapse();
-                        setTimeout(() => setShowAllTools(true), 300);
-                      }}
-                      className="w-full flex items-center justify-center p-2.5 rounded-xl hover:bg-card text-muted-foreground mt-2"
-                    >
-                      <ChevronDown className="w-4 h-4" />
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent side="right">Voir tous les outils</TooltipContent>
-                </Tooltip>
-              )}
             </div>
           )}
         </nav>
