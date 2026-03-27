@@ -206,6 +206,9 @@ const SalesPage = () => {
         </div>
       </header>
 
+      {/* ═══════════════════════════════════════ FLASH EXCLUSIF ═══════════════════════════════════════ */}
+      <ExclusiveFlashBanner />
+
       {/* ═══════════════════════════════════════ HERO ═══════════════════════════════════════ */}
       <section className="relative py-20 sm:py-28 px-4">
         {/* Background effects */}
