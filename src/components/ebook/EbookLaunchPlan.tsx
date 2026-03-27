@@ -14,6 +14,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import EbookLaunchSocialPosts from './EbookLaunchSocialPosts';
+import LaunchEmailGenerator from './social/LaunchEmailGenerator';
 
 interface LaunchTask {
   id: string;
@@ -438,6 +439,10 @@ const EbookLaunchPlan: React.FC = () => {
 
       <TabsContent value="social">
         <EbookLaunchSocialPosts />
+      </TabsContent>
+
+      <TabsContent value="emails">
+        <LaunchEmailGenerator />
       </TabsContent>
     </Tabs>
   );
