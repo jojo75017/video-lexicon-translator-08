@@ -22,6 +22,8 @@ import UrgencyBanner from "@/components/sales/UrgencyBanner";
 import GuaranteeSection from "@/components/sales/GuaranteeSection";
 import ProgressEngagement from "@/components/sales/ProgressEngagement";
 import InteractiveDemo from "@/components/sales/InteractiveDemo";
+import WhoIsThisFor from "@/components/sales/WhoIsThisFor";
+import TonightOutcomes from "@/components/sales/TonightOutcomes";
 
 // ════════════════════════════════════════════════════════════════════════════════
 // DESIGN SYSTEM 2026 — Palette Premium
