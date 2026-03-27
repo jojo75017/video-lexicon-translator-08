@@ -25,6 +25,9 @@ import InteractiveDemo from "@/components/sales/InteractiveDemo";
 import WhoIsThisFor from "@/components/sales/WhoIsThisFor";
 import TonightOutcomes from "@/components/sales/TonightOutcomes";
 import ExclusiveFlashBanner from "@/components/sales/ExclusiveFlashBanner";
+import BeforeAfterSection from "@/components/sales/BeforeAfterSection";
+import KdpTestimonials from "@/components/sales/KdpTestimonials";
+import { FloatingMobileCta } from "@/components/sales/FloatingMobileCta";
 
 // ════════════════════════════════════════════════════════════════════════════════
 // DESIGN SYSTEM 2026 — Palette Premium
@@ -399,146 +402,10 @@ const SalesPage = () => {
       <WhoIsThisFor />
 
       {/* ═══════════════════════════════════════ AVANT/APRÈS ═══════════════════════════════════════ */}
-      <section className="py-20 px-4 bg-slate-900/50">
-        <div className="max-w-5xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-12">
-            <motion.h2 variants={fadeIn} className="text-3xl sm:text-4xl md:text-5xl font-black mb-4">
-              La différence EbookStudio
-            </motion.h2>
-            <motion.p variants={fadeIn} custom={1} className="text-white/80 text-lg">Comparez vous-même</motion.p>
-          </motion.div>
+      <BeforeAfterSection />
 
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}
-            className="grid md:grid-cols-2 gap-6">
-            {/* AVANT */}
-            <motion.div variants={fadeIn}>
-              <Card className="h-full bg-red-950/30 border-red-900/50">
-                <CardContent className="pt-8 pb-8">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-12 h-12 rounded-xl bg-red-500/10 flex items-center justify-center">
-                      <span className="text-2xl">😩</span>
-                    </div>
-                    <div>
-                      <p className="text-xs font-bold text-red-400 uppercase tracking-wider">Avant</p>
-                      <p className="font-bold text-xl text-white">Sans EbookStudio</p>
-                    </div>
-                  </div>
-                  <div className="space-y-4">
-                    {[
-                      "2 à 6 mois pour écrire un ebook",
-                      "Freelance : 500€ à 5 000€ par livre",
-                      "Syndrome de la page blanche",
-                      "Aucune idée des mots-clés Amazon",
-                      "Mise en page amateur, refusée par KDP",
-                    ].map((item, i) => (
-                      <div key={i} className="flex items-center gap-3 text-white/80">
-                        <div className="w-5 h-5 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0">
-                          <span className="text-red-400 text-xs">✕</span>
-                        </div>
-                        <span>{item}</span>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-
-            {/* APRÈS */}
-            <motion.div variants={fadeIn} custom={1}>
-              <Card className="h-full bg-emerald-950/30 border-emerald-900/50 relative overflow-hidden">
-                <div className="absolute top-3 right-3">
-                  <Badge className="bg-emerald-500 text-slate-900 border-0 font-bold">VOTRE FUTUR</Badge>
-                </div>
-                <CardContent className="pt-8 pb-8">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-                      <span className="text-2xl">🚀</span>
-                    </div>
-                    <div>
-                      <p className="text-xs font-bold text-emerald-400 uppercase tracking-wider">Après</p>
-                      <p className="font-bold text-xl text-white">Avec EbookStudio Pro</p>
-                    </div>
-                  </div>
-                  <div className="space-y-4">
-                    {[
-                      "Premier ebook en moins d'1 heure",
-                      "Coût total : ~0,30€ par ebook",
-                      "15 rôles IA qui écrivent pour vous",
-                      "SEO Amazon automatiquement optimisé",
-                      "Export professionnel PDF/EPUB/Word",
-                    ].map((item, i) => (
-                      <div key={i} className="flex items-center gap-3 text-white">
-                        <div className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
-                          <Check className="w-3 h-3 text-emerald-400" />
-                        </div>
-                        <span>{item}</span>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════ TÉMOIGNAGES ═══════════════════════════════════════ */}
-      <section className="py-20 px-4">
-        <div className="max-w-6xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-12">
-            <motion.h2 variants={fadeIn} className="text-3xl sm:text-4xl md:text-5xl font-black mb-4">
-              Ils ont publié avec EbookStudio
-            </motion.h2>
-          </motion.div>
-
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}
-            className="grid md:grid-cols-3 gap-6">
-            {[
-              { 
-                name: "Marie D.", role: "5 ebooks publiés en 3 semaines", 
-                text: "Mon meilleur mois : 420€ de royalties KDP. Le BSR de mon livre 'Recettes Healthy' est descendu à #2,847 en Cuisine — je n'aurais jamais cru ça possible aussi vite.", 
-                avatar: "MD",
-                stats: "BSR #2,847 · 420€/mois"
-              },
-              { 
-                name: "Thomas L.", role: "Entrepreneur · 12 ebooks", 
-                text: "J'utilise les ebooks comme lead magnets pour mon business. Résultat : +340 leads qualifiés en 2 mois et 3 livres dans le Top 100 de leur catégorie.", 
-                avatar: "TL",
-                stats: "Top 100 Amazon · 340 leads"
-              },
-              { 
-                name: "Nicolas F.", role: "Revenus passifs · 22 ebooks", 
-                text: "De 0€ à 850€/mois en 6 mois. Mon secret : 1 ebook par semaine avec EbookStudio + les mots-clés KDP optimisés. Mes 3 meilleurs titres font chacun +150€/mois.", 
-                avatar: "NF",
-                stats: "850€/mois · 22 ebooks publiés"
-              },
-            ].map((t, i) => (
-              <motion.div key={i} variants={fadeIn} custom={i}>
-                <Card className="h-full bg-slate-900/50 border-slate-800">
-                  <CardContent className="pt-6 pb-6">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500 to-emerald-500 flex items-center justify-center text-slate-900 font-bold">
-                        {t.avatar}
-                      </div>
-                      <div>
-                        <p className="font-semibold text-white">{t.name}</p>
-                        <p className="text-xs text-white/60">{t.role}</p>
-                      </div>
-                      <div className="ml-auto flex gap-0.5">
-                        {[1,2,3,4,5].map(s => <Star key={s} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />)}
-                      </div>
-                    </div>
-                    <p className="text-white/90 leading-relaxed text-sm">"{t.text}"</p>
-                    <div className="mt-3 pt-3 border-t border-slate-800">
-                      <p className="text-xs font-semibold text-cyan-400">📊 {t.stats}</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
+      {/* ═══════════════════════════════════════ TÉMOIGNAGES KDP ═══════════════════════════════════════ */}
+      <KdpTestimonials />
 
       {/* ═══════════════════════════════════════ COMPARATIF PRIX ═══════════════════════════════════════ */}
       <PriceComparison />
@@ -830,6 +697,7 @@ const SalesPage = () => {
       <ExitIntentPopup />
       <SocialProofToast />
       <ProgressEngagement />
+      <FloatingMobileCta />
     </div>
   );
 };
