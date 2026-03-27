@@ -414,7 +414,6 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
 }) => {
   const navigate = useNavigate();
   const { isDark, toggleTheme } = useTheme();
-  const [showAllTools, setShowAllTools] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedGroups, setExpandedGroups] = useState<string[]>([]);
 
