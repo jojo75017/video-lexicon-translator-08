@@ -612,7 +612,7 @@ export const CoverDesignEditor: React.FC<CoverDesignEditorProps> = ({
       <div className="flex gap-4 flex-1 min-h-0">
         {/* LEFT PANEL: Tools + Templates */}
         <div className="w-72 flex-shrink-0">
-          <ScrollArea className="h-[calc(100vh-220px)]">
+          <div className="h-[calc(100vh-220px)] overflow-y-auto pr-1">
             <Tabs defaultValue="templates" className="w-full">
               <TabsList className="w-full grid grid-cols-3">
                 <TabsTrigger value="templates" className="text-xs">Templates</TabsTrigger>
@@ -718,7 +718,7 @@ export const CoverDesignEditor: React.FC<CoverDesignEditorProps> = ({
                 {elements.length === 0 && <p className="text-xs text-muted-foreground italic text-center py-2">Aucun calque</p>}
               </div>
             </div>
-          </ScrollArea>
+          </div>
         </div>
 
         {/* CENTER: Canvas */}
@@ -746,7 +746,7 @@ export const CoverDesignEditor: React.FC<CoverDesignEditorProps> = ({
 
         {/* RIGHT PANEL: Properties */}
         <div className="w-64 flex-shrink-0">
-          <ScrollArea className="h-[calc(100vh-220px)]">
+          <div className="h-[calc(100vh-220px)] overflow-y-auto pr-1">
             {selectedElement ? (
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
@@ -855,7 +855,7 @@ export const CoverDesignEditor: React.FC<CoverDesignEditorProps> = ({
                 <p className="text-xs text-muted-foreground/60 mt-1">ou choisissez un template à gauche</p>
               </div>
             )}
-          </ScrollArea>
+          </div>
         </div>
       </div>
     </div>
