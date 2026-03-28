@@ -9,6 +9,7 @@ import { CrmActivityPanel } from '@/components/crm/CrmActivityPanel';
 import { CrmKanban } from '@/components/crm/CrmKanban';
 import { CrmAnalytics } from '@/components/crm/CrmAnalytics';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { AdminPanelNav } from '@/components/admin/AdminPanelNav';
 
 export interface CrmContact {
   id: string;
@@ -296,6 +297,10 @@ const CrmPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <div className="max-w-7xl mx-auto px-4 pt-6">
+        <AdminPanelNav className="mb-6" />
+      </div>
+
       <CrmHeader
         onImportProspects={importFromProspects}
         onImportSubscribers={importFromSubscribers}

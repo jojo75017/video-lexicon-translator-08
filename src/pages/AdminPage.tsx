@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import { usePaymentNotifications } from '@/hooks/usePaymentNotifications';
 import { usePaymentConfirmations } from '@/hooks/usePaymentConfirmations';
 import { format } from 'date-fns';
+import { AdminPanelNav } from '@/components/admin/AdminPanelNav';
 
 export const AdminPage = () => {
   const [email, setEmail] = useState('');
@@ -296,6 +297,8 @@ export const AdminPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 p-4">
       <div className="container mx-auto max-w-6xl py-8 space-y-6">
+        <AdminPanelNav />
+
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -354,9 +357,6 @@ export const AdminPage = () => {
               {isRefreshingAdmin ? 'Vérification...' : 'Refresh Admin'}
             </Button>
             
-            <Button onClick={() => navigate('/ebook-planner')} variant="outline">
-              Retour au générateur
-            </Button>
             <Button onClick={() => navigate('/admin/profile')} variant="outline">
               <User className="w-4 h-4 mr-2" />
               Mon profil
