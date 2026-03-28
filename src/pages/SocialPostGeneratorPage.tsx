@@ -15,10 +15,11 @@ import {
 import SocialCalendar from '@/components/social/SocialCalendar';
 import SocialAnalytics from '@/components/social/SocialAnalytics';
 import {
-  Copy, Check, ArrowLeft, Facebook, Linkedin, Sparkles,
+  Copy, Check, Facebook, Linkedin, Sparkles,
   RefreshCw, Lightbulb, Calendar, BarChart3, Zap, Target,
   Image, MessageSquare, Twitter
 } from 'lucide-react';
+import { AdminPanelNav } from '@/components/admin/AdminPanelNav';
 
 const SocialPostGeneratorPage = () => {
   const navigate = useNavigate();
@@ -252,11 +253,7 @@ Réponds en texte simple, pas de JSON.`,
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-5xl mx-auto px-4 py-8">
-        <div className="flex items-center gap-4 mb-8">
-          <Button variant="ghost" onClick={() => navigate(-1)} className="text-muted-foreground">
-            <ArrowLeft className="h-4 w-4 mr-2" /> Retour
-          </Button>
-        </div>
+        <AdminPanelNav className="mb-8" />
 
         <div className="text-center mb-10">
           <h1 className="text-3xl md:text-4xl font-bold text-gradient-gold mb-3">

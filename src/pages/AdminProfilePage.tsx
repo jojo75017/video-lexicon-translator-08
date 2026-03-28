@@ -6,7 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Loader2, ArrowLeft, User, Lock } from 'lucide-react';
+import { Loader2, User, Lock } from 'lucide-react';
+import { AdminPanelNav } from '@/components/admin/AdminPanelNav';
 
 export const AdminProfilePage = () => {
   const [email, setEmail] = useState('');
@@ -124,14 +125,7 @@ export const AdminProfilePage = () => {
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="max-w-2xl mx-auto space-y-6">
-        <Button
-          variant="ghost"
-          onClick={() => navigate('/admin')}
-          className="mb-4"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Retour au tableau de bord
-        </Button>
+        <AdminPanelNav />
 
         {/* Informations du compte */}
         <Card>

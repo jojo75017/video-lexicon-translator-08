@@ -9,11 +9,12 @@ import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import {
-  Upload, Users, Send, Play, Pause, Trash2, ArrowLeft,
+  Upload, Users, Send, Play, Pause, Trash2,
   Mail, CheckCircle, Clock, AlertCircle, RefreshCw,
   FileSpreadsheet, Zap, BarChart3
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
+import { AdminPanelNav } from '@/components/admin/AdminPanelNav';
 
 interface Prospect {
   id: string;
@@ -217,12 +218,7 @@ const ProspectManagerPage = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="flex items-center gap-4 mb-6">
-          <Button variant="ghost" onClick={() => navigate(-1)} className="text-muted-foreground">
-            <ArrowLeft className="h-4 w-4 mr-2" /> Retour
-          </Button>
-        </div>
+        <AdminPanelNav className="mb-6" />
 
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gradient-gold mb-2">
