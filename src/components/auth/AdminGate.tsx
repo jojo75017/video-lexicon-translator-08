@@ -21,8 +21,6 @@ export function AdminGate({ children }: Props) {
   useEffect(() => {
     let cancelled = false;
 
-    const PERMANENT_ADMIN_EMAIL = "boubetgeorges@gmail.com";
-
     const run = async () => {
       try {
         const {
@@ -30,13 +28,7 @@ export function AdminGate({ children }: Props) {
         } = await supabase.auth.getSession();
 
         if (!session) {
-          // Session absente (souvent après expiration). Pour l'admin permanent,
-          // on redirige vers /admin-direct pour récupérer une session via lien email.
-          const storedAdminEmail = localStorage.getItem("permanent_admin_email");
-          const isPermanentAdmin = (storedAdminEmail || "").toLowerCase() === PERMANENT_ADMIN_EMAIL;
-
-          console.log("AdminGate: No session found", { isPermanentAdmin });
-
+          console.log("AdminGate: No session found");
           if (!cancelled) {
             setAllowed(false);
             setChecking(false);
@@ -102,16 +94,6 @@ export function AdminGate({ children }: Props) {
   }
 
   if (!allowed) {
-    const PERMANENT_ADMIN_EMAIL = "boubetgeorges@gmail.com";
-    const storedAdminEmail = localStorage.getItem("permanent_admin_email");
-    const isPermanentAdmin = (storedAdminEmail || "").toLowerCase() === PERMANENT_ADMIN_EMAIL;
-
-    // Si on sait que c'est l'admin permanent mais qu'il n'y a plus de session,
-    // on l'envoie vers le flux de reconnexion automatique.
-    if (isPermanentAdmin) {
-      return <Navigate to="/admin-direct" replace state={{ from: location }} />;
-    }
-
     return <Navigate to="/auth" replace state={{ from: location }} />;
   }
 

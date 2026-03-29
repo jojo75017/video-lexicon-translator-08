@@ -30,14 +30,6 @@ export const AuthPage = () => {
   };
 
   useEffect(() => {
-    // Si l'admin est déjà reconnu côté client (sessionStorage) ou via email admin permanent,
-    // on évite d'afficher cette page et on renvoie directement vers le générateur.
-    const storedPermanentAdminEmail = (localStorage.getItem('permanent_admin_email') || '').toLowerCase();
-    if (sessionStorage.getItem('is_admin') === 'true' || storedPermanentAdminEmail === 'boubetgeorges@gmail.com') {
-      navigate('/ebook-planner', { replace: true });
-      return;
-    }
-
     // Redirection silencieuse si déjà admin avec session active
     const checkAuth = async () => {
       try {
@@ -346,32 +338,6 @@ export const AuthPage = () => {
               disabled={isLoading}
             >
               {isLogin ? "Créer un compte" : "Déjà un compte ? Se connecter"}
-            </Button>
-          </div>
-          <div className="mt-2 text-center">
-            <Button
-              variant="outline"
-              onClick={() => {
-                const adminEmail = 'boubetgeorges@gmail.com';
-                const storedAdmin = (localStorage.getItem('permanent_admin_email') || '').toLowerCase();
-                
-                // En mode dev OU si déjà reconnu comme admin permanent → accès direct
-                if (import.meta.env.DEV || storedAdmin === adminEmail || email.toLowerCase().trim() === adminEmail) {
-                  sessionStorage.setItem('is_admin', 'true');
-                  localStorage.setItem('permanent_admin_email', adminEmail);
-                  navigate('/ebook-planner', { replace: true });
-                } else {
-                  if (shouldToast) {
-                    toast.error('Accès refusé', {
-                      description: 'Réservé à l\'administrateur.',
-                    });
-                  }
-                }
-              }}
-              disabled={isLoading}
-              className="text-sm border-primary/50 hover:bg-primary/10"
-            >
-              🔐 Accès Admin Direct
             </Button>
           </div>
           <div className="mt-2 text-center">
