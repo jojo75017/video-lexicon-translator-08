@@ -155,7 +155,7 @@ const App = () => {
             console.log('Statut admin confirmé dans App.tsx');
             setIsAdmin(true);
             sessionStorage.setItem('is_admin', 'true');
-            localStorage.setItem('permanent_admin_email', session.user?.email || '');
+            // Security: don't store admin email in localStorage
           } else {
             console.log('Utilisateur non-admin dans App.tsx');
             sessionStorage.removeItem('is_admin');
@@ -163,7 +163,6 @@ const App = () => {
         } else {
           console.log('Aucune session Supabase');
           sessionStorage.removeItem('is_admin');
-          localStorage.removeItem('permanent_admin_email');
           setIsAdmin(false);
         }
       } catch (error) {
@@ -248,6 +247,7 @@ const App = () => {
               </div>
             </div>
           )}
+          <Suspense fallback={<PageLoader />}>
           <Routes>
             {/* Google Search Console verification (fallback if static file routing is rewritten) */}
             <Route
@@ -483,6 +483,7 @@ const App = () => {
             {/* Catch-all : redirige vers /offres */}
             <Route path="*" element={<Navigate to="/offres" replace />} />
           </Routes>
+          </Suspense>
           <Toaster />
         </div>
       </TooltipProvider>
