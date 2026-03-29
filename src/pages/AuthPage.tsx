@@ -257,10 +257,14 @@ export const AuthPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>{isLogin ? 'Connexion Admin' : 'Créer un compte Admin'}</CardTitle>
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-4">
+      <Card className="w-full max-w-md border-primary/20 shadow-xl shadow-primary/5">
+        <CardHeader className="text-center">
+          <div className="mx-auto mb-3 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+            <Loader2 className="h-6 w-6 text-primary hidden" />
+            <span className="text-xl">🔐</span>
+          </div>
+          <CardTitle className="text-xl">{isLogin ? 'Connexion Admin' : 'Créer un compte Admin'}</CardTitle>
           <CardDescription>
             {isLogin ? 'Connectez-vous avec vos identifiants' : 'Créez votre compte administrateur'}
           </CardDescription>
