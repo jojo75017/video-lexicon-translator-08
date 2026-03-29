@@ -235,7 +235,7 @@ const SalesPage = () => {
             <a href="#pricing" className="text-slate-300 hover:text-white transition-colors">Tarif</a>
             <Link to="/nouveautes-2026" className="text-cyan-400 hover:text-cyan-300 transition-colors font-medium">Nouveautés 2026</Link>
             <Link to="/demo" className="text-slate-300 hover:text-white transition-colors">Démo</Link>
-            <Link to="/faq" className="text-slate-300 hover:text-white transition-colors">FAQ</Link>
+            <Link to="/subscription" className="text-slate-300 hover:text-white transition-colors">Connexion</Link>
           </nav>
 
           <Button onClick={scrollToPricing} className="bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold rounded-xl px-5">
