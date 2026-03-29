@@ -1,79 +1,88 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Routes, Route, Navigate } from 'react-router-dom';
-import EbookPlannerPage from './pages/EbookPlannerPage';
-import EbookIdeasPage from './pages/EbookIdeasPage';
-import AiChatPage from './pages/AiChatPage';
-import SubscriptionPage from './pages/SubscriptionPage';
-import { AdminPage } from './pages/AdminPage';
-import AuthPage from './pages/AuthPage';
-import AdminProfilePage from './pages/AdminProfilePage';
-import AdminDirectPage from './pages/AdminDirectPage';
-import AffiliationFormationPage from './pages/AffiliationFormationPage';
-import ParrainagePage from './pages/ParrainagePage';
-import FormationPage from './pages/FormationPage';
-import FormationSeriesPage from './pages/FormationSeriesPage';
-import FormationAudioPage from './pages/FormationAudioPage';
-import FormationSeriesAudioPage from './pages/FormationSeriesAudioPage';
-import FormationVideosPage from './pages/FormationVideosPage';
-import SalesPage from './pages/SalesPage';
-import MentionsLegales from './pages/MentionsLegales';
-import PolitiqueConfidentialite from './pages/PolitiqueConfidentialite';
-import CGV from './pages/CGV';
-import PaymentSuccessPage from './pages/PaymentSuccessPage';
-import DemoPage from './pages/DemoPage';
-import OfferValuePage from './pages/OfferValuePage';
-import SeoTutorialChatGptPage from './pages/SeoTutorialChatGptPage';
-import SeoCreerEbookIaPage from './pages/SeoCreerEbookIaPage';
-import SeoGenerateurEbookPage from './pages/SeoGenerateurEbookPage';
-import BlogPage from './pages/BlogPage';
-import BlogArticleTemplate from './components/blog/BlogArticleTemplate';
-import LogoutTotalPage from './pages/LogoutTotalPage';
-import PaiementManuelPage from './pages/PaiementManuelPage';
-import ConfirmationPaiementPage from './pages/ConfirmationPaiementPage';
-import FaqAssistancePage from './pages/FaqAssistancePage';
-import NichesPage from './pages/NichesPage';
-import ArcSignupPage from './pages/ArcSignupPage';
-import MarketingPlanPage from './pages/MarketingPlanPage';
-import UpsellPage from './pages/UpsellPage';
-import UpsellPaiementPage from './pages/UpsellPaiementPage';
-import SeoGeneratorPage from './pages/SeoGeneratorPage';
-import PracticalSheetsGeneratorPage from './pages/PracticalSheetsGeneratorPage';
-import ResultatEn5MinPage from './pages/ResultatEn5MinPage';
-import CadeauPage from './pages/CadeauPage';
-import ChecklistTournagePage from './pages/ChecklistTournagePage';
-import BDStudioPage from './pages/BDStudioPage';
-import SeriesTomesPage from './pages/SeriesTomesPage';
-import ForumPage from './pages/ForumPage';
-import KdpKeywordResearchPage from './pages/KdpKeywordResearchPage';
-import PublicAudiobookPage from './pages/PublicAudiobookPage';
-import AudiobookEmbedPage from './pages/AudiobookEmbedPage';
-import AudiobookDemoPage from './pages/AudiobookDemoPage';
-import AudiobookThankYouPage from './pages/AudiobookThankYouPage';
-import FormationEmbedPage from './pages/FormationEmbedPage';
-import Nouveautes2026Page from './pages/Nouveautes2026Page';
-import InstallPage from './pages/InstallPage';
-import ElementorExportPage from './pages/ElementorExportPage';
-import { SubscriptionAuth } from '@/components/SubscriptionAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { SubscriberGate } from '@/components/auth/SubscriberGate';
 import { AdminGate } from '@/components/auth/AdminGate';
+import { Loader2 } from 'lucide-react';
+
+// Lazy-loaded pages for performance
+const EbookPlannerPage = lazy(() => import('./pages/EbookPlannerPage'));
+const EbookIdeasPage = lazy(() => import('./pages/EbookIdeasPage'));
+const AiChatPage = lazy(() => import('./pages/AiChatPage'));
+const SubscriptionPage = lazy(() => import('./pages/SubscriptionPage'));
+const AdminPage = lazy(() => import('./pages/AdminPage').then(m => ({ default: m.AdminPage })));
+const AuthPage = lazy(() => import('./pages/AuthPage'));
+const AdminProfilePage = lazy(() => import('./pages/AdminProfilePage'));
+const AdminDirectPage = lazy(() => import('./pages/AdminDirectPage'));
+const AffiliationFormationPage = lazy(() => import('./pages/AffiliationFormationPage'));
+const ParrainagePage = lazy(() => import('./pages/ParrainagePage'));
+const FormationPage = lazy(() => import('./pages/FormationPage'));
+const FormationSeriesPage = lazy(() => import('./pages/FormationSeriesPage'));
+const FormationAudioPage = lazy(() => import('./pages/FormationAudioPage'));
+const FormationSeriesAudioPage = lazy(() => import('./pages/FormationSeriesAudioPage'));
+const FormationVideosPage = lazy(() => import('./pages/FormationVideosPage'));
+const SalesPage = lazy(() => import('./pages/SalesPage'));
+const MentionsLegales = lazy(() => import('./pages/MentionsLegales'));
+const PolitiqueConfidentialite = lazy(() => import('./pages/PolitiqueConfidentialite'));
+const CGV = lazy(() => import('./pages/CGV'));
+const PaymentSuccessPage = lazy(() => import('./pages/PaymentSuccessPage'));
+const DemoPage = lazy(() => import('./pages/DemoPage'));
+const OfferValuePage = lazy(() => import('./pages/OfferValuePage'));
+const SeoTutorialChatGptPage = lazy(() => import('./pages/SeoTutorialChatGptPage'));
+const SeoCreerEbookIaPage = lazy(() => import('./pages/SeoCreerEbookIaPage'));
+const SeoGenerateurEbookPage = lazy(() => import('./pages/SeoGenerateurEbookPage'));
+const BlogPage = lazy(() => import('./pages/BlogPage'));
+const BlogArticleTemplate = lazy(() => import('./components/blog/BlogArticleTemplate'));
+const LogoutTotalPage = lazy(() => import('./pages/LogoutTotalPage'));
+const PaiementManuelPage = lazy(() => import('./pages/PaiementManuelPage'));
+const ConfirmationPaiementPage = lazy(() => import('./pages/ConfirmationPaiementPage'));
+const FaqAssistancePage = lazy(() => import('./pages/FaqAssistancePage'));
+const NichesPage = lazy(() => import('./pages/NichesPage'));
+const ArcSignupPage = lazy(() => import('./pages/ArcSignupPage'));
+const MarketingPlanPage = lazy(() => import('./pages/MarketingPlanPage'));
+const UpsellPage = lazy(() => import('./pages/UpsellPage'));
+const UpsellPaiementPage = lazy(() => import('./pages/UpsellPaiementPage'));
+const SeoGeneratorPage = lazy(() => import('./pages/SeoGeneratorPage'));
+const PracticalSheetsGeneratorPage = lazy(() => import('./pages/PracticalSheetsGeneratorPage'));
+const ResultatEn5MinPage = lazy(() => import('./pages/ResultatEn5MinPage'));
+const CadeauPage = lazy(() => import('./pages/CadeauPage'));
+const ChecklistTournagePage = lazy(() => import('./pages/ChecklistTournagePage'));
+const BDStudioPage = lazy(() => import('./pages/BDStudioPage'));
+const SeriesTomesPage = lazy(() => import('./pages/SeriesTomesPage'));
+const ForumPage = lazy(() => import('./pages/ForumPage'));
+const KdpKeywordResearchPage = lazy(() => import('./pages/KdpKeywordResearchPage'));
+const PublicAudiobookPage = lazy(() => import('./pages/PublicAudiobookPage'));
+const AudiobookEmbedPage = lazy(() => import('./pages/AudiobookEmbedPage'));
+const AudiobookDemoPage = lazy(() => import('./pages/AudiobookDemoPage'));
+const AudiobookThankYouPage = lazy(() => import('./pages/AudiobookThankYouPage'));
+const FormationEmbedPage = lazy(() => import('./pages/FormationEmbedPage'));
+const Nouveautes2026Page = lazy(() => import('./pages/Nouveautes2026Page'));
+const InstallPage = lazy(() => import('./pages/InstallPage'));
+const ElementorExportPage = lazy(() => import('./pages/ElementorExportPage'));
+const SubscriptionAuth = lazy(() => import('@/components/SubscriptionAuth').then(m => ({ default: m.SubscriptionAuth })));
 
 // SaaS Pages
-import { SaasLayout } from '@/components/saas/SaasLayout';
-import SaasDashboard from '@/pages/saas/SaasDashboard';
-import SaasAnalytics from '@/pages/saas/SaasAnalytics';
-import SaasBilling from '@/pages/saas/SaasBilling';
-import SaasSettings from '@/pages/saas/SaasSettings';
-import SaasAuthPage from '@/pages/saas/SaasAuthPage';
-import SalesCampaignPage from '@/pages/SalesCampaignPage';
-import EmailPreviewPage from '@/pages/EmailPreviewPage';
-import ProspectManagerPage from '@/pages/ProspectManagerPage';
-import SocialPostGeneratorPage from '@/pages/SocialPostGeneratorPage';
-import UnifiedMarketingDashboard from '@/pages/UnifiedMarketingDashboard';
-import CrmPage from '@/pages/CrmPage';
+const SaasLayout = lazy(() => import('@/components/saas/SaasLayout').then(m => ({ default: m.SaasLayout })));
+const SaasDashboard = lazy(() => import('@/pages/saas/SaasDashboard'));
+const SaasAnalytics = lazy(() => import('@/pages/saas/SaasAnalytics'));
+const SaasBilling = lazy(() => import('@/pages/saas/SaasBilling'));
+const SaasSettings = lazy(() => import('@/pages/saas/SaasSettings'));
+const SaasAuthPage = lazy(() => import('@/pages/saas/SaasAuthPage'));
+const SalesCampaignPage = lazy(() => import('@/pages/SalesCampaignPage'));
+const EmailPreviewPage = lazy(() => import('@/pages/EmailPreviewPage'));
+const ProspectManagerPage = lazy(() => import('@/pages/ProspectManagerPage'));
+const SocialPostGeneratorPage = lazy(() => import('@/pages/SocialPostGeneratorPage'));
+const UnifiedMarketingDashboard = lazy(() => import('@/pages/UnifiedMarketingDashboard'));
+const CrmPage = lazy(() => import('@/pages/CrmPage'));
+
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center bg-background">
+    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+  </div>
+);
 const queryClient = new QueryClient();
 
 const App = () => {
@@ -146,7 +155,7 @@ const App = () => {
             console.log('Statut admin confirmé dans App.tsx');
             setIsAdmin(true);
             sessionStorage.setItem('is_admin', 'true');
-            localStorage.setItem('permanent_admin_email', session.user?.email || '');
+            // Security: don't store admin email in localStorage
           } else {
             console.log('Utilisateur non-admin dans App.tsx');
             sessionStorage.removeItem('is_admin');
@@ -154,7 +163,6 @@ const App = () => {
         } else {
           console.log('Aucune session Supabase');
           sessionStorage.removeItem('is_admin');
-          localStorage.removeItem('permanent_admin_email');
           setIsAdmin(false);
         }
       } catch (error) {
@@ -239,6 +247,7 @@ const App = () => {
               </div>
             </div>
           )}
+          <Suspense fallback={<PageLoader />}>
           <Routes>
             {/* Google Search Console verification (fallback if static file routing is rewritten) */}
             <Route
@@ -474,6 +483,7 @@ const App = () => {
             {/* Catch-all : redirige vers /offres */}
             <Route path="*" element={<Navigate to="/offres" replace />} />
           </Routes>
+          </Suspense>
           <Toaster />
         </div>
       </TooltipProvider>
