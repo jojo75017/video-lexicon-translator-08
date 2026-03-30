@@ -289,8 +289,10 @@ export function cleanForAudio(text: string): string {
     // Supprimer underscores de mise en forme
     .replace(/_([^_]+)_/g, '$1')
     .replace(/_+/g, ' ')
-    // Supprimer les titres markdown # ## ### etc.
+    // Supprimer les titres markdown # ## ### etc. (avec ou sans espace)
     .replace(/^#{1,6}\s*/gm, '')
+    // Supprimer tout # résiduel dans le texte
+    .replace(/#{1,6}/g, '')
     // Supprimer les balises HTML résiduelles
     .replace(/<[^>]*>/g, '')
     // Supprimer les crochets markdown [texte](url)
