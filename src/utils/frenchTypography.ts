@@ -61,13 +61,27 @@ export function applyFrenchTypography(text: string): string {
     // Espace insécable après n° N°
     .replace(/(n°|N°)\s*/g, `$1${NBSP}`)
 
+    // ========== LIGATURES FRANÇAISES ==========
+    // Œ/œ pour les mots courants
+    .replace(/\bOe(?=uvre|il|uf)/g, 'Œ')
+    .replace(/\boe(?=uvre|il|uf)/g, 'œ')
+    // Cœur, sœur, nœud, vœu, bœuf, mœurs
+    .replace(/\bc(oe)(ur)/gi, (m, oe, ur) => m[0] === 'C' ? `Cœ${ur}` : `cœ${ur}`)
+    .replace(/\bs(oe)(ur)/gi, (m, oe, ur) => m[0] === 'S' ? `Sœ${ur}` : `sœ${ur}`)
+    .replace(/\bn(oe)(ud)/gi, (m, oe, ud) => m[0] === 'N' ? `Nœ${ud}` : `nœ${ud}`)
+    .replace(/\bv(oe)(u)/gi, (m, oe, u) => m[0] === 'V' ? `Vœ${u}` : `vœ${u}`)
+    .replace(/\bb(oe)(uf)/gi, (m, oe, uf) => m[0] === 'B' ? `Bœ${uf}` : `bœ${uf}`)
+    .replace(/\bm(oe)(urs)/gi, (m, oe, urs) => m[0] === 'M' ? `Mœ${urs}` : `mœ${urs}`)
+
     // ========== CORRECTIONS FINALES ==========
     // Éviter les doubles espaces insécables
     .replace(/\u00A0{2,}/g, NBSP)
     .replace(/\u202F{2,}/g, NNBSP)
     // Ne pas ajouter d'espace insécable dans les URLs
     .replace(/(https?:)\u00A0/g, '$1')
-    .replace(/(https?:)\u202F/g, '$1');
+    .replace(/(https?:)\u202F/g, '$1')
+    // Corriger les espaces multiples
+    .replace(/  +/g, ' ');
 
   return result;
 }
