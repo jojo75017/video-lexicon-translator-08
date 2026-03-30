@@ -25,8 +25,11 @@ export function cleanGeneratedText(text: string): string {
     .replace(/\*(.+?)\*/g, '$1')
     // Supprimer les astérisques orphelins restants
     .replace(/\*+/g, '')
-    // Supprimer les titres markdown # ## ### etc.
-    .replace(/^#{1,6}\s+/gm, '')
+    // Supprimer les titres markdown # ## ### etc. (avec ou sans espace après)
+    .replace(/^#{1,6}\s*/gm, '')
+    // Supprimer les # isolés ou en groupe au milieu d'une ligne (artefacts IA)
+    .replace(/\s#{1,6}\s/g, ' ')
+    .replace(/#{2,}/g, '')
     // Supprimer les séparateurs markdown --- *** ===
     .replace(/^[=\-*_]{3,}\s*$/gm, '')
     // Supprimer les balises de liste markdown - ou *
@@ -286,8 +289,10 @@ export function cleanForAudio(text: string): string {
     // Supprimer underscores de mise en forme
     .replace(/_([^_]+)_/g, '$1')
     .replace(/_+/g, ' ')
-    // Supprimer les titres markdown # ## ### etc.
+    // Supprimer les titres markdown # ## ### etc. (avec ou sans espace)
     .replace(/^#{1,6}\s*/gm, '')
+    // Supprimer tout # résiduel dans le texte
+    .replace(/#{1,6}/g, '')
     // Supprimer les balises HTML résiduelles
     .replace(/<[^>]*>/g, '')
     // Supprimer les crochets markdown [texte](url)
