@@ -25,8 +25,11 @@ export function cleanGeneratedText(text: string): string {
     .replace(/\*(.+?)\*/g, '$1')
     // Supprimer les astérisques orphelins restants
     .replace(/\*+/g, '')
-    // Supprimer les titres markdown # ## ### etc.
-    .replace(/^#{1,6}\s+/gm, '')
+    // Supprimer les titres markdown # ## ### etc. (avec ou sans espace après)
+    .replace(/^#{1,6}\s*/gm, '')
+    // Supprimer les # isolés ou en groupe au milieu d'une ligne (artefacts IA)
+    .replace(/\s#{1,6}\s/g, ' ')
+    .replace(/#{2,}/g, '')
     // Supprimer les séparateurs markdown --- *** ===
     .replace(/^[=\-*_]{3,}\s*$/gm, '')
     // Supprimer les balises de liste markdown - ou *
