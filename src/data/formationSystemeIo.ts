@@ -818,13 +818,13 @@ Configurez votre compte.
 
 ### Options :
 - Nom d'auteur par défaut
-- Clé API OpenAI personnelle (optionnel)
+- Clé API Gemini personnelle (optionnel)
 - Langue de l'interface
 - Thème clair/sombre
 - Notifications
 
 ### Clé API personnelle :
-Vous pouvez utiliser votre propre clé OpenAI pour une facturation directe. Cela n'affecte pas les fonctionnalités.
+Vous pouvez utiliser votre propre clé Gemini pour une facturation directe. Cela n'affecte pas les fonctionnalités.
 
 ---
 

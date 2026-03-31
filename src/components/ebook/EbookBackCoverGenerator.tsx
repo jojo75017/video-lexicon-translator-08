@@ -142,7 +142,7 @@ export const EbookBackCoverGenerator: React.FC<EbookBackCoverGeneratorProps> = (
         if (error) {
           console.error(`[CoverGen] Error on version ${i + 1}:`, error);
           
-          // Si crédits Lovable épuisés et clé OpenAI disponible, basculer vers OpenAI
+          // Si crédits Lovable épuisés et clé Gemini disponible, basculer vers Gemini
           const creditsError = error.message?.includes('402') || error.context?.body?.error?.includes('Crédits épuisés');
           if (creditsError && !useOpenAI && !!config.apiKey && !triedOpenAI) {
             console.warn('[CoverGen] Switching to OpenAI after credits exhausted');
@@ -181,7 +181,7 @@ export const EbookBackCoverGenerator: React.FC<EbookBackCoverGeneratorProps> = (
         console.error(`[CoverGen] Failed to generate cover ${i + 1}:`, error);
         
         if (error.message?.includes('402') || error.context?.body?.error?.includes('Crédits épuisés')) {
-          toast.error('⚠️ Crédits épuisés. Veuillez configurer une clé OpenAI personnelle.');
+          toast.error('⚠️ Crédits épuisés. Veuillez configurer une clé Gemini personnelle.');
         } else if (error.message?.includes('429')) {
           toast.error('⏱️ Trop de requêtes. Veuillez patienter.');
         }
@@ -206,20 +206,20 @@ export const EbookBackCoverGenerator: React.FC<EbookBackCoverGeneratorProps> = (
 
   return (
     <div className="space-y-6">
-      {/* Configuration OpenAI */}
+      {/* Configuration Gemini */}
       <Collapsible open={showConfig} onOpenChange={setShowConfig}>
         <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50">
           <CardContent className="pt-6">
             <CollapsibleTrigger asChild>
               <Button variant="outline" className="w-full mb-4">
                 <Settings className="h-4 w-4 mr-2" />
-                {hasValidApiKey() ? '✓ Clé OpenAI configurée - Génération illimitée' : 'Configurer clé OpenAI personnelle (optionnel)'}
+                {hasValidApiKey() ? '✓ Clé Gemini configurée - Génération illimitée' : 'Configurer clé Gemini personnelle (optionnel)'}
               </Button>
             </CollapsibleTrigger>
             <CollapsibleContent>
               <OpenAIConfigPanel 
-                title="Configuration OpenAI pour 4ème de Couverture"
-                description="Utilisez votre propre clé API OpenAI pour générer des images sans limite de crédits Lovable"
+                title="Configuration Gemini pour 4ème de Couverture"
+                description="Utilisez votre propre clé API Gemini pour générer des images sans limite de crédits Lovable"
                 showModelSelection={false}
                 compact
               />
@@ -237,7 +237,7 @@ export const EbookBackCoverGenerator: React.FC<EbookBackCoverGeneratorProps> = (
           </CardTitle>
           <CardDescription>
             {hasValidApiKey() 
-              ? "Utilise votre clé OpenAI personnelle pour générer des images" 
+              ? "Utilise votre clé Gemini personnelle pour générer des images" 
               : "Créez une image de 4ème de couverture avec Lovable AI (crédits requis)"}
           </CardDescription>
         </CardHeader>
