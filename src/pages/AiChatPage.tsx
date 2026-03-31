@@ -80,48 +80,31 @@ const AiChatPage: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'gpt-4.1-2025-04-14',
-          messages: [
-            {
-              role: 'system',
-              content: `Tu es un expert en marketing d'ebook et en analyse des tendances Amazon. 
-              Tu aides les auteurs à trouver des idées d'ebook à succès. 
-              Tu peux analyser les tendances du marché, suggérer des niches rentables, 
-              et recommander des sujets basés sur le top 50 Amazon et autres classements.
-              Réponds toujours en français de manière concise et actionnable.
-              Donne des conseils pratiques et des exemples concrets.`
-            },
-            ...messages.map(m => ({ role: m.role, content: m.content })),
-            { role: 'user', content: input }
-          ],
-          max_completion_tokens: 1000,
-        }),
-      });
+      const chatHistory = messages.map(m => `${m.role === 'user' ? 'Utilisateur' : 'Assistant'}: ${m.content}`).join('\n\n');
+      
+      const response = await callGemini(apiKey,
+        `Historique de la conversation:\n${chatHistory}\n\nUtilisateur: ${input}`,
+        {
+          systemPrompt: `Tu es un expert en marketing d'ebook et en analyse des tendances Amazon. 
+Tu aides les auteurs à trouver des idées d'ebook à succès. 
+Tu peux analyser les tendances du marché, suggérer des niches rentables, 
+et recommander des sujets basés sur le top 50 Amazon et autres classements.
+Réponds toujours en français de manière concise et actionnable.
+Donne des conseils pratiques et des exemples concrets.`,
+          maxTokens: 1000,
+          temperature: 0.7,
+        }
+      );
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error?.message || 'Erreur lors de la communication avec OpenAI');
-      }
-
-      const data = await response.json();
       const assistantMessage: Message = {
         role: 'assistant',
-        content: data.choices[0].message.content
+        content: response
       };
 
       setMessages(prev => [...prev, assistantMessage]);
-    } catch (error) {
-      console.error('Error calling OpenAI:', error);
-      toast.error(error instanceof Error ? error.message : 'Erreur lors de la génération de la réponse');
-      
-      // Remove user message on error
+    } catch (error: any) {
+      console.error('Error calling Gemini:', error);
+      toast.error(error.message || 'Erreur lors de la génération de la réponse');
       setMessages(prev => prev.slice(0, -1));
     } finally {
       setIsLoading(false);
