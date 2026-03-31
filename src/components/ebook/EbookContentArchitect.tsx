@@ -54,7 +54,8 @@ export const EbookContentArchitect = ({ onArchitectureComplete, onApplyStructure
         body: { 
           sujet, 
           objectif: `Permettre au lecteur de maîtriser complètement "${sujet}" de façon pratique et actionnable`,
-          nombreChapitres: 8
+          nombreChapitres: 8,
+          userApiKey: userGeminiKey
         },
       });
 
