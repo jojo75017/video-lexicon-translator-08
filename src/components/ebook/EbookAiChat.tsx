@@ -56,32 +56,26 @@ export const EbookAiChat: React.FC<{ isDemo?: boolean }> = ({ isDemo = false }) 
       return;
     }
 
-    if (!tempApiKey.startsWith('sk-')) {
-      toast.error('La clé API doit commencer par "sk-"');
+    if (!tempApiKey.startsWith('AIza')) {
+      toast.error('La clé API Gemini doit commencer par "AIza"');
       return;
     }
 
-    // Test de la clé API avec un appel simple
     toast.loading('Validation de la clé API en cours...', { id: 'api-test' });
     
     try {
-      const response = await fetch('https://api.openai.com/v1/models', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${tempApiKey}`,
-        },
-      });
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${tempApiKey}`);
 
       if (!response.ok) {
         throw new Error('Clé API invalide');
       }
 
-      localStorage.setItem('user_openai_key', tempApiKey);
+      localStorage.setItem('openai_api_key', tempApiKey);
       setApiKey(tempApiKey);
       setShowSettings(false);
-      toast.dismiss('api-test'); // Suppression du toast loading au lieu d'afficher un succès
+      toast.dismiss('api-test');
     } catch (error) {
-      toast.error('❌ Clé API invalide. Vérifiez votre clé et réessayez.', { id: 'api-test' });
+      toast.error('❌ Clé API invalide. Vérifiez votre clé Gemini.', { id: 'api-test' });
     }
   };
 
