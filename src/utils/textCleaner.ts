@@ -338,6 +338,11 @@ export function cleanForAudio(text: string): string {
     .replace(/--+/g, ', ')
     // Supprimer les séparateurs
     .replace(/^[=\-*_]{3,}\s*$/gm, '')
+    // Supprimer les URLs (illisibles en audio)
+    .replace(/https?:\/\/[^\s)>\]]+/g, '')
+    .replace(/www\.[^\s)>\]]+/g, '')
+    // Supprimer les adresses email
+    .replace(/[\w.+-]+@[\w-]+\.[\w.-]+/g, '')
     // Supprimer les emojis
     .replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{FE00}-\u{FE0F}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{200D}\u{20E3}\u{E0020}-\u{E007F}]/gu, '')
     // Convertir les abréviations courantes pour la lecture
@@ -348,23 +353,46 @@ export function cleanForAudio(text: string): string {
     .replace(/\bDr\.?\s/g, 'Docteur ')
     .replace(/\bPr\.?\s/g, 'Professeur ')
     .replace(/\bMe\.?\s/g, 'Maître ')
+    .replace(/\bSt\.?\s/g, 'Saint ')
+    .replace(/\bSte\.?\s/g, 'Sainte ')
     .replace(/\betc\.\s/g, 'et cætera. ')
     .replace(/\bcf\.\s/gi, 'voir ')
     .replace(/\bex\.\s/gi, 'par exemple ')
     .replace(/\bvs\.?\s/gi, 'contre ')
     .replace(/\bp\.\s*(\d+)/gi, 'page $1')
     .replace(/\bpp\.\s*(\d+)/gi, 'pages $1')
+    .replace(/\bchap\.\s*/gi, 'chapitre ')
+    .replace(/\bfig\.\s*/gi, 'figure ')
+    .replace(/\bvol\.\s*/gi, 'volume ')
+    .replace(/\béd\.\s*/gi, 'édition ')
+    // Convertir les pourcentages pour la lecture
+    .replace(/(\d+)\s*%/g, '$1 pour cent')
+    // Convertir les symboles courants
+    .replace(/&/g, ' et ')
+    .replace(/\+/g, ' plus ')
     // Convertir les chiffres romains courants en toutes lettres
     .replace(/\bXXI(?:e|ème)?\s*siècle/gi, 'vingt-et-unième siècle')
     .replace(/\bXX(?:e|ème)?\s*siècle/gi, 'vingtième siècle')
     .replace(/\bXIX(?:e|ème)?\s*siècle/gi, 'dix-neuvième siècle')
+    .replace(/\bXVIII(?:e|ème)?\s*siècle/gi, 'dix-huitième siècle')
+    .replace(/\bXVII(?:e|ème)?\s*siècle/gi, 'dix-septième siècle')
+    .replace(/\bXVI(?:e|ème)?\s*siècle/gi, 'seizième siècle')
+    .replace(/\bXV(?:e|ème)?\s*siècle/gi, 'quinzième siècle')
     // Améliorer la ponctuation pour des pauses naturelles
     .replace(/\s*;\s*/g, '. ')
     .replace(/\s*:\s*$/gm, '.')
     // Supprimer les parenthèses vides
     .replace(/\(\s*\)/g, '')
+    // Supprimer les crochets vides
+    .replace(/\[\s*\]/g, '')
+    // Convertir les parenthèses en virgules pour fluidité audio
+    .replace(/\s*\(\s*/g, ', ')
+    .replace(/\s*\)\s*/g, ', ')
     // Nettoyer les lignes vides multiples
     .replace(/\n{3,}/g, '\n\n')
+    // Nettoyer les doubles virgules ou ponctuation redondante
+    .replace(/,\s*,/g, ',')
+    .replace(/\.\s*\./g, '.')
     // Nettoyer les espaces multiples
     .replace(/  +/g, ' ')
     .trim();
