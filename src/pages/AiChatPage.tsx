@@ -69,7 +69,7 @@ const AiChatPage: React.FC = () => {
     if (!input.trim()) return;
     
     if (!apiKey) {
-      toast.error('Veuillez configurer votre clé API OpenAI dans les paramètres');
+      toast.error('Veuillez configurer votre clé API Gemini dans les paramètres');
       setShowSettings(true);
       return;
     }
