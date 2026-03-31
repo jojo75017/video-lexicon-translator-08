@@ -34,7 +34,7 @@ const AiChatPage: React.FC = () => {
 
   useEffect(() => {
     // Load API key from localStorage
-    const savedKey = localStorage.getItem('user_openai_key');
+    const savedKey = localStorage.getItem('openai_api_key');
     if (savedKey) {
       setApiKey(savedKey);
     }
