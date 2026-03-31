@@ -163,28 +163,13 @@ export const EbookStatisticsTools: React.FC<EbookStatisticsToolsProps> = ({
       const translateText = async (text: string) => {
         if (!text) return '';
         
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model: 'gpt-4o-mini',
-            messages: [
-              { 
-                role: 'system', 
-                content: `Tu es un traducteur professionnel. Traduis le texte suivant en ${targetLanguage}. Conserve le style, le ton et la mise en forme. Ne fais que traduire.` 
-              },
-              { role: 'user', content: text }
-            ],
-            max_tokens: 4000,
-          }),
+        const translated = await callGemini(apiKey, text, {
+          systemPrompt: `Tu es un traducteur professionnel. Traduis le texte suivant en ${targetLanguage}. Conserve le style, le ton et la mise en forme. Ne fais que traduire, ne rajoute aucune explication.`,
+          maxTokens: 4000,
+          temperature: 0.3,
         });
 
-        if (!response.ok) throw new Error('Erreur de traduction');
-        const data = await response.json();
-        return data.choices[0].message.content;
+        return translated;
       };
 
       // Traduire les sections principales
