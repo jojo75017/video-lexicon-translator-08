@@ -152,7 +152,7 @@ export const EbookStatisticsTools: React.FC<EbookStatisticsToolsProps> = ({
     }
 
     if (!apiKey) {
-      toast.error('Clé API OpenAI requise pour la traduction');
+      toast.error('Clé API Gemini requise pour la traduction');
       return;
     }
 
