@@ -20,7 +20,7 @@ const PromptsGeneratorPage: React.FC = () => {
 
   const generateCustomPrompts = async () => {
     if (!hasValidApiKey() || !customTopic.trim()) {
-      toast.error("Veuillez configurer votre clé API OpenAI et saisir un sujet");
+      toast.error("Veuillez configurer votre clé API Gemini et saisir un sujet");
       return;
     }
 
@@ -28,18 +28,10 @@ const PromptsGeneratorPage: React.FC = () => {
     
     try {
       const config = getConfig();
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${config.apiKey}`
-        },
-        body: JSON.stringify({
-          model: config.model,
-          messages: [
-            {
-              role: 'system',
-              content: `Tu es un expert en création de prompts professionnels. Tu dois créer 10 prompts détaillés et professionnels sur le sujet demandé. Chaque prompt doit suivre cette structure exacte :
+      const generatedContent = await callGemini(config.apiKey,
+        `Crée 10 prompts professionnels détaillés sur le sujet : "${customTopic}"`,
+        {
+          systemPrompt: `Tu es un expert en création de prompts professionnels. Tu dois créer 10 prompts détaillés et professionnels sur le sujet demandé. Chaque prompt doit suivre cette structure exacte :
 
 🎯 Prompt [numéro] : [Titre accrocheur]
 Demande : [Description claire de ce qui est demandé]
@@ -54,33 +46,19 @@ Structure attendue :
 • Point 6
 Style : [Ton et approche à adopter]
 
-Les prompts doivent être variés, couvrir différents aspects du sujet, et être immédiatement utilisables.`
-            },
-            {
-              role: 'user',
-              content: `Crée 10 prompts professionnels détaillés sur le sujet : "${customTopic}"`
-            }
-          ],
+Les prompts doivent être variés, couvrir différents aspects du sujet, et être immédiatement utilisables.`,
           temperature: 0.8,
-          max_tokens: 4000
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error(`Erreur API: ${response.status}`);
-      }
-
-      const data = await response.json();
-      const generatedContent = data.choices[0].message.content;
+          maxTokens: 4000
+        }
+      );
       
-      // Séparer les prompts générés
       const generatedPrompts = generatedContent.split(/🎯 Prompt \d+/).filter(p => p.trim()).map((prompt, index) => `🎯 Prompt ${index + 1}${prompt.trim()}`);
       
       setPrompts(generatedPrompts);
       toast.success(`${generatedPrompts.length} prompts personnalisés générés !`);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erreur lors de la génération:', error);
-      toast.error("Erreur lors de la génération des prompts");
+      toast.error(error.message || "Erreur lors de la génération des prompts");
     } finally {
       setIsGenerating(false);
     }
