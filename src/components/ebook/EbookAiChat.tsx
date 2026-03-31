@@ -31,7 +31,7 @@ export const EbookAiChat: React.FC<{ isDemo?: boolean }> = ({ isDemo = false }) 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const savedKey = localStorage.getItem('user_openai_key');
+    const savedKey = localStorage.getItem('openai_api_key');
     if (savedKey) {
       setApiKey(savedKey);
     }
