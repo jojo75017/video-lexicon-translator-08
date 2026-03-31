@@ -307,7 +307,7 @@ Donne des conseils pratiques et des exemples concrets.`,
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Key className="h-5 w-5" />
-              Configuration de votre clé API OpenAI
+              Configuration de votre clé API Gemini
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
