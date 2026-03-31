@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { callGemini } from '@/services/geminiService';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -30,7 +31,7 @@ export const EbookAiChat: React.FC<{ isDemo?: boolean }> = ({ isDemo = false }) 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const savedKey = localStorage.getItem('user_openai_key');
+    const savedKey = localStorage.getItem('openai_api_key');
     if (savedKey) {
       setApiKey(savedKey);
     }
@@ -55,32 +56,26 @@ export const EbookAiChat: React.FC<{ isDemo?: boolean }> = ({ isDemo = false }) 
       return;
     }
 
-    if (!tempApiKey.startsWith('sk-')) {
-      toast.error('La clé API doit commencer par "sk-"');
+    if (!tempApiKey.startsWith('AIza')) {
+      toast.error('La clé API Gemini doit commencer par "AIza"');
       return;
     }
 
-    // Test de la clé API avec un appel simple
     toast.loading('Validation de la clé API en cours...', { id: 'api-test' });
     
     try {
-      const response = await fetch('https://api.openai.com/v1/models', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${tempApiKey}`,
-        },
-      });
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${tempApiKey}`);
 
       if (!response.ok) {
         throw new Error('Clé API invalide');
       }
 
-      localStorage.setItem('user_openai_key', tempApiKey);
+      localStorage.setItem('openai_api_key', tempApiKey);
       setApiKey(tempApiKey);
       setShowSettings(false);
-      toast.dismiss('api-test'); // Suppression du toast loading au lieu d'afficher un succès
+      toast.dismiss('api-test');
     } catch (error) {
-      toast.error('❌ Clé API invalide. Vérifiez votre clé et réessayez.', { id: 'api-test' });
+      toast.error('❌ Clé API invalide. Vérifiez votre clé Gemini.', { id: 'api-test' });
     }
   };
 
@@ -95,7 +90,7 @@ export const EbookAiChat: React.FC<{ isDemo?: boolean }> = ({ isDemo = false }) 
     }
 
     if (!apiKey) {
-      toast.error('Veuillez configurer votre clé API OpenAI');
+      toast.error('Veuillez configurer votre clé API Gemini');
       setShowSettings(true);
       return;
     }
@@ -106,46 +101,31 @@ export const EbookAiChat: React.FC<{ isDemo?: boolean }> = ({ isDemo = false }) 
     setIsLoading(true);
 
     try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'gpt-4.1-2025-04-14',
-          messages: [
-            {
-              role: 'system',
-              content: `Tu es un expert en marketing d'ebook et en analyse des tendances Amazon. 
-              Tu aides les auteurs à trouver des idées d'ebook à succès. 
-              Tu peux analyser les tendances du marché, suggérer des niches rentables, 
-              et recommander des sujets basés sur le top 50 Amazon et autres classements.
-              Réponds toujours en français de manière concise et actionnable.
-              Donne des conseils pratiques et des exemples concrets.`
-            },
-            ...messages.map(m => ({ role: m.role, content: m.content })),
-            { role: 'user', content: input }
-          ],
-          max_completion_tokens: 1000,
-        }),
-      });
+      const chatHistory = messages.map(m => `${m.role === 'user' ? 'Utilisateur' : 'Assistant'}: ${m.content}`).join('\n\n');
+      
+      const response = await callGemini(apiKey,
+        `Historique de la conversation:\n${chatHistory}\n\nUtilisateur: ${input}`,
+        {
+          systemPrompt: `Tu es un expert en marketing d'ebook et en analyse des tendances Amazon. 
+Tu aides les auteurs à trouver des idées d'ebook à succès. 
+Tu peux analyser les tendances du marché, suggérer des niches rentables, 
+et recommander des sujets basés sur le top 50 Amazon et autres classements.
+Réponds toujours en français de manière concise et actionnable.
+Donne des conseils pratiques et des exemples concrets.`,
+          maxTokens: 1000,
+          temperature: 0.7,
+        }
+      );
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error?.message || 'Erreur lors de la communication avec OpenAI');
-      }
-
-      const data = await response.json();
       const assistantMessage: Message = {
         role: 'assistant',
-        content: data.choices[0].message.content
+        content: response
       };
 
       setMessages(prev => [...prev, assistantMessage]);
-    } catch (error) {
-      console.error('Error calling OpenAI:', error);
-      toast.error(error instanceof Error ? error.message : 'Erreur lors de la génération de la réponse');
+    } catch (error: any) {
+      console.error('Error calling Gemini:', error);
+      toast.error(error.message || 'Erreur lors de la génération de la réponse');
       setMessages(prev => prev.slice(0, -1));
     } finally {
       setIsLoading(false);
@@ -327,7 +307,7 @@ export const EbookAiChat: React.FC<{ isDemo?: boolean }> = ({ isDemo = false }) 
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Key className="h-5 w-5" />
-              Configuration de votre clé API OpenAI
+              Configuration de votre clé API Gemini
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
@@ -344,11 +324,11 @@ export const EbookAiChat: React.FC<{ isDemo?: boolean }> = ({ isDemo = false }) 
             )}
             <div>
               <label className="text-sm font-medium mb-2 block">
-                Clé API OpenAI (commençant par sk-)
+                Clé API Gemini (commençant par AIza)
               </label>
               <Input
                 type="password"
-                placeholder="sk-..."
+                placeholder="AIza..."
                 value={tempApiKey}
                 onChange={(e) => setTempApiKey(e.target.value)}
                 className="mb-2"

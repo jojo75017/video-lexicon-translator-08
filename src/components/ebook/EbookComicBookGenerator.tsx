@@ -160,7 +160,7 @@ export const EbookComicBookGenerator: React.FC<ComicBookGeneratorProps> = ({ ebo
   const [setting, setSetting] = useState('');
   const [customPrompt, setCustomPrompt] = useState('');
 
-  // Clé OpenAI utilisateur (fallback fiable si les crédits image internes sont épuisés)
+  // Clé Gemini utilisateur (fallback fiable si les crédits image internes sont épuisés)
   const { apiKey: userApiKey, isValid: isUserKeyValid } = useOpenAIConfig();
   const useOpenAI = Boolean(userApiKey) && isUserKeyValid === true;
   
@@ -580,7 +580,7 @@ Réponds en JSON:
         body: {
           type: 'comic-scenario',
           prompt,
-          // Passer la clé OpenAI utilisateur pour éviter les limites Lovable AI
+          // Passer la clé Gemini utilisateur pour éviter les limites Lovable AI
           useOpenAI: useOpenAI,
           openaiApiKey: userApiKey || undefined,
         }
@@ -1318,7 +1318,7 @@ Réponds en JSON:
       {/* Templates BD Franco-Belges */}
       <BDTemplatesSelector onApplyTemplate={applyBDTemplate} />
 
-      {/* Avertissement si pas de clé OpenAI */}
+      {/* Avertissement si pas de clé Gemini */}
       {!useOpenAI && (
         <Card className="border-amber-500/50 bg-amber-500/5">
           <CardContent className="py-4">
@@ -1326,10 +1326,10 @@ Réponds en JSON:
               <AlertTriangle className="h-5 w-5 text-amber-500 mt-0.5 flex-shrink-0" />
               <div className="space-y-1">
                 <p className="font-medium text-amber-700 dark:text-amber-400">
-                  Clé OpenAI non configurée
+                  Clé Gemini non configurée
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  Pour générer de vraies images de BD, ajoutez votre clé API OpenAI dans l'onglet <strong>Paramètres</strong>. 
+                  Pour générer de vraies images de BD, ajoutez votre clé API Gemini dans l'onglet <strong>Paramètres</strong>. 
                   Sans clé, des images placeholder seront affichées.
                 </p>
               </div>

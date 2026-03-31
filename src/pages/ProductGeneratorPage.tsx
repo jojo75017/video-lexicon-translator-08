@@ -103,7 +103,7 @@ ${result.characteristics.map(char => `• ${char}`).join('\n')}
           </p>
         </div>
 
-        {/* Configuration OpenAI */}
+        {/* Configuration Gemini */}
         <OpenAIConfigPanel />
 
         {/* Générateur */}

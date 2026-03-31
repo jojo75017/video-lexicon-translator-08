@@ -387,11 +387,11 @@ const CompetitorAnalysisPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10 p-6">
       <div className="container mx-auto max-w-7xl">
-        {/* Configuration OpenAI */}
+        {/* Configuration IA */}
         <div className="mb-6">
           <OpenAIConfigPanel 
             title="🤖 Configuration IA - Analyse Concurrentielle"
-            description="Configurez OpenAI pour des analyses concurrentielles avancées avec l'IA ou utilisez des données de démonstration"
+            description="Configurez Gemini pour des analyses concurrentielles avancées avec l'IA ou utilisez des données de démonstration"
             compact={true}
           />
         </div>

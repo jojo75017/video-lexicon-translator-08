@@ -36,7 +36,7 @@ export class OpenAIService {
   static async generateKeywords(topic: string, count: number = 10): Promise<string[]> {
     const apiKey = this.getApiKey();
     if (!apiKey) {
-      throw new Error('Clé API OpenAI non configurée');
+      throw new Error('Clé API Gemini non configurée');
     }
 
     try {
@@ -81,7 +81,7 @@ export class OpenAIService {
   static async generateLongTailKeywords(mainKeyword: string): Promise<string[]> {
     const apiKey = this.getApiKey();
     if (!apiKey) {
-      throw new Error('Clé API OpenAI non configurée');
+      throw new Error('Clé API Gemini non configurée');
     }
 
     try {
@@ -123,7 +123,7 @@ export class OpenAIService {
   static async generateBlogOutline(keyword: string): Promise<any> {
     const apiKey = this.getApiKey();
     if (!apiKey) {
-      throw new Error('Clé API OpenAI non configurée');
+      throw new Error('Clé API Gemini non configurée');
     }
 
     try {
@@ -171,7 +171,7 @@ export class OpenAIService {
   }> {
     const apiKey = this.getApiKey();
     if (!apiKey) {
-      throw new Error('Clé API OpenAI non configurée');
+      throw new Error('Clé API Gemini non configurée');
     }
 
     try {
@@ -219,7 +219,7 @@ Répondez au format JSON strictement:
       });
 
       if (!response.ok) {
-        throw new Error(`Erreur OpenAI: ${response.status}`);
+        throw new Error(`Erreur Gemini: ${response.status}`);
       }
 
       const data: OpenAIResponse = await response.json();
@@ -234,7 +234,7 @@ Répondez au format JSON strictement:
         return this.fallbackAnalysis(content, url);
       }
     } catch (error) {
-      console.error('Erreur OpenAI:', error);
+      console.error('Erreur Gemini:', error);
       return this.fallbackAnalysis(content, url);
     }
   }

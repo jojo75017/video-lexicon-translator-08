@@ -340,20 +340,20 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
             setShowConfig(true);
             setIsGenerating(false);
             
-            // Vérifier si une clé OpenAI est configurée
+            // Vérifier si une clé Gemini est configurée
             if (hasValidApiKey()) {
-              toast.info("Repli automatique vers OpenAI", {
-                description: "Lovable AI épuisé, relance avec votre clé OpenAI...",
+              toast.info("Repli automatique vers Gemini", {
+                description: "Lovable AI épuisé, relance avec votre clé Gemini...",
                 duration: 3000
               });
               
-              // Relancer automatiquement avec OpenAI
+              // Relancer automatiquement avec Gemini
               await delay(1500);
               await generateAllChapterImages();
               return;
             } else {
               toast.error("💳 Crédits Lovable AI épuisés", {
-                description: "Options : 1️⃣ Ajoutez des crédits à votre workspace Lovable, ou 2️⃣ Configurez votre clé OpenAI ci-dessous pour continuer",
+                description: "Options : 1️⃣ Ajoutez des crédits à votre workspace Lovable, ou 2️⃣ Configurez votre clé Gemini ci-dessous pour continuer",
                 duration: 8000,
                 action: {
                   label: 'En savoir plus',
@@ -399,7 +399,7 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
     
     // Toast uniquement en cas d'échec total
     if (newImages.length === 0) {
-      toast.error('Aucune image générée. Vérifiez vos crédits ou votre clé OpenAI.');
+      toast.error('Aucune image générée. Vérifiez vos crédits ou votre clé Gemini.');
     }
   };
 
@@ -501,20 +501,20 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
         setShowConfig(true);
         setIsGenerating(false);
         
-        // Vérifier si une clé OpenAI est configurée
+        // Vérifier si une clé Gemini est configurée
         if (hasValidApiKey()) {
-          toast.info("Repli automatique vers OpenAI", {
-            description: "Lovable AI épuisé, relance avec votre clé OpenAI...",
+          toast.info("Repli automatique vers Gemini", {
+            description: "Lovable AI épuisé, relance avec votre clé Gemini...",
             duration: 3000
           });
           
-          // Relancer automatiquement avec OpenAI
+          // Relancer automatiquement avec Gemini
           await new Promise(resolve => setTimeout(resolve, 1500));
           await generateSingleChapterImage(chapter);
           return;
         } else {
           toast.error("Crédits Lovable AI épuisés", {
-            description: "Configurez votre clé OpenAI ci-dessous pour continuer",
+            description: "Configurez votre clé Gemini ci-dessous pour continuer",
             duration: 6000
           });
           return;
@@ -707,7 +707,7 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
           </CardTitle>
           <CardDescription style={{ color: 'hsl(var(--royal-purple) / 0.8)' }}>
             {hasValidApiKey() 
-              ? "Utilise votre clé OpenAI personnelle pour générer des images" 
+              ? "Utilise votre clé Gemini personnelle pour générer des images" 
               : "Créez des illustrations avec Lovable AI (crédits requis)"}
           </CardDescription>
         </CardHeader>
@@ -716,13 +716,13 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
             <CollapsibleTrigger asChild>
               <Button variant="outline" className="w-full">
                 <Settings className="h-4 w-4 mr-2" />
-                {hasValidApiKey() ? '✓ Clé OpenAI configurée' : 'Configurer clé OpenAI (optionnel)'}
+                {hasValidApiKey() ? '✓ Clé Gemini configurée' : 'Configurer clé Gemini (optionnel)'}
               </Button>
             </CollapsibleTrigger>
             <CollapsibleContent className="mt-4">
               <OpenAIConfigPanel 
-                title="Configuration OpenAI pour Images"
-                description="Utilisez votre propre clé API OpenAI pour générer des images sans limite de crédits Lovable"
+                title="Configuration Gemini pour Images"
+                description="Utilisez votre propre clé API Gemini pour générer des images sans limite de crédits Lovable"
                 showModelSelection={false}
                 compact
               />
