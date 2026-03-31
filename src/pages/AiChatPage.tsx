@@ -54,15 +54,15 @@ const AiChatPage: React.FC = () => {
       return;
     }
     
-    if (!tempApiKey.startsWith('sk-')) {
-      toast.error('La clé API doit commencer par "sk-"');
+    if (!tempApiKey.startsWith('AIza')) {
+      toast.error('La clé API Gemini doit commencer par "AIza"');
       return;
     }
 
-    localStorage.setItem('user_openai_key', tempApiKey);
+    localStorage.setItem('openai_api_key', tempApiKey);
     setApiKey(tempApiKey);
     setShowSettings(false);
-    toast.success('Clé API OpenAI enregistrée avec succès');
+    toast.success('Clé API Gemini enregistrée avec succès');
   };
 
   const handleSend = async () => {
