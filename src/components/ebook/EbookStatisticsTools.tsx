@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { Chapter } from '@/hooks/useSubscriptionGeneration';
 import EbookNarrativeChecker from './EbookNarrativeChecker';
+import { callGemini } from '@/services/geminiService';
 
 interface Character {
   id: string;
