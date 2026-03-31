@@ -232,10 +232,10 @@ export const EbookStatisticsTools: React.FC<EbookStatisticsToolsProps> = ({
     }
   };
 
-  // Text-to-Speech avec OpenAI
+  // Text-to-Speech via la fonction Edge azure-speech-tts
   const handleGenerateAudio = async () => {
     if (!apiKey) {
-      toast.error('Clé API OpenAI requise pour l\'audio');
+      toast.error('Clé API Gemini requise pour l\'audio');
       return;
     }
 
@@ -256,7 +256,7 @@ export const EbookStatisticsTools: React.FC<EbookStatisticsToolsProps> = ({
       return;
     }
 
-    // Limiter à 4096 caractères pour l'API OpenAI TTS
+    // Limiter à 4096 caractères
     if (textToSpeak.length > 4096) {
       textToSpeak = textToSpeak.substring(0, 4096);
       toast.info('Texte tronqué (limite API)');
@@ -265,37 +265,31 @@ export const EbookStatisticsTools: React.FC<EbookStatisticsToolsProps> = ({
     setIsGeneratingAudio(true);
 
     try {
-      const response = await fetch('https://api.openai.com/v1/audio/speech', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'tts-1',
-          input: textToSpeak,
-          voice: 'nova', // Voix française naturelle
-          response_format: 'mp3',
-        }),
+      const { data, error } = await supabase.functions.invoke('azure-speech-tts', {
+        body: { text: textToSpeak, voice: 'fr-FR-DeniseNeural' },
       });
 
-      if (!response.ok) {
-        throw new Error('Erreur génération audio');
+      if (error) throw error;
+
+      // The edge function returns base64 audio
+      if (data?.audioContent) {
+        const audioBytes = Uint8Array.from(atob(data.audioContent), c => c.charCodeAt(0));
+        const audioBlob = new Blob([audioBytes], { type: 'audio/mp3' });
+        const audioUrl = URL.createObjectURL(audioBlob);
+        const audio = new Audio(audioUrl);
+        
+        audio.onended = () => {
+          setIsPlayingAudio(false);
+          URL.revokeObjectURL(audioUrl);
+        };
+
+        setCurrentAudio(audio);
+        audio.play();
+        setIsPlayingAudio(true);
+        toast.success('Audio généré !');
+      } else {
+        throw new Error('Pas de contenu audio retourné');
       }
-
-      const audioBlob = await response.blob();
-      const audioUrl = URL.createObjectURL(audioBlob);
-      const audio = new Audio(audioUrl);
-      
-      audio.onended = () => {
-        setIsPlayingAudio(false);
-        URL.revokeObjectURL(audioUrl);
-      };
-
-      setCurrentAudio(audio);
-      audio.play();
-      setIsPlayingAudio(true);
-      toast.success('Audio généré !');
     } catch (error) {
       console.error('TTS error:', error);
       toast.error('Erreur lors de la génération audio');
