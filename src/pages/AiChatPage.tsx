@@ -178,11 +178,11 @@ Donne des conseils pratiques et des exemples concrets.`,
             <CardContent className="space-y-4">
               <div>
                 <label className="text-sm font-medium mb-2 block">
-                  Clé API OpenAI (commençant par sk-)
+                  Clé API Gemini (commençant par AIza)
                 </label>
                 <Input
                   type="password"
-                  placeholder="sk-..."
+                  placeholder="AIza..."
                   value={tempApiKey}
                   onChange={(e) => setTempApiKey(e.target.value)}
                   className="mb-2"
@@ -190,7 +190,7 @@ Donne des conseils pratiques et des exemples concrets.`,
                 <p className="text-xs text-muted-foreground">
                   Votre clé est stockée localement et n'est jamais partagée. 
                   <a 
-                    href="https://platform.openai.com/api-keys" 
+                    href="https://aistudio.google.com/apikey" 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="text-primary hover:underline ml-1"

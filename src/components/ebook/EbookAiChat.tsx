@@ -324,11 +324,11 @@ Donne des conseils pratiques et des exemples concrets.`,
             )}
             <div>
               <label className="text-sm font-medium mb-2 block">
-                Clé API OpenAI (commençant par sk-)
+                Clé API Gemini (commençant par AIza)
               </label>
               <Input
                 type="password"
-                placeholder="sk-..."
+                placeholder="AIza..."
                 value={tempApiKey}
                 onChange={(e) => setTempApiKey(e.target.value)}
                 className="mb-2"
