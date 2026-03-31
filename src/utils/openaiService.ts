@@ -219,7 +219,7 @@ Répondez au format JSON strictement:
       });
 
       if (!response.ok) {
-        throw new Error(`Erreur OpenAI: ${response.status}`);
+        throw new Error(`Erreur Gemini: ${response.status}`);
       }
 
       const data: OpenAIResponse = await response.json();
@@ -234,7 +234,7 @@ Répondez au format JSON strictement:
         return this.fallbackAnalysis(content, url);
       }
     } catch (error) {
-      console.error('Erreur OpenAI:', error);
+      console.error('Erreur Gemini:', error);
       return this.fallbackAnalysis(content, url);
     }
   }
