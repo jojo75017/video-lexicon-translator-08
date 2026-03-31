@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 import { OpenAIConfigPanel } from '@/components/shared/OpenAIConfigPanel';
+import { callGemini } from '@/services/geminiService';
 
 const PromptsGeneratorPage: React.FC = () => {
   const navigate = useNavigate();
