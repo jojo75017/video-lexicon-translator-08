@@ -509,7 +509,7 @@ export const EbookStatisticsTools: React.FC<EbookStatisticsToolsProps> = ({
           </div>
 
           <p className="text-xs text-muted-foreground">
-            ⚠️ L'audio est limité à ~4000 caractères par génération (limite API OpenAI).
+            ⚠️ L'audio est limité à ~4000 caractères par génération.
           </p>
         </CardContent>
       </Card>
