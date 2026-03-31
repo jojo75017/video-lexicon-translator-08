@@ -109,6 +109,19 @@ export function cleanGeneratedText(text: string): string {
     .replace(/^\s*(?:---+|\*\*\*+|===+|___+)\s*$/gm, '')
     .replace(/^(?:résumé|summary|synopsis|abstract)\s*[:]\s*/gim, '')
     .replace(/^\s*[-*=_]{1,2}\s*$/gm, '')
+    // ========== NETTOYAGE DES EMOJIS TEXTUELS ==========
+    .replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{FE00}-\u{FE0F}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{200D}\u{20E3}\u{E0020}-\u{E007F}]/gu, '')
+    // ========== NETTOYAGE DES URLS ORPHELINES ==========
+    .replace(/https?:\/\/[^\s)>\]]+/g, '')
+    // ========== NETTOYAGE DES RÉPÉTITIONS IA (bégaiement) ==========
+    // Mots identiques répétés 3+ fois consécutivement
+    .replace(/\b(\w{3,})\s+(?:\1\s+){2,}\1\b/gi, '$1')
+    // Même mot répété 2 fois consécutivement (sauf mots courts courants)
+    .replace(/\b((?!que|qui|très|plus|dans|avec|pour|mais|tout|elle|nous|vous|leur|bien|même|être|faire|aller|voir|dire|dont)\w{4,})\s+\1\b/gi, '$1')
+    // ========== NETTOYAGE PHRASES IA RÉCURRENTES ==========
+    .replace(/\b(?:n'hésitez\s+pas\s+à|feel\s+free\s+to)\b[^.\n]*/gi, '')
+    .replace(/\b(?:en\s+conclusion|pour\s+conclure|en\s+résumé|pour\s+résumer)\s*,?\s*(?:nous\s+avons\s+vu|il\s+est\s+(?:important|essentiel|crucial)\s+de\s+(?:noter|souligner|rappeler))\b[^.\n]*/gi, '')
+    .replace(/\b(?:il\s+est\s+(?:important|essentiel|crucial|fondamental)\s+de\s+(?:noter|souligner|comprendre|rappeler)\s+que)\b/gi, '')
     .replace(/  +/g, ' ')
     .replace(/ ([.,;:!?])/g, '$1');
   
