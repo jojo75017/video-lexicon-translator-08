@@ -571,19 +571,19 @@ const SalesPage = () => {
                   <span>Accès instantané</span>
                 </p>
 
-                {/* Paiement fractionné */}
+                {/* Trial details */}
                 <div className="mt-8 pt-6 border-t border-slate-800">
-                  <p className="text-center text-white/60 text-sm mb-4">Ou payez en plusieurs fois</p>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-3 gap-4 text-center">
                     {[
-                      { label: "En 2 fois", price: "35€/mois" },
-                      { label: "En 3 fois", price: "25€/mois" },
-                    ].map((opt, i) => (
-                      <button key={i} onClick={handlePlanClick}
-                        className="p-4 rounded-xl border border-slate-800 hover:border-cyan-500/50 transition-colors text-center group">
-                        <p className="font-bold text-white group-hover:text-cyan-400 transition-colors">{opt.label}</p>
-                        <p className="text-sm text-white/60">{opt.price}</p>
-                      </button>
+                      { label: "Jour 1–7", desc: "Accès complet gratuit", icon: "🎉" },
+                      { label: "Jour 5", desc: "Rappel par email", icon: "📧" },
+                      { label: "Jour 8", desc: `${LAUNCH_PRICE}€ si vous gardez`, icon: "💎" },
+                    ].map((step, i) => (
+                      <div key={i} className="p-3 rounded-xl bg-slate-800/50">
+                        <p className="text-lg mb-1">{step.icon}</p>
+                        <p className="font-bold text-white text-sm">{step.label}</p>
+                        <p className="text-xs text-white/60">{step.desc}</p>
+                      </div>
                     ))}
                   </div>
                 </div>
