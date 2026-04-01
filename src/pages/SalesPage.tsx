@@ -525,11 +525,10 @@ const SalesPage = () => {
                 {/* Price */}
                 <div className="text-center mb-10">
                   <div className="flex items-baseline justify-center gap-3 mb-2">
-                    <span className="text-2xl text-white/50 line-through">{NORMAL_PRICE}€</span>
-                    <span className="text-7xl md:text-8xl font-black text-white">{LAUNCH_PRICE}</span>
-                    <span className="text-3xl font-bold text-white/70">€</span>
+                    <span className="text-7xl md:text-8xl font-black text-white">0€</span>
                   </div>
-                  <p className="text-white/60">Paiement unique • Accès à vie</p>
+                  <p className="text-white/80 text-lg">pendant <span className="text-cyan-400 font-bold">7 jours</span></p>
+                  <p className="text-white/50 mt-2">Puis <span className="line-through">{NORMAL_PRICE}€</span> <span className="text-cyan-400 font-bold">{LAUNCH_PRICE}€</span> paiement unique — Accès à vie</p>
                 </div>
 
                 {/* Features */}
