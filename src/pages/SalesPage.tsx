@@ -504,16 +504,16 @@ const SalesPage = () => {
         <div className="max-w-3xl mx-auto relative z-10">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-10">
             <motion.div variants={fadeIn}>
-              <Badge className="bg-amber-500/10 text-amber-400 border-amber-500/30 px-5 py-2 font-semibold mb-5">
+              <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/30 px-5 py-2 font-semibold mb-5">
                 <Gift className="w-4 h-4 mr-2" />
-                OFFRE DE LANCEMENT — Économisez 150€
+                ESSAI GRATUIT 7 JOURS — Puis {LAUNCH_PRICE}€ à vie
               </Badge>
             </motion.div>
             <motion.h2 variants={fadeIn} custom={1} className="text-4xl sm:text-5xl md:text-6xl font-black mb-4">
-              Accès Pro Lifetime
+              Essayez <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-emerald-400">gratuitement</span> pendant 7 jours
             </motion.h2>
             <motion.p variants={fadeIn} custom={2} className="text-white/80 text-lg">
-              Un paiement unique. Accès à vie. Sans abonnement.
+              Accès complet à toutes les fonctionnalités Pro. Si ça ne vous plaît pas, annulez avant 7 jours — <strong className="text-white">0€ facturé</strong>.
             </motion.p>
           </motion.div>
 
