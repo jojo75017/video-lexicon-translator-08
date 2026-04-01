@@ -63,23 +63,22 @@ serve(async (req) => {
       });
     }
 
-    // Determine plan type and expiration
-    let planType = "starter";
+    // Determine plan type and trial status
+    let planType = "pro";
     let expiresAt: string | null = null;
+    let trialEndsAt: string | null = null;
+    let subscriberStatus = "active";
 
-    if (planId === "pro") {
-      planType = "pro";
-      const expDate = new Date();
-      expDate.setMonth(expDate.getMonth() + 1);
-      expiresAt = expDate.toISOString();
-    } else if (planId === "lifetime") {
-      planType = "lifetime";
-      expiresAt = null;
-    } else {
-      planType = "starter";
-      const expDate = new Date();
-      expDate.setMonth(expDate.getMonth() + 1);
-      expiresAt = expDate.toISOString();
+    // Check if this is a subscription with trial
+    if (session.mode === "subscription") {
+      const subscriptionId = (session as any).subscription as string;
+      if (subscriptionId) {
+        const sub = await stripe.subscriptions.retrieve(subscriptionId);
+        if (sub.trial_end) {
+          trialEndsAt = new Date(sub.trial_end * 1000).toISOString();
+          subscriberStatus = "trialing";
+        }
+      }
     }
 
     // Fetch existing subscriber (if any)
