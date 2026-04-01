@@ -36,13 +36,12 @@ serve(async (req) => {
 
     const session = await stripe.checkout.sessions.retrieve(sessionId);
 
-    // Validate paid session: we require BOTH paid + complete
+    // For subscription with trial, payment_status can be "no_payment_required" 
     const paymentStatus = (session as any).payment_status;
     const status = (session as any).status;
+    const isTrialSession = session.mode === "subscription" && paymentStatus === "no_payment_required";
 
-    // NOTE: previous logic used "&&" which could incorrectly accept sessions that are
-    // marked complete but not actually paid.
-    if (paymentStatus !== "paid" || status !== "complete") {
+    if (status !== "complete" || (paymentStatus !== "paid" && !isTrialSession)) {
       return new Response(
         JSON.stringify({
           ok: false,

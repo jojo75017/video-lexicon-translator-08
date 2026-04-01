@@ -78,30 +78,29 @@ serve(async (req) => {
         const email = session.metadata?.email || session.customer_details?.email;
         const planId = session.metadata?.planId;
 
-        console.log("Checkout completed for:", email, "plan:", planId);
+        console.log("Checkout completed for:", email, "plan:", planId, "mode:", session.mode);
 
         if (email) {
-          // Generate access code with correct format EBK-XXXXXX
           const randomPart = Math.random().toString(36).substring(2, 8).toUpperCase();
           const accessCode = `EBK-${randomPart}`;
           
-          // Determine plan type and expiration
-          let planType = "starter";
-          let expiresAt: string | null = null;
+          // For subscription mode with trial
+          const isSubscription = session.mode === "subscription";
+          const subscriptionId = (session as any).subscription as string | null;
+          const customerId = session.customer as string | null;
+          
+          let planType = "pro";
+          let trialEndsAt: string | null = null;
+          let status = "active";
 
-          if (planId === "pro") {
-            planType = "pro";
-            const expDate = new Date();
-            expDate.setMonth(expDate.getMonth() + 1);
-            expiresAt = expDate.toISOString();
-          } else if (planId === "lifetime") {
-            planType = "lifetime";
-            expiresAt = null; // Never expires
-          } else {
-            planType = "starter";
-            const expDate = new Date();
-            expDate.setMonth(expDate.getMonth() + 1);
-            expiresAt = expDate.toISOString();
+          if (isSubscription && subscriptionId) {
+            // Retrieve subscription to get trial info
+            const sub = await stripe.subscriptions.retrieve(subscriptionId);
+            if (sub.trial_end) {
+              trialEndsAt = new Date(sub.trial_end * 1000).toISOString();
+              status = "trialing";
+              console.log("Trial ends at:", trialEndsAt);
+            }
           }
 
           // Check if subscriber exists
@@ -111,45 +110,37 @@ serve(async (req) => {
             .eq("email", email)
             .single();
 
+          const subscriberData: any = {
+            plan_type: planType,
+            status,
+            trial_ends_at: trialEndsAt,
+            stripe_customer_id: customerId,
+            stripe_subscription_id: subscriptionId,
+            updated_at: new Date().toISOString(),
+          };
+
           if (existingSubscriber) {
-            // Update existing subscriber
             const { error: updateError } = await supabase
               .from("subscribers")
-              .update({
-                plan_type: planType,
-                status: "active",
-                expires_at: expiresAt,
-                updated_at: new Date().toISOString(),
-              })
+              .update(subscriberData)
               .eq("email", email);
             
-            if (updateError) {
-              console.error("Error updating subscriber:", updateError);
-            } else {
-              console.log("Updated existing subscriber:", email);
-            }
+            if (updateError) console.error("Error updating subscriber:", updateError);
+            else console.log("Updated existing subscriber:", email);
 
-            // Send reminder email with existing access code
             await sendEmail(email, existingSubscriber.access_code, planType, true);
           } else {
-            // Create new subscriber
             const { error: insertError } = await supabase
               .from("subscribers")
               .insert({
                 email,
                 access_code: accessCode,
-                plan_type: planType,
-                status: "active",
-                expires_at: expiresAt,
+                ...subscriberData,
               });
             
-            if (insertError) {
-              console.error("Error creating subscriber:", insertError);
-            } else {
-              console.log("Created new subscriber:", email, "with code:", accessCode);
-            }
+            if (insertError) console.error("Error creating subscriber:", insertError);
+            else console.log("Created new subscriber:", email, "with code:", accessCode);
 
-            // Send welcome email with access code
             await sendEmail(email, accessCode, planType, false);
           }
         } else {
@@ -165,7 +156,6 @@ serve(async (req) => {
 
         console.log("Processing subscription event for customer:", customerId);
 
-        // Get customer email
         const customer = await stripe.customers.retrieve(customerId);
         if (customer.deleted) {
           console.log("Customer was deleted");
@@ -178,12 +168,17 @@ serve(async (req) => {
           break;
         }
 
-        const status = subscription.status === "active" ? "active" : "inactive";
+        // Map Stripe status to our status
+        let dbStatus = "inactive";
+        if (subscription.status === "active") dbStatus = "active";
+        else if (subscription.status === "trialing") dbStatus = "trialing";
+        else if (subscription.status === "canceled" || subscription.status === "unpaid") dbStatus = "inactive";
 
         const { error: updateError } = await supabase
           .from("subscribers")
           .update({
-            status,
+            status: dbStatus,
+            stripe_subscription_id: subscription.id,
             updated_at: new Date().toISOString(),
           })
           .eq("email", email);
@@ -191,7 +186,50 @@ serve(async (req) => {
         if (updateError) {
           console.error("Error updating subscription status:", updateError);
         } else {
-          console.log("Updated subscription status for:", email, "to:", status);
+          console.log("Updated subscription status for:", email, "to:", dbStatus);
+        }
+        break;
+      }
+
+      case "invoice.payment_succeeded": {
+        // Trial ended, first real payment succeeded
+        const invoice = event.data.object as Stripe.Invoice;
+        const customerId = invoice.customer as string;
+        
+        const customer = await stripe.customers.retrieve(customerId);
+        if (customer.deleted) break;
+        
+        const email = (customer as Stripe.Customer).email;
+        if (!email) break;
+
+        console.log("Payment succeeded for:", email, "billing_reason:", (invoice as any).billing_reason);
+
+        // After trial ends and payment succeeds, mark as fully active with no expiry (lifetime access)
+        if ((invoice as any).billing_reason === "subscription_cycle" || (invoice as any).billing_reason === "subscription_create") {
+          const { error } = await supabase
+            .from("subscribers")
+            .update({
+              status: "active",
+              plan_type: "lifetime",
+              expires_at: null, // Lifetime
+              trial_ends_at: null, // Trial is over
+              updated_at: new Date().toISOString(),
+            })
+            .eq("email", email);
+
+          if (error) console.error("Error upgrading to lifetime:", error);
+          else console.log("Upgraded to lifetime for:", email);
+
+          // Cancel the subscription after first payment (it's a lifetime product)
+          const subscriptionId = invoice.subscription as string;
+          if (subscriptionId) {
+            try {
+              await stripe.subscriptions.cancel(subscriptionId);
+              console.log("Cancelled recurring subscription after first payment:", subscriptionId);
+            } catch (cancelErr) {
+              console.error("Error cancelling subscription:", cancelErr);
+            }
+          }
         }
         break;
       }
