@@ -1075,7 +1075,10 @@ export type Database = {
           plan_tier: string
           plan_type: string
           status: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
           subchapters_generated: number
+          trial_ends_at: string | null
           updated_at: string
         }
         Insert: {
@@ -1090,7 +1093,10 @@ export type Database = {
           plan_tier?: string
           plan_type?: string
           status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
           subchapters_generated?: number
+          trial_ends_at?: string | null
           updated_at?: string
         }
         Update: {
@@ -1105,7 +1111,10 @@ export type Database = {
           plan_tier?: string
           plan_type?: string
           status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
           subchapters_generated?: number
+          trial_ends_at?: string | null
           updated_at?: string
         }
         Relationships: []
