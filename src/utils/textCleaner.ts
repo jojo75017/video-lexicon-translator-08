@@ -86,6 +86,21 @@ export function cleanGeneratedText(text: string): string {
     .replace(/^[\[{,\s]+"?(numero|titre|title|content|chapters|subChapters|contenu)"?\s*:\s*/gim, '')
     .replace(/^"{3,}/gm, '"')
     .replace(/"{3,}$/gm, '"')
+    // ========== NETTOYAGE DES MÉTADONNÉES JSON RÉSIDUELLES ==========
+    // Supprimer les fragments JSON de métadonnées en fin de texte (nombreMots, qualityScore, wordCount, etc.)
+    .replace(/,?\s*"(?:nombreMots|nombre_mots|wordCount|word_count|qualityScore|quality_score|scoreGlobal|score_global|scoreReelEstime|nombrePagesEstime|nombreMotsEstime|nombreMotsPrevu|contenuComplet|raw|_qualityScore|_attempts)"\s*:\s*(?:"[^"]*"|\d+|true|false|null)\s*/gi, '')
+    // Supprimer les accolades/crochets JSON orphelins en fin de texte
+    .replace(/[,\s]*[}\]]\s*$/g, (match, offset, str) => {
+      // Ne supprimer que si c'est probablement un résidu JSON (pas de { ou [ correspondant proche)
+      const lastOpen = Math.max(str.lastIndexOf('{', offset - 1), str.lastIndexOf('[', offset - 1));
+      const textBetween = str.substring(lastOpen, offset);
+      if (lastOpen >= 0 && textBetween.includes('"') && textBetween.includes(':')) return '';
+      // Aussi supprimer si c'est juste } ou ] tout seul en fin
+      if (/^\s*[}\]]\s*$/.test(match.trim())) return '';
+      return match;
+    })
+    // Supprimer les blocs JSON complets de métadonnées en fin de texte
+    .replace(/[.,]?\s*"(?:nombreMots|wordCount|qualityScore|score\w+)"\s*:\s*\d+\s*(?:,\s*"(?:\w+)"\s*:\s*(?:\d+|"[^"]*")\s*)*[}\]]*\s*`*\s*$/gi, '')
     // ========== NETTOYAGE DES MÉTADONNÉES / ARTEFACTS DE STATS ==========
     .replace(/\b(?:nombre\s+de\s+mots|word\s*count|mots?\s*:?\s*total)\s*[:=]\s*\d[\d\s.,]*/gi, '')
     .replace(/export\s+epub\s*(?:natif|native)?[^.\n]*/gi, '')
