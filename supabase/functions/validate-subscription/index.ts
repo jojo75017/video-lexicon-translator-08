@@ -72,7 +72,7 @@ serve(async (req) => {
       );
     }
 
-    if (subscriber.status !== 'active') {
+    if (subscriber.status !== 'active' && subscriber.status !== 'trialing') {
       return new Response(
         JSON.stringify({ valid: false, message: 'Abonnement inactif' }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

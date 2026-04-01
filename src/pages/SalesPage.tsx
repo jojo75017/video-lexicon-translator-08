@@ -504,16 +504,16 @@ const SalesPage = () => {
         <div className="max-w-3xl mx-auto relative z-10">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-10">
             <motion.div variants={fadeIn}>
-              <Badge className="bg-amber-500/10 text-amber-400 border-amber-500/30 px-5 py-2 font-semibold mb-5">
+              <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/30 px-5 py-2 font-semibold mb-5">
                 <Gift className="w-4 h-4 mr-2" />
-                OFFRE DE LANCEMENT — Économisez 150€
+                ESSAI GRATUIT 7 JOURS — Puis {LAUNCH_PRICE}€ à vie
               </Badge>
             </motion.div>
             <motion.h2 variants={fadeIn} custom={1} className="text-4xl sm:text-5xl md:text-6xl font-black mb-4">
-              Accès Pro Lifetime
+              Essayez <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-emerald-400">gratuitement</span> pendant 7 jours
             </motion.h2>
             <motion.p variants={fadeIn} custom={2} className="text-white/80 text-lg">
-              Un paiement unique. Accès à vie. Sans abonnement.
+              Accès complet à toutes les fonctionnalités Pro. Si ça ne vous plaît pas, annulez avant 7 jours — <strong className="text-white">0€ facturé</strong>.
             </motion.p>
           </motion.div>
 
@@ -525,11 +525,10 @@ const SalesPage = () => {
                 {/* Price */}
                 <div className="text-center mb-10">
                   <div className="flex items-baseline justify-center gap-3 mb-2">
-                    <span className="text-2xl text-white/50 line-through">{NORMAL_PRICE}€</span>
-                    <span className="text-7xl md:text-8xl font-black text-white">{LAUNCH_PRICE}</span>
-                    <span className="text-3xl font-bold text-white/70">€</span>
+                    <span className="text-7xl md:text-8xl font-black text-white">0€</span>
                   </div>
-                  <p className="text-white/60">Paiement unique • Accès à vie</p>
+                  <p className="text-white/80 text-lg">pendant <span className="text-cyan-400 font-bold">7 jours</span></p>
+                  <p className="text-white/50 mt-2">Puis <span className="line-through">{NORMAL_PRICE}€</span> <span className="text-cyan-400 font-bold">{LAUNCH_PRICE}€</span> paiement unique — Accès à vie</p>
                 </div>
 
                 {/* Features */}
@@ -561,28 +560,30 @@ const SalesPage = () => {
                 <Button size="lg" onClick={handlePlanClick}
                   className="w-full py-8 text-xl font-bold bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-900 rounded-2xl shadow-xl shadow-cyan-500/20">
                   <Rocket className="w-6 h-6 mr-2" />
-                  Oui, je veux publier mon ebook — {LAUNCH_PRICE}€
+                  Commencer mon essai gratuit de 7 jours
                   <ArrowRight className="w-6 h-6 ml-2" />
                 </Button>
                 <p className="text-center text-white/50 text-xs mt-3 flex items-center justify-center gap-3">
-                  <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5 text-emerald-400" />12 personnes ont rejoint aujourd'hui</span>
+                  <span className="flex items-center gap-1"><ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />Aucune facturation pendant 7 jours</span>
+                  <span>•</span>
+                  <span>Annulation en 1 clic</span>
                   <span>•</span>
                   <span>Accès instantané</span>
                 </p>
 
-                {/* Paiement fractionné */}
+                {/* Trial details */}
                 <div className="mt-8 pt-6 border-t border-slate-800">
-                  <p className="text-center text-white/60 text-sm mb-4">Ou payez en plusieurs fois</p>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-3 gap-4 text-center">
                     {[
-                      { label: "En 2 fois", price: "35€/mois" },
-                      { label: "En 3 fois", price: "25€/mois" },
-                    ].map((opt, i) => (
-                      <button key={i} onClick={handlePlanClick}
-                        className="p-4 rounded-xl border border-slate-800 hover:border-cyan-500/50 transition-colors text-center group">
-                        <p className="font-bold text-white group-hover:text-cyan-400 transition-colors">{opt.label}</p>
-                        <p className="text-sm text-white/60">{opt.price}</p>
-                      </button>
+                      { label: "Jour 1–7", desc: "Accès complet gratuit", icon: "🎉" },
+                      { label: "Jour 5", desc: "Rappel par email", icon: "📧" },
+                      { label: "Jour 8", desc: `${LAUNCH_PRICE}€ si vous gardez`, icon: "💎" },
+                    ].map((step, i) => (
+                      <div key={i} className="p-3 rounded-xl bg-slate-800/50">
+                        <p className="text-lg mb-1">{step.icon}</p>
+                        <p className="font-bold text-white text-sm">{step.label}</p>
+                        <p className="text-xs text-white/60">{step.desc}</p>
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -651,10 +652,10 @@ const SalesPage = () => {
             <Button size="lg" onClick={handlePlanClick}
               className="text-lg px-12 py-8 bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-900 font-bold rounded-2xl shadow-2xl shadow-cyan-500/25 hover:shadow-cyan-500/40 transition-all duration-300 hover:-translate-y-1">
               <Rocket className="w-6 h-6 mr-2" />
-              Oui, je publie ce soir — {LAUNCH_PRICE}€
+              Essai gratuit 7 jours — puis {LAUNCH_PRICE}€ à vie
               <ArrowRight className="w-6 h-6 ml-2" />
             </Button>
-            <p className="text-white/60 text-sm mt-5">Paiement unique • Accès à vie • Garantie 30 jours</p>
+            <p className="text-white/60 text-sm mt-5">0€ pendant 7 jours • Annulation en 1 clic • Garantie 30 jours</p>
             <p className="text-white/40 text-xs mt-2 flex items-center justify-center gap-1">
               <Users className="w-3.5 h-3.5 text-emerald-400" />
               Rejoignez +47 auteurs qui publient déjà avec EbookStudio

@@ -36,13 +36,12 @@ serve(async (req) => {
 
     const session = await stripe.checkout.sessions.retrieve(sessionId);
 
-    // Validate paid session: we require BOTH paid + complete
+    // For subscription with trial, payment_status can be "no_payment_required" 
     const paymentStatus = (session as any).payment_status;
     const status = (session as any).status;
+    const isTrialSession = session.mode === "subscription" && paymentStatus === "no_payment_required";
 
-    // NOTE: previous logic used "&&" which could incorrectly accept sessions that are
-    // marked complete but not actually paid.
-    if (paymentStatus !== "paid" || status !== "complete") {
+    if (status !== "complete" || (paymentStatus !== "paid" && !isTrialSession)) {
       return new Response(
         JSON.stringify({
           ok: false,
@@ -64,23 +63,22 @@ serve(async (req) => {
       });
     }
 
-    // Determine plan type and expiration
-    let planType = "starter";
+    // Determine plan type and trial status
+    let planType = "pro";
     let expiresAt: string | null = null;
+    let trialEndsAt: string | null = null;
+    let subscriberStatus = "active";
 
-    if (planId === "pro") {
-      planType = "pro";
-      const expDate = new Date();
-      expDate.setMonth(expDate.getMonth() + 1);
-      expiresAt = expDate.toISOString();
-    } else if (planId === "lifetime") {
-      planType = "lifetime";
-      expiresAt = null;
-    } else {
-      planType = "starter";
-      const expDate = new Date();
-      expDate.setMonth(expDate.getMonth() + 1);
-      expiresAt = expDate.toISOString();
+    // Check if this is a subscription with trial
+    if (session.mode === "subscription") {
+      const subscriptionId = (session as any).subscription as string;
+      if (subscriptionId) {
+        const sub = await stripe.subscriptions.retrieve(subscriptionId);
+        if (sub.trial_end) {
+          trialEndsAt = new Date(sub.trial_end * 1000).toISOString();
+          subscriberStatus = "trialing";
+        }
+      }
     }
 
     // Fetch existing subscriber (if any)
@@ -102,8 +100,11 @@ serve(async (req) => {
         .from("subscribers")
         .update({
           plan_type: planType,
-          status: "active",
+          status: subscriberStatus,
           expires_at: expiresAt,
+          trial_ends_at: trialEndsAt,
+          stripe_customer_id: session.customer as string,
+          stripe_subscription_id: (session as any).subscription as string,
           updated_at: new Date().toISOString(),
         })
         .eq("email", email);
@@ -112,13 +113,12 @@ serve(async (req) => {
         console.error("Error updating subscriber:", updateError);
       }
 
-      // Best effort email (do not fail the flow)
       await sendEmail(email, accessCode, planType, true).catch((e) => {
         console.error("Email send failed (renewal):", e);
       });
 
       return new Response(
-        JSON.stringify({ ok: true, email, accessCode, subscriber: { ...existingSubscriber, plan_type: planType, status: "active", expires_at: expiresAt } }),
+        JSON.stringify({ ok: true, email, accessCode, trialEndsAt, subscriber: { ...existingSubscriber, plan_type: planType, status: subscriberStatus, trial_ends_at: trialEndsAt } }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -127,8 +127,11 @@ serve(async (req) => {
       email,
       access_code: accessCode,
       plan_type: planType,
-      status: "active",
+      status: subscriberStatus,
       expires_at: expiresAt,
+      trial_ends_at: trialEndsAt,
+      stripe_customer_id: session.customer as string,
+      stripe_subscription_id: (session as any).subscription as string,
     });
 
     if (insertError) {
@@ -140,7 +143,7 @@ serve(async (req) => {
     });
 
     return new Response(
-      JSON.stringify({ ok: true, email, accessCode, subscriber: { email, access_code: accessCode, plan_type: planType, status: "active", expires_at: expiresAt } }),
+      JSON.stringify({ ok: true, email, accessCode, trialEndsAt, subscriber: { email, access_code: accessCode, plan_type: planType, status: subscriberStatus, trial_ends_at: trialEndsAt } }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error: any) {

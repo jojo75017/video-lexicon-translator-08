@@ -6,83 +6,6 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Plan configurations - Pro 67€ (launch), future 147€ (1er juillet)
-const PLANS = {
-  pro: {
-    name: "EbookStudio Pro Lifetime",
-    price: 6700, // 67€
-    type: "one_time" as const,
-    features: ["Workflow 15 rôles IA", "Gemini 2.5 Pro", "Imagen 3", "Azure Neural Voices", "Export PDF/EPUB/Word", "18 modules formation", "Outils KDP Premium", "Traduction multi-langues", "Audiobooks", "Mises à jour à vie", "Support prioritaire"],
-  },
-  // Keep lifetime as alias for pro (backwards compatibility)
-  lifetime: {
-    name: "EbookStudio Pro Lifetime",
-    price: 6700, // 67€
-    type: "one_time" as const,
-    features: ["Workflow 15 rôles IA", "Gemini 2.5 Pro", "Imagen 3", "Azure Neural Voices", "Export PDF/EPUB/Word", "18 modules formation", "Outils KDP Premium", "Traduction multi-langues", "Audiobooks", "Mises à jour à vie", "Support prioritaire"],
-  },
-};
-
-// Cache for price IDs to avoid repeated API calls
-const priceCache: Record<string, string> = {};
-
-async function getOrCreatePrice(stripe: Stripe, planId: string, plan: typeof PLANS.lifetime): Promise<string> {
-  // Check cache first
-  if (priceCache[planId]) {
-    console.log("Using cached price for", planId);
-    return priceCache[planId];
-  }
-
-  // Search for existing price by looking up the product
-  const products = await stripe.products.search({
-    query: `name:'${plan.name}'`,
-    limit: 1,
-  });
-
-  let productId: string;
-
-  if (products.data.length > 0) {
-    productId = products.data[0].id;
-    console.log("Found existing product:", productId);
-    
-    // Get prices for this product
-    const prices = await stripe.prices.list({ 
-      product: productId, 
-      active: true,
-      limit: 10 
-    });
-    
-    const matchingPrice = prices.data.find(p => 
-      p.unit_amount === plan.price && p.type === "one_time"
-    );
-
-    if (matchingPrice) {
-      console.log("Found existing price:", matchingPrice.id);
-      priceCache[planId] = matchingPrice.id;
-      return matchingPrice.id;
-    }
-  } else {
-    // Create product
-    const product = await stripe.products.create({
-      name: plan.name,
-      description: plan.features.join(", "),
-    });
-    productId = product.id;
-    console.log("Created product:", productId);
-  }
-
-  // Create price (all one-time payments)
-  const price = await stripe.prices.create({
-    product: productId,
-    unit_amount: plan.price,
-    currency: "eur",
-  });
-  
-  console.log("Created price:", price.id);
-  priceCache[planId] = price.id;
-  return price.id;
-}
-
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -92,119 +15,111 @@ serve(async (req) => {
     const stripeKeyRaw = Deno.env.get("STRIPE_SECRET_KEY");
     const stripeKey = (stripeKeyRaw || "").trim();
     if (!stripeKey) {
-      console.error("STRIPE_SECRET_KEY not configured");
       throw new Error("Stripe non configuré");
     }
 
-    // Helpful diagnostic (never log the full key)
     console.log("Stripe key prefix:", stripeKey.slice(0, 7));
 
-    const stripe = new Stripe(stripeKey, {
-      apiVersion: "2023-10-16",
-    });
+    const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
 
     const { planId, email, successUrl, cancelUrl } = await req.json();
 
     console.log("Creating checkout for plan:", planId, "email:", email);
 
-    if (!planId || !PLANS[planId as keyof typeof PLANS]) {
-      throw new Error("Plan invalide");
-    }
-
-    if (!email) {
-      throw new Error("Email requis");
-    }
-
-    const plan = PLANS[planId as keyof typeof PLANS];
+    if (!email) throw new Error("Email requis");
 
     const isRestrictedKey = stripeKey.startsWith("rk_");
-    const configuredPriceId = (Deno.env.get("STRIPE_LIFETIME_PRICE_ID") || Deno.env.get("STRIPE_PRICE_ID") || "").trim();
 
-    if (isRestrictedKey && !configuredPriceId) {
-      throw new Error(
-        "Clé Stripe limitée détectée: configurez STRIPE_LIFETIME_PRICE_ID (ex: price_...) dans le backend."
-      );
-    }
-
-    if (
-      isRestrictedKey &&
-      configuredPriceId &&
-      (configuredPriceId.startsWith("rk_") || configuredPriceId.startsWith("sk_"))
-    ) {
-      // Common misconfiguration: secret key pasted instead of price id
-      throw new Error(
-        "STRIPE_LIFETIME_PRICE_ID est invalide: vous avez collé une clé Stripe (rk_/sk_...). Il faut l'ID de prix (price_...) associé au produit dans Stripe."
-      );
-    }
-
-    if (isRestrictedKey && configuredPriceId && configuredPriceId.startsWith("prod_")) {
-      // Common misconfiguration: product id (prod_) provided instead of price id (price_)
-      throw new Error(
-        "STRIPE_LIFETIME_PRICE_ID est invalide: vous avez fourni un ID produit (prod_...). Il faut l'ID de prix (price_...) associé au produit dans Stripe."
-      );
-    }
-
-    if (isRestrictedKey && configuredPriceId && !configuredPriceId.startsWith("price_")) {
-      throw new Error(
-        "STRIPE_LIFETIME_PRICE_ID est invalide: il doit commencer par price_... (ID de prix Stripe)."
-      );
-    }
-
-    let priceId: string;
-    let sessionConfig: Stripe.Checkout.SessionCreateParams;
-
-    if (isRestrictedKey) {
-      // Mode clé limitée: pas de lookup client/prix, utiliser uniquement le price_id configuré
-      console.log("Restricted key mode: using configured price_id:", configuredPriceId);
-      priceId = configuredPriceId;
-      
-      sessionConfig = {
-        customer_email: email, // Stripe crée le client automatiquement
-        line_items: [{ price: priceId, quantity: 1 }],
-        mode: "payment",
-        success_url: successUrl || `${req.headers.get("origin")}/paiement-succes?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: cancelUrl || `${req.headers.get("origin")}/offres`,
-        metadata: {
-          planId,
-          email,
-        },
-        allow_promotion_codes: true,
-      };
-    } else {
-      // Mode clé complète: lookup client + prix dynamiques
-      const [customersResult, dynamicPriceId] = await Promise.all([
-        stripe.customers.list({ email, limit: 1 }),
-        getOrCreatePrice(stripe, planId, plan),
-      ]);
-
-      priceId = dynamicPriceId;
-
-      // Get or create customer
-      let customerId: string;
-      if (customersResult.data.length > 0) {
-        customerId = customersResult.data[0].id;
-        console.log("Found existing customer:", customerId);
+    // Get or create customer
+    let customerId: string | undefined;
+    if (!isRestrictedKey) {
+      const customers = await stripe.customers.list({ email, limit: 1 });
+      if (customers.data.length > 0) {
+        customerId = customers.data[0].id;
       } else {
         const newCustomer = await stripe.customers.create({ email });
         customerId = newCustomer.id;
-        console.log("Created new customer:", customerId);
       }
-
-      sessionConfig = {
-        customer: customerId,
-        line_items: [{ price: priceId, quantity: 1 }],
-        mode: "payment",
-        success_url: successUrl || `${req.headers.get("origin")}/paiement-succes?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: cancelUrl || `${req.headers.get("origin")}/offres`,
-        metadata: {
-          planId,
-          email,
-        },
-        allow_promotion_codes: true,
-      };
+      console.log("Customer:", customerId);
     }
 
-    // Create checkout session
+    // Get or create a recurring price for the subscription with trial
+    const configuredPriceId = (Deno.env.get("STRIPE_LIFETIME_PRICE_ID") || "").trim();
+    let priceId: string;
+
+    if (isRestrictedKey) {
+      if (!configuredPriceId || !configuredPriceId.startsWith("price_")) {
+        throw new Error(
+          "Clé Stripe limitée: configurez STRIPE_LIFETIME_PRICE_ID (price_...) dans le backend."
+        );
+      }
+      priceId = configuredPriceId;
+    } else {
+      // Look for or create a recurring price for the trial model
+      const productName = "EbookStudio Pro — Accès à Vie";
+      const amount = 6700; // 67€
+
+      const products = await stripe.products.search({
+        query: `name:'${productName}'`,
+        limit: 1,
+      });
+
+      let productId: string;
+      if (products.data.length > 0) {
+        productId = products.data[0].id;
+      } else {
+        const product = await stripe.products.create({
+          name: productName,
+          description: "Accès complet à EbookStudio Pro avec essai gratuit de 7 jours",
+        });
+        productId = product.id;
+      }
+
+      // Look for existing recurring price
+      const prices = await stripe.prices.list({
+        product: productId,
+        active: true,
+        type: "recurring",
+        limit: 10,
+      });
+
+      const matchingPrice = prices.data.find(
+        (p) => p.unit_amount === amount && p.recurring?.interval === "year"
+      );
+
+      if (matchingPrice) {
+        priceId = matchingPrice.id;
+      } else {
+        // Create a yearly recurring price (will only charge once after trial due to cancel logic)
+        const price = await stripe.prices.create({
+          product: productId,
+          unit_amount: amount,
+          currency: "eur",
+          recurring: { interval: "year" },
+        });
+        priceId = price.id;
+      }
+    }
+
+    console.log("Using price:", priceId);
+
+    // Create subscription checkout with 7-day trial
+    const sessionConfig: Stripe.Checkout.SessionCreateParams = {
+      ...(customerId ? { customer: customerId } : { customer_email: email }),
+      line_items: [{ price: priceId, quantity: 1 }],
+      mode: "subscription",
+      subscription_data: {
+        trial_period_days: 7,
+        metadata: { planId: planId || "pro", email },
+      },
+      success_url:
+        successUrl ||
+        `${req.headers.get("origin")}/paiement-succes?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: cancelUrl || `${req.headers.get("origin")}/offres`,
+      metadata: { planId: planId || "pro", email },
+      allow_promotion_codes: true,
+    };
+
     const session = await stripe.checkout.sessions.create(sessionConfig);
     console.log("Created checkout session:", session.id);
 
