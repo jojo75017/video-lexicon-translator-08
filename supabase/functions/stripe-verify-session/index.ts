@@ -100,8 +100,11 @@ serve(async (req) => {
         .from("subscribers")
         .update({
           plan_type: planType,
-          status: "active",
+          status: subscriberStatus,
           expires_at: expiresAt,
+          trial_ends_at: trialEndsAt,
+          stripe_customer_id: session.customer as string,
+          stripe_subscription_id: (session as any).subscription as string,
           updated_at: new Date().toISOString(),
         })
         .eq("email", email);
@@ -110,13 +113,12 @@ serve(async (req) => {
         console.error("Error updating subscriber:", updateError);
       }
 
-      // Best effort email (do not fail the flow)
       await sendEmail(email, accessCode, planType, true).catch((e) => {
         console.error("Email send failed (renewal):", e);
       });
 
       return new Response(
-        JSON.stringify({ ok: true, email, accessCode, subscriber: { ...existingSubscriber, plan_type: planType, status: "active", expires_at: expiresAt } }),
+        JSON.stringify({ ok: true, email, accessCode, trialEndsAt, subscriber: { ...existingSubscriber, plan_type: planType, status: subscriberStatus, trial_ends_at: trialEndsAt } }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -125,8 +127,11 @@ serve(async (req) => {
       email,
       access_code: accessCode,
       plan_type: planType,
-      status: "active",
+      status: subscriberStatus,
       expires_at: expiresAt,
+      trial_ends_at: trialEndsAt,
+      stripe_customer_id: session.customer as string,
+      stripe_subscription_id: (session as any).subscription as string,
     });
 
     if (insertError) {
