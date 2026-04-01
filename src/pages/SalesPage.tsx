@@ -652,10 +652,10 @@ const SalesPage = () => {
             <Button size="lg" onClick={handlePlanClick}
               className="text-lg px-12 py-8 bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-900 font-bold rounded-2xl shadow-2xl shadow-cyan-500/25 hover:shadow-cyan-500/40 transition-all duration-300 hover:-translate-y-1">
               <Rocket className="w-6 h-6 mr-2" />
-              Oui, je publie ce soir — {LAUNCH_PRICE}€
+              Essai gratuit 7 jours — puis {LAUNCH_PRICE}€ à vie
               <ArrowRight className="w-6 h-6 ml-2" />
             </Button>
-            <p className="text-white/60 text-sm mt-5">Paiement unique • Accès à vie • Garantie 30 jours</p>
+            <p className="text-white/60 text-sm mt-5">0€ pendant 7 jours • Annulation en 1 clic • Garantie 30 jours</p>
             <p className="text-white/40 text-xs mt-2 flex items-center justify-center gap-1">
               <Users className="w-3.5 h-3.5 text-emerald-400" />
               Rejoignez +47 auteurs qui publient déjà avec EbookStudio

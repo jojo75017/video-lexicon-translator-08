@@ -32,7 +32,7 @@ serve(async (req) => {
       .from('subscribers')
       .select('*')
       .eq('email', email.toLowerCase().trim())
-      .eq('status', 'active')
+      .in('status', ['active', 'trialing'])
       .single();
 
     if (fetchError || !subscriber) {
