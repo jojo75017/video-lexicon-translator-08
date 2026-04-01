@@ -54,7 +54,7 @@ serve(async (req) => {
       .from('subscribers')
       .select('*')
       .eq('email', email)
-      .eq('status', 'active')
+      .in('status', ['active', 'trialing'])
       .single();
 
     if (subError || !subscriber) {
