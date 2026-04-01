@@ -560,11 +560,13 @@ const SalesPage = () => {
                 <Button size="lg" onClick={handlePlanClick}
                   className="w-full py-8 text-xl font-bold bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-900 rounded-2xl shadow-xl shadow-cyan-500/20">
                   <Rocket className="w-6 h-6 mr-2" />
-                  Oui, je veux publier mon ebook — {LAUNCH_PRICE}€
+                  Commencer mon essai gratuit de 7 jours
                   <ArrowRight className="w-6 h-6 ml-2" />
                 </Button>
                 <p className="text-center text-white/50 text-xs mt-3 flex items-center justify-center gap-3">
-                  <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5 text-emerald-400" />12 personnes ont rejoint aujourd'hui</span>
+                  <span className="flex items-center gap-1"><ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />Aucune facturation pendant 7 jours</span>
+                  <span>•</span>
+                  <span>Annulation en 1 clic</span>
                   <span>•</span>
                   <span>Accès instantané</span>
                 </p>
