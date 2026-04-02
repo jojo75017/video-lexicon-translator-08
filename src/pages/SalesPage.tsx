@@ -368,6 +368,47 @@ const SalesPage = () => {
         </motion.div>
       </section>
 
+      {/* ═══════════════════════════════════════ TRIAL INLINE BANNER ═══════════════════════════════════════ */}
+      <section className="py-8 px-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="max-w-3xl mx-auto"
+        >
+          <div className="relative bg-gradient-to-r from-emerald-500/10 via-cyan-500/10 to-emerald-500/10 border-2 border-emerald-500/30 rounded-2xl p-6 sm:p-8 overflow-hidden">
+            {/* Shimmer */}
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent"
+              initial={{ x: '-100%' }}
+              animate={{ x: '100%' }}
+              transition={{ duration: 3, repeat: Infinity, repeatDelay: 4 }}
+            />
+            <div className="relative z-10 flex flex-col sm:flex-row items-center gap-5">
+              <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 flex items-center justify-center shrink-0">
+                <Gift className="w-7 h-7 text-emerald-400" />
+              </div>
+              <div className="flex-1 text-center sm:text-left">
+                <h3 className="text-xl font-bold text-white mb-1">
+                  🎁 Essai gratuit 7 jours — Aucune carte requise
+                </h3>
+                <p className="text-white/70 text-sm">
+                  Testez toutes les fonctionnalités Pro gratuitement. Si ça ne vous plaît pas, vous ne payez rien.
+                </p>
+              </div>
+              <Button
+                onClick={handlePlanClick}
+                className="shrink-0 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-900 font-bold px-6 py-5 rounded-xl shadow-lg shadow-emerald-500/25 whitespace-nowrap"
+              >
+                <Rocket className="w-5 h-5 mr-2" />
+                Commencer gratuitement
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </div>
+          </div>
+        </motion.div>
+      </section>
+
       {/* ═══════════════════════════════════════ VIDEO PRÉSENTATION ═══════════════════════════════════════ */}
       <section className="py-16 px-4">
         <div className="max-w-4xl mx-auto">
