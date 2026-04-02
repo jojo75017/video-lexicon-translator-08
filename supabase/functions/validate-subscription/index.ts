@@ -59,7 +59,20 @@ serve(async (req) => {
       );
     }
 
-    // Vérifier si expiré
+    // Vérifier si essai expiré
+    if (subscriber.status === 'trialing' && subscriber.trial_ends_at && new Date(subscriber.trial_ends_at) < new Date()) {
+      await supabase
+        .from('subscribers')
+        .update({ status: 'trial_expired' })
+        .eq('id', subscriber.id);
+
+      return new Response(
+        JSON.stringify({ valid: false, message: 'Votre essai gratuit de 7 jours est terminé. Passez à l\'accès à vie pour 67€ et continuez à créer !' }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Vérifier si expiré (plan payant)
     if (subscriber.expires_at && new Date(subscriber.expires_at) < new Date()) {
       await supabase
         .from('subscribers')
@@ -74,7 +87,7 @@ serve(async (req) => {
 
     if (subscriber.status !== 'active' && subscriber.status !== 'trialing') {
       return new Response(
-        JSON.stringify({ valid: false, message: 'Abonnement inactif' }),
+        JSON.stringify({ valid: false, message: subscriber.status === 'trial_expired' ? 'Essai terminé. Passez à l\'accès à vie pour 67€.' : 'Abonnement inactif' }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
