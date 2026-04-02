@@ -772,6 +772,61 @@ const SalesPage = () => {
       <SocialProofToast />
       <ProgressEngagement />
       <FloatingMobileCta />
+
+      {/* ═══════════════════════════════════════ TRIAL MODAL ═══════════════════════════════════════ */}
+      {showTrialModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4" onClick={() => !trialLoading && setShowTrialModal(false)}>
+          <div className="bg-slate-900 border border-slate-700 rounded-3xl max-w-md w-full p-8 relative" onClick={e => e.stopPropagation()}>
+            <button type="button" onClick={() => !trialLoading && setShowTrialModal(false)} className="absolute top-4 right-4 text-white/50 hover:text-white text-xl">✕</button>
+            
+            {trialResult?.ok ? (
+              <div className="text-center space-y-4">
+                <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto">
+                  <CheckCircle className="w-10 h-10 text-emerald-400" />
+                </div>
+                <h3 className="text-2xl font-bold text-white">Essai activé ! 🎉</h3>
+                <p className="text-white/70">Votre accès gratuit de 7 jours est prêt.</p>
+                <div className="bg-slate-800 rounded-xl p-4 space-y-2">
+                  <p className="text-sm text-white/60">Votre code d'accès :</p>
+                  <p className="text-2xl font-mono font-bold text-cyan-400">{trialResult.accessCode}</p>
+                  <p className="text-sm text-white/60">Email : {trialResult.email}</p>
+                </div>
+                <Button size="lg" onClick={() => navigate("/subscription")} className="w-full py-6 bg-gradient-to-r from-cyan-500 to-emerald-500 text-slate-900 font-bold rounded-xl">
+                  <ArrowRight className="w-5 h-5 mr-2" />
+                  Se connecter maintenant
+                </Button>
+              </div>
+            ) : (
+              <form onSubmit={handleStartTrial} className="space-y-6">
+                <div className="text-center space-y-2">
+                  <div className="w-14 h-14 rounded-full bg-cyan-500/20 flex items-center justify-center mx-auto">
+                    <Gift className="w-8 h-8 text-cyan-400" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-white">Essai gratuit 7 jours</h3>
+                  <p className="text-white/60 text-sm">Accès complet à toutes les fonctionnalités Pro. Aucune carte bancaire requise.</p>
+                </div>
+                <div>
+                  <Input
+                    type="email"
+                    placeholder="votre@email.com"
+                    value={trialEmail}
+                    onChange={e => setTrialEmail(e.target.value)}
+                    required
+                    className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 h-12 rounded-xl text-center text-lg"
+                  />
+                </div>
+                <Button type="submit" size="lg" disabled={trialLoading} className="w-full py-6 bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-900 font-bold rounded-xl text-lg">
+                  {trialLoading ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : <Rocket className="w-5 h-5 mr-2" />}
+                  {trialLoading ? "Activation..." : "Démarrer mon essai gratuit"}
+                </Button>
+                <p className="text-center text-white/40 text-xs">
+                  Puis {LAUNCH_PRICE}€ paiement unique si vous souhaitez continuer après 7 jours.
+                </p>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
