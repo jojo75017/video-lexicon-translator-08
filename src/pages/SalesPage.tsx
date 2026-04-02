@@ -109,6 +109,10 @@ const SalesPage = () => {
   const location = useLocation();
   const countdown = useCountdown(LAUNCH_END);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [showTrialModal, setShowTrialModal] = useState(false);
+  const [trialEmail, setTrialEmail] = useState("");
+  const [trialLoading, setTrialLoading] = useState(false);
+  const [trialResult, setTrialResult] = useState<{ ok: boolean; accessCode?: string; email?: string } | null>(null);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -131,8 +135,41 @@ const SalesPage = () => {
 
   const handlePlanClick = () => {
     trackPlanSelect('pro', LAUNCH_PRICE);
-    trackCTAClick('plan_click', '/upsell-paiement');
-    navigate('/upsell-paiement?plan=pro');
+    trackCTAClick('plan_click', 'trial_modal');
+    setShowTrialModal(true);
+  };
+
+  const handleStartTrial = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!trialEmail.includes("@")) {
+      toast.error("Veuillez entrer un email valide");
+      return;
+    }
+    setTrialLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("start-trial", {
+        body: { email: trialEmail.trim().toLowerCase() },
+      });
+      if (error) throw error;
+      if (data?.ok) {
+        setTrialResult(data);
+        localStorage.setItem("subscriber_email", data.email);
+        localStorage.setItem("subscriber_data", JSON.stringify({
+          email: data.email,
+          access_code: data.accessCode,
+          status: data.status,
+          plan_type: 'pro',
+        }));
+        trackBeginCheckout('pro', 0);
+        toast.success("🎉 Essai gratuit activé !");
+      } else {
+        toast.error(data?.error || "Erreur lors de l'activation");
+      }
+    } catch (err: any) {
+      toast.error(err?.message || "Erreur serveur");
+    } finally {
+      setTrialLoading(false);
+    }
   };
 
   const scrollToPricing = () => {
