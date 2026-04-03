@@ -43,8 +43,16 @@ let totalTokenUsage = {
 
 async function callGeminiDirect(systemPrompt: string, userPrompt: string, maxTokens: number, apiKey: string, retryCount = 0): Promise<string> {
   const MAX_RETRIES = 3;
+  const cleanKey = apiKey.trim();
   
-  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+  // Pre-flight: vérifier le format de la clé
+  if (!cleanKey || cleanKey.length < 10) {
+    throw new Error('INVALID_API_KEY: Clé API Gemini invalide (trop courte ou vide).');
+  }
+  
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(cleanKey)}`;
+  
+  const response = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -324,14 +332,16 @@ serve(async (req) => {
       useUserKey: _useUserKey,
     } = payload;
 
-    if (!userApiKey) {
+    // Nettoyer et valider la clé API
+    const cleanedApiKey = typeof userApiKey === 'string' ? userApiKey.trim() : '';
+    if (!cleanedApiKey) {
       return new Response(
         JSON.stringify({ error: 'NO_API_KEY: Clé API Gemini requise. Configurez votre propre clé dans Paramètres > Clés API.' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
-    activeApiKey = userApiKey;
-    console.log(`Using USER API key for step ${step}`);
+    activeApiKey = cleanedApiKey;
+    console.log(`Using USER API key for step ${step} (length=${cleanedApiKey.length}, prefix=${cleanedApiKey.substring(0, 4)})`);
 
     if (!title) {
       return new Response(
