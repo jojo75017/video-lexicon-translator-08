@@ -1219,7 +1219,7 @@ JSON :
   } catch (error) {
     console.error('Workflow step error:', error);
     
-    const errorMessage = error.message || 'Unknown error';
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     let status = 500;
     let userMessage = errorMessage;
     
