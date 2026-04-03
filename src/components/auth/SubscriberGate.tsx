@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { getIsCurrentSessionAdmin } from "@/lib/adminAccess";
 
 const corslessMessage = "Vérification de l'accès...";
 
@@ -48,24 +49,14 @@ export function SubscriberGate({
 
       // Double-check: if there's an active Supabase session, verify admin status directly via DB
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) {
-          // Check user_roles table directly (no edge function needed)
-          const { data: roleData } = await supabase
-            .from('user_roles')
-            .select('role')
-            .eq('user_id', session.user.id)
-            .eq('role', 'admin')
-            .maybeSingle();
-          
-          if (roleData) {
-            console.log('SubscriberGate: Admin confirmed via direct DB check');
-            if (!cancelled) {
-              setAllowed(true);
-              setChecking(false);
-            }
-            return;
+        const isCurrentSessionAdmin = await getIsCurrentSessionAdmin();
+        if (isCurrentSessionAdmin) {
+          console.log('SubscriberGate: Admin confirmed via secure session check');
+          if (!cancelled) {
+            setAllowed(true);
+            setChecking(false);
           }
+          return;
         }
       } catch (err) {
         console.log('SubscriberGate: Session check failed, continuing with subscriber validation');
