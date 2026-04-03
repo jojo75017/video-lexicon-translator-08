@@ -210,7 +210,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
     (!!subscriberEmail &&
       typeof subscriberData?.access_code === 'string' &&
       subscriberData.access_code.trim().length > 0 &&
-      (subscriberData?.status === 'active' || subscriberData?.plan_type === 'lifetime'));
+      (subscriberData?.status === 'active' ||
+        subscriberData?.status === 'trialing' ||
+        subscriberData?.plan_type === 'lifetime'));
 
   const [hasVerifiedAdminAccess, setHasVerifiedAdminAccess] = useState(isAdminProp);
 
