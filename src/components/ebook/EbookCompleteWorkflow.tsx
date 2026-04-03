@@ -49,6 +49,8 @@ interface WorkflowProgress {
   subtitle: string;
   category: string;
   authorName: string;
+  bookIntroduction: string;
+  hasReadSteps: boolean;
   numberOfChapters: number;
   currentStepIndex: number;
   stepResults: Record<string, { result: any; displayContent: string }>;
@@ -137,12 +139,44 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const data: WorkflowProgress = JSON.parse(saved);
-        // Only restore if there's actual progress
-        if (data.currentStepIndex >= 0 && Object.keys(data.stepResults).length > 0) {
-          setHasSavedProgress(true);
+      if (!saved) return;
+
+      const data: WorkflowProgress = JSON.parse(saved);
+      if (data.currentStepIndex >= 0 && Object.keys(data.stepResults || {}).length > 0) {
+        setHasSavedProgress(true);
+
+        // Restauration automatique après refresh pour éviter de tout recommencer
+        setTitle(data.title || '');
+        setSubtitle(data.subtitle || '');
+        setCategory(data.category || '');
+        setAuthorName(data.authorName || '');
+        setBookIntroduction(data.bookIntroduction || '');
+        setHasReadSteps(Boolean(data.hasReadSteps));
+        setNumberOfChapters(data.numberOfChapters || 8);
+        setCurrentStepIndex(data.currentStepIndex);
+        setStepResults(data.stepResults || {});
+        setAllContext(data.allContext || {});
+
+        if (data.generatedCharacters?.length) {
+          setGeneratedCharacters(data.generatedCharacters);
         }
+        setWaitingForCharacterValidation(Boolean(data.waitingForCharacterValidation));
+        setWaitingForTitleValidation(Boolean(data.waitingForTitleValidation));
+        if (data.titleSuggestions) setTitleSuggestions(data.titleSuggestions);
+        if (data.originalTitleScore) setOriginalTitleScore(data.originalTitleScore);
+        if (data.selectedTitleIndex !== undefined) setSelectedTitleIndex(data.selectedTitleIndex);
+
+        const restoredP1 = data.allContext?.P1 || data.stepResults?.P1?.result;
+        if (restoredP1?.introductionGeneree) setGeneratedIntro(restoredP1.introductionGeneree);
+        if (restoredP1?.conclusionGeneree) setGeneratedConclusion(restoredP1.conclusionGeneree);
+
+        const expanded: Record<string, boolean> = {};
+        Object.keys(data.stepResults || {}).forEach(stepId => {
+          expanded[stepId] = false;
+        });
+        const lastStepId = workflowSteps[data.currentStepIndex]?.id;
+        if (lastStepId) expanded[lastStepId] = true;
+        setExpandedSteps(expanded);
       }
     } catch (e) {
       console.error('Error loading saved progress:', e);
@@ -156,6 +190,8 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
       subtitle,
       category,
       authorName,
+      bookIntroduction,
+      hasReadSteps,
       numberOfChapters,
       currentStepIndex,
       stepResults,
@@ -174,11 +210,12 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
     
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+      setHasSavedProgress(true);
       console.log(`📦 Progress saved at step ${progress.currentStepIndex + 1}`);
     } catch (e) {
       console.error('Error saving progress:', e);
     }
-  }, [title, subtitle, category, authorName, numberOfChapters, currentStepIndex, stepResults, allContext, generatedCharacters, waitingForCharacterValidation, waitingForTitleValidation, titleSuggestions, originalTitleScore, selectedTitleIndex]);
+  }, [title, subtitle, category, authorName, bookIntroduction, hasReadSteps, numberOfChapters, currentStepIndex, stepResults, allContext, generatedCharacters, waitingForCharacterValidation, waitingForTitleValidation, titleSuggestions, originalTitleScore, selectedTitleIndex]);
 
   // Auto-save whenever stepResults changes
   useEffect(() => {
