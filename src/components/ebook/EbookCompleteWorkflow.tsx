@@ -132,9 +132,14 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   const [generatedConclusion, setGeneratedConclusion] = useState('');
 
   const progress = currentStepIndex >= 0 ? ((currentStepIndex + 1) / 15) * 100 : 0;
-  // La clé API utilisateur est OBLIGATOIRE pour générer
-  const hasValidApiKey = isUserKeyValid && !!userApiKey;
-  const canGenerate = title.trim() && authorName.trim() && category && bookIntroduction.trim() && hasReadSteps && hasValidApiKey;
+  const normalizedUserApiKey = typeof userApiKey === 'string' ? userApiKey.trim() : '';
+  const hasConfiguredApiKey = normalizedUserApiKey.length > 0;
+  const hasPlausibleApiKeyFormat =
+    normalizedUserApiKey.startsWith('AIza') || normalizedUserApiKey.startsWith('sk-');
+  const hasUsableApiKey = hasConfiguredApiKey && hasPlausibleApiKeyFormat;
+  const hasStrictlyValidatedApiKey = hasUsableApiKey && isUserKeyValid === true;
+  const hasApiKeyValidationWarning = hasUsableApiKey && isUserKeyValid === false;
+  const canGenerate = title.trim() && authorName.trim() && category && bookIntroduction.trim() && hasReadSteps && hasUsableApiKey;
 
   const readSavedProgressSnapshot = useCallback((): WorkflowProgress | null => {
     try {
@@ -492,8 +497,8 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             characters: charactersForAI,
             previousContext,
             // Transmettre la clé API utilisateur si disponible et valide
-            userApiKey: isUserKeyValid ? userApiKey : undefined,
-            useUserKey: isUserKeyValid && !!userApiKey,
+            userApiKey: hasUsableApiKey ? normalizedUserApiKey : undefined,
+            useUserKey: hasUsableApiKey,
             ...extraBody,
           }
         });
@@ -648,10 +653,13 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
       return;
     }
 
-    // Vérifier que l'utilisateur a configuré sa clé API
-    if (!hasValidApiKey) {
+    if (!hasUsableApiKey) {
       toast.error('🔑 Veuillez configurer votre clé API Gemini dans l\'onglet "Paramètres" avant de générer.');
       return;
+    }
+
+    if (hasApiKeyValidationWarning) {
+      toast.warning('⚠️ Clé détectée mais non validée localement. Tentative de lancement du workflow quand même.');
     }
 
     setIsGenerating(true);
@@ -1310,23 +1318,30 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
           </div>
 
           {/* API Key Status Indicator */}
-          <div className={`flex items-start space-x-3 p-4 rounded-lg border ${hasValidApiKey ? 'bg-green-500/10 border-green-500/30' : 'bg-red-500/10 border-red-500/30'}`}>
-            <Key className={`h-5 w-5 mt-0.5 ${hasValidApiKey ? 'text-green-600' : 'text-red-500'}`} />
+          <div className={`flex items-start space-x-3 p-4 rounded-lg border ${hasStrictlyValidatedApiKey ? 'bg-green-500/10 border-green-500/30' : hasUsableApiKey ? 'bg-amber-500/10 border-amber-500/30' : 'bg-red-500/10 border-red-500/30'}`}>
+            <Key className={`h-5 w-5 mt-0.5 ${hasStrictlyValidatedApiKey ? 'text-green-600' : hasUsableApiKey ? 'text-amber-600' : 'text-red-500'}`} />
             <div className="space-y-1 flex-1">
               <div className="flex items-center justify-between">
-                <span className={`text-sm font-medium ${hasValidApiKey ? 'text-green-700' : 'text-red-600'}`}>
-                  {hasValidApiKey ? '🔑 Votre clé API Gemini est active' : '🔑 Clé API Gemini requise'}
+                <span className={`text-sm font-medium ${hasStrictlyValidatedApiKey ? 'text-green-700' : hasUsableApiKey ? 'text-amber-700' : 'text-red-600'}`}>
+                  {hasStrictlyValidatedApiKey
+                    ? '🔑 Votre clé API Gemini est active'
+                    : hasUsableApiKey
+                      ? '🔑 Clé détectée, lancement autorisé'
+                      : '🔑 Clé API Gemini requise'}
                 </span>
-                {hasValidApiKey && (
-                  <Badge variant="outline" className="bg-green-100 text-green-700 border-green-300">
-                    Prêt
-                  </Badge>
-                )}
+                <Badge
+                  variant="outline"
+                  className={hasStrictlyValidatedApiKey ? 'bg-green-100 text-green-700 border-green-300' : hasUsableApiKey ? 'bg-amber-100 text-amber-700 border-amber-300' : 'bg-red-100 text-red-700 border-red-300'}
+                >
+                  {hasStrictlyValidatedApiKey ? 'Prêt' : hasUsableApiKey ? 'À vérifier' : 'Bloqué'}
+                </Badge>
               </div>
               <p className="text-xs text-muted-foreground">
-                {hasValidApiKey 
+                {hasStrictlyValidatedApiKey
                   ? 'Les coûts de génération seront facturés directement sur votre compte Gemini (~0,30€ par livre).'
-                  : 'Configurez votre clé API Gemini dans l\'onglet "Paramètres" pour générer votre livre. Les coûts (~0,20€ - 0,50€ par livre) seront facturés sur votre compte Google AI.'
+                  : hasUsableApiKey
+                    ? 'Une clé est bien présente. Si la validation locale échoue, le workflow peut quand même tenter de démarrer avec votre clé.'
+                    : 'Configurez votre clé API Gemini dans l\'onglet "Paramètres" pour générer votre livre. Les coûts (~0,20€ - 0,50€ par livre) seront facturés sur votre compte Google AI.'
                 }
               </p>
             </div>
@@ -1416,6 +1431,10 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
                 <p className="text-sm text-destructive">
                   ⚠️ Veuillez remplir le titre, la catégorie et le nom d'auteur
                 </p>
+              ) : !hasUsableApiKey ? (
+                <p className="text-sm text-destructive">
+                  ⚠️ Ajoutez une clé API Gemini dans l'onglet Paramètres pour lancer P1
+                </p>
               ) : !bookIntroduction.trim() ? (
                 <p className="text-sm text-destructive">
                   ⚠️ Veuillez décrire votre vision du livre dans le champ Introduction
@@ -1423,6 +1442,10 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
               ) : !hasReadSteps ? (
                 <p className="text-sm text-amber-600">
                   ⚠️ Veuillez cocher la case ci-dessus pour confirmer que vous avez lu les 14 étapes
+                </p>
+              ) : hasApiKeyValidationWarning ? (
+                <p className="text-sm text-amber-600">
+                  ⚠️ La validation locale de la clé a échoué, mais P1 peut maintenant démarrer quand même.
                 </p>
               ) : null}
             </motion.div>
