@@ -54,7 +54,7 @@ export const AuthPage = () => {
 
         if (data?.isAdmin) {
           sessionStorage.setItem('is_admin', 'true');
-          navigate('/admin', { replace: true });
+          navigate('/dashboard', { replace: true });
         }
       } catch (error) {
         // Ignorer les erreurs silencieusement
@@ -176,7 +176,7 @@ export const AuthPage = () => {
         sessionStorage.setItem('is_admin', 'true');
         if (shouldToast) toast.success('Connexion admin réussie');
         trackFormSubmit('admin_login', email);
-        navigate('/admin');
+        navigate('/dashboard');
       } else {
         const { error } = await supabase.auth.signUp({
           email,
