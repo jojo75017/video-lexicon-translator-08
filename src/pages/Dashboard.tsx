@@ -17,15 +17,12 @@ import {
   Image, 
   Mail,
   Activity,
-  Award,
   Clock,
   Eye,
   Filter,
   Star,
   Zap,
-  Calendar,
   CheckCircle,
-  AlertTriangle,
   Info
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -55,7 +52,7 @@ const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState('all');
   const [recentActivity, setRecentActivity] = useState([]);
-  const [stats, setStats] = useState({
+  const [stats] = useState({
     totalAnalyses: 156,
     todayAnalyses: 12,
     avgSeoScore: 78,
