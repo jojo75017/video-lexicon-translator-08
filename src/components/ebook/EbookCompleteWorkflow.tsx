@@ -727,7 +727,44 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
 
         // P4 est la seule étape potentiellement très longue : on la découpe en requêtes "1 chapitre".
         if (step.id === 'P4') {
-          const structure = normalizeP3Structure(context.P3?.chapitres || []);
+          // Try multiple sources for P3 data
+          let p3Data = context.P3;
+          if (!p3Data?.chapitres || !Array.isArray(p3Data.chapitres) || p3Data.chapitres.length === 0) {
+            // Fallback 1: stepResults React state
+            if (stepResults.P3?.result?.chapitres) {
+              p3Data = stepResults.P3.result;
+              context.P3 = p3Data;
+              console.log('🔄 P3 récupéré depuis stepResults React');
+            }
+          }
+          if (!p3Data?.chapitres || !Array.isArray(p3Data.chapitres) || p3Data.chapitres.length === 0) {
+            // Fallback 2: ebook_workflow_results (separate localStorage key from useWorkflowResults)
+            try {
+              const workflowResults = localStorage.getItem('ebook_workflow_results');
+              if (workflowResults) {
+                const parsed = JSON.parse(workflowResults);
+                if (parsed.P3?.result?.chapitres) {
+                  p3Data = parsed.P3.result;
+                  context.P3 = p3Data;
+                  console.log('🔄 P3 récupéré depuis ebook_workflow_results');
+                }
+              }
+            } catch (e) {
+              console.error('Error reading workflow results for P3 fallback:', e);
+            }
+          }
+          if (!p3Data?.chapitres || !Array.isArray(p3Data.chapitres) || p3Data.chapitres.length === 0) {
+            // Fallback 3: savedProgressSnapshot
+            const fallback = savedProgressSnapshot || readSavedProgressSnapshot();
+            const fallbackP3 = fallback?.allContext?.P3 || fallback?.stepResults?.P3?.result;
+            if (fallbackP3?.chapitres) {
+              p3Data = fallbackP3;
+              context.P3 = p3Data;
+              console.log('🔄 P3 récupéré depuis savedProgressSnapshot');
+            }
+          }
+
+          const structure = normalizeP3Structure(p3Data?.chapitres || []);
           if (!Array.isArray(structure) || structure.length === 0) {
             console.error('P3 context:', JSON.stringify(context.P3)?.substring(0, 500));
             toast.error('⚠️ La structure P3 est vide. Veuillez relancer depuis P3.');
