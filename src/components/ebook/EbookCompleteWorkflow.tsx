@@ -706,7 +706,29 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
 
   const resumeFromFailedStep = () => {
     if (failedStepIndex !== null && failedStepIndex >= 0) {
-      generateCompleteBook(failedStepIndex);
+      // Réhydrater depuis localStorage si le contexte React est vide
+      let extraContext: Record<string, any> = {};
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const data: WorkflowProgress = JSON.parse(saved);
+          // Restaurer les stepResults si l'état React est vide
+          if (Object.keys(stepResults).length === 0 && data.stepResults && Object.keys(data.stepResults).length > 0) {
+            setStepResults(data.stepResults);
+            Object.entries(data.stepResults).forEach(([stepId, d]) => {
+              extraContext[stepId] = d.result;
+            });
+          }
+          // Restaurer allContext si vide
+          if (Object.keys(allContext).length === 0 && data.allContext && Object.keys(data.allContext).length > 0) {
+            setAllContext(data.allContext);
+            extraContext = { ...data.allContext, ...extraContext };
+          }
+        }
+      } catch (e) {
+        console.error('Error rehydrating from localStorage:', e);
+      }
+      generateCompleteBook(failedStepIndex, extraContext);
     }
   };
 
