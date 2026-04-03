@@ -150,9 +150,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   }, []);
 
   // Save progress after each step
-  const saveProgress = useCallback(() => {
-    if (currentStepIndex < 0 || Object.keys(stepResults).length === 0) return;
-    
+  const saveProgress = useCallback((overrides: Partial<WorkflowProgress> = {}) => {
     const progress: WorkflowProgress = {
       title,
       subtitle,
@@ -168,12 +166,15 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
       waitingForTitleValidation,
       titleSuggestions,
       originalTitleScore,
-      selectedTitleIndex
+      selectedTitleIndex,
+      ...overrides,
     };
+
+    if (progress.currentStepIndex < 0 || Object.keys(progress.stepResults).length === 0) return;
     
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
-      console.log(`📦 Progress saved at step ${currentStepIndex + 1}`);
+      console.log(`📦 Progress saved at step ${progress.currentStepIndex + 1}`);
     } catch (e) {
       console.error('Error saving progress:', e);
     }
@@ -346,11 +347,29 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   // Continuer le workflow après validation des personnages
   const continueAfterCharacterValidation = () => {
     setWaitingForCharacterValidation(false);
-    // Mettre à jour le contexte P3 avec les personnages modifiés
-    const updatedP3 = { ...allContext.P3, personnages: generatedCharacters };
-    setAllContext(prev => ({ ...prev, P3: updatedP3 }));
-    // Reprendre à partir de P4 (index 3)
-    generateCompleteBook(3);
+
+    const baseP3 = allContext.P3 || stepResults.P3?.result || {};
+    const updatedP3 = { ...baseP3, personnages: generatedCharacters };
+    const nextContext = { ...allContext, P3: updatedP3 };
+    const nextStepResults = stepResults.P3
+      ? { ...stepResults, P3: { ...stepResults.P3, result: updatedP3 } }
+      : stepResults;
+
+    setAllContext(nextContext);
+    if (stepResults.P3) {
+      setStepResults(nextStepResults);
+    }
+
+    saveProgress({
+      currentStepIndex: 2,
+      allContext: nextContext,
+      stepResults: nextStepResults,
+      generatedCharacters,
+      waitingForCharacterValidation: false,
+    });
+
+    // Reprendre à partir de P4 (index 3) avec le contexte P3 déjà injecté
+    generateCompleteBook(3, { P3: updatedP3 });
   };
 
   // Continuer le workflow après validation du titre P1
@@ -397,7 +416,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
       arc: ''
     }]);
   };
-  const generateCompleteBook = async (resumeFromIndex: number = 0) => {
+  const generateCompleteBook = async (resumeFromIndex: number = 0, contextOverride: Record<string, any> = {}) => {
     if (!title.trim() || !authorName.trim() || !category) {
       toast.error('Veuillez remplir le titre, le nom d\'auteur et la catégorie');
       return;
@@ -427,7 +446,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
     // Récupérer le contexte existant ou en créer un nouveau
     // NOTE: en cas de pause après P3 (validation des personnages), React peut ne pas avoir flushé `allContext`.
     // On ré-hydrate donc depuis `stepResults` pour éviter un blocage à P4.
-    const context: Record<string, any> = isResuming ? { ...allContext } : {};
+    const context: Record<string, any> = isResuming ? { ...allContext, ...contextOverride } : { ...contextOverride };
 
     if (isResuming) {
       Object.entries(stepResults).forEach(([stepId, data]) => {
@@ -546,6 +565,9 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
           // On fait ce check AVANT le if(result) pour garantir l'arrêt même si result est null
           if (step.id === 'P1') {
             if (result) {
+              const nextStepResults = { ...stepResults, [step.id]: result };
+              const nextContext = { ...context, [step.id]: result.result };
+
               setStepResults(prev => ({ ...prev, [step.id]: result }));
               context[step.id] = result.result;
               setAllContext(prev => ({ ...prev, [step.id]: result.result }));
@@ -560,10 +582,25 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
               // Capturer intro/conclusion générées
               if (result.result?.introductionGeneree) setGeneratedIntro(result.result.introductionGeneree);
               if (result.result?.conclusionGeneree) setGeneratedConclusion(result.result.conclusionGeneree);
+
+              setWaitingForTitleValidation(true);
+              setIsGenerating(false);
+              saveProgress({
+                currentStepIndex: i,
+                stepResults: nextStepResults,
+                allContext: nextContext,
+                waitingForTitleValidation: true,
+                waitingForCharacterValidation: false,
+                titleSuggestions: suggestions,
+                originalTitleScore: origScore,
+                selectedTitleIndex: null,
+              });
+              toast.info('📊 Analyse du titre terminée ! Choisissez votre titre best-seller avant de continuer.');
+              return; // STOP — l'utilisateur doit valider avant P2
             }
             setWaitingForTitleValidation(true);
             setIsGenerating(false);
-            saveProgress();
+            saveProgress({ waitingForTitleValidation: true, waitingForCharacterValidation: false });
             toast.info('📊 Analyse du titre terminée ! Choisissez votre titre best-seller avant de continuer.');
             return; // STOP — l'utilisateur doit valider avant P2
           }
@@ -589,10 +626,20 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             // Même si 0 personnages, on laisse l'utilisateur vérifier et ajouter des personnages si besoin
             if (step.id === 'P3') {
               const personnagesP3 = Array.isArray(result.result?.personnages) ? result.result.personnages : [];
+              const nextStepResults = { ...stepResults, [step.id]: result };
+              const nextContext = { ...context, [step.id]: result.result };
+
               setGeneratedCharacters(personnagesP3);
               setWaitingForCharacterValidation(true);
               setIsGenerating(false);
-              saveProgress();
+              saveProgress({
+                currentStepIndex: i,
+                stepResults: nextStepResults,
+                allContext: nextContext,
+                generatedCharacters: personnagesP3,
+                waitingForCharacterValidation: true,
+                waitingForTitleValidation: false,
+              });
               toast.info(personnagesP3.length > 0
                 ? '🎭 Personnages générés ! Validez-les ou modifiez-les avant la rédaction.'
                 : '✅ Structure générée ! Vous pouvez ajouter des personnages ou continuer directement.');
