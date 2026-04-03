@@ -321,7 +321,7 @@ serve(async (req) => {
       chapter,
       chapterSegment,
       userApiKey,
-      useUserKey,
+      useUserKey: _useUserKey,
     } = payload;
 
     if (!userApiKey) {
@@ -458,9 +458,13 @@ Réponds en JSON :
           5000,
           9, 2, 'P1'
         );
-        result = parseJSON(content) || { raw: content };
+        result = normalizeP3Result(parseJSON(content) || { raw: content }, numberOfChapters, wordsPerChapter);
         result._qualityScore = qualityScore;
         result._attempts = attempts;
+
+        if (result.chapitres.length < numberOfChapters) {
+          throw new Error(`P3_STRUCTURE_INCOMPLETE: ${result.chapitres.length}/${numberOfChapters} chapitres exploitables générés.`);
+        }
         
         // Construire l'affichage riche
         const to = result.titreOriginal;
@@ -731,7 +735,6 @@ Format JSON :
         const tonEditorial = previousContext.P1?.tonEditorial || '';
         const lecteurCible = previousContext.P1?.lecteurCible || '';
         const structureGlobale = previousContext.P3?.structureGlobale || '';
-        const introP3 = previousContext.P3?.introduction || {};
 
         const personnagesP3 = previousContext.P3?.personnages || [];
         const personnagesAUtiliser = personnagesP3.length > 0 ? personnagesP3 : characters;
