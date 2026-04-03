@@ -568,19 +568,40 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
       case 'A7':
         return (
           <div className="space-y-4">
-            <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 text-sm space-y-1">
-              <p>✅ Titre : <strong>{brief.bookTitle}</strong></p>
-              <p>✅ Auteur : <strong>{brief.authorName}</strong></p>
-              <p>✅ Voix : <strong>{CATEGORIES.find(c => c.value === brief.category)?.voiceName}</strong></p>
-              <p>✅ Texte nettoyé & ponctuation optimisée</p>
-              <div className="text-xs text-muted-foreground mt-2 space-y-1">
-                <p className="font-medium">🎬 Ce qui sera généré :</p>
-                <p>1. 🎵 Intro Premium (jingle + présentation + teaser)</p>
-                <p>2. 📖 Tous les chapitres en MP3 séparés</p>
-                <p>3. 📦 Archive ZIP complète téléchargée automatiquement</p>
-                <p>4. 💾 Sauvegarde automatique dans Mes Livres Audio</p>
-              </div>
-            </div>
+            {(() => {
+              const textToPreview = cleanedText || brief.chapterContent || chapterContent;
+              const detectedChaps = textToPreview ? splitIntoChapters(textToPreview) : [];
+              return (
+                <>
+                  <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 text-sm space-y-1">
+                    <p>✅ Titre : <strong>{brief.bookTitle}</strong></p>
+                    <p>✅ Auteur : <strong>{brief.authorName}</strong></p>
+                    <p>✅ Voix : <strong>{CATEGORIES.find(c => c.value === brief.category)?.voiceName}</strong></p>
+                    <p>✅ Texte nettoyé & ponctuation optimisée</p>
+                  </div>
+                  {detectedChaps.length > 0 && (
+                    <div className="bg-accent/50 border border-accent rounded-lg p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <FileText className="h-5 w-5 text-primary" />
+                        <span className="font-semibold text-base">{detectedChaps.length} épisode{detectedChaps.length > 1 ? 's' : ''} détecté{detectedChaps.length > 1 ? 's' : ''}</span>
+                      </div>
+                      <div className="max-h-32 overflow-auto space-y-0.5 text-xs text-muted-foreground">
+                        {detectedChaps.map((ch, idx) => (
+                          <p key={idx}>📖 {ch.title} <span className="opacity-60">({ch.content.length} car.)</span></p>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  <div className="text-xs text-muted-foreground space-y-1">
+                    <p className="font-medium">🎬 Ce qui sera généré :</p>
+                    <p>1. 🎵 Intro Premium (jingle + présentation + teaser)</p>
+                    <p>2. 📖 {detectedChaps.length} chapitre{detectedChaps.length > 1 ? 's' : ''} en MP3 séparés</p>
+                    <p>3. 📦 Archive ZIP complète téléchargée automatiquement</p>
+                    <p>4. 💾 Sauvegarde automatique dans Mes Livres Audio</p>
+                  </div>
+                </>
+              );
+            })()}
             {isGeneratingAudio && (
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
