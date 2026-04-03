@@ -84,17 +84,23 @@ const AdminDirectPage = () => {
   };
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state change:", event, session?.user?.email);
-      if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session) {
-        setStatus("authenticating");
-        setMessage("Authentification en cours...");
+    const processAuthenticatedSession = async (session: any) => {
+      setStatus("authenticating");
+      setMessage("Authentification en cours...");
 
-        const success = await checkAdminAndRedirect(session);
-        if (!success) {
-          setStatus("error");
-          setMessage("Accès refusé - Vous n'êtes pas administrateur");
-        }
+      const success = await checkAdminAndRedirect(session);
+      if (!success) {
+        setStatus("error");
+        setMessage("Accès refusé - Vous n'êtes pas administrateur");
+      }
+    };
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Auth state change:", event, session?.user?.email);
+      if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') && session) {
+        setTimeout(() => {
+          void processAuthenticatedSession(session);
+        }, 0);
       }
     });
 
