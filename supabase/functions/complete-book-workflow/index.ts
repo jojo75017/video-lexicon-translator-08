@@ -469,13 +469,9 @@ Réponds en JSON :
           5000,
           9, 2, 'P1'
         );
-        result = normalizeP3Result(parseJSON(content) || { raw: content }, numberOfChapters, wordsPerChapter);
+        result = parseJSON(content) || { raw: content };
         result._qualityScore = qualityScore;
         result._attempts = attempts;
-
-        if (result.chapitres.length < numberOfChapters) {
-          throw new Error(`P3_STRUCTURE_INCOMPLETE: ${result.chapitres.length}/${numberOfChapters} chapitres exploitables générés.`);
-        }
         
         // Construire l'affichage riche
         const to = result.titreOriginal;
@@ -699,9 +695,13 @@ Format JSON :
           p3Settings.maxRetries,
           'P3'
         );
-        result = parseJSON(content) || { raw: content };
+        result = normalizeP3Result(parseJSON(content) || { raw: content }, numberOfChapters, wordsPerChapter);
         result._qualityScore = qualityScore;
         result._attempts = attempts;
+
+        if (result.chapitres.length < numberOfChapters) {
+          throw new Error(`P3_STRUCTURE_INCOMPLETE: ${result.chapitres.length}/${numberOfChapters} chapitres exploitables générés.`);
+        }
         
         // Intégrer intro/conclusion pré-générées dans le résultat
         if (introductionGeneree && !result.introductionPreGeneree) {
