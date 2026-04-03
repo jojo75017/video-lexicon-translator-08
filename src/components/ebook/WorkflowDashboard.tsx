@@ -81,6 +81,9 @@ export const WorkflowDashboard: React.FC<WorkflowDashboardProps> = ({
     return allReqsMet ? 'available' : 'locked';
   };
 
+  const nextAvailableStep = WORKFLOW_STEPS.find((step) => getStepStatus(step.id) === 'available');
+  const nextAvailableTabId = nextAvailableStep ? STEP_TO_TAB[nextAvailableStep.id] : null;
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -159,6 +162,37 @@ export const WorkflowDashboard: React.FC<WorkflowDashboardProps> = ({
           </div>
         </CardContent>
       </Card>
+
+      {nextAvailableStep && nextAvailableTabId && (
+        <Card className="border-2 border-cyan-500/30 bg-cyan-500/5 shadow-lg shadow-cyan-500/10">
+          <CardContent className="p-6">
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div className="space-y-2">
+                <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/30">
+                  Étape suivante recommandée
+                </Badge>
+                <div>
+                  <h3 className="text-xl font-bold text-white">
+                    Continuer avec {nextAvailableStep.id} — {nextAvailableStep.label}
+                  </h3>
+                  <p className="text-sm text-white/60 mt-1">
+                    {nextAvailableStep.description} · ~{STEP_ESTIMATES[nextAvailableStep.id]?.minutes || 3} min
+                  </p>
+                </div>
+              </div>
+
+              <Button
+                size="lg"
+                onClick={() => onNavigate(nextAvailableTabId)}
+                className="bg-gold hover:bg-gold-dark text-slate-900 font-bold"
+              >
+                <Play className="h-5 w-5 mr-2" />
+                Continuer maintenant
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Steps Grid */}
       <TooltipProvider delayDuration={200}>
