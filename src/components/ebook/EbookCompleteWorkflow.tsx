@@ -367,6 +367,12 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
 
   const p3Structure = normalizeP3Structure((allContext.P3 || stepResults.P3?.result || {})?.chapitres || []);
   const canResumeAfterP3 = !isGenerating && !waitingForTitleValidation && !waitingForCharacterValidation && p3Structure.length > 0 && !stepResults.P4;
+  const savedResumeStepIndex = failedStepIndex !== null
+    ? failedStepIndex
+    : currentStepIndex >= 0 && currentStepIndex < workflowSteps.length && currentStepIndex < 14
+      ? currentStepIndex
+      : null;
+  const canResumeWorkflow = !isGenerating && !waitingForTitleValidation && !waitingForCharacterValidation && savedResumeStepIndex !== null;
 
   const splitIntoChunks = <T,>(items: T[], chunkCount: number) => {
     if (items.length === 0) return [] as T[][];
@@ -971,6 +977,49 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
       }
       generateCompleteBook(failedStepIndex, extraContext);
     }
+  };
+
+  const resumeWorkflowFromProgress = () => {
+    let resumeIndex = savedResumeStepIndex;
+    let extraContext: Record<string, any> = {};
+
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const data: WorkflowProgress = JSON.parse(saved);
+        if (resumeIndex === null && data.currentStepIndex >= 0 && data.currentStepIndex < workflowSteps.length) {
+          resumeIndex = data.currentStepIndex;
+        }
+
+        if (data.stepResults && Object.keys(stepResults).length === 0) {
+          setStepResults(data.stepResults);
+          Object.entries(data.stepResults).forEach(([stepId, d]) => {
+            extraContext[stepId] = d.result;
+          });
+        }
+
+        if (data.allContext) {
+          if (Object.keys(allContext).length === 0) {
+            setAllContext(data.allContext);
+          }
+          extraContext = { ...data.allContext, ...extraContext };
+        }
+      }
+    } catch (e) {
+      console.error('Error resuming workflow from progress:', e);
+    }
+
+    if (resumeIndex === null) {
+      toast.error('Aucune étape à reprendre pour le moment.');
+      return;
+    }
+
+    if (resumeIndex <= 2 && p3Structure.length > 0 && !stepResults.P4) {
+      continueAfterCharacterValidation();
+      return;
+    }
+
+    generateCompleteBook(resumeIndex, extraContext);
   };
 
   // Estimation réaliste : 3000-4000 mots/chapitre = ~12-16 pages/chapitre
@@ -1646,6 +1695,33 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
               >
                 <Rocket className="h-5 w-5" />
                 Continuer vers P4
+              </Button>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+
+      {canResumeWorkflow && !canResumeAfterP3 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <Card className="border border-primary/30 bg-muted/20">
+            <CardContent className="pt-6 space-y-4">
+              <div className="space-y-1">
+                <p className="font-medium text-foreground">Une reprise est disponible.</p>
+                <p className="text-sm text-muted-foreground">
+                  Votre progression est sauvegardée. Vous pouvez relancer le workflow depuis l'étape {workflowSteps[savedResumeStepIndex ?? 0]?.id}.
+                </p>
+              </div>
+
+              <Button
+                size="lg"
+                onClick={resumeWorkflowFromProgress}
+                className="w-full gap-2"
+              >
+                <Rocket className="h-5 w-5" />
+                Reprendre le workflow
               </Button>
             </CardContent>
           </Card>
