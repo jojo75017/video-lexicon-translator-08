@@ -224,6 +224,20 @@ function cleanChapter(chapter: any): any {
   };
 }
 
+function getP3GenerationSettings(numberOfChapters: number) {
+  const isLargeProject = numberOfChapters >= 16;
+
+  return {
+    isLargeProject,
+    maxTokens: Math.min(7000, Math.max(3600, 1800 + numberOfChapters * 90)),
+    minScore: isLargeProject ? 7 : 9,
+    maxRetries: isLargeProject ? 0 : 1,
+    sousSectionsRange: isLargeProject ? '3-4' : '4-6',
+    keyPointsCount: isLargeProject ? 2 : 3,
+    characterDescriptionLength: isLargeProject ? '1-2 phrases maximum' : '2-3 phrases',
+  };
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -501,11 +515,13 @@ Format JSON :
         const wordsPerChapter = 3500;
         const totalWords = numberOfChapters * wordsPerChapter;
         const estimatedPages = Math.ceil(totalWords / 250);
+        const p3Settings = getP3GenerationSettings(numberOfChapters);
         const descriptionGeneree = previousContext.P1?.descriptionGeneree || '';
         const introductionGeneree = previousContext.P1?.introductionGeneree || '';
         const conclusionGeneree = previousContext.P1?.conclusionGeneree || '';
         
         console.log(`Step P3: Structuring ${numberOfChapters} chapters for "${fullTitle}"`);
+        console.log(`P3 settings → largeProject=${p3Settings.isLargeProject}, maxTokens=${p3Settings.maxTokens}, retries=${p3Settings.maxRetries}`);
         
         const { content, qualityScore, attempts } = await callAIWithQualityLoop(
           `Tu es un ARCHITECTE DE CONTENU expert, spécialisé dans les best-sellers Amazon KDP. Tu structures des livres qui se vendent.
@@ -526,7 +542,12 @@ QUALITÉ DE STRUCTURE :
 - Progression pédagogique : du simple au complexe
 - Pas de redondance entre chapitres
 - Chaque chapitre amène naturellement au suivant
-- Sous-sections variées : concepts + exemples + exercices`,
+- Sous-sections variées : concepts + exemples + exercices
+
+RÈGLE DE CONCISION ABSOLUE :
+- Retourne un JSON compact, sans texte hors JSON
+- Chaque champ textuel = 1 phrase utile maximum quand c'est possible
+- Pas de paragraphes longs dans les descriptions`,
           `Structure ce livre selon les normes KDP PRO en ${numberOfChapters} chapitres ET crée les personnages :
 ${bookContext}
 DESCRIPTION : ${descriptionGeneree}
@@ -536,9 +557,15 @@ VISION P1 : ${JSON.stringify(previousContext.P1 || {})}
 MARCHÉ P2 : ${JSON.stringify(previousContext.P2 || {})}
 
 OBJECTIF : ~${totalWords} mots total (~${estimatedPages} pages)
-Chaque chapitre ~${wordsPerChapter} mots avec 4-6 sous-sections.
+Chaque chapitre ~${wordsPerChapter} mots avec ${p3Settings.sousSectionsRange} sous-sections.
 
 MISSION PERSONNAGES : Crée 4-6 personnages UNIQUES et COHÉRENTS.
+
+IMPORTANT SI LE PROJET EST LONG :
+- Objectif, accroche, lienAvecPrecedent = 1 phrase courte chacun
+- pointsCles = ${p3Settings.keyPointsCount} entrées maximum, très courtes
+- Description personnage = ${p3Settings.characterDescriptionLength}
+- Priorité à la structure exploitable, pas aux développements verbeux
 
 Format JSON :
 {
@@ -555,7 +582,7 @@ Format JSON :
     {
       "name": "Nom du personnage",
       "role": "protagoniste/antagoniste/secondaire/mentor",
-      "description": "Description physique et psychologique (2-3 phrases)",
+      "description": "Description physique et psychologique (${p3Settings.characterDescriptionLength})",
       "arc": "Son évolution"
     }
   ],
@@ -565,8 +592,8 @@ Format JSON :
       "titre": "Titre accrocheur du chapitre",
       "objectif": "Ce que le lecteur maîtrisera après ce chapitre",
       "nombreMotsPrevu": ${wordsPerChapter},
-      "sousSections": ["sous-section 1", "sous-section 2", "sous-section 3", "sous-section 4"],
-      "pointsCles": ["point1", "point2", "point3"],
+      "sousSections": ["sous-section 1", "sous-section 2", "sous-section 3"],
+      "pointsCles": ["point1", "point2"],
       "accroche": "Phrase d'ouverture captivante",
       "lienAvecPrecedent": "comment ce chapitre découle du précédent"
     }
@@ -590,7 +617,10 @@ Format JSON :
   "progressionLogique": "explication de pourquoi cet ordre",
   "qualityScore": 9
 }`,
-          12000, 9, 1, 'P3'
+          p3Settings.maxTokens,
+          p3Settings.minScore,
+          p3Settings.maxRetries,
+          'P3'
         );
         result = parseJSON(content) || { raw: content };
         result._qualityScore = qualityScore;
