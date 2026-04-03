@@ -50,7 +50,8 @@ async function callGeminiDirect(systemPrompt: string, userPrompt: string, maxTok
     throw new Error('INVALID_API_KEY: Clé API Gemini invalide (trop courte ou vide).');
   }
   
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(cleanKey)}`;
+  console.log(`[Gemini] Using key: length=${cleanKey.length}, prefix=${cleanKey.substring(0, 8)}..., retry=${retryCount}`);
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${cleanKey}`;
   
   const response = await fetch(url, {
     method: 'POST',
