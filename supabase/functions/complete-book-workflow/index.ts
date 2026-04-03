@@ -43,8 +43,16 @@ let totalTokenUsage = {
 
 async function callGeminiDirect(systemPrompt: string, userPrompt: string, maxTokens: number, apiKey: string, retryCount = 0): Promise<string> {
   const MAX_RETRIES = 3;
+  const cleanKey = apiKey.trim();
   
-  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+  // Pre-flight: vérifier le format de la clé
+  if (!cleanKey || cleanKey.length < 10) {
+    throw new Error('INVALID_API_KEY: Clé API Gemini invalide (trop courte ou vide).');
+  }
+  
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(cleanKey)}`;
+  
+  const response = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
