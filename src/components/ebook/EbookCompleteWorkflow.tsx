@@ -365,6 +365,9 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
       .filter(Boolean);
   };
 
+  const p3Structure = normalizeP3Structure((allContext.P3 || stepResults.P3?.result || {})?.chapitres || []);
+  const canResumeAfterP3 = !isGenerating && !waitingForTitleValidation && !waitingForCharacterValidation && p3Structure.length > 0 && !stepResults.P4;
+
   const splitIntoChunks = <T,>(items: T[], chunkCount: number) => {
     if (items.length === 0) return [] as T[][];
 
@@ -525,6 +528,11 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
 
     const baseP3 = allContext.P3 || stepResults.P3?.result || {};
     const normalizedChapitres = normalizeP3Structure(baseP3.chapitres || []);
+    const effectiveCharacters = generatedCharacters.length > 0
+      ? generatedCharacters
+      : Array.isArray(baseP3.personnages)
+        ? baseP3.personnages
+        : [];
 
     if (normalizedChapitres.length === 0) {
       toast.error('La structure P3 est vide ou invalide. Relancez P3 avant de continuer vers P4.');
@@ -533,7 +541,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
       return;
     }
 
-    const updatedP3 = { ...baseP3, chapitres: normalizedChapitres, personnages: generatedCharacters };
+    const updatedP3 = { ...baseP3, chapitres: normalizedChapitres, personnages: effectiveCharacters };
     const nextContext = { ...allContext, P3: updatedP3 };
     const nextStepResults = stepResults.P3
       ? { ...stepResults, P3: { ...stepResults.P3, result: updatedP3 } }
@@ -548,7 +556,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
       currentStepIndex: 2,
       allContext: nextContext,
       stepResults: nextStepResults,
-      generatedCharacters,
+      generatedCharacters: effectiveCharacters,
       waitingForCharacterValidation: false,
     });
 
@@ -1612,6 +1620,33 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
               <p className="text-xs text-center text-muted-foreground">
                 Ces personnages seront utilisés dans tous les chapitres de votre livre
               </p>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+
+      {canResumeAfterP3 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <Card className="border border-primary/30 bg-muted/20">
+            <CardContent className="pt-6 space-y-4">
+              <div className="space-y-1">
+                <p className="font-medium text-foreground">La structure P3 est prête.</p>
+                <p className="text-sm text-muted-foreground">
+                  Le bouton de validation a été masqué, mais vous pouvez reprendre directement à la rédaction P4.
+                </p>
+              </div>
+
+              <Button
+                size="lg"
+                onClick={continueAfterCharacterValidation}
+                className="w-full gap-2"
+              >
+                <Rocket className="h-5 w-5" />
+                Continuer vers P4
+              </Button>
             </CardContent>
           </Card>
         </motion.div>
