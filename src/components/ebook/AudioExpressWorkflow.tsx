@@ -276,14 +276,42 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
 
       // Chapters
       const chaps = splitIntoChapters(textToConvert);
+      const allMp3Blobs: Blob[] = [];
+      
+      // Include intro in the full merged audio
+      if (introBlobs.length > 0) {
+        allMp3Blobs.push(new Blob(introBlobs, { type: 'audio/mpeg' }));
+      }
+      
+      let chaptersGenerated = 0;
       for (let i = 0; i < chaps.length; i++) {
+        const chapContent = chaps[i].content?.trim();
+        if (!chapContent || chapContent.length < 10) {
+          console.warn(`Chapitre ${i + 1} ignoré (contenu vide ou trop court)`);
+          continue;
+        }
         setGenerationLabel(`📖 ${i + 1}/${chaps.length} — ${chaps[i].title}`);
         setGenerationProgress(Math.round(10 + ((i) / chaps.length) * 80));
-        const blob = await generateTts(chaps[i].content);
-        if (blob) {
-          const fname = `${String(i + 1).padStart(2, '0')}-${chaps[i].title.replace(/[^a-zA-Z0-9àâéèêëïîôùûüç\s-]/gi, '').replace(/\s+/g, '-').substring(0, 60)}.mp3`;
-          zip.file(fname, blob);
+        try {
+          const blob = await generateTts(chapContent);
+          if (blob && blob.size > 100) {
+            const fname = `${String(i + 1).padStart(2, '0')}-${chaps[i].title.replace(/[^a-zA-Z0-9àâéèêëïîôùûüç\s-]/gi, '').replace(/\s+/g, '-').substring(0, 60)}.mp3`;
+            zip.file(fname, blob);
+            allMp3Blobs.push(blob);
+            chaptersGenerated++;
+          } else {
+            console.warn(`Chapitre ${i + 1}: blob vide ou trop petit`);
+            toast.error(`⚠️ Chapitre ${i + 1} "${chaps[i].title}" : audio non généré`);
+          }
+        } catch (chapterError: any) {
+          console.error(`Erreur chapitre ${i + 1}:`, chapterError);
+          toast.error(`⚠️ Chapitre ${i + 1} "${chaps[i].title}" : ${chapterError.message}`);
         }
+      }
+
+      if (chaptersGenerated === 0) {
+        toast.error('❌ Aucun chapitre n\'a pu être converti en audio. Vérifiez le contenu texte.');
+        return;
       }
 
       // ZIP download
@@ -292,15 +320,11 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
       const zipBlob = await zip.generateAsync({ type: 'blob' });
       saveAs(zipBlob, `audiobook-${(brief.bookTitle || bookTitle).replace(/\s+/g, '-')}.zip`);
 
-      // Merge for full preview
-      const allFiles = Object.values(zip.files);
-      const mp3Blobs: Blob[] = [];
-      for (const file of allFiles) {
-        if (!file.dir) mp3Blobs.push(await file.async('blob'));
-      }
-      if (mp3Blobs.length > 0) {
-        const mergedBlob = new Blob(mp3Blobs, { type: 'audio/mpeg' });
+      // Merge all blobs (intro + chapters) for full preview and library
+      if (allMp3Blobs.length > 0) {
+        const mergedBlob = new Blob(allMp3Blobs, { type: 'audio/mpeg' });
         setFullBlob(mergedBlob);
+        console.log(`Full audiobook: ${allMp3Blobs.length} segments, ${mergedBlob.size} bytes, ${chaptersGenerated} chapitres`);
         await saveToLibrary(mergedBlob, brief.bookTitle || bookTitle, brief.authorName || authorNameState);
       }
 
