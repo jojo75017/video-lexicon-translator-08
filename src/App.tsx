@@ -77,6 +77,7 @@ const ProspectManagerPage = lazy(() => import('@/pages/ProspectManagerPage'));
 const SocialPostGeneratorPage = lazy(() => import('@/pages/SocialPostGeneratorPage'));
 const UnifiedMarketingDashboard = lazy(() => import('@/pages/UnifiedMarketingDashboard'));
 const CrmPage = lazy(() => import('@/pages/CrmPage'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
 
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center bg-background">
@@ -405,6 +406,14 @@ const App = () => {
               element={
                 <AdminGate>
                   <AdminPage />
+                </AdminGate>
+              }
+            />
+            <Route 
+              path="/dashboard" 
+              element={
+                <AdminGate>
+                  <Dashboard />
                 </AdminGate>
               }
             />
