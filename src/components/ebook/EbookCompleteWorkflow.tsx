@@ -365,6 +365,62 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
       .filter(Boolean);
   };
 
+  const splitIntoChunks = <T,>(items: T[], chunkCount: number) => {
+    if (items.length === 0) return [] as T[][];
+
+    return Array.from({ length: chunkCount }, (_, index) => {
+      const start = Math.floor((index * items.length) / chunkCount);
+      const end = Math.floor(((index + 1) * items.length) / chunkCount);
+      return items.slice(start, end);
+    }).filter(chunk => chunk.length > 0);
+  };
+
+  const buildP4Segments = (chapter: any, totalChapters: number) => {
+    const rawSections = Array.isArray(chapter?.sousSections)
+      ? chapter.sousSections.filter(Boolean)
+      : [];
+
+    if (totalChapters < 30) {
+      return [{ partNumber: 1, totalParts: 1, sectionTitles: rawSections }];
+    }
+
+    const fallbackSections = [chapter?.objectif, chapter?.accroche, chapter?.lienAvecPrecedent]
+      .filter(Boolean)
+      .map((value: string) => String(value).trim());
+
+    const sectionSource = rawSections.length > 0 ? rawSections : fallbackSections;
+    const chunks = splitIntoChunks(sectionSource, 2);
+
+    if (chunks.length === 0) {
+      return [{ partNumber: 1, totalParts: 2, sectionTitles: [] }, { partNumber: 2, totalParts: 2, sectionTitles: [] }];
+    }
+
+    return chunks.map((sectionTitles, index) => ({
+      partNumber: index + 1,
+      totalParts: chunks.length,
+      sectionTitles,
+    }));
+  };
+
+  const countWords = (text: string) => text.trim().split(/\s+/).filter(Boolean).length;
+
+  const mergeChapterSegments = (chapter: any, segments: any[]) => {
+    const contenu = segments
+      .map(segment => String(segment?.contenu || segment?.content || '').trim())
+      .filter(Boolean)
+      .join('\n\n');
+
+    return {
+      numero: chapter?.numero,
+      titre: chapter?.titre || chapter?.title,
+      contenu,
+      nombreMots: segments.reduce((total, segment) => {
+        const explicitCount = Number(segment?.nombreMots);
+        return total + (Number.isFinite(explicitCount) && explicitCount > 0 ? explicitCount : countWords(String(segment?.contenu || segment?.content || '')));
+      }, 0),
+    };
+  };
+
   const runStep = async (
     stepId: string,
     context: Record<string, any>,
@@ -661,28 +717,49 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
 
           for (let chIdx = startFromChapter; chIdx < retryStructure.length; chIdx++) {
             const chapitre = retryStructure[chIdx];
+            const chapterSegments = buildP4Segments(chapitre, retryStructure.length);
+            const generatedSegments: any[] = [];
 
             // Contexte slim pour P4 : inclut les résumés des 3 derniers chapitres générés
             // pour maintenir la cohérence narrative sans exploser la taille du payload
-            const p4SlimContext = buildSlimP4Context(context, retryStructure, chapitresComplets);
-
             let partial: { result: any; displayContent: string } | null = null;
-            try {
-              partial = await runStepWithRetry(
-                'P4',
-                context,
-                { chapter: chapitre },
-                { previousContextOverride: p4SlimContext },
-                3
-              );
-            } catch (err: any) {
-              throw new Error(`P4 — Chapitre ${chIdx + 1}/${retryStructure.length} : ${err?.message || 'Erreur inconnue'}`);
+
+            for (const chapterSegment of chapterSegments) {
+              const p4SlimContext = buildSlimP4Context(context, retryStructure, chapitresComplets);
+
+              try {
+                partial = await runStepWithRetry(
+                  'P4',
+                  context,
+                  {
+                    chapter: chapitre,
+                    chapterSegment: {
+                      partNumber: chapterSegment.partNumber,
+                      totalParts: chapterSegment.totalParts,
+                      sectionTitles: chapterSegment.sectionTitles,
+                      previousParts: generatedSegments,
+                    }
+                  },
+                  { previousContextOverride: p4SlimContext },
+                  3
+                );
+              } catch (err: any) {
+                throw new Error(`P4 — Chapitre ${chIdx + 1}/${retryStructure.length} : ${err?.message || 'Erreur inconnue'}`);
+              }
+
+              const generatedPart = partial?.result?.chapitrePart || partial?.result?.chapitre;
+              if (!generatedPart) {
+                throw new Error(`P4 — Chapitre ${chIdx + 1}/${retryStructure.length} : segment vide`);
+              }
+
+              generatedSegments.push(generatedPart);
             }
-            const chapitreGenere = partial?.result?.chapitre;
+
+            const chapitreGenere = mergeChapterSegments(chapitre, generatedSegments);
             if (chapitreGenere) chapitresComplets.push(chapitreGenere);
 
             // UI : on met à jour P4 au fil de l'eau
-            const p4DisplayContent = `**📄 Chapitres rédigés : ${chapitresComplets.length}/${retryStructure.length}**\n\nDernier : ${partial?.displayContent || ''}`;
+            const p4DisplayContent = `**📄 Chapitres rédigés : ${chapitresComplets.length}/${retryStructure.length}**\n\nDernier : ${chapitreGenere?.titre || partial?.displayContent || ''}`;
             const nextP4State = {
               result: { chapitres: chapitresComplets, nombreChapitres: chapitresComplets.length },
               displayContent: p4DisplayContent,

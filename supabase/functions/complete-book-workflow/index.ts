@@ -288,13 +288,14 @@ function getP4GenerationSettings(numberOfChapters: number) {
   return {
     isLargeProject,
     isVeryLargeProject,
-    maxTokens: isVeryLargeProject ? 3600 : isLargeProject ? 4500 : 6000,
-    minWords: isVeryLargeProject ? 1800 : 2500,
-    targetWords: isVeryLargeProject ? 2200 : 3000,
-    maxWords: isVeryLargeProject ? 2600 : 3500,
+    maxTokens: isVeryLargeProject ? 2400 : isLargeProject ? 4200 : 6000,
+    minWords: isVeryLargeProject ? 1200 : 2500,
+    targetWords: isVeryLargeProject ? 1600 : 3000,
+    maxWords: isVeryLargeProject ? 1900 : 3500,
     minScore: isVeryLargeProject ? 7 : 8,
     maxRetries: isVeryLargeProject ? 0 : 1,
-    previousChapterChars: isVeryLargeProject ? 220 : 400,
+    previousChapterChars: isVeryLargeProject ? 140 : 400,
+    segmentCount: isVeryLargeProject ? 2 : 1,
   };
 }
 
@@ -318,6 +319,7 @@ serve(async (req) => {
       characters = [],
       previousContext = {},
       chapter,
+      chapterSegment,
       userApiKey,
       useUserKey,
     } = payload;
@@ -456,13 +458,9 @@ Réponds en JSON :
           5000,
           9, 2, 'P1'
         );
-        result = normalizeP3Result(parseJSON(content) || { raw: content }, numberOfChapters, wordsPerChapter);
+        result = parseJSON(content) || { raw: content };
         result._qualityScore = qualityScore;
         result._attempts = attempts;
-
-        if (result.chapitres.length < numberOfChapters) {
-          throw new Error(`P3_STRUCTURE_INCOMPLETE: ${result.chapitres.length}/${numberOfChapters} chapitres exploitables générés.`);
-        }
         
         // Construire l'affichage riche
         const to = result.titreOriginal;
@@ -728,6 +726,7 @@ Format JSON :
         // RÉDACTION PRO AVEC BOUCLE QUALITÉ
         const structure = previousContext.P3?.chapitres || [];
         const p4Settings = getP4GenerationSettings(structure.length || numberOfChapters);
+        const useSegmentedMode = p4Settings.segmentCount > 1;
         const descriptionGeneree = previousContext.P1?.descriptionGeneree || '';
         const tonEditorial = previousContext.P1?.tonEditorial || '';
         const lecteurCible = previousContext.P1?.lecteurCible || '';
@@ -741,11 +740,22 @@ Format JSON :
           ? `\n\nPERSONNAGES (à utiliser OBLIGATOIREMENT) :\n${personnagesAUtiliser.map((c: any) => `- ${c.name} (${c.role}): ${c.description}${c.arc ? ` | Arc: ${c.arc}` : ''}`).join('\n')}`
           : '';
 
-        const planComplet = structure.map((ch: any) => `Ch.${ch.numero}: ${ch.titre} — ${ch.objectif || ''}`).join('\n');
+        const planComplet = useSegmentedMode
+          ? structure.map((ch: any) => `Ch.${ch.numero}: ${cleanGeneratedText(ch.titre || '').slice(0, 70)}`).join(' | ')
+          : structure.map((ch: any) => `Ch.${ch.numero}: ${ch.titre} — ${ch.objectif || ''}`).join('\n');
         const chapitresDejaGeneres = previousContext.P4?.chapitres || [];
 
         if (chapter) {
           const chapitre = chapter?.titre ? chapter : structure.find((c: any) => c.numero === chapter.numero) || chapter;
+          const totalParts = Math.max(1, Number(chapterSegment?.totalParts) || 1);
+          const partNumber = Math.min(totalParts, Math.max(1, Number(chapterSegment?.partNumber) || 1));
+          const segmentSections = Array.isArray(chapterSegment?.sectionTitles)
+            ? chapterSegment.sectionTitles.map((item: any) => cleanGeneratedText(String(item))).filter(Boolean)
+            : [];
+          const previousParts = Array.isArray(chapterSegment?.previousParts) ? chapterSegment.previousParts : [];
+          const segmentMinWords = totalParts > 1 ? Math.max(450, Math.floor(p4Settings.minWords / totalParts)) : p4Settings.minWords;
+          const segmentTargetWords = totalParts > 1 ? Math.max(650, Math.floor(p4Settings.targetWords / totalParts)) : p4Settings.targetWords;
+          const segmentMaxWords = totalParts > 1 ? Math.max(850, Math.floor(p4Settings.maxWords / totalParts)) : p4Settings.maxWords;
 
           if (!chapitre?.numero || !chapitre?.titre) {
             return new Response(
@@ -759,19 +769,36 @@ Format JSON :
             const resumesList = chapitresDejaGeneres
               .filter((ch: any) => ch.numero < chapitre.numero)
               .sort((a: any, b: any) => a.numero - b.numero)
-              .slice(-3)
+              .slice(useSegmentedMode ? -2 : -3)
               .map((ch: any) => `Ch.${ch.numero} "${ch.titre}": ${(ch.contenu || '').substring(0, p4Settings.previousChapterChars)}...`);
             if (resumesList.length > 0) {
               resumeChapitresPrecedents = `\n\nCHAPITRES PRÉCÉDENTS (continuité narrative) :\n${resumesList.join('\n\n')}`;
             }
           }
 
+          const previousPartsSection = previousParts.length > 0
+            ? `\n\nSEGMENTS DÉJÀ RÉDIGÉS POUR CE CHAPITRE :\n${previousParts.map((part: any) => `Segment ${part.partNumber}/${totalParts}: ${(part.contenu || '').substring(0, 220)}...`).join('\n\n')}`
+            : '';
+
           const chapSuivant = structure.find((c: any) => c.numero === chapitre.numero + 1);
           const transitionVers = chapSuivant ? `\nTRANSITION : Amène naturellement vers "${chapSuivant.titre}".` : '\nDERNIER CHAPITRE : Conclusion forte.';
+          const segmentTransition = totalParts > 1
+            ? (partNumber < totalParts
+                ? `\nFIN DU SEGMENT : termine avec une transition immédiate vers le segment ${partNumber + 1}/${totalParts}, sans conclure tout le chapitre.`
+                : transitionVers)
+            : transitionVers;
+          const segmentSectionsText = (segmentSections.length > 0 ? segmentSections : (chapitre.sousSections || []))
+            .join(', ');
+          const p4SystemPrompt = totalParts > 1
+            ? `Tu es un AUTEUR-ÉDITEUR expert du genre "${category}". Tu rédiges un segment de chapitre dense, fluide et crédible.
 
-          // Boucle qualité pour chaque chapitre
-          const { content: chapterContent, qualityScore, attempts } = await callAIWithQualityLoop(
-            `Tu es un AUTEUR BEST-SELLER avec 20 ans d'expérience. Tu rédiges des chapitres EXCEPTIONNELS dans le genre "${category}".
+RÈGLES STRICTES :
+- Respect absolu de la continuité narrative et des personnages
+- Aucune redite, aucun remplissage, aucun méta-discours
+- Style vivant, concret, immersif
+- Si ce n'est pas le dernier segment, ne conclus pas le chapitre
+- Retourne uniquement un JSON valide${personnagesSection}`
+            : `Tu es un AUTEUR BEST-SELLER avec 20 ans d'expérience. Tu rédiges des chapitres EXCEPTIONNELS dans le genre "${category}".
 
 EXIGENCES QUALITÉ PUBLICATION PROFESSIONNELLE :
 - Chaque paragraphe doit être INDISPENSABLE (zéro remplissage, zéro redondance)
@@ -808,8 +835,35 @@ STYLE PROFESSIONNEL :
 - Phrases courtes percutantes alternées avec développements fluides
 - Montrer (show) au lieu d'expliquer (tell)
 - Supprimer tout adverbe inutile (vraiment, absolument, totalement)
-- Aucune tournure passive excessive${personnagesSection}`,
-            `Rédige le CHAPITRE COMPLET (${p4Settings.minWords}-${p4Settings.maxWords} mots, qualité best-seller) :
+- Aucune tournure passive excessive${personnagesSection}`;
+          const p4UserPrompt = totalParts > 1
+            ? `Rédige uniquement le SEGMENT ${partNumber}/${totalParts} du chapitre, en ${segmentMinWords}-${segmentMaxWords} mots :
+
+LIVRE : "${fullTitle}"
+CATÉGORIE : ${category}
+DESCRIPTION : ${descriptionGeneree}
+LECTEUR CIBLE : ${lecteurCible}
+ARC GLOBAL : ${structureGlobale}
+PLAN GLOBAL (compact) : ${planComplet}
+${resumeChapitresPrecedents}${previousPartsSection}${personnagesSection}
+
+CHAPITRE ${chapitre.numero}/${structure.length} : "${chapitre.titre}"
+OBJECTIF : ${chapitre.objectif || ''}
+SOUS-SECTIONS DE CE SEGMENT : ${segmentSectionsText}
+ACCROCHE : ${chapitre.accroche || ''}
+${segmentTransition}
+
+Retourne en JSON :
+{
+  "numero": ${chapitre.numero},
+  "titre": "${chapitre.titre}",
+  "contenu": "LE CONTENU COMPLET DU SEGMENT ${partNumber}/${totalParts}",
+  "nombreMots": ${segmentTargetWords},
+  "partNumber": ${partNumber},
+  "totalParts": ${totalParts},
+  "qualityScore": 8
+}`
+            : `Rédige le CHAPITRE COMPLET (${p4Settings.minWords}-${p4Settings.maxWords} mots, qualité best-seller) :
 
 LIVRE : "${fullTitle}"
 CATÉGORIE : ${category}
@@ -833,11 +887,16 @@ Retourne en JSON :
   "contenu": "LE CONTENU COMPLET (${p4Settings.minWords}-${p4Settings.maxWords} mots)",
   "nombreMots": ${p4Settings.targetWords},
   "qualityScore": 9
-}`,
+}`;
+
+          // Boucle qualité pour chaque chapitre
+          const { content: chapterContent, qualityScore, attempts } = await callAIWithQualityLoop(
+            p4SystemPrompt,
+            p4UserPrompt,
             p4Settings.maxTokens,
             p4Settings.minScore,
             p4Settings.maxRetries,
-            `P4-Ch${chapitre.numero}`
+            totalParts > 1 ? `P4-Ch${chapitre.numero}-Part${partNumber}` : `P4-Ch${chapitre.numero}`
           );
 
           const parsedChapter = parseJSON(chapterContent);
@@ -848,16 +907,31 @@ Retourne en JSON :
             nombreMots: chapterContent.split(/\s+/).length,
           });
 
-          result = {
-            chapitre: chapitreGenere,
-            numero: chapitreGenere.numero,
-            titre: chapitreGenere.titre,
-            nombreMots: chapitreGenere.nombreMots,
-            _qualityScore: qualityScore,
-            _attempts: attempts,
-          };
+          result = totalParts > 1
+            ? {
+                chapitrePart: {
+                  ...chapitreGenere,
+                  partNumber,
+                  totalParts,
+                },
+                numero: chapitreGenere.numero,
+                titre: chapitreGenere.titre,
+                nombreMots: chapitreGenere.nombreMots,
+                _qualityScore: qualityScore,
+                _attempts: attempts,
+              }
+            : {
+                chapitre: chapitreGenere,
+                numero: chapitreGenere.numero,
+                titre: chapitreGenere.titre,
+                nombreMots: chapitreGenere.nombreMots,
+                _qualityScore: qualityScore,
+                _attempts: attempts,
+              };
 
-          displayContent = `**Ch.${chapitreGenere.numero} - ${chapitreGenere.titre}** (~${chapitreGenere.nombreMots || p4Settings.targetWords} mots) 🎯 ${qualityScore}/10\n_${cleanGeneratedText((chapitreGenere.contenu || '').substring(0, 200))}..._`;
+          displayContent = totalParts > 1
+            ? `**Ch.${chapitreGenere.numero} - ${chapitreGenere.titre} (segment ${partNumber}/${totalParts})** (~${chapitreGenere.nombreMots || segmentTargetWords} mots) 🎯 ${qualityScore}/10\n_${cleanGeneratedText((chapitreGenere.contenu || '').substring(0, 200))}..._`
+            : `**Ch.${chapitreGenere.numero} - ${chapitreGenere.titre}** (~${chapitreGenere.nombreMots || p4Settings.targetWords} mots) 🎯 ${qualityScore}/10\n_${cleanGeneratedText((chapitreGenere.contenu || '').substring(0, 200))}..._`;
           break;
         }
 
