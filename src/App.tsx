@@ -111,7 +111,7 @@ const App = () => {
         try {
           const parsed = JSON.parse(savedData);
           const hasCode = typeof parsed?.access_code === 'string' && parsed.access_code.trim().length > 0;
-          const isActive = parsed?.status === 'active' || parsed?.plan_type === 'lifetime';
+          const isActive = parsed?.status === 'active' || parsed?.status === 'trialing' || parsed?.plan_type === 'lifetime';
 
           if (hasCode && isActive) {
             setSubscriberEmail(savedEmail);
