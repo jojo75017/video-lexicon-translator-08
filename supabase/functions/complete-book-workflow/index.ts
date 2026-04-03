@@ -5,6 +5,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const DEFAULT_WORDS_PER_CHAPTER = 3500;
+
 // STANDARDS ÉDITORIAUX PRO — Voix d'éditeur professionnel
 const EDITORIAL_PRO_RULES = `
 STANDARDS ÉDITORIAUX PROFESSIONNELS (niveau maison d'édition) :
@@ -366,6 +368,7 @@ CHAPITRES PRÉVUS : ${numberOfChapters}${introContext}${charactersContext}
 
     console.log(`Step ${step} for: "${fullTitle}" (Category: ${category}, Characters: ${characters.length})`);
 
+    const wordsPerChapter = DEFAULT_WORDS_PER_CHAPTER;
     let result: any = {};
     let displayContent = '';
 
@@ -585,7 +588,6 @@ Format JSON :
 
       case 'P3': {
         // ARCHITECTE DE CONTENU PRO
-        const wordsPerChapter = 3500;
         const totalWords = numberOfChapters * wordsPerChapter;
         const estimatedPages = Math.ceil(totalWords / 250);
         const p3Settings = getP3GenerationSettings(numberOfChapters);
