@@ -352,7 +352,8 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
       msg.includes('503') ||
       msg.includes('502') ||
       msg.includes('network') ||
-      msg.includes('failed to fetch')
+      msg.includes('failed to fetch') ||
+      msg.includes('failed to send a request to the edge function')
     );
   };
 
@@ -625,7 +626,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             setExpandedSteps(prev => ({ ...prev, [prevStep.id]: false }));
           }
         } else {
-          const result = await runStep(step.id, context);
+          const result = await runStepWithRetry(step.id, context, {}, {}, step.id === 'P3' ? 2 : 1);
 
           // APRÈS P1 : TOUJOURS pause pour valider/choisir le titre best-seller
           // On fait ce check AVANT le if(result) pour garantir l'arrêt même si result est null
