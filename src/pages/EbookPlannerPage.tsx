@@ -122,6 +122,7 @@ import EbookDescriptionMagnet from '@/components/ebook/EbookDescriptionMagnet';
 import EbookPenNameGenerator from '@/components/ebook/EbookPenNameGenerator';
 import { detectPlaceholderImage, isExternalPlaceholderUrl } from '@/lib/ebookImageValidation';
 import { isDataImageUrl, persistEbookImageToLibrary } from '@/lib/ebookImageStorage';
+import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
 
 // Composants 2026
 import EbookVideoTrailer from '@/components/ebook/EbookVideoTrailer';
@@ -211,7 +212,38 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       subscriberData.access_code.trim().length > 0 &&
       (subscriberData?.status === 'active' || subscriberData?.plan_type === 'lifetime'));
 
-  const isDemo = isDemoProp || !hasValidSubscriber;
+  const [hasVerifiedAdminAccess, setHasVerifiedAdminAccess] = useState(isAdminProp);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const verifyAdminAccess = async () => {
+      if (isAdminProp) {
+        setHasVerifiedAdminAccess(true);
+        return;
+      }
+
+      try {
+        const isAdmin = await getIsCurrentSessionAdmin();
+        if (!cancelled) {
+          setHasVerifiedAdminAccess(isAdmin);
+        }
+      } catch (error) {
+        console.error('EbookPlannerPage admin verification error:', error);
+        if (!cancelled) {
+          setHasVerifiedAdminAccess(false);
+        }
+      }
+    };
+
+    void verifyAdminAccess();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isAdminProp]);
+
+  const isDemo = isDemoProp || (!hasValidSubscriber && !hasVerifiedAdminAccess);
   const contentContainerRef = useRef<HTMLDivElement>(null);
 
   const STORAGE_KEY = 'ebook-planner-autosave';

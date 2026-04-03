@@ -16,6 +16,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
 
 interface SubscriptionAuthProps {
   onAuthenticated: (email: string, subscriber: any) => void;
@@ -35,11 +36,21 @@ export const SubscriptionAuth = ({ onAuthenticated }: SubscriptionAuthProps) => 
 
   useEffect(() => {
     const checkAdminSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        setHasAdminSession(true);
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          setHasAdminSession(false);
+          return;
+        }
+
+        const isAdmin = await getIsCurrentSessionAdmin();
+        setHasAdminSession(isAdmin);
+      } catch (error) {
+        console.error('Admin session check error:', error);
+        setHasAdminSession(false);
       }
     };
+
     checkAdminSession();
   }, []);
 
@@ -55,13 +66,14 @@ export const SubscriptionAuth = ({ onAuthenticated }: SubscriptionAuthProps) => 
         return;
       }
 
-      await supabase.functions.invoke('bootstrap-admin');
-      const { data } = await supabase.functions.invoke('check-admin');
-      
-      if (data?.isAdmin) {
+      const isAdmin = await getIsCurrentSessionAdmin();
+
+      if (isAdmin) {
+        setHasAdminSession(true);
         toast.success('Accès admin confirmé');
-        navigate('/admin');
+        navigate('/dashboard');
       } else {
+        setHasAdminSession(false);
         toast.error('Accès refusé', {
           description: 'Votre compte n\'a pas les droits administrateur'
         });
