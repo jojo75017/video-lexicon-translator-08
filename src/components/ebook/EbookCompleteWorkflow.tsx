@@ -116,6 +116,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   const [failedStepIndex, setFailedStepIndex] = useState<number | null>(null);
   const [allContext, setAllContext] = useState<Record<string, any>>({});
   const [hasSavedProgress, setHasSavedProgress] = useState(false);
+  const [savedProgressSnapshot, setSavedProgressSnapshot] = useState<WorkflowProgress | null>(null);
   
   // État pour les personnages générés en P3 et l'édition avant P4
   const [generatedCharacters, setGeneratedCharacters] = useState<GeneratedCharacter[]>([]);
@@ -135,6 +136,17 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   const hasValidApiKey = isUserKeyValid && !!userApiKey;
   const canGenerate = title.trim() && authorName.trim() && category && bookIntroduction.trim() && hasReadSteps && hasValidApiKey;
 
+  const readSavedProgressSnapshot = useCallback((): WorkflowProgress | null => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved) return null;
+      return JSON.parse(saved) as WorkflowProgress;
+    } catch (e) {
+      console.error('Error reading saved progress snapshot:', e);
+      return null;
+    }
+  }, []);
+
   // Load saved progress on mount
   useEffect(() => {
     try {
@@ -142,6 +154,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
       if (!saved) return;
 
       const data: WorkflowProgress = JSON.parse(saved);
+      setSavedProgressSnapshot(data);
       if (data.currentStepIndex >= 0 && Object.keys(data.stepResults || {}).length > 0) {
         setHasSavedProgress(true);
 
@@ -210,6 +223,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
     
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+      setSavedProgressSnapshot(progress);
       setHasSavedProgress(true);
       console.log(`📦 Progress saved at step ${progress.currentStepIndex + 1}`);
     } catch (e) {
@@ -227,6 +241,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   // Clear saved progress
   const clearSavedProgress = () => {
     localStorage.removeItem(STORAGE_KEY);
+    setSavedProgressSnapshot(null);
     setHasSavedProgress(false);
     toast.success('Sauvegarde supprimée');
   };
@@ -237,6 +252,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const data: WorkflowProgress = JSON.parse(saved);
+        setSavedProgressSnapshot(data);
         setTitle(data.title);
         setSubtitle(data.subtitle);
         setCategory(data.category);
@@ -366,13 +382,21 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   };
 
   const p3Structure = normalizeP3Structure((allContext.P3 || stepResults.P3?.result || {})?.chapitres || []);
+  const persistedP3Structure = normalizeP3Structure((savedProgressSnapshot?.allContext?.P3 || savedProgressSnapshot?.stepResults?.P3?.result || {})?.chapitres || []);
+  const effectiveP3Structure = p3Structure.length > 0 ? p3Structure : persistedP3Structure;
+  const persistedHasP4 = Boolean(savedProgressSnapshot?.stepResults?.P4 || savedProgressSnapshot?.allContext?.P4);
   const canResumeAfterP3 = !isGenerating && !waitingForTitleValidation && !waitingForCharacterValidation && p3Structure.length > 0 && !stepResults.P4;
   const savedResumeStepIndex = failedStepIndex !== null
     ? failedStepIndex
     : currentStepIndex >= 0 && currentStepIndex < workflowSteps.length && currentStepIndex < 14
       ? currentStepIndex
       : null;
-  const canResumeWorkflow = !isGenerating && !waitingForTitleValidation && !waitingForCharacterValidation && savedResumeStepIndex !== null;
+  const persistedResumeStepIndex = savedProgressSnapshot && savedProgressSnapshot.currentStepIndex >= 0 && savedProgressSnapshot.currentStepIndex < 14
+    ? savedProgressSnapshot.currentStepIndex
+    : null;
+  const effectiveResumeStepIndex = savedResumeStepIndex ?? persistedResumeStepIndex;
+  const canResumeAfterP3FromSavedState = !isGenerating && !waitingForTitleValidation && !waitingForCharacterValidation && effectiveP3Structure.length > 0 && !stepResults.P4 && !persistedHasP4;
+  const canResumeWorkflow = !isGenerating && !waitingForTitleValidation && !waitingForCharacterValidation && effectiveResumeStepIndex !== null;
 
   const splitIntoChunks = <T,>(items: T[], chunkCount: number) => {
     if (items.length === 0) return [] as T[][];
@@ -532,12 +556,17 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   const continueAfterCharacterValidation = () => {
     setWaitingForCharacterValidation(false);
 
-    const baseP3 = allContext.P3 || stepResults.P3?.result || {};
+    const fallbackSavedProgress = savedProgressSnapshot || readSavedProgressSnapshot();
+    const baseP3 = allContext.P3 || stepResults.P3?.result || fallbackSavedProgress?.allContext?.P3 || fallbackSavedProgress?.stepResults?.P3?.result || {};
     const normalizedChapitres = normalizeP3Structure(baseP3.chapitres || []);
+    const baseContext = Object.keys(allContext).length > 0 ? allContext : (fallbackSavedProgress?.allContext || {});
+    const baseStepResults = Object.keys(stepResults).length > 0 ? stepResults : (fallbackSavedProgress?.stepResults || {});
     const effectiveCharacters = generatedCharacters.length > 0
       ? generatedCharacters
       : Array.isArray(baseP3.personnages)
         ? baseP3.personnages
+        : Array.isArray(fallbackSavedProgress?.generatedCharacters)
+          ? fallbackSavedProgress.generatedCharacters
         : [];
 
     if (normalizedChapitres.length === 0) {
@@ -548,15 +577,14 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
     }
 
     const updatedP3 = { ...baseP3, chapitres: normalizedChapitres, personnages: effectiveCharacters };
-    const nextContext = { ...allContext, P3: updatedP3 };
-    const nextStepResults = stepResults.P3
-      ? { ...stepResults, P3: { ...stepResults.P3, result: updatedP3 } }
-      : stepResults;
+    const nextContext = { ...baseContext, P3: updatedP3 };
+    const nextP3State = baseStepResults.P3
+      ? { ...baseStepResults.P3, result: updatedP3 }
+      : { result: updatedP3, displayContent: 'Structure P3 restaurée depuis la sauvegarde locale.' };
+    const nextStepResults = { ...baseStepResults, P3: nextP3State };
 
     setAllContext(nextContext);
-    if (stepResults.P3) {
-      setStepResults(nextStepResults);
-    }
+    setStepResults(nextStepResults);
 
     saveProgress({
       currentStepIndex: 2,
@@ -980,7 +1008,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   };
 
   const resumeWorkflowFromProgress = () => {
-    let resumeIndex = savedResumeStepIndex;
+    let resumeIndex = effectiveResumeStepIndex;
     let extraContext: Record<string, any> = {};
 
     try {
@@ -1014,7 +1042,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
       return;
     }
 
-    if (resumeIndex <= 2 && p3Structure.length > 0 && !stepResults.P4) {
+    if (resumeIndex <= 2 && effectiveP3Structure.length > 0 && !stepResults.P4 && !persistedHasP4) {
       continueAfterCharacterValidation();
       return;
     }
@@ -1674,7 +1702,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
         </motion.div>
       )}
 
-      {canResumeAfterP3 && (
+      {(canResumeAfterP3 || canResumeAfterP3FromSavedState) && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -1701,7 +1729,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
         </motion.div>
       )}
 
-      {canResumeWorkflow && !canResumeAfterP3 && (
+      {canResumeWorkflow && !(canResumeAfterP3 || canResumeAfterP3FromSavedState) && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -1711,7 +1739,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
               <div className="space-y-1">
                 <p className="font-medium text-foreground">Une reprise est disponible.</p>
                 <p className="text-sm text-muted-foreground">
-                  Votre progression est sauvegardée. Vous pouvez relancer le workflow depuis l'étape {workflowSteps[savedResumeStepIndex ?? 0]?.id}.
+                  Votre progression est sauvegardée. Vous pouvez relancer le workflow depuis l'étape {workflowSteps[effectiveResumeStepIndex ?? 0]?.id}.
                 </p>
               </div>
 
