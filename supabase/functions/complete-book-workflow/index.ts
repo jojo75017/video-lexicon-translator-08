@@ -226,15 +226,36 @@ function cleanChapter(chapter: any): any {
 
 function getP3GenerationSettings(numberOfChapters: number) {
   const isLargeProject = numberOfChapters >= 16;
+  const isVeryLargeProject = numberOfChapters >= 30;
 
   return {
     isLargeProject,
-    maxTokens: Math.min(7000, Math.max(3600, 1800 + numberOfChapters * 90)),
+    isVeryLargeProject,
+    maxTokens: isVeryLargeProject
+      ? 4200
+      : Math.min(7000, Math.max(3600, 1800 + numberOfChapters * 90)),
     minScore: isLargeProject ? 7 : 9,
     maxRetries: isLargeProject ? 0 : 1,
-    sousSectionsRange: isLargeProject ? '3-4' : '4-6',
-    keyPointsCount: isLargeProject ? 2 : 3,
-    characterDescriptionLength: isLargeProject ? '1-2 phrases maximum' : '2-3 phrases',
+    sousSectionsRange: isVeryLargeProject ? '2-3' : isLargeProject ? '3-4' : '4-6',
+    keyPointsCount: isVeryLargeProject ? 1 : isLargeProject ? 2 : 3,
+    characterDescriptionLength: isVeryLargeProject ? '1 phrase maximum' : isLargeProject ? '1-2 phrases maximum' : '2-3 phrases',
+  };
+}
+
+function getP4GenerationSettings(numberOfChapters: number) {
+  const isLargeProject = numberOfChapters >= 16;
+  const isVeryLargeProject = numberOfChapters >= 30;
+
+  return {
+    isLargeProject,
+    isVeryLargeProject,
+    maxTokens: isVeryLargeProject ? 3600 : isLargeProject ? 4500 : 6000,
+    minWords: isVeryLargeProject ? 1800 : 2500,
+    targetWords: isVeryLargeProject ? 2200 : 3000,
+    maxWords: isVeryLargeProject ? 2600 : 3500,
+    minScore: isVeryLargeProject ? 7 : 8,
+    maxRetries: isVeryLargeProject ? 0 : 1,
+    previousChapterChars: isVeryLargeProject ? 220 : 400,
   };
 }
 
@@ -663,6 +684,7 @@ Format JSON :
       case 'P4': {
         // RÉDACTION PRO AVEC BOUCLE QUALITÉ
         const structure = previousContext.P3?.chapitres || [];
+        const p4Settings = getP4GenerationSettings(structure.length || numberOfChapters);
         const descriptionGeneree = previousContext.P1?.descriptionGeneree || '';
         const tonEditorial = previousContext.P1?.tonEditorial || '';
         const lecteurCible = previousContext.P1?.lecteurCible || '';
@@ -695,7 +717,7 @@ Format JSON :
               .filter((ch: any) => ch.numero < chapitre.numero)
               .sort((a: any, b: any) => a.numero - b.numero)
               .slice(-3)
-              .map((ch: any) => `Ch.${ch.numero} "${ch.titre}": ${(ch.contenu || '').substring(0, 400)}...`);
+              .map((ch: any) => `Ch.${ch.numero} "${ch.titre}": ${(ch.contenu || '').substring(0, p4Settings.previousChapterChars)}...`);
             if (resumesList.length > 0) {
               resumeChapitresPrecedents = `\n\nCHAPITRES PRÉCÉDENTS (continuité narrative) :\n${resumesList.join('\n\n')}`;
             }
@@ -744,7 +766,7 @@ STYLE PROFESSIONNEL :
 - Montrer (show) au lieu d'expliquer (tell)
 - Supprimer tout adverbe inutile (vraiment, absolument, totalement)
 - Aucune tournure passive excessive${personnagesSection}`,
-            `Rédige le CHAPITRE COMPLET (2500-3500 mots, qualité best-seller) :
+            `Rédige le CHAPITRE COMPLET (${p4Settings.minWords}-${p4Settings.maxWords} mots, qualité best-seller) :
 
 LIVRE : "${fullTitle}"
 CATÉGORIE : ${category}
@@ -765,11 +787,14 @@ Retourne en JSON :
 {
   "numero": ${chapitre.numero},
   "titre": "${chapitre.titre}",
-  "contenu": "LE CONTENU COMPLET (2500-3500 mots minimum)",
-  "nombreMots": 3000,
+  "contenu": "LE CONTENU COMPLET (${p4Settings.minWords}-${p4Settings.maxWords} mots)",
+  "nombreMots": ${p4Settings.targetWords},
   "qualityScore": 9
 }`,
-            6000, 8, 1, `P4-Ch${chapitre.numero}`
+            p4Settings.maxTokens,
+            p4Settings.minScore,
+            p4Settings.maxRetries,
+            `P4-Ch${chapitre.numero}`
           );
 
           const parsedChapter = parseJSON(chapterContent);
@@ -789,7 +814,7 @@ Retourne en JSON :
             _attempts: attempts,
           };
 
-          displayContent = `**Ch.${chapitreGenere.numero} - ${chapitreGenere.titre}** (~${chapitreGenere.nombreMots || 3000} mots) 🎯 ${qualityScore}/10\n_${cleanGeneratedText((chapitreGenere.contenu || '').substring(0, 200))}..._`;
+          displayContent = `**Ch.${chapitreGenere.numero} - ${chapitreGenere.titre}** (~${chapitreGenere.nombreMots || p4Settings.targetWords} mots) 🎯 ${qualityScore}/10\n_${cleanGeneratedText((chapitreGenere.contenu || '').substring(0, 200))}..._`;
           break;
         }
 
