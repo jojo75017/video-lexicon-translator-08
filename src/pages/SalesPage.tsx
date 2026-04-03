@@ -109,6 +109,9 @@ const SalesPage = () => {
   const location = useLocation();
   const countdown = useCountdown(LAUNCH_END);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [hasWorkflowProgress, setHasWorkflowProgress] = useState(false);
+  const [hasSubscriberAccess, setHasSubscriberAccess] = useState(false);
+  const [hasAdminSession, setHasAdminSession] = useState(false);
   const [showTrialModal, setShowTrialModal] = useState(false);
   const [trialEmail, setTrialEmail] = useState("");
   const [trialLoading, setTrialLoading] = useState(false);
@@ -131,6 +134,46 @@ const SalesPage = () => {
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    const refreshAccessState = async () => {
+      const savedWorkflow = localStorage.getItem('ebook_workflow_progress');
+      const savedSubscriberEmail = localStorage.getItem('subscriber_email');
+      const savedSubscriberData = localStorage.getItem('subscriber_data');
+
+      let subscriberAccess = false;
+
+      if (savedSubscriberEmail && savedSubscriberData) {
+        try {
+          const parsed = JSON.parse(savedSubscriberData);
+          subscriberAccess = Boolean(
+            parsed?.access_code ||
+            parsed?.status === 'active' ||
+            parsed?.plan_type === 'lifetime' ||
+            parsed?.plan_type === 'pro'
+          );
+        } catch {
+          subscriberAccess = false;
+        }
+      }
+
+      const { data: { session } } = await supabase.auth.getSession();
+
+      setHasWorkflowProgress(Boolean(savedWorkflow));
+      setHasSubscriberAccess(subscriberAccess);
+      setHasAdminSession(Boolean(session));
+    };
+
+    void refreshAccessState();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
+      setTimeout(() => {
+        void refreshAccessState();
+      }, 0);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const handlePlanClick = () => {
@@ -329,6 +372,45 @@ const SalesPage = () => {
               </div>
             ))}
           </motion.div>
+
+          {(hasWorkflowProgress || hasSubscriberAccess || hasAdminSession) && (
+            <motion.div variants={fadeIn} custom={3.5} className="mb-8">
+              <div className="mx-auto max-w-2xl rounded-2xl border border-cyan-500/30 bg-slate-900/70 p-4 sm:p-5 shadow-lg shadow-cyan-500/10 backdrop-blur-sm">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="text-left">
+                    <p className="text-sm font-semibold text-cyan-400">Session détectée</p>
+                    <p className="text-sm text-white/75">
+                      {hasWorkflowProgress
+                        ? 'Votre progression est sauvegardée : vous pouvez reprendre immédiatement.'
+                        : 'Votre accès a été détecté : vous pouvez rouvrir le générateur.'}
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col gap-2 sm:flex-row">
+                    <Button
+                      type="button"
+                      onClick={() => navigate(hasAdminSession || hasSubscriberAccess ? '/ebook-planner' : '/subscription')}
+                      className="bg-gradient-to-r from-cyan-500 to-emerald-500 text-slate-900 font-bold rounded-xl"
+                    >
+                      <Rocket className="w-4 h-4 mr-2" />
+                      {hasAdminSession || hasSubscriberAccess ? 'Reprendre le générateur' : 'Retrouver mon accès'}
+                    </Button>
+
+                    {hasAdminSession && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => navigate('/admin')}
+                        className="border-cyan-500/40 text-cyan-400 hover:text-white hover:bg-cyan-500/10 rounded-xl"
+                      >
+                        Dashboard admin
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
 
           {/* CTA Principal */}
           <motion.div variants={fadeIn} custom={4} className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-5">
