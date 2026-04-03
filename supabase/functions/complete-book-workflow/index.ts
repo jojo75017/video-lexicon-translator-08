@@ -224,6 +224,45 @@ function cleanChapter(chapter: any): any {
   };
 }
 
+function normalizeP3Chapter(rawChapter: any, index: number, wordsPerChapter: number) {
+  if (!rawChapter || typeof rawChapter !== 'object') return null;
+
+  const numero = Number(rawChapter.numero) || index + 1;
+  const titre = cleanGeneratedText(rawChapter.titre || rawChapter.title || `Chapitre ${numero}`);
+  const objectif = cleanGeneratedText(rawChapter.objectif || rawChapter.goal || '');
+  const sousSections = Array.isArray(rawChapter.sousSections)
+    ? rawChapter.sousSections.map((item: any) => cleanGeneratedText(String(item))).filter(Boolean)
+    : [];
+  const pointsCles = Array.isArray(rawChapter.pointsCles)
+    ? rawChapter.pointsCles.map((item: any) => cleanGeneratedText(String(item))).filter(Boolean)
+    : [];
+
+  if (!titre) return null;
+
+  return {
+    numero,
+    titre,
+    objectif,
+    nombreMotsPrevu: Number(rawChapter.nombreMotsPrevu) || wordsPerChapter,
+    sousSections,
+    pointsCles,
+    accroche: cleanGeneratedText(rawChapter.accroche || ''),
+    lienAvecPrecedent: cleanGeneratedText(rawChapter.lienAvecPrecedent || ''),
+  };
+}
+
+function normalizeP3Result(result: any, numberOfChapters: number, wordsPerChapter: number) {
+  const rawChapters = Array.isArray(result?.chapitres) ? result.chapitres : [];
+  const normalizedChapters = rawChapters
+    .map((chapter: any, index: number) => normalizeP3Chapter(chapter, index, wordsPerChapter))
+    .filter(Boolean);
+
+  return {
+    ...result,
+    chapitres: normalizedChapters,
+  };
+}
+
 function getP3GenerationSettings(numberOfChapters: number) {
   const isLargeProject = numberOfChapters >= 16;
   const isVeryLargeProject = numberOfChapters >= 30;
@@ -417,9 +456,13 @@ Réponds en JSON :
           5000,
           9, 2, 'P1'
         );
-        result = parseJSON(content) || { raw: content };
+        result = normalizeP3Result(parseJSON(content) || { raw: content }, numberOfChapters, wordsPerChapter);
         result._qualityScore = qualityScore;
         result._attempts = attempts;
+
+        if (result.chapitres.length < numberOfChapters) {
+          throw new Error(`P3_STRUCTURE_INCOMPLETE: ${result.chapitres.length}/${numberOfChapters} chapitres exploitables générés.`);
+        }
         
         // Construire l'affichage riche
         const to = result.titreOriginal;
