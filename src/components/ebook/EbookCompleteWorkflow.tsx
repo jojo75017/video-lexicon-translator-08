@@ -444,16 +444,45 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
     }
     
     // Récupérer le contexte existant ou en créer un nouveau
-    // NOTE: en cas de pause après P3 (validation des personnages), React peut ne pas avoir flushé `allContext`.
-    // On ré-hydrate donc depuis `stepResults` pour éviter un blocage à P4.
-    const context: Record<string, any> = isResuming ? { ...allContext, ...contextOverride } : { ...contextOverride };
+    // Réhydrater depuis localStorage + stepResults + allContext + contextOverride
+    let context: Record<string, any> = isResuming ? { ...allContext, ...contextOverride } : { ...contextOverride };
 
     if (isResuming) {
+      // 1) Réhydrater depuis localStorage si le contexte React est vide
+      if (Object.keys(context).length === 0 || !context.P3) {
+        try {
+          const saved = localStorage.getItem(STORAGE_KEY);
+          if (saved) {
+            const data: WorkflowProgress = JSON.parse(saved);
+            if (data.allContext) {
+              context = { ...data.allContext, ...context };
+            }
+            if (data.stepResults) {
+              Object.entries(data.stepResults).forEach(([stepId, d]) => {
+                if (context[stepId] === undefined) {
+                  context[stepId] = d.result;
+                }
+              });
+              // Restaurer aussi stepResults dans React si vide
+              if (Object.keys(stepResults).length === 0) {
+                setStepResults(data.stepResults);
+              }
+            }
+            console.log('🔄 Context rehydrated from localStorage, keys:', Object.keys(context));
+          }
+        } catch (e) {
+          console.error('Error rehydrating context from localStorage:', e);
+        }
+      }
+
+      // 2) Compléter depuis stepResults React
       Object.entries(stepResults).forEach(([stepId, data]) => {
         if (context[stepId] === undefined) {
           context[stepId] = data.result;
         }
       });
+
+      console.log('📋 Resume context keys:', Object.keys(context), 'P3 chapitres:', context.P3?.chapitres?.length || 0);
     }
     toast.info(isResuming 
       ? `🔄 Reprise à l'étape ${workflowSteps[resumeFromIndex].id}...` 
