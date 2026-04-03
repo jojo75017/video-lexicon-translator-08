@@ -6,6 +6,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { SubscriberGate } from '@/components/auth/SubscriberGate';
 import { AdminGate } from '@/components/auth/AdminGate';
+import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
 import { Loader2 } from 'lucide-react';
 
 // Lazy-loaded pages for performance
@@ -100,21 +101,6 @@ const App = () => {
   const PERMANENT_ADMIN_EMAIL = 'boubetgeorges@gmail.com';
 
   useEffect(() => {
-    const checkAdminDirect = async (userId: string): Promise<boolean> => {
-      try {
-        const { data } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', userId)
-          .eq('role', 'admin')
-          .maybeSingle();
-        return !!data;
-      } catch {
-        return false;
-      }
-    };
-
-
     const initAuth = async () => {
       // Check subscriber auth (client cache)
       // NOTE: localStorage can be tampered with, so we only use it as a hint.
@@ -150,7 +136,7 @@ const App = () => {
 
         if (session?.user) {
           console.log('Session admin trouvée dans App.tsx');
-          const adminStatus = await checkAdminDirect(session.user.id);
+          const adminStatus = await getIsCurrentSessionAdmin();
 
           if (adminStatus) {
             console.log('Statut admin confirmé dans App.tsx');
@@ -189,7 +175,7 @@ const App = () => {
 
       if (shouldRecheckAdmin && session?.user) {
         setTimeout(async () => {
-          const adminStatus = await checkAdminDirect(session.user.id);
+          const adminStatus = await getIsCurrentSessionAdmin();
           setIsAdmin(adminStatus);
           if (adminStatus) {
             sessionStorage.setItem('is_admin', 'true');
