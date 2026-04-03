@@ -343,6 +343,28 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
     },
   });
 
+  const normalizeP3Structure = (rawStructure: any[] = []) => {
+    return rawStructure
+      .map((item: any, index: number) => {
+        const numero = Number(item?.numero) || index + 1;
+        const titre = String(item?.titre || item?.title || '').trim();
+
+        if (!titre) return null;
+
+        return {
+          ...item,
+          numero,
+          titre,
+          objectif: String(item?.objectif || '').trim(),
+          sousSections: Array.isArray(item?.sousSections) ? item.sousSections.filter(Boolean) : [],
+          pointsCles: Array.isArray(item?.pointsCles) ? item.pointsCles.filter(Boolean) : [],
+          accroche: String(item?.accroche || '').trim(),
+          lienAvecPrecedent: String(item?.lienAvecPrecedent || '').trim(),
+        };
+      })
+      .filter(Boolean);
+  };
+
   const runStep = async (
     stepId: string,
     context: Record<string, any>,
@@ -446,7 +468,16 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
     setWaitingForCharacterValidation(false);
 
     const baseP3 = allContext.P3 || stepResults.P3?.result || {};
-    const updatedP3 = { ...baseP3, personnages: generatedCharacters };
+    const normalizedChapitres = normalizeP3Structure(baseP3.chapitres || []);
+
+    if (normalizedChapitres.length === 0) {
+      toast.error('La structure P3 est vide ou invalide. Relancez P3 avant de continuer vers P4.');
+      setFailedStepIndex(2);
+      setError('Structure P3 invalide : aucun chapitre exploitable trouvé.');
+      return;
+    }
+
+    const updatedP3 = { ...baseP3, chapitres: normalizedChapitres, personnages: generatedCharacters };
     const nextContext = { ...allContext, P3: updatedP3 };
     const nextStepResults = stepResults.P3
       ? { ...stepResults, P3: { ...stepResults.P3, result: updatedP3 } }
@@ -598,7 +629,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
 
         // P4 est la seule étape potentiellement très longue : on la découpe en requêtes "1 chapitre".
         if (step.id === 'P4') {
-          const structure = context.P3?.chapitres || [];
+          const structure = normalizeP3Structure(context.P3?.chapitres || []);
           if (!Array.isArray(structure) || structure.length === 0) {
             console.error('P3 context:', JSON.stringify(context.P3)?.substring(0, 500));
             toast.error('⚠️ La structure P3 est vide. Veuillez relancer depuis P3.');
@@ -606,11 +637,12 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             toast.info('🔄 Relance automatique de P3...');
             try {
               const p3Retry = await runStep('P3', context);
-              if (p3Retry?.result?.chapitres?.length > 0) {
-                context.P3 = p3Retry.result;
+              const repairedStructure = normalizeP3Structure(p3Retry?.result?.chapitres || []);
+              if (repairedStructure.length > 0) {
+                context.P3 = { ...p3Retry.result, chapitres: repairedStructure };
                 setAllContext(prev => ({ ...prev, P3: p3Retry.result }));
-                setStepResults(prev => ({ ...prev, P3: p3Retry }));
-                saveStepResult('P3', p3Retry.result, p3Retry.displayContent);
+                setStepResults(prev => ({ ...prev, P3: { ...p3Retry, result: context.P3 } }));
+                saveStepResult('P3', context.P3, p3Retry.displayContent);
                 toast.success('✅ P3 re-généré avec succès, continuation vers P4...');
               } else {
                 throw new Error("Structure P3 introuvable même après relance. Veuillez réessayer en cliquant sur 'Relancer'.");
@@ -620,7 +652,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             }
           }
 
-          const retryStructure = context.P3?.chapitres || [];
+          const retryStructure = normalizeP3Structure(context.P3?.chapitres || []);
 
           // Récupérer les chapitres déjà générés (si reprise)
           const existingChapters = context.P4?.chapitres || [];
