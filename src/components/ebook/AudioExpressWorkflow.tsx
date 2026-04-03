@@ -220,7 +220,8 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
 
   // Split text into chapters
   const splitIntoChapters = (text: string): { title: string; content: string }[] => {
-    const chapterRegex = /(?:^|\n)(Chapitre\s+\d+[^\n]*)/gi;
+    // Match "Chapitre N", "Épisode N", "Episode N", "Partie N", "Section N"
+    const chapterRegex = /(?:^|\n)((?:Chapitre|[ÉE]pisode|Partie|Section)\s+\d+[^\n]*)/gi;
     const matches = [...text.matchAll(chapterRegex)];
     if (matches.length >= 2) {
       const chapters: { title: string; content: string }[] = [];
@@ -231,12 +232,13 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
       }
       return chapters;
     }
+    // Fallback: split by paragraphs with smaller chunk size to preserve more sections
     const sections: { title: string; content: string }[] = [];
     const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim().length > 20);
     let currentContent = '';
     let sectionIndex = 1;
     for (const para of paragraphs) {
-      if (currentContent.length + para.length > 5000 && currentContent.length > 500) {
+      if (currentContent.length + para.length > 2000 && currentContent.length > 200) {
         sections.push({ title: `Section ${sectionIndex}`, content: currentContent.trim() });
         currentContent = para;
         sectionIndex++;
