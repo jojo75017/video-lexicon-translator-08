@@ -324,14 +324,16 @@ serve(async (req) => {
       useUserKey: _useUserKey,
     } = payload;
 
-    if (!userApiKey) {
+    // Nettoyer et valider la clé API
+    const cleanedApiKey = typeof userApiKey === 'string' ? userApiKey.trim() : '';
+    if (!cleanedApiKey) {
       return new Response(
         JSON.stringify({ error: 'NO_API_KEY: Clé API Gemini requise. Configurez votre propre clé dans Paramètres > Clés API.' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
-    activeApiKey = userApiKey;
-    console.log(`Using USER API key for step ${step}`);
+    activeApiKey = cleanedApiKey;
+    console.log(`Using USER API key for step ${step} (length=${cleanedApiKey.length}, prefix=${cleanedApiKey.substring(0, 4)})`);
 
     if (!title) {
       return new Response(
