@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { getIsCurrentSessionAdmin } from "@/lib/adminAccess";
 
 type Props = {
   children: React.ReactNode;
@@ -38,22 +39,10 @@ export function AdminGate({ children }: Props) {
 
         console.log("AdminGate: Session found, checking admin status...");
 
-        const { data, error } = await supabase.functions.invoke("check-admin", {
-          headers: { Authorization: `Bearer ${session.access_token}` },
-        });
+        const isAdmin = await getIsCurrentSessionAdmin();
 
         if (cancelled) return;
 
-        if (error) {
-          console.error("AdminGate check-admin error:", error);
-          // Évite les popups/toasts bruyants en cas d'erreur réseau temporaire.
-          // La redirection (ou /admin-direct pour l'admin permanent) gère le flux.
-          setAllowed(false);
-          setChecking(false);
-          return;
-        }
-
-        const isAdmin = !!data?.isAdmin;
         console.log("AdminGate: isAdmin =", isAdmin);
 
         if (isAdmin) {
