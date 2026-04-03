@@ -284,6 +284,65 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
     setExpandedSteps(prev => ({ ...prev, [stepId]: !prev[stepId] }));
   };
 
+  const limitText = (value: unknown, maxLength: number) => {
+    if (typeof value !== 'string') return '';
+    return value.length > maxLength ? `${value.slice(0, maxLength).trim()}…` : value;
+  };
+
+  const buildSlimP4Context = (
+    context: Record<string, any>,
+    structure: any[],
+    generatedChapters: any[]
+  ) => ({
+    P1: context.P1
+      ? {
+          descriptionGeneree: context.P1.descriptionGeneree,
+          tonEditorial: context.P1.tonEditorial,
+          lecteurCible: context.P1.lecteurCible,
+        }
+      : undefined,
+    P2: context.P2
+      ? {
+          nichePrincipale: context.P2.nichePrincipale,
+          motsClésKDP: context.P2.motsClésKDP,
+          categoriesKDP: context.P2.categoriesKDP,
+        }
+      : undefined,
+    P3: context.P3
+      ? {
+          structureGlobale: context.P3.structureGlobale,
+          personnages: Array.isArray(context.P3.personnages)
+            ? context.P3.personnages.map((character: any) => ({
+                name: limitText(character?.name, 80),
+                role: limitText(character?.role, 40),
+                description: limitText(character?.description, 180),
+                arc: limitText(character?.arc, 140),
+              }))
+            : [],
+          chapitres: structure.map((item: any) => ({
+            numero: item?.numero,
+            titre: limitText(item?.titre || item?.title, 120),
+            objectif: limitText(item?.objectif, 180),
+            sousSections: Array.isArray(item?.sousSections)
+              ? item.sousSections.slice(0, 3).map((section: string) => limitText(section, 90))
+              : [],
+            pointsCles: Array.isArray(item?.pointsCles)
+              ? item.pointsCles.slice(0, 2).map((point: string) => limitText(point, 90))
+              : [],
+            accroche: limitText(item?.accroche, 140),
+            lienAvecPrecedent: limitText(item?.lienAvecPrecedent, 140),
+          })),
+        }
+      : undefined,
+    P4: {
+      chapitres: generatedChapters.slice(-3).map((chapter: any) => ({
+        numero: chapter?.numero,
+        titre: limitText(chapter?.titre || chapter?.title, 120),
+        contenu: limitText(chapter?.contenu || chapter?.content, 400),
+      })),
+    },
+  });
+
   const runStep = async (
     stepId: string,
     context: Record<string, any>,
@@ -573,17 +632,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
 
             // Contexte slim pour P4 : inclut les résumés des 3 derniers chapitres générés
             // pour maintenir la cohérence narrative sans exploser la taille du payload
-            const derniersCh = chapitresComplets.slice(-3).map((ch: any) => ({
-              numero: ch.numero,
-              titre: ch.titre,
-              contenu: (ch.contenu || ch.content || '').substring(0, 400),
-            }));
-            const p4SlimContext: Record<string, any> = {
-              P1: context.P1,
-              P2: context.P2,
-              P3: context.P3,
-              P4: { chapitres: derniersCh },
-            };
+            const p4SlimContext = buildSlimP4Context(context, retryStructure, chapitresComplets);
 
             let partial: { result: any; displayContent: string } | null = null;
             try {
@@ -602,12 +651,14 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
 
             // UI : on met à jour P4 au fil de l'eau
             const p4DisplayContent = `**📄 Chapitres rédigés : ${chapitresComplets.length}/${retryStructure.length}**\n\nDernier : ${partial?.displayContent || ''}`;
+            const nextP4State = {
+              result: { chapitres: chapitresComplets, nombreChapitres: chapitresComplets.length },
+              displayContent: p4DisplayContent,
+            };
+
             setStepResults(prev => ({
               ...prev,
-              P4: {
-                result: { chapitres: chapitresComplets, nombreChapitres: chapitresComplets.length },
-                displayContent: p4DisplayContent,
-              }
+              P4: nextP4State
             }));
             
             // Sauvegarder le contexte intermédiaire pour la reprise
@@ -618,6 +669,12 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             saveStepResult('P4', context.P4, p4DisplayContent);
             // Sync cloud
             if (title) saveStepToCloud(title, 'P4', context.P4, p4DisplayContent);
+            saveProgress({
+              currentStepIndex: i,
+              stepResults: { ...stepResults, P4: nextP4State },
+              allContext: { ...context, P4: context.P4 },
+              waitingForCharacterValidation: false,
+            });
           }
 
           // Collapse previous step, keep current expanded
