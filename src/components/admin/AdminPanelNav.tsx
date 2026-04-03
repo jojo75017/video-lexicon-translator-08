@@ -11,6 +11,7 @@ type AdminNavItem = {
 };
 
 const adminNavItems: AdminNavItem[] = [
+  { label: 'Dashboard', path: '/dashboard', icon: BarChart3, exact: true },
   { label: 'Abonnés', path: '/admin', icon: Shield, exact: true },
   { label: 'Profil', path: '/admin/profile', icon: User, exact: true },
   { label: 'Prospects', path: '/gestion-prospects', icon: Users, exact: true },
