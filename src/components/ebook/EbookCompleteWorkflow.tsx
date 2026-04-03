@@ -49,6 +49,8 @@ interface WorkflowProgress {
   subtitle: string;
   category: string;
   authorName: string;
+  bookIntroduction: string;
+  hasReadSteps: boolean;
   numberOfChapters: number;
   currentStepIndex: number;
   stepResults: Record<string, { result: any; displayContent: string }>;
