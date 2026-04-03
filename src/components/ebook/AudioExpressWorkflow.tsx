@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import {
   Target, ListOrdered, PenTool, Sparkles, Clock, Mic2,
   Volume2, Combine, Archive, ChevronRight, ChevronLeft,
-  CheckCircle2, Lock, Loader2, Headphones, Download, Play, Pause, Music
+  CheckCircle2, Lock, Loader2, Headphones, Download, Play, Pause, Music, FileText
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cleanForAudio } from '@/utils/textCleaner';
