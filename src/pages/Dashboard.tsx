@@ -17,18 +17,16 @@ import {
   Image, 
   Mail,
   Activity,
-  Award,
   Clock,
   Eye,
   Filter,
   Star,
   Zap,
-  Calendar,
   CheckCircle,
-  AlertTriangle,
   Info
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { AdminPanelNav } from '@/components/admin/AdminPanelNav';
 
 // Import des icônes personnalisées des bots
 import DashBotIcon from '@/assets/icons/dash-bot.png';
@@ -54,7 +52,7 @@ const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState('all');
   const [recentActivity, setRecentActivity] = useState([]);
-  const [stats, setStats] = useState({
+  const [stats] = useState({
     totalAnalyses: 156,
     todayAnalyses: 12,
     avgSeoScore: 78,
@@ -71,6 +69,14 @@ const Dashboard: React.FC = () => {
     ];
     setRecentActivity(activities);
   }, []);
+
+  const handleResumeGenerator = () => {
+    try {
+      localStorage.setItem('ebook_planner_active_tab', 'workflow-dashboard');
+    } catch {}
+
+    navigate('/ebook-planner');
+  };
 
   const features = [
     {
@@ -349,6 +355,8 @@ const Dashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10 p-6">
       <div className="container mx-auto max-w-7xl">
+        <AdminPanelNav className="mb-6" />
+
         {/* Header avec stats */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
@@ -360,13 +368,36 @@ const Dashboard: React.FC = () => {
                 Tableau de bord complet pour votre stratégie SEO
               </p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap justify-end">
               <Badge variant="outline" className="gap-1">
                 <Activity className="h-3 w-3" />
                 {stats.todayAnalyses} analyses aujourd'hui
               </Badge>
+              <Button size="lg" onClick={handleResumeGenerator}>
+                <BookOpen className="h-4 w-4 mr-2" />
+                Reprendre le générateur
+              </Button>
             </div>
           </div>
+
+          <Card className="mb-6 border-primary/20 bg-primary/5">
+            <CardContent className="p-6">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                  <p className="text-sm font-semibold text-primary">Accès rapide</p>
+                  <h2 className="text-2xl font-bold text-foreground">Continuer votre workflow ebook</h2>
+                  <p className="mt-2 text-muted-foreground">
+                    Le bouton ci-dessous rouvre directement le générateur sur le tableau de bord éditorial.
+                  </p>
+                </div>
+
+                <Button size="lg" onClick={handleResumeGenerator} className="w-full lg:w-auto">
+                  <BookOpen className="h-4 w-4 mr-2" />
+                  Reprendre le générateur
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Stats rapides */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">

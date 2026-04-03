@@ -24,7 +24,7 @@ const AdminDirectPage = () => {
         if (session.user.email === ADMIN_EMAIL) {
           sessionStorage.setItem('is_admin', 'true');
           localStorage.setItem('permanent_admin_email', session.user.email);
-          navigate("/admin", { replace: true });
+          navigate("/dashboard", { replace: true });
           return true;
         }
         return false;
@@ -33,7 +33,7 @@ const AdminDirectPage = () => {
       if (isAdmin || session.user.email === ADMIN_EMAIL) {
         sessionStorage.setItem('is_admin', 'true');
         localStorage.setItem('permanent_admin_email', session.user.email || ADMIN_EMAIL);
-        navigate("/admin", { replace: true });
+        navigate("/dashboard", { replace: true });
         return true;
       }
 
@@ -43,7 +43,7 @@ const AdminDirectPage = () => {
       if (session.user.email === ADMIN_EMAIL) {
         sessionStorage.setItem('is_admin', 'true');
         localStorage.setItem('permanent_admin_email', session.user.email);
-        navigate("/admin", { replace: true });
+        navigate("/dashboard", { replace: true });
         return true;
       }
       return false;
