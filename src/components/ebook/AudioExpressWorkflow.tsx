@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -63,6 +63,33 @@ const AZURE_VOICES = [
   { id: 'fr-FR-CelesteNeural', label: '📚 Céleste (Histoire)', niche: 'histoire' },
 ];
 
+const serializeProjectChapters = (chapterList: any[] = []) => {
+  const sections: string[] = [];
+
+  chapterList.forEach((chapter: any, chapterIndex: number) => {
+    sections.push(`Chapitre ${chapterIndex + 1}: ${chapter.title || `Chapitre ${chapterIndex + 1}`}`);
+
+    if (typeof chapter.content === 'string' && chapter.content.trim()) {
+      sections.push(chapter.content.trim());
+    }
+
+    const subChapters = chapter.subChapters || chapter.subchapters || [];
+    subChapters.forEach((subChapter: any, subIndex: number) => {
+      if (typeof subChapter.title === 'string' && subChapter.title.trim()) {
+        sections.push(subChapter.title.trim());
+      } else {
+        sections.push(`Sous-chapitre ${chapterIndex + 1}.${subIndex + 1}`);
+      }
+
+      if (typeof subChapter.content === 'string' && subChapter.content.trim()) {
+        sections.push(subChapter.content.trim());
+      }
+    });
+  });
+
+  return sections.join('\n\n').trim();
+};
+
 // --- Component ---
 
 interface AudioExpressWorkflowProps {
@@ -108,6 +135,14 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
   }, [bookTitle, authorNameState, introManuallyEdited, preface]);
   const [chapterContent, setChapterContent] = useState('');
 
+  const projectChapterText = useMemo(() => serializeProjectChapters(chapters), [chapters]);
+  const displayedChapterContent = chapterContent || projectChapterText;
+  const effectiveChapterContent = chapterContent.trim() ? chapterContent : projectChapterText;
+  const availableChapterWordCount = useMemo(
+    () => effectiveChapterContent.split(/\s+/).filter(Boolean).length,
+    [effectiveChapterContent]
+  );
+
   // A4 cleaned text
   const [cleanedText, setCleanedText] = useState('');
 
@@ -149,7 +184,14 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
 
   // A1 validation → auto-advance to A2
   const handleValidateBrief = () => {
-    const briefData = { bookTitle, bookSubtitle, authorName: authorNameState, category, introduction, chapterContent };
+    const briefData = {
+      bookTitle,
+      bookSubtitle,
+      authorName: authorNameState,
+      category,
+      introduction,
+      chapterContent: effectiveChapterContent,
+    };
     markStepDone('A1', briefData);
     // Auto-advance
     setTimeout(() => setCurrentStep(1), 400);
@@ -161,8 +203,10 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
     const brief = getBriefData();
     let fullText = '';
     if (brief.introduction) fullText += brief.introduction + '\n\n';
-    if (brief.chapterContent) {
-      fullText += brief.chapterContent;
+
+    const sourceChapterText = brief.chapterContent || effectiveChapterContent;
+    if (sourceChapterText) {
+      fullText += sourceChapterText;
     } else {
       chapters.forEach((ch: any, i: number) => {
         fullText += `Chapitre ${i + 1}: ${ch.title || ''}\n\n${ch.content || ''}\n\n`;
@@ -170,12 +214,13 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
         subs.forEach((s: any) => { fullText += `${s.title || ''}\n\n${s.content || ''}\n\n`; });
       });
     }
+
     if (conclusion) fullText += conclusion;
     const cleaned = cleanForAudio(fullText);
     setCleanedText(cleaned);
     setIsProcessing(false);
     markStepDone('A4', cleaned);
-  }, [chapters, conclusion, stepResults]);
+  }, [chapters, conclusion, effectiveChapterContent, stepResults]);
 
   // TTS generation via edge function
   const generateTts = async (text: string): Promise<Blob | null> => {
@@ -253,7 +298,7 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
   // A7: Generate full audiobook (intro + chapters) as MP3
   const handleGenerateAudio = async () => {
     const brief = getBriefData();
-    const textToConvert = cleanedText || brief.chapterContent || chapterContent;
+    const textToConvert = cleanedText || brief.chapterContent || effectiveChapterContent;
     if (!textToConvert?.trim()) {
       toast.error('Aucun texte à convertir. Complétez les étapes précédentes.');
       return;
