@@ -161,6 +161,11 @@ const App = () => {
 
     initAuth();
 
+    // Safety timeout: never leave the app stuck on loader
+    const safetyTimer = setTimeout(() => {
+      setIsCheckingAuth(false);
+    }, 5000);
+
     // Listen for auth changes
     const {
       data: { subscription },
@@ -193,7 +198,10 @@ const App = () => {
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      clearTimeout(safetyTimer);
+      subscription.unsubscribe();
+    };
   }, []);
 
   const handleAuthenticated = (email: string, data: any) => {
@@ -215,7 +223,7 @@ const App = () => {
   const showAccessDebug = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('debug') === '1';
 
   if (isCheckingAuth) {
-    return null;
+    return <PageLoader />;
   }
 
   return (
