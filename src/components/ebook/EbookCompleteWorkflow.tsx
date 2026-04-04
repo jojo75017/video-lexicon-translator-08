@@ -1434,6 +1434,25 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             </motion.div>
           )}
 
+          {/* Bouton Reset Total */}
+          {(hasSavedProgress || currentStepIndex >= 0 || Object.keys(stepResults).length > 0) && (
+            <div className="text-center">
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => {
+                  if (window.confirm('⚠️ Supprimer TOUT le workflow en mémoire et repartir de zéro ?')) {
+                    resetWorkflowCompletely();
+                  }
+                }}
+                className="gap-2"
+              >
+                <Trash2 className="h-4 w-4" />
+                Réinitialisation complète (repartir de zéro)
+              </Button>
+            </div>
+          )}
+
           {/* Generate Button */}
           {currentStepIndex < 0 && (
             <motion.div
