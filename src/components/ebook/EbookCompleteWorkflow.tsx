@@ -250,6 +250,33 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
     toast.success('Sauvegarde supprimée');
   };
 
+  // Reset TOTAL — efface tout le workflow (toutes les clés localStorage liées)
+  const resetWorkflowCompletely = () => {
+    const keysToRemove = [
+      STORAGE_KEY,
+      'ebook_workflow_results',
+      'ebook_workflow_sync_data',
+      'editorial_memory',
+    ];
+    keysToRemove.forEach(k => localStorage.removeItem(k));
+    setSavedProgressSnapshot(null);
+    setHasSavedProgress(false);
+    setTitle('');
+    setSubtitle('');
+    setCategory('');
+    setBookIntroduction('');
+    setAuthorName('');
+    setNumberOfChapters(8);
+    setCurrentStepIndex(-1);
+    setStepResults({});
+    setAllContext({});
+    setError(null);
+    setFailedStepIndex(null);
+    setGeneratedDescription('');
+    setHasReadSteps(false);
+    toast.success('Workflow entièrement réinitialisé ! Vous pouvez repartir de zéro.');
+  };
+
   // Restore saved progress
   const restoreSavedProgress = () => {
     try {
@@ -1405,6 +1432,25 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
                 </div>
               </div>
             </motion.div>
+          )}
+
+          {/* Bouton Reset Total */}
+          {(hasSavedProgress || currentStepIndex >= 0 || Object.keys(stepResults).length > 0) && (
+            <div className="text-center">
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => {
+                  if (window.confirm('⚠️ Supprimer TOUT le workflow en mémoire et repartir de zéro ?')) {
+                    resetWorkflowCompletely();
+                  }
+                }}
+                className="gap-2"
+              >
+                <Trash2 className="h-4 w-4" />
+                Réinitialisation complète (repartir de zéro)
+              </Button>
+            </div>
           )}
 
           {/* Generate Button */}
