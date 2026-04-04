@@ -236,7 +236,7 @@ function cleanChapter(chapter: any): any {
 }
 
 function normalizeP3Chapter(rawChapter: any, index: number, wordsPerChapter: number) {
-  if (!rawChapter || typeof rawChapter !== 'object') return null;
+  if (!rawChapter || (typeof rawChapter !== 'object' && typeof rawChapter !== 'string')) return null;
 
   const numero = Number(rawChapter.numero) || index + 1;
   const derivedTitle = typeof rawChapter === 'string'
@@ -279,6 +279,7 @@ function normalizeP3Chapter(rawChapter: any, index: number, wordsPerChapter: num
 
 function normalizeP3Result(result: any, numberOfChapters: number, wordsPerChapter: number) {
   const rawChapters =
+    (Array.isArray(result) && result) ||
     (Array.isArray(result?.chapitres) && result.chapitres) ||
     (Array.isArray(result?.chapters) && result.chapters) ||
     (Array.isArray(result?.tableDesMatieres) && result.tableDesMatieres) ||
