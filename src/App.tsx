@@ -101,6 +101,12 @@ const App = () => {
   const PERMANENT_ADMIN_EMAIL = 'boubetgeorges@gmail.com';
 
   useEffect(() => {
+    // Safety timeout FIRST: never leave the app stuck on loader
+    const safetyTimer = setTimeout(() => {
+      console.warn('Safety timer triggered – forcing auth check complete');
+      setIsCheckingAuth(false);
+    }, 3000);
+
     const initAuth = async () => {
       // Check subscriber auth (client cache)
       // NOTE: localStorage can be tampered with, so we only use it as a hint.
@@ -118,7 +124,6 @@ const App = () => {
             setSubscriberData(parsed);
             setIsAuthenticated(true);
           } else {
-            // Invalid cached data → reset
             localStorage.removeItem('subscriber_email');
             localStorage.removeItem('subscriber_data');
           }
@@ -142,7 +147,6 @@ const App = () => {
             console.log('Statut admin confirmé dans App.tsx');
             setIsAdmin(true);
             sessionStorage.setItem('is_admin', 'true');
-            // Security: don't store admin email in localStorage
           } else {
             console.log('Utilisateur non-admin dans App.tsx');
             sessionStorage.removeItem('is_admin');
@@ -160,11 +164,6 @@ const App = () => {
     };
 
     initAuth();
-
-    // Safety timeout: never leave the app stuck on loader
-    const safetyTimer = setTimeout(() => {
-      setIsCheckingAuth(false);
-    }, 5000);
 
     // Listen for auth changes
     const {
