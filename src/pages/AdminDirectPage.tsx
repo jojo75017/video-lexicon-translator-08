@@ -54,9 +54,16 @@ const AdminDirectPage = () => {
     setStatus("sending");
     setMessage(`Envoi du lien magique à ${ADMIN_EMAIL}...`);
 
-    const redirectTo = typeof window !== 'undefined'
-      ? window.location.href.split('#')[0]
+    // Use published URL to avoid preview token interference
+    const publishedUrl = 'https://video-lexicon-translator-08.lovable.app/admin-direct';
+    const currentOriginPath = typeof window !== 'undefined'
+      ? `${window.location.origin}/admin-direct`
       : '/admin-direct';
+    
+    // Prefer published URL, fallback to current origin (without query params)
+    const redirectTo = currentOriginPath.includes('lovableproject.com') 
+      ? publishedUrl 
+      : currentOriginPath;
 
     console.log("[AdminDirect] Sending OTP to:", ADMIN_EMAIL, "redirectTo:", redirectTo);
     const { data: otpData, error: magicLinkError } = await supabase.auth.signInWithOtp({
