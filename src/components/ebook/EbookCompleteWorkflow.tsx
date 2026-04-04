@@ -274,6 +274,15 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
     setFailedStepIndex(null);
     setGeneratedDescription('');
     setHasReadSteps(false);
+    setGeneratedCharacters([]);
+    setWaitingForCharacterValidation(false);
+    setEditingCharacterIndex(null);
+    setWaitingForTitleValidation(false);
+    setTitleSuggestions([]);
+    setOriginalTitleScore(null);
+    setSelectedTitleIndex(null);
+    setGeneratedIntro('');
+    setGeneratedConclusion('');
     toast.success('Workflow entièrement réinitialisé ! Vous pouvez repartir de zéro.');
   };
 
@@ -2035,11 +2044,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
                   variant="outline" 
                   size="sm" 
                   onClick={() => {
-                    setError(null);
-                    setFailedStepIndex(null);
-                    setCurrentStepIndex(-1);
-                    setStepResults({});
-                    setAllContext({});
+                    resetWorkflowCompletely();
                   }}
                 >
                   Tout recommencer

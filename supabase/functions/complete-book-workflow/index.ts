@@ -239,14 +239,29 @@ function normalizeP3Chapter(rawChapter: any, index: number, wordsPerChapter: num
   if (!rawChapter || typeof rawChapter !== 'object') return null;
 
   const numero = Number(rawChapter.numero) || index + 1;
-  const titre = cleanGeneratedText(rawChapter.titre || rawChapter.title || `Chapitre ${numero}`);
-  const objectif = cleanGeneratedText(rawChapter.objectif || rawChapter.goal || '');
-  const sousSections = Array.isArray(rawChapter.sousSections)
-    ? rawChapter.sousSections.map((item: any) => cleanGeneratedText(String(item))).filter(Boolean)
-    : [];
-  const pointsCles = Array.isArray(rawChapter.pointsCles)
-    ? rawChapter.pointsCles.map((item: any) => cleanGeneratedText(String(item))).filter(Boolean)
-    : [];
+  const derivedTitle = typeof rawChapter === 'string'
+    ? rawChapter
+    : rawChapter.titre || rawChapter.title || rawChapter.nom || rawChapter.chapterTitle || rawChapter.heading || `Chapitre ${numero}`;
+  const titre = cleanGeneratedText(derivedTitle);
+  const objectif = cleanGeneratedText(rawChapter.objectif || rawChapter.goal || rawChapter.resume || rawChapter.summary || rawChapter.description || '');
+  const rawSubSections =
+    rawChapter.sousSections ||
+    rawChapter.subSections ||
+    rawChapter.sections ||
+    rawChapter.parties ||
+    rawChapter.points ||
+    [];
+  const sousSections = Array.isArray(rawSubSections)
+    ? rawSubSections.map((item: any) => cleanGeneratedText(String(item))).filter(Boolean)
+    : typeof rawSubSections === 'string'
+      ? rawSubSections.split(/\n|•|- /g).map((item: string) => cleanGeneratedText(item)).filter(Boolean)
+      : [];
+  const rawPointsCles = rawChapter.pointsCles || rawChapter.keyPoints || rawChapter.points_cles || [];
+  const pointsCles = Array.isArray(rawPointsCles)
+    ? rawPointsCles.map((item: any) => cleanGeneratedText(String(item))).filter(Boolean)
+    : typeof rawPointsCles === 'string'
+      ? rawPointsCles.split(/\n|•|- /g).map((item: string) => cleanGeneratedText(item)).filter(Boolean)
+      : [];
 
   if (!titre) return null;
 
@@ -263,14 +278,38 @@ function normalizeP3Chapter(rawChapter: any, index: number, wordsPerChapter: num
 }
 
 function normalizeP3Result(result: any, numberOfChapters: number, wordsPerChapter: number) {
-  const rawChapters = Array.isArray(result?.chapitres) ? result.chapitres : [];
+  const rawChapters =
+    (Array.isArray(result?.chapitres) && result.chapitres) ||
+    (Array.isArray(result?.chapters) && result.chapters) ||
+    (Array.isArray(result?.tableDesMatieres) && result.tableDesMatieres) ||
+    (Array.isArray(result?.table_of_contents) && result.table_of_contents) ||
+    [];
   const normalizedChapters = rawChapters
     .map((chapter: any, index: number) => normalizeP3Chapter(chapter, index, wordsPerChapter))
     .filter(Boolean);
 
+  const paddedChapters = normalizedChapters.length > 0 && normalizedChapters.length < numberOfChapters
+    ? [
+        ...normalizedChapters,
+        ...Array.from({ length: numberOfChapters - normalizedChapters.length }, (_, offset) => {
+          const numero = normalizedChapters.length + offset + 1;
+          return {
+            numero,
+            titre: `Chapitre ${numero}`,
+            objectif: 'À détailler',
+            nombreMotsPrevu: wordsPerChapter,
+            sousSections: [],
+            pointsCles: [],
+            accroche: '',
+            lienAvecPrecedent: '',
+          };
+        }),
+      ]
+    : normalizedChapters;
+
   return {
     ...result,
-    chapitres: normalizedChapters,
+    chapitres: paddedChapters,
   };
 }
 
