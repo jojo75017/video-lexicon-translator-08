@@ -47,9 +47,9 @@ async function callGeminiDirect(systemPrompt: string, userPrompt: string, maxTok
   const MAX_RETRIES = 3;
   const cleanKey = apiKey.trim();
   
-  // Pre-flight: vérifier le format de la clé
-  if (!cleanKey || cleanKey.length < 10) {
-    throw new Error('INVALID_API_KEY: Clé API Gemini invalide (trop courte ou vide).');
+  // Pre-flight: vérifier le format de la clé Gemini
+  if (!cleanKey || cleanKey.length < 20 || !cleanKey.startsWith('AIza')) {
+    throw new Error('INVALID_API_KEY: Clé API Gemini invalide. Utilisez une clé Google AI Studio commençant par AIza.');
   }
   
   console.log(`[Gemini] Using key: length=${cleanKey.length}, prefix=${cleanKey.substring(0, 8)}..., retry=${retryCount}`);
@@ -81,7 +81,7 @@ async function callGeminiDirect(systemPrompt: string, userPrompt: string, maxTok
     }
     
     if (status === 429) throw new Error('RATE_LIMIT: Limite Gemini atteinte après 3 tentatives. Activez la facturation sur votre projet Google Cloud pour supprimer cette limite.');
-    if (status === 401 || status === 403) throw new Error('INVALID_API_KEY: Clé API Gemini invalide.');
+    if (status === 400 || status === 401 || status === 403) throw new Error('INVALID_API_KEY: Clé API Gemini invalide. Utilisez une clé Google AI Studio commençant par AIza.');
     throw new Error(`Gemini Error: ${status}`);
   }
 
@@ -1381,12 +1381,15 @@ JSON :
     let status = 500;
     let userMessage = errorMessage;
     
-    if (errorMessage === 'RATE_LIMIT') {
+    if (errorMessage.includes('RATE_LIMIT')) {
       status = 429;
       userMessage = 'Limite de requêtes atteinte. Patientez quelques secondes.';
     } else if (errorMessage === 'CREDITS_EXHAUSTED') {
       status = 402;
       userMessage = 'Crédits épuisés. Veuillez recharger.';
+    } else if (errorMessage.includes('INVALID_API_KEY')) {
+      status = 400;
+      userMessage = 'Votre clé Gemini n\'est pas valide. Collez une clé Google AI Studio commençant par AIza dans Paramètres puis relancez le workflow.';
     }
 
     return new Response(

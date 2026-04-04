@@ -134,8 +134,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   const progress = currentStepIndex >= 0 ? ((currentStepIndex + 1) / 15) * 100 : 0;
   const normalizedUserApiKey = typeof userApiKey === 'string' ? userApiKey.trim() : '';
   const hasConfiguredApiKey = normalizedUserApiKey.length > 0;
-  const hasPlausibleApiKeyFormat =
-    normalizedUserApiKey.startsWith('AIza') || normalizedUserApiKey.startsWith('sk-');
+  const hasPlausibleApiKeyFormat = normalizedUserApiKey.startsWith('AIza');
   const hasUsableApiKey = hasConfiguredApiKey && hasPlausibleApiKeyFormat;
   const hasStrictlyValidatedApiKey = hasUsableApiKey && isUserKeyValid === true;
   const hasApiKeyValidationWarning = hasUsableApiKey && isUserKeyValid === false;
@@ -1338,11 +1337,10 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
               </div>
               <p className="text-xs text-muted-foreground">
                 {hasStrictlyValidatedApiKey
-                  ? 'Les coûts de génération seront facturés directement sur votre compte Gemini (~0,30€ par livre).'
+                    ? 'Les coûts de génération seront facturés directement sur votre compte Gemini (~0,30€ par livre).'
                   : hasUsableApiKey
-                    ? 'Une clé est bien présente. Si la validation locale échoue, le workflow peut quand même tenter de démarrer avec votre clé.'
-                    : 'Configurez votre clé API Gemini dans l\'onglet "Paramètres" pour générer votre livre. Les coûts (~0,20€ - 0,50€ par livre) seront facturés sur votre compte Google AI.'
-                }
+                    ? 'Une clé Gemini valide est bien présente. Le workflow peut démarrer.'
+                    : 'Configurez une clé Gemini commençant par AIza dans l\'onglet "Paramètres" pour générer votre livre. Les anciens formats de clé ne sont plus acceptés.'}
               </p>
             </div>
           </div>

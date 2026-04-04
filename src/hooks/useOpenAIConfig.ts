@@ -31,12 +31,13 @@ export const useOpenAIConfig = () => {
     const savedModel = localStorage.getItem(GEMINI_MODEL);
     
     if (savedApiKey) {
-      // Accept both sk- (legacy OpenAI) and AIza (Gemini) format keys
-      const isValidFormat = isValidApiKeyFormat(savedApiKey, 'AIza') || isValidApiKeyFormat(savedApiKey, 'sk-');
-      if (isValidFormat) {
-        setApiKey(savedApiKey);
+      const normalizedSavedApiKey = savedApiKey.trim();
+      const isGeminiKey = isValidApiKeyFormat(normalizedSavedApiKey, 'AIza');
+
+      if (isGeminiKey) {
+        setApiKey(normalizedSavedApiKey);
         logSecurityWarning();
-        setTimeout(() => validateApiKey(savedApiKey), 100);
+        setTimeout(() => validateApiKey(normalizedSavedApiKey), 100);
       } else {
         console.warn('[Security] Stored API key has invalid format, removing.');
         localStorage.removeItem(GEMINI_API_KEY);
@@ -52,21 +53,23 @@ export const useOpenAIConfig = () => {
     setIsValid(null);
     
     if (newApiKey) {
-      const isValidFormat = isValidApiKeyFormat(newApiKey, 'AIza') || isValidApiKeyFormat(newApiKey, 'sk-');
+      const normalizedApiKey = newApiKey.trim();
+      const isValidFormat = isValidApiKeyFormat(normalizedApiKey, 'AIza');
       if (!isValidFormat) {
         console.warn('[Security] API key has invalid format');
         setIsValid(false);
         return;
       }
       
-      localStorage.setItem(GEMINI_API_KEY, newApiKey);
+      localStorage.setItem(GEMINI_API_KEY, normalizedApiKey);
+      setApiKey(normalizedApiKey);
       logSecurityWarning();
       
       if (!securityWarningShown) {
         setSecurityWarningShown(true);
       }
       
-      await validateApiKey(newApiKey);
+      await validateApiKey(normalizedApiKey);
     } else {
       localStorage.removeItem(GEMINI_API_KEY);
     }
@@ -82,7 +85,8 @@ export const useOpenAIConfig = () => {
     const key = keyToValidate || apiKey;
     if (!key) return false;
 
-    const isValidFormat = isValidApiKeyFormat(key, 'AIza') || isValidApiKeyFormat(key, 'sk-');
+    const normalizedKey = key.trim();
+    const isValidFormat = isValidApiKeyFormat(normalizedKey, 'AIza');
     if (!isValidFormat) {
       setIsValid(false);
       return false;
@@ -90,7 +94,7 @@ export const useOpenAIConfig = () => {
 
     setIsValidating(true);
     try {
-      const isValidKey = await validateOpenAIApiKey(key, model);
+      const isValidKey = await validateOpenAIApiKey(normalizedKey, model);
       setIsValid(isValidKey);
       return isValidKey;
     } catch (error) {
