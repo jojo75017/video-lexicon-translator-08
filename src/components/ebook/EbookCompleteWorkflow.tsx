@@ -1341,7 +1341,6 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
                   : hasUsableApiKey
                     ? 'Une clé Gemini valide est bien présente. Le workflow peut démarrer.'
                     : 'Configurez une clé Gemini commençant par AIza dans l\'onglet "Paramètres" pour générer votre livre. Les anciens formats de clé ne sont plus acceptés.'}
-                }
               </p>
             </div>
           </div>
