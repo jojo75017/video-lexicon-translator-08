@@ -215,7 +215,7 @@ const App = () => {
   const showAccessDebug = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('debug') === '1';
 
   if (isCheckingAuth) {
-    return null;
+    return <PageLoader />;
   }
 
   return (
