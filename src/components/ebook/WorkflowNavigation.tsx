@@ -19,27 +19,27 @@ export interface WorkflowStep {
 }
 
 export const WORKFLOW_STEPS: WorkflowStep[] = [
-  { id: 'P1', label: 'Directeur Éditorial', shortLabel: 'P1', description: 'Analyse du titre et positionnement stratégique', requiredSteps: [], estimatedMinutes: 2, tip: "Définissez bien votre titre et sous-titre.", phase: 1 },
-  { id: 'P2', label: 'Analyse Marché', shortLabel: 'P2', description: 'Mots-clés KDP et analyse concurrentielle', requiredSteps: ['P1'], estimatedMinutes: 3, tip: "Les 7 mots-clés KDP sont cruciaux.", phase: 1 },
-  { id: 'P3', label: 'Architecte Contenu', shortLabel: 'P3', description: 'Structure des chapitres et personnages', requiredSteps: ['P1', 'P2'], estimatedMinutes: 3, tip: "Visez 8-15 chapitres.", phase: 1 },
-  { id: 'P4', label: 'Rédaction Expert', shortLabel: 'P4', description: 'Génération du contenu des chapitres', requiredSteps: ['P3'], estimatedMinutes: 15, tip: "L'étape la plus longue.", phase: 2 },
-  { id: 'P5', label: 'Réécriture Naturelle', shortLabel: 'P5', description: 'Humanisation du texte généré', requiredSteps: ['P4'], estimatedMinutes: 5, tip: "Rend votre texte naturel.", phase: 2 },
-  { id: 'P6', label: 'Qualité Éditoriale', shortLabel: 'P6', description: 'Analyse qualité et suggestions', requiredSteps: ['P4'], estimatedMinutes: 3, tip: "Grammaire, cohérence et style.", phase: 2 },
-  { id: 'P7', label: 'Packaging Éditorial', shortLabel: 'P7', description: 'Description et métadonnées KDP', requiredSteps: ['P1', 'P2'], estimatedMinutes: 2, tip: "Optimisé pour Amazon.", phase: 2 },
-  { id: 'P8', label: 'Diagnostic Final', shortLabel: 'P8', description: 'Vérification complète avant publication', requiredSteps: ['P4', 'P7'], estimatedMinutes: 3, tip: "Vérification globale.", phase: 2 },
-  { id: 'P9', label: 'Mémoire Éditoriale', shortLabel: 'P9', description: 'Cohérence globale du projet', requiredSteps: ['P4'], estimatedMinutes: 2, tip: "Votre voix d'auteur.", phase: 3 },
-  { id: 'P10', label: 'Cohérence Chapitres', shortLabel: 'P10', description: 'Liens entre les chapitres', requiredSteps: ['P4'], estimatedMinutes: 3, tip: "Transitions fluides.", phase: 3 },
-  { id: 'P11', label: 'Auto-Critique', shortLabel: 'P11', description: 'Analyse critique du manuscrit', requiredSteps: ['P4'], estimatedMinutes: 3, tip: "Analyse sans complaisance.", phase: 3 },
-  { id: 'P12', label: 'Boucle Itérative', shortLabel: 'P12', description: 'Amélioration continue', requiredSteps: ['P11'], estimatedMinutes: 5, tip: "Améliorations auto.", phase: 3 },
-  { id: 'P13', label: 'Signature Style', shortLabel: 'P13', description: 'Cohérence stylistique', requiredSteps: ['P4'], estimatedMinutes: 2, tip: "Style unifié.", phase: 3 },
-  { id: 'P14', label: 'Verdict Ultime', shortLabel: 'P14', description: 'Évaluation finale et recommandations', requiredSteps: ['P8'], estimatedMinutes: 2, tip: "Validation finale.", phase: 3 },
-  { id: 'P15', label: 'Humanisation Anti-IA', shortLabel: 'P15', description: '🎁 BONUS — Rend le texte indétectable', requiredSteps: ['P5'], estimatedMinutes: 5, tip: "Anti-détection IA.", phase: 4 },
+  { id: 'P1', label: 'Zyro', shortLabel: 'P1', description: 'Vision & Niche', requiredSteps: [], estimatedMinutes: 2, tip: "Définis ta niche et ton angle.", phase: 1 },
+  { id: 'P2', label: 'Jano', shortLabel: 'P2', description: 'Analyse marché Amazon', requiredSteps: ['P1'], estimatedMinutes: 3, tip: "Valide ta niche sur Amazon.", phase: 1 },
+  { id: 'P3', label: 'Kiro', shortLabel: 'P3', description: 'Structure des chapitres', requiredSteps: ['P1', 'P2'], estimatedMinutes: 3, tip: "Vise 8-15 chapitres.", phase: 1 },
+  { id: 'P4', label: 'Alia', shortLabel: 'P4', description: 'Rédaction du manuscrit', requiredSteps: ['P3'], estimatedMinutes: 15, tip: "L'étape la plus longue.", phase: 1 },
+  { id: 'P5', label: 'Lexo', shortLabel: 'P5', description: 'Réécriture & style', requiredSteps: ['P4'], estimatedMinutes: 5, tip: "Rend ton texte pro.", phase: 2 },
+  { id: 'P6', label: 'Vero', shortLabel: 'P6', description: 'Contrôle qualité', requiredSteps: ['P4'], estimatedMinutes: 3, tip: "Grammaire et cohérence.", phase: 2 },
+  { id: 'P7', label: 'Kado', shortLabel: 'P7', description: 'Packaging KDP', requiredSteps: ['P1', 'P2'], estimatedMinutes: 2, tip: "Optimisé pour Amazon.", phase: 3 },
+  { id: 'P8', label: 'Conso', shortLabel: 'P8', description: 'Diagnostic global', requiredSteps: ['P4', 'P7'], estimatedMinutes: 3, tip: "Vérification complète.", phase: 2 },
+  { id: 'P9', label: 'Emio', shortLabel: 'P9', description: 'Mémoire éditoriale', requiredSteps: ['P4'], estimatedMinutes: 2, tip: "Ta voix d'auteur.", phase: 2 },
+  { id: 'P10', label: 'Mira', shortLabel: 'P10', description: 'Transitions chapitres', requiredSteps: ['P4'], estimatedMinutes: 3, tip: "Transitions fluides.", phase: 2 },
+  { id: 'P11', label: 'Beto', shortLabel: 'P11', description: 'Lecteur critique', requiredSteps: ['P4'], estimatedMinutes: 3, tip: "Feedback sans filtre.", phase: 2 },
+  { id: 'P12', label: 'Nexa', shortLabel: 'P12', description: 'Améliorations auto', requiredSteps: ['P11'], estimatedMinutes: 5, tip: "Corrections ciblées.", phase: 2 },
+  { id: 'P13', label: 'Huma', shortLabel: 'P13', description: 'Signature style', requiredSteps: ['P4'], estimatedMinutes: 2, tip: "Style unifié.", phase: 2 },
+  { id: 'P14', label: 'Tila', shortLabel: 'P14', description: 'Verdict final', requiredSteps: ['P8'], estimatedMinutes: 2, tip: "Go / No-Go.", phase: 3 },
+  { id: 'P15', label: 'Orin', shortLabel: 'P15', description: '🎁 Anti-Détection IA', requiredSteps: ['P5'], estimatedMinutes: 5, tip: "Texte 100% humain.", phase: 4 },
 ];
 
 const PHASES = [
-  { id: 1, label: 'Préparation', emoji: '📋', steps: ['P1', 'P2', 'P3'] },
-  { id: 2, label: 'Rédaction', emoji: '✍️', steps: ['P4', 'P5', 'P6', 'P7', 'P8'] },
-  { id: 3, label: 'Optimisation', emoji: '🔍', steps: ['P9', 'P10', 'P11', 'P12', 'P13', 'P14'] },
+  { id: 1, label: 'Créer', emoji: '✍️', steps: ['P1', 'P2', 'P3', 'P4'] },
+  { id: 2, label: 'Optimiser', emoji: '⚡', steps: ['P5', 'P6', 'P8', 'P9', 'P10', 'P11', 'P12', 'P13'] },
+  { id: 3, label: 'Publier', emoji: '📦', steps: ['P7', 'P14'] },
   { id: 4, label: 'Bonus', emoji: '🎁', steps: ['P15'] },
 ];
 
@@ -83,7 +83,6 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
   const currentAgent = AGENT_STEPS[currentStepIndex];
   const currentPhase = PHASES.find(p => p.steps.includes(currentStepId));
 
-  // Auto-detect active phase from current step
   const displayPhase = activePhase ?? currentPhase?.id ?? 1;
 
   const prevStep = currentStepIndex > 0 ? WORKFLOW_STEPS[currentStepIndex - 1] : null;
@@ -107,26 +106,27 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
 
   return (
     <div className={cn("space-y-0 mb-6", className)}>
-      {/* ── Agent Card (like the screenshot style) ── */}
+      {/* Agent Card */}
       {currentAgent && (
-        <div className="bg-card border border-border rounded-t-xl p-5 flex items-start gap-4">
-          {/* Agent Icon / Avatar */}
+        <div className="bg-card border border-border rounded-t-xl p-4 flex items-start gap-4">
           <div className={cn(
-            "flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl shadow-md",
+            "flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl shadow-md",
             "bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20"
           )}>
             {isGenerating 
-              ? <Loader2 className="h-7 w-7 animate-spin text-primary" />
-              : <currentAgent.icon className="h-7 w-7 text-primary" />
+              ? <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              : <currentAgent.icon className="h-6 w-6 text-primary" />
             }
           </div>
 
-          {/* Agent Info */}
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap mb-1">
+            <div className="flex items-center gap-2 flex-wrap mb-0.5">
               <h3 className="text-base font-bold text-foreground">
-                {currentAgent.agentTitle} {currentAgent.agentSubtitle && `— ${currentAgent.agentSubtitle}`}
+                {currentAgent.agentTitle}
               </h3>
+              <Badge variant="outline" className="text-[11px] font-semibold border-primary/30 text-primary px-1.5 py-0">
+                {currentAgent.agentSubtitle}
+              </Badge>
               {hasStepResult(currentStepId) && (
                 <Badge className="bg-green-500/15 text-green-600 dark:text-green-400 border-green-500/30 text-xs">
                   <Check className="w-3 h-3 mr-1" />Terminé
@@ -136,47 +136,21 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
             <p className="text-sm text-muted-foreground leading-relaxed">
               {currentAgent.agentMission}
             </p>
-            <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
-              <span className="flex items-center gap-1">
-                <Badge variant="outline" className="text-[11px] font-semibold border-primary/30 text-primary px-1.5 py-0">
-                  Étape {currentStep.shortLabel}
-                </Badge>
-              </span>
+            <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
               <span>⏱️ ~{currentStep.estimatedMinutes} min</span>
-              <span className="text-muted-foreground/60">•</span>
-              <span>{completedCount}/{WORKFLOW_STEPS.length} complétées</span>
-              <span className="text-muted-foreground/60">•</span>
+              <span className="text-muted-foreground/40">•</span>
+              <span>{completedCount}/{WORKFLOW_STEPS.length} terminés</span>
+              <span className="text-muted-foreground/40">•</span>
               <span className="font-semibold text-primary">{Math.round(progressPercentage)}%</span>
             </div>
-            {/* Prerequisites */}
-            {currentStep.requiredSteps && currentStep.requiredSteps.length > 0 && !hasStepResult(currentStepId) && (
-              <div className="mt-2 flex items-center gap-1.5 flex-wrap">
-                <span className="text-xs text-muted-foreground">Prérequis :</span>
-                {currentStep.requiredSteps.map(reqId => (
-                  <Badge
-                    key={reqId}
-                    variant="outline"
-                    className={cn(
-                      "text-[10px] px-1.5 py-0",
-                      hasStepResult(reqId)
-                        ? "bg-green-500/15 text-green-600 border-green-500/30"
-                        : "bg-amber-500/15 text-amber-600 border-amber-500/30"
-                    )}
-                  >
-                    {hasStepResult(reqId) && <Check className="w-2.5 h-2.5 mr-0.5" />}
-                    {reqId}
-                  </Badge>
-                ))}
-              </div>
-            )}
           </div>
         </div>
       )}
 
-      {/* ── Progress bar ── */}
+      {/* Progress bar */}
       <Progress value={progressPercentage} className="h-1.5 rounded-none" />
 
-      {/* ── Phase Tabs (like "Thématiques | Calendrier éditorial") ── */}
+      {/* Pipeline Tabs: Créer → Optimiser → Publier */}
       <div className="bg-card border-x border-border">
         <div className="flex">
           {PHASES.map((phase) => {
@@ -188,21 +162,21 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
                 key={phase.id}
                 onClick={() => setActivePhase(phase.id)}
                 className={cn(
-                  "flex-1 px-4 py-2.5 text-sm font-medium transition-all border-b-2 relative",
+                  "flex-1 px-3 py-2.5 text-sm font-medium transition-all border-b-2 relative",
                   isActive
                     ? "border-primary text-primary bg-primary/5"
                     : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 )}
               >
                 <span>{phase.emoji} {phase.label}</span>
-                <span className="ml-1.5 text-[11px] opacity-60">{phaseCompleted}/{phase.steps.length}</span>
+                <span className="ml-1 text-[11px] opacity-60">{phaseCompleted}/{phase.steps.length}</span>
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* ── Steps of the active phase (simple clickable tabs) ── */}
+      {/* Agents of active phase */}
       <div className="bg-card border-x border-b border-border rounded-b-xl p-3">
         <div className="flex flex-wrap gap-2">
           {PHASES.find(p => p.id === displayPhase)?.steps.map((stepId) => {
@@ -210,7 +184,6 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
             const agent = AGENT_STEPS.find(a => a.id === stepId);
             const status = getStepStatus(step);
             const tabId = STEP_TO_TAB[step.id];
-            const AgentIcon = agent?.icon;
 
             return (
               <button
@@ -218,7 +191,7 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
                 onClick={() => status !== 'locked' && handleNavigate(tabId)}
                 disabled={status === 'locked' || isGenerating}
                 className={cn(
-                  "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all border",
+                  "flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all border",
                   status === 'completed' && "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20",
                   status === 'current' && "bg-primary text-primary-foreground border-primary shadow-sm",
                   status === 'available' && "bg-muted/50 hover:bg-accent text-muted-foreground border-border hover:text-foreground cursor-pointer",
@@ -226,20 +199,18 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
                 )}
               >
                 {status === 'completed' ? (
-                  <Check className="w-4 h-4 shrink-0" />
+                  <Check className="w-3.5 h-3.5 shrink-0" />
                 ) : status === 'locked' ? (
-                  <Lock className="w-3.5 h-3.5 shrink-0" />
-                ) : AgentIcon ? (
-                  <AgentIcon className="w-4 h-4 shrink-0" />
+                  <Lock className="w-3 h-3 shrink-0" />
                 ) : null}
-                <span className="whitespace-nowrap">{step.shortLabel} — {agent?.agentTitle || step.label}</span>
+                <span className="whitespace-nowrap">{agent?.agentTitle || step.label}</span>
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* ── Prev / Next Navigation ── */}
+      {/* Prev / Next */}
       <div className="flex items-center justify-between gap-3 mt-3">
         <Button
           variant="outline"
@@ -250,7 +221,7 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
         >
           <ChevronLeft className="w-4 h-4" />
           <span className="hidden sm:inline">
-            {prevStep ? `${prevStep.shortLabel} — ${AGENT_STEPS.find(a => a.id === prevStep.id)?.agentTitle || prevStep.label}` : 'Précédent'}
+            {prevStep ? AGENT_STEPS.find(a => a.id === prevStep.id)?.agentTitle || prevStep.label : 'Précédent'}
           </span>
         </Button>
 
@@ -265,7 +236,7 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
           className="flex items-center gap-1.5"
         >
           <span className="hidden sm:inline">
-            {nextStep ? `${nextStep.shortLabel} — ${AGENT_STEPS.find(a => a.id === nextStep.id)?.agentTitle || nextStep.label}` : 'Suivant'}
+            {nextStep ? AGENT_STEPS.find(a => a.id === nextStep.id)?.agentTitle || nextStep.label : 'Suivant'}
           </span>
           <ChevronRight className="w-4 h-4" />
         </Button>
