@@ -343,7 +343,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       const saved = localStorage.getItem('ebook_planner_active_tab');
       if (saved && saved !== 'onboarding' && saved !== 'subscription') return saved;
     } catch {}
-    return 'onboarding';
+    return 'planner';
   });
 
   // Persist activeTab to localStorage so workflow isn't lost on re-render
