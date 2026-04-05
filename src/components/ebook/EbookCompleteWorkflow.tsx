@@ -477,6 +477,47 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
 
   const countWords = (text: string) => text.trim().split(/\s+/).filter(Boolean).length;
 
+  const summarizeChapterForTransmission = (chapter: any, maxContentLength: number) => {
+    const rawContent = String(chapter?.contenu || chapter?.content || '').trim();
+
+    return {
+      numero: Number(chapter?.numero) || undefined,
+      titre: limitText(chapter?.titre || chapter?.title, 120),
+      objectif: limitText(chapter?.objectif, 180),
+      contenu: limitText(rawContent, maxContentLength),
+      nombreMots: Number(chapter?.nombreMots) || countWords(rawContent),
+    };
+  };
+
+  const buildLeanWorkflowContext = (stepId: string, baseContext: Record<string, any>) => {
+    if (!['P5', 'P6', 'P7', 'P8', 'P9', 'P10', 'P11', 'P12', 'P13', 'P14', 'P15'].includes(stepId)) {
+      return baseContext;
+    }
+
+    const p4Chapters = Array.isArray(baseContext.P4?.chapitres) ? baseContext.P4.chapitres : [];
+    const p5FinalChapters = Array.isArray(baseContext.P5?.chapitresFinal) ? baseContext.P5.chapitresFinal : [];
+
+    return {
+      ...baseContext,
+      P4: baseContext.P4
+        ? {
+            ...baseContext.P4,
+            nombreChapitres: Number(baseContext.P4?.nombreChapitres) || p4Chapters.length,
+            nombreMotsTotal: Number(baseContext.P4?.nombreMotsTotal) || p4Chapters.reduce((total: number, chapter: any) => {
+              return total + (Number(chapter?.nombreMots) || countWords(String(chapter?.contenu || chapter?.content || '')));
+            }, 0),
+            chapitres: p4Chapters.slice(0, 5).map((chapter: any) => summarizeChapterForTransmission(chapter, 1400)),
+          }
+        : baseContext.P4,
+      P5: baseContext.P5
+        ? {
+            ...baseContext.P5,
+            chapitresFinal: p5FinalChapters.slice(0, 3).map((chapter: any) => summarizeChapterForTransmission(chapter, 1500)),
+          }
+        : baseContext.P5,
+    };
+  };
+
   const mergeChapterSegments = (chapter: any, segments: any[]) => {
     const contenu = segments
       .map(segment => String(segment?.contenu || segment?.content || '').trim())
@@ -515,7 +556,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
           role: c.role || 'secondary'
         }));
 
-    const previousContext = options.previousContextOverride ?? context;
+    const previousContext = options.previousContextOverride ?? buildLeanWorkflowContext(stepId, context);
 
     try {
       // IMPORTANT: pour éviter des payloads énormes (P4 chapitre par chapitre),
