@@ -21,6 +21,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { useWorkflowResults } from '@/hooks/useWorkflowResults';
 import { useWorkflowCloudSync } from '@/hooks/useWorkflowCloudSync';
 import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
+import { WORKFLOW_STEPS, WORKFLOW_STEP_COUNT } from './workflow/workflowAgents';
 
 interface Character {
   id: string;
@@ -63,24 +64,6 @@ interface WorkflowProgress {
   originalTitleScore?: any;
   selectedTitleIndex?: number | null;
 }
-
-const workflowSteps = [
-  { id: 'P1', name: 'Directeur Éditorial', icon: Target, description: 'Vision stratégique et analyse du projet' },
-  { id: 'P2', name: 'Analyse de Marché', icon: TrendingUp, description: 'Positionnement Amazon KDP + 7 mots-clés stratégiques' },
-  { id: 'P3', name: 'Architecte de Contenu', icon: Layers, description: 'Structure détaillée (400+ pages)' },
-  { id: 'P4', name: 'Rédaction Experte', icon: FileText, description: 'Écriture professionnelle chapitre par chapitre' },
-  { id: 'P5', name: 'Réécriture Naturelle', icon: Sparkles, description: 'Humanisation du texte (votre voix, pas un robot)' },
-  { id: 'P6', name: 'Qualité Éditoriale', icon: CheckCircle2, description: 'Contrôle qualité approfondi' },
-  { id: 'P7', name: 'Packaging Éditorial', icon: BookOpen, description: 'Métadonnées et mots-clés KDP optimisés' },
-  { id: 'P8', name: 'Diagnostic Final', icon: Target, description: 'Vérification cohérence globale' },
-  { id: 'P9', name: 'Mémoire Éditoriale', icon: Sparkles, description: 'Capture de VOTRE voix unique d\'auteur' },
-  { id: 'P10', name: 'Cohérence Chapitres', icon: Layers, description: 'Transitions fluides entre chapitres' },
-  { id: 'P11', name: 'Auto-Critique', icon: AlertCircle, description: 'Détection des faiblesses (sans flatterie)' },
-  { id: 'P12', name: 'Boucle Itérative', icon: Sparkles, description: 'Améliorations automatiques' },
-  { id: 'P13', name: 'Signature de Style', icon: Award, description: 'Voix d\'auteur unifiée et reconnaissable' },
-  { id: 'P14', name: 'Verdict Ultime', icon: CheckCircle2, description: 'Validation finale par l\'éditeur professionnel' },
-  { id: 'P15', name: 'Humanisation Anti-IA', icon: Shield, description: '🎁 BONUS — Rend le texte indétectable par les outils anti-IA' },
-];
 
 const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplete, characters: externalCharacters = [] }) => {
   // Hook pour sauvegarder les résultats P1-P14 globalement
@@ -131,7 +114,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   const [generatedIntro, setGeneratedIntro] = useState('');
   const [generatedConclusion, setGeneratedConclusion] = useState('');
 
-  const progress = currentStepIndex >= 0 ? ((currentStepIndex + 1) / 15) * 100 : 0;
+  const progress = currentStepIndex >= 0 ? ((currentStepIndex + 1) / WORKFLOW_STEP_COUNT) * 100 : 0;
   const normalizedUserApiKey = typeof userApiKey === 'string' ? userApiKey.trim() : '';
   const hasConfiguredApiKey = normalizedUserApiKey.length > 0;
   const hasPlausibleApiKeyFormat = normalizedUserApiKey.startsWith('AIza');
@@ -517,6 +500,18 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
         : baseContext.P5,
     };
   };
+
+  const workflowAgents = WORKFLOW_STEPS.map((step, index) => {
+    const isCompleted = stepResults[step.id] !== undefined;
+    const isActive = currentStepIndex === index && isGenerating;
+    const isBlocked = !isCompleted && !isActive && currentStepIndex >= 0 && index > currentStepIndex;
+
+    return {
+      ...step,
+      sequence: index + 1,
+      status: isCompleted ? 'completed' : isActive ? 'active' : isBlocked ? 'queued' : 'ready',
+    };
+  });
 
   const mergeChapterSegments = (chapter: any, segments: any[]) => {
     const contenu = segments
