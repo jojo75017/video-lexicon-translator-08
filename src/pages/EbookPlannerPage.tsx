@@ -751,8 +751,8 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
         body: {
           characterName: character.name,
           characterDescription: character.description,
-          useOpenAI: !!apiKey,
-          openaiApiKey: apiKey || undefined
+          useGemini: !!apiKey,
+          geminiApiKey: apiKey || undefined
         }
       });
 
@@ -789,7 +789,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       return;
     }
     if (!apiKey) {
-      toast.error('Clé API OpenAI requise');
+      toast.error('Clé API Gemini requise');
       return;
     }
 
@@ -1769,10 +1769,10 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label className="text-sm font-medium">Clé API OpenAI</Label>
+                          <Label className="text-sm font-medium">Clé API Gemini</Label>
                           <Input
                             type="password"
-                            placeholder="sk-..."
+                            placeholder="AIza..."
                             value={apiKey}
                             onChange={(e) => setApiKey(e.target.value)}
                             className="h-12 border-2 focus:border-primary"
