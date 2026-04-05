@@ -9,18 +9,19 @@ import { Slider } from '@/components/ui/slider';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { 
-  Sparkles, BookOpen, CheckCircle2, Loader2, AlertCircle, Shield,
-  Rocket, Target, TrendingUp, Layers, FileText, Award, User, Hash,
+import {
+  Sparkles, BookOpen, CheckCircle2, Loader2, AlertCircle,
+  Rocket, Target, FileText, User, Hash,
   ChevronDown, ChevronUp, Tag, AlignLeft, RotateCcw, Trash2, Plus, Key
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useWorkflowResults } from '@/hooks/useWorkflowResults';
 import { useWorkflowCloudSync } from '@/hooks/useWorkflowCloudSync';
 import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
+import { WORKFLOW_STEPS, WORKFLOW_STEP_COUNT } from './workflow/workflowAgents';
 
 interface Character {
   id: string;
@@ -64,27 +65,9 @@ interface WorkflowProgress {
   selectedTitleIndex?: number | null;
 }
 
-const workflowSteps = [
-  { id: 'P1', name: 'Directeur Éditorial', icon: Target, description: 'Vision stratégique et analyse du projet' },
-  { id: 'P2', name: 'Analyse de Marché', icon: TrendingUp, description: 'Positionnement Amazon KDP + 7 mots-clés stratégiques' },
-  { id: 'P3', name: 'Architecte de Contenu', icon: Layers, description: 'Structure détaillée (400+ pages)' },
-  { id: 'P4', name: 'Rédaction Experte', icon: FileText, description: 'Écriture professionnelle chapitre par chapitre' },
-  { id: 'P5', name: 'Réécriture Naturelle', icon: Sparkles, description: 'Humanisation du texte (votre voix, pas un robot)' },
-  { id: 'P6', name: 'Qualité Éditoriale', icon: CheckCircle2, description: 'Contrôle qualité approfondi' },
-  { id: 'P7', name: 'Packaging Éditorial', icon: BookOpen, description: 'Métadonnées et mots-clés KDP optimisés' },
-  { id: 'P8', name: 'Diagnostic Final', icon: Target, description: 'Vérification cohérence globale' },
-  { id: 'P9', name: 'Mémoire Éditoriale', icon: Sparkles, description: 'Capture de VOTRE voix unique d\'auteur' },
-  { id: 'P10', name: 'Cohérence Chapitres', icon: Layers, description: 'Transitions fluides entre chapitres' },
-  { id: 'P11', name: 'Auto-Critique', icon: AlertCircle, description: 'Détection des faiblesses (sans flatterie)' },
-  { id: 'P12', name: 'Boucle Itérative', icon: Sparkles, description: 'Améliorations automatiques' },
-  { id: 'P13', name: 'Signature de Style', icon: Award, description: 'Voix d\'auteur unifiée et reconnaissable' },
-  { id: 'P14', name: 'Verdict Ultime', icon: CheckCircle2, description: 'Validation finale par l\'éditeur professionnel' },
-  { id: 'P15', name: 'Humanisation Anti-IA', icon: Shield, description: '🎁 BONUS — Rend le texte indétectable par les outils anti-IA' },
-];
-
 const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplete, characters: externalCharacters = [] }) => {
   // Hook pour sauvegarder les résultats P1-P14 globalement
-  const { saveStepResult, saveAllResults } = useWorkflowResults();
+  const { saveStepResult } = useWorkflowResults();
   const { saveStepToCloud } = useWorkflowCloudSync();
   
   // Hook pour récupérer la clé API utilisateur
@@ -101,7 +84,6 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   const [title, setTitle] = useState('');
   const [subtitle, setSubtitle] = useState('');
   const [category, setCategory] = useState('');
-  const [generatedDescription, setGeneratedDescription] = useState('');
   const [bookIntroduction, setBookIntroduction] = useState('');
   const [authorName, setAuthorName] = useState('');
   const [numberOfChapters, setNumberOfChapters] = useState(8);
@@ -121,7 +103,6 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   // État pour les personnages générés en P3 et l'édition avant P4
   const [generatedCharacters, setGeneratedCharacters] = useState<GeneratedCharacter[]>([]);
   const [waitingForCharacterValidation, setWaitingForCharacterValidation] = useState(false);
-  const [editingCharacterIndex, setEditingCharacterIndex] = useState<number | null>(null);
   
   // État pour la validation du titre après P1
   const [waitingForTitleValidation, setWaitingForTitleValidation] = useState(false);
@@ -131,7 +112,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   const [generatedIntro, setGeneratedIntro] = useState('');
   const [generatedConclusion, setGeneratedConclusion] = useState('');
 
-  const progress = currentStepIndex >= 0 ? ((currentStepIndex + 1) / 15) * 100 : 0;
+  const progress = currentStepIndex >= 0 ? ((currentStepIndex + 1) / WORKFLOW_STEP_COUNT) * 100 : 0;
   const normalizedUserApiKey = typeof userApiKey === 'string' ? userApiKey.trim() : '';
   const hasConfiguredApiKey = normalizedUserApiKey.length > 0;
   const hasPlausibleApiKeyFormat = normalizedUserApiKey.startsWith('AIza');
@@ -191,7 +172,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
         Object.keys(data.stepResults || {}).forEach(stepId => {
           expanded[stepId] = false;
         });
-        const lastStepId = workflowSteps[data.currentStepIndex]?.id;
+        const lastStepId = WORKFLOW_STEPS[data.currentStepIndex]?.id;
         if (lastStepId) expanded[lastStepId] = true;
         setExpandedSteps(expanded);
       }
@@ -272,11 +253,9 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
     setAllContext({});
     setError(null);
     setFailedStepIndex(null);
-    setGeneratedDescription('');
     setHasReadSteps(false);
     setGeneratedCharacters([]);
     setWaitingForCharacterValidation(false);
-    setEditingCharacterIndex(null);
     setWaitingForTitleValidation(false);
     setTitleSuggestions([]);
     setOriginalTitleScore(null);
@@ -324,7 +303,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
           expanded[stepId] = false;
         });
         // Expand the last completed step
-        const lastStepId = workflowSteps[data.currentStepIndex]?.id;
+        const lastStepId = WORKFLOW_STEPS[data.currentStepIndex]?.id;
         if (lastStepId) expanded[lastStepId] = true;
         setExpandedSteps(expanded);
         
@@ -428,7 +407,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   const canResumeAfterP3 = !isGenerating && !waitingForTitleValidation && !waitingForCharacterValidation && p3Structure.length > 0 && !stepResults.P4;
   const savedResumeStepIndex = failedStepIndex !== null
     ? failedStepIndex
-    : currentStepIndex >= 0 && currentStepIndex < workflowSteps.length && currentStepIndex < 14
+    : currentStepIndex >= 0 && currentStepIndex < WORKFLOW_STEPS.length && currentStepIndex < 14
       ? currentStepIndex
       : null;
   const persistedResumeStepIndex = savedProgressSnapshot && savedProgressSnapshot.currentStepIndex >= 0 && savedProgressSnapshot.currentStepIndex < 14
@@ -517,6 +496,18 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
         : baseContext.P5,
     };
   };
+
+  const workflowAgents = WORKFLOW_STEPS.map((step, index) => {
+    const isCompleted = stepResults[step.id] !== undefined;
+    const isActive = currentStepIndex === index && isGenerating;
+    const isBlocked = !isCompleted && !isActive && currentStepIndex >= 0 && index > currentStepIndex;
+
+    return {
+      ...step,
+      sequence: index + 1,
+      status: isCompleted ? 'completed' : isActive ? 'active' : isBlocked ? 'queued' : 'ready',
+    };
+  });
 
   const mergeChapterSegments = (chapter: any, segments: any[]) => {
     const contenu = segments
@@ -831,15 +822,15 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
       console.log('📋 Resume context keys:', Object.keys(context), 'P3 chapitres:', context.P3?.chapitres?.length || 0);
     }
     toast.info(isResuming 
-      ? `🔄 Reprise à l'étape ${workflowSteps[resumeFromIndex].id}...` 
+      ? `🔄 Reprise à l'étape ${WORKFLOW_STEPS[resumeFromIndex].id}...` 
       : '🚀 Le Directeur Éditorial lance le workflow complet...'
     );
 
     let lastStepI = resumeFromIndex;
     try {
-      for (let i = resumeFromIndex; i < workflowSteps.length; i++) {
+      for (let i = resumeFromIndex; i < WORKFLOW_STEPS.length; i++) {
         lastStepI = i;
-        const step = workflowSteps[i];
+        const step = WORKFLOW_STEPS[i];
         setCurrentStepIndex(i);
 
         // Auto-expand current step
@@ -987,7 +978,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
 
           // Collapse previous step, keep current expanded
           if (i > 0) {
-            const prevStep = workflowSteps[i - 1];
+            const prevStep = WORKFLOW_STEPS[i - 1];
             setExpandedSteps(prev => ({ ...prev, [prevStep.id]: false }));
           }
         } else {
@@ -1050,7 +1041,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
 
             // Collapse previous step, keep current expanded
             if (i > 0) {
-              const prevStep = workflowSteps[i - 1];
+              const prevStep = WORKFLOW_STEPS[i - 1];
               setExpandedSteps(prev => ({ ...prev, [prevStep.id]: false }));
             }
             
@@ -1081,7 +1072,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
         }
 
         // Small delay between steps to avoid rate limiting
-        if (i < workflowSteps.length - 1) {
+        if (i < WORKFLOW_STEPS.length - 1) {
           await new Promise(resolve => setTimeout(resolve, 1000));
         }
       }
@@ -1130,7 +1121,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
       setError(err.message || 'Erreur lors de la génération');
       // Save progress on error so user can resume
       saveProgress();
-      toast.error(`Erreur à l'étape ${workflowSteps[lastStepI]?.id}: ${err.message}`);
+      toast.error(`Erreur à l'étape ${WORKFLOW_STEPS[lastStepI]?.id}: ${err.message}`);
     } finally {
       setIsGenerating(false);
     }
@@ -1172,7 +1163,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const data: WorkflowProgress = JSON.parse(saved);
-        if (resumeIndex === null && data.currentStepIndex >= 0 && data.currentStepIndex < workflowSteps.length) {
+        if (resumeIndex === null && data.currentStepIndex >= 0 && data.currentStepIndex < WORKFLOW_STEPS.length) {
           resumeIndex = data.currentStepIndex;
         }
 
@@ -1925,7 +1916,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
               <div className="space-y-1">
                 <p className="font-medium text-foreground">Une reprise est disponible.</p>
                 <p className="text-sm text-muted-foreground">
-                  Votre progression est sauvegardée. Vous pouvez relancer le workflow depuis l'étape {workflowSteps[effectiveResumeStepIndex ?? 0]?.id}.
+                  Votre progression est sauvegardée. Vous pouvez relancer le workflow depuis l'étape {WORKFLOW_STEPS[effectiveResumeStepIndex ?? 0]?.id}.
                 </p>
               </div>
 
@@ -1942,12 +1933,65 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
         </motion.div>
       )}
 
+      <Card className="border border-primary/30 bg-card/70 backdrop-blur-sm">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-primary" />
+            Les 15 agents du workflow professionnel
+          </CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Une équipe éditoriale spécialisée pilote chaque étape du manuscrit.
+          </p>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {workflowAgents.map((agent) => {
+              const AgentIcon = agent.icon;
+
+              return (
+                <div
+                  key={agent.id}
+                  className={[
+                    'rounded-2xl border p-4 transition-all',
+                    agent.status === 'completed' ? 'border-primary/40 bg-primary/10' : '',
+                    agent.status === 'active' ? 'border-primary/60 bg-primary/15 shadow-[0_0_0_1px_hsl(var(--primary)/0.25)]' : '',
+                    agent.status === 'queued' ? 'border-border bg-muted/20 opacity-75' : '',
+                    agent.status === 'ready' ? 'border-border bg-background/40' : '',
+                  ].join(' ')}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary">
+                      {agent.status === 'completed' ? <CheckCircle2 className="h-5 w-5" /> :
+                       agent.status === 'active' ? <Loader2 className="h-5 w-5 animate-spin" /> :
+                       <AgentIcon className="h-5 w-5" />}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <Badge variant="outline" className="border-primary/30 text-primary">{agent.id}</Badge>
+                        <span className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Agent {agent.sequence}</span>
+                      </div>
+                      <h3 className="mt-2 text-lg font-semibold text-foreground">{agent.agentTitle}</h3>
+                      <p className="text-sm font-medium text-foreground/80">{agent.agentSubtitle}</p>
+                    </div>
+                  </div>
+                  <div className="mt-4 space-y-2">
+                    <p className="text-sm font-medium text-foreground">{agent.name}</p>
+                    <p className="text-sm text-muted-foreground">{agent.description}</p>
+                    <p className="text-sm text-muted-foreground">{agent.agentMission}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Workflow Steps Card - Always visible */}
       <Card className="border border-primary/30">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" />
-            Les 14 étapes du Directeur Éditorial
+            Les 15 étapes du Directeur Éditorial
           </CardTitle>
           
           {/* Progress bar */}
@@ -1955,7 +1999,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             <div className="space-y-2 mt-4">
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">
-                  {currentStepIndex >= 14 ? 'Terminé !' : `Étape ${currentStepIndex + 1} sur 14`}
+                  {currentStepIndex >= 14 ? 'Terminé !' : `Étape ${currentStepIndex + 1} sur ${WORKFLOW_STEP_COUNT}`}
                 </span>
                 <span className="font-semibold text-primary">{Math.round(progress)}%</span>
               </div>
@@ -1966,7 +2010,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
 
         <CardContent className="space-y-2">
           {/* Steps List with Real Content */}
-          {workflowSteps.map((step, index) => {
+          {WORKFLOW_STEPS.map((step, index) => {
             const StepIcon = step.icon;
             const isActive = isGenerating && index === currentStepIndex;
             const isCompleted = stepResults[step.id] !== undefined;
@@ -2094,7 +2138,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             <AlertCircle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
             <div className="flex-1">
               <p className="font-medium text-destructive">
-                Erreur à l'étape {failedStepIndex !== null ? workflowSteps[failedStepIndex]?.id : '?'}
+                Erreur à l'étape {failedStepIndex !== null ? WORKFLOW_STEPS[failedStepIndex]?.id : '?'}
               </p>
               <p className="text-sm text-muted-foreground mt-1">{error}</p>
               
@@ -2108,7 +2152,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
                     disabled={isGenerating}
                   >
                     <Rocket className="h-4 w-4" />
-                    Reprendre à {workflowSteps[failedStepIndex]?.id}
+                    Reprendre à {WORKFLOW_STEPS[failedStepIndex]?.id}
                   </Button>
                 )}
                 
