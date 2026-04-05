@@ -549,6 +549,43 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
         displayContent: data.displayContent || 'Résultat généré'
       };
     } catch (err: any) {
+      if (stepId === 'P3') {
+        const rawMessage = String(err?.message || '');
+        const needsFallback =
+          rawMessage.includes('non-2xx status code') ||
+          rawMessage.includes('P3_STRUCTURE_INCOMPLETE') ||
+          rawMessage.includes('failed to send a request to the edge function') ||
+          rawMessage.includes('FunctionsFetchError');
+
+        if (needsFallback && !extraBody.forceFallback) {
+          console.warn('P3 failed in standard mode, retrying with robust fallback mode.');
+          const { data, error: fallbackError } = await supabase.functions.invoke('complete-book-workflow', {
+            body: {
+              step: stepId,
+              title,
+              subtitle,
+              category,
+              authorName,
+              numberOfChapters,
+              bookIntroduction,
+              characters: charactersForAI,
+              previousContext,
+              userApiKey: hasUsableApiKey ? normalizedUserApiKey : undefined,
+              useUserKey: hasUsableApiKey,
+              ...extraBody,
+              forceFallback: true,
+            }
+          });
+
+          if (!fallbackError && !data?.error) {
+            return {
+              result: data.result,
+              displayContent: data.displayContent || 'Résultat généré'
+            };
+          }
+        }
+      }
+
       console.error(`Step ${stepId} error:`, err);
       throw err;
     }
