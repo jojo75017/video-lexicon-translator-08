@@ -33,7 +33,7 @@ STANDARDS ÉDITORIAUX PROFESSIONNELS (niveau maison d'édition) :
    Score < 7 = à refaire
 `;
 
-// Variable globale pour stocker la clé API
+// Variable globale pour stocker la clé API utilisateur optionnelle
 let activeApiKey: string | null = null;
 
 // Token tracking global
@@ -59,7 +59,7 @@ async function callGeminiDirect(systemPrompt: string, userPrompt: string, maxTok
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      system_instruction: { parts: [{ text: systemPrompt + EDITORIAL_PRO_RULES }] },
+      system_instruction: { parts: [{ text: `${systemPrompt}\n\n${EDITORIAL_PRO_RULES}` }] },
       contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
       generationConfig: { maxOutputTokens: maxTokens, temperature: 0.7 },
     }),
@@ -89,15 +89,82 @@ async function callGeminiDirect(systemPrompt: string, userPrompt: string, maxTok
   return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
 }
 
-async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000): Promise<string> {
-  // BYOK OBLIGATOIRE : seule la clé de l'utilisateur est acceptée
-  const userKey = activeApiKey;
-  
-  if (!userKey) {
-    throw new Error('NO_API_KEY: Clé API Gemini requise. Configurez votre propre clé Gemini dans les Paramètres avant de générer.');
+async function callLovableAI(systemPrompt: string, userPrompt: string, maxTokens: number, retryCount = 0): Promise<string> {
+  const MAX_RETRIES = 2;
+  const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
+
+  if (!lovableApiKey) {
+    throw new Error('LOVABLE_AI_UNAVAILABLE: Le backend IA n\'est pas configuré.');
   }
 
-  return await callGeminiDirect(systemPrompt + EDITORIAL_PRO_RULES, userPrompt, maxTokens, userKey);
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 120000);
+
+  try {
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${lovableApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-flash',
+        messages: [
+          {
+            role: 'system',
+            content: `${systemPrompt}\n\n${EDITORIAL_PRO_RULES}`,
+          },
+          {
+            role: 'user',
+            content: userPrompt,
+          },
+        ],
+        temperature: 0.7,
+        max_tokens: maxTokens,
+      }),
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      const status = response.status;
+      const errText = await response.text();
+      console.error(`Lovable AI error ${status}: ${errText}`);
+
+      if ((status === 429 || status === 503) && retryCount < MAX_RETRIES) {
+        const waitSeconds = Math.min(10 * Math.pow(2, retryCount), 45);
+        await new Promise((resolve) => setTimeout(resolve, waitSeconds * 1000));
+        return await callLovableAI(systemPrompt, userPrompt, maxTokens, retryCount + 1);
+      }
+
+      if (status === 402) throw new Error('CREDITS_EXHAUSTED');
+      if (status === 429) throw new Error('RATE_LIMIT: Limite IA atteinte. Réessayez dans quelques instants.');
+      throw new Error(`LOVABLE_AI_ERROR: ${status}`);
+    }
+
+    const data = await response.json();
+    return data.choices?.[0]?.message?.content || '';
+  } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error('TIMEOUT: La génération a pris trop de temps.');
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000): Promise<string> {
+  const userKey = activeApiKey?.trim();
+
+  if (userKey) {
+    try {
+      return await callGeminiDirect(systemPrompt, userPrompt, maxTokens, userKey);
+    } catch (error) {
+      console.warn('User Gemini key failed, falling back to Lovable AI:', error instanceof Error ? error.message : error);
+    }
+  }
+
+  return await callLovableAI(systemPrompt, userPrompt, maxTokens);
 }
 
 // BOUCLE QUALITÉ : appelle l'IA, évalue le score, relance si < seuil
@@ -375,16 +442,20 @@ serve(async (req) => {
       useUserKey: _useUserKey,
     } = payload;
 
-    // Nettoyer et valider la clé API
+    // La clé utilisateur devient optionnelle ; sinon on utilise le backend IA intégré
     const cleanedApiKey = typeof userApiKey === 'string' ? userApiKey.trim() : '';
-    if (!cleanedApiKey) {
-      return new Response(
-        JSON.stringify({ error: 'NO_API_KEY: Clé API Gemini requise. Configurez votre propre clé dans Paramètres > Clés API.' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    const hasValidUserKeyFormat = cleanedApiKey.length >= 20 && cleanedApiKey.startsWith('AIza');
+    activeApiKey = hasValidUserKeyFormat ? cleanedApiKey : null;
+
+    if (cleanedApiKey && !hasValidUserKeyFormat) {
+      console.warn(`Ignoring invalid user Gemini key for step ${step}; using Lovable AI fallback instead.`);
     }
-    activeApiKey = cleanedApiKey;
-    console.log(`Using USER API key for step ${step} (length=${cleanedApiKey.length}, prefix=${cleanedApiKey.substring(0, 4)})`);
+
+    console.log(
+      activeApiKey
+        ? `Using USER API key for step ${step} (length=${cleanedApiKey.length}, prefix=${cleanedApiKey.substring(0, 4)})`
+        : `Using Lovable AI backend for step ${step}`
+    );
 
     if (!title) {
       return new Response(
@@ -1427,9 +1498,15 @@ JSON :
     } else if (errorMessage === 'CREDITS_EXHAUSTED') {
       status = 402;
       userMessage = 'Crédits épuisés. Veuillez recharger.';
+    } else if (errorMessage.includes('TIMEOUT')) {
+      status = 504;
+      userMessage = 'La génération a pris trop de temps. Relancez l\'étape.';
     } else if (errorMessage.includes('INVALID_API_KEY')) {
       status = 400;
-      userMessage = 'Votre clé Gemini n\'est pas valide. Collez une clé Google AI Studio commençant par AIza dans Paramètres puis relancez le workflow.';
+      userMessage = 'Votre clé Gemini personnelle est invalide, le backend a essayé de prendre le relais. Relancez le workflow.';
+    } else if (errorMessage.includes('LOVABLE_AI_UNAVAILABLE') || errorMessage.includes('LOVABLE_AI_ERROR')) {
+      status = 500;
+      userMessage = 'Le moteur IA du workflow est temporairement indisponible.';
     }
 
     return new Response(
