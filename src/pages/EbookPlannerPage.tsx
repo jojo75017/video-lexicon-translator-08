@@ -1378,8 +1378,22 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
         return (
           <WorkflowDashboard
             ebookTitle={ebookTitle}
+            authorName={authorName}
+            bookDescription={bookDescription}
+            genre={genre}
+            targetAudience={targetAudience}
+            numberOfChapters={numberOfChapters}
+            chapters={chapters}
             onNavigate={(tabId) => setActiveTab(tabId)}
             onStartAutoWorkflow={() => setActiveTab('complete-workflow')}
+            onUpdateTitle={setEbookTitle}
+            onUpdateAuthor={setAuthorName}
+            onUpdateDescription={setBookDescription}
+            onUpdateGenre={setGenre}
+            onUpdateTargetAudience={setTargetAudience}
+            onUpdateNumberOfChapters={setNumberOfChapters}
+            onUpdateChapterTitle={updateChapterTitle}
+            onAddChapter={addChapter}
           />
         );
 
