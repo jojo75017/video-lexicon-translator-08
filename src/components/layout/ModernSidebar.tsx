@@ -512,14 +512,14 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
     const q = searchQuery.toLowerCase();
     return allToolGroups
       .flatMap(g => g.items)
-      .filter(filterAdmin)
+      .filter(item => !item.adminOnly || isAdmin)
       .filter(item => item.label.toLowerCase().includes(q) || item.id.toLowerCase().includes(q))
       .slice(0, 15);
   }, [searchQuery, isAdmin]);
 
   const getSectionedItems = (group: ToolGroup, visibleItems: MenuItem[]): GroupedItems[] => {
     const config = SIDEBAR_SUBSECTIONS[group.label] ?? [];
-    const itemMap = new Map(visibleItems.map(item => [item.id, item]));
+    const itemMap = new globalThis.Map(visibleItems.map(item => [item.id, item]));
 
     const configuredSections = config
       .map(section => ({
@@ -535,6 +535,19 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
       ? [...configuredSections, { label: 'Autres', items: remainingItems }]
       : configuredSections;
   };
+
+  React.useEffect(() => {
+    for (const group of allToolGroups) {
+      const sections = SIDEBAR_SUBSECTIONS[group.label] ?? [];
+      const activeSection = sections.find(section => section.itemIds.includes(activeTab));
+
+      if (activeSection) {
+        const sectionKey = `${group.label}:${activeSection.label}`;
+        setExpandedSections(prev => prev.includes(sectionKey) ? prev : [...prev, sectionKey]);
+        break;
+      }
+    }
+  }, [activeTab]);
 
   return (
     <TooltipProvider delayDuration={0}>
