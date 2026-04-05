@@ -3567,15 +3567,15 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               {/* Import URL CTA */}
               <Button
                 type="button"
-                onClick={() => handleTabChange('url-import')}
+                onClick={() => handleTabChange('planner')}
                 className="mt-6 relative overflow-hidden bg-gradient-to-r from-primary/10 to-accent/10 hover:from-primary/20 hover:to-accent/20 text-foreground font-semibold px-8 py-3 h-auto rounded-2xl border border-primary/20 group transition-all duration-500 hover:shadow-[0_0_40px_rgba(59,158,255,0.2)] hover:-translate-y-0.5"
               >
                 <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/5 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
                 <span className="relative flex items-center gap-3">
-                  <span className="text-lg">🔗</span>
-                  <span>Créer mon premier ebook</span>
+                  <span className="text-lg">📝</span>
+                  <span>Ouvrir le formulaire du livre</span>
                   <Badge className="bg-primary/20 text-primary font-bold text-[10px] px-2 py-0.5 border border-primary/30">
-                    2026
+                    Titre • Auteur • Chapitres
                   </Badge>
                 </span>
               </Button>
