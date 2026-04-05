@@ -189,7 +189,9 @@ const SubscriptionPage = ({ subscriberEmail, subscriberData, onLogout }: Subscri
           <div className="flex gap-2">
             <Button 
               onClick={() => {
-                // Force navigation directe sans passer par SubscriberGate
+                try {
+                  localStorage.setItem('ebook_planner_active_tab', 'workflow-dashboard');
+                } catch {}
                 window.location.href = '/ebook-planner';
               }} 
               className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700"

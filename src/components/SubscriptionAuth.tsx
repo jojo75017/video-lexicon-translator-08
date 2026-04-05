@@ -125,9 +125,10 @@ export const SubscriptionAuth = ({ onAuthenticated }: SubscriptionAuthProps) => 
       if (data.valid) {
         localStorage.setItem('subscriber_email', normalizedEmail);
         localStorage.setItem('subscriber_data', JSON.stringify(data.subscriber));
+        localStorage.setItem('ebook_planner_active_tab', 'workflow-dashboard');
         toast.success(`Bienvenue ! Plan ${data.subscriber.plan_type}`);
         onAuthenticated(normalizedEmail, data.subscriber);
-        navigate('/ebook-planner');
+        window.location.href = '/ebook-planner';
       } else {
         toast.error(data.message || 'Abonnement non trouvé');
       }
@@ -186,7 +187,12 @@ export const SubscriptionAuth = ({ onAuthenticated }: SubscriptionAuthProps) => 
               <Button
                 type="button"
                 className="w-full"
-                onClick={() => navigate('/ebook-planner')}
+                onClick={() => {
+                  try {
+                    localStorage.setItem('ebook_planner_active_tab', 'workflow-dashboard');
+                  } catch {}
+                  window.location.href = '/ebook-planner';
+                }}
               >
                 Accéder au Planner (Admin)
               </Button>
