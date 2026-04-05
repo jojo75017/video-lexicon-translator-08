@@ -302,12 +302,171 @@ function cleanChapter(chapter: any): any {
   };
 }
 
+function isSkippableP3Title(title: string): boolean {
+  const normalizedTitle = cleanGeneratedText(title).toLowerCase();
+  return [
+    'introduction',
+    'préface',
+    'preface',
+    'conclusion',
+    'annexe',
+    'annexes',
+    'table des matières',
+    'table des matieres',
+    'sommaire',
+    'à propos de l\'auteur',
+    'a propos de l\'auteur',
+    'remerciements',
+  ].includes(normalizedTitle);
+}
+
+function looksLikeChapterCandidate(value: any): boolean {
+  if (!value) return false;
+  if (typeof value === 'string') return cleanGeneratedText(value).length > 3;
+  if (typeof value !== 'object') return false;
+
+  return Boolean(
+    value.titre ||
+    value.title ||
+    value.nom ||
+    value.chapterTitle ||
+    value.heading ||
+    value.objectif ||
+    value.goal ||
+    value.resume ||
+    value.summary ||
+    value.description ||
+    value.sousSections ||
+    value.subSections ||
+    value.sections ||
+    value.parties ||
+    value.points ||
+    value.pointsCles ||
+    value.keyPoints ||
+    value.points_cles
+  );
+}
+
+function chapterCandidateToArray(candidate: any): any[] {
+  if (!candidate) return [];
+
+  if (Array.isArray(candidate)) {
+    return candidate.filter(looksLikeChapterCandidate);
+  }
+
+  if (typeof candidate === 'string') {
+    return candidate
+      .split(/\n+/)
+      .map((line) => cleanGeneratedText(line.replace(/^[•*\-–\d.)\s]+/, '')))
+      .filter(Boolean);
+  }
+
+  if (typeof candidate === 'object') {
+    const values = Object.values(candidate).filter(looksLikeChapterCandidate);
+    if (values.length > 0) return values;
+  }
+
+  return [];
+}
+
+function extractP3ChaptersFromRawText(rawContent: string): any[] {
+  if (!rawContent || typeof rawContent !== 'string') return [];
+
+  const cleaned = rawContent.replace(/```json\s*/gi, '').replace(/```\s*/g, '');
+  const jsonStyleMatches = Array.from(
+    cleaned.matchAll(/"(?:numero|number)"\s*:\s*(\d+)[\s\S]{0,500}?"(?:titre|title|nom|chapterTitle|heading)"\s*:\s*"([^"]+)"/gi)
+  );
+
+  if (jsonStyleMatches.length > 0) {
+    return jsonStyleMatches.map((match) => ({
+      numero: Number(match[1]),
+      titre: cleanGeneratedText(match[2]),
+    }));
+  }
+
+  return cleaned
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const chapterMatch = line.match(/^(?:[-*•]\s*)?(?:chapitre|chapter)\s*(\d+)\s*[:\-.–]?\s*(.+)$/i);
+      if (chapterMatch) {
+        return {
+          numero: Number(chapterMatch[1]),
+          titre: cleanGeneratedText(chapterMatch[2]),
+        };
+      }
+
+      const numberedLineMatch = line.match(/^(?:[-*•]\s*)?(\d{1,2})[.)\-–]\s+(.{4,140})$/);
+      if (numberedLineMatch && !/qualityscore|score qualité|score global/i.test(line)) {
+        return {
+          numero: Number(numberedLineMatch[1]),
+          titre: cleanGeneratedText(numberedLineMatch[2]),
+        };
+      }
+
+      return null;
+    })
+    .filter((chapter): chapter is { numero: number; titre: string } => Boolean(chapter?.titre));
+}
+
+function extractP3RawChapters(result: any, rawContent: string): any[] {
+  if (Array.isArray(result)) return result;
+
+  const candidatePaths = [
+    result?.chapitres,
+    result?.chapters,
+    result?.tableDesMatieres,
+    result?.tableDesMatieres?.chapitres,
+    result?.tableDesMatieres?.chapters,
+    result?.tableDesMatieres?.sections,
+    result?.table_of_contents,
+    result?.table_of_contents?.chapters,
+    result?.table_of_contents?.sections,
+    result?.sommaire,
+    result?.sommaire?.chapitres,
+    result?.sommaire?.chapters,
+    result?.outline,
+    result?.outline?.chapters,
+    result?.outline?.sections,
+    result?.plan,
+    result?.plan?.chapitres,
+    result?.plan?.chapters,
+    result?.structure,
+    result?.structure?.chapitres,
+    result?.structure?.chapters,
+    result?.bookStructure,
+    result?.bookStructure?.chapters,
+    result?.livre?.chapitres,
+    result?.livre?.chapters,
+  ];
+
+  for (const candidate of candidatePaths) {
+    const chapterArray = chapterCandidateToArray(candidate);
+    if (chapterArray.length > 0) return chapterArray;
+  }
+
+  if (result && typeof result === 'object') {
+    const topLevelChapterEntries = Object.entries(result)
+      .filter(([key, value]) => /^(chap(itre)?|chapter)\s*\d+$/i.test(key) || /^(chap(itre)?|chapter)\d+$/i.test(key) || looksLikeChapterCandidate(value))
+      .map(([, value]) => value)
+      .filter(looksLikeChapterCandidate);
+
+    if (topLevelChapterEntries.length > 0) return topLevelChapterEntries;
+  }
+
+  return extractP3ChaptersFromRawText(rawContent || result?.raw || '');
+}
+
 function normalizeP3Chapter(rawChapter: any, index: number, wordsPerChapter: number) {
   if (!rawChapter || (typeof rawChapter !== 'object' && typeof rawChapter !== 'string')) return null;
 
-  const numero = Number(rawChapter.numero) || index + 1;
+  const stringChapterMatch = typeof rawChapter === 'string'
+    ? rawChapter.match(/^(?:chapitre|chapter)?\s*(\d+)?[\s:.)\-–]*(.+)$/i)
+    : null;
+  const numero = Number(rawChapter.numero) || Number(stringChapterMatch?.[1]) || index + 1;
   const derivedTitle = typeof rawChapter === 'string'
-    ? rawChapter
+    ? stringChapterMatch?.[2] || rawChapter
     : rawChapter.titre || rawChapter.title || rawChapter.nom || rawChapter.chapterTitle || rawChapter.heading || `Chapitre ${numero}`;
   const titre = cleanGeneratedText(derivedTitle);
   const objectif = cleanGeneratedText(rawChapter.objectif || rawChapter.goal || rawChapter.resume || rawChapter.summary || rawChapter.description || '');
@@ -330,7 +489,7 @@ function normalizeP3Chapter(rawChapter: any, index: number, wordsPerChapter: num
       ? rawPointsCles.split(/\n|•|- /g).map((item: string) => cleanGeneratedText(item)).filter(Boolean)
       : [];
 
-  if (!titre) return null;
+  if (!titre || isSkippableP3Title(titre)) return null;
 
   return {
     numero,
@@ -344,17 +503,19 @@ function normalizeP3Chapter(rawChapter: any, index: number, wordsPerChapter: num
   };
 }
 
-function normalizeP3Result(result: any, numberOfChapters: number, wordsPerChapter: number) {
-  const rawChapters =
-    (Array.isArray(result) && result) ||
-    (Array.isArray(result?.chapitres) && result.chapitres) ||
-    (Array.isArray(result?.chapters) && result.chapters) ||
-    (Array.isArray(result?.tableDesMatieres) && result.tableDesMatieres) ||
-    (Array.isArray(result?.table_of_contents) && result.table_of_contents) ||
-    [];
+function normalizeP3Result(result: any, numberOfChapters: number, wordsPerChapter: number, rawContent = '') {
+  const rawChapters = extractP3RawChapters(result, rawContent);
   const normalizedChapters = rawChapters
     .map((chapter: any, index: number) => normalizeP3Chapter(chapter, index, wordsPerChapter))
-    .filter(Boolean);
+    .filter(Boolean)
+    .sort((a: any, b: any) => a.numero - b.numero)
+    .filter((chapter: any, index: number, chapters: any[]) =>
+      chapters.findIndex((candidate: any) => candidate.numero === chapter.numero || candidate.titre.toLowerCase() === chapter.titre.toLowerCase()) === index
+    );
+
+  if (normalizedChapters.length === 0 && rawContent) {
+    console.warn('P3 parser fallback triggered: no exploitable chapters found in structured JSON.');
+  }
 
   const paddedChapters = normalizedChapters.length > 0 && normalizedChapters.length < numberOfChapters
     ? [
@@ -373,7 +534,18 @@ function normalizeP3Result(result: any, numberOfChapters: number, wordsPerChapte
           };
         }),
       ]
-    : normalizedChapters;
+    : normalizedChapters.length > 0
+      ? normalizedChapters
+      : Array.from({ length: numberOfChapters }, (_, index) => ({
+          numero: index + 1,
+          titre: `Chapitre ${index + 1}`,
+          objectif: 'À détailler',
+          nombreMotsPrevu: wordsPerChapter,
+          sousSections: [],
+          pointsCles: [],
+          accroche: '',
+          lienAvecPrecedent: '',
+        }));
 
   return {
     ...result,
@@ -808,7 +980,7 @@ Format JSON :
           p3Settings.maxRetries,
           'P3'
         );
-        result = normalizeP3Result(parseJSON(content) || { raw: content }, numberOfChapters, wordsPerChapter);
+        result = normalizeP3Result(parseJSON(content) || { raw: content }, numberOfChapters, wordsPerChapter, content);
         result._qualityScore = qualityScore;
         result._attempts = attempts;
 
