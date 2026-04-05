@@ -39,18 +39,13 @@ interface MenuItem {
   adminOnly?: boolean;
 }
 
-// ─── TOP 10 outils essentiels (liste plate) ───
-const topTools: MenuItem[] = [
-  { id: 'global-dashboard', label: 'Vue d\'ensemble', icon: LayoutDashboard },
-  { id: 'complete-workflow', label: 'Créer un livre', icon: Rocket, isPro: true },
-  { id: 'writing', label: 'Écrire les chapitres', icon: PenTool },
-  { id: 'cover-design-editor', label: 'Éditeur Couverture', icon: Palette, isNew: true },
-  { id: 'export', label: 'Exporter (PDF, Word)', icon: Download },
-  { id: 'aichat', label: 'Assistant IA', icon: Bot },
-  { id: 'kdp', label: 'Description KDP', icon: TrendingUp },
-  { id: 'seo-articles', label: 'Articles SEO', icon: Globe },
-  { id: 'audiobook', label: 'Livre Audio', icon: Headphones },
-  { id: 'ebook-library', label: 'Ma Bibliothèque', icon: Library },
+// ─── 5 robots mis en avant pour démarrer vite ───
+const starterWorkflowAgents: MenuItem[] = [
+  { id: 'editorial-director', label: 'Zyro — Trouver la niche', icon: Crown, isPro: true },
+  { id: 'content-architect', label: 'Kiro — Construire le plan', icon: LayoutDashboard, isPro: true },
+  { id: 'expert-writing', label: 'Alia — Écrire le livre', icon: PenTool, isPro: true },
+  { id: 'cover-design-editor', label: 'Cova — Créer la couverture', icon: Palette, isNew: true },
+  { id: 'kdp-keywords', label: 'Keyro — Trouver les mots-clés', icon: Search, isLink: true, href: '/kdp-keywords' },
 ];
 
 // ─── Tous les outils (groupés pour "Voir tout") ───
@@ -74,11 +69,11 @@ const allToolGroups: ToolGroup[] = [
     color: 'emerald',
     items: [
       { id: 'presentation', label: 'Découvrir KDP Studio', icon: Info },
-      { id: 'onboarding', label: 'Par où commencer ?', icon: BookOpen },
-      { id: 'workflow-dashboard', label: 'Tableau de Bord', icon: BarChart3 },
+      { id: 'onboarding', label: 'Commencer ici', icon: BookOpen },
+      { id: 'workflow-dashboard', label: 'Pipeline robots', icon: BarChart3 },
       { id: 'niche-templates', label: 'Templates par Niche', icon: Library },
       { id: 'niches', label: 'Niches Rentables', icon: Lightbulb, isLink: true, href: '/niches' },
-      { id: 'complete-workflow', label: 'Créer un livre', icon: Rocket, isPro: true },
+      { id: 'complete-workflow', label: 'Lancer le workflow guidé', icon: Rocket, isPro: true },
       { id: 'focus-mode', label: 'Mode Focus / Zen', icon: Eye },
       { id: 'draft-mode', label: 'Brouillon Rapide', icon: Zap },
       { id: 'rich-editor', label: 'Éditeur Enrichi', icon: PenTool },
@@ -112,21 +107,21 @@ const allToolGroups: ToolGroup[] = [
     emoji: '⚡',
     color: 'violet',
     items: [
-      { id: 'editorial-director', label: 'P1 — Directeur Éditorial', icon: Crown, isPro: true },
-      { id: 'market-analysis', label: 'P2 — Analyse Marché', icon: Search, isPro: true },
-      { id: 'content-architect', label: 'P3 — Architecte', icon: LayoutDashboard, isPro: true },
-      { id: 'expert-writing', label: 'P4 — Rédaction Expert', icon: PenTool, isPro: true },
-      { id: 'natural-rewrite', label: 'P5 — Réécriture', icon: Sparkles, isPro: true },
-      { id: 'editorial-quality', label: 'P6 — Qualité', icon: FileEdit, isPro: true },
-      { id: 'editorial-packaging', label: 'P7 — Packaging', icon: FileText, isPro: true },
-      { id: 'final-diagnosis', label: 'P8 — Diagnostic', icon: Shield, isPro: true },
-      { id: 'editorial-memory', label: 'P9 — Mémoire', icon: Brain, isPro: true },
-      { id: 'chapter-coherence', label: 'P10 — Cohérence', icon: GitBranch, isPro: true },
-      { id: 'self-critique', label: 'P11 — Critique', icon: Eye, isPro: true },
-      { id: 'iterative-loop', label: 'P12 — Boucle', icon: RefreshCw, isPro: true },
-      { id: 'style-signature', label: 'P13 — Style', icon: Fingerprint, isPro: true },
-      { id: 'ultimate-verdict', label: 'P14 — Verdict', icon: Award, isPro: true },
-      { id: 'humanize-anti-ia', label: 'P15 — Humanisation', icon: Shield, isPro: true },
+      { id: 'editorial-director', label: 'P1 — Zyro • Niche', icon: Crown, isPro: true },
+      { id: 'market-analysis', label: 'P2 — Jano • Marché', icon: Search, isPro: true },
+      { id: 'content-architect', label: 'P3 — Kiro • Plan', icon: LayoutDashboard, isPro: true },
+      { id: 'expert-writing', label: 'P4 — Alia • Rédaction', icon: PenTool, isPro: true },
+      { id: 'natural-rewrite', label: 'P5 — Lexo • Réécriture', icon: Sparkles, isPro: true },
+      { id: 'editorial-quality', label: 'P6 — Vero • Qualité', icon: FileEdit, isPro: true },
+      { id: 'editorial-packaging', label: 'P7 — Kado • Publication', icon: FileText, isPro: true },
+      { id: 'final-diagnosis', label: 'P8 — Conso • Diagnostic', icon: Shield, isPro: true },
+      { id: 'editorial-memory', label: 'P9 — Emio • Voix auteur', icon: Brain, isPro: true },
+      { id: 'chapter-coherence', label: 'P10 — Mira • Fluidité', icon: GitBranch, isPro: true },
+      { id: 'self-critique', label: 'P11 — Beto • Lecteur test', icon: Eye, isPro: true },
+      { id: 'iterative-loop', label: 'P12 — Nexa • Corrections', icon: RefreshCw, isPro: true },
+      { id: 'style-signature', label: 'P13 — Huma • Humaniser', icon: Fingerprint, isPro: true },
+      { id: 'ultimate-verdict', label: 'P14 — Tila • Verdict', icon: Award, isPro: true },
+      { id: 'humanize-anti-ia', label: 'P15 — Orin • Anti-IA', icon: Shield, isPro: true },
       { id: 'manuscript-dashboard', label: 'Dashboard Manuscrit', icon: BarChart3 },
       { id: 'readability-analyzer', label: 'Analyseur Lisibilité', icon: BookOpen },
       { id: 'chapter-word-count', label: 'Mots par Chapitre', icon: BarChart3 },
@@ -612,92 +607,128 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
               )}
             </div>
           ) : (
-            /* ── All 5 categories, always visible, collapsible ── */
-            <div className="space-y-1.5">
-              {allToolGroups.map(group => {
-                const isExpanded = expandedGroups.includes(group.label);
-                const visibleItems = group.items.filter(filterAdmin);
-                const hasActive = visibleItems.some(i => i.id === activeTab);
-                const colors = colorMap[group.color] || colorMap.blue;
-
-                if (isCollapsed) {
-                  return (
-                    <Tooltip key={group.label}>
-                      <TooltipTrigger asChild>
-                        <button
-                          onClick={() => {
-                            onToggleCollapse();
-                            setTimeout(() => setExpandedGroups([group.label]), 300);
-                          }}
-                          className={cn(
-                            "w-full flex items-center justify-center p-2.5 rounded-xl transition-all",
-                            hasActive
-                              ? cn(colors.bg, "border", colors.border)
-                              : "hover:bg-card text-muted-foreground"
-                          )}
-                        >
-                          <span className="text-base">{group.emoji}</span>
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent side="right" className="font-medium">
-                        {group.label} ({visibleItems.length})
-                      </TooltipContent>
-                    </Tooltip>
-                  );
-                }
-
-                return (
-                  <div key={group.label} className="rounded-xl overflow-hidden">
+            <div className="space-y-3">
+              {!isCollapsed && (
+                <div className="rounded-2xl border border-border bg-card/80 p-2.5 shadow-sm">
+                  <div className="flex items-center justify-between gap-3 px-1 pb-2">
+                    <div>
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                        Démarrage rapide
+                      </p>
+                      <p className="text-sm font-semibold text-foreground">
+                        5 robots pour créer ton ebook
+                      </p>
+                    </div>
                     <button
-                      onClick={() => toggleGroup(group.label)}
-                      className={cn(
-                        "w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all",
-                        hasActive ? colors.bg : "hover:bg-card/60"
-                      )}
+                      type="button"
+                      onClick={() => onTabChange('workflow-dashboard')}
+                      className="text-xs font-semibold text-primary transition-opacity hover:opacity-80"
                     >
-                      <span className="flex items-center gap-2.5">
-                        <span className={cn(
-                          "w-7 h-7 rounded-lg flex items-center justify-center text-sm",
-                          isExpanded || hasActive ? colors.iconBg : "bg-muted/50"
-                        )}>
-                          <span className="text-white text-xs">{group.emoji}</span>
-                        </span>
-                        <span className={cn(
-                          "text-sm font-semibold",
-                          hasActive ? colors.text : "text-foreground"
-                        )}>
-                          {group.label}
-                        </span>
-                        <span className={cn(
-                          "text-[10px] font-medium px-1.5 py-0.5 rounded-full",
-                          colors.bg, colors.text
-                        )}>
-                          {visibleItems.length}
-                        </span>
-                      </span>
-                      <ChevronDown className={cn(
-                        "w-3.5 h-3.5 transition-transform duration-200",
-                        isExpanded ? "rotate-0" : "-rotate-90",
-                        hasActive ? colors.text : "text-muted-foreground"
-                      )} />
+                      Voir le pipeline
                     </button>
-                    {isExpanded && (
-                      <div className={cn("pl-1 pr-1 pb-1 space-y-0.5 mt-0.5 ml-2 border-l-2", colors.border)}>
-                        {visibleItems.map(item => (
-                          <MenuItemButton
-                            key={item.id}
-                            item={item}
-                            isActive={activeTab === item.id}
-                            onClick={() => handleItemClick(item)}
-                            isCollapsed={false}
-                            groupColor={group.color}
-                          />
-                        ))}
-                      </div>
-                    )}
                   </div>
-                );
-              })}
+
+                  <div className="space-y-1">
+                    {starterWorkflowAgents.map(item => (
+                      <MenuItemButton
+                        key={item.id}
+                        item={item}
+                        isActive={activeTab === item.id}
+                        onClick={() => handleItemClick(item)}
+                        isCollapsed={false}
+                        groupColor="blue"
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-1.5">
+                {allToolGroups.map(group => {
+                  const isExpanded = expandedGroups.includes(group.label);
+                  const visibleItems = group.items.filter(filterAdmin);
+                  const hasActive = visibleItems.some(i => i.id === activeTab);
+                  const colors = colorMap[group.color] || colorMap.blue;
+
+                  if (isCollapsed) {
+                    return (
+                      <Tooltip key={group.label}>
+                        <TooltipTrigger asChild>
+                          <button
+                            onClick={() => {
+                              onToggleCollapse();
+                              setTimeout(() => setExpandedGroups([group.label]), 300);
+                            }}
+                            className={cn(
+                              "w-full flex items-center justify-center p-2.5 rounded-xl transition-all",
+                              hasActive
+                                ? cn(colors.bg, "border", colors.border)
+                                : "hover:bg-card text-muted-foreground"
+                            )}
+                          >
+                            <span className="text-base">{group.emoji}</span>
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="right" className="font-medium">
+                          {group.label} ({visibleItems.length})
+                        </TooltipContent>
+                      </Tooltip>
+                    );
+                  }
+
+                  return (
+                    <div key={group.label} className="rounded-xl overflow-hidden">
+                      <button
+                        onClick={() => toggleGroup(group.label)}
+                        className={cn(
+                          "w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all",
+                          hasActive ? colors.bg : "hover:bg-card/60"
+                        )}
+                      >
+                        <span className="flex items-center gap-2.5">
+                          <span className={cn(
+                            "w-7 h-7 rounded-lg flex items-center justify-center text-sm",
+                            isExpanded || hasActive ? colors.iconBg : "bg-muted/50"
+                          )}>
+                            <span className="text-white text-xs">{group.emoji}</span>
+                          </span>
+                          <span className={cn(
+                            "text-sm font-semibold",
+                            hasActive ? colors.text : "text-foreground"
+                          )}>
+                            {group.label}
+                          </span>
+                          <span className={cn(
+                            "text-[10px] font-medium px-1.5 py-0.5 rounded-full",
+                            colors.bg, colors.text
+                          )}>
+                            {visibleItems.length}
+                          </span>
+                        </span>
+                        <ChevronDown className={cn(
+                          "w-3.5 h-3.5 transition-transform duration-200",
+                          isExpanded ? "rotate-0" : "-rotate-90",
+                          hasActive ? colors.text : "text-muted-foreground"
+                        )} />
+                      </button>
+                      {isExpanded && (
+                        <div className={cn("pl-1 pr-1 pb-1 space-y-0.5 mt-0.5 ml-2 border-l-2", colors.border)}>
+                          {visibleItems.map(item => (
+                            <MenuItemButton
+                              key={item.id}
+                              item={item}
+                              isActive={activeTab === item.id}
+                              onClick={() => handleItemClick(item)}
+                              isCollapsed={false}
+                              groupColor={group.color}
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           )}
         </nav>
