@@ -500,25 +500,26 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
     extraBody: Record<string, any> = {},
     options: { previousContextOverride?: Record<string, any> } = {}
   ): Promise<{ result: any; displayContent: string } | null> => {
-    try {
-      // Utiliser les personnages générés en P3 OU ceux passés en externe
-      const personnagesP3 = generatedCharacters.length > 0 ? generatedCharacters : context.P3?.personnages || [];
-      const charactersForAI = personnagesP3.length > 0
-        ? personnagesP3.map((c: any) => ({
-            name: c.name,
-            description: c.description,
-            role: c.role || 'secondary',
-            arc: c.arc || ''
-          }))
-        : externalCharacters.map(c => ({
-            name: c.name,
-            description: c.description,
-            role: c.role || 'secondary'
-          }));
+    // Utiliser les personnages générés en P3 OU ceux passés en externe
+    const personnagesP3 = generatedCharacters.length > 0 ? generatedCharacters : context.P3?.personnages || [];
+    const charactersForAI = personnagesP3.length > 0
+      ? personnagesP3.map((c: any) => ({
+          name: c.name,
+          description: c.description,
+          role: c.role || 'secondary',
+          arc: c.arc || ''
+        }))
+      : externalCharacters.map(c => ({
+          name: c.name,
+          description: c.description,
+          role: c.role || 'secondary'
+        }));
 
+    const previousContext = options.previousContextOverride ?? context;
+
+    try {
       // IMPORTANT: pour éviter des payloads énormes (P4 chapitre par chapitre),
       // on peut passer un contexte "slim".
-      const previousContext = options.previousContextOverride ?? context;
 
       const { data, error: fnError } = await supabase.functions.invoke('complete-book-workflow', {
           body: {
