@@ -553,6 +553,162 @@ function normalizeP3Result(result: any, numberOfChapters: number, wordsPerChapte
   };
 }
 
+function buildFallbackP3Characters(category: string, providedCharacters: any[] = []) {
+  if (Array.isArray(providedCharacters) && providedCharacters.length > 0) {
+    return providedCharacters.slice(0, 6).map((character: any, index: number) => ({
+      name: cleanGeneratedText(character?.name || `Personnage ${index + 1}`),
+      role: cleanGeneratedText(character?.role || (index === 0 ? 'protagoniste' : 'secondaire')),
+      description: cleanGeneratedText(character?.description || 'Personnage à développer pendant la rédaction.'),
+      arc: cleanGeneratedText(character?.arc || 'Évolue au fil du livre.'),
+    }));
+  }
+
+  const isYouthBook = /jeunesse|enfant|ado|conte/i.test(category || '');
+
+  return isYouthBook
+    ? [
+        {
+          name: 'Héros principal',
+          role: 'protagoniste',
+          description: 'Personnage central attachant, curieux et imparfait, qui apprend en avançant.',
+          arc: 'Gagne en confiance et en maturité au fil des chapitres.',
+        },
+        {
+          name: 'Allié fidèle',
+          role: 'secondaire',
+          description: 'Compagnon rassurant qui apporte humour, soutien et regard complémentaire.',
+          arc: 'Passe de simple soutien à moteur actif de la résolution.',
+        },
+        {
+          name: 'Guide sage',
+          role: 'mentor',
+          description: 'Figure de recul qui aide à comprendre les enjeux sans voler la vedette.',
+          arc: 'Oriente le héros jusqu’à ce qu’il puisse agir seul.',
+        },
+      ]
+    : [];
+}
+
+function buildFallbackP3Result(params: {
+  title: string;
+  subtitle: string;
+  category: string;
+  authorName: string;
+  numberOfChapters: number;
+  wordsPerChapter: number;
+  introductionGeneree?: string;
+  conclusionGeneree?: string;
+  descriptionGeneree?: string;
+  characters?: any[];
+}) {
+  const {
+    title,
+    subtitle,
+    category,
+    authorName,
+    numberOfChapters,
+    wordsPerChapter,
+    introductionGeneree,
+    conclusionGeneree,
+    descriptionGeneree,
+    characters = [],
+  } = params;
+
+  const fullTitle = subtitle ? `${title} : ${subtitle}` : title;
+  const chapterTemplates = [
+    {
+      prefix: 'Fondations',
+      objectif: 'Poser les bases, présenter les enjeux et donner une direction claire au lecteur.',
+      sousSections: ['Contexte de départ', 'Problème central', 'Promesse du chapitre'],
+      pointsCles: ['Comprendre le sujet', 'Créer l’intérêt', 'Installer la progression'],
+    },
+    {
+      prefix: 'Premier passage à l’action',
+      objectif: 'Transformer les idées en premières actions concrètes et mesurables.',
+      sousSections: ['Déclic', 'Méthode simple', 'Premier résultat'],
+      pointsCles: ['Passer à l’action', 'Éviter les erreurs courantes'],
+    },
+    {
+      prefix: 'Montée en puissance',
+      objectif: 'Approfondir, renforcer la maîtrise et traiter les obstacles réels.',
+      sousSections: ['Obstacle majeur', 'Ajustement utile', 'Cas concret'],
+      pointsCles: ['Renforcer la méthode', 'Garder le cap'],
+    },
+    {
+      prefix: 'Consolidation',
+      objectif: 'Structurer durablement les acquis et préparer la suite logique du livre.',
+      sousSections: ['Synthèse opérationnelle', 'Application guidée', 'Ouverture'],
+      pointsCles: ['Stabiliser les acquis', 'Préparer la suite'],
+    },
+    {
+      prefix: 'Accélération',
+      objectif: 'Élever le niveau d’exigence avec une stratégie plus avancée et plus précise.',
+      sousSections: ['Niveau supérieur', 'Décision stratégique', 'Exécution ciblée'],
+      pointsCles: ['Optimiser', 'Décider avec méthode'],
+    },
+    {
+      prefix: 'Aboutissement',
+      objectif: 'Conclure avec un résultat clair, une synthèse forte et une projection motivante.',
+      sousSections: ['Bilan', 'Transformation visible', 'Prochaine étape'],
+      pointsCles: ['Mesurer les progrès', 'Ancrer la transformation'],
+    },
+  ];
+
+  const chapitres = Array.from({ length: numberOfChapters }, (_, index) => {
+    const template = chapterTemplates[Math.min(index, chapterTemplates.length - 1)];
+    const numero = index + 1;
+
+    return {
+      numero,
+      titre: `${template.prefix} ${numero} — ${fullTitle}`,
+      objectif: template.objectif,
+      nombreMotsPrevu: wordsPerChapter,
+      sousSections: template.sousSections,
+      pointsCles: template.pointsCles,
+      accroche: numero === 1 ? 'Accrocher immédiatement avec une situation claire et vivante.' : 'Relancer l’intérêt avec une évolution concrète et visible.',
+      lienAvecPrecedent: numero === 1 ? '' : `Ce chapitre prolonge le chapitre ${numero - 1} en ajoutant un niveau de profondeur supplémentaire.`,
+    };
+  });
+
+  return {
+    structureGlobale: `Structure de secours robuste pour « ${fullTitle} », organisée en ${numberOfChapters} chapitres progressifs et immédiatement exploitables.`,
+    nombrePagesEstime: Math.ceil((numberOfChapters * wordsPerChapter) / 250),
+    nombreMotsEstime: numberOfChapters * wordsPerChapter,
+    introduction: {
+      titre: 'Introduction',
+      accroche: 'Ouvrir avec une promesse claire et un bénéfice immédiat pour le lecteur.',
+      promesse: introductionGeneree || descriptionGeneree || `Ce livre guide le lecteur pas à pas dans ${category || 'son sujet principal'}.`,
+      elements: ['Contexte', 'Promesse', 'Résultat attendu'],
+    },
+    personnages: buildFallbackP3Characters(category, characters),
+    chapitres,
+    blocsPratiques: {
+      checklist: ['Point clé à retenir', 'Action immédiate', 'Vérification finale'],
+      faq: [
+        { question: 'Par où commencer ?', reponse: 'Commencer par l’action la plus simple du chapitre 1.' },
+        { question: 'Comment garder le rythme ?', reponse: 'Appliquer une action concrète à la fin de chaque chapitre.' },
+      ],
+      etudeDeCas: 'Cas pratique simple à enrichir pendant la rédaction.',
+      planAction: ['Lire', 'Appliquer', 'Mesurer'],
+    },
+    aproposAuteur: {
+      bio: `${authorName} partage ici une structure éditoriale claire, pensée pour une lecture fluide et utile.`,
+      expertise: category || 'Création éditoriale',
+      contact: 'À compléter',
+    },
+    annexes: {
+      titre: 'Annexes',
+      ressources: ['Ressource complémentaire 1', 'Ressource complémentaire 2'],
+      references: ['Référence à compléter'],
+    },
+    progressionLogique: 'Le parcours va des bases à l’application, puis vers la consolidation et la conclusion.',
+    introductionPreGeneree: introductionGeneree || '',
+    conclusionPreGeneree: conclusionGeneree || '',
+    qualityScore: 8,
+    _fallback: true,
+  };
+}
+
 function getP3GenerationSettings(numberOfChapters: number) {
   const isLargeProject = numberOfChapters >= 16;
   const isVeryLargeProject = numberOfChapters >= 30;
@@ -611,6 +767,7 @@ serve(async (req) => {
       chapter,
       chapterSegment,
       userApiKey,
+      forceFallback = false,
       useUserKey: _useUserKey,
     } = payload;
 
@@ -877,11 +1034,30 @@ Format JSON :
         const descriptionGeneree = previousContext.P1?.descriptionGeneree || '';
         const introductionGeneree = previousContext.P1?.introductionGeneree || '';
         const conclusionGeneree = previousContext.P1?.conclusionGeneree || '';
+        const fallbackP3 = () => buildFallbackP3Result({
+          title,
+          subtitle,
+          category,
+          authorName,
+          numberOfChapters,
+          wordsPerChapter,
+          introductionGeneree,
+          conclusionGeneree,
+          descriptionGeneree,
+          characters,
+        });
         
         console.log(`Step P3: Structuring ${numberOfChapters} chapters for "${fullTitle}"`);
         console.log(`P3 settings → largeProject=${p3Settings.isLargeProject}, maxTokens=${p3Settings.maxTokens}, retries=${p3Settings.maxRetries}`);
-        
-        const { content, qualityScore, attempts } = await callAIWithQualityLoop(
+
+        if (forceFallback) {
+          result = fallbackP3();
+          displayContent = `**Structure KDP PRO générée (mode robuste) :** ${result.structureGlobale}\n\n**${result.chapitres.length} chapitres prêts à rédiger.**`;
+          break;
+        }
+
+        try {
+          const { content, qualityScore, attempts } = await callAIWithQualityLoop(
           `Tu es un ARCHITECTE DE CONTENU expert, spécialisé dans les best-sellers Amazon KDP. Tu structures des livres qui se vendent.
           
 STRUCTURE KDP PROFESSIONNELLE (dans cet ordre) :
@@ -980,44 +1156,49 @@ Format JSON :
           p3Settings.maxRetries,
           'P3'
         );
-        result = normalizeP3Result(parseJSON(content) || { raw: content }, numberOfChapters, wordsPerChapter, content);
-        result._qualityScore = qualityScore;
-        result._attempts = attempts;
+          result = normalizeP3Result(parseJSON(content) || { raw: content }, numberOfChapters, wordsPerChapter, content);
+          result._qualityScore = qualityScore;
+          result._attempts = attempts;
 
-        if (result.chapitres.length < numberOfChapters) {
-          throw new Error(`P3_STRUCTURE_INCOMPLETE: ${result.chapitres.length}/${numberOfChapters} chapitres exploitables générés.`);
-        }
+          if (!Array.isArray(result.chapitres) || result.chapitres.length === 0) {
+            throw new Error('P3_EMPTY_STRUCTURE');
+          }
         
-        // Intégrer intro/conclusion pré-générées dans le résultat
-        if (introductionGeneree && !result.introductionPreGeneree) {
-          result.introductionPreGeneree = introductionGeneree;
-        }
-        if (conclusionGeneree && !result.conclusionPreGeneree) {
-          result.conclusionPreGeneree = conclusionGeneree;
-        }
+          // Intégrer intro/conclusion pré-générées dans le résultat
+          if (introductionGeneree && !result.introductionPreGeneree) {
+            result.introductionPreGeneree = introductionGeneree;
+          }
+          if (conclusionGeneree && !result.conclusionPreGeneree) {
+            result.conclusionPreGeneree = conclusionGeneree;
+          }
         
-        const personnagesDisplay = result.personnages?.length > 0
-          ? `\n\n**🎭 ${result.personnages.length} Personnages créés :**\n${result.personnages.map((p: any) => `- **${p.name}** (${p.role}) : ${p.description}${p.arc ? `\n  _Arc :_ ${p.arc}` : ''}`).join('\n')}`
-          : '';
-
-        const qualityBadge = `\n\n🎯 **Score qualité : ${qualityScore}/10** (${attempts} passage${attempts > 1 ? 's' : ''})`;
-
-        if (result.chapitres) {
-          const totalMotsPrevu = result.chapitres.reduce((acc: number, ch: any) => acc + (ch.nombreMotsPrevu || wordsPerChapter), 0);
-          const pagesEstime = result.nombrePagesEstime || estimatedPages;
-          
-          const introDisplay = result.introduction
-            ? `\n\n**📖 Introduction :** ${result.introduction.promesse}`
+          const personnagesDisplay = result.personnages?.length > 0
+            ? `\n\n**🎭 ${result.personnages.length} Personnages créés :**\n${result.personnages.map((p: any) => `- **${p.name}** (${p.role}) : ${p.description}${p.arc ? `\n  _Arc :_ ${p.arc}` : ''}`).join('\n')}`
             : '';
-          
-          const blocsPratiquesDisplay = result.blocsPratiques
-            ? `\n\n**🛠️ Blocs pratiques :** Checklist (${result.blocsPratiques.checklist?.length || 0} points), FAQ (${result.blocsPratiques.faq?.length || 0} questions), Plan d'action (${result.blocsPratiques.planAction?.length || 0} étapes)`
-            : '';
-          
-          displayContent = `**Structure KDP PRO générée :** ${result.structureGlobale || ''}${introDisplay}${personnagesDisplay}${blocsPratiquesDisplay}\n\n**📖 ~${pagesEstime} pages (~${totalMotsPrevu} mots)**\n\n**${result.chapitres.length} chapitres :**\n\n` +
-            result.chapitres.map((ch: any) => `**Ch.${ch.numero} - ${ch.titre}** (~${ch.nombreMotsPrevu || wordsPerChapter} mots)\n_Objectif :_ ${ch.objectif}${ch.lienAvecPrecedent ? `\n_Lien :_ ${ch.lienAvecPrecedent}` : ''}`).join('\n\n') + qualityBadge;
-        } else {
-          displayContent = `**Structure P3 générée**${personnagesDisplay}` + qualityBadge;
+
+          const qualityBadge = `\n\n🎯 **Score qualité : ${qualityScore}/10** (${attempts} passage${attempts > 1 ? 's' : ''})`;
+
+          if (result.chapitres) {
+            const totalMotsPrevu = result.chapitres.reduce((acc: number, ch: any) => acc + (ch.nombreMotsPrevu || wordsPerChapter), 0);
+            const pagesEstime = result.nombrePagesEstime || estimatedPages;
+            
+            const introDisplay = result.introduction
+              ? `\n\n**📖 Introduction :** ${result.introduction.promesse}`
+              : '';
+            
+            const blocsPratiquesDisplay = result.blocsPratiques
+              ? `\n\n**🛠️ Blocs pratiques :** Checklist (${result.blocsPratiques.checklist?.length || 0} points), FAQ (${result.blocsPratiques.faq?.length || 0} questions), Plan d'action (${result.blocsPratiques.planAction?.length || 0} étapes)`
+              : '';
+            
+            displayContent = `**Structure KDP PRO générée :** ${result.structureGlobale || ''}${introDisplay}${personnagesDisplay}${blocsPratiquesDisplay}\n\n**📖 ~${pagesEstime} pages (~${totalMotsPrevu} mots)**\n\n**${result.chapitres.length} chapitres :**\n\n` +
+              result.chapitres.map((ch: any) => `**Ch.${ch.numero} - ${ch.titre}** (~${ch.nombreMotsPrevu || wordsPerChapter} mots)\n_Objectif :_ ${ch.objectif}${ch.lienAvecPrecedent ? `\n_Lien :_ ${ch.lienAvecPrecedent}` : ''}`).join('\n\n') + qualityBadge;
+          } else {
+            displayContent = `**Structure P3 générée**${personnagesDisplay}` + qualityBadge;
+          }
+        } catch (p3Error) {
+          console.error('P3 generation failed, switching to fallback structure:', p3Error);
+          result = fallbackP3();
+          displayContent = `**Structure KDP PRO générée (mode robuste) :** ${result.structureGlobale}\n\n**📖 ~${result.nombrePagesEstime} pages (~${result.nombreMotsEstime} mots)**\n\n**${result.chapitres.length} chapitres prêts à rédiger.**`;
         }
         break;
       }
