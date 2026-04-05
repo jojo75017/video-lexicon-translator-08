@@ -28,6 +28,7 @@ import { Input } from '@/components/ui/input';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Progress } from '@/components/ui/progress';
 import { useUserQuotas, getQuotaPercentage } from '@/hooks/useUserQuotas';
+import { SIDEBAR_SUBSECTIONS } from './modernSidebarSections';
 
 interface ModernSidebarProps {
   activeTab: string;
@@ -51,6 +52,11 @@ interface ToolGroup {
   label: string;
   emoji: string;
   color: string;
+  items: MenuItem[];
+}
+
+interface GroupedItems {
+  label: string;
   items: MenuItem[];
 }
 
@@ -456,6 +462,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
   const { isDark, toggleTheme } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedGroups, setExpandedGroups] = useState<string[]>(['🤖 Workflow IA']);
+  const [expandedSections, setExpandedSections] = useState<string[]>(['🤖 Workflow IA:Pipeline', '🤖 Workflow IA:Créer']);
 
   const [isAdmin, setIsAdmin] = useState(() => sessionStorage.getItem('is_admin') === 'true');
   React.useEffect(() => {
@@ -476,6 +483,12 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
   const toggleGroup = (label: string) => {
     setExpandedGroups(prev =>
       prev.includes(label) ? prev.filter(l => l !== label) : [...prev, label]
+    );
+  };
+
+  const toggleSection = (key: string) => {
+    setExpandedSections(prev =>
+      prev.includes(key) ? prev.filter(section => section !== key) : [...prev, key]
     );
   };
 
@@ -503,6 +516,25 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
       .filter(item => item.label.toLowerCase().includes(q) || item.id.toLowerCase().includes(q))
       .slice(0, 15);
   }, [searchQuery, isAdmin]);
+
+  const getSectionedItems = (group: ToolGroup, visibleItems: MenuItem[]): GroupedItems[] => {
+    const config = SIDEBAR_SUBSECTIONS[group.label] ?? [];
+    const itemMap = new Map(visibleItems.map(item => [item.id, item]));
+
+    const configuredSections = config
+      .map(section => ({
+        label: section.label,
+        items: section.itemIds.map(itemId => itemMap.get(itemId)).filter(Boolean) as MenuItem[],
+      }))
+      .filter(section => section.items.length > 0);
+
+    const configuredIds = new Set(config.flatMap(section => section.itemIds));
+    const remainingItems = visibleItems.filter(item => !configuredIds.has(item.id));
+
+    return remainingItems.length > 0
+      ? [...configuredSections, { label: 'Autres', items: remainingItems }]
+      : configuredSections;
+  };
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -647,17 +679,60 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                       </div>
                     </button>
                     {isExpanded && (
-                      <div className={cn("ml-2 pl-2 border-l-2 space-y-0.5 mt-0.5 pb-1", colors.border)}>
-                        {visibleItems.map(item => (
-                          <MenuItemButton
-                            key={item.id}
-                            item={item}
-                            isActive={activeTab === item.id}
-                            onClick={() => handleItemClick(item)}
-                            isCollapsed={false}
-                            groupColor={group.color}
-                          />
-                        ))}
+                      <div className={cn("ml-2 pl-2 border-l-2 space-y-2 mt-1 pb-1", colors.border)}>
+                        {getSectionedItems(group, visibleItems).map(section => {
+                          const sectionKey = `${group.label}:${section.label}`;
+                          const sectionExpanded = expandedSections.includes(sectionKey);
+                          const sectionHasActive = section.items.some(item => item.id === activeTab);
+
+                          return (
+                            <div key={sectionKey} className="space-y-1">
+                              <button
+                                onClick={() => toggleSection(sectionKey)}
+                                className={cn(
+                                  "w-full flex items-center justify-between rounded-lg px-2 py-1.5 text-left transition-all",
+                                  sectionHasActive ? colors.bg : "hover:bg-card/60"
+                                )}
+                              >
+                                <span className={cn(
+                                  "text-xs font-semibold",
+                                  sectionHasActive ? colors.text : "text-muted-foreground"
+                                )}>
+                                  {section.label}
+                                </span>
+                                <div className="flex items-center gap-1.5">
+                                  <span className={cn(
+                                    "text-[10px] font-medium px-1.5 py-0.5 rounded-full",
+                                    colors.bg,
+                                    sectionHasActive ? colors.text : "text-muted-foreground"
+                                  )}>
+                                    {section.items.length}
+                                  </span>
+                                  <ChevronDown className={cn(
+                                    "w-3 h-3 transition-transform duration-200",
+                                    sectionExpanded ? "rotate-0" : "-rotate-90",
+                                    sectionHasActive ? colors.text : "text-muted-foreground"
+                                  )} />
+                                </div>
+                              </button>
+
+                              {sectionExpanded && (
+                                <div className="space-y-0.5 pl-1">
+                                  {section.items.map(item => (
+                                    <MenuItemButton
+                                      key={item.id}
+                                      item={item}
+                                      isActive={activeTab === item.id}
+                                      onClick={() => handleItemClick(item)}
+                                      isCollapsed={false}
+                                      groupColor={group.color}
+                                    />
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
                       </div>
                     )}
                   </div>
