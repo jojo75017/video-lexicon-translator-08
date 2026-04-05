@@ -187,9 +187,15 @@ const SubscriptionPage = ({ subscriberEmail, subscriberData, onLogout }: Subscri
             </p>
           </div>
           <div className="flex gap-2">
-            <Button onClick={() => navigate('/ebook-planner')} variant="outline">
+            <Button 
+              onClick={() => {
+                // Force navigation directe sans passer par SubscriberGate
+                window.location.href = '/ebook-planner';
+              }} 
+              className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700"
+            >
               <BookOpen className="w-4 h-4 mr-2" />
-              Générateur
+              ← Retour au Générateur
             </Button>
             <Button onClick={handleLogout} variant="outline">
               <LogOut className="w-4 h-4 mr-2" />
