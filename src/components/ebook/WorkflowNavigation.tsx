@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { useWorkflowResults } from '@/hooks/useWorkflowResults';
+import { WORKFLOW_STEPS as AGENT_STEPS } from './workflow/workflowAgents';
 
 export interface WorkflowStep {
   id: string;
@@ -80,6 +81,7 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
   const progressPercentage = (completedCount / WORKFLOW_STEPS.length) * 100;
 
   const currentStep = WORKFLOW_STEPS[currentStepIndex];
+  const currentAgent = AGENT_STEPS[currentStepIndex];
   const prevStep = currentStepIndex > 0 ? WORKFLOW_STEPS[currentStepIndex - 1] : null;
   const nextStep = currentStepIndex < WORKFLOW_STEPS.length - 1 ? WORKFLOW_STEPS[currentStepIndex + 1] : null;
 
@@ -107,20 +109,20 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
     <TooltipProvider delayDuration={200}>
       <div className={cn("space-y-3 mb-6", className)}>
         {/* Header with progress */}
-        <div className="bg-slate-900/80 border-2 border-gold/20 rounded-xl p-4 shadow-lg shadow-gold/5 backdrop-blur-sm">
+        <div className="bg-card border border-border rounded-xl p-4 shadow-sm">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <span className="text-lg">🚀</span>
-              <span className="text-sm font-bold text-gradient-gold">Workflow Éditorial</span>
-              <Badge className="text-xs font-semibold bg-gold/20 text-gold border-gold/30">
+              <span className="text-sm font-bold text-primary">Workflow Éditorial</span>
+              <Badge variant="outline" className="text-xs font-semibold border-primary/30 text-primary">
                 {completedCount}/{WORKFLOW_STEPS.length}
               </Badge>
             </div>
-            <span className="text-lg font-bold text-gold">{Math.round(progressPercentage)}%</span>
+            <span className="text-lg font-bold text-primary">{Math.round(progressPercentage)}%</span>
           </div>
-          <Progress value={progressPercentage} className="h-2.5 mb-4 gold-progress" />
+          <Progress value={progressPercentage} className="h-2.5 mb-4" />
 
-          {/* Phases with steps */}
+          {/* Phases with agent steps */}
           <div className="space-y-2">
             {PHASES.map((phase) => {
               const phaseCompleted = getPhaseCompletedCount(phase);
@@ -130,8 +132,8 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
               return (
                 <div key={phase.id} className="flex items-center gap-2">
                   <div className={cn(
-                    "flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-semibold shrink-0 min-w-[120px]",
-                    isPhaseComplete ? "bg-emerald-500/20 text-emerald-400" : "bg-slate-800/60 text-white/50"
+                    "flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-semibold shrink-0 min-w-[130px]",
+                    isPhaseComplete ? "bg-green-500/15 text-green-600 dark:text-green-400" : "bg-muted text-muted-foreground"
                   )}>
                     <span>{phase.label}</span>
                     <span className="text-[10px] opacity-70">({phaseCompleted}/{phaseTotal})</span>
@@ -140,8 +142,10 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
                   <div className="flex items-center gap-1 flex-wrap">
                     {phase.steps.map((stepId) => {
                       const step = WORKFLOW_STEPS.find(s => s.id === stepId)!;
+                      const agentDef = AGENT_STEPS.find(a => a.id === stepId);
                       const status = getStepStatus(step);
                       const tabId = STEP_TO_TAB[step.id];
+                      const AgentIcon = agentDef?.icon;
 
                       return (
                         <Tooltip key={step.id}>
@@ -151,29 +155,31 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
                               disabled={status === 'locked' || isGenerating}
                               className={cn(
                                 "flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium transition-all duration-200 border",
-                                status === 'completed' && "bg-emerald-500 text-white border-emerald-600 shadow-sm",
-                                status === 'current' && "bg-gold text-slate-900 border-gold shadow-sm ring-2 ring-gold/30 ring-offset-1 ring-offset-slate-900",
-                                status === 'available' && "bg-slate-800/60 hover:bg-slate-700/60 text-white/60 border-white/10 hover:text-white cursor-pointer",
-                                status === 'locked' && "bg-slate-800/30 text-white/20 border-transparent cursor-not-allowed"
+                                status === 'completed' && "bg-green-500/15 text-green-700 dark:text-green-400 border-green-500/30 shadow-sm",
+                                status === 'current' && "bg-primary text-primary-foreground border-primary shadow-sm ring-2 ring-primary/30 ring-offset-1 ring-offset-background",
+                                status === 'available' && "bg-muted hover:bg-accent text-muted-foreground border-border hover:text-foreground cursor-pointer",
+                                status === 'locked' && "bg-muted/50 text-muted-foreground/40 border-transparent cursor-not-allowed"
                               )}
                             >
-                              {status === 'completed' ? <Check className="w-3 h-3" /> : status === 'locked' ? <Lock className="w-3 h-3" /> : null}
+                              {status === 'completed' ? <Check className="w-3 h-3" /> : 
+                               status === 'locked' ? <Lock className="w-3 h-3" /> : 
+                               AgentIcon ? <AgentIcon className="w-3 h-3" /> : null}
                               <span>{step.shortLabel}</span>
                             </button>
                           </TooltipTrigger>
-                          <TooltipContent side="bottom" className="max-w-xs bg-slate-800 border-white/10 text-white">
+                          <TooltipContent side="bottom" className="max-w-xs">
                             <div className="space-y-1">
-                              <p className="font-semibold">{step.id}: {step.label}</p>
-                              <p className="text-xs text-white/60">{step.description}</p>
+                              <p className="font-semibold">{step.id}: {agentDef?.agentTitle || step.label}</p>
+                              <p className="text-xs text-muted-foreground">{agentDef?.agentMission || step.description}</p>
                               {step.estimatedMinutes && <p className="text-xs">⏱️ ~{step.estimatedMinutes} min</p>}
                               {status === 'locked' && step.requiredSteps && step.requiredSteps.length > 0 && (
-                                <p className="text-xs text-amber-400 flex items-center gap-1">
+                                <p className="text-xs text-amber-500 flex items-center gap-1">
                                   <AlertCircle className="w-3 h-3" />
                                   Requiert: {step.requiredSteps.join(', ')}
                                 </p>
                               )}
                               {status === 'completed' && (
-                                <p className="text-xs text-emerald-400 flex items-center gap-1">
+                                <p className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
                                   <Check className="w-3 h-3" /> Complété
                                 </p>
                               )}
@@ -189,80 +195,83 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
           </div>
         </div>
 
-        {/* Navigation Buttons + Current Step */}
+        {/* Current Agent Card */}
+        {currentAgent && (
+          <div className="bg-primary/5 border border-primary/20 rounded-xl p-4">
+            <div className="flex items-start gap-3">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary">
+                {isGenerating ? <Loader2 className="h-5 w-5 animate-spin" /> : <currentAgent.icon className="h-5 w-5" />}
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Badge variant="outline" className="border-primary/30 text-primary text-xs">{currentStep.shortLabel}</Badge>
+                  <span className="text-xs uppercase tracking-widest text-muted-foreground">Agent {currentStepIndex + 1}/{WORKFLOW_STEPS.length}</span>
+                  {hasStepResult(currentStepId) && (
+                    <Badge className="bg-green-500/15 text-green-600 dark:text-green-400 border-green-500/30 text-[10px] px-1.5 py-0">
+                      <Check className="w-3 h-3 mr-0.5" />Fait
+                    </Badge>
+                  )}
+                </div>
+                <h3 className="mt-1 text-lg font-semibold text-foreground">{currentAgent.agentTitle}</h3>
+                <p className="text-sm font-medium text-foreground/80">{currentAgent.agentSubtitle}</p>
+                <p className="text-sm text-muted-foreground mt-1">{currentAgent.agentMission}</p>
+                {currentStep.tip && (
+                  <p className="text-xs text-muted-foreground mt-2 italic">💡 {currentStep.tip}</p>
+                )}
+                {currentStep.requiredSteps && currentStep.requiredSteps.length > 0 && !hasStepResult(currentStepId) && (
+                  <div className="mt-2 flex items-center gap-1.5 flex-wrap">
+                    <span className="text-xs text-muted-foreground">Prérequis:</span>
+                    {currentStep.requiredSteps.map(reqId => (
+                      <Badge
+                        key={reqId}
+                        variant="outline"
+                        className={cn(
+                          "text-[10px] px-1.5 py-0",
+                          hasStepResult(reqId)
+                            ? "bg-green-500/15 text-green-600 dark:text-green-400 border-green-500/30"
+                            : "bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30"
+                        )}
+                      >
+                        {hasStepResult(reqId) && <Check className="w-2.5 h-2.5 mr-0.5" />}
+                        {reqId}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Navigation Buttons */}
         <div className="flex items-center justify-between gap-3">
           <Button
             variant="outline"
             size="sm"
             onClick={() => prevStep && handleNavigate(STEP_TO_TAB[prevStep.id])}
             disabled={!prevStep || isGenerating}
-            className="flex items-center gap-1 border-gold/30 text-gold/70 hover:text-gold bg-slate-800/50"
+            className="flex items-center gap-1"
           >
             <ChevronLeft className="w-4 h-4" />
             <span className="hidden sm:inline">{prevStep?.shortLabel || 'Préc.'}</span>
           </Button>
 
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-800/60 rounded-lg border border-gold/20">
-            {isGenerating && <Loader2 className="w-4 h-4 animate-spin text-gold" />}
-            <span className="text-sm font-semibold text-white">
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-muted rounded-lg border border-border">
+            {isGenerating && <Loader2 className="w-4 h-4 animate-spin text-primary" />}
+            <span className="text-sm font-semibold text-foreground">
               {currentStep.shortLabel}: {currentStep.label}
             </span>
-            {hasStepResult(currentStepId) && (
-              <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 text-[10px] px-1.5 py-0">
-                <Check className="w-3 h-3 mr-0.5" />Fait
-              </Badge>
-            )}
           </div>
 
           <Button
             size="sm"
             onClick={() => nextStep && handleNavigate(STEP_TO_TAB[nextStep.id])}
             disabled={!nextStep || isGenerating || (nextStep && !canProceedToNext(nextStep))}
-            className="flex items-center gap-1 bg-gold hover:bg-gold-dark text-slate-900 font-semibold"
+            className="flex items-center gap-1"
           >
             <span className="hidden sm:inline">{nextStep?.shortLabel || 'Suiv.'}</span>
             <ChevronRight className="w-4 h-4" />
           </Button>
-        </div>
-
-        {/* Current Step Details */}
-        <div className="bg-gold/10 border border-gold/20 rounded-lg p-3">
-          <div className="flex items-start gap-3">
-            <div className="w-7 h-7 rounded-full bg-gold/20 flex items-center justify-center shrink-0">
-              <span className="text-xs font-bold text-gold">{currentStepIndex + 1}</span>
-            </div>
-            <div className="min-w-0 flex-1">
-              <h4 className="font-semibold text-sm text-white">{currentStep.label}</h4>
-              <p className="text-xs text-white/50 mt-0.5">{currentStep.description}</p>
-              <div className="flex items-center gap-3 mt-1.5 flex-wrap">
-                {currentStep.estimatedMinutes && (
-                  <span className="text-xs text-gold">⏱️ ~{currentStep.estimatedMinutes} min</span>
-                )}
-                {currentStep.tip && (
-                  <span className="text-xs text-white/40 italic">💡 {currentStep.tip}</span>
-                )}
-              </div>
-              {currentStep.requiredSteps && currentStep.requiredSteps.length > 0 && !hasStepResult(currentStepId) && (
-                <div className="mt-2 flex items-center gap-1.5 flex-wrap">
-                  <span className="text-xs text-white/40">Prérequis:</span>
-                  {currentStep.requiredSteps.map(reqId => (
-                    <Badge
-                      key={reqId}
-                      className={cn(
-                        "text-[10px] px-1.5 py-0",
-                        hasStepResult(reqId)
-                          ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
-                          : "bg-amber-500/20 text-amber-400 border-amber-500/30"
-                      )}
-                    >
-                      {hasStepResult(reqId) && <Check className="w-2.5 h-2.5 mr-0.5" />}
-                      {reqId}
-                    </Badge>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
         </div>
       </div>
     </TooltipProvider>
