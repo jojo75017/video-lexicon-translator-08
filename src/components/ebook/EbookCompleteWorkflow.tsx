@@ -137,8 +137,8 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   const hasPlausibleApiKeyFormat = normalizedUserApiKey.startsWith('AIza');
   const hasUsableApiKey = hasConfiguredApiKey && hasPlausibleApiKeyFormat;
   const hasStrictlyValidatedApiKey = hasUsableApiKey && isUserKeyValid === true;
-  const hasApiKeyValidationWarning = hasUsableApiKey && isUserKeyValid === false;
-  const canGenerate = title.trim() && authorName.trim() && category && bookIntroduction.trim() && hasReadSteps && hasUsableApiKey;
+  const hasApiKeyValidationWarning = hasConfiguredApiKey && !hasPlausibleApiKeyFormat;
+  const canGenerate = title.trim() && authorName.trim() && category && bookIntroduction.trim() && hasReadSteps;
 
   const readSavedProgressSnapshot = useCallback((): WorkflowProgress | null => {
     try {
@@ -538,7 +538,10 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
           }
         });
 
-      if (fnError) throw new Error(fnError.message);
+      if (fnError) {
+        const realMessage = (fnError as any)?.context?.json?.error || fnError.message;
+        throw new Error(realMessage);
+      }
       if (data?.error) throw new Error(data.error);
 
       return {
@@ -688,13 +691,8 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
       return;
     }
 
-    if (!hasUsableApiKey) {
-      toast.error('🔑 Veuillez configurer votre clé API Gemini dans l\'onglet "Paramètres" avant de générer.');
-      return;
-    }
-
     if (hasApiKeyValidationWarning) {
-      toast.warning('⚠️ Clé détectée mais non validée localement. Tentative de lancement du workflow quand même.');
+      toast.warning('⚠️ Votre clé Gemini semble mal formatée ; le workflow utilisera le moteur IA intégré.');
     }
 
     setIsGenerating(true);
@@ -1484,10 +1482,6 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
                 <p className="text-sm text-destructive">
                   ⚠️ Veuillez remplir le titre, la catégorie et le nom d'auteur
                 </p>
-              ) : !hasUsableApiKey ? (
-                <p className="text-sm text-destructive">
-                  ⚠️ Ajoutez une clé API Gemini dans l'onglet Paramètres pour lancer P1
-                </p>
               ) : !bookIntroduction.trim() ? (
                 <p className="text-sm text-destructive">
                   ⚠️ Veuillez décrire votre vision du livre dans le champ Introduction
@@ -1498,7 +1492,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
                 </p>
               ) : hasApiKeyValidationWarning ? (
                 <p className="text-sm text-amber-600">
-                  ⚠️ La validation locale de la clé a échoué, mais P1 peut maintenant démarrer quand même.
+                  ⚠️ La clé Gemini enregistrée semble invalide ; le workflow basculera automatiquement sur le backend intégré.
                 </p>
               ) : null}
             </motion.div>
