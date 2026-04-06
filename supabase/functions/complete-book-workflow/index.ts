@@ -1483,12 +1483,17 @@ Retourne en JSON :
 
       case 'P5': {
         const chapitres = previousContext.P4?.chapitres || [];
+        const personnagesP3 = previousContext.P3?.personnages || [];
+        const manuscriptCtx = buildManuscriptSummary(chapitres, fullTitle, category, personnagesP3);
         const echantillons = chapitres.slice(0, 5).map((ch: any) => 
-          `Ch.${ch.numero} "${ch.titre}": ${(ch.contenu || '').substring(0, 500)}`
+          `Ch.${ch.numero} "${ch.titre}": ${(ch.contenu || '').substring(0, 1200)}`
         ).join('\n\n');
         
         const { content, qualityScore, attempts } = await callAIWithQualityLoop(
-          `Tu es un RÉÉCRIVAIN expert. Tu détectes et élimines tout pattern "IA". Tu ajoutes de la vie, des tournures naturelles, du rythme humain.`,
+          `Tu es un RÉÉCRIVAIN expert. Tu détectes et élimines tout pattern "IA". Tu ajoutes de la vie, des tournures naturelles, du rythme humain.
+
+CONTEXTE DU MANUSCRIT COMPLET :
+${manuscriptCtx}`,
           `Analyse ces extraits et donne des conseils d'humanisation CONCRETS :
 
 EXTRAITS :
