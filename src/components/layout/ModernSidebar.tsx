@@ -457,7 +457,8 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
   activeTab,
   onTabChange,
   isCollapsed,
-  onToggleCollapse
+  onToggleCollapse,
+  onSwitchToTrello
 }) => {
   const navigate = useNavigate();
   const { isDark, toggleTheme } = useTheme();
