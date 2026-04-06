@@ -14,7 +14,6 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cleanForAudio } from '@/utils/textCleaner';
-import { buildIntroDisplayText } from '@/utils/audioIntroGenerator';
 import { generateIntroForExport } from '@/utils/audioIntroGenerator';
 import { supabase } from '@/integrations/supabase/client';
 import { combineMp3Blobs, requestTtsAudioChunks } from '@/utils/ttsRequest';
@@ -118,21 +117,11 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
   const [bookSubtitle, setBookSubtitle] = useState('');
   const [authorNameState, setAuthorNameState] = useState(propAuthorName || '');
   const [category, setCategory] = useState('enfants-3-8');
-  const buildDefaultIntro = (title: string, author?: string) => {
-    return buildIntroDisplayText({
-      ebookTitle: title,
-      authorName: author || authorNameState || 'Georges Boubet',
-    });
-  };
-  const [introduction, setIntroduction] = useState(preface || buildDefaultIntro(ebookTitle || ''));
+  const [introduction, setIntroduction] = useState(preface || '');
 
   // Update intro when title changes (only if user hasn't manually edited)
   const [introManuallyEdited, setIntroManuallyEdited] = useState(false);
-  useEffect(() => {
-    if (!introManuallyEdited && !preface) {
-      setIntroduction(buildDefaultIntro(bookTitle, authorNameState));
-    }
-  }, [bookTitle, authorNameState, introManuallyEdited, preface]);
+  // No auto-generated intro text — introduction field holds the real preface
   const [chapterContent, setChapterContent] = useState('');
 
   const projectChapterText = useMemo(() => serializeProjectChapters(chapters), [chapters]);
@@ -281,28 +270,41 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
     setGenerationProgress(0);
     try {
       const zip = new JSZip();
+      const allMp3Blobs: Blob[] = [];
 
-      // Intro MP3
+      // Intro MP3 — "{Titre}, par {Auteur}."
       setGenerationLabel('🎵 Génération de l\'intro...');
       setGenerationProgress(5);
       const introBlobs = await generateIntroForExport(
-        generateTts, brief.bookTitle || bookTitle, brief.authorName || authorNameState,
-        brief.introduction || introduction, category
+        generateTts, brief.bookTitle || bookTitle, brief.authorName || authorNameState
       );
       if (introBlobs.length > 0) {
         const iBlob = new Blob(introBlobs, { type: 'audio/mpeg' });
-        zip.file('00-Intro-Jingle.mp3', iBlob);
+        zip.file('00-Intro.mp3', iBlob);
         setIntroBlob(iBlob);
+        allMp3Blobs.push(iBlob);
+      }
+
+      // Préface / Introduction (texte réel, lu en entier)
+      const prefaceText = (brief.introduction || introduction || '').trim();
+      if (prefaceText && prefaceText.length > 20) {
+        setGenerationLabel('📖 Génération de la préface...');
+        setGenerationProgress(8);
+        try {
+          const prefaceResult = await requestTtsAudioChunks({ text: prefaceText, voiceName: selectedVoice });
+          if (prefaceResult.audioBlobs.length > 0) {
+            const prefaceBlob = combineMp3Blobs(prefaceResult.audioBlobs);
+            zip.file('01-Preface.mp3', prefaceBlob);
+            allMp3Blobs.push(prefaceBlob);
+          }
+        } catch (e: any) {
+          console.warn('Préface audio failed:', e.message);
+          toast.error(`⚠️ Préface non générée : ${e.message}`);
+        }
       }
 
       // Chapters
       const chaps = splitIntoChapters(textToConvert);
-      const allMp3Blobs: Blob[] = [];
-      
-      // Include intro in the full merged audio
-      if (introBlobs.length > 0) {
-        allMp3Blobs.push(new Blob(introBlobs, { type: 'audio/mpeg' }));
-      }
       
       let chaptersGenerated = 0;
       for (let i = 0; i < chaps.length; i++) {
@@ -316,7 +318,7 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
         try {
           const blob = await generateTts(chapContent);
           if (blob && blob.size > 100) {
-            const fname = `${String(i + 1).padStart(2, '0')}-${chaps[i].title.replace(/[^a-zA-Z0-9àâéèêëïîôùûüç\s-]/gi, '').replace(/\s+/g, '-').substring(0, 60)}.mp3`;
+            const fname = `${String(i + 2).padStart(2, '0')}-${chaps[i].title.replace(/[^a-zA-Z0-9àâéèêëïîôùûüç\s-]/gi, '').replace(/\s+/g, '-').substring(0, 60)}.mp3`;
             zip.file(fname, blob);
             allMp3Blobs.push(blob);
             chaptersGenerated++;
