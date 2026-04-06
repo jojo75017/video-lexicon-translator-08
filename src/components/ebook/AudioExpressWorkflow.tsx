@@ -318,7 +318,7 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
         try {
           const blob = await generateTts(chapContent);
           if (blob && blob.size > 100) {
-            const fname = `${String(i + 1).padStart(2, '0')}-${chaps[i].title.replace(/[^a-zA-Z0-9àâéèêëïîôùûüç\s-]/gi, '').replace(/\s+/g, '-').substring(0, 60)}.mp3`;
+            const fname = `${String(i + 2).padStart(2, '0')}-${chaps[i].title.replace(/[^a-zA-Z0-9àâéèêëïîôùûüç\s-]/gi, '').replace(/\s+/g, '-').substring(0, 60)}.mp3`;
             zip.file(fname, blob);
             allMp3Blobs.push(blob);
             chaptersGenerated++;
