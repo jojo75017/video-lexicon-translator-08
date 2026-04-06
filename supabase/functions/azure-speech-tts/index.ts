@@ -1,5 +1,4 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { encode as base64Encode } from "https://deno.land/std@0.168.0/encoding/base64.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -8,7 +7,6 @@ const corsHeaders = {
 
 const MAX_TEXT_LENGTH = 5000;
 
-// Voix Azure par niche
 const VOICE_PRESETS: Record<string, { voice: string; rate: string; pitch: string }> = {
   'enfants-3-6': { voice: 'fr-FR-EloiseNeural', rate: '0%', pitch: '+5%' },
   'enfants-6-12': { voice: 'fr-FR-BrigitteNeural', rate: '0%', pitch: '0%' },
@@ -21,14 +19,18 @@ const VOICE_PRESETS: Record<string, { voice: string; rate: string; pitch: string
   'default': { voice: 'fr-FR-DeniseNeural', rate: '0%', pitch: '0%' },
 };
 
-// Fallback: OpenAI TTS
-async function generateWithOpenAIFallback(text: string): Promise<{ base64: string; provider: string }> {
+const errorResponse = (message: string, status = 500) =>
+  new Response(JSON.stringify({ error: message }), {
+    status,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
+
+// Fallback: OpenAI TTS — returns the Response object directly (no base64)
+async function generateWithOpenAIFallback(text: string): Promise<Response> {
   const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
-  if (!OPENAI_API_KEY) throw new Error('OPENAI_API_KEY non configurée pour le fallback');
+  if (!OPENAI_API_KEY) throw new Error('OPENAI_API_KEY non configurée');
 
   console.log('Fallback: Using OpenAI TTS...');
-  const truncated = text.substring(0, 4000);
-
   const response = await fetch('https://api.openai.com/v1/audio/speech', {
     method: 'POST',
     headers: {
@@ -37,7 +39,7 @@ async function generateWithOpenAIFallback(text: string): Promise<{ base64: strin
     },
     body: JSON.stringify({
       model: 'gpt-4o-mini-tts',
-      input: truncated,
+      input: text.substring(0, 4000),
       voice: 'alloy',
       response_format: 'mp3',
     }),
@@ -48,21 +50,16 @@ async function generateWithOpenAIFallback(text: string): Promise<{ base64: strin
     throw new Error(`OpenAI TTS error ${response.status}: ${errText}`);
   }
 
-  const audioBuffer = await response.arrayBuffer();
-  const base64Audio = base64Encode(audioBuffer);
-
-  console.log(`OpenAI TTS fallback success: ${audioBuffer.byteLength} bytes`);
-  return { base64: base64Audio, provider: 'openai-tts-fallback' };
+  console.log('OpenAI TTS fallback success');
+  return response;
 }
 
-// Fallback 2: ElevenLabs TTS
-async function generateWithElevenLabsFallback(text: string): Promise<{ base64: string; provider: string }> {
+// Fallback: ElevenLabs TTS — returns the Response object directly
+async function generateWithElevenLabsFallback(text: string): Promise<Response> {
   const ELEVENLABS_API_KEY = Deno.env.get('ELEVENLABS_API_KEY');
-  if (!ELEVENLABS_API_KEY) throw new Error('ELEVENLABS_API_KEY non configurée pour le fallback');
+  if (!ELEVENLABS_API_KEY) throw new Error('ELEVENLABS_API_KEY non configurée');
 
   console.log('Fallback: Using ElevenLabs TTS...');
-  const truncated = text.substring(0, 5000);
-
   const voiceId = 'Xb7hH8MSUJpSbSDYk0k2';
   const response = await fetch(
     `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=mp3_44100_128`,
@@ -73,14 +70,9 @@ async function generateWithElevenLabsFallback(text: string): Promise<{ base64: s
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        text: truncated,
+        text: text.substring(0, 5000),
         model_id: 'eleven_multilingual_v2',
-        voice_settings: {
-          stability: 0.5,
-          similarity_boost: 0.80,
-          style: 0.35,
-          use_speaker_boost: true,
-        },
+        voice_settings: { stability: 0.5, similarity_boost: 0.80, style: 0.35, use_speaker_boost: true },
       }),
     }
   );
@@ -90,11 +82,8 @@ async function generateWithElevenLabsFallback(text: string): Promise<{ base64: s
     throw new Error(`ElevenLabs TTS error ${response.status}: ${errText}`);
   }
 
-  const audioBuffer = await response.arrayBuffer();
-  const base64Audio = base64Encode(audioBuffer);
-
-  console.log(`ElevenLabs TTS fallback success: ${audioBuffer.byteLength} bytes`);
-  return { base64: base64Audio, provider: 'elevenlabs-fallback' };
+  console.log('ElevenLabs TTS fallback success');
+  return response;
 }
 
 serve(async (req) => {
@@ -109,15 +98,11 @@ serve(async (req) => {
     const { text, voiceName, niche, rate, pitch } = await req.json();
 
     if (!text || text.trim().length === 0) {
-      return new Response(
-        JSON.stringify({ error: 'Le texte est requis' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return errorResponse('Le texte est requis', 400);
     }
 
     const truncatedText = text.substring(0, MAX_TEXT_LENGTH);
 
-    // Determine voice settings
     const preset = niche && VOICE_PRESETS[niche] ? VOICE_PRESETS[niche] : VOICE_PRESETS['default'];
     const finalVoice = voiceName || preset.voice;
     const finalRate = rate || preset.rate;
@@ -143,7 +128,6 @@ serve(async (req) => {
 
         console.log(`Azure TTS: voice=${finalVoice}, niche=${niche || 'default'}, textLength=${truncatedText.length}`);
 
-        // Get token with timeout
         const tokenController = new AbortController();
         const tokenTimeout = setTimeout(() => tokenController.abort(), 10000);
         
@@ -151,10 +135,7 @@ serve(async (req) => {
           `https://${AZURE_SPEECH_REGION}.api.cognitive.microsoft.com/sts/v1.0/issueToken`,
           {
             method: 'POST',
-            headers: {
-              'Ocp-Apim-Subscription-Key': AZURE_SPEECH_KEY,
-              'Content-Length': '0',
-            },
+            headers: { 'Ocp-Apim-Subscription-Key': AZURE_SPEECH_KEY, 'Content-Length': '0' },
             signal: tokenController.signal,
           }
         );
@@ -171,7 +152,6 @@ serve(async (req) => {
 
         const accessToken = await tokenResponse.text();
 
-        // Call TTS with timeout
         const ttsController = new AbortController();
         const ttsTimeout = setTimeout(() => ttsController.abort(), 30000);
 
@@ -200,20 +180,16 @@ serve(async (req) => {
           throw new Error(`Azure TTS error: ${ttsResponse.status}`);
         }
 
-        const audioBuffer = await ttsResponse.arrayBuffer();
-        const base64Audio = base64Encode(audioBuffer);
+        console.log('Azure TTS success — streaming binary response');
 
-        console.log(`Azure TTS success: ${audioBuffer.byteLength} bytes`);
-
-        return new Response(
-          JSON.stringify({
-            audioContent: base64Audio,
-            provider: 'azure-speech',
-            voice: finalVoice,
-            format: 'audio-48khz-192kbitrate-mono-mp3'
-          }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
+        return new Response(ttsResponse.body, {
+          headers: {
+            ...corsHeaders,
+            'Content-Type': 'audio/mpeg',
+            'X-TTS-Provider': 'azure-speech',
+            'X-TTS-Voice': finalVoice,
+          },
+        });
 
       } catch (azureErr: any) {
         if (azureErr?.name === 'AbortError') {
@@ -228,49 +204,29 @@ serve(async (req) => {
       console.warn('AZURE_SPEECH_KEY not configured, using fallbacks...');
     }
 
-    // === FALLBACK CHAIN: ElevenLabs → OpenAI ===
+    // === FALLBACK: ElevenLabs → OpenAI — stream binary directly ===
     try {
-      const result = await generateWithElevenLabsFallback(truncatedText);
-      return new Response(
-        JSON.stringify({
-          audioContent: result.base64,
-          provider: result.provider,
-          voice: 'Alice (ElevenLabs)',
-          format: 'mp3_44100_128',
-          fallbackUsed: true
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      const elResponse = await generateWithElevenLabsFallback(truncatedText);
+      return new Response(elResponse.body, {
+        headers: { ...corsHeaders, 'Content-Type': 'audio/mpeg', 'X-TTS-Provider': 'elevenlabs-fallback' },
+      });
     } catch (elErr) {
       console.error('ElevenLabs fallback failed:', elErr);
     }
 
     try {
-      const result = await generateWithOpenAIFallback(truncatedText);
-      return new Response(
-        JSON.stringify({
-          audioContent: result.base64,
-          provider: result.provider,
-          voice: 'Alloy (OpenAI)',
-          format: 'mp3',
-          fallbackUsed: true
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      const oaiResponse = await generateWithOpenAIFallback(truncatedText);
+      return new Response(oaiResponse.body, {
+        headers: { ...corsHeaders, 'Content-Type': 'audio/mpeg', 'X-TTS-Provider': 'openai-fallback' },
+      });
     } catch (oaiErr) {
       console.error('OpenAI TTS fallback also failed:', oaiErr);
     }
 
-    return new Response(
-      JSON.stringify({ error: 'Tous les services de synthèse vocale sont indisponibles. Veuillez réessayer plus tard.' }),
-      { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    return errorResponse('Tous les services de synthèse vocale sont indisponibles. Veuillez réessayer plus tard.', 503);
 
   } catch (error) {
     console.error('Error in azure-speech-tts:', error);
-    return new Response(
-      JSON.stringify({ error: error.message || 'Erreur interne' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    return errorResponse(error.message || 'Erreur interne', 500);
   }
 });
