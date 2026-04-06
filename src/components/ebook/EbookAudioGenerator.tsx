@@ -873,7 +873,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
   };
 
   // Save audiobook to library (storage + database)
-  const saveToLibrary = async (audioBlob: Blob, title: string, durationEstimate: number) => {
+  const saveToLibrary = async (audioBlob: Blob, title: string, durationEstimate: number, retryCount = 0): Promise<string | null> => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       let userId = session?.user?.id;
@@ -886,10 +886,10 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
       if (!userId) {
         toast.info('Téléchargement terminé. Connectez-vous pour enregistrer automatiquement dans Mes Livres Audio.');
         console.warn('saveToLibrary skipped: NO USER ID');
-        return;
+        return null;
       }
       
-      console.log('saveToLibrary: userId =', userId, '| title =', title, '| blob size =', audioBlob.size);
+      console.log(`saveToLibrary: userId=${userId} | title=${title} | blob=${audioBlob.size} bytes | attempt=${retryCount + 1}`);
 
       const fileName = `${userId}/${Date.now()}-${title.replace(/[^a-zA-Z0-9àâéèêëïîôùûüç\s-]/gi, '').replace(/\s+/g, '-')}.mp3`;
 
@@ -903,8 +903,14 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
 
       if (uploadError) {
         console.error('Storage upload error:', uploadError);
+        // Retry once after 2s
+        if (retryCount < 1) {
+          console.log('saveToLibrary: retrying in 2s...');
+          await new Promise(r => setTimeout(r, 2000));
+          return saveToLibrary(audioBlob, title, durationEstimate, retryCount + 1);
+        }
         toast.error(`Erreur upload du fichier audio: ${uploadError.message}`);
-        return;
+        return null;
       }
 
       const { data: urlData } = supabase.storage.from('audiobooks').getPublicUrl(fileName);
@@ -915,7 +921,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
         : ELEVENLABS_VOICES_LIST.find(v => v.id === selectedPremiumVoice)?.name || selectedPremiumVoice;
 
       // Insert into audiobooks table
-      const { error: dbError } = await supabase.from('audiobooks').insert({
+      const { data: dbData, error: dbError } = await supabase.from('audiobooks').insert({
         user_id: userId,
         title: title.trim(),
         author_name: authorName || null,
@@ -924,17 +930,24 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
         duration_seconds: Math.round(durationEstimate),
         status: 'published',
         is_public: false,
-      });
+      }).select('id').single();
 
       if (dbError) {
         console.error('DB insert error:', dbError);
         toast.error(`Erreur sauvegarde en bibliothèque: ${dbError.message}`);
-        return;
+        return null;
       }
 
       toast.success('📚 Livre audio sauvegardé dans votre bibliothèque !');
+      return dbData?.id || null;
     } catch (err: any) {
       console.error('Save to library error:', err);
+      if (retryCount < 1) {
+        console.log('saveToLibrary: retrying after exception in 2s...');
+        await new Promise(r => setTimeout(r, 2000));
+        return saveToLibrary(audioBlob, title, durationEstimate, retryCount + 1);
+      }
+      return null;
     }
   };
 
