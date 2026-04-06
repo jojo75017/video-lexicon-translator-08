@@ -1222,7 +1222,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       console.error('Erreur localStorage:', error);
     }
 
-    setActiveTab('planner');
+    setActiveTab('workflow-dashboard');
   };
 
   const handleCreateNewProject = () => {
@@ -1298,7 +1298,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
     setKdpDescription(project.kdp_description || '');
     setKdpKeywords(project.kdp_keywords || '');
     setKdpCategories(project.kdp_categories || '');
-    setActiveTab('planner');
+    setActiveTab('workflow-dashboard');
   };
 
   const renderContent = () => {
@@ -2729,8 +2729,8 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                 }));
                 setChapters(newChapters);
                 
-                // Naviguer vers le planificateur pour voir le résultat
-                setActiveTab('planner');
+                // Naviguer vers le workflow dashboard
+                setActiveTab('workflow-dashboard');
                 toast.success(`Template "${template.title}" appliqué avec ${template.chapters.length} chapitres !`);
               }
             }}
@@ -2763,7 +2763,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               if (guide.summary) setBookDescription(guide.summary);
               
               toast.success(`Guide "${guide.title}" importé avec ${guide.chapters?.length || 0} chapitres !`);
-              setActiveTab('planner');
+              setActiveTab('workflow-dashboard');
             }}
           />
         );
@@ -3180,7 +3180,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                   // Replace chapters entirely (not append) to prevent duplicates
                   setChapters(newChapters);
                   toast.success(`Structure appliquée : ${newChapters.length} chapitres créés`);
-                  setActiveTab('planner');
+                  setActiveTab('workflow-dashboard');
                 }}
               />
             </WorkflowResultViewer>
@@ -3691,20 +3691,30 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               </p>
               
               {/* Import URL CTA */}
-              <Button
-                type="button"
-                onClick={() => handleTabChange('planner')}
-                className="mt-6 relative overflow-hidden bg-gradient-to-r from-primary/10 to-accent/10 hover:from-primary/20 hover:to-accent/20 text-foreground font-semibold px-8 py-3 h-auto rounded-2xl border border-primary/20 group transition-all duration-500 hover:shadow-[0_0_40px_rgba(59,158,255,0.2)] hover:-translate-y-0.5"
-              >
-                <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/5 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-                <span className="relative flex items-center gap-3">
-                  <span className="text-lg">📝</span>
-                  <span>Ouvrir le formulaire du livre</span>
-                  <Badge className="bg-primary/20 text-primary font-bold text-[10px] px-2 py-0.5 border border-primary/30">
-                    Titre • Auteur • Chapitres
-                  </Badge>
-                </span>
-              </Button>
+              <div className="mt-6 flex flex-col sm:flex-row items-center gap-3">
+                <Button
+                  type="button"
+                  onClick={() => handleTabChange('editorial-director')}
+                  className="relative overflow-hidden bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-semibold px-8 py-3 h-auto rounded-2xl group transition-all duration-500 hover:shadow-[0_0_40px_rgba(59,158,255,0.3)] hover:-translate-y-0.5"
+                >
+                  <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+                  <span className="relative flex items-center gap-3">
+                    <Rocket className="w-5 h-5" />
+                    <span>Créer mon livre avec le Workflow</span>
+                  </span>
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => handleTabChange('planner')}
+                  className="rounded-2xl border-border text-muted-foreground text-sm px-4 py-2 h-auto"
+                >
+                  <span className="flex items-center gap-2">
+                    <FileText className="w-4 h-4" />
+                    <span>Formulaire manuel</span>
+                  </span>
+                </Button>
+              </div>
 
               <p className="mt-5 text-muted-foreground text-sm italic">
                 🚀 1, 2, 3… Foncez ! Je suis toujours là pour vous accompagner en Zoom gratuit — Georges
