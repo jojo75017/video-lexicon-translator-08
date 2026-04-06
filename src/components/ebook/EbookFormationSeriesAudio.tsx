@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { combineMp3Blobs, requestTtsAudioChunks } from '@/utils/ttsRequest';
 
 interface AudioLesson {
   id: string;
@@ -276,43 +277,28 @@ export const EbookFormationSeriesAudio: React.FC = () => {
   const generateAudio = async (text: string) => {
     setIsLoading(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token;
+      const { audioBlobs, errors } = await requestTtsAudioChunks({
+        text,
+        niche: 'default',
+        maxFailures: 1,
+      });
 
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/azure-speech-tts`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          },
-          body: JSON.stringify({
-            text: text.substring(0, 4500),
-            niche: 'default',
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        try {
-          const parsed = JSON.parse(errorText);
-          throw new Error(parsed.error || 'Erreur de génération audio');
-        } catch {
-          throw new Error(errorText || 'Erreur de génération audio');
-        }
+      if (audioUrl) {
+        URL.revokeObjectURL(audioUrl);
       }
 
-      const audioBlob = await response.blob();
+      const audioBlob = combineMp3Blobs(audioBlobs);
       const url = URL.createObjectURL(audioBlob);
       setAudioUrl(url);
       
       if (audioRef.current) {
         audioRef.current.src = url;
-        audioRef.current.play();
+        await audioRef.current.play();
         setIsPlaying(true);
+      }
+
+      if (errors.length > 0) {
+        toast.info('Lecture démarrée avec quelques segments ignorés');
       }
     } catch (error: any) {
       console.error('Error generating audio:', error);

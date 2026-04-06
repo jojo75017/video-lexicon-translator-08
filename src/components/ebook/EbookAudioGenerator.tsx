@@ -25,7 +25,7 @@ import { fetchFile, toBlobURL } from '@ffmpeg/util';
 import { supabase } from '@/integrations/supabase/client';
 import { generateIntroJingle, generateIntroForExport } from '@/utils/audioIntroGenerator';
 import { cleanForAudio, detectAudioArtifacts } from '@/utils/textCleaner';
-import { splitTextForTts } from '@/utils/ttsChunker';
+import { requestTtsAudioChunks } from '@/utils/ttsRequest';
 
 interface Chapter {
   id: string;
@@ -693,50 +693,11 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
 
     // Nettoyage final de sécurité avant envoi à l'API vocale
     const cleanText = cleanForAudio(text);
-    
-    // Split text into chunks at sentence boundaries for natural audio
-    const chunks = splitTextForTts(cleanText);
-
-    const audioBlobs: Blob[] = [];
-    const chunkErrors: string[] = [];
-    
-    for (const chunk of chunks) {
-      try {
-        const headers: Record<string, string> = {
-          'Content-Type': 'application/json',
-          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-        };
-        if (token) headers.Authorization = `Bearer ${token}`;
-
-        const response = await fetch(
-          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/azure-speech-tts`,
-          {
-            method: 'POST',
-            headers,
-            body: JSON.stringify({
-              text: chunk,
-              niche: selectedNiche,
-            }),
-          }
-        );
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          try {
-            const parsed = JSON.parse(errorText);
-            throw new Error(parsed.error || `Erreur ${response.status}`);
-          } catch {
-            throw new Error(errorText || `Erreur ${response.status}`);
-          }
-        }
-
-        audioBlobs.push(await response.blob());
-      } catch (error: any) {
-        const message = error?.message || 'Erreur chunk audio';
-        chunkErrors.push(message);
-        console.warn('TTS chunk skipped:', message);
-      }
-    }
+    const { audioBlobs, errors: chunkErrors } = await requestTtsAudioChunks({
+      text: cleanText,
+      niche: selectedNiche,
+      maxFailures: 2,
+    });
 
     if (audioBlobs.length === 0) {
       throw new Error(chunkErrors[0] || 'Aucun segment audio généré');

@@ -4,8 +4,8 @@
  * Produces natural-sounding audio segments.
  */
 
-const MAX_CHUNK_SIZE = 4800;
-const MIN_CHUNK_SIZE = 200;
+const MAX_CHUNK_SIZE = 1400;
+const MIN_CHUNK_SIZE = 120;
 
 /**
  * Split text into TTS-friendly chunks at paragraph/sentence boundaries.
@@ -106,6 +106,16 @@ function splitByClauses(text: string, maxSize: number): string[] {
   let current = '';
 
   for (const part of parts) {
+    if (part.length > maxSize) {
+      if (current.trim().length > 0) {
+        result.push(current.trim());
+        current = '';
+      }
+
+      result.push(...splitByHardCut(part, maxSize));
+      continue;
+    }
+
     if (current.length + part.length > maxSize && current.trim().length > 0) {
       result.push(current.trim());
       current = '';
@@ -115,6 +125,19 @@ function splitByClauses(text: string, maxSize: number): string[] {
 
   if (current.trim().length > 0) {
     result.push(current.trim());
+  }
+
+  return result;
+}
+
+function splitByHardCut(text: string, maxSize: number): string[] {
+  const result: string[] = [];
+
+  for (let index = 0; index < text.length; index += maxSize) {
+    const chunk = text.slice(index, index + maxSize).trim();
+    if (chunk.length > 0) {
+      result.push(chunk);
+    }
   }
 
   return result;
