@@ -315,7 +315,30 @@ export function countAllStuckWords(
 export function cleanForAudio(text: string): string {
   if (!text || typeof text !== 'string') return text || '';
   
-  let cleaned = cleanGeneratedText(text);
+  let cleaned = text;
+  
+  // ========== PRÉ-NETTOYAGE JSON AGRESSIF ==========
+  // Supprimer les blocs JSON complets en début de texte
+  cleaned = cleaned.replace(/^\s*\{[\s\S]*?\}\s*/m, (match) => {
+    // Ne supprimer que si ça ressemble à du JSON (contient ":" et des guillemets)
+    if (match.includes('"') && match.includes(':')) return '';
+    return match;
+  });
+  cleaned = cleaned.replace(/^\s*\[[\s\S]*?\]\s*/m, (match) => {
+    if (match.includes('"') && match.includes(':')) return '';
+    return match;
+  });
+  // Supprimer les lignes qui commencent par des clés JSON typiques
+  cleaned = cleaned.replace(/^\s*"?(titre|title|content|contenu|chapters|subChapters|numero|description|summary|text|body|paragraph|raw)"?\s*:\s*.*/gim, '');
+  // Supprimer le mot "json" isolé en début de texte (artefact de code fence)
+  cleaned = cleaned.replace(/^\s*json\s*/gim, '');
+  // Supprimer accolades/crochets orphelins en début ou fin
+  cleaned = cleaned.replace(/^\s*[{\[]\s*/gm, '');
+  cleaned = cleaned.replace(/\s*[}\]]\s*$/gm, '');
+  // Supprimer les virgules orphelines de séparation JSON
+  cleaned = cleaned.replace(/^,\s*/gm, '');
+  
+  cleaned = cleanGeneratedText(cleaned);
   
   cleaned = cleaned
     // Supprimer TOUT astérisque restant (gras, italique, orphelins)

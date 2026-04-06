@@ -191,7 +191,6 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
     setIsProcessing(true);
     const brief = getBriefData();
     let fullText = '';
-    if (brief.introduction) fullText += brief.introduction + '\n\n';
 
     const sourceChapterText = brief.chapterContent || effectiveChapterContent;
     if (sourceChapterText) {
@@ -285,23 +284,7 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
         allMp3Blobs.push(iBlob);
       }
 
-      // Préface / Introduction (texte réel, lu en entier)
-      const prefaceText = (brief.introduction || introduction || '').trim();
-      if (prefaceText && prefaceText.length > 20) {
-        setGenerationLabel('📖 Génération de la préface...');
-        setGenerationProgress(8);
-        try {
-          const prefaceResult = await requestTtsAudioChunks({ text: prefaceText, voiceName: selectedVoice });
-          if (prefaceResult.audioBlobs.length > 0) {
-            const prefaceBlob = combineMp3Blobs(prefaceResult.audioBlobs);
-            zip.file('01-Preface.mp3', prefaceBlob);
-            allMp3Blobs.push(prefaceBlob);
-          }
-        } catch (e: any) {
-          console.warn('Préface audio failed:', e.message);
-          toast.error(`⚠️ Préface non générée : ${e.message}`);
-        }
-      }
+      // Préface supprimée — seuls les chapitres sont lus
 
       // Chapters
       const chaps = splitIntoChapters(textToConvert);
@@ -318,7 +301,7 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
         try {
           const blob = await generateTts(chapContent);
           if (blob && blob.size > 100) {
-            const fname = `${String(i + 2).padStart(2, '0')}-${chaps[i].title.replace(/[^a-zA-Z0-9àâéèêëïîôùûüç\s-]/gi, '').replace(/\s+/g, '-').substring(0, 60)}.mp3`;
+            const fname = `${String(i + 1).padStart(2, '0')}-${chaps[i].title.replace(/[^a-zA-Z0-9àâéèêëïîôùûüç\s-]/gi, '').replace(/\s+/g, '-').substring(0, 60)}.mp3`;
             zip.file(fname, blob);
             allMp3Blobs.push(blob);
             chaptersGenerated++;
