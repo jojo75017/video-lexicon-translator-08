@@ -342,7 +342,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   const [activeTab, setActiveTab] = useState(() => {
     try {
       const saved = localStorage.getItem('ebook_planner_active_tab');
-      if (saved && saved !== 'onboarding' && saved !== 'subscription') return saved;
+      if (saved && saved !== 'onboarding' && saved !== 'subscription' && saved !== 'planner') return saved;
     } catch {}
     return 'workflow-dashboard';
   });
