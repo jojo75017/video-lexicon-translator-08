@@ -3616,6 +3616,20 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       )}
 
       <main className="flex-1 overflow-y-auto">
+        {/* Back to board button in trello mode */}
+        {viewMode === 'trello' && activeTab !== 'workflow-dashboard' && (
+          <div className="bg-card border-b border-border px-6 py-3 flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setActiveTab('workflow-dashboard')}
+              className="rounded-xl text-sm hover:bg-background"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Retour au tableau
+            </Button>
+          </div>
+        )}
         {/* Hero Header — Dark Premium 2026 */}
         <div className="relative overflow-hidden bg-background border-b border-border">
           {/* Subtle glow effects */}
