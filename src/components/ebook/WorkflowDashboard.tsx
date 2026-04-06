@@ -168,6 +168,69 @@ export const WorkflowDashboard: React.FC<WorkflowDashboardProps> = ({
         </div>
       </div>
 
+      {/* Agent Remyr — Créer un livre */}
+      {completedCount === 0 && (
+        <Card className="border-2 border-primary/40 bg-gradient-to-br from-primary/10 via-card/95 to-accent/10 shadow-xl shadow-primary/10 overflow-hidden relative">
+          <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 rounded-full blur-[60px] pointer-events-none" />
+          <CardContent className="p-6 md:p-8 relative z-10">
+            <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+              {/* Avatar Agent */}
+              <div className="shrink-0">
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg shadow-primary/20">
+                  <Rocket className="h-10 w-10 text-primary-foreground" />
+                </div>
+              </div>
+
+              {/* Info Agent */}
+              <div className="flex-1 space-y-2">
+                <div className="flex items-center gap-3 flex-wrap">
+                  <Badge className="bg-primary/20 text-primary border-primary/30 font-bold text-sm px-3 py-1">
+                    🤖 Agent Remyr
+                  </Badge>
+                  <Badge variant="outline" className="border-muted-foreground/30 text-muted-foreground text-xs">
+                    Directeur de Création
+                  </Badge>
+                </div>
+                <h3 className="text-xl md:text-2xl font-extrabold text-foreground">
+                  Créer votre livre avec le Workflow IA
+                </h3>
+                <p className="text-muted-foreground text-sm leading-relaxed max-w-xl">
+                  Remplissez les informations ci-dessous (titre, auteur, sujet, catégorie) puis lancez les 15 agents spécialisés. 
+                  <span className="text-primary font-semibold"> Remyr</span> orchestre tout le processus : de l'idée au manuscrit prêt à publier.
+                </p>
+                <div className="flex items-center gap-4 pt-1 flex-wrap">
+                  <span className="text-xs text-muted-foreground flex items-center gap-1.5">
+                    <Sparkles className="h-3.5 w-3.5 text-primary" /> 15 agents IA spécialisés
+                  </span>
+                  <span className="text-xs text-muted-foreground flex items-center gap-1.5">
+                    <BookMarked className="h-3.5 w-3.5 text-primary" /> Manuscrit pro 400+ pages
+                  </span>
+                  <span className="text-xs text-muted-foreground flex items-center gap-1.5">
+                    <Clock className="h-3.5 w-3.5 text-primary" /> ~45 min automatisé
+                  </span>
+                </div>
+              </div>
+
+              {/* CTA */}
+              <div className="shrink-0 w-full md:w-auto">
+                <Button
+                  size="lg"
+                  onClick={() => {
+                    const configSection = document.getElementById('workflow-book-title');
+                    if (configSection) configSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    else if (onStartAutoWorkflow) onStartAutoWorkflow();
+                  }}
+                  className="w-full md:w-auto gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-base px-8 h-14 shadow-lg shadow-primary/20"
+                >
+                  <Play className="h-5 w-5" />
+                  Commencer la création
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Progress Overview */}
       <Card className="border-2 border-gold/20 bg-slate-900/80 backdrop-blur-sm">
         <CardContent className="pt-6">
