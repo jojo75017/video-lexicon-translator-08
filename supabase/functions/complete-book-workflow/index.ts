@@ -1656,8 +1656,14 @@ JSON :
       }
 
       case 'P10': {
+        const chapitresP10 = previousContext.P4?.chapitres || [];
+        const personnagesP10 = previousContext.P3?.personnages || [];
+        const manuscriptCtxP10 = buildManuscriptSummary(chapitresP10, fullTitle, category, personnagesP10);
         const content = await callAI(
-          `Tu es un expert en TRANSITIONS NARRATIVES. Tu vérifies que les chapitres s'enchaînent naturellement.`,
+          `Tu es un expert en TRANSITIONS NARRATIVES. Tu vérifies que les chapitres s'enchaînent naturellement.
+
+CONTEXTE DU MANUSCRIT :
+${manuscriptCtxP10}`,
           `Analyse les transitions :
 STRUCTURE : ${JSON.stringify(previousContext.P3?.chapitres || [])}
 MÉMOIRE : ${JSON.stringify(previousContext.P9 || {})}
@@ -1805,6 +1811,9 @@ JSON (VERDICT HONNÊTE) :
           displayContent = "⚠️ Aucun chapitre trouvé pour l'humanisation.";
           break;
         }
+
+        const personnagesP15 = previousContext.P3?.personnages || [];
+        const manuscriptCtxP15 = buildManuscriptSummary(chapitresList, fullTitle, category, personnagesP15);
 
         const echantillon = chapitresList.slice(0, 3).map((ch: any) => 
           `### ${ch.titre || ch.title || 'Chapitre'}\n${(ch.contenu || ch.content || '').substring(0, 1500)}`
