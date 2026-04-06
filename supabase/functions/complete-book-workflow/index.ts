@@ -740,9 +740,39 @@ function getP4GenerationSettings(numberOfChapters: number) {
     maxWords: isVeryLargeProject ? 1900 : 3500,
     minScore: isVeryLargeProject ? 7 : 8,
     maxRetries: isVeryLargeProject ? 0 : 1,
-    previousChapterChars: isVeryLargeProject ? 140 : 400,
+    previousChapterChars: isVeryLargeProject ? 400 : 800,
     segmentCount: isVeryLargeProject ? 2 : 1,
   };
+}
+
+/**
+ * Génère un résumé synthétique du manuscrit après P4 pour donner aux agents P5-P15
+ * une vision globale sans envoyer tout le contenu brut.
+ */
+function buildManuscriptSummary(chapitres: any[], title: string, category: string, characters: any[]): string {
+  if (!chapitres || chapitres.length === 0) return '';
+  
+  const chapterSummaries = chapitres.map((ch: any) => {
+    const content = ch.contenu || ch.content || '';
+    // Prendre les 1200 premiers caractères par chapitre (au lieu de 140-400)
+    const excerpt = content.substring(0, 1200);
+    return `Ch.${ch.numero} "${ch.titre || ch.title}": ${excerpt}${content.length > 1200 ? '...' : ''}`;
+  }).join('\n\n');
+  
+  const personnagesList = characters.length > 0
+    ? `\nPERSONNAGES : ${characters.map((c: any) => `${c.name} (${c.role})`).join(', ')}`
+    : '';
+  
+  return `
+=== BIBLE DU LIVRE ===
+TITRE : "${title}"
+CATÉGORIE : ${category}${personnagesList}
+NOMBRE DE CHAPITRES : ${chapitres.length}
+MOTS TOTAL : ~${chapitres.reduce((acc: number, ch: any) => acc + (ch.nombreMots || (ch.contenu || ch.content || '').split(/\s+/).length), 0)}
+
+=== RÉSUMÉ PAR CHAPITRE ===
+${chapterSummaries}
+`.trim();
 }
 
 serve(async (req) => {
