@@ -460,6 +460,27 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
     const loadFromDatabase = async () => {
       const dbProject = await loadLatestProject();
       if (dbProject) {
+        // Comparer avec le brouillon local pour ne pas écraser un travail plus récent
+        try {
+          const localRaw = localStorage.getItem(STORAGE_KEY);
+          if (localRaw) {
+            const localData = JSON.parse(localRaw);
+            const localTime = localData.lastSaved ? new Date(localData.lastSaved).getTime() : 0;
+            const cloudTime = dbProject.updated_at ? new Date(dbProject.updated_at).getTime() : 0;
+            
+            if (localTime > cloudTime && localData.ebookTitle) {
+              console.log('📋 [loadFromDatabase] Brouillon local plus récent que le cloud, conservation du local');
+              toast.info('Brouillon local plus récent détecté', {
+                description: 'Vos modifications locales ont été conservées. Sauvegardez pour synchroniser.',
+                duration: 5000,
+              });
+              return; // Ne pas écraser le brouillon local
+            }
+          }
+        } catch (e) {
+          console.error('Erreur comparaison timestamps:', e);
+        }
+        
         setEbookTitle(dbProject.title);
         setAuthorName(dbProject.author_name || '');
         setTargetAudience(dbProject.target_audience || 'Adultes');
@@ -601,20 +622,6 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       console.error('Erreur lors de la sauvegarde localStorage:', error);
     }
 
-    if (ebookTitle) {
-      const projectData = {
-        title: ebookTitle, author_name: authorName, target_audience: targetAudience,
-        tome_number: tomeNumber, writing_style: writingStyle, chapter_length: chapterLength,
-        detail_level: detailLevel, tone, narrative_format: narrativeFormat,
-        preface, conclusion, chapters, characters, ebook_images: ebookImages,
-        number_of_chapters: numberOfChapters, book_summary: bookSummary,
-        cover_concepts: coverConcepts, seo_optimization: seoOptimization,
-        kdp_description: kdpDescription, kdp_keywords: kdpKeywords, kdp_categories: kdpCategories,
-      };
-
-      const timer = setTimeout(() => saveProject(projectData), 2000);
-      return () => clearTimeout(timer);
-    }
   }, [ebookTitle, authorName, targetAudience, tomeNumber, writingStyle, chapterLength, detailLevel, tone, narrativeFormat, bookDescription, genre, preface, conclusion, epilogue, chapters, numberOfChapters, ebookImages, characters, bookSummary, coverConcepts, seoOptimization, kdpDescription, kdpKeywords, kdpCategories]);
 
   const sensors = useSensors(
@@ -1107,8 +1114,14 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       kdp_description: kdpDescription, kdp_keywords: kdpKeywords, kdp_categories: kdpCategories,
     };
     
-    await saveProject(projectData);
-    toast.success('Projet sauvegardé !');
+    const result = await saveProject(projectData);
+    if (result) {
+      toast.success('Projet sauvegardé en cloud ✓');
+    } else {
+      toast.warning('Projet sauvegardé localement uniquement', {
+        description: 'Connectez-vous pour sauvegarder en base de données.',
+      });
+    }
   };
 
   // Fonction de changement d'onglet avec sauvegarde (utilise la ref pour avoir les dernières données)
