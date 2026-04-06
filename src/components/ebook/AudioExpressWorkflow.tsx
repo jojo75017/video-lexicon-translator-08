@@ -395,7 +395,8 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
       const { data: { session } } = await supabase.auth.getSession();
       const userId = session?.user?.id;
       if (!userId) return;
-      const fileName = `${userId}/${Date.now()}-${titleStr.replace(/[^a-zA-Z0-9àâéèêëïîôùûüç\s-]/gi, '').replace(/\s+/g, '-')}.mp3`;
+      const safeName = titleStr.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9\s-]/g, '').replace(/\s+/g, '-').substring(0, 80);
+      const fileName = `${userId}/${Date.now()}-${safeName}.mp3`;
       const { error: uploadError } = await supabase.storage.from('audiobooks').upload(fileName, audioBlob, { contentType: 'audio/mpeg' });
       if (uploadError) { console.error('Upload error:', uploadError); return; }
       const { data: urlData } = supabase.storage.from('audiobooks').getPublicUrl(fileName);
