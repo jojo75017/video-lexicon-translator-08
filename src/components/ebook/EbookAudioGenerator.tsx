@@ -1696,23 +1696,34 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                           }
 
                           if (allBlobs.length === 0) {
-                            throw new Error('Aucun chapitre n’a pu être fusionné');
+                            throw new Error('Aucun chapitre n'a pu être fusionné');
                           }
 
+                          // 1) Sauvegarder AVANT la fusion FFmpeg (blob brut concaténé)
+                          const totalMinutes = sections.reduce((sum, s) => sum + s.estimatedMinutes, 0);
+                          const rawBlob = new Blob(allBlobs, { type: 'audio/mpeg' });
+                          setMp3ProgressLabel('Sauvegarde en bibliothèque...');
+                          setMp3Progress(92);
+                          await saveToLibrary(rawBlob, ebookTitle || 'Audiobook', totalMinutes * 60);
+
+                          // 2) Tenter la fusion FFmpeg propre (fallback sur blob brut si échec)
                           setMp3ProgressLabel('Fusion audio MP3...');
                           setMp3Progress(95);
                           const filename = `${(ebookTitle || 'audiobook').replace(/\s+/g, '-')}-complet.mp3`;
-                          const finalBlob = await mergeAudioBlobsToMp3(allBlobs, {
-                            outputFileName: filename,
-                            onProgress: (progress) => {
-                              setMp3Progress(Math.max(95, Math.min(99, Math.round(95 + progress * 4))));
-                            },
-                          });
+                          let finalBlob: Blob;
+                          try {
+                            finalBlob = await mergeAudioBlobsToMp3(allBlobs, {
+                              outputFileName: filename,
+                              onProgress: (p) => {
+                                setMp3Progress(Math.max(95, Math.min(99, Math.round(95 + p * 4))));
+                              },
+                            });
+                          } catch (mergeErr: any) {
+                            console.warn('FFmpeg merge failed, using raw blob:', mergeErr?.message);
+                            toast.warning('Fusion avancée indisponible, fichier brut utilisé.');
+                            finalBlob = rawBlob;
+                          }
                           saveAs(finalBlob, filename);
-
-                          // Persist in audiobook library for Elementor export
-                          const totalMinutes = sections.reduce((sum, s) => sum + s.estimatedMinutes, 0);
-                          await saveToLibrary(finalBlob, ebookTitle || 'Audiobook', totalMinutes * 60);
 
                           if (failedSections.length > 0) {
                             toast.warning(`Audiobook exporté, mais ${failedSections.length} chapitre(s) ont été ignoré(s).`);
