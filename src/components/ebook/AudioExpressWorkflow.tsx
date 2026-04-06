@@ -14,7 +14,6 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cleanForAudio } from '@/utils/textCleaner';
-import { buildIntroDisplayText } from '@/utils/audioIntroGenerator';
 import { generateIntroForExport } from '@/utils/audioIntroGenerator';
 import { supabase } from '@/integrations/supabase/client';
 import { combineMp3Blobs, requestTtsAudioChunks } from '@/utils/ttsRequest';
@@ -271,28 +270,41 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
     setGenerationProgress(0);
     try {
       const zip = new JSZip();
+      const allMp3Blobs: Blob[] = [];
 
-      // Intro MP3
+      // Intro MP3 — "{Titre}, par {Auteur}."
       setGenerationLabel('🎵 Génération de l\'intro...');
       setGenerationProgress(5);
       const introBlobs = await generateIntroForExport(
-        generateTts, brief.bookTitle || bookTitle, brief.authorName || authorNameState,
-        brief.introduction || introduction, category
+        generateTts, brief.bookTitle || bookTitle, brief.authorName || authorNameState
       );
       if (introBlobs.length > 0) {
         const iBlob = new Blob(introBlobs, { type: 'audio/mpeg' });
-        zip.file('00-Intro-Jingle.mp3', iBlob);
+        zip.file('00-Intro.mp3', iBlob);
         setIntroBlob(iBlob);
+        allMp3Blobs.push(iBlob);
+      }
+
+      // Préface / Introduction (texte réel, lu en entier)
+      const prefaceText = (brief.introduction || introduction || '').trim();
+      if (prefaceText && prefaceText.length > 20) {
+        setGenerationLabel('📖 Génération de la préface...');
+        setGenerationProgress(8);
+        try {
+          const prefaceResult = await requestTtsAudioChunks({ text: prefaceText, voiceName: selectedVoice });
+          if (prefaceResult.audioBlobs.length > 0) {
+            const prefaceBlob = combineMp3Blobs(prefaceResult.audioBlobs);
+            zip.file('01-Preface.mp3', prefaceBlob);
+            allMp3Blobs.push(prefaceBlob);
+          }
+        } catch (e: any) {
+          console.warn('Préface audio failed:', e.message);
+          toast.error(`⚠️ Préface non générée : ${e.message}`);
+        }
       }
 
       // Chapters
       const chaps = splitIntoChapters(textToConvert);
-      const allMp3Blobs: Blob[] = [];
-      
-      // Include intro in the full merged audio
-      if (introBlobs.length > 0) {
-        allMp3Blobs.push(new Blob(introBlobs, { type: 'audio/mpeg' }));
-      }
       
       let chaptersGenerated = 0;
       for (let i = 0; i < chaps.length; i++) {
