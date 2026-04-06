@@ -1524,12 +1524,18 @@ JSON :
       }
 
       case 'P6': {
+        const chapitresP6 = previousContext.P4?.chapitres || [];
+        const personnagesP6 = previousContext.P3?.personnages || [];
+        const manuscriptCtxP6 = buildManuscriptSummary(chapitresP6, fullTitle, category, personnagesP6);
         const { content, qualityScore } = await callAIWithQualityLoop(
-          `Tu es un CORRECTEUR-ÉDITEUR de maison d'édition. Exigeant, méthodique. Tu vérifies tout : grammaire, cohérence, style, rythme. Chaque faiblesse est identifiée avec une solution.`,
+          `Tu es un CORRECTEUR-ÉDITEUR de maison d'édition. Exigeant, méthodique. Tu vérifies tout : grammaire, cohérence, style, rythme. Chaque faiblesse est identifiée avec une solution.
+
+CONTEXTE DU MANUSCRIT :
+${manuscriptCtxP6}`,
           `Analyse la qualité éditoriale COMPLÈTE :
 TITRE : "${title}"
 VISION : ${JSON.stringify(previousContext.P1 || {})}
-CHAPITRES : ${(previousContext.P4?.chapitres || []).length}
+CHAPITRES : ${chapitresP6.length}
 STRUCTURE : ${JSON.stringify(previousContext.P3 || {})}
 
 JSON :
