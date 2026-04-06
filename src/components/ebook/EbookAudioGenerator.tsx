@@ -583,73 +583,84 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
     const chunks = splitTextForTts(cleanText);
 
     const audioBlobs: Blob[] = [];
+    const chunkErrors: string[] = [];
     
     for (const chunk of chunks) {
-      let response: Response;
+      try {
+        let response: Response;
 
-      if (canUseElevenLabs) {
-        // Use ElevenLabs Premium TTS (primary)
-        const voiceId = selectedPremiumVoice === AUTO_VOICE
-          ? VOICE_PRESETS.find(p => p.id === selectedNiche)?.voiceId || 'pFZP5JQG7iQjIQuC4Bku'
-          : selectedPremiumVoice;
+        if (canUseElevenLabs) {
+          const voiceId = selectedPremiumVoice === AUTO_VOICE
+            ? VOICE_PRESETS.find(p => p.id === selectedNiche)?.voiceId || 'pFZP5JQG7iQjIQuC4Bku'
+            : selectedPremiumVoice;
 
-        const headers: Record<string, string> = {
-          'Content-Type': 'application/json',
-          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-          Authorization: `Bearer ${token}`,
-        };
+          const headers: Record<string, string> = {
+            'Content-Type': 'application/json',
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            Authorization: `Bearer ${token}`,
+          };
 
-        response = await fetch(
-          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`,
-          {
-            method: 'POST',
-            headers,
-            body: JSON.stringify({
-              text: chunk,
-              voiceId,
-              modelId: 'eleven_multilingual_v2',
-            }),
-          }
-        );
-      } else {
-        // Azure/OpenAI fallback available even without user session
-        const headers: Record<string, string> = {
-          'Content-Type': 'application/json',
-          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-        };
-        if (token) headers.Authorization = `Bearer ${token}`;
+          response = await fetch(
+            `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`,
+            {
+              method: 'POST',
+              headers,
+              body: JSON.stringify({
+                text: chunk,
+                voiceId,
+                modelId: 'eleven_multilingual_v2',
+              }),
+            }
+          );
+        } else {
+          const headers: Record<string, string> = {
+            'Content-Type': 'application/json',
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          };
+          if (token) headers.Authorization = `Bearer ${token}`;
 
-        response = await fetch(
-          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/azure-speech-tts`,
-          {
-            method: 'POST',
-            headers,
-            body: JSON.stringify({
-              text: chunk,
-              niche: selectedNiche,
-            }),
-          }
-        );
-      }
+          response = await fetch(
+            `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/azure-speech-tts`,
+            {
+              method: 'POST',
+              headers,
+              body: JSON.stringify({
+                text: chunk,
+                niche: selectedNiche,
+              }),
+            }
+          );
+        }
 
-      if (!response.ok) {
-        const err = await response.json().catch(() => ({ error: 'Erreur inconnue' }));
-        throw new Error(err.error || `Erreur ${response.status}`);
-      }
+        if (!response.ok) {
+          const err = await response.json().catch(() => ({ error: 'Erreur inconnue' }));
+          throw new Error(err.error || `Erreur ${response.status}`);
+        }
 
-      // Check if response is binary audio (new) or JSON with base64 (legacy)
-      const contentType = response.headers.get('Content-Type') || '';
-      if (contentType.includes('audio/')) {
-        audioBlobs.push(await response.blob());
-      } else {
-        const data = await response.json();
-        const audioUrl = `data:audio/mpeg;base64,${data.audioContent}`;
-        const audioResponse = await fetch(audioUrl);
-        audioBlobs.push(await audioResponse.blob());
+        const contentType = response.headers.get('Content-Type') || '';
+        if (contentType.includes('audio/')) {
+          audioBlobs.push(await response.blob());
+        } else {
+          const data = await response.json();
+          const audioUrl = `data:audio/mpeg;base64,${data.audioContent}`;
+          const audioResponse = await fetch(audioUrl);
+          audioBlobs.push(await audioResponse.blob());
+        }
+      } catch (error: any) {
+        const message = error?.message || 'Erreur chunk audio';
+        chunkErrors.push(message);
+        console.warn('TTS chunk skipped:', message);
       }
     }
 
-    // Concatenate all blobs into a single MP3 file
+    if (audioBlobs.length === 0) {
+      throw new Error(chunkErrors[0] || 'Aucun segment audio généré');
+    }
+
+    if (chunkErrors.length > 0) {
+      console.warn(`Section audio générée partiellement: ${chunkErrors.length} chunk(s) ignoré(s)`);
+    }
+
     return new Blob(audioBlobs, { type: 'audio/mpeg' });
   };
 
@@ -1530,19 +1541,34 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                         setMp3Progress(0);
                         try {
                           const allBlobs: Blob[] = [];
+                          const failedSections: string[] = [];
                           
                           // Generate intro jingle (bell + TTS + silence)
                           setMp3ProgressLabel('🔔 Génération du jingle d\'intro...');
                           setMp3Progress(2);
-                          const introBlobs = await generateIntroForExport(generateSectionMp3, ebookTitle, authorName, preface, selectedNiche);
-                          allBlobs.push(...introBlobs);
+                          try {
+                            const introBlobs = await generateIntroForExport(generateSectionMp3, ebookTitle, authorName, preface, selectedNiche);
+                            allBlobs.push(...introBlobs);
+                          } catch (error: any) {
+                            console.warn('Intro audio skipped:', error?.message || error);
+                          }
                           
                           for (let i = 0; i < sections.length; i++) {
                             setMp3ProgressLabel(`${i + 1}/${sections.length} — ${sections[i].title}`);
                             setMp3Progress(Math.round(5 + (i / sections.length) * 85));
-                            const blob = await generateSectionMp3(sections[i].content);
-                            if (blob) allBlobs.push(blob);
+                            try {
+                              const blob = await generateSectionMp3(sections[i].content);
+                              if (blob) allBlobs.push(blob);
+                            } catch (error: any) {
+                              failedSections.push(sections[i].title);
+                              console.warn(`Section skipped during full merge: ${sections[i].title}`, error?.message || error);
+                            }
                           }
+
+                          if (allBlobs.length === 0) {
+                            throw new Error('Aucun chapitre n’a pu être fusionné');
+                          }
+
                           setMp3ProgressLabel('Fusion audio...');
                           setMp3Progress(95);
                           const finalBlob = new Blob(allBlobs, { type: 'audio/mpeg' });
@@ -1553,7 +1579,11 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                           const totalMinutes = sections.reduce((sum, s) => sum + s.estimatedMinutes, 0);
                           await saveToLibrary(finalBlob, ebookTitle || 'Audiobook', totalMinutes * 60);
 
-                          toast.success('Audiobook complet exporté avec intro jingle !');
+                          if (failedSections.length > 0) {
+                            toast.warning(`Audiobook exporté, mais ${failedSections.length} chapitre(s) ont été ignoré(s).`);
+                          } else {
+                            toast.success('Audiobook complet exporté avec intro jingle !');
+                          }
                         } catch (error: any) {
                           toast.error(`Erreur : ${error.message}`);
                         } finally {
