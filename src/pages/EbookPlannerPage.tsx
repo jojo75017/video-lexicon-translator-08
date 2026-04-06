@@ -95,6 +95,7 @@ import { WorkflowStepWrapper } from '@/components/ebook/WorkflowStepWrapper';
 import { WorkflowOnboarding } from '@/components/ebook/WorkflowOnboarding';
 import { WorkflowDashboard } from '@/components/ebook/WorkflowDashboard';
 import { WorkflowExportCompiled } from '@/components/ebook/WorkflowExportCompiled';
+import { TrelloBoardView } from '@/components/ebook/TrelloBoardView';
 import { useConfetti } from '@/hooks/useConfetti';
 import { useDemoMode } from '@/hooks/useDemoMode';
 import { DemoBanner } from '@/components/ebook/DemoBanner';
@@ -353,6 +354,11 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
     } catch {}
   }, [activeTab]);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [viewMode, setViewMode] = useState<'trello' | 'classic'>(() => {
+    try {
+      return (localStorage.getItem('ebook_view_mode') as 'trello' | 'classic') || 'trello';
+    } catch { return 'trello'; }
+  });
   const [showWelcome, setShowWelcome] = useState(location.state?.fromFormation || false);
   const [showTutorial, setShowTutorial] = useState(location.state?.fromFormation || false);
 
