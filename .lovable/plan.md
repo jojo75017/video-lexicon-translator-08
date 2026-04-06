@@ -1,69 +1,56 @@
 
-Objectif: faire du workflow P1–P15 l’entrée principale, et arrêter les renvois parasites vers le planificateur.
+Do I know what the issue is? Oui.
 
-1. Corriger la navigation qui renvoie encore vers `planner`
-- Fichier: `src/pages/EbookPlannerPage.tsx`
-- Remplacer les redirections automatiques vers `setActiveTab('planner')` par `setActiveTab('workflow-dashboard')` dans les cas où on charge ou injecte des données:
-  - reset / nouveau projet
-  - chargement d’un projet
-  - application d’un template
-  - import URL
-  - application d’une structure depuis le workflow
-- Garder `planner` seulement comme onglet secondaire, ouvert uniquement si l’utilisateur le choisit explicitement.
+Problème exact :
+- Le crash ne vient plus seulement de `elevenlabs-tts`.
+- Les logs montrent maintenant que `supabase/functions/azure-speech-tts/index.ts` dépasse la mémoire sur des requêtes de ~4600–4800 caractères (`Memory limit exceeded`).
+- Le frontend envoie encore de trop gros chunks vers cette fonction dans :
+  - `src/components/ebook/AudioExpressWorkflow.tsx`
+  - `src/components/ebook/EbookAudioGenerator.tsx`
+  - `src/components/ebook/EbookFormationSeriesAudio.tsx`
+- Il y a aussi un composant incohérent : `src/components/ebook/EbookStatisticsTools.tsx` attend encore l’ancien format JSON/base64, alors que la fonction TTS renvoie maintenant de l’audio binaire.
 
-2. Supprimer le faux “point d’entrée principal” vers le planificateur
-- Fichier: `src/pages/EbookPlannerPage.tsx`
-- Le gros bouton actuel “Ouvrir le formulaire du livre” envoie vers `planner`, ce qui contredit la nouvelle navigation.
-- Le remplacer par un CTA principal clair:
-  - “Créer mon livre avec le workflow”
-  - clic → `workflow-dashboard` ou directement `editorial-director` selon le contexte
-- Ajouter éventuellement un petit bouton secondaire discret:
-  - “Ouvrir le formulaire manuel”
-  - clic → `planner`
+Plan de correction :
+1. Durcir la fonction TTS backend
+- Fichier : `supabase/functions/azure-speech-tts/index.ts`
+- Ajouter une validation stricte des entrées.
+- Réduire la taille maximale réellement acceptée par requête à une valeur sûre.
+- Baisser le format audio Azure pour réduire la mémoire.
+- Garder une seule forme de réponse : binaire `audio/mpeg`.
+- Retourner une erreur claire si le texte est trop long au lieu de laisser planter le worker.
 
-3. Rendre le démarrage du workflow visible en permanence
-- Fichier: `src/components/ebook/TrelloBoardView.tsx`
-- Le CTA actuel n’apparaît que si `completedCount === 0`; s’il y a déjà des données ou un état partiel, il disparaît.
-- Le remplacer par une zone d’actions toujours visible en haut du tableau:
-  - bouton principal: “Démarrer le workflow”
-  - bouton secondaire: “Lancer le workflow complet”
-  - bouton tertiaire éventuel: “Formulaire manuel”
-- Ainsi, même si un projet existe déjà, on voit toujours comment créer le livre via le workflow.
+2. Réduire fortement le chunking côté client
+- Fichier : `src/utils/ttsChunker.ts`
+- Passer d’un découpage à `4800` caractères à une taille bien plus petite et stable.
+- Garder le découpage par phrases/paragraphes, mais avec une limite orientée fiabilité.
 
-4. Réduire la confusion créée par la carte “Plan du livre”
-- Fichier: `src/components/ebook/TrelloBoardColumns.ts`
-- La carte `planner` apparaît dans la colonne “Créer”, ce qui la fait passer pour le chemin principal.
-- La déclasser visuellement:
-  - soit la renommer “Formulaire manuel”
-  - soit la déplacer en fin de colonne
-  - soit la marquer comme optionnelle
-- Le premier parcours visible doit rester:
-  - P1 Zyro
-  - P2 Jano
-  - P3 Kiro
-  - P4 Alia
+3. Uniformiser tous les appels audio
+- Fichiers :
+  - `src/components/ebook/AudioExpressWorkflow.tsx`
+  - `src/components/ebook/EbookAudioGenerator.tsx`
+  - `src/components/ebook/EbookFormationSeriesAudio.tsx`
+- Utiliser partout le même flux `fetch -> response.blob()`.
+- Vérifier `response.ok`, `content-type` et `blob.size`.
+- Stopper proprement la génération si trop de segments échouent, sans casser l’écran.
 
-5. Harmoniser le vocabulaire dans l’UI
-- Le problème semble aussi venir d’un mélange entre “planificateur”, “formulaire du livre”, “workflow”, “pipeline”.
-- Uniformiser les libellés:
-  - principal: “Workflow”
-  - secondaire: “Formulaire manuel”
-- Éviter que le planificateur soit présenté comme l’entrée par défaut.
+4. Corriger le module resté sur l’ancien contrat
+- Fichier : `src/components/ebook/EbookStatisticsTools.tsx`
+- Remplacer la logique `data.audioContent` base64 par le même traitement binaire que les autres écrans.
+- Si ce module n’est pas prioritaire, le désactiver temporairement pour supprimer une source de crash.
 
-Résultat attendu
-- En arrivant sur `/ebook-planner`, l’utilisateur reste sur le tableau workflow.
-- Il voit immédiatement un bouton clair pour créer son livre avec le workflow.
-- Le planificateur reste disponible, mais seulement comme option manuelle.
-- Le parcours devient:
-  - arrivée sur dashboard workflow
-  - clic sur “Créer mon livre avec le workflow”
-  - démarrage sur P1 ou lancement du workflow complet
-  - plus de retour involontaire vers le planificateur
+5. Bloquer la popup globale côté UI
+- Dans les écrans audio, encapsuler les appels lourds avec une gestion d’erreur défensive.
+- Ne jamais laisser remonter une exception non gérée.
+- Afficher un toast métier et conserver la page interactive, même si un chunk échoue.
 
-Détails techniques ciblés
-- `src/pages/EbookPlannerPage.tsx`: normaliser toutes les redirections internes vers `workflow-dashboard`
-- `src/components/ebook/TrelloBoardView.tsx`: CTA workflow permanent, non conditionnel
-- `src/components/ebook/TrelloBoardColumns.ts`: déprioriser `planner` pour qu’il ne concurrence plus le workflow
+6. Vérification ciblée
+- Tester un texte court.
+- Tester un chapitre moyen.
+- Tester un export complet depuis `audio-express`.
+- Vérifier qu’en cas d’échec partiel, on obtient un message utilisateur et non plus l’écran blanc avec popup.
 
-Point important
-- D’après le code actuel, l’entrée par défaut est déjà prévue sur `workflow-dashboard`, mais plusieurs actions reculent encore vers `planner`. Le correctif doit donc porter surtout sur ces redirections résiduelles et sur le CTA principal mal orienté.
+Résultat attendu :
+- Plus de popup récurrente.
+- Plus de `WORKER_LIMIT` sur les exports audio courants.
+- Un seul comportement audio cohérent dans tout le projet.
+- Une génération audio plus lente mais stable, ce qui est le bon compromis ici.
