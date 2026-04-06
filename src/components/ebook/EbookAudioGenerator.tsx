@@ -702,65 +702,35 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
     
     for (const chunk of chunks) {
       try {
-        let response: Response;
+        const headers: Record<string, string> = {
+          'Content-Type': 'application/json',
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        };
+        if (token) headers.Authorization = `Bearer ${token}`;
 
-        if (canUseElevenLabs) {
-          const voiceId = selectedPremiumVoice === AUTO_VOICE
-            ? VOICE_PRESETS.find(p => p.id === selectedNiche)?.voiceId || 'pFZP5JQG7iQjIQuC4Bku'
-            : selectedPremiumVoice;
-
-          const headers: Record<string, string> = {
-            'Content-Type': 'application/json',
-            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-            Authorization: `Bearer ${token}`,
-          };
-
-          response = await fetch(
-            `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`,
-            {
-              method: 'POST',
-              headers,
-              body: JSON.stringify({
-                text: chunk,
-                voiceId,
-                modelId: 'eleven_multilingual_v2',
-              }),
-            }
-          );
-        } else {
-          const headers: Record<string, string> = {
-            'Content-Type': 'application/json',
-            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-          };
-          if (token) headers.Authorization = `Bearer ${token}`;
-
-          response = await fetch(
-            `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/azure-speech-tts`,
-            {
-              method: 'POST',
-              headers,
-              body: JSON.stringify({
-                text: chunk,
-                niche: selectedNiche,
-              }),
-            }
-          );
-        }
+        const response = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/azure-speech-tts`,
+          {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({
+              text: chunk,
+              niche: selectedNiche,
+            }),
+          }
+        );
 
         if (!response.ok) {
-          const err = await response.json().catch(() => ({ error: 'Erreur inconnue' }));
-          throw new Error(err.error || `Erreur ${response.status}`);
+          const errorText = await response.text();
+          try {
+            const parsed = JSON.parse(errorText);
+            throw new Error(parsed.error || `Erreur ${response.status}`);
+          } catch {
+            throw new Error(errorText || `Erreur ${response.status}`);
+          }
         }
 
-        const contentType = response.headers.get('Content-Type') || '';
-        if (contentType.includes('audio/')) {
-          audioBlobs.push(await response.blob());
-        } else {
-          const data = await response.json();
-          const audioUrl = `data:audio/mpeg;base64,${data.audioContent}`;
-          const audioResponse = await fetch(audioUrl);
-          audioBlobs.push(await audioResponse.blob());
-        }
+        audioBlobs.push(await response.blob());
       } catch (error: any) {
         const message = error?.message || 'Erreur chunk audio';
         chunkErrors.push(message);

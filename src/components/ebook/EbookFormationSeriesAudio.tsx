@@ -276,19 +276,36 @@ export const EbookFormationSeriesAudio: React.FC = () => {
   const generateAudio = async (text: string) => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('elevenlabs-tts', {
-        body: { 
-          text: text.substring(0, 4500),
-          voiceId: 'EXAVITQu4vr4xnSDxMaL', // Sarah - douce et narrative
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/azure-speech-tts`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify({
+            text: text.substring(0, 4500),
+            niche: 'default',
+          }),
         }
-      });
+      );
 
-      if (error) throw error;
-      if (!data?.audioContent) throw new Error('No audio content received');
+      if (!response.ok) {
+        const errorText = await response.text();
+        try {
+          const parsed = JSON.parse(errorText);
+          throw new Error(parsed.error || 'Erreur de génération audio');
+        } catch {
+          throw new Error(errorText || 'Erreur de génération audio');
+        }
+      }
 
-      const audioDataUrl = `data:audio/mpeg;base64,${data.audioContent}`;
-      const audioResponse = await fetch(audioDataUrl);
-      const audioBlob = await audioResponse.blob();
+      const audioBlob = await response.blob();
       const url = URL.createObjectURL(audioBlob);
       setAudioUrl(url);
       
