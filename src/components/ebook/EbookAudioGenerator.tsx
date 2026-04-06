@@ -1696,7 +1696,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                           }
 
                           if (allBlobs.length === 0) {
-                            throw new Error('Aucun chapitre n a pu etre fusionne');
+                            throw new Error('Aucun chapitre n\'a pu être fusionné');
                           }
 
                           // 1) Sauvegarder AVANT la fusion FFmpeg (blob brut concaténé)
