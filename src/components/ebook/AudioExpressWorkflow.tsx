@@ -122,11 +122,7 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
 
   // Update intro when title changes (only if user hasn't manually edited)
   const [introManuallyEdited, setIntroManuallyEdited] = useState(false);
-  useEffect(() => {
-    if (!introManuallyEdited && !preface) {
-      setIntroduction(buildDefaultIntro(bookTitle, authorNameState));
-    }
-  }, [bookTitle, authorNameState, introManuallyEdited, preface]);
+  // No auto-generated intro text — introduction field holds the real preface
   const [chapterContent, setChapterContent] = useState('');
 
   const projectChapterText = useMemo(() => serializeProjectChapters(chapters), [chapters]);
