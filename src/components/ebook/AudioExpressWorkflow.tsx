@@ -14,10 +14,10 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cleanForAudio } from '@/utils/textCleaner';
-import { splitTextForTts } from '@/utils/ttsChunker';
 import { buildIntroDisplayText } from '@/utils/audioIntroGenerator';
 import { generateIntroForExport } from '@/utils/audioIntroGenerator';
 import { supabase } from '@/integrations/supabase/client';
+import { combineMp3Blobs, requestTtsAudioChunks } from '@/utils/ttsRequest';
 import { saveAs } from 'file-saver';
 import JSZip from 'jszip';
 
@@ -224,40 +224,17 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
 
   // TTS generation via edge function
   const generateTts = async (text: string): Promise<Blob | null> => {
-    const { data: { session } } = await supabase.auth.getSession();
-    const token = session?.access_token;
-    const clean = cleanForAudio(text);
-    const chunks = splitTextForTts(clean);
-    const audioBlobs: Blob[] = [];
+    const { audioBlobs, errors } = await requestTtsAudioChunks({
+      text,
+      niche: category,
+      maxFailures: 2,
+    });
 
-    for (const chunk of chunks) {
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/azure-speech-tts`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          },
-          body: JSON.stringify({ text: chunk, niche: category }),
-        }
-      );
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        try {
-          const parsed = JSON.parse(errorText);
-          throw new Error(parsed.error || `Erreur ${response.status}`);
-        } catch {
-          throw new Error(errorText || `Erreur ${response.status}`);
-        }
-      }
-
-      audioBlobs.push(await response.blob());
+    if (errors.length > 0) {
+      console.warn('AudioExpress partial TTS generation:', errors);
     }
 
-    return new Blob(audioBlobs, { type: 'audio/mpeg' });
+    return combineMp3Blobs(audioBlobs);
   };
 
   // Split text into chapters

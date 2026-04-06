@@ -9,10 +9,10 @@ import {
   Target, TrendingUp, Languages, Play, Pause, Square
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
 import { Chapter } from '@/hooks/useSubscriptionGeneration';
 import EbookNarrativeChecker from './EbookNarrativeChecker';
 import { callGemini } from '@/services/geminiService';
+import { combineMp3Blobs, requestTtsAudioChunks } from '@/utils/ttsRequest';
 
 interface Character {
   id: string;
@@ -234,11 +234,6 @@ export const EbookStatisticsTools: React.FC<EbookStatisticsToolsProps> = ({
 
   // Text-to-Speech via la fonction Edge azure-speech-tts
   const handleGenerateAudio = async () => {
-    if (!apiKey) {
-      toast.error('Clé API Gemini requise pour l\'audio');
-      return;
-    }
-
     let textToSpeak = '';
     if (selectedChapterForAudio === 'preface') {
       textToSpeak = preface;
@@ -256,43 +251,45 @@ export const EbookStatisticsTools: React.FC<EbookStatisticsToolsProps> = ({
       return;
     }
 
-    // Limiter à 4096 caractères
-    if (textToSpeak.length > 4096) {
-      textToSpeak = textToSpeak.substring(0, 4096);
-      toast.info('Texte tronqué (limite API)');
-    }
-
     setIsGeneratingAudio(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke('azure-speech-tts', {
-        body: { text: textToSpeak, voice: 'fr-FR-DeniseNeural' },
+      const { audioBlobs, errors } = await requestTtsAudioChunks({
+        text: textToSpeak,
+        voiceName: 'fr-FR-DeniseNeural',
+        maxFailures: 1,
       });
 
-      if (error) throw error;
-
-      // The edge function returns base64 audio
-      if (data?.audioContent) {
-        const audioBytes = Uint8Array.from(atob(data.audioContent), c => c.charCodeAt(0));
-        const audioBlob = new Blob([audioBytes], { type: 'audio/mp3' });
-        const audioUrl = URL.createObjectURL(audioBlob);
-        const audio = new Audio(audioUrl);
-        
-        audio.onended = () => {
-          setIsPlayingAudio(false);
-          URL.revokeObjectURL(audioUrl);
-        };
-
-        setCurrentAudio(audio);
-        audio.play();
-        setIsPlayingAudio(true);
-        toast.success('Audio généré !');
-      } else {
-        throw new Error('Pas de contenu audio retourné');
+      if (currentAudio) {
+        currentAudio.pause();
       }
-    } catch (error) {
+
+      const audioBlob = combineMp3Blobs(audioBlobs);
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+
+      audio.onended = () => {
+        setIsPlayingAudio(false);
+        URL.revokeObjectURL(audioUrl);
+      };
+
+      audio.onerror = () => {
+        setIsPlayingAudio(false);
+        URL.revokeObjectURL(audioUrl);
+      };
+
+      setCurrentAudio(audio);
+      await audio.play();
+      setIsPlayingAudio(true);
+
+      if (errors.length > 0) {
+        toast.info('Audio généré partiellement');
+      } else {
+        toast.success('Audio généré !');
+      }
+    } catch (error: any) {
       console.error('TTS error:', error);
-      toast.error('Erreur lors de la génération audio');
+      toast.error(error?.message || 'Erreur lors de la génération audio');
     } finally {
       setIsGeneratingAudio(false);
     }
