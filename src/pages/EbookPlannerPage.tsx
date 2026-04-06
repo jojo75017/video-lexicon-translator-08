@@ -1454,6 +1454,18 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
         );
 
       case 'workflow-dashboard':
+        if (viewMode === 'trello') {
+          return (
+            <TrelloBoardView
+              ebookTitle={ebookTitle}
+              onNavigate={(tabId) => setActiveTab(tabId)}
+              onSwitchToClassic={() => {
+                setViewMode('classic');
+                localStorage.setItem('ebook_view_mode', 'classic');
+              }}
+            />
+          );
+        }
         return (
           <WorkflowDashboard
             ebookTitle={ebookTitle}
