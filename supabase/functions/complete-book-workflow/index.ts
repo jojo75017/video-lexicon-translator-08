@@ -740,9 +740,39 @@ function getP4GenerationSettings(numberOfChapters: number) {
     maxWords: isVeryLargeProject ? 1900 : 3500,
     minScore: isVeryLargeProject ? 7 : 8,
     maxRetries: isVeryLargeProject ? 0 : 1,
-    previousChapterChars: isVeryLargeProject ? 140 : 400,
+    previousChapterChars: isVeryLargeProject ? 400 : 800,
     segmentCount: isVeryLargeProject ? 2 : 1,
   };
+}
+
+/**
+ * Génère un résumé synthétique du manuscrit après P4 pour donner aux agents P5-P15
+ * une vision globale sans envoyer tout le contenu brut.
+ */
+function buildManuscriptSummary(chapitres: any[], title: string, category: string, characters: any[]): string {
+  if (!chapitres || chapitres.length === 0) return '';
+  
+  const chapterSummaries = chapitres.map((ch: any) => {
+    const content = ch.contenu || ch.content || '';
+    // Prendre les 1200 premiers caractères par chapitre (au lieu de 140-400)
+    const excerpt = content.substring(0, 1200);
+    return `Ch.${ch.numero} "${ch.titre || ch.title}": ${excerpt}${content.length > 1200 ? '...' : ''}`;
+  }).join('\n\n');
+  
+  const personnagesList = characters.length > 0
+    ? `\nPERSONNAGES : ${characters.map((c: any) => `${c.name} (${c.role})`).join(', ')}`
+    : '';
+  
+  return `
+=== BIBLE DU LIVRE ===
+TITRE : "${title}"
+CATÉGORIE : ${category}${personnagesList}
+NOMBRE DE CHAPITRES : ${chapitres.length}
+MOTS TOTAL : ~${chapitres.reduce((acc: number, ch: any) => acc + (ch.nombreMots || (ch.contenu || ch.content || '').split(/\s+/).length), 0)}
+
+=== RÉSUMÉ PAR CHAPITRE ===
+${chapterSummaries}
+`.trim();
 }
 
 serve(async (req) => {
@@ -1453,12 +1483,17 @@ Retourne en JSON :
 
       case 'P5': {
         const chapitres = previousContext.P4?.chapitres || [];
+        const personnagesP3 = previousContext.P3?.personnages || [];
+        const manuscriptCtx = buildManuscriptSummary(chapitres, fullTitle, category, personnagesP3);
         const echantillons = chapitres.slice(0, 5).map((ch: any) => 
-          `Ch.${ch.numero} "${ch.titre}": ${(ch.contenu || '').substring(0, 500)}`
+          `Ch.${ch.numero} "${ch.titre}": ${(ch.contenu || '').substring(0, 1200)}`
         ).join('\n\n');
         
         const { content, qualityScore, attempts } = await callAIWithQualityLoop(
-          `Tu es un RÉÉCRIVAIN expert. Tu détectes et élimines tout pattern "IA". Tu ajoutes de la vie, des tournures naturelles, du rythme humain.`,
+          `Tu es un RÉÉCRIVAIN expert. Tu détectes et élimines tout pattern "IA". Tu ajoutes de la vie, des tournures naturelles, du rythme humain.
+
+CONTEXTE DU MANUSCRIT COMPLET :
+${manuscriptCtx}`,
           `Analyse ces extraits et donne des conseils d'humanisation CONCRETS :
 
 EXTRAITS :
@@ -1489,12 +1524,18 @@ JSON :
       }
 
       case 'P6': {
+        const chapitresP6 = previousContext.P4?.chapitres || [];
+        const personnagesP6 = previousContext.P3?.personnages || [];
+        const manuscriptCtxP6 = buildManuscriptSummary(chapitresP6, fullTitle, category, personnagesP6);
         const { content, qualityScore } = await callAIWithQualityLoop(
-          `Tu es un CORRECTEUR-ÉDITEUR de maison d'édition. Exigeant, méthodique. Tu vérifies tout : grammaire, cohérence, style, rythme. Chaque faiblesse est identifiée avec une solution.`,
+          `Tu es un CORRECTEUR-ÉDITEUR de maison d'édition. Exigeant, méthodique. Tu vérifies tout : grammaire, cohérence, style, rythme. Chaque faiblesse est identifiée avec une solution.
+
+CONTEXTE DU MANUSCRIT :
+${manuscriptCtxP6}`,
           `Analyse la qualité éditoriale COMPLÈTE :
 TITRE : "${title}"
 VISION : ${JSON.stringify(previousContext.P1 || {})}
-CHAPITRES : ${(previousContext.P4?.chapitres || []).length}
+CHAPITRES : ${chapitresP6.length}
 STRUCTURE : ${JSON.stringify(previousContext.P3 || {})}
 
 JSON :
@@ -1615,8 +1656,14 @@ JSON :
       }
 
       case 'P10': {
+        const chapitresP10 = previousContext.P4?.chapitres || [];
+        const personnagesP10 = previousContext.P3?.personnages || [];
+        const manuscriptCtxP10 = buildManuscriptSummary(chapitresP10, fullTitle, category, personnagesP10);
         const content = await callAI(
-          `Tu es un expert en TRANSITIONS NARRATIVES. Tu vérifies que les chapitres s'enchaînent naturellement.`,
+          `Tu es un expert en TRANSITIONS NARRATIVES. Tu vérifies que les chapitres s'enchaînent naturellement.
+
+CONTEXTE DU MANUSCRIT :
+${manuscriptCtxP10}`,
           `Analyse les transitions :
 STRUCTURE : ${JSON.stringify(previousContext.P3?.chapitres || [])}
 MÉMOIRE : ${JSON.stringify(previousContext.P9 || {})}
@@ -1765,6 +1812,9 @@ JSON (VERDICT HONNÊTE) :
           break;
         }
 
+        const personnagesP15 = previousContext.P3?.personnages || [];
+        const manuscriptCtxP15 = buildManuscriptSummary(chapitresList, fullTitle, category, personnagesP15);
+
         const echantillon = chapitresList.slice(0, 3).map((ch: any) => 
           `### ${ch.titre || ch.title || 'Chapitre'}\n${(ch.contenu || ch.content || '').substring(0, 1500)}`
         ).join('\n\n---\n\n');
@@ -1772,6 +1822,8 @@ JSON (VERDICT HONNÊTE) :
         const content = await callAI(
           `Tu es un EXPERT EN HUMANISATION DE TEXTE. Mission : rendre le texte INDÉTECTABLE par GPTZero, Originality.ai, Turnitin.
 
+CONTEXTE DU MANUSCRIT :
+${manuscriptCtxP15}
 TECHNIQUES :
 1. VARIABILITÉ SYNTAXIQUE : phrases courtes et longues alternées
 2. IMPERFECTIONS NATURELLES : tournures familières, expressions idiomatiques
