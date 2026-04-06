@@ -1,6 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { encode as base64Encode } from "https://deno.land/std@0.168.0/encoding/base64.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -14,8 +13,8 @@ const ELEVENLABS_TEXT_LIMIT = 5000;
 const OPENAI_TEXT_LIMIT = 4000;
 const AZURE_TEXT_LIMIT = 5000;
 
-const jsonResponse = (payload: unknown, status = 200) =>
-  new Response(JSON.stringify(payload), {
+const errorResponse = (message: string, status = 500) =>
+  new Response(JSON.stringify({ error: message }), {
     status,
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   });
@@ -49,7 +48,7 @@ const generateWithElevenLabs = async (text: string, voiceId?: string, modelId?: 
     throw new Error(`ELEVENLABS_ERROR_${response.status}:${errorText}`);
   }
 
-  return await response.arrayBuffer();
+  return response;
 };
 
 // === PROVIDER 2: Azure Neural Speech ===
@@ -61,7 +60,6 @@ const generateWithAzure = async (text: string) => {
   const truncated = text.substring(0, AZURE_TEXT_LIMIT);
   console.log(`Azure TTS fallback: region=${AZURE_SPEECH_REGION}, len=${truncated.length}`);
 
-  // Escape XML
   const escaped = truncated
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -75,7 +73,6 @@ const generateWithAzure = async (text: string) => {
   </voice>
 </speak>`;
 
-  // Get token
   const tokenRes = await fetch(
     `https://${AZURE_SPEECH_REGION}.api.cognitive.microsoft.com/sts/v1.0/issueToken`,
     {
@@ -91,7 +88,6 @@ const generateWithAzure = async (text: string) => {
 
   const accessToken = await tokenRes.text();
 
-  // Call TTS
   const ttsRes = await fetch(
     `https://${AZURE_SPEECH_REGION}.tts.speech.microsoft.com/cognitiveservices/v1`,
     {
@@ -111,7 +107,7 @@ const generateWithAzure = async (text: string) => {
     throw new Error(`Azure TTS error ${ttsRes.status}: ${errText}`);
   }
 
-  return await ttsRes.arrayBuffer();
+  return ttsRes;
 };
 
 // === PROVIDER 3: OpenAI TTS ===
@@ -140,7 +136,7 @@ const generateWithOpenAI = async (text: string) => {
     throw new Error(`OpenAI TTS error ${response.status}: ${errorText}`);
   }
 
-  return await response.arrayBuffer();
+  return response;
 };
 
 serve(async (req) => {
@@ -151,7 +147,7 @@ serve(async (req) => {
   try {
     const authHeader = req.headers.get('Authorization');
     if (!authHeader?.startsWith('Bearer ')) {
-      return jsonResponse({ error: 'Authentification requise' }, 401);
+      return errorResponse('Authentification requise', 401);
     }
 
     const supabase = createClient(
@@ -163,7 +159,7 @@ serve(async (req) => {
     const { data: { user }, error: userError } = await supabase.auth.getUser();
 
     if (userError || !user) {
-      return jsonResponse({ error: 'Token invalide ou expiré' }, 401);
+      return errorResponse('Token invalide ou expiré', 401);
     }
 
     console.log(`User: ${user.id}`);
@@ -171,42 +167,44 @@ serve(async (req) => {
     const { text, voiceId, modelId } = await req.json();
 
     if (typeof text !== 'string' || !text.trim()) {
-      return jsonResponse({ error: 'Le texte est requis' }, 400);
+      return errorResponse('Le texte est requis', 400);
     }
     if (text.length > MAX_TEXT_LENGTH) {
-      return jsonResponse({ error: `Texte trop long (max ${MAX_TEXT_LENGTH})` }, 400);
+      return errorResponse(`Texte trop long (max ${MAX_TEXT_LENGTH})`, 400);
     }
 
-    let audioBuffer: ArrayBuffer;
+    let audioResponse: Response;
     let provider = 'elevenlabs';
 
     // === FALLBACK CHAIN: ElevenLabs → Azure → OpenAI ===
     try {
-      audioBuffer = await generateWithElevenLabs(text, voiceId, modelId);
+      audioResponse = await generateWithElevenLabs(text, voiceId, modelId);
     } catch (elError) {
       const msg = elError instanceof Error ? elError.message : String(elError);
       console.warn('ElevenLabs failed:', msg);
 
-      // Try Azure
       try {
-        audioBuffer = await generateWithAzure(text);
+        audioResponse = await generateWithAzure(text);
         provider = 'azure-fallback';
       } catch (azError) {
         console.warn('Azure failed:', azError instanceof Error ? azError.message : azError);
-
-        // Try OpenAI as last resort
-        audioBuffer = await generateWithOpenAI(text);
+        audioResponse = await generateWithOpenAI(text);
         provider = 'openai-fallback';
       }
     }
 
-    // Use Deno's native base64 encoding (no CPU timeout)
-    const base64Audio = base64Encode(audioBuffer);
-    console.log(`TTS OK [${provider}]: ${audioBuffer.byteLength} bytes`);
+    // Stream binary audio directly — no base64, no memory spike
+    console.log(`TTS OK [${provider}]: streaming binary response`);
 
-    return jsonResponse({ audioContent: base64Audio, provider });
+    return new Response(audioResponse.body, {
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'audio/mpeg',
+        'X-TTS-Provider': provider,
+      },
+    });
   } catch (error) {
     console.error('TTS fatal error:', error);
-    return jsonResponse({ error: error instanceof Error ? error.message : 'Erreur inconnue' }, 500);
+    return errorResponse(error instanceof Error ? error.message : 'Erreur inconnue', 500);
   }
 });
