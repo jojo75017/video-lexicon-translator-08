@@ -35,6 +35,7 @@ interface ModernSidebarProps {
   onTabChange: (tab: string) => void;
   isCollapsed: boolean;
   onToggleCollapse: () => void;
+  onSwitchToTrello?: () => void;
 }
 
 interface MenuItem {
