@@ -95,6 +95,7 @@ import { WorkflowStepWrapper } from '@/components/ebook/WorkflowStepWrapper';
 import { WorkflowOnboarding } from '@/components/ebook/WorkflowOnboarding';
 import { WorkflowDashboard } from '@/components/ebook/WorkflowDashboard';
 import { WorkflowExportCompiled } from '@/components/ebook/WorkflowExportCompiled';
+import { TrelloBoardView } from '@/components/ebook/TrelloBoardView';
 import { useConfetti } from '@/hooks/useConfetti';
 import { useDemoMode } from '@/hooks/useDemoMode';
 import { DemoBanner } from '@/components/ebook/DemoBanner';
@@ -353,6 +354,11 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
     } catch {}
   }, [activeTab]);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [viewMode, setViewMode] = useState<'trello' | 'classic'>(() => {
+    try {
+      return (localStorage.getItem('ebook_view_mode') as 'trello' | 'classic') || 'trello';
+    } catch { return 'trello'; }
+  });
   const [showWelcome, setShowWelcome] = useState(location.state?.fromFormation || false);
   const [showTutorial, setShowTutorial] = useState(location.state?.fromFormation || false);
 
@@ -1448,6 +1454,18 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
         );
 
       case 'workflow-dashboard':
+        if (viewMode === 'trello') {
+          return (
+            <TrelloBoardView
+              ebookTitle={ebookTitle}
+              onNavigate={(tabId) => setActiveTab(tabId)}
+              onSwitchToClassic={() => {
+                setViewMode('classic');
+                localStorage.setItem('ebook_view_mode', 'classic');
+              }}
+            />
+          );
+        }
         return (
           <WorkflowDashboard
             ebookTitle={ebookTitle}
@@ -3583,14 +3601,35 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   return (
     <div className="min-h-screen flex bg-background">
       <OnboardingGuide />
-      <ModernSidebar 
-        activeTab={activeTab}
-        onTabChange={handleTabChange}
-        isCollapsed={sidebarCollapsed}
-        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-      />
+      {viewMode !== 'trello' && (
+        <ModernSidebar 
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+          isCollapsed={sidebarCollapsed}
+          onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+          onSwitchToTrello={() => {
+            setViewMode('trello');
+            localStorage.setItem('ebook_view_mode', 'trello');
+            setActiveTab('workflow-dashboard');
+          }}
+        />
+      )}
 
       <main className="flex-1 overflow-y-auto">
+        {/* Back to board button in trello mode */}
+        {viewMode === 'trello' && activeTab !== 'workflow-dashboard' && (
+          <div className="bg-card border-b border-border px-6 py-3 flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setActiveTab('workflow-dashboard')}
+              className="rounded-xl text-sm hover:bg-background"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Retour au tableau
+            </Button>
+          </div>
+        )}
         {/* Hero Header — Dark Premium 2026 */}
         <div className="relative overflow-hidden bg-background border-b border-border">
           {/* Subtle glow effects */}

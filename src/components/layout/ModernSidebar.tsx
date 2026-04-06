@@ -35,6 +35,7 @@ interface ModernSidebarProps {
   onTabChange: (tab: string) => void;
   isCollapsed: boolean;
   onToggleCollapse: () => void;
+  onSwitchToTrello?: () => void;
 }
 
 interface MenuItem {
@@ -456,7 +457,8 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
   activeTab,
   onTabChange,
   isCollapsed,
-  onToggleCollapse
+  onToggleCollapse,
+  onSwitchToTrello
 }) => {
   const navigate = useNavigate();
   const { isDark, toggleTheme } = useTheme();
@@ -760,43 +762,55 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
           <QuotaDisplay isCollapsed={isCollapsed} />
         </div>
 
-        {/* Collapse toggle */}
-        <div className="p-2 border-t border-border flex gap-1">
-          {isCollapsed && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={toggleTheme}
-                  className="flex-1 h-10 rounded-xl hover:bg-card"
-                >
-                  {isDark ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className="w-4 h-4 text-muted-foreground" />}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="right">
-                {isDark ? 'Mode clair' : 'Mode sombre'}
-              </TooltipContent>
-            </Tooltip>
+        <div className="p-2 border-t border-border flex flex-col gap-1">
+          {onSwitchToTrello && !isCollapsed && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onSwitchToTrello}
+              className="w-full h-9 flex items-center gap-2 rounded-xl hover:bg-card text-xs"
+            >
+              <LayoutDashboard className="w-4 h-4 text-primary" />
+              <span className="text-muted-foreground">Mode Tableau</span>
+            </Button>
           )}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onToggleCollapse}
-            className={cn(
-              "h-10 flex items-center gap-2 rounded-xl hover:bg-card",
-              isCollapsed ? "flex-1 justify-center" : "w-full"
+          <div className="flex gap-1">
+            {isCollapsed && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={toggleTheme}
+                    className="flex-1 h-10 rounded-xl hover:bg-card"
+                  >
+                    {isDark ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className="w-4 h-4 text-muted-foreground" />}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="right">
+                  {isDark ? 'Mode clair' : 'Mode sombre'}
+                </TooltipContent>
+              </Tooltip>
             )}
-          >
-            {isCollapsed ? (
-              <ChevronRight className="w-4 h-4 text-muted-foreground" />
-            ) : (
-              <>
-                <ChevronLeft className="w-4 h-4 text-muted-foreground" />
-                <span className="text-xs text-muted-foreground">Réduire</span>
-              </>
-            )}
-          </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onToggleCollapse}
+              className={cn(
+                "h-10 flex items-center gap-2 rounded-xl hover:bg-card",
+                isCollapsed ? "flex-1 justify-center" : "w-full"
+              )}
+            >
+              {isCollapsed ? (
+                <ChevronRight className="w-4 h-4 text-muted-foreground" />
+              ) : (
+                <>
+                  <ChevronLeft className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-xs text-muted-foreground">Réduire</span>
+                </>
+              )}
+            </Button>
+          </div>
         </div>
       </aside>
     </TooltipProvider>
