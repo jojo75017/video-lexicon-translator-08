@@ -188,7 +188,7 @@ const mergeAudioBlobsToMp3 = async (
       throw new Error('Le fichier MP3 fusionné est vide');
     }
 
-    return new Blob([bytes], { type: 'audio/mpeg' });
+    return new Blob([bytes.buffer], { type: 'audio/mpeg' });
   } finally {
     ffmpeg.off('progress', progressHandler);
 
