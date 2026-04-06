@@ -20,6 +20,8 @@ import jsPDF from 'jspdf';
 import { Document, Packer, Paragraph, TextRun, HeadingLevel } from 'docx';
 import { saveAs } from 'file-saver';
 import JSZip from 'jszip';
+import { FFmpeg } from '@ffmpeg/ffmpeg';
+import { fetchFile, toBlobURL } from '@ffmpeg/util';
 import { supabase } from '@/integrations/supabase/client';
 import { generateIntroJingle, generateIntroForExport } from '@/utils/audioIntroGenerator';
 import { cleanForAudio, detectAudioArtifacts } from '@/utils/textCleaner';
@@ -88,6 +90,119 @@ const ELEVENLABS_VOICES_LIST = [
   { id: 'CwhRBWXzGAHq8TQ4Fs17', name: 'Roger (Classique)', lang: 'fr' },
   { id: 'SAz9YHcvj6GT2YYXdXww', name: 'River (Non-binaire)', lang: 'fr' },
 ];
+
+const FFMPEG_CORE_BASE_URL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
+
+let ffmpegInstance: FFmpeg | null = null;
+let ffmpegLoadPromise: Promise<FFmpeg> | null = null;
+
+const writeBlobToFfmpeg = async (ffmpeg: FFmpeg, fileName: string, blob: Blob) => {
+  await ffmpeg.writeFile(fileName, await fetchFile(blob));
+};
+
+const loadAudioMerger = async (): Promise<FFmpeg> => {
+  if (ffmpegInstance?.loaded) return ffmpegInstance;
+
+  if (!ffmpegLoadPromise) {
+    ffmpegLoadPromise = (async () => {
+      const ffmpeg = ffmpegInstance ?? new FFmpeg();
+
+      if (!ffmpeg.loaded) {
+        const [coreURL, wasmURL] = await Promise.all([
+          toBlobURL(`${FFMPEG_CORE_BASE_URL}/ffmpeg-core.js`, 'text/javascript'),
+          toBlobURL(`${FFMPEG_CORE_BASE_URL}/ffmpeg-core.wasm`, 'application/wasm'),
+        ]);
+
+        await ffmpeg.load({ coreURL, wasmURL });
+      }
+
+      ffmpegInstance = ffmpeg;
+      return ffmpeg;
+    })().catch((error) => {
+      ffmpegLoadPromise = null;
+      throw error;
+    });
+  }
+
+  return ffmpegLoadPromise;
+};
+
+const mergeAudioBlobsToMp3 = async (
+  inputBlobs: Blob[],
+  options?: { outputFileName?: string; onProgress?: (progress: number) => void }
+): Promise<Blob> => {
+  const validBlobs = inputBlobs.filter((blob) => blob && blob.size > 0);
+
+  if (validBlobs.length === 0) {
+    throw new Error('Aucun segment audio à fusionner');
+  }
+
+  if (validBlobs.length === 1) {
+    return validBlobs[0];
+  }
+
+  const ffmpeg = await loadAudioMerger();
+  const jobId = `audio-merge-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const concatFileName = `${jobId}.txt`;
+  const outputFileName = options?.outputFileName || `${jobId}.mp3`;
+  const tempFiles = [concatFileName, outputFileName];
+  const progressHandler = ({ progress }: { progress: number }) => {
+    options?.onProgress?.(progress);
+  };
+
+  ffmpeg.on('progress', progressHandler);
+
+  try {
+    const inputFileNames: string[] = [];
+
+    for (let index = 0; index < validBlobs.length; index += 1) {
+      const fileName = `${jobId}-${String(index).padStart(3, '0')}.mp3`;
+      inputFileNames.push(fileName);
+      tempFiles.push(fileName);
+      await writeBlobToFfmpeg(ffmpeg, fileName, validBlobs[index]);
+    }
+
+    const concatManifest = inputFileNames.map((fileName) => `file '${fileName}'`).join('\n');
+    await ffmpeg.writeFile(concatFileName, new TextEncoder().encode(concatManifest));
+
+    const exitCode = await ffmpeg.exec([
+      '-f', 'concat',
+      '-safe', '0',
+      '-i', concatFileName,
+      '-vn',
+      '-ar', '48000',
+      '-ac', '1',
+      '-b:a', '192k',
+      '-c:a', 'libmp3lame',
+      outputFileName,
+    ], 180000);
+
+    if (exitCode !== 0) {
+      throw new Error(`Fusion audio impossible (code ${exitCode})`);
+    }
+
+    const outputData = await ffmpeg.readFile(outputFileName);
+    const bytes = outputData instanceof Uint8Array ? outputData : new Uint8Array();
+
+    if (!bytes.byteLength) {
+      throw new Error('Le fichier MP3 fusionné est vide');
+    }
+
+    return new Blob([bytes], { type: 'audio/mpeg' });
+  } finally {
+    ffmpeg.off('progress', progressHandler);
+
+    await Promise.all(
+      tempFiles.map(async (fileName) => {
+        try {
+          await ffmpeg.deleteFile(fileName);
+        } catch {
+          // noop
+        }
+      })
+    );
+  }
+};
 
 // Helper: encode AudioBuffer to WAV Blob for download
 function audioBufferToWavBlob(buffer: AudioBuffer): Blob {
@@ -661,7 +776,9 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
       console.warn(`Section audio générée partiellement: ${chunkErrors.length} chunk(s) ignoré(s)`);
     }
 
-    return new Blob(audioBlobs, { type: 'audio/mpeg' });
+    return await mergeAudioBlobsToMp3(audioBlobs, {
+      outputFileName: `section-${Date.now()}.mp3`,
+    });
   };
 
   // Export a single section as MP3
@@ -1569,10 +1686,15 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                             throw new Error('Aucun chapitre n’a pu être fusionné');
                           }
 
-                          setMp3ProgressLabel('Fusion audio...');
+                          setMp3ProgressLabel('Fusion audio MP3...');
                           setMp3Progress(95);
-                          const finalBlob = new Blob(allBlobs, { type: 'audio/mpeg' });
                           const filename = `${(ebookTitle || 'audiobook').replace(/\s+/g, '-')}-complet.mp3`;
+                          const finalBlob = await mergeAudioBlobsToMp3(allBlobs, {
+                            outputFileName: filename,
+                            onProgress: (progress) => {
+                              setMp3Progress(Math.max(95, Math.min(99, Math.round(95 + progress * 4))));
+                            },
+                          });
                           saveAs(finalBlob, filename);
 
                           // Persist in audiobook library for Elementor export
