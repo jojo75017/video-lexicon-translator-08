@@ -500,6 +500,66 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
     loadProjectsCount();
   }, []);
 
+  // Sauvegarde forcée périodique toutes les 60 secondes (filet de sécurité pour le workflow)
+  useEffect(() => {
+    const forceSaveInterval = setInterval(async () => {
+      const data = currentDataRef.current;
+      if (data.ebookTitle) {
+        try {
+          await saveProject({
+            title: data.ebookTitle, author_name: data.authorName, target_audience: data.targetAudience,
+            tome_number: data.tomeNumber, writing_style: data.writingStyle, chapter_length: data.chapterLength,
+            detail_level: data.detailLevel, tone: data.tone, narrative_format: data.narrativeFormat,
+            preface: data.preface, conclusion: data.conclusion, chapters: data.chapters,
+            characters: data.characters, ebook_images: data.ebookImages,
+            number_of_chapters: data.numberOfChapters, book_summary: data.bookSummary,
+            cover_concepts: data.coverConcepts, seo_optimization: data.seoOptimization,
+            kdp_description: data.kdpDescription, kdp_keywords: data.kdpKeywords, kdp_categories: data.kdpCategories,
+          }, false);
+          console.log('🔄 [Auto-save 60s] Projet sauvegardé');
+        } catch (err) {
+          console.error('❌ [Auto-save 60s] Erreur:', err);
+        }
+      }
+    }, 60000);
+    return () => clearInterval(forceSaveInterval);
+  }, [saveProject]);
+
+  // Sauvegarde avant fermeture/refresh de la page
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      const data = currentDataRef.current;
+      if (data.ebookTitle) {
+        try {
+          localStorage.setItem('ebook_pending_save', JSON.stringify({
+            title: data.ebookTitle, author_name: data.authorName, target_audience: data.targetAudience,
+            tome_number: data.tomeNumber, writing_style: data.writingStyle, chapter_length: data.chapterLength,
+            detail_level: data.detailLevel, tone: data.tone, narrative_format: data.narrativeFormat,
+            preface: data.preface, conclusion: data.conclusion, chapters: data.chapters,
+            characters: data.characters, ebook_images: data.ebookImages,
+            number_of_chapters: data.numberOfChapters, book_summary: data.bookSummary,
+            cover_concepts: data.coverConcepts, seo_optimization: data.seoOptimization,
+            kdp_description: data.kdpDescription, kdp_keywords: data.kdpKeywords, kdp_categories: data.kdpCategories,
+          }));
+        } catch {}
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, []);
+
+  // Récupérer la sauvegarde en attente au chargement
+  useEffect(() => {
+    const pending = localStorage.getItem('ebook_pending_save');
+    if (pending) {
+      try {
+        const projectData = JSON.parse(pending);
+        localStorage.removeItem('ebook_pending_save');
+        saveProject(projectData, false);
+      } catch {}
+    }
+  }, []);
+
   // Fonction pour nettoyer les images base64 volumineuses du contenu avant localStorage
   // Garde les URLs cloud [IMAGE_URL:https://...] mais supprime les base64
   const stripBase64ImagesFromContent = (text: string): string => {
