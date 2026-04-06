@@ -37,7 +37,7 @@ export const TRELLO_COLUMNS: TrelloColumn[] = [
       { id: 'market-analysis', label: 'P2 · Jano — Marché', icon: Search, isWorkflowStep: true, requiredSteps: ['P1'], isPro: true },
       { id: 'content-architect', label: 'P3 · Kiro — Plan', icon: LayoutDashboard, isWorkflowStep: true, requiredSteps: ['P1', 'P2'], isPro: true },
       { id: 'expert-writing', label: 'P4 · Alia — Rédaction', icon: PenTool, isWorkflowStep: true, requiredSteps: ['P3'], isPro: true },
-      { id: 'planner', label: 'Plan du livre', icon: FileText },
+      { id: 'planner', label: 'Formulaire manuel', icon: FileText },
       { id: 'writing', label: 'Écrire les chapitres', icon: PenTool },
       { id: 'characters', label: 'Personnages', icon: Users },
       { id: 'aichat', label: 'Assistant IA', icon: Bot },

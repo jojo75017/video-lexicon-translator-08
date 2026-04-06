@@ -90,24 +90,36 @@ export const TrelloBoardView: React.FC<TrelloBoardViewProps> = ({
           </div>
         </div>
 
-        {/* CTA - Start workflow */}
-        {completedCount === 0 && (
-          <div className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-2xl border border-primary/20 p-6 flex flex-col sm:flex-row items-center gap-4">
-            <div className="flex-1">
-              <h3 className="text-lg font-bold text-foreground mb-1">🚀 Prêt à créer ton livre ?</h3>
-              <p className="text-sm text-muted-foreground">
-                Commence par l'agent <strong>Zyro (P1)</strong> pour définir ta niche et ton titre. Le workflow te guidera ensuite étape par étape.
-              </p>
-            </div>
+        {/* CTA - Workflow actions (always visible) */}
+        <div className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-2xl border border-primary/20 p-5 flex flex-col sm:flex-row items-center gap-4">
+          <div className="flex-1">
+            <h3 className="text-lg font-bold text-foreground mb-1">
+              {completedCount === 0 ? '🚀 Prêt à créer ton livre ?' : '🚀 Continue ton workflow'}
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              {completedCount === 0
+                ? 'Commence par l\'agent Zyro (P1) pour définir ta niche et ton titre.'
+                : `${completedCount}/${totalAgents} agents terminés. Continue avec l'étape suivante.`}
+            </p>
+          </div>
+          <div className="flex items-center gap-2 flex-wrap">
             <Button
               onClick={() => onNavigate('editorial-director')}
               className="rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 whitespace-nowrap"
             >
               <Play className="w-4 h-4 mr-2" />
-              Démarrer le Workflow
+              {completedCount === 0 ? 'Démarrer le Workflow' : 'Continuer le Workflow'}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => onNavigate('complete-workflow')}
+              className="rounded-xl border-border whitespace-nowrap"
+            >
+              <Sparkles className="w-4 h-4 mr-2" />
+              Workflow complet
             </Button>
           </div>
-        )}
+        </div>
 
         {/* Progress bar */}
         <div className="bg-card rounded-2xl border border-border p-4">
