@@ -123,6 +123,29 @@ export const SubscriptionAuth = ({ onAuthenticated }: SubscriptionAuthProps) => 
       if (error) throw error;
 
       if (data.valid) {
+        // Step 2: Create/sign-in a real auth session for this subscriber
+        try {
+          const { data: authData, error: authError } = await supabase.functions.invoke('subscriber-auth', {
+            body: {
+              email: normalizedEmail,
+              access_code: normalizedCode
+            }
+          });
+
+          if (!authError && authData?.access_token && authData?.refresh_token) {
+            // Set the session in Supabase client
+            await supabase.auth.setSession({
+              access_token: authData.access_token,
+              refresh_token: authData.refresh_token,
+            });
+            console.log('✅ Session auth créée pour abonné:', normalizedEmail);
+          } else {
+            console.warn('⚠️ Auth session creation failed, continuing without persistent save:', authError);
+          }
+        } catch (authErr) {
+          console.warn('⚠️ subscriber-auth call failed, continuing:', authErr);
+        }
+
         localStorage.setItem('subscriber_email', normalizedEmail);
         localStorage.setItem('subscriber_data', JSON.stringify(data.subscriber));
         localStorage.setItem('ebook_planner_active_tab', 'workflow-dashboard');

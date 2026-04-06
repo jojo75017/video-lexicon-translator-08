@@ -127,7 +127,11 @@ export const useEbookDatabase = () => {
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
-        console.log('⚠️ [saveProject] Impossible de sauvegarder: utilisateur non connecté');
+        console.warn('⚠️ [saveProject] Impossible de sauvegarder: utilisateur non connecté (pas de session auth)');
+        toast.error('Session expirée ou absente', {
+          description: 'Connectez-vous pour sauvegarder vos projets en base de données. Vos données sont conservées localement en attendant.',
+          duration: 8000,
+        });
         return null;
       }
 
