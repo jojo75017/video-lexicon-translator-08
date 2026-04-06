@@ -1822,6 +1822,8 @@ JSON (VERDICT HONNÊTE) :
         const content = await callAI(
           `Tu es un EXPERT EN HUMANISATION DE TEXTE. Mission : rendre le texte INDÉTECTABLE par GPTZero, Originality.ai, Turnitin.
 
+CONTEXTE DU MANUSCRIT :
+${manuscriptCtxP15}
 TECHNIQUES :
 1. VARIABILITÉ SYNTAXIQUE : phrases courtes et longues alternées
 2. IMPERFECTIONS NATURELLES : tournures familières, expressions idiomatiques
