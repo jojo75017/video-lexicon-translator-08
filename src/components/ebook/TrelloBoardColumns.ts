@@ -3,9 +3,9 @@ import {
   Shield, Brain, GitBranch, Eye, RefreshCw, Fingerprint, Award,
   Palette, Download, Headphones, Image, FileText, TrendingUp,
   ClipboardCheck, MessageSquare, Rocket, Target, DollarSign,
-  BarChart3, FolderOpen, CreditCard, Settings, BookOpen,
-  Users, Bot, Mic, Video, Globe, Gauge, Calculator,
-  Monitor, Play, Glasses, Wand2, Camera, BookCopy,
+  BarChart3, FolderOpen, CreditCard, Settings,
+  Users, Bot, Video, Globe, Gauge, Calculator,
+  Monitor, Play, Glasses, Camera,
   type LucideIcon
 } from 'lucide-react';
 

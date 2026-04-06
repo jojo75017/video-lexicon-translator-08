@@ -1,12 +1,11 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import {
-  CheckCircle2, Lock, Clock, Play, LayoutList, Search,
-  FolderOpen, CreditCard, Settings, Sparkles
+  CheckCircle2, Lock, Clock, Play, LayoutList, Search, Sparkles
 } from 'lucide-react';
 import { useWorkflowResults } from '@/hooks/useWorkflowResults';
 import {
@@ -15,7 +14,6 @@ import {
   COLUMN_COLORS,
   ACCOUNT_QUICK_ITEMS,
   type TrelloCard,
-  type TrelloColumn,
 } from './TrelloBoardColumns';
 
 interface TrelloBoardViewProps {
