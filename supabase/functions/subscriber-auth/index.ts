@@ -101,9 +101,13 @@ serve(async (req) => {
       // Maybe user exists with different password (edge case: code was changed)
       // Try updating the password
       if (createError.message?.includes('already been registered') || createError.message?.includes('already exists')) {
-        // Find user by email
-        const { data: { users } } = await adminClient.auth.admin.listUsers();
-        const existingUser = users?.find(u => u.email?.toLowerCase() === normalizedEmail);
+        // Find user by email using targeted lookup instead of listing all users
+        const { data: existingUserData } = await adminClient.auth.admin.listUsers({ 
+          filter: `email.eq.${normalizedEmail}`,
+          page: 1,
+          perPage: 1
+        });
+        const existingUser = existingUserData?.users?.[0];
         
         if (existingUser) {
           await adminClient.auth.admin.updateUserById(existingUser.id, { password });
