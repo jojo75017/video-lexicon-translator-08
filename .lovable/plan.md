@@ -1,46 +1,39 @@
 
 
-## Problème identifié
+## Problème
 
-L'intro du livre audio est kitsch et non professionnelle :
-- **Jingle "annonce de gare"** (3s de bruit synthétique WebAudio)
-- **"Bienvenue sur EbookStudio 2026"** — branding forcé
-- **"Attachez vos ceintures, l'aventure commence maintenant"** — phrase cliché
-- **Préface/Introduction réelle** non lue dans l'audio final
-- Le texte affiché dans le champ intro contient des marqueurs `🔊 [Ambiance sonore...]` qui polluent l'affichage
+1. **Préface/Introduction lue dans l'audio** alors que l'utilisateur n'en veut pas — le code inclut automatiquement le champ `introduction` comme segment audio séparé (lignes 288-304) ET le concatène aussi dans le texte nettoyé (ligne 194)
+2. **JSON résiduel au début du fichier audio** — le contenu des chapitres injecté depuis le workflow P1-P15 contient encore des fragments JSON bruts que `cleanForAudio` ne capture pas complètement
 
-## Plan de correction
+## Corrections
 
-### 1. Réécrire `audioIntroGenerator.ts` — Intro sobre et pro
+### 1. Supprimer la préface/introduction du pipeline audio
 
-Remplacer tout le script "immersif" par une intro simple et élégante :
-- **Segment unique** : `"{Titre}, par {Auteur}."` — point final, rien d'autre
-- Supprimer `generatePremiumJingle()` (le bruit de gare)
-- Supprimer `generateSilenceWav()` 
-- Supprimer le teaser 50 mots et "Attachez vos ceintures"
-- `generateIntroForExport` : retourne un seul blob TTS avec le titre+auteur
-- `buildIntroDisplayText` : retourne juste `"{Titre}, par {Auteur}."` sans emoji ni marqueurs
+**Fichier : `src/components/ebook/AudioExpressWorkflow.tsx`**
 
-### 2. Intégrer la préface dans le contenu audio — `AudioExpressWorkflow.tsx`
+- **Ligne 194** : Supprimer l'ajout de `brief.introduction` dans `handleCleanText` — le texte nettoyé ne doit contenir que les chapitres
+- **Lignes 288-304** : Supprimer entièrement le bloc "Préface / Introduction" dans `handleGenerateAudio` — plus de fichier `01-Preface.mp3`
+- **Ligne 120** : Supprimer l'initialisation `useState(preface || '')` — le champ introduction reste disponible mais n'est plus injecté dans l'audio
+- **Numérotation ZIP** : Les chapitres commencent à `01-` au lieu de `02-` (l'intro titre/auteur reste en `00-Intro.mp3`)
 
-Actuellement `handleCleanText` (A4) concatène introduction + chapitres, mais `handleGenerateAudio` (A7) ne prend que `cleanedText` qui peut ne pas inclure la préface séparément.
+### 2. Renforcer le nettoyage JSON dans `cleanForAudio`
 
-Correction :
-- Dans `handleGenerateAudio`, après l'intro titre/auteur, générer l'audio de la **préface** (`introduction` ou `preface` prop) comme premier segment avant les chapitres
-- Ajouter la préface comme fichier séparé dans le ZIP : `01-Preface.mp3`
-- Inclure la préface dans le blob fusionné
+**Fichier : `src/utils/textCleaner.ts`**
 
-### 3. Nettoyer le champ introduction par défaut
+- Ajouter en début de `cleanForAudio` un pré-nettoyage agressif qui détecte et supprime tout bloc JSON complet en début de texte (pattern `{...}` ou `[...]` avant le premier paragraphe de prose)
+- Ajouter un pattern pour supprimer les lignes qui commencent par des clés JSON typiques (`"titre":`, `"content":`, `"chapters":`, `"numero":`, etc.)
+- Renforcer la suppression des accolades/crochets orphelins et des fragments `json` en début de contenu
 
-- `buildDefaultIntro` ne doit plus appeler `buildIntroDisplayText` (qui ajoutait les marqueurs emoji)
-- Le champ texte "Introduction" dans A1 doit contenir le vrai texte de préface, pas le script d'intro
+### 3. Nettoyer le champ UI
+
+**Fichier : `src/components/ebook/AudioExpressWorkflow.tsx`**
+
+- Renommer le label du champ "Introduction / Résumé" en "Notes (non lu dans l'audio)" pour clarifier qu'il ne sera pas inclus dans la synthèse vocale
+- Ou supprimer complètement ce champ de l'interface A1 si non nécessaire
 
 ### Résultat attendu
 
-Ordre audio final :
-1. **Titre + Auteur** (3-5 secondes TTS)
-2. **Préface / Introduction** (texte complet, lu en entier)
-3. **Chapitre 1, 2, 3...** (contenu)
-
-Plus de jingle de gare, plus de "EbookStudio 2026", plus de "Attachez vos ceintures".
+- Audio : `00-Intro.mp3` (titre+auteur, 3s) → `01-Chapitre-1.mp3` → `02-Chapitre-2.mp3`...
+- Plus aucune préface/introduction lue
+- Plus de JSON audible dans le fichier audio
 
