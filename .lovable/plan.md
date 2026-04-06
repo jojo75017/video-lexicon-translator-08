@@ -1,37 +1,45 @@
 
 
-# Correction : Connexion admin impossible + erreur React
+# Refonte Dashboard Trello + Mon Compte toujours visible
 
-## 2 problèmes identifiés
+## Problème immédiat
+"Mon Compte" est le 5ème groupe de la sidebar, poussé sous le fold par les 127 outils au-dessus. Il faut scroller pour le trouver.
 
-### Problème 1 — Erreur React bloquante (priorité immédiate)
-L'erreur `"Should have a queue"` crash l'application au chargement de `EbookPlannerPage`. Elle vient de `useWorkflowCloudSync` appelé dans `useWorkflowResults`. Ce bug React se produit quand le nombre ou l'ordre des hooks change entre les renders — probablement causé par les modifications récentes de `useWorkflowResults.ts` qui ont ajouté l'appel à `useWorkflowCloudSync` en tant que hook interne destructuré différemment.
+## Solution : Dashboard Trello (déjà validé) + correctif rapide
 
-**Correction :** Dans `useWorkflowResults.ts`, s'assurer que `useWorkflowCloudSync()` est appelé inconditionnellement au tout début du hook (ce qui semble être le cas ligne 32, mais le HMR peut créer ce bug). Forcer un rebuild propre en ajoutant un commentaire de version ou en réorganisant légèrement l'import.
+### Correctif immédiat — Épingler "Mon Compte" en bas de la sidebar
+**Fichier : `src/components/layout/ModernSidebar.tsx`**
+- Sortir le groupe "Mon Compte" de la zone scrollable
+- L'épingler juste au-dessus du bouton "Réduire", toujours visible
+- Afficher seulement les items essentiels : Mes Projets, Abonnement, Paramètres (les autres restent accessibles en cliquant)
 
-### Problème 2 — Magic link admin échoue
-Les logs auth montrent `"One-time token not found"` et `"Email link is invalid or has expired"`. La cause : quand on est sur le preview (`id-preview--...lovable.app`), le `redirectTo` pointe vers ce domaine preview. Mais le lien dans l'email est cliqué depuis Gmail (IP Google `172.253.x.x`) ce qui pré-consomme le token OTP via un prefetch/link-preview avant que l'utilisateur ne clique réellement. Le second clic échoue car le token est déjà utilisé.
+### Dashboard Trello — Refonte complète (validée précédemment)
 
-**Correction :** Forcer `emailRedirectTo` vers l'URL publiée (`https://video-lexicon-translator-08.lovable.app/admin-direct`) dans TOUS les cas, pas seulement quand on détecte `lovableproject.com`. Cela évite les interférences du proxy preview.
+**Fichier 1 (nouveau) — `src/components/ebook/TrelloBoardColumns.ts`**
+- Configuration des 5 colonnes (Créer, Optimiser, Produire, Publier, Vendre)
+- Mapping de ~30 outils essentiels avec leurs prérequis et icônes
+- Items "Mon Compte" inclus en accès rapide en haut du tableau
 
-## Plan de correction
+**Fichier 2 (nouveau) — `src/components/ebook/TrelloBoardView.tsx`**
+- Tableau Kanban à 5 colonnes colorées
+- Cartes cliquables avec statuts (fait/en cours/dispo/bloqué)
+- Barre de progression globale en haut
+- Accès rapide "Mon Compte" (Projets, Paramètres, Abonnement) toujours visible en header
+- Bouton "Tous les outils (127)" et "Vue classique" en bas
 
-### Étape 1 — Corriger l'erreur React dans useWorkflowResults
-**Fichier :** `src/hooks/useWorkflowResults.ts`
-- Vérifier que `useWorkflowCloudSync()` est le tout premier appel après `useState`
-- Si le problème persiste, déplacer les appels cloud en dehors du hook (les passer en paramètre ou les appeler directement via import)
+**Fichier 3 — `src/pages/EbookPlannerPage.tsx`**
+- Ajouter `viewMode: 'trello' | 'classic'` persisté en localStorage (défaut: trello)
+- Mode trello : masquer sidebar, afficher TrelloBoardView
+- Clic sur carte → ouvre l'outil + header "← Retour au tableau"
+- Mode classic : comportement actuel inchangé
 
-### Étape 2 — Forcer le redirect vers l'URL publiée
-**Fichier :** `src/pages/AdminDirectPage.tsx`
-- Remplacer la logique conditionnelle du `redirectTo` par une constante fixe vers `https://video-lexicon-translator-08.lovable.app/admin-direct`
-- Supprimer la détection `lovableproject.com` / `window.location.origin` qui ne fonctionne pas correctement sur le preview
+**Fichier 4 — `src/components/layout/ModernSidebar.tsx`**
+- Épingler "Mon Compte" (3 items essentiels) en bas, hors zone de scroll
+- Ajouter prop `visible` pour masquer en mode trello
+- Ajouter bouton "Mode Tableau" en bas
 
-### Étape 3 — Même correction pour AuthPage
-**Fichier :** `src/pages/AuthPage.tsx`  
-- Appliquer la même URL de redirection fixe pour les OTP/magic links envoyés depuis la page auth standard
-
-### Résultat attendu
-- L'application ne crash plus au chargement
-- Le magic link admin redirige correctement vers l'app publiée
-- La connexion admin fonctionne de bout en bout
+## Résultat
+- "Mon Compte" toujours visible (plus besoin de scroller)
+- Vue par défaut = tableau Kanban clair avec 5 colonnes
+- Les 127 outils restent accessibles via "Tous les outils" ou "Vue classique"
 
