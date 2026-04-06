@@ -92,6 +92,25 @@ export function SubscriberGate({
         localStorage.setItem("subscriber_email", email);
         localStorage.setItem("subscriber_data", JSON.stringify(data.subscriber));
 
+        // Ensure a real auth session exists (needed for RLS-protected saves)
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          try {
+            const { data: authData } = await supabase.functions.invoke("subscriber-auth", {
+              body: { email, access_code: code },
+            });
+            if (authData?.access_token && authData?.refresh_token) {
+              await supabase.auth.setSession({
+                access_token: authData.access_token,
+                refresh_token: authData.refresh_token,
+              });
+              console.log("SubscriberGate: Auth session created for subscriber");
+            }
+          } catch (authErr) {
+            console.warn("SubscriberGate: Could not create auth session:", authErr);
+          }
+        }
+
         setAllowed(true);
         setChecking(false);
       } catch {

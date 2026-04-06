@@ -188,7 +188,7 @@ const mergeAudioBlobsToMp3 = async (
       throw new Error('Le fichier MP3 fusionné est vide');
     }
 
-    return new Blob([bytes.buffer], { type: 'audio/mpeg' });
+    return new Blob([bytes.buffer as ArrayBuffer], { type: 'audio/mpeg' });
   } finally {
     ffmpeg.off('progress', progressHandler);
 
@@ -1696,7 +1696,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                           }
 
                           if (allBlobs.length === 0) {
-                            throw new Error('Aucun chapitre n a pu etre fusionne');
+                            throw new Error('Aucun chapitre n\'a pu être fusionné');
                           }
 
                           // 1) Sauvegarder AVANT la fusion FFmpeg (blob brut concaténé)
