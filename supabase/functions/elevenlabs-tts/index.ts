@@ -174,23 +174,47 @@ serve(async (req) => {
     }
 
     let audioResponse: Response;
-    let provider = 'elevenlabs';
+    let provider = 'unknown';
 
-    // === FALLBACK CHAIN: ElevenLabs → Azure → OpenAI ===
-    try {
-      audioResponse = await generateWithElevenLabs(text, voiceId, modelId);
-    } catch (elError) {
-      const msg = elError instanceof Error ? elError.message : String(elError);
-      console.warn('ElevenLabs failed:', msg);
+    // === FALLBACK CHAIN: Azure (primary) → OpenAI → ElevenLabs ===
+    // Azure is primary because ElevenLabs free tier is blocked (401)
+    const AZURE_KEY = Deno.env.get('AZURE_SPEECH_KEY');
+    const ELEVENLABS_KEY = Deno.env.get('ELEVENLABS_API_KEY');
+    const OPENAI_KEY = Deno.env.get('OPENAI_API_KEY');
 
+    if (AZURE_KEY) {
       try {
         audioResponse = await generateWithAzure(text);
-        provider = 'azure-fallback';
+        provider = 'azure';
       } catch (azError) {
         console.warn('Azure failed:', azError instanceof Error ? azError.message : azError);
-        audioResponse = await generateWithOpenAI(text);
-        provider = 'openai-fallback';
+        if (OPENAI_KEY) {
+          audioResponse = await generateWithOpenAI(text);
+          provider = 'openai-fallback';
+        } else if (ELEVENLABS_KEY) {
+          audioResponse = await generateWithElevenLabs(text, voiceId, modelId);
+          provider = 'elevenlabs-fallback';
+        } else {
+          throw azError;
+        }
       }
+    } else if (ELEVENLABS_KEY) {
+      try {
+        audioResponse = await generateWithElevenLabs(text, voiceId, modelId);
+        provider = 'elevenlabs';
+      } catch (elError) {
+        if (OPENAI_KEY) {
+          audioResponse = await generateWithOpenAI(text);
+          provider = 'openai-fallback';
+        } else {
+          throw elError;
+        }
+      }
+    } else if (OPENAI_KEY) {
+      audioResponse = await generateWithOpenAI(text);
+      provider = 'openai';
+    } else {
+      return errorResponse('Aucun fournisseur TTS configuré', 500);
     }
 
     // Stream binary audio directly — no base64, no memory spike
