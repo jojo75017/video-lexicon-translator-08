@@ -1,56 +1,46 @@
 
-Do I know what the issue is? Oui.
 
-Problème exact :
-- Le crash ne vient plus seulement de `elevenlabs-tts`.
-- Les logs montrent maintenant que `supabase/functions/azure-speech-tts/index.ts` dépasse la mémoire sur des requêtes de ~4600–4800 caractères (`Memory limit exceeded`).
-- Le frontend envoie encore de trop gros chunks vers cette fonction dans :
-  - `src/components/ebook/AudioExpressWorkflow.tsx`
-  - `src/components/ebook/EbookAudioGenerator.tsx`
-  - `src/components/ebook/EbookFormationSeriesAudio.tsx`
-- Il y a aussi un composant incohérent : `src/components/ebook/EbookStatisticsTools.tsx` attend encore l’ancien format JSON/base64, alors que la fonction TTS renvoie maintenant de l’audio binaire.
+## Problème identifié
 
-Plan de correction :
-1. Durcir la fonction TTS backend
-- Fichier : `supabase/functions/azure-speech-tts/index.ts`
-- Ajouter une validation stricte des entrées.
-- Réduire la taille maximale réellement acceptée par requête à une valeur sûre.
-- Baisser le format audio Azure pour réduire la mémoire.
-- Garder une seule forme de réponse : binaire `audio/mpeg`.
-- Retourner une erreur claire si le texte est trop long au lieu de laisser planter le worker.
+L'intro du livre audio est kitsch et non professionnelle :
+- **Jingle "annonce de gare"** (3s de bruit synthétique WebAudio)
+- **"Bienvenue sur EbookStudio 2026"** — branding forcé
+- **"Attachez vos ceintures, l'aventure commence maintenant"** — phrase cliché
+- **Préface/Introduction réelle** non lue dans l'audio final
+- Le texte affiché dans le champ intro contient des marqueurs `🔊 [Ambiance sonore...]` qui polluent l'affichage
 
-2. Réduire fortement le chunking côté client
-- Fichier : `src/utils/ttsChunker.ts`
-- Passer d’un découpage à `4800` caractères à une taille bien plus petite et stable.
-- Garder le découpage par phrases/paragraphes, mais avec une limite orientée fiabilité.
+## Plan de correction
 
-3. Uniformiser tous les appels audio
-- Fichiers :
-  - `src/components/ebook/AudioExpressWorkflow.tsx`
-  - `src/components/ebook/EbookAudioGenerator.tsx`
-  - `src/components/ebook/EbookFormationSeriesAudio.tsx`
-- Utiliser partout le même flux `fetch -> response.blob()`.
-- Vérifier `response.ok`, `content-type` et `blob.size`.
-- Stopper proprement la génération si trop de segments échouent, sans casser l’écran.
+### 1. Réécrire `audioIntroGenerator.ts` — Intro sobre et pro
 
-4. Corriger le module resté sur l’ancien contrat
-- Fichier : `src/components/ebook/EbookStatisticsTools.tsx`
-- Remplacer la logique `data.audioContent` base64 par le même traitement binaire que les autres écrans.
-- Si ce module n’est pas prioritaire, le désactiver temporairement pour supprimer une source de crash.
+Remplacer tout le script "immersif" par une intro simple et élégante :
+- **Segment unique** : `"{Titre}, par {Auteur}."` — point final, rien d'autre
+- Supprimer `generatePremiumJingle()` (le bruit de gare)
+- Supprimer `generateSilenceWav()` 
+- Supprimer le teaser 50 mots et "Attachez vos ceintures"
+- `generateIntroForExport` : retourne un seul blob TTS avec le titre+auteur
+- `buildIntroDisplayText` : retourne juste `"{Titre}, par {Auteur}."` sans emoji ni marqueurs
 
-5. Bloquer la popup globale côté UI
-- Dans les écrans audio, encapsuler les appels lourds avec une gestion d’erreur défensive.
-- Ne jamais laisser remonter une exception non gérée.
-- Afficher un toast métier et conserver la page interactive, même si un chunk échoue.
+### 2. Intégrer la préface dans le contenu audio — `AudioExpressWorkflow.tsx`
 
-6. Vérification ciblée
-- Tester un texte court.
-- Tester un chapitre moyen.
-- Tester un export complet depuis `audio-express`.
-- Vérifier qu’en cas d’échec partiel, on obtient un message utilisateur et non plus l’écran blanc avec popup.
+Actuellement `handleCleanText` (A4) concatène introduction + chapitres, mais `handleGenerateAudio` (A7) ne prend que `cleanedText` qui peut ne pas inclure la préface séparément.
 
-Résultat attendu :
-- Plus de popup récurrente.
-- Plus de `WORKER_LIMIT` sur les exports audio courants.
-- Un seul comportement audio cohérent dans tout le projet.
-- Une génération audio plus lente mais stable, ce qui est le bon compromis ici.
+Correction :
+- Dans `handleGenerateAudio`, après l'intro titre/auteur, générer l'audio de la **préface** (`introduction` ou `preface` prop) comme premier segment avant les chapitres
+- Ajouter la préface comme fichier séparé dans le ZIP : `01-Preface.mp3`
+- Inclure la préface dans le blob fusionné
+
+### 3. Nettoyer le champ introduction par défaut
+
+- `buildDefaultIntro` ne doit plus appeler `buildIntroDisplayText` (qui ajoutait les marqueurs emoji)
+- Le champ texte "Introduction" dans A1 doit contenir le vrai texte de préface, pas le script d'intro
+
+### Résultat attendu
+
+Ordre audio final :
+1. **Titre + Auteur** (3-5 secondes TTS)
+2. **Préface / Introduction** (texte complet, lu en entier)
+3. **Chapitre 1, 2, 3...** (contenu)
+
+Plus de jingle de gare, plus de "EbookStudio 2026", plus de "Attachez vos ceintures".
+
