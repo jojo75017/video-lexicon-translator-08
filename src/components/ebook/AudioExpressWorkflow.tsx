@@ -118,13 +118,7 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
   const [bookSubtitle, setBookSubtitle] = useState('');
   const [authorNameState, setAuthorNameState] = useState(propAuthorName || '');
   const [category, setCategory] = useState('enfants-3-8');
-  const buildDefaultIntro = (title: string, author?: string) => {
-    return buildIntroDisplayText({
-      ebookTitle: title,
-      authorName: author || authorNameState || 'Georges Boubet',
-    });
-  };
-  const [introduction, setIntroduction] = useState(preface || buildDefaultIntro(ebookTitle || ''));
+  const [introduction, setIntroduction] = useState(preface || '');
 
   // Update intro when title changes (only if user hasn't manually edited)
   const [introManuallyEdited, setIntroManuallyEdited] = useState(false);
