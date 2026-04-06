@@ -82,6 +82,75 @@ export async function callGemini(
 }
 
 /**
+ * Appelle Gemini avec un historique de conversation multi-turn
+ */
+export async function callGeminiWithHistory(
+  apiKey: string,
+  messages: Array<{ role: 'user' | 'model'; text: string }>,
+  options: GeminiCallOptions = {}
+): Promise<string> {
+  const {
+    systemPrompt,
+    temperature = 0.7,
+    maxTokens = 2000,
+    timeout = 60000,
+  } = options;
+
+  const model = 'gemini-2.5-flash';
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+  const body: any = {
+    contents: messages.map(m => ({ role: m.role, parts: [{ text: m.text }] })),
+    generationConfig: {
+      temperature,
+      maxOutputTokens: maxTokens,
+    },
+  };
+
+  if (systemPrompt) {
+    body.system_instruction = { parts: [{ text: systemPrompt }] };
+  }
+
+  try {
+    const response = await fetch(
+      `${GEMINI_API_BASE}/${model}:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        signal: controller.signal,
+      }
+    );
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      const errText = await response.text();
+      console.error('Gemini API error:', response.status, errText);
+      if (response.status === 429) {
+        throw new Error('Limite de requêtes Gemini atteinte. Attendez un moment avant de réessayer.');
+      }
+      if (response.status === 400 || response.status === 401 || response.status === 403) {
+        throw new Error('Clé API Gemini invalide. Vérifiez votre clé sur aistudio.google.com');
+      }
+      throw new Error(`Erreur Gemini: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!content) throw new Error('Aucune réponse de Gemini');
+    return content;
+  } catch (error: any) {
+    clearTimeout(timeoutId);
+    if (error.name === 'AbortError') {
+      throw new Error('Timeout - la génération a pris trop de temps. Réessayez.');
+    }
+    throw error;
+  }
+}
+
+/**
  * Appelle Gemini et parse la réponse comme JSON
  */
 export async function callGeminiJSON<T = any>(

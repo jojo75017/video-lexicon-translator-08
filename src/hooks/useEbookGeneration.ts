@@ -18,7 +18,11 @@ export interface SubChapter {
 export const useEbookGeneration = () => {
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const generateChapterContent = async (chapter: Chapter, apiKey: string) => {
+  const generateChapterContent = async (
+    chapter: Chapter, 
+    apiKey: string,
+    bookContext?: { title: string; category?: string; allChapters?: Chapter[]; currentIndex?: number }
+  ) => {
     if (!chapter.title || !apiKey) {
       toast.error('Titre du chapitre et clé API requis');
       return null;
@@ -27,8 +31,31 @@ export const useEbookGeneration = () => {
     setIsGenerating(true);
 
     try {
+      // Construire le contexte enrichi
+      let contextBlock = '';
+      if (bookContext) {
+        contextBlock += `\nLIVRE : "${bookContext.title}"`;
+        if (bookContext.category) contextBlock += `\nCATÉGORIE : ${bookContext.category}`;
+        
+        if (bookContext.allChapters && bookContext.allChapters.length > 0) {
+          const plan = bookContext.allChapters.map((ch, i) => `${i + 1}. ${ch.title}`).join('\n');
+          contextBlock += `\n\nPLAN DU LIVRE :\n${plan}`;
+          
+          // Résumé des chapitres déjà rédigés (max 800 chars chacun, les 3 derniers)
+          const previousChapters = bookContext.allChapters
+            .filter((ch, i) => ch.content && i < (bookContext.currentIndex ?? Infinity))
+            .slice(-3);
+          if (previousChapters.length > 0) {
+            contextBlock += `\n\nCHAPITRES PRÉCÉDENTS (pour continuité) :\n${previousChapters.map(ch => 
+              `- "${ch.title}": ${ch.content!.substring(0, 800)}...`
+            ).join('\n')}`;
+          }
+        }
+      }
+
       const content = await callGemini(apiKey, 
         `Rédige un chapitre complet de 350 mots exactement sur le sujet : "${chapter.title}".
+${contextBlock}
             
 Le contenu doit être :
 - Informatif et engageant sur le sujet donné
@@ -37,6 +64,7 @@ Le contenu doit être :
 - Exactement 350 mots
 - Inclure des mots ou phrases importantes en *italique* pour mettre l'accent
 - Technique et détaillé quand approprié
+- COHÉRENT avec les chapitres précédents (ne pas répéter, poursuivre la progression)
 
 Assure-toi que le contenu soit riche, détaillé et apporte une vraie valeur ajoutée aux lecteurs sur ce sujet spécifique.`,
         { maxTokens: 600, temperature: 0.7 }
@@ -56,7 +84,11 @@ Assure-toi que le contenu soit riche, détaillé et apporte une vraie valeur ajo
     }
   };
 
-  const generateSubChapterContent = async (subChapter: SubChapter, apiKey: string) => {
+  const generateSubChapterContent = async (
+    subChapter: SubChapter, 
+    apiKey: string,
+    bookContext?: { title: string; category?: string; parentChapterTitle?: string }
+  ) => {
     if (!subChapter.title || !apiKey) {
       toast.error('Titre du sous-chapitre et clé API requis');
       return null;
@@ -65,8 +97,16 @@ Assure-toi que le contenu soit riche, détaillé et apporte une vraie valeur ajo
     setIsGenerating(true);
 
     try {
+      let contextBlock = '';
+      if (bookContext) {
+        contextBlock += `\nLIVRE : "${bookContext.title}"`;
+        if (bookContext.category) contextBlock += `\nCATÉGORIE : ${bookContext.category}`;
+        if (bookContext.parentChapterTitle) contextBlock += `\nCHAPITRE PARENT : "${bookContext.parentChapterTitle}"`;
+      }
+
       const content = await callGemini(apiKey,
         `Rédige un sous-chapitre complet de 300 mots exactement sur le sujet : "${subChapter.title}".
+${contextBlock}
             
 Le contenu doit être :
 - Informatif et engageant sur le sujet donné
@@ -75,6 +115,7 @@ Le contenu doit être :
 - Exactement 300 mots
 - Inclure des mots ou phrases importantes en *italique* pour mettre l'accent
 - Technique et détaillé quand approprié
+- COHÉRENT avec le chapitre parent et le livre dans son ensemble
 
 Assure-toi que le contenu soit riche, détaillé et apporte une vraie valeur ajoutée aux lecteurs sur ce sujet spécifique.`,
         { maxTokens: 500, temperature: 0.7 }
