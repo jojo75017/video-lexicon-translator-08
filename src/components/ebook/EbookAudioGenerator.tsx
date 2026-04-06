@@ -637,10 +637,16 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
         throw new Error(err.error || `Erreur ${response.status}`);
       }
 
-      const data = await response.json();
-      const audioUrl = `data:audio/mpeg;base64,${data.audioContent}`;
-      const audioResponse = await fetch(audioUrl);
-      audioBlobs.push(await audioResponse.blob());
+      // Check if response is binary audio (new) or JSON with base64 (legacy)
+      const contentType = response.headers.get('Content-Type') || '';
+      if (contentType.includes('audio/')) {
+        audioBlobs.push(await response.blob());
+      } else {
+        const data = await response.json();
+        const audioUrl = `data:audio/mpeg;base64,${data.audioContent}`;
+        const audioResponse = await fetch(audioUrl);
+        audioBlobs.push(await audioResponse.blob());
+      }
     }
 
     // Concatenate all blobs into a single MP3 file
