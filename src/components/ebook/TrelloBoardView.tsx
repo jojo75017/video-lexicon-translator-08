@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import {
-  CheckCircle2, Lock, Clock, Play, LayoutList, Search, Sparkles
+  CheckCircle2, Lock, Clock, Play, LayoutList, Search, Sparkles, Rocket
 } from 'lucide-react';
 import { useWorkflowResults } from '@/hooks/useWorkflowResults';
 import {
