@@ -66,7 +66,7 @@ export const useEbookDatabase = () => {
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
-        console.log('⚠️ [loadLatestProject] Aucun utilisateur connecté');
+        console.warn('⚠️ [loadLatestProject] Aucun utilisateur connecté — les projets cloud ne sont pas accessibles');
         return null;
       }
 
