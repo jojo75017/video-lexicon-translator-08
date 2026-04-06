@@ -10,7 +10,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   BarChart3, CheckCircle2, Clock, Eye, AlertCircle, Lock, Play,
-  Trash2, Cloud, RefreshCw, Loader2, Headphones, BookOpen, Plus, FileText
+  Trash2, Cloud, RefreshCw, Loader2, Headphones, BookOpen, Plus, FileText,
+  Rocket, Sparkles, BookMarked
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useWorkflowResults } from '@/hooks/useWorkflowResults';
