@@ -3601,12 +3601,19 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   return (
     <div className="min-h-screen flex bg-background">
       <OnboardingGuide />
-      <ModernSidebar 
-        activeTab={activeTab}
-        onTabChange={handleTabChange}
-        isCollapsed={sidebarCollapsed}
-        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-      />
+      {viewMode !== 'trello' && (
+        <ModernSidebar 
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+          isCollapsed={sidebarCollapsed}
+          onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+          onSwitchToTrello={() => {
+            setViewMode('trello');
+            localStorage.setItem('ebook_view_mode', 'trello');
+            setActiveTab('workflow-dashboard');
+          }}
+        />
+      )}
 
       <main className="flex-1 overflow-y-auto">
         {/* Hero Header — Dark Premium 2026 */}
