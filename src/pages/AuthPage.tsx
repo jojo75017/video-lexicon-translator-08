@@ -71,7 +71,7 @@ export const AuthPage = () => {
 
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth`,
+        redirectTo: 'https://video-lexicon-translator-08.lovable.app/auth',
       });
 
       if (error) throw error;
@@ -182,7 +182,7 @@ export const AuthPage = () => {
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/auth`,
+            emailRedirectTo: 'https://video-lexicon-translator-08.lovable.app/auth',
           },
         });
 
