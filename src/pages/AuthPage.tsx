@@ -105,7 +105,7 @@ export const AuthPage = () => {
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth`,
+          emailRedirectTo: 'https://video-lexicon-translator-08.lovable.app/auth',
         },
       });
 

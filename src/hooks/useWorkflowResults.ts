@@ -1,3 +1,4 @@
+// v2 - stable hook ordering fix
 import { useState, useEffect, useCallback } from 'react';
 import { useWorkflowCloudSync } from './useWorkflowCloudSync';
 
