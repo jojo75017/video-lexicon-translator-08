@@ -31,7 +31,7 @@ interface AudioExpressStep {
 }
 
 const AUDIO_STEPS: AudioExpressStep[] = [
-  { id: 'A1', label: 'Brief Directeur', description: 'Titre, auteur, catégorie, introduction et contenu des chapitres', icon: Target, estimatedMinutes: 3 },
+  { id: 'A1', label: 'Brief Directeur', description: 'Titre, auteur, catégorie et contenu des chapitres', icon: Target, estimatedMinutes: 3 },
   { id: 'A2', label: 'Structure Audible', description: 'Plan optimisé pour l\'écoute (chapitres courts, transitions)', icon: ListOrdered, estimatedMinutes: 5 },
   { id: 'A3', label: 'Rédaction Voix Haute', description: 'Phrases courtes, ton amical et conversationnel', icon: PenTool, estimatedMinutes: 15 },
   { id: 'A4', label: 'Nettoyage & Polissage', description: 'Retrait des astérisques, markdown et défauts', icon: Sparkles, estimatedMinutes: 2 },
@@ -439,8 +439,8 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
               </div>
             </div>
             <div className="space-y-2">
-              <Label>📖 Introduction / Résumé</Label>
-              <Textarea value={introduction} onChange={e => { setIntroduction(e.target.value); setIntroManuallyEdited(true); }} rows={6} placeholder="Résumé ou introduction du livre audio..." />
+              <Label>📝 Notes internes (non lu dans l'audio)</Label>
+              <Textarea value={introduction} onChange={e => { setIntroduction(e.target.value); setIntroManuallyEdited(true); }} rows={6} placeholder="Notes de projet, résumé interne... (ce texte ne sera pas lu dans l'audio)" />
             </div>
             <div className="space-y-2">
               <Label>📚 Contenu des Chapitres</Label>
