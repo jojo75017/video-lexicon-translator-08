@@ -88,7 +88,10 @@ import { EbookLibrary } from '@/components/ebook/EbookLibrary';
 import { AudioExpressWorkflow } from '@/components/ebook/AudioExpressWorkflow';
 
 import { CoverDesignEditor } from '@/components/ebook/CoverDesignEditor';
-import { EbookKdpPrePublishChecklist } from '@/components/ebook/EbookKdpPrePublishChecklist';
+import { detectPlaceholderImage, isExternalPlaceholderUrl } from '@/lib/ebookImageValidation';
+import { isDataImageUrl, persistEbookImageToLibrary } from '@/lib/ebookImageStorage';
+import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
+import { EbookTemplates } from '@/components/ebook/EbookTemplates';
 import { EbookAutoSaveIndicator } from '@/components/ebook/EbookAutoSaveIndicator';
 import { EbookFloatingAIEditor } from '@/components/ebook/EbookFloatingAIEditor';
 
