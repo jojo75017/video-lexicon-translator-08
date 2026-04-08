@@ -91,7 +91,6 @@ import { CoverDesignEditor } from '@/components/ebook/CoverDesignEditor';
 import { detectPlaceholderImage, isExternalPlaceholderUrl } from '@/lib/ebookImageValidation';
 import { isDataImageUrl, persistEbookImageToLibrary } from '@/lib/ebookImageStorage';
 import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
-import { EbookTemplates } from '@/components/ebook/EbookTemplates';
 import { EbookAutoSaveIndicator } from '@/components/ebook/EbookAutoSaveIndicator';
 import { EbookFloatingAIEditor } from '@/components/ebook/EbookFloatingAIEditor';
 
