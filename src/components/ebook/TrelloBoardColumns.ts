@@ -1,11 +1,10 @@
 import {
   Crown, Search, LayoutDashboard, PenTool, Sparkles, FileEdit,
   Shield, Brain, GitBranch, Eye, RefreshCw, Fingerprint, Award,
-  Palette, Download, Headphones, Image, FileText, TrendingUp,
-  ClipboardCheck, MessageSquare, Rocket, Target, DollarSign,
-  BarChart3, FolderOpen, CreditCard, Settings,
-  Users, Bot, Video, Globe, Gauge, Calculator,
-  Monitor, Play, Glasses, Camera,
+  Palette, Download, Headphones, FileText,
+  ClipboardCheck, MessageSquare, Rocket,
+  FolderOpen, CreditCard, Settings,
+  Users, Bot, Play, Glasses,
   type LucideIcon
 } from 'lucide-react';
 
@@ -58,7 +57,6 @@ export const TRELLO_COLUMNS: TrelloColumn[] = [
       { id: 'style-signature', label: 'P13 · Huma — Style', icon: Fingerprint, isWorkflowStep: true, requiredSteps: ['P5'], isPro: true },
       { id: 'humanize-anti-ia', label: 'P15 · Orin — Anti-IA', icon: Shield, isWorkflowStep: true, requiredSteps: ['P5'], isPro: true },
       { id: 'strict-proofread', label: 'Relecture Stricte', icon: Glasses },
-      { id: 'readability-analyzer', label: 'Score Lisibilité', icon: Gauge },
     ],
   },
   {
@@ -69,13 +67,10 @@ export const TRELLO_COLUMNS: TrelloColumn[] = [
     cards: [
       { id: 'cover-design-editor', label: 'Éditeur Couverture', icon: Palette },
       { id: 'cover', label: 'Couverture IA', icon: Sparkles },
-      { id: 'ai-cover-studio', label: 'Studio Cover IA', icon: Camera },
       { id: 'export', label: 'Export PDF / Word', icon: Download },
       { id: 'calibre-epub', label: 'Export ePub', icon: Download },
       { id: 'audiobook', label: 'Livre Audio', icon: Headphones },
       { id: 'audio-express', label: 'Audio Express', icon: Play },
-      { id: 'mockup-studio', label: 'Studio Mockup', icon: Image },
-      { id: 'video-trailer', label: 'Bande Annonce', icon: Video },
     ],
   },
   {
@@ -87,10 +82,8 @@ export const TRELLO_COLUMNS: TrelloColumn[] = [
       { id: 'editorial-packaging', label: 'P7 · Kado — KDP', icon: FileText, isWorkflowStep: true, requiredSteps: ['P5'], isPro: true },
       { id: 'final-diagnosis', label: 'P8 · Conso — Diagnostic', icon: Shield, isWorkflowStep: true, requiredSteps: ['P5'], isPro: true },
       { id: 'ultimate-verdict', label: 'P14 · Tila — Verdict', icon: Award, isWorkflowStep: true, requiredSteps: ['P7', 'P8'], isPro: true },
-      { id: 'kdp', label: 'Description KDP', icon: TrendingUp },
-      { id: 'kdp-keywords', label: 'Mots-Clés KDP', icon: Search },
+      { id: 'kdp', label: 'Description KDP', icon: FileText },
       { id: 'kdp-prepublish-checklist', label: 'Checklist KDP', icon: ClipboardCheck },
-      { id: 'kindle-preview', label: 'Prévisualisation Kindle', icon: Monitor },
       { id: 'backcover', label: '4e de Couverture', icon: FileText },
     ],
   },
@@ -102,12 +95,6 @@ export const TRELLO_COLUMNS: TrelloColumn[] = [
     cards: [
       { id: 'marketing', label: 'Posts Réseaux Sociaux', icon: MessageSquare },
       { id: 'launch-plan', label: 'Plan Lancement', icon: Rocket },
-      { id: 'amazon-ads', label: 'Amazon Ads', icon: Target },
-      { id: 'monetization', label: 'Monétisation', icon: DollarSign },
-      { id: 'kdp-revenue-simulator', label: 'Simulateur Revenus', icon: Calculator },
-      { id: 'kdp-analytics', label: 'Analytics KDP', icon: BarChart3 },
-      { id: 'landing-page-generator', label: 'Landing Page', icon: Globe },
-      { id: 'seo-articles', label: 'Articles SEO', icon: Globe },
     ],
   },
 ];

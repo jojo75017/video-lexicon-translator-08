@@ -17,9 +17,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { ModernSidebar } from '@/components/layout/ModernSidebar';
 import { OnboardingGuide } from '@/components/onboarding/OnboardingGuide';
 import { useEbookDatabase } from '@/hooks/useEbookDatabase';
-import EbookImageBank from '@/components/ebook/EbookImageBank';
 import { EbookMarketing } from '@/components/ebook/EbookMarketing';
-import { EbookMonetization } from '@/components/ebook/EbookMonetization';
 import {
   DndContext,
   closestCenter,
@@ -41,40 +39,17 @@ import { EbookTemplates } from '@/components/ebook/EbookTemplates';
 import { EbookChapter } from '@/components/ebook/EbookChapter';
 import { EbookWriting } from '@/components/ebook/EbookWriting';
 import { EbookSettings } from '@/components/ebook/EbookSettings';
-import { EbookChapterImageGenerator } from '@/components/ebook/EbookChapterImageGenerator';
 import { EbookExporter } from '@/components/ebook/EbookExporter';
-import { EbookAdvancedFeatures } from '@/components/ebook/EbookAdvancedFeatures';
 import { EbookKdpTools } from '@/components/ebook/EbookKdpTools';
-import { EbookPreview } from '@/components/ebook/EbookPreview';
 import { EbookCoverGenerator } from '@/components/ebook/EbookCoverGenerator';
-import { EbookWritingAssistant } from '@/components/ebook/EbookWritingAssistant';
 import { EbookBackCoverGenerator } from '@/components/ebook/EbookBackCoverGenerator';
-import { EbookMockupStudio } from '@/components/ebook/EbookMockupStudio';
 import { CalibreStudioEpub } from '@/components/ebook/CalibreStudioEpub';
-import { PriceEbookStudio } from '@/components/ebook/PriceEbookStudio';
 import { EbookCharacters, type Character } from '@/components/ebook/EbookCharacters';
 import { EbookProjectsList } from '@/components/ebook/EbookProjectsList';
 import { EbookAiChat } from '@/components/ebook/EbookAiChat';
-import { EbookDashboard } from '@/components/ebook/EbookDashboard';
 
-import { EbookStatisticsTools } from '@/components/ebook/EbookStatisticsTools';
-import { EbookVoiceDictation } from '@/components/ebook/EbookVoiceDictation';
 import { EbookSeriesManager } from '@/components/ebook/EbookSeriesManager';
-import { EbookKdpMarketAnalysis } from '@/components/ebook/EbookKdpMarketAnalysis';
-import { EbookKdpResearch } from '@/components/ebook/EbookKdpResearch';
-import { KdpAmazonResearch } from '@/components/ebook/KdpAmazonResearch';
-import EbookKdpExplosiveSimulator from '@/components/ebook/EbookKdpExplosiveSimulator';
 import { EbookAudioGenerator } from '@/components/ebook/EbookAudioGenerator';
-import FormationAudiobookDistribution from '@/components/ebook/FormationAudiobookDistribution';
-import { EbookFormationPDF } from '@/components/ebook/EbookFormationPDF';
-import EbookKdpAnalytics from '@/components/ebook/EbookKdpAnalytics';
-import { EbookImageLibrary } from '@/components/ebook/EbookImageLibrary';
-import { EbookAnalyticsDashboard } from '@/components/ebook/EbookAnalyticsDashboard';
-import { EbookBookMockup3D } from '@/components/ebook/EbookBookMockup3D';
-import EbookPriceEstimator from '@/components/ebook/EbookPriceEstimator';
-import EbookEncyclopedia from '@/components/ebook/EbookEncyclopedia';
-import EbookAtlas from '@/components/ebook/EbookAtlas';
-import { EbookEditorAudit } from '@/components/ebook/EbookEditorAudit';
 import { EbookEditorialDirector } from '@/components/ebook/EbookEditorialDirector';
 import { EbookMarketAnalysis } from '@/components/ebook/EbookMarketAnalysis';
 import { EbookContentArchitect } from '@/components/ebook/EbookContentArchitect';
@@ -104,83 +79,21 @@ import { useWorkflowResults } from '@/hooks/useWorkflowResults';
 import { WorkflowResultViewer } from '@/components/ebook/WorkflowResultViewer';
 import { cleanGeneratedText, cleanChapters, countAllStuckWords } from '@/utils/textCleaner';
 import EbookUrlImport from '@/components/ebook/EbookUrlImport';
-import EbookPlagiarismValidator from '@/components/ebook/EbookPlagiarismValidator';
-import EbookAmazonSimulator from '@/components/ebook/EbookAmazonSimulator';
-import EbookSeoArticleGenerator from '@/components/ebook/EbookSeoArticleGenerator';
 import EbookDocumentTransformer from '@/components/ebook/EbookDocumentTransformer';
-import EbookAmazonAdsSimulator from '@/components/ebook/EbookAmazonAdsSimulator';
 import EbookLaunchPlan from '@/components/ebook/EbookLaunchPlan';
-import EbookColoringBookGenerator from '@/components/ebook/EbookColoringBookGenerator';
-import EbookComicBookGenerator from '@/components/ebook/EbookComicBookGenerator';
-import EbookDiaryGenerator from '@/components/ebook/EbookDiaryGenerator';
-import EbookDocumentaryGenerator from '@/components/ebook/EbookDocumentaryGenerator';
-import EbookRecipeBookGenerator from '@/components/ebook/EbookRecipeBookGenerator';
-import EbookTravelGuideGenerator from '@/components/ebook/EbookTravelGuideGenerator';
-import EbookAquariumGenerator from '@/components/ebook/EbookAquariumGenerator';
-import EbookBirdSheetGenerator from '@/components/ebook/EbookBirdSheetGenerator';
-import EbookNicheAnalysis from '@/components/ebook/EbookNicheAnalysis';
-import EbookDescriptionMagnet from '@/components/ebook/EbookDescriptionMagnet';
-import EbookPenNameGenerator from '@/components/ebook/EbookPenNameGenerator';
-import { detectPlaceholderImage, isExternalPlaceholderUrl } from '@/lib/ebookImageValidation';
-import { isDataImageUrl, persistEbookImageToLibrary } from '@/lib/ebookImageStorage';
-import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
-
-// Composants 2026
-import EbookVideoTrailer from '@/components/ebook/EbookVideoTrailer';
-import EbookVideoCreator from '@/components/ebook/EbookVideoCreator';
-import EbookMultiTranslator from '@/components/ebook/EbookMultiTranslator';
-import EbookTrendPredictor from '@/components/ebook/EbookTrendPredictor';
-import EbookABTesting from '@/components/ebook/EbookABTesting';
-import EbookPresentation from '@/components/ebook/EbookPresentation';
 import EbookHumanizer from '@/components/ebook/EbookHumanizer';
-import EbookArcManager from '@/components/ebook/EbookArcManager';
-import EbookDirectSales from '@/components/ebook/EbookDirectSales';
-import EbookBsrTracker from '@/components/ebook/EbookBsrTracker';
-import EbookExportGuide from '@/components/ebook/EbookExportGuide';
-import KdpGuideChecklist from '@/components/ebook/KdpGuideChecklist';
-import PdfKdpReformatter from '@/components/ebook/PdfKdpReformatter';
-import PdfKdpAnalyzer from '@/components/ebook/PdfKdpAnalyzer';
 import EbookStrictProofreader from '@/components/ebook/EbookStrictProofreader';
-import KdpCoverStudio from '@/components/ebook/KdpCoverStudio';
 import SubscriberActivityPopup from '@/components/admin/SubscriberActivityPopup';
 import { EbookLibrary } from '@/components/ebook/EbookLibrary';
 import { AudioExpressWorkflow } from '@/components/ebook/AudioExpressWorkflow';
-import { AudiobookLibrary } from '@/components/ebook/AudiobookLibrary';
 
-import ElementorExportPage from '@/pages/ElementorExportPage';
-import { EbookDraftMode } from '@/components/ebook/EbookDraftMode';
-import { EbookPromptLibrary } from '@/components/ebook/EbookPromptLibrary';
-import { EbookManuscriptDashboard } from '@/components/ebook/EbookManuscriptDashboard';
-import { EbookRichEditor } from '@/components/ebook/EbookRichEditor';
-import { EbookAIDetectorScore } from '@/components/ebook/EbookAIDetectorScore';
-import { EbookAICoverStudio } from '@/components/ebook/EbookAICoverStudio';
 import { CoverDesignEditor } from '@/components/ebook/CoverDesignEditor';
-import { EbookMultiTomeHub } from '@/components/ebook/EbookMultiTomeHub';
-import { EbookAdvancedExport } from '@/components/ebook/EbookAdvancedExport';
-import { EbookWritingIntelligence } from '@/components/ebook/EbookWritingIntelligence';
-import { EbookPublicationPlanner } from '@/components/ebook/EbookPublicationPlanner';
-import { EbookRoyaltyDashboard } from '@/components/ebook/EbookRoyaltyDashboard';
-import { EbookUXEnhancements } from '@/components/ebook/EbookUXEnhancements';
+import { detectPlaceholderImage, isExternalPlaceholderUrl } from '@/lib/ebookImageValidation';
+import { isDataImageUrl, persistEbookImageToLibrary } from '@/lib/ebookImageStorage';
+import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
 import { EbookKdpPrePublishChecklist } from '@/components/ebook/EbookKdpPrePublishChecklist';
-import { EbookPromptChainGenerator } from '@/components/ebook/EbookPromptChainGenerator';
-import { EbookCompetitorDashboard } from '@/components/ebook/EbookCompetitorDashboard';
-import { EbookBetaReaderHub } from '@/components/ebook/EbookBetaReaderHub';
-import { EbookTitleABTest } from '@/components/ebook/EbookTitleABTest';
-import { EbookEditorialCalendar } from '@/components/ebook/EbookEditorialCalendar';
-import { EbookBackMatterGenerator } from '@/components/ebook/EbookBackMatterGenerator';
-import { EbookCompetitorSpy } from '@/components/ebook/EbookCompetitorSpy';
-import { EbookGlobalDashboard } from '@/components/ebook/EbookGlobalDashboard';
-import { EbookNicheTemplates } from '@/components/ebook/EbookNicheTemplates';
-import { EbookFocusMode } from '@/components/ebook/EbookFocusMode';
-import { EbookLandingPageGenerator } from '@/components/ebook/EbookLandingPageGenerator';
-import { EbookReadabilityAnalyzer } from '@/components/ebook/EbookReadabilityAnalyzer';
-import { EbookChapterWordCount } from '@/components/ebook/EbookChapterWordCount';
-import { EbookKindlePreview } from '@/components/ebook/EbookKindlePreview';
 import { EbookAutoSaveIndicator } from '@/components/ebook/EbookAutoSaveIndicator';
-import { EbookConsistencyDetector } from '@/components/ebook/EbookConsistencyDetector';
 import { EbookFloatingAIEditor } from '@/components/ebook/EbookFloatingAIEditor';
-import { EbookRhythmAnalyzer } from '@/components/ebook/EbookRhythmAnalyzer';
-import { EbookKdpRevenueSimulator } from '@/components/ebook/EbookKdpRevenueSimulator';
 
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
 import { ebookTemplates } from '@/data/ebookTemplates';
@@ -1313,143 +1226,12 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           />
         );
 
-      case 'presentation':
-        return (
-          <EbookPresentation onNavigate={(tab) => setActiveTab(tab)} />
-        );
-
-      case 'niche-analysis':
-        return <EbookNicheAnalysis />;
-
       case 'projects':
         return (
           <EbookProjectsList 
             onProjectLoad={handleProjectLoad}
             onCreateNew={handleCreateNewProject}
             currentProject={{ title: ebookTitle, hasContent: chapters.length > 0 || preface.length > 0 || conclusion.length > 0 }}
-          />
-        );
-      
-      case 'dashboard':
-        return (
-          <EbookDashboard
-            ebookTitle={ebookTitle}
-            authorName={authorName}
-            chapters={chapters}
-            preface={preface}
-            conclusion={conclusion}
-            targetWordsPerChapter={targetWordsPerChapter}
-            kdpDescription={kdpDescription}
-            kdpKeywords={kdpKeywords}
-          />
-        );
-
-      case 'draft-mode':
-        if (isDemo) {
-          setShowPaywall('chapters');
-          return null;
-        }
-        return (
-          <EbookDraftMode
-            chapters={chapters}
-            ebookTitle={ebookTitle}
-            authorName={authorName}
-            isGenerating={isGeneratingComplete}
-            onGenerateAll={generateCompleteEbook}
-            generationProgress={generationProgress}
-          />
-        );
-
-      case 'prompt-library':
-        return (
-          <EbookPromptLibrary
-            currentGenre={genre}
-            onApplyTemplate={(template) => {
-              setWritingStyle(template.writingStyle);
-              setTone(template.tone);
-              setNarrativeFormat(template.narrativeFormat);
-              setGenre(template.genre);
-            }}
-          />
-        );
-
-      case 'manuscript-dashboard':
-        return (
-          <EbookManuscriptDashboard
-            ebookTitle={ebookTitle}
-            authorName={authorName}
-            chapters={chapters}
-            preface={preface}
-            conclusion={conclusion}
-            targetWordsPerChapter={targetWordsPerChapter}
-            kdpDescription={kdpDescription}
-            kdpKeywords={kdpKeywords}
-            kdpCategories={kdpCategories}
-          />
-        );
-
-      case 'readability-analyzer':
-        return (
-          <EbookReadabilityAnalyzer
-            chapters={chapters}
-            preface={preface}
-            conclusion={conclusion}
-          />
-        );
-
-      case 'chapter-word-count':
-        return (
-          <EbookChapterWordCount
-            chapters={chapters}
-            targetWordsPerChapter={targetWordsPerChapter}
-          />
-        );
-
-      case 'kindle-preview':
-        return (
-          <EbookKindlePreview
-            title={ebookTitle}
-            authorName={authorName}
-            chapters={chapters}
-            preface={preface}
-            conclusion={conclusion}
-          />
-        );
-
-      case 'consistency-detector':
-        return (
-          <EbookConsistencyDetector
-            chapters={chapters}
-            characters={characters as any}
-          />
-        );
-
-      case 'rhythm-analyzer':
-        return (
-          <EbookRhythmAnalyzer
-            chapters={chapters}
-            ebookTitle={ebookTitle}
-          />
-        );
-
-      case 'kdp-revenue-simulator':
-        return (
-          <EbookKdpRevenueSimulator
-            ebookTitle={ebookTitle}
-          />
-        );
-
-      case 'rich-editor':
-        if (isDemo) {
-          setShowPaywall('chapters');
-          return null;
-        }
-        return (
-          <EbookRichEditor
-            chapters={chapters}
-            onUpdateChapterContent={updateChapterContent}
-            onUpdateSubChapterContent={updateSubChapterContent}
-            targetWordsPerChapter={targetWordsPerChapter}
           />
         );
 
@@ -2355,14 +2137,13 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                 {/* Colonne droite - Aperçu (1/3) */}
                 <div className="space-y-6">
                   <div className="sticky top-6">
-                    <EbookPreview
-                      ebookTitle={ebookTitle}
-                      authorName={authorName}
-                      preface={preface}
-                      conclusion={conclusion}
-                      epilogue={epilogue}
-                      chapters={chapters}
-                    />
+                    <Card className="glass-card border-0">
+                      <CardHeader><CardTitle>Aperçu</CardTitle></CardHeader>
+                      <CardContent>
+                        <p className="text-muted-foreground text-sm">{ebookTitle || 'Aucun titre'}</p>
+                        <p className="text-muted-foreground text-xs mt-1">{chapters.length} chapitres</p>
+                      </CardContent>
+                    </Card>
                   </div>
                 </div>
               </div>
@@ -2550,41 +2331,6 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           />
         );
 
-      case 'description-magnet':
-        return <EbookDescriptionMagnet />;
-
-      case 'pen-name':
-        return <EbookPenNameGenerator />;
-      
-      case 'images':
-        return (
-          <EbookChapterImageGenerator
-            ebookTitle={ebookTitle}
-            chapters={chapters}
-            characters={characters}
-            ebookImages={ebookImages.map(img => ({
-              chapterId: img.chapterId || '',
-              chapterTitle: img.title,
-              imageUrl: img.url,
-              style: ''
-            }))}
-            onImagesUpdate={(images) => {
-              setEbookImages(images.map(img => ({
-                url: img.imageUrl,
-                title: img.chapterTitle,
-                chapterId: img.chapterId
-              })));
-            }}
-            onInsertImageToChapter={handleInsertImageToChapter}
-            subscriberEmail={subscriberEmail}
-          />
-        );
-      
-      case 'export-guide':
-        return <EbookExportGuide />;
-      
-      case 'kdp-guide':
-        return <KdpGuideChecklist />;
       
       case 'export':
         // Bloquer l'export en mode démo
@@ -2654,37 +2400,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           />
         );
       
-      case 'imagebank':
-        return (
-          <EbookImageBank
-            ebookTitle={ebookTitle}
-            chapters={chapters}
-            onImageSelect={(url, title) => setEbookImages([...ebookImages, { url, title }])}
-          />
-        );
-      
-      case 'mockup-studio':
-        return <EbookMockupStudio />;
-
       case 'calibre-epub':
         return <CalibreStudioEpub />;
 
-      case 'price-studio':
-        return <PriceEbookStudio />;
-
-      case 'kdp-cover-studio':
-        return <KdpCoverStudio />;
-
-      case 'library':
-        return (
-          <EbookImageLibrary
-            ebookId={currentProjectId || undefined}
-            ebookTitle={ebookTitle}
-            subscriberEmail={subscriberEmail}
-            onImageSelect={(url) => setEbookImages([...ebookImages, { url, title: 'Image sélectionnée' }])}
-          />
-        );
-      
       case 'marketing':
         return (
           <EbookMarketing
@@ -2692,16 +2410,6 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             chapters={chapters}
             isGenerating={isGenerating}
           />
-        );
-      
-      case 'monetization':
-        return (
-          <EbookMonetization />
-        );
-      
-      case 'price-estimator':
-        return (
-          <EbookPriceEstimator />
         );
       
       case 'templates':
@@ -2806,48 +2514,6 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           />
         );
       
-      case 'encyclopedia':
-        return (
-          <EbookEncyclopedia
-            onInsertContent={(content) => {
-              // Ajouter le contenu à la préface ou au premier chapitre disponible
-              if (chapters.length > 0) {
-                const updatedChapters = [...chapters];
-                updatedChapters[0].content = (updatedChapters[0].content || '') + '\n\n' + content;
-                setChapters(updatedChapters);
-                toast.success('Contenu ajouté au premier chapitre');
-              } else {
-                setPreface((prev) => prev + '\n\n' + content);
-                toast.success('Contenu ajouté à la préface');
-              }
-            }}
-          />
-        );
-      
-      case 'atlas':
-        return (
-          <EbookAtlas
-            onInsertContent={(content) => {
-              if (chapters.length > 0) {
-                const updatedChapters = [...chapters];
-                updatedChapters[0].content = (updatedChapters[0].content || '') + '\n\n' + content;
-                setChapters(updatedChapters);
-                toast.success('Contenu ajouté au premier chapitre');
-              } else {
-                setPreface((prev) => prev + '\n\n' + content);
-                toast.success('Contenu ajouté à la préface');
-              }
-            }}
-          />
-        );
-      
-      case 'assistant':
-        return (
-          <EbookWritingAssistant
-            ebookTitle={ebookTitle}
-          />
-        );
-      
       case 'aichat':
         return (
           <EbookAiChat isDemo={isDemo} />
@@ -2876,40 +2542,6 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           />
         );
       
-      case 'statistics':
-        return (
-          <EbookStatisticsTools
-            ebookTitle={ebookTitle}
-            preface={preface}
-            conclusion={conclusion}
-            epilogue={epilogue}
-            chapters={chapters}
-            characters={characters}
-            apiKey={apiKey}
-            isDemo={isDemo}
-            onTranslate={(translatedData) => {
-              setPreface(translatedData.preface);
-              setConclusion(translatedData.conclusion);
-              setEpilogue(translatedData.epilogue);
-              setChapters(translatedData.chapters);
-              toast.success('Traduction appliquée !');
-            }}
-          />
-        );
-      
-      case 'voice':
-        return (
-          <EbookVoiceDictation
-            chapters={chapters}
-            onUpdateChapterContent={updateChapterContent}
-            onUpdateSubChapterContent={updateSubChapterContent}
-            apiKey={apiKey}
-          />
-        );
-      
-      case 'audio-direct':
-        return null;
-
       case 'audiobook':
         return (
           <EbookAudioGenerator
@@ -2923,9 +2555,6 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           />
         );
       
-      case 'formation-audiobook-distribution':
-        return <FormationAudiobookDistribution />;
-
       case 'audio-express':
         return (
           <AudioExpressWorkflow
@@ -2943,12 +2572,6 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           <EbookLibrary onLoadProject={(project) => handleProjectLoad(project)} />
         );
 
-      case 'audiobook-library':
-        return <AudiobookLibrary />;
-
-      case 'elementor-export':
-        return <ElementorExportPage />;
-      
       case 'series':
         return (
           <EbookSeriesManager
@@ -3012,119 +2635,8 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           />
         );
       
-      case 'coloring-book':
-        return (
-          <EbookColoringBookGenerator ebookTitle={ebookTitle} />
-        );
-      
-      case 'comic-book':
-        return (
-          <EbookComicBookGenerator ebookTitle={ebookTitle} />
-        );
-      
-      case 'diary-generator':
-        return (
-          <EbookDiaryGenerator ebookTitle={ebookTitle} />
-        );
-      
-      case 'recipe-book':
-        return (
-          <EbookRecipeBookGenerator ebookTitle={ebookTitle} />
-        );
-      
-      case 'travel-guide':
-        return (
-          <EbookTravelGuideGenerator ebookTitle={ebookTitle} />
-        );
-      
-      case 'aquarium-guide':
-        return (
-          <EbookAquariumGenerator ebookTitle={ebookTitle} />
-        );
-      
-      case 'bird-guide':
-        return (
-          <EbookBirdSheetGenerator ebookTitle={ebookTitle} />
-        );
-      
-      case 'documentary':
-        return (
-          <EbookDocumentaryGenerator ebookTitle={ebookTitle} />
-        );
-      
-      case 'kdp-amazon-research':
-        return (
-          <KdpAmazonResearch />
-        );
-
-      case 'kdp-research':
-        return (
-          <EbookKdpResearch />
-        );
-      
-      case 'kdp-explosive':
-        return (
-          <EbookKdpExplosiveSimulator />
-        );
-      
-      case 'amazon-simulator':
-        return (
-          <EbookAmazonSimulator 
-            title={ebookTitle}
-            authorName={authorName}
-          />
-        );
-      
-      case 'amazon-ads':
-        return (
-          <EbookAmazonAdsSimulator 
-            ebookTitle={ebookTitle}
-            genre={genre}
-          />
-        );
-      
       case 'launch-plan':
         return <EbookLaunchPlan />;
-      
-      case 'market':
-        return (
-          <EbookKdpMarketAnalysis />
-        );
-      
-      case 'kdp-analytics':
-        return (
-          <EbookKdpAnalytics />
-        );
-      
-      case 'analytics':
-        return (
-          <div className="space-y-6">
-            <EbookAnalyticsDashboard
-              chapters={chapters}
-              targetWordsPerChapter={targetWordsPerChapter}
-              ebookTitle={ebookTitle}
-            />
-            <div className="grid md:grid-cols-2 gap-6">
-              <EbookBookMockup3D
-                title={ebookTitle}
-                author={authorName}
-              />
-            </div>
-          </div>
-        );
-
-
-      
-      case 'plagiarism-validator':
-        return (
-          <EbookPlagiarismValidator />
-        );
-      
-      case 'editor-audit':
-        return (
-          <EbookEditorAudit
-            />
-        );
       
       case 'editorial-director':
         return (
@@ -3330,64 +2842,6 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           </WorkflowStepWrapper>
         );
       
-      case 'formation-pdf':
-        return (
-          <EbookFormationPDF />
-        );
-      
-      case 'affiliation':
-        // Rediriger vers la page affiliation
-        navigate('/affiliation');
-        return null;
-      
-      case 'seo-articles':
-        return (
-          <EbookSeoArticleGenerator />
-        );
-
-      // ========== OUTILS 2026 ==========
-      case 'video-trailer':
-        return (
-          <EbookVideoTrailer
-            ebookTitle={ebookTitle}
-            bookSummary={bookSummary}
-            coverImage={ebookImages[0]?.url}
-          />
-        );
-
-      case 'video-creator':
-        return (
-          <EbookVideoCreator
-            ebookTitle={ebookTitle}
-            authorName={authorName}
-            chapters={chapters}
-            ebookImages={ebookImages}
-            coverImage={ebookImages[0]?.url}
-            onImagesUpdate={(images) => setEbookImages(normalizeEbookImages(images))}
-          />
-        );
-      
-      case 'multi-translator':
-        return (
-          <EbookMultiTranslator
-            ebookTitle={ebookTitle}
-            chapters={chapters}
-            preface={preface}
-            conclusion={conclusion}
-          />
-        );
-      
-      case 'trend-predictor':
-        return <EbookTrendPredictor />;
-      
-      case 'ab-testing':
-        return (
-          <EbookABTesting
-            ebookTitle={ebookTitle}
-            coverImage={ebookImages[0]?.url}
-          />
-        );
-      
       case 'humanize-anti-ia':
         return (
           <WorkflowStepWrapper currentTabId={activeTab} onNavigate={handleTabChange} isGenerating={isGenerating}>
@@ -3401,12 +2855,6 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           </WorkflowStepWrapper>
         );
       
-      case 'humanizer':
-        return <EbookHumanizer />;
-
-      case 'ai-detector':
-        return <EbookAIDetectorScore />;
-
       case 'cover-design-editor':
         return (
           <CoverDesignEditor
@@ -3418,48 +2866,6 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           />
         );
 
-      case 'ai-cover-studio':
-        return (
-          <EbookAICoverStudio
-            ebookTitle={ebookTitle}
-            authorName={authorName}
-            onCoverGenerated={(url) => {
-              setEbookImages(prev => [{ url, title: 'Couverture IA' }, ...prev]);
-              toast.success('Couverture ajoutée à votre projet');
-            }}
-          />
-        );
-
-      case 'multi-tome-hub':
-        return <EbookMultiTomeHub />;
-
-      case 'advanced-export':
-        return (
-          <EbookAdvancedExport
-            ebookTitle={ebookTitle}
-            authorName={authorName}
-            chapters={chapters}
-            preface={preface}
-            conclusion={conclusion}
-            characters={characters}
-            coverImage={ebookImages[0]?.url}
-          />
-        );
-      
-      case 'writing-intelligence':
-        return (
-          <EbookWritingIntelligence
-            chapters={chapters}
-            onUpdateChapterContent={updateChapterContent}
-          />
-        );
-
-      case 'publication-planner':
-        return <EbookPublicationPlanner />;
-
-      case 'royalty-dashboard':
-        return <EbookRoyaltyDashboard />;
-
       case 'kdp-prepublish-checklist':
         return (
           <EbookKdpPrePublishChecklist
@@ -3470,91 +2876,6 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             kdpKeywords={kdpKeywords}
           />
         );
-
-      case 'prompt-chain-generator':
-        return <EbookPromptChainGenerator />;
-
-      case 'competitor-dashboard':
-        return <EbookCompetitorDashboard />;
-
-      case 'beta-reader-hub':
-        return (
-          <EbookBetaReaderHub
-            ebookTitle={ebookTitle}
-            chapters={chapters}
-          />
-        );
-
-      case 'ux-center':
-        return <EbookUXEnhancements />;
-
-      case 'title-ab-test':
-        return <EbookTitleABTest currentTitle={ebookTitle} />;
-
-      case 'editorial-calendar':
-        return <EbookEditorialCalendar chapters={chapters} />;
-
-      case 'back-matter-generator':
-        return <EbookBackMatterGenerator authorName={authorName} ebookTitle={ebookTitle} bookSummary={bookSummary} />;
-
-      case 'competitor-spy':
-        return <EbookCompetitorSpy />;
-
-      case 'global-dashboard':
-        return (
-          <EbookGlobalDashboard
-            ebookTitle={ebookTitle}
-            authorName={authorName}
-            chapters={chapters}
-            preface={preface}
-            conclusion={conclusion}
-            kdpDescription={kdpDescription}
-            kdpKeywords={kdpKeywords}
-            onNavigate={(tab) => setActiveTab(tab)}
-          />
-        );
-
-      case 'niche-templates':
-        return <EbookNicheTemplates />;
-
-      case 'focus-mode':
-        return <EbookFocusMode onClose={() => setActiveTab('writing')} initialContent="" wordGoal={1000} />;
-
-      case 'landing-page-generator':
-        return (
-          <EbookLandingPageGenerator
-            ebookTitle={ebookTitle}
-            authorName={authorName}
-            bookSummary={bookSummary}
-            kdpDescription={kdpDescription}
-          />
-        );
-
-      case 'arc-manager':
-        return (
-          <EbookArcManager
-            ebookTitle={ebookTitle}
-            authorName={authorName}
-            bookSummary={bookSummary}
-          />
-        );
-      
-      case 'direct-sales':
-        return (
-          <EbookDirectSales
-            ebookTitle={ebookTitle}
-            authorName={authorName}
-          />
-        );
-      
-      case 'bsr-tracker':
-        return <EbookBsrTracker />;
-
-      case 'pdf-reformatter':
-        return <PdfKdpReformatter />;
-
-      case 'pdf-analyzer':
-        return <PdfKdpAnalyzer />;
 
       case 'strict-proofread':
         return (
