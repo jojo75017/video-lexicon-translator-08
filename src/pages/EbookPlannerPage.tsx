@@ -2391,37 +2391,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           />
         );
       
-      case 'imagebank':
-        return (
-          <EbookImageBank
-            ebookTitle={ebookTitle}
-            chapters={chapters}
-            onImageSelect={(url, title) => setEbookImages([...ebookImages, { url, title }])}
-          />
-        );
-      
-      case 'mockup-studio':
-        return <EbookMockupStudio />;
-
       case 'calibre-epub':
         return <CalibreStudioEpub />;
 
-      case 'price-studio':
-        return <PriceEbookStudio />;
-
-      case 'kdp-cover-studio':
-        return <KdpCoverStudio />;
-
-      case 'library':
-        return (
-          <EbookImageLibrary
-            ebookId={currentProjectId || undefined}
-            ebookTitle={ebookTitle}
-            subscriberEmail={subscriberEmail}
-            onImageSelect={(url) => setEbookImages([...ebookImages, { url, title: 'Image sélectionnée' }])}
-          />
-        );
-      
       case 'marketing':
         return (
           <EbookMarketing
@@ -2429,16 +2401,6 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             chapters={chapters}
             isGenerating={isGenerating}
           />
-        );
-      
-      case 'monetization':
-        return (
-          <EbookMonetization />
-        );
-      
-      case 'price-estimator':
-        return (
-          <EbookPriceEstimator />
         );
       
       case 'templates':
@@ -2543,48 +2505,6 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           />
         );
       
-      case 'encyclopedia':
-        return (
-          <EbookEncyclopedia
-            onInsertContent={(content) => {
-              // Ajouter le contenu à la préface ou au premier chapitre disponible
-              if (chapters.length > 0) {
-                const updatedChapters = [...chapters];
-                updatedChapters[0].content = (updatedChapters[0].content || '') + '\n\n' + content;
-                setChapters(updatedChapters);
-                toast.success('Contenu ajouté au premier chapitre');
-              } else {
-                setPreface((prev) => prev + '\n\n' + content);
-                toast.success('Contenu ajouté à la préface');
-              }
-            }}
-          />
-        );
-      
-      case 'atlas':
-        return (
-          <EbookAtlas
-            onInsertContent={(content) => {
-              if (chapters.length > 0) {
-                const updatedChapters = [...chapters];
-                updatedChapters[0].content = (updatedChapters[0].content || '') + '\n\n' + content;
-                setChapters(updatedChapters);
-                toast.success('Contenu ajouté au premier chapitre');
-              } else {
-                setPreface((prev) => prev + '\n\n' + content);
-                toast.success('Contenu ajouté à la préface');
-              }
-            }}
-          />
-        );
-      
-      case 'assistant':
-        return (
-          <EbookWritingAssistant
-            ebookTitle={ebookTitle}
-          />
-        );
-      
       case 'aichat':
         return (
           <EbookAiChat isDemo={isDemo} />
@@ -2613,40 +2533,6 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           />
         );
       
-      case 'statistics':
-        return (
-          <EbookStatisticsTools
-            ebookTitle={ebookTitle}
-            preface={preface}
-            conclusion={conclusion}
-            epilogue={epilogue}
-            chapters={chapters}
-            characters={characters}
-            apiKey={apiKey}
-            isDemo={isDemo}
-            onTranslate={(translatedData) => {
-              setPreface(translatedData.preface);
-              setConclusion(translatedData.conclusion);
-              setEpilogue(translatedData.epilogue);
-              setChapters(translatedData.chapters);
-              toast.success('Traduction appliquée !');
-            }}
-          />
-        );
-      
-      case 'voice':
-        return (
-          <EbookVoiceDictation
-            chapters={chapters}
-            onUpdateChapterContent={updateChapterContent}
-            onUpdateSubChapterContent={updateSubChapterContent}
-            apiKey={apiKey}
-          />
-        );
-      
-      case 'audio-direct':
-        return null;
-
       case 'audiobook':
         return (
           <EbookAudioGenerator
@@ -2660,9 +2546,6 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           />
         );
       
-      case 'formation-audiobook-distribution':
-        return <FormationAudiobookDistribution />;
-
       case 'audio-express':
         return (
           <AudioExpressWorkflow
@@ -2680,12 +2563,6 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           <EbookLibrary onLoadProject={(project) => handleProjectLoad(project)} />
         );
 
-      case 'audiobook-library':
-        return <AudiobookLibrary />;
-
-      case 'elementor-export':
-        return <ElementorExportPage />;
-      
       case 'series':
         return (
           <EbookSeriesManager
@@ -2749,119 +2626,8 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           />
         );
       
-      case 'coloring-book':
-        return (
-          <EbookColoringBookGenerator ebookTitle={ebookTitle} />
-        );
-      
-      case 'comic-book':
-        return (
-          <EbookComicBookGenerator ebookTitle={ebookTitle} />
-        );
-      
-      case 'diary-generator':
-        return (
-          <EbookDiaryGenerator ebookTitle={ebookTitle} />
-        );
-      
-      case 'recipe-book':
-        return (
-          <EbookRecipeBookGenerator ebookTitle={ebookTitle} />
-        );
-      
-      case 'travel-guide':
-        return (
-          <EbookTravelGuideGenerator ebookTitle={ebookTitle} />
-        );
-      
-      case 'aquarium-guide':
-        return (
-          <EbookAquariumGenerator ebookTitle={ebookTitle} />
-        );
-      
-      case 'bird-guide':
-        return (
-          <EbookBirdSheetGenerator ebookTitle={ebookTitle} />
-        );
-      
-      case 'documentary':
-        return (
-          <EbookDocumentaryGenerator ebookTitle={ebookTitle} />
-        );
-      
-      case 'kdp-amazon-research':
-        return (
-          <KdpAmazonResearch />
-        );
-
-      case 'kdp-research':
-        return (
-          <EbookKdpResearch />
-        );
-      
-      case 'kdp-explosive':
-        return (
-          <EbookKdpExplosiveSimulator />
-        );
-      
-      case 'amazon-simulator':
-        return (
-          <EbookAmazonSimulator 
-            title={ebookTitle}
-            authorName={authorName}
-          />
-        );
-      
-      case 'amazon-ads':
-        return (
-          <EbookAmazonAdsSimulator 
-            ebookTitle={ebookTitle}
-            genre={genre}
-          />
-        );
-      
       case 'launch-plan':
         return <EbookLaunchPlan />;
-      
-      case 'market':
-        return (
-          <EbookKdpMarketAnalysis />
-        );
-      
-      case 'kdp-analytics':
-        return (
-          <EbookKdpAnalytics />
-        );
-      
-      case 'analytics':
-        return (
-          <div className="space-y-6">
-            <EbookAnalyticsDashboard
-              chapters={chapters}
-              targetWordsPerChapter={targetWordsPerChapter}
-              ebookTitle={ebookTitle}
-            />
-            <div className="grid md:grid-cols-2 gap-6">
-              <EbookBookMockup3D
-                title={ebookTitle}
-                author={authorName}
-              />
-            </div>
-          </div>
-        );
-
-
-      
-      case 'plagiarism-validator':
-        return (
-          <EbookPlagiarismValidator />
-        );
-      
-      case 'editor-audit':
-        return (
-          <EbookEditorAudit
-            />
-        );
       
       case 'editorial-director':
         return (
@@ -3067,64 +2833,6 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           </WorkflowStepWrapper>
         );
       
-      case 'formation-pdf':
-        return (
-          <EbookFormationPDF />
-        );
-      
-      case 'affiliation':
-        // Rediriger vers la page affiliation
-        navigate('/affiliation');
-        return null;
-      
-      case 'seo-articles':
-        return (
-          <EbookSeoArticleGenerator />
-        );
-
-      // ========== OUTILS 2026 ==========
-      case 'video-trailer':
-        return (
-          <EbookVideoTrailer
-            ebookTitle={ebookTitle}
-            bookSummary={bookSummary}
-            coverImage={ebookImages[0]?.url}
-          />
-        );
-
-      case 'video-creator':
-        return (
-          <EbookVideoCreator
-            ebookTitle={ebookTitle}
-            authorName={authorName}
-            chapters={chapters}
-            ebookImages={ebookImages}
-            coverImage={ebookImages[0]?.url}
-            onImagesUpdate={(images) => setEbookImages(normalizeEbookImages(images))}
-          />
-        );
-      
-      case 'multi-translator':
-        return (
-          <EbookMultiTranslator
-            ebookTitle={ebookTitle}
-            chapters={chapters}
-            preface={preface}
-            conclusion={conclusion}
-          />
-        );
-      
-      case 'trend-predictor':
-        return <EbookTrendPredictor />;
-      
-      case 'ab-testing':
-        return (
-          <EbookABTesting
-            ebookTitle={ebookTitle}
-            coverImage={ebookImages[0]?.url}
-          />
-        );
-      
       case 'humanize-anti-ia':
         return (
           <WorkflowStepWrapper currentTabId={activeTab} onNavigate={handleTabChange} isGenerating={isGenerating}>
@@ -3138,12 +2846,6 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           </WorkflowStepWrapper>
         );
       
-      case 'humanizer':
-        return <EbookHumanizer />;
-
-      case 'ai-detector':
-        return <EbookAIDetectorScore />;
-
       case 'cover-design-editor':
         return (
           <CoverDesignEditor
@@ -3155,48 +2857,6 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           />
         );
 
-      case 'ai-cover-studio':
-        return (
-          <EbookAICoverStudio
-            ebookTitle={ebookTitle}
-            authorName={authorName}
-            onCoverGenerated={(url) => {
-              setEbookImages(prev => [{ url, title: 'Couverture IA' }, ...prev]);
-              toast.success('Couverture ajoutée à votre projet');
-            }}
-          />
-        );
-
-      case 'multi-tome-hub':
-        return <EbookMultiTomeHub />;
-
-      case 'advanced-export':
-        return (
-          <EbookAdvancedExport
-            ebookTitle={ebookTitle}
-            authorName={authorName}
-            chapters={chapters}
-            preface={preface}
-            conclusion={conclusion}
-            characters={characters}
-            coverImage={ebookImages[0]?.url}
-          />
-        );
-      
-      case 'writing-intelligence':
-        return (
-          <EbookWritingIntelligence
-            chapters={chapters}
-            onUpdateChapterContent={updateChapterContent}
-          />
-        );
-
-      case 'publication-planner':
-        return <EbookPublicationPlanner />;
-
-      case 'royalty-dashboard':
-        return <EbookRoyaltyDashboard />;
-
       case 'kdp-prepublish-checklist':
         return (
           <EbookKdpPrePublishChecklist
@@ -3207,91 +2867,6 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             kdpKeywords={kdpKeywords}
           />
         );
-
-      case 'prompt-chain-generator':
-        return <EbookPromptChainGenerator />;
-
-      case 'competitor-dashboard':
-        return <EbookCompetitorDashboard />;
-
-      case 'beta-reader-hub':
-        return (
-          <EbookBetaReaderHub
-            ebookTitle={ebookTitle}
-            chapters={chapters}
-          />
-        );
-
-      case 'ux-center':
-        return <EbookUXEnhancements />;
-
-      case 'title-ab-test':
-        return <EbookTitleABTest currentTitle={ebookTitle} />;
-
-      case 'editorial-calendar':
-        return <EbookEditorialCalendar chapters={chapters} />;
-
-      case 'back-matter-generator':
-        return <EbookBackMatterGenerator authorName={authorName} ebookTitle={ebookTitle} bookSummary={bookSummary} />;
-
-      case 'competitor-spy':
-        return <EbookCompetitorSpy />;
-
-      case 'global-dashboard':
-        return (
-          <EbookGlobalDashboard
-            ebookTitle={ebookTitle}
-            authorName={authorName}
-            chapters={chapters}
-            preface={preface}
-            conclusion={conclusion}
-            kdpDescription={kdpDescription}
-            kdpKeywords={kdpKeywords}
-            onNavigate={(tab) => setActiveTab(tab)}
-          />
-        );
-
-      case 'niche-templates':
-        return <EbookNicheTemplates />;
-
-      case 'focus-mode':
-        return <EbookFocusMode onClose={() => setActiveTab('writing')} initialContent="" wordGoal={1000} />;
-
-      case 'landing-page-generator':
-        return (
-          <EbookLandingPageGenerator
-            ebookTitle={ebookTitle}
-            authorName={authorName}
-            bookSummary={bookSummary}
-            kdpDescription={kdpDescription}
-          />
-        );
-
-      case 'arc-manager':
-        return (
-          <EbookArcManager
-            ebookTitle={ebookTitle}
-            authorName={authorName}
-            bookSummary={bookSummary}
-          />
-        );
-      
-      case 'direct-sales':
-        return (
-          <EbookDirectSales
-            ebookTitle={ebookTitle}
-            authorName={authorName}
-          />
-        );
-      
-      case 'bsr-tracker':
-        return <EbookBsrTracker />;
-
-      case 'pdf-reformatter':
-        return <PdfKdpReformatter />;
-
-      case 'pdf-analyzer':
-        return <PdfKdpAnalyzer />;
 
       case 'strict-proofread':
         return (
