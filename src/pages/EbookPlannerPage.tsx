@@ -2322,41 +2322,6 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           />
         );
 
-      case 'description-magnet':
-        return <EbookDescriptionMagnet />;
-
-      case 'pen-name':
-        return <EbookPenNameGenerator />;
-      
-      case 'images':
-        return (
-          <EbookChapterImageGenerator
-            ebookTitle={ebookTitle}
-            chapters={chapters}
-            characters={characters}
-            ebookImages={ebookImages.map(img => ({
-              chapterId: img.chapterId || '',
-              chapterTitle: img.title,
-              imageUrl: img.url,
-              style: ''
-            }))}
-            onImagesUpdate={(images) => {
-              setEbookImages(images.map(img => ({
-                url: img.imageUrl,
-                title: img.chapterTitle,
-                chapterId: img.chapterId
-              })));
-            }}
-            onInsertImageToChapter={handleInsertImageToChapter}
-            subscriberEmail={subscriberEmail}
-          />
-        );
-      
-      case 'export-guide':
-        return <EbookExportGuide />;
-      
-      case 'kdp-guide':
-        return <KdpGuideChecklist />;
       
       case 'export':
         // Bloquer l'export en mode démo
