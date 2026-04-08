@@ -1225,6 +1225,15 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           />
         );
 
+      case 'projects':
+        return (
+          <EbookProjectsList 
+            onProjectLoad={handleProjectLoad}
+            onCreateNew={handleCreateNewProject}
+            currentProject={{ title: ebookTitle, hasContent: chapters.length > 0 || preface.length > 0 || conclusion.length > 0 }}
+          />
+        );
+
       case 'workflow-dashboard':
         if (viewMode === 'trello') {
           return (
@@ -2127,14 +2136,13 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                 {/* Colonne droite - Aperçu (1/3) */}
                 <div className="space-y-6">
                   <div className="sticky top-6">
-                    <EbookPreview
-                      ebookTitle={ebookTitle}
-                      authorName={authorName}
-                      preface={preface}
-                      conclusion={conclusion}
-                      epilogue={epilogue}
-                      chapters={chapters}
-                    />
+                    <Card className="glass-card border-0">
+                      <CardHeader><CardTitle>Aperçu</CardTitle></CardHeader>
+                      <CardContent>
+                        <p className="text-muted-foreground text-sm">{ebookTitle || 'Aucun titre'}</p>
+                        <p className="text-muted-foreground text-xs mt-1">{chapters.length} chapitres</p>
+                      </CardContent>
+                    </Card>
                   </div>
                 </div>
               </div>
