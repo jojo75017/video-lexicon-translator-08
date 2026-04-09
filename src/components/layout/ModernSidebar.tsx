@@ -5,7 +5,7 @@ import {
   LayoutDashboard, Palette, ChevronLeft, ChevronRight, ChevronDown,
   Sparkles, PenTool, FolderOpen,
   Bot, BookCopy, CreditCard, FileText,
-  Crown, Search, Brain, GitBranch, Eye,
+  Crown, Search, Brain, GitBranch, Eye, Zap,
   RefreshCw, Fingerprint, Award, Rocket, Shield,
   Sun, Moon, X, Star,
   BarChart3, Library, Headphones,
