@@ -2,24 +2,18 @@ import React, { useState, useMemo } from 'react';
 import { Smartphone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  BookOpen, Settings, Image, Users, Download, TrendingUp,
+  BookOpen, Settings, Users, Download, TrendingUp,
   LayoutDashboard, Palette, ChevronLeft, ChevronRight, ChevronDown,
-  Sparkles, PenTool, FolderOpen, MessageSquare, DollarSign,
-  Bot, BookCopy, CreditCard, FileText, GraduationCap,
+  Sparkles, PenTool, FolderOpen, MessageSquare,
+  Bot, BookCopy, CreditCard, FileText,
   Zap, Crown, Search, Brain, GitBranch, Eye,
   RefreshCw, Fingerprint, Award, Rocket, Shield,
   Sun, Moon, X, Star, Lightbulb,
-  BarChart3, Monitor, Library, Headphones,
-  Contact, Mail, Target, FileEdit,
-  ChevronUp, Globe, Mic, Video, Camera,
-  Wand2, BookMarked, Compass, Map, Hash,
-  Gauge, Calculator, Puzzle, Layers, Type,
-  ScrollText, FileCheck, Megaphone, ShoppingCart,
-  BarChart2, TestTube, Newspaper, Paintbrush,
-  Ruler, Scissors, Bookmark, BookOpenCheck,
-  ListChecks, Workflow, Play, Music,
-  AlignLeft, Pen, FileImage, Flame,
-  Glasses, ClipboardCheck, Printer, Package
+  BarChart3, Library, Headphones,
+  ChevronUp, Globe, Mic,
+  Layers,
+  ListChecks, Play,
+  Glasses, ClipboardCheck, Package, Megaphone
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -62,7 +56,7 @@ interface GroupedItems {
 }
 
 // ══════════════════════════════════════════════════════════════
-//  TOUS LES 127 OUTILS — organisés en 5 catégories
+//  ~44 OUTILS FONCTIONNELS — organisés en 5 catégories
 // ══════════════════════════════════════════════════════════════
 
 const allToolGroups: ToolGroup[] = [
@@ -73,14 +67,12 @@ const allToolGroups: ToolGroup[] = [
     items: [
       { id: 'workflow-dashboard', label: '📊 Dashboard Pipeline', icon: BarChart3 },
       { id: 'complete-workflow', label: '🚀 Lancer le workflow', icon: Rocket, isPro: true },
-      // Phase 1 — Créer
       { id: 'editorial-director', label: 'P1 · Zyro — Niche', icon: Crown, isPro: true },
       { id: 'market-analysis', label: 'P2 · Jano — Marché', icon: Search, isPro: true },
       { id: 'content-architect', label: 'P3 · Kiro — Plan', icon: LayoutDashboard, isPro: true },
       { id: 'expert-writing', label: 'P4 · Alia — Rédaction', icon: PenTool, isPro: true },
-      // Phase 2 — Optimiser
       { id: 'natural-rewrite', label: 'P5 · Lexo — Réécriture', icon: Sparkles, isPro: true },
-      { id: 'editorial-quality', label: 'P6 · Vero — Qualité', icon: FileEdit, isPro: true },
+      { id: 'editorial-quality', label: 'P6 · Vero — Qualité', icon: FileText, isPro: true },
       { id: 'editorial-packaging', label: 'P7 · Kado — KDP', icon: FileText, isPro: true },
       { id: 'final-diagnosis', label: 'P8 · Conso — Diagnostic', icon: Shield, isPro: true },
       { id: 'editorial-memory', label: 'P9 · Emio — Voix', icon: Brain, isPro: true },
@@ -88,9 +80,7 @@ const allToolGroups: ToolGroup[] = [
       { id: 'self-critique', label: 'P11 · Beto — Lecteur test', icon: Eye, isPro: true },
       { id: 'iterative-loop', label: 'P12 · Nexa — Corrections', icon: RefreshCw, isPro: true },
       { id: 'style-signature', label: 'P13 · Huma — Style', icon: Fingerprint, isPro: true },
-      // Phase 3 — Publier
       { id: 'ultimate-verdict', label: 'P14 · Tila — Verdict', icon: Award, isPro: true },
-      // Bonus
       { id: 'humanize-anti-ia', label: 'P15 · Orin — Anti-IA', icon: Shield, isPro: true },
     ]
   },
@@ -99,41 +89,15 @@ const allToolGroups: ToolGroup[] = [
     emoji: '✍️',
     color: 'violet',
     items: [
-      { id: 'onboarding', label: 'Commencer ici', icon: BookOpen },
-      { id: 'presentation', label: 'Présentation', icon: BookOpen },
       { id: 'planner', label: 'Plan de l\'ebook', icon: ListChecks },
       { id: 'writing', label: 'Écrire les chapitres', icon: PenTool },
-      { id: 'rich-editor', label: 'Éditeur enrichi', icon: AlignLeft },
       { id: 'aichat', label: 'Assistant IA', icon: Bot },
       { id: 'characters', label: 'Personnages', icon: Users },
       { id: 'series', label: 'Série / Saga', icon: BookCopy },
-      { id: 'multi-tome-hub', label: 'Hub Multi-Tomes', icon: BookCopy },
       { id: 'doc-transform', label: 'Importer Word', icon: FileText },
       { id: 'url-import', label: 'Importer URL', icon: Globe },
-      { id: 'pdf-analyzer', label: 'Analyseur PDF', icon: FileText },
-      { id: 'pdf-reformatter', label: 'Reformatter PDF', icon: FileText },
-      { id: 'niche-templates', label: 'Templates Niche', icon: Lightbulb },
       { id: 'templates', label: 'Modèles / Templates', icon: Layers },
-      { id: 'niches', label: 'Niches Rentables', icon: Lightbulb, isLink: true, href: '/niches' },
-      { id: 'niche-analysis', label: 'Analyse de Niche', icon: Search },
-      { id: 'draft-mode', label: 'Mode Brouillon', icon: Pen },
-      { id: 'focus-mode', label: 'Mode Focus', icon: Eye },
-      { id: 'chapter-word-count', label: 'Compteur de Mots', icon: Hash },
-      { id: 'prompt-library', label: 'Bibliothèque Prompts', icon: BookMarked },
-      { id: 'prompt-chain-generator', label: 'Générateur Prompts', icon: Wand2 },
-      { id: 'voice', label: 'Ton & Voix', icon: Mic },
-      { id: 'writing-intelligence', label: 'Intelligence Rédaction', icon: Brain },
-      // Niches spécialisées
-      { id: 'recipe-book', label: 'Livre de Recettes', icon: BookOpen },
-      { id: 'coloring-book', label: 'Livre de Coloriage', icon: Paintbrush },
-      { id: 'diary-generator', label: 'Journal / Carnet', icon: BookOpen },
-      { id: 'travel-guide', label: 'Guide Voyage', icon: Map },
-      { id: 'bird-guide', label: 'Guide Oiseaux', icon: BookOpen },
-      { id: 'aquarium-guide', label: 'Guide Aquarium', icon: BookOpen },
-      { id: 'documentary', label: 'Documentaire', icon: BookOpen },
-      { id: 'encyclopedia', label: 'Encyclopédie', icon: BookOpen },
-      { id: 'comic-book', label: 'Bande Dessinée', icon: Image },
-      { id: 'atlas', label: 'Atlas', icon: Globe },
+      { id: 'strict-proofread', label: 'Relecture Stricte', icon: Glasses },
     ]
   },
   {
@@ -143,49 +107,14 @@ const allToolGroups: ToolGroup[] = [
     items: [
       { id: 'export', label: 'Exporter (PDF, Word)', icon: Download },
       { id: 'workflow-export', label: 'Export Global Workflow', icon: Download },
-      { id: 'advanced-export', label: 'Export Avancé', icon: Download },
       { id: 'calibre-epub', label: 'Export ePub (Calibre)', icon: Download },
-      { id: 'elementor-export', label: 'Export Elementor', icon: Download },
-      { id: 'export-guide', label: 'Guide d\'Export', icon: BookOpen },
       { id: 'cover-design-editor', label: 'Éditeur Couverture', icon: Palette, isNew: true },
       { id: 'cover', label: 'Couverture IA', icon: Sparkles },
-      { id: 'ai-cover-studio', label: 'Studio Couverture IA', icon: Camera },
-      { id: 'kdp-cover-studio', label: 'Studio Cover KDP', icon: Palette },
       { id: 'backcover', label: '4e de Couverture', icon: FileText },
-      { id: 'back-matter-generator', label: 'Pages Finales', icon: ScrollText },
-      { id: 'mockup-studio', label: 'Studio Mockup', icon: Image },
-      { id: 'imagebank', label: 'Banque d\'Images', icon: Image },
-      { id: 'images', label: 'Images du Livre', icon: FileImage },
       { id: 'kdp', label: 'Description KDP', icon: TrendingUp },
-      { id: 'kdp-keywords', label: 'Mots-Clés KDP', icon: Search, isLink: true, href: '/kdp-keywords' },
       { id: 'kdp-prepublish-checklist', label: 'Checklist KDP', icon: ClipboardCheck },
-      { id: 'kdp-guide', label: 'Guide KDP', icon: BookOpen },
-      { id: 'kdp-amazon-research', label: 'Recherche Amazon', icon: Search },
-      { id: 'kdp-research', label: 'Recherche KDP', icon: Search },
-      { id: 'kdp-explosive', label: 'KDP Explosive', icon: Flame },
-      { id: 'kindle-preview', label: 'Prévisualisation Kindle', icon: Monitor },
       { id: 'audiobook', label: 'Livre Audio', icon: Headphones },
-      { id: 'audiobook-library', label: 'Bibliothèque Audio', icon: Music },
-      { id: 'audio-direct', label: 'Audio Direct', icon: Mic },
       { id: 'audio-express', label: 'Audio Express', icon: Play },
-      { id: 'formation-audiobook-distribution', label: 'Distribution Audio', icon: Headphones },
-      { id: 'video-creator', label: 'Créateur Vidéo', icon: Video },
-      { id: 'video-trailer', label: 'Bande Annonce', icon: Video },
-      // Qualité
-      { id: 'strict-proofread', label: 'Relecture Stricte', icon: Glasses },
-      { id: 'readability-analyzer', label: 'Score Lisibilité', icon: Gauge },
-      { id: 'consistency-detector', label: 'Détecteur Incohérences', icon: Puzzle },
-      { id: 'rhythm-analyzer', label: 'Analyseur Rythme', icon: BarChart2 },
-      { id: 'plagiarism-validator', label: 'Anti-Plagiat', icon: Shield },
-      { id: 'ai-detector', label: 'Détecteur IA', icon: Shield },
-      { id: 'humanizer', label: 'Humaniseur', icon: Fingerprint },
-      { id: 'editor-audit', label: 'Audit Éditorial', icon: FileCheck },
-      { id: 'pen-name', label: 'Nom de Plume', icon: Pen },
-      { id: 'description-magnet', label: 'Description Magnétique', icon: Type },
-      { id: 'title-ab-test', label: 'A/B Test Titres', icon: TestTube },
-      { id: 'multi-translator', label: 'Traduction Multi-Langues', icon: Globe },
-      { id: 'manuscript-dashboard', label: 'Tableau Manuscrit', icon: LayoutDashboard },
-      { id: 'publication-planner', label: 'Planning Publication', icon: BarChart3 },
     ]
   },
   {
@@ -193,27 +122,8 @@ const allToolGroups: ToolGroup[] = [
     emoji: '📣',
     color: 'orange',
     items: [
-      { id: 'marketing', label: 'Posts Réseaux Sociaux', icon: MessageSquare },
+      { id: 'marketing', label: 'Posts Réseaux Sociaux', icon: Megaphone },
       { id: 'launch-plan', label: 'Plan Lancement', icon: Rocket },
-      { id: 'amazon-ads', label: 'Amazon Ads', icon: Target },
-      { id: 'monetization', label: 'Monétisation', icon: DollarSign },
-      { id: 'kdp-revenue-simulator', label: 'Simulateur Revenus', icon: DollarSign },
-      { id: 'kdp-analytics', label: 'Analytics KDP', icon: BarChart3 },
-      { id: 'price-estimator', label: 'Estimateur de Prix', icon: Calculator },
-      { id: 'price-studio', label: 'Studio Prix', icon: DollarSign },
-      { id: 'royalty-dashboard', label: 'Tableau Royalties', icon: DollarSign },
-      { id: 'bsr-tracker', label: 'BSR Tracker', icon: TrendingUp },
-      { id: 'competitor-spy', label: 'Espion Concurrents', icon: Eye },
-      { id: 'competitor-dashboard', label: 'Dashboard Concurrents', icon: BarChart2 },
-      { id: 'trend-predictor', label: 'Prédicteur Tendances', icon: TrendingUp },
-      { id: 'amazon-simulator', label: 'Simulateur Amazon', icon: ShoppingCart },
-      { id: 'seo-articles', label: 'Articles SEO', icon: Globe },
-      { id: 'landing-page-generator', label: 'Générateur Landing Page', icon: Globe },
-      { id: 'editorial-calendar', label: 'Calendrier Éditorial', icon: BarChart3 },
-      { id: 'direct-sales', label: 'Vente Directe', icon: ShoppingCart },
-      { id: 'ab-testing', label: 'A/B Testing', icon: TestTube },
-      { id: 'affiliation', label: 'Affiliation', icon: Users },
-      { id: 'beta-reader-hub', label: 'Hub Bêta-Lecteurs', icon: Users },
     ]
   },
   {
@@ -223,30 +133,13 @@ const allToolGroups: ToolGroup[] = [
     items: [
       { id: 'projects', label: 'Mes Projets', icon: FolderOpen },
       { id: 'ebook-library', label: 'Ma Bibliothèque', icon: Library },
-      { id: 'library', label: 'Librairie Ebooks', icon: BookOpen },
-      { id: 'dashboard', label: 'Tableau de Bord', icon: LayoutDashboard },
-      { id: 'global-dashboard', label: 'Dashboard Global', icon: BarChart3 },
-      { id: 'statistics', label: 'Statistiques', icon: BarChart2 },
-      { id: 'analytics', label: 'Analytics', icon: BarChart3 },
       { id: 'subscription', label: 'Abonnement', icon: CreditCard },
-      { id: 'communaute', label: 'Communauté', icon: MessageSquare, isLink: true, href: '/communaute' },
-      { id: 'formation-complete', label: 'Formation Ebook', icon: GraduationCap, isLink: true, href: '/formation' },
-      { id: 'formation-pdf', label: 'Formation PDF', icon: FileText },
       { id: 'settings', label: 'Paramètres', icon: Settings },
-      { id: 'tools', label: 'Boîte à Outils', icon: Puzzle },
-      { id: 'ux-center', label: 'Centre UX', icon: Compass },
-      { id: 'arc-manager', label: 'Gestionnaire Arcs', icon: GitBranch },
-      { id: 'assistant', label: 'Assistant', icon: Bot },
-      { id: 'market', label: 'Marché', icon: ShoppingCart },
-      // Admin
       { id: 'admin', label: 'Admin Panel', icon: Shield, isLink: true, href: '/admin', adminOnly: true },
       { id: 'admin-panel', label: 'Gestion Admin', icon: Shield, isLink: true, href: '/admin', adminOnly: true },
-      { id: 'crm-page', label: 'CRM', icon: Contact, isLink: true, href: '/crm', adminOnly: true },
-      { id: 'prospect-manager', label: 'Prospects', icon: Mail, isLink: true, href: '/gestion-prospects', adminOnly: true },
     ]
   },
 ];
-
 // ─── Theme hook ───
 const useTheme = () => {
   const [isDark, setIsDark] = useState(() => {
