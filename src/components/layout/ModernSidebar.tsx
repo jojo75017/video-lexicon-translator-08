@@ -1,19 +1,18 @@
 import React, { useState, useMemo } from 'react';
-import { Smartphone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  BookOpen, Settings, Users, Download, TrendingUp,
+  Settings, Users, Download, TrendingUp,
   LayoutDashboard, Palette, ChevronLeft, ChevronRight, ChevronDown,
-  Sparkles, PenTool, FolderOpen, MessageSquare,
+  Sparkles, PenTool, FolderOpen,
   Bot, BookCopy, CreditCard, FileText,
-  Zap, Crown, Search, Brain, GitBranch, Eye,
+  Crown, Search, Brain, GitBranch, Eye,
   RefreshCw, Fingerprint, Award, Rocket, Shield,
-  Sun, Moon, X, Star, Lightbulb,
+  Sun, Moon, X, Star,
   BarChart3, Library, Headphones,
-  ChevronUp, Globe, Mic,
+  Globe,
   Layers,
   ListChecks, Play,
-  Glasses, ClipboardCheck, Package, Megaphone
+  Glasses, ClipboardCheck, Megaphone
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
