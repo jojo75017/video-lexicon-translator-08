@@ -96,7 +96,7 @@ const App = () => {
     const safetyTimer = setTimeout(() => {
       console.warn('Safety timer triggered – forcing auth check complete');
       setIsCheckingAuth(false);
-    }, 3000);
+    }, 8000);
 
     const initAuth = async () => {
       // Check subscriber auth (client cache)
