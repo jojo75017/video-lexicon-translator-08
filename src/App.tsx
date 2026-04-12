@@ -65,13 +65,7 @@ const InstallPage = lazy(() => import('./pages/InstallPage'));
 const ElementorExportPage = lazy(() => import('./pages/ElementorExportPage'));
 const SubscriptionAuth = lazy(() => import('@/components/SubscriptionAuth').then(m => ({ default: m.SubscriptionAuth })));
 
-// SaaS Pages
-const SaasLayout = lazy(() => import('@/components/saas/SaasLayout').then(m => ({ default: m.SaasLayout })));
-const SaasDashboard = lazy(() => import('@/pages/saas/SaasDashboard'));
-const SaasAnalytics = lazy(() => import('@/pages/saas/SaasAnalytics'));
-const SaasBilling = lazy(() => import('@/pages/saas/SaasBilling'));
-const SaasSettings = lazy(() => import('@/pages/saas/SaasSettings'));
-const SaasAuthPage = lazy(() => import('@/pages/saas/SaasAuthPage'));
+// SaaS pages removed (orphan system)
 const SalesCampaignPage = lazy(() => import('@/pages/SalesCampaignPage'));
 const EmailPreviewPage = lazy(() => import('@/pages/EmailPreviewPage'));
 const ProspectManagerPage = lazy(() => import('@/pages/ProspectManagerPage'));
@@ -91,14 +85,11 @@ const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [subscriberEmail, setSubscriberEmail] = useState('');
   const [subscriberData, setSubscriberData] = useState<any>(null);
-  // Persist admin status in sessionStorage to prevent logout on re-renders
-  const [isAdmin, setIsAdmin] = useState(() => {
-    return sessionStorage.getItem('is_admin') === 'true';
-  });
+  // Admin status is ONLY set after server-side verification — never from client storage
+  const [isAdmin, setIsAdmin] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
-  // Permanent admin email - bypasses session expiration
-  const PERMANENT_ADMIN_EMAIL = 'boubetgeorges@gmail.com';
+  // Admin email is checked server-side only (via check-admin edge function)
 
   useEffect(() => {
     // Safety timeout FIRST: never leave the app stuck on loader
@@ -146,14 +137,12 @@ const App = () => {
           if (adminStatus) {
             console.log('Statut admin confirmé dans App.tsx');
             setIsAdmin(true);
-            sessionStorage.setItem('is_admin', 'true');
           } else {
             console.log('Utilisateur non-admin dans App.tsx');
-            sessionStorage.removeItem('is_admin');
+            setIsAdmin(false);
           }
         } else {
           console.log('Aucune session Supabase');
-          sessionStorage.removeItem('is_admin');
           setIsAdmin(false);
         }
       } catch (error) {
@@ -181,11 +170,6 @@ const App = () => {
         setTimeout(async () => {
           const adminStatus = await getIsCurrentSessionAdmin();
           setIsAdmin(adminStatus);
-          if (adminStatus) {
-            sessionStorage.setItem('is_admin', 'true');
-          } else {
-            sessionStorage.removeItem('is_admin');
-          }
         }, 0);
         return;
       }
@@ -193,7 +177,6 @@ const App = () => {
       if (!session || event === 'SIGNED_OUT') {
         console.log('Déconnexion détectée');
         setIsAdmin(false);
-        sessionStorage.removeItem('is_admin');
       }
     });
 
@@ -369,9 +352,9 @@ const App = () => {
             <Route
               path="/subscription"
               element={
-                isAdmin ? (
+              isAdmin ? (
                   <SubscriptionPage
-                    subscriberEmail={subscriberEmail || PERMANENT_ADMIN_EMAIL}
+                    subscriberEmail={subscriberEmail || ''}
                     subscriberData={subscriberData || { 
                       plan_type: 'lifetime', 
                       status: 'active', 
@@ -473,14 +456,7 @@ const App = () => {
             <Route path="/nouveautes-2026" element={<Nouveautes2026Page />} />
             <Route path="/install" element={<InstallPage />} />
             
-            {/* SaaS Routes */}
-            <Route path="/saas/login" element={<SaasAuthPage />} />
-            <Route path="/saas" element={<SaasLayout userRole={isAdmin ? 'admin' : 'pro'} />}>
-              <Route index element={<SaasDashboard />} />
-              <Route path="analytics" element={<SaasAnalytics />} />
-              <Route path="billing" element={<SaasBilling />} />
-              <Route path="settings" element={<SaasSettings />} />
-            </Route>
+            {/* SaaS routes removed — orphan system */}
             
             {/* Catch-all : redirige vers /offres */}
             <Route path="*" element={<Navigate to="/offres" replace />} />
