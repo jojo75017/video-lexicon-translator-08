@@ -46,14 +46,8 @@ export function AdminGate({ children }: Props) {
         console.log("AdminGate: isAdmin =", isAdmin);
 
         if (isAdmin) {
-          // Persist admin status for UI optimizations
-          sessionStorage.setItem('is_admin', 'true');
           setAllowed(true);
         } else {
-          // Non-admin trying to access admin area
-          sessionStorage.removeItem('is_admin');
-          // Pas de toast ici: on redirige simplement vers /auth (ou /admin-direct si admin permanent)
-          // pour éviter la popup répétitive quand la session est instable.
           setAllowed(false);
         }
         
