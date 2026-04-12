@@ -220,7 +220,7 @@ export const TrelloBoardView: React.FC<TrelloBoardViewProps> = ({
             className="rounded-xl border-border"
           >
             <LayoutList className="w-4 h-4 mr-2" />
-            Tous les outils (44)
+            Tous les outils ({TRELLO_COLUMNS.reduce((sum, col) => sum + col.cards.length, 0)})
           </Button>
           <Button
             variant="outline"
