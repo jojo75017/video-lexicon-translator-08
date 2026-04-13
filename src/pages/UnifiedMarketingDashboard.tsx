@@ -212,7 +212,7 @@ const UnifiedMarketingDashboard = () => {
             {/* Pipeline funnel */}
             <Card className="bg-card border-border">
               <CardHeader>
-                <CardTitle className="text-white">Pipeline d'emails (5 étapes)</CardTitle>
+                <CardTitle className="text-foreground">Pipeline d'emails (5 étapes)</CardTitle>
                 <CardDescription className="text-muted-foreground">Distribution des prospects par étape</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -223,7 +223,7 @@ const UnifiedMarketingDashboard = () => {
                     <div key={step} className="space-y-1">
                       <div className="flex justify-between text-sm">
                         <span className="text-foreground/70">{STEP_LABELS[step]}</span>
-                        <span className="font-bold text-white">{count} <span className="text-muted-foreground">({pct.toFixed(0)}%)</span></span>
+                        <span className="font-bold text-foreground">{count} <span className="text-muted-foreground">({pct.toFixed(0)}%)</span></span>
                       </div>
                       <Progress value={pct} className="h-3" />
                     </div>
@@ -235,14 +235,14 @@ const UnifiedMarketingDashboard = () => {
             {/* Recent prospects */}
             <Card className="bg-card border-border">
               <CardHeader>
-                <CardTitle className="text-white">Derniers prospects importés</CardTitle>
+                <CardTitle className="text-foreground">Derniers prospects importés</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   {recentProspects.map(p => (
                     <div key={p.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
                       <div>
-                        <p className="font-medium text-white">{p.email}</p>
+                        <p className="font-medium text-foreground">{p.email}</p>
                         <p className="text-xs text-muted-foreground">{p.first_name || '—'} • Étape {p.current_step}/5</p>
                       </div>
                       <div className="flex items-center gap-2">
@@ -281,7 +281,7 @@ const UnifiedMarketingDashboard = () => {
             {/* Platform breakdown */}
             <Card className="bg-card border-border">
               <CardHeader>
-                <CardTitle className="text-white">Engagement par plateforme</CardTitle>
+                <CardTitle className="text-foreground">Engagement par plateforme</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {Object.entries(socialStats.byPlatform).map(([platform, stats]) => (
@@ -329,7 +329,7 @@ const UnifiedMarketingDashboard = () => {
             {/* Top posts by clicks */}
             <Card className="bg-card border-border">
               <CardHeader>
-                <CardTitle className="text-white">🖱️ Posts avec le plus de clics</CardTitle>
+                <CardTitle className="text-foreground">🖱️ Posts avec le plus de clics</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">

@@ -112,7 +112,7 @@ export const WorkflowOnboarding: React.FC<WorkflowOnboardingProps> = ({
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900/95 to-amber-950/20 border-2 border-primary/20 p-8 md:p-12"
+        className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-card via-card/95 to-primary/20 border-2 border-primary/20 p-8 md:p-12"
       >
         {/* Decorative orbs */}
         <div className="absolute -top-16 -right-16 w-48 h-48 bg-gold/10 rounded-full blur-[80px]" />
@@ -231,9 +231,9 @@ export const WorkflowOnboarding: React.FC<WorkflowOnboardingProps> = ({
                       phaseCompleted ? "from-emerald-500 to-green-500" : phase.color
                     )}>
                       {phaseCompleted ? (
-                        <CheckCircle2 className="w-6 h-6 text-white" />
+                        <CheckCircle2 className="w-6 h-6 text-foreground" />
                       ) : (
-                        <PhaseIcon className="w-6 h-6 text-white" />
+                        <PhaseIcon className="w-6 h-6 text-foreground" />
                       )}
                     </div>
                     <div className="flex-1">
@@ -273,7 +273,7 @@ export const WorkflowOnboarding: React.FC<WorkflowOnboardingProps> = ({
                         >
                           <div className={cn(
                             "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-all",
-                            isDone && "bg-emerald-500 text-white",
+                            isDone && "bg-emerald-500 text-foreground",
                             isNext && "bg-cyan-600 text-white shadow-md shadow-cyan-500/30",
                             !isDone && !isNext && "bg-muted text-muted-foreground"
                           )}>
