@@ -2896,6 +2896,16 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           />
         );
 
+      case 'multi-translator':
+        return (
+          <EbookMultiTranslator
+            ebookTitle={ebookTitle}
+            chapters={chapters}
+            preface={preface}
+            conclusion={conclusion}
+          />
+        );
+
       case 'atlas':
         return <EbookAtlas onInsertContent={(content) => {
           const updated = [...chapters];

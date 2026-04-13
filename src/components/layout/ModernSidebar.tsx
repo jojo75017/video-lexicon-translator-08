@@ -101,6 +101,7 @@ const allToolGroups: ToolGroup[] = [
       { id: 'url-import', label: 'Importer URL', icon: Globe },
       { id: 'templates', label: 'Modèles / Templates', icon: Layers },
       { id: 'strict-proofread', label: 'Relecture Stricte', icon: Glasses },
+      { id: 'multi-translator', label: 'Traduction Multi-Langues', icon: Globe },
     ]
   },
   {
