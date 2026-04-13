@@ -1,47 +1,51 @@
 
 
-## Migration vers le thème Amazon KDP (Option C)
+## Rapport — Pages et composants encore en thème sombre
 
-Palette choisie :
-- **Fond** : `#FAFAFA` (blanc cassé) / `#FFFFFF` (cartes)
-- **Accent** : `#008296` (teal Amazon)
-- **Texte** : `#232F3E` (gris Amazon foncé)
-- **Texte secondaire** : `#565959` (gris Amazon)
-- **Bordures** : `#D5D9D9` (gris Amazon clair)
+Après scan complet, **15 fichiers** utilisent encore les anciennes couleurs sombres (`bg-slate-950`, `bg-slate-900`, `text-white`, etc.) au lieu du thème Amazon KDP clair.
 
 ---
 
-### Fichiers modifiés
+### Pages (8 fichiers)
 
-**1. `src/index.css`** — Variables CSS `:root` et `.dark`
-- Remplacer le fond sombre `#0d0820` par `#FAFAFA`, les cartes par `#FFFFFF`
-- Accent `#3B9EFF` → `#008296` (teal), accent deep `#0052CC` → `#005F73`
-- Texte blanc → `#232F3E`, muted → `#565959`
-- Bordures → `#D5D9D9`
-- Mettre à jour tous les gradients, shadows et variables charter
-- Bloc `.dark` : même palette (thème unique clair)
+| # | Fichier | Problème |
+|---|---------|----------|
+| 1 | `src/pages/EmailPreviewPage.tsx` | `bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950`, tout le contenu en `text-white` |
+| 2 | `src/pages/ElementorExportPage.tsx` | `bg-slate-950 text-white`, cartes `bg-slate-900/50`, bordures `border-slate-800` (~20 occurrences) |
+| 3 | `src/pages/BlogPage.tsx` | `bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950`, header/footer sombres |
+| 4 | `src/pages/UnifiedMarketingDashboard.tsx` | `bg-slate-950 text-white`, cartes `bg-slate-900/60` |
+| 5 | `src/pages/HierarchyPage.tsx` | Boutons `bg-blue-600 text-white` hardcodés (pas le fond, mais incohérent) |
+| 6 | `src/pages/FormationVideosPage.tsx` | Gradient violet `from-violet-600 to-purple-600` sur le badge (mineur) |
+| 7 | `src/pages/Nouveautes2026Page.tsx` | Gradients colorés sur icônes (mineur, acceptable) |
+| 8 | `src/pages/SeoCreerEbookIaPage.tsx` | CTA section `bg-gradient-to-r from-primary to-accent text-white` (acceptable) |
 
-**2. `src/App.css`** — Classes utilitaires
-- `.gradient-text`, `.animated-gradient`, `.elegant-button`, `.elegant-button-v2`, `.quora-gradient-button` : remplacer `#3B9EFF`/`#0052CC` par `#008296`/`#005F73`
-- `.modern-nav` : fond clair `rgba(250,250,250,0.95)`, bordure `#D5D9D9`
-- `.feature-card`, `.glass-card` : adapter pour fond clair (backgrounds blancs, bordures grises)
+### Composants (7 fichiers)
 
-**3. `tailwind.config.ts`** — Couleurs et gradients
-- `gradient-magazine-hero` : utiliser le teal au lieu du bleu
-
-**4. `src/components/ebook/KdpAmazonResearch.tsx`** — Tab active color
-- Remplacer `bg-[#3B9EFF]` par la classe `bg-primary`
-
-**5. `src/pages/EbookPlannerPage.tsx`** — Couleurs hardcodées
-- Remplacer les `#3B9EFF` et `#0052CC` dans les stats et le welcome banner par les variables CSS/classes Tailwind
-
-**6. Migration SQL** — Policies restantes
-- Changer les 8 policies `published_books`, `series_bibles`, `book_tracking_history`, `ebook_projects`, `ebook_project_versions` de `public` à `authenticated`
-- Restreindre upload audiobooks par dossier utilisateur
+| # | Fichier | Problème |
+|---|---------|----------|
+| 9 | `src/components/blog/BlogArticleTemplate.tsx` | `from-slate-950 via-slate-900 to-slate-950`, header/footer sombres |
+| 10 | `src/components/ebook/EbookMarketing.tsx` | 5 cartes `bg-slate-900/80` avec bordures colorées, `text-white` |
+| 11 | `src/components/ebook/EbookCoverGenerator.tsx` | Hero `from-slate-900 via-purple-900`, textarea `bg-slate-900` |
+| 12 | `src/components/ebook/WorkflowDashboard.tsx` | Cartes `bg-slate-900/80`, `bg-slate-900/60` |
+| 13 | `src/components/ebook/WorkflowOnboarding.tsx` | `from-slate-900 via-slate-900/95 to-amber-950/20` |
+| 14 | `src/components/onboarding/OnboardingGuide.tsx` | Dialog `bg-slate-900 text-white` |
+| 15 | `src/components/admin/SubscriberActivityPopup.tsx` | Popup `bg-slate-900 border-violet-500/30` |
 
 ---
 
-### Résultat attendu
+### Plan de correction
 
-L'application passera d'un thème sombre bleu électrique agressif à un thème clair, reposant, inspiré d'Amazon/KDP : fond blanc cassé, accent teal professionnel, texte gris foncé lisible. Toutes les pages hériteront automatiquement via les variables CSS.
+Pour chaque fichier, le travail est identique :
+- Remplacer `bg-slate-950`, `bg-slate-900` → `bg-background`, `bg-card`
+- Remplacer `text-white` → `text-foreground`, `text-white/60` → `text-muted-foreground`
+- Remplacer `border-slate-800` → `border-border`
+- Remplacer `border-violet/cyan/emerald-500/30` → `border-primary/20`
+- Supprimer les gradients sombres (`from-slate-950 via-slate-900`)
+
+**Priorité** :
+1. **Critiques** (pages principales) : `EmailPreviewPage`, `ElementorExportPage`, `UnifiedMarketingDashboard`, `BlogPage` — ce sont des pages entières en noir
+2. **Importants** (composants du générateur) : `EbookMarketing`, `WorkflowDashboard`, `EbookCoverGenerator`, `WorkflowOnboarding`
+3. **Mineurs** (popups/dialogs) : `OnboardingGuide`, `SubscriberActivityPopup`, `BlogArticleTemplate`
+
+15 fichiers à migrer. Aucun changement de logique, uniquement des classes CSS.
 
