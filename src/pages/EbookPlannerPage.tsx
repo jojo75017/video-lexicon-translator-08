@@ -52,6 +52,7 @@ import { EbookSeriesManager } from '@/components/ebook/EbookSeriesManager';
 import EbookAtlas from '@/components/ebook/EbookAtlas';
 import EbookEncyclopedia from '@/components/ebook/EbookEncyclopedia';
 import EbookDocumentaryGenerator from '@/components/ebook/EbookDocumentaryGenerator';
+import { EbookColoringBookGenerator } from '@/components/ebook/EbookColoringBookGenerator';
 import { KdpQuickTools } from '@/components/ebook/KdpQuickTools';
 import { EbookAudioGenerator } from '@/components/ebook/EbookAudioGenerator';
 import { EbookEditorialDirector } from '@/components/ebook/EbookEditorialDirector';
