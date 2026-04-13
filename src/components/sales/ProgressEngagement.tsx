@@ -55,7 +55,7 @@ const ProgressEngagement = ({
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-violet-400" />
-                <span className="text-sm font-medium text-white">
+                <span className="text-sm font-medium text-foreground">
                   Votre progression vers votre 1er ebook
                 </span>
               </div>
@@ -105,7 +105,7 @@ const ProgressEngagement = ({
               >
                 <Button
                   onClick={scrollToOffer}
-                  className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white font-semibold px-4 md:px-6 h-10 shadow-lg shadow-emerald-500/25"
+                  className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-foreground font-semibold px-4 md:px-6 h-10 shadow-lg shadow-emerald-500/25"
                 >
                   <span className="hidden sm:inline">Plus qu'un pas !</span>
                   <ArrowRight className="w-4 h-4 sm:ml-2" />

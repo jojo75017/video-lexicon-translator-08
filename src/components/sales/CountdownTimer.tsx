@@ -44,15 +44,15 @@ const CountdownTimer = () => {
       className={`rounded-2xl border p-5 ${
         isUrgent
           ? 'bg-red-950/50 border-red-500/40'
-          : 'bg-slate-900/60 border-cyan-500/30'
+          : 'bg-card border-primary/30'
       }`}
     >
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Timer className={`w-5 h-5 ${isUrgent ? 'text-red-400' : 'text-cyan-400'} animate-pulse`} />
-          <span className="font-bold text-white text-sm">Votre offre expire dans</span>
+          <Timer className={`w-5 h-5 ${isUrgent ? 'text-red-400' : 'text-primary'} animate-pulse`} />
+          <span className="font-bold text-foreground text-sm">Votre offre expire dans</span>
         </div>
-        <Badge className={`${isUrgent ? 'bg-red-500 text-white' : 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30'} font-bold`}>
+        <Badge className={`${isUrgent ? 'bg-red-500 text-foreground' : 'bg-cyan-500/10 text-primary border-primary/30'} font-bold`}>
           {isUrgent ? '⏰ DERNIÈRE CHANCE' : 'OFFRE LIMITÉE'}
         </Badge>
       </div>
@@ -65,21 +65,21 @@ const CountdownTimer = () => {
         ].map((unit, i) => (
           <div key={i} className="flex items-center gap-3">
             <div className={`text-center px-4 py-3 rounded-xl ${
-              isUrgent ? 'bg-red-500/20' : 'bg-slate-800/80'
+              isUrgent ? 'bg-red-500/20' : 'bg-muted/80'
             }`}>
               <motion.span
                 key={unit.value}
                 initial={{ y: -5, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 className={`text-3xl font-black tabular-nums block ${
-                  isUrgent ? 'text-red-400' : 'text-white'
+                  isUrgent ? 'text-red-400' : 'text-foreground'
                 }`}
               >
                 {String(unit.value).padStart(2, '0')}
               </motion.span>
-              <span className="text-[10px] text-white/50 uppercase tracking-wider">{unit.label}</span>
+              <span className="text-[10px] text-foreground/50 uppercase tracking-wider">{unit.label}</span>
             </div>
-            {i < 2 && <span className={`text-2xl font-bold ${isUrgent ? 'text-red-400/50' : 'text-white/30'}`}>:</span>}
+            {i < 2 && <span className={`text-2xl font-bold ${isUrgent ? 'text-red-400/50' : 'text-foreground/30'}`}>:</span>}
           </div>
         ))}
       </div>

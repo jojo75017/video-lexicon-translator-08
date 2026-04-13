@@ -63,11 +63,11 @@ const SalesFaq: React.FC = () => {
 
       <div className="max-w-3xl mx-auto relative z-10">
         <div className="text-center mb-12">
-          <Badge className="mb-4 bg-cyan-500/10 text-cyan-400 border-cyan-500/20 px-4 py-2">
+          <Badge className="mb-4 bg-cyan-500/10 text-primary border-cyan-500/20 px-4 py-2">
             <HelpCircle className="w-4 h-4 mr-2" />
             FAQ — 11 réponses essentielles
           </Badge>
-          <h2 className="text-3xl md:text-4xl font-extrabold mb-4 text-white">
+          <h2 className="text-3xl md:text-4xl font-extrabold mb-4 text-foreground">
             Toutes vos questions,
             <span className="text-slate-500"> nos réponses.</span>
           </h2>
@@ -81,11 +81,11 @@ const SalesFaq: React.FC = () => {
             <AccordionItem 
               key={index} 
               value={`faq-${index}`}
-              className="bg-slate-900/80 backdrop-blur-sm rounded-xl border border-slate-800 px-6 shadow-sm hover:border-cyan-500/20 transition-colors duration-300 data-[state=open]:border-cyan-500/30 data-[state=open]:shadow-md data-[state=open]:shadow-cyan-500/5"
+              className="bg-card backdrop-blur-sm rounded-xl border border-border px-6 shadow-sm hover:border-primary/20 transition-colors duration-300 data-[state=open]:border-primary/30 data-[state=open]:shadow-md data-[state=open]:shadow-primary/5"
             >
-              <AccordionTrigger className="text-left font-semibold hover:no-underline py-5 text-sm md:text-base text-white">
+              <AccordionTrigger className="text-left font-semibold hover:no-underline py-5 text-sm md:text-base text-foreground">
                 <span className="flex items-start gap-3">
-                  <span className="flex items-center justify-center w-7 h-7 rounded-lg bg-cyan-500/10 text-cyan-400 text-xs font-bold shrink-0 mt-0.5">
+                  <span className="flex items-center justify-center w-7 h-7 rounded-lg bg-cyan-500/10 text-primary text-xs font-bold shrink-0 mt-0.5">
                     {String(index + 1).padStart(2, '0')}
                   </span>
                   <span>{faq.question}</span>
@@ -101,7 +101,7 @@ const SalesFaq: React.FC = () => {
         {/* CTA sous la FAQ */}
         <div className="mt-12 text-center">
           <div className="bg-gradient-to-r from-cyan-500/5 via-cyan-500/10 to-cyan-500/5 border border-cyan-500/20 rounded-2xl p-8">
-            <p className="font-bold text-lg mb-2 text-white">Encore des doutes ?</p>
+            <p className="font-bold text-lg mb-2 text-foreground">Encore des doutes ?</p>
             <p className="text-slate-400 text-sm mb-6">
               Réservez un appel Zoom gratuit pour voir l'outil en direct, ou lancez-vous directement.
             </p>
@@ -116,7 +116,7 @@ const SalesFaq: React.FC = () => {
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
               <a href="https://calendly.com/boubetgeorges/nouvelle-reunion" target="_blank" rel="noopener noreferrer">
-                <Button variant="outline" size="lg" className="gap-2 border-slate-700 text-slate-300 hover:text-white hover:border-slate-600 hover:bg-slate-800/50">
+                <Button variant="outline" size="lg" className="gap-2 border-border text-slate-300 hover:text-foreground hover:border-slate-600 hover:bg-muted/50">
                   <MessageCircle className="w-4 h-4" />
                   Réserver un Zoom gratuit
                 </Button>

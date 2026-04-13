@@ -122,17 +122,17 @@ const LiveEbookCounter: React.FC<LiveEbookCounterProps> = ({
         </div>
 
         <div className="grid grid-cols-2 gap-3 mt-4">
-          <div className="flex items-center gap-2 p-3 rounded-xl bg-white/5 border border-white/10">
+          <div className="flex items-center gap-2 p-3 rounded-xl bg-white/5 border border-border">
             <TrendingUp className="h-4 w-4 text-emerald-400" />
             <div>
-              <div className="text-sm font-semibold text-white">+{todayCount}</div>
+              <div className="text-sm font-semibold text-foreground">+{todayCount}</div>
               <div className="text-xs text-muted-foreground">aujourd'hui</div>
             </div>
           </div>
-          <div className="flex items-center gap-2 p-3 rounded-xl bg-white/5 border border-white/10">
+          <div className="flex items-center gap-2 p-3 rounded-xl bg-white/5 border border-border">
             <Users className="h-4 w-4 text-blue-400" />
             <div>
-              <div className="text-sm font-semibold text-white">847+</div>
+              <div className="text-sm font-semibold text-foreground">847+</div>
               <div className="text-xs text-muted-foreground">auteurs actifs</div>
             </div>
           </div>

@@ -143,7 +143,7 @@ const SuccessGallery: React.FC<SuccessGalleryProps> = ({
             
             {/* Revenue badge */}
             <div className="absolute top-3 right-3">
-              <Badge className="bg-emerald-500/90 text-white font-bold px-3 py-1">
+              <Badge className="bg-emerald-500/90 text-foreground font-bold px-3 py-1">
                 <DollarSign className="w-3 h-3 mr-1" />
                 {story.monthlyRevenue}/mois
               </Badge>
@@ -152,7 +152,7 @@ const SuccessGallery: React.FC<SuccessGalleryProps> = ({
             {/* Title overlay */}
             <div className="absolute bottom-3 left-3 right-3">
               <Badge variant="secondary" className="text-xs mb-2">{story.category}</Badge>
-              <h3 className="text-white font-bold text-lg line-clamp-2">{story.title}</h3>
+              <h3 className="text-foreground font-bold text-lg line-clamp-2">{story.title}</h3>
             </div>
           </div>
         </div>
@@ -211,7 +211,7 @@ const SuccessGallery: React.FC<SuccessGalleryProps> = ({
     return (
       <div className="space-y-6">
         <div className="text-center">
-          <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white mb-3">
+          <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-foreground mb-3">
             <Star className="w-3 h-3 mr-1 fill-current" />
             Success Stories
           </Badge>
@@ -234,7 +234,7 @@ const SuccessGallery: React.FC<SuccessGalleryProps> = ({
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white mb-3">
+        <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-foreground mb-3">
           <Star className="w-3 h-3 mr-1 fill-current" />
           Success Stories
         </Badge>

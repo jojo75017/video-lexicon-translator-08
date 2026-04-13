@@ -39,7 +39,7 @@ export const KdpRoiCalculator: React.FC<KdpRoiCalculatorProps> = ({ onCtaClick }
       <CardHeader className="pb-4">
         <div className="flex items-center gap-3 mb-2">
           <div className="p-2 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600">
-            <Calculator className="w-5 h-5 text-white" />
+            <Calculator className="w-5 h-5 text-foreground" />
           </div>
           <div>
             <CardTitle className="text-xl flex items-center gap-2">
@@ -47,7 +47,7 @@ export const KdpRoiCalculator: React.FC<KdpRoiCalculatorProps> = ({ onCtaClick }
               <Badge className="bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/30">
                 ROI
               </Badge>
-              <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0 text-[10px] font-bold">
+              <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-foreground border-0 text-[10px] font-bold">
                 2026
               </Badge>
             </CardTitle>
@@ -170,7 +170,7 @@ export const KdpRoiCalculator: React.FC<KdpRoiCalculatorProps> = ({ onCtaClick }
 
         {/* CTA */}
         <Button 
-          className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-lg shadow-emerald-500/25"
+          className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-foreground shadow-lg shadow-emerald-500/25"
           size="lg"
           onClick={handleCtaClick}
         >

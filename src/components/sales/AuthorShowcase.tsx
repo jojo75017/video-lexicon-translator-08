@@ -35,11 +35,11 @@ const AuthorShowcase: React.FC = () => {
       >
         {/* Header */}
         <motion.div variants={fadeUp} className="text-center mb-10">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-sm font-medium mb-4">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-primary text-sm font-medium mb-4">
             <BookOpen className="w-4 h-4" />
             Résultats réels
           </div>
-          <h2 className="text-3xl md:text-4xl font-extrabold mb-3 text-white">
+          <h2 className="text-3xl md:text-4xl font-extrabold mb-3 text-foreground">
             ✨ Exemples réels d'ebooks publiés avec{' '}
             <span className="bg-gradient-to-r from-cyan-400 to-emerald-400 bg-clip-text text-transparent">
               EbookStudio
@@ -55,7 +55,7 @@ const AuthorShowcase: React.FC = () => {
 
         {/* Images */}
         <motion.div variants={fadeUp} custom={1} className="grid md:grid-cols-2 gap-6 mb-8">
-          <div className="rounded-2xl overflow-hidden border border-cyan-500/20 shadow-2xl shadow-cyan-500/10 hover:shadow-cyan-500/20 transition-shadow duration-500">
+          <div className="rounded-2xl overflow-hidden border border-cyan-500/20 shadow-2xl shadow-primary/10 hover:shadow-cyan-500/20 transition-shadow duration-500">
             <img
               src={ebooksShowcase1}
               alt="Ebooks publiés avec EbookStudio — Ce que la femme de ménage a vu, Revenu Passif 2025, Retour en Provence"
@@ -63,7 +63,7 @@ const AuthorShowcase: React.FC = () => {
               loading="lazy"
             />
           </div>
-          <div className="rounded-2xl overflow-hidden border border-cyan-500/20 shadow-2xl shadow-cyan-500/10 hover:shadow-cyan-500/20 transition-shadow duration-500">
+          <div className="rounded-2xl overflow-hidden border border-cyan-500/20 shadow-2xl shadow-primary/10 hover:shadow-cyan-500/20 transition-shadow duration-500">
             <img
               src={ebooksShowcase2}
               alt="Ebooks publiés avec EbookStudio — L'Appel des Ombres, Revenu Passif 2025, Bien-Être au Quotidien"
@@ -81,7 +81,7 @@ const AuthorShowcase: React.FC = () => {
             'Créés avec EbookStudio Pro',
           ].map((text) => (
             <div key={text} className="flex items-center gap-2 text-slate-400">
-              <CheckCircle2 className="w-4 h-4 text-cyan-400" />
+              <CheckCircle2 className="w-4 h-4 text-primary" />
               <span className="font-medium">{text}</span>
             </div>
           ))}

@@ -120,7 +120,7 @@ const PriceComparison: React.FC = () => {
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
-          className="relative bg-gradient-to-br from-violet-600 to-purple-700 rounded-2xl p-8 md:p-10 text-white shadow-2xl shadow-violet-500/20 overflow-hidden"
+          className="relative bg-gradient-to-br from-violet-600 to-purple-700 rounded-2xl p-8 md:p-10 text-foreground shadow-2xl shadow-primary/20 overflow-hidden"
         >
           <div className="absolute top-0 right-0 w-72 h-72 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl" />
           <div className="absolute bottom-0 left-0 w-56 h-56 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2 blur-xl" />
@@ -132,7 +132,7 @@ const PriceComparison: React.FC = () => {
                   <Sparkles className="w-6 h-6 text-yellow-300" />
                   <span className="font-bold text-2xl">EbookStudio Pro</span>
                 </div>
-                <p className="text-white/70 mb-5 text-sm">Accès à vie – Ebooks illimités – {isVipAvailable ? 'Offre Fondateur' : 'Paiement unique ou en 2×35€ / 3×25€'}</p>
+                <p className="text-foreground/70 mb-5 text-sm">Accès à vie – Ebooks illimités – {isVipAvailable ? 'Offre Fondateur' : 'Paiement unique ou en 2×35€ / 3×25€'}</p>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {[
@@ -145,7 +145,7 @@ const PriceComparison: React.FC = () => {
                   ].map((feature, i) => (
                     <div key={i} className="flex items-center gap-2 text-sm">
                       <Check className="w-4 h-4 text-emerald-300 shrink-0" />
-                      <span className="text-white/90">{feature}</span>
+                      <span className="text-foreground/90">{feature}</span>
                     </div>
                   ))}
                 </div>
@@ -153,10 +153,10 @@ const PriceComparison: React.FC = () => {
 
               <div className="text-center flex flex-col items-center gap-3">
                 <div>
-                  <span className="text-xl text-white/50 line-through">147€</span>
+                  <span className="text-xl text-foreground/50 line-through">147€</span>
                 </div>
                 <div className="text-6xl font-black text-yellow-300 leading-none">{price}€</div>
-                <p className="text-sm text-white/70">{isVipAvailable ? 'Paiement unique' : 'Paiement unique ou en 2×35€ / 3×25€'}</p>
+                <p className="text-sm text-foreground/70">{isVipAvailable ? 'Paiement unique' : 'Paiement unique ou en 2×35€ / 3×25€'}</p>
                 <div className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-medium">
                   💰 Économie : <span className="font-bold text-yellow-200">de 463€ à 9 963€</span>
                 </div>
@@ -171,7 +171,7 @@ const PriceComparison: React.FC = () => {
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
 
-                <div className="flex items-center gap-2 text-xs text-white/60 mt-1">
+                <div className="flex items-center gap-2 text-xs text-foreground/60 mt-1">
                   <Shield className="w-3.5 h-3.5" />
                   <span>Paiement sécurisé • Accès immédiat</span>
                 </div>

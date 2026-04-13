@@ -129,7 +129,7 @@ const StarTestimonials: React.FC = () => {
                 <div className="flex flex-col md:flex-row gap-8 items-center">
                   {/* Avatar & Info */}
                   <div className="text-center md:text-left shrink-0">
-                    <div className={`w-20 h-20 rounded-full bg-gradient-to-br ${current.color} flex items-center justify-center text-white text-2xl font-bold shadow-lg mx-auto md:mx-0`}>
+                    <div className={`w-20 h-20 rounded-full bg-gradient-to-br ${current.color} flex items-center justify-center text-foreground text-2xl font-bold shadow-lg mx-auto md:mx-0`}>
                       {current.avatar}
                     </div>
                     <div className="mt-4">

@@ -91,7 +91,7 @@ const ExitIntentPopup = ({ onContinueToOffer }: ExitIntentPopupProps) => {
         target="_blank"
         rel="noopener noreferrer"
         onClick={() => trackExitIntent('converted')}
-        className="fixed top-0 left-0 right-0 z-[70] flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 hover:from-amber-600 hover:via-orange-600 hover:to-red-600 text-white font-bold px-4 py-2.5 shadow-lg transition-all duration-300 text-sm md:text-base cursor-pointer"
+        className="fixed top-0 left-0 right-0 z-[70] flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 hover:from-amber-600 hover:via-orange-600 hover:to-red-600 text-foreground font-bold px-4 py-2.5 shadow-lg transition-all duration-300 text-sm md:text-base cursor-pointer"
       >
         <Gift className="w-4 h-4 flex-shrink-0 animate-bounce" />
         <span>🎁 OFFERT : 10 Niches KDP Rentables à Exploiter → Récupérez-les !</span>
@@ -100,7 +100,7 @@ const ExitIntentPopup = ({ onContinueToOffer }: ExitIntentPopupProps) => {
 
       {/* Dialog popup */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="sm:max-w-lg p-0 overflow-hidden border-0 bg-slate-950 text-white shadow-2xl shadow-violet-500/20 z-[100]">
+        <DialogContent className="sm:max-w-lg p-0 overflow-hidden border-0 bg-background text-foreground shadow-2xl shadow-primary/20 z-[100]">
           <VisuallyHidden>
             <DialogTitle>Cadeau exclusif - 10 Niches KDP gratuites</DialogTitle>
             <DialogDescription>Recevez gratuitement 10 niches KDP rentables prêtes à exploiter</DialogDescription>
@@ -111,11 +111,11 @@ const ExitIntentPopup = ({ onContinueToOffer }: ExitIntentPopupProps) => {
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(255,255,255,0.15),transparent)]" />
             <div className="relative">
               <div className="flex items-center justify-center gap-2 mb-1">
-                <Gift className="w-6 h-6 text-white animate-bounce" />
-                <span className="text-white font-black text-xl tracking-wide uppercase">Attendez !</span>
-                <Gift className="w-6 h-6 text-white animate-bounce" />
+                <Gift className="w-6 h-6 text-foreground animate-bounce" />
+                <span className="text-foreground font-black text-xl tracking-wide uppercase">Attendez !</span>
+                <Gift className="w-6 h-6 text-foreground animate-bounce" />
               </div>
-              <p className="text-white/90 text-sm font-medium">
+              <p className="text-foreground/90 text-sm font-medium">
                 Ne partez pas les mains vides...
               </p>
             </div>
@@ -124,7 +124,7 @@ const ExitIntentPopup = ({ onContinueToOffer }: ExitIntentPopupProps) => {
           {/* Contenu */}
           <div className="p-6 text-center space-y-5">
             <div>
-              <h3 className="text-2xl font-black text-white mb-2">
+              <h3 className="text-2xl font-black text-foreground mb-2">
                 Recevez <span className="text-amber-400">10 Niches KDP</span>
               </h3>
               <p className="text-lg text-violet-300 font-semibold italic">
@@ -157,7 +157,7 @@ const ExitIntentPopup = ({ onContinueToOffer }: ExitIntentPopupProps) => {
             {/* CTA principal */}
             <Button
               onClick={handleGetGuide}
-              className="w-full bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-400 hover:to-green-400 text-white font-black py-6 text-lg shadow-lg shadow-emerald-500/30 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              className="w-full bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-400 hover:to-green-400 text-foreground font-black py-6 text-lg shadow-lg shadow-emerald-500/30 transition-all hover:scale-[1.02] active:scale-[0.98]"
             >
               <Gift className="w-5 h-5 mr-2" />
               Oui, je veux les 10 niches KDP !

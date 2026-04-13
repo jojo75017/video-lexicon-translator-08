@@ -23,7 +23,7 @@ const SocialProofBanner = () => {
                 whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ delay: i * 0.05 }}
                 viewport={{ once: true }}
-                className={`w-10 h-10 rounded-full bg-gradient-to-br ${a.color} flex items-center justify-center text-white text-xs font-bold border-2 border-background shadow-md`}
+                className={`w-10 h-10 rounded-full bg-gradient-to-br ${a.color} flex items-center justify-center text-foreground text-xs font-bold border-2 border-background shadow-md`}
               >
                 {a.initials}
               </motion.div>

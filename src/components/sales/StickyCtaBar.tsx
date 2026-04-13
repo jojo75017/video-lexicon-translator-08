@@ -80,7 +80,7 @@ export const StickyCtaBar: React.FC<StickyCtaBarProps> = ({ onCtaClick }) => {
               {/* Left: Offer info */}
               <div className="flex items-center gap-4 flex-wrap">
                 <div className="flex items-center gap-2">
-                  <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0 text-[10px] font-bold">
+                  <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-foreground border-0 text-[10px] font-bold">
                     2026
                   </Badge>
                   {isVipAvailable ? (
@@ -88,7 +88,7 @@ export const StickyCtaBar: React.FC<StickyCtaBarProps> = ({ onCtaClick }) => {
                       <Badge className="bg-red-500/20 text-red-400 border-red-500/30 animate-pulse">
                         🔥 OFFRE FONDATEUR
                       </Badge>
-                      <span className="text-white/60 text-sm hidden sm:inline">
+                      <span className="text-foreground/60 text-sm hidden sm:inline">
                         Plus que <strong className="text-amber-400">{daysLeft} jours</strong> à 67€
                       </span>
                     </>
@@ -101,8 +101,8 @@ export const StickyCtaBar: React.FC<StickyCtaBarProps> = ({ onCtaClick }) => {
                 
                 {/* Price */}
                 <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold text-white">{price}€</span>
-                  <span className="text-lg text-white/40 line-through">{originalPrice}€</span>
+                  <span className="text-3xl font-bold text-foreground">{price}€</span>
+                  <span className="text-lg text-foreground/40 line-through">{originalPrice}€</span>
                   <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 text-xs">
                     {discount}
                   </Badge>
@@ -110,7 +110,7 @@ export const StickyCtaBar: React.FC<StickyCtaBarProps> = ({ onCtaClick }) => {
               </div>
 
               {/* Center: Trust badges */}
-              <div className="hidden lg:flex items-center gap-4 text-xs text-white/60">
+              <div className="hidden lg:flex items-center gap-4 text-xs text-foreground/60">
                 <span className="flex items-center gap-1">
                   <Shield className="w-4 h-4 text-emerald-400" />
                   Garantie 30 jours
@@ -125,7 +125,7 @@ export const StickyCtaBar: React.FC<StickyCtaBarProps> = ({ onCtaClick }) => {
               <div className="flex items-center gap-2">
                 <Button
                   size="lg"
-                  className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white shadow-lg shadow-violet-500/25 whitespace-nowrap"
+                  className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-foreground shadow-lg shadow-violet-500/25 whitespace-nowrap"
                   onClick={handleCtaClick}
                 >
                   <Sparkles className="w-4 h-4 mr-2" />
@@ -136,7 +136,7 @@ export const StickyCtaBar: React.FC<StickyCtaBarProps> = ({ onCtaClick }) => {
                 
                 <button
                   onClick={handleDismiss}
-                  className="p-2 text-white/40 hover:text-white/80 transition-colors"
+                  className="p-2 text-foreground/40 hover:text-foreground/80 transition-colors"
                   aria-label="Fermer"
                 >
                   <X className="w-4 h-4" />
