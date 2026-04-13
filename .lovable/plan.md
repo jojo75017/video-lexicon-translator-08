@@ -1,66 +1,51 @@
 
 
-# État des lieux — Améliorations réelles possibles
+# Diagnostic et Plan de Correction -- Accès EbookPlanner bloqué
 
-## Ce qui fonctionne (acquis solides)
-- Générateur d'ebooks complet avec chapitres, templates, drag & drop
-- Export PDF/DOCX/EPUB fonctionnel
-- Couvertures, 4e de couverture, Calibre EPUB
-- Formats KDP : Atlas, Encyclopédie, Coloriage, Documentaire
-- Traduction multi-langues, personnages, séries
-- Workflow IA éditorial complet
-- Authentification, projets sauvegardés en base
-- Audio, checklist pré-publication KDP
+## Probleme identifie
 
-## Points critiques à améliorer (VRAIS problèmes, pas du factice)
+Deux problemes distincts empechent l'acces a `/ebook-planner` :
 
-### 1. Données factices dans les modules SEO/Analyse
-Plusieurs utilitaires retournent des **`Math.random()`** au lieu de vraies données :
-- `contentAnalyzer.ts` : qualité du contenu (grammaire, orthographe, unicité) = **100% aléatoire**
-- `mobileAnalyzer.ts` : score mobile = **aléatoire**
-- `keywordAnalyzer.ts` / `keywordExtractor.ts` : volumes de recherche, difficulté, CPC = **inventés**
-- `openaiService.ts` : score SEO, densité mots-clés = **aléatoire**
-- `analyticsAnalyzer.ts` : visiteurs, pages vues = **simulées**
-- `healthUtils.ts` : métriques santé = **valeurs fixes codées en dur**
+### 1. Timeout de l'authentification (Safety Timer)
+Les logs console montrent "Safety timer triggered" a chaque chargement. La verification admin via l'Edge Function `check-admin` prend plus de 8 secondes, ce qui force le timeout. Resultat : `isAdmin = false`, meme si vous etes admin.
 
-**Action** : Soit supprimer ces modules SEO non utilisés par le générateur d'ebooks, soit les connecter à Lovable AI pour de vraies analyses.
+### 2. SubscriberGate bloque l'acces
+Quand ni `isAdmin` ni `isAuthenticated` ne sont `true`, le `SubscriberGate` redirige vers `/subscription`, qui redirige vers `/auth`. Boucle.
 
-### 2. Fallbacks simulés dans les composants ebook
-- `EbookABTesting.tsx` : quand l'IA échoue, les scores sont **aléatoires**
-- `EbookArcManager.tsx` : analyse de titre en fallback = **score random**
-- `EbookAmazonAdsSimulator.tsx` : mots-clés générés par **simulation avec délai artificiel**
+## Cause technique
 
-**Action** : Remplacer les fallbacks random par des appels Lovable AI (Gemini/GPT) qui donneront de vraies analyses.
+- L'Edge Function `check-admin` est lente (>8s) probablement a cause du cold start Deno
+- Le `SubscriberGate` appelle AUSSI `getIsCurrentSessionAdmin()` en interne (double appel, double attente)
+- Le `initAuth` dans App.tsx ne met pas `setIsCheckingAuth(false)` assez vite quand la reponse traine
 
-### 3. UX du fichier EbookPlannerPage.tsx
-Le fichier fait **3149 lignes** — c'est un monolithe difficile à maintenir. Risque de bugs et lenteur.
+## Plan de correction
 
-**Action** : Découper en sous-composants (header, section plan, section chapitres, etc.)
+### Etape 1 : Augmenter le safety timer et optimiser initAuth
+- Passer le safety timer de 8s a 12s
+- Ajouter un `setIsCheckingAuth(false)` immediatement apres la partie subscriber (avant le check admin), pour que les subscribers ne soient pas bloques par le check admin
+- Separer la logique : d'abord terminer le check subscriber (rapide, localStorage), puis lancer le check admin en parallele sans bloquer le rendu
 
-### 4. Exports — Qualité professionnelle
-L'export PDF/DOCX existe mais pourrait être amélioré :
-- Typographie française automatique (guillemets «», espaces insécables avant : ; ! ?)
-- Table des matières cliquable dans le PDF
-- Numérotation de pages cohérente
+### Etape 2 : Optimiser SubscriberGate
+- Ajouter un timeout de 5s dans le `SubscriberGate` pour le check `getIsCurrentSessionAdmin()` : si ca depasse, continuer avec la validation subscriber normale au lieu de bloquer
+- Eviter le double appel admin quand `isAdmin` est deja passe en prop
 
-### 5. Sauvegarde automatique
-Vérifier que l'auto-save fonctionne sans perte de données, surtout sur les gros projets.
+### Etape 3 : Ajouter un cache court pour le statut admin
+- Apres un check admin reussi dans `App.tsx`, stocker le resultat en memoire (state React, pas localStorage) pour eviter de re-appeler l'Edge Function dans `SubscriberGate`
 
-### 6. Pages orphelines dans App.tsx
-~60 pages sont importées dont beaucoup ne servent pas au générateur d'ebooks (SEO, CRM, Pinterest, Dashboard, etc.). Elles alourdissent le bundle même avec le lazy loading.
+## Fichiers modifies
+- `src/App.tsx` : restructurer initAuth pour ne pas bloquer les subscribers
+- `src/components/auth/SubscriberGate.tsx` : ajouter timeout au check admin interne
+- `src/lib/adminAccess.ts` : ajouter cache memoire temporaire (30s)
 
-**Action** : Nettoyer les routes inutilisées pour alléger l'application.
+## Detail technique
 
----
+```text
+AVANT:
+initAuth() -> check localStorage -> check admin (8s+) -> setIsCheckingAuth(false)
+                                     ^^ bloque tout
 
-## Recommandation prioritaire (stabilisation)
-
-Conformément à votre stratégie de stabilisation :
-
-1. **Supprimer les modules SEO factices** — ne garder que ce qui sert vraiment au générateur
-2. **Remplacer les 3 fallbacks random** des outils ebook par Lovable AI
-3. **Nettoyer les routes orphelines** de App.tsx
-4. **Refactorer EbookPlannerPage.tsx** en sous-composants
-
-Aucune de ces actions n'ajoute de fausse fonctionnalité — elles consolident ce qui existe.
+APRES:
+initAuth() -> check localStorage -> setIsCheckingAuth(false) si subscriber OK
+                                  -> check admin en parallele (met a jour isAdmin quand pret)
+```
 
