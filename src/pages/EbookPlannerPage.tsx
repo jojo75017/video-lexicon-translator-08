@@ -1355,7 +1355,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           <div className="relative animate-fade-in">
             {/* Indicateur de bienvenue pour les utilisateurs venant de la formation */}
             {showWelcome && (
-              <div className="mb-8 relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary via-[#0052CC] to-accent p-6 shadow-2xl animate-scale-in">
+              <div className="mb-8 relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary via-accent to-primary p-6 shadow-2xl animate-scale-in">
                 <div className="absolute inset-0 bg-grid-white opacity-10" />
                 <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl" />
                 
@@ -1422,7 +1422,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             
             <div className="relative z-10 space-y-6">
               {/* Header Hero Section — 2026 Glass */}
-              <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0d1a2e] via-[#0d2444] to-[#0d0820] p-8 shadow-2xl border border-primary/20">
+              <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-secondary via-muted to-background p-8 shadow-2xl border border-primary/20">
                 <div className="absolute -top-20 -right-20 w-60 h-60 bg-primary rounded-full blur-[100px] opacity-20" />
                 <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-accent rounded-full blur-[80px] opacity-15" />
                 
@@ -1501,10 +1501,10 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               {/* Quick Stats — 2026 Glass Cards */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {[
-                  { label: 'Chapitres', value: chapters.length, icon: BookOpen, color: '#3B9EFF' },
-                  { label: 'Personnages', value: characters.length, icon: Users, color: '#0052CC' },
-                  { label: 'Images', value: ebookImages.length, icon: Palette, color: '#3B9EFF' },
-                  { label: 'Mots', value: chapters.reduce((acc, c) => acc + (c.content?.split(' ').length || 0) + c.subChapters.reduce((subAcc, sc) => subAcc + (sc.content?.split(' ').length || 0), 0), 0), icon: FileText, color: '#0052CC' },
+                  { label: 'Chapitres', value: chapters.length, icon: BookOpen, color: 'hsl(189, 100%, 29%)' },
+                  { label: 'Personnages', value: characters.length, icon: Users, color: 'hsl(189, 100%, 23%)' },
+                  { label: 'Images', value: ebookImages.length, icon: Palette, color: 'hsl(189, 100%, 29%)' },
+                  { label: 'Mots', value: chapters.reduce((acc, c) => acc + (c.content?.split(' ').length || 0) + c.subChapters.reduce((subAcc, sc) => subAcc + (sc.content?.split(' ').length || 0), 0), 0), icon: FileText, color: 'hsl(189, 100%, 23%)' },
                 ].map((stat, i) => (
                   <div 
                     key={i} 

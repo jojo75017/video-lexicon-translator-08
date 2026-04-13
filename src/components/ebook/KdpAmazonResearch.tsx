@@ -241,7 +241,7 @@ export const KdpAmazonResearch: React.FC = () => {
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid grid-cols-5 w-full bg-secondary/50 p-1.5 gap-1">
-          <TabsTrigger value="asin" className="flex items-center gap-1.5 data-[state=active]:bg-[#3B9EFF] data-[state=active]:text-white data-[state=active]:shadow-[0_0_12px_rgba(59,158,255,0.4)] text-muted-foreground transition-all">
+          <TabsTrigger value="asin" className="flex items-center gap-1.5 data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-[0_0_12px_rgba(0,130,150,0.3)] text-muted-foreground transition-all">
             <BookOpen className="h-4 w-4" />
             <span className="hidden sm:inline">Fiche ASIN</span>
           </TabsTrigger>
