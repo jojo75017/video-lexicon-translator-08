@@ -2895,6 +2895,36 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           />
         );
 
+      case 'atlas':
+        return <EbookAtlas onInsertContent={(content) => {
+          const updated = [...chapters];
+          if (updated[selectedChapter]) {
+            updated[selectedChapter] = { ...updated[selectedChapter], content: (updated[selectedChapter].content || '') + '\n\n' + content };
+            setChapters(updated);
+            toast.success('Contenu Atlas inséré dans le chapitre');
+          }
+        }} />;
+
+      case 'encyclopedia':
+        return <EbookEncyclopedia onInsertContent={(content) => {
+          const updated = [...chapters];
+          if (updated[selectedChapter]) {
+            updated[selectedChapter] = { ...updated[selectedChapter], content: (updated[selectedChapter].content || '') + '\n\n' + content };
+            setChapters(updated);
+            toast.success('Contenu Encyclopédie inséré dans le chapitre');
+          }
+        }} />;
+
+      case 'coloring':
+        return <KdpQuickTools
+          productType="coloring"
+          ebookTitle={ebookTitle}
+          targetAudience={targetAudience}
+        />;
+
+      case 'documentary':
+        return <EbookDocumentaryGenerator ebookTitle={ebookTitle} />;
+
       case 'subscription':
         // Rediriger vers la page Abonnement
         navigate('/subscription');
