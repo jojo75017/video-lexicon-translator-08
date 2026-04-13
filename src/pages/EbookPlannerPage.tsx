@@ -2898,8 +2898,8 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       case 'atlas':
         return <EbookAtlas onInsertContent={(content) => {
           const updated = [...chapters];
-          if (updated[selectedChapter]) {
-            updated[selectedChapter] = { ...updated[selectedChapter], content: (updated[selectedChapter].content || '') + '\n\n' + content };
+          if (updated[selectedChapters[0]]) {
+            updated[selectedChapters[0]] = { ...updated[selectedChapters[0]], content: (updated[selectedChapters[0]].content || '') + '\n\n' + content };
             setChapters(updated);
             toast.success('Contenu Atlas inséré dans le chapitre');
           }
@@ -2908,19 +2908,15 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       case 'encyclopedia':
         return <EbookEncyclopedia onInsertContent={(content) => {
           const updated = [...chapters];
-          if (updated[selectedChapter]) {
-            updated[selectedChapter] = { ...updated[selectedChapter], content: (updated[selectedChapter].content || '') + '\n\n' + content };
+          if (updated[selectedChapters[0]]) {
+            updated[selectedChapters[0]] = { ...updated[selectedChapters[0]], content: (updated[selectedChapters[0]].content || '') + '\n\n' + content };
             setChapters(updated);
             toast.success('Contenu Encyclopédie inséré dans le chapitre');
           }
         }} />;
 
       case 'coloring':
-        return <KdpQuickTools
-          productType="coloring"
-          ebookTitle={ebookTitle}
-          targetAudience={targetAudience}
-        />;
+        return <KdpQuickTools productType="coloring" />;
 
       case 'documentary':
         return <EbookDocumentaryGenerator ebookTitle={ebookTitle} />;
