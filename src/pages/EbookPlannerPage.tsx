@@ -2916,7 +2916,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
         }} />;
 
       case 'coloring':
-        return <KdpQuickTools productType="coloring" />;
+        return <KdpQuickTools productType="coloring" title={ebookTitle || 'Mon livre de coloriage'} pageCount={chapters.length * 10} targetAudience={targetAudience} />;
 
       case 'documentary':
         return <EbookDocumentaryGenerator ebookTitle={ebookTitle} />;
