@@ -92,8 +92,8 @@ const NewsletterForm = () => {
   return (
     <form onSubmit={handleSubmit} className="flex gap-2">
       <Input type="email" placeholder="votre@email.com" value={email} onChange={e => setEmail(e.target.value)} 
-        className="bg-slate-800/50 border-border text-foreground placeholder:text-muted-foreground h-10 rounded-xl" />
-      <Button type="submit" disabled={loading} className="bg-cyan-500 hover:bg-cyan-400 text-foreground font-bold h-10 px-4 rounded-xl">
+        className="bg-muted border-border text-foreground placeholder:text-muted-foreground h-10 rounded-xl" />
+      <Button type="submit" disabled={loading} className="bg-primary hover:bg-primary/90 text-foreground font-bold h-10 px-4 rounded-xl">
         {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
       </Button>
     </form>
@@ -282,7 +282,7 @@ const SalesPage = () => {
       <UrgencyBanner />
 
       {/* ═══════════════════════════════════════ TOP BAR ═══════════════════════════════════════ */}
-      <div className="bg-gradient-to-r from-cyan-600 via-cyan-500 to-emerald-500 text-foreground py-2.5 px-4">
+      <div className="bg-gradient-to-r from-primary via-primary to-accent text-foreground py-2.5 px-4">
         <div className="max-w-6xl mx-auto flex items-center justify-center gap-4 text-sm font-semibold">
           <Flame className="w-4 h-4" />
           <span>OFFRE DE LANCEMENT — Fin le 30 juin 2026</span>
@@ -293,7 +293,7 @@ const SalesPage = () => {
             <span>:</span>
             <span className="tabular-nums font-bold">{countdown.minutes}m</span>
           </div>
-          <Badge className="bg-card text-cyan-400 border-0 font-bold">−150€</Badge>
+          <Badge className="bg-card text-primary border-0 font-bold">−150€</Badge>
         </div>
       </div>
 
@@ -301,24 +301,24 @@ const SalesPage = () => {
       <header className="sticky top-[42px] z-50 bg-background/90 backdrop-blur-xl border-b border-border">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link to="/offres" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-emerald-400 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/80 to-accent/80 flex items-center justify-center">
               <BookOpen className="w-5 h-5 text-foreground" />
             </div>
             <div>
               <span className="font-bold text-lg">EbookStudio</span>
-              <span className="text-cyan-400 font-bold ml-1">Pro</span>
+              <span className="text-primary font-bold ml-1">Pro</span>
             </div>
           </Link>
           
           <nav className="hidden md:flex items-center gap-6 text-sm">
             <a href="#features" className="text-muted-foreground hover:text-foreground transition-colors">Fonctionnalités</a>
             <a href="#pricing" className="text-muted-foreground hover:text-foreground transition-colors">Tarif</a>
-            <Link to="/nouveautes-2026" className="text-cyan-400 hover:text-cyan-300 transition-colors font-medium">Nouveautés 2026</Link>
+            <Link to="/nouveautes-2026" className="text-primary hover:text-primary transition-colors font-medium">Nouveautés 2026</Link>
             <Link to="/demo" className="text-muted-foreground hover:text-foreground transition-colors">Démo</Link>
             <Link to="/subscription" className="text-muted-foreground hover:text-foreground transition-colors">Connexion</Link>
           </nav>
 
-          <Button onClick={scrollToPricing} className="bg-cyan-500 hover:bg-cyan-400 text-foreground font-bold rounded-xl px-5">
+          <Button onClick={scrollToPricing} className="bg-primary hover:bg-primary/90 text-foreground font-bold rounded-xl px-5">
             <Sparkles className="w-4 h-4 mr-2" />
             67€ à vie
           </Button>
@@ -338,7 +338,7 @@ const SalesPage = () => {
         <motion.div initial="hidden" animate="visible" variants={stagger} className="max-w-4xl mx-auto text-center relative z-10">
           
           <motion.div variants={fadeIn} className="mb-6">
-            <Badge className="bg-cyan-500/10 text-cyan-400 border-cyan-500/30 px-4 py-2 text-sm font-semibold">
+            <Badge className="bg-cyan-500/10 text-primary border-primary/30 px-4 py-2 text-sm font-semibold">
               <Cpu className="w-4 h-4 mr-2" />
               Propulsé par Gemini 3 Flash & Imagen 3
             </Badge>
@@ -375,10 +375,10 @@ const SalesPage = () => {
 
           {(hasWorkflowProgress || hasSubscriberAccess || hasAdminSession) && (
             <motion.div variants={fadeIn} custom={3.5} className="mb-8">
-              <div className="mx-auto max-w-2xl rounded-2xl border border-cyan-500/30 bg-card/70 p-4 sm:p-5 shadow-lg shadow-cyan-500/10 backdrop-blur-sm">
+              <div className="mx-auto max-w-2xl rounded-2xl border border-primary/30 bg-card/70 p-4 sm:p-5 shadow-lg shadow-primary/10 backdrop-blur-sm">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <div className="text-left">
-                    <p className="text-sm font-semibold text-cyan-400">Session détectée</p>
+                    <p className="text-sm font-semibold text-primary">Session détectée</p>
                     <p className="text-sm text-muted-foreground">
                       {hasWorkflowProgress
                         ? 'Votre progression est sauvegardée : vous pouvez reprendre immédiatement.'
@@ -390,7 +390,7 @@ const SalesPage = () => {
                     <Button
                       type="button"
                       onClick={() => navigate(hasAdminSession || hasSubscriberAccess ? '/ebook-planner' : '/subscription')}
-                      className="bg-gradient-to-r from-cyan-500 to-emerald-500 text-foreground font-bold rounded-xl"
+                      className="bg-gradient-to-r from-primary to-accent text-foreground font-bold rounded-xl"
                     >
                       <Rocket className="w-4 h-4 mr-2" />
                       {hasAdminSession || hasSubscriberAccess ? 'Reprendre le générateur' : 'Retrouver mon accès'}
@@ -401,7 +401,7 @@ const SalesPage = () => {
                         type="button"
                         variant="outline"
                         onClick={() => navigate('/admin')}
-                        className="border-cyan-500/40 text-cyan-400 hover:text-foreground hover:bg-cyan-500/10 rounded-xl"
+                        className="border-primary/40 text-primary hover:text-foreground hover:bg-cyan-500/10 rounded-xl"
                       >
                         Dashboard admin
                       </Button>
@@ -415,13 +415,13 @@ const SalesPage = () => {
           {/* CTA Principal */}
           <motion.div variants={fadeIn} custom={4} className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-5">
             <Button size="lg" onClick={handlePlanClick}
-              className="w-full sm:w-auto text-lg px-10 py-7 bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-foreground font-bold rounded-2xl shadow-2xl shadow-cyan-500/25 hover:shadow-cyan-500/40 transition-all duration-300 hover:-translate-y-1">
+              className="w-full sm:w-auto text-lg px-10 py-7 bg-gradient-to-r from-primary to-accent hover:from-cyan-400 hover:to-emerald-400 text-foreground font-bold rounded-2xl shadow-2xl shadow-primary/25 hover:shadow-primary/40 transition-all duration-300 hover:-translate-y-1">
               <Rocket className="w-5 h-5 mr-2" />
               Je publie mon 1er ebook — 67€ à vie
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
             <Button size="lg" variant="outline" onClick={() => navigate('/demo')}
-              className="w-full sm:w-auto text-base px-8 py-6 border-cyan-500/50 text-cyan-400 hover:text-foreground hover:border-cyan-400 hover:bg-cyan-500/10 rounded-2xl">
+              className="w-full sm:w-auto text-base px-8 py-6 border-primary/50 text-primary hover:text-foreground hover:border-primary hover:bg-cyan-500/10 rounded-2xl">
               <Play className="w-5 h-5 mr-2" />
               Voir la démo
             </Button>
@@ -480,7 +480,7 @@ const SalesPage = () => {
               </div>
               <Button
                 onClick={handlePlanClick}
-                className="shrink-0 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-foreground font-bold px-6 py-5 rounded-xl shadow-lg shadow-emerald-500/25 whitespace-nowrap"
+                className="shrink-0 bg-gradient-to-r from-primary to-accent hover:from-emerald-400 hover:to-cyan-400 text-foreground font-bold px-6 py-5 rounded-xl shadow-lg shadow-primary/25 whitespace-nowrap"
               >
                 <Rocket className="w-5 h-5 mr-2" />
                 Commencer gratuitement
@@ -495,14 +495,14 @@ const SalesPage = () => {
       <section className="py-16 px-4">
         <div className="max-w-4xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-8">
-            <motion.p variants={fadeIn} className="text-cyan-400 font-semibold mb-3 uppercase tracking-wider text-sm">Présentation vidéo</motion.p>
+            <motion.p variants={fadeIn} className="text-primary font-semibold mb-3 uppercase tracking-wider text-sm">Présentation vidéo</motion.p>
             <motion.h2 variants={fadeIn} custom={1} className="text-3xl sm:text-4xl font-black mb-3">
               Découvrez l'Offre Fondatrice
             </motion.h2>
             <motion.p variants={fadeIn} custom={2} className="text-muted-foreground">Tout ce qui est inclus, en moins de 3 minutes</motion.p>
           </motion.div>
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-            className="rounded-2xl overflow-hidden border-2 border-cyan-500/20 shadow-2xl shadow-cyan-500/10">
+            className="rounded-2xl overflow-hidden border-2 border-cyan-500/20 shadow-2xl shadow-primary/10">
             <video
               controls
               preload="metadata"
@@ -524,7 +524,7 @@ const SalesPage = () => {
             <div className="flex items-center gap-3">
               <div className="flex -space-x-3">
                 {['MD','TL','SR','JP','CB'].map((a, i) => (
-                  <div key={i} className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-emerald-500 flex items-center justify-center text-xs text-foreground font-bold border-2 border-background">{a}</div>
+                  <div key={i} className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-xs text-foreground font-bold border-2 border-background">{a}</div>
                 ))}
               </div>
               <div>
@@ -556,7 +556,7 @@ const SalesPage = () => {
       <section id="features" className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-16">
-            <motion.p variants={fadeIn} className="text-cyan-400 font-semibold mb-3 uppercase tracking-wider text-sm">Technologie 2026</motion.p>
+            <motion.p variants={fadeIn} className="text-primary font-semibold mb-3 uppercase tracking-wider text-sm">Technologie 2026</motion.p>
             <motion.h2 variants={fadeIn} custom={1} className="text-3xl sm:text-4xl md:text-5xl font-black mb-5">
               Tout ce dont vous avez besoin
             </motion.h2>
@@ -609,7 +609,7 @@ const SalesPage = () => {
       {/* ═══════════════════════════════════════ LEAD CAPTURE GRATUIT ═══════════════════════════════════════ */}
       <section className="py-16 px-4 bg-gradient-to-b from-slate-950 to-slate-900">
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="max-w-3xl mx-auto">
-          <Card className="bg-gradient-to-br from-amber-950/40 to-slate-900 border-2 border-amber-500/30 rounded-3xl overflow-hidden shadow-2xl shadow-amber-500/10">
+          <Card className="bg-gradient-to-br from-amber-50 to-secondary border-2 border-amber-500/30 rounded-3xl overflow-hidden shadow-2xl shadow-amber-500/10">
             <CardContent className="p-8 md:p-10">
               <div className="text-center space-y-4">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center mx-auto">
@@ -670,7 +670,7 @@ const SalesPage = () => {
               </Badge>
             </motion.div>
             <motion.h2 variants={fadeIn} custom={1} className="text-4xl sm:text-5xl md:text-6xl font-black mb-4">
-              Essayez <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-emerald-400">gratuitement</span> pendant 7 jours
+              Essayez <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary/80 to-accent/80">gratuitement</span> pendant 7 jours
             </motion.h2>
             <motion.p variants={fadeIn} custom={2} className="text-foreground/80 text-lg">
               Accès complet à toutes les fonctionnalités Pro. Si ça ne vous plaît pas, annulez avant 7 jours — <strong className="text-foreground">0€ facturé</strong>.
@@ -680,15 +680,15 @@ const SalesPage = () => {
           {/* Pricing Card */}
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
             transition={{ duration: 0.6 }}>
-            <Card className="bg-gradient-to-b from-slate-900 to-slate-950 border-2 border-cyan-500/30 rounded-3xl overflow-hidden shadow-2xl shadow-cyan-500/10">
+            <Card className="bg-gradient-to-b from-secondary to-muted border-2 border-primary/30 rounded-3xl overflow-hidden shadow-2xl shadow-primary/10">
               <CardContent className="p-8 md:p-12">
                 {/* Price */}
                 <div className="text-center mb-10">
                   <div className="flex items-baseline justify-center gap-3 mb-2">
                     <span className="text-7xl md:text-8xl font-black text-foreground">0€</span>
                   </div>
-                  <p className="text-foreground/80 text-lg">pendant <span className="text-cyan-400 font-bold">7 jours</span></p>
-                  <p className="text-muted-foreground mt-2">Puis <span className="line-through">{NORMAL_PRICE}€</span> <span className="text-cyan-400 font-bold">{LAUNCH_PRICE}€</span> paiement unique — Accès à vie</p>
+                  <p className="text-foreground/80 text-lg">pendant <span className="text-primary font-bold">7 jours</span></p>
+                  <p className="text-muted-foreground mt-2">Puis <span className="line-through">{NORMAL_PRICE}€</span> <span className="text-primary font-bold">{LAUNCH_PRICE}€</span> paiement unique — Accès à vie</p>
                 </div>
 
                 {/* Features */}
@@ -709,7 +709,7 @@ const SalesPage = () => {
                   ].map((f, i) => (
                     <div key={i} className="flex items-center gap-3">
                       <div className="w-5 h-5 rounded-full bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
-                        <Check className="w-3 h-3 text-cyan-400" />
+                        <Check className="w-3 h-3 text-primary" />
                       </div>
                       <span className="text-sm text-foreground">{f}</span>
                     </div>
@@ -718,7 +718,7 @@ const SalesPage = () => {
 
                 {/* CTA */}
                 <Button size="lg" onClick={handlePlanClick}
-                  className="w-full py-8 text-xl font-bold bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-foreground rounded-2xl shadow-xl shadow-cyan-500/20">
+                  className="w-full py-8 text-xl font-bold bg-gradient-to-r from-primary to-accent hover:from-cyan-400 hover:to-emerald-400 text-foreground rounded-2xl shadow-xl shadow-primary/20">
                   <Rocket className="w-6 h-6 mr-2" />
                   Commencer mon essai gratuit de 7 jours
                   <ArrowRight className="w-6 h-6 ml-2" />
@@ -739,7 +739,7 @@ const SalesPage = () => {
                       { label: "Jour 5", desc: "Rappel par email", icon: "📧" },
                       { label: "Jour 8", desc: `${LAUNCH_PRICE}€ si vous gardez`, icon: "💎" },
                     ].map((step, i) => (
-                      <div key={i} className="p-3 rounded-xl bg-slate-800/50">
+                      <div key={i} className="p-3 rounded-xl bg-muted">
                         <p className="text-lg mb-1">{step.icon}</p>
                         <p className="font-bold text-foreground text-sm">{step.label}</p>
                         <p className="text-xs text-muted-foreground">{step.desc}</p>
@@ -810,7 +810,7 @@ const SalesPage = () => {
           </motion.p>
           <motion.div variants={fadeIn} custom={2}>
             <Button size="lg" onClick={handlePlanClick}
-              className="text-lg px-12 py-8 bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-foreground font-bold rounded-2xl shadow-2xl shadow-cyan-500/25 hover:shadow-cyan-500/40 transition-all duration-300 hover:-translate-y-1">
+              className="text-lg px-12 py-8 bg-gradient-to-r from-primary to-accent hover:from-cyan-400 hover:to-emerald-400 text-foreground font-bold rounded-2xl shadow-2xl shadow-primary/25 hover:shadow-primary/40 transition-all duration-300 hover:-translate-y-1">
               <Rocket className="w-6 h-6 mr-2" />
               Essai gratuit 7 jours — puis {LAUNCH_PRICE}€ à vie
               <ArrowRight className="w-6 h-6 ml-2" />
@@ -830,7 +830,7 @@ const SalesPage = () => {
           <div className="grid md:grid-cols-5 gap-10 mb-10">
             <div className="md:col-span-1">
               <div className="flex items-center gap-2.5 mb-4">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-400 to-emerald-400 flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary/80 to-accent/80 flex items-center justify-center">
                   <BookOpen className="w-4 h-4 text-foreground" />
                 </div>
                 <h3 className="text-lg font-bold text-foreground">EbookStudio Pro</h3>
@@ -840,23 +840,23 @@ const SalesPage = () => {
             <div>
               <h4 className="font-semibold mb-4 text-foreground text-sm uppercase tracking-wider">Guides</h4>
               <ul className="space-y-2.5 text-sm">
-                <li><button onClick={() => navigate("/ecrire-livre-chatgpt")} className="text-muted-foreground hover:text-cyan-400 transition-colors">Écrire avec l'IA</button></li>
-                <li><button onClick={() => navigate("/creer-ebook-ia")} className="text-muted-foreground hover:text-cyan-400 transition-colors">Créer un ebook IA</button></li>
+                <li><button onClick={() => navigate("/ecrire-livre-chatgpt")} className="text-muted-foreground hover:text-primary transition-colors">Écrire avec l'IA</button></li>
+                <li><button onClick={() => navigate("/creer-ebook-ia")} className="text-muted-foreground hover:text-primary transition-colors">Créer un ebook IA</button></li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold mb-4 text-foreground text-sm uppercase tracking-wider">Produit</h4>
               <ul className="space-y-2.5 text-sm">
-                <li><button onClick={() => navigate("/demo")} className="text-muted-foreground hover:text-cyan-400 transition-colors">Démo gratuite</button></li>
-                <li><button onClick={() => navigate("/formation")} className="text-muted-foreground hover:text-cyan-400 transition-colors">Formation</button></li>
+                <li><button onClick={() => navigate("/demo")} className="text-muted-foreground hover:text-primary transition-colors">Démo gratuite</button></li>
+                <li><button onClick={() => navigate("/formation")} className="text-muted-foreground hover:text-primary transition-colors">Formation</button></li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold mb-4 text-foreground text-sm uppercase tracking-wider">Légal</h4>
               <ul className="space-y-2.5 text-sm">
-                <li><button onClick={() => navigate("/mentions-legales")} className="text-muted-foreground hover:text-cyan-400 transition-colors">Mentions légales</button></li>
-                <li><button onClick={() => navigate("/cgv")} className="text-muted-foreground hover:text-cyan-400 transition-colors">CGV</button></li>
-                <li><button onClick={() => navigate("/politique-confidentialite")} className="text-muted-foreground hover:text-cyan-400 transition-colors">Confidentialité</button></li>
+                <li><button onClick={() => navigate("/mentions-legales")} className="text-muted-foreground hover:text-primary transition-colors">Mentions légales</button></li>
+                <li><button onClick={() => navigate("/cgv")} className="text-muted-foreground hover:text-primary transition-colors">CGV</button></li>
+                <li><button onClick={() => navigate("/politique-confidentialite")} className="text-muted-foreground hover:text-primary transition-colors">Confidentialité</button></li>
               </ul>
             </div>
             <div>
@@ -874,7 +874,7 @@ const SalesPage = () => {
       {/* ═══════════════════════════════════════ STICKY MOBILE CTA ═══════════════════════════════════════ */}
       <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-background/95 backdrop-blur-xl border-t border-border p-3 safe-area-inset-bottom">
         <Button onClick={handlePlanClick}
-          className="w-full py-5 text-base font-bold bg-gradient-to-r from-cyan-500 to-emerald-500 text-foreground rounded-xl">
+          className="w-full py-5 text-base font-bold bg-gradient-to-r from-primary to-accent text-foreground rounded-xl">
           <Rocket className="w-4 h-4 mr-2" />
           Accès Pro — {LAUNCH_PRICE}€ à vie
         </Button>
@@ -911,10 +911,10 @@ const SalesPage = () => {
                 <p className="text-muted-foreground">Votre accès gratuit de 7 jours est prêt.</p>
                 <div className="bg-slate-800 rounded-xl p-4 space-y-2">
                   <p className="text-sm text-muted-foreground">Votre code d'accès :</p>
-                  <p className="text-2xl font-mono font-bold text-cyan-400">{trialResult.accessCode}</p>
+                  <p className="text-2xl font-mono font-bold text-primary">{trialResult.accessCode}</p>
                   <p className="text-sm text-muted-foreground">Email : {trialResult.email}</p>
                 </div>
-                <Button size="lg" onClick={() => navigate("/subscription")} className="w-full py-6 bg-gradient-to-r from-cyan-500 to-emerald-500 text-foreground font-bold rounded-xl">
+                <Button size="lg" onClick={() => navigate("/subscription")} className="w-full py-6 bg-gradient-to-r from-primary to-accent text-foreground font-bold rounded-xl">
                   <ArrowRight className="w-5 h-5 mr-2" />
                   Se connecter maintenant
                 </Button>
@@ -923,7 +923,7 @@ const SalesPage = () => {
               <form onSubmit={handleStartTrial} className="space-y-6">
                 <div className="text-center space-y-2">
                   <div className="w-14 h-14 rounded-full bg-cyan-500/20 flex items-center justify-center mx-auto">
-                    <Gift className="w-8 h-8 text-cyan-400" />
+                    <Gift className="w-8 h-8 text-primary" />
                   </div>
                   <h3 className="text-2xl font-bold text-foreground">Essai gratuit 7 jours</h3>
                   <p className="text-muted-foreground text-sm">Accès complet à toutes les fonctionnalités Pro. Aucune carte bancaire requise.</p>
@@ -938,7 +938,7 @@ const SalesPage = () => {
                     className="bg-slate-800 border-border text-foreground placeholder:text-muted-foreground h-12 rounded-xl text-center text-lg"
                   />
                 </div>
-                <Button type="submit" size="lg" disabled={trialLoading} className="w-full py-6 bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-foreground font-bold rounded-xl text-lg">
+                <Button type="submit" size="lg" disabled={trialLoading} className="w-full py-6 bg-gradient-to-r from-primary to-accent hover:from-cyan-400 hover:to-emerald-400 text-foreground font-bold rounded-xl text-lg">
                   {trialLoading ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : <Rocket className="w-5 h-5 mr-2" />}
                   {trialLoading ? "Activation..." : "Démarrer mon essai gratuit"}
                 </Button>
