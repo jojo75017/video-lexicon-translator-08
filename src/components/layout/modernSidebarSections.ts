@@ -14,6 +14,7 @@ export const SIDEBAR_SUBSECTIONS: Record<string, SidebarSectionConfig[]> = {
   '✍️ Écriture': [
     { label: 'Essentiel', itemIds: ['planner', 'writing', 'aichat'] },
     { label: 'Univers', itemIds: ['characters', 'series'] },
+    { label: 'Formats KDP', itemIds: ['atlas', 'encyclopedia', 'coloring', 'documentary'] },
     { label: 'Imports', itemIds: ['doc-transform', 'url-import'] },
     { label: 'Outils', itemIds: ['templates', 'strict-proofread'] },
   ],

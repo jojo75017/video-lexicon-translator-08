@@ -49,6 +49,10 @@ import { EbookProjectsList } from '@/components/ebook/EbookProjectsList';
 import { EbookAiChat } from '@/components/ebook/EbookAiChat';
 
 import { EbookSeriesManager } from '@/components/ebook/EbookSeriesManager';
+import EbookAtlas from '@/components/ebook/EbookAtlas';
+import EbookEncyclopedia from '@/components/ebook/EbookEncyclopedia';
+import EbookDocumentaryGenerator from '@/components/ebook/EbookDocumentaryGenerator';
+import { KdpQuickTools } from '@/components/ebook/KdpQuickTools';
 import { EbookAudioGenerator } from '@/components/ebook/EbookAudioGenerator';
 import { EbookEditorialDirector } from '@/components/ebook/EbookEditorialDirector';
 import { EbookMarketAnalysis } from '@/components/ebook/EbookMarketAnalysis';
@@ -2890,6 +2894,32 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             }}
           />
         );
+
+      case 'atlas':
+        return <EbookAtlas onInsertContent={(content) => {
+          const updated = [...chapters];
+          if (updated[selectedChapters[0]]) {
+            updated[selectedChapters[0]] = { ...updated[selectedChapters[0]], content: (updated[selectedChapters[0]].content || '') + '\n\n' + content };
+            setChapters(updated);
+            toast.success('Contenu Atlas inséré dans le chapitre');
+          }
+        }} />;
+
+      case 'encyclopedia':
+        return <EbookEncyclopedia onInsertContent={(content) => {
+          const updated = [...chapters];
+          if (updated[selectedChapters[0]]) {
+            updated[selectedChapters[0]] = { ...updated[selectedChapters[0]], content: (updated[selectedChapters[0]].content || '') + '\n\n' + content };
+            setChapters(updated);
+            toast.success('Contenu Encyclopédie inséré dans le chapitre');
+          }
+        }} />;
+
+      case 'coloring':
+        return <KdpQuickTools productType="coloring" title={ebookTitle || 'Mon livre de coloriage'} pageCount={chapters.length * 10} targetAudience={targetAudience} />;
+
+      case 'documentary':
+        return <EbookDocumentaryGenerator ebookTitle={ebookTitle} />;
 
       case 'subscription':
         // Rediriger vers la page Abonnement
