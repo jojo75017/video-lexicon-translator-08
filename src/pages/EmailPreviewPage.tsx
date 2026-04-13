@@ -2,9 +2,7 @@ import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Mail, Clock, Eye, ChevronLeft, ChevronRight } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Mail, Clock, ChevronLeft, ChevronRight } from "lucide-react";
 import { AdminPanelNav } from '@/components/admin/AdminPanelNav';
 
 const DEMO_LINK = "https://ebookstudio.fr/demo";
@@ -217,7 +215,6 @@ function renderEmailHtml(body: string): string {
 }
 
 const EmailPreviewPage = () => {
-  const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
   const email = EMAIL_SEQUENCE[activeStep];
 
