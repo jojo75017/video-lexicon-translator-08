@@ -126,7 +126,7 @@ export const WorkflowDashboard: React.FC<WorkflowDashboardProps> = ({
             <BarChart3 className="h-6 w-6 text-gold gold-icon" />
             <span className="text-gradient-gold">Tableau de Bord Workflow</span>
           </h2>
-          <p className="text-white/50 text-sm mt-1">
+          <p className="text-muted-foreground text-sm mt-1">
             Vue d'ensemble de votre processus éditorial
           </p>
         </div>
@@ -136,7 +136,7 @@ export const WorkflowDashboard: React.FC<WorkflowDashboardProps> = ({
             size="sm"
             onClick={handleCloudSync}
             disabled={isSyncing || completedCount === 0}
-            className="gap-2 border-gold/20 text-gold/70 hover:text-gold bg-slate-800/50"
+            className="gap-2 border-primary/20 text-gold/70 hover:text-gold bg-muted/50"
           >
             {isSyncing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Cloud className="h-4 w-4" />}
             Sauvegarder Cloud
@@ -145,7 +145,7 @@ export const WorkflowDashboard: React.FC<WorkflowDashboardProps> = ({
             variant="outline"
             size="sm"
             onClick={handleCloudRestore}
-            className="gap-2 border-gold/20 text-gold/70 hover:text-gold bg-slate-800/50"
+            className="gap-2 border-primary/20 text-gold/70 hover:text-gold bg-muted/50"
           >
             <RefreshCw className="h-4 w-4" />
             Restaurer
@@ -159,7 +159,7 @@ export const WorkflowDashboard: React.FC<WorkflowDashboardProps> = ({
           {(hasStepResult('P4') || hasStepResult('P5')) && (
             <Button 
               onClick={() => onNavigate('audio-express')} 
-              className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold"
+              className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-foreground font-semibold"
             >
               <Headphones className="h-4 w-4" />
               Exporter vers Audio Express
@@ -232,28 +232,28 @@ export const WorkflowDashboard: React.FC<WorkflowDashboardProps> = ({
       )}
 
       {/* Progress Overview */}
-      <Card className="border-2 border-gold/20 bg-slate-900/80 backdrop-blur-sm">
+      <Card className="border-2 border-primary/20 bg-card backdrop-blur-sm">
         <CardContent className="pt-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="md:col-span-2">
               <div className="flex justify-between mb-2">
-                <span className="text-sm font-medium text-white/70">Progression globale</span>
+                <span className="text-sm font-medium text-foreground/70">Progression globale</span>
                 <span className="text-sm font-bold text-gold">{Math.round(progressPercent)}%</span>
               </div>
               <Progress value={progressPercent} className="h-4 mb-3 gold-progress" />
-              <p className="text-xs text-white/50">
+              <p className="text-xs text-muted-foreground">
                 {completedCount}/{totalSteps} étapes complétées
               </p>
             </div>
-            <div className="text-center p-4 bg-slate-800/60 rounded-lg border border-gold/10">
+            <div className="text-center p-4 bg-muted/50 rounded-lg border border-primary/10">
               <Clock className="h-6 w-6 mx-auto mb-1 text-gold" />
               <p className="text-2xl font-bold text-white">{remainingMinutes}</p>
-              <p className="text-xs text-white/50">min restantes</p>
+              <p className="text-xs text-muted-foreground">min restantes</p>
             </div>
-            <div className="text-center p-4 bg-slate-800/60 rounded-lg border border-white/10">
+            <div className="text-center p-4 bg-muted/50 rounded-lg border border-border">
               <CheckCircle2 className="h-6 w-6 mx-auto mb-1 text-emerald-400" />
               <p className="text-2xl font-bold text-white">{completedCount}</p>
-              <p className="text-xs text-white/50">étapes terminées</p>
+              <p className="text-xs text-muted-foreground">étapes terminées</p>
             </div>
           </div>
         </CardContent>
@@ -411,7 +411,7 @@ export const WorkflowDashboard: React.FC<WorkflowDashboardProps> = ({
                   <h3 className="text-xl font-bold text-white">
                     Continuer avec {nextAvailableStep.id} — {nextAvailableStep.label}
                   </h3>
-                  <p className="text-sm text-white/60 mt-1">
+                  <p className="text-sm text-muted-foreground mt-1">
                     {nextAvailableStep.description} · ~{STEP_ESTIMATES[nextAvailableStep.id]?.minutes || 3} min
                   </p>
                 </div>
@@ -445,8 +445,8 @@ export const WorkflowDashboard: React.FC<WorkflowDashboardProps> = ({
                 className={cn(
                   "transition-all duration-200 cursor-pointer hover:shadow-lg bg-slate-900/60 backdrop-blur-sm",
                   status === 'completed' && "border-emerald-500/30 bg-emerald-500/5",
-                  status === 'available' && "border-white/10 hover:border-cyan-500/30",
-                  status === 'locked' && "opacity-50 border-white/5",
+                  status === 'available' && "border-border hover:border-cyan-500/30",
+                  status === 'locked' && "opacity-50 border-border/50",
                   expandedPreview === step.id && "ring-2 ring-cyan-500/50"
                 )}
                 onClick={() => { if (status !== 'locked') onNavigate(tabId); }}
@@ -458,7 +458,7 @@ export const WorkflowDashboard: React.FC<WorkflowDashboardProps> = ({
                         "w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-sm font-bold",
                         status === 'completed' && "bg-emerald-500 text-white",
                         status === 'available' && "bg-cyan-500/20 text-cyan-400",
-                        status === 'locked' && "bg-slate-800 text-white/30"
+                        status === 'locked' && "bg-muted text-muted-foreground"
                       )}>
                         {status === 'completed' ? <CheckCircle2 className="h-5 w-5" /> :
                          status === 'locked' ? <Lock className="h-4 w-4" /> :
@@ -473,10 +473,10 @@ export const WorkflowDashboard: React.FC<WorkflowDashboardProps> = ({
                             </Badge>
                           )}
                         </div>
-                        <p className="text-xs text-white/40 mt-0.5">{step.description}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">{step.description}</p>
                         
                         <div className="flex items-center gap-3 mt-2">
-                          <span className="text-xs flex items-center gap-1 text-white/40">
+                          <span className="text-xs flex items-center gap-1 text-muted-foreground">
                             <Clock className="h-3 w-3" />
                             ~{estimate?.minutes} min
                           </span>
@@ -487,7 +487,7 @@ export const WorkflowDashboard: React.FC<WorkflowDashboardProps> = ({
                                 Conseil
                               </span>
                             </TooltipTrigger>
-                            <TooltipContent side="bottom" className="max-w-xs bg-slate-800 border-white/10 text-white">
+                            <TooltipContent side="bottom" className="max-w-xs bg-muted border-border text-white">
                               <p className="text-xs">{estimate?.tip}</p>
                             </TooltipContent>
                           </Tooltip>
@@ -510,8 +510,8 @@ export const WorkflowDashboard: React.FC<WorkflowDashboardProps> = ({
                   </div>
 
                   {expandedPreview === step.id && result && (
-                    <div className="mt-3 p-3 bg-slate-800/60 rounded-lg text-xs max-h-40 overflow-y-auto border border-white/10">
-                      <p className="whitespace-pre-wrap text-white/70">
+                    <div className="mt-3 p-3 bg-muted/50 rounded-lg text-xs max-h-40 overflow-y-auto border border-border">
+                      <p className="whitespace-pre-wrap text-foreground/70">
                         {result.displayContent?.substring(0, 500)}
                         {(result.displayContent?.length || 0) > 500 && '...'}
                       </p>
@@ -526,9 +526,9 @@ export const WorkflowDashboard: React.FC<WorkflowDashboardProps> = ({
 
       {/* Actions */}
       {completedCount > 0 && (
-        <Card className="bg-slate-900/60 border-white/10">
+        <Card className="bg-slate-900/60 border-border">
           <CardContent className="p-4 flex items-center justify-between flex-wrap gap-3">
-            <div className="flex items-center gap-2 text-sm text-white/40">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
               {isCloudSynced && lastSyncedAt && (
                 <span className="flex items-center gap-1 text-emerald-400">
                   <Cloud className="h-4 w-4" />

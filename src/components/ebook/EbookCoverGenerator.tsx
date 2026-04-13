@@ -488,13 +488,13 @@ export const EbookCoverGenerator: React.FC<EbookCoverGeneratorProps> = ({
                   value={customPrompt}
                   onChange={e => setCustomPrompt(e.target.value)}
                   rows={6}
-                  className="mt-1 text-sm font-mono bg-slate-900 text-green-300 border-slate-700 rounded-xl"
+                  className="mt-1 text-sm font-mono bg-card text-green-300 border-border rounded-xl"
                 />
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={copyPrompt}
-                  className="absolute top-8 right-2 text-slate-400 hover:text-white hover:bg-slate-700"
+                  className="absolute top-8 right-2 text-slate-400 hover:text-foreground hover:bg-slate-700"
                 >
                   {promptCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                 </Button>
