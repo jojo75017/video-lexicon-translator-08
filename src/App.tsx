@@ -96,11 +96,10 @@ const App = () => {
     const safetyTimer = setTimeout(() => {
       console.warn('Safety timer triggered – forcing auth check complete');
       setIsCheckingAuth(false);
-    }, 8000);
+    }, 12000);
 
     const initAuth = async () => {
-      // Check subscriber auth (client cache)
-      // NOTE: localStorage can be tampered with, so we only use it as a hint.
+      // Check subscriber auth (client cache) — fast, localStorage only
       const savedEmail = localStorage.getItem('subscriber_email');
       const savedData = localStorage.getItem('subscriber_data');
 
@@ -124,7 +123,10 @@ const App = () => {
         }
       }
 
-      // Check admin session
+      // Unblock rendering NOW — subscribers can proceed while admin check runs in background
+      setIsCheckingAuth(false);
+
+      // Check admin session in background (non-blocking)
       try {
         const {
           data: { session },
@@ -148,8 +150,6 @@ const App = () => {
       } catch (error) {
         console.error('Erreur lors de la vérification de la session admin:', error);
       }
-
-      setIsCheckingAuth(false);
     };
 
     initAuth();
