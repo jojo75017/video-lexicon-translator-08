@@ -1185,21 +1185,13 @@ export type Database = {
       count_vip_subscribers: { Args: never; Returns: number }
       generate_referral_code: { Args: never; Returns: string }
       get_referral_stats: { Args: { p_user_id: string }; Returns: Json }
-      has_role:
-        | {
-            Args: {
-              _email: string
-              _role: Database["public"]["Enums"]["app_role"]
-            }
-            Returns: boolean
-          }
-        | {
-            Args: {
-              _role: Database["public"]["Enums"]["app_role"]
-              _user_id: string
-            }
-            Returns: boolean
-          }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       vip_days_remaining: { Args: never; Returns: number }
     }
     Enums: {

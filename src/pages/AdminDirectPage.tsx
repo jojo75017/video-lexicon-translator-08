@@ -1,78 +1,55 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { getIsCurrentSessionAdmin } from "@/lib/adminAccess";
 import { Loader2, Mail, Shield, AlertCircle, Send } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-
-const ADMIN_EMAIL = "boubetgeorges@gmail.com";
+import { Input } from "@/components/ui/input";
 
 const AdminDirectPage = () => {
   const navigate = useNavigate();
   const [status, setStatus] = useState<"checking" | "idle" | "sending" | "sent" | "authenticating" | "error">("checking");
   const [message, setMessage] = useState("Vérification de la session...");
+  const [email, setEmail] = useState("");
 
-  const checkAdminAndRedirect = useCallback(async (session: any) => {
+  const checkAdminAndRedirect = useCallback(async () => {
     try {
-      const { data: isAdmin, error: rpcError } = await supabase.rpc("has_role", {
-        _user_id: session.user.id,
-        _role: "admin"
-      });
-
-      if (rpcError) {
-        console.warn("RPC has_role error:", rpcError);
-        if (session.user.email === ADMIN_EMAIL) {
-          sessionStorage.setItem('is_admin', 'true');
-          localStorage.setItem('permanent_admin_email', session.user.email);
-          navigate("/dashboard", { replace: true });
-          return true;
-        }
-        return false;
-      }
-
-      if (isAdmin || session.user.email === ADMIN_EMAIL) {
-        sessionStorage.setItem('is_admin', 'true');
-        localStorage.setItem('permanent_admin_email', session.user.email || ADMIN_EMAIL);
+      const isAdmin = await getIsCurrentSessionAdmin();
+      if (isAdmin) {
         navigate("/dashboard", { replace: true });
         return true;
       }
-
       return false;
     } catch (err) {
       console.error("Admin check error:", err);
-      if (session.user.email === ADMIN_EMAIL) {
-        sessionStorage.setItem('is_admin', 'true');
-        localStorage.setItem('permanent_admin_email', session.user.email);
-        navigate("/dashboard", { replace: true });
-        return true;
-      }
       return false;
     }
   }, [navigate]);
 
   const sendMagicLink = async () => {
-    setStatus("sending");
-    setMessage(`Envoi du lien magique à ${ADMIN_EMAIL}...`);
+    if (!email || !email.includes("@")) {
+      setStatus("error");
+      setMessage("Veuillez entrer une adresse email valide.");
+      return;
+    }
 
-    // Always use published URL to avoid preview proxy interference with OTP tokens
+    setStatus("sending");
+    setMessage("Envoi du lien magique...");
+
     const redirectTo = 'https://video-lexicon-translator-08.lovable.app/admin-direct';
 
-    console.log("[AdminDirect] Sending OTP to:", ADMIN_EMAIL, "redirectTo:", redirectTo);
-    const { data: otpData, error: magicLinkError } = await supabase.auth.signInWithOtp({
-      email: ADMIN_EMAIL,
-      options: {
-        emailRedirectTo: redirectTo
-      }
+    const { error: magicLinkError } = await supabase.auth.signInWithOtp({
+      email: email.trim().toLowerCase(),
+      options: { emailRedirectTo: redirectTo }
     });
-    console.log("[AdminDirect] OTP response:", { data: otpData, error: magicLinkError });
 
     if (magicLinkError) {
       if (magicLinkError.status === 429) {
         setStatus("sent");
-        setMessage("⚠️ Rate limit atteint. Attendez quelques minutes puis réessayez. Vérifiez aussi vos spams.");
+        setMessage("⚠️ Rate limit atteint. Attendez quelques minutes puis réessayez.");
         return;
       }
-      console.error("Magic link error:", JSON.stringify(magicLinkError));
       setStatus("error");
       setMessage(`Erreur: ${magicLinkError.message || "Erreur inconnue"}`);
       return;
@@ -83,47 +60,32 @@ const AdminDirectPage = () => {
   };
 
   useEffect(() => {
-    const processAuthenticatedSession = async (session: any) => {
+    const processAuthenticatedSession = async () => {
       setStatus("authenticating");
       setMessage("Authentification en cours...");
 
-      const success = await checkAdminAndRedirect(session);
+      const success = await checkAdminAndRedirect();
       if (!success) {
         setStatus("error");
-        setMessage("Accès refusé - Vous n'êtes pas administrateur");
+        setMessage("Accès refusé — Vous n'êtes pas administrateur.");
       }
     };
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("Auth state change:", event, session?.user?.email);
       if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') && session) {
-        setTimeout(() => {
-          void processAuthenticatedSession(session);
-        }, 0);
+        setTimeout(() => { void processAuthenticatedSession(); }, 0);
       }
     });
 
-    // Only check existing session, do NOT auto-send a new link
     const init = async () => {
       try {
-        console.log("[AdminDirect] Checking existing session...");
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        
-        console.log("[AdminDirect] Session result:", { 
-          hasSession: !!session, 
-          email: session?.user?.email,
-          error: sessionError?.message 
-        });
-
+        const { data: { session } } = await supabase.auth.getSession();
         if (session) {
-          const success = await checkAdminAndRedirect(session);
-          console.log("[AdminDirect] Admin check result:", success);
+          const success = await checkAdminAndRedirect();
           if (success) return;
         }
-
-        // No session - show button to send link manually
         setStatus("idle");
-        setMessage("Cliquez ci-dessous pour recevoir votre lien de connexion admin.");
+        setMessage("Entrez votre email admin pour recevoir un lien de connexion.");
       } catch (err) {
         console.error("[AdminDirect] Init error:", err);
         setStatus("error");
@@ -132,7 +94,6 @@ const AdminDirectPage = () => {
     };
 
     init();
-
     return () => subscription.unsubscribe();
   }, [navigate, checkAdminAndRedirect]);
 
@@ -156,10 +117,19 @@ const AdminDirectPage = () => {
           </div>
 
           {status === "idle" && (
-            <Button onClick={sendMagicLink} className="w-full mt-4" size="lg">
-              <Send className="w-4 h-4 mr-2" />
-              Envoyer le lien de connexion
-            </Button>
+            <div className="space-y-3 mt-4">
+              <Input
+                type="email"
+                placeholder="votre@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && sendMagicLink()}
+              />
+              <Button onClick={sendMagicLink} className="w-full" size="lg">
+                <Send className="w-4 h-4 mr-2" />
+                Envoyer le lien de connexion
+              </Button>
+            </div>
           )}
 
           {status === "sent" && (
@@ -169,17 +139,17 @@ const AdminDirectPage = () => {
                   📧 Cliquez sur le lien dans l'email pour vous connecter.
                 </p>
                 <p className="text-xs text-muted-foreground mt-2">
-                  ⚠️ N'actualisez pas cette page avant d'avoir cliqué sur le lien, sinon il sera invalidé.
+                  ⚠️ N'actualisez pas cette page avant d'avoir cliqué sur le lien.
                 </p>
               </div>
-              <Button variant="outline" onClick={sendMagicLink} size="sm">
+              <Button variant="outline" onClick={() => { setStatus("idle"); setMessage("Entrez votre email admin."); }} size="sm">
                 Renvoyer un nouveau lien
               </Button>
             </div>
           )}
 
           {status === "error" && (
-            <Button onClick={() => { setStatus("idle"); setMessage(""); }} variant="outline" className="mt-4">
+            <Button onClick={() => { setStatus("idle"); setMessage("Entrez votre email admin."); }} variant="outline" className="mt-4">
               Réessayer
             </Button>
           )}
