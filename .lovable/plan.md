@@ -1,51 +1,66 @@
 
 
-## Rapport — Pages et composants encore en thème sombre
+# État des lieux — Améliorations réelles possibles
 
-Après scan complet, **15 fichiers** utilisent encore les anciennes couleurs sombres (`bg-slate-950`, `bg-slate-900`, `text-white`, etc.) au lieu du thème Amazon KDP clair.
+## Ce qui fonctionne (acquis solides)
+- Générateur d'ebooks complet avec chapitres, templates, drag & drop
+- Export PDF/DOCX/EPUB fonctionnel
+- Couvertures, 4e de couverture, Calibre EPUB
+- Formats KDP : Atlas, Encyclopédie, Coloriage, Documentaire
+- Traduction multi-langues, personnages, séries
+- Workflow IA éditorial complet
+- Authentification, projets sauvegardés en base
+- Audio, checklist pré-publication KDP
+
+## Points critiques à améliorer (VRAIS problèmes, pas du factice)
+
+### 1. Données factices dans les modules SEO/Analyse
+Plusieurs utilitaires retournent des **`Math.random()`** au lieu de vraies données :
+- `contentAnalyzer.ts` : qualité du contenu (grammaire, orthographe, unicité) = **100% aléatoire**
+- `mobileAnalyzer.ts` : score mobile = **aléatoire**
+- `keywordAnalyzer.ts` / `keywordExtractor.ts` : volumes de recherche, difficulté, CPC = **inventés**
+- `openaiService.ts` : score SEO, densité mots-clés = **aléatoire**
+- `analyticsAnalyzer.ts` : visiteurs, pages vues = **simulées**
+- `healthUtils.ts` : métriques santé = **valeurs fixes codées en dur**
+
+**Action** : Soit supprimer ces modules SEO non utilisés par le générateur d'ebooks, soit les connecter à Lovable AI pour de vraies analyses.
+
+### 2. Fallbacks simulés dans les composants ebook
+- `EbookABTesting.tsx` : quand l'IA échoue, les scores sont **aléatoires**
+- `EbookArcManager.tsx` : analyse de titre en fallback = **score random**
+- `EbookAmazonAdsSimulator.tsx` : mots-clés générés par **simulation avec délai artificiel**
+
+**Action** : Remplacer les fallbacks random par des appels Lovable AI (Gemini/GPT) qui donneront de vraies analyses.
+
+### 3. UX du fichier EbookPlannerPage.tsx
+Le fichier fait **3149 lignes** — c'est un monolithe difficile à maintenir. Risque de bugs et lenteur.
+
+**Action** : Découper en sous-composants (header, section plan, section chapitres, etc.)
+
+### 4. Exports — Qualité professionnelle
+L'export PDF/DOCX existe mais pourrait être amélioré :
+- Typographie française automatique (guillemets «», espaces insécables avant : ; ! ?)
+- Table des matières cliquable dans le PDF
+- Numérotation de pages cohérente
+
+### 5. Sauvegarde automatique
+Vérifier que l'auto-save fonctionne sans perte de données, surtout sur les gros projets.
+
+### 6. Pages orphelines dans App.tsx
+~60 pages sont importées dont beaucoup ne servent pas au générateur d'ebooks (SEO, CRM, Pinterest, Dashboard, etc.). Elles alourdissent le bundle même avec le lazy loading.
+
+**Action** : Nettoyer les routes inutilisées pour alléger l'application.
 
 ---
 
-### Pages (8 fichiers)
+## Recommandation prioritaire (stabilisation)
 
-| # | Fichier | Problème |
-|---|---------|----------|
-| 1 | `src/pages/EmailPreviewPage.tsx` | `bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950`, tout le contenu en `text-white` |
-| 2 | `src/pages/ElementorExportPage.tsx` | `bg-slate-950 text-white`, cartes `bg-slate-900/50`, bordures `border-slate-800` (~20 occurrences) |
-| 3 | `src/pages/BlogPage.tsx` | `bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950`, header/footer sombres |
-| 4 | `src/pages/UnifiedMarketingDashboard.tsx` | `bg-slate-950 text-white`, cartes `bg-slate-900/60` |
-| 5 | `src/pages/HierarchyPage.tsx` | Boutons `bg-blue-600 text-white` hardcodés (pas le fond, mais incohérent) |
-| 6 | `src/pages/FormationVideosPage.tsx` | Gradient violet `from-violet-600 to-purple-600` sur le badge (mineur) |
-| 7 | `src/pages/Nouveautes2026Page.tsx` | Gradients colorés sur icônes (mineur, acceptable) |
-| 8 | `src/pages/SeoCreerEbookIaPage.tsx` | CTA section `bg-gradient-to-r from-primary to-accent text-white` (acceptable) |
+Conformément à votre stratégie de stabilisation :
 
-### Composants (7 fichiers)
+1. **Supprimer les modules SEO factices** — ne garder que ce qui sert vraiment au générateur
+2. **Remplacer les 3 fallbacks random** des outils ebook par Lovable AI
+3. **Nettoyer les routes orphelines** de App.tsx
+4. **Refactorer EbookPlannerPage.tsx** en sous-composants
 
-| # | Fichier | Problème |
-|---|---------|----------|
-| 9 | `src/components/blog/BlogArticleTemplate.tsx` | `from-slate-950 via-slate-900 to-slate-950`, header/footer sombres |
-| 10 | `src/components/ebook/EbookMarketing.tsx` | 5 cartes `bg-slate-900/80` avec bordures colorées, `text-white` |
-| 11 | `src/components/ebook/EbookCoverGenerator.tsx` | Hero `from-slate-900 via-purple-900`, textarea `bg-slate-900` |
-| 12 | `src/components/ebook/WorkflowDashboard.tsx` | Cartes `bg-slate-900/80`, `bg-slate-900/60` |
-| 13 | `src/components/ebook/WorkflowOnboarding.tsx` | `from-slate-900 via-slate-900/95 to-amber-950/20` |
-| 14 | `src/components/onboarding/OnboardingGuide.tsx` | Dialog `bg-slate-900 text-white` |
-| 15 | `src/components/admin/SubscriberActivityPopup.tsx` | Popup `bg-slate-900 border-violet-500/30` |
-
----
-
-### Plan de correction
-
-Pour chaque fichier, le travail est identique :
-- Remplacer `bg-slate-950`, `bg-slate-900` → `bg-background`, `bg-card`
-- Remplacer `text-white` → `text-foreground`, `text-white/60` → `text-muted-foreground`
-- Remplacer `border-slate-800` → `border-border`
-- Remplacer `border-violet/cyan/emerald-500/30` → `border-primary/20`
-- Supprimer les gradients sombres (`from-slate-950 via-slate-900`)
-
-**Priorité** :
-1. **Critiques** (pages principales) : `EmailPreviewPage`, `ElementorExportPage`, `UnifiedMarketingDashboard`, `BlogPage` — ce sont des pages entières en noir
-2. **Importants** (composants du générateur) : `EbookMarketing`, `WorkflowDashboard`, `EbookCoverGenerator`, `WorkflowOnboarding`
-3. **Mineurs** (popups/dialogs) : `OnboardingGuide`, `SubscriberActivityPopup`, `BlogArticleTemplate`
-
-15 fichiers à migrer. Aucun changement de logique, uniquement des classes CSS.
+Aucune de ces actions n'ajoute de fausse fonctionnalité — elles consolident ce qui existe.
 
