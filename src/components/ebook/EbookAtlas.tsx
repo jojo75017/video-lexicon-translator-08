@@ -305,7 +305,7 @@ ${safeString(card.practicalInfo)}
                     <h3 className={`font-semibold ${isSelected ? 'text-white' : ''}`}>
                       {type.label}
                     </h3>
-                    <p className={`text-xs ${isSelected ? 'text-white/80' : 'text-muted-foreground'}`}>
+                    <p className={`text-xs ${isSelected ? 'text-foreground/80' : 'text-muted-foreground'}`}>
                       {type.description}
                     </p>
                   </div>

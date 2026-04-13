@@ -400,11 +400,11 @@ export const WorkflowDashboard: React.FC<WorkflowDashboardProps> = ({
       )}
 
       {nextAvailableStep && nextAvailableTabId && (
-        <Card className="border-2 border-cyan-500/30 bg-cyan-500/5 shadow-lg shadow-cyan-500/10">
+        <Card className="border-2 border-primary/20 bg-cyan-500/5 shadow-lg shadow-cyan-500/10">
           <CardContent className="p-6">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div className="space-y-2">
-                <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/30">
+                <Badge className="bg-cyan-500/20 text-cyan-400 border-primary/20">
                   Étape suivante recommandée
                 </Badge>
                 <div>
@@ -444,8 +444,8 @@ export const WorkflowDashboard: React.FC<WorkflowDashboardProps> = ({
                 key={step.id}
                 className={cn(
                   "transition-all duration-200 cursor-pointer hover:shadow-lg bg-card/60 backdrop-blur-sm",
-                  status === 'completed' && "border-emerald-500/30 bg-emerald-500/5",
-                  status === 'available' && "border-border hover:border-cyan-500/30",
+                  status === 'completed' && "border-primary/20 bg-emerald-500/5",
+                  status === 'available' && "border-border hover:border-primary/20",
                   status === 'locked' && "opacity-50 border-border/50",
                   expandedPreview === step.id && "ring-2 ring-cyan-500/50"
                 )}
@@ -468,7 +468,7 @@ export const WorkflowDashboard: React.FC<WorkflowDashboardProps> = ({
                         <div className="flex items-center gap-2 flex-wrap">
                           <h3 className="font-semibold text-sm text-foreground">{step.id}: {step.label}</h3>
                           {status === 'completed' && (
-                            <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 text-xs">
+                            <Badge className="bg-emerald-500/20 text-emerald-400 border-primary/20 text-xs">
                               Fait
                             </Badge>
                           )}

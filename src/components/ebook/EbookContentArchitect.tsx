@@ -88,7 +88,7 @@ export const EbookContentArchitect = ({ onArchitectureComplete, onApplyStructure
 
   return (
     <div className="space-y-6">
-      <Card className="border-violet-500/20 bg-gradient-to-br from-violet-500/5 to-transparent">
+      <Card className="border-primary/20 bg-gradient-to-br from-violet-500/5 to-transparent">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-xl">
             <LayoutGrid className="h-6 w-6 text-violet-500" />
@@ -168,7 +168,7 @@ export const EbookContentArchitect = ({ onArchitectureComplete, onApplyStructure
           {/* Chapitres */}
           <div className="grid gap-3">
             {architecture.chapitres.map((chapitre) => (
-              <Card key={chapitre.numero} className="border-violet-500/20">
+              <Card key={chapitre.numero} className="border-primary/20">
                 <CardHeader className="pb-2">
                   <div className="flex items-start justify-between">
                     <CardTitle className="text-base flex items-center gap-2">

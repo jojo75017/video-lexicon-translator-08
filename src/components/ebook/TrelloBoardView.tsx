@@ -177,7 +177,7 @@ export const TrelloBoardView: React.FC<TrelloBoardViewProps> = ({
                               isLocked
                                 ? "opacity-50 cursor-not-allowed"
                                 : cn(colors.cardHover, "hover:shadow-md cursor-pointer"),
-                              status === 'completed' && "border-emerald-500/30 bg-emerald-500/5"
+                              status === 'completed' && "border-primary/20 bg-emerald-500/5"
                             )}
                           >
                             <Icon className={cn(

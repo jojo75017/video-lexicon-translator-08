@@ -248,7 +248,7 @@ export default function Nouveautes2026Page() {
                   >
                     <Card className="group relative overflow-hidden border-border/50 bg-card/50 backdrop-blur hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 p-5 h-full">
                       <div className="flex gap-4">
-                        <div className={`flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br ${cat.gradient} text-white/90 group-hover:scale-110 transition-transform`}>
+                        <div className={`flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br ${cat.gradient} text-foreground group-hover:scale-110 transition-transform`}>
                           <f.icon className="w-5 h-5" />
                         </div>
                         <div>

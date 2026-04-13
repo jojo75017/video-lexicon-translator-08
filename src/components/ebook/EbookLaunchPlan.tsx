@@ -169,7 +169,7 @@ const EbookLaunchPlan: React.FC = () => {
 
       <TabsContent value="checklist">
     <div className="space-y-6">
-      <Card className="bg-gradient-to-br from-violet-900/30 to-purple-900/20 border-violet-500/30">
+      <Card className="bg-gradient-to-br from-violet-900/30 to-purple-900/20 border-primary/20">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -301,7 +301,7 @@ const EbookLaunchPlan: React.FC = () => {
                   "transition-all duration-300",
                   isCompleted 
                     ? "bg-green-500/10 border-green-500/30" 
-                    : "bg-card/50 border-border/50 hover:border-violet-500/30"
+                    : "bg-card/50 border-border/50 hover:border-primary/20"
                 )}>
                   <CardContent className="p-4">
                     <div className="flex items-start gap-3">
@@ -374,7 +374,7 @@ const EbookLaunchPlan: React.FC = () => {
                                   exit={{ height: 0, opacity: 0 }}
                                   className="overflow-hidden"
                                 >
-                                  <div className="mt-2 p-3 rounded-lg bg-violet-500/10 border border-violet-500/20">
+                                  <div className="mt-2 p-3 rounded-lg bg-violet-500/10 border border-primary/20">
                                     <ul className="space-y-1">
                                       {task.tips.map((tip, i) => (
                                         <li key={i} className="text-xs text-muted-foreground flex items-start gap-2">

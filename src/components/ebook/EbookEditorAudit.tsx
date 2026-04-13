@@ -315,7 +315,7 @@ export const EbookEditorAudit: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <Card className="bg-gradient-to-br from-violet-500/10 to-purple-500/10 border-violet-500/20">
+      <Card className="bg-gradient-to-br from-violet-500/10 to-purple-500/10 border-primary/20">
         <CardHeader>
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-violet-500/20">

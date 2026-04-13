@@ -78,7 +78,7 @@ export const EbookFinalDiagnosis: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header Premium */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-500/20 via-violet-500/10 to-fuchsia-500/20 border border-purple-500/30 p-6">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-500/20 via-violet-500/10 to-fuchsia-500/20 border border-primary/20 p-6">
         <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl" />
         <div className="absolute bottom-0 left-0 w-24 h-24 bg-fuchsia-500/10 rounded-full blur-2xl" />
         <div className="relative">
@@ -112,7 +112,7 @@ export const EbookFinalDiagnosis: React.FC = () => {
                 placeholder="Ex: Maîtriser le marketing digital"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="border-purple-500/30 focus:border-purple-500"
+                className="border-primary/20 focus:border-purple-500"
               />
             </div>
             <div>
@@ -121,7 +121,7 @@ export const EbookFinalDiagnosis: React.FC = () => {
                 placeholder="Ex: Jean Dupont"
                 value={author}
                 onChange={(e) => setAuthor(e.target.value)}
-                className="border-purple-500/30 focus:border-purple-500"
+                className="border-primary/20 focus:border-purple-500"
               />
             </div>
           </div>
@@ -190,7 +190,7 @@ export const EbookFinalDiagnosis: React.FC = () => {
               <div className="text-3xl font-bold text-fuchsia-500">{diagnosis.scoreValeurPercue}/10</div>
               <p className="text-sm text-muted-foreground mt-1">Valeur Perçue</p>
             </Card>
-            <Card className="border-violet-500/20 text-center p-4 bg-gradient-to-br from-violet-500/10 to-purple-500/10">
+            <Card className="border-primary/20 text-center p-4 bg-gradient-to-br from-violet-500/10 to-purple-500/10">
               <div className="text-3xl font-bold text-violet-500">{diagnosis.scoreMoyen}/10</div>
               <p className="text-sm text-muted-foreground mt-1">Score Global</p>
             </Card>
@@ -247,7 +247,7 @@ export const EbookFinalDiagnosis: React.FC = () => {
           </Card>
 
           {/* Conclusion */}
-          <Card className="border-2 border-purple-500/30 bg-gradient-to-br from-purple-500/5 to-fuchsia-500/5">
+          <Card className="border-2 border-primary/20 bg-gradient-to-br from-purple-500/5 to-fuchsia-500/5">
             <CardContent className="p-6">
               <h4 className="font-semibold text-purple-600 mb-2 flex items-center gap-2">
                 <Award className="w-5 h-5" />

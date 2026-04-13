@@ -156,7 +156,7 @@ Donne des conseils pratiques et des exemples concrets.`,
                 <Sparkles className="h-8 w-8" />
                 <div>
                   <h2 className="text-2xl font-playfair font-bold">Parlez avec l'IA</h2>
-                  <p className="text-white/90 text-sm">
+                  <p className="text-foreground text-sm">
                     Découvrez les meilleures idées d'ebook du top Amazon
                   </p>
                 </div>

@@ -571,7 +571,7 @@ const FormationSeriesPage: React.FC = () => {
               <Button 
                 variant="outline" 
                 onClick={() => navigate('/formation-series-audio')}
-                className="border-emerald-500/30 text-emerald-600 hover:bg-emerald-500/10"
+                className="border-primary/20 text-emerald-600 hover:bg-emerald-500/10"
               >
                 <Headphones className="h-4 w-4 mr-2" />
                 Version Audio

@@ -89,10 +89,10 @@ export const SocialProofNotifications: React.FC = () => {
                   {notification.name}
                 </span>
               </div>
-              <p className="text-xs text-slate-600 dark:text-slate-300">
+              <p className="text-xs text-slate-600 dark:text-foreground">
                 vient de rejoindre EbookStudio Pro
               </p>
-              <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
+              <p className="text-xs text-muted-foreground dark:text-slate-500 mt-1">
                 📍 {notification.city} • il y a {notification.minutes} min
               </p>
             </div>

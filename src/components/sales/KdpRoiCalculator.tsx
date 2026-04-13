@@ -44,7 +44,7 @@ export const KdpRoiCalculator: React.FC<KdpRoiCalculatorProps> = ({ onCtaClick }
           <div>
             <CardTitle className="text-xl flex items-center gap-2">
               Calculateur de Revenus KDP
-              <Badge className="bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/30">
+              <Badge className="bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-primary/20">
                 ROI
               </Badge>
               <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-foreground border-0 text-[10px] font-bold">

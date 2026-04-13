@@ -300,7 +300,7 @@ const MarketingPlanPage: React.FC = () => {
                       {progress}%
                     </Badge>
                   </CardTitle>
-                  <p className="text-white/80 text-sm">{channel.description}</p>
+                  <p className="text-foreground/80 text-sm">{channel.description}</p>
                   <Progress value={progress} className="h-2 bg-white/20" />
                 </CardHeader>
                 
@@ -426,7 +426,7 @@ const MarketingPlanPage: React.FC = () => {
         <Card className="mt-8 bg-gradient-to-r from-purple-600 to-pink-600 border-0 text-white">
           <CardContent className="py-8 text-center">
             <h3 className="text-2xl font-bold mb-2">🚀 Prêt à booster votre trafic ?</h3>
-            <p className="text-white/80 mb-4">Commencez par les tâches prioritaires et progressez étape par étape</p>
+            <p className="text-foreground/80 mb-4">Commencez par les tâches prioritaires et progressez étape par étape</p>
             <div className="flex justify-center gap-4">
               <Button 
                 variant="secondary" 

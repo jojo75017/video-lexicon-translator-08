@@ -133,7 +133,7 @@ const ExitIntentPopup = ({ onContinueToOffer }: ExitIntentPopupProps) => {
             </div>
 
             {/* Value box */}
-            <div className="bg-gradient-to-br from-violet-900/60 to-violet-800/30 border border-violet-500/30 rounded-xl p-4">
+            <div className="bg-gradient-to-br from-violet-900/60 to-violet-800/30 border border-primary/20 rounded-xl p-4">
               <div className="flex items-center justify-center gap-2 mb-3">
                 <Zap className="w-5 h-5 text-amber-400" />
                 <span className="font-bold text-amber-400 text-sm uppercase tracking-wide">

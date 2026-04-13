@@ -66,9 +66,9 @@ const SalesCampaignPage = () => {
     const colors = [
       'from-amber-500/20 to-amber-600/5 border-amber-500/30',
       'from-red-500/20 to-red-600/5 border-red-500/30',
-      'from-emerald-500/20 to-emerald-600/5 border-emerald-500/30',
+      'from-emerald-500/20 to-emerald-600/5 border-primary/20',
       'from-orange-500/20 to-orange-600/5 border-orange-500/30',
-      'from-violet-500/20 to-violet-600/5 border-violet-500/30',
+      'from-violet-500/20 to-violet-600/5 border-primary/20',
     ];
     return colors[index % colors.length];
   };

@@ -484,7 +484,7 @@ Génère 5 top books, 5 titres suggérés, 5 catégories, 4 lacunes et 5 recomma
 
   const getCompetitionBadge = (comp: string) => {
     switch (comp) {
-      case 'low': return <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30">Faible</Badge>;
+      case 'low': return <Badge className="bg-emerald-500/20 text-emerald-400 border-primary/20">Faible</Badge>;
       case 'medium': return <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/30">Moyenne</Badge>;
       case 'high': return <Badge className="bg-red-500/20 text-red-400 border-red-500/30">Élevée</Badge>;
       default: return null;
@@ -625,7 +625,7 @@ Génère 5 top books, 5 titres suggérés, 5 catégories, 4 lacunes et 5 recomma
 
               {/* Barre de progression analyse complète */}
               {isFullAnalysis && (
-                <div className="p-4 rounded-xl bg-gradient-to-r from-rose-500/10 via-purple-500/10 to-indigo-500/10 border border-purple-500/30 space-y-3">
+                <div className="p-4 rounded-xl bg-gradient-to-r from-rose-500/10 via-purple-500/10 to-indigo-500/10 border border-primary/20 space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="font-medium text-sm">Analyse complète en cours...</span>
                     <span className="text-xs text-muted-foreground">
@@ -643,9 +643,9 @@ Génère 5 top books, 5 titres suggérés, 5 catégories, 4 lacunes et 5 recomma
                         key={key}
                         className={`p-2 rounded-lg text-center text-xs transition-all ${
                           analysisProgress[key] === 'done' 
-                            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' 
+                            ? 'bg-emerald-500/20 text-emerald-400 border border-primary/20' 
                             : analysisProgress[key] === 'loading'
-                            ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30 animate-pulse'
+                            ? 'bg-purple-500/20 text-purple-400 border border-primary/20 animate-pulse'
                             : analysisProgress[key] === 'error'
                             ? 'bg-red-500/20 text-red-400 border border-red-500/30'
                             : 'bg-muted/30 text-muted-foreground'
@@ -744,7 +744,7 @@ Génère 5 top books, 5 titres suggérés, 5 catégories, 4 lacunes et 5 recomma
         {/* Titles Tab */}
         <TabsContent value="titles" className="space-y-4 mt-4">
           {titleSuggestions.length === 0 ? (
-            <Card className="border-dashed border-2 border-purple-500/30 bg-purple-500/5">
+            <Card className="border-dashed border-2 border-primary/20 bg-purple-500/5">
               <CardContent className="py-12 text-center">
                 <PenTool className="h-12 w-12 mx-auto text-purple-500/50 mb-4" />
                 <h3 className="text-lg font-semibold mb-2">Générateur de Titres SEO</h3>
@@ -756,7 +756,7 @@ Génère 5 top books, 5 titres suggérés, 5 catégories, 4 lacunes et 5 recomma
           ) : (
             <div className="grid gap-4">
               {titleSuggestions.map((suggestion, index) => (
-                <Card key={index} className="hover:border-purple-500/30 transition-colors">
+                <Card key={index} className="hover:border-primary/20 transition-colors">
                   <CardContent className="py-4">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
@@ -772,7 +772,7 @@ Génère 5 top books, 5 titres suggérés, 5 catégories, 4 lacunes et 5 recomma
                         
                         <div className="flex flex-wrap gap-1 mb-2">
                           {suggestion.keywords.map((kw, i) => (
-                            <Badge key={i} className="bg-purple-500/20 text-purple-400 border-purple-500/30 text-xs">
+                            <Badge key={i} className="bg-purple-500/20 text-purple-400 border-primary/20 text-xs">
                               {kw}
                             </Badge>
                           ))}
@@ -805,7 +805,7 @@ Génère 5 top books, 5 titres suggérés, 5 catégories, 4 lacunes et 5 recomma
         {/* Categories Tab */}
         <TabsContent value="categories" className="space-y-4 mt-4">
           {categories.length === 0 ? (
-            <Card className="border-dashed border-2 border-emerald-500/30 bg-emerald-500/5">
+            <Card className="border-dashed border-2 border-primary/20 bg-emerald-500/5">
               <CardContent className="py-12 text-center">
                 <FolderTree className="h-12 w-12 mx-auto text-emerald-500/50 mb-4" />
                 <h3 className="text-lg font-semibold mb-2">Catégories Cachées</h3>
@@ -817,7 +817,7 @@ Génère 5 top books, 5 titres suggérés, 5 catégories, 4 lacunes et 5 recomma
           ) : (
             <div className="space-y-3">
               {categories.map((cat, index) => (
-                <Card key={index} className="hover:border-emerald-500/30 transition-colors">
+                <Card key={index} className="hover:border-primary/20 transition-colors">
                   <CardContent className="py-4">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
@@ -940,7 +940,7 @@ Génère 5 top books, 5 titres suggérés, 5 catégories, 4 lacunes et 5 recomma
                 <CardContent>
                   <div className="flex flex-wrap gap-2">
                     {nicheAnalysis.contentGaps.map((gap, index) => (
-                      <Badge key={index} variant="outline" className="bg-purple-500/10 border-purple-500/30 py-2">
+                      <Badge key={index} variant="outline" className="bg-purple-500/10 border-primary/20 py-2">
                         {gap}
                       </Badge>
                     ))}

@@ -98,7 +98,7 @@ const InteractiveDemo = () => {
       <div className="max-w-5xl mx-auto relative z-10">
         {/* Header */}
         <div className="text-center mb-12">
-          <Badge className="mb-4 bg-cyan-500/10 text-primary border-cyan-500/20 px-4 py-2">
+          <Badge className="mb-4 bg-cyan-500/10 text-primary border-primary/20 px-4 py-2">
             <Play className="w-4 h-4 mr-2" />
             DÉMO EN 3 ÉTAPES
           </Badge>

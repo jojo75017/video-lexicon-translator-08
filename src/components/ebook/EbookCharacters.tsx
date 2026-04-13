@@ -339,7 +339,7 @@ export const EbookCharacters = ({ characters, onUpdateCharacters, ebookTitle = '
       </p>
 
       {/* Zone de génération IA */}
-      <div className="bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10 border border-violet-500/20 rounded-lg p-4 mb-6">
+      <div className="bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10 border border-primary/20 rounded-lg p-4 mb-6">
         <div className="flex flex-col md:flex-row gap-3 items-end">
           <div className="flex-1">
             <Label htmlFor="ebook-title-for-characters">Titre de l'ebook</Label>

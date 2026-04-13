@@ -172,7 +172,7 @@ P.S: Je ne relancerai pas après cet email.`,
     subject: "🔒 C'est terminé ce soir à minuit",
     preheader: "Votre dernière chance de rejoindre les fondateurs.",
     strategy: "DERNIER APPEL",
-    strategyColor: "bg-purple-500/10 text-purple-600 border-purple-500/30",
+    strategyColor: "bg-purple-500/10 text-purple-600 border-primary/20",
     body: `[PRÉNOM],
 
 Dernier email. Dernier appel.

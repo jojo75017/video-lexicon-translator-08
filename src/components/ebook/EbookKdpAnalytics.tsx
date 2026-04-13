@@ -467,7 +467,7 @@ IMPORTANT: Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après.
   const getIntentColor = (intent: string) => {
     switch (intent) {
       case 'commercial': return 'bg-green-500/20 text-green-400 border-green-500/30';
-      case 'transactional': return 'bg-purple-500/20 text-purple-400 border-purple-500/30';
+      case 'transactional': return 'bg-purple-500/20 text-purple-400 border-primary/20';
       case 'informational': return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
       case 'navigational': return 'bg-orange-500/20 text-orange-400 border-orange-500/30';
       default: return 'bg-muted text-muted-foreground';
@@ -547,7 +547,7 @@ IMPORTANT: Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après.
       <div className="flex items-center justify-between">
         <div className="space-y-1">
           <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-orange-400 bg-clip-text text-transparent flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30">
+            <div className="p-2 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-primary/20">
               <BarChart3 className="h-7 w-7 text-purple-400" />
             </div>
             KDP Analytics Pro
@@ -568,11 +568,11 @@ IMPORTANT: Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après.
             <Library className="h-4 w-4" />
             <span className="hidden sm:inline">Livres</span>
           </TabsTrigger>
-          <TabsTrigger value="volume" className="rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500/20 data-[state=active]:to-teal-500/20 data-[state=active]:border-cyan-500/30 gap-2">
+          <TabsTrigger value="volume" className="rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500/20 data-[state=active]:to-teal-500/20 data-[state=active]:border-primary/20 gap-2">
             <TrendingUp className="h-4 w-4" />
             <span className="hidden sm:inline">Volume</span>
           </TabsTrigger>
-          <TabsTrigger value="keywords" className="rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500/20 data-[state=active]:to-violet-500/20 data-[state=active]:border-purple-500/30 gap-2">
+          <TabsTrigger value="keywords" className="rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500/20 data-[state=active]:to-violet-500/20 data-[state=active]:border-primary/20 gap-2">
             <Search className="h-4 w-4" />
             <span className="hidden sm:inline">Mots-clés</span>
           </TabsTrigger>
@@ -597,7 +597,7 @@ IMPORTANT: Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après.
 
         {/* Volume Search Tab */}
         <TabsContent value="volume" className="space-y-4">
-          <Card className="bg-gradient-to-br from-cyan-500/5 to-teal-500/5 border-cyan-500/20">
+          <Card className="bg-gradient-to-br from-cyan-500/5 to-teal-500/5 border-primary/20">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <div className="p-1.5 rounded-lg bg-cyan-500/20">
@@ -726,7 +726,7 @@ IMPORTANT: Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après.
                   {/* Results Grid */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {titleVolumeResults.map((item, index) => (
-                      <Card key={index} className="bg-background/50 border-border/30 hover:border-cyan-500/30 transition-colors">
+                      <Card key={index} className="bg-background/50 border-border/30 hover:border-primary/20 transition-colors">
                         <CardContent className="p-4 space-y-3">
                           <div className="flex items-start justify-between gap-2">
                             <h4 className="font-semibold text-sm line-clamp-2 flex-1">{item.title}</h4>
@@ -890,7 +890,7 @@ IMPORTANT: Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après.
 
                   {/* Keywords Cards */}
                   {keywordResults.map((kw, idx) => (
-                    <Card key={idx} className="bg-background/30 border-border/30 hover:border-purple-500/30 transition-colors">
+                    <Card key={idx} className="bg-background/30 border-border/30 hover:border-primary/20 transition-colors">
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center gap-2">
@@ -1016,7 +1016,7 @@ IMPORTANT: Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après.
                 {bsrEstimate && (
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-3">
-                      <Card className="bg-gradient-to-br from-purple-500/10 to-purple-500/5 border-purple-500/30">
+                      <Card className="bg-gradient-to-br from-purple-500/10 to-purple-500/5 border-primary/20">
                         <CardContent className="p-4 text-center">
                           <BookOpen className="h-6 w-6 mx-auto mb-2 text-purple-400" />
                           <div className="text-xs text-muted-foreground">Ventes/jour</div>
@@ -1186,7 +1186,7 @@ IMPORTANT: Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après.
                 <div className="space-y-4 mt-4">
                   {/* Score Cards */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <Card className="bg-gradient-to-br from-purple-500/10 to-purple-500/5 border-purple-500/30">
+                    <Card className="bg-gradient-to-br from-purple-500/10 to-purple-500/5 border-primary/20">
                       <CardContent className="p-4 text-center">
                         <div className="text-xs text-muted-foreground mb-1">Score demande</div>
                         <div className={`text-2xl font-bold ${getOpportunityColor(nicheAnalysis.demandScore)}`}>
@@ -1259,7 +1259,7 @@ IMPORTANT: Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après.
                       <CardContent>
                         <div className="flex flex-wrap gap-2">
                           {nicheAnalysis.bestSellingCategories?.map((cat, idx) => (
-                            <Badge key={idx} variant="outline" className="bg-purple-500/10 border-purple-500/30">
+                            <Badge key={idx} variant="outline" className="bg-purple-500/10 border-primary/20">
                               {cat}
                             </Badge>
                           ))}

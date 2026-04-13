@@ -227,7 +227,7 @@ Crée 4-5 concurrents fictifs réalistes, 4-5 recommandations stratégiques, 4 l
 
   const getOpportunityBadge = (opportunity: string) => {
     switch (opportunity) {
-      case 'high': return { icon: Flame, label: '🔥 Excellente', class: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' };
+      case 'high': return { icon: Flame, label: '🔥 Excellente', class: 'bg-emerald-500/20 text-emerald-400 border-primary/20' };
       case 'medium': return { icon: Zap, label: '⚡ Moyenne', class: 'bg-amber-500/20 text-amber-400 border-amber-500/30' };
       case 'low': return { icon: AlertTriangle, label: '⚠️ Faible', class: 'bg-red-500/20 text-red-400 border-red-500/30' };
       default: return { icon: Target, label: 'Inconnu', class: '' };
@@ -259,7 +259,7 @@ Crée 4-5 concurrents fictifs réalistes, 4-5 recommandations stratégiques, 4 l
         <Card className="bg-gradient-to-br from-emerald-500/5 via-teal-500/5 to-cyan-500/5 border-emerald-500/20">
           <CardHeader>
             <CardTitle className="flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-500/30">
+              <div className="p-2 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-primary/20">
                 <Sparkles className="h-6 w-6 text-emerald-400" />
               </div>
               <div>
@@ -415,7 +415,7 @@ Crée 4-5 concurrents fictifs réalistes, 4-5 recommandations stratégiques, 4 l
                 <Progress value={analysis.niche.competition} className="h-2 mt-2" />
               </Card>
 
-              <Card className="bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border-emerald-500/30 p-4">
+              <Card className="bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border-primary/20 p-4">
                 <div className="flex items-center justify-between mb-2">
                   <DollarSign className="h-5 w-5 text-emerald-500" />
                   <span className="text-xs text-muted-foreground">Prix moyen</span>
@@ -578,7 +578,7 @@ Crée 4-5 concurrents fictifs réalistes, 4-5 recommandations stratégiques, 4 l
                         <h4 className="font-semibold">{comp.title}</h4>
                         <p className="text-sm text-muted-foreground">par {comp.author}</p>
                       </div>
-                      <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">
+                      <Badge className="bg-purple-500/20 text-purple-400 border-primary/20">
                         #{comp.rank}
                       </Badge>
                     </div>

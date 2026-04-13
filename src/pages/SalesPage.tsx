@@ -458,7 +458,7 @@ const SalesPage = () => {
           viewport={{ once: true }}
           className="max-w-3xl mx-auto"
         >
-          <div className="relative bg-gradient-to-r from-emerald-500/10 via-cyan-500/10 to-emerald-500/10 border-2 border-emerald-500/30 rounded-2xl p-6 sm:p-8 overflow-hidden">
+          <div className="relative bg-gradient-to-r from-emerald-500/10 via-cyan-500/10 to-emerald-500/10 border-2 border-primary/20 rounded-2xl p-6 sm:p-8 overflow-hidden">
             {/* Shimmer */}
             <motion.div
               className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent"
@@ -502,7 +502,7 @@ const SalesPage = () => {
             <motion.p variants={fadeIn} custom={2} className="text-muted-foreground">Tout ce qui est inclus, en moins de 3 minutes</motion.p>
           </motion.div>
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-            className="rounded-2xl overflow-hidden border-2 border-cyan-500/20 shadow-2xl shadow-primary/10">
+            className="rounded-2xl overflow-hidden border-2 border-primary/20 shadow-2xl shadow-primary/10">
             <video
               controls
               preload="metadata"
@@ -664,7 +664,7 @@ const SalesPage = () => {
         <div className="max-w-3xl mx-auto relative z-10">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-10">
             <motion.div variants={fadeIn}>
-              <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/30 px-5 py-2 font-semibold mb-5">
+              <Badge className="bg-emerald-500/10 text-emerald-400 border-primary/20 px-5 py-2 font-semibold mb-5">
                 <Gift className="w-4 h-4 mr-2" />
                 ESSAI GRATUIT 7 JOURS — Puis {LAUNCH_PRICE}€ à vie
               </Badge>

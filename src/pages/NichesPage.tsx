@@ -250,7 +250,7 @@ const NichesPage = () => {
                             )}
                           </CardTitle>
                           {categorySubtitles[theme.category] && (
-                            <p className="text-white/80 text-sm mt-1 font-normal">
+                            <p className="text-foreground/80 text-sm mt-1 font-normal">
                               {categorySubtitles[theme.category]}
                             </p>
                           )}

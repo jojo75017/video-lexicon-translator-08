@@ -324,7 +324,7 @@ Réponds en JSON avec cette structure:
   return (
     <div className="space-y-6">
       {/* Header */}
-      <Card className="border-2 border-violet-500/20 bg-gradient-to-br from-violet-500/5 to-purple-500/5">
+      <Card className="border-2 border-primary/20 bg-gradient-to-br from-violet-500/5 to-purple-500/5">
         <CardHeader>
           <div className="flex items-center gap-3">
             <div className="p-3 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 text-white">
@@ -423,7 +423,7 @@ Réponds en JSON avec cette structure:
       {result && (
         <div className="space-y-4">
           {/* Score principal */}
-          <Card className="border-2 border-violet-500/30">
+          <Card className="border-2 border-primary/20">
             <CardContent className="pt-6">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 {/* Score global */}

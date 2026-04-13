@@ -54,7 +54,7 @@ const EbookIdeasPage: React.FC = () => {
             <h1 className="text-6xl md:text-7xl font-bold mb-6 leading-tight">
               {totalIdeas}+ Idées de<br />Bestsellers à Créer
             </h1>
-            <p className="text-xl md:text-2xl text-white/90 mb-8 font-light">
+            <p className="text-xl md:text-2xl text-foreground mb-8 font-light">
               Trouvez l'inspiration parfaite pour votre prochain ebook. De la fiction aux guides pratiques, découvrez des titres qui cartonnent.
             </p>
 
@@ -74,19 +74,19 @@ const EbookIdeasPage: React.FC = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12">
             <div className="text-center">
               <div className="text-4xl font-bold mb-2">{totalIdeas}+</div>
-              <div className="text-white/80 text-sm">Idées disponibles</div>
+              <div className="text-foreground/80 text-sm">Idées disponibles</div>
             </div>
             <div className="text-center">
               <div className="text-4xl font-bold mb-2">50k+</div>
-              <div className="text-white/80 text-sm">Ebooks créés</div>
+              <div className="text-foreground/80 text-sm">Ebooks créés</div>
             </div>
             <div className="text-center">
               <div className="text-4xl font-bold mb-2">{totalCategories}+</div>
-              <div className="text-white/80 text-sm">Catégories</div>
+              <div className="text-foreground/80 text-sm">Catégories</div>
             </div>
             <div className="text-center">
               <div className="text-4xl font-bold mb-2">4.9⭐</div>
-              <div className="text-white/80 text-sm">Note moyenne</div>
+              <div className="text-foreground/80 text-sm">Note moyenne</div>
             </div>
           </div>
         </div>
@@ -217,7 +217,7 @@ const EbookIdeasPage: React.FC = () => {
           <h2 className="text-4xl md:text-5xl font-playfair font-bold mb-6">
             Prêt à écrire votre bestseller ?
           </h2>
-          <p className="text-xl mb-8 text-white/90 max-w-2xl mx-auto">
+          <p className="text-xl mb-8 text-foreground max-w-2xl mx-auto">
             Choisissez votre idée et laissez notre IA générer un plan complet en quelques secondes
           </p>
           <Button 

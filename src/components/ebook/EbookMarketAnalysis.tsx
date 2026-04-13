@@ -128,7 +128,7 @@ export const EbookMarketAnalysis = ({ onAnalysisComplete }: EbookMarketAnalysisP
         <div className="space-y-6">
           {/* Mots-clés KDP - Section prioritaire */}
           {analysis.motsClésKDP && analysis.motsClésKDP.length > 0 && (
-            <Card className="border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5">
+            <Card className="border-primary/20 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5">
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center gap-2 text-lg text-emerald-700 dark:text-emerald-400">
                   <Key className="h-5 w-5" />
@@ -164,7 +164,7 @@ export const EbookMarketAnalysis = ({ onAnalysisComplete }: EbookMarketAnalysisP
           {(analysis.nichePrincipale || analysis.prixOptimal) && (
             <div className="grid gap-4 md:grid-cols-3">
               {analysis.nichePrincipale && (
-                <Card className="border-violet-500/30 bg-violet-500/5">
+                <Card className="border-primary/20 bg-violet-500/5">
                   <CardContent className="pt-4">
                     <div className="flex items-center gap-2 mb-2">
                       <TrendingUp className="h-4 w-4 text-violet-600" />
@@ -256,7 +256,7 @@ export const EbookMarketAnalysis = ({ onAnalysisComplete }: EbookMarketAnalysisP
               </CardContent>
             </Card>
 
-            <Card className="border-purple-500/30 bg-purple-500/5">
+            <Card className="border-primary/20 bg-purple-500/5">
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center gap-2 text-lg text-purple-700 dark:text-purple-400">
                   <Lightbulb className="h-5 w-5" />

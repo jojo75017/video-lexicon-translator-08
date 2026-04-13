@@ -80,7 +80,7 @@ const Dashboard: React.FC = () => {
     { label: 'Abonnés actifs', value: stats.activeSubscribers, icon: Activity, gradient: 'from-emerald-500/20 to-emerald-600/5', iconBg: 'bg-emerald-500/15 text-emerald-400', border: 'border-emerald-500/20' },
     { label: 'Total abonnés', value: stats.totalSubscribers, icon: Users, gradient: 'from-purple-500/20 to-purple-600/5', iconBg: 'bg-purple-500/15 text-purple-400', border: 'border-purple-500/20' },
     { label: 'Audiobooks', value: stats.totalAudiobooks, icon: Headphones, gradient: 'from-orange-500/20 to-orange-600/5', iconBg: 'bg-orange-500/15 text-orange-400', border: 'border-orange-500/20' },
-    { label: 'Résultats IA', value: stats.totalWorkflowResults, icon: Zap, gradient: 'from-cyan-500/20 to-cyan-600/5', iconBg: 'bg-cyan-500/15 text-cyan-400', border: 'border-cyan-500/20' },
+    { label: 'Résultats IA', value: stats.totalWorkflowResults, icon: Zap, gradient: 'from-cyan-500/20 to-cyan-600/5', iconBg: 'bg-cyan-500/15 text-cyan-400', border: 'border-primary/20' },
   ];
 
   const quickActions = [

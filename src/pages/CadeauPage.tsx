@@ -103,7 +103,7 @@ const CadeauPage = () => {
                   <Icon className="w-4 h-4 text-violet-400" />
                 </div>
                 <span className="text-gray-200 flex-1">{text}</span>
-                <Badge variant="secondary" className="bg-violet-500/20 text-violet-300 border-violet-500/30 text-xs">
+                <Badge variant="secondary" className="bg-violet-500/20 text-violet-300 border-primary/20 text-xs">
                   {badge}
                 </Badge>
               </div>

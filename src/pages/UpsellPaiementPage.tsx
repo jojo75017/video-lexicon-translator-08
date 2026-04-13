@@ -75,14 +75,14 @@ const UpsellPaiementPage = () => {
   return (
     <div className="min-h-screen bg-background py-8 px-4">
       <div className="max-w-xl mx-auto">
-        <Link to="/offres" className="inline-flex items-center gap-2 text-white/60 hover:text-white mb-6 text-sm">
+        <Link to="/offres" className="inline-flex items-center gap-2 text-muted-foreground hover:text-white mb-6 text-sm">
           <ArrowLeft className="w-4 h-4" />
           Retour aux offres
         </Link>
 
         {/* Trust banner */}
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-center gap-4 text-xs text-white/50 mb-4">
+          className="flex items-center justify-center gap-4 text-xs text-muted-foreground mb-4">
           <span className="flex items-center gap-1"><Lock className="w-3.5 h-3.5 text-emerald-400" />Paiement sécurisé</span>
           <span className="flex items-center gap-1"><ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />Garantie 30 jours</span>
           <span className="flex items-center gap-1"><Zap className="w-3.5 h-3.5 text-amber-400" />Accès instantané</span>
@@ -98,15 +98,15 @@ const UpsellPaiementPage = () => {
                 </Badge>
               </div>
               <CardTitle className="text-2xl font-bold">Finalisez votre commande</CardTitle>
-              <p className="text-white/80 mt-1 text-sm">EbookStudio Pro — Accès à vie</p>
+              <p className="text-foreground/80 mt-1 text-sm">EbookStudio Pro — Accès à vie</p>
               <div className="mt-5 flex items-baseline justify-center gap-3">
-                <span className="text-xl text-white/40 line-through">{PLAN.originalPrice}€</span>
+                <span className="text-xl text-muted-foreground line-through">{PLAN.originalPrice}€</span>
                 <span className="text-6xl font-black text-white">{PLAN.price}€</span>
               </div>
-              <p className="text-sm text-white/70 mt-1">Paiement unique • Sans abonnement</p>
+              <p className="text-sm text-muted-foreground mt-1">Paiement unique • Sans abonnement</p>
               
               {/* Live social proof */}
-              <div className="mt-4 inline-flex items-center gap-2 bg-white/10 rounded-full px-4 py-1.5 text-xs text-white/80">
+              <div className="mt-4 inline-flex items-center gap-2 bg-white/10 rounded-full px-4 py-1.5 text-xs text-foreground/80">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                 {buyerCount} personnes ont rejoint aujourd'hui
               </div>
@@ -115,17 +115,17 @@ const UpsellPaiementPage = () => {
             <CardContent className="p-6 space-y-6">
               {/* Quick recap - collapsed */}
               <details className="group">
-                <summary className="flex items-center justify-between cursor-pointer text-white/80 hover:text-white transition-colors">
+                <summary className="flex items-center justify-between cursor-pointer text-foreground/80 hover:text-white transition-colors">
                   <span className="flex items-center gap-2 font-medium text-sm">
                     <Sparkles className="w-4 h-4 text-amber-400" />
                     Voir tout ce qui est inclus ({PLAN.features.length} fonctionnalités)
                   </span>
                   <ArrowRight className="w-4 h-4 group-open:rotate-90 transition-transform" />
                 </summary>
-                <div className="mt-3 bg-slate-800/50 rounded-xl p-4">
+                <div className="mt-3 bg-muted rounded-xl p-4">
                   <div className="grid grid-cols-1 gap-1.5">
                     {PLAN.features.map((f, i) => (
-                      <div key={i} className="flex items-center gap-2 text-white/80 text-sm">
+                      <div key={i} className="flex items-center gap-2 text-foreground/80 text-sm">
                         <Check className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
                         <span>{f}</span>
                       </div>
@@ -138,7 +138,7 @@ const UpsellPaiementPage = () => {
                       { icon: Image, label: "Imagen 3" },
                       { icon: Headphones, label: "Azure Speech" },
                     ].map((t, i) => (
-                      <span key={i} className="inline-flex items-center gap-1 bg-slate-700/50 rounded-full px-2.5 py-1 text-[11px] text-white/60">
+                      <span key={i} className="inline-flex items-center gap-1 bg-slate-700/50 rounded-full px-2.5 py-1 text-[11px] text-muted-foreground">
                         <t.icon className="w-3 h-3" />{t.label}
                       </span>
                     ))}
@@ -157,7 +157,7 @@ const UpsellPaiementPage = () => {
                   placeholder="votre@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="bg-slate-800 border-border text-white placeholder:text-slate-500 h-12 rounded-xl"
+                  className="bg-muted border-border text-white placeholder:text-slate-500 h-12 rounded-xl"
                 />
                 <p className="text-[11px] text-slate-500 flex items-center gap-1">
                   <Lock className="w-3 h-3" />
@@ -179,7 +179,7 @@ const UpsellPaiementPage = () => {
                       className={`w-full flex items-center justify-between p-4 rounded-xl border-2 transition-all ${
                         selectedPayment === option.id 
                           ? 'border-cyan-400 bg-cyan-950/30 shadow-lg shadow-cyan-500/10' 
-                          : 'border-border hover:border-slate-600 bg-slate-800/30'
+                          : 'border-border hover:border-slate-600 bg-muted/50'
                       }`}
                     >
                       <div className="flex items-center gap-3">
@@ -192,12 +192,12 @@ const UpsellPaiementPage = () => {
                           <div className="flex items-center gap-2">
                             <span className="font-semibold text-white text-sm">{option.label}</span>
                             {option.badge && (
-                              <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/30 text-[10px] px-1.5 py-0">
+                              <Badge className="bg-cyan-500/20 text-cyan-400 border-primary/20 text-[10px] px-1.5 py-0">
                                 {option.badge}
                               </Badge>
                             )}
                           </div>
-                          <p className="text-[11px] text-slate-400">{option.detail}</p>
+                          <p className="text-[11px] text-muted-foreground">{option.detail}</p>
                         </div>
                       </div>
                       <span className="text-lg font-bold text-white">{option.price}</span>
@@ -241,7 +241,7 @@ const UpsellPaiementPage = () => {
                 <Button 
                   onClick={goToConfirmation} 
                   variant="outline"
-                  className="w-full border-border text-white hover:bg-slate-800 hover:border-slate-600 rounded-xl"
+                  className="w-full border-border text-white hover:bg-muted hover:border-slate-600 rounded-xl"
                   size="lg"
                 >
                   <CheckCircle className="w-5 h-5 mr-2 text-emerald-400" />
@@ -269,7 +269,7 @@ const UpsellPaiementPage = () => {
               <div className="text-center space-y-2">
                 <div className="flex items-center justify-center gap-1">
                   {[1,2,3,4,5].map(i => <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />)}
-                  <span className="text-white/70 text-sm ml-1">4.8/5 (47 avis)</span>
+                  <span className="text-muted-foreground text-sm ml-1">4.8/5 (47 avis)</span>
                 </div>
                 <p className="text-slate-500 text-xs">
                   Rejoint par 47+ auteurs KDP • Créé par Georges Boubet (35+ ebooks publiés)
@@ -287,11 +287,11 @@ const UpsellPaiementPage = () => {
             { q: "Et si ça ne me convient pas ?", a: "Vous avez 30 jours pour tester. Remboursement intégral sans justification." },
           ].map((faq, i) => (
             <details key={i} className="group bg-card border border-border rounded-xl">
-              <summary className="px-4 py-3 cursor-pointer text-white/80 hover:text-white font-medium flex items-center justify-between">
+              <summary className="px-4 py-3 cursor-pointer text-foreground/80 hover:text-white font-medium flex items-center justify-between">
                 {faq.q}
                 <ArrowRight className="w-4 h-4 group-open:rotate-90 transition-transform flex-shrink-0" />
               </summary>
-              <p className="px-4 pb-3 text-white/60 text-sm">{faq.a}</p>
+              <p className="px-4 pb-3 text-muted-foreground text-sm">{faq.a}</p>
             </details>
           ))}
         </div>

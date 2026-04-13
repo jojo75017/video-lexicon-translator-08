@@ -1377,7 +1377,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                         🎉 Bravo ! Vous êtes prêt à créer votre livre
                       </h2>
                     </div>
-                    <p className="text-white/90">
+                    <p className="text-foreground">
                       Vous ne rédigez aucune ligne. <span className="font-semibold">Vous guidez l'intention, l'éditeur numérique fait le reste.</span>
                     </p>
                     
@@ -1386,25 +1386,25 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                         <div className="w-8 h-8 rounded-full bg-white/30 flex items-center justify-center text-white font-bold text-sm">1</div>
                         <div className="text-white">
                           <p className="font-semibold text-sm">Choisir</p>
-                          <p className="text-xs text-white/80">Remplissez le titre et la description</p>
+                          <p className="text-xs text-foreground/80">Remplissez le titre et la description</p>
                         </div>
-                        <ChevronRight className="h-4 w-4 text-white/60" />
+                        <ChevronRight className="h-4 w-4 text-muted-foreground" />
                       </div>
                       
                       <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-xl">
                         <div className="w-8 h-8 rounded-full bg-white/30 flex items-center justify-center text-white font-bold text-sm">2</div>
                         <div className="text-white">
                           <p className="font-semibold text-sm">Générer</p>
-                          <p className="text-xs text-white/80">Cliquez sur "Générer avec l'IA"</p>
+                          <p className="text-xs text-foreground/80">Cliquez sur "Générer avec l'IA"</p>
                         </div>
-                        <ChevronRight className="h-4 w-4 text-white/60" />
+                        <ChevronRight className="h-4 w-4 text-muted-foreground" />
                       </div>
                       
                       <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-xl">
                         <div className="w-8 h-8 rounded-full bg-white/30 flex items-center justify-center text-white font-bold text-sm">3</div>
                         <div className="text-white">
                           <p className="font-semibold text-sm">Valider</p>
-                          <p className="text-xs text-white/80">Consultez le verdict final</p>
+                          <p className="text-xs text-foreground/80">Consultez le verdict final</p>
                         </div>
                         <CheckCircle2 className="h-4 w-4 text-white" />
                       </div>
@@ -1436,7 +1436,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                         <h1 className="text-3xl font-extrabold text-white tracking-tight">
                           {ebookTitle || "Votre prochain best-seller"}
                         </h1>
-                        <p className="text-white/50 text-sm mt-1 font-medium">
+                        <p className="text-muted-foreground text-sm mt-1 font-medium">
                           {authorName ? `Par ${authorName}` : "Commencez à créer votre ebook"}
                         </p>
                       </div>
@@ -1492,7 +1492,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                   </div>
                 </div>
                 <div className="mt-4 text-center">
-                  <p className="text-white/70 text-sm italic">
+                  <p className="text-muted-foreground text-sm italic">
                     🚀 1, 2, 3… Foncez ! Je suis toujours là pour vous accompagner en Zoom gratuit — Georges
                   </p>
                 </div>

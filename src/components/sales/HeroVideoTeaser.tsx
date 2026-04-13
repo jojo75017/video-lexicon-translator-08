@@ -17,7 +17,7 @@ const HeroVideoTeaser = () => {
     <section className="py-16 px-4 bg-gradient-to-b from-muted/30 to-background">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-10">
-          <Badge className="mb-3 bg-violet-500/10 text-violet-400 border-violet-500/30">
+          <Badge className="mb-3 bg-violet-500/10 text-violet-400 border-primary/20">
             <Play className="w-3 h-3 mr-1" />
             Vidéos explicatives
           </Badge>
