@@ -29,7 +29,7 @@ const EMAIL_SEQUENCE: EmailStep[] = [
     subject: "📖 J'ai généré 150 pages en 47 minutes... voici comment",
     preheader: "Le secret des auteurs qui publient un livre par semaine sur Amazon",
     strategy: "CURIOSITÉ",
-    strategyColor: "bg-blue-500/20 text-blue-400 border-blue-500/30",
+    strategyColor: "bg-primary/10 text-primary border-primary/30",
     body: `Bonjour [PRÉNOM],
 
 Je vais être direct avec vous.
@@ -70,7 +70,7 @@ P.S: Mon profil Amazon avec mes 35+ livres publiés : https://www.amazon.fr/Mr-G
     subject: "⚠️ Les 3 erreurs qui tuent 90% des auteurs KDP",
     preheader: "Erreur #2 est celle que TOUT LE MONDE fait...",
     strategy: "DOULEUR / SOLUTION",
-    strategyColor: "bg-red-500/20 text-red-400 border-red-500/30",
+    strategyColor: "bg-destructive/10 text-destructive border-destructive/30",
     body: `[PRÉNOM],
 
 Savez-vous pourquoi 90% des gens qui veulent publier sur Amazon... n'y arrivent jamais ?
@@ -103,7 +103,7 @@ P.S: Testez d'abord gratuitement : ${DEMO_LINK}`,
     subject: "💰 De 0 à 35 livres Amazon — Mon parcours transparent",
     preheader: "Chiffres réels, résultats réels, outil réel.",
     strategy: "PREUVE SOCIALE",
-    strategyColor: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
+    strategyColor: "bg-green-500/10 text-green-600 border-green-500/30",
     body: `[PRÉNOM],
 
 Aujourd'hui, pas de pitch. Juste des faits.
@@ -138,7 +138,7 @@ https://www.amazon.fr/Mr-Georges-Boubet/e/B0CGVLHNX7`,
     subject: "⏰ [Dernière chance] L'offre Fondateur disparaît dans 48h",
     preheader: "Après ça, le prix passe à 147€. Point final.",
     strategy: "URGENCE",
-    strategyColor: "bg-amber-500/20 text-amber-400 border-amber-500/30",
+    strategyColor: "bg-amber-500/10 text-amber-600 border-amber-500/30",
     body: `[PRÉNOM],
 
 L'offre Fondateur EbookStudio Pro à 67€ se termine dans 48 heures.
@@ -174,7 +174,7 @@ P.S: Je ne relancerai pas après cet email.`,
     subject: "🔒 C'est terminé ce soir à minuit",
     preheader: "Votre dernière chance de rejoindre les fondateurs.",
     strategy: "DERNIER APPEL",
-    strategyColor: "bg-purple-500/20 text-purple-400 border-purple-500/30",
+    strategyColor: "bg-purple-500/10 text-purple-600 border-purple-500/30",
     body: `[PRÉNOM],
 
 Dernier email. Dernier appel.
@@ -222,18 +222,18 @@ const EmailPreviewPage = () => {
   const email = EMAIL_SEQUENCE[activeStep];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4 md:p-8">
+    <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="max-w-5xl mx-auto space-y-6">
         <AdminPanelNav />
 
         {/* Header */}
         <div className="flex items-center gap-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-white flex items-center gap-3">
-              <Mail className="w-7 h-7 text-amber-400" />
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground flex items-center gap-3">
+              <Mail className="w-7 h-7 text-primary" />
               Séquence Emails Prospects
             </h1>
-            <p className="text-white/50 text-sm mt-1">Prévisualisation des 5 emails envoyés automatiquement à vos prospects</p>
+            <p className="text-muted-foreground text-sm mt-1">Prévisualisation des 5 emails envoyés automatiquement à vos prospects</p>
           </div>
         </div>
 
@@ -245,12 +245,12 @@ const EmailPreviewPage = () => {
               onClick={() => setActiveStep(i)}
               className={`flex-shrink-0 flex items-center gap-2 px-4 py-3 rounded-xl border transition-all ${
                 activeStep === i
-                  ? "bg-amber-500/20 border-amber-500/50 text-amber-300"
-                  : "bg-white/5 border-white/10 text-white/50 hover:bg-white/10 hover:text-white/70"
+                  ? "bg-primary/10 border-primary/50 text-primary"
+                  : "bg-card border-border text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
             >
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                activeStep === i ? "bg-amber-500 text-black" : "bg-white/10 text-white/60"
+                activeStep === i ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
               }`}>
                 {e.step}
               </div>
@@ -266,39 +266,39 @@ const EmailPreviewPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left: Meta info */}
           <div className="space-y-4">
-            <Card className="bg-white/5 border-white/10">
+            <Card className="bg-card border-border">
               <CardHeader className="pb-3">
-                <CardTitle className="text-white text-sm flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-amber-400" />
+                <CardTitle className="text-foreground text-sm flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-primary" />
                   Détails de l'email
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm">
                 <div>
-                  <span className="text-white/40">Étape</span>
-                  <p className="text-white font-semibold">{email.step} / 5</p>
+                  <span className="text-muted-foreground">Étape</span>
+                  <p className="text-foreground font-semibold">{email.step} / 5</p>
                 </div>
                 <div>
-                  <span className="text-white/40">Envoi</span>
-                  <p className="text-white font-semibold">{email.dayLabel} après inscription</p>
+                  <span className="text-muted-foreground">Envoi</span>
+                  <p className="text-foreground font-semibold">{email.dayLabel} après inscription</p>
                 </div>
                 <div>
-                  <span className="text-white/40">Stratégie</span>
+                  <span className="text-muted-foreground">Stratégie</span>
                   <div className="mt-1">
                     <Badge className={email.strategyColor}>{email.strategy}</Badge>
                   </div>
                 </div>
                 <div>
-                  <span className="text-white/40">Objet</span>
-                  <p className="text-white font-medium text-xs mt-1">{email.subject}</p>
+                  <span className="text-muted-foreground">Objet</span>
+                  <p className="text-foreground font-medium text-xs mt-1">{email.subject}</p>
                 </div>
                 <div>
-                  <span className="text-white/40">Pré-header</span>
-                  <p className="text-white/60 text-xs mt-1 italic">{email.preheader}</p>
+                  <span className="text-muted-foreground">Pré-header</span>
+                  <p className="text-muted-foreground text-xs mt-1 italic">{email.preheader}</p>
                 </div>
                 <div>
-                  <span className="text-white/40">Expéditeur</span>
-                  <p className="text-white text-xs mt-1">Georges Boubet &lt;noreply@ebookstudio.fr&gt;</p>
+                  <span className="text-muted-foreground">Expéditeur</span>
+                  <p className="text-foreground text-xs mt-1">Georges Boubet &lt;noreply@ebookstudio.fr&gt;</p>
                 </div>
               </CardContent>
             </Card>
@@ -310,7 +310,7 @@ const EmailPreviewPage = () => {
                 size="sm"
                 disabled={activeStep === 0}
                 onClick={() => setActiveStep(activeStep - 1)}
-                className="flex-1 border-white/20 text-white/70 hover:text-white"
+                className="flex-1"
               >
                 <ChevronLeft className="w-4 h-4 mr-1" /> Précédent
               </Button>
@@ -319,7 +319,7 @@ const EmailPreviewPage = () => {
                 size="sm"
                 disabled={activeStep === EMAIL_SEQUENCE.length - 1}
                 onClick={() => setActiveStep(activeStep + 1)}
-                className="flex-1 border-white/20 text-white/70 hover:text-white"
+                className="flex-1"
               >
                 Suivant <ChevronRight className="w-4 h-4 ml-1" />
               </Button>
@@ -362,15 +362,15 @@ const EmailPreviewPage = () => {
         </div>
 
         {/* Summary table */}
-        <Card className="bg-white/5 border-white/10">
+        <Card className="bg-card border-border">
           <CardHeader>
-            <CardTitle className="text-white text-sm">📋 Récapitulatif de la séquence</CardTitle>
+            <CardTitle className="text-foreground text-sm">📋 Récapitulatif de la séquence</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-white/10 text-white/40">
+                  <tr className="border-b border-border text-muted-foreground">
                     <th className="text-left py-2 px-3">Étape</th>
                     <th className="text-left py-2 px-3">Jour</th>
                     <th className="text-left py-2 px-3">Stratégie</th>
@@ -382,22 +382,22 @@ const EmailPreviewPage = () => {
                     <tr
                       key={e.step}
                       onClick={() => setActiveStep(i)}
-                      className={`border-b border-white/5 cursor-pointer transition-colors ${
-                        activeStep === i ? "bg-amber-500/10" : "hover:bg-white/5"
+                      className={`border-b border-border/50 cursor-pointer transition-colors ${
+                        activeStep === i ? "bg-primary/5" : "hover:bg-muted/50"
                       }`}
                     >
                       <td className="py-2.5 px-3">
                         <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
-                          activeStep === i ? "bg-amber-500 text-black" : "bg-white/10 text-white/60"
+                          activeStep === i ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
                         }`}>
                           {e.step}
                         </div>
                       </td>
-                      <td className="py-2.5 px-3 text-white font-semibold">{e.dayLabel}</td>
+                      <td className="py-2.5 px-3 text-foreground font-semibold">{e.dayLabel}</td>
                       <td className="py-2.5 px-3">
                         <Badge className={`text-[10px] ${e.strategyColor}`}>{e.strategy}</Badge>
                       </td>
-                      <td className="py-2.5 px-3 text-white/70 text-xs">{e.subject}</td>
+                      <td className="py-2.5 px-3 text-muted-foreground text-xs">{e.subject}</td>
                     </tr>
                   ))}
                 </tbody>

@@ -20,7 +20,6 @@ const steps = [
       "Rédaction complète par IA (Gemini 3 Flash)",
       "Couvertures professionnelles avec Imagen 3",
     ],
-    color: "from-cyan-500 to-emerald-500",
   },
   {
     icon: Zap,
@@ -31,7 +30,6 @@ const steps = [
       "2. Entrez votre titre — l'IA fait le reste",
       "3. Exportez en PDF/EPUB et publiez sur KDP",
     ],
-    color: "from-amber-500 to-orange-500",
   },
   {
     icon: Rocket,
@@ -42,7 +40,6 @@ const steps = [
       "🎓 18 modules de formation inclus",
       "📊 Recherche de mots-clés KDP intégrée",
     ],
-    color: "from-purple-500 to-pink-500",
   },
 ];
 
@@ -53,7 +50,6 @@ export const OnboardingGuide = ({ userName }: OnboardingGuideProps) => {
   useEffect(() => {
     const done = localStorage.getItem(ONBOARDING_KEY);
     if (!done) {
-      // Delay to let the page load
       const timer = setTimeout(() => setIsOpen(true), 1500);
       return () => clearTimeout(timer);
     }
@@ -78,11 +74,11 @@ export const OnboardingGuide = ({ userName }: OnboardingGuideProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => { if (!open) handleSkip(); }}>
-      <DialogContent className="sm:max-w-lg p-0 overflow-hidden border-0 bg-slate-900 text-white">
+      <DialogContent className="sm:max-w-lg p-0 overflow-hidden border-border bg-card text-foreground">
         {/* Progress */}
         <div className="flex gap-1.5 px-6 pt-5">
           {steps.map((_, i) => (
-            <div key={i} className={`h-1 flex-1 rounded-full transition-all duration-300 ${i <= currentStep ? 'bg-gradient-to-r ' + steps[i].color : 'bg-slate-800'}`} />
+            <div key={i} className={`h-1 flex-1 rounded-full transition-all duration-300 ${i <= currentStep ? 'bg-primary' : 'bg-muted'}`} />
           ))}
         </div>
 
@@ -96,30 +92,30 @@ export const OnboardingGuide = ({ userName }: OnboardingGuideProps) => {
             className="p-6"
           >
             {/* Icon */}
-            <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${step.color} flex items-center justify-center mb-5 shadow-lg`}>
-              <StepIcon className="w-8 h-8 text-white" />
+            <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center mb-5 shadow-lg">
+              <StepIcon className="w-8 h-8 text-primary-foreground" />
             </div>
 
             {/* Content */}
-            <h2 className="text-2xl font-bold text-white mb-2">{step.title}</h2>
-            <p className="text-slate-400 mb-5">{step.description}</p>
+            <h2 className="text-2xl font-bold text-foreground mb-2">{step.title}</h2>
+            <p className="text-muted-foreground mb-5">{step.description}</p>
 
             {/* Tips */}
             <div className="space-y-2.5 mb-6">
               {step.tips.map((tip, i) => (
                 <div key={i} className="flex items-start gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-slate-300">{tip}</span>
+                  <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                  <span className="text-sm text-muted-foreground">{tip}</span>
                 </div>
               ))}
             </div>
 
             {/* Actions */}
             <div className="flex items-center justify-between">
-              <button onClick={handleSkip} className="text-sm text-slate-500 hover:text-slate-300 transition-colors">
+              <button onClick={handleSkip} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Passer l'intro
               </button>
-              <Button onClick={handleNext} className={`bg-gradient-to-r ${step.color} text-white font-bold rounded-xl px-6 gap-2`}>
+              <Button onClick={handleNext} className="font-bold rounded-xl px-6 gap-2">
                 {currentStep < steps.length - 1 ? (
                   <>Suivant <ArrowRight className="w-4 h-4" /></>
                 ) : (
@@ -132,7 +128,7 @@ export const OnboardingGuide = ({ userName }: OnboardingGuideProps) => {
 
         {/* Step counter */}
         <div className="px-6 pb-4 text-center">
-          <span className="text-xs text-slate-600">{currentStep + 1} / {steps.length}</span>
+          <span className="text-xs text-muted-foreground">{currentStep + 1} / {steps.length}</span>
         </div>
       </DialogContent>
     </Dialog>
