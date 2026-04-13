@@ -1,51 +1,99 @@
 
+# Rapport d'Amélioration — Générateur d'Ebooks
 
-# Diagnostic et Plan de Correction -- Accès EbookPlanner bloqué
+## Ce qui fonctionne parfaitement (acquis solides)
+- Workflow IA 15 agents (P1-P15) complet et fonctionnel
+- Sidebar organisée en 5 catégories claires
+- Export PDF/DOCX/EPUB + Calibre
+- Formats KDP spécialisés (Atlas, Encyclopédie, Coloriage, Documentaire)
+- Couverture IA + 4e de couverture + Éditeur visuel
+- Sauvegarde auto (60s) + sauvegarde cloud
+- Traduction multi-langues, personnages, séries
+- Checklist KDP pré-publication
+- Audio / Audio Express
+- Plan de lancement + Marketing
 
-## Probleme identifie
+---
 
-Deux problemes distincts empechent l'acces a `/ebook-planner` :
+## Problèmes concrets à corriger
 
-### 1. Timeout de l'authentification (Safety Timer)
-Les logs console montrent "Safety timer triggered" a chaque chargement. La verification admin via l'Edge Function `check-admin` prend plus de 8 secondes, ce qui force le timeout. Resultat : `isAdmin = false`, meme si vous etes admin.
+### 1. Composants avec données factices (Math.random) encore présents
 
-### 2. SubscriberGate bloque l'acces
-Quand ni `isAdmin` ni `isAuthenticated` ne sont `true`, le `SubscriberGate` redirige vers `/subscription`, qui redirige vers `/auth`. Boucle.
+Ces fichiers existent dans le dossier `src/components/ebook/` mais ne sont **pas** dans la sidebar ni utilisés dans EbookPlannerPage. Ils sont orphelins et doivent être supprimés :
 
-## Cause technique
+| Fichier | Problème |
+|---------|----------|
+| `EbookCompetitorDashboard.tsx` | Prix, BSR, reviews = Math.random() |
+| `EbookBsrTracker.tsx` | Classements BSR simulés par Math.random() |
+| `EbookAmazonAdsSimulator.tsx` | Mots-clés et CPC simulés |
+| `EbookPlagiarismValidator.tsx` | Scores de similarité = Math.random() |
+| `SpecializedAmazonPreview.tsx` | Rating, reviews, BSR = Math.random() |
+| `EbookCompetitorSpy.tsx` | Orphelin |
+| `EbookAdvancedFeatures.tsx` | Que des "coming soon" |
+| `EbookAnalyticsDashboard.tsx` | Orphelin |
+| `EbookPublicationPlanner.tsx` | Orphelin |
+| `EbookRoyaltyDashboard.tsx` | Orphelin |
+| `EbookKdpExplosiveSimulator.tsx` | Orphelin |
+| `EbookKdpRevenueSimulator.tsx` | Orphelin |
+| `EbookVideoCreator.tsx` | Orphelin |
+| `EbookVideoTrailer.tsx` | Orphelin |
+| `EbookLandingPageGenerator.tsx` | Orphelin |
+| `EbookDirectSales.tsx` | Orphelin |
+| `EbookSeoArticleGenerator.tsx` | Orphelin |
+| `EbookTrendPredictor.tsx` | Orphelin |
+| `EbookPublishedBooksDashboard.tsx` | Orphelin |
+| `EbookKdpAnalytics.tsx` | Orphelin |
 
-- L'Edge Function `check-admin` est lente (>8s) probablement a cause du cold start Deno
-- Le `SubscriberGate` appelle AUSSI `getIsCurrentSessionAdmin()` en interne (double appel, double attente)
-- Le `initAuth` dans App.tsx ne met pas `setIsCheckingAuth(false)` assez vite quand la reponse traine
+**Action** : Supprimer ces ~20 fichiers orphelins qui alourdissent le projet sans rien apporter.
 
-## Plan de correction
+### 2. Fallbacks Math.random dans les composants ACTIFS
 
-### Etape 1 : Augmenter le safety timer et optimiser initAuth
-- Passer le safety timer de 8s a 12s
-- Ajouter un `setIsCheckingAuth(false)` immediatement apres la partie subscriber (avant le check admin), pour que les subscribers ne soient pas bloques par le check admin
-- Separer la logique : d'abord terminer le check subscriber (rapide, localStorage), puis lancer le check admin en parallele sans bloquer le rendu
+Ces composants sont dans la sidebar mais ont des fallbacks factices quand l'IA échoue :
 
-### Etape 2 : Optimiser SubscriberGate
-- Ajouter un timeout de 5s dans le `SubscriberGate` pour le check `getIsCurrentSessionAdmin()` : si ca depasse, continuer avec la validation subscriber normale au lieu de bloquer
-- Eviter le double appel admin quand `isAdmin` est deja passe en prop
+| Composant | Problème |
+|-----------|----------|
+| `EbookABTesting.tsx` | `simulateAnalysis()` génère des scores random (ligne 155-160) |
+| `EbookArcManager.tsx` | Fallback titre = score random (ligne 248) |
+| `EbookBetaReaderHub.tsx` | Lecteur random parmi la liste |
 
-### Etape 3 : Ajouter un cache court pour le statut admin
-- Apres un check admin reussi dans `App.tsx`, stocker le resultat en memoire (state React, pas localStorage) pour eviter de re-appeler l'Edge Function dans `SubscriberGate`
+**Action** : Remplacer les fallbacks par un message d'erreur clair ("Analyse impossible, vérifiez votre clé API") au lieu de fausses données.
 
-## Fichiers modifies
-- `src/App.tsx` : restructurer initAuth pour ne pas bloquer les subscribers
-- `src/components/auth/SubscriberGate.tsx` : ajouter timeout au check admin interne
-- `src/lib/adminAccess.ts` : ajouter cache memoire temporaire (30s)
+### 3. EbookPlannerPage.tsx = 3149 lignes (monolithe)
 
-## Detail technique
+Fichier trop gros, difficile à maintenir. Contient tout : état, effets, rendu de ~40 onglets.
 
-```text
-AVANT:
-initAuth() -> check localStorage -> check admin (8s+) -> setIsCheckingAuth(false)
-                                     ^^ bloque tout
+**Action** : Extraire le `renderContent()` (switch de ~1000 lignes) dans un fichier séparé `EbookContentRenderer.tsx` + extraire la logique d'état dans un hook `useEbookPlannerState.ts`.
 
-APRES:
-initAuth() -> check localStorage -> setIsCheckingAuth(false) si subscriber OK
-                                  -> check admin en parallele (met a jour isAdmin quand pret)
-```
+### 4. UX — Points de friction identifiés
 
+| Problème | Solution |
+|----------|----------|
+| Pas de message d'accueil clair quand on arrive la première fois | Ajouter un écran "Bienvenue" simple avec 3 choix : Workflow IA / Formulaire manuel / Mes projets |
+| L'onglet "Planner" (formulaire manuel) est dense et intimidant | Ajouter des tooltips sur chaque champ + regrouper visuellement |
+| Quand un onglet n'existe pas → message "Onglet non disponible" sans contexte | Améliorer le fallback avec suggestion du bon onglet |
+| Deux admin links dans la sidebar (admin + admin-panel) pointent vers la même page | Supprimer le doublon |
+
+### 5. Typographie française dans les exports
+
+Les exports PDF/DOCX n'appliquent pas les règles typographiques françaises automatiquement.
+
+**Action** : Ajouter un utilitaire `frenchTypography.ts` qui convertit automatiquement :
+- `"texte"` → `« texte »`
+- Espace insécable avant `:`, `;`, `!`, `?`
+- Apostrophes typographiques
+
+---
+
+## Plan d'exécution (par priorité)
+
+1. **Supprimer les ~20 fichiers orphelins** — Nettoyage immédiat, 0 risque
+2. **Corriger les 3 fallbacks random actifs** — Remplacer par messages d'erreur clairs
+3. **Supprimer le doublon admin** dans la sidebar
+4. **Refactorer EbookPlannerPage.tsx** — Extraire renderContent + état
+5. **Typographie française** dans les exports
+
+## Détails techniques
+
+- Fichiers à supprimer : ~20 composants non référencés dans la sidebar ni dans EbookPlannerPage
+- Fichiers à modifier : `EbookABTesting.tsx`, `EbookArcManager.tsx`, `ModernSidebar.tsx`, `EbookPlannerPage.tsx`
+- Nouveau fichier : `src/utils/frenchTypography.ts`
