@@ -65,7 +65,7 @@ const InstallPage = lazy(() => import('./pages/InstallPage'));
 const ElementorExportPage = lazy(() => import('./pages/ElementorExportPage'));
 const SubscriptionAuth = lazy(() => import('@/components/SubscriptionAuth').then(m => ({ default: m.SubscriptionAuth })));
 
-// SaaS pages removed (orphan system)
+// SaaS/marketing pages (admin-only tools)
 const SalesCampaignPage = lazy(() => import('@/pages/SalesCampaignPage'));
 const EmailPreviewPage = lazy(() => import('@/pages/EmailPreviewPage'));
 const ProspectManagerPage = lazy(() => import('@/pages/ProspectManagerPage'));
