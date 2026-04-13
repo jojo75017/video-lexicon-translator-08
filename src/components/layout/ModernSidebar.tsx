@@ -259,29 +259,29 @@ const QuotaDisplay: React.FC<{ isCollapsed: boolean }> = ({ isCollapsed }) => {
 // ─── Color map ───
 const colorMap: Record<string, { bg: string; bgActive: string; border: string; text: string; icon: string; iconBg: string; dot: string }> = {
   emerald: {
-    bg: 'bg-emerald-500/10', bgActive: 'bg-gradient-to-r from-emerald-500/15 to-emerald-400/10',
-    border: 'border-primary/20', text: 'text-emerald-400', icon: 'text-emerald-300',
-    iconBg: 'bg-gradient-to-br from-emerald-500 to-emerald-600', dot: 'bg-emerald-400',
+    bg: 'bg-emerald-500/10', bgActive: 'bg-gradient-to-r from-emerald-500/10 to-emerald-400/5',
+    border: 'border-primary/20', text: 'text-kdp-orange', icon: 'text-emerald-600',
+    iconBg: 'bg-gradient-to-br from-emerald-500 to-emerald-600', dot: 'bg-emerald-500',
   },
   violet: {
-    bg: 'bg-violet-500/10', bgActive: 'bg-gradient-to-r from-violet-500/15 to-violet-400/10',
-    border: 'border-primary/20', text: 'text-violet-400', icon: 'text-violet-300',
-    iconBg: 'bg-gradient-to-br from-violet-500 to-violet-600', dot: 'bg-violet-400',
+    bg: 'bg-violet-500/10', bgActive: 'bg-gradient-to-r from-violet-500/10 to-violet-400/5',
+    border: 'border-primary/20', text: 'text-kdp-orange', icon: 'text-violet-600',
+    iconBg: 'bg-gradient-to-br from-violet-500 to-violet-600', dot: 'bg-violet-500',
   },
   blue: {
-    bg: 'bg-blue-500/10', bgActive: 'bg-gradient-to-r from-blue-500/15 to-blue-400/10',
-    border: 'border-blue-500/30', text: 'text-blue-400', icon: 'text-blue-300',
-    iconBg: 'bg-gradient-to-br from-blue-500 to-blue-600', dot: 'bg-blue-400',
+    bg: 'bg-blue-500/10', bgActive: 'bg-gradient-to-r from-blue-500/10 to-blue-400/5',
+    border: 'border-blue-500/20', text: 'text-kdp-orange', icon: 'text-blue-600',
+    iconBg: 'bg-gradient-to-br from-blue-500 to-blue-600', dot: 'bg-blue-500',
   },
   orange: {
-    bg: 'bg-orange-500/10', bgActive: 'bg-gradient-to-r from-orange-500/15 to-orange-400/10',
-    border: 'border-orange-500/30', text: 'text-orange-400', icon: 'text-orange-300',
-    iconBg: 'bg-gradient-to-br from-orange-500 to-orange-600', dot: 'bg-orange-400',
+    bg: 'bg-orange-500/10', bgActive: 'bg-gradient-to-r from-orange-500/10 to-orange-400/5',
+    border: 'border-orange-500/20', text: 'text-kdp-orange', icon: 'text-orange-600',
+    iconBg: 'bg-gradient-to-br from-orange-500 to-orange-600', dot: 'bg-orange-500',
   },
   slate: {
-    bg: 'bg-slate-500/10', bgActive: 'bg-gradient-to-r from-slate-500/15 to-slate-400/10',
-    border: 'border-slate-500/30', text: 'text-muted-foreground', icon: 'text-foreground',
-    iconBg: 'bg-gradient-to-br from-slate-500 to-slate-600', dot: 'bg-slate-400',
+    bg: 'bg-muted/50', bgActive: 'bg-gradient-to-r from-muted/60 to-muted/30',
+    border: 'border-border', text: 'text-kdp-orange', icon: 'text-foreground',
+    iconBg: 'bg-gradient-to-br from-slate-500 to-slate-600', dot: 'bg-muted-foreground',
   },
 };
 
