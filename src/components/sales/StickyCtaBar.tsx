@@ -103,7 +103,7 @@ export const StickyCtaBar: React.FC<StickyCtaBarProps> = ({ onCtaClick }) => {
                 <div className="flex items-baseline gap-2">
                   <span className="text-3xl font-bold text-foreground">{price}€</span>
                   <span className="text-lg text-foreground/40 line-through">{originalPrice}€</span>
-                  <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 text-xs">
+                  <Badge className="bg-emerald-500/20 text-emerald-400 border-primary/20 text-xs">
                     {discount}
                   </Badge>
                 </div>

@@ -196,7 +196,7 @@ const AudiobookDemoPage = () => {
                 <div className="flex items-center gap-2 mb-4">
                   <Headphones className="w-5 h-5 text-amber-400" />
                   <h3 className="text-foreground/90 font-semibold text-base">Écouter l'extrait gratuit</h3>
-                  <Badge className="bg-emerald-500/15 text-emerald-400 border-emerald-500/30 text-[10px] ml-auto">GRATUIT</Badge>
+                  <Badge className="bg-emerald-500/15 text-emerald-400 border-primary/20 text-[10px] ml-auto">GRATUIT</Badge>
                 </div>
                 <div className="flex items-center gap-4">
                   <Button
@@ -220,7 +220,7 @@ const AudiobookDemoPage = () => {
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }} className="flex items-baseline gap-3 justify-center lg:justify-start mb-5">
                 <span className="text-5xl font-black bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">{audiobook.price.toFixed(2)} €</span>
                 <span className="text-foreground/30 text-lg line-through">{(audiobook.price * 1.5).toFixed(2)} €</span>
-                <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 text-xs font-bold">-33%</Badge>
+                <Badge className="bg-emerald-500/20 text-emerald-400 border-primary/20 text-xs font-bold">-33%</Badge>
               </motion.div>
 
               {/* CTA */}
@@ -385,7 +385,7 @@ const AudiobookDemoPage = () => {
                   <Badge variant="outline" className="border-purple-500/20 text-purple-300/70 bg-purple-500/5 rounded-full px-4 py-1.5 text-xs font-medium">
                     🎙️ Audio IA Premium
                   </Badge>
-                  <Badge variant="outline" className="border-cyan-500/20 text-cyan-300/70 bg-cyan-500/5 rounded-full px-4 py-1.5 text-xs font-medium">
+                  <Badge variant="outline" className="border-primary/20 text-cyan-300/70 bg-cyan-500/5 rounded-full px-4 py-1.5 text-xs font-medium">
                     🗣️ {audiobook.voice_name}
                   </Badge>
                   <Badge variant="outline" className="border-emerald-500/20 text-emerald-300/70 bg-emerald-500/5 rounded-full px-4 py-1.5 text-xs font-medium">

@@ -294,7 +294,7 @@ const ProspectManagerPage = () => {
                 variant="outline"
                 size="sm"
                 onClick={() => toggleAllAutoSend(true)}
-                className="border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10"
+                className="border-primary/20 text-emerald-400 hover:bg-emerald-500/10"
               >
                 <Play className="h-3 w-3 mr-1" /> Auto ON (tous)
               </Button>
@@ -379,7 +379,7 @@ const ProspectManagerPage = () => {
                             ) : p.unsubscribed ? (
                               <Badge className="bg-red-500/20 text-red-400 border-red-500/30">Désinscrit</Badge>
                             ) : (
-                              <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30">Actif</Badge>
+                              <Badge className="bg-emerald-500/20 text-emerald-400 border-primary/20">Actif</Badge>
                             )}
                           </td>
                           <td className="px-3 py-2 text-center">

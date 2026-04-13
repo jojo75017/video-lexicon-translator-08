@@ -63,7 +63,7 @@ const ProgressEngagement = ({
                 variant="secondary" 
                 className={`text-xs ${
                   progress >= 80 
-                    ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30 animate-pulse" 
+                    ? "bg-emerald-500/20 text-emerald-300 border-primary/20 animate-pulse" 
                     : "bg-primary/20 text-primary border-primary/30"
                 }`}
               >

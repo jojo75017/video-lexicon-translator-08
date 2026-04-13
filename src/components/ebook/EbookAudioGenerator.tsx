@@ -1685,7 +1685,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                       onClick={exportAllMp3}
                       disabled={isGeneratingMp3 || totalWords === 0}
                       variant="outline"
-                      className="flex-1 h-12 border-emerald-500/30 text-emerald-700 hover:bg-emerald-500/10"
+                      className="flex-1 h-12 border-primary/20 text-emerald-700 hover:bg-emerald-500/10"
                       size="lg"
                     >
                       <Download className="h-5 w-5 mr-2" />

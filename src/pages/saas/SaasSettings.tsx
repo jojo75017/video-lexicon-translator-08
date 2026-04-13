@@ -510,7 +510,7 @@ export const SaasSettings: React.FC = () => {
                   { step: "2", title: "Créez une ressource Speech", desc: "Cherchez 'Speech' dans la barre de recherche → Créer → Choisissez la région 'France Central' → Tarif gratuit (F0) ou Standard", icon: "🎙️", color: "from-teal-500 to-cyan-500" },
                   { step: "3", title: "Copiez la clé et la région", desc: "Dans votre ressource Speech → 'Keys and Endpoint' → Copiez Key 1 et la région (ex: francecentral). Collez ci-dessous.", icon: "📋", color: "from-cyan-500 to-blue-500" },
                 ].map((item, i) => (
-                  <div key={i} className="flex items-start gap-3 p-4 bg-card border border-border rounded-xl hover:border-emerald-500/30 transition-colors">
+                  <div key={i} className="flex items-start gap-3 p-4 bg-card border border-border rounded-xl hover:border-primary/20 transition-colors">
                     <div className={`w-9 h-9 rounded-lg bg-gradient-to-br ${item.color} flex items-center justify-center text-white font-bold text-sm flex-shrink-0`}>
                       {item.step}
                     </div>
@@ -532,7 +532,7 @@ export const SaasSettings: React.FC = () => {
 
               <div className="flex gap-2">
                 <a href="https://portal.azure.com/#create/Microsoft.CognitiveServicesSpeechServices" target="_blank" rel="noopener noreferrer">
-                  <Button variant="outline" size="sm" className="gap-2 border-emerald-500/30 text-emerald-600 hover:bg-emerald-500/10">
+                  <Button variant="outline" size="sm" className="gap-2 border-primary/20 text-emerald-600 hover:bg-emerald-500/10">
                     <ExternalLink className="h-4 w-4" />
                     Créer une ressource Azure Speech →
                   </Button>

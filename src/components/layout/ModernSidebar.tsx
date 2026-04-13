@@ -260,12 +260,12 @@ const QuotaDisplay: React.FC<{ isCollapsed: boolean }> = ({ isCollapsed }) => {
 const colorMap: Record<string, { bg: string; bgActive: string; border: string; text: string; icon: string; iconBg: string; dot: string }> = {
   emerald: {
     bg: 'bg-emerald-500/10', bgActive: 'bg-gradient-to-r from-emerald-500/15 to-emerald-400/10',
-    border: 'border-emerald-500/30', text: 'text-emerald-400', icon: 'text-emerald-300',
+    border: 'border-primary/20', text: 'text-emerald-400', icon: 'text-emerald-300',
     iconBg: 'bg-gradient-to-br from-emerald-500 to-emerald-600', dot: 'bg-emerald-400',
   },
   violet: {
     bg: 'bg-violet-500/10', bgActive: 'bg-gradient-to-r from-violet-500/15 to-violet-400/10',
-    border: 'border-violet-500/30', text: 'text-violet-400', icon: 'text-violet-300',
+    border: 'border-primary/20', text: 'text-violet-400', icon: 'text-violet-300',
     iconBg: 'bg-gradient-to-br from-violet-500 to-violet-600', dot: 'bg-violet-400',
   },
   blue: {
@@ -280,7 +280,7 @@ const colorMap: Record<string, { bg: string; bgActive: string; border: string; t
   },
   slate: {
     bg: 'bg-slate-500/10', bgActive: 'bg-gradient-to-r from-slate-500/15 to-slate-400/10',
-    border: 'border-slate-500/30', text: 'text-slate-400', icon: 'text-slate-300',
+    border: 'border-slate-500/30', text: 'text-muted-foreground', icon: 'text-foreground',
     iconBg: 'bg-gradient-to-br from-slate-500 to-slate-600', dot: 'bg-slate-400',
   },
 };

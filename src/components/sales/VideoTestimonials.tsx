@@ -54,7 +54,7 @@ const VideoTestimonials = () => {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <Badge className="mb-4 bg-violet-500/10 text-violet-400 border-violet-500/30">
+          <Badge className="mb-4 bg-violet-500/10 text-violet-400 border-primary/20">
             <Star className="w-3 h-3 mr-1 fill-current" />
             Témoignages Clients
           </Badge>

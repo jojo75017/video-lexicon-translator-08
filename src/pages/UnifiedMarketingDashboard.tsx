@@ -246,7 +246,7 @@ const UnifiedMarketingDashboard = () => {
                         <p className="text-xs text-muted-foreground">{p.first_name || '—'} • Étape {p.current_step}/5</p>
                       </div>
                       <div className="flex items-center gap-2">
-                        {p.auto_send && <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/30 text-xs">Auto</Badge>}
+                        {p.auto_send && <Badge className="bg-emerald-500/10 text-emerald-400 border-primary/20 text-xs">Auto</Badge>}
                         <Badge variant="secondary" className="text-xs">
                           {new Date(p.created_at).toLocaleDateString('fr-FR')}
                         </Badge>
@@ -365,19 +365,19 @@ const UnifiedMarketingDashboard = () => {
                   Chaque email de la séquence de 5 étapes contient des liens cliquables vers :
                 </p>
                 <ul className="mt-3 space-y-2 text-sm">
-                  <li className="flex items-center gap-2 text-white/80">
+                  <li className="flex items-center gap-2 text-foreground/80">
                     <CheckCircle className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                     <span><strong>Démo gratuite</strong> → ebookstudio.fr/demo</span>
                   </li>
-                  <li className="flex items-center gap-2 text-white/80">
+                  <li className="flex items-center gap-2 text-foreground/80">
                     <CheckCircle className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                     <span><strong>Page d'offres</strong> → ebookstudio.fr/offres</span>
                   </li>
-                  <li className="flex items-center gap-2 text-white/80">
+                  <li className="flex items-center gap-2 text-foreground/80">
                     <CheckCircle className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                     <span><strong>Profil Amazon</strong> → amazon.fr/Mr-Georges-Boubet (preuve sociale)</span>
                   </li>
-                  <li className="flex items-center gap-2 text-white/80">
+                  <li className="flex items-center gap-2 text-foreground/80">
                     <CheckCircle className="w-4 h-4 text-cyan-400 flex-shrink-0" />
                     <span><strong>Lien de désinscription</strong> → inclus en bas de chaque email</span>
                   </li>

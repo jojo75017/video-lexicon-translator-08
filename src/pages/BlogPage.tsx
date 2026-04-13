@@ -88,7 +88,7 @@ const BlogPage = () => {
                       <div className="absolute inset-0 bg-black/20" />
                       <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
                         <Badge variant="secondary" className="bg-white/20 text-white border-0">{article.category}</Badge>
-                        <article.icon className="w-12 h-12 text-white/30" />
+                        <article.icon className="w-12 h-12 text-muted-foreground" />
                       </div>
                     </div>
                     <CardContent className="p-6">

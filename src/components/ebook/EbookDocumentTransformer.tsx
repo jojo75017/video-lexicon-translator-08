@@ -376,7 +376,7 @@ Réponds UNIQUEMENT en JSON valide:
   return (
     <div className="space-y-6">
       {/* Header */}
-      <Card className="bg-gradient-to-r from-violet-500/10 to-purple-500/10 border-violet-500/30">
+      <Card className="bg-gradient-to-r from-violet-500/10 to-purple-500/10 border-primary/20">
         <CardHeader>
           <div className="flex items-center gap-3">
             <div className="p-3 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600">
@@ -385,7 +385,7 @@ Réponds UNIQUEMENT en JSON valide:
             <div>
               <CardTitle className="text-xl flex items-center gap-2">
                 Transformateur Document → Ebook
-                <Badge className="bg-violet-500/20 text-violet-300 border-violet-500/30">
+                <Badge className="bg-violet-500/20 text-violet-300 border-primary/20">
                   IA
                 </Badge>
               </CardTitle>
@@ -403,7 +403,7 @@ Réponds UNIQUEMENT en JSON valide:
           <Card>
             <CardContent className="pt-6">
               <div 
-                className="border-2 border-dashed border-violet-500/30 rounded-xl p-8 text-center hover:border-violet-500/50 transition-colors cursor-pointer"
+                className="border-2 border-dashed border-primary/20 rounded-xl p-8 text-center hover:border-violet-500/50 transition-colors cursor-pointer"
                 onClick={() => fileInputRef.current?.click()}
               >
                 <input

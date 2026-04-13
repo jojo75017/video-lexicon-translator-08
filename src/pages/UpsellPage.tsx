@@ -55,7 +55,7 @@ const UpsellPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-violet-950 to-slate-950">
+    <div className="min-h-screen bg-gradient-to-br from-background via-violet-950 to-background">
       {/* Header urgence */}
       <div className="bg-gradient-to-r from-amber-500 to-orange-500 text-black py-3 px-4 text-center">
         <div className="flex items-center justify-center gap-3">
@@ -98,7 +98,7 @@ const UpsellPage = () => {
             { icon: ImageIcon, name: "Imagen 3", desc: "Couvertures pro", color: "from-violet-500 to-purple-500" },
             { icon: Headphones, name: "Azure Speech", desc: "Voix neuronales", color: "from-emerald-500 to-teal-500" },
           ].map((tech, i) => (
-            <div key={i} className="flex items-center gap-3 bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3">
+            <div key={i} className="flex items-center gap-3 bg-muted border border-border rounded-xl px-4 py-3">
               <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${tech.color} flex items-center justify-center`}>
                 <tech.icon className="w-5 h-5 text-white" />
               </div>

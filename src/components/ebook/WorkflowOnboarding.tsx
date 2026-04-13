@@ -40,7 +40,7 @@ const PHASES = [
     icon: PenTool,
     color: 'from-violet-500 to-purple-500',
     bgColor: 'bg-violet-500/10',
-    borderColor: 'border-violet-500/30',
+    borderColor: 'border-primary/20',
     textColor: 'text-violet-400',
     steps: [
       { id: 'P3', label: 'Architecte Contenu', desc: 'Structure & chapitres', tabId: 'content-architect', time: '3 min' },
@@ -55,7 +55,7 @@ const PHASES = [
     icon: Package,
     color: 'from-emerald-500 to-teal-500',
     bgColor: 'bg-emerald-500/10',
-    borderColor: 'border-emerald-500/30',
+    borderColor: 'border-primary/20',
     textColor: 'text-emerald-400',
     steps: [
       { id: 'P6', label: 'Qualité Éditoriale', desc: 'Grammaire & cohérence', tabId: 'editorial-quality', time: '3 min' },
@@ -242,7 +242,7 @@ export const WorkflowOnboarding: React.FC<WorkflowOnboardingProps> = ({
                           {phaseIdx + 1}. {phase.title}
                         </h3>
                         {isActive && !phaseCompleted && (
-                          <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/30 text-xs animate-pulse">
+                          <Badge className="bg-cyan-500/20 text-cyan-400 border-primary/20 text-xs animate-pulse">
                             En cours
                           </Badge>
                         )}

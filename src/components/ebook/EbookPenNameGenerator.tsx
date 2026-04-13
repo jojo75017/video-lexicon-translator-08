@@ -213,7 +213,7 @@ const EbookPenNameGenerator: React.FC = () => {
               <Card 
                 key={i} 
                 className={`border-border/50 shadow-md hover:shadow-lg transition-all cursor-pointer ${
-                  favoriteNames.includes(pen.name) ? 'ring-2 ring-violet-500/50 border-violet-500/30' : ''
+                  favoriteNames.includes(pen.name) ? 'ring-2 ring-violet-500/50 border-primary/20' : ''
                 }`}
               >
                 <CardContent className="p-4">
@@ -271,7 +271,7 @@ const EbookPenNameGenerator: React.FC = () => {
 
           {/* Favoris */}
           {favoriteNames.length > 0 && (
-            <Card className="border-violet-500/30 bg-violet-500/5 shadow-lg">
+            <Card className="border-primary/20 bg-violet-500/5 shadow-lg">
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-2">
                   <Star className="w-4 h-4 text-amber-500 fill-amber-400" />

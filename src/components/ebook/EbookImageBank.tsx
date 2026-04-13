@@ -263,9 +263,9 @@ const EbookImageBank: React.FC<EbookImageBankProps> = ({
                       placeholder="Entrez votre clé API Runware"
                       value={runwareApiKey}
                       onChange={(e) => setRunwareApiKey(e.target.value)}
-                      className="bg-white/20 border-white/30 text-white placeholder:text-white/70"
+                      className="bg-white/20 border-white/30 text-white placeholder:text-muted-foreground"
                     />
-                    <p className="text-sm text-white/80">
+                    <p className="text-sm text-foreground/80">
                       Obtenez votre clé gratuite sur{' '}
                       <a 
                         href="https://runware.ai" 

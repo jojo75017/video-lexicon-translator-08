@@ -318,7 +318,7 @@ const SubscriptionPage = ({ subscriberEmail, subscriberData, onLogout }: Subscri
                 variant="outline" 
                 size="sm"
                 onClick={() => navigate('/formation')}
-                className="border-emerald-500/30 text-emerald-600 hover:bg-emerald-500/10"
+                className="border-primary/20 text-emerald-600 hover:bg-emerald-500/10"
               >
                 <BookOpen className="w-4 h-4 mr-2" />
                 Formation Ebook
@@ -329,7 +329,7 @@ const SubscriptionPage = ({ subscriberEmail, subscriberData, onLogout }: Subscri
                     variant="outline" 
                     size="sm"
                     onClick={() => navigate('/formation-series')}
-                    className="border-emerald-500/30 text-emerald-600 hover:bg-emerald-500/10"
+                    className="border-primary/20 text-emerald-600 hover:bg-emerald-500/10"
                   >
                     <Library className="w-4 h-4 mr-2" />
                     Formation Séries
@@ -338,7 +338,7 @@ const SubscriptionPage = ({ subscriberEmail, subscriberData, onLogout }: Subscri
                     variant="outline" 
                     size="sm"
                     onClick={() => navigate('/formation-series-audio')}
-                    className="border-emerald-500/30 text-emerald-600 hover:bg-emerald-500/10"
+                    className="border-primary/20 text-emerald-600 hover:bg-emerald-500/10"
                   >
                     <Crown className="w-4 h-4 mr-2" />
                     Formation Audio

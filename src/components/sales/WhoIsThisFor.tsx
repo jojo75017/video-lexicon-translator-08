@@ -55,7 +55,7 @@ const WhoIsThisFor = () => {
       <div className="max-w-5xl mx-auto relative z-10">
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-12">
           <motion.div variants={fadeIn}>
-            <Badge className="bg-cyan-500/10 text-primary border-cyan-500/20 px-4 py-2 mb-4">
+            <Badge className="bg-cyan-500/10 text-primary border-primary/20 px-4 py-2 mb-4">
               <Target className="w-4 h-4 mr-2" />
               EST-CE POUR VOUS ?
             </Badge>

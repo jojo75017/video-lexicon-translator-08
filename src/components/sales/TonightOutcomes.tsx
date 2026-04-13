@@ -18,9 +18,9 @@ const fadeIn = {
 const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
 
 const outcomes = [
-  { time: "0–5 min", icon: Search, label: "Niche validée + plan de 12 chapitres", color: "text-primary bg-cyan-500/10 border-cyan-500/20" },
+  { time: "0–5 min", icon: Search, label: "Niche validée + plan de 12 chapitres", color: "text-primary bg-cyan-500/10 border-primary/20" },
   { time: "5–20 min", icon: FileText, label: "Ebook de 25 000+ mots rédigé par l'IA", color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" },
-  { time: "20–30 min", icon: Palette, label: "Couverture pro générée par Imagen 3", color: "text-violet-400 bg-violet-500/10 border-violet-500/20" },
+  { time: "20–30 min", icon: Palette, label: "Couverture pro générée par Imagen 3", color: "text-violet-400 bg-violet-500/10 border-primary/20" },
   { time: "30–45 min", icon: BookOpen, label: "Export PDF/EPUB prêt pour Amazon KDP", color: "text-amber-400 bg-amber-500/10 border-amber-500/20" },
 ];
 

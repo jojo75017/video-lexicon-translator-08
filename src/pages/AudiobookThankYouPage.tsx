@@ -121,7 +121,7 @@ const AudiobookThankYouPage = () => {
           transition={{ duration: 0.5 }}
           className="text-center mb-10"
         >
-          <div className="w-20 h-20 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center mx-auto mb-6">
+          <div className="w-20 h-20 rounded-full bg-emerald-500/20 border border-primary/20 flex items-center justify-center mx-auto mb-6">
             <CheckCircle2 className="w-10 h-10 text-emerald-400" />
           </div>
           <h1 className="text-3xl md:text-4xl font-extrabold mb-3">

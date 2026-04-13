@@ -30,7 +30,7 @@ interface StatCardProps {
 const StatCard: React.FC<StatCardProps> = ({ title, value, change, changeType, icon: Icon, description }) => (
   <Card className="hover:shadow-lg transition-shadow duration-200">
     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-      <CardTitle className="text-sm font-medium text-white/70">{title}</CardTitle>
+      <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
       <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
         <Icon className="h-4 w-4 text-primary" />
       </div>
@@ -47,7 +47,7 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, change, changeType, i
           {change}
         </div>
         {description && (
-          <span className="text-xs text-white/60">{description}</span>
+          <span className="text-xs text-muted-foreground">{description}</span>
         )}
       </div>
     </CardContent>
@@ -71,7 +71,7 @@ const QuickAction: React.FC<QuickActionProps> = ({ title, description, icon: Ico
     </div>
     <div>
       <p className="font-medium text-white">{title}</p>
-      <p className="text-sm text-white/60">{description}</p>
+      <p className="text-sm text-muted-foreground">{description}</p>
     </div>
   </button>
 );
@@ -124,7 +124,7 @@ export const SaasDashboard: React.FC = () => {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-white">Tableau de bord</h1>
-          <p className="text-white/70">Bon retour ! Voici ce qui se passe aujourd'hui.</p>
+          <p className="text-muted-foreground">Bon retour ! Voici ce qui se passe aujourd'hui.</p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline">
@@ -180,7 +180,7 @@ export const SaasDashboard: React.FC = () => {
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle className="text-white">Actions Rapides</CardTitle>
-            <CardDescription className="text-white/60">Raccourcis courants pour accélérer votre workflow</CardDescription>
+            <CardDescription className="text-muted-foreground">Raccourcis courants pour accélérer votre workflow</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 sm:grid-cols-2">
@@ -212,13 +212,13 @@ export const SaasDashboard: React.FC = () => {
         <Card>
           <CardHeader>
             <CardTitle className="text-white">Utilisation</CardTitle>
-            <CardDescription className="text-white/60">Limites actuelles de votre plan</CardDescription>
+            <CardDescription className="text-muted-foreground">Limites actuelles de votre plan</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {usageMetrics.map((metric) => (
               <div key={metric.name} className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-white/70">{metric.name}</span>
+                  <span className="text-muted-foreground">{metric.name}</span>
                   <span className="font-medium text-white">
                     {metric.current} / {metric.max} {metric.unit}
                   </span>
@@ -239,7 +239,7 @@ export const SaasDashboard: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="text-white">Activité Récente</CardTitle>
-              <CardDescription className="text-white/60">Dernières actions de votre équipe</CardDescription>
+              <CardDescription className="text-muted-foreground">Dernières actions de votre équipe</CardDescription>
             </div>
             <Button variant="ghost" size="sm">
               Voir tout
@@ -254,7 +254,7 @@ export const SaasDashboard: React.FC = () => {
                 <div className="flex-1 min-w-0">
                   <p className="text-sm">
                     <span className="font-medium text-white">{activity.user}</span>
-                    <span className="text-white/60"> {activity.action} </span>
+                    <span className="text-muted-foreground"> {activity.action} </span>
                     <span className="font-medium text-white">{activity.target}</span>
                   </p>
                 </div>

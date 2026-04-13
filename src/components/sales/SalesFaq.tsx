@@ -63,7 +63,7 @@ const SalesFaq: React.FC = () => {
 
       <div className="max-w-3xl mx-auto relative z-10">
         <div className="text-center mb-12">
-          <Badge className="mb-4 bg-cyan-500/10 text-primary border-cyan-500/20 px-4 py-2">
+          <Badge className="mb-4 bg-cyan-500/10 text-primary border-primary/20 px-4 py-2">
             <HelpCircle className="w-4 h-4 mr-2" />
             FAQ — 11 réponses essentielles
           </Badge>
@@ -71,7 +71,7 @@ const SalesFaq: React.FC = () => {
             Toutes vos questions,
             <span className="text-slate-500"> nos réponses.</span>
           </h2>
-          <p className="text-slate-400 text-lg max-w-xl mx-auto">
+          <p className="text-muted-foreground text-lg max-w-xl mx-auto">
             Nous avons rassemblé les questions les plus posées par nos utilisateurs avant de se lancer.
           </p>
         </div>
@@ -91,7 +91,7 @@ const SalesFaq: React.FC = () => {
                   <span>{faq.question}</span>
                 </span>
               </AccordionTrigger>
-              <AccordionContent className="text-slate-400 pb-5 pl-10 text-sm leading-relaxed">
+              <AccordionContent className="text-muted-foreground pb-5 pl-10 text-sm leading-relaxed">
                 {faq.answer}
               </AccordionContent>
             </AccordionItem>
@@ -100,9 +100,9 @@ const SalesFaq: React.FC = () => {
 
         {/* CTA sous la FAQ */}
         <div className="mt-12 text-center">
-          <div className="bg-gradient-to-r from-cyan-500/5 via-cyan-500/10 to-cyan-500/5 border border-cyan-500/20 rounded-2xl p-8">
+          <div className="bg-gradient-to-r from-cyan-500/5 via-cyan-500/10 to-cyan-500/5 border border-primary/20 rounded-2xl p-8">
             <p className="font-bold text-lg mb-2 text-foreground">Encore des doutes ?</p>
-            <p className="text-slate-400 text-sm mb-6">
+            <p className="text-muted-foreground text-sm mb-6">
               Réservez un appel Zoom gratuit pour voir l'outil en direct, ou lancez-vous directement.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -116,7 +116,7 @@ const SalesFaq: React.FC = () => {
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
               <a href="https://calendly.com/boubetgeorges/nouvelle-reunion" target="_blank" rel="noopener noreferrer">
-                <Button variant="outline" size="lg" className="gap-2 border-border text-slate-300 hover:text-foreground hover:border-slate-600 hover:bg-muted/50">
+                <Button variant="outline" size="lg" className="gap-2 border-border text-foreground hover:text-foreground hover:border-slate-600 hover:bg-muted/50">
                   <MessageCircle className="w-4 h-4" />
                   Réserver un Zoom gratuit
                 </Button>

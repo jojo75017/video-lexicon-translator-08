@@ -341,7 +341,7 @@ const EbookVideoTrailer: React.FC<EbookVideoTrailerProps> = ({
                   </div>
                 </>
               ) : (
-                <div className="text-center text-white/50 p-8">
+                <div className="text-center text-muted-foreground p-8">
                   <Video className="h-16 w-16 mx-auto mb-4 opacity-50" />
                   <p>Votre trailer apparaîtra ici</p>
                   <p className="text-sm mt-2">Format: {selectedFormat} • {duration}s</p>

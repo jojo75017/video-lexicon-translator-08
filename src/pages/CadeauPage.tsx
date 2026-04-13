@@ -39,7 +39,7 @@ const CadeauPage = () => {
 
   if (isSuccess) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-violet-950 to-slate-950 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-background via-violet-950 to-background flex items-center justify-center p-4">
         <div className="max-w-md w-full text-center space-y-6">
           <div className="mx-auto w-20 h-20 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full flex items-center justify-center">
             <CheckCircle2 className="w-10 h-10 text-white" />
@@ -71,7 +71,7 @@ const CadeauPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-violet-950 to-slate-950 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-background via-violet-950 to-background flex items-center justify-center p-4">
       <div className="max-w-lg w-full space-y-8">
         {/* Header */}
         <div className="text-center space-y-4">
@@ -103,7 +103,7 @@ const CadeauPage = () => {
                   <Icon className="w-4 h-4 text-violet-400" />
                 </div>
                 <span className="text-gray-200 flex-1">{text}</span>
-                <Badge variant="secondary" className="bg-violet-500/20 text-violet-300 border-violet-500/30 text-xs">
+                <Badge variant="secondary" className="bg-violet-500/20 text-violet-300 border-primary/20 text-xs">
                   {badge}
                 </Badge>
               </div>

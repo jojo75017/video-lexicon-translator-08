@@ -56,7 +56,7 @@ const EbookStyleSignature = () => {
 
   return (
     <div className="space-y-6">
-      <Card className="border-purple-500/30 bg-gradient-to-br from-purple-950/20 to-background">
+      <Card className="border-primary/20 bg-gradient-to-br from-purple-950/20 to-background">
         <CardHeader>
           <CardTitle className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-purple-500/20">
@@ -118,7 +118,7 @@ const EbookStyleSignature = () => {
 
           {result && (
             <div className="space-y-4 mt-6">
-              <div className="p-4 bg-purple-500/20 rounded-lg border border-purple-500/30">
+              <div className="p-4 bg-purple-500/20 rounded-lg border border-primary/20">
                 <Label className="text-purple-400">Identité Éditoriale</Label>
                 <p className="mt-1 text-sm">{result.identiteEditoriale}</p>
               </div>

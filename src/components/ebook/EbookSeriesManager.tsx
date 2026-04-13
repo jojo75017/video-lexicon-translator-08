@@ -2087,7 +2087,7 @@ RÈGLES STRICTES:
             <Button 
               onClick={() => navigate('/formation-series-audio')}
               variant="outline"
-              className="border-emerald-500/30 text-emerald-600 hover:bg-emerald-500/10"
+              className="border-primary/20 text-emerald-600 hover:bg-emerald-500/10"
             >
               <Crown className="h-4 w-4 mr-2" />
               Formation Audio

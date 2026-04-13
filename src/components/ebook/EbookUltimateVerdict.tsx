@@ -87,7 +87,7 @@ const EbookUltimateVerdict = () => {
 
   return (
     <div className="space-y-6">
-      <Card className="border-purple-500/30 bg-gradient-to-br from-purple-950/20 to-background">
+      <Card className="border-primary/20 bg-gradient-to-br from-purple-950/20 to-background">
         <CardHeader>
           <CardTitle className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-purple-500/20">
@@ -187,7 +187,7 @@ const EbookUltimateVerdict = () => {
 
               {/* Points Forts */}
               {verdict.pointsForts && verdict.pointsForts.length > 0 && (
-                <div className="p-5 bg-emerald-500/10 rounded-lg border border-emerald-500/30">
+                <div className="p-5 bg-emerald-500/10 rounded-lg border border-primary/20">
                   <Label className="text-emerald-400 flex items-center gap-2 mb-3">
                     <CheckCircle2 className="h-4 w-4" />
                     Points Forts Identifiés
@@ -222,7 +222,7 @@ const EbookUltimateVerdict = () => {
               )}
 
               {/* Recommandation Finale */}
-              <div className="p-5 bg-purple-500/20 rounded-lg border border-purple-500/30">
+              <div className="p-5 bg-purple-500/20 rounded-lg border border-primary/20">
                 <Label className="text-purple-400 mb-2 block">Recommandation Finale</Label>
                 <p className="text-sm leading-relaxed">{verdict.recommandationFinale}</p>
               </div>

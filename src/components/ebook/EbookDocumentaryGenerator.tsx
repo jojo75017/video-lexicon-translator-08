@@ -1168,7 +1168,7 @@ Inclus des faits marquants et des anecdotes.`;
   return (
     <div className="space-y-6">
       {/* Header */}
-      <Card className="border-0 shadow-xl bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 text-white overflow-hidden">
+      <Card className="border-0 shadow-xl bg-gradient-to-r from-background via-blue-900 to-background text-white overflow-hidden">
         <CardContent className="p-8">
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur flex items-center justify-center">
@@ -1549,7 +1549,7 @@ Inclus des faits marquants et des anecdotes.`;
           {/* Onglet Aperçu */}
           <TabsContent value="preview">
             <Card className="overflow-hidden">
-              <div className="bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 text-white p-12 text-center">
+              <div className="bg-gradient-to-r from-background via-blue-900 to-background text-white p-12 text-center">
                 <h1 className="text-4xl font-bold mb-2">{book.title}</h1>
                 {book.subtitle && (
                   <p className="text-xl text-blue-200 mb-4">{book.subtitle}</p>

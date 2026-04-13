@@ -452,7 +452,7 @@ export const EbookCoverGenerator: React.FC<EbookCoverGeneratorProps> = ({
                       {aiPromptResult.colorPalette?.map((color, i) => (
                         <div key={i} className="flex flex-col items-center gap-1">
                           <div className="w-8 h-8 rounded-lg shadow-sm border border-white" style={{ backgroundColor: color }} />
-                          <span className="text-[10px] text-slate-400">{color}</span>
+                          <span className="text-[10px] text-muted-foreground">{color}</span>
                         </div>
                       ))}
                     </div>
@@ -494,7 +494,7 @@ export const EbookCoverGenerator: React.FC<EbookCoverGeneratorProps> = ({
                   variant="ghost"
                   size="sm"
                   onClick={copyPrompt}
-                  className="absolute top-8 right-2 text-slate-400 hover:text-foreground hover:bg-slate-700"
+                  className="absolute top-8 right-2 text-muted-foreground hover:text-foreground hover:bg-slate-700"
                 >
                   {promptCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                 </Button>

@@ -214,7 +214,7 @@ const SeoTutorialChatGptPage = () => {
           <h2 className="text-2xl md:text-3xl font-bold mb-4">
             Automatisez Tout le Processus avec EbookStudio
           </h2>
-          <p className="text-lg text-white/90 mb-8 max-w-2xl mx-auto">
+          <p className="text-lg text-foreground mb-8 max-w-2xl mx-auto">
             Pourquoi jongler avec ChatGPT quand vous pouvez avoir un <strong>générateur de livre IA professionnel</strong> 
             qui gère structure, rédaction, cohérence et formatage automatiquement ?
           </p>
@@ -226,7 +226,7 @@ const SeoTutorialChatGptPage = () => {
             ].map((item, i) => (
               <div key={i} className="bg-white/10 rounded-lg p-4 backdrop-blur-sm">
                 <div className="font-bold text-lg">{item.title}</div>
-                <div className="text-white/80 text-sm">{item.desc}</div>
+                <div className="text-foreground/80 text-sm">{item.desc}</div>
               </div>
             ))}
           </div>

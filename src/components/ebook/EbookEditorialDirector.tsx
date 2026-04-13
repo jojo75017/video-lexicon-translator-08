@@ -236,7 +236,7 @@ export const EbookEditorialDirector = ({
             </CardContent>
           </Card>
 
-          <Card className="border-purple-500/30 bg-purple-500/5">
+          <Card className="border-primary/20 bg-purple-500/5">
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center gap-2 text-lg text-purple-700 dark:text-purple-400">
                 <Target className="h-5 w-5" />

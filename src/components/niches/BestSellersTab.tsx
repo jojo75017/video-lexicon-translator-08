@@ -100,7 +100,7 @@ const BestSellersTab = () => {
                             </Badge>
                           )}
                         </div>
-                        <p className="text-white/80 text-xs font-medium">
+                        <p className="text-foreground/80 text-xs font-medium">
                           {book.subtitle}
                         </p>
                       </div>

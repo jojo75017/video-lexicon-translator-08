@@ -358,7 +358,7 @@ export const AudiobookPublisher: React.FC<AudiobookPublisherProps> = ({
   return (
     <div className="space-y-4">
       {/* Publish button */}
-      <Card className="border-2 border-dashed border-purple-500/30 bg-gradient-to-r from-purple-500/5 to-violet-500/5">
+      <Card className="border-2 border-dashed border-primary/20 bg-gradient-to-r from-purple-500/5 to-violet-500/5">
         <CardContent className="p-4 flex items-center justify-between flex-wrap gap-3">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center">

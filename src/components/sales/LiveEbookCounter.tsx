@@ -92,7 +92,7 @@ const LiveEbookCounter: React.FC<LiveEbookCounterProps> = ({
 
   return (
     <motion.div 
-      className={`relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-900/40 via-purple-900/30 to-indigo-900/40 border border-violet-500/30 p-6 ${className}`}
+      className={`relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-900/40 via-purple-900/30 to-indigo-900/40 border border-primary/20 p-6 ${className}`}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
     >

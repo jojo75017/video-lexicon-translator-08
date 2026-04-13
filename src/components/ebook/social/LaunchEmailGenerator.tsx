@@ -139,7 +139,7 @@ Réponds en JSON strict:
   return (
     <div className="space-y-6">
       {/* Config */}
-      <Card className="bg-gradient-to-br from-emerald-900/30 to-teal-900/20 border-emerald-500/30">
+      <Card className="bg-gradient-to-br from-emerald-900/30 to-teal-900/20 border-primary/20">
         <CardHeader>
           <div className="flex items-center gap-3">
             <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg">
@@ -240,7 +240,7 @@ Réponds en JSON strict:
                 <motion.div key={index} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }}>
                   <Card className={cn(
                     "bg-card/50 border-border/50 transition-all",
-                    isExpanded && "border-emerald-500/30"
+                    isExpanded && "border-primary/20"
                   )}>
                     <CardContent className="p-0">
                       {/* Email header - clickable */}

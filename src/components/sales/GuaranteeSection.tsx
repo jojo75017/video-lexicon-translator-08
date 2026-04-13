@@ -34,7 +34,7 @@ const GuaranteeSection = () => {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/30 px-4 py-2 font-semibold mb-4">
+          <Badge className="bg-emerald-500/10 text-emerald-400 border-primary/20 px-4 py-2 font-semibold mb-4">
             <ShieldCheck className="w-4 h-4 mr-2" />
             TRIPLE GARANTIE
           </Badge>

@@ -188,7 +188,7 @@ Réponds en texte simple, pas de JSON.`,
             </Badge>
             <Badge variant="outline" className="text-xs">{post.type}</Badge>
             {post.id.startsWith('ai-') && (
-              <Badge className="bg-purple-600/20 text-purple-400 border-purple-500/30 text-xs">
+              <Badge className="bg-purple-600/20 text-purple-400 border-primary/20 text-xs">
                 <Sparkles className="h-3 w-3 mr-1" /> IA
               </Badge>
             )}

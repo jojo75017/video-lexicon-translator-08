@@ -108,7 +108,7 @@ export const EbookAnalyticsDashboard: React.FC<EbookAnalyticsDashboardProps> = (
                 <BookOpen className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <p className="text-xs text-white/50">Total Mots</p>
+                <p className="text-xs text-muted-foreground">Total Mots</p>
                 <p className="text-2xl font-bold text-white">{analytics.totalWords.toLocaleString()}</p>
               </div>
             </div>
@@ -122,21 +122,21 @@ export const EbookAnalyticsDashboard: React.FC<EbookAnalyticsDashboardProps> = (
                 <Target className="h-5 w-5 text-cyan-400" />
               </div>
               <div>
-                <p className="text-xs text-white/50">Pages estimées</p>
+                <p className="text-xs text-muted-foreground">Pages estimées</p>
                 <p className="text-2xl font-bold text-white">{analytics.estimatedPages}</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-card border-emerald-500/30 hover:scale-105 transition-transform duration-300 backdrop-blur-sm">
+        <Card className="bg-card border-primary/20 hover:scale-105 transition-transform duration-300 backdrop-blur-sm">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-emerald-500/20 rounded-lg">
                 <Clock className="h-5 w-5 text-emerald-400" />
               </div>
               <div>
-                <p className="text-xs text-white/50">Temps de lecture</p>
+                <p className="text-xs text-muted-foreground">Temps de lecture</p>
                 <p className="text-2xl font-bold text-white">{analytics.estimatedReadingTime} min</p>
               </div>
             </div>
@@ -150,7 +150,7 @@ export const EbookAnalyticsDashboard: React.FC<EbookAnalyticsDashboardProps> = (
                 <Award className="h-5 w-5 text-amber-400" />
               </div>
               <div>
-                <p className="text-xs text-white/50">Chapitres rédigés</p>
+                <p className="text-xs text-muted-foreground">Chapitres rédigés</p>
                 <p className="text-2xl font-bold text-white">{analytics.chaptersWithContent}/{analytics.totalChapters}</p>
               </div>
             </div>
@@ -191,7 +191,7 @@ export const EbookAnalyticsDashboard: React.FC<EbookAnalyticsDashboardProps> = (
               </div>
               <div className="flex-1">
                 <p className="text-4xl font-bold text-cyan-400">{Math.round(analytics.completionPercent)}%</p>
-                <p className="text-sm text-white/60">
+                <p className="text-sm text-muted-foreground">
                   {analytics.totalWords.toLocaleString()} / {analytics.targetTotalWords.toLocaleString()} mots
                 </p>
                 <Progress value={analytics.completionPercent} className="mt-3 h-2" />
@@ -201,7 +201,7 @@ export const EbookAnalyticsDashboard: React.FC<EbookAnalyticsDashboardProps> = (
         </Card>
 
         {/* KDP Revenue Estimator */}
-        <Card className="border-emerald-500/30 bg-card backdrop-blur-sm">
+        <Card className="border-primary/20 bg-card backdrop-blur-sm">
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-lg text-white">
               <DollarSign className="h-5 w-5 text-emerald-400" />
@@ -211,14 +211,14 @@ export const EbookAnalyticsDashboard: React.FC<EbookAnalyticsDashboardProps> = (
           <CardContent>
             <div className="space-y-4">
               <div className="flex justify-between items-center p-3 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
-                <span className="text-sm text-white/70">Ventes estimées/mois</span>
+                <span className="text-sm text-muted-foreground">Ventes estimées/mois</span>
                 <span className="text-xl font-bold text-emerald-400">{analytics.estimatedMonthlySales}</span>
               </div>
               <div className="flex justify-between items-center p-3 bg-emerald-500/15 rounded-lg border border-emerald-500/20">
-                <span className="text-sm text-white/70">Revenus estimés/mois</span>
+                <span className="text-sm text-muted-foreground">Revenus estimés/mois</span>
                 <span className="text-2xl font-bold text-emerald-400">${analytics.estimatedMonthlyRevenue.toFixed(2)}</span>
               </div>
-              <p className="text-xs text-white/40">
+              <p className="text-xs text-muted-foreground">
                 * Basé sur un prix de 4.99$ et 70% de royalties. Les résultats réels peuvent varier.
               </p>
             </div>
@@ -318,31 +318,31 @@ export const EbookAnalyticsDashboard: React.FC<EbookAnalyticsDashboardProps> = (
             {analytics.totalWords >= 1000 && (
               <div className="flex items-center gap-2 px-3 py-2 bg-amber-500/15 rounded-full border border-amber-500/30 animate-scale-in">
                 <Zap className="h-4 w-4 text-amber-400" />
-                <span className="text-sm font-medium text-white/90">1000 mots</span>
+                <span className="text-sm font-medium text-foreground">1000 mots</span>
               </div>
             )}
             {analytics.totalWords >= 5000 && (
               <div className="flex items-center gap-2 px-3 py-2 bg-primary/15 rounded-full border border-primary/30 animate-scale-in">
                 <Star className="h-4 w-4 text-primary" />
-                <span className="text-sm font-medium text-white/90">5000 mots</span>
+                <span className="text-sm font-medium text-foreground">5000 mots</span>
               </div>
             )}
             {analytics.totalWords >= 10000 && (
               <div className="flex items-center gap-2 px-3 py-2 bg-cyan-500/15 rounded-full border border-primary/30 animate-scale-in">
                 <Award className="h-4 w-4 text-cyan-400" />
-                <span className="text-sm font-medium text-white/90">10000 mots</span>
+                <span className="text-sm font-medium text-foreground">10000 mots</span>
               </div>
             )}
             {analytics.chaptersWithContent >= 3 && (
-              <div className="flex items-center gap-2 px-3 py-2 bg-emerald-500/15 rounded-full border border-emerald-500/30 animate-scale-in">
+              <div className="flex items-center gap-2 px-3 py-2 bg-emerald-500/15 rounded-full border border-primary/20 animate-scale-in">
                 <BookOpen className="h-4 w-4 text-emerald-400" />
-                <span className="text-sm font-medium text-white/90">3 chapitres</span>
+                <span className="text-sm font-medium text-foreground">3 chapitres</span>
               </div>
             )}
             {analytics.completionPercent >= 50 && (
               <div className="flex items-center gap-2 px-3 py-2 bg-pink-500/15 rounded-full border border-pink-500/30 animate-scale-in">
                 <Target className="h-4 w-4 text-pink-400" />
-                <span className="text-sm font-medium text-white/90">50% complété</span>
+                <span className="text-sm font-medium text-foreground">50% complété</span>
               </div>
             )}
             {analytics.completionPercent >= 100 && (
@@ -352,7 +352,7 @@ export const EbookAnalyticsDashboard: React.FC<EbookAnalyticsDashboardProps> = (
               </div>
             )}
             {analytics.totalWords === 0 && (
-              <p className="text-sm text-white/40">Commencez à écrire pour débloquer des badges !</p>
+              <p className="text-sm text-muted-foreground">Commencez à écrire pour débloquer des badges !</p>
             )}
           </div>
         </CardContent>

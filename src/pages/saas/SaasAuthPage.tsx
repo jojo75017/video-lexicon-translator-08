@@ -89,45 +89,45 @@ export const SaasAuthPage: React.FC = () => {
             <h1 className="text-4xl font-bold text-white leading-tight">
               Build faster with our all-in-one platform
             </h1>
-            <p className="text-xl text-white/80">
+            <p className="text-xl text-foreground/80">
               Join thousands of teams using SaaS Studio to ship products faster.
             </p>
           </div>
         </div>
 
         <div className="space-y-8">
-          <div className="flex items-center gap-4 text-white/90">
+          <div className="flex items-center gap-4 text-foreground">
             <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
               <span className="text-2xl">🚀</span>
             </div>
             <div>
               <p className="font-medium">Ship 10x faster</p>
-              <p className="text-sm text-white/70">Pre-built components and templates</p>
+              <p className="text-sm text-muted-foreground">Pre-built components and templates</p>
             </div>
           </div>
           
-          <div className="flex items-center gap-4 text-white/90">
+          <div className="flex items-center gap-4 text-foreground">
             <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
               <span className="text-2xl">🔒</span>
             </div>
             <div>
               <p className="font-medium">Enterprise security</p>
-              <p className="text-sm text-white/70">SOC2 compliant infrastructure</p>
+              <p className="text-sm text-muted-foreground">SOC2 compliant infrastructure</p>
             </div>
           </div>
           
-          <div className="flex items-center gap-4 text-white/90">
+          <div className="flex items-center gap-4 text-foreground">
             <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
               <span className="text-2xl">💡</span>
             </div>
             <div>
               <p className="font-medium">AI-powered</p>
-              <p className="text-sm text-white/70">Built-in AI capabilities</p>
+              <p className="text-sm text-muted-foreground">Built-in AI capabilities</p>
             </div>
           </div>
         </div>
 
-        <p className="text-white/60 text-sm">
+        <p className="text-muted-foreground text-sm">
           © 2024 SaaS Studio. All rights reserved.
         </p>
       </div>

@@ -78,7 +78,7 @@ const ScrollIntentPopup = ({ scrollThreshold = 50 }: ScrollIntentPopupProps) => 
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-md border-violet-500/30 bg-gradient-to-br from-secondary via-secondary to-violet-950">
+      <DialogContent className="sm:max-w-md border-primary/20 bg-gradient-to-br from-secondary via-secondary to-violet-950">
         <button 
           onClick={() => setIsOpen(false)}
           className="absolute right-4 top-4 text-foreground/60 hover:text-foreground"
@@ -100,13 +100,13 @@ const ScrollIntentPopup = ({ scrollThreshold = 50 }: ScrollIntentPopupProps) => 
 
         <div className="space-y-4 pt-2">
           <div className="flex flex-wrap justify-center gap-2">
-            <Badge variant="secondary" className="bg-violet-500/20 text-violet-300 border-violet-500/30">
+            <Badge variant="secondary" className="bg-violet-500/20 text-violet-300 border-primary/20">
               📚 10 niches rentables
             </Badge>
             <Badge variant="secondary" className="bg-pink-500/20 text-pink-300 border-pink-500/30">
               💰 Plan d'action
             </Badge>
-            <Badge variant="secondary" className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30">
+            <Badge variant="secondary" className="bg-emerald-500/20 text-emerald-300 border-primary/20">
               🚀 40+ pages
             </Badge>
           </div>

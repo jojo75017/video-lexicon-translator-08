@@ -171,7 +171,7 @@ const DemoPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
+    <div className="min-h-screen bg-background text-white">
       <Helmet>
         <title>Démo Gratuite — Testez le Générateur d'Ebook IA | EbookStudio</title>
         <meta name="description" content="Testez gratuitement notre IA : générez un plan d'ebook structuré avec chapitres et mots-clés Amazon KDP en 30 secondes. Sans inscription." />
@@ -180,10 +180,10 @@ const DemoPage = () => {
         <link rel="canonical" href="https://video-lexicon-translator-08.lovable.app/demo" />
       </Helmet>
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-slate-950/90 backdrop-blur-xl border-b border-slate-800/50">
+      <header className="sticky top-0 z-50 bg-background/90 backdrop-blur-xl border-b border-border/50">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" onClick={() => navigate('/offres')} className="text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-xl gap-2">
+            <Button variant="ghost" size="sm" onClick={() => navigate('/offres')} className="text-muted-foreground hover:text-white hover:bg-muted rounded-xl gap-2">
               <ArrowLeft className="w-4 h-4" />
               <span className="hidden sm:inline">Retour</span>
             </Button>
@@ -212,7 +212,7 @@ const DemoPage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <Badge className="bg-cyan-500/10 text-cyan-400 border-cyan-500/30 px-4 py-2 mb-6 text-sm">
+          <Badge className="bg-cyan-500/10 text-cyan-400 border-primary/20 px-4 py-2 mb-6 text-sm">
             <Zap className="w-4 h-4 mr-2" />
             {remainingTries > 0 ? '1 essai gratuit • 3 chapitres • Sans inscription' : 'Essai utilisé — Passez à la version complète'}
           </Badge>
@@ -222,14 +222,14 @@ const DemoPage = () => {
               moins de 60 minutes
             </span>
           </h1>
-          <p className="text-slate-300 text-lg md:text-xl max-w-3xl mx-auto mb-6 leading-relaxed">
+          <p className="text-foreground text-lg md:text-xl max-w-3xl mx-auto mb-6 leading-relaxed">
             Notre IA analyse votre sujet, structure un plan professionnel avec chapitres détaillés, 
             et génère les mots-clés Amazon KDP pour maximiser vos ventes.{' '}
             <span className="text-white font-semibold">Testez gratuitement ci-dessous.</span>
           </p>
           
           {/* Trust Indicators */}
-          <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-slate-400">
+          <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
               <Users className="w-4 h-4 text-cyan-400" />
               <span>+2 400 ebooks créés</span>
@@ -264,7 +264,7 @@ const DemoPage = () => {
               { icon: BarChart3, label: "Estimation pages", desc: "Volume automatique", color: "amber" },
               { icon: BookMarked, label: "Résumé du livre", desc: "Pitch professionnel", color: "purple" },
             ].map((item, i) => (
-              <div key={i} className="bg-slate-900/50 border border-slate-800 rounded-xl p-4 text-center hover:border-slate-700 transition-colors">
+              <div key={i} className="bg-card border border-border rounded-xl p-4 text-center hover:border-border transition-colors">
                 <div className={`w-10 h-10 mx-auto mb-2 rounded-lg bg-${item.color}-500/10 flex items-center justify-center`}>
                   <item.icon className={`w-5 h-5 text-${item.color}-400`} />
                 </div>
@@ -278,59 +278,59 @@ const DemoPage = () => {
         <div className="grid lg:grid-cols-5 gap-6">
           {/* Form */}
           <div className="lg:col-span-2">
-            <Card className="bg-slate-900/50 border-slate-800 sticky top-24">
+            <Card className="bg-card border-border sticky top-24">
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center gap-2 text-xl text-white">
                   <BookOpen className="w-6 h-6 text-cyan-400" />
                   Créez votre Ebook
                 </CardTitle>
-                <CardDescription className="text-slate-400">
+                <CardDescription className="text-muted-foreground">
                   Remplissez le formulaire et laissez l'IA faire le reste
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label className="text-slate-300">Titre de l'ebook *</Label>
+                  <Label className="text-foreground">Titre de l'ebook *</Label>
                   <Input
                     placeholder="Ex: Les secrets du marketing digital en 2026"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     disabled={demoUsed || isGenerating}
-                    className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 text-lg py-5"
+                    className="bg-muted border-border text-white placeholder:text-slate-500 text-lg py-5"
                   />
                   <p className="text-xs text-slate-500">Astuce : un titre précis donne un meilleur plan</p>
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-slate-300 text-sm">Genre / Catégorie</Label>
+                  <Label className="text-foreground text-sm">Genre / Catégorie</Label>
                   <Select value={genre} onValueChange={setGenre} disabled={demoUsed || isGenerating}>
-                    <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
+                    <SelectTrigger className="bg-muted border-border text-white">
                       <SelectValue placeholder="Choisir un genre" />
                     </SelectTrigger>
-                    <SelectContent className="bg-slate-900 border-slate-800">
+                    <SelectContent className="bg-card border-border">
                       {genres.map((g) => (
-                        <SelectItem key={g} value={g} className="text-white hover:bg-slate-800">{g}</SelectItem>
+                        <SelectItem key={g} value={g} className="text-white hover:bg-muted">{g}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-slate-300 text-sm">Public cible (optionnel)</Label>
+                  <Label className="text-foreground text-sm">Public cible (optionnel)</Label>
                   <Input
                     placeholder="Ex: Entrepreneurs débutants"
                     value={targetAudience}
                     onChange={(e) => setTargetAudience(e.target.value)}
                     disabled={demoUsed || isGenerating}
-                    className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500"
+                    className="bg-muted border-border text-white placeholder:text-slate-500"
                   />
                 </div>
 
                 {/* Chapitres fixés à 3 en démo */}
-                <div className="flex items-center gap-2 p-3 bg-slate-800/30 rounded-lg border border-slate-800/50">
+                <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg border border-border/50">
                   <BookMarked className="w-4 h-4 text-cyan-400" />
-                  <span className="text-sm text-slate-300">3 chapitres générés</span>
-                  <Badge className="ml-auto bg-slate-800 text-slate-400 border-slate-700 text-xs">Démo</Badge>
+                  <span className="text-sm text-foreground">3 chapitres générés</span>
+                  <Badge className="ml-auto bg-muted text-muted-foreground border-border text-xs">Démo</Badge>
                 </div>
                 <p className="text-xs text-slate-500">💡 La version complète permet jusqu'à 20 chapitres avec rédaction intégrale</p>
 
@@ -355,7 +355,7 @@ const DemoPage = () => {
                     <span>Essais utilisés</span>
                     <span>{demoCount}/{MAX_DEMO_TRIES}</span>
                   </div>
-                  <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                  <div className="h-1.5 bg-muted rounded-full overflow-hidden">
                     <div 
                       className="h-full bg-gradient-to-r from-cyan-500 to-emerald-500 rounded-full transition-all duration-500"
                       style={{ width: `${(demoCount / MAX_DEMO_TRIES) * 100}%` }}
@@ -364,8 +364,8 @@ const DemoPage = () => {
                 </div>
 
                 {demoUsed && (
-                  <div className="text-center pt-4 border-t border-slate-800 space-y-3">
-                    <p className="text-slate-300 text-sm font-medium">🚀 Vous avez vu la puissance de l'IA !</p>
+                  <div className="text-center pt-4 border-t border-border space-y-3">
+                    <p className="text-foreground text-sm font-medium">🚀 Vous avez vu la puissance de l'IA !</p>
                     <p className="text-slate-500 text-xs">Débloquez la rédaction complète, les couvertures IA, l'export et bien plus encore.</p>
                     <Button 
                       className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-900 font-bold rounded-xl py-5"
@@ -383,7 +383,7 @@ const DemoPage = () => {
           {/* Result */}
           <div className="lg:col-span-3">
             {isGenerating ? (
-              <Card className="bg-slate-900/50 border-slate-800 h-full flex items-center justify-center min-h-[500px]">
+              <Card className="bg-card border-border h-full flex items-center justify-center min-h-[500px]">
                 <div className="text-center p-8">
                   <div className="relative mx-auto w-20 h-20 mb-6">
                     <div className="absolute inset-0 bg-cyan-500/20 rounded-full animate-ping" />
@@ -392,7 +392,7 @@ const DemoPage = () => {
                     </div>
                   </div>
                   <h3 className="text-xl font-semibold text-white mb-2">L'IA analyse votre sujet...</h3>
-                  <p className="text-slate-400 mb-4">Structure, chapitres, sous-sections et mots-clés KDP</p>
+                  <p className="text-muted-foreground mb-4">Structure, chapitres, sous-sections et mots-clés KDP</p>
                   <div className="flex flex-col gap-2 text-sm text-slate-500 max-w-xs mx-auto">
                     <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Analyse du sujet et du genre</div>
                     <div className="flex items-center gap-2"><Loader2 className="w-4 h-4 text-cyan-400 animate-spin" /> Structuration des chapitres</div>
@@ -403,7 +403,7 @@ const DemoPage = () => {
             ) : generatedPlan ? (
               <div className="space-y-4">
                 {/* Success Card */}
-                <Card className="bg-slate-900/50 border-emerald-800/50 overflow-hidden">
+                <Card className="bg-card border-emerald-800/50 overflow-hidden">
                   <div className="bg-gradient-to-r from-emerald-600 to-green-600 text-white p-4">
                     <div className="flex items-center gap-3">
                       <CheckCircle2 className="w-6 h-6" />
@@ -425,7 +425,7 @@ const DemoPage = () => {
                       {/* Stats */}
                       <div className="flex-1">
                         <h2 className="text-2xl font-bold text-white mb-2">{title}</h2>
-                        <p className="text-slate-400 mb-4 line-clamp-3">{generatedPlan.summary}</p>
+                        <p className="text-muted-foreground mb-4 line-clamp-3">{generatedPlan.summary}</p>
                         
                         <div className="grid grid-cols-3 gap-3">
                           {[
@@ -445,7 +445,7 @@ const DemoPage = () => {
                     
                     {/* KDP Keywords */}
                     <div className="mb-6">
-                      <h4 className="text-sm font-semibold text-slate-400 mb-2 flex items-center gap-2">
+                      <h4 className="text-sm font-semibold text-muted-foreground mb-2 flex items-center gap-2">
                         <Target className="w-4 h-4" /> Mots-clés Amazon KDP optimisés
                       </h4>
                       <div className="flex flex-wrap gap-2">
@@ -458,7 +458,7 @@ const DemoPage = () => {
                     
                     {/* Chapters */}
                     <div>
-                      <h4 className="text-sm font-semibold text-slate-400 mb-3 flex items-center gap-2">
+                      <h4 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
                         <BookMarked className="w-4 h-4" /> Structure détaillée des chapitres
                       </h4>
                       <div className="space-y-2">
@@ -466,7 +466,7 @@ const DemoPage = () => {
                           <div 
                             key={i} 
                             className={`border rounded-xl overflow-hidden transition-all cursor-pointer ${
-                              expandedChapter === i ? 'border-cyan-500/50 bg-cyan-500/5' : 'border-slate-800 hover:border-slate-700'
+                              expandedChapter === i ? 'border-cyan-500/50 bg-cyan-500/5' : 'border-border hover:border-border'
                             }`}
                             onClick={() => setExpandedChapter(expandedChapter === i ? null : i)}
                           >
@@ -480,20 +480,20 @@ const DemoPage = () => {
                                   <p className="text-xs text-slate-500 truncate">{chapter.description}</p>
                                 )}
                               </div>
-                              <Badge variant="outline" className="text-xs border-slate-700 text-slate-400">
+                              <Badge variant="outline" className="text-xs border-border text-muted-foreground">
                                 {chapter.subSections.length} sections
                               </Badge>
                               <ChevronRight className={`w-4 h-4 text-slate-600 transition-transform ${expandedChapter === i ? 'rotate-90' : ''}`} />
                             </div>
                             {expandedChapter === i && (
-                              <div className="px-3 pb-3 border-t border-slate-800">
+                              <div className="px-3 pb-3 border-t border-border">
                                 {chapter.description && (
-                                  <p className="text-sm text-slate-400 mt-2 mb-2">{chapter.description}</p>
+                                  <p className="text-sm text-muted-foreground mt-2 mb-2">{chapter.description}</p>
                                 )}
                                 {chapter.subSections.length > 0 && (
                                   <ul className="space-y-1 mt-2">
                                     {chapter.subSections.map((sub, j) => (
-                                      <li key={j} className="text-sm text-slate-400 flex items-start gap-2">
+                                      <li key={j} className="text-sm text-muted-foreground flex items-start gap-2">
                                         <span className="text-cyan-400 mt-0.5">•</span>
                                         <span>{sub}</span>
                                       </li>
@@ -510,7 +510,7 @@ const DemoPage = () => {
                 </Card>
 
                 {/* Locked Features Preview */}
-                <Card className="bg-slate-900/50 border-slate-800">
+                <Card className="bg-card border-border">
                   <CardContent className="p-6">
                     <h4 className="font-semibold text-white mb-4 flex items-center gap-2">
                       <Lock className="w-4 h-4 text-slate-500" />
@@ -525,12 +525,12 @@ const DemoPage = () => {
                         { icon: Image, label: "Illustrations IA", desc: "Images générées pour enrichir le livre", locked: true },
                         { icon: Layers, label: "Séries & tomes", desc: "Créez des séries cohérentes multi-tomes", locked: true },
                       ].map((feat, i) => (
-                        <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-slate-800/30 border border-slate-800/50">
-                          <div className="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center flex-shrink-0">
+                        <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-muted/50 border border-border/50">
+                          <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
                             <feat.icon className="w-4 h-4 text-slate-500" />
                           </div>
                           <div>
-                            <p className="text-sm font-medium text-slate-300 flex items-center gap-1.5">
+                            <p className="text-sm font-medium text-foreground flex items-center gap-1.5">
                               {feat.label}
                               <Lock className="w-3 h-3 text-slate-600" />
                             </p>
@@ -551,7 +551,7 @@ const DemoPage = () => {
                       </div>
                       <div className="flex-1">
                         <h3 className="font-bold text-xl text-white mb-1">Passez à la version complète</h3>
-                        <p className="text-slate-400 text-sm mb-4">Accès à vie pour 67€ — pas d'abonnement, pas de limites</p>
+                        <p className="text-muted-foreground text-sm mb-4">Accès à vie pour 67€ — pas d'abonnement, pas de limites</p>
                         <div className="grid sm:grid-cols-2 gap-2 mb-4">
                           {[
                             "✍️ Rédaction complète des chapitres",
@@ -561,7 +561,7 @@ const DemoPage = () => {
                             "🎓 Formation 18 modules incluse",
                             "♾️ Générations illimitées à vie",
                           ].map((f, i) => (
-                            <div key={i} className="flex items-center gap-2 text-sm text-slate-300">{f}</div>
+                            <div key={i} className="flex items-center gap-2 text-sm text-foreground">{f}</div>
                           ))}
                         </div>
                         <Button 
@@ -581,7 +581,7 @@ const DemoPage = () => {
             ) : (
               /* Empty State - Before Generation */
               <div className="space-y-6">
-                <Card className="bg-slate-900/50 border-slate-800 border-dashed flex items-center justify-center min-h-[300px]">
+                <Card className="bg-card border-border border-dashed flex items-center justify-center min-h-[300px]">
                   <div className="text-center p-8">
                     <motion.div 
                       className="w-20 h-20 bg-cyan-500/10 rounded-2xl mx-auto mb-6 flex items-center justify-center"
@@ -591,20 +591,20 @@ const DemoPage = () => {
                       <BookOpen className="w-10 h-10 text-cyan-400" />
                     </motion.div>
                     <h3 className="text-xl font-semibold text-white mb-2">Votre ebook commence ici</h3>
-                    <p className="text-slate-400 mb-6 max-w-sm mx-auto">
+                    <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
                       Entrez un titre à gauche et cliquez sur <span className="text-cyan-400 font-medium">"Générer"</span> pour voir la puissance de l'IA en action
                     </p>
                     <div className="flex flex-wrap justify-center gap-2">
-                      <Badge className="bg-slate-800 text-slate-300 border-slate-700">📖 Plan structuré</Badge>
-                      <Badge className="bg-slate-800 text-slate-300 border-slate-700">🎯 Mots-clés KDP</Badge>
-                      <Badge className="bg-slate-800 text-slate-300 border-slate-700">📊 Estimation pages</Badge>
-                      <Badge className="bg-slate-800 text-slate-300 border-slate-700">📝 Résumé du livre</Badge>
+                      <Badge className="bg-muted text-foreground border-border">📖 Plan structuré</Badge>
+                      <Badge className="bg-muted text-foreground border-border">🎯 Mots-clés KDP</Badge>
+                      <Badge className="bg-muted text-foreground border-border">📊 Estimation pages</Badge>
+                      <Badge className="bg-muted text-foreground border-border">📝 Résumé du livre</Badge>
                     </div>
                   </div>
                 </Card>
 
                 {/* How it works */}
-                <Card className="bg-slate-900/50 border-slate-800">
+                <Card className="bg-card border-border">
                   <CardContent className="p-6">
                     <h3 className="font-bold text-white text-lg mb-4 flex items-center gap-2">
                       <Sparkles className="w-5 h-5 text-cyan-400" />
@@ -622,7 +622,7 @@ const DemoPage = () => {
                           </div>
                           <div>
                             <p className="font-semibold text-white">{item.title}</p>
-                            <p className="text-sm text-slate-400">{item.desc}</p>
+                            <p className="text-sm text-muted-foreground">{item.desc}</p>
                           </div>
                         </div>
                       ))}
@@ -631,7 +631,7 @@ const DemoPage = () => {
                 </Card>
 
                 {/* Social Proof */}
-                <Card className="bg-slate-900/50 border-slate-800">
+                <Card className="bg-card border-border">
                   <CardContent className="p-6">
                     <h3 className="font-bold text-white text-lg mb-4 flex items-center gap-2">
                       <Quote className="w-5 h-5 text-amber-400" />
@@ -644,13 +644,13 @@ const DemoPage = () => {
                         { name: "Sophie R.", text: "La fonctionnalité audiobook est incroyable. Mon ebook se vend à la fois en format écrit et audio sur Amazon.", rating: 5 },
                         { name: "Julien M.", text: "J'ai testé la démo et j'ai été convaincu en 30 secondes. L'investissement de 67€ est rentabilisé dès le premier ebook vendu.", rating: 5 },
                       ].map((review, i) => (
-                        <div key={i} className="bg-slate-800/30 rounded-xl p-4 border border-slate-800/50">
+                        <div key={i} className="bg-muted/50 rounded-xl p-4 border border-border/50">
                           <div className="flex items-center gap-1 mb-2">
                             {Array(review.rating).fill(0).map((_, j) => (
                               <Star key={j} className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
                             ))}
                           </div>
-                          <p className="text-sm text-slate-300 mb-2 italic">"{review.text}"</p>
+                          <p className="text-sm text-foreground mb-2 italic">"{review.text}"</p>
                           <p className="text-xs text-slate-500 font-medium">— {review.name}</p>
                         </div>
                       ))}
@@ -665,7 +665,7 @@ const DemoPage = () => {
                       <TrendingUp className="w-5 h-5 text-emerald-400" />
                       La démo, c'est 5% de la puissance
                     </h3>
-                    <p className="text-slate-400 text-sm mb-4">
+                    <p className="text-muted-foreground text-sm mb-4">
                       Avec la version complète, vous passez du plan à un ebook publié sur Amazon en moins d'une heure.
                     </p>
                     <div className="grid sm:grid-cols-3 gap-3 mb-4">
@@ -674,7 +674,7 @@ const DemoPage = () => {
                         { label: "Couverture Pro", desc: "Design professionnel généré par IA", icon: Palette },
                         { label: "Audiobook", desc: "Voix neurale réaliste intégrée", icon: Headphones },
                       ].map((item, i) => (
-                        <div key={i} className="bg-slate-900/50 rounded-xl p-4 border border-slate-800/50 text-center">
+                        <div key={i} className="bg-card rounded-xl p-4 border border-border/50 text-center">
                           <item.icon className="w-6 h-6 mx-auto text-cyan-400 mb-2" />
                           <p className="font-semibold text-white text-sm">{item.label}</p>
                           <p className="text-xs text-slate-500 mt-1">{item.desc}</p>
@@ -711,9 +711,9 @@ const DemoPage = () => {
               { q: "Puis-je vendre les ebooks créés ?", a: "Absolument. Vous êtes propriétaire de tout le contenu généré. Vous pouvez le publier sur Amazon KDP, le vendre sur votre site, ou le distribuer comme bon vous semble." },
               { q: "L'audiobook est-il inclus ?", a: "Oui, la version complète inclut la génération d'audiobooks avec des voix neurales Azure ultra-réalistes. Vous pouvez vendre votre livre en format audio sur Audible/Amazon." },
             ].map((faq, i) => (
-              <div key={i} className="bg-slate-900/50 border border-slate-800 rounded-xl p-5">
+              <div key={i} className="bg-card border border-border rounded-xl p-5">
                 <h4 className="font-semibold text-white mb-2 text-sm">{faq.q}</h4>
-                <p className="text-slate-400 text-sm leading-relaxed">{faq.a}</p>
+                <p className="text-muted-foreground text-sm leading-relaxed">{faq.a}</p>
               </div>
             ))}
           </div>
@@ -721,7 +721,7 @@ const DemoPage = () => {
 
         {/* Final CTA */}
         <motion.div 
-          className="text-center py-12 border-t border-slate-800"
+          className="text-center py-12 border-t border-border"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -730,7 +730,7 @@ const DemoPage = () => {
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">
             Prêt à créer votre premier ebook ?
           </h2>
-          <p className="text-slate-400 max-w-lg mx-auto mb-6">
+          <p className="text-muted-foreground max-w-lg mx-auto mb-6">
             Rejoignez +2 400 créateurs qui utilisent EbookStudio Pro pour publier sur Amazon KDP et générer des revenus passifs.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -749,13 +749,13 @@ const DemoPage = () => {
 
       {/* Email Popup */}
       <Dialog open={showEmailPopup} onOpenChange={setShowEmailPopup}>
-        <DialogContent className="bg-slate-900 border-slate-800 text-white sm:max-w-md">
+        <DialogContent className="bg-card border-border text-white sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-xl">
               <Gift className="w-6 h-6 text-emerald-400" />
               🎉 Votre plan est prêt !
             </DialogTitle>
-            <DialogDescription className="text-slate-400">
+            <DialogDescription className="text-muted-foreground">
               Recevez gratuitement notre guide <span className="text-white font-medium">"10 Niches KDP Rentables 2026"</span> avec des stratégies concrètes pour vos premiers revenus.
             </DialogDescription>
           </DialogHeader>
@@ -768,7 +768,7 @@ const DemoPage = () => {
                 value={captureEmail}
                 onChange={(e) => setCaptureEmail(e.target.value)}
                 disabled={isSubmittingEmail}
-                className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500"
+                className="bg-muted border-border text-white placeholder:text-slate-500"
               />
               <Button 
                 onClick={handleEmailSubmit}
