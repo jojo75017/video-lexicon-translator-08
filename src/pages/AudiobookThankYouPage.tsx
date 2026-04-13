@@ -84,10 +84,10 @@ const AudiobookThankYouPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0A0A0F]">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="animate-pulse text-amber-400 flex flex-col items-center gap-3">
           <Headphones className="w-14 h-14 animate-bounce" />
-          <p className="text-white/80 font-medium">Chargement...</p>
+          <p className="text-foreground/80 font-medium">Chargement...</p>
         </div>
       </div>
     );
@@ -95,18 +95,18 @@ const AudiobookThankYouPage = () => {
 
   if (!audiobook) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0A0A0F] text-white">
+      <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
         <div className="text-center">
-          <Headphones className="w-20 h-20 mx-auto mb-4 text-white/20" />
+          <Headphones className="w-20 h-20 mx-auto mb-4 text-foreground/20" />
           <h1 className="text-3xl font-bold mb-2">Livre audio introuvable</h1>
-          <p className="text-white/50">Ce lien n'est plus valide ou le livre audio n'existe pas.</p>
+          <p className="text-foreground/50">Ce lien n'est plus valide ou le livre audio n'existe pas.</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0A0F] text-white">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Background effects */}
       <div className="absolute inset-0 opacity-20 pointer-events-none">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-emerald-500/20 rounded-full blur-[120px]" />
@@ -127,7 +127,7 @@ const AudiobookThankYouPage = () => {
           <h1 className="text-3xl md:text-4xl font-extrabold mb-3">
             Merci pour votre achat ! 🎉
           </h1>
-          <p className="text-white/60 text-lg">
+          <p className="text-foreground/60 text-lg">
             Votre livre audio est prêt à être téléchargé
           </p>
         </motion.div>
@@ -161,7 +161,7 @@ const AudiobookThankYouPage = () => {
                   🎧 MP3 HD
                 </Badge>
                 {audiobook.duration_seconds && (
-                  <Badge className="bg-white/[0.06] text-white/50 border-white/10 text-xs">
+                  <Badge className="bg-white/[0.06] text-foreground/50 border-white/10 text-xs">
                     ⏱ {formatDuration(audiobook.duration_seconds)}
                   </Badge>
                 )}
@@ -173,7 +173,7 @@ const AudiobookThankYouPage = () => {
           {audiobook.audio_url && (
             <Button
               onClick={handleDownload}
-              className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white font-bold gap-3 h-14 rounded-xl shadow-xl shadow-emerald-500/20 text-base transition-all hover:scale-[1.01]"
+              className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-foreground font-bold gap-3 h-14 rounded-xl shadow-xl shadow-emerald-500/20 text-base transition-all hover:scale-[1.01]"
             >
               <Download className="w-5 h-5" />
               Télécharger mon livre audio (MP3)
@@ -192,7 +192,7 @@ const AudiobookThankYouPage = () => {
             <Mail className="w-5 h-5 text-amber-400" />
             <h3 className="font-semibold text-lg">Recevoir par email</h3>
           </div>
-          <p className="text-white/50 text-sm mb-4">
+          <p className="text-foreground/50 text-sm mb-4">
             Entrez votre email pour recevoir le lien de téléchargement. Vous pourrez le re-télécharger à tout moment.
           </p>
           {emailSent ? (
@@ -209,7 +209,7 @@ const AudiobookThankYouPage = () => {
                 value={buyerEmail}
                 onChange={(e) => setBuyerEmail(e.target.value)}
                 placeholder="votre@email.com"
-                className="flex-1 bg-white/[0.06] border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:border-amber-500/50 transition-colors"
+                className="flex-1 bg-white/[0.06] border border-white/10 rounded-xl px-4 py-3 text-foreground placeholder:text-foreground/30 focus:outline-none focus:border-amber-500/50 transition-colors"
               />
               <Button
                 onClick={handleSendEmail}
@@ -232,7 +232,7 @@ const AudiobookThankYouPage = () => {
           <Shield className="w-8 h-8 text-emerald-400 shrink-0 mt-0.5" />
           <div>
             <h3 className="font-bold text-emerald-300 mb-1">Garantie 30 jours</h3>
-            <p className="text-white/50 text-sm leading-relaxed">
+            <p className="text-foreground/50 text-sm leading-relaxed">
               Si vous n'êtes pas satisfait, contactez-nous pour un remboursement intégral. Votre satisfaction est notre priorité.
             </p>
           </div>
@@ -242,7 +242,7 @@ const AudiobookThankYouPage = () => {
         <div className="text-center">
           <Link
             to={`/audiobook/${audiobook.slug}`}
-            className="inline-flex items-center gap-2 text-white/40 hover:text-white/60 transition-colors text-sm"
+            className="inline-flex items-center gap-2 text-foreground/40 hover:text-foreground/60 transition-colors text-sm"
           >
             <ArrowLeft className="w-4 h-4" />
             Retour à la fiche produit
