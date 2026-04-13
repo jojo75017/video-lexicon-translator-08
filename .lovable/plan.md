@@ -1,59 +1,61 @@
 
 
-## Audit des bugs et problemes restants
+## Audit final — ce qui bloque encore
 
-Voici la liste complete des problemes identifies dans l'application, classes par gravite.
+Apres verification complete du code, de la securite et de la base de donnees, voici les problemes restants classes par priorite.
 
 ---
 
-### CRITIQUE — Securite
+### CRITIQUE — Securite (3 problemes)
 
-| # | Probleme | Detail |
+| # | Probleme | Impact |
 |---|----------|--------|
-| 1 | **Admin via sessionStorage** | `App.tsx` ligne 96 : le statut admin est stocke dans `sessionStorage.getItem('is_admin')`. Un utilisateur peut ouvrir la console et taper `sessionStorage.setItem('is_admin', 'true')` pour devenir admin. Le `SubscriberGate` rattrape partiellement via une verification serveur, mais le flag initial est exploitable. |
-| 2 | **Email admin hardcode** | `App.tsx` ligne 101 : `PERMANENT_ADMIN_EMAIL = 'boubetgeorges@gmail.com'` en clair dans le code source. Visible par n'importe qui dans le bundle JS. |
-| 3 | **8 policies RLS trop permissives** | Tables `subscribers`, `referrals`, `payment_confirmations`, `email_opens`, `email_sequences` ont des policies `WITH CHECK (true)` ou `USING (true)` qui permettent a n'importe qui d'inserer/modifier des donnees sans authentification. |
-| 4 | **Protection mots de passe fuites desactivee** | Le linter Supabase signale que la protection contre les mots de passe compromis est desactivee. |
+| 1 | **Subscribers INSERT ouvert a tous** | La policy `Service role can insert subscriptions` est sur le role `public` avec `WITH CHECK (true)`. N'importe qui peut s'auto-inscrire en tant qu'abonne premium via l'API. Faille d'elevation de privileges. |
+| 2 | **Donnees sensibles en Realtime** | Les tables `subscribers` et `payment_confirmations` sont publiees en Realtime sans protection. Tout utilisateur authentifie peut ecouter les changements et voir les emails, codes d'acces et donnees de paiement des autres. |
+| 3 | **Fonction `has_role(text, app_role)` cassee** | L'overload email de `has_role` cherche une colonne `email` qui n'existe pas dans `user_roles`. Si invoquee, elle crashera. Risque de faille si utilisee dans une future policy. |
 
----
+### MAJEUR — Securite residuelle (3 problemes)
 
-### MAJEUR — Fonctionnel
-
-| # | Probleme | Detail |
+| # | Probleme | Impact |
 |---|----------|--------|
-| 5 | **EbookPlannerPage toujours 3107 lignes** | Fichier monstre avec 47 switch cases. Risque de lenteur et de bugs difficiles a isoler. |
-| 6 | **Cle API Gemini stockee en localStorage** | `useOpenAIConfig.ts` : la cle API Gemini de l'utilisateur est en localStorage sans chiffrement. Accessible via XSS ou console. |
-| 7 | **Pages SaaS orphelines** | 5 pages SaaS (`SaasDashboard`, `SaasAnalytics`, `SaasBilling`, `SaasSettings`, `SaasAuthPage`) sont importees et routees mais semblent etre un systeme parallele non utilise par les abonnes. |
-| 8 | **64 routes dans App.tsx** | Beaucoup de pages de vente/marketing/SEO encore actives alors que la commercialisation est suspendue. |
+| 4 | **Email admin en dur dans `AdminDirectPage.tsx`** | `ADMIN_EMAIL = 'boubetgeorges@gmail.com'` est encore visible dans le code. De plus, ce fichier remet `sessionStorage.setItem('is_admin', 'true')` — exactement la faille corrigee dans App.tsx mais toujours presente ici. |
+| 5 | **Policy INSERT `payment_confirmations` ouverte** | `Anyone can submit payment confirmation` avec `WITH CHECK (true)` sur role `public`. Un attaquant peut injecter de faux paiements. |
+| 6 | **Policy INSERT `forum_notifications` ouverte** | `Service can create notifications` avec `WITH CHECK (true)` sur `authenticated`. Un utilisateur peut spammer les notifications de n'importe qui. |
 
----
+### MOYEN — Nettoyage code (2 problemes)
 
-### MOYEN — UX / Performance
-
-| # | Probleme | Detail |
+| # | Probleme | Impact |
 |---|----------|--------|
-| 9 | **Safety timer auth 3s** | `App.tsx` ligne 108 : si l'auth prend plus de 3s, l'ecran de chargement disparait et l'utilisateur peut voir un etat intermediaire non authentifie. |
-| 10 | **Browserslist obsolete** | Warning dans les logs : `caniuse-lite is 14 months old`. Impacte la compilation CSS/JS. |
-| 11 | **TrelloBoardView compteur statique** | Le compteur "Tous les outils (44)" est hardcode — si on ajoute/supprime des outils, il sera faux. |
+| 7 | **~50 routes encore actives** | Beaucoup de pages marketing/SEO/vente encore routees alors que la commercialisation est suspendue. Augmente le bundle et la surface d'attaque. |
+| 8 | **Bucket `audiobooks` sans policy UPDATE** | Les fichiers audio ne peuvent pas etre mis a jour par leurs proprietaires. |
 
 ---
 
-### MINEUR — Code / Dette technique
+### Plan de correction
 
-| # | Probleme | Detail |
-|---|----------|--------|
-| 12 | **Nommage trompeur** | `useOpenAIConfig` et `openaiApiUtils.ts` gerent en realite Gemini, pas OpenAI. Confusion garantie. |
-| 13 | **Workflow data en localStorage** | `useWorkflowSync.ts` : toutes les donnees du workflow sont en localStorage. Limite a ~5MB, pas synchronise entre appareils. |
-| 14 | **ModulesDiagnosticService** | Service de monitoring en memoire qui ne persiste rien — les stats sont perdues a chaque refresh. |
+**Etape 1 — Securite critique (migration SQL)**
+- Changer la policy INSERT de `subscribers` pour `service_role` uniquement
+- Retirer `subscribers` et `payment_confirmations` de la publication Realtime
+- Supprimer l'overload cassee `has_role(text, app_role)`
+- Restreindre INSERT `payment_confirmations` aux utilisateurs authentifies avec `WITH CHECK (auth.uid() IS NOT NULL)`
+- Restreindre INSERT `forum_notifications` avec `WITH CHECK (auth.uid() = user_id)`
+
+**Etape 2 — AdminDirectPage.tsx**
+- Supprimer l'email admin en dur
+- Supprimer les `sessionStorage.setItem('is_admin', 'true')` — utiliser uniquement la verification serveur comme dans App.tsx
+
+**Etape 3 — Storage**
+- Ajouter une policy UPDATE sur le bucket `audiobooks` pour les proprietaires
+
+**Etape 4 — Nettoyage optionnel des routes**
+- Commenter ou supprimer les routes de vente/marketing si vous confirmez la suspension
 
 ---
 
-### Recommandation de priorite
+### Sections techniques
 
-1. **Securite d'abord** : Corriger l'admin sessionStorage (#1), supprimer l'email hardcode (#2), resserrer les RLS (#3)
-2. **Stabilite** : Nettoyer les pages SaaS orphelines (#7), reduire les routes (#8)
-3. **UX** : Ameliorer le safety timer (#9), rendre le compteur dynamique (#11)
-4. **Dette technique** : Renommer les fichiers OpenAI→Gemini (#12), migrer le workflow sync vers la base de donnees (#13)
-
-Voulez-vous que je commence par les corrections de securite, ou par un autre groupe ?
+Fichiers modifies :
+- 1 migration SQL (policies RLS + Realtime + fonction)
+- `src/pages/AdminDirectPage.tsx` (suppression email hardcode + sessionStorage)
+- Pas besoin de toucher a `App.tsx` (deja corrige)
 
