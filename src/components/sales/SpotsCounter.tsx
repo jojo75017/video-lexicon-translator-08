@@ -48,9 +48,9 @@ const SpotsCounter = () => {
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <Flame className={`w-5 h-5 ${isLow ? 'text-red-400' : 'text-amber-400'} animate-pulse`} />
-          <span className="font-bold text-white text-sm">Places Fondateur</span>
+          <span className="font-bold text-foreground text-sm">Places Fondateur</span>
         </div>
-        <Badge className={`${isLow ? 'bg-red-500 text-white' : 'bg-amber-500/10 text-amber-400 border-amber-500/30'} font-bold`}>
+        <Badge className={`${isLow ? 'bg-red-500 text-foreground' : 'bg-amber-500/10 text-amber-400 border-amber-500/30'} font-bold`}>
           {isLow ? '⚠️ PRESQUE COMPLET' : 'LIMITÉ'}
         </Badge>
       </div>
@@ -67,11 +67,11 @@ const SpotsCounter = () => {
             {spotsLeft}
           </motion.span>
         </AnimatePresence>
-        <span className="text-white/60 text-sm">/ {TOTAL_SPOTS} places restantes</span>
+        <span className="text-foreground/60 text-sm">/ {TOTAL_SPOTS} places restantes</span>
       </div>
       
       <Progress value={pctTaken} className="h-3 mb-2" />
-      <p className="text-xs text-white/50">
+      <p className="text-xs text-foreground/50">
         {TOTAL_SPOTS - spotsLeft} créateurs ont déjà rejoint l'offre Fondateur
       </p>
     </motion.div>

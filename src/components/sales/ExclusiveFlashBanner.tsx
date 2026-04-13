@@ -13,7 +13,7 @@ export const ExclusiveFlashBanner: React.FC = () => {
       {/* Glow effect */}
       <div className="absolute -inset-1 bg-gradient-to-r from-amber-500/30 via-orange-500/30 to-red-500/30 rounded-2xl blur-xl" />
       
-      <div className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border border-amber-500/40 rounded-2xl overflow-hidden">
+      <div className="relative bg-gradient-to-br from-card via-secondary to-card border border-amber-500/40 rounded-2xl overflow-hidden">
         {/* Animated top stripe */}
         <div className="h-1.5 bg-gradient-to-r from-amber-400 via-orange-500 to-red-500 animate-pulse" />
         

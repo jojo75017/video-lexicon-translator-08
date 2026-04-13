@@ -38,10 +38,10 @@ const GuaranteeSection = () => {
             <ShieldCheck className="w-4 h-4 mr-2" />
             TRIPLE GARANTIE
           </Badge>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-4">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground mb-4">
             Zéro risque. Zéro excuse.
           </h2>
-          <p className="text-white/70 text-lg max-w-2xl mx-auto">
+          <p className="text-foreground/70 text-lg max-w-2xl mx-auto">
             On prend le risque à votre place. Si ça ne fonctionne pas, vous ne perdez rien.
           </p>
         </motion.div>
@@ -55,13 +55,13 @@ const GuaranteeSection = () => {
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
             >
-              <Card className="h-full bg-slate-900/50 border-slate-800 hover:border-emerald-500/30 transition-all duration-300 group">
+              <Card className="h-full bg-card/80 border-border hover:border-primary/30 transition-all duration-300 group">
                 <CardContent className="pt-8 pb-8 text-center">
                   <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${g.color} flex items-center justify-center mx-auto mb-5 group-hover:scale-110 transition-transform`}>
-                    <g.icon className="w-8 h-8 text-white" />
+                    <g.icon className="w-8 h-8 text-foreground" />
                   </div>
-                  <h3 className="font-bold text-xl text-white mb-3">{g.title}</h3>
-                  <p className="text-white/70 leading-relaxed text-sm">{g.desc}</p>
+                  <h3 className="font-bold text-xl text-foreground mb-3">{g.title}</h3>
+                  <p className="text-foreground/70 leading-relaxed text-sm">{g.desc}</p>
                 </CardContent>
               </Card>
             </motion.div>
@@ -82,7 +82,7 @@ const GuaranteeSection = () => {
               "🛡️ Garantie 30 jours",
               "💬 Support 7j/7",
             ].map((item, i) => (
-              <span key={i} className="text-sm text-white/70 flex items-center gap-1">
+              <span key={i} className="text-sm text-foreground/70 flex items-center gap-1">
                 {item}
               </span>
             ))}

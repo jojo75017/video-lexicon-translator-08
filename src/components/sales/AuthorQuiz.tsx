@@ -276,7 +276,7 @@ const AuthorQuiz: React.FC<AuthorQuizProps> = ({
               className="space-y-6"
             >
               {/* Résultat */}
-              <div className={`p-6 rounded-2xl bg-gradient-to-br ${profile.color} text-white`}>
+              <div className={`p-6 rounded-2xl bg-gradient-to-br ${profile.color} text-foreground`}>
                 <div className="flex items-center gap-4 mb-4">
                   <div className="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center">
                     {profile.icon}
@@ -286,7 +286,7 @@ const AuthorQuiz: React.FC<AuthorQuizProps> = ({
                     <h3 className="text-2xl font-bold">{profile.title}</h3>
                   </div>
                 </div>
-                <p className="text-white/90">{profile.description}</p>
+                <p className="text-foreground/90">{profile.description}</p>
               </div>
 
               {/* Recommandation */}

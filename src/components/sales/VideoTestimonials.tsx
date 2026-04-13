@@ -79,14 +79,14 @@ const VideoTestimonials = () => {
               transition={{ delay: idx * 0.1 }}
               viewport={{ once: true }}
             >
-              <Card className="overflow-hidden border-white/10 bg-slate-900/50 hover:border-violet-500/30 transition-all group">
+              <Card className="overflow-hidden border-border bg-card/80 hover:border-primary/30 transition-all group">
                 {/* Video Placeholder / Thumbnail */}
-                <div className="relative aspect-video bg-gradient-to-br from-slate-800 to-slate-900">
+                <div className="relative aspect-video bg-gradient-to-br from-muted to-secondary">
                   <div className={`absolute inset-0 bg-gradient-to-br ${testimonial.color} opacity-20`} />
                   
                   {/* Avatar in center */}
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className={`w-20 h-20 rounded-full bg-gradient-to-br ${testimonial.color} flex items-center justify-center text-white text-2xl font-bold shadow-2xl`}>
+                    <div className={`w-20 h-20 rounded-full bg-gradient-to-br ${testimonial.color} flex items-center justify-center text-foreground text-2xl font-bold shadow-2xl`}>
                       {testimonial.avatar}
                     </div>
                   </div>
@@ -94,20 +94,20 @@ const VideoTestimonials = () => {
                   {/* Play button overlay */}
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/30">
                     <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center cursor-pointer hover:bg-white/30 transition-colors">
-                      <Play className="w-6 h-6 text-white ml-1" fill="white" />
+                      <Play className="w-6 h-6 text-foreground ml-1" fill="white" />
                     </div>
                   </div>
 
                   {/* Result badge */}
                   <div className="absolute top-3 right-3">
-                    <Badge className="bg-emerald-500/90 text-white border-0 shadow-lg">
+                    <Badge className="bg-emerald-500/90 text-foreground border-0 shadow-lg">
                       {testimonial.result}
                     </Badge>
                   </div>
 
                   {/* Coming soon indicator */}
                   <div className="absolute bottom-3 left-3">
-                    <Badge variant="secondary" className="bg-black/50 text-white/80 border-0 text-xs">
+                    <Badge variant="secondary" className="bg-black/50 text-foreground/80 border-0 text-xs">
                       <Volume2 className="w-3 h-3 mr-1" />
                       Audio bientôt
                     </Badge>
@@ -125,7 +125,7 @@ const VideoTestimonials = () => {
 
                   {/* Author */}
                   <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${testimonial.color} flex items-center justify-center text-white text-sm font-bold`}>
+                    <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${testimonial.color} flex items-center justify-center text-foreground text-sm font-bold`}>
                       {testimonial.avatar}
                     </div>
                     <div>

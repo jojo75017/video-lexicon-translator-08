@@ -18,7 +18,7 @@ const fadeIn = {
 const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
 
 const outcomes = [
-  { time: "0–5 min", icon: Search, label: "Niche validée + plan de 12 chapitres", color: "text-cyan-400 bg-cyan-500/10 border-cyan-500/20" },
+  { time: "0–5 min", icon: Search, label: "Niche validée + plan de 12 chapitres", color: "text-primary bg-cyan-500/10 border-cyan-500/20" },
   { time: "5–20 min", icon: FileText, label: "Ebook de 25 000+ mots rédigé par l'IA", color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" },
   { time: "20–30 min", icon: Palette, label: "Couverture pro générée par Imagen 3", color: "text-violet-400 bg-violet-500/10 border-violet-500/20" },
   { time: "30–45 min", icon: BookOpen, label: "Export PDF/EPUB prêt pour Amazon KDP", color: "text-amber-400 bg-amber-500/10 border-amber-500/20" },
@@ -28,7 +28,7 @@ const TonightOutcomes = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="py-20 px-4 bg-slate-900/40 relative overflow-hidden">
+    <section className="py-20 px-4 bg-secondary/50 relative overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_0%,rgba(16,185,129,0.06),transparent)]" />
       
       <div className="max-w-3xl mx-auto relative z-10">
@@ -39,7 +39,7 @@ const TonightOutcomes = () => {
               CE SOIR, VOUS AUREZ…
             </Badge>
           </motion.div>
-          <motion.h2 variants={fadeIn} custom={1} className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-4">
+          <motion.h2 variants={fadeIn} custom={1} className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground mb-4">
             Votre ebook publié
             <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">
@@ -63,9 +63,9 @@ const TonightOutcomes = () => {
                   {o.time}
                 </div>
                 {/* Content */}
-                <div className="flex items-center gap-3 flex-1 bg-slate-800/50 rounded-xl px-5 py-4 border border-slate-700/50 group-hover:border-slate-600 transition-colors">
+                <div className="flex items-center gap-3 flex-1 bg-muted/50 rounded-xl px-5 py-4 border border-border/50 group-hover:border-slate-600 transition-colors">
                   <o.icon className={`w-5 h-5 flex-shrink-0 ${o.color.split(' ')[0]}`} />
-                  <span className="text-white font-medium">{o.label}</span>
+                  <span className="text-foreground font-medium">{o.label}</span>
                 </div>
               </motion.div>
             ))}
@@ -81,7 +81,7 @@ const TonightOutcomes = () => {
             Je publie mon ebook ce soir
             <ArrowRight className="w-5 h-5 ml-2" />
           </Button>
-          <p className="text-white/40 text-xs mt-3 flex items-center justify-center gap-2">
+          <p className="text-foreground/40 text-xs mt-3 flex items-center justify-center gap-2">
             <Rocket className="w-3.5 h-3.5" />
             Accès immédiat après paiement • Garantie 30 jours
           </p>

@@ -78,19 +78,19 @@ const ScrollIntentPopup = ({ scrollThreshold = 50 }: ScrollIntentPopupProps) => 
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-md border-violet-500/30 bg-gradient-to-br from-slate-900 via-slate-900 to-violet-950">
+      <DialogContent className="sm:max-w-md border-violet-500/30 bg-gradient-to-br from-secondary via-secondary to-violet-950">
         <button 
           onClick={() => setIsOpen(false)}
-          className="absolute right-4 top-4 text-white/60 hover:text-white"
+          className="absolute right-4 top-4 text-foreground/60 hover:text-foreground"
         >
           <X className="h-4 w-4" />
         </button>
         
         <DialogHeader className="text-center">
           <div className="mx-auto w-16 h-16 bg-gradient-to-br from-violet-500 to-pink-500 rounded-2xl flex items-center justify-center mb-4">
-            <Sparkles className="w-8 h-8 text-white" />
+            <Sparkles className="w-8 h-8 text-foreground" />
           </div>
-          <DialogTitle className="text-2xl text-white flex items-center justify-center gap-2">
+          <DialogTitle className="text-2xl text-foreground flex items-center justify-center gap-2">
             <span>🎯</span> Vous êtes au bon endroit !
           </DialogTitle>
           <DialogDescription className="text-gray-300 text-base mt-2">
@@ -119,7 +119,7 @@ const ScrollIntentPopup = ({ scrollThreshold = 50 }: ScrollIntentPopupProps) => 
                 placeholder="votre@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-gray-400"
+                className="pl-10 bg-white/10 border-white/20 text-foreground placeholder:text-gray-400"
                 disabled={isSubmitting}
               />
             </div>

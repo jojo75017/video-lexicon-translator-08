@@ -6,7 +6,7 @@ const messages = [
   { icon: Flame, text: "3 personnes ont acheté dans la dernière heure", color: "text-orange-400" },
   { icon: TrendingUp, text: "Le prix passera à 147€ le 1er juillet", color: "text-amber-400" },
   { icon: Users, text: "Rejoignez +5000 auteurs satisfaits", color: "text-emerald-400" },
-  { icon: ShieldCheck, text: "Garantie 30 jours — 0 risque pour vous", color: "text-cyan-400" },
+  { icon: ShieldCheck, text: "Garantie 30 jours — 0 risque pour vous", color: "text-primary" },
   { icon: Zap, text: "Votre 1er ebook publié ce soir sur Amazon", color: "text-violet-400" },
   { icon: Clock, text: "Places Fondateur limitées — ne tardez pas", color: "text-red-400" },
 ];
@@ -25,7 +25,7 @@ export const UrgencyBanner: React.FC = () => {
   const Icon = current.icon;
 
   return (
-    <div className="bg-slate-900/90 border-y border-amber-500/20 py-2.5 overflow-hidden">
+    <div className="bg-secondary border-y border-amber-500/20 py-2.5 overflow-hidden">
       <motion.div
         key={currentIndex}
         initial={{ opacity: 0, y: 10 }}
@@ -34,7 +34,7 @@ export const UrgencyBanner: React.FC = () => {
         className="flex items-center justify-center gap-2 text-sm"
       >
         <Icon className={`w-4 h-4 ${current.color}`} />
-        <span className="text-white/80 font-medium">{current.text}</span>
+        <span className="text-foreground/80 font-medium">{current.text}</span>
       </motion.div>
     </div>
   );

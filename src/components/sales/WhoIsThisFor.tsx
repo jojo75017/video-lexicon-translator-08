@@ -55,15 +55,15 @@ const WhoIsThisFor = () => {
       <div className="max-w-5xl mx-auto relative z-10">
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-12">
           <motion.div variants={fadeIn}>
-            <Badge className="bg-cyan-500/10 text-cyan-400 border-cyan-500/20 px-4 py-2 mb-4">
+            <Badge className="bg-cyan-500/10 text-primary border-cyan-500/20 px-4 py-2 mb-4">
               <Target className="w-4 h-4 mr-2" />
               EST-CE POUR VOUS ?
             </Badge>
           </motion.div>
-          <motion.h2 variants={fadeIn} custom={1} className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-4">
+          <motion.h2 variants={fadeIn} custom={1} className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground mb-4">
             Vous vous reconnaissez ?
           </motion.h2>
-          <motion.p variants={fadeIn} custom={2} className="text-white/70 text-lg max-w-xl mx-auto">
+          <motion.p variants={fadeIn} custom={2} className="text-foreground/70 text-lg max-w-xl mx-auto">
             EbookStudio est fait pour vous si…
           </motion.p>
         </motion.div>
@@ -72,15 +72,15 @@ const WhoIsThisFor = () => {
           className="grid sm:grid-cols-2 gap-5">
           {profiles.map((p, i) => (
             <motion.div key={i} variants={fadeIn} custom={i}>
-              <Card className="h-full bg-slate-900/60 border-slate-800 hover:border-cyan-500/30 transition-all duration-300 group">
+              <Card className="h-full bg-card border-border hover:border-primary/30 transition-all duration-300 group">
                 <CardContent className="p-6">
                   <div className="flex items-start gap-4">
                     <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${p.color} flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform`}>
-                      <p.icon className="w-6 h-6 text-white" />
+                      <p.icon className="w-6 h-6 text-foreground" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-bold text-lg text-white mb-1">{p.title}</h3>
-                      <p className="text-white/60 text-sm mb-3">{p.desc}</p>
+                      <h3 className="font-bold text-lg text-foreground mb-1">{p.title}</h3>
+                      <p className="text-foreground/60 text-sm mb-3">{p.desc}</p>
                       <div className="flex items-center gap-2 text-emerald-400 text-sm font-medium">
                         <ArrowRight className="w-3.5 h-3.5" />
                         <span>{p.outcome}</span>
@@ -96,7 +96,7 @@ const WhoIsThisFor = () => {
         {/* Reassurance */}
         <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
           className="mt-8 text-center">
-          <div className="inline-flex items-center gap-6 flex-wrap justify-center text-sm text-white/50">
+          <div className="inline-flex items-center gap-6 flex-wrap justify-center text-sm text-foreground/50">
             <span className="flex items-center gap-1.5">
               <Heart className="w-4 h-4 text-red-400" />
               Aucune compétence technique requise

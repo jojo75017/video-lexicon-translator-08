@@ -72,20 +72,20 @@ export const SocialProofNotifications: React.FC = () => {
         >
           <div className="bg-card rounded-xl shadow-2xl border border-emerald-800/40 p-4 flex items-start gap-3 relative">
             {/* Badge 2026 */}
-            <span className="absolute -top-2 -right-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-lg">
+            <span className="absolute -top-2 -right-2 bg-gradient-to-r from-amber-500 to-orange-500 text-foreground text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-lg">
               2026
             </span>
             
             {/* Avatar */}
             <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center">
-              <User className="w-5 h-5 text-white" />
+              <User className="w-5 h-5 text-foreground" />
             </div>
             
             {/* Content */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
                 <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0" />
-                <span className="text-sm font-semibold text-slate-900 dark:text-white truncate">
+                <span className="text-sm font-semibold text-slate-900 dark:text-foreground truncate">
                   {notification.name}
                 </span>
               </div>
