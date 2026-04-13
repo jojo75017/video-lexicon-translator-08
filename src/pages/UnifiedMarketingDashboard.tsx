@@ -137,7 +137,7 @@ const UnifiedMarketingDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white p-4 md:p-8">
+    <div className="min-h-screen bg-background text-foreground p-4 md:p-8">
       <div className="max-w-7xl mx-auto space-y-6">
         <AdminPanelNav />
 
@@ -145,9 +145,9 @@ const UnifiedMarketingDashboard = () => {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-black">📊 Tableau de Bord Marketing</h1>
-            <p className="text-white/60 mt-1">Vue unifiée prospects, emails et réseaux sociaux</p>
+            <p className="text-muted-foreground mt-1">Vue unifiée prospects, emails et réseaux sociaux</p>
           </div>
-          <Button onClick={fetchAll} variant="outline" className="border-slate-700 text-white hover:bg-slate-800">
+          <Button onClick={fetchAll} variant="outline" className="border-border text-white hover:bg-muted">
             <RefreshCw className="w-4 h-4 mr-2" />
             Actualiser
           </Button>
@@ -163,21 +163,21 @@ const UnifiedMarketingDashboard = () => {
             { label: 'Engagement social', value: totalEngagement, icon: Heart, color: 'text-pink-400' },
             { label: 'Clics total', value: socialStats.totalClicks, icon: MousePointerClick, color: 'text-cyan-400' },
           ].map((kpi, i) => (
-            <Card key={i} className="bg-slate-900/60 border-slate-800">
+            <Card key={i} className="bg-card border-border">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-2">
                   <kpi.icon className={`w-5 h-5 ${kpi.color}`} />
                   <ArrowUpRight className="w-3 h-3 text-emerald-400" />
                 </div>
                 <p className="text-2xl font-black">{typeof kpi.value === 'string' ? kpi.value : kpi.value.toLocaleString('fr-FR')}</p>
-                <p className="text-xs text-white/50 mt-1">{kpi.label}</p>
+                <p className="text-xs text-muted-foreground mt-1">{kpi.label}</p>
               </CardContent>
             </Card>
           ))}
         </div>
 
         <Tabs defaultValue="prospects" className="space-y-6">
-          <TabsList className="bg-slate-900 border border-slate-800">
+          <TabsList className="bg-card border border-border">
             <TabsTrigger value="prospects">📋 Pipeline Email</TabsTrigger>
             <TabsTrigger value="social">📣 Réseaux Sociaux</TabsTrigger>
             <TabsTrigger value="clicks">🖱️ Clics & Conversions</TabsTrigger>
@@ -190,30 +190,30 @@ const UnifiedMarketingDashboard = () => {
                 <CardContent className="p-6 text-center">
                   <CheckCircle className="w-8 h-8 text-emerald-400 mx-auto mb-2" />
                   <p className="text-3xl font-black text-emerald-400">{prospectStats.completed}</p>
-                  <p className="text-sm text-white/60">Séquence terminée</p>
+                  <p className="text-sm text-muted-foreground">Séquence terminée</p>
                 </CardContent>
               </Card>
               <Card className="bg-blue-950/30 border-blue-900/50">
                 <CardContent className="p-6 text-center">
                   <Target className="w-8 h-8 text-blue-400 mx-auto mb-2" />
                   <p className="text-3xl font-black text-blue-400">{prospectStats.active}</p>
-                  <p className="text-sm text-white/60">En cours de nurturing</p>
+                  <p className="text-sm text-muted-foreground">En cours de nurturing</p>
                 </CardContent>
               </Card>
               <Card className="bg-red-950/30 border-red-900/50">
                 <CardContent className="p-6 text-center">
                   <XCircle className="w-8 h-8 text-red-400 mx-auto mb-2" />
                   <p className="text-3xl font-black text-red-400">{prospectStats.unsubscribed}</p>
-                  <p className="text-sm text-white/60">Désinscrits</p>
+                  <p className="text-sm text-muted-foreground">Désinscrits</p>
                 </CardContent>
               </Card>
             </div>
 
             {/* Pipeline funnel */}
-            <Card className="bg-slate-900/60 border-slate-800">
+            <Card className="bg-card border-border">
               <CardHeader>
-                <CardTitle className="text-white">Pipeline d'emails (5 étapes)</CardTitle>
-                <CardDescription className="text-white/50">Distribution des prospects par étape</CardDescription>
+                <CardTitle className="text-foreground">Pipeline d'emails (5 étapes)</CardTitle>
+                <CardDescription className="text-muted-foreground">Distribution des prospects par étape</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {[0, 1, 2, 3, 4, 5].map(step => {
@@ -222,8 +222,8 @@ const UnifiedMarketingDashboard = () => {
                   return (
                     <div key={step} className="space-y-1">
                       <div className="flex justify-between text-sm">
-                        <span className="text-white/70">{STEP_LABELS[step]}</span>
-                        <span className="font-bold text-white">{count} <span className="text-white/40">({pct.toFixed(0)}%)</span></span>
+                        <span className="text-foreground/70">{STEP_LABELS[step]}</span>
+                        <span className="font-bold text-foreground">{count} <span className="text-muted-foreground">({pct.toFixed(0)}%)</span></span>
                       </div>
                       <Progress value={pct} className="h-3" />
                     </div>
@@ -233,17 +233,17 @@ const UnifiedMarketingDashboard = () => {
             </Card>
 
             {/* Recent prospects */}
-            <Card className="bg-slate-900/60 border-slate-800">
+            <Card className="bg-card border-border">
               <CardHeader>
-                <CardTitle className="text-white">Derniers prospects importés</CardTitle>
+                <CardTitle className="text-foreground">Derniers prospects importés</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   {recentProspects.map(p => (
-                    <div key={p.id} className="flex items-center justify-between p-3 rounded-lg bg-slate-800/40">
+                    <div key={p.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
                       <div>
-                        <p className="font-medium text-white">{p.email}</p>
-                        <p className="text-xs text-white/50">{p.first_name || '—'} • Étape {p.current_step}/5</p>
+                        <p className="font-medium text-foreground">{p.email}</p>
+                        <p className="text-xs text-muted-foreground">{p.first_name || '—'} • Étape {p.current_step}/5</p>
                       </div>
                       <div className="flex items-center gap-2">
                         {p.auto_send && <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/30 text-xs">Auto</Badge>}
@@ -253,7 +253,7 @@ const UnifiedMarketingDashboard = () => {
                       </div>
                     </div>
                   ))}
-                  {recentProspects.length === 0 && <p className="text-white/40 text-center py-4">Aucun prospect</p>}
+                  {recentProspects.length === 0 && <p className="text-muted-foreground text-center py-4">Aucun prospect</p>}
                 </div>
               </CardContent>
             </Card>
@@ -268,39 +268,39 @@ const UnifiedMarketingDashboard = () => {
                 { label: 'Commentaires', value: socialStats.totalComments, icon: MessageSquare, color: 'text-blue-400' },
                 { label: 'Partages', value: socialStats.totalShares, icon: Share2, color: 'text-violet-400' },
               ].map((m, i) => (
-                <Card key={i} className="bg-slate-900/60 border-slate-800">
+                <Card key={i} className="bg-card border-border">
                   <CardContent className="p-5">
                     <m.icon className={`w-5 h-5 ${m.color} mb-2`} />
                     <p className="text-2xl font-black">{m.value}</p>
-                    <p className="text-xs text-white/50">{m.label}</p>
+                    <p className="text-xs text-muted-foreground">{m.label}</p>
                   </CardContent>
                 </Card>
               ))}
             </div>
 
             {/* Platform breakdown */}
-            <Card className="bg-slate-900/60 border-slate-800">
+            <Card className="bg-card border-border">
               <CardHeader>
-                <CardTitle className="text-white">Engagement par plateforme</CardTitle>
+                <CardTitle className="text-foreground">Engagement par plateforme</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {Object.entries(socialStats.byPlatform).map(([platform, stats]) => (
-                  <div key={platform} className="p-4 rounded-xl bg-slate-800/40">
+                  <div key={platform} className="p-4 rounded-xl bg-muted/30">
                     <div className="flex items-center gap-3 mb-3">
                       <div className={`w-3 h-3 rounded-full ${PLATFORM_COLORS[platform] || 'bg-gray-500'}`} />
                       <span className="font-bold text-white capitalize">{platform}</span>
                       <Badge variant="secondary" className="text-xs ml-auto">{stats.posts} posts</Badge>
                     </div>
                     <div className="grid grid-cols-4 gap-3 text-center text-sm">
-                      <div><p className="text-pink-400 font-bold">{stats.likes}</p><p className="text-white/40 text-xs">Likes</p></div>
-                      <div><p className="text-blue-400 font-bold">{stats.comments}</p><p className="text-white/40 text-xs">Commentaires</p></div>
-                      <div><p className="text-violet-400 font-bold">{stats.shares}</p><p className="text-white/40 text-xs">Partages</p></div>
-                      <div><p className="text-cyan-400 font-bold">{stats.clicks}</p><p className="text-white/40 text-xs">Clics</p></div>
+                      <div><p className="text-pink-400 font-bold">{stats.likes}</p><p className="text-muted-foreground text-xs">Likes</p></div>
+                      <div><p className="text-blue-400 font-bold">{stats.comments}</p><p className="text-muted-foreground text-xs">Commentaires</p></div>
+                      <div><p className="text-violet-400 font-bold">{stats.shares}</p><p className="text-muted-foreground text-xs">Partages</p></div>
+                      <div><p className="text-cyan-400 font-bold">{stats.clicks}</p><p className="text-muted-foreground text-xs">Clics</p></div>
                     </div>
                   </div>
                 ))}
                 {Object.keys(socialStats.byPlatform).length === 0 && (
-                  <p className="text-white/40 text-center py-4">Aucun post enregistré</p>
+                  <p className="text-muted-foreground text-center py-4">Aucun post enregistré</p>
                 )}
               </CardContent>
             </Card>
@@ -313,23 +313,23 @@ const UnifiedMarketingDashboard = () => {
                 <CardContent className="p-6 text-center">
                   <MousePointerClick className="w-10 h-10 text-cyan-400 mx-auto mb-3" />
                   <p className="text-4xl font-black text-cyan-400">{socialStats.totalClicks}</p>
-                  <p className="text-sm text-white/60 mt-1">Clics réseaux sociaux</p>
+                  <p className="text-sm text-muted-foreground mt-1">Clics réseaux sociaux</p>
                 </CardContent>
               </Card>
               <Card className="bg-emerald-950/30 border-emerald-900/50">
                 <CardContent className="p-6 text-center">
                   <Mail className="w-10 h-10 text-emerald-400 mx-auto mb-3" />
                   <p className="text-4xl font-black text-emerald-400">{estimatedEmailsSent}</p>
-                  <p className="text-sm text-white/60 mt-1">Emails envoyés (estimés)</p>
-                  <p className="text-xs text-white/40 mt-1">Les liens cliquables dans chaque email redirigent vers /offres et /demo</p>
+                  <p className="text-sm text-muted-foreground mt-1">Emails envoyés (estimés)</p>
+                  <p className="text-xs text-muted-foreground mt-1">Les liens cliquables dans chaque email redirigent vers /offres et /demo</p>
                 </CardContent>
               </Card>
             </div>
 
             {/* Top posts by clicks */}
-            <Card className="bg-slate-900/60 border-slate-800">
+            <Card className="bg-card border-border">
               <CardHeader>
-                <CardTitle className="text-white">🖱️ Posts avec le plus de clics</CardTitle>
+                <CardTitle className="text-foreground">🖱️ Posts avec le plus de clics</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
@@ -337,22 +337,22 @@ const UnifiedMarketingDashboard = () => {
                     .sort((a, b) => (b.clicks_count || 0) - (a.clicks_count || 0))
                     .slice(0, 5)
                     .map(post => (
-                      <div key={post.id} className="flex items-center justify-between p-3 rounded-lg bg-slate-800/40">
+                      <div key={post.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
                             <div className={`w-2 h-2 rounded-full ${PLATFORM_COLORS[post.platform] || 'bg-gray-500'}`} />
-                            <span className="text-xs text-white/50 capitalize">{post.platform}</span>
+                            <span className="text-xs text-muted-foreground capitalize">{post.platform}</span>
                             <Badge variant="secondary" className="text-xs">{post.status}</Badge>
                           </div>
                           <p className="text-sm text-white truncate">{post.content.substring(0, 80)}...</p>
                         </div>
                         <div className="text-right ml-4">
                           <p className="text-lg font-black text-cyan-400">{post.clicks_count || 0}</p>
-                          <p className="text-xs text-white/40">clics</p>
+                          <p className="text-xs text-muted-foreground">clics</p>
                         </div>
                       </div>
                     ))}
-                  {recentPosts.length === 0 && <p className="text-white/40 text-center py-4">Aucune donnée de clic</p>}
+                  {recentPosts.length === 0 && <p className="text-muted-foreground text-center py-4">Aucune donnée de clic</p>}
                 </div>
               </CardContent>
             </Card>
@@ -361,7 +361,7 @@ const UnifiedMarketingDashboard = () => {
             <Card className="bg-amber-950/20 border-amber-900/40">
               <CardContent className="p-6">
                 <h3 className="font-bold text-amber-400 mb-2">📧 Liens dans les emails de vente</h3>
-                <p className="text-white/70 text-sm leading-relaxed">
+                <p className="text-foreground/70 text-sm leading-relaxed">
                   Chaque email de la séquence de 5 étapes contient des liens cliquables vers :
                 </p>
                 <ul className="mt-3 space-y-2 text-sm">

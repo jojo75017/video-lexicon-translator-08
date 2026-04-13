@@ -303,12 +303,12 @@ export const EbookCoverGenerator: React.FC<EbookCoverGeneratorProps> = ({
   return (
     <div className="space-y-6">
       {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-8 text-white">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-card via-primary/20 to-card p-8 text-foreground">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDE4YzAtOS45NC04LjA2LTE4LTE4LTE4UzAgOC4wNiAwIDE4czguMDYgMTggMTggMTggMTgtOC4wNiAxOC0xOHoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-50" />
         <div className="relative z-10">
           <div className="flex items-center gap-4 mb-3">
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-2xl shadow-orange-500/30">
-              <Camera className="h-7 w-7 text-white" />
+              <Camera className="h-7 w-7 text-foreground" />
             </div>
             <div>
               <h2 className="text-2xl font-bold tracking-tight">Studio de Couverture KDP</h2>
@@ -488,13 +488,13 @@ export const EbookCoverGenerator: React.FC<EbookCoverGeneratorProps> = ({
                   value={customPrompt}
                   onChange={e => setCustomPrompt(e.target.value)}
                   rows={6}
-                  className="mt-1 text-sm font-mono bg-slate-900 text-green-300 border-slate-700 rounded-xl"
+                  className="mt-1 text-sm font-mono bg-card text-green-300 border-border rounded-xl"
                 />
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={copyPrompt}
-                  className="absolute top-8 right-2 text-slate-400 hover:text-white hover:bg-slate-700"
+                  className="absolute top-8 right-2 text-slate-400 hover:text-foreground hover:bg-slate-700"
                 >
                   {promptCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                 </Button>
