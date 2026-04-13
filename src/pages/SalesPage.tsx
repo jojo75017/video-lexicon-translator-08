@@ -355,7 +355,7 @@ const SalesPage = () => {
           </motion.h1>
 
           <motion.p variants={fadeIn} custom={2} className="text-lg sm:text-xl text-foreground/80 mb-8 max-w-2xl mx-auto leading-relaxed">
-            Le workflow IA complet qui a déjà généré <span className="text-white font-semibold">+35 ebooks publiés</span> sur Amazon KDP.
+            Le workflow IA complet qui a déjà généré <span className="text-primary font-semibold">+35 ebooks publiés</span> sur Amazon KDP.
             Rédaction, couvertures, audiobooks — tout en un.
           </motion.p>
 
@@ -367,7 +367,7 @@ const SalesPage = () => {
               { value: "45 min", label: "Temps moyen" },
             ].map((stat, i) => (
               <div key={i} className="text-center">
-                <p className="text-3xl sm:text-4xl font-black text-white">{stat.value}</p>
+                <p className="text-3xl sm:text-4xl font-black text-foreground">{stat.value}</p>
                 <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
               </div>
             ))}
@@ -528,7 +528,7 @@ const SalesPage = () => {
                 ))}
               </div>
               <div>
-                <p className="font-semibold text-white">47+ auteurs</p>
+                <p className="font-semibold text-foreground">47+ auteurs</p>
                 <p className="text-xs text-muted-foreground">utilisent EbookStudio</p>
               </div>
             </div>
@@ -544,7 +544,7 @@ const SalesPage = () => {
                 <Trophy className="w-5 h-5 text-amber-400" />
               </div>
               <div>
-                <p className="font-semibold text-white">#1 en France</p>
+                <p className="font-semibold text-foreground">#1 en France</p>
                 <p className="text-xs text-muted-foreground">Workflow KDP IA</p>
               </div>
             </div>
@@ -579,7 +579,7 @@ const SalesPage = () => {
                 <Card className="h-full bg-card/50 border-border hover:border-border transition-all duration-300 hover:-translate-y-1 group">
                   <CardContent className="pt-8 pb-8">
                     <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300`}>
-                      <feature.icon className="w-7 h-7 text-white" />
+                      <feature.icon className="w-7 h-7 text-primary-foreground" />
                     </div>
                     <h3 className="font-bold text-xl text-foreground mb-2">{feature.title}</h3>
                     <p className="text-muted-foreground leading-relaxed">{feature.desc}</p>
@@ -613,9 +613,9 @@ const SalesPage = () => {
             <CardContent className="p-8 md:p-10">
               <div className="text-center space-y-4">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center mx-auto">
-                  <Gift className="w-8 h-8 text-white" />
+                  <Gift className="w-8 h-8 text-primary-foreground" />
                 </div>
-                <motion.h2 variants={fadeIn} className="text-2xl sm:text-3xl font-black text-white">
+                <motion.h2 variants={fadeIn} className="text-2xl sm:text-3xl font-black text-foreground">
                   Pas encore décidé ?
                 </motion.h2>
                 <motion.p variants={fadeIn} custom={1} className="text-foreground/80 text-lg max-w-xl mx-auto">
@@ -673,7 +673,7 @@ const SalesPage = () => {
               Essayez <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-emerald-400">gratuitement</span> pendant 7 jours
             </motion.h2>
             <motion.p variants={fadeIn} custom={2} className="text-foreground/80 text-lg">
-              Accès complet à toutes les fonctionnalités Pro. Si ça ne vous plaît pas, annulez avant 7 jours — <strong className="text-white">0€ facturé</strong>.
+              Accès complet à toutes les fonctionnalités Pro. Si ça ne vous plaît pas, annulez avant 7 jours — <strong className="text-foreground">0€ facturé</strong>.
             </motion.p>
           </motion.div>
 
@@ -685,7 +685,7 @@ const SalesPage = () => {
                 {/* Price */}
                 <div className="text-center mb-10">
                   <div className="flex items-baseline justify-center gap-3 mb-2">
-                    <span className="text-7xl md:text-8xl font-black text-white">0€</span>
+                    <span className="text-7xl md:text-8xl font-black text-foreground">0€</span>
                   </div>
                   <p className="text-foreground/80 text-lg">pendant <span className="text-cyan-400 font-bold">7 jours</span></p>
                   <p className="text-muted-foreground mt-2">Puis <span className="line-through">{NORMAL_PRICE}€</span> <span className="text-cyan-400 font-bold">{LAUNCH_PRICE}€</span> paiement unique — Accès à vie</p>
@@ -711,7 +711,7 @@ const SalesPage = () => {
                       <div className="w-5 h-5 rounded-full bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
                         <Check className="w-3 h-3 text-cyan-400" />
                       </div>
-                      <span className="text-sm text-white">{f}</span>
+                      <span className="text-sm text-foreground">{f}</span>
                     </div>
                   ))}
                 </div>
@@ -833,7 +833,7 @@ const SalesPage = () => {
                 <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-400 to-emerald-400 flex items-center justify-center">
                   <BookOpen className="w-4 h-4 text-foreground" />
                 </div>
-                <h3 className="text-lg font-bold text-white">EbookStudio Pro</h3>
+                <h3 className="text-lg font-bold text-foreground">EbookStudio Pro</h3>
               </div>
               <p className="text-muted-foreground text-sm leading-relaxed">Le workflow IA #1 en France pour Amazon KDP.</p>
             </div>
@@ -898,7 +898,7 @@ const SalesPage = () => {
 
       {/* ═══════════════════════════════════════ TRIAL MODAL ═══════════════════════════════════════ */}
       {showTrialModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4" onClick={() => !trialLoading && setShowTrialModal(false)}>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-foreground/50 backdrop-blur-sm p-4" onClick={() => !trialLoading && setShowTrialModal(false)}>
           <div className="bg-card border border-border rounded-3xl max-w-md w-full p-8 relative" onClick={e => e.stopPropagation()}>
             <button type="button" onClick={() => !trialLoading && setShowTrialModal(false)} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground text-xl">✕</button>
             
@@ -907,7 +907,7 @@ const SalesPage = () => {
                 <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto">
                   <CheckCircle className="w-10 h-10 text-emerald-400" />
                 </div>
-                <h3 className="text-2xl font-bold text-white">Essai activé ! 🎉</h3>
+                <h3 className="text-2xl font-bold text-foreground">Essai activé ! 🎉</h3>
                 <p className="text-muted-foreground">Votre accès gratuit de 7 jours est prêt.</p>
                 <div className="bg-slate-800 rounded-xl p-4 space-y-2">
                   <p className="text-sm text-muted-foreground">Votre code d'accès :</p>
@@ -925,7 +925,7 @@ const SalesPage = () => {
                   <div className="w-14 h-14 rounded-full bg-cyan-500/20 flex items-center justify-center mx-auto">
                     <Gift className="w-8 h-8 text-cyan-400" />
                   </div>
-                  <h3 className="text-2xl font-bold text-white">Essai gratuit 7 jours</h3>
+                  <h3 className="text-2xl font-bold text-foreground">Essai gratuit 7 jours</h3>
                   <p className="text-muted-foreground text-sm">Accès complet à toutes les fonctionnalités Pro. Aucune carte bancaire requise.</p>
                 </div>
                 <div>
