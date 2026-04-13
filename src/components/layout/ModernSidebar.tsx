@@ -140,7 +140,6 @@ const allToolGroups: ToolGroup[] = [
       { id: 'subscription', label: 'Abonnement', icon: CreditCard },
       { id: 'settings', label: 'Paramètres', icon: Settings },
       { id: 'admin', label: 'Admin Panel', icon: Shield, isLink: true, href: '/admin', adminOnly: true },
-      { id: 'admin-panel', label: 'Gestion Admin', icon: Shield, isLink: true, href: '/admin', adminOnly: true },
     ]
   },
 ];

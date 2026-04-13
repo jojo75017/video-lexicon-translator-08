@@ -141,46 +141,14 @@ const EbookABTesting: React.FC<EbookABTestingProps> = ({
         }
         toast.success('🏆 Analyse terminée !');
       } else {
-        // Fallback simulation
-        simulateAnalysis();
+        toast.error('Analyse impossible — réponse vide du serveur. Réessayez.');
       }
     } catch (error) {
       console.error('Erreur A/B test:', error);
-      simulateAnalysis();
+      toast.error('Analyse impossible — vérifiez votre connexion et réessayez.');
     } finally {
       setIsAnalyzing(false);
     }
-  };
-
-  const simulateAnalysis = () => {
-    // Simulation pour démo
-    const scoredVariants = variants.map(v => ({
-      ...v,
-      score: Math.floor(Math.random() * 30) + 70,
-      analysis: {
-        clarity: Math.floor(Math.random() * 30) + 70,
-        emotion: Math.floor(Math.random() * 30) + 70,
-        uniqueness: Math.floor(Math.random() * 30) + 70,
-        marketFit: Math.floor(Math.random() * 30) + 70,
-      }
-    }));
-
-    const winner = scoredVariants.reduce((prev, current) => 
-      (prev.score || 0) > (current.score || 0) ? prev : current
-    );
-
-    setVariants(scoredVariants);
-    setTestResult({
-      winnerId: winner.id,
-      winnerName: winner.name,
-      confidence: winner.score || 85,
-      reasoning: `La ${winner.name} obtient le meilleur score grâce à sa clarté et son impact émotionnel supérieurs. Elle communique efficacement la proposition de valeur du livre.`,
-      recommendations: [
-        'Utilisez cette version comme base pour votre publication',
-        'Testez des variations mineures de cette version gagnante',
-        'Surveillez les performances réelles après publication'
-      ]
-    });
   };
 
   const generateAIVariants = async () => {
