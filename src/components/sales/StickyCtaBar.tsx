@@ -63,7 +63,7 @@ export const StickyCtaBar: React.FC<StickyCtaBarProps> = ({ onCtaClick }) => {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className="fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-r from-secondary via-muted to-secondary border-t border-violet-500/30 shadow-2xl shadow-black/50"
+          className="fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-r from-card via-card to-card border-t border-primary/30 shadow-2xl shadow-primary/10"
         >
           {/* Progress bar at top */}
           <div className="absolute top-0 left-0 right-0 h-1 bg-slate-700">
@@ -93,7 +93,7 @@ export const StickyCtaBar: React.FC<StickyCtaBarProps> = ({ onCtaClick }) => {
                       </span>
                     </>
                   ) : (
-                    <Badge className="bg-violet-500/20 text-violet-400 border-violet-500/30">
+                    <Badge className="bg-primary/20 text-primary border-primary/30">
                       ⭐ OFFRE SPÉCIALE
                     </Badge>
                   )}
@@ -125,7 +125,7 @@ export const StickyCtaBar: React.FC<StickyCtaBarProps> = ({ onCtaClick }) => {
               <div className="flex items-center gap-2">
                 <Button
                   size="lg"
-                  className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-foreground shadow-lg shadow-violet-500/25 whitespace-nowrap"
+                  className="bg-gradient-to-r from-primary to-accent hover:from-violet-500 hover:to-purple-500 text-foreground shadow-lg shadow-primary/25 whitespace-nowrap"
                   onClick={handleCtaClick}
                 >
                   <Sparkles className="w-4 h-4 mr-2" />
