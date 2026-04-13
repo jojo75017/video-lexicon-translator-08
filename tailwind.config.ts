@@ -36,6 +36,7 @@ export default {
         rose: "hsl(var(--rose))",
         indigo: "hsl(var(--indigo))",
         sky: "hsl(var(--sky))",
+        "kdp-orange": "hsl(var(--kdp-orange))",
         gold: {
           DEFAULT: "hsl(var(--gold))",
           light: "hsl(var(--gold-light))",
