@@ -1,5 +1,29 @@
 import { useState, useEffect } from 'react';
-import { validateOpenAIApiKey } from '@/services/openai/openaiApiUtils';
+import { toast } from 'sonner';
+
+const validateOpenAIApiKey = async (apiKey: string, _model: string): Promise<boolean> => {
+  try {
+    toast.loading("Validation de la clé API Gemini...", { id: "validate-openai-key" });
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+    if (response.status === 429) {
+      toast.warning("Clé API valide mais limite de requêtes atteinte", { id: "validate-openai-key" });
+      return true;
+    }
+    if (response.status === 400 || response.status === 401 || response.status === 403) {
+      toast.error("Clé API Gemini invalide", { id: "validate-openai-key" });
+      return false;
+    }
+    if (!response.ok) {
+      toast.error("Erreur de validation", { id: "validate-openai-key" });
+      return false;
+    }
+    toast.success("Clé API Gemini validée ✓", { id: "validate-openai-key" });
+    return true;
+  } catch {
+    toast.error("Erreur de connexion", { id: "validate-openai-key" });
+    return false;
+  }
+};
 import { 
   isValidApiKeyFormat, 
   maskApiKey, 
