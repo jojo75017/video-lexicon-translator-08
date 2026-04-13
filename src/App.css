@@ -6,14 +6,14 @@
 
 /* ── CHARTER: Grid pattern ── */
 .bg-grid-pattern {
-  background-image: linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-image: linear-gradient(to right, rgba(0,0,0,0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0,0,0,0.03) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
 /* ── CHARTER: Gradient text ── */
 .gradient-text {
-  background: linear-gradient(135deg, #3B9EFF, #0052CC);
+  background: linear-gradient(135deg, #008296, #005F73);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-size: 200% auto;
@@ -29,22 +29,22 @@
 .feature-card {
   transition: all 0.3s ease;
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #FFFFFF;
+  border: 1px solid #D5D9D9;
 }
 
 .feature-card:hover {
   transform: translateY(-5px);
-  border-color: rgba(59, 158, 255, 0.3);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  border-color: rgba(0, 130, 150, 0.3);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
 }
 
 /* ── CHARTER: Glass card ── */
 .glass-card {
-  background: rgba(255, 255, 255, 0.05);
+  background: #FFFFFF;
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  border: 1px solid #D5D9D9;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
 }
 
 /* ── CHARTER: Fade in ── */
@@ -59,7 +59,7 @@
 
 /* ── CHARTER: Animated gradient ── */
 .animated-gradient {
-  background: linear-gradient(270deg, #3B9EFF, #0052CC, #3B9EFF);
+  background: linear-gradient(270deg, #008296, #005F73, #008296);
   background-size: 200% 200%;
   animation: gradient 6s ease infinite;
 }
@@ -72,7 +72,7 @@
 
 /* ── CHARTER: Elegant button ── */
 .elegant-button {
-  background: linear-gradient(135deg, #3B9EFF, #0052CC);
+  background: linear-gradient(135deg, #008296, #005F73);
   color: white;
   padding: 13px 26px;
   border-radius: 10px;
@@ -80,24 +80,24 @@
   border: none;
   cursor: pointer;
   font-weight: 700;
-  box-shadow: 0 6px 24px rgba(59, 158, 255, 0.35);
+  box-shadow: 0 4px 14px rgba(0, 130, 150, 0.25);
 }
 
 .elegant-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 32px rgba(59, 158, 255, 0.45);
+  box-shadow: 0 6px 20px rgba(0, 130, 150, 0.35);
 }
 
 /* ── CHARTER: Modern nav ── */
 .modern-nav {
-  background: rgba(13, 8, 32, 0.95);
+  background: rgba(250, 250, 250, 0.95);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid #D5D9D9;
 }
 
 /* ── CHARTER: Soft shadow ── */
 .soft-shadow {
-  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.08);
 }
 
 /* ── CHARTER: Floating animation ── */
@@ -113,7 +113,7 @@
 
 /* ── CHARTER: Elegant button v2 ── */
 .elegant-button-v2 {
-  background: linear-gradient(135deg, #3B9EFF, #0052CC);
+  background: linear-gradient(135deg, #008296, #005F73);
   color: white;
   padding: 13px 26px;
   border-radius: 10px;
@@ -124,19 +124,19 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  box-shadow: 0 6px 24px rgba(59, 158, 255, 0.35);
+  box-shadow: 0 4px 14px rgba(0, 130, 150, 0.25);
 }
 
 .elegant-button-v2:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 32px rgba(59, 158, 255, 0.45);
+  box-shadow: 0 6px 20px rgba(0, 130, 150, 0.35);
 }
 
 /* ── CHARTER: Glass card v2 ── */
 .glass-card-v2 {
-  background: rgba(255, 255, 255, 0.05);
+  background: #FFFFFF;
   backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid #D5D9D9;
   border-radius: 14px;
 }
 
@@ -147,18 +147,18 @@
 
 .pulse-on-hover:hover {
   transform: scale(1.02);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
-  border-color: rgba(59, 158, 255, 0.3);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 130, 150, 0.3);
 }
 
 /* ── CHARTER: Quora gradient ── */
 .quora-gradient-button {
-  background: linear-gradient(135deg, #3B9EFF, #0052CC);
+  background: linear-gradient(135deg, #008296, #005F73);
   color: white;
   transition: all 0.3s ease;
 }
 
 .quora-gradient-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(59, 158, 255, 0.25);
+  box-shadow: 0 10px 20px rgba(0, 130, 150, 0.2);
 }
