@@ -327,10 +327,10 @@ const MenuItemButton: React.FC<{
           : "hover:bg-card/80"
       )}
     >
-      <Icon className={cn("w-4 h-4 flex-shrink-0", isActive ? colors.text : "text-muted-foreground")} />
+      <Icon className={cn("w-4 h-4 flex-shrink-0", isActive ? colors.icon : "text-muted-foreground")} />
       <span className={cn(
         "text-sm flex-1 truncate",
-        isActive ? cn("font-semibold", colors.text) : "text-muted-foreground"
+        isActive ? cn("font-semibold", colors.text) : "text-foreground group-hover:text-kdp-orange"
       )}>
         {item.label}
       </span>
