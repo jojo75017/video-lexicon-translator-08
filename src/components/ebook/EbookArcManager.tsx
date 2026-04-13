@@ -243,27 +243,7 @@ ${authorName}`);
       toast.success('Analyse terminée !');
     } catch (error) {
       console.error('Erreur analyse titre:', error);
-      // Fallback avec données simulées
-      setTitleAnalysis({
-        score: Math.floor(Math.random() * 30) + 65,
-        marketPotential: "Ce titre a un bon potentiel sur Amazon KDP. Il utilise des mots-clés recherchés et évoque clairement le bénéfice pour le lecteur.",
-        kdpOptimization: "Le titre est optimisé pour la recherche Amazon avec des termes pertinents. Ajoutez un sous-titre avec des mots-clés additionnels pour maximiser la visibilité.",
-        emotionalImpact: "Le titre crée une curiosité modérée. Considérez l'ajout de mots à forte charge émotionnelle comme 'secret', 'ultime', ou 'révélé'.",
-        suggestions: [
-          `${titleToAnalyze} : Le Guide Complet`,
-          `${titleToAnalyze} - Secrets et Stratégies`,
-          `Maîtrisez ${titleToAnalyze} en 30 Jours`,
-          `${titleToAnalyze} pour Débutants`,
-          `Le Guide Ultime de ${titleToAnalyze}`
-        ],
-        keywords: ['guide', 'méthode', 'stratégie', 'débutant', 'complet', 'ultime'],
-        competitorTitles: [
-          'Le Grand Livre de la Réussite',
-          'Secrets des Auteurs à Succès',
-          'Comment Publier son Premier Livre'
-        ]
-      });
-      toast.info('Analyse simulée (API indisponible)');
+      toast.error('Analyse du titre impossible — vérifiez votre connexion et réessayez.');
     } finally {
       setIsAnalyzingTitle(false);
     }

@@ -74,7 +74,7 @@ export const EbookBetaReaderHub: React.FC<EbookBetaReaderHubProps> = ({
       id: Date.now().toString(),
       chapterIndex: selectedChapter,
       chapterTitle: chapters[selectedChapter]?.title || `Chapitre ${selectedChapter + 1}`,
-      readerName: readers.length > 0 ? readers[Math.floor(Math.random() * readers.length)].name : 'Bêta-lecteur',
+      readerName: readers.length > 0 ? readers[0].name : 'Bêta-lecteur',
       rating: newRating,
       comment: newComment.trim(),
       category: newCategory,
