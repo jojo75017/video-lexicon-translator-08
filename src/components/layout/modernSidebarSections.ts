@@ -16,7 +16,7 @@ export const SIDEBAR_SUBSECTIONS: Record<string, SidebarSectionConfig[]> = {
     { label: 'Univers', itemIds: ['characters', 'series'] },
     { label: 'Formats KDP', itemIds: ['atlas', 'encyclopedia', 'coloring', 'documentary'] },
     { label: 'Imports', itemIds: ['doc-transform', 'url-import'] },
-    { label: 'Outils', itemIds: ['templates', 'strict-proofread'] },
+    { label: 'Outils', itemIds: ['templates', 'strict-proofread', 'multi-translator'] },
   ],
   '📦 Publier': [
     { label: 'Exports', itemIds: ['export', 'workflow-export', 'calibre-epub'] },
