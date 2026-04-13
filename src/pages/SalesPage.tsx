@@ -532,13 +532,13 @@ const SalesPage = () => {
                 <p className="text-xs text-muted-foreground">utilisent EbookStudio</p>
               </div>
             </div>
-            <div className="h-10 w-px bg-slate-800 hidden sm:block" />
+            <div className="h-10 w-px bg-muted hidden sm:block" />
             <div className="flex items-center gap-2">
               {[1,2,3,4,5].map(i => <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />)}
               <span className="font-bold text-foreground ml-2">4.8/5</span>
               <span className="text-muted-foreground text-sm">(47 avis)</span>
             </div>
-            <div className="h-10 w-px bg-slate-800 hidden sm:block" />
+            <div className="h-10 w-px bg-muted hidden sm:block" />
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
                 <Trophy className="w-5 h-5 text-amber-400" />
@@ -607,7 +607,7 @@ const SalesPage = () => {
       <PriceComparison />
 
       {/* ═══════════════════════════════════════ LEAD CAPTURE GRATUIT ═══════════════════════════════════════ */}
-      <section className="py-16 px-4 bg-gradient-to-b from-slate-950 to-slate-900">
+      <section className="py-16 px-4 bg-gradient-to-b from-background to-secondary">
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="max-w-3xl mx-auto">
           <Card className="bg-gradient-to-br from-amber-50 to-secondary border-2 border-amber-500/30 rounded-3xl overflow-hidden shadow-2xl shadow-amber-500/10">
             <CardContent className="p-8 md:p-10">
@@ -909,7 +909,7 @@ const SalesPage = () => {
                 </div>
                 <h3 className="text-2xl font-bold text-foreground">Essai activé ! 🎉</h3>
                 <p className="text-muted-foreground">Votre accès gratuit de 7 jours est prêt.</p>
-                <div className="bg-slate-800 rounded-xl p-4 space-y-2">
+                <div className="bg-muted rounded-xl p-4 space-y-2">
                   <p className="text-sm text-muted-foreground">Votre code d'accès :</p>
                   <p className="text-2xl font-mono font-bold text-primary">{trialResult.accessCode}</p>
                   <p className="text-sm text-muted-foreground">Email : {trialResult.email}</p>
@@ -935,7 +935,7 @@ const SalesPage = () => {
                     value={trialEmail}
                     onChange={e => setTrialEmail(e.target.value)}
                     required
-                    className="bg-slate-800 border-border text-foreground placeholder:text-muted-foreground h-12 rounded-xl text-center text-lg"
+                    className="bg-muted border-border text-foreground placeholder:text-muted-foreground h-12 rounded-xl text-center text-lg"
                   />
                 </div>
                 <Button type="submit" size="lg" disabled={trialLoading} className="w-full py-6 bg-gradient-to-r from-primary to-accent hover:from-cyan-400 hover:to-emerald-400 text-foreground font-bold rounded-xl text-lg">

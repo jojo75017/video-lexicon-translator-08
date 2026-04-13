@@ -47,7 +47,7 @@ const ProgressEngagement = ({
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 bg-gradient-to-r from-slate-900/95 via-violet-900/95 to-slate-900/95 backdrop-blur-md border-t border-violet-500/30 py-3 px-4 md:py-4">
+    <div className="fixed bottom-0 left-0 right-0 z-40 bg-gradient-to-r from-secondary/95 via-violet-900/95 to-secondary/95 backdrop-blur-md border-t border-violet-500/30 py-3 px-4 md:py-4">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center gap-4">
           {/* Progress Section */}

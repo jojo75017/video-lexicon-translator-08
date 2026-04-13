@@ -63,7 +63,7 @@ export const StickyCtaBar: React.FC<StickyCtaBarProps> = ({ onCtaClick }) => {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className="fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-t border-violet-500/30 shadow-2xl shadow-black/50"
+          className="fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-r from-secondary via-muted to-secondary border-t border-violet-500/30 shadow-2xl shadow-black/50"
         >
           {/* Progress bar at top */}
           <div className="absolute top-0 left-0 right-0 h-1 bg-slate-700">

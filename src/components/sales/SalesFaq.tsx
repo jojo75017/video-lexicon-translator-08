@@ -58,7 +58,7 @@ const SalesFaq: React.FC = () => {
   return (
     <section className="relative py-20 px-4 overflow-hidden">
       {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-slate-900/50 to-slate-950" />
+      <div className="absolute inset-0 bg-gradient-to-b from-background via-secondary/50 to-background" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_0%,rgba(6,182,212,0.05),transparent)]" />
 
       <div className="max-w-3xl mx-auto relative z-10">

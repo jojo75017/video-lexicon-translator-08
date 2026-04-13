@@ -78,7 +78,7 @@ const ScrollIntentPopup = ({ scrollThreshold = 50 }: ScrollIntentPopupProps) => 
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-md border-violet-500/30 bg-gradient-to-br from-slate-900 via-slate-900 to-violet-950">
+      <DialogContent className="sm:max-w-md border-violet-500/30 bg-gradient-to-br from-secondary via-secondary to-violet-950">
         <button 
           onClick={() => setIsOpen(false)}
           className="absolute right-4 top-4 text-foreground/60 hover:text-foreground"
