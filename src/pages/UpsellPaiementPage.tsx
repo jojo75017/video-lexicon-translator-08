@@ -73,7 +73,7 @@ const UpsellPaiementPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 py-8 px-4">
+    <div className="min-h-screen bg-background py-8 px-4">
       <div className="max-w-xl mx-auto">
         <Link to="/offres" className="inline-flex items-center gap-2 text-white/60 hover:text-white mb-6 text-sm">
           <ArrowLeft className="w-4 h-4" />
@@ -89,7 +89,7 @@ const UpsellPaiementPage = () => {
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-          <Card className="border border-slate-800 shadow-2xl bg-slate-900/95 backdrop-blur overflow-hidden">
+          <Card className="border border-border shadow-2xl bg-card/95 backdrop-blur overflow-hidden">
             {/* Header */}
             <CardHeader className="text-center bg-gradient-to-r from-cyan-600 to-emerald-600 text-white py-8 relative">
               <div className="absolute top-3 right-3">
@@ -132,7 +132,7 @@ const UpsellPaiementPage = () => {
                     ))}
                   </div>
                   {/* Tech badges */}
-                  <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-slate-700">
+                  <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-border">
                     {[
                       { icon: Cpu, label: "Gemini 3 Flash" },
                       { icon: Image, label: "Imagen 3" },
@@ -157,7 +157,7 @@ const UpsellPaiementPage = () => {
                   placeholder="votre@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 h-12 rounded-xl"
+                  className="bg-slate-800 border-border text-white placeholder:text-slate-500 h-12 rounded-xl"
                 />
                 <p className="text-[11px] text-slate-500 flex items-center gap-1">
                   <Lock className="w-3 h-3" />
@@ -179,7 +179,7 @@ const UpsellPaiementPage = () => {
                       className={`w-full flex items-center justify-between p-4 rounded-xl border-2 transition-all ${
                         selectedPayment === option.id 
                           ? 'border-cyan-400 bg-cyan-950/30 shadow-lg shadow-cyan-500/10' 
-                          : 'border-slate-700 hover:border-slate-600 bg-slate-800/30'
+                          : 'border-border hover:border-slate-600 bg-slate-800/30'
                       }`}
                     >
                       <div className="flex items-center gap-3">
@@ -233,7 +233,7 @@ const UpsellPaiementPage = () => {
               </div>
 
               {/* Step 4: Confirm */}
-              <div className="space-y-2 pt-2 border-t border-slate-800">
+              <div className="space-y-2 pt-2 border-t border-border">
                 <label className="text-white font-medium text-sm flex items-center gap-2">
                   <span className="bg-slate-700 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">4</span>
                   Après paiement
@@ -241,7 +241,7 @@ const UpsellPaiementPage = () => {
                 <Button 
                   onClick={goToConfirmation} 
                   variant="outline"
-                  className="w-full border-slate-700 text-white hover:bg-slate-800 hover:border-slate-600 rounded-xl"
+                  className="w-full border-border text-white hover:bg-slate-800 hover:border-slate-600 rounded-xl"
                   size="lg"
                 >
                   <CheckCircle className="w-5 h-5 mr-2 text-emerald-400" />
@@ -286,7 +286,7 @@ const UpsellPaiementPage = () => {
             { q: "Est-ce vraiment un paiement unique ?", a: "Oui, 67€ une seule fois. Pas d'abonnement, pas de frais cachés. Accès à vie." },
             { q: "Et si ça ne me convient pas ?", a: "Vous avez 30 jours pour tester. Remboursement intégral sans justification." },
           ].map((faq, i) => (
-            <details key={i} className="group bg-slate-900/50 border border-slate-800 rounded-xl">
+            <details key={i} className="group bg-card border border-border rounded-xl">
               <summary className="px-4 py-3 cursor-pointer text-white/80 hover:text-white font-medium flex items-center justify-between">
                 {faq.q}
                 <ArrowRight className="w-4 h-4 group-open:rotate-90 transition-transform flex-shrink-0" />
