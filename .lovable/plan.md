@@ -1,61 +1,47 @@
 
 
-## Audit final — ce qui bloque encore
+## Migration vers le thème Amazon KDP (Option C)
 
-Apres verification complete du code, de la securite et de la base de donnees, voici les problemes restants classes par priorite.
-
----
-
-### CRITIQUE — Securite (3 problemes)
-
-| # | Probleme | Impact |
-|---|----------|--------|
-| 1 | **Subscribers INSERT ouvert a tous** | La policy `Service role can insert subscriptions` est sur le role `public` avec `WITH CHECK (true)`. N'importe qui peut s'auto-inscrire en tant qu'abonne premium via l'API. Faille d'elevation de privileges. |
-| 2 | **Donnees sensibles en Realtime** | Les tables `subscribers` et `payment_confirmations` sont publiees en Realtime sans protection. Tout utilisateur authentifie peut ecouter les changements et voir les emails, codes d'acces et donnees de paiement des autres. |
-| 3 | **Fonction `has_role(text, app_role)` cassee** | L'overload email de `has_role` cherche une colonne `email` qui n'existe pas dans `user_roles`. Si invoquee, elle crashera. Risque de faille si utilisee dans une future policy. |
-
-### MAJEUR — Securite residuelle (3 problemes)
-
-| # | Probleme | Impact |
-|---|----------|--------|
-| 4 | **Email admin en dur dans `AdminDirectPage.tsx`** | `ADMIN_EMAIL = 'boubetgeorges@gmail.com'` est encore visible dans le code. De plus, ce fichier remet `sessionStorage.setItem('is_admin', 'true')` — exactement la faille corrigee dans App.tsx mais toujours presente ici. |
-| 5 | **Policy INSERT `payment_confirmations` ouverte** | `Anyone can submit payment confirmation` avec `WITH CHECK (true)` sur role `public`. Un attaquant peut injecter de faux paiements. |
-| 6 | **Policy INSERT `forum_notifications` ouverte** | `Service can create notifications` avec `WITH CHECK (true)` sur `authenticated`. Un utilisateur peut spammer les notifications de n'importe qui. |
-
-### MOYEN — Nettoyage code (2 problemes)
-
-| # | Probleme | Impact |
-|---|----------|--------|
-| 7 | **~50 routes encore actives** | Beaucoup de pages marketing/SEO/vente encore routees alors que la commercialisation est suspendue. Augmente le bundle et la surface d'attaque. |
-| 8 | **Bucket `audiobooks` sans policy UPDATE** | Les fichiers audio ne peuvent pas etre mis a jour par leurs proprietaires. |
+Palette choisie :
+- **Fond** : `#FAFAFA` (blanc cassé) / `#FFFFFF` (cartes)
+- **Accent** : `#008296` (teal Amazon)
+- **Texte** : `#232F3E` (gris Amazon foncé)
+- **Texte secondaire** : `#565959` (gris Amazon)
+- **Bordures** : `#D5D9D9` (gris Amazon clair)
 
 ---
 
-### Plan de correction
+### Fichiers modifiés
 
-**Etape 1 — Securite critique (migration SQL)**
-- Changer la policy INSERT de `subscribers` pour `service_role` uniquement
-- Retirer `subscribers` et `payment_confirmations` de la publication Realtime
-- Supprimer l'overload cassee `has_role(text, app_role)`
-- Restreindre INSERT `payment_confirmations` aux utilisateurs authentifies avec `WITH CHECK (auth.uid() IS NOT NULL)`
-- Restreindre INSERT `forum_notifications` avec `WITH CHECK (auth.uid() = user_id)`
+**1. `src/index.css`** — Variables CSS `:root` et `.dark`
+- Remplacer le fond sombre `#0d0820` par `#FAFAFA`, les cartes par `#FFFFFF`
+- Accent `#3B9EFF` → `#008296` (teal), accent deep `#0052CC` → `#005F73`
+- Texte blanc → `#232F3E`, muted → `#565959`
+- Bordures → `#D5D9D9`
+- Mettre à jour tous les gradients, shadows et variables charter
+- Bloc `.dark` : même palette (thème unique clair)
 
-**Etape 2 — AdminDirectPage.tsx**
-- Supprimer l'email admin en dur
-- Supprimer les `sessionStorage.setItem('is_admin', 'true')` — utiliser uniquement la verification serveur comme dans App.tsx
+**2. `src/App.css`** — Classes utilitaires
+- `.gradient-text`, `.animated-gradient`, `.elegant-button`, `.elegant-button-v2`, `.quora-gradient-button` : remplacer `#3B9EFF`/`#0052CC` par `#008296`/`#005F73`
+- `.modern-nav` : fond clair `rgba(250,250,250,0.95)`, bordure `#D5D9D9`
+- `.feature-card`, `.glass-card` : adapter pour fond clair (backgrounds blancs, bordures grises)
 
-**Etape 3 — Storage**
-- Ajouter une policy UPDATE sur le bucket `audiobooks` pour les proprietaires
+**3. `tailwind.config.ts`** — Couleurs et gradients
+- `gradient-magazine-hero` : utiliser le teal au lieu du bleu
 
-**Etape 4 — Nettoyage optionnel des routes**
-- Commenter ou supprimer les routes de vente/marketing si vous confirmez la suspension
+**4. `src/components/ebook/KdpAmazonResearch.tsx`** — Tab active color
+- Remplacer `bg-[#3B9EFF]` par la classe `bg-primary`
+
+**5. `src/pages/EbookPlannerPage.tsx`** — Couleurs hardcodées
+- Remplacer les `#3B9EFF` et `#0052CC` dans les stats et le welcome banner par les variables CSS/classes Tailwind
+
+**6. Migration SQL** — Policies restantes
+- Changer les 8 policies `published_books`, `series_bibles`, `book_tracking_history`, `ebook_projects`, `ebook_project_versions` de `public` à `authenticated`
+- Restreindre upload audiobooks par dossier utilisateur
 
 ---
 
-### Sections techniques
+### Résultat attendu
 
-Fichiers modifies :
-- 1 migration SQL (policies RLS + Realtime + fonction)
-- `src/pages/AdminDirectPage.tsx` (suppression email hardcode + sessionStorage)
-- Pas besoin de toucher a `App.tsx` (deja corrige)
+L'application passera d'un thème sombre bleu électrique agressif à un thème clair, reposant, inspiré d'Amazon/KDP : fond blanc cassé, accent teal professionnel, texte gris foncé lisible. Toutes les pages hériteront automatiquement via les variables CSS.
 
