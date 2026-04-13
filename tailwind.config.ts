@@ -87,7 +87,7 @@ export default {
         'gradient-subtle': 'var(--gradient-subtle)',
         'gradient-card': 'var(--gradient-card)',
         'gradient-glass': 'var(--gradient-glass)',
-        'gradient-magazine-hero': 'linear-gradient(135deg, hsl(210 100% 62%) 0%, hsl(216 100% 40%) 100%)',
+        'gradient-magazine-hero': 'linear-gradient(135deg, hsl(189 100% 29%) 0%, hsl(189 100% 23%) 100%)',
         'gradient-gold': 'var(--gradient-gold)',
         'gradient-gold-subtle': 'var(--gradient-gold-subtle)',
       },

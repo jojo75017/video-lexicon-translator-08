@@ -4,82 +4,82 @@
 
 @layer base {
   :root {
-    /* ── CHARTE EBOOKSTUDIO 2026 ── */
-    /* Fond principal: #0d0820 */
-    --background: 253 60% 8%;
-    --foreground: 0 0% 100%;
+    /* ── CHARTE EBOOKSTUDIO — Amazon KDP Style ── */
+    /* Fond principal: #FAFAFA */
+    --background: 0 0% 98%;
+    --foreground: 213 32% 19%;
 
-    /* Fond section: #0d1a2e */
-    --card: 216 56% 12%;
-    --card-foreground: 0 0% 100%;
-    --popover: 216 56% 12%;
-    --popover-foreground: 0 0% 100%;
+    /* Cartes: #FFFFFF */
+    --card: 0 0% 100%;
+    --card-foreground: 213 32% 19%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 213 32% 19%;
 
-    /* Accent principal: #3B9EFF */
-    --primary: 210 100% 62%;
+    /* Accent principal: #008296 (teal Amazon) */
+    --primary: 189 100% 29%;
     --primary-foreground: 0 0% 100%;
 
     /* Fond secondaire */
-    --secondary: 216 56% 14%;
-    --secondary-foreground: 0 0% 90%;
+    --secondary: 210 14% 96%;
+    --secondary-foreground: 213 32% 19%;
 
     /* Muted */
-    --muted: 216 40% 16%;
-    --muted-foreground: 0 0% 65%;
+    --muted: 210 14% 95%;
+    --muted-foreground: 200 5% 34%;
 
-    /* Accent deep: #0052CC */
-    --accent: 216 100% 40%;
+    /* Accent deep: #005F73 */
+    --accent: 189 100% 23%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 70% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Bordures: rgba(255,255,255,0.08) → approx solid on dark bg */
-    --border: 253 20% 16%;
-    --input: 253 20% 18%;
-    --ring: 210 100% 62%;
+    /* Bordures: #D5D9D9 */
+    --border: 180 3% 84%;
+    --input: 180 3% 84%;
+    --ring: 189 100% 29%;
     --radius: 0.75rem;
 
-    /* ── Accent System - Blue Charter ── */
-    --accent-blue: 210 100% 62%;
-    --accent-deep: 216 100% 40%;
-    --accent-glow: 210 100% 62%;
-    --accent-soft: 210 100% 62%;
+    /* ── Accent System - Teal Charter ── */
+    --accent-blue: 189 100% 29%;
+    --accent-deep: 189 100% 23%;
+    --accent-glow: 189 100% 29%;
+    --accent-soft: 189 100% 29%;
 
     /* ── Charter CSS Custom Properties ── */
-    --charter-accent: #3B9EFF;
-    --charter-accent-deep: #0052CC;
-    --charter-accent-glow: rgba(59, 158, 255, 0.35);
-    --charter-accent-soft: rgba(59, 158, 255, 0.12);
-    --charter-accent-border: rgba(59, 158, 255, 0.3);
-    --charter-bg-main: #0d0820;
-    --charter-bg-section: #0d1a2e;
-    --charter-bg-card: rgba(255, 255, 255, 0.05);
-    --charter-border: rgba(255, 255, 255, 0.08);
-    --charter-text-primary: #ffffff;
-    --charter-text-secondary: rgba(255, 255, 255, 0.65);
-    --charter-text-muted: rgba(255, 255, 255, 0.35);
+    --charter-accent: #008296;
+    --charter-accent-deep: #005F73;
+    --charter-accent-glow: rgba(0, 130, 150, 0.25);
+    --charter-accent-soft: rgba(0, 130, 150, 0.08);
+    --charter-accent-border: rgba(0, 130, 150, 0.25);
+    --charter-bg-main: #FAFAFA;
+    --charter-bg-section: #F4F5F7;
+    --charter-bg-card: #FFFFFF;
+    --charter-border: #D5D9D9;
+    --charter-text-primary: #232F3E;
+    --charter-text-secondary: #565959;
+    --charter-text-muted: #8D9096;
 
     /* Pastel palette (legacy) */
-    --pastel-violet: 210 65% 75%;
+    --pastel-violet: 189 50% 75%;
     --pastel-pink: 330 65% 80%;
-    --pastel-blue: 210 70% 80%;
+    --pastel-blue: 189 50% 80%;
     --pastel-mint: 160 55% 75%;
     --pastel-peach: 25 80% 80%;
-    --pastel-lavender: 216 60% 82%;
+    --pastel-lavender: 189 40% 82%;
 
     /* Palette Moderne */
-    --violet: 210 100% 62%;
-    --violet-light: 210 100% 72%;
-    --violet-dark: 216 100% 40%;
-    --fuchsia: 210 90% 55%;
-    --cyan: 210 100% 62%;
-    --cyan-light: 210 100% 72%;
+    --violet: 189 100% 29%;
+    --violet-light: 189 80% 45%;
+    --violet-dark: 189 100% 23%;
+    --fuchsia: 189 90% 35%;
+    --cyan: 189 100% 29%;
+    --cyan-light: 189 80% 45%;
     --emerald: 160 84% 39%;
     --amber: 38 92% 50%;
     --rose: 346 77% 50%;
-    --indigo: 216 100% 40%;
-    --sky: 210 100% 62%;
+    --indigo: 189 100% 23%;
+    --sky: 189 100% 29%;
 
     /* Gold Luxe Palette */
     --gold: 43 96% 56%;
@@ -93,55 +93,55 @@
 
     /* Legacy Colors */
     --coral-pink: 12 76% 61%;
-    --royal-purple: 216 100% 40%;
-    --navy-deep: 253 60% 8%;
+    --royal-purple: 189 100% 23%;
+    --navy-deep: 213 32% 19%;
     --cream: 40 40% 97%;
-    --gray-cool: 214 32% 60%;
+    --gray-cool: 200 5% 50%;
 
-    /* ── Gradients Premium - Blue Charter ── */
-    --gradient-primary: linear-gradient(135deg, #3B9EFF 0%, #0052CC 100%);
-    --gradient-secondary: linear-gradient(135deg, #0052CC 0%, #3B9EFF 100%);
+    /* ── Gradients - Teal Charter ── */
+    --gradient-primary: linear-gradient(135deg, #008296 0%, #005F73 100%);
+    --gradient-secondary: linear-gradient(135deg, #005F73 0%, #008296 100%);
     --gradient-accent: linear-gradient(135deg, hsl(38 92% 50%) 0%, hsl(346 77% 50%) 100%);
-    --gradient-hero: linear-gradient(135deg, #0d1a2e 0%, #0d2444 100%);
-    --gradient-subtle: linear-gradient(135deg, #0d0820 0%, #0d1a2e 100%);
-    --gradient-card: linear-gradient(145deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
-    --gradient-glass: linear-gradient(145deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.03) 100%);
-    --gradient-header-line: linear-gradient(90deg, #0052CC, #3B9EFF);
-    --gradient-separator: linear-gradient(90deg, transparent, rgba(59, 158, 255, 0.3), transparent);
+    --gradient-hero: linear-gradient(135deg, #F4F5F7 0%, #E8EAED 100%);
+    --gradient-subtle: linear-gradient(135deg, #FAFAFA 0%, #F4F5F7 100%);
+    --gradient-card: linear-gradient(145deg, #FFFFFF 0%, #F9FAFB 100%);
+    --gradient-glass: linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+    --gradient-header-line: linear-gradient(90deg, #005F73, #008296);
+    --gradient-separator: linear-gradient(90deg, transparent, rgba(0, 130, 150, 0.2), transparent);
 
     /* ── Shadows ── */
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-    --shadow-violet: 0 10px 40px -10px rgba(59, 158, 255, 0.4);
-    --shadow-fuchsia: 0 10px 40px -10px rgba(59, 158, 255, 0.4);
-    --shadow-cyan: 0 10px 40px -10px rgba(59, 158, 255, 0.4);
-    --shadow-glow: 0 0 60px rgba(59, 158, 255, 0.2);
-    --shadow-cta: 0 6px 24px rgba(59, 158, 255, 0.35);
-    --shadow-cta-hover: 0 8px 32px rgba(59, 158, 255, 0.45);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.04);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.08), 0 8px 10px -6px rgb(0 0 0 / 0.04);
+    --shadow-violet: 0 10px 40px -10px rgba(0, 130, 150, 0.2);
+    --shadow-fuchsia: 0 10px 40px -10px rgba(0, 130, 150, 0.2);
+    --shadow-cyan: 0 10px 40px -10px rgba(0, 130, 150, 0.2);
+    --shadow-glow: 0 0 60px rgba(0, 130, 150, 0.1);
+    --shadow-cta: 0 4px 14px rgba(0, 130, 150, 0.25);
+    --shadow-cta-hover: 0 6px 20px rgba(0, 130, 150, 0.35);
   }
 
   .dark {
-    --background: 253 60% 8%;
-    --foreground: 0 0% 100%;
-    --card: 216 56% 12%;
-    --card-foreground: 0 0% 100%;
-    --popover: 216 56% 12%;
-    --popover-foreground: 0 0% 100%;
-    --primary: 210 100% 62%;
+    --background: 0 0% 98%;
+    --foreground: 213 32% 19%;
+    --card: 0 0% 100%;
+    --card-foreground: 213 32% 19%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 213 32% 19%;
+    --primary: 189 100% 29%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 216 56% 14%;
-    --secondary-foreground: 0 0% 90%;
-    --muted: 216 40% 16%;
-    --muted-foreground: 0 0% 65%;
-    --accent: 216 100% 40%;
+    --secondary: 210 14% 96%;
+    --secondary-foreground: 213 32% 19%;
+    --muted: 210 14% 95%;
+    --muted-foreground: 200 5% 34%;
+    --accent: 189 100% 23%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 60% 45%;
     --destructive-foreground: 0 0% 100%;
-    --border: 253 20% 16%;
-    --input: 253 20% 18%;
-    --ring: 210 100% 62%;
+    --border: 180 3% 84%;
+    --input: 180 3% 84%;
+    --ring: 189 100% 29%;
   }
 }
 
@@ -191,7 +191,7 @@ a {
 }
 
 a:hover {
-  color: #5bb3ff;
+  color: #00a3b5;
 }
 
 /* ── Glass Morphism ── */
@@ -199,7 +199,7 @@ a:hover {
   background: var(--gradient-glass);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .glass-card {
@@ -344,8 +344,8 @@ a:hover {
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(59, 158, 255, 0.3); }
-  50% { box-shadow: 0 0 40px rgba(59, 158, 255, 0.5); }
+  0%, 100% { box-shadow: 0 0 20px rgba(0, 130, 150, 0.15); }
+  50% { box-shadow: 0 0 40px rgba(0, 130, 150, 0.3); }
 }
 
 @keyframes shimmer {
@@ -376,7 +376,7 @@ a:hover {
 .animate-float { animation: float 6s ease-in-out infinite; }
 .animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
 .animate-shimmer {
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  background: linear-gradient(90deg, transparent, rgba(0, 130, 150, 0.15), transparent);
   background-size: 200% 100%;
   animation: shimmer 2s infinite;
 }
@@ -427,17 +427,17 @@ a:hover {
 
 /* Secondary button (charter) */
 .btn-secondary-charter {
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: white;
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--charter-border);
+  color: var(--charter-text-primary);
   border-radius: 10px;
   font-weight: 600;
   transition: all 0.3s ease;
 }
 
 .btn-secondary-charter:hover {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 0, 0, 0.15);
 }
 
 /* Outline button (charter) */
@@ -458,9 +458,9 @@ a:hover {
 .btn-ghost-pill {
   display: inline-flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.6);
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid var(--charter-border);
+  color: var(--charter-text-secondary);
   font-size: 12px;
   font-weight: 600;
   padding: 6px 14px;
@@ -469,8 +469,8 @@ a:hover {
 }
 
 .btn-ghost-pill:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.8);
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--charter-text-primary);
 }
 
 /* ── Card Hover Effects ── */
@@ -494,30 +494,30 @@ a:hover {
 
 .scrollbar-thin {
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+  scrollbar-color: rgba(0, 0, 0, 0.12) transparent;
 }
 
 .scrollbar-thin::-webkit-scrollbar { width: 6px; }
 .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(0, 0, 0, 0.12);
   border-radius: 3px;
 }
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(0, 0, 0, 0.2);
 }
 
 /* ── Grid & Dot Backgrounds ── */
 .bg-grid {
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='rgb(255 255 255 / 0.04)'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e");
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='rgb(0 0 0 / 0.04)'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e");
 }
 
 .bg-grid-white {
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='rgb(255 255 255 / 0.06)'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e");
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='rgb(0 0 0 / 0.04)'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e");
 }
 
 .bg-dots {
-  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
   background-size: 20px 20px;
 }
 
@@ -541,8 +541,8 @@ a:hover {
 
 /* Selection */
 ::selection {
-  background: rgba(59, 158, 255, 0.3);
-  color: #ffffff;
+  background: rgba(0, 130, 150, 0.2);
+  color: #232F3E;
 }
 
 /* ── SUITE CLUSTER FOOTER ── */
@@ -550,17 +550,17 @@ a:hover {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(0, 0, 0, 0.03);
   border: 1px solid var(--charter-border);
   border-radius: 999px;
   padding: 8px 18px;
   font-size: 13px;
   font-weight: 600;
-  color: #fff;
+  color: var(--charter-text-primary);
   transition: all 0.3s ease;
 }
 
 .suite-pill:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.06);
   border-color: var(--charter-accent-border);
 }
