@@ -49,6 +49,10 @@ import { EbookProjectsList } from '@/components/ebook/EbookProjectsList';
 import { EbookAiChat } from '@/components/ebook/EbookAiChat';
 
 import { EbookSeriesManager } from '@/components/ebook/EbookSeriesManager';
+import EbookAtlas from '@/components/ebook/EbookAtlas';
+import EbookEncyclopedia from '@/components/ebook/EbookEncyclopedia';
+import EbookDocumentaryGenerator from '@/components/ebook/EbookDocumentaryGenerator';
+import { KdpQuickTools } from '@/components/ebook/KdpQuickTools';
 import { EbookAudioGenerator } from '@/components/ebook/EbookAudioGenerator';
 import { EbookEditorialDirector } from '@/components/ebook/EbookEditorialDirector';
 import { EbookMarketAnalysis } from '@/components/ebook/EbookMarketAnalysis';
