@@ -52,6 +52,7 @@ import { EbookSeriesManager } from '@/components/ebook/EbookSeriesManager';
 import EbookAtlas from '@/components/ebook/EbookAtlas';
 import EbookEncyclopedia from '@/components/ebook/EbookEncyclopedia';
 import EbookDocumentaryGenerator from '@/components/ebook/EbookDocumentaryGenerator';
+import { EbookColoringBookGenerator } from '@/components/ebook/EbookColoringBookGenerator';
 import { KdpQuickTools } from '@/components/ebook/KdpQuickTools';
 import { EbookAudioGenerator } from '@/components/ebook/EbookAudioGenerator';
 import { EbookEditorialDirector } from '@/components/ebook/EbookEditorialDirector';
@@ -2916,7 +2917,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
         }} />;
 
       case 'coloring':
-        return <KdpQuickTools productType="coloring" title={ebookTitle || 'Mon livre de coloriage'} pageCount={chapters.length * 10} targetAudience={targetAudience} />;
+        return <EbookColoringBookGenerator ebookTitle={ebookTitle || 'Mon livre de coloriage'} />;
 
       case 'documentary':
         return <EbookDocumentaryGenerator ebookTitle={ebookTitle} />;
