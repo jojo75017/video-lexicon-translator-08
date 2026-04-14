@@ -230,9 +230,8 @@ Réponds UNIQUEMENT avec un tableau JSON valide.`;
       });
       if (error) throw error;
       const content = data?.content || data?.generatedContent || '';
-      const jsonMatch = content.match(/\[[\s\S]*\]/);
-      if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[0]) as KdpKeyword[];
+      const parsed = safeParseJsonArray(content) as KdpKeyword[] | null;
+      if (parsed) {
         setLongTailKeywords(parsed);
         toast.success(`${parsed.length} mots-clés longue traîne générés !`);
       } else throw new Error('Format invalide');
