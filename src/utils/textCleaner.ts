@@ -14,6 +14,32 @@ export function cleanGeneratedText(text: string): string {
   if (!text || typeof text !== 'string') return text || '';
   
   let cleaned = text
+    // ========== PRÉ-NETTOYAGE JSON FRANÇAIS (artefacts IA) ==========
+    // Supprimer les blocs JSON complets qui enveloppent tout le contenu
+    .replace(/^\s*\{[\s\S]*?"(?:page[_ ]?de[_ ]?titre|préface|preface|table[_ ]?des[_ ]?matieres|chapitres?[_ ]?liste|texte[_ ]?integral|conclusion|epilogue|personnages)"[\s\S]*\}\s*$/gi, (match) => {
+      // Extraire uniquement les valeurs textuelles des clés JSON
+      const textValues: string[] = [];
+      const valueRegex = /:\s*"((?:[^"\\]|\\.)*)"/g;
+      let m;
+      while ((m = valueRegex.exec(match)) !== null) {
+        const val = m[1].replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+        if (val.length > 20 && !/^(?:page[_ ]?de[_ ]?titre|préface|chapitres?|conclusion|personnages)/i.test(val)) {
+          textValues.push(val);
+        }
+      }
+      return textValues.length > 0 ? textValues.join('\n\n') : match;
+    })
+    // Supprimer les clés JSON françaises avec guillemets français « clé » :
+    .replace(/[«»"\u201C\u201D]\s*(?:json)?(?:page[_ ]?de[_ ]?titre|préface|preface|table[_ ]?des[_ ]?mati[eè]res|chapitres?[_ ]?liste|texte[_ ]?int[eé]gral|conclusion|[eé]pilogue|personnages|introduction|elements?|sous[_ ]?chapitres?|contenu|titre[_ ]?principal)\s*[«»"\u201C\u201D]\s*:\s*/gi, '')
+    // Supprimer les clés JSON anglaises/techniques avec guillemets français
+    .replace(/[«»"\u201C\u201D]\s*(?:title|content|chapters?|sub[_ ]?chapters?|text|body|summary|description|author|name|role)\s*[«»"\u201C\u201D]\s*:\s*/gi, '')
+    // Supprimer le mot "json" isolé en début de ligne (artefact code fence)
+    .replace(/^\s*json\s*/gim, '')
+    // Supprimer les crochets/accolades de structure JSON orphelins
+    .replace(/^\s*[\[{]\s*$/gm, '')
+    .replace(/^\s*[\]}],?\s*$/gm, '')
+    // Supprimer les virgules de séparation JSON en début de ligne
+    .replace(/^,\s*/gm, '')
     // ========== NETTOYAGE MARKDOWN / ASTÉRISQUES ==========
     // Supprimer gras+italique ***text*** ou ___text___
     .replace(/\*{3}(.+?)\*{3}/g, '$1')
