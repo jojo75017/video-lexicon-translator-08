@@ -177,40 +177,10 @@ Réponds UNIQUEMENT avec un tableau JSON valide.`;
       });
       if (error) throw error;
       const content = data?.content || data?.generatedContent || '';
-      // Try to extract JSON array, handle truncated responses
-      let jsonStr = '';
-      const jsonMatch = content.match(/\[[\s\S]*\]/);
-      if (jsonMatch) {
-        jsonStr = jsonMatch[0];
-      } else {
-        // Response may be truncated - try to repair by adding closing brackets
-        const arrStart = content.indexOf('[');
-        if (arrStart !== -1) {
-          let partial = content.substring(arrStart).trim();
-          // Close any unclosed object then close the array
-          if (!partial.endsWith(']')) {
-            // Remove trailing incomplete object
-            const lastComplete = partial.lastIndexOf('},');
-            if (lastComplete !== -1) {
-              partial = partial.substring(0, lastComplete + 1) + ']';
-            } else {
-              const lastObj = partial.lastIndexOf('}');
-              if (lastObj !== -1) {
-                partial = partial.substring(0, lastObj + 1) + ']';
-              }
-            }
-          }
-          jsonStr = partial;
-        }
-      }
-      if (jsonStr) {
-        try {
-          const parsed = JSON.parse(jsonStr) as KdpKeyword[];
-          setKeywords(parsed);
-          toast.success(`${parsed.length} mots-clés KDP générés (mode ${effectiveMode === 'title' ? 'titre' : 'niche'}) !`);
-        } catch {
-          throw new Error('Format invalide');
-        }
+      const parsed = safeParseJsonArray(content) as KdpKeyword[] | null;
+      if (parsed) {
+        setKeywords(parsed);
+        toast.success(`${parsed.length} mots-clés KDP générés (mode ${effectiveMode === 'title' ? 'titre' : 'niche'}) !`);
       } else {
         throw new Error('Format invalide');
       }
@@ -231,9 +201,8 @@ Réponds UNIQUEMENT avec un tableau JSON valide.`;
       });
       if (error) throw error;
       const content = data?.content || data?.generatedContent || '';
-      const jsonMatch = content.match(/\[[\s\S]*\]/);
-      if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[0]) as string[];
+      const parsed = safeParseJsonArray(content) as string[] | null;
+      if (parsed) {
         setBackend7Keywords(parsed.slice(0, 7));
         toast.success('7 mots-clés backend KDP générés !');
       } else throw new Error('Format invalide');
