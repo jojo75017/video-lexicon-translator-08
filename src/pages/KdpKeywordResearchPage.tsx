@@ -142,8 +142,11 @@ Inclus un mix de :
 Réponds UNIQUEMENT avec un tableau JSON valide.`;
   };
 
-  // Helper to safely parse JSON arrays, handling truncated responses
-  const safeParseJsonArray = (content: string): any[] | null => {
+  // Helper to safely parse JSON arrays, handling truncated responses and markdown fences
+  const safeParseJsonArray = (rawContent: string): any[] | null => {
+    // Strip markdown fences
+    const content = rawContent.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    
     const jsonMatch = content.match(/\[[\s\S]*\]/);
     if (jsonMatch) {
       try { return JSON.parse(jsonMatch[0]); } catch { /* fall through */ }
@@ -152,12 +155,21 @@ Réponds UNIQUEMENT avec un tableau JSON valide.`;
     if (arrStart !== -1) {
       let partial = content.substring(arrStart).trim();
       if (!partial.endsWith(']')) {
-        const lastComplete = partial.lastIndexOf('},');
-        if (lastComplete !== -1) {
-          partial = partial.substring(0, lastComplete + 1) + ']';
+        // For string arrays: find last complete quoted string
+        const lastQuote = partial.lastIndexOf('"');
+        const lastComma = partial.lastIndexOf(',');
+        if (lastQuote > lastComma) {
+          // Last item is a complete string
+          partial = partial.substring(0, lastQuote + 1) + ']';
         } else {
-          const lastObj = partial.lastIndexOf('}');
-          if (lastObj !== -1) partial = partial.substring(0, lastObj + 1) + ']';
+          // For object arrays
+          const lastComplete = partial.lastIndexOf('},');
+          if (lastComplete !== -1) {
+            partial = partial.substring(0, lastComplete + 1) + ']';
+          } else {
+            const lastObj = partial.lastIndexOf('}');
+            if (lastObj !== -1) partial = partial.substring(0, lastObj + 1) + ']';
+          }
         }
       }
       try { return JSON.parse(partial); } catch { /* fall through */ }
