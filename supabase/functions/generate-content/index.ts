@@ -582,7 +582,7 @@ RÈGLES CRITIQUES POUR DES MOTS-CLÉS AMAZON EXPLOITABLES :
 
 Réponds UNIQUEMENT avec un tableau JSON valide, sans markdown.`,
         prompt,
-        { maxOutputTokens: 4000, temperature: 0.6, timeoutMs: 60000 }
+        { maxOutputTokens: 8000, temperature: 0.6, timeoutMs: 90000 }
       );
       if (res.error) return geminiError(res);
       return jsonSuccess({ content: res.text });
