@@ -631,9 +631,9 @@ STRATÉGIE OPTIMALE :
 - Champ 5-6 : Termes émotionnels / bénéfices
 - Champ 7 : Terme saisonnier ou tendance
 
-Réponds UNIQUEMENT avec un tableau JSON de 7 strings : ["mot-clé 1", "mot-clé 2", ...]`,
+Réponds UNIQUEMENT avec un tableau JSON de 7 strings, sans markdown ni backticks : ["mot-clé 1", "mot-clé 2", ...]`,
         prompt,
-        { maxOutputTokens: 1000, temperature: 0.4, timeoutMs: 60000 }
+        { maxOutputTokens: 2000, temperature: 0.4, timeoutMs: 60000 }
       );
       if (res.error) return geminiError(res);
       return jsonSuccess({ content: res.text });
