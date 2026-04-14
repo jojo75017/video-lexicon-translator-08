@@ -81,13 +81,19 @@ export function SubscriberGate({
       }
 
       try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 10000);
+
         const { data, error } = await supabase.functions.invoke("validate-subscription", {
           body: { email, access_code: code },
         });
 
+        clearTimeout(timeout);
+
         if (cancelled) return;
 
         if (error || !data?.valid) {
+          // Explicit rejection from the server → deny access
           onInvalid();
           setAllowed(false);
           setChecking(false);
@@ -119,8 +125,24 @@ export function SubscriberGate({
 
         setAllowed(true);
         setChecking(false);
-      } catch {
+      } catch (networkErr) {
         if (cancelled) return;
+        // Network/timeout error (NOT explicit rejection) → allow temporary access
+        // if localStorage has complete subscriber data
+        console.warn("SubscriberGate: Network error, using fallback:", networkErr);
+        const cachedData = localStorage.getItem("subscriber_data");
+        const cachedEmail = localStorage.getItem("subscriber_email");
+        if (cachedData && cachedEmail && cachedEmail === email) {
+          try {
+            const parsed = JSON.parse(cachedData);
+            if (parsed?.email && parsed?.access_code) {
+              console.log("SubscriberGate: Allowing temporary access via cached data");
+              setAllowed(true);
+              setChecking(false);
+              return;
+            }
+          } catch { /* invalid cache */ }
+        }
         onInvalid();
         setAllowed(false);
         setChecking(false);
