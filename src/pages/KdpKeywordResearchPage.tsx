@@ -164,9 +164,7 @@ Réponds UNIQUEMENT avec un tableau JSON valide.`;
       }
     } catch (err) {
       console.error('Erreur génération:', err);
-      const mockKeywords = generateMockKeywords(seedKeyword, effectiveMode);
-      setKeywords(mockKeywords);
-      toast.success(`${mockKeywords.length} mots-clés KDP générés !`);
+      toast.error('Impossible de générer les mots-clés. Vérifiez votre connexion et réessayez.');
     } finally {
       setIsLoading(false);
     }
@@ -188,10 +186,7 @@ Réponds UNIQUEMENT avec un tableau JSON valide.`;
         toast.success('7 mots-clés backend KDP générés !');
       } else throw new Error('Format invalide');
     } catch {
-      // Fallback
-      const fallback = generateMockBackend7(seedKeyword);
-      setBackend7Keywords(fallback);
-      toast.success('7 mots-clés backend KDP générés !');
+      toast.error('Impossible de générer les mots-clés backend. Réessayez.');
     } finally {
       setIsGenerating7(false);
     }
@@ -213,9 +208,7 @@ Réponds UNIQUEMENT avec un tableau JSON valide.`;
         toast.success(`${parsed.length} mots-clés longue traîne générés !`);
       } else throw new Error('Format invalide');
     } catch {
-      const mock = generateMockKeywords(seedKeyword, 'longtail');
-      setLongTailKeywords(mock);
-      toast.success(`${mock.length} mots-clés longue traîne générés !`);
+      toast.error('Impossible de générer les mots-clés longue traîne. Réessayez.');
     } finally {
       setIsGeneratingLongTail(false);
     }

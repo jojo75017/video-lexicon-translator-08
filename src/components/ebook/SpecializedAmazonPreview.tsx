@@ -109,9 +109,9 @@ const SpecializedAmazonPreview: React.FC<SpecializedAmazonPreviewProps> = ({
   const config = productTypeConfig[productType];
   const [viewMode, setViewMode] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
   const [customPrice, setCustomPrice] = useState(price || config.defaultPrice.optimal);
-  const [rating] = useState(4.5 + Math.random() * 0.4);
-  const [reviewCount] = useState(Math.floor(50 + Math.random() * 200));
-  const [bsrRank] = useState(Math.floor(500 + Math.random() * 5000));
+  const [rating] = useState(4.5);
+  const [reviewCount] = useState(0);
+  const [bsrRank] = useState<number | null>(null);
 
   const renderStars = (rating: number) => {
     const stars = [];
