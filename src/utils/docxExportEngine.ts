@@ -116,10 +116,47 @@ function normalizeBrokenSpacing(text: string): string {
  * Nettoyage éditorial profond du texte avant insertion DOCX.
  * Va au-delà du textCleaner standard pour garantir la propreté typographique.
  */
+/**
+ * Pré-nettoyage JSON agressif avant le nettoyage standard.
+ * Intercepte les structures JSON brutes AVANT que la typographie française
+ * ne transforme les guillemets et rende les patterns indétectables.
+ */
+function preCleanJSON(raw: string): string {
+  let text = raw;
+  
+  // Supprimer les blocs JSON complets enveloppant le contenu
+  text = text.replace(/^\s*\{[\s\S]*?"(?:page_de_titre|préface|chapitres|conclusion|personnages)"[\s\S]*\}\s*$/gi, (match) => {
+    const textValues: string[] = [];
+    const valueRegex = /:\s*"((?:[^"\\]|\\.)*)"/g;
+    let m;
+    while ((m = valueRegex.exec(match)) !== null) {
+      const val = m[1].replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+      if (val.length > 30 && !/^(?:page_de_titre|préface|chapitres|conclusion|personnages)/i.test(val)) {
+        textValues.push(val);
+      }
+    }
+    return textValues.length > 0 ? textValues.join('\n\n') : match;
+  });
+
+  // Supprimer les clés JSON avec guillemets (droits ou français)
+  text = text.replace(/[«»"\u201C\u201D]\s*(?:json)?(?:page[_ ]?de[_ ]?titre|pr[eé]face|table[_ ]?des[_ ]?mati[eè]res|chapitres?[_ ]?liste|texte[_ ]?int[eé]gral|conclusion|[eé]pilogue|personnages|introduction|[eé]l[eé]ments?|sous[_ ]?chapitres?|contenu|titre[_ ]?principal)\s*[«»"\u201C\u201D]\s*:\s*/gi, '');
+  
+  // Supprimer "json" isolé en début de ligne
+  text = text.replace(/^\s*json\s*/gim, '');
+  
+  // Supprimer crochets/accolades JSON orphelins
+  text = text.replace(/^\s*[\[{]\s*$/gm, '');
+  text = text.replace(/^\s*[\]}],?\s*$/gm, '');
+  text = text.replace(/^,\s*/gm, '');
+
+  return text;
+}
+
 function editorialClean(raw: string): string {
   if (!raw) return '';
 
-  let text = cleanGeneratedText(raw);
+  // 0. Pré-nettoyage JSON AVANT le nettoyage standard
+  let text = cleanGeneratedText(preCleanJSON(raw));
 
   // 1. Normaliser les retours Windows et les espaces cassés
   text = text.replace(/\r\n/g, '\n');
@@ -301,11 +338,25 @@ function buildContentParagraphs(
   const result: Paragraph[] = [];
 
   for (const para of paragraphs) {
+    // Filtrer les lignes qui ressemblent à des clés/structures JSON résiduelles
+    if (/^[«»"\u201C\u201D]?\s*(?:json|page[_ ]?de[_ ]?titre|pr[eé]face|chapitres?[_ ]?liste|texte[_ ]?int[eé]gral|[eé]l[eé]ments?|sous[_ ]?chapitres?|personnages|contenu|titre[_ ]?principal)\s*[«»"\u201C\u201D]?\s*:?\s*$/i.test(para)) {
+      continue;
+    }
+    // Ignorer les lignes très courtes qui sont juste des accolades/crochets
+    if (/^[\s{}\[\],]+$/.test(para)) {
+      continue;
+    }
+
     // Vérifier si c'est un sous-titre inline (ligne courte en gras ou commençant par #)
     const headingMatch = para.match(/^#{1,3}\s+(.*)/);
     if (headingMatch) {
+      // Ne pas traiter comme heading si ça ressemble à du JSON
+      const headingText = headingMatch[1];
+      if (/^[«»"]?\s*(?:json|titre|content|chapitres?)/i.test(headingText)) {
+        continue;
+      }
       result.push(new Paragraph({
-        children: [new TextRun({ text: headingMatch[1], bold: true, size: Math.round(sizeHalfPt * 1.2), font })],
+        children: [new TextRun({ text: headingText, bold: true, size: Math.round(sizeHalfPt * 1.2), font })],
         spacing: { before: 360, after: 200 },
       }));
       continue;
