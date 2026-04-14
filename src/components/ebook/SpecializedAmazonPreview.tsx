@@ -109,9 +109,9 @@ const SpecializedAmazonPreview: React.FC<SpecializedAmazonPreviewProps> = ({
   const config = productTypeConfig[productType];
   const [viewMode, setViewMode] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
   const [customPrice, setCustomPrice] = useState(price || config.defaultPrice.optimal);
-  const [rating] = useState(4.5 + Math.random() * 0.4);
-  const [reviewCount] = useState(Math.floor(50 + Math.random() * 200));
-  const [bsrRank] = useState(Math.floor(500 + Math.random() * 5000));
+  const [rating] = useState(4.5);
+  const [reviewCount] = useState(0);
+  const [bsrRank] = useState<number | null>(null);
 
   const renderStars = (rating: number) => {
     const stars = [];
@@ -302,17 +302,19 @@ const SpecializedAmazonPreview: React.FC<SpecializedAmazonPreviewProps> = ({
                   {rating.toFixed(1)} sur 5
                 </span>
                 <span className="text-sm text-[#007185]">
-                  ({reviewCount} évaluations)
+                  {reviewCount > 0 ? `(${reviewCount} évaluations)` : '(Nouveau)'}
                 </span>
               </div>
 
               {/* BSR */}
-              <div className="flex items-center gap-2 text-sm">
-                <TrendingUp className="w-4 h-4 text-green-600" />
-                <span className="text-gray-600">
-                  n°{bsrRank.toLocaleString()} en {config.defaultCategories[0]}
-                </span>
-              </div>
+              {bsrRank && (
+                <div className="flex items-center gap-2 text-sm">
+                  <TrendingUp className="w-4 h-4 text-green-600" />
+                  <span className="text-gray-600">
+                    n°{bsrRank.toLocaleString()} en {config.defaultCategories[0]}
+                  </span>
+                </div>
+              )}
 
               <hr className="border-gray-200" />
 

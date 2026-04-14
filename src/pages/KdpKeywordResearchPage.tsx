@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -164,9 +164,7 @@ Réponds UNIQUEMENT avec un tableau JSON valide.`;
       }
     } catch (err) {
       console.error('Erreur génération:', err);
-      const mockKeywords = generateMockKeywords(seedKeyword, effectiveMode);
-      setKeywords(mockKeywords);
-      toast.success(`${mockKeywords.length} mots-clés KDP générés !`);
+      toast.error('Impossible de générer les mots-clés. Vérifiez votre connexion et réessayez.');
     } finally {
       setIsLoading(false);
     }
@@ -188,10 +186,7 @@ Réponds UNIQUEMENT avec un tableau JSON valide.`;
         toast.success('7 mots-clés backend KDP générés !');
       } else throw new Error('Format invalide');
     } catch {
-      // Fallback
-      const fallback = generateMockBackend7(seedKeyword);
-      setBackend7Keywords(fallback);
-      toast.success('7 mots-clés backend KDP générés !');
+      toast.error('Impossible de générer les mots-clés backend. Réessayez.');
     } finally {
       setIsGenerating7(false);
     }
@@ -213,105 +208,12 @@ Réponds UNIQUEMENT avec un tableau JSON valide.`;
         toast.success(`${parsed.length} mots-clés longue traîne générés !`);
       } else throw new Error('Format invalide');
     } catch {
-      const mock = generateMockKeywords(seedKeyword, 'longtail');
-      setLongTailKeywords(mock);
-      toast.success(`${mock.length} mots-clés longue traîne générés !`);
+      toast.error('Impossible de générer les mots-clés longue traîne. Réessayez.');
     } finally {
       setIsGeneratingLongTail(false);
     }
   };
 
-  const generateMockBackend7 = (seed: string): string[] => {
-    const words = seed.toLowerCase().split(/\s+/);
-    const base = words.slice(0, 2).join(' ');
-    return [
-      `${base} guide pratique`,
-      `${base} méthode complète`,
-      `${base} astuces secrets`,
-      `${base} débutant avancé`,
-      `${base} étape par étape`,
-      `${base} stratégie efficace`,
-      `${base} résultats rapides`,
-    ].map(k => k.slice(0, 50));
-  };
-
-  const generateMockKeywords = (seed: string, mode: SearchMode | 'title' | 'niche'): KdpKeyword[] => {
-    const templates = mode === 'longtail' ? [
-      { prefix: 'comment apprendre ', suffix: ' facilement', volumeRange: [100, 2000], diffRange: [5, 25] },
-      { prefix: 'guide complet pour ', suffix: '', volumeRange: [200, 3000], diffRange: [10, 30] },
-      { prefix: 'les secrets de ', suffix: ' révélés', volumeRange: [150, 2500], diffRange: [8, 28] },
-      { prefix: '', suffix: ' pour les nuls pdf', volumeRange: [80, 1500], diffRange: [5, 20] },
-      { prefix: 'tout savoir sur ', suffix: ' en 2026', volumeRange: [120, 1800], diffRange: [10, 25] },
-      { prefix: '', suffix: ' livre kindle recommandé', volumeRange: [60, 1200], diffRange: [3, 18] },
-      { prefix: 'meilleur guide ', suffix: ' amazon', volumeRange: [100, 2000], diffRange: [15, 35] },
-      { prefix: '', suffix: ' étape par étape débutant', volumeRange: [90, 1600], diffRange: [5, 22] },
-      { prefix: 'astuces et conseils ', suffix: '', volumeRange: [70, 1400], diffRange: [8, 25] },
-      { prefix: '', suffix: ' techniques avancées livre', volumeRange: [50, 1000], diffRange: [5, 20] },
-      { prefix: 'formation ', suffix: ' complète ebook', volumeRange: [80, 1300], diffRange: [6, 22] },
-      { prefix: '', suffix: ' méthode prouvée', volumeRange: [60, 1100], diffRange: [4, 18] },
-    ] : mode === 'title' ? [
-      { suffix: '', volumeRange: [500, 8000], diffRange: [40, 75], cat: 'thème principal' },
-      { suffix: ' livre', volumeRange: [1000, 12000], diffRange: [35, 65], cat: 'thème principal' },
-      { suffix: ' ebook', volumeRange: [300, 5000], diffRange: [20, 50], cat: 'synonyme' },
-      { suffix: ' kindle', volumeRange: [400, 6000], diffRange: [25, 55], cat: 'synonyme' },
-      { suffix: ' roman', volumeRange: [600, 9000], diffRange: [30, 60], cat: 'catégorie' },
-      { suffix: ' guide pratique', volumeRange: [200, 4000], diffRange: [15, 40], cat: 'longue traîne' },
-      { prefix: 'meilleur ', suffix: '', volumeRange: [800, 10000], diffRange: [45, 75], cat: 'émotionnel' },
-      { prefix: 'avis ', suffix: '', volumeRange: [300, 4000], diffRange: [20, 45], cat: 'émotionnel' },
-      { suffix: ' pas cher', volumeRange: [500, 7000], diffRange: [30, 60], cat: 'commercial' },
-      { suffix: ' pdf gratuit', volumeRange: [400, 6000], diffRange: [25, 50], cat: 'commercial' },
-      { suffix: ' résumé', volumeRange: [200, 3000], diffRange: [15, 35], cat: 'informationnel' },
-      { suffix: ' critique', volumeRange: [150, 2500], diffRange: [10, 30], cat: 'informationnel' },
-      { suffix: ' similar', volumeRange: [100, 2000], diffRange: [10, 28], cat: 'synonyme' },
-      { prefix: 'livres comme ', suffix: '', volumeRange: [200, 3500], diffRange: [15, 35], cat: 'synonyme' },
-      { suffix: ' recommandation', volumeRange: [180, 2800], diffRange: [12, 32], cat: 'émotionnel' },
-      { suffix: ' nouveauté 2026', volumeRange: [250, 4000], diffRange: [18, 40], cat: 'tendance' },
-      { suffix: ' best seller', volumeRange: [600, 8000], diffRange: [40, 70], cat: 'commercial' },
-      { suffix: ' collection', volumeRange: [150, 2500], diffRange: [12, 30], cat: 'catégorie' },
-      { prefix: 'acheter ', suffix: '', volumeRange: [350, 5000], diffRange: [25, 50], cat: 'transactionnel' },
-      { suffix: ' tome 1', volumeRange: [100, 2000], diffRange: [8, 25], cat: 'longue traîne' },
-    ] : [
-      { suffix: '', volumeRange: [5000, 30000], diffRange: [60, 90], cat: 'courte traîne' },
-      { suffix: ' livre', volumeRange: [2000, 15000], diffRange: [40, 70], cat: 'courte traîne' },
-      { suffix: ' guide', volumeRange: [1000, 8000], diffRange: [30, 60], cat: 'courte traîne' },
-      { suffix: ' pour débutant', volumeRange: [500, 5000], diffRange: [15, 40], cat: 'longue traîne' },
-      { suffix: ' 2026', volumeRange: [800, 6000], diffRange: [20, 50], cat: 'tendance' },
-      { suffix: ' conseils', volumeRange: [600, 4000], diffRange: [25, 45], cat: 'longue traîne' },
-      { suffix: ' complet', volumeRange: [400, 3000], diffRange: [20, 40], cat: 'longue traîne' },
-      { suffix: ' facile', volumeRange: [300, 2500], diffRange: [10, 35], cat: 'longue traîne' },
-      { suffix: ' pas cher', volumeRange: [1500, 8000], diffRange: [35, 65], cat: 'niche' },
-      { suffix: ' avis', volumeRange: [800, 5000], diffRange: [30, 55], cat: 'niche' },
-      { suffix: ' amazon', volumeRange: [1200, 7000], diffRange: [45, 75], cat: 'courte traîne' },
-      { suffix: ' kindle', volumeRange: [600, 4000], diffRange: [25, 50], cat: 'niche' },
-      { prefix: 'meilleur ', suffix: '', volumeRange: [2000, 12000], diffRange: [50, 80], cat: 'courte traîne' },
-      { prefix: 'comment ', suffix: '', volumeRange: [1500, 9000], diffRange: [20, 45], cat: 'longue traîne' },
-      { prefix: 'apprendre ', suffix: '', volumeRange: [700, 5000], diffRange: [15, 40], cat: 'longue traîne' },
-      { suffix: ' secret', volumeRange: [300, 3500], diffRange: [15, 35], cat: 'niche' },
-      { suffix: ' méthode', volumeRange: [400, 4500], diffRange: [20, 45], cat: 'niche' },
-      { suffix: ' formation', volumeRange: [350, 4000], diffRange: [18, 42], cat: 'tendance' },
-      { suffix: ' exercices', volumeRange: [250, 3000], diffRange: [12, 35], cat: 'saisonnière' },
-      { suffix: ' enfants', volumeRange: [500, 6000], diffRange: [25, 55], cat: 'saisonnière' },
-    ];
-
-    return templates.map((t: any) => {
-      const kw = (t.prefix || '') + seed + (t.suffix || '');
-      const volume = Math.floor(Math.random() * (t.volumeRange[1] - t.volumeRange[0]) + t.volumeRange[0]);
-      const difficulty = Math.floor(Math.random() * (t.diffRange[1] - t.diffRange[0]) + t.diffRange[0]);
-      const cpc = parseFloat((Math.random() * 3 + 0.15).toFixed(2));
-      const opportunity = Math.round(((volume / 30000) * 50) + ((100 - difficulty) / 100 * 50));
-      return {
-        keyword: kw,
-        volume,
-        difficulty,
-        cpc,
-        competition: (difficulty > 60 ? 'high' : difficulty > 35 ? 'medium' : 'low') as 'low' | 'medium' | 'high',
-        trend: (Math.random() > 0.6 ? 'rising' : Math.random() > 0.3 ? 'stable' : 'declining') as 'rising' | 'stable' | 'declining',
-        intent: (Math.random() > 0.6 ? 'commercial' : Math.random() > 0.3 ? 'informational' : 'transactional') as 'informational' | 'commercial' | 'transactional',
-        opportunity,
-        category: t.cat || 'général',
-      };
-    });
-  };
 
   const toggleSelect = (kw: string) => {
     setSelectedKeywords(prev => {

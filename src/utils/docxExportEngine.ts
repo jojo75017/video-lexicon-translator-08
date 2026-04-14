@@ -29,6 +29,7 @@ import {
 } from 'docx';
 import { saveAs } from 'file-saver';
 import { cleanGeneratedText } from '@/utils/textCleaner';
+import { applyFrenchTypography } from '@/utils/frenchTypography';
 
 // ═══════════════════════════════════════════════════════════
 // TYPES
@@ -175,9 +176,8 @@ function editorialClean(raw: string): string {
   // Supprimer les liens markdown mais garder le texte
   text = text.replace(/\[([^\]]+)\]\([^)]*\)/g, '$1');
 
-  // 8. Typographie française : espace insécable avant ; : ! ?
-  text = text.replace(/ ([;:!?»])/g, '\u00A0$1');
-  text = text.replace(/([«])\u00A0?/g, '$1\u00A0');
+  // 8. Typographie française professionnelle
+  text = applyFrenchTypography(text);
 
   return text.trim();
 }

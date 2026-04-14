@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense } from 'react';
+import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -186,13 +186,13 @@ const App = () => {
     };
   }, []);
 
-  const handleAuthenticated = (email: string, data: any) => {
+  const handleAuthenticated = useCallback((email: string, data: any) => {
     setSubscriberEmail(email);
     setSubscriberData(data);
     setIsAuthenticated(true);
-  };
+  }, []);
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     // IMPORTANT: always clear client cache, otherwise users can appear logged-in without a valid backend check
     localStorage.removeItem('subscriber_email');
     localStorage.removeItem('subscriber_data');
@@ -200,7 +200,7 @@ const App = () => {
     setIsAuthenticated(false);
     setSubscriberEmail('');
     setSubscriberData(null);
-  };
+  }, []);
 
   const showAccessDebug = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('debug') === '1';
 
