@@ -142,6 +142,29 @@ Inclus un mix de :
 Réponds UNIQUEMENT avec un tableau JSON valide.`;
   };
 
+  // Helper to safely parse JSON arrays, handling truncated responses
+  const safeParseJsonArray = (content: string): any[] | null => {
+    const jsonMatch = content.match(/\[[\s\S]*\]/);
+    if (jsonMatch) {
+      try { return JSON.parse(jsonMatch[0]); } catch { /* fall through */ }
+    }
+    const arrStart = content.indexOf('[');
+    if (arrStart !== -1) {
+      let partial = content.substring(arrStart).trim();
+      if (!partial.endsWith(']')) {
+        const lastComplete = partial.lastIndexOf('},');
+        if (lastComplete !== -1) {
+          partial = partial.substring(0, lastComplete + 1) + ']';
+        } else {
+          const lastObj = partial.lastIndexOf('}');
+          if (lastObj !== -1) partial = partial.substring(0, lastObj + 1) + ']';
+        }
+      }
+      try { return JSON.parse(partial); } catch { /* fall through */ }
+    }
+    return null;
+  };
+
   const generateKeywords = async () => {
     if (!seedKeyword.trim()) {
       toast.error('Entrez un mot-clé, une niche ou un titre de livre');
