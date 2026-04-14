@@ -142,6 +142,41 @@ Inclus un mix de :
 Réponds UNIQUEMENT avec un tableau JSON valide.`;
   };
 
+  // Helper to safely parse JSON arrays, handling truncated responses and markdown fences
+  const safeParseJsonArray = (rawContent: string): any[] | null => {
+    // Strip markdown fences
+    const content = rawContent.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    
+    const jsonMatch = content.match(/\[[\s\S]*\]/);
+    if (jsonMatch) {
+      try { return JSON.parse(jsonMatch[0]); } catch { /* fall through */ }
+    }
+    const arrStart = content.indexOf('[');
+    if (arrStart !== -1) {
+      let partial = content.substring(arrStart).trim();
+      if (!partial.endsWith(']')) {
+        // For string arrays: find last complete quoted string
+        const lastQuote = partial.lastIndexOf('"');
+        const lastComma = partial.lastIndexOf(',');
+        if (lastQuote > lastComma) {
+          // Last item is a complete string
+          partial = partial.substring(0, lastQuote + 1) + ']';
+        } else {
+          // For object arrays
+          const lastComplete = partial.lastIndexOf('},');
+          if (lastComplete !== -1) {
+            partial = partial.substring(0, lastComplete + 1) + ']';
+          } else {
+            const lastObj = partial.lastIndexOf('}');
+            if (lastObj !== -1) partial = partial.substring(0, lastObj + 1) + ']';
+          }
+        }
+      }
+      try { return JSON.parse(partial); } catch { /* fall through */ }
+    }
+    return null;
+  };
+
   const generateKeywords = async () => {
     if (!seedKeyword.trim()) {
       toast.error('Entrez un mot-clé, une niche ou un titre de livre');
@@ -154,40 +189,10 @@ Réponds UNIQUEMENT avec un tableau JSON valide.`;
       });
       if (error) throw error;
       const content = data?.content || data?.generatedContent || '';
-      // Try to extract JSON array, handle truncated responses
-      let jsonStr = '';
-      const jsonMatch = content.match(/\[[\s\S]*\]/);
-      if (jsonMatch) {
-        jsonStr = jsonMatch[0];
-      } else {
-        // Response may be truncated - try to repair by adding closing brackets
-        const arrStart = content.indexOf('[');
-        if (arrStart !== -1) {
-          let partial = content.substring(arrStart).trim();
-          // Close any unclosed object then close the array
-          if (!partial.endsWith(']')) {
-            // Remove trailing incomplete object
-            const lastComplete = partial.lastIndexOf('},');
-            if (lastComplete !== -1) {
-              partial = partial.substring(0, lastComplete + 1) + ']';
-            } else {
-              const lastObj = partial.lastIndexOf('}');
-              if (lastObj !== -1) {
-                partial = partial.substring(0, lastObj + 1) + ']';
-              }
-            }
-          }
-          jsonStr = partial;
-        }
-      }
-      if (jsonStr) {
-        try {
-          const parsed = JSON.parse(jsonStr) as KdpKeyword[];
-          setKeywords(parsed);
-          toast.success(`${parsed.length} mots-clés KDP générés (mode ${effectiveMode === 'title' ? 'titre' : 'niche'}) !`);
-        } catch {
-          throw new Error('Format invalide');
-        }
+      const parsed = safeParseJsonArray(content) as KdpKeyword[] | null;
+      if (parsed) {
+        setKeywords(parsed);
+        toast.success(`${parsed.length} mots-clés KDP générés (mode ${effectiveMode === 'title' ? 'titre' : 'niche'}) !`);
       } else {
         throw new Error('Format invalide');
       }
@@ -208,9 +213,8 @@ Réponds UNIQUEMENT avec un tableau JSON valide.`;
       });
       if (error) throw error;
       const content = data?.content || data?.generatedContent || '';
-      const jsonMatch = content.match(/\[[\s\S]*\]/);
-      if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[0]) as string[];
+      const parsed = safeParseJsonArray(content) as string[] | null;
+      if (parsed) {
         setBackend7Keywords(parsed.slice(0, 7));
         toast.success('7 mots-clés backend KDP générés !');
       } else throw new Error('Format invalide');
@@ -230,9 +234,8 @@ Réponds UNIQUEMENT avec un tableau JSON valide.`;
       });
       if (error) throw error;
       const content = data?.content || data?.generatedContent || '';
-      const jsonMatch = content.match(/\[[\s\S]*\]/);
-      if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[0]) as KdpKeyword[];
+      const parsed = safeParseJsonArray(content) as KdpKeyword[] | null;
+      if (parsed) {
         setLongTailKeywords(parsed);
         toast.success(`${parsed.length} mots-clés longue traîne générés !`);
       } else throw new Error('Format invalide');
