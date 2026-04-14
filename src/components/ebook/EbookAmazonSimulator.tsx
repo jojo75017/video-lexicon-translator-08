@@ -512,7 +512,7 @@ const EbookAmazonSimulator: React.FC<EbookAmazonSimulatorProps> = ({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
                   <div className="flex">
                     <span className="font-medium text-gray-700 w-40">ASIN :</span>
-                    <span className="text-gray-600">B0{Math.random().toString(36).substring(2, 10).toUpperCase()}</span>
+                    <span className="text-gray-600">B0EXAMPLE0KDP</span>
                   </div>
                   <div className="flex">
                     <span className="font-medium text-gray-700 w-40">Éditeur :</span>
@@ -528,7 +528,7 @@ const EbookAmazonSimulator: React.FC<EbookAmazonSimulatorProps> = ({
                   </div>
                   <div className="flex">
                     <span className="font-medium text-gray-700 w-40">Taille du fichier :</span>
-                    <span className="text-gray-600">{Math.floor(pageCount * 0.05 + Math.random() * 2)} Mo</span>
+                    <span className="text-gray-600">{Math.max(1, Math.floor(pageCount * 0.05))} Mo</span>
                   </div>
                   <div className="flex">
                     <span className="font-medium text-gray-700 w-40">Nombre de pages :</span>
@@ -609,7 +609,7 @@ const EbookAmazonSimulator: React.FC<EbookAmazonSimulatorProps> = ({
                       {renderStars(5)}
                       <span className="font-medium text-sm">Excellent livre !</span>
                     </div>
-                    <p className="text-xs text-gray-500 mb-2">Commenté en France le {new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR')}</p>
+                    <p className="text-xs text-gray-500 mb-2">Commenté en France le {new Date().toLocaleDateString('fr-FR')}</p>
                     <p className="text-sm text-gray-700">
                       Un livre vraiment captivant du début à la fin. L'auteur maîtrise parfaitement son sujet et nous transmet sa passion avec clarté. Je recommande vivement !
                     </p>
