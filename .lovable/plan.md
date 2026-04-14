@@ -1,65 +1,41 @@
 
 
-# Audit Final — Ce qu'il reste à faire
+# Plan de correction — Export DOCX propre (sans JSON ni formatage cassé)
 
-## Problème immédiat : toujours bloqué sur /subscription
+## Problème identifié
 
-Vous êtes redirigé vers `/subscription` au lieu d'accéder à `/ebook-planner`. Les corrections `useCallback` ont été appliquées dans `App.tsx` (lignes 189-203), donc le bug de boucle est corrigé. Le problème restant est que le `SubscriberGate` appelle `onInvalid()` car la validation backend échoue (edge function `validate-subscription` rejette la requête ou timeout). Il faut ajouter un fallback : si l'utilisateur a des données subscriber valides en localStorage ET que l'edge function échoue par erreur réseau/timeout, on autorise l'accès temporairement au lieu de déconnecter.
+Le document exporté contient des **artefacts JSON bruts** dans le texte. L'IA génère du contenu structuré en JSON, et le nettoyeur actuel ne capture pas tous les patterns. Exemples visibles dans votre fichier :
 
-## Pages et services orphelins à supprimer (non référencés dans App.tsx)
+- `« jsonpage De Titre » : titre Principal : Maîtriser l'IA...`
+- `« préface » : Préface : Le manifeste...`
+- `« table Des Matieres » : Table des Matières...`
+- `« texte Integral : Le silence...`
+- `« elements » : [ « Comprendre l'érosion...`
+- `« personnages » : [ {`
 
-| Fichier | Raison |
-|---------|--------|
-| `src/pages/CrawlerPage.tsx` | Orphelin, Math.random partout |
-| `src/pages/CompetitorAnalysisPage.tsx` | Orphelin, Math.random partout |
-| `src/pages/TitleGeneratorPage.tsx` | Orphelin, Math.random pour les métriques |
-| `src/pages/SerpGenerator.tsx` | Orphelin, Math.random partout |
-| `src/pages/EmailMarketingPage.tsx` | Orphelin, utilise emailGeneratorService |
-| `src/services/realCompetitorAnalysisService.ts` | Orphelin (uniquement utilisé par CompetitorAnalysisPage) |
-| `src/services/serpApiService.ts` | Orphelin (authority = Math.random) |
-| `src/services/contentQualityService.ts` | Orphelin (uniqueness = Math.random) |
-| `src/services/imageGeneratorService.ts` | Orphelin (aucun import) |
-| `src/services/emailGeneratorService.ts` | Orphelin (uniquement EmailMarketingPage) |
-| `src/services/titleGeneratorService.ts` | Orphelin (aucun import dans App.tsx) |
-| `src/utils/competitorAnalysisUtils.ts` | Orphelin (uniquement CompetitorAnalysisPage) |
+Le contenu est aussi parfois **trop gros et en gras** car des fragments JSON sont interprétés comme des titres par le moteur d'export.
 
-## Math.random légitimes (à garder)
+## Corrections à appliquer
 
-Ces usages sont correctement utilisés et ne simulent pas de fausses données :
-- `EbookPlannerPage.tsx` : génération d'ID unique pour chapitres dupliqués
-- `CoverDesignEditor.tsx` : génération d'ID pour éléments visuels
-- `AudiobookLibrary/Publisher` : génération de noms de fichiers uniques
-- `EbookExporter.tsx` : génération d'ID EPUB
-- `EbookRecipeBookGenerator.tsx` : shuffle Fisher-Yates pour varier les recettes
-- `EbookColoringBookGenerator.tsx` : shuffle pour varier les sujets
-- `EbookTravelGuideGenerator.tsx` : shuffle pour varier les destinations
-- `TokenCounter.tsx` : animation visuelle
-- `FormationQuiz.tsx` : animation confetti
-- `SpotsCounter.tsx` : animation marketing (page de vente)
-- `LiveActivityNotifications.tsx` : notifications marketing (page de vente)
-- Edge functions (start-trial, stripe-webhook, add-subscriber) : génération de codes
+### 1. Renforcer le nettoyeur JSON dans `textCleaner.ts`
 
-## Math.random problématique restant (composant actif)
+Ajouter des regex ciblant les patterns JSON français qui fuient dans le texte :
+- `« clé_json »` suivi de `:` — supprimer la clé, garder la valeur
+- Blocs JSON complets `{ "page_de_titre": ..., "préface": ... }` — extraire uniquement le texte narratif
+- Patterns `« chapitres Liste » : [`, `« texte Integral :`, `« elements » : [`  — supprimer
+- Crochets/accolades orphelins `}, ]` en fin de paragraphe
+- Nettoyage des guillemets français autour de clés JSON (`« introduction »` → supprimer)
 
-| Fichier | Problème |
-|---------|----------|
-| `EbookAmazonSimulator.tsx` | ASIN simulé `B0{Math.random()}`, taille fichier random, date review random |
+### 2. Ajouter un nettoyage pré-typographie dans `docxExportEngine.ts`
 
-Ce composant EST utilisé dans la sidebar du planner. Les données factices doivent être remplacées par des valeurs fixes réalistes.
+Dans la fonction `editorialClean`, ajouter une passe de nettoyage JSON **avant** l'appel à `cleanGeneratedText` pour intercepter les structures JSON brutes avant qu'elles ne soient partiellement transformées par la typographie française.
 
-## Plan d'exécution
+### 3. Corriger le formatage excessif
 
-### 1. Corriger le SubscriberGate (accès /ebook-planner)
-Ajouter un fallback réseau : si `validate-subscription` échoue par timeout/erreur réseau (pas par rejet explicite), autoriser l'accès temporaire si les données localStorage sont complètes et valides.
+- S'assurer que les fragments JSON ne sont pas interprétés comme des headings (lignes courtes = titres)
+- Ajouter un filtre dans `buildContentParagraphs` pour ignorer les lignes qui ressemblent à des clés JSON
 
-### 2. Supprimer ~12 fichiers orphelins
-Pages et services listés ci-dessus qui ne sont référencés nulle part dans le routeur.
-
-### 3. Nettoyer EbookAmazonSimulator.tsx
-Remplacer l'ASIN random par un ASIN fixe basé sur le titre, la taille fichier par un calcul basé sur le nombre de pages, et la date de review par une date fixe.
-
-### Fichiers modifiés
-- `src/components/auth/SubscriberGate.tsx` — fallback réseau
-- `src/components/ebook/EbookAmazonSimulator.tsx` — valeurs fixes
-- Supprimés : 12 fichiers orphelins (pages + services)
+## Fichiers modifiés
+- `src/utils/textCleaner.ts` — regex JSON renforcées
+- `src/utils/docxExportEngine.ts` — nettoyage pré-typographie + filtre headings
 
