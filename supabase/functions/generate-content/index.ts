@@ -588,7 +588,29 @@ Réponds UNIQUEMENT avec un tableau JSON valide, sans markdown.`,
       return jsonSuccess({ content: res.text });
     }
 
-    // ====== KDP BACKEND KEYWORDS ======
+    // ====== KDP LONG-TAIL KEYWORDS ======
+    if (type === 'kdp-longtail') {
+      console.log('Processing KDP long-tail keywords (Gemini)...');
+      const res = await callGemini(
+        `Tu es un EXPERT SEO Amazon KDP spécialisé en mots-clés LONGUE TRAÎNE (3-6 mots).
+
+RÈGLES POUR DES MOTS-CLÉS LONGUE TRAÎNE EXPLOITABLES :
+
+1. LONGUEUR : Chaque mot-clé doit contenir 3 à 6 mots minimum
+2. SPÉCIFICITÉ : Plus le terme est précis, mieux c'est pour le classement
+3. INTENTION D'ACHAT : Prioriser les termes que tapent les ACHETEURS
+4. VOLUMES RÉALISTES Amazon : 50-2000/mois pour de la longue traîne
+5. FAIBLE CONCURRENCE : Difficulté 5-40 maximum
+6. DIVERSITÉ : Couvrir questions, problèmes, solutions, audiences
+
+Réponds UNIQUEMENT avec un tableau JSON valide, sans markdown ni backticks.`,
+        prompt,
+        { maxOutputTokens: 8000, temperature: 0.6, timeoutMs: 90000 }
+      );
+      if (res.error) return geminiError(res);
+      return jsonSuccess({ content: res.text });
+    }
+
     if (type === 'kdp-backend-keywords') {
       console.log('Processing KDP backend keywords (Gemini)...');
       const res = await callGemini(
