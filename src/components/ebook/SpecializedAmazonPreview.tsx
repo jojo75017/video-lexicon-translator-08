@@ -302,17 +302,19 @@ const SpecializedAmazonPreview: React.FC<SpecializedAmazonPreviewProps> = ({
                   {rating.toFixed(1)} sur 5
                 </span>
                 <span className="text-sm text-[#007185]">
-                  ({reviewCount} évaluations)
+                  {reviewCount > 0 ? `(${reviewCount} évaluations)` : '(Nouveau)'}
                 </span>
               </div>
 
               {/* BSR */}
-              <div className="flex items-center gap-2 text-sm">
-                <TrendingUp className="w-4 h-4 text-green-600" />
-                <span className="text-gray-600">
-                  n°{bsrRank.toLocaleString()} en {config.defaultCategories[0]}
-                </span>
-              </div>
+              {bsrRank && (
+                <div className="flex items-center gap-2 text-sm">
+                  <TrendingUp className="w-4 h-4 text-green-600" />
+                  <span className="text-gray-600">
+                    n°{bsrRank.toLocaleString()} en {config.defaultCategories[0]}
+                  </span>
+                </div>
+              )}
 
               <hr className="border-gray-200" />
 
