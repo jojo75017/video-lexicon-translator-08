@@ -125,31 +125,75 @@ function preCleanJSON(raw: string): string {
   let text = raw;
   
   // Supprimer les blocs JSON complets enveloppant le contenu
-  text = text.replace(/^\s*\{[\s\S]*?"(?:page_de_titre|préface|chapitres|conclusion|personnages)"[\s\S]*\}\s*$/gi, (match) => {
+  text = text.replace(/^\s*\{[\s\S]*?"(?:page[_ ]?de[_ ]?titre|préface|preface|chapitres?|conclusion|personnages|introduction|table[_ ]?des[_ ]?mati[eè]res)"[\s\S]*\}\s*$/gi, (match) => {
     const textValues: string[] = [];
     const valueRegex = /:\s*"((?:[^"\\]|\\.)*)"/g;
     let m;
     while ((m = valueRegex.exec(match)) !== null) {
       const val = m[1].replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\\\/g, '\\');
-      if (val.length > 30 && !/^(?:page_de_titre|préface|chapitres|conclusion|personnages)/i.test(val)) {
+      if (val.length > 30 && !/^(?:page[_ ]?de[_ ]?titre|préface|preface|chapitres?|conclusion|personnages|introduction)/i.test(val)) {
         textValues.push(val);
       }
     }
     return textValues.length > 0 ? textValues.join('\n\n') : match;
   });
 
-  // Supprimer les clés JSON avec guillemets (droits ou français)
-  text = text.replace(/[«»"\u201C\u201D]\s*(?:json)?(?:page[_ ]?de[_ ]?titre|pr[eé]face|table[_ ]?des[_ ]?mati[eè]res|chapitres?[_ ]?liste|texte[_ ]?int[eé]gral|conclusion|[eé]pilogue|personnages|introduction|[eé]l[eé]ments?|sous[_ ]?chapitres?|contenu|titre[_ ]?principal)\s*[«»"\u201C\u201D]\s*:\s*/gi, '');
+  // Supprimer les clés JSON avec guillemets (droits ou français) — liste exhaustive
+  text = text.replace(/[«»"\u201C\u201D]?\s*(?:json)?(?:page[_ ]?de[_ ]?titre|pr[eé]face|table[_ ]?des[_ ]?mati[eè]res|chapitres?[_ ]?liste|texte[_ ]?int[eé]gral|conclusion|[eé]pilogue|personnages|introduction|[eé]l[eé]ments?|sous[_ ]?chapitres?|contenu|titre[_ ]?principal|titre|r[eé]sum[eé]|description|auteur|genre|th[eè]me|format|sections?)\s*[«»"\u201C\u201D]?\s*:\s*/gi, '');
   
+  // Supprimer les clés JSON anglaises/techniques
+  text = text.replace(/[«»"\u201C\u201D]?\s*(?:title|content|chapters?|sub[_ ]?chapters?|text|body|summary|description|author|name|role|numero|number|type|id)\s*[«»"\u201C\u201D]?\s*:\s*/gi, '');
+
+  // Supprimer les structures de listes JSON françaises : [ « item1 », « item2 » ]
+  text = text.replace(/\[\s*[«»"\u201C\u201D]\s*[^[\]]{0,60}\s*[«»"\u201C\u201D]\s*(?:,\s*[«»"\u201C\u201D]\s*[^[\]]{0,60}\s*[«»"\u201C\u201D]\s*)*\]/g, '');
+
   // Supprimer "json" isolé en début de ligne
   text = text.replace(/^\s*json\s*/gim, '');
+  
+  // Supprimer les balises de code markdown ```json ... ```
+  text = text.replace(/```(?:json)?\s*/gi, '');
   
   // Supprimer crochets/accolades JSON orphelins
   text = text.replace(/^\s*[\[{]\s*$/gm, '');
   text = text.replace(/^\s*[\]}],?\s*$/gm, '');
   text = text.replace(/^,\s*/gm, '');
+  
+  // Supprimer les blocs terminaux type , « personnages » : [ {
+  text = text.replace(/,?\s*[«»"\u201C\u201D]?\s*personnages\s*[«»"\u201C\u201D]?\s*:\s*\[[\s\S]*$/gi, '');
+  
+  // Supprimer les guillemets français orphelins autour de rien
+  text = text.replace(/[«»]\s*[«»]/g, '');
 
   return text;
+}
+
+/**
+ * Nettoie un titre de chapitre : si >150 car., c'est du JSON — on extrait le vrai titre
+ */
+function cleanChapterTitle(rawTitle: string): string {
+  if (!rawTitle) return 'Sans titre';
+  
+  let title = preCleanJSON(rawTitle);
+  title = cleanGeneratedText(title);
+  
+  // Si le titre est encore trop long, c'est du JSON résiduel
+  if (title.length > 150) {
+    // Chercher un pattern "titre Principal :" ou "titre :"
+    const titleMatch = title.match(/titre\s*(?:principal)?\s*[:]\s*([^«»"\n]{5,80})/i);
+    if (titleMatch) return titleMatch[1].trim();
+    
+    // Prendre la première phrase courte
+    const firstSentence = title.match(/^([^.!?\n]{5,80})[.!?]/);
+    if (firstSentence) return firstSentence[1].trim();
+    
+    // En dernier recours, tronquer
+    return title.substring(0, 80).trim() + '…';
+  }
+  
+  // Supprimer les numéros de chapitre redondants en début
+  title = title.replace(/^chapitre\s+\d+\s*[:–—]\s*/i, '');
+  
+  return title.trim() || 'Sans titre';
 }
 
 function editorialClean(raw: string): string {
@@ -502,15 +546,20 @@ export async function generateProfessionalDocx(options: DocxExportOptions): Prom
     }
 
     chapters.forEach((chapter, index) => {
+      // Filtrer les chapitres vides (titre générique sans contenu)
+      const hasAnyContent = (chapter.content && chapter.content.trim().length > 50) ||
+        chapter.subChapters.some(s => s.content && s.content.trim().length > 50);
+      if (!hasAnyContent && /^chapitre\s+\d+$/i.test(chapter.title.trim())) return;
+
       children.push(new Paragraph({
-        children: [new TextRun({ text: `Chapitre ${index + 1} – ${editorialClean(chapter.title)}`, size: baseSize, font })],
+        children: [new TextRun({ text: `Chapitre ${index + 1} – ${cleanChapterTitle(chapter.title)}`, size: baseSize, font })],
         spacing: { after: 80 },
       }));
 
       chapter.subChapters.forEach((sub, subIdx) => {
         children.push(new Paragraph({
           children: [new TextRun({
-            text: `${index + 1}.${subIdx + 1}  ${editorialClean(sub.title)}`,
+            text: `${index + 1}.${subIdx + 1}  ${cleanChapterTitle(sub.title)}`,
             size: Math.round(baseSize * 0.9),
             font,
             color: '555555',
@@ -552,6 +601,11 @@ export async function generateProfessionalDocx(options: DocxExportOptions): Prom
 
   // ═══ CHAPITRES ═══
   chapters.forEach((chapter, index) => {
+    // Filtrer les chapitres vides (titre générique sans contenu réel)
+    const hasAnyContent = (chapter.content && chapter.content.trim().length > 50) ||
+      chapter.subChapters.some(s => s.content && s.content.trim().length > 50);
+    if (!hasAnyContent && /^chapitre\s+\d+$/i.test(chapter.title.trim())) return;
+
     // Numéro du chapitre (discret)
     children.push(new Paragraph({
       children: [new TextRun({ text: `CHAPITRE ${index + 1}`, bold: true, size: subTitleSize, font, color: '888888' })],
@@ -560,9 +614,10 @@ export async function generateProfessionalDocx(options: DocxExportOptions): Prom
       spacing: { before: 800, after: 200 },
     }));
 
-    // Titre du chapitre
+    // Titre du chapitre — nettoyé avec cleanChapterTitle
+    const cleanTitle = cleanChapterTitle(chapter.title);
     children.push(new Paragraph({
-      children: [new TextRun({ text: editorialClean(chapter.title).toUpperCase(), bold: true, size: chapterTitleSize, font })],
+      children: [new TextRun({ text: cleanTitle.toUpperCase(), bold: true, size: chapterTitleSize, font })],
       alignment: AlignmentType.CENTER,
       spacing: { after: 600 },
     }));
@@ -578,28 +633,28 @@ export async function generateProfessionalDocx(options: DocxExportOptions): Prom
       if (!sub.content || sub.content.trim().length === 0) {
         // Afficher quand même le titre du sous-chapitre comme repère
         children.push(new Paragraph({
-          children: [new TextRun({
-            text: `${index + 1}.${subIdx + 1}  ${editorialClean(sub.title)}`,
-            bold: true,
-            size: subTitleSize,
-            font,
-          })],
-          heading: HeadingLevel.HEADING_2,
-          spacing: { before: 480, after: 120 },
-        }));
-        children.push(new Paragraph({
-          children: [new TextRun({ text: '[Contenu à rédiger]', italics: true, size: baseSize, font, color: 'AAAAAA' })],
-          spacing: { after: 200 },
-        }));
-        return;
-      }
-
-      // Séparateur visuel subtil avant le sous-chapitre
-      children.push(new Paragraph({ spacing: { before: 240 } }));
-
-      children.push(new Paragraph({
         children: [new TextRun({
-          text: `${index + 1}.${subIdx + 1}  ${editorialClean(sub.title)}`,
+          text: `${index + 1}.${subIdx + 1}  ${cleanChapterTitle(sub.title)}`,
+          bold: true,
+          size: subTitleSize,
+          font,
+        })],
+        heading: HeadingLevel.HEADING_2,
+        spacing: { before: 480, after: 120 },
+      }));
+      children.push(new Paragraph({
+        children: [new TextRun({ text: '[Contenu à rédiger]', italics: true, size: baseSize, font, color: 'AAAAAA' })],
+        spacing: { after: 200 },
+      }));
+      return;
+    }
+
+    // Séparateur visuel subtil avant le sous-chapitre
+    children.push(new Paragraph({ spacing: { before: 240 } }));
+
+    children.push(new Paragraph({
+      children: [new TextRun({
+        text: `${index + 1}.${subIdx + 1}  ${cleanChapterTitle(sub.title)}`,
           bold: true,
           size: subTitleSize,
           font,

@@ -30,9 +30,15 @@ export function cleanGeneratedText(text: string): string {
       return textValues.length > 0 ? textValues.join('\n\n') : match;
     })
     // Supprimer les clés JSON françaises avec guillemets français « clé » :
-    .replace(/[«»"\u201C\u201D]\s*(?:json)?(?:page[_ ]?de[_ ]?titre|préface|preface|table[_ ]?des[_ ]?mati[eè]res|chapitres?[_ ]?liste|texte[_ ]?int[eé]gral|conclusion|[eé]pilogue|personnages|introduction|elements?|sous[_ ]?chapitres?|contenu|titre[_ ]?principal)\s*[«»"\u201C\u201D]\s*:\s*/gi, '')
+    .replace(/[«»"\u201C\u201D]?\s*(?:json)?(?:page[_ ]?de[_ ]?titre|préface|preface|table[_ ]?des[_ ]?mati[eè]res|chapitres?[_ ]?liste|texte[_ ]?int[eé]gral|conclusion|[eé]pilogue|personnages|introduction|[eé]l[eé]ments?|sous[_ ]?chapitres?|contenu|titre[_ ]?principal|r[eé]sum[eé]|auteur|genre|th[eè]me|format|sections?)\s*[«»"\u201C\u201D]?\s*:\s*/gi, '')
     // Supprimer les clés JSON anglaises/techniques avec guillemets français
-    .replace(/[«»"\u201C\u201D]\s*(?:title|content|chapters?|sub[_ ]?chapters?|text|body|summary|description|author|name|role)\s*[«»"\u201C\u201D]\s*:\s*/gi, '')
+    .replace(/[«»"\u201C\u201D]?\s*(?:title|content|chapters?|sub[_ ]?chapters?|text|body|summary|description|author|name|role|numero|number|type|id)\s*[«»"\u201C\u201D]?\s*:\s*/gi, '')
+    // Supprimer les structures de listes JSON françaises [ « item1 », « item2 » ]
+    .replace(/\[\s*[«»"\u201C\u201D]\s*[^[\]]{0,60}\s*[«»"\u201C\u201D]\s*(?:,\s*[«»"\u201C\u201D]\s*[^[\]]{0,60}\s*[«»"\u201C\u201D]\s*)*\]/g, '')
+    // Supprimer les blocs terminaux , « personnages » : [ {
+    .replace(/,?\s*[«»"\u201C\u201D]?\s*personnages\s*[«»"\u201C\u201D]?\s*:\s*\[[\s\S]*$/gi, '')
+    // Supprimer les balises de code markdown ```json
+    .replace(/```(?:json)?\s*/gi, '')
     // Supprimer le mot "json" isolé en début de ligne (artefact code fence)
     .replace(/^\s*json\s*/gim, '')
     // Supprimer les crochets/accolades de structure JSON orphelins
