@@ -10,15 +10,12 @@ export const ExclusiveFlashBanner: React.FC = () => {
       transition={{ duration: 0.6, delay: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
       className="relative mx-4 sm:mx-auto max-w-4xl my-10"
     >
-      {/* Glow effect */}
-      <div className="absolute -inset-1 bg-gradient-to-r from-amber-500/30 via-orange-500/30 to-red-500/30 rounded-2xl blur-xl" />
+      <div className="absolute -inset-1 bg-gradient-to-r from-kdp-orange/30 via-kdp-orange/20 to-destructive/20 rounded-2xl blur-xl" />
       
-      <div className="relative bg-gradient-to-br from-card via-secondary to-card border border-amber-500/40 rounded-2xl overflow-hidden">
-        {/* Animated top stripe */}
-        <div className="h-1.5 bg-gradient-to-r from-amber-400 via-orange-500 to-red-500 animate-pulse" />
+      <div className="relative bg-gradient-to-br from-card via-secondary to-card border border-kdp-orange/40 rounded-2xl overflow-hidden">
+        <div className="h-1.5 bg-gradient-to-r from-kdp-orange via-kdp-orange/80 to-destructive animate-pulse" />
         
         <div className="px-6 sm:px-10 py-8 sm:py-10">
-          {/* Flash badge */}
           <div className="flex items-center justify-center gap-2 mb-5">
             <motion.div
               animate={{ rotate: [0, -10, 10, -10, 0] }}
@@ -37,7 +34,6 @@ export const ExclusiveFlashBanner: React.FC = () => {
             </motion.div>
           </div>
 
-          {/* Main headline */}
           <h3 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-center leading-tight mb-4">
             <span className="text-foreground drop-shadow-sm">Ce que vous allez découvrir ici,</span>
             <br />
@@ -46,29 +42,22 @@ export const ExclusiveFlashBanner: React.FC = () => {
             </span>
           </h3>
 
-          {/* Sub-points */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
             {[
               {
                 icon: Diamond,
                 title: "Suite IA Complète",
                 desc: "Rédaction, couvertures, audiobooks — tout en un seul outil",
-                 color: "text-primary",
-                 border: "border-border",
               },
               {
                 icon: AlertTriangle,
                 title: "Prix Introuvable",
                 desc: "67€ à vie au lieu de 500-2000€ chez les concurrents",
-                 color: "text-primary",
-                 border: "border-border",
               },
               {
                 icon: Zap,
                 title: "Résultats ce soir",
                 desc: "Votre 1er ebook publié sur Amazon en moins d'1h",
-                 color: "text-primary",
-                 border: "border-border",
               },
             ].map((item, i) => (
               <motion.div
@@ -77,16 +66,15 @@ export const ExclusiveFlashBanner: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.2 + i * 0.1 }}
-                 className={`bg-card/80 ${item.border} border rounded-xl p-4 text-center backdrop-blur-sm`}
+                className="bg-card/80 border-border border rounded-xl p-4 text-center backdrop-blur-sm"
               >
-                <item.icon className={`w-7 h-7 ${item.color} mx-auto mb-2`} />
-                 <p className="font-bold text-foreground text-sm">{item.title}</p>
-                 <p className="text-muted-foreground text-xs mt-1">{item.desc}</p>
+                <item.icon className="w-7 h-7 text-primary mx-auto mb-2" />
+                <p className="font-bold text-foreground text-sm">{item.title}</p>
+                <p className="text-muted-foreground text-xs mt-1">{item.desc}</p>
               </motion.div>
             ))}
           </div>
 
-          {/* Arrow indicator */}
           <motion.div
             animate={{ y: [0, 6, 0] }}
             transition={{ duration: 1.5, repeat: Infinity }}

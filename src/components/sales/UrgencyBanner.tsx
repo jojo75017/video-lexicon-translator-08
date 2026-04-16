@@ -3,12 +3,12 @@ import { motion } from 'framer-motion';
 import { Flame, TrendingUp, Users, ShieldCheck, Zap, Clock } from 'lucide-react';
 
 const messages = [
-  { icon: Flame, text: "3 personnes ont acheté dans la dernière heure", color: "text-orange-400" },
-  { icon: TrendingUp, text: "Le prix passera à 147€ le 1er juillet", color: "text-amber-400" },
-  { icon: Users, text: "Rejoignez +5000 auteurs satisfaits", color: "text-emerald-400" },
+  { icon: Flame, text: "3 personnes ont acheté dans la dernière heure", color: "text-kdp-orange" },
+  { icon: TrendingUp, text: "Le prix passera à 147€ le 1er juillet", color: "text-kdp-orange" },
+  { icon: Users, text: "Rejoignez +5000 auteurs satisfaits", color: "text-primary" },
   { icon: ShieldCheck, text: "Garantie 30 jours — 0 risque pour vous", color: "text-primary" },
-  { icon: Zap, text: "Votre 1er ebook publié ce soir sur Amazon", color: "text-violet-400" },
-  { icon: Clock, text: "Places Fondateur limitées — ne tardez pas", color: "text-red-400" },
+  { icon: Zap, text: "Votre 1er ebook publié ce soir sur Amazon", color: "text-primary" },
+  { icon: Clock, text: "Places Fondateur limitées — ne tardez pas", color: "text-destructive" },
 ];
 
 export const UrgencyBanner: React.FC = () => {
@@ -25,7 +25,7 @@ export const UrgencyBanner: React.FC = () => {
   const Icon = current.icon;
 
   return (
-    <div className="bg-secondary border-y border-amber-500/20 py-2.5 overflow-hidden">
+    <div className="bg-secondary border-y border-kdp-orange/20 py-2.5 overflow-hidden">
       <motion.div
         key={currentIndex}
         initial={{ opacity: 0, y: 10 }}

@@ -47,10 +47,9 @@ const ProgressEngagement = ({
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 bg-gradient-to-r from-card/95 via-card/95 to-card/95 backdrop-blur-md border-t border-primary/30 py-3 px-4 md:py-4">
+    <div className="fixed bottom-0 left-0 right-0 z-40 bg-card/95 backdrop-blur-md border-t border-primary/30 py-3 px-4 md:py-4">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center gap-4">
-          {/* Progress Section */}
           <div className="flex-1">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
@@ -63,7 +62,7 @@ const ProgressEngagement = ({
                 variant="secondary" 
                 className={`text-xs ${
                   progress >= 80 
-                    ? "bg-emerald-500/20 text-emerald-300 border-primary/20 animate-pulse" 
+                    ? "bg-primary/20 text-primary border-primary/20 animate-pulse" 
                     : "bg-primary/20 text-primary border-primary/30"
                 }`}
               >
@@ -71,21 +70,20 @@ const ProgressEngagement = ({
               </Badge>
             </div>
             
-            <Progress value={progress} className="h-2 bg-white/10" />
+            <Progress value={progress} className="h-2 bg-muted" />
             
-            {/* Step indicators (hidden on mobile) */}
             <div className="hidden md:flex justify-between mt-2">
-              {steps.map((step, idx) => (
+              {steps.map((step) => (
                 <div 
                   key={step.id}
                   className={`flex items-center gap-1 text-xs transition-all ${
                     currentStep >= step.id 
                       ? "text-primary" 
-                      : "text-gray-500"
+                      : "text-muted-foreground"
                   }`}
                 >
                   {currentStep > step.id ? (
-                    <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                    <CheckCircle2 className="w-3 h-3 text-primary" />
                   ) : (
                     <span>{step.icon}</span>
                   )}
@@ -95,7 +93,6 @@ const ProgressEngagement = ({
             </div>
           </div>
 
-          {/* CTA Button (appears at 80%+) */}
           <AnimatePresence>
             {showCta && (
               <motion.div
@@ -105,7 +102,7 @@ const ProgressEngagement = ({
               >
                 <Button
                   onClick={scrollToOffer}
-                  className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-foreground font-semibold px-4 md:px-6 h-10 shadow-lg shadow-emerald-500/25"
+                  className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground font-semibold px-4 md:px-6 h-10 shadow-lg shadow-primary/25"
                 >
                   <span className="hidden sm:inline">Plus qu'un pas !</span>
                   <ArrowRight className="w-4 h-4 sm:ml-2" />
