@@ -57,19 +57,18 @@ const SalesFaq: React.FC = () => {
 
   return (
     <section className="relative py-20 px-4 overflow-hidden">
-      {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-secondary/50 to-background" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_0%,rgba(6,182,212,0.05),transparent)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_0%,hsl(var(--primary)/0.03),transparent)]" />
 
       <div className="max-w-3xl mx-auto relative z-10">
         <div className="text-center mb-12">
-          <Badge className="mb-4 bg-cyan-500/10 text-primary border-primary/20 px-4 py-2">
+          <Badge className="mb-4 bg-primary/10 text-primary border-primary/20 px-4 py-2">
             <HelpCircle className="w-4 h-4 mr-2" />
             FAQ — 11 réponses essentielles
           </Badge>
           <h2 className="text-3xl md:text-4xl font-extrabold mb-4 text-foreground">
             Toutes vos questions,
-            <span className="text-slate-500"> nos réponses.</span>
+            <span className="text-muted-foreground"> nos réponses.</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-xl mx-auto">
             Nous avons rassemblé les questions les plus posées par nos utilisateurs avant de se lancer.
@@ -85,7 +84,7 @@ const SalesFaq: React.FC = () => {
             >
               <AccordionTrigger className="text-left font-semibold hover:no-underline py-5 text-sm md:text-base text-foreground">
                 <span className="flex items-start gap-3">
-                  <span className="flex items-center justify-center w-7 h-7 rounded-lg bg-cyan-500/10 text-primary text-xs font-bold shrink-0 mt-0.5">
+                  <span className="flex items-center justify-center w-7 h-7 rounded-lg bg-primary/10 text-primary text-xs font-bold shrink-0 mt-0.5">
                     {String(index + 1).padStart(2, '0')}
                   </span>
                   <span>{faq.question}</span>
@@ -98,9 +97,8 @@ const SalesFaq: React.FC = () => {
           ))}
         </Accordion>
 
-        {/* CTA sous la FAQ */}
         <div className="mt-12 text-center">
-          <div className="bg-gradient-to-r from-cyan-500/5 via-cyan-500/10 to-cyan-500/5 border border-primary/20 rounded-2xl p-8">
+          <div className="bg-primary/5 border border-primary/20 rounded-2xl p-8">
             <p className="font-bold text-lg mb-2 text-foreground">Encore des doutes ?</p>
             <p className="text-muted-foreground text-sm mb-6">
               Réservez un appel Zoom gratuit pour voir l'outil en direct, ou lancez-vous directement.
@@ -108,7 +106,7 @@ const SalesFaq: React.FC = () => {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Button 
                 size="lg" 
-                className="bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-900 font-bold px-8 py-5 rounded-xl shadow-lg shadow-cyan-500/20"
+                className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground font-bold px-8 py-5 rounded-xl shadow-lg shadow-primary/20"
                 onClick={() => navigate('/upsell-paiement?plan=pro')}
               >
                 <Rocket className="w-5 h-5 mr-2" />
@@ -116,7 +114,7 @@ const SalesFaq: React.FC = () => {
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
               <a href="https://calendly.com/boubetgeorges/nouvelle-reunion" target="_blank" rel="noopener noreferrer">
-                <Button variant="outline" size="lg" className="gap-2 border-border text-foreground hover:text-foreground hover:border-slate-600 hover:bg-muted/50">
+                <Button variant="outline" size="lg" className="gap-2 border-border text-foreground hover:text-foreground hover:border-primary/30 hover:bg-muted/50">
                   <MessageCircle className="w-4 h-4" />
                   Réserver un Zoom gratuit
                 </Button>

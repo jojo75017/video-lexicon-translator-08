@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Calculator, TrendingUp, DollarSign, Sparkles } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 
-const ROI_PER_EBOOK_MONTH = 25; // avg €25/month per ebook
+const ROI_PER_EBOOK_MONTH = 25;
 const COST_PER_EBOOK = 0.30;
 const TOOL_PRICE = 67;
 
@@ -25,8 +25,8 @@ const RoiCalculator = () => {
     <Card className="bg-card/80 border-border overflow-hidden">
       <CardContent className="p-6 md:p-8">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center">
-            <Calculator className="w-6 h-6 text-slate-900" />
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+            <Calculator className="w-6 h-6 text-primary-foreground" />
           </div>
           <div>
             <h3 className="font-bold text-xl text-foreground">Calculateur de ROI</h3>
@@ -34,7 +34,6 @@ const RoiCalculator = () => {
           </div>
         </div>
 
-        {/* Slider */}
         <div className="mb-8">
           <div className="flex justify-between items-baseline mb-3">
             <label className="text-sm font-semibold text-foreground/80">Ebooks publiés par mois</label>
@@ -54,22 +53,21 @@ const RoiCalculator = () => {
           </div>
         </div>
 
-        {/* Results Grid */}
         <div className="grid grid-cols-2 gap-4 mb-6">
           <motion.div 
             key={monthlyRevenue}
             initial={{ scale: 0.95 }} animate={{ scale: 1 }}
-            className="p-4 rounded-xl bg-emerald-950/40 border border-emerald-900/50 text-center"
+            className="p-4 rounded-xl bg-primary/10 border border-primary/20 text-center"
           >
-            <DollarSign className="w-5 h-5 text-emerald-400 mx-auto mb-1" />
-            <p className="text-2xl font-black text-emerald-400">{monthlyRevenue}€</p>
+            <DollarSign className="w-5 h-5 text-primary mx-auto mb-1" />
+            <p className="text-2xl font-black text-primary">{monthlyRevenue}€</p>
             <p className="text-xs text-foreground/50">Revenus/mois estimés</p>
           </motion.div>
           
           <motion.div 
             key={yearlyRevenue}
             initial={{ scale: 0.95 }} animate={{ scale: 1 }}
-            className="p-4 rounded-xl bg-cyan-950/40 border border-cyan-900/50 text-center"
+            className="p-4 rounded-xl bg-primary/10 border border-primary/20 text-center"
           >
             <TrendingUp className="w-5 h-5 text-primary mx-auto mb-1" />
             <p className="text-2xl font-black text-primary">{yearlyRevenue.toLocaleString('fr-FR')}€</p>
@@ -81,20 +79,19 @@ const RoiCalculator = () => {
             <p className="text-xs text-foreground/50">Coût total (outil + API)</p>
           </div>
           
-          <div className="p-4 rounded-xl bg-amber-950/40 border border-amber-900/50 text-center">
-            <Sparkles className="w-5 h-5 text-amber-400 mx-auto mb-1" />
-            <p className="text-2xl font-black text-amber-400">x{Math.max(1, Math.round(yearlyRevenue / totalCost))}</p>
+          <div className="p-4 rounded-xl bg-kdp-orange/10 border border-kdp-orange/20 text-center">
+            <Sparkles className="w-5 h-5 text-kdp-orange mx-auto mb-1" />
+            <p className="text-2xl font-black text-kdp-orange">x{Math.max(1, Math.round(yearlyRevenue / totalCost))}</p>
             <p className="text-xs text-foreground/50">Retour sur investissement</p>
           </div>
         </div>
 
-        {/* Summary */}
-        <div className="p-4 rounded-xl bg-gradient-to-r from-cyan-500/10 to-emerald-500/10 border border-primary/20">
+        <div className="p-4 rounded-xl bg-primary/5 border border-primary/20">
           <p className="text-sm text-foreground/90 text-center leading-relaxed">
             À <strong className="text-primary">{ebooksPerMonth[0]} ebook{ebooksPerMonth[0] > 1 ? 's' : ''}/mois</strong>, 
-            votre investissement de <strong>67€</strong> est rentabilisé dès le <strong className="text-emerald-400">{paybackBooks}ème ebook vendu</strong>.
+            votre investissement de <strong>67€</strong> est rentabilisé dès le <strong className="text-primary">{paybackBooks}ème ebook vendu</strong>.
             <br />
-            Profit net estimé sur 12 mois : <strong className="text-amber-400">{netProfit.toLocaleString('fr-FR')}€</strong>
+            Profit net estimé sur 12 mois : <strong className="text-kdp-orange">{netProfit.toLocaleString('fr-FR')}€</strong>
           </p>
         </div>
       </CardContent>

@@ -25,7 +25,7 @@ const STEPS = [
         "📊 Concurrence : Modérée — Opportunité forte",
       ],
     },
-    color: "from-cyan-500 to-blue-500",
+    color: "from-primary to-accent",
   },
   {
     id: 2,
@@ -42,7 +42,7 @@ const STEPS = [
         "🔄 Régénération illimitée si besoin",
       ],
     },
-    color: "from-emerald-500 to-teal-500",
+    color: "from-primary to-accent",
   },
   {
     id: 3,
@@ -59,7 +59,7 @@ const STEPS = [
         "🚀 Listing Amazon optimisé inclus",
       ],
     },
-    color: "from-violet-500 to-purple-500",
+    color: "from-kdp-orange to-kdp-orange/80",
   },
 ];
 
@@ -93,18 +93,17 @@ const InteractiveDemo = () => {
 
   return (
     <section className="py-20 px-4 relative overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_0%,rgba(6,182,212,0.06),transparent)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_0%,hsl(var(--primary)/0.04),transparent)]" />
 
       <div className="max-w-5xl mx-auto relative z-10">
-        {/* Header */}
         <div className="text-center mb-12">
-          <Badge className="mb-4 bg-cyan-500/10 text-primary border-primary/20 px-4 py-2">
+          <Badge className="mb-4 bg-primary/10 text-primary border-primary/20 px-4 py-2">
             <Play className="w-4 h-4 mr-2" />
             DÉMO EN 3 ÉTAPES
           </Badge>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground mb-4">
             Voyez la puissance de l'IA{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-emerald-400">
+            <span className="text-primary">
               en action
             </span>
           </h2>
@@ -113,7 +112,6 @@ const InteractiveDemo = () => {
           </p>
         </div>
 
-        {/* Step selector */}
         <div className="flex items-center justify-center gap-2 sm:gap-4 mb-10">
           {STEPS.map((s, i) => (
             <button
@@ -130,7 +128,7 @@ const InteractiveDemo = () => {
                   i === activeStep ? 'scale-110' : 'scale-100 opacity-60'
                 }`}
               >
-                <s.icon className="w-4 h-4 text-foreground" />
+                <s.icon className="w-4 h-4 text-primary-foreground" />
               </div>
               <div className="text-left hidden sm:block">
                 <p className={`text-sm font-semibold ${i === activeStep ? 'text-foreground' : 'text-foreground/50'}`}>
@@ -147,7 +145,6 @@ const InteractiveDemo = () => {
           ))}
         </div>
 
-        {/* Demo area */}
         <AnimatePresence mode="wait">
           <motion.div
             key={activeStep}
@@ -159,10 +156,9 @@ const InteractiveDemo = () => {
             <Card className="bg-card border-border overflow-hidden">
               <CardContent className="p-0">
                 <div className="grid md:grid-cols-2">
-                  {/* Left: description */}
                   <div className="p-8 md:p-10 border-b md:border-b-0 md:border-r border-border">
                     <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${step.color} flex items-center justify-center mb-5`}>
-                      <step.icon className="w-7 h-7 text-foreground" />
+                      <step.icon className="w-7 h-7 text-primary-foreground" />
                     </div>
                     <h3 className="text-2xl font-bold text-foreground mb-2">{step.title}</h3>
                     <div className="flex items-center gap-2 mb-4">
@@ -172,7 +168,7 @@ const InteractiveDemo = () => {
                     <p className="text-foreground/70 leading-relaxed mb-6">{step.description}</p>
                     <Button
                       onClick={handleSimulate}
-                      className="bg-gradient-to-r from-cyan-500 to-emerald-500 text-slate-900 font-bold hover:from-cyan-400 hover:to-emerald-400"
+                      className="bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold hover:from-primary/90 hover:to-accent/90"
                       disabled={isAnimating}
                     >
                       <Sparkles className="w-4 h-4 mr-2" />
@@ -180,9 +176,7 @@ const InteractiveDemo = () => {
                     </Button>
                   </div>
 
-                  {/* Right: simulated output */}
                   <div className="p-8 md:p-10 bg-background/50">
-                    {/* Input */}
                     <div className="mb-6">
                       <p className="text-xs text-foreground/40 uppercase tracking-wider mb-2">Entrée</p>
                       <div className="bg-muted/80 rounded-lg px-4 py-3 border border-border">
@@ -190,7 +184,6 @@ const InteractiveDemo = () => {
                       </div>
                     </div>
 
-                    {/* Output */}
                     <div>
                       <p className="text-xs text-foreground/40 uppercase tracking-wider mb-2">Résultat IA</p>
                       <div className="space-y-2">
@@ -213,7 +206,7 @@ const InteractiveDemo = () => {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.8 }}
-                        className="mt-6 flex items-center gap-2 text-emerald-400 text-sm font-medium"
+                        className="mt-6 flex items-center gap-2 text-primary text-sm font-medium"
                       >
                         <CheckCircle className="w-4 h-4" />
                         Terminé en {step.subtitle}
@@ -226,7 +219,6 @@ const InteractiveDemo = () => {
           </motion.div>
         </AnimatePresence>
 
-        {/* Bottom CTA */}
         <div className="text-center mt-10">
           <p className="text-foreground/60 text-sm mb-4">
             <strong className="text-foreground">20 minutes</strong> du début à la publication. Essayez par vous-même.
@@ -235,7 +227,7 @@ const InteractiveDemo = () => {
             <Button
               size="lg"
               onClick={() => navigate('/demo')}
-              className="bg-gradient-to-r from-cyan-500 to-emerald-500 text-slate-900 font-bold px-8 py-6 rounded-xl shadow-lg shadow-cyan-500/20"
+              className="bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold px-8 py-6 rounded-xl shadow-lg shadow-primary/20"
             >
               <Rocket className="w-5 h-5 mr-2" />
               Essayer la démo gratuite
@@ -245,7 +237,7 @@ const InteractiveDemo = () => {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <Button variant="outline" size="lg" className="border-border text-foreground/70 hover:text-foreground hover:border-slate-600">
+              <Button variant="outline" size="lg" className="border-border text-foreground/70 hover:text-foreground hover:border-primary/30">
                 Recevoir les 10 niches gratuites
               </Button>
             </a>

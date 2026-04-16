@@ -10,24 +10,19 @@ import { useNavigate, Link, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
-import ExitIntentPopup from "@/components/sales/ExitIntentPopup";
 import SalesFaq from "@/components/sales/SalesFaq";
 import AuthorShowcase from "@/components/sales/AuthorShowcase";
-import SpotsCounter from "@/components/sales/SpotsCounter";
 import RoiCalculator from "@/components/sales/RoiCalculator";
-import SocialProofToast from "@/components/sales/SocialProofToast";
 import PriceComparison from "@/components/sales/PriceComparison";
 import CountdownTimer from "@/components/sales/CountdownTimer";
 import UrgencyBanner from "@/components/sales/UrgencyBanner";
 import GuaranteeSection from "@/components/sales/GuaranteeSection";
-import ProgressEngagement from "@/components/sales/ProgressEngagement";
 import InteractiveDemo from "@/components/sales/InteractiveDemo";
 import WhoIsThisFor from "@/components/sales/WhoIsThisFor";
 import TonightOutcomes from "@/components/sales/TonightOutcomes";
 import ExclusiveFlashBanner from "@/components/sales/ExclusiveFlashBanner";
 import BeforeAfterSection from "@/components/sales/BeforeAfterSection";
 import KdpTestimonials from "@/components/sales/KdpTestimonials";
-import { FloatingMobileCta } from "@/components/sales/FloatingMobileCta";
 
 // ════════════════════════════════════════════════════════════════════════════════
 // DESIGN SYSTEM 2026 — Palette Premium
@@ -87,13 +82,13 @@ const NewsletterForm = () => {
     setLoading(false);
   };
 
-  if (done) return <p className="text-emerald-400 text-sm flex items-center gap-2"><CheckCircle className="w-4 h-4" />Inscrit !</p>;
+  if (done) return <p className="text-primary text-sm flex items-center gap-2"><CheckCircle className="w-4 h-4" />Inscrit !</p>;
 
   return (
     <form onSubmit={handleSubmit} className="flex gap-2">
       <Input type="email" placeholder="votre@email.com" value={email} onChange={e => setEmail(e.target.value)} 
         className="bg-muted border-border text-foreground placeholder:text-muted-foreground h-10 rounded-xl" />
-      <Button type="submit" disabled={loading} className="bg-primary hover:bg-primary/90 text-foreground font-bold h-10 px-4 rounded-xl">
+      <Button type="submit" disabled={loading} className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold h-10 px-4 rounded-xl">
         {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
       </Button>
     </form>
@@ -178,8 +173,8 @@ const SalesPage = () => {
 
   const handlePlanClick = () => {
     trackPlanSelect('pro', LAUNCH_PRICE);
-    trackCTAClick('plan_click', 'trial_modal');
-    setShowTrialModal(true);
+    trackCTAClick('plan_click', 'pricing_section');
+    navigate('/upsell-paiement?plan=pro');
   };
 
   const handleStartTrial = async (e: React.FormEvent) => {
@@ -231,8 +226,8 @@ const SalesPage = () => {
         <meta property="og:title" content="EbookStudio Pro — Créez des Ebooks avec l'IA" />
         <meta property="og:description" content="Générez des ebooks professionnels avec l'IA : plan, rédaction, couverture, audiobook. 67€ accès à vie." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://video-lexicon-translator-08.lovable.app/offres" />
-        <link rel="canonical" href="https://video-lexicon-translator-08.lovable.app/offres" />
+        <meta property="og:url" content="https://ebookstudio.fr/offres" />
+        <link rel="canonical" href="https://ebookstudio.fr/offres" />
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",
           "@type": "Product",
@@ -282,11 +277,11 @@ const SalesPage = () => {
       <UrgencyBanner />
 
       {/* ═══════════════════════════════════════ TOP BAR ═══════════════════════════════════════ */}
-      <div className="bg-gradient-to-r from-primary via-primary to-accent text-foreground py-2.5 px-4">
+      <div className="bg-gradient-to-r from-primary via-primary to-accent text-primary-foreground py-2.5 px-4">
         <div className="max-w-6xl mx-auto flex items-center justify-center gap-4 text-sm font-semibold">
           <Flame className="w-4 h-4" />
           <span>OFFRE DE LANCEMENT — Fin le 30 juin 2026</span>
-          <div className="hidden sm:flex items-center gap-1.5 bg-secondary/30 rounded-lg px-3 py-1">
+          <div className="hidden sm:flex items-center gap-1.5 bg-background/20 rounded-lg px-3 py-1">
             <span className="tabular-nums font-bold">{countdown.days}j</span>
             <span>:</span>
             <span className="tabular-nums font-bold">{countdown.hours}h</span>
@@ -302,7 +297,7 @@ const SalesPage = () => {
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link to="/offres" className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/80 to-accent/80 flex items-center justify-center">
-              <BookOpen className="w-5 h-5 text-foreground" />
+              <BookOpen className="w-5 h-5 text-primary-foreground" />
             </div>
             <div>
               <span className="font-bold text-lg">EbookStudio</span>
@@ -318,7 +313,7 @@ const SalesPage = () => {
             <Link to="/subscription" className="text-muted-foreground hover:text-foreground transition-colors">Connexion</Link>
           </nav>
 
-          <Button onClick={scrollToPricing} className="bg-primary hover:bg-primary/90 text-foreground font-bold rounded-xl px-5">
+          <Button onClick={scrollToPricing} className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl px-5">
             <Sparkles className="w-4 h-4 mr-2" />
             67€ à vie
           </Button>
@@ -331,14 +326,14 @@ const SalesPage = () => {
       {/* ═══════════════════════════════════════ HERO ═══════════════════════════════════════ */}
       <section className="relative py-20 sm:py-28 px-4">
         {/* Background effects */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(6,182,212,0.15),transparent)]" />
-        <div className="absolute top-40 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-20 right-1/4 w-80 h-80 bg-emerald-500/10 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,hsl(var(--primary)/0.1),transparent)]" />
+        <div className="absolute top-40 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-20 right-1/4 w-80 h-80 bg-accent/10 rounded-full blur-[100px] pointer-events-none" />
         
         <motion.div initial="hidden" animate="visible" variants={stagger} className="max-w-4xl mx-auto text-center relative z-10">
           
           <motion.div variants={fadeIn} className="mb-6">
-            <Badge className="bg-cyan-500/10 text-primary border-primary/30 px-4 py-2 text-sm font-semibold">
+            <Badge className="bg-primary/10 text-primary border-primary/30 px-4 py-2 text-sm font-semibold">
               <Cpu className="w-4 h-4 mr-2" />
               Propulsé par Gemini 3 Flash & Imagen 3
             </Badge>
@@ -347,7 +342,7 @@ const SalesPage = () => {
           <motion.h1 variants={fadeIn} custom={1} className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-[1.1] tracking-tight mb-6">
             Créez des ebooks
             <br />
-            <span className="bg-gradient-to-r from-cyan-400 via-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
               professionnels
             </span>
             <br />
@@ -390,7 +385,7 @@ const SalesPage = () => {
                     <Button
                       type="button"
                       onClick={() => navigate(hasAdminSession || hasSubscriberAccess ? '/ebook-planner' : '/subscription')}
-                      className="bg-gradient-to-r from-primary to-accent text-foreground font-bold rounded-xl"
+                      className="bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold rounded-xl"
                     >
                       <Rocket className="w-4 h-4 mr-2" />
                       {hasAdminSession || hasSubscriberAccess ? 'Reprendre le générateur' : 'Retrouver mon accès'}
@@ -401,7 +396,7 @@ const SalesPage = () => {
                         type="button"
                         variant="outline"
                         onClick={() => navigate('/admin')}
-                        className="border-primary/40 text-primary hover:text-foreground hover:bg-cyan-500/10 rounded-xl"
+                        className="border-primary/40 text-primary hover:text-foreground hover:bg-primary/10 rounded-xl"
                       >
                         Dashboard admin
                       </Button>
@@ -415,13 +410,13 @@ const SalesPage = () => {
           {/* CTA Principal */}
           <motion.div variants={fadeIn} custom={4} className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-5">
             <Button size="lg" onClick={handlePlanClick}
-              className="w-full sm:w-auto text-lg px-10 py-7 bg-gradient-to-r from-primary to-accent hover:from-cyan-400 hover:to-emerald-400 text-foreground font-bold rounded-2xl shadow-2xl shadow-primary/25 hover:shadow-primary/40 transition-all duration-300 hover:-translate-y-1">
+              className="w-full sm:w-auto text-lg px-10 py-7 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground font-bold rounded-2xl shadow-2xl shadow-primary/25 hover:shadow-primary/40 transition-all duration-300 hover:-translate-y-1">
               <Rocket className="w-5 h-5 mr-2" />
-              Je publie mon 1er ebook — 67€ à vie
+              Accéder — 67€ à vie
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
             <Button size="lg" variant="outline" onClick={() => navigate('/demo')}
-              className="w-full sm:w-auto text-base px-8 py-6 border-primary/50 text-primary hover:text-foreground hover:border-primary hover:bg-cyan-500/10 rounded-2xl">
+              className="w-full sm:w-auto text-base px-8 py-6 border-primary/50 text-primary hover:text-foreground hover:border-primary hover:bg-primary/10 rounded-2xl">
               <Play className="w-5 h-5 mr-2" />
               Voir la démo
             </Button>
@@ -434,7 +429,7 @@ const SalesPage = () => {
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => trackCTAClick('hero_free_guide', 'capture_tunnel')}
-              className="inline-flex items-center gap-2 text-amber-400 hover:text-amber-300 font-semibold text-sm transition-colors group"
+              className="inline-flex items-center gap-2 text-kdp-orange hover:text-kdp-orange/80 font-semibold text-sm transition-colors group"
             >
               <Gift className="w-4 h-4 group-hover:animate-bounce" />
               Pas encore prêt ? Recevez notre guide gratuit : 10 Niches KDP Rentables
@@ -443,9 +438,9 @@ const SalesPage = () => {
           </motion.div>
 
           <motion.div variants={fadeIn} custom={5} className="flex flex-wrap justify-center gap-4 text-sm text-muted-foreground">
-            <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-500" />Paiement unique</span>
-            <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-500" />Accès à vie</span>
-            <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-500" />Garantie 30 jours</span>
+            <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-primary" />Paiement unique</span>
+            <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-primary" />Accès à vie</span>
+            <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-primary" />Garantie 30 jours</span>
           </motion.div>
         </motion.div>
       </section>
@@ -458,7 +453,7 @@ const SalesPage = () => {
           viewport={{ once: true }}
           className="max-w-3xl mx-auto"
         >
-          <div className="relative bg-gradient-to-r from-emerald-500/10 via-cyan-500/10 to-emerald-500/10 border-2 border-primary/20 rounded-2xl p-6 sm:p-8 overflow-hidden">
+          <div className="relative bg-primary/5 border-2 border-primary/20 rounded-2xl p-6 sm:p-8 overflow-hidden">
             {/* Shimmer */}
             <motion.div
               className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent"
@@ -467,8 +462,8 @@ const SalesPage = () => {
               transition={{ duration: 3, repeat: Infinity, repeatDelay: 4 }}
             />
             <div className="relative z-10 flex flex-col sm:flex-row items-center gap-5">
-              <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 flex items-center justify-center shrink-0">
-                <Gift className="w-7 h-7 text-emerald-400" />
+              <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
+                <Gift className="w-7 h-7 text-primary" />
               </div>
               <div className="flex-1 text-center sm:text-left">
                 <h3 className="text-xl font-bold text-foreground mb-1">
@@ -480,41 +475,15 @@ const SalesPage = () => {
               </div>
               <Button
                 onClick={handlePlanClick}
-                className="shrink-0 bg-gradient-to-r from-primary to-accent hover:from-emerald-400 hover:to-cyan-400 text-foreground font-bold px-6 py-5 rounded-xl shadow-lg shadow-primary/25 whitespace-nowrap"
+                className="shrink-0 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground font-bold px-6 py-5 rounded-xl shadow-lg shadow-primary/25 whitespace-nowrap"
               >
                 <Rocket className="w-5 h-5 mr-2" />
-                Commencer gratuitement
+                Accéder — 67€ à vie
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </div>
           </div>
         </motion.div>
-      </section>
-
-      {/* ═══════════════════════════════════════ VIDEO PRÉSENTATION ═══════════════════════════════════════ */}
-      <section className="py-16 px-4">
-        <div className="max-w-4xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-8">
-            <motion.p variants={fadeIn} className="text-primary font-semibold mb-3 uppercase tracking-wider text-sm">Présentation vidéo</motion.p>
-            <motion.h2 variants={fadeIn} custom={1} className="text-3xl sm:text-4xl font-black mb-3">
-              Découvrez l'Offre Fondatrice
-            </motion.h2>
-            <motion.p variants={fadeIn} custom={2} className="text-muted-foreground">Tout ce qui est inclus, en moins de 3 minutes</motion.p>
-          </motion.div>
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-            className="rounded-2xl overflow-hidden border-2 border-primary/20 shadow-2xl shadow-primary/10">
-            <video
-              controls
-              preload="metadata"
-              poster="/images/video-poster-offre.jpg"
-              className="w-full aspect-video bg-card"
-              playsInline
-            >
-              <source src="/videos/ebookstudio-offre-fondatrice.mp4" type="video/mp4" />
-              Votre navigateur ne supporte pas la lecture vidéo.
-            </video>
-          </motion.div>
-        </div>
       </section>
 
       {/* ═══════════════════════════════════════ SOCIAL PROOF ═══════════════════════════════════════ */}
@@ -524,7 +493,7 @@ const SalesPage = () => {
             <div className="flex items-center gap-3">
               <div className="flex -space-x-3">
                 {['MD','TL','SR','JP','CB'].map((a, i) => (
-                  <div key={i} className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-xs text-foreground font-bold border-2 border-background">{a}</div>
+                  <div key={i} className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-xs text-primary-foreground font-bold border-2 border-background">{a}</div>
                 ))}
               </div>
               <div>
@@ -534,14 +503,14 @@ const SalesPage = () => {
             </div>
             <div className="h-10 w-px bg-muted hidden sm:block" />
             <div className="flex items-center gap-2">
-              {[1,2,3,4,5].map(i => <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />)}
+              {[1,2,3,4,5].map(i => <Star key={i} className="w-5 h-5 fill-kdp-orange text-kdp-orange" />)}
               <span className="font-bold text-foreground ml-2">4.8/5</span>
               <span className="text-muted-foreground text-sm">(47 avis)</span>
             </div>
             <div className="h-10 w-px bg-muted hidden sm:block" />
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
-                <Trophy className="w-5 h-5 text-amber-400" />
+              <div className="w-10 h-10 rounded-xl bg-kdp-orange/10 flex items-center justify-center">
+                <Trophy className="w-5 h-5 text-kdp-orange" />
               </div>
               <div>
                 <p className="font-semibold text-foreground">#1 en France</p>
@@ -568,15 +537,15 @@ const SalesPage = () => {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}
             className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { icon: Cpu, title: "Gemini 3 Flash", desc: "IA la plus rapide de Google pour une rédaction instantanée", color: "from-blue-500 to-cyan-500" },
-              { icon: Image, title: "Imagen 3", desc: "Couvertures photoréalistes générées en quelques secondes", color: "from-violet-500 to-purple-500" },
-              { icon: Headphones, title: "Azure Neural Voices", desc: "Audiobooks avec 7 voix neuronales premium", color: "from-emerald-500 to-teal-500" },
-              { icon: Globe, title: "Multi-langues", desc: "Rédaction et traduction dans 30+ langues", color: "from-amber-500 to-orange-500" },
-              { icon: Search, title: "SEO Amazon", desc: "Mots-clés optimisés pour le référencement KDP", color: "from-pink-500 to-rose-500" },
-              { icon: Package, title: "Export Pro", desc: "PDF, EPUB, Word — formats KDP et distribution", color: "from-indigo-500 to-blue-500" },
+              { icon: Cpu, title: "Gemini 3 Flash", desc: "IA la plus rapide de Google pour une rédaction instantanée", color: "from-primary to-accent" },
+              { icon: Image, title: "Imagen 3", desc: "Couvertures photoréalistes générées en quelques secondes", color: "from-primary to-accent" },
+              { icon: Headphones, title: "Azure Neural Voices", desc: "Audiobooks avec 7 voix neuronales premium", color: "from-primary to-accent" },
+              { icon: Globe, title: "Multi-langues", desc: "Rédaction et traduction dans 30+ langues", color: "from-kdp-orange to-kdp-orange/80" },
+              { icon: Search, title: "SEO Amazon", desc: "Mots-clés optimisés pour le référencement KDP", color: "from-primary to-accent" },
+              { icon: Package, title: "Export Pro", desc: "PDF, EPUB, Word — formats KDP et distribution", color: "from-primary to-accent" },
             ].map((feature, i) => (
               <motion.div key={i} variants={fadeIn} custom={i}>
-                <Card className="h-full bg-card/50 border-border hover:border-border transition-all duration-300 hover:-translate-y-1 group">
+                <Card className="h-full bg-card/50 border-border hover:border-primary/30 transition-all duration-300 hover:-translate-y-1 group">
                   <CardContent className="pt-8 pb-8">
                     <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300`}>
                       <feature.icon className="w-7 h-7 text-primary-foreground" />
@@ -607,44 +576,38 @@ const SalesPage = () => {
       <PriceComparison />
 
       {/* ═══════════════════════════════════════ LEAD CAPTURE GRATUIT ═══════════════════════════════════════ */}
-      <section className="py-16 px-4 bg-gradient-to-b from-background to-secondary">
-        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="max-w-3xl mx-auto">
-          <Card className="bg-gradient-to-br from-amber-50 to-secondary border-2 border-amber-500/30 rounded-3xl overflow-hidden shadow-2xl shadow-amber-500/10">
-            <CardContent className="p-8 md:p-10">
-              <div className="text-center space-y-4">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center mx-auto">
-                  <Gift className="w-8 h-8 text-primary-foreground" />
-                </div>
-                <motion.h2 variants={fadeIn} className="text-2xl sm:text-3xl font-black text-foreground">
-                  Pas encore décidé ?
-                </motion.h2>
-                <motion.p variants={fadeIn} custom={1} className="text-foreground/80 text-lg max-w-xl mx-auto">
-                  Recevez <span className="text-amber-400 font-bold">10 niches KDP rentables</span> gratuitement et commencez à valider votre marché avant de vous lancer.
-                </motion.p>
-                <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground pt-2">
-                  <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-500" />Guide PDF offert</span>
-                  <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-500" />Niches validées 2026</span>
-                  <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-500" />Accès immédiat</span>
-                </div>
-                <motion.div variants={fadeIn} custom={2} className="pt-4">
-                  <a
-                    href="https://www.trafic-affiliation.com/ebookstudio_capture"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => trackCTAClick('mid_page_free_guide', 'capture_tunnel')}
-                  >
-                    <Button size="lg" className="text-lg px-10 py-7 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-foreground font-bold rounded-2xl shadow-2xl shadow-amber-500/25 hover:shadow-amber-500/40 transition-all duration-300 hover:-translate-y-1">
-                      <Gift className="w-5 h-5 mr-2" />
-                      Recevoir les 10 niches gratuites
-                      <ArrowRight className="w-5 h-5 ml-2" />
-                    </Button>
-                  </a>
-                  <p className="text-muted-foreground text-xs mt-3">🔒 Aucune carte bancaire requise • Accès instantané</p>
-                </motion.div>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
+      <section className="py-12 px-4 bg-secondary/50">
+        <div className="max-w-3xl mx-auto text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <Badge className="bg-kdp-orange/10 text-kdp-orange border-kdp-orange/20 px-4 py-2 mb-4">
+              <Gift className="w-4 h-4 mr-2" />
+              GUIDE GRATUIT
+            </Badge>
+            <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-3">
+              Pas encore prêt ? Commencez par le guide gratuit
+            </h2>
+            <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
+              Recevez gratuitement notre guide <strong className="text-foreground">"10 Niches KDP Rentables en 2026"</strong> — la même liste que nos auteurs top-sellers utilisent.
+            </p>
+            <a
+              href="https://www.trafic-affiliation.com/ebookstudio_capture"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => trackCTAClick('lead_capture_section', 'capture_tunnel')}
+            >
+              <Button size="lg" className="bg-kdp-orange hover:bg-kdp-orange/90 text-foreground font-bold px-8 py-6 rounded-xl shadow-lg">
+                <Gift className="w-5 h-5 mr-2" />
+                Recevoir le guide gratuit
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+            </a>
+            <p className="text-xs text-muted-foreground mt-3">📩 Envoyé par email • 0€ • Aucun engagement</p>
+          </motion.div>
+        </div>
       </section>
 
       {/* ═══════════════════════════════════════ CE SOIR VOUS AUREZ ═══════════════════════════════════════ */}
@@ -659,21 +622,21 @@ const SalesPage = () => {
 
       {/* ═══════════════════════════════════════ PRICING ═══════════════════════════════════════ */}
       <section id="pricing" className="py-20 px-4 relative">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_50%,rgba(6,182,212,0.08),transparent)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_50%,hsl(var(--primary)/0.06),transparent)]" />
         
         <div className="max-w-3xl mx-auto relative z-10">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-10">
             <motion.div variants={fadeIn}>
-              <Badge className="bg-emerald-500/10 text-emerald-400 border-primary/20 px-5 py-2 font-semibold mb-5">
-                <Gift className="w-4 h-4 mr-2" />
-                ESSAI GRATUIT 7 JOURS — Puis {LAUNCH_PRICE}€ à vie
+              <Badge className="bg-primary/10 text-primary border-primary/20 px-5 py-2 font-semibold mb-5">
+                <Sparkles className="w-4 h-4 mr-2" />
+                OFFRE DE LANCEMENT — Prix qui augmentera
               </Badge>
             </motion.div>
             <motion.h2 variants={fadeIn} custom={1} className="text-4xl sm:text-5xl md:text-6xl font-black mb-4">
-              Essayez <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary/80 to-accent/80">gratuitement</span> pendant 7 jours
+              Accès à vie pour <span className="text-primary">{LAUNCH_PRICE}€</span>
             </motion.h2>
             <motion.p variants={fadeIn} custom={2} className="text-foreground/80 text-lg">
-              Accès complet à toutes les fonctionnalités Pro. Si ça ne vous plaît pas, annulez avant 7 jours — <strong className="text-foreground">0€ facturé</strong>.
+              Paiement unique — pas d'abonnement. <span className="line-through text-muted-foreground">{NORMAL_PRICE}€</span> → <strong className="text-primary">{LAUNCH_PRICE}€</strong>
             </motion.p>
           </motion.div>
 
@@ -685,10 +648,11 @@ const SalesPage = () => {
                 {/* Price */}
                 <div className="text-center mb-10">
                   <div className="flex items-baseline justify-center gap-3 mb-2">
-                    <span className="text-7xl md:text-8xl font-black text-foreground">0€</span>
+                    <span className="text-2xl text-muted-foreground line-through">{NORMAL_PRICE}€</span>
+                    <span className="text-7xl md:text-8xl font-black text-foreground">{LAUNCH_PRICE}€</span>
                   </div>
-                  <p className="text-foreground/80 text-lg">pendant <span className="text-primary font-bold">7 jours</span></p>
-                  <p className="text-muted-foreground mt-2">Puis <span className="line-through">{NORMAL_PRICE}€</span> <span className="text-primary font-bold">{LAUNCH_PRICE}€</span> paiement unique — Accès à vie</p>
+                  <p className="text-foreground/80 text-lg">Paiement unique — <span className="text-primary font-bold">Accès à vie</span></p>
+                  <p className="text-muted-foreground mt-2 text-sm">ou en 2×35€ / 3×25€ · Essai gratuit 7 jours inclus</p>
                 </div>
 
                 {/* Features */}
@@ -708,7 +672,7 @@ const SalesPage = () => {
                     "Zoom gratuit avec le créateur",
                   ].map((f, i) => (
                     <div key={i} className="flex items-center gap-3">
-                      <div className="w-5 h-5 rounded-full bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
+                      <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
                         <Check className="w-3 h-3 text-primary" />
                       </div>
                       <span className="text-sm text-foreground">{f}</span>
@@ -718,39 +682,22 @@ const SalesPage = () => {
 
                 {/* CTA */}
                 <Button size="lg" onClick={handlePlanClick}
-                  className="w-full py-8 text-xl font-bold bg-gradient-to-r from-primary to-accent hover:from-cyan-400 hover:to-emerald-400 text-foreground rounded-2xl shadow-xl shadow-primary/20">
+                  className="w-full py-8 text-xl font-bold bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground rounded-2xl shadow-xl shadow-primary/20">
                   <Rocket className="w-6 h-6 mr-2" />
-                  Commencer mon essai gratuit de 7 jours
+                  Accéder pour {LAUNCH_PRICE}€ — Paiement unique
                   <ArrowRight className="w-6 h-6 ml-2" />
                 </Button>
                 <p className="text-center text-muted-foreground text-xs mt-3 flex items-center justify-center gap-3">
-                  <span className="flex items-center gap-1"><ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />Aucune facturation pendant 7 jours</span>
-                  <span>•</span>
-                  <span>Annulation en 1 clic</span>
+                  <span className="flex items-center gap-1"><ShieldCheck className="w-3.5 h-3.5 text-primary" />Garantie 30 jours satisfait ou remboursé</span>
                   <span>•</span>
                   <span>Accès instantané</span>
+                  <span>•</span>
+                  <span>Essai 7 jours inclus</span>
                 </p>
-
-                {/* Trial details */}
-                <div className="mt-8 pt-6 border-t border-border">
-                  <div className="grid grid-cols-3 gap-4 text-center">
-                    {[
-                      { label: "Jour 1–7", desc: "Accès complet gratuit", icon: "🎉" },
-                      { label: "Jour 5", desc: "Rappel par email", icon: "📧" },
-                      { label: "Jour 8", desc: `${LAUNCH_PRICE}€ si vous gardez`, icon: "💎" },
-                    ].map((step, i) => (
-                      <div key={i} className="p-3 rounded-xl bg-muted">
-                        <p className="text-lg mb-1">{step.icon}</p>
-                        <p className="font-bold text-foreground text-sm">{step.label}</p>
-                        <p className="text-xs text-muted-foreground">{step.desc}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
 
                 {/* Garantie */}
                 <div className="flex items-center justify-center gap-3 mt-8 text-muted-foreground text-sm">
-                  <ShieldCheck className="w-5 h-5 text-emerald-500" />
+                  <ShieldCheck className="w-5 h-5 text-primary" />
                   <span>Paiement sécurisé • Accès immédiat • Garantie 30 jours</span>
                 </div>
               </CardContent>
@@ -759,14 +706,14 @@ const SalesPage = () => {
 
           {/* Garantie */}
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mt-8">
-            <Card className="bg-emerald-950/30 border-emerald-900/50">
+            <Card className="bg-primary/5 border-primary/20">
               <CardContent className="p-6 text-center">
-                <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center mx-auto mb-4">
-                  <ShieldCheck className="w-7 h-7 text-emerald-400" />
+                <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                  <ShieldCheck className="w-7 h-7 text-primary" />
                 </div>
-                <h3 className="text-xl font-bold text-emerald-400 mb-2">Garantie 30 jours — Satisfait ou remboursé</h3>
+                <h3 className="text-xl font-bold text-primary mb-2">Garantie 30 jours — Satisfait ou remboursé</h3>
                 <p className="text-foreground/80 text-sm">
-                  Testez pendant 30 jours. Si vous ne publiez pas votre 1er ebook, on vous rembourse intégralement. <strong className="text-emerald-400">Aucune question posée.</strong>
+                  Testez pendant 30 jours. Si vous ne publiez pas votre 1er ebook, on vous rembourse intégralement. <strong className="text-primary">Aucune question posée.</strong>
                 </p>
               </CardContent>
             </Card>
@@ -775,11 +722,6 @@ const SalesPage = () => {
           {/* Countdown Timer */}
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mt-6">
             <CountdownTimer />
-          </motion.div>
-
-          {/* Spots Counter */}
-          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mt-6">
-            <SpotsCounter />
           </motion.div>
         </div>
       </section>
@@ -797,7 +739,7 @@ const SalesPage = () => {
 
       {/* ═══════════════════════════════════════ FINAL CTA ═══════════════════════════════════════ */}
       <section className="py-20 px-4 relative">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_50%,rgba(6,182,212,0.06),transparent)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_50%,hsl(var(--primary)/0.04),transparent)]" />
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}
           className="max-w-3xl mx-auto text-center relative z-10">
           <motion.h2 variants={fadeIn} className="text-3xl sm:text-4xl md:text-5xl font-black mb-5 leading-tight">
@@ -810,14 +752,14 @@ const SalesPage = () => {
           </motion.p>
           <motion.div variants={fadeIn} custom={2}>
             <Button size="lg" onClick={handlePlanClick}
-              className="text-lg px-12 py-8 bg-gradient-to-r from-primary to-accent hover:from-cyan-400 hover:to-emerald-400 text-foreground font-bold rounded-2xl shadow-2xl shadow-primary/25 hover:shadow-primary/40 transition-all duration-300 hover:-translate-y-1">
+              className="text-lg px-12 py-8 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground font-bold rounded-2xl shadow-2xl shadow-primary/25 hover:shadow-primary/40 transition-all duration-300 hover:-translate-y-1">
               <Rocket className="w-6 h-6 mr-2" />
-              Essai gratuit 7 jours — puis {LAUNCH_PRICE}€ à vie
+              Accéder — {LAUNCH_PRICE}€ à vie
               <ArrowRight className="w-6 h-6 ml-2" />
             </Button>
-            <p className="text-muted-foreground text-sm mt-5">0€ pendant 7 jours • Annulation en 1 clic • Garantie 30 jours</p>
+            <p className="text-muted-foreground text-sm mt-5">Paiement unique • Garantie 30 jours • Accès instantané</p>
             <p className="text-muted-foreground text-xs mt-2 flex items-center justify-center gap-1">
-              <Users className="w-3.5 h-3.5 text-emerald-400" />
+              <Users className="w-3.5 h-3.5 text-primary" />
               Rejoignez +47 auteurs qui publient déjà avec EbookStudio
             </p>
           </motion.div>
@@ -831,7 +773,7 @@ const SalesPage = () => {
             <div className="md:col-span-1">
               <div className="flex items-center gap-2.5 mb-4">
                 <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary/80 to-accent/80 flex items-center justify-center">
-                  <BookOpen className="w-4 h-4 text-foreground" />
+                  <BookOpen className="w-4 h-4 text-primary-foreground" />
                 </div>
                 <h3 className="text-lg font-bold text-foreground">EbookStudio Pro</h3>
               </div>
@@ -874,9 +816,9 @@ const SalesPage = () => {
       {/* ═══════════════════════════════════════ STICKY MOBILE CTA ═══════════════════════════════════════ */}
       <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-background/95 backdrop-blur-xl border-t border-border p-3 safe-area-inset-bottom">
         <Button onClick={handlePlanClick}
-          className="w-full py-5 text-base font-bold bg-gradient-to-r from-primary to-accent text-foreground rounded-xl">
+          className="w-full py-5 text-base font-bold bg-gradient-to-r from-primary to-accent text-primary-foreground rounded-xl">
           <Rocket className="w-4 h-4 mr-2" />
-          Accès Pro — {LAUNCH_PRICE}€ à vie
+          Accéder — {LAUNCH_PRICE}€ à vie
         </Button>
       </div>
 
@@ -889,66 +831,6 @@ const SalesPage = () => {
         >
           ↑
         </button>
-      )}
-
-      <ExitIntentPopup />
-      <SocialProofToast />
-      <ProgressEngagement />
-      <FloatingMobileCta />
-
-      {/* ═══════════════════════════════════════ TRIAL MODAL ═══════════════════════════════════════ */}
-      {showTrialModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-foreground/50 backdrop-blur-sm p-4" onClick={() => !trialLoading && setShowTrialModal(false)}>
-          <div className="bg-card border border-border rounded-3xl max-w-md w-full p-8 relative" onClick={e => e.stopPropagation()}>
-            <button type="button" onClick={() => !trialLoading && setShowTrialModal(false)} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground text-xl">✕</button>
-            
-            {trialResult?.ok ? (
-              <div className="text-center space-y-4">
-                <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto">
-                  <CheckCircle className="w-10 h-10 text-emerald-400" />
-                </div>
-                <h3 className="text-2xl font-bold text-foreground">Essai activé ! 🎉</h3>
-                <p className="text-muted-foreground">Votre accès gratuit de 7 jours est prêt.</p>
-                <div className="bg-muted rounded-xl p-4 space-y-2">
-                  <p className="text-sm text-muted-foreground">Votre code d'accès :</p>
-                  <p className="text-2xl font-mono font-bold text-primary">{trialResult.accessCode}</p>
-                  <p className="text-sm text-muted-foreground">Email : {trialResult.email}</p>
-                </div>
-                <Button size="lg" onClick={() => navigate("/subscription")} className="w-full py-6 bg-gradient-to-r from-primary to-accent text-foreground font-bold rounded-xl">
-                  <ArrowRight className="w-5 h-5 mr-2" />
-                  Se connecter maintenant
-                </Button>
-              </div>
-            ) : (
-              <form onSubmit={handleStartTrial} className="space-y-6">
-                <div className="text-center space-y-2">
-                  <div className="w-14 h-14 rounded-full bg-cyan-500/20 flex items-center justify-center mx-auto">
-                    <Gift className="w-8 h-8 text-primary" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-foreground">Essai gratuit 7 jours</h3>
-                  <p className="text-muted-foreground text-sm">Accès complet à toutes les fonctionnalités Pro. Aucune carte bancaire requise.</p>
-                </div>
-                <div>
-                  <Input
-                    type="email"
-                    placeholder="votre@email.com"
-                    value={trialEmail}
-                    onChange={e => setTrialEmail(e.target.value)}
-                    required
-                    className="bg-muted border-border text-foreground placeholder:text-muted-foreground h-12 rounded-xl text-center text-lg"
-                  />
-                </div>
-                <Button type="submit" size="lg" disabled={trialLoading} className="w-full py-6 bg-gradient-to-r from-primary to-accent hover:from-cyan-400 hover:to-emerald-400 text-foreground font-bold rounded-xl text-lg">
-                  {trialLoading ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : <Rocket className="w-5 h-5 mr-2" />}
-                  {trialLoading ? "Activation..." : "Démarrer mon essai gratuit"}
-                </Button>
-                <p className="text-center text-muted-foreground text-xs">
-                  Puis {LAUNCH_PRICE}€ paiement unique si vous souhaitez continuer après 7 jours.
-                </p>
-              </form>
-            )}
-          </div>
-        </div>
       )}
     </div>
   );
