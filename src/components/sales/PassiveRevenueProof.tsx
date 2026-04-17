@@ -77,14 +77,3 @@ const PassiveRevenueProof: React.FC = () => {
 };
 
 export default PassiveRevenueProof;
-              <span className="font-semibold text-sm">{item.label}</span>
-              <span className="text-xs text-muted-foreground">{item.desc}</span>
-            </div>
-          ))}
-        </motion.div>
-      </motion.div>
-    </section>
-  );
-};
-
-export default PassiveRevenueProof;

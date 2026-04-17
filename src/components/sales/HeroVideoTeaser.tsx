@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
-import { Play, Lightbulb, Layers } from "lucide-react";
+import { Play, Layers } from "lucide-react";
 
 const videos = [
   {
