@@ -21,6 +21,7 @@ import { Input } from '@/components/ui/input';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Progress } from '@/components/ui/progress';
 import { useUserQuotas, getQuotaPercentage } from '@/hooks/useUserQuotas';
+import { ToolsGuideButton } from '@/components/layout/ToolsGuideButton';
 import { SIDEBAR_SUBSECTIONS } from './modernSidebarSections';
 
 interface ModernSidebarProps {
