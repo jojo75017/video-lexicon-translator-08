@@ -591,7 +591,7 @@ RÈGLES CRITIQUES POUR DES MOTS-CLÉS AMAZON EXPLOITABLES :
 
 Réponds UNIQUEMENT avec un tableau JSON valide, sans markdown.`,
         prompt,
-        { maxOutputTokens: 8000, temperature: 0.6, timeoutMs: 90000 }
+        { maxOutputTokens: 8000, temperature: 0.6, timeoutMs: 90000, userApiKey }
       );
       if (res.error) return geminiError(res);
       return jsonSuccess({ content: res.text });
@@ -614,7 +614,7 @@ RÈGLES POUR DES MOTS-CLÉS LONGUE TRAÎNE EXPLOITABLES :
 
 Réponds UNIQUEMENT avec un tableau JSON valide, sans markdown ni backticks.`,
         prompt,
-        { maxOutputTokens: 8000, temperature: 0.6, timeoutMs: 90000 }
+        { maxOutputTokens: 8000, temperature: 0.6, timeoutMs: 90000, userApiKey }
       );
       if (res.error) return geminiError(res);
       return jsonSuccess({ content: res.text });
@@ -642,7 +642,7 @@ STRATÉGIE OPTIMALE :
 
 Réponds UNIQUEMENT avec un tableau JSON de 7 strings, sans markdown ni backticks : ["mot-clé 1", "mot-clé 2", ...]`,
         prompt,
-        { maxOutputTokens: 2000, temperature: 0.4, timeoutMs: 60000 }
+        { maxOutputTokens: 2000, temperature: 0.4, timeoutMs: 60000, userApiKey }
       );
       if (res.error) return geminiError(res);
       return jsonSuccess({ content: res.text });
