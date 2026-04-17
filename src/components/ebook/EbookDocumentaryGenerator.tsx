@@ -211,8 +211,8 @@ Le contenu doit être factuel, bien documenté et adapté à l'audience ${target
         body: {
           prompt: structurePrompt,
           type: 'documentary-structure',
-          useOpenAI,
-          openaiApiKey: useOpenAI ? userApiKey : undefined,
+          useOpenAI: useGemini,
+          openaiApiKey: useGemini ? userApiKey : undefined,
           maxTokens: 8000,
         },
       });
@@ -282,8 +282,8 @@ Audience: ${targetAudience}`;
               body: {
                 prompt: enrichPrompt,
                 type: 'documentary-chapter',
-                useOpenAI,
-                openaiApiKey: useOpenAI ? userApiKey : undefined,
+                useOpenAI: useGemini,
+                openaiApiKey: useGemini ? userApiKey : undefined,
                 maxTokens: 2000,
               },
             });
@@ -426,8 +426,8 @@ Inclus des faits marquants et des anecdotes.`;
         body: {
           prompt,
           type: 'documentary-chapter-regen',
-          useOpenAI,
-          openaiApiKey: useOpenAI ? userApiKey : undefined,
+          useOpenAI: useGemini,
+          openaiApiKey: useGemini ? userApiKey : undefined,
           maxTokens: 2500,
         },
       });

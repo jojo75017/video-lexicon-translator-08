@@ -470,7 +470,7 @@ CRITICAL REQUIREMENTS:
           ratio: 'square',
           quality: 'high',
           colorScheme: 'monochrome',
-          useOpenAI: useOpenAI,
+          useOpenAI: useGemini,
           openaiApiKey: userApiKey || undefined,
           // Activer explicitement le mode livre de coloriage
           isColoringBook: true,
