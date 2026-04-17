@@ -406,10 +406,15 @@ const SalesPage = () => {
             <Button size="lg" onClick={handlePlanClick}
               className="w-full sm:w-auto text-lg px-10 py-7 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground font-bold rounded-2xl shadow-2xl shadow-primary/25 hover:shadow-primary/40 transition-all duration-300 hover:-translate-y-1">
               <Rocket className="w-5 h-5 mr-2" />
-              Accéder — 67€ à vie
+              Commencer maintenant — 67€
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
-            <Button size="lg" variant="outline" onClick={() => navigate('/demo')}
+            <Button size="lg" variant="outline" onClick={() => document.getElementById('outils')?.scrollIntoView({ behavior: 'smooth' })}
+              className="w-full sm:w-auto text-base px-8 py-6 border-primary/50 text-primary hover:text-foreground hover:border-primary hover:bg-primary/10 rounded-2xl">
+              <Sparkles className="w-5 h-5 mr-2" />
+              Voir les 15 agents
+            </Button>
+          </motion.div>
               className="w-full sm:w-auto text-base px-8 py-6 border-primary/50 text-primary hover:text-foreground hover:border-primary hover:bg-primary/10 rounded-2xl">
               <Play className="w-5 h-5 mr-2" />
               Voir la démo
