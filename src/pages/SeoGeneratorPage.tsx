@@ -398,10 +398,10 @@ Généré le ${new Date().toLocaleDateString('fr-FR')} avec le Générateur SEO 
         </div>
 
         <div className="space-y-6">
-          {/* Configuration OpenAI */}
+          {/* Configuration Gemini */}
           <OpenAIConfigPanel 
             title="Configuration IA"
-            description="Configurez votre clé API OpenAI pour des analyses avancées"
+            description="Configurez votre clé API Gemini pour des analyses avancées"
             showModelSelection={true}
             compact={true}
           />

@@ -87,9 +87,9 @@ const BOOK_FORMATS = [
 ];
 
 export const EbookColoringBookGenerator: React.FC<ColoringBookGeneratorProps> = ({ ebookTitle }) => {
-  // Configuration OpenAI - utiliser la clé API utilisateur si disponible
+  // Configuration Gemini - utiliser la clé API utilisateur si disponible
   const { apiKey: userApiKey, isValid: isUserKeyValid } = useOpenAIConfig();
-  const useOpenAI = Boolean(userApiKey) && isUserKeyValid === true;
+  const useGemini = Boolean(userApiKey) && isUserKeyValid === true;
   const { saveSpecializedProject } = useProjectSave();
 
   const [theme, setTheme] = useState('animals');
@@ -1272,18 +1272,18 @@ CRITICAL REQUIREMENTS:
         </CardHeader>
       </Card>
 
-      {/* Avertissement si pas de clé OpenAI */}
-      {!useOpenAI && (
+      {/* Avertissement si pas de clé Gemini */}
+      {!useGemini && (
         <Card className="border-amber-500/50 bg-amber-500/5">
           <CardContent className="py-4">
             <div className="flex items-start gap-3">
               <AlertTriangle className="h-5 w-5 text-amber-500 mt-0.5 flex-shrink-0" />
               <div className="space-y-1">
                 <p className="font-medium text-amber-700 dark:text-amber-400">
-                  Clé OpenAI non configurée
+                  Clé Gemini non configurée
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  Pour générer de vraies images de coloriage, ajoutez votre clé API OpenAI dans l'onglet <strong>Paramètres</strong>. 
+                  Pour générer de vraies images de coloriage, ajoutez votre clé API Gemini dans l'onglet <strong>Paramètres</strong>. 
                   Sans clé, des images placeholder seront affichées.
                 </p>
               </div>

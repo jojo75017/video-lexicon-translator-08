@@ -155,7 +155,7 @@ const HierarchyPage: React.FC = () => {
     }
     
     if (useAI && !apiKey) {
-      toast.error('Clé API OpenAI requise pour le mode IA');
+      toast.error('Clé API Gemini requise pour le mode IA');
       return;
     }
     
@@ -277,7 +277,7 @@ const HierarchyPage: React.FC = () => {
                   {useAI && (
                     <Input
                       type="password"
-                      placeholder="Clé API OpenAI"
+                      placeholder="Clé API Gemini (AIza...)"
                       value={apiKey}
                       onChange={(e) => setApiKey(e.target.value)}
                       className="ml-2 h-8"

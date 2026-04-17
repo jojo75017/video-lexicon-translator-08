@@ -529,11 +529,11 @@ const PinterestPage: React.FC = () => {
                   <CardContent>
                     <div className="space-y-6">
                       <div>
-                        <label className="text-sm font-medium mb-2 block">Clé API OpenAI</label>
+                        <label className="text-sm font-medium mb-2 block">Clé API Gemini</label>
                         <div className="flex gap-2">
                           <Input
                             type="password"
-                            placeholder="sk-..."
+                            placeholder="AIza..."
                             value={instagramApiKey}
                             onChange={(e) => setInstagramApiKey(e.target.value)}
                           />

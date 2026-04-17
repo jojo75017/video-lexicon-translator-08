@@ -94,12 +94,12 @@ const RESEARCH_DEPTH = [
 ];
 
 const EbookDocumentaryGenerator: React.FC<DocumentaryGeneratorProps> = ({ ebookTitle: initialTitle }) => {
-  // Configuration - utiliser la clé API utilisateur si disponible
+  // Configuration - utiliser la clé API Gemini utilisateur
   const { apiKey: userApiKey, isValid: isUserKeyValid, isValidating } = useOpenAIConfig();
-  const useOpenAI = !!userApiKey && userApiKey.startsWith('sk-');
+  const useGemini = Boolean(userApiKey) && isUserKeyValid === true;
   const { saveSpecializedProject } = useProjectSave();
   
-  console.log('[Documentary] API Key config:', { hasKey: !!userApiKey, useOpenAI, isValid: isUserKeyValid });
+  console.log('[Documentary] API Key config:', { hasKey: !!userApiKey, useGemini, isValid: isUserKeyValid });
 
   // État du formulaire
   const [title, setTitle] = useState(initialTitle || '');

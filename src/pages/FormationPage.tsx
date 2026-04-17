@@ -65,28 +65,28 @@ const FormationPage = () => {
     {
       id: 0,
       title: "Étape 0 : Configurer votre Clé API",
-      description: "Connectez votre clé OpenAI pour activer la génération IA",
+      description: "Connectez votre clé Gemini pour activer la génération IA",
       category: 'basics',
       icon: Settings,
       duration: '3 min',
       difficulty: 'débutant',
-      content: `# Étape 0 : Configurer votre Clé API OpenAI
+      content: `# Étape 0 : Configurer votre Clé API Gemini
 
 ## Pourquoi une clé API ?
-**EbookStudio utilise votre propre clé OpenAI** pour générer du contenu. Cela vous donne le contrôle total sur vos coûts.
+**EbookStudio utilise votre propre clé Gemini** pour générer du contenu. Cela vous donne le contrôle total sur vos coûts.
 
 ---
 
 ## Comment obtenir votre clé :
 
-### 1. Créez un compte OpenAI
-- Rendez-vous sur **platform.openai.com**
-- Créez un compte gratuit ou connectez-vous
+### 1. Créez un compte Google AI Studio
+- Rendez-vous sur **aistudio.google.com**
+- Connectez-vous avec votre compte Google
 
 ### 2. Générez une clé API
-- Allez dans **Settings → API Keys**
-- Cliquez sur **"Create new secret key"**
-- Copiez la clé (commence par "sk-...")
+- Allez dans **API Keys**
+- Cliquez sur **"Create API Key"**
+- Copiez la clé (commence par "AIza...")
 
 ### 3. Ajoutez-la dans EbookStudio
 - Allez dans **Mon Compte → Paramètres**
