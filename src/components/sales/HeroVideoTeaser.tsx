@@ -1,16 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
-import { Play, Layers } from "lucide-react";
-
-const videos = [
-  {
-    id: "5qG4svJ-dfE",
-    icon: Layers,
-    title: "Les fonctionnalités en détail",
-    description:
-      "Tour complet des 14 modules IA : de la génération du plan à l'export KDP, chaque onglet expliqué pas à pas.",
-  },
-];
+import { Play, Sparkles } from "lucide-react";
 
 const HeroVideoTeaser = () => {
   return (
@@ -19,55 +9,48 @@ const HeroVideoTeaser = () => {
         <div className="text-center mb-10">
           <Badge className="mb-3 bg-primary/10 text-primary border-primary/20">
             <Play className="w-3 h-3 mr-1" />
-            Vidéos explicatives
+            Vidéo de présentation
           </Badge>
-          <h2 className="text-2xl md:text-3xl font-bold text-foreground">
-            Comprenez{" "}
-            <span className="text-primary">
-              exactement ce que vous obtenez
-            </span>
+          <h2 className="text-2xl md:text-4xl font-bold text-foreground">
+            La <span className="text-primary">révolution Amazon KDP</span> en 90 secondes
           </h2>
           <p className="text-muted-foreground mt-3 max-w-2xl mx-auto">
-            Avant d'essayer, regardez ces 2 courtes vidéos. Vous verrez pourquoi
-            des centaines de créateurs utilisent déjà EbookStudio Pro pour
-            publier sur Amazon KDP.
+            Découvrez comment EbookStudio Pro automatise tout le workflow : du brief à la publication sur KDP.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8">
-          {videos.map((video, idx) => (
-            <motion.div
-              key={video.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: idx * 0.15 }}
-              viewport={{ once: true }}
-              className="flex flex-col"
-            >
-              <div className="relative rounded-xl overflow-hidden shadow-xl shadow-primary/10 border border-border bg-card aspect-video">
-                <iframe
-                  src={`https://www.youtube.com/embed/${video.id}?rel=0`}
-                  title={video.title}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  className="absolute inset-0 w-full h-full"
-                  loading="lazy"
-                />
-              </div>
-              <div className="mt-4 flex gap-3 items-start">
-                <div className="shrink-0 w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center mt-0.5">
-                  <video.icon className="w-4 h-4 text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-foreground">{video.title}</h3>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {video.description}
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          className="relative rounded-2xl overflow-hidden shadow-2xl shadow-primary/20 border-2 border-primary/20 bg-card aspect-video group"
+        >
+          <video
+            src="/videos/ebookstudio-presentation.mp4"
+            controls
+            playsInline
+            preload="metadata"
+            poster=""
+            className="absolute inset-0 w-full h-full object-cover"
+          >
+            Votre navigateur ne supporte pas la lecture vidéo.
+          </video>
+
+          {/* Glow accent */}
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/0 via-primary/20 to-accent/0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none rounded-2xl" />
+        </motion.div>
+
+        <motion.p
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          viewport={{ once: true }}
+          className="text-center text-sm text-muted-foreground mt-6 flex items-center justify-center gap-2"
+        >
+          <Sparkles className="w-4 h-4 text-primary" />
+          Démo réelle de la plateforme — aucun trucage
+        </motion.p>
       </div>
     </section>
   );
