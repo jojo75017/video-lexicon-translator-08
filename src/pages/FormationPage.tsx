@@ -22,7 +22,7 @@ import ReactMarkdown from 'react-markdown';
 import FormationQuiz from '@/components/formation/FormationQuiz';
 import FormationBadges from '@/components/formation/FormationBadges';
 import FormationModuleTabs from '@/components/formation/FormationModuleTabs';
-import { FORMATION_SYSTEME_IO_CONTENT } from '@/data/formationSystemeIo';
+
 
 interface Module {
   id: number;
