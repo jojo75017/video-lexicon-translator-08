@@ -336,31 +336,28 @@ const SalesPage = () => {
             </Badge>
           </motion.div>
 
-          <motion.h1 variants={fadeIn} custom={1} className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-[1.1] tracking-tight mb-6">
-            Créez des ebooks
+          <motion.h1 variants={fadeIn} custom={1} className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-[1.05] tracking-tight mb-6">
+            Ton ebook mérite
             <br />
             <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-              professionnels
+              Amazon KDP
             </span>
-            <br />
-            en moins d'une heure
           </motion.h1>
 
-          <motion.p variants={fadeIn} custom={2} className="text-lg sm:text-xl text-foreground/80 mb-8 max-w-2xl mx-auto leading-relaxed">
-            Le workflow IA complet qui a déjà généré <span className="text-primary font-semibold">+35 ebooks publiés</span> sur Amazon KDP.
-            Rédaction, couvertures, audiobooks — tout en un.
+          <motion.p variants={fadeIn} custom={2} className="text-lg sm:text-xl text-foreground/80 mb-10 max-w-2xl mx-auto leading-relaxed">
+            15 agents IA qui rédigent, illustrent et publient ton livre — <span className="text-primary font-semibold">en moins d'une heure</span>.
           </motion.p>
 
-          {/* Stats */}
-          <motion.div variants={fadeIn} custom={3} className="flex flex-wrap justify-center gap-6 sm:gap-10 mb-10">
+          {/* Stats — façon KDP Rocket */}
+          <motion.div variants={fadeIn} custom={3} className="grid grid-cols-3 gap-4 sm:gap-8 max-w-2xl mx-auto mb-10">
             {[
-              { value: "35+", label: "Ebooks publiés" },
-              { value: "~0,30€", label: "Coût par ebook" },
-              { value: "45 min", label: "Temps moyen" },
+              { value: "+347%", label: "ventes Amazon" },
+              { value: "47 min", label: "par ebook" },
+              { value: "15", label: "agents IA" },
             ].map((stat, i) => (
-              <div key={i} className="text-center">
-                <p className="text-3xl sm:text-4xl font-black text-foreground">{stat.value}</p>
-                <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
+              <div key={i} className="text-center bg-card/60 border border-border rounded-2xl py-4 backdrop-blur">
+                <p className="text-2xl sm:text-4xl font-black bg-gradient-to-br from-primary to-accent bg-clip-text text-transparent">{stat.value}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground mt-1">{stat.label}</p>
               </div>
             ))}
           </motion.div>
