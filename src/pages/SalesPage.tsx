@@ -355,9 +355,9 @@ const SalesPage = () => {
           {/* Stats — façon KDP Rocket */}
           <motion.div variants={fadeIn} custom={3} className="grid grid-cols-3 gap-4 sm:gap-8 max-w-2xl mx-auto mb-10">
             {[
-              { value: "+347%", label: "ventes Amazon" },
+              { value: "21", label: "outils pro" },
               { value: "47 min", label: "par ebook" },
-              { value: "15", label: "agents IA" },
+              { value: "+347%", label: "ventes Amazon" },
             ].map((stat, i) => (
               <div key={i} className="text-center bg-card/60 border border-border rounded-2xl py-4 backdrop-blur">
                 <p className="text-2xl sm:text-4xl font-black bg-gradient-to-br from-primary to-accent bg-clip-text text-transparent">{stat.value}</p>
