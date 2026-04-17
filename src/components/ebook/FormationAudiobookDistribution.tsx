@@ -271,7 +271,7 @@ const distributionModules: FormationModule[] = [
         items: [
           "Gumroad : Simple, 10% de commission. Idéal pour débuter",
           "Payhip : 5% de commission, support TVA EU automatique",
-          "Systeme.io : Tunnel de vente complet + email marketing inclus (plan gratuit disponible)",
+          "Podia : Tunnel de vente complet + email marketing inclus (plan gratuit disponible)",
           "WooCommerce : Sur votre propre WordPress, frais minimaux",
           "Shopify : Boutique professionnelle, à partir de 29€/mois",
           "SendOwl : Spécialisé dans la vente de fichiers numériques"
