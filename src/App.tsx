@@ -74,6 +74,7 @@ const SocialPostGeneratorPage = lazy(() => import('@/pages/SocialPostGeneratorPa
 const UnifiedMarketingDashboard = lazy(() => import('@/pages/UnifiedMarketingDashboard'));
 const CrmPage = lazy(() => import('@/pages/CrmPage'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
+const KdpAdsGuidePage = lazy(() => import('./pages/KdpAdsGuidePage'));
 
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center bg-background">
@@ -347,6 +348,19 @@ const App = () => {
                   onInvalid={handleLogout}
                 >
                   <SeriesTomesPage />
+                </SubscriberGate>
+              }
+            />
+            <Route
+              path="/kdp-ads-guide"
+              element={
+                <SubscriberGate
+                  isAdmin={isAdmin}
+                  subscriberEmail={subscriberEmail}
+                  subscriberData={subscriberData}
+                  onInvalid={handleLogout}
+                >
+                  <KdpAdsGuidePage />
                 </SubscriberGate>
               }
             />
