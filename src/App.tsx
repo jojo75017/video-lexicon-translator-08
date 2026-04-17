@@ -75,6 +75,7 @@ const UnifiedMarketingDashboard = lazy(() => import('@/pages/UnifiedMarketingDas
 const CrmPage = lazy(() => import('@/pages/CrmPage'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const KdpAdsGuidePage = lazy(() => import('./pages/KdpAdsGuidePage'));
+const ToolsGuidePage = lazy(() => import('./pages/ToolsGuidePage'));
 
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center bg-background">
@@ -348,6 +349,19 @@ const App = () => {
                   onInvalid={handleLogout}
                 >
                   <SeriesTomesPage />
+                </SubscriberGate>
+              }
+            />
+            <Route
+              path="/guide-outils"
+              element={
+                <SubscriberGate
+                  isAdmin={isAdmin}
+                  subscriberEmail={subscriberEmail}
+                  subscriberData={subscriberData}
+                  onInvalid={handleLogout}
+                >
+                  <ToolsGuidePage />
                 </SubscriberGate>
               }
             />

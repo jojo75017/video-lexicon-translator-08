@@ -21,6 +21,7 @@ import { Input } from '@/components/ui/input';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Progress } from '@/components/ui/progress';
 import { useUserQuotas, getQuotaPercentage } from '@/hooks/useUserQuotas';
+import { ToolsGuideButton } from '@/components/layout/ToolsGuideButton';
 import { SIDEBAR_SUBSECTIONS } from './modernSidebarSections';
 
 interface ModernSidebarProps {
@@ -505,6 +506,11 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
             </div>
           </div>
         )}
+
+        {/* Tools Guide button - always at top */}
+        <div className={cn('px-2 pt-2', isCollapsed && 'px-2')}>
+          <ToolsGuideButton isCollapsed={isCollapsed} />
+        </div>
 
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto px-2 py-2 space-y-1">
