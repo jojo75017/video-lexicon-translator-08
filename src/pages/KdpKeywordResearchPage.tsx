@@ -15,6 +15,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 
 interface KdpKeyword {
   keyword: string;
@@ -33,6 +34,7 @@ type SearchMode = 'auto' | 'niche' | 'title' | 'longtail' | 'backend7';
 const KdpKeywordResearchPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { apiKey: userGeminiKey } = useOpenAIConfig();
   const titleFromUrl = searchParams.get('title') || '';
   const isFromProject = !!searchParams.get('title');
 
@@ -177,28 +179,44 @@ Réponds UNIQUEMENT avec un tableau JSON valide.`;
     return null;
   };
 
+  const extractError = (err: any, data: any): string => {
+    return data?.error || err?.context?.error || err?.message || 'Erreur inconnue';
+  };
+
+  const checkKey = (): boolean => {
+    if (!userGeminiKey?.trim()) {
+      toast.error('Clé Gemini requise. Configurez-la dans Paramètres > Clés API (gratuit sur aistudio.google.com/apikey).', { duration: 6000 });
+      return false;
+    }
+    return true;
+  };
+
   const generateKeywords = async () => {
     if (!seedKeyword.trim()) {
       toast.error('Entrez un mot-clé, une niche ou un titre de livre');
       return;
     }
+    if (!checkKey()) return;
     setIsLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke('generate-content', {
-        body: { type: 'kdp-keyword-research', prompt: getPromptForMode(effectiveMode) }
+        body: { type: 'kdp-keyword-research', prompt: getPromptForMode(effectiveMode), userApiKey: userGeminiKey }
       });
-      if (error) throw error;
+      if (error || data?.error) {
+        const msg = extractError(error, data);
+        throw new Error(msg);
+      }
       const content = data?.content || data?.generatedContent || '';
       const parsed = safeParseJsonArray(content) as KdpKeyword[] | null;
-      if (parsed) {
+      if (parsed && parsed.length > 0) {
         setKeywords(parsed);
         toast.success(`${parsed.length} mots-clés KDP générés (mode ${effectiveMode === 'title' ? 'titre' : 'niche'}) !`);
       } else {
-        throw new Error('Format invalide');
+        throw new Error('Réponse IA mal formée. Simplifiez votre niche ou réessayez.');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Erreur génération:', err);
-      toast.error('Impossible de générer les mots-clés. Vérifiez votre connexion et réessayez.');
+      toast.error(err.message || 'Échec de la génération', { duration: 6000 });
     } finally {
       setIsLoading(false);
     }
@@ -206,20 +224,21 @@ Réponds UNIQUEMENT avec un tableau JSON valide.`;
 
   const generateBackend7 = async () => {
     if (!seedKeyword.trim()) return;
+    if (!checkKey()) return;
     setIsGenerating7(true);
     try {
       const { data, error } = await supabase.functions.invoke('generate-content', {
-        body: { type: 'kdp-backend-keywords', prompt: getPromptForMode('backend7') }
+        body: { type: 'kdp-backend-keywords', prompt: getPromptForMode('backend7'), userApiKey: userGeminiKey }
       });
-      if (error) throw error;
+      if (error || data?.error) throw new Error(extractError(error, data));
       const content = data?.content || data?.generatedContent || '';
       const parsed = safeParseJsonArray(content) as string[] | null;
-      if (parsed) {
+      if (parsed && parsed.length > 0) {
         setBackend7Keywords(parsed.slice(0, 7));
         toast.success('7 mots-clés backend KDP générés !');
-      } else throw new Error('Format invalide');
-    } catch {
-      toast.error('Impossible de générer les mots-clés backend. Réessayez.');
+      } else throw new Error('Réponse IA mal formée. Réessayez.');
+    } catch (err: any) {
+      toast.error(err.message || 'Échec de la génération', { duration: 6000 });
     } finally {
       setIsGenerating7(false);
     }
@@ -227,20 +246,21 @@ Réponds UNIQUEMENT avec un tableau JSON valide.`;
 
   const generateLongTail = async () => {
     if (!seedKeyword.trim()) return;
+    if (!checkKey()) return;
     setIsGeneratingLongTail(true);
     try {
       const { data, error } = await supabase.functions.invoke('generate-content', {
-        body: { type: 'kdp-longtail', prompt: getPromptForMode('longtail') }
+        body: { type: 'kdp-longtail', prompt: getPromptForMode('longtail'), userApiKey: userGeminiKey }
       });
-      if (error) throw error;
+      if (error || data?.error) throw new Error(extractError(error, data));
       const content = data?.content || data?.generatedContent || '';
       const parsed = safeParseJsonArray(content) as KdpKeyword[] | null;
-      if (parsed) {
+      if (parsed && parsed.length > 0) {
         setLongTailKeywords(parsed);
         toast.success(`${parsed.length} mots-clés longue traîne générés !`);
-      } else throw new Error('Format invalide');
-    } catch {
-      toast.error('Impossible de générer les mots-clés longue traîne. Réessayez.');
+      } else throw new Error('Réponse IA mal formée. Simplifiez votre niche.');
+    } catch (err: any) {
+      toast.error(err.message || 'Échec de la génération', { duration: 6000 });
     } finally {
       setIsGeneratingLongTail(false);
     }
