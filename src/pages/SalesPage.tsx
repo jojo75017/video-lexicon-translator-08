@@ -24,6 +24,7 @@ import KdpRoiCalculator from "@/components/sales/KdpRoiCalculator";
 import EbookGallery from "@/components/sales/EbookGallery";
 import EbookAnatomy from "@/components/sales/EbookAnatomy";
 import ToolsNavigationBar from "@/components/sales/ToolsNavigationBar";
+import ToolsCounterBanner from "@/components/sales/ToolsCounterBanner";
 
 // ════════════════════════════════════════════════════════════════════════════════
 // DESIGN SYSTEM 2026 — Palette Premium
