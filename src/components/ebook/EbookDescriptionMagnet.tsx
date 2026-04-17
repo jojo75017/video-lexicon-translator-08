@@ -101,6 +101,10 @@ const EbookDescriptionMagnet: React.FC = () => {
       toast.error("Le titre de l'ebook est requis");
       return;
     }
+    if (!userGeminiKey?.trim()) {
+      toast.error('Clé Gemini requise. Configurez-la dans Paramètres > Clés API (gratuit sur aistudio.google.com/apikey).', { duration: 6000 });
+      return;
+    }
 
     setIsGenerating(true);
     try {
@@ -108,12 +112,15 @@ const EbookDescriptionMagnet: React.FC = () => {
         body: { userApiKey: userGeminiKey, title, subtitle, genre, targetAudience, keywords, additionalInfo }
       });
 
-      if (error) throw error;
+      if (error || data?.error) {
+        const msg = data?.error || (error as any)?.context?.error || error?.message || 'Erreur inconnue';
+        throw new Error(msg);
+      }
       setResult(data);
       toast.success('Description générée avec succès !');
     } catch (error: any) {
       console.error('Error:', error);
-      toast.error(error.message || "Erreur lors de la génération");
+      toast.error(error.message || "Erreur lors de la génération", { duration: 6000 });
     } finally {
       setIsGenerating(false);
     }
@@ -222,6 +229,21 @@ const EbookDescriptionMagnet: React.FC = () => {
               rows={3}
             />
           </div>
+
+          {!userGeminiKey?.trim() && (
+            <div className="rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-700 p-3 flex items-start gap-2">
+              <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+              <div className="text-sm">
+                <p className="font-medium text-amber-900 dark:text-amber-200">Clé Gemini requise</p>
+                <p className="text-amber-800 dark:text-amber-300 mt-0.5">
+                  Configure ta clé dans <strong>Paramètres &gt; Clés API</strong>. Clé gratuite sur{' '}
+                  <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" className="underline font-medium">
+                    aistudio.google.com/apikey
+                  </a>.
+                </p>
+              </div>
+            </div>
+          )}
 
           <Button
             onClick={handleGenerate}

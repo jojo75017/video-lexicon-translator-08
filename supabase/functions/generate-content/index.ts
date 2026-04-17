@@ -11,11 +11,17 @@ const corsHeaders = {
 async function callGemini(
   systemPrompt: string,
   userPrompt: string,
-  options: { maxOutputTokens?: number; temperature?: number; timeoutMs?: number } = {}
-): Promise<{ text: string; error?: string; status?: number }> {
-  const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
+  options: { maxOutputTokens?: number; temperature?: number; timeoutMs?: number; userApiKey?: string } = {}
+): Promise<{ text: string; error?: string; status?: number; stage?: string }> {
+  // Prefer user-provided BYOK key, fallback to server key
+  const GEMINI_API_KEY = options.userApiKey?.trim() || Deno.env.get('GEMINI_API_KEY');
   if (!GEMINI_API_KEY) {
-    return { text: '', error: 'GEMINI_API_KEY non configurée', status: 500 };
+    return {
+      text: '',
+      error: 'Clé API Gemini manquante. Configurez votre clé dans Paramètres > Clés API (gratuit sur aistudio.google.com/apikey).',
+      status: 400,
+      stage: 'missing_key',
+    };
   }
 
   const { maxOutputTokens = 4000, temperature = 0.7, timeoutMs = 120000 } = options;
@@ -44,9 +50,12 @@ async function callGemini(
       const errText = await response.text();
       console.error('Gemini API error:', response.status, errText);
       if (response.status === 429) {
-        return { text: '', error: 'Trop de requêtes. Réessayez dans quelques instants.', status: 429 };
+        return { text: '', error: 'Quota Gemini atteint. Attendez quelques minutes ou vérifiez votre quota sur aistudio.google.com.', status: 429, stage: 'rate_limit' };
       }
-      return { text: '', error: `Erreur Gemini: ${response.status}`, status: response.status };
+      if (response.status === 400 || response.status === 401 || response.status === 403) {
+        return { text: '', error: 'Clé API Gemini invalide ou expirée. Vérifiez votre clé sur aistudio.google.com/apikey.', status: response.status, stage: 'invalid_key' };
+      }
+      return { text: '', error: `Erreur Gemini ${response.status}: ${errText.substring(0, 200)}`, status: response.status, stage: 'gemini_error' };
     }
 
     const data = await response.json();
@@ -54,22 +63,22 @@ async function callGemini(
 
     if (!text) {
       console.error('Empty Gemini response:', JSON.stringify(data));
-      return { text: '', error: "Réponse vide de l'IA", status: 500 };
+      return { text: '', error: "Réponse vide de l'IA. Réessayez en simplifiant votre demande.", status: 500, stage: 'empty_response' };
     }
 
     return { text };
   } catch (err) {
     clearTimeout(timeoutId);
     if (err.name === 'AbortError') {
-      return { text: '', error: 'Timeout - génération trop longue', status: 500 };
+      return { text: '', error: 'Timeout - la génération a pris trop de temps. Simplifiez votre niche ou réessayez.', status: 504, stage: 'timeout' };
     }
-    return { text: '', error: err.message || 'Erreur inconnue', status: 500 };
+    return { text: '', error: err.message || 'Erreur inconnue', status: 500, stage: 'unknown' };
   }
 }
 
-function geminiError(res: { error?: string; status?: number }) {
+function geminiError(res: { error?: string; status?: number; stage?: string }) {
   return new Response(
-    JSON.stringify({ error: res.error }),
+    JSON.stringify({ error: res.error, stage: res.stage }),
     { status: res.status || 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
   );
 }
@@ -89,8 +98,8 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { email, actionType, prompt, numberOfChapters, ebookTitle, authorName, apiKey, type, content, openaiApiKey, useOpenAI, maxTokens } = body;
-    console.log('Content generation request:', { email, actionType, type });
+    const { email, actionType, prompt, numberOfChapters, ebookTitle, authorName, apiKey, type, content, openaiApiKey, useOpenAI, maxTokens, userApiKey } = body;
+    console.log('Content generation request:', { email, actionType, type, hasUserKey: !!userApiKey });
 
     // ====== FLOATING AI EDIT ======
     if (type === 'floating-ai-edit') {
@@ -582,7 +591,7 @@ RÈGLES CRITIQUES POUR DES MOTS-CLÉS AMAZON EXPLOITABLES :
 
 Réponds UNIQUEMENT avec un tableau JSON valide, sans markdown.`,
         prompt,
-        { maxOutputTokens: 8000, temperature: 0.6, timeoutMs: 90000 }
+        { maxOutputTokens: 8000, temperature: 0.6, timeoutMs: 90000, userApiKey }
       );
       if (res.error) return geminiError(res);
       return jsonSuccess({ content: res.text });
@@ -605,7 +614,7 @@ RÈGLES POUR DES MOTS-CLÉS LONGUE TRAÎNE EXPLOITABLES :
 
 Réponds UNIQUEMENT avec un tableau JSON valide, sans markdown ni backticks.`,
         prompt,
-        { maxOutputTokens: 8000, temperature: 0.6, timeoutMs: 90000 }
+        { maxOutputTokens: 8000, temperature: 0.6, timeoutMs: 90000, userApiKey }
       );
       if (res.error) return geminiError(res);
       return jsonSuccess({ content: res.text });
@@ -633,7 +642,7 @@ STRATÉGIE OPTIMALE :
 
 Réponds UNIQUEMENT avec un tableau JSON de 7 strings, sans markdown ni backticks : ["mot-clé 1", "mot-clé 2", ...]`,
         prompt,
-        { maxOutputTokens: 2000, temperature: 0.4, timeoutMs: 60000 }
+        { maxOutputTokens: 2000, temperature: 0.4, timeoutMs: 60000, userApiKey }
       );
       if (res.error) return geminiError(res);
       return jsonSuccess({ content: res.text });
