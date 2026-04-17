@@ -11,11 +11,17 @@ const corsHeaders = {
 async function callGemini(
   systemPrompt: string,
   userPrompt: string,
-  options: { maxOutputTokens?: number; temperature?: number; timeoutMs?: number } = {}
-): Promise<{ text: string; error?: string; status?: number }> {
-  const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
+  options: { maxOutputTokens?: number; temperature?: number; timeoutMs?: number; userApiKey?: string } = {}
+): Promise<{ text: string; error?: string; status?: number; stage?: string }> {
+  // Prefer user-provided BYOK key, fallback to server key
+  const GEMINI_API_KEY = options.userApiKey?.trim() || Deno.env.get('GEMINI_API_KEY');
   if (!GEMINI_API_KEY) {
-    return { text: '', error: 'GEMINI_API_KEY non configurée', status: 500 };
+    return {
+      text: '',
+      error: 'Clé API Gemini manquante. Configurez votre clé dans Paramètres > Clés API (gratuit sur aistudio.google.com/apikey).',
+      status: 400,
+      stage: 'missing_key',
+    };
   }
 
   const { maxOutputTokens = 4000, temperature = 0.7, timeoutMs = 120000 } = options;
