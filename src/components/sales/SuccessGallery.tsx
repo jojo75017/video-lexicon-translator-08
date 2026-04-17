@@ -4,8 +4,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { 
-  Star, TrendingUp, Eye, ChevronLeft, ChevronRight, 
-  Quote, DollarSign, BookOpen, Calendar
+  Star, TrendingUp, ChevronLeft, ChevronRight, 
+  Quote, DollarSign, Calendar
 } from 'lucide-react';
 
 interface SuccessStory {
@@ -143,7 +143,7 @@ const SuccessGallery: React.FC<SuccessGalleryProps> = ({
             
             {/* Revenue badge */}
             <div className="absolute top-3 right-3">
-              <Badge className="bg-emerald-500/90 text-foreground font-bold px-3 py-1">
+              <Badge className="bg-primary/90 text-primary-foreground font-bold px-3 py-1">
                 <DollarSign className="w-3 h-3 mr-1" />
                 {story.monthlyRevenue}/mois
               </Badge>
@@ -189,7 +189,7 @@ const SuccessGallery: React.FC<SuccessGalleryProps> = ({
             </div>
             <div className="p-2 rounded-lg bg-muted/50">
               <div className="flex items-center justify-center">
-                <TrendingUp className="w-4 h-4 text-emerald-500" />
+                <TrendingUp className="w-4 h-4 text-primary" />
               </div>
               <div className="text-xs text-muted-foreground">Top 100</div>
             </div>

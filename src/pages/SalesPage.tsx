@@ -23,6 +23,7 @@ import TonightOutcomes from "@/components/sales/TonightOutcomes";
 import ExclusiveFlashBanner from "@/components/sales/ExclusiveFlashBanner";
 import BeforeAfterSection from "@/components/sales/BeforeAfterSection";
 import KdpTestimonials from "@/components/sales/KdpTestimonials";
+import HeroVideoTeaser from "@/components/sales/HeroVideoTeaser";
 
 // ════════════════════════════════════════════════════════════════════════════════
 // DESIGN SYSTEM 2026 — Palette Premium
@@ -246,7 +247,7 @@ const SalesPage = () => {
           "aggregateRating": {
             "@type": "AggregateRating",
             "ratingValue": "4.8",
-            "reviewCount": "127",
+            "reviewCount": "47",
             "bestRating": "5",
             "worstRating": "1"
           },
@@ -444,6 +445,9 @@ const SalesPage = () => {
           </motion.div>
         </motion.div>
       </section>
+
+      {/* ═══════════════════════════════════════ VIDÉO EXPLICATIVE ═══════════════════════════════════════ */}
+      <HeroVideoTeaser />
 
       {/* ═══════════════════════════════════════ TRIAL INLINE BANNER ═══════════════════════════════════════ */}
       <section className="py-8 px-4">
