@@ -2,99 +2,82 @@
 
 ## Diagnostic
 
-L'utilisateur veut améliorer la page `/offres` par rapport à kdp-rocket.fr sur 2 points précis :
-1. **Images d'ebooks pas visibles** — KDP Rocket montre des mockups/captures d'écran de chaque outil, on ne le fait pas (ou mal)
-2. **Titres et descriptions des onglets/outils peu clairs** — l'utilisateur ne voit pas facilement les 15 agents et leur fonction
+L'utilisateur dit que sur `/offres`, **on ne voit pas les outils** et que les visiteurs sont perdus. Il pointe vers `kdp-rocket.fr/#outils` comme référence : leur section outils est claire, visuelle, immédiatement identifiable.
 
-Je dois inspecter ce qui existe déjà pour comprendre l'écart visuel.
+Sur notre page actuelle, le composant `AgentsShowcase` existe avec mockups, mais il y a 2 problèmes probables :
+1. **Visibilité** : la section est noyée dans la page, pas de point d'entrée évident depuis le hero
+2. **Lisibilité** : les 15 agents en grille sans regroupement visuel = mur d'info indigeste
 
-## Inspection rapide nécessaire
+## Plan — Rendre les outils ULTRA visibles
 
-- `AgentsShowcase.tsx` (créé récemment) — voir s'il a vraiment des images ou juste du texte
-- `BonusStack.tsx` — vérifier la présentation visuelle
-- Structure actuelle de `SalesPage.tsx` après refonte
-- Voir s'il existe des screenshots/mockups dans `/public` qu'on pourrait réutiliser
+### 1. Ancre `#outils` directe + CTA hero
+- Ajouter un CTA "Voir les 15 outils" en gros sous le hero qui scroll vers `#outils`
+- L'URL `ebookstudio.fr/offres#outils` devient partageable comme chez le concurrent
 
-Sans relancer l'inspection complète (le code a beaucoup bougé), je propose un plan ciblé sur les 2 manques identifiés.
+### 2. Refonte `AgentsShowcase.tsx` en 5 piliers visuels
+Au lieu d'une grille plate de 15 cartes, regrouper par **pilier** avec gros titre + couleur :
 
-## Plan d'amélioration — Visibilité maximale des outils et résultats
-
-### 1. Refonte `AgentsShowcase.tsx` — Format "vitrine produit"
-
-**Avant** : grille de cartes avec icônes Lucide + texte
-**Après** : grille de cartes avec **mockup screenshot réel** de chaque agent
-
-Pour chaque agent (P1 → P15) :
-- 📸 **Screenshot mockup** (capture de l'interface réelle) en haut de carte
-- 🏷️ Badge numéro (P1, P2…)
-- 📝 Titre court : "Agent Briefing", "Agent Plan Détaillé", etc.
-- 💡 1 phrase de bénéfice concret (ex : "Génère 10 angles de marché en 30s")
-- ⏱️ Temps d'exécution (ex : "30s")
-
-Génération des mockups via IA (nano-banana) ou capture des vraies interfaces.
-
-### 2. Nouveau composant `EbookGallery.tsx` — Vitrine des résultats
-
-Section dédiée **avant** AgentsShowcase pour montrer **ce que ça produit** :
-- 🖼️ Galerie de **6 à 9 couvertures d'ebooks** générées par la plateforme (effet "Avant/Après" ou wall of books)
-- 📚 Chaque cover cliquable → modal avec titre, description KDP, mots-clés générés, score qualité
-- 💰 Stats sous chaque ebook : "BSR #2 847 — 89€/mois passifs"
-
-Cela répond directement à "on ne sait pas où elles se trouvent" : on **MONTRE** les ebooks réels avec leurs métadonnées.
-
-### 3. Nouvelle navigation visuelle `ToolsNavigationBar.tsx`
-
-Barre horizontale sticky **sous le hero** avec les 5 piliers :
 ```
-[ ✍️ Écrire ] [ 🎨 Visuels ] [ 🎙️ Audio ] [ 📊 KDP ] [ 🚀 Marketing ]
+┌─ ✍️ ÉCRIRE (7 outils) ───────────────────┐
+│ [P1][P3][P4][P5][P9][P10][P13]          │
+└──────────────────────────────────────────┘
+
+┌─ 🎨 VISUELS (2 outils) ──────────────────┐
+│ [Couvertures IA][Éditeur Canva]         │
+└──────────────────────────────────────────┘
+
+┌─ 🎙️ AUDIO (2 outils) ───────────────────┐
+│ [Audiobook TTS][Audio Express]          │
+└──────────────────────────────────────────┘
+
+┌─ 📊 KDP (8 outils) ──────────────────────┐
+│ [P2][P6][P7][P8][P11][P12][P14][P15]    │
+└──────────────────────────────────────────┘
+
+┌─ 🚀 MARKETING (2 outils) ────────────────┐
+│ [Plan lancement][Marketing posts]       │
+└──────────────────────────────────────────┘
 ```
-- Cliquables → scroll vers la section correspondante de AgentsShowcase
-- Indique visuellement la richesse de l'outil
 
-### 4. Section "Anatomie d'un ebook généré" — `EbookAnatomy.tsx`
+Chaque carte garde son mockup screenshot + nom + temps d'exécution.
 
-Composant visuel type "infographie" qui montre **toutes les sorties** d'un projet :
-- 📖 Manuscrit complet (200 pages)
-- 🎨 Couverture pro (front + back + tranche)
-- 🔊 Audiobook (5h)
-- 📝 Description KDP optimisée
-- 🏷️ 7 mots-clés backend
-- 📊 3 catégories niches
-- 📧 Email de lancement
-- 🎯 Calendrier social media
+### 3. Compteur d'outils géant en tête de section
+Comme KDP Rocket affiche "12 outils" en énorme, on affiche :
 
-Avec icônes + petits screenshots pour chaque livrable.
+> **21 OUTILS PRO** dans une seule plateforme
+> *(15 agents IA + 6 studios visuels/audio/marketing)*
 
-### 5. Mise à jour des titres pour clarté maximale
+Avec les 5 icônes piliers en sous-titre.
 
-Tous les titres de sections à reformuler en mode **bénéfice direct** :
-- "AgentsShowcase" → **"Les 15 agents IA qui rédigent votre ebook"**
-- "EbookGallery" → **"Voyez les ebooks créés par nos auteurs"**
-- "BonusStack" → **"Tout ce que vous obtenez pour 67€"**
-- "PriceComparison" → **"67€ une fois vs 39€/mois chez KDP Rocket"**
+### 4. Mini-nav sticky sous le hero (déjà créée → la rendre VISIBLE)
+Le composant `ToolsNavigationBar.tsx` existe déjà. Vérifier qu'il :
+- Est bien intégré dans `SalesPage.tsx` juste après le hero
+- A un fond contrasté (pas transparent)
+- Affiche les 5 piliers cliquables avec compteur (ex: "Écrire (7)")
 
-## Questions clarifiantes
+### 5. Section "Voir tous les outils" avant le pricing
+Ajouter un récapitulatif type tableau comparatif :
+```
+21 outils — 67€ à vie
+✍️ 7 outils écriture
+🎨 2 studios visuels
+🎙️ 2 outils audio
+📊 8 outils KDP
+🚀 2 outils marketing
+```
 
-Avant d'exécuter, 2 décisions importantes :
+## Question avant exécution
 
-1. **Pour les mockups d'agents** : 
-   - Option A — Génération IA de mockups stylisés (rapide, joli, pas 100% fidèle)
-   - Option B — Vraies captures d'écran à fournir par vous (fidèle mais demande votre travail)
-   - Option C — Les deux (mockups IA pour les écrans + vos vraies captures pour 3-4 agents phares)
+Souhaitez-vous :
+- **A** — Refonte complète des 5 points (1h30) → page beaucoup plus claire
+- **B** — Uniquement points 1+2+3 (45 min) → focus sur la visibilité de la section outils
+- **C** — Uniquement point 4 (15 min) → juste rendre la barre de nav visible
 
-2. **Pour la galerie d'ebooks** :
-   - Option A — Couvertures générées par IA (3 styles : roman, business, développement perso)
-   - Option B — Vrais ebooks publiés (avez-vous des ASIN/captures Amazon à montrer ?)
+Si pas de réponse : **A** par défaut.
 
-## Livrables prévus
-
-- **Refonte** : `src/components/sales/AgentsShowcase.tsx` (cartes avec mockups)
-- **Nouveau** : `src/components/sales/EbookGallery.tsx` (galerie de résultats)
-- **Nouveau** : `src/components/sales/ToolsNavigationBar.tsx` (barre piliers)
-- **Nouveau** : `src/components/sales/EbookAnatomy.tsx` (infographie livrables)
-- **Modifié** : `src/pages/SalesPage.tsx` (intégration + titres clarifiés)
-- **Generated** : ~9 images mockups via nano-banana si Option A choisie
-
-## Estimation
-2-3h selon options choisies. Résultat : page **ultra-visuelle** où le visiteur **voit** chaque outil et chaque résultat, sans avoir à lire.
+## Livrables
+- **Refonte** : `src/components/sales/AgentsShowcase.tsx` (regroupement par pilier + compteur géant)
+- **Vérif/fix** : `src/components/sales/ToolsNavigationBar.tsx` (visibilité)
+- **Modifié** : `src/pages/SalesPage.tsx` (CTA hero "Voir les 21 outils" + récap avant pricing)
+- **Nouveau** (optionnel) : `src/components/sales/ToolsCounterBanner.tsx` (bannière "21 outils")
 
