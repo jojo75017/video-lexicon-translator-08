@@ -12,18 +12,15 @@ import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import SalesFaq from "@/components/sales/SalesFaq";
 import AuthorShowcase from "@/components/sales/AuthorShowcase";
-import RoiCalculator from "@/components/sales/RoiCalculator";
 import PriceComparison from "@/components/sales/PriceComparison";
 import CountdownTimer from "@/components/sales/CountdownTimer";
 import UrgencyBanner from "@/components/sales/UrgencyBanner";
 import GuaranteeSection from "@/components/sales/GuaranteeSection";
-import InteractiveDemo from "@/components/sales/InteractiveDemo";
-import WhoIsThisFor from "@/components/sales/WhoIsThisFor";
-import TonightOutcomes from "@/components/sales/TonightOutcomes";
-import ExclusiveFlashBanner from "@/components/sales/ExclusiveFlashBanner";
-import BeforeAfterSection from "@/components/sales/BeforeAfterSection";
-import KdpTestimonials from "@/components/sales/KdpTestimonials";
 import HeroVideoTeaser from "@/components/sales/HeroVideoTeaser";
+import AgentsShowcase from "@/components/sales/AgentsShowcase";
+import EbookieAssistant from "@/components/sales/EbookieAssistant";
+import BonusStack from "@/components/sales/BonusStack";
+import KdpRoiCalculator from "@/components/sales/KdpRoiCalculator";
 
 // ════════════════════════════════════════════════════════════════════════════════
 // DESIGN SYSTEM 2026 — Palette Premium
