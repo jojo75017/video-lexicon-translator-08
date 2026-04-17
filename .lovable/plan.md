@@ -1,42 +1,74 @@
 
 
-## Diagnostic
+## Objectif
+Créer un récapitulatif clair et visuel de tous les onglets/outils pour que les abonnés sachent quoi utiliser, quand, et dans quel ordre — sans se noyer.
 
-Deux problèmes distincts dans les onglets **Description** et **Mots-clés** :
+## Analyse rapide
+Tu as ~44 outils répartis dans 5 piliers (Workflow IA, Écriture, Publier, Vendre, Mon Compte). Le problème : un nouvel abonné arrive et voit 44 boutons dans la sidebar → paralysie.
 
-### 1. Description Magnet (`generate-kdp-description`)
-- Utilise **ta clé Gemini personnelle (BYOK)**.
-- Si la clé est absente, expirée ou invalide → 400 "Clé API Gemini requise".
-- Si Gemini renvoie du JSON mal formé → fallback silencieux mais l'utilisateur ne sait pas pourquoi.
+## Solution proposée
 
-### 2. Mots-clés (3 onglets : Recherche, Longue traîne, Backend 7)
-- Utilise la **clé serveur** `GEMINI_API_KEY` via `generate-content` (PAS la clé BYOK).
-- Le frontend affiche un toast **générique** : *"Impossible de générer les mots-clés. Réessayez."* — qui masque la vraie cause (quota, timeout, JSON tronqué, clé serveur manquante).
-- Incohérence avec le reste du projet qui est en BYOK.
+### Page unique `/guide-outils` (accès abonnés)
+Un **mode d'emploi visuel** qui sert de "carte au trésor" pour naviguer dans EbookStudio.
 
-## Plan de correction
+### Structure en 4 sections
 
-### A. Aligner les 3 onglets mots-clés sur le BYOK (cohérence projet)
-- `KdpKeywordResearchPage.tsx` : lire `userGeminiKey` via `useOpenAIConfig()` et l'envoyer dans `body.userApiKey`.
-- `generate-content/index.ts` : pour les 3 types `kdp-keyword-research`, `kdp-longtail`, `kdp-backend-keywords`, accepter et utiliser `userApiKey` en priorité (fallback serveur si vide).
+**Section 1 — Parcours recommandé (le chemin "happy path")**
+Un schéma visuel en 5 étapes numérotées :
+1. **Idée** → Recherche Niche KDP + Mots-clés
+2. **Création** → Workflow IA P1-P15 (le seul à utiliser pour écrire)
+3. **Habillage** → Studio Couverture + Description Magnet
+4. **Publication** → Export KDP + Checklist Pré-publication
+5. **Vente** → Guide KDP Ads + Marketing
 
-### B. Remonter les vraies erreurs au lieu d'un toast générique
-- Frontend : afficher le message réel renvoyé (`error.message` ou `data.error`) au lieu de "Impossible de générer".
-- Edge function : structurer la réponse d'erreur avec `{ error, stage, details }` pour diagnostiquer (timeout vs 429 vs JSON invalide vs clé absente).
+Chaque étape = 1 carte cliquable qui amène directement à l'outil.
 
-### C. Robustifier le parsing JSON
-- Côté serveur : si Gemini renvoie un JSON tronqué (max tokens atteints), retenter une fois avec `maxOutputTokens` plus élevé OU renvoyer un message clair "Réponse tronquée, simplifie ta niche".
-- Côté client : déjà un `safeParseJsonArray` mais améliorer le message d'échec pour guider l'utilisateur.
+**Section 2 — Les 5 piliers expliqués**
+Pour chaque pilier (Workflow IA, Écriture, Publier, Vendre, Mon Compte) :
+- Couleur sémantique (déjà existante)
+- À quoi ça sert en 1 phrase
+- Liste compacte des outils-clés (pas les 44, juste les essentiels)
+- Bouton "Voir tous les outils de ce pilier"
 
-### D. Vérifier la config de la clé Gemini utilisateur
-- Sur `EbookDescriptionMagnet.tsx` : si `userGeminiKey` est vide, afficher un encart clair *"Configurez votre clé Gemini dans Paramètres"* AVANT le bouton, plutôt qu'attendre l'erreur 400.
+**Section 3 — "Je veux faire X" (FAQ pratique)**
+Tableau de mappings cas d'usage → outil :
+- *"Je débute, je veux écrire mon 1er livre"* → Workflow IA P1-P15
+- *"Je veux trouver une niche rentable"* → Recherche KDP + Analyse de marché
+- *"J'ai un livre déjà écrit, je veux l'améliorer"* → Réécriture Naturelle + Correcteur Strict
+- *"Je veux créer une couverture"* → Studio Couverture IA
+- *"Je veux faire de la pub Amazon"* → Guide KDP Ads
+- *"Je veux convertir mon livre en audio"* → Audio Express
+- *"Je veux exporter pour KDP"* → Export Pro KDP
+*(8-10 cas d'usage max)*
 
-## Fichiers modifiés
-- `src/pages/KdpKeywordResearchPage.tsx` (BYOK + meilleurs messages d'erreur + check clé)
-- `src/components/ebook/EbookDescriptionMagnet.tsx` (encart pré-check clé + affichage erreur réelle)
-- `supabase/functions/generate-content/index.ts` (accepter `userApiKey`, retours d'erreur structurés sur les 3 types KDP)
+**Section 4 — Outils avancés (à découvrir plus tard)**
+Liste discrète des outils niches/experts (Pinterest Generator, SEO Generator, Site Cloner, etc.) avec mention *"À explorer une fois les bases maîtrisées"*.
 
-## Ce que je ne touche pas
-- Les autres types de `generate-content` (kdp-analytics, etc.) — pas concernés par le bug.
-- Le design visuel — uniquement la logique d'erreur et BYOK.
+### Intégrations
+1. **Sidebar** : Ajouter en TOUT EN HAUT de la sidebar un bouton 🗺️ **"Guide des outils"** (avant les piliers) — ça devient le 1er réflexe.
+2. **Page Hierarchy/Dashboard** : Bandeau d'accueil pour les nouveaux abonnés *"Première visite ? Découvre le guide des outils →"*.
+3. **Onboarding** : Lien dans l'email de bienvenue (mention seulement, pas de modif email auto).
+
+## Fichiers à créer/modifier
+
+**Créer**
+- `src/pages/ToolsGuidePage.tsx` (la page récap complète)
+- `src/components/layout/ToolsGuideButton.tsx` (bouton sidebar dédié, style highlighté)
+
+**Modifier**
+- `src/App.tsx` — route `/guide-outils` (gated abonnés via `SubscriberGate`)
+- `src/components/layout/ModernSidebar.tsx` — insérer le bouton "Guide des outils" en tête de sidebar
+- `src/pages/HierarchyPage.tsx` (ou page d'accueil app) — bandeau d'accueil discret avec CTA vers le guide
+
+## Style visuel
+- Charte Amazon KDP existante (#FAFAFA, #008296, #FF9E2D)
+- Cartes numérotées pour le parcours (gros chiffres style "1, 2, 3...")
+- Icônes Lucide cohérentes avec la sidebar
+- Responsive mobile friendly (l'utilisateur voyage)
+
+## Ce que je NE fais PAS
+- Pas de refonte de la sidebar (juste l'ajout d'un bouton en tête)
+- Pas de suppression d'outils (tout reste accessible)
+- Pas de tutoriel vidéo (texte + visuel uniquement)
+- Pas de système d'onboarding multi-étapes intrusif (juste un bandeau dismissible)
 
