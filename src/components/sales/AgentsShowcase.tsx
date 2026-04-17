@@ -68,7 +68,7 @@ const agentToCard = (id: string): ToolCard => {
     badge: `Agent ${agent.id}`,
     name: agent.name,
     subtitle: agent.agentSubtitle,
-    description: agent.description,
+    description: AGENT_BENEFITS[agent.id] ?? agent.description,
     icon: agent.icon,
     mockup: AGENT_MOCKUPS[agent.id] ?? mockEditor,
     time: AGENT_TIME[agent.id] ?? '60s',
