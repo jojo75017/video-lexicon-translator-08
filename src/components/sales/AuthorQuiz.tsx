@@ -102,7 +102,7 @@ const profiles: Record<string, AuthorProfile> = {
     title: "L'Âme Créative",
     description: "Votre imagination débordante est votre plus grand atout. L'IA peut vous aider à structurer vos idées tout en préservant votre voix unique.",
     icon: <PenTool className="w-8 h-8" />,
-    color: 'from-pink-500 to-rose-500',
+    color: 'from-primary to-accent',
     recommendation: "Explorez la fiction avec notre assistant de création de personnages",
     features: ['Générateur de personnages', 'Assistant de style', 'Cohérence narrative IA']
   },
@@ -111,7 +111,7 @@ const profiles: Record<string, AuthorProfile> = {
     title: "L'Entrepreneur Ambitieux",
     description: "Vous voyez les ebooks comme une source de revenus passifs. Avec la bonne stratégie, vous pouvez créer une machine à cash automatisée.",
     icon: <Rocket className="w-8 h-8" />,
-    color: 'from-emerald-500 to-teal-500',
+    color: 'from-primary to-kdp-orange',
     recommendation: "Utilisez notre analyse de marché KDP pour trouver les niches rentables",
     features: ['Analyse de marché KDP', 'Simulateur Amazon Ads', 'Plan de lancement 30 jours']
   },
@@ -120,7 +120,7 @@ const profiles: Record<string, AuthorProfile> = {
     title: "L'Auteur en Devenir",
     description: "Chaque expert a commencé quelque part ! Avec les bons outils et un accompagnement pas à pas, votre premier ebook est à portée de main.",
     icon: <Sparkles className="w-8 h-8" />,
-    color: 'from-violet-500 to-purple-500',
+    color: 'from-accent to-primary',
     recommendation: "Notre workflow complet vous guide de A à Z pour votre premier livre",
     features: ['Tutoriel interactif', 'Workflow guidé P1-P14', 'Formation intégrée']
   }
@@ -209,7 +209,7 @@ const AuthorQuiz: React.FC<AuthorQuizProps> = ({
 
   return (
     <Card className="w-full max-w-2xl mx-auto overflow-hidden border-0 shadow-2xl bg-gradient-to-br from-card via-card to-card/80">
-      <CardHeader className="bg-gradient-to-r from-primary/10 to-violet-500/10 border-b border-border/50">
+      <CardHeader className="bg-primary/5 border-b border-border/50">
         <div className="flex items-center justify-between">
           <CardTitle className="text-xl flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" />
@@ -292,7 +292,7 @@ const AuthorQuiz: React.FC<AuthorQuizProps> = ({
               {/* Recommandation */}
               <div className="p-4 rounded-xl bg-muted/50 border border-border">
                 <div className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-emerald-500 mt-0.5" />
+                  <CheckCircle2 className="w-5 h-5 text-primary mt-0.5" />
                   <div>
                     <div className="font-semibold text-foreground">Notre recommandation</div>
                     <p className="text-sm text-muted-foreground">{profile.recommendation}</p>
@@ -314,7 +314,7 @@ const AuthorQuiz: React.FC<AuthorQuizProps> = ({
 
               {/* Email capture */}
               {showEmailCapture && (
-                <div className="p-4 rounded-xl bg-gradient-to-r from-primary/10 to-violet-500/10 border border-primary/20">
+                <div className="p-4 rounded-xl bg-primary/5 border border-primary/20">
                   <div className="flex items-center gap-2 mb-3">
                     <Gift className="w-5 h-5 text-primary" />
                     <span className="font-semibold">Recevez votre guide personnalisé gratuit</span>
@@ -333,7 +333,7 @@ const AuthorQuiz: React.FC<AuthorQuizProps> = ({
                     <Button 
                       onClick={handleSubmitEmail}
                       disabled={isSubmitting}
-                      className="bg-gradient-to-r from-primary to-violet-600"
+                      className="bg-primary hover:bg-primary/90"
                     >
                       {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Recevoir'}
                     </Button>
@@ -344,7 +344,7 @@ const AuthorQuiz: React.FC<AuthorQuizProps> = ({
               {/* CTA */}
               <Button 
                 onClick={() => navigate('/demo')}
-                className="w-full bg-gradient-to-r from-primary to-violet-600 h-12 text-lg"
+                className="w-full bg-primary hover:bg-primary/90 h-12 text-lg"
               >
                 Essayer le générateur gratuitement
                 <ArrowRight className="w-5 h-5 ml-2" />
