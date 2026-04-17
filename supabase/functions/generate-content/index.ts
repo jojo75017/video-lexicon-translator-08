@@ -50,9 +50,12 @@ async function callGemini(
       const errText = await response.text();
       console.error('Gemini API error:', response.status, errText);
       if (response.status === 429) {
-        return { text: '', error: 'Trop de requêtes. Réessayez dans quelques instants.', status: 429 };
+        return { text: '', error: 'Quota Gemini atteint. Attendez quelques minutes ou vérifiez votre quota sur aistudio.google.com.', status: 429, stage: 'rate_limit' };
       }
-      return { text: '', error: `Erreur Gemini: ${response.status}`, status: response.status };
+      if (response.status === 400 || response.status === 401 || response.status === 403) {
+        return { text: '', error: 'Clé API Gemini invalide ou expirée. Vérifiez votre clé sur aistudio.google.com/apikey.', status: response.status, stage: 'invalid_key' };
+      }
+      return { text: '', error: `Erreur Gemini ${response.status}: ${errText.substring(0, 200)}`, status: response.status, stage: 'gemini_error' };
     }
 
     const data = await response.json();
@@ -60,22 +63,22 @@ async function callGemini(
 
     if (!text) {
       console.error('Empty Gemini response:', JSON.stringify(data));
-      return { text: '', error: "Réponse vide de l'IA", status: 500 };
+      return { text: '', error: "Réponse vide de l'IA. Réessayez en simplifiant votre demande.", status: 500, stage: 'empty_response' };
     }
 
     return { text };
   } catch (err) {
     clearTimeout(timeoutId);
     if (err.name === 'AbortError') {
-      return { text: '', error: 'Timeout - génération trop longue', status: 500 };
+      return { text: '', error: 'Timeout - la génération a pris trop de temps. Simplifiez votre niche ou réessayez.', status: 504, stage: 'timeout' };
     }
-    return { text: '', error: err.message || 'Erreur inconnue', status: 500 };
+    return { text: '', error: err.message || 'Erreur inconnue', status: 500, stage: 'unknown' };
   }
 }
 
-function geminiError(res: { error?: string; status?: number }) {
+function geminiError(res: { error?: string; status?: number; stage?: string }) {
   return new Response(
-    JSON.stringify({ error: res.error }),
+    JSON.stringify({ error: res.error, stage: res.stage }),
     { status: res.status || 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
   );
 }
