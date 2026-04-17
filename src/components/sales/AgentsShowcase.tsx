@@ -29,6 +29,25 @@ const AGENT_TIME: Record<string, string> = {
   P11: '40s', P12: '60s', P13: '30s', P14: '20s', P15: '3 min',
 };
 
+// Bénéfices orientés résultats (style KDP Rocket)
+const AGENT_BENEFITS: Record<string, string> = {
+  P1: 'Trouve les angles éditoriaux qui vendent',
+  P2: 'Analyse 50 concurrents Amazon et trouve la niche rentable',
+  P3: 'Construit le plan détaillé chapitre par chapitre',
+  P4: 'Rédige le manuscrit complet (jusqu\'à 30 chapitres)',
+  P5: 'Optimise le rythme et la fluidité de chaque chapitre',
+  P6: 'Génère description KDP optimisée SEO',
+  P7: 'Trouve les 7 mots-clés backend Amazon',
+  P8: 'Recommande les meilleures catégories KDP',
+  P9: 'Corrige orthographe et typographie française pro',
+  P10: 'Crée la structure narrative qui captive',
+  P11: 'Calcule le prix optimal pour maximiser tes royalties',
+  P12: 'Conçoit la table des matières et la couverture textuelle',
+  P13: 'Polit le manuscrit pour un rendu éditeur pro',
+  P14: 'Vérifie la conformité KDP avant publication',
+  P15: 'Audit final qualité (jury éditorial)',
+};
+
 type ToolCard = {
   id: string;
   badge: string;
