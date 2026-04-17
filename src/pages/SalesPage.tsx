@@ -26,6 +26,7 @@ import EbookAnatomy from "@/components/sales/EbookAnatomy";
 import ToolsNavigationBar from "@/components/sales/ToolsNavigationBar";
 import ToolsCounterBanner from "@/components/sales/ToolsCounterBanner";
 import KdpRocketParityTable from "@/components/sales/KdpRocketParityTable";
+import KdpAdsTeaser from "@/components/sales/KdpAdsTeaser";
 
 // ════════════════════════════════════════════════════════════════════════════════
 // DESIGN SYSTEM 2026 — Palette Premium
@@ -588,6 +589,9 @@ const SalesPage = () => {
 
       {/* ═══════════════════════════════════════ PARITÉ KDP ROCKET + 9 EXCLUSIFS ═══════════════════════════════════════ */}
       <KdpRocketParityTable />
+
+      {/* ═══════════════════════════════════════ BONUS GUIDE KDP ADS ═══════════════════════════════════════ */}
+      <KdpAdsTeaser />
 
       {/* ═══════════════════════════════════════ LEAD CAPTURE GRATUIT ═══════════════════════════════════════ */}
       <section className="py-12 px-4 bg-secondary/50">
