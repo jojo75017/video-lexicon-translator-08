@@ -230,6 +230,21 @@ const EbookDescriptionMagnet: React.FC = () => {
             />
           </div>
 
+          {!userGeminiKey?.trim() && (
+            <div className="rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-700 p-3 flex items-start gap-2">
+              <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+              <div className="text-sm">
+                <p className="font-medium text-amber-900 dark:text-amber-200">Clé Gemini requise</p>
+                <p className="text-amber-800 dark:text-amber-300 mt-0.5">
+                  Configure ta clé dans <strong>Paramètres &gt; Clés API</strong>. Clé gratuite sur{' '}
+                  <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" className="underline font-medium">
+                    aistudio.google.com/apikey
+                  </a>.
+                </p>
+              </div>
+            </div>
+          )}
+
           <Button
             onClick={handleGenerate}
             disabled={isGenerating || !title.trim()}
