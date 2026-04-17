@@ -4,8 +4,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { 
-  Star, TrendingUp, Eye, ChevronLeft, ChevronRight, 
-  Quote, DollarSign, BookOpen, Calendar
+  Star, TrendingUp, ChevronLeft, ChevronRight, 
+  Quote, DollarSign, Calendar
 } from 'lucide-react';
 
 interface SuccessStory {

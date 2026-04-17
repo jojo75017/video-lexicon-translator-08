@@ -23,6 +23,7 @@ import TonightOutcomes from "@/components/sales/TonightOutcomes";
 import ExclusiveFlashBanner from "@/components/sales/ExclusiveFlashBanner";
 import BeforeAfterSection from "@/components/sales/BeforeAfterSection";
 import KdpTestimonials from "@/components/sales/KdpTestimonials";
+import HeroVideoTeaser from "@/components/sales/HeroVideoTeaser";
 
 // ════════════════════════════════════════════════════════════════════════════════
 // DESIGN SYSTEM 2026 — Palette Premium
