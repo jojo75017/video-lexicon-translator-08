@@ -168,7 +168,7 @@ const KdpRocketParityTable: React.FC = () => {
             <div className="p-4 sm:p-5 text-center border-l border-border bg-primary/10">
               <p className="font-black text-base sm:text-lg text-primary">67€</p>
               <p className="text-[10px] sm:text-xs text-primary/80 font-bold">À VIE</p>
-              <p className="text-[10px] text-emerald-600 font-bold mt-1">−401€/an</p>
+              <p className="text-[10px] text-primary font-bold mt-1">−401€/an</p>
             </div>
           </div>
         </motion.div>
