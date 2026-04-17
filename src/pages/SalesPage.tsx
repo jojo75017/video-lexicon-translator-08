@@ -318,8 +318,7 @@ const SalesPage = () => {
         </div>
       </header>
 
-      {/* ═══════════════════════════════════════ FLASH EXCLUSIF ═══════════════════════════════════════ */}
-      <ExclusiveFlashBanner />
+      {/* (ExclusiveFlashBanner supprimé — refonte) */}
 
       {/* ═══════════════════════════════════════ HERO ═══════════════════════════════════════ */}
       <section className="relative py-20 sm:py-28 px-4">
@@ -561,17 +560,14 @@ const SalesPage = () => {
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════ DÉMO INTERACTIVE ═══════════════════════════════════════ */}
-      <InteractiveDemo />
+      {/* ═══════════════════════════════════════ AGENTS SHOWCASE (#outils) ═══════════════════════════════════════ */}
+      <AgentsShowcase />
 
-      {/* ═══════════════════════════════════════ POUR QUI ? ═══════════════════════════════════════ */}
-      <WhoIsThisFor />
+      {/* ═══════════════════════════════════════ EBOOKIE COPILOTE IA ═══════════════════════════════════════ */}
+      <EbookieAssistant />
 
-      {/* ═══════════════════════════════════════ AVANT/APRÈS ═══════════════════════════════════════ */}
-      <BeforeAfterSection />
-
-      {/* ═══════════════════════════════════════ TÉMOIGNAGES KDP ═══════════════════════════════════════ */}
-      <KdpTestimonials />
+      {/* ═══════════════════════════════════════ BONUS STACK 935€ → 67€ ═══════════════════════════════════════ */}
+      <BonusStack />
 
       {/* ═══════════════════════════════════════ COMPARATIF PRIX ═══════════════════════════════════════ */}
       <PriceComparison />
@@ -611,13 +607,10 @@ const SalesPage = () => {
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════ CE SOIR VOUS AUREZ ═══════════════════════════════════════ */}
-      <TonightOutcomes />
-
-      {/* ═══════════════════════════════════════ ROI CALCULATOR ═══════════════════════════════════════ */}
+      {/* ═══════════════════════════════════════ ROI CALCULATOR KDP ═══════════════════════════════════════ */}
       <section className="py-16 px-4 bg-secondary/50">
         <div className="max-w-3xl mx-auto">
-          <RoiCalculator />
+          <KdpRoiCalculator onCtaClick={handlePlanClick} />
         </div>
       </section>
 
