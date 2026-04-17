@@ -25,7 +25,7 @@ export const AdminPage = () => {
   const [isLoadingSubscribers, setIsLoadingSubscribers] = useState(false);
   const [searchEmail, setSearchEmail] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
-  const [planFilter, setPlanFilter] = useState<'all' | 'starter' | 'pro' | 'enterprise'>('all');
+  const [planFilter, setPlanFilter] = useState<'all' | 'lifetime' | 'starter' | 'pro' | 'demo'>('all');
   const [selectedSubscriber, setSelectedSubscriber] = useState<any>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [expirationDate, setExpirationDate] = useState('');
@@ -933,9 +933,10 @@ export const AdminPage = () => {
               onChange={(e) => setPlanFilter(e.target.value as any)}
             >
               <option value="all">Tous les plans</option>
+              <option value="lifetime">Lifetime / VIP</option>
               <option value="starter">Starter</option>
               <option value="pro">Pro</option>
-              <option value="enterprise">Enterprise</option>
+              <option value="demo">Démo / Lead</option>
             </select>
           </div>
 
