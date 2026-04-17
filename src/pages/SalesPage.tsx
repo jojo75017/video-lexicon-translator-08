@@ -24,6 +24,7 @@ import KdpRoiCalculator from "@/components/sales/KdpRoiCalculator";
 import EbookGallery from "@/components/sales/EbookGallery";
 import EbookAnatomy from "@/components/sales/EbookAnatomy";
 import ToolsNavigationBar from "@/components/sales/ToolsNavigationBar";
+import ToolsCounterBanner from "@/components/sales/ToolsCounterBanner";
 
 // ════════════════════════════════════════════════════════════════════════════════
 // DESIGN SYSTEM 2026 — Palette Premium
@@ -354,9 +355,9 @@ const SalesPage = () => {
           {/* Stats — façon KDP Rocket */}
           <motion.div variants={fadeIn} custom={3} className="grid grid-cols-3 gap-4 sm:gap-8 max-w-2xl mx-auto mb-10">
             {[
-              { value: "+347%", label: "ventes Amazon" },
+              { value: "21", label: "outils pro" },
               { value: "47 min", label: "par ebook" },
-              { value: "15", label: "agents IA" },
+              { value: "+347%", label: "ventes Amazon" },
             ].map((stat, i) => (
               <div key={i} className="text-center bg-card/60 border border-border rounded-2xl py-4 backdrop-blur">
                 <p className="text-2xl sm:text-4xl font-black bg-gradient-to-br from-primary to-accent bg-clip-text text-transparent">{stat.value}</p>
@@ -415,7 +416,7 @@ const SalesPage = () => {
             <Button size="lg" variant="outline" onClick={() => document.getElementById('outils')?.scrollIntoView({ behavior: 'smooth' })}
               className="w-full sm:w-auto text-base px-8 py-6 border-primary/50 text-primary hover:text-foreground hover:border-primary hover:bg-primary/10 rounded-2xl">
               <Sparkles className="w-5 h-5 mr-2" />
-              Voir les 15 agents
+              Voir les 21 outils
             </Button>
           </motion.div>
 
@@ -444,6 +445,9 @@ const SalesPage = () => {
 
       {/* ═══════════════════════════════════════ NAV PILIERS (sticky) ═══════════════════════════════════════ */}
       <ToolsNavigationBar />
+
+      {/* ═══════════════════════════════════════ COMPTEUR 21 OUTILS ═══════════════════════════════════════ */}
+      <ToolsCounterBanner />
 
       {/* ═══════════════════════════════════════ VIDÉO EXPLICATIVE ═══════════════════════════════════════ */}
       <HeroVideoTeaser />

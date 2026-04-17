@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { PenTool, Palette, Mic, BarChart3, Megaphone } from 'lucide-react';
 
 const PILLARS = [
-  { id: 'pilier-ecrire', icon: PenTool, label: 'Écrire', color: 'text-emerald-500' },
-  { id: 'pilier-visuels', icon: Palette, label: 'Visuels', color: 'text-violet-500' },
-  { id: 'pilier-audio', icon: Mic, label: 'Audio', color: 'text-blue-500' },
-  { id: 'pilier-kdp', icon: BarChart3, label: 'KDP', color: 'text-kdp-orange' },
-  { id: 'pilier-marketing', icon: Megaphone, label: 'Marketing', color: 'text-rose-500' },
+  { id: 'pilier-ecrire',    icon: PenTool,   label: 'Écrire',    count: 7, color: 'text-emerald-500' },
+  { id: 'pilier-visuels',   icon: Palette,   label: 'Visuels',   count: 2, color: 'text-violet-500' },
+  { id: 'pilier-audio',     icon: Mic,       label: 'Audio',     count: 2, color: 'text-blue-500' },
+  { id: 'pilier-kdp',       icon: BarChart3, label: 'KDP',       count: 8, color: 'text-kdp-orange' },
+  { id: 'pilier-marketing', icon: Megaphone, label: 'Marketing', count: 2, color: 'text-rose-500' },
 ];
 
 const ToolsNavigationBar: React.FC = () => {
@@ -14,7 +14,6 @@ const ToolsNavigationBar: React.FC = () => {
 
   useEffect(() => {
     const onScroll = () => {
-      // Highlight pilier currently in view
       let current: string | null = null;
       for (const p of PILLARS) {
         const el = document.getElementById(p.id);
@@ -35,10 +34,10 @@ const ToolsNavigationBar: React.FC = () => {
   };
 
   return (
-    <div className="sticky top-[110px] z-40 bg-background/85 backdrop-blur-xl border-y border-border">
+    <div className="sticky top-[110px] z-40 bg-card border-y-2 border-primary/20 shadow-md">
       <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-center gap-1 sm:gap-2 overflow-x-auto">
-        <span className="hidden md:inline text-xs font-semibold text-muted-foreground uppercase tracking-wider mr-3">
-          Explorer :
+        <span className="hidden md:inline text-xs font-bold text-foreground uppercase tracking-wider mr-3">
+          21 outils :
         </span>
         {PILLARS.map((p) => {
           const Icon = p.icon;
@@ -50,12 +49,17 @@ const ToolsNavigationBar: React.FC = () => {
               onClick={() => handleClick(p.id)}
               className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-sm font-semibold transition-all whitespace-nowrap ${
                 isActive
-                  ? 'bg-primary/10 text-primary scale-105'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-secondary/60'
+                  ? 'bg-primary text-primary-foreground scale-105 shadow-lg'
+                  : 'text-foreground hover:bg-secondary'
               }`}
             >
-              <Icon className={`w-4 h-4 ${isActive ? 'text-primary' : p.color}`} />
-              {p.label}
+              <Icon className={`w-4 h-4 ${isActive ? 'text-primary-foreground' : p.color}`} />
+              <span>{p.label}</span>
+              <span className={`text-xs font-bold px-1.5 py-0.5 rounded-md ${
+                isActive ? 'bg-primary-foreground/20 text-primary-foreground' : 'bg-muted text-muted-foreground'
+              }`}>
+                {p.count}
+              </span>
             </button>
           );
         })}
