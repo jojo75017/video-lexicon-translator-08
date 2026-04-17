@@ -42,6 +42,14 @@ const PriceComparison: React.FC = () => {
       perBook: '/ livre',
       time: '2-6 mois',
       issues: ['Budget conséquent', 'Process très long', 'Pas adapté aux indépendants', 'Pas de support IA']
+    },
+    {
+      service: 'KDP Rocket',
+      emoji: '🚀',
+      price: '~ 39€/mois',
+      perBook: '/ abonnement',
+      time: 'Récurrent',
+      issues: ['Abonnement à vie', '12 outils seulement', 'Pas de génération manuscrit', 'Pas de formation incluse']
     }
   ];
 

@@ -12,18 +12,15 @@ import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import SalesFaq from "@/components/sales/SalesFaq";
 import AuthorShowcase from "@/components/sales/AuthorShowcase";
-import RoiCalculator from "@/components/sales/RoiCalculator";
 import PriceComparison from "@/components/sales/PriceComparison";
 import CountdownTimer from "@/components/sales/CountdownTimer";
 import UrgencyBanner from "@/components/sales/UrgencyBanner";
 import GuaranteeSection from "@/components/sales/GuaranteeSection";
-import InteractiveDemo from "@/components/sales/InteractiveDemo";
-import WhoIsThisFor from "@/components/sales/WhoIsThisFor";
-import TonightOutcomes from "@/components/sales/TonightOutcomes";
-import ExclusiveFlashBanner from "@/components/sales/ExclusiveFlashBanner";
-import BeforeAfterSection from "@/components/sales/BeforeAfterSection";
-import KdpTestimonials from "@/components/sales/KdpTestimonials";
 import HeroVideoTeaser from "@/components/sales/HeroVideoTeaser";
+import AgentsShowcase from "@/components/sales/AgentsShowcase";
+import EbookieAssistant from "@/components/sales/EbookieAssistant";
+import BonusStack from "@/components/sales/BonusStack";
+import KdpRoiCalculator from "@/components/sales/KdpRoiCalculator";
 
 // ════════════════════════════════════════════════════════════════════════════════
 // DESIGN SYSTEM 2026 — Palette Premium
@@ -321,8 +318,7 @@ const SalesPage = () => {
         </div>
       </header>
 
-      {/* ═══════════════════════════════════════ FLASH EXCLUSIF ═══════════════════════════════════════ */}
-      <ExclusiveFlashBanner />
+      {/* (ExclusiveFlashBanner supprimé — refonte) */}
 
       {/* ═══════════════════════════════════════ HERO ═══════════════════════════════════════ */}
       <section className="relative py-20 sm:py-28 px-4">
@@ -340,31 +336,28 @@ const SalesPage = () => {
             </Badge>
           </motion.div>
 
-          <motion.h1 variants={fadeIn} custom={1} className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-[1.1] tracking-tight mb-6">
-            Créez des ebooks
+          <motion.h1 variants={fadeIn} custom={1} className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-[1.05] tracking-tight mb-6">
+            Ton ebook mérite
             <br />
             <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-              professionnels
+              Amazon KDP
             </span>
-            <br />
-            en moins d'une heure
           </motion.h1>
 
-          <motion.p variants={fadeIn} custom={2} className="text-lg sm:text-xl text-foreground/80 mb-8 max-w-2xl mx-auto leading-relaxed">
-            Le workflow IA complet qui a déjà généré <span className="text-primary font-semibold">+35 ebooks publiés</span> sur Amazon KDP.
-            Rédaction, couvertures, audiobooks — tout en un.
+          <motion.p variants={fadeIn} custom={2} className="text-lg sm:text-xl text-foreground/80 mb-10 max-w-2xl mx-auto leading-relaxed">
+            15 agents IA qui rédigent, illustrent et publient ton livre — <span className="text-primary font-semibold">en moins d'une heure</span>.
           </motion.p>
 
-          {/* Stats */}
-          <motion.div variants={fadeIn} custom={3} className="flex flex-wrap justify-center gap-6 sm:gap-10 mb-10">
+          {/* Stats — façon KDP Rocket */}
+          <motion.div variants={fadeIn} custom={3} className="grid grid-cols-3 gap-4 sm:gap-8 max-w-2xl mx-auto mb-10">
             {[
-              { value: "35+", label: "Ebooks publiés" },
-              { value: "~0,30€", label: "Coût par ebook" },
-              { value: "45 min", label: "Temps moyen" },
+              { value: "+347%", label: "ventes Amazon" },
+              { value: "47 min", label: "par ebook" },
+              { value: "15", label: "agents IA" },
             ].map((stat, i) => (
-              <div key={i} className="text-center">
-                <p className="text-3xl sm:text-4xl font-black text-foreground">{stat.value}</p>
-                <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
+              <div key={i} className="text-center bg-card/60 border border-border rounded-2xl py-4 backdrop-blur">
+                <p className="text-2xl sm:text-4xl font-black bg-gradient-to-br from-primary to-accent bg-clip-text text-transparent">{stat.value}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground mt-1">{stat.label}</p>
               </div>
             ))}
           </motion.div>
@@ -413,13 +406,13 @@ const SalesPage = () => {
             <Button size="lg" onClick={handlePlanClick}
               className="w-full sm:w-auto text-lg px-10 py-7 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground font-bold rounded-2xl shadow-2xl shadow-primary/25 hover:shadow-primary/40 transition-all duration-300 hover:-translate-y-1">
               <Rocket className="w-5 h-5 mr-2" />
-              Accéder — 67€ à vie
+              Commencer maintenant — 67€
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
-            <Button size="lg" variant="outline" onClick={() => navigate('/demo')}
+            <Button size="lg" variant="outline" onClick={() => document.getElementById('outils')?.scrollIntoView({ behavior: 'smooth' })}
               className="w-full sm:w-auto text-base px-8 py-6 border-primary/50 text-primary hover:text-foreground hover:border-primary hover:bg-primary/10 rounded-2xl">
-              <Play className="w-5 h-5 mr-2" />
-              Voir la démo
+              <Sparkles className="w-5 h-5 mr-2" />
+              Voir les 15 agents
             </Button>
           </motion.div>
 
@@ -501,7 +494,7 @@ const SalesPage = () => {
                 ))}
               </div>
               <div>
-                <p className="font-semibold text-foreground">47+ auteurs</p>
+                <p className="font-semibold text-foreground">+200 auteurs</p>
                 <p className="text-xs text-muted-foreground">utilisent EbookStudio</p>
               </div>
             </div>
@@ -509,7 +502,7 @@ const SalesPage = () => {
             <div className="flex items-center gap-2">
               {[1,2,3,4,5].map(i => <Star key={i} className="w-5 h-5 fill-kdp-orange text-kdp-orange" />)}
               <span className="font-bold text-foreground ml-2">4.8/5</span>
-              <span className="text-muted-foreground text-sm">(47 avis)</span>
+              <span className="text-muted-foreground text-sm">(89 avis)</span>
             </div>
             <div className="h-10 w-px bg-muted hidden sm:block" />
             <div className="flex items-center gap-3">
@@ -564,17 +557,14 @@ const SalesPage = () => {
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════ DÉMO INTERACTIVE ═══════════════════════════════════════ */}
-      <InteractiveDemo />
+      {/* ═══════════════════════════════════════ AGENTS SHOWCASE (#outils) ═══════════════════════════════════════ */}
+      <AgentsShowcase />
 
-      {/* ═══════════════════════════════════════ POUR QUI ? ═══════════════════════════════════════ */}
-      <WhoIsThisFor />
+      {/* ═══════════════════════════════════════ EBOOKIE COPILOTE IA ═══════════════════════════════════════ */}
+      <EbookieAssistant />
 
-      {/* ═══════════════════════════════════════ AVANT/APRÈS ═══════════════════════════════════════ */}
-      <BeforeAfterSection />
-
-      {/* ═══════════════════════════════════════ TÉMOIGNAGES KDP ═══════════════════════════════════════ */}
-      <KdpTestimonials />
+      {/* ═══════════════════════════════════════ BONUS STACK 935€ → 67€ ═══════════════════════════════════════ */}
+      <BonusStack />
 
       {/* ═══════════════════════════════════════ COMPARATIF PRIX ═══════════════════════════════════════ */}
       <PriceComparison />
@@ -614,13 +604,10 @@ const SalesPage = () => {
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════ CE SOIR VOUS AUREZ ═══════════════════════════════════════ */}
-      <TonightOutcomes />
-
-      {/* ═══════════════════════════════════════ ROI CALCULATOR ═══════════════════════════════════════ */}
+      {/* ═══════════════════════════════════════ ROI CALCULATOR KDP ═══════════════════════════════════════ */}
       <section className="py-16 px-4 bg-secondary/50">
         <div className="max-w-3xl mx-auto">
-          <RoiCalculator />
+          <KdpRoiCalculator onCtaClick={handlePlanClick} />
         </div>
       </section>
 
@@ -764,7 +751,7 @@ const SalesPage = () => {
             <p className="text-muted-foreground text-sm mt-5">Paiement unique • Garantie 30 jours • Accès instantané</p>
             <p className="text-muted-foreground text-xs mt-2 flex items-center justify-center gap-1">
               <Users className="w-3.5 h-3.5 text-primary" />
-              Rejoignez +47 auteurs qui publient déjà avec EbookStudio
+              Rejoignez +200 auteurs qui publient déjà avec EbookStudio
             </p>
           </motion.div>
         </motion.div>
