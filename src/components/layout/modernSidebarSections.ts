@@ -26,6 +26,7 @@ export const SIDEBAR_SUBSECTIONS: Record<string, SidebarSectionConfig[]> = {
   ],
   '📣 Vendre': [
     { label: 'Marketing', itemIds: ['marketing', 'launch-plan'] },
+    { label: 'Amazon Ads', itemIds: ['kdp-ads-guide'] },
   ],
   '⚙️ Mon Compte': [
     { label: 'Espace', itemIds: ['projects', 'ebook-library', 'settings', 'subscription'] },
