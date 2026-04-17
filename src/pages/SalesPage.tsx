@@ -415,11 +415,6 @@ const SalesPage = () => {
               Voir les 15 agents
             </Button>
           </motion.div>
-              className="w-full sm:w-auto text-base px-8 py-6 border-primary/50 text-primary hover:text-foreground hover:border-primary hover:bg-primary/10 rounded-2xl">
-              <Play className="w-5 h-5 mr-2" />
-              Voir la démo
-            </Button>
-          </motion.div>
 
           {/* CTA Gratuit — capture de leads */}
           <motion.div variants={fadeIn} custom={4.5} className="mb-6">
@@ -499,7 +494,7 @@ const SalesPage = () => {
                 ))}
               </div>
               <div>
-                <p className="font-semibold text-foreground">47+ auteurs</p>
+                <p className="font-semibold text-foreground">+200 auteurs</p>
                 <p className="text-xs text-muted-foreground">utilisent EbookStudio</p>
               </div>
             </div>
@@ -507,7 +502,7 @@ const SalesPage = () => {
             <div className="flex items-center gap-2">
               {[1,2,3,4,5].map(i => <Star key={i} className="w-5 h-5 fill-kdp-orange text-kdp-orange" />)}
               <span className="font-bold text-foreground ml-2">4.8/5</span>
-              <span className="text-muted-foreground text-sm">(47 avis)</span>
+              <span className="text-muted-foreground text-sm">(89 avis)</span>
             </div>
             <div className="h-10 w-px bg-muted hidden sm:block" />
             <div className="flex items-center gap-3">
@@ -756,7 +751,7 @@ const SalesPage = () => {
             <p className="text-muted-foreground text-sm mt-5">Paiement unique • Garantie 30 jours • Accès instantané</p>
             <p className="text-muted-foreground text-xs mt-2 flex items-center justify-center gap-1">
               <Users className="w-3.5 h-3.5 text-primary" />
-              Rejoignez +47 auteurs qui publient déjà avec EbookStudio
+              Rejoignez +200 auteurs qui publient déjà avec EbookStudio
             </p>
           </motion.div>
         </motion.div>
