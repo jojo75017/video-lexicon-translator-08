@@ -39,9 +39,6 @@ verify_jwt = true
 [functions.export-to-google-docs]
 verify_jwt = false
 
-[functions.systemeio-webhook]
-verify_jwt = false
-
 [functions.send-access-code]
 verify_jwt = false
 
