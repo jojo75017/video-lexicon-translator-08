@@ -8,7 +8,7 @@ import jsPDF from 'jspdf';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 const modules = [
-  { id: 1, title: "Configuration et Démarrage", description: "Installation, configuration API OpenAI, générateur d'idées" },
+  { id: 1, title: "Configuration et Démarrage", description: "Installation, configuration API Gemini, générateur d'idées" },
   { id: 2, title: "Planificateur d'Ebook", description: "Création du plan, gestion des chapitres, structure" },
   { id: 3, title: "Templates Professionnels", description: "Galerie de templates, personnalisation" },
   { id: 4, title: "Génération de Contenu IA", description: "Rédaction automatique, outils d'écriture avancés" },
