@@ -446,6 +446,9 @@ const SalesPage = () => {
         </motion.div>
       </section>
 
+      {/* ═══════════════════════════════════════ VIDÉO EXPLICATIVE ═══════════════════════════════════════ */}
+      <HeroVideoTeaser />
+
       {/* ═══════════════════════════════════════ TRIAL INLINE BANNER ═══════════════════════════════════════ */}
       <section className="py-8 px-4">
         <motion.div
