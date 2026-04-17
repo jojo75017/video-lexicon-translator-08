@@ -99,12 +99,12 @@ const PILLARS = [
     tools: [
       {
         id: 'V1', badge: 'Studio', name: 'Studio Couverture IA', subtitle: 'Imagen 3',
-        description: 'Génération de couvertures front + back + tranche conformes KDP',
+        description: 'Génère une couverture KDP pro (front + back + tranche) en 3 clics',
         icon: ImageIcon, mockup: mockCover, time: '90s',
       },
       {
         id: 'V2', badge: 'Studio', name: 'Éditeur Canva intégré', subtitle: 'Drag & Drop',
-        description: 'Personnalisation pixel-perfect avec bibliothèque de templates',
+        description: 'Personnalise ta couverture pixel-perfect, sans logiciel externe',
         icon: Palette, mockup: mockCover, time: 'Live',
       },
     ] as ToolCard[],
@@ -120,12 +120,12 @@ const PILLARS = [
     tools: [
       {
         id: 'A1', badge: 'Studio', name: 'Audiobook TTS Pro', subtitle: 'OpenAI Voice',
-        description: 'Narration naturelle multi-voix, export MP3 haute qualité 48kHz',
+        description: 'Transforme ton ebook en livre audio (5h) prêt pour Audible en 10 min',
         icon: Headphones, mockup: mockAudio, time: '5 min/h',
       },
       {
         id: 'A2', badge: 'Studio', name: 'Audio Express', subtitle: 'Pipeline FFmpeg',
-        description: 'Génération automatique chapitre par chapitre + montage pro',
+        description: 'Génère et assemble tous tes chapitres audio automatiquement',
         icon: Zap, mockup: mockAudio, time: 'Auto',
       },
     ] as ToolCard[],
@@ -156,7 +156,7 @@ const PILLARS = [
       },
       {
         id: 'M2', badge: 'Studio', name: 'Posts Réseaux Sociaux', subtitle: 'Multi-plateformes',
-        description: 'Génération automatique de 30 posts (Instagram, Facebook, LinkedIn)',
+        description: '30 posts prêts à publier (Instagram, Facebook, LinkedIn, TikTok)',
         icon: Send, mockup: mockMarket, time: '90s',
       },
     ] as ToolCard[],
