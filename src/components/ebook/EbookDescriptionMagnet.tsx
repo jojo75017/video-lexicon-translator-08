@@ -101,6 +101,10 @@ const EbookDescriptionMagnet: React.FC = () => {
       toast.error("Le titre de l'ebook est requis");
       return;
     }
+    if (!userGeminiKey?.trim()) {
+      toast.error('Clé Gemini requise. Configurez-la dans Paramètres > Clés API (gratuit sur aistudio.google.com/apikey).', { duration: 6000 });
+      return;
+    }
 
     setIsGenerating(true);
     try {
@@ -108,12 +112,15 @@ const EbookDescriptionMagnet: React.FC = () => {
         body: { userApiKey: userGeminiKey, title, subtitle, genre, targetAudience, keywords, additionalInfo }
       });
 
-      if (error) throw error;
+      if (error || data?.error) {
+        const msg = data?.error || (error as any)?.context?.error || error?.message || 'Erreur inconnue';
+        throw new Error(msg);
+      }
       setResult(data);
       toast.success('Description générée avec succès !');
     } catch (error: any) {
       console.error('Error:', error);
-      toast.error(error.message || "Erreur lors de la génération");
+      toast.error(error.message || "Erreur lors de la génération", { duration: 6000 });
     } finally {
       setIsGenerating(false);
     }
