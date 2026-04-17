@@ -506,6 +506,11 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
           </div>
         )}
 
+        {/* Tools Guide button - always at top */}
+        <div className={cn('px-2 pt-2', isCollapsed && 'px-2')}>
+          <ToolsGuideButton isCollapsed={isCollapsed} />
+        </div>
+
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto px-2 py-2 space-y-1">
           {searchQuery.trim() && !isCollapsed ? (
