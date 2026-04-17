@@ -157,7 +157,7 @@ const EbookieAssistant: React.FC = () => {
                 <div className="text-primary-foreground flex-1">
                   <p className="font-bold text-sm">Ebookie</p>
                   <p className="text-[11px] opacity-80 flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary-foreground animate-pulse" />
                     En ligne — répond en 2s
                   </p>
                 </div>
