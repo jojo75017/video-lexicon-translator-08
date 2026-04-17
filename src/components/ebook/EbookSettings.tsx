@@ -102,7 +102,7 @@ export const EbookSettings: React.FC<EbookSettingsProps> = ({
               <span className="text-2xl">💡</span>
               <div className="space-y-3">
                 <p className="text-sm font-semibold text-blue-800 dark:text-blue-200">
-                  Gemini 3 Flash — Plus rapide et moins cher qu'OpenAI !
+                  Gemini 3 Flash — Rapide, puissant et économique !
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
                   <div className="bg-white/60 dark:bg-white/5 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
@@ -337,7 +337,7 @@ export const EbookSettings: React.FC<EbookSettingsProps> = ({
                   <div className="space-y-3 text-xs">
                     <div>
                       <p className="font-medium text-blue-700 dark:text-blue-300">Combien ça coûte par livre ?</p>
-                      <p className="text-blue-600 dark:text-blue-400">Entre 0,20€ et 0,50€ selon la longueur du livre. Beaucoup moins cher qu'OpenAI !</p>
+                      <p className="text-blue-600 dark:text-blue-400">Entre 0,20€ et 0,50€ selon la longueur du livre. Très économique !</p>
                     </div>
                     <div>
                       <p className="font-medium text-blue-700 dark:text-blue-300">Ma clé est-elle sécurisée ?</p>

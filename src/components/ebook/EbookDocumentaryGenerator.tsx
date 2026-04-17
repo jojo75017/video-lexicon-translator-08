@@ -94,12 +94,12 @@ const RESEARCH_DEPTH = [
 ];
 
 const EbookDocumentaryGenerator: React.FC<DocumentaryGeneratorProps> = ({ ebookTitle: initialTitle }) => {
-  // Configuration - utiliser la clé API utilisateur si disponible
+  // Configuration - utiliser la clé API Gemini utilisateur
   const { apiKey: userApiKey, isValid: isUserKeyValid, isValidating } = useOpenAIConfig();
-  const useOpenAI = !!userApiKey && userApiKey.startsWith('sk-');
+  const useGemini = Boolean(userApiKey) && isUserKeyValid === true;
   const { saveSpecializedProject } = useProjectSave();
   
-  console.log('[Documentary] API Key config:', { hasKey: !!userApiKey, useOpenAI, isValid: isUserKeyValid });
+  console.log('[Documentary] API Key config:', { hasKey: !!userApiKey, useGemini, isValid: isUserKeyValid });
 
   // État du formulaire
   const [title, setTitle] = useState(initialTitle || '');
@@ -211,8 +211,8 @@ Le contenu doit être factuel, bien documenté et adapté à l'audience ${target
         body: {
           prompt: structurePrompt,
           type: 'documentary-structure',
-          useOpenAI,
-          openaiApiKey: useOpenAI ? userApiKey : undefined,
+          useOpenAI: useGemini,
+          openaiApiKey: useGemini ? userApiKey : undefined,
           maxTokens: 8000,
         },
       });
@@ -282,8 +282,8 @@ Audience: ${targetAudience}`;
               body: {
                 prompt: enrichPrompt,
                 type: 'documentary-chapter',
-                useOpenAI,
-                openaiApiKey: useOpenAI ? userApiKey : undefined,
+                useOpenAI: useGemini,
+                openaiApiKey: useGemini ? userApiKey : undefined,
                 maxTokens: 2000,
               },
             });
@@ -426,8 +426,8 @@ Inclus des faits marquants et des anecdotes.`;
         body: {
           prompt,
           type: 'documentary-chapter-regen',
-          useOpenAI,
-          openaiApiKey: useOpenAI ? userApiKey : undefined,
+          useOpenAI: useGemini,
+          openaiApiKey: useGemini ? userApiKey : undefined,
           maxTokens: 2500,
         },
       });

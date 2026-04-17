@@ -309,7 +309,7 @@ Disallow: /`
       // Score amélioré avec IA
       score = Math.min(100, score + 10);
       
-      // Insights IA simulés (en production, ce serait un appel à l'API OpenAI)
+      // Insights IA simulés (en production, ce serait un appel à l'API Gemini)
       aiInsights = {
         strategicAnalysis: 'L\'IA détecte une configuration équilibrée entre sécurité et accessibilité SEO',
         botsTrends: 'Recommandation IA : Bloquer les nouveaux bots GPT-4o et Claude-3 émergents',
@@ -424,7 +424,7 @@ Disallow: /`
                     </p>
                     <Input
                       type="password"
-                      placeholder="Clé API OpenAI (sk-...)"
+                      placeholder="Clé API Gemini (AIza...)"
                       value={apiKey}
                       onChange={(e) => setApiKey(e.target.value)}
                       className="mb-2"
