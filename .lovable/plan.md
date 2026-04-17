@@ -1,83 +1,78 @@
 
 
-## Diagnostic
+## Objectif
+Créer un nouveau module pédagogique "Maîtriser KDP Ads sans se faire arnaquer" — pas de vraies pubs, juste un guide éducatif premium pour aider tes abonnés à éviter les pièges classiques d'Amazon Ads.
 
-L'utilisateur dit que sur `/offres`, **on ne voit pas les outils** et que les visiteurs sont perdus. Il pointe vers `kdp-rocket.fr/#outils` comme référence : leur section outils est claire, visuelle, immédiatement identifiable.
+## Faisabilité
+100% possible. C'est un contenu statique enrichi (texte + tableaux + checklists + simulateurs simples) qui ne nécessite aucune API Amazon Ads. On reste dans le cadre légal et éthique : on **explique**, on ne **gère** pas les campagnes.
 
-Sur notre page actuelle, le composant `AgentsShowcase` existe avec mockups, mais il y a 2 problèmes probables :
-1. **Visibilité** : la section est noyée dans la page, pas de point d'entrée évident depuis le hero
-2. **Lisibilité** : les 15 agents en grille sans regroupement visuel = mur d'info indigeste
+## Ce que je vais créer
 
-## Plan — Rendre les outils ULTRA visibles
+### 1. Nouvelle page `/kdp-ads-guide` (accès abonnés)
+Structure en 6 onglets pédagogiques :
 
-### 1. Ancre `#outils` directe + CTA hero
-- Ajouter un CTA "Voir les 15 outils" en gros sous le hero qui scroll vers `#outils`
-- L'URL `ebookstudio.fr/offres#outils` devient partageable comme chez le concurrent
+**Onglet 1 — Les 7 Arnaques à Éviter**
+- Le piège du "Ciblage Automatique" qui brûle ton budget
+- Les enchères par défaut trop élevées (Amazon suggère toujours plus haut)
+- Les mots-clés "broad match" qui matchent n'importe quoi
+- Le ACOS qui ment (différence ACOS vs TACOS expliquée)
+- Les campagnes "Lock & Leave" abandonnées qui saignent
+- Les "agences KDP Ads" à 500€/mois qui font ce que tu peux faire
+- Le mythe "plus je dépense, plus je vends"
 
-### 2. Refonte `AgentsShowcase.tsx` en 5 piliers visuels
-Au lieu d'une grille plate de 15 cartes, regrouper par **pilier** avec gros titre + couleur :
+**Onglet 2 — Les 3 Types de Campagnes (Quand & Pourquoi)**
+- Sponsored Products (manuel vs auto) — le seul vraiment utile pour débuter
+- Sponsored Brands — réservé aux séries de 3+ livres
+- Lockscreen Ads — à éviter (ROI quasi nul pour 95% des niches)
 
-```
-┌─ ✍️ ÉCRIRE (7 outils) ───────────────────┐
-│ [P1][P3][P4][P5][P9][P10][P13]          │
-└──────────────────────────────────────────┘
+**Onglet 3 — Stratégie d'Enchères Sécurisée**
+- Calculateur simple : "Mon livre vaut X€ → enchère max = ?"
+- Formule : `Enchère max = (Royalty × Taux conversion estimé) / 2`
+- Tableau de référence : non-fiction vs fiction vs low-content
+- Quand monter / quand baisser (règles 7-14-30 jours)
 
-┌─ 🎨 VISUELS (2 outils) ──────────────────┐
-│ [Couvertures IA][Éditeur Canva]         │
-└──────────────────────────────────────────┘
+**Onglet 4 — Les Mots-Clés qui Marchent (sans payer 0,80€ le clic)**
+- Long-tail vs head terms
+- Les 50 mots-clés "défensifs" (ton propre nom + titre)
+- Comment voler les mots-clés des concurrents (légalement)
+- Les "negative keywords" indispensables (liste de 30 à exclure d'office)
 
-┌─ 🎙️ AUDIO (2 outils) ───────────────────┐
-│ [Audiobook TTS][Audio Express]          │
-└──────────────────────────────────────────┘
+**Onglet 5 — Lecture des Rapports (sans se faire avoir)**
+- Décrypter le Search Term Report
+- Les 4 KPI qui comptent vraiment (CTR, CVR, ACOS, TACOS)
+- Quand une campagne est "morte" et qu'il faut la tuer
+- Tableau de bord type à recopier dans Excel
 
-┌─ 📊 KDP (8 outils) ──────────────────────┐
-│ [P2][P6][P7][P8][P11][P12][P14][P15]    │
-└──────────────────────────────────────────┘
+**Onglet 6 — Checklist Lancement Ads (J-1 à J+30)**
+- J-1 : prérequis avant la 1ère pub (description optimisée, 5 reviews mini, A+ Content)
+- J+0 à J+7 : phase d'apprentissage, ne touche à rien
+- J+8 à J+14 : premières optimisations
+- J+15 à J+30 : scaling intelligent
+- Budget de test recommandé : 5€/jour × 14 jours = 70€ max
 
-┌─ 🚀 MARKETING (2 outils) ────────────────┐
-│ [Plan lancement][Marketing posts]       │
-└──────────────────────────────────────────┘
-```
+### 2. Intégration dans `/offres`
+Nouvelle section "🎯 Bonus Inclus : Guide Anti-Arnaque KDP Ads" entre `KdpRocketParityTable` et la FAQ, avec CTA vers `/kdp-ads-guide`.
 
-Chaque carte garde son mockup screenshot + nom + temps d'exécution.
+### 3. Entrée sidebar
+Ajout dans la section "📣 Vendre" → nouveau bouton **"Guide KDP Ads"** (id: `kdp-ads-guide`).
 
-### 3. Compteur d'outils géant en tête de section
-Comme KDP Rocket affiche "12 outils" en énorme, on affiche :
+## Fichiers à créer/modifier
 
-> **21 OUTILS PRO** dans une seule plateforme
-> *(15 agents IA + 6 studios visuels/audio/marketing)*
+**Créer**
+- `src/pages/KdpAdsGuidePage.tsx` (page principale avec les 6 onglets)
+- `src/components/sales/KdpAdsTeaser.tsx` (encart sur `/offres`)
 
-Avec les 5 icônes piliers en sous-titre.
+**Modifier**
+- `src/App.tsx` — nouvelle route `/kdp-ads-guide` (gated abonnés)
+- `src/pages/SalesPage.tsx` — insérer `<KdpAdsTeaser />`
+- `src/components/layout/modernSidebarSections.ts` — ajouter `kdp-ads-guide` dans Marketing
 
-### 4. Mini-nav sticky sous le hero (déjà créée → la rendre VISIBLE)
-Le composant `ToolsNavigationBar.tsx` existe déjà. Vérifier qu'il :
-- Est bien intégré dans `SalesPage.tsx` juste après le hero
-- A un fond contrasté (pas transparent)
-- Affiche les 5 piliers cliquables avec compteur (ex: "Écrire (7)")
+## Ce que je NE fais PAS (pour rester clean)
+- Aucune connexion API Amazon Ads (pas autorisée par Amazon pour ce cas d'usage)
+- Aucune simulation de "vraies stats" (pas de Math.random — règle projet)
+- Aucune promesse de ROI — uniquement de la pédagogie
+- Pas de contenu copié de KDP Rocket / Publisher Rocket — rédigé à partir de tes connaissances métier
 
-### 5. Section "Voir tous les outils" avant le pricing
-Ajouter un récapitulatif type tableau comparatif :
-```
-21 outils — 67€ à vie
-✍️ 7 outils écriture
-🎨 2 studios visuels
-🎙️ 2 outils audio
-📊 8 outils KDP
-🚀 2 outils marketing
-```
-
-## Question avant exécution
-
-Souhaitez-vous :
-- **A** — Refonte complète des 5 points (1h30) → page beaucoup plus claire
-- **B** — Uniquement points 1+2+3 (45 min) → focus sur la visibilité de la section outils
-- **C** — Uniquement point 4 (15 min) → juste rendre la barre de nav visible
-
-Si pas de réponse : **A** par défaut.
-
-## Livrables
-- **Refonte** : `src/components/sales/AgentsShowcase.tsx` (regroupement par pilier + compteur géant)
-- **Vérif/fix** : `src/components/sales/ToolsNavigationBar.tsx` (visibilité)
-- **Modifié** : `src/pages/SalesPage.tsx` (CTA hero "Voir les 21 outils" + récap avant pricing)
-- **Nouveau** (optionnel) : `src/components/sales/ToolsCounterBanner.tsx` (bannière "21 outils")
+## Style visuel
+Charte Amazon KDP existante (bg #FAFAFA, accent #008296, hover #FF9E2D). Onglets en haut, cartes pédagogiques avec icônes d'alerte rouges pour les pièges, vertes pour les bonnes pratiques.
 
