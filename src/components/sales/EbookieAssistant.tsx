@@ -1,25 +1,83 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Bot, Sparkles, Zap, MessageSquare, Star, ArrowRight } from 'lucide-react';
+import { Bot, Sparkles, Zap, MessageSquare, Star, ArrowRight, Send } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-const chatBubbles = [
-  { from: 'user', text: 'Quelle niche KDP est rentable en 2026 ?' },
-  { from: 'bot', text: '🎯 3 niches qui cartonnent : Développement personnel pour parents, Recettes batch cooking, Carnets de gratitude. BSR moyen < 50k.' },
-  { from: 'user', text: 'Tu peux générer la couverture ?' },
-  { from: 'bot', text: '✨ Lancement Imagen 3 → 4 visuels photoréalistes prêts en 12s. Style "minimaliste premium" sélectionné automatiquement.' },
+type Suggestion = {
+  question: string;
+  answer: string[];
+};
+
+const SUGGESTIONS: Suggestion[] = [
+  {
+    question: 'Comment optimiser mon titre pour Amazon KDP ?',
+    answer: [
+      '✅ Mets le bénéfice principal en premier (ex : "Perdre 5 kg…")',
+      '✅ Ajoute un sous-titre avec 2-3 mots-clés Amazon',
+      '✅ Limite-toi à 60 caractères pour éviter la troncature',
+      '💡 Je peux générer 10 variantes A/B testées en 20s.',
+    ],
+  },
+  {
+    question: 'Quel prix pour mon ebook de 120 pages ?',
+    answer: [
+      '📊 Sweet spot KDP : 4,99 € (royalties 70%)',
+      '💰 Lancement : 0,99 € pendant 7j → boost BSR',
+      '🎯 Stable : 3,99 € à 5,99 € selon niche',
+      '⚠️ Évite la zone morte 6,99-8,99 € (royalties tombent à 35%).',
+    ],
+  },
+  {
+    question: 'Quelle niche KDP est rentable en 2026 ?',
+    answer: [
+      '🔥 Top 3 niches BSR < 50k :',
+      '1. Développement personnel parents (faible concurrence)',
+      '2. Recettes batch cooking (recherche +180%)',
+      '3. Carnets de gratitude illustrés (marges +400%)',
+      '✨ Veux-tu une analyse complète d\'une de ces niches ?',
+    ],
+  },
 ];
 
 const stats = [
-  { icon: MessageSquare, value: '10k+', label: 'questions / semaine' },
+  { icon: MessageSquare, value: '10k+', label: 'questions/semaine' },
   { icon: Zap, value: '< 2s', label: 'temps de réponse' },
-  { icon: Star, value: '4.8/5', label: 'satisfaction' },
+  { icon: Star, value: '4.9/5', label: 'satisfaction' },
 ];
 
 const EbookieAssistant: React.FC = () => {
   const navigate = useNavigate();
+  const [activeQuestion, setActiveQuestion] = useState<number | null>(null);
+  const [visibleLines, setVisibleLines] = useState(0);
+
+  // Auto-démarre avec la première question
+  useEffect(() => {
+    const t = setTimeout(() => setActiveQuestion(0), 800);
+    return () => clearTimeout(t);
+  }, []);
+
+  // Animation ligne par ligne
+  useEffect(() => {
+    if (activeQuestion === null) return;
+    setVisibleLines(0);
+    const total = SUGGESTIONS[activeQuestion].answer.length;
+    const interval = setInterval(() => {
+      setVisibleLines((v) => {
+        if (v >= total) {
+          clearInterval(interval);
+          return v;
+        }
+        return v + 1;
+      });
+    }, 600);
+    return () => clearInterval(interval);
+  }, [activeQuestion]);
+
+  const handleAsk = (i: number) => {
+    setActiveQuestion(i);
+  };
 
   return (
     <section className="py-20 px-4">
@@ -37,12 +95,28 @@ const EbookieAssistant: React.FC = () => {
             </Badge>
             <h2 className="text-3xl md:text-4xl font-black text-foreground mb-4 leading-tight">
               Rencontrez <span className="text-primary">Ebookie</span><br />
-              votre copilote KDP
+              votre copilote KDP 24/7
             </h2>
-            <p className="text-foreground/70 text-lg mb-8">
+            <p className="text-foreground/70 text-lg mb-6">
               Bloqué sur une niche ? Une couverture qui pèche ? Un titre faible ? Ebookie répond
-              en moins de 2 secondes, 24/7, dans toutes les langues.
+              en moins de 2 secondes, dans toutes les langues, sans jamais dormir.
             </p>
+
+            {/* Bénéfices clés */}
+            <div className="space-y-2.5 mb-8">
+              {[
+                'Réponses précises basées sur 50k+ ebooks Amazon analysés',
+                'Conseils niche, prix, mots-clés et marketing en temps réel',
+                'Génération de titres, descriptions et A+ content à la demande',
+              ].map((b, i) => (
+                <div key={i} className="flex items-start gap-2.5 text-sm text-foreground/80">
+                  <div className="w-5 h-5 rounded-full bg-primary/15 flex items-center justify-center shrink-0 mt-0.5">
+                    <Sparkles className="w-3 h-3 text-primary" />
+                  </div>
+                  <span>{b}</span>
+                </div>
+              ))}
+            </div>
 
             <div className="grid grid-cols-3 gap-3 mb-8">
               {stats.map((s, i) => (
@@ -65,14 +139,13 @@ const EbookieAssistant: React.FC = () => {
             </Button>
           </motion.div>
 
-          {/* Right : Chat mockup */}
+          {/* Right : Chat démo interactive */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             className="relative"
           >
-            {/* Glow */}
             <div className="absolute -inset-4 bg-gradient-to-br from-primary/20 to-accent/20 blur-3xl rounded-full opacity-60" />
 
             <div className="relative bg-card border border-border rounded-3xl shadow-2xl overflow-hidden">
@@ -81,57 +154,103 @@ const EbookieAssistant: React.FC = () => {
                 <div className="w-10 h-10 rounded-full bg-background/20 backdrop-blur flex items-center justify-center">
                   <Bot className="w-5 h-5 text-primary-foreground" />
                 </div>
-                <div className="text-primary-foreground">
+                <div className="text-primary-foreground flex-1">
                   <p className="font-bold text-sm">Ebookie</p>
                   <p className="text-[11px] opacity-80 flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                    En ligne
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary-foreground animate-pulse" />
+                    En ligne — répond en 2s
                   </p>
+                </div>
+                <Badge className="bg-background/20 text-primary-foreground border-0 text-[10px]">
+                  DÉMO LIVE
+                </Badge>
+              </div>
+
+              {/* Questions cliquables */}
+              <div className="p-4 bg-muted/30 border-b border-border">
+                <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2.5">
+                  💬 Pose une question (cliquable) :
+                </p>
+                <div className="flex flex-col gap-2">
+                  {SUGGESTIONS.map((s, i) => (
+                    <button
+                      key={i}
+                      onClick={() => handleAsk(i)}
+                      className={`text-left text-xs px-3 py-2 rounded-lg border transition-all ${
+                        activeQuestion === i
+                          ? 'bg-primary/10 border-primary/40 text-foreground font-semibold'
+                          : 'bg-background border-border text-foreground/70 hover:border-primary/30 hover:bg-primary/5'
+                      }`}
+                    >
+                      {s.question}
+                    </button>
+                  ))}
                 </div>
               </div>
 
-              {/* Messages */}
-              <div className="p-5 space-y-3 bg-background/50 min-h-[320px]">
-                {chatBubbles.map((b, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: 10 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.3 }}
-                    className={`flex ${b.from === 'user' ? 'justify-end' : 'justify-start'}`}
-                  >
-                    <div
-                      className={`max-w-[85%] px-4 py-2.5 rounded-2xl text-sm ${
-                        b.from === 'user'
-                          ? 'bg-primary text-primary-foreground rounded-br-sm'
-                          : 'bg-muted text-foreground rounded-bl-sm border border-border'
-                      }`}
+              {/* Conversation */}
+              <div className="p-5 space-y-3 bg-background/50 min-h-[280px]">
+                <AnimatePresence mode="wait">
+                  {activeQuestion !== null && (
+                    <motion.div
+                      key={activeQuestion}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="space-y-3"
                     >
-                      {b.text}
-                    </div>
-                  </motion.div>
-                ))}
+                      {/* Question utilisateur */}
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="flex justify-end"
+                      >
+                        <div className="max-w-[85%] px-4 py-2.5 rounded-2xl rounded-br-sm bg-primary text-primary-foreground text-sm">
+                          {SUGGESTIONS[activeQuestion].question}
+                        </div>
+                      </motion.div>
 
-                {/* Typing indicator */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 1.5 }}
-                  className="flex justify-start"
-                >
-                  <div className="bg-muted border border-border rounded-2xl rounded-bl-sm px-4 py-3 flex gap-1">
-                    {[0, 1, 2].map(i => (
-                      <motion.span
-                        key={i}
-                        animate={{ y: [0, -3, 0] }}
-                        transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.15 }}
-                        className="w-1.5 h-1.5 rounded-full bg-muted-foreground/50"
-                      />
-                    ))}
-                  </div>
-                </motion.div>
+                      {/* Réponse Ebookie ligne par ligne */}
+                      {visibleLines === 0 ? (
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          className="flex justify-start"
+                        >
+                          <div className="bg-muted border border-border rounded-2xl rounded-bl-sm px-4 py-3 flex gap-1">
+                            {[0, 1, 2].map((i) => (
+                              <motion.span
+                                key={i}
+                                animate={{ y: [0, -3, 0] }}
+                                transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.15 }}
+                                className="w-1.5 h-1.5 rounded-full bg-muted-foreground/50"
+                              />
+                            ))}
+                          </div>
+                        </motion.div>
+                      ) : (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="flex justify-start"
+                        >
+                          <div className="max-w-[90%] px-4 py-3 rounded-2xl rounded-bl-sm bg-muted text-foreground text-sm border border-border space-y-1.5">
+                            {SUGGESTIONS[activeQuestion].answer.slice(0, visibleLines).map((line, i) => (
+                              <motion.p
+                                key={i}
+                                initial={{ opacity: 0, x: -5 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                className="leading-relaxed"
+                              >
+                                {line}
+                              </motion.p>
+                            ))}
+                          </div>
+                        </motion.div>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
               {/* Input mock */}
@@ -140,7 +259,7 @@ const EbookieAssistant: React.FC = () => {
                   Pose une question à Ebookie…
                 </div>
                 <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
-                  <ArrowRight className="w-4 h-4 text-primary-foreground" />
+                  <Send className="w-4 h-4 text-primary-foreground" />
                 </div>
               </div>
             </div>

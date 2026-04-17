@@ -29,6 +29,25 @@ const AGENT_TIME: Record<string, string> = {
   P11: '40s', P12: '60s', P13: '30s', P14: '20s', P15: '3 min',
 };
 
+// Bénéfices orientés résultats (style KDP Rocket)
+const AGENT_BENEFITS: Record<string, string> = {
+  P1: 'Trouve les angles éditoriaux qui vendent',
+  P2: 'Analyse 50 concurrents Amazon et trouve la niche rentable',
+  P3: 'Construit le plan détaillé chapitre par chapitre',
+  P4: 'Rédige le manuscrit complet (jusqu\'à 30 chapitres)',
+  P5: 'Optimise le rythme et la fluidité de chaque chapitre',
+  P6: 'Génère description KDP optimisée SEO',
+  P7: 'Trouve les 7 mots-clés backend Amazon',
+  P8: 'Recommande les meilleures catégories KDP',
+  P9: 'Corrige orthographe et typographie française pro',
+  P10: 'Crée la structure narrative qui captive',
+  P11: 'Calcule le prix optimal pour maximiser tes royalties',
+  P12: 'Conçoit la table des matières et la couverture textuelle',
+  P13: 'Polit le manuscrit pour un rendu éditeur pro',
+  P14: 'Vérifie la conformité KDP avant publication',
+  P15: 'Audit final qualité (jury éditorial)',
+};
+
 type ToolCard = {
   id: string;
   badge: string;
@@ -49,7 +68,7 @@ const agentToCard = (id: string): ToolCard => {
     badge: `Agent ${agent.id}`,
     name: agent.name,
     subtitle: agent.agentSubtitle,
-    description: agent.description,
+    description: AGENT_BENEFITS[agent.id] ?? agent.description,
     icon: agent.icon,
     mockup: AGENT_MOCKUPS[agent.id] ?? mockEditor,
     time: AGENT_TIME[agent.id] ?? '60s',
@@ -80,12 +99,12 @@ const PILLARS = [
     tools: [
       {
         id: 'V1', badge: 'Studio', name: 'Studio Couverture IA', subtitle: 'Imagen 3',
-        description: 'Génération de couvertures front + back + tranche conformes KDP',
+        description: 'Génère une couverture KDP pro (front + back + tranche) en 3 clics',
         icon: ImageIcon, mockup: mockCover, time: '90s',
       },
       {
         id: 'V2', badge: 'Studio', name: 'Éditeur Canva intégré', subtitle: 'Drag & Drop',
-        description: 'Personnalisation pixel-perfect avec bibliothèque de templates',
+        description: 'Personnalise ta couverture pixel-perfect, sans logiciel externe',
         icon: Palette, mockup: mockCover, time: 'Live',
       },
     ] as ToolCard[],
@@ -101,12 +120,12 @@ const PILLARS = [
     tools: [
       {
         id: 'A1', badge: 'Studio', name: 'Audiobook TTS Pro', subtitle: 'OpenAI Voice',
-        description: 'Narration naturelle multi-voix, export MP3 haute qualité 48kHz',
+        description: 'Transforme ton ebook en livre audio (5h) prêt pour Audible en 10 min',
         icon: Headphones, mockup: mockAudio, time: '5 min/h',
       },
       {
         id: 'A2', badge: 'Studio', name: 'Audio Express', subtitle: 'Pipeline FFmpeg',
-        description: 'Génération automatique chapitre par chapitre + montage pro',
+        description: 'Génère et assemble tous tes chapitres audio automatiquement',
         icon: Zap, mockup: mockAudio, time: 'Auto',
       },
     ] as ToolCard[],
@@ -137,7 +156,7 @@ const PILLARS = [
       },
       {
         id: 'M2', badge: 'Studio', name: 'Posts Réseaux Sociaux', subtitle: 'Multi-plateformes',
-        description: 'Génération automatique de 30 posts (Instagram, Facebook, LinkedIn)',
+        description: '30 posts prêts à publier (Instagram, Facebook, LinkedIn, TikTok)',
         icon: Send, mockup: mockMarket, time: '90s',
       },
     ] as ToolCard[],
