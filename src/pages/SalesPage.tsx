@@ -21,6 +21,9 @@ import AgentsShowcase from "@/components/sales/AgentsShowcase";
 import EbookieAssistant from "@/components/sales/EbookieAssistant";
 import BonusStack from "@/components/sales/BonusStack";
 import KdpRoiCalculator from "@/components/sales/KdpRoiCalculator";
+import EbookGallery from "@/components/sales/EbookGallery";
+import EbookAnatomy from "@/components/sales/EbookAnatomy";
+import ToolsNavigationBar from "@/components/sales/ToolsNavigationBar";
 
 // ════════════════════════════════════════════════════════════════════════════════
 // DESIGN SYSTEM 2026 — Palette Premium
@@ -439,8 +442,17 @@ const SalesPage = () => {
         </motion.div>
       </section>
 
+      {/* ═══════════════════════════════════════ NAV PILIERS (sticky) ═══════════════════════════════════════ */}
+      <ToolsNavigationBar />
+
       {/* ═══════════════════════════════════════ VIDÉO EXPLICATIVE ═══════════════════════════════════════ */}
       <HeroVideoTeaser />
+
+      {/* ═══════════════════════════════════════ GALERIE EBOOKS RÉSULTATS ═══════════════════════════════════════ */}
+      <EbookGallery />
+
+      {/* ═══════════════════════════════════════ ANATOMIE D'UN PROJET ═══════════════════════════════════════ */}
+      <EbookAnatomy />
 
       {/* ═══════════════════════════════════════ TRIAL INLINE BANNER ═══════════════════════════════════════ */}
       <section className="py-8 px-4">
