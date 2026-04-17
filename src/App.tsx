@@ -8,6 +8,7 @@ import { SubscriberGate } from '@/components/auth/SubscriberGate';
 import { AdminGate } from '@/components/auth/AdminGate';
 import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
 import { Loader2 } from 'lucide-react';
+import SubscriberActivityPopup from '@/components/admin/SubscriberActivityPopup';
 
 // Lazy-loaded pages for performance
 const EbookPlannerPage = lazy(() => import('./pages/EbookPlannerPage'));
@@ -462,6 +463,8 @@ const App = () => {
             <Route path="*" element={<Navigate to="/offres" replace />} />
           </Routes>
           </Suspense>
+          {/* Admin: popup flottant abonnés visible sur toutes les pages */}
+          <SubscriberActivityPopup />
           <Toaster />
         </div>
       </TooltipProvider>
