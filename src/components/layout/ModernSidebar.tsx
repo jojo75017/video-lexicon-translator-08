@@ -151,6 +151,66 @@ const allToolGroups: ToolGroup[] = [
 // Flat lookup for favorites/recent
 const ALL_ITEMS_FLAT: MenuItem[] = allToolGroups.flatMap(g => g.items);
 
+// ─── Tooltip descriptions (KDP Rocket style) ───
+// One sentence per tool, shown on hover to guide subscribers.
+const TOOL_TOOLTIPS: Record<string, string> = {
+  // Workflow IA
+  'workflow-dashboard': 'Vue Kanban du pipeline P1-P15 : suivez l\'avancement de chaque étape.',
+  'complete-workflow': 'Lance automatiquement les 15 agents IA pour produire un manuscrit complet.',
+  'editorial-director': 'P1 — Choisit la niche rentable et positionne ton ebook sur le marché KDP.',
+  'market-analysis': 'P2 — Analyse la concurrence Amazon et identifie les opportunités.',
+  'content-architect': 'P3 — Construit le plan détaillé avec chapitres et sous-chapitres.',
+  'expert-writing': 'P4 — Génère le contenu complet des chapitres avec un style éditorial professionnel.',
+  'natural-rewrite': 'P5 — Réécrit pour rendre le texte plus fluide et naturel.',
+  'editorial-quality': 'P6 — Vérifie la cohérence et le niveau éditorial du manuscrit.',
+  'editorial-packaging': 'P7 — Génère titre, description KDP, mots-clés et catégories optimisés.',
+  'final-diagnosis': 'P8 — Diagnostic final qualité avant publication.',
+  'editorial-memory': 'P9 — Construit la voix narrative cohérente entre chapitres.',
+  'chapter-coherence': 'P10 — Crée des transitions fluides entre chapitres.',
+  'self-critique': 'P11 — Simule un lecteur test et identifie les faiblesses.',
+  'iterative-loop': 'P12 — Applique automatiquement les corrections suggérées.',
+  'style-signature': 'P13 — Renforce ta signature stylistique d\'auteur.',
+  'ultimate-verdict': 'P14 — Verdict final : prêt à publier ou besoin de retouches.',
+  'humanize-anti-ia': 'P15 — Humanise le texte pour passer les détecteurs anti-IA.',
+  // Écriture
+  'planner': 'Crée le plan structuré de ton ebook (titre, chapitres, sous-chapitres).',
+  'writing': 'Édite et rédige les chapitres manuellement avec assistance IA.',
+  'aichat': 'Discute avec l\'IA pour brainstormer, corriger ou enrichir ton contenu.',
+  'characters': 'Crée et gère les personnages de ton roman ou de ta saga.',
+  'series': 'Planifie une série en plusieurs tomes avec une bible cohérente.',
+  'atlas': 'Construit l\'univers géographique de ton roman.',
+  'encyclopedia': 'Encyclopédie de référence pour ton univers fictif.',
+  'coloring': 'Génère un livre de coloriage prêt à publier sur KDP.',
+  'documentary': 'Format documentaire : structure et sources pour un essai factuel.',
+  'doc-transform': 'Importe un fichier Word et transforme-le en ebook structuré.',
+  'url-import': 'Importe un article ou guide depuis une URL.',
+  'templates': 'Modèles prêts à l\'emploi par genre (roman, guide, essai...).',
+  'strict-proofread': 'Relecture stricte : corrige uniquement orthographe, grammaire, typographie.',
+  'multi-translator': 'Traduit ton ebook dans plusieurs langues simultanément.',
+  // Publier
+  'export': 'Exporte ton ebook en PDF et Word, prêt pour KDP.',
+  'workflow-export': 'Compile et exporte tous les résultats du workflow en un fichier.',
+  'calibre-epub': 'Génère un ePub compatible Calibre / Kindle.',
+  'cover-design-editor': 'Éditeur visuel type Canva pour personnaliser ta couverture.',
+  'cover': 'Génère une couverture de livre avec l\'IA Imagen 3.',
+  'backcover': 'Rédige la 4e de couverture (résumé accroche).',
+  'kdp': 'Description vendeuse + mots-clés + catégories optimisés pour Amazon KDP.',
+  'kdp-prepublish-checklist': 'Vérifie que tout est conforme avant de publier sur KDP.',
+  'audiobook': 'Convertit ton ebook en livre audio avec voix IA professionnelle.',
+  'audio-express': 'Pipeline rapide ebook → audio prêt à vendre.',
+  // Vendre
+  'marketing': 'Génère des posts pour Facebook, Instagram, LinkedIn.',
+  'launch-plan': 'Plan de lancement complet sur 30 jours.',
+  'kdp-ads-guide': 'Guide pour configurer des campagnes Amazon Ads rentables.',
+  // Mon Compte
+  'projects': 'Reprends tes projets ebook en cours.',
+  'ebook-library': 'Bibliothèque de tous tes ebooks publiés.',
+  'subscription': 'Gère ton abonnement et ton quota.',
+  'settings': 'Configure ta clé API Gemini (BYOK) et tes préférences.',
+  'admin-subscribers': 'Liste complète des abonnés (admin).',
+  'admin': 'Panneau d\'administration (admin).',
+};
+
 // ─── Theme hook ───
 const useTheme = () => {
   const [isDark, setIsDark] = useState(() => {
