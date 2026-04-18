@@ -17,7 +17,8 @@ const AdminDirectPage = () => {
     try {
       const isAdmin = await getIsCurrentSessionAdmin();
       if (isAdmin) {
-        navigate("/dashboard", { replace: true });
+        sessionStorage.setItem('is_admin', 'true');
+        navigate("/admin", { replace: true });
         return true;
       }
       return false;
