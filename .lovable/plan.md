@@ -1,74 +1,100 @@
 
 
 ## Objectif
-Créer un récapitulatif clair et visuel de tous les onglets/outils pour que les abonnés sachent quoi utiliser, quand, et dans quel ordre — sans se noyer.
+Refondre la sidebar pour qu'elle soit **opérationnelle** : moins de friction, hiérarchie claire, navigation rapide vers ce qui compte vraiment (Workflow IA + Guide).
 
-## Analyse rapide
-Tu as ~44 outils répartis dans 5 piliers (Workflow IA, Écriture, Publier, Vendre, Mon Compte). Le problème : un nouvel abonné arrive et voit 44 boutons dans la sidebar → paralysie.
+## Diagnostic actuel
+La sidebar (`ModernSidebar.tsx` + `modernSidebarSections.ts`) a aujourd'hui :
+- 5 piliers + ~15 sous-sections + ~44 outils empilés
+- Tous les piliers ouvrables simultanément → mur de boutons
+- Pas de distinction visuelle entre "outils du quotidien" et "outils experts"
+- Pas de raccourcis vers les actions critiques (Nouveau projet, Reprendre)
+- Pas de barre de recherche → impossible de retrouver un outil par nom
+- Aucun indicateur d'état (étape en cours du workflow, projet actif)
 
-## Solution proposée
+## Plan de refonte (5 chantiers)
 
-### Page unique `/guide-outils` (accès abonnés)
-Un **mode d'emploi visuel** qui sert de "carte au trésor" pour naviguer dans EbookStudio.
+### Chantier 1 — Header sidebar opérationnel
+Nouveau bloc en haut de sidebar (au-dessus du Guide) :
+- **Sélecteur de projet actif** (dropdown avec les 3 derniers ebooks ouverts)
+- **Bouton CTA "+ Nouveau projet"** (vert, primaire)
+- **Barre de recherche outils** (filtre live dans tous les onglets — tape "couverture" → 2 résultats)
 
-### Structure en 4 sections
+### Chantier 2 — Section "⭐ Favoris / Épinglés"
+Nouvelle section juste sous le Guide :
+- L'utilisateur peut épingler ses 5 outils favoris (étoile au survol de chaque item)
+- Stockage `localStorage` (pas de table DB nécessaire)
+- Par défaut : Workflow IA, Studio Couverture, Export KDP, Guide KDP Ads, Mes Projets
 
-**Section 1 — Parcours recommandé (le chemin "happy path")**
-Un schéma visuel en 5 étapes numérotées :
-1. **Idée** → Recherche Niche KDP + Mots-clés
-2. **Création** → Workflow IA P1-P15 (le seul à utiliser pour écrire)
-3. **Habillage** → Studio Couverture + Description Magnet
-4. **Publication** → Export KDP + Checklist Pré-publication
-5. **Vente** → Guide KDP Ads + Marketing
+### Chantier 3 — Hiérarchie "Essentiel vs Avancé" dans chaque pilier
+Pour chaque pilier (Workflow IA, Écriture, Publier, Vendre, Compte) :
+- **Bloc visible par défaut** : 3-4 outils essentiels uniquement
+- **Lien "+ Voir 8 outils avancés"** qui déplie le reste
+- → Réduit le bruit visuel de ~60%
 
-Chaque étape = 1 carte cliquable qui amène directement à l'outil.
+### Chantier 4 — Comportement "accordéon exclusif"
+Un seul pilier ouvert à la fois (clic sur un autre → ferme le précédent).
+- Le pilier contenant la route active reste forcé ouvert
+- Ajoute un bouton "Tout replier" en bas de sidebar
 
-**Section 2 — Les 5 piliers expliqués**
-Pour chaque pilier (Workflow IA, Écriture, Publier, Vendre, Mon Compte) :
-- Couleur sémantique (déjà existante)
-- À quoi ça sert en 1 phrase
-- Liste compacte des outils-clés (pas les 44, juste les essentiels)
-- Bouton "Voir tous les outils de ce pilier"
+### Chantier 5 — Indicateurs d'état contextuels
+- Badge "En cours" sur l'étape Workflow IA active (P1-P15)
+- Badge numérique "3" sur "Mes Projets" (nombre de projets non finalisés)
+- Pastille verte sur Guide KDP Ads tant que l'utilisateur ne l'a pas ouvert (onboarding silencieux)
 
-**Section 3 — "Je veux faire X" (FAQ pratique)**
-Tableau de mappings cas d'usage → outil :
-- *"Je débute, je veux écrire mon 1er livre"* → Workflow IA P1-P15
-- *"Je veux trouver une niche rentable"* → Recherche KDP + Analyse de marché
-- *"J'ai un livre déjà écrit, je veux l'améliorer"* → Réécriture Naturelle + Correcteur Strict
-- *"Je veux créer une couverture"* → Studio Couverture IA
-- *"Je veux faire de la pub Amazon"* → Guide KDP Ads
-- *"Je veux convertir mon livre en audio"* → Audio Express
-- *"Je veux exporter pour KDP"* → Export Pro KDP
-*(8-10 cas d'usage max)*
+## Architecture finale de la sidebar
 
-**Section 4 — Outils avancés (à découvrir plus tard)**
-Liste discrète des outils niches/experts (Pinterest Generator, SEO Generator, Site Cloner, etc.) avec mention *"À explorer une fois les bases maîtrisées"*.
+```text
+┌─────────────────────────────────┐
+│ 📚 EbookStudio          [<<]    │  ← logo + collapse
+├─────────────────────────────────┤
+│ 📂 Projet : "Mon ebook v2"  ▾   │  ← sélecteur projet
+│ [+ Nouveau projet]              │  ← CTA vert
+│ 🔍 Rechercher un outil...       │  ← filtre live
+├─────────────────────────────────┤
+│ 🗺️  Guide des outils            │  ← bouton highlighté (existant)
+├─────────────────────────────────┤
+│ ⭐ Favoris                       │
+│   • Workflow IA                 │
+│   • Studio Couverture           │
+│   • Export KDP                  │
+├─────────────────────────────────┤
+│ 🤖 Workflow IA          [▾]     │  ← un seul ouvert à la fois
+│   • Pipeline complet [En cours] │
+│   • Nouveau workflow            │
+│   • Reprendre dernier           │
+│   + Voir 8 outils avancés       │
+├─────────────────────────────────┤
+│ ✍️  Écriture            [▸]     │
+│ 📦 Publier              [▸]     │
+│ 📣 Vendre               [▸]     │
+│ ⚙️  Mon Compte          [▸]     │
+├─────────────────────────────────┤
+│ [Tout replier]                  │
+└─────────────────────────────────┘
+```
 
-### Intégrations
-1. **Sidebar** : Ajouter en TOUT EN HAUT de la sidebar un bouton 🗺️ **"Guide des outils"** (avant les piliers) — ça devient le 1er réflexe.
-2. **Page Hierarchy/Dashboard** : Bandeau d'accueil pour les nouveaux abonnés *"Première visite ? Découvre le guide des outils →"*.
-3. **Onboarding** : Lien dans l'email de bienvenue (mention seulement, pas de modif email auto).
-
-## Fichiers à créer/modifier
+## Fichiers à créer / modifier
 
 **Créer**
-- `src/pages/ToolsGuidePage.tsx` (la page récap complète)
-- `src/components/layout/ToolsGuideButton.tsx` (bouton sidebar dédié, style highlighté)
+- `src/components/layout/SidebarHeader.tsx` (sélecteur projet + CTA + recherche)
+- `src/components/layout/SidebarFavorites.tsx` (section épinglés + hook localStorage)
+- `src/hooks/useSidebarFavorites.ts` (gestion favoris)
+- `src/hooks/useSidebarSearch.ts` (filtre live)
 
 **Modifier**
-- `src/App.tsx` — route `/guide-outils` (gated abonnés via `SubscriberGate`)
-- `src/components/layout/ModernSidebar.tsx` — insérer le bouton "Guide des outils" en tête de sidebar
-- `src/pages/HierarchyPage.tsx` (ou page d'accueil app) — bandeau d'accueil discret avec CTA vers le guide
-
-## Style visuel
-- Charte Amazon KDP existante (#FAFAFA, #008296, #FF9E2D)
-- Cartes numérotées pour le parcours (gros chiffres style "1, 2, 3...")
-- Icônes Lucide cohérentes avec la sidebar
-- Responsive mobile friendly (l'utilisateur voyage)
+- `src/components/layout/ModernSidebar.tsx` (intégrer header + favoris + accordéon exclusif + indicateurs)
+- `src/components/layout/modernSidebarSections.ts` (marquer chaque outil `essential: true/false`)
 
 ## Ce que je NE fais PAS
-- Pas de refonte de la sidebar (juste l'ajout d'un bouton en tête)
-- Pas de suppression d'outils (tout reste accessible)
-- Pas de tutoriel vidéo (texte + visuel uniquement)
-- Pas de système d'onboarding multi-étapes intrusif (juste un bandeau dismissible)
+- Pas de changement de la palette (KDP #008296 / #FF9E2D conservée)
+- Pas de suppression d'outils (tous restent accessibles via "Voir avancés")
+- Pas de refonte du `App.tsx` ni des routes
+- Pas de table DB pour les favoris (localStorage suffit)
+- Pas de drag & drop pour réorganiser (étoile = simple toggle)
+
+## Bénéfice mesurable
+- **-60% de boutons visibles** au premier coup d'œil
+- **3 clics max** pour atteindre n'importe quel outil (vs 5-6 aujourd'hui)
+- **0 clic** pour relancer le dernier projet (sélecteur en haut)
 
