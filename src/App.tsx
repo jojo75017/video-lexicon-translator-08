@@ -76,6 +76,7 @@ const CrmPage = lazy(() => import('@/pages/CrmPage'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const KdpAdsGuidePage = lazy(() => import('./pages/KdpAdsGuidePage'));
 const ToolsGuidePage = lazy(() => import('./pages/ToolsGuidePage'));
+const RecuperationCodePage = lazy(() => import('./pages/RecuperationCodePage'));
 
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center bg-background">
@@ -486,6 +487,7 @@ const App = () => {
             <Route path="/install" element={<InstallPage />} />
             
             {/* SaaS routes removed — orphan system */}
+            <Route path="/mon-code" element={<RecuperationCodePage />} />
             
             {/* Catch-all : redirige vers /offres */}
             <Route path="*" element={<Navigate to="/offres" replace />} />
