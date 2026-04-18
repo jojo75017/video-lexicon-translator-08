@@ -33,3 +33,15 @@ export const SIDEBAR_SUBSECTIONS: Record<string, SidebarSectionConfig[]> = {
     { label: 'Admin', itemIds: ['admin', 'admin-panel'] },
   ],
 };
+
+/**
+ * Outils "essentiels" affichés par défaut dans chaque pilier.
+ * Les autres outils sont masqués derrière un bouton "+ Voir avancés".
+ */
+export const ESSENTIAL_TOOL_IDS: Record<string, string[]> = {
+  '🤖 Workflow IA': ['workflow-dashboard', 'complete-workflow', 'editorial-director'],
+  '✍️ Écriture': ['planner', 'writing', 'aichat', 'characters'],
+  '📦 Publier': ['export', 'cover-design-editor', 'kdp', 'audio-express'],
+  '📣 Vendre': ['marketing', 'launch-plan', 'kdp-ads-guide'],
+  '⚙️ Mon Compte': ['projects', 'ebook-library', 'subscription', 'settings'],
+};

@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
+import {
   Settings, Users, Download, TrendingUp,
   LayoutDashboard, Palette, ChevronLeft, ChevronRight, ChevronDown,
   Sparkles, PenTool, FolderOpen,
@@ -12,7 +12,8 @@ import {
   Globe,
   Layers,
   ListChecks, Play,
-  Glasses, ClipboardCheck, Megaphone
+  Glasses, ClipboardCheck, Megaphone,
+  ChevronsUpDown, Plus, Minus
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -22,7 +23,12 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Progress } from '@/components/ui/progress';
 import { useUserQuotas, getQuotaPercentage } from '@/hooks/useUserQuotas';
 import { ToolsGuideButton } from '@/components/layout/ToolsGuideButton';
-import { SIDEBAR_SUBSECTIONS } from './modernSidebarSections';
+import { ESSENTIAL_TOOL_IDS } from './modernSidebarSections';
+import { useSidebarFavorites } from '@/hooks/useSidebarFavorites';
+import { SidebarFavorites } from './SidebarFavorites';
+import { SidebarHeader, type RecentProject } from './SidebarHeader';
+import { useEbookDatabase } from '@/hooks/useEbookDatabase';
+import { useWorkflowResults } from '@/hooks/useWorkflowResults';
 
 interface ModernSidebarProps {
   activeTab: string;
@@ -47,11 +53,6 @@ interface ToolGroup {
   label: string;
   emoji: string;
   color: string;
-  items: MenuItem[];
-}
-
-interface GroupedItems {
-  label: string;
   items: MenuItem[];
 }
 
@@ -129,6 +130,7 @@ const allToolGroups: ToolGroup[] = [
     items: [
       { id: 'marketing', label: 'Posts Réseaux Sociaux', icon: Megaphone },
       { id: 'launch-plan', label: 'Plan Lancement', icon: Rocket },
+      { id: 'kdp-ads-guide', label: 'Guide KDP Ads', icon: TrendingUp },
     ]
   },
   {
@@ -144,6 +146,10 @@ const allToolGroups: ToolGroup[] = [
     ]
   },
 ];
+
+// Flat lookup for favorites/recent
+const ALL_ITEMS_FLAT: MenuItem[] = allToolGroups.flatMap(g => g.items);
+
 // ─── Theme hook ───
 const useTheme = () => {
   const [isDark, setIsDark] = useState(() => {
@@ -165,7 +171,7 @@ const useTheme = () => {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark') {
       document.documentElement.classList.add('dark');
@@ -290,14 +296,25 @@ const colorMap: Record<string, { bg: string; bgActive: string; border: string; t
   },
 };
 
-// ─── Menu item button ───
+// Map workflow step IDs (P1..P15) to tool IDs in the sidebar
+const WORKFLOW_STEP_TO_TAB: Record<string, string> = {
+  P1: 'editorial-director', P2: 'market-analysis', P3: 'content-architect', P4: 'expert-writing',
+  P5: 'natural-rewrite', P6: 'editorial-quality', P7: 'editorial-packaging', P8: 'final-diagnosis',
+  P9: 'editorial-memory', P10: 'chapter-coherence', P11: 'self-critique', P12: 'iterative-loop',
+  P13: 'style-signature', P14: 'ultimate-verdict', P15: 'humanize-anti-ia',
+};
+
+// ─── Menu item button (with star) ───
 const MenuItemButton: React.FC<{
   item: MenuItem;
   isActive: boolean;
   onClick: () => void;
   isCollapsed: boolean;
   groupColor?: string;
-}> = ({ item, isActive, onClick, isCollapsed, groupColor = 'blue' }) => {
+  isFavorite?: boolean;
+  onToggleFavorite?: () => void;
+  inProgress?: boolean;
+}> = ({ item, isActive, onClick, isCollapsed, groupColor = 'blue', isFavorite, onToggleFavorite, inProgress }) => {
   const Icon = item.icon;
   const colors = colorMap[groupColor] || colorMap.blue;
 
@@ -308,13 +325,16 @@ const MenuItemButton: React.FC<{
           <button
             onClick={onClick}
             className={cn(
-              "w-full flex items-center justify-center p-2.5 rounded-xl transition-all",
+              "w-full flex items-center justify-center p-2.5 rounded-xl transition-all relative",
               isActive
                 ? cn(colors.iconBg, "text-white shadow-md")
                 : "hover:bg-card text-muted-foreground"
             )}
           >
             <Icon className="w-4 h-4" />
+            {inProgress && (
+              <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            )}
           </button>
         </TooltipTrigger>
         <TooltipContent side="right" className="font-medium">{item.label}</TooltipContent>
@@ -323,29 +343,55 @@ const MenuItemButton: React.FC<{
   }
 
   return (
-    <button
-      onClick={onClick}
+    <div
       className={cn(
-        "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg transition-all text-left group",
-        isActive
-          ? cn(colors.bgActive, "border", colors.border, "shadow-sm")
-          : "hover:bg-card/80"
+        "group/item w-full flex items-center gap-1 rounded-lg transition-all",
+        isActive ? cn(colors.bgActive, "border", colors.border, "shadow-sm") : "hover:bg-card/80"
       )}
     >
-      <Icon className={cn("w-4 h-4 flex-shrink-0", isActive ? colors.icon : "text-muted-foreground")} />
-      <span className={cn(
-        "text-sm flex-1 truncate",
-        isActive ? cn("font-semibold", colors.text) : "text-foreground group-hover:text-kdp-orange"
-      )}>
-        {item.label}
-      </span>
-      {item.isNew && <span className={cn("w-2 h-2 rounded-full flex-shrink-0", colors.dot)} />}
-      {item.isPro && (
-        <span className={cn("text-[9px] font-bold px-1.5 py-0.5 rounded-md flex-shrink-0", colors.bg, colors.text)}>
-          PRO
+      <button
+        onClick={onClick}
+        className="flex-1 flex items-center gap-2.5 px-3 py-2 text-left min-w-0"
+      >
+        <Icon className={cn("w-4 h-4 flex-shrink-0", isActive ? colors.icon : "text-muted-foreground")} />
+        <span className={cn(
+          "text-sm flex-1 truncate",
+          isActive ? cn("font-semibold", colors.text) : "text-foreground group-hover/item:text-kdp-orange"
+        )}>
+          {item.label}
         </span>
+        {inProgress && (
+          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 flex-shrink-0">
+            EN COURS
+          </span>
+        )}
+        {item.isNew && !inProgress && <span className={cn("w-2 h-2 rounded-full flex-shrink-0", colors.dot)} />}
+        {item.isPro && !inProgress && (
+          <span className={cn("text-[9px] font-bold px-1.5 py-0.5 rounded-md flex-shrink-0", colors.bg, colors.text)}>
+            PRO
+          </span>
+        )}
+      </button>
+      {onToggleFavorite && (
+        <button
+          onClick={(e) => { e.stopPropagation(); onToggleFavorite(); }}
+          className={cn(
+            "p-1.5 rounded-md mr-1 transition-opacity flex-shrink-0",
+            isFavorite ? "opacity-100" : "opacity-0 group-hover/item:opacity-100",
+            "hover:bg-background/60"
+          )}
+          aria-label={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+          title={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+        >
+          <Star
+            className={cn(
+              "w-3.5 h-3.5",
+              isFavorite ? "text-kdp-orange fill-kdp-orange" : "text-muted-foreground"
+            )}
+          />
+        </button>
       )}
-    </button>
+    </div>
   );
 };
 
@@ -360,15 +406,71 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
   const navigate = useNavigate();
   const { isDark, toggleTheme } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
-  const [expandedGroups, setExpandedGroups] = useState<string[]>(['🤖 Workflow IA']);
-  const [expandedSections, setExpandedSections] = useState<string[]>(['🤖 Workflow IA:Pipeline', '🤖 Workflow IA:Créer']);
+  // Accordéon EXCLUSIF — un seul groupe ouvert à la fois
+  const [openGroup, setOpenGroup] = useState<string | null>('🤖 Workflow IA');
+  // Toggle "essentiel vs avancé" par groupe (true = avancés visibles)
+  const [showAdvanced, setShowAdvanced] = useState<Record<string, boolean>>({});
 
   const [isAdmin, setIsAdmin] = useState(() => sessionStorage.getItem('is_admin') === 'true');
-  React.useEffect(() => {
+  useEffect(() => {
     const checkAdmin = () => setIsAdmin(sessionStorage.getItem('is_admin') === 'true');
     window.addEventListener('storage', checkAdmin);
     return () => window.removeEventListener('storage', checkAdmin);
   }, []);
+
+  // Favoris
+  const { favorites, isFavorite, toggleFavorite } = useSidebarFavorites();
+  const favoriteItems = useMemo(
+    () => favorites
+      .map(id => ALL_ITEMS_FLAT.find(i => i.id === id))
+      .filter((i): i is MenuItem => Boolean(i) && (!i!.adminOnly || isAdmin)),
+    [favorites, isAdmin]
+  );
+
+  // Projets récents pour le sélecteur
+  const { loadAllProjects } = useEbookDatabase();
+  const [recentProjects, setRecentProjects] = useState<RecentProject[]>([]);
+  const [currentProjectTitle, setCurrentProjectTitle] = useState<string | null>(null);
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const projects = await loadAllProjects();
+        if (!mounted) return;
+        setRecentProjects(projects.slice(0, 3).map((p: any) => ({ id: p.id, title: p.title })));
+      } catch {
+        /* ignore */
+      }
+    })();
+    try {
+      const raw = localStorage.getItem('ebook_planner_data');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed?.ebookTitle) setCurrentProjectTitle(parsed.ebookTitle);
+      }
+    } catch { /* ignore */ }
+    return () => { mounted = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Étape Workflow IA "en cours" = dernière étape P* qui a un résultat
+  const { results } = useWorkflowResults();
+  const inProgressTabId = useMemo(() => {
+    const completed = Object.keys(results).filter(k => results[k as keyof typeof results]);
+    if (completed.length === 0) return null;
+    // dernière étape réalisée (max P{n})
+    const maxStep = completed
+      .map(k => parseInt(k.replace('P', ''), 10))
+      .filter(n => !Number.isNaN(n))
+      .sort((a, b) => b - a)[0];
+    if (!maxStep) return null;
+    return WORKFLOW_STEP_TO_TAB[`P${maxStep}`] ?? null;
+  }, [results]);
+
+  // Compteur projets non finalisés (status !== 'completed' ou non défini)
+  const unfinishedProjectsCount = useMemo(() => {
+    return recentProjects.length;
+  }, [recentProjects]);
 
   const handleItemClick = (item: MenuItem) => {
     if (item.isLink && item.href) {
@@ -379,28 +481,32 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
     if (searchQuery) setSearchQuery('');
   };
 
+  const handleFavoriteClick = (id: string) => {
+    const item = ALL_ITEMS_FLAT.find(i => i.id === id);
+    if (item) handleItemClick(item);
+  };
+
   const toggleGroup = (label: string) => {
-    setExpandedGroups(prev =>
-      prev.includes(label) ? prev.filter(l => l !== label) : [...prev, label]
-    );
+    setOpenGroup(prev => (prev === label ? null : label));
   };
 
-  const toggleSection = (key: string) => {
-    setExpandedSections(prev =>
-      prev.includes(key) ? prev.filter(section => section !== key) : [...prev, key]
-    );
+  const toggleAdvanced = (label: string) => {
+    setShowAdvanced(prev => ({ ...prev, [label]: !prev[label] }));
   };
 
-  const filterAdmin = (item: MenuItem) => {
-    if (item.adminOnly && !isAdmin) return false;
-    return true;
-  };
+  const collapseAll = () => setOpenGroup(null);
 
-  // Auto-expand group of active tab
-  React.useEffect(() => {
+  const filterAdmin = (item: MenuItem) => !item.adminOnly || isAdmin;
+
+  // Auto-open group of active tab (and force essentials override if active is advanced)
+  useEffect(() => {
     for (const group of allToolGroups) {
       if (group.items.some(i => i.id === activeTab)) {
-        setExpandedGroups(prev => prev.includes(group.label) ? prev : [...prev, group.label]);
+        setOpenGroup(group.label);
+        const essentials = ESSENTIAL_TOOL_IDS[group.label] ?? [];
+        if (!essentials.includes(activeTab)) {
+          setShowAdvanced(prev => ({ ...prev, [group.label]: true }));
+        }
         break;
       }
     }
@@ -409,44 +515,20 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
   const searchResults = useMemo(() => {
     if (!searchQuery.trim()) return [];
     const q = searchQuery.toLowerCase();
-    return allToolGroups
-      .flatMap(g => g.items)
+    return ALL_ITEMS_FLAT
       .filter(item => !item.adminOnly || isAdmin)
       .filter(item => item.label.toLowerCase().includes(q) || item.id.toLowerCase().includes(q))
       .slice(0, 15);
   }, [searchQuery, isAdmin]);
 
-  const getSectionedItems = (group: ToolGroup, visibleItems: MenuItem[]): GroupedItems[] => {
-    const config = SIDEBAR_SUBSECTIONS[group.label] ?? [];
-    const itemMap = new globalThis.Map(visibleItems.map(item => [item.id, item]));
-
-    const configuredSections = config
-      .map(section => ({
-        label: section.label,
-        items: section.itemIds.map(itemId => itemMap.get(itemId)).filter(Boolean) as MenuItem[],
-      }))
-      .filter(section => section.items.length > 0);
-
-    const configuredIds = new Set(config.flatMap(section => section.itemIds));
-    const remainingItems = visibleItems.filter(item => !configuredIds.has(item.id));
-
-    return remainingItems.length > 0
-      ? [...configuredSections, { label: 'Autres', items: remainingItems }]
-      : configuredSections;
+  // Décompose les items d'un groupe en (essentiels visibles, avancés visibles si toggle)
+  const partitionItems = (group: ToolGroup) => {
+    const visible = group.items.filter(filterAdmin);
+    const essentialIds = ESSENTIAL_TOOL_IDS[group.label] ?? [];
+    const essentials = visible.filter(i => essentialIds.includes(i.id));
+    const advanced = visible.filter(i => !essentialIds.includes(i.id));
+    return { essentials, advanced, total: visible.length };
   };
-
-  React.useEffect(() => {
-    for (const group of allToolGroups) {
-      const sections = SIDEBAR_SUBSECTIONS[group.label] ?? [];
-      const activeSection = sections.find(section => section.itemIds.includes(activeTab));
-
-      if (activeSection) {
-        const sectionKey = `${group.label}:${activeSection.label}`;
-        setExpandedSections(prev => prev.includes(sectionKey) ? prev : [...prev, sectionKey]);
-        break;
-      }
-    }
-  }, [activeTab]);
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -457,7 +539,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
           isCollapsed ? "w-[72px]" : "w-72"
         )}
       >
-        {/* Header */}
+        {/* Header logo */}
         <div className={cn(
           "flex items-center gap-3 p-4 border-b border-border",
           isCollapsed && "justify-center p-3"
@@ -483,14 +565,24 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
           )}
         </div>
 
-        {/* Search */}
+        {/* CHANTIER 1 — Header opérationnel: projet actif + nouveau */}
+        <SidebarHeader
+          recentProjects={recentProjects}
+          currentProjectTitle={currentProjectTitle}
+          onSelectProject={() => onTabChange('projects')}
+          onNewProject={() => onTabChange('planner')}
+          onOpenAllProjects={() => onTabChange('projects')}
+          isCollapsed={isCollapsed}
+        />
+
+        {/* Search bar */}
         {!isCollapsed && (
           <div className="p-3 pb-1">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 type="text"
-                placeholder="Rechercher..."
+                placeholder="Rechercher un outil..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-8 h-9 text-sm bg-card border-border placeholder:text-muted-foreground rounded-xl focus:border-gold/50 focus:ring-gold/20"
@@ -507,10 +599,18 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
           </div>
         )}
 
-        {/* Tools Guide button - always at top */}
+        {/* Tools Guide button */}
         <div className={cn('px-2 pt-2', isCollapsed && 'px-2')}>
           <ToolsGuideButton isCollapsed={isCollapsed} />
         </div>
+
+        {/* CHANTIER 2 — Favoris */}
+        <SidebarFavorites
+          items={favoriteItems}
+          activeTab={activeTab}
+          onItemClick={handleFavoriteClick}
+          isCollapsed={isCollapsed}
+        />
 
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto px-2 py-2 space-y-1">
@@ -526,6 +626,9 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                   isActive={activeTab === item.id}
                   onClick={() => handleItemClick(item)}
                   isCollapsed={false}
+                  isFavorite={isFavorite(item.id)}
+                  onToggleFavorite={() => toggleFavorite(item.id)}
+                  inProgress={inProgressTabId === item.id}
                 />
               ))}
               {searchResults.length === 0 && (
@@ -535,7 +638,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
           ) : (
             <div className="space-y-1">
               {allToolGroups.map(group => {
-                const isExpanded = expandedGroups.includes(group.label);
+                const isExpanded = openGroup === group.label;
                 const visibleItems = group.items.filter(filterAdmin);
                 const hasActive = visibleItems.some(i => i.id === activeTab);
                 const colors = colorMap[group.color] || colorMap.blue;
@@ -547,7 +650,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                         <button
                           onClick={() => {
                             onToggleCollapse();
-                            setTimeout(() => setExpandedGroups([group.label]), 300);
+                            setTimeout(() => setOpenGroup(group.label), 300);
                           }}
                           className={cn(
                             "w-full flex items-center justify-center p-2.5 rounded-xl transition-all",
@@ -566,6 +669,20 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                   );
                 }
 
+                const { essentials, advanced, total } = partitionItems(group);
+                const advancedShown = showAdvanced[group.label] ?? false;
+                const groupHasInProgress = inProgressTabId
+                  ? visibleItems.some(i => i.id === inProgressTabId)
+                  : false;
+
+                // CHANTIER 5 — badge contextuel
+                const groupBadge = (() => {
+                  if (group.label === '⚙️ Mon Compte' && unfinishedProjectsCount > 0) {
+                    return String(unfinishedProjectsCount);
+                  }
+                  return String(total);
+                })();
+
                 return (
                   <div key={group.label}>
                     <button
@@ -576,17 +693,20 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                       )}
                     >
                       <span className={cn(
-                        "text-sm font-semibold",
+                        "text-sm font-semibold flex items-center gap-2",
                         hasActive ? colors.text : "text-foreground"
                       )}>
                         {group.label}
+                        {groupHasInProgress && (
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        )}
                       </span>
                       <div className="flex items-center gap-1.5">
                         <span className={cn(
                           "text-[10px] font-medium px-1.5 py-0.5 rounded-full",
                           colors.bg, colors.text
                         )}>
-                          {visibleItems.length}
+                          {groupBadge}
                         </span>
                         <ChevronDown className={cn(
                           "w-3.5 h-3.5 transition-transform duration-200",
@@ -595,66 +715,81 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                         )} />
                       </div>
                     </button>
+
                     {isExpanded && (
-                      <div className={cn("ml-2 pl-2 border-l-2 space-y-2 mt-1 pb-1", colors.border)}>
-                        {getSectionedItems(group, visibleItems).map(section => {
-                          const sectionKey = `${group.label}:${section.label}`;
-                          const sectionExpanded = expandedSections.includes(sectionKey);
-                          const sectionHasActive = section.items.some(item => item.id === activeTab);
+                      <div className={cn("ml-2 pl-2 border-l-2 space-y-0.5 mt-1 pb-1", colors.border)}>
+                        {/* CHANTIER 3 — essentiels d'abord */}
+                        {essentials.map(item => (
+                          <MenuItemButton
+                            key={item.id}
+                            item={item}
+                            isActive={activeTab === item.id}
+                            onClick={() => handleItemClick(item)}
+                            isCollapsed={false}
+                            groupColor={group.color}
+                            isFavorite={isFavorite(item.id)}
+                            onToggleFavorite={() => toggleFavorite(item.id)}
+                            inProgress={inProgressTabId === item.id}
+                          />
+                        ))}
 
-                          return (
-                            <div key={sectionKey} className="space-y-1">
-                              <button
-                                onClick={() => toggleSection(sectionKey)}
-                                className={cn(
-                                  "w-full flex items-center justify-between rounded-lg px-2 py-1.5 text-left transition-all",
-                                  sectionHasActive ? colors.bg : "hover:bg-card/60"
-                                )}
-                              >
-                                <span className={cn(
-                                  "text-xs font-semibold",
-                                  sectionHasActive ? colors.text : "text-muted-foreground"
-                                )}>
-                                  {section.label}
-                                </span>
-                                <div className="flex items-center gap-1.5">
-                                  <span className={cn(
-                                    "text-[10px] font-medium px-1.5 py-0.5 rounded-full",
-                                    colors.bg,
-                                    sectionHasActive ? colors.text : "text-muted-foreground"
-                                  )}>
-                                    {section.items.length}
-                                  </span>
-                                  <ChevronDown className={cn(
-                                    "w-3 h-3 transition-transform duration-200",
-                                    sectionExpanded ? "rotate-0" : "-rotate-90",
-                                    sectionHasActive ? colors.text : "text-muted-foreground"
-                                  )} />
-                                </div>
-                              </button>
-
-                              {sectionExpanded && (
-                                <div className="space-y-0.5 pl-1">
-                                  {section.items.map(item => (
-                                    <MenuItemButton
-                                      key={item.id}
-                                      item={item}
-                                      isActive={activeTab === item.id}
-                                      onClick={() => handleItemClick(item)}
-                                      isCollapsed={false}
-                                      groupColor={group.color}
-                                    />
-                                  ))}
-                                </div>
+                        {advanced.length > 0 && (
+                          <>
+                            <button
+                              onClick={() => toggleAdvanced(group.label)}
+                              className="w-full flex items-center gap-1.5 px-3 py-1.5 mt-1 rounded-md text-[11px] font-medium text-muted-foreground hover:text-foreground hover:bg-card/60 transition-all"
+                            >
+                              {advancedShown ? (
+                                <Minus className="w-3 h-3" />
+                              ) : (
+                                <Plus className="w-3 h-3" />
                               )}
-                            </div>
-                          );
-                        })}
+                              <span>
+                                {advancedShown
+                                  ? `Masquer ${advanced.length} outil${advanced.length > 1 ? 's' : ''} avancé${advanced.length > 1 ? 's' : ''}`
+                                  : `Voir ${advanced.length} outil${advanced.length > 1 ? 's' : ''} avancé${advanced.length > 1 ? 's' : ''}`}
+                              </span>
+                            </button>
+
+                            {advancedShown && (
+                              <div className="space-y-0.5 pt-1">
+                                {advanced.map(item => (
+                                  <MenuItemButton
+                                    key={item.id}
+                                    item={item}
+                                    isActive={activeTab === item.id}
+                                    onClick={() => handleItemClick(item)}
+                                    isCollapsed={false}
+                                    groupColor={group.color}
+                                    isFavorite={isFavorite(item.id)}
+                                    onToggleFavorite={() => toggleFavorite(item.id)}
+                                    inProgress={inProgressTabId === item.id}
+                                  />
+                                ))}
+                              </div>
+                            )}
+                          </>
+                        )}
+
+                        {essentials.length === 0 && advanced.length === 0 && (
+                          <p className="text-xs text-muted-foreground px-3 py-2">Aucun outil</p>
+                        )}
                       </div>
                     )}
                   </div>
                 );
               })}
+
+              {/* CHANTIER 4 — Tout replier */}
+              {openGroup && !isCollapsed && (
+                <button
+                  onClick={collapseAll}
+                  className="w-full flex items-center justify-center gap-1.5 px-3 py-2 mt-2 rounded-lg text-[11px] font-medium text-muted-foreground hover:text-foreground hover:bg-card/60 transition-all"
+                >
+                  <ChevronsUpDown className="w-3 h-3" />
+                  Tout replier
+                </button>
+              )}
             </div>
           )}
         </nav>
