@@ -404,55 +404,64 @@ const MenuItemButton: React.FC<{
   }
 
   return (
-    <div
-      className={cn(
-        "group/item w-full flex items-center gap-1 rounded-lg transition-all",
-        isActive ? cn(colors.bgActive, "border", colors.border, "shadow-sm") : "hover:bg-card/80"
-      )}
-    >
-      <button
-        onClick={onClick}
-        className="flex-1 flex items-center gap-2.5 px-3 py-2 text-left min-w-0"
-      >
-        <Icon className={cn("w-4 h-4 flex-shrink-0", isActive ? colors.icon : "text-muted-foreground")} />
-        <span className={cn(
-          "text-sm flex-1 truncate",
-          isActive ? cn("font-semibold", colors.text) : "text-foreground group-hover/item:text-kdp-orange"
-        )}>
-          {item.label}
-        </span>
-        {inProgress && (
-          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 flex-shrink-0">
-            EN COURS
-          </span>
-        )}
-        {item.isNew && !inProgress && <span className={cn("w-2 h-2 rounded-full flex-shrink-0", colors.dot)} />}
-        {item.isPro && !inProgress && (
-          <span className={cn("text-[9px] font-bold px-1.5 py-0.5 rounded-md flex-shrink-0", colors.bg, colors.text)}>
-            PRO
-          </span>
-        )}
-      </button>
-      {onToggleFavorite && (
-        <button
-          onClick={(e) => { e.stopPropagation(); onToggleFavorite(); }}
+    <Tooltip delayDuration={400}>
+      <TooltipTrigger asChild>
+        <div
           className={cn(
-            "p-1.5 rounded-md mr-1 transition-opacity flex-shrink-0",
-            isFavorite ? "opacity-100" : "opacity-0 group-hover/item:opacity-100",
-            "hover:bg-background/60"
+            "group/item w-full flex items-center gap-1 rounded-lg transition-all",
+            isActive ? cn(colors.bgActive, "border", colors.border, "shadow-sm") : "hover:bg-card/80"
           )}
-          aria-label={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
-          title={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
         >
-          <Star
-            className={cn(
-              "w-3.5 h-3.5",
-              isFavorite ? "text-kdp-orange fill-kdp-orange" : "text-muted-foreground"
+          <button
+            onClick={onClick}
+            className="flex-1 flex items-center gap-2.5 px-3 py-2 text-left min-w-0"
+          >
+            <Icon className={cn("w-4 h-4 flex-shrink-0", isActive ? colors.icon : "text-muted-foreground")} />
+            <span className={cn(
+              "text-sm flex-1 truncate",
+              isActive ? cn("font-semibold", colors.text) : "text-foreground group-hover/item:text-kdp-orange"
+            )}>
+              {item.label}
+            </span>
+            {inProgress && (
+              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 flex-shrink-0">
+                EN COURS
+              </span>
             )}
-          />
-        </button>
+            {item.isNew && !inProgress && <span className={cn("w-2 h-2 rounded-full flex-shrink-0", colors.dot)} />}
+            {item.isPro && !inProgress && (
+              <span className={cn("text-[9px] font-bold px-1.5 py-0.5 rounded-md flex-shrink-0", colors.bg, colors.text)}>
+                PRO
+              </span>
+            )}
+          </button>
+          {onToggleFavorite && (
+            <button
+              onClick={(e) => { e.stopPropagation(); onToggleFavorite(); }}
+              className={cn(
+                "p-1.5 rounded-md mr-1 transition-opacity flex-shrink-0",
+                isFavorite ? "opacity-100" : "opacity-0 group-hover/item:opacity-100",
+                "hover:bg-background/60"
+              )}
+              aria-label={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+              title={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+            >
+              <Star
+                className={cn(
+                  "w-3.5 h-3.5",
+                  isFavorite ? "text-kdp-orange fill-kdp-orange" : "text-muted-foreground"
+                )}
+              />
+            </button>
+          )}
+        </div>
+      </TooltipTrigger>
+      {TOOL_TOOLTIPS[item.id] && (
+        <TooltipContent side="right" className="max-w-xs text-xs leading-relaxed">
+          {TOOL_TOOLTIPS[item.id]}
+        </TooltipContent>
       )}
-    </div>
+    </Tooltip>
   );
 };
 
