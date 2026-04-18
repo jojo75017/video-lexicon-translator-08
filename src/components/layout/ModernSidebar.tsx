@@ -142,6 +142,7 @@ const allToolGroups: ToolGroup[] = [
       { id: 'ebook-library', label: 'Ma Bibliothèque', icon: Library },
       { id: 'subscription', label: 'Abonnement', icon: CreditCard },
       { id: 'settings', label: 'Paramètres', icon: Settings },
+      { id: 'admin-subscribers', label: '👥 Mes Abonnés', icon: Users, isLink: true, href: '/admin', adminOnly: true },
       { id: 'admin', label: 'Admin Panel', icon: Shield, isLink: true, href: '/admin', adminOnly: true },
     ]
   },
