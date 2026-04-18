@@ -47,17 +47,29 @@ export function SubscriberGate({
         return;
       }
 
-      // If not yet marked admin by prop, try a quick check with timeout (5s max)
+      // If not yet marked admin by prop, try a quick check with timeout (8s max)
       // Uses in-memory cache so this is instant if App.tsx already checked
       try {
         const adminPromise = getIsCurrentSessionAdmin();
         const timeoutPromise = new Promise<boolean>((resolve) =>
-          setTimeout(() => resolve(false), 5000)
+          setTimeout(() => resolve(false), 8000)
         );
         const isCurrentSessionAdmin = await Promise.race([adminPromise, timeoutPromise]);
 
         if (isCurrentSessionAdmin) {
           console.log('SubscriberGate: Admin confirmed via cached/session check');
+          if (!cancelled) {
+            setAllowed(true);
+            setChecking(false);
+          }
+          return;
+        }
+
+        // Fallback: if a real Supabase session exists, allow access
+        // (admin check may have failed transiently — App.tsx will re-verify in background)
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          console.log('SubscriberGate: Active Supabase session found, allowing access');
           if (!cancelled) {
             setAllowed(true);
             setChecking(false);
