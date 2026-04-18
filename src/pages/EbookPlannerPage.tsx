@@ -16,6 +16,7 @@ import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { ModernSidebar } from '@/components/layout/ModernSidebar';
 import { OnboardingGuide } from '@/components/onboarding/OnboardingGuide';
+import { FirstVisitBanner } from '@/components/onboarding/FirstVisitBanner';
 import { useEbookDatabase } from '@/hooks/useEbookDatabase';
 import { EbookMarketing } from '@/components/ebook/EbookMarketing';
 import {
@@ -2979,6 +2980,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       )}
 
       <main className="flex-1 overflow-y-auto">
+        <FirstVisitBanner />
         {/* Back to board button in trello mode */}
         {viewMode === 'trello' && activeTab !== 'workflow-dashboard' && (
           <div className="bg-card border-b border-border px-6 py-3 flex items-center gap-3">
