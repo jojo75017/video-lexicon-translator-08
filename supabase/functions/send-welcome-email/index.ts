@@ -153,8 +153,14 @@ const handler = async (req: Request): Promise<Response> => {
               </p>
               
               <p style="text-align: center;">
-                <a href="https://ebook-studio-ai.lovable.app/offres" class="cta-button">
-                  🚀 Découvrir les offres
+                <a href="https://ebookstudio.fr/guide-outils" class="cta-button">
+                  📖 Voir le Guide des Outils (2 min)
+                </a>
+              </p>
+
+              <p style="text-align: center; margin-top: 10px;">
+                <a href="https://ebookstudio.fr/offres" style="color: #8B5CF6; text-decoration: underline; font-size: 14px;">
+                  Ou découvrir les offres d'abonnement →
                 </a>
               </p>
               
