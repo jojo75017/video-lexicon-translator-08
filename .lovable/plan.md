@@ -1,46 +1,65 @@
 
 
-## Diagnostic des 2 problèmes
+## État du projet pour le lancement du 1er mai
 
-### Problème 1 : "La sidebar n'a pas changé"
-Le code de la sidebar **a bien été mis à jour** (header projet, recherche, favoris, accordéon exclusif, badges) — vérifié dans `ModernSidebar.tsx` lignes 568-792.
+### ✅ Ce qui est prêt
+- **Sidebar opérationnelle** : header projet + recherche + favoris + accordéon exclusif + badges "EN COURS" + indicateurs (style proche KDP Rocket)
+- **Guide des outils** (`/guide-outils`) : parcours en 5 étapes, FAQ "Je veux faire X", piliers expliqués → un abonné ne se noie plus
+- **Workflow IA P1-P15** stable (BYOK Gemini, timeout 90s, fallbacks)
+- **Studio Couverture, Export KDP, Audio Express** fonctionnels
+- **Admin** : accès subscribers réparé (`/admin-direct` → `/admin`), cache 5min, raccourci sidebar "👥 Mes Abonnés"
+- **Backend** : RLS strictes, 67€/an, essai 7 jours manuel, BYOK Gemini
 
-**MAIS** la sidebar n'apparaît **QUE sur 2 pages** : `/ebook-planner` et `/formation-series`. Tu es actuellement sur `/admin-direct` qui est une **page de connexion admin par lien magique** — elle n'a JAMAIS eu de sidebar. Donc forcément, tu ne vois aucun changement ici.
+### ⚠️ Ce qui reste à boucler avant le 1er mai
 
-→ Pour voir les nouveautés sidebar : aller sur `/ebook-planner`.
+#### Priorité 1 — Bloquants (à faire absolument)
+1. **Test parcours abonné de bout en bout** : inscription → email bienvenue → connexion → /ebook-planner → générer un ebook → exporter
+2. **Onglets KDP Description + Mots-clés** : vérifier que les corrections d'erreur (BYOK + messages clairs) fonctionnent vraiment côté abonné (pas juste admin)
+3. **Bandeau d'accueil "Première visite ?"** sur `/ebook-planner` qui redirige vers `/guide-outils` (prévu mais pas implémenté)
 
-### Problème 2 : "Je ne vois pas mes abonnés"
-La page `/admin-direct` n'affiche PAS la liste des abonnés — c'est juste un formulaire d'envoi de lien magique. La vraie page de gestion est `/admin` (`AdminPage.tsx` qui charge `subscribers` depuis Supabase et les liste).
+#### Priorité 2 — Confort lancement
+4. **Page d'accueil après login** : aujourd'hui un nouvel abonné arrive directement dans le générateur → forcer la 1ère visite sur `/guide-outils`
+5. **Tooltip "Astuce du jour"** sur les outils essentiels pour guider sans intrusion
+6. **Compteur de quota visible en permanence** dans la sidebar (déjà présent, vérifier visibilité)
+7. **Email de bienvenue** : ajouter lien direct vers `/guide-outils`
 
-Tu es probablement coincé sur `/admin-direct` parce que :
-- soit ta session admin a expiré → redirige sur le formulaire au lieu de `/dashboard`
-- soit le clic sur "Admin Panel" dans la sidebar t'envoie sur `/admin` mais le `AdminGate` te renvoie sur `/admin-direct`
+#### Priorité 3 — Marketing lancement (idées)
+8. **Page "/lancement-1-mai"** : compte à rebours + offre early-bird (-20% premiers 50 abonnés ?)
+9. **Vidéo de démo 2 min** intégrée sur `/offres` montrant le workflow P1→P15
+10. **FAQ visible** sur la page de vente (objections classiques : "C'est de l'IA ?", "Combien de temps ?", "Garantie ?")
 
-## Plan de correction (3 actions ciblées, pas de fioritures)
+### 🎯 Sidebar "façon KDP Rocket" — état actuel vs cible
 
-### Action 1 — Fusionner `/admin-direct` et `/admin` en une seule page
-Sur `/admin-direct` : si l'utilisateur **est déjà admin connecté**, afficher directement la liste des abonnés (au lieu de juste rediriger vers `/dashboard` qui ne montre pas les abonnés). Si non connecté, garder le formulaire lien magique.
+| Critère KDP Rocket | État actuel | Action |
+|---|---|---|
+| Recherche live tools | ✅ Fait | — |
+| Favoris épinglés | ✅ Fait | — |
+| Hiérarchie essentiel/avancé | ✅ Fait | — |
+| Accordéon exclusif | ✅ Fait | — |
+| Indicateurs d'état | ✅ Fait (badge "EN COURS") | — |
+| **Tutoriel intégré au survol** | ❌ Manquant | À ajouter (tooltip explicatif sur chaque outil) |
+| **Onboarding guidé 1ère visite** | ⚠️ Page existe mais pas forcée | Forcer redirect 1er login |
 
-→ Plus de page-piège qui te coupe l'accès à tes abonnés.
+### Plan d'action recommandé (3 chantiers ciblés, ~2h de dev)
 
-### Action 2 — Ajouter un raccourci "Voir abonnés" partout
-Dans la sidebar (section ⚙️ Mon Compte) : ajouter un item **"👥 Mes Abonnés"** (admin only) qui pointe directement vers `/admin` (la liste).
+**Chantier A — Onboarding forcé**
+- `EbookPlannerPage.tsx` : si premier login (flag `localStorage`), bandeau jaune "👋 Bienvenue ! Découvre le guide en 2 min →" cliquable
+- Email de bienvenue : ajouter CTA "Voir le guide des outils"
 
-Aujourd'hui il y a juste "Admin Panel" → on ajoute un lien direct vers la table des abonnés.
+**Chantier B — Tooltips KDP Rocket**
+- `ModernSidebar.tsx` : ajouter `TooltipContent` avec description courte (1 phrase) sur chaque outil
+- Ex : survol "P4 · Alia — Rédaction" → "Génère le contenu complet des chapitres avec ton style éditorial"
 
-### Action 3 — Vérifier que `AdminGate` ne te bloque pas
-Lire `AdminGate.tsx` et `getIsCurrentSessionAdmin()` pour comprendre pourquoi tu es renvoyé sur `/admin-direct` au lieu de voir `/admin`. Si la session admin est trop fragile (timeout 5s), l'allonger ou ajouter un fallback `localStorage`.
+**Chantier C — Test bout-en-bout + correction bugs détectés**
+- Créer un abonné test avec un email réel
+- Parcourir : login → guide → planner → workflow → export
+- Lister les blocages restants → corriger
 
-## Fichiers à modifier
-- `src/pages/AdminDirectPage.tsx` — afficher liste abonnés si déjà admin (réutilise le composant de `AdminPage.tsx`)
-- `src/components/layout/ModernSidebar.tsx` — ajouter item "👥 Mes Abonnés" → `/admin`
-- `src/components/auth/AdminGate.tsx` (à lire) — vérifier la logique de redirection
+### Ce que je NE recommande PAS pour le 1er mai
+- Pas d'ajout de nouvelles fonctionnalités (gel des features)
+- Pas de refonte design (charte KDP figée)
+- Pas de migration DB (on garde le schéma actuel)
 
-## Ce que je NE fais PAS
-- Pas de refonte sidebar bis (la précédente est déjà en place et fonctionne sur `/ebook-planner`)
-- Pas de touche au design
-- Pas de migration DB
-
-## Pour le 1er mai
-Le projet **est prêt techniquement** — les 5 chantiers sidebar sont en place, la page Guide existe, les BYOK fonctionnent. Le seul vrai blocage actuel c'est que **tu ne vois pas tes abonnés** depuis `/admin-direct`. C'est un bug de routage (3 fichiers à corriger), pas un problème de fond.
+### Verdict
+Le projet est **techniquement à 85%** prêt. Les 15% restants = onboarding + tests. Si tu valides les 3 chantiers (A, B, C) je peux les enchaîner pour que tu sois prêt le 1er mai sans surprise.
 
