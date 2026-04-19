@@ -774,6 +774,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
       toast.warning('⚠️ Votre clé Gemini semble mal formatée ; le workflow utilisera le moteur IA intégré.');
     }
 
+    cancelRef.current = false;
     setIsGenerating(true);
     setError(null);
     setFailedStepIndex(null);
