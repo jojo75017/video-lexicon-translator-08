@@ -180,7 +180,7 @@ async function sendWelcomeEmail(email: string, accessCode: string, planType: str
     console.log('Sending welcome email to:', email);
 
     const emailResponse = await resend.emails.send({
-      from: EbookStudio <noreply@ebookstudio.frv>',
+      from: 'EbookStudio <noreply@ebookstudio.fr>',
       to: [email],
       subject: subject,
       html: html,
