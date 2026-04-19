@@ -13,7 +13,8 @@ import {
   Layers,
   ListChecks, Play,
   Glasses, ClipboardCheck, Megaphone,
-  ChevronsUpDown, Plus, Minus
+  ChevronsUpDown, Plus, Minus,
+  Gift, MessageCircle
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
