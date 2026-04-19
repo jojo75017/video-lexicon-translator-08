@@ -1127,11 +1127,14 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
     } catch (err: any) {
       console.error('Workflow error:', err);
       setFailedStepIndex(lastStepI);
-      setError(err.message || 'Erreur lors de la génération');
+      const friendly = getFriendlyError(err);
+      setError(friendly);
       // Save progress on error so user can resume
       saveProgress();
-      toast.error(`Erreur à l'étape ${WORKFLOW_STEPS[lastStepI]?.id}: ${err.message}`);
+      const stepLabel = WORKFLOW_STEPS[lastStepI]?.id ? `Étape ${WORKFLOW_STEPS[lastStepI].id} : ` : '';
+      toast.error(`${stepLabel}${friendly}`);
     } finally {
+      cancelRef.current = false;
       setIsGenerating(false);
     }
   };
@@ -2003,7 +2006,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             Les 15 étapes du Directeur Éditorial
           </CardTitle>
           
-          {/* Progress bar */}
+          {/* Progress bar + bouton Stop */}
           {currentStepIndex >= 0 && (
             <div className="space-y-2 mt-4">
               <div className="flex justify-between text-sm">
@@ -2013,6 +2016,23 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
                 <span className="font-semibold text-primary">{Math.round(progress)}%</span>
               </div>
               <Progress value={progress} className="h-3" />
+              {isGenerating && (
+                <div className="flex justify-end pt-1">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      cancelRef.current = true;
+                      toast.info('⏹️ Arrêt demandé… La génération s\'arrêtera après l\'étape en cours.');
+                    }}
+                    className="gap-2 text-destructive border-destructive/40 hover:bg-destructive/10"
+                  >
+                    <StopCircle className="h-4 w-4" />
+                    Arrêter le workflow
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </CardHeader>
