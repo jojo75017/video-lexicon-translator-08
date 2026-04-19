@@ -209,6 +209,8 @@ const TOOL_TOOLTIPS: Record<string, string> = {
   'projects': 'Reprends tes projets ebook en cours.',
   'ebook-library': 'Bibliothèque de tous tes ebooks publiés.',
   'subscription': 'Gère ton abonnement et ton quota.',
+  'parrainage': 'Gagne 30€ par filleul qui s\'abonne via ton lien.',
+  'communaute': 'Forum entre abonnés : entraide, retours, astuces.',
   'settings': 'Configure ta clé API Gemini (BYOK) et tes préférences.',
   'admin-subscribers': 'Liste complète des abonnés (admin).',
   'admin': 'Panneau d\'administration (admin).',
