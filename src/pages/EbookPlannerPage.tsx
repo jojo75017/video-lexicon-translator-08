@@ -3131,11 +3131,13 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             userName={subscriberEmail}
             projectsCount={userProjectsCount}
           />
-          <div className="flex justify-end mb-2">
-            <EbookAutoSaveIndicator
-              data={{ ebookTitle, authorName, chapters, preface, conclusion, epilogue, characters, targetAudience, writingStyle, chapterLength, detailLevel, tone, narrativeFormat, bookDescription, genre, numberOfChapters, targetWordsPerChapter, ebookImages, tomeNumber }}
-              storageKey="ebook-planner-autosave"
-            />
+          <div className="sticky top-2 z-30 flex justify-end mb-2">
+            <div className="rounded-full bg-background/95 backdrop-blur border border-border shadow-sm px-3 py-1.5">
+              <EbookAutoSaveIndicator
+                data={{ ebookTitle, authorName, chapters, preface, conclusion, epilogue, characters, targetAudience, writingStyle, chapterLength, detailLevel, tone, narrativeFormat, bookDescription, genre, numberOfChapters, targetWordsPerChapter, ebookImages, tomeNumber }}
+                storageKey="ebook-planner-autosave"
+              />
+            </div>
           </div>
           {renderContent()}
         </div>
