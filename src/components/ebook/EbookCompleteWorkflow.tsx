@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { getFriendlyError } from '@/lib/errorMessages';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -12,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import {
   Sparkles, BookOpen, CheckCircle2, Loader2, AlertCircle,
   Rocket, Target, FileText, User, Hash,
-  ChevronDown, ChevronUp, Tag, AlignLeft, RotateCcw, Trash2, Plus, Key
+  ChevronDown, ChevronUp, Tag, AlignLeft, RotateCcw, Trash2, Plus, Key, StopCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
