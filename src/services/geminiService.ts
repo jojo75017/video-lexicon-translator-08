@@ -43,16 +43,25 @@ export async function callGemini(
     body.system_instruction = { parts: [{ text: systemPrompt }] };
   }
 
+  const doFetch = () => fetch(
+    `${GEMINI_API_BASE}/${model}:generateContent?key=${apiKey}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    }
+  );
+
   try {
-    const response = await fetch(
-      `${GEMINI_API_BASE}/${model}:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-        signal: controller.signal,
-      }
-    );
+    let response = await doFetch();
+
+    // Retry automatique en cas de 429 (quota momentané)
+    if (response.status === 429) {
+      console.warn('Gemini 429 — retry dans 30s...');
+      await new Promise(r => setTimeout(r, 30000));
+      response = await doFetch();
+    }
 
     clearTimeout(timeoutId);
 
@@ -60,7 +69,7 @@ export async function callGemini(
       const errText = await response.text();
       console.error('Gemini API error:', response.status, errText);
       if (response.status === 429) {
-        throw new Error('Limite de requêtes Gemini atteinte. Attendez un moment avant de réessayer.');
+        throw new Error('Quota Gemini atteint. Patientez ~60s puis relancez la génération.');
       }
       if (response.status === 400 || response.status === 401 || response.status === 403) {
         throw new Error('Clé API Gemini invalide. Vérifiez votre clé sur aistudio.google.com');
@@ -112,16 +121,24 @@ export async function callGeminiWithHistory(
     body.system_instruction = { parts: [{ text: systemPrompt }] };
   }
 
+  const doFetch = () => fetch(
+    `${GEMINI_API_BASE}/${model}:generateContent?key=${apiKey}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    }
+  );
+
   try {
-    const response = await fetch(
-      `${GEMINI_API_BASE}/${model}:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-        signal: controller.signal,
-      }
-    );
+    let response = await doFetch();
+
+    if (response.status === 429) {
+      console.warn('Gemini 429 — retry dans 30s...');
+      await new Promise(r => setTimeout(r, 30000));
+      response = await doFetch();
+    }
 
     clearTimeout(timeoutId);
 
@@ -129,7 +146,7 @@ export async function callGeminiWithHistory(
       const errText = await response.text();
       console.error('Gemini API error:', response.status, errText);
       if (response.status === 429) {
-        throw new Error('Limite de requêtes Gemini atteinte. Attendez un moment avant de réessayer.');
+        throw new Error('Quota Gemini atteint. Patientez ~60s puis relancez la génération.');
       }
       if (response.status === 400 || response.status === 401 || response.status === 403) {
         throw new Error('Clé API Gemini invalide. Vérifiez votre clé sur aistudio.google.com');

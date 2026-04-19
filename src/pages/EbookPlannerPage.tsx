@@ -544,8 +544,18 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
     
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erreur lors de la sauvegarde localStorage:', error);
+      // Quota exceeded → purger les anciens caches non essentiels et réessayer
+      if (error?.name === 'QuotaExceededError' || /quota/i.test(error?.message || '')) {
+        try {
+          localStorage.removeItem('ebook_workflow_progress');
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
+          console.warn('🧹 localStorage purgé pour libérer de l\'espace');
+        } catch {
+          toast.error('Espace de stockage local saturé. Exportez votre projet pour le sauvegarder.');
+        }
+      }
     }
 
   }, [ebookTitle, authorName, targetAudience, tomeNumber, writingStyle, chapterLength, detailLevel, tone, narrativeFormat, bookDescription, genre, preface, conclusion, epilogue, chapters, numberOfChapters, ebookImages, characters, bookSummary, coverConcepts, seoOptimization, kdpDescription, kdpKeywords, kdpCategories]);
@@ -637,11 +647,15 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   const duplicateChapter = (chapterId: string) => {
     const chapterToDuplicate = chapters.find(c => c.id === chapterId);
     if (!chapterToDuplicate) return;
+    const newChapterId = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const duplicatedChapter: Chapter = {
       ...chapterToDuplicate,
-      id: Date.now().toString(),
+      id: newChapterId,
       title: `${chapterToDuplicate.title} (copie)`,
-      subChapters: chapterToDuplicate.subChapters.map(sub => ({ ...sub, id: (Date.now() + Math.random()).toString() }))
+      subChapters: chapterToDuplicate.subChapters.map(sub => ({
+        ...sub,
+        id: (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      })),
     };
     const originalIndex = chapters.findIndex(c => c.id === chapterId);
     const newChapters = [...chapters];
@@ -768,9 +782,18 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   // État pour la génération complète
   const [generationProgress, setGenerationProgress] = useState({ current: 0, total: 0, currentItem: '' });
   const [isGeneratingComplete, setIsGeneratingComplete] = useState(false);
+  // Verrou anti-double-clic + projet figé pendant la génération
+  const generationLockRef = useRef(false);
+  const frozenProjectTitleRef = useRef<string | null>(null);
 
   // Générer l'ebook complet en une seule action
   const generateCompleteEbook = async () => {
+    // Verrou anti-double-clic strict
+    if (generationLockRef.current || isGeneratingComplete) {
+      console.warn('Génération déjà en cours — clic ignoré');
+      return;
+    }
+
     // Bloquer en mode démo
     if (isDemo) {
       setShowPaywall('chapters');
@@ -786,6 +809,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       return;
     }
 
+    // Geler le titre pour la durée du workflow
+    generationLockRef.current = true;
+    frozenProjectTitleRef.current = ebookTitle;
     setIsGeneratingComplete(true);
     
     try {
@@ -798,12 +824,13 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           if (!authorName) setAuthorName(planData.author);
           setPreface(planData.preface);
           setConclusion(planData.conclusion);
-          const generatedChapters = planData.chapters.map((chapter: any, index: number) => ({
-            id: (Date.now() + index).toString(),
+          const makeId = () => (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+          const generatedChapters = planData.chapters.map((chapter: any) => ({
+            id: makeId(),
             title: chapter.title,
             content: '',
-            subChapters: chapter.subChapters.map((sub: string, subIndex: number) => ({
-              id: (Date.now() + index * 100 + subIndex).toString(),
+            subChapters: chapter.subChapters.map((sub: string) => ({
+              id: makeId(),
               title: sub,
               content: ''
             }))
@@ -929,10 +956,17 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       toast.success('🎉 Ebook complet généré avec cohérence !');
       fireStars();
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erreur génération complète:', error);
-      toast.error('Erreur lors de la génération');
+      const msg = error?.message || '';
+      if (msg.includes('429') || /quota|limite/i.test(msg)) {
+        toast.error('⚠️ Quota Gemini atteint. Patientez ~60s puis relancez.');
+      } else {
+        toast.error('Erreur lors de la génération. Vérifiez votre clé Gemini et réessayez.');
+      }
     } finally {
+      generationLockRef.current = false;
+      frozenProjectTitleRef.current = null;
       setIsGeneratingComplete(false);
       setGenerationProgress({ current: 0, total: 0, currentItem: '' });
     }
