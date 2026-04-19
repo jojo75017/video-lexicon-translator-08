@@ -839,6 +839,11 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
     let lastStepI = resumeFromIndex;
     try {
       for (let i = resumeFromIndex; i < WORKFLOW_STEPS.length; i++) {
+        // Vérifier si l'utilisateur a demandé l'arrêt
+        if (cancelRef.current) {
+          saveProgress();
+          throw new Error('USER_CANCELLED');
+        }
         lastStepI = i;
         const step = WORKFLOW_STEPS[i];
         setCurrentStepIndex(i);
