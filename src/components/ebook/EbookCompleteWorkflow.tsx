@@ -92,6 +92,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   
   // Workflow state
   const [isGenerating, setIsGenerating] = useState(false);
+  const cancelRef = useRef(false);
   const [currentStepIndex, setCurrentStepIndex] = useState(-1);
   const [stepResults, setStepResults] = useState<Record<string, { result: any; displayContent: string }>>({});
   const [expandedSteps, setExpandedSteps] = useState<Record<string, boolean>>({});
@@ -176,6 +177,13 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
         const lastStepId = WORKFLOW_STEPS[data.currentStepIndex]?.id;
         if (lastStepId) expanded[lastStepId] = true;
         setExpandedSteps(expanded);
+
+        // Toast persistant de reprise pour informer l'utilisateur
+        const stepLabel = WORKFLOW_STEPS[data.currentStepIndex]?.id || 'précédente';
+        const remaining = Math.max(0, WORKFLOW_STEPS.length - 1 - data.currentStepIndex);
+        toast.info(`🔄 Reprise possible depuis l'étape ${stepLabel} — ${remaining} étape(s) restante(s)`, {
+          duration: 7000,
+        });
       }
     } catch (e) {
       console.error('Error loading saved progress:', e);
