@@ -544,8 +544,18 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
     
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erreur lors de la sauvegarde localStorage:', error);
+      // Quota exceeded → purger les anciens caches non essentiels et réessayer
+      if (error?.name === 'QuotaExceededError' || /quota/i.test(error?.message || '')) {
+        try {
+          localStorage.removeItem('ebook_workflow_progress');
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
+          console.warn('🧹 localStorage purgé pour libérer de l\'espace');
+        } catch {
+          toast.error('Espace de stockage local saturé. Exportez votre projet pour le sauvegarder.');
+        }
+      }
     }
 
   }, [ebookTitle, authorName, targetAudience, tomeNumber, writingStyle, chapterLength, detailLevel, tone, narrativeFormat, bookDescription, genre, preface, conclusion, epilogue, chapters, numberOfChapters, ebookImages, characters, bookSummary, coverConcepts, seoOptimization, kdpDescription, kdpKeywords, kdpCategories]);
