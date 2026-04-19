@@ -772,9 +772,18 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   // État pour la génération complète
   const [generationProgress, setGenerationProgress] = useState({ current: 0, total: 0, currentItem: '' });
   const [isGeneratingComplete, setIsGeneratingComplete] = useState(false);
+  // Verrou anti-double-clic + projet figé pendant la génération
+  const generationLockRef = useRef(false);
+  const frozenProjectTitleRef = useRef<string | null>(null);
 
   // Générer l'ebook complet en une seule action
   const generateCompleteEbook = async () => {
+    // Verrou anti-double-clic strict
+    if (generationLockRef.current || isGeneratingComplete) {
+      console.warn('Génération déjà en cours — clic ignoré');
+      return;
+    }
+
     // Bloquer en mode démo
     if (isDemo) {
       setShowPaywall('chapters');
@@ -790,6 +799,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       return;
     }
 
+    // Geler le titre pour la durée du workflow
+    generationLockRef.current = true;
+    frozenProjectTitleRef.current = ebookTitle;
     setIsGeneratingComplete(true);
     
     try {
