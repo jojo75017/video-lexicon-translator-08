@@ -164,122 +164,147 @@ const Dashboard: React.FC = () => {
           ))}
         </div>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {/* Recent Projects */}
-          <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
-            <CardHeader className="flex flex-row items-center justify-between pb-3">
-              <CardTitle className="flex items-center gap-2 text-base font-semibold">
-                <div className="p-1.5 rounded-lg bg-primary/10">
-                  <FileText className="h-4 w-4 text-primary" />
-                </div>
-                Projets récents
-              </CardTitle>
-              <Button variant="ghost" size="sm" onClick={() => navigate('/ebook-planner')} className="text-xs text-muted-foreground hover:text-foreground">
-                Voir tout <ArrowRight className="h-3.5 w-3.5 ml-1" />
-              </Button>
-            </CardHeader>
-            <CardContent className="pt-0">
-              {stats.recentProjects.length === 0 ? (
-                <div className="text-center py-8">
-                  <FileText className="h-10 w-10 text-muted-foreground/30 mx-auto mb-2" />
-                  <p className="text-sm text-muted-foreground">Aucun projet pour le moment</p>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {stats.recentProjects.map((project) => (
-                    <div key={project.id} className="group flex items-center justify-between p-3 rounded-xl border border-transparent hover:border-border/50 hover:bg-muted/30 transition-all cursor-pointer">
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
-                          {project.title.charAt(0).toUpperCase()}
-                        </div>
-                        <div>
-                          <p className="font-medium text-sm group-hover:text-primary transition-colors">{project.title}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {project.author_name || 'Auteur non défini'} · {formatDate(project.updated_at)}
-                          </p>
-                        </div>
-                      </div>
-                      <Clock className="h-3.5 w-3.5 text-muted-foreground/50 group-hover:text-muted-foreground transition-colors" />
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+        {/* Tabs : Vue d'ensemble | Mes Abonnés */}
+        <Tabs defaultValue="overview" className="w-full">
+          <TabsList className="grid w-full max-w-md grid-cols-2">
+            <TabsTrigger value="overview" className="gap-2">
+              <LayoutDashboard className="h-4 w-4" /> Vue d'ensemble
+            </TabsTrigger>
+            <TabsTrigger value="subscribers" className="gap-2">
+              <Crown className="h-4 w-4" /> Mes Abonnés
+              <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-[10px]">
+                {allSubscribers.length}
+              </Badge>
+            </TabsTrigger>
+          </TabsList>
 
-          {/* Recent Subscribers */}
-          <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
-            <CardHeader className="flex flex-row items-center justify-between pb-3">
-              <CardTitle className="flex items-center gap-2 text-base font-semibold">
-                <div className="p-1.5 rounded-lg bg-emerald-500/10">
-                  <Users className="h-4 w-4 text-emerald-400" />
-                </div>
-                Derniers abonnés
-              </CardTitle>
-              <Button variant="ghost" size="sm" onClick={() => navigate('/admin')} className="text-xs text-muted-foreground hover:text-foreground">
-                Gérer <ArrowRight className="h-3.5 w-3.5 ml-1" />
-              </Button>
-            </CardHeader>
-            <CardContent className="pt-0">
-              {stats.recentSubscribers.length === 0 ? (
-                <div className="text-center py-8">
-                  <Users className="h-10 w-10 text-muted-foreground/30 mx-auto mb-2" />
-                  <p className="text-sm text-muted-foreground">Aucun abonné pour le moment</p>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {stats.recentSubscribers.map((sub) => (
-                    <div key={sub.id} className="group flex items-center justify-between p-3 rounded-xl border border-transparent hover:border-border/50 hover:bg-muted/30 transition-all">
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-xs font-bold text-primary">
-                          {sub.email.charAt(0).toUpperCase()}
-                        </div>
-                        <div>
-                          <p className="font-medium text-sm">{sub.email}</p>
-                          <p className="text-xs text-muted-foreground">{formatDate(sub.created_at)}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <Badge className={`text-[10px] px-2 py-0.5 border ${getPlanColor(sub.plan_tier)}`}>
-                          {sub.plan_tier === 'vip' && <Crown className="h-3 w-3 mr-1" />}
-                          {sub.plan_tier.toUpperCase()}
-                        </Badge>
-                        <div className={`w-2 h-2 rounded-full ${sub.status === 'active' ? 'bg-emerald-400 shadow-sm shadow-emerald-400/50' : 'bg-muted-foreground/30'}`} />
-                      </div>
+          <TabsContent value="overview" className="space-y-4 mt-4">
+            {/* Main Content Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {/* Recent Projects */}
+              <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
+                <CardHeader className="flex flex-row items-center justify-between pb-3">
+                  <CardTitle className="flex items-center gap-2 text-base font-semibold">
+                    <div className="p-1.5 rounded-lg bg-primary/10">
+                      <FileText className="h-4 w-4 text-primary" />
                     </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+                    Projets récents
+                  </CardTitle>
+                  <Button variant="ghost" size="sm" onClick={() => navigate('/ebook-planner')} className="text-xs text-muted-foreground hover:text-foreground">
+                    Voir tout <ArrowRight className="h-3.5 w-3.5 ml-1" />
+                  </Button>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  {stats.recentProjects.length === 0 ? (
+                    <div className="text-center py-8">
+                      <FileText className="h-10 w-10 text-muted-foreground/30 mx-auto mb-2" />
+                      <p className="text-sm text-muted-foreground">Aucun projet pour le moment</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {stats.recentProjects.map((project) => (
+                        <div key={project.id} className="group flex items-center justify-between p-3 rounded-xl border border-transparent hover:border-border/50 hover:bg-muted/30 transition-all cursor-pointer">
+                          <div className="flex items-center gap-3">
+                            <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
+                              {project.title.charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                              <p className="font-medium text-sm group-hover:text-primary transition-colors">{project.title}</p>
+                              <p className="text-xs text-muted-foreground">
+                                {project.author_name || 'Auteur non défini'} · {formatDate(project.updated_at)}
+                              </p>
+                            </div>
+                          </div>
+                          <Clock className="h-3.5 w-3.5 text-muted-foreground/50 group-hover:text-muted-foreground transition-colors" />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
 
-        {/* Quick Actions */}
-        <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-base font-semibold">
-              <div className="p-1.5 rounded-lg bg-secondary/10">
-                <TrendingUp className="h-4 w-4 text-secondary" />
-              </div>
-              Actions rapides
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {quickActions.map((action) => (
-                <button
-                  key={action.label}
-                  onClick={() => navigate(action.path)}
-                  className={`group flex flex-col items-center gap-3 p-5 rounded-xl border border-border/30 bg-gradient-to-br ${action.gradient} transition-all hover:shadow-md hover:scale-[1.02]`}
-                >
-                  <action.icon className={`h-7 w-7 ${action.iconColor} transition-transform group-hover:scale-110`} />
-                  <span className="text-sm font-medium">{action.label}</span>
-                </button>
-              ))}
+              {/* Recent Subscribers */}
+              <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
+                <CardHeader className="flex flex-row items-center justify-between pb-3">
+                  <CardTitle className="flex items-center gap-2 text-base font-semibold">
+                    <div className="p-1.5 rounded-lg bg-emerald-500/10">
+                      <Users className="h-4 w-4 text-emerald-400" />
+                    </div>
+                    Derniers abonnés
+                  </CardTitle>
+                  <Button variant="ghost" size="sm" onClick={() => navigate('/admin')} className="text-xs text-muted-foreground hover:text-foreground">
+                    Gérer <ArrowRight className="h-3.5 w-3.5 ml-1" />
+                  </Button>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  {stats.recentSubscribers.length === 0 ? (
+                    <div className="text-center py-8">
+                      <Users className="h-10 w-10 text-muted-foreground/30 mx-auto mb-2" />
+                      <p className="text-sm text-muted-foreground">Aucun abonné pour le moment</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {stats.recentSubscribers.map((sub) => (
+                        <div key={sub.id} className="group flex items-center justify-between p-3 rounded-xl border border-transparent hover:border-border/50 hover:bg-muted/30 transition-all">
+                          <div className="flex items-center gap-3">
+                            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-xs font-bold text-primary">
+                              {sub.email.charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                              <p className="font-medium text-sm">{sub.email}</p>
+                              <p className="text-xs text-muted-foreground">{formatDate(sub.created_at)}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <Badge className={`text-[10px] px-2 py-0.5 border ${getPlanColor(sub.plan_tier)}`}>
+                              {sub.plan_tier === 'vip' && <Crown className="h-3 w-3 mr-1" />}
+                              {sub.plan_tier.toUpperCase()}
+                            </Badge>
+                            <div className={`w-2 h-2 rounded-full ${sub.status === 'active' ? 'bg-emerald-400 shadow-sm shadow-emerald-400/50' : 'bg-muted-foreground/30'}`} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
             </div>
-          </CardContent>
-        </Card>
+
+            {/* Quick Actions */}
+            <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-base font-semibold">
+                  <div className="p-1.5 rounded-lg bg-secondary/10">
+                    <TrendingUp className="h-4 w-4 text-secondary" />
+                  </div>
+                  Actions rapides
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {quickActions.map((action) => (
+                    <button
+                      key={action.label}
+                      onClick={() => navigate(action.path)}
+                      className={`group flex flex-col items-center gap-3 p-5 rounded-xl border border-border/30 bg-gradient-to-br ${action.gradient} transition-all hover:shadow-md hover:scale-[1.02]`}
+                    >
+                      <action.icon className={`h-7 w-7 ${action.iconColor} transition-transform group-hover:scale-110`} />
+                      <span className="text-sm font-medium">{action.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="subscribers" className="mt-4">
+            <SubscribersTable
+              subscribers={allSubscribers}
+              loading={loadingSubs}
+              onRefresh={fetchAllSubscribers}
+            />
+          </TabsContent>
+        </Tabs>
       </div>
 
       <SubscriberActivityPopup />
