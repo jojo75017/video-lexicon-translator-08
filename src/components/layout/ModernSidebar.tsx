@@ -13,7 +13,8 @@ import {
   Layers,
   ListChecks, Play,
   Glasses, ClipboardCheck, Megaphone,
-  ChevronsUpDown, Plus, Minus
+  ChevronsUpDown, Plus, Minus,
+  Gift, MessageCircle
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -141,6 +142,8 @@ const allToolGroups: ToolGroup[] = [
       { id: 'projects', label: 'Mes Projets', icon: FolderOpen },
       { id: 'ebook-library', label: 'Ma Bibliothèque', icon: Library },
       { id: 'subscription', label: 'Abonnement', icon: CreditCard },
+      { id: 'parrainage', label: '🎁 Parrainage 30€', icon: Gift, isLink: true, href: '/parrainage' },
+      { id: 'communaute', label: '💬 Communauté', icon: MessageCircle, isLink: true, href: '/communaute' },
       { id: 'settings', label: 'Paramètres', icon: Settings },
       { id: 'admin-subscribers', label: '👥 Mes Abonnés', icon: Users, isLink: true, href: '/admin', adminOnly: true },
       { id: 'admin', label: 'Admin Panel', icon: Shield, isLink: true, href: '/admin', adminOnly: true },
@@ -206,6 +209,8 @@ const TOOL_TOOLTIPS: Record<string, string> = {
   'projects': 'Reprends tes projets ebook en cours.',
   'ebook-library': 'Bibliothèque de tous tes ebooks publiés.',
   'subscription': 'Gère ton abonnement et ton quota.',
+  'parrainage': 'Gagne 30€ par filleul qui s\'abonne via ton lien.',
+  'communaute': 'Forum entre abonnés : entraide, retours, astuces.',
   'settings': 'Configure ta clé API Gemini (BYOK) et tes préférences.',
   'admin-subscribers': 'Liste complète des abonnés (admin).',
   'admin': 'Panneau d\'administration (admin).',
