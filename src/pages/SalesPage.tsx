@@ -276,7 +276,42 @@ const SalesPage = () => {
           ]
         })}</script>
       </Helmet>
-      
+
+      {/* ═══════════════════════════════════════ STICKY ACCESS BANNER (connected users) ═══════════════════════════════════════ */}
+      {(hasSubscriberAccess || hasAdminSession) && (
+        <div className="sticky top-0 z-50 bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg">
+          <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3 px-4 py-2.5">
+            <div className="flex items-center gap-2 text-sm font-medium">
+              <CheckCircle className="w-4 h-4 flex-shrink-0" />
+              <span>
+                {hasAdminSession ? 'Session admin active' : 'Abonnement actif détecté'}
+                {hasWorkflowProgress && ' — projet en cours sauvegardé'}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              {hasAdminSession && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => navigate('/admin')}
+                  className="bg-white/10 border-white/30 text-white hover:bg-white/20 h-8"
+                >
+                  Admin
+                </Button>
+              )}
+              <Button
+                size="sm"
+                onClick={() => navigate('/ebook-planner')}
+                className="bg-white text-emerald-700 hover:bg-white/90 font-bold h-8"
+              >
+                <Rocket className="w-3.5 h-3.5 mr-1.5" />
+                Accéder au Générateur
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ═══════════════════════════════════════ URGENCY BANNER ═══════════════════════════════════════ */}
       <UrgencyBanner />
 
