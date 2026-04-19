@@ -40,7 +40,9 @@ const Dashboard: React.FC = () => {
     totalProjects: 0, totalSubscribers: 0, activeSubscribers: 0,
     totalAudiobooks: 0, totalWorkflowResults: 0, recentProjects: [], recentSubscribers: [],
   });
+  const [allSubscribers, setAllSubscribers] = useState<Subscriber[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingSubs, setLoadingSubs] = useState(true);
 
   const fetchStats = async () => {
     setLoading(true);
@@ -64,7 +66,20 @@ const Dashboard: React.FC = () => {
     finally { setLoading(false); }
   };
 
-  useEffect(() => { fetchStats(); }, []);
+  const fetchAllSubscribers = async () => {
+    setLoadingSubs(true);
+    try {
+      const { data, error } = await supabase
+        .from('subscribers')
+        .select('id, email, access_code, plan_type, plan_tier, status, created_at, expires_at')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      setAllSubscribers(data || []);
+    } catch (err) { console.error('Subscribers fetch error:', err); }
+    finally { setLoadingSubs(false); }
+  };
+
+  useEffect(() => { fetchStats(); fetchAllSubscribers(); }, []);
 
   const handleResumeGenerator = () => {
     try { localStorage.setItem('ebook_planner_active_tab', 'workflow-dashboard'); } catch {}
