@@ -1,15 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import SubscriberActivityPopup from '@/components/admin/SubscriberActivityPopup';
+import { SubscribersTable } from '@/components/admin/SubscribersTable';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
   BookOpen, Users, TrendingUp, Clock, FileText, Headphones, 
-  BarChart3, ArrowRight, RefreshCw, Zap, Activity, Crown, Sparkles
+  BarChart3, ArrowRight, RefreshCw, Zap, Activity, Crown, Sparkles, LayoutDashboard
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AdminPanelNav } from '@/components/admin/AdminPanelNav';
 import { supabase } from '@/integrations/supabase/client';
+
+interface Subscriber {
+  id: string;
+  email: string;
+  access_code: string | null;
+  plan_type: string;
+  plan_tier: string;
+  status: string;
+  created_at: string;
+  expires_at: string | null;
+}
 
 interface DashboardStats {
   totalProjects: number;
