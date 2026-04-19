@@ -637,11 +637,15 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   const duplicateChapter = (chapterId: string) => {
     const chapterToDuplicate = chapters.find(c => c.id === chapterId);
     if (!chapterToDuplicate) return;
+    const newChapterId = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const duplicatedChapter: Chapter = {
       ...chapterToDuplicate,
-      id: Date.now().toString(),
+      id: newChapterId,
       title: `${chapterToDuplicate.title} (copie)`,
-      subChapters: chapterToDuplicate.subChapters.map(sub => ({ ...sub, id: (Date.now() + Math.random()).toString() }))
+      subChapters: chapterToDuplicate.subChapters.map(sub => ({
+        ...sub,
+        id: (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      })),
     };
     const originalIndex = chapters.findIndex(c => c.id === chapterId);
     const newChapters = [...chapters];
@@ -798,12 +802,13 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           if (!authorName) setAuthorName(planData.author);
           setPreface(planData.preface);
           setConclusion(planData.conclusion);
-          const generatedChapters = planData.chapters.map((chapter: any, index: number) => ({
-            id: (Date.now() + index).toString(),
+          const makeId = () => (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+          const generatedChapters = planData.chapters.map((chapter: any) => ({
+            id: makeId(),
             title: chapter.title,
             content: '',
-            subChapters: chapter.subChapters.map((sub: string, subIndex: number) => ({
-              id: (Date.now() + index * 100 + subIndex).toString(),
+            subChapters: chapter.subChapters.map((sub: string) => ({
+              id: makeId(),
               title: sub,
               content: ''
             }))
