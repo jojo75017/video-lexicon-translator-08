@@ -946,10 +946,17 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       toast.success('🎉 Ebook complet généré avec cohérence !');
       fireStars();
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erreur génération complète:', error);
-      toast.error('Erreur lors de la génération');
+      const msg = error?.message || '';
+      if (msg.includes('429') || /quota|limite/i.test(msg)) {
+        toast.error('⚠️ Quota Gemini atteint. Patientez ~60s puis relancez.');
+      } else {
+        toast.error('Erreur lors de la génération. Vérifiez votre clé Gemini et réessayez.');
+      }
     } finally {
+      generationLockRef.current = false;
+      frozenProjectTitleRef.current = null;
       setIsGeneratingComplete(false);
       setGenerationProgress({ current: 0, total: 0, currentItem: '' });
     }
