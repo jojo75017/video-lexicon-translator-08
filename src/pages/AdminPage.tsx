@@ -14,6 +14,7 @@ import { usePaymentNotifications } from '@/hooks/usePaymentNotifications';
 import { usePaymentConfirmations } from '@/hooks/usePaymentConfirmations';
 import { format } from 'date-fns';
 import { AdminPanelNav } from '@/components/admin/AdminPanelNav';
+import { ErrorLogsViewer } from '@/components/admin/ErrorLogsViewer';
 
 export const AdminPage = () => {
   const [email, setEmail] = useState('');
@@ -1146,6 +1147,8 @@ export const AdminPage = () => {
             <p>• Les abonnés suspendus ne peuvent plus générer de contenu</p>
           </div>
         </Card>
+
+        <ErrorLogsViewer />
       </div>
     </div>
   );
