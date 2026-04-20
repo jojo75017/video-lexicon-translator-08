@@ -60,6 +60,7 @@ const UpsellPaiementPage = () => {
   const handlePayPalClick = () => {
     if (email.trim()) {
       sessionStorage.setItem('payment_email', email.trim());
+      localStorage.setItem('payment_email_backup', email.trim());
     }
   };
 
@@ -69,6 +70,7 @@ const UpsellPaiementPage = () => {
       return;
     }
     sessionStorage.setItem('payment_email', email.trim());
+    localStorage.setItem('payment_email_backup', email.trim());
     navigate('/confirmation-paiement');
   };
 

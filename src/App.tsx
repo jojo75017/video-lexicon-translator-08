@@ -9,6 +9,7 @@ import { AdminGate } from '@/components/auth/AdminGate';
 import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
 import { Loader2 } from 'lucide-react';
 import SubscriberActivityPopup from '@/components/admin/SubscriberActivityPopup';
+import { FirstEbookOnboarding } from '@/components/onboarding/FirstEbookOnboarding';
 
 // Lazy-loaded pages for performance
 const EbookPlannerPage = lazy(() => import('./pages/EbookPlannerPage'));
@@ -97,10 +98,11 @@ const App = () => {
 
   useEffect(() => {
     // Safety timeout FIRST: never leave the app stuck on loader
+    // 6s is enough — initial localStorage check is synchronous, only Supabase admin check is async
     const safetyTimer = setTimeout(() => {
       console.warn('Safety timer triggered – forcing auth check complete');
       setIsCheckingAuth(false);
-    }, 12000);
+    }, 6000);
 
     const initAuth = async () => {
       // Check subscriber auth (client cache) — fast, localStorage only
@@ -495,6 +497,8 @@ const App = () => {
           </Suspense>
           {/* Admin: popup flottant abonnés visible sur toutes les pages */}
           <SubscriberActivityPopup />
+          {/* Onboarding 1er ebook (modal one-shot après inscription) */}
+          {isAuthenticated && <FirstEbookOnboarding subscriberEmail={subscriberEmail} />}
           <Toaster />
         </div>
       </TooltipProvider>

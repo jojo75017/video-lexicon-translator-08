@@ -47,9 +47,10 @@ const PaiementManuelPage = () => {
   };
 
   const handlePayPalClick = () => {
-    // Sauvegarder l'email pour la page de confirmation
+    // Sauvegarder l'email (sessionStorage + localStorage backup pour résister aux fermetures d'onglet)
     if (email.trim()) {
       sessionStorage.setItem('payment_email', email.trim());
+      localStorage.setItem('payment_email_backup', email.trim());
     }
   };
 
@@ -59,6 +60,7 @@ const PaiementManuelPage = () => {
       return;
     }
     sessionStorage.setItem('payment_email', email.trim());
+    localStorage.setItem('payment_email_backup', email.trim());
     navigate('/confirmation-paiement');
   };
 
