@@ -3,7 +3,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Loader2, RefreshCw, Trash2, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 
@@ -111,7 +110,7 @@ export const ErrorLogsViewer = () => {
         ) : logs.length === 0 ? (
           <p className="text-center text-muted-foreground py-8">Aucune erreur 🎉</p>
         ) : (
-          <ScrollArea className="h-[500px] pr-3">
+          <div className="h-[500px] overflow-y-auto pr-3">
             <div className="space-y-2">
               {logs.map((log) => (
                 <div key={log.id} className="rounded-lg border p-3 text-sm">
@@ -146,7 +145,7 @@ export const ErrorLogsViewer = () => {
                 </div>
               ))}
             </div>
-          </ScrollArea>
+          </div>
         )}
       </CardContent>
     </Card>
