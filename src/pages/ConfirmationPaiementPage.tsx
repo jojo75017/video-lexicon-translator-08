@@ -12,13 +12,12 @@ const ConfirmationPaiementPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  // Récupérer l'email sauvegardé depuis la page de paiement
+  // Récupérer l'email sauvegardé depuis la page de paiement (sessionStorage prioritaire, puis localStorage fallback)
+  // IMPORTANT : on NE supprime PAS l'email immédiatement — l'utilisateur peut recharger la page avant submit.
+  // Le nettoyage se fait après envoi réussi de la confirmation.
   useEffect(() => {
-    const savedEmail = sessionStorage.getItem('payment_email');
-    if (savedEmail) {
-      setEmail(savedEmail);
-      sessionStorage.removeItem('payment_email');
-    }
+    const saved = sessionStorage.getItem('payment_email') || localStorage.getItem('payment_email_backup');
+    if (saved) setEmail(saved);
   }, []);
 
   const validateEmail = (email: string) => {
@@ -41,28 +40,43 @@ const ConfirmationPaiementPage = () => {
     setIsSubmitting(true);
 
     try {
+      const cleanEmail = email.trim().toLowerCase();
+
       const { error } = await supabase
         .from("payment_confirmations")
-        .insert({ email: email.trim().toLowerCase() });
+        .insert({ email: cleanEmail });
 
       if (error) throw error;
 
-      // Notifier l'admin par email
-      await supabase.functions.invoke('notify-admin-confirmation', {
-        body: { email: email.trim().toLowerCase(), timestamp: new Date().toISOString() }
-      });
+      // Notifier l'admin par email (best-effort, on ne bloque pas l'utilisateur si ça échoue)
+      try {
+        await supabase.functions.invoke('notify-admin-confirmation', {
+          body: { email: cleanEmail, timestamp: new Date().toISOString() }
+        });
+      } catch (notifyErr) {
+        console.warn('notify-admin-confirmation failed:', notifyErr);
+        // L'enregistrement en DB suffit, l'admin verra dans /admin
+      }
 
       // Track referral conversion if there's a referral code
       const referralCode = sessionStorage.getItem('referral_code');
       if (referralCode) {
-        await supabase.functions.invoke('track-referral', {
-          body: { action: 'track', referral_code: referralCode, referred_email: email.trim().toLowerCase() }
-        });
-        await supabase.functions.invoke('track-referral', {
-          body: { action: 'convert', referred_email: email.trim().toLowerCase() }
-        });
-        sessionStorage.removeItem('referral_code');
+        try {
+          await supabase.functions.invoke('track-referral', {
+            body: { action: 'track', referral_code: referralCode, referred_email: cleanEmail }
+          });
+          await supabase.functions.invoke('track-referral', {
+            body: { action: 'convert', referred_email: cleanEmail }
+          });
+          sessionStorage.removeItem('referral_code');
+        } catch (refErr) {
+          console.warn('track-referral failed:', refErr);
+        }
       }
+
+      // Nettoyage : maintenant qu'on a confirmé, on peut purger les caches
+      sessionStorage.removeItem('payment_email');
+      localStorage.removeItem('payment_email_backup');
 
       setIsSubmitted(true);
       toast.success("Confirmation envoyée ! Vous recevrez votre code sous peu.");
