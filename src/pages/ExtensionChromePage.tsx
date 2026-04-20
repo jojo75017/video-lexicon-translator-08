@@ -1,4 +1,4 @@
-import { Helmet } from 'react-helmet-async';
+import { Helmet } from 'react-helmet';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { Download, Check, Chrome, Sparkles, ArrowLeft, Zap, Eye, Target, ShieldCheck } from 'lucide-react';

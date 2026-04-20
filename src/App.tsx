@@ -78,6 +78,7 @@ const Dashboard = lazy(() => import('./pages/Dashboard'));
 const KdpAdsGuidePage = lazy(() => import('./pages/KdpAdsGuidePage'));
 const ToolsGuidePage = lazy(() => import('./pages/ToolsGuidePage'));
 const RecuperationCodePage = lazy(() => import('./pages/RecuperationCodePage'));
+const ExtensionChromePage = lazy(() => import('./pages/ExtensionChromePage'));
 
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center bg-background">
@@ -244,6 +245,7 @@ const App = () => {
 
             <Route path="/" element={<Navigate to="/offres" replace />} />
             <Route path="/offres" element={<SalesPage />} />
+            <Route path="/extension-chrome" element={<ExtensionChromePage />} />
             <Route path="/mentions-legales" element={<MentionsLegales />} />
             <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
             <Route path="/cgv" element={<CGV />} />
