@@ -9,6 +9,7 @@ import { AdminGate } from '@/components/auth/AdminGate';
 import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
 import { Loader2 } from 'lucide-react';
 import SubscriberActivityPopup from '@/components/admin/SubscriberActivityPopup';
+import { FirstEbookOnboarding } from '@/components/onboarding/FirstEbookOnboarding';
 
 // Lazy-loaded pages for performance
 const EbookPlannerPage = lazy(() => import('./pages/EbookPlannerPage'));
@@ -496,6 +497,8 @@ const App = () => {
           </Suspense>
           {/* Admin: popup flottant abonnés visible sur toutes les pages */}
           <SubscriberActivityPopup />
+          {/* Onboarding 1er ebook (modal one-shot après inscription) */}
+          {isAuthenticated && <FirstEbookOnboarding subscriberEmail={subscriberEmail} />}
           <Toaster />
         </div>
       </TooltipProvider>
