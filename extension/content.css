@@ -1,0 +1,53 @@
+#ebkstudio-badge {
+  position: fixed;
+  top: 90px;
+  right: 20px;
+  width: 280px;
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.18);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  z-index: 999999;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  animation: ebk-in 0.3s ease-out;
+}
+@keyframes ebk-in {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+#ebkstudio-badge .ebk-head {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 14px; background: linear-gradient(135deg, #FF9E2D, #008296); color: white;
+  font-weight: 600; font-size: 13px;
+}
+#ebkstudio-badge .ebk-close {
+  background: rgba(255,255,255,0.25); border: none; color: white;
+  width: 22px; height: 22px; border-radius: 50%; cursor: pointer; font-size: 14px; line-height: 1;
+}
+#ebkstudio-badge .ebk-score-row {
+  display: flex; align-items: center; gap: 12px; padding: 16px 14px 8px;
+}
+#ebkstudio-badge .ebk-score {
+  width: 70px; height: 70px; border-radius: 50%;
+  border: 5px solid var(--c); display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+#ebkstudio-badge .ebk-score-num { font-size: 22px; font-weight: 800; color: #232F3E; line-height: 1; }
+#ebkstudio-badge .ebk-score-lbl { font-size: 10px; color: #6b7280; }
+#ebkstudio-badge .ebk-verdict {
+  flex: 1; color: white; padding: 10px; border-radius: 8px; text-align: center;
+  font-weight: 700; font-size: 13px;
+}
+#ebkstudio-badge .ebk-stats {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 8px 14px 12px;
+}
+#ebkstudio-badge .ebk-stat {
+  background: #f9fafb; border-radius: 8px; padding: 8px; display: flex; flex-direction: column;
+}
+#ebkstudio-badge .ebk-stat span { font-size: 10px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.3px; }
+#ebkstudio-badge .ebk-stat b { font-size: 14px; color: #232F3E; margin-top: 2px; }
+#ebkstudio-badge .ebk-cta {
+  display: block; text-align: center; padding: 11px; background: #232F3E; color: white !important;
+  text-decoration: none; font-weight: 600; font-size: 12px;
+}
+#ebkstudio-badge .ebk-cta:hover { background: #FF9E2D; }
