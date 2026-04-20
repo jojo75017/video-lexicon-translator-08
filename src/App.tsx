@@ -97,10 +97,11 @@ const App = () => {
 
   useEffect(() => {
     // Safety timeout FIRST: never leave the app stuck on loader
+    // 6s is enough — initial localStorage check is synchronous, only Supabase admin check is async
     const safetyTimer = setTimeout(() => {
       console.warn('Safety timer triggered – forcing auth check complete');
       setIsCheckingAuth(false);
-    }, 12000);
+    }, 6000);
 
     const initAuth = async () => {
       // Check subscriber auth (client cache) — fast, localStorage only
