@@ -348,10 +348,27 @@ export const WorkflowDashboard: React.FC<WorkflowDashboardProps> = ({
                   id="workflow-book-chapter-count"
                   type="number"
                   min="3"
-                  max="100"
+                  max="30"
                   value={numberOfChapters}
-                  onChange={(e) => onUpdateNumberOfChapters?.(parseInt(e.target.value, 10) || 8)}
+                  onChange={(e) => {
+                    const val = parseInt(e.target.value, 10) || 8;
+                    onUpdateNumberOfChapters?.(Math.min(val, 30));
+                  }}
                 />
+                {numberOfChapters > 25 && (
+                  <p className="text-xs text-destructive flex items-start gap-1.5 mt-1">
+                    <span>⚠️</span>
+                    <span>
+                      Au-delà de 25 chapitres, des timeouts peuvent survenir.
+                      Maximum recommandé : 30 chapitres.
+                    </span>
+                  </p>
+                )}
+                {numberOfChapters >= 20 && numberOfChapters <= 25 && (
+                  <p className="text-xs text-amber-600 mt-1">
+                    💡 Volume élevé : prévoyez plus de temps de génération.
+                  </p>
+                )}
               </div>
             </div>
 
