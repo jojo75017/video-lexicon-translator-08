@@ -240,10 +240,23 @@ function parseJSON(content: string): any {
       try {
         return JSON.parse(jsonStr);
       } catch {
+        // Repair pass 1: trailing commas + newlines in strings
         jsonStr = jsonStr.replace(/,\s*([\]}])/g, '$1');
         jsonStr = jsonStr.replace(/(?<="[^"]*)\n(?=[^"]*")/g, '\\n');
         try {
           return JSON.parse(jsonStr);
+        } catch {}
+
+        // Repair pass 2: unquoted property names → "key":
+        // Matches { key: ... } or , key: ...
+        let repaired = jsonStr.replace(
+          /([{,]\s*)([a-zA-Z_][a-zA-Z0-9_]*)\s*:/g,
+          '$1"$2":'
+        );
+        // Repair pass 3: single quotes → double quotes (only for property values)
+        repaired = repaired.replace(/:\s*'([^']*)'/g, ': "$1"');
+        try {
+          return JSON.parse(repaired);
         } catch (e) {
           console.error('JSON parse failed after repair:', e);
         }
