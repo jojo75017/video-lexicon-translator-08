@@ -318,29 +318,30 @@ const SalesPage = () => {
       {/* ═══════════════════════════════════════ CHROME EXTENSION TOP BANNER ═══════════════════════════════════════ */}
       <a
         href="/extension-chrome"
-        className="block bg-gradient-to-r from-orange-500 via-primary to-teal-600 text-white hover:brightness-110 transition-all"
+        style={{ background: 'linear-gradient(90deg, #EA580C 0%, #C2410C 50%, #0F766E 100%)' }}
+        className="block hover:brightness-110 transition-all"
       >
-        <div className="max-w-6xl mx-auto px-4 py-2.5 flex items-center justify-center gap-3 text-sm font-semibold flex-wrap text-center">
+        <div className="max-w-6xl mx-auto px-4 py-2.5 flex items-center justify-center gap-3 text-sm font-semibold flex-wrap text-center" style={{ color: '#FFFFFF' }}>
           <span className="text-lg">🚀</span>
-          <span className="bg-white/20 px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider">Nouveau</span>
-          <span>Extension Chrome <strong>100% gratuite</strong> — Score de niche Amazon en 1 clic</span>
-          <span className="underline font-bold">Télécharger →</span>
+          <span className="px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider" style={{ backgroundColor: 'rgba(255,255,255,0.25)', color: '#FFFFFF' }}>Nouveau</span>
+          <span style={{ color: '#FFFFFF' }}>Extension Chrome <strong style={{ color: '#FFFFFF' }}>100% gratuite</strong> — Score de niche Amazon en 1 clic</span>
+          <span className="underline font-bold" style={{ color: '#FFFFFF' }}>Télécharger →</span>
         </div>
       </a>
 
       {/* ═══════════════════════════════════════ TOP BAR ═══════════════════════════════════════ */}
-      <div className="bg-gradient-to-r from-primary via-primary to-accent text-primary-foreground py-2.5 px-4">
-        <div className="max-w-6xl mx-auto flex items-center justify-center gap-4 text-sm font-semibold">
-          <Flame className="w-4 h-4" />
-          <span>OFFRE DE LANCEMENT — Fin le 30 juin 2026</span>
-          <div className="hidden sm:flex items-center gap-1.5 bg-background/20 rounded-lg px-3 py-1">
-            <span className="tabular-nums font-bold">{countdown.days}j</span>
-            <span>:</span>
-            <span className="tabular-nums font-bold">{countdown.hours}h</span>
-            <span>:</span>
-            <span className="tabular-nums font-bold">{countdown.minutes}m</span>
+      <div style={{ background: 'linear-gradient(90deg, #006064 0%, #00838F 100%)' }} className="py-2.5 px-4">
+        <div className="max-w-6xl mx-auto flex items-center justify-center gap-4 text-sm font-semibold" style={{ color: '#FFFFFF' }}>
+          <Flame className="w-4 h-4" style={{ color: '#FFFFFF' }} />
+          <span style={{ color: '#FFFFFF' }}>OFFRE DE LANCEMENT — Fin le 15 septembre 2026</span>
+          <div className="hidden sm:flex items-center gap-1.5 rounded-lg px-3 py-1" style={{ backgroundColor: 'rgba(255,255,255,0.2)', color: '#FFFFFF' }}>
+            <span className="tabular-nums font-bold" style={{ color: '#FFFFFF' }}>{countdown.days}j</span>
+            <span style={{ color: '#FFFFFF' }}>:</span>
+            <span className="tabular-nums font-bold" style={{ color: '#FFFFFF' }}>{countdown.hours}h</span>
+            <span style={{ color: '#FFFFFF' }}>:</span>
+            <span className="tabular-nums font-bold" style={{ color: '#FFFFFF' }}>{countdown.minutes}m</span>
           </div>
-          <Badge className="bg-card text-primary border-0 font-bold">−150€</Badge>
+          <Badge style={{ backgroundColor: '#FFFFFF', color: '#006064', border: 0 }} className="font-bold">−150€</Badge>
         </div>
       </div>
 
