@@ -27,6 +27,7 @@ export const SIDEBAR_SUBSECTIONS: Record<string, SidebarSectionConfig[]> = {
   '📣 Vendre': [
     { label: 'Marketing', itemIds: ['marketing', 'launch-plan'] },
     { label: 'Amazon Ads', itemIds: ['kdp-ads-guide'] },
+    { label: 'Bonus', itemIds: ['chrome-extension'] },
   ],
   '⚙️ Mon Compte': [
     { label: 'Espace', itemIds: ['projects', 'ebook-library', 'settings', 'subscription'] },
@@ -42,6 +43,6 @@ export const ESSENTIAL_TOOL_IDS: Record<string, string[]> = {
   '🤖 Workflow IA': ['workflow-dashboard', 'complete-workflow', 'editorial-director'],
   '✍️ Écriture': ['planner', 'writing', 'aichat', 'characters'],
   '📦 Publier': ['export', 'cover-design-editor', 'kdp', 'audio-express'],
-  '📣 Vendre': ['marketing', 'launch-plan', 'kdp-ads-guide'],
+  '📣 Vendre': ['marketing', 'launch-plan', 'kdp-ads-guide', 'chrome-extension'],
   '⚙️ Mon Compte': ['projects', 'ebook-library', 'subscription', 'settings'],
 };

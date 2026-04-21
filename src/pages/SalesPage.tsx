@@ -773,6 +773,33 @@ const SalesPage = () => {
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mt-6">
             <CountdownTimer />
           </motion.div>
+
+          {/* Bonus Chrome Extension Banner */}
+          <motion.a
+            href="/extension-chrome"
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            whileHover={{ scale: 1.01 }}
+            className="mt-4 flex items-center justify-between gap-3 rounded-xl border-2 border-primary/30 bg-gradient-to-r from-orange-500/10 via-primary/10 to-teal-500/10 px-4 py-3 hover:border-primary transition-all group"
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <span className="flex-shrink-0 inline-flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-orange-500 to-teal-600 text-white text-lg">
+                🚀
+              </span>
+              <div className="min-w-0">
+                <div className="text-sm font-bold text-foreground truncate">
+                  <span className="text-primary">NOUVEAU</span> — Extension Chrome 100% gratuite
+                </div>
+                <div className="text-xs text-muted-foreground truncate">
+                  Score de niche Amazon en 1 clic — sans inscription
+                </div>
+              </div>
+            </div>
+            <span className="flex-shrink-0 text-sm font-semibold text-primary group-hover:translate-x-1 transition-transform">
+              Télécharger →
+            </span>
+          </motion.a>
         </div>
       </section>
 
