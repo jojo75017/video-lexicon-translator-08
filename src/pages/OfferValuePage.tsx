@@ -508,7 +508,7 @@ const OfferValuePage = () => {
                 Pourquoi le prix passera-t-il à 247€ ?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground">
-                Le tarif actuel de 67€ est un prix de lancement exceptionnel pour remercier nos premiers utilisateurs. Le 1er juillet, le prix passera à 147€ pour refléter la valeur réelle de l'outil.
+                Le tarif actuel de 67€ est un prix de lancement exceptionnel pour remercier nos premiers utilisateurs. Le 15 septembre 2026 (après les vacances d'été), le prix passera à 147€ pour refléter la valeur réelle de l'outil.
               </AccordionContent>
             </AccordionItem>
 
