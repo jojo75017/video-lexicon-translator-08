@@ -47,7 +47,7 @@ const stagger = {
 // Prix
 const LAUNCH_PRICE = 67;
 const NORMAL_PRICE = 147;
-const LAUNCH_END = new Date('2026-06-30T23:59:59').getTime();
+const LAUNCH_END = new Date('2026-09-15T23:59:59').getTime();
 
 const useCountdown = (targetDate: number) => {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
@@ -244,7 +244,7 @@ const SalesPage = () => {
             "price": "67",
             "priceCurrency": "EUR",
             "availability": "https://schema.org/InStock",
-            "priceValidUntil": "2026-06-30",
+            "priceValidUntil": "2026-09-15",
             "url": "https://ebookstudio.fr/offres"
           },
           "aggregateRating": {
@@ -270,7 +270,7 @@ const SalesPage = () => {
             { "@type": "Question", "name": "Puis-je vendre les ebooks générés sur Amazon KDP ?", "acceptedAnswer": { "@type": "Answer", "text": "Oui, vous gardez 100% des droits sur tout ce que vous créez. Nos outils KDP intégrés vous aident à maximiser vos ventes." } },
             { "@type": "Question", "name": "Combien de temps faut-il pour créer un ebook complet ?", "acceptedAnswer": { "@type": "Answer", "text": "Avec le workflow en 7 étapes guidées par l'IA, vous pouvez avoir un ebook complet en moins d'une heure." } },
             { "@type": "Question", "name": "Que se passe-t-il si je ne suis pas satisfait ?", "acceptedAnswer": { "@type": "Answer", "text": "Nous offrons une garantie satisfait ou remboursé de 30 jours, sans condition." } },
-            { "@type": "Question", "name": "Le prix de 67€ va-t-il augmenter ?", "acceptedAnswer": { "@type": "Answer", "text": "Oui. Le prix normal passera à 147€ le 1er juillet. Le tarif de lancement est à 67€ à vie avec toutes les futures mises à jour incluses." } },
+            { "@type": "Question", "name": "Le prix de 67€ va-t-il augmenter ?", "acceptedAnswer": { "@type": "Answer", "text": "Oui. Le prix normal passera à 147€ le 15 septembre 2026. Le tarif de lancement est à 67€ à vie avec toutes les futures mises à jour incluses." } },
             { "@type": "Question", "name": "Puis-je créer des audiobooks et des BD ?", "acceptedAnswer": { "@type": "Answer", "text": "Oui ! EbookStudio inclut un module audiobook et un module BD/Comics. Tout est inclus sans surcoût." } },
             { "@type": "Question", "name": "Comment fonctionne le paiement en plusieurs fois ?", "acceptedAnswer": { "@type": "Answer", "text": "Vous pouvez payer en 2 fois (2×35€) ou 3 fois (3×25€) via PayPal. Accès immédiat dès le premier paiement." } }
           ]
@@ -314,6 +314,19 @@ const SalesPage = () => {
 
       {/* ═══════════════════════════════════════ URGENCY BANNER ═══════════════════════════════════════ */}
       <UrgencyBanner />
+
+      {/* ═══════════════════════════════════════ CHROME EXTENSION TOP BANNER ═══════════════════════════════════════ */}
+      <a
+        href="/extension-chrome"
+        className="block bg-gradient-to-r from-orange-500 via-primary to-teal-600 text-white hover:brightness-110 transition-all"
+      >
+        <div className="max-w-6xl mx-auto px-4 py-2.5 flex items-center justify-center gap-3 text-sm font-semibold flex-wrap text-center">
+          <span className="text-lg">🚀</span>
+          <span className="bg-white/20 px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider">Nouveau</span>
+          <span>Extension Chrome <strong>100% gratuite</strong> — Score de niche Amazon en 1 clic</span>
+          <span className="underline font-bold">Télécharger →</span>
+        </div>
+      </a>
 
       {/* ═══════════════════════════════════════ TOP BAR ═══════════════════════════════════════ */}
       <div className="bg-gradient-to-r from-primary via-primary to-accent text-primary-foreground py-2.5 px-4">
