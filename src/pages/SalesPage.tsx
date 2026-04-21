@@ -634,7 +634,14 @@ const SalesPage = () => {
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════ PRICING ═══════════════════════════════════════ */}
+      {/* ═══════════════════════════════════════ BLACK PACK PRICING (refonte sombre premium) ═══════════════════════════════════════ */}
+      <BlackPackPricing
+        onCtaClick={handlePlanClick}
+        launchPrice={LAUNCH_PRICE}
+        normalPrice={NORMAL_PRICE}
+      />
+
+      {/* ═══════════════════════════════════════ PRICING (détails complets) ═══════════════════════════════════════ */}
       <section id="pricing" className="py-20 px-4 relative">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_50%,hsl(var(--primary)/0.06),transparent)]" />
         
