@@ -794,22 +794,23 @@ const SalesPage = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             whileHover={{ scale: 1.01 }}
-            className="mt-4 flex items-center justify-between gap-3 rounded-xl border-2 border-primary/30 bg-gradient-to-r from-orange-500/10 via-primary/10 to-teal-500/10 px-4 py-3 hover:border-primary transition-all group"
+            className="mt-4 flex items-center justify-between gap-3 rounded-xl border-2 border-white/30 bg-gradient-to-r from-orange-500 via-orange-400 to-teal-600 px-4 py-3 hover:border-white/60 transition-all group shadow-lg"
           >
             <div className="flex items-center gap-3 min-w-0">
-              <span className="flex-shrink-0 inline-flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-orange-500 to-teal-600 text-white text-lg">
+              <span className="flex-shrink-0 inline-flex items-center justify-center w-9 h-9 rounded-lg bg-white/20 backdrop-blur text-white text-lg">
                 🚀
               </span>
               <div className="min-w-0">
-                <div className="text-sm font-bold text-foreground truncate">
-                  <span className="text-primary">NOUVEAU</span> — Extension Chrome 100% gratuite
+                <div className="text-sm font-bold text-white truncate">
+                  <span className="bg-white/25 text-white px-1.5 py-0.5 rounded text-[10px] font-extrabold mr-1">NOUVEAU</span>
+                  Extension Chrome 100% gratuite
                 </div>
-                <div className="text-xs text-muted-foreground truncate">
+                <div className="text-xs text-white/90 truncate">
                   Score de niche Amazon en 1 clic — sans inscription
                 </div>
               </div>
             </div>
-            <span className="flex-shrink-0 text-sm font-semibold text-primary group-hover:translate-x-1 transition-transform">
+            <span className="flex-shrink-0 text-sm font-bold text-white group-hover:translate-x-1 transition-transform">
               Télécharger →
             </span>
           </motion.a>
