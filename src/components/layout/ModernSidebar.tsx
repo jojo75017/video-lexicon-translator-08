@@ -14,7 +14,7 @@ import {
   ListChecks, Play,
   Glasses, ClipboardCheck, Megaphone,
   ChevronsUpDown, Plus, Minus,
-  Gift, MessageCircle
+  Gift, MessageCircle, Chrome
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -132,6 +132,7 @@ const allToolGroups: ToolGroup[] = [
       { id: 'marketing', label: 'Posts Réseaux Sociaux', icon: Megaphone },
       { id: 'launch-plan', label: 'Plan Lancement', icon: Rocket },
       { id: 'kdp-ads-guide', label: 'Guide KDP Ads', icon: TrendingUp },
+      { id: 'chrome-extension', label: '🎁 Extension Chrome', icon: Chrome, isLink: true, href: '/extension-chrome', isNew: true },
     ]
   },
   {
@@ -205,6 +206,7 @@ const TOOL_TOOLTIPS: Record<string, string> = {
   'marketing': 'Génère des posts pour Facebook, Instagram, LinkedIn.',
   'launch-plan': 'Plan de lancement complet sur 30 jours.',
   'kdp-ads-guide': 'Guide pour configurer des campagnes Amazon Ads rentables.',
+  'chrome-extension': 'Extension Chrome gratuite : score de niche Amazon en 1 clic.',
   // Mon Compte
   'projects': 'Reprends tes projets ebook en cours.',
   'ebook-library': 'Bibliothèque de tous tes ebooks publiés.',
