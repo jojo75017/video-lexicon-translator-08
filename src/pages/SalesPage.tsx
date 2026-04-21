@@ -27,6 +27,8 @@ import ToolsNavigationBar from "@/components/sales/ToolsNavigationBar";
 import ToolsCounterBanner from "@/components/sales/ToolsCounterBanner";
 import KdpRocketParityTable from "@/components/sales/KdpRocketParityTable";
 import KdpAdsTeaser from "@/components/sales/KdpAdsTeaser";
+import BlackPackHero from "@/components/sales/BlackPackHero";
+import BlackPackPricing from "@/components/sales/BlackPackPricing";
 
 // ════════════════════════════════════════════════════════════════════════════════
 // DESIGN SYSTEM 2026 — Palette Premium
@@ -396,126 +398,51 @@ const SalesPage = () => {
         </div>
       </header>
 
-      {/* (ExclusiveFlashBanner supprimé — refonte) */}
+      {/* ═══════════════════════════════════════ BLACK PACK HERO (refonte sombre premium) ═══════════════════════════════════════ */}
+      <BlackPackHero
+        onCtaClick={handlePlanClick}
+        launchEnd={LAUNCH_END}
+        launchPrice={LAUNCH_PRICE}
+        normalPrice={NORMAL_PRICE}
+      />
 
-      {/* ═══════════════════════════════════════ HERO ═══════════════════════════════════════ */}
-      <section className="relative py-20 sm:py-28 px-4">
-        {/* Background effects */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,hsl(var(--primary)/0.1),transparent)]" />
-        <div className="absolute top-40 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-20 right-1/4 w-80 h-80 bg-accent/10 rounded-full blur-[100px] pointer-events-none" />
-        
-        <motion.div initial="hidden" animate="visible" variants={stagger} className="max-w-4xl mx-auto text-center relative z-10">
-          
-          <motion.div variants={fadeIn} className="mb-6">
-            <Badge className="bg-primary/10 text-primary border-primary/30 px-4 py-2 text-sm font-semibold">
-              <Cpu className="w-4 h-4 mr-2" />
-              Propulsé par Gemini 3 Flash & Imagen 3
-            </Badge>
-          </motion.div>
-
-          <motion.h1 variants={fadeIn} custom={1} className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-[1.05] tracking-tight mb-6">
-            Ton ebook mérite
-            <br />
-            <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-              Amazon KDP
-            </span>
-          </motion.h1>
-
-          <motion.p variants={fadeIn} custom={2} className="text-lg sm:text-xl text-foreground/80 mb-10 max-w-2xl mx-auto leading-relaxed">
-            15 agents IA qui rédigent, illustrent et publient ton livre — <span className="text-primary font-semibold">en moins d'une heure</span>.
-          </motion.p>
-
-          {/* Stats — façon KDP Rocket */}
-          <motion.div variants={fadeIn} custom={3} className="grid grid-cols-3 gap-4 sm:gap-8 max-w-2xl mx-auto mb-10">
-            {[
-              { value: "21", label: "outils pro" },
-              { value: "47 min", label: "par ebook" },
-              { value: "+347%", label: "ventes Amazon" },
-            ].map((stat, i) => (
-              <div key={i} className="text-center bg-card/60 border border-border rounded-2xl py-4 backdrop-blur">
-                <p className="text-2xl sm:text-4xl font-black bg-gradient-to-br from-primary to-accent bg-clip-text text-transparent">{stat.value}</p>
-                <p className="text-xs sm:text-sm text-muted-foreground mt-1">{stat.label}</p>
+      {/* Bandeau session détectée (utilisateurs connectés) */}
+      {(hasWorkflowProgress || hasSubscriberAccess || hasAdminSession) && (
+        <section className="py-6 px-4 bg-background">
+          <div className="mx-auto max-w-2xl rounded-2xl border border-primary/30 bg-card/70 p-4 sm:p-5 shadow-lg shadow-primary/10 backdrop-blur-sm">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="text-left">
+                <p className="text-sm font-semibold text-primary">Session détectée</p>
+                <p className="text-sm text-muted-foreground">
+                  {hasWorkflowProgress
+                    ? 'Votre progression est sauvegardée : vous pouvez reprendre immédiatement.'
+                    : 'Votre accès a été détecté : vous pouvez rouvrir le générateur.'}
+                </p>
               </div>
-            ))}
-          </motion.div>
-
-          {(hasWorkflowProgress || hasSubscriberAccess || hasAdminSession) && (
-            <motion.div variants={fadeIn} custom={3.5} className="mb-8">
-              <div className="mx-auto max-w-2xl rounded-2xl border border-primary/30 bg-card/70 p-4 sm:p-5 shadow-lg shadow-primary/10 backdrop-blur-sm">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="text-left">
-                    <p className="text-sm font-semibold text-primary">Session détectée</p>
-                    <p className="text-sm text-muted-foreground">
-                      {hasWorkflowProgress
-                        ? 'Votre progression est sauvegardée : vous pouvez reprendre immédiatement.'
-                        : 'Votre accès a été détecté : vous pouvez rouvrir le générateur.'}
-                    </p>
-                  </div>
-
-                  <div className="flex flex-col gap-2 sm:flex-row">
-                    <Button
-                      type="button"
-                      onClick={() => navigate(hasAdminSession || hasSubscriberAccess ? '/ebook-planner' : '/subscription')}
-                      className="bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold rounded-xl"
-                    >
-                      <Rocket className="w-4 h-4 mr-2" />
-                      {hasAdminSession || hasSubscriberAccess ? 'Reprendre le générateur' : 'Retrouver mon accès'}
-                    </Button>
-
-                    {hasAdminSession && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => navigate('/admin')}
-                        className="border-primary/40 text-primary hover:text-foreground hover:bg-primary/10 rounded-xl"
-                      >
-                        Dashboard admin
-                      </Button>
-                    )}
-                  </div>
-                </div>
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <Button
+                  type="button"
+                  onClick={() => navigate(hasAdminSession || hasSubscriberAccess ? '/ebook-planner' : '/subscription')}
+                  className="bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold rounded-xl"
+                >
+                  <Rocket className="w-4 h-4 mr-2" />
+                  {hasAdminSession || hasSubscriberAccess ? 'Reprendre le générateur' : 'Retrouver mon accès'}
+                </Button>
+                {hasAdminSession && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => navigate('/admin')}
+                    className="border-primary/40 text-primary hover:text-foreground hover:bg-primary/10 rounded-xl"
+                  >
+                    Dashboard admin
+                  </Button>
+                )}
               </div>
-            </motion.div>
-          )}
-
-          {/* CTA Principal */}
-          <motion.div variants={fadeIn} custom={4} className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-5">
-            <Button size="lg" onClick={handlePlanClick}
-              className="w-full sm:w-auto text-lg px-10 py-7 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground font-bold rounded-2xl shadow-2xl shadow-primary/25 hover:shadow-primary/40 transition-all duration-300 hover:-translate-y-1">
-              <Rocket className="w-5 h-5 mr-2" />
-              Commencer maintenant — 67€
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Button>
-            <Button size="lg" variant="outline" onClick={() => document.getElementById('outils')?.scrollIntoView({ behavior: 'smooth' })}
-              className="w-full sm:w-auto text-base px-8 py-6 border-primary/50 text-primary hover:text-foreground hover:border-primary hover:bg-primary/10 rounded-2xl">
-              <Sparkles className="w-5 h-5 mr-2" />
-              Voir les 21 outils
-            </Button>
-          </motion.div>
-
-          {/* CTA Gratuit — capture de leads */}
-          <motion.div variants={fadeIn} custom={4.5} className="mb-6">
-            <a
-              href="https://www.trafic-affiliation.com/ebookstudio_capture"
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => trackCTAClick('hero_free_guide', 'capture_tunnel')}
-              className="inline-flex items-center gap-2 text-kdp-orange hover:text-kdp-orange/80 font-semibold text-sm transition-colors group"
-            >
-              <Gift className="w-4 h-4 group-hover:animate-bounce" />
-              Pas encore prêt ? Recevez notre guide gratuit : 10 Niches KDP Rentables
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </a>
-          </motion.div>
-
-          <motion.div variants={fadeIn} custom={5} className="flex flex-wrap justify-center gap-4 text-sm text-muted-foreground">
-            <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-primary" />Paiement unique</span>
-            <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-primary" />Accès à vie</span>
-            <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-primary" />Garantie 30 jours</span>
-          </motion.div>
-        </motion.div>
-      </section>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ═══════════════════════════════════════ NAV PILIERS (sticky) ═══════════════════════════════════════ */}
       <ToolsNavigationBar />
@@ -707,7 +634,14 @@ const SalesPage = () => {
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════ PRICING ═══════════════════════════════════════ */}
+      {/* ═══════════════════════════════════════ BLACK PACK PRICING (refonte sombre premium) ═══════════════════════════════════════ */}
+      <BlackPackPricing
+        onCtaClick={handlePlanClick}
+        launchPrice={LAUNCH_PRICE}
+        normalPrice={NORMAL_PRICE}
+      />
+
+      {/* ═══════════════════════════════════════ PRICING (détails complets) ═══════════════════════════════════════ */}
       <section id="pricing" className="py-20 px-4 relative">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_50%,hsl(var(--primary)/0.06),transparent)]" />
         
