@@ -43,7 +43,7 @@ const SalesFaq: React.FC = () => {
     },
     {
       question: "Le prix de 67€ va-t-il augmenter ?",
-      answer: "Oui. Le prix normal passera à 147€ le 1er juillet. Parce que j'accompagne les créateurs et que je veux rendre cet outil accessible, le tarif de lancement est à 67€ à vie avec toutes les futures mises à jour incluses. Profitez-en avant l'augmentation !"
+      answer: "Oui. Le prix normal passera à 147€ le 15 septembre 2026 (après les vacances d'été). Parce que j'accompagne les créateurs et que je veux rendre cet outil accessible, le tarif de lancement est à 67€ à vie avec toutes les futures mises à jour incluses. Profitez-en avant l'augmentation !"
     },
     {
       question: "Puis-je gagner de l'argent en recommandant EbookStudio ?",
