@@ -316,32 +316,55 @@ const SalesPage = () => {
       <UrgencyBanner />
 
       {/* ═══════════════════════════════════════ CHROME EXTENSION TOP BANNER ═══════════════════════════════════════ */}
-      <a
-        href="/extension-chrome"
-        style={{ background: 'linear-gradient(90deg, #EA580C 0%, #C2410C 50%, #0F766E 100%)' }}
-        className="block hover:brightness-110 transition-all"
+      <button
+        type="button"
+        onClick={() => navigate('/extension-chrome')}
+        className="block w-full transition-all hover:brightness-110"
+        style={{ background: 'linear-gradient(90deg, hsl(24 83% 53%) 0%, hsl(20 80% 44%) 46%, hsl(181 78% 32%) 100%)' }}
       >
-        <div className="max-w-6xl mx-auto px-4 py-2.5 flex items-center justify-center gap-3 text-sm font-semibold flex-wrap text-center" style={{ color: '#FFFFFF' }}>
-          <span className="text-lg">🚀</span>
-          <span className="px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider" style={{ backgroundColor: 'rgba(255,255,255,0.25)', color: '#FFFFFF' }}>Nouveau</span>
-          <span style={{ color: '#FFFFFF' }}>Extension Chrome <strong style={{ color: '#FFFFFF' }}>100% gratuite</strong> — Score de niche Amazon en 1 clic</span>
-          <span className="underline font-bold" style={{ color: '#FFFFFF' }}>Télécharger →</span>
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-3 px-4 py-3 text-center">
+          <div className="text-lg font-black" style={{ color: 'hsl(0 0% 100%)' }}>🚀</div>
+          <div
+            className="rounded-md px-2 py-0.5 text-xs font-black uppercase"
+            style={{ backgroundColor: 'hsl(0 0% 100% / 0.18)', color: 'hsl(0 0% 100%)' }}
+          >
+            Nouveau
+          </div>
+          <div className="text-sm font-bold sm:text-[15px]" style={{ color: 'hsl(0 0% 100%)' }}>
+            Extension Chrome <strong style={{ color: 'hsl(0 0% 100%)' }}>100% gratuite</strong> — Score de niche Amazon en 1 clic
+          </div>
+          <div className="text-sm font-black underline underline-offset-4" style={{ color: 'hsl(0 0% 100%)' }}>
+            Télécharger →
+          </div>
         </div>
-      </a>
+      </button>
 
       {/* ═══════════════════════════════════════ TOP BAR ═══════════════════════════════════════ */}
-      <div style={{ background: 'linear-gradient(90deg, #006064 0%, #00838F 100%)' }} className="py-2.5 px-4">
-        <div className="max-w-6xl mx-auto flex items-center justify-center gap-4 text-sm font-semibold" style={{ color: '#FFFFFF' }}>
-          <Flame className="w-4 h-4" style={{ color: '#FFFFFF' }} />
-          <span style={{ color: '#FFFFFF' }}>OFFRE DE LANCEMENT — Fin le 15 septembre 2026</span>
-          <div className="hidden sm:flex items-center gap-1.5 rounded-lg px-3 py-1" style={{ backgroundColor: 'rgba(255,255,255,0.2)', color: '#FFFFFF' }}>
-            <span className="tabular-nums font-bold" style={{ color: '#FFFFFF' }}>{countdown.days}j</span>
-            <span style={{ color: '#FFFFFF' }}>:</span>
-            <span className="tabular-nums font-bold" style={{ color: '#FFFFFF' }}>{countdown.hours}h</span>
-            <span style={{ color: '#FFFFFF' }}>:</span>
-            <span className="tabular-nums font-bold" style={{ color: '#FFFFFF' }}>{countdown.minutes}m</span>
+      <div
+        className="px-4 py-2.5"
+        style={{ background: 'linear-gradient(90deg, hsl(188 91% 24%) 0%, hsl(185 90% 30%) 100%)' }}
+      >
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-3 sm:gap-4">
+          <div className="flex items-center gap-2 text-sm font-black sm:text-[15px]" style={{ color: 'hsl(0 0% 100%)' }}>
+            <Flame className="h-4 w-4" style={{ color: 'hsl(0 0% 100%)' }} />
+            <div style={{ color: 'hsl(0 0% 100%)' }}>OFFRE DE LANCEMENT — Fin le 15 septembre 2026</div>
           </div>
-          <Badge style={{ backgroundColor: '#FFFFFF', color: '#006064', border: 0 }} className="font-bold">−150€</Badge>
+          <div
+            className="hidden items-center gap-1.5 rounded-lg px-3 py-1 sm:flex"
+            style={{ backgroundColor: 'hsl(0 0% 100% / 0.18)', color: 'hsl(0 0% 100%)' }}
+          >
+            <div className="tabular-nums font-black" style={{ color: 'hsl(0 0% 100%)' }}>{countdown.days}j</div>
+            <div style={{ color: 'hsl(0 0% 100%)' }}>:</div>
+            <div className="tabular-nums font-black" style={{ color: 'hsl(0 0% 100%)' }}>{countdown.hours}h</div>
+            <div style={{ color: 'hsl(0 0% 100%)' }}>:</div>
+            <div className="tabular-nums font-black" style={{ color: 'hsl(0 0% 100%)' }}>{countdown.minutes}m</div>
+          </div>
+          <Badge
+            className="border-0 font-black"
+            style={{ backgroundColor: 'hsl(0 0% 100%)', color: 'hsl(188 91% 24%)' }}
+          >
+            −150€
+          </Badge>
         </div>
       </div>
 
