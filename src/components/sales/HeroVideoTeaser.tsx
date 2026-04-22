@@ -12,7 +12,7 @@ const HeroVideoTeaser = () => {
             Vidéo de présentation
           </Badge>
           <h2 className="text-2xl md:text-4xl font-bold text-foreground">
-            La <span className="text-primary">révolution Amazon KDP</span> en 90 secondes
+            Découvrez <span className="text-primary">EbookStudio Pro</span> en vidéo
           </h2>
           <p className="text-muted-foreground mt-3 max-w-2xl mx-auto">
             Découvrez comment EbookStudio Pro automatise tout le workflow : du brief à la publication sur KDP.
@@ -27,7 +27,7 @@ const HeroVideoTeaser = () => {
           className="relative rounded-2xl overflow-hidden shadow-2xl shadow-primary/20 border-2 border-primary/20 bg-card aspect-video group"
         >
           <video
-            src="/videos/ebookstudio-presentation.mp4"
+            src="/videos/revolution-amazon-kdp-ebookstudio-pro.mp4?v=4"
             controls
             playsInline
             preload="metadata"
