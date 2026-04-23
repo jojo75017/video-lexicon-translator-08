@@ -6,62 +6,18 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
   try {
-    const { bookData } = await req.json();
-    if (!bookData) {
-      return new Response(JSON.stringify({ success: false, error: 'Données du livre requises' }), {
-        status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
+    const { bookData, csvSummary, auditType = 'book' } = await req.json();
+    if (!bookData && !csvSummary) return jsonResponse({ success: false, error: 'Données requises pour l’audit' }, 400);
 
     const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
-    if (!GEMINI_API_KEY) {
-      return new Response(JSON.stringify({ success: false, error: 'Clé Gemini non configurée. Ajoutez votre clé dans les paramètres.' }), {
-        status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
+    if (!GEMINI_API_KEY) return jsonResponse({ success: false, error: 'Clé Gemini non configurée. Ajoutez votre clé dans les paramètres.' }, 500);
 
-    const systemPrompt = `Tu es un expert KDP Amazon spécialisé dans l'optimisation de fiches produit. Tu dois analyser un livre et donner des scores de 0 à 100 et des recommandations concrètes pour chaque critère. Sois précis, actionnable et bienveillant. Réponds TOUJOURS en français.
-
-Tu DOIS retourner un JSON valide avec cette structure exacte :
-{
-  "overall_score": number (0-100),
-  "overall_verdict": "string verdict global",
-  "criteria": [
-    {
-      "name": "Nom du critère",
-      "score": number (0-100),
-      "status": "excellent" | "bon" | "moyen" | "faible" | "critique",
-      "recommendation": "Recommandation concrète",
-      "priority": "haute" | "moyenne" | "basse"
-    }
-  ],
-  "quick_wins": ["action rapide 1", "action rapide 2", ...]
-}
-
-Les critères à évaluer sont : Titre, Description, Prix, Catégories, Mots-clés potentiels, Couverture (basé sur les avis), Note & Avis, Positionnement BSR.
-Retourne UNIQUEMENT le JSON, sans markdown ni texte autour.`;
-
-    const userPrompt = `Analyse cette fiche de livre Amazon KDP :
-
-- Titre : ${bookData.title || 'Non disponible'}
-- Auteur : ${bookData.author || 'Non disponible'}
-- Prix : ${bookData.price ? bookData.price + '€' : 'Non disponible'}
-- Note : ${bookData.rating ? bookData.rating + '/5' : 'Non disponible'}
-- Avis : ${bookData.reviews || 'Non disponible'}
-- BSR : ${bookData.bsr ? '#' + bookData.bsr : 'Non disponible'}
-- Pages : ${bookData.pages || 'Non disponible'}
-- Catégories : ${bookData.categories?.length ? bookData.categories.join(', ') : 'Aucune catégorie détectée'}
-- Description : ${bookData.description || 'Non disponible'}
-- Ventes estimées/mois : ${bookData.estimatedMonthlySales || 'Non disponible'}
-
-Retourne le JSON d'audit complet.`;
-
-    console.log('Calling Gemini for audit...');
+    const prompt = auditType === 'csv'
+      ? buildCsvAuditPrompt(csvSummary)
+      : buildBookAuditPrompt(bookData);
 
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
@@ -69,54 +25,115 @@ Retourne le JSON d'audit complet.`;
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          contents: [
-            { role: 'user', parts: [{ text: systemPrompt + '\n\n' + userPrompt }] },
-          ],
-          generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 4096,
-            responseMimeType: 'application/json',
-          },
+          contents: [{ role: 'user', parts: [{ text: prompt }] }],
+          generationConfig: { temperature: 0.45, maxOutputTokens: 8192, responseMimeType: 'application/json' },
         }),
-      }
+      },
     );
 
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Gemini API error:', response.status, errorText);
-      if (response.status === 429) {
-        return new Response(JSON.stringify({ success: false, error: 'Trop de requêtes Gemini, réessayez dans quelques secondes.' }), {
-          status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
-      return new Response(JSON.stringify({ success: false, error: 'Erreur Gemini: ' + response.status }), {
-        status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+      if (response.status === 429) return jsonResponse({ success: false, error: 'Trop de requêtes Gemini, réessayez dans quelques secondes.' }, 429);
+      return jsonResponse({ success: false, error: 'Erreur Gemini: ' + response.status }, 500);
     }
 
     const aiData = await response.json();
     const rawText = aiData?.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!rawText) return jsonResponse({ success: false, error: 'Réponse Gemini vide' }, 500);
 
-    if (!rawText) {
-      console.error('No text in Gemini response:', JSON.stringify(aiData));
-      return new Response(JSON.stringify({ success: false, error: 'Réponse Gemini vide' }), {
-        status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    console.log('Gemini response received, parsing...');
-
-    // Clean and parse JSON
-    const cleaned = rawText.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
-    const audit = JSON.parse(cleaned);
-
-    return new Response(JSON.stringify({ success: true, data: audit }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    const audit = JSON.parse(cleanJson(rawText));
+    return jsonResponse({ success: true, data: normalizeAudit(audit) });
   } catch (error) {
     console.error('Audit error:', error);
-    return new Response(JSON.stringify({ success: false, error: error instanceof Error ? error.message : 'Erreur interne' }), {
-      status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return jsonResponse({ success: false, error: error instanceof Error ? error.message : 'Erreur interne' }, 500);
   }
 });
+
+function jsonResponse(body: unknown, status = 200) {
+  return new Response(JSON.stringify(body), { status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+}
+
+function cleanJson(text: string) {
+  const cleaned = text.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+  const match = cleaned.match(/\{[\s\S]*\}/);
+  return match ? match[0] : cleaned;
+}
+
+function buildBookAuditPrompt(bookData: Record<string, unknown>) {
+  return `Tu es un expert Amazon KDP senior. Analyse cette fiche publique et retourne UNIQUEMENT un JSON valide, sans markdown.
+
+Structure obligatoire:
+{
+  "overall_score": number,
+  "overall_verdict": string,
+  "globalScore": number,
+  "verdict": string,
+  "priorityLevel": "critique" | "important" | "recommandé",
+  "potential": "faible" | "moyen" | "bon" | "fort",
+  "criteria": [{"name": string, "score": number, "status": "excellent" | "bon" | "moyen" | "faible" | "critique", "recommendation": string, "priority": "haute" | "moyenne" | "basse"}],
+  "quick_wins": string[],
+  "titleAudit": {"score": number, "problems": string[], "suggestedTitles": string[], "keywordsToInclude": string[]},
+  "subtitleAudit": {"score": number, "promiseClarity": string, "seoLevel": string, "suggestedSubtitles": string[]},
+  "descriptionAudit": {"score": number, "weaknesses": string[], "missingSections": string[], "improvedDescription": string},
+  "categoriesAudit": {"score": number, "currentFit": string, "opportunities": string[], "suggestedCategories": string[]},
+  "keywordsAudit": {"backendKeywords": string[], "competitorKeywords": string[], "missingKeywords": string[], "keywordsToAvoid": string[]},
+  "pricingAudit": {"score": number, "diagnosis": string, "recommendedPriceRange": string},
+  "conversionAudit": {"score": number, "positiveSignals": string[], "conversionFriction": string[]},
+  "positioningAudit": {"diagnosis": string, "priorityActions": string[]},
+  "actionPlan": string[]
+}
+
+Contraintes:
+- Réponds en français.
+- Donne des corrections concrètes prêtes à copier.
+- Propose exactement 4 titres alternatifs si le titre peut être amélioré.
+- Propose exactement 7 mots-clés backend.
+- Ne prétends jamais connaître des ventes privées; utilise uniquement les estimations fournies.
+
+Données livre:
+${JSON.stringify(bookData, null, 2)}`;
+}
+
+function buildCsvAuditPrompt(csvSummary: Record<string, unknown>) {
+  return `Tu es un analyste KDP/Amazon Ads. Analyse ce résumé CSV importé par l’utilisateur et retourne UNIQUEMENT un JSON valide.
+
+Structure obligatoire:
+{
+  "overall_score": number,
+  "overall_verdict": string,
+  "globalScore": number,
+  "verdict": string,
+  "priorityLevel": "critique" | "important" | "recommandé",
+  "potential": "faible" | "moyen" | "bon" | "fort",
+  "criteria": [{"name": string, "score": number, "status": "excellent" | "bon" | "moyen" | "faible" | "critique", "recommendation": string, "priority": "haute" | "moyenne" | "basse"}],
+  "quick_wins": string[],
+  "performanceSummary": {"booksAnalyzed": number, "underperformers": number, "bestOpportunities": string[]},
+  "bookPriorities": [{"title": string, "status": string, "probableProblem": string, "recommendedAction": string}],
+  "actionPlan": string[]
+}
+
+Analyse:
+- livres qui vendent peu
+- trafic avec mauvaise conversion
+- prix potentiellement mal optimisé
+- dépenses Ads non rentables si colonnes disponibles
+- livres à prioriser
+
+Données CSV résumées:
+${JSON.stringify(csvSummary, null, 2)}`;
+}
+
+function normalizeAudit(audit: Record<string, unknown>) {
+  const score = Number(audit.globalScore || audit.overall_score || 0);
+  return {
+    ...audit,
+    globalScore: score,
+    overall_score: score,
+    verdict: String(audit.verdict || audit.overall_verdict || ''),
+    overall_verdict: String(audit.overall_verdict || audit.verdict || ''),
+    criteria: Array.isArray(audit.criteria) ? audit.criteria : [],
+    quick_wins: Array.isArray(audit.quick_wins) ? audit.quick_wins : [],
+    actionPlan: Array.isArray(audit.actionPlan) ? audit.actionPlan : [],
+  };
+}

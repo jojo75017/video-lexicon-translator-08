@@ -10,7 +10,8 @@ import {
   Search, Loader2, Copy, BookOpen, DollarSign, Star, 
   TrendingUp, BarChart3, Eye, Key, Sparkles, ExternalLink,
   Users, Target, ArrowRight, Hash, Globe, ClipboardCheck,
-  AlertTriangle, CheckCircle2, XCircle, Zap, ShieldCheck
+  AlertTriangle, CheckCircle2, XCircle, Zap, ShieldCheck,
+  Upload, FileText, ListChecks
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -64,6 +65,29 @@ interface AuditData {
   overall_verdict: string;
   criteria: AuditCriterion[];
   quick_wins: string[];
+  globalScore?: number;
+  verdict?: string;
+  priorityLevel?: 'critique' | 'important' | 'recommandé';
+  potential?: 'faible' | 'moyen' | 'bon' | 'fort';
+  titleAudit?: { score: number; problems: string[]; suggestedTitles: string[]; keywordsToInclude: string[] };
+  subtitleAudit?: { score: number; promiseClarity: string; seoLevel: string; suggestedSubtitles: string[] };
+  descriptionAudit?: { score: number; weaknesses: string[]; missingSections: string[]; improvedDescription: string };
+  categoriesAudit?: { score: number; currentFit: string; opportunities: string[]; suggestedCategories: string[] };
+  keywordsAudit?: { backendKeywords: string[]; competitorKeywords: string[]; missingKeywords: string[]; keywordsToAvoid: string[] };
+  pricingAudit?: { score: number; diagnosis: string; recommendedPriceRange: string };
+  conversionAudit?: { score: number; positiveSignals: string[]; conversionFriction: string[] };
+  positioningAudit?: { diagnosis: string; priorityActions: string[] };
+  performanceSummary?: { booksAnalyzed: number; underperformers: number; bestOpportunities: string[] };
+  bookPriorities?: Array<{ title: string; status: string; probableProblem: string; recommendedAction: string }>;
+  actionPlan?: string[];
+}
+
+interface CsvSummary {
+  fileName: string;
+  rows: number;
+  columns: string[];
+  sampleRows: Record<string, string>[];
+  totals: Record<string, number>;
 }
 
 const MARKETPLACES = [
@@ -72,6 +96,25 @@ const MARKETPLACES = [
   { value: 'uk', label: '🇬🇧 UK', domain: 'amazon.co.uk' },
   { value: 'de', label: '🇩🇪 Allemagne', domain: 'amazon.de' },
 ];
+
+const parseCsvSummary = (csvText: string, fileName: string): CsvSummary => {
+  const lines = csvText.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+  if (lines.length < 2) throw new Error('Le CSV doit contenir une ligne d’en-tête et au moins une ligne de données');
+  const parseLine = (line: string) => line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(cell => cell.replace(/^"|"$/g, '').trim());
+  const columns = parseLine(lines[0]);
+  const rows = lines.slice(1, 101).map(line => {
+    const values = parseLine(line);
+    return columns.reduce<Record<string, string>>((acc, column, index) => ({ ...acc, [column || `Colonne ${index + 1}`]: values[index] || '' }), {});
+  });
+  const totals = rows.reduce<Record<string, number>>((acc, row) => {
+    Object.entries(row).forEach(([key, value]) => {
+      const numeric = Number(value.replace(/[^0-9,.-]/g, '').replace(',', '.'));
+      if (Number.isFinite(numeric) && value.match(/\d/)) acc[key] = (acc[key] || 0) + numeric;
+    });
+    return acc;
+  }, {});
+  return { fileName, rows: lines.length - 1, columns, sampleRows: rows.slice(0, 25), totals };
+};
 
 export const KdpAmazonResearch: React.FC = () => {
   const [activeTab, setActiveTab] = useState('asin');
@@ -96,6 +139,9 @@ export const KdpAmazonResearch: React.FC = () => {
 
   // Audit
   const [auditData, setAuditData] = useState<AuditData | null>(null);
+  const [pilotAsin, setPilotAsin] = useState('');
+  const [pilotBook, setPilotBook] = useState<BookData | null>(null);
+  const [csvSummary, setCsvSummary] = useState<CsvSummary | null>(null);
   const [isAuditing, setIsAuditing] = useState(false);
 
   const callScraper = async (body: Record<string, any>) => {
@@ -209,6 +255,64 @@ export const KdpAmazonResearch: React.FC = () => {
     }
   };
 
+  const handlePilotAsinAudit = async () => {
+    const targetAsin = pilotAsin.trim();
+    if (!targetAsin) { toast.error('Entrez un ASIN à auditer'); return; }
+    setIsAuditing(true);
+    setAuditData(null);
+    setPilotBook(null);
+    try {
+      const scrapedBook = await callScraper({ mode: 'asin', asin: targetAsin, marketplace });
+      const { data, error } = await supabase.functions.invoke('kdp-book-audit', {
+        body: { bookData: scrapedBook, auditType: 'book' },
+      });
+      if (error) throw new Error(error.message);
+      if (!data?.success) throw new Error(data?.error || 'Erreur d’audit');
+      setPilotBook(scrapedBook);
+      setAuditData(data.data);
+      toast.success('Audit Pilot terminé !');
+    } catch (err: any) {
+      toast.error(err.message || 'Erreur lors de l’audit Pilot');
+    } finally {
+      setIsAuditing(false);
+    }
+  };
+
+  const handleCsvUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const summary = parseCsvSummary(text, file.name);
+      setCsvSummary(summary);
+      toast.success(`${summary.rows} ligne(s) importée(s)`);
+    } catch (err: any) {
+      toast.error(err.message || 'CSV illisible');
+    } finally {
+      event.target.value = '';
+    }
+  };
+
+  const handleCsvAudit = async () => {
+    if (!csvSummary) { toast.error('Importez un fichier CSV'); return; }
+    setIsAuditing(true);
+    setAuditData(null);
+    try {
+      const { data, error } = await supabase.functions.invoke('kdp-book-audit', {
+        body: { csvSummary, auditType: 'csv' },
+      });
+      if (error) throw new Error(error.message);
+      if (!data?.success) throw new Error(data?.error || 'Erreur d’analyse CSV');
+      setAuditData(data.data);
+      setPilotBook(null);
+      toast.success('Analyse CSV terminée !');
+    } catch (err: any) {
+      toast.error(err.message || 'Erreur lors de l’analyse CSV');
+    } finally {
+      setIsAuditing(false);
+    }
+  };
+
   const copyText = (text: string) => {
     navigator.clipboard.writeText(text);
     toast.success('Copié !');
@@ -240,7 +344,7 @@ export const KdpAmazonResearch: React.FC = () => {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-5 w-full bg-secondary/50 p-1.5 gap-1">
+        <TabsList className="grid grid-cols-6 w-full bg-secondary/50 p-1.5 gap-1">
           <TabsTrigger value="asin" className="flex items-center gap-1.5 data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-[0_0_12px_rgba(0,130,150,0.3)] text-muted-foreground transition-all">
             <BookOpen className="h-4 w-4" />
             <span className="hidden sm:inline">Fiche ASIN</span>
@@ -256,6 +360,10 @@ export const KdpAmazonResearch: React.FC = () => {
           <TabsTrigger value="keywords" className="flex items-center gap-1.5 data-[state=active]:bg-[#8B5CF6] data-[state=active]:text-white data-[state=active]:shadow-[0_0_12px_rgba(139,92,246,0.4)] text-muted-foreground transition-all">
             <Key className="h-4 w-4" />
             <span className="hidden sm:inline">Mots-Clés</span>
+          </TabsTrigger>
+          <TabsTrigger value="pilot" className="flex items-center gap-1.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground transition-all">
+            <ClipboardCheck className="h-4 w-4" />
+            <span className="hidden sm:inline">Audit Pilot</span>
           </TabsTrigger>
           <TabsTrigger value="studio" className="flex items-center gap-1.5 data-[state=active]:bg-[#EF4444] data-[state=active]:text-white data-[state=active]:shadow-[0_0_12px_rgba(239,68,68,0.4)] text-muted-foreground transition-all">
             <Sparkles className="h-4 w-4" />
@@ -290,7 +398,16 @@ export const KdpAmazonResearch: React.FC = () => {
             </CardContent>
           </Card>
 
-          {bookData && <BookDataCard book={bookData} onCopy={copyText} />}
+          {bookData && (
+            <div className="space-y-4">
+              <BookDataCard book={bookData} onCopy={copyText} />
+              <Button onClick={handleAudit} disabled={isAuditing} variant="outline">
+                {isAuditing ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <ClipboardCheck className="h-4 w-4 mr-2" />}
+                Auditer cette fiche
+              </Button>
+              {auditData && activeTab === 'asin' && <AuditResultsCard audit={auditData} onCopy={copyText} />}
+            </div>
+          )}
         </TabsContent>
 
         {/* ——— TAB 2: NICHE ——— */}
@@ -539,6 +656,37 @@ export const KdpAmazonResearch: React.FC = () => {
         <TabsContent value="studio" className="space-y-4">
           <StudioKdpTab marketplace={marketplace} onNavigateAsin={(asin) => { setAsinInput(asin); setActiveTab('asin'); }} />
         </TabsContent>
+
+        <TabsContent value="pilot" className="space-y-4">
+          <div className="grid gap-4 lg:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2"><ShieldCheck className="h-5 w-5 text-primary" />Audit par ASIN</CardTitle>
+                <CardDescription>Diagnostic commercial complet avec corrections prêtes à copier</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex gap-2">
+                  <Input placeholder="Ex: B0DPQ3XKCD" value={pilotAsin} onChange={e => setPilotAsin(e.target.value)} onKeyDown={e => e.key === 'Enter' && handlePilotAsinAudit()} />
+                  <Button onClick={handlePilotAsinAudit} disabled={isAuditing}>{isAuditing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}<span className="ml-2">Auditer</span></Button>
+                </div>
+                {pilotBook && <p className="text-sm text-muted-foreground">Livre audité : <span className="font-medium text-foreground">{pilotBook.title}</span></p>}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2"><Upload className="h-5 w-5 text-primary" />Importer mes données KDP / Ads</CardTitle>
+                <CardDescription>Analyse temporaire d’un CSV exporté depuis KDP ou Amazon Ads</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Input type="file" accept=".csv,text/csv" onChange={handleCsvUpload} />
+                {csvSummary && <div className="rounded-lg border bg-muted/30 p-3 text-sm text-muted-foreground"><FileText className="h-4 w-4 inline mr-2" />{csvSummary.fileName} · {csvSummary.rows} lignes · {csvSummary.columns.length} colonnes</div>}
+                <Button variant="outline" onClick={handleCsvAudit} disabled={isAuditing || !csvSummary} className="w-full"><ListChecks className="h-4 w-4 mr-2" />Analyser mes performances</Button>
+              </CardContent>
+            </Card>
+          </div>
+          {auditData && <AuditResultsCard audit={auditData} onCopy={copyText} />}
+        </TabsContent>
       </Tabs>
     </div>
   );
@@ -650,7 +798,27 @@ const getPriorityBadge = (priority: string) => {
   return colors[priority] || colors.basse;
 };
 
-const AuditResultsCard: React.FC<{ audit: AuditData }> = ({ audit }) => (
+const RecommendationBlock: React.FC<{ title: string; items: string[]; score?: number; onCopy: (t: string) => void }> = ({ title, items, score, onCopy }) => (
+  <Card>
+    <CardHeader className="pb-2">
+      <div className="flex items-center justify-between gap-2">
+        <CardTitle className="text-base">{title}</CardTitle>
+        {typeof score === 'number' && <Badge variant="outline">{score}/100</Badge>}
+      </div>
+    </CardHeader>
+    <CardContent className="space-y-2">
+      {items?.length ? items.map((item, i) => (
+        <div key={i} className="flex items-start justify-between gap-2 rounded-lg border p-2">
+          <p className="text-sm text-foreground">{item}</p>
+          <Button variant="ghost" size="sm" onClick={() => onCopy(item)}><Copy className="h-4 w-4" /></Button>
+        </div>
+      )) : <p className="text-sm text-muted-foreground">Aucune suggestion disponible.</p>}
+      {items?.length ? <Button variant="outline" size="sm" onClick={() => onCopy(items.join('\n'))}><Copy className="h-4 w-4 mr-2" />Copier tout</Button> : null}
+    </CardContent>
+  </Card>
+);
+
+const AuditResultsCard: React.FC<{ audit: AuditData; onCopy: (t: string) => void }> = ({ audit, onCopy }) => (
   <div className="space-y-4">
     {/* Overall Score */}
     <Card className="overflow-hidden">
@@ -670,6 +838,10 @@ const AuditResultsCard: React.FC<{ audit: AuditData }> = ({ audit }) => (
             <div className="flex-1">
               <h3 className="text-xl font-bold text-foreground mb-1">Score Global</h3>
               <p className="text-muted-foreground">{audit.overall_verdict}</p>
+              <div className="flex flex-wrap gap-2 mt-3">
+                {audit.priorityLevel && <Badge variant="outline">Priorité : {audit.priorityLevel}</Badge>}
+                {audit.potential && <Badge variant="secondary">Potentiel : {audit.potential}</Badge>}
+              </div>
             </div>
           </div>
         </CardContent>
@@ -701,6 +873,39 @@ const AuditResultsCard: React.FC<{ audit: AuditData }> = ({ audit }) => (
         </Card>
       ))}
     </div>
+
+    {(audit.titleAudit || audit.descriptionAudit || audit.keywordsAudit || audit.actionPlan?.length) && (
+      <div className="grid gap-4 lg:grid-cols-2">
+        {audit.titleAudit && <RecommendationBlock title="Titres suggérés" score={audit.titleAudit.score} items={audit.titleAudit.suggestedTitles} onCopy={onCopy} />}
+        {audit.subtitleAudit && <RecommendationBlock title="Sous-titres suggérés" score={audit.subtitleAudit.score} items={audit.subtitleAudit.suggestedSubtitles} onCopy={onCopy} />}
+        {audit.keywordsAudit && <RecommendationBlock title="7 mots-clés backend" items={audit.keywordsAudit.backendKeywords} onCopy={onCopy} />}
+        {audit.descriptionAudit?.improvedDescription && (
+          <Card className="lg:col-span-2">
+            <CardHeader className="pb-2"><CardTitle className="text-base">Description optimisée</CardTitle></CardHeader>
+            <CardContent className="space-y-3">
+              <p className="text-sm text-muted-foreground whitespace-pre-line">{audit.descriptionAudit.improvedDescription}</p>
+              <Button variant="outline" size="sm" onClick={() => onCopy(audit.descriptionAudit!.improvedDescription)}><Copy className="h-4 w-4 mr-2" />Copier la description</Button>
+            </CardContent>
+          </Card>
+        )}
+        {audit.actionPlan?.length ? <RecommendationBlock title="Plan d’action 7 jours" items={audit.actionPlan} onCopy={onCopy} /> : null}
+      </div>
+    )}
+
+    {audit.bookPriorities?.length ? (
+      <Card>
+        <CardHeader className="pb-2"><CardTitle className="text-base">Priorités détectées dans le CSV</CardTitle></CardHeader>
+        <CardContent className="space-y-3">
+          {audit.bookPriorities.map((book, i) => (
+            <div key={i} className="rounded-lg border p-3">
+              <div className="flex items-center justify-between gap-2"><p className="font-medium text-foreground">{book.title}</p><Badge variant="outline">{book.status}</Badge></div>
+              <p className="text-sm text-muted-foreground mt-1">{book.probableProblem}</p>
+              <p className="text-sm text-foreground mt-2">→ {book.recommendedAction}</p>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+    ) : null}
 
     {/* Quick Wins */}
     {audit.quick_wins.length > 0 && (
@@ -736,7 +941,7 @@ const StatCard: React.FC<{ icon: any; label: string; value: string; color: strin
   </div>
 );
 
-const StudioKdpTab: React.FC<{ marketplace: string; onNavigateAsin: (asin: string) => void }> = ({ marketplace, onNavigateAsin }) => {
+const StudioKdpTab: React.FC<{ marketplace: string; onNavigateAsin: (asin: string) => void }> = ({ marketplace: _marketplace, onNavigateAsin: _onNavigateAsin }) => {
   const tools = [
     { 
       icon: BookOpen, title: 'Calculateur de Royalties', 
