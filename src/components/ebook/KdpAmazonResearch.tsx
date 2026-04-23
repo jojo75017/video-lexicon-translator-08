@@ -798,6 +798,26 @@ const getPriorityBadge = (priority: string) => {
   return colors[priority] || colors.basse;
 };
 
+const RecommendationBlock: React.FC<{ title: string; items: string[]; score?: number; onCopy: (t: string) => void }> = ({ title, items, score, onCopy }) => (
+  <Card>
+    <CardHeader className="pb-2">
+      <div className="flex items-center justify-between gap-2">
+        <CardTitle className="text-base">{title}</CardTitle>
+        {typeof score === 'number' && <Badge variant="outline">{score}/100</Badge>}
+      </div>
+    </CardHeader>
+    <CardContent className="space-y-2">
+      {items?.length ? items.map((item, i) => (
+        <div key={i} className="flex items-start justify-between gap-2 rounded-lg border p-2">
+          <p className="text-sm text-foreground">{item}</p>
+          <Button variant="ghost" size="sm" onClick={() => onCopy(item)}><Copy className="h-4 w-4" /></Button>
+        </div>
+      )) : <p className="text-sm text-muted-foreground">Aucune suggestion disponible.</p>}
+      {items?.length ? <Button variant="outline" size="sm" onClick={() => onCopy(items.join('\n'))}><Copy className="h-4 w-4 mr-2" />Copier tout</Button> : null}
+    </CardContent>
+  </Card>
+);
+
 const AuditResultsCard: React.FC<{ audit: AuditData; onCopy: (t: string) => void }> = ({ audit, onCopy }) => (
   <div className="space-y-4">
     {/* Overall Score */}
