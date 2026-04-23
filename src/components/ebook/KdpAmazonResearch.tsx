@@ -97,6 +97,25 @@ const MARKETPLACES = [
   { value: 'de', label: '🇩🇪 Allemagne', domain: 'amazon.de' },
 ];
 
+const parseCsvSummary = (csvText: string, fileName: string): CsvSummary => {
+  const lines = csvText.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+  if (lines.length < 2) throw new Error('Le CSV doit contenir une ligne d’en-tête et au moins une ligne de données');
+  const parseLine = (line: string) => line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(cell => cell.replace(/^"|"$/g, '').trim());
+  const columns = parseLine(lines[0]);
+  const rows = lines.slice(1, 101).map(line => {
+    const values = parseLine(line);
+    return columns.reduce<Record<string, string>>((acc, column, index) => ({ ...acc, [column || `Colonne ${index + 1}`]: values[index] || '' }), {});
+  });
+  const totals = rows.reduce<Record<string, number>>((acc, row) => {
+    Object.entries(row).forEach(([key, value]) => {
+      const numeric = Number(value.replace(/[^0-9,.-]/g, '').replace(',', '.'));
+      if (Number.isFinite(numeric) && value.match(/\d/)) acc[key] = (acc[key] || 0) + numeric;
+    });
+    return acc;
+  }, {});
+  return { fileName, rows: lines.length - 1, columns, sampleRows: rows.slice(0, 25), totals };
+};
+
 export const KdpAmazonResearch: React.FC = () => {
   const [activeTab, setActiveTab] = useState('asin');
   const [marketplace, setMarketplace] = useState('fr');
