@@ -941,7 +941,7 @@ const StatCard: React.FC<{ icon: any; label: string; value: string; color: strin
   </div>
 );
 
-const StudioKdpTab: React.FC<{ marketplace: string; onNavigateAsin: (asin: string) => void }> = ({ marketplace, onNavigateAsin }) => {
+const StudioKdpTab: React.FC<{ marketplace: string; onNavigateAsin: (asin: string) => void }> = ({ marketplace: _marketplace, onNavigateAsin: _onNavigateAsin }) => {
   const tools = [
     { 
       icon: BookOpen, title: 'Calculateur de Royalties', 
