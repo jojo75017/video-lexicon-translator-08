@@ -398,7 +398,16 @@ export const KdpAmazonResearch: React.FC = () => {
             </CardContent>
           </Card>
 
-          {bookData && <BookDataCard book={bookData} onCopy={copyText} />}
+          {bookData && (
+            <div className="space-y-4">
+              <BookDataCard book={bookData} onCopy={copyText} />
+              <Button onClick={handleAudit} disabled={isAuditing} variant="outline">
+                {isAuditing ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <ClipboardCheck className="h-4 w-4 mr-2" />}
+                Auditer cette fiche
+              </Button>
+              {auditData && activeTab === 'asin' && <AuditResultsCard audit={auditData} onCopy={copyText} />}
+            </div>
+          )}
         </TabsContent>
 
         {/* ——— TAB 2: NICHE ——— */}
@@ -789,7 +798,7 @@ const getPriorityBadge = (priority: string) => {
   return colors[priority] || colors.basse;
 };
 
-const AuditResultsCard: React.FC<{ audit: AuditData }> = ({ audit }) => (
+const AuditResultsCard: React.FC<{ audit: AuditData; onCopy: (t: string) => void }> = ({ audit, onCopy }) => (
   <div className="space-y-4">
     {/* Overall Score */}
     <Card className="overflow-hidden">
