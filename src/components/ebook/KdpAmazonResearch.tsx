@@ -120,6 +120,9 @@ export const KdpAmazonResearch: React.FC = () => {
 
   // Audit
   const [auditData, setAuditData] = useState<AuditData | null>(null);
+  const [pilotAsin, setPilotAsin] = useState('');
+  const [pilotBook, setPilotBook] = useState<BookData | null>(null);
+  const [csvSummary, setCsvSummary] = useState<CsvSummary | null>(null);
   const [isAuditing, setIsAuditing] = useState(false);
 
   const callScraper = async (body: Record<string, any>) => {
@@ -228,6 +231,64 @@ export const KdpAmazonResearch: React.FC = () => {
       toast.success('Audit terminé !');
     } catch (err: any) {
       toast.error(err.message || 'Erreur lors de l\'audit');
+    } finally {
+      setIsAuditing(false);
+    }
+  };
+
+  const handlePilotAsinAudit = async () => {
+    const targetAsin = pilotAsin.trim();
+    if (!targetAsin) { toast.error('Entrez un ASIN à auditer'); return; }
+    setIsAuditing(true);
+    setAuditData(null);
+    setPilotBook(null);
+    try {
+      const scrapedBook = await callScraper({ mode: 'asin', asin: targetAsin, marketplace });
+      const { data, error } = await supabase.functions.invoke('kdp-book-audit', {
+        body: { bookData: scrapedBook, auditType: 'book' },
+      });
+      if (error) throw new Error(error.message);
+      if (!data?.success) throw new Error(data?.error || 'Erreur d’audit');
+      setPilotBook(scrapedBook);
+      setAuditData(data.data);
+      toast.success('Audit Pilot terminé !');
+    } catch (err: any) {
+      toast.error(err.message || 'Erreur lors de l’audit Pilot');
+    } finally {
+      setIsAuditing(false);
+    }
+  };
+
+  const handleCsvUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const summary = parseCsvSummary(text, file.name);
+      setCsvSummary(summary);
+      toast.success(`${summary.rows} ligne(s) importée(s)`);
+    } catch (err: any) {
+      toast.error(err.message || 'CSV illisible');
+    } finally {
+      event.target.value = '';
+    }
+  };
+
+  const handleCsvAudit = async () => {
+    if (!csvSummary) { toast.error('Importez un fichier CSV'); return; }
+    setIsAuditing(true);
+    setAuditData(null);
+    try {
+      const { data, error } = await supabase.functions.invoke('kdp-book-audit', {
+        body: { csvSummary, auditType: 'csv' },
+      });
+      if (error) throw new Error(error.message);
+      if (!data?.success) throw new Error(data?.error || 'Erreur d’analyse CSV');
+      setAuditData(data.data);
+      setPilotBook(null);
+      toast.success('Analyse CSV terminée !');
+    } catch (err: any) {
+      toast.error(err.message || 'Erreur lors de l’analyse CSV');
     } finally {
       setIsAuditing(false);
     }
