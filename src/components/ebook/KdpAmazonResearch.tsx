@@ -325,7 +325,7 @@ export const KdpAmazonResearch: React.FC = () => {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-5 w-full bg-secondary/50 p-1.5 gap-1">
+        <TabsList className="grid grid-cols-6 w-full bg-secondary/50 p-1.5 gap-1">
           <TabsTrigger value="asin" className="flex items-center gap-1.5 data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-[0_0_12px_rgba(0,130,150,0.3)] text-muted-foreground transition-all">
             <BookOpen className="h-4 w-4" />
             <span className="hidden sm:inline">Fiche ASIN</span>
@@ -341,6 +341,10 @@ export const KdpAmazonResearch: React.FC = () => {
           <TabsTrigger value="keywords" className="flex items-center gap-1.5 data-[state=active]:bg-[#8B5CF6] data-[state=active]:text-white data-[state=active]:shadow-[0_0_12px_rgba(139,92,246,0.4)] text-muted-foreground transition-all">
             <Key className="h-4 w-4" />
             <span className="hidden sm:inline">Mots-Clés</span>
+          </TabsTrigger>
+          <TabsTrigger value="pilot" className="flex items-center gap-1.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground transition-all">
+            <ClipboardCheck className="h-4 w-4" />
+            <span className="hidden sm:inline">Audit Pilot</span>
           </TabsTrigger>
           <TabsTrigger value="studio" className="flex items-center gap-1.5 data-[state=active]:bg-[#EF4444] data-[state=active]:text-white data-[state=active]:shadow-[0_0_12px_rgba(239,68,68,0.4)] text-muted-foreground transition-all">
             <Sparkles className="h-4 w-4" />
@@ -623,6 +627,37 @@ export const KdpAmazonResearch: React.FC = () => {
         {/* ——— TAB 5: STUDIO KDP ——— */}
         <TabsContent value="studio" className="space-y-4">
           <StudioKdpTab marketplace={marketplace} onNavigateAsin={(asin) => { setAsinInput(asin); setActiveTab('asin'); }} />
+        </TabsContent>
+
+        <TabsContent value="pilot" className="space-y-4">
+          <div className="grid gap-4 lg:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2"><ShieldCheck className="h-5 w-5 text-primary" />Audit par ASIN</CardTitle>
+                <CardDescription>Diagnostic commercial complet avec corrections prêtes à copier</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex gap-2">
+                  <Input placeholder="Ex: B0DPQ3XKCD" value={pilotAsin} onChange={e => setPilotAsin(e.target.value)} onKeyDown={e => e.key === 'Enter' && handlePilotAsinAudit()} />
+                  <Button onClick={handlePilotAsinAudit} disabled={isAuditing}>{isAuditing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}<span className="ml-2">Auditer</span></Button>
+                </div>
+                {pilotBook && <p className="text-sm text-muted-foreground">Livre audité : <span className="font-medium text-foreground">{pilotBook.title}</span></p>}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2"><Upload className="h-5 w-5 text-primary" />Importer mes données KDP / Ads</CardTitle>
+                <CardDescription>Analyse temporaire d’un CSV exporté depuis KDP ou Amazon Ads</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Input type="file" accept=".csv,text/csv" onChange={handleCsvUpload} />
+                {csvSummary && <div className="rounded-lg border bg-muted/30 p-3 text-sm text-muted-foreground"><FileText className="h-4 w-4 inline mr-2" />{csvSummary.fileName} · {csvSummary.rows} lignes · {csvSummary.columns.length} colonnes</div>}
+                <Button variant="outline" onClick={handleCsvAudit} disabled={isAuditing || !csvSummary} className="w-full"><ListChecks className="h-4 w-4 mr-2" />Analyser mes performances</Button>
+              </CardContent>
+            </Card>
+          </div>
+          {auditData && <AuditResultsCard audit={auditData} onCopy={copyText} />}
         </TabsContent>
       </Tabs>
     </div>
