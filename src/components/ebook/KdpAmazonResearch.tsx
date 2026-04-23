@@ -10,7 +10,8 @@ import {
   Search, Loader2, Copy, BookOpen, DollarSign, Star, 
   TrendingUp, BarChart3, Eye, Key, Sparkles, ExternalLink,
   Users, Target, ArrowRight, Hash, Globe, ClipboardCheck,
-  AlertTriangle, CheckCircle2, XCircle, Zap, ShieldCheck
+  AlertTriangle, CheckCircle2, XCircle, Zap, ShieldCheck,
+  Upload, FileText, ListChecks
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -64,6 +65,29 @@ interface AuditData {
   overall_verdict: string;
   criteria: AuditCriterion[];
   quick_wins: string[];
+  globalScore?: number;
+  verdict?: string;
+  priorityLevel?: 'critique' | 'important' | 'recommandé';
+  potential?: 'faible' | 'moyen' | 'bon' | 'fort';
+  titleAudit?: { score: number; problems: string[]; suggestedTitles: string[]; keywordsToInclude: string[] };
+  subtitleAudit?: { score: number; promiseClarity: string; seoLevel: string; suggestedSubtitles: string[] };
+  descriptionAudit?: { score: number; weaknesses: string[]; missingSections: string[]; improvedDescription: string };
+  categoriesAudit?: { score: number; currentFit: string; opportunities: string[]; suggestedCategories: string[] };
+  keywordsAudit?: { backendKeywords: string[]; competitorKeywords: string[]; missingKeywords: string[]; keywordsToAvoid: string[] };
+  pricingAudit?: { score: number; diagnosis: string; recommendedPriceRange: string };
+  conversionAudit?: { score: number; positiveSignals: string[]; conversionFriction: string[] };
+  positioningAudit?: { diagnosis: string; priorityActions: string[] };
+  performanceSummary?: { booksAnalyzed: number; underperformers: number; bestOpportunities: string[] };
+  bookPriorities?: Array<{ title: string; status: string; probableProblem: string; recommendedAction: string }>;
+  actionPlan?: string[];
+}
+
+interface CsvSummary {
+  fileName: string;
+  rows: number;
+  columns: string[];
+  sampleRows: Record<string, string>[];
+  totals: Record<string, number>;
 }
 
 const MARKETPLACES = [
