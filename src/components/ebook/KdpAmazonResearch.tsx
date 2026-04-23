@@ -818,6 +818,10 @@ const AuditResultsCard: React.FC<{ audit: AuditData; onCopy: (t: string) => void
             <div className="flex-1">
               <h3 className="text-xl font-bold text-foreground mb-1">Score Global</h3>
               <p className="text-muted-foreground">{audit.overall_verdict}</p>
+              <div className="flex flex-wrap gap-2 mt-3">
+                {audit.priorityLevel && <Badge variant="outline">Priorité : {audit.priorityLevel}</Badge>}
+                {audit.potential && <Badge variant="secondary">Potentiel : {audit.potential}</Badge>}
+              </div>
             </div>
           </div>
         </CardContent>
@@ -849,6 +853,39 @@ const AuditResultsCard: React.FC<{ audit: AuditData; onCopy: (t: string) => void
         </Card>
       ))}
     </div>
+
+    {(audit.titleAudit || audit.descriptionAudit || audit.keywordsAudit || audit.actionPlan?.length) && (
+      <div className="grid gap-4 lg:grid-cols-2">
+        {audit.titleAudit && <RecommendationBlock title="Titres suggérés" score={audit.titleAudit.score} items={audit.titleAudit.suggestedTitles} onCopy={onCopy} />}
+        {audit.subtitleAudit && <RecommendationBlock title="Sous-titres suggérés" score={audit.subtitleAudit.score} items={audit.subtitleAudit.suggestedSubtitles} onCopy={onCopy} />}
+        {audit.keywordsAudit && <RecommendationBlock title="7 mots-clés backend" items={audit.keywordsAudit.backendKeywords} onCopy={onCopy} />}
+        {audit.descriptionAudit?.improvedDescription && (
+          <Card className="lg:col-span-2">
+            <CardHeader className="pb-2"><CardTitle className="text-base">Description optimisée</CardTitle></CardHeader>
+            <CardContent className="space-y-3">
+              <p className="text-sm text-muted-foreground whitespace-pre-line">{audit.descriptionAudit.improvedDescription}</p>
+              <Button variant="outline" size="sm" onClick={() => onCopy(audit.descriptionAudit!.improvedDescription)}><Copy className="h-4 w-4 mr-2" />Copier la description</Button>
+            </CardContent>
+          </Card>
+        )}
+        {audit.actionPlan?.length ? <RecommendationBlock title="Plan d’action 7 jours" items={audit.actionPlan} onCopy={onCopy} /> : null}
+      </div>
+    )}
+
+    {audit.bookPriorities?.length ? (
+      <Card>
+        <CardHeader className="pb-2"><CardTitle className="text-base">Priorités détectées dans le CSV</CardTitle></CardHeader>
+        <CardContent className="space-y-3">
+          {audit.bookPriorities.map((book, i) => (
+            <div key={i} className="rounded-lg border p-3">
+              <div className="flex items-center justify-between gap-2"><p className="font-medium text-foreground">{book.title}</p><Badge variant="outline">{book.status}</Badge></div>
+              <p className="text-sm text-muted-foreground mt-1">{book.probableProblem}</p>
+              <p className="text-sm text-foreground mt-2">→ {book.recommendedAction}</p>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+    ) : null}
 
     {/* Quick Wins */}
     {audit.quick_wins.length > 0 && (
