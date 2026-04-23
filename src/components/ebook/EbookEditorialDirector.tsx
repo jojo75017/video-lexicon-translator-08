@@ -146,6 +146,7 @@ export const EbookEditorialDirector = ({
         body: {
           sujet: subjectToAnalyze,
           contexte: `Analyse automatique complète pour un ebook sur "${subjectToAnalyze}". Identifier le positionnement optimal, la cible idéale et les opportunités de différenciation.`,
+          userApiKey: userGeminiKey,
         },
       });
 
