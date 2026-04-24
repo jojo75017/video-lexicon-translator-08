@@ -103,19 +103,63 @@
     return el ? el.innerText.trim() : null;
   }
 
+  function extractAuthor() {
+    const el = document.querySelector(".author .a-link-normal, #bylineInfo .author a, [data-feature-name='bylineInfo'] a");
+    return el ? el.innerText.trim() : null;
+  }
+
+  function extractRating() {
+    const el = document.querySelector("[data-hook='rating-out-of-text'], #acrPopover .a-icon-alt, .a-icon-star .a-icon-alt");
+    if (el) {
+      const txt = el.textContent || el.getAttribute("title") || "";
+      const m = txt.match(/([\d.,]+)\s*(?:sur|out of|von|de)\s*5/i) || txt.match(/^([\d.,]+)/);
+      if (m) return parseFloat(m[1].replace(",", "."));
+    }
+    return null;
+  }
+
+  function extractFormatPages() {
+    // Cherche "Format Kindle" et "X pages"
+    const txt = document.body.innerText || "";
+    const pagesMatch = txt.match(/(\d{1,4})\s*pages/i);
+    const formatEl = document.querySelector("#productSubtitle, #tmmSwatches .selected, [data-feature-name='kformat']");
+    return {
+      pages: pagesMatch ? parseInt(pagesMatch[1], 10) : null,
+      format: formatEl ? formatEl.innerText.trim().split("\n")[0].slice(0, 30) : "Format Kindle",
+    };
+  }
+
+  function extractPublicationDate() {
+    // Cherche "Date de publication" dans les détails
+    const detailRows = document.querySelectorAll("#detailBulletsWrapper_feature_div li, #productDetails_detailBullets_sections1 tr");
+    for (const row of detailRows) {
+      const txt = row.innerText || "";
+      const m = txt.match(/(?:Date de publication|Publication date|Publishing date)\s*[:\s]\s*([^\n]+)/i);
+      if (m) return m[1].trim().slice(0, 30);
+    }
+    return null;
+  }
+
   function extractDescription() {
     const sel = document.querySelector("#bookDescription_feature_div .a-expander-content, #productDescription, [data-feature-name='bookDescription']");
     return sel ? sel.innerText.trim().slice(0, 1500) : "";
   }
 
   function parseProductPage() {
+    const fp = extractFormatPages();
     return {
       asin: detectAsin(),
       title: extractTitle(),
+      author: extractAuthor(),
+      rating: extractRating(),
+      pages: fp.pages,
+      format: fp.format,
+      publishedAt: extractPublicationDate(),
       bsr: extractBsrFromProduct(),
       price: extractPriceFromProduct(),
       reviews: extractReviewsFromProduct(),
       description: extractDescription(),
+      marketplace: detectMarketplace(),
     };
   }
 
