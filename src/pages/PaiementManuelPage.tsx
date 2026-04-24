@@ -3,13 +3,20 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Check, Copy, CreditCard, ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
+import { Check, Copy, CreditCard, ArrowLeft, ArrowRight, Loader2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { Link, useNavigate } from "react-router-dom";
 import { useVipAvailability } from "@/hooks/useVipAvailability";
 
+const BASE_PRICE = 67;
+const SERENITY_PRICE = 30;
+
+const buildPaypalLink = (amount: number, label: string) =>
+  `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=${amount}&currency_code=EUR&item_name=${encodeURIComponent(label)}`;
+
 const PaiementManuelPage = () => {
   const [email, setEmail] = useState("");
+  const [serenityAddon, setSerenityAddon] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
   const navigate = useNavigate();
   const { isVipAvailable, isLoading: vipLoading } = useVipAvailability();
@@ -22,11 +29,16 @@ const PaiementManuelPage = () => {
     }
   }, [vipLoading, isVipAvailable, navigate]);
 
+  const totalPrice = BASE_PRICE + (serenityAddon ? SERENITY_PRICE : 0);
+  const itemName = serenityAddon
+    ? "EbookStudio Pro Lifetime + Pack Sérénité"
+    : "EbookStudio Pro - Acces a Vie";
+
   const paymentInfo = {
-    price: "67",
+    price: String(totalPrice),
     name: "EbookStudio Pro - Accès à Vie",
     description: "Offre de lancement • Accès complet à vie",
-    paypalLink: "https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=67&currency_code=EUR&item_name=EbookStudio%20Pro%20-%20Acces%20a%20Vie",
+    paypalLink: buildPaypalLink(totalPrice, itemName),
     iban: "FR76 XXXX XXXX XXXX XXXX XXXX XXX",
   };
 
@@ -104,10 +116,46 @@ const PaiementManuelPage = () => {
               <p className="text-xs text-muted-foreground">Vous recevrez votre code d'accès à cette adresse</p>
             </div>
 
+            {/* Add-on Pack Sérénité */}
+            <label
+              className={`flex items-start gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                serenityAddon
+                  ? 'border-amber-400 bg-amber-50 shadow-md'
+                  : 'border-violet-100 hover:border-amber-300 bg-white'
+              }`}
+            >
+              <input
+                type="checkbox"
+                checked={serenityAddon}
+                onChange={(e) => setSerenityAddon(e.target.checked)}
+                className="mt-1 w-5 h-5 accent-amber-500 cursor-pointer"
+              />
+              <div className="flex-1">
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-amber-500" />
+                    <span className="font-semibold text-violet-900 text-sm">
+                      Ajouter le Pack Sérénité
+                    </span>
+                    <Badge className="bg-amber-100 text-amber-700 border border-amber-300 text-[10px]">
+                      OPTIONNEL
+                    </Badge>
+                  </div>
+                  <span className="text-amber-700 font-bold">+{SERENITY_PRICE}€</span>
+                </div>
+                <ul className="mt-2 space-y-1 text-xs text-muted-foreground">
+                  <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-amber-500 flex-shrink-0" />Session Zoom 1-à-1 (30 min) avec un expert</li>
+                  <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-amber-500 flex-shrink-0" />Support prioritaire (réponse sous 24h)</li>
+                  <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-amber-500 flex-shrink-0" />Audit de votre 1er ebook avant publication</li>
+                </ul>
+              </div>
+            </label>
+
             <div className="space-y-4">
               <h3 className="font-semibold flex items-center gap-2">
                 <span className="bg-violet-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm">2</span>
                 Effectuez votre paiement de {paymentInfo.price}€
+
               </h3>
 
               {/* PayPal */}
