@@ -43,6 +43,7 @@ const UpsellPaiementPage = () => {
   const [email, setEmail] = useState("");
   const [selectedPayment, setSelectedPayment] = useState<'full' | 'installment2' | 'installment3'>('full');
   const [serenityAddon, setSerenityAddon] = useState(false);
+  const [extendedLicense, setExtendedLicense] = useState(false);
   const [buyerCount, setBuyerCount] = useState(12);
   const navigate = useNavigate();
 
