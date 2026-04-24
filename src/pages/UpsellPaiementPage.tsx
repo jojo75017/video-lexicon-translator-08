@@ -226,14 +226,75 @@ const UpsellPaiementPage = () => {
                 </div>
               </div>
 
+              {/* Add-on Pack Sérénité */}
+              <div className="space-y-2">
+                <label
+                  className={`flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                    serenityAddon
+                      ? 'border-amber-400 bg-amber-950/20 shadow-lg shadow-amber-500/10'
+                      : 'border-border hover:border-amber-500/50 bg-muted/40'
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={serenityAddon}
+                    onChange={(e) => setSerenityAddon(e.target.checked)}
+                    className="mt-1 w-5 h-5 accent-amber-400 cursor-pointer"
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-amber-400" />
+                        <span className="font-semibold text-white text-sm">
+                          Ajouter le Pack Sérénité
+                        </span>
+                        <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/30 text-[10px] px-1.5 py-0">
+                          OPTIONNEL
+                        </Badge>
+                      </div>
+                      <span className="text-amber-300 font-bold text-base">+{SERENITY_PRICE}€</span>
+                    </div>
+                    <ul className="mt-2 space-y-1 text-[12px] text-foreground/75">
+                      <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-amber-400 flex-shrink-0" />Session Zoom 1-à-1 (30 min) avec un expert</li>
+                      <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-amber-400 flex-shrink-0" />Support prioritaire (réponse sous 24h)</li>
+                      <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-amber-400 flex-shrink-0" />Audit de votre 1er ebook avant publication</li>
+                    </ul>
+                  </div>
+                </label>
+              </div>
+
               {/* Step 3: Pay */}
               <div className="space-y-3">
                 <label className="text-white font-medium text-sm flex items-center gap-2">
                   <span className="bg-cyan-500 text-slate-900 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">3</span>
                   Payer maintenant
                 </label>
+
+                {/* Récap du total */}
+                {serenityAddon && (
+                  <div className="bg-muted/60 border border-amber-500/30 rounded-lg p-3 text-sm">
+                    <div className="flex justify-between text-foreground/80">
+                      <span>{paymentOptions.find(o => o.id === selectedPayment)?.label}</span>
+                      <span>{baseAmounts[selectedPayment]}€</span>
+                    </div>
+                    <div className="flex justify-between text-amber-300">
+                      <span>+ Pack Sérénité</span>
+                      <span>+{SERENITY_PRICE}€</span>
+                    </div>
+                    <div className="flex justify-between font-bold text-white pt-2 mt-2 border-t border-border">
+                      <span>Total à payer maintenant</span>
+                      <span>{currentAmount}€</span>
+                    </div>
+                    {selectedPayment !== 'full' && (
+                      <p className="text-[11px] text-muted-foreground mt-1">
+                        (Pack Sérénité ajouté à la 1ère échéance uniquement)
+                      </p>
+                    )}
+                  </div>
+                )}
+
                 <a 
-                  href={PLAN.paypalLinks[selectedPayment]}
+                  href={currentPaypalLink}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={handlePayPalClick}
@@ -241,7 +302,7 @@ const UpsellPaiementPage = () => {
                 >
                   <Button size="lg" className="w-full py-7 text-lg font-bold bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-900 rounded-xl shadow-xl shadow-cyan-500/20 hover:shadow-cyan-500/30 transition-all">
                     <CreditCard className="w-5 h-5 mr-2" />
-                    Payer {paymentOptions.find(o => o.id === selectedPayment)?.price} — PayPal ou CB
+                    Payer {currentAmount}€ — PayPal ou CB
                     <ArrowRight className="w-5 h-5 ml-2" />
                   </Button>
                 </a>
