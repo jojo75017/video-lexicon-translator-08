@@ -772,6 +772,35 @@ const SalesPage = () => {
             </Card>
           </motion.div>
 
+          {/* Pack Sérénité — supplément optionnel */}
+          <motion.div initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mt-4">
+            <Card className="bg-amber-50/60 dark:bg-amber-950/20 border-2 border-amber-300/60 dark:border-amber-500/30">
+              <CardContent className="p-5">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-amber-500/20 flex items-center justify-center flex-shrink-0">
+                    <Sparkles className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between gap-3 flex-wrap">
+                      <h3 className="font-bold text-amber-900 dark:text-amber-200">
+                        Pack Sérénité — supplément optionnel
+                      </h3>
+                      <span className="text-amber-700 dark:text-amber-300 font-bold text-lg">+30€</span>
+                    </div>
+                    <p className="text-sm text-foreground/80 mt-1">
+                      Pour aller plus vite et publier sans hésiter — à cocher au moment du paiement.
+                    </p>
+                    <ul className="mt-2 grid sm:grid-cols-3 gap-1.5 text-xs text-foreground/75">
+                      <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-amber-600 flex-shrink-0" />Session Zoom 30 min</li>
+                      <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-amber-600 flex-shrink-0" />Support prioritaire 24h</li>
+                      <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-amber-600 flex-shrink-0" />Audit de votre 1er ebook</li>
+                    </ul>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
           {/* Countdown Timer */}
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mt-6">
             <CountdownTimer />
