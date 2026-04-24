@@ -2233,7 +2233,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center">
                 <ImageIcon className="w-10 h-10 text-primary" />
               </div>
-              <h2 className="text-2xl font-bold text-center">Générateur de couvertures</h2>
+              <h2 className="text-2xl font-bold text-center">Studio Couverture KDP</h2>
               <p className="text-muted-foreground text-center max-w-md">
                 Créez des couvertures professionnelles avec l'IA. Disponible avec l'accès complet.
               </p>
@@ -2248,9 +2248,18 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           );
         }
         return (
-          <EbookCoverGenerator
+          <UnifiedCoverStudio
             ebookTitle={ebookTitle}
             authorName={authorName}
+            chapters={chapters}
+            isGenerating={isGenerating}
+            defaultTab="ai"
+            onGenerateBackCover={async (tone, audience, highlights) =>
+              await generateBackCover(ebookTitle, authorName, chapters, tone, audience, highlights)
+            }
+            onCoverGenerated={(url) => {
+              setEbookImages(prev => [{ url, title: 'Couverture IA' }, ...prev]);
+            }}
           />
         );
       
