@@ -2582,13 +2582,17 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       
       case 'backcover':
         return (
-          <EbookBackCoverGenerator
+          <UnifiedCoverStudio
             ebookTitle={ebookTitle}
             authorName={authorName}
             chapters={chapters}
             isGenerating={isGenerating}
-            onGenerate={async (tone, audience, highlights) => {
-              return await generateBackCover(ebookTitle, authorName, chapters, tone, audience, highlights);
+            defaultTab="backcover"
+            onGenerateBackCover={async (tone, audience, highlights) =>
+              await generateBackCover(ebookTitle, authorName, chapters, tone, audience, highlights)
+            }
+            onCoverGenerated={(url) => {
+              setEbookImages(prev => [{ url, title: 'Couverture IA' }, ...prev]);
             }}
           />
         );
