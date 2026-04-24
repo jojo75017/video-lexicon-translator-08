@@ -44,6 +44,7 @@ import { EbookExporter } from '@/components/ebook/EbookExporter';
 import { EbookKdpTools } from '@/components/ebook/EbookKdpTools';
 import { EbookCoverGenerator } from '@/components/ebook/EbookCoverGenerator';
 import { EbookBackCoverGenerator } from '@/components/ebook/EbookBackCoverGenerator';
+import { UnifiedCoverStudio } from '@/components/ebook/UnifiedCoverStudio';
 import { CalibreStudioEpub } from '@/components/ebook/CalibreStudioEpub';
 import { EbookCharacters, type Character } from '@/components/ebook/EbookCharacters';
 import { EbookProjectsList } from '@/components/ebook/EbookProjectsList';
