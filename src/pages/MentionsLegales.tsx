@@ -37,6 +37,11 @@ const MentionsLegales = () => (
           <h2 className="text-xl font-bold">Données personnelles</h2>
           <p>Consultez notre <Link to="/politique-confidentialite" className="text-primary underline">politique de confidentialité</Link> pour en savoir plus sur le traitement de vos données.</p>
         </section>
+
+        <section>
+          <h2 className="text-xl font-bold">Licence d'utilisation</h2>
+          <p>L'utilisation du logiciel est encadrée par notre <Link to="/licence" className="text-primary underline">Licence d'utilisation (EULA)</Link>.</p>
+        </section>
       </div>
     </div>
   </div>

@@ -31,6 +31,7 @@ const SalesPage = lazy(() => import('./pages/SalesPage'));
 const MentionsLegales = lazy(() => import('./pages/MentionsLegales'));
 const PolitiqueConfidentialite = lazy(() => import('./pages/PolitiqueConfidentialite'));
 const CGV = lazy(() => import('./pages/CGV'));
+const Licence = lazy(() => import('./pages/Licence'));
 const PaymentSuccessPage = lazy(() => import('./pages/PaymentSuccessPage'));
 const DemoPage = lazy(() => import('./pages/DemoPage'));
 const OfferValuePage = lazy(() => import('./pages/OfferValuePage'));
@@ -250,6 +251,8 @@ const App = () => {
             <Route path="/mentions-legales" element={<MentionsLegales />} />
             <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
             <Route path="/cgv" element={<CGV />} />
+            <Route path="/licence" element={<Licence />} />
+            <Route path="/eula" element={<Licence />} />
             <Route path="/logout-total" element={<LogoutTotalPage />} />
             <Route path="/blog" element={<BlogPage />} />
             <Route path="/blog/:slug" element={<BlogArticleTemplate />} />
