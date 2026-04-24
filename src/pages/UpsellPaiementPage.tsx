@@ -98,6 +98,7 @@ const UpsellPaiementPage = () => {
     sessionStorage.setItem('payment_email', email.trim());
     localStorage.setItem('payment_email_backup', email.trim());
     if (serenityAddon) sessionStorage.setItem('serenity_addon', 'true');
+    if (extendedLicense) sessionStorage.setItem('extended_license', 'true');
     navigate('/confirmation-paiement');
   };
 
