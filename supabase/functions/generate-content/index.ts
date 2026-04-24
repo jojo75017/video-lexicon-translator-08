@@ -98,7 +98,7 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { email, actionType, prompt, numberOfChapters, ebookTitle, authorName, apiKey, type, content, openaiApiKey, useOpenAI, maxTokens, userApiKey } = body;
+    const { email, actionType, prompt, numberOfChapters, ebookTitle, authorName, apiKey, type, content, openaiApiKey, useOpenAI, maxTokens, userApiKey, temperature } = body;
     console.log('Content generation request:', { email, actionType, type, hasUserKey: !!userApiKey });
 
     // ====== FLOATING AI EDIT ======
@@ -648,12 +648,24 @@ Réponds UNIQUEMENT avec un tableau JSON de 7 strings, sans markdown ni backtick
       return jsonSuccess({ content: res.text });
     }
 
+    // ====== LAUNCH EMAIL SEQUENCE ======
+    if (type === 'launch-email-sequence') {
+      console.log('Processing launch-email-sequence (Gemini)...');
+      const res = await callGemini(
+        'Tu es un expert en email marketing pour auteurs indépendants. Tu réponds toujours en JSON valide et complet, sans markdown autour.',
+        prompt,
+        { maxOutputTokens: maxTokens || 8000, temperature: temperature ?? 0.8, timeoutMs: 120000, userApiKey }
+      );
+      if (res.error) return geminiError(res);
+      return jsonSuccess({ content: res.text });
+    }
+
     // ====== GENERIC FALLBACK HANDLER ======
     console.log('Calling Gemini API (generic handler)...');
     const res = await callGemini(
       'Vous êtes un expert en création de contenu pour ebooks. Répondez en français avec un contenu de haute qualité.',
       prompt,
-      { maxOutputTokens: maxTokens || 2000 }
+      { maxOutputTokens: maxTokens || 2000, temperature: temperature ?? 0.7, userApiKey }
     );
     if (res.error) return geminiError(res);
 
