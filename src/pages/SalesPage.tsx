@@ -314,6 +314,38 @@ const SalesPage = () => {
         </div>
       )}
 
+      {/* ═══════════════════════════════════════ KDP TOOLS QUICK ACCESS (connected users) ═══════════════════════════════════════ */}
+      {(hasSubscriberAccess || hasAdminSession) && (
+        <div className="bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 dark:from-amber-950/30 dark:via-orange-950/20 dark:to-amber-950/30 border-b border-amber-200/60 dark:border-amber-800/30">
+          <div className="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2 text-sm">
+              <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+              <span className="font-semibold text-foreground">Outils KDP exclusifs</span>
+              <Badge className="bg-amber-400 text-amber-950 hover:bg-amber-400 text-[10px]">Nouveau</Badge>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => navigate('/kdp-keywords')}
+                className="h-8 gap-1.5 border-amber-300 dark:border-amber-700 hover:bg-amber-100 dark:hover:bg-amber-900/30"
+              >
+                <Key className="w-3.5 h-3.5" />
+                Mots-Clés KDP Pro
+              </Button>
+              <Button
+                size="sm"
+                onClick={() => navigate('/audit-pilot')}
+                className="h-8 gap-1.5 bg-gradient-to-r from-primary to-teal-600 text-primary-foreground hover:opacity-90"
+              >
+                <ShieldCheck className="w-3.5 h-3.5" />
+                Audit Pilot KDP
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ═══════════════════════════════════════ URGENCY BANNER ═══════════════════════════════════════ */}
       <UrgencyBanner />
 

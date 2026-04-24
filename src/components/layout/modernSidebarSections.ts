@@ -21,7 +21,7 @@ export const SIDEBAR_SUBSECTIONS: Record<string, SidebarSectionConfig[]> = {
   '📦 Publier': [
     { label: 'Exports', itemIds: ['export', 'workflow-export', 'calibre-epub'] },
     { label: 'Couverture', itemIds: ['cover-design-editor', 'cover', 'backcover'] },
-    { label: 'KDP', itemIds: ['kdp', 'kdp-prepublish-checklist'] },
+    { label: 'KDP', itemIds: ['kdp', 'kdp-prepublish-checklist', 'kdp-keywords-pro', 'audit-pilot'] },
     { label: 'Audio', itemIds: ['audiobook', 'audio-express'] },
   ],
   '📣 Vendre': [
@@ -42,7 +42,7 @@ export const SIDEBAR_SUBSECTIONS: Record<string, SidebarSectionConfig[]> = {
 export const ESSENTIAL_TOOL_IDS: Record<string, string[]> = {
   '🤖 Workflow IA': ['workflow-dashboard', 'complete-workflow', 'editorial-director'],
   '✍️ Écriture': ['planner', 'writing', 'aichat', 'characters'],
-  '📦 Publier': ['export', 'cover-design-editor', 'kdp', 'audio-express'],
+  '📦 Publier': ['export', 'cover-design-editor', 'kdp', 'kdp-keywords-pro', 'audit-pilot', 'audio-express'],
   '📣 Vendre': ['marketing', 'launch-plan', 'kdp-ads-guide', 'chrome-extension'],
   '⚙️ Mon Compte': ['projects', 'ebook-library', 'subscription', 'settings'],
 };

@@ -14,7 +14,7 @@ import {
   ListChecks, Play,
   Glasses, ClipboardCheck, Megaphone,
   ChevronsUpDown, Plus, Minus,
-  Gift, MessageCircle, Chrome
+  Gift, MessageCircle, Chrome, Key
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -120,6 +120,8 @@ const allToolGroups: ToolGroup[] = [
       { id: 'backcover', label: '4e de Couverture', icon: FileText },
       { id: 'kdp', label: 'Description KDP', icon: TrendingUp },
       { id: 'kdp-prepublish-checklist', label: 'Checklist KDP', icon: ClipboardCheck },
+      { id: 'kdp-keywords-pro', label: 'Mots-Clés KDP Pro', icon: Key, isLink: true, href: '/kdp-keywords', isNew: true },
+      { id: 'audit-pilot', label: 'Audit Pilot KDP', icon: ClipboardCheck, isLink: true, href: '/audit-pilot', isNew: true },
       { id: 'audiobook', label: 'Livre Audio', icon: Headphones },
       { id: 'audio-express', label: 'Audio Express', icon: Play },
     ]
@@ -200,6 +202,8 @@ const TOOL_TOOLTIPS: Record<string, string> = {
   'backcover': 'Rédige la 4e de couverture (résumé accroche).',
   'kdp': 'Description vendeuse + mots-clés + catégories optimisés pour Amazon KDP.',
   'kdp-prepublish-checklist': 'Vérifie que tout est conforme avant de publier sur KDP.',
+  'kdp-keywords-pro': 'Recherche avancée de mots-clés Amazon KDP avec volumes et concurrence.',
+  'audit-pilot': 'Audite un livre par ASIN ou fichier KDP/Ads et obtiens un plan d\'action IA.',
   'audiobook': 'Convertit ton ebook en livre audio avec voix IA professionnelle.',
   'audio-express': 'Pipeline rapide ebook → audio prêt à vendre.',
   // Vendre

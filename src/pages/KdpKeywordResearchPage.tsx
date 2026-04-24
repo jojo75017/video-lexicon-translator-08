@@ -411,12 +411,42 @@ Réponds UNIQUEMENT avec un tableau JSON valide.`;
           </div>
           <Button
             onClick={() => navigate('/audit-pilot')}
-            className="bg-gradient-to-r from-primary to-teal-600 hover:opacity-90 text-primary-foreground shadow-lg gap-2"
+            size="lg"
+            className="bg-gradient-to-r from-primary to-teal-600 hover:opacity-90 text-primary-foreground shadow-lg gap-2 relative"
           >
-            <ClipboardCheck className="h-4 w-4" />
+            <ClipboardCheck className="h-5 w-5" />
             Audit Pilot KDP
+            <Badge className="ml-1 bg-amber-400 text-amber-950 hover:bg-amber-400 text-[10px] px-1.5 py-0">Nouveau</Badge>
           </Button>
         </div>
+
+        {/* CTA Audit Pilot mis en avant */}
+        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
+          <Card className="mb-4 border-2 border-primary/30 bg-gradient-to-r from-primary/10 via-teal-500/5 to-primary/10 shadow-lg">
+            <CardContent className="p-4 md:p-5 flex flex-col md:flex-row items-start md:items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-teal-600 flex items-center justify-center shadow-md shrink-0">
+                <ClipboardCheck className="w-6 h-6 text-primary-foreground" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
+                  Auditer un livre Amazon (ASIN)
+                  <Badge className="bg-amber-400 text-amber-950 hover:bg-amber-400 text-[10px]">Nouveau</Badge>
+                </h3>
+                <p className="text-sm text-muted-foreground mt-0.5">
+                  Diagnostic complet par ASIN + plan d'action concret pour booster les ventes
+                </p>
+              </div>
+              <Button
+                onClick={() => navigate('/audit-pilot')}
+                size="lg"
+                className="bg-gradient-to-r from-primary to-teal-600 hover:opacity-90 text-primary-foreground shadow-md gap-2 shrink-0"
+              >
+                Lancer l'audit
+                <ClipboardCheck className="h-4 w-4" />
+              </Button>
+            </CardContent>
+          </Card>
+        </motion.div>
 
         {/* Source indicator */}
         {isFromProject && (
