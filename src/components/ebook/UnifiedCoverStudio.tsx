@@ -100,10 +100,10 @@ export const UnifiedCoverStudio: React.FC<UnifiedCoverStudioProps> = ({
           >
             <Ruler className="w-4 h-4 text-primary" />
             <div className="text-left hidden sm:block">
-              <div className="font-semibold text-sm">Outils Techniques</div>
-              <div className="text-[10px] text-muted-foreground">Tranche, gabarits, BISAC</div>
+              <div className="font-semibold text-sm">Format & Tranche KDP</div>
+              <div className="text-[10px] text-muted-foreground">Recto • Dos • Verso • Pages</div>
             </div>
-            <span className="sm:hidden text-xs font-medium">Technique</span>
+            <span className="sm:hidden text-xs font-medium">Format KDP</span>
           </TabsTrigger>
 
           <TabsTrigger
