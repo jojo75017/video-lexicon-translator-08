@@ -2,7 +2,7 @@
   position: fixed;
   top: 90px;
   right: 20px;
-  width: 280px;
+  width: 300px;
   background: #ffffff;
   border-radius: 14px;
   box-shadow: 0 10px 40px rgba(0,0,0,0.18);
@@ -25,12 +25,21 @@
   background: rgba(255,255,255,0.25); border: none; color: white;
   width: 22px; height: 22px; border-radius: 50%; cursor: pointer; font-size: 14px; line-height: 1;
 }
+#ebkstudio-badge .ebk-tabs {
+  display: flex; border-bottom: 1px solid #e5e7eb; background: #f9fafb;
+}
+#ebkstudio-badge .ebk-tab {
+  flex: 1; background: transparent; border: none; padding: 10px; font-size: 12px;
+  font-weight: 600; color: #6b7280; cursor: pointer; border-bottom: 2px solid transparent;
+}
+#ebkstudio-badge .ebk-tab.ebk-active { color: #008296; border-bottom-color: #FF9E2D; background: white; }
 #ebkstudio-badge .ebk-score-row {
   display: flex; align-items: center; gap: 12px; padding: 16px 14px 8px;
 }
 #ebkstudio-badge .ebk-score {
   width: 70px; height: 70px; border-radius: 50%;
   border: 5px solid var(--c); display: flex; flex-direction: column; align-items: center; justify-content: center;
+  flex-shrink: 0;
 }
 #ebkstudio-badge .ebk-score-num { font-size: 22px; font-weight: 800; color: #232F3E; line-height: 1; }
 #ebkstudio-badge .ebk-score-lbl { font-size: 10px; color: #6b7280; }
@@ -52,5 +61,43 @@
 }
 #ebkstudio-badge .ebk-cta:hover { background: #FF9E2D; }
 #ebkstudio-badge .ebk-search-msg {
-  padding: 16px 14px; font-size: 13px; color: #232F3E; line-height: 1.5; text-align: center;
+  padding: 14px; font-size: 12px; color: #232F3E; line-height: 1.5; text-align: center; background: #fff7ed;
+  border-top: 1px solid #fed7aa;
+}
+
+/* Mots-clés */
+#ebkstudio-badge .ebk-pane-kw { padding: 12px 14px; }
+#ebkstudio-badge .ebk-kw-section { margin-bottom: 12px; }
+#ebkstudio-badge .ebk-kw-label {
+  font-size: 10px; text-transform: uppercase; color: #6b7280; font-weight: 700;
+  letter-spacing: 0.5px; margin-bottom: 6px;
+}
+#ebkstudio-badge .ebk-kw-list {
+  display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; min-height: 24px;
+}
+#ebkstudio-badge .ebk-kw {
+  background: #e0f2fe; color: #075985; padding: 3px 8px; border-radius: 12px;
+  font-size: 11px; font-weight: 500;
+}
+#ebkstudio-badge .ebk-kw-long { background: #fef3c7; color: #92400e; }
+#ebkstudio-badge .ebk-copy-btn {
+  background: #232F3E; color: white; border: none; padding: 6px 10px; border-radius: 6px;
+  font-size: 11px; cursor: pointer; width: 100%; font-weight: 600;
+}
+#ebkstudio-badge .ebk-copy-btn:hover { background: #FF9E2D; }
+
+/* Pépite badge sur résultats de recherche */
+.ebk-nugget-badge {
+  position: absolute !important;
+  top: 8px !important;
+  left: 8px !important;
+  background: #10b981 !important;
+  color: white !important;
+  padding: 4px 8px !important;
+  border-radius: 6px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  z-index: 9999 !important;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4) !important;
 }

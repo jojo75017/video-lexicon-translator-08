@@ -1,13 +1,16 @@
 {
   "manifest_version": 3,
   "name": "EbookStudio Scanner — Niches KDP",
-  "version": "1.0.2",
-  "description": "Scanne instantanément n'importe quelle page Amazon Kindle : score de niche /100, ventes estimées, niveau de concurrence, verdict GO/À creuser/À éviter.",
-  "permissions": ["activeTab", "storage", "scripting"],
+  "version": "1.1.0",
+  "description": "Score de niche KDP /100, analyse top 10 d'une recherche, détection de pépites, extraction mots-clés et historique des scans avec export CSV.",
+  "permissions": ["activeTab", "storage", "scripting", "tabs"],
   "host_permissions": [
     "https://www.amazon.fr/*",
     "https://www.amazon.com/*",
-    "https://www.amazon.co.uk/*"
+    "https://www.amazon.co.uk/*",
+    "https://www.amazon.de/*",
+    "https://www.amazon.es/*",
+    "https://www.amazon.it/*"
   ],
   "action": {
     "default_popup": "popup.html",
@@ -28,7 +31,10 @@
       "matches": [
         "https://www.amazon.fr/*",
         "https://www.amazon.com/*",
-        "https://www.amazon.co.uk/*"
+        "https://www.amazon.co.uk/*",
+        "https://www.amazon.de/*",
+        "https://www.amazon.es/*",
+        "https://www.amazon.it/*"
       ],
       "js": ["content.js"],
       "css": ["content.css"],
