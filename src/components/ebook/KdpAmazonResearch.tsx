@@ -116,8 +116,12 @@ const parseCsvSummary = (csvText: string, fileName: string): CsvSummary => {
   return { fileName, rows: lines.length - 1, columns, sampleRows: rows.slice(0, 25), totals };
 };
 
-export const KdpAmazonResearch: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('asin');
+interface KdpAmazonResearchProps {
+  defaultTab?: string;
+}
+
+export const KdpAmazonResearch: React.FC<KdpAmazonResearchProps> = ({ defaultTab = 'asin' }) => {
+  const [activeTab, setActiveTab] = useState(defaultTab);
   const [marketplace, setMarketplace] = useState('fr');
   const [isLoading, setIsLoading] = useState(false);
 

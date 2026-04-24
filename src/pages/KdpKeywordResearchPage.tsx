@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import {
   ArrowLeft, Search, TrendingUp, Copy, Download, Sparkles, Target,
   BarChart3, Zap, ChevronUp, ChevronDown, Minus, Star, BookOpen,
-  Hash, Layers, Eye, ShieldCheck, Lightbulb, CheckCircle, AlertTriangle
+  Hash, Layers, Eye, ShieldCheck, Lightbulb, CheckCircle, AlertTriangle, ClipboardCheck
 } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -399,16 +399,23 @@ Réponds UNIQUEMENT avec un tableau JSON valide.`;
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50/60 to-rose-50/40 dark:from-orange-950/20 dark:via-amber-950/10 dark:to-background p-4 md:p-6">
       <div className="container mx-auto max-w-7xl">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-6">
+        <div className="flex flex-wrap items-center gap-4 mb-6">
           <Button variant="ghost" onClick={() => navigate(-1)} className="shrink-0">
             <ArrowLeft className="h-4 w-4 mr-2" /> Retour
           </Button>
-          <div>
+          <div className="flex-1 min-w-0">
             <h1 className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-orange-600 via-red-500 to-pink-600 bg-clip-text text-transparent flex items-center gap-3">
               <span className="text-4xl">🔥</span> Mots-Clés KDP Pro
             </h1>
             <p className="text-sm text-muted-foreground mt-1">Recherche avancée de mots-clés Amazon KDP avec IA</p>
           </div>
+          <Button
+            onClick={() => navigate('/audit-pilot')}
+            className="bg-gradient-to-r from-primary to-teal-600 hover:opacity-90 text-primary-foreground shadow-lg gap-2"
+          >
+            <ClipboardCheck className="h-4 w-4" />
+            Audit Pilot KDP
+          </Button>
         </div>
 
         {/* Source indicator */}
