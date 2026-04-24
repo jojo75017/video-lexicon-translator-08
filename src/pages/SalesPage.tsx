@@ -29,6 +29,7 @@ import KdpRocketParityTable from "@/components/sales/KdpRocketParityTable";
 import KdpAdsTeaser from "@/components/sales/KdpAdsTeaser";
 import BlackPackHero from "@/components/sales/BlackPackHero";
 import BlackPackPricing from "@/components/sales/BlackPackPricing";
+import FunnelStepsBar from "@/components/sales/FunnelStepsBar";
 
 // ════════════════════════════════════════════════════════════════════════════════
 // DESIGN SYSTEM 2026 — Palette Premium
@@ -429,6 +430,9 @@ const SalesPage = () => {
           </Button>
         </div>
       </header>
+
+      {/* ═══════════════════════════════════════ TUNNEL 3 ÉTAPES (visible dès le haut) ═══════════════════════════════════════ */}
+      <FunnelStepsBar onCtaClick={scrollToPricing} />
 
       {/* ═══════════════════════════════════════ BLACK PACK HERO (refonte sombre premium) ═══════════════════════════════════════ */}
       <BlackPackHero
