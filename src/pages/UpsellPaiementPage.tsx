@@ -60,10 +60,14 @@ const UpsellPaiementPage = () => {
     installment3: "EbookStudio Pro (1/3)",
   };
 
-  // L'add-on Sérénité s'ajoute uniquement à la 1ère échéance (paiement initial)
-  const currentAmount = baseAmounts[selectedPayment] + (serenityAddon ? SERENITY_PRICE : 0);
-  const currentLabel = serenityAddon
-    ? `${baseLabels[selectedPayment]} + Pack Sérénité`
+  // Les add-ons s'ajoutent uniquement à la 1ère échéance (paiement initial)
+  const addonsAmount = (serenityAddon ? SERENITY_PRICE : 0) + (extendedLicense ? EXTENDED_LICENSE_PRICE : 0);
+  const currentAmount = baseAmounts[selectedPayment] + addonsAmount;
+  const addonLabels: string[] = [];
+  if (serenityAddon) addonLabels.push("Pack Sérénité");
+  if (extendedLicense) addonLabels.push("Licence Étendue");
+  const currentLabel = addonLabels.length
+    ? `${baseLabels[selectedPayment]} + ${addonLabels.join(" + ")}`
     : baseLabels[selectedPayment];
   const currentPaypalLink = buildPaypalLink(currentAmount, currentLabel);
 
