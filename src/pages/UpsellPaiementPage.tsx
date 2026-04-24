@@ -13,16 +13,15 @@ import { motion } from "framer-motion";
 
 const LAUNCH_PRICE = 67;
 const NORMAL_PRICE = 147;
+const SERENITY_PRICE = 30;
+
+const buildPaypalLink = (amount: number, label: string) =>
+  `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=${amount}&currency_code=EUR&item_name=${encodeURIComponent(label)}`;
 
 const PLAN = {
   name: "Pro Lifetime",
   price: String(LAUNCH_PRICE),
   originalPrice: String(NORMAL_PRICE),
-  paypalLinks: {
-    full: `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=${LAUNCH_PRICE}&currency_code=EUR&item_name=EbookStudio%20Pro%20Lifetime`,
-    installment2: `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=35&currency_code=EUR&item_name=EbookStudio%20Pro%20(1/2)`,
-    installment3: `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=25&currency_code=EUR&item_name=EbookStudio%20Pro%20(1/3)`,
-  },
   features: [
     "Workflow éditorial 15 rôles IA",
     "Gemini 3 Flash — IA ultra-rapide",
@@ -42,6 +41,7 @@ const UpsellPaiementPage = () => {
   const [searchParams] = useSearchParams();
   const [email, setEmail] = useState("");
   const [selectedPayment, setSelectedPayment] = useState<'full' | 'installment2' | 'installment3'>('full');
+  const [serenityAddon, setSerenityAddon] = useState(false);
   const [buyerCount, setBuyerCount] = useState(12);
   const navigate = useNavigate();
 
@@ -50,6 +50,20 @@ const UpsellPaiementPage = () => {
     const base = new Date().getDate() % 8 + 9;
     setBuyerCount(base);
   }, []);
+
+  const baseAmounts = { full: LAUNCH_PRICE, installment2: 35, installment3: 25 };
+  const baseLabels = {
+    full: "EbookStudio Pro Lifetime",
+    installment2: "EbookStudio Pro (1/2)",
+    installment3: "EbookStudio Pro (1/3)",
+  };
+
+  // L'add-on Sérénité s'ajoute uniquement à la 1ère échéance (paiement initial)
+  const currentAmount = baseAmounts[selectedPayment] + (serenityAddon ? SERENITY_PRICE : 0);
+  const currentLabel = serenityAddon
+    ? `${baseLabels[selectedPayment]} + Pack Sérénité`
+    : baseLabels[selectedPayment];
+  const currentPaypalLink = buildPaypalLink(currentAmount, currentLabel);
 
   const paymentOptions = [
     { id: 'full' as const, label: 'Paiement unique', price: `${LAUNCH_PRICE}€`, detail: 'Meilleur rapport qualité-prix', badge: 'POPULAIRE' },
@@ -62,6 +76,9 @@ const UpsellPaiementPage = () => {
       sessionStorage.setItem('payment_email', email.trim());
       localStorage.setItem('payment_email_backup', email.trim());
     }
+    if (serenityAddon) {
+      sessionStorage.setItem('serenity_addon', 'true');
+    }
   };
 
   const goToConfirmation = () => {
@@ -71,6 +88,7 @@ const UpsellPaiementPage = () => {
     }
     sessionStorage.setItem('payment_email', email.trim());
     localStorage.setItem('payment_email_backup', email.trim());
+    if (serenityAddon) sessionStorage.setItem('serenity_addon', 'true');
     navigate('/confirmation-paiement');
   };
 
