@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 import { 
   Copy, Loader2, Sparkles, Mail, RefreshCw, Download, 
   Pencil, Check, ChevronDown, ChevronUp 
