@@ -273,7 +273,46 @@ const UpsellPaiementPage = () => {
                 </label>
               </div>
 
-              {/* Step 3: Pay */}
+              {/* Add-on Licence Étendue */}
+              <div className="space-y-2">
+                <label
+                  className={`flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                    extendedLicense
+                      ? 'border-purple-400 bg-purple-950/20 shadow-lg shadow-purple-500/10'
+                      : 'border-border hover:border-purple-500/50 bg-muted/40'
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={extendedLicense}
+                    onChange={(e) => setExtendedLicense(e.target.checked)}
+                    className="mt-1 w-5 h-5 accent-purple-400 cursor-pointer"
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-purple-400" />
+                        <span className="font-semibold text-white text-sm">
+                          🚀 Licence Commerciale Étendue
+                        </span>
+                        <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/30 text-[10px] px-1.5 py-0">
+                          PRO / FREELANCE
+                        </Badge>
+                      </div>
+                      <span className="text-purple-300 font-bold text-base">+{EXTENDED_LICENSE_PRICE}€</span>
+                    </div>
+                    <ul className="mt-2 space-y-1 text-[12px] text-foreground/75">
+                      <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-purple-400 flex-shrink-0" />Créez des ebooks pour vos clients</li>
+                      <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-purple-400 flex-shrink-0" />Usage freelance et agence autorisé</li>
+                      <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-purple-400 flex-shrink-0" />Projets commerciaux illimités</li>
+                      <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-purple-400 flex-shrink-0" />Revente des prestations autorisée</li>
+                    </ul>
+                    <Link to="/licence-etendue" target="_blank" className="text-[11px] text-purple-300 hover:text-purple-200 underline mt-2 inline-block">
+                      En savoir plus →
+                    </Link>
+                  </div>
+                </label>
+              </div>
               <div className="space-y-3">
                 <label className="text-white font-medium text-sm flex items-center gap-2">
                   <span className="bg-cyan-500 text-slate-900 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">3</span>
