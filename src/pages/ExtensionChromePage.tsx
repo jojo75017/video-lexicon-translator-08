@@ -93,33 +93,105 @@ const ExtensionChromePage = () => {
         </div>
       </section>
 
-      {/* Mockup */}
-      <section className="max-w-3xl mx-auto px-4 pb-16">
-        <div className="bg-white rounded-2xl shadow-2xl p-8 border-2">
-          <div className="text-xs text-muted-foreground mb-3">Aperçu du badge sur une fiche Amazon :</div>
-          <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl p-6 relative min-h-[280px]">
-            <div className="text-xs text-slate-400 italic">… page Amazon Kindle …</div>
-            {/* Mock badge */}
-            <div className="absolute top-4 right-4 w-72 bg-white rounded-xl shadow-2xl border overflow-hidden">
-              <div className="bg-gradient-to-r from-orange-500 to-teal-600 text-white px-3 py-2 text-xs font-semibold flex justify-between">
-                <span>📚 EbookStudio</span><span className="opacity-70">×</span>
+      {/* Mockup réaliste */}
+      <section className="max-w-5xl mx-auto px-4 pb-16">
+        <h2 className="text-2xl font-bold text-center mb-2 text-foreground">Voilà ce que tu vois sur Amazon, en vrai :</h2>
+        <p className="text-center text-muted-foreground mb-8 text-sm">Aperçu fidèle du badge avec toutes les infos extraites de la fiche produit</p>
+
+        <div className="grid md:grid-cols-2 gap-6 items-start">
+          {/* Mock fiche Amazon */}
+          <div className="bg-white rounded-2xl shadow-xl p-5 border-2 border-slate-200">
+            <div className="text-[10px] uppercase tracking-wider text-slate-400 mb-3 font-semibold">📦 Fiche Amazon Kindle</div>
+            <div className="flex gap-3">
+              <div className="w-20 h-28 bg-gradient-to-br from-orange-400 to-red-600 rounded shadow-md flex items-center justify-center text-white text-[10px] font-bold text-center p-1">COUVERTURE</div>
+              <div className="flex-1 text-xs">
+                <div className="font-bold text-slate-900 leading-tight mb-1">Réveil Spirituel : 30 Jours pour Transformer Votre Vie</div>
+                <div className="text-blue-700 mb-1">par Marie Dubois (Auteur)</div>
+                <div className="text-amber-500 mb-1">★★★★☆ <span className="text-slate-500">4,3 sur 5 — 87 évaluations</span></div>
+                <div className="text-red-700 font-bold text-lg">7,99 €</div>
+                <div className="text-slate-500 text-[10px] mt-1">Format Kindle • 142 pages • 12 mars 2025</div>
               </div>
-              <div className="p-3 flex items-center gap-3">
-                <div className="w-16 h-16 rounded-full border-4 border-emerald-500 flex flex-col items-center justify-center">
-                  <div className="text-xl font-extrabold text-foreground">82</div>
-                  <div className="text-[9px] text-muted-foreground">/100</div>
-                </div>
-                <div className="flex-1 bg-emerald-500 text-white p-2 rounded-lg text-center text-xs font-bold">🚀 GO</div>
-              </div>
-              <div className="grid grid-cols-2 gap-1.5 px-3 pb-3">
-                <div className="bg-slate-50 p-2 rounded"><div className="text-[9px] uppercase text-muted-foreground">Ventes/jour</div><b className="text-sm">~60</b></div>
-                <div className="bg-slate-50 p-2 rounded"><div className="text-[9px] uppercase text-muted-foreground">Ventes/mois</div><b className="text-sm">~1 800</b></div>
-                <div className="bg-slate-50 p-2 rounded"><div className="text-[9px] uppercase text-muted-foreground">Concurrence</div><b className="text-sm text-emerald-600">Faible</b></div>
-                <div className="bg-slate-50 p-2 rounded"><div className="text-[9px] uppercase text-muted-foreground">BSR</div><b className="text-sm">#4 820</b></div>
-              </div>
-              <div className="bg-slate-900 text-white text-center py-2.5 text-xs font-semibold">Analyse complète sur EbookStudio →</div>
+            </div>
+            <div className="mt-3 pt-3 border-t text-[10px] text-slate-500">
+              <div><b>ASIN :</b> B0CXY8K2LM</div>
+              <div><b>Classement des meilleures ventes Amazon :</b> #4 820 dans la Boutique Kindle</div>
             </div>
           </div>
+
+          {/* Mock badge réaliste */}
+          <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl p-4 border-2 border-dashed border-slate-300">
+            <div className="text-[10px] uppercase tracking-wider text-slate-400 mb-3 font-semibold text-center">⬇ Le badge EbookStudio extrait & analyse ⬇</div>
+            <div className="bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden text-xs">
+              {/* Head */}
+              <div className="bg-gradient-to-r from-orange-500 to-teal-600 text-white px-3 py-2 text-[11px] font-semibold flex justify-between">
+                <span>📚 EbookStudio</span><span className="opacity-70">×</span>
+              </div>
+              {/* Book info */}
+              <div className="px-3 py-2.5 bg-slate-50 border-b border-slate-200">
+                <div className="font-bold text-slate-900 text-[12px] leading-tight">Réveil Spirituel : 30 Jours pour Transformer Votre Vie</div>
+                <div className="text-teal-700 italic text-[10px] mt-0.5">par Marie Dubois</div>
+                <div className="flex flex-wrap gap-1.5 mt-1.5 text-[9px] items-center">
+                  <span className="bg-orange-100 text-orange-900 px-1.5 py-0.5 rounded font-mono"><b>ASIN: B0CXY8K2LM</b></span>
+                  <span className="bg-cyan-100 text-cyan-800 px-1.5 py-0.5 rounded font-semibold">🌍 .fr</span>
+                </div>
+                <div className="flex flex-wrap gap-2 mt-1.5 text-[9px] text-slate-500 items-center">
+                  <span>Format Kindle</span>
+                  <span>📖 142 p.</span>
+                  <span className="text-amber-500 font-bold">★★★★☆ 4.3</span>
+                </div>
+                <div className="text-[9px] text-slate-500 mt-1">📅 12 mars 2025</div>
+              </div>
+              {/* Tabs */}
+              <div className="flex border-b border-slate-200 bg-slate-50">
+                <div className="flex-1 py-2 text-center text-[11px] font-semibold text-teal-700 border-b-2 border-orange-500 bg-white">Score</div>
+                <div className="flex-1 py-2 text-center text-[11px] font-semibold text-slate-400">Mots-clés</div>
+              </div>
+              {/* Score */}
+              <div className="p-3">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-14 h-14 rounded-full border-[5px] border-emerald-500 flex flex-col items-center justify-center flex-shrink-0">
+                    <div className="text-lg font-extrabold text-slate-900 leading-none">82</div>
+                    <div className="text-[8px] text-slate-500">/100</div>
+                  </div>
+                  <div className="flex-1 bg-emerald-500 text-white py-2 rounded-lg text-center text-[12px] font-bold">🚀 GO</div>
+                </div>
+                <div className="grid grid-cols-2 gap-1.5 mb-2">
+                  <div className="bg-slate-50 p-1.5 rounded"><div className="text-[8px] uppercase text-slate-500">Ventes/jour</div><b className="text-[12px]">~60</b></div>
+                  <div className="bg-slate-50 p-1.5 rounded"><div className="text-[8px] uppercase text-slate-500">Ventes/mois</div><b className="text-[12px]">~1 800</b></div>
+                  <div className="bg-slate-50 p-1.5 rounded"><div className="text-[8px] uppercase text-slate-500">Concurrence</div><b className="text-[12px] text-emerald-600">Faible</b></div>
+                  <div className="bg-slate-50 p-1.5 rounded"><div className="text-[8px] uppercase text-slate-500">BSR</div><b className="text-[12px]">#4 820</b></div>
+                  <div className="bg-slate-50 p-1.5 rounded"><div className="text-[8px] uppercase text-slate-500">Prix</div><b className="text-[12px]">7,99 €</b></div>
+                  <div className="bg-slate-50 p-1.5 rounded"><div className="text-[8px] uppercase text-slate-500">Avis</div><b className="text-[12px]">87</b></div>
+                </div>
+                <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-lg p-2 text-center text-[11px] text-emerald-900">
+                  💰 Revenus estimés/mois : <b className="text-emerald-700 text-[13px]">~10 062 €</b>
+                </div>
+              </div>
+              <div className="bg-slate-900 text-white text-center py-2.5 text-[11px] font-semibold">Analyse complète sur EbookStudio →</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Aperçu mots-clés */}
+        <div className="mt-8 bg-white rounded-2xl shadow-lg border-2 p-5 max-w-2xl mx-auto">
+          <div className="text-[10px] uppercase tracking-wider text-slate-400 mb-3 font-semibold">🔑 Onglet "Mots-clés" — extraction automatique</div>
+          <div className="mb-4">
+            <div className="text-[10px] uppercase text-slate-500 font-bold mb-2">Mots-clés principaux</div>
+            <div className="flex flex-wrap gap-1.5">
+              {['spirituel', 'transformation', 'développement', 'éveil', 'méditation', 'conscience', 'épanouissement', 'sagesse'].map(k => (
+                <span key={k} className="bg-sky-100 text-sky-800 px-2 py-1 rounded-full text-xs font-medium">{k}</span>
+              ))}
+            </div>
+          </div>
+          <div>
+            <div className="text-[10px] uppercase text-slate-500 font-bold mb-2">Longue traîne (suggestions)</div>
+            <div className="flex flex-wrap gap-1.5">
+              {['développement personnel', 'transformer votre vie', 'éveil spirituel', 'méditation guidée', 'reveil conscience'].map(k => (
+                <span key={k} className="bg-amber-100 text-amber-900 px-2 py-1 rounded-full text-xs font-medium">{k}</span>
+              ))}
+            </div>
+          </div>
+          <button className="mt-4 w-full bg-slate-900 hover:bg-orange-500 transition-colors text-white py-2 rounded-lg text-xs font-semibold">📋 Copier tous les mots-clés en 1 clic</button>
         </div>
       </section>
 
