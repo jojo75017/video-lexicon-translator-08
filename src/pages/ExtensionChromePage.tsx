@@ -67,17 +67,22 @@ const ExtensionChromePage = () => {
 
       {/* What you see */}
       <section className="max-w-5xl mx-auto px-4 pb-16">
-        <h2 className="text-3xl font-bold text-center mb-3 text-foreground">Sur n'importe quelle page Amazon, tu vois :</h2>
-        <p className="text-center text-muted-foreground mb-10">Un badge flottant qui apparaît automatiquement en haut à droite</p>
+        <div className="text-center mb-3">
+          <span className="inline-block bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full mb-3">✨ NOUVEAU v1.1 — Mode Niche + Mots-clés + Historique</span>
+        </div>
+        <h2 className="text-3xl font-bold text-center mb-3 text-foreground">6 super-pouvoirs pour scanner Amazon Kindle</h2>
+        <p className="text-center text-muted-foreground mb-10">Bien plus qu'un simple badge : un vrai outil d'analyse de niche</p>
 
-        <div className="grid md:grid-cols-4 gap-4">
+        <div className="grid md:grid-cols-3 gap-4">
           {[
-            { icon: Target, title: 'Score /100', desc: 'Évaluation globale de la niche basée sur BSR, prix et concurrence' },
-            { icon: Eye, title: 'Ventes estimées', desc: 'Nombre de ventes par jour et par mois selon le BSR Amazon' },
-            { icon: ShieldCheck, title: 'Concurrence', desc: 'Faible / Moyenne / Forte selon le nombre d\'avis sur le marché' },
-            { icon: Zap, title: 'Verdict clair', desc: 'GO 🚀 / À CREUSER 🔍 / À ÉVITER ⛔ — décision en 2 secondes' },
+            { icon: Target, title: 'Score de niche /100', desc: 'Évaluation calculée sur BSR + prix + concurrence avec verdict GO / À creuser / À éviter' },
+            { icon: Eye, title: 'Ventes estimées', desc: 'Estimation des ventes/jour et /mois selon le BSR Amazon en temps réel' },
+            { icon: ShieldCheck, title: 'Analyse Top 10 + Pépites 💎', desc: 'Sur une page de recherche : score moyen de la niche + livres à fort potentiel surlignés en vert' },
+            { icon: Sparkles, title: 'Extraction mots-clés', desc: 'Détecte automatiquement les mots-clés principaux + longue traîne du livre, copie en 1 clic' },
+            { icon: Download, title: 'Historique + Export CSV', desc: 'Garde les 30 derniers scans, ré-ouvre un livre en 1 clic, exporte tout en CSV' },
+            { icon: Zap, title: 'Multi-marketplaces', desc: 'Compatible Amazon FR, COM, UK, DE, ES, IT — un seul outil pour tous les marchés' },
           ].map(f => (
-            <Card key={f.title} className="p-5 text-center border-2 hover:border-primary transition-colors">
+            <Card key={f.title} className="p-5 border-2 hover:border-primary transition-colors">
               <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-orange-100 to-teal-100 mb-3">
                 <f.icon className="w-6 h-6 text-primary" />
               </div>
