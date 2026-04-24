@@ -128,7 +128,7 @@ const ExtensionChromePage = () => {
               </div>
             </div>
 
-            {/* RIGHT : Browser mockup with Amazon page + KDP Rocket panel */}
+            {/* RIGHT : Browser mockup — Amazon page + REAL extension popup */}
             <div className="relative">
               {/* Floating "100% Gratuit" pill */}
               <div className="absolute -top-3 right-4 z-20 bg-orange-500 text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg flex items-center gap-1.5">
@@ -146,120 +146,133 @@ const ExtensionChromePage = () => {
                   </div>
                   <div className="ml-2 flex-1 bg-white rounded-md px-3 py-1 text-[11px] text-black/60 flex items-center gap-2 border border-black/5">
                     <span>🔒</span>
-                    <span>https://www.amazon.fr/dp/B0CKDB7F3Q</span>
+                    <span className="truncate">https://www.amazon.fr/dp/B0CW194QGL</span>
                   </div>
                 </div>
 
                 {/* Amazon nav */}
                 <div className="bg-[#131921] px-4 py-2 flex items-center gap-3 text-white text-[10px]">
                   <span className="font-bold text-sm">amazon<span className="text-orange-400">.fr</span></span>
-                  <span className="opacity-70">Bonjour,<br/>Identifiez-vous</span>
-                  <span className="opacity-70">Retours et Commandes</span>
-                  <span className="opacity-70 ml-auto">Ventes</span>
-                  <span className="opacity-70">🛒 Panier</span>
-                  <div className="ml-2 px-2 py-1 bg-orange-500 rounded text-[9px] font-bold flex items-center gap-1">
-                    <Rocket className="w-2.5 h-2.5" /> EBS SCANNER
-                  </div>
+                  <span className="opacity-70 hidden sm:inline">Bonjour,<br/>Identifiez-vous</span>
+                  <span className="opacity-70 ml-auto">🛒 Panier</span>
                 </div>
 
-                {/* Page content */}
-                <div className="p-4 grid grid-cols-[80px_1fr_140px] gap-3">
-                  {/* Book cover */}
-                  <div className="bg-gradient-to-br from-orange-400 to-orange-600 rounded shadow-md aspect-[2/3] flex flex-col items-center justify-between p-2 text-white">
-                    <div className="text-[8px] font-bold text-center leading-tight">MINDSET<br/>RESET</div>
-                    <div className="w-full h-px bg-white/40" />
-                    <div className="text-[6px] text-center opacity-90 leading-tight">Reprenez le contrôle<br/>de votre vie</div>
-                    <div className="text-[5px] font-bold opacity-80">JEAN-CLAUDE FOURNIER</div>
-                  </div>
-
-                  {/* Product info */}
-                  <div className="space-y-1.5 text-[10px]">
-                    <div className="text-black/50 text-[8px]">Livres › Développement personnel › Mindset Reset</div>
-                    <h3 className="font-bold text-black text-sm leading-tight">Mindset Reset : Reprenez le contrôle de votre vie</h3>
-                    <div className="text-blue-600 text-[9px]">de Jean-Claude Fournier (Auteur)</div>
-                    <div className="flex items-center gap-1 text-[9px]">
-                      <span className="text-orange-500">★★★★★</span>
-                      <span className="text-black/60">4,7 · 1 284 évaluations</span>
-                    </div>
-                    <div className="text-base font-bold text-black pt-1">14,99 €</div>
-                    <button className="w-full bg-yellow-400 text-black text-[9px] font-semibold py-1 rounded">Ajouter au panier</button>
-                    <button className="w-full bg-orange-400 text-black text-[9px] font-semibold py-1 rounded">Acheter cet article</button>
-                    <div className="pt-1.5">
-                      <div className="font-bold text-[9px] text-black mb-0.5">Description</div>
-                      <p className="text-[8px] text-black/60 leading-snug">Découvrez les méthodes éprouvées pour transformer vos habitudes et reprendre le contrôle de votre vie quotidienne.</p>
+                {/* Page content with floating extension popup */}
+                <div className="relative p-4 bg-white min-h-[480px]">
+                  {/* Faded Amazon page in background */}
+                  <div className="grid grid-cols-[80px_1fr] gap-3 opacity-40">
+                    <div className="bg-gradient-to-br from-gray-300 to-gray-500 rounded shadow aspect-[2/3]" />
+                    <div className="space-y-1.5 text-[10px]">
+                      <div className="text-black/50 text-[8px]">Livres › Romans › Suspense</div>
+                      <h3 className="font-bold text-black text-sm leading-tight">La femme de ménage voit tout (French Edition)</h3>
+                      <div className="text-blue-600 text-[9px]">par Freida McFadden</div>
+                      <div className="flex items-center gap-1 text-[9px]">
+                        <span className="text-orange-500">★★★★★</span>
+                        <span className="text-black/60">4,5 · 17 594 évaluations</span>
+                      </div>
+                      <div className="text-base font-bold text-black pt-1">6,40 €</div>
+                      <div className="h-2 bg-gray-200 rounded w-3/4" />
+                      <div className="h-2 bg-gray-200 rounded w-2/3" />
+                      <div className="h-2 bg-gray-200 rounded w-4/5" />
                     </div>
                   </div>
 
-                  {/* EbookStudio Scanner panel (the magic) */}
-                  <div className="bg-white border-2 border-orange-400 rounded-lg p-2 space-y-2 shadow-[0_4px_12px_rgba(249,115,22,0.2)]">
-                    <div className="flex items-center gap-1 pb-1 border-b border-orange-100">
-                      <Rocket className="w-3 h-3 text-orange-500" />
-                      <span className="text-[8px] font-black text-black">EBS SCANNER</span>
+                  {/* THE REAL EXTENSION POPUP — floating top-right */}
+                  <div className="absolute top-3 right-3 w-[260px] bg-[#FAFAFA] rounded-xl shadow-2xl border border-black/10 overflow-hidden">
+                    {/* Header gradient orange → teal */}
+                    <div className="px-3 py-2.5 text-white relative" style={{ background: 'linear-gradient(135deg, #FF9E2D, #008296)' }}>
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <div className="font-bold text-[13px] flex items-center gap-1.5">📚 EbookStudio</div>
+                        </div>
+                        <button className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[10px]">×</button>
+                      </div>
                     </div>
 
-                    {/* Score gauge */}
-                    <div className="flex flex-col items-center">
-                      <div className="relative w-14 h-14">
-                        <svg className="w-14 h-14 -rotate-90" viewBox="0 0 100 100">
-                          <circle cx="50" cy="50" r="42" stroke="#fed7aa" strokeWidth="10" fill="none" />
-                          <circle cx="50" cy="50" r="42" stroke="#f97316" strokeWidth="10" fill="none" strokeLinecap="round" strokeDasharray={`${87 * 2.64} 264`} />
+                    {/* Book info */}
+                    <div className="px-3 pt-2.5 pb-2 bg-white">
+                      <div className="font-bold text-[11px] text-[#232F3E] leading-tight mb-0.5">La femme de ménage voit tout (French Edition)</div>
+                      <div className="text-[#FF9E2D] text-[9px] italic mb-1.5">par Freida McFadden</div>
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <span className="bg-gray-100 text-[8px] px-1.5 py-0.5 rounded font-mono font-semibold">ASIN: B0CW194QGL</span>
+                        <span className="text-[8px] text-[#008296] font-semibold flex items-center gap-0.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#008296]" /> .com
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 text-[9px] text-black/70">
+                        <span>📖 Kindle</span>
+                        <span>448 p.</span>
+                        <span className="text-orange-500">★★★★☆</span>
+                        <span className="font-semibold">4.5</span>
+                      </div>
+                      <div className="text-[9px] text-black/60 mt-0.5 flex items-center gap-1">
+                        📅 October 2, 2024
+                      </div>
+                    </div>
+
+                    {/* Tabs */}
+                    <div className="flex bg-white border-b border-gray-200">
+                      <button className="flex-1 py-1.5 text-[10px] font-bold text-[#008296] border-b-2 border-[#FF9E2D]">Score</button>
+                      <button className="flex-1 py-1.5 text-[10px] font-semibold text-gray-500">Mots-clés</button>
+                    </div>
+
+                    {/* Score + Verdict */}
+                    <div className="px-3 py-2.5 bg-white flex items-center gap-2.5">
+                      <div className="relative w-12 h-12 shrink-0">
+                        <svg className="w-12 h-12 -rotate-90" viewBox="0 0 100 100">
+                          <circle cx="50" cy="50" r="44" stroke="#fee2e2" strokeWidth="8" fill="none" />
+                          <circle cx="50" cy="50" r="44" stroke="#ef4444" strokeWidth="8" fill="none" strokeLinecap="round" strokeDasharray={`${21 * 2.76} 276`} />
                         </svg>
                         <div className="absolute inset-0 flex flex-col items-center justify-center">
-                          <div className="text-sm font-black text-orange-500 leading-none">87</div>
-                          <div className="text-[6px] font-bold text-black/40">/100</div>
+                          <div className="text-base font-black text-[#232F3E] leading-none">21</div>
+                          <div className="text-[7px] font-bold text-black/40">/100</div>
                         </div>
                       </div>
-                      <div className="text-[7px] font-bold text-green-600 mt-0.5 flex items-center gap-0.5">
-                        <Check className="w-2 h-2" /> Excellente niche
+                      <button className="flex-1 bg-[#ef4444] text-white text-[11px] font-bold py-2.5 rounded-md flex items-center justify-center gap-1 shadow-sm">
+                        <span className="w-3 h-3 rounded-full border-2 border-white flex items-center justify-center text-[8px]">⛔</span>
+                        À ÉVITER
+                      </button>
+                    </div>
+
+                    {/* Stats grid 2x3 */}
+                    <div className="px-3 pb-2 grid grid-cols-2 gap-1.5">
+                      <div className="bg-gray-50 rounded p-1.5">
+                        <div className="text-[7px] font-bold text-gray-500 uppercase tracking-wider">Ventes/jour</div>
+                        <div className="text-[11px] font-black text-[#232F3E] mt-0.5">~1</div>
+                      </div>
+                      <div className="bg-gray-50 rounded p-1.5">
+                        <div className="text-[7px] font-bold text-gray-500 uppercase tracking-wider">Ventes/mois</div>
+                        <div className="text-[11px] font-black text-[#232F3E] mt-0.5">~30</div>
+                      </div>
+                      <div className="bg-gray-50 rounded p-1.5">
+                        <div className="text-[7px] font-bold text-gray-500 uppercase tracking-wider">Concurrence</div>
+                        <div className="text-[11px] font-black text-red-500 mt-0.5">Forte</div>
+                      </div>
+                      <div className="bg-gray-50 rounded p-1.5">
+                        <div className="text-[7px] font-bold text-gray-500 uppercase tracking-wider">BSR</div>
+                        <div className="text-[11px] font-black text-[#232F3E] mt-0.5">#316 077</div>
+                      </div>
+                      <div className="bg-gray-50 rounded p-1.5">
+                        <div className="text-[7px] font-bold text-gray-500 uppercase tracking-wider">Prix</div>
+                        <div className="text-[11px] font-black text-[#232F3E] mt-0.5">—</div>
+                      </div>
+                      <div className="bg-gray-50 rounded p-1.5">
+                        <div className="text-[7px] font-bold text-gray-500 uppercase tracking-wider">Avis</div>
+                        <div className="text-[11px] font-black text-[#232F3E] mt-0.5">17 594</div>
                       </div>
                     </div>
 
-                    {/* Stats */}
-                    <div className="grid grid-cols-2 gap-1 text-[7px]">
-                      <div>
-                        <div className="text-black/50 font-semibold">Revenu/mois</div>
-                        <div className="font-black text-black text-[8px]">2 340 €</div>
-                      </div>
-                      <div>
-                        <div className="text-black/50 font-semibold">Ventes/jour</div>
-                        <div className="font-black text-black text-[8px]">~12</div>
-                      </div>
-                      <div>
-                        <div className="text-black/50 font-semibold">Concurrence</div>
-                        <div className="font-black text-green-600 text-[8px]">Faible</div>
-                      </div>
-                      <div>
-                        <div className="text-black/50 font-semibold">BSR</div>
-                        <div className="font-black text-black text-[8px]">#4 218</div>
+                    {/* Revenus estimés banner */}
+                    <div className="mx-3 mb-2 bg-emerald-50 border border-emerald-200 rounded-md py-1.5 px-2 text-center">
+                      <div className="text-[9px] font-bold text-emerald-700 flex items-center justify-center gap-1">
+                        💡 Revenus estimés/mois : <span className="text-emerald-800">~105 €</span>
                       </div>
                     </div>
 
-                    {/* Keywords */}
-                    <div>
-                      <div className="text-[7px] font-bold text-black mb-1">Top mots-clés</div>
-                      <div className="flex flex-wrap gap-0.5">
-                        {['mindset', 'développement', 'habitudes', 'réussite', 'psychologie'].map(k => (
-                          <span key={k} className="bg-orange-100 text-orange-700 px-1 py-0.5 rounded text-[6px] font-semibold">{k}</span>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* AI button */}
-                    <button className="w-full bg-orange-500 text-white text-[7px] font-bold py-1 rounded flex items-center justify-center gap-0.5">
-                      <Sparkles className="w-2 h-2" /> Analyser les avis IA
+                    {/* CTA bottom */}
+                    <button className="w-full bg-[#232F3E] hover:bg-[#FF9E2D] text-white text-[10px] font-bold py-2.5 transition-colors">
+                      Analyse complète sur EbookStudio →
                     </button>
-
-                    {/* Quota bar */}
-                    <div className="bg-orange-50 rounded p-1">
-                      <div className="flex items-center justify-between text-[6px] font-semibold mb-0.5">
-                        <span className="text-black flex items-center gap-0.5"><Zap className="w-2 h-2 text-orange-500" /> Analyses gratuites</span>
-                        <span className="text-black/60">2/3</span>
-                      </div>
-                      <div className="h-1 bg-white rounded-full overflow-hidden">
-                        <div className="h-full bg-orange-500 rounded-full" style={{ width: '66%' }} />
-                      </div>
-                      <div className="text-right text-[6px] text-black/50 mt-0.5">66%</div>
-                    </div>
                   </div>
                 </div>
               </div>
