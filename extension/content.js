@@ -474,6 +474,20 @@
     box.querySelectorAll(".ebk-copy-btn").forEach(btn => {
       btn.addEventListener("click", () => copyText(btn.dataset.copy, btn));
     });
+    const asinEl = box.querySelector(".ebk-asin");
+    if (asinEl) {
+      asinEl.style.cursor = "pointer";
+      asinEl.addEventListener("click", () => {
+        const asin = asinEl.querySelector("b")?.textContent;
+        if (asin && asin !== "—") {
+          navigator.clipboard.writeText(asin).then(() => {
+            const orig = asinEl.innerHTML;
+            asinEl.innerHTML = "✓ ASIN copié !";
+            setTimeout(() => { asinEl.innerHTML = orig; }, 1200);
+          });
+        }
+      });
+    }
   }
 
   // ============ MAIN ============
