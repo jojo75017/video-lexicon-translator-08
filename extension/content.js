@@ -351,10 +351,28 @@
     const est = estimateFromBsr(metrics.bsr);
     const comp = competitionFromReviews(metrics.reviews);
 
+    const mp = (metrics.marketplace || "fr").toUpperCase();
+    const stars = metrics.rating ? "★".repeat(Math.round(metrics.rating)) + "☆".repeat(5 - Math.round(metrics.rating)) : "—";
+    const titleSafe = (metrics.title || "(titre introuvable)").replace(/"/g, "&quot;");
+
     return `
       <div class="ebk-head">
         <span class="ebk-logo">📚 EbookStudio</span>
         <button class="ebk-close" aria-label="Fermer">×</button>
+      </div>
+      <div class="ebk-book-info">
+        <div class="ebk-book-title" title="${titleSafe}">${metrics.title || "(titre introuvable)"}</div>
+        <div class="ebk-book-author">${metrics.author ? "par " + metrics.author : ""}</div>
+        <div class="ebk-book-meta">
+          <span class="ebk-asin" title="Cliquer pour copier">ASIN: <b>${metrics.asin || "—"}</b></span>
+          <span class="ebk-mp">🌍 .${mp.toLowerCase()}</span>
+        </div>
+        <div class="ebk-book-meta">
+          <span>${metrics.format || "Format Kindle"}</span>
+          ${metrics.pages ? `<span>📖 ${metrics.pages} p.</span>` : ""}
+          ${metrics.rating ? `<span class="ebk-stars">${stars} ${metrics.rating.toFixed(1)}</span>` : ""}
+        </div>
+        ${metrics.publishedAt ? `<div class="ebk-book-meta"><span>📅 ${metrics.publishedAt}</span></div>` : ""}
       </div>
       <div class="ebk-tabs">
         <button class="ebk-tab ebk-active" data-tab="score">Score</button>
@@ -377,6 +395,9 @@
           <div class="ebk-stat"><span>BSR</span><b>${metrics.bsr ? "#" + metrics.bsr.toLocaleString("fr-FR") : "—"}</b></div>
           <div class="ebk-stat"><span>Prix</span><b>${metrics.price ? metrics.price.toFixed(2) + " €" : "—"}</b></div>
           <div class="ebk-stat"><span>Avis</span><b>${metrics.reviews !== null ? metrics.reviews.toLocaleString("fr-FR") : "—"}</b></div>
+        </div>
+        <div class="ebk-revenue">
+          💰 Revenus estimés/mois : <b>~${(est.monthly * (metrics.price || 4.99) * 0.7).toFixed(0)} €</b>
         </div>
       </div>
       <div class="ebk-pane ebk-pane-kw" style="display:none">
