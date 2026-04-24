@@ -51,3 +51,6 @@
   text-decoration: none; font-weight: 600; font-size: 12px;
 }
 #ebkstudio-badge .ebk-cta:hover { background: #FF9E2D; }
+#ebkstudio-badge .ebk-search-msg {
+  padding: 16px 14px; font-size: 13px; color: #232F3E; line-height: 1.5; text-align: center;
+}
