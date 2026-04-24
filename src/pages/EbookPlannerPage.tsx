@@ -44,6 +44,7 @@ import { EbookExporter } from '@/components/ebook/EbookExporter';
 import { EbookKdpTools } from '@/components/ebook/EbookKdpTools';
 import { EbookCoverGenerator } from '@/components/ebook/EbookCoverGenerator';
 import { EbookBackCoverGenerator } from '@/components/ebook/EbookBackCoverGenerator';
+import { UnifiedCoverStudio } from '@/components/ebook/UnifiedCoverStudio';
 import { CalibreStudioEpub } from '@/components/ebook/CalibreStudioEpub';
 import { EbookCharacters, type Character } from '@/components/ebook/EbookCharacters';
 import { EbookProjectsList } from '@/components/ebook/EbookProjectsList';
@@ -2232,7 +2233,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center">
                 <ImageIcon className="w-10 h-10 text-primary" />
               </div>
-              <h2 className="text-2xl font-bold text-center">Générateur de couvertures</h2>
+              <h2 className="text-2xl font-bold text-center">Studio Couverture KDP</h2>
               <p className="text-muted-foreground text-center max-w-md">
                 Créez des couvertures professionnelles avec l'IA. Disponible avec l'accès complet.
               </p>
@@ -2247,9 +2248,18 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           );
         }
         return (
-          <EbookCoverGenerator
+          <UnifiedCoverStudio
             ebookTitle={ebookTitle}
             authorName={authorName}
+            chapters={chapters}
+            isGenerating={isGenerating}
+            defaultTab="ai"
+            onGenerateBackCover={async (tone, audience, highlights) =>
+              await generateBackCover(ebookTitle, authorName, chapters, tone, audience, highlights)
+            }
+            onCoverGenerated={(url) => {
+              setEbookImages(prev => [{ url, title: 'Couverture IA' }, ...prev]);
+            }}
           />
         );
       
@@ -2572,13 +2582,17 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       
       case 'backcover':
         return (
-          <EbookBackCoverGenerator
+          <UnifiedCoverStudio
             ebookTitle={ebookTitle}
             authorName={authorName}
             chapters={chapters}
             isGenerating={isGenerating}
-            onGenerate={async (tone, audience, highlights) => {
-              return await generateBackCover(ebookTitle, authorName, chapters, tone, audience, highlights);
+            defaultTab="backcover"
+            onGenerateBackCover={async (tone, audience, highlights) =>
+              await generateBackCover(ebookTitle, authorName, chapters, tone, audience, highlights)
+            }
+            onCoverGenerated={(url) => {
+              setEbookImages(prev => [{ url, title: 'Couverture IA' }, ...prev]);
             }}
           />
         );
@@ -2898,11 +2912,17 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       
       case 'cover-design-editor':
         return (
-          <CoverDesignEditor
+          <UnifiedCoverStudio
             ebookTitle={ebookTitle}
             authorName={authorName}
-            onCoverExported={(url) => {
-              setEbookImages(prev => [{ url, title: 'Couverture Design' }, ...prev]);
+            chapters={chapters}
+            isGenerating={isGenerating}
+            defaultTab="ai"
+            onGenerateBackCover={async (tone, audience, highlights) =>
+              await generateBackCover(ebookTitle, authorName, chapters, tone, audience, highlights)
+            }
+            onCoverGenerated={(url) => {
+              setEbookImages(prev => [{ url, title: 'Couverture IA' }, ...prev]);
             }}
           />
         );
