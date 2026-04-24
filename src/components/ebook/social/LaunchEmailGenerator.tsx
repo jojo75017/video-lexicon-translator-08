@@ -58,12 +58,12 @@ const LaunchEmailGenerator: React.FC<LaunchEmailGeneratorProps> = ({
       const prompt = `Tu es un expert en email marketing pour auteurs. Génère une séquence de 6 emails de lancement pour le livre "${title}"${author ? ` par ${author}` : ''}${link ? ` (lien: ${link})` : ''}.
 
 Les 6 emails correspondent aux phases:
-${EMAIL_PHASES.map(p => `- ${p.label}: ${p.description}`).join('\n')}
+${EMAIL_PHASES.map(p => `- ${p.id} (${p.label}): ${p.description}`).join('\n')}
 
 Pour CHAQUE email, fournis:
 - Un objet/sujet accrocheur (max 60 caractères)
 - Un texte de preview (max 90 caractères)  
-- Le corps de l'email (300-500 mots, ton conversationnel et engageant)
+- Le corps de l'email (200-350 mots, ton conversationnel et engageant)
 
 CONTRAINTES:
 - Écrire en français
@@ -71,37 +71,66 @@ CONTRAINTES:
 - Personnaliser avec {{PRENOM}} comme variable
 - NE PAS utiliser de markdown
 - Ton chaleureux et authentique, pas commercial agressif
+- Réponds UNIQUEMENT avec du JSON valide, sans texte autour
 
-Réponds en JSON strict:
+Format JSON strict (utilise les phaseId exacts ci-dessus):
 {
   "emails": [
-    {
-      "phaseId": "teaser-j7",
-      "subject": "objet de l'email",
-      "preview": "texte de preview",
-      "body": "corps complet de l'email"
-    }
+    { "phaseId": "teaser-j7", "subject": "...", "preview": "...", "body": "..." },
+    { "phaseId": "teaser-j3", "subject": "...", "preview": "...", "body": "..." },
+    { "phaseId": "launch-j0", "subject": "...", "preview": "...", "body": "..." },
+    { "phaseId": "reminder-j1", "subject": "...", "preview": "...", "body": "..." },
+    { "phaseId": "social-proof-j3", "subject": "...", "preview": "...", "body": "..." },
+    { "phaseId": "last-chance-j7", "subject": "...", "preview": "...", "body": "..." }
   ]
 }`;
 
       const { data, error } = await supabase.functions.invoke('generate-content', {
-        body: { type: 'launch-email-sequence', prompt, maxOutputTokens: 6000, temperature: 0.8 },
+        body: { 
+          type: 'launch-email-sequence', 
+          prompt, 
+          maxTokens: 8000, 
+          temperature: 0.8,
+          userApiKey: userGeminiKey,
+        },
       });
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
 
       const text = data?.content || data?.text || '';
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[0]);
-        if (parsed.emails) {
-          setEmails(parsed.emails);
-          setExpandedEmail(0);
-          toast.success(`${parsed.emails.length} emails générés !`);
-        }
+      if (!text) throw new Error('Réponse vide de l\'IA');
+
+      // Nettoyer les éventuels backticks
+      const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        console.error('Pas de JSON trouvé. Réponse brute:', text);
+        throw new Error('Format de réponse invalide');
       }
-    } catch (err) {
+
+      let parsed;
+      try {
+        parsed = JSON.parse(jsonMatch[0]);
+      } catch (parseErr) {
+        console.error('JSON invalide. Réponse brute:', text);
+        throw new Error('JSON tronqué — réessayez');
+      }
+
+      if (parsed.emails && parsed.emails.length > 0) {
+        setEmails(parsed.emails);
+        setExpandedEmail(0);
+        toast.success(`${parsed.emails.length} emails générés !`);
+      } else {
+        throw new Error('Aucun email retourné');
+      }
+    } catch (err: any) {
       console.error('Erreur génération emails:', err);
-      toast.error('Erreur lors de la génération');
+      const msg = err?.message || 'Erreur lors de la génération';
+      if (msg.includes('Clé API Gemini') || msg.includes('API key')) {
+        toast.error('Configurez votre clé API Gemini dans Paramètres > Clés API', { duration: 6000 });
+      } else {
+        toast.error(msg);
+      }
     } finally { setIsGenerating(false); }
   };
 
