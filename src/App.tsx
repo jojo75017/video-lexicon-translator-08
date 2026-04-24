@@ -254,6 +254,7 @@ const App = () => {
             <Route path="/cgv" element={<CGV />} />
             <Route path="/licence" element={<Licence />} />
             <Route path="/eula" element={<Licence />} />
+            <Route path="/licence-etendue" element={<LicenceEtenduePage />} />
             <Route path="/logout-total" element={<LogoutTotalPage />} />
             <Route path="/blog" element={<BlogPage />} />
             <Route path="/blog/:slug" element={<BlogArticleTemplate />} />
