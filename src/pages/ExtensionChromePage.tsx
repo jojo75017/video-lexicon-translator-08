@@ -158,7 +158,7 @@ const ExtensionChromePage = () => {
                   <span className="opacity-70 ml-auto">Ventes</span>
                   <span className="opacity-70">🛒 Panier</span>
                   <div className="ml-2 px-2 py-1 bg-orange-500 rounded text-[9px] font-bold flex items-center gap-1">
-                    <Rocket className="w-2.5 h-2.5" /> KDP ROCKET
+                    <Rocket className="w-2.5 h-2.5" /> EBS SCANNER
                   </div>
                 </div>
 
@@ -190,11 +190,11 @@ const ExtensionChromePage = () => {
                     </div>
                   </div>
 
-                  {/* KDP ROCKET panel (the magic) */}
+                  {/* EbookStudio Scanner panel (the magic) */}
                   <div className="bg-white border-2 border-orange-400 rounded-lg p-2 space-y-2 shadow-[0_4px_12px_rgba(249,115,22,0.2)]">
                     <div className="flex items-center gap-1 pb-1 border-b border-orange-100">
                       <Rocket className="w-3 h-3 text-orange-500" />
-                      <span className="text-[8px] font-black text-black">KDP ROCKET</span>
+                      <span className="text-[8px] font-black text-black">EBS SCANNER</span>
                     </div>
 
                     {/* Score gauge */}
