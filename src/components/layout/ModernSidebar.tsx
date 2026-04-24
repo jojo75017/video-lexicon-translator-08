@@ -487,8 +487,18 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
   const navigate = useNavigate();
   const { isDark, toggleTheme } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
-  // Accordéon EXCLUSIF — un seul groupe ouvert à la fois
-  const [openGroup, setOpenGroup] = useState<string | null>('🤖 Workflow IA');
+  // Accordéon EXCLUSIF — un seul groupe ouvert à la fois.
+  // Au premier accès on met en avant le groupe "📦 Publier" (qui contient les nouveaux
+  // outils Mots-Clés KDP Pro & Audit Pilot) puis on retombe sur Workflow IA.
+  const [openGroup, setOpenGroup] = useState<string | null>(() => {
+    if (typeof window === 'undefined') return '🤖 Workflow IA';
+    const seen = localStorage.getItem('sidebar_kdp_tools_promoted_v1');
+    if (!seen) {
+      localStorage.setItem('sidebar_kdp_tools_promoted_v1', '1');
+      return '📦 Publier';
+    }
+    return '🤖 Workflow IA';
+  });
   // Toggle "essentiel vs avancé" par groupe (true = avancés visibles)
   const [showAdvanced, setShowAdvanced] = useState<Record<string, boolean>>({});
 
