@@ -57,6 +57,7 @@ const BDStudioPage = lazy(() => import('./pages/BDStudioPage'));
 const SeriesTomesPage = lazy(() => import('./pages/SeriesTomesPage'));
 const ForumPage = lazy(() => import('./pages/ForumPage'));
 const KdpKeywordResearchPage = lazy(() => import('./pages/KdpKeywordResearchPage'));
+const AuditPilotPage = lazy(() => import('./pages/AuditPilotPage'));
 const PublicAudiobookPage = lazy(() => import('./pages/PublicAudiobookPage'));
 const AudiobookEmbedPage = lazy(() => import('./pages/AudiobookEmbedPage'));
 const AudiobookDemoPage = lazy(() => import('./pages/AudiobookDemoPage'));
@@ -341,6 +342,19 @@ const App = () => {
                   onInvalid={handleLogout}
                 >
                   <KdpKeywordResearchPage />
+                </SubscriberGate>
+              }
+            />
+            <Route
+              path="/audit-pilot"
+              element={
+                <SubscriberGate
+                  isAdmin={isAdmin}
+                  subscriberEmail={subscriberEmail}
+                  subscriberData={subscriberData}
+                  onInvalid={handleLogout}
+                >
+                  <AuditPilotPage />
                 </SubscriberGate>
               }
             />
