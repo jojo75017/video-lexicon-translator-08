@@ -41,6 +41,7 @@ const LaunchEmailGenerator: React.FC<LaunchEmailGeneratorProps> = ({
   authorName = '',
   amazonLink = '',
 }) => {
+  const { apiKey: userGeminiKey } = useOpenAIConfig();
   const [title, setTitle] = useState(ebookTitle);
   const [author, setAuthor] = useState(authorName);
   const [link, setLink] = useState(amazonLink);
