@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
-import { Download, Check, Chrome, Sparkles, ArrowLeft, Zap, Eye, Target, ShieldCheck } from 'lucide-react';
+import { Download, Check, Chrome, Sparkles, ArrowLeft, Zap, Eye, Target, ShieldCheck, Search, BarChart3, Crosshair, Gift } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
@@ -26,8 +26,15 @@ const ExtensionChromePage = () => {
       .finally(() => setDownloading(false));
   };
 
+  const heroFeatures = [
+    { icon: Search, title: 'Score de niche en temps réel', desc: 'Visualise le potentiel d\'un livre directement sur sa fiche Amazon' },
+    { icon: BarChart3, title: 'Analyse IA des avis', desc: 'Synthèse des points forts et faibles des concurrents en 30 sec' },
+    { icon: Crosshair, title: 'Mots-clés extraits automatiquement', desc: 'Récupère les keywords gagnants utilisés par les best-sellers' },
+    { icon: Gift, title: 'Gratuit pour tous', desc: '3 analyses IA offertes le 1er jour, puis 1/jour. Illimité avec un plan payant.' },
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-background to-teal-50">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-background to-orange-50/40">
       <Helmet>
         <title>Extension Chrome KDP — Score de niche Amazon en 1 clic | EbookStudio</title>
         <meta name="description" content="Scanne n'importe quelle page Amazon Kindle : score de niche /100, ventes estimées, concurrence et verdict GO/À éviter. Extension Chrome 100% gratuite." />
@@ -36,7 +43,7 @@ const ExtensionChromePage = () => {
 
       {/* Header */}
       <header className="border-b bg-white/80 backdrop-blur sticky top-0 z-40">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           <Link to="/offres" className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground">
             <ArrowLeft className="w-4 h-4" /> Retour aux offres
           </Link>
@@ -44,25 +51,196 @@ const ExtensionChromePage = () => {
         </div>
       </header>
 
-      {/* Hero */}
-      <section className="max-w-5xl mx-auto px-4 pt-12 pb-16 text-center">
-        <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-1.5 rounded-full text-xs font-semibold mb-6">
-          <Sparkles className="w-3.5 h-3.5" /> NOUVEAU — Extension Chrome
+      {/* HERO — style maquette KDP Rocket */}
+      <section className="max-w-7xl mx-auto px-4 pt-12 pb-20">
+        {/* Badge top centré */}
+        <div className="flex justify-center mb-6">
+          <span className="inline-flex items-center gap-2 bg-white border border-orange-200 text-orange-600 px-4 py-1.5 rounded-full text-xs font-semibold shadow-sm">
+            <Chrome className="w-3.5 h-3.5" /> Nouveau · Extension Chrome gratuite
+          </span>
         </div>
-        <h1 className="text-4xl md:text-6xl font-extrabold text-foreground mb-5 leading-tight">
-          Tu passes encore des heures à<br/>
-          <span className="bg-gradient-to-r from-orange-500 to-teal-600 bg-clip-text text-transparent">chercher une niche rentable ?</span>
+
+        {/* Titre */}
+        <h1 className="text-4xl md:text-6xl font-extrabold text-center text-slate-900 leading-tight mb-5">
+          Analyse n'importe quel livre Amazon<br />
+          <span className="text-orange-500">en 1 clic</span>
         </h1>
-        <p className="text-xl md:text-2xl text-muted-foreground mb-3 font-medium">C'est terminé.</p>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
-          L'extension <strong>EbookStudio Scanner</strong> t'ouvre Amazon, tu cliques, et tu sais instantanément si la niche vaut le coup.
+        <p className="text-lg text-center text-slate-600 max-w-2xl mx-auto mb-12">
+          Installe l'extension <strong>EbookStudio Scanner</strong> sur Chrome et obtiens instantanément le potentiel d'une niche, le score de concurrence et les mots-clés gagnants directement sur Amazon.
         </p>
 
-        <Button size="lg" onClick={handleDownload} disabled={downloading} className="text-lg px-8 py-6 bg-gradient-to-r from-orange-500 to-teal-600 hover:from-orange-600 hover:to-teal-700 text-white shadow-xl">
-          <Download className="w-5 h-5 mr-2" />
-          {downloading ? 'Téléchargement…' : "Télécharger l'extension (gratuit)"}
-        </Button>
-        <p className="text-xs text-muted-foreground mt-3">Compatible Chrome, Edge, Brave, Opera • 17 Ko • Aucune inscription</p>
+        {/* Grille 2 colonnes : features à gauche, mockup à droite */}
+        <div className="grid lg:grid-cols-2 gap-10 items-center">
+          {/* Colonne gauche : 4 features + CTA */}
+          <div className="space-y-3">
+            {heroFeatures.map(f => (
+              <div key={f.title} className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex items-start gap-4 hover:shadow-md transition-shadow">
+                <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-orange-50 flex items-center justify-center">
+                  <f.icon className="w-5 h-5 text-orange-500" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-slate-900 text-base mb-0.5">{f.title}</h3>
+                  <p className="text-sm text-slate-500 leading-snug">{f.desc}</p>
+                </div>
+              </div>
+            ))}
+
+            {/* CTA principal */}
+            <div className="pt-3">
+              <Button
+                size="lg"
+                onClick={handleDownload}
+                disabled={downloading}
+                className="w-full sm:w-auto text-base px-8 py-6 bg-orange-500 hover:bg-orange-600 text-white shadow-lg shadow-orange-500/30 rounded-xl"
+              >
+                <Download className="w-5 h-5 mr-2" />
+                {downloading ? 'Téléchargement…' : 'Télécharger gratuitement'}
+                <span className="ml-2">→</span>
+              </Button>
+              <div className="flex flex-wrap gap-x-5 gap-y-1 mt-4 text-sm text-slate-600">
+                <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-emerald-500" /> Sans carte bancaire</span>
+                <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-emerald-500" /> Installation en 30 sec</span>
+                <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-emerald-500" /> Compatible Chrome, Edge, Brave</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Colonne droite : mockup navigateur Amazon + badge */}
+          <div className="relative">
+            {/* Badge "100% Gratuit" flottant */}
+            <div className="absolute -top-3 -right-2 z-20 bg-orange-500 text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-1.5 text-sm font-bold">
+              <Gift className="w-4 h-4" /> 100% Gratuit
+            </div>
+
+            {/* Fenêtre navigateur */}
+            <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+              {/* Barre navigateur */}
+              <div className="bg-slate-100 px-3 py-2 flex items-center gap-2 border-b border-slate-200">
+                <div className="flex gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-red-400" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
+                </div>
+                <div className="flex-1 bg-white rounded-md px-3 py-1 text-[10px] text-slate-500 truncate border border-slate-200 mx-2">
+                  🔒 https://www.amazon.fr/dp/B0CKD87F3Q
+                </div>
+                <span className="text-[10px] text-slate-400">⋮</span>
+              </div>
+
+              {/* Barre Amazon */}
+              <div className="bg-[#131921] text-white px-3 py-1.5 flex items-center gap-3 text-[10px]">
+                <span className="font-bold italic text-amber-400">amazon<span className="text-white">.fr</span></span>
+                <span className="text-slate-300">Bonjour,<br/>Identifiez-vous</span>
+                <span className="text-slate-300 hidden sm:inline">Retours et Commandes</span>
+                <span className="text-slate-300 hidden md:inline">Ventes</span>
+                <span className="ml-auto text-slate-300">🛒 Panier</span>
+              </div>
+
+              {/* Contenu fiche + badge extension */}
+              <div className="p-3 grid grid-cols-12 gap-2 bg-white">
+                {/* Fil d'ariane */}
+                <div className="col-span-12 text-[9px] text-slate-500 mb-1">Livres › Développement personnel › Mindset Reset</div>
+
+                {/* Couverture */}
+                <div className="col-span-4">
+                  <div className="aspect-[2/3] bg-gradient-to-br from-orange-400 to-orange-600 rounded shadow-md flex flex-col items-center justify-between p-2 text-white">
+                    <div className="text-center pt-3">
+                      <div className="text-[18px] font-extrabold leading-none tracking-tight">MINDSET</div>
+                      <div className="text-[18px] font-extrabold leading-none tracking-tight">RESET</div>
+                    </div>
+                    <div className="text-center text-[7px] leading-tight px-1">
+                      Reprenez le contrôle<br/>de votre vie
+                    </div>
+                    <div className="text-[7px] font-bold tracking-wider">JEAN-CLAUDE FOURNIER</div>
+                  </div>
+                </div>
+
+                {/* Infos livre */}
+                <div className="col-span-4 text-[9px] leading-tight">
+                  <div className="font-bold text-slate-900 text-[11px] leading-tight mb-1">Mindset Reset : Reprenez le contrôle de votre vie</div>
+                  <div className="text-blue-700 mb-1">de Jean-Claude Fournier <span className="text-slate-500">(Auteur)</span></div>
+                  <div className="text-amber-500 mb-1">★★★★★ <span className="text-blue-700">1 284 évaluations</span></div>
+                  <div className="text-slate-900 font-bold text-sm mb-1.5">14,99 €</div>
+                  <button className="w-full bg-amber-300 text-slate-900 rounded-full py-1 text-[9px] font-semibold mb-1">Ajouter au panier</button>
+                  <button className="w-full bg-orange-400 text-white rounded-full py-1 text-[9px] font-semibold mb-2">Acheter cet article</button>
+                  <div className="text-[8px] text-slate-700">
+                    <div className="font-bold mb-0.5">Description</div>
+                    <div className="text-slate-500 leading-snug">Découvrez les méthodes éprouvées pour transformer vos habitudes et reprendre le contrôle de votre vie quotidienne.</div>
+                  </div>
+                </div>
+
+                {/* BADGE EXTENSION (à droite) */}
+                <div className="col-span-4">
+                  <div className="bg-white rounded-lg border-2 border-orange-300 shadow-lg overflow-hidden">
+                    <div className="bg-gradient-to-r from-orange-500 to-orange-400 text-white px-2 py-1 text-[8px] font-bold flex items-center gap-1">
+                      <Sparkles className="w-2.5 h-2.5" /> KDP ROCKET
+                    </div>
+                    <div className="p-2">
+                      {/* Score circulaire */}
+                      <div className="flex flex-col items-center mb-2">
+                        <div className="w-14 h-14 rounded-full border-[5px] border-orange-500 flex flex-col items-center justify-center">
+                          <div className="text-base font-extrabold text-orange-600 leading-none">87</div>
+                          <div className="text-[7px] text-slate-500">/100</div>
+                        </div>
+                        <div className="text-[8px] font-bold text-emerald-600 mt-1">✓ Excellente niche</div>
+                      </div>
+
+                      {/* Stats */}
+                      <div className="grid grid-cols-2 gap-1 text-[7px] mb-2">
+                        <div className="bg-slate-50 rounded p-1">
+                          <div className="text-slate-500">• Revenu/mois</div>
+                          <div className="font-bold text-slate-900 text-[8px]">2 340 €</div>
+                        </div>
+                        <div className="bg-slate-50 rounded p-1">
+                          <div className="text-slate-500">• Ventes/jour</div>
+                          <div className="font-bold text-slate-900 text-[8px]">~12</div>
+                        </div>
+                        <div className="bg-slate-50 rounded p-1">
+                          <div className="text-slate-500">• Concurrence</div>
+                          <div className="font-bold text-emerald-600 text-[8px]">Faible</div>
+                        </div>
+                        <div className="bg-slate-50 rounded p-1">
+                          <div className="text-slate-500">• BSR</div>
+                          <div className="font-bold text-slate-900 text-[8px]">#4 218</div>
+                        </div>
+                      </div>
+
+                      {/* Top mots-clés */}
+                      <div className="mb-2">
+                        <div className="text-[7px] font-bold text-slate-700 mb-0.5">Top mots-clés</div>
+                        <div className="flex flex-wrap gap-0.5">
+                          {['mindset', 'développement', 'habitudes', 'réussite', 'psychologie'].map(k => (
+                            <span key={k} className="bg-orange-100 text-orange-800 px-1 py-0.5 rounded text-[6px] font-medium">{k}</span>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* CTA analyse avis */}
+                      <button className="w-full bg-amber-300 text-slate-900 rounded-full py-1 text-[7px] font-bold mb-1.5">⚡ Analyser les avis IA</button>
+
+                      {/* Quota */}
+                      <div className="bg-orange-50 rounded p-1 text-[7px]">
+                        <div className="flex justify-between mb-0.5">
+                          <span className="text-orange-700 font-semibold">📊 Analyses gratuites</span>
+                          <span className="font-bold text-orange-900">2/3</span>
+                        </div>
+                        <div className="h-1 bg-orange-200 rounded-full overflow-hidden">
+                          <div className="h-full w-2/3 bg-orange-500 rounded-full" />
+                        </div>
+                        <div className="text-right text-orange-700 mt-0.5">66%</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Tag "Analyse en 1 clic" sous le mockup */}
+            <div className="absolute -bottom-4 left-8 bg-white border border-slate-200 rounded-full px-4 py-2 shadow-lg flex items-center gap-2 text-sm font-semibold text-slate-700">
+              <Zap className="w-4 h-4 text-orange-500" /> Analyse en 1 clic
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* What you see */}
