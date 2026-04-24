@@ -85,6 +85,9 @@ const UpsellPaiementPage = () => {
     if (serenityAddon) {
       sessionStorage.setItem('serenity_addon', 'true');
     }
+    if (extendedLicense) {
+      sessionStorage.setItem('extended_license', 'true');
+    }
   };
 
   const goToConfirmation = () => {
