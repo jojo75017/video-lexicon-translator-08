@@ -2912,11 +2912,17 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       
       case 'cover-design-editor':
         return (
-          <CoverDesignEditor
+          <UnifiedCoverStudio
             ebookTitle={ebookTitle}
             authorName={authorName}
-            onCoverExported={(url) => {
-              setEbookImages(prev => [{ url, title: 'Couverture Design' }, ...prev]);
+            chapters={chapters}
+            isGenerating={isGenerating}
+            defaultTab="ai"
+            onGenerateBackCover={async (tone, audience, highlights) =>
+              await generateBackCover(ebookTitle, authorName, chapters, tone, audience, highlights)
+            }
+            onCoverGenerated={(url) => {
+              setEbookImages(prev => [{ url, title: 'Couverture IA' }, ...prev]);
             }}
           />
         );
