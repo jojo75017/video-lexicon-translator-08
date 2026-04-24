@@ -3,13 +3,20 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Check, Copy, CreditCard, ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
+import { Check, Copy, CreditCard, ArrowLeft, ArrowRight, Loader2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { Link, useNavigate } from "react-router-dom";
 import { useVipAvailability } from "@/hooks/useVipAvailability";
 
+const BASE_PRICE = 67;
+const SERENITY_PRICE = 30;
+
+const buildPaypalLink = (amount: number, label: string) =>
+  `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=${amount}&currency_code=EUR&item_name=${encodeURIComponent(label)}`;
+
 const PaiementManuelPage = () => {
   const [email, setEmail] = useState("");
+  const [serenityAddon, setSerenityAddon] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
   const navigate = useNavigate();
   const { isVipAvailable, isLoading: vipLoading } = useVipAvailability();
@@ -22,11 +29,16 @@ const PaiementManuelPage = () => {
     }
   }, [vipLoading, isVipAvailable, navigate]);
 
+  const totalPrice = BASE_PRICE + (serenityAddon ? SERENITY_PRICE : 0);
+  const itemName = serenityAddon
+    ? "EbookStudio Pro Lifetime + Pack Sérénité"
+    : "EbookStudio Pro - Acces a Vie";
+
   const paymentInfo = {
-    price: "67",
+    price: String(totalPrice),
     name: "EbookStudio Pro - Accès à Vie",
     description: "Offre de lancement • Accès complet à vie",
-    paypalLink: "https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=67&currency_code=EUR&item_name=EbookStudio%20Pro%20-%20Acces%20a%20Vie",
+    paypalLink: buildPaypalLink(totalPrice, itemName),
     iban: "FR76 XXXX XXXX XXXX XXXX XXXX XXX",
   };
 
