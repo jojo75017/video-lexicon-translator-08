@@ -1,11 +1,13 @@
 import { Helmet } from 'react-helmet';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
-import { Download, Check, ArrowLeft, ArrowRight, Search, BarChart3, Crosshair, Gift, Rocket, Zap, Star, Target, TrendingUp, ShieldCheck, Sparkles, Eye } from 'lucide-react';
+import { Download, Check, ArrowLeft, ArrowRight, Search, BarChart3, Crosshair, Gift, Rocket, Zap, Star, Target, TrendingUp, ShieldCheck, Sparkles, Eye, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 const ExtensionChromePage = () => {
   const [downloading, setDownloading] = useState(false);
+  const navigate = useNavigate();
 
   const handleDownload = () => {
     setDownloading(true);
@@ -109,17 +111,30 @@ const ExtensionChromePage = () => {
               ))}
 
               {/* CTA */}
-              <div className="pt-4">
+              <div className="pt-4 space-y-3">
                 <Button
                   onClick={handleDownload}
                   disabled={downloading}
                   size="lg"
-                  className="w-full sm:w-auto bg-orange-500 hover:bg-orange-600 text-white font-bold text-base px-8 py-6 rounded-xl shadow-[0_8px_30px_rgba(249,115,22,0.35)] hover:shadow-[0_12px_40px_rgba(249,115,22,0.45)] transition-all border-0"
+                  className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold text-base px-8 py-6 rounded-xl shadow-[0_8px_30px_rgba(249,115,22,0.35)] hover:shadow-[0_12px_40px_rgba(249,115,22,0.45)] transition-all border-0"
                 >
                   <Download className="w-5 h-5 mr-2" />
                   {downloading ? 'Téléchargement…' : 'Télécharger gratuitement'}
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
+
+                {/* Bouton secondaire Pro */}
+                <Button
+                  onClick={() => navigate('/offres')}
+                  variant="outline"
+                  size="lg"
+                  className="w-full bg-black hover:bg-gray-900 text-white border-0 font-bold text-base px-8 py-6 rounded-xl transition-all hover:scale-[1.01]"
+                >
+                  <Crown className="w-5 h-5 mr-2 text-orange-400" />
+                  Passer Pro — 67€/an (analyses illimitées)
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+
                 <div className="flex flex-wrap gap-x-5 gap-y-1 mt-4 text-sm text-black/60">
                   <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-orange-500" /> Sans carte bancaire</span>
                   <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-orange-500" /> Installation en 30 sec</span>
