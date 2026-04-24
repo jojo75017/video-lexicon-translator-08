@@ -104,10 +104,15 @@ const FunnelStepsBar = ({ onCtaClick }: FunnelStepsBarProps) => {
           <button
             type="button"
             onClick={handleClick}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-black text-sm sm:text-base px-6 py-3 shadow-lg shadow-amber-500/30 transition-all hover:scale-[1.02]"
+            className="inline-flex items-center justify-center gap-2 rounded-xl font-black text-base sm:text-lg px-8 py-4 transition-all hover:scale-[1.02]"
+            style={{
+              background: "linear-gradient(90deg, #F59E0B 0%, #F97316 100%)",
+              color: "#FFFFFF",
+              boxShadow: "0 10px 25px -5px rgba(245, 158, 11, 0.5)",
+            }}
           >
-            🚀 Démarrer maintenant — 67€/an
-            <ArrowRight className="w-4 h-4" />
+            <span style={{ color: "#FFFFFF" }}>🚀 Démarrer maintenant — 67€/an</span>
+            <ArrowRight className="w-5 h-5" style={{ color: "#FFFFFF" }} />
           </button>
           <span className="text-xs text-muted-foreground">
             ✓ 7 jours gratuits · ✓ Sans engagement · ✓ Paiement sécurisé
