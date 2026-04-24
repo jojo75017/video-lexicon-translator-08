@@ -320,23 +320,31 @@ const UpsellPaiementPage = () => {
                 </label>
 
                 {/* Récap du total */}
-                {serenityAddon && (
+                {(serenityAddon || extendedLicense) && (
                   <div className="bg-muted/60 border border-amber-500/30 rounded-lg p-3 text-sm">
                     <div className="flex justify-between text-foreground/80">
                       <span>{paymentOptions.find(o => o.id === selectedPayment)?.label}</span>
                       <span>{baseAmounts[selectedPayment]}€</span>
                     </div>
-                    <div className="flex justify-between text-amber-300">
-                      <span>+ Pack Sérénité</span>
-                      <span>+{SERENITY_PRICE}€</span>
-                    </div>
+                    {serenityAddon && (
+                      <div className="flex justify-between text-amber-300">
+                        <span>+ Pack Sérénité</span>
+                        <span>+{SERENITY_PRICE}€</span>
+                      </div>
+                    )}
+                    {extendedLicense && (
+                      <div className="flex justify-between text-purple-300">
+                        <span>+ Licence Étendue</span>
+                        <span>+{EXTENDED_LICENSE_PRICE}€</span>
+                      </div>
+                    )}
                     <div className="flex justify-between font-bold text-white pt-2 mt-2 border-t border-border">
                       <span>Total à payer maintenant</span>
                       <span>{currentAmount}€</span>
                     </div>
                     {selectedPayment !== 'full' && (
                       <p className="text-[11px] text-muted-foreground mt-1">
-                        (Pack Sérénité ajouté à la 1ère échéance uniquement)
+                        (Suppléments ajoutés à la 1ère échéance uniquement)
                       </p>
                     )}
                   </div>
