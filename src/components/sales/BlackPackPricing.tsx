@@ -1,5 +1,8 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { Check, Rocket, ArrowRight, ShieldCheck, Star } from "lucide-react";
+import { Check, Rocket, ArrowRight, ShieldCheck, Star, Mail } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import StripeCheckoutButton from "@/components/StripeCheckoutButton";
 
 interface BlackPackPricingProps {
   onCtaClick: () => void;
@@ -15,6 +18,8 @@ const SOFT = "#1a1a1a";
 
 const BlackPackPricing = ({ onCtaClick, launchPrice = 67, normalPrice = 147 }: BlackPackPricingProps) => {
   const discount = Math.round(((normalPrice - launchPrice) / normalPrice) * 100);
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
 
   const breakdown = [
     { label: "Tous les outils KDP", price: 87 },
@@ -187,41 +192,83 @@ const BlackPackPricing = ({ onCtaClick, launchPrice = 67, normalPrice = 147 }: B
           </motion.div>
         </div>
 
-        {/* CTA central */}
+        {/* CTA central — Email + 2 boutons paiement */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="text-center"
+          className="mx-auto max-w-xl"
         >
-          <button
-            type="button"
-            onClick={onCtaClick}
-            className="group inline-flex items-center justify-center gap-3 rounded-2xl px-8 sm:px-12 py-5 sm:py-6 font-black text-base sm:text-lg transition-all hover:scale-[1.03] active:scale-100"
+          {/* Champ email */}
+          <div
+            className="rounded-2xl p-5 sm:p-6"
             style={{
-              background: `linear-gradient(135deg, ${GOLD} 0%, #FF8A00 100%)`,
-              color: SOFT,
-              boxShadow: `0 10px 40px hsl(38 92% 50% / 0.45), 0 0 0 1px hsl(38 92% 50% / 0.6)`,
+              background: "rgba(255,255,255,0.04)",
+              border: `1px solid rgba(255,176,32,0.25)`,
             }}
           >
-            <Rocket className="h-5 w-5 sm:h-6 sm:w-6" style={{ color: SOFT }} />
-            <span style={{ color: SOFT }}>
-              Je veux générer des revenus (€{launchPrice})
-            </span>
-            <ArrowRight className="h-5 w-5 sm:h-6 sm:w-6 transition-transform group-hover:translate-x-1" style={{ color: SOFT }} />
-          </button>
+            <label className="block text-xs font-bold uppercase tracking-widest mb-2" style={{ color: GOLD }}>
+              Ton email pour recevoir l'accès
+            </label>
+            <div className="relative mb-4">
+              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5" style={{ color: GREY }} />
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="ton@email.com"
+                className="w-full rounded-xl border-0 py-3.5 pl-12 pr-4 text-base font-semibold focus:outline-none focus:ring-2"
+                style={{
+                  background: "rgba(255,255,255,0.06)",
+                  color: WHITE,
+                  border: "1px solid rgba(255,255,255,0.12)",
+                }}
+                required
+              />
+            </div>
 
+            {/* Bouton 1 : Carte bancaire (Stripe) — PRINCIPAL */}
+            <StripeCheckoutButton
+              email={email}
+              className="w-full inline-flex items-center justify-center gap-3 rounded-xl px-6 py-4 sm:py-5 font-black text-base sm:text-lg transition-all hover:scale-[1.02] active:scale-100 disabled:opacity-60 disabled:hover:scale-100 mb-3"
+            >
+              💳 Payer par carte — €{launchPrice}/an
+            </StripeCheckoutButton>
+
+            {/* Séparateur */}
+            <div className="flex items-center gap-3 my-3">
+              <div className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.12)" }} />
+              <span className="text-xs font-bold uppercase tracking-widest" style={{ color: GREY }}>ou</span>
+              <div className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.12)" }} />
+            </div>
+
+            {/* Bouton 2 : PayPal — SECONDAIRE */}
+            <button
+              type="button"
+              onClick={() => navigate("/paiement-manuel")}
+              className="w-full inline-flex items-center justify-center gap-3 rounded-xl px-6 py-3.5 font-bold text-sm transition-all hover:bg-white/10"
+              style={{
+                background: "transparent",
+                color: WHITE,
+                border: "1.5px solid rgba(255,255,255,0.25)",
+              }}
+            >
+              💰 Payer avec PayPal (2x ou 3x possible)
+            </button>
+          </div>
+
+          {/* Rassurances */}
           <div
             className="mt-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm"
             style={{ color: GREY }}
           >
-            <span className="inline-flex items-center gap-1.5" style={{ color: GREY }}>
+            <span className="inline-flex items-center gap-1.5">
               <ShieldCheck className="h-4 w-4" style={{ color: GOLD }} />
-              Garantie 30 jours
+              7 jours d'essai gratuit
             </span>
-            <span style={{ color: GREY }}>· Paiement sécurisé</span>
-            <span style={{ color: GREY }}>· Accès immédiat</span>
+            <span>· Annulable en 1 clic</span>
+            <span>· Paiement 100% sécurisé</span>
           </div>
         </motion.div>
       </div>
