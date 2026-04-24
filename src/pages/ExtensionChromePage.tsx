@@ -384,16 +384,28 @@ const ExtensionChromePage = () => {
                 ))}
               </div>
 
-              <Button
-                onClick={handleDownload}
-                disabled={downloading}
-                size="lg"
-                className="bg-black hover:bg-white hover:text-orange-500 text-white font-bold text-base px-8 py-6 rounded-xl transition-all hover:-translate-y-0.5 border-0"
-              >
-                <Download className="w-5 h-5 mr-2" />
-                {downloading ? 'Téléchargement…' : 'Télécharger maintenant'}
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Button
+                  onClick={handleDownload}
+                  disabled={downloading}
+                  size="lg"
+                  className="bg-black hover:bg-white hover:text-orange-500 text-white font-bold text-base px-8 py-6 rounded-xl transition-all hover:-translate-y-0.5 border-0"
+                >
+                  <Download className="w-5 h-5 mr-2" />
+                  {downloading ? 'Téléchargement…' : 'Télécharger gratuitement'}
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+
+                <Button
+                  onClick={() => navigate('/offres')}
+                  size="lg"
+                  className="bg-white hover:bg-orange-100 text-orange-600 font-bold text-base px-8 py-6 rounded-xl transition-all hover:-translate-y-0.5 border-0"
+                >
+                  <Crown className="w-5 h-5 mr-2" />
+                  Passer Pro — 67€/an
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </div>
             </div>
           </div>
 
