@@ -801,6 +801,42 @@ const SalesPage = () => {
             </Card>
           </motion.div>
 
+          {/* Licence Commerciale Étendue — supplément optionnel */}
+          <motion.div initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mt-4">
+            <Link to="/licence-etendue" className="block group">
+              <Card className="bg-purple-50/60 dark:bg-purple-950/20 border-2 border-purple-300/60 dark:border-purple-500/30 hover:border-purple-400 dark:hover:border-purple-400 transition-all">
+                <CardContent className="p-5">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center flex-shrink-0">
+                      <Sparkles className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between gap-3 flex-wrap">
+                        <h3 className="font-bold text-purple-900 dark:text-purple-200 flex items-center gap-2 flex-wrap">
+                          🚀 Licence Commerciale Étendue
+                          <span className="text-[10px] bg-purple-500/20 text-purple-700 dark:text-purple-300 px-2 py-0.5 rounded-full font-semibold">PRO / FREELANCE</span>
+                        </h3>
+                        <span className="text-purple-700 dark:text-purple-300 font-bold text-lg">+47€</span>
+                      </div>
+                      <p className="text-sm text-foreground/80 mt-1">
+                        Pour ceux qui créent des ebooks <strong>pour leurs clients</strong> — agences, freelances, studios.
+                      </p>
+                      <ul className="mt-2 grid sm:grid-cols-2 gap-1.5 text-xs text-foreground/75">
+                        <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-purple-600 flex-shrink-0" />Création pour clients tiers</li>
+                        <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-purple-600 flex-shrink-0" />Usage freelance / agence</li>
+                        <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-purple-600 flex-shrink-0" />Projets commerciaux illimités</li>
+                        <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-purple-600 flex-shrink-0" />Revente de prestations OK</li>
+                      </ul>
+                      <div className="mt-3 text-xs text-purple-700 dark:text-purple-300 font-semibold group-hover:underline">
+                        Voir les détails →
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          </motion.div>
+
           {/* Countdown Timer */}
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mt-6">
             <CountdownTimer />
