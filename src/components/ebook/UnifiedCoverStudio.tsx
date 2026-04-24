@@ -4,7 +4,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Sparkles, Ruler, BookOpen, Wand2, CheckCircle2 } from 'lucide-react';
 import { EbookAICoverStudio } from './EbookAICoverStudio';
-import { KdpCoverStudio } from './KdpCoverStudio';
+import KdpCoverStudio from './KdpCoverStudio';
 import { EbookBackCoverGenerator } from './EbookBackCoverGenerator';
 import coverHero from '@/assets/cover-studio-hero.jpg';
 
