@@ -116,10 +116,46 @@ const PaiementManuelPage = () => {
               <p className="text-xs text-muted-foreground">Vous recevrez votre code d'accès à cette adresse</p>
             </div>
 
+            {/* Add-on Pack Sérénité */}
+            <label
+              className={`flex items-start gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                serenityAddon
+                  ? 'border-amber-400 bg-amber-50 shadow-md'
+                  : 'border-violet-100 hover:border-amber-300 bg-white'
+              }`}
+            >
+              <input
+                type="checkbox"
+                checked={serenityAddon}
+                onChange={(e) => setSerenityAddon(e.target.checked)}
+                className="mt-1 w-5 h-5 accent-amber-500 cursor-pointer"
+              />
+              <div className="flex-1">
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-amber-500" />
+                    <span className="font-semibold text-violet-900 text-sm">
+                      Ajouter le Pack Sérénité
+                    </span>
+                    <Badge className="bg-amber-100 text-amber-700 border border-amber-300 text-[10px]">
+                      OPTIONNEL
+                    </Badge>
+                  </div>
+                  <span className="text-amber-700 font-bold">+{SERENITY_PRICE}€</span>
+                </div>
+                <ul className="mt-2 space-y-1 text-xs text-muted-foreground">
+                  <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-amber-500 flex-shrink-0" />Session Zoom 1-à-1 (30 min) avec un expert</li>
+                  <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-amber-500 flex-shrink-0" />Support prioritaire (réponse sous 24h)</li>
+                  <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-amber-500 flex-shrink-0" />Audit de votre 1er ebook avant publication</li>
+                </ul>
+              </div>
+            </label>
+
             <div className="space-y-4">
               <h3 className="font-semibold flex items-center gap-2">
                 <span className="bg-violet-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm">2</span>
                 Effectuez votre paiement de {paymentInfo.price}€
+
               </h3>
 
               {/* PayPal */}
