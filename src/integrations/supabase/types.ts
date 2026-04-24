@@ -1117,6 +1117,7 @@ export type Database = {
           email: string
           expires_at: string | null
           id: string
+          license_type: string
           plan_tier: string
           plan_type: string
           status: string
@@ -1135,6 +1136,7 @@ export type Database = {
           email: string
           expires_at?: string | null
           id?: string
+          license_type?: string
           plan_tier?: string
           plan_type?: string
           status?: string
@@ -1153,6 +1155,7 @@ export type Database = {
           email?: string
           expires_at?: string | null
           id?: string
+          license_type?: string
           plan_tier?: string
           plan_type?: string
           status?: string
