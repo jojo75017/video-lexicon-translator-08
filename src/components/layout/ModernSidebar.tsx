@@ -427,11 +427,11 @@ const MenuItemButton: React.FC<{
         >
           <button
             onClick={onClick}
-            className="flex-1 flex items-center gap-2.5 px-3 py-2 text-left min-w-0"
+            className="flex-1 flex items-center gap-3 px-3 py-2.5 text-left min-w-0"
           >
             <Icon className={cn("w-4 h-4 flex-shrink-0", isActive ? colors.icon : "text-muted-foreground")} />
             <span className={cn(
-              "text-sm flex-1 truncate",
+              "text-[14px] flex-1 truncate leading-tight",
               isActive ? cn("font-semibold", colors.text) : "text-foreground group-hover/item:text-kdp-orange"
             )}>
               {item.label}
@@ -633,7 +633,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
         className={cn(
           "relative flex flex-col h-screen transition-all duration-300 ease-out",
           "bg-background border-r border-border",
-          isCollapsed ? "w-[72px]" : "w-72"
+          isCollapsed ? "w-[72px]" : "w-[320px]"
         )}
       >
         {/* Header logo */}
@@ -716,7 +716,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
         />
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto px-2 py-2 space-y-1">
+        <nav className="flex-1 overflow-y-auto px-2 py-3 space-y-1.5">
           {searchQuery.trim() && !isCollapsed ? (
             <div className="space-y-1">
               <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground px-2 mb-2">
@@ -787,16 +787,16 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                 })();
 
                 return (
-                  <div key={group.label} className="mb-1">
+                  <div key={group.label} className="mb-2">
                     <button
                       onClick={() => toggleGroup(group.label)}
                       className={cn(
-                        "w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all",
+                        "w-full flex items-center justify-between px-3 py-3 rounded-xl transition-all",
                         hasActive ? colors.bg : "hover:bg-card/60"
                       )}
                     >
                       <span className={cn(
-                        "text-[13px] font-bold flex items-center gap-2 tracking-tight",
+                        "text-[14px] font-bold flex items-center gap-2 tracking-tight",
                         hasActive ? colors.text : "text-foreground"
                       )}>
                         {group.label}
@@ -820,7 +820,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                     </button>
 
                     {isExpanded && (
-                      <div className={cn("ml-2 pl-2.5 border-l-2 space-y-1 mt-1.5 pb-2", colors.border)}>
+                      <div className={cn("ml-2 pl-3 border-l-[3px] space-y-1 mt-2 pb-2", colors.border)}>
                         {/* Essentiels d'abord */}
                         {essentials.map(item => (
                           <MenuItemButton
