@@ -54,12 +54,11 @@ serve(async (req) => {
     let lineItems: Stripe.Checkout.SessionCreateParams.LineItem[];
 
     if (isRestrictedKey) {
-      console.log("Restricted key detected, ignoring stored price ID and using inline recurring price_data");
+      console.log("Restricted key detected, using inline one-time price_data");
       lineItems = [{
         price_data: {
           currency: "eur",
           unit_amount: amount,
-          recurring: { interval: "year" },
           product_data: {
             name: productName,
             description: productDescription,
@@ -68,7 +67,7 @@ serve(async (req) => {
         quantity: 1,
       }];
     } else {
-      // Look for or create a recurring price for the trial model
+      // Look for or create a one-time price
       const products = await stripe.products.search({
         query: `name:'${productName}'`,
         limit: 1,
@@ -85,27 +84,25 @@ serve(async (req) => {
         productId = product.id;
       }
 
-      // Look for existing recurring price
+      // Look for existing one-time price
       const prices = await stripe.prices.list({
         product: productId,
         active: true,
-        type: "recurring",
+        type: "one_time",
         limit: 10,
       });
 
       const matchingPrice = prices.data.find(
-        (p) => p.unit_amount === amount && p.recurring?.interval === "year"
+        (p) => p.unit_amount === amount && !p.recurring
       );
 
       if (matchingPrice) {
         priceId = matchingPrice.id;
       } else {
-        // Create a yearly recurring price (will only charge once after trial due to cancel logic)
         const price = await stripe.prices.create({
           product: productId,
           unit_amount: amount,
           currency: "eur",
-          recurring: { interval: "year" },
         });
         priceId = price.id;
       }
@@ -115,13 +112,12 @@ serve(async (req) => {
 
     console.log("Using price:", priceId ?? "inline_price_data");
 
-    // Create subscription checkout with 7-day trial
+    // Create one-time payment checkout (no subscription, no trial)
     const sessionConfig: Stripe.Checkout.SessionCreateParams = {
       ...(customerId ? { customer: customerId } : { customer_email: email }),
       line_items: lineItems,
-      mode: "subscription",
-      subscription_data: {
-        trial_period_days: 7,
+      mode: "payment",
+      payment_intent_data: {
         metadata: { planId: planId || "pro", email },
       },
       success_url:
