@@ -212,20 +212,29 @@ export const useEbookDatabase = () => {
           });
         }
 
-      // Auto-sauvegarde de version si activée
-      if (autoVersion && savedData) {
-        await autoSaveVersion(savedData.id, savedData);
-      }
+        // Auto-sauvegarde de version si activée
+        if (autoVersion && savedData) {
+          await autoSaveVersion(savedData.id, savedData);
+        }
 
-      return savedData;
-    } catch (error) {
-      console.error('❌ [saveProject] Exception:', error);
-      toast.error('Erreur lors de la sauvegarde du projet');
-      return null;
+        return savedData;
+      } catch (error) {
+        console.error('❌ [saveProject] Exception:', error);
+        toast.error('Erreur lors de la sauvegarde du projet');
+        return null;
+      } finally {
+        setIsSaving(false);
+        console.log(`⏱️ [saveProject] Terminé`);
+      }
+    })();
+
+    savingPromiseRef.current = promise;
+    try {
+      return await promise;
     } finally {
-      setIsSaving(false);
-      const totalTime = Date.now() - startTime;
-      console.log(`⏱️ [saveProject] Terminé en ${totalTime}ms`);
+      if (savingPromiseRef.current === promise) {
+        savingPromiseRef.current = null;
+      }
     }
   };
 
