@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Sparkles, Shield, Clock, ArrowRight, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useVipAvailability } from '@/hooks/useVipAvailability';
 
 interface StickyCtaBarProps {
   onCtaClick?: () => void;
