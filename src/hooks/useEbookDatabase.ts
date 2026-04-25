@@ -97,7 +97,7 @@ export const useEbookDatabase = () => {
 
       if (data) {
         const loadTime = Date.now() - startTime;
-        setCurrentProjectId(data.id);
+        updateCurrentProjectId(data.id);
         // Toast supprimé pour éviter les popups à chaque chargement automatique
         console.log(`✅ [loadLatestProject] Projet chargé en ${loadTime}ms:`, {
           id: data.id,
