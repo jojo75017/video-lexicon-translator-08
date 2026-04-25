@@ -3,46 +3,54 @@ export interface SidebarSectionConfig {
   itemIds: string[];
 }
 
+// Liste des 15 agents du workflow IA (P1 → P15)
+// Repliés dans un sous-groupe dédié pour ne pas écraser la sidebar.
+export const WORKFLOW_AGENT_IDS: string[] = [
+  'editorial-director', 'market-analysis', 'content-architect', 'expert-writing',
+  'natural-rewrite', 'editorial-quality', 'editorial-packaging', 'final-diagnosis',
+  'editorial-memory', 'chapter-coherence', 'self-critique', 'iterative-loop',
+  'style-signature', 'ultimate-verdict', 'humanize-anti-ia',
+];
+
 export const SIDEBAR_SUBSECTIONS: Record<string, SidebarSectionConfig[]> = {
-  '🤖 Workflow IA': [
-    { label: 'Pipeline', itemIds: ['workflow-dashboard', 'complete-workflow'] },
-    { label: 'Créer', itemIds: ['editorial-director', 'market-analysis', 'content-architect', 'expert-writing'] },
-    { label: 'Optimiser', itemIds: ['natural-rewrite', 'editorial-quality', 'editorial-memory', 'chapter-coherence', 'self-critique', 'iterative-loop', 'style-signature'] },
-    { label: 'Publier', itemIds: ['editorial-packaging', 'final-diagnosis', 'ultimate-verdict'] },
-    { label: 'Bonus', itemIds: ['humanize-anti-ia'] },
-  ],
-  '✍️ Écriture': [
-    { label: 'Essentiel', itemIds: ['planner', 'writing', 'aichat'] },
-    { label: 'Univers', itemIds: ['characters', 'series'] },
-    { label: 'Formats KDP', itemIds: ['atlas', 'encyclopedia', 'coloring', 'documentary'] },
+  '1️⃣ Préparer': [
+    { label: 'Plan & univers', itemIds: ['planner', 'characters', 'series'] },
     { label: 'Imports', itemIds: ['doc-transform', 'url-import'] },
-    { label: 'Outils', itemIds: ['templates', 'strict-proofread', 'multi-translator'] },
+    { label: 'Modèles', itemIds: ['templates'] },
   ],
-  '📦 Publier': [
-    { label: 'Exports', itemIds: ['export', 'workflow-export', 'calibre-epub'] },
+  '2️⃣ Écrire': [
+    { label: 'Rédaction', itemIds: ['writing', 'aichat', 'strict-proofread'] },
+    { label: 'Workflow IA', itemIds: ['workflow-dashboard', 'complete-workflow'] },
+    { label: 'Formats KDP', itemIds: ['atlas', 'encyclopedia', 'coloring', 'documentary'] },
+    { label: 'Outils', itemIds: ['multi-translator'] },
+  ],
+  '3️⃣ Publier': [
     { label: 'Couverture', itemIds: ['cover-design-editor', 'cover', 'backcover'] },
+    { label: 'Export', itemIds: ['export', 'workflow-export', 'calibre-epub'] },
     { label: 'KDP', itemIds: ['kdp', 'kdp-prepublish-checklist', 'kdp-keywords-pro', 'audit-pilot'] },
     { label: 'Audio', itemIds: ['audiobook', 'audio-express'] },
   ],
-  '📣 Vendre': [
+  '4️⃣ Vendre': [
     { label: 'Marketing', itemIds: ['marketing', 'launch-plan'] },
     { label: 'Amazon Ads', itemIds: ['kdp-ads-guide'] },
     { label: 'Bonus', itemIds: ['chrome-extension'] },
   ],
   '⚙️ Mon Compte': [
     { label: 'Espace', itemIds: ['projects', 'ebook-library', 'settings', 'subscription'] },
-    { label: 'Admin', itemIds: ['admin', 'admin-panel'] },
+    { label: 'Communauté', itemIds: ['parrainage', 'communaute'] },
+    { label: 'Admin', itemIds: ['admin', 'admin-subscribers'] },
   ],
 };
 
 /**
- * Outils "essentiels" affichés par défaut dans chaque pilier.
- * Les autres outils sont masqués derrière un bouton "+ Voir avancés".
+ * Outils "essentiels" affichés par défaut dans chaque étape.
+ * Volontairement réduits à 3-4 outils max pour aérer la sidebar.
+ * Les autres outils restent accessibles via "+ Voir avancés".
  */
 export const ESSENTIAL_TOOL_IDS: Record<string, string[]> = {
-  '🤖 Workflow IA': ['workflow-dashboard', 'complete-workflow', 'editorial-director'],
-  '✍️ Écriture': ['planner', 'writing', 'aichat', 'characters'],
-  '📦 Publier': ['export', 'cover-design-editor', 'kdp', 'kdp-keywords-pro', 'audit-pilot', 'audio-express'],
-  '📣 Vendre': ['marketing', 'launch-plan', 'kdp-ads-guide', 'chrome-extension'],
-  '⚙️ Mon Compte': ['projects', 'ebook-library', 'subscription', 'settings'],
+  '1️⃣ Préparer': ['planner', 'characters', 'doc-transform'],
+  '2️⃣ Écrire': ['writing', 'aichat', 'strict-proofread'],
+  '3️⃣ Publier': ['export', 'cover-design-editor', 'kdp', 'audit-pilot'],
+  '4️⃣ Vendre': ['marketing', 'launch-plan', 'kdp-ads-guide'],
+  '⚙️ Mon Compte': ['projects', 'subscription'],
 };
