@@ -24,10 +24,11 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Progress } from '@/components/ui/progress';
 import { useUserQuotas, getQuotaPercentage } from '@/hooks/useUserQuotas';
 import { ToolsGuideButton } from '@/components/layout/ToolsGuideButton';
-import { ESSENTIAL_TOOL_IDS } from './modernSidebarSections';
+import { ESSENTIAL_TOOL_IDS, WORKFLOW_AGENT_IDS } from './modernSidebarSections';
 import { useSidebarFavorites } from '@/hooks/useSidebarFavorites';
 import { SidebarFavorites } from './SidebarFavorites';
 import { SidebarHeader, type RecentProject } from './SidebarHeader';
+import { SidebarOnboarding } from './SidebarOnboarding';
 import { useEbookDatabase } from '@/hooks/useEbookDatabase';
 import { useWorkflowResults } from '@/hooks/useWorkflowResults';
 
@@ -63,12 +64,34 @@ interface ToolGroup {
 
 const allToolGroups: ToolGroup[] = [
   {
-    label: '🤖 Workflow IA',
-    emoji: '🤖',
+    label: '1️⃣ Préparer',
+    emoji: '📋',
     color: 'emerald',
     items: [
-      { id: 'workflow-dashboard', label: '📊 Dashboard Pipeline', icon: BarChart3 },
+      { id: 'planner', label: 'Plan de l\'ebook', icon: ListChecks },
+      { id: 'characters', label: 'Personnages', icon: Users },
+      { id: 'series', label: 'Série / Saga', icon: BookCopy },
+      { id: 'doc-transform', label: 'Importer Word', icon: FileText },
+      { id: 'url-import', label: 'Importer URL', icon: Globe },
+      { id: 'templates', label: 'Modèles / Templates', icon: Layers },
+    ]
+  },
+  {
+    label: '2️⃣ Écrire',
+    emoji: '✍️',
+    color: 'violet',
+    items: [
+      { id: 'writing', label: 'Écrire les chapitres', icon: PenTool },
+      { id: 'aichat', label: 'Assistant IA', icon: Bot },
+      { id: 'strict-proofread', label: 'Relecture Stricte', icon: Glasses },
+      { id: 'workflow-dashboard', label: '📊 Dashboard Workflow', icon: BarChart3 },
       { id: 'complete-workflow', label: '🚀 Lancer le workflow', icon: Rocket, isPro: true },
+      { id: 'atlas', label: 'Atlas', icon: Globe },
+      { id: 'encyclopedia', label: 'Encyclopédie', icon: Library },
+      { id: 'coloring', label: 'Livre de Coloriage', icon: Palette },
+      { id: 'documentary', label: 'Documentaire', icon: FileText },
+      { id: 'multi-translator', label: 'Traduction Multi-Langues', icon: Globe },
+      // Les 15 agents P1→P15 sont rendus séparément dans un sous-bloc repliable.
       { id: 'editorial-director', label: 'P1 · Zyro — Niche', icon: Crown, isPro: true },
       { id: 'market-analysis', label: 'P2 · Jano — Marché', icon: Search, isPro: true },
       { id: 'content-architect', label: 'P3 · Kiro — Plan', icon: LayoutDashboard, isPro: true },
@@ -87,47 +110,26 @@ const allToolGroups: ToolGroup[] = [
     ]
   },
   {
-    label: '✍️ Écriture',
-    emoji: '✍️',
-    color: 'violet',
-    items: [
-      { id: 'planner', label: 'Plan de l\'ebook', icon: ListChecks },
-      { id: 'writing', label: 'Écrire les chapitres', icon: PenTool },
-      { id: 'aichat', label: 'Assistant IA', icon: Bot },
-      { id: 'characters', label: 'Personnages', icon: Users },
-      { id: 'series', label: 'Série / Saga', icon: BookCopy },
-      { id: 'atlas', label: 'Atlas', icon: Globe },
-      { id: 'encyclopedia', label: 'Encyclopédie', icon: Library },
-      { id: 'coloring', label: 'Livre de Coloriage', icon: Palette },
-      { id: 'documentary', label: 'Documentaire', icon: FileText },
-      { id: 'doc-transform', label: 'Importer Word', icon: FileText },
-      { id: 'url-import', label: 'Importer URL', icon: Globe },
-      { id: 'templates', label: 'Modèles / Templates', icon: Layers },
-      { id: 'strict-proofread', label: 'Relecture Stricte', icon: Glasses },
-      { id: 'multi-translator', label: 'Traduction Multi-Langues', icon: Globe },
-    ]
-  },
-  {
-    label: '📦 Publier',
+    label: '3️⃣ Publier',
     emoji: '📦',
     color: 'blue',
     items: [
       { id: 'export', label: 'Exporter (PDF, Word)', icon: Download },
+      { id: 'cover-design-editor', label: 'Éditeur Couverture', icon: Palette, isNew: true },
+      { id: 'kdp', label: 'Description KDP', icon: TrendingUp },
+      { id: 'audit-pilot', label: 'Audit Pilot KDP', icon: ClipboardCheck, isLink: true, href: '/audit-pilot', isNew: true },
       { id: 'workflow-export', label: 'Export Global Workflow', icon: Download },
       { id: 'calibre-epub', label: 'Export ePub (Calibre)', icon: Download },
-      { id: 'cover-design-editor', label: 'Éditeur Couverture', icon: Palette, isNew: true },
       { id: 'cover', label: 'Couverture IA', icon: Sparkles },
       { id: 'backcover', label: '4e de Couverture', icon: FileText },
-      { id: 'kdp', label: 'Description KDP', icon: TrendingUp },
       { id: 'kdp-prepublish-checklist', label: 'Checklist KDP', icon: ClipboardCheck },
       { id: 'kdp-keywords-pro', label: 'Mots-Clés KDP Pro', icon: Key, isLink: true, href: '/kdp-keywords', isNew: true },
-      { id: 'audit-pilot', label: 'Audit Pilot KDP', icon: ClipboardCheck, isLink: true, href: '/audit-pilot', isNew: true },
       { id: 'audiobook', label: 'Livre Audio', icon: Headphones },
       { id: 'audio-express', label: 'Audio Express', icon: Play },
     ]
   },
   {
-    label: '📣 Vendre',
+    label: '4️⃣ Vendre',
     emoji: '📣',
     color: 'orange',
     items: [
@@ -488,19 +490,12 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
   const { isDark, toggleTheme } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
   // Accordéon EXCLUSIF — un seul groupe ouvert à la fois.
-  // Au premier accès on met en avant le groupe "📦 Publier" (qui contient les nouveaux
-  // outils Mots-Clés KDP Pro & Audit Pilot) puis on retombe sur Workflow IA.
-  const [openGroup, setOpenGroup] = useState<string | null>(() => {
-    if (typeof window === 'undefined') return '🤖 Workflow IA';
-    const seen = localStorage.getItem('sidebar_kdp_tools_promoted_v1');
-    if (!seen) {
-      localStorage.setItem('sidebar_kdp_tools_promoted_v1', '1');
-      return '📦 Publier';
-    }
-    return '🤖 Workflow IA';
-  });
+  // Au premier accès on ouvre "1️⃣ Préparer" pour guider les nouveaux abonnés.
+  const [openGroup, setOpenGroup] = useState<string | null>('1️⃣ Préparer');
   // Toggle "essentiel vs avancé" par groupe (true = avancés visibles)
   const [showAdvanced, setShowAdvanced] = useState<Record<string, boolean>>({});
+  // Sous-bloc des 15 agents Workflow IA (replié par défaut)
+  const [showWorkflowAgents, setShowWorkflowAgents] = useState<boolean>(false);
 
   const [isAdmin, setIsAdmin] = useState(() => sessionStorage.getItem('is_admin') === 'true');
   useEffect(() => {
@@ -598,6 +593,10 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
         if (!essentials.includes(activeTab)) {
           setShowAdvanced(prev => ({ ...prev, [group.label]: true }));
         }
+        // Si l'onglet actif est un agent du Workflow IA, déplier le sous-bloc
+        if (WORKFLOW_AGENT_IDS.includes(activeTab)) {
+          setShowWorkflowAgents(true);
+        }
         break;
       }
     }
@@ -612,13 +611,20 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
       .slice(0, 15);
   }, [searchQuery, isAdmin]);
 
-  // Décompose les items d'un groupe en (essentiels visibles, avancés visibles si toggle)
+  // Décompose les items d'un groupe en (essentiels visibles, avancés visibles si toggle).
+  // Pour le groupe "2️⃣ Écrire" on EXCLUT les 15 agents Workflow IA — ils sont rendus
+  // séparément dans un sous-bloc repliable pour ne pas écraser la sidebar.
   const partitionItems = (group: ToolGroup) => {
-    const visible = group.items.filter(filterAdmin);
+    let visible = group.items.filter(filterAdmin);
+    let workflowAgents: MenuItem[] = [];
+    if (group.label === '2️⃣ Écrire') {
+      workflowAgents = visible.filter(i => WORKFLOW_AGENT_IDS.includes(i.id));
+      visible = visible.filter(i => !WORKFLOW_AGENT_IDS.includes(i.id));
+    }
     const essentialIds = ESSENTIAL_TOOL_IDS[group.label] ?? [];
     const essentials = visible.filter(i => essentialIds.includes(i.id));
     const advanced = visible.filter(i => !essentialIds.includes(i.id));
-    return { essentials, advanced, total: visible.length };
+    return { essentials, advanced, workflowAgents, total: visible.length + workflowAgents.length };
   };
 
   return (
@@ -703,6 +709,12 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
           isCollapsed={isCollapsed}
         />
 
+        {/* Onboarding "Par où commencer ?" — visible pour les nouveaux abonnés */}
+        <SidebarOnboarding
+          isCollapsed={isCollapsed}
+          onStepClick={(tabId) => onTabChange(tabId)}
+        />
+
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto px-2 py-2 space-y-1">
           {searchQuery.trim() && !isCollapsed ? (
@@ -760,7 +772,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                   );
                 }
 
-                const { essentials, advanced, total } = partitionItems(group);
+                const { essentials, advanced, workflowAgents, total } = partitionItems(group);
                 const advancedShown = showAdvanced[group.label] ?? false;
                 const groupHasInProgress = inProgressTabId
                   ? visibleItems.some(i => i.id === inProgressTabId)
@@ -775,16 +787,16 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                 })();
 
                 return (
-                  <div key={group.label}>
+                  <div key={group.label} className="mb-1">
                     <button
                       onClick={() => toggleGroup(group.label)}
                       className={cn(
-                        "w-full flex items-center justify-between px-3 py-2 rounded-xl transition-all",
+                        "w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all",
                         hasActive ? colors.bg : "hover:bg-card/60"
                       )}
                     >
                       <span className={cn(
-                        "text-sm font-semibold flex items-center gap-2",
+                        "text-[13px] font-bold flex items-center gap-2 tracking-tight",
                         hasActive ? colors.text : "text-foreground"
                       )}>
                         {group.label}
@@ -794,7 +806,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                       </span>
                       <div className="flex items-center gap-1.5">
                         <span className={cn(
-                          "text-[10px] font-medium px-1.5 py-0.5 rounded-full",
+                          "text-[10px] font-semibold px-1.5 py-0.5 rounded-full",
                           colors.bg, colors.text
                         )}>
                           {groupBadge}
@@ -808,8 +820,8 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                     </button>
 
                     {isExpanded && (
-                      <div className={cn("ml-2 pl-2 border-l-2 space-y-0.5 mt-1 pb-1", colors.border)}>
-                        {/* CHANTIER 3 — essentiels d'abord */}
+                      <div className={cn("ml-2 pl-2.5 border-l-2 space-y-1 mt-1.5 pb-2", colors.border)}>
+                        {/* Essentiels d'abord */}
                         {essentials.map(item => (
                           <MenuItemButton
                             key={item.id}
@@ -862,7 +874,47 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                           </>
                         )}
 
-                        {essentials.length === 0 && advanced.length === 0 && (
+                        {/* Sous-bloc Workflow IA — 15 agents repliés par défaut (uniquement étape Écrire) */}
+                        {workflowAgents.length > 0 && (
+                          <>
+                            <button
+                              onClick={() => setShowWorkflowAgents(prev => !prev)}
+                              className={cn(
+                                "w-full flex items-center justify-between px-3 py-2 mt-2 rounded-lg text-[11px] font-semibold transition-all border",
+                                showWorkflowAgents
+                                  ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-400"
+                                  : "bg-card/60 border-border hover:bg-card text-foreground"
+                              )}
+                            >
+                              <span className="flex items-center gap-1.5">
+                                🤖 Workflow 15 agents IA
+                              </span>
+                              <ChevronDown className={cn(
+                                "w-3.5 h-3.5 transition-transform",
+                                showWorkflowAgents ? "rotate-0" : "-rotate-90"
+                              )} />
+                            </button>
+                            {showWorkflowAgents && (
+                              <div className="space-y-0.5 pt-1 ml-1 border-l-2 border-emerald-500/20 pl-2">
+                                {workflowAgents.map(item => (
+                                  <MenuItemButton
+                                    key={item.id}
+                                    item={item}
+                                    isActive={activeTab === item.id}
+                                    onClick={() => handleItemClick(item)}
+                                    isCollapsed={false}
+                                    groupColor="emerald"
+                                    isFavorite={isFavorite(item.id)}
+                                    onToggleFavorite={() => toggleFavorite(item.id)}
+                                    inProgress={inProgressTabId === item.id}
+                                  />
+                                ))}
+                              </div>
+                            )}
+                          </>
+                        )}
+
+                        {essentials.length === 0 && advanced.length === 0 && workflowAgents.length === 0 && (
                           <p className="text-xs text-muted-foreground px-3 py-2">Aucun outil</p>
                         )}
                       </div>
