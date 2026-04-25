@@ -156,6 +156,9 @@ const allToolGroups: ToolGroup[] = [
   },
 ];
 
+const PRIMARY_GROUP_LABELS = ['1️⃣ Préparer', '2️⃣ Écrire', '3️⃣ Publier', '4️⃣ Vendre'];
+const ACCOUNT_GROUP_LABEL = '⚙️ Mon Compte';
+
 // Flat lookup for favorites/recent
 const ALL_ITEMS_FLAT: MenuItem[] = allToolGroups.flatMap(g => g.items);
 
