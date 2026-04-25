@@ -54,24 +54,19 @@ serve(async (req) => {
     let lineItems: Stripe.Checkout.SessionCreateParams.LineItem[];
 
     if (isRestrictedKey) {
-      if (configuredPriceId && configuredPriceId.startsWith("price_")) {
-        priceId = configuredPriceId;
-        lineItems = [{ price: priceId, quantity: 1 }];
-      } else {
-        console.log("Restricted key detected without usable price ID, using inline recurring price_data");
-        lineItems = [{
-          price_data: {
-            currency: "eur",
-            unit_amount: amount,
-            recurring: { interval: "year" },
-            product_data: {
-              name: productName,
-              description: productDescription,
-            },
+      console.log("Restricted key detected, ignoring stored price ID and using inline recurring price_data");
+      lineItems = [{
+        price_data: {
+          currency: "eur",
+          unit_amount: amount,
+          recurring: { interval: "year" },
+          product_data: {
+            name: productName,
+            description: productDescription,
           },
-          quantity: 1,
-        }];
-      }
+        },
+        quantity: 1,
+      }];
     } else {
       // Look for or create a recurring price for the trial model
       const products = await stripe.products.search({
