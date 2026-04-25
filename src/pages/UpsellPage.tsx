@@ -32,7 +32,7 @@ const UpsellPage = () => {
   }, []);
 
   const handleUpgrade = () => {
-    window.location.href = `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=${LAUNCH_PRICE}&currency_code=EUR&item_name=EbookStudio%20Pro%20Lifetime&return=${encodeURIComponent(window.location.origin + '/confirmation-paiement')}&cancel_return=${encodeURIComponent(window.location.origin + '/offres')}`;
+    navigate('/upsell-paiement?plan=pro');
   };
 
   const handleSkip = () => {
@@ -170,7 +170,7 @@ const UpsellPage = () => {
           </div>
 
           <p className="text-sm text-gray-500 max-w-md mx-auto">
-            🔒 Paiement 100% sécurisé par PayPal. Cette offre expire dans{" "}
+            🔒 Paiement 100% sécurisé par carte. Cette offre expire dans{" "}
             {countdown.minutes}:{countdown.seconds.toString().padStart(2, "0")}.
           </p>
         </div>
