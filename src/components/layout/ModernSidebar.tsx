@@ -709,6 +709,12 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
           isCollapsed={isCollapsed}
         />
 
+        {/* Onboarding "Par où commencer ?" — visible pour les nouveaux abonnés */}
+        <SidebarOnboarding
+          isCollapsed={isCollapsed}
+          onStepClick={(tabId) => onTabChange(tabId)}
+        />
+
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto px-2 py-2 space-y-1">
           {searchQuery.trim() && !isCollapsed ? (
