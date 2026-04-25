@@ -349,8 +349,8 @@ export const useEbookDatabase = () => {
       
       toast.success('Projet supprimé');
       
-      if (projectId === currentProjectId) {
-        setCurrentProjectId(null);
+      if (projectId === currentProjectIdRef.current) {
+        updateCurrentProjectId(null);
       }
       
       return true;
