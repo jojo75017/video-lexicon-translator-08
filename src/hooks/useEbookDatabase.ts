@@ -122,79 +122,95 @@ export const useEbookDatabase = () => {
   };
 
   // Sauvegarder ou mettre à jour le projet (avec version automatique)
+  // Sérialise les appels concurrents pour éviter les doublons (race condition)
   const saveProject = async (projectData: EbookProject, autoVersion: boolean = true) => {
-    const startTime = Date.now();
-    console.log('💾 [saveProject] Début de la sauvegarde:', {
-      titre: projectData.title,
-      mode: currentProjectId ? 'MISE À JOUR' : 'CRÉATION',
-      currentProjectId,
-      chapitres: Array.isArray(projectData.chapters) ? projectData.chapters.length : 0,
-      autoVersion
-    });
-    
-    try {
-      setIsSaving(true);
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        console.warn('⚠️ [saveProject] Impossible de sauvegarder: utilisateur non connecté (pas de session auth)');
-        toast.error('Session expirée ou absente', {
-          description: 'Connectez-vous pour sauvegarder vos projets en base de données. Vos données sont conservées localement en attendant.',
-          duration: 8000,
-        });
-        return null;
-      }
+    // Si une sauvegarde est en cours, on attend qu'elle finisse avant de lancer la suivante
+    // Cela garantit que currentProjectIdRef est à jour pour le second appel → UPDATE au lieu de INSERT
+    if (savingPromiseRef.current) {
+      console.log('⏳ [saveProject] Attente de la sauvegarde en cours pour éviter un doublon...');
+      try { await savingPromiseRef.current; } catch { /* ignore */ }
+    }
 
-      console.log(`👤 [saveProject] Utilisateur: ${user.email}`);
+    const promise = (async () => {
+      const startTime = Date.now();
+      console.log('💾 [saveProject] Début de la sauvegarde:', {
+        titre: projectData.title,
+        mode: currentProjectIdRef.current ? 'MISE À JOUR' : 'CRÉATION',
+        currentProjectId: currentProjectIdRef.current,
+        chapitres: Array.isArray(projectData.chapters) ? projectData.chapters.length : 0,
+        autoVersion
+      });
 
-      let savedData = null;
+      try {
+        setIsSaving(true);
+        const { data: { user } } = await supabase.auth.getUser();
 
-      if (currentProjectId) {
-        // Mise à jour du projet existant
-        console.log(`🔄 [saveProject] Mise à jour du projet ID: ${currentProjectId}`);
-        const { data, error } = await supabase
-          .from('ebook_projects')
-          .update({
-            ...projectData,
-            user_id: user.id,
-          })
-          .eq('id', currentProjectId)
-          .select()
-          .single();
-
-        if (error) {
-          console.error('❌ [saveProject] Erreur mise à jour:', error);
-          throw error;
+        if (!user) {
+          console.warn('⚠️ [saveProject] Impossible de sauvegarder: utilisateur non connecté');
+          toast.error('Session expirée ou absente', {
+            description: 'Connectez-vous pour sauvegarder vos projets en base de données.',
+            duration: 8000,
+          });
+          return null;
         }
-        
-        savedData = data;
-        const saveTime = Date.now() - startTime;
-        console.log(`✅ [saveProject] Projet mis à jour avec succès en ${saveTime}ms`);
-      } else {
-        // Création d'un nouveau projet
-        console.log('✨ [saveProject] Création d\'un nouveau projet');
-        const { data, error } = await supabase
-          .from('ebook_projects')
-          .insert({
-            ...projectData,
-            user_id: user.id,
-          })
-          .select()
-          .single();
 
-        if (error) {
-          console.error('❌ [saveProject] Erreur création:', error);
-          throw error;
+        let savedData = null;
+        let projectIdToUse = currentProjectIdRef.current;
+
+        // Garde-fou anti-doublon : si pas d'ID en mémoire, chercher un projet existant
+        // récent du même utilisateur portant exactement le même titre (créé < 24h)
+        if (!projectIdToUse && projectData.title && projectData.title.trim() !== '' && projectData.title !== 'Sans titre') {
+          const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+          const { data: existing } = await supabase
+            .from('ebook_projects')
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('title', projectData.title)
+            .gte('created_at', since)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
+          if (existing) {
+            console.log(`♻️ [saveProject] Projet existant détecté (anti-doublon): ${existing.id}`);
+            projectIdToUse = existing.id;
+            updateCurrentProjectId(existing.id);
+          }
         }
-        
-        setCurrentProjectId(data.id);
-        savedData = data;
-        const saveTime = Date.now() - startTime;
-        console.log(`✅ [saveProject] Nouveau projet créé avec succès en ${saveTime}ms:`, {
-          id: data.id,
-          titre: data.title
-        });
-      }
+
+        if (projectIdToUse) {
+          console.log(`🔄 [saveProject] Mise à jour du projet ID: ${projectIdToUse}`);
+          const { data, error } = await supabase
+            .from('ebook_projects')
+            .update({ ...projectData, user_id: user.id })
+            .eq('id', projectIdToUse)
+            .select()
+            .single();
+
+          if (error) {
+            console.error('❌ [saveProject] Erreur mise à jour:', error);
+            throw error;
+          }
+          savedData = data;
+          console.log(`✅ [saveProject] Projet mis à jour en ${Date.now() - startTime}ms`);
+        } else {
+          console.log('✨ [saveProject] Création d\'un nouveau projet');
+          const { data, error } = await supabase
+            .from('ebook_projects')
+            .insert({ ...projectData, user_id: user.id })
+            .select()
+            .single();
+
+          if (error) {
+            console.error('❌ [saveProject] Erreur création:', error);
+            throw error;
+          }
+          updateCurrentProjectId(data.id);
+          savedData = data;
+          console.log(`✅ [saveProject] Nouveau projet créé en ${Date.now() - startTime}ms:`, {
+            id: data.id, titre: data.title
+          });
+        }
 
       // Auto-sauvegarde de version si activée
       if (autoVersion && savedData) {
