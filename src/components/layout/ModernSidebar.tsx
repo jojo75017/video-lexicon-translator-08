@@ -772,7 +772,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                   );
                 }
 
-                const { essentials, advanced, total } = partitionItems(group);
+                const { essentials, advanced, workflowAgents, total } = partitionItems(group);
                 const advancedShown = showAdvanced[group.label] ?? false;
                 const groupHasInProgress = inProgressTabId
                   ? visibleItems.some(i => i.id === inProgressTabId)
@@ -787,16 +787,16 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                 })();
 
                 return (
-                  <div key={group.label}>
+                  <div key={group.label} className="mb-1">
                     <button
                       onClick={() => toggleGroup(group.label)}
                       className={cn(
-                        "w-full flex items-center justify-between px-3 py-2 rounded-xl transition-all",
+                        "w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all",
                         hasActive ? colors.bg : "hover:bg-card/60"
                       )}
                     >
                       <span className={cn(
-                        "text-sm font-semibold flex items-center gap-2",
+                        "text-[13px] font-bold flex items-center gap-2 tracking-tight",
                         hasActive ? colors.text : "text-foreground"
                       )}>
                         {group.label}
@@ -806,7 +806,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                       </span>
                       <div className="flex items-center gap-1.5">
                         <span className={cn(
-                          "text-[10px] font-medium px-1.5 py-0.5 rounded-full",
+                          "text-[10px] font-semibold px-1.5 py-0.5 rounded-full",
                           colors.bg, colors.text
                         )}>
                           {groupBadge}
@@ -820,8 +820,8 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                     </button>
 
                     {isExpanded && (
-                      <div className={cn("ml-2 pl-2 border-l-2 space-y-0.5 mt-1 pb-1", colors.border)}>
-                        {/* CHANTIER 3 — essentiels d'abord */}
+                      <div className={cn("ml-2 pl-2.5 border-l-2 space-y-1 mt-1.5 pb-2", colors.border)}>
+                        {/* Essentiels d'abord */}
                         {essentials.map(item => (
                           <MenuItemButton
                             key={item.id}
@@ -874,7 +874,47 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                           </>
                         )}
 
-                        {essentials.length === 0 && advanced.length === 0 && (
+                        {/* Sous-bloc Workflow IA — 15 agents repliés par défaut (uniquement étape Écrire) */}
+                        {workflowAgents.length > 0 && (
+                          <>
+                            <button
+                              onClick={() => setShowWorkflowAgents(prev => !prev)}
+                              className={cn(
+                                "w-full flex items-center justify-between px-3 py-2 mt-2 rounded-lg text-[11px] font-semibold transition-all border",
+                                showWorkflowAgents
+                                  ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-400"
+                                  : "bg-card/60 border-border hover:bg-card text-foreground"
+                              )}
+                            >
+                              <span className="flex items-center gap-1.5">
+                                🤖 Workflow 15 agents IA
+                              </span>
+                              <ChevronDown className={cn(
+                                "w-3.5 h-3.5 transition-transform",
+                                showWorkflowAgents ? "rotate-0" : "-rotate-90"
+                              )} />
+                            </button>
+                            {showWorkflowAgents && (
+                              <div className="space-y-0.5 pt-1 ml-1 border-l-2 border-emerald-500/20 pl-2">
+                                {workflowAgents.map(item => (
+                                  <MenuItemButton
+                                    key={item.id}
+                                    item={item}
+                                    isActive={activeTab === item.id}
+                                    onClick={() => handleItemClick(item)}
+                                    isCollapsed={false}
+                                    groupColor="emerald"
+                                    isFavorite={isFavorite(item.id)}
+                                    onToggleFavorite={() => toggleFavorite(item.id)}
+                                    inProgress={inProgressTabId === item.id}
+                                  />
+                                ))}
+                              </div>
+                            )}
+                          </>
+                        )}
+
+                        {essentials.length === 0 && advanced.length === 0 && workflowAgents.length === 0 && (
                           <p className="text-xs text-muted-foreground px-3 py-2">Aucun outil</p>
                         )}
                       </div>
