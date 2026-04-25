@@ -47,20 +47,28 @@ serve(async (req) => {
     const rawPriceId = Deno.env.get("STRIPE_LIFETIME_PRICE_ID") || "";
     const configuredPriceId = rawPriceId.trim();
     console.log("DEBUG STRIPE_LIFETIME_PRICE_ID raw length:", rawPriceId.length, "trimmed:", configuredPriceId, "starts with price_:", configuredPriceId.startsWith("price_"));
-    let priceId: string;
+    const productName = "EbookStudio Pro — Accès à Vie";
+    const productDescription = "Accès complet à EbookStudio Pro avec essai gratuit de 7 jours";
+    const amount = 6700; // 67€
+    let priceId: string | undefined;
+    let lineItems: Stripe.Checkout.SessionCreateParams.LineItem[];
 
     if (isRestrictedKey) {
-      if (!configuredPriceId || !configuredPriceId.startsWith("price_")) {
-        throw new Error(
-          `Clé Stripe limitée: STRIPE_LIFETIME_PRICE_ID invalide (reçu: "${configuredPriceId.substring(0, 20)}..." longueur=${configuredPriceId.length}). Doit commencer par price_`
-        );
-      }
-      priceId = configuredPriceId;
+      console.log("Restricted key detected, ignoring stored price ID and using inline recurring price_data");
+      lineItems = [{
+        price_data: {
+          currency: "eur",
+          unit_amount: amount,
+          recurring: { interval: "year" },
+          product_data: {
+            name: productName,
+            description: productDescription,
+          },
+        },
+        quantity: 1,
+      }];
     } else {
       // Look for or create a recurring price for the trial model
-      const productName = "EbookStudio Pro — Accès à Vie";
-      const amount = 6700; // 67€
-
       const products = await stripe.products.search({
         query: `name:'${productName}'`,
         limit: 1,
@@ -72,7 +80,7 @@ serve(async (req) => {
       } else {
         const product = await stripe.products.create({
           name: productName,
-          description: "Accès complet à EbookStudio Pro avec essai gratuit de 7 jours",
+          description: productDescription,
         });
         productId = product.id;
       }
@@ -101,14 +109,16 @@ serve(async (req) => {
         });
         priceId = price.id;
       }
+
+      lineItems = [{ price: priceId, quantity: 1 }];
     }
 
-    console.log("Using price:", priceId);
+    console.log("Using price:", priceId ?? "inline_price_data");
 
     // Create subscription checkout with 7-day trial
     const sessionConfig: Stripe.Checkout.SessionCreateParams = {
       ...(customerId ? { customer: customerId } : { customer_email: email }),
-      line_items: [{ price: priceId, quantity: 1 }],
+      line_items: lineItems,
       mode: "subscription",
       subscription_data: {
         trial_period_days: 7,
