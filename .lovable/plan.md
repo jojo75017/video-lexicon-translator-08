@@ -1,113 +1,105 @@
-## 🎯 Objectif
+## Objectif
 
-Créer un **tunnel de vente fluide** avec **paiement par carte bancaire (Stripe)** pour ne plus perdre les acheteurs qui n'utilisent pas PayPal. Tarif : **67€/an** (lancement).
-
----
-
-## ✅ Bonne nouvelle : tout est déjà là
-
-Votre projet a **déjà** :
-- ✅ Stripe configuré (`STRIPE_SECRET_KEY`, `STRIPE_LIFETIME_PRICE_ID`, `STRIPE_WEBHOOK_SECRET`)
-- ✅ Edge function `stripe-checkout` qui crée des sessions de paiement avec essai gratuit 7 jours
-- ✅ Edge function `stripe-webhook` qui traite les paiements
-- ✅ Edge function `stripe-verify-session` pour confirmer l'achat
-- ✅ Pages existantes : `/offres`, `/paiement-manuel`, `/paiement-succes`, `/confirmation-paiement`
-
-**On n'a donc QUE 4 choses à faire :** moderniser le tunnel, brancher Stripe sur les bons boutons, ajouter le bouton "Payer par carte" partout, et relier l'extension au tunnel.
+Rendre la sidebar **simple, lisible et orientée parcours** pour les abonnés, en réduisant la densité visuelle et en mettant en avant un chemin clair : **Préparer → Écrire → Publier → Vendre**. Les 15 agents du workflow IA et les outils avancés restent accessibles mais repliés par défaut.
 
 ---
 
-## 📐 Structure du tunnel (3 étapes)
+## Ce que verra l'abonné
 
+```text
+┌─────────────────────────────────┐
+│  📁 Projet actif : "Mon ebook"  │  ← inchangé
+│  [+ Nouveau projet]              │
+├─────────────────────────────────┤
+│  🚀 PAR OÙ COMMENCER ?          │  ← NOUVEAU bandeau
+│  1. Créer mon plan              │     onboarding repliable
+│  2. Écrire les chapitres        │     (masqué après 1ère utilisation)
+│  3. Générer la couverture       │
+│  4. Exporter pour KDP           │
+│  [Masquer ce guide]             │
+├─────────────────────────────────┤
+│  ⭐ FAVORIS                     │  ← inchangé
+│   • Plan ebook                  │
+│   • Exporter                    │
+├─────────────────────────────────┤
+│  1️⃣ PRÉPARER                   │  ← Étape 1 (toujours visible)
+│   • Plan de l'ebook             │
+│   • Personnages                 │
+│   • Importer Word / URL         │
+│   [+ 3 outils avancés]          │
+├─────────────────────────────────┤
+│  2️⃣ ÉCRIRE                     │  ← Étape 2
+│   • Écrire les chapitres        │
+│   • Assistant IA                │
+│   • Relecture stricte           │
+│   [🤖 Workflow 15 agents ▾]    │  ← REPLIÉ par défaut
+│   [+ 4 outils avancés]          │
+├─────────────────────────────────┤
+│  3️⃣ PUBLIER                    │  ← Étape 3
+│   • Éditeur Couverture          │
+│   • Exporter (PDF/Word/ePub)    │
+│   • Description KDP             │
+│   • Audit Pilot KDP             │
+│   [+ 5 outils avancés]          │
+├─────────────────────────────────┤
+│  4️⃣ VENDRE                     │  ← Étape 4
+│   • Posts Réseaux Sociaux       │
+│   • Plan Lancement              │
+│   • Guide KDP Ads               │
+├─────────────────────────────────┤
+│  ⚙️ Mon Compte                  │  ← Compact en bas
+│   • Mes Projets · Abonnement    │
+│   • Paramètres · Communauté     │
+└─────────────────────────────────┘
 ```
-┌─────────────────┐      ┌─────────────────┐      ┌─────────────────┐
-│  ÉTAPE 1        │      │  ÉTAPE 2        │      │  ÉTAPE 3        │
-│  /offres        │ ───► │  Paiement       │ ───► │  /paiement-     │
-│                 │      │  (modal Stripe) │      │  succes         │
-│  Page de vente  │      │                 │      │                 │
-│  + Email + CTA  │      │  💳 Carte       │      │  🎉 Bienvenue   │
-│                 │      │  ou             │      │  + Accès outils │
-│                 │      │  💰 PayPal      │      │  + Extension    │
-└─────────────────┘      └─────────────────┘      └─────────────────┘
-```
+
+### Améliorations visuelles
+- **Espacement augmenté** entre sections (py-3 → py-4) et entre items (py-1.5 → py-2.5).
+- **Numérotation 1️⃣2️⃣3️⃣4️⃣** sur les piliers principaux pour suggérer l'ordre.
+- **Police légèrement plus grande** pour les labels d'outils (text-sm → text-[13.5px]) et **icônes mieux contrastées**.
+- **Séparateurs visuels** plus marqués entre étapes (bordure colorée à gauche selon le pilier).
+- **Mode replié (icon)** : conserve les icônes des 4 étapes + favoris, plus lisible.
 
 ---
 
-## 🛠️ Travaux à effectuer
+## Détails techniques
 
-### 1️⃣ Page `/offres` — Boutons de paiement clairs
-- Garder le design actuel
-- Remplacer le bouton unique par **2 boutons côte à côte** :
-  - 💳 **« Payer par carte (7 jours d'essai gratuit) »** → déclenche Stripe Checkout
-  - 💰 **« Payer par PayPal »** → redirige vers `/paiement-manuel`
-- Ajouter rassurances sous les boutons : *Sans engagement · Annulable en 1 clic · 7 jours gratuits*
-- Champ email obligatoire avant clic (pour Stripe)
+### Fichiers modifiés
+1. **`src/components/layout/modernSidebarSections.ts`**
+   - Renommer les 5 piliers en 4 étapes numérotées : `1️⃣ Préparer`, `2️⃣ Écrire`, `3️⃣ Publier`, `4️⃣ Vendre` + `⚙️ Mon Compte` (rétrogradé en footer).
+   - Réduire `ESSENTIAL_TOOL_IDS` à 3-4 outils max par étape (le reste passe en "avancés").
+   - Sortir les 15 agents P1→P15 dans un sous-groupe `WORKFLOW_AGENTS` replié.
 
-### 2️⃣ Composant `StripeCheckoutButton` réutilisable
-- Appelle `supabase.functions.invoke('stripe-checkout')` avec `email`, `successUrl`, `cancelUrl`
-- Redirige automatiquement vers la page Stripe hébergée (sécurisée, conforme PCI)
-- État loading + gestion d'erreurs
+2. **`src/components/layout/ModernSidebar.tsx`**
+   - Ajouter un état `showWorkflowAgents` (défaut `false`) avec toggle `🤖 Workflow 15 agents ▾`.
+   - Augmenter espacement (gap, padding) et tailles de police.
+   - Ajouter une bordure gauche colorée par pilier (emerald/violet/blue/orange).
+   - Compacter `⚙️ Mon Compte` en footer 2 colonnes.
 
-### 3️⃣ Page `/paiement-succes` — Page de remerciement premium
-- Animation de succès (✓ vert)
-- Message : *« Bienvenue dans EbookStudio Pro ! »*
-- 3 prochaines étapes claires :
-  1. 📧 Vérifie ta boîte mail (code d'accès envoyé)
-  2. 🔑 Connecte-toi via le bouton ci-dessous
-  3. 📥 Télécharge l'extension Chrome (lien direct)
-- Vérifie automatiquement la session Stripe via `stripe-verify-session`
-- Crée/active automatiquement le compte abonné
+3. **NOUVEAU `src/components/layout/SidebarOnboarding.tsx`**
+   - Composant bandeau "🚀 Par où commencer ?" avec 4 étapes cliquables (chaque étape = onTabChange vers l'outil correspondant).
+   - État persisté via `localStorage` (clé `sidebar_onboarding_dismissed_v1`).
+   - Bouton "Masquer ce guide" pour les abonnés expérimentés.
+   - Réafficher via lien dans `⚙️ Paramètres` ("Réafficher le guide de démarrage").
 
-### 4️⃣ Page `/extension-chrome` — Boutons CTA mis à jour
-- Bouton principal (orange) : **« Télécharger gratuitement »** (ZIP, comme actuellement)
-- Bouton secondaire (noir, sous le principal) : **« Passer Pro — 67€/an »** → redirige vers `/offres`
-- Idem dans la section CTA finale en bas de page
+4. **`src/hooks/useSidebarFavorites.ts`** : aucun changement (déjà bon).
 
----
+### Comportement
+- Aucun outil supprimé — tout reste accessible via `[+ Voir avancés]` ou `[🤖 Workflow 15 agents ▾]`.
+- Les abonnés existants gardent leurs favoris et leur projet actif.
+- Le bandeau onboarding apparaît automatiquement aux abonnés qui ne l'ont jamais masqué (rétro-compatible : il s'affichera une fois pour tous, ils peuvent le fermer).
 
-## 🎨 Détails techniques
-
-| Élément | Valeur |
-|---|---|
-| Tarif | 67€/an (lancement) |
-| Essai gratuit | 7 jours (déjà configuré dans `stripe-checkout`) |
-| Mode Stripe | Checkout hébergé Stripe (PCI compliant, pas de carte stockée chez vous) |
-| Modes paiement | Carte (Visa, Mastercard, Amex), Apple Pay, Google Pay automatiques |
-| Devises | EUR |
-| Webhook | Déjà branché — active automatiquement l'abonné après paiement |
-| URL succès | `https://www.ebookstudio.fr/paiement-succes?session_id={CHECKOUT_SESSION_ID}` |
-| URL annulation | `https://www.ebookstudio.fr/offres` |
+### Hors-scope
+- Pas de refonte de `MagazineSidebar.tsx` (sidebar legacy non utilisée par les abonnés).
+- Pas de modification du système d'auth ni des routes.
+- Pas de changement sur la page `/offres` (la vente fonctionne déjà).
 
 ---
 
-## 📝 Fichiers modifiés / créés
+## Ce que ça va changer pour vos abonnés
 
-**Modifiés :**
-- `src/pages/SalesPage.tsx` (ou la page `/offres` actuelle) — boutons CTA
-- `src/pages/PaymentSuccessPage.tsx` — page de remerciement modernisée
-- `src/pages/ExtensionChromePage.tsx` — bouton "Passer Pro" ajouté
-
-**Créés :**
-- `src/components/StripeCheckoutButton.tsx` — composant réutilisable carte bancaire
-
-**Aucune fonction backend à créer** — tout existe déjà ✅
-
----
-
-## 🚀 Résultat attendu
-
-- Augmentation du taux de conversion (+30 à 50% typiquement quand on ajoute la carte)
-- Plus aucun abonné perdu à cause du paiement
-- Tunnel rapide : un visiteur peut acheter en moins de 90 secondes
-- Page de remerciement claire qui guide vers la 1ère utilisation
-
----
-
-## ⚠️ À vérifier après implémentation
-
-1. Tester un achat en mode test Stripe (carte `4242 4242 4242 4242`)
-2. Vérifier que l'email d'accès est bien envoyé (via `send-access-code`)
-3. Vérifier la redirection finale vers `/paiement-succes`
-4. Publier le site (Publish → Update) pour que les changements soient en ligne sur ebookstudio.fr
-
-Validez ce plan et je passe à l'implémentation. 👇
+✅ **Premier coup d'œil** : ils voient 4 étapes claires au lieu de 44 outils empilés.
+✅ **Nouveaux abonnés** : un bandeau les guide pas-à-pas (Plan → Écrire → Couverture → Export).
+✅ **Workflow 15 agents** : replié par défaut, n'écrase plus la sidebar.
+✅ **Pros** : peuvent tout déplier d'un clic, ajouter aux favoris, ou masquer le guide.
+✅ **Lisibilité** : police et espacement améliorés, hiérarchie visuelle claire.
