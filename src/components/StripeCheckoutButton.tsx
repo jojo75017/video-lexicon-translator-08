@@ -26,6 +26,7 @@ const StripeCheckoutButton = ({
   successPath = "/paiement-succes",
   cancelPath = "/offres",
   planId = "annual",
+  addons,
   onError,
 }: StripeCheckoutButtonProps) => {
   const [loading, setLoading] = useState(false);
@@ -46,6 +47,7 @@ const StripeCheckoutButton = ({
         body: {
           planId,
           email: trimmedEmail,
+          addons: addons ?? [],
           successUrl: `${origin}${successPath}?session_id={CHECKOUT_SESSION_ID}`,
           cancelUrl: `${origin}${cancelPath}`,
         },
