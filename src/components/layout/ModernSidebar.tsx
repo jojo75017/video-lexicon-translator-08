@@ -64,12 +64,34 @@ interface ToolGroup {
 
 const allToolGroups: ToolGroup[] = [
   {
-    label: '🤖 Workflow IA',
-    emoji: '🤖',
+    label: '1️⃣ Préparer',
+    emoji: '📋',
     color: 'emerald',
     items: [
-      { id: 'workflow-dashboard', label: '📊 Dashboard Pipeline', icon: BarChart3 },
+      { id: 'planner', label: 'Plan de l\'ebook', icon: ListChecks },
+      { id: 'characters', label: 'Personnages', icon: Users },
+      { id: 'series', label: 'Série / Saga', icon: BookCopy },
+      { id: 'doc-transform', label: 'Importer Word', icon: FileText },
+      { id: 'url-import', label: 'Importer URL', icon: Globe },
+      { id: 'templates', label: 'Modèles / Templates', icon: Layers },
+    ]
+  },
+  {
+    label: '2️⃣ Écrire',
+    emoji: '✍️',
+    color: 'violet',
+    items: [
+      { id: 'writing', label: 'Écrire les chapitres', icon: PenTool },
+      { id: 'aichat', label: 'Assistant IA', icon: Bot },
+      { id: 'strict-proofread', label: 'Relecture Stricte', icon: Glasses },
+      { id: 'workflow-dashboard', label: '📊 Dashboard Workflow', icon: BarChart3 },
       { id: 'complete-workflow', label: '🚀 Lancer le workflow', icon: Rocket, isPro: true },
+      { id: 'atlas', label: 'Atlas', icon: Globe },
+      { id: 'encyclopedia', label: 'Encyclopédie', icon: Library },
+      { id: 'coloring', label: 'Livre de Coloriage', icon: Palette },
+      { id: 'documentary', label: 'Documentaire', icon: FileText },
+      { id: 'multi-translator', label: 'Traduction Multi-Langues', icon: Globe },
+      // Les 15 agents P1→P15 sont rendus séparément dans un sous-bloc repliable.
       { id: 'editorial-director', label: 'P1 · Zyro — Niche', icon: Crown, isPro: true },
       { id: 'market-analysis', label: 'P2 · Jano — Marché', icon: Search, isPro: true },
       { id: 'content-architect', label: 'P3 · Kiro — Plan', icon: LayoutDashboard, isPro: true },
@@ -88,47 +110,26 @@ const allToolGroups: ToolGroup[] = [
     ]
   },
   {
-    label: '✍️ Écriture',
-    emoji: '✍️',
-    color: 'violet',
-    items: [
-      { id: 'planner', label: 'Plan de l\'ebook', icon: ListChecks },
-      { id: 'writing', label: 'Écrire les chapitres', icon: PenTool },
-      { id: 'aichat', label: 'Assistant IA', icon: Bot },
-      { id: 'characters', label: 'Personnages', icon: Users },
-      { id: 'series', label: 'Série / Saga', icon: BookCopy },
-      { id: 'atlas', label: 'Atlas', icon: Globe },
-      { id: 'encyclopedia', label: 'Encyclopédie', icon: Library },
-      { id: 'coloring', label: 'Livre de Coloriage', icon: Palette },
-      { id: 'documentary', label: 'Documentaire', icon: FileText },
-      { id: 'doc-transform', label: 'Importer Word', icon: FileText },
-      { id: 'url-import', label: 'Importer URL', icon: Globe },
-      { id: 'templates', label: 'Modèles / Templates', icon: Layers },
-      { id: 'strict-proofread', label: 'Relecture Stricte', icon: Glasses },
-      { id: 'multi-translator', label: 'Traduction Multi-Langues', icon: Globe },
-    ]
-  },
-  {
-    label: '📦 Publier',
+    label: '3️⃣ Publier',
     emoji: '📦',
     color: 'blue',
     items: [
       { id: 'export', label: 'Exporter (PDF, Word)', icon: Download },
+      { id: 'cover-design-editor', label: 'Éditeur Couverture', icon: Palette, isNew: true },
+      { id: 'kdp', label: 'Description KDP', icon: TrendingUp },
+      { id: 'audit-pilot', label: 'Audit Pilot KDP', icon: ClipboardCheck, isLink: true, href: '/audit-pilot', isNew: true },
       { id: 'workflow-export', label: 'Export Global Workflow', icon: Download },
       { id: 'calibre-epub', label: 'Export ePub (Calibre)', icon: Download },
-      { id: 'cover-design-editor', label: 'Éditeur Couverture', icon: Palette, isNew: true },
       { id: 'cover', label: 'Couverture IA', icon: Sparkles },
       { id: 'backcover', label: '4e de Couverture', icon: FileText },
-      { id: 'kdp', label: 'Description KDP', icon: TrendingUp },
       { id: 'kdp-prepublish-checklist', label: 'Checklist KDP', icon: ClipboardCheck },
       { id: 'kdp-keywords-pro', label: 'Mots-Clés KDP Pro', icon: Key, isLink: true, href: '/kdp-keywords', isNew: true },
-      { id: 'audit-pilot', label: 'Audit Pilot KDP', icon: ClipboardCheck, isLink: true, href: '/audit-pilot', isNew: true },
       { id: 'audiobook', label: 'Livre Audio', icon: Headphones },
       { id: 'audio-express', label: 'Audio Express', icon: Play },
     ]
   },
   {
-    label: '📣 Vendre',
+    label: '4️⃣ Vendre',
     emoji: '📣',
     color: 'orange',
     items: [
