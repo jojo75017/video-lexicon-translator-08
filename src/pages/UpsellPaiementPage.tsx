@@ -3,12 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import StripeCheckoutButton from "@/components/StripeCheckoutButton";
 import { 
   Check, CreditCard, ArrowLeft, ArrowRight, Sparkles, Cpu, Headphones, 
   Image, ShieldCheck, Lock, Clock, Users, Star, Zap, Gift, CheckCircle
 } from "lucide-react";
 import { toast } from "sonner";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
 const LAUNCH_PRICE = 67;
@@ -39,7 +40,6 @@ const PLAN = {
 };
 
 const UpsellPaiementPage = () => {
-  const [searchParams] = useSearchParams();
   const [email, setEmail] = useState("");
   const [selectedPayment, setSelectedPayment] = useState<'full' | 'installment2' | 'installment3'>('full');
   const [serenityAddon, setSerenityAddon] = useState(false);
@@ -350,24 +350,44 @@ const UpsellPaiementPage = () => {
                   </div>
                 )}
 
-                <a 
-                  href={currentPaypalLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={handlePayPalClick}
-                  className="block"
-                >
-                  <Button size="lg" className="w-full py-7 text-lg font-bold bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-900 rounded-xl shadow-xl shadow-cyan-500/20 hover:shadow-cyan-500/30 transition-all">
-                    <CreditCard className="w-5 h-5 mr-2" />
-                    Payer {currentAmount}€ — PayPal ou CB
-                    <ArrowRight className="w-5 h-5 ml-2" />
-                  </Button>
-                </a>
+                {selectedPayment === 'full' && !serenityAddon && !extendedLicense ? (
+                  <StripeCheckoutButton
+                    email={email}
+                    planId="pro"
+                    cancelPath="/upsell-paiement?plan=pro"
+                    className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 px-6 py-7 text-lg font-bold text-slate-900 shadow-xl shadow-cyan-500/20 transition-all hover:from-cyan-400 hover:to-emerald-400 hover:shadow-cyan-500/30 disabled:opacity-60 disabled:hover:scale-100"
+                  >
+                    <>
+                      <CreditCard className="w-5 h-5" />
+                      Payer 67€ par carte
+                      <ArrowRight className="w-5 h-5" />
+                    </>
+                  </StripeCheckoutButton>
+                ) : (
+                  <a 
+                    href={currentPaypalLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={handlePayPalClick}
+                    className="block"
+                  >
+                    <Button size="lg" className="w-full py-7 text-lg font-bold bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-900 rounded-xl shadow-xl shadow-cyan-500/20 hover:shadow-cyan-500/30 transition-all">
+                      <CreditCard className="w-5 h-5 mr-2" />
+                      Payer {currentAmount}€ — PayPal ou CB
+                      <ArrowRight className="w-5 h-5 ml-2" />
+                    </Button>
+                  </a>
+                )}
                 <p className="text-center text-[11px] text-slate-500 flex items-center justify-center gap-3">
                   <span className="flex items-center gap-1"><Lock className="w-3 h-3" />SSL 256-bit</span>
                   <span>•</span>
-                  <span>PayPal ou carte bancaire</span>
+                  <span>{selectedPayment === 'full' && !serenityAddon && !extendedLicense ? 'Carte bancaire via Stripe' : 'PayPal ou carte bancaire'}</span>
                 </p>
+                {!(selectedPayment === 'full' && !serenityAddon && !extendedLicense) && (
+                  <p className="text-center text-[11px] text-muted-foreground">
+                    Le paiement Stripe direct est disponible pour l'offre 67€ seule, sans options additionnelles.
+                  </p>
+                )}
               </div>
 
               {/* Step 4: Confirm */}
