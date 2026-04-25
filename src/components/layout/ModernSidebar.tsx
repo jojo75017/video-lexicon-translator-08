@@ -607,13 +607,20 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
       .slice(0, 15);
   }, [searchQuery, isAdmin]);
 
-  // Décompose les items d'un groupe en (essentiels visibles, avancés visibles si toggle)
+  // Décompose les items d'un groupe en (essentiels visibles, avancés visibles si toggle).
+  // Pour le groupe "2️⃣ Écrire" on EXCLUT les 15 agents Workflow IA — ils sont rendus
+  // séparément dans un sous-bloc repliable pour ne pas écraser la sidebar.
   const partitionItems = (group: ToolGroup) => {
-    const visible = group.items.filter(filterAdmin);
+    let visible = group.items.filter(filterAdmin);
+    let workflowAgents: MenuItem[] = [];
+    if (group.label === '2️⃣ Écrire') {
+      workflowAgents = visible.filter(i => WORKFLOW_AGENT_IDS.includes(i.id));
+      visible = visible.filter(i => !WORKFLOW_AGENT_IDS.includes(i.id));
+    }
     const essentialIds = ESSENTIAL_TOOL_IDS[group.label] ?? [];
     const essentials = visible.filter(i => essentialIds.includes(i.id));
     const advanced = visible.filter(i => !essentialIds.includes(i.id));
-    return { essentials, advanced, total: visible.length };
+    return { essentials, advanced, workflowAgents, total: visible.length + workflowAgents.length };
   };
 
   return (
