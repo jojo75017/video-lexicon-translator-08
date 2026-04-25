@@ -522,7 +522,7 @@ export const useEbookDatabase = () => {
     saveProject,
     loadAllProjects,
     deleteProject,
-    setCurrentProjectId,
+    setCurrentProjectId: updateCurrentProjectId,
     duplicateProject,
     saveVersion,
     loadVersions,
