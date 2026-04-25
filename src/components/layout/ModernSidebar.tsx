@@ -24,10 +24,11 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Progress } from '@/components/ui/progress';
 import { useUserQuotas, getQuotaPercentage } from '@/hooks/useUserQuotas';
 import { ToolsGuideButton } from '@/components/layout/ToolsGuideButton';
-import { ESSENTIAL_TOOL_IDS } from './modernSidebarSections';
+import { ESSENTIAL_TOOL_IDS, WORKFLOW_AGENT_IDS } from './modernSidebarSections';
 import { useSidebarFavorites } from '@/hooks/useSidebarFavorites';
 import { SidebarFavorites } from './SidebarFavorites';
 import { SidebarHeader, type RecentProject } from './SidebarHeader';
+import { SidebarOnboarding } from './SidebarOnboarding';
 import { useEbookDatabase } from '@/hooks/useEbookDatabase';
 import { useWorkflowResults } from '@/hooks/useWorkflowResults';
 
