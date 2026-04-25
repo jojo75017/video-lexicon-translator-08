@@ -6,6 +6,25 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Catalogue des produits autorisés (montants en centimes EUR)
+const PRODUCT_CATALOG: Record<string, { name: string; description: string; amount: number }> = {
+  pro_lifetime: {
+    name: "EbookStudio Pro — Accès à Vie",
+    description: "Accès complet à EbookStudio Pro (paiement unique)",
+    amount: 6700,
+  },
+  serenity: {
+    name: "Pack Sérénité",
+    description: "Session Zoom 1-à-1 + support prioritaire + audit ebook",
+    amount: 3000,
+  },
+  extended_license: {
+    name: "Licence Commerciale Étendue",
+    description: "Usage freelance / agence + projets clients illimités",
+    amount: 4700,
+  },
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -18,13 +37,11 @@ serve(async (req) => {
       throw new Error("Stripe non configuré");
     }
 
-    console.log("Stripe key prefix:", stripeKey.slice(0, 7));
-
     const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
 
-    const { planId, email, successUrl, cancelUrl } = await req.json();
+    const { planId, email, successUrl, cancelUrl, addons } = await req.json();
 
-    console.log("Creating checkout for plan:", planId, "email:", email);
+    console.log("Creating checkout for plan:", planId, "email:", email, "addons:", addons);
 
     if (!email) throw new Error("Email requis");
 
@@ -40,91 +57,58 @@ serve(async (req) => {
         const newCustomer = await stripe.customers.create({ email });
         customerId = newCustomer.id;
       }
-      console.log("Customer:", customerId);
     }
 
-    // Get or create a recurring price for the subscription with trial
-    const rawPriceId = Deno.env.get("STRIPE_LIFETIME_PRICE_ID") || "";
-    const configuredPriceId = rawPriceId.trim();
-    console.log("DEBUG STRIPE_LIFETIME_PRICE_ID raw length:", rawPriceId.length, "trimmed:", configuredPriceId, "starts with price_:", configuredPriceId.startsWith("price_"));
-    const productName = "EbookStudio Pro — Accès à Vie";
-    const productDescription = "Accès complet à EbookStudio Pro avec essai gratuit de 7 jours";
-    const amount = 6700; // 67€
-    let priceId: string | undefined;
-    let lineItems: Stripe.Checkout.SessionCreateParams.LineItem[];
+    // Construire la liste des produits commandés
+    // Le produit principal "pro_lifetime" est toujours inclus
+    const requestedItems: string[] = ["pro_lifetime"];
+    if (Array.isArray(addons)) {
+      for (const addon of addons) {
+        if (typeof addon === "string" && PRODUCT_CATALOG[addon] && addon !== "pro_lifetime") {
+          requestedItems.push(addon);
+        }
+      }
+    }
 
-    if (isRestrictedKey) {
-      console.log("Restricted key detected, using inline one-time price_data");
-      lineItems = [{
+    // Construire les line items pour Stripe (price_data inline = simple et flexible)
+    const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = requestedItems.map((key) => {
+      const product = PRODUCT_CATALOG[key];
+      return {
         price_data: {
           currency: "eur",
-          unit_amount: amount,
+          unit_amount: product.amount,
           product_data: {
-            name: productName,
-            description: productDescription,
+            name: product.name,
+            description: product.description,
           },
         },
         quantity: 1,
-      }];
-    } else {
-      // Look for or create a one-time price
-      const products = await stripe.products.search({
-        query: `name:'${productName}'`,
-        limit: 1,
-      });
+      };
+    });
 
-      let productId: string;
-      if (products.data.length > 0) {
-        productId = products.data[0].id;
-      } else {
-        const product = await stripe.products.create({
-          name: productName,
-          description: productDescription,
-        });
-        productId = product.id;
-      }
+    const totalAmount = requestedItems.reduce((sum, key) => sum + PRODUCT_CATALOG[key].amount, 0);
+    console.log("Line items:", requestedItems, "Total:", totalAmount / 100, "€");
 
-      // Look for existing one-time price
-      const prices = await stripe.prices.list({
-        product: productId,
-        active: true,
-        type: "one_time",
-        limit: 10,
-      });
-
-      const matchingPrice = prices.data.find(
-        (p) => p.unit_amount === amount && !p.recurring
-      );
-
-      if (matchingPrice) {
-        priceId = matchingPrice.id;
-      } else {
-        const price = await stripe.prices.create({
-          product: productId,
-          unit_amount: amount,
-          currency: "eur",
-        });
-        priceId = price.id;
-      }
-
-      lineItems = [{ price: priceId, quantity: 1 }];
-    }
-
-    console.log("Using price:", priceId ?? "inline_price_data");
-
-    // Create one-time payment checkout (no subscription, no trial)
     const sessionConfig: Stripe.Checkout.SessionCreateParams = {
       ...(customerId ? { customer: customerId } : { customer_email: email }),
       line_items: lineItems,
       mode: "payment",
       payment_intent_data: {
-        metadata: { planId: planId || "pro", email },
+        metadata: {
+          planId: planId || "pro",
+          email,
+          items: requestedItems.join(","),
+        },
       },
       success_url:
         successUrl ||
         `${req.headers.get("origin")}/paiement-succes?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: cancelUrl || `${req.headers.get("origin")}/offres`,
-      metadata: { planId: planId || "pro", email },
+      metadata: {
+        planId: planId || "pro",
+        email,
+        items: requestedItems.join(","),
+      },
       allow_promotion_codes: true,
     };
 

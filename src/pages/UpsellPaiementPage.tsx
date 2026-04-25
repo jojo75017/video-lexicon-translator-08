@@ -350,16 +350,20 @@ const UpsellPaiementPage = () => {
                   </div>
                 )}
 
-                {selectedPayment === 'full' && !serenityAddon && !extendedLicense ? (
+                {selectedPayment === 'full' ? (
                   <StripeCheckoutButton
                     email={email}
                     planId="pro"
+                    addons={[
+                      ...(serenityAddon ? ['serenity'] : []),
+                      ...(extendedLicense ? ['extended_license'] : []),
+                    ]}
                     cancelPath="/upsell-paiement?plan=pro"
                     className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 px-6 py-7 text-lg font-bold text-slate-900 shadow-xl shadow-cyan-500/20 transition-all hover:from-cyan-400 hover:to-emerald-400 hover:shadow-cyan-500/30 disabled:opacity-60 disabled:hover:scale-100"
                   >
                     <>
                       <CreditCard className="w-5 h-5" />
-                      Payer 67€ par carte
+                      Payer {currentAmount}€ par carte
                       <ArrowRight className="w-5 h-5" />
                     </>
                   </StripeCheckoutButton>
@@ -381,11 +385,11 @@ const UpsellPaiementPage = () => {
                 <p className="text-center text-[11px] text-slate-500 flex items-center justify-center gap-3">
                   <span className="flex items-center gap-1"><Lock className="w-3 h-3" />SSL 256-bit</span>
                   <span>•</span>
-                  <span>{selectedPayment === 'full' && !serenityAddon && !extendedLicense ? 'Carte bancaire via Stripe' : 'PayPal ou carte bancaire'}</span>
+                  <span>{selectedPayment === 'full' ? 'Carte bancaire via Stripe' : 'PayPal ou carte bancaire'}</span>
                 </p>
-                {!(selectedPayment === 'full' && !serenityAddon && !extendedLicense) && (
+                {selectedPayment !== 'full' && (
                   <p className="text-center text-[11px] text-muted-foreground">
-                    Le paiement Stripe direct est disponible pour l'offre 67€ seule, sans options additionnelles.
+                    Le paiement en plusieurs fois est traité via PayPal.
                   </p>
                 )}
               </div>
