@@ -54,11 +54,7 @@ const PriceComparison: React.FC = () => {
   ];
 
   const handleCta = () => {
-    if (isVipAvailable) {
-      navigate('/paiement-manuel');
-    } else {
-      navigate('/upsell-paiement?plan=pro');
-    }
+    navigate('/upsell-paiement?plan=pro');
   };
 
   return (

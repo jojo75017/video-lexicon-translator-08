@@ -35,11 +35,7 @@ export const StickyCtaBar: React.FC<StickyCtaBarProps> = ({ onCtaClick }) => {
     if (onCtaClick) {
       onCtaClick();
     } else {
-      if (isVipAvailable) {
-        navigate('/paiement-manuel');
-      } else {
-        navigate('/upsell-paiement?plan=pro');
-      }
+      navigate('/upsell-paiement?plan=pro');
     }
   };
 

@@ -246,7 +246,7 @@ const BlackPackPricing = ({ onCtaClick, launchPrice = 67, normalPrice = 147 }: B
             {/* Bouton 2 : PayPal — SECONDAIRE */}
             <button
               type="button"
-              onClick={() => navigate("/paiement-manuel")}
+              onClick={() => navigate("/upsell-paiement?plan=pro")}
               className="w-full inline-flex items-center justify-center gap-3 rounded-xl px-6 py-3.5 font-bold text-sm transition-all hover:bg-white/10"
               style={{
                 background: "transparent",
