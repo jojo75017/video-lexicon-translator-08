@@ -593,6 +593,10 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
         if (!essentials.includes(activeTab)) {
           setShowAdvanced(prev => ({ ...prev, [group.label]: true }));
         }
+        // Si l'onglet actif est un agent du Workflow IA, déplier le sous-bloc
+        if (WORKFLOW_AGENT_IDS.includes(activeTab)) {
+          setShowWorkflowAgents(true);
+        }
         break;
       }
     }
