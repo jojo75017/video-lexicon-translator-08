@@ -44,13 +44,15 @@ serve(async (req) => {
     }
 
     // Get or create a recurring price for the subscription with trial
-    const configuredPriceId = (Deno.env.get("STRIPE_LIFETIME_PRICE_ID") || "").trim();
+    const rawPriceId = Deno.env.get("STRIPE_LIFETIME_PRICE_ID") || "";
+    const configuredPriceId = rawPriceId.trim();
+    console.log("DEBUG STRIPE_LIFETIME_PRICE_ID raw length:", rawPriceId.length, "trimmed:", configuredPriceId, "starts with price_:", configuredPriceId.startsWith("price_"));
     let priceId: string;
 
     if (isRestrictedKey) {
       if (!configuredPriceId || !configuredPriceId.startsWith("price_")) {
         throw new Error(
-          "Clé Stripe limitée: configurez STRIPE_LIFETIME_PRICE_ID (price_...) dans le backend."
+          `Clé Stripe limitée: STRIPE_LIFETIME_PRICE_ID invalide (reçu: "${configuredPriceId.substring(0, 20)}..." longueur=${configuredPriceId.length}). Doit commencer par price_`
         );
       }
       priceId = configuredPriceId;
