@@ -633,7 +633,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
         className={cn(
           "relative flex flex-col h-screen transition-all duration-300 ease-out",
           "bg-background border-r border-border",
-          isCollapsed ? "w-[72px]" : "w-72"
+          isCollapsed ? "w-[72px]" : "w-[320px]"
         )}
       >
         {/* Header logo */}
