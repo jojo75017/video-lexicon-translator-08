@@ -427,11 +427,11 @@ const MenuItemButton: React.FC<{
         >
           <button
             onClick={onClick}
-            className="flex-1 flex items-center gap-2.5 px-3 py-2 text-left min-w-0"
+            className="flex-1 flex items-center gap-3 px-3 py-2.5 text-left min-w-0"
           >
             <Icon className={cn("w-4 h-4 flex-shrink-0", isActive ? colors.icon : "text-muted-foreground")} />
             <span className={cn(
-              "text-sm flex-1 truncate",
+              "text-[14px] flex-1 truncate leading-tight",
               isActive ? cn("font-semibold", colors.text) : "text-foreground group-hover/item:text-kdp-orange"
             )}>
               {item.label}
