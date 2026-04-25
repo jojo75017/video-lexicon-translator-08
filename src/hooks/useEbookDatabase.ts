@@ -56,6 +56,16 @@ export const useEbookDatabase = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Refs synchrones pour éviter les races conditions sur saveProject
+  const currentProjectIdRef = useRef<string | null>(null);
+  const savingPromiseRef = useRef<Promise<any> | null>(null);
+
+  // Synchroniser le state avec le ref via un setter unifié
+  const updateCurrentProjectId = (id: string | null) => {
+    currentProjectIdRef.current = id;
+    setCurrentProjectId(id);
+  };
+
   // Charger le projet le plus récent au démarrage
   const loadLatestProject = async () => {
     const startTime = Date.now();
