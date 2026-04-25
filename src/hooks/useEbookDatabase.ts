@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -56,6 +56,16 @@ export const useEbookDatabase = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Refs synchrones pour éviter les races conditions sur saveProject
+  const currentProjectIdRef = useRef<string | null>(null);
+  const savingPromiseRef = useRef<Promise<any> | null>(null);
+
+  // Synchroniser le state avec le ref via un setter unifié
+  const updateCurrentProjectId = (id: string | null) => {
+    currentProjectIdRef.current = id;
+    setCurrentProjectId(id);
+  };
+
   // Charger le projet le plus récent au démarrage
   const loadLatestProject = async () => {
     const startTime = Date.now();
@@ -87,7 +97,7 @@ export const useEbookDatabase = () => {
 
       if (data) {
         const loadTime = Date.now() - startTime;
-        setCurrentProjectId(data.id);
+        updateCurrentProjectId(data.id);
         // Toast supprimé pour éviter les popups à chaque chargement automatique
         console.log(`✅ [loadLatestProject] Projet chargé en ${loadTime}ms:`, {
           id: data.id,
@@ -112,94 +122,119 @@ export const useEbookDatabase = () => {
   };
 
   // Sauvegarder ou mettre à jour le projet (avec version automatique)
+  // Sérialise les appels concurrents pour éviter les doublons (race condition)
   const saveProject = async (projectData: EbookProject, autoVersion: boolean = true) => {
-    const startTime = Date.now();
-    console.log('💾 [saveProject] Début de la sauvegarde:', {
-      titre: projectData.title,
-      mode: currentProjectId ? 'MISE À JOUR' : 'CRÉATION',
-      currentProjectId,
-      chapitres: Array.isArray(projectData.chapters) ? projectData.chapters.length : 0,
-      autoVersion
-    });
-    
-    try {
-      setIsSaving(true);
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        console.warn('⚠️ [saveProject] Impossible de sauvegarder: utilisateur non connecté (pas de session auth)');
-        toast.error('Session expirée ou absente', {
-          description: 'Connectez-vous pour sauvegarder vos projets en base de données. Vos données sont conservées localement en attendant.',
-          duration: 8000,
-        });
+    // Si une sauvegarde est en cours, on attend qu'elle finisse avant de lancer la suivante
+    // Cela garantit que currentProjectIdRef est à jour pour le second appel → UPDATE au lieu de INSERT
+    if (savingPromiseRef.current) {
+      console.log('⏳ [saveProject] Attente de la sauvegarde en cours pour éviter un doublon...');
+      try { await savingPromiseRef.current; } catch { /* ignore */ }
+    }
+
+    const promise = (async () => {
+      const startTime = Date.now();
+      console.log('💾 [saveProject] Début de la sauvegarde:', {
+        titre: projectData.title,
+        mode: currentProjectIdRef.current ? 'MISE À JOUR' : 'CRÉATION',
+        currentProjectId: currentProjectIdRef.current,
+        chapitres: Array.isArray(projectData.chapters) ? projectData.chapters.length : 0,
+        autoVersion
+      });
+
+      try {
+        setIsSaving(true);
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
+          console.warn('⚠️ [saveProject] Impossible de sauvegarder: utilisateur non connecté');
+          toast.error('Session expirée ou absente', {
+            description: 'Connectez-vous pour sauvegarder vos projets en base de données.',
+            duration: 8000,
+          });
+          return null;
+        }
+
+        let savedData = null;
+        let projectIdToUse = currentProjectIdRef.current;
+
+        // Garde-fou anti-doublon : si pas d'ID en mémoire, chercher un projet existant
+        // récent du même utilisateur portant exactement le même titre (créé < 24h)
+        if (!projectIdToUse && projectData.title && projectData.title.trim() !== '' && projectData.title !== 'Sans titre') {
+          const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+          const { data: existing } = await supabase
+            .from('ebook_projects')
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('title', projectData.title)
+            .gte('created_at', since)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
+          if (existing) {
+            console.log(`♻️ [saveProject] Projet existant détecté (anti-doublon): ${existing.id}`);
+            projectIdToUse = existing.id;
+            updateCurrentProjectId(existing.id);
+          }
+        }
+
+        if (projectIdToUse) {
+          console.log(`🔄 [saveProject] Mise à jour du projet ID: ${projectIdToUse}`);
+          const { data, error } = await supabase
+            .from('ebook_projects')
+            .update({ ...projectData, user_id: user.id })
+            .eq('id', projectIdToUse)
+            .select()
+            .single();
+
+          if (error) {
+            console.error('❌ [saveProject] Erreur mise à jour:', error);
+            throw error;
+          }
+          savedData = data;
+          console.log(`✅ [saveProject] Projet mis à jour en ${Date.now() - startTime}ms`);
+        } else {
+          console.log('✨ [saveProject] Création d\'un nouveau projet');
+          const { data, error } = await supabase
+            .from('ebook_projects')
+            .insert({ ...projectData, user_id: user.id })
+            .select()
+            .single();
+
+          if (error) {
+            console.error('❌ [saveProject] Erreur création:', error);
+            throw error;
+          }
+          updateCurrentProjectId(data.id);
+          savedData = data;
+          console.log(`✅ [saveProject] Nouveau projet créé en ${Date.now() - startTime}ms:`, {
+            id: data.id, titre: data.title
+          });
+        }
+
+        // Auto-sauvegarde de version si activée
+        if (autoVersion && savedData) {
+          await autoSaveVersion(savedData.id, savedData);
+        }
+
+        return savedData;
+      } catch (error) {
+        console.error('❌ [saveProject] Exception:', error);
+        toast.error('Erreur lors de la sauvegarde du projet');
         return null;
+      } finally {
+        setIsSaving(false);
+        console.log(`⏱️ [saveProject] Terminé`);
       }
+    })();
 
-      console.log(`👤 [saveProject] Utilisateur: ${user.email}`);
-
-      let savedData = null;
-
-      if (currentProjectId) {
-        // Mise à jour du projet existant
-        console.log(`🔄 [saveProject] Mise à jour du projet ID: ${currentProjectId}`);
-        const { data, error } = await supabase
-          .from('ebook_projects')
-          .update({
-            ...projectData,
-            user_id: user.id,
-          })
-          .eq('id', currentProjectId)
-          .select()
-          .single();
-
-        if (error) {
-          console.error('❌ [saveProject] Erreur mise à jour:', error);
-          throw error;
-        }
-        
-        savedData = data;
-        const saveTime = Date.now() - startTime;
-        console.log(`✅ [saveProject] Projet mis à jour avec succès en ${saveTime}ms`);
-      } else {
-        // Création d'un nouveau projet
-        console.log('✨ [saveProject] Création d\'un nouveau projet');
-        const { data, error } = await supabase
-          .from('ebook_projects')
-          .insert({
-            ...projectData,
-            user_id: user.id,
-          })
-          .select()
-          .single();
-
-        if (error) {
-          console.error('❌ [saveProject] Erreur création:', error);
-          throw error;
-        }
-        
-        setCurrentProjectId(data.id);
-        savedData = data;
-        const saveTime = Date.now() - startTime;
-        console.log(`✅ [saveProject] Nouveau projet créé avec succès en ${saveTime}ms:`, {
-          id: data.id,
-          titre: data.title
-        });
-      }
-
-      // Auto-sauvegarde de version si activée
-      if (autoVersion && savedData) {
-        await autoSaveVersion(savedData.id, savedData);
-      }
-
-      return savedData;
-    } catch (error) {
-      console.error('❌ [saveProject] Exception:', error);
-      toast.error('Erreur lors de la sauvegarde du projet');
-      return null;
+    savingPromiseRef.current = promise;
+    try {
+      return await promise;
     } finally {
-      setIsSaving(false);
-      const totalTime = Date.now() - startTime;
-      console.log(`⏱️ [saveProject] Terminé en ${totalTime}ms`);
+      if (savingPromiseRef.current === promise) {
+        savingPromiseRef.current = null;
+      }
     }
   };
 
@@ -314,8 +349,8 @@ export const useEbookDatabase = () => {
       
       toast.success('Projet supprimé');
       
-      if (projectId === currentProjectId) {
-        setCurrentProjectId(null);
+      if (projectId === currentProjectIdRef.current) {
+        updateCurrentProjectId(null);
       }
       
       return true;
@@ -487,7 +522,7 @@ export const useEbookDatabase = () => {
     saveProject,
     loadAllProjects,
     deleteProject,
-    setCurrentProjectId,
+    setCurrentProjectId: updateCurrentProjectId,
     duplicateProject,
     saveVersion,
     loadVersions,
