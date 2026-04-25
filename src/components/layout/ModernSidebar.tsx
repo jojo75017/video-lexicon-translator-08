@@ -719,7 +719,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
         />
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto px-2 py-3 space-y-1.5">
+        <nav className="flex-1 min-h-0 overflow-y-auto px-2 py-3 space-y-1.5">
           {searchQuery.trim() && !isCollapsed ? (
             <div className="space-y-1">
               <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground px-2 mb-2">
@@ -742,8 +742,9 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
               )}
             </div>
           ) : (
-            <div className="space-y-1">
-              {allToolGroups.map(group => {
+            <div className="min-h-full flex flex-col">
+              <div className="space-y-1 flex-shrink-0">
+              {allToolGroups.filter(group => PRIMARY_GROUP_LABELS.includes(group.label)).map(group => {
                 const isExpanded = openGroup === group.label;
                 const visibleItems = group.items.filter(filterAdmin);
                 const hasActive = visibleItems.some(i => i.id === activeTab);
@@ -790,11 +791,11 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                 })();
 
                 return (
-                  <div key={group.label} className="mb-2">
+                  <div key={group.label} className="mb-1.5">
                     <button
                       onClick={() => toggleGroup(group.label)}
                       className={cn(
-                        "w-full flex items-center justify-between px-3 py-3 rounded-xl transition-all",
+                        "w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all",
                         hasActive ? colors.bg : "hover:bg-card/60"
                       )}
                     >
@@ -925,6 +926,102 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                   </div>
                 );
               })}
+
+              </div>
+
+              {!isCollapsed && (
+                <div className="mt-auto pt-3 space-y-1">
+                  {allToolGroups.filter(group => group.label === ACCOUNT_GROUP_LABEL).map(group => {
+                    const isExpanded = openGroup === group.label;
+                    const visibleItems = group.items.filter(filterAdmin);
+                    const hasActive = visibleItems.some(i => i.id === activeTab);
+                    const colors = colorMap[group.color] || colorMap.blue;
+                    const { essentials, advanced, workflowAgents, total } = partitionItems(group);
+                    const advancedShown = showAdvanced[group.label] ?? false;
+                    const groupBadge = unfinishedProjectsCount > 0 ? String(unfinishedProjectsCount) : String(total);
+
+                    return (
+                      <div key={group.label} className="mb-1.5 border-t border-border pt-2">
+                        <button
+                          onClick={() => toggleGroup(group.label)}
+                          className={cn(
+                            "w-full flex items-center justify-between px-3 py-2 rounded-xl transition-all",
+                            hasActive ? colors.bg : "hover:bg-card/60"
+                          )}
+                        >
+                          <span className={cn(
+                            "text-[13px] font-bold flex items-center gap-2 tracking-tight",
+                            hasActive ? colors.text : "text-foreground"
+                          )}>
+                            {group.label}
+                          </span>
+                          <div className="flex items-center gap-1.5">
+                            <span className={cn(
+                              "text-[10px] font-semibold px-1.5 py-0.5 rounded-full",
+                              colors.bg, colors.text
+                            )}>
+                              {groupBadge}
+                            </span>
+                            <ChevronDown className={cn(
+                              "w-3.5 h-3.5 transition-transform duration-200",
+                              isExpanded ? "rotate-0" : "-rotate-90",
+                              hasActive ? colors.text : "text-muted-foreground"
+                            )} />
+                          </div>
+                        </button>
+
+                        {isExpanded && (
+                          <div className={cn("ml-2 pl-3 border-l-[3px] space-y-1 mt-2 pb-2", colors.border)}>
+                            {essentials.map(item => (
+                              <MenuItemButton
+                                key={item.id}
+                                item={item}
+                                isActive={activeTab === item.id}
+                                onClick={() => handleItemClick(item)}
+                                isCollapsed={false}
+                                groupColor={group.color}
+                                isFavorite={isFavorite(item.id)}
+                                onToggleFavorite={() => toggleFavorite(item.id)}
+                                inProgress={inProgressTabId === item.id}
+                              />
+                            ))}
+
+                            {advanced.length > 0 && (
+                              <>
+                                <button
+                                  onClick={() => toggleAdvanced(group.label)}
+                                  className="w-full flex items-center gap-1.5 px-3 py-1.5 mt-1 rounded-md text-[11px] font-medium text-muted-foreground hover:text-foreground hover:bg-card/60 transition-all"
+                                >
+                                  {advancedShown ? <Minus className="w-3 h-3" /> : <Plus className="w-3 h-3" />}
+                                  <span>{advancedShown ? 'Masquer les options' : `Voir ${advanced.length} option${advanced.length > 1 ? 's' : ''}`}</span>
+                                </button>
+
+                                {advancedShown && (
+                                  <div className="space-y-0.5 pt-1">
+                                    {advanced.map(item => (
+                                      <MenuItemButton
+                                        key={item.id}
+                                        item={item}
+                                        isActive={activeTab === item.id}
+                                        onClick={() => handleItemClick(item)}
+                                        isCollapsed={false}
+                                        groupColor={group.color}
+                                        isFavorite={isFavorite(item.id)}
+                                        onToggleFavorite={() => toggleFavorite(item.id)}
+                                        inProgress={inProgressTabId === item.id}
+                                      />
+                                    ))}
+                                  </div>
+                                )}
+                              </>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
 
               {/* CHANTIER 4 — Tout replier */}
               {openGroup && !isCollapsed && (
