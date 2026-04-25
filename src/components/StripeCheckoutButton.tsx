@@ -10,6 +10,8 @@ interface StripeCheckoutButtonProps {
   successPath?: string;
   cancelPath?: string;
   planId?: string;
+  /** Liste d'addons (clés du catalogue côté edge function: 'serenity', 'extended_license') */
+  addons?: string[];
   onError?: (msg: string) => void;
 }
 
