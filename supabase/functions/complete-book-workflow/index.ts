@@ -803,6 +803,7 @@ serve(async (req) => {
       subtitle = '',
       category = '',
       authorName,
+      language = 'fr',
       numberOfChapters = 8,
       bookIntroduction = '',
       characters = [],
@@ -813,6 +814,15 @@ serve(async (req) => {
       forceFallback = false,
       useUserKey: _useUserKey,
     } = payload;
+
+    const LANGUAGE_NAMES: Record<string, string> = {
+      fr: 'français (France)',
+      en: 'anglais (English, US/UK natural style)',
+      es: 'espagnol (Español, Spain/LatAm neutral)',
+      it: 'italien (Italiano, Italy)',
+    };
+    const langName = LANGUAGE_NAMES[language] || LANGUAGE_NAMES.fr;
+    const languageDirective = `\n\n🌍 LANGUE OBLIGATOIRE DE RÉDACTION : ${langName.toUpperCase()}.\nTout le contenu (titres, sous-titres, chapitres, introduction, conclusion, dialogues, descriptions, JSON values texte) DOIT être rédigé EXCLUSIVEMENT en ${langName}. Ne mélange JAMAIS les langues. Si le titre fourni est dans une autre langue, traduis-le naturellement en ${langName} dans tes sorties textuelles. Les CLÉS JSON restent en français comme dans le schéma demandé, mais les VALEURS textuelles sont en ${langName}.`;
 
     // La clé utilisateur devient optionnelle ; sinon on utilise le backend IA intégré
     const cleanedApiKey = typeof userApiKey === 'string' ? userApiKey.trim() : '';
