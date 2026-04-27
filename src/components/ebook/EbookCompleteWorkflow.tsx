@@ -87,6 +87,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   const [category, setCategory] = useState('');
   const [bookIntroduction, setBookIntroduction] = useState('');
   const [authorName, setAuthorName] = useState('');
+  const [language, setLanguage] = useState<'fr' | 'en' | 'es' | 'it'>('fr');
   const [numberOfChapters, setNumberOfChapters] = useState(8);
   const [hasReadSteps, setHasReadSteps] = useState(false);
   
