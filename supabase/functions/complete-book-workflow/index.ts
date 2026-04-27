@@ -833,6 +833,7 @@ serve(async (req) => {
     const cleanedApiKey = typeof userApiKey === 'string' ? userApiKey.trim() : '';
     const hasValidUserKeyFormat = cleanedApiKey.length >= 20 && cleanedApiKey.startsWith('AIza');
     activeApiKey = hasValidUserKeyFormat ? cleanedApiKey : null;
+    activeLanguageDirective = languageDirective;
 
     if (cleanedApiKey && !hasValidUserKeyFormat) {
       console.warn(`Ignoring invalid user Gemini key for step ${step}; using Lovable AI fallback instead.`);
