@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import {
   Sparkles, BookOpen, CheckCircle2, Loader2, AlertCircle,
   Rocket, Target, FileText, User, Hash,
-  ChevronDown, ChevronUp, Tag, AlignLeft, RotateCcw, Trash2, Plus, Key, StopCircle
+  ChevronDown, ChevronUp, Tag, AlignLeft, RotateCcw, Trash2, Plus, Key, StopCircle, Globe
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
