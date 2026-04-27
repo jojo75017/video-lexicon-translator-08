@@ -30,6 +30,7 @@ import KdpAdsTeaser from "@/components/sales/KdpAdsTeaser";
 import BlackPackHero from "@/components/sales/BlackPackHero";
 import BlackPackPricing from "@/components/sales/BlackPackPricing";
 import FunnelStepsBar from "@/components/sales/FunnelStepsBar";
+import OffresKdpRocket from "@/components/sales/OffresKdpRocket";
 
 // ════════════════════════════════════════════════════════════════════════════════
 // DESIGN SYSTEM 2026 — Palette Premium
@@ -433,6 +434,9 @@ const SalesPage = () => {
 
       {/* ═══════════════════════════════════════ TUNNEL 3 ÉTAPES (visible dès le haut) ═══════════════════════════════════════ */}
       <FunnelStepsBar onCtaClick={scrollToPricing} />
+
+      {/* ═══════════════════════════════════════ OFFRES STYLE KDP ROCKET (cards cliquables → modal) ═══════════════════════════════════════ */}
+      <OffresKdpRocket />
 
       {/* ═══════════════════════════════════════ BLACK PACK HERO (refonte sombre premium) ═══════════════════════════════════════ */}
       <BlackPackHero
