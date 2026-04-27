@@ -156,16 +156,20 @@ async function callLovableAI(systemPrompt: string, userPrompt: string, maxTokens
 
 async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000): Promise<string> {
   const userKey = activeApiKey?.trim();
+  // Injection automatique de la directive de langue dans CHAQUE appel IA
+  const finalSystemPrompt = activeLanguageDirective
+    ? `${systemPrompt}\n\n${activeLanguageDirective}`
+    : systemPrompt;
 
   if (userKey) {
     try {
-      return await callGeminiDirect(systemPrompt, userPrompt, maxTokens, userKey);
+      return await callGeminiDirect(finalSystemPrompt, userPrompt, maxTokens, userKey);
     } catch (error) {
       console.warn('User Gemini key failed, falling back to Lovable AI:', error instanceof Error ? error.message : error);
     }
   }
 
-  return await callLovableAI(systemPrompt, userPrompt, maxTokens);
+  return await callLovableAI(finalSystemPrompt, userPrompt, maxTokens);
 }
 
 // BOUCLE QUALITÉ : appelle l'IA, évalue le score, relance si < seuil
