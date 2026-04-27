@@ -30,6 +30,7 @@ import KdpAdsTeaser from "@/components/sales/KdpAdsTeaser";
 import BlackPackHero from "@/components/sales/BlackPackHero";
 import BlackPackPricing from "@/components/sales/BlackPackPricing";
 import FunnelStepsBar from "@/components/sales/FunnelStepsBar";
+import OffresKdpRocket from "@/components/sales/OffresKdpRocket";
 
 // ════════════════════════════════════════════════════════════════════════════════
 // DESIGN SYSTEM 2026 — Palette Premium
