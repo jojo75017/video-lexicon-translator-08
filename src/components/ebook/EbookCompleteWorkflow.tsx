@@ -1390,6 +1390,28 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             </div>
           </div>
 
+          {/* Langue de rédaction */}
+          <div className="space-y-2">
+            <Label htmlFor="language" className="flex items-center gap-2">
+              <Globe className="h-4 w-4 text-primary" />
+              Langue de rédaction du livre *
+            </Label>
+            <Select value={language} onValueChange={(v) => setLanguage(v as 'fr' | 'en' | 'es' | 'it')} disabled={isGenerating}>
+              <SelectTrigger id="language">
+                <SelectValue placeholder="Choisissez la langue..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="fr">🇫🇷 Français</SelectItem>
+                <SelectItem value="en">🇬🇧 Anglais (English)</SelectItem>
+                <SelectItem value="es">🇪🇸 Espagnol (Español)</SelectItem>
+                <SelectItem value="it">🇮🇹 Italien (Italiano)</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              💡 Le livre sera intégralement rédigé dans la langue choisie (titres, chapitres, intro, conclusion).
+            </p>
+          </div>
+
           {/* Introduction / Vision du livre */}
           <div className="space-y-2">
             <Label htmlFor="book-introduction" className="flex items-center gap-2">
