@@ -4,61 +4,63 @@
 
 @layer base {
   :root {
-    /* ── CHARTE EBOOKSTUDIO — Amazon KDP Style ── */
-    /* Fond principal: #FAFAFA */
-    --background: 0 0% 98%;
-    --foreground: 213 32% 19%;
+    /* ── CHARTE EBOOKSTUDIO — KDP ROCKET (Orange / Blanc / Noir) ── */
+    /* Fond principal: blanc pur */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 8%;
 
-    /* Cartes: #FFFFFF */
+    /* Cartes: blanc */
     --card: 0 0% 100%;
-    --card-foreground: 213 32% 19%;
+    --card-foreground: 0 0% 8%;
     --popover: 0 0% 100%;
-    --popover-foreground: 213 32% 19%;
+    --popover-foreground: 0 0% 8%;
 
-    /* Accent principal: #008296 (teal Amazon) */
-    --primary: 189 100% 29%;
+    /* Accent principal: ORANGE KDP Rocket #FF6B1A */
+    --primary: 22 100% 55%;
     --primary-foreground: 0 0% 100%;
 
-    /* Fond secondaire */
-    --secondary: 210 14% 96%;
-    --secondary-foreground: 213 32% 19%;
+    /* Fond secondaire blanc cassé */
+    --secondary: 30 30% 97%;
+    --secondary-foreground: 0 0% 8%;
 
-    /* Muted */
-    --muted: 210 14% 95%;
-    --muted-foreground: 200 5% 34%;
+    /* Muted neutre */
+    --muted: 30 15% 96%;
+    --muted-foreground: 0 0% 35%;
 
-    /* Accent deep: #005F73 */
-    --accent: 189 100% 23%;
+    /* Accent VERT KDP Rocket (badges scores) #22C55E */
+    --accent: 142 71% 45%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 70% 55%;
+    --destructive: 0 75% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Bordures: #D5D9D9 */
-    --border: 180 3% 84%;
-    --input: 180 3% 84%;
-    --ring: 189 100% 29%;
+    /* Bordures: gris très clair */
+    --border: 30 10% 88%;
+    --input: 30 10% 88%;
+    --ring: 22 100% 55%;
     --radius: 0.75rem;
 
-    /* ── Accent System - Teal Charter ── */
-    --accent-blue: 189 100% 29%;
-    --accent-deep: 189 100% 23%;
-    --accent-glow: 189 100% 29%;
-    --accent-soft: 189 100% 29%;
+    /* ── Accent System - Orange Charter ── */
+    --accent-blue: 22 100% 55%;
+    --accent-deep: 18 95% 45%;
+    --accent-glow: 22 100% 55%;
+    --accent-soft: 22 100% 55%;
 
-    /* ── Charter CSS Custom Properties ── */
-    --charter-accent: #008296;
-    --charter-accent-deep: #005F73;
-    --charter-accent-glow: rgba(0, 130, 150, 0.25);
-    --charter-accent-soft: rgba(0, 130, 150, 0.08);
-    --charter-accent-border: rgba(0, 130, 150, 0.25);
-    --charter-bg-main: #FAFAFA;
-    --charter-bg-section: #F4F5F7;
+    /* ── Charter CSS Custom Properties (KDP Rocket) ── */
+    --charter-accent: #FF6B1A;
+    --charter-accent-deep: #E55300;
+    --charter-accent-glow: rgba(255, 107, 26, 0.25);
+    --charter-accent-soft: rgba(255, 107, 26, 0.08);
+    --charter-accent-border: rgba(255, 107, 26, 0.25);
+    --charter-success: #22C55E;
+    --charter-success-soft: rgba(34, 197, 94, 0.12);
+    --charter-bg-main: #FFFFFF;
+    --charter-bg-section: #FFF8F3;
     --charter-bg-card: #FFFFFF;
-    --charter-border: #D5D9D9;
-    --charter-text-primary: #232F3E;
-    --charter-text-secondary: #565959;
-    --charter-text-muted: #8D9096;
+    --charter-border: #EAE3DC;
+    --charter-text-primary: #111111;
+    --charter-text-secondary: #333333;
+    --charter-text-muted: #6B6B6B;
 
     /* Pastel palette (legacy) */
     --pastel-violet: 189 50% 75%;
