@@ -570,6 +570,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             subtitle,
             category,
             authorName,
+            language,
             numberOfChapters,
             bookIntroduction,
             characters: charactersForAI,
