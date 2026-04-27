@@ -856,10 +856,11 @@ serve(async (req) => {
 TITRE COMPLET : "${fullTitle}"
 CATÉGORIE : ${category || 'Non spécifiée'}
 AUTEUR : ${authorName}
-CHAPITRES PRÉVUS : ${numberOfChapters}${introContext}${charactersContext}
+LANGUE DE RÉDACTION : ${langName}
+CHAPITRES PRÉVUS : ${numberOfChapters}${introContext}${charactersContext}${languageDirective}
 `.trim();
 
-    console.log(`Step ${step} for: "${fullTitle}" (Category: ${category}, Characters: ${characters.length})`);
+    console.log(`Step ${step} for: "${fullTitle}" (Category: ${category}, Lang: ${language}, Characters: ${characters.length})`);
 
     const wordsPerChapter = DEFAULT_WORDS_PER_CHAPTER;
     let result: any = {};
