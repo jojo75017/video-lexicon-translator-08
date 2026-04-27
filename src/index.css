@@ -349,8 +349,8 @@ a:hover {
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(0, 130, 150, 0.15); }
-  50% { box-shadow: 0 0 40px rgba(0, 130, 150, 0.3); }
+  0%, 100% { box-shadow: 0 0 20px rgba(255, 107, 26, 0.15); }
+  50% { box-shadow: 0 0 40px rgba(255, 107, 26, 0.3); }
 }
 
 @keyframes shimmer {
@@ -381,7 +381,7 @@ a:hover {
 .animate-float { animation: float 6s ease-in-out infinite; }
 .animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
 .animate-shimmer {
-  background: linear-gradient(90deg, transparent, rgba(0, 130, 150, 0.15), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 107, 26, 0.15), transparent);
   background-size: 200% 100%;
   animation: shimmer 2s infinite;
 }
@@ -546,7 +546,7 @@ a:hover {
 
 /* Selection */
 ::selection {
-  background: rgba(0, 130, 150, 0.2);
+  background: rgba(255, 107, 26, 0.2);
   color: #232F3E;
 }
 
