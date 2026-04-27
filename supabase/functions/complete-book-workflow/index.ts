@@ -35,6 +35,7 @@ STANDARDS ÉDITORIAUX PROFESSIONNELS (niveau maison d'édition) :
 
 // Variable globale pour stocker la clé API utilisateur optionnelle
 let activeApiKey: string | null = null;
+let activeLanguageDirective = '';
 
 // Token tracking global
 let totalTokenUsage = {
@@ -155,16 +156,20 @@ async function callLovableAI(systemPrompt: string, userPrompt: string, maxTokens
 
 async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000): Promise<string> {
   const userKey = activeApiKey?.trim();
+  // Injection automatique de la directive de langue dans CHAQUE appel IA
+  const finalSystemPrompt = activeLanguageDirective
+    ? `${systemPrompt}\n\n${activeLanguageDirective}`
+    : systemPrompt;
 
   if (userKey) {
     try {
-      return await callGeminiDirect(systemPrompt, userPrompt, maxTokens, userKey);
+      return await callGeminiDirect(finalSystemPrompt, userPrompt, maxTokens, userKey);
     } catch (error) {
       console.warn('User Gemini key failed, falling back to Lovable AI:', error instanceof Error ? error.message : error);
     }
   }
 
-  return await callLovableAI(systemPrompt, userPrompt, maxTokens);
+  return await callLovableAI(finalSystemPrompt, userPrompt, maxTokens);
 }
 
 // BOUCLE QUALITÉ : appelle l'IA, évalue le score, relance si < seuil
@@ -803,6 +808,7 @@ serve(async (req) => {
       subtitle = '',
       category = '',
       authorName,
+      language = 'fr',
       numberOfChapters = 8,
       bookIntroduction = '',
       characters = [],
@@ -814,10 +820,20 @@ serve(async (req) => {
       useUserKey: _useUserKey,
     } = payload;
 
+    const LANGUAGE_NAMES: Record<string, string> = {
+      fr: 'français (France)',
+      en: 'anglais (English, US/UK natural style)',
+      es: 'espagnol (Español, Spain/LatAm neutral)',
+      it: 'italien (Italiano, Italy)',
+    };
+    const langName = LANGUAGE_NAMES[language] || LANGUAGE_NAMES.fr;
+    const languageDirective = `\n\n🌍 LANGUE OBLIGATOIRE DE RÉDACTION : ${langName.toUpperCase()}.\nTout le contenu (titres, sous-titres, chapitres, introduction, conclusion, dialogues, descriptions, JSON values texte) DOIT être rédigé EXCLUSIVEMENT en ${langName}. Ne mélange JAMAIS les langues. Si le titre fourni est dans une autre langue, traduis-le naturellement en ${langName} dans tes sorties textuelles. Les CLÉS JSON restent en français comme dans le schéma demandé, mais les VALEURS textuelles sont en ${langName}.`;
+
     // La clé utilisateur devient optionnelle ; sinon on utilise le backend IA intégré
     const cleanedApiKey = typeof userApiKey === 'string' ? userApiKey.trim() : '';
     const hasValidUserKeyFormat = cleanedApiKey.length >= 20 && cleanedApiKey.startsWith('AIza');
     activeApiKey = hasValidUserKeyFormat ? cleanedApiKey : null;
+    activeLanguageDirective = languageDirective;
 
     if (cleanedApiKey && !hasValidUserKeyFormat) {
       console.warn(`Ignoring invalid user Gemini key for step ${step}; using Lovable AI fallback instead.`);
@@ -846,10 +862,11 @@ serve(async (req) => {
 TITRE COMPLET : "${fullTitle}"
 CATÉGORIE : ${category || 'Non spécifiée'}
 AUTEUR : ${authorName}
-CHAPITRES PRÉVUS : ${numberOfChapters}${introContext}${charactersContext}
+LANGUE DE RÉDACTION : ${langName}
+CHAPITRES PRÉVUS : ${numberOfChapters}${introContext}${charactersContext}${languageDirective}
 `.trim();
 
-    console.log(`Step ${step} for: "${fullTitle}" (Category: ${category}, Characters: ${characters.length})`);
+    console.log(`Step ${step} for: "${fullTitle}" (Category: ${category}, Lang: ${language}, Characters: ${characters.length})`);
 
     const wordsPerChapter = DEFAULT_WORDS_PER_CHAPTER;
     let result: any = {};

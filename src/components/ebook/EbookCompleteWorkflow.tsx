@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import {
   Sparkles, BookOpen, CheckCircle2, Loader2, AlertCircle,
   Rocket, Target, FileText, User, Hash,
-  ChevronDown, ChevronUp, Tag, AlignLeft, RotateCcw, Trash2, Plus, Key, StopCircle
+  ChevronDown, ChevronUp, Tag, AlignLeft, RotateCcw, Trash2, Plus, Key, StopCircle, Globe
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -87,6 +87,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   const [category, setCategory] = useState('');
   const [bookIntroduction, setBookIntroduction] = useState('');
   const [authorName, setAuthorName] = useState('');
+  const [language, setLanguage] = useState<'fr' | 'en' | 'es' | 'it'>('fr');
   const [numberOfChapters, setNumberOfChapters] = useState(8);
   const [hasReadSteps, setHasReadSteps] = useState(false);
   
@@ -569,6 +570,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             subtitle,
             category,
             authorName,
+            language,
             numberOfChapters,
             bookIntroduction,
             characters: charactersForAI,
@@ -608,6 +610,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
               subtitle,
               category,
               authorName,
+              language,
               numberOfChapters,
               bookIntroduction,
               characters: charactersForAI,
@@ -1385,6 +1388,28 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
                 className="text-lg"
               />
             </div>
+          </div>
+
+          {/* Langue de rédaction */}
+          <div className="space-y-2">
+            <Label htmlFor="language" className="flex items-center gap-2">
+              <Globe className="h-4 w-4 text-primary" />
+              Langue de rédaction du livre *
+            </Label>
+            <Select value={language} onValueChange={(v) => setLanguage(v as 'fr' | 'en' | 'es' | 'it')} disabled={isGenerating}>
+              <SelectTrigger id="language">
+                <SelectValue placeholder="Choisissez la langue..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="fr">🇫🇷 Français</SelectItem>
+                <SelectItem value="en">🇬🇧 Anglais (English)</SelectItem>
+                <SelectItem value="es">🇪🇸 Espagnol (Español)</SelectItem>
+                <SelectItem value="it">🇮🇹 Italien (Italiano)</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              💡 Le livre sera intégralement rédigé dans la langue choisie (titres, chapitres, intro, conclusion).
+            </p>
           </div>
 
           {/* Introduction / Vision du livre */}
