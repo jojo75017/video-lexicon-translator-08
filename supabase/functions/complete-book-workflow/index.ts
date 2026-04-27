@@ -35,6 +35,7 @@ STANDARDS ÉDITORIAUX PROFESSIONNELS (niveau maison d'édition) :
 
 // Variable globale pour stocker la clé API utilisateur optionnelle
 let activeApiKey: string | null = null;
+let activeLanguageDirective = '';
 
 // Token tracking global
 let totalTokenUsage = {
