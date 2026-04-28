@@ -402,12 +402,14 @@ function extractFromHtml(html: string) {
     if (!isNaN(r) && r > 0 && r <= 5) result.rating = r;
   }
 
-  // Reviews count
-  const reviewMatch = html.match(/id="acrCustomerReviewText"[^>]*>\s*([\d\s,.\u202f\u00a0]+)\s*(?:évaluations|ratings|avis|reviews|commentaires)/i)
+  // Reviews count - Amazon uses aria-label="N Commentaires/ratings" or visible "(N)" pattern
+  const reviewMatch = html.match(/acrCustomerReviewText[^>]*aria-label="([\d\s,.\u202f\u00a0]+)\s*(?:Commentaires|évaluations|ratings|avis|reviews)/i)
+    || html.match(/aria-label="([\d\s,.\u202f\u00a0]+)\s*(?:Commentaires|évaluations|ratings|avis|reviews)"/i)
+    || html.match(/id="acrCustomerReviewText"[^>]*>\s*\(?([\d\s,.\u202f\u00a0]+)\)?\s*</i)
     || html.match(/>\s*([\d\s,.\u202f\u00a0]+)\s*(?:évaluations|ratings|avis|reviews|commentaires)\s*</i);
   if (reviewMatch) {
     const n = parseInt(reviewMatch[1].replace(/[^\d]/g, ''), 10);
-    if (!isNaN(n) && n > 0) result.reviews = n;
+    if (!isNaN(n) && n >= 0) result.reviews = n;
   }
 
   // Pages
