@@ -728,10 +728,19 @@ const BookDataCard: React.FC<{ book: BookData; onCopy: (t: string) => void }> = 
         <StatCard icon={BarChart3} label="~Ventes/mois (est.)" value={book.estimatedMonthlySales?.toString() || 'N/A'} color="text-orange-600" />
         <StatCard icon={DollarSign} label="~Revenus/mois (est.)" value={book.estimatedMonthlyRevenue ? `${book.estimatedMonthlyRevenue}€` : 'N/A'} color="text-emerald-600" />
       </div>
-      <p className="text-xs text-muted-foreground mb-6 italic">
-        ⚠️ Estimations basées sur le BSR{book.bsr ? ` (#${book.bsr.toLocaleString()})` : ' (non détecté)'} — les ventes réelles peuvent varier significativement.
-        {!book.bsr && ' Le BSR n\'a pas pu être extrait de la page Amazon, les données de ventes ne sont pas disponibles.'}
-      </p>
+      {book.bsr ? (
+        <p className="text-xs text-muted-foreground mb-6 italic">
+          ⚠️ Estimations basées sur le BSR (#{book.bsr.toLocaleString()}) — les ventes réelles peuvent varier significativement.
+        </p>
+      ) : (
+        <div className="mb-6 p-3 rounded-lg border border-orange-200 bg-orange-50 flex items-start gap-2">
+          <span className="text-orange-600 text-sm">ℹ️</span>
+          <div className="text-xs text-orange-900">
+            <strong>BSR estimé indisponible.</strong> Le Best Sellers Rank n'est pas exposé publiquement par Amazon pour ce livre (livre récent, faible volume, ou rendu dynamique). 
+            Les autres données (titre, auteur, prix, note, avis) restent fiables. Le BSR sera automatiquement disponible dès que ton compte Amazon Associates sera éligible à la PA-API officielle.
+          </div>
+        </div>
+      )}
 
       {book.categories.length > 0 && (
         <div className="mb-4">
