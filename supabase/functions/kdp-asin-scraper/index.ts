@@ -41,6 +41,8 @@ type FirecrawlSearchItem = {
 
 type FirecrawlScrapePayload = {
   markdown?: string;
+  html?: string;
+  rawHtml?: string;
   metadata?: Record<string, unknown>;
 };
 
