@@ -309,6 +309,7 @@ async function resolveAmazonBook(
     asin,
     domain,
     searchHit,
+    selectedScrape?.html || selectedScrape?.rawHtml || '',
   );
 
   const keywordSource = [
