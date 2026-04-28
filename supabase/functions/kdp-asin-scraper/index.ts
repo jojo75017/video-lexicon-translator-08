@@ -202,9 +202,10 @@ async function firecrawlScrape(
     },
     body: JSON.stringify({
       url,
-      formats: ['markdown', 'html'],
+      formats: ['markdown', 'html', 'rawHtml'],
       onlyMainContent: false,
-      waitFor: 4000,
+      waitFor: 6000,
+      timeout: 45000,
       location: {
         country: MARKET_COUNTRY[marketplace] || 'FR',
         languages: [MARKET_LANG[marketplace] || 'fr'],
