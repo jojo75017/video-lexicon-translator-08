@@ -204,8 +204,16 @@ async function firecrawlScrape(
       url,
       formats: ['markdown', 'html', 'rawHtml'],
       onlyMainContent: false,
-      waitFor: 6000,
-      timeout: 45000,
+      waitFor: 8000,
+      timeout: 60000,
+      actions: [
+        { type: 'wait', milliseconds: 2000 },
+        { type: 'scroll', direction: 'down' },
+        { type: 'scroll', direction: 'down' },
+        { type: 'wait', milliseconds: 2500 },
+        { type: 'scroll', direction: 'down' },
+        { type: 'wait', milliseconds: 2000 },
+      ],
       location: {
         country: MARKET_COUNTRY[marketplace] || 'FR',
         languages: [MARKET_LANG[marketplace] || 'fr'],
