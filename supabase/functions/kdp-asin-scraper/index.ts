@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { paapiGetItems, parsePaapiItem, type PaapiBookData } from "./paapi.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -298,6 +299,23 @@ async function resolveAmazonBook(
   marketplace: string,
   domain: string,
 ) {
+  // 1) Tentative PA-API officielle (BSR fiable à 100%)
+  let paapiData: PaapiBookData | null = null;
+  try {
+    const paapiResp = await paapiGetItems([asin], marketplace);
+    const item = paapiResp?.ItemsResult?.Items?.[0];
+    if (item) {
+      paapiData = parsePaapiItem(item);
+      console.log('PA-API OK pour', asin, '— BSR:', paapiData.bsr, 'Reviews:', paapiData.reviews, 'Rating:', paapiData.rating, 'Price:', paapiData.price);
+    } else {
+      const errs = paapiResp?.Errors || paapiResp?.ItemsResult?.Items;
+      if (errs) console.warn('PA-API: pas d\'item retourné pour', asin, JSON.stringify(errs).slice(0, 300));
+    }
+  } catch (e) {
+    console.warn('PA-API exception pour', asin, e);
+  }
+
+  // 2) Firecrawl en complément (description, image, fallback)
   const directUrl = `https://www.${domain}/dp/${asin}`;
   const directScrape = await firecrawlScrape(firecrawlApiKey, directUrl, marketplace);
   const searchHit = await searchAmazonByAsin(firecrawlApiKey, asin, marketplace, domain);
@@ -319,6 +337,28 @@ async function resolveAmazonBook(
     searchHit,
     selectedScrape?.html || selectedScrape?.rawHtml || '',
   );
+
+  // 3) PA-API a priorité absolue sur les valeurs scrapées (sources officielles)
+  if (paapiData) {
+    if (paapiData.title) book.title = paapiData.title;
+    if (paapiData.author) book.author = paapiData.author;
+    if (paapiData.price != null) book.price = paapiData.price;
+    if (paapiData.rating != null) book.rating = paapiData.rating;
+    if (paapiData.reviews != null) book.reviews = paapiData.reviews;
+    if (paapiData.bsr != null) {
+      book.bsr = paapiData.bsr;
+      book.estimatedDailySales = estimateSalesFromBsr(paapiData.bsr);
+      book.estimatedMonthlySales = Math.round(book.estimatedDailySales * 30);
+      book.estimatedMonthlyRevenue = book.price ? Math.round(book.estimatedMonthlySales * book.price * 0.7) : null;
+    }
+    if (paapiData.pages != null) book.pages = paapiData.pages;
+    if (paapiData.categories && paapiData.categories.length > 0) {
+      book.categories = [...new Set([...paapiData.categories, ...(book.categories || [])])].slice(0, 8);
+    }
+    (book as any).source = 'paapi+firecrawl';
+  } else {
+    (book as any).source = 'firecrawl';
+  }
 
   const keywordSource = [
     searchHit?.title,
