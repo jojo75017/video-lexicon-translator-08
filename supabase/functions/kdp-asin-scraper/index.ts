@@ -358,70 +358,158 @@ function extractDescription(markdown: string, metadata: Record<string, unknown>,
   return candidates[0] || 'Description indisponible';
 }
 
+function stripHtml(html: string) {
+  return html
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&#?\w+;/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function extractFromHtml(html: string) {
+  const result: { bsr: number | null; reviews: number | null; rating: number | null; price: number | null; pages: number | null; categories: string[] } = {
+    bsr: null, reviews: null, rating: null, price: null, pages: null, categories: [],
+  };
+  if (!html) return result;
+
+  // Price from offer blocks (Amazon a-price classes)
+  const priceWhole = html.match(/<span[^>]*class="[^"]*a-price-whole[^"]*"[^>]*>([\d\s.,]+)<\/span>\s*(?:<span[^>]*class="[^"]*a-price-decimal[^"]*"[^>]*>[^<]*<\/span>\s*<span[^>]*class="[^"]*a-price-fraction[^"]*"[^>]*>([\d]+)<\/span>)?/i);
+  if (priceWhole) {
+    const w = priceWhole[1].replace(/[^\d]/g, '');
+    const f = priceWhole[2] ? priceWhole[2].replace(/[^\d]/g, '') : '00';
+    const num = parseFloat(`${w}.${f}`);
+    if (!isNaN(num) && num > 0 && num < 1000) result.price = num;
+  }
+  if (!result.price) {
+    const offHtml = stripHtml(html);
+    const m = offHtml.match(/(\d+[.,]\d{2})\s*€/) || offHtml.match(/€\s*(\d+[.,]\d{2})/) || offHtml.match(/\$(\d+[.,]\d{2})/);
+    if (m) {
+      const num = parseFloat(m[1].replace(',', '.'));
+      if (!isNaN(num) && num > 0 && num < 1000) result.price = num;
+    }
+  }
+
+  // Rating
+  const ratingMatch = html.match(/(\d[.,]\d)\s*(?:sur|out of)\s*5\s*étoiles?/i)
+    || html.match(/data-hook="rating-out-of-text"[^>]*>\s*(\d[.,]\d)/i)
+    || html.match(/a-icon-alt[^>]*>\s*(\d[.,]\d)\s*(?:sur|out of)/i);
+  if (ratingMatch) {
+    const r = parseFloat(ratingMatch[1].replace(',', '.'));
+    if (!isNaN(r) && r > 0 && r <= 5) result.rating = r;
+  }
+
+  // Reviews count
+  const reviewMatch = html.match(/id="acrCustomerReviewText"[^>]*>\s*([\d\s,.\u202f\u00a0]+)\s*(?:évaluations|ratings|avis|reviews|commentaires)/i)
+    || html.match(/>\s*([\d\s,.\u202f\u00a0]+)\s*(?:évaluations|ratings|avis|reviews|commentaires)\s*</i);
+  if (reviewMatch) {
+    const n = parseInt(reviewMatch[1].replace(/[^\d]/g, ''), 10);
+    if (!isNaN(n) && n > 0) result.reviews = n;
+  }
+
+  // Pages
+  const pagesMatch = html.match(/(\d{2,5})\s*pages/i);
+  if (pagesMatch) {
+    const n = parseInt(pagesMatch[1], 10);
+    if (n > 0 && n < 20000) result.pages = n;
+  }
+
+  // BSR — Amazon "Détails sur le produit" / "Product details" block
+  // Format FR: "Classement des meilleures ventes d'Amazon : 12 345 en Boutique Kindle"
+  // Format EN: "Best Sellers Rank: #12,345 in Kindle Store"
+  const bsrBlock = html.match(/(?:Classement des meilleures ventes|Best Sellers Rank|Amazon Bestseller-Rang|Clasificaci[oó]n en los m[aá]s vendidos|Posizione nella classifica)[^<]{0,500}/i);
+  if (bsrBlock) {
+    const text = stripHtml(bsrBlock[0]);
+    const m = text.match(/#?\s*([\d\s.,\u202f\u00a0]{2,})/);
+    if (m) {
+      const n = parseInt(m[1].replace(/[^\d]/g, ''), 10);
+      if (n > 0 && n < 10_000_000) result.bsr = n;
+    }
+    // Sub-categories like "12 in Self-Help"
+    const subMatches = [...text.matchAll(/#?\s*([\d\s.,\u202f\u00a0]+)\s+(?:dans|in|en)\s+([^#\n<>]{3,80})/gi)];
+    for (const sub of subMatches.slice(0, 5)) {
+      const cat = cleanText(sub[2]).replace(/\s*\(.*$/, '');
+      if (cat) result.categories.push(cat);
+    }
+  }
+
+  return result;
+}
+
 function parseAmazonBookPage(
   markdown: string,
   metadata: Record<string, unknown>,
   asin: string,
   domain: string,
   searchHit?: ResolvedSearchHit | null,
+  html: string = '',
 ) {
+  const htmlData = extractFromHtml(html);
+
   const combinedText = [
     String(metadata.title || ''),
     String(metadata.description || ''),
     searchHit?.title || '',
     searchHit?.description || '',
     markdown,
+    stripHtml(html).slice(0, 20000),
   ].join('\n');
 
   const metadataTitle = cleanAmazonTitle(String(metadata.title || ''));
   const searchTitle = cleanAmazonTitle(searchHit?.title || '');
   const title = [metadataTitle, searchTitle].find((entry) => entry && !/^amazon\.[a-z.]+$/i.test(entry)) || `ASIN ${asin}`;
 
-  const priceMatch = combinedText.match(/(\d+[.,]\d{2})\s*€/i) || combinedText.match(/\$(\d+[.,]\d{2})/i);
-  const price = priceMatch ? parseFloat(priceMatch[1].replace(',', '.')) : null;
+  let price = htmlData.price;
+  if (price == null) {
+    const priceMatch = combinedText.match(/(\d+[.,]\d{2})\s*€/i) || combinedText.match(/\$(\d+[.,]\d{2})/i);
+    price = priceMatch ? parseFloat(priceMatch[1].replace(',', '.')) : null;
+  }
 
-  const ratingMatch = combinedText.match(/(\d[.,]\d)\s*(?:sur|out of)\s*5/i);
-  const rating = ratingMatch ? parseFloat(ratingMatch[1].replace(',', '.')) : null;
+  let rating = htmlData.rating;
+  if (rating == null) {
+    const ratingMatch = combinedText.match(/(\d[.,]\d)\s*(?:sur|out of)\s*5/i);
+    rating = ratingMatch ? parseFloat(ratingMatch[1].replace(',', '.')) : null;
+  }
 
-  const reviewMatch = combinedText.match(/(\d[\d\s,.]*)\s*(?:évaluations|ratings|avis|reviews|commentaires)/i);
-  const reviews = reviewMatch ? parseInt(reviewMatch[1].replace(/[\s,.]/g, ''), 10) : null;
+  let reviews = htmlData.reviews;
+  if (reviews == null) {
+    const reviewMatch = combinedText.match(/([\d\s,.\u202f\u00a0]+)\s*(?:évaluations|ratings|avis|reviews|commentaires)/i);
+    reviews = reviewMatch ? parseInt(reviewMatch[1].replace(/[^\d]/g, ''), 10) : null;
+  }
 
-  // Multiple BSR extraction patterns
-  const bsrPatterns = [
-    /(?:Best Sellers Rank|Classement des meilleures ventes|Rang des ventes|Amazon Bestseller-Rang|Classement)[^\d#]*#?([\d\s,.]+)/i,
-    /n[°º]?\s*([\d\s,.]+)\s*(?:dans|in|en)\s/i,
-    /#([\d\s,.]+)\s*(?:dans|in|en)\s/i,
-    /classement[^\d]*([\d\s,.]+)/i,
-    /rank[^\d]*([\d\s,.]+)/i,
-  ];
-  let bsr: number | null = null;
-  for (const pattern of bsrPatterns) {
-    const match = combinedText.match(pattern);
-    if (match) {
-      const parsed = parseInt(match[1].replace(/[\s,.]/g, ''), 10);
-      if (parsed > 0 && parsed < 10000000) {
-        bsr = parsed;
-        break;
+  let bsr = htmlData.bsr;
+  if (bsr == null) {
+    const bsrPatterns = [
+      /(?:Best Sellers Rank|Classement des meilleures ventes|Amazon Bestseller-Rang)[^\d#]*#?([\d\s,.\u202f\u00a0]+)/i,
+    ];
+    for (const pattern of bsrPatterns) {
+      const match = combinedText.match(pattern);
+      if (match) {
+        const parsed = parseInt(match[1].replace(/[^\d]/g, ''), 10);
+        if (parsed > 0 && parsed < 10000000) { bsr = parsed; break; }
       }
     }
   }
 
-  const pagesMatch = combinedText.match(/(\d+)\s*(?:pages|page)/i);
-  const pages = pagesMatch ? parseInt(pagesMatch[1], 10) : null;
+  let pages = htmlData.pages;
+  if (pages == null) {
+    const pagesMatch = combinedText.match(/(\d{2,5})\s*(?:pages|page)/i);
+    pages = pagesMatch ? parseInt(pagesMatch[1], 10) : null;
+  }
 
+  const categorySet = new Set<string>(htmlData.categories);
   const categoryPatterns = [
-    /(?:in|dans)\s+(?:Kindle Store|Boutique Kindle|Books|Livres)\s*>\s*([^\n]+)/gi,
-    /(?:Catégorie|Category)\s*:\s*([^\n]+)/gi,
-    />\s*([^>\n]{4,60})\s*>\s*([^>\n]{4,60})/g,
+    /(?:in|dans)\s+(?:Kindle Store|Boutique Kindle|Books|Livres)\s*>\s*([^\n<]+)/gi,
+    /(?:Catégorie|Category)\s*:\s*([^\n<]+)/gi,
   ];
-  const categorySet = new Set<string>();
   for (const pattern of categoryPatterns) {
     const matches = combinedText.matchAll(pattern);
     for (const m of matches) {
       const cat = cleanText(m[1] || m[0]).replace(/^(?:in|dans)\s+/i, '');
-      if (cat && !isGenericAmazonContent(cat) && cat.length < 120) {
-        categorySet.add(cat);
-      }
+      if (cat && !isGenericAmazonContent(cat) && cat.length < 120) categorySet.add(cat);
     }
   }
   const categories = [...categorySet].slice(0, 8);
