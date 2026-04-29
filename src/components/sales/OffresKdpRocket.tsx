@@ -29,115 +29,38 @@ interface Offer {
 
 const OFFERS: Offer[] = [
   {
-    id: "founder",
-    icon: Rocket,
-    badge: "Offre Fondateur",
-    title: "Pack Fondateur 67€",
-    subtitle: "Accès total à EbookStudio Pro pendant 1 an",
-    score: 98,
+    id: "founder-lifetime",
+    icon: Crown,
+    badge: "Offre Fondateur — À VIE",
+    title: "Accès À Vie 67€",
+    subtitle: "Payez une seule fois, accès illimité pour toujours (offre jusqu'au 15 septembre)",
+    score: 99,
     price: "67€",
     oldPrice: "147€",
     highlights: [
-      "1 an d'accès illimité",
-      "15 agents IA inclus",
-      "Garantie 7 jours",
+      "Paiement unique — aucun abonnement",
+      "Accès à vie à tous les 15 agents IA",
+      "Toutes les futures mises à jour incluses",
+      "⏰ Tarif de lancement jusqu'au 15 septembre (puis 147€ à vie)",
     ],
     longDescription:
-      "Le tarif de lancement réservé aux 100 premiers fondateurs. Vous obtenez l'accès complet à la suite EbookStudio Pro pendant 12 mois : tous les outils, toutes les mises à jour, toute la formation.",
+      "L'offre fondateur unique : payez 67€ une seule fois et accédez à EbookStudio Pro À VIE. Après le 15 septembre, le tarif passera définitivement à 147€ à vie. Aucun abonnement, aucun renouvellement, toutes les futures fonctionnalités incluses.",
     features: [
-      "Workflow complet 15 agents IA (P1 à P15)",
-      "Générateur d'ebooks illimité",
-      "Studio Couverture IA + bibliothèque",
-      "Recherche de niches KDP en temps réel",
-      "Export EPUB / PDF / DOCX professionnels",
-      "Module audiobook + hébergement public",
-      "CRM + module marketing intégrés",
-      "Communauté privée + support direct",
-      "Toutes les mises à jour pendant 1 an",
-      "Garantie satisfait ou remboursé 7 jours",
+      "✅ Accès illimité À VIE (paiement unique)",
+      "✅ Workflow complet 15 agents IA (P1 à P15)",
+      "✅ Générateur d'ebooks illimité",
+      "✅ Studio Couverture IA + bibliothèque",
+      "✅ Recherche de niches KDP en temps réel",
+      "✅ Export EPUB / PDF / DOCX professionnels",
+      "✅ Module audiobook + hébergement public",
+      "✅ CRM + module marketing intégrés",
+      "✅ Communauté privée + support direct",
+      "✅ Toutes les futures mises à jour à vie",
+      "✅ Garantie satisfait ou remboursé 7 jours",
     ],
-    cta: "Je rejoins les fondateurs",
-    ctaUrl: "/paiement-manuel?offer=founder&price=67",
+    cta: "Verrouiller mon accès à vie pour 67€",
+    ctaUrl: "/paiement-manuel?offer=founder-lifetime&price=67",
     recommended: true,
-  },
-  {
-    id: "creator",
-    icon: BookOpen,
-    badge: "Créateur",
-    title: "Pack Créateur",
-    subtitle: "Pour publier vos premiers ebooks KDP",
-    score: 92,
-    price: "47€",
-    highlights: [
-      "5 ebooks générés inclus",
-      "Studio couverture",
-      "Export KDP-ready",
-    ],
-    longDescription:
-      "Idéal si vous démarrez sur KDP. Vous générez vos 5 premiers ebooks complets avec couvertures professionnelles, et vous êtes prêts à publier sur Amazon en moins d'une semaine.",
-    features: [
-      "5 ebooks complets générés par IA",
-      "5 couvertures Studio IA inclus",
-      "Export EPUB + PDF KDP",
-      "Recherche de niches (50 requêtes)",
-      "Templates marketing inclus",
-      "Email d'onboarding personnalisé",
-    ],
-    cta: "Démarrer mon pack créateur",
-    ctaUrl: "/paiement-manuel?offer=creator&price=47",
-  },
-  {
-    id: "audiobook",
-    icon: Sparkles,
-    badge: "Audio",
-    title: "Pack Audiobook",
-    subtitle: "Transformez vos ebooks en livres audio premium",
-    score: 89,
-    price: "37€",
-    highlights: [
-      "TTS OpenAI Nova HD",
-      "Hébergement inclus",
-      "Page publique sur mesure",
-    ],
-    longDescription:
-      "Convertissez n'importe quel manuscrit en audiobook professionnel avec la voix Nova d'OpenAI. Hébergement, page de vente publique et lecteur intégré inclus.",
-    features: [
-      "Workflow Audio Express (A1-A9)",
-      "Voix OpenAI Nova HD",
-      "Fusion audio professionnelle FFmpeg",
-      "Hébergement public illimité",
-      "Page de vente avec slug personnalisé",
-      "Lecteur intégré responsive",
-    ],
-    cta: "Lancer mon audiobook",
-    ctaUrl: "/paiement-manuel?offer=audiobook&price=37",
-  },
-  {
-    id: "lifetime",
-    icon: Crown,
-    badge: "Lifetime",
-    title: "Accès À Vie",
-    subtitle: "Une seule fois, accès illimité pour toujours",
-    score: 95,
-    price: "297€",
-    oldPrice: "597€",
-    highlights: [
-      "Aucun abonnement à renouveler",
-      "Toutes les futures mises à jour",
-      "Support prioritaire à vie",
-    ],
-    longDescription:
-      "L'option ultime : payez une seule fois et accédez à EbookStudio Pro à vie, avec toutes les futures mises à jour et fonctionnalités.",
-    features: [
-      "Accès illimité à VIE",
-      "Toutes les mises à jour incluses",
-      "Support prioritaire VIP",
-      "Accès anticipé aux nouveautés",
-      "Bonus formation premium",
-      "Statut Membre Fondateur",
-    ],
-    cta: "Verrouiller mon accès à vie",
-    ctaUrl: "/paiement-manuel?offer=lifetime&price=297",
   },
 ];
 
@@ -226,15 +149,15 @@ export default function OffresKdpRocket() {
             Top des offres de la semaine
           </div>
           <h2 className="text-4xl md:text-5xl font-extrabold text-black mb-4">
-            Choisissez l'offre <span className="text-[#FF6B1A]">qui vous correspond</span>
+            Une seule offre, <span className="text-[#FF6B1A]">claire et définitive</span>
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Cliquez sur une carte pour voir le détail complet et activer votre accès en quelques secondes.
+            <strong>67€ une seule fois = accès à vie.</strong> Tarif de lancement valable jusqu'au <strong>15 septembre</strong> — ensuite il passera à 147€ à vie.
           </p>
         </div>
 
-        {/* Grid de cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Une seule carte centrée */}
+        <div className="grid grid-cols-1 gap-6 max-w-2xl mx-auto">
           {OFFERS.map((offer) => (
             <OfferCard key={offer.id} offer={offer} onClick={() => setSelected(offer)} />
           ))}
