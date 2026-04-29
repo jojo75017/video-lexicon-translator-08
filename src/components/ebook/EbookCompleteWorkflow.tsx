@@ -1390,23 +1390,34 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             </div>
           </div>
 
-          {/* Langue de rédaction */}
-          <div className="space-y-2">
-            <Label htmlFor="language" className="flex items-center gap-2">
-              <Globe className="h-4 w-4 text-primary" />
-              Langue de rédaction du livre *
+          {/* Langue de rédaction - mise en évidence */}
+          <div className="space-y-3 p-4 rounded-xl border-2 border-primary/40 bg-primary/5">
+            <Label htmlFor="language" className="flex items-center gap-2 text-base font-bold">
+              <Globe className="h-5 w-5 text-primary" />
+              🌍 Langue de rédaction du livre *
             </Label>
-            <Select value={language} onValueChange={(v) => setLanguage(v as 'fr' | 'en' | 'es' | 'it')} disabled={isGenerating}>
-              <SelectTrigger id="language">
-                <SelectValue placeholder="Choisissez la langue..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="fr">🇫🇷 Français</SelectItem>
-                <SelectItem value="en">🇬🇧 Anglais (English)</SelectItem>
-                <SelectItem value="es">🇪🇸 Espagnol (Español)</SelectItem>
-                <SelectItem value="it">🇮🇹 Italien (Italiano)</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              {[
+                { code: 'fr', label: '🇫🇷 Français' },
+                { code: 'en', label: '🇬🇧 Anglais' },
+                { code: 'es', label: '🇪🇸 Espagnol' },
+                { code: 'it', label: '🇮🇹 Italien' },
+              ].map((l) => (
+                <button
+                  key={l.code}
+                  type="button"
+                  disabled={isGenerating}
+                  onClick={() => setLanguage(l.code as 'fr' | 'en' | 'es' | 'it')}
+                  className={`p-3 rounded-lg border-2 font-medium transition-all ${
+                    language === l.code
+                      ? 'border-primary bg-primary text-primary-foreground shadow-md'
+                      : 'border-border bg-background hover:border-primary/50'
+                  } disabled:opacity-50`}
+                >
+                  {l.label}
+                </button>
+              ))}
+            </div>
             <p className="text-xs text-muted-foreground">
               💡 Le livre sera intégralement rédigé dans la langue choisie (titres, chapitres, intro, conclusion).
             </p>
