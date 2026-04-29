@@ -149,15 +149,15 @@ export default function OffresKdpRocket() {
             Top des offres de la semaine
           </div>
           <h2 className="text-4xl md:text-5xl font-extrabold text-black mb-4">
-            Choisissez l'offre <span className="text-[#FF6B1A]">qui vous correspond</span>
+            Une seule offre, <span className="text-[#FF6B1A]">claire et définitive</span>
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Cliquez sur une carte pour voir le détail complet et activer votre accès en quelques secondes.
+            <strong>67€ une seule fois = accès à vie.</strong> Tarif de lancement valable jusqu'au <strong>15 septembre</strong> — ensuite il passera à 147€ à vie.
           </p>
         </div>
 
-        {/* Grid de cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Une seule carte centrée */}
+        <div className="grid grid-cols-1 gap-6 max-w-2xl mx-auto">
           {OFFERS.map((offer) => (
             <OfferCard key={offer.id} offer={offer} onClick={() => setSelected(offer)} />
           ))}
