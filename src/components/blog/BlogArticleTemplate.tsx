@@ -100,19 +100,29 @@ const BlogArticleTemplate = () => {
 
       <div className="min-h-screen bg-background">
         <header className="border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-50">
-          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="container mx-auto px-4 py-4 flex items-center justify-between gap-3">
             <Link to="/offres" className="flex items-center gap-2">
               <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center"><BookOpen className="w-5 h-5 text-primary-foreground" /></div>
-              <span className="text-xl font-bold text-foreground">EbookStudio Pro</span>
+              <span className="text-xl font-bold text-foreground hidden sm:inline">EbookStudio Pro</span>
             </Link>
             <nav className="hidden md:flex items-center gap-6">
               <Link to="/offres" onClick={() => { import('@/utils/analytics').then(m => m.trackOffresClick('article_nav')); }} className="text-muted-foreground hover:text-foreground transition-colors">Accueil</Link>
               <Link to="/blog" className="text-primary font-medium">Blog</Link>
               <Link to="/demo" className="text-muted-foreground hover:text-foreground transition-colors">Démo</Link>
             </nav>
-            <Link to="/offres" onClick={() => { import('@/utils/analytics').then(m => m.trackOffresClick('article_cta')); }}>
-              <Button className="text-sm">Accès Générateur</Button>
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link to="/offres" onClick={() => { import('@/utils/analytics').then(m => m.trackOffresClick('article_back_btn')); }}>
+                <Button variant="outline" size="sm" className="border-primary/30 text-primary hover:bg-primary/10">
+                  <ArrowLeft className="w-4 h-4 sm:mr-1" />
+                  <span className="hidden sm:inline">Retour au site</span>
+                </Button>
+              </Link>
+              <Link to="/blog">
+                <Button variant="ghost" size="sm" className="hidden md:inline-flex">
+                  ← Tous les articles
+                </Button>
+              </Link>
+            </div>
           </div>
         </header>
 
