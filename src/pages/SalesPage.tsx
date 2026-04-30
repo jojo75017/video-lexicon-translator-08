@@ -619,8 +619,7 @@ const SalesPage = () => {
       {/* ═══════════════════════════════════════ EBOOKIE COPILOTE IA ═══════════════════════════════════════ */}
       <EbookieAssistant />
 
-      {/* ═══════════════════════════════════════ BONUS STACK 935€ → 67€ ═══════════════════════════════════════ */}
-      <BonusStack />
+      {/* BonusStack supprimé — encart prix unifié plus bas */}
 
       {/* ═══════════════════════════════════════ COMPARATIF PRIX ═══════════════════════════════════════ */}
       <PriceComparison />
