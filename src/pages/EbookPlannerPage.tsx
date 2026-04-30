@@ -3109,8 +3109,8 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                 Créez des ebooks professionnels avec l'intelligence artificielle
               </p>
               
-              {/* Import URL CTA */}
-              <div className="mt-6 flex flex-col sm:flex-row items-center gap-3">
+              {/* CTA principal unique */}
+              <div className="mt-6 flex flex-col items-center gap-2">
                 <Button
                   type="button"
                   onClick={() => handleTabChange('editorial-director')}
@@ -3119,20 +3119,16 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                   <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
                   <span className="relative flex items-center gap-3">
                     <Rocket className="w-5 h-5" />
-                    <span>Créer mon livre avec le Workflow</span>
+                    <span>🚀 Créer mon ebook (Workflow IA)</span>
                   </span>
                 </Button>
-                <Button
+                <button
                   type="button"
-                  variant="outline"
                   onClick={() => handleTabChange('planner')}
-                  className="rounded-2xl border-border text-muted-foreground text-sm px-4 py-2 h-auto"
+                  className="text-xs text-muted-foreground underline-offset-2 hover:underline hover:text-foreground transition-colors"
                 >
-                  <span className="flex items-center gap-2">
-                    <FileText className="w-4 h-4" />
-                    <span>Formulaire manuel</span>
-                  </span>
-                </Button>
+                  ou utiliser le formulaire manuel
+                </button>
               </div>
 
               <p className="mt-5 text-muted-foreground text-sm italic">
