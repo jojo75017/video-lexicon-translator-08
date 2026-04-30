@@ -143,8 +143,11 @@ const BlogPage = () => {
                     <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
                       Découvrez notre magazine ebookstudio.blog
                     </h3>
-                    <p className="text-muted-foreground text-sm md:text-base">
+                    <p className="text-muted-foreground text-sm md:text-base mb-2">
                       Des dizaines d'articles supplémentaires : tendances KDP, niches rentables, stratégies IA, témoignages d'auteurs et études de cas. Le complément parfait pour aller plus loin.
+                    </p>
+                    <p className="text-xs text-muted-foreground/80 italic">
+                      💡 S'ouvre dans un nouvel onglet — votre session sur ebookstudio.fr reste active, fermez simplement l'onglet pour revenir.
                     </p>
                   </div>
 
