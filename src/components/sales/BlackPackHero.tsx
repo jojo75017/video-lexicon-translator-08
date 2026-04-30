@@ -175,13 +175,13 @@ const BlackPackHero = ({ onCtaClick, launchEnd, launchPrice = 67, normalPrice = 
           >
             <Rocket className="h-5 w-5 sm:h-6 sm:w-6" style={{ color: "#1a1a1a" }} />
             <span style={{ color: "#1a1a1a" }}>
-              Générer des revenus passifs ({launchPrice}€)
+              Découvrir l'offre
             </span>
             <ArrowRight className="h-5 w-5 sm:h-6 sm:w-6 transition-transform group-hover:translate-x-1" style={{ color: "#1a1a1a" }} />
           </button>
         </motion.div>
 
-        {/* Bandeau −54% / urgence */}
+        {/* Bandeau urgence (sans prix) */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -194,7 +194,7 @@ const BlackPackHero = ({ onCtaClick, launchEnd, launchPrice = 67, normalPrice = 
           >
             <Flame className="h-4 w-4" style={{ color: GOLD }} />
             <span style={{ color: GOLD }}>
-              ⚡ Offre expire dans {c.d}j {c.h}h {c.m}m
+              ⚡ Offre de lancement expire dans {c.d}j {c.h}h {c.m}m
             </span>
           </div>
 
@@ -206,25 +206,6 @@ const BlackPackHero = ({ onCtaClick, launchEnd, launchPrice = 67, normalPrice = 
               boxShadow: `0 0 30px hsl(38 92% 50% / 0.20)`,
             }}
           >
-            <span
-              className="rounded-md px-2 py-1 text-sm font-black"
-              style={{ background: GOLD, color: "#1a1a1a" }}
-            >
-              −{discount}%
-            </span>
-            <div className="flex items-center gap-2 text-sm sm:text-base font-bold" style={{ color: WHITE }}>
-              <span style={{ color: GREY, textDecoration: "line-through", fontWeight: 600 }}>
-                €{normalPrice}
-              </span>
-              <ArrowRight className="h-4 w-4" style={{ color: GOLD }} />
-              <span style={{ color: GOLD, fontSize: "1.1em", fontWeight: 900 }}>
-                €{launchPrice}
-              </span>
-            </div>
-            <div
-              className="hidden sm:block h-6 w-px"
-              style={{ background: "rgba(255,255,255,0.18)" }}
-            />
             <div className="flex items-center gap-1.5 text-sm font-semibold" style={{ color: WHITE }}>
               <Users className="h-4 w-4" style={{ color: GOLD }} />
               <span style={{ color: WHITE }}>
@@ -233,7 +214,7 @@ const BlackPackHero = ({ onCtaClick, launchEnd, launchPrice = 67, normalPrice = 
             </div>
           </div>
 
-          {/* Petits réassurances */}
+          {/* Petites réassurances */}
           <div
             className="mt-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs sm:text-sm"
             style={{ color: GREY }}

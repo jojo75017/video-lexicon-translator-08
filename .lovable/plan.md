@@ -1,43 +1,52 @@
-# Sidebar simplifiée : 5 étapes au lieu de 16 items
+## Corrections de la page `/offres` avant lancement
 
-## Le problème
+### 1. Fusion finale des encarts tarifs (1 SEUL bloc)
 
-Aujourd'hui la sidebar (`MagazineSidebar.tsx`) affiche **16 boutons en vrac** sans logique :
-Projets, Planificateur, Templates, Paramètres, Personnages, Rédaction, Outils, KDP, 4ème Couv, Business, Marketing, Monétisation, Export, Sommaire, Images, Correcteur.
+Aujourd'hui, la page contient encore **3 zones de prix** :
+- `<BlackPackHero>` (L441) — hero sombre avec prix
+- `<PriceComparison />` (L625) — bloc comparatif qui se termine par un encart prix
+- Section `#pricing` (L678) — bloc prix unifié final
 
-Résultat : on ne sait pas par où commencer, ni dans quel ordre cliquer.
+**Action :**
+- **Garder uniquement** la section `#pricing` (L678) comme encart prix officiel.
+- **Modifier `<BlackPackHero>`** : retirer l'affichage du prix et le CTA prix → remplacer par un CTA neutre type "Découvrir l'offre" qui scrolle vers `#pricing`. (Le hero garde son rôle de bannière premium sans dupliquer le tarif.)
+- **Modifier `<PriceComparison>`** : tronquer le composant après le grid des comparatifs concurrents (services freelance, ghostwriter, etc.) et **supprimer la carte "EbookStudio Pro" finale** avec son prix 67€/CTA. Remplacer par un simple lien "Voir notre offre ↓" qui scrolle vers `#pricing`.
 
-## Le nouveau menu (5 entrées seulement)
+Résultat : un seul prix affiché, en bas de page, dans `#pricing`.
 
-```
-🏠  Accueil               → ton tableau de bord (Mes Projets)
-1️⃣  Démarrer un livre    → Planificateur + Personnages + Templates
-2️⃣  Écrire                → Rédaction + Correcteur + Sommaire
-3️⃣  Habiller              → Couverture + 4ème Couv + Images
-4️⃣  Publier               → Export + KDP
-5️⃣  Vendre                → Marketing + Monétisation + Business
-─────────────────────────
-🔧  Tous les outils       (bouton replié, pour les pros)
-⚙️  Paramètres
-💳  Mon Abonnement
-```
+### 2. Verrouillage des outils Audit + Mots-clés (réservés abonnés)
 
-Chaque entrée principale ouvre **une seule vue** où les sous-outils sont présentés en grandes cartes claires, dans l'ordre où on les utilise.
+- Le bandeau orange "Outils KDP exclusifs" (L320-349) est déjà conditionné à `hasSubscriberAccess || hasAdminSession` — **OK, rien à faire ici**.
+- Vérifier qu'il n'existe pas d'autres CTA publics vers `/kdp-keywords` ou `/audit-pilot` ailleurs sur la page (`grep` confirmera, sinon retirer).
+- Confirmer que les routes `/kdp-keywords` et `/audit-pilot` sont bien protégées par `<SubscriberGate>` dans `App.tsx`.
 
-## Ce que ça change pour toi
+### 3. Suppression des avis fake (risque légal)
 
-- **Avant** : 16 boutons → on est perdu.
-- **Après** : 5 étapes numérotées → on suit le chemin naturel d'un livre.
-- Les outils avancés (Audio, Audit Pilot, Extension Chrome, BD, Atlas, etc.) restent accessibles via "🔧 Tous les outils" mais ne polluent plus la vue par défaut.
+Dans le JSON-LD de la page (L254-265) :
+- Supprimer le bloc `"review": [...]` avec Marie D., Thomas L., Sophie R. (faux noms, faux chiffres).
+- Supprimer également `"aggregateRating"` avec `reviewCount: 47` et la note moyenne fictive.
+- Garder le reste du schema (Product, Offer, FAQPage) qui est factuel.
 
-## Détails techniques
+### 4. Cohérence garantie / essai
 
-- Réécrire `src/components/layout/MagazineSidebar.tsx` : remplacer le tableau `sidebarItems` (16 entrées) par 5 entrées d'étape + footer (Tous les outils, Paramètres, Abonnement).
-- Chaque clic sur une étape route vers une vue groupée : réutiliser le système de tabs existant en mappant chaque étape vers un set d'`id` (ex : `démarrer` → ouvre `planner` par défaut, propose `characters`/`templates` en sous-cartes).
-- Le bouton "🔧 Tous les outils" ouvre la vue Trello existante (`TrelloBoardView`) qui contient déjà tous les outils classés.
-- Aucune suppression d'outil — uniquement réorganisation de la navigation.
-- Conserver le footer existant (Abonnement + Admin).
+Aujourd'hui : on parle à la fois de **"Garantie 30 jours satisfait ou remboursé"** et **"Essai gratuit 7 jours"** (L523, L709, L749). C'est ambigu pour le visiteur.
 
-## Question avant de coder
+**Décision proposée** : conserver **uniquement la garantie 30 jours satisfait ou remboursé** (cohérent avec la mémoire "free trial" qui mentionne un workflow manuel mais sur la page de vente publique on garde une promesse claire et juridiquement solide).
+- Retirer toutes les mentions "Essai gratuit 7 jours" / "7 jours sans carte" sur SalesPage.
+- La FAQ mentionne déjà la garantie 30 jours → cohérent.
 
-Tu valides ces 5 étapes (Accueil / Démarrer / Écrire / Habiller / Publier / Vendre) ? Ou tu préfères un autre regroupement (par ex. fusionner Habiller + Publier en une seule étape "Finaliser") ?
+### 5. Nettoyage code mort
+
+Dans `src/pages/SalesPage.tsx` :
+- Retirer les imports inutilisés : `BonusStack` (L22), `BlackPackPricing` (L31), `OffresKdpRocket` (L33).
+- Retirer les commentaires obsolètes "BonusStack supprimé", "BlackPackPricing supprimé", "OffresKdpRocket retiré".
+
+### Fichiers modifiés
+
+- `src/pages/SalesPage.tsx` (le principal)
+- `src/components/sales/BlackPackHero.tsx` (retrait prix + CTA neutre)
+- `src/components/sales/PriceComparison.tsx` (suppression card finale)
+
+### Hors scope (à publier ensuite)
+
+Une fois ces 4 corrections faites, **vous devrez recliquer "Publish" / "Update"** dans Lovable pour que `ebookstudio.fr` reflète la nouvelle version (les modifs frontend ne sont pas auto-déployées).
