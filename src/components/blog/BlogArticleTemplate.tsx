@@ -180,12 +180,12 @@ const BlogArticleTemplate = () => {
                     Retour au blog
                   </Button>
                 </Link>
-                <Link to="/offres" onClick={() => { import('@/utils/analytics').then(m => m.trackOffresClick('article_footer_site')); }}>
+                <a href="https://ebookstudio.blog" onClick={() => { import('@/utils/analytics').then(m => m.trackOffresClick('article_footer_site')); }}>
                   <Button variant="outline" size="lg" className="border-primary/30 text-primary hover:bg-primary/10">
                     <BookOpen className="w-4 h-4 mr-2" />
                     Retour au site web
                   </Button>
-                </Link>
+                </a>
                 <Link to="/dashboard">
                   <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground">
                     Accès Générateur
