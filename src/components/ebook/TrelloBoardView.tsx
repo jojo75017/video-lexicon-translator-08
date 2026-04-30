@@ -90,7 +90,7 @@ export const TrelloBoardView: React.FC<TrelloBoardViewProps> = ({
           </div>
         </div>
 
-        {/* CTA - Workflow actions (always visible) */}
+        {/* CTA - Workflow action (single primary action) */}
         <div className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-2xl border border-primary/20 p-5 flex flex-col sm:flex-row items-center gap-4">
           <div className="flex-1">
             <h3 className="text-lg font-bold text-foreground mb-1">
@@ -98,25 +98,17 @@ export const TrelloBoardView: React.FC<TrelloBoardViewProps> = ({
             </h3>
             <p className="text-sm text-muted-foreground">
               {completedCount === 0
-                ? 'Commence par l\'agent Zyro (P1) pour définir ta niche et ton titre.'
-                : `${completedCount}/${totalAgents} agents terminés. Continue avec l'étape suivante.`}
+                ? `Étape 0 / ${totalAgents} — Commence par l'étape P1 ci-dessous (définir ta niche et ton titre).`
+                : `Étape ${completedCount} / ${totalAgents} terminée. Continue avec l'étape suivante.`}
             </p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <Button
-              onClick={() => onNavigate('editorial-director')}
+              onClick={() => onNavigate(completedCount === 0 ? 'editorial-director' : 'complete-workflow')}
               className="rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 whitespace-nowrap"
             >
               <Play className="w-4 h-4 mr-2" />
-              {completedCount === 0 ? 'Démarrer le Workflow' : 'Continuer le Workflow'}
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => onNavigate('complete-workflow')}
-              className="rounded-xl border-border whitespace-nowrap"
-            >
-              <Sparkles className="w-4 h-4 mr-2" />
-              Workflow complet
+              {completedCount === 0 ? 'Démarrer (étape P1)' : 'Continuer le workflow'}
             </Button>
           </div>
         </div>
