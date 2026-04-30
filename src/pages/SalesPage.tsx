@@ -13,13 +13,14 @@ import { Input } from "@/components/ui/input";
 import SalesFaq from "@/components/sales/SalesFaq";
 import AuthorShowcase from "@/components/sales/AuthorShowcase";
 import PriceComparison from "@/components/sales/PriceComparison";
+// (BonusStack, BlackPackPricing, OffresKdpRocket retirés — encart prix unifié dans #pricing)
 import CountdownTimer from "@/components/sales/CountdownTimer";
 import UrgencyBanner from "@/components/sales/UrgencyBanner";
 import GuaranteeSection from "@/components/sales/GuaranteeSection";
 import HeroVideoTeaser from "@/components/sales/HeroVideoTeaser";
 import AgentsShowcase from "@/components/sales/AgentsShowcase";
 import EbookieAssistant from "@/components/sales/EbookieAssistant";
-import BonusStack from "@/components/sales/BonusStack";
+
 import KdpRoiCalculator from "@/components/sales/KdpRoiCalculator";
 import EbookGallery from "@/components/sales/EbookGallery";
 import EbookAnatomy from "@/components/sales/EbookAnatomy";
@@ -28,9 +29,9 @@ import ToolsCounterBanner from "@/components/sales/ToolsCounterBanner";
 import KdpRocketParityTable from "@/components/sales/KdpRocketParityTable";
 import KdpAdsTeaser from "@/components/sales/KdpAdsTeaser";
 import BlackPackHero from "@/components/sales/BlackPackHero";
-import BlackPackPricing from "@/components/sales/BlackPackPricing";
+
 import FunnelStepsBar from "@/components/sales/FunnelStepsBar";
-import OffresKdpRocket from "@/components/sales/OffresKdpRocket";
+
 
 // ════════════════════════════════════════════════════════════════════════════════
 // DESIGN SYSTEM 2026 — Palette Premium
@@ -250,19 +251,7 @@ const SalesPage = () => {
             "availability": "https://schema.org/InStock",
             "priceValidUntil": "2026-09-15",
             "url": "https://ebookstudio.fr/offres"
-          },
-          "aggregateRating": {
-            "@type": "AggregateRating",
-            "ratingValue": "4.8",
-            "reviewCount": "47",
-            "bestRating": "5",
-            "worstRating": "1"
-          },
-          "review": [
-            { "@type": "Review", "author": { "@type": "Person", "name": "Marie D." }, "reviewRating": { "@type": "Rating", "ratingValue": "5" }, "reviewBody": "J'ai publié 3 ebooks en 2 semaines. Le workflow IA est incroyable, tout est guidé étape par étape." },
-            { "@type": "Review", "author": { "@type": "Person", "name": "Thomas L." }, "reviewRating": { "@type": "Rating", "ratingValue": "5" }, "reviewBody": "BSR passé de 890 000 à 12 400. 1 847€/mois de revenus passifs grâce aux outils KDP intégrés." },
-            { "@type": "Review", "author": { "@type": "Person", "name": "Sophie R." }, "reviewRating": { "@type": "Rating", "ratingValue": "5" }, "reviewBody": "Même sans savoir écrire, l'IA génère des chapitres de qualité pro. Mon premier ebook publié en 45 minutes." }
-          ]
+          }
         })}</script>
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",
@@ -520,10 +509,10 @@ const SalesPage = () => {
               </div>
               <div className="flex-1 text-center sm:text-left">
                 <h3 className="text-xl font-bold text-foreground mb-1">
-                  🎁 Essai gratuit 7 jours — Aucune carte requise
+                  🛡️ Garantie 30 jours satisfait ou remboursé
                 </h3>
                 <p className="text-muted-foreground text-sm">
-                  Testez toutes les fonctionnalités Pro gratuitement. Si ça ne vous plaît pas, vous ne payez rien.
+                  Testez toutes les fonctionnalités Pro. Si ça ne vous convient pas, on vous rembourse intégralement sous 30 jours, sans condition.
                 </p>
               </div>
               <Button
@@ -706,7 +695,7 @@ const SalesPage = () => {
                     <span className="text-7xl md:text-8xl font-black text-foreground">{LAUNCH_PRICE}€</span>
                   </div>
                   <p className="text-foreground/80 text-lg">Paiement unique — <span className="text-primary font-bold">Accès à vie</span></p>
-                  <p className="text-muted-foreground mt-2 text-sm">ou en 2×35€ / 3×25€ · Essai gratuit 7 jours inclus</p>
+                  <p className="text-muted-foreground mt-2 text-sm">ou en 2×35€ / 3×25€ · Garantie 30 jours satisfait ou remboursé</p>
                 </div>
 
                 {/* Features */}
@@ -746,7 +735,7 @@ const SalesPage = () => {
                   <span>•</span>
                   <span>Accès instantané</span>
                   <span>•</span>
-                  <span>Essai 7 jours inclus</span>
+                  <span>Paiement sécurisé</span>
                 </p>
 
                 {/* Garantie */}
