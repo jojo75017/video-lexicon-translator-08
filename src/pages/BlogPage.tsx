@@ -53,9 +53,18 @@ const BlogPage = () => {
               <Link to="/demo" className="text-muted-foreground hover:text-foreground transition-colors">Démo</Link>
               <Link to="/formation" className="text-muted-foreground hover:text-foreground transition-colors">Formation</Link>
             </nav>
-            <Link to="/offres" onClick={() => { import('@/utils/analytics').then(m => m.trackOffresClick('blog_cta')); }}>
-              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">Accès Générateur</Button>
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link to="/offres" onClick={() => { import('@/utils/analytics').then(m => m.trackOffresClick('blog_back_btn')); }}>
+                <Button variant="outline" size="sm" className="border-primary/30 text-primary hover:bg-primary/10">
+                  <ArrowLeft className="w-4 h-4 mr-1" />
+                  <span className="hidden sm:inline">Retour au site</span>
+                  <Home className="w-4 h-4 sm:hidden" />
+                </Button>
+              </Link>
+              <Link to="/offres" onClick={() => { import('@/utils/analytics').then(m => m.trackOffresClick('blog_cta')); }}>
+                <Button className="bg-primary hover:bg-primary/90 text-primary-foreground hidden sm:inline-flex">Accès Générateur</Button>
+              </Link>
+            </div>
           </div>
         </header>
 
