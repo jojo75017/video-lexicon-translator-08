@@ -166,13 +166,23 @@ const BlogPage = () => {
         </section>
 
         {/* CTA */}
-        <section className="py-16 border-t border-border">
+        <section className="py-16 border-t border-border bg-muted/20">
           <div className="container mx-auto px-4 text-center">
-            <h2 className="text-3xl font-bold text-foreground mb-4">Prêt à créer votre premier ebook ?</h2>
-            <p className="text-muted-foreground mb-8 max-w-xl mx-auto">Passez de la lecture à l'action. Notre générateur IA transforme vos idées en ebooks professionnels en quelques minutes.</p>
+            <h2 className="text-3xl font-bold text-foreground mb-4">Que souhaitez-vous faire ensuite ?</h2>
+            <p className="text-muted-foreground mb-8 max-w-xl mx-auto">Explorez nos offres ou lancez-vous directement dans la création de votre premier ebook avec notre générateur IA.</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/demo"><Button size="lg" variant="outline">Essayer gratuitement</Button></Link>
-              <Link to="/offres"><Button size="lg">Accès Pro — 67€ à vie <ArrowRight className="w-4 h-4 ml-2" /></Button></Link>
+              <Link to="/offres" onClick={() => { import('@/utils/analytics').then(m => m.trackOffresClick('blog_footer_site')); }}>
+                <Button size="lg" variant="outline" className="border-primary/30 text-primary hover:bg-primary/10">
+                  <Home className="w-4 h-4 mr-2" />
+                  Retour au site web
+                </Button>
+              </Link>
+              <Link to="/dashboard">
+                <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                  Accès Générateur
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </Link>
             </div>
           </div>
         </section>
