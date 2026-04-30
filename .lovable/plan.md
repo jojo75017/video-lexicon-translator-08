@@ -1,64 +1,84 @@
-## Pack "60 Posts Réseaux Sociaux + Calendrier 30 jours"
 
-### Ce que vous allez recevoir
+# Audit UX du générateur EbookStudio
 
-Un pack complet livré dans `/mnt/documents/` au format **PDF imprimable** + **Word (.docx)** prêt à copier-coller, contenant :
+J'ai fait le tour de l'outil (route `/ebook-planner` + `/demo`). L'outil est très puissant mais **visuellement saturé** — un nouvel utilisateur ne sait pas par où commencer. Voici les problèmes identifiés et ce que je propose de corriger.
 
-**60 posts répartis sur 5 plateformes** :
-- 15 posts Facebook (groupes, témoignages, valeur, urgence)
-- 15 posts LinkedIn (storytelling pro, chiffres, leçons, éducatif)
-- 12 posts TikTok (hooks viraux, scripts courts avec timing 0-3s, 3-15s, 15-30s)
-- 10 posts Pinterest (épingles verticales avec descriptions SEO)
-- 8 posts X/Twitter (threads + tweets uniques)
+---
 
-**Calendrier 30 jours jour par jour** sous forme de tableau :
-```text
-Jour 1 — Lundi    | 09h Facebook (Post FB-1) | 17h LinkedIn (Post LI-1)
-Jour 2 — Mardi    | 12h TikTok (Post TK-1)   | 20h Pinterest (Post PIN-1)
-Jour 3 — Mercredi | 08h LinkedIn (Post LI-2) | 19h Facebook (Post FB-2)
-... (30 jours complets avec heures optimales par plateforme)
-```
+## 🔴 Problèmes identifiés
 
-### Contenu de chaque post
+### 1. Trop de CTA concurrents en haut de page
+Sur la page principale, on voit en même temps :
+- "Créer mon livre avec le Workflow" (orange, gros)
+- "Formulaire manuel" (à côté)
+- "Démarrer le Workflow" (plus bas, vert)
+- "Workflow complet" (à côté)
+- "Voir le guide" (bandeau jaune en haut)
 
-Chaque post contiendra :
-- **Numéro et plateforme** (ex: FB-1, LI-3, TK-7)
-- **Type de post** (témoignage, valeur, urgence, etc.)
-- **Texte complet prêt à copier-coller** (avec emojis, sauts de ligne, CTA)
-- **Hashtags** déjà formatés
-- **Description visuelle** (quoi mettre comme image/vidéo)
-- **Lien à insérer** : `ebookstudio.fr/offres` ou `ebookstudio.fr/demo`
+→ **4 boutons "démarrer" différents** sur le même écran. L'utilisateur ne sait pas lequel cliquer.
 
-### Adapté à votre offre
+### 2. Bandeau "Bienvenue sur EbookStudio" persistant
+Le bandeau orange en haut "Découvrez le guide des outils en 2 min pour ne pas vous perdre dans les **44 outils disponibles**" reste affiché en permanence et indique lui-même que l'outil est complexe (44 outils !).
 
-Tous les posts mentionneront :
-- **EbookStudio à 67€/an** (offre fondateur, 147€ après)
-- **Garantie 7 jours**
-- **Workflow 15 agents IA**
-- **35+ livres publiés** (preuve sociale)
-- **Fondateur Georges**
-- Liens vers `ebookstudio.fr/offres` (vente) et `ebookstudio.fr/demo` (essai gratuit)
+### 3. Modal d'intro à chaque visite
+Le modal "Bienvenue sur EbookStudio Pro 🎉" (3 étapes) s'ouvre à chaque chargement de `/ebook-planner`. Très intrusif.
 
-### Fichiers livrés
+### 4. Le Kanban à 5 colonnes (P1→P15) est intimidant
+Cinq piliers (Créer / Optimiser / Produire / Publier / Vendre) avec **31 outils** + agents verrouillés (icône cadenas) sans explication claire de l'ordre. On voit "P1 · Zyro — Niche", "P2 · Jano — Marché"… les noms de code (Zyro, Jano, Kiro, Alia) ne disent rien à un débutant.
 
-```text
-/mnt/documents/
-├── PACK-60-POSTS-RESEAUX-SOCIAUX.pdf      ← Imprimable, lisible
-├── PACK-60-POSTS-RESEAUX-SOCIAUX.docx     ← Copier-coller direct
-└── CALENDRIER-30-JOURS.pdf                ← Tableau planning séparé
-```
+### 5. Doublons d'entrée
+- "Créer mon livre avec le Workflow" ≠ "Démarrer le Workflow" ≠ "Workflow complet" → Trois portes pour la même chose.
+- "Formulaire manuel" en haut + "Formulaire manuel" dans la colonne Créer → doublon.
 
-### Détails techniques (pour info)
+### 6. Indicateurs peu lisibles
+- "0/15 agents terminés · 0%" → un débutant ne sait pas ce que sont "les agents".
+- "22 projets créés" sur le bandeau Lifetime → info qui n'aide pas pour l'action en cours.
 
-- Génération via Python (`python-docx` + `reportlab`)
-- Réutilisation des 19 posts existants dans `src/data/socialPostTemplates.ts` comme base
-- Création de 41 nouveaux posts inédits (storytelling, valeur, urgence, FAQ, témoignages)
-- Heures de publication basées sur `PLATFORM_CONFIG.bestTimes` du code existant
-- QA visuel obligatoire : conversion en images de chaque page pour vérifier mise en page
-- Aucune modification du code de l'app — livraison uniquement de fichiers téléchargeables
+### 7. Bouton flottant IA (orange en bas à droite) + Communauté (orange avec "3" en haut à droite)
+Deux pastilles flottantes orange éparpillées qui distraient sans contexte clair.
 
-### Temps estimé
+---
 
-~3-5 minutes de génération + QA visuel des fichiers.
+## ✅ Plan de simplification (4 changements)
 
-Vous obtiendrez un pack autonome utilisable dès demain matin pour publier sur vos réseaux.
+### Étape 1 — Un seul CTA principal "Démarrer"
+Sur le hero du planner, garder **UN SEUL** bouton primaire :
+- **"🚀 Créer mon ebook (Workflow IA)"** (gros, orange)
+- En dessous, un lien texte discret : *"ou utiliser le formulaire manuel"*
+
+Supprimer les boutons doublons "Démarrer le Workflow" / "Workflow complet" qui apparaissent plus bas dans le bloc "Prêt à créer ton livre ?".
+
+### Étape 2 — Renommer les agents avec des noms parlants
+Remplacer les noms de code (Zyro, Jano, Kiro…) par leur **fonction métier** :
+- P1 · Zyro → **P1 · Définir la niche**
+- P2 · Jano → **P2 · Analyser le marché**
+- P3 · Kiro → **P3 · Plan du livre**
+- P4 · Alia → **P4 · Rédaction IA**
+- … et garder le nom de code en sous-titre petit (`Zyro`) pour le suivi.
+
+### Étape 3 — Modal d'intro en "1-fois seulement" + bandeau désactivable
+- Marquer le modal d'intro comme **vu** dans `localStorage` après la 1ère fermeture (ne plus le rouvrir à chaque visite).
+- Sur le bandeau jaune "Bienvenue sur EbookStudio", quand l'utilisateur clique sur ✕, le mémoriser définitivement.
+
+### Étape 4 — Réduire la verbosité du Kanban
+- Renommer la colonne pillier **"Créer" → "1. Préparer"**, **"Optimiser" → "2. Améliorer"**, etc. (numéroter pour clarifier l'ordre).
+- Sous le titre du projet ("Le Loup à la Plage 0/15 agents · 0%"), reformuler en **"Étape 0 / 15 — Commence par P1 ci-dessous"**.
+- Cacher par défaut les outils annexes "Formulaire manuel", "Personnages", "Assistant IA" derrière un bouton **"+ Outils avancés"** dans la colonne "1. Préparer" (déjà 8 items, c'est trop).
+
+---
+
+## 📋 Fichiers concernés (technique)
+
+- `src/pages/EbookPlannerPage.tsx` — hero + dédoublonnage CTA
+- `src/components/ebook/TrelloBoardView.tsx` & `TrelloBoardColumns.ts` — renommage piliers + agents
+- `src/components/ebook/WorkflowDashboard.tsx` ou équivalent — suppression bouton "Démarrer le Workflow" doublon
+- `src/components/onboarding/FirstEbookOnboarding.tsx` — flag localStorage "déjà vu"
+- `src/components/onboarding/FirstVisitBanner.tsx` — flag localStorage de fermeture définitive
+
+Aucune modification de logique métier, uniquement de l'UX/copy/affichage. Aucun risque sur le backend, les agents IA ou les exports.
+
+---
+
+## ❓ Avant que j'implémente
+
+Tu valides ces 4 changements en bloc ? Ou tu préfères que je commence par **1 seul** (par ex. "1 seul CTA principal") pour voir le résultat avant le reste ?
