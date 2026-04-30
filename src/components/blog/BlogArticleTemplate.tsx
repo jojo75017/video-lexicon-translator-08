@@ -111,12 +111,12 @@ const BlogArticleTemplate = () => {
               <Link to="/demo" className="text-muted-foreground hover:text-foreground transition-colors">Démo</Link>
             </nav>
             <div className="flex items-center gap-2">
-              <Link to="/offres" onClick={() => { import('@/utils/analytics').then(m => m.trackOffresClick('article_back_btn')); }}>
+              <a href="https://ebookstudio.blog" onClick={() => { import('@/utils/analytics').then(m => m.trackOffresClick('article_back_btn')); }}>
                 <Button variant="outline" size="sm" className="border-primary/30 text-primary hover:bg-primary/10">
                   <ArrowLeft className="w-4 h-4 sm:mr-1" />
                   <span className="hidden sm:inline">Retour au site</span>
                 </Button>
-              </Link>
+              </a>
               <Link to="/dashboard">
                 <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground">
                   <span className="hidden sm:inline">Accès Générateur</span>
@@ -180,12 +180,12 @@ const BlogArticleTemplate = () => {
                     Retour au blog
                   </Button>
                 </Link>
-                <Link to="/offres" onClick={() => { import('@/utils/analytics').then(m => m.trackOffresClick('article_footer_site')); }}>
+                <a href="https://ebookstudio.blog" onClick={() => { import('@/utils/analytics').then(m => m.trackOffresClick('article_footer_site')); }}>
                   <Button variant="outline" size="lg" className="border-primary/30 text-primary hover:bg-primary/10">
                     <BookOpen className="w-4 h-4 mr-2" />
                     Retour au site web
                   </Button>
-                </Link>
+                </a>
                 <Link to="/dashboard">
                   <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground">
                     Accès Générateur

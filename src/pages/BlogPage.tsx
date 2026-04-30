@@ -54,13 +54,13 @@ const BlogPage = () => {
               <Link to="/formation" className="text-muted-foreground hover:text-foreground transition-colors">Formation</Link>
             </nav>
             <div className="flex items-center gap-2">
-              <Link to="/offres" onClick={() => { import('@/utils/analytics').then(m => m.trackOffresClick('blog_back_btn')); }}>
+              <a href="https://ebookstudio.blog" onClick={() => { import('@/utils/analytics').then(m => m.trackOffresClick('blog_back_btn')); }}>
                 <Button variant="outline" size="sm" className="border-primary/30 text-primary hover:bg-primary/10">
                   <ArrowLeft className="w-4 h-4 mr-1" />
                   <span className="hidden sm:inline">Retour au site</span>
                   <Home className="w-4 h-4 sm:hidden" />
                 </Button>
-              </Link>
+              </a>
               <Link to="/offres" onClick={() => { import('@/utils/analytics').then(m => m.trackOffresClick('blog_cta')); }}>
                 <Button className="bg-primary hover:bg-primary/90 text-primary-foreground hidden sm:inline-flex">Accès Générateur</Button>
               </Link>
@@ -171,12 +171,12 @@ const BlogPage = () => {
             <h2 className="text-3xl font-bold text-foreground mb-4">Que souhaitez-vous faire ensuite ?</h2>
             <p className="text-muted-foreground mb-8 max-w-xl mx-auto">Explorez nos offres ou lancez-vous directement dans la création de votre premier ebook avec notre générateur IA.</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/offres" onClick={() => { import('@/utils/analytics').then(m => m.trackOffresClick('blog_footer_site')); }}>
+              <a href="https://ebookstudio.blog" onClick={() => { import('@/utils/analytics').then(m => m.trackOffresClick('blog_footer_site')); }}>
                 <Button size="lg" variant="outline" className="border-primary/30 text-primary hover:bg-primary/10">
                   <Home className="w-4 h-4 mr-2" />
                   Retour au site web
                 </Button>
-              </Link>
+              </a>
               <Link to="/dashboard">
                 <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground">
                   Accès Générateur
