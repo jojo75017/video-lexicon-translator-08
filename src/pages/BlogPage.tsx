@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
-import { BookOpen, Clock, TrendingUp, ArrowRight, Sparkles, Target, Zap, PenTool, DollarSign, Lightbulb } from 'lucide-react';
+import { BookOpen, Clock, TrendingUp, ArrowRight, Sparkles, Target, Zap, PenTool, DollarSign, Lightbulb, Newspaper, ExternalLink } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
