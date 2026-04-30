@@ -169,8 +169,28 @@ const BlogArticleTemplate = () => {
             <FaqSection faq={article.faq} />
             <RelatedArticles slugs={article.relatedSlugs} />
 
-            <div className="mt-12 text-center">
-              <Link to="/blog"><Button variant="outline"><ArrowLeft className="w-4 h-4 mr-2" />Retour au blog</Button></Link>
+            <div className="mt-12 border-t border-border pt-10">
+              <h3 className="text-center text-lg font-semibold text-foreground mb-6">Et maintenant ?</h3>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+                <Link to="/blog">
+                  <Button variant="outline" size="lg">
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Retour au blog
+                  </Button>
+                </Link>
+                <Link to="/offres" onClick={() => { import('@/utils/analytics').then(m => m.trackOffresClick('article_footer_site')); }}>
+                  <Button variant="outline" size="lg" className="border-primary/30 text-primary hover:bg-primary/10">
+                    <BookOpen className="w-4 h-4 mr-2" />
+                    Retour au site web
+                  </Button>
+                </Link>
+                <Link to="/dashboard">
+                  <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                    Accès Générateur
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
         </article>
