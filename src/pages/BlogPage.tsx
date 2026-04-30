@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
-import { BookOpen, Clock, TrendingUp, ArrowRight, Sparkles, Target, Zap, PenTool, DollarSign, Lightbulb } from 'lucide-react';
+import { BookOpen, Clock, TrendingUp, ArrowRight, Sparkles, Target, Zap, PenTool, DollarSign, Lightbulb, Newspaper, ExternalLink } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -109,6 +109,46 @@ const BlogPage = () => {
                   </Card>
                 </Link>
               ))}
+            </div>
+
+            {/* Bannière vers le blog complet */}
+            <div className="mt-16 max-w-5xl mx-auto">
+              <a
+                href="https://ebookstudio.blog/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group block relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/5 via-background to-amber-500/5 hover:border-primary/40 hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500"
+              >
+                <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-all duration-700" />
+                <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl group-hover:bg-amber-500/20 transition-all duration-700" />
+
+                <div className="relative grid md:grid-cols-[auto_1fr_auto] items-center gap-6 p-8 md:p-10">
+                  <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br from-primary to-amber-500 flex items-center justify-center shadow-lg shadow-primary/30 group-hover:scale-110 transition-transform duration-500">
+                    <Newspaper className="w-8 h-8 md:w-10 md:h-10 text-primary-foreground" />
+                  </div>
+
+                  <div>
+                    <Badge className="mb-3 bg-primary/10 text-primary border-primary/30 hover:bg-primary/15">
+                      ✨ Magazine officiel
+                    </Badge>
+                    <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
+                      Découvrez notre magazine ebookstudio.blog
+                    </h3>
+                    <p className="text-muted-foreground text-sm md:text-base">
+                      Des dizaines d'articles supplémentaires : tendances KDP, niches rentables, stratégies IA, témoignages d'auteurs et études de cas. Le complément parfait pour aller plus loin.
+                    </p>
+                  </div>
+
+                  <div className="hidden md:flex items-center gap-2 text-primary font-semibold whitespace-nowrap group-hover:gap-3 transition-all">
+                    Visiter le blog
+                    <ExternalLink className="w-5 h-5" />
+                  </div>
+                </div>
+
+                <div className="md:hidden flex items-center justify-center gap-2 text-primary font-semibold pb-6">
+                  Visiter le blog <ExternalLink className="w-4 h-4" />
+                </div>
+              </a>
             </div>
           </div>
         </section>
