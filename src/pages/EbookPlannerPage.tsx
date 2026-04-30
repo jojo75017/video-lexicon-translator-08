@@ -14,7 +14,7 @@ import {
 import { toast } from 'sonner';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { ModernSidebar } from '@/components/layout/ModernSidebar';
+import { SimpleSidebar } from '@/components/layout/SimpleSidebar';
 import { OnboardingGuide } from '@/components/onboarding/OnboardingGuide';
 import { FirstVisitBanner } from '@/components/onboarding/FirstVisitBanner';
 import { useEbookDatabase } from '@/hooks/useEbookDatabase';
@@ -3020,7 +3020,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
     <div className="min-h-screen flex bg-background">
       <OnboardingGuide />
       {viewMode !== 'trello' && (
-        <ModernSidebar 
+        <SimpleSidebar
           activeTab={activeTab}
           onTabChange={handleTabChange}
           isCollapsed={sidebarCollapsed}

@@ -1,6 +1,5 @@
 import React from 'react';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 import {
   Home,
   Sparkles,
@@ -14,36 +13,41 @@ import {
   ChevronRight,
   CreditCard,
   Shield,
+  type LucideIcon,
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 
-interface MagazineSidebarProps {
+interface SimpleSidebarProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
-  isCollapsed?: boolean;
-  onToggleCollapse?: () => void;
+  isCollapsed: boolean;
+  onToggleCollapse: () => void;
+  /** Bascule vers la vue Trello (toutes les cartes / tous les outils). */
+  onSwitchToTrello?: () => void;
 }
 
 interface StepItem {
-  id: string;       // tabId envoyé à onTabChange (point d'entrée par défaut de l'étape)
+  id: string;            // tabId envoyé au parent (point d'entrée par défaut de l'étape)
   label: string;
   hint: string;
-  icon: React.ElementType;
-  step?: string;    // numéro affiché ("1", "2"...)
-  matchIds?: string[]; // tabIds qui doivent surligner cette étape
-  badge?: string;
+  icon: LucideIcon;
+  step?: string;         // numéro affiché ("1", "2"...)
+  matchIds?: string[];   // tabIds qui doivent surligner cette étape
 }
 
-// 5 étapes claires + accueil. Chaque étape ouvre l'outil principal de l'étape.
-// L'utilisateur découvre les outils complémentaires depuis la vue de l'outil
-// (ou via le bouton "Tous les outils" en bas).
+/**
+ * 5 étapes simples qui suivent l'ordre naturel de production d'un livre.
+ * Chaque étape ouvre directement l'outil principal correspondant ; les outils
+ * complémentaires restent accessibles depuis la vue Trello via "Tous les outils".
+ */
 const STEP_ITEMS: StepItem[] = [
   {
     id: 'projects',
     label: 'Accueil',
     hint: 'Mes projets',
     icon: Home,
-    matchIds: ['projects'],
+    matchIds: ['projects', 'ebook-library'],
   },
   {
     id: 'planner',
@@ -51,7 +55,7 @@ const STEP_ITEMS: StepItem[] = [
     hint: 'Plan, idée, personnages',
     icon: Sparkles,
     step: '1',
-    matchIds: ['planner', 'characters', 'templates'],
+    matchIds: ['planner', 'characters', 'series', 'templates', 'doc-transform', 'url-import'],
   },
   {
     id: 'writing',
@@ -59,15 +63,15 @@ const STEP_ITEMS: StepItem[] = [
     hint: 'Rédaction & relecture',
     icon: PenTool,
     step: '2',
-    matchIds: ['writing', 'strict-proofread', 'toc', 'aichat'],
+    matchIds: ['writing', 'aichat', 'strict-proofread'],
   },
   {
-    id: 'images',
+    id: 'cover-design-editor',
     label: 'Habiller',
     hint: 'Couverture & visuels',
     icon: ImageIcon,
     step: '3',
-    matchIds: ['images', 'cover', 'cover-design-editor', 'back-cover', 'backcover'],
+    matchIds: ['cover-design-editor', 'cover', 'backcover', 'images'],
   },
   {
     id: 'export',
@@ -75,28 +79,29 @@ const STEP_ITEMS: StepItem[] = [
     hint: 'Export PDF & KDP',
     icon: Download,
     step: '4',
-    matchIds: ['export', 'kdp', 'kdp-prepublish-checklist'],
+    matchIds: ['export', 'workflow-export', 'calibre-epub', 'kdp', 'kdp-prepublish-checklist', 'audit-pilot'],
   },
   {
     id: 'marketing',
     label: 'Vendre',
-    hint: 'Marketing & monétisation',
+    hint: 'Marketing & lancement',
     icon: Megaphone,
     step: '5',
-    matchIds: ['marketing', 'monetization', 'advanced', 'launch-plan'],
+    matchIds: ['marketing', 'launch-plan', 'kdp-ads-guide'],
   },
 ];
 
-export function MagazineSidebar({
+export const SimpleSidebar: React.FC<SimpleSidebarProps> = ({
   activeTab,
   onTabChange,
-  isCollapsed = false,
+  isCollapsed,
   onToggleCollapse,
-}: MagazineSidebarProps) {
+  onSwitchToTrello,
+}) => {
   const navigate = useNavigate();
 
   const isStepActive = (item: StepItem) =>
-    item.id === activeTab || item.matchIds?.includes(activeTab);
+    activeTab === item.id || !!item.matchIds?.includes(activeTab);
 
   return (
     <aside
@@ -106,19 +111,23 @@ export function MagazineSidebar({
       )}
     >
       {/* Header */}
-      <div className="p-6 border-b border-border">
+      <div className="p-5 border-b border-border">
         <div className="flex items-center justify-between">
           {!isCollapsed && (
             <div>
               <h2 className="font-playfair text-xl font-bold text-foreground">Ebook Studio</h2>
-              <p className="text-xs text-muted-foreground mt-1">Suis les 5 étapes</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Suis les 5 étapes</p>
             </div>
           )}
-          {onToggleCollapse && (
-            <Button variant="ghost" size="icon" onClick={onToggleCollapse} className="ml-auto">
-              {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-            </Button>
-          )}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onToggleCollapse}
+            className="ml-auto"
+            aria-label={isCollapsed ? 'Déplier le menu' : 'Replier le menu'}
+          >
+            {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+          </Button>
         </div>
       </div>
 
@@ -132,8 +141,9 @@ export function MagazineSidebar({
             <button
               key={item.id}
               onClick={() => onTabChange(item.id)}
+              title={`${item.label} — ${item.hint}`}
               className={cn(
-                'w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group relative text-left',
+                'w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group text-left',
                 active
                   ? 'bg-gradient-to-r from-amber-500 via-yellow-500 to-orange-500 text-white shadow-lg shadow-amber-500/30'
                   : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
@@ -143,12 +153,10 @@ export function MagazineSidebar({
               <div
                 className={cn(
                   'flex-shrink-0 w-9 h-9 rounded-lg flex items-center justify-center font-bold text-sm',
-                  active
-                    ? 'bg-white/20 text-white'
-                    : 'bg-amber-500/10 text-amber-500'
+                  active ? 'bg-white/20 text-white' : 'bg-amber-500/10 text-amber-500'
                 )}
               >
-                {item.step ? item.step : <Icon className="h-5 w-5" />}
+                {item.step ?? <Icon className="h-5 w-5" />}
               </div>
 
               {!isCollapsed && (
@@ -184,7 +192,7 @@ export function MagazineSidebar({
           );
         })}
 
-        {/* Séparateur */}
+        {/* Séparateur "Avancé" */}
         {!isCollapsed && (
           <div className="pt-4 mt-4 border-t border-border">
             <p className="px-3 pb-2 text-[11px] uppercase tracking-wide text-muted-foreground/70 font-semibold">
@@ -193,14 +201,13 @@ export function MagazineSidebar({
           </div>
         )}
 
-        {/* Tous les outils (vue Trello) */}
+        {/* Tous les outils → vue Trello */}
         <button
-          onClick={() => onTabChange('all-tools')}
+          onClick={() => onSwitchToTrello?.()}
+          title="Voir tous les outils en mode tableau (kanban)"
           className={cn(
             'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-left',
-            activeTab === 'all-tools'
-              ? 'bg-muted text-foreground'
-              : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
+            'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
           )}
         >
           <Wrench className="h-4 w-4 flex-shrink-0" />
@@ -240,4 +247,6 @@ export function MagazineSidebar({
       )}
     </aside>
   );
-}
+};
+
+export default SimpleSidebar;
