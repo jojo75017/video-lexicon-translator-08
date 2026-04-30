@@ -672,12 +672,7 @@ const SalesPage = () => {
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════ BLACK PACK PRICING (refonte sombre premium) ═══════════════════════════════════════ */}
-      <BlackPackPricing
-        onCtaClick={handlePlanClick}
-        launchPrice={LAUNCH_PRICE}
-        normalPrice={NORMAL_PRICE}
-      />
+      {/* BlackPackPricing supprimé — encart prix unifié ci-dessous */}
 
       {/* ═══════════════════════════════════════ PRICING (détails complets) ═══════════════════════════════════════ */}
       <section id="pricing" className="py-20 px-4 relative">
