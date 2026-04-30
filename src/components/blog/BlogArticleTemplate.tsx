@@ -117,9 +117,11 @@ const BlogArticleTemplate = () => {
                   <span className="hidden sm:inline">Retour au site</span>
                 </Button>
               </Link>
-              <Link to="/blog">
-                <Button variant="ghost" size="sm" className="hidden md:inline-flex">
-                  ← Tous les articles
+              <Link to="/dashboard">
+                <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                  <span className="hidden sm:inline">Accès Générateur</span>
+                  <span className="sm:hidden">Générateur</span>
+                  <ArrowRight className="w-4 h-4 sm:ml-1" />
                 </Button>
               </Link>
             </div>
