@@ -435,8 +435,7 @@ const SalesPage = () => {
       {/* ═══════════════════════════════════════ TUNNEL 3 ÉTAPES (visible dès le haut) ═══════════════════════════════════════ */}
       <FunnelStepsBar onCtaClick={scrollToPricing} />
 
-      {/* ═══════════════════════════════════════ OFFRES STYLE KDP ROCKET (cards cliquables → modal) ═══════════════════════════════════════ */}
-      <OffresKdpRocket />
+      {/* OffresKdpRocket retiré : on ne garde que l'offre 67€ */}
 
       {/* ═══════════════════════════════════════ BLACK PACK HERO (refonte sombre premium) ═══════════════════════════════════════ */}
       <BlackPackHero
