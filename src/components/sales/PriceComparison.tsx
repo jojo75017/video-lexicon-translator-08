@@ -47,9 +47,6 @@ const PriceComparison: React.FC = () => {
     }
   ];
 
-  const handleCta = () => {
-    navigate('/upsell-paiement?plan=pro');
-  };
 
   return (
     <section className="py-20 px-4 bg-background">
