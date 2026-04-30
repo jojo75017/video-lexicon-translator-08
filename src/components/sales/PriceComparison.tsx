@@ -1,14 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Check, X, Sparkles, ArrowRight, Shield, Zap } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
-import { useVipAvailability } from '@/hooks/useVipAvailability';
+import { X, Sparkles, ArrowRight } from 'lucide-react';
 
 const PriceComparison: React.FC = () => {
-  const navigate = useNavigate();
-  const { isVipAvailable } = useVipAvailability();
-  const price = '67';
 
   const comparisons = [
     {
