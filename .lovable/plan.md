@@ -1,77 +1,69 @@
-# Plan de corrections pré-lancement — Audit complet
+## Résultat de l'audit /ebook-planner
 
-## ✅ Décision tarifaire confirmée
-**67€ paiement unique, accès À VIE, AUCUNE récurrence.**
-Bannir partout : "67€/an", "abonnement", "annuel", "récurrent", "/an".
-Wording autorisé : "Accès à vie", "Paiement unique", "Pro Lifetime", "Garantie 30 jours".
+### Ce qui fonctionne bien
 
----
+- **Chargement de la page** : OK (~3s, sidebar + hero + workflow)
+- **Vue Kanban des 5 piliers** : Préparer (8) / Améliorer (9) / Produire (6) / Publier (6) / Vendre (2) — total 31 outils
+- **Les 15 agents P1-P15** sont bien présents et organisés visuellement
+- **Onboarding "1er ebook"** s'affiche correctement (modal 3 étapes)
+- **Auto-save** fonctionne (badge "Sauvé il y a 26s")
+- **Chargement projet existant** : "Le Secret du Locataire 2026" + 24 projets en historique
+- **Navigation P1** : ouvre bien l'écran Directeur Éditorial avec champ titre prérempli
+- **Aucune erreur JS bloquante** dans la console
 
-## 🔧 Bugs à corriger (par ordre de priorité)
+### Bug CRITIQUE identifié (lancement demain)
 
-### 1. 🚨 BLOQUANT — `/dashboard` inaccessible aux abonnés payants
-La route principale du générateur 15-Agents est protégée par `<AdminGate>` au lieu de `<SubscriberGate>`. Aucun client payant ne peut entrer.
-- **Fichier** : `src/App.tsx`
-- **Action** : remplacer `AdminGate` par `SubscriberGate` (mêmes props que `/ebook-planner`).
+**P1 (et tous les agents Gemini) échouent silencieusement** quand la clé API n'est pas configurée :
 
-### 2. 🚨 CRITIQUE — Wording prix incohérent ("67€/an" vs "à vie")
-Audit complet pour retirer toute mention "67€/an", "abonnement annuel", "récurrent" → remplacer par "Accès à vie" / "Paiement unique" / "Garantie 30 jours".
-- **Fichiers** : `src/pages/SalesPage.tsx`, composants dans `src/components/sales/`, `src/pages/SubscriptionPage.tsx`, `src/pages/PaiementManuelPage.tsx`, `src/pages/UpsellPage.tsx`, `src/pages/FaqAssistancePage.tsx`.
-- **Vérifier** : badges `lifetime-badge`, footer, CTA, FAQ.
+- L'edge function `editorial-director` répond **HTTP 400** avec le message : `"Clé API Gemini requise. Configurez votre clé dans Paramètres > Clés API."`
+- Côté UI : **aucun toast, aucune alerte, aucune redirection**. L'utilisateur clique "Lancer l'analyse" → rien ne se passe → il pense que le site est cassé.
+- **Impact** : 100% des nouveaux acheteurs 67€ vont vivre cet écran cassé à leur tout premier essai.
 
-### 3. 🚨 CRITIQUE — Contraste illisible sur `/audiobook-demo`
-Texte sombre sur fond sombre (titre livre, label "Écouter l'extrait", sous-texte audio).
-- **Fichier** : `src/pages/AudiobookEmbedPage.tsx` (et page démo associée)
-- **Action** : forcer classes contrastées via tokens (`text-foreground` sur fond clair, ou inverse).
+### Warnings mineurs (non bloquants)
 
-### 4. 🚨 CRITIQUE — Contraste cassé sur `/upsell`
-Sur fond violet, les noms cartes (Gemini 3 Flash, Imagen 3, Azure Speech), prix barré "147€" et label "Cliquez à VIP" sont invisibles.
-- **Fichier** : `src/pages/UpsellPage.tsx`
-- **Action** : passer en classes tokens haute lisibilité.
+- `DialogContent requires a DialogTitle` (a11y, sur un Dialog Radix — probablement EbookbotChat ou onboarding)
+- `Safety timer triggered – forcing auth check complete` (déjà documenté, fallback SubscriberGate)
+- `postMessage` cross-origin warnings : iframe Lovable preview seulement, n'apparaîtra pas en prod
 
-### 5. ⚠️ MOYEN — Blog annonce "6 Articles" mais n'en contient que 3
-- **Fichier** : `src/pages/BlogPage.tsx`
-- **Action** : remplacer la stat statique "6 Articles" par `{blogArticles.length}` dynamique → affichera "3" automatiquement.
+## Plan de correction (à exécuter avant publication)
 
-### 6. 🎨 UX — Bloc "Connexion Admin" intrusif sur `/ebook-planner`
-Quand un abonné non-connecté arrive sur `/ebook-planner`, il voit en grand un bloc "Administrateur ?" avant le formulaire abonné. Confus pour un client lambda.
-- **Fichier** : `src/components/SubscriptionAuth.tsx` (composant en amont du `SubscriberGate`)
-- **Action** : afficher ce bloc admin uniquement via toggle discret (lien "Espace admin →" en bas), ou via `?admin=1`.
+### 1. Gérer le 400 BYOK côté front (PRIORITÉ ABSOLUE)
 
-### 7. 🪶 COSMÉTIQUE — Warning meta tag deprecated
-- **Fichier** : `index.html`
-- **Action** : ajouter `<meta name="mobile-web-app-capable" content="yes" />` à côté de `apple-mobile-web-app-capable`.
+Dans le hook qui appelle `editorial-director` (probablement `src/hooks/useEbookGeneration.ts` ou un sous-composant agent dans `src/components/ebook/`) :
 
----
+- Catch le `response.error` quand le message contient "Clé API Gemini requise"
+- Afficher un **toast destructif** explicite : "Clé Gemini manquante — configurez-la pour lancer P1"
+- Ajouter un **CTA dans le toast** ou une **modale** : "Configurer ma clé →" qui ouvre directement l'onglet Paramètres / API Keys
+- Faire pareil pour les **autres edge functions IA** qui suivent le même pattern BYOK (P2 marché, P3 architecte, P4 rédaction, etc.) — recensement nécessaire
 
-## ✅ Routes confirmées OK (aucune modif)
+### 2. Onboarding "première utilisation" : pré-vérifier la clé
 
-`/blog`, `/blog/:slug`, `/demo`, `/faq`, `/formation`, `/formation-audio`, `/formation-videos`, `/communaute`, `/ebookbot`, `/cgv`, `/mentions-legales`, `/paiement-manuel`, `/confirmation-paiement`, `/paiement-succes`, `/audiobook-merci/:slug`, `/ebook-planner` (auth fonctionne), `/kdp-keywords`, `/seo-generator`, `/audit-pilot`, `/series-tomes`.
+Dans `FirstEbookOnboarding.tsx` ou avant le bouton "Démarrer (étape P1)" du workflow :
 
----
+- Si l'utilisateur n'a pas de clé Gemini en localStorage / DB → afficher une **étape 0 obligatoire** : "Avant de créer ton 1er ebook, configure ta clé Gemini gratuite (2 min)" + lien vers `/Guide_Cle_Gemini_API.pdf` déjà présent dans `/public/`
+- Bloquer le CTA "Créer mon ebook" tant que la clé n'est pas saisie
 
-## ❌ Hors scope (post-lancement, validé par toi)
+### 3. Banner global "clé manquante" dans EbookPlannerPage
 
-- ❌ Ajouter 3 articles blog supplémentaires pour atteindre "6 articles" (on garde 3, on corrige juste le compteur — bug #5).
-- ❌ Refonte UX complète du `SubscriberGate` (au-delà de cacher le bloc admin — bug #6 limité à la cosmétique).
-- ❌ Warning React `UNSAFE_componentWillMount` (provient d'une lib externe non maintenue par nous).
+Dans `src/pages/EbookPlannerPage.tsx` :
 
----
+- En haut de page, si pas de clé → bandeau orange persistant : "⚠️ Configure ta clé Gemini pour activer les 15 agents IA — [Configurer maintenant]"
 
-## 📦 Mise à jour mémoire (après build)
+### 4. Corriger le warning a11y DialogContent (optionnel)
 
-- `mem://business/pricing/subscription-model-2026` : remplacer "67€/an" par "67€ paiement unique à vie, aucune récurrence".
-- `mem://index.md` : mettre à jour la ligne référence + ajouter règle Core "PRICING : 67€ à vie, jamais /an".
+Identifier le Dialog sans `DialogTitle` (probablement `EbookbotChat.tsx` ou similaire) et wrapper le titre avec `VisuallyHidden` de Radix.
 
----
+## Hors scope (post-lancement)
 
-## 🚀 Après les 7 corrections
+- Test exhaustif d'exécution des 14 autres agents (P2 → P15) — bloqué tant que P1 n'a pas validé une réponse Gemini réelle
+- Refonte de la page Paramètres / Clés API
+- Suppression du warning `Safety timer` (déjà connu, mémorisé)
 
-1. Build automatique Lovable.
-2. Tu cliques **"Publier"** pour déployer sur `ebookstudio.fr`.
-3. Hard refresh (Ctrl+Shift+R) pour vider le cache CDN.
-4. Lancement demain ✨
+## Question rapide
 
----
+Veux-tu que je :
+- **A)** Applique seulement la correction #1 (toast + redirection) — minimum vital pour ne pas perdre les ventes demain
+- **B)** Applique #1 + #2 + #3 (parcours BYOK complet et bloquant) — recommandé pour un vrai lancement pro
+- **C)** Applique tout (#1 à #4)
 
-**👉 Dis-moi "go" pour que je passe en mode build et lance les 7 corrections.**
+Dis-moi A, B ou C et je passe en mode build.
