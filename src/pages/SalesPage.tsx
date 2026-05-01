@@ -15,7 +15,7 @@ import AuthorShowcase from "@/components/sales/AuthorShowcase";
 import PriceComparison from "@/components/sales/PriceComparison";
 // (BonusStack, BlackPackPricing, OffresKdpRocket retirés — encart prix unifié dans #pricing)
 import CountdownTimer from "@/components/sales/CountdownTimer";
-import UrgencyBanner from "@/components/sales/UrgencyBanner";
+
 import GuaranteeSection from "@/components/sales/GuaranteeSection";
 import HeroVideoTeaser from "@/components/sales/HeroVideoTeaser";
 import AgentsShowcase from "@/components/sales/AgentsShowcase";
