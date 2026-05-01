@@ -15,7 +15,7 @@ import AuthorShowcase from "@/components/sales/AuthorShowcase";
 import PriceComparison from "@/components/sales/PriceComparison";
 // (BonusStack, BlackPackPricing, OffresKdpRocket retirés — encart prix unifié dans #pricing)
 import CountdownTimer from "@/components/sales/CountdownTimer";
-import UrgencyBanner from "@/components/sales/UrgencyBanner";
+
 import GuaranteeSection from "@/components/sales/GuaranteeSection";
 import HeroVideoTeaser from "@/components/sales/HeroVideoTeaser";
 import AgentsShowcase from "@/components/sales/AgentsShowcase";
@@ -270,128 +270,82 @@ const SalesPage = () => {
         })}</script>
       </Helmet>
 
-      {/* ═══════════════════════════════════════ STICKY ACCESS BANNER (connected users) ═══════════════════════════════════════ */}
-      {(hasSubscriberAccess || hasAdminSession) && (
-        <div className="sticky top-0 z-50 bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg">
-          <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3 px-4 py-2.5">
-            <div className="flex items-center gap-2 text-sm font-medium">
-              <CheckCircle className="w-4 h-4 flex-shrink-0" />
-              <span>
-                {hasAdminSession ? 'Session admin active' : 'Abonnement actif détecté'}
-                {hasWorkflowProgress && ' — projet en cours sauvegardé'}
-              </span>
-            </div>
+      {/* ═══════════════ ADMIN-ONLY DISCRETE BAR (hidden from regular subscribers & visitors) ═══════════════ */}
+      {hasAdminSession && (
+        <div className="bg-emerald-700 text-white text-xs">
+          <div className="max-w-6xl mx-auto flex items-center justify-between gap-3 px-4 py-1.5">
+            <span className="flex items-center gap-1.5 opacity-90">
+              <CheckCircle className="w-3 h-3" />
+              Admin
+            </span>
             <div className="flex items-center gap-2">
-              {hasAdminSession && (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => navigate('/admin')}
-                  className="bg-white/10 border-white/30 text-white hover:bg-white/20 h-8"
-                >
-                  Admin
-                </Button>
-              )}
-              <Button
-                size="sm"
+              <button
+                onClick={() => navigate('/admin')}
+                className="underline underline-offset-2 hover:opacity-80"
+              >
+                Dashboard
+              </button>
+              <span className="opacity-50">·</span>
+              <button
                 onClick={() => navigate('/ebook-planner')}
-                className="bg-white text-emerald-700 hover:bg-white/90 font-bold h-8"
+                className="underline underline-offset-2 hover:opacity-80"
               >
-                <Rocket className="w-3.5 h-3.5 mr-1.5" />
-                Accéder au Générateur
-              </Button>
+                Générateur
+              </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* ═══════════════════════════════════════ KDP TOOLS QUICK ACCESS (connected users) ═══════════════════════════════════════ */}
-      {(hasSubscriberAccess || hasAdminSession) && (
-        <div className="bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 dark:from-amber-950/30 dark:via-orange-950/20 dark:to-amber-950/30 border-b border-amber-200/60 dark:border-amber-800/30">
-          <div className="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-2 text-sm">
-              <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-              <span className="font-semibold text-foreground">Outils KDP exclusifs</span>
-              <Badge className="bg-amber-400 text-amber-950 hover:bg-amber-400 text-[10px]">Nouveau</Badge>
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => navigate('/kdp-keywords')}
-                className="h-8 gap-1.5 border-amber-300 dark:border-amber-700 hover:bg-amber-100 dark:hover:bg-amber-900/30"
-              >
-                <Key className="w-3.5 h-3.5" />
-                Mots-Clés KDP Pro
-              </Button>
-              <Button
-                size="sm"
-                onClick={() => navigate('/audit-pilot')}
-                className="h-8 gap-1.5 bg-gradient-to-r from-primary to-teal-600 text-primary-foreground hover:opacity-90"
-              >
-                <ShieldCheck className="w-3.5 h-3.5" />
-                Audit Pilot KDP
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ═══════════════════════════════════════ URGENCY BANNER ═══════════════════════════════════════ */}
-      <UrgencyBanner />
-
-      {/* ═══════════════════════════════════════ CHROME EXTENSION TOP BANNER ═══════════════════════════════════════ */}
-      <button
-        type="button"
-        onClick={() => navigate('/extension-chrome')}
-        className="block w-full transition-all hover:brightness-110"
-        style={{ background: 'linear-gradient(90deg, hsl(24 83% 53%) 0%, hsl(20 80% 44%) 46%, hsl(181 78% 32%) 100%)' }}
-      >
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-3 px-4 py-3 text-center">
-          <div className="text-lg font-black" style={{ color: 'hsl(0 0% 100%)' }}>🚀</div>
-          <div
-            className="rounded-md px-2 py-0.5 text-xs font-black uppercase"
-            style={{ backgroundColor: 'hsl(0 0% 100% / 0.18)', color: 'hsl(0 0% 100%)' }}
-          >
-            Nouveau
-          </div>
-          <div className="text-sm font-bold sm:text-[15px]" style={{ color: 'hsl(0 0% 100%)' }}>
-            Extension Chrome <strong style={{ color: 'hsl(0 0% 100%)' }}>100% gratuite</strong> — Score de niche Amazon en 1 clic
-          </div>
-          <div className="text-sm font-black underline underline-offset-4" style={{ color: 'hsl(0 0% 100%)' }}>
-            Télécharger →
-          </div>
-        </div>
-      </button>
-
-      {/* ═══════════════════════════════════════ TOP BAR ═══════════════════════════════════════ */}
+      {/* ═══════════════ MEGA BANNER UNIQUE — Offre + Garantie + Extension fusionnés ═══════════════ */}
       <div
         className="px-4 py-2.5"
         style={{ background: 'linear-gradient(90deg, hsl(188 91% 24%) 0%, hsl(185 90% 30%) 100%)' }}
       >
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-3 sm:gap-4">
-          <div className="flex items-center gap-2 text-sm font-black sm:text-[15px]" style={{ color: 'hsl(0 0% 100%)' }}>
-            <Flame className="h-4 w-4" style={{ color: 'hsl(0 0% 100%)' }} />
-            <div style={{ color: 'hsl(0 0% 100%)' }}>OFFRE DE LANCEMENT — Fin le 15 septembre 2026</div>
-          </div>
-          <div
-            className="hidden items-center gap-1.5 rounded-lg px-3 py-1 sm:flex"
-            style={{ backgroundColor: 'hsl(0 0% 100% / 0.18)', color: 'hsl(0 0% 100%)' }}
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-white text-sm font-bold">
+          <span className="flex items-center gap-1.5">
+            <Flame className="h-4 w-4" />
+            <span className="font-black">−150€ jusqu'au 15 sept.</span>
+          </span>
+          <span className="hidden sm:inline opacity-40">·</span>
+          <span className="hidden sm:flex items-center gap-1.5 tabular-nums">
+            <span className="font-black">{countdown.days}j {countdown.hours}h {countdown.minutes}m</span>
+          </span>
+          <span className="hidden sm:inline opacity-40">·</span>
+          <span className="hidden md:flex items-center gap-1.5">
+            <ShieldCheck className="h-3.5 w-3.5" />
+            Garantie 30 jours
+          </span>
+          <span className="hidden md:inline opacity-40">·</span>
+          <button
+            type="button"
+            onClick={() => navigate('/extension-chrome')}
+            className="flex items-center gap-1.5 underline underline-offset-2 hover:opacity-90"
           >
-            <div className="tabular-nums font-black" style={{ color: 'hsl(0 0% 100%)' }}>{countdown.days}j</div>
-            <div style={{ color: 'hsl(0 0% 100%)' }}>:</div>
-            <div className="tabular-nums font-black" style={{ color: 'hsl(0 0% 100%)' }}>{countdown.hours}h</div>
-            <div style={{ color: 'hsl(0 0% 100%)' }}>:</div>
-            <div className="tabular-nums font-black" style={{ color: 'hsl(0 0% 100%)' }}>{countdown.minutes}m</div>
-          </div>
-          <Badge
-            className="border-0 font-black"
-            style={{ backgroundColor: 'hsl(0 0% 100%)', color: 'hsl(188 91% 24%)' }}
-          >
-            −150€
-          </Badge>
+            🚀 Extension Chrome gratuite
+          </button>
         </div>
       </div>
+
+      {/* ═══════════════ Subscriber quick CTA (single discreet line for logged-in users only) ═══════════════ */}
+      {hasSubscriberAccess && !hasAdminSession && (
+        <div className="bg-emerald-50 dark:bg-emerald-950/20 border-b border-emerald-200 dark:border-emerald-800/30">
+          <div className="max-w-6xl mx-auto flex items-center justify-between gap-3 px-4 py-2 text-sm">
+            <span className="flex items-center gap-1.5 text-emerald-800 dark:text-emerald-300 font-medium">
+              <CheckCircle className="w-3.5 h-3.5" />
+              Votre accès est actif{hasWorkflowProgress && ' — projet sauvegardé'}
+            </span>
+            <Button
+              size="sm"
+              onClick={() => navigate('/ebook-planner')}
+              className="h-7 bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
+            >
+              <Rocket className="w-3 h-3 mr-1" />
+              Ouvrir le Générateur
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* ═══════════════════════════════════════ HEADER ═══════════════════════════════════════ */}
       <header className="sticky top-[42px] z-50 bg-background/90 backdrop-blur-xl border-b border-border">
