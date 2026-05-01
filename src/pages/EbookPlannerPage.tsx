@@ -3035,12 +3035,11 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       )}
 
       <main className="flex-1 overflow-y-auto">
-        <FirstVisitBanner />
         <MissingApiKeyBanner
           apiKey={apiKey}
           onScrollToKeyField={() => {
-            // Switch to the parameters tab if needed, then scroll to the key field
-            setActiveTab('settings');
+            // The Gemini key field lives inside the "planner" tab — switch to it first
+            setActiveTab('planner');
             setTimeout(() => {
               const el = document.getElementById('gemini-api-key-field');
               if (el) {
@@ -3048,9 +3047,10 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                 const input = el.querySelector('input');
                 if (input) (input as HTMLInputElement).focus();
               }
-            }, 250);
+            }, 350);
           }}
         />
+        <FirstVisitBanner />
         {/* Back to board button in trello mode */}
         {viewMode === 'trello' && activeTab !== 'workflow-dashboard' && (
           <div className="bg-card border-b border-border px-6 py-3 flex items-center gap-3">
