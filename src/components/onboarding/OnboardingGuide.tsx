@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { Button } from '@/components/ui/button';
 import { BookOpen, Sparkles, Zap, ArrowRight, CheckCircle2, Rocket } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
