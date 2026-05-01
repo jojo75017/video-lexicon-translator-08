@@ -1,69 +1,56 @@
-## Résultat de l'audit /ebook-planner
+# Bugs trouvés dans l'audit du flow ebook-planner
 
-### Ce qui fonctionne bien
+J'ai retesté la page `/ebook-planner` après les corrections de tout à l'heure. Bonne nouvelle : la console est propre (zéro erreur applicative, juste 6 warnings inoffensifs de la lib Lovable externe sur `postMessage` cross-origin — non bloquants). La bannière jaune "Clé Gemini manquante" s'affiche bien et le modal d'onboarding aussi.
 
-- **Chargement de la page** : OK (~3s, sidebar + hero + workflow)
-- **Vue Kanban des 5 piliers** : Préparer (8) / Améliorer (9) / Produire (6) / Publier (6) / Vendre (2) — total 31 outils
-- **Les 15 agents P1-P15** sont bien présents et organisés visuellement
-- **Onboarding "1er ebook"** s'affiche correctement (modal 3 étapes)
-- **Auto-save** fonctionne (badge "Sauvé il y a 26s")
-- **Chargement projet existant** : "Le Secret du Locataire 2026" + 24 projets en historique
-- **Navigation P1** : ouvre bien l'écran Directeur Éditorial avec champ titre prérempli
-- **Aucune erreur JS bloquante** dans la console
+**Mais 3 bugs concrets restent à fixer.**
 
-### Bug CRITIQUE identifié (lancement demain)
+---
 
-**P1 (et tous les agents Gemini) échouent silencieusement** quand la clé API n'est pas configurée :
+## Bug #1 — Bouton "Coller ma clé" envoie sur un tab inexistant
 
-- L'edge function `editorial-director` répond **HTTP 400** avec le message : `"Clé API Gemini requise. Configurez votre clé dans Paramètres > Clés API."`
-- Côté UI : **aucun toast, aucune alerte, aucune redirection**. L'utilisateur clique "Lancer l'analyse" → rien ne se passe → il pense que le site est cassé.
-- **Impact** : 100% des nouveaux acheteurs 67€ vont vivre cet écran cassé à leur tout premier essai.
+**Symptôme :** Quand l'utilisateur clique sur le bouton orange "Coller ma clé" dans la bannière jaune, l'appel `setActiveTab('settings')` est lancé… mais ce tab **n'existe pas** dans la page. Les vrais tabs sont `planner`, `workflow-dashboard`, `complete-workflow`, `projects`, `onboarding`, `writing`, etc. Résultat : le clic ne fait rien de visible, le scroll vers le champ ne se déclenche jamais.
 
-### Warnings mineurs (non bloquants)
+**Fix :** Remplacer `setActiveTab('settings')` par `setActiveTab('planner')` dans le handler de `MissingApiKeyBanner` (dans `EbookPlannerPage.tsx`), et augmenter le délai du `setTimeout` de 250 → 350 ms pour laisser le temps au tab de se monter avant le scroll.
 
-- `DialogContent requires a DialogTitle` (a11y, sur un Dialog Radix — probablement EbookbotChat ou onboarding)
-- `Safety timer triggered – forcing auth check complete` (déjà documenté, fallback SubscriberGate)
-- `postMessage` cross-origin warnings : iframe Lovable preview seulement, n'apparaîtra pas en prod
+---
 
-## Plan de correction (à exécuter avant publication)
+## Bug #2 — Toast "Clé API Gemini requise" dans le workflow auto trop sec
 
-### 1. Gérer le 400 BYOK côté front (PRIORITÉ ABSOLUE)
+**Symptôme :** Quand l'utilisateur clique sur "Créer mon ebook (Workflow IA)" sans clé, il reçoit juste `toast.error('Clé API Gemini requise')` (ligne 810 de `EbookPlannerPage.tsx`). Pas de lien vers AI Studio, pas d'action pour ouvrir la bannière, pas de description. C'est l'inverse de ce qu'on a fait sur P1.
 
-Dans le hook qui appelle `editorial-director` (probablement `src/hooks/useEbookGeneration.ts` ou un sous-composant agent dans `src/components/ebook/`) :
+**Fix :** Aligner ce toast sur le pattern intelligent de P1 (description + action vers `aistudio.google.com/apikey` + duration 8000 ms).
 
-- Catch le `response.error` quand le message contient "Clé API Gemini requise"
-- Afficher un **toast destructif** explicite : "Clé Gemini manquante — configurez-la pour lancer P1"
-- Ajouter un **CTA dans le toast** ou une **modale** : "Configurer ma clé →" qui ouvre directement l'onglet Paramètres / API Keys
-- Faire pareil pour les **autres edge functions IA** qui suivent le même pattern BYOK (P2 marché, P3 architecte, P4 rédaction, etc.) — recensement nécessaire
+---
 
-### 2. Onboarding "première utilisation" : pré-vérifier la clé
+## Bug #3 — Bannière jaune cachée sous le bandeau bienvenue
 
-Dans `FirstEbookOnboarding.tsx` ou avant le bouton "Démarrer (étape P1)" du workflow :
+**Symptôme :** Sur le screenshot, la bannière jaune "Clé Gemini manquante" est partiellement masquée par le bandeau orange-pâle "👋 Bienvenue sur EbookStudio !" qui flotte au-dessus. L'œil ne capte pas immédiatement l'alerte — qui est pourtant la chose la plus importante.
 
-- Si l'utilisateur n'a pas de clé Gemini en localStorage / DB → afficher une **étape 0 obligatoire** : "Avant de créer ton 1er ebook, configure ta clé Gemini gratuite (2 min)" + lien vers `/Guide_Cle_Gemini_API.pdf` déjà présent dans `/public/`
-- Bloquer le CTA "Créer mon ebook" tant que la clé n'est pas saisie
+**Fix :** Donner à `MissingApiKeyBanner` un `z-index` plus élevé que le bandeau de bienvenue, ou inverser l'ordre de rendu (mettre la bannière clé AVANT `FirstVisitBanner`).
 
-### 3. Banner global "clé manquante" dans EbookPlannerPage
+---
 
-Dans `src/pages/EbookPlannerPage.tsx` :
+## Vérifications faites (pas de bug)
 
-- En haut de page, si pas de clé → bandeau orange persistant : "⚠️ Configure ta clé Gemini pour activer les 15 agents IA — [Configurer maintenant]"
+- ✅ Console : aucune erreur React, aucun warning DialogTitle restant
+- ✅ Modal `OnboardingGuide` charge bien avec son titre a11y invisible
+- ✅ La bannière disparaît bien dès qu'une clé valide est saisie (logique conditionnelle OK)
+- ✅ Le format `AIza` est validé côté Step 0 onboarding
+- ✅ Aucune erreur edge function dans les logs récents (`editorial-director`, `check-admin` répondent normalement)
 
-### 4. Corriger le warning a11y DialogContent (optionnel)
+---
 
-Identifier le Dialog sans `DialogTitle` (probablement `EbookbotChat.tsx` ou similaire) et wrapper le titre avec `VisuallyHidden` de Radix.
+## Hors scope (à confirmer si tu veux qu'on les fasse aussi)
 
-## Hors scope (post-lancement)
+- Les **20+ autres agents** (`generate-content`, `editorial-memory`, `expert-writing`, `generate-cover-prompt`, etc.) appellent leurs edge functions avec le même pattern que P1. **Aucun n'a été migré au toast intelligent.** Si l'utilisateur lance P5 (rédaction), P12 (couverture) ou n'importe quel autre agent sans clé, il aura le même toast générique muet qu'avant. Faire le même fix pour tous serait propre, mais représente ~20 fichiers à toucher.
+- Le `setActiveTab` du Step 0 onboarding redirige vers `/ebook-planner` qui ouvre le tab par défaut (workflow-dashboard) — pas le formulaire `planner`. À voir si on veut changer ça aussi.
 
-- Test exhaustif d'exécution des 14 autres agents (P2 → P15) — bloqué tant que P1 n'a pas validé une réponse Gemini réelle
-- Refonte de la page Paramètres / Clés API
-- Suppression du warning `Safety timer` (déjà connu, mémorisé)
+## Plan d'action
 
-## Question rapide
+Si tu approuves :
+1. Fix bug #1 (1 ligne dans `EbookPlannerPage.tsx`)
+2. Fix bug #2 (refactor du toast ligne 810)
+3. Fix bug #3 (z-index ou réordonnancement)
+4. **Optionnel** : étendre le toast intelligent aux ~20 autres agents (dis-moi si oui)
 
-Veux-tu que je :
-- **A)** Applique seulement la correction #1 (toast + redirection) — minimum vital pour ne pas perdre les ventes demain
-- **B)** Applique #1 + #2 + #3 (parcours BYOK complet et bloquant) — recommandé pour un vrai lancement pro
-- **C)** Applique tout (#1 à #4)
-
-Dis-moi A, B ou C et je passe en mode build.
+Dis "go" pour les 3 fixes critiques, ou "go + tous les agents" pour inclure aussi le point optionnel.
