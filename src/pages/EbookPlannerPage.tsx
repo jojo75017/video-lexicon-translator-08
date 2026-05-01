@@ -1697,7 +1697,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                             className="h-12 border-2 focus:border-primary"
                           />
                         </div>
-                        <div className="space-y-2">
+                        <div className="space-y-2" id="gemini-api-key-field">
                           <Label className="text-sm font-medium">Clé API Gemini</Label>
                           <Input
                             type="password"
