@@ -17,6 +17,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { SimpleSidebar } from '@/components/layout/SimpleSidebar';
 import { OnboardingGuide } from '@/components/onboarding/OnboardingGuide';
 import { FirstVisitBanner } from '@/components/onboarding/FirstVisitBanner';
+import { MissingApiKeyBanner } from '@/components/ebook/MissingApiKeyBanner';
 import { useEbookDatabase } from '@/hooks/useEbookDatabase';
 import { EbookMarketing } from '@/components/ebook/EbookMarketing';
 import {
