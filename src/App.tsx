@@ -441,12 +441,15 @@ const App = () => {
                 </AdminGate>
               }
             />
+            {/* /dashboard = panel admin (stats globales). Les abonnés vont sur /ebook-planner via redirection. */}
             <Route 
               path="/dashboard" 
               element={
-                <AdminGate>
+                isAdmin ? (
                   <Dashboard />
-                </AdminGate>
+                ) : (
+                  <Navigate to="/ebook-planner" replace />
+                )
               }
             />
             <Route 

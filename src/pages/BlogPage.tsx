@@ -177,7 +177,7 @@ const BlogPage = () => {
                   Retour au site web
                 </Button>
               </a>
-              <Link to="/dashboard">
+              <Link to="/ebook-planner">
                 <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground">
                   Accès Générateur
                   <ArrowRight className="w-4 h-4 ml-2" />

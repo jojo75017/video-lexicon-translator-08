@@ -56,7 +56,7 @@ const OFFERS: Offer[] = [
       "✅ CRM + module marketing intégrés",
       "✅ Communauté privée + support direct",
       "✅ Toutes les futures mises à jour à vie",
-      "✅ Garantie satisfait ou remboursé 7 jours",
+      "✅ Garantie satisfait ou remboursé 30 jours",
     ],
     cta: "Verrouiller mon accès à vie pour 67€",
     ctaUrl: "/paiement-manuel?offer=founder-lifetime&price=67",
@@ -223,7 +223,7 @@ export default function OffresKdpRocket() {
                       </span>
                     )}
                     <span className="text-4xl font-extrabold text-black">{selected.price}</span>
-                    <p className="text-xs text-gray-600 mt-1">Paiement sécurisé · Garantie 7 jours</p>
+                    <p className="text-xs text-gray-600 mt-1">Paiement unique · Accès à vie · Garantie 30 jours</p>
                   </div>
                   <Button
                     onClick={() => {

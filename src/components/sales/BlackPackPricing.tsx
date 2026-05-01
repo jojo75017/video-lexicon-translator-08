@@ -233,7 +233,7 @@ const BlackPackPricing = ({ onCtaClick, launchPrice = 67, normalPrice = 147 }: B
               email={email}
               className="w-full inline-flex items-center justify-center gap-3 rounded-xl px-6 py-4 sm:py-5 font-black text-base sm:text-lg transition-all hover:scale-[1.02] active:scale-100 disabled:opacity-60 disabled:hover:scale-100 mb-3"
             >
-              💳 Payer par carte — €{launchPrice}/an
+              💳 Payer par carte — €{launchPrice} à vie
             </StripeCheckoutButton>
 
             {/* Séparateur */}
@@ -265,10 +265,10 @@ const BlackPackPricing = ({ onCtaClick, launchPrice = 67, normalPrice = 147 }: B
           >
             <span className="inline-flex items-center gap-1.5">
               <ShieldCheck className="h-4 w-4" style={{ color: GOLD }} />
-              7 jours d'essai gratuit
+              Garantie 30 jours satisfait ou remboursé
             </span>
-            <span>· Annulable en 1 clic</span>
-            <span>· Paiement 100% sécurisé</span>
+            <span>· Paiement unique · Accès à vie</span>
+            <span>· 100% sécurisé</span>
           </div>
         </motion.div>
       </div>

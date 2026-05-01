@@ -111,11 +111,11 @@ const FunnelStepsBar = ({ onCtaClick }: FunnelStepsBarProps) => {
               boxShadow: "0 10px 25px -5px rgba(245, 158, 11, 0.5)",
             }}
           >
-            <span style={{ color: "#FFFFFF" }}>🚀 Démarrer maintenant — 67€/an</span>
+            <span style={{ color: "#FFFFFF" }}>🚀 Démarrer maintenant — 67€ à vie</span>
             <ArrowRight className="w-5 h-5" style={{ color: "#FFFFFF" }} />
           </button>
           <span className="text-xs text-muted-foreground">
-            ✓ 7 jours gratuits · ✓ Sans engagement · ✓ Paiement sécurisé
+            ✓ Paiement unique · ✓ Garantie 30 jours · ✓ Paiement sécurisé
           </span>
         </div>
       </div>
