@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { BookOpen, Sparkles, Zap, ArrowRight, CheckCircle2, Rocket } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -75,6 +75,10 @@ export const OnboardingGuide = ({ userName }: OnboardingGuideProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => { if (!open) handleSkip(); }}>
       <DialogContent className="sm:max-w-lg p-0 overflow-hidden border-border bg-card text-foreground">
+        <DialogTitle className="sr-only">Guide d'onboarding EbookStudio</DialogTitle>
+        <DialogDescription className="sr-only">
+          Découvrez les principales fonctionnalités d'EbookStudio en quelques étapes guidées.
+        </DialogDescription>
         {/* Progress */}
         <div className="flex gap-1.5 px-6 pt-5">
           {steps.map((_, i) => (

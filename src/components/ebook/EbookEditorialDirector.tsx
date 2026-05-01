@@ -137,6 +137,19 @@ export const EbookEditorialDirector = ({
       return;
     }
 
+    // BYOK guard — no key, no call. Avoid silent 400 from edge function.
+    if (!userGeminiKey || userGeminiKey.trim().length === 0) {
+      toast.error("Clé API Gemini manquante", {
+        description: "Collez votre clé (AIza...) dans le champ 'Clé API Gemini' plus bas. Gratuit sur aistudio.google.com.",
+        action: {
+          label: "Obtenir une clé",
+          onClick: () => window.open("https://aistudio.google.com/apikey", "_blank"),
+        },
+        duration: 8000,
+      });
+      return;
+    }
+
     // Évite de lancer plusieurs analyses en parallèle si l'utilisateur clique vite
     if (isAnalyzing) return;
 
@@ -157,9 +170,28 @@ export const EbookEditorialDirector = ({
         onAnalysisComplete?.(data.analysis);
         toast.success("Analyse éditoriale terminée !");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erreur analyse:", error);
-      toast.error("Erreur lors de l'analyse. Réessayez.");
+      const msg = String(error?.message || error || "");
+      const isKeyError =
+        msg.includes("400") ||
+        msg.includes("401") ||
+        msg.includes("403") ||
+        /api.?key/i.test(msg) ||
+        /clé/i.test(msg);
+
+      if (isKeyError) {
+        toast.error("Clé Gemini invalide ou expirée", {
+          description: "Vérifiez votre clé sur aistudio.google.com (elle doit commencer par AIza).",
+          action: {
+            label: "Vérifier ma clé",
+            onClick: () => window.open("https://aistudio.google.com/apikey", "_blank"),
+          },
+          duration: 8000,
+        });
+      } else {
+        toast.error("Erreur lors de l'analyse. Réessayez.");
+      }
     } finally {
       setIsAnalyzing(false);
     }

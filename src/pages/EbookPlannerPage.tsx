@@ -17,6 +17,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { SimpleSidebar } from '@/components/layout/SimpleSidebar';
 import { OnboardingGuide } from '@/components/onboarding/OnboardingGuide';
 import { FirstVisitBanner } from '@/components/onboarding/FirstVisitBanner';
+import { MissingApiKeyBanner } from '@/components/ebook/MissingApiKeyBanner';
 import { useEbookDatabase } from '@/hooks/useEbookDatabase';
 import { EbookMarketing } from '@/components/ebook/EbookMarketing';
 import {
@@ -1697,7 +1698,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                             className="h-12 border-2 focus:border-primary"
                           />
                         </div>
-                        <div className="space-y-2">
+                        <div className="space-y-2" id="gemini-api-key-field">
                           <Label className="text-sm font-medium">Clé API Gemini</Label>
                           <Input
                             type="password"
@@ -3035,6 +3036,21 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
 
       <main className="flex-1 overflow-y-auto">
         <FirstVisitBanner />
+        <MissingApiKeyBanner
+          apiKey={apiKey}
+          onScrollToKeyField={() => {
+            // Switch to the parameters tab if needed, then scroll to the key field
+            setActiveTab('settings');
+            setTimeout(() => {
+              const el = document.getElementById('gemini-api-key-field');
+              if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                const input = el.querySelector('input');
+                if (input) (input as HTMLInputElement).focus();
+              }
+            }, 250);
+          }}
+        />
         {/* Back to board button in trello mode */}
         {viewMode === 'trello' && activeTab !== 'workflow-dashboard' && (
           <div className="bg-card border-b border-border px-6 py-3 flex items-center gap-3">
