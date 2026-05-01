@@ -807,7 +807,14 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       return;
     }
     if (!apiKey) {
-      toast.error('Clé API Gemini requise');
+      toast.error('Clé API Gemini requise', {
+        description: 'Les 15 agents IA ont besoin de votre clé Gemini gratuite pour générer votre ebook. Récupérez-la sur Google AI Studio.',
+        action: {
+          label: 'Obtenir ma clé',
+          onClick: () => window.open('https://aistudio.google.com/apikey', '_blank'),
+        },
+        duration: 8000,
+      });
       return;
     }
 
