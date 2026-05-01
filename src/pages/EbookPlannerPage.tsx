@@ -3036,6 +3036,21 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
 
       <main className="flex-1 overflow-y-auto">
         <FirstVisitBanner />
+        <MissingApiKeyBanner
+          apiKey={apiKey}
+          onScrollToKeyField={() => {
+            // Switch to the parameters tab if needed, then scroll to the key field
+            setActiveTab('settings');
+            setTimeout(() => {
+              const el = document.getElementById('gemini-api-key-field');
+              if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                const input = el.querySelector('input');
+                if (input) (input as HTMLInputElement).focus();
+              }
+            }, 250);
+          }}
+        />
         {/* Back to board button in trello mode */}
         {viewMode === 'trello' && activeTab !== 'workflow-dashboard' && (
           <div className="bg-card border-b border-border px-6 py-3 flex items-center gap-3">
