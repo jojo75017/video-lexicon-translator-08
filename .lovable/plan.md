@@ -1,52 +1,77 @@
-## Corrections de la page `/offres` avant lancement
+# Plan de corrections pré-lancement — Audit complet
 
-### 1. Fusion finale des encarts tarifs (1 SEUL bloc)
+## ✅ Décision tarifaire confirmée
+**67€ paiement unique, accès À VIE, AUCUNE récurrence.**
+Bannir partout : "67€/an", "abonnement", "annuel", "récurrent", "/an".
+Wording autorisé : "Accès à vie", "Paiement unique", "Pro Lifetime", "Garantie 30 jours".
 
-Aujourd'hui, la page contient encore **3 zones de prix** :
-- `<BlackPackHero>` (L441) — hero sombre avec prix
-- `<PriceComparison />` (L625) — bloc comparatif qui se termine par un encart prix
-- Section `#pricing` (L678) — bloc prix unifié final
+---
 
-**Action :**
-- **Garder uniquement** la section `#pricing` (L678) comme encart prix officiel.
-- **Modifier `<BlackPackHero>`** : retirer l'affichage du prix et le CTA prix → remplacer par un CTA neutre type "Découvrir l'offre" qui scrolle vers `#pricing`. (Le hero garde son rôle de bannière premium sans dupliquer le tarif.)
-- **Modifier `<PriceComparison>`** : tronquer le composant après le grid des comparatifs concurrents (services freelance, ghostwriter, etc.) et **supprimer la carte "EbookStudio Pro" finale** avec son prix 67€/CTA. Remplacer par un simple lien "Voir notre offre ↓" qui scrolle vers `#pricing`.
+## 🔧 Bugs à corriger (par ordre de priorité)
 
-Résultat : un seul prix affiché, en bas de page, dans `#pricing`.
+### 1. 🚨 BLOQUANT — `/dashboard` inaccessible aux abonnés payants
+La route principale du générateur 15-Agents est protégée par `<AdminGate>` au lieu de `<SubscriberGate>`. Aucun client payant ne peut entrer.
+- **Fichier** : `src/App.tsx`
+- **Action** : remplacer `AdminGate` par `SubscriberGate` (mêmes props que `/ebook-planner`).
 
-### 2. Verrouillage des outils Audit + Mots-clés (réservés abonnés)
+### 2. 🚨 CRITIQUE — Wording prix incohérent ("67€/an" vs "à vie")
+Audit complet pour retirer toute mention "67€/an", "abonnement annuel", "récurrent" → remplacer par "Accès à vie" / "Paiement unique" / "Garantie 30 jours".
+- **Fichiers** : `src/pages/SalesPage.tsx`, composants dans `src/components/sales/`, `src/pages/SubscriptionPage.tsx`, `src/pages/PaiementManuelPage.tsx`, `src/pages/UpsellPage.tsx`, `src/pages/FaqAssistancePage.tsx`.
+- **Vérifier** : badges `lifetime-badge`, footer, CTA, FAQ.
 
-- Le bandeau orange "Outils KDP exclusifs" (L320-349) est déjà conditionné à `hasSubscriberAccess || hasAdminSession` — **OK, rien à faire ici**.
-- Vérifier qu'il n'existe pas d'autres CTA publics vers `/kdp-keywords` ou `/audit-pilot` ailleurs sur la page (`grep` confirmera, sinon retirer).
-- Confirmer que les routes `/kdp-keywords` et `/audit-pilot` sont bien protégées par `<SubscriberGate>` dans `App.tsx`.
+### 3. 🚨 CRITIQUE — Contraste illisible sur `/audiobook-demo`
+Texte sombre sur fond sombre (titre livre, label "Écouter l'extrait", sous-texte audio).
+- **Fichier** : `src/pages/AudiobookEmbedPage.tsx` (et page démo associée)
+- **Action** : forcer classes contrastées via tokens (`text-foreground` sur fond clair, ou inverse).
 
-### 3. Suppression des avis fake (risque légal)
+### 4. 🚨 CRITIQUE — Contraste cassé sur `/upsell`
+Sur fond violet, les noms cartes (Gemini 3 Flash, Imagen 3, Azure Speech), prix barré "147€" et label "Cliquez à VIP" sont invisibles.
+- **Fichier** : `src/pages/UpsellPage.tsx`
+- **Action** : passer en classes tokens haute lisibilité.
 
-Dans le JSON-LD de la page (L254-265) :
-- Supprimer le bloc `"review": [...]` avec Marie D., Thomas L., Sophie R. (faux noms, faux chiffres).
-- Supprimer également `"aggregateRating"` avec `reviewCount: 47` et la note moyenne fictive.
-- Garder le reste du schema (Product, Offer, FAQPage) qui est factuel.
+### 5. ⚠️ MOYEN — Blog annonce "6 Articles" mais n'en contient que 3
+- **Fichier** : `src/pages/BlogPage.tsx`
+- **Action** : remplacer la stat statique "6 Articles" par `{blogArticles.length}` dynamique → affichera "3" automatiquement.
 
-### 4. Cohérence garantie / essai
+### 6. 🎨 UX — Bloc "Connexion Admin" intrusif sur `/ebook-planner`
+Quand un abonné non-connecté arrive sur `/ebook-planner`, il voit en grand un bloc "Administrateur ?" avant le formulaire abonné. Confus pour un client lambda.
+- **Fichier** : `src/components/SubscriptionAuth.tsx` (composant en amont du `SubscriberGate`)
+- **Action** : afficher ce bloc admin uniquement via toggle discret (lien "Espace admin →" en bas), ou via `?admin=1`.
 
-Aujourd'hui : on parle à la fois de **"Garantie 30 jours satisfait ou remboursé"** et **"Essai gratuit 7 jours"** (L523, L709, L749). C'est ambigu pour le visiteur.
+### 7. 🪶 COSMÉTIQUE — Warning meta tag deprecated
+- **Fichier** : `index.html`
+- **Action** : ajouter `<meta name="mobile-web-app-capable" content="yes" />` à côté de `apple-mobile-web-app-capable`.
 
-**Décision proposée** : conserver **uniquement la garantie 30 jours satisfait ou remboursé** (cohérent avec la mémoire "free trial" qui mentionne un workflow manuel mais sur la page de vente publique on garde une promesse claire et juridiquement solide).
-- Retirer toutes les mentions "Essai gratuit 7 jours" / "7 jours sans carte" sur SalesPage.
-- La FAQ mentionne déjà la garantie 30 jours → cohérent.
+---
 
-### 5. Nettoyage code mort
+## ✅ Routes confirmées OK (aucune modif)
 
-Dans `src/pages/SalesPage.tsx` :
-- Retirer les imports inutilisés : `BonusStack` (L22), `BlackPackPricing` (L31), `OffresKdpRocket` (L33).
-- Retirer les commentaires obsolètes "BonusStack supprimé", "BlackPackPricing supprimé", "OffresKdpRocket retiré".
+`/blog`, `/blog/:slug`, `/demo`, `/faq`, `/formation`, `/formation-audio`, `/formation-videos`, `/communaute`, `/ebookbot`, `/cgv`, `/mentions-legales`, `/paiement-manuel`, `/confirmation-paiement`, `/paiement-succes`, `/audiobook-merci/:slug`, `/ebook-planner` (auth fonctionne), `/kdp-keywords`, `/seo-generator`, `/audit-pilot`, `/series-tomes`.
 
-### Fichiers modifiés
+---
 
-- `src/pages/SalesPage.tsx` (le principal)
-- `src/components/sales/BlackPackHero.tsx` (retrait prix + CTA neutre)
-- `src/components/sales/PriceComparison.tsx` (suppression card finale)
+## ❌ Hors scope (post-lancement, validé par toi)
 
-### Hors scope (à publier ensuite)
+- ❌ Ajouter 3 articles blog supplémentaires pour atteindre "6 articles" (on garde 3, on corrige juste le compteur — bug #5).
+- ❌ Refonte UX complète du `SubscriberGate` (au-delà de cacher le bloc admin — bug #6 limité à la cosmétique).
+- ❌ Warning React `UNSAFE_componentWillMount` (provient d'une lib externe non maintenue par nous).
 
-Une fois ces 4 corrections faites, **vous devrez recliquer "Publish" / "Update"** dans Lovable pour que `ebookstudio.fr` reflète la nouvelle version (les modifs frontend ne sont pas auto-déployées).
+---
+
+## 📦 Mise à jour mémoire (après build)
+
+- `mem://business/pricing/subscription-model-2026` : remplacer "67€/an" par "67€ paiement unique à vie, aucune récurrence".
+- `mem://index.md` : mettre à jour la ligne référence + ajouter règle Core "PRICING : 67€ à vie, jamais /an".
+
+---
+
+## 🚀 Après les 7 corrections
+
+1. Build automatique Lovable.
+2. Tu cliques **"Publier"** pour déployer sur `ebookstudio.fr`.
+3. Hard refresh (Ctrl+Shift+R) pour vider le cache CDN.
+4. Lancement demain ✨
+
+---
+
+**👉 Dis-moi "go" pour que je passe en mode build et lance les 7 corrections.**
