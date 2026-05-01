@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
-import { BookOpen, Clock, TrendingUp, ArrowRight, Sparkles, Target, Zap, PenTool, DollarSign, Lightbulb, Newspaper, ExternalLink, ArrowLeft, Home } from 'lucide-react';
+import { BookOpen, Clock, TrendingUp, ArrowRight, Sparkles, Target, Zap, PenTool, DollarSign, Lightbulb, Newspaper, ExternalLink, ArrowLeft, Home, Headphones } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -12,6 +12,9 @@ const articles = [
   { slug: '/blog/auto-edition-amazon-kdp', title: 'Auto-édition Amazon KDP : Le Guide Ultime 2025', excerpt: 'Tout ce qu\'il faut savoir pour réussir son auto-édition sur Amazon KDP. Formatage, prix, catégories et stratégies de lancement.', category: 'Guide', readTime: '15 min', keyword: 'auto édition amazon kdp', searchVolume: 880, icon: PenTool, gradient: 'from-rose-500 to-pink-500', date: '14 Janvier 2025' },
   { slug: '/blog/gagner-argent-ebook', title: 'Gagner de l\'Argent avec les Ebooks : Stratégies Rentables', excerpt: 'Découvrez comment générer des revenus passifs avec vos ebooks. Niches rentables, pricing et techniques de vente sur Amazon.', category: 'Monétisation', readTime: '11 min', keyword: 'gagner argent ebook', searchVolume: 590, icon: DollarSign, gradient: 'from-emerald-500 to-teal-500', date: '14 Janvier 2025' },
   { slug: '/blog/idees-ebook-rentables', title: '50 Idées d\'Ebooks Rentables à Créer en 2025', excerpt: 'Liste complète d\'idées de niches et sujets d\'ebooks qui se vendent bien sur Amazon KDP. Inspirez-vous pour votre prochain bestseller.', category: 'Inspiration', readTime: '9 min', keyword: 'idées ebook rentables', searchVolume: 390, icon: Lightbulb, gradient: 'from-indigo-500 to-blue-500', date: '14 Janvier 2025' },
+  { slug: '/blog/ebookstudio-pro-avis', title: 'EbookStudio Pro : Avis Complet, Fonctionnalités et Test 2026', excerpt: 'Test complet : workflow 15 agents IA, Gemini 3 Flash, audiobooks Azure, export KDP. Avis honnête sur le pack 67€ à vie.', category: 'Avis', readTime: '13 min', keyword: 'ebookstudio pro avis', searchVolume: 320, icon: Sparkles, gradient: 'from-amber-500 to-orange-500', date: '1 Mai 2026' },
+  { slug: '/blog/kdp-pilot-strategie-publication', title: 'KDP Pilot : La Stratégie de Publication Amazon qui Cartonne en 2026', excerpt: 'Méthode complète : sélection de niches, mots-clés Amazon, BSR, séries et lancement optimisé pour percer sur Kindle Direct Publishing.', category: 'Stratégie', readTime: '14 min', keyword: 'kdp pilot stratégie', searchVolume: 410, icon: Target, gradient: 'from-violet-500 to-purple-600', date: '1 Mai 2026' },
+  { slug: '/blog/audiobook-ia-amazon-acx', title: 'Créer un Audiobook IA en 2026 : Guide Complet (Amazon ACX, Audible)', excerpt: 'Méthode complète pour créer, héberger et vendre un audiobook IA professionnel. Voix Azure, segmentation, ACX et vente directe.', category: 'Audiobook', readTime: '12 min', keyword: 'créer audiobook ia', searchVolume: 480, icon: Headphones, gradient: 'from-cyan-500 to-blue-600', date: '1 Mai 2026' },
 ];
 
 const BlogPage = () => {
@@ -177,7 +180,7 @@ const BlogPage = () => {
                   Retour au site web
                 </Button>
               </a>
-              <Link to="/dashboard">
+              <Link to="/ebook-planner">
                 <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground">
                   Accès Générateur
                   <ArrowRight className="w-4 h-4 ml-2" />
