@@ -131,7 +131,7 @@ const ExtensionChromePage = () => {
                   className="w-full bg-black hover:bg-gray-900 text-white border-0 font-bold text-base px-8 py-6 rounded-xl transition-all hover:scale-[1.01]"
                 >
                   <Crown className="w-5 h-5 mr-2 text-orange-400" />
-                  Passer Pro — 67€/an (analyses illimitées)
+                  Passer Pro — 67€ à vie (analyses illimitées)
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
 
@@ -402,7 +402,7 @@ const ExtensionChromePage = () => {
                   className="bg-white hover:bg-orange-100 text-orange-600 font-bold text-base px-8 py-6 rounded-xl transition-all hover:-translate-y-0.5 border-0"
                 >
                   <Crown className="w-5 h-5 mr-2" />
-                  Passer Pro — 67€/an
+                  Passer Pro — 67€ à vie
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </div>
