@@ -48,8 +48,8 @@ const MetaRow = ({ icon, label, value, dark = false }: { icon: React.ReactNode; 
   <div className="flex items-start gap-3">
     <div className="mt-0.5 shrink-0">{icon}</div>
     <div className="min-w-0">
-      <p className={`text-[11px] uppercase tracking-wider mb-0.5 ${dark ? 'text-gray-400' : 'text-foreground/35'}`}>{label}</p>
-      <p className={`text-sm font-medium ${dark ? 'text-gray-700' : 'text-foreground/80'}`}>{value}</p>
+      <p className={`text-[11px] uppercase tracking-wider mb-0.5 ${dark ? 'text-gray-300' : 'text-foreground/35'}`}>{label}</p>
+      <p className={`text-sm font-medium ${dark ? 'text-white' : 'text-foreground/80'}`}>{value}</p>
     </div>
   </div>
 );
