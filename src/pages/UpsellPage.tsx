@@ -98,13 +98,13 @@ const UpsellPage = () => {
             { icon: ImageIcon, name: "Imagen 3", desc: "Couvertures pro", color: "from-violet-500 to-purple-500" },
             { icon: Headphones, name: "Azure Speech", desc: "Voix neuronales", color: "from-emerald-500 to-teal-500" },
           ].map((tech, i) => (
-            <div key={i} className="flex items-center gap-3 bg-muted border border-border rounded-xl px-4 py-3">
+            <div key={i} className="flex items-center gap-3 bg-white/10 backdrop-blur border border-white/20 rounded-xl px-4 py-3">
               <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${tech.color} flex items-center justify-center`}>
                 <tech.icon className="w-5 h-5 text-white" />
               </div>
               <div>
                 <p className="text-white font-semibold text-sm">{tech.name}</p>
-                <p className="text-gray-400 text-xs">{tech.desc}</p>
+                <p className="text-gray-200 text-xs">{tech.desc}</p>
               </div>
             </div>
           ))}
@@ -125,7 +125,7 @@ const UpsellPage = () => {
               Pro Lifetime
             </CardTitle>
             <div>
-              <p className="text-gray-400 line-through text-lg">{NORMAL_PRICE}€</p>
+              <p className="text-gray-300 line-through text-lg">{NORMAL_PRICE}€</p>
               <p className="text-4xl font-bold text-white">
                 {LAUNCH_PRICE}€ <span className="text-sm font-normal text-gray-400">unique à vie</span>
               </p>
