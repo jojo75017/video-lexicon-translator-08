@@ -19,9 +19,19 @@ export default defineConfig(({ mode }) => ({
       registerType: 'autoUpdate',
       includeAssets: ['pwa-icon-192.png', 'pwa-icon-512.png'],
       workbox: {
-        navigateFallbackDenylist: [/^\/~oauth/],
+        navigateFallbackDenylist: [/^\/~oauth/, /^\/offres(?:\/|$|\?)/],
         globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,jpeg,woff,woff2}'],
         maximumFileSizeToCacheInBytes: 20 * 1024 * 1024,
+        cleanupOutdatedCaches: true,
+        runtimeCaching: [
+          {
+            urlPattern: ({ url }) => url.pathname === '/offres',
+            handler: 'NetworkOnly',
+            options: {
+              cacheName: 'offres-network-only',
+            },
+          },
+        ],
       },
       manifest: {
         name: 'EbookStudio - Générateur de Livre IA',
