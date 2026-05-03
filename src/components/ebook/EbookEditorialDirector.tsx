@@ -130,6 +130,38 @@ export const EbookEditorialDirector = ({
     return "bg-red-500";
   };
 
+  const regenerateTitles = async (overrideSujet?: string, silent = false) => {
+    const subjectToAnalyze = (overrideSujet ?? sujet).trim();
+    if (!subjectToAnalyze) {
+      toast.error("Aucun sujet à analyser");
+      return;
+    }
+    if (!userGeminiKey) {
+      toast.error("Clé API Gemini manquante");
+      return;
+    }
+    if (isRegeneratingTitles) return;
+    setIsRegeneratingTitles(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("editorial-director", {
+        body: { sujet: subjectToAnalyze, userApiKey: userGeminiKey, onlyTitles: true },
+      });
+      if (error) throw error;
+      const newTitles = data?.analysis?.suggestionsTitle ?? [];
+      if (newTitles.length > 0) {
+        setAnalysis((prev) => prev ? { ...prev, suggestionsTitle: newTitles, meilleurTitre: undefined } : prev);
+        if (!silent) toast.success(`${newTitles.length} nouveaux titres générés !`);
+      } else if (!silent) {
+        toast.error("Aucun titre généré, réessayez.");
+      }
+    } catch (e) {
+      console.error("Erreur régénération titres:", e);
+      if (!silent) toast.error("Erreur lors de la régénération");
+    } finally {
+      setIsRegeneratingTitles(false);
+    }
+  };
+
   const analyzeSubject = async (overrideSujet?: string) => {
     const subjectToAnalyze = (overrideSujet ?? sujet).trim();
 
