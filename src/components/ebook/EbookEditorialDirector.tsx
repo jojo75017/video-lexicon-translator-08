@@ -149,8 +149,16 @@ export const EbookEditorialDirector = ({
       if (error) throw error;
       const newTitles = data?.analysis?.suggestionsTitle ?? [];
       if (newTitles.length > 0) {
-        setAnalysis((prev) => prev ? { ...prev, suggestionsTitle: newTitles, meilleurTitre: undefined } : prev);
-        if (!silent) toast.success(`${newTitles.length} nouveaux titres générés !`);
+        // Auto-sélection du meilleur titre par scoreKdp le plus élevé
+        let bestIndex = 0;
+        let bestScore = -1;
+        newTitles.forEach((t: any, i: number) => {
+          const score = typeof t === "object" && t?.scoreKdp ? Number(t.scoreKdp) : 0;
+          if (score > bestScore) { bestScore = score; bestIndex = i; }
+        });
+        const meilleurTitre = { index: bestIndex, explication: `Score KDP le plus élevé (${bestScore}/100).` };
+        setAnalysis((prev) => prev ? { ...prev, suggestionsTitle: newTitles, meilleurTitre } : prev);
+        if (!silent) toast.success(`${newTitles.length} nouveaux titres générés ! Meilleur : #${bestIndex + 1}`);
       } else if (!silent) {
         toast.error("Aucun titre généré, réessayez.");
       }
