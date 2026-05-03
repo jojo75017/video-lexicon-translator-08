@@ -169,7 +169,14 @@ export const EbookEditorialDirector = ({
       if (data?.analysis) {
         setAnalysis(data.analysis);
         onAnalysisComplete?.(data.analysis);
-        toast.success("Analyse éditoriale terminée !");
+        const titles = data.analysis.suggestionsTitle ?? [];
+        if (titles.length < 3) {
+          toast.warning("Liste de titres incomplète, complétion auto…");
+          // Best-effort: relance ciblée
+          void regenerateTitles(subjectToAnalyze, true);
+        } else {
+          toast.success("Analyse éditoriale terminée !");
+        }
       }
     } catch (error: any) {
       console.error("Erreur analyse:", error);
