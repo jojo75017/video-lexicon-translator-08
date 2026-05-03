@@ -363,6 +363,20 @@ export const EbookEditorialDirector = ({
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
+                <div className="flex justify-end">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => regenerateTitles()}
+                    disabled={isRegeneratingTitles || isAnalyzing}
+                  >
+                    {isRegeneratingTitles ? (
+                      <><Loader2 className="mr-2 h-3 w-3 animate-spin" /> Génération…</>
+                    ) : (
+                      <><RefreshCw className="mr-2 h-3 w-3" /> Régénérer 5 nouveaux titres</>
+                    )}
+                  </Button>
+                </div>
                 {/* Score du titre original */}
                 {analysis.titreOriginalScore && (
                   <div className="p-4 rounded-lg bg-muted/50 border border-muted-foreground/20 space-y-3">
