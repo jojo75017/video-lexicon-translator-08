@@ -94,6 +94,7 @@ export const EbookEditorialDirector = ({
   const setSujet = onSubjectChange ?? setLocalSujet;
 
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isRegeneratingTitles, setIsRegeneratingTitles] = useState(false);
   const [analysis, setAnalysis] = useState<EditorialAnalysis | null>(null);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
