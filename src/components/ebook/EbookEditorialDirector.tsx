@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, BookOpen, Target, Lightbulb, AlertTriangle, Eye, Sparkles, PenLine, Copy, Check, Trophy, TrendingUp, Star } from "lucide-react";
+import { Loader2, BookOpen, Target, Lightbulb, AlertTriangle, Eye, Sparkles, PenLine, Copy, Check, Trophy, TrendingUp, Star, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Progress } from "@/components/ui/progress";
@@ -94,6 +94,7 @@ export const EbookEditorialDirector = ({
   const setSujet = onSubjectChange ?? setLocalSujet;
 
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isRegeneratingTitles, setIsRegeneratingTitles] = useState(false);
   const [analysis, setAnalysis] = useState<EditorialAnalysis | null>(null);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
@@ -127,6 +128,38 @@ export const EbookEditorialDirector = ({
     if (score >= 85) return "bg-green-500";
     if (score >= 70) return "bg-yellow-500";
     return "bg-red-500";
+  };
+
+  const regenerateTitles = async (overrideSujet?: string, silent = false) => {
+    const subjectToAnalyze = (overrideSujet ?? sujet).trim();
+    if (!subjectToAnalyze) {
+      toast.error("Aucun sujet à analyser");
+      return;
+    }
+    if (!userGeminiKey) {
+      toast.error("Clé API Gemini manquante");
+      return;
+    }
+    if (isRegeneratingTitles) return;
+    setIsRegeneratingTitles(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("editorial-director", {
+        body: { sujet: subjectToAnalyze, userApiKey: userGeminiKey, onlyTitles: true },
+      });
+      if (error) throw error;
+      const newTitles = data?.analysis?.suggestionsTitle ?? [];
+      if (newTitles.length > 0) {
+        setAnalysis((prev) => prev ? { ...prev, suggestionsTitle: newTitles, meilleurTitre: undefined } : prev);
+        if (!silent) toast.success(`${newTitles.length} nouveaux titres générés !`);
+      } else if (!silent) {
+        toast.error("Aucun titre généré, réessayez.");
+      }
+    } catch (e) {
+      console.error("Erreur régénération titres:", e);
+      if (!silent) toast.error("Erreur lors de la régénération");
+    } finally {
+      setIsRegeneratingTitles(false);
+    }
   };
 
   const analyzeSubject = async (overrideSujet?: string) => {
@@ -168,7 +201,14 @@ export const EbookEditorialDirector = ({
       if (data?.analysis) {
         setAnalysis(data.analysis);
         onAnalysisComplete?.(data.analysis);
-        toast.success("Analyse éditoriale terminée !");
+        const titles = data.analysis.suggestionsTitle ?? [];
+        if (titles.length < 3) {
+          toast.warning("Liste de titres incomplète, complétion auto…");
+          // Best-effort: relance ciblée
+          void regenerateTitles(subjectToAnalyze, true);
+        } else {
+          toast.success("Analyse éditoriale terminée !");
+        }
       }
     } catch (error: any) {
       console.error("Erreur analyse:", error);
@@ -323,6 +363,20 @@ export const EbookEditorialDirector = ({
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
+                <div className="flex justify-end">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => regenerateTitles()}
+                    disabled={isRegeneratingTitles || isAnalyzing}
+                  >
+                    {isRegeneratingTitles ? (
+                      <><Loader2 className="mr-2 h-3 w-3 animate-spin" /> Génération…</>
+                    ) : (
+                      <><RefreshCw className="mr-2 h-3 w-3" /> Régénérer 5 nouveaux titres</>
+                    )}
+                  </Button>
+                </div>
                 {/* Score du titre original */}
                 {analysis.titreOriginalScore && (
                   <div className="p-4 rounded-lg bg-muted/50 border border-muted-foreground/20 space-y-3">
