@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { CheckCircle2, Clock, RefreshCw, Eye } from 'lucide-react';
+import { CheckCircle2, Clock, RefreshCw, Eye, ChevronRight } from 'lucide-react';
 
 interface WorkflowResultViewerProps {
   stepId: string;
@@ -13,6 +13,8 @@ interface WorkflowResultViewerProps {
   } | undefined;
   onRegenerate?: () => void;
   isRegenerating?: boolean;
+  onContinue?: () => void;
+  continueLabel?: string;
   children: React.ReactNode;
 }
 
@@ -22,6 +24,8 @@ export const WorkflowResultViewer: React.FC<WorkflowResultViewerProps> = ({
   result,
   onRegenerate,
   isRegenerating,
+  onContinue,
+  continueLabel = 'Continuer',
   children
 }) => {
   const [showSaved, setShowSaved] = React.useState(!!result);
@@ -100,6 +104,16 @@ export const WorkflowResultViewer: React.FC<WorkflowResultViewerProps> = ({
 
             {/* Actions */}
             <div className="grid gap-2 sm:flex">
+              {onContinue && (
+                <Button
+                  size="sm"
+                  onClick={onContinue}
+                  className="h-auto min-h-9 flex-1 whitespace-normal px-3 py-2 leading-snug"
+                >
+                  {continueLabel}
+                  <ChevronRight className="h-4 w-4 ml-2" />
+                </Button>
+              )}
               <Button
                 variant="outline"
                 size="sm"
