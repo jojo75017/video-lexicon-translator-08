@@ -32,6 +32,7 @@ serve(async (req) => {
     const body = await req.json();
     const {
       title,
+      subtitle = '',
       author,
       genre,
       style,
