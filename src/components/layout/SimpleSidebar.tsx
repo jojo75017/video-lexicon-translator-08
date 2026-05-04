@@ -203,13 +203,39 @@ export const SimpleSidebar: React.FC<SimpleSidebarProps> = ({
 
               {!isCollapsed && (
                 <div className="flex-1 min-w-0">
-                  <div
-                    className={cn(
-                      'font-inter font-semibold text-sm truncate',
-                      active ? 'text-white' : 'text-foreground'
+                  <div className="flex items-center gap-1.5">
+                    <span
+                      className={cn(
+                        'font-inter font-semibold text-sm truncate',
+                        active ? 'text-white' : 'text-foreground'
+                      )}
+                    >
+                      {item.label}
+                    </span>
+                    {item.badge === 'workflow' && (
+                      <span
+                        className={cn(
+                          'shrink-0 rounded px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide',
+                          active
+                            ? 'bg-white/25 text-white'
+                            : 'bg-primary/15 text-primary'
+                        )}
+                      >
+                        IA
+                      </span>
                     )}
-                  >
-                    {item.label}
+                    {item.badge === 'manuel' && (
+                      <span
+                        className={cn(
+                          'shrink-0 rounded px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide',
+                          active
+                            ? 'bg-white/25 text-white'
+                            : 'bg-muted text-muted-foreground'
+                        )}
+                      >
+                        Manuel
+                      </span>
+                    )}
                   </div>
                   <div
                     className={cn(
