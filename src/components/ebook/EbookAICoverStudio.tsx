@@ -59,6 +59,7 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
   onCoverGenerated,
 }) => {
   const [title, setTitle] = useState(ebookTitle);
+  const [subtitle, setSubtitle] = useState('');
   const [author, setAuthor] = useState(authorName);
   const [format, setFormat] = useState<CoverFormat>('kindle');
   const [style, setStyle] = useState('professional');
