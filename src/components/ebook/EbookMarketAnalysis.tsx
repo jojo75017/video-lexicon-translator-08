@@ -33,6 +33,8 @@ interface MarketAnalysis {
 
 interface EbookMarketAnalysisProps {
   onAnalysisComplete?: (analysis: MarketAnalysis) => void;
+  subject?: string;
+  onSubjectChange?: (subject: string) => void;
 }
 
 const impactColors = {
@@ -41,10 +43,12 @@ const impactColors = {
   "faible": "bg-green-500/20 text-green-600 border-green-500/50"
 };
 
-export const EbookMarketAnalysis = ({ onAnalysisComplete }: EbookMarketAnalysisProps) => {
+export const EbookMarketAnalysis = ({ onAnalysisComplete, subject, onSubjectChange }: EbookMarketAnalysisProps) => {
   const { apiKey: userGeminiKey } = useOpenAIConfig();
 
-  const [sujet, setSujet] = useState("");
+  const [localSujet, setLocalSujet] = useState("");
+  const sujet = subject ?? localSujet;
+  const setSujet = onSubjectChange ?? setLocalSujet;
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState<MarketAnalysis | null>(null);
 
@@ -53,13 +57,18 @@ export const EbookMarketAnalysis = ({ onAnalysisComplete }: EbookMarketAnalysisP
       toast.error("Veuillez entrer un sujet à analyser");
       return;
     }
+    if (!userGeminiKey || userGeminiKey.trim().length === 0) {
+      toast.error("Clé API Gemini manquante");
+      return;
+    }
 
     setIsAnalyzing(true);
     try {
       const { data, error } = await supabase.functions.invoke("market-analysis", {
         body: { 
           sujet, 
-          contexte: `Analyse de marché complète et automatique pour un ebook sur "${sujet}". Identifier toutes les opportunités et les pièges à éviter.`
+          contexte: `Analyse de marché complète et automatique pour un ebook sur "${sujet}". Identifier toutes les opportunités et les pièges à éviter.`,
+          userApiKey: userGeminiKey,
         },
       });
 
