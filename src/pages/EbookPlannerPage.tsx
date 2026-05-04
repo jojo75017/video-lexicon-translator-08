@@ -2731,6 +2731,8 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               stepId="P1"
               stepName="Directeur Éditorial"
               result={getStepResult('P1')}
+              onContinue={() => handleTabChange(getNextWorkflowTab('P1'))}
+              continueLabel="Continuer vers P2"
             >
               <EbookEditorialDirector
                 subject={ebookTitle}
@@ -2785,8 +2787,32 @@ ${titles.map((item, index) => {
               stepId="P2"
               stepName="Analyse de Marché"
               result={getStepResult('P2')}
+              onContinue={() => handleTabChange(getNextWorkflowTab('P2'))}
+              continueLabel="Continuer vers P3"
             >
-              <EbookMarketAnalysis />
+              <EbookMarketAnalysis
+                subject={ebookTitle}
+                onSubjectChange={setEbookTitle}
+                onAnalysisComplete={(analysis) => {
+                  const displayContent = `# 🔎 P2 — Jano / Analyse de Marché
+
+**Titre analysé :** ${ebookTitle}
+**Niche :** ${analysis.nichePrincipale || 'Non précisée'}
+**Concurrence :** ${analysis.concurrenceNiveau || 'Non précisée'}
+**Prix optimal :** ${analysis.prixOptimal || 'Non précisé'}
+
+## Opportunité
+${analysis.opportunite || ''}
+
+## 7 mots-clés KDP
+${(analysis.motsClésKDP || []).map((keyword, index) => `${index + 1}. ${keyword}`).join('\n')}
+
+## Catégories KDP
+${(analysis.categoriesKDP || []).join('\n')}`;
+                  saveStepResult('P2', analysis, displayContent);
+                  toast.success('P2 terminé : vous pouvez passer à Kiro (P3).');
+                }}
+              />
             </WorkflowResultViewer>
           </WorkflowStepWrapper>
         );
@@ -2798,8 +2824,28 @@ ${titles.map((item, index) => {
               stepId="P3"
               stepName="Architecte de Contenu"
               result={getStepResult('P3')}
+              onContinue={() => handleTabChange(getNextWorkflowTab('P3'))}
+              continueLabel="Continuer vers P4"
             >
               <EbookContentArchitect 
+                subject={ebookTitle}
+                onSubjectChange={setEbookTitle}
+                onArchitectureComplete={(architecture) => {
+                  const displayContent = `# 🧱 P3 — Kiro / Architecture du livre
+
+**Titre :** ${ebookTitle}
+
+## Introduction
+${architecture.introduction?.elements?.join('\n') || ''}
+
+## Chapitres
+${(architecture.chapitres || []).map((chapter) => `${chapter.numero}. ${chapter.titre}\n${(chapter.sousSections || []).map((section) => `- ${section}`).join('\n')}`).join('\n\n')}
+
+## Conclusion
+${architecture.conclusion?.elements?.join('\n') || ''}`;
+                  saveStepResult('P3', architecture, displayContent);
+                  toast.success('P3 terminé : vous pouvez passer à Alia (P4).');
+                }}
                 onApplyStructure={(structure) => {
                   // Generate new unique chapters - replaces entirely to avoid duplicates
                   const timestamp = Date.now();
