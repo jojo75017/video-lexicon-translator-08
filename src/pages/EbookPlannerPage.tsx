@@ -207,6 +207,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   const [tone, setTone] = useState(savedData?.tone || 'professionnel');
   const [narrativeFormat, setNarrativeFormat] = useState(savedData?.narrativeFormat || 'troisième personne');
   const [bookDescription, setBookDescription] = useState(savedData?.bookDescription || '');
+  const [bookSubtitle, setBookSubtitle] = useState(savedData?.bookSubtitle || savedData?.subtitle || '');
   const [genre, setGenre] = useState(categoryFromUrl || savedData?.genre || '');
   const [characters, setCharacters] = useState<EbookCharacter[]>(savedData?.characters || []);
   
@@ -1290,11 +1291,27 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           return (
             <TrelloBoardView
               ebookTitle={ebookTitle}
+              bookSubtitle={bookSubtitle}
+              authorName={authorName}
+              bookDescription={bookDescription}
+              genre={genre}
+              targetAudience={targetAudience}
+              numberOfChapters={numberOfChapters}
+              chapters={chapters}
               onNavigate={(tabId) => setActiveTab(tabId)}
               onSwitchToClassic={() => {
                 setViewMode('classic');
                 localStorage.setItem('ebook_view_mode', 'classic');
               }}
+              onUpdateTitle={setEbookTitle}
+              onUpdateSubtitle={setBookSubtitle}
+              onUpdateAuthor={setAuthorName}
+              onUpdateDescription={setBookDescription}
+              onUpdateGenre={setGenre}
+              onUpdateTargetAudience={setTargetAudience}
+              onUpdateNumberOfChapters={setNumberOfChapters}
+              onUpdateChapterTitle={updateChapterTitle}
+              onAddChapter={addChapter}
             />
           );
         }
@@ -1302,6 +1319,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           <WorkflowDashboard
             ebookTitle={ebookTitle}
             authorName={authorName}
+            bookSubtitle={bookSubtitle}
             bookDescription={bookDescription}
             genre={genre}
             targetAudience={targetAudience}
@@ -1310,6 +1328,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             onNavigate={(tabId) => setActiveTab(tabId)}
             onStartAutoWorkflow={() => setActiveTab('complete-workflow')}
             onUpdateTitle={setEbookTitle}
+            onUpdateSubtitle={setBookSubtitle}
             onUpdateAuthor={setAuthorName}
             onUpdateDescription={setBookDescription}
             onUpdateGenre={setGenre}

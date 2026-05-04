@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-  CheckCircle2, Lock, Clock, Play, LayoutList, Search, Sparkles
+  CheckCircle2, Lock, Clock, Play, LayoutList, Search, Sparkles, BookOpen, ChevronDown, ChevronUp
 } from 'lucide-react';
 import { useWorkflowResults } from '@/hooks/useWorkflowResults';
 import {
@@ -15,11 +16,28 @@ import {
   ACCOUNT_QUICK_ITEMS,
   type TrelloCard,
 } from './TrelloBoardColumns';
+import { WorkflowBookConfigForm } from './WorkflowBookConfigForm';
 
 interface TrelloBoardViewProps {
   ebookTitle: string;
   onNavigate: (tabId: string) => void;
   onSwitchToClassic: () => void;
+  authorName?: string;
+  bookSubtitle?: string;
+  bookDescription?: string;
+  genre?: string;
+  targetAudience?: string;
+  numberOfChapters?: number;
+  chapters?: Array<{ id: string; title: string }>;
+  onUpdateTitle?: (value: string) => void;
+  onUpdateSubtitle?: (value: string) => void;
+  onUpdateAuthor?: (value: string) => void;
+  onUpdateDescription?: (value: string) => void;
+  onUpdateGenre?: (value: string) => void;
+  onUpdateTargetAudience?: (value: string) => void;
+  onUpdateNumberOfChapters?: (value: number) => void;
+  onUpdateChapterTitle?: (chapterId: string, title: string) => void;
+  onAddChapter?: () => void;
 }
 
 type CardStatus = 'completed' | 'in-progress' | 'available' | 'locked';
@@ -28,6 +46,22 @@ export const TrelloBoardView: React.FC<TrelloBoardViewProps> = ({
   ebookTitle,
   onNavigate,
   onSwitchToClassic,
+  authorName = '',
+  bookSubtitle = '',
+  bookDescription = '',
+  genre = '',
+  targetAudience = '',
+  numberOfChapters = 8,
+  chapters = [],
+  onUpdateTitle,
+  onUpdateSubtitle,
+  onUpdateAuthor,
+  onUpdateDescription,
+  onUpdateGenre,
+  onUpdateTargetAudience,
+  onUpdateNumberOfChapters,
+  onUpdateChapterTitle,
+  onAddChapter,
 }) => {
   const { hasStepResult, getCompletedStepsCount } = useWorkflowResults();
 
@@ -50,6 +84,13 @@ export const TrelloBoardView: React.FC<TrelloBoardViewProps> = ({
   const completedCount = getCompletedStepsCount();
   const totalAgents = 15;
   const progressPercent = Math.round((completedCount / totalAgents) * 100);
+
+  const hasConfigHandlers = !!(onUpdateTitle || onUpdateAuthor || onUpdateDescription);
+  const configIncomplete = !ebookTitle?.trim() || !authorName?.trim();
+  const [configOpen, setConfigOpen] = useState<boolean>(configIncomplete);
+  useEffect(() => {
+    if (configIncomplete) setConfigOpen(true);
+  }, [configIncomplete]);
 
   const statusConfig: Record<CardStatus, { icon: React.ReactNode; label: string; class: string }> = {
     completed: { icon: <CheckCircle2 className="w-3.5 h-3.5" />, label: 'Fait', class: 'text-emerald-400' },
@@ -121,6 +162,62 @@ export const TrelloBoardView: React.FC<TrelloBoardViewProps> = ({
           </div>
           <Progress value={progressPercent} className="h-2" />
         </div>
+
+        {/* Book configuration (titre, sous-titre, auteur, intro, catégorie, chapitres) */}
+        {hasConfigHandlers && (
+          <Card className={cn(
+            "border-2 transition-colors",
+            configIncomplete ? "border-primary/40 bg-primary/5" : "border-border bg-card"
+          )}>
+            <CardHeader className="pb-2">
+              <button
+                type="button"
+                onClick={() => setConfigOpen(o => !o)}
+                className="w-full flex items-center justify-between text-left"
+              >
+                <CardTitle className="flex items-center gap-2 text-foreground">
+                  <BookOpen className="h-5 w-5 text-primary" />
+                  Configuration du livre
+                  {configIncomplete && (
+                    <Badge className="ml-2 bg-primary/20 text-primary border-primary/30 text-[10px]">
+                      À remplir
+                    </Badge>
+                  )}
+                </CardTitle>
+                {configOpen ? <ChevronUp className="h-5 w-5 text-muted-foreground" /> : <ChevronDown className="h-5 w-5 text-muted-foreground" />}
+              </button>
+              {!configOpen && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  Titre · Sous-titre · Auteur · Introduction · Catégorie · Chapitres
+                </p>
+              )}
+            </CardHeader>
+            {configOpen && (
+              <CardContent>
+                <WorkflowBookConfigForm
+                  variant="plain"
+                  ebookTitle={ebookTitle}
+                  bookSubtitle={bookSubtitle}
+                  authorName={authorName}
+                  bookDescription={bookDescription}
+                  genre={genre}
+                  targetAudience={targetAudience}
+                  numberOfChapters={numberOfChapters}
+                  chapters={chapters}
+                  onUpdateTitle={onUpdateTitle}
+                  onUpdateSubtitle={onUpdateSubtitle}
+                  onUpdateAuthor={onUpdateAuthor}
+                  onUpdateDescription={onUpdateDescription}
+                  onUpdateGenre={onUpdateGenre}
+                  onUpdateTargetAudience={onUpdateTargetAudience}
+                  onUpdateNumberOfChapters={onUpdateNumberOfChapters}
+                  onUpdateChapterTitle={onUpdateChapterTitle}
+                  onAddChapter={onAddChapter}
+                />
+              </CardContent>
+            )}
+          </Card>
+        )}
 
         {/* Kanban columns */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
