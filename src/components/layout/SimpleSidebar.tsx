@@ -34,6 +34,7 @@ interface StepItem {
   icon: LucideIcon;
   step?: string;         // numéro affiché ("1", "2"...)
   matchIds?: string[];   // tabIds qui doivent surligner cette étape
+  badge?: 'workflow' | 'manuel';
 }
 
 /**
@@ -52,18 +53,20 @@ const STEP_ITEMS: StepItem[] = [
   {
     id: 'planner',
     label: 'Démarrer un livre',
-    hint: 'Plan, idée, personnages',
+    hint: 'Plan & idée — manuel ou IA',
     icon: Sparkles,
     step: '1',
     matchIds: ['planner', 'characters', 'series', 'templates', 'doc-transform', 'url-import'],
+    badge: 'workflow',
   },
   {
     id: 'writing',
     label: 'Écrire',
-    hint: 'Rédaction & relecture',
+    hint: 'Rédaction manuelle (l\'IA est dans Workflow)',
     icon: PenTool,
     step: '2',
     matchIds: ['writing', 'aichat', 'strict-proofread'],
+    badge: 'manuel',
   },
   {
     id: 'cover-design-editor',

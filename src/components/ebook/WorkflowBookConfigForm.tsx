@@ -141,17 +141,17 @@ const InnerForm: React.FC<WorkflowBookConfigFormProps> = ({
             id="workflow-book-chapter-count"
             type="number"
             min="3"
-            max="30"
+            max="40"
             value={numberOfChapters}
             onChange={(e) => {
               const val = parseInt(e.target.value, 10) || 8;
-              onUpdateNumberOfChapters?.(Math.min(val, 30));
+              onUpdateNumberOfChapters?.(Math.min(val, 40));
             }}
           />
-          {numberOfChapters > 25 && (
+          {numberOfChapters > 30 && (
             <p className="text-xs text-destructive flex items-start gap-1.5 mt-1">
               <span>⚠️</span>
-              <span>Au-delà de 25 chapitres, des timeouts peuvent survenir. Maximum&nbsp;: 30.</span>
+              <span>Au-delà de 30 chapitres, des timeouts peuvent survenir. Maximum&nbsp;: 40.</span>
             </p>
           )}
         </div>
