@@ -2876,6 +2876,8 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
               stepId="P4"
               stepName="Rédaction Experte"
               result={getStepResult('P4')}
+              onContinue={() => handleTabChange(getNextWorkflowTab('P4'))}
+              continueLabel="Continuer vers P5"
             >
               <EbookExpertWriting />
             </WorkflowResultViewer>
@@ -2889,6 +2891,8 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
               stepId="P5"
               stepName="Réécriture Naturelle"
               result={getStepResult('P5')}
+              onContinue={() => handleTabChange(getNextWorkflowTab('P5'))}
+              continueLabel="Continuer vers P6"
             >
               <EbookNaturalRewrite />
             </WorkflowResultViewer>
@@ -2902,6 +2906,8 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
               stepId="P7"
               stepName="Packaging Éditorial"
               result={getStepResult('P7')}
+              onContinue={() => handleTabChange(getNextWorkflowTab('P7'))}
+              continueLabel="Continuer vers P8"
             >
               <EbookEditorialPackaging />
             </WorkflowResultViewer>
@@ -2915,6 +2921,8 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
               stepId="P6"
               stepName="Qualité Éditoriale"
               result={getStepResult('P6')}
+              onContinue={() => handleTabChange(getNextWorkflowTab('P6'))}
+              continueLabel="Continuer vers P7"
             >
               <EbookEditorialQuality />
             </WorkflowResultViewer>
