@@ -85,6 +85,13 @@ export const TrelloBoardView: React.FC<TrelloBoardViewProps> = ({
   const totalAgents = 15;
   const progressPercent = Math.round((completedCount / totalAgents) * 100);
 
+  const hasConfigHandlers = !!(onUpdateTitle || onUpdateAuthor || onUpdateDescription);
+  const configIncomplete = !ebookTitle?.trim() || !authorName?.trim();
+  const [configOpen, setConfigOpen] = useState<boolean>(configIncomplete);
+  useEffect(() => {
+    if (configIncomplete) setConfigOpen(true);
+  }, [configIncomplete]);
+
   const statusConfig: Record<CardStatus, { icon: React.ReactNode; label: string; class: string }> = {
     completed: { icon: <CheckCircle2 className="w-3.5 h-3.5" />, label: 'Fait', class: 'text-emerald-400' },
     'in-progress': { icon: <Play className="w-3.5 h-3.5" />, label: 'En cours', class: 'text-amber-400' },
