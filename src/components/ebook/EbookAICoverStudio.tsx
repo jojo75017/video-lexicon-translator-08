@@ -204,6 +204,9 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
             <div className="space-y-2">
               <Label>Titre du livre</Label>
               <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Mon livre..." />
+            <div className="space-y-2">
+              <Label>Sous-titre <span className="text-muted-foreground text-xs">(optionnel)</span></Label>
+              <Input value={subtitle} onChange={(e) => setSubtitle(e.target.value)} placeholder="Le guide ultime pour..." />
             </div>
             <div className="space-y-2">
               <Label>Nom d'auteur</Label>
