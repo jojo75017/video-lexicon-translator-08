@@ -292,24 +292,70 @@ export const EbookEditorialDirector = ({
             />
           </div>
 
-          <Button
-            onClick={() => analyzeSubject()}
-            disabled={isAnalyzing || !sujet.trim()}
-            className="w-full"
-            size="lg"
-          >
-            {isAnalyzing ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Analyse en cours...
-              </>
-            ) : (
-              <>
-                <Sparkles className="mr-2 h-4 w-4" />
-                Lancer l'analyse éditoriale
-              </>
-            )}
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Button
+              onClick={() => analyzeSubject()}
+              disabled={isAnalyzing || !sujet.trim()}
+              className="flex-1"
+              size="lg"
+            >
+              {isAnalyzing ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Analyse en cours...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="mr-2 h-4 w-4" />
+                  {analysis ? "Lancer l'analyse éditoriale" : "Lancer l'analyse éditoriale"}
+                </>
+              )}
+            </Button>
+
+            {/* Bouton de secours : relance l'analyse si elle se bloque */}
+            <Button
+              type="button"
+              variant="outline"
+              size="lg"
+              onClick={() => {
+                setIsAnalyzing(false);
+                setAnalysis(null);
+                toast.info("Relance de l'analyse…");
+                void analyzeSubject();
+              }}
+              disabled={!sujet.trim()}
+              title="Cliquez ici si l'analyse semble bloquée"
+            >
+              <RefreshCw className={`mr-2 h-4 w-4 ${isAnalyzing ? "animate-spin" : ""}`} />
+              Relancer l'analyse
+            </Button>
+          </div>
+
+          {isAnalyzing && (
+            <p className="text-xs text-muted-foreground text-center">
+              ⏱️ L'analyse prend généralement 20 à 40 secondes. Si rien ne se passe au bout d'une minute, cliquez sur « Relancer l'analyse ».
+            </p>
+          )}
+
+          {analysis && !isAnalyzing && (
+            <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-green-500/30 bg-green-500/5 p-3">
+              <p className="text-sm text-green-700 dark:text-green-400">
+                ✅ Analyse terminée. Vous pouvez passer à <strong>Jano (P2)</strong> dans le tableau de bord.
+              </p>
+              <Button
+                type="button"
+                variant="default"
+                size="sm"
+                onClick={() => {
+                  // Re-notifie le planner pour débloquer P2 si jamais l'event a été manqué
+                  onAnalysisComplete?.(analysis);
+                  toast.success("Étape P1 confirmée — passez à Jano (P2).");
+                }}
+              >
+                Continuer vers Jano (P2) →
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
 
