@@ -106,7 +106,8 @@ RÈGLES:
     maxTokens: 2000,
     temperature: 0.95,
     jsonMode: true,
-    timeout: 45000,
+    timeout: 35000,
+    label: "titles-only",
   });
   const parsed = tryParseJSON(content);
   return Array.isArray(parsed?.suggestionsTitle) ? parsed.suggestionsTitle : [];
