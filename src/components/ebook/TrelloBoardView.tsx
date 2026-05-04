@@ -163,6 +163,62 @@ export const TrelloBoardView: React.FC<TrelloBoardViewProps> = ({
           <Progress value={progressPercent} className="h-2" />
         </div>
 
+        {/* Book configuration (titre, sous-titre, auteur, intro, catégorie, chapitres) */}
+        {hasConfigHandlers && (
+          <Card className={cn(
+            "border-2 transition-colors",
+            configIncomplete ? "border-primary/40 bg-primary/5" : "border-border bg-card"
+          )}>
+            <CardHeader className="pb-2">
+              <button
+                type="button"
+                onClick={() => setConfigOpen(o => !o)}
+                className="w-full flex items-center justify-between text-left"
+              >
+                <CardTitle className="flex items-center gap-2 text-foreground">
+                  <BookOpen className="h-5 w-5 text-primary" />
+                  Configuration du livre
+                  {configIncomplete && (
+                    <Badge className="ml-2 bg-primary/20 text-primary border-primary/30 text-[10px]">
+                      À remplir
+                    </Badge>
+                  )}
+                </CardTitle>
+                {configOpen ? <ChevronUp className="h-5 w-5 text-muted-foreground" /> : <ChevronDown className="h-5 w-5 text-muted-foreground" />}
+              </button>
+              {!configOpen && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  Titre · Sous-titre · Auteur · Introduction · Catégorie · Chapitres
+                </p>
+              )}
+            </CardHeader>
+            {configOpen && (
+              <CardContent>
+                <WorkflowBookConfigForm
+                  variant="plain"
+                  ebookTitle={ebookTitle}
+                  bookSubtitle={bookSubtitle}
+                  authorName={authorName}
+                  bookDescription={bookDescription}
+                  genre={genre}
+                  targetAudience={targetAudience}
+                  numberOfChapters={numberOfChapters}
+                  chapters={chapters}
+                  onUpdateTitle={onUpdateTitle}
+                  onUpdateSubtitle={onUpdateSubtitle}
+                  onUpdateAuthor={onUpdateAuthor}
+                  onUpdateDescription={onUpdateDescription}
+                  onUpdateGenre={onUpdateGenre}
+                  onUpdateTargetAudience={onUpdateTargetAudience}
+                  onUpdateNumberOfChapters={onUpdateNumberOfChapters}
+                  onUpdateChapterTitle={onUpdateChapterTitle}
+                  onAddChapter={onAddChapter}
+                />
+              </CardContent>
+            )}
+          </Card>
+        )}
+
         {/* Kanban columns */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
           {TRELLO_COLUMNS.map(column => {
