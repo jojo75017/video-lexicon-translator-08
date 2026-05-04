@@ -1,88 +1,69 @@
-# Guide campagne « Écrire un livre avec EbookStudio » — onglet par onglet
 
 ## Objectif
-Produire **un document markdown** (`/mnt/documents/CAMPAGNE_WORKFLOW_LIVRE.md`) qui te donne, **pour chacun des 15 onglets du workflow** (P1 Zyro → P15 Orin), un bloc copier-coller standardisé contenant :
 
-1. **Nom de l'agent + numéro** (ex: `P4 — Alia (Rédaction)`)
-2. **Où aller** : route exacte + chemin de clic (ex: `/ebook-planner` → onglet `Créer` → bouton `Alia`)
-3. **Pré-requis** : ce qui doit être fait avant (étapes verrouillées sinon)
-4. **Ce qu'il faut remplir** : champs à saisir (titre, sous-titre, niche, etc.)
-5. **L'action à faire** : sur quel bouton cliquer
-6. **Capture d'écran à prendre** : 1 à 3 emplacements précis (ex: « capturer la carte agent en haut + le résultat généré »)
-7. **Texte de campagne prêt à coller** : 2-3 phrases pédagogiques style email/post réseau, dans ton ton (KDP, simple, rassurant)
-8. **Durée estimée** + tip de l'agent
+Deux problèmes utilisateurs à corriger :
 
-## Format de chaque bloc (exemple P1)
+1. **Sidebar ambiguë** : "Démarrer un livre / Écrire / Habiller / Publier / Vendre" ne dit pas si on travaille en **Workflow IA (P1→P15 automatique)** ou en **Mode simple (manuel)**.
+2. **Limite chapitres** : actuellement bridée à **30**, on veut **40**.
 
-```
-═══════════════════════════════════════════
-P1 — ZYRO (Vision & Niche)        ⏱️ ~2 min
-═══════════════════════════════════════════
+---
 
-📍 OÙ ALLER
-Route : /ebook-planner
-Onglet : Créer ✍️ → cliquer sur "Zyro"
+## 1. Clarifier la sidebar : Workflow IA vs Mode simple
 
-✅ PRÉ-REQUIS
-Aucun — c'est le point de départ.
+Dans `src/components/layout/SimpleSidebar.tsx`, ajouter en haut de la liste un **sélecteur de mode** clair (2 cartes/boutons) qui guide l'utilisateur dès l'arrivée :
 
-📝 À REMPLIR (carte "Configuration du livre")
-- Titre provisoire
-- Sous-titre
-- Auteur
-- Niche / catégorie
-- Public cible
-- Petite intro (3-5 lignes)
-
-🎯 ACTION
-Cliquer sur "Lancer Zyro" → l'IA propose 5 titres
-percutants notés sur 100 (score KDP).
-Le meilleur titre est sélectionné automatiquement.
-
-📸 CAPTURES D'ÉCRAN À PRENDRE
-1. Carte "Configuration du livre" remplie
-2. Bouton "Lancer Zyro" (avant clic)
-3. Résultat : les 5 titres avec scores KDP
-4. Badge vert "Terminé" en haut
-
-📣 TEXTE CAMPAGNE (à coller dans email/post)
-"Étape 1 — Tu donnes juste ton idée et ta niche.
-Zyro, ton directeur éditorial IA, te propose
-5 titres optimisés Amazon KDP, notés sur 100.
-Tu choisis. 2 minutes chrono."
-
-💡 TIP : Définis ta niche et ton angle.
+```text
+┌─────────────────────────────┐
+│  Comment veux-tu créer ?    │
+├─────────────────────────────┤
+│ ⚡ Workflow IA (recommandé) │  → ouvre /ebook-planner avec onglet "complete-workflow"
+│   15 agents automatiques    │
+│   P1 → P15, ~30 min         │
+├─────────────────────────────┤
+│ ✍️  Mode simple (manuel)    │  → ouvre /ebook-planner avec onglet "planner"
+│   Plan + écriture libre     │
+│   À ton rythme              │
+└─────────────────────────────┘
 ```
 
-Le même bloc est répété pour P2 → P15, en s'appuyant sur les données déjà présentes dans `WorkflowNavigation.tsx` (label, description, requiredSteps, estimatedMinutes, tip, phase) et dans `STEP_TO_TAB` pour la route exacte.
+Puis sous ce sélecteur, garder les 5 étapes actuelles (Démarrer / Écrire / Habiller / Publier / Vendre) avec un **petit badge** sur chaque étape qui précise la nature de l'outil par défaut :
+- "Démarrer un livre" → badge `Workflow` (envoie sur le planner connecté au workflow)
+- "Écrire" → badge `Manuel` (éditeur libre) + sous-tip "Le Workflow IA écrit pour toi"
+- "Habiller", "Publier", "Vendre" → pas de badge (étapes communes)
 
-## Découpage par phase (groupement campagne)
+Mettre à jour le `hint` des étapes pour lever toute ambiguïté :
+- "Démarrer un livre" → "Plan, idée, personnages — manuel ou IA"
+- "Écrire" → "Rédaction manuelle (l'IA est dans Workflow)"
 
-Le doc sera organisé en 4 sections, comme dans l'app, pour que tu puisses faire **4 emails de campagne** (1 par phase) ou **15 posts** (1 par agent) :
+Visuel : utiliser le teal `#008296` pour le mode actif, hover orange `#FF9E2D` (charte KDP existante).
 
-| Phase | Étapes | Usage campagne suggéré |
-|---|---|---|
-| ✍️ Créer | P1, P2, P3, P4 | Email 1 « De l'idée au manuscrit » |
-| ⚡ Optimiser | P5, P6, P8–P13 | Email 2 « Du brouillon au pro » |
-| 📦 Publier | P7, P14 | Email 3 « Prêt pour Amazon KDP » |
-| 🎁 Bonus | P15 | Email 4 « 100% indétectable IA » |
+## 2. Passer le nombre max de chapitres de 30 → 40
 
-## Sections supplémentaires du document
+Fichier : `src/components/ebook/WorkflowBookConfigForm.tsx`
+- Ligne 144 : `max="30"` → `max="40"`
+- Ligne ~148 : `Math.min(val, 30)` → `Math.min(val, 40)`
+- Ligne 154 : texte d'aide → "Au-delà de 30 chapitres, des timeouts peuvent survenir. Maximum : 40."
 
-À la fin du markdown, j'ajoute :
+Vérifier également :
+- `src/components/ebook/EbookContentArchitect.tsx` (P3 — architecte de structure) : si un cap implicite limite la TOC à 30, le passer à 40.
+- `supabase/functions/check-quota/` : la limite quota est par projet/abonnement, pas par chapitre — pas de changement nécessaire.
 
-- **Checklist captures globale** (les 16 captures les plus importantes, à cocher au tournage — sur le modèle de `ChecklistTournagePage.tsx`)
-- **Glossaire des 15 agents** (1 ligne par agent : nom + rôle + super-pouvoir)
-- **Script d'accroche campagne** : 3 hooks courts pour démarrer (« 47 minutes pour un livre de 150 pages », etc.)
-- **CTA final** : invitation à tester sur ebookstudio.fr
+## 3. Mémoire à mettre à jour
+
+`mem://constraints/workflow/chapter-limit-guideline` actuel : "maximum de 30 chapitres"
+→ remplacer par : "maximum de 40 chapitres (au-delà de 30, risque de timeout sur P4)".
+
+---
 
 ## Détails techniques
 
-- Source de vérité : `src/components/ebook/WorkflowNavigation.tsx` (WORKFLOW_STEPS, STEP_TO_TAB, PHASES)
-- Source de vérité noms agents : `src/components/ebook/workflow/workflowAgents.ts` (lecture pour récupérer agentTitle / agentMission)
-- Génération : un script Node `/tmp/build_campagne.mjs` qui lit ces deux fichiers et produit le markdown final dans `/mnt/documents/CAMPAGNE_WORKFLOW_LIVRE.md`
-- Aucun changement dans le code de l'app (read-only sur le code applicatif)
-- Livrable final servi via `<lov-artifact>` pour téléchargement immédiat
+- Aucune migration DB.
+- Aucune edge function modifiée (le P4 itère sur le tableau de chapitres reçu, pas de borne dure côté serveur).
+- Pas d'impact sur le workflow P1→P15 stabilisé précédemment ; on ne touche qu'à l'UI sidebar et à 3 lignes du formulaire de config.
 
-## Ce que tu obtiens
-Un seul fichier `.md` que tu ouvres, et **chaque bloc P1…P15 est prêt à copier-coller** dans ton outil de campagne (Mailchimp, Brevo, post LinkedIn, script Loom…), avec à côté la liste exacte des captures à faire et où les faire.
+## Fichiers modifiés
+
+- `src/components/layout/SimpleSidebar.tsx` — ajout sélecteur de mode + badges + hints clarifiés
+- `src/components/ebook/WorkflowBookConfigForm.tsx` — limite 30 → 40
+- `src/components/ebook/EbookContentArchitect.tsx` — vérifier/aligner sur 40 si besoin
+- `mem://constraints/workflow/chapter-limit-guideline` — mise à jour de la règle
