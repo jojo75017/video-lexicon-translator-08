@@ -207,6 +207,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   const [tone, setTone] = useState(savedData?.tone || 'professionnel');
   const [narrativeFormat, setNarrativeFormat] = useState(savedData?.narrativeFormat || 'troisième personne');
   const [bookDescription, setBookDescription] = useState(savedData?.bookDescription || '');
+  const [bookSubtitle, setBookSubtitle] = useState(savedData?.bookSubtitle || savedData?.subtitle || '');
   const [genre, setGenre] = useState(categoryFromUrl || savedData?.genre || '');
   const [characters, setCharacters] = useState<EbookCharacter[]>(savedData?.characters || []);
   
