@@ -9,38 +9,65 @@ async function callGemini(
   apiKey: string,
   systemPrompt: string,
   userPrompt: string,
-  opts: { maxTokens?: number; temperature?: number; timeout?: number; jsonMode?: boolean } = {}
-) {
+  opts: { maxTokens?: number; temperature?: number; timeout?: number; jsonMode?: boolean; label?: string } = {}
+): Promise<string> {
+  const label = opts.label || "gemini";
+  const timeoutMs = opts.timeout || 50000;
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), opts.timeout || 90000);
+  const timeoutId = setTimeout(() => {
+    console.warn(`[${label}] timeout after ${timeoutMs}ms — aborting`);
+    controller.abort();
+  }, timeoutMs);
+
   const generationConfig: any = {
     temperature: opts.temperature ?? 0.6,
     maxOutputTokens: opts.maxTokens ?? 3000,
   };
   if (opts.jsonMode) generationConfig.responseMimeType = "application/json";
 
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        system_instruction: { parts: [{ text: systemPrompt }] },
-        contents: [{ role: "user", parts: [{ text: userPrompt }] }],
-        generationConfig,
-      }),
-      signal: controller.signal,
+  const t0 = Date.now();
+  console.log(`[${label}] calling Gemini (maxTokens=${generationConfig.maxOutputTokens}, timeout=${timeoutMs}ms)`);
+
+  let response: Response;
+  try {
+    response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          system_instruction: { parts: [{ text: systemPrompt }] },
+          contents: [{ role: "user", parts: [{ text: userPrompt }] }],
+          generationConfig,
+        }),
+        signal: controller.signal,
+      }
+    );
+  } catch (e: any) {
+    clearTimeout(timeoutId);
+    if (e?.name === "AbortError") {
+      console.error(`[${label}] AbortError after ${Date.now() - t0}ms`);
+      throw { status: 504, message: "Gemini n'a pas répondu à temps. Réessayez avec un sujet plus court." };
     }
-  );
+    console.error(`[${label}] fetch failed:`, e?.message || e);
+    throw new Error(`Erreur réseau Gemini: ${e?.message || e}`);
+  }
   clearTimeout(timeoutId);
+  console.log(`[${label}] HTTP ${response.status} in ${Date.now() - t0}ms`);
+
   if (!response.ok) {
     const errText = await response.text();
-    console.error("Gemini error:", response.status, errText);
-    if (response.status === 429) throw { status: 429, message: "Limite Gemini atteinte." };
-    throw new Error(`Erreur Gemini: ${response.status}`);
+    console.error(`[${label}] Gemini error:`, response.status, errText.substring(0, 500));
+    if (response.status === 429) throw { status: 429, message: "Limite Gemini atteinte. Patientez 1 min." };
+    if (response.status === 400 || response.status === 401 || response.status === 403) {
+      throw { status: 401, message: "Clé API Gemini invalide. Vérifiez sur aistudio.google.com (AIza...)." };
+    }
+    throw new Error(`Erreur Gemini ${response.status}: ${errText.substring(0, 200)}`);
   }
   const data = await response.json();
-  return data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+  console.log(`[${label}] received ${text.length} chars`);
+  return text;
 }
 
 function tryParseJSON(content: string): any | null {
