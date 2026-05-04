@@ -76,6 +76,7 @@ import EbookUltimateVerdict from '@/components/ebook/EbookUltimateVerdict';
 import EbookCompleteWorkflow from '@/components/ebook/EbookCompleteWorkflow';
 import { EbookInteractiveTutorial } from '@/components/ebook/EbookInteractiveTutorial';
 import { WorkflowStepWrapper } from '@/components/ebook/WorkflowStepWrapper';
+import { STEP_TO_TAB } from '@/components/ebook/WorkflowNavigation';
 import { WorkflowOnboarding } from '@/components/ebook/WorkflowOnboarding';
 import { WorkflowDashboard } from '@/components/ebook/WorkflowDashboard';
 import { WorkflowExportCompiled } from '@/components/ebook/WorkflowExportCompiled';
@@ -1095,33 +1096,36 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   };
 
   // Fonction de changement d'onglet avec sauvegarde (utilise la ref pour avoir les dernières données)
-  const handleTabChange = async (newTab: string) => {
-    // Sauvegarder avant de changer d'onglet si on a un titre
-    try {
-      const data = currentDataRef.current;
-      if (data.ebookTitle) {
-        console.log('💾 Sauvegarde avant changement onglet - chapters:', data.chapters.map(c => ({ id: c.id, title: c.title, hasContent: !!c.content, contentPreview: c.content?.slice(-50) })));
-        const projectData = {
-          title: data.ebookTitle, author_name: data.authorName, target_audience: data.targetAudience,
-          tome_number: data.tomeNumber, writing_style: data.writingStyle, chapter_length: data.chapterLength,
-          detail_level: data.detailLevel, tone: data.tone, narrative_format: data.narrativeFormat,
-          preface: data.preface, conclusion: data.conclusion, chapters: data.chapters, 
-          characters: data.characters, ebook_images: data.ebookImages,
-          number_of_chapters: data.numberOfChapters, book_summary: data.bookSummary,
-          cover_concepts: data.coverConcepts, seo_optimization: data.seoOptimization,
-          kdp_description: data.kdpDescription, kdp_keywords: data.kdpKeywords, kdp_categories: data.kdpCategories,
-        };
-        await saveProject(projectData);
-      }
-    } catch (err) {
-      console.error('Erreur sauvegarde avant changement onglet:', err);
-    }
+  const handleTabChange = (newTab: string) => {
     if (newTab === 'subscription') {
       try {
         localStorage.setItem('ebook_planner_active_tab', activeTab === 'subscription' ? 'workflow-dashboard' : activeTab);
       } catch {}
     }
     setActiveTab(newTab);
+
+    // Sauvegarde non bloquante : la navigation P1→P15 doit rester instantanée.
+    const data = currentDataRef.current;
+    if (data.ebookTitle) {
+      const projectData = {
+        title: data.ebookTitle, author_name: data.authorName, target_audience: data.targetAudience,
+        tome_number: data.tomeNumber, writing_style: data.writingStyle, chapter_length: data.chapterLength,
+        detail_level: data.detailLevel, tone: data.tone, narrative_format: data.narrativeFormat,
+        preface: data.preface, conclusion: data.conclusion, chapters: data.chapters,
+        characters: data.characters, ebook_images: data.ebookImages,
+        number_of_chapters: data.numberOfChapters, book_summary: data.bookSummary,
+        cover_concepts: data.coverConcepts, seo_optimization: data.seoOptimization,
+        kdp_description: data.kdpDescription, kdp_keywords: data.kdpKeywords, kdp_categories: data.kdpCategories,
+      };
+      saveProject(projectData).catch((err) => console.error('Erreur sauvegarde après changement onglet:', err));
+    }
+  };
+
+  const getNextWorkflowTab = (stepId: string) => {
+    const order = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8', 'P9', 'P10', 'P11', 'P12', 'P13', 'P14', 'P15'];
+    const index = order.indexOf(stepId);
+    const nextStep = index >= 0 ? order[index + 1] : null;
+    return nextStep ? STEP_TO_TAB[nextStep] : 'workflow-dashboard';
   };
 
   const generateTableOfContents = () => {
