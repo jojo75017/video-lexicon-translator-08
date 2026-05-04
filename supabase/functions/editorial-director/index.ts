@@ -178,12 +178,49 @@ Produis la stratégie éditoriale + 5 titres alternatifs PERCUTANTS et VARIÉS (
 
     console.log("Editorial Director - Analyse pour:", sujet);
 
-    const content = await callGemini(userApiKey, systemPrompt, userPrompt, {
-      maxTokens: 8000,
-      temperature: 0.85,
-      jsonMode: true,
-      timeout: 90000,
-    });
+    let content = "";
+    try {
+      content = await callGemini(userApiKey, systemPrompt, userPrompt, {
+        maxTokens: 4000,
+        temperature: 0.85,
+        jsonMode: true,
+        timeout: 50000,
+        label: "full-analysis",
+      });
+    } catch (e: any) {
+      console.warn("Full analysis failed, falling back to titles-only:", e?.message || e);
+      // Fallback gracieux : au moins renvoyer les 5 titres pour ne pas bloquer l'utilisateur
+      try {
+        const titles = await generateTitlesOnly(userApiKey, sujet);
+        if (titles.length > 0) {
+          const best = titles.reduce(
+            (acc: number, cur: any, i: number) =>
+              (cur?.scoreKdp ?? 0) > (titles[acc]?.scoreKdp ?? 0) ? i : acc,
+            0
+          );
+          return new Response(
+            JSON.stringify({
+              analysis: {
+                promesseCentrale: `Analyse rapide pour "${sujet}". Relancez pour la version complète.`,
+                angleEditorial: "À affiner manuellement.",
+                cibleIdeale: `Lecteurs intéressés par ${sujet}.`,
+                erreursCourantes: ["Trop générique", "Manque de profondeur", "Pas de différenciation"],
+                visionGlobale: "Vision à compléter.",
+                suggestionsTitle: titles,
+                meilleurTitre: { index: best, explication: "Score KDP le plus élevé." },
+                titreOriginalScore: { scoreKdp: 60, forces: "Sujet pertinent", faiblesses: "Optimisable" },
+              },
+              partial: true,
+            }),
+            { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+      } catch (e2) {
+        console.error("Titles-only fallback failed too:", e2);
+      }
+      // Si même le fallback échoue, on renvoie une vraie erreur
+      throw e;
+    }
 
     let analysis: any = tryParseJSON(content);
 
@@ -211,10 +248,9 @@ Produis la stratégie éditoriale + 5 titres alternatifs PERCUTANTS et VARIÉS (
       try {
         const extra = await generateTitlesOnly(userApiKey, sujet);
         if (extra.length >= analysis.suggestionsTitle.length) {
-          // Remplace par la liste plus complète
           analysis.suggestionsTitle = extra;
           if (!analysis.meilleurTitre) {
-            const best = extra.reduce((acc, cur, i) => (cur.scoreKdp > (extra[acc]?.scoreKdp ?? 0) ? i : acc), 0);
+            const best = extra.reduce((acc: number, cur: any, i: number) => (cur.scoreKdp > (extra[acc]?.scoreKdp ?? 0) ? i : acc), 0);
             analysis.meilleurTitre = { index: best, explication: "Score KDP le plus élevé." };
           }
         }
