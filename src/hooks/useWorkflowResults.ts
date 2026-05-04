@@ -32,7 +32,9 @@ const MIGRATION_DONE_KEY = 'ebook_workflow_migration_v1_done';
 const WORKFLOW_RESULTS_UPDATED_EVENT = 'ebook_workflow_results_updated';
 
 const notifyWorkflowResultsUpdated = () => {
-  window.dispatchEvent(new Event(WORKFLOW_RESULTS_UPDATED_EVENT));
+  window.setTimeout(() => {
+    window.dispatchEvent(new Event(WORKFLOW_RESULTS_UPDATED_EVENT));
+  }, 0);
 };
 
 /**
