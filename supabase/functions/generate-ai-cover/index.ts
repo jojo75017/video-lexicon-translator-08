@@ -60,6 +60,7 @@ Create a PROFESSIONAL Amazon best-seller quality book cover.
 
 === BOOK ===
 Title: "${title}"
+${subtitle ? `Subtitle: "${subtitle}" — display the subtitle clearly BELOW the main title in a smaller but elegant typographic style, perfectly readable, hierarchically subordinate to the title.` : ''}
 Author: "${author || 'Author'}"
 Genre: ${genre || 'non-fiction'}
 
