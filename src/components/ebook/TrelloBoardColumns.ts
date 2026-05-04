@@ -98,6 +98,21 @@ export const TRELLO_COLUMNS: TrelloColumn[] = [
       { id: 'launch-plan', label: 'Plan de lancement', icon: Rocket },
     ],
   },
+  {
+    id: 'special-formats',
+    label: '6. Formats spéciaux',
+    emoji: '📚',
+    color: 'amber',
+    cards: [
+      { id: 'coloring', label: 'Livre de coloriage', icon: Palette },
+      { id: 'atlas', label: 'Atlas', icon: Map },
+      { id: 'encyclopedia', label: 'Encyclopédie', icon: BookOpen },
+      { id: 'documentary', label: 'Documentaire', icon: Film },
+      { id: 'series', label: 'Séries / Tomes', icon: Library },
+      { id: 'doc-transform', label: 'Transformer un document', icon: FileUp },
+      { id: 'templates', label: 'Modèles', icon: LayoutTemplate },
+    ],
+  },
 ];
 
 // Mapping workflow step IDs (P1-P15) to their tab IDs
