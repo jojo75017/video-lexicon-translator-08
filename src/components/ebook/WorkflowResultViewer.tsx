@@ -74,12 +74,12 @@ export const WorkflowResultViewer: React.FC<WorkflowResultViewerProps> = ({
         {/* Banner showing saved result */}
         <Card className="border-green-500/30 bg-gradient-to-r from-green-500/10 to-emerald-500/5">
           <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2 text-lg">
+            <div className="grid gap-2 sm:grid-cols-[1fr_auto] sm:items-start">
+              <CardTitle className="flex min-w-0 items-center gap-2 text-lg leading-tight">
                 <CheckCircle2 className="h-5 w-5 text-green-500" />
-                Résultat {stepId} - {stepName}
+                <span className="min-w-0 break-words">Résultat {stepId} - {stepName}</span>
               </CardTitle>
-              <div className="flex items-center gap-2">
+              <div className="flex min-w-0 items-center gap-2">
                 <Badge variant="outline" className="text-xs text-muted-foreground">
                   <Clock className="h-3 w-3 mr-1" />
                   {formatDate(result.generatedAt)}
@@ -99,12 +99,12 @@ export const WorkflowResultViewer: React.FC<WorkflowResultViewerProps> = ({
             </div>
 
             {/* Actions */}
-            <div className="flex gap-2">
+            <div className="grid gap-2 sm:flex">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setShowSaved(false)}
-                className="flex-1"
+                className="h-auto min-h-9 flex-1 whitespace-normal px-3 py-2 leading-snug"
               >
                 <RefreshCw className="h-4 w-4 mr-2" />
                 Régénérer manuellement
@@ -124,7 +124,7 @@ export const WorkflowResultViewer: React.FC<WorkflowResultViewerProps> = ({
           variant="ghost"
           size="sm"
           onClick={() => setShowSaved(true)}
-          className="w-full justify-start text-muted-foreground hover:text-foreground"
+          className="h-auto min-h-9 w-full justify-start whitespace-normal text-left leading-snug text-muted-foreground hover:text-foreground"
         >
           <Eye className="h-4 w-4 mr-2" />
           Voir le résultat sauvegardé du workflow complet
