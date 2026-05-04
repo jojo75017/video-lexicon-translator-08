@@ -300,35 +300,63 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
                 <p className="text-sm">Choisissez le format Kindle ou Broché et lancez une génération</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-6">
                 {generatedCovers.map((cover, i) => (
-                  <div key={i} className="relative group rounded-lg overflow-hidden border bg-muted/20">
-                    <Badge className="absolute top-2 left-2 z-10 bg-background/90 text-foreground border">
-                      {cover.format === 'kindle' ? '📱 Kindle' : '📖 Broché complet'}
-                    </Badge>
-                    <img
-                      src={cover.url}
-                      alt={`Couverture ${i + 1}`}
-                      className={`w-full object-contain bg-muted ${
-                        cover.format === 'kindle' ? 'aspect-[1/1.6]' : 'aspect-[1.6/1]'
-                      }`}
-                    />
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
-                      <div className="flex gap-2 w-full">
-                        <Button size="sm" variant="secondary" className="flex-1" onClick={() => downloadCover(cover, i)}>
+                  <div key={i} className="rounded-lg border bg-muted/20 overflow-hidden">
+                    <div className="flex items-center justify-between p-3 border-b bg-background/50">
+                      <Badge className="bg-primary/10 text-primary border-primary/30">
+                        {cover.format === 'kindle' ? '📱 Kindle eBook' : '📖 Broché complet (face + dos + 4ème)'}
+                      </Badge>
+                      <div className="flex gap-2">
+                        <Button size="sm" variant="outline" onClick={() => downloadCover(cover, i)}>
                           <Download className="h-3 w-3 mr-1" /> Télécharger
                         </Button>
                         <Button
                           size="sm"
-                          variant="secondary"
                           onClick={() => {
                             onCoverGenerated?.(cover.url);
                             toast.success('Couverture sélectionnée');
                           }}
                         >
-                          Utiliser
+                          ✓ Utiliser cette couverture
                         </Button>
                       </div>
+                    </div>
+
+                    <div className="relative bg-muted">
+                      <img
+                        src={cover.url}
+                        alt={`Couverture ${i + 1}`}
+                        className={`w-full object-contain ${
+                          cover.format === 'kindle' ? 'max-h-[600px]' : 'max-h-[420px]'
+                        }`}
+                      />
+
+                      {/* Overlay repères broché */}
+                      {cover.format === 'paperback' && (
+                        <svg
+                          className="absolute inset-0 w-full h-full pointer-events-none"
+                          viewBox="0 0 100 60"
+                          preserveAspectRatio="none"
+                        >
+                          {/* Marge de sécurité 3mm (≈3% du wrap) */}
+                          <rect x="3" y="3" width="94" height="54" fill="none" stroke="hsl(var(--primary))" strokeWidth="0.15" strokeDasharray="0.5,0.5" opacity="0.7" />
+                          {/* Séparateurs panneaux : back | spine | front */}
+                          <line x1="46" y1="0" x2="46" y2="60" stroke="hsl(var(--primary))" strokeWidth="0.2" strokeDasharray="0.8,0.4" opacity="0.8" />
+                          <line x1="54" y1="0" x2="54" y2="60" stroke="hsl(var(--primary))" strokeWidth="0.2" strokeDasharray="0.8,0.4" opacity="0.8" />
+                          {/* Zone ISBN (bas droit du panneau back) */}
+                          <rect x="33" y="46" width="11" height="9" fill="hsl(var(--primary) / 0.15)" stroke="hsl(var(--primary))" strokeWidth="0.2" />
+                        </svg>
+                      )}
+
+                      {cover.format === 'paperback' && (
+                        <div className="absolute inset-x-0 bottom-0 bg-background/85 backdrop-blur-sm border-t px-3 py-2 flex flex-wrap gap-3 text-[11px]">
+                          <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-primary" /> Marge sécurité 3mm</span>
+                          <span className="flex items-center gap-1"><span className="w-3 h-0.5 border-t border-dashed border-primary" /> Pliures dos</span>
+                          <span className="flex items-center gap-1"><span className="w-3 h-2 bg-primary/30 border border-primary" /> Zone ISBN (5×3 cm)</span>
+                          <span className="ml-auto text-muted-foreground">4ème · Dos · Face</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
