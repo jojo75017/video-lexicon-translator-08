@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-  CheckCircle2, Lock, Clock, Play, LayoutList, Search, Sparkles
+  CheckCircle2, Lock, Clock, Play, LayoutList, Search, Sparkles, BookOpen, ChevronDown, ChevronUp
 } from 'lucide-react';
 import { useWorkflowResults } from '@/hooks/useWorkflowResults';
 import {
@@ -15,11 +16,28 @@ import {
   ACCOUNT_QUICK_ITEMS,
   type TrelloCard,
 } from './TrelloBoardColumns';
+import { WorkflowBookConfigForm } from './WorkflowBookConfigForm';
 
 interface TrelloBoardViewProps {
   ebookTitle: string;
   onNavigate: (tabId: string) => void;
   onSwitchToClassic: () => void;
+  authorName?: string;
+  bookSubtitle?: string;
+  bookDescription?: string;
+  genre?: string;
+  targetAudience?: string;
+  numberOfChapters?: number;
+  chapters?: Array<{ id: string; title: string }>;
+  onUpdateTitle?: (value: string) => void;
+  onUpdateSubtitle?: (value: string) => void;
+  onUpdateAuthor?: (value: string) => void;
+  onUpdateDescription?: (value: string) => void;
+  onUpdateGenre?: (value: string) => void;
+  onUpdateTargetAudience?: (value: string) => void;
+  onUpdateNumberOfChapters?: (value: number) => void;
+  onUpdateChapterTitle?: (chapterId: string, title: string) => void;
+  onAddChapter?: () => void;
 }
 
 type CardStatus = 'completed' | 'in-progress' | 'available' | 'locked';
@@ -28,6 +46,22 @@ export const TrelloBoardView: React.FC<TrelloBoardViewProps> = ({
   ebookTitle,
   onNavigate,
   onSwitchToClassic,
+  authorName = '',
+  bookSubtitle = '',
+  bookDescription = '',
+  genre = '',
+  targetAudience = '',
+  numberOfChapters = 8,
+  chapters = [],
+  onUpdateTitle,
+  onUpdateSubtitle,
+  onUpdateAuthor,
+  onUpdateDescription,
+  onUpdateGenre,
+  onUpdateTargetAudience,
+  onUpdateNumberOfChapters,
+  onUpdateChapterTitle,
+  onAddChapter,
 }) => {
   const { hasStepResult, getCompletedStepsCount } = useWorkflowResults();
 
