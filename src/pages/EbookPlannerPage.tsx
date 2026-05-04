@@ -2936,6 +2936,8 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
               stepId="P8"
               stepName="Diagnostic Final"
               result={getStepResult('P8')}
+              onContinue={() => handleTabChange(getNextWorkflowTab('P8'))}
+              continueLabel="Continuer vers P9"
             >
               <EbookFinalDiagnosis />
             </WorkflowResultViewer>
@@ -2949,6 +2951,8 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
               stepId="P9"
               stepName="Mémoire Éditoriale"
               result={getStepResult('P9')}
+              onContinue={() => handleTabChange(getNextWorkflowTab('P9'))}
+              continueLabel="Continuer vers P10"
             >
               <EbookEditorialMemory />
             </WorkflowResultViewer>
@@ -2962,6 +2966,8 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
               stepId="P10"
               stepName="Cohérence Chapitres"
               result={getStepResult('P10')}
+              onContinue={() => handleTabChange(getNextWorkflowTab('P10'))}
+              continueLabel="Continuer vers P11"
             >
               <EbookChapterCoherence />
             </WorkflowResultViewer>
@@ -2975,6 +2981,8 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
               stepId="P11"
               stepName="Auto-Critique"
               result={getStepResult('P11')}
+              onContinue={() => handleTabChange(getNextWorkflowTab('P11'))}
+              continueLabel="Continuer vers P12"
             >
               <EbookSelfCritique />
             </WorkflowResultViewer>
