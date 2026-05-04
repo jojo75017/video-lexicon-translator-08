@@ -76,6 +76,7 @@ import EbookUltimateVerdict from '@/components/ebook/EbookUltimateVerdict';
 import EbookCompleteWorkflow from '@/components/ebook/EbookCompleteWorkflow';
 import { EbookInteractiveTutorial } from '@/components/ebook/EbookInteractiveTutorial';
 import { WorkflowStepWrapper } from '@/components/ebook/WorkflowStepWrapper';
+import { STEP_TO_TAB } from '@/components/ebook/WorkflowNavigation';
 import { WorkflowOnboarding } from '@/components/ebook/WorkflowOnboarding';
 import { WorkflowDashboard } from '@/components/ebook/WorkflowDashboard';
 import { WorkflowExportCompiled } from '@/components/ebook/WorkflowExportCompiled';
@@ -1095,33 +1096,36 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   };
 
   // Fonction de changement d'onglet avec sauvegarde (utilise la ref pour avoir les dernières données)
-  const handleTabChange = async (newTab: string) => {
-    // Sauvegarder avant de changer d'onglet si on a un titre
-    try {
-      const data = currentDataRef.current;
-      if (data.ebookTitle) {
-        console.log('💾 Sauvegarde avant changement onglet - chapters:', data.chapters.map(c => ({ id: c.id, title: c.title, hasContent: !!c.content, contentPreview: c.content?.slice(-50) })));
-        const projectData = {
-          title: data.ebookTitle, author_name: data.authorName, target_audience: data.targetAudience,
-          tome_number: data.tomeNumber, writing_style: data.writingStyle, chapter_length: data.chapterLength,
-          detail_level: data.detailLevel, tone: data.tone, narrative_format: data.narrativeFormat,
-          preface: data.preface, conclusion: data.conclusion, chapters: data.chapters, 
-          characters: data.characters, ebook_images: data.ebookImages,
-          number_of_chapters: data.numberOfChapters, book_summary: data.bookSummary,
-          cover_concepts: data.coverConcepts, seo_optimization: data.seoOptimization,
-          kdp_description: data.kdpDescription, kdp_keywords: data.kdpKeywords, kdp_categories: data.kdpCategories,
-        };
-        await saveProject(projectData);
-      }
-    } catch (err) {
-      console.error('Erreur sauvegarde avant changement onglet:', err);
-    }
+  const handleTabChange = (newTab: string) => {
     if (newTab === 'subscription') {
       try {
         localStorage.setItem('ebook_planner_active_tab', activeTab === 'subscription' ? 'workflow-dashboard' : activeTab);
       } catch {}
     }
     setActiveTab(newTab);
+
+    // Sauvegarde non bloquante : la navigation P1→P15 doit rester instantanée.
+    const data = currentDataRef.current;
+    if (data.ebookTitle) {
+      const projectData = {
+        title: data.ebookTitle, author_name: data.authorName, target_audience: data.targetAudience,
+        tome_number: data.tomeNumber, writing_style: data.writingStyle, chapter_length: data.chapterLength,
+        detail_level: data.detailLevel, tone: data.tone, narrative_format: data.narrativeFormat,
+        preface: data.preface, conclusion: data.conclusion, chapters: data.chapters,
+        characters: data.characters, ebook_images: data.ebookImages,
+        number_of_chapters: data.numberOfChapters, book_summary: data.bookSummary,
+        cover_concepts: data.coverConcepts, seo_optimization: data.seoOptimization,
+        kdp_description: data.kdpDescription, kdp_keywords: data.kdpKeywords, kdp_categories: data.kdpCategories,
+      };
+      saveProject(projectData).catch((err) => console.error('Erreur sauvegarde après changement onglet:', err));
+    }
+  };
+
+  const getNextWorkflowTab = (stepId: string) => {
+    const order = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8', 'P9', 'P10', 'P11', 'P12', 'P13', 'P14', 'P15'];
+    const index = order.indexOf(stepId);
+    const nextStep = index >= 0 ? order[index + 1] : null;
+    return nextStep ? STEP_TO_TAB[nextStep] : 'workflow-dashboard';
   };
 
   const generateTableOfContents = () => {
@@ -2727,6 +2731,8 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               stepId="P1"
               stepName="Directeur Éditorial"
               result={getStepResult('P1')}
+              onContinue={() => handleTabChange(getNextWorkflowTab('P1'))}
+              continueLabel="Continuer vers P2"
             >
               <EbookEditorialDirector
                 subject={ebookTitle}
@@ -2781,8 +2787,32 @@ ${titles.map((item, index) => {
               stepId="P2"
               stepName="Analyse de Marché"
               result={getStepResult('P2')}
+              onContinue={() => handleTabChange(getNextWorkflowTab('P2'))}
+              continueLabel="Continuer vers P3"
             >
-              <EbookMarketAnalysis />
+              <EbookMarketAnalysis
+                subject={ebookTitle}
+                onSubjectChange={setEbookTitle}
+                onAnalysisComplete={(analysis) => {
+                  const displayContent = `# 🔎 P2 — Jano / Analyse de Marché
+
+**Titre analysé :** ${ebookTitle}
+**Niche :** ${analysis.nichePrincipale || 'Non précisée'}
+**Concurrence :** ${analysis.concurrenceNiveau || 'Non précisée'}
+**Prix optimal :** ${analysis.prixOptimal || 'Non précisé'}
+
+## Opportunité
+${analysis.opportunite || ''}
+
+## 7 mots-clés KDP
+${(analysis.motsClésKDP || []).map((keyword, index) => `${index + 1}. ${keyword}`).join('\n')}
+
+## Catégories KDP
+${(analysis.categoriesKDP || []).join('\n')}`;
+                  saveStepResult('P2', analysis, displayContent);
+                  toast.success('P2 terminé : vous pouvez passer à Kiro (P3).');
+                }}
+              />
             </WorkflowResultViewer>
           </WorkflowStepWrapper>
         );
@@ -2794,8 +2824,28 @@ ${titles.map((item, index) => {
               stepId="P3"
               stepName="Architecte de Contenu"
               result={getStepResult('P3')}
+              onContinue={() => handleTabChange(getNextWorkflowTab('P3'))}
+              continueLabel="Continuer vers P4"
             >
               <EbookContentArchitect 
+                subject={ebookTitle}
+                onSubjectChange={setEbookTitle}
+                onArchitectureComplete={(architecture) => {
+                  const displayContent = `# 🧱 P3 — Kiro / Architecture du livre
+
+**Titre :** ${ebookTitle}
+
+## Introduction
+${architecture.introduction?.elements?.join('\n') || ''}
+
+## Chapitres
+${(architecture.chapitres || []).map((chapter) => `${chapter.numero}. ${chapter.titre}\n${(chapter.sousSections || []).map((section) => `- ${section}`).join('\n')}`).join('\n\n')}
+
+## Conclusion
+${architecture.conclusion?.elements?.join('\n') || ''}`;
+                  saveStepResult('P3', architecture, displayContent);
+                  toast.success('P3 terminé : vous pouvez passer à Alia (P4).');
+                }}
                 onApplyStructure={(structure) => {
                   // Generate new unique chapters - replaces entirely to avoid duplicates
                   const timestamp = Date.now();
@@ -2826,6 +2876,8 @@ ${titles.map((item, index) => {
               stepId="P4"
               stepName="Rédaction Experte"
               result={getStepResult('P4')}
+              onContinue={() => handleTabChange(getNextWorkflowTab('P4'))}
+              continueLabel="Continuer vers P5"
             >
               <EbookExpertWriting />
             </WorkflowResultViewer>
@@ -2839,6 +2891,8 @@ ${titles.map((item, index) => {
               stepId="P5"
               stepName="Réécriture Naturelle"
               result={getStepResult('P5')}
+              onContinue={() => handleTabChange(getNextWorkflowTab('P5'))}
+              continueLabel="Continuer vers P6"
             >
               <EbookNaturalRewrite />
             </WorkflowResultViewer>
@@ -2852,6 +2906,8 @@ ${titles.map((item, index) => {
               stepId="P7"
               stepName="Packaging Éditorial"
               result={getStepResult('P7')}
+              onContinue={() => handleTabChange(getNextWorkflowTab('P7'))}
+              continueLabel="Continuer vers P8"
             >
               <EbookEditorialPackaging />
             </WorkflowResultViewer>
@@ -2865,6 +2921,8 @@ ${titles.map((item, index) => {
               stepId="P6"
               stepName="Qualité Éditoriale"
               result={getStepResult('P6')}
+              onContinue={() => handleTabChange(getNextWorkflowTab('P6'))}
+              continueLabel="Continuer vers P7"
             >
               <EbookEditorialQuality />
             </WorkflowResultViewer>
@@ -2878,6 +2936,8 @@ ${titles.map((item, index) => {
               stepId="P8"
               stepName="Diagnostic Final"
               result={getStepResult('P8')}
+              onContinue={() => handleTabChange(getNextWorkflowTab('P8'))}
+              continueLabel="Continuer vers P9"
             >
               <EbookFinalDiagnosis />
             </WorkflowResultViewer>
@@ -2891,6 +2951,8 @@ ${titles.map((item, index) => {
               stepId="P9"
               stepName="Mémoire Éditoriale"
               result={getStepResult('P9')}
+              onContinue={() => handleTabChange(getNextWorkflowTab('P9'))}
+              continueLabel="Continuer vers P10"
             >
               <EbookEditorialMemory />
             </WorkflowResultViewer>
@@ -2904,6 +2966,8 @@ ${titles.map((item, index) => {
               stepId="P10"
               stepName="Cohérence Chapitres"
               result={getStepResult('P10')}
+              onContinue={() => handleTabChange(getNextWorkflowTab('P10'))}
+              continueLabel="Continuer vers P11"
             >
               <EbookChapterCoherence />
             </WorkflowResultViewer>
@@ -2917,6 +2981,8 @@ ${titles.map((item, index) => {
               stepId="P11"
               stepName="Auto-Critique"
               result={getStepResult('P11')}
+              onContinue={() => handleTabChange(getNextWorkflowTab('P11'))}
+              continueLabel="Continuer vers P12"
             >
               <EbookSelfCritique />
             </WorkflowResultViewer>
@@ -2930,6 +2996,8 @@ ${titles.map((item, index) => {
               stepId="P12"
               stepName="Boucle Itérative"
               result={getStepResult('P12')}
+              onContinue={() => handleTabChange(getNextWorkflowTab('P12'))}
+              continueLabel="Continuer vers P13"
             >
               <EbookIterativeLoop />
             </WorkflowResultViewer>
@@ -2943,6 +3011,8 @@ ${titles.map((item, index) => {
               stepId="P13"
               stepName="Signature de Style"
               result={getStepResult('P13')}
+              onContinue={() => handleTabChange(getNextWorkflowTab('P13'))}
+              continueLabel="Continuer vers P14"
             >
               <EbookStyleSignature />
             </WorkflowResultViewer>
@@ -2956,6 +3026,8 @@ ${titles.map((item, index) => {
               stepId="P14"
               stepName="Verdict Ultime"
               result={getStepResult('P14')}
+              onContinue={() => handleTabChange(getNextWorkflowTab('P14'))}
+              continueLabel="Continuer vers P15"
             >
               <EbookUltimateVerdict />
             </WorkflowResultViewer>
@@ -2969,6 +3041,8 @@ ${titles.map((item, index) => {
               stepId="P15"
               stepName="Humanisation Anti-IA"
               result={getStepResult('P15')}
+              onContinue={() => handleTabChange(getNextWorkflowTab('P15'))}
+              continueLabel="Retour au tableau de bord"
             >
               <EbookHumanizer />
             </WorkflowResultViewer>

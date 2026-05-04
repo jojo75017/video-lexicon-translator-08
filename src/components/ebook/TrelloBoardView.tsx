@@ -12,6 +12,7 @@ import { useWorkflowResults } from '@/hooks/useWorkflowResults';
 import {
   TRELLO_COLUMNS,
   TAB_TO_WORKFLOW_STEP,
+  WORKFLOW_STEP_TO_TAB,
   COLUMN_COLORS,
   ACCOUNT_QUICK_ITEMS,
   type TrelloCard,
@@ -41,6 +42,8 @@ interface TrelloBoardViewProps {
 }
 
 type CardStatus = 'completed' | 'in-progress' | 'available' | 'locked';
+
+const WORKFLOW_ORDER = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8', 'P9', 'P10', 'P11', 'P12', 'P13', 'P14', 'P15'];
 
 export const TrelloBoardView: React.FC<TrelloBoardViewProps> = ({
   ebookTitle,
@@ -73,17 +76,14 @@ export const TrelloBoardView: React.FC<TrelloBoardViewProps> = ({
 
     if (hasStepResult(stepId)) return 'completed';
 
-    if (card.requiredSteps) {
-      const allMet = card.requiredSteps.every(req => hasStepResult(req));
-      if (!allMet) return 'locked';
-    }
-
     return 'available';
   };
 
   const completedCount = getCompletedStepsCount();
   const totalAgents = 15;
   const progressPercent = Math.round((completedCount / totalAgents) * 100);
+  const nextStepId = WORKFLOW_ORDER.find(stepId => !hasStepResult(stepId)) || 'P1';
+  const nextWorkflowTab = WORKFLOW_STEP_TO_TAB[nextStepId] || 'editorial-director';
 
   const hasConfigHandlers = !!(onUpdateTitle || onUpdateAuthor || onUpdateDescription);
   const configIncomplete = !ebookTitle?.trim() || !authorName?.trim();
@@ -145,7 +145,7 @@ export const TrelloBoardView: React.FC<TrelloBoardViewProps> = ({
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <Button
-              onClick={() => onNavigate(completedCount === 0 ? 'editorial-director' : 'complete-workflow')}
+              onClick={() => onNavigate(nextWorkflowTab)}
               className="rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 whitespace-nowrap"
             >
               <Play className="w-4 h-4 mr-2" />

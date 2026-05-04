@@ -113,10 +113,7 @@ export const WorkflowDashboard: React.FC<WorkflowDashboardProps> = ({
 
   const getStepStatus = (stepId: string): 'completed' | 'available' | 'locked' => {
     if (hasStepResult(stepId)) return 'completed';
-    const step = WORKFLOW_STEPS.find(s => s.id === stepId);
-    if (!step?.requiredSteps?.length) return 'available';
-    const allReqsMet = step.requiredSteps.every(r => hasStepResult(r));
-    return allReqsMet ? 'available' : 'locked';
+    return 'available';
   };
 
   const nextAvailableStep = WORKFLOW_STEPS.find((step) => getStepStatus(step.id) === 'available');

@@ -89,8 +89,9 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
   const nextStep = currentStepIndex < WORKFLOW_STEPS.length - 1 ? WORKFLOW_STEPS[currentStepIndex + 1] : null;
 
   const canProceedToNext = (step: WorkflowStep): boolean => {
-    if (!step.requiredSteps || step.requiredSteps.length === 0) return true;
-    return step.requiredSteps.every(reqId => hasStepResult(reqId));
+    // Le workflow doit rester navigable : un blocage IA ne doit jamais empêcher
+    // l'utilisateur de continuer manuellement vers l'agent suivant.
+    return true;
   };
 
   const getStepStatus = (step: WorkflowStep): 'completed' | 'current' | 'locked' | 'available' => {
@@ -232,7 +233,7 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
         <Button
           size="sm"
           onClick={() => nextStep && handleNavigate(STEP_TO_TAB[nextStep.id])}
-          disabled={!nextStep || isGenerating || (nextStep && !canProceedToNext(nextStep))}
+          disabled={!nextStep || isGenerating}
           className="flex h-auto min-h-9 items-center gap-1.5 px-3 py-2"
         >
           <span className="hidden sm:inline">

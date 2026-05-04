@@ -33,18 +33,26 @@ interface ContentArchitecture {
 interface EbookContentArchitectProps {
   onArchitectureComplete?: (architecture: ContentArchitecture) => void;
   onApplyStructure?: (chapters: Array<{ title: string; subChapters: string[] }>) => void;
+  subject?: string;
+  onSubjectChange?: (subject: string) => void;
 }
 
-export const EbookContentArchitect = ({ onArchitectureComplete, onApplyStructure }: EbookContentArchitectProps) => {
+export const EbookContentArchitect = ({ onArchitectureComplete, onApplyStructure, subject, onSubjectChange }: EbookContentArchitectProps) => {
   const { apiKey: userGeminiKey } = useOpenAIConfig();
 
-  const [sujet, setSujet] = useState("");
+  const [localSujet, setLocalSujet] = useState("");
+  const sujet = subject ?? localSujet;
+  const setSujet = onSubjectChange ?? setLocalSujet;
   const [isGenerating, setIsGenerating] = useState(false);
   const [architecture, setArchitecture] = useState<ContentArchitecture | null>(null);
 
   const generateArchitecture = async () => {
     if (!sujet.trim()) {
       toast.error("Veuillez entrer le sujet de votre ebook");
+      return;
+    }
+    if (!userGeminiKey || userGeminiKey.trim().length === 0) {
+      toast.error("Clé API Gemini manquante");
       return;
     }
 
