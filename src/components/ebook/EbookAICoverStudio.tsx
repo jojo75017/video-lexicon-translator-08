@@ -95,6 +95,7 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
       const { data, error } = await supabase.functions.invoke('generate-ai-cover', {
         body: {
           title,
+          subtitle,
           author,
           genre,
           style,
