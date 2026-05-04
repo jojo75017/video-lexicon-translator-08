@@ -2996,6 +2996,8 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
               stepId="P12"
               stepName="Boucle Itérative"
               result={getStepResult('P12')}
+              onContinue={() => handleTabChange(getNextWorkflowTab('P12'))}
+              continueLabel="Continuer vers P13"
             >
               <EbookIterativeLoop />
             </WorkflowResultViewer>
@@ -3009,6 +3011,8 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
               stepId="P13"
               stepName="Signature de Style"
               result={getStepResult('P13')}
+              onContinue={() => handleTabChange(getNextWorkflowTab('P13'))}
+              continueLabel="Continuer vers P14"
             >
               <EbookStyleSignature />
             </WorkflowResultViewer>
@@ -3022,6 +3026,8 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
               stepId="P14"
               stepName="Verdict Ultime"
               result={getStepResult('P14')}
+              onContinue={() => handleTabChange(getNextWorkflowTab('P14'))}
+              continueLabel="Continuer vers P15"
             >
               <EbookUltimateVerdict />
             </WorkflowResultViewer>
@@ -3035,6 +3041,8 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
               stepId="P15"
               stepName="Humanisation Anti-IA"
               result={getStepResult('P15')}
+              onContinue={() => handleTabChange(getNextWorkflowTab('P15'))}
+              continueLabel="Retour au tableau de bord"
             >
               <EbookHumanizer />
             </WorkflowResultViewer>
