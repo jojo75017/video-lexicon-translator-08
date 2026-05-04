@@ -5,6 +5,7 @@ import {
   ClipboardCheck, MessageSquare, Rocket,
   FolderOpen, CreditCard, Settings,
   Users, Bot, Play, Glasses,
+  Map, BookOpen, Film, Library, FileUp, LayoutTemplate,
   type LucideIcon
 } from 'lucide-react';
 
@@ -97,6 +98,21 @@ export const TRELLO_COLUMNS: TrelloColumn[] = [
       { id: 'launch-plan', label: 'Plan de lancement', icon: Rocket },
     ],
   },
+  {
+    id: 'special-formats',
+    label: '6. Formats spéciaux',
+    emoji: '📚',
+    color: 'amber',
+    cards: [
+      { id: 'coloring', label: 'Livre de coloriage', icon: Palette },
+      { id: 'atlas', label: 'Atlas', icon: Map },
+      { id: 'encyclopedia', label: 'Encyclopédie', icon: BookOpen },
+      { id: 'documentary', label: 'Documentaire', icon: Film },
+      { id: 'series', label: 'Séries / Tomes', icon: Library },
+      { id: 'doc-transform', label: 'Transformer un document', icon: FileUp },
+      { id: 'templates', label: 'Modèles', icon: LayoutTemplate },
+    ],
+  },
 ];
 
 // Mapping workflow step IDs (P1-P15) to their tab IDs
@@ -175,5 +191,14 @@ export const COLUMN_COLORS: Record<string, { bg: string; border: string; header:
     cardHover: 'hover:border-rose-500/30 hover:shadow-rose-500/10',
     badge: 'bg-rose-500/15 text-rose-400',
     text: 'text-rose-400',
+  },
+  amber: {
+    bg: 'bg-amber-500/5',
+    border: 'border-amber-500/20',
+    header: 'bg-gradient-to-r from-amber-500/15 to-amber-400/10',
+    card: 'bg-card border-amber-500/10',
+    cardHover: 'hover:border-amber-500/30 hover:shadow-amber-500/10',
+    badge: 'bg-amber-500/15 text-amber-400',
+    text: 'text-amber-400',
   },
 };
