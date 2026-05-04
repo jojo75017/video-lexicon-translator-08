@@ -24,6 +24,7 @@ export interface WorkflowResultsState {
   P12?: WorkflowResult;
   P13?: WorkflowResult;
   P14?: WorkflowResult;
+  P15?: WorkflowResult;
 }
 
 const WORKFLOW_RESULTS_KEY = 'ebook_workflow_results';
