@@ -133,7 +133,7 @@ export const EbookEditorialDirector = ({
     setTimeout(() => setCopiedIndex(null), 2000);
   };
 
-  const useTitle = (title: string) => {
+  const applyTitle = (title: string) => {
     setSujet(title);
     // Important: l'analyse affichée correspond à l'ancien titre tant qu'on ne relance pas.
     // Ici on relance automatiquement pour que le score/ligne se mette à jour immédiatement.
@@ -240,9 +240,9 @@ export const EbookEditorialDirector = ({
           toast.success("Analyse éditoriale terminée !");
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Erreur analyse:", error);
-      const msg = String(error?.message || error || "");
+      const msg = error instanceof Error ? error.message : String(error || "");
       const isKeyError =
         msg.includes("400") ||
         msg.includes("401") ||
@@ -560,7 +560,7 @@ export const EbookEditorialDirector = ({
                             <Button
                               variant={isBest ? "default" : "outline"}
                               size="sm"
-                              onClick={() => useTitle(fullTitle)}
+                              onClick={() => applyTitle(fullTitle)}
                               className="h-8 text-xs"
                             >
                               {isBest ? "🏆 Utiliser" : "Utiliser"}
