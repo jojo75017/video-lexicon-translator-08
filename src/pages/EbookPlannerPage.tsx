@@ -2731,6 +2731,44 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               <EbookEditorialDirector
                 subject={ebookTitle}
                 onSubjectChange={setEbookTitle}
+                onAnalysisComplete={(analysis) => {
+                  const titles = Array.isArray(analysis.suggestionsTitle) ? analysis.suggestionsTitle : [];
+                  const bestIndex = analysis.meilleurTitre?.index ?? 0;
+                  const bestTitle = titles[bestIndex];
+                  const bestTitleText = typeof bestTitle === 'object' && bestTitle
+                    ? `${bestTitle.titre}${bestTitle.sousTitre ? ` : ${bestTitle.sousTitre}` : ''}`
+                    : typeof bestTitle === 'string'
+                      ? bestTitle
+                      : ebookTitle;
+
+                  const displayContent = `# 🧭 P1 — Zyro / Directeur Éditorial
+
+**Titre analysé :** ${ebookTitle}
+**Meilleur titre KDP :** ${bestTitleText}
+
+## Promesse centrale
+${analysis.promesseCentrale}
+
+## Angle éditorial
+${analysis.angleEditorial}
+
+## Cible idéale
+${typeof analysis.cibleIdeale === 'string'
+  ? analysis.cibleIdeale
+  : [analysis.cibleIdeale.profil, analysis.cibleIdeale.besoins, analysis.cibleIdeale.frustrations].filter(Boolean).join('\n')}
+
+## Vision globale
+${analysis.visionGlobale}
+
+## Titres proposés
+${titles.map((item, index) => {
+  if (typeof item === 'string') return `${index + 1}. ${item}`;
+  return `${index + 1}. ${item.titre}${item.sousTitre ? ` : ${item.sousTitre}` : ''} — Score KDP ${item.scoreKdp}/100`;
+}).join('\n')}`;
+
+                  saveStepResult('P1', analysis, displayContent);
+                  toast.success('P1 terminé : vous pouvez passer à Jano (P2).');
+                }}
               />
             </WorkflowResultViewer>
           </WorkflowStepWrapper>
