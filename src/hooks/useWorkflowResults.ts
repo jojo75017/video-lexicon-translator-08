@@ -29,6 +29,13 @@ export interface WorkflowResultsState {
 const WORKFLOW_RESULTS_KEY = 'ebook_workflow_results';
 const LEGACY_PROGRESS_KEY = 'ebook_workflow_progress';
 const MIGRATION_DONE_KEY = 'ebook_workflow_migration_v1_done';
+const WORKFLOW_RESULTS_UPDATED_EVENT = 'ebook_workflow_results_updated';
+
+const notifyWorkflowResultsUpdated = () => {
+  window.setTimeout(() => {
+    window.dispatchEvent(new Event(WORKFLOW_RESULTS_UPDATED_EVENT));
+  }, 0);
+};
 
 /**
  * Migration unique : importer stepResults depuis ebook_workflow_progress
@@ -192,6 +199,20 @@ export const useWorkflowResults = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    const reloadFromLocalStorage = () => {
+      try {
+        const saved = localStorage.getItem(WORKFLOW_RESULTS_KEY);
+        setResults(saved ? JSON.parse(saved) : {});
+      } catch (e) {
+        console.error('Error reloading workflow results:', e);
+      }
+    };
+
+    window.addEventListener(WORKFLOW_RESULTS_UPDATED_EVENT, reloadFromLocalStorage);
+    return () => window.removeEventListener(WORKFLOW_RESULTS_UPDATED_EVENT, reloadFromLocalStorage);
+  }, []);
+
   // Save a single step result — localStorage + cloud
   const saveStepResult = useCallback((stepId: string, result: any, displayContent: string) => {
     const workflowResult: WorkflowResult = {
@@ -205,6 +226,7 @@ export const useWorkflowResults = () => {
       const updated = { ...prev, [stepId]: workflowResult };
       try {
         localStorage.setItem(WORKFLOW_RESULTS_KEY, JSON.stringify(updated));
+        notifyWorkflowResultsUpdated();
       } catch (e) {
         console.error('Error saving workflow result:', e);
       }
@@ -248,6 +270,7 @@ export const useWorkflowResults = () => {
     setResults(formattedResults);
     try {
       localStorage.setItem(WORKFLOW_RESULTS_KEY, JSON.stringify(formattedResults));
+      notifyWorkflowResultsUpdated();
     } catch (e) {
       console.error('Error saving all workflow results:', e);
     }
@@ -267,6 +290,7 @@ export const useWorkflowResults = () => {
   const clearResults = useCallback(() => {
     setResults({});
     localStorage.removeItem(WORKFLOW_RESULTS_KEY);
+    notifyWorkflowResultsUpdated();
   }, []);
 
   // Get count of completed steps
