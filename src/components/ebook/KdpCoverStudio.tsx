@@ -43,7 +43,11 @@ const BLEED_INCH = 0.125; // 3.175mm standard bleed
 function inToMm(inches: number) { return Math.round(inches * 25.4 * 100) / 100; }
 function mmToIn(mm: number) { return Math.round(mm / 25.4 * 1000) / 1000; }
 
-const KdpCoverStudio: React.FC = () => {
+interface KdpCoverStudioProps {
+  onUseForGeneration?: (description: string) => void;
+}
+
+const KdpCoverStudio: React.FC<KdpCoverStudioProps> = ({ onUseForGeneration }) => {
   const [formatId, setFormatId] = useState('6x9');
   const [pageCount, setPageCount] = useState(172);
   const [paperType, setPaperType] = useState('white');
@@ -97,6 +101,20 @@ const KdpCoverStudio: React.FC = () => {
     widthPt: Math.round(calculations.totalWidth * 72),
     heightPt: Math.round(calculations.totalHeight * 72),
   }), [calculations]);
+
+  const kdpGenerationBrief = useMemo(() => `Couverture Amazon KDP complète pour livre broché.
+Format intérieur: ${format.label} (${format.w}" x ${format.h}").
+Nombre de pages: ${pageCount}. Papier: ${paper.label}.
+Fond perdu: ${hasBleed ? 'oui, 0.125 pouce / 3.175 mm' : 'non'}.
+Dimensions couverture complète: ${calculations.totalWidth.toFixed(3)}" x ${calculations.totalHeight.toFixed(3)}" (${calculations.totalWidthMm} x ${calculations.totalHeightMm} mm).
+Résolution cible: ${calculations.totalWidthPx} x ${calculations.totalHeightPx} px à 300 DPI.
+Largeur du dos: ${calculations.spineWidth.toFixed(3)}" (${calculations.spineWidthMm} mm).
+Prévoir recto, dos et quatrième de couverture, avec zone code-barres ISBN 2" x 1.2" en bas à droite du verso.`, [format, pageCount, paper, hasBleed, calculations]);
+
+  const handleUseForGeneration = () => {
+    copyToClipboard(kdpGenerationBrief);
+    onUseForGeneration?.(kdpGenerationBrief);
+  };
 
   return (
     <div className="space-y-6">
@@ -159,6 +177,19 @@ const KdpCoverStudio: React.FC = () => {
               </Select>
             </div>
           </div>
+
+          <Card className="border-primary/20 bg-primary/5">
+            <CardContent className="p-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div>
+                <p className="font-semibold text-foreground">Utiliser ces infos KDP pour générer la couverture</p>
+                <p className="text-sm text-muted-foreground">Envoie le format, le nombre de pages, le dos, le fond perdu et la zone ISBN au Studio IA.</p>
+              </div>
+              <Button onClick={handleUseForGeneration} className="shrink-0 gap-2">
+                <Palette className="w-4 h-4" />
+                Générer avec ces infos
+              </Button>
+            </CardContent>
+          </Card>
 
           <div className="flex items-center gap-2">
             <input type="checkbox" id="bleed" checked={hasBleed} onChange={e => setHasBleed(e.target.checked)} className="rounded" />

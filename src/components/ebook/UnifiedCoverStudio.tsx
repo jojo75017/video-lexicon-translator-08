@@ -28,6 +28,7 @@ export const UnifiedCoverStudio: React.FC<UnifiedCoverStudioProps> = ({
   defaultTab = 'ai',
 }) => {
   const [activeTab, setActiveTab] = useState<string>(defaultTab);
+  const [coverBrief, setCoverBrief] = useState('');
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -124,12 +125,18 @@ export const UnifiedCoverStudio: React.FC<UnifiedCoverStudioProps> = ({
             <EbookAICoverStudio
               ebookTitle={ebookTitle}
               authorName={authorName}
+              initialDescription={coverBrief}
               onCoverGenerated={onCoverGenerated}
             />
           </TabsContent>
 
           <TabsContent value="technical" className="mt-0 animate-fade-in">
-            <KdpCoverStudio />
+            <KdpCoverStudio
+              onUseForGeneration={(brief) => {
+                setCoverBrief(brief);
+                setActiveTab('ai');
+              }}
+            />
           </TabsContent>
 
           <TabsContent value="backcover" className="mt-0 animate-fade-in">

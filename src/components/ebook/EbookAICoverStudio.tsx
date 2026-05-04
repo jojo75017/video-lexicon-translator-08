@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,6 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 interface EbookAICoverStudioProps {
   ebookTitle?: string;
   authorName?: string;
+  initialDescription?: string;
   onCoverGenerated?: (url: string) => void;
 }
 
@@ -42,6 +43,7 @@ const genres = [
 export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
   ebookTitle = '',
   authorName = '',
+  initialDescription = '',
   onCoverGenerated,
 }) => {
   const [title, setTitle] = useState(ebookTitle);
@@ -52,6 +54,10 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
   const [description, setDescription] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedCovers, setGeneratedCovers] = useState<{ url: string; desc: string }[]>([]);
+
+  useEffect(() => {
+    if (initialDescription.trim()) setDescription(initialDescription);
+  }, [initialDescription]);
 
   const generateCover = async () => {
     if (!title.trim()) { toast.error('Titre requis'); return; }
