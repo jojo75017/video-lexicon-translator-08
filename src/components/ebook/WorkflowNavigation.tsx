@@ -152,7 +152,7 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
 
       {/* Pipeline Tabs: Créer → Optimiser → Publier */}
       <div className="bg-card border-x border-border">
-        <div className="flex">
+        <div className="grid grid-cols-2 sm:grid-cols-4">
           {PHASES.map((phase) => {
             const phaseCompleted = phase.steps.filter(id => hasStepResult(id)).length;
             const isActive = displayPhase === phase.id;
@@ -162,13 +162,13 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
                 key={phase.id}
                 onClick={() => setActivePhase(phase.id)}
                 className={cn(
-                  "flex-1 px-3 py-2.5 text-sm font-medium transition-all border-b-2 relative",
+                   "px-2 py-2.5 text-sm font-medium transition-all border-b-2 relative min-w-0",
                   isActive
                     ? "border-primary text-primary bg-primary/5"
                     : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 )}
               >
-                <span>{phase.emoji} {phase.label}</span>
+                 <span className="inline-flex max-w-full flex-wrap items-center justify-center gap-1 leading-tight">{phase.emoji} {phase.label}</span>
                 <span className="ml-1 text-[11px] opacity-60">{phaseCompleted}/{phase.steps.length}</span>
               </button>
             );
@@ -178,7 +178,7 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
 
       {/* Agents of active phase */}
       <div className="bg-card border-x border-b border-border rounded-b-xl p-3">
-        <div className="flex flex-wrap gap-2">
+        <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
           {PHASES.find(p => p.id === displayPhase)?.steps.map((stepId) => {
             const step = WORKFLOW_STEPS.find(s => s.id === stepId)!;
             const agent = AGENT_STEPS.find(a => a.id === stepId);
@@ -191,7 +191,7 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
                 onClick={() => status !== 'locked' && handleNavigate(tabId)}
                 disabled={status === 'locked' || isGenerating}
                 className={cn(
-                  "flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all border",
+                  "flex min-h-10 min-w-0 items-center justify-center gap-1.5 rounded-lg border px-2 py-2 text-sm font-medium leading-tight transition-all sm:justify-start sm:px-3",
                   status === 'completed' && "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20",
                   status === 'current' && "bg-primary text-primary-foreground border-primary shadow-sm",
                   status === 'available' && "bg-muted/50 hover:bg-accent text-muted-foreground border-border hover:text-foreground cursor-pointer",
@@ -203,7 +203,7 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
                 ) : status === 'locked' ? (
                   <Lock className="w-3 h-3 shrink-0" />
                 ) : null}
-                <span className="whitespace-nowrap">{agent?.agentTitle || step.label}</span>
+                <span className="min-w-0 break-words text-center sm:text-left">{agent?.agentTitle || step.label}</span>
               </button>
             );
           })}
@@ -211,13 +211,13 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
       </div>
 
       {/* Prev / Next */}
-      <div className="flex items-center justify-between gap-3 mt-3">
+      <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2 mt-3">
         <Button
           variant="outline"
           size="sm"
           onClick={() => prevStep && handleNavigate(STEP_TO_TAB[prevStep.id])}
           disabled={!prevStep || isGenerating}
-          className="flex items-center gap-1.5"
+          className="flex h-auto min-h-9 items-center gap-1.5 px-3 py-2"
         >
           <ChevronLeft className="w-4 h-4" />
           <span className="hidden sm:inline">
@@ -225,7 +225,7 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
           </span>
         </Button>
 
-        <div className="text-xs text-muted-foreground">
+        <div className="min-w-0 text-center text-xs text-muted-foreground">
           {currentStep.tip && <span>💡 {currentStep.tip}</span>}
         </div>
 
@@ -233,7 +233,7 @@ export const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
           size="sm"
           onClick={() => nextStep && handleNavigate(STEP_TO_TAB[nextStep.id])}
           disabled={!nextStep || isGenerating || (nextStep && !canProceedToNext(nextStep))}
-          className="flex items-center gap-1.5"
+          className="flex h-auto min-h-9 items-center gap-1.5 px-3 py-2"
         >
           <span className="hidden sm:inline">
             {nextStep ? AGENT_STEPS.find(a => a.id === nextStep.id)?.agentTitle || nextStep.label : 'Suivant'}
