@@ -5,6 +5,7 @@ import {
   ClipboardCheck, MessageSquare, Rocket,
   FolderOpen, CreditCard, Settings,
   Users, Bot, Play, Glasses,
+  Map, BookOpen, Film, Library, FileUp, LayoutTemplate,
   type LucideIcon
 } from 'lucide-react';
 
