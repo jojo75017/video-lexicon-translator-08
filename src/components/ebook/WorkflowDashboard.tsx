@@ -17,6 +17,7 @@ import { cn } from '@/lib/utils';
 import { useWorkflowResults } from '@/hooks/useWorkflowResults';
 import { useWorkflowCloudSync } from '@/hooks/useWorkflowCloudSync';
 import { WORKFLOW_STEPS, STEP_TO_TAB } from './WorkflowNavigation';
+import { WorkflowBookConfigForm } from './WorkflowBookConfigForm';
 import { toast } from 'sonner';
 
 interface WorkflowDashboardProps {
@@ -24,12 +25,14 @@ interface WorkflowDashboardProps {
   onNavigate: (tabId: string) => void;
   onStartAutoWorkflow?: () => void;
   authorName?: string;
+  bookSubtitle?: string;
   bookDescription?: string;
   genre?: string;
   targetAudience?: string;
   numberOfChapters?: number;
   chapters?: Array<{ id: string; title: string; content?: string }>;
   onUpdateTitle?: (value: string) => void;
+  onUpdateSubtitle?: (value: string) => void;
   onUpdateAuthor?: (value: string) => void;
   onUpdateDescription?: (value: string) => void;
   onUpdateGenre?: (value: string) => void;
