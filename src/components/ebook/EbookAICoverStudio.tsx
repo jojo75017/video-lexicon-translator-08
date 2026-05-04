@@ -59,6 +59,7 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
   onCoverGenerated,
 }) => {
   const [title, setTitle] = useState(ebookTitle);
+  const [subtitle, setSubtitle] = useState('');
   const [author, setAuthor] = useState(authorName);
   const [format, setFormat] = useState<CoverFormat>('kindle');
   const [style, setStyle] = useState('professional');
@@ -94,6 +95,7 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
       const { data, error } = await supabase.functions.invoke('generate-ai-cover', {
         body: {
           title,
+          subtitle,
           author,
           genre,
           style,
@@ -202,6 +204,10 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
             <div className="space-y-2">
               <Label>Titre du livre</Label>
               <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Mon livre..." />
+            </div>
+            <div className="space-y-2">
+              <Label>Sous-titre <span className="text-muted-foreground text-xs">(optionnel)</span></Label>
+              <Input value={subtitle} onChange={(e) => setSubtitle(e.target.value)} placeholder="Le guide ultime pour..." />
             </div>
             <div className="space-y-2">
               <Label>Nom d'auteur</Label>
