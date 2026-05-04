@@ -133,7 +133,7 @@ export const EbookEditorialDirector = ({
     setTimeout(() => setCopiedIndex(null), 2000);
   };
 
-  const useTitle = (title: string) => {
+  const applyTitle = (title: string) => {
     setSujet(title);
     // Important: l'analyse affichée correspond à l'ancien titre tant qu'on ne relance pas.
     // Ici on relance automatiquement pour que le score/ligne se mette à jour immédiatement.
@@ -191,7 +191,7 @@ export const EbookEditorialDirector = ({
     }
   };
 
-  const analyzeSubject = async (overrideSujet?: string) => {
+  const analyzeSubject = async (overrideSujet?: string, options?: { force?: boolean }) => {
     const subjectToAnalyze = (overrideSujet ?? sujet).trim();
 
     if (!subjectToAnalyze) {
@@ -212,8 +212,8 @@ export const EbookEditorialDirector = ({
       return;
     }
 
-    // Évite de lancer plusieurs analyses en parallèle si l'utilisateur clique vite
-    if (isAnalyzing) return;
+    // Évite de lancer plusieurs analyses en parallèle, sauf bouton de secours volontaire.
+    if (isAnalyzing && !options?.force) return;
 
     setIsAnalyzing(true);
     try {
@@ -240,9 +240,9 @@ export const EbookEditorialDirector = ({
           toast.success("Analyse éditoriale terminée !");
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Erreur analyse:", error);
-      const msg = String(error?.message || error || "");
+      const msg = error instanceof Error ? error.message : String(error || "");
       const isKeyError =
         msg.includes("400") ||
         msg.includes("401") ||
@@ -292,11 +292,11 @@ export const EbookEditorialDirector = ({
             />
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-2">
+          <div className="grid gap-2 sm:grid-cols-2">
             <Button
               onClick={() => analyzeSubject()}
               disabled={isAnalyzing || !sujet.trim()}
-              className="flex-1"
+              className="h-auto min-h-11 w-full whitespace-normal px-4 py-3 leading-snug"
               size="lg"
             >
               {isAnalyzing ? (
@@ -318,13 +318,13 @@ export const EbookEditorialDirector = ({
               variant="outline"
               size="lg"
               onClick={() => {
-                setIsAnalyzing(false);
                 setAnalysis(null);
                 toast.info("Relance de l'analyse…");
-                void analyzeSubject();
+                void analyzeSubject(undefined, { force: true });
               }}
               disabled={!sujet.trim()}
               title="Cliquez ici si l'analyse semble bloquée"
+              className="h-auto min-h-11 w-full whitespace-normal px-4 py-3 leading-snug"
             >
               <RefreshCw className={`mr-2 h-4 w-4 ${isAnalyzing ? "animate-spin" : ""}`} />
               Relancer l'analyse
@@ -338,8 +338,8 @@ export const EbookEditorialDirector = ({
           )}
 
           {analysis && !isAnalyzing && (
-            <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-green-500/30 bg-green-500/5 p-3">
-              <p className="text-sm text-green-700 dark:text-green-400">
+            <div className="grid gap-3 rounded-lg border border-green-500/30 bg-green-500/5 p-3 sm:grid-cols-[1fr_auto] sm:items-center">
+              <p className="min-w-0 text-sm text-green-700 dark:text-green-400">
                 ✅ Analyse terminée. Vous pouvez passer à <strong>Jano (P2)</strong> dans le tableau de bord.
               </p>
               <Button
@@ -351,6 +351,7 @@ export const EbookEditorialDirector = ({
                   onAnalysisComplete?.(analysis);
                   toast.success("Étape P1 confirmée — passez à Jano (P2).");
                 }}
+                className="h-auto min-h-9 w-full whitespace-normal px-3 py-2 leading-snug sm:w-auto"
               >
                 Continuer vers Jano (P2) →
               </Button>
@@ -559,7 +560,7 @@ export const EbookEditorialDirector = ({
                             <Button
                               variant={isBest ? "default" : "outline"}
                               size="sm"
-                              onClick={() => useTitle(fullTitle)}
+                              onClick={() => applyTitle(fullTitle)}
                               className="h-8 text-xs"
                             >
                               {isBest ? "🏆 Utiliser" : "Utiliser"}
