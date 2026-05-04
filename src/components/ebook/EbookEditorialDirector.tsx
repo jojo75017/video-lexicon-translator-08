@@ -102,6 +102,30 @@ export const EbookEditorialDirector = ({
     return typeof item === 'string' ? item : item.titre;
   };
 
+  const getBestTitleIndex = (titles: Array<TitleSuggestion | string>): number => {
+    return titles.reduce((bestIndex, current, currentIndex) => {
+      const currentScore = typeof current === "object" ? Number(current?.scoreKdp ?? 0) : 0;
+      const bestScore = typeof titles[bestIndex] === "object" ? Number((titles[bestIndex] as TitleSuggestion)?.scoreKdp ?? 0) : 0;
+      return currentScore > bestScore ? currentIndex : bestIndex;
+    }, 0);
+  };
+
+  const normalizeAnalysis = (nextAnalysis: EditorialAnalysis): EditorialAnalysis => {
+    const titles = Array.isArray(nextAnalysis.suggestionsTitle) ? nextAnalysis.suggestionsTitle : [];
+    if (titles.length === 0) return nextAnalysis;
+
+    const bestIndex = getBestTitleIndex(titles);
+    const best = titles[bestIndex];
+    const bestScore = typeof best === "object" ? Number(best?.scoreKdp ?? 0) : 0;
+    return {
+      ...nextAnalysis,
+      meilleurTitre: {
+        index: bestIndex,
+        explication: bestScore > 0 ? `Score KDP le plus élevé (${bestScore}/100).` : "Titre recommandé par l'analyse.",
+      },
+    };
+  };
+
   const copyTitle = (title: string, index: number) => {
     navigator.clipboard.writeText(title);
     setCopiedIndex(index);
@@ -150,12 +174,9 @@ export const EbookEditorialDirector = ({
       const newTitles = data?.analysis?.suggestionsTitle ?? [];
       if (newTitles.length > 0) {
         // Auto-sélection du meilleur titre par scoreKdp le plus élevé
-        let bestIndex = 0;
-        let bestScore = -1;
-        newTitles.forEach((t: any, i: number) => {
-          const score = typeof t === "object" && t?.scoreKdp ? Number(t.scoreKdp) : 0;
-          if (score > bestScore) { bestScore = score; bestIndex = i; }
-        });
+        const bestIndex = getBestTitleIndex(newTitles);
+        const bestTitle = newTitles[bestIndex];
+        const bestScore = typeof bestTitle === "object" ? Number(bestTitle?.scoreKdp ?? 0) : 0;
         const meilleurTitre = { index: bestIndex, explication: `Score KDP le plus élevé (${bestScore}/100).` };
         setAnalysis((prev) => prev ? { ...prev, suggestionsTitle: newTitles, meilleurTitre } : prev);
         if (!silent) toast.success(`${newTitles.length} nouveaux titres générés ! Meilleur : #${bestIndex + 1}`);
@@ -207,9 +228,10 @@ export const EbookEditorialDirector = ({
       if (error) throw error;
 
       if (data?.analysis) {
-        setAnalysis(data.analysis);
-        onAnalysisComplete?.(data.analysis);
-        const titles = data.analysis.suggestionsTitle ?? [];
+        const normalizedAnalysis = normalizeAnalysis(data.analysis);
+        setAnalysis(normalizedAnalysis);
+        onAnalysisComplete?.(normalizedAnalysis);
+        const titles = normalizedAnalysis.suggestionsTitle ?? [];
         if (titles.length < 3) {
           toast.warning("Liste de titres incomplète, complétion auto…");
           // Best-effort: relance ciblée
