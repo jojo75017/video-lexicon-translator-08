@@ -192,4 +192,13 @@ export const COLUMN_COLORS: Record<string, { bg: string; border: string; header:
     badge: 'bg-rose-500/15 text-rose-400',
     text: 'text-rose-400',
   },
+  amber: {
+    bg: 'bg-amber-500/5',
+    border: 'border-amber-500/20',
+    header: 'bg-gradient-to-r from-amber-500/15 to-amber-400/10',
+    card: 'bg-card border-amber-500/10',
+    cardHover: 'hover:border-amber-500/30 hover:shadow-amber-500/10',
+    badge: 'bg-amber-500/15 text-amber-400',
+    text: 'text-amber-400',
+  },
 };
