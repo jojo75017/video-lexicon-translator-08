@@ -13,6 +13,8 @@ import {
   ChevronRight,
   CreditCard,
   Shield,
+  Zap,
+  Hand,
   type LucideIcon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -136,6 +138,43 @@ export const SimpleSidebar: React.FC<SimpleSidebarProps> = ({
 
       {/* Étapes */}
       <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1.5 scrollbar-thin">
+        {/* Sélecteur de mode : Workflow IA vs Manuel */}
+        {!isCollapsed && (
+          <div className="mb-4 rounded-xl border border-border bg-muted/30 p-2.5">
+            <p className="px-1 pb-2 text-[11px] uppercase tracking-wide text-muted-foreground/80 font-semibold">
+              Comment veux-tu créer ?
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => onTabChange('complete-workflow')}
+                title="Workflow IA — 15 agents enchaînent toutes les étapes (P1 → P15)"
+                className="group flex flex-col items-start gap-1 rounded-lg border border-primary/30 bg-primary/5 p-2.5 text-left transition-all hover:border-primary hover:bg-primary/10"
+              >
+                <div className="flex items-center gap-1.5">
+                  <Zap className="h-3.5 w-3.5 text-primary" />
+                  <span className="text-xs font-bold text-primary">Workflow IA</span>
+                </div>
+                <span className="text-[10px] leading-tight text-muted-foreground">
+                  15 agents auto · ~30 min
+                </span>
+              </button>
+              <button
+                onClick={() => onTabChange('planner')}
+                title="Mode simple — tu pilotes manuellement chaque étape"
+                className="group flex flex-col items-start gap-1 rounded-lg border border-border bg-card p-2.5 text-left transition-all hover:border-amber-500/50 hover:bg-amber-500/5"
+              >
+                <div className="flex items-center gap-1.5">
+                  <Hand className="h-3.5 w-3.5 text-foreground" />
+                  <span className="text-xs font-bold text-foreground">Mode simple</span>
+                </div>
+                <span className="text-[10px] leading-tight text-muted-foreground">
+                  À ton rythme, manuel
+                </span>
+              </button>
+            </div>
+          </div>
+        )}
+
         {STEP_ITEMS.map((item) => {
           const Icon = item.icon;
           const active = isStepActive(item);
