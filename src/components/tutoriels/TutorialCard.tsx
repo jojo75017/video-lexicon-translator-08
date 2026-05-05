@@ -14,8 +14,11 @@ interface TutorialCardProps {
 export const TutorialCard: React.FC<TutorialCardProps> = ({ tutoriel, validationError }) => {
   const navigate = useNavigate();
   const Icon = tutoriel.icon;
-  const target = tutoriel.targetTab
-    ? `${tutoriel.targetRoute}?tab=${encodeURIComponent(tutoriel.targetTab)}`
+  const params = new URLSearchParams();
+  if (tutoriel.targetTab) params.set('tab', tutoriel.targetTab);
+  if (tutoriel.targetAnchor) params.set('focus', tutoriel.targetAnchor);
+  const target = params.toString()
+    ? `${tutoriel.targetRoute}?${params.toString()}`
     : tutoriel.targetRoute;
   const isInvalid = Boolean(validationError);
 
