@@ -181,6 +181,10 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
       toast.error('Titre requis');
       return;
     }
+    if (format === 'paperback' && paperbackValidation?.hasError) {
+      toast.error('Dimensions broché incomplètes — corrigez la validation avant de générer');
+      return;
+    }
     setIsGenerating(true);
     try {
       const { data, error } = await supabase.functions.invoke('generate-ai-cover', {
