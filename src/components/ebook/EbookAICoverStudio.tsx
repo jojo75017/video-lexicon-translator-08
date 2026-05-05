@@ -78,10 +78,93 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedCovers, setGeneratedCovers] = useState<GeneratedCover[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [showPromptsPreview, setShowPromptsPreview] = useState(false);
 
   useEffect(() => {
     if (initialDescription.trim()) setDescription(initialDescription);
   }, [initialDescription]);
+
+  // ========== VALIDATION DIMENSIONS BROCHÉ (en direct, avant génération) ==========
+  type CheckStatus = 'ok' | 'warn' | 'error';
+  interface Check { label: string; status: CheckStatus; detail: string; }
+
+  const paperbackValidation = React.useMemo(() => {
+    if (format !== 'paperback') return null;
+    const brief = (initialDescription || '').toLowerCase();
+    const checks: Check[] = [];
+
+    // Trim
+    const trimMatch = brief.match(/(\d{1,2}[.,]?\d?)\s*[x×]\s*(\d{1,2}[.,]?\d?)\s*cm/);
+    let widthMm = 0, heightMm = 0;
+    if (trimMatch) {
+      widthMm = parseFloat(trimMatch[1].replace(',', '.')) * 10;
+      heightMm = parseFloat(trimMatch[2].replace(',', '.')) * 10;
+      const validKdp = widthMm >= 102 && widthMm <= 216 && heightMm >= 152 && heightMm <= 279;
+      checks.push({
+        label: 'Trim (format final)',
+        status: validKdp ? 'ok' : 'warn',
+        detail: `${(widthMm/10).toFixed(2)} × ${(heightMm/10).toFixed(2)} cm${validKdp ? ' — conforme KDP' : ' — hors plage KDP standard (10.2–21.6 × 15.2–27.9 cm)'}`,
+      });
+    } else {
+      checks.push({
+        label: 'Trim (format final)',
+        status: 'error',
+        detail: 'Aucune dimension trouvée. Renseignez le format dans Format & Tranche KDP (ex : 15.24 × 22.86 cm).',
+      });
+    }
+
+    // Pages + papier
+    const pagesMatch = brief.match(/(\d{2,4})\s*pages?/);
+    const paper: 'cream' | 'white' = /blanc|white/.test(brief) ? 'white' : 'cream';
+    if (pagesMatch) {
+      const pages = parseInt(pagesMatch[1], 10);
+      const validPages = pages >= 24 && pages <= 828;
+      checks.push({
+        label: 'Pages & papier',
+        status: validPages ? 'ok' : 'error',
+        detail: `${pages} pages, papier ${paper === 'white' ? 'blanc' : 'crème'}${validPages ? '' : ' — KDP exige 24 à 828 pages'}`,
+      });
+    } else {
+      checks.push({
+        label: 'Pages & papier',
+        status: 'error',
+        detail: 'Nombre de pages manquant — impossible de calculer le dos. Saisissez-le dans Format & Tranche KDP.',
+      });
+    }
+
+    // Dos calculé
+    if (pagesMatch) {
+      const pages = parseInt(pagesMatch[1], 10);
+      const factor = paper === 'white' ? 0.0524 : 0.0573;
+      const spineMm = +(pages * factor).toFixed(2);
+      const spineOk = spineMm >= 1; // KDP : pas de texte sur le dos < 80p (~4.6mm) mais structure OK >= 1mm
+      checks.push({
+        label: 'Dos (spine)',
+        status: spineMm < 4.6 ? 'warn' : 'ok',
+        detail: `${spineMm} mm calculés${spineMm < 4.6 ? ' — KDP interdit le texte sur le dos sous ~80 pages (4.6 mm)' : ' — assez large pour titre + auteur'}`,
+      });
+    }
+
+    // Bleed (toujours 3.175 mm imposé par buildPaperbackSpec)
+    checks.push({
+      label: 'Bleed (fond perdu)',
+      status: 'ok',
+      detail: '3.175 mm (0.125") appliqué automatiquement sur les 4 côtés',
+    });
+
+    const hasError = checks.some((c) => c.status === 'error');
+    const hasWarn = checks.some((c) => c.status === 'warn');
+    return { checks, hasError, hasWarn };
+  }, [format, initialDescription]);
+
+  // ========== APERÇU DES PROMPTS AVANT GÉNÉRATION ==========
+  const livePromptPreview = React.useMemo(() => {
+    if (!title.trim()) return null;
+    const baseArt = `Style: ${style}. Palette: ${colorScheme || 'modern, high contrast'}. Genre: ${genre}.${description ? ` Concept: ${description}.` : ''} Photorealistic magazine-grade quality, NO cartoon, NO low-fidelity, NO watermark, NO Amazon badge, NO mockup. Title typography sharp and perfectly legible.`;
+    const recto = `FRONT COVER (recto) for the book "${title}"${subtitle ? `, subtitle "${subtitle}"` : ''}, by ${author || 'Author'}. Vertical portrait artwork, ratio 1.6:1, flat 2D print-ready. Title HUGE centered at top third, ${subtitle ? 'subtitle clearly below in smaller elegant type, ' : ''}author name at the bottom. ${baseArt}`;
+    const verso = `BACK COVER (verso / 4ème de couverture) for the same book "${title}" by ${author || 'Author'}. Same visual universe as the front cover (same palette, lighting, typography). Vertical portrait, same dimensions as the front. Compose a clean back panel with: a short hook headline at the top, a 3–5 line synopsis area in readable body text, a small author bio block at the bottom-left, and a CLEAN EMPTY rectangular zone of 50 x 30 mm in the BOTTOM-RIGHT reserved for ISBN barcode. ${baseArt}`;
+    return { recto, verso };
+  }, [title, subtitle, author, style, colorScheme, genre, description]);
 
   const handleReferenceUpload = (file: File) => {
     if (file.size > 4 * 1024 * 1024) {
