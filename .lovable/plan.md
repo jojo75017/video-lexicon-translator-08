@@ -1,50 +1,47 @@
-Je confirme le problème : les outils KDP actuels utilisent encore un ancien appel direct à OpenAI (`api.openai.com`) alors que le projet est configuré pour les clés Gemini abonné (`AIza...`). Résultat : description, mots-clés, catégories et A+ peuvent échouer ou ne rien afficher.
+## Problèmes identifiés
 
-Plan de correction :
+**1. Description KDP trop courte**
+- `maxTokens: 1500` côté Gemini — mais le prompt demande "max 1900 caractères"
+- En français, 1900 caractères ≈ 600-800 tokens normalement, MAIS Gemini 2.5 Flash consomme beaucoup de tokens en "thinking" interne avant de produire le texte
+- Résultat : la description est tronquée avant d'atteindre la longueur attendue
 
-1. Remplacer le moteur IA de l’onglet KDP
-   - Modifier les fonctions KDP dans `useSubscriptionGeneration` pour utiliser Gemini via le service existant `callGemini` / `callGeminiJSON`.
-   - Supprimer la dépendance à l’ancien appel OpenAI pour ces outils.
-   - Garder la logique BYOK : chaque abonné utilise sa clé Gemini déjà configurée dans EbookStudio.
+**2. Mots-clés "Impossible de parser la réponse JSON de Gemini"**
+- `callGeminiJSON` tente `JSON.parse` puis cherche `{...}` ou `[...]`. Si la réponse est tronquée (max tokens atteint), le `]` final manque → parse échoue
+- Le service Gemini ne demande pas explicitement `responseMimeType: 'application/json'` à l'API → Gemini renvoie parfois du texte mêlé de markdown, voire du commentaire avant le tableau
+- Pas de réparation automatique (suppression virgules trailing, troncature, etc.)
 
-2. Corriger les messages utilisateur
-   - Remplacer “Clé API OpenAI requise” par “Clé API Gemini requise”.
-   - Afficher une erreur claire si la clé est absente ou ne commence pas par `AIza`.
-   - Ajouter des messages précis en cas de quota, clé invalide ou réponse IA mal formatée.
+## Plan de correction (2 fichiers, sans casser le reste)
 
-3. Fiabiliser la génération Description KDP
-   - Générer une description Amazon propre, persuasive, limitée aux contraintes KDP.
-   - Inclure titre, auteur, public cible, résumé/chapitres et bénéfices lecteur.
-   - Retourner un texte directement copiable, sans JSON inutile.
+### A. `src/services/geminiService.ts`
+1. Augmenter `maxOutputTokens` par défaut à **8192** (au lieu de 2000)
+2. Ajouter un paramètre `jsonMode` à `callGemini` qui, quand activé, ajoute `responseMimeType: 'application/json'` dans `generationConfig` → Gemini renvoie alors du JSON pur garanti
+3. Faire en sorte que `callGeminiJSON` active automatiquement `jsonMode: true`
+4. Logger `finishReason` quand la réponse est vide ou tronquée pour debug futur
+5. Améliorer l'extracteur JSON dans `callGeminiJSON` :
+   - Strip markdown ` ```json `
+   - Trouver bornes `{...}` ou `[...]`
+   - Réparer virgules trailing (`,}` / `,]`)
+   - Nettoyer caractères de contrôle
+   - En dernier recours, si la réponse est tronquée à mi-chemin dans un tableau, fermer proprement avant de parser
 
-4. Fiabiliser les 7 mots-clés KDP
-   - Demander une réponse JSON stricte.
-   - Normaliser le résultat même si Gemini renvoie une liste simple au lieu d’objets détaillés.
-   - Garantir l’affichage des 7 champs dans l’interface avec copie facile.
+### B. `src/hooks/useSubscriptionGeneration.ts`
+1. **Description KDP** : passer `maxTokens` de 1500 → **4000** pour laisser de la marge au "thinking" interne de Gemini 2.5 Flash
+2. **Mots-clés KDP** : passer `maxTokens` de 1200 → **3000**
+3. **Catégories KDP** : passer `maxTokens` de 1200 → **3000**
+4. **A+ Content** : passer `maxTokens` de 4000 → **8000**
+5. Si `callGeminiJSON` échoue toujours sur les keywords/categories, faire un **second essai automatique** en demandant à Gemini "réponds UNIQUEMENT en JSON valide commençant par `[` et terminant par `]`, rien d'autre"
 
-5. Fiabiliser les catégories KDP
-   - Demander une réponse JSON stricte avec catégorie, concurrence, estimation et recommandation.
-   - Normaliser le résultat pour éviter que l’interface reste vide si la réponse est légèrement différente.
+## Pas touché
+- Sidebar
+- Pages, routes, navigation
+- Dashboard
+- Edge functions (la migration est déjà côté client via `geminiService`)
+- Workflow P1-P15
+- Schéma DB
+- Aucune nouvelle table, aucun nouveau secret
 
-6. Fiabiliser le contenu A+
-   - Utiliser Gemini avec un prompt plus strict.
-   - Supprimer les faux témoignages présentés comme réels : les remplacer par des “modèles de témoignages à demander aux lecteurs”, pour rester crédible et éviter les contenus trompeurs.
-   - Ajouter une validation minimale de la structure retournée pour éviter les crashes si une section manque.
-
-7. Améliorer `EbookKdpTools.tsx`
-   - Utiliser la clé Gemini issue de la configuration existante au lieu de dépendre uniquement de la prop `apiKey` si nécessaire.
-   - Ajouter des états de chargement par bouton pour mieux voir que la génération travaille.
-   - Ajouter un message visible si la clé Gemini n’est pas configurée.
-   - Garder l’onglet et la sidebar inchangés pour ne pas casser ce qui vient d’être stabilisé.
-
-Fichiers concernés :
+## Fichiers modifiés
+- `src/services/geminiService.ts`
 - `src/hooks/useSubscriptionGeneration.ts`
-- `src/components/ebook/EbookKdpTools.tsx`
 
-Aucun changement prévu :
-- Pas de nouvelle table.
-- Pas d’envoi email.
-- Pas de modification sidebar/dashboard.
-- Pas de modification des fichiers auto-générés Lovable Cloud.
-
-Après validation, je corrige directement ces deux fichiers.
+Après validation, j'applique ces corrections directement.

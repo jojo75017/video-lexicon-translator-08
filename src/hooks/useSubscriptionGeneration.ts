@@ -446,7 +446,7 @@ Contraintes :
 
     setIsGenerating(true);
     try {
-      const content = await callGemini(key, prompt, { maxTokens: 1500, temperature: 0.7 });
+      const content = await callGemini(key, prompt, { maxTokens: 4000, temperature: 0.7 });
       return (content || '').trim();
     } catch (e: any) {
       console.error('[KDP description] error', e);
@@ -484,7 +484,7 @@ Les niveaux de "relevance" autorisés : "haute", "moyenne", "faible".`;
 
     setIsGenerating(true);
     try {
-      const raw = await callGeminiJSON<any>(key, prompt, { maxTokens: 1200, temperature: 0.6 });
+      const raw = await callGeminiJSON<any>(key, prompt, { maxTokens: 3000, temperature: 0.6 });
       // Normalisation : accepte string[] ou objet
       const arr = Array.isArray(raw) ? raw : (Array.isArray((raw as any)?.keywords) ? (raw as any).keywords : []);
       const normalized = arr.slice(0, 7).map((k: any) => {
@@ -547,7 +547,7 @@ Valeurs autorisées pour "competition" : "faible", "moyenne", "élevée", "très
 
     setIsGenerating(true);
     try {
-      const raw = await callGeminiJSON<any>(key, prompt, { maxTokens: 1200, temperature: 0.6 });
+      const raw = await callGeminiJSON<any>(key, prompt, { maxTokens: 3000, temperature: 0.6 });
       const arr = Array.isArray(raw) ? raw : (Array.isArray((raw as any)?.categories) ? (raw as any).categories : []);
       const normalized = arr.slice(0, 5).map((c: any) => {
         if (typeof c === 'string') return { category: c };
@@ -887,7 +887,7 @@ IMPORTANT :
     }
     setIsGenerating(true);
     try {
-      const content = await callGemini(key, prompt, { maxTokens: 4000, temperature: 0.7 });
+      const content = await callGemini(key, prompt, { maxTokens: 8000, temperature: 0.7 });
       let clean = (content || '').trim().replace(/```json\s*|```/g, '').trim();
       const match = clean.match(/\{[\s\S]*\}/);
       const jsonText = match ? match[0] : clean;

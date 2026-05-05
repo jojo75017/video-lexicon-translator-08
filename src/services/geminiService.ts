@@ -10,6 +10,7 @@ interface GeminiCallOptions {
   temperature?: number;
   maxTokens?: number;
   timeout?: number;
+  jsonMode?: boolean;
 }
 
 /**
@@ -23,20 +24,26 @@ export async function callGemini(
   const {
     systemPrompt,
     temperature = 0.7,
-    maxTokens = 2000,
+    maxTokens = 8192,
     timeout = 60000,
+    jsonMode = false,
   } = options;
 
   const model = 'gemini-2.5-flash';
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeout);
 
+  const generationConfig: any = {
+    temperature,
+    maxOutputTokens: maxTokens,
+  };
+  if (jsonMode) {
+    generationConfig.responseMimeType = 'application/json';
+  }
+
   const body: any = {
     contents: [{ role: 'user', parts: [{ text: prompt }] }],
-    generationConfig: {
-      temperature,
-      maxOutputTokens: maxTokens,
-    },
+    generationConfig,
   };
 
   if (systemPrompt) {
@@ -79,7 +86,20 @@ export async function callGemini(
 
     const data = await response.json();
     const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!content) throw new Error('Aucune réponse de Gemini');
+    const finishReason = data.candidates?.[0]?.finishReason;
+    if (!content) {
+      console.error('Gemini réponse vide. finishReason:', finishReason, 'data:', JSON.stringify(data).slice(0, 500));
+      if (finishReason === 'MAX_TOKENS') {
+        throw new Error('Réponse Gemini tronquée (limite de tokens). Réessayez ou réduisez la longueur du prompt.');
+      }
+      if (finishReason === 'SAFETY') {
+        throw new Error('Réponse Gemini bloquée par les filtres de sécurité. Reformulez votre demande.');
+      }
+      throw new Error('Aucune réponse de Gemini');
+    }
+    if (finishReason === 'MAX_TOKENS') {
+      console.warn('[Gemini] Réponse possiblement tronquée (MAX_TOKENS)');
+    }
     return content;
   } catch (error: any) {
     clearTimeout(timeoutId);
@@ -168,34 +188,122 @@ export async function callGeminiWithHistory(
 }
 
 /**
- * Appelle Gemini et parse la réponse comme JSON
+ * Tente de réparer une chaîne JSON potentiellement tronquée ou malformée
+ */
+function tryRepairJson(input: string): string {
+  let s = input
+    .replace(/```json\s*/gi, '')
+    .replace(/```\s*/g, '')
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')
+    .trim();
+
+  // Trouver la borne d'ouverture
+  const firstBrace = s.indexOf('{');
+  const firstBracket = s.indexOf('[');
+  let start = -1;
+  let isArray = false;
+  if (firstBracket !== -1 && (firstBrace === -1 || firstBracket < firstBrace)) {
+    start = firstBracket;
+    isArray = true;
+  } else if (firstBrace !== -1) {
+    start = firstBrace;
+  }
+  if (start === -1) return s;
+
+  s = s.substring(start);
+
+  // Borne de fermeture explicite si présente
+  const lastClose = isArray ? s.lastIndexOf(']') : s.lastIndexOf('}');
+  if (lastClose !== -1) {
+    s = s.substring(0, lastClose + 1);
+  }
+
+  // Supprimer virgules trailing
+  s = s.replace(/,(\s*[}\]])/g, '$1');
+
+  // Si JSON tronqué, fermer en équilibrant les braces/brackets ouverts (en ignorant ceux dans les strings)
+  let openBrace = 0, openBracket = 0;
+  let inString = false, escape = false;
+  let lastValidEnd = -1;
+  for (let i = 0; i < s.length; i++) {
+    const c = s[i];
+    if (escape) { escape = false; continue; }
+    if (c === '\\') { escape = true; continue; }
+    if (c === '"') { inString = !inString; continue; }
+    if (inString) continue;
+    if (c === '{') openBrace++;
+    else if (c === '}') openBrace--;
+    else if (c === '[') openBracket++;
+    else if (c === ']') openBracket--;
+    if (openBrace === 0 && openBracket === 0) lastValidEnd = i;
+  }
+
+  // Si déséquilibré, on tronque à la dernière virgule avant le déséquilibre puis on ferme
+  if (openBrace > 0 || openBracket > 0 || inString) {
+    // Tronquer à la dernière virgule "saine"
+    let truncateAt = -1;
+    let ob = 0, obk = 0, str = false, esc = false;
+    for (let i = 0; i < s.length; i++) {
+      const c = s[i];
+      if (esc) { esc = false; continue; }
+      if (c === '\\') { esc = true; continue; }
+      if (c === '"') { str = !str; continue; }
+      if (str) continue;
+      if (c === '{') ob++;
+      else if (c === '}') ob--;
+      else if (c === '[') obk++;
+      else if (c === ']') obk--;
+      if (c === ',' && ((isArray && obk === 1 && ob === 0) || (!isArray && ob === 1 && obk === 0))) {
+        truncateAt = i;
+      }
+    }
+    if (truncateAt > 0) {
+      s = s.substring(0, truncateAt);
+    }
+    // Fermer ce qui reste
+    let ob2 = 0, obk2 = 0, str2 = false, esc2 = false;
+    for (let i = 0; i < s.length; i++) {
+      const c = s[i];
+      if (esc2) { esc2 = false; continue; }
+      if (c === '\\') { esc2 = true; continue; }
+      if (c === '"') { str2 = !str2; continue; }
+      if (str2) continue;
+      if (c === '{') ob2++;
+      else if (c === '}') ob2--;
+      else if (c === '[') obk2++;
+      else if (c === ']') obk2--;
+    }
+    if (str2) s += '"';
+    while (ob2-- > 0) s += '}';
+    while (obk2-- > 0) s += ']';
+  }
+
+  return s;
+}
+
+/**
+ * Appelle Gemini et parse la réponse comme JSON (avec responseMimeType + réparation)
  */
 export async function callGeminiJSON<T = any>(
   apiKey: string,
   prompt: string,
   options: GeminiCallOptions = {}
 ): Promise<T> {
-  const content = await callGemini(apiKey, prompt, options);
-  const cleanContent = content
-    .replace(/```json\n?/g, '')
-    .replace(/```\n?/g, '')
-    .trim();
-  
+  const content = await callGemini(apiKey, prompt, { ...options, jsonMode: true });
+
+  // 1er essai : parse direct
   try {
-    return JSON.parse(cleanContent);
-  } catch {
-    // Try to extract JSON from the response
-    const start = cleanContent.indexOf('{');
-    const end = cleanContent.lastIndexOf('}');
-    if (start !== -1 && end !== -1) {
-      return JSON.parse(cleanContent.substring(start, end + 1));
-    }
-    // Try array
-    const arrStart = cleanContent.indexOf('[');
-    const arrEnd = cleanContent.lastIndexOf(']');
-    if (arrStart !== -1 && arrEnd !== -1) {
-      return JSON.parse(cleanContent.substring(arrStart, arrEnd + 1));
-    }
-    throw new Error('Impossible de parser la réponse JSON de Gemini');
+    return JSON.parse(content);
+  } catch {}
+
+  // 2e essai : réparation
+  const repaired = tryRepairJson(content);
+  try {
+    return JSON.parse(repaired);
+  } catch (e) {
+    console.error('[Gemini JSON] Échec parsing. Brut:', content.slice(0, 800));
+    console.error('[Gemini JSON] Réparé:', repaired.slice(0, 800));
+    throw new Error('Impossible de parser la réponse JSON de Gemini. Relancez la génération.');
   }
 }
+
