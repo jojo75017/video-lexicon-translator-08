@@ -79,6 +79,7 @@ import { WorkflowStepWrapper } from '@/components/ebook/WorkflowStepWrapper';
 import { STEP_TO_TAB } from '@/components/ebook/WorkflowNavigation';
 import { WorkflowOnboarding } from '@/components/ebook/WorkflowOnboarding';
 import { WorkflowDashboard } from '@/components/ebook/WorkflowDashboard';
+import { EbookProgressDashboard } from '@/components/ebook/EbookProgressDashboard';
 import { WorkflowExportCompiled } from '@/components/ebook/WorkflowExportCompiled';
 import { TrelloBoardView } from '@/components/ebook/TrelloBoardView';
 import { useConfetti } from '@/hooks/useConfetti';
