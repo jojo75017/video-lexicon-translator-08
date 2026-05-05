@@ -177,6 +177,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   const contentContainerRef = useRef<HTMLDivElement>(null);
 
   const STORAGE_KEY = 'ebook-planner-autosave';
+  const DASHBOARD_VIEW_MODE_KEY = 'ebook_dashboard_view_mode_v2';
   
   const loadSavedData = () => {
     try {
@@ -282,10 +283,11 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
     } catch {}
   }, [activeTab]);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [viewMode, setViewMode] = useState<'trello' | 'classic'>(() => {
+  const [viewMode, setViewMode] = useState<'choice' | 'trello' | 'classic'>(() => {
     try {
-      return (localStorage.getItem('ebook_view_mode') as 'trello' | 'classic') || 'trello';
-    } catch { return 'trello'; }
+      const savedMode = localStorage.getItem(DASHBOARD_VIEW_MODE_KEY);
+      return savedMode === 'trello' || savedMode === 'classic' ? savedMode : 'choice';
+    } catch { return 'choice'; }
   });
   const [showWelcome, setShowWelcome] = useState(location.state?.fromFormation || false);
   const [showTutorial, setShowTutorial] = useState(location.state?.fromFormation || false);
@@ -1297,44 +1299,70 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       case 'workflow-dashboard':
         return (
           <div className="space-y-6">
-            {/* Sélecteur de mode de tableau de bord */}
-            <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between bg-white rounded-xl border p-3 shadow-sm">
-              <div className="text-sm font-medium px-2" style={{ color: '#232F3E' }}>
-                🎛️ Mode d'affichage du tableau de bord :
+            {viewMode === 'choice' ? (
+              <div className="rounded-xl border bg-card p-5 shadow-sm">
+                <div className="mb-4">
+                  <p className="text-sm font-semibold text-primary">Choisissez votre tableau de bord</p>
+                  <h2 className="text-2xl font-bold text-foreground">Vous voulez travailler en simple ou en Workflow ?</h2>
+                </div>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setViewMode('classic');
+                      localStorage.setItem(DASHBOARD_VIEW_MODE_KEY, 'classic');
+                    }}
+                    className="rounded-lg border-2 border-border bg-background p-5 text-left transition-all hover:border-primary hover:shadow-md"
+                  >
+                    <span className="mb-3 flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold">1</span>
+                    <span className="block text-xl font-bold text-foreground">Parcours simple</span>
+                    <span className="mt-2 block text-sm text-muted-foreground">Vue guidée étape par étape, plus linéaire.</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setViewMode('trello');
+                      localStorage.setItem(DASHBOARD_VIEW_MODE_KEY, 'trello');
+                    }}
+                    className="rounded-lg border-2 border-border bg-background p-5 text-left transition-all hover:border-accent hover:shadow-md"
+                  >
+                    <span className="mb-3 flex h-9 w-9 items-center justify-center rounded-full bg-accent text-accent-foreground font-bold">2</span>
+                    <span className="block text-xl font-bold text-foreground">Workflow 15 agents</span>
+                    <span className="mt-2 block text-sm text-muted-foreground">Vue Kanban complète pour piloter tout le workflow IA.</span>
+                  </button>
+                </div>
               </div>
-              <div className="inline-flex rounded-lg border overflow-hidden bg-[#FAFAFA]">
+            ) : (
+              <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between bg-card rounded-xl border p-3 shadow-sm">
+                <div className="text-sm font-medium px-2 text-foreground">
+                  Mode choisi : {viewMode === 'classic' ? '1 — Parcours simple' : '2 — Workflow 15 agents'}
+                </div>
+                <div className="inline-flex rounded-lg border overflow-hidden bg-background">
                 <button
                   type="button"
                   onClick={() => {
                     setViewMode('classic');
-                    localStorage.setItem('ebook_view_mode', 'classic');
+                    localStorage.setItem(DASHBOARD_VIEW_MODE_KEY, 'classic');
                   }}
-                  className="px-4 py-2 text-sm font-semibold transition-all"
-                  style={{
-                    backgroundColor: viewMode === 'classic' ? '#008296' : 'transparent',
-                    color: viewMode === 'classic' ? '#FFFFFF' : '#232F3E',
-                  }}
+                  className={`px-4 py-2 text-sm font-semibold transition-all ${viewMode === 'classic' ? 'bg-primary text-primary-foreground' : 'text-foreground hover:bg-muted'}`}
                 >
-                  ✨ Parcours guidé A → Z
+                  1 Simple
                 </button>
                 <button
                   type="button"
                   onClick={() => {
                     setViewMode('trello');
-                    localStorage.setItem('ebook_view_mode', 'trello');
+                    localStorage.setItem(DASHBOARD_VIEW_MODE_KEY, 'trello');
                   }}
-                  className="px-4 py-2 text-sm font-semibold transition-all"
-                  style={{
-                    backgroundColor: viewMode === 'trello' ? '#FF9E2D' : 'transparent',
-                    color: viewMode === 'trello' ? '#FFFFFF' : '#232F3E',
-                  }}
+                  className={`px-4 py-2 text-sm font-semibold transition-all ${viewMode === 'trello' ? 'bg-accent text-accent-foreground' : 'text-foreground hover:bg-muted'}`}
                 >
-                  🗂️ Vue Workflow (Kanban)
+                  2 Workflow
                 </button>
+                </div>
               </div>
-            </div>
+            )}
 
-            {viewMode === 'trello' ? (
+            {viewMode === 'choice' ? null : viewMode === 'trello' ? (
               <TrelloBoardView
                 ebookTitle={ebookTitle}
                 bookSubtitle={bookSubtitle}
@@ -1347,7 +1375,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                 onNavigate={(tabId) => setActiveTab(tabId)}
                 onSwitchToClassic={() => {
                   setViewMode('classic');
-                  localStorage.setItem('ebook_view_mode', 'classic');
+                  localStorage.setItem(DASHBOARD_VIEW_MODE_KEY, 'classic');
                 }}
                 onUpdateTitle={setEbookTitle}
                 onUpdateSubtitle={setBookSubtitle}
@@ -1379,8 +1407,8 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             )}
 
             {/* Sections secondaires repliables */}
-            <details className="rounded-xl border bg-white p-4 group">
-              <summary className="cursor-pointer font-semibold text-sm flex items-center justify-between" style={{ color: '#232F3E' }}>
+            {viewMode === 'classic' && <details className="rounded-xl border bg-card p-4 group">
+              <summary className="cursor-pointer font-semibold text-sm flex items-center justify-between text-foreground">
                 📊 Statistiques détaillées du projet
                 <span className="text-xs text-muted-foreground group-open:hidden">Cliquez pour ouvrir</span>
               </summary>
@@ -1401,10 +1429,10 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                   onNavigateToTab={(tabId) => setActiveTab(tabId)}
                 />
               </div>
-            </details>
+            </details>}
 
-            <details className="rounded-xl border bg-white p-4 group">
-              <summary className="cursor-pointer font-semibold text-sm flex items-center justify-between" style={{ color: '#232F3E' }}>
+            {viewMode === 'classic' && <details className="rounded-xl border bg-card p-4 group">
+              <summary className="cursor-pointer font-semibold text-sm flex items-center justify-between text-foreground">
                 💡 Inspirations best-sellers & exemples de livres
                 <span className="text-xs text-muted-foreground group-open:hidden">Cliquez pour ouvrir</span>
               </summary>
@@ -1440,7 +1468,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                   }}
                 />
               </div>
-            </details>
+            </details>}
           </div>
         );
 
@@ -3267,7 +3295,7 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
           onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
           onSwitchToTrello={() => {
             setViewMode('trello');
-            localStorage.setItem('ebook_view_mode', 'trello');
+            localStorage.setItem(DASHBOARD_VIEW_MODE_KEY, 'trello');
             setActiveTab('workflow-dashboard');
           }}
         />
@@ -3301,6 +3329,18 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Retour au tableau de bord
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setViewMode('choice');
+                localStorage.removeItem(DASHBOARD_VIEW_MODE_KEY);
+                setActiveTab('workflow-dashboard');
+              }}
+              className="rounded-xl text-sm"
+            >
+              Choisir 1 ou 2
             </Button>
           </div>
         )}
