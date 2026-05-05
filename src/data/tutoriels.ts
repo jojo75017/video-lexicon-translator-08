@@ -316,6 +316,7 @@ export const TUTORIELS: Tutoriel[] = [
     ctaLabel: 'Préparer ma fiche KDP',
   },
   {
+    id: 'checklist-kdp',
     category: 'export',
     title: 'Publier sur Amazon KDP (checklist conformité)',
     description: "La checklist complète pour éviter un refus de publication.",
