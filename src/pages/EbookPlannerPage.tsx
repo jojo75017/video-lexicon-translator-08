@@ -79,6 +79,7 @@ import { WorkflowStepWrapper } from '@/components/ebook/WorkflowStepWrapper';
 import { STEP_TO_TAB } from '@/components/ebook/WorkflowNavigation';
 import { WorkflowOnboarding } from '@/components/ebook/WorkflowOnboarding';
 import { WorkflowDashboard } from '@/components/ebook/WorkflowDashboard';
+import { EbookProgressDashboard } from '@/components/ebook/EbookProgressDashboard';
 import { WorkflowExportCompiled } from '@/components/ebook/WorkflowExportCompiled';
 import { TrelloBoardView } from '@/components/ebook/TrelloBoardView';
 import { useConfetti } from '@/hooks/useConfetti';
@@ -1320,27 +1321,44 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           );
         }
         return (
-          <WorkflowDashboard
-            ebookTitle={ebookTitle}
-            authorName={authorName}
-            bookSubtitle={bookSubtitle}
-            bookDescription={bookDescription}
-            genre={genre}
-            targetAudience={targetAudience}
-            numberOfChapters={numberOfChapters}
-            chapters={chapters}
-            onNavigate={(tabId) => setActiveTab(tabId)}
-            onStartAutoWorkflow={() => setActiveTab('complete-workflow')}
-            onUpdateTitle={setEbookTitle}
-            onUpdateSubtitle={setBookSubtitle}
-            onUpdateAuthor={setAuthorName}
-            onUpdateDescription={setBookDescription}
-            onUpdateGenre={setGenre}
-            onUpdateTargetAudience={setTargetAudience}
-            onUpdateNumberOfChapters={setNumberOfChapters}
-            onUpdateChapterTitle={updateChapterTitle}
-            onAddChapter={addChapter}
-          />
+          <div className="space-y-6">
+            <EbookProgressDashboard
+              ebookTitle={ebookTitle}
+              authorName={authorName}
+              bookDescription={bookDescription}
+              targetAudience={targetAudience}
+              chapters={chapters}
+              preface={preface}
+              conclusion={conclusion}
+              coverImageUrl={coverConcepts ? 'generated' : undefined}
+              kdpDescription={kdpDescription}
+              kdpKeywords={kdpKeywords}
+              kdpCategories={kdpCategories}
+              numberOfChapters={numberOfChapters}
+              onNavigateToTab={(tabId) => setActiveTab(tabId)}
+            />
+            <WorkflowDashboard
+              ebookTitle={ebookTitle}
+              authorName={authorName}
+              bookSubtitle={bookSubtitle}
+              bookDescription={bookDescription}
+              genre={genre}
+              targetAudience={targetAudience}
+              numberOfChapters={numberOfChapters}
+              chapters={chapters}
+              onNavigate={(tabId) => setActiveTab(tabId)}
+              onStartAutoWorkflow={() => setActiveTab('complete-workflow')}
+              onUpdateTitle={setEbookTitle}
+              onUpdateSubtitle={setBookSubtitle}
+              onUpdateAuthor={setAuthorName}
+              onUpdateDescription={setBookDescription}
+              onUpdateGenre={setGenre}
+              onUpdateTargetAudience={setTargetAudience}
+              onUpdateNumberOfChapters={setNumberOfChapters}
+              onUpdateChapterTitle={updateChapterTitle}
+              onAddChapter={addChapter}
+            />
+          </div>
         );
 
       case 'workflow-export':

@@ -3,7 +3,7 @@ import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
-  Search, Lightbulb, ArrowRight, Sparkles, Heart, Brain, 
+  Search, Lightbulb, ArrowRight, ArrowLeft, Sparkles, Heart, Brain, 
   Briefcase, Users, Target, Flame, Star, BookOpen,
   TrendingUp, DollarSign, GraduationCap, Palette, Zap
 } from 'lucide-react';
@@ -126,7 +126,26 @@ const NichesPage = () => {
   const totalNiches = ebookThemes.reduce((acc, theme) => acc + theme.ideas.length, 0);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 p-4 md:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+      {/* Sticky top bar — toujours visible (y compris onglet Best-Sellers) */}
+      <div className="sticky top-0 z-50 backdrop-blur-md bg-background/85 border-b shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 py-3 flex items-center justify-between gap-3">
+          <Button
+            onClick={() => navigate('/ebook-planner')}
+            className="bg-[#008296] hover:bg-[#FF9E2D] text-white font-semibold shadow-md transition-colors"
+            size="sm"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Retour au Générateur d'Ebook
+          </Button>
+          <div className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground">
+            <Lightbulb className="w-4 h-4 text-[#008296]" />
+            <span><strong className="text-foreground">{totalNiches}</strong> niches disponibles</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="p-4 md:p-8">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <motion.div 
@@ -335,6 +354,17 @@ const NichesPage = () => {
           </Card>
         </motion.div>
       </div>
+      </div>
+
+      {/* Floating fallback button (mobile + desktop scroll) */}
+      <Button
+        onClick={() => navigate('/ebook-planner')}
+        className="fixed bottom-6 left-6 z-40 bg-[#008296] hover:bg-[#FF9E2D] text-white shadow-xl rounded-full px-5 py-6"
+        aria-label="Retour au Générateur d'Ebook"
+      >
+        <ArrowLeft className="w-5 h-5 mr-2" />
+        <span className="hidden sm:inline">Générateur</span>
+      </Button>
     </div>
   );
 };
