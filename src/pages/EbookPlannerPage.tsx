@@ -1339,6 +1339,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               <div className="absolute -right-20 -bottom-20 w-60 h-60 rounded-full bg-white/5" />
             </div>
 
+            {/* Bloc 1bis — Moteur de mots-clés Amazon KDP (aimant) */}
+            <KdpKeywordWidget defaultSeed={ebookTitle} onSubmit={(seed) => navigate(`/kdp-keywords${seed ? `?title=${encodeURIComponent(seed)}` : ''}`)} />
+
             {/* Bloc 2 — Vitrine livres Amazon (toujours visible) */}
             <AuthorBooksShowcase
               onStartWorkflow={() => {
