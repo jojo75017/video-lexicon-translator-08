@@ -572,6 +572,8 @@ Valeurs autorisées pour "competition" : "faible", "moyenne", "élevée", "très
       setIsGenerating(false);
     }
   };
+
+  const generateBackCover = async (
     ebookTitle: string, 
     authorName: string, 
     chapters: Chapter[], 
