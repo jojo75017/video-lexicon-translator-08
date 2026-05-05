@@ -24,20 +24,26 @@ export async function callGemini(
   const {
     systemPrompt,
     temperature = 0.7,
-    maxTokens = 2000,
+    maxTokens = 8192,
     timeout = 60000,
+    jsonMode = false,
   } = options;
 
   const model = 'gemini-2.5-flash';
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeout);
 
+  const generationConfig: any = {
+    temperature,
+    maxOutputTokens: maxTokens,
+  };
+  if (jsonMode) {
+    generationConfig.responseMimeType = 'application/json';
+  }
+
   const body: any = {
     contents: [{ role: 'user', parts: [{ text: prompt }] }],
-    generationConfig: {
-      temperature,
-      maxOutputTokens: maxTokens,
-    },
+    generationConfig,
   };
 
   if (systemPrompt) {
