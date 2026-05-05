@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { callGemini, callGeminiJSON } from '@/services/geminiService';
+import { callGemini, callGeminiJSON, extractKeywordsFromText } from '@/services/geminiService';
 
 // Récupère la clé Gemini de l'abonné depuis le localStorage (BYOK).
 const getGeminiKey = (fallback?: string) => {
