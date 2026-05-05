@@ -861,12 +861,12 @@ Réponds UNIQUEMENT avec ce format JSON (pas de texte avant/après) :
   },
   "testimonial_templates": [
     {
-      "quote": "Citation fictive de lecteur satisfait (style authentique)",
-      "attribution": "Type de lecteur"
+      "quote": "Modèle de témoignage à demander à un vrai lecteur (style authentique, à personnaliser).",
+      "attribution": "Type de lecteur cible (ex: Lectrice de 35 ans, entrepreneure)"
     },
     {
-      "quote": "Deuxième citation de style différent",
-      "attribution": "Type de lecteur"
+      "quote": "Deuxième modèle de témoignage à recueillir auprès d'un beta-lecteur réel.",
+      "attribution": "Autre profil de lecteur cible"
     }
   ],
   "call_to_action": {
@@ -876,22 +876,35 @@ Réponds UNIQUEMENT avec ce format JSON (pas de texte avant/après) :
   }
 }
 
-IMPORTANT : Tous les modules doivent être cohérents entre eux et refléter fidèlement le contenu réel du livre.`;
+IMPORTANT :
+- Tous les modules doivent être cohérents entre eux et refléter fidèlement le contenu réel du livre.
+- Les "testimonial_templates" sont des MODÈLES à faire remplir par de vrais lecteurs : ne jamais les présenter comme des avis réels. Indique clairement par le style qu'il s'agit d'exemples à personnaliser.`;
 
-    const content = await callGenerateContent('chapters_generated', prompt);
-    
-    if (content) {
-      try {
-        let clean = content.trim().replace(/```json\s*|```/g, '').trim();
-        const match = clean.match(/\{[\s\S]*\}/);
-        const jsonText = match ? match[0] : clean;
-        return JSON.parse(jsonText);
-      } catch (e) {
-        console.error('Error parsing A+ content JSON:', e);
+    const key = getGeminiKey(apiKey);
+    if (!key || !key.startsWith('AIza')) {
+      toast.error('Clé API Gemini manquante', { description: 'Ajoute ta clé Gemini (commençant par AIza) dans Paramètres.' });
+      return null;
+    }
+    setIsGenerating(true);
+    try {
+      const content = await callGemini(key, prompt, { maxTokens: 4000, temperature: 0.7 });
+      let clean = (content || '').trim().replace(/```json\s*|```/g, '').trim();
+      const match = clean.match(/\{[\s\S]*\}/);
+      const jsonText = match ? match[0] : clean;
+      const parsed = JSON.parse(jsonText);
+      // Validation minimale
+      if (!parsed?.brand_story || !parsed?.hero_module || !Array.isArray(parsed?.key_features)) {
+        toast.error('Le contenu A+ retourné est incomplet. Réessaie.');
         return null;
       }
+      return parsed;
+    } catch (e: any) {
+      console.error('[A+ content] error', e);
+      toast.error(e?.message || 'Erreur lors de la génération du contenu A+');
+      return null;
+    } finally {
+      setIsGenerating(false);
     }
-    return null;
   };
 
   return {
