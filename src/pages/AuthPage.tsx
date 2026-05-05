@@ -23,10 +23,18 @@ export const AuthPage = () => {
   const checkAdmin = async (accessToken?: string) => {
     // Important: after sign-in, the client token can take a tick to propagate.
     // Passing the access token explicitly avoids false "non-admin" results.
-    return supabase.functions.invoke(
+    // Timeout de sécurité 8s pour ne jamais figer la page de connexion.
+    const invokePromise = supabase.functions.invoke(
       'check-admin',
       accessToken ? { headers: { Authorization: `Bearer ${accessToken}` } } : undefined
     );
+    const timeoutPromise = new Promise<{ data: null; error: Error }>((resolve) => {
+      setTimeout(
+        () => resolve({ data: null, error: new Error('check-admin timeout (8s)') }),
+        8000
+      );
+    });
+    return Promise.race([invokePromise, timeoutPromise]) as Promise<{ data: { isAdmin?: boolean } | null; error: Error | null }>;
   };
 
   useEffect(() => {
