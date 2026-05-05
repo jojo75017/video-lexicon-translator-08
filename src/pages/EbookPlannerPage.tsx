@@ -204,6 +204,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   const nicheFromUrl = searchParams.get('niche');
   const categoryFromUrl = searchParams.get('category');
   const requestedTabFromUrl = searchParams.get('tab');
+  const requestedFocusFromUrl = searchParams.get('focus');
   
   // Utiliser useOpenAIConfig pour une persistance fiable de la clé API
   const { apiKey, updateApiKey: setApiKey } = useOpenAIConfig();
@@ -294,6 +295,21 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       setActiveTab(requestedTabFromUrl);
     }
   }, [requestedTabFromUrl, activeTab]);
+
+  useEffect(() => {
+    if (!requestedFocusFromUrl) return;
+
+    const timer = window.setTimeout(() => {
+      const target = document.getElementById(requestedFocusFromUrl);
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const input = target.querySelector('input, textarea, button') as HTMLElement | null;
+        input?.focus();
+      }
+    }, 500);
+
+    return () => window.clearTimeout(timer);
+  }, [requestedFocusFromUrl, activeTab]);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [viewMode, setViewMode] = useState<'trello' | 'classic'>(() => {
     try {

@@ -25,6 +25,7 @@ export interface Tutoriel {
   steps: string[];
   targetRoute: string;
   targetTab?: string;
+  targetAnchor?: string;
   ctaLabel?: string;
   videoRoute?: string;
 }
@@ -103,6 +104,7 @@ export const TUTORIELS: Tutoriel[] = [
     ],
     targetRoute: '/ebook-planner',
     targetTab: 'planner',
+    targetAnchor: 'gemini-api-key-field',
     ctaLabel: 'Configurer la clé',
   },
   {
