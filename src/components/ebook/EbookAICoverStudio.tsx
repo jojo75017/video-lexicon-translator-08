@@ -46,10 +46,17 @@ const genres = [
 
 type CoverFormat = 'kindle' | 'paperback';
 
+interface PaperbackSpec {
+  widthMm: number; heightMm: number; spineMm: number; bleed: number;
+  totalWmm: number; totalHmm: number; pages?: number; paper?: string; trim: string;
+}
+
 interface GeneratedCover {
   url: string;
   desc: string;
   format: CoverFormat;
+  paperbackSpec?: PaperbackSpec | null;
+  prompts?: { recto: string; verso: string };
 }
 
 export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
