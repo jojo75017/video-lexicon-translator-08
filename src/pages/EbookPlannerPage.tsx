@@ -1295,34 +1295,8 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
         );
 
       case 'workflow-dashboard':
-        if (viewMode === 'trello') {
-          return (
-            <TrelloBoardView
-              ebookTitle={ebookTitle}
-              bookSubtitle={bookSubtitle}
-              authorName={authorName}
-              bookDescription={bookDescription}
-              genre={genre}
-              targetAudience={targetAudience}
-              numberOfChapters={numberOfChapters}
-              chapters={chapters}
-              onNavigate={(tabId) => setActiveTab(tabId)}
-              onSwitchToClassic={() => {
-                setViewMode('classic');
-                localStorage.setItem('ebook_view_mode', 'classic');
-              }}
-              onUpdateTitle={setEbookTitle}
-              onUpdateSubtitle={setBookSubtitle}
-              onUpdateAuthor={setAuthorName}
-              onUpdateDescription={setBookDescription}
-              onUpdateGenre={setGenre}
-              onUpdateTargetAudience={setTargetAudience}
-              onUpdateNumberOfChapters={setNumberOfChapters}
-              onUpdateChapterTitle={updateChapterTitle}
-              onAddChapter={addChapter}
-            />
-          );
-        }
+        // Le nouveau "Parcours A → Z" remplace désormais l'ancienne vue Trello
+        // pour offrir une expérience claire et linéaire à l'utilisateur.
         return (
           <div className="space-y-6">
             <EbookJourneyDashboard
