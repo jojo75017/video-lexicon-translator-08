@@ -117,7 +117,7 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
       if (!data?.imageUrl) throw new Error('Aucune image générée');
 
       setGeneratedCovers((prev) => [
-        { url: data.imageUrl, desc: data.description || '', format },
+        { url: data.imageUrl, desc: data.description || '', format, paperbackSpec: data.paperbackSpec, prompts: data.prompts },
         ...prev,
       ]);
       onCoverGenerated?.(data.imageUrl);
