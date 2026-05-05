@@ -178,7 +178,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   const contentContainerRef = useRef<HTMLDivElement>(null);
 
   const STORAGE_KEY = 'ebook-planner-autosave';
-  const DASHBOARD_VIEW_MODE_KEY = 'ebook_dashboard_view_mode_v2';
+  const DASHBOARD_VIEW_MODE_KEY = 'ebook_dashboard_view_mode_v3';
   
   const loadSavedData = () => {
     try {
@@ -287,8 +287,8 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   const [viewMode, setViewMode] = useState<'trello' | 'classic'>(() => {
     try {
       const savedMode = localStorage.getItem(DASHBOARD_VIEW_MODE_KEY);
-      return savedMode === 'classic' ? 'classic' : 'trello';
-    } catch { return 'trello'; }
+      return savedMode === 'trello' ? 'trello' : 'classic';
+    } catch { return 'classic'; }
   });
   const [showWelcome, setShowWelcome] = useState(location.state?.fromFormation || false);
   const [showTutorial, setShowTutorial] = useState(location.state?.fromFormation || false);
@@ -1347,31 +1347,34 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               }}
             />
 
-            {/* Bloc 3 — Sélecteur de mode (toujours visible) */}
+            {/* Bloc 3 — Choix clair : Simple OU Workflow */}
             <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between bg-card rounded-xl border p-3 shadow-sm">
-              <div className="text-sm font-medium px-2 text-foreground">
-                Mode choisi : {viewMode === 'classic' ? '1 — Parcours simple' : '2 — Workflow 15 agents'}
+              <div className="px-2">
+                <p className="text-sm font-semibold text-foreground">Parcours de création</p>
+                <p className="text-xs text-muted-foreground">Choisissez une seule option : Simple ou Workflow.</p>
               </div>
-              <div className="inline-flex rounded-lg border overflow-hidden bg-background">
+              <div className="inline-flex rounded-lg border overflow-hidden bg-background" role="group" aria-label="Choix du parcours">
                 <button
                   type="button"
+                  aria-pressed={viewMode === 'classic'}
                   onClick={() => {
                     setViewMode('classic');
                     localStorage.setItem(DASHBOARD_VIEW_MODE_KEY, 'classic');
                   }}
                   className={`px-4 py-2 text-sm font-semibold transition-all ${viewMode === 'classic' ? 'bg-primary text-primary-foreground' : 'text-foreground hover:bg-muted'}`}
                 >
-                  1 Simple
+                  Simple
                 </button>
                 <button
                   type="button"
+                  aria-pressed={viewMode === 'trello'}
                   onClick={() => {
                     setViewMode('trello');
                     localStorage.setItem(DASHBOARD_VIEW_MODE_KEY, 'trello');
                   }}
                   className={`px-4 py-2 text-sm font-semibold transition-all ${viewMode === 'trello' ? 'bg-accent text-accent-foreground' : 'text-foreground hover:bg-muted'}`}
                 >
-                  2 Workflow
+                  Workflow
                 </button>
               </div>
             </div>
