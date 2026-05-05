@@ -80,6 +80,8 @@ import { STEP_TO_TAB } from '@/components/ebook/WorkflowNavigation';
 import { WorkflowOnboarding } from '@/components/ebook/WorkflowOnboarding';
 import { WorkflowDashboard } from '@/components/ebook/WorkflowDashboard';
 import { EbookProgressDashboard } from '@/components/ebook/EbookProgressDashboard';
+import { EbookHeroDashboard } from '@/components/ebook/EbookHeroDashboard';
+import type { EbookExample } from '@/data/ebookExamples';
 import { WorkflowExportCompiled } from '@/components/ebook/WorkflowExportCompiled';
 import { TrelloBoardView } from '@/components/ebook/TrelloBoardView';
 import { useConfetti } from '@/hooks/useConfetti';
@@ -1322,6 +1324,36 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
         }
         return (
           <div className="space-y-6">
+            <EbookHeroDashboard
+              ebookTitle={ebookTitle}
+              authorName={authorName}
+              chapters={chapters}
+              preface={preface}
+              conclusion={conclusion}
+              coverImageUrl={coverConcepts ? 'generated' : undefined}
+              kdpDescription={kdpDescription}
+              kdpKeywords={kdpKeywords}
+              onNavigateToTab={(tabId) => setActiveTab(tabId)}
+              onStartAutoWorkflow={() => setActiveTab('complete-workflow')}
+              onApplyExample={(ex: EbookExample) => {
+                setEbookTitle(ex.title);
+                setBookSubtitle(ex.subtitle);
+                setBookDescription(ex.pitch);
+                setGenre(ex.genre);
+                setTargetAudience(ex.audience);
+                setNumberOfChapters(ex.numberOfChapters);
+                setChapters(ex.chapters.map((title, i) => ({
+                  id: `ex-${Date.now()}-${i}`,
+                  title,
+                  subChapters: [],
+                  content: '',
+                })));
+                setKdpDescription(ex.kdpDescription);
+                setKdpKeywords(ex.keywords.join(', '));
+                toast.success(`Projet "${ex.title}" pré-rempli ! Allez dans l'onglet Plan pour continuer.`);
+                setActiveTab('planner');
+              }}
+            />
             <EbookProgressDashboard
               ebookTitle={ebookTitle}
               authorName={authorName}
