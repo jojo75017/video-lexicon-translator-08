@@ -10,6 +10,7 @@ interface GeminiCallOptions {
   temperature?: number;
   maxTokens?: number;
   timeout?: number;
+  jsonMode?: boolean;
 }
 
 /**
