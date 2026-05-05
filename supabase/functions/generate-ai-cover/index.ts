@@ -5,25 +5,64 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Format-specific guidance for the image model
-const FORMAT_PROMPTS: Record<string, string> = {
-  kindle: `KINDLE eBOOK COVER FORMAT.
-- Single FRONT cover only, vertical portrait orientation, aspect ratio 1.6:1 (width:height = 1:1.6, e.g. 1600x2560 px).
-- Composition fully framed for a thumbnail visible at small sizes on Amazon Kindle store.
-- Title must be HUGE, bold, perfectly centered horizontally, instantly readable even at 200px wide.
-- Author name clearly visible at the bottom.
-- NO spine, NO back cover, NO wrap-around — only the front face.
-- Margins safe: keep important elements 8% away from each edge.`,
+// Try to extract page count + paper type + trim from a free-text KDP brief
+function parseKdpBrief(brief: string) {
+  const result: { pages?: number; paper?: string; trim?: string; spineMm?: number; widthMm?: number; heightMm?: number } = {};
+  if (!brief) return result;
+  const pagesMatch = brief.match(/(\d{2,4})\s*pages?/i);
+  if (pagesMatch) result.pages = parseInt(pagesMatch[1], 10);
+  if (/cr[eè]me|cream/i.test(brief)) result.paper = 'cream';
+  else if (/blanc|white/i.test(brief)) result.paper = 'white';
+  const trimMatch = brief.match(/(\d{1,2}[.,]?\d?)\s*[x×]\s*(\d{1,2}[.,]?\d?)\s*cm/i);
+  if (trimMatch) {
+    result.widthMm = parseFloat(trimMatch[1].replace(',', '.')) * 10;
+    result.heightMm = parseFloat(trimMatch[2].replace(',', '.')) * 10;
+    result.trim = `${trimMatch[1]}x${trimMatch[2]} cm`;
+  }
+  // KDP spine formula approx : pages * (cream 0.0573mm | white 0.0524mm)
+  if (result.pages) {
+    const factor = result.paper === 'white' ? 0.0524 : 0.0573;
+    result.spineMm = +(result.pages * factor).toFixed(2);
+  }
+  return result;
+}
 
-  paperback: `AMAZON KDP PAPERBACK FULL WRAP COVER.
-- ONE single continuous landscape image containing in this exact order from LEFT to RIGHT:
-  1) BACK COVER (4ème de couverture) on the left third — leave a clean rectangular zone of about 5cm x 3cm in the BOTTOM-RIGHT of this back panel for the ISBN barcode (do not place any text or critical art there).
-  2) SPINE in the center — narrow vertical strip with the title written vertically (top to bottom) plus author name. Keep all spine text at least 3mm away from the spine edges.
-  3) FRONT COVER on the right third — full hero design with title big and centered, author name at bottom.
-- The three panels must share ONE consistent visual universe: same colors, same lighting, same typography family. The artwork should flow naturally across the spine.
-- Landscape orientation, wide aspect (roughly 1.6:1 to 1.7:1 in landscape).
-- Add a 3mm safe bleed margin around the entire wrap.`,
-};
+function buildPaperbackSpec(parsed: ReturnType<typeof parseKdpBrief>) {
+  const w = parsed.widthMm ?? 152;   // 15.24 cm default 6x9"
+  const h = parsed.heightMm ?? 229;  // 22.86 cm
+  const spine = parsed.spineMm ?? 12;
+  const bleed = 3.175; // 0.125"
+  const totalW = w * 2 + spine + bleed * 2;
+  const totalH = h + bleed * 2;
+  return {
+    widthMm: w, heightMm: h, spineMm: spine, bleed,
+    totalWmm: +totalW.toFixed(2), totalHmm: +totalH.toFixed(2),
+    pages: parsed.pages, paper: parsed.paper,
+    trim: parsed.trim ?? `${(w/10).toFixed(2)}x${(h/10).toFixed(2)} cm`,
+  };
+}
+
+const KINDLE_SPEC = `KINDLE eBOOK FRONT COVER — FLAT PRINT-READY ARTWORK.
+- Output a FLAT 2D cover artwork only — NOT a 3D mockup, NOT a book photo, NOT a tilted Kindle device, NOT a shelf scene, NO shadow under a fake book.
+- Pure rectangular artwork edge to edge, no border, no frame, no perspective.
+- Vertical portrait, aspect ratio exactly 1.6:1 (e.g. 1600 x 2560 px).
+- Title HUGE, bold, centered, readable at 200px wide thumbnail.
+- Author name clean at the bottom.
+- 8% safe margin from each edge.`;
+
+function paperbackSpecPrompt(spec: ReturnType<typeof buildPaperbackSpec>) {
+  return `AMAZON KDP PAPERBACK FULL WRAP — single continuous landscape artwork.
+- Total wrap dimensions: ${spec.totalWmm} mm wide x ${spec.totalHmm} mm tall (includes 3.175 mm bleed each side).
+- LEFT panel = BACK COVER, width ${spec.widthMm} mm.
+- CENTER = SPINE, width EXACTLY ${spec.spineMm} mm — narrow vertical strip${spec.pages ? ` (calculated for ${spec.pages} pages, ${spec.paper ?? 'cream'} paper)` : ''}.
+- RIGHT panel = FRONT COVER, width ${spec.widthMm} mm.
+- Trim per cover panel: ${spec.trim}.
+- SPINE: title written vertically top-to-bottom + author name, all text 5 mm minimum from spine edges.
+- BACK PANEL: leave a clean rectangular zone 50 x 30 mm in the BOTTOM-RIGHT for ISBN barcode (no text, no critical art there).
+- Artwork must flow seamlessly across spine — same colors, lighting, typography family on all 3 panels.
+- 3 mm safe bleed all around. Add discreet fold guide marks just outside the spine on top/bottom edges.
+- Output a FLAT 2D wrap, NOT a 3D mockup of the book.`;
+}
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
@@ -38,9 +77,9 @@ serve(async (req) => {
       style,
       colorScheme,
       description,
-      format = 'kindle', // 'kindle' | 'paperback'
-      kdpBrief = '',     // optional technical brief from KDP calculator
-      referenceImage,    // optional data URL or https URL of an inspiration cover
+      format = 'kindle',
+      kdpBrief = '',
+      referenceImage,
     } = body;
 
     if (!title) {
@@ -53,14 +92,24 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY non configurée");
 
-    const formatGuidance = FORMAT_PROMPTS[format] || FORMAT_PROMPTS.kindle;
+    const parsed = parseKdpBrief(kdpBrief);
+    const paperbackSpec = format === 'paperback' ? buildPaperbackSpec(parsed) : null;
+    const formatGuidance = format === 'paperback'
+      ? paperbackSpecPrompt(paperbackSpec!)
+      : KINDLE_SPEC;
 
-    const textPrompt = `You are an award-winning book-cover art director.
-Create a PROFESSIONAL Amazon best-seller quality book cover.
+    // ===== Build the two reusable prompts (recto + verso) =====
+    const baseArt = `Style: ${style || 'professional'}. Palette: ${colorScheme || 'modern, high contrast'}. Genre: ${genre || 'non-fiction'}.${description ? ` Concept: ${description}.` : ''} Photorealistic magazine-grade quality, NO cartoon, NO low-fidelity, NO watermark, NO Amazon badge, NO mockup. Title typography sharp and perfectly legible.`;
+
+    const rectoPrompt = `FRONT COVER (recto) for the book "${title}"${subtitle ? `, subtitle "${subtitle}"` : ''}, by ${author || 'Author'}. Vertical portrait artwork, ratio 1.6:1, flat 2D print-ready. Title HUGE centered at top third, ${subtitle ? 'subtitle clearly below in smaller elegant type, ' : ''}author name at the bottom. ${baseArt}`;
+
+    const versoPrompt = `BACK COVER (verso / 4ème de couverture) for the same book "${title}" by ${author || 'Author'}. Same visual universe as the front cover (same palette, lighting, typography). Vertical portrait, same dimensions as the front. Compose a clean back panel with: a short hook headline at the top, a 3–5 line synopsis area in readable body text, a small author bio block at the bottom-left, and a CLEAN EMPTY rectangular zone of 50 x 30 mm in the BOTTOM-RIGHT reserved for ISBN barcode (do not draw a barcode, leave it white/neutral). ${baseArt}`;
+
+    const textPrompt = `You are an award-winning book-cover art director. Create a PROFESSIONAL Amazon best-seller quality book cover.
 
 === BOOK ===
 Title: "${title}"
-${subtitle ? `Subtitle: "${subtitle}" — display the subtitle clearly BELOW the main title in a smaller but elegant typographic style, perfectly readable, hierarchically subordinate to the title.` : ''}
+${subtitle ? `Subtitle: "${subtitle}" — display it clearly BELOW the title, smaller but elegant, hierarchically subordinate.` : ''}
 Author: "${author || 'Author'}"
 Genre: ${genre || 'non-fiction'}
 
@@ -72,15 +121,11 @@ ${description ? `Concept: ${description}` : ''}
 === FORMAT ===
 ${formatGuidance}
 
-=== KDP TECHNICAL SPECS ===
-${kdpBrief || 'Standard KDP cover, 300 DPI, photorealistic, print-ready quality.'}
-
 === QUALITY BAR ===
-- Photorealistic, magazine-grade, ZERO cartoonish or low-fidelity rendering.
-- Title typography must be perfectly legible — clean, sharp, no warped letters, no fake glyphs.
-- Author name perfectly legible.
-- Inspired by current Amazon top 100 best-sellers in the genre.
-- No watermarks, no logos, no UI mockups, no Amazon badges.
+- Photorealistic, magazine-grade. ZERO cartoon, ZERO low-fidelity.
+- Title typography perfectly legible — clean, sharp, no warped letters, no fake glyphs.
+- Inspired by current Amazon top 100 best-sellers in this genre.
+- No watermarks, no logos, no UI mockups, no Amazon badges, NO 3D book mockup.
 ${referenceImage ? '- Use the attached reference image ONLY for stylistic inspiration (mood, palette, composition). Do NOT copy it.' : ''}`;
 
     const userContent: any[] = [{ type: "text", text: textPrompt }];
@@ -113,7 +158,13 @@ ${referenceImage ? '- Use the attached reference image ONLY for stylistic inspir
 
     if (!imageUrl) throw new Error("Aucune image générée");
 
-    return new Response(JSON.stringify({ imageUrl, description: textResponse, format }), {
+    return new Response(JSON.stringify({
+      imageUrl,
+      description: textResponse,
+      format,
+      paperbackSpec,
+      prompts: { recto: rectoPrompt, verso: versoPrompt },
+    }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
