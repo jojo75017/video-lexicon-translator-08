@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import {
-  Palette, Loader2, Download, Sparkles, Image as ImageIcon, Smartphone, BookOpen, Upload, X, Type,
+  Palette, Loader2, Download, Sparkles, Image as ImageIcon, Smartphone, BookOpen, Upload, X, Type, Copy, Ruler,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -46,10 +46,17 @@ const genres = [
 
 type CoverFormat = 'kindle' | 'paperback';
 
+interface PaperbackSpec {
+  widthMm: number; heightMm: number; spineMm: number; bleed: number;
+  totalWmm: number; totalHmm: number; pages?: number; paper?: string; trim: string;
+}
+
 interface GeneratedCover {
   url: string;
   desc: string;
   format: CoverFormat;
+  paperbackSpec?: PaperbackSpec | null;
+  prompts?: { recto: string; verso: string };
 }
 
 export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
@@ -110,7 +117,7 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
       if (!data?.imageUrl) throw new Error('Aucune image générée');
 
       setGeneratedCovers((prev) => [
-        { url: data.imageUrl, desc: data.description || '', format },
+        { url: data.imageUrl, desc: data.description || '', format, paperbackSpec: data.paperbackSpec, prompts: data.prompts },
         ...prev,
       ]);
       onCoverGenerated?.(data.imageUrl);
@@ -132,6 +139,15 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
     link.download = `couverture-${cover.format}-${index + 1}-${title.replace(/\s+/g, '-').toLowerCase() || 'livre'}.png`;
     link.click();
     toast.success('Téléchargement lancé');
+  };
+
+  const copyPrompt = async (text: string, label: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success(`Prompt ${label} copié`);
+    } catch {
+      toast.error('Copie impossible');
+    }
   };
 
   return (
@@ -364,6 +380,47 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
                         </div>
                       )}
                     </div>
+
+                    {/* Spec dimensions broché */}
+                    {cover.format === 'paperback' && cover.paperbackSpec && (
+                      <div className="px-3 py-2 border-t bg-muted/30 text-[11px] flex flex-wrap gap-x-4 gap-y-1">
+                        <span className="flex items-center gap-1 font-semibold"><Ruler className="w-3 h-3" /> Spec calculée :</span>
+                        <span>Trim <strong>{cover.paperbackSpec.trim}</strong></span>
+                        <span>Dos <strong>{cover.paperbackSpec.spineMm} mm</strong>{cover.paperbackSpec.pages ? ` (${cover.paperbackSpec.pages} p.)` : ''}</span>
+                        <span>Wrap total <strong>{cover.paperbackSpec.totalWmm} × {cover.paperbackSpec.totalHmm} mm</strong></span>
+                        <span>Bleed <strong>{cover.paperbackSpec.bleed} mm</strong></span>
+                      </div>
+                    )}
+
+                    {/* Prompts recto + verso à copier */}
+                    {cover.prompts && (
+                      <div className="border-t bg-background p-3 space-y-3">
+                        <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
+                          <Sparkles className="w-3.5 h-3.5 text-primary" />
+                          Prompts professionnels prêts à copier (MidJourney, DALL·E, Imagen, Firefly…)
+                        </div>
+                        <div className="grid md:grid-cols-2 gap-3">
+                          <div className="rounded-lg border bg-muted/20 p-2 space-y-1.5">
+                            <div className="flex items-center justify-between">
+                              <Badge variant="outline" className="text-[10px]">RECTO · Face</Badge>
+                              <Button size="sm" variant="ghost" className="h-6 px-2 text-[11px]" onClick={() => copyPrompt(cover.prompts!.recto, 'recto')}>
+                                <Copy className="w-3 h-3 mr-1" /> Copier
+                              </Button>
+                            </div>
+                            <Textarea readOnly value={cover.prompts.recto} className="text-[11px] min-h-[120px] font-mono" />
+                          </div>
+                          <div className="rounded-lg border bg-muted/20 p-2 space-y-1.5">
+                            <div className="flex items-center justify-between">
+                              <Badge variant="outline" className="text-[10px]">VERSO · 4ème</Badge>
+                              <Button size="sm" variant="ghost" className="h-6 px-2 text-[11px]" onClick={() => copyPrompt(cover.prompts!.verso, 'verso')}>
+                                <Copy className="w-3 h-3 mr-1" /> Copier
+                              </Button>
+                            </div>
+                            <Textarea readOnly value={cover.prompts.verso} className="text-[11px] min-h-[120px] font-mono" />
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
