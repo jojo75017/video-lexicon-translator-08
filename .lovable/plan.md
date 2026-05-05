@@ -1,50 +1,68 @@
-## Refonte de l'écran de choix du tableau de bord auteur
+## Objectif
 
-L'écran `viewMode === 'choice'` dans `src/pages/EbookPlannerPage.tsx` est trop sec. On l'enrichit en 3 blocs verticaux pour un rendu pro façon "KDP Rocket".
+Sur le tableau de bord auteur, **toujours** afficher le texte marketing + les 6 livres Amazon **en haut**, suivis du sélecteur 1 Simple / 2 Workflow, puis du plan complet (P1 → P15 ou parcours simple) — **plus jamais d'écran de choix qui cache le plan**. Et corriger les deux boutons cassés.
 
-### Bloc 1 — En-tête éditorial
+## Fichier touché
 
-Bandeau dégradé teal → orange (charte KDP) avec :
+`src/pages/EbookPlannerPage.tsx` uniquement. Aucun changement aux composants enfants (`AuthorBooksShowcase`, `EbookJourneyDashboard`, `TrelloBoardView`, agents P1→P15).
 
-- **Titre** : "Votre livre Amazon KDP mérite d'être lu."
-- **Texte (réécrit, sans plagiat)** : "EbookStudio est la suite d'outils IA pensée pour les auteurs Amazon Kindle Direct Publishing. Identifiez les niches rentables, optimisez vos titres, mots-clés, descriptions et couvertures — et donnez à votre livre toutes ses chances dès la première publication."
-- 3 mini-pictos : "Niches rentables · Optimisation KDP · Couvertures pro"
+## Changements précis
 
-### Bloc 2 — Choix du mode (existant, conservé et réharmonisé)
+### 1. Supprimer l'écran de choix séparé (lignes ~1306-1452)
 
-Les deux cartes "1 — Parcours simple" et "2 — Workflow 15 agents" restent en place, avec même padding et même rayon que les blocs 1 et 3.
+Aujourd'hui : si `viewMode === 'choice'`, on affiche **seulement** le bandeau + sélecteur + livres Amazon, et on **cache** le plan (`viewMode === 'choice' ? null : ...`).
 
-### Bloc 3 — Vitrine "Livres publiés avec EbookStudio"
+Après : un seul rendu, **toujours dans cet ordre** :
 
-Nouveau composant `AuthorBooksShowcase.tsx` placé sous les cartes de choix.
+```text
+┌─────────────────────────────────────────────┐
+│ Bandeau marketing (Votre livre KDP mérite…) │  ← toujours visible
+├─────────────────────────────────────────────┤
+│ AuthorBooksShowcase (6 livres Amazon)       │  ← toujours visible
+├─────────────────────────────────────────────┤
+│ Sélecteur "Mode : 1 Simple / 2 Workflow"    │  ← toujours visible
+├─────────────────────────────────────────────┤
+│ Plan complet :                              │
+│   - si Workflow  → TrelloBoardView P1→P15   │
+│   - si Simple    → EbookJourneyDashboard    │
+├─────────────────────────────────────────────┤
+│ Sections repliables (stats, etc.)           │
+└─────────────────────────────────────────────┘
+```
 
-- **Titre** : "Des livres déjà publiés sur Amazon avec EbookStudio"
-- **Sous-titre** : "6 titres signés Georges Boubet — preuve que la méthode fonctionne."
+- L'état `viewMode` ne prend plus que les valeurs `'trello' | 'classic'`. Valeur par défaut : `'trello'` si rien en localStorage (pour montrer P1→P15 directement).
+- Suppression du `?:` qui rendait `viewMode === 'choice'`.
 
-Grille responsive (2 cols mobile, 3 cols md, 6 cols lg) avec vos 6 livres :
+### 2. Corriger "+ Nouveau" (`resetPlan`, lignes 1233-1250)
 
-| ASIN | Titre | Catégorie |
-|---|---|---|
-| B0GXB3V5DJ | Retour en Provence — Tome 1 | Saga / Romance |
-| B0GG7QCFTZ | Le Loup qui Voulait Manger le Père Noël | Jeunesse 4-6 ans |
-| B0GY5K8GCS | Signal Zéro — Intégrale T1 & T2 | Thriller technologique |
-| B0GX2SVHY4 | Retour en Provence — Tome 2 | Saga / Romance |
-| B0GQQB7V1F | Les Secrets de la Femme de Ménage — T3 | Polar |
-| B0GN34WYMK | (6e titre) | À détecter |
+- Garder `clearCurrentEditorState()` (qui vide bien le titre, chapitres, images, etc. et remet `currentProjectId = null`).
+- **Retirer** `setViewMode('choice')` et `localStorage.removeItem(DASHBOARD_VIEW_MODE_KEY)` → on reste sur le mode actuel.
+- Ajouter un **flag local** `localStorage.setItem('ebook_just_reset', '1')` lu par `loadFromDatabase` (ligne 397) pour empêcher le rechargement automatique de "La Belle-sœur" depuis le cloud après reset (le flag est consommé immédiatement).
+- Toast : "Projet réinitialisé — nouveau livre prêt à démarrer".
 
-**Couvertures Amazon** : récupérées via le pattern public `https://images-na.ssl-images-amazon.com/images/P/{ASIN}.01.LZZZZZZZ.jpg` (ou fallback `m.media-amazon.com/images/P/{ASIN}.jpg`). Pas d'appel API requis.
+### 3. Corriger "Retour au tableau de bord" (lignes ~3367-3420)
 
-Chaque carte : couverture (aspect 2/3, ombre douce, hover lift), badge catégorie, titre tronqué 2 lignes, "de Georges Boubet", lien externe complet vers `https://www.amazon.fr/dp/{ASIN}/` (`target="_blank" rel="noopener"`).
+- Un seul bouton "Retour au tableau de bord" qui :
+  - fait `setActiveTab('workflow-dashboard')`,
+  - **ne touche pas** à `viewMode` ni au localStorage (préserve le mode choisi par l'utilisateur),
+  - scrolle en haut (`window.scrollTo({ top: 0, behavior: 'smooth' })`).
+- Supprimer le second bouton "Choisir 1 ou 2" ajouté précédemment (qui forçait le mode choice).
 
-CTA bas de section : bouton teal "Créer mon livre comme Georges →" qui passe en mode `trello` (workflow 15 agents).
+### 4. Migration de l'état `viewMode`
 
-### Détails techniques
+- Type : `'trello' | 'classic'` (plus `'choice'`).
+- Init : lire `DASHBOARD_VIEW_MODE_KEY` ; si absent ou égal à `'choice'`, fallback `'trello'`.
 
-- **Fichier modifié** : `src/pages/EbookPlannerPage.tsx` — bloc `viewMode === 'choice'` (lignes ~1297-1335)
-- **Fichier créé** : `src/components/ebook/AuthorBooksShowcase.tsx` — données livres en `const` interne, props `onStartWorkflow?: () => void`
-- **Charte respectée** : `bg-card`, `text-foreground`, `border-border`, gradient `#008296 → #FF9E2D`, hover `#FF9E2D`
-- **Aucune dépendance ajoutée**, aucune migration, aucun appel API, aucun edge function
+## Ce qui ne change PAS
 
-### À noter
+- `AuthorBooksShowcase.tsx` (déjà créé avec les 6 livres Amazon + URLs).
+- Bandeau marketing (mêmes textes, juste déplacé hors du `viewMode === 'choice'`).
+- Agents P1 → P15, `TrelloBoardView`, `EbookJourneyDashboard`.
+- Sections repliables (stats, versions, etc.).
+- Logique de chargement projet, sauvegarde auto, sync cloud.
 
-Le 6e ASIN (B0GN34WYMK) — je ne l'ai pas dans vos captures. Je vais charger sa couverture depuis Amazon mais le titre/catégorie sera "Livre Georges Boubet" en attendant que vous me le précisiez. Vous pourrez l'éditer dans le composant ou me l'indiquer après.
+## Résultat attendu
+
+- Sur `/ebook-planner` onglet "Tableau de bord", l'utilisateur voit **immédiatement** : texte marketing → ses 6 livres Amazon → sélecteur 1/2 → plan P1→P15 (mode Workflow par défaut).
+- Cliquer "+ Nouveau" → confirmation → titre devient vide / "Nouveau projet", reste sur le tableau de bord avec le même mode, sans rechargement de l'ancien livre.
+- Cliquer "Retour au tableau de bord" depuis n'importe quel onglet → revient ici avec le mode préservé, scroll en haut.

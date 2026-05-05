@@ -284,11 +284,11 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
     } catch {}
   }, [activeTab]);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [viewMode, setViewMode] = useState<'choice' | 'trello' | 'classic'>(() => {
+  const [viewMode, setViewMode] = useState<'trello' | 'classic'>(() => {
     try {
       const savedMode = localStorage.getItem(DASHBOARD_VIEW_MODE_KEY);
-      return savedMode === 'trello' || savedMode === 'classic' ? savedMode : 'choice';
-    } catch { return 'choice'; }
+      return savedMode === 'classic' ? 'classic' : 'trello';
+    } catch { return 'trello'; }
   });
   const [showWelcome, setShowWelcome] = useState(location.state?.fromFormation || false);
   const [showTutorial, setShowTutorial] = useState(location.state?.fromFormation || false);
@@ -395,6 +395,15 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
 
   useEffect(() => {
     const loadFromDatabase = async () => {
+      // Si on vient de cliquer "+ Nouveau", ne pas recharger l'ancien projet
+      try {
+        if (localStorage.getItem('ebook_just_reset') === '1') {
+          localStorage.removeItem('ebook_just_reset');
+          console.log('📋 [loadFromDatabase] Reset détecté, on ignore le projet cloud');
+          return;
+        }
+      } catch {}
+
       const dbProject = await loadLatestProject();
       if (dbProject) {
         // Comparer avec le brouillon local pour ne pas écraser un travail plus récent
@@ -1235,16 +1244,13 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       return;
     }
 
+    // Empêche loadFromDatabase de recharger immédiatement l'ancien projet cloud
+    try { localStorage.setItem('ebook_just_reset', '1'); } catch {}
+
     clearCurrentEditorState();
 
-    // Forcer le retour à l'écran de choix 1/2 et oublier le mode courant
-    setViewMode('choice');
-    try {
-      localStorage.removeItem(DASHBOARD_VIEW_MODE_KEY);
-    } catch {}
-
     toast.success('🧹 Projet réinitialisé !', {
-      description: 'Vous repartez de zéro. Choisissez à nouveau Parcours simple ou Workflow.',
+      description: 'Nouveau livre prêt à démarrer.',
       duration: 4000,
     });
   };
@@ -1306,83 +1312,47 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       case 'workflow-dashboard':
         return (
           <div className="space-y-6">
-            {viewMode === 'choice' ? (
-              <>
-                {/* Bloc 1 — En-tête éditorial */}
-                <div
-                  className="rounded-xl p-6 text-white shadow-sm relative overflow-hidden"
-                  style={{ background: 'linear-gradient(135deg, #008296 0%, #FF9E2D 100%)' }}
-                >
-                  <div className="relative z-10 max-w-3xl">
-                    <p className="text-xs font-semibold uppercase tracking-wide opacity-90 mb-2">
-                      ✨ EbookStudio · Suite IA pour auteurs Amazon KDP
-                    </p>
-                    <h2 className="text-2xl md:text-3xl font-bold leading-tight mb-2">
-                      Votre livre Amazon KDP mérite d'être lu.
-                    </h2>
-                    <p className="text-sm md:text-base opacity-95 leading-relaxed">
-                      EbookStudio est la suite d'outils IA pensée pour les auteurs Amazon Kindle Direct Publishing.
-                      Identifiez les niches rentables, optimisez vos titres, mots-clés, descriptions et couvertures —
-                      et donnez à votre livre toutes ses chances dès la première publication.
-                    </p>
-                    <div className="mt-4 flex flex-wrap gap-2 text-xs font-semibold">
-                      <span className="rounded-full bg-white/20 px-3 py-1 backdrop-blur-sm">🎯 Niches rentables</span>
-                      <span className="rounded-full bg-white/20 px-3 py-1 backdrop-blur-sm">🔑 Optimisation KDP</span>
-                      <span className="rounded-full bg-white/20 px-3 py-1 backdrop-blur-sm">🎨 Couvertures pro</span>
-                    </div>
-                  </div>
-                  <div className="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-white/10" />
-                  <div className="absolute -right-20 -bottom-20 w-60 h-60 rounded-full bg-white/5" />
+            {/* Bloc 1 — En-tête éditorial (toujours visible) */}
+            <div
+              className="rounded-xl p-6 text-white shadow-sm relative overflow-hidden"
+              style={{ background: 'linear-gradient(135deg, #008296 0%, #FF9E2D 100%)' }}
+            >
+              <div className="relative z-10 max-w-3xl">
+                <p className="text-xs font-semibold uppercase tracking-wide opacity-90 mb-2">
+                  ✨ EbookStudio · Suite IA pour auteurs Amazon KDP
+                </p>
+                <h2 className="text-2xl md:text-3xl font-bold leading-tight mb-2">
+                  Votre livre Amazon KDP mérite d'être lu.
+                </h2>
+                <p className="text-sm md:text-base opacity-95 leading-relaxed">
+                  EbookStudio est la suite d'outils IA pensée pour les auteurs Amazon Kindle Direct Publishing.
+                  Identifiez les niches rentables, optimisez vos titres, mots-clés, descriptions et couvertures —
+                  et donnez à votre livre toutes ses chances dès la première publication.
+                </p>
+                <div className="mt-4 flex flex-wrap gap-2 text-xs font-semibold">
+                  <span className="rounded-full bg-white/20 px-3 py-1 backdrop-blur-sm">🎯 Niches rentables</span>
+                  <span className="rounded-full bg-white/20 px-3 py-1 backdrop-blur-sm">🔑 Optimisation KDP</span>
+                  <span className="rounded-full bg-white/20 px-3 py-1 backdrop-blur-sm">🎨 Couvertures pro</span>
                 </div>
+              </div>
+              <div className="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-white/10" />
+              <div className="absolute -right-20 -bottom-20 w-60 h-60 rounded-full bg-white/5" />
+            </div>
 
-                {/* Bloc 2 — Choix du mode */}
-                <div className="rounded-xl border bg-card p-6 shadow-sm">
-                  <div className="mb-4">
-                    <p className="text-sm font-semibold text-primary">Choisissez votre tableau de bord</p>
-                    <h2 className="text-2xl font-bold text-foreground">Vous voulez travailler en simple ou en Workflow ?</h2>
-                  </div>
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setViewMode('classic');
-                        localStorage.setItem(DASHBOARD_VIEW_MODE_KEY, 'classic');
-                      }}
-                      className="rounded-lg border-2 border-border bg-background p-5 text-left transition-all hover:border-primary hover:shadow-md"
-                    >
-                      <span className="mb-3 flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold">1</span>
-                      <span className="block text-xl font-bold text-foreground">Parcours simple</span>
-                      <span className="mt-2 block text-sm text-muted-foreground">Vue guidée étape par étape, plus linéaire.</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setViewMode('trello');
-                        localStorage.setItem(DASHBOARD_VIEW_MODE_KEY, 'trello');
-                      }}
-                      className="rounded-lg border-2 border-border bg-background p-5 text-left transition-all hover:border-accent hover:shadow-md"
-                    >
-                      <span className="mb-3 flex h-9 w-9 items-center justify-center rounded-full bg-accent text-accent-foreground font-bold">2</span>
-                      <span className="block text-xl font-bold text-foreground">Workflow 15 agents</span>
-                      <span className="mt-2 block text-sm text-muted-foreground">Vue Kanban complète pour piloter tout le workflow IA.</span>
-                    </button>
-                  </div>
-                </div>
+            {/* Bloc 2 — Vitrine livres Amazon (toujours visible) */}
+            <AuthorBooksShowcase
+              onStartWorkflow={() => {
+                setViewMode('trello');
+                localStorage.setItem(DASHBOARD_VIEW_MODE_KEY, 'trello');
+              }}
+            />
 
-                {/* Bloc 3 — Vitrine livres publiés */}
-                <AuthorBooksShowcase
-                  onStartWorkflow={() => {
-                    setViewMode('trello');
-                    localStorage.setItem(DASHBOARD_VIEW_MODE_KEY, 'trello');
-                  }}
-                />
-              </>
-            ) : (
-              <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between bg-card rounded-xl border p-3 shadow-sm">
-                <div className="text-sm font-medium px-2 text-foreground">
-                  Mode choisi : {viewMode === 'classic' ? '1 — Parcours simple' : '2 — Workflow 15 agents'}
-                </div>
-                <div className="inline-flex rounded-lg border overflow-hidden bg-background">
+            {/* Bloc 3 — Sélecteur de mode (toujours visible) */}
+            <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between bg-card rounded-xl border p-3 shadow-sm">
+              <div className="text-sm font-medium px-2 text-foreground">
+                Mode choisi : {viewMode === 'classic' ? '1 — Parcours simple' : '2 — Workflow 15 agents'}
+              </div>
+              <div className="inline-flex rounded-lg border overflow-hidden bg-background">
                 <button
                   type="button"
                   onClick={() => {
@@ -1403,11 +1373,11 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                 >
                   2 Workflow
                 </button>
-                </div>
               </div>
-            )}
+            </div>
 
-            {viewMode === 'choice' ? null : viewMode === 'trello' ? (
+            {/* Bloc 4 — Plan complet selon le mode */}
+            {viewMode === 'trello' ? (
               <TrelloBoardView
                 ebookTitle={ebookTitle}
                 bookSubtitle={bookSubtitle}
@@ -3369,23 +3339,14 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setActiveTab('workflow-dashboard')}
+              onClick={() => {
+                setActiveTab('workflow-dashboard');
+                setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 50);
+              }}
               className="rounded-xl text-sm hover:bg-background"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Retour au tableau de bord
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                setViewMode('choice');
-                localStorage.removeItem(DASHBOARD_VIEW_MODE_KEY);
-                setActiveTab('workflow-dashboard');
-              }}
-              className="rounded-xl text-sm"
-            >
-              Choisir 1 ou 2
             </Button>
           </div>
         )}
@@ -3410,19 +3371,6 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
                 >
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Retour au tableau de bord
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setViewMode('choice');
-                    try { localStorage.removeItem(DASHBOARD_VIEW_MODE_KEY); } catch {}
-                    setActiveTab('workflow-dashboard');
-                    setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 50);
-                  }}
-                  className="rounded-xl text-sm"
-                  title="Revenir à l'écran de choix 1 / 2"
-                >
-                  Choisir 1 ou 2
                 </Button>
               </div>
               
