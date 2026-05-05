@@ -1237,8 +1237,14 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
 
     clearCurrentEditorState();
 
+    // Forcer le retour à l'écran de choix 1/2 et oublier le mode courant
+    setViewMode('choice');
+    try {
+      localStorage.removeItem(DASHBOARD_VIEW_MODE_KEY);
+    } catch {}
+
     toast.success('🧹 Projet réinitialisé !', {
-      description: 'Toutes les données ont été effacées. Vous repartez de zéro.',
+      description: 'Vous repartez de zéro. Choisissez à nouveau Parcours simple ou Workflow.',
       duration: 4000,
     });
   };
@@ -3393,14 +3399,32 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
           <div className="relative container mx-auto px-6 py-6">
             {/* Top bar */}
             <div className="flex items-center justify-between mb-6">
-              <Button
-                variant="ghost"
-                onClick={() => handleTabChange('workflow-dashboard')}
-                className="text-muted-foreground hover:text-foreground hover:bg-card border border-border rounded-xl text-sm"
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Retour au tableau de bord
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setActiveTab('workflow-dashboard');
+                    setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 50);
+                  }}
+                  className="text-muted-foreground hover:text-foreground hover:bg-card border border-border rounded-xl text-sm"
+                >
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Retour au tableau de bord
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setViewMode('choice');
+                    try { localStorage.removeItem(DASHBOARD_VIEW_MODE_KEY); } catch {}
+                    setActiveTab('workflow-dashboard');
+                    setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 50);
+                  }}
+                  className="rounded-xl text-sm"
+                  title="Revenir à l'écran de choix 1 / 2"
+                >
+                  Choisir 1 ou 2
+                </Button>
+              </div>
               
               <div className="flex gap-2">
                 <Button
