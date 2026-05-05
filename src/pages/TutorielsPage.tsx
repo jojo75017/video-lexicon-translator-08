@@ -5,12 +5,30 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, GraduationCap, Search } from 'lucide-react';
 import { TutorialCard } from '@/components/tutoriels/TutorialCard';
-import { TUTORIELS, CATEGORIES, type TutorielCategory } from '@/data/tutoriels';
+import {
+  TUTORIELS,
+  CATEGORIES,
+  validateTutorielDestination,
+  type TutorielCategory,
+} from '@/data/tutoriels';
 
 const TutorielsPage: React.FC = () => {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [activeTab, setActiveTab] = useState<TutorielCategory | 'all'>('all');
+
+  const validationErrors = useMemo(() => {
+    return TUTORIELS.reduce<Record<string, string>>((acc, tutoriel) => {
+      const error = validateTutorielDestination(tutoriel);
+      if (error) acc[tutoriel.id] = error;
+      return acc;
+    }, {});
+  }, []);
+
+  const invalidTutoriels = useMemo(
+    () => TUTORIELS.filter((tutoriel) => validationErrors[tutoriel.id]),
+    [validationErrors]
+  );
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -57,6 +75,20 @@ const TutorielsPage: React.FC = () => {
         </div>
 
         {/* Recherche */}
+        {invalidTutoriels.length > 0 && (
+          <div className="mb-6 rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
+            <p className="font-semibold">Certains boutons de tutoriels ne pointent pas vers un espace abonné valide.</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5">
+              {invalidTutoriels.map((tutoriel) => (
+                <li key={tutoriel.id}>
+                  {tutoriel.title} — {validationErrors[tutoriel.id]}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Recherche */}
         <div className="relative mb-6 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -89,7 +121,7 @@ const TutorielsPage: React.FC = () => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 {filtered.map((t) => (
-                  <TutorialCard key={t.id} tutoriel={t} />
+                  <TutorialCard key={t.id} tutoriel={t} validationError={validationErrors[t.id]} />
                 ))}
               </div>
             )}

@@ -29,6 +29,52 @@ export interface Tutoriel {
   videoRoute?: string;
 }
 
+export const SUBSCRIBER_TUTORIAL_ROUTES = [
+  '/ebook-planner',
+  '/kdp-keywords',
+  '/guide-outils',
+  '/tutoriels',
+  '/kdp-ads-guide',
+] as const;
+
+export const EBOOK_PLANNER_TABS = [
+  'workflow-dashboard',
+  'planner',
+  'complete-workflow',
+  'doc-transform',
+  'cover',
+  'audio-express',
+  'audiobook',
+  'export',
+  'kdp-prepublish-checklist',
+] as const;
+
+export const validateTutorielDestination = (tutoriel: Tutoriel): string | null => {
+  if (!SUBSCRIBER_TUTORIAL_ROUTES.includes(tutoriel.targetRoute as typeof SUBSCRIBER_TUTORIAL_ROUTES[number])) {
+    return `Route abonné inexistante ou non protégée : ${tutoriel.targetRoute}`;
+  }
+
+  if (tutoriel.targetRoute === '/ebook-planner') {
+    if (!tutoriel.targetTab) {
+      return "Onglet dashboard manquant pour /ebook-planner";
+    }
+
+    if (!EBOOK_PLANNER_TABS.includes(tutoriel.targetTab as typeof EBOOK_PLANNER_TABS[number])) {
+      return `Onglet dashboard inexistant : ${tutoriel.targetTab}`;
+    }
+  }
+
+  if (tutoriel.targetTab && tutoriel.targetRoute !== '/ebook-planner') {
+    return `Onglet '${tutoriel.targetTab}' fourni sur une route qui n'est pas le dashboard`;
+  }
+
+  if (tutoriel.videoRoute && !SUBSCRIBER_TUTORIAL_ROUTES.includes(tutoriel.videoRoute as typeof SUBSCRIBER_TUTORIAL_ROUTES[number])) {
+    return `Bouton vidéo non abonné ou inexistant : ${tutoriel.videoRoute}`;
+  }
+
+  return null;
+};
+
 export const CATEGORIES: { id: TutorielCategory; label: string }[] = [
   { id: 'demarrage', label: 'Démarrage' },
   { id: 'creation', label: 'Création contenu' },
