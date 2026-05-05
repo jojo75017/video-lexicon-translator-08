@@ -9,6 +9,7 @@ import {
   Megaphone,
   Wrench,
   Search,
+  TrendingUp,
   GraduationCap,
   Settings,
   ChevronLeft,
