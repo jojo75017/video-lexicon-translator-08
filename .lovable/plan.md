@@ -1,86 +1,50 @@
+Je confirme le problème : les outils KDP actuels utilisent encore un ancien appel direct à OpenAI (`api.openai.com`) alors que le projet est configuré pour les clés Gemini abonné (`AIza...`). Résultat : description, mots-clés, catégories et A+ peuvent échouer ou ne rien afficher.
 
-## Objectif
+Plan de correction :
 
-Donner aux abonnés un générateur IA qui produit une **séquence de 5 emails prêts à envoyer** pour annoncer la sortie de leur livre (newsletter de lancement). L'abonné copie-colle dans son outil habituel (Mailchimp, Brevo, Systeme.io, ConvertKit, MailerLite…). **Aucun envoi depuis EbookStudio.**
+1. Remplacer le moteur IA de l’onglet KDP
+   - Modifier les fonctions KDP dans `useSubscriptionGeneration` pour utiliser Gemini via le service existant `callGemini` / `callGeminiJSON`.
+   - Supprimer la dépendance à l’ancien appel OpenAI pour ces outils.
+   - Garder la logique BYOK : chaque abonné utilise sa clé Gemini déjà configurée dans EbookStudio.
 
-## Contraintes (zéro casse)
+2. Corriger les messages utilisateur
+   - Remplacer “Clé API OpenAI requise” par “Clé API Gemini requise”.
+   - Afficher une erreur claire si la clé est absente ou ne commence pas par `AIza`.
+   - Ajouter des messages précis en cas de quota, clé invalide ou réponse IA mal formatée.
 
-- Ne PAS toucher à `SimpleSidebar.tsx`, `EbookPlannerPage.tsx`, ni à la navigation/onglets existants.
-- Ne PAS créer de nouvelle route ni de nouveau bouton sidebar.
-- Ne PAS toucher à `useEbookGeneration`, `useWorkflowResults`, ni à la pipeline P1-P15.
-- Ajout purement additif : un nouveau composant inséré dans un onglet déjà existant.
+3. Fiabiliser la génération Description KDP
+   - Générer une description Amazon propre, persuasive, limitée aux contraintes KDP.
+   - Inclure titre, auteur, public cible, résumé/chapitres et bénéfices lecteur.
+   - Retourner un texte directement copiable, sans JSON inutile.
 
-## Emplacement
+4. Fiabiliser les 7 mots-clés KDP
+   - Demander une réponse JSON stricte.
+   - Normaliser le résultat même si Gemini renvoie une liste simple au lieu d’objets détaillés.
+   - Garantir l’affichage des 7 champs dans l’interface avec copie facile.
 
-Le composant `EbookMarketing.tsx` (onglet **Vendre** du planner) contient déjà des cartes "Posts réseaux sociaux", "Landing page", "Système Email Marketing (séquence 5 emails)", "Publicités". Le bouton "Système Email Marketing" est actuellement un placeholder (`toast.info('Fonctionnalité disponible via la page de gestion')`).
+5. Fiabiliser les catégories KDP
+   - Demander une réponse JSON stricte avec catégorie, concurrence, estimation et recommandation.
+   - Normaliser le résultat pour éviter que l’interface reste vide si la réponse est légèrement différente.
 
-→ On **active réellement** cette carte existante en branchant la génération IA dessus, et on la spécialise pour le **lancement de livre**. Aucun nouveau composant à insérer ailleurs, aucune réorganisation.
+6. Fiabiliser le contenu A+
+   - Utiliser Gemini avec un prompt plus strict.
+   - Supprimer les faux témoignages présentés comme réels : les remplacer par des “modèles de témoignages à demander aux lecteurs”, pour rester crédible et éviter les contenus trompeurs.
+   - Ajouter une validation minimale de la structure retournée pour éviter les crashes si une section manque.
 
-## Ce qui sera ajouté
+7. Améliorer `EbookKdpTools.tsx`
+   - Utiliser la clé Gemini issue de la configuration existante au lieu de dépendre uniquement de la prop `apiKey` si nécessaire.
+   - Ajouter des états de chargement par bouton pour mieux voir que la génération travaille.
+   - Ajouter un message visible si la clé Gemini n’est pas configurée.
+   - Garder l’onglet et la sidebar inchangés pour ne pas casser ce qui vient d’être stabilisé.
 
-### 1. Edge function `generate-launch-email-campaign`
+Fichiers concernés :
+- `src/hooks/useSubscriptionGeneration.ts`
+- `src/components/ebook/EbookKdpTools.tsx`
 
-Nouvelle fonction edge (n'impacte aucune fonction existante) :
-- Reçoit : `{ ebookTitle, authorName, targetAudience, bookSummary, launchDate, geminiApiKey }`
-- Utilise la clé Gemini BYOK de l'abonné (cohérent avec la stratégie API existante)
-- Demande à Gemini 2.5 Flash de générer 5 emails au format JSON :
-  1. **J-7 Teasing** : "Quelque chose arrive..."
-  2. **J-3 Révélation** : couverture + pitch
-  3. **Jour J Lancement** : appel à l'achat + lien
-  4. **J+3 Preuve sociale** : premiers retours / témoignages
-  5. **J+7 Dernière chance** : urgence / bonus de lancement
-- Chaque email retourne : `{ subject, preheader, bodyText, bodyHtml }`
-- `verify_jwt = false` (cohérent avec les autres fonctions BYOK du projet)
-- Validation Zod du payload
+Aucun changement prévu :
+- Pas de nouvelle table.
+- Pas d’envoi email.
+- Pas de modification sidebar/dashboard.
+- Pas de modification des fichiers auto-générés Lovable Cloud.
 
-### 2. Mise à jour de `EbookMarketing.tsx`
-
-Branchement réel de la carte "Système Email Marketing" déjà présente (lignes ~110-130) :
-- Renommer la carte en **"Campagne Email de Lancement (5 emails prêts à envoyer)"**
-- Ajouter 2 inputs locaux : `launchDate` (date) et `bookPitch` (textarea court, optionnel — fallback sur `book_summary` du projet)
-- `generateEmailCampaign` appelle vraiment la nouvelle edge function et stocke les 5 emails dans `emailTemplates`
-- Pour chaque email affiché : badge "Email N — J-X", **objet**, preheader, **corps**, et 3 boutons :
-  - 📋 Copier le texte brut
-  - 📋 Copier le HTML
-  - 💾 Télécharger `.eml` (importable dans n'importe quel outil)
-- Bouton global : **"Télécharger les 5 emails (.zip)"** via `jsZip` (déjà dans le projet pour les exports KDP/audio)
-- Note explicative en haut de la carte : *"Ces emails sont à copier-coller dans ton outil d'emailing (Mailchimp, Brevo, Systeme.io…). EbookStudio ne les envoie pas."*
-
-### 3. Récupération automatique des données du projet
-
-Le composant reçoit déjà `ebookTitle` et `chapters` en props. On va aussi lire depuis le projet courant (via le state existant déjà disponible dans `EbookPlannerPage`) :
-- `author_name`
-- `book_summary`
-- `target_audience`
-
-Ces 3 valeurs sont passées en props supplémentaires à `EbookMarketing` (changement de signature additif, défauts à `''`).
-
-## Ce qui ne sera PAS fait
-
-- Pas d'envoi d'email automatique
-- Pas de capture d'emails / liste d'abonnés gérée par EbookStudio
-- Pas de configuration de domaine email
-- Pas de modification de la sidebar, des onglets, ou de la navigation
-- Pas de nouvelle table en BDD
-- Pas de cron, pas de séquence programmée, pas de pgmq
-
-## Fichiers touchés
-
-```text
-NOUVEAU  supabase/functions/generate-launch-email-campaign/index.ts
-MODIFIÉ  src/components/ebook/EbookMarketing.tsx     (branchement réel + UI campagne lancement)
-MODIFIÉ  src/pages/EbookPlannerPage.tsx              (passer 3 props supplémentaires au composant)
-```
-
-Aucun autre fichier touché. Le dashboard, la sidebar, la pipeline P1-P15, le tracking, le KDP, l'audio, les exports : **rien n'est modifié**.
-
-## Test après déploiement
-
-1. Ouvrir un projet ebook existant → onglet **Vendre**
-2. Vérifier que la carte "Campagne Email de Lancement" s'affiche
-3. Renseigner la date de lancement → cliquer "Générer la séquence"
-4. Vérifier que 5 emails apparaissent avec objet + corps cohérents avec le titre du livre
-5. Tester "Télécharger .zip" → vérifier que les 5 `.eml` s'ouvrent bien dans Apple Mail / Outlook / Gmail (drag & drop)
-6. Vérifier que le reste du dashboard fonctionne toujours (création projet, pipeline, KDP, audio)
-
-Si tu valides, je passe en implémentation.
+Après validation, je corrige directement ces deux fichiers.
