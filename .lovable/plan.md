@@ -1,59 +1,90 @@
-## Tableau de bord générateur — version "Wow Factor"
+## Problème actuel
 
-Cible : l'onglet **Dashboard** du générateur d'ebook (`workflow-dashboard` dans `EbookPlannerPage.tsx`), pas la page /offres. Aujourd'hui ce dashboard affiche `EbookProgressDashboard` + `WorkflowDashboard` (très techniques). Objectif : ajouter en tête un dashboard inspirant qui combine vrai état du projet + exemples concrets de livres pour donner envie d'agir.
+L'onglet **Tableau de bord** (`workflow-dashboard`) empile **3 gros composants** l'un sous l'autre :
+1. `EbookHeroDashboard` (hero + best-sellers + 3 prochaines étapes)
+2. `EbookProgressDashboard` (statistiques techniques)
+3. `WorkflowDashboard` (autre vue workflow)
 
-### 1. Nouveau composant `EbookHeroDashboard.tsx`
+→ Résultat : redondance, pas de hiérarchie, on ne sait plus où cliquer. De plus :
+- Les **outils image** (Couverture IA, Éditeur de couverture, 4ème de couverture) ne sont pas mis en avant alors que ce sont des étapes clés.
+- Aucune **feuille de route post-publication** (que faire après l'export KDP : marketing, audiobook, série, etc.).
 
-Placé **au-dessus** de `EbookProgressDashboard` dans le case `workflow-dashboard`. Sections de haut en bas :
+## Solution : un parcours linéaire "A → Z" en 5 phases
 
-**A. Hero animé**
-- Grand bandeau dégradé teal→orange (palette KDP mémorisée).
-- Titre dynamique :
-  - Si projet vide : « Créez votre prochain best-seller Amazon KDP »
-  - Sinon : « Votre livre "{title}" est à {progress}% — continuons ! »
-- Sous-titre avec compteur animé (mots écrits / objectif), badge "Niveau" (Brouillon → Manuscrit → Prêt KDP).
-- 2 CTA : « ▶ Continuer maintenant » (saute à la prochaine étape réelle) et « 🪄 Lancer le Workflow IA 15 Agents ».
-- Décor : étoiles SVG flottantes (animate-pulse), petit mockup 3D de couverture (`EbookBookMockup3D` existant) si `coverImageUrl` présent, sinon silhouette placeholder cliquable → onglet Couverture.
+Remplacer l'empilement actuel par **un seul composant `EbookJourneyDashboard`** qui présente un parcours visuel clair, avec une seule timeline verticale colorée. Chaque phase = une carte cliquable avec son statut (✓ fait / 🟡 en cours / ⚪ à faire), durée estimée et CTA direct vers l'onglet.
 
-**B. Bandeau "Inspirez-vous des best-sellers"**
-- Carrousel horizontal (scroll-snap) de 6-8 livres réels tirés de `src/data/bestSellers2026.ts` (déjà en mémoire — *Atomic Habits*, *Psychology of Money*, *Ikigai*, etc.).
-- Chaque carte : mini-cover (placeholder coloré + titre stylé), genre, BSR estimé, 1 phrase « Pourquoi ça marche », bouton « 📋 Utiliser cette structure » → préremplit titre/genre/audience et ouvre l'onglet Plan.
-- Filtre rapide par catégorie (Business, Dev perso, Santé, Fiction, Enfants).
+### Les 5 phases
 
-**C. Grille "3 prochaines étapes pour vous"**
-- Calcul intelligent basé sur état réel (titre vide ? plan vide ? <50% rédigé ? pas de couverture ? pas de description KDP ?).
-- 3 grandes cartes illustrées (icône + couleur pillar) avec : numéro d'étape, durée estimée, mini-progress bar, bouton « Y aller ».
-- Effet hover-scale + halo orange.
+```text
+┌─ PHASE 1 — PRÉPARATION ──────────────────────┐
+│  • Idée & niche (→ /ebook-ideas)             │
+│  • Titre, sous-titre, audience (→ planner)   │
+│  • Plan détaillé des chapitres (→ planner)   │
+└──────────────────────────────────────────────┘
+            ▼
+┌─ PHASE 2 — RÉDACTION ────────────────────────┐
+│  • Workflow IA 15 Agents (→ complete-workflow)│
+│  • Rédaction manuelle (→ writing)            │
+│  • Préface & conclusion                      │
+└──────────────────────────────────────────────┘
+            ▼
+┌─ PHASE 3 — VISUELS (mise en avant ++) ───────┐
+│  🎨 Couverture IA (→ cover)                  │
+│  🎨 Éditeur de couverture (→ cover-design-editor) │
+│  🎨 4ème de couverture (→ backcover)         │
+└──────────────────────────────────────────────┘
+            ▼
+┌─ PHASE 4 — PUBLICATION KDP ──────────────────┐
+│  • Description & mots-clés KDP (→ kdp)       │
+│  • Checklist pré-publication                 │
+│  • Export PDF/EPUB (→ export)                │
+└──────────────────────────────────────────────┘
+            ▼
+┌─ PHASE 5 — APRÈS PUBLICATION (NOUVEAU) ──────┐
+│  • Plan marketing (→ marketing)              │
+│  • Audiobook express (→ audio-express)       │
+│  • Série / tomes (→ series)                  │
+│  • Affiliation & nurture (→ launch-plan)     │
+│  • Communauté / forum                        │
+└──────────────────────────────────────────────┘
+```
 
-**D. Preuves & motivation**
-- 4 KPI animés en grand format (CountUp via simple `useEffect`) : mots écrits aujourd'hui, chapitres terminés, score KDP /100, jours d'avance.
-- Témoignage rotatif (3 citations utilisateurs ebookstudio.fr) + logos « Disponible sur Amazon KDP / Kobo / Apple Books ».
+### Détails visuels
 
-**E. Galerie "Livres créés avec EbookStudio"** (exemples)
-- 6 vignettes de couvertures exemples (titres fictifs réalistes par niche : *La Méthode 90 Jours*, *Recettes Healthy Express*, *L'Atelier Aquarelle*…) générées en CSS pur (gradient + typo) — aucune image externe, conformément aux règles photoréalistes.
-- Au clic : ouvre une modale « Voici comment ce livre a été structuré » avec plan + description type, bouton « Démarrer un projet similaire ».
+- **Header compact** : titre du projet, % global de progression, badge phase actuelle, CTA principal "Continuer là où je m'étais arrêté" (calcul de l'étape la + avancée mais pas finie).
+- **Timeline verticale** avec ligne dégradée teal→orange (palette KDP). Chaque phase = carte large pliable/dépliable.
+- **Phase active** : déployée par défaut, halo orange, pulse léger.
+- **Phases terminées** : compactées, check vert, cliquables pour revenir.
+- **Phase 3 (Visuels)** : 3 sous-cartes côte à côte avec mini-aperçu coloré et bouton "Ouvrir" → corrige le manque de liens vers les prompts image.
+- **Phase 5** : entièrement nouvelle, expose enfin les outils post-KDP qui sont aujourd'hui invisibles depuis le dashboard.
 
-### 2. Données
+### Section secondaire conservée
 
-- Réutiliser `src/data/bestSellers2026.ts` (déjà existant).
-- Créer `src/data/ebookExamples.ts` : tableau de 6 exemples de livres "réussis" (titre, sous-titre, niche, plan en 8 chapitres, description KDP type, mots-clés, palette de couverture). Données statiques, aucun fake stat.
+Sous la timeline, garder en accordéon replié par défaut :
+- "Statistiques détaillées" (réutilise `EbookProgressDashboard`)
+- "Inspirations best-sellers" (carrousel actuel du Hero)
 
-### 3. Intégration
+→ L'utilisateur les ouvre s'il en a besoin, sans polluer la vue principale.
 
-Dans `src/pages/EbookPlannerPage.tsx` case `workflow-dashboard` (vue classique), insérer `<EbookHeroDashboard …/>` **avant** `<EbookProgressDashboard …/>`. Props : titre, auteur, chapters, coverImageUrl, kdpDescription, callbacks `onNavigateToTab`, `onApplyExample(example)` (qui setState titre/genre/audience/numberOfChapters et bascule sur l'onglet Plan).
+## Fichiers
 
-### 4. Style & animations
+**Créer**
+- `src/components/ebook/EbookJourneyDashboard.tsx` — nouveau composant timeline 5 phases
+- `src/components/ebook/journey/PhaseCard.tsx` — carte de phase réutilisable
+- `src/data/ebookJourneySteps.ts` — définition des 5 phases, leurs étapes, l'onglet cible et la fonction de détection "fait / en cours / à faire" basée sur l'état réel du projet (chapitres remplis, kdpDescription présent, coverConcepts généré, etc.)
 
-- Palette mémorisée : `#FAFAFA` fond, `#008296` teal, `#FF9E2D` accent orange hover, `#232F3E` texte.
-- Animations Tailwind déjà disponibles : `animate-fade-in`, `animate-scale-in`, `hover-scale`, transitions 300ms.
-- Aucune dépendance nouvelle (Recharts, framer-motion, lucide, shadcn déjà installés).
+**Modifier**
+- `src/pages/EbookPlannerPage.tsx` (case `workflow-dashboard`, lignes 1325-1394) :
+  - Remplacer l'empilement Hero + Progress + Workflow par `<EbookJourneyDashboard …/>` + 2 sections accordéon (Stats détaillées + Inspirations).
+  - Garder toutes les props/callbacks existants (`onNavigateToTab`, `onStartAutoWorkflow`, `onApplyExample`).
 
-### Ce qui n'est PAS touché
+**Supprimer (utilisation)**
+- `EbookHeroDashboard` et `WorkflowDashboard` ne sont plus rendus dans `workflow-dashboard` (les fichiers restent en cas de réutilisation ailleurs ; à confirmer ensuite).
 
-- `/offres`, `EbookGlobalDashboard`, `WorkflowDashboard`, `EbookAICoverStudio`, edge functions, `client.ts`, `types.ts`, `supabase/config.toml`.
-- Aucune fausse statistique ni `Math.random` (règle mémoire).
+## Règles respectées
 
-### Fichiers
-
-- **Créer** : `src/components/ebook/EbookHeroDashboard.tsx`, `src/data/ebookExamples.ts`
-- **Modifier** : `src/pages/EbookPlannerPage.tsx` (ajout import + insertion ~ligne 1324)
+- Aucune fausse statistique, aucun `Math.random` (mémoire core).
+- Palette Amazon KDP : `#FAFAFA`, `#008296`, `#FF9E2D`, `#232F3E`.
+- Aucune nouvelle dépendance.
+- Pas de modification de `client.ts`, `types.ts`, `supabase/config.toml`.
+- Pas de refonte du monolithe `EbookPlannerPage` au-delà du case `workflow-dashboard` (mémoire `refactoring-monolithe-ebook-planner`).
