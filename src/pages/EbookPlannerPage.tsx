@@ -1321,27 +1321,44 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           );
         }
         return (
-          <WorkflowDashboard
-            ebookTitle={ebookTitle}
-            authorName={authorName}
-            bookSubtitle={bookSubtitle}
-            bookDescription={bookDescription}
-            genre={genre}
-            targetAudience={targetAudience}
-            numberOfChapters={numberOfChapters}
-            chapters={chapters}
-            onNavigate={(tabId) => setActiveTab(tabId)}
-            onStartAutoWorkflow={() => setActiveTab('complete-workflow')}
-            onUpdateTitle={setEbookTitle}
-            onUpdateSubtitle={setBookSubtitle}
-            onUpdateAuthor={setAuthorName}
-            onUpdateDescription={setBookDescription}
-            onUpdateGenre={setGenre}
-            onUpdateTargetAudience={setTargetAudience}
-            onUpdateNumberOfChapters={setNumberOfChapters}
-            onUpdateChapterTitle={updateChapterTitle}
-            onAddChapter={addChapter}
-          />
+          <div className="space-y-6">
+            <EbookProgressDashboard
+              ebookTitle={ebookTitle}
+              authorName={authorName}
+              bookDescription={bookDescription}
+              targetAudience={targetAudience}
+              chapters={chapters}
+              preface={preface}
+              conclusion={conclusion}
+              coverImageUrl={coverImageUrl}
+              kdpDescription={kdpDescription}
+              kdpKeywords={kdpKeywords}
+              kdpCategories={kdpCategories}
+              numberOfChapters={numberOfChapters}
+              onNavigateToTab={(tabId) => setActiveTab(tabId)}
+            />
+            <WorkflowDashboard
+              ebookTitle={ebookTitle}
+              authorName={authorName}
+              bookSubtitle={bookSubtitle}
+              bookDescription={bookDescription}
+              genre={genre}
+              targetAudience={targetAudience}
+              numberOfChapters={numberOfChapters}
+              chapters={chapters}
+              onNavigate={(tabId) => setActiveTab(tabId)}
+              onStartAutoWorkflow={() => setActiveTab('complete-workflow')}
+              onUpdateTitle={setEbookTitle}
+              onUpdateSubtitle={setBookSubtitle}
+              onUpdateAuthor={setAuthorName}
+              onUpdateDescription={setBookDescription}
+              onUpdateGenre={setGenre}
+              onUpdateTargetAudience={setTargetAudience}
+              onUpdateNumberOfChapters={setNumberOfChapters}
+              onUpdateChapterTitle={updateChapterTitle}
+              onAddChapter={addChapter}
+            />
+          </div>
         );
 
       case 'workflow-export':
