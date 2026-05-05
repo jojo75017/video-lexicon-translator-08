@@ -270,6 +270,19 @@ export const SimpleSidebar: React.FC<SimpleSidebarProps> = ({
           </div>
         )}
 
+        {/* Mots-clés KDP → page dédiée */}
+        <button
+          onClick={() => navigate('/kdp-keywords')}
+          title="Recherche de mots-clés Amazon KDP par IA"
+          className={cn(
+            'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-left',
+            'text-muted-foreground hover:bg-accent/15 hover:text-accent'
+          )}
+        >
+          <Search className="h-4 w-4 flex-shrink-0" />
+          {!isCollapsed && <span className="text-sm font-medium">Mots-clés KDP</span>}
+        </button>
+
         {/* Tous les outils → vue Trello */}
         <button
           onClick={() => onSwitchToTrello?.()}
