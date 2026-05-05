@@ -13,6 +13,9 @@ interface TutorialCardProps {
 export const TutorialCard: React.FC<TutorialCardProps> = ({ tutoriel }) => {
   const navigate = useNavigate();
   const Icon = tutoriel.icon;
+  const target = tutoriel.targetTab
+    ? `${tutoriel.targetRoute}?tab=${encodeURIComponent(tutoriel.targetTab)}`
+    : tutoriel.targetRoute;
 
   return (
     <Card className="border-2 transition-all hover:shadow-md hover:border-accent/40 flex flex-col h-full">
@@ -42,7 +45,7 @@ export const TutorialCard: React.FC<TutorialCardProps> = ({ tutoriel }) => {
         <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border">
           <Button
             size="sm"
-            onClick={() => navigate(tutoriel.targetRoute)}
+            onClick={() => navigate(target)}
             className="bg-primary hover:bg-accent transition-colors"
           >
             {tutoriel.ctaLabel ?? "Lancer cette action"}

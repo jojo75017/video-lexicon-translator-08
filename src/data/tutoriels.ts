@@ -24,6 +24,7 @@ export interface Tutoriel {
   icon: LucideIcon;
   steps: string[];
   targetRoute: string;
+  targetTab?: string;
   ctaLabel?: string;
   videoRoute?: string;
 }
@@ -35,9 +36,8 @@ export const CATEGORIES: { id: TutorielCategory; label: string }[] = [
   { id: 'export', label: 'Export & Publication' },
 ];
 
-// Toutes les routes ci-dessous existent dans src/App.tsx et sont accessibles aux abonnés.
-// Plusieurs fonctionnalités (config API, Document Transformer, Cover Studio, Audio Express,
-// Export KDP) sont des onglets/sections internes au /ebook-planner — donc on y renvoie.
+// Les tutoriels doivent pointer vers les outils abonnés réels : soit une route protégée
+// (/kdp-keywords), soit un onglet interne exact du dashboard (/ebook-planner?tab=...).
 
 export const TUTORIELS: Tutoriel[] = [
   // --- Démarrage ---
@@ -56,8 +56,8 @@ export const TUTORIELS: Tutoriel[] = [
       "Un message de confirmation s'affiche : vous êtes prêt à générer.",
     ],
     targetRoute: '/ebook-planner',
-    ctaLabel: 'Ouvrir le dashboard',
-    videoRoute: '/formation-videos',
+    targetTab: 'planner',
+    ctaLabel: 'Configurer la clé',
   },
   {
     id: 'premier-ebook',
@@ -74,8 +74,8 @@ export const TUTORIELS: Tutoriel[] = [
       "Lancez la génération automatique du manuscrit.",
     ],
     targetRoute: '/ebook-planner',
+    targetTab: 'planner',
     ctaLabel: 'Lancer la création',
-    videoRoute: '/formation-videos',
   },
   {
     id: 'workflow-15-agents',
@@ -91,8 +91,9 @@ export const TUTORIELS: Tutoriel[] = [
       "Vous pouvez relancer un agent isolé en cas de besoin.",
       "Le résultat final est un manuscrit complet, structuré et relu.",
     ],
-    targetRoute: '/guide-outils',
-    ctaLabel: 'Voir le guide complet',
+    targetRoute: '/ebook-planner',
+    targetTab: 'complete-workflow',
+    ctaLabel: 'Ouvrir le workflow IA',
   },
 
   // --- Création contenu ---
@@ -111,6 +112,7 @@ export const TUTORIELS: Tutoriel[] = [
       "Récupérez le manuscrit prêt à exporter à la fin.",
     ],
     targetRoute: '/ebook-planner',
+    targetTab: 'complete-workflow',
     ctaLabel: 'Démarrer le pipeline',
   },
   {
@@ -145,7 +147,8 @@ export const TUTORIELS: Tutoriel[] = [
       "Importez : votre ebook est prêt à être exporté ou augmenté.",
     ],
     targetRoute: '/ebook-planner',
-    ctaLabel: 'Ouvrir le dashboard',
+    targetTab: 'doc-transform',
+    ctaLabel: 'Importer un Word',
   },
   {
     id: 'cover-ai',
@@ -162,7 +165,8 @@ export const TUTORIELS: Tutoriel[] = [
       "Téléchargez la couverture aux bonnes dimensions KDP.",
     ],
     targetRoute: '/ebook-planner',
-    ctaLabel: 'Ouvrir le dashboard',
+    targetTab: 'cover',
+    ctaLabel: 'Générer la couverture',
   },
 
   // --- Audio ---
@@ -181,7 +185,8 @@ export const TUTORIELS: Tutoriel[] = [
       "Téléchargez le fichier audio final prêt pour publication.",
     ],
     targetRoute: '/ebook-planner',
-    ctaLabel: 'Ouvrir le dashboard',
+    targetTab: 'audio-express',
+    ctaLabel: 'Lancer Audio Express',
   },
   {
     id: 'publier-audiobook',
@@ -191,14 +196,15 @@ export const TUTORIELS: Tutoriel[] = [
     durationMin: 10,
     icon: Globe,
     steps: [
-      "Voyez la démo d'audiobook publié pour comprendre le résultat.",
-      "Depuis votre projet, cliquez sur 'Publier l\'audiobook'.",
+      "Depuis le Dashboard, ouvrez l'onglet 'Audio & Audiobook'.",
+      "Préparez ou vérifiez les fichiers audio de votre projet.",
       "Renseignez prix, description et image de couverture.",
       "Activez le checkout PayPal et la livraison automatique par email.",
       "Récupérez le lien public (slug) à partager.",
     ],
-    targetRoute: '/audiobook-demo',
-    ctaLabel: 'Voir la démo',
+    targetRoute: '/ebook-planner',
+    targetTab: 'audiobook',
+    ctaLabel: 'Ouvrir Audiobook',
   },
 
   // --- Export ---
@@ -217,7 +223,8 @@ export const TUTORIELS: Tutoriel[] = [
       "Téléchargez les deux fichiers prêts à uploader sur KDP.",
     ],
     targetRoute: '/ebook-planner',
-    ctaLabel: 'Ouvrir le dashboard',
+    targetTab: 'export',
+    ctaLabel: 'Exporter le livre',
   },
   {
     id: 'checklist-kdp',
@@ -233,7 +240,8 @@ export const TUTORIELS: Tutoriel[] = [
       "Uploadez le PDF intérieur, l'epub et la couverture.",
       "Validez l'aperçu KDP, puis publiez votre livre.",
     ],
-    targetRoute: '/kdp-ads-guide',
-    ctaLabel: 'Voir le guide KDP Ads',
+    targetRoute: '/ebook-planner',
+    targetTab: 'kdp-prepublish-checklist',
+    ctaLabel: 'Ouvrir la checklist',
   },
 ];
