@@ -8,6 +8,7 @@ import {
   Download,
   Megaphone,
   Wrench,
+  Search,
   Settings,
   ChevronLeft,
   ChevronRight,
