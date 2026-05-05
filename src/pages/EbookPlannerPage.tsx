@@ -1295,26 +1295,88 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
         );
 
       case 'workflow-dashboard':
-        // Le nouveau "Parcours A → Z" remplace désormais l'ancienne vue Trello
-        // pour offrir une expérience claire et linéaire à l'utilisateur.
         return (
           <div className="space-y-6">
-            <EbookJourneyDashboard
-              ebookTitle={ebookTitle}
-              authorName={authorName}
-              bookDescription={bookDescription}
-              targetAudience={targetAudience}
-              genre={genre}
-              chapters={chapters}
-              preface={preface}
-              conclusion={conclusion}
-              coverImageUrl={coverConcepts ? 'generated' : undefined}
-              kdpDescription={kdpDescription}
-              kdpKeywords={kdpKeywords}
-              kdpCategories={kdpCategories}
-              onNavigateToTab={(tabId) => setActiveTab(tabId)}
-              onStartAutoWorkflow={() => setActiveTab('complete-workflow')}
-            />
+            {/* Sélecteur de mode de tableau de bord */}
+            <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between bg-white rounded-xl border p-3 shadow-sm">
+              <div className="text-sm font-medium px-2" style={{ color: '#232F3E' }}>
+                🎛️ Mode d'affichage du tableau de bord :
+              </div>
+              <div className="inline-flex rounded-lg border overflow-hidden bg-[#FAFAFA]">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setViewMode('classic');
+                    localStorage.setItem('ebook_view_mode', 'classic');
+                  }}
+                  className="px-4 py-2 text-sm font-semibold transition-all"
+                  style={{
+                    backgroundColor: viewMode === 'classic' ? '#008296' : 'transparent',
+                    color: viewMode === 'classic' ? '#FFFFFF' : '#232F3E',
+                  }}
+                >
+                  ✨ Parcours guidé A → Z
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setViewMode('trello');
+                    localStorage.setItem('ebook_view_mode', 'trello');
+                  }}
+                  className="px-4 py-2 text-sm font-semibold transition-all"
+                  style={{
+                    backgroundColor: viewMode === 'trello' ? '#FF9E2D' : 'transparent',
+                    color: viewMode === 'trello' ? '#FFFFFF' : '#232F3E',
+                  }}
+                >
+                  🗂️ Vue Workflow (Kanban)
+                </button>
+              </div>
+            </div>
+
+            {viewMode === 'trello' ? (
+              <TrelloBoardView
+                ebookTitle={ebookTitle}
+                bookSubtitle={bookSubtitle}
+                authorName={authorName}
+                bookDescription={bookDescription}
+                genre={genre}
+                targetAudience={targetAudience}
+                numberOfChapters={numberOfChapters}
+                chapters={chapters}
+                onNavigate={(tabId) => setActiveTab(tabId)}
+                onSwitchToClassic={() => {
+                  setViewMode('classic');
+                  localStorage.setItem('ebook_view_mode', 'classic');
+                }}
+                onUpdateTitle={setEbookTitle}
+                onUpdateSubtitle={setBookSubtitle}
+                onUpdateAuthor={setAuthorName}
+                onUpdateDescription={setBookDescription}
+                onUpdateGenre={setGenre}
+                onUpdateTargetAudience={setTargetAudience}
+                onUpdateNumberOfChapters={setNumberOfChapters}
+                onUpdateChapterTitle={updateChapterTitle}
+                onAddChapter={addChapter}
+              />
+            ) : (
+              <EbookJourneyDashboard
+                ebookTitle={ebookTitle}
+                authorName={authorName}
+                bookDescription={bookDescription}
+                targetAudience={targetAudience}
+                genre={genre}
+                chapters={chapters}
+                preface={preface}
+                conclusion={conclusion}
+                coverImageUrl={coverConcepts ? 'generated' : undefined}
+                kdpDescription={kdpDescription}
+                kdpKeywords={kdpKeywords}
+                kdpCategories={kdpCategories}
+                onNavigateToTab={(tabId) => setActiveTab(tabId)}
+                onStartAutoWorkflow={() => setActiveTab('complete-workflow')}
+              />
+            )}
 
             {/* Sections secondaires repliables */}
             <details className="rounded-xl border bg-white p-4 group">
