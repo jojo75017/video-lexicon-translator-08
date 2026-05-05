@@ -305,6 +305,40 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
               )}
             </div>
 
+            {/* ========= VALIDATION DIMENSIONS BROCHÉ EN DIRECT ========= */}
+            {format === 'paperback' && paperbackValidation && (
+              <div className={`rounded-lg border p-3 space-y-2 ${
+                paperbackValidation.hasError
+                  ? 'border-destructive/40 bg-destructive/5'
+                  : paperbackValidation.hasWarn
+                    ? 'border-amber-500/40 bg-amber-500/5'
+                    : 'border-emerald-500/40 bg-emerald-500/5'
+              }`}>
+                <div className="flex items-center gap-2 text-xs font-semibold">
+                  {paperbackValidation.hasError ? (
+                    <><XCircle className="w-4 h-4 text-destructive" /> Validation broché — corrections requises</>
+                  ) : paperbackValidation.hasWarn ? (
+                    <><AlertTriangle className="w-4 h-4 text-amber-600" /> Validation broché — avertissements</>
+                  ) : (
+                    <><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Dimensions broché conformes KDP</>
+                  )}
+                </div>
+                <ul className="space-y-1.5">
+                  {paperbackValidation.checks.map((c, idx) => (
+                    <li key={idx} className="flex items-start gap-2 text-[11px]">
+                      {c.status === 'ok' && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />}
+                      {c.status === 'warn' && <AlertTriangle className="w-3.5 h-3.5 text-amber-600 mt-0.5 flex-shrink-0" />}
+                      {c.status === 'error' && <XCircle className="w-3.5 h-3.5 text-destructive mt-0.5 flex-shrink-0" />}
+                      <div>
+                        <div className="font-medium text-foreground">{c.label}</div>
+                        <div className="text-muted-foreground">{c.detail}</div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
             <div className="space-y-2">
               <Label>Titre du livre</Label>
               <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Mon livre..." />
