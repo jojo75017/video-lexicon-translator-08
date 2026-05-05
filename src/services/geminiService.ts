@@ -282,28 +282,96 @@ function tryRepairJson(input: string): string {
 }
 
 /**
- * Appelle Gemini et parse la réponse comme JSON (avec responseMimeType + réparation)
+ * Appelle Gemini et parse la réponse comme JSON (avec responseMimeType + réparation + retry)
  */
 export async function callGeminiJSON<T = any>(
   apiKey: string,
   prompt: string,
   options: GeminiCallOptions = {}
 ): Promise<T> {
-  const content = await callGemini(apiKey, prompt, { ...options, jsonMode: true });
+  const tryParse = (content: string): T | null => {
+    try { return JSON.parse(content) as T; } catch {}
+    const repaired = tryRepairJson(content);
+    try { return JSON.parse(repaired) as T; } catch {}
+    return null;
+  };
 
-  // 1er essai : parse direct
+  // 1ère tentative : jsonMode
+  let lastRaw = '';
   try {
-    return JSON.parse(content);
+    const content = await callGemini(apiKey, prompt, { ...options, jsonMode: true });
+    lastRaw = content;
+    const parsed = tryParse(content);
+    if (parsed !== null) return parsed;
+  } catch (e) {
+    console.warn('[Gemini JSON] 1ère tentative échouée:', (e as any)?.message);
+  }
+
+  // 2e tentative : prompt renforcé strict JSON
+  try {
+    const stricter = `${prompt}\n\nIMPORTANT : Réponds UNIQUEMENT avec du JSON valide, sans aucun texte avant ni après, sans balises markdown, sans commentaires.`;
+    const content = await callGemini(apiKey, stricter, { ...options, jsonMode: true, temperature: 0.3 });
+    lastRaw = content;
+    const parsed = tryParse(content);
+    if (parsed !== null) return parsed;
+  } catch (e) {
+    console.warn('[Gemini JSON] 2e tentative échouée:', (e as any)?.message);
+  }
+
+  console.error('[Gemini JSON] Échec parsing après 2 tentatives. Brut:', lastRaw.slice(0, 800));
+  throw new Error('Impossible de parser la réponse JSON de Gemini. Relancez la génération.');
+}
+
+/**
+ * Extrait des mots-clés depuis une réponse texte libre (fallback ultime).
+ * Accepte JSON, listes à puces, lignes simples, séparateurs variés.
+ */
+export function extractKeywordsFromText(raw: string, max = 7): string[] {
+  if (!raw) return [];
+  let text = raw.replace(/```json|```/gi, '').trim();
+
+  // Tentative JSON tableau de strings
+  try {
+    const parsed = JSON.parse(text);
+    if (Array.isArray(parsed)) {
+      return parsed
+        .map((x: any) => (typeof x === 'string' ? x : (x?.keyword || x?.mot || x?.term || '')))
+        .map((s: string) => s.trim())
+        .filter(Boolean)
+        .slice(0, max);
+    }
+    if (parsed && Array.isArray((parsed as any).keywords)) {
+      return (parsed as any).keywords
+        .map((x: any) => (typeof x === 'string' ? x : (x?.keyword || '')))
+        .map((s: string) => s.trim())
+        .filter(Boolean)
+        .slice(0, max);
+    }
   } catch {}
 
-  // 2e essai : réparation
-  const repaired = tryRepairJson(content);
-  try {
-    return JSON.parse(repaired);
-  } catch (e) {
-    console.error('[Gemini JSON] Échec parsing. Brut:', content.slice(0, 800));
-    console.error('[Gemini JSON] Réparé:', repaired.slice(0, 800));
-    throw new Error('Impossible de parser la réponse JSON de Gemini. Relancez la génération.');
+  // Extraire tout ce qui ressemble à "..." dans la réponse
+  const quoted = Array.from(text.matchAll(/"([^"\n]{2,80})"/g)).map(m => m[1].trim());
+  if (quoted.length >= 3) {
+    return Array.from(new Set(quoted)).slice(0, max);
   }
+
+  // Découpe par lignes / puces / virgules
+  const lines = text
+    .split(/\r?\n/)
+    .map(l => l.replace(/^[\s\-*•\d.\)]+/, '').trim())
+    .filter(l => l && !/^[\{\}\[\],]+$/.test(l));
+
+  let candidates: string[] = [];
+  if (lines.length >= 3) {
+    candidates = lines;
+  } else {
+    candidates = text.split(/[,;\n]/).map(s => s.trim()).filter(Boolean);
+  }
+
+  candidates = candidates
+    .map(s => s.replace(/^["'`]+|["'`,.]+$/g, '').trim())
+    .filter(s => s.length >= 2 && s.length <= 80 && !/^(json|keywords?|mots?-?cl[eé]s?)\s*[:=]?$/i.test(s));
+
+  return Array.from(new Set(candidates)).slice(0, max);
 }
 

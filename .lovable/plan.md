@@ -1,47 +1,36 @@
-## Problèmes identifiés
+Je vois le problème : la description générée est beaucoup trop courte (une simple accroche), et les mots-clés restent fragiles car l’outil dépend encore trop d’une réponse JSON parfaite de Gemini.
 
-**1. Description KDP trop courte**
-- `maxTokens: 1500` côté Gemini — mais le prompt demande "max 1900 caractères"
-- En français, 1900 caractères ≈ 600-800 tokens normalement, MAIS Gemini 2.5 Flash consomme beaucoup de tokens en "thinking" interne avant de produire le texte
-- Résultat : la description est tronquée avant d'atteindre la longueur attendue
+Plan de correction ciblé, sans toucher au reste :
 
-**2. Mots-clés "Impossible de parser la réponse JSON de Gemini"**
-- `callGeminiJSON` tente `JSON.parse` puis cherche `{...}` ou `[...]`. Si la réponse est tronquée (max tokens atteint), le `]` final manque → parse échoue
-- Le service Gemini ne demande pas explicitement `responseMimeType: 'application/json'` à l'API → Gemini renvoie parfois du texte mêlé de markdown, voire du commentaire avant le tableau
-- Pas de réparation automatique (suppression virgules trailing, troncature, etc.)
+1. Renforcer la description KDP
+- Modifier le prompt de `generateKDPDescription` pour demander une vraie fiche Amazon complète, pas seulement un hook.
+- Viser explicitement environ 1 500 à 1 900 caractères, avec un minimum de sécurité autour de 1 200 caractères.
+- Garder la limite KDP correcte et la structure attendue : hook, promesse, bénéfices, aperçu du contenu, appel à l’action.
+- Ajouter une validation après génération : si Gemini renvoie moins de ~900 caractères ou seulement une accroche, relancer automatiquement une seconde fois avec une consigne plus stricte.
+- Si la réponse reste courte, afficher une erreur claire au lieu de laisser croire que la description est exploitable.
 
-## Plan de correction (2 fichiers, sans casser le reste)
+2. Fiabiliser les mots-clés KDP
+- Ne plus dépendre uniquement du format tableau JSON enrichi avec objets `{ keyword, chars, relevance, tip }`.
+- Ajouter une stratégie de secours : si le JSON objet échoue ou retourne vide, relancer Gemini avec un format ultra-simple `string[]`.
+- Ajouter un parseur de dernier recours capable d’extraire des mots-clés depuis une réponse texte, même si Gemini ajoute du texte parasite.
+- Normaliser le résultat pour toujours essayer d’obtenir 7 mots-clés exploitables.
+- Filtrer les entrées vides, les doublons et les mots-clés trop longs, avec recalcul automatique du nombre de caractères.
 
-### A. `src/services/geminiService.ts`
-1. Augmenter `maxOutputTokens` par défaut à **8192** (au lieu de 2000)
-2. Ajouter un paramètre `jsonMode` à `callGemini` qui, quand activé, ajoute `responseMimeType: 'application/json'` dans `generationConfig` → Gemini renvoie alors du JSON pur garanti
-3. Faire en sorte que `callGeminiJSON` active automatiquement `jsonMode: true`
-4. Logger `finishReason` quand la réponse est vide ou tronquée pour debug futur
-5. Améliorer l'extracteur JSON dans `callGeminiJSON` :
-   - Strip markdown ` ```json `
-   - Trouver bornes `{...}` ou `[...]`
-   - Réparer virgules trailing (`,}` / `,]`)
-   - Nettoyer caractères de contrôle
-   - En dernier recours, si la réponse est tronquée à mi-chemin dans un tableau, fermer proprement avant de parser
+3. Corriger le mode JSON Gemini
+- Adapter `callGeminiJSON` pour accepter un retry automatique strict quand le parsing échoue.
+- Ajouter une option de fallback texte afin que les outils KDP puissent récupérer quelque chose d’utilisable au lieu d’échouer sur “Impossible de parser la réponse JSON de Gemini”.
+- Garder `responseMimeType: application/json`, mais ne plus considérer cela comme suffisant.
 
-### B. `src/hooks/useSubscriptionGeneration.ts`
-1. **Description KDP** : passer `maxTokens` de 1500 → **4000** pour laisser de la marge au "thinking" interne de Gemini 2.5 Flash
-2. **Mots-clés KDP** : passer `maxTokens` de 1200 → **3000**
-3. **Catégories KDP** : passer `maxTokens` de 1200 → **3000**
-4. **A+ Content** : passer `maxTokens` de 4000 → **8000**
-5. Si `callGeminiJSON` échoue toujours sur les keywords/categories, faire un **second essai automatique** en demandant à Gemini "réponds UNIQUEMENT en JSON valide commençant par `[` et terminant par `]`, rien d'autre"
+4. Corriger le contenu A+ si nécessaire
+- Remplacer son parsing JSON manuel par `callGeminiJSON`, déjà plus robuste.
+- Ajouter une validation minimale pour éviter les réponses incomplètes.
 
-## Pas touché
-- Sidebar
-- Pages, routes, navigation
-- Dashboard
-- Edge functions (la migration est déjà côté client via `geminiService`)
-- Workflow P1-P15
-- Schéma DB
-- Aucune nouvelle table, aucun nouveau secret
+5. Ne pas toucher au reste
+- Pas de modification de base de données.
+- Pas de modification de sidebar, exports, dashboard, audio, pipeline P1-P15 ou authentification.
+- Changements limités à `src/services/geminiService.ts` et `src/hooks/useSubscriptionGeneration.ts`.
 
-## Fichiers modifiés
-- `src/services/geminiService.ts`
-- `src/hooks/useSubscriptionGeneration.ts`
-
-Après validation, j'applique ces corrections directement.
+Résultat attendu après correction :
+- La description KDP doit être une vraie description longue et vendable, pas une phrase d’accroche.
+- Les mots-clés doivent apparaître même si Gemini répond avec un JSON imparfait.
+- L’erreur “Impossible de parser la réponse JSON de Gemini” ne doit plus bloquer l’outil mots-clés dans les cas courants.
