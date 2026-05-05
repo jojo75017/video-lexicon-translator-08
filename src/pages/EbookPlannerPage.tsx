@@ -83,6 +83,7 @@ import { EbookProgressDashboard } from '@/components/ebook/EbookProgressDashboar
 import { EbookHeroDashboard } from '@/components/ebook/EbookHeroDashboard';
 import { EbookJourneyDashboard } from '@/components/ebook/EbookJourneyDashboard';
 import { AuthorBooksShowcase } from '@/components/ebook/AuthorBooksShowcase';
+import { KdpKeywordWidget } from '@/components/ebook/KdpKeywordWidget';
 import type { EbookExample } from '@/data/ebookExamples';
 import { WorkflowExportCompiled } from '@/components/ebook/WorkflowExportCompiled';
 import { TrelloBoardView } from '@/components/ebook/TrelloBoardView';
