@@ -1300,38 +1300,76 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
         return (
           <div className="space-y-6">
             {viewMode === 'choice' ? (
-              <div className="rounded-xl border bg-card p-5 shadow-sm">
-                <div className="mb-4">
-                  <p className="text-sm font-semibold text-primary">Choisissez votre tableau de bord</p>
-                  <h2 className="text-2xl font-bold text-foreground">Vous voulez travailler en simple ou en Workflow ?</h2>
+              <>
+                {/* Bloc 1 — En-tête éditorial */}
+                <div
+                  className="rounded-xl p-6 text-white shadow-sm relative overflow-hidden"
+                  style={{ background: 'linear-gradient(135deg, #008296 0%, #FF9E2D 100%)' }}
+                >
+                  <div className="relative z-10 max-w-3xl">
+                    <p className="text-xs font-semibold uppercase tracking-wide opacity-90 mb-2">
+                      ✨ EbookStudio · Suite IA pour auteurs Amazon KDP
+                    </p>
+                    <h2 className="text-2xl md:text-3xl font-bold leading-tight mb-2">
+                      Votre livre Amazon KDP mérite d'être lu.
+                    </h2>
+                    <p className="text-sm md:text-base opacity-95 leading-relaxed">
+                      EbookStudio est la suite d'outils IA pensée pour les auteurs Amazon Kindle Direct Publishing.
+                      Identifiez les niches rentables, optimisez vos titres, mots-clés, descriptions et couvertures —
+                      et donnez à votre livre toutes ses chances dès la première publication.
+                    </p>
+                    <div className="mt-4 flex flex-wrap gap-2 text-xs font-semibold">
+                      <span className="rounded-full bg-white/20 px-3 py-1 backdrop-blur-sm">🎯 Niches rentables</span>
+                      <span className="rounded-full bg-white/20 px-3 py-1 backdrop-blur-sm">🔑 Optimisation KDP</span>
+                      <span className="rounded-full bg-white/20 px-3 py-1 backdrop-blur-sm">🎨 Couvertures pro</span>
+                    </div>
+                  </div>
+                  <div className="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-white/10" />
+                  <div className="absolute -right-20 -bottom-20 w-60 h-60 rounded-full bg-white/5" />
                 </div>
-                <div className="grid gap-4 md:grid-cols-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setViewMode('classic');
-                      localStorage.setItem(DASHBOARD_VIEW_MODE_KEY, 'classic');
-                    }}
-                    className="rounded-lg border-2 border-border bg-background p-5 text-left transition-all hover:border-primary hover:shadow-md"
-                  >
-                    <span className="mb-3 flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold">1</span>
-                    <span className="block text-xl font-bold text-foreground">Parcours simple</span>
-                    <span className="mt-2 block text-sm text-muted-foreground">Vue guidée étape par étape, plus linéaire.</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setViewMode('trello');
-                      localStorage.setItem(DASHBOARD_VIEW_MODE_KEY, 'trello');
-                    }}
-                    className="rounded-lg border-2 border-border bg-background p-5 text-left transition-all hover:border-accent hover:shadow-md"
-                  >
-                    <span className="mb-3 flex h-9 w-9 items-center justify-center rounded-full bg-accent text-accent-foreground font-bold">2</span>
-                    <span className="block text-xl font-bold text-foreground">Workflow 15 agents</span>
-                    <span className="mt-2 block text-sm text-muted-foreground">Vue Kanban complète pour piloter tout le workflow IA.</span>
-                  </button>
+
+                {/* Bloc 2 — Choix du mode */}
+                <div className="rounded-xl border bg-card p-6 shadow-sm">
+                  <div className="mb-4">
+                    <p className="text-sm font-semibold text-primary">Choisissez votre tableau de bord</p>
+                    <h2 className="text-2xl font-bold text-foreground">Vous voulez travailler en simple ou en Workflow ?</h2>
+                  </div>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setViewMode('classic');
+                        localStorage.setItem(DASHBOARD_VIEW_MODE_KEY, 'classic');
+                      }}
+                      className="rounded-lg border-2 border-border bg-background p-5 text-left transition-all hover:border-primary hover:shadow-md"
+                    >
+                      <span className="mb-3 flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold">1</span>
+                      <span className="block text-xl font-bold text-foreground">Parcours simple</span>
+                      <span className="mt-2 block text-sm text-muted-foreground">Vue guidée étape par étape, plus linéaire.</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setViewMode('trello');
+                        localStorage.setItem(DASHBOARD_VIEW_MODE_KEY, 'trello');
+                      }}
+                      className="rounded-lg border-2 border-border bg-background p-5 text-left transition-all hover:border-accent hover:shadow-md"
+                    >
+                      <span className="mb-3 flex h-9 w-9 items-center justify-center rounded-full bg-accent text-accent-foreground font-bold">2</span>
+                      <span className="block text-xl font-bold text-foreground">Workflow 15 agents</span>
+                      <span className="mt-2 block text-sm text-muted-foreground">Vue Kanban complète pour piloter tout le workflow IA.</span>
+                    </button>
+                  </div>
                 </div>
-              </div>
+
+                {/* Bloc 3 — Vitrine livres publiés */}
+                <AuthorBooksShowcase
+                  onStartWorkflow={() => {
+                    setViewMode('trello');
+                    localStorage.setItem(DASHBOARD_VIEW_MODE_KEY, 'trello');
+                  }}
+                />
+              </>
             ) : (
               <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between bg-card rounded-xl border p-3 shadow-sm">
                 <div className="text-sm font-medium px-2 text-foreground">
