@@ -51,8 +51,8 @@ export const TUTORIELS: Tutoriel[] = [
       "Collez la clé et cliquez sur Enregistrer.",
       "Un message de confirmation s'affiche : vous êtes prêt à générer.",
     ],
-    targetRoute: '/parametres-api',
-    ctaLabel: 'Configurer ma clé',
+    targetRoute: '/ebook-planner',
+    ctaLabel: 'Aller au dashboard',
   },
   {
     id: 'premier-ebook',
@@ -138,8 +138,8 @@ export const TUTORIELS: Tutoriel[] = [
       "Vérifiez la structure proposée et corrigez si besoin.",
       "Importez : votre ebook est prêt à être exporté ou augmenté.",
     ],
-    targetRoute: '/document-transformer',
-    ctaLabel: 'Importer mon document',
+    targetRoute: '/ebook-planner',
+    ctaLabel: 'Ouvrir le dashboard',
   },
   {
     id: 'cover-ai',
@@ -155,8 +155,8 @@ export const TUTORIELS: Tutoriel[] = [
       "Lancez la génération IA (photo-réaliste).",
       "Téléchargez la couverture aux bonnes dimensions KDP.",
     ],
-    targetRoute: '/cover-studio',
-    ctaLabel: 'Créer ma couverture',
+    targetRoute: '/ebook-planner',
+    ctaLabel: 'Ouvrir le dashboard',
   },
 
   // --- Audio ---
@@ -174,8 +174,8 @@ export const TUTORIELS: Tutoriel[] = [
       "Lancez la génération : chaque chapitre est traité puis fusionné.",
       "Téléchargez le fichier audio final prêt pour publication.",
     ],
-    targetRoute: '/audio-express',
-    ctaLabel: 'Lancer Audio Express',
+    targetRoute: '/ebook-planner',
+    ctaLabel: 'Ouvrir le dashboard',
   },
   {
     id: 'publier-audiobook',
