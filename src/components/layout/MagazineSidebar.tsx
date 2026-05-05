@@ -10,6 +10,7 @@ import {
   Megaphone,
   Wrench,
   Search,
+  GraduationCap,
   Settings,
   ChevronLeft,
   ChevronRight,
@@ -193,6 +194,19 @@ export function MagazineSidebar({
             </p>
           </div>
         )}
+
+        {/* Tutoriels → page dédiée */}
+        <button
+          onClick={() => navigate('/tutoriels')}
+          title="Tutoriels — actions principales pas à pas"
+          className={cn(
+            'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-left',
+            'text-muted-foreground hover:bg-accent/15 hover:text-accent'
+          )}
+        >
+          <GraduationCap className="h-4 w-4 flex-shrink-0" />
+          {!isCollapsed && <span className="text-sm font-medium">Tutoriels</span>}
+        </button>
 
         {/* Mots-clés KDP → page dédiée */}
         <button

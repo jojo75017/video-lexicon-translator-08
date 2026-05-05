@@ -81,6 +81,7 @@ const CrmPage = lazy(() => import('@/pages/CrmPage'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const KdpAdsGuidePage = lazy(() => import('./pages/KdpAdsGuidePage'));
 const ToolsGuidePage = lazy(() => import('./pages/ToolsGuidePage'));
+const TutorielsPage = lazy(() => import('./pages/TutorielsPage'));
 const RecuperationCodePage = lazy(() => import('./pages/RecuperationCodePage'));
 const ExtensionChromePage = lazy(() => import('./pages/ExtensionChromePage'));
 const EbookbotPage = lazy(() => import('./pages/EbookbotPage'));
@@ -389,6 +390,19 @@ const App = () => {
                   onInvalid={handleLogout}
                 >
                   <ToolsGuidePage />
+                </SubscriberGate>
+              }
+            />
+            <Route
+              path="/tutoriels"
+              element={
+                <SubscriberGate
+                  isAdmin={isAdmin}
+                  subscriberEmail={subscriberEmail}
+                  subscriberData={subscriberData}
+                  onInvalid={handleLogout}
+                >
+                  <TutorielsPage />
                 </SubscriberGate>
               }
             />
