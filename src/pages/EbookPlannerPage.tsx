@@ -203,6 +203,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   const [searchParams] = useSearchParams();
   const nicheFromUrl = searchParams.get('niche');
   const categoryFromUrl = searchParams.get('category');
+  const requestedTabFromUrl = searchParams.get('tab');
   
   // Utiliser useOpenAIConfig pour une persistance fiable de la clé API
   const { apiKey, updateApiKey: setApiKey } = useOpenAIConfig();
@@ -272,6 +273,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   
   const [activeTab, setActiveTab] = useState(() => {
     try {
+      const params = new URLSearchParams(window.location.search);
+      const tab = params.get('tab');
+      if (tab && tab !== 'onboarding' && tab !== 'subscription') return tab;
       const saved = localStorage.getItem('ebook_planner_active_tab');
       if (saved && saved !== 'onboarding' && saved !== 'subscription' && saved !== 'planner') return saved;
     } catch {}
@@ -284,6 +288,12 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       localStorage.setItem('ebook_planner_active_tab', activeTab);
     } catch {}
   }, [activeTab]);
+
+  useEffect(() => {
+    if (requestedTabFromUrl && requestedTabFromUrl !== activeTab && requestedTabFromUrl !== 'onboarding' && requestedTabFromUrl !== 'subscription') {
+      setActiveTab(requestedTabFromUrl);
+    }
+  }, [requestedTabFromUrl, activeTab]);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [viewMode, setViewMode] = useState<'trello' | 'classic'>(() => {
     try {
