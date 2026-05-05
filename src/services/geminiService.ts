@@ -86,7 +86,20 @@ export async function callGemini(
 
     const data = await response.json();
     const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!content) throw new Error('Aucune réponse de Gemini');
+    const finishReason = data.candidates?.[0]?.finishReason;
+    if (!content) {
+      console.error('Gemini réponse vide. finishReason:', finishReason, 'data:', JSON.stringify(data).slice(0, 500));
+      if (finishReason === 'MAX_TOKENS') {
+        throw new Error('Réponse Gemini tronquée (limite de tokens). Réessayez ou réduisez la longueur du prompt.');
+      }
+      if (finishReason === 'SAFETY') {
+        throw new Error('Réponse Gemini bloquée par les filtres de sécurité. Reformulez votre demande.');
+      }
+      throw new Error('Aucune réponse de Gemini');
+    }
+    if (finishReason === 'MAX_TOKENS') {
+      console.warn('[Gemini] Réponse possiblement tronquée (MAX_TOKENS)');
+    }
     return content;
   } catch (error: any) {
     clearTimeout(timeoutId);
