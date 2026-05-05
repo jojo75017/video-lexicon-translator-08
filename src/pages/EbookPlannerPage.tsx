@@ -177,6 +177,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   const contentContainerRef = useRef<HTMLDivElement>(null);
 
   const STORAGE_KEY = 'ebook-planner-autosave';
+  const DASHBOARD_VIEW_MODE_KEY = 'ebook_dashboard_view_mode_v2';
   
   const loadSavedData = () => {
     try {
@@ -282,10 +283,11 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
     } catch {}
   }, [activeTab]);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [viewMode, setViewMode] = useState<'trello' | 'classic'>(() => {
+  const [viewMode, setViewMode] = useState<'choice' | 'trello' | 'classic'>(() => {
     try {
-      return (localStorage.getItem('ebook_view_mode') as 'trello' | 'classic') || 'trello';
-    } catch { return 'trello'; }
+      const savedMode = localStorage.getItem(DASHBOARD_VIEW_MODE_KEY);
+      return savedMode === 'trello' || savedMode === 'classic' ? savedMode : 'choice';
+    } catch { return 'choice'; }
   });
   const [showWelcome, setShowWelcome] = useState(location.state?.fromFormation || false);
   const [showTutorial, setShowTutorial] = useState(location.state?.fromFormation || false);
