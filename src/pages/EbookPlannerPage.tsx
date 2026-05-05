@@ -1237,8 +1237,14 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
 
     clearCurrentEditorState();
 
+    // Forcer le retour à l'écran de choix 1/2 et oublier le mode courant
+    setViewMode('choice');
+    try {
+      localStorage.removeItem(DASHBOARD_VIEW_MODE_KEY);
+    } catch {}
+
     toast.success('🧹 Projet réinitialisé !', {
-      description: 'Toutes les données ont été effacées. Vous repartez de zéro.',
+      description: 'Vous repartez de zéro. Choisissez à nouveau Parcours simple ou Workflow.',
       duration: 4000,
     });
   };
