@@ -1408,7 +1408,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
 
             {/* Sections secondaires repliables */}
             {viewMode === 'classic' && <details className="rounded-xl border bg-card p-4 group">
-              <summary className="cursor-pointer font-semibold text-sm flex items-center justify-between" style={{ color: '#232F3E' }}>
+              <summary className="cursor-pointer font-semibold text-sm flex items-center justify-between text-foreground">
                 📊 Statistiques détaillées du projet
                 <span className="text-xs text-muted-foreground group-open:hidden">Cliquez pour ouvrir</span>
               </summary>
@@ -1432,7 +1432,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             </details>}
 
             {viewMode === 'classic' && <details className="rounded-xl border bg-card p-4 group">
-              <summary className="cursor-pointer font-semibold text-sm flex items-center justify-between" style={{ color: '#232F3E' }}>
+              <summary className="cursor-pointer font-semibold text-sm flex items-center justify-between text-foreground">
                 💡 Inspirations best-sellers & exemples de livres
                 <span className="text-xs text-muted-foreground group-open:hidden">Cliquez pour ouvrir</span>
               </summary>
