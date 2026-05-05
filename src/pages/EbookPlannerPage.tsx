@@ -2695,6 +2695,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             ebookTitle={ebookTitle}
             chapters={chapters}
             isGenerating={isGenerating}
+            authorName={authorName}
+            bookSummary={bookSummary}
+            targetAudience={targetAudience}
           />
         );
       
