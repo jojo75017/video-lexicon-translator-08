@@ -284,11 +284,11 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
     } catch {}
   }, [activeTab]);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [viewMode, setViewMode] = useState<'choice' | 'trello' | 'classic'>(() => {
+  const [viewMode, setViewMode] = useState<'trello' | 'classic'>(() => {
     try {
       const savedMode = localStorage.getItem(DASHBOARD_VIEW_MODE_KEY);
-      return savedMode === 'trello' || savedMode === 'classic' ? savedMode : 'choice';
-    } catch { return 'choice'; }
+      return savedMode === 'classic' ? 'classic' : 'trello';
+    } catch { return 'trello'; }
   });
   const [showWelcome, setShowWelcome] = useState(location.state?.fromFormation || false);
   const [showTutorial, setShowTutorial] = useState(location.state?.fromFormation || false);
