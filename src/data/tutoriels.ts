@@ -35,6 +35,10 @@ export const CATEGORIES: { id: TutorielCategory; label: string }[] = [
   { id: 'export', label: 'Export & Publication' },
 ];
 
+// Toutes les routes ci-dessous existent dans src/App.tsx et sont accessibles aux abonnés.
+// Plusieurs fonctionnalités (config API, Document Transformer, Cover Studio, Audio Express,
+// Export KDP) sont des onglets/sections internes au /ebook-planner — donc on y renvoie.
+
 export const TUTORIELS: Tutoriel[] = [
   // --- Démarrage ---
   {
@@ -47,12 +51,13 @@ export const TUTORIELS: Tutoriel[] = [
     steps: [
       "Créez gratuitement votre clé sur aistudio.google.com (bouton 'Get API key').",
       "Copiez la clé qui commence par AIza...",
-      "Ouvrez Paramètres API dans EbookStudio.",
+      "Ouvrez le Dashboard et cliquez sur l'icône clé / Paramètres API en haut.",
       "Collez la clé et cliquez sur Enregistrer.",
       "Un message de confirmation s'affiche : vous êtes prêt à générer.",
     ],
     targetRoute: '/ebook-planner',
-    ctaLabel: 'Aller au dashboard',
+    ctaLabel: 'Ouvrir le dashboard',
+    videoRoute: '/formation-videos',
   },
   {
     id: 'premier-ebook',
@@ -70,6 +75,7 @@ export const TUTORIELS: Tutoriel[] = [
     ],
     targetRoute: '/ebook-planner',
     ctaLabel: 'Lancer la création',
+    videoRoute: '/formation-videos',
   },
   {
     id: 'workflow-15-agents',
@@ -85,8 +91,8 @@ export const TUTORIELS: Tutoriel[] = [
       "Vous pouvez relancer un agent isolé en cas de besoin.",
       "Le résultat final est un manuscrit complet, structuré et relu.",
     ],
-    targetRoute: '/ebook-planner',
-    ctaLabel: 'Voir le workflow',
+    targetRoute: '/guide-outils',
+    ctaLabel: 'Voir le guide complet',
   },
 
   // --- Création contenu ---
@@ -132,7 +138,7 @@ export const TUTORIELS: Tutoriel[] = [
     durationMin: 5,
     icon: FileUp,
     steps: [
-      "Allez sur le Document Transformer.",
+      "Ouvrez le Dashboard puis l'onglet 'Document Transformer'.",
       "Glissez-déposez votre fichier .docx.",
       "L'outil détecte automatiquement les chapitres.",
       "Vérifiez la structure proposée et corrigez si besoin.",
@@ -149,7 +155,7 @@ export const TUTORIELS: Tutoriel[] = [
     durationMin: 8,
     icon: ImagePlus,
     steps: [
-      "Ouvrez le KDP Cover Studio.",
+      "Depuis le Dashboard, ouvrez l'onglet 'Cover Studio'.",
       "Saisissez titre, auteur, format et nombre de pages.",
       "Décrivez l'ambiance visuelle souhaitée.",
       "Lancez la génération IA (photo-réaliste).",
@@ -168,7 +174,7 @@ export const TUTORIELS: Tutoriel[] = [
     durationMin: 15,
     icon: Headphones,
     steps: [
-      "Ouvrez l'outil Audio Express.",
+      "Depuis le Dashboard, ouvrez l'onglet 'Audio Express'.",
       "Sélectionnez votre ebook source.",
       "Choisissez la voix (homme/femme) et la langue.",
       "Lancez la génération : chaque chapitre est traité puis fusionné.",
@@ -185,14 +191,14 @@ export const TUTORIELS: Tutoriel[] = [
     durationMin: 10,
     icon: Globe,
     steps: [
-      "Depuis votre audiobook, cliquez sur 'Publier'.",
+      "Voyez la démo d'audiobook publié pour comprendre le résultat.",
+      "Depuis votre projet, cliquez sur 'Publier l\'audiobook'.",
       "Renseignez prix, description et image de couverture.",
       "Activez le checkout PayPal et la livraison automatique par email.",
       "Récupérez le lien public (slug) à partager.",
-      "Les acheteurs reçoivent l'accès complet via la page Merci.",
     ],
     targetRoute: '/audiobook-demo',
-    ctaLabel: 'Publier un audiobook',
+    ctaLabel: 'Voir la démo',
   },
 
   // --- Export ---
@@ -204,14 +210,14 @@ export const TUTORIELS: Tutoriel[] = [
     durationMin: 5,
     icon: FileDown,
     steps: [
-      "Ouvrez l'onglet Export depuis votre ebook.",
+      "Depuis votre ebook, ouvrez l'onglet Export.",
       "Choisissez le format de page (6x9 recommandé).",
       "Vérifiez la pagination (multiple de 10 conseillé).",
       "Lancez l'export PDF intérieur puis epub.",
       "Téléchargez les deux fichiers prêts à uploader sur KDP.",
     ],
     targetRoute: '/ebook-planner',
-    ctaLabel: 'Exporter mon ebook',
+    ctaLabel: 'Ouvrir le dashboard',
   },
   {
     id: 'checklist-kdp',
@@ -228,6 +234,6 @@ export const TUTORIELS: Tutoriel[] = [
       "Validez l'aperçu KDP, puis publiez votre livre.",
     ],
     targetRoute: '/kdp-ads-guide',
-    ctaLabel: 'Voir le guide complet',
+    ctaLabel: 'Voir le guide KDP Ads',
   },
 ];
