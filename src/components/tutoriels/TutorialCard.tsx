@@ -8,14 +8,16 @@ import type { Tutoriel } from '@/data/tutoriels';
 
 interface TutorialCardProps {
   tutoriel: Tutoriel;
+  validationError?: string | null;
 }
 
-export const TutorialCard: React.FC<TutorialCardProps> = ({ tutoriel }) => {
+export const TutorialCard: React.FC<TutorialCardProps> = ({ tutoriel, validationError }) => {
   const navigate = useNavigate();
   const Icon = tutoriel.icon;
   const target = tutoriel.targetTab
     ? `${tutoriel.targetRoute}?tab=${encodeURIComponent(tutoriel.targetTab)}`
     : tutoriel.targetRoute;
+  const isInvalid = Boolean(validationError);
 
   return (
     <Card className="border-2 transition-all hover:shadow-md hover:border-accent/40 flex flex-col h-full">
@@ -42,13 +44,19 @@ export const TutorialCard: React.FC<TutorialCardProps> = ({ tutoriel }) => {
             </li>
           ))}
         </ol>
+        {validationError && (
+          <div className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+            Destination indisponible : {validationError}
+          </div>
+        )}
         <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border">
           <Button
             size="sm"
-            onClick={() => navigate(target)}
+            onClick={() => !isInvalid && navigate(target)}
+            disabled={isInvalid}
             className="bg-primary hover:bg-accent transition-colors"
           >
-            {tutoriel.ctaLabel ?? "Lancer cette action"}
+            {isInvalid ? 'Lien à corriger' : tutoriel.ctaLabel ?? "Lancer cette action"}
             <ArrowRight className="h-4 w-4 ml-1" />
           </Button>
           {tutoriel.videoRoute && (
