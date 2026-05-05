@@ -3295,7 +3295,7 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
           onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
           onSwitchToTrello={() => {
             setViewMode('trello');
-            localStorage.setItem('ebook_view_mode', 'trello');
+            localStorage.setItem(DASHBOARD_VIEW_MODE_KEY, 'trello');
             setActiveTab('workflow-dashboard');
           }}
         />
@@ -3329,6 +3329,18 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Retour au tableau de bord
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setViewMode('choice');
+                localStorage.removeItem(DASHBOARD_VIEW_MODE_KEY);
+                setActiveTab('workflow-dashboard');
+              }}
+              className="rounded-xl text-sm"
+            >
+              Choisir 1 ou 2
             </Button>
           </div>
         )}
