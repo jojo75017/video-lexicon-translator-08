@@ -1375,7 +1375,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                 onNavigate={(tabId) => setActiveTab(tabId)}
                 onSwitchToClassic={() => {
                   setViewMode('classic');
-                  localStorage.setItem('ebook_view_mode', 'classic');
+                  localStorage.setItem(DASHBOARD_VIEW_MODE_KEY, 'classic');
                 }}
                 onUpdateTitle={setEbookTitle}
                 onUpdateSubtitle={setBookSubtitle}
@@ -1407,7 +1407,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             )}
 
             {/* Sections secondaires repliables */}
-            <details className="rounded-xl border bg-white p-4 group">
+            {viewMode === 'classic' && <details className="rounded-xl border bg-card p-4 group">
               <summary className="cursor-pointer font-semibold text-sm flex items-center justify-between" style={{ color: '#232F3E' }}>
                 📊 Statistiques détaillées du projet
                 <span className="text-xs text-muted-foreground group-open:hidden">Cliquez pour ouvrir</span>
@@ -1429,9 +1429,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                   onNavigateToTab={(tabId) => setActiveTab(tabId)}
                 />
               </div>
-            </details>
+            </details>}
 
-            <details className="rounded-xl border bg-white p-4 group">
+            {viewMode === 'classic' && <details className="rounded-xl border bg-card p-4 group">
               <summary className="cursor-pointer font-semibold text-sm flex items-center justify-between" style={{ color: '#232F3E' }}>
                 💡 Inspirations best-sellers & exemples de livres
                 <span className="text-xs text-muted-foreground group-open:hidden">Cliquez pour ouvrir</span>
@@ -1468,7 +1468,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                   }}
                 />
               </div>
-            </details>
+            </details>}
           </div>
         );
 
