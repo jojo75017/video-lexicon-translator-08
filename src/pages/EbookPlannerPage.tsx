@@ -1347,34 +1347,44 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               }}
             />
 
-            {/* Bloc 3 — Choix clair : Simple OU Workflow */}
+            {/* Bloc 3 — Choix clair : Simple OU Workflow + Discuter avec l'IA */}
             <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between bg-card rounded-xl border p-3 shadow-sm">
               <div className="px-2">
                 <p className="text-sm font-semibold text-foreground">Parcours de création</p>
                 <p className="text-xs text-muted-foreground">Choisissez une seule option : Simple ou Workflow.</p>
               </div>
-              <div className="inline-flex rounded-lg border overflow-hidden bg-background" role="group" aria-label="Choix du parcours">
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="inline-flex rounded-lg border overflow-hidden bg-background" role="group" aria-label="Choix du parcours">
+                  <button
+                    type="button"
+                    aria-pressed={viewMode === 'classic'}
+                    onClick={() => {
+                      setViewMode('classic');
+                      localStorage.setItem(DASHBOARD_VIEW_MODE_KEY, 'classic');
+                    }}
+                    className={`px-4 py-2 text-sm font-semibold transition-all ${viewMode === 'classic' ? 'bg-primary text-primary-foreground' : 'text-foreground hover:bg-muted'}`}
+                  >
+                    Simple
+                  </button>
+                  <button
+                    type="button"
+                    aria-pressed={viewMode === 'trello'}
+                    onClick={() => {
+                      setViewMode('trello');
+                      localStorage.setItem(DASHBOARD_VIEW_MODE_KEY, 'trello');
+                    }}
+                    className={`px-4 py-2 text-sm font-semibold transition-all ${viewMode === 'trello' ? 'bg-accent text-accent-foreground' : 'text-foreground hover:bg-muted'}`}
+                  >
+                    Workflow
+                  </button>
+                </div>
                 <button
                   type="button"
-                  aria-pressed={viewMode === 'classic'}
-                  onClick={() => {
-                    setViewMode('classic');
-                    localStorage.setItem(DASHBOARD_VIEW_MODE_KEY, 'classic');
-                  }}
-                  className={`px-4 py-2 text-sm font-semibold transition-all ${viewMode === 'classic' ? 'bg-primary text-primary-foreground' : 'text-foreground hover:bg-muted'}`}
+                  onClick={() => setActiveTab('aichat')}
+                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg border border-accent/40 bg-accent/10 text-accent hover:bg-accent hover:text-accent-foreground transition-all"
+                  title="Poser une question ou échanger avec l'IA"
                 >
-                  Simple
-                </button>
-                <button
-                  type="button"
-                  aria-pressed={viewMode === 'trello'}
-                  onClick={() => {
-                    setViewMode('trello');
-                    localStorage.setItem(DASHBOARD_VIEW_MODE_KEY, 'trello');
-                  }}
-                  className={`px-4 py-2 text-sm font-semibold transition-all ${viewMode === 'trello' ? 'bg-accent text-accent-foreground' : 'text-foreground hover:bg-muted'}`}
-                >
-                  Workflow
+                  💬 Discuter avec l'IA
                 </button>
               </div>
             </div>
