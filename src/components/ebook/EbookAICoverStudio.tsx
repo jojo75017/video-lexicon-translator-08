@@ -416,7 +416,52 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
               />
             </div>
 
-            <Button className="w-full" onClick={generateCover} disabled={isGenerating || !title.trim()}>
+            {/* ========= APERÇU PROMPTS AVANT GÉNÉRATION ========= */}
+            {livePromptPreview && (
+              <div className="rounded-lg border bg-muted/20">
+                <button
+                  type="button"
+                  onClick={() => setShowPromptsPreview((v) => !v)}
+                  className="w-full flex items-center justify-between p-2.5 text-xs font-semibold hover:bg-muted/40 transition-colors"
+                >
+                  <span className="flex items-center gap-2">
+                    <Eye className="w-3.5 h-3.5 text-primary" />
+                    Voir les prompts qui seront envoyés à l'IA
+                  </span>
+                  <span className="text-muted-foreground">{showPromptsPreview ? '▲' : '▼'}</span>
+                </button>
+                {showPromptsPreview && (
+                  <div className="border-t p-2 space-y-2">
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between">
+                        <Badge variant="outline" className="text-[10px]">RECTO · Face</Badge>
+                        <Button size="sm" variant="ghost" className="h-6 px-2 text-[10px]" onClick={() => copyPrompt(livePromptPreview.recto, 'recto')}>
+                          <Copy className="w-3 h-3 mr-1" /> Copier
+                        </Button>
+                      </div>
+                      <Textarea readOnly value={livePromptPreview.recto} className="text-[10px] min-h-[80px] font-mono" />
+                    </div>
+                    {format === 'paperback' && (
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between">
+                          <Badge variant="outline" className="text-[10px]">VERSO · 4ème</Badge>
+                          <Button size="sm" variant="ghost" className="h-6 px-2 text-[10px]" onClick={() => copyPrompt(livePromptPreview.verso, 'verso')}>
+                            <Copy className="w-3 h-3 mr-1" /> Copier
+                          </Button>
+                        </div>
+                        <Textarea readOnly value={livePromptPreview.verso} className="text-[10px] min-h-[80px] font-mono" />
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
+            <Button
+              className="w-full"
+              onClick={generateCover}
+              disabled={isGenerating || !title.trim() || (format === 'paperback' && !!paperbackValidation?.hasError)}
+            >
               {isGenerating ? (
                 <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Génération en cours...</>
               ) : (
