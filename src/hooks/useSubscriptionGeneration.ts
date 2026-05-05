@@ -547,7 +547,7 @@ Valeurs autorisées pour "competition" : "faible", "moyenne", "élevée", "très
 
     setIsGenerating(true);
     try {
-      const raw = await callGeminiJSON<any>(key, prompt, { maxTokens: 1200, temperature: 0.6 });
+      const raw = await callGeminiJSON<any>(key, prompt, { maxTokens: 3000, temperature: 0.6 });
       const arr = Array.isArray(raw) ? raw : (Array.isArray((raw as any)?.categories) ? (raw as any).categories : []);
       const normalized = arr.slice(0, 5).map((c: any) => {
         if (typeof c === 'string') return { category: c };
