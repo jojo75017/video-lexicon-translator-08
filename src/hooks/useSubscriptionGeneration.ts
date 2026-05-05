@@ -484,7 +484,7 @@ Les niveaux de "relevance" autorisés : "haute", "moyenne", "faible".`;
 
     setIsGenerating(true);
     try {
-      const raw = await callGeminiJSON<any>(key, prompt, { maxTokens: 1200, temperature: 0.6 });
+      const raw = await callGeminiJSON<any>(key, prompt, { maxTokens: 3000, temperature: 0.6 });
       // Normalisation : accepte string[] ou objet
       const arr = Array.isArray(raw) ? raw : (Array.isArray((raw as any)?.keywords) ? (raw as any).keywords : []);
       const normalized = arr.slice(0, 7).map((k: any) => {
