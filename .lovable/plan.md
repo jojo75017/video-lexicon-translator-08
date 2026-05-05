@@ -1,68 +1,63 @@
-## Objectif
+## Contexte
 
-Sur le tableau de bord auteur, **toujours** afficher le texte marketing + les 6 livres Amazon **en haut**, suivis du sélecteur 1 Simple / 2 Workflow, puis du plan complet (P1 → P15 ou parcours simple) — **plus jamais d'écran de choix qui cache le plan**. Et corriger les deux boutons cassés.
+Une page complète de recherche de mots-clés Amazon KDP existe déjà :
+- Route : `/kdp-keywords` (protégée membres via SubscriberGate)
+- Fichier : `src/pages/KdpKeywordResearchPage.tsx`
+- Branchée sur Gemini BYOK (clé personnelle de l'utilisateur)
+- Modes : recherche auto, par niche, par titre, longue traîne, "Backend 7 mots-clés Amazon"
+- Tri par volume / difficulté / opportunité, export, copier, sélection multiple
 
-## Fichier touché
+Aucune nouvelle page, aucun nouvel edge function, aucune nouvelle clé API n'est nécessaire. Il suffit de **rendre cet outil visible et attractif** depuis le dashboard.
 
-`src/pages/EbookPlannerPage.tsx` uniquement. Aucun changement aux composants enfants (`AuthorBooksShowcase`, `EbookJourneyDashboard`, `TrelloBoardView`, agents P1→P15).
+## Ce qui change
 
-## Changements précis
+### 1. Mini-widget en haut du dashboard (`/ebook-planner`)
 
-### 1. Supprimer l'écran de choix séparé (lignes ~1306-1452)
+Insertion d'un nouveau bloc dans `src/pages/EbookPlannerPage.tsx`, **juste après le bandeau hero "Votre livre Amazon KDP mérite d'être lu"** et avant la vitrine 6 livres Amazon.
 
-Aujourd'hui : si `viewMode === 'choice'`, on affiche **seulement** le bandeau + sélecteur + livres Amazon, et on **cache** le plan (`viewMode === 'choice' ? null : ...`).
+Apparence : carte horizontale aux couleurs Amazon KDP (fond blanc, bordure teal `#008296`, accent orange `#FF9E2D` au hover), avec :
+- Icône loupe/Sparkles à gauche
+- Titre : « Trouvez les mots-clés qui vendent sur Amazon »
+- Sous-titre court : « Volume, difficulté, opportunité, longue traîne et backend 7 mots-clés Amazon — généré par IA »
+- Champ de saisie rapide (sujet ou titre du livre, pré-rempli avec `ebookTitle` s'il existe)
+- Bouton CTA orange : « Rechercher »
 
-Après : un seul rendu, **toujours dans cet ordre** :
+Action du bouton : `navigate('/kdp-keywords?title=' + encodeURIComponent(seed))` — la page existante lit déjà le param `title` via `useSearchParams`.
 
-```text
-┌─────────────────────────────────────────────┐
-│ Bandeau marketing (Votre livre KDP mérite…) │  ← toujours visible
-├─────────────────────────────────────────────┤
-│ AuthorBooksShowcase (6 livres Amazon)       │  ← toujours visible
-├─────────────────────────────────────────────┤
-│ Sélecteur "Mode : 1 Simple / 2 Workflow"    │  ← toujours visible
-├─────────────────────────────────────────────┤
-│ Plan complet :                              │
-│   - si Workflow  → TrelloBoardView P1→P15   │
-│   - si Simple    → EbookJourneyDashboard    │
-├─────────────────────────────────────────────┤
-│ Sections repliables (stats, etc.)           │
-└─────────────────────────────────────────────┘
-```
+État local : un seul `useState<string>` pour le champ. Pas de logique IA dans ce widget — il sert uniquement de point d'entrée attractif.
 
-- L'état `viewMode` ne prend plus que les valeurs `'trello' | 'classic'`. Valeur par défaut : `'trello'` si rien en localStorage (pour montrer P1→P15 directement).
-- Suppression du `?:` qui rendait `viewMode === 'choice'`.
+### 2. Visible dans les deux modes (Simple et Workflow)
 
-### 2. Corriger "+ Nouveau" (`resetPlan`, lignes 1233-1250)
+Le widget est placé **au-dessus** du sélecteur Simple/Workflow et du plan, donc affiché identiquement quel que soit le mode choisi.
 
-- Garder `clearCurrentEditorState()` (qui vide bien le titre, chapitres, images, etc. et remet `currentProjectId = null`).
-- **Retirer** `setViewMode('choice')` et `localStorage.removeItem(DASHBOARD_VIEW_MODE_KEY)` → on reste sur le mode actuel.
-- Ajouter un **flag local** `localStorage.setItem('ebook_just_reset', '1')` lu par `loadFromDatabase` (ligne 397) pour empêcher le rechargement automatique de "La Belle-sœur" depuis le cloud après reset (le flag est consommé immédiatement).
-- Toast : "Projet réinitialisé — nouveau livre prêt à démarrer".
+### 3. Entrée dans la sidebar gauche
 
-### 3. Corriger "Retour au tableau de bord" (lignes ~3367-3420)
+Dans la sidebar `Ebook Studio › Suis les 5 étapes`, ajouter sous "Tous les outils" (section AVANCÉ) une ligne dédiée :
+- Icône : `Search` (lucide)
+- Label : « Mots-clés KDP »
+- Cible : `/kdp-keywords`
 
-- Un seul bouton "Retour au tableau de bord" qui :
-  - fait `setActiveTab('workflow-dashboard')`,
-  - **ne touche pas** à `viewMode` ni au localStorage (préserve le mode choisi par l'utilisateur),
-  - scrolle en haut (`window.scrollTo({ top: 0, behavior: 'smooth' })`).
-- Supprimer le second bouton "Choisir 1 ou 2" ajouté précédemment (qui forçait le mode choice).
+Localiser le composant qui rend cette sidebar (probablement `src/components/ebook/EbookSidebar.tsx` ou similaire) et y insérer l'item.
 
-### 4. Migration de l'état `viewMode`
+## Détails techniques
 
-- Type : `'trello' | 'classic'` (plus `'choice'`).
-- Init : lire `DASHBOARD_VIEW_MODE_KEY` ; si absent ou égal à `'choice'`, fallback `'trello'`.
+| Élément | Valeur |
+|---|---|
+| Fichier principal modifié | `src/pages/EbookPlannerPage.tsx` |
+| Sidebar modifiée | composant sidebar du planner (à confirmer à l'implémentation) |
+| Page cible | `/kdp-keywords` (déjà existante, déjà SubscriberGate) |
+| Param URL | `?title=<sujet>` |
+| Couleurs | tokens existants : `bg-card`, `border-primary` (teal), `bg-accent` (orange) |
+| Auth | aucun changement (gating déjà actif sur la route cible) |
+| Backend | aucun changement (Gemini BYOK déjà en place) |
 
-## Ce qui ne change PAS
+## Hors scope
 
-- `AuthorBooksShowcase.tsx` (déjà créé avec les 6 livres Amazon + URLs).
-- Bandeau marketing (mêmes textes, juste déplacé hors du `viewMode === 'choice'`).
-- Agents P1 → P15, `TrelloBoardView`, `EbookJourneyDashboard`.
-- Sections repliables (stats, versions, etc.).
-- Logique de chargement projet, sauvegarde auto, sync cloud.
+- Pas d'édition de la page `KdpKeywordResearchPage` elle-même
+- Pas de nouveau widget de résultats inline (l'utilisateur a choisi "mini widget en haut + page complète")
+- Pas d'accès visiteur non connecté (réservé membres, conformément au choix utilisateur)
+- Pas d'ajout de Perplexity ni Firecrawl
 
 ## Résultat attendu
 
-- Sur `/ebook-planner` onglet "Tableau de bord", l'utilisateur voit **immédiatement** : texte marketing → ses 6 livres Amazon → sélecteur 1/2 → plan P1→P15 (mode Workflow par défaut).
-- Cliquer "+ Nouveau" → confirmation → titre devient vide / "Nouveau projet", reste sur le tableau de bord avec le même mode, sans rechargement de l'ancien livre.
-- Cliquer "Retour au tableau de bord" depuis n'importe quel onglet → revient ici avec le mode préservé, scroll en haut.
+Dès l'arrivée sur le dashboard, le membre voit immédiatement un encart attractif l'invitant à découvrir un outil concret et utile (recherche de mots-clés Amazon KDP), ce qui sert à la fois d'**outil pratique** et d'**aimant marketing** mettant en avant la valeur de la suite.

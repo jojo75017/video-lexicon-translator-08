@@ -83,6 +83,7 @@ import { EbookProgressDashboard } from '@/components/ebook/EbookProgressDashboar
 import { EbookHeroDashboard } from '@/components/ebook/EbookHeroDashboard';
 import { EbookJourneyDashboard } from '@/components/ebook/EbookJourneyDashboard';
 import { AuthorBooksShowcase } from '@/components/ebook/AuthorBooksShowcase';
+import { KdpKeywordWidget } from '@/components/ebook/KdpKeywordWidget';
 import type { EbookExample } from '@/data/ebookExamples';
 import { WorkflowExportCompiled } from '@/components/ebook/WorkflowExportCompiled';
 import { TrelloBoardView } from '@/components/ebook/TrelloBoardView';
@@ -1338,6 +1339,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               <div className="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-white/10" />
               <div className="absolute -right-20 -bottom-20 w-60 h-60 rounded-full bg-white/5" />
             </div>
+
+            {/* Bloc 1bis — Moteur de mots-clés Amazon KDP (aimant) */}
+            <KdpKeywordWidget defaultSeed={ebookTitle} onSubmit={(seed) => navigate(`/kdp-keywords${seed ? `?title=${encodeURIComponent(seed)}` : ''}`)} />
 
             {/* Bloc 2 — Vitrine livres Amazon (toujours visible) */}
             <AuthorBooksShowcase
