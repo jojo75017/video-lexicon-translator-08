@@ -1,69 +1,59 @@
-## Problèmes identifiés
+## Tableau de bord générateur — version "Wow Factor"
 
-1. **Page Niches** : le bouton "Retour au Générateur d'Ebook" existe mais il est noyé dans le header de la page (haut centre). Sur l'onglet "🏆 30 Best-Sellers" (sous-composant `BestSellersTab`), il n'y a aucun bouton de retour. L'utilisateur se sent piégé.
-2. **Générateur d'Ebook** : pas de tableau de bord clair qui explique *où on en est*, *ce qu'on a fait*, et *ce qu'il reste à faire*. Le `EbookGlobalDashboard` actuel est trop technique, sans graphiques de progression visuels ni guidage pédagogique.
+Cible : l'onglet **Dashboard** du générateur d'ebook (`workflow-dashboard` dans `EbookPlannerPage.tsx`), pas la page /offres. Aujourd'hui ce dashboard affiche `EbookProgressDashboard` + `WorkflowDashboard` (très techniques). Objectif : ajouter en tête un dashboard inspirant qui combine vrai état du projet + exemples concrets de livres pour donner envie d'agir.
 
-## Plan d'action
+### 1. Nouveau composant `EbookHeroDashboard.tsx`
 
-### 1. Bouton "Retour au Générateur" toujours visible (Niches)
+Placé **au-dessus** de `EbookProgressDashboard` dans le case `workflow-dashboard`. Sections de haut en bas :
 
-Dans `src/pages/NichesPage.tsx` :
-- Ajouter une **barre supérieure sticky** (top-0, z-50, fond blanc/blur) contenant :
-  - À gauche : bouton **"← Retour au Générateur d'Ebook"** (teal #008296 KDP, toujours visible quel que soit l'onglet, y compris Best-Sellers)
-  - À droite : compteur "X niches disponibles"
-- Garder le grand CTA dans le header existant pour la cohérence visuelle.
-- Ajouter aussi un **bouton flottant "← Générateur"** en bas à gauche (mobile + desktop) pour accès permanent au scroll.
+**A. Hero animé**
+- Grand bandeau dégradé teal→orange (palette KDP mémorisée).
+- Titre dynamique :
+  - Si projet vide : « Créez votre prochain best-seller Amazon KDP »
+  - Sinon : « Votre livre "{title}" est à {progress}% — continuons ! »
+- Sous-titre avec compteur animé (mots écrits / objectif), badge "Niveau" (Brouillon → Manuscrit → Prêt KDP).
+- 2 CTA : « ▶ Continuer maintenant » (saute à la prochaine étape réelle) et « 🪄 Lancer le Workflow IA 15 Agents ».
+- Décor : étoiles SVG flottantes (animate-pulse), petit mockup 3D de couverture (`EbookBookMockup3D` existant) si `coverImageUrl` présent, sinon silhouette placeholder cliquable → onglet Couverture.
 
-### 2. Nouveau Tableau de Bord Pédagogique : `EbookProgressDashboard`
+**B. Bandeau "Inspirez-vous des best-sellers"**
+- Carrousel horizontal (scroll-snap) de 6-8 livres réels tirés de `src/data/bestSellers2026.ts` (déjà en mémoire — *Atomic Habits*, *Psychology of Money*, *Ikigai*, etc.).
+- Chaque carte : mini-cover (placeholder coloré + titre stylé), genre, BSR estimé, 1 phrase « Pourquoi ça marche », bouton « 📋 Utiliser cette structure » → préremplit titre/genre/audience et ouvre l'onglet Plan.
+- Filtre rapide par catégorie (Business, Dev perso, Santé, Fiction, Enfants).
 
-Création de `src/components/ebook/EbookProgressDashboard.tsx` — un tableau de bord visuel et pédagogique affiché en tête de l'onglet "Dashboard" du générateur (`EbookPlannerPage.tsx`).
+**C. Grille "3 prochaines étapes pour vous"**
+- Calcul intelligent basé sur état réel (titre vide ? plan vide ? <50% rédigé ? pas de couverture ? pas de description KDP ?).
+- 3 grandes cartes illustrées (icône + couleur pillar) avec : numéro d'étape, durée estimée, mini-progress bar, bouton « Y aller ».
+- Effet hover-scale + halo orange.
 
-**Sections du tableau de bord** (style Amazon KDP, fond #FAFAFA, accent teal #008296) :
+**D. Preuves & motivation**
+- 4 KPI animés en grand format (CountUp via simple `useEffect`) : mots écrits aujourd'hui, chapitres terminés, score KDP /100, jours d'avance.
+- Témoignage rotatif (3 citations utilisateurs ebookstudio.fr) + logos « Disponible sur Amazon KDP / Kobo / Apple Books ».
 
-#### A. Bandeau "Où en êtes-vous ?" (statut global)
-- Grande barre de progression globale (0 → 100 %) calculée sur 5 jalons : Concept ✓ / Plan chapitres ✓ / Rédaction ✓ / Couverture ✓ / Export KDP ✓
-- Badge dynamique : "Phase 1 : Conception" / "Phase 2 : Rédaction" / "Phase 3 : Édition" / "Phase 4 : Publication"
-- Sous-titre pédagogique adaptatif : *"Prochaine étape recommandée : générer votre plan de chapitres dans l'onglet Plan."*
+**E. Galerie "Livres créés avec EbookStudio"** (exemples)
+- 6 vignettes de couvertures exemples (titres fictifs réalistes par niche : *La Méthode 90 Jours*, *Recettes Healthy Express*, *L'Atelier Aquarelle*…) générées en CSS pur (gradient + typo) — aucune image externe, conformément aux règles photoréalistes.
+- Au clic : ouvre une modale « Voici comment ce livre a été structuré » avec plan + description type, bouton « Démarrer un projet similaire ».
 
-#### B. KPI Cards (4 cartes, style `CrmStats`)
-- **Mots écrits** / objectif (ex : 12 450 / 25 000) avec icône `FileText`
-- **Chapitres complétés** (ex : 4 / 8) avec icône `BookOpen`
-- **Temps estimé restant** calculé (ex : ~3 h) avec icône `Clock`
-- **Score qualité KDP** (% conformité couverture, description, mots-clés) avec icône `CheckCircle2`
+### 2. Données
 
-#### C. Graphiques (Recharts, déjà utilisé dans `CrmAnalytics`)
-- **Progression chapitres** (BarChart horizontal) : pour chaque chapitre, mots écrits vs objectif, couleur teal si OK, orange #FF9E2D si en retard
-- **Répartition des tâches** (PieChart) : Plan / Rédaction / Couverture / Marketing / Export — pourcentage fait vs restant
-- **Timeline** (AreaChart 7 derniers jours) : mots écrits par jour pour montrer la régularité
+- Réutiliser `src/data/bestSellers2026.ts` (déjà existant).
+- Créer `src/data/ebookExamples.ts` : tableau de 6 exemples de livres "réussis" (titre, sous-titre, niche, plan en 8 chapitres, description KDP type, mots-clés, palette de couverture). Données statiques, aucun fake stat.
 
-#### D. Bloc "Que faire maintenant ?" (guidage pédagogique)
-- 3 cartes d'actions recommandées avec icône, titre, description courte et bouton CTA qui change l'onglet actif :
-  - Si pas de plan → *"Créez votre plan de chapitres"* (vers onglet Plan)
-  - Si plan OK mais peu rédigé → *"Rédigez votre prochain chapitre"* (vers Rédaction)
-  - Si rédaction avancée → *"Générez votre couverture KDP"* (vers Couverture)
-  - Si tout OK → *"Préparez votre publication Amazon"* (vers Export)
-- Logique adaptative basée sur l'état réel du projet (chapters[], coverImageUrl, kdpDescription...)
+### 3. Intégration
 
-#### E. Mini-checklist visuelle
-- 8-10 items avec ✓/⚪ pour rassurer l'utilisateur sur tout ce qu'il a déjà accompli (Titre défini, Public cible défini, Préface rédigée, Plan validé, etc.)
+Dans `src/pages/EbookPlannerPage.tsx` case `workflow-dashboard` (vue classique), insérer `<EbookHeroDashboard …/>` **avant** `<EbookProgressDashboard …/>`. Props : titre, auteur, chapters, coverImageUrl, kdpDescription, callbacks `onNavigateToTab`, `onApplyExample(example)` (qui setState titre/genre/audience/numberOfChapters et bascule sur l'onglet Plan).
 
-### 3. Intégration dans le générateur
+### 4. Style & animations
 
-Dans `src/pages/EbookPlannerPage.tsx` :
-- Importer `EbookProgressDashboard`
-- L'afficher en haut de l'onglet "dashboard" (avant le `WorkflowDashboard` existant) avec les props : `chapters`, `title`, `author`, `coverImageUrl`, `kdpDescription`, `kdpKeywords`, `targetWordsPerChapter`, et un callback `onNavigateToTab` pour les CTA contextuels.
+- Palette mémorisée : `#FAFAFA` fond, `#008296` teal, `#FF9E2D` accent orange hover, `#232F3E` texte.
+- Animations Tailwind déjà disponibles : `animate-fade-in`, `animate-scale-in`, `hover-scale`, transitions 300ms.
+- Aucune dépendance nouvelle (Recharts, framer-motion, lucide, shadcn déjà installés).
 
-## Détails techniques
+### Ce qui n'est PAS touché
 
-- **Pas de nouvelles dépendances** : Recharts, framer-motion, lucide-react et shadcn (Card, Progress, Badge, Button) sont déjà installés.
-- **Charte respectée** : fond #FAFAFA, accent teal #008296, hover #FF9E2D, texte #232F3E (mémoire `style/charte-graphique-amazon-kdp-reposant`).
-- **Pas de données simulées** : tous les graphiques se basent sur l'état réel du projet (chapters, kdpDescription, etc.). Si une donnée est absente → message "À compléter" plutôt qu'un faux chiffre (mémoire Core "No fake data").
-- **Aucune modification** des fichiers `EbookAICoverStudio.tsx`, `generate-ai-cover/index.ts`, `client.ts`, `types.ts`.
+- `/offres`, `EbookGlobalDashboard`, `WorkflowDashboard`, `EbookAICoverStudio`, edge functions, `client.ts`, `types.ts`, `supabase/config.toml`.
+- Aucune fausse statistique ni `Math.random` (règle mémoire).
 
-## Ce qui n'est pas dans ce plan
+### Fichiers
 
-- Refonte du `WorkflowDashboard` existant (volumineux, 444 lignes — rester additif).
-- Nouvelles fonctionnalités back-end ou edge functions.
-- Pas de touche aux génériques ebook déjà fonctionnels.
-
-Une fois le plan approuvé, je passerai en mode build pour implémenter ces deux changements.
+- **Créer** : `src/components/ebook/EbookHeroDashboard.tsx`, `src/data/ebookExamples.ts`
+- **Modifier** : `src/pages/EbookPlannerPage.tsx` (ajout import + insertion ~ligne 1324)
