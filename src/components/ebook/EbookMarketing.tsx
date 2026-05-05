@@ -8,7 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { Share2, Globe, Mail, Target, Copy, Download, Loader2, Rocket, Info } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { getGeminiApiKey } from '@/lib/adminAccess';
+
+const getGeminiApiKey = (): string => (localStorage.getItem('openai_api_key') || '').trim();
 
 interface Chapter { id: string; title: string; subChapters: SubChapter[]; content?: string; }
 interface SubChapter { id: string; title: string; content?: string; }
