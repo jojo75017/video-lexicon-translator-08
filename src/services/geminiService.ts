@@ -307,4 +307,3 @@ export async function callGeminiJSON<T = any>(
   }
 }
 
-}
