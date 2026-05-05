@@ -1325,41 +1325,12 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
         }
         return (
           <div className="space-y-6">
-            <EbookHeroDashboard
-              ebookTitle={ebookTitle}
-              authorName={authorName}
-              chapters={chapters}
-              preface={preface}
-              conclusion={conclusion}
-              coverImageUrl={coverConcepts ? 'generated' : undefined}
-              kdpDescription={kdpDescription}
-              kdpKeywords={kdpKeywords}
-              onNavigateToTab={(tabId) => setActiveTab(tabId)}
-              onStartAutoWorkflow={() => setActiveTab('complete-workflow')}
-              onApplyExample={(ex: EbookExample) => {
-                setEbookTitle(ex.title);
-                setBookSubtitle(ex.subtitle);
-                setBookDescription(ex.pitch);
-                setGenre(ex.genre);
-                setTargetAudience(ex.audience);
-                setNumberOfChapters(ex.numberOfChapters);
-                setChapters(ex.chapters.map((title, i) => ({
-                  id: `ex-${Date.now()}-${i}`,
-                  title,
-                  subChapters: [],
-                  content: '',
-                })));
-                setKdpDescription(ex.kdpDescription);
-                setKdpKeywords(ex.keywords.join(', '));
-                toast.success(`Projet "${ex.title}" pré-rempli ! Allez dans l'onglet Plan pour continuer.`);
-                setActiveTab('planner');
-              }}
-            />
-            <EbookProgressDashboard
+            <EbookJourneyDashboard
               ebookTitle={ebookTitle}
               authorName={authorName}
               bookDescription={bookDescription}
               targetAudience={targetAudience}
+              genre={genre}
               chapters={chapters}
               preface={preface}
               conclusion={conclusion}
@@ -1367,30 +1338,73 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               kdpDescription={kdpDescription}
               kdpKeywords={kdpKeywords}
               kdpCategories={kdpCategories}
-              numberOfChapters={numberOfChapters}
               onNavigateToTab={(tabId) => setActiveTab(tabId)}
-            />
-            <WorkflowDashboard
-              ebookTitle={ebookTitle}
-              authorName={authorName}
-              bookSubtitle={bookSubtitle}
-              bookDescription={bookDescription}
-              genre={genre}
-              targetAudience={targetAudience}
-              numberOfChapters={numberOfChapters}
-              chapters={chapters}
-              onNavigate={(tabId) => setActiveTab(tabId)}
               onStartAutoWorkflow={() => setActiveTab('complete-workflow')}
-              onUpdateTitle={setEbookTitle}
-              onUpdateSubtitle={setBookSubtitle}
-              onUpdateAuthor={setAuthorName}
-              onUpdateDescription={setBookDescription}
-              onUpdateGenre={setGenre}
-              onUpdateTargetAudience={setTargetAudience}
-              onUpdateNumberOfChapters={setNumberOfChapters}
-              onUpdateChapterTitle={updateChapterTitle}
-              onAddChapter={addChapter}
             />
+
+            {/* Sections secondaires repliables */}
+            <details className="rounded-xl border bg-white p-4 group">
+              <summary className="cursor-pointer font-semibold text-sm flex items-center justify-between" style={{ color: '#232F3E' }}>
+                📊 Statistiques détaillées du projet
+                <span className="text-xs text-muted-foreground group-open:hidden">Cliquez pour ouvrir</span>
+              </summary>
+              <div className="mt-4">
+                <EbookProgressDashboard
+                  ebookTitle={ebookTitle}
+                  authorName={authorName}
+                  bookDescription={bookDescription}
+                  targetAudience={targetAudience}
+                  chapters={chapters}
+                  preface={preface}
+                  conclusion={conclusion}
+                  coverImageUrl={coverConcepts ? 'generated' : undefined}
+                  kdpDescription={kdpDescription}
+                  kdpKeywords={kdpKeywords}
+                  kdpCategories={kdpCategories}
+                  numberOfChapters={numberOfChapters}
+                  onNavigateToTab={(tabId) => setActiveTab(tabId)}
+                />
+              </div>
+            </details>
+
+            <details className="rounded-xl border bg-white p-4 group">
+              <summary className="cursor-pointer font-semibold text-sm flex items-center justify-between" style={{ color: '#232F3E' }}>
+                💡 Inspirations best-sellers & exemples de livres
+                <span className="text-xs text-muted-foreground group-open:hidden">Cliquez pour ouvrir</span>
+              </summary>
+              <div className="mt-4">
+                <EbookHeroDashboard
+                  ebookTitle={ebookTitle}
+                  authorName={authorName}
+                  chapters={chapters}
+                  preface={preface}
+                  conclusion={conclusion}
+                  coverImageUrl={coverConcepts ? 'generated' : undefined}
+                  kdpDescription={kdpDescription}
+                  kdpKeywords={kdpKeywords}
+                  onNavigateToTab={(tabId) => setActiveTab(tabId)}
+                  onStartAutoWorkflow={() => setActiveTab('complete-workflow')}
+                  onApplyExample={(ex: EbookExample) => {
+                    setEbookTitle(ex.title);
+                    setBookSubtitle(ex.subtitle);
+                    setBookDescription(ex.pitch);
+                    setGenre(ex.genre);
+                    setTargetAudience(ex.audience);
+                    setNumberOfChapters(ex.numberOfChapters);
+                    setChapters(ex.chapters.map((title, i) => ({
+                      id: `ex-${Date.now()}-${i}`,
+                      title,
+                      subChapters: [],
+                      content: '',
+                    })));
+                    setKdpDescription(ex.kdpDescription);
+                    setKdpKeywords(ex.keywords.join(', '));
+                    toast.success(`Projet "${ex.title}" pré-rempli ! Allez dans l'onglet Plan pour continuer.`);
+                    setActiveTab('planner');
+                  }}
+                />
+              </div>
+            </details>
           </div>
         );
 
