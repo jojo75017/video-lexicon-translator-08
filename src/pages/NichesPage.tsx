@@ -3,7 +3,7 @@ import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
-  Search, Lightbulb, ArrowRight, Sparkles, Heart, Brain, 
+  Search, Lightbulb, ArrowRight, ArrowLeft, Sparkles, Heart, Brain, 
   Briefcase, Users, Target, Flame, Star, BookOpen,
   TrendingUp, DollarSign, GraduationCap, Palette, Zap
 } from 'lucide-react';
