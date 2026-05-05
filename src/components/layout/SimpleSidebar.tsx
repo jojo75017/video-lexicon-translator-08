@@ -9,6 +9,7 @@ import {
   Megaphone,
   Wrench,
   Search,
+  TrendingUp,
   GraduationCap,
   Settings,
   ChevronLeft,
@@ -295,6 +296,21 @@ export const SimpleSidebar: React.FC<SimpleSidebarProps> = ({
         >
           <Search className="h-4 w-4 flex-shrink-0" />
           {!isCollapsed && <span className="text-sm font-medium">Mots-clés KDP</span>}
+        </button>
+
+        {/* Fiche KDP & A+ Content → onglet kdp du dashboard */}
+        <button
+          onClick={() => onTabChange('kdp')}
+          title="Description KDP, mots-clés, catégories et générateur A+ Content Amazon"
+          className={cn(
+            'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-left',
+            activeTab === 'kdp'
+              ? 'bg-primary text-primary-foreground'
+              : 'text-muted-foreground hover:bg-accent/15 hover:text-accent'
+          )}
+        >
+          <TrendingUp className="h-4 w-4 flex-shrink-0" />
+          {!isCollapsed && <span className="text-sm font-medium">Fiche KDP & A+</span>}
         </button>
 
         {/* Tous les outils → vue Trello */}
