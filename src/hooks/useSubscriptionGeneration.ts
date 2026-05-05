@@ -1,6 +1,14 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { callGemini, callGeminiJSON } from '@/services/geminiService';
+
+// Récupère la clé Gemini de l'abonné depuis le localStorage (BYOK).
+const getGeminiKey = (fallback?: string) => {
+  const local = (typeof window !== 'undefined' ? localStorage.getItem('openai_api_key') : '') || '';
+  const key = (local || fallback || '').trim();
+  return key;
+};
 
 export interface Chapter {
   id: string;
@@ -414,93 +422,155 @@ Format JSON attendu:
   };
 
   const generateKDPDescription = async (title: string, chapters: Chapter[]) => {
-    const chaptersText = chapters.map(c => c.title).join(', ');
-    const prompt = `Crée une description Amazon KDP attractive pour le livre "${title}" avec ces chapitres : ${chaptersText}.
-    
-La description doit :
-- Faire 2000 caractères maximum
-- Être persuasive et engageante
-- Mettre en avant les bénéfices pour le lecteur
-- Inclure un appel à l'action`;
+    const key = getGeminiKey(apiKey);
+    if (!key || !key.startsWith('AIza')) {
+      toast.error('Clé API Gemini manquante', { description: 'Ajoute ta clé Gemini (commençant par AIza) dans Paramètres.' });
+      return null;
+    }
+    const chaptersText = chapters.map(c => c.title).join(', ') || '(pas de chapitres définis)';
+    const audienceLine = targetAudience ? `\nPublic cible : ${targetAudience}.` : '';
+    const genreLine = genre ? `\nGenre : ${genre}.` : '';
+    const summaryLine = bookDescription ? `\nRésumé / contexte du livre : ${bookDescription}` : '';
+    const prompt = `Tu es un copywriter expert Amazon KDP. Rédige une description Amazon KDP percutante pour le livre "${title}".${audienceLine}${genreLine}${summaryLine}
+Chapitres principaux : ${chaptersText}.
 
-    return await callGenerateContent('chapters_generated', prompt);
+Contraintes :
+- Maximum 1900 caractères (limite Amazon : 2000, garde de la marge).
+- Ouvre par un HOOK qui interpelle directement le lecteur (1-2 phrases).
+- Présente le PROBLÈME que le livre résout, puis la PROMESSE.
+- Liste 4 à 6 BÉNÉFICES concrets sous forme de bullet points (utilise • en début de ligne).
+- Termine par un APPEL À L'ACTION clair.
+- Ton : professionnel, persuasif, sans superlatifs creux ("révolutionnaire", "incroyable").
+- Pas de markdown, pas de balises HTML, pas de guillemets autour de la description.
+- Réponds UNIQUEMENT par le texte de la description, sans introduction.`;
+
+    setIsGenerating(true);
+    try {
+      const content = await callGemini(key, prompt, { maxTokens: 1500, temperature: 0.7 });
+      return (content || '').trim();
+    } catch (e: any) {
+      console.error('[KDP description] error', e);
+      toast.error(e?.message || 'Erreur lors de la génération de la description KDP');
+      return null;
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const generateKDPKeywords = async (title: string, chapters: Chapter[]) => {
-    const chaptersText = chapters.map(c => c.title).join(', ');
-    const prompt = `Tu es un expert en optimisation Amazon KDP et algorithme A9.
+    const key = getGeminiKey(apiKey);
+    if (!key || !key.startsWith('AIza')) {
+      toast.error('Clé API Gemini manquante', { description: 'Ajoute ta clé Gemini (commençant par AIza) dans Paramètres.' });
+      return null;
+    }
+    const chaptersText = chapters.map(c => c.title).join(', ') || '(pas de chapitres définis)';
+    const audienceLine = targetAudience ? `\nPublic cible : ${targetAudience}.` : '';
+    const genreLine = genre ? `\nGenre : ${genre}.` : '';
+    const prompt = `Tu es un expert SEO Amazon KDP / algorithme A9.
+Génère EXACTEMENT 7 mots-clés Amazon KDP pour le livre "${title}".${audienceLine}${genreLine}
+Chapitres : ${chaptersText}.
 
-Génère exactement 7 mots-clés Amazon KDP pour le livre "${title}" avec ces chapitres : ${chaptersText}.
+Règles strictes :
+- Chaque mot-clé : maximum 50 caractères, en français.
+- Mélange de courte et longue traîne (expressions de 2 à 5 mots).
+- Pertinents pour la recherche Amazon, pas de répétition exacte du titre.
+- Pas de marques déposées, pas de noms d'auteurs concurrents.
 
-RÈGLES STRICTES pour chaque mot-clé :
-- Maximum 50 caractères
-- Pertinent pour la recherche Amazon
-- Pas de répétition du titre exact
-- Inclure des variantes longue traîne
-
-Réponds UNIQUEMENT avec ce format JSON (pas de texte avant/après) :
+Réponds UNIQUEMENT par un tableau JSON valide (aucun texte avant/après) :
 [
-  {"keyword": "mot clé 1", "chars": 12, "relevance": "haute", "tip": "conseil A9"},
-  {"keyword": "mot clé 2", "chars": 15, "relevance": "haute", "tip": "conseil A9"},
-  ...
+  { "keyword": "exemple mot clé", "chars": 17, "relevance": "haute", "tip": "pourquoi ce mot-clé est efficace pour A9" }
 ]
+Les niveaux de "relevance" autorisés : "haute", "moyenne", "faible".`;
 
-Les niveaux de relevance sont : "haute", "moyenne", "faible"
-Le tip doit expliquer pourquoi ce mot-clé est efficace pour A9.`;
-
-    const content = await callGenerateContent('chapters_generated', prompt);
-    
-    if (content) {
-      try {
-        let clean = content.trim().replace(/```json\s*|```/g, '').trim();
-        const match = clean.match(/\[[\s\S]*\]/);
-        const jsonText = match ? match[0] : clean;
-        return JSON.parse(jsonText);
-      } catch {
+    setIsGenerating(true);
+    try {
+      const raw = await callGeminiJSON<any>(key, prompt, { maxTokens: 1200, temperature: 0.6 });
+      // Normalisation : accepte string[] ou objet
+      const arr = Array.isArray(raw) ? raw : (Array.isArray((raw as any)?.keywords) ? (raw as any).keywords : []);
+      const normalized = arr.slice(0, 7).map((k: any) => {
+        if (typeof k === 'string') {
+          return { keyword: k.trim(), chars: k.trim().length, relevance: 'moyenne', tip: '' };
+        }
+        const kw = (k?.keyword || k?.mot || k?.term || '').toString().trim();
+        return {
+          keyword: kw,
+          chars: typeof k?.chars === 'number' ? k.chars : kw.length,
+          relevance: k?.relevance || 'moyenne',
+          tip: k?.tip || k?.conseil || '',
+        };
+      }).filter((k: any) => k.keyword);
+      if (!normalized.length) {
+        toast.error('Aucun mot-clé exploitable n\'a été retourné par Gemini.');
         return null;
       }
+      return normalized;
+    } catch (e: any) {
+      console.error('[KDP keywords] error', e);
+      toast.error(e?.message || 'Erreur lors de la génération des mots-clés KDP');
+      return null;
+    } finally {
+      setIsGenerating(false);
     }
-    return null;
   };
 
   const generateKDPCategories = async (title: string, chapters: Chapter[]) => {
-    const chaptersText = chapters.map(c => c.title).join(', ');
-    const prompt = `Tu es un expert en catégories Amazon KDP et BISAC.
+    const key = getGeminiKey(apiKey);
+    if (!key || !key.startsWith('AIza')) {
+      toast.error('Clé API Gemini manquante', { description: 'Ajoute ta clé Gemini (commençant par AIza) dans Paramètres.' });
+      return null;
+    }
+    const chaptersText = chapters.map(c => c.title).join(', ') || '(pas de chapitres définis)';
+    const audienceLine = targetAudience ? `\nPublic cible : ${targetAudience}.` : '';
+    const genreLine = genre ? `\nGenre : ${genre}.` : '';
+    const prompt = `Tu es un expert catégories Amazon KDP / BISAC.
+Suggère les 5 meilleures catégories Amazon KDP (FR) pour le livre "${title}".${audienceLine}${genreLine}
+Chapitres : ${chaptersText}.
 
-Suggère les 5 meilleures catégories Amazon KDP pour le livre "${title}" avec ces chapitres : ${chaptersText}.
+Pour chaque catégorie :
+- Chemin BISAC complet (ex: "Livres > Développement personnel > Gestion du stress").
+- Niveau de concurrence estimé.
+- Estimation grossière du nombre de livres en compétition.
+- Recommandation stratégique courte.
+- Potentiel de classement.
 
-Pour chaque catégorie, fournis :
-- Le chemin BISAC complet (ex: "Fiction > Romance > Contemporary")
-- Le niveau de concurrence estimé
-- Une recommandation stratégique
-
-Réponds UNIQUEMENT avec ce format JSON (pas de texte avant/après) :
+Réponds UNIQUEMENT par un tableau JSON valide (aucun texte avant/après) :
 [
   {
-    "category": "Chemin > Complet > Catégorie",
+    "category": "Livres > X > Y",
     "competition": "faible",
     "books_estimate": "500-1000",
-    "recommendation": "Excellente niche avec peu de concurrence",
-    "ranking_potential": "Top 100 accessible"
-  },
-  ...
+    "recommendation": "Niche peu concurrentielle, bon angle pour démarrer.",
+    "ranking_potential": "Top 100 atteignable"
+  }
 ]
+Valeurs autorisées pour "competition" : "faible", "moyenne", "élevée", "très élevée".`;
 
-Les niveaux de competition sont : "faible", "moyenne", "élevée", "très élevée"`;
-
-    const content = await callGenerateContent('chapters_generated', prompt);
-    
-    if (content) {
-      try {
-        let clean = content.trim().replace(/```json\s*|```/g, '').trim();
-        const match = clean.match(/\[[\s\S]*\]/);
-        const jsonText = match ? match[0] : clean;
-        return JSON.parse(jsonText);
-      } catch {
+    setIsGenerating(true);
+    try {
+      const raw = await callGeminiJSON<any>(key, prompt, { maxTokens: 1200, temperature: 0.6 });
+      const arr = Array.isArray(raw) ? raw : (Array.isArray((raw as any)?.categories) ? (raw as any).categories : []);
+      const normalized = arr.slice(0, 5).map((c: any) => {
+        if (typeof c === 'string') return { category: c };
+        return {
+          category: c?.category || c?.path || c?.name || '',
+          competition: c?.competition || '',
+          books_estimate: c?.books_estimate || c?.estimate || '',
+          recommendation: c?.recommendation || c?.tip || '',
+          ranking_potential: c?.ranking_potential || c?.potential || '',
+        };
+      }).filter((c: any) => c.category);
+      if (!normalized.length) {
+        toast.error('Aucune catégorie exploitable n\'a été retournée par Gemini.');
         return null;
       }
+      return normalized;
+    } catch (e: any) {
+      console.error('[KDP categories] error', e);
+      toast.error(e?.message || 'Erreur lors de la génération des catégories KDP');
+      return null;
+    } finally {
+      setIsGenerating(false);
     }
-    return null;
   };
 
   const generateBackCover = async (
@@ -791,12 +861,12 @@ Réponds UNIQUEMENT avec ce format JSON (pas de texte avant/après) :
   },
   "testimonial_templates": [
     {
-      "quote": "Citation fictive de lecteur satisfait (style authentique)",
-      "attribution": "Type de lecteur"
+      "quote": "Modèle de témoignage à demander à un vrai lecteur (style authentique, à personnaliser).",
+      "attribution": "Type de lecteur cible (ex: Lectrice de 35 ans, entrepreneure)"
     },
     {
-      "quote": "Deuxième citation de style différent",
-      "attribution": "Type de lecteur"
+      "quote": "Deuxième modèle de témoignage à recueillir auprès d'un beta-lecteur réel.",
+      "attribution": "Autre profil de lecteur cible"
     }
   ],
   "call_to_action": {
@@ -806,22 +876,35 @@ Réponds UNIQUEMENT avec ce format JSON (pas de texte avant/après) :
   }
 }
 
-IMPORTANT : Tous les modules doivent être cohérents entre eux et refléter fidèlement le contenu réel du livre.`;
+IMPORTANT :
+- Tous les modules doivent être cohérents entre eux et refléter fidèlement le contenu réel du livre.
+- Les "testimonial_templates" sont des MODÈLES à faire remplir par de vrais lecteurs : ne jamais les présenter comme des avis réels. Indique clairement par le style qu'il s'agit d'exemples à personnaliser.`;
 
-    const content = await callGenerateContent('chapters_generated', prompt);
-    
-    if (content) {
-      try {
-        let clean = content.trim().replace(/```json\s*|```/g, '').trim();
-        const match = clean.match(/\{[\s\S]*\}/);
-        const jsonText = match ? match[0] : clean;
-        return JSON.parse(jsonText);
-      } catch (e) {
-        console.error('Error parsing A+ content JSON:', e);
+    const key = getGeminiKey(apiKey);
+    if (!key || !key.startsWith('AIza')) {
+      toast.error('Clé API Gemini manquante', { description: 'Ajoute ta clé Gemini (commençant par AIza) dans Paramètres.' });
+      return null;
+    }
+    setIsGenerating(true);
+    try {
+      const content = await callGemini(key, prompt, { maxTokens: 4000, temperature: 0.7 });
+      let clean = (content || '').trim().replace(/```json\s*|```/g, '').trim();
+      const match = clean.match(/\{[\s\S]*\}/);
+      const jsonText = match ? match[0] : clean;
+      const parsed = JSON.parse(jsonText);
+      // Validation minimale
+      if (!parsed?.brand_story || !parsed?.hero_module || !Array.isArray(parsed?.key_features)) {
+        toast.error('Le contenu A+ retourné est incomplet. Réessaie.');
         return null;
       }
+      return parsed;
+    } catch (e: any) {
+      console.error('[A+ content] error', e);
+      toast.error(e?.message || 'Erreur lors de la génération du contenu A+');
+      return null;
+    } finally {
+      setIsGenerating(false);
     }
-    return null;
   };
 
   return {
