@@ -116,7 +116,7 @@ const allToolGroups: ToolGroup[] = [
     items: [
       { id: 'export', label: 'Exporter (PDF, Word)', icon: Download },
       { id: 'cover-design-editor', label: 'Éditeur Couverture', icon: Palette, isNew: true },
-      { id: 'kdp', label: 'Description KDP', icon: TrendingUp },
+      { id: 'kdp', label: 'Fiche KDP & A+ Content', icon: TrendingUp },
       { id: 'audit-pilot', label: 'Audit Pilot KDP', icon: ClipboardCheck, isLink: true, href: '/audit-pilot', isNew: true },
       { id: 'workflow-export', label: 'Export Global Workflow', icon: Download },
       { id: 'calibre-epub', label: 'Export ePub (Calibre)', icon: Download },
