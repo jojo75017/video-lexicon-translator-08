@@ -3249,7 +3249,7 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
               className="rounded-xl text-sm hover:bg-background"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Retour au tableau
+              Retour au tableau de bord
             </Button>
           </div>
         )}
@@ -3269,7 +3269,7 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
                 className="text-muted-foreground hover:text-foreground hover:bg-card border border-border rounded-xl text-sm"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Retour au tableau
+                Retour au tableau de bord
               </Button>
               
               <div className="flex gap-2">
