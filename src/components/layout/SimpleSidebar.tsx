@@ -263,6 +263,28 @@ export const SimpleSidebar: React.FC<SimpleSidebarProps> = ({
           );
         })}
 
+        {/* Accès direct visible : Fiche KDP & A+ Content */}
+        <button
+          onClick={() => onTabChange('kdp')}
+          title="Description KDP, catégories, mots-clés et générateur A+ Content Amazon"
+          className={cn(
+            'w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 text-left',
+            activeTab === 'kdp'
+              ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20'
+              : 'border border-primary/25 bg-primary/5 text-primary hover:bg-primary/10'
+          )}
+        >
+          <div className="flex-shrink-0 w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
+            <TrendingUp className="h-5 w-5" />
+          </div>
+          {!isCollapsed && (
+            <div className="flex-1 min-w-0">
+              <div className="font-inter font-semibold text-sm truncate">Fiche KDP & A+</div>
+              <div className="text-xs truncate opacity-80">Description & A+ Content</div>
+            </div>
+          )}
+        </button>
+
         {/* Séparateur "Avancé" */}
         {!isCollapsed && (
           <div className="pt-4 mt-4 border-t border-border">
@@ -296,21 +318,6 @@ export const SimpleSidebar: React.FC<SimpleSidebarProps> = ({
         >
           <Search className="h-4 w-4 flex-shrink-0" />
           {!isCollapsed && <span className="text-sm font-medium">Mots-clés KDP</span>}
-        </button>
-
-        {/* Fiche KDP & A+ Content → onglet kdp du dashboard */}
-        <button
-          onClick={() => onTabChange('kdp')}
-          title="Description KDP, mots-clés, catégories et générateur A+ Content Amazon"
-          className={cn(
-            'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-left',
-            activeTab === 'kdp'
-              ? 'bg-primary text-primary-foreground'
-              : 'text-muted-foreground hover:bg-accent/15 hover:text-accent'
-          )}
-        >
-          <TrendingUp className="h-4 w-4 flex-shrink-0" />
-          {!isCollapsed && <span className="text-sm font-medium">Fiche KDP & A+</span>}
         </button>
 
         {/* Tous les outils → vue Trello */}
