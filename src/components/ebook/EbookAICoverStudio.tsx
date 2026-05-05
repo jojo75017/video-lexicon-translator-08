@@ -141,6 +141,15 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
     toast.success('Téléchargement lancé');
   };
 
+  const copyPrompt = async (text: string, label: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success(`Prompt ${label} copié`);
+    } catch {
+      toast.error('Copie impossible');
+    }
+  };
+
   return (
     <div className="space-y-6">
       <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
