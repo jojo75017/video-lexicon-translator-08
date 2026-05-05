@@ -34,7 +34,7 @@ export const AuthPage = () => {
         8000
       );
     });
-    return Promise.race([invokePromise, timeoutPromise]) as ReturnType<typeof supabase.functions.invoke>;
+    return Promise.race([invokePromise, timeoutPromise]) as Promise<{ data: { isAdmin?: boolean } | null; error: Error | null }>;
   };
 
   useEffect(() => {
