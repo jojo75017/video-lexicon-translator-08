@@ -3265,11 +3265,11 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
             <div className="flex items-center justify-between mb-6">
               <Button
                 variant="ghost"
-                onClick={() => navigate('/ebook-ideas')}
+                onClick={() => handleTabChange('workflow-dashboard')}
                 className="text-muted-foreground hover:text-foreground hover:bg-card border border-border rounded-xl text-sm"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Retour
+                Retour au tableau
               </Button>
               
               <div className="flex gap-2">
