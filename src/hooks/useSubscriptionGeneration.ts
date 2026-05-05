@@ -1,6 +1,14 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { callGemini, callGeminiJSON } from '@/services/geminiService';
+
+// Récupère la clé Gemini de l'abonné depuis le localStorage (BYOK).
+const getGeminiKey = (fallback?: string) => {
+  const local = (typeof window !== 'undefined' ? localStorage.getItem('openai_api_key') : '') || '';
+  const key = (local || fallback || '').trim();
+  return key;
+};
 
 export interface Chapter {
   id: string;
