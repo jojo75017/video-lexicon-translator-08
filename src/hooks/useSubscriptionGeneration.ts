@@ -887,7 +887,7 @@ IMPORTANT :
     }
     setIsGenerating(true);
     try {
-      const content = await callGemini(key, prompt, { maxTokens: 4000, temperature: 0.7 });
+      const content = await callGemini(key, prompt, { maxTokens: 8000, temperature: 0.7 });
       let clean = (content || '').trim().replace(/```json\s*|```/g, '').trim();
       const match = clean.match(/\{[\s\S]*\}/);
       const jsonText = match ? match[0] : clean;
