@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { 
   BookOpen, Plus, Wand2, RotateCcw, ArrowLeft, Merge, Sparkles, Eye, Search, Palette, Users,
   Save, Zap, Target, FileText, Crown, Trash2, ImageIcon, Loader2, X, ChevronRight, Rocket, CheckCircle2,
-  HelpCircle
+  HelpCircle, GraduationCap
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
@@ -1342,6 +1342,23 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
 
             {/* Bloc 1bis — Moteur de mots-clés Amazon KDP (aimant) */}
             <KdpKeywordWidget defaultSeed={ebookTitle} onSubmit={(seed) => navigate(`/kdp-keywords${seed ? `?title=${encodeURIComponent(seed)}` : ''}`)} />
+
+            {/* Bloc 1ter — Lien rapide vers les Tutoriels */}
+            <button
+              onClick={() => navigate('/tutoriels')}
+              className="w-full flex items-center justify-between gap-3 rounded-xl border-2 border-dashed border-primary/30 bg-card hover:bg-accent/10 hover:border-accent/50 px-4 py-3 transition-all text-left group"
+            >
+              <span className="flex items-center gap-3">
+                <span className="h-9 w-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                  <GraduationCap className="h-5 w-5" />
+                </span>
+                <span>
+                  <span className="block text-sm font-semibold text-foreground">Nouveau ici ? Voir les tutoriels</span>
+                  <span className="block text-xs text-muted-foreground">11 actions essentielles pas à pas pour maîtriser EbookStudio</span>
+                </span>
+              </span>
+              <span className="text-xs font-medium text-primary group-hover:text-accent transition-colors">Découvrir →</span>
+            </button>
 
             {/* Bloc 2 — Vitrine livres Amazon (toujours visible) */}
             <AuthorBooksShowcase

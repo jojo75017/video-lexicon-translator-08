@@ -1,63 +1,76 @@
-## Contexte
+# Onglet Tutoriels — Actions principales pas-à-pas
 
-Une page complète de recherche de mots-clés Amazon KDP existe déjà :
-- Route : `/kdp-keywords` (protégée membres via SubscriberGate)
-- Fichier : `src/pages/KdpKeywordResearchPage.tsx`
-- Branchée sur Gemini BYOK (clé personnelle de l'utilisateur)
-- Modes : recherche auto, par niche, par titre, longue traîne, "Backend 7 mots-clés Amazon"
-- Tri par volume / difficulté / opportunité, export, copier, sélection multiple
+## Objectif
 
-Aucune nouvelle page, aucun nouvel edge function, aucune nouvelle clé API n'est nécessaire. Il suffit de **rendre cet outil visible et attractif** depuis le dashboard.
+Créer une page **Tutoriels** dédiée qui liste les principales actions à faire dans EbookStudio, sous forme de fiches pas-à-pas avec captures, durée estimée et bouton "Lancer l'action". Différent de `/guide-outils` (vue d'ensemble marketing) : ici, c'est **opérationnel et actionnable**.
 
-## Ce qui change
+## Structure de la page `/tutoriels`
 
-### 1. Mini-widget en haut du dashboard (`/ebook-planner`)
+Header sobre (charte KDP : fond `#FAFAFA`, accent teal `#008296`, hover orange `#FF9E2D`) avec :
+- Titre "Tutoriels — Actions principales"
+- Sous-titre "Les 10 actions essentielles pour réussir votre ebook avec EbookStudio"
+- Barre de recherche/filtre par catégorie
 
-Insertion d'un nouveau bloc dans `src/pages/EbookPlannerPage.tsx`, **juste après le bandeau hero "Votre livre Amazon KDP mérite d'être lu"** et avant la vitrine 6 livres Amazon.
+### Catégories (onglets `Tabs` shadcn)
 
-Apparence : carte horizontale aux couleurs Amazon KDP (fond blanc, bordure teal `#008296`, accent orange `#FF9E2D` au hover), avec :
-- Icône loupe/Sparkles à gauche
-- Titre : « Trouvez les mots-clés qui vendent sur Amazon »
-- Sous-titre court : « Volume, difficulté, opportunité, longue traîne et backend 7 mots-clés Amazon — généré par IA »
-- Champ de saisie rapide (sujet ou titre du livre, pré-rempli avec `ebookTitle` s'il existe)
-- Bouton CTA orange : « Rechercher »
+1. **Démarrage** (3 tutos)
+   - Configurer ma clé Gemini (BYOK) → `/parametres-api`
+   - Créer mon premier ebook → `/ebook-planner` mode Simple
+   - Comprendre le workflow 15 agents → `/ebook-planner` mode Workflow
 
-Action du bouton : `navigate('/kdp-keywords?title=' + encodeURIComponent(seed))` — la page existante lit déjà le param `title` via `useSearchParams`.
+2. **Création contenu** (4 tutos)
+   - Lancer le pipeline P1→P15 (génération automatique)
+   - Recherche mots-clés Amazon KDP → `/kdp-keywords`
+   - Importer un manuscrit Word existant → Document Transformer
+   - Générer une couverture KDP avec IA → KDP Cover Studio
 
-État local : un seul `useState<string>` pour le champ. Pas de logique IA dans ce widget — il sert uniquement de point d'entrée attractif.
+3. **Audio & Audiobook** (2 tutos)
+   - Lancer l'Audio Express (TTS automatique)
+   - Publier mon audiobook (page publique + checkout)
 
-### 2. Visible dans les deux modes (Simple et Workflow)
+4. **Export & Publication** (2 tutos)
+   - Exporter au format KDP (PDF intérieur + epub)
+   - Publier sur Amazon KDP (checklist conformité)
 
-Le widget est placé **au-dessus** du sélecteur Simple/Workflow et du plan, donc affiché identiquement quel que soit le mode choisi.
+### Format d'une fiche tutoriel
 
-### 3. Entrée dans la sidebar gauche
+Chaque tuto = `Card` avec :
+- Icône + titre + badge durée (ex : "5 min")
+- Description courte (1 phrase)
+- Liste numérotée des étapes (3 à 6 étapes max)
+- Bouton CTA "Lancer cette action" → navigate vers la page concernée
+- Lien optionnel "Voir la vidéo" (si formation existante dans `/formation-videos`)
 
-Dans la sidebar `Ebook Studio › Suis les 5 étapes`, ajouter sous "Tous les outils" (section AVANCÉ) une ligne dédiée :
-- Icône : `Search` (lucide)
-- Label : « Mots-clés KDP »
-- Cible : `/kdp-keywords`
+## Points d'accès
 
-Localiser le composant qui rend cette sidebar (probablement `src/components/ebook/EbookSidebar.tsx` ou similaire) et y insérer l'item.
+1. **Sidebar** (`SimpleSidebar.tsx` + `MagazineSidebar.tsx`) : ajouter entrée "Tutoriels" (icône `GraduationCap` lucide) en haut, juste sous le logo / au-dessus de "Mots-clés KDP".
+2. **Dashboard `/ebook-planner`** : ajouter un petit widget compact "Nouveau ? Voir les tutoriels" à côté du widget mots-clés existant, ou un lien discret dans le hero.
+3. **Route** : `/tutoriels` ajoutée dans `src/App.tsx` (lazy import, protégée par `SubscriberGate` comme les autres outils membres).
 
-## Détails techniques
+## Fichiers à créer / modifier
 
-| Élément | Valeur |
-|---|---|
-| Fichier principal modifié | `src/pages/EbookPlannerPage.tsx` |
-| Sidebar modifiée | composant sidebar du planner (à confirmer à l'implémentation) |
-| Page cible | `/kdp-keywords` (déjà existante, déjà SubscriberGate) |
-| Param URL | `?title=<sujet>` |
-| Couleurs | tokens existants : `bg-card`, `border-primary` (teal), `bg-accent` (orange) |
-| Auth | aucun changement (gating déjà actif sur la route cible) |
-| Backend | aucun changement (Gemini BYOK déjà en place) |
+**Créer**
+- `src/pages/TutorielsPage.tsx` — page principale avec Tabs et data inline (pas de table DB, contenu statique éditable)
+- `src/components/tutoriels/TutorialCard.tsx` — composant fiche réutilisable
+- `src/data/tutoriels.ts` — array typé des 11 tutos (titre, étapes, route cible, durée, catégorie, icône)
+
+**Modifier**
+- `src/App.tsx` — ajouter la route `/tutoriels`
+- `src/components/layout/SimpleSidebar.tsx` — ajouter entrée Tutoriels
+- `src/components/layout/MagazineSidebar.tsx` — ajouter entrée Tutoriels
+- `src/pages/EbookPlannerPage.tsx` — ajouter mini-lien "Voir les tutoriels" dans le hero
 
 ## Hors scope
 
-- Pas d'édition de la page `KdpKeywordResearchPage` elle-même
-- Pas de nouveau widget de résultats inline (l'utilisateur a choisi "mini widget en haut + page complète")
-- Pas d'accès visiteur non connecté (réservé membres, conformément au choix utilisateur)
-- Pas d'ajout de Perplexity ni Firecrawl
+- Pas de vidéos hébergées (on réutilise `/formation-videos` existant via liens)
+- Pas de système de progression / "tuto complété" sauvegardé en DB (peut être ajouté plus tard)
+- Pas de modification de `/guide-outils` existant (les deux pages cohabitent : guide = vue marketing, tutoriels = mode d'emploi opérationnel)
+- Pas de nouvelle table Supabase
 
-## Résultat attendu
+## Détails techniques
 
-Dès l'arrivée sur le dashboard, le membre voit immédiatement un encart attractif l'invitant à découvrir un outil concret et utile (recherche de mots-clés Amazon KDP), ce qui sert à la fois d'**outil pratique** et d'**aimant marketing** mettant en avant la valeur de la suite.
+- Données 100% statiques dans `src/data/tutoriels.ts` (TypeScript const) → faciles à éditer sans migration
+- Type : `{ id, category, title, description, durationMin, icon, steps: string[], targetRoute: string, videoRoute?: string }`
+- Navigation : `useNavigate()` de `react-router-dom`
+- Style : composants `Card`, `Tabs`, `Badge`, `Button` shadcn déjà présents
+- Charte : conformité memory `style/charte-graphique-amazon-kdp-reposant` (teal #008296, orange hover #FF9E2D, fond #FAFAFA)
