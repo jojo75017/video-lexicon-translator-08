@@ -81,6 +81,7 @@ import { WorkflowOnboarding } from '@/components/ebook/WorkflowOnboarding';
 import { WorkflowDashboard } from '@/components/ebook/WorkflowDashboard';
 import { EbookProgressDashboard } from '@/components/ebook/EbookProgressDashboard';
 import { EbookHeroDashboard } from '@/components/ebook/EbookHeroDashboard';
+import { EbookJourneyDashboard } from '@/components/ebook/EbookJourneyDashboard';
 import type { EbookExample } from '@/data/ebookExamples';
 import { WorkflowExportCompiled } from '@/components/ebook/WorkflowExportCompiled';
 import { TrelloBoardView } from '@/components/ebook/TrelloBoardView';
