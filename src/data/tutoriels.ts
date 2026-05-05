@@ -58,7 +58,6 @@ export const TUTORIELS: Tutoriel[] = [
     targetRoute: '/ebook-planner',
     targetTab: 'planner',
     ctaLabel: 'Configurer la clé',
-    videoRoute: '/formation-videos',
   },
   {
     id: 'premier-ebook',
@@ -77,7 +76,6 @@ export const TUTORIELS: Tutoriel[] = [
     targetRoute: '/ebook-planner',
     targetTab: 'planner',
     ctaLabel: 'Lancer la création',
-    videoRoute: '/formation-videos',
   },
   {
     id: 'workflow-15-agents',
