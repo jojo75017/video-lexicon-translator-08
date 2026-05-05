@@ -47,6 +47,7 @@ export const EBOOK_PLANNER_TABS = [
   'audio-express',
   'audiobook',
   'export',
+  'kdp',
   'kdp-prepublish-checklist',
 ] as const;
 
