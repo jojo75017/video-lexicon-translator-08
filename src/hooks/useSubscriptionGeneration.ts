@@ -446,7 +446,7 @@ Contraintes :
 
     setIsGenerating(true);
     try {
-      const content = await callGemini(key, prompt, { maxTokens: 1500, temperature: 0.7 });
+      const content = await callGemini(key, prompt, { maxTokens: 4000, temperature: 0.7 });
       return (content || '').trim();
     } catch (e: any) {
       console.error('[KDP description] error', e);
