@@ -88,6 +88,16 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   const [category, setCategory] = useState('');
   const [bookIntroduction, setBookIntroduction] = useState('');
   const [authorName, setAuthorName] = useState('');
+  // Cible idéale (déroulant)
+  const [cibleProfil, setCibleProfil] = useState('');
+  const [cibleBesoins, setCibleBesoins] = useState('');
+  const [cibleFrustrations, setCibleFrustrations] = useState('');
+  const [cibleNiveau, setCibleNiveau] = useState('');
+  // Promesse centrale (déroulant)
+  const [promesseCentrale, setPromesseCentrale] = useState('');
+  const [promesseBenefices, setPromesseBenefices] = useState('');
+  const [promesseDifferenciation, setPromesseDifferenciation] = useState('');
+  const [promesseEmotion, setPromesseEmotion] = useState('');
   const [language, setLanguage] = useState<'fr' | 'en' | 'es' | 'it'>('fr');
   const [numberOfChapters, setNumberOfChapters] = useState(8);
   const [hasReadSteps, setHasReadSteps] = useState(false);
