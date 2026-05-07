@@ -606,10 +606,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             authorName,
             language,
             numberOfChapters,
-            bookIntroduction,
-            characters: charactersForAI,
-            previousContext,
-            // Transmettre la clé API utilisateur si disponible et valide
+            bookIntroduction: buildEnrichedIntroduction(),
             userApiKey: hasUsableApiKey ? normalizedUserApiKey : undefined,
             useUserKey: hasUsableApiKey,
             ...extraBody,
