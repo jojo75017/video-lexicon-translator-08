@@ -135,6 +135,29 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   const hasApiKeyValidationWarning = hasConfiguredApiKey && !hasPlausibleApiKeyFormat;
   const canGenerate = title.trim() && authorName.trim() && category && bookIntroduction.trim() && hasReadSteps;
 
+  // Combine l'introduction libre avec les sections "Cible" et "Promesse" structurées
+  const buildEnrichedIntroduction = useCallback(() => {
+    const sections: string[] = [];
+    if (bookIntroduction.trim()) sections.push(bookIntroduction.trim());
+
+    const cibleLines: string[] = [];
+    if (cibleProfil.trim()) cibleLines.push(`- Profil: ${cibleProfil.trim()}`);
+    if (cibleBesoins.trim()) cibleLines.push(`- Besoins: ${cibleBesoins.trim()}`);
+    if (cibleFrustrations.trim()) cibleLines.push(`- Frustrations: ${cibleFrustrations.trim()}`);
+    if (cibleNiveau.trim()) cibleLines.push(`- Niveau: ${cibleNiveau.trim()}`);
+    if (cibleLines.length) sections.push(`=== CIBLE IDÉALE ===\n${cibleLines.join('\n')}`);
+
+    const promesseLines: string[] = [];
+    if (promesseCentrale.trim()) promesseLines.push(`- Promesse: ${promesseCentrale.trim()}`);
+    if (promesseBenefices.trim()) promesseLines.push(`- Bénéfices: ${promesseBenefices.trim()}`);
+    if (promesseDifferenciation.trim()) promesseLines.push(`- Différenciation: ${promesseDifferenciation.trim()}`);
+    if (promesseEmotion.trim()) promesseLines.push(`- Émotion visée: ${promesseEmotion.trim()}`);
+    if (promesseLines.length) sections.push(`=== PROMESSE CENTRALE ===\n${promesseLines.join('\n')}`);
+
+    return sections.join('\n\n');
+  }, [bookIntroduction, cibleProfil, cibleBesoins, cibleFrustrations, cibleNiveau, promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion]);
+
+
   const readSavedProgressSnapshot = useCallback((): WorkflowProgress | null => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
