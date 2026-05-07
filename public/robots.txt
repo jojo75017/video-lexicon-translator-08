@@ -5,7 +5,10 @@ User-agent: *
 Allow: /
 
 # Sitemap location
+Sitemap: https://ebookstudio.fr/sitemap-index.xml
 Sitemap: https://ebookstudio.fr/sitemap.xml
+Sitemap: https://ebookstudio.fr/sitemap-blog.xml
+Sitemap: https://ebookstudio.fr/sitemap-formation.xml
 
 # Block admin and auth pages
 Disallow: /admin
