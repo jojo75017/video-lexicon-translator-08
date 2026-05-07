@@ -1473,7 +1473,125 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             </p>
           </div>
 
-          {/* Chapters Slider */}
+          {/* Sections déroulantes : Cible & Promesse (recommandées pour un meilleur résultat) */}
+          <Accordion type="multiple" className="rounded-xl border-2 border-primary/20 bg-primary/5 px-4">
+            <AccordionItem value="cible" className="border-b border-primary/15">
+              <AccordionTrigger className="hover:no-underline">
+                <div className="flex items-center gap-2 text-left">
+                  <Target className="h-4 w-4 text-primary" />
+                  <span className="font-semibold">🎯 Cible idéale</span>
+                  <Badge variant="secondary" className="ml-2 text-[10px]">Recommandé</Badge>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="grid gap-3 md:grid-cols-2 pt-2">
+                  <div className="space-y-1">
+                    <Label htmlFor="cible-profil" className="text-xs">Profil du lecteur</Label>
+                    <Input
+                      id="cible-profil"
+                      placeholder="Ex: Femmes 35-55 ans, en quête de sens"
+                      value={cibleProfil}
+                      onChange={(e) => setCibleProfil(e.target.value)}
+                      disabled={isGenerating}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="cible-niveau" className="text-xs">Niveau</Label>
+                    <Select value={cibleNiveau} onValueChange={setCibleNiveau} disabled={isGenerating}>
+                      <SelectTrigger id="cible-niveau">
+                        <SelectValue placeholder="Choisir..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="debutant">Débutant</SelectItem>
+                        <SelectItem value="intermediaire">Intermédiaire</SelectItem>
+                        <SelectItem value="avance">Avancé</SelectItem>
+                        <SelectItem value="tous">Tous niveaux</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1 md:col-span-2">
+                    <Label htmlFor="cible-besoins" className="text-xs">Besoins / attentes</Label>
+                    <Textarea
+                      id="cible-besoins"
+                      placeholder="Ce que votre lecteur cherche, espère trouver dans ce livre..."
+                      value={cibleBesoins}
+                      onChange={(e) => setCibleBesoins(e.target.value)}
+                      disabled={isGenerating}
+                      rows={2}
+                    />
+                  </div>
+                  <div className="space-y-1 md:col-span-2">
+                    <Label htmlFor="cible-frustrations" className="text-xs">Frustrations / douleurs</Label>
+                    <Textarea
+                      id="cible-frustrations"
+                      placeholder="Ce qu'il veut éviter, ce qui ne marche pas pour lui aujourd'hui..."
+                      value={cibleFrustrations}
+                      onChange={(e) => setCibleFrustrations(e.target.value)}
+                      disabled={isGenerating}
+                      rows={2}
+                    />
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="promesse" className="border-b-0">
+              <AccordionTrigger className="hover:no-underline">
+                <div className="flex items-center gap-2 text-left">
+                  <Sparkles className="h-4 w-4 text-primary" />
+                  <span className="font-semibold">✨ Promesse centrale</span>
+                  <Badge variant="secondary" className="ml-2 text-[10px]">Recommandé</Badge>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="grid gap-3 md:grid-cols-2 pt-2">
+                  <div className="space-y-1 md:col-span-2">
+                    <Label htmlFor="promesse-centrale" className="text-xs">Promesse principale (en 1 phrase)</Label>
+                    <Input
+                      id="promesse-centrale"
+                      placeholder="Ex: Reprendre le contrôle de son temps en 30 jours"
+                      value={promesseCentrale}
+                      onChange={(e) => setPromesseCentrale(e.target.value)}
+                      disabled={isGenerating}
+                    />
+                  </div>
+                  <div className="space-y-1 md:col-span-2">
+                    <Label htmlFor="promesse-benefices" className="text-xs">Bénéfices clés (3 idées)</Label>
+                    <Textarea
+                      id="promesse-benefices"
+                      placeholder={"- Bénéfice 1\n- Bénéfice 2\n- Bénéfice 3"}
+                      value={promesseBenefices}
+                      onChange={(e) => setPromesseBenefices(e.target.value)}
+                      disabled={isGenerating}
+                      rows={3}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="promesse-diff" className="text-xs">Différenciation</Label>
+                    <Textarea
+                      id="promesse-diff"
+                      placeholder="Ce qui rend ce livre unique vs concurrence..."
+                      value={promesseDifferenciation}
+                      onChange={(e) => setPromesseDifferenciation(e.target.value)}
+                      disabled={isGenerating}
+                      rows={2}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="promesse-emotion" className="text-xs">Émotion visée</Label>
+                    <Input
+                      id="promesse-emotion"
+                      placeholder="Ex: rassurer, inspirer, faire rire..."
+                      value={promesseEmotion}
+                      onChange={(e) => setPromesseEmotion(e.target.value)}
+                      disabled={isGenerating}
+                    />
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+
           <div className="space-y-4 p-4 bg-muted/30 rounded-lg">
             <div className="flex items-center justify-between">
               <Label className="flex items-center gap-2">
