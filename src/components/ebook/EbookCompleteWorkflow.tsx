@@ -19,6 +19,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { motion } from 'framer-motion';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useWorkflowResults } from '@/hooks/useWorkflowResults';
 import { useWorkflowCloudSync } from '@/hooks/useWorkflowCloudSync';
 import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
