@@ -150,6 +150,48 @@
   }
 }
 
+/* ── JOYFUL PALETTE (Page /offres v2) ── */
+:root {
+  --joy-peach: 22 100% 78%;
+  --joy-sun: 45 100% 71%;
+  --joy-mint: 155 60% 70%;
+  --joy-lavender: 255 60% 86%;
+  --joy-cream: 35 100% 97%;
+  --joy-ink: 220 25% 22%;
+  --joy-bubblegum: 340 90% 80%;
+  --shadow-joy: 0 12px 32px -12px hsl(var(--joy-peach) / 0.55);
+  --shadow-joy-lg: 0 24px 48px -16px hsl(var(--joy-peach) / 0.45);
+}
+
+@layer utilities {
+  .bg-joy-cream { background-color: hsl(var(--joy-cream)); }
+  .bg-joy-peach { background-color: hsl(var(--joy-peach)); }
+  .bg-joy-sun { background-color: hsl(var(--joy-sun)); }
+  .bg-joy-mint { background-color: hsl(var(--joy-mint)); }
+  .bg-joy-lavender { background-color: hsl(var(--joy-lavender)); }
+  .bg-joy-bubblegum { background-color: hsl(var(--joy-bubblegum)); }
+  .text-joy-ink { color: hsl(var(--joy-ink)); }
+  .border-joy-ink { border-color: hsl(var(--joy-ink)); }
+  .shadow-joy { box-shadow: var(--shadow-joy); }
+  .shadow-joy-lg { box-shadow: var(--shadow-joy-lg); }
+}
+
+@keyframes joy-wiggle {
+  0%, 100% { transform: rotate(-2deg); }
+  50% { transform: rotate(2deg); }
+}
+@keyframes joy-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes joy-pop {
+  0% { transform: scale(0.85); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.animate-joy-wiggle { animation: joy-wiggle 3s ease-in-out infinite; }
+.animate-joy-float { animation: joy-float 4s ease-in-out infinite; }
+.animate-joy-pop { animation: joy-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+
 /* ── GLOBAL BASE ── */
 * {
   border-color: var(--charter-border);
