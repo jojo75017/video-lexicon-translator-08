@@ -1523,7 +1523,20 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
           </div>
 
           {/* Sections déroulantes : Cible & Promesse (recommandées pour un meilleur résultat) */}
-          <Accordion type="multiple" className="rounded-xl border-2 border-primary/20 bg-primary/5 px-4">
+          <Button
+            type="button"
+            onClick={handleAutofillTargetPromise}
+            disabled={autofillLoading || isGenerating || !title.trim() || !bookIntroduction.trim()}
+            className="w-full bg-joy-sun hover:bg-joy-sun/80 text-joy-ink border-2 border-joy-ink/10 shadow-joy rounded-2xl font-semibold"
+          >
+            {autofillLoading ? (
+              <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> L'IA réfléchit…</>
+            ) : (
+              <><Sparkles className="h-4 w-4 mr-2" /> Auto-remplir Cible &amp; Promesse avec l'IA</>
+            )}
+          </Button>
+
+          <Accordion type="multiple" value={openAccordions} onValueChange={setOpenAccordions} className="rounded-xl border-2 border-primary/20 bg-primary/5 px-4">
             <AccordionItem value="cible" className="border-b border-primary/15">
               <AccordionTrigger className="hover:no-underline">
                 <div className="flex items-center gap-2 text-left">
