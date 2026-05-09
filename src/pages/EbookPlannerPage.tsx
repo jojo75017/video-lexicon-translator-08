@@ -3363,7 +3363,7 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
   };
 
   return (
-    <div className="min-h-screen flex bg-background">
+    <div className="min-h-screen flex bg-joy-cream text-joy-ink">
       <OnboardingGuide />
       {viewMode !== 'trello' && (
         <SimpleSidebar
