@@ -1,53 +1,43 @@
-# Plan — Section Démo Joyeuse sur /offres
+## Problème
 
-## Contexte
-La page `/offres` (qui sert aussi de `/`) a été refondue dans un style "joyeux" pastel. L'ancienne démo interactive (`InteractiveDemo.tsx`, style KDP Rocket orange/sombre) n'apparaît plus. Tu veux que les visiteurs puissent **voir comment ça marche** directement sur la page offres, sans bouton "/demo" séparé.
+La page `/demo` (route fonctionnelle dans `App.tsx`) existe toujours, mais depuis la refonte joyeuse de `/offres`, plus aucun lien visible n'y mène :
 
-## Objectif
-Créer une nouvelle section démo immersive et conforme à la charte joyeuse (pêche, mint, soleil, lavande, crème) qui simule visuellement la création d'un ebook en 3 étapes — sans formulaire réel ni génération IA, juste une mise en scène animée pour donner envie.
+- Le menu du header contient seulement : Découvrir, Les agents, Tarif, Connexion
+- Le footer pointe vers l'ancre interne `#demo-live` (la mini-démo animée scriptée), pas vers la vraie page interactive `/demo`
+- Le visiteur n'a donc aucun moyen d'accéder à la démo Gemini réelle
 
-## Ce qui sera fait
+## Ce que je vais faire
 
-### 1. Nouveau composant `JoyfulLiveDemo.tsx`
-Dans `src/components/sales/joyful/`, un composant unique avec :
+### 1. Header `/offres` — ajouter un lien "Démo"
+Dans `src/pages/SalesPage.tsx` (nav ligne 241-246), ajouter une entrée :
+```
+<Link to="/demo">Démo gratuite</Link>
+```
+Placée juste avant "Connexion" pour rester visible au-dessus de la fold.
 
-- **Titre joyeux** : "Regarde ton premier livre prendre vie" + sous-titre rassurant
-- **Carte simulateur** style "écran d'app" sur fond crème, bords arrondis 32px, ombre douce
-- **Champ d'entrée pré-rempli défilant** : 3 sujets qui s'écrivent automatiquement en boucle (ex : "Le jeûne intermittent", "Méditation pour débutants", "Recettes véganes faciles") effet machine à écrire
-- **Bouton "Lancer la magie"** (peach + wiggle au survol) qui déclenche l'animation
-- **3 étapes animées** apparaissant en cascade :
-  1. Plan généré (mint) — liste de chapitres qui se cochent un par un
-  2. Chapitre rédigé (sun) — texte qui se "tape" avec curseur clignotant
-  3. Couverture créée (lavender) — mockup de couverture qui apparaît avec léger float
-- **Compteur de temps** "27 secondes ⚡" en badge pop
-- **CTA final** "Moi aussi je veux essayer →" qui scrolle vers `OffreUnique67`
+### 2. Footer `/offres` — corriger le lien démo
+Remplacer l'ancre `#demo-live` (ligne 332) par un vrai `<Link to="/demo">` vers la page de démo Gemini.
 
-Animations : Framer Motion (déjà utilisé), variantes `joy-pop`, `joy-float`, `joy-wiggle` déjà dans `index.css`.
+### 3. Section `JoyfulLiveDemo` — ajouter un pont vers la vraie démo
+Sous le CTA "Moi aussi je veux essayer" du composant `src/components/sales/joyful/JoyfulLiveDemo.tsx`, ajouter un second bouton secondaire / lien texte :
+```
+"Tu veux tester avec ton propre sujet ? → Lancer la démo interactive"
+```
+qui route vers `/demo`. Ainsi la mini-animation scriptée garde son rôle "teaser" et les visiteurs curieux ont un chemin clair vers la vraie démo.
 
-### 2. Insertion dans `SalesPage.tsx`
-Placer `<JoyfulLiveDemo />` juste après `<JoyfulJourney />` et avant `<AgentsShowcaseFun />` — c'est le moment idéal après avoir présenté la promesse, le visiteur est curieux de voir.
-
-### 3. Lien footer
-Le footer pointe vers `/demo` (route morte). Remplacer par un scroll vers la section démo (`#demo-live`) ou retirer le lien.
-
-### 4. Mockup couverture
-Réutiliser un visuel existant si disponible dans `src/assets/`, sinon générer une couverture pastel simple (livre stylisé inclinable).
+### 4. Bandeau mobile (optionnel mais recommandé)
+Le menu desktop est `hidden md:flex` — les mobiles ne voient ni Découvrir, ni Démo. Ajouter un petit bouton "Démo" discret à côté du logo en mobile, ou intégrer la démo dans un menu burger si tu préfères (à confirmer).
 
 ## Ce qui ne change pas
-- Aucune logique métier, aucun appel IA réel
-- Le tunnel de paiement, l'auth et les autres sections restent intacts
-- L'ancien `InteractiveDemo.tsx` reste en place (utilisé ailleurs ?) — à vérifier avant suppression éventuelle
 
-## Détails techniques
-```text
-src/components/sales/joyful/
-├── JoyfulLiveDemo.tsx     ← nouveau
-└── (existants inchangés)
+- La page `/demo` elle-même (déjà refondue en style joyeux)
+- La logique de génération, le edge function `demo-generate-plan`, le tracking
+- La section `JoyfulLiveDemo` reste comme teaser visuel
+- Aucune modification backend
 
-src/pages/SalesPage.tsx    ← +1 import, +1 balise, lien footer corrigé
-```
+## Question
 
-Pas de migration DB, pas de nouvelle dépendance.
-
-## Question ouverte
-Veux-tu que la démo soit **purement visuelle** (animations scriptées, c'est ce que je propose) ou **réellement interactive** (l'utilisateur tape un sujet et on appelle Gemini en mode aperçu limité) ? La version visuelle est plus rapide, plus sûre, et zéro coût IA — recommandée pour une page d'accueil grand public.
+Pour le mobile, tu préfères :
+- A) Un bouton "Démo" visible à côté du CTA "67€"
+- B) Un menu burger complet (Découvrir, Agents, Démo, Tarif, Connexion)
+- C) Rien sur mobile, juste le footer suffit
