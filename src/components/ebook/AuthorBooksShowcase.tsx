@@ -9,12 +9,12 @@ interface AuthorBook {
 }
 
 const BOOKS: AuthorBook[] = [
-  { asin: 'B0GXB3V5DJ', title: 'Retour en Provence — Tome 1 : Là où tout recommence', category: 'Saga / Romance' },
-  { asin: 'B0GG7QCFTZ', title: 'Le Loup qui Voulait Manger le Père Noël', category: 'Jeunesse 4-6 ans' },
+  { asin: 'B0GXB3V5DJ', title: "L'Ancien Locataire — Un thriller psychologique dans un Paris de 2030", category: 'Thriller psychologique' },
+  { asin: 'B0GG7QCFTZ', title: "Axel Kiev : L'Origine du Code — Tome 1", category: "Thriller d'espionnage technologique" },
   { asin: 'B0GY5K8GCS', title: 'Signal Zéro — Intégrale Tomes 1 & 2', category: 'Thriller technologique' },
-  { asin: 'B0GX2SVHY4', title: 'Retour en Provence — Tome 2 : Guérir là où tout a commencé', category: 'Saga / Romance' },
-  { asin: 'B0GQQB7V1F', title: 'Les Secrets de la Femme de Ménage — Tome 3', category: 'Polar' },
-  { asin: 'B0GN34WYMK', title: 'Livre Georges Boubet', category: 'Fiction' },
+  { asin: 'B0GX2SVHY4', title: 'Le Loup en Vacances — Les aventures de Lupo', category: 'Jeunesse 4-6 ans' },
+  { asin: 'B0GQQB7V1F', title: "Dans l'Ombre de la Villa — Tome 1 (Les Secrets de la Femme de Ménage)", category: 'Polar' },
+  { asin: 'B0GN34WYMK', title: 'La Bible du Voyage — En famille en Europe, 27 pays', category: 'Voyage / Famille' },
 ];
 
 const coverUrl = (asin: string) =>
