@@ -275,6 +275,9 @@ const SalesPage = () => {
       {/* PROMESSES */}
       <JoyfulPromise />
 
+      {/* RÉSULTAT CONCRET + CTA gratuit faible friction */}
+      <ResultatConcretBlock />
+
       {/* VIDÉO */}
       <section className="py-12 px-4 bg-joy-cream">
         <div className="max-w-4xl mx-auto bg-white rounded-3xl p-4 md:p-6 shadow-joy border-2 border-[hsl(var(--joy-peach))]">
