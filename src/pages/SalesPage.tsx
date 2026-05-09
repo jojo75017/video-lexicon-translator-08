@@ -241,17 +241,26 @@ const SalesPage = () => {
           <nav className="hidden md:flex items-center gap-6 text-sm font-semibold">
             <a href="#decouvrir" className="text-joy-ink/70 hover:text-joy-ink">Découvrir</a>
             <a href="#outils" className="text-joy-ink/70 hover:text-joy-ink">Les agents</a>
+            <Link to="/demo" className="text-joy-ink/70 hover:text-joy-ink">Démo gratuite</Link>
             <a href="#pricing" className="text-joy-ink/70 hover:text-joy-ink">Tarif</a>
             <Link to="/subscription" className="text-joy-ink/70 hover:text-joy-ink">Connexion</Link>
           </nav>
 
-          <Button
-            onClick={scrollToPricing}
-            className="bg-joy-ink text-joy-cream hover:bg-joy-ink/90 font-black rounded-full px-5 shadow-joy"
-          >
-            <Sparkles className="w-4 h-4 mr-2" />
-            67€ à vie
-          </Button>
+          <div className="flex items-center gap-2">
+            <Link
+              to="/demo"
+              className="md:hidden text-sm font-bold text-joy-ink/80 hover:text-joy-ink underline underline-offset-4"
+            >
+              Démo
+            </Link>
+            <Button
+              onClick={scrollToPricing}
+              className="bg-joy-ink text-joy-cream hover:bg-joy-ink/90 font-black rounded-full px-5 shadow-joy"
+            >
+              <Sparkles className="w-4 h-4 mr-2" />
+              67€ à vie
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -329,6 +338,7 @@ const SalesPage = () => {
             <div>
               <h4 className="font-bold mb-4 text-joy-ink text-sm uppercase tracking-wider">Produit</h4>
               <ul className="space-y-2.5 text-sm">
+                <li><Link to="/demo" className="text-joy-ink/70 hover:text-joy-ink">Démo gratuite</Link></li>
                 <li><a href="#demo-live" className="text-joy-ink/70 hover:text-joy-ink">Démo en direct</a></li>
                 <li><button onClick={() => navigate("/formation")} className="text-joy-ink/70 hover:text-joy-ink">Formation</button></li>
                 <li><button onClick={() => navigate("/extension-chrome")} className="text-joy-ink/70 hover:text-joy-ink">Extension Chrome</button></li>

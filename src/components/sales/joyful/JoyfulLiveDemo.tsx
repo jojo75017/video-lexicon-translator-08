@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Wand2, BookOpen, Palette, CheckCircle2, ArrowRight, Clock } from "lucide-react";
 
@@ -285,6 +286,19 @@ export const JoyfulLiveDemo = ({ onCtaClick }: Props) => {
                       <p className="text-sm text-joy-ink/60 mt-3">
                         67€ à vie · 30 jours satisfait ou remboursé
                       </p>
+                      <div className="mt-5 pt-5 border-t border-joy-ink/10">
+                        <p className="text-sm text-joy-ink/70 mb-2">
+                          Tu veux tester avec <strong>ton propre sujet</strong> ?
+                        </p>
+                        <Link
+                          to="/demo"
+                          className="inline-flex items-center gap-2 text-joy-ink font-bold underline underline-offset-4 hover:text-[hsl(var(--joy-bubblegum))] transition-colors"
+                        >
+                          <Wand2 className="w-4 h-4" />
+                          Lancer la démo interactive gratuite
+                          <ArrowRight className="w-4 h-4" />
+                        </Link>
+                      </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
