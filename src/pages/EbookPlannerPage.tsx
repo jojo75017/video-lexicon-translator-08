@@ -3518,7 +3518,7 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
             projectsCount={userProjectsCount}
           />
           <div className="sticky top-2 z-30 flex justify-end mb-2">
-            <div className="rounded-full bg-background/95 backdrop-blur border border-border shadow-sm px-3 py-1.5">
+            <div className="rounded-full bg-white border-2 border-joy-ink/10 shadow-joy px-3 py-1.5">
               <EbookAutoSaveIndicator
                 data={{ ebookTitle, authorName, chapters, preface, conclusion, epilogue, characters, targetAudience, writingStyle, chapterLength, detailLevel, tone, narrativeFormat, bookDescription, genre, numberOfChapters, targetWordsPerChapter, ebookImages, tomeNumber }}
                 storageKey="ebook-planner-autosave"
