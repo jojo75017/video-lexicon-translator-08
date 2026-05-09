@@ -279,6 +279,9 @@ const SalesPage = () => {
       {/* PARCOURS 7 JOURS */}
       <JoyfulJourney />
 
+      {/* DÉMO LIVE JOYEUSE */}
+      <JoyfulLiveDemo onCtaClick={handlePlanClick} />
+
       {/* ROI */}
       <section className="py-16 px-4 bg-joy-cream">
         <div className="max-w-3xl mx-auto bg-white rounded-3xl p-6 md:p-8 shadow-joy border-2 border-[hsl(var(--joy-mint))]">
