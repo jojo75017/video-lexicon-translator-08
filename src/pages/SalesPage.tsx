@@ -246,13 +246,21 @@ const SalesPage = () => {
             <Link to="/subscription" className="text-joy-ink/70 hover:text-joy-ink">Connexion</Link>
           </nav>
 
-          <Button
-            onClick={scrollToPricing}
-            className="bg-joy-ink text-joy-cream hover:bg-joy-ink/90 font-black rounded-full px-5 shadow-joy"
-          >
-            <Sparkles className="w-4 h-4 mr-2" />
-            67€ à vie
-          </Button>
+          <div className="flex items-center gap-2">
+            <Link
+              to="/demo"
+              className="md:hidden text-sm font-bold text-joy-ink/80 hover:text-joy-ink underline underline-offset-4"
+            >
+              Démo
+            </Link>
+            <Button
+              onClick={scrollToPricing}
+              className="bg-joy-ink text-joy-cream hover:bg-joy-ink/90 font-black rounded-full px-5 shadow-joy"
+            >
+              <Sparkles className="w-4 h-4 mr-2" />
+              67€ à vie
+            </Button>
+          </div>
         </div>
       </header>
 
