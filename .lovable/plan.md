@@ -1,71 +1,64 @@
 ## Objectif
 
-Appliquer la même charte joyeuse (palette `joy-cream`, `joy-peach`, `joy-mint`, `joy-sun`, `joy-lavender`, `joy-bubblegum`, texte `joy-ink`, ombres `shadow-joy`, animation `animate-joy-float`, coins très arrondis, typographie black) à la page `/dashboard` (`src/pages/Dashboard.tsx`), pour qu'elle soit cohérente avec `/offres`.
+Ajouter un bouton **"✨ Auto-remplir avec l'IA"** dans le formulaire `EbookCompleteWorkflow` qui, à partir du **titre + sous-titre + introduction** déjà saisis, demande à Gemini de remplir automatiquement les **8 champs** des deux accordéons "🎯 Cible idéale" et "✨ Promesse centrale".
 
-Aucune logique métier ne change : mêmes requêtes Supabase, mêmes données, mêmes onglets, mêmes routes de navigation. C'est purement un travail de présentation.
+## Champs auto-remplis
 
-## Plan visuel section par section
+**Cible idéale (4 champs)**
+- `cibleProfil` — Profil du lecteur
+- `cibleNiveau` — Niveau (énum : `debutant` / `intermediaire` / `avance` / `tous`)
+- `cibleBesoins` — Besoins / attentes
+- `cibleFrustrations` — Frustrations / douleurs
 
-### 1. Fond + ambiance
-- Remplacer `bg-background` par `bg-joy-cream text-joy-ink`.
-- Ajouter 2-3 blobs SVG décoratifs flottants (peach, mint, sun) en arrière-plan, façon `/offres`.
+**Promesse centrale (4 champs)**
+- `promesseCentrale` — Promesse principale en 1 phrase
+- `promesseBenefices` — 3 bénéfices (liste à puces)
+- `promesseDifferenciation` — Différenciation
+- `promesseEmotion` — Émotion visée
 
-### 2. Header "Tableau de bord"
-- Titre en `font-black` avec un mot en surligné `joy-bubblegum` ou `joy-sun` (genre "Ton **studio** ✨").
-- Sous-titre chaleureux : "Bienvenue, voilà ce qui se passe aujourd'hui 🌈".
-- Bouton "Actualiser" → pilule arrondie `rounded-full` bordure `joy-ink/20`.
-- Bouton "Générateur" → `bg-joy-ink text-joy-cream rounded-full shadow-joy` (même que CTA `/offres`).
+## UX
 
-### 3. KPI Cards (5 cartes)
-- Remplacer les dégradés sombres par des cartes pastel pleines :
-  - Projets ebook → `bg-joy-peach`
-  - Abonnés actifs → `bg-joy-mint`
-  - Total abonnés → `bg-joy-lavender`
-  - Audiobooks → `bg-joy-sun`
-  - Résultats IA → `bg-[hsl(var(--joy-bubblegum)/0.4)]`
-- `rounded-3xl border-2 border-joy-ink/10 shadow-joy`, hover : léger `rotate-1` et `shadow-joy-lg`.
-- Icônes dans une bulle blanche `rounded-2xl` avec `text-joy-ink`.
-- Valeur en `text-4xl font-black`.
+Un seul bouton placé **juste au-dessus des deux accordéons** (avant `<AccordionItem value="cible">`), pleine largeur, joyeux :
+- Style : `bg-joy-sun` + bordure `joy-ink/10`, icône `Sparkles`, texte "✨ Auto-remplir Cible & Promesse avec l'IA".
+- État `disabled` si `title` ou `bookIntroduction` est vide → tooltip "Remplis d'abord le titre et l'introduction".
+- État `loading` avec spinner pendant l'appel.
+- Toast succès "Cible & Promesse remplies, vérifie/ajuste si besoin 🌈" + ouverture automatique des deux accordéons.
+- Toast erreur explicite si la clé Gemini manque ou si l'API échoue.
+- Si les champs étaient déjà remplis : `confirm()` avant écrasement.
 
-### 4. Tabs "Vue d'ensemble" / "Mes Abonnés"
-- `TabsList` → `bg-white rounded-full p-1 shadow-joy`.
-- Trigger actif → `bg-joy-ink text-joy-cream rounded-full font-black`.
-- Trigger inactif → `text-joy-ink/60`.
+## Backend — nouvelle edge function
 
-### 5. Cartes "Projets récents" et "Derniers abonnés"
-- Carte blanche `rounded-3xl border-2 border-[hsl(var(--joy-peach))] shadow-joy` (mint pour la 2e).
-- Header : pastille icône colorée + titre `font-black`.
-- Bouton "Voir tout" → texte `joy-ink/70` + flèche.
-- Items de liste : `rounded-2xl hover:bg-joy-cream/50`, avatar pastel, badges plan repensés (VIP = `bg-joy-sun`, PRO = `bg-joy-lavender`, sinon `bg-joy-mint`).
-- État vide : émoji 📚 / 🎉 + texte doux.
+**Fichier** : `supabase/functions/autofill-target-promise/index.ts`
 
-### 6. Carte "Actions rapides"
-- Carte blanche `rounded-3xl shadow-joy border-2 border-[hsl(var(--joy-lavender))]`.
-- 4 boutons en pastel rotatifs (peach, mint, sun, lavender), `rounded-2xl`, icône grande, label `font-bold`, légère rotation au hover.
+- Reçoit : `{ title, subtitle?, bookIntroduction, language?, userApiKey }` (BYOK Gemini, validation `AIza` prefix conforme à la mémoire `Access Control & AI Configuration Policy`).
+- Auth : `supabase.auth.getUser()` (mémoire Core).
+- Appelle Gemini `gemini-2.5-flash` via `generativelanguage.googleapis.com` (même pattern que les autres functions BYOK du projet) avec `responseMimeType: application/json` et un schéma JSON strict pour les 8 champs.
+- Si `userApiKey` invalide ou absent → 400 avec message clair.
+- Renvoie `{ cibleProfil, cibleNiveau, cibleBesoins, cibleFrustrations, promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion }`.
+- CORS standard, gestion 429 / quota Gemini selon mémoire `Gemini Rate Limits`.
 
-### 7. Onglet "Mes Abonnés"
-- Le composant `SubscribersTable` reste tel quel (table dense). On l'enveloppe simplement dans une carte `bg-white rounded-3xl shadow-joy border-2 border-joy-ink/10 p-2` pour qu'il s'intègre visuellement, sans toucher à son code interne.
+## Frontend — modifications
 
-### 8. AdminPanelNav
-- Laissé tel quel (composant partagé). Si visuellement trop sombre, ajouter `className` wrapper avec un fond `bg-white/60 rounded-2xl p-1` — sinon ne pas y toucher pour éviter d'impacter d'autres pages admin.
+**Fichier modifié** : `src/components/ebook/EbookCompleteWorkflow.tsx` uniquement.
+
+- Ajouter `const [autofillLoading, setAutofillLoading] = useState(false);`
+- Ajouter `handleAutofill()` : appelle `supabase.functions.invoke('autofill-target-promise', { body: { title, subtitle, bookIntroduction, language, userApiKey: normalizedUserApiKey } })`, puis appelle les 8 setters `setCibleProfil(...)` etc.
+- Insérer le bouton avant l'`<AccordionItem value="cible">` (vers la ligne ~1478).
+- Forcer l'ouverture des accordéons "cible" et "promesse" via le state `value` de l'`Accordion` après succès.
+
+## Hors-scope
+
+- Ne touche pas à `EbookEditorialDirector` (autre composant, déjà autonome avec son P1).
+- Ne modifie pas l'edge function `complete-book-workflow`.
+- Pas de migration DB, pas de nouvelle table.
+- Aucun changement de logique de génération P1-P15.
 
 ## Détails techniques
 
-- **Fichier modifié** : `src/pages/Dashboard.tsx` uniquement.
-- **Tokens** : tous déjà définis dans `index.css` / `tailwind.config.ts` (`joy-cream`, `joy-ink`, `joy-peach`, `joy-mint`, `joy-sun`, `joy-lavender`, `joy-bubblegum`, `shadow-joy`, `shadow-joy-lg`, `animate-joy-float`).
-- **Aucune** modification de :
-  - logique de fetch (`fetchStats`, `fetchAllSubscribers`)
-  - routes de navigation (`/ebook-planner`, `/admin`, `/dashboard-marketing`, `/offres`)
-  - structure des données / typages
-  - composants enfants (`SubscribersTable`, `SubscriberActivityPopup`, `AdminPanelNav`)
-- **Aucune** dépendance ajoutée, **aucune** migration DB, **aucun** edge function touché.
-
-## Hors-scope (à confirmer si tu veux qu'on les fasse plus tard)
-
-- `/ebook-planner` (la vraie console de production) : très grosse page, refonte séparée.
-- `/admin` (gestion abonnés) : page outil dense, peut rester sobre.
-- Pages Formation / Blog / Forum : refontes ciblées sur demande.
+- **Modèle** : `google/gemini-2.5-flash` via la clé Gemini de l'abonné (BYOK), prompt en français, `responseSchema` JSON strict pour fiabilité.
+- **Sécurité** : `verify_jwt = true` côté config (par défaut), rate limit côté provider. La clé utilisateur n'est jamais loggée.
+- **Fallback** : si la réponse n'est pas un JSON valide, on renvoie 502 avec message + le bouton reste utilisable pour réessayer.
 
 ## Résultat attendu
 
-Le `/dashboard` aura la même âme que `/offres` : crème, pastels, bulles arrondies, typographie black, micro-animations float — tout en gardant 100 % de ses fonctionnalités actuelles.
+L'abonné saisit titre + intro, clique sur le bouton → en 3-5 secondes les 8 champs sont pré-remplis intelligemment et il peut juste les ajuster. Gain de temps massif sur l'étape la plus coûteuse de la rédaction.
