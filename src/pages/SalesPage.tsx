@@ -36,6 +36,7 @@ import FinalCtaJoyful from "@/components/sales/joyful/FinalCtaJoyful";
 import HeroVideoTeaser from "@/components/sales/HeroVideoTeaser";
 import EbookieAssistant from "@/components/sales/EbookieAssistant";
 import KdpRoiCalculator from "@/components/sales/KdpRoiCalculator";
+import ResultatConcretBlock from "@/components/sales/ResultatConcretBlock";
 
 const LAUNCH_PRICE = 67;
 const NORMAL_PRICE = 147;
