@@ -241,6 +241,7 @@ const SalesPage = () => {
           <nav className="hidden md:flex items-center gap-6 text-sm font-semibold">
             <a href="#decouvrir" className="text-joy-ink/70 hover:text-joy-ink">Découvrir</a>
             <a href="#outils" className="text-joy-ink/70 hover:text-joy-ink">Les agents</a>
+            <Link to="/demo" className="text-joy-ink/70 hover:text-joy-ink">Démo gratuite</Link>
             <a href="#pricing" className="text-joy-ink/70 hover:text-joy-ink">Tarif</a>
             <Link to="/subscription" className="text-joy-ink/70 hover:text-joy-ink">Connexion</Link>
           </nav>
