@@ -159,6 +159,53 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
     return sections.join('\n\n');
   }, [bookIntroduction, cibleProfil, cibleBesoins, cibleFrustrations, cibleNiveau, promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion]);
 
+  const handleAutofillTargetPromise = useCallback(async () => {
+    if (!title.trim() || !bookIntroduction.trim()) {
+      toast.error('Remplis d\'abord le titre et l\'introduction du livre.');
+      return;
+    }
+    if (!hasUsableApiKey) {
+      toast.error('Configure ta clé Gemini dans les paramètres avant d\'utiliser l\'IA.');
+      return;
+    }
+    const hasExisting = [cibleProfil, cibleBesoins, cibleFrustrations, promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion].some(v => v.trim());
+    if (hasExisting && !window.confirm('Des champs sont déjà remplis. Les écraser avec la suggestion IA ?')) {
+      return;
+    }
+    setAutofillLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('autofill-target-promise', {
+        body: {
+          title: title.trim(),
+          subtitle: subtitle.trim(),
+          bookIntroduction: bookIntroduction.trim(),
+          language,
+          userApiKey: normalizedUserApiKey,
+        },
+      });
+      if (error) {
+        const msg = (error as any)?.context?.json?.error || error.message || 'Erreur lors de l\'appel IA';
+        throw new Error(msg);
+      }
+      if (data?.error) throw new Error(data.error);
+      setCibleProfil(data.cibleProfil || '');
+      setCibleNiveau(data.cibleNiveau || 'tous');
+      setCibleBesoins(data.cibleBesoins || '');
+      setCibleFrustrations(data.cibleFrustrations || '');
+      setPromesseCentrale(data.promesseCentrale || '');
+      setPromesseBenefices(data.promesseBenefices || '');
+      setPromesseDifferenciation(data.promesseDifferenciation || '');
+      setPromesseEmotion(data.promesseEmotion || '');
+      setOpenAccordions(['cible', 'promesse']);
+      toast.success('Cible & Promesse remplies, vérifie/ajuste si besoin 🌈');
+    } catch (e: any) {
+      toast.error(e?.message || 'Échec de l\'auto-remplissage');
+    } finally {
+      setAutofillLoading(false);
+    }
+  }, [title, subtitle, bookIntroduction, language, normalizedUserApiKey, cibleProfil, cibleBesoins, cibleFrustrations, promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion]);
+
+
 
   const readSavedProgressSnapshot = useCallback((): WorkflowProgress | null => {
     try {
