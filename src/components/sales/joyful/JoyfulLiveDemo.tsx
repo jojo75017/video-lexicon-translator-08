@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Wand2, BookOpen, Palette, CheckCircle2, ArrowRight, Clock } from "lucide-react";
 
