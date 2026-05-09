@@ -329,7 +329,7 @@ const SalesPage = () => {
             <div>
               <h4 className="font-bold mb-4 text-joy-ink text-sm uppercase tracking-wider">Produit</h4>
               <ul className="space-y-2.5 text-sm">
-                <li><button onClick={() => navigate("/demo")} className="text-joy-ink/70 hover:text-joy-ink">Démo gratuite</button></li>
+                <li><a href="#demo-live" className="text-joy-ink/70 hover:text-joy-ink">Démo en direct</a></li>
                 <li><button onClick={() => navigate("/formation")} className="text-joy-ink/70 hover:text-joy-ink">Formation</button></li>
                 <li><button onClick={() => navigate("/extension-chrome")} className="text-joy-ink/70 hover:text-joy-ink">Extension Chrome</button></li>
               </ul>
