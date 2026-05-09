@@ -26,6 +26,7 @@ import HeroJoyful from "@/components/sales/joyful/HeroJoyful";
 import JoyfulPromise from "@/components/sales/joyful/JoyfulPromise";
 import AgentsShowcaseFun from "@/components/sales/joyful/AgentsShowcaseFun";
 import JoyfulJourney from "@/components/sales/joyful/JoyfulJourney";
+import JoyfulLiveDemo from "@/components/sales/joyful/JoyfulLiveDemo";
 import OffreUnique67 from "@/components/sales/joyful/OffreUnique67";
 import JoyfulFAQ from "@/components/sales/joyful/JoyfulFAQ";
 import FinalCtaJoyful from "@/components/sales/joyful/FinalCtaJoyful";
