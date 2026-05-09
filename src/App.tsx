@@ -51,6 +51,7 @@ const ArcSignupPage = lazy(() => import('./pages/ArcSignupPage'));
 const MarketingPlanPage = lazy(() => import('./pages/MarketingPlanPage'));
 const UpsellPage = lazy(() => import('./pages/UpsellPage'));
 const UpsellPaiementPage = lazy(() => import('./pages/UpsellPaiementPage'));
+const CoachingVipPage = lazy(() => import('./pages/CoachingVipPage'));
 const SeoGeneratorPage = lazy(() => import('./pages/SeoGeneratorPage'));
 const PracticalSheetsGeneratorPage = lazy(() => import('./pages/PracticalSheetsGeneratorPage'));
 const ResultatEn5MinPage = lazy(() => import('./pages/ResultatEn5MinPage'));
@@ -269,6 +270,7 @@ const App = () => {
             <Route path="/demo" element={<DemoPage />} />
             <Route path="/upsell" element={<UpsellPage />} />
             <Route path="/upsell-paiement" element={<UpsellPaiementPage />} />
+            <Route path="/coaching-vip" element={<CoachingVipPage />} />
             <Route path="/paiement-succes" element={<PaymentSuccessPage />} />
             <Route path="/paiement-manuel" element={<PaiementManuelPage />} />
             <Route path="/confirmation-paiement" element={<ConfirmationPaiementPage />} />
