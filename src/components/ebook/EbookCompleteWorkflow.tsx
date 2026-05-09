@@ -101,6 +101,8 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   const [language, setLanguage] = useState<'fr' | 'en' | 'es' | 'it'>('fr');
   const [numberOfChapters, setNumberOfChapters] = useState(8);
   const [hasReadSteps, setHasReadSteps] = useState(false);
+  const [autofillLoading, setAutofillLoading] = useState(false);
+  const [openAccordions, setOpenAccordions] = useState<string[]>([]);
   
   // Workflow state
   const [isGenerating, setIsGenerating] = useState(false);
