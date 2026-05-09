@@ -22,6 +22,7 @@ import {
 
 // Joyful components (refonte v2)
 import JoyfulBanner from "@/components/sales/joyful/JoyfulBanner";
+import CoachingVipBanner from "@/components/sales/CoachingVipBanner";
 import HeroJoyful from "@/components/sales/joyful/HeroJoyful";
 import JoyfulPromise from "@/components/sales/joyful/JoyfulPromise";
 import AgentsShowcaseFun from "@/components/sales/joyful/AgentsShowcaseFun";
@@ -184,6 +185,9 @@ const SalesPage = () => {
           },
         })}</script>
       </Helmet>
+
+      {/* Bandeau coaching VIP (10 places à 47€) */}
+      <CoachingVipBanner />
 
       {/* Bandeau jovial rotatif */}
       <JoyfulBanner />
