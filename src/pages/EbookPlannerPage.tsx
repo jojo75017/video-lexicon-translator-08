@@ -3398,7 +3398,7 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
         <FirstVisitBanner />
         {/* Back to board button in trello mode */}
         {viewMode === 'trello' && activeTab !== 'workflow-dashboard' && (
-          <div className="bg-card border-b border-border px-6 py-3 flex items-center gap-3">
+          <div className="bg-white border-b-2 border-[hsl(var(--joy-peach))] px-6 py-3 flex items-center gap-3">
             <Button
               variant="ghost"
               size="sm"
@@ -3406,20 +3406,22 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
                 setActiveTab('workflow-dashboard');
                 setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 50);
               }}
-              className="rounded-xl text-sm hover:bg-background"
+              className="rounded-full text-sm font-bold text-joy-ink hover:bg-joy-cream"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Retour au tableau de bord
             </Button>
           </div>
         )}
-        {/* Hero Header — Dark Premium 2026 */}
-        <div className="relative overflow-hidden bg-background border-b border-border">
-          {/* Subtle glow effects */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(59,158,255,0.1),transparent)]" />
-          <div className="absolute -top-20 -right-20 w-80 h-80 bg-primary/8 rounded-full blur-[120px]" />
-          <div className="absolute -bottom-20 -left-20 w-60 h-60 bg-accent/8 rounded-full blur-[100px]" />
-          
+        {/* Hero Header — Joyful */}
+        <div className="relative overflow-hidden bg-joy-cream border-b-2 border-joy-ink/10">
+          {/* Joyful blobs */}
+          <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+            <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full bg-joy-peach/60 blur-3xl animate-joy-float" />
+            <div className="absolute -bottom-20 -left-20 w-72 h-72 rounded-full bg-joy-mint/50 blur-3xl animate-joy-float" style={{ animationDelay: '1.5s' }} />
+            <div className="absolute top-1/2 left-1/3 w-60 h-60 rounded-full bg-joy-sun/40 blur-3xl animate-joy-float" style={{ animationDelay: '3s' }} />
+          </div>
+
           <div className="relative container mx-auto px-6 py-6">
             {/* Top bar */}
             <div className="flex items-center justify-between mb-6">
@@ -3430,19 +3432,19 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
                     setActiveTab('workflow-dashboard');
                     setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 50);
                   }}
-                  className="text-muted-foreground hover:text-foreground hover:bg-card border border-border rounded-xl text-sm"
+                  className="text-joy-ink hover:bg-white border-2 border-joy-ink/20 bg-white rounded-full text-sm font-bold"
                 >
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Retour au tableau de bord
                 </Button>
               </div>
-              
+
               <div className="flex gap-2">
                 <Button
                   type="button"
                   onClick={handleManualSave}
                   disabled={isSaving || !ebookTitle}
-                  className="bg-card hover:bg-card/80 text-foreground border border-border rounded-xl transition-all duration-300"
+                  className="bg-white hover:bg-joy-cream text-joy-ink border-2 border-joy-ink/20 rounded-full font-bold transition-all"
                 >
                   <Save className="h-4 w-4 mr-2" />
                   {isSaving ? 'Sauvegarde...' : 'Sauvegarder'}
@@ -3450,58 +3452,57 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
                 <Button
                   type="button"
                   onClick={resetPlan}
-                  className="bg-card hover:bg-card/80 text-foreground border border-border rounded-xl"
+                  className="bg-joy-peach hover:bg-joy-peach/80 text-joy-ink border-2 border-joy-ink/10 rounded-full font-bold"
                 >
                   <Plus className="h-4 w-4 mr-2" />
                   Nouveau
                 </Button>
               </div>
             </div>
-            
+
             <div className="max-w-3xl mx-auto text-center pb-6">
-              <div className="inline-flex items-center justify-center w-16 h-16 mb-5 rounded-2xl bg-gradient-to-br from-primary to-accent shadow-lg shadow-primary/20">
-                <Sparkles className="w-8 h-8 text-background" />
+              <div className="inline-flex items-center justify-center w-16 h-16 mb-5 rounded-3xl bg-joy-sun shadow-joy animate-joy-float">
+                <Sparkles className="w-8 h-8 text-joy-ink" />
               </div>
-              
-              <h1 className="text-4xl md:text-5xl font-extrabold mb-3 text-foreground tracking-tight font-display italic">
-                {ebookTitle || 'Studio de Création'}
+
+              <h1 className="text-4xl md:text-5xl font-black mb-3 text-joy-ink tracking-tight">
+                {ebookTitle || (
+                  <>Ton <span className="px-2 rounded-2xl bg-joy-bubblegum/40 inline-block -rotate-1">studio</span> ✨</>
+                )}
               </h1>
-              
+
               {isSaving && (
-                <Badge className="bg-card text-primary border-border">
+                <Badge className="bg-joy-mint text-joy-ink border-0 font-bold">
                   <Save className="w-3 h-3 mr-1 animate-pulse" />
                   Sauvegarde...
                 </Badge>
               )}
-              
-              <p className="text-muted-foreground max-w-xl mx-auto mt-2 text-sm tracking-wide uppercase font-medium">
-                Créez des ebooks professionnels avec l'intelligence artificielle
+
+              <p className="text-joy-ink/70 max-w-xl mx-auto mt-2 text-sm tracking-wide uppercase font-bold">
+                Crée des ebooks pros avec tes 15 agents IA 🌈
               </p>
-              
+
               {/* CTA principal unique */}
               <div className="mt-6 flex flex-col items-center gap-2">
                 <Button
                   type="button"
                   onClick={() => handleTabChange('editorial-director')}
-                  className="relative overflow-hidden bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-semibold px-8 py-3 h-auto rounded-2xl group transition-all duration-500 hover:shadow-[0_0_40px_rgba(59,158,255,0.3)] hover:-translate-y-0.5"
+                  className="bg-joy-ink text-joy-cream hover:bg-joy-ink/90 font-black px-8 py-6 h-auto rounded-full shadow-joy hover:shadow-joy-lg transition-all hover:-translate-y-0.5"
                 >
-                  <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-                  <span className="relative flex items-center gap-3">
-                    <Rocket className="w-5 h-5" />
-                    <span>🚀 Créer mon ebook (Workflow IA)</span>
-                  </span>
+                  <Rocket className="w-5 h-5 mr-3" />
+                  🚀 Créer mon ebook (Workflow IA)
                 </Button>
                 <button
                   type="button"
                   onClick={() => handleTabChange('planner')}
-                  className="text-xs text-muted-foreground underline-offset-2 hover:underline hover:text-foreground transition-colors"
+                  className="text-xs text-joy-ink/60 underline-offset-2 hover:underline hover:text-joy-ink transition-colors"
                 >
                   ou utiliser le formulaire manuel
                 </button>
               </div>
 
-              <p className="mt-5 text-muted-foreground text-sm italic">
-                🚀 1, 2, 3… Foncez ! Je suis toujours là pour vous accompagner en Zoom gratuit — Georges
+              <p className="mt-5 text-joy-ink/70 text-sm italic">
+                🚀 1, 2, 3… Fonce ! Je suis là pour t'accompagner en Zoom gratuit — Georges
               </p>
             </div>
           </div>
