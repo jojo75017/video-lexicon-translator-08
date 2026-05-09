@@ -1,67 +1,96 @@
-## Objectif
+## Diagnostic honnête
 
-Faire de `/coaching-vip` une vraie page de vente conçue pour convertir, avec ta vidéo HeyGen en hero, et rendre l'offre beaucoup plus visible sur `/offres`.
+Les analytics montrent que le problème principal n’est pas encore “les gens ne veulent pas acheter”, mais plutôt : **il n’y a pas assez de visiteurs qualifiés**.
 
-## 1. Intégration de la vidéo HeyGen
+- 339 visiteurs sur 30 jours
+- 183 vues de `/offres`
+- Trafic majoritairement direct
+- Très peu de trafic Google, YouTube, Facebook
+- Donc même avec une bonne page, le volume actuel ne suffit pas pour juger l’offre
 
-- Copier `Accompagnement_Privé_30_Jours_L_Offre_Exclusive_de_Georges_1080p_caption.mp4` dans `public/videos/coaching-vip-georges.mp4` (et garder un poster image pour le chargement).
-- Affichage natif via balise `<video>` HTML5, contrôles natifs, `playsInline`, `preload="metadata"`.
-- Responsive : `aspect-video`, max-width contrôlée, coins arrondis, ombre douce, accent teal.
+KDP Rocket réussit surtout parce qu’ils ont : trafic régulier, preuve sociale massive, démonstration produit claire, autorité construite depuis longtemps.
 
-## 2. Refonte de la page `/coaching-vip`
+## Plan prioritaire à mettre en place
 
-Nouvelle structure orientée conversion :
+### 1. Créer un vrai tableau de bord conversion
+Ajouter une page/admin bloc simple pour suivre :
 
-1. **Hero compact** — badge "10 places", titre court "Tu fais partie des personnes que je surveille de près 😏", sous-titre résultat ("En 30 jours, on transforme ton projet d'ebook en livre publié et vendable sur Amazon KDP").
-2. **VIDÉO HeyGen** — placée immédiatement sous le hero, avec contrôles natifs et un cadre teal/orange. Mention "1 min — regarde avant de réserver".
-3. **Bloc inclusions** (existant, conservé) — 3 sessions Zoom, email perso, audit ebook, conseils stratégiques.
-4. **Plan 30 jours semaine par semaine** — nouveau bloc visuel :
-   - Semaine 1 : Niche, angle et structure validés.
-   - Semaine 2 : Rédaction + corrections du manuscrit.
-   - Semaine 3 : Couverture, description, mots-clés KDP.
-   - Semaine 4 : Publication et stratégie de lancement.
-5. **Pour qui / pas pour qui** — deux colonnes :
-   - Pour toi si : tu as une idée, tu veux publier, tu appliques.
-   - Pas pour toi si : tu cherches une formation passive, tu n'as pas le temps, tu ne veux pas appliquer.
-6. **Bloc honnêteté prix** (existant, conservé).
-7. **CTA PayPal principal** (existant) — légèrement renforcé : badge "Places restantes affichées en clair" et micro-rassurance "Réponse sous 24h après paiement".
-8. **Comment ça se passe** (existant, 3 étapes) — conservé.
-9. **Objections / FAQ courte** — nouveau bloc, 5 questions :
-   - "Et si je n'ai pas encore d'idée d'ebook ?"
-   - "Je débute totalement, c'est pour moi ?"
-   - "Combien de temps par semaine ?"
-   - "Que se passe-t-il après le paiement ?"
-   - "Et si finalement ça ne me convient pas ?"
-10. **CTA final** (existant, conservé).
-11. **Contact email** (existant, conservé).
+- visites `/offres`
+- clics bouton achat
+- clics PayPal
+- vues `/coaching-vip`
+- clics coaching
+- lecture vidéo coaching
 
-## 3. Plus de visibilité sur `/offres`
+Objectif : arrêter de deviner et savoir exactement où les gens décrochent.
 
-- Remplacer l'actuelle bannière fine `CoachingVipBanner` (bandeau plein largeur) par un **bloc bannière vidéo** placé en haut de la page :
-  - Mini lecteur vidéo (autoplay muet en boucle, `playsInline`) à gauche.
-  - À droite : titre "Offre privée — 10 places coaching VIP 30 jours", prix 197€ → 47€, bouton "Voir l'offre".
-  - Reste fermable (croix + localStorage), pour ne pas casser l'UX existante.
-- L'ancienne bannière fine est supprimée du flux (le composant est remplacé in-place dans `SalesPage.tsx`, aucun autre import à changer).
+### 2. Renforcer la preuve avant achat sur `/offres`
+Ajouter un bloc très visible avant le prix :
 
-## 4. Tracking
+- “Ce que tu peux créer avec EbookStudio”
+- 3 exemples concrets : ebook, fiche pratique, couverture/audio
+- mini démonstration orientée résultat
+- rappel : 67€ à vie au lieu d’un abonnement
 
-- Ajouter 3 events analytics simples (via le helper `trackEvent` déjà présent) :
-  - `coaching_video_play` (lecture vidéo coaching)
-  - `coaching_paypal_click` (clic PayPal)
-  - `coaching_banner_click` (clic depuis `/offres`)
-- Permet de savoir où ça bloque sans rien casser.
+Objectif : rendre l’achat plus évident en montrant le résultat final, pas seulement les fonctionnalités.
 
-## Détails techniques
+### 3. Ajouter un CTA faible friction
+Avant de demander 67€, proposer une action plus facile :
 
-- Fichier vidéo copié vers `public/videos/coaching-vip-georges.mp4` (servi statiquement par Vite).
-- Aucun changement de routes, ni de backend, ni d'auth.
-- `CoachingVipBanner.tsx` réécrit pour devenir un bandeau plus riche (autoplay muet) sans casser l'API d'import.
-- `CoachingVipPage.tsx` étendu, sans toucher à la logique PayPal ni au pricing (47€, 10 places, mail `boubetgeorges@gmail.com`).
-- Pas de Stripe, pas d'edge function, pas de DB.
+- “Recevoir le guide gratuit”
+- ou “Voir une démo en 5 minutes”
+- ou “Tester le plan de ton premier ebook”
 
-## Hors scope
+Objectif : capter les visiteurs qui ne sont pas prêts à acheter tout de suite.
 
-- Compteur réel "places restantes".
-- Système de questionnaire automatique.
-- Concours, séquence email, vidéos additionnelles.
-- Refonte des autres offres (67€, licence étendue, etc.).
+### 4. Créer une offre d’entrée plus simple
+Le coaching à 47€ est bon, mais il peut être perçu comme personnel/engageant.
+Ajouter une option plus facile :
+
+- “Audit express de ton idée d’ebook — 9€ ou 17€”
+- livraison rapide
+- mène ensuite vers coaching ou abonnement
+
+Objectif : obtenir les premiers paiements, même petits, pour débloquer la confiance commerciale.
+
+### 5. Plan contenu 7 jours orienté ventes
+Créer 7 posts/scripts courts basés sur des angles directs :
+
+1. “Pourquoi ton ebook ne se vend pas”
+2. “3 erreurs Amazon KDP que je vois partout”
+3. “Avant/après : idée vague → ebook vendable”
+4. “Combien peut rapporter un ebook réaliste ?”
+5. “Je corrige une niche KDP en direct”
+6. “EbookStudio vs payer un freelance”
+7. “Challenge : sortir ton ebook en 30 jours”
+
+Chaque contenu renvoie vers une seule action : `/offres` ou `/coaching-vip`.
+
+## Ce que je recommande d’implémenter maintenant
+
+Priorité technique :
+
+1. Ajouter le tracking complet des clics et vues importantes.
+2. Ajouter un bloc “résultat concret” sur `/offres`.
+3. Ajouter un CTA gratuit ou faible friction sur `/offres`.
+4. Préparer les textes des 7 contenus de relance.
+
+## Ce que je ne recommande pas maintenant
+
+- Ajouter encore des concours
+- Multiplier les pages
+- Changer tout le prix tous les deux jours
+- Faire plus de vidéos sans mesurer les clics
+- Copier KDP Rocket visuellement sans copier leur moteur : trafic + preuve + démonstration
+
+## Résultat attendu
+
+Dans 7 jours, on doit savoir clairement :
+
+- combien de personnes voient l’offre
+- combien cliquent
+- combien arrivent au paiement
+- combien refusent avant paiement
+- quel contenu amène les meilleurs visiteurs
+
+Ensuite seulement, on ajuste prix, promesse ou tunnel.
