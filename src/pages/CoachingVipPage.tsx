@@ -4,6 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
   ArrowLeft,
   ArrowRight,
   Check,
@@ -11,15 +17,20 @@ import {
   Eye,
   Mail,
   MessageCircle,
+  PlayCircle,
   ShieldCheck,
   Sparkles,
   Users,
   Video,
+  X as XIcon,
+  CalendarDays,
 } from "lucide-react";
+import { trackEvent } from "@/utils/analytics";
 
 const PRICE = 47;
 const NORMAL_PRICE = 197;
 const SEATS = 10;
+const VIDEO_SRC = "/videos/coaching-vip-georges.mp4";
 
 const PAYPAL_LINK = `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=${PRICE}&currency_code=EUR&item_name=${encodeURIComponent(
   "Coaching VIP 30 jours - EbookStudio"
@@ -48,6 +59,43 @@ const inclusions = [
   },
 ];
 
+const weeks = [
+  {
+    n: 1,
+    title: "Semaine 1 — Cadrage",
+    desc: "Niche validée, angle unique, structure claire de ton ebook. On évite les erreurs qui font perdre 3 mois.",
+  },
+  {
+    n: 2,
+    title: "Semaine 2 — Production",
+    desc: "Rédaction guidée + corrections du manuscrit. Tu avances sans bloquer, je relis et je corrige avec toi.",
+  },
+  {
+    n: 3,
+    title: "Semaine 3 — Packaging",
+    desc: "Couverture qui vend, description Amazon optimisée, mots-clés KDP qui rapportent.",
+  },
+  {
+    n: 4,
+    title: "Semaine 4 — Lancement",
+    desc: "Publication sur Amazon KDP + plan de lancement concret pour tes premières ventes.",
+  },
+];
+
+const forYou = [
+  "Tu as une idée d'ebook (même floue) et tu veux enfin la sortir.",
+  "Tu as commencé un projet et tu n'arrives pas à le finir seul.",
+  "Tu veux publier sur Amazon KDP sans perdre 6 mois à tâtonner.",
+  "Tu es prêt(e) à appliquer, pas juste à consommer du contenu.",
+];
+
+const notForYou = [
+  "Tu cherches une formation passive à regarder en mangeant.",
+  "Tu n'as pas 2 à 3 heures par semaine à investir sur ton projet.",
+  "Tu attends une recette magique sans rien faire.",
+  "Tu n'es pas prêt(e) à recevoir des retours francs sur ton travail.",
+];
+
 const steps = [
   {
     n: 1,
@@ -65,6 +113,37 @@ const steps = [
     desc: "Pour fixer un RDV Zoom ou téléphonique selon ta préférence.",
   },
 ];
+
+const faqs = [
+  {
+    q: "Et si je n'ai pas encore d'idée d'ebook ?",
+    a: "Pas de souci. La 1ère session sert justement à ça : on creuse ton expérience, ta cible, et on sort 2 à 3 angles d'ebook que tu peux vraiment porter.",
+  },
+  {
+    q: "Je débute totalement, c'est pour moi ?",
+    a: "Oui, c'est même l'idéal. Mieux vaut être bien accompagné dès le départ que devoir corriger 6 mois d'erreurs. Je t'évite tous les pièges classiques.",
+  },
+  {
+    q: "Combien de temps ça me demande par semaine ?",
+    a: "Compte 2 à 3 heures par semaine en moyenne, plus la session Zoom. C'est compatible avec un job à côté, à condition de bloquer ces créneaux.",
+  },
+  {
+    q: "Que se passe-t-il après le paiement ?",
+    a: "Tu reçois immédiatement un email avec un court questionnaire. Sous 24h max, je te contacte personnellement pour caler notre première session Zoom.",
+  },
+  {
+    q: "Et si finalement ça ne me convient pas ?",
+    a: "Dis-le moi dès la 1ère session. Je préfère qu'on s'arrête tout de suite plutôt que de perdre du temps tous les deux. On reste corrects.",
+  },
+];
+
+const handlePaypalClick = (location: string) => {
+  trackEvent("coaching_paypal_click", { location });
+};
+
+const handleVideoPlay = () => {
+  trackEvent("coaching_video_play", {});
+};
 
 const CoachingVipPage = () => {
   return (
@@ -88,7 +167,7 @@ const CoachingVipPage = () => {
         </Link>
 
         {/* HERO */}
-        <div className="text-center mb-10">
+        <div className="text-center mb-8">
           <Badge className="bg-[#FF9E2D]/15 text-[#FF9E2D] border border-[#FF9E2D]/40 mb-4 font-bold">
             <Crown className="w-3 h-3 mr-1" />
             ACCÈS PRIVÉ — 10 PLACES SEULEMENT
@@ -100,9 +179,29 @@ const CoachingVipPage = () => {
             <span className="inline-block">😏</span>
           </h1>
           <p className="text-lg text-[#232F3E]/70 max-w-2xl mx-auto">
-            Pas par hasard. Parce que tu passes à l'action.
+            En <strong>30 jours</strong>, on transforme ton projet d'ebook en livre
+            <strong> publié et vendable</strong> sur Amazon KDP.
             <br />
-            Et ça, ça change tout.
+            Avec moi, en privé, étape par étape.
+          </p>
+        </div>
+
+        {/* VIDÉO HEYGEN */}
+        <div className="mb-8">
+          <div className="relative rounded-2xl overflow-hidden shadow-xl ring-2 ring-[#008296]/30 bg-black aspect-video">
+            <video
+              src={VIDEO_SRC}
+              controls
+              playsInline
+              preload="metadata"
+              poster=""
+              onPlay={handleVideoPlay}
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <p className="text-center text-xs text-[#232F3E]/60 mt-2 flex items-center justify-center gap-1.5">
+            <PlayCircle className="w-3.5 h-3.5 text-[#008296]" />
+            1 min — regarde avant de réserver ta place
           </p>
         </div>
 
@@ -143,6 +242,63 @@ const CoachingVipPage = () => {
               </CardContent>
             </Card>
           ))}
+        </div>
+
+        {/* PLAN 30 JOURS */}
+        <h2 className="text-2xl font-black mb-4 flex items-center gap-2">
+          <CalendarDays className="w-6 h-6 text-[#008296]" />
+          Ton plan sur 30 jours
+        </h2>
+        <div className="grid sm:grid-cols-2 gap-4 mb-8">
+          {weeks.map((w) => (
+            <Card key={w.n} className="border-[#008296]/15 bg-white relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-[#008296] to-[#FF9E2D]" />
+              <CardContent className="p-5 pl-6">
+                <div className="text-xs font-black text-[#008296] uppercase tracking-wider mb-1">
+                  Semaine {w.n}
+                </div>
+                <h3 className="font-bold mb-1">{w.title.replace(/^Semaine \d+ — /, "")}</h3>
+                <p className="text-sm text-[#232F3E]/70">{w.desc}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* POUR QUI / PAS POUR QUI */}
+        <h2 className="text-2xl font-black mb-4">C'est pour qui (et pas pour qui) ?</h2>
+        <div className="grid md:grid-cols-2 gap-4 mb-8">
+          <Card className="border-[#008296]/30 bg-[#008296]/5">
+            <CardContent className="p-5">
+              <h3 className="font-black text-[#008296] mb-3 flex items-center gap-2">
+                <Check className="w-5 h-5" />
+                C'est pour toi si...
+              </h3>
+              <ul className="space-y-2 text-sm">
+                {forYou.map((item, i) => (
+                  <li key={i} className="flex gap-2">
+                    <Check className="w-4 h-4 text-[#008296] flex-shrink-0 mt-0.5" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+          <Card className="border-[#232F3E]/15 bg-[#232F3E]/[0.03]">
+            <CardContent className="p-5">
+              <h3 className="font-black text-[#232F3E]/70 mb-3 flex items-center gap-2">
+                <XIcon className="w-5 h-5" />
+                Ce n'est PAS pour toi si...
+              </h3>
+              <ul className="space-y-2 text-sm">
+                {notForYou.map((item, i) => (
+                  <li key={i} className="flex gap-2">
+                    <XIcon className="w-4 h-4 text-[#232F3E]/50 flex-shrink-0 mt-0.5" />
+                    <span className="text-[#232F3E]/75">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
         </div>
 
         {/* HONNÊTETÉ PRIX */}
@@ -189,10 +345,15 @@ const CoachingVipPage = () => {
               </span>
             </div>
             <p className="text-xs text-[#232F3E]/60 mb-6">
-              Paiement unique • 30 jours d'accompagnement
+              Paiement unique • 30 jours d'accompagnement • Réponse sous 24h
             </p>
 
-            <a href={PAYPAL_LINK} target="_blank" rel="noopener noreferrer">
+            <a
+              href={PAYPAL_LINK}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => handlePaypalClick("main_cta")}
+            >
               <Button
                 size="lg"
                 className="w-full md:w-auto px-10 py-6 text-lg font-black bg-[#FF9E2D] hover:bg-[#FF8C00] text-[#232F3E] rounded-xl shadow-lg"
@@ -226,6 +387,25 @@ const CoachingVipPage = () => {
           ))}
         </div>
 
+        {/* FAQ */}
+        <h2 className="text-2xl font-black mb-4">Questions fréquentes</h2>
+        <Card className="border-[#008296]/15 bg-white mb-8">
+          <CardContent className="p-2 md:p-4">
+            <Accordion type="single" collapsible className="w-full">
+              {faqs.map((f, i) => (
+                <AccordionItem key={i} value={`faq-${i}`}>
+                  <AccordionTrigger className="text-left font-bold text-[#232F3E] hover:text-[#008296]">
+                    {f.q}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-[#232F3E]/75 text-sm leading-relaxed">
+                    {f.a}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </CardContent>
+        </Card>
+
         {/* CTA FINAL */}
         <Card className="border-[#008296]/30 bg-[#008296]/5 mb-8">
           <CardContent className="p-6 text-center">
@@ -236,7 +416,12 @@ const CoachingVipPage = () => {
               {SEATS} places. Une fois rempli, je ferme et je n'ouvre plus
               avant longtemps.
             </p>
-            <a href={PAYPAL_LINK} target="_blank" rel="noopener noreferrer">
+            <a
+              href={PAYPAL_LINK}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => handlePaypalClick("final_cta")}
+            >
               <Button
                 size="lg"
                 className="bg-[#008296] hover:bg-[#006d7e] text-white font-black rounded-xl px-8"
