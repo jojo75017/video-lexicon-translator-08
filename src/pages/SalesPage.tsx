@@ -38,6 +38,8 @@ import EbookieAssistant from "@/components/sales/EbookieAssistant";
 import KdpRoiCalculator from "@/components/sales/KdpRoiCalculator";
 import ResultatConcretBlock from "@/components/sales/ResultatConcretBlock";
 import Guide10NichesBlock from "@/components/sales/Guide10NichesBlock";
+import CountdownDeadline from "@/components/sales/CountdownDeadline";
+import GuaranteeBlock from "@/components/sales/GuaranteeBlock";
 
 const LAUNCH_PRICE = 67;
 const NORMAL_PRICE = 147;
@@ -188,6 +190,9 @@ const SalesPage = () => {
         })}</script>
       </Helmet>
 
+      {/* Compteur réel jusqu'au 18 mai 23h59 (pont de l'Ascension) */}
+      <CountdownDeadline />
+
       {/* Bandeau coaching VIP (10 places à 47€) */}
       <CoachingVipBanner />
 
@@ -309,6 +314,9 @@ const SalesPage = () => {
           <KdpRoiCalculator onCtaClick={handlePlanClick} />
         </div>
       </section>
+
+      {/* GARANTIE COMPACTE — juste avant le CTA principal pour lever les freins */}
+      <GuaranteeBlock />
 
       {/* OFFRE UNIQUE 67€ */}
       <OffreUnique67 onCtaClick={handlePlanClick} launchPrice={LAUNCH_PRICE} normalPrice={NORMAL_PRICE} />

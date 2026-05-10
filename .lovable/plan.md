@@ -1,96 +1,64 @@
-## Diagnostic honnête
+## Objectif
 
-Les analytics montrent que le problème principal n’est pas encore “les gens ne veulent pas acheter”, mais plutôt : **il n’y a pas assez de visiteurs qualifiés**.
+Augmenter le taux de clic sur `/offres` **sans aucun chiffre fictif** (conformité légale + règle projet "no fake data"). 3 leviers honnêtes, déployés uniquement sur la page `/offres`.
 
-- 339 visiteurs sur 30 jours
-- 183 vues de `/offres`
-- Trafic majoritairement direct
-- Très peu de trafic Google, YouTube, Facebook
-- Donc même avec une bonne page, le volume actuel ne suffit pas pour juger l’offre
+---
 
-KDP Rocket réussit surtout parce qu’ils ont : trafic régulier, preuve sociale massive, démonstration produit claire, autorité construite depuis longtemps.
+## 1. Nettoyer `UrgencyBanner.tsx` (suppression du faux)
 
-## Plan prioritaire à mettre en place
+Le composant actuel contient 2 messages fictifs interdits :
+- "3 personnes ont acheté dans la dernière heure" → **supprimé**
+- "Rejoignez +5000 auteurs satisfaits" → **supprimé**
 
-### 1. Créer un vrai tableau de bord conversion
-Ajouter une page/admin bloc simple pour suivre :
+Remplacés par 6 messages **vrais et vérifiables** :
+- "Pont Ascension : -30€ jusqu'au lundi 18 mai 23h59"
+- "Garantie 30 jours — remboursé sans question"
+- "Paiement unique 67€, pas d'abonnement"
+- "Accès immédiat après paiement"
+- "15 agents IA pour écrire ton ebook KDP"
+- "Le prix passe à 97€ mardi 19 mai"
 
-- visites `/offres`
-- clics bouton achat
-- clics PayPal
-- vues `/coaching-vip`
-- clics coaching
-- lecture vidéo coaching
+## 2. Countdown réel jusqu'au 18 mai 23h59
 
-Objectif : arrêter de deviner et savoir exactement où les gens décrochent.
+Nouveau composant `CountdownDeadline.tsx` placé **en haut de `/offres`** (sticky bandeau orange #FF9E2D) :
+- Affiche `Jours : Heures : Minutes : Secondes` jusqu'au **18/05/2026 23h59**
+- Texte : "Offre lancement -30€ se termine dans"
+- Décrémente en temps réel (setInterval 1s)
+- Quand expiré → masque le bandeau automatiquement (pas de fake reset)
+- Cliquable → scroll vers la section CTA
 
-### 2. Renforcer la preuve avant achat sur `/offres`
-Ajouter un bloc très visible avant le prix :
+## 3. Bandeau garantie 30 jours XL
 
-- “Ce que tu peux créer avec EbookStudio”
-- 3 exemples concrets : ebook, fiche pratique, couverture/audio
-- mini démonstration orientée résultat
-- rappel : 67€ à vie au lieu d’un abonnement
+Section visible **juste avant chaque CTA "Acheter maintenant"** sur `/offres` :
+- Icône bouclier vert + titre gros : "Garantie satisfait ou remboursé 30 jours"
+- Sous-titre : "Tu testes EbookStudio. Si tu n'es pas convaincu, tu écris 1 email, tu es remboursé. Aucune justification demandée."
+- Bordure verte 2px, fond crème, padding généreux
+- But : lever le frein "et si ça marche pas ?"
 
-Objectif : rendre l’achat plus évident en montrant le résultat final, pas seulement les fonctionnalités.
+---
 
-### 3. Ajouter un CTA faible friction
-Avant de demander 67€, proposer une action plus facile :
+## Fichiers touchés (uniquement `/offres`)
 
-- “Recevoir le guide gratuit”
-- ou “Voir une démo en 5 minutes”
-- ou “Tester le plan de ton premier ebook”
+```text
+src/components/sales/UrgencyBanner.tsx        ← messages remplacés
+src/components/sales/CountdownDeadline.tsx    ← NOUVEAU
+src/components/sales/GuaranteeBlock.tsx       ← NOUVEAU
+src/pages/SalesPage.tsx (ou page /offres)     ← intégration des 2 composants
+```
 
-Objectif : capter les visiteurs qui ne sont pas prêts à acheter tout de suite.
+Aucune autre page modifiée. Aucun changement backend, aucun changement de prix, aucune migration DB.
 
-### 4. Créer une offre d’entrée plus simple
-Le coaching à 47€ est bon, mais il peut être perçu comme personnel/engageant.
-Ajouter une option plus facile :
+---
 
-- “Audit express de ton idée d’ebook — 9€ ou 17€”
-- livraison rapide
-- mène ensuite vers coaching ou abonnement
+## Détails techniques
 
-Objectif : obtenir les premiers paiements, même petits, pour débloquer la confiance commerciale.
+- Countdown : date cible en const `const DEADLINE = new Date('2026-05-18T23:59:00+02:00')`. Si `Date.now() > DEADLINE` → composant retourne `null`.
+- Couleurs strictement via tokens existants (`bg-kdp-orange`, `text-foreground`, etc.) — respect charte Amazon KDP.
+- Pas de localStorage, pas de tracking ajouté.
+- Responsive mobile-first (le countdown passe en 2 lignes sous 640px).
 
-### 5. Plan contenu 7 jours orienté ventes
-Créer 7 posts/scripts courts basés sur des angles directs :
+## Hors scope (à voir plus tard si besoin)
 
-1. “Pourquoi ton ebook ne se vend pas”
-2. “3 erreurs Amazon KDP que je vois partout”
-3. “Avant/après : idée vague → ebook vendable”
-4. “Combien peut rapporter un ebook réaliste ?”
-5. “Je corrige une niche KDP en direct”
-6. “EbookStudio vs payer un freelance”
-7. “Challenge : sortir ton ebook en 30 jours”
-
-Chaque contenu renvoie vers une seule action : `/offres` ou `/coaching-vip`.
-
-## Ce que je recommande d’implémenter maintenant
-
-Priorité technique :
-
-1. Ajouter le tracking complet des clics et vues importantes.
-2. Ajouter un bloc “résultat concret” sur `/offres`.
-3. Ajouter un CTA gratuit ou faible friction sur `/offres`.
-4. Préparer les textes des 7 contenus de relance.
-
-## Ce que je ne recommande pas maintenant
-
-- Ajouter encore des concours
-- Multiplier les pages
-- Changer tout le prix tous les deux jours
-- Faire plus de vidéos sans mesurer les clics
-- Copier KDP Rocket visuellement sans copier leur moteur : trafic + preuve + démonstration
-
-## Résultat attendu
-
-Dans 7 jours, on doit savoir clairement :
-
-- combien de personnes voient l’offre
-- combien cliquent
-- combien arrivent au paiement
-- combien refusent avant paiement
-- quel contenu amène les meilleurs visiteurs
-
-Ensuite seulement, on ajuste prix, promesse ou tunnel.
+- Vidéo démo 60s (besoin que tu fournisses la vidéo)
+- PDF "ebook exemple gratuit" (besoin que tu fournisses le PDF)
+- FAQ objections (à faire dans un 2e passage si le countdown ne suffit pas)

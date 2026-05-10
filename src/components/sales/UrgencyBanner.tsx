@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Flame, TrendingUp, Users, ShieldCheck, Zap, Clock } from 'lucide-react';
+import { TrendingUp, ShieldCheck, Zap, Clock, CreditCard, Sparkles } from 'lucide-react';
 
+// Messages 100% factuels — aucun chiffre fictif (conformité DGCCRF + règle projet "no fake data")
 const messages = [
-  { icon: Flame, text: "3 personnes ont acheté dans la dernière heure", color: "text-kdp-orange" },
-  { icon: TrendingUp, text: "Le prix passera à 147€ le 15 septembre 2026", color: "text-kdp-orange" },
-  { icon: Users, text: "Rejoignez +5000 auteurs satisfaits", color: "text-primary" },
-  { icon: ShieldCheck, text: "Garantie 30 jours — 0 risque pour vous", color: "text-primary" },
-  { icon: Zap, text: "Votre 1er ebook publié ce soir sur Amazon", color: "text-primary" },
-  { icon: Clock, text: "Places Fondateur limitées — ne tardez pas", color: "text-destructive" },
+  { icon: Clock, text: "Pont de l'Ascension : −30€ jusqu'au lundi 18 mai 23h59", color: "text-kdp-orange" },
+  { icon: TrendingUp, text: "Le prix passe à 97€ le mardi 19 mai", color: "text-kdp-orange" },
+  { icon: ShieldCheck, text: "Garantie 30 jours — remboursé sans question", color: "text-primary" },
+  { icon: CreditCard, text: "Paiement unique 67€ — pas d'abonnement", color: "text-primary" },
+  { icon: Zap, text: "Accès immédiat après paiement", color: "text-primary" },
+  { icon: Sparkles, text: "15 agents IA pour écrire ton ebook KDP", color: "text-primary" },
 ];
 
 export const UrgencyBanner: React.FC = () => {
