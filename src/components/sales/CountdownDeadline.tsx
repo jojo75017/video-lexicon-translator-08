@@ -38,7 +38,7 @@ const CountdownDeadline = () => {
       type="button"
       onClick={scrollToCoaching}
       aria-label="Voir l'offre coaching VIP avant la fin du compteur"
-      className="w-full bg-kdp-orange text-white hover:brightness-105 transition-all border-b-2 border-black/10"
+      className="w-full bg-yellow-300 text-joy-ink hover:bg-yellow-400 transition-all border-b-2 border-joy-ink/15"
     >
       <div className="max-w-6xl mx-auto px-4 py-2.5 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-sm md:text-base font-bold">
         <span className="flex items-center gap-1.5">
@@ -63,7 +63,7 @@ const CountdownDeadline = () => {
 };
 
 const Box = ({ value, label }: { value: number | string; label: string }) => (
-  <span className="inline-flex items-baseline gap-0.5 bg-black/15 rounded-md px-1.5 py-0.5">
+  <span className="inline-flex items-baseline gap-0.5 bg-joy-ink/10 rounded-md px-1.5 py-0.5">
     <span>{value}</span>
     <span className="text-[10px] opacity-80">{label}</span>
   </span>
