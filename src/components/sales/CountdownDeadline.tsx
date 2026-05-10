@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Clock } from "lucide-react";
 
-// Vraie deadline du pont de l'Ascension : lundi 18 mai 2026 23h59 (heure Paris)
-const DEADLINE = new Date("2026-05-18T23:59:00+02:00").getTime();
+// Vraie deadline de l'offre lancement : lundi 15 juin 2026 23h59 (heure Paris)
+const DEADLINE = new Date("2026-06-15T23:59:00+02:00").getTime();
 
 const pad = (n: number) => n.toString().padStart(2, "0");
 
@@ -40,7 +40,7 @@ const CountdownDeadline = () => {
       <div className="max-w-6xl mx-auto px-4 py-2.5 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-sm md:text-base font-bold">
         <span className="flex items-center gap-1.5">
           <Clock className="w-4 h-4" />
-          Offre lancement −30€ se termine dans
+          Offre lancement −20€ (47€ au lieu de 67€) se termine dans
         </span>
         <span className="flex items-center gap-1.5 font-mono tracking-tight tabular-nums">
           <Box value={t.days} label="j" />

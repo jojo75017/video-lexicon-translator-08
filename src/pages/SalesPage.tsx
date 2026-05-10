@@ -190,7 +190,7 @@ const SalesPage = () => {
         })}</script>
       </Helmet>
 
-      {/* Compteur réel jusqu'au 18 mai 23h59 (pont de l'Ascension) */}
+      {/* Compteur réel jusqu'au 15 juin 23h59 (offre lancement −20€) */}
       <CountdownDeadline />
 
       {/* Bandeau coaching VIP (10 places à 47€) */}
