@@ -4,8 +4,8 @@ import { TrendingUp, ShieldCheck, Zap, Clock, CreditCard, Sparkles } from 'lucid
 
 // Messages 100% factuels — aucun chiffre fictif (conformité DGCCRF + règle projet "no fake data")
 const messages = [
-  { icon: Clock, text: "Offre lancement : −20€ (47€ au lieu de 67€) jusqu'au 15 juin", color: "text-kdp-orange" },
-  { icon: TrendingUp, text: "Le prix repasse à 67€ après le 15 juin", color: "text-kdp-orange" },
+  { icon: Clock, text: "Coaching VIP : 47€ au lieu de 197€ jusqu'au 15 juin", color: "text-kdp-orange" },
+  { icon: TrendingUp, text: "EbookStudio Pro : 67€ à vie, paiement unique", color: "text-kdp-orange" },
   { icon: ShieldCheck, text: "Garantie 30 jours — remboursé sans question", color: "text-primary" },
   { icon: CreditCard, text: "Paiement unique 67€ — pas d'abonnement", color: "text-primary" },
   { icon: Zap, text: "Accès immédiat après paiement", color: "text-primary" },

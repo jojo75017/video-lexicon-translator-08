@@ -26,21 +26,24 @@ const CountdownDeadline = () => {
 
   if (!t) return null;
 
-  const scrollToPricing = () => {
-    document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" });
+  const scrollToCoaching = () => {
+    const target =
+      document.getElementById("coaching-offer") ||
+      document.getElementById("pricing");
+    target?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   return (
     <button
       type="button"
-      onClick={scrollToPricing}
-      aria-label="Profiter de l'offre lancement avant la fin du compteur"
+      onClick={scrollToCoaching}
+      aria-label="Voir l'offre coaching VIP avant la fin du compteur"
       className="w-full bg-kdp-orange text-white hover:brightness-105 transition-all border-b-2 border-black/10"
     >
       <div className="max-w-6xl mx-auto px-4 py-2.5 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-sm md:text-base font-bold">
         <span className="flex items-center gap-1.5">
           <Clock className="w-4 h-4" />
-          Offre lancement −20€ (47€ au lieu de 67€) se termine dans
+          Coaching VIP 47€ (au lieu de 197€) se termine dans
         </span>
         <span className="flex items-center gap-1.5 font-mono tracking-tight tabular-nums">
           <Box value={t.days} label="j" />
