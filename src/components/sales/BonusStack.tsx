@@ -13,7 +13,7 @@ const items = [
   { icon: Image, title: 'Studio couvertures Imagen 3', desc: 'Couvertures photoréalistes illimitées', value: 197 },
   { icon: Headphones, title: 'Studio audiobooks Azure Neural', desc: 'Voix neuronales premium en 30+ langues', value: 147 },
   { icon: GraduationCap, title: 'Formation 18 modules KDP', desc: 'De zéro à 1k€/mois sur Amazon', value: 197 },
-  { icon: Bot, title: 'Copilote Ebookie 24/7', desc: 'Assistant IA intégré multilingue', value: 97 },
+  { icon: Bot, title: 'Copilote EbookStudio 24/7', desc: 'Assistant IA intégré multilingue', value: 97 },
   { icon: Users, title: 'Communauté privée', desc: 'Forum, lives, partage de niches', value: 97 },
   { icon: ShieldCheck, title: 'Garantie 30 jours', desc: 'Satisfait ou remboursé sans condition', value: 0, free: true },
 ];
