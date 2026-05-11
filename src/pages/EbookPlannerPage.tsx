@@ -2153,7 +2153,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                           </div>
                           
                           {/* Barre de progression */}
-                          {isGeneratingComplete && generationProgress.total > 0 && (
+                          {generationProgress.total > 0 && (
                             <div className="mt-4 space-y-2">
                               <div className="flex justify-between text-sm">
                                 <span className="text-foreground font-medium">{generationProgress.currentItem}</span>
