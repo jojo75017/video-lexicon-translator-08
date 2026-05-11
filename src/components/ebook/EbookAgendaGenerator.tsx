@@ -283,6 +283,14 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) de 8 à 12 pages repr
         </CardContent>
       </Card>
 
+      <EbookProjectsPanel
+        scope="agenda"
+        label="Agenda"
+        currentData={{ type, theme, year, audience, customPrompt, pages }}
+        isEmpty={pages.length === 0}
+        onLoad={loadProject}
+      />
+
       {pages.length > 0 && (
         <>
           <div className="flex justify-end gap-2">
