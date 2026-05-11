@@ -142,7 +142,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
     (!!subscriberEmail &&
       typeof subscriberData?.access_code === 'string' &&
       subscriberData.access_code.trim().length > 0 &&
-      (subscriberData?.status === 'active' ||
+      // Status may be missing in older cached payloads — only block when explicitly inactive
+      (subscriberData?.status == null ||
+        subscriberData?.status === 'active' ||
         subscriberData?.status === 'trialing' ||
         subscriberData?.plan_type === 'lifetime'));
 
