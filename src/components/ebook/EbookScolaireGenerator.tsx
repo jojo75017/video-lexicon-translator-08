@@ -99,6 +99,37 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) avec ${numberOfChapte
     toast.success('Chapitre copié');
   };
   const removeChapter = (id: string) => setChapters(prev => prev.filter(c => c.id !== id));
+
+  const generateChapterImage = async (chapter: ScolaireChapter) => {
+    setChapters(prev => prev.map(c => c.id === chapter.id ? { ...c, isGeneratingImage: true } : c));
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-educational-image', {
+        body: {
+          title: chapter.title,
+          context: chapter.imagePrompt || `${subject} ${level} - ${chapter.title}`,
+          folder: `scolaire/${level}`,
+        }
+      });
+      if (error) throw error;
+      const url = data?.imageUrl;
+      if (!url) throw new Error('Pas d\'image');
+      setChapters(prev => prev.map(c => c.id === chapter.id ? { ...c, imageUrl: url, isGeneratingImage: false } : c));
+      toast.success('Illustration générée');
+    } catch (e: any) {
+      console.error(e);
+      toast.error(e?.message || 'Erreur génération image');
+      setChapters(prev => prev.map(c => c.id === chapter.id ? { ...c, isGeneratingImage: false } : c));
+    }
+  };
+
+  const generateAllImages = async () => {
+    for (const c of chapters) {
+      if (!c.imageUrl) {
+        await generateChapterImage(c);
+      }
+    }
+  };
+
   const exportAll = () => {
     const md = chapters.map(formatChapter).join('\n');
     const blob = new Blob([md], { type: 'text/markdown' });
