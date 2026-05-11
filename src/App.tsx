@@ -270,6 +270,13 @@ const App = () => {
             <Route path="/eula" element={<Licence />} />
             <Route path="/licence-etendue" element={<LicenceEtenduePage />} />
             <Route path="/logout-total" element={<LogoutTotalPage />} />
+            <Route path="/promo" element={<PromoCapturePage />} />
+            <Route path="/promo/merci" element={<PromoMerciPage />} />
+            <Route path="/promo/decouverte" element={<PromoDecouvertePage />} />
+            <Route path="/promo/commande" element={<PromoCommandePage />} />
+            <Route path="/promo/bonus" element={<PromoBonusPage />} />
+            <Route path="/promo/espace" element={<PromoEspacePage />} />
+            <Route path="/promo/affilie" element={<PromoAffiliePage />} />
             <Route path="/blog" element={<BlogPage />} />
             <Route path="/blog/:slug" element={<BlogArticleTemplate />} />
             <Route path="/ecrire-livre-chatgpt" element={<SeoTutorialChatGptPage />} />
