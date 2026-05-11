@@ -79,6 +79,7 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) avec ${numberOfChapte
         lesson: c.lesson || '',
         exercises: c.exercises || '',
         corrections: c.corrections || '',
+        imagePrompt: c.imagePrompt || '',
       }));
       setChapters(prev => [...prev, ...generated]);
       toast.success(`${generated.length} chapitres générés !`);
