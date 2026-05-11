@@ -394,6 +394,10 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) avec ${numberOfChapte
                 </SelectContent>
               </Select>
             </div>
+            <Button variant="outline" onClick={generate} disabled={isGenerating} title="Régénère tous les chapitres avec les paramètres actuels">
+              {isGenerating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-2" />}
+              Régénérer le cahier
+            </Button>
             <Button variant="outline" onClick={generateAllImages}>
               <ImageIcon className="w-4 h-4 mr-2" />Générer toutes les illustrations
             </Button>
