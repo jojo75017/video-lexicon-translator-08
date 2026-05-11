@@ -64,14 +64,43 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) avec ${numberOfChapte
 - imagePrompt: description courte en anglais d'une illustration pédagogique (schéma, figure, scène) qui illustre le chapitre, sans texte dans l'image`;
 
       const { data, error } = await supabase.functions.invoke('generate-content', {
-        body: { prompt, type: 'scolaire', maxTokens: 6000 }
+        body: { prompt, type: 'scolaire', maxTokens: 16000 }
       });
       if (error) throw error;
 
-      let content = data.content || data;
+      let content: any = data.content || data;
       if (typeof content === 'string') {
-        content = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-        content = JSON.parse(content);
+        let raw = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        const start = raw.indexOf('[');
+        if (start > 0) raw = raw.slice(start);
+        try {
+          content = JSON.parse(raw);
+        } catch {
+          // Recover from truncated JSON: keep only complete objects
+          const objects: any[] = [];
+          let depth = 0, inStr = false, esc = false, objStart = -1;
+          for (let i = 0; i < raw.length; i++) {
+            const ch = raw[i];
+            if (inStr) {
+              if (esc) esc = false;
+              else if (ch === '\\') esc = true;
+              else if (ch === '"') inStr = false;
+              continue;
+            }
+            if (ch === '"') { inStr = true; continue; }
+            if (ch === '{') { if (depth === 0) objStart = i; depth++; }
+            else if (ch === '}') {
+              depth--;
+              if (depth === 0 && objStart >= 0) {
+                try { objects.push(JSON.parse(raw.slice(objStart, i + 1))); } catch {}
+                objStart = -1;
+              }
+            }
+          }
+          if (!objects.length) throw new Error('JSON invalide reçu de l\'IA');
+          content = objects;
+          toast.warning(`Réponse tronquée : ${objects.length}/${numberOfChapters} chapitres récupérés`);
+        }
       }
       const generated: ScolaireChapter[] = (content as any[]).map((c, i) => ({
         id: `sco-${Date.now()}-${i}`,
