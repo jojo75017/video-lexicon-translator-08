@@ -15,6 +15,12 @@ import { exportEbookToPdf } from '@/lib/ebookPdfExporter';
 import { getFriendlyError } from '@/lib/errorMessages';
 import { writeAutosave, readAutosave } from '@/lib/ebookProjectStorage';
 import { EbookProjectsPanel } from './EbookProjectsPanel';
+import { callGemini } from '@/services/geminiService';
+
+const getGeminiKey = (): string => {
+  if (typeof window === 'undefined') return '';
+  return (localStorage.getItem('openai_api_key') || '').trim();
+};
 
 interface ScolaireGeneratorProps {
   ebookTitle?: string;
