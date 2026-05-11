@@ -59,7 +59,8 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) avec ${numberOfChapte
 - objectives: 2-4 objectifs pédagogiques (puces "- ...")
 - lesson: cours clair et pédagogique (300-500 mots, exemples concrets adaptés au niveau ${level})
 - exercises: 5 à 8 exercices progressifs numérotés, du plus simple au plus difficile
-- corrections: corrigés détaillés des exercices avec méthode expliquée`;
+- corrections: corrigés détaillés des exercices avec méthode expliquée
+- imagePrompt: description courte en anglais d'une illustration pédagogique (schéma, figure, scène) qui illustre le chapitre, sans texte dans l'image`;
 
       const { data, error } = await supabase.functions.invoke('generate-content', {
         body: { prompt, type: 'scolaire', maxTokens: 6000 }
