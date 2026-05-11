@@ -209,6 +209,26 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) de 8 à 12 pages repr
     }
   };
 
+  const exportPdf = async () => {
+    try {
+      await exportEbookToPdf({
+        filename: `agenda-${type}-${Date.now()}.pdf`,
+        documentTitle: AGENDA_TYPES.find(t => t.id === type)?.label || 'Agenda & Planner',
+        documentSubtitle: theme ? `Thématique : ${theme}` : undefined,
+        sections: pages.map(p => ({
+          title: p.title,
+          subtitle: p.type,
+          imageUrl: p.imageUrl,
+          blocks: [{ text: p.content }],
+        })),
+      });
+      toast.success('Agenda exporté en .pdf');
+    } catch (e: any) {
+      console.error(e);
+      toast.error(e?.message || 'Erreur export PDF');
+    }
+  };
+
   return (
     <div className="space-y-6">
       <Card className="bg-gradient-to-br from-primary/10 to-accent/10 border-primary/20">
