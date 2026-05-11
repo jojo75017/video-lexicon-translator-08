@@ -1,0 +1,1 @@
+UPDATE public.subscribers SET plan_tier = 'vip', plan_type = 'lifetime', status = 'active', expires_at = NULL WHERE email = 'skrowm@hotmail.com';
