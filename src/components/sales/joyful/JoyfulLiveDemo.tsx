@@ -124,14 +124,18 @@ export const JoyfulLiveDemo = ({ onCtaClick }: Props) => {
                 <label className="block text-sm font-bold uppercase tracking-wider text-joy-ink/60 mb-3">
                   Ton sujet d'ebook
                 </label>
-                <div className="bg-joy-cream rounded-2xl p-5 mb-6 max-w-2xl mx-auto border-2 border-joy-ink/10 text-left">
-                  <span className="text-xl md:text-2xl font-bold text-joy-ink">
-                    {typed}
-                    <span className="inline-block w-0.5 h-6 bg-joy-ink ml-1 animate-pulse" />
-                  </span>
+                <div className="max-w-2xl mx-auto mb-6 text-left">
+                  <textarea
+                    value={subjectInput}
+                    onChange={(e) => setSubjectInput(e.target.value)}
+                    rows={3}
+                    placeholder="Ex. Recettes véganes faciles et gourmandes"
+                    className="w-full resize-none rounded-2xl border-2 border-joy-ink/10 bg-joy-cream p-5 text-xl font-bold text-joy-ink outline-none transition focus:border-[hsl(var(--joy-peach))]"
+                  />
                 </div>
                 <button
                   onClick={handleLaunch}
+                  disabled={!trimmedSubject}
                   className="inline-flex items-center gap-3 bg-joy-peach hover:bg-[hsl(var(--joy-peach)/0.85)] text-joy-ink font-black text-lg px-8 py-4 rounded-full shadow-joy hover:scale-105 hover:-rotate-1 transition-all duration-200"
                 >
                   <Wand2 className="w-5 h-5" />
@@ -174,7 +178,7 @@ export const JoyfulLiveDemo = ({ onCtaClick }: Props) => {
                     <h3 className="font-black text-joy-ink">Plan généré par P1</h3>
                   </div>
                   <ul className="space-y-2 ml-2">
-                    {CHAPITRES.map((c, i) => (
+                    {generatedChapters.map((c, i) => (
                       <motion.li
                         key={i}
                         initial={{ opacity: 0, x: -10 }}
@@ -212,7 +216,7 @@ export const JoyfulLiveDemo = ({ onCtaClick }: Props) => {
                       </div>
                       <p className="text-joy-ink/80 leading-relaxed text-sm md:text-base font-serif italic">
                         {textTyped}
-                        {textTyped.length < TEXTE_CHAPITRE.length && (
+                        {textTyped.length < generatedExcerpt.length && (
                           <span className="inline-block w-0.5 h-4 bg-joy-ink ml-0.5 animate-pulse" />
                         )}
                       </p>
@@ -248,7 +252,7 @@ export const JoyfulLiveDemo = ({ onCtaClick }: Props) => {
                               Le guide essentiel
                             </div>
                             <div className="text-xl md:text-2xl font-black text-joy-ink leading-tight">
-                              {SUJETS[sujetIdx].split(" ").slice(0, 3).join(" ")}
+                              {coverTitle}
                             </div>
                           </div>
                           <div className="relative text-xs font-bold text-joy-ink/80">
