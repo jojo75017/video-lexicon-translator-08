@@ -193,7 +193,7 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) avec ${numberOfChapte
         corrections: toDisplayText(c.corrections),
         imagePrompt: toDisplayText(c.imagePrompt),
       }));
-      setChapters(prev => [...prev, ...generated]);
+      setChapters(generated);
       toast.success(`${generated.length} chapitres générés !`);
     } catch (e) {
       console.error(e);
