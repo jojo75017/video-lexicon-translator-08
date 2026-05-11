@@ -106,8 +106,8 @@ const EbookScolaireGenerator: React.FC<ScolaireGeneratorProps> = ({ ebookTitle }
   // Auto-save on changes
   useEffect(() => {
     if (!hydrated.current) return;
-    writeAutosave('scolaire', { level, subject, format, themes, numberOfChapters, customPrompt, chapters });
-  }, [level, subject, format, themes, numberOfChapters, customPrompt, chapters]);
+    writeAutosave('scolaire', { level, subject, format, themes, numberOfChapters, customPrompt, imageStyle, chapters });
+  }, [level, subject, format, themes, numberOfChapters, customPrompt, imageStyle, chapters]);
 
   const loadProject = (data: any) => {
     if (!data) return;
