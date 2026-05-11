@@ -10,6 +10,7 @@ import { CalendarDays, Loader2, Sparkles, Download, Copy, Trash2, Target, Notebo
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { buildImageCacheKey, getCachedImage, setCachedImage } from '@/lib/educationalImageCache';
+import { exportEbookToDocx } from '@/lib/ebookDocxExporter';
 
 interface AgendaGeneratorProps {
   ebookTitle?: string;
@@ -156,16 +157,24 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) de 8 à 12 pages repr
       if (!p.imageUrl) await generatePageImage(p);
     }
   };
-  const exportAll = () => {
-    const md = pages.map(p => `# ${p.title}\n\n${p.content}\n\n---\n`).join('\n');
-    const blob = new Blob([md], { type: 'text/markdown' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `agenda-${type}-${Date.now()}.md`;
-    a.click();
-    URL.revokeObjectURL(url);
-    toast.success('Agenda exporté');
+  const exportAll = async () => {
+    try {
+      await exportEbookToDocx({
+        filename: `agenda-${type}-${Date.now()}.docx`,
+        documentTitle: AGENDA_TYPES.find(t => t.id === type)?.label || 'Agenda & Planner',
+        documentSubtitle: theme ? `Thématique : ${theme}` : undefined,
+        sections: pages.map(p => ({
+          title: p.title,
+          subtitle: p.type,
+          imageUrl: p.imageUrl,
+          blocks: [{ text: p.content }],
+        })),
+      });
+      toast.success('Agenda exporté en .docx');
+    } catch (e: any) {
+      console.error(e);
+      toast.error(e?.message || 'Erreur export DOCX');
+    }
   };
 
   return (

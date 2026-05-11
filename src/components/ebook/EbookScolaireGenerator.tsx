@@ -10,6 +10,7 @@ import { GraduationCap, Loader2, Sparkles, Download, Copy, Trash2, BookOpen, Ima
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { buildImageCacheKey, getCachedImage, setCachedImage } from '@/lib/educationalImageCache';
+import { exportEbookToDocx } from '@/lib/ebookDocxExporter';
 
 interface ScolaireGeneratorProps {
   ebookTitle?: string;
@@ -172,16 +173,28 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) avec ${numberOfChapte
     }
   };
 
-  const exportAll = () => {
-    const md = chapters.map(formatChapter).join('\n');
-    const blob = new Blob([md], { type: 'text/markdown' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `scolaire-${level}-${subject}-${Date.now()}.md`;
-    a.click();
-    URL.revokeObjectURL(url);
-    toast.success('Cahier exporté');
+  const exportAll = async () => {
+    try {
+      await exportEbookToDocx({
+        filename: `scolaire-${level}-${subject}-${Date.now()}.docx`,
+        documentTitle: `${subject} — ${level}`,
+        documentSubtitle: FORMATS.find(f => f.id === format)?.label,
+        sections: chapters.map(c => ({
+          title: c.title,
+          imageUrl: c.imageUrl,
+          blocks: [
+            { heading: 'Objectifs pédagogiques', text: c.objectives },
+            { heading: 'Cours', text: c.lesson },
+            { heading: 'Exercices', text: c.exercises },
+            { heading: 'Corrigés', text: c.corrections },
+          ],
+        })),
+      });
+      toast.success('Cahier exporté en .docx');
+    } catch (e: any) {
+      console.error(e);
+      toast.error(e?.message || 'Erreur export DOCX');
+    }
   };
 
   return (
