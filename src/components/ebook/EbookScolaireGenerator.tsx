@@ -12,6 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { buildImageCacheKey, getCachedImage, setCachedImage } from '@/lib/educationalImageCache';
 import { exportEbookToDocx } from '@/lib/ebookDocxExporter';
 import { exportEbookToPdf } from '@/lib/ebookPdfExporter';
+import { getFriendlyError } from '@/lib/errorMessages';
 import { writeAutosave, readAutosave } from '@/lib/ebookProjectStorage';
 import { EbookProjectsPanel } from './EbookProjectsPanel';
 
@@ -39,6 +40,40 @@ const FORMATS = [
   { id: 'exercices', label: 'Cahier d\'exercices', desc: 'Exercices progressifs avec corrigés' },
   { id: 'methodologie', label: 'Méthodologie / annales', desc: 'Méthodes + sujets corrigés' },
 ];
+
+const toDisplayText = (value: unknown): string => {
+  if (value == null) return '';
+  if (typeof value === 'string') return value;
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+
+  if (Array.isArray(value)) {
+    return value.map((entry) => toDisplayText(entry)).filter(Boolean).join('\n\n');
+  }
+
+  if (typeof value === 'object') {
+    const record = value as Record<string, unknown>;
+    const preferredKeys = ['title', 'type', 'heading', 'name', 'label', 'instructions', 'answers', 'content', 'text', 'description'];
+    const usedKeys = new Set<string>();
+
+    const orderedValues = preferredKeys
+      .filter((key) => key in record)
+      .map((key) => {
+        usedKeys.add(key);
+        return record[key];
+      });
+
+    const remainingValues = Object.entries(record)
+      .filter(([key]) => !usedKeys.has(key))
+      .map(([, entry]) => entry);
+
+    return [...orderedValues, ...remainingValues]
+      .map((entry) => toDisplayText(entry))
+      .filter(Boolean)
+      .join('\n');
+  }
+
+  return '';
+};
 
 const EbookScolaireGenerator: React.FC<ScolaireGeneratorProps> = ({ ebookTitle }) => {
   const [level, setLevel] = useState('CM2');
@@ -139,20 +174,30 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) avec ${numberOfChapte
           toast.warning(`Réponse tronquée : ${objects.length}/${numberOfChapters} chapitres récupérés`);
         }
       }
-      const generated: ScolaireChapter[] = (content as any[]).map((c, i) => ({
+      const chapterList = Array.isArray(content)
+        ? content
+        : Array.isArray((content as any)?.chapters)
+          ? (content as any).chapters
+          : [];
+
+      if (!chapterList.length) {
+        throw new Error('Aucun chapitre valide reçu depuis le service de génération');
+      }
+
+      const generated: ScolaireChapter[] = chapterList.map((c, i) => ({
         id: `sco-${Date.now()}-${i}`,
-        title: c.title || `Chapitre ${i + 1}`,
-        objectives: c.objectives || '',
-        lesson: c.lesson || '',
-        exercises: c.exercises || '',
-        corrections: c.corrections || '',
-        imagePrompt: c.imagePrompt || '',
+        title: toDisplayText(c.title) || `Chapitre ${i + 1}`,
+        objectives: toDisplayText(c.objectives),
+        lesson: toDisplayText(c.lesson),
+        exercises: toDisplayText(c.exercises),
+        corrections: toDisplayText(c.corrections),
+        imagePrompt: toDisplayText(c.imagePrompt),
       }));
       setChapters(prev => [...prev, ...generated]);
       toast.success(`${generated.length} chapitres générés !`);
     } catch (e) {
       console.error(e);
-      toast.error('Erreur lors de la génération du contenu scolaire');
+      toast.error(getFriendlyError(e, 'Erreur lors de la génération du contenu scolaire'));
     } finally {
       setIsGenerating(false);
     }
