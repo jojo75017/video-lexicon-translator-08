@@ -233,6 +233,30 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) avec ${numberOfChapte
     }
   };
 
+  const exportPdf = async () => {
+    try {
+      await exportEbookToPdf({
+        filename: `scolaire-${level}-${subject}-${Date.now()}.pdf`,
+        documentTitle: `${subject} — ${level}`,
+        documentSubtitle: FORMATS.find(f => f.id === format)?.label,
+        sections: chapters.map(c => ({
+          title: c.title,
+          imageUrl: c.imageUrl,
+          blocks: [
+            { heading: 'Objectifs pédagogiques', text: c.objectives },
+            { heading: 'Cours', text: c.lesson },
+            { heading: 'Exercices', text: c.exercises },
+            { heading: 'Corrigés', text: c.corrections },
+          ],
+        })),
+      });
+      toast.success('Cahier exporté en .pdf');
+    } catch (e: any) {
+      console.error(e);
+      toast.error(e?.message || 'Erreur export PDF');
+    }
+  };
+
   return (
     <div className="space-y-6">
       <Card className="bg-gradient-to-br from-primary/10 to-accent/10 border-primary/20">
