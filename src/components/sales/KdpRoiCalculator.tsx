@@ -126,7 +126,10 @@ export const KdpRoiCalculator: React.FC<KdpRoiCalculatorProps> = ({ onCtaClick }
           </div>
 
           <p className="text-xs text-center text-muted-foreground mt-3">
-            💡 Investissement : <strong>67€ une seule fois</strong> → ROI en {roiDays} jour{roiDays > 1 ? 's' : ''}
+            💡 Investissement : <strong>67€ / an</strong> → ROI en {roiDays} jour{roiDays > 1 ? 's' : ''}
+          </p>
+          <p className="text-[11px] text-center text-muted-foreground/80 mt-2 italic">
+            ⚠️ Estimation indicative. Les résultats réels dépendent de votre niche, de la qualité du contenu, du marketing et du référencement. KDP demande du travail régulier.
           </p>
         </div>
 
