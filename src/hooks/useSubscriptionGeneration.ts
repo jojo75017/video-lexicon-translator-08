@@ -58,50 +58,42 @@ export const useSubscriptionGeneration = (
       return null;
     }
 
-    if (!apiKey) {
-      toast.error('Clé API OpenAI requise');
+    const geminiKey = getGeminiKey(apiKey);
+    if (!geminiKey) {
+      toast.error('Clé API Gemini requise', {
+        description: 'Renseignez votre clé Gemini (commence par AIza) dans les paramètres.',
+      });
+      return null;
+    }
+    if (!geminiKey.startsWith('AIza')) {
+      toast.error('Clé API invalide', {
+        description: 'Cette application utilise Gemini. Votre clé doit commencer par "AIza".',
+      });
       return null;
     }
 
     setIsGenerating(true);
 
     try {
-      // Appel direct à l'API OpenAI sans vérification d'abonnement
-      console.log('Calling OpenAI directly with provided API key');
-      
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: [
-            { 
-              role: 'system', 
-              content: 'Vous êtes un expert en création de contenu pour ebooks. Répondez en français avec un contenu de haute qualité.' 
-            },
-            { role: 'user', content: prompt }
-          ],
-          max_tokens: 2000,
-          temperature: 0.7,
-        }),
+      console.log('[useSubscriptionGeneration] Calling Gemini for action:', actionType);
+      const content = await callGemini(geminiKey, prompt, {
+        systemPrompt: 'Vous êtes un expert en création de contenu pour ebooks. Répondez en français avec un contenu de haute qualité, bien structuré et engageant.',
+        temperature: 0.7,
+        maxTokens: 8192,
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('OpenAI error:', errorText);
-        toast.error('Erreur lors de la génération du contenu');
+      if (!content || content.trim().length === 0) {
+        toast.error('Erreur lors de la génération du contenu', {
+          description: 'Réponse vide de l\'IA. Vérifiez votre clé Gemini ou réessayez.',
+        });
         return null;
       }
 
-      const data = await response.json();
-      return data.choices[0].message.content;
-      
-    } catch (error) {
+      return content;
+    } catch (error: any) {
       console.error('Generation error:', error);
-      toast.error(error instanceof Error ? error.message : 'Erreur lors de la génération');
+      const msg = error?.message || 'Erreur lors de la génération';
+      toast.error('Erreur lors de la génération du contenu', { description: msg });
       return null;
     } finally {
       setIsGenerating(false);
