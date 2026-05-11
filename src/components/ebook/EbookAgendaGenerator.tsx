@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { CalendarDays, Loader2, Sparkles, Download, Copy, Trash2, Target, Notebook, ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { buildImageCacheKey, getCachedImage, setCachedImage } from '@/lib/educationalImageCache';
 
 interface AgendaGeneratorProps {
   ebookTitle?: string;
@@ -115,7 +116,18 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) de 8 à 12 pages repr
   };
   const removePage = (id: string) => setPages(prev => prev.filter(p => p.id !== id));
 
-  const generatePageImage = async (page: AgendaPage) => {
+  const generatePageImage = async (page: AgendaPage, force = false) => {
+    const cacheKey = buildImageCacheKey(['agenda', type, theme, page.title, page.type]);
+    if (!force) {
+      const cached = page.imageUrl || getCachedImage(cacheKey);
+      if (cached) {
+        if (!page.imageUrl) {
+          setPages(prev => prev.map(p => p.id === page.id ? { ...p, imageUrl: cached } : p));
+        }
+        toast.info('Illustration déjà générée (cache)');
+        return;
+      }
+    }
     setPages(prev => prev.map(p => p.id === page.id ? { ...p, isGeneratingImage: true } : p));
     try {
       const { data, error } = await supabase.functions.invoke('generate-educational-image', {
@@ -129,6 +141,7 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) de 8 à 12 pages repr
       if (error) throw error;
       const url = data?.imageUrl;
       if (!url) throw new Error('Pas d\'image');
+      setCachedImage(cacheKey, url);
       setPages(prev => prev.map(p => p.id === page.id ? { ...p, imageUrl: url, isGeneratingImage: false } : p));
       toast.success('Illustration générée');
     } catch (e: any) {
