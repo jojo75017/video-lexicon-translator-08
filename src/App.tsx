@@ -87,6 +87,15 @@ const RecuperationCodePage = lazy(() => import('./pages/RecuperationCodePage'));
 const ExtensionChromePage = lazy(() => import('./pages/ExtensionChromePage'));
 const EbookbotPage = lazy(() => import('./pages/EbookbotPage'));
 
+// Promo funnel pages
+const PromoCapturePage = lazy(() => import('./pages/promo/PromoCapturePage'));
+const PromoMerciPage = lazy(() => import('./pages/promo/PromoMerciPage'));
+const PromoDecouvertePage = lazy(() => import('./pages/promo/PromoDecouvertePage'));
+const PromoCommandePage = lazy(() => import('./pages/promo/PromoCommandePage'));
+const PromoBonusPage = lazy(() => import('./pages/promo/PromoBonusPage'));
+const PromoEspacePage = lazy(() => import('./pages/promo/PromoEspacePage'));
+const PromoAffiliePage = lazy(() => import('./pages/promo/PromoAffiliePage'));
+
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center bg-background">
     <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -261,6 +270,13 @@ const App = () => {
             <Route path="/eula" element={<Licence />} />
             <Route path="/licence-etendue" element={<LicenceEtenduePage />} />
             <Route path="/logout-total" element={<LogoutTotalPage />} />
+            <Route path="/promo" element={<PromoCapturePage />} />
+            <Route path="/promo/merci" element={<PromoMerciPage />} />
+            <Route path="/promo/decouverte" element={<PromoDecouvertePage />} />
+            <Route path="/promo/commande" element={<PromoCommandePage />} />
+            <Route path="/promo/bonus" element={<PromoBonusPage />} />
+            <Route path="/promo/espace" element={<PromoEspacePage />} />
+            <Route path="/promo/affilie" element={<PromoAffiliePage />} />
             <Route path="/blog" element={<BlogPage />} />
             <Route path="/blog/:slug" element={<BlogArticleTemplate />} />
             <Route path="/ecrire-livre-chatgpt" element={<SeoTutorialChatGptPage />} />
