@@ -1053,11 +1053,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
         id: (Date.now() + index).toString(),
         title: chapter.title,
         content: '',
-        subChapters: chapter.subChapters.map((sub: string, subIndex: number) => ({
-          id: (Date.now() + index * 100 + subIndex).toString(),
-          title: sub,
-          content: ''
-        }))
+        subChapters: []
       }));
       setChapters(generatedChapters);
       
