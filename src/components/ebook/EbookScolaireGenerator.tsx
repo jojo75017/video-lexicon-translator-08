@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { GraduationCap, Loader2, Sparkles, Download, Copy, Trash2, BookOpen, ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { buildImageCacheKey, getCachedImage, setCachedImage } from '@/lib/educationalImageCache';
 
 interface ScolaireGeneratorProps {
   ebookTitle?: string;
@@ -100,7 +101,18 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) avec ${numberOfChapte
   };
   const removeChapter = (id: string) => setChapters(prev => prev.filter(c => c.id !== id));
 
-  const generateChapterImage = async (chapter: ScolaireChapter) => {
+  const generateChapterImage = async (chapter: ScolaireChapter, force = false) => {
+    const cacheKey = buildImageCacheKey(['scolaire', level, subject, chapter.title, chapter.imagePrompt]);
+    if (!force) {
+      const cached = chapter.imageUrl || getCachedImage(cacheKey);
+      if (cached) {
+        if (!chapter.imageUrl) {
+          setChapters(prev => prev.map(c => c.id === chapter.id ? { ...c, imageUrl: cached } : c));
+        }
+        toast.info('Illustration déjà générée (cache)');
+        return;
+      }
+    }
     setChapters(prev => prev.map(c => c.id === chapter.id ? { ...c, isGeneratingImage: true } : c));
     try {
       const { data, error } = await supabase.functions.invoke('generate-educational-image', {
@@ -113,6 +125,7 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) avec ${numberOfChapte
       if (error) throw error;
       const url = data?.imageUrl;
       if (!url) throw new Error('Pas d\'image');
+      setCachedImage(cacheKey, url);
       setChapters(prev => prev.map(c => c.id === chapter.id ? { ...c, imageUrl: url, isGeneratingImage: false } : c));
       toast.success('Illustration générée');
     } catch (e: any) {
