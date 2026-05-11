@@ -5,7 +5,7 @@ import {
   ClipboardCheck, MessageSquare, Rocket,
   FolderOpen, CreditCard, Settings,
   Users, Bot, Play, Glasses,
-  Map, BookOpen, Film, Library, FileUp, LayoutTemplate,
+  Map, BookOpen, Film, Library, FileUp, LayoutTemplate, CalendarDays, GraduationCap,
   type LucideIcon
 } from 'lucide-react';
 
@@ -109,6 +109,8 @@ export const TRELLO_COLUMNS: TrelloColumn[] = [
       { id: 'encyclopedia', label: 'Encyclopédie', icon: BookOpen },
       { id: 'documentary', label: 'Documentaire', icon: Film },
       { id: 'series', label: 'Séries / Tomes', icon: Library },
+      { id: 'agenda', label: 'Agendas & Planners', icon: CalendarDays },
+      { id: 'scolaire', label: 'Scolaire & Parascolaire', icon: GraduationCap },
       { id: 'doc-transform', label: 'Transformer un document', icon: FileUp },
       { id: 'templates', label: 'Modèles', icon: LayoutTemplate },
     ],
