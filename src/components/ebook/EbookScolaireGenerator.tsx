@@ -84,6 +84,7 @@ const EbookScolaireGenerator: React.FC<ScolaireGeneratorProps> = ({ ebookTitle }
   const [chapters, setChapters] = useState<ScolaireChapter[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [customPrompt, setCustomPrompt] = useState('');
+  const [imageStyle, setImageStyle] = useState<'hatier-school' | 'flat-clean' | 'soft-planner'>('hatier-school');
   const hydrated = useRef(false);
 
   // Auto-load last session
