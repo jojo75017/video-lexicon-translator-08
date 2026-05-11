@@ -18,7 +18,7 @@ const schema = z.object({
   payment_method: z.enum(['paypal', 'virement']),
 });
 
-const PRODUCT = { key: 'main_yearly', label: 'EbookStudio — Abonnement annuel', amount: 67 };
+const PRODUCT = { key: 'main', label: 'EbookStudio — Abonnement annuel', amount: 67 };
 
 const PromoCommandePage = () => {
   useReferralTracking();
@@ -57,8 +57,9 @@ const PromoCommandePage = () => {
         },
       });
       if (error) throw error;
+      try { localStorage.setItem('ebs_lead_email', parsed.data.email); } catch {}
       toast.success('Commande enregistrée !');
-      navigate('/promo/bonus');
+      navigate(`/promo/paiement?email=${encodeURIComponent(parsed.data.email)}`);
     } catch (err) {
       console.error(err);
       toast.error('Erreur. Réessayez.');

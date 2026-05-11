@@ -92,6 +92,7 @@ const PromoCapturePage = lazy(() => import('./pages/promo/PromoCapturePage'));
 const PromoMerciPage = lazy(() => import('./pages/promo/PromoMerciPage'));
 const PromoDecouvertePage = lazy(() => import('./pages/promo/PromoDecouvertePage'));
 const PromoCommandePage = lazy(() => import('./pages/promo/PromoCommandePage'));
+const PromoPaiementPage = lazy(() => import('./pages/promo/PromoPaiementPage'));
 const PromoBonusPage = lazy(() => import('./pages/promo/PromoBonusPage'));
 const PromoEspacePage = lazy(() => import('./pages/promo/PromoEspacePage'));
 const PromoAffiliePage = lazy(() => import('./pages/promo/PromoAffiliePage'));
@@ -274,6 +275,7 @@ const App = () => {
             <Route path="/promo/merci" element={<PromoMerciPage />} />
             <Route path="/promo/decouverte" element={<PromoDecouvertePage />} />
             <Route path="/promo/commande" element={<PromoCommandePage />} />
+            <Route path="/promo/paiement" element={<PromoPaiementPage />} />
             <Route path="/promo/bonus" element={<PromoBonusPage />} />
             <Route path="/promo/espace" element={<PromoEspacePage />} />
             <Route path="/promo/affilie" element={<PromoAffiliePage />} />
