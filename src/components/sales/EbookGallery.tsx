@@ -128,9 +128,27 @@ const EBOOKS: EbookEntry[] = [
   },
 ];
 
+const CATEGORIES = [
+  'Tous',
+  'Business',
+  'Thriller',
+  'Développement perso',
+  'Cuisine',
+  'Romance',
+  'Jeunesse',
+  'Agendas & Planners',
+  'Scolaire & Parascolaire',
+];
+
 const EbookGallery: React.FC = () => {
   const [selected, setSelected] = useState<EbookEntry | null>(null);
+  const [activeCategory, setActiveCategory] = useState('Tous');
   const navigate = useNavigate();
+
+  const filteredBooks = useMemo(() => {
+    if (activeCategory === 'Tous') return EBOOKS;
+    return EBOOKS.filter((b) => b.category === activeCategory);
+  }, [activeCategory]);
 
   return (
     <section id="galerie" className="py-20 px-4 bg-background scroll-mt-32">
@@ -154,52 +172,84 @@ const EbookGallery: React.FC = () => {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6">
-          {EBOOKS.map((book, i) => (
-            <motion.button
-              key={book.title}
-              type="button"
-              onClick={() => setSelected(book)}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.06 }}
-              whileHover={{ y: -6 }}
-              className="group relative text-left"
-            >
-              <div className="relative aspect-[3/4] rounded-xl overflow-hidden shadow-xl shadow-foreground/10 ring-1 ring-border group-hover:ring-primary/40 group-hover:shadow-2xl group-hover:shadow-primary/20 transition-all">
-                <img
-                  src={book.cover}
-                  alt={`Couverture ebook ${book.title}`}
-                  loading="lazy"
-                  width={768}
-                  height={1024}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center p-3">
-                  <span className="text-white text-xs font-bold bg-primary/90 px-3 py-1 rounded-full">
-                    Voir la fiche →
-                  </span>
-                </div>
-                <Badge className="absolute top-2 left-2 bg-kdp-orange text-foreground border-0 text-[10px] font-bold">
-                  {book.bsr}
-                </Badge>
-              </div>
-              <div className="mt-3 px-1">
-                <p className="text-xs text-muted-foreground">{book.category}</p>
-                <p className="font-bold text-sm text-foreground line-clamp-1">{book.title}</p>
-                <p className="text-xs text-primary font-bold mt-0.5 flex items-center gap-1">
-                  <TrendingUp className="w-3 h-3" />
-                  {book.monthlyRevenue} / mois
-                </p>
-              </div>
-            </motion.button>
-          ))}
+        {/* Onglets de filtre */}
+        <div className="flex justify-center mb-10">
+          <Tabs value={activeCategory} onValueChange={setActiveCategory} className="w-full max-w-4xl">
+            <TabsList className="flex flex-wrap justify-center h-auto gap-1.5 bg-transparent p-0">
+              {CATEGORIES.map((cat) => (
+                <TabsTrigger
+                  key={cat}
+                  value={cat}
+                  className="rounded-full border border-border bg-muted/50 px-3.5 py-1.5 text-xs font-medium text-muted-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary transition-all"
+                >
+                  {cat === 'Tous' && <LayoutGrid className="w-3 h-3 mr-1" />}
+                  {cat}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
         </div>
+
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeCategory}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.25 }}
+            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6"
+          >
+            {filteredBooks.map((book, i) => (
+              <motion.button
+                key={book.title}
+                type="button"
+                onClick={() => setSelected(book)}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.06 }}
+                whileHover={{ y: -6 }}
+                className="group relative text-left"
+              >
+                <div className="relative aspect-[3/4] rounded-xl overflow-hidden shadow-xl shadow-foreground/10 ring-1 ring-border group-hover:ring-primary/40 group-hover:shadow-2xl group-hover:shadow-primary/20 transition-all">
+                  <img
+                    src={book.cover}
+                    alt={`Couverture ebook ${book.title}`}
+                    loading="lazy"
+                    width={768}
+                    height={1024}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center p-3">
+                    <span className="text-white text-xs font-bold bg-primary/90 px-3 py-1 rounded-full">
+                      Voir la fiche →
+                    </span>
+                  </div>
+                  <Badge className="absolute top-2 left-2 bg-kdp-orange text-foreground border-0 text-[10px] font-bold">
+                    {book.bsr}
+                  </Badge>
+                </div>
+                <div className="mt-3 px-1">
+                  <p className="text-xs text-muted-foreground">{book.category}</p>
+                  <p className="font-bold text-sm text-foreground line-clamp-1">{book.title}</p>
+                  <p className="text-xs text-primary font-bold mt-0.5 flex items-center gap-1">
+                    <TrendingUp className="w-3 h-3" />
+                    {book.monthlyRevenue} / mois
+                  </p>
+                </div>
+              </motion.button>
+            ))}
+          </motion.div>
+        </AnimatePresence>
 
         <div className="mt-12 text-center">
           <p className="text-muted-foreground mb-5 text-sm">
-            8 niches couvertes — la plateforme s'adapte à <span className="text-foreground font-semibold">tous les genres</span>
+            {activeCategory === 'Tous'
+              ? '8 niches couvertes — la plateforme s\'adapte à'
+              : `${filteredBooks.length} ebook${filteredBooks.length > 1 ? 's' : ''} dans la catégorie « ${activeCategory} » — explorez aussi les`}{' '}
+            <span className="text-foreground font-semibold">
+              {activeCategory === 'Tous' ? 'tous les genres' : 'autres univers'}
+            </span>
           </p>
           <Button
             size="lg"
