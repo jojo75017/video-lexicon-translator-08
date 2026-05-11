@@ -923,11 +923,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             id: makeId(),
             title: chapter.title,
             content: '',
-            subChapters: chapter.subChapters.map((sub: string) => ({
-              id: makeId(),
-              title: sub,
-              content: ''
-            }))
+            subChapters: []
           }));
           setChapters(generatedChapters);
           currentChapters = generatedChapters;
@@ -938,9 +934,11 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
         }
       }
 
-      // Calculer le total d'éléments à générer
-      const totalSubChapters = currentChapters.reduce((acc, ch) => acc + ch.subChapters.length, 0);
-      const totalItems = currentChapters.length + totalSubChapters + 4; // +4 pour synopsis, préface, conclusion et épilogue
+      // Calculer le total d'éléments à générer : ebook simple = chapitres uniquement, sans sous-chapitres
+      const currentChaptersWithoutSubChapters = currentChapters.map(ch => ({ ...ch, subChapters: [] }));
+      currentChapters = currentChaptersWithoutSubChapters;
+      setChapters(currentChaptersWithoutSubChapters);
+      const totalItems = currentChapters.length + 4; // +4 pour synopsis, préface, conclusion et épilogue
       let currentProgress = 0;
 
       // NOUVELLE ÉTAPE: Générer la synopsis pour assurer la cohérence
@@ -966,7 +964,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
         currentProgress++;
       }
 
-      // Étape 3: Générer le contenu de chaque chapitre et sous-chapitre (avec synopsis et contexte)
+      // Étape 3: Générer le contenu de chaque chapitre (sans sous-chapitres)
       let previousChapterSummary = '';
       
       for (let i = 0; i < currentChapters.length; i++) {
@@ -998,37 +996,6 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
         }
         currentProgress++;
 
-        // Générer le contenu de chaque sous-chapitre si vide (avec synopsis)
-        for (let j = 0; j < chapter.subChapters.length; j++) {
-          const subChapter = chapter.subChapters[j];
-          if (!subChapter.content) {
-            setGenerationProgress({ 
-              current: currentProgress, 
-              total: totalItems, 
-              currentItem: `📄 Sous-chapitre: ${subChapter.title}` 
-            });
-            const subContent = await generateSubChapterContent(
-              subChapter, 
-              Math.round(targetWordsPerChapter * 0.6),
-              synopsis || undefined,
-              chapter.title
-            );
-            if (subContent) {
-              setChapters(prev => prev.map(ch => {
-                if (ch.id === chapter.id) {
-                  return {
-                    ...ch,
-                    subChapters: ch.subChapters.map(sub => 
-                      sub.id === subChapter.id ? { ...sub, content: subContent } : sub
-                    )
-                  };
-                }
-                return ch;
-              }));
-            }
-          }
-          currentProgress++;
-        }
       }
 
       // Étape 4: Générer la conclusion si vide (avec synopsis)
@@ -1062,7 +1029,6 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       generationLockRef.current = false;
       frozenProjectTitleRef.current = null;
       setIsGeneratingComplete(false);
-      setGenerationProgress({ current: 0, total: 0, currentItem: '' });
     }
   };
 
