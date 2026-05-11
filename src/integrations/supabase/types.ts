@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      affiliate_clicks: {
+        Row: {
+          clicked_at: string
+          id: string
+          ip: string | null
+          landing_path: string | null
+          ref_code: string
+          referrer: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          clicked_at?: string
+          id?: string
+          ip?: string | null
+          landing_path?: string | null
+          ref_code: string
+          referrer?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          clicked_at?: string
+          id?: string
+          ip?: string | null
+          landing_path?: string | null
+          ref_code?: string
+          referrer?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       audiobooks: {
         Row: {
           audio_url: string | null
@@ -804,6 +834,105 @@ export type Database = {
           },
         ]
       }
+      funnel_leads: {
+        Row: {
+          created_at: string
+          email: string
+          first_name: string | null
+          id: string
+          ip: string | null
+          landing_url: string | null
+          lead_magnet_sent_at: string | null
+          ref_code: string | null
+          sequence_started: boolean
+          updated_at: string
+          user_agent: string | null
+          utm_campaign: string | null
+          utm_medium: string | null
+          utm_source: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          first_name?: string | null
+          id?: string
+          ip?: string | null
+          landing_url?: string | null
+          lead_magnet_sent_at?: string | null
+          ref_code?: string | null
+          sequence_started?: boolean
+          updated_at?: string
+          user_agent?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          first_name?: string | null
+          id?: string
+          ip?: string | null
+          landing_url?: string | null
+          lead_magnet_sent_at?: string | null
+          ref_code?: string | null
+          sequence_started?: boolean
+          updated_at?: string
+          user_agent?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Relationships: []
+      }
+      funnel_orders: {
+        Row: {
+          admin_notes: string | null
+          amount: number
+          created_at: string
+          currency: string
+          email: string
+          first_name: string | null
+          id: string
+          paid_at: string | null
+          payment_method: string
+          product_key: string
+          ref_code: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          amount: number
+          created_at?: string
+          currency?: string
+          email: string
+          first_name?: string | null
+          id?: string
+          paid_at?: string | null
+          payment_method: string
+          product_key: string
+          ref_code?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          amount?: number
+          created_at?: string
+          currency?: string
+          email?: string
+          first_name?: string | null
+          id?: string
+          paid_at?: string | null
+          payment_method?: string
+          product_key?: string
+          ref_code?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       payment_confirmations: {
         Row: {
           created_at: string
@@ -910,8 +1039,10 @@ export type Database = {
         Row: {
           commission_amount: number
           commission_paid: boolean
+          commission_rate: number
           converted_at: string | null
           created_at: string
+          funnel_order_id: string | null
           id: string
           paid_at: string | null
           referred_email: string
@@ -922,8 +1053,10 @@ export type Database = {
         Insert: {
           commission_amount?: number
           commission_paid?: boolean
+          commission_rate?: number
           converted_at?: string | null
           created_at?: string
+          funnel_order_id?: string | null
           id?: string
           paid_at?: string | null
           referred_email: string
@@ -934,8 +1067,10 @@ export type Database = {
         Update: {
           commission_amount?: number
           commission_paid?: boolean
+          commission_rate?: number
           converted_at?: string | null
           created_at?: string
+          funnel_order_id?: string | null
           id?: string
           paid_at?: string | null
           referred_email?: string
