@@ -18,8 +18,12 @@ export const KdpRoiCalculator: React.FC<KdpRoiCalculatorProps> = ({ onCtaClick }
   const royaltyPerSale = pricePerEbook * royaltyRate;
   const monthlyRevenuePerBook = royaltyPerSale * salesPerDay * 30;
   const totalEbooks = ebooksPerMonth * 12;
-  const yearlyRevenue = monthlyRevenuePerBook * totalEbooks * 6;
-  const monthlyPassiveIncome = yearlyRevenue / 12;
+  // Catalogue cumulatif : mois 1 → ebooksPerMonth livres, mois 12 → 12*ebooksPerMonth livres
+  // Somme des livres-mois sur 12 mois = ebooksPerMonth * (1+2+...+12) = ebooksPerMonth * 78
+  const yearlyRevenue = monthlyRevenuePerBook * ebooksPerMonth * 78;
+  // Revenu mensuel atteint au bout d'1 an (catalogue complet)
+  const monthlyPassiveIncome = monthlyRevenuePerBook * totalEbooks;
+  const roiDays = monthlyPassiveIncome > 0 ? Math.max(1, Math.ceil((67 / monthlyPassiveIncome) * 30)) : 0;
 
   const handleCtaClick = () => {
     if (onCtaClick) onCtaClick();
@@ -107,19 +111,19 @@ export const KdpRoiCalculator: React.FC<KdpRoiCalculatorProps> = ({ onCtaClick }
               <p className="text-3xl font-bold text-kdp-orange">
                 {monthlyPassiveIncome.toLocaleString('fr-FR', { maximumFractionDigits: 0 })}€
               </p>
-              <p className="text-xs text-muted-foreground mt-1">Revenus mensuels</p>
+              <p className="text-xs text-muted-foreground mt-1">Revenus mensuels (mois 12)</p>
             </div>
           </div>
 
           <div className="mt-4 p-4 bg-primary/10 rounded-lg text-center">
-            <p className="text-sm text-muted-foreground mb-1">Revenus annuels potentiels</p>
+            <p className="text-sm text-muted-foreground mb-1">Revenus cumulés sur 12 mois</p>
             <p className="text-4xl font-bold text-primary">
               {yearlyRevenue.toLocaleString('fr-FR', { maximumFractionDigits: 0 })}€
             </p>
           </div>
 
           <p className="text-xs text-center text-muted-foreground mt-3">
-            💡 Investissement : <strong>67€ une seule fois</strong> → ROI en {Math.ceil(67 / monthlyPassiveIncome * 30)} jours
+            💡 Investissement : <strong>67€ une seule fois</strong> → ROI en {roiDays} jour{roiDays > 1 ? 's' : ''}
           </p>
         </div>
 
