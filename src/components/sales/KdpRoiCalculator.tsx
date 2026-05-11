@@ -10,16 +10,19 @@ interface KdpRoiCalculatorProps {
 }
 
 export const KdpRoiCalculator: React.FC<KdpRoiCalculatorProps> = ({ onCtaClick }) => {
-  const [ebooksPerMonth, setEbooksPerMonth] = useState(2);
+  const [ebooksPerMonth, setEbooksPerMonth] = useState(1);
   const [pricePerEbook, setPricePerEbook] = useState(4.99);
-  const [salesPerDay, setSalesPerDay] = useState(3);
+  const [salesPerDay, setSalesPerDay] = useState(1);
+
+  // Facteur de réalisme : tous les ebooks ne performent pas. En moyenne ~40% du catalogue
+  // génère des ventes régulières (les autres sont en sommeil ou démarrent doucement).
+  const PERFORMANCE_FACTOR = 0.4;
 
   const royaltyRate = pricePerEbook >= 2.99 && pricePerEbook <= 9.99 ? 0.7 : 0.35;
   const royaltyPerSale = pricePerEbook * royaltyRate;
-  const monthlyRevenuePerBook = royaltyPerSale * salesPerDay * 30;
+  const monthlyRevenuePerBook = royaltyPerSale * salesPerDay * 30 * PERFORMANCE_FACTOR;
   const totalEbooks = ebooksPerMonth * 12;
-  // Catalogue cumulatif : mois 1 → ebooksPerMonth livres, mois 12 → 12*ebooksPerMonth livres
-  // Somme des livres-mois sur 12 mois = ebooksPerMonth * (1+2+...+12) = ebooksPerMonth * 78
+  // Catalogue cumulatif : somme des livres-mois sur 12 mois = ebooksPerMonth * 78
   const yearlyRevenue = monthlyRevenuePerBook * ebooksPerMonth * 78;
   // Revenu mensuel atteint au bout d'1 an (catalogue complet)
   const monthlyPassiveIncome = monthlyRevenuePerBook * totalEbooks;
@@ -92,7 +95,7 @@ export const KdpRoiCalculator: React.FC<KdpRoiCalculatorProps> = ({ onCtaClick }
               </Badge>
             </div>
             <Slider value={[salesPerDay]} onValueChange={(v) => setSalesPerDay(v[0])} min={1} max={20} step={1} />
-            <p className="text-xs text-muted-foreground">Moyenne conservatrice pour un ebook bien optimisé SEO</p>
+            <p className="text-xs text-muted-foreground">Estimation pondérée : ~40% du catalogue performe réellement (le reste démarre lentement)</p>
           </div>
         </div>
 
@@ -123,7 +126,10 @@ export const KdpRoiCalculator: React.FC<KdpRoiCalculatorProps> = ({ onCtaClick }
           </div>
 
           <p className="text-xs text-center text-muted-foreground mt-3">
-            💡 Investissement : <strong>67€ une seule fois</strong> → ROI en {roiDays} jour{roiDays > 1 ? 's' : ''}
+            💡 Investissement : <strong>67€ / an</strong> → ROI en {roiDays} jour{roiDays > 1 ? 's' : ''}
+          </p>
+          <p className="text-[11px] text-center text-muted-foreground/80 mt-2 italic">
+            ⚠️ Estimation indicative. Les résultats réels dépendent de votre niche, de la qualité du contenu, du marketing et du référencement. KDP demande du travail régulier.
           </p>
         </div>
 
