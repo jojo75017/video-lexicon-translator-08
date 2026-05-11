@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,11 +6,14 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { CalendarDays, Loader2, Sparkles, Download, Copy, Trash2, Target, Notebook, ImageIcon } from 'lucide-react';
+import { CalendarDays, Loader2, Sparkles, Download, Copy, Trash2, Target, Notebook, ImageIcon, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { buildImageCacheKey, getCachedImage, setCachedImage } from '@/lib/educationalImageCache';
 import { exportEbookToDocx } from '@/lib/ebookDocxExporter';
+import { exportEbookToPdf } from '@/lib/ebookPdfExporter';
+import { writeAutosave, readAutosave } from '@/lib/ebookProjectStorage';
+import { EbookProjectsPanel } from './EbookProjectsPanel';
 
 interface AgendaGeneratorProps {
   ebookTitle?: string;
@@ -68,6 +71,35 @@ const EbookAgendaGenerator: React.FC<AgendaGeneratorProps> = ({ ebookTitle }) =>
   const [pages, setPages] = useState<AgendaPage[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [customPrompt, setCustomPrompt] = useState('');
+  const hydrated = useRef(false);
+
+  useEffect(() => {
+    const saved = readAutosave<any>('agenda');
+    if (saved) {
+      if (saved.type) setType(saved.type);
+      if (saved.theme) setTheme(saved.theme);
+      if (saved.year) setYear(saved.year);
+      if (saved.audience) setAudience(saved.audience);
+      if (saved.customPrompt) setCustomPrompt(saved.customPrompt);
+      if (Array.isArray(saved.pages)) setPages(saved.pages);
+    }
+    hydrated.current = true;
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated.current) return;
+    writeAutosave('agenda', { type, theme, year, audience, customPrompt, pages });
+  }, [type, theme, year, audience, customPrompt, pages]);
+
+  const loadProject = (data: any) => {
+    if (!data) return;
+    setType(data.type || 'planner-2026');
+    setTheme(data.theme || '');
+    setYear(data.year || '2026');
+    setAudience(data.audience || 'adultes');
+    setCustomPrompt(data.customPrompt || '');
+    setPages(Array.isArray(data.pages) ? data.pages : []);
+  };
 
   const generate = async () => {
     setIsGenerating(true);
@@ -177,6 +209,26 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) de 8 à 12 pages repr
     }
   };
 
+  const exportPdf = async () => {
+    try {
+      await exportEbookToPdf({
+        filename: `agenda-${type}-${Date.now()}.pdf`,
+        documentTitle: AGENDA_TYPES.find(t => t.id === type)?.label || 'Agenda & Planner',
+        documentSubtitle: theme ? `Thématique : ${theme}` : undefined,
+        sections: pages.map(p => ({
+          title: p.title,
+          subtitle: p.type,
+          imageUrl: p.imageUrl,
+          blocks: [{ text: p.content }],
+        })),
+      });
+      toast.success('Agenda exporté en .pdf');
+    } catch (e: any) {
+      console.error(e);
+      toast.error(e?.message || 'Erreur export PDF');
+    }
+  };
+
   return (
     <div className="space-y-6">
       <Card className="bg-gradient-to-br from-primary/10 to-accent/10 border-primary/20">
@@ -231,11 +283,20 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) de 8 à 12 pages repr
         </CardContent>
       </Card>
 
+      <EbookProjectsPanel
+        scope="agenda"
+        label="Agenda"
+        currentData={{ type, theme, year, audience, customPrompt, pages }}
+        isEmpty={pages.length === 0}
+        onLoad={loadProject}
+      />
+
       {pages.length > 0 && (
         <>
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={generateAllImages}><ImageIcon className="w-4 h-4 mr-2" />Générer toutes les illustrations</Button>
-            <Button variant="outline" onClick={exportAll}><Download className="w-4 h-4 mr-2" />Exporter ({pages.length})</Button>
+            <Button variant="outline" onClick={exportAll}><Download className="w-4 h-4 mr-2" />DOCX ({pages.length})</Button>
+            <Button onClick={exportPdf}><FileText className="w-4 h-4 mr-2" />PDF ({pages.length})</Button>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {pages.map(p => <AgendaSection key={p.id} page={p} onCopy={copyPage} onRemove={removePage} onGenerateImage={generatePageImage} />)}

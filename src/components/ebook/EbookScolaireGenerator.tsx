@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,11 +6,14 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { GraduationCap, Loader2, Sparkles, Download, Copy, Trash2, BookOpen, ImageIcon } from 'lucide-react';
+import { GraduationCap, Loader2, Sparkles, Download, Copy, Trash2, BookOpen, ImageIcon, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { buildImageCacheKey, getCachedImage, setCachedImage } from '@/lib/educationalImageCache';
 import { exportEbookToDocx } from '@/lib/ebookDocxExporter';
+import { exportEbookToPdf } from '@/lib/ebookPdfExporter';
+import { writeAutosave, readAutosave } from '@/lib/ebookProjectStorage';
+import { EbookProjectsPanel } from './EbookProjectsPanel';
 
 interface ScolaireGeneratorProps {
   ebookTitle?: string;
@@ -46,6 +49,39 @@ const EbookScolaireGenerator: React.FC<ScolaireGeneratorProps> = ({ ebookTitle }
   const [chapters, setChapters] = useState<ScolaireChapter[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [customPrompt, setCustomPrompt] = useState('');
+  const hydrated = useRef(false);
+
+  // Auto-load last session
+  useEffect(() => {
+    const saved = readAutosave<any>('scolaire');
+    if (saved) {
+      if (saved.level) setLevel(saved.level);
+      if (saved.subject) setSubject(saved.subject);
+      if (saved.format) setFormat(saved.format);
+      if (saved.themes) setThemes(saved.themes);
+      if (saved.numberOfChapters) setNumberOfChapters(saved.numberOfChapters);
+      if (saved.customPrompt) setCustomPrompt(saved.customPrompt);
+      if (Array.isArray(saved.chapters)) setChapters(saved.chapters);
+    }
+    hydrated.current = true;
+  }, []);
+
+  // Auto-save on changes
+  useEffect(() => {
+    if (!hydrated.current) return;
+    writeAutosave('scolaire', { level, subject, format, themes, numberOfChapters, customPrompt, chapters });
+  }, [level, subject, format, themes, numberOfChapters, customPrompt, chapters]);
+
+  const loadProject = (data: any) => {
+    if (!data) return;
+    setLevel(data.level || 'CM2');
+    setSubject(data.subject || 'Mathématiques');
+    setFormat(data.format || 'cahier-revisions');
+    setThemes(data.themes || '');
+    setNumberOfChapters(data.numberOfChapters || 6);
+    setCustomPrompt(data.customPrompt || '');
+    setChapters(Array.isArray(data.chapters) ? data.chapters : []);
+  };
 
   const generate = async () => {
     setIsGenerating(true);
@@ -197,6 +233,30 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) avec ${numberOfChapte
     }
   };
 
+  const exportPdf = async () => {
+    try {
+      await exportEbookToPdf({
+        filename: `scolaire-${level}-${subject}-${Date.now()}.pdf`,
+        documentTitle: `${subject} — ${level}`,
+        documentSubtitle: FORMATS.find(f => f.id === format)?.label,
+        sections: chapters.map(c => ({
+          title: c.title,
+          imageUrl: c.imageUrl,
+          blocks: [
+            { heading: 'Objectifs pédagogiques', text: c.objectives },
+            { heading: 'Cours', text: c.lesson },
+            { heading: 'Exercices', text: c.exercises },
+            { heading: 'Corrigés', text: c.corrections },
+          ],
+        })),
+      });
+      toast.success('Cahier exporté en .pdf');
+    } catch (e: any) {
+      console.error(e);
+      toast.error(e?.message || 'Erreur export PDF');
+    }
+  };
+
   return (
     <div className="space-y-6">
       <Card className="bg-gradient-to-br from-primary/10 to-accent/10 border-primary/20">
@@ -262,13 +322,22 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) avec ${numberOfChapte
         </CardContent>
       </Card>
 
+      <EbookProjectsPanel
+        scope="scolaire"
+        label="Scolaire"
+        currentData={{ level, subject, format, themes, numberOfChapters, customPrompt, chapters }}
+        isEmpty={chapters.length === 0}
+        onLoad={loadProject}
+      />
+
       {chapters.length > 0 && (
         <>
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={generateAllImages}>
               <ImageIcon className="w-4 h-4 mr-2" />Générer toutes les illustrations
             </Button>
-            <Button variant="outline" onClick={exportAll}><Download className="w-4 h-4 mr-2" />Exporter ({chapters.length})</Button>
+            <Button variant="outline" onClick={exportAll}><Download className="w-4 h-4 mr-2" />DOCX ({chapters.length})</Button>
+            <Button onClick={exportPdf}><FileText className="w-4 h-4 mr-2" />PDF ({chapters.length})</Button>
           </div>
           <div className="space-y-4">
             {chapters.map(c => (
