@@ -3,57 +3,48 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Wand2, BookOpen, Palette, CheckCircle2, ArrowRight, Clock } from "lucide-react";
 
-const SUJETS = [
-  "Le jeûne intermittent pour débutants",
-  "Méditation pleine conscience au quotidien",
-  "Recettes véganes faciles et gourmandes",
+const buildChapters = (subject: string) => [
+  `Introduction : pourquoi ${subject} intéresse autant les lecteurs aujourd'hui`,
+  `Chapitre 1 : les bases essentielles de ${subject}`,
+  `Chapitre 2 : méthode simple pour passer à l'action`,
+  `Chapitre 3 : erreurs fréquentes et ajustements utiles`,
+  `Chapitre 4 : plan concret, outils et exemples autour de ${subject}`,
+  `Conclusion : feuille de route pour avancer sereinement`,
 ];
 
-const CHAPITRES = [
-  "Introduction : pourquoi ce livre va te transformer",
-  "Chapitre 1 : les bases scientifiques",
-  "Chapitre 2 : ta première semaine pas à pas",
-  "Chapitre 3 : les 7 erreurs à éviter",
-  "Chapitre 4 : recettes & menus prêts à l'emploi",
-  "Conclusion : ton plan d'action sur 30 jours",
-];
+const buildExcerpt = (subject: string) =>
+  `Dans ce guide dédié à ${subject}, le lecteur avance étape par étape avec une structure claire, des repères concrets et une progression simple à appliquer. L'objectif est de transformer une idée utile en contenu publiable, cohérent et immédiatement exploitable.`;
 
-const TEXTE_CHAPITRE =
-  "Imagine te réveiller chaque matin avec une énergie débordante, une clarté mentale absolue et une sensation de légèreté que tu n'avais plus connue depuis l'enfance. Ce n'est pas un rêve — c'est exactement ce que des milliers de personnes vivent aujourd'hui...";
+const buildCoverTitle = (subject: string) =>
+  subject
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 4)
+    .join(" ");
 
 interface Props {
   onCtaClick?: () => void;
 }
 
 export const JoyfulLiveDemo = ({ onCtaClick }: Props) => {
-  const [sujetIdx, setSujetIdx] = useState(0);
-  const [typed, setTyped] = useState("");
+  const [subjectInput, setSubjectInput] = useState("");
+  const [activeSubject, setActiveSubject] = useState("");
   const [launched, setLaunched] = useState(false);
   const [step, setStep] = useState(0); // 0=idle, 1=plan, 2=redaction, 3=cover
   const [chaptersDone, setChaptersDone] = useState(0);
   const [textTyped, setTextTyped] = useState("");
   const sectionRef = useRef<HTMLElement>(null);
-
-  // Effet machine à écrire pour le sujet
-  useEffect(() => {
-    if (launched) return;
-    const sujet = SUJETS[sujetIdx];
-    let i = 0;
-    setTyped("");
-    const typing = setInterval(() => {
-      i++;
-      setTyped(sujet.slice(0, i));
-      if (i >= sujet.length) {
-        clearInterval(typing);
-        setTimeout(() => setSujetIdx((s) => (s + 1) % SUJETS.length), 1800);
-      }
-    }, 55);
-    return () => clearInterval(typing);
-  }, [sujetIdx, launched]);
+  const trimmedSubject = subjectInput.trim();
+  const generatedChapters = activeSubject ? buildChapters(activeSubject) : [];
+  const generatedExcerpt = activeSubject ? buildExcerpt(activeSubject) : "";
+  const coverTitle = activeSubject ? buildCoverTitle(activeSubject) : "Ton ebook";
 
   // Animation séquentielle après lancement
   useEffect(() => {
-    if (!launched) return;
+    if (!launched || !activeSubject) return;
+    const currentChapters = buildChapters(activeSubject);
+    const currentExcerpt = buildExcerpt(activeSubject);
+
     setStep(1);
     setChaptersDone(0);
     setTextTyped("");
@@ -61,7 +52,7 @@ export const JoyfulLiveDemo = ({ onCtaClick }: Props) => {
     // Étape 1 : chapitres qui se cochent
     const chapInterval = setInterval(() => {
       setChaptersDone((c) => {
-        if (c + 1 >= CHAPITRES.length) clearInterval(chapInterval);
+        if (c + 1 >= currentChapters.length) clearInterval(chapInterval);
         return c + 1;
       });
     }, 350);
@@ -72,8 +63,8 @@ export const JoyfulLiveDemo = ({ onCtaClick }: Props) => {
       let i = 0;
       const writer = setInterval(() => {
         i += 3;
-        setTextTyped(TEXTE_CHAPITRE.slice(0, i));
-        if (i >= TEXTE_CHAPITRE.length) clearInterval(writer);
+        setTextTyped(currentExcerpt.slice(0, i));
+        if (i >= currentExcerpt.length) clearInterval(writer);
       }, 25);
     }, 2800);
 
@@ -85,9 +76,11 @@ export const JoyfulLiveDemo = ({ onCtaClick }: Props) => {
       clearTimeout(t2);
       clearTimeout(t3);
     };
-  }, [launched]);
+  }, [launched, activeSubject]);
 
   const handleLaunch = () => {
+    if (!trimmedSubject) return;
+    setActiveSubject(trimmedSubject);
     setLaunched(true);
   };
 
