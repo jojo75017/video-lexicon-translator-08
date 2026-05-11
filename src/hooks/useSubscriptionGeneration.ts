@@ -276,7 +276,7 @@ INSTRUCTIONS CRITIQUES:
 1. Le contenu DOIT être parfaitement adapté au public cible
 2. Les titres de chapitres doivent former une progression logique et narrative
 3. Chaque chapitre doit avoir un objectif clair et s'enchaîner naturellement avec le suivant
-4. Les sous-chapitres doivent détailler le contenu de manière cohérente
+4. Ne crée AUCUN sous-chapitre : l'ebook simple doit contenir uniquement des chapitres principaux
 5. ${bookDescription ? 'RESPECTE IMPÉRATIVEMENT la description fournie ci-dessus' : 'Crée une structure originale et engageante basée sur le titre'}
 
 Le plan doit contenir exactement ${numberOfChapters} chapitres principaux.
@@ -287,10 +287,7 @@ Format JSON attendu (réponds UNIQUEMENT avec le JSON, sans texte additionnel):
   "chapters": [
     {
       "title": "Titre du chapitre 1 (clair et engageant)",
-      "subChapters": [
-        "Sous-chapitre 1.1 (détaillé)",
-        "Sous-chapitre 1.2 (détaillé)"
-      ]
+      "subChapters": []
     }
   ],
   "conclusion": "Une conclusion percutante de 100-150 mots adaptée au genre et au public"
@@ -302,7 +299,13 @@ Format JSON attendu (réponds UNIQUEMENT avec le JSON, sans texte additionnel):
       try {
         // Nettoyer le contenu pour enlever les balises markdown
         const cleanContent = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-        const parsed = JSON.parse(cleanContent);
+        const parsed: { chapters?: Array<Record<string, unknown>> } & Record<string, unknown> = JSON.parse(cleanContent);
+        if (Array.isArray(parsed?.chapters)) {
+          parsed.chapters = parsed.chapters.map((chapter) => ({
+            ...chapter,
+            subChapters: [],
+          }));
+        }
         // Toast supprimé - génération silencieuse
         return parsed;
       } catch (error) {
@@ -324,10 +327,6 @@ Format JSON attendu (réponds UNIQUEMENT avec le JSON, sans texte additionnel):
   // Génère une synopsis détaillée pour assurer la cohérence de tout l'ebook
   const generateBookSynopsis = async (title: string, chapters: Chapter[], audience: string) => {
     const chapterTitles = chapters.map((c, i) => `${i + 1}. ${c.title}`).join('\n');
-    const subChaptersList = chapters.map((c, i) => 
-      c.subChapters.map((sub, j) => `  ${i + 1}.${j + 1} ${sub.title}`).join('\n')
-    ).join('\n');
-    
     const styleLine = writingStyle ? `Style d'écriture: ${writingStyle}` : '';
     const toneLine = tone ? `Ton: ${tone}` : '';
     const narrativeLine = narrativeFormat ? `Format de narration: ${narrativeFormat}` : '';
@@ -349,9 +348,6 @@ ${descriptionContext}
 
 Structure du livre:
 ${chapterTitles}
-
-Sous-chapitres:
-${subChaptersList}
 
 La synopsis DOIT définir PRÉCISÉMENT:
 1. Le THÈME CENTRAL et le message principal du livre
