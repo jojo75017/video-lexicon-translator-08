@@ -37,15 +37,21 @@ export const useReferralTracking = () => {
       setCookie(REF_COOKIE, refFromUrl, COOKIE_DAYS);
       try { localStorage.setItem(REF_KEY, refFromUrl); } catch { /* ignore */ }
 
-      // Log click (fire-and-forget, don't block UI)
-      supabase.functions.invoke('track-affiliate-click', {
-        body: {
-          ref_code: refFromUrl,
-          landing_path: location.pathname + location.search,
-          referrer: document.referrer || null,
-          user_agent: navigator.userAgent,
-        },
-      }).catch(() => { /* ignore */ });
+      // Log click once per session (fire-and-forget)
+      try {
+        const sessionKey = `ebs_ref_logged_${refFromUrl}`;
+        if (!sessionStorage.getItem(sessionKey)) {
+          sessionStorage.setItem(sessionKey, '1');
+          supabase.functions.invoke('track-affiliate-click', {
+            body: {
+              ref_code: refFromUrl,
+              landing_path: location.pathname + location.search,
+              referrer: document.referrer || null,
+              user_agent: navigator.userAgent,
+            },
+          }).catch(() => { /* ignore */ });
+        }
+      } catch { /* ignore */ }
     }
   }, [params, location.pathname, location.search]);
 };
