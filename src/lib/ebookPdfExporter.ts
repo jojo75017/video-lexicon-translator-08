@@ -49,23 +49,32 @@ export const exportEbookToPdf = async (opts: {
     }
   };
 
-  const writeText = (text: string, size: number, opts2: { bold?: boolean; color?: [number, number, number]; spacingAfter?: number; align?: 'left' | 'center' } = {}) => {
-    if (!text) return;
+  const toText = (v: any): string => {
+    if (v == null) return '';
+    if (typeof v === 'string') return v;
+    if (Array.isArray(v)) return v.map(toText).join('\n');
+    if (typeof v === 'object') return Object.values(v).map(toText).filter(Boolean).join('\n');
+    return String(v);
+  };
+
+  const writeText = (text: any, size: number, opts2: { bold?: boolean; color?: [number, number, number]; spacingAfter?: number; align?: 'left' | 'center' } = {}) => {
+    const str = toText(text);
+    if (!str) return;
     doc.setFont('helvetica', opts2.bold ? 'bold' : 'normal');
     doc.setFontSize(size);
     doc.setTextColor(...(opts2.color || [35, 47, 62]));
-    const lines = doc.splitTextToSize(text, contentW);
-    const lineH = size * 1.3;
+    const lines = doc.splitTextToSize(str, contentW);
+    const lineH = size * 1.35;
     for (const line of lines) {
       ensureSpace(lineH);
       if (opts2.align === 'center') {
-        doc.text(line, pageW / 2, y + size, { align: 'center' });
+        doc.text(line, pageW / 2, y + size * 0.9, { align: 'center' });
       } else {
-        doc.text(line, margin, y + size);
+        doc.text(line, margin, y + size * 0.9);
       }
       y += lineH;
     }
-    y += opts2.spacingAfter ?? 4;
+    y += opts2.spacingAfter ?? 6;
   };
 
   // Cover page
