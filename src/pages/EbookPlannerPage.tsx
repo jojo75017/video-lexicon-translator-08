@@ -137,16 +137,25 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   // Security: if the page is reached without a verified subscriber context,
   // we force demo mode so premium actions stay blocked.
   // EXCEPTION: Admins have full access without needing a subscriber code.
+  // Live subscriber data (refreshed from backend on mount to avoid stale localStorage)
+  const [liveSubscriberData, setLiveSubscriberData] = useState<any>(subscriberData);
+
+  useEffect(() => {
+    setLiveSubscriberData(subscriberData);
+  }, [subscriberData]);
+
+  const effectiveSubscriberData = liveSubscriberData || subscriberData;
+
   const hasValidSubscriber =
     isAdminProp ||
     (!!subscriberEmail &&
-      typeof subscriberData?.access_code === 'string' &&
-      subscriberData.access_code.trim().length > 0 &&
+      typeof effectiveSubscriberData?.access_code === 'string' &&
+      effectiveSubscriberData.access_code.trim().length > 0 &&
       // Status may be missing in older cached payloads — only block when explicitly inactive
-      (subscriberData?.status == null ||
-        subscriberData?.status === 'active' ||
-        subscriberData?.status === 'trialing' ||
-        subscriberData?.plan_type === 'lifetime'));
+      (effectiveSubscriberData?.status == null ||
+        effectiveSubscriberData?.status === 'active' ||
+        effectiveSubscriberData?.status === 'trialing' ||
+        effectiveSubscriberData?.plan_type === 'lifetime'));
 
   const [hasVerifiedAdminAccess, setHasVerifiedAdminAccess] = useState(isAdminProp);
 
@@ -178,6 +187,33 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       cancelled = true;
     };
   }, [isAdminProp]);
+
+  // Auto-sync subscription status on mount — avoids forcing logout/login
+  // when cached subscriber_data lacks fields (e.g. status) after a backend update.
+  useEffect(() => {
+    let cancelled = false;
+    const syncSubscription = async () => {
+      const email = (subscriberEmail || '').trim().toLowerCase();
+      const code = (subscriberData?.access_code || '').trim().toUpperCase();
+      if (!email || !code) return;
+      try {
+        const { data, error } = await supabase.functions.invoke('validate-subscription', {
+          body: { email, access_code: code },
+        });
+        if (cancelled) return;
+        if (!error && data?.valid && data?.subscriber) {
+          localStorage.setItem('subscriber_email', email);
+          localStorage.setItem('subscriber_data', JSON.stringify(data.subscriber));
+          setLiveSubscriberData(data.subscriber);
+          console.log('✅ Subscription auto-sync OK:', data.subscriber.plan_tier, data.subscriber.status);
+        }
+      } catch (e) {
+        console.warn('Subscription auto-sync failed (offline?):', e);
+      }
+    };
+    void syncSubscription();
+    return () => { cancelled = true; };
+  }, [subscriberEmail, subscriberData?.access_code]);
 
   const isDemo = isDemoProp || (!hasValidSubscriber && !hasVerifiedAdminAccess);
   const contentContainerRef = useRef<HTMLDivElement>(null);
