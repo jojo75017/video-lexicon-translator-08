@@ -7,7 +7,7 @@ import SeoHead from '@/components/funnel/SeoHead';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+
 import { useReferralTracking, getStoredRefCode } from '@/hooks/useReferralTracking';
 import { toast } from 'sonner';
 import { Loader2, Check, Lock, ShieldCheck } from 'lucide-react';
