@@ -29,9 +29,21 @@ const fetchImageBytes = async (url: string): Promise<{ data: Uint8Array; type: '
   }
 };
 
-const textToParagraphs = (text: string): Paragraph[] => {
-  if (!text) return [];
-  return text.split(/\n+/).map(
+const toText = (v: any): string => {
+  if (v == null) return '';
+  if (typeof v === 'string') return v;
+  if (Array.isArray(v)) return v.map(toText).join('\n');
+  if (typeof v === 'object') {
+    // Common shapes: { question, answer } or { title, content }
+    return Object.values(v).map(toText).filter(Boolean).join('\n');
+  }
+  return String(v);
+};
+
+const textToParagraphs = (text: any): Paragraph[] => {
+  const str = toText(text);
+  if (!str) return [];
+  return str.split(/\n+/).map(
     line =>
       new Paragraph({
         children: [new TextRun({ text: line.replace(/^[-•]\s*/, '• '), size: 22 })],
