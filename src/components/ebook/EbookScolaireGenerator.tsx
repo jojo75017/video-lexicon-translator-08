@@ -97,6 +97,7 @@ const EbookScolaireGenerator: React.FC<ScolaireGeneratorProps> = ({ ebookTitle }
       if (saved.themes) setThemes(saved.themes);
       if (saved.numberOfChapters) setNumberOfChapters(saved.numberOfChapters);
       if (saved.customPrompt) setCustomPrompt(saved.customPrompt);
+      if (saved.imageStyle) setImageStyle(saved.imageStyle);
       if (Array.isArray(saved.chapters)) setChapters(saved.chapters);
     }
     hydrated.current = true;
