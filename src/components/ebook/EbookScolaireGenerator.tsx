@@ -127,9 +127,20 @@ const EbookScolaireGenerator: React.FC<ScolaireGeneratorProps> = ({ ebookTitle }
   };
 
   const generate = async () => {
+    const geminiKey = getGeminiKey();
+    if (!geminiKey || !geminiKey.startsWith('AIza')) {
+      toast.error("Clé Gemini manquante ou invalide. Renseignez-la dans Paramètres > Clés API (commence par 'AIza').");
+      return;
+    }
     setIsGenerating(true);
     try {
       const fmt = FORMATS.find(f => f.id === format);
+      const sysPrompt = `Tu es un professeur certifié de l'Éducation Nationale française expert en pédagogie.
+RÈGLES CRITIQUES :
+- Réponds UNIQUEMENT avec un tableau JSON valide (commence par [ et termine par ]).
+- AUCUN texte avant ou après le JSON, AUCUN markdown, AUCUN backtick.
+- Échappe correctement les guillemets et sauts de ligne dans les chaînes JSON (\\n).
+- Chaque chapitre doit contenir un cours COMPLET (300-500 mots minimum), des exercices détaillés et leurs corrigés.`;
       const prompt = `Tu es professeur certifié de ${subject} pour le niveau ${level} (Éducation Nationale française).
 Crée un "${fmt?.label}" (${fmt?.desc}) en ${numberOfChapters} chapitres conformes au programme officiel.
 ${themes ? `Thèmes prioritaires: ${themes}.` : ''}
@@ -143,12 +154,14 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) avec ${numberOfChapte
 - corrections: corrigés détaillés des exercices avec méthode expliquée
 - imagePrompt: description courte en anglais d'une illustration pédagogique (schéma, figure, scène) qui illustre le chapitre, sans texte dans l'image`;
 
-      const { data, error } = await supabase.functions.invoke('generate-content', {
-        body: { prompt, type: 'scolaire', maxTokens: 16000 }
+      const text = await callGemini(geminiKey, prompt, {
+        systemPrompt: sysPrompt,
+        temperature: 0.6,
+        maxTokens: 16000,
+        jsonMode: true,
       });
-      if (error) throw error;
 
-      let content: any = data.content || data;
+      let content: any = text;
       if (typeof content === 'string') {
         let raw = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
         const start = raw.indexOf('[');
@@ -203,9 +216,9 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) avec ${numberOfChapte
       }));
       setChapters(generated);
       toast.success(`${generated.length} chapitres générés !`);
-    } catch (e) {
-      console.error(e);
-      toast.error(getFriendlyError(e, 'Erreur lors de la génération du contenu scolaire'));
+    } catch (e: any) {
+      console.error('[Scolaire] generation error:', e);
+      toast.error(e?.message || getFriendlyError(e, 'Erreur lors de la génération du contenu scolaire'));
     } finally {
       setIsGenerating(false);
     }
