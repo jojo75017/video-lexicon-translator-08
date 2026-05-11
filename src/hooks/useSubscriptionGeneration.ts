@@ -301,7 +301,7 @@ Format JSON attendu (réponds UNIQUEMENT avec le JSON, sans texte additionnel):
         const cleanContent = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
         const parsed = JSON.parse(cleanContent);
         if (Array.isArray(parsed?.chapters)) {
-          parsed.chapters = parsed.chapters.map((chapter: any) => ({
+          parsed.chapters = parsed.chapters.map((chapter) => ({
             ...chapter,
             subChapters: [],
           }));
