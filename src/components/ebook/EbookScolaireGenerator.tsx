@@ -328,7 +328,8 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) avec ${numberOfChapte
             <Button variant="outline" onClick={generateAllImages}>
               <ImageIcon className="w-4 h-4 mr-2" />Générer toutes les illustrations
             </Button>
-            <Button variant="outline" onClick={exportAll}><Download className="w-4 h-4 mr-2" />Exporter ({chapters.length})</Button>
+            <Button variant="outline" onClick={exportAll}><Download className="w-4 h-4 mr-2" />DOCX ({chapters.length})</Button>
+            <Button onClick={exportPdf}><FileText className="w-4 h-4 mr-2" />PDF ({chapters.length})</Button>
           </div>
           <div className="space-y-4">
             {chapters.map(c => (
