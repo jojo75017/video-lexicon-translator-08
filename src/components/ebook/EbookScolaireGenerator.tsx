@@ -329,6 +329,8 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) avec ${numberOfChapte
         isEmpty={chapters.length === 0}
         onLoad={loadProject}
       />
+
+      {chapters.length > 0 && (
         <>
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={generateAllImages}>
