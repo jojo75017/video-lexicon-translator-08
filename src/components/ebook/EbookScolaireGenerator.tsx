@@ -209,7 +209,10 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) avec ${numberOfChapte
 
       {chapters.length > 0 && (
         <>
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={generateAllImages}>
+              <ImageIcon className="w-4 h-4 mr-2" />Générer toutes les illustrations
+            </Button>
             <Button variant="outline" onClick={exportAll}><Download className="w-4 h-4 mr-2" />Exporter ({chapters.length})</Button>
           </div>
           <div className="space-y-4">
@@ -219,12 +222,18 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) avec ${numberOfChapte
                   <div className="flex items-start justify-between">
                     <CardTitle className="text-lg">{c.title}</CardTitle>
                     <div className="flex gap-1">
+                      <Button variant="ghost" size="icon" onClick={() => generateChapterImage(c)} disabled={c.isGeneratingImage} title="Générer illustration">
+                        {c.isGeneratingImage ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImageIcon className="w-4 h-4" />}
+                      </Button>
                       <Button variant="ghost" size="icon" onClick={() => copyChapter(c)}><Copy className="w-4 h-4" /></Button>
                       <Button variant="ghost" size="icon" onClick={() => removeChapter(c.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-3 text-sm">
+                  {c.imageUrl && (
+                    <img src={c.imageUrl} alt={c.title} className="w-full max-h-80 object-contain rounded-lg border bg-muted/30" />
+                  )}
                   <div><Badge variant="secondary">Objectifs</Badge><pre className="mt-1 whitespace-pre-wrap font-sans text-muted-foreground">{c.objectives}</pre></div>
                   <div><Badge variant="secondary">Cours</Badge><pre className="mt-1 whitespace-pre-wrap font-sans text-muted-foreground">{c.lesson}</pre></div>
                   <div><Badge variant="secondary">Exercices</Badge><pre className="mt-1 whitespace-pre-wrap font-sans text-muted-foreground">{c.exercises}</pre></div>
