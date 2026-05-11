@@ -382,7 +382,18 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) avec ${numberOfChapte
 
       {chapters.length > 0 && (
         <>
-          <div className="flex justify-end gap-2">
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <div className="flex items-center gap-2 mr-auto">
+              <Label className="text-sm whitespace-nowrap">Style des illustrations :</Label>
+              <Select value={imageStyle} onValueChange={(v: any) => setImageStyle(v)}>
+                <SelectTrigger className="w-[260px]"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="hatier-school">🎨 Style Hatier (mascotte + couleurs)</SelectItem>
+                  <SelectItem value="flat-clean">✏️ Épuré (flat vector blanc)</SelectItem>
+                  <SelectItem value="soft-planner">🖌️ Aquarelle douce</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             <Button variant="outline" onClick={generateAllImages}>
               <ImageIcon className="w-4 h-4 mr-2" />Générer toutes les illustrations
             </Button>
