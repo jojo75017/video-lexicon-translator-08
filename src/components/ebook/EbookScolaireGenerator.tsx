@@ -49,6 +49,39 @@ const EbookScolaireGenerator: React.FC<ScolaireGeneratorProps> = ({ ebookTitle }
   const [chapters, setChapters] = useState<ScolaireChapter[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [customPrompt, setCustomPrompt] = useState('');
+  const hydrated = useRef(false);
+
+  // Auto-load last session
+  useEffect(() => {
+    const saved = readAutosave<any>('scolaire');
+    if (saved) {
+      if (saved.level) setLevel(saved.level);
+      if (saved.subject) setSubject(saved.subject);
+      if (saved.format) setFormat(saved.format);
+      if (saved.themes) setThemes(saved.themes);
+      if (saved.numberOfChapters) setNumberOfChapters(saved.numberOfChapters);
+      if (saved.customPrompt) setCustomPrompt(saved.customPrompt);
+      if (Array.isArray(saved.chapters)) setChapters(saved.chapters);
+    }
+    hydrated.current = true;
+  }, []);
+
+  // Auto-save on changes
+  useEffect(() => {
+    if (!hydrated.current) return;
+    writeAutosave('scolaire', { level, subject, format, themes, numberOfChapters, customPrompt, chapters });
+  }, [level, subject, format, themes, numberOfChapters, customPrompt, chapters]);
+
+  const loadProject = (data: any) => {
+    if (!data) return;
+    setLevel(data.level || 'CM2');
+    setSubject(data.subject || 'Mathématiques');
+    setFormat(data.format || 'cahier-revisions');
+    setThemes(data.themes || '');
+    setNumberOfChapters(data.numberOfChapters || 6);
+    setCustomPrompt(data.customPrompt || '');
+    setChapters(Array.isArray(data.chapters) ? data.chapters : []);
+  };
 
   const generate = async () => {
     setIsGenerating(true);
