@@ -1,43 +1,46 @@
-## Renommer "Ebookie" → "EbookStudio" sur la page de vente
 
-Tu as raison, deux noms = confusion. On uniformise sous **EbookStudio**.
+## 🎨 Objectif
+Rendre les illustrations des **cahiers scolaires** beaucoup plus riches, dans l'esprit des manuels Hatier que vous avez envoyés (mascottes, bulles colorées, bannières, scènes pédagogiques vivantes) — au lieu du style "flat vector blanc" actuel qui est trop plat.
 
-### Où c'est affiché aujourd'hui
+## 🔍 Diagnostic
+- `supabase/functions/generate-educational-image` impose un style très minimaliste par défaut :
+  > *"Clean educational illustration, flat vector style, bright friendly colors, white background, simple shapes…"*
+- `EbookScolaireGenerator` n'envoie **aucun `style`** → il hérite de ce style fade.
+- Le `context` envoyé est juste `"matière niveau - titre du chapitre"` → trop pauvre pour produire une scène illustrée.
 
-Sur `/offres`, dans le bloc copilote (`EbookieAssistant.tsx`) :
-- Titre : "Rencontrez **Ebookie**"
-- Sous-titre : "Bloqué sur une niche ? ... **Ebookie** répond"
-- Bouton CTA : "Activer **Ebookie** — 67€ à vie"
-- Avatar du chat : "**Ebookie**"
-- Placeholder input : "Pose une question à **Ebookie**…"
-- Étape Jour 1 (`JoyfulJourney.tsx`) : "Avec l'aide d'**Ebookie**, tu trouves une niche…"
-- Bonus stack (`BonusStack.tsx`) : "Copilote **Ebookie** 24/7"
+## 🛠️ Plan d'action (3 changements ciblés)
 
-### Ce qu'on change
+### 1. Nouveau preset `style` "Cahier Hatier" dans l'edge function
+Ajouter une logique côté `generate-educational-image` qui accepte un champ `preset` :
+- `preset: 'hatier-school'` (défaut pour Scolaire) → prompt enrichi :
+  > *"Vibrant educational illustration in the style of a modern Hatier school workbook. Friendly cartoon mascot character (young teacher or student) demonstrating the concept, colorful speech bubbles, bright banners with arrows, playful didactic scene, energetic composition, hand-drawn cartoon style, rich saturated colors (orange, teal, yellow, purple), white background with colored accent shapes, dynamic and engaging, suitable for ages 10-17. No text, no letters, no numbers."*
+- `preset: 'soft-planner'` → garde le style aquarelle actuel pour Agenda.
+- Fallback : style minimaliste actuel.
 
-Remplacement texte uniquement, **aucune logique modifiée** :
-
-| Avant | Après |
-|---|---|
-| "Rencontrez Ebookie" | "Rencontrez votre copilote EbookStudio" |
-| "Ebookie répond" | "EbookStudio répond" |
-| "Activer Ebookie — 67€ à vie" | "Activer EbookStudio — 67€ à vie" |
-| Avatar chat "Ebookie" | "EbookStudio" |
-| "Pose une question à Ebookie…" | "Pose ta question…" |
-| "Avec l'aide d'Ebookie" | "Avec l'aide d'EbookStudio" |
-| "Copilote Ebookie 24/7" | "Copilote EbookStudio 24/7" |
-
-### Fichiers touchés
-
+### 2. Enrichir le `context` envoyé par `EbookScolaireGenerator`
+Au lieu de `subject + level + title`, construire :
 ```
-src/components/sales/EbookieAssistant.tsx   ← 5 occurrences textuelles
-src/components/sales/joyful/JoyfulJourney.tsx ← 1 occurrence
-src/components/sales/BonusStack.tsx          ← 1 occurrence
+"Pedagogical scene illustrating <title> in <subject> for <level> students. 
+Show a mascot character explaining the concept with visual metaphors 
+(diagrams, objects, arrows). Pillar: <pillar/methode/exos/quiz>."
 ```
+Cela donne à Gemini de la matière pour composer une vraie scène.
 
-Le **nom de fichier** `EbookieAssistant.tsx` et la **fonction** `EbookieAssistant` restent inchangés (purement technique, pas vu par l'utilisateur). Pas de risque de casser les imports.
+### 3. Ajouter un sélecteur de style dans l'UI Scolaire
+Petit dropdown au-dessus du bouton "Générer toutes les illustrations" :
+- 🎨 Style Hatier (mascotte + couleurs) — défaut
+- ✏️ Style épuré (flat vector blanc) — actuel
+- 🖌️ Style aquarelle douce
 
-### Hors scope (à ne pas toucher)
+Choix mémorisé dans le state du générateur, envoyé via `body.preset`.
 
-- `EbookbotPage.tsx` ("Rencontre EBOOKBOT") → c'est un autre produit, page différente
-- Toutes les occurrences "Rencontre" dans `bdTemplates.ts`, `ebookTemplates.ts` → c'est du contenu narratif d'ebooks, rien à voir
+## ✅ Garanties
+- Aucune régression : Agenda continue d'utiliser son style aquarelle (preset `soft-planner`).
+- Le bouton "regénérer" force un bypass du cache pour récupérer immédiatement les nouvelles images.
+- Pas de texte généré dans l'image (contrainte conservée pour la cohérence pédagogique).
+
+## 📎 Hors scope (à faire séparément si besoin)
+- Personnalisation du nom/visage de la mascotte par projet.
+- Génération d'images "encadrés" (À noter / Le récap') comme dans les pages Hatier.
+
+Souhaitez-vous que j'implémente ces 3 changements ?

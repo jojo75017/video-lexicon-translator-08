@@ -84,6 +84,7 @@ const EbookScolaireGenerator: React.FC<ScolaireGeneratorProps> = ({ ebookTitle }
   const [chapters, setChapters] = useState<ScolaireChapter[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [customPrompt, setCustomPrompt] = useState('');
+  const [imageStyle, setImageStyle] = useState<'hatier-school' | 'flat-clean' | 'soft-planner'>('hatier-school');
   const hydrated = useRef(false);
 
   // Auto-load last session
@@ -96,6 +97,7 @@ const EbookScolaireGenerator: React.FC<ScolaireGeneratorProps> = ({ ebookTitle }
       if (saved.themes) setThemes(saved.themes);
       if (saved.numberOfChapters) setNumberOfChapters(saved.numberOfChapters);
       if (saved.customPrompt) setCustomPrompt(saved.customPrompt);
+      if (saved.imageStyle) setImageStyle(saved.imageStyle);
       if (Array.isArray(saved.chapters)) setChapters(saved.chapters);
     }
     hydrated.current = true;
@@ -104,8 +106,8 @@ const EbookScolaireGenerator: React.FC<ScolaireGeneratorProps> = ({ ebookTitle }
   // Auto-save on changes
   useEffect(() => {
     if (!hydrated.current) return;
-    writeAutosave('scolaire', { level, subject, format, themes, numberOfChapters, customPrompt, chapters });
-  }, [level, subject, format, themes, numberOfChapters, customPrompt, chapters]);
+    writeAutosave('scolaire', { level, subject, format, themes, numberOfChapters, customPrompt, imageStyle, chapters });
+  }, [level, subject, format, themes, numberOfChapters, customPrompt, imageStyle, chapters]);
 
   const loadProject = (data: any) => {
     if (!data) return;
@@ -213,7 +215,7 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) avec ${numberOfChapte
   const removeChapter = (id: string) => setChapters(prev => prev.filter(c => c.id !== id));
 
   const generateChapterImage = async (chapter: ScolaireChapter, force = false) => {
-    const cacheKey = buildImageCacheKey(['scolaire', level, subject, chapter.title, chapter.imagePrompt]);
+    const cacheKey = buildImageCacheKey(['scolaire', level, subject, chapter.title, chapter.imagePrompt, imageStyle]);
     if (!force) {
       const cached = chapter.imageUrl || getCachedImage(cacheKey);
       if (cached) {
@@ -226,10 +228,13 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) avec ${numberOfChapte
     }
     setChapters(prev => prev.map(c => c.id === chapter.id ? { ...c, isGeneratingImage: true } : c));
     try {
+      const richContext = chapter.imagePrompt ||
+        `Pedagogical scene illustrating "${chapter.title}" in ${subject} for ${level} students. Show a friendly mascot character explaining the concept with visual metaphors (diagrams, objects, arrows, colorful banners). Objectives: ${(chapter.objectives || '').slice(0, 200)}.`;
       const { data, error } = await supabase.functions.invoke('generate-educational-image', {
         body: {
           title: chapter.title,
-          context: chapter.imagePrompt || `${subject} ${level} - ${chapter.title}`,
+          context: richContext,
+          preset: imageStyle,
           folder: `scolaire/${level}`,
         }
       });
@@ -377,7 +382,18 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) avec ${numberOfChapte
 
       {chapters.length > 0 && (
         <>
-          <div className="flex justify-end gap-2">
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <div className="flex items-center gap-2 mr-auto">
+              <Label className="text-sm whitespace-nowrap">Style des illustrations :</Label>
+              <Select value={imageStyle} onValueChange={(v: any) => setImageStyle(v)}>
+                <SelectTrigger className="w-[260px]"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="hatier-school">🎨 Style Hatier (mascotte + couleurs)</SelectItem>
+                  <SelectItem value="flat-clean">✏️ Épuré (flat vector blanc)</SelectItem>
+                  <SelectItem value="soft-planner">🖌️ Aquarelle douce</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             <Button variant="outline" onClick={generateAllImages}>
               <ImageIcon className="w-4 h-4 mr-2" />Générer toutes les illustrations
             </Button>
