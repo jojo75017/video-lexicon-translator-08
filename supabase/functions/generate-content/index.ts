@@ -660,6 +660,31 @@ Réponds UNIQUEMENT avec un tableau JSON de 7 strings, sans markdown ni backtick
       return jsonSuccess({ content: res.text });
     }
 
+    // ====== SCOLAIRE / AGENDA (strict JSON) ======
+    if (type === 'scolaire' || type === 'agenda') {
+      console.log(`Processing ${type} generation (Gemini)...`);
+      const sysPrompt = type === 'scolaire'
+        ? `Tu es un professeur certifié de l'Éducation Nationale française expert en pédagogie.
+RÈGLES CRITIQUES :
+- Réponds UNIQUEMENT avec un tableau JSON valide (commence par [ et termine par ]).
+- AUCUN texte avant ou après le JSON, AUCUN markdown, AUCUN backtick.
+- Échappe correctement les guillemets et sauts de ligne dans les chaînes JSON (\\n).
+- Chaque chapitre doit contenir un cours COMPLET (300-500 mots minimum), des exercices détaillés et leurs corrigés.`
+        : `Tu es un expert en création d'agendas et planners pédagogiques.
+RÈGLES CRITIQUES :
+- Réponds UNIQUEMENT avec un tableau JSON valide (commence par [ et termine par ]).
+- AUCUN texte avant ou après le JSON, AUCUN markdown, AUCUN backtick.
+- Échappe correctement les guillemets et sauts de ligne dans les chaînes JSON (\\n).`;
+      const res = await callGemini(
+        sysPrompt,
+        prompt,
+        { maxOutputTokens: maxTokens || 16000, temperature: temperature ?? 0.6, timeoutMs: 180000, userApiKey }
+      );
+      if (res.error) return geminiError(res);
+      console.log(`${type} content generated successfully`);
+      return jsonSuccess({ content: res.text });
+    }
+
     // ====== GENERIC FALLBACK HANDLER ======
     console.log('Calling Gemini API (generic handler)...');
     const res = await callGemini(
