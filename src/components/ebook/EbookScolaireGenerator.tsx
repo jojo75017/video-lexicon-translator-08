@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { GraduationCap, Loader2, Sparkles, Download, Copy, Trash2, BookOpen } from 'lucide-react';
+import { GraduationCap, Loader2, Sparkles, Download, Copy, Trash2, BookOpen, ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -21,6 +21,9 @@ interface ScolaireChapter {
   lesson: string;
   exercises: string;
   corrections: string;
+  imageUrl?: string;
+  imagePrompt?: string;
+  isGeneratingImage?: boolean;
 }
 
 const LEVELS = ['CP', 'CE1', 'CE2', 'CM1', 'CM2', '6e', '5e', '4e', '3e', 'Seconde', 'Première', 'Terminale'];
