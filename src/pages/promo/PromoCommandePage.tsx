@@ -119,16 +119,24 @@ const PromoCommandePage = () => {
 
           <div className="space-y-2">
             <Label>Mode de paiement</Label>
-            <RadioGroup value={method} onValueChange={(v) => setMethod(v as 'paypal' | 'virement')}>
-              <div className="flex items-center space-x-2 border border-gray-200 rounded-lg p-3 cursor-pointer hover:border-[#008296]">
-                <RadioGroupItem value="paypal" id="paypal" />
-                <Label htmlFor="paypal" className="cursor-pointer flex-1">PayPal — Validation immédiate</Label>
-              </div>
-              <div className="flex items-center space-x-2 border border-gray-200 rounded-lg p-3 cursor-pointer hover:border-[#008296]">
-                <RadioGroupItem value="virement" id="virement" />
-                <Label htmlFor="virement" className="cursor-pointer flex-1">Virement bancaire — Validation 24h</Label>
-              </div>
-            </RadioGroup>
+            <div className="space-y-2">
+              {[
+                { v: 'paypal', l: 'PayPal — Validation immédiate' },
+                { v: 'virement', l: 'Virement bancaire — Validation 24h' },
+              ].map((opt) => (
+                <button
+                  type="button"
+                  key={opt.v}
+                  onClick={() => setMethod(opt.v as 'paypal' | 'virement')}
+                  className={`w-full text-left border rounded-lg p-3 flex items-center gap-3 transition ${
+                    method === opt.v ? 'border-[#008296] bg-[#008296]/5' : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <span className={`w-4 h-4 rounded-full border-2 ${method === opt.v ? 'border-[#008296] bg-[#008296]' : 'border-gray-300'}`} />
+                  <span>{opt.l}</span>
+                </button>
+              ))}
+            </div>
           </div>
 
           <Button type="submit" disabled={loading} className="w-full bg-[#FF9E2D] hover:bg-[#e88f1f] text-white font-bold py-6 text-base">
