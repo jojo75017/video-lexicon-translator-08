@@ -2100,7 +2100,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                                 <div>
                                   <h3 className="text-lg font-bold text-foreground">Générer l'ebook complet</h3>
                                   <p className="text-sm text-muted-foreground">
-                                    Génère automatiquement le plan, tous les chapitres, sous-chapitres, préface et conclusion
+                                    Génère automatiquement le plan, les chapitres, la préface et la conclusion
                                   </p>
                                 </div>
                               </div>
