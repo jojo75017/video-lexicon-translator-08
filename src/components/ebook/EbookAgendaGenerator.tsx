@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { CalendarDays, Loader2, Sparkles, Download, Copy, Trash2, Target, Notebook } from 'lucide-react';
+import { CalendarDays, Loader2, Sparkles, Download, Copy, Trash2, Target, Notebook, ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -19,6 +19,8 @@ interface AgendaPage {
   title: string;
   type: string;
   content: string;
+  imageUrl?: string;
+  isGeneratingImage?: boolean;
 }
 
 const AGENDA_TYPES = [
@@ -30,7 +32,7 @@ const AGENDA_TYPES = [
   { id: 'wellness-planner', label: 'Wellness / Self-care', desc: 'Sommeil, gratitude, méditation' },
 ];
 
-const AgendaSection = ({ page, onCopy, onInsert, onRemove }: any) => (
+const AgendaSection = ({ page, onCopy, onRemove, onGenerateImage }: any) => (
   <Card className="border-2 hover:border-primary/40">
     <CardHeader className="pb-2">
       <div className="flex items-start justify-between">
@@ -39,12 +41,18 @@ const AgendaSection = ({ page, onCopy, onInsert, onRemove }: any) => (
           <Badge variant="secondary" className="mt-1">{page.type}</Badge>
         </div>
         <div className="flex gap-1">
+          <Button variant="ghost" size="icon" onClick={() => onGenerateImage(page)} disabled={page.isGeneratingImage} title="Générer illustration">
+            {page.isGeneratingImage ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImageIcon className="w-4 h-4" />}
+          </Button>
           <Button variant="ghost" size="icon" onClick={() => onCopy(page)}><Copy className="w-4 h-4" /></Button>
           <Button variant="ghost" size="icon" onClick={() => onRemove(page.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
         </div>
       </div>
     </CardHeader>
-    <CardContent>
+    <CardContent className="space-y-3">
+      {page.imageUrl && (
+        <img src={page.imageUrl} alt={page.title} className="w-full max-h-64 object-contain rounded-lg border bg-muted/30" />
+      )}
       <pre className="text-xs whitespace-pre-wrap text-muted-foreground font-sans">{page.content}</pre>
     </CardContent>
   </Card>
