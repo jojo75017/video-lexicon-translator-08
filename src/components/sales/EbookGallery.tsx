@@ -12,6 +12,8 @@ import coverSelfhelp from '@/assets/mockups/cover-selfhelp.jpg';
 import coverCooking from '@/assets/mockups/cover-cooking.jpg';
 import coverRomance from '@/assets/mockups/cover-romance.jpg';
 import coverKids from '@/assets/mockups/cover-kids.jpg';
+import coverAgenda from '@/assets/mockups/cover-agenda.jpg';
+import coverScolaire from '@/assets/mockups/cover-scolaire.jpg';
 
 interface EbookEntry {
   cover: string;
@@ -99,6 +101,30 @@ const EBOOKS: EbookEntry[] = [
     rating: 4.9,
     reviews: 73,
   },
+  {
+    cover: coverAgenda,
+    title: 'Mon Agenda 2026',
+    author: 'Émilie R.',
+    category: 'Agendas & Planners',
+    bsr: '#1 945',
+    monthlyRevenue: '1 820 €',
+    description: 'Agenda annuel 2026 : planning hebdomadaire, objectifs mensuels, suivi habitudes. 380 pages low-content ultra-rentables sur KDP.',
+    keywords: ['agenda 2026', 'planner annuel', 'organiseur', 'planificateur productivité', 'agenda hebdomadaire', 'bullet journal', 'low content book'],
+    rating: 4.8,
+    reviews: 312,
+  },
+  {
+    cover: coverScolaire,
+    title: 'Cahier de révisions CM2',
+    author: 'Nathalie B.',
+    category: 'Scolaire & Parascolaire',
+    bsr: '#3 670',
+    monthlyRevenue: '1 410 €',
+    description: 'Cahier de révisions Mathématiques CM2 — exercices progressifs, corrigés détaillés, préparation entrée en 6e. Conforme programme 2026.',
+    keywords: ['cahier de vacances CM2', 'révisions maths', 'parascolaire', 'entrée en 6e', 'exercices CM2', 'soutien scolaire', 'cahier exercices'],
+    rating: 4.7,
+    reviews: 198,
+  },
 ];
 
 const EbookGallery: React.FC = () => {
@@ -172,7 +198,7 @@ const EbookGallery: React.FC = () => {
 
         <div className="mt-12 text-center">
           <p className="text-muted-foreground mb-5 text-sm">
-            6 niches couvertes — la plateforme s'adapte à <span className="text-foreground font-semibold">tous les genres</span>
+            8 niches couvertes — la plateforme s'adapte à <span className="text-foreground font-semibold">tous les genres</span>
           </p>
           <Button
             size="lg"
