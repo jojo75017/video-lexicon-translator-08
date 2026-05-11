@@ -114,6 +114,35 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) de 8 à 12 pages repr
     toast.success('Page copiée');
   };
   const removePage = (id: string) => setPages(prev => prev.filter(p => p.id !== id));
+
+  const generatePageImage = async (page: AgendaPage) => {
+    setPages(prev => prev.map(p => p.id === page.id ? { ...p, isGeneratingImage: true } : p));
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-educational-image', {
+        body: {
+          title: page.title,
+          context: `Decorative illustration for a planner page about ${theme || type}. ${page.type}.`,
+          style: 'Soft pastel watercolor planner illustration, hand-drawn, minimalist, light and airy, white background, no text, clean composition for low-content KDP book.',
+          folder: `agenda/${type}`,
+        }
+      });
+      if (error) throw error;
+      const url = data?.imageUrl;
+      if (!url) throw new Error('Pas d\'image');
+      setPages(prev => prev.map(p => p.id === page.id ? { ...p, imageUrl: url, isGeneratingImage: false } : p));
+      toast.success('Illustration générée');
+    } catch (e: any) {
+      console.error(e);
+      toast.error(e?.message || 'Erreur génération image');
+      setPages(prev => prev.map(p => p.id === page.id ? { ...p, isGeneratingImage: false } : p));
+    }
+  };
+
+  const generateAllImages = async () => {
+    for (const p of pages) {
+      if (!p.imageUrl) await generatePageImage(p);
+    }
+  };
   const exportAll = () => {
     const md = pages.map(p => `# ${p.title}\n\n${p.content}\n\n---\n`).join('\n');
     const blob = new Blob([md], { type: 'text/markdown' });
@@ -186,7 +215,7 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) de 8 à 12 pages repr
             <Button variant="outline" onClick={exportAll}><Download className="w-4 h-4 mr-2" />Exporter ({pages.length})</Button>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {pages.map(p => <AgendaSection key={p.id} page={p} onCopy={copyPage} onRemove={removePage} />)}
+            {pages.map(p => <AgendaSection key={p.id} page={p} onCopy={copyPage} onRemove={removePage} onGenerateImage={generatePageImage} />)}
           </div>
         </>
       )}
