@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { GraduationCap, Loader2, Sparkles, Download, Copy, Trash2, BookOpen } from 'lucide-react';
+import { GraduationCap, Loader2, Sparkles, Download, Copy, Trash2, BookOpen, ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -21,6 +21,9 @@ interface ScolaireChapter {
   lesson: string;
   exercises: string;
   corrections: string;
+  imageUrl?: string;
+  imagePrompt?: string;
+  isGeneratingImage?: boolean;
 }
 
 const LEVELS = ['CP', 'CE1', 'CE2', 'CM1', 'CM2', '6e', '5e', '4e', '3e', 'Seconde', 'Première', 'Terminale'];
@@ -56,7 +59,8 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) avec ${numberOfChapte
 - objectives: 2-4 objectifs pédagogiques (puces "- ...")
 - lesson: cours clair et pédagogique (300-500 mots, exemples concrets adaptés au niveau ${level})
 - exercises: 5 à 8 exercices progressifs numérotés, du plus simple au plus difficile
-- corrections: corrigés détaillés des exercices avec méthode expliquée`;
+- corrections: corrigés détaillés des exercices avec méthode expliquée
+- imagePrompt: description courte en anglais d'une illustration pédagogique (schéma, figure, scène) qui illustre le chapitre, sans texte dans l'image`;
 
       const { data, error } = await supabase.functions.invoke('generate-content', {
         body: { prompt, type: 'scolaire', maxTokens: 6000 }
@@ -75,6 +79,7 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) avec ${numberOfChapte
         lesson: c.lesson || '',
         exercises: c.exercises || '',
         corrections: c.corrections || '',
+        imagePrompt: c.imagePrompt || '',
       }));
       setChapters(prev => [...prev, ...generated]);
       toast.success(`${generated.length} chapitres générés !`);
@@ -94,6 +99,37 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) avec ${numberOfChapte
     toast.success('Chapitre copié');
   };
   const removeChapter = (id: string) => setChapters(prev => prev.filter(c => c.id !== id));
+
+  const generateChapterImage = async (chapter: ScolaireChapter) => {
+    setChapters(prev => prev.map(c => c.id === chapter.id ? { ...c, isGeneratingImage: true } : c));
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-educational-image', {
+        body: {
+          title: chapter.title,
+          context: chapter.imagePrompt || `${subject} ${level} - ${chapter.title}`,
+          folder: `scolaire/${level}`,
+        }
+      });
+      if (error) throw error;
+      const url = data?.imageUrl;
+      if (!url) throw new Error('Pas d\'image');
+      setChapters(prev => prev.map(c => c.id === chapter.id ? { ...c, imageUrl: url, isGeneratingImage: false } : c));
+      toast.success('Illustration générée');
+    } catch (e: any) {
+      console.error(e);
+      toast.error(e?.message || 'Erreur génération image');
+      setChapters(prev => prev.map(c => c.id === chapter.id ? { ...c, isGeneratingImage: false } : c));
+    }
+  };
+
+  const generateAllImages = async () => {
+    for (const c of chapters) {
+      if (!c.imageUrl) {
+        await generateChapterImage(c);
+      }
+    }
+  };
+
   const exportAll = () => {
     const md = chapters.map(formatChapter).join('\n');
     const blob = new Blob([md], { type: 'text/markdown' });
@@ -173,7 +209,10 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) avec ${numberOfChapte
 
       {chapters.length > 0 && (
         <>
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={generateAllImages}>
+              <ImageIcon className="w-4 h-4 mr-2" />Générer toutes les illustrations
+            </Button>
             <Button variant="outline" onClick={exportAll}><Download className="w-4 h-4 mr-2" />Exporter ({chapters.length})</Button>
           </div>
           <div className="space-y-4">
@@ -183,12 +222,18 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) avec ${numberOfChapte
                   <div className="flex items-start justify-between">
                     <CardTitle className="text-lg">{c.title}</CardTitle>
                     <div className="flex gap-1">
+                      <Button variant="ghost" size="icon" onClick={() => generateChapterImage(c)} disabled={c.isGeneratingImage} title="Générer illustration">
+                        {c.isGeneratingImage ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImageIcon className="w-4 h-4" />}
+                      </Button>
                       <Button variant="ghost" size="icon" onClick={() => copyChapter(c)}><Copy className="w-4 h-4" /></Button>
                       <Button variant="ghost" size="icon" onClick={() => removeChapter(c.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-3 text-sm">
+                  {c.imageUrl && (
+                    <img src={c.imageUrl} alt={c.title} className="w-full max-h-80 object-contain rounded-lg border bg-muted/30" />
+                  )}
                   <div><Badge variant="secondary">Objectifs</Badge><pre className="mt-1 whitespace-pre-wrap font-sans text-muted-foreground">{c.objectives}</pre></div>
                   <div><Badge variant="secondary">Cours</Badge><pre className="mt-1 whitespace-pre-wrap font-sans text-muted-foreground">{c.lesson}</pre></div>
                   <div><Badge variant="secondary">Exercices</Badge><pre className="mt-1 whitespace-pre-wrap font-sans text-muted-foreground">{c.exercises}</pre></div>

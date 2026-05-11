@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { CalendarDays, Loader2, Sparkles, Download, Copy, Trash2, Target, Notebook } from 'lucide-react';
+import { CalendarDays, Loader2, Sparkles, Download, Copy, Trash2, Target, Notebook, ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -19,6 +19,8 @@ interface AgendaPage {
   title: string;
   type: string;
   content: string;
+  imageUrl?: string;
+  isGeneratingImage?: boolean;
 }
 
 const AGENDA_TYPES = [
@@ -30,7 +32,7 @@ const AGENDA_TYPES = [
   { id: 'wellness-planner', label: 'Wellness / Self-care', desc: 'Sommeil, gratitude, méditation' },
 ];
 
-const AgendaSection = ({ page, onCopy, onInsert, onRemove }: any) => (
+const AgendaSection = ({ page, onCopy, onRemove, onGenerateImage }: any) => (
   <Card className="border-2 hover:border-primary/40">
     <CardHeader className="pb-2">
       <div className="flex items-start justify-between">
@@ -39,12 +41,18 @@ const AgendaSection = ({ page, onCopy, onInsert, onRemove }: any) => (
           <Badge variant="secondary" className="mt-1">{page.type}</Badge>
         </div>
         <div className="flex gap-1">
+          <Button variant="ghost" size="icon" onClick={() => onGenerateImage(page)} disabled={page.isGeneratingImage} title="Générer illustration">
+            {page.isGeneratingImage ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImageIcon className="w-4 h-4" />}
+          </Button>
           <Button variant="ghost" size="icon" onClick={() => onCopy(page)}><Copy className="w-4 h-4" /></Button>
           <Button variant="ghost" size="icon" onClick={() => onRemove(page.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
         </div>
       </div>
     </CardHeader>
-    <CardContent>
+    <CardContent className="space-y-3">
+      {page.imageUrl && (
+        <img src={page.imageUrl} alt={page.title} className="w-full max-h-64 object-contain rounded-lg border bg-muted/30" />
+      )}
       <pre className="text-xs whitespace-pre-wrap text-muted-foreground font-sans">{page.content}</pre>
     </CardContent>
   </Card>
@@ -106,6 +114,35 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) de 8 à 12 pages repr
     toast.success('Page copiée');
   };
   const removePage = (id: string) => setPages(prev => prev.filter(p => p.id !== id));
+
+  const generatePageImage = async (page: AgendaPage) => {
+    setPages(prev => prev.map(p => p.id === page.id ? { ...p, isGeneratingImage: true } : p));
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-educational-image', {
+        body: {
+          title: page.title,
+          context: `Decorative illustration for a planner page about ${theme || type}. ${page.type}.`,
+          style: 'Soft pastel watercolor planner illustration, hand-drawn, minimalist, light and airy, white background, no text, clean composition for low-content KDP book.',
+          folder: `agenda/${type}`,
+        }
+      });
+      if (error) throw error;
+      const url = data?.imageUrl;
+      if (!url) throw new Error('Pas d\'image');
+      setPages(prev => prev.map(p => p.id === page.id ? { ...p, imageUrl: url, isGeneratingImage: false } : p));
+      toast.success('Illustration générée');
+    } catch (e: any) {
+      console.error(e);
+      toast.error(e?.message || 'Erreur génération image');
+      setPages(prev => prev.map(p => p.id === page.id ? { ...p, isGeneratingImage: false } : p));
+    }
+  };
+
+  const generateAllImages = async () => {
+    for (const p of pages) {
+      if (!p.imageUrl) await generatePageImage(p);
+    }
+  };
   const exportAll = () => {
     const md = pages.map(p => `# ${p.title}\n\n${p.content}\n\n---\n`).join('\n');
     const blob = new Blob([md], { type: 'text/markdown' });
@@ -174,11 +211,12 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) de 8 à 12 pages repr
 
       {pages.length > 0 && (
         <>
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={generateAllImages}><ImageIcon className="w-4 h-4 mr-2" />Générer toutes les illustrations</Button>
             <Button variant="outline" onClick={exportAll}><Download className="w-4 h-4 mr-2" />Exporter ({pages.length})</Button>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {pages.map(p => <AgendaSection key={p.id} page={p} onCopy={copyPage} onRemove={removePage} />)}
+            {pages.map(p => <AgendaSection key={p.id} page={p} onCopy={copyPage} onRemove={removePage} onGenerateImage={generatePageImage} />)}
           </div>
         </>
       )}
