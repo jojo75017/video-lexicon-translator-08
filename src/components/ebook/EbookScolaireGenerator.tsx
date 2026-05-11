@@ -215,7 +215,7 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) avec ${numberOfChapte
   const removeChapter = (id: string) => setChapters(prev => prev.filter(c => c.id !== id));
 
   const generateChapterImage = async (chapter: ScolaireChapter, force = false) => {
-    const cacheKey = buildImageCacheKey(['scolaire', level, subject, chapter.title, chapter.imagePrompt]);
+    const cacheKey = buildImageCacheKey(['scolaire', level, subject, chapter.title, chapter.imagePrompt, imageStyle]);
     if (!force) {
       const cached = chapter.imageUrl || getCachedImage(cacheKey);
       if (cached) {
@@ -228,10 +228,13 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) avec ${numberOfChapte
     }
     setChapters(prev => prev.map(c => c.id === chapter.id ? { ...c, isGeneratingImage: true } : c));
     try {
+      const richContext = chapter.imagePrompt ||
+        `Pedagogical scene illustrating "${chapter.title}" in ${subject} for ${level} students. Show a friendly mascot character explaining the concept with visual metaphors (diagrams, objects, arrows, colorful banners). Objectives: ${(chapter.objectives || '').slice(0, 200)}.`;
       const { data, error } = await supabase.functions.invoke('generate-educational-image', {
         body: {
           title: chapter.title,
-          context: chapter.imagePrompt || `${subject} ${level} - ${chapter.title}`,
+          context: richContext,
+          preset: imageStyle,
           folder: `scolaire/${level}`,
         }
       });
