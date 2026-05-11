@@ -133,7 +133,7 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) de 8 à 12 pages repr
         type: p.type || 'page',
         content: p.content || '',
       }));
-      setPages(prev => [...prev, ...generated]);
+      setPages(generated);
       toast.success(`${generated.length} pages d'agenda générées !`);
     } catch (e) {
       console.error(e);
