@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Star, TrendingUp, BookOpen, Tag, Award, ArrowRight } from 'lucide-react';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Star, TrendingUp, BookOpen, Tag, Award, ArrowRight, LayoutGrid } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import coverBusiness from '@/assets/mockups/cover-business.jpg';
