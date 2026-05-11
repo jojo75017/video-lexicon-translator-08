@@ -299,7 +299,7 @@ Format JSON attendu (réponds UNIQUEMENT avec le JSON, sans texte additionnel):
       try {
         // Nettoyer le contenu pour enlever les balises markdown
         const cleanContent = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-        const parsed = JSON.parse(cleanContent);
+        const parsed: { chapters?: Array<Record<string, unknown>> } & Record<string, unknown> = JSON.parse(cleanContent);
         if (Array.isArray(parsed?.chapters)) {
           parsed.chapters = parsed.chapters.map((chapter) => ({
             ...chapter,
