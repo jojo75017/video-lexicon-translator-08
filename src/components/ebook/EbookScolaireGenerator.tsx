@@ -322,7 +322,13 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) avec ${numberOfChapte
         </CardContent>
       </Card>
 
-      {chapters.length > 0 && (
+      <EbookProjectsPanel
+        scope="scolaire"
+        label="Scolaire"
+        currentData={{ level, subject, format, themes, numberOfChapters, customPrompt, chapters }}
+        isEmpty={chapters.length === 0}
+        onLoad={loadProject}
+      />
         <>
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={generateAllImages}>
