@@ -13,6 +13,16 @@ interface GeminiCallOptions {
   jsonMode?: boolean;
 }
 
+function extractGeminiText(data: any): string {
+  const parts = data?.candidates?.[0]?.content?.parts;
+  if (!Array.isArray(parts)) return '';
+
+  return parts
+    .map((part: any) => (typeof part?.text === 'string' ? part.text : ''))
+    .join('\n')
+    .trim();
+}
+
 /**
  * Appelle l'API Gemini avec un prompt et retourne le texte généré
  */
@@ -25,13 +35,14 @@ export async function callGemini(
     systemPrompt,
     temperature = 0.7,
     maxTokens = 8192,
-    timeout = 60000,
+    timeout = 90000,
     jsonMode = false,
   } = options;
 
   const model = 'gemini-2.5-flash';
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeout);
+  const effectiveTimeout = Math.max(timeout, maxTokens >= 6000 ? 180000 : 90000);
+  const timeoutId = setTimeout(() => controller.abort(), effectiveTimeout);
 
   const generationConfig: any = {
     temperature,
@@ -85,7 +96,7 @@ export async function callGemini(
     }
 
     const data = await response.json();
-    const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    const content = extractGeminiText(data);
     const finishReason = data.candidates?.[0]?.finishReason;
     if (!content) {
       console.error('Gemini réponse vide. finishReason:', finishReason, 'data:', JSON.stringify(data).slice(0, 500));
@@ -122,12 +133,13 @@ export async function callGeminiWithHistory(
     systemPrompt,
     temperature = 0.7,
     maxTokens = 2000,
-    timeout = 60000,
+    timeout = 90000,
   } = options;
 
   const model = 'gemini-2.5-flash';
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeout);
+  const effectiveTimeout = Math.max(timeout, maxTokens >= 6000 ? 180000 : 90000);
+  const timeoutId = setTimeout(() => controller.abort(), effectiveTimeout);
 
   const body: any = {
     contents: messages.map(m => ({ role: m.role, parts: [{ text: m.text }] })),
@@ -175,7 +187,7 @@ export async function callGeminiWithHistory(
     }
 
     const data = await response.json();
-    const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    const content = extractGeminiText(data);
     if (!content) throw new Error('Aucune réponse de Gemini');
     return content;
   } catch (error: any) {
