@@ -71,6 +71,35 @@ const EbookAgendaGenerator: React.FC<AgendaGeneratorProps> = ({ ebookTitle }) =>
   const [pages, setPages] = useState<AgendaPage[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [customPrompt, setCustomPrompt] = useState('');
+  const hydrated = useRef(false);
+
+  useEffect(() => {
+    const saved = readAutosave<any>('agenda');
+    if (saved) {
+      if (saved.type) setType(saved.type);
+      if (saved.theme) setTheme(saved.theme);
+      if (saved.year) setYear(saved.year);
+      if (saved.audience) setAudience(saved.audience);
+      if (saved.customPrompt) setCustomPrompt(saved.customPrompt);
+      if (Array.isArray(saved.pages)) setPages(saved.pages);
+    }
+    hydrated.current = true;
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated.current) return;
+    writeAutosave('agenda', { type, theme, year, audience, customPrompt, pages });
+  }, [type, theme, year, audience, customPrompt, pages]);
+
+  const loadProject = (data: any) => {
+    if (!data) return;
+    setType(data.type || 'planner-2026');
+    setTheme(data.theme || '');
+    setYear(data.year || '2026');
+    setAudience(data.audience || 'adultes');
+    setCustomPrompt(data.customPrompt || '');
+    setPages(Array.isArray(data.pages) ? data.pages : []);
+  };
 
   const generate = async () => {
     setIsGenerating(true);
