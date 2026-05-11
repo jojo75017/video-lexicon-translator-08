@@ -211,7 +211,8 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) de 8 à 12 pages repr
 
       {pages.length > 0 && (
         <>
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={generateAllImages}><ImageIcon className="w-4 h-4 mr-2" />Générer toutes les illustrations</Button>
             <Button variant="outline" onClick={exportAll}><Download className="w-4 h-4 mr-2" />Exporter ({pages.length})</Button>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
