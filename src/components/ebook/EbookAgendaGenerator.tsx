@@ -295,7 +295,8 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) de 8 à 12 pages repr
         <>
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={generateAllImages}><ImageIcon className="w-4 h-4 mr-2" />Générer toutes les illustrations</Button>
-            <Button variant="outline" onClick={exportAll}><Download className="w-4 h-4 mr-2" />Exporter ({pages.length})</Button>
+            <Button variant="outline" onClick={exportAll}><Download className="w-4 h-4 mr-2" />DOCX ({pages.length})</Button>
+            <Button onClick={exportPdf}><FileText className="w-4 h-4 mr-2" />PDF ({pages.length})</Button>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {pages.map(p => <AgendaSection key={p.id} page={p} onCopy={copyPage} onRemove={removePage} onGenerateImage={generatePageImage} />)}
