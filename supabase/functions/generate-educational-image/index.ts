@@ -10,7 +10,7 @@ serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
   try {
-    const { title, context, style, folder } = await req.json();
+    const { title, context, style, preset, folder } = await req.json();
     if (!title) {
       return new Response(JSON.stringify({ error: 'title requis' }), {
         status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -24,10 +24,18 @@ serve(async (req) => {
       });
     }
 
-    const baseStyle = style ||
-      'Clean educational illustration, flat vector style, bright friendly colors, white background, simple shapes, clear lines, suitable for a school workbook or planner. No text in the image. High readability, pedagogical clarity.';
+    const PRESETS: Record<string, string> = {
+      'hatier-school':
+        'Vibrant educational illustration in the style of a modern Hatier school workbook. Friendly cartoon mascot character (a young teacher or curious student) demonstrating the concept with visual metaphors, colorful speech bubbles, bright banners with arrows, playful didactic scene, energetic and dynamic composition, hand-drawn cartoon style with confident inked outlines, rich saturated colors (orange #FF9E2D, teal #008296, sunny yellow, deep purple), white background with bold colored accent shapes and curved ribbons, suitable for ages 10-17, engaging and motivating. No text, no letters, no numbers, no words in the image.',
+      'soft-planner':
+        'Soft pastel watercolor planner illustration, hand-drawn, minimalist, light and airy, white background, no text, clean composition for low-content KDP book.',
+      'flat-clean':
+        'Clean educational illustration, flat vector style, bright friendly colors, white background, simple shapes, clear lines, suitable for a school workbook or planner. No text in the image. High readability, pedagogical clarity.',
+    };
 
-    const prompt = `${baseStyle} Subject: ${title}. ${context ? `Context: ${context}.` : ''} No text, no letters, no numbers in the image.`;
+    const baseStyle = style || PRESETS[preset as string] || PRESETS['hatier-school'];
+
+    const prompt = `${baseStyle}\n\nSubject: ${title}.${context ? ` Context: ${context}.` : ''}\n\nStrict rules: NO text, NO letters, NO numbers, NO words, NO writing of any kind in the image. Only pure illustration.`;
 
     console.log('[generate-educational-image] Generating:', title);
 
