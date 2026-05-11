@@ -95,7 +95,7 @@ export const KdpRoiCalculator: React.FC<KdpRoiCalculatorProps> = ({ onCtaClick }
               </Badge>
             </div>
             <Slider value={[salesPerDay]} onValueChange={(v) => setSalesPerDay(v[0])} min={1} max={20} step={1} />
-            <p className="text-xs text-muted-foreground">Moyenne conservatrice pour un ebook bien optimisé SEO</p>
+            <p className="text-xs text-muted-foreground">Estimation pondérée : ~40% du catalogue performe réellement (le reste démarre lentement)</p>
           </div>
         </div>
 
