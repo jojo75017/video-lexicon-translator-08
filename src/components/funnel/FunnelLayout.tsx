@@ -27,7 +27,10 @@ const FunnelLayout = ({ children, showFooter = true }: FunnelLayoutProps) => {
         <footer className="border-t border-gray-200 bg-white mt-16">
           <div className="max-w-6xl mx-auto px-4 py-8 text-sm text-gray-600 flex flex-col md:flex-row justify-between gap-4">
             <p>© {new Date().getFullYear()} EbookStudio — Tous droits réservés</p>
-            <div className="flex gap-4">
+            <div className="flex flex-wrap gap-4">
+              <Link to="/promo/affilie" className="text-[#FF9E2D] hover:underline font-semibold">
+                💰 Programme d'affiliation — 30%
+              </Link>
               <Link to="/mentions-legales" className="hover:text-[#008296]">Mentions légales</Link>
               <Link to="/cgv" className="hover:text-[#008296]">CGV</Link>
               <Link to="/politique-confidentialite" className="hover:text-[#008296]">Confidentialité</Link>

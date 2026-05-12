@@ -190,6 +190,12 @@ const PromoDecouvertePage = () => {
               🚀 Commander — 67€ à vie
             </Button>
           </Link>
+          <p className="text-sm opacity-75 pt-4">
+            Vous êtes blogueur, créateur ou formateur ?{' '}
+            <Link to="/promo/affilie" className="text-[#FF9E2D] underline hover:text-white">
+              Devenez affilié et touchez 30% par vente
+            </Link>
+          </p>
         </div>
       </section>
     </FunnelLayout>
