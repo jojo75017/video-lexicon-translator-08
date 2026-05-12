@@ -1,13 +1,42 @@
 /**
  * Mappe une erreur technique brute vers un message FR clair pour l'utilisateur.
  */
+
+/**
+ * Détecte si l'erreur correspond au quota gratuit Gemini épuisé (20 req/jour).
+ * Dans ce cas l'abonné doit activer la facturation sur son projet Google Cloud.
+ */
+export function isFreeTierQuotaError(error: any): boolean {
+  const raw = (error?.message || error?.toString() || '').toString().toLowerCase();
+  if (!raw) return false;
+  return (
+    raw.includes('free_tier') ||
+    raw.includes('freetier') ||
+    raw.includes('resource_exhausted') ||
+    raw.includes('activez la facturation') ||
+    raw.includes('rate_limit: limite gemini') ||
+    (raw.includes('429') && raw.includes('gemini'))
+  );
+}
+
 export function getFriendlyError(error: any, fallback = 'Une erreur est survenue. Réessayez.'): string {
   const raw = (error?.message || error?.toString() || '').toString();
   const msg = raw.toLowerCase();
 
   if (!raw) return fallback;
 
-  // Quotas / rate limiting
+  // Quota gratuit Gemini épuisé (20 req/jour) — cas le plus fréquent chez les abonnés
+  if (isFreeTierQuotaError(error)) {
+    return (
+      '🚫 Votre clé Gemini a atteint la limite GRATUITE de 20 générations/jour.\n\n' +
+      '✅ Solution (2 min, gratuit) : activez la facturation sur votre projet Google Cloud. ' +
+      'Google offre 300$ de crédit gratuit et le coût réel d\'un ebook complet est ~0,01€.\n\n' +
+      '👉 Allez sur https://aistudio.google.com/app/apikey → cliquez sur votre clé → "Set up Billing" → liez une carte. ' +
+      'Votre clé passe de "Free" à "Paid" (1000 req/min) immédiatement.'
+    );
+  }
+
+  // Quotas / rate limiting génériques
   if (msg.includes('429') || msg.includes('quota') || msg.includes('rate limit')) {
     return '⚠️ Quota IA atteint. Patientez ~60s puis relancez la génération.';
   }
