@@ -203,7 +203,7 @@ export const SimpleSidebar: React.FC<SimpleSidebarProps> = ({
           const active = isStepActive(item);
 
           return (
-            <React.Fragment key={item.id}>
+            <div key={item.id}>
             <button
               onClick={() => onTabChange(item.id === 'images' ? 'images-library' : item.id)}
               title={`${item.label} - ${item.hint}`}
