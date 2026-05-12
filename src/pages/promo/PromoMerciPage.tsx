@@ -39,6 +39,10 @@ const PromoMerciPage = () => {
             target="_blank"
             rel="noopener noreferrer"
             download="5-niches-rentables-2026.pdf"
+            onClick={() => {
+              trackLeadMagnetDownload('5_niches_rentables_2026_fallback');
+              trackCTAClick('merci_download_pdf_fallback', '/lead-magnets/5-niches-rentables-2026.pdf');
+            }}
           >
             <Download className="w-5 h-5 mr-2" />
             Télécharger le guide PDF
