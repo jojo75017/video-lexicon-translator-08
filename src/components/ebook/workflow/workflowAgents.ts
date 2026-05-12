@@ -214,7 +214,7 @@ export const WORKFLOW_STEPS: WorkflowStepDefinition[] = ([
     agentRole: 'Rendre le texte plus humain',
     agentAction: 'BONUS - Rend le texte indétectable par les outils anti-IA',
   },
-].map((step) => ({ ...step, codename: ROBOT_CODENAMES[step.id] || '' }));
+] as Omit<WorkflowStepDefinition, 'codename'>[]).map((step) => ({ ...step, codename: ROBOT_CODENAMES[step.id] || '' }));
 
 export const WORKFLOW_STEP_COUNT = WORKFLOW_STEPS.length;
 export { ROBOT_CODENAMES };
