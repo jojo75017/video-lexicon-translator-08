@@ -107,6 +107,8 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   // Workflow state
   const [isGenerating, setIsGenerating] = useState(false);
   const cancelRef = useRef(false);
+  const autoResumeCountRef = useRef(0);
+  const autoResumeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [currentStepIndex, setCurrentStepIndex] = useState(-1);
   const [activeStepProgress, setActiveStepProgress] = useState(0);
   const [stepResults, setStepResults] = useState<Record<string, { result: any; displayContent: string }>>({});
@@ -1219,6 +1221,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
       // Clear saved progress on success
       localStorage.removeItem(STORAGE_KEY);
       setHasSavedProgress(false);
+      autoResumeCountRef.current = 0;
 
       toast.success('✅ Livre généré ! Le contenu a été importé dans l\'onglet "Rédaction".');
       onComplete(bookData);
@@ -1231,7 +1234,27 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
       // Save progress on error so user can resume
       saveProgress();
       const stepLabel = WORKFLOW_STEPS[lastStepI]?.id ? `Étape ${WORKFLOW_STEPS[lastStepI].id} : ` : '';
-      toast.error(`${stepLabel}${friendly}`);
+
+      // ⏯️ AUTO-REPRISE : si l'erreur est transitoire (rate limit, surcharge, timeout), on relance tout seul
+      const msg = String(err?.message || err || '');
+      const isUserCancelled = msg.includes('USER_CANCELLED');
+      const isTransient = !isUserCancelled && /503|429|overload|surcharg|RATE_LIMIT|TIMEOUT|GEMINI_OVERLOAD|CREDITS_EXHAUSTED|segment vide|Erreur inconnue|fetch|network/i.test(msg);
+      const MAX_AUTO_RESUME = 6;
+
+      if (isTransient && autoResumeCountRef.current < MAX_AUTO_RESUME) {
+        autoResumeCountRef.current += 1;
+        const waitSec = 20;
+        toast.info(`⏳ ${stepLabel}reprise automatique dans ${waitSec}s (${autoResumeCountRef.current}/${MAX_AUTO_RESUME})…`);
+        if (autoResumeTimerRef.current) clearTimeout(autoResumeTimerRef.current);
+        autoResumeTimerRef.current = setTimeout(() => {
+          if (!cancelRef.current) {
+            generateCompleteBook(lastStepI, { ...allContext });
+          }
+        }, waitSec * 1000);
+      } else {
+        toast.error(`${stepLabel}${friendly}`);
+        autoResumeCountRef.current = 0;
+      }
     } finally {
       cancelRef.current = false;
       setIsGenerating(false);
@@ -2298,6 +2321,11 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
                     size="sm"
                     onClick={() => {
                       cancelRef.current = true;
+                      autoResumeCountRef.current = 999; // bloque toute reprise auto
+                      if (autoResumeTimerRef.current) {
+                        clearTimeout(autoResumeTimerRef.current);
+                        autoResumeTimerRef.current = null;
+                      }
                       toast.info('⏹️ Arrêt demandé… La génération s\'arrêtera après l\'étape en cours.');
                     }}
                     className="gap-2 text-destructive border-destructive/40 hover:bg-destructive/10"
