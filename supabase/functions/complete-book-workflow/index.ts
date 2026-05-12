@@ -157,7 +157,6 @@ async function callLovableAI(systemPrompt: string, userPrompt: string, maxTokens
 
 async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000): Promise<string> {
   const userKey = activeApiKey?.trim();
-  // Injection automatique de la directive de langue dans CHAQUE appel IA
   const finalSystemPrompt = activeLanguageDirective
     ? `${systemPrompt}\n\n${activeLanguageDirective}`
     : systemPrompt;
@@ -166,7 +165,17 @@ async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000
     try {
       return await callGeminiDirect(finalSystemPrompt, userPrompt, maxTokens, userKey);
     } catch (error) {
-      console.warn('User Gemini key failed, falling back to Lovable AI:', error instanceof Error ? error.message : error);
+      const msg = error instanceof Error ? error.message : String(error);
+      console.warn('User Gemini key failed, falling back to Lovable AI:', msg);
+      try {
+        return await callLovableAI(finalSystemPrompt, userPrompt, maxTokens);
+      } catch (fallbackErr) {
+        const fbMsg = fallbackErr instanceof Error ? fallbackErr.message : String(fallbackErr);
+        console.warn('Lovable AI fallback failed, retrying Gemini after long wait:', fbMsg);
+        // Dernier recours : attendre 30s et retenter Gemini une fois
+        await new Promise((r) => setTimeout(r, 30000));
+        return await callGeminiDirect(finalSystemPrompt, userPrompt, maxTokens, userKey);
+      }
     }
   }
 
