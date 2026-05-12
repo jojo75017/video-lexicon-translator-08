@@ -2468,17 +2468,36 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       case 'images':
         return (
           <div className="space-y-6 animate-fade-in">
-            <Tabs defaultValue="generator" className="w-full">
-              <TabsList className="grid grid-cols-2 w-full max-w-xl">
+            <Tabs defaultValue="cover" className="w-full">
+              <TabsList className="grid grid-cols-3 w-full max-w-2xl">
+                <TabsTrigger value="cover">
+                  <BookOpen className="w-4 h-4 mr-2" />
+                  Couverture KDP
+                </TabsTrigger>
                 <TabsTrigger value="generator">
                   <Sparkles className="w-4 h-4 mr-2" />
-                  Générateur d'images IA
+                  Générateur IA
                 </TabsTrigger>
                 <TabsTrigger value="library">
                   <ImageIcon className="w-4 h-4 mr-2" />
-                  Bibliothèque d'images
+                  Bibliothèque
                 </TabsTrigger>
               </TabsList>
+              <TabsContent value="cover" className="mt-6">
+                <UnifiedCoverStudio
+                  ebookTitle={ebookTitle}
+                  authorName={authorName}
+                  chapters={chapters}
+                  isGenerating={isGenerating}
+                  defaultTab="ai"
+                  onGenerateBackCover={async (tone, audience, highlights) =>
+                    await generateBackCover(ebookTitle, authorName, chapters, tone, audience, highlights)
+                  }
+                  onCoverGenerated={(url) => {
+                    setEbookImages(prev => [{ url, title: 'Couverture IA' }, ...prev]);
+                  }}
+                />
+              </TabsContent>
               <TabsContent value="generator" className="mt-6">
                 <EbookChapterImageGenerator
                   ebookTitle={ebookTitle}
