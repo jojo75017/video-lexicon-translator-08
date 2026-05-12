@@ -1110,8 +1110,8 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
         } else {
           const result = await runStepWithRetry(step.id, context, {}, {}, step.id === 'P3' ? 2 : 1);
 
-          // APRÈS P1 : TOUJOURS pause pour valider/choisir le titre best-seller
-          // On fait ce check AVANT le if(result) pour garantir l'arrêt même si result est null
+          // APRÈS P1 : ne plus bloquer les abonnés sur une validation manuelle.
+          // On conserve les suggestions et l'intro/conclusion, puis le workflow enchaîne P2 automatiquement.
           if (step.id === 'P1') {
             if (result) {
               const nextStepResults = { ...stepResults, [step.id]: result };
@@ -1132,26 +1132,20 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
               if (result.result?.introductionGeneree) setGeneratedIntro(result.result.introductionGeneree);
               if (result.result?.conclusionGeneree) setGeneratedConclusion(result.result.conclusionGeneree);
 
-              setWaitingForTitleValidation(true);
-              setIsGenerating(false);
+              setWaitingForTitleValidation(false);
               saveProgress({
                 currentStepIndex: i,
                 stepResults: nextStepResults,
                 allContext: nextContext,
-                waitingForTitleValidation: true,
+                waitingForTitleValidation: false,
                 waitingForCharacterValidation: false,
                 titleSuggestions: suggestions,
                 originalTitleScore: origScore,
                 selectedTitleIndex: null,
               });
-              toast.info('📊 Analyse du titre terminée ! Choisissez votre titre best-seller avant de continuer.');
-              return; // STOP - l'utilisateur doit valider avant P2
+              toast.success('📊 P1 terminé, le workflow continue automatiquement vers P2.');
             }
-            setWaitingForTitleValidation(true);
-            setIsGenerating(false);
-            saveProgress({ waitingForTitleValidation: true, waitingForCharacterValidation: false });
-            toast.info('📊 Analyse du titre terminée ! Choisissez votre titre best-seller avant de continuer.');
-            return; // STOP - l'utilisateur doit valider avant P2
+            continue;
           }
 
           if (result) {
