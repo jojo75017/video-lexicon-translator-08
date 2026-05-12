@@ -120,6 +120,38 @@ const PromoCommandePage = () => {
             </div>
           </div>
 
+          <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-4">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="font-bold">{PRODUCT.label}</p>
+                <p className="text-sm text-gray-500">Accès 12 mois - Renouvellement manuel</p>
+              </div>
+              <p className="font-bold text-xl">{PRODUCT.amount}€</p>
+            </div>
+            {bonuses.map((b) => (
+              <div key={b.key} className="flex justify-between items-start pt-2 border-t border-dashed border-gray-200">
+                <div className="flex-1">
+                  <p className="font-semibold text-sm flex items-center gap-2">
+                    <span className="text-[#FF9E2D]">+</span> {b.title}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => removeBonus(b.key)}
+                    className="text-xs text-gray-400 hover:text-red-500 underline mt-1"
+                  >
+                    Retirer
+                  </button>
+                </div>
+                <p className="font-bold text-sm">{b.amount}€</p>
+              </div>
+            ))}
+            <hr />
+            <div className="flex justify-between text-lg font-bold">
+              <span>Total TTC</span>
+              <span className="text-[#008296]">{totalAmount}€</span>
+            </div>
+          </div>
+
           <div className="bg-[#008296]/5 rounded-xl p-6 space-y-3">
             <h3 className="font-bold flex items-center gap-2"><ShieldCheck className="w-5 h-5 text-[#008296]" /> Inclus dans votre abonnement</h3>
             <ul className="space-y-2 text-sm">
