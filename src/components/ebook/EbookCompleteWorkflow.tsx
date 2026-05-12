@@ -107,6 +107,8 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   // Workflow state
   const [isGenerating, setIsGenerating] = useState(false);
   const cancelRef = useRef(false);
+  const autoResumeCountRef = useRef(0);
+  const autoResumeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [currentStepIndex, setCurrentStepIndex] = useState(-1);
   const [activeStepProgress, setActiveStepProgress] = useState(0);
   const [stepResults, setStepResults] = useState<Record<string, { result: any; displayContent: string }>>({});
