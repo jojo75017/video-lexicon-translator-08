@@ -29,12 +29,20 @@ const PromoMerciPage = () => {
           Vous allez recevoir le PDF par email dans quelques secondes. En attendant, téléchargez-le directement ici&nbsp;:
         </p>
 
-        <a href={pdfUrl} target="_blank" rel="noopener noreferrer" download>
-          <Button className="bg-[#008296] hover:bg-[#006d7e] text-white font-bold py-6 px-8 text-base">
+        <Button
+          asChild
+          className="bg-[#008296] hover:bg-[#006d7e] text-white font-bold py-6 px-8 text-base"
+        >
+          <a
+            href="/lead-magnets/5-niches-rentables-2026.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            download="5-niches-rentables-2026.pdf"
+          >
             <Download className="w-5 h-5 mr-2" />
             Télécharger le guide PDF
-          </Button>
-        </a>
+          </a>
+        </Button>
 
         <div className="bg-white border border-gray-200 rounded-xl p-8 shadow-sm space-y-4 text-left mt-12">
           <h2 className="text-2xl font-bold text-[#232F3E]">
