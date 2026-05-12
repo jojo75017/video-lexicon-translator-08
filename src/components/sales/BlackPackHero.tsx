@@ -152,7 +152,7 @@ const BlackPackHero = ({ onCtaClick, launchEnd, launchPrice = 67, normalPrice = 
           className="mx-auto max-w-2xl text-base sm:text-lg md:text-xl mb-10"
           style={{ color: GREY, lineHeight: 1.6 }}
         >
-          15 agents IA qui rédigent, illustrent et publient ton livre — entièrement automatisé,{" "}
+          15 agents IA qui rédigent, illustrent et publient ton livre - entièrement automatisé,{" "}
           <strong style={{ color: WHITE }}>sans expérience requise</strong>.
         </motion.p>
 

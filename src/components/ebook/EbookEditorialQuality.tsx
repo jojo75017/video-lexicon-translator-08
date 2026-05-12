@@ -140,7 +140,7 @@ export const EbookEditorialQuality: React.FC = () => {
             </div>
             <div>
               <h2 className="text-2xl font-bold bg-gradient-to-r from-teal-400 to-cyan-400 bg-clip-text text-transparent">
-                Prompt 6 — Cohérence & Qualité
+                Prompt 6 - Cohérence & Qualité
               </h2>
               <p className="text-sm text-muted-foreground">Analyse comme un éditeur exigeant</p>
             </div>

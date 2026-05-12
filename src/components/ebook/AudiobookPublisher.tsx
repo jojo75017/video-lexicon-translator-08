@@ -408,7 +408,7 @@ export const AudiobookPublisher: React.FC<AudiobookPublisherProps> = ({
                   )}
                 </div>
                 <div>
-                  <Label>Extrait audio (MP3) — aperçu sur la fiche produit</Label>
+                  <Label>Extrait audio (MP3) - aperçu sur la fiche produit</Label>
                   <Input type="file" accept="audio/*" onChange={(e) => setExcerptFile(e.target.files?.[0] || null)} />
                   <p className="text-xs text-muted-foreground mt-1">Court extrait (30s à 2min) pour donner envie d'écouter</p>
                   <div className="flex items-center gap-2 mt-2">

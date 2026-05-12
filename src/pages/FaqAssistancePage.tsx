@@ -157,7 +157,7 @@ La seule limite est votre imagination !`
     {
       category: 'usage',
       question: "Comment fonctionne l'IA Gemini 3 Flash ?",
-      answer: `EbookStudio utilise l'IA Gemini 3 Flash de Google — plus rapide et moins chère que les alternatives :
+      answer: `EbookStudio utilise l'IA Gemini 3 Flash de Google - plus rapide et moins chère que les alternatives :
 
 **Configuration en 2 minutes :**
 1. Créez un compte gratuit sur Google AI Studio

@@ -17,7 +17,7 @@ const PolitiqueConfidentialite = () => (
           <ul className="list-disc pl-5 space-y-1">
             <li>Adresse email (inscription, paiement, newsletter)</li>
             <li>Données de paiement (traitées par Stripe, non stockées chez nous)</li>
-            <li>Contenu généré (ebooks, chapitres) — stocké dans votre espace personnel</li>
+            <li>Contenu généré (ebooks, chapitres) - stocké dans votre espace personnel</li>
           </ul>
         </section>
 

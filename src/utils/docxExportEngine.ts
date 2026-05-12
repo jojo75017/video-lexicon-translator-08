@@ -138,7 +138,7 @@ function preCleanJSON(raw: string): string {
     return textValues.length > 0 ? textValues.join('\n\n') : match;
   });
 
-  // Supprimer les clés JSON avec guillemets (droits ou français) — liste exhaustive
+  // Supprimer les clés JSON avec guillemets (droits ou français) - liste exhaustive
   text = text.replace(/[«»"\u201C\u201D]?\s*(?:json)?(?:page[_ ]?de[_ ]?titre|pr[eé]face|table[_ ]?des[_ ]?mati[eè]res|chapitres?[_ ]?liste|texte[_ ]?int[eé]gral|conclusion|[eé]pilogue|personnages|introduction|[eé]l[eé]ments?|sous[_ ]?chapitres?|contenu|titre[_ ]?principal|titre|r[eé]sum[eé]|description|auteur|genre|th[eè]me|format|sections?)\s*[«»"\u201C\u201D]?\s*:\s*/gi, '');
   
   // Supprimer les clés JSON anglaises/techniques
@@ -168,7 +168,7 @@ function preCleanJSON(raw: string): string {
 }
 
 /**
- * Nettoie un titre de chapitre : si >150 car., c'est du JSON — on extrait le vrai titre
+ * Nettoie un titre de chapitre : si >150 car., c'est du JSON - on extrait le vrai titre
  */
 function cleanChapterTitle(rawTitle: string): string {
   if (!rawTitle) return 'Sans titre';
@@ -614,7 +614,7 @@ export async function generateProfessionalDocx(options: DocxExportOptions): Prom
       spacing: { before: 800, after: 200 },
     }));
 
-    // Titre du chapitre — nettoyé avec cleanChapterTitle
+    // Titre du chapitre - nettoyé avec cleanChapterTitle
     const cleanTitle = cleanChapterTitle(chapter.title);
     children.push(new Paragraph({
       children: [new TextRun({ text: cleanTitle.toUpperCase(), bold: true, size: chapterTitleSize, font })],

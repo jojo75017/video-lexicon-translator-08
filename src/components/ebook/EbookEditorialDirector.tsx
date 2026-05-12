@@ -199,7 +199,7 @@ export const EbookEditorialDirector = ({
       return;
     }
 
-    // BYOK guard — no key, no call. Avoid silent 400 from edge function.
+    // BYOK guard - no key, no call. Avoid silent 400 from edge function.
     if (!userGeminiKey || userGeminiKey.trim().length === 0) {
       toast.error("Clé API Gemini manquante", {
         description: "Collez votre clé (AIza...) dans le champ 'Clé API Gemini' plus bas. Gratuit sur aistudio.google.com.",
@@ -349,7 +349,7 @@ export const EbookEditorialDirector = ({
                 onClick={() => {
                   // Re-notifie le planner pour débloquer P2 si jamais l'event a été manqué
                   onAnalysisComplete?.(analysis);
-                  toast.success("Étape P1 confirmée — passez à Jano (P2).");
+                  toast.success("Étape P1 confirmée - passez à Jano (P2).");
                 }}
                 className="h-auto min-h-9 w-full whitespace-normal px-3 py-2 leading-snug sm:w-auto"
               >

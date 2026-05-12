@@ -59,7 +59,7 @@ interface ToolGroup {
 }
 
 // ══════════════════════════════════════════════════════════════
-//  ~44 OUTILS FONCTIONNELS — organisés en 5 catégories
+//  ~44 OUTILS FONCTIONNELS - organisés en 5 catégories
 // ══════════════════════════════════════════════════════════════
 
 const allToolGroups: ToolGroup[] = [
@@ -92,21 +92,21 @@ const allToolGroups: ToolGroup[] = [
       { id: 'documentary', label: 'Documentaire', icon: FileText },
       { id: 'multi-translator', label: 'Traduction Multi-Langues', icon: Globe },
       // Les 15 agents P1→P15 sont rendus séparément dans un sous-bloc repliable.
-      { id: 'editorial-director', label: 'P1 · Zyro — Niche', icon: Crown, isPro: true },
-      { id: 'market-analysis', label: 'P2 · Jano — Marché', icon: Search, isPro: true },
-      { id: 'content-architect', label: 'P3 · Kiro — Plan', icon: LayoutDashboard, isPro: true },
-      { id: 'expert-writing', label: 'P4 · Alia — Rédaction', icon: PenTool, isPro: true },
-      { id: 'natural-rewrite', label: 'P5 · Lexo — Réécriture', icon: Sparkles, isPro: true },
-      { id: 'editorial-quality', label: 'P6 · Vero — Qualité', icon: FileText, isPro: true },
-      { id: 'editorial-packaging', label: 'P7 · Kado — KDP', icon: FileText, isPro: true },
-      { id: 'final-diagnosis', label: 'P8 · Conso — Diagnostic', icon: Shield, isPro: true },
-      { id: 'editorial-memory', label: 'P9 · Emio — Voix', icon: Brain, isPro: true },
-      { id: 'chapter-coherence', label: 'P10 · Mira — Transitions', icon: GitBranch, isPro: true },
-      { id: 'self-critique', label: 'P11 · Beto — Lecteur test', icon: Eye, isPro: true },
-      { id: 'iterative-loop', label: 'P12 · Nexa — Corrections', icon: RefreshCw, isPro: true },
-      { id: 'style-signature', label: 'P13 · Huma — Style', icon: Fingerprint, isPro: true },
-      { id: 'ultimate-verdict', label: 'P14 · Tila — Verdict', icon: Award, isPro: true },
-      { id: 'humanize-anti-ia', label: 'P15 · Orin — Anti-IA', icon: Shield, isPro: true },
+      { id: 'editorial-director', label: 'P1 · Zyro - Niche', icon: Crown, isPro: true },
+      { id: 'market-analysis', label: 'P2 · Jano - Marché', icon: Search, isPro: true },
+      { id: 'content-architect', label: 'P3 · Kiro - Plan', icon: LayoutDashboard, isPro: true },
+      { id: 'expert-writing', label: 'P4 · Alia - Rédaction', icon: PenTool, isPro: true },
+      { id: 'natural-rewrite', label: 'P5 · Lexo - Réécriture', icon: Sparkles, isPro: true },
+      { id: 'editorial-quality', label: 'P6 · Vero - Qualité', icon: FileText, isPro: true },
+      { id: 'editorial-packaging', label: 'P7 · Kado - KDP', icon: FileText, isPro: true },
+      { id: 'final-diagnosis', label: 'P8 · Conso - Diagnostic', icon: Shield, isPro: true },
+      { id: 'editorial-memory', label: 'P9 · Emio - Voix', icon: Brain, isPro: true },
+      { id: 'chapter-coherence', label: 'P10 · Mira - Transitions', icon: GitBranch, isPro: true },
+      { id: 'self-critique', label: 'P11 · Beto - Lecteur test', icon: Eye, isPro: true },
+      { id: 'iterative-loop', label: 'P12 · Nexa - Corrections', icon: RefreshCw, isPro: true },
+      { id: 'style-signature', label: 'P13 · Huma - Style', icon: Fingerprint, isPro: true },
+      { id: 'ultimate-verdict', label: 'P14 · Tila - Verdict', icon: Award, isPro: true },
+      { id: 'humanize-anti-ia', label: 'P15 · Orin - Anti-IA', icon: Shield, isPro: true },
     ]
   },
   {
@@ -168,21 +168,21 @@ const TOOL_TOOLTIPS: Record<string, string> = {
   // Workflow IA
   'workflow-dashboard': 'Vue Kanban du pipeline P1-P15 : suivez l\'avancement de chaque étape.',
   'complete-workflow': 'Lance automatiquement les 15 agents IA pour produire un manuscrit complet.',
-  'editorial-director': 'P1 — Choisit la niche rentable et positionne ton ebook sur le marché KDP.',
-  'market-analysis': 'P2 — Analyse la concurrence Amazon et identifie les opportunités.',
-  'content-architect': 'P3 — Construit le plan détaillé avec chapitres et sous-chapitres.',
-  'expert-writing': 'P4 — Génère le contenu complet des chapitres avec un style éditorial professionnel.',
-  'natural-rewrite': 'P5 — Réécrit pour rendre le texte plus fluide et naturel.',
-  'editorial-quality': 'P6 — Vérifie la cohérence et le niveau éditorial du manuscrit.',
-  'editorial-packaging': 'P7 — Génère titre, description KDP, mots-clés et catégories optimisés.',
-  'final-diagnosis': 'P8 — Diagnostic final qualité avant publication.',
-  'editorial-memory': 'P9 — Construit la voix narrative cohérente entre chapitres.',
-  'chapter-coherence': 'P10 — Crée des transitions fluides entre chapitres.',
-  'self-critique': 'P11 — Simule un lecteur test et identifie les faiblesses.',
-  'iterative-loop': 'P12 — Applique automatiquement les corrections suggérées.',
-  'style-signature': 'P13 — Renforce ta signature stylistique d\'auteur.',
-  'ultimate-verdict': 'P14 — Verdict final : prêt à publier ou besoin de retouches.',
-  'humanize-anti-ia': 'P15 — Humanise le texte pour passer les détecteurs anti-IA.',
+  'editorial-director': 'P1 - Choisit la niche rentable et positionne ton ebook sur le marché KDP.',
+  'market-analysis': 'P2 - Analyse la concurrence Amazon et identifie les opportunités.',
+  'content-architect': 'P3 - Construit le plan détaillé avec chapitres et sous-chapitres.',
+  'expert-writing': 'P4 - Génère le contenu complet des chapitres avec un style éditorial professionnel.',
+  'natural-rewrite': 'P5 - Réécrit pour rendre le texte plus fluide et naturel.',
+  'editorial-quality': 'P6 - Vérifie la cohérence et le niveau éditorial du manuscrit.',
+  'editorial-packaging': 'P7 - Génère titre, description KDP, mots-clés et catégories optimisés.',
+  'final-diagnosis': 'P8 - Diagnostic final qualité avant publication.',
+  'editorial-memory': 'P9 - Construit la voix narrative cohérente entre chapitres.',
+  'chapter-coherence': 'P10 - Crée des transitions fluides entre chapitres.',
+  'self-critique': 'P11 - Simule un lecteur test et identifie les faiblesses.',
+  'iterative-loop': 'P12 - Applique automatiquement les corrections suggérées.',
+  'style-signature': 'P13 - Renforce ta signature stylistique d\'auteur.',
+  'ultimate-verdict': 'P14 - Verdict final : prêt à publier ou besoin de retouches.',
+  'humanize-anti-ia': 'P15 - Humanise le texte pour passer les détecteurs anti-IA.',
   // Écriture
   'planner': 'Crée le plan structuré de ton ebook (titre, chapitres, sous-chapitres).',
   'writing': 'Édite et rédige les chapitres manuellement avec assistance IA.',
@@ -492,7 +492,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
   const navigate = useNavigate();
   const { isDark, toggleTheme } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
-  // Accordéon EXCLUSIF — un seul groupe ouvert à la fois.
+  // Accordéon EXCLUSIF - un seul groupe ouvert à la fois.
   // Au premier accès on ouvre "1️⃣ Préparer" pour guider les nouveaux abonnés.
   const [openGroup, setOpenGroup] = useState<string | null>('1️⃣ Préparer');
   // Toggle "essentiel vs avancé" par groupe (true = avancés visibles)
@@ -615,7 +615,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
   }, [searchQuery, isAdmin]);
 
   // Décompose les items d'un groupe en (essentiels visibles, avancés visibles si toggle).
-  // Pour le groupe "2️⃣ Écrire" on EXCLUT les 15 agents Workflow IA — ils sont rendus
+  // Pour le groupe "2️⃣ Écrire" on EXCLUT les 15 agents Workflow IA - ils sont rendus
   // séparément dans un sous-bloc repliable pour ne pas écraser la sidebar.
   const partitionItems = (group: ToolGroup) => {
     let visible = group.items.filter(filterAdmin);
@@ -665,7 +665,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
           )}
         </div>
 
-        {/* CHANTIER 1 — Header opérationnel: projet actif + nouveau */}
+        {/* CHANTIER 1 - Header opérationnel: projet actif + nouveau */}
         <SidebarHeader
           recentProjects={recentProjects}
           currentProjectTitle={currentProjectTitle}
@@ -704,7 +704,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
           <ToolsGuideButton isCollapsed={isCollapsed} />
         </div>
 
-        {/* CHANTIER 2 — Favoris */}
+        {/* CHANTIER 2 - Favoris */}
         <SidebarFavorites
           items={favoriteItems}
           activeTab={activeTab}
@@ -712,7 +712,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
           isCollapsed={isCollapsed}
         />
 
-        {/* Onboarding "Par où commencer ?" — visible pour les nouveaux abonnés */}
+        {/* Onboarding "Par où commencer ?" - visible pour les nouveaux abonnés */}
         <SidebarOnboarding
           isCollapsed={isCollapsed}
           onStepClick={(tabId) => onTabChange(tabId)}
@@ -782,7 +782,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                   ? visibleItems.some(i => i.id === inProgressTabId)
                   : false;
 
-                // CHANTIER 5 — badge contextuel
+                // CHANTIER 5 - badge contextuel
                 const groupBadge = (() => {
                   if (group.label === '⚙️ Mon Compte' && unfinishedProjectsCount > 0) {
                     return String(unfinishedProjectsCount);
@@ -878,7 +878,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                           </>
                         )}
 
-                        {/* Sous-bloc Workflow IA — 15 agents repliés par défaut (uniquement étape Écrire) */}
+                        {/* Sous-bloc Workflow IA - 15 agents repliés par défaut (uniquement étape Écrire) */}
                         {workflowAgents.length > 0 && (
                           <>
                             <button
@@ -1023,7 +1023,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                 </div>
               )}
 
-              {/* CHANTIER 4 — Tout replier */}
+              {/* CHANTIER 4 - Tout replier */}
               {openGroup && !isCollapsed && (
                 <button
                   onClick={collapseAll}

@@ -41,7 +41,7 @@ const categories = [
   },
   {
     id: 'ai-v2',
-    title: 'Moteur IA V2 — Modules P9 à P14',
+    title: 'Moteur IA V2 - Modules P9 à P14',
     subtitle: 'Intelligence éditoriale avancée pour une qualité premium',
     icon: Sparkles,
     gradient: 'from-amber-500 to-orange-600',
@@ -63,7 +63,7 @@ const categories = [
     gradient: 'from-primary to-accent',
     badge: 'NOUVEAU',
     features: [
-      { icon: Volume2, title: 'Voix Neurales Azure', desc: 'Denise, Henri, Celeste — des voix françaises naturelles et expressives' },
+      { icon: Volume2, title: 'Voix Neurales Azure', desc: 'Denise, Henri, Celeste - des voix françaises naturelles et expressives' },
       { icon: Music, title: 'Jingles Automatiques', desc: 'Introduction avec cloche cristalline et transitions entre chapitres' },
       { icon: FileText, title: 'Découpage Intelligent', desc: 'Chunking au niveau des phrases pour un audio sans coupures' },
       { icon: Sparkles, title: 'Nettoyage Audio', desc: 'Conversion des abréviations, suppression emojis, ponctuation optimisée' },
@@ -131,7 +131,7 @@ export default function Nouveautes2026Page() {
   return (
     <>
       <Helmet>
-        <title>Nouveautés 2026 — EbookStudio Pro | Toutes les fonctionnalités</title>
+        <title>Nouveautés 2026 - EbookStudio Pro | Toutes les fonctionnalités</title>
         <meta name="description" content="Découvrez toutes les nouveautés 2026 d'EbookStudio Pro : moteur IA Gemini 3 Flash, livres audio professionnels, 7 générateurs spécialisés et outils marketing KDP intégrés." />
       </Helmet>
 
@@ -156,7 +156,7 @@ export default function Nouveautes2026Page() {
           <div className="relative mx-auto max-w-5xl px-4 text-center">
             <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6 }}>
               <Badge className="mb-6 bg-primary/10 text-primary border-primary/30 text-sm px-4 py-1.5">
-                <Rocket className="w-4 h-4 mr-2" /> Version 2026 — La plus grosse mise à jour
+                <Rocket className="w-4 h-4 mr-2" /> Version 2026 - La plus grosse mise à jour
               </Badge>
               <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-6">
                 Toutes les{' '}
@@ -272,7 +272,7 @@ export default function Nouveautes2026Page() {
                 <Globe className="w-3 h-3 mr-1" /> En construction
               </Badge>
               <h2 className="text-2xl md:text-3xl font-bold mb-4">
-                BlogCluster.com — Le Hub des Auteurs KDP
+                BlogCluster.com - Le Hub des Auteurs KDP
               </h2>
               <p className="text-muted-foreground max-w-2xl mx-auto mb-8">
                 Un nouveau site qui retracera tous nos livres (ou presque), avec de nombreux articles, 
@@ -297,7 +297,7 @@ export default function Nouveautes2026Page() {
         {/* Pricing reminder */}
         <section className="border-t border-border/40">
           <div className="mx-auto max-w-3xl px-4 py-16 text-center">
-            <h2 className="text-2xl font-bold mb-3">Tout cet arsenal — Accès à vie</h2>
+            <h2 className="text-2xl font-bold mb-3">Tout cet arsenal - Accès à vie</h2>
             <div className="flex items-center justify-center gap-3 mb-4">
               <span className="text-muted-foreground line-through text-lg">247€</span>
               <span className="text-5xl font-black text-primary">67€</span>
@@ -317,7 +317,7 @@ export default function Nouveautes2026Page() {
 
         {/* Footer */}
         <footer className="border-t border-border/40 py-6 text-center text-xs text-muted-foreground">
-          <p>© {new Date().getFullYear()} EbookStudio Pro — Tous droits réservés</p>
+          <p>© {new Date().getFullYear()} EbookStudio Pro - Tous droits réservés</p>
         </footer>
       </div>
     </>

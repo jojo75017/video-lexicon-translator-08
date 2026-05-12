@@ -42,9 +42,9 @@ const UpsellPage = () => {
 
   const proFeatures = [
     { text: "Workflow 15 rôles IA complet", included: true, highlight: true },
-    { text: "Gemini 3 Flash — IA la plus rapide", included: true, highlight: true },
-    { text: "Imagen 3 — couvertures photoréalistes", included: true },
-    { text: "Azure Neural Voices — audiobooks", included: true },
+    { text: "Gemini 3 Flash - IA la plus rapide", included: true, highlight: true },
+    { text: "Imagen 3 - couvertures photoréalistes", included: true },
+    { text: "Azure Neural Voices - audiobooks", included: true },
     { text: "Export PDF / EPUB / Word", included: true },
     { text: "Toutes les formations (18 modules)", included: true },
     { text: "Traduction multi-langues (30+)", included: true },
@@ -67,7 +67,7 @@ const UpsellPage = () => {
           <Gift className="w-5 h-5" />
         </div>
         <p className="text-sm font-medium mt-1">
-          Accès Pro Lifetime à {LAUNCH_PRICE}€ au lieu de {NORMAL_PRICE}€ — Économisez {NORMAL_PRICE - LAUNCH_PRICE}€ !
+          Accès Pro Lifetime à {LAUNCH_PRICE}€ au lieu de {NORMAL_PRICE}€ - Économisez {NORMAL_PRICE - LAUNCH_PRICE}€ !
         </p>
       </div>
 
@@ -86,7 +86,7 @@ const UpsellPage = () => {
             pour vos ebooks
           </h1>
           <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-            Gemini 3 Flash, Imagen 3, Azure Neural Voices — tout inclus à vie pour seulement{" "}
+            Gemini 3 Flash, Imagen 3, Azure Neural Voices - tout inclus à vie pour seulement{" "}
             <strong className="text-white">{LAUNCH_PRICE}€</strong>.
           </p>
         </div>
@@ -160,7 +160,7 @@ const UpsellPage = () => {
             onClick={handleUpgrade}
           >
             <Zap className="w-6 h-6 mr-2" />
-            Accès Pro Lifetime — {LAUNCH_PRICE}€ à vie
+            Accès Pro Lifetime - {LAUNCH_PRICE}€ à vie
           </Button>
 
           <div>

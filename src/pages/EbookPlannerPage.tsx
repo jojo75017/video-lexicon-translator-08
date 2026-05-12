@@ -151,7 +151,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
     (!!subscriberEmail &&
       typeof effectiveSubscriberData?.access_code === 'string' &&
       effectiveSubscriberData.access_code.trim().length > 0 &&
-      // Status may be missing in older cached payloads — only block when explicitly inactive
+      // Status may be missing in older cached payloads - only block when explicitly inactive
       (effectiveSubscriberData?.status == null ||
         effectiveSubscriberData?.status === 'active' ||
         effectiveSubscriberData?.status === 'trialing' ||
@@ -188,7 +188,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
     };
   }, [isAdminProp]);
 
-  // Auto-sync subscription status on mount — avoids forcing logout/login
+  // Auto-sync subscription status on mount - avoids forcing logout/login
   // when cached subscriber_data lacks fields (e.g. status) after a backend update.
   useEffect(() => {
     let cancelled = false;
@@ -877,7 +877,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   const generateCompleteEbook = async () => {
     // Verrou anti-double-clic strict
     if (generationLockRef.current || isGeneratingComplete) {
-      console.warn('Génération déjà en cours — clic ignoré');
+      console.warn('Génération déjà en cours - clic ignoré');
       return;
     }
 
@@ -1341,7 +1341,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       case 'workflow-dashboard':
         return (
           <div className="space-y-6">
-            {/* Bloc 1 — En-tête éditorial (toujours visible) */}
+            {/* Bloc 1 - En-tête éditorial (toujours visible) */}
             <div
               className="rounded-xl p-6 text-white shadow-sm relative overflow-hidden"
               style={{ background: 'linear-gradient(135deg, #008296 0%, #FF9E2D 100%)' }}
@@ -1368,10 +1368,10 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               <div className="absolute -right-20 -bottom-20 w-60 h-60 rounded-full bg-white/5" />
             </div>
 
-            {/* Bloc 1bis — Moteur de mots-clés Amazon KDP (aimant) */}
+            {/* Bloc 1bis - Moteur de mots-clés Amazon KDP (aimant) */}
             <KdpKeywordWidget defaultSeed={ebookTitle} onSubmit={(seed) => navigate(`/kdp-keywords${seed ? `?title=${encodeURIComponent(seed)}` : ''}`)} />
 
-            {/* Bloc 1ter — Lien rapide vers les Tutoriels */}
+            {/* Bloc 1ter - Lien rapide vers les Tutoriels */}
             <button
               onClick={() => navigate('/tutoriels')}
               className="w-full flex items-center justify-between gap-3 rounded-xl border-2 border-dashed border-primary/30 bg-card hover:bg-accent/10 hover:border-accent/50 px-4 py-3 transition-all text-left group"
@@ -1388,7 +1388,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               <span className="text-xs font-medium text-primary group-hover:text-accent transition-colors">Découvrir →</span>
             </button>
 
-            {/* Bloc 2 — Vitrine livres Amazon (toujours visible) */}
+            {/* Bloc 2 - Vitrine livres Amazon (toujours visible) */}
             <AuthorBooksShowcase
               onStartWorkflow={() => {
                 setViewMode('trello');
@@ -1396,7 +1396,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               }}
             />
 
-            {/* Bloc 3 — Choix clair : Simple OU Workflow + Discuter avec l'IA */}
+            {/* Bloc 3 - Choix clair : Simple OU Workflow + Discuter avec l'IA */}
             <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between bg-card rounded-xl border p-3 shadow-sm">
               <div className="px-2">
                 <p className="text-sm font-semibold text-foreground">Parcours de création</p>
@@ -1438,7 +1438,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               </div>
             </div>
 
-            {/* Bloc 4 — Plan complet selon le mode */}
+            {/* Bloc 4 - Plan complet selon le mode */}
             {viewMode === 'trello' ? (
               <TrelloBoardView
                 ebookTitle={ebookTitle}
@@ -1693,14 +1693,14 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               </div>
             )}
 
-            {/* Background décoratif — subtle */}
+            {/* Background décoratif - subtle */}
             <div className="absolute inset-0 pointer-events-none">
               <div className="absolute top-20 right-10 w-72 h-72 bg-primary/5 rounded-full blur-[100px]" />
               <div className="absolute bottom-20 left-10 w-96 h-96 bg-accent/5 rounded-full blur-[120px]" />
             </div>
             
             <div className="relative z-10 space-y-6">
-              {/* Header Hero Section — 2026 Glass */}
+              {/* Header Hero Section - 2026 Glass */}
               <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-secondary via-muted to-background p-8 shadow-2xl border border-primary/20">
                 <div className="absolute -top-20 -right-20 w-60 h-60 bg-primary rounded-full blur-[100px] opacity-20" />
                 <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-accent rounded-full blur-[80px] opacity-15" />
@@ -1772,12 +1772,12 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                 </div>
                 <div className="mt-4 text-center">
                   <p className="text-muted-foreground text-sm italic">
-                    🚀 1, 2, 3… Foncez ! Je suis toujours là pour vous accompagner en Zoom gratuit — Georges
+                    🚀 1, 2, 3… Foncez ! Je suis toujours là pour vous accompagner en Zoom gratuit - Georges
                   </p>
                 </div>
               </div>
 
-              {/* Quick Stats — 2026 Glass Cards */}
+              {/* Quick Stats - 2026 Glass Cards */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {[
                   { label: 'Chapitres', value: chapters.length, icon: BookOpen, color: 'hsl(189, 100%, 29%)' },
@@ -1807,7 +1807,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Colonne principale (2/3) */}
                 <div className="lg:col-span-2 space-y-6">
-                  {/* General Info Card — 2026 */}
+                  {/* General Info Card - 2026 */}
                   <Card className="overflow-hidden border border-border/50 shadow-xl bg-card/90 backdrop-blur-sm rounded-2xl">
                     <CardHeader className="bg-gradient-to-r from-primary/5 to-accent/5 border-b border-border/30">
                       <div className="flex items-center justify-between">
@@ -2956,7 +2956,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                       ? bestTitle
                       : ebookTitle;
 
-                  const displayContent = `# 🧭 P1 — Zyro / Directeur Éditorial
+                  const displayContent = `# 🧭 P1 - Zyro / Directeur Éditorial
 
 **Titre analysé :** ${ebookTitle}
 **Meilleur titre KDP :** ${bestTitleText}
@@ -2978,7 +2978,7 @@ ${analysis.visionGlobale}
 ## Titres proposés
 ${titles.map((item, index) => {
   if (typeof item === 'string') return `${index + 1}. ${item}`;
-  return `${index + 1}. ${item.titre}${item.sousTitre ? ` : ${item.sousTitre}` : ''} — Score KDP ${item.scoreKdp}/100`;
+  return `${index + 1}. ${item.titre}${item.sousTitre ? ` : ${item.sousTitre}` : ''} - Score KDP ${item.scoreKdp}/100`;
 }).join('\n')}`;
 
                   saveStepResult('P1', analysis, displayContent);
@@ -3003,7 +3003,7 @@ ${titles.map((item, index) => {
                 subject={ebookTitle}
                 onSubjectChange={setEbookTitle}
                 onAnalysisComplete={(analysis) => {
-                  const displayContent = `# 🔎 P2 — Jano / Analyse de Marché
+                  const displayContent = `# 🔎 P2 - Jano / Analyse de Marché
 
 **Titre analysé :** ${ebookTitle}
 **Niche :** ${analysis.nichePrincipale || 'Non précisée'}
@@ -3040,7 +3040,7 @@ ${(analysis.categoriesKDP || []).join('\n')}`;
                 subject={ebookTitle}
                 onSubjectChange={setEbookTitle}
                 onArchitectureComplete={(architecture) => {
-                  const displayContent = `# 🧱 P3 — Kiro / Architecture du livre
+                  const displayContent = `# 🧱 P3 - Kiro / Architecture du livre
 
 **Titre :** ${ebookTitle}
 
@@ -3391,7 +3391,7 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
         <MissingApiKeyBanner
           apiKey={apiKey}
           onScrollToKeyField={() => {
-            // The Gemini key field lives inside the "planner" tab — switch to it first
+            // The Gemini key field lives inside the "planner" tab - switch to it first
             setActiveTab('planner');
             setTimeout(() => {
               const el = document.getElementById('gemini-api-key-field');
@@ -3421,7 +3421,7 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
             </Button>
           </div>
         )}
-        {/* Hero Header — Joyful */}
+        {/* Hero Header - Joyful */}
         <div className="relative overflow-hidden bg-joy-cream border-b-2 border-joy-ink/10">
           {/* Joyful blobs */}
           <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -3510,7 +3510,7 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
               </div>
 
               <p className="mt-5 text-joy-ink/70 text-sm italic">
-                🚀 1, 2, 3… Fonce ! Je suis là pour t'accompagner en Zoom gratuit — Georges
+                🚀 1, 2, 3… Fonce ! Je suis là pour t'accompagner en Zoom gratuit - Georges
               </p>
             </div>
           </div>

@@ -33,11 +33,11 @@ interface SocialStats {
 
 const STEP_LABELS: Record<number, string> = {
   0: 'Non contacté',
-  1: 'Email 1 — Curiosité',
-  2: 'Email 2 — Douleur',
-  3: 'Email 3 — Preuve sociale',
-  4: 'Email 4 — Urgence',
-  5: 'Email 5 — Dernier appel',
+  1: 'Email 1 - Curiosité',
+  2: 'Email 2 - Douleur',
+  3: 'Email 3 - Preuve sociale',
+  4: 'Email 4 - Urgence',
+  5: 'Email 5 - Dernier appel',
 };
 
 const PLATFORM_COLORS: Record<string, string> = {

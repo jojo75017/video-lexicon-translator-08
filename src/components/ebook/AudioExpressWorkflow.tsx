@@ -112,7 +112,7 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
   const [stepResults, setStepResults] = useState<Record<string, any>>({});
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // A1 — Brief Directeur
+  // A1 - Brief Directeur
   const [bookTitle, setBookTitle] = useState(ebookTitle || '');
   const [bookSubtitle, setBookSubtitle] = useState('');
   const [authorNameState, setAuthorNameState] = useState(propAuthorName || '');
@@ -121,7 +121,7 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
 
   // Update intro when title changes (only if user hasn't manually edited)
   const [introManuallyEdited, setIntroManuallyEdited] = useState(false);
-  // No auto-generated intro text — introduction field holds the real preface
+  // No auto-generated intro text - introduction field holds the real preface
   const [chapterContent, setChapterContent] = useState('');
 
   const projectChapterText = useMemo(() => serializeProjectChapters(chapters), [chapters]);
@@ -135,7 +135,7 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
   // A4 cleaned text
   const [cleanedText, setCleanedText] = useState('');
 
-  // A6 voice — auto-mapped from category
+  // A6 voice - auto-mapped from category
   const [selectedVoice, setSelectedVoice] = useState('fr-FR-EloiseNeural');
 
   // MP3 generation state
@@ -271,7 +271,7 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
       const zip = new JSZip();
       const allMp3Blobs: Blob[] = [];
 
-      // Intro MP3 — "{Titre}, par {Auteur}."
+      // Intro MP3 - "{Titre}, par {Auteur}."
       setGenerationLabel('🎵 Génération de l\'intro...');
       setGenerationProgress(5);
       const introBlobs = await generateIntroForExport(
@@ -284,7 +284,7 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
         allMp3Blobs.push(iBlob);
       }
 
-      // Préface supprimée — seuls les chapitres sont lus
+      // Préface supprimée - seuls les chapitres sont lus
 
       // Chapters
       const chaps = splitIntoChapters(textToConvert);
@@ -296,7 +296,7 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
           console.warn(`Chapitre ${i + 1} ignoré (contenu vide ou trop court)`);
           continue;
         }
-        setGenerationLabel(`📖 ${i + 1}/${chaps.length} — ${chaps[i].title}`);
+        setGenerationLabel(`📖 ${i + 1}/${chaps.length} - ${chaps[i].title}`);
         setGenerationProgress(Math.round(10 + ((i) / chaps.length) * 80));
         try {
           const blob = await generateTts(chapContent);
@@ -468,7 +468,7 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
         return (
           <div className="space-y-4">
             <div className="bg-muted/30 border rounded-lg p-4 text-sm space-y-2">
-              <p className="font-medium">📕 {brief.bookTitle} — {brief.bookSubtitle}</p>
+              <p className="font-medium">📕 {brief.bookTitle} - {brief.bookSubtitle}</p>
               <p className="text-muted-foreground">Par {brief.authorName} • {CATEGORIES.find(c => c.value === brief.category)?.label}</p>
             </div>
             <p className="text-muted-foreground text-sm">La structure sera optimisée pour l'écoute : chapitres courts, transitions naturelles, titres lus à voix haute.</p>
@@ -766,7 +766,7 @@ export const AudioExpressWorkflow: React.FC<AudioExpressWorkflowProps> = ({
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2 text-lg">
               {React.createElement(AUDIO_STEPS[currentStep].icon, { className: 'h-5 w-5 text-primary' })}
-              {AUDIO_STEPS[currentStep].id} — {AUDIO_STEPS[currentStep].label}
+              {AUDIO_STEPS[currentStep].id} - {AUDIO_STEPS[currentStep].label}
             </CardTitle>
             <Badge variant="outline">~{AUDIO_STEPS[currentStep].estimatedMinutes} min</Badge>
           </div>

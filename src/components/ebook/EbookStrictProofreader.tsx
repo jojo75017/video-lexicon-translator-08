@@ -121,7 +121,7 @@ export default function EbookStrictProofreader({ chapters = [], onApplyCorrectio
             <div>
               <CardTitle className="text-xl">Correcteur Éditorial Strict</CardTitle>
               <CardDescription>
-                Correction orthographique, grammaticale et typographique — sans aucune réécriture. 
+                Correction orthographique, grammaticale et typographique - sans aucune réécriture. 
                 Le style de l'auteur est préservé intégralement.
               </CardDescription>
             </div>

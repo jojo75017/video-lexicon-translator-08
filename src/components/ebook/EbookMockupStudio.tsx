@@ -286,7 +286,7 @@ export const EbookMockupStudio: React.FC = () => {
                       {isGenerating ? (
                         <><Loader2 className="h-5 w-5 mr-2 animate-spin" />Génération en cours...</>
                       ) : (
-                        <><Sparkles className="h-5 w-5 mr-2" />Générer {currentPose?.label} — {viewModeConfig[viewMode].label}</>
+                        <><Sparkles className="h-5 w-5 mr-2" />Générer {currentPose?.label} - {viewModeConfig[viewMode].label}</>
                       )}
                     </Button>
                   </CardContent>
@@ -300,7 +300,7 @@ export const EbookMockupStudio: React.FC = () => {
                   <CardHeader className="pb-2">
                     <CardTitle className="text-lg flex items-center gap-2">
                       <ImageIcon className="w-5 h-5 text-emerald-500" />
-                      Résultat — {viewModeConfig[viewMode].label}
+                      Résultat - {viewModeConfig[viewMode].label}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -327,7 +327,7 @@ export const EbookMockupStudio: React.FC = () => {
                           <div className="p-3 bg-emerald-50 rounded-lg border border-emerald-200">
                             <p className="text-xs text-emerald-700 flex items-center gap-1.5">
                               <Sparkles className="w-3.5 h-3.5" />
-                              <strong>Fond transparent</strong> — Idéal pour pages de vente et réseaux sociaux
+                              <strong>Fond transparent</strong> - Idéal pour pages de vente et réseaux sociaux
                             </p>
                           </div>
                         )}
@@ -335,7 +335,7 @@ export const EbookMockupStudio: React.FC = () => {
                           <div className="p-3 bg-amber-50 rounded-lg border border-amber-200">
                             <p className="text-xs text-amber-700 flex items-center gap-1.5">
                               <Diamond className="w-3.5 h-3.5" />
-                              <strong>Haute Qualité</strong> — Résolution maximale pour impression et grand format
+                              <strong>Haute Qualité</strong> - Résolution maximale pour impression et grand format
                             </p>
                           </div>
                         )}

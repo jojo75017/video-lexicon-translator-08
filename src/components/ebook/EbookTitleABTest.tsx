@@ -56,7 +56,7 @@ export const EbookTitleABTest: React.FC<EbookTitleABTestProps> = ({ currentTitle
 
     setIsAnalyzing(true);
     try {
-      const titlesText = validVariants.map((v, i) => `Variante ${i + 1}: "${v.title}"${v.subtitle ? ` — Sous-titre: "${v.subtitle}"` : ''}`).join('\n');
+      const titlesText = validVariants.map((v, i) => `Variante ${i + 1}: "${v.title}"${v.subtitle ? ` - Sous-titre: "${v.subtitle}"` : ''}`).join('\n');
 
       const { data, error } = await supabase.functions.invoke('generate-content', {
         body: {
@@ -122,7 +122,7 @@ export const EbookTitleABTest: React.FC<EbookTitleABTestProps> = ({ currentTitle
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Trophy className="h-5 w-5 text-primary" />
-            A/B Test de Titres — Trouvez le titre qui vend
+            A/B Test de Titres - Trouvez le titre qui vend
           </CardTitle>
           <p className="text-sm text-muted-foreground">
             Comparez jusqu'à 6 variantes de titres. L'IA évalue chacune sur 5 critères KDP et désigne le gagnant.
@@ -172,7 +172,7 @@ export const EbookTitleABTest: React.FC<EbookTitleABTestProps> = ({ currentTitle
               {v.isWinner && <div className="absolute -top-3 left-4"><Badge className="bg-yellow-500 text-white">🏆 MEILLEUR TITRE</Badge></div>}
               <CardHeader className="pb-2">
                 <CardTitle className="text-base">
-                  #{rank + 1} — {v.title}
+                  #{rank + 1} - {v.title}
                   {v.subtitle && <span className="block text-sm text-muted-foreground font-normal mt-1">{v.subtitle}</span>}
                 </CardTitle>
               </CardHeader>

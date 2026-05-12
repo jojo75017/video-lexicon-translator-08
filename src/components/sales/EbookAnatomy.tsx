@@ -32,7 +32,7 @@ const EbookAnatomy: React.FC = () => {
             Anatomie d'un projet <span className="text-primary">EbookStudio</span>
           </h2>
           <p className="text-foreground/70 text-lg max-w-2xl mx-auto">
-            Chaque projet vous livre 8 actifs prêts à publier sur Amazon KDP — pas seulement un manuscrit.
+            Chaque projet vous livre 8 actifs prêts à publier sur Amazon KDP - pas seulement un manuscrit.
           </p>
         </motion.div>
 

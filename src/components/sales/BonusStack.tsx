@@ -92,7 +92,7 @@ const BonusStack: React.FC = () => {
               <ArrowRight className="w-6 h-6" />
               <span className="text-6xl md:text-7xl font-black text-kdp-orange leading-none">{PRICE}€</span>
             </div>
-            <p className="text-primary-foreground/80 mb-2">Paiement unique — accès à vie</p>
+            <p className="text-primary-foreground/80 mb-2">Paiement unique - accès à vie</p>
             <p className="text-sm text-primary-foreground/70 mb-6">
               Économie immédiate : <span className="font-bold text-kdp-orange">{totalValue - PRICE}€</span> ({Math.round((1 - PRICE / totalValue) * 100)}% de remise)
             </p>

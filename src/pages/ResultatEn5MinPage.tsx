@@ -33,7 +33,7 @@ const ResultatEn5MinPage: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-b from-background via-violet-50/30 to-background dark:from-background dark:via-violet-950/20 dark:to-background">
       <div className="container mx-auto px-4 py-12 max-w-4xl">
         
-        {/* BLOC 1 — PROMESSE CLAIRE */}
+        {/* BLOC 1 - PROMESSE CLAIRE */}
         <section className="text-center mb-16">
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6 leading-tight">
             Voici ce que le générateur produit en 5 minutes
@@ -48,7 +48,7 @@ const ResultatEn5MinPage: React.FC = () => {
           </p>
         </section>
 
-        {/* BLOC 2 — EXEMPLE DE RÉSULTAT */}
+        {/* BLOC 2 - EXEMPLE DE RÉSULTAT */}
         <section className="mb-16">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 text-foreground">
             <BookOpen className="inline-block w-8 h-8 mr-3 text-violet-500" />
@@ -98,7 +98,7 @@ const ResultatEn5MinPage: React.FC = () => {
           </div>
         </section>
 
-        {/* BLOC 3 — CTA DÉMO GRATUITE */}
+        {/* BLOC 3 - CTA DÉMO GRATUITE */}
         <section className="text-center mb-12">
           <Button 
             size="lg" 
@@ -116,7 +116,7 @@ const ResultatEn5MinPage: React.FC = () => {
           </p>
         </section>
 
-        {/* BLOC 4 — GARANTIE */}
+        {/* BLOC 4 - GARANTIE */}
         <section className="mb-16">
           <Card className="border-emerald-300 dark:border-emerald-700 bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-950/40 dark:to-green-950/40 shadow-lg">
             <CardContent className="py-6">
@@ -137,7 +137,7 @@ const ResultatEn5MinPage: React.FC = () => {
           </Card>
         </section>
 
-        {/* BLOC 5 — POUR QUI / PAS POUR QUI */}
+        {/* BLOC 5 - POUR QUI / PAS POUR QUI */}
         <section className="mb-16">
           <div className="grid md:grid-cols-2 gap-6">
             {/* Pour toi */}
@@ -176,7 +176,7 @@ const ResultatEn5MinPage: React.FC = () => {
           </div>
         </section>
 
-        {/* BLOC 6 — RAPPEL OFFRE DISCRET */}
+        {/* BLOC 6 - RAPPEL OFFRE DISCRET */}
         <section className="text-center py-8 border-t border-border/50">
           <p className="text-muted-foreground mb-4">
             <strong className="text-foreground">Offre actuelle :</strong>

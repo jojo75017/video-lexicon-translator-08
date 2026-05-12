@@ -94,7 +94,7 @@ const InstallPage = () => {
 
         <div className="text-center mt-8 p-6 rounded-2xl bg-primary/5">
           <p className="text-sm text-muted-foreground">
-            ✨ Une fois installée, l'app fonctionne en plein écran sans barre de navigateur — comme une vraie application mobile.
+            ✨ Une fois installée, l'app fonctionne en plein écran sans barre de navigateur - comme une vraie application mobile.
           </p>
         </div>
       </div>

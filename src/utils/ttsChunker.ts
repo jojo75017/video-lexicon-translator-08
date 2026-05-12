@@ -37,7 +37,7 @@ export function splitTextForTts(text: string, maxChunkSize = MAX_CHUNK_SIZE): st
       currentChunk = '';
     }
 
-    // Paragraph itself is too long — split by sentences
+    // Paragraph itself is too long - split by sentences
     if (trimmed.length > maxChunkSize) {
       const sentenceChunks = splitBySentences(trimmed, maxChunkSize);
       for (const sc of sentenceChunks) {

@@ -135,7 +135,7 @@ export const EbookMarketing: React.FC<EbookMarketingProps> = ({
         zip.file(`${base}.html`, e.bodyHtml);
       });
       zip.file('README.txt',
-`Campagne email de lancement — ${ebookTitle}
+`Campagne email de lancement - ${ebookTitle}
 
 Comment utiliser ces fichiers :
 1. Importe-les dans ton outil d'emailing (Mailchimp, Brevo, Systeme.io, ConvertKit, MailerLite...).
@@ -143,7 +143,7 @@ Comment utiliser ces fichiers :
 3. Programme l'envoi selon le calendrier J-7, J-3, J0, J+3, J+7.
 4. Remplace [LIEN_ACHAT] par le vrai lien si tu ne l'as pas renseigné.
 
-EbookStudio génère le contenu — l'envoi se fait depuis ton outil d'emailing.`);
+EbookStudio génère le contenu - l'envoi se fait depuis ton outil d'emailing.`);
       const blob = await zip.generateAsync({ type: 'blob' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -204,7 +204,7 @@ EbookStudio génère le contenu — l'envoi se fait depuis ton outil d'emailing.
           </div>
 
           <div>
-            <Label htmlFor="book-pitch">Pitch / promesse du livre (optionnel — sinon le résumé du projet sera utilisé)</Label>
+            <Label htmlFor="book-pitch">Pitch / promesse du livre (optionnel - sinon le résumé du projet sera utilisé)</Label>
             <Textarea
               id="book-pitch"
               rows={3}

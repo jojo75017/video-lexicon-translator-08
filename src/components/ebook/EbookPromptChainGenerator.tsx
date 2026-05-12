@@ -120,7 +120,7 @@ export const EbookPromptChainGenerator: React.FC = () => {
             Générateur de Chaînes de Prompts
           </CardTitle>
           <p className="text-muted-foreground">
-            Séquences de prompts optimisés par genre — Créez un livre entier étape par étape
+            Séquences de prompts optimisés par genre - Créez un livre entier étape par étape
           </p>
         </CardHeader>
       </Card>

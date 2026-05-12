@@ -44,12 +44,12 @@ const CoachingVipBanner = () => {
           <div className="flex items-center gap-2 mb-1">
             <Crown className="w-4 h-4 flex-shrink-0" />
             <span className="text-xs font-bold uppercase tracking-wider opacity-95">
-              Offre privée — 10 places seulement
+              Offre privée - 10 places seulement
             </span>
           </div>
           <h3 className="font-black text-base md:text-lg leading-tight">
             Coaching VIP 30 jours avec Georges
-            <span className="hidden sm:inline"> — pour passer vraiment à l'action</span>
+            <span className="hidden sm:inline"> - pour passer vraiment à l'action</span>
           </h3>
           <div className="flex items-center gap-2 mt-1.5 text-sm">
             <span className="line-through opacity-80">197€</span>

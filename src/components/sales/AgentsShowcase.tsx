@@ -76,7 +76,7 @@ const agentToCard = (id: string): ToolCard => {
   };
 };
 
-// 5 piliers — 21 outils au total
+// 5 piliers - 21 outils au total
 const PILLARS = [
   {
     id: 'pilier-ecrire',
@@ -237,7 +237,7 @@ const AgentsShowcase: React.FC = () => {
         >
           <Badge className="bg-primary/10 text-primary border-primary/30 px-4 py-2 mb-4">
             <Layers className="w-4 h-4 mr-2" />
-            ÉCOSYSTÈME COMPLET — 5 PILIERS
+            ÉCOSYSTÈME COMPLET - 5 PILIERS
           </Badge>
           <div className="inline-flex items-baseline gap-3 mb-4">
             <span className="text-7xl sm:text-8xl font-black bg-gradient-to-br from-primary to-accent bg-clip-text text-transparent leading-none">
@@ -249,7 +249,7 @@ const AgentsShowcase: React.FC = () => {
             Tout pour <span className="text-primary">créer, publier et vendre</span> vos ebooks
           </h2>
           <p className="text-foreground/70 text-lg max-w-2xl mx-auto">
-            15 agents IA + 6 studios visuels, audio et marketing — dans une seule plateforme.
+            15 agents IA + 6 studios visuels, audio et marketing - dans une seule plateforme.
           </p>
         </motion.div>
 
@@ -301,7 +301,7 @@ const AgentsShowcase: React.FC = () => {
           className="mt-20 text-center"
         >
           <p className="text-muted-foreground mb-5">
-            Tous les {TOTAL_TOOLS} outils inclus à vie — <span className="text-primary font-bold">aucun coût additionnel</span>
+            Tous les {TOTAL_TOOLS} outils inclus à vie - <span className="text-primary font-bold">aucun coût additionnel</span>
           </p>
           <Button
             size="lg"
@@ -309,7 +309,7 @@ const AgentsShowcase: React.FC = () => {
             className="bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold px-10 py-7 rounded-2xl shadow-xl shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-1 transition-all"
           >
             <Sparkles className="w-5 h-5 mr-2" />
-            Débloquer les {TOTAL_TOOLS} outils — 67€ à vie
+            Débloquer les {TOTAL_TOOLS} outils - 67€ à vie
             <ArrowRight className="w-5 h-5 ml-2" />
           </Button>
         </motion.div>

@@ -12,7 +12,7 @@ const ONBOARDING_KEY = "ebookstudio_first_ebook_onboarding_done";
 
 /**
  * Onboarding modal shown ONCE after first login.
- * Step 0: BYOK Gemini key validation (mandatory — without it, P1-P15 fail).
+ * Step 0: BYOK Gemini key validation (mandatory - without it, P1-P15 fail).
  * Step 1: Quick overview of the 3-step ebook creation flow.
  */
 export const FirstEbookOnboarding = ({ subscriberEmail }: { subscriberEmail?: string }) => {
@@ -78,7 +78,7 @@ export const FirstEbookOnboarding = ({ subscriberEmail }: { subscriberEmail?: st
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2 text-xl">
                 <KeyRound className="h-5 w-5 text-primary" />
-                Étape 0 — Connectez votre IA
+                Étape 0 - Connectez votre IA
               </DialogTitle>
               <DialogDescription>
                 EbookStudio utilise Gemini de Google pour rédiger vos livres.

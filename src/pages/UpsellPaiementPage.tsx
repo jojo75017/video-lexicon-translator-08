@@ -26,9 +26,9 @@ const PLAN = {
   originalPrice: String(NORMAL_PRICE),
   features: [
     "Workflow éditorial 15 rôles IA",
-    "Gemini 3 Flash — IA ultra-rapide",
-    "Imagen 3 — couvertures pro",
-    "Azure Neural — audiobooks",
+    "Gemini 3 Flash - IA ultra-rapide",
+    "Imagen 3 - couvertures pro",
+    "Azure Neural - audiobooks",
     "Export PDF/EPUB/Word",
     "18 modules de formation (147€ offerts)",
     "Outils KDP Premium + SEO",
@@ -128,7 +128,7 @@ const UpsellPaiementPage = () => {
                 </Badge>
               </div>
               <CardTitle className="text-2xl font-bold">Finalisez votre commande</CardTitle>
-              <p className="text-foreground/80 mt-1 text-sm">EbookStudio Pro — Accès à vie</p>
+              <p className="text-foreground/80 mt-1 text-sm">EbookStudio Pro - Accès à vie</p>
               <div className="mt-5 flex items-baseline justify-center gap-3">
                 <span className="text-xl text-muted-foreground line-through">{PLAN.originalPrice}€</span>
                 <span className="text-6xl font-black text-white">{PLAN.price}€</span>
@@ -377,7 +377,7 @@ const UpsellPaiementPage = () => {
                   >
                     <Button size="lg" className="w-full py-7 text-lg font-bold bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-900 rounded-xl shadow-xl shadow-cyan-500/20 hover:shadow-cyan-500/30 transition-all">
                       <CreditCard className="w-5 h-5 mr-2" />
-                      Payer {currentAmount}€ — PayPal ou CB
+                      Payer {currentAmount}€ - PayPal ou CB
                       <ArrowRight className="w-5 h-5 ml-2" />
                     </Button>
                   </a>
@@ -419,7 +419,7 @@ const UpsellPaiementPage = () => {
                 <div className="flex items-start gap-3">
                   <ShieldCheck className="w-6 h-6 text-emerald-400 flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-emerald-300 font-semibold text-sm">Garantie 30 jours — Satisfait ou remboursé</p>
+                    <p className="text-emerald-300 font-semibold text-sm">Garantie 30 jours - Satisfait ou remboursé</p>
                     <p className="text-emerald-400/70 text-xs mt-1">
                       Testez EbookStudio pendant 30 jours. Si vous ne publiez pas votre premier ebook, remboursement intégral. Aucune question posée.
                     </p>

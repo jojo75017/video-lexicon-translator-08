@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 const messages = [
   { emoji: "👋", text: "Hey, content de te voir ! +200 auteurs ont déjà rejoint l'aventure" },
   { emoji: "✨", text: "Pas de stress : on t'accompagne pas à pas, à ton rythme" },
-  { emoji: "🎁", text: "Tarif câlin -150€ jusqu'au 15 sept — pas de bla-bla" },
+  { emoji: "🎁", text: "Tarif câlin -150€ jusqu'au 15 sept - pas de bla-bla" },
   { emoji: "🛡️", text: "Garantie 30 jours : si tu adores pas, on te rembourse, point" },
   { emoji: "🚀", text: "Ton premier ebook publié ce week-end ? On y croit avec toi" },
 ];

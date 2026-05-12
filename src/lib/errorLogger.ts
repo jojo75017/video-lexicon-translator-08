@@ -1,7 +1,7 @@
 /**
  * Centralized client-side error logger.
  * Sends errors to the log-client-error edge function.
- * Fails silently — never throws to avoid cascading errors.
+ * Fails silently - never throws to avoid cascading errors.
  */
 import { supabase } from "@/integrations/supabase/client";
 

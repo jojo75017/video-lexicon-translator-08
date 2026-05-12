@@ -154,7 +154,7 @@ export const EbookKdpPrePublishChecklist: React.FC<EbookKdpPrePublishChecklistPr
                 Checklist Pré-Publication KDP
               </CardTitle>
               <p className="text-muted-foreground mt-1">
-                {totalItems} points de contrôle — Vérifiez tout avant de publier sur Amazon
+                {totalItems} points de contrôle - Vérifiez tout avant de publier sur Amazon
               </p>
             </div>
             <div className="text-right">

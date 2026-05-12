@@ -42,7 +42,7 @@ const categoryIcons: Record<string, any> = {
 
 const categorySubtitles: Record<string, string> = {
   'Romans & Fiction Populaires': 'Captivez vos lecteurs avec des histoires inoubliables',
-  'Romance': 'Le genre #1 sur Amazon KDP — potentiel illimité',
+  'Romance': 'Le genre #1 sur Amazon KDP - potentiel illimité',
   'Livres pour Enfants': 'Un marché en pleine croissance toute l\'année',
   'Développement Personnel': 'Aidez vos lecteurs à transformer leur vie',
   'Business & Entrepreneuriat': 'Des guides pratiques pour entrepreneurs ambitieux',
@@ -127,7 +127,7 @@ const NichesPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
-      {/* Sticky top bar — toujours visible (y compris onglet Best-Sellers) */}
+      {/* Sticky top bar - toujours visible (y compris onglet Best-Sellers) */}
       <div className="sticky top-0 z-50 backdrop-blur-md bg-background/85 border-b shadow-sm">
         <div className="max-w-7xl mx-auto px-4 md:px-8 py-3 flex items-center justify-between gap-3">
           <Button

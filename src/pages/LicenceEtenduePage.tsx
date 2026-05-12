@@ -101,7 +101,7 @@ const LicenceEtenduePage = () => {
             <a href={PAYPAL_LINK} target="_blank" rel="noopener noreferrer" className="block">
               <Button size="lg" className="w-full md:w-auto px-10 py-6 text-lg font-bold bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400 rounded-xl">
                 <CreditCard className="w-5 h-5 mr-2" />
-                Débloquer la Licence Étendue — {EXTENDED_PRICE}€
+                Débloquer la Licence Étendue - {EXTENDED_PRICE}€
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </a>

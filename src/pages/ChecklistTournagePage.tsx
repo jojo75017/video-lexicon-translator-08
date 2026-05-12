@@ -11,14 +11,14 @@ const CAPTURES = [
   { id: 1, label: "PDF final exporté (150 pages)", sequence: "Hook", tip: "Ouvrez un PDF déjà exporté, scrollez pour montrer le volume", route: "/ebook-planner" },
   { id: 2, label: "Recherche concurrents Amazon/Google", sequence: "Problème", tip: "Ouvrez Amazon KDP + Google côte à côte, montrez la masse de livres", route: null },
   { id: 3, label: "Document Word vide", sequence: "Problème", tip: "Ouvrez un fichier Word vierge avec curseur clignotant", route: null },
-  { id: 4, label: "Planificateur — champ rempli", sequence: "Planificateur", tip: "Remplissez titre + genre + nb chapitres AVANT de capturer", route: "/ebook-planner" },
-  { id: 5, label: "Planificateur — loading (spinner)", sequence: "Planificateur", tip: "Lancez la génération et capturez PENDANT le spinner", route: "/ebook-planner" },
-  { id: 6, label: "Planificateur — résultat complet", sequence: "Planificateur", tip: "Montrez le plan avec tous les chapitres générés", route: "/ebook-planner" },
+  { id: 4, label: "Planificateur - champ rempli", sequence: "Planificateur", tip: "Remplissez titre + genre + nb chapitres AVANT de capturer", route: "/ebook-planner" },
+  { id: 5, label: "Planificateur - loading (spinner)", sequence: "Planificateur", tip: "Lancez la génération et capturez PENDANT le spinner", route: "/ebook-planner" },
+  { id: 6, label: "Planificateur - résultat complet", sequence: "Planificateur", tip: "Montrez le plan avec tous les chapitres générés", route: "/ebook-planner" },
   { id: 7, label: "Bouton P4 Rédaction Experte", sequence: "Rédaction", tip: "Zoomez sur le bouton/onglet Rédaction Experte", route: "/ebook-planner" },
   { id: 8, label: "Génération en cours (chapitre)", sequence: "Rédaction", tip: "Lancez la rédaction d'un chapitre, capturez le loading", route: "/ebook-planner" },
-  { id: 9, label: "Chapitre terminé — zoom texte", sequence: "Rédaction", tip: "Montrez un chapitre complet avec du vrai contenu lisible", route: "/ebook-planner" },
+  { id: 9, label: "Chapitre terminé - zoom texte", sequence: "Rédaction", tip: "Montrez un chapitre complet avec du vrai contenu lisible", route: "/ebook-planner" },
   { id: 10, label: "Compteur ~150 pages", sequence: "Rédaction", tip: "Montrez les stats (mots, pages estimées) dans le dashboard", route: "/ebook-planner" },
-  { id: 11, label: "Générateur couverture — interface", sequence: "Couverture", tip: "Montrez l'interface du générateur de couverture vide", route: "/ebook-planner" },
+  { id: 11, label: "Générateur couverture - interface", sequence: "Couverture", tip: "Montrez l'interface du générateur de couverture vide", route: "/ebook-planner" },
   { id: 12, label: "Couverture générée", sequence: "Couverture", tip: "Montrez une couverture fraîchement générée en gros plan", route: "/ebook-planner" },
   { id: 13, label: "Galerie couvertures", sequence: "Couverture", tip: "Si plusieurs couvertures, montrez la galerie/sélection", route: "/ebook-planner" },
   { id: 14, label: "KDP Keywords générés", sequence: "SEO & Export", tip: "Montrez les 7 mots-clés KDP suggérés par l'IA", route: "/ebook-planner" },
@@ -57,7 +57,7 @@ const ChecklistTournagePage: React.FC = () => {
           <h1 className="text-3xl font-bold">Checklist Tournage Vidéo</h1>
         </div>
         <p className="text-muted-foreground">
-          Script : <strong>"150 pages en 47 minutes avec l'IA"</strong> — Durée cible : 3min30
+          Script : <strong>"150 pages en 47 minutes avec l'IA"</strong> - Durée cible : 3min30
         </p>
       </div>
 

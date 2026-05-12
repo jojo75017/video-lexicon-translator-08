@@ -44,7 +44,7 @@ const EbookLaunchSocialPosts: React.FC<EbookLaunchSocialPostsProps> = ({
   const buildPrompt = useCallback((platform: typeof PLATFORMS[number], phase: typeof PHASES[number], count: number = 3) => {
     return `Tu es un expert en marketing littéraire et réseaux sociaux. Génère ${count} post${count > 1 ? 's' : ''} ${platform.label} pour un livre intitulé "${title}"${author ? ` par ${author}` : ''}${bookGenre ? ` (genre: ${bookGenre})` : ''}${targetAudience ? ` ciblant: ${targetAudience}` : ''}.
 
-Phase de lancement : ${phase.label} — ${phase.description}
+Phase de lancement : ${phase.label} - ${phase.description}
 ${link ? `Lien Amazon : ${link}` : ''}
 
 CONTRAINTES STRICTES :
@@ -207,13 +207,13 @@ Réponds en JSON strict :
     const allText = generatedPosts.map(post => {
       const platform = PLATFORMS.find(p => p.id === post.platform);
       const phase = PHASES.find(p => p.id === post.phase);
-      const header = `═══ ${platform?.label?.toUpperCase()} — ${phase?.label} ═══`;
+      const header = `═══ ${platform?.label?.toUpperCase()} - ${phase?.label} ═══`;
       const hashtags = post.hashtags.length > 0 ? `\n\nHashtags: ${post.hashtags.map(h => `#${h}`).join(' ')}` : '';
       const visual = post.visualTip ? `\n\n🎨 Visuel: ${post.visualTip}` : '';
       return `${header}\n\n${post.content}${hashtags}${visual}`;
     }).join('\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n');
     
-    const blob = new Blob([`📚 Posts de lancement — ${title}\n\n${allText}`], { type: 'text/plain;charset=utf-8' });
+    const blob = new Blob([`📚 Posts de lancement - ${title}\n\n${allText}`], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url; a.download = `posts-lancement-${title.replace(/\s+/g, '-').toLowerCase()}.txt`;

@@ -241,7 +241,7 @@ const KDP_FORMATS = [
 ];
 
 const CHAR_LIMITS = [
-  { field: 'Titre', limit: '200 caractères', note: 'Pas de sous-titre ici — utilisez le champ dédié' },
+  { field: 'Titre', limit: '200 caractères', note: 'Pas de sous-titre ici - utilisez le champ dédié' },
   { field: 'Sous-titre', limit: '200 caractères', note: 'Optimisez pour le SEO avec des mots-clés' },
   { field: 'Description', limit: '4 000 caractères', note: 'HTML limité : <b>, <i>, <br>, <h2>' },
   { field: 'Nom d\'auteur', limit: '100 caractères', note: 'Doit correspondre à la couverture' },
@@ -366,7 +366,7 @@ const KdpGuideChecklist: React.FC = () => {
             </div>
             <div>
               <CardTitle className="text-xl flex items-center gap-2">
-                Guide KDP — Règles Amazon Officielles
+                Guide KDP - Règles Amazon Officielles
                 <Badge className="bg-red-500 text-white border-0 text-[10px]">2024-2026</Badge>
               </CardTitle>
               <CardDescription>

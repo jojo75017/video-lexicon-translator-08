@@ -50,31 +50,31 @@ const audioModules = [
       {
         subtitle: "👩 Voix Féminines (9)",
         items: [
-          "Aria — Claire et polyvalente ✓ Pour enfants",
-          "Sarah — Douce et narrative ✓ Pour enfants",
-          "Laura — Chaleureuse et engageante ✓ Pour enfants",
-          "Charlotte — Britannique élégante",
-          "Alice — Britannique confiante",
-          "Matilda — Chaleureuse et américaine ✓ Pour enfants",
-          "Jessica — Expressive et américaine",
-          "Lily — Britannique narrative ✓ Pour enfants",
-          "River — Non-binaire américain"
+          "Aria - Claire et polyvalente ✓ Pour enfants",
+          "Sarah - Douce et narrative ✓ Pour enfants",
+          "Laura - Chaleureuse et engageante ✓ Pour enfants",
+          "Charlotte - Britannique élégante",
+          "Alice - Britannique confiante",
+          "Matilda - Chaleureuse et américaine ✓ Pour enfants",
+          "Jessica - Expressive et américaine",
+          "Lily - Britannique narrative ✓ Pour enfants",
+          "River - Non-binaire américain"
         ]
       },
       {
         subtitle: "👨 Voix Masculines (11)",
         items: [
-          "Roger — Profonde et autoritaire (Business, Thriller)",
-          "Charlie — Australien décontracté (Podcast, Blog)",
-          "George — Britannique chaleureux ✓ Pour enfants",
-          "Callum — Transatlantique (Documentaire)",
-          "Liam — Américain articulé ✓ Pour enfants",
-          "Will — Américain amical ✓ Pour enfants",
-          "Eric — Américain amical (Guide pratique)",
-          "Chris — Américain décontracté (Podcast)",
-          "Brian — Américain profond (Non-fiction)",
-          "Daniel — Britannique autoritaire (Business)",
-          "Bill — Américain fiable (Formation)"
+          "Roger - Profonde et autoritaire (Business, Thriller)",
+          "Charlie - Australien décontracté (Podcast, Blog)",
+          "George - Britannique chaleureux ✓ Pour enfants",
+          "Callum - Transatlantique (Documentaire)",
+          "Liam - Américain articulé ✓ Pour enfants",
+          "Will - Américain amical ✓ Pour enfants",
+          "Eric - Américain amical (Guide pratique)",
+          "Chris - Américain décontracté (Podcast)",
+          "Brian - Américain profond (Non-fiction)",
+          "Daniel - Britannique autoritaire (Business)",
+          "Bill - Américain fiable (Formation)"
         ]
       },
       {
@@ -114,23 +114,23 @@ const audioModules = [
     color: "from-amber-500 to-orange-500",
     content: [
       {
-        subtitle: "Étape 1 — Accéder au générateur",
+        subtitle: "Étape 1 - Accéder au générateur",
         text: "Ouvrez votre projet ebook depuis le générateur, puis cliquez sur l'onglet « Audio ». Le contenu de votre ebook est automatiquement chargé."
       },
       {
-        subtitle: "Étape 2 — Choisir le type de contenu",
+        subtitle: "Étape 2 - Choisir le type de contenu",
         text: "Sélectionnez entre les sections prédéfinies (préface, chapitres, conclusion), l'ebook complet ou un texte personnalisé."
       },
       {
-        subtitle: "Étape 3 — Sélectionner une voix",
+        subtitle: "Étape 3 - Sélectionner une voix",
         text: "Parcourez les 20 voix disponibles. Filtrez par genre (féminin/masculin) ou par compatibilité enfants. Écoutez un aperçu si possible."
       },
       {
-        subtitle: "Étape 4 — Générer l'audio",
+        subtitle: "Étape 4 - Générer l'audio",
         text: "Cliquez sur « Générer ». Le texte est découpé automatiquement en segments de 5000 caractères maximum. Chaque segment prend 1-2 secondes."
       },
       {
-        subtitle: "Étape 5 — Écouter et télécharger",
+        subtitle: "Étape 5 - Écouter et télécharger",
         text: "Utilisez le lecteur intégré pour écouter le résultat. Téléchargez en MP3 haute qualité. Vous pouvez aussi mettre en ligne votre livre audio directement depuis la plateforme."
       }
     ]
@@ -281,12 +281,12 @@ const audioModules = [
       {
         subtitle: "📦 Distribution externe",
         items: [
-          "Audible (Amazon) — La plus grande plateforme d'audiobooks",
-          "Apple Books — Écosystème Apple",
-          "Google Play Livres — Android et web",
-          "Kobo — International",
-          "Spotify (via distributeur type Findaway) — Streaming",
-          "Votre propre site web — Vente directe avec meilleure marge"
+          "Audible (Amazon) - La plus grande plateforme d'audiobooks",
+          "Apple Books - Écosystème Apple",
+          "Google Play Livres - Android et web",
+          "Kobo - International",
+          "Spotify (via distributeur type Findaway) - Streaming",
+          "Votre propre site web - Vente directe avec meilleure marge"
         ]
       },
       {

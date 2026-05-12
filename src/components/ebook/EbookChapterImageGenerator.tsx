@@ -899,7 +899,7 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
                 </Label>
               </div>
               <p className="text-xs text-amber-700 mt-1 pl-6">
-                Seed actuel: {lastSeed} — Les nouvelles images auront un style proche
+                Seed actuel: {lastSeed} - Les nouvelles images auront un style proche
               </p>
             </div>
           )}

@@ -15,7 +15,7 @@ const SalesFaq: React.FC = () => {
     },
     {
       question: "Ai-je besoin de compétences techniques ou de savoir écrire ?",
-      answer: "Absolument pas ! EbookStudio est conçu pour les débutants complets. L'IA Gemini 3 Flash rédige l'intégralité de votre ebook. Vous choisissez simplement le sujet, le ton et le style — l'IA s'occupe de tout le reste, de la structure aux chapitres en passant par la couverture."
+      answer: "Absolument pas ! EbookStudio est conçu pour les débutants complets. L'IA Gemini 3 Flash rédige l'intégralité de votre ebook. Vous choisissez simplement le sujet, le ton et le style - l'IA s'occupe de tout le reste, de la structure aux chapitres en passant par la couverture."
     },
     {
       question: "Qu'est-ce que Gemini 3 Flash et combien ça coûte ?",
@@ -64,7 +64,7 @@ const SalesFaq: React.FC = () => {
         <div className="text-center mb-12">
           <Badge className="mb-4 bg-primary/10 text-primary border-primary/20 px-4 py-2">
             <HelpCircle className="w-4 h-4 mr-2" />
-            FAQ — 11 réponses essentielles
+            FAQ - 11 réponses essentielles
           </Badge>
           <h2 className="text-3xl md:text-4xl font-extrabold mb-4 text-foreground">
             Toutes vos questions,
@@ -110,7 +110,7 @@ const SalesFaq: React.FC = () => {
                 onClick={() => navigate('/upsell-paiement?plan=pro')}
               >
                 <Rocket className="w-5 h-5 mr-2" />
-                Accès Pro — 67€ à vie
+                Accès Pro - 67€ à vie
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
               <a href="https://calendly.com/boubetgeorges/nouvelle-reunion" target="_blank" rel="noopener noreferrer">

@@ -17,7 +17,7 @@ const Licence = () => (
           <p>
             EI Entrepreneur<br />
             164 rue de Saussure<br />
-            75017 Paris — France<br />
+            75017 Paris - France<br />
             SIRET : 853 211 035 00011<br />
             Email : tanboub75017@gmail.com
           </p>

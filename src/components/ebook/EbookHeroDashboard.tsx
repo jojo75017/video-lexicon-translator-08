@@ -182,7 +182,7 @@ export const EbookHeroDashboard: React.FC<EbookHeroDashboardProps> = ({
               <h1 className="text-3xl md:text-4xl font-bold leading-tight" style={{ fontFamily: 'Georgia, serif' }}>
                 {isEmpty
                   ? 'Créez votre prochain best-seller Amazon KDP'
-                  : <>Votre livre <span className="italic">"{ebookTitle}"</span> est à <span style={{ color: ORANGE }}><AnimatedNumber value={stats.progress} suffix="%" /></span> — continuons !</>}
+                  : <>Votre livre <span className="italic">"{ebookTitle}"</span> est à <span style={{ color: ORANGE }}><AnimatedNumber value={stats.progress} suffix="%" /></span> - continuons !</>}
               </h1>
               <p className="mt-3 text-white/90 text-base md:text-lg max-w-2xl">
                 {isEmpty
@@ -242,7 +242,7 @@ export const EbookHeroDashboard: React.FC<EbookHeroDashboardProps> = ({
         </div>
       </Card>
 
-      {/* ════════ B. INSPIREZ-VOUS — exemples concrets ════════ */}
+      {/* ════════ B. INSPIREZ-VOUS - exemples concrets ════════ */}
       <Card>
         <CardContent className="pt-6">
           <div className="flex items-center justify-between mb-4">

@@ -37,7 +37,7 @@ const BestSellersTab = () => {
           🏆 30 Best-Sellers à Écrire en 2026
         </h2>
         <p className="text-muted-foreground max-w-2xl mx-auto">
-          Titres, sous-titres et préfaces prêts à l'emploi — Chaque concept a été analysé pour son potentiel commercial sur Amazon KDP.
+          Titres, sous-titres et préfaces prêts à l'emploi - Chaque concept a été analysé pour son potentiel commercial sur Amazon KDP.
         </p>
       </motion.div>
 

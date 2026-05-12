@@ -19,10 +19,10 @@ const STEPS = [
     demo: {
       input: "Guide pratique sur le jeûne intermittent",
       output: [
-        "✅ Niche validée — Volume Amazon élevé",
+        "✅ Niche validée - Volume Amazon élevé",
         "📖 12 chapitres structurés automatiquement",
         "🎯 5 mots-clés KDP identifiés",
-        "📊 Concurrence : Modérée — Opportunité forte",
+        "📊 Concurrence : Modérée - Opportunité forte",
       ],
     },
     color: "from-primary to-accent",
@@ -49,7 +49,7 @@ const STEPS = [
     icon: Palette,
     title: "Couverture + Export",
     subtitle: "5 minutes",
-    description: "Imagen 3 crée une couverture pro. Exportez en PDF, EPUB ou Word — prêt pour Amazon KDP.",
+    description: "Imagen 3 crée une couverture pro. Exportez en PDF, EPUB ou Word - prêt pour Amazon KDP.",
     demo: {
       input: "Générer couverture professionnelle",
       output: [
@@ -108,7 +108,7 @@ const InteractiveDemo = () => {
             </span>
           </h2>
           <p className="text-foreground/70 text-lg max-w-2xl mx-auto">
-            De l'idée au livre publié sur Amazon — en moins de 20 minutes.
+            De l'idée au livre publié sur Amazon - en moins de 20 minutes.
           </p>
         </div>
 

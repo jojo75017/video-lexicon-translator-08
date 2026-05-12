@@ -562,7 +562,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
       pdf.text(`Par ${authorName || 'Auteur'}`, pageWidth / 2, 65, { align: 'center' });
       pdf.setFontSize(10);
       pdf.text(`Script genere le ${new Date().toLocaleDateString('fr-FR')}`, pageWidth / 2, 80, { align: 'center' });
-      pdf.text(`${totalWords.toLocaleString()} mots — ~${estimatedDuration} min de lecture`, pageWidth / 2, 88, { align: 'center' });
+      pdf.text(`${totalWords.toLocaleString()} mots - ~${estimatedDuration} min de lecture`, pageWidth / 2, 88, { align: 'center' });
 
       const sections = prepareSections();
       for (const section of sections) {
@@ -575,7 +575,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
         pdf.setFontSize(8);
         pdf.setFont('helvetica', 'normal');
         pdf.setTextColor(120);
-        pdf.text(`${section.wordCount} mots — ~${section.estimatedMinutes} min`, margin, y);
+        pdf.text(`${section.wordCount} mots - ~${section.estimatedMinutes} min`, margin, y);
         pdf.setTextColor(0);
         y += 8;
         pdf.setFontSize(10);
@@ -605,13 +605,13 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
       const children: any[] = [
         new Paragraph({ text: ebookTitle || 'Script Livre Audio', heading: HeadingLevel.TITLE, spacing: { after: 200 } }),
         new Paragraph({ children: [new TextRun({ text: `Par ${authorName || 'Auteur'}`, italics: true })], spacing: { after: 200 } }),
-        new Paragraph({ children: [new TextRun({ text: `Script généré le ${new Date().toLocaleDateString('fr-FR')} — ${totalWords.toLocaleString()} mots — ~${estimatedDuration} min`, size: 20, color: '666666' })], spacing: { after: 600 } }),
+        new Paragraph({ children: [new TextRun({ text: `Script généré le ${new Date().toLocaleDateString('fr-FR')} - ${totalWords.toLocaleString()} mots - ~${estimatedDuration} min`, size: 20, color: '666666' })], spacing: { after: 600 } }),
       ];
 
       for (const section of sections) {
         children.push(
           new Paragraph({ text: section.title, heading: HeadingLevel.HEADING_1, spacing: { before: 400, after: 100 } }),
-          new Paragraph({ children: [new TextRun({ text: `${section.wordCount} mots — ~${section.estimatedMinutes} min`, italics: true, color: '888888', size: 18 })], spacing: { after: 200 } }),
+          new Paragraph({ children: [new TextRun({ text: `${section.wordCount} mots - ~${section.estimatedMinutes} min`, italics: true, color: '888888', size: 18 })], spacing: { after: 200 } }),
         );
         const paragraphs = section.content.split('\n').filter(l => l.trim());
         for (const para of paragraphs) {
@@ -761,7 +761,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
       
       for (let i = 0; i < sections.length; i++) {
         const section = sections[i];
-        setMp3ProgressLabel(`${i + 1}/${sections.length} — ${section.title}`);
+        setMp3ProgressLabel(`${i + 1}/${sections.length} - ${section.title}`);
         setMp3Progress(Math.round(5 + ((i) / sections.length) * 90));
         
         const blob = await generateSectionMp3(section.content);
@@ -931,7 +931,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
             </div>
           </div>
           <p className="text-xs text-muted-foreground mt-2">
-            ✨ Moteur ElevenLabs Multilingual v2 — Voix ultra-réalistes, émotions naturelles. Azure en fallback automatique.
+            ✨ Moteur ElevenLabs Multilingual v2 - Voix ultra-réalistes, émotions naturelles. Azure en fallback automatique.
           </p>
         </div>
 
@@ -1317,7 +1317,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                   style={{ fontFamily: 'Georgia, serif', lineHeight: '1.8' }}
                 />
                 <div className="flex items-center justify-between text-sm text-muted-foreground">
-                  <span>{customText.length} caractères — {customText.split(/\s+/).filter(w => w).length} mots</span>
+                  <span>{customText.length} caractères - {customText.split(/\s+/).filter(w => w).length} mots</span>
                   <span>~{Math.ceil(customText.split(/\s+/).filter(w => w).length / 150)} min de lecture</span>
                 </div>
               </div>
@@ -1423,7 +1423,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                 </CardContent>
               </Card>
 
-              {/* Export MP3 — Azure Speech */}
+              {/* Export MP3 - Azure Speech */}
               <Card className="border-2 border-emerald-500/40 bg-gradient-to-br from-emerald-500/5 to-teal-500/10">
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2">
@@ -1444,7 +1444,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                     </Label>
                     <p className="text-xs text-muted-foreground">
                       🎤 {VOICE_PRESETS.find(p => p.id === selectedNiche)?.voiceName || 'Lily'} (ElevenLabs Premium)
-                      {' '} — Changez la voix dans le panneau de configuration ci-dessus
+                      {' '} - Changez la voix dans le panneau de configuration ci-dessus
                     </p>
                   </div>
 
@@ -1615,7 +1615,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                           }
                           
                           for (let i = 0; i < sections.length; i++) {
-                            setMp3ProgressLabel(`${i + 1}/${sections.length} — ${sections[i].title}`);
+                            setMp3ProgressLabel(`${i + 1}/${sections.length} - ${sections[i].title}`);
                             setMp3Progress(Math.round(5 + (i / sections.length) * 85));
                             try {
                               const blob = await generateSectionMp3(sections[i].content);
@@ -1697,7 +1697,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                     <div className="space-y-2">
                       <Progress value={mp3Progress} className="h-3" />
                       <p className="text-sm text-center text-muted-foreground">
-                        {mp3ProgressLabel} — {mp3Progress}%
+                        {mp3ProgressLabel} - {mp3Progress}%
                       </p>
                     </div>
                   )}
@@ -1734,7 +1734,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                     <ul className="space-y-1 text-xs">
                       <li>• 🔔 Intro jingle automatique (cloche + message d'accueil)</li>
                       <li>• Voix neuronales Azure premium (7 voix par niche)</li>
-                      <li>• Format MP3 192kbps / 48kHz — conforme KDP & Audible</li>
+                      <li>• Format MP3 192kbps / 48kHz - conforme KDP & Audible</li>
                       <li>• Fusion automatique en un seul fichier audiobook</li>
                       <li>• Export chapitres séparés en archive ZIP</li>
                       <li>• Compatible avec tous les lecteurs et plateformes</li>

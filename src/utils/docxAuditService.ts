@@ -71,7 +71,7 @@ function detectJsonResiduals(text: string, location: string): AuditIssue[] {
       type: 'json_residual',
       severity: 'warning',
       chapter: location,
-      message: `${braces} accolades/crochets détectés — possible structure JSON`,
+      message: `${braces} accolades/crochets détectés - possible structure JSON`,
     });
   }
 
@@ -127,7 +127,7 @@ export function runDocxAudit(input: AuditInput): AuditReport {
         type: 'title_too_long',
         severity: 'critical',
         chapter: `Chapitre ${i + 1}`,
-        message: `Titre trop long (${ch.title.length} car.) — contient probablement du JSON`,
+        message: `Titre trop long (${ch.title.length} car.) - contient probablement du JSON`,
       });
       failedChecks++;
     }
@@ -157,7 +157,7 @@ export function runDocxAudit(input: AuditInput): AuditReport {
         type: 'empty_chapter',
         severity: 'warning',
         chapter: `Chapitre ${i + 1}`,
-        message: `Chapitre vide ou quasi-vide — "${ch.title.substring(0, 40)}"`,
+        message: `Chapitre vide ou quasi-vide - "${ch.title.substring(0, 40)}"`,
       });
       failedChecks++;
     }

@@ -193,7 +193,7 @@ export const CrmKanban: React.FC<CrmKanbanProps> = ({ contacts, onUpdateContact,
     if (COLUMNS.some(col => col.id === over.id)) {
       newStatus = over.id as string;
     } else {
-      // Dropped over a contact — find which column that contact is in
+      // Dropped over a contact - find which column that contact is in
       const overContact = contacts.find(c => c.id === over.id);
       if (overContact) {
         newStatus = overContact.status;

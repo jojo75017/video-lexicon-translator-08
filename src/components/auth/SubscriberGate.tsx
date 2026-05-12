@@ -66,7 +66,7 @@ export function SubscriberGate({
         }
 
         // Fallback: if a real Supabase session exists, allow access
-        // (admin check may have failed transiently — App.tsx will re-verify in background)
+        // (admin check may have failed transiently - App.tsx will re-verify in background)
         const { data: { session } } = await supabase.auth.getSession();
         if (session?.user) {
           console.log('SubscriberGate: Active Supabase session found, allowing access');

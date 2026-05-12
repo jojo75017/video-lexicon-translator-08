@@ -77,7 +77,7 @@ const PromoBonusPage = () => {
   return (
     <FunnelLayout>
       <SeoHead
-        title="Boostez votre commande — Bonus EbookStudio"
+        title="Boostez votre commande - Bonus EbookStudio"
         description="Ajoutez la licence commerciale étendue ou le pack 50 templates premium à votre commande."
         canonical="/promo/bonus"
         noindex
@@ -85,7 +85,7 @@ const PromoBonusPage = () => {
       <section className="max-w-5xl mx-auto px-4 py-12 space-y-10">
         <div className="text-center space-y-4">
           <span className="inline-block bg-[#FF9E2D]/10 text-[#FF9E2D] px-3 py-1 rounded-full text-sm font-semibold">
-            🎁 Offre exclusive — Disponible uniquement maintenant
+            🎁 Offre exclusive - Disponible uniquement maintenant
           </span>
           <h1 className="text-3xl md:text-4xl font-bold">Une dernière chose avant de finaliser…</h1>
           <p className="text-lg text-gray-700 max-w-2xl mx-auto">
@@ -116,7 +116,7 @@ const PromoBonusPage = () => {
                   disabled={loadingKey !== null}
                   className="w-full bg-[#FF9E2D] hover:bg-[#e88f1f] text-white font-bold py-5"
                 >
-                  {loadingKey === u.key ? <Loader2 className="w-5 h-5 animate-spin" /> : `Ajouter — ${u.price}€`}
+                  {loadingKey === u.key ? <Loader2 className="w-5 h-5 animate-spin" /> : `Ajouter - ${u.price}€`}
                 </Button>
               </div>
             </div>

@@ -143,7 +143,7 @@ export const JoyfulLiveDemo = ({ onCtaClick }: Props) => {
                   <Sparkles className="w-5 h-5" />
                 </button>
                 <p className="text-sm text-joy-ink/50 mt-4">
-                  ⚡ Aperçu animé — la vraie version est encore plus fluide
+                  ⚡ Aperçu animé - la vraie version est encore plus fluide
                 </p>
               </div>
             )}

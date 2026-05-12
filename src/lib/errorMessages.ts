@@ -51,7 +51,7 @@ export function getFriendlyError(error: any, fallback = 'Une erreur est survenue
 
   // Storage
   if (msg.includes('quotaexceedederror') || msg.includes('localstorage')) {
-    return '💾 Espace de sauvegarde local saturé. Une purge automatique a été effectuée — réessayez.';
+    return '💾 Espace de sauvegarde local saturé. Une purge automatique a été effectuée - réessayez.';
   }
 
   // Cancellation utilisateur

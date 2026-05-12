@@ -134,7 +134,7 @@ const EbookieAssistant: React.FC = () => {
               className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl px-8 py-6"
             >
               <Sparkles className="w-5 h-5 mr-2" />
-              Activer EbookStudio — 67€ à vie
+              Activer EbookStudio - 67€ à vie
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
           </motion.div>
@@ -158,7 +158,7 @@ const EbookieAssistant: React.FC = () => {
                   <p className="font-bold text-sm">EbookStudio</p>
                   <p className="text-[11px] opacity-80 flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-primary-foreground animate-pulse" />
-                    En ligne — répond en 2s
+                    En ligne - répond en 2s
                   </p>
                 </div>
                 <Badge className="bg-background/20 text-primary-foreground border-0 text-[10px]">

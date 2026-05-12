@@ -144,7 +144,7 @@ export const WorkflowOnboarding: React.FC<WorkflowOnboardingProps> = ({
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
               {isFirstTime 
                 ? "15 experts IA travaillent pour vous. Suivez le chemin, cliquez, c'est fait."
-                : `${completedCount}/15 étapes complétées — Continuez là où vous en étiez.`
+                : `${completedCount}/15 étapes complétées - Continuez là où vous en étiez.`
               }
             </p>
           </div>

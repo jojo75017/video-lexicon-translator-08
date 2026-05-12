@@ -365,7 +365,7 @@ Prévoir recto, dos et quatrième de couverture, avec zone code-barres ISBN 2" x
             <Card className="border-l-4 border-l-yellow-400 md:col-span-2">
               <CardHeader className="pb-2"><CardTitle className="text-sm">Zone jaune = Code-barres ISBN</CardTitle></CardHeader>
               <CardContent className="text-xs text-muted-foreground">
-                Emplacement : 2.000" × 1.200" (50.80mm × 30.48mm) — Coin inférieur droit de la 4ème de couverture. Ne rien placer dessus.
+                Emplacement : 2.000" × 1.200" (50.80mm × 30.48mm) - Coin inférieur droit de la 4ème de couverture. Ne rien placer dessus.
               </CardContent>
             </Card>
           </div>
@@ -567,7 +567,7 @@ const CoverTemplate: React.FC<{
           ({props.totalWidthMm} × {props.totalHeightMm}mm)
         </text>
         <text x={frontX + props.trimW * scale / 2} y={oy + 180} textAnchor="middle" fontSize="9" fill="#333">
-          {props.pageCount} pages — {props.paperLabel}
+          {props.pageCount} pages - {props.paperLabel}
         </text>
       </svg>
     </div>

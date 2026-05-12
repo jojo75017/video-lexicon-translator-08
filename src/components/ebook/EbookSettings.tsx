@@ -102,7 +102,7 @@ export const EbookSettings: React.FC<EbookSettingsProps> = ({
               <span className="text-2xl">💡</span>
               <div className="space-y-3">
                 <p className="text-sm font-semibold text-blue-800 dark:text-blue-200">
-                  Gemini 3 Flash — Rapide, puissant et économique !
+                  Gemini 3 Flash - Rapide, puissant et économique !
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
                   <div className="bg-white/60 dark:bg-white/5 rounded-lg p-3 border border-gray-200 dark:border-gray-700">

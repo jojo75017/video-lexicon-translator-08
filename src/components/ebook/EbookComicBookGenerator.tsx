@@ -416,7 +416,7 @@ export const EbookComicBookGenerator: React.FC<ComicBookGeneratorProps> = ({ ebo
       const panels = Array.from({ length: panelCount }, (_, panelIdx) => {
         const globalIdx = pageIdx * panelCount + panelIdx;
         return {
-          description: `${step} — ${heroName} ${actionBank[globalIdx % actionBank.length]}. ${baseDesc ? `(${baseDesc})` : ''} [Style: ${selectedGenre?.label || 'Aventure'}]`.trim(),
+          description: `${step} - ${heroName} ${actionBank[globalIdx % actionBank.length]}. ${baseDesc ? `(${baseDesc})` : ''} [Style: ${selectedGenre?.label || 'Aventure'}]`.trim(),
           character: panelIdx % 3 === 2 ? 'Ami' : heroName,
           dialogue: dialogueBank[globalIdx % dialogueBank.length],
         };

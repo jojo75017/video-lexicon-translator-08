@@ -243,7 +243,7 @@ ${authorName}`);
       toast.success('Analyse terminée !');
     } catch (error) {
       console.error('Erreur analyse titre:', error);
-      toast.error('Analyse du titre impossible — vérifiez votre connexion et réessayez.');
+      toast.error('Analyse du titre impossible - vérifiez votre connexion et réessayez.');
     } finally {
       setIsAnalyzingTitle(false);
     }

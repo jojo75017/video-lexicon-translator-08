@@ -67,7 +67,7 @@ interface CoverTemplate {
 // ===================== CONSTANTS =====================
 
 const CANVAS_W = 612; // 6 inches * 102 DPI (display)
-const CANVAS_H = 936; // 9 inches * 104 DPI (display) — ~6x9 ratio
+const CANVAS_H = 936; // 9 inches * 104 DPI (display) - ~6x9 ratio
 const EXPORT_SCALE = 3; // export at 3x for print quality
 
 const FONTS = [

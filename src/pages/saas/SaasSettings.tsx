@@ -374,7 +374,7 @@ export const SaasSettings: React.FC = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-xl">
                 <Key className="h-5 w-5 text-primary" />
-                🔑 Vos Clés API — Ce qu'il faut savoir
+                🔑 Vos Clés API - Ce qu'il faut savoir
               </CardTitle>
               <CardDescription className="text-base">
                 EbookStudio Pro fonctionne avec vos propres clés API. Vous ne payez que ce que vous utilisez, sans intermédiaire.
@@ -452,7 +452,7 @@ export const SaasSettings: React.FC = () => {
                 <Badge className="bg-blue-500/10 text-blue-600 border-blue-500/30">Obligatoire</Badge>
               </div>
               <CardDescription>
-                3 étapes simples — moins de 2 minutes
+                3 étapes simples - moins de 2 minutes
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -524,7 +524,7 @@ export const SaasSettings: React.FC = () => {
 
               <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
                 <p className="text-sm text-muted-foreground">
-                  <strong className="text-foreground">💡 Bon à savoir :</strong> Azure offre un tier gratuit (F0) avec 500 000 caractères/mois — 
+                  <strong className="text-foreground">💡 Bon à savoir :</strong> Azure offre un tier gratuit (F0) avec 500 000 caractères/mois - 
                   soit environ <strong className="text-foreground">5 audiobooks complets gratuits par mois</strong>. 
                   Au-delà, le tarif Standard coûte ~0,01€ par minute d'audio.
                 </p>

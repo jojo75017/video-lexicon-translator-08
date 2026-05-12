@@ -130,7 +130,7 @@ const BlackPackPricing = ({ onCtaClick, launchPrice = 67, normalPrice = 147 }: B
             </div>
           </motion.div>
 
-          {/* Carte Black Pack — meilleur choix */}
+          {/* Carte Black Pack - meilleur choix */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -192,7 +192,7 @@ const BlackPackPricing = ({ onCtaClick, launchPrice = 67, normalPrice = 147 }: B
           </motion.div>
         </div>
 
-        {/* CTA central — Email + 2 boutons paiement */}
+        {/* CTA central - Email + 2 boutons paiement */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -228,12 +228,12 @@ const BlackPackPricing = ({ onCtaClick, launchPrice = 67, normalPrice = 147 }: B
               />
             </div>
 
-            {/* Bouton 1 : Carte bancaire (Stripe) — PRINCIPAL */}
+            {/* Bouton 1 : Carte bancaire (Stripe) - PRINCIPAL */}
             <StripeCheckoutButton
               email={email}
               className="w-full inline-flex items-center justify-center gap-3 rounded-xl px-6 py-4 sm:py-5 font-black text-base sm:text-lg transition-all hover:scale-[1.02] active:scale-100 disabled:opacity-60 disabled:hover:scale-100 mb-3"
             >
-              💳 Payer par carte — €{launchPrice} à vie
+              💳 Payer par carte - €{launchPrice} à vie
             </StripeCheckoutButton>
 
             {/* Séparateur */}
@@ -243,7 +243,7 @@ const BlackPackPricing = ({ onCtaClick, launchPrice = 67, normalPrice = 147 }: B
               <div className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.12)" }} />
             </div>
 
-            {/* Bouton 2 : PayPal — SECONDAIRE */}
+            {/* Bouton 2 : PayPal - SECONDAIRE */}
             <button
               type="button"
               onClick={() => navigate("/upsell-paiement?plan=pro")}

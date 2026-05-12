@@ -159,7 +159,7 @@ export const ebookExamples: EbookExample[] = [
       'Construire ses propres assistants',
     ],
     kdpDescription:
-      "ChatGPT peut vous faire gagner 10 heures par semaine — à condition de savoir lui parler. Ce guide réunit 50 prompts testés et expliqués, classés par usage pro, pour transformer l'IA en véritable bras droit.",
+      "ChatGPT peut vous faire gagner 10 heures par semaine - à condition de savoir lui parler. Ce guide réunit 50 prompts testés et expliqués, classés par usage pro, pour transformer l'IA en véritable bras droit.",
     keywords: ['ChatGPT', 'IA', 'prompts', 'productivité', 'business', 'automatisation', 'indépendants'],
   },
 ];

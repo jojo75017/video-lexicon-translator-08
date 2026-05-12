@@ -27,7 +27,7 @@ const steps = [
     description: "Suivez le workflow guidé pour passer de l'idée au manuscrit publié en moins d'une heure.",
     tips: [
       "1. Lancez le Workflow IA (P1 → P15) dans la sidebar",
-      "2. Entrez votre titre — l'IA fait le reste",
+      "2. Entrez votre titre - l'IA fait le reste",
       "3. Exportez en PDF/EPUB et publiez sur KDP",
     ],
   },

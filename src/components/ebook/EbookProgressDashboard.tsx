@@ -57,7 +57,7 @@ export const EbookProgressDashboard: React.FC<EbookProgressDashboardProps> = ({
   targetWordsPerChapter = 2000,
   onNavigateToTab,
 }) => {
-  // ============= Real data only — no mock numbers =============
+  // ============= Real data only - no mock numbers =============
   const stats = useMemo(() => {
     const totalChapters = chapters.length || numberOfChapters || 0;
     const writtenChapters = chapters.filter(c => wordCount(c.content) >= 200).length;
@@ -68,7 +68,7 @@ export const EbookProgressDashboard: React.FC<EbookProgressDashboardProps> = ({
     const targetTotal = (totalChapters || 8) * targetWordsPerChapter;
     const wordsProgress = Math.min(100, Math.round((totalWords / targetTotal) * 100));
 
-    // KDP quality score (0-100) — based on actual fields filled
+    // KDP quality score (0-100) - based on actual fields filled
     const kdpChecks = [
       !!coverImageUrl,
       kdpDescription.length >= 200,
@@ -93,7 +93,7 @@ export const EbookProgressDashboard: React.FC<EbookProgressDashboardProps> = ({
     };
   }, [chapters, preface, conclusion, coverImageUrl, kdpDescription, kdpKeywords, kdpCategories, numberOfChapters, targetWordsPerChapter]);
 
-  // ============= 5 milestones — global progress =============
+  // ============= 5 milestones - global progress =============
   const milestones = useMemo(() => {
     const conceptOk = !!ebookTitle && !!authorName && bookDescription.length >= 50;
     const planOk = stats.totalChapters >= 3 && chapters.every(c => !!c.title);
@@ -133,7 +133,7 @@ export const EbookProgressDashboard: React.FC<EbookProgressDashboardProps> = ({
     };
     if (!milestones[1].done) return {
       title: '2️⃣ Créez votre plan de chapitres',
-      desc: 'Générez automatiquement un plan structuré avec l\'IA — c\'est la base de votre livre.',
+      desc: 'Générez automatiquement un plan structuré avec l\'IA - c\'est la base de votre livre.',
       tab: 'complete-workflow',
       cta: 'Lancer le pipeline IA',
     };
@@ -347,7 +347,7 @@ export const EbookProgressDashboard: React.FC<EbookProgressDashboardProps> = ({
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <EmptyChart label="Aucun chapitre planifié — créez votre plan d'abord" />
+              <EmptyChart label="Aucun chapitre planifié - créez votre plan d'abord" />
             )}
           </CardContent>
         </Card>
@@ -386,7 +386,7 @@ export const EbookProgressDashboard: React.FC<EbookProgressDashboardProps> = ({
         </Card>
       </div>
 
-      {/* ===== D. Que faire maintenant ? — 4 actions ===== */}
+      {/* ===== D. Que faire maintenant ? - 4 actions ===== */}
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2">

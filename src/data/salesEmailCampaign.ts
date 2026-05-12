@@ -23,7 +23,7 @@ export const salesEmailSequence: SalesEmail[] = [
     day: 'J+0 (Immédiat)',
     subject: '📖 J\'ai généré 150 pages en 47 minutes... voici comment',
     preheader: 'Le secret des auteurs qui publient un livre par semaine sur Amazon',
-    strategy: 'CURIOSITÉ — Révéler un résultat choquant pour captiver immédiatement',
+    strategy: 'CURIOSITÉ - Révéler un résultat choquant pour captiver immédiatement',
     body: `Bonjour [PRÉNOM],
 
 Je vais être direct avec vous.
@@ -44,7 +44,7 @@ J'ai construit un outil. Un vrai générateur d'ebooks propulsé par l'IA la plu
 
 Et aujourd'hui, je vous ouvre les portes.
 
-🔥 **EbookStudio Pro 2026** — L'usine à ebooks que j'utilise personnellement :
+🔥 **EbookStudio Pro 2026** - L'usine à ebooks que j'utilise personnellement :
 
 → 300+ idées de titres par niche rentable
 → Plan complet généré en 30 secondes
@@ -72,7 +72,7 @@ La preuve que ça marche, c'est sous vos yeux.`
     day: 'J+2',
     subject: '⚠️ Les 3 erreurs qui tuent 90% des auteurs KDP',
     preheader: 'Erreur #2 est celle que TOUT LE MONDE fait...',
-    strategy: 'DOULEUR + SOLUTION — Identifier les frustrations et positionner l\'outil comme remède',
+    strategy: 'DOULEUR + SOLUTION - Identifier les frustrations et positionner l\'outil comme remède',
     body: `[PRÉNOM],
 
 Savez-vous pourquoi 90% des gens qui veulent publier sur Amazon... n'y arrivent jamais ?
@@ -121,9 +121,9 @@ P.S: Si vous hésitez, commencez par la démo gratuite. Zéro risque : [LIEN DEM
   {
     id: 'email-3-preuve-sociale',
     day: 'J+4',
-    subject: '💰 De 0 à 35 livres Amazon — Mon parcours transparent',
+    subject: '💰 De 0 à 35 livres Amazon - Mon parcours transparent',
     preheader: 'Chiffres réels, résultats réels, outil réel.',
-    strategy: 'PREUVE SOCIALE — Démontrer la crédibilité avec des résultats concrets',
+    strategy: 'PREUVE SOCIALE - Démontrer la crédibilité avec des résultats concrets',
     body: `[PRÉNOM],
 
 Aujourd'hui, pas de pitch. Juste des faits.
@@ -147,7 +147,7 @@ Quand j'ai automatisé le processus, tout a changé :
 Et je n'ai pas gardé cet outil pour moi. Je l'ai transformé en plateforme complète pour que VOUS puissiez faire pareil.
 
 **EbookStudio Pro 2026 inclut** :
-📝 Générateur IA (Gemini 3 Flash — le plus performant)
+📝 Générateur IA (Gemini 3 Flash - le plus performant)
 🎨 Créateur de couvertures pro
 🔊 Convertisseur en livre audio (Azure Neural)
 📊 Dashboard marketing complet
@@ -172,7 +172,7 @@ https://www.amazon.fr/Mr-Georges-Boubet/e/B0CGVLHNX7`
     day: 'J+6',
     subject: '⏰ [Dernière chance] L\'offre Fondateur disparaît dans 48h',
     preheader: 'Après ça, le prix passe à 147€. Point final.',
-    strategy: 'URGENCE + FOMO — Créer un sentiment d\'urgence légitime',
+    strategy: 'URGENCE + FOMO - Créer un sentiment d\'urgence légitime',
     body: `[PRÉNOM],
 
 Je serai bref.
@@ -224,7 +224,7 @@ P.S: Je ne relancerai pas après cet email. La décision vous appartient.`
     day: 'J+7',
     subject: '🔒 C\'est terminé ce soir à minuit',
     preheader: 'Votre dernière chance de rejoindre les fondateurs.',
-    strategy: 'DERNIER APPEL — Émotion + vision du futur + fermeture',
+    strategy: 'DERNIER APPEL - Émotion + vision du futur + fermeture',
     body: `[PRÉNOM],
 
 Dernier email. Dernier appel.
@@ -301,7 +301,7 @@ Moi j'en publie 3 par semaine. 📚
     id: 'tiktok-2',
     platform: 'tiktok',
     type: 'Avant/Après',
-    hook: '0-3s: Split screen — galère vs facilité',
+    hook: '0-3s: Split screen - galère vs facilité',
     content: `AVANT EbookStudio :
 😩 3 semaines pour UN livre
 😩 500€ de ghostwriter
@@ -369,7 +369,7 @@ EbookStudio Pro génère votre ebook de A à Z :
 ✅ Coût par ebook : 0,30€
 ✅ Aucune compétence technique requise
 
-🎁 Démo 100% gratuite — sans carte bancaire
+🎁 Démo 100% gratuite - sans carte bancaire
 
 [BOUTON : Essayer gratuitement]`,
     hashtags: ['ebookstudio', 'kdp', 'amazon', 'ebook', 'ia']
@@ -477,13 +477,13 @@ SLIDE 1 : "35 livres publiés. Temps moyen : 47 min/livre."
 
 SLIDE 2 : "❌ L'ancienne méthode : 3 semaines, 500€+ de ghostwriter"
 
-SLIDE 3 : "✅ Ma méthode : EbookStudio Pro — plan en 30s, chapitres en minutes"
+SLIDE 3 : "✅ Ma méthode : EbookStudio Pro - plan en 30s, chapitres en minutes"
 
 SLIDE 4 : "Le coût ? 0,30€ par ebook. Oui, trente centimes."
 
 SLIDE 5 : "Ce que l'outil génère : plan + chapitres + couverture + optimisation KDP"
 
-SLIDE 6 : "Résultats visibles sur Amazon — profil public en bio"
+SLIDE 6 : "Résultats visibles sur Amazon - profil public en bio"
 
 SLIDE 7 : "🆓 Testez gratuitement → ebookstudio.fr (lien en bio)"
 

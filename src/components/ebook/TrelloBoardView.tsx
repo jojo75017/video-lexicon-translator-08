@@ -139,7 +139,7 @@ export const TrelloBoardView: React.FC<TrelloBoardViewProps> = ({
             </h3>
             <p className="text-sm text-muted-foreground">
               {completedCount === 0
-                ? `Étape 0 / ${totalAgents} — Commence par l'étape P1 ci-dessous (définir ta niche et ton titre).`
+                ? `Étape 0 / ${totalAgents} - Commence par l'étape P1 ci-dessous (définir ta niche et ton titre).`
                 : `Étape ${completedCount} / ${totalAgents} terminée. Continue avec l'étape suivante.`}
             </p>
           </div>

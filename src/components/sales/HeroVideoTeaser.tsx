@@ -49,7 +49,7 @@ const HeroVideoTeaser = () => {
           className="text-center text-sm text-muted-foreground mt-6 flex items-center justify-center gap-2"
         >
           <Sparkles className="w-4 h-4 text-primary" />
-          Démo réelle de la plateforme — aucun trucage
+          Démo réelle de la plateforme - aucun trucage
         </motion.p>
       </div>
     </section>

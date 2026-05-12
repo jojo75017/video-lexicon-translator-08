@@ -47,7 +47,7 @@ export const HeroJoyful = ({ onCtaClick, launchPrice, normalPrice }: Props) => {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="text-lg md:text-2xl text-joy-ink/80 max-w-2xl mx-auto mb-10 font-medium"
         >
-          15 agents IA bienveillants qui t'aident à créer, illustrer et publier ton ebook sur Amazon KDP — sans prise de tête, sans abonnement, sans pression.
+          15 agents IA bienveillants qui t'aident à créer, illustrer et publier ton ebook sur Amazon KDP - sans prise de tête, sans abonnement, sans pression.
         </motion.p>
 
         <motion.div

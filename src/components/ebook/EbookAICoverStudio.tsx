@@ -103,7 +103,7 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
       checks.push({
         label: 'Trim (format final)',
         status: validKdp ? 'ok' : 'warn',
-        detail: `${(widthMm/10).toFixed(2)} × ${(heightMm/10).toFixed(2)} cm${validKdp ? ' — conforme KDP' : ' — hors plage KDP standard (10.2–21.6 × 15.2–27.9 cm)'}`,
+        detail: `${(widthMm/10).toFixed(2)} × ${(heightMm/10).toFixed(2)} cm${validKdp ? ' - conforme KDP' : ' - hors plage KDP standard (10.2–21.6 × 15.2–27.9 cm)'}`,
       });
     } else {
       checks.push({
@@ -122,13 +122,13 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
       checks.push({
         label: 'Pages & papier',
         status: validPages ? 'ok' : 'error',
-        detail: `${pages} pages, papier ${paper === 'white' ? 'blanc' : 'crème'}${validPages ? '' : ' — KDP exige 24 à 828 pages'}`,
+        detail: `${pages} pages, papier ${paper === 'white' ? 'blanc' : 'crème'}${validPages ? '' : ' - KDP exige 24 à 828 pages'}`,
       });
     } else {
       checks.push({
         label: 'Pages & papier',
         status: 'error',
-        detail: 'Nombre de pages manquant — impossible de calculer le dos. Saisissez-le dans Format & Tranche KDP.',
+        detail: 'Nombre de pages manquant - impossible de calculer le dos. Saisissez-le dans Format & Tranche KDP.',
       });
     }
 
@@ -141,7 +141,7 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
       checks.push({
         label: 'Dos (spine)',
         status: spineMm < 4.6 ? 'warn' : 'ok',
-        detail: `${spineMm} mm calculés${spineMm < 4.6 ? ' — KDP interdit le texte sur le dos sous ~80 pages (4.6 mm)' : ' — assez large pour titre + auteur'}`,
+        detail: `${spineMm} mm calculés${spineMm < 4.6 ? ' - KDP interdit le texte sur le dos sous ~80 pages (4.6 mm)' : ' - assez large pour titre + auteur'}`,
       });
     }
 
@@ -182,7 +182,7 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
       return;
     }
     if (format === 'paperback' && paperbackValidation?.hasError) {
-      toast.error('Dimensions broché incomplètes — corrigez la validation avant de générer');
+      toast.error('Dimensions broché incomplètes - corrigez la validation avant de générer');
       return;
     }
     setIsGenerating(true);
@@ -316,9 +316,9 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
               }`}>
                 <div className="flex items-center gap-2 text-xs font-semibold">
                   {paperbackValidation.hasError ? (
-                    <><XCircle className="w-4 h-4 text-destructive" /> Validation broché — corrections requises</>
+                    <><XCircle className="w-4 h-4 text-destructive" /> Validation broché - corrections requises</>
                   ) : paperbackValidation.hasWarn ? (
-                    <><AlertTriangle className="w-4 h-4 text-amber-600" /> Validation broché — avertissements</>
+                    <><AlertTriangle className="w-4 h-4 text-amber-600" /> Validation broché - avertissements</>
                   ) : (
                     <><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Dimensions broché conformes KDP</>
                   )}
@@ -469,7 +469,7 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
               )}
             </Button>
             <p className="text-[10px] text-muted-foreground text-center">
-              Modèle Pro Bestseller (Gemini 3 Pro Image) — quelques secondes par génération
+              Modèle Pro Bestseller (Gemini 3 Pro Image) - quelques secondes par génération
             </p>
           </CardContent>
         </Card>

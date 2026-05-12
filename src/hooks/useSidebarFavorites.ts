@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 
-// v2 — ajout des nouveaux outils KDP Pro & Audit Pilot pour qu'ils soient
+// v2 - ajout des nouveaux outils KDP Pro & Audit Pilot pour qu'ils soient
 // visibles immédiatement par tous les abonnés sans avoir à déplier le groupe.
 const STORAGE_KEY = 'sidebar_favorites_v2';
 const LEGACY_KEY = 'sidebar_favorites_v1';
@@ -35,7 +35,7 @@ export const useSidebarFavorites = () => {
         const parsed = JSON.parse(raw);
         return Array.isArray(parsed) ? parsed : DEFAULT_FAVORITES;
       }
-      // Migration depuis v1 — on conserve les choix utilisateur et on
+      // Migration depuis v1 - on conserve les choix utilisateur et on
       // ajoute les nouveaux outils KDP automatiquement.
       const legacy = localStorage.getItem(LEGACY_KEY);
       if (legacy) {

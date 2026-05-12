@@ -95,7 +95,7 @@ Si vous avez déjà rêvé d'écrire et publier votre propre livre sur Amazon KD
 
 EbookStudio transforme une simple idée en ebook complet (plan, chapitres, couverture, fichiers KDP-compliant) en moins de 30 minutes. Tout est généré, vous n'avez qu'à valider.
 
-Le mieux ? C'est un paiement unique de 67€ — accès à vie, aucun abonnement.
+Le mieux ? C'est un paiement unique de 67€ - accès à vie, aucun abonnement.
 
 Mon lien : ${link}
 
@@ -126,16 +126,16 @@ Plus besoin de bricoler 10 outils. ${link}` : '';
 [CTA 25-30s] "Lien dans la bio" → ${link}` : '';
 
   const objections = [
-    { q: 'C\'est de l\'IA, donc le contenu est plat ?', a: 'Non — EbookStudio utilise un workflow à 15 agents IA spécialisés (un par tâche : plan, narration, dialogue, SEO, etc.) qui produit du contenu structuré et professionnel. L\'auteur garde le contrôle à chaque étape.' },
-    { q: 'Pourquoi 67€ alors que d\'autres outils sont gratuits ?', a: 'Parce que c\'est un paiement unique — pas un abonnement à 30€/mois. À l\'année, vous économisez plusieurs centaines d\'euros vs Jasper, Sudowrite ou ChatGPT Plus.' },
-    { q: 'Je suis débutant, c\'est pour moi ?', a: 'Oui — tout est guidé pas à pas. Une formation est incluse pour publier votre 1er ebook sur Amazon KDP de A à Z.' },
+    { q: 'C\'est de l\'IA, donc le contenu est plat ?', a: 'Non - EbookStudio utilise un workflow à 15 agents IA spécialisés (un par tâche : plan, narration, dialogue, SEO, etc.) qui produit du contenu structuré et professionnel. L\'auteur garde le contrôle à chaque étape.' },
+    { q: 'Pourquoi 67€ alors que d\'autres outils sont gratuits ?', a: 'Parce que c\'est un paiement unique - pas un abonnement à 30€/mois. À l\'année, vous économisez plusieurs centaines d\'euros vs Jasper, Sudowrite ou ChatGPT Plus.' },
+    { q: 'Je suis débutant, c\'est pour moi ?', a: 'Oui - tout est guidé pas à pas. Une formation est incluse pour publier votre 1er ebook sur Amazon KDP de A à Z.' },
     { q: 'Y a-t-il une garantie ?', a: 'Garantie satisfait ou remboursé 14 jours, sans condition.' },
   ];
 
   return (
     <FunnelLayout>
       <SeoHead
-        title="Programme d'affiliation EbookStudio — 30% par vente"
+        title="Programme d'affiliation EbookStudio - 30% par vente"
         description="Gagnez 20,10€ par vente en recommandant EbookStudio. Paiement unique 67€ à vie. Cookie 30 jours, paiement PayPal."
         canonical="/promo/affilie"
       />
@@ -355,7 +355,7 @@ Plus besoin de bricoler 10 outils. ${link}` : '';
                     <ImageIcon className="w-12 h-12 text-gray-400 mx-auto" />
                     <p className="text-sm text-gray-700 font-medium">Visuels prêts à partager</p>
                     <p className="text-xs text-gray-500 max-w-md mx-auto">
-                      Bannières 1200×630 (post Facebook/LinkedIn), 1080×1080 (Instagram), 1080×1920 (Story/Reel) — disponibles très bientôt.
+                      Bannières 1200×630 (post Facebook/LinkedIn), 1080×1080 (Instagram), 1080×1920 (Story/Reel) - disponibles très bientôt.
                     </p>
                     <p className="text-xs text-gray-500">
                       En attendant, contactez-nous : <strong>contact@ebookstudio.fr</strong>
@@ -366,7 +366,7 @@ Plus besoin de bricoler 10 outils. ${link}` : '';
                 {/* OBJECTIONS */}
                 <TabsContent value="objections" className="mt-4 space-y-3">
                   <p className="text-xs text-gray-500">
-                    Réponses aux objections les plus fréquentes — copiez-les pour répondre à vos prospects.
+                    Réponses aux objections les plus fréquentes - copiez-les pour répondre à vos prospects.
                   </p>
                   {objections.map((o) => (
                     <div key={o.q} className="bg-gray-50 border border-gray-200 rounded-lg p-4">

@@ -166,7 +166,7 @@ export const EbookWritingIntelligence: React.FC<WritingIntelligenceProps> = ({ c
             Assistant d'Écriture Intelligent
             <Badge className="bg-primary/10 text-primary border-primary/30">TEMPS RÉEL</Badge>
           </CardTitle>
-          <CardDescription>Analyse de lisibilité, détection de répétitions, suggestions de style — tout en écrivant</CardDescription>
+          <CardDescription>Analyse de lisibilité, détection de répétitions, suggestions de style - tout en écrivant</CardDescription>
         </CardHeader>
       </Card>
 

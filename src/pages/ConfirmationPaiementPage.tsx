@@ -13,7 +13,7 @@ const ConfirmationPaiementPage = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   // Récupérer l'email sauvegardé depuis la page de paiement (sessionStorage prioritaire, puis localStorage fallback)
-  // IMPORTANT : on NE supprime PAS l'email immédiatement — l'utilisateur peut recharger la page avant submit.
+  // IMPORTANT : on NE supprime PAS l'email immédiatement - l'utilisateur peut recharger la page avant submit.
   // Le nettoyage se fait après envoi réussi de la confirmation.
   useEffect(() => {
     const saved = sessionStorage.getItem('payment_email') || localStorage.getItem('payment_email_backup');

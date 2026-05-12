@@ -542,7 +542,7 @@ Format JSON strict:
       setSheets(generatedSheets);
       setActiveTab('sheets');
       setProgress(60);
-      setCurrentStep('Fiches générées — génération des images en arrière-plan…');
+      setCurrentStep('Fiches générées - génération des images en arrière-plan…');
       toast.success(`${generatedSheets.length} fiches recettes générées !`);
 
       // Génération d'images en tâche de fond (peut échouer si crédits épuisés)
@@ -724,11 +724,11 @@ Pure food photography only, high resolution, cookbook quality.`,
         if (error) {
           const status = getInvokeStatus(error);
           if (status === 402) {
-            toast.error("Crédits images épuisés — images non générées.");
+            toast.error("Crédits images épuisés - images non générées.");
             break;
           }
           if (status === 429) {
-            toast.error('Trop de requêtes image — réessayez dans quelques instants.');
+            toast.error('Trop de requêtes image - réessayez dans quelques instants.');
             break;
           }
         }
@@ -741,11 +741,11 @@ Pure food photography only, high resolution, cookbook quality.`,
         console.error(`Erreur image ${i + 1}:`, err);
         const status = getInvokeStatus(err);
         if (status === 402) {
-          toast.error("Crédits images épuisés — images non générées.");
+          toast.error("Crédits images épuisés - images non générées.");
           break;
         }
         if (status === 429) {
-          toast.error('Trop de requêtes image — réessayez dans quelques instants.');
+          toast.error('Trop de requêtes image - réessayez dans quelques instants.');
           break;
         }
       }
@@ -785,12 +785,12 @@ Pure food photography only.`,
       if (error) {
         const status = getInvokeStatus(error);
         if (status === 402) {
-          toast.error("Crédits images épuisés — impossible de régénérer l'image.");
+          toast.error("Crédits images épuisés - impossible de régénérer l'image.");
           setSheets(prev => prev.map(s => s.id === sheetId ? { ...s, isGeneratingImage: false } : s));
           return;
         }
         if (status === 429) {
-          toast.error("Trop de requêtes image — réessayez dans quelques instants.");
+          toast.error("Trop de requêtes image - réessayez dans quelques instants.");
           setSheets(prev => prev.map(s => s.id === sheetId ? { ...s, isGeneratingImage: false } : s));
           return;
         }

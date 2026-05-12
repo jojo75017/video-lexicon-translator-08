@@ -282,7 +282,7 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) avec ${numberOfChapte
     try {
       await exportEbookToDocx({
         filename: `scolaire-${level}-${subject}-${Date.now()}.docx`,
-        documentTitle: `${subject} — ${level}`,
+        documentTitle: `${subject} - ${level}`,
         documentSubtitle: FORMATS.find(f => f.id === format)?.label,
         sections: chapters.map(c => ({
           title: c.title,
@@ -306,7 +306,7 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) avec ${numberOfChapte
     try {
       await exportEbookToPdf({
         filename: `scolaire-${level}-${subject}-${Date.now()}.pdf`,
-        documentTitle: `${subject} — ${level}`,
+        documentTitle: `${subject} - ${level}`,
         documentSubtitle: FORMATS.find(f => f.id === format)?.label,
         sections: chapters.map(c => ({
           title: c.title,
