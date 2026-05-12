@@ -1399,14 +1399,14 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               }}
             />
 
-            {/* Bloc 3 - Choix clair : Simple OU Workflow + Discuter avec l'IA */}
+            {/* Bloc 3 - Affichage du tableau de bord + accès rapide au Workflow IA */}
             <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between bg-card rounded-xl border p-3 shadow-sm">
               <div className="px-2">
-                <p className="text-sm font-semibold text-foreground">Parcours de création</p>
-                <p className="text-xs text-muted-foreground">Choisissez une seule option : Simple ou Workflow.</p>
+                <p className="text-sm font-semibold text-foreground">Affichage du tableau de bord</p>
+                <p className="text-xs text-muted-foreground">Choisissez comment voir votre projet — pour lancer la rédaction IA, utilisez le bouton bleu.</p>
               </div>
               <div className="flex flex-wrap items-center gap-2">
-                <div className="inline-flex rounded-lg border overflow-hidden bg-background" role="group" aria-label="Choix du parcours">
+                <div className="inline-flex rounded-lg border overflow-hidden bg-background" role="group" aria-label="Mode d'affichage">
                   <button
                     type="button"
                     aria-pressed={viewMode === 'classic'}
@@ -1414,9 +1414,10 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                       setViewMode('classic');
                       localStorage.setItem(DASHBOARD_VIEW_MODE_KEY, 'classic');
                     }}
-                    className={`px-4 py-2 text-sm font-semibold transition-all ${viewMode === 'classic' ? 'bg-primary text-primary-foreground' : 'text-foreground hover:bg-muted'}`}
+                    title="Affichage liste classique"
+                    className={`px-4 py-2 text-sm font-semibold transition-all ${viewMode === 'classic' ? 'bg-muted text-foreground' : 'text-muted-foreground hover:bg-muted/60'}`}
                   >
-                    Simple
+                    📄 Vue liste
                   </button>
                   <button
                     type="button"
@@ -1425,11 +1426,20 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                       setViewMode('trello');
                       localStorage.setItem(DASHBOARD_VIEW_MODE_KEY, 'trello');
                     }}
-                    className={`px-4 py-2 text-sm font-semibold transition-all ${viewMode === 'trello' ? 'bg-accent text-accent-foreground' : 'text-foreground hover:bg-muted'}`}
+                    title="Affichage Kanban (tableau visuel)"
+                    className={`px-4 py-2 text-sm font-semibold transition-all ${viewMode === 'trello' ? 'bg-muted text-foreground' : 'text-muted-foreground hover:bg-muted/60'}`}
                   >
-                    Workflow
+                    🗂️ Vue Kanban
                   </button>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('complete-workflow')}
+                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg border border-blue-600 bg-blue-600 text-white hover:bg-blue-700 transition-all shadow-sm"
+                  title="Lancer les 15 agents IA qui rédigent automatiquement votre livre"
+                >
+                  ⚡ Workflow IA (15 agents)
+                </button>
                 <button
                   type="button"
                   onClick={() => setActiveTab('aichat')}
