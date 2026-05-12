@@ -108,6 +108,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   const [isGenerating, setIsGenerating] = useState(false);
   const cancelRef = useRef(false);
   const [currentStepIndex, setCurrentStepIndex] = useState(-1);
+  const [activeStepProgress, setActiveStepProgress] = useState(0);
   const [stepResults, setStepResults] = useState<Record<string, { result: any; displayContent: string }>>({});
   const [expandedSteps, setExpandedSteps] = useState<Record<string, boolean>>({});
   const [error, setError] = useState<string | null>(null);
