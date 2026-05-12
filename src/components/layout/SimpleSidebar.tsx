@@ -1,10 +1,12 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
+  BookOpen,
   Home,
   Sparkles,
   PenTool,
   Image as ImageIcon,
+  Library,
   Download,
   Megaphone,
   Wrench,
@@ -79,7 +81,7 @@ const STEP_ITEMS: StepItem[] = [
     hint: 'Couverture, visuels & bibliothèque',
     icon: ImageIcon,
     step: '3',
-    matchIds: ['images', 'cover-design-editor', 'cover', 'backcover'],
+    matchIds: ['images', 'images-cover', 'images-generator', 'images-library', 'cover-design-editor', 'cover', 'backcover'],
   },
   {
     id: 'export',
@@ -97,6 +99,12 @@ const STEP_ITEMS: StepItem[] = [
     step: '5',
     matchIds: ['marketing', 'launch-plan', 'kdp-ads-guide'],
   },
+];
+
+const IMAGE_SUBTABS = [
+  { id: 'images-cover', label: 'Couverture KDP', icon: BookOpen },
+  { id: 'images-generator', label: 'Générateur IA', icon: Sparkles },
+  { id: 'images-library', label: 'Bibliothèque', icon: Library },
 ];
 
 export const SimpleSidebar: React.FC<SimpleSidebarProps> = ({
