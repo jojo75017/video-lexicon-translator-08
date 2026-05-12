@@ -79,6 +79,7 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
   const [generatedCovers, setGeneratedCovers] = useState<GeneratedCover[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showPromptsPreview, setShowPromptsPreview] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   useEffect(() => {
     if (initialDescription.trim()) setDescription(initialDescription);
