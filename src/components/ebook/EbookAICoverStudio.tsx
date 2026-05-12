@@ -256,6 +256,99 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
         </CardHeader>
       </Card>
 
+      {/* ============ MODE EXPRESS 1-CLIC ============ */}
+      <Card className="border-2 border-primary/40 bg-gradient-to-br from-amber-50 via-primary/5 to-orange-50 dark:from-amber-950/20 dark:via-primary/10 dark:to-orange-950/20 shadow-lg">
+        <CardHeader className="pb-3">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-xl bg-gradient-to-br from-primary to-orange-400 shadow-md">
+              <Zap className="h-5 w-5 text-white" />
+            </div>
+            <div className="flex-1">
+              <CardTitle className="text-xl flex items-center gap-2">
+                Mode Express
+                <Badge className="bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30">
+                  Recommandé
+                </Badge>
+              </CardTitle>
+              <CardDescription className="mt-1">
+                Titre + auteur → couverture professionnelle en 1 clic. L'IA choisit le style optimal.
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <Label htmlFor="express-title" className="text-sm font-medium">
+                Titre du livre <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="express-title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Ex : Les Secrets de la DME"
+                className="mt-1.5 bg-background"
+              />
+            </div>
+            <div>
+              <Label htmlFor="express-author" className="text-sm font-medium">
+                Nom de l'auteur
+              </Label>
+              <Input
+                id="express-author"
+                value={author}
+                onChange={(e) => setAuthor(e.target.value)}
+                placeholder="Ex : Marie Dupont"
+                className="mt-1.5 bg-background"
+              />
+            </div>
+          </div>
+
+          <Button
+            onClick={generateCover}
+            disabled={isGenerating || !title.trim()}
+            size="lg"
+            className="w-full h-14 text-base font-semibold bg-gradient-to-r from-primary to-orange-500 hover:from-primary/90 hover:to-orange-500/90 shadow-md"
+          >
+            {isGenerating ? (
+              <>
+                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                Création en cours… (~30s)
+              </>
+            ) : (
+              <>
+                <Sparkles className="w-5 h-5 mr-2" />
+                Générer ma couverture en 1 clic
+              </>
+            )}
+          </Button>
+
+          <p className="text-xs text-muted-foreground text-center">
+            ✨ Style professionnel · Format Kindle · Qualité bestseller Amazon
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* ============ TOGGLE MODE AVANCÉ ============ */}
+      <Button
+        variant="ghost"
+        onClick={() => setShowAdvanced((v) => !v)}
+        className="w-full justify-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+      >
+        {showAdvanced ? (
+          <>
+            <ChevronUp className="w-4 h-4" />
+            Masquer les options avancées
+          </>
+        ) : (
+          <>
+            <ChevronDown className="w-4 h-4" />
+            Personnaliser (style, broché, image de référence…)
+          </>
+        )}
+      </Button>
+
+      {showAdvanced && (
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Settings */}
         <Card className="lg:col-span-1">
