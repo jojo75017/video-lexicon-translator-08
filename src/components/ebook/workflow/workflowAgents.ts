@@ -20,6 +20,7 @@ import {
 export interface WorkflowStepDefinition {
   id: string;
   name: string;
+  codename: string;
   description: string;
   icon: LucideIcon;
   agentTitle: string;
@@ -28,6 +29,24 @@ export interface WorkflowStepDefinition {
   agentRole: string;
   agentAction: string;
 }
+
+const ROBOT_CODENAMES: Record<string, string> = {
+  P1: 'Zyro',
+  P2: 'Jano',
+  P3: 'Kiro',
+  P4: 'Alia',
+  P5: 'Lexo',
+  P6: 'Vero',
+  P7: 'Kado',
+  P8: 'Conso',
+  P9: 'Mira',
+  P10: 'Nexa',
+  P11: 'Beto',
+  P12: 'Emio',
+  P13: 'Huma',
+  P14: 'Tila',
+  P15: 'Orin',
+};
 
 export const WORKFLOW_STEPS: WorkflowStepDefinition[] = [
   {
