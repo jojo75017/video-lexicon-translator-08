@@ -74,12 +74,12 @@ const STEP_ITEMS: StepItem[] = [
     badge: 'manuel',
   },
   {
-    id: 'cover-design-editor',
+    id: 'images',
     label: 'Habiller',
-    hint: 'Couverture & visuels',
+    hint: 'Couverture, visuels & bibliothèque',
     icon: ImageIcon,
     step: '3',
-    matchIds: ['cover-design-editor', 'cover', 'backcover', 'images'],
+    matchIds: ['images', 'cover-design-editor', 'cover', 'backcover'],
   },
   {
     id: 'export',
