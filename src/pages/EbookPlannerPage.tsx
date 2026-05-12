@@ -103,6 +103,8 @@ import EbookHumanizer from '@/components/ebook/EbookHumanizer';
 import EbookStrictProofreader from '@/components/ebook/EbookStrictProofreader';
 import SubscriberActivityPopup from '@/components/admin/SubscriberActivityPopup';
 import { EbookLibrary } from '@/components/ebook/EbookLibrary';
+import { EbookImageLibrary } from '@/components/ebook/EbookImageLibrary';
+import { EbookChapterImageGenerator } from '@/components/ebook/EbookChapterImageGenerator';
 import { AudioExpressWorkflow } from '@/components/ebook/AudioExpressWorkflow';
 
 import { CoverDesignEditor } from '@/components/ebook/CoverDesignEditor';
