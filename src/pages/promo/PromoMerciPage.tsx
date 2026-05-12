@@ -49,6 +49,22 @@ const PromoMerciPage = () => {
             </Button>
           </Link>
         </div>
+
+        {/* RECRUTEMENT AFFILIÉ */}
+        <div className="bg-gradient-to-br from-[#008296]/10 to-[#FF9E2D]/10 border border-[#008296]/30 rounded-xl p-8 text-left">
+          <p className="text-xs uppercase tracking-wide text-[#008296] font-bold mb-2">💰 Bonus</p>
+          <h2 className="text-2xl font-bold text-[#232F3E] mb-2">
+            Vous adorez EbookStudio ? Gagnez 20€ par recommandation
+          </h2>
+          <p className="text-gray-700 mb-4">
+            Notre programme d'affiliation vous reverse <strong>30% de commission</strong> (soit 20,10€) sur chaque vente que vous générez. Cookie 30 jours, paiement PayPal.
+          </p>
+          <Link to="/promo/affilie">
+            <Button variant="outline" className="border-[#008296] text-[#008296] hover:bg-[#008296] hover:text-white">
+              Devenir affilié <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </Link>
+        </div>
       </section>
     </FunnelLayout>
   );
