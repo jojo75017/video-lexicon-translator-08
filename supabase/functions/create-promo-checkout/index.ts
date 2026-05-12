@@ -88,7 +88,7 @@ Deno.serve(async (req) => {
         metadata: {
           order_id: order.id,
           ref_code: ref_code || "",
-          product: "ebookstudio_annual",
+          product: "ebookstudio_lifetime",
         },
         payment_intent_data: {
           metadata: { order_id: order.id, ref_code: ref_code || "" },
