@@ -55,16 +55,29 @@ async function callGeminiDirect(systemPrompt: string, userPrompt: string, maxTok
   
   console.log(`[Gemini] Using key: length=${cleanKey.length}, prefix=${cleanKey.substring(0, 8)}..., retry=${retryCount}`);
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${cleanKey}`;
-  
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      system_instruction: { parts: [{ text: `${systemPrompt}\n\n${EDITORIAL_PRO_RULES}` }] },
-      contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
-      generationConfig: { maxOutputTokens: maxTokens, temperature: 0.7 },
-    }),
-  });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), maxTokens >= 5000 ? 115000 : 90000);
+  let response: Response;
+
+  try {
+    response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        system_instruction: { parts: [{ text: `${systemPrompt}\n\n${EDITORIAL_PRO_RULES}` }] },
+        contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+        generationConfig: { maxOutputTokens: maxTokens, temperature: 0.7 },
+      }),
+      signal: controller.signal,
+    });
+  } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error('TIMEOUT: La génération Gemini a dépassé le délai sécurisé. Le workflow va reprendre automatiquement.');
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 
   if (!response.ok) {
     const status = response.status;
@@ -782,9 +795,9 @@ function getP4GenerationSettings(numberOfChapters: number) {
     targetWords: isVeryLargeProject ? 1600 : 3000,
     maxWords: isVeryLargeProject ? 1900 : 3500,
     minScore: isVeryLargeProject ? 7 : 8,
-    maxRetries: isVeryLargeProject ? 0 : 1,
+    maxRetries: 0,
     previousChapterChars: isVeryLargeProject ? 400 : 800,
-    segmentCount: isVeryLargeProject ? 2 : 1,
+    segmentCount: 2,
   };
 }
 
