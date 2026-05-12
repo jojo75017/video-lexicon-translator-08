@@ -2315,12 +2315,45 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             Les 15 étapes du Directeur Éditorial
           </CardTitle>
           
+          {/* Stepper P1 → P15 */}
+          <div className="mt-4 mb-2">
+            <div className="flex flex-wrap items-center gap-1.5">
+              {WORKFLOW_STEPS.map((step, idx) => {
+                const done = stepResults[step.id] !== undefined;
+                const active = isGenerating && idx === currentStepIndex;
+                const failed = failedStepIndex === idx;
+                return (
+                  <div key={step.id} className="flex items-center gap-1.5">
+                    <div
+                      title={`${step.id} – ${step.name}`}
+                      className={[
+                        'flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold transition-all',
+                        failed ? 'border-destructive bg-destructive/10 text-destructive' :
+                        done ? 'border-emerald-500/50 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300' :
+                        active ? 'border-primary bg-primary text-primary-foreground shadow-sm animate-pulse' :
+                        'border-border bg-muted/30 text-muted-foreground',
+                      ].join(' ')}
+                    >
+                      {done ? <CheckCircle2 className="h-3 w-3" /> :
+                       active ? <Loader2 className="h-3 w-3 animate-spin" /> :
+                       failed ? <AlertCircle className="h-3 w-3" /> : null}
+                      <span>{step.id}</span>
+                    </div>
+                    {idx < WORKFLOW_STEPS.length - 1 && (
+                      <span className={done ? 'text-emerald-500' : 'text-muted-foreground/40'}>→</span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
           {/* Progress bar + bouton Stop */}
           {currentStepIndex >= 0 && (
             <div className="space-y-2 mt-4">
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">
-                  {currentStepIndex >= 14 ? 'Terminé !' : `Étape ${currentStepIndex + 1} sur ${WORKFLOW_STEP_COUNT}`}
+                  {currentStepIndex >= 14 ? '✅ Workflow terminé !' : `🔄 En cours : ${WORKFLOW_STEPS[currentStepIndex]?.id} – ${WORKFLOW_STEPS[currentStepIndex]?.name} (${currentStepIndex + 1}/${WORKFLOW_STEP_COUNT})`}
                 </span>
                 <span className="font-semibold text-primary">{Math.round(progress)}%</span>
               </div>
