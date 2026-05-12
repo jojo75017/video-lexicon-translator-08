@@ -2469,8 +2469,10 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       case 'images-cover':
       case 'images-generator':
       case 'images-library':
-        const imageStudioTab = activeTab === 'images-generator' ? 'generator' : activeTab === 'images-library' ? 'library' : 'cover';
-        return (
+        return (() => {
+          const imageStudioTab = activeTab === 'images-generator' ? 'generator' : activeTab === 'images-library' ? 'library' : 'cover';
+
+          return (
           <div className="space-y-6 animate-fade-in">
             <Tabs
               value={imageStudioTab}
@@ -2531,7 +2533,8 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               </TabsContent>
             </Tabs>
           </div>
-        );
+          );
+        })();
 
       case 'cover':
         // Bloquer la couverture en mode démo
