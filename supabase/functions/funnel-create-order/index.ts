@@ -9,9 +9,16 @@ const corsHeaders = {
 
 const PRODUCTS: Record<string, { label: string; amount: number }> = {
   main: { label: "EbookStudio — Accès à vie", amount: 67 },
-  upsell_license: { label: "Licence commerciale", amount: 47 },
-  upsell_templates: { label: "Pack 50 templates premium", amount: 27 },
+  license_extended: { label: "Licence commerciale étendue", amount: 47 },
+  templates_premium: { label: "Pack 50 templates premium", amount: 25 },
+  // Legacy aliases
+  upsell_license: { label: "Licence commerciale étendue", amount: 47 },
+  upsell_templates: { label: "Pack 50 templates premium", amount: 25 },
 };
+
+// Direct download links delivered after upsell payment
+const TEMPLATES_PACK_URL = "https://drive.google.com/uc?export=download&id=177h1X9Up5ufQQOg0Ojc2WMPkVlGkXI4B";
+const NICHES_GUIDE_URL = "https://www.ebookstudio.fr/lead-magnets/5-niches-rentables-2026.pdf";
 
 const isValidEmail = (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
 
