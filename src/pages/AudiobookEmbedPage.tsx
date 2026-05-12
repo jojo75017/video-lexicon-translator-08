@@ -107,7 +107,7 @@ const AudiobookEmbedPage = () => {
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, margin: '12px 0' }}>
               {stripeLink && (
                 <a href={stripeLink} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 28px', borderRadius: 999, fontWeight: 700, fontSize: '.95rem', textDecoration: 'none', background: 'linear-gradient(135deg,#f6ad55,#ed8936)', color: '#fff', boxShadow: '0 8px 24px rgba(246,173,85,.25)', border: 'none', cursor: 'pointer' }}>
-                  🛒 Acheter — {price} €
+                  🛒 Acheter - {price} €
                 </a>
               )}
               {!stripeLink && price && (
@@ -182,7 +182,7 @@ const AudiobookEmbedPage = () => {
         <div style={{ margin: '0 32px 32px', background: 'linear-gradient(135deg,rgba(16,185,129,.08),rgba(16,185,129,.02))', border: '1px solid rgba(16,185,129,.2)', borderRadius: 16, padding: '28px 32px', display: 'flex', alignItems: 'center', gap: 24 }}>
           <div style={{ fontSize: '3rem', flexShrink: 0 }}>🛡️</div>
           <div>
-            <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#34d399', marginBottom: 6 }}>Garantie Satisfait ou Remboursé — 30 jours</h3>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#34d399', marginBottom: 6 }}>Garantie Satisfait ou Remboursé - 30 jours</h3>
             <p style={{ color: 'rgba(255,255,255,.6)', fontSize: '.9rem', lineHeight: 1.6 }}>Vous n'êtes pas satisfait ? Nous vous remboursons intégralement, sans conditions et sans questions. Votre satisfaction est notre priorité absolue.</p>
           </div>
         </div>

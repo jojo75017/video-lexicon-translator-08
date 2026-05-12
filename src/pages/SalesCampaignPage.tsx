@@ -109,7 +109,7 @@ const SalesCampaignPage = () => {
           <TabsContent value="emails" className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-semibold text-foreground">Séquence Email — 7 Jours</h2>
+                <h2 className="text-xl font-semibold text-foreground">Séquence Email - 7 Jours</h2>
                 <p className="text-sm text-muted-foreground">De la curiosité au passage à l'action</p>
               </div>
               <Button onClick={copyAllEmails} variant="outline" className="border-gold/30 text-gold-light hover:bg-gold/10">

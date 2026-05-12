@@ -41,7 +41,7 @@ const PassiveRevenueProof: React.FC = () => {
             </span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Capture réelle d'un dashboard KDP — preuve que la méthode fonctionne.
+            Capture réelle d'un dashboard KDP - preuve que la méthode fonctionne.
           </p>
         </motion.div>
 
@@ -49,7 +49,7 @@ const PassiveRevenueProof: React.FC = () => {
           <div className="rounded-2xl overflow-hidden border border-primary/20 shadow-2xl shadow-primary/10 bg-card">
             <img
               src={kdpProof}
-              alt="Dashboard Amazon KDP — revenus passifs réels"
+              alt="Dashboard Amazon KDP - revenus passifs réels"
               loading="lazy"
               className="w-full h-auto"
             />

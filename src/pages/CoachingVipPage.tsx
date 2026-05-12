@@ -62,22 +62,22 @@ const inclusions = [
 const weeks = [
   {
     n: 1,
-    title: "Semaine 1 — Cadrage",
+    title: "Semaine 1 - Cadrage",
     desc: "Niche validée, angle unique, structure claire de ton ebook. On évite les erreurs qui font perdre 3 mois.",
   },
   {
     n: 2,
-    title: "Semaine 2 — Production",
+    title: "Semaine 2 - Production",
     desc: "Rédaction guidée + corrections du manuscrit. Tu avances sans bloquer, je relis et je corrige avec toi.",
   },
   {
     n: 3,
-    title: "Semaine 3 — Packaging",
+    title: "Semaine 3 - Packaging",
     desc: "Couverture qui vend, description Amazon optimisée, mots-clés KDP qui rapportent.",
   },
   {
     n: 4,
-    title: "Semaine 4 — Lancement",
+    title: "Semaine 4 - Lancement",
     desc: "Publication sur Amazon KDP + plan de lancement concret pour tes premières ventes.",
   },
 ];
@@ -149,7 +149,7 @@ const CoachingVipPage = () => {
   return (
     <div className="min-h-screen bg-[#FAFAFA] text-[#232F3E] py-10 px-4">
       <Helmet>
-        <title>Coaching VIP 30 jours — 10 places à 47€ | EbookStudio</title>
+        <title>Coaching VIP 30 jours - 10 places à 47€ | EbookStudio</title>
         <meta
           name="description"
           content="Accompagnement privé de 30 jours avec Georges Boubet : 3 sessions Zoom, email perso, audit ebook. 10 places seulement à 47€ au lieu de 197€."
@@ -170,7 +170,7 @@ const CoachingVipPage = () => {
         <div className="text-center mb-8">
           <Badge className="bg-[#FF9E2D]/15 text-[#FF9E2D] border border-[#FF9E2D]/40 mb-4 font-bold">
             <Crown className="w-3 h-3 mr-1" />
-            ACCÈS PRIVÉ — 10 PLACES SEULEMENT
+            ACCÈS PRIVÉ - 10 PLACES SEULEMENT
           </Badge>
           <h1 className="text-3xl md:text-5xl font-black mb-4 leading-tight">
             Tu fais partie des personnes
@@ -201,7 +201,7 @@ const CoachingVipPage = () => {
           </div>
           <p className="text-center text-xs text-[#232F3E]/60 mt-2 flex items-center justify-center gap-1.5">
             <PlayCircle className="w-3.5 h-3.5 text-[#008296]" />
-            1 min — regarde avant de réserver ta place
+            1 min - regarde avant de réserver ta place
           </p>
         </div>
 
@@ -257,7 +257,7 @@ const CoachingVipPage = () => {
                 <div className="text-xs font-black text-[#008296] uppercase tracking-wider mb-1">
                   Semaine {w.n}
                 </div>
-                <h3 className="font-bold mb-1">{w.title.replace(/^Semaine \d+ — /, "")}</h3>
+                <h3 className="font-bold mb-1">{w.title.replace(/^Semaine \d+ - /, "")}</h3>
                 <p className="text-sm text-[#232F3E]/70">{w.desc}</p>
               </CardContent>
             </Card>
@@ -332,7 +332,7 @@ const CoachingVipPage = () => {
         {/* CTA PAYPAL */}
         <Card className="border-2 border-[#008296] shadow-xl mb-6 overflow-hidden">
           <div className="bg-gradient-to-r from-[#008296] to-[#00a3b4] text-white text-center py-3 text-sm font-bold tracking-wide">
-            ⚠️ {SEATS} PLACES MAXIMUM — UNE FOIS REMPLI, JE FERME
+            ⚠️ {SEATS} PLACES MAXIMUM - UNE FOIS REMPLI, JE FERME
           </div>
           <CardContent className="p-8 text-center bg-white">
             <p className="text-sm text-[#232F3E]/60 mb-1">Tarif unique</p>
@@ -358,7 +358,7 @@ const CoachingVipPage = () => {
                 size="lg"
                 className="w-full md:w-auto px-10 py-6 text-lg font-black bg-[#FF9E2D] hover:bg-[#FF8C00] text-[#232F3E] rounded-xl shadow-lg"
               >
-                Je réserve ma place — {PRICE}€
+                Je réserve ma place - {PRICE}€
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </a>

@@ -73,7 +73,7 @@ const EBOOKS: EbookEntry[] = [
     category: 'Cuisine',
     bsr: '#8 924',
     monthlyRevenue: '620 €',
-    description: '80 recettes du sud — Italie, Grèce, Espagne, Provence. Photos pas-à-pas et conseils nutrition.',
+    description: '80 recettes du sud - Italie, Grèce, Espagne, Provence. Photos pas-à-pas et conseils nutrition.',
     keywords: ['cuisine méditerranéenne', 'recettes faciles', 'cuisine italienne', 'régime méditerranéen', 'recettes santé', 'cuisine du sud', 'plats provençaux'],
     rating: 4.8,
     reviews: 156,
@@ -121,7 +121,7 @@ const EBOOKS: EbookEntry[] = [
     category: 'Scolaire & Parascolaire',
     bsr: '#3 670',
     monthlyRevenue: '1 410 €',
-    description: 'Cahier de révisions Mathématiques CM2 — exercices progressifs, corrigés détaillés, préparation entrée en 6e. Conforme programme 2026.',
+    description: 'Cahier de révisions Mathématiques CM2 - exercices progressifs, corrigés détaillés, préparation entrée en 6e. Conforme programme 2026.',
     keywords: ['cahier de vacances CM2', 'révisions maths', 'parascolaire', 'entrée en 6e', 'exercices CM2', 'soutien scolaire', 'cahier exercices'],
     rating: 4.7,
     reviews: 198,
@@ -245,8 +245,8 @@ const EbookGallery: React.FC = () => {
         <div className="mt-12 text-center">
           <p className="text-muted-foreground mb-5 text-sm">
             {activeCategory === 'Tous'
-              ? '8 niches couvertes — la plateforme s\'adapte à'
-              : `${filteredBooks.length} ebook${filteredBooks.length > 1 ? 's' : ''} dans la catégorie « ${activeCategory} » — explorez aussi les`}{' '}
+              ? '8 niches couvertes - la plateforme s\'adapte à'
+              : `${filteredBooks.length} ebook${filteredBooks.length > 1 ? 's' : ''} dans la catégorie « ${activeCategory} » - explorez aussi les`}{' '}
             <span className="text-foreground font-semibold">
               {activeCategory === 'Tous' ? 'tous les genres' : 'autres univers'}
             </span>
@@ -257,7 +257,7 @@ const EbookGallery: React.FC = () => {
             className="bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold px-10 py-7 rounded-2xl shadow-xl shadow-primary/20 hover:-translate-y-1 transition-all"
           >
             <BookOpen className="w-5 h-5 mr-2" />
-            Créer mon ebook — 67€ à vie
+            Créer mon ebook - 67€ à vie
             <ArrowRight className="w-5 h-5 ml-2" />
           </Button>
         </div>
@@ -335,7 +335,7 @@ const EbookGallery: React.FC = () => {
                     onClick={() => navigate('/upsell-paiement?plan=pro')}
                     className="w-full bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold rounded-xl"
                   >
-                    Créer un ebook comme celui-ci — 67€
+                    Créer un ebook comme celui-ci - 67€
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                 </div>

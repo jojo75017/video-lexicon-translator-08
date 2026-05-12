@@ -50,9 +50,9 @@ export const WorkflowStepWrapper: React.FC<WorkflowStepWrapperProps> = ({
       saveStepResult(
         currentStepId,
         { validatedManually: true, stepId: currentStepId, label: currentStep.label },
-        `# ${currentStepId} — ${currentStep.label}\n\nÉtape validée manuellement pour débloquer la suite du workflow.`
+        `# ${currentStepId} - ${currentStep.label}\n\nÉtape validée manuellement pour débloquer la suite du workflow.`
       );
-      toast.success(`${currentStepId} validé — workflow débloqué.`);
+      toast.success(`${currentStepId} validé - workflow débloqué.`);
     }
 
     if (nextStep) {
@@ -76,7 +76,7 @@ export const WorkflowStepWrapper: React.FC<WorkflowStepWrapperProps> = ({
             <span className="font-medium text-foreground">
               {currentStepCompleted ? `${currentStepId} est validé.` : `Si ${currentStepId} bloque, validez l'étape pour continuer.`}
             </span>{' '}
-            {nextStep ? `Prochaine étape : ${nextStep.id} — ${nextStep.label}.` : 'Dernière étape du workflow.'}
+            {nextStep ? `Prochaine étape : ${nextStep.id} - ${nextStep.label}.` : 'Dernière étape du workflow.'}
           </div>
           <Button
             type="button"

@@ -268,7 +268,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
         // Toast persistant de reprise pour informer l'utilisateur
         const stepLabel = WORKFLOW_STEPS[data.currentStepIndex]?.id || 'précédente';
         const remaining = Math.max(0, WORKFLOW_STEPS.length - 1 - data.currentStepIndex);
-        toast.info(`🔄 Reprise possible depuis l'étape ${stepLabel} — ${remaining} étape(s) restante(s)`, {
+        toast.info(`🔄 Reprise possible depuis l'étape ${stepLabel} - ${remaining} étape(s) restante(s)`, {
           duration: 7000,
         });
       }
@@ -327,7 +327,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
     toast.success('Sauvegarde supprimée');
   };
 
-  // Reset TOTAL — efface tout le workflow (toutes les clés localStorage liées)
+  // Reset TOTAL - efface tout le workflow (toutes les clés localStorage liées)
   const resetWorkflowCompletely = () => {
     const keysToRemove = [
       STORAGE_KEY,
@@ -751,7 +751,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
         if (!isTransientError(err) || attempt === maxRetries) break;
 
         const backoffMs = 700 * Math.pow(2, attempt - 1);
-        toast.info(`⏳ Reprise automatique (${stepId}) — tentative ${attempt + 1}/${maxRetries}…`);
+        toast.info(`⏳ Reprise automatique (${stepId}) - tentative ${attempt + 1}/${maxRetries}…`);
         await sleep(backoffMs);
       }
     }
@@ -1034,12 +1034,12 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
                   3
                 );
               } catch (err: any) {
-                throw new Error(`P4 — Chapitre ${chIdx + 1}/${retryStructure.length} : ${err?.message || 'Erreur inconnue'}`);
+                throw new Error(`P4 - Chapitre ${chIdx + 1}/${retryStructure.length} : ${err?.message || 'Erreur inconnue'}`);
               }
 
               const generatedPart = partial?.result?.chapitrePart || partial?.result?.chapitre;
               if (!generatedPart) {
-                throw new Error(`P4 — Chapitre ${chIdx + 1}/${retryStructure.length} : segment vide`);
+                throw new Error(`P4 - Chapitre ${chIdx + 1}/${retryStructure.length} : segment vide`);
               }
 
               generatedSegments.push(generatedPart);
@@ -1119,13 +1119,13 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
                 selectedTitleIndex: null,
               });
               toast.info('📊 Analyse du titre terminée ! Choisissez votre titre best-seller avant de continuer.');
-              return; // STOP — l'utilisateur doit valider avant P2
+              return; // STOP - l'utilisateur doit valider avant P2
             }
             setWaitingForTitleValidation(true);
             setIsGenerating(false);
             saveProgress({ waitingForTitleValidation: true, waitingForCharacterValidation: false });
             toast.info('📊 Analyse du titre terminée ! Choisissez votre titre best-seller avant de continuer.');
-            return; // STOP — l'utilisateur doit valider avant P2
+            return; // STOP - l'utilisateur doit valider avant P2
           }
 
           if (result) {
@@ -1152,7 +1152,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
               setGeneratedCharacters(personnagesP3);
               setWaitingForCharacterValidation(false);
               if (personnagesP3.length > 0) {
-                toast.success(`🎭 ${personnagesP3.length} personnage(s) généré(s) — rédaction des chapitres en cours…`);
+                toast.success(`🎭 ${personnagesP3.length} personnage(s) généré(s) - rédaction des chapitres en cours…`);
               }
             }
           }
@@ -1338,9 +1338,9 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
           {/* Bandeau motivationnel */}
           <div className="bg-gradient-to-r from-violet-600 to-purple-600 text-white rounded-lg px-4 py-3 mb-4 text-sm">
             {projectCount !== null && projectCount > 0 ? (
-              <p>👉 {projectCount} projets créés — lancez le prochain 🚀</p>
+              <p>👉 {projectCount} projets créés - lancez le prochain 🚀</p>
             ) : (
-              <p>✨ Votre ebook peut être prêt en quelques minutes — commencez maintenant.</p>
+              <p>✨ Votre ebook peut être prêt en quelques minutes - commencez maintenant.</p>
             )}
           </div>
            <CardTitle className="text-2xl font-bold text-foreground">
@@ -1368,7 +1368,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
           {/* Guidage visuel */}
           <div className="flex items-center gap-2 text-sm font-medium text-primary bg-primary/10 border border-primary/20 rounded-lg px-4 py-2 animate-fade-in">
             <span>👇</span>
-            <span>Étape 1 — Entrez le titre pour lancer votre ebook</span>
+            <span>Étape 1 - Entrez le titre pour lancer votre ebook</span>
           </div>
 
           {/* Form Fields - Row 1: Title & Subtitle */}
@@ -1496,7 +1496,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
           <div className="space-y-2">
             <Label htmlFor="book-introduction" className="flex items-center gap-2">
               <Sparkles className="h-4 w-4 text-primary" />
-              Introduction — Décrivez votre vision du livre *
+              Introduction - Décrivez votre vision du livre *
             </Label>
             <Textarea
               id="book-introduction"

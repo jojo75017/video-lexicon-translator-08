@@ -31,7 +31,7 @@ const SCAMS = [
   },
   {
     title: "Les enchères par défaut trop élevées",
-    risk: "Amazon suggère TOUJOURS plus haut (0,75 € à 1,20 €) — c'est leur business.",
+    risk: "Amazon suggère TOUJOURS plus haut (0,75 € à 1,20 €) - c'est leur business.",
     fix: "Démarre à 0,15 €–0,25 € max. Tu peux toujours monter ; tu ne peux jamais récupérer ce que tu as cramé.",
   },
   {
@@ -63,7 +63,7 @@ const SCAMS = [
 
 const CAMPAIGN_TYPES = [
   {
-    name: "Sponsored Products — Manuel",
+    name: "Sponsored Products - Manuel",
     when: "À utiliser DÈS LE DÉBUT",
     why: "Contrôle total sur les mots-clés et les enchères. C'est 80 % de ton ROI.",
     color: "border-l-4 border-l-emerald-500 bg-emerald-50/50",
@@ -71,7 +71,7 @@ const CAMPAIGN_TYPES = [
     iconColor: "text-emerald-600",
   },
   {
-    name: "Sponsored Products — Auto",
+    name: "Sponsored Products - Auto",
     when: "Phase de découverte UNIQUEMENT (14 jours max)",
     why: "Amazon teste pour toi. Tu récoltes les mots-clés gagnants, puis tu coupes.",
     color: "border-l-4 border-l-amber-500 bg-amber-50/50",
@@ -115,26 +115,26 @@ const KPIS = [
 ];
 
 const CHECKLIST = [
-  { phase: "J-1 — Prérequis (NE PAS LANCER SANS)", items: [
+  { phase: "J-1 - Prérequis (NE PAS LANCER SANS)", items: [
     "Description optimisée 7 keywords + bullet points",
     "Minimum 5 reviews authentiques (3,8 ★ minimum)",
     "A+ Content publié et validé",
     "Prix calibré marché (±10 % des concurrents directs)",
     "Couverture A/B testée (au moins 2 versions)",
   ]},
-  { phase: "J+0 à J+7 — Phase d'apprentissage", items: [
+  { phase: "J+0 à J+7 - Phase d'apprentissage", items: [
     "Lance 1 campagne auto + 1 manuelle exact match",
     "Budget : 5 €/jour MAX par campagne",
     "Enchère de départ : 0,20 €",
     "NE TOUCHE À RIEN pendant 7 jours (Amazon a besoin de data)",
   ]},
-  { phase: "J+8 à J+14 — Premières optimisations", items: [
+  { phase: "J+8 à J+14 - Premières optimisations", items: [
     "Identifie les mots-clés > 10 clics sans vente → en negative",
     "Identifie les mots-clés > 1 vente → migrer en campagne manuelle exact",
     "Baisse les enchères des mots-clés ACOS > 50 %",
     "Augmente de +10 % les mots-clés ACOS < 20 %",
   ]},
-  { phase: "J+15 à J+30 — Scaling intelligent", items: [
+  { phase: "J+15 à J+30 - Scaling intelligent", items: [
     "Tue les campagnes avec TACOS > 25 %",
     "Double le budget des campagnes TACOS < 10 %",
     "Lance 2 nouvelles campagnes phrase match basées sur les gagnants",

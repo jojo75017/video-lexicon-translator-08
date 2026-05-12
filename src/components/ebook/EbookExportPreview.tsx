@@ -126,7 +126,7 @@ export const EbookExportPreview: React.FC<EbookExportPreviewProps> = ({
             <auditStatusConfig.icon className={`h-5 w-5 ${auditStatusConfig.textColor}`} />
             <div className="flex-1">
               <span className={`font-semibold ${auditStatusConfig.textColor}`}>
-                Score : {auditReport.score}/100 — {auditStatusConfig.label}
+                Score : {auditReport.score}/100 - {auditStatusConfig.label}
               </span>
               {auditReport.issues.length > 0 && (
                 <span className="text-sm text-muted-foreground ml-2">

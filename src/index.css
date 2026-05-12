@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    /* ── CHARTE EBOOKSTUDIO — KDP ROCKET (Orange / Blanc / Noir) ── */
+    /* ── CHARTE EBOOKSTUDIO - KDP ROCKET (Orange / Blanc / Noir) ── */
     /* Fond principal: blanc pur */
     --background: 0 0% 100%;
     --foreground: 0 0% 8%;
@@ -70,7 +70,7 @@
     --pastel-peach: 25 80% 80%;
     --pastel-lavender: 189 40% 82%;
 
-    /* Palette Moderne — remappée Orange/Vert KDP Rocket */
+    /* Palette Moderne - remappée Orange/Vert KDP Rocket */
     --violet: 22 100% 55%;
     --violet-light: 22 100% 65%;
     --violet-dark: 18 95% 45%;

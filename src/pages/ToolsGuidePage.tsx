@@ -124,7 +124,7 @@ const ToolsGuidePage: React.FC = () => {
       emoji: '✍️',
       label: 'Écriture',
       color: 'text-emerald-600 border-emerald-200 bg-emerald-50',
-      description: 'Plan, chapitres, personnages, séries — l’atelier d’écriture manuel et assisté.',
+      description: 'Plan, chapitres, personnages, séries - l’atelier d’écriture manuel et assisté.',
       keyTools: ['Planificateur', 'Écriture', 'Personnages', 'Correcteur strict'],
       tabId: 'planner',
     },
@@ -232,7 +232,7 @@ const ToolsGuidePage: React.FC = () => {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 py-10 space-y-14">
-        {/* Section 1 — Parcours recommandé */}
+        {/* Section 1 - Parcours recommandé */}
         <section>
           <div className="flex items-center gap-2 mb-6">
             <Compass className="w-5 h-5 text-primary" />
@@ -270,7 +270,7 @@ const ToolsGuidePage: React.FC = () => {
           </div>
         </section>
 
-        {/* Section 2 — Les 5 piliers */}
+        {/* Section 2 - Les 5 piliers */}
         <section>
           <div className="flex items-center gap-2 mb-6">
             <Package className="w-5 h-5 text-primary" />
@@ -313,7 +313,7 @@ const ToolsGuidePage: React.FC = () => {
           </div>
         </section>
 
-        {/* Section 3 — Je veux faire X */}
+        {/* Section 3 - Je veux faire X */}
         <section>
           <div className="flex items-center gap-2 mb-6">
             <HelpCircle className="w-5 h-5 text-primary" />
@@ -344,7 +344,7 @@ const ToolsGuidePage: React.FC = () => {
           </div>
         </section>
 
-        {/* Section 4 — Outils avancés */}
+        {/* Section 4 - Outils avancés */}
         <section>
           <div className="flex items-center gap-2 mb-4">
             <Settings className="w-5 h-5 text-muted-foreground" />

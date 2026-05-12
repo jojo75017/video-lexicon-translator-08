@@ -141,11 +141,11 @@ const EbookABTesting: React.FC<EbookABTestingProps> = ({
         }
         toast.success('🏆 Analyse terminée !');
       } else {
-        toast.error('Analyse impossible — réponse vide du serveur. Réessayez.');
+        toast.error('Analyse impossible - réponse vide du serveur. Réessayez.');
       }
     } catch (error) {
       console.error('Erreur A/B test:', error);
-      toast.error('Analyse impossible — vérifiez votre connexion et réessayez.');
+      toast.error('Analyse impossible - vérifiez votre connexion et réessayez.');
     } finally {
       setIsAnalyzing(false);
     }

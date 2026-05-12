@@ -161,7 +161,7 @@ const DemoPage = () => {
   return (
     <div className="min-h-screen bg-joy-cream text-joy-ink overflow-x-hidden">
       <Helmet>
-        <title>Démo Gratuite — Génère ton plan d'ebook en 30 secondes | EbookStudio</title>
+        <title>Démo Gratuite - Génère ton plan d'ebook en 30 secondes | EbookStudio</title>
         <meta name="description" content="Teste gratuitement notre IA : un plan d'ebook structuré avec chapitres et mots-clés Amazon KDP, en 30 secondes. Sans inscription." />
         <link rel="canonical" href="https://ebookstudio.fr/demo" />
       </Helmet>
@@ -200,7 +200,7 @@ const DemoPage = () => {
         <motion.div className="text-center mb-12" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
           <Badge className="bg-joy-sun text-joy-ink border-0 px-4 py-2 mb-6 text-sm font-bold rounded-full shadow-joy animate-joy-pop">
             <Zap className="w-4 h-4 mr-1.5" />
-            {remainingTries > 0 ? '1 essai gratuit • 3 chapitres • Sans inscription' : 'Essai utilisé — passe à la version complète'}
+            {remainingTries > 0 ? '1 essai gratuit • 3 chapitres • Sans inscription' : 'Essai utilisé - passe à la version complète'}
           </Badge>
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-black mb-5 leading-[1.05] text-joy-ink">
             Regarde ton ebook{" "}
@@ -322,7 +322,7 @@ const DemoPage = () => {
                     </div>
                   </div>
                   <h3 className="text-2xl font-black text-joy-ink mb-2">L'IA réfléchit pour toi…</h3>
-                  <p className="text-joy-ink/70 mb-4">Structure, chapitres, mots-clés KDP — tout arrive</p>
+                  <p className="text-joy-ink/70 mb-4">Structure, chapitres, mots-clés KDP - tout arrive</p>
                   <div className="flex flex-col gap-2 text-sm text-joy-ink/70 max-w-xs mx-auto">
                     <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-joy-mint" /> Analyse du sujet</div>
                     <div className="flex items-center gap-2"><Loader2 className="w-4 h-4 text-joy-peach animate-spin" /> Structuration des chapitres</div>
@@ -432,7 +432,7 @@ const DemoPage = () => {
                       </div>
                       <div className="flex-1">
                         <h3 className="font-black text-xl text-joy-ink mb-1">Tu veux la version complète ?</h3>
-                        <p className="text-joy-ink/70 text-sm mb-4">67€ à vie — pas d'abonnement, pas de limites.</p>
+                        <p className="text-joy-ink/70 text-sm mb-4">67€ à vie - pas d'abonnement, pas de limites.</p>
                         <div className="grid sm:grid-cols-2 gap-2 mb-4 text-sm text-joy-ink">
                           {["✍️ Rédaction complète des chapitres", "🎨 Couvertures IA", "📄 Export PDF / EPUB / Word", "🎧 Audiobooks voix neurale", "🎓 Formation 18 modules", "♾️ Générations illimitées"].map((f, i) => (
                             <div key={i}>{f}</div>

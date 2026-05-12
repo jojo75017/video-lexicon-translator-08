@@ -54,7 +54,7 @@ export const EbookChapterWordCount: React.FC<Props> = ({ chapters, targetWordsPe
           return (
             <div key={d.index} className="space-y-1">
               <div className="flex justify-between items-center text-sm">
-                <span className="truncate max-w-[200px] font-medium">Ch.{d.index} — {d.title}</span>
+                <span className="truncate max-w-[200px] font-medium">Ch.{d.index} - {d.title}</span>
                 <span className={`font-mono text-xs ${textColor}`}>
                   {d.words.toLocaleString()} / {targetWordsPerChapter.toLocaleString()}
                 </span>

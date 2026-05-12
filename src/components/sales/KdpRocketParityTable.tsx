@@ -63,7 +63,7 @@ const KdpRocketParityTable: React.FC = () => {
             <span className="text-primary">+ 9 outils en plus</span>
           </h2>
           <p className="text-foreground/70 text-lg max-w-2xl mx-auto">
-            Comparaison fonctionnalité par fonctionnalité — pour 67€ à vie au lieu de 39€/mois.
+            Comparaison fonctionnalité par fonctionnalité - pour 67€ à vie au lieu de 39€/mois.
           </p>
         </motion.div>
 
@@ -155,7 +155,7 @@ const KdpRocketParityTable: React.FC = () => {
             </motion.div>
           ))}
 
-          {/* Pied — Prix */}
+          {/* Pied - Prix */}
           <div className="grid grid-cols-[1fr_120px_120px] sm:grid-cols-[1fr_180px_180px] bg-gradient-to-r from-primary/5 to-accent/5 border-t-2 border-border">
             <div className="p-4 sm:p-5 font-black text-foreground text-base sm:text-lg flex items-center">
               💰 Prix total

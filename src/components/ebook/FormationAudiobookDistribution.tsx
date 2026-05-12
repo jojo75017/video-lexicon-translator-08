@@ -38,10 +38,10 @@ const distributionModules: FormationModule[] = [
         subtitle: "💡 Pourquoi vous devez vous lancer",
         items: [
           "Revenus passifs : Un livre audio génère des ventes 24h/24 sans effort supplémentaire",
-          "Nouveau public : 65% des auditeurs n'achètent PAS la version écrite — c'est un marché différent",
+          "Nouveau public : 65% des auditeurs n'achètent PAS la version écrite - c'est un marché différent",
           "Prix plus élevés : Un audiobook se vend 15-30€ vs 5-15€ pour un ebook",
           "Fidélisation : Les auditeurs consomment 2x plus de livres que les lecteurs traditionnels",
-          "Faible concurrence : Seulement 5% des ebooks ont une version audio — opportunité massive"
+          "Faible concurrence : Seulement 5% des ebooks ont une version audio - opportunité massive"
         ]
       },
       {
@@ -117,7 +117,7 @@ const distributionModules: FormationModule[] = [
           "Similarité : 0.75 pour un bon équilibre voix/naturel",
           "Style : 0.3-0.5 pour la fiction, 0.1-0.3 pour la non-fiction",
           "Vitesse : 1.0 par défaut, 0.9 pour du contenu technique",
-          "Format : MP3 44.1kHz 128kbps — standard de l'industrie"
+          "Format : MP3 44.1kHz 128kbps - standard de l'industrie"
         ]
       },
       {
@@ -149,7 +149,7 @@ const distributionModules: FormationModule[] = [
           "2. Remplissez : titre, auteur, description, voix utilisée",
           "3. Uploadez le fichier MP3 ou utilisez l'audio généré automatiquement",
           "4. Choisissez la visibilité : public ou privé",
-          "5. Cliquez sur 'Publier' — votre page est créée instantanément",
+          "5. Cliquez sur 'Publier' - votre page est créée instantanément",
           "6. Partagez le lien public ou copiez le code embed pour votre site"
         ]
       },
@@ -174,7 +174,7 @@ const distributionModules: FormationModule[] = [
     color: "from-orange-500 to-red-500",
     content: [
       {
-        subtitle: "🎧 Audible — Le géant du livre audio",
+        subtitle: "🎧 Audible - Le géant du livre audio",
         text: "Audible (Amazon) représente 60% du marché mondial des audiobooks. C'est LA plateforme incontournable pour maximiser vos ventes. Distribution via ACX (Audiobook Creation Exchange)."
       },
       {
@@ -186,15 +186,15 @@ const distributionModules: FormationModule[] = [
           "4. Ajoutez la couverture (2400x2400px minimum, carré)",
           "5. Renseignez le résumé, les catégories et les tags",
           "6. Choisissez le mode de distribution : exclusif ou non-exclusif",
-          "7. Soumettez — validation en 10-15 jours ouvrés",
+          "7. Soumettez - validation en 10-15 jours ouvrés",
           "8. Disponible sur Audible, Amazon et iTunes automatiquement"
         ]
       },
       {
         subtitle: "💰 Modèles de rémunération ACX",
         items: [
-          "Exclusif (7 ans) : 40% de royalties — distribué UNIQUEMENT sur Audible/Amazon/iTunes",
-          "Non-exclusif : 25% de royalties — libre de vendre partout ailleurs aussi",
+          "Exclusif (7 ans) : 40% de royalties - distribué UNIQUEMENT sur Audible/Amazon/iTunes",
+          "Non-exclusif : 25% de royalties - libre de vendre partout ailleurs aussi",
           "Bounty : 75$ par nouveau membre Audible qui achète votre livre en premier",
           "CONSEIL : Commencez en exclusif pour les 40%, puis passez en non-exclusif si vous avez d'autres canaux"
         ]
@@ -226,10 +226,10 @@ const distributionModules: FormationModule[] = [
       {
         subtitle: "🏪 Plateformes majeures",
         items: [
-          "Findaway Voices : Distribue sur 40+ plateformes (Spotify, Apple, Kobo...) — 80% de royalties",
-          "Google Play Livres : Directement via Google Play Console — 52% de royalties",
-          "Apple Books : Via iTunes Connect — 70% de royalties, mais processus exigeant",
-          "Kobo : Via Kobo Writing Life — Forte présence au Canada et en Europe",
+          "Findaway Voices : Distribue sur 40+ plateformes (Spotify, Apple, Kobo...) - 80% de royalties",
+          "Google Play Livres : Directement via Google Play Console - 52% de royalties",
+          "Apple Books : Via iTunes Connect - 70% de royalties, mais processus exigeant",
+          "Kobo : Via Kobo Writing Life - Forte présence au Canada et en Europe",
           "BookBeat : Très populaire en Europe du Nord, modèle abonnement",
           "Spotify (via Findaway) : En forte croissance, audience massive"
         ]
@@ -447,9 +447,9 @@ const distributionModules: FormationModule[] = [
         items: [
           "Vous êtes propriétaire des droits audio si vous êtes l'auteur du texte",
           "Les voix IA d'ElevenLabs sont utilisables commercialement avec un abonnement",
-          "L'ISBN audio est différent de l'ISBN ebook — obtenez-en un nouveau (gratuit via Bowker ou BnF)",
+          "L'ISBN audio est différent de l'ISBN ebook - obtenez-en un nouveau (gratuit via Bowker ou BnF)",
           "Déposez votre œuvre à la BnF ou via Copyright.gov pour preuve de paternité",
-          "Les contrats d'exclusivité ACX durent 7 ans — réfléchissez bien avant de signer"
+          "Les contrats d'exclusivité ACX durent 7 ans - réfléchissez bien avant de signer"
         ]
       },
       {
@@ -545,7 +545,7 @@ const FormationAudiobookDistribution: React.FC = () => {
     y += 8;
     pdf.setFontSize(10);
     pdf.setTextColor(100);
-    pdf.text('EbookStudio Pro — Guide complet de distribution audiobook', 105, y, { align: 'center' });
+    pdf.text('EbookStudio Pro - Guide complet de distribution audiobook', 105, y, { align: 'center' });
     y += 15;
 
     distributionModules.forEach((module) => {
@@ -553,7 +553,7 @@ const FormationAudiobookDistribution: React.FC = () => {
       
       pdf.setFontSize(14);
       pdf.setTextColor(80, 0, 180);
-      pdf.text(`Module ${module.id} — ${module.title}`, 15, y);
+      pdf.text(`Module ${module.id} - ${module.title}`, 15, y);
       y += 7;
       pdf.setFontSize(9);
       pdf.setTextColor(120);
@@ -653,7 +653,7 @@ const FormationAudiobookDistribution: React.FC = () => {
                     </div>
                     <div className="text-left">
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold text-sm">Module {module.id} — {module.title}</span>
+                        <span className="font-semibold text-sm">Module {module.id} - {module.title}</span>
                         {isCompleted && <CheckCircle2 className="h-4 w-4 text-green-500" />}
                       </div>
                       <p className="text-xs text-muted-foreground">{module.description}</p>

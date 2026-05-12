@@ -111,14 +111,14 @@ const AudiobookDemoPage = () => {
       
       {/* Demo banner */}
       <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 text-black text-center py-2.5 text-sm font-bold tracking-wide">
-        🎯 PAGE DÉMO — Voici à quoi ressemble la fiche produit de vos audiobooks
+        🎯 PAGE DÉMO - Voici à quoi ressemble la fiche produit de vos audiobooks
       </div>
 
       {/* Urgency Banner */}
       <div className="bg-gradient-to-r from-red-900/80 via-red-700/80 to-red-900/80 border-b border-red-500/20 text-foreground text-center py-3 px-4">
         <div className="flex items-center justify-center gap-3 flex-wrap">
           <Timer className="w-5 h-5 animate-pulse text-red-300" />
-          <span className="font-semibold text-sm">🔥 Offre de lancement — Prix réduit pendant encore</span>
+          <span className="font-semibold text-sm">🔥 Offre de lancement - Prix réduit pendant encore</span>
           <div className="flex gap-1.5">
             {[String(timeLeft.h).padStart(2, '0'), String(timeLeft.m).padStart(2, '0'), String(timeLeft.s).padStart(2, '0')].map((v, i) => (
               <div key={i} className="flex gap-1.5 items-center">
@@ -230,7 +230,7 @@ const AudiobookDemoPage = () => {
                   className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-foreground font-bold gap-2 px-8 h-13 rounded-full shadow-xl shadow-amber-500/25 text-base transition-all hover:scale-[1.02]"
                 >
                   <ShoppingCart className="h-5 w-5" />
-                  Acheter maintenant — {audiobook.price.toFixed(2)} €
+                  Acheter maintenant - {audiobook.price.toFixed(2)} €
                 </Button>
                 <Button 
                   variant="outline" 
@@ -338,7 +338,7 @@ const AudiobookDemoPage = () => {
             
             <div className="flex-1 min-w-0 space-y-10">
               
-              {/* Synopsis — Section professionnelle */}
+              {/* Synopsis - Section professionnelle */}
               <div className="bg-white/[0.02] border border-white/[0.06] rounded-2xl p-6 md:p-8">
                 <h2 className="text-xl md:text-2xl font-bold text-foreground mb-6 flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 border border-amber-500/20 flex items-center justify-center">
@@ -370,7 +370,7 @@ const AudiobookDemoPage = () => {
                   </p>
                   <p>
                     À travers <strong className="text-foreground/75 font-semibold">8 chapitres truffés de gags</strong>, de rebondissements et de moments tendres, cette aventure 
-                    emmène les jeunes auditeurs dans un Far West décalé où le courage, l'amitié et la persévérance triomphent toujours — même quand tout part de travers.
+                    emmène les jeunes auditeurs dans un Far West décalé où le courage, l'amitié et la persévérance triomphent toujours - même quand tout part de travers.
                   </p>
                 </div>
 
@@ -439,7 +439,7 @@ const AudiobookDemoPage = () => {
                 </h3>
                 <ul className="space-y-3 text-foreground/50 text-sm">
                   {[
-                    `${audiobook.target_audience} — curieux, rêveurs et amateurs de westerns rigolos`,
+                    `${audiobook.target_audience} - curieux, rêveurs et amateurs de westerns rigolos`,
                     "Parents cherchant des histoires captivantes pour le coucher ou les longs trajets en voiture",
                     "Enseignants souhaitant des supports audio ludiques et éducatifs pour la classe",
                     "Amateurs d'aventures western drôles, tendres et familiales",
@@ -481,7 +481,7 @@ const AudiobookDemoPage = () => {
                     className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-foreground font-bold gap-2 h-11 rounded-xl shadow-lg shadow-amber-500/20"
                   >
                     <ShoppingCart className="h-4 w-4" />
-                    Acheter — {audiobook.price.toFixed(2)} €
+                    Acheter - {audiobook.price.toFixed(2)} €
                   </Button>
                 </div>
               </div>
@@ -495,10 +495,10 @@ const AudiobookDemoPage = () => {
               Extrait du Chapitre 1
             </h2>
             <blockquote className="text-foreground/40 text-[15px] leading-[1.8] italic border-l-2 border-amber-500/40 pl-6 space-y-4">
-              <p>« Le soleil tapait fort sur la petite ville de Cactus Valley. Tellement fort que même les cactus avaient l'air de transpirer. Au milieu de la rue principale — qui était aussi la seule rue — un garçon de dix ans se tenait debout, les pouces glissés dans les passants de sa ceinture, un chapeau de cow-boy beaucoup trop grand sur la tête. »</p>
-              <p>« — Je suis Billy le Kid… enfin, Billy tout court, marmonna-t-il en plissant les yeux comme il avait vu faire dans les films. Et aujourd'hui, je deviens le cow-boy le plus rapide de tout l'Ouest ! »</p>
-              <p>« Son cheval, Tornado — qui était en réalité un poney assez grassouillet — leva à peine la tête de son seau d'avoine et souffla un bruit qui ressemblait beaucoup à un rire. Billy fronça les sourcils. »</p>
-              <p>« — On ne rigole pas, Tornado. C'est du sérieux. Aujourd'hui, c'est le grand jour. Le jour où tout change. »</p>
+              <p>« Le soleil tapait fort sur la petite ville de Cactus Valley. Tellement fort que même les cactus avaient l'air de transpirer. Au milieu de la rue principale - qui était aussi la seule rue - un garçon de dix ans se tenait debout, les pouces glissés dans les passants de sa ceinture, un chapeau de cow-boy beaucoup trop grand sur la tête. »</p>
+              <p>« - Je suis Billy le Kid… enfin, Billy tout court, marmonna-t-il en plissant les yeux comme il avait vu faire dans les films. Et aujourd'hui, je deviens le cow-boy le plus rapide de tout l'Ouest ! »</p>
+              <p>« Son cheval, Tornado - qui était en réalité un poney assez grassouillet - leva à peine la tête de son seau d'avoine et souffla un bruit qui ressemblait beaucoup à un rire. Billy fronça les sourcils. »</p>
+              <p>« - On ne rigole pas, Tornado. C'est du sérieux. Aujourd'hui, c'est le grand jour. Le jour où tout change. »</p>
               <p>« Tornado replongea le museau dans l'avoine. Visiblement, le poney n'était pas du même avis. »</p>
             </blockquote>
             <p className="text-amber-400/50 text-xs mt-5 font-medium">— Extrait du Chapitre 1 : « L'Arrivée à Cactus Valley »</p>
@@ -516,7 +516,7 @@ const AudiobookDemoPage = () => {
               {[
                 { icon: Wand2, title: "1. Rédaction IA", desc: "Le scénario et les dialogues sont générés par notre moteur d'écriture créative Gemini 3 Flash, calibré pour le jeune public.", color: "from-violet-500 to-purple-500" },
                 { icon: Mic2, title: "2. Narration vocale", desc: "La voix de Brigitte, synthétisée par Azure Neural Speech, donne vie au texte avec des intonations naturelles et expressives.", color: "from-amber-500 to-orange-500" },
-                { icon: Sparkles, title: "3. Production finale", desc: "Mastering audio automatique, chapitrage, métadonnées et couverture — prêt à vendre sur toutes les plateformes.", color: "from-emerald-500 to-teal-500" },
+                { icon: Sparkles, title: "3. Production finale", desc: "Mastering audio automatique, chapitrage, métadonnées et couverture - prêt à vendre sur toutes les plateformes.", color: "from-emerald-500 to-teal-500" },
               ].map((step, i) => (
                 <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.15 }}
                   className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6 text-center"
@@ -570,10 +570,10 @@ const AudiobookDemoPage = () => {
               <Shield className="w-10 h-10 text-foreground" />
             </div>
             <div className="text-center sm:text-left">
-              <h3 className="text-lg font-bold text-emerald-300 mb-2">Garantie Satisfait ou Remboursé — 30 jours</h3>
+              <h3 className="text-lg font-bold text-emerald-300 mb-2">Garantie Satisfait ou Remboursé - 30 jours</h3>
               <p className="text-foreground/40 text-sm leading-relaxed">
                 Vous n'êtes pas satisfait ? Nous vous remboursons intégralement, sans conditions et sans questions. 
-                Pas de formulaire compliqué, pas de justification — un simple email suffit. Votre satisfaction est notre priorité absolue.
+                Pas de formulaire compliqué, pas de justification - un simple email suffit. Votre satisfaction est notre priorité absolue.
               </p>
             </div>
           </motion.div>
@@ -615,7 +615,7 @@ const AudiobookDemoPage = () => {
               className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-foreground font-bold gap-2 px-10 h-13 rounded-full shadow-xl shadow-amber-500/25 text-base transition-all hover:scale-[1.02]"
             >
               <ShoppingCart className="h-5 w-5" />
-              Acheter maintenant — {audiobook.price.toFixed(2)} €
+              Acheter maintenant - {audiobook.price.toFixed(2)} €
             </Button>
           </motion.div>
 

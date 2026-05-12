@@ -29,7 +29,7 @@ const ToolsCounterBanner: React.FC = () => {
             <span className="text-3xl sm:text-4xl font-black text-foreground">OUTILS PRO</span>
           </div>
           <p className="text-foreground/70 text-lg mb-8 max-w-2xl mx-auto">
-            Dans une seule plateforme — <span className="text-primary font-bold">15 agents IA</span> + <span className="text-primary font-bold">6 studios</span> visuels, audio et marketing
+            Dans une seule plateforme - <span className="text-primary font-bold">15 agents IA</span> + <span className="text-primary font-bold">6 studios</span> visuels, audio et marketing
           </p>
 
           {/* 5 piliers en chiffres */}

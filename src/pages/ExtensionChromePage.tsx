@@ -56,7 +56,7 @@ const ExtensionChromePage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-orange-50/40 to-white text-black">
       <Helmet>
-        <title>Extension Chrome KDP — Scanner Amazon Kindle gratuit | EbookStudio</title>
+        <title>Extension Chrome KDP - Scanner Amazon Kindle gratuit | EbookStudio</title>
         <meta name="description" content="Scanne n'importe quelle page Amazon Kindle : score de niche /100, ventes estimées, concurrence et verdict GO/À éviter. Extension Chrome 100% gratuite." />
         <link rel="canonical" href="https://www.ebookstudio.fr/extension-chrome" />
       </Helmet>
@@ -131,7 +131,7 @@ const ExtensionChromePage = () => {
                   className="w-full bg-black hover:bg-gray-900 text-white border-0 font-bold text-base px-8 py-6 rounded-xl transition-all hover:scale-[1.01]"
                 >
                   <Crown className="w-5 h-5 mr-2 text-orange-400" />
-                  Passer Pro — 67€ à vie (analyses illimitées)
+                  Passer Pro - 67€ à vie (analyses illimitées)
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
 
@@ -143,7 +143,7 @@ const ExtensionChromePage = () => {
               </div>
             </div>
 
-            {/* RIGHT : Browser mockup — Amazon page + REAL extension popup */}
+            {/* RIGHT : Browser mockup - Amazon page + REAL extension popup */}
             <div className="relative">
               {/* Floating "100% Gratuit" pill */}
               <div className="absolute -top-3 right-4 z-20 bg-orange-500 text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg flex items-center gap-1.5">
@@ -192,7 +192,7 @@ const ExtensionChromePage = () => {
                     </div>
                   </div>
 
-                  {/* THE REAL EXTENSION POPUP — floating top-right */}
+                  {/* THE REAL EXTENSION POPUP - floating top-right */}
                   <div className="absolute top-3 right-3 w-[260px] bg-[#FAFAFA] rounded-xl shadow-2xl border border-black/10 overflow-hidden">
                     {/* Header gradient orange → teal */}
                     <div className="px-3 py-2.5 text-white relative" style={{ background: 'linear-gradient(135deg, #FF9E2D, #008296)' }}>
@@ -310,7 +310,7 @@ const ExtensionChromePage = () => {
               Tout ce qu'un éditeur KDP attend.
             </h2>
             <p className="text-black/60 text-lg max-w-2xl mx-auto">
-              Une analyse complète, professionnelle et instantanée — sans quitter Amazon.
+              Une analyse complète, professionnelle et instantanée - sans quitter Amazon.
             </p>
           </div>
 
@@ -402,7 +402,7 @@ const ExtensionChromePage = () => {
                   className="bg-white hover:bg-orange-100 text-orange-600 font-bold text-base px-8 py-6 rounded-xl transition-all hover:-translate-y-0.5 border-0"
                 >
                   <Crown className="w-5 h-5 mr-2" />
-                  Passer Pro — 67€ à vie
+                  Passer Pro - 67€ à vie
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </div>

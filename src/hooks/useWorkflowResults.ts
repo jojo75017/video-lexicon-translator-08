@@ -214,7 +214,7 @@ export const useWorkflowResults = () => {
     return () => window.removeEventListener(WORKFLOW_RESULTS_UPDATED_EVENT, reloadFromLocalStorage);
   }, []);
 
-  // Save a single step result — localStorage + cloud
+  // Save a single step result - localStorage + cloud
   const saveStepResult = useCallback((stepId: string, result: any, displayContent: string) => {
     const workflowResult: WorkflowResult = {
       stepId,

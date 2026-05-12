@@ -36,7 +36,7 @@ const ResultatConcretBlock = () => {
             Pas un outil de plus. Un résultat concret.
           </h2>
           <p className="text-joy-ink/70 max-w-2xl mx-auto">
-            En quelques heures, tu sors un produit fini que tu peux vendre — pas juste des
+            En quelques heures, tu sors un produit fini que tu peux vendre - pas juste des
             “fonctionnalités cool”.
           </p>
         </div>

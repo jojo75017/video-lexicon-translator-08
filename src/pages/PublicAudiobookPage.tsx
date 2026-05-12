@@ -211,7 +211,7 @@ const PublicAudiobookPage = () => {
         <div className="bg-gradient-to-r from-red-900/80 via-red-700/80 to-red-900/80 border-b border-red-500/20 text-foreground text-center py-3 px-4">
           <div className="flex items-center justify-center gap-3 flex-wrap">
             <Timer className="w-5 h-5 animate-pulse text-red-300" />
-            <span className="font-semibold text-sm">🔥 Offre de lancement — Prix réduit pendant encore</span>
+            <span className="font-semibold text-sm">🔥 Offre de lancement - Prix réduit pendant encore</span>
             <div className="flex gap-1.5">
               {[String(timeLeft.h).padStart(2, '0'), String(timeLeft.m).padStart(2, '0'), String(timeLeft.s).padStart(2, '0')].map((v, i) => (
                 <div key={i} className="flex gap-1.5 items-center">
@@ -286,7 +286,7 @@ const PublicAudiobookPage = () => {
                 <span className="text-foreground/50 text-sm">{audiobook.play_count || 0} écoutes</span>
               </motion.div>
 
-              {/* Excerpt player — uses excerpt_url or falls back to full audio */}
+              {/* Excerpt player - uses excerpt_url or falls back to full audio */}
               {hasExcerpt && (
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
                   className="bg-white/[0.04] border border-white/[0.08] backdrop-blur-sm rounded-2xl p-5 md:p-6 mb-7"
@@ -343,7 +343,7 @@ const PublicAudiobookPage = () => {
                       <Button asChild className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-foreground font-bold gap-2 px-8 h-13 rounded-full shadow-xl shadow-amber-500/25 text-base transition-all hover:scale-[1.02]">
                         <a href={audiobook.stripe_link} target="_blank" rel="noopener noreferrer">
                           <ShoppingCart className="h-5 w-5" />
-                          Acheter maintenant — {Number(audiobook.price).toFixed(2)} €
+                          Acheter maintenant - {Number(audiobook.price).toFixed(2)} €
                         </a>
                       </Button>
                     )}
@@ -475,7 +475,7 @@ const PublicAudiobookPage = () => {
             
             <div className="flex-1 min-w-0 space-y-10">
               
-              {/* Synopsis — Section professionnelle */}
+              {/* Synopsis - Section professionnelle */}
               <div className="bg-white/[0.02] border border-white/[0.06] rounded-2xl p-6 md:p-8">
                 <h2 className="text-xl md:text-2xl font-bold text-foreground mb-6 flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 border border-amber-500/20 flex items-center justify-center">
@@ -573,7 +573,7 @@ const PublicAudiobookPage = () => {
                     <Button asChild className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-foreground font-bold gap-2 h-11 rounded-xl shadow-lg shadow-amber-500/20">
                       <a href={audiobook.stripe_link} target="_blank" rel="noopener noreferrer">
                         <ShoppingCart className="h-4 w-4" />
-                        Acheter — {Number(audiobook.price).toFixed(2)} €
+                        Acheter - {Number(audiobook.price).toFixed(2)} €
                       </a>
                     </Button>
                   </div>
@@ -594,7 +594,7 @@ const PublicAudiobookPage = () => {
               {[
                 { icon: Wand2, title: "1. Rédaction IA", desc: "Le scénario est généré par notre moteur d'écriture créative, calibré pour votre audience.", color: "from-violet-500 to-purple-500" },
                 { icon: Mic2, title: "2. Narration vocale", desc: "La voix, synthétisée par Azure Neural Speech, donne vie au texte avec des intonations naturelles.", color: "from-amber-500 to-orange-500" },
-                { icon: Sparkles, title: "3. Production finale", desc: "Mastering audio automatique, chapitrage et métadonnées — prêt à écouter.", color: "from-emerald-500 to-teal-500" },
+                { icon: Sparkles, title: "3. Production finale", desc: "Mastering audio automatique, chapitrage et métadonnées - prêt à écouter.", color: "from-emerald-500 to-teal-500" },
               ].map((step, i) => (
                 <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.15 }}
                   className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6 text-center"
@@ -648,7 +648,7 @@ const PublicAudiobookPage = () => {
               <Shield className="w-10 h-10 text-foreground" />
             </div>
             <div className="text-center sm:text-left">
-              <h3 className="text-lg font-bold text-emerald-300 mb-2">Garantie Satisfait ou Remboursé — 30 jours</h3>
+              <h3 className="text-lg font-bold text-emerald-300 mb-2">Garantie Satisfait ou Remboursé - 30 jours</h3>
               <p className="text-foreground/40 text-sm leading-relaxed">
                 Vous n'êtes pas satisfait ? Nous vous remboursons intégralement, sans conditions et sans questions. 
                 Un simple email suffit. Votre satisfaction est notre priorité absolue.
@@ -692,7 +692,7 @@ const PublicAudiobookPage = () => {
                 <Button asChild className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-foreground font-bold gap-2 px-10 h-13 rounded-full shadow-xl shadow-amber-500/25 text-base transition-all hover:scale-[1.02]">
                   <a href={audiobook.stripe_link} target="_blank" rel="noopener noreferrer">
                     <ShoppingCart className="h-5 w-5" />
-                    Acheter maintenant — {Number(audiobook.price).toFixed(2)} €
+                    Acheter maintenant - {Number(audiobook.price).toFixed(2)} €
                   </a>
                 </Button>
               )}
@@ -700,7 +700,7 @@ const PublicAudiobookPage = () => {
                 <Button variant="outline" asChild className="gap-2 border-blue-400/30 bg-blue-500/10 text-blue-300 hover:bg-blue-500/20 hover:text-blue-200 rounded-full h-13 font-semibold px-8">
                   <a href={audiobook.paypal_link} target="_blank" rel="noopener noreferrer">
                     <CreditCard className="h-4 w-4" />
-                    Payer via PayPal — {Number(audiobook.price).toFixed(2)} €
+                    Payer via PayPal - {Number(audiobook.price).toFixed(2)} €
                   </a>
                 </Button>
               )}

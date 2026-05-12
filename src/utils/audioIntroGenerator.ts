@@ -24,7 +24,7 @@ export function buildIntroDisplayText(options: IntroPremiumOptions): string {
 }
 
 /**
- * Generate intro for file export — single TTS segment: "{Titre}, par {Auteur}."
+ * Generate intro for file export - single TTS segment: "{Titre}, par {Auteur}."
  */
 export async function generateIntroForExport(
   generateTts: (text: string) => Promise<Blob | null>,
@@ -42,7 +42,7 @@ export async function generateIntroForExport(
 }
 
 /**
- * Generate intro jingle for in-browser playback — same as export (no more jingle/silence).
+ * Generate intro jingle for in-browser playback - same as export (no more jingle/silence).
  */
 export async function generateIntroJingle(
   generateTts: (text: string) => Promise<Blob | null>,

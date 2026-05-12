@@ -58,7 +58,7 @@ const STEP_ITEMS: StepItem[] = [
   {
     id: 'planner',
     label: 'Démarrer un livre',
-    hint: 'Plan & idée — manuel ou IA',
+    hint: 'Plan & idée - manuel ou IA',
     icon: Sparkles,
     step: '1',
     matchIds: ['planner', 'characters', 'series', 'templates', 'doc-transform', 'url-import'],
@@ -150,7 +150,7 @@ export const SimpleSidebar: React.FC<SimpleSidebarProps> = ({
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => onTabChange('complete-workflow')}
-                title="Workflow IA — 15 agents enchaînent toutes les étapes (P1 → P15)"
+                title="Workflow IA - 15 agents enchaînent toutes les étapes (P1 → P15)"
                 className="group flex flex-col items-start gap-1 rounded-lg border border-primary/30 bg-primary/5 p-2.5 text-left transition-all hover:border-primary hover:bg-primary/10"
               >
                 <div className="flex items-center gap-1.5">
@@ -163,7 +163,7 @@ export const SimpleSidebar: React.FC<SimpleSidebarProps> = ({
               </button>
               <button
                 onClick={() => onTabChange('planner')}
-                title="Mode simple — tu pilotes manuellement chaque étape"
+                title="Mode simple - tu pilotes manuellement chaque étape"
                 className="group flex flex-col items-start gap-1 rounded-lg border border-border bg-card p-2.5 text-left transition-all hover:border-amber-500/50 hover:bg-amber-500/5"
               >
                 <div className="flex items-center gap-1.5">
@@ -186,7 +186,7 @@ export const SimpleSidebar: React.FC<SimpleSidebarProps> = ({
             <button
               key={item.id}
               onClick={() => onTabChange(item.id)}
-              title={`${item.label} — ${item.hint}`}
+              title={`${item.label} - ${item.hint}`}
               className={cn(
                 'w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group text-left',
                 active
@@ -297,7 +297,7 @@ export const SimpleSidebar: React.FC<SimpleSidebarProps> = ({
         {/* Tutoriels → page dédiée */}
         <button
           onClick={() => navigate('/tutoriels')}
-          title="Tutoriels — actions principales pas à pas"
+          title="Tutoriels - actions principales pas à pas"
           className={cn(
             'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-left',
             'text-muted-foreground hover:bg-accent/15 hover:text-accent'

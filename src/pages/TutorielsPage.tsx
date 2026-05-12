@@ -65,7 +65,7 @@ const TutorielsPage: React.FC = () => {
             </div>
             <div className="flex-1">
               <h1 className="text-3xl font-bold text-foreground">
-                Tutoriels — Actions principales
+                Tutoriels - Actions principales
               </h1>
               <p className="text-muted-foreground mt-1">
                 Les actions essentielles pour réussir votre ebook avec EbookStudio, pas à pas.
@@ -81,7 +81,7 @@ const TutorielsPage: React.FC = () => {
             <ul className="mt-2 list-disc space-y-1 pl-5">
               {invalidTutoriels.map((tutoriel) => (
                 <li key={tutoriel.id}>
-                  {tutoriel.title} — {validationErrors[tutoriel.id]}
+                  {tutoriel.title} - {validationErrors[tutoriel.id]}
                 </li>
               ))}
             </ul>

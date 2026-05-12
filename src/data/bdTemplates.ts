@@ -116,7 +116,7 @@ export const bdTemplates: Record<string, BDTemplate> = {
     numberOfPages: 24,
     mainCharacter: 'Le Reporter',
     characterDescription: 'Jeune reporter courageux avec une houppe de cheveux caractéristique, chemise bleue, pantalon beige. Toujours accompagné de son petit chien blanc fidèle.',
-    setting: 'Monde entier — villes exotiques, déserts, jungles, ports maritimes',
+    setting: 'Monde entier - villes exotiques, déserts, jungles, ports maritimes',
     storyTemplate: 'aventure-tintin',
     customPrompt: 'Un jeune reporter découvre un complot international lors d\'un voyage. Avec son fidèle chien, il traverse plusieurs pays pour résoudre le mystère. Style d\'aventure réaliste avec des moments de suspense et d\'humour.',
     coverPrompt: 'Ligne Claire comic book cover, young reporter with distinctive quiff hairstyle and small white dog, exotic adventure backdrop, clean uniform outlines, flat vivid colors, Hergé Tintin style'
@@ -156,7 +156,7 @@ export const bdTemplates: Record<string, BDTemplate> = {
     numberOfPages: 24,
     mainCharacter: 'Le Cow-Boy',
     characterDescription: 'Cow-boy élancé et longiligne, chapeau blanc, chemise jaune, gilet noir, jeans bleus. Monte un cheval blanc intelligent. Mâche toujours un brin d\'herbe.',
-    setting: 'Far West américain — saloons, déserts, canyons, villes frontières poussiéreuses',
+    setting: 'Far West américain - saloons, déserts, canyons, villes frontières poussiéreuses',
     storyTemplate: 'cowboy-solitaire',
     customPrompt: 'Un cow-boy solitaire arrive dans une ville terrorisée par des bandits. Avec son cheval intelligent et son tir ultra-rapide, il rétablit l\'ordre. Humour western avec des duels comiques et des personnages hauts en couleur.',
     coverPrompt: 'Franco-Belgian comic cover in Morris/Lucky Luke style, tall lanky cowboy with white hat on white horse, Wild West desert sunset backdrop, elongated cartoon proportions, clean lines, warm western colors'
@@ -255,7 +255,7 @@ export const bdTemplates: Record<string, BDTemplate> = {
     panelLayout: '4-panels',
     numberOfPages: 12,
     mainCharacter: 'Le Garçon',
-    characterDescription: 'Petit garçon joyeux avec une casquette rouge et un pull rayé. Son cocker roux est son meilleur ami — loyal, gourmand et farceur.',
+    characterDescription: 'Petit garçon joyeux avec une casquette rouge et un pull rayé. Son cocker roux est son meilleur ami - loyal, gourmand et farceur.',
     setting: 'Maison familiale avec jardin, parc, école, quartier résidentiel',
     storyTemplate: 'friendship',
     customPrompt: 'Un petit garçon et son chien cocker vivent des aventures quotidiennes hilarantes. Gags familiaux, bêtises au jardin, promenades chaotiques et amitié indéfectible entre un enfant et son animal.',

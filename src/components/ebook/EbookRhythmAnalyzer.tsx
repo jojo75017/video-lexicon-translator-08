@@ -55,10 +55,10 @@ const analyzeChapterRhythm = (text: string) => {
 const getRhythmAdvice = (action: number, dialogue: number, description: number) => {
   const tips: string[] = [];
   if (dialogue < 15) tips.push('💬 Ajoutez plus de dialogues pour dynamiser le récit');
-  if (dialogue > 60) tips.push('💬 Trop de dialogues — ajoutez des descriptions pour ancrer la scène');
-  if (action < 10) tips.push('⚡ Le rythme manque d\'action — ajoutez des scènes de mouvement');
-  if (action > 50) tips.push('⚡ Trop d\'action sans pause — ajoutez des moments de réflexion');
-  if (description > 50) tips.push('🎨 Descriptions excessives — allégez pour maintenir le rythme');
+  if (dialogue > 60) tips.push('💬 Trop de dialogues - ajoutez des descriptions pour ancrer la scène');
+  if (action < 10) tips.push('⚡ Le rythme manque d\'action - ajoutez des scènes de mouvement');
+  if (action > 50) tips.push('⚡ Trop d\'action sans pause - ajoutez des moments de réflexion');
+  if (description > 50) tips.push('🎨 Descriptions excessives - allégez pour maintenir le rythme');
   if (description < 10) tips.push('🎨 Ajoutez des descriptions pour immerger le lecteur');
   if (tips.length === 0) tips.push('✅ Bon équilibre narratif ! Le rythme est bien dosé');
   return tips;

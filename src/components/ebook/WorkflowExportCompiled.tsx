@@ -111,7 +111,7 @@ export const WorkflowExportCompiled: React.FC<WorkflowExportCompiledProps> = ({
         }),
         new Paragraph({
           children: [new TextRun({ 
-            text: `Rapport généré le ${new Date().toLocaleDateString('fr-FR')} — ${completedCount}/${WORKFLOW_STEPS.length} étapes`,
+            text: `Rapport généré le ${new Date().toLocaleDateString('fr-FR')} - ${completedCount}/${WORKFLOW_STEPS.length} étapes`,
             size: 20,
             color: '666666',
           })],

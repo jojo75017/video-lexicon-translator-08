@@ -102,11 +102,11 @@ Répondez avec votre lettre ! 👇`,
     visualDescription: 'Top 5 liste visuelle avec icônes par niche, fond sombre, texte doré pour les chiffres.',
     content: `📊 Les 5 niches KDP les plus rentables en 2026 :
 
-1️⃣ Développement personnel — Demande massive
-2️⃣ Low-content (carnets, planners) — Volume = revenus
-3️⃣ Cuisine/Recettes — Evergreen, excellent BSR
-4️⃣ Livres enfants illustrés — Marges élevées
-5️⃣ Business/Finance perso — Audience qui achète
+1️⃣ Développement personnel - Demande massive
+2️⃣ Low-content (carnets, planners) - Volume = revenus
+3️⃣ Cuisine/Recettes - Evergreen, excellent BSR
+4️⃣ Livres enfants illustrés - Marges élevées
+5️⃣ Business/Finance perso - Audience qui achète
 
 💡 L'astuce : 3-5 titres par niche pour dominer Amazon.
 
@@ -273,7 +273,7 @@ Moi j'en publie 3 par semaine. 📚
   },
   {
     id: 'tk-2', platform: 'tiktok', type: 'Avant/Après',
-    hook: '0-3s: Split screen — galère vs facilité',
+    hook: '0-3s: Split screen - galère vs facilité',
     visualDescription: 'Split screen vertical: gauche = personne stressée qui écrit, droite = clic et ebook prêt. Transition satisfaisante.',
     content: `AVANT EbookStudio :
 😩 3 semaines pour UN livre
@@ -375,7 +375,7 @@ Testez gratuitement → ebookstudio.fr
   // === X (TWITTER) ===
   {
     id: 'x-1', platform: 'x', type: 'Thread viral',
-    visualDescription: 'Pas de visuel nécessaire — thread texte pur. Optionnel : screenshot profil Amazon.',
+    visualDescription: 'Pas de visuel nécessaire - thread texte pur. Optionnel : screenshot profil Amazon.',
     content: `🧵 J'ai publié 35 livres sur Amazon sans écrire une seule ligne.
 
 Voici comment (thread) ↓
@@ -406,7 +406,7 @@ RT si vous connaissez quelqu'un qui rêve de publier un livre 📖`,
   },
   {
     id: 'x-2', platform: 'x', type: 'Tweet unique percutant',
-    visualDescription: 'Pas de visuel — tweet texte seul.',
+    visualDescription: 'Pas de visuel - tweet texte seul.',
     content: `En 2023 j'écrivais un livre en 3 semaines.
 
 En 2026 j'en publie 3 par semaine.

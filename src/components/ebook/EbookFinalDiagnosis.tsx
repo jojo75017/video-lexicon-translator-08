@@ -88,7 +88,7 @@ export const EbookFinalDiagnosis: React.FC = () => {
             </div>
             <div>
               <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-fuchsia-400 bg-clip-text text-transparent">
-                Prompt 8 — Diagnostic Final
+                Prompt 8 - Diagnostic Final
               </h2>
               <p className="text-sm text-muted-foreground">Verdict éditorial complet avant publication</p>
             </div>

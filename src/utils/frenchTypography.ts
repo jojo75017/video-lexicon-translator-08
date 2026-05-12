@@ -141,7 +141,7 @@ export function checkTypographyCompliance(text: string): {
   // Tirets simples pour dialogues
   const simpleDashes = (text.match(/^[-–]\s/gm) || []).length;
   if (simpleDashes > 0) {
-    issues.push({ type: 'Tirets simples au lieu de — (dialogue)', count: simpleDashes, severity: 'warning' });
+    issues.push({ type: 'Tirets simples au lieu de - (dialogue)', count: simpleDashes, severity: 'warning' });
   }
 
   // Calculer le score

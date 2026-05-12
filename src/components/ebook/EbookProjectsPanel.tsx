@@ -24,7 +24,7 @@ export function EbookProjectsPanel<T>({ scope, label, currentData, isEmpty, onLo
   const handleSave = () => {
     const finalName = name.trim() || `${label} ${new Date().toLocaleString('fr-FR')}`;
     if (isEmpty) {
-      toast.error('Rien à sauvegarder — générez d\'abord du contenu');
+      toast.error('Rien à sauvegarder - générez d\'abord du contenu');
       return;
     }
     saveProject<T>(scope, finalName, currentData);

@@ -68,7 +68,7 @@ const AdminDirectPage = () => {
       const success = await checkAdminAndRedirect();
       if (!success) {
         setStatus("error");
-        setMessage("Accès refusé — Vous n'êtes pas administrateur.");
+        setMessage("Accès refusé - Vous n'êtes pas administrateur.");
       }
     };
 

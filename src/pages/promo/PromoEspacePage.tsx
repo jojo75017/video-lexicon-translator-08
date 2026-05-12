@@ -141,7 +141,7 @@ const PromoEspacePage = () => {
   };
 
   const productLabel = (k: string) => {
-    if (k === 'main' || k === 'main_yearly') return 'EbookStudio — Accès à vie';
+    if (k === 'main' || k === 'main_yearly') return 'EbookStudio - Accès à vie';
     if (k === 'license_extended') return 'Licence commerciale étendue';
     if (k === 'templates_premium') return 'Pack 50 templates premium';
     return k;
@@ -150,7 +150,7 @@ const PromoEspacePage = () => {
   return (
     <FunnelLayout>
       <SeoHead
-        title="Espace membre — EbookStudio"
+        title="Espace membre - EbookStudio"
         description="Accédez à vos commandes, votre lien d'affiliation et vos bonus EbookStudio."
         canonical="/promo/espace"
         noindex

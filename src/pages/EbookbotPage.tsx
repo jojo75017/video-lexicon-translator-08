@@ -8,7 +8,7 @@ const EbookbotPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50/30">
       <Helmet>
-        <title>EBOOKBOT — Ton copilote IA pour réussir sur Amazon KDP | EbookStudio</title>
+        <title>EBOOKBOT - Ton copilote IA pour réussir sur Amazon KDP | EbookStudio</title>
         <meta name="description" content="EBOOKBOT, l'assistant IA gratuit qui te guide sur Amazon KDP : niches rentables, mots-clés, structure d'ebook, marketing et lancement. Réponses en 3 secondes." />
         <link rel="canonical" href="https://www.ebookstudio.fr/ebookbot" />
       </Helmet>
@@ -29,7 +29,7 @@ const EbookbotPage = () => {
           {/* Left: pitch */}
           <div>
             <div className="inline-flex items-center gap-2 bg-orange-500/10 text-orange-700 px-3 py-1 rounded-full text-xs font-semibold mb-5">
-              <Sparkles className="w-3.5 h-3.5" /> NOUVEAU — Assistant IA intégré
+              <Sparkles className="w-3.5 h-3.5" /> NOUVEAU - Assistant IA intégré
             </div>
             <h1 className="text-4xl md:text-5xl font-extrabold text-foreground mb-4 leading-tight">
               Rencontre <span className="text-orange-600">EBOOKBOT</span>,<br/>

@@ -170,22 +170,22 @@ function checkPrice(price?: number, format?: string): KdpCheck {
   if (format !== 'paperback') {
     // Ebook : vérifier palier 70%
     if (price >= 2.99 && price <= 9.99) {
-      return { id: 'price', label: 'Prix de vente', status: 'pass', message: `${price}€ — Palier 70% de royalties`, category: 'metadata' };
+      return { id: 'price', label: 'Prix de vente', status: 'pass', message: `${price}€ - Palier 70% de royalties`, category: 'metadata' };
     }
     if (price < 0.99) {
       return { id: 'price', label: 'Prix de vente', status: 'fail', message: 'Prix minimum KDP : 0,99€', category: 'metadata' };
     }
-    return { id: 'price', label: 'Prix de vente', status: 'warning', message: `${price}€ — Palier 35% de royalties (2,99-9,99€ pour 70%)`, category: 'metadata' };
+    return { id: 'price', label: 'Prix de vente', status: 'warning', message: `${price}€ - Palier 35% de royalties (2,99-9,99€ pour 70%)`, category: 'metadata' };
   }
   return { id: 'price', label: 'Prix de vente', status: 'pass', message: `${price}€`, category: 'metadata' };
 }
 
 function checkWordCount(totalWords: number): KdpCheck {
   if (totalWords < 2500) {
-    return { id: 'wordcount', label: 'Nombre de mots', status: 'fail', message: `${totalWords.toLocaleString()} mots — Minimum recommandé : 5 000`, category: 'content' };
+    return { id: 'wordcount', label: 'Nombre de mots', status: 'fail', message: `${totalWords.toLocaleString()} mots - Minimum recommandé : 5 000`, category: 'content' };
   }
   if (totalWords < 10000) {
-    return { id: 'wordcount', label: 'Nombre de mots', status: 'warning', message: `${totalWords.toLocaleString()} mots — Court pour un ebook standard`, category: 'content' };
+    return { id: 'wordcount', label: 'Nombre de mots', status: 'warning', message: `${totalWords.toLocaleString()} mots - Court pour un ebook standard`, category: 'content' };
   }
   return { id: 'wordcount', label: 'Nombre de mots', status: 'pass', message: `${totalWords.toLocaleString()} mots`, category: 'content' };
 }
@@ -223,7 +223,7 @@ function checkPrefaceConclusion(preface?: string, conclusion?: string): KdpCheck
   const hasPreface = preface && preface.trim().length > 50;
   const hasConclusion = conclusion && conclusion.trim().length > 50;
   if (!hasPreface && !hasConclusion) {
-    return { id: 'preface-conclusion', label: 'Préface / Conclusion', status: 'warning', message: 'Ni préface ni conclusion — recommandé pour un ebook professionnel', category: 'structure' };
+    return { id: 'preface-conclusion', label: 'Préface / Conclusion', status: 'warning', message: 'Ni préface ni conclusion - recommandé pour un ebook professionnel', category: 'structure' };
   }
   return { id: 'preface-conclusion', label: 'Préface / Conclusion', status: 'pass', message: `${hasPreface ? '✓ Préface' : '✗ Préface'} | ${hasConclusion ? '✓ Conclusion' : '✗ Conclusion'}`, category: 'structure' };
 }
@@ -233,11 +233,11 @@ function checkStructure(chapters?: KdpCheckInput['chapters']): KdpCheck {
     return { id: 'structure', label: 'Structure hiérarchique', status: 'fail', message: 'Aucune structure détectée', category: 'structure' };
   }
   if (chapters.length < 3) {
-    return { id: 'structure', label: 'Structure hiérarchique', status: 'warning', message: `Seulement ${chapters.length} chapitre(s) — 5+ recommandés`, category: 'structure' };
+    return { id: 'structure', label: 'Structure hiérarchique', status: 'warning', message: `Seulement ${chapters.length} chapitre(s) - 5+ recommandés`, category: 'structure' };
   }
   const withSubs = chapters.filter(c => c.subChapters && c.subChapters.length > 0).length;
   if (withSubs === 0 && chapters.length > 5) {
-    return { id: 'structure', label: 'Structure hiérarchique', status: 'warning', message: 'Pas de sous-chapitres — améliorerait la navigation', category: 'structure' };
+    return { id: 'structure', label: 'Structure hiérarchique', status: 'warning', message: 'Pas de sous-chapitres - améliorerait la navigation', category: 'structure' };
   }
   return { id: 'structure', label: 'Structure hiérarchique', status: 'pass', message: `${chapters.length} chapitres, ${withSubs} avec sous-chapitres`, category: 'structure' };
 }
@@ -267,7 +267,7 @@ function checkEstimatedFileSize(totalWords: number): KdpCheck {
   const estimatedMB = (estimatedKB / 1024).toFixed(1);
   
   if (estimatedKB > 650 * 1024) { // 650 MB max KDP
-    return { id: 'filesize', label: 'Taille estimée du fichier', status: 'fail', message: `~${estimatedMB} MB — Dépasse la limite KDP de 650 MB`, category: 'format' };
+    return { id: 'filesize', label: 'Taille estimée du fichier', status: 'fail', message: `~${estimatedMB} MB - Dépasse la limite KDP de 650 MB`, category: 'format' };
   }
   return { id: 'filesize', label: 'Taille estimée du fichier', status: 'pass', message: `~${estimatedKB < 1024 ? estimatedKB + ' KB' : estimatedMB + ' MB'}`, category: 'format' };
 }
@@ -277,10 +277,10 @@ function checkPageCount(pageCount?: number): KdpCheck {
     return { id: 'pages', label: 'Nombre de pages', status: 'warning', message: 'Non calculé', category: 'format' };
   }
   if (pageCount < 24) {
-    return { id: 'pages', label: 'Nombre de pages', status: 'fail', message: `${pageCount} pages — Minimum KDP broché : 24 pages`, category: 'format' };
+    return { id: 'pages', label: 'Nombre de pages', status: 'fail', message: `${pageCount} pages - Minimum KDP broché : 24 pages`, category: 'format' };
   }
   if (pageCount > 828) {
-    return { id: 'pages', label: 'Nombre de pages', status: 'fail', message: `${pageCount} pages — Maximum KDP broché : 828 pages`, category: 'format' };
+    return { id: 'pages', label: 'Nombre de pages', status: 'fail', message: `${pageCount} pages - Maximum KDP broché : 828 pages`, category: 'format' };
   }
   return { id: 'pages', label: 'Nombre de pages', status: 'pass', message: `${pageCount} pages`, category: 'format' };
 }

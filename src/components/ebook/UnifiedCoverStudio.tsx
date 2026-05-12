@@ -38,7 +38,7 @@ export const UnifiedCoverStudio: React.FC<UnifiedCoverStudioProps> = ({
         <div className="absolute inset-0">
           <img
             src={coverHero}
-            alt="Studio Couverture KDP — couvertures de livres professionnelles"
+            alt="Studio Couverture KDP - couvertures de livres professionnelles"
             className="w-full h-full object-cover"
             width={1920}
             height={640}
@@ -52,7 +52,7 @@ export const UnifiedCoverStudio: React.FC<UnifiedCoverStudioProps> = ({
         <div className="relative px-6 sm:px-10 py-10 sm:py-14 max-w-3xl">
           <Badge className="mb-4 bg-primary/15 text-primary border-primary/30 hover:bg-primary/20">
             <Sparkles className="w-3 h-3 mr-1.5" />
-            Studio Couverture KDP — Tout-en-un
+            Studio Couverture KDP - Tout-en-un
           </Badge>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground leading-tight mb-3">
             Concevez une couverture <br />
@@ -61,7 +61,7 @@ export const UnifiedCoverStudio: React.FC<UnifiedCoverStudioProps> = ({
             </span>
           </h1>
           <p className="text-base sm:text-lg text-muted-foreground mb-6 max-w-xl">
-            Génération IA, dimensions KDP exactes, quatrième de couverture rédigée par l'IA — tout est réuni au même endroit.
+            Génération IA, dimensions KDP exactes, quatrième de couverture rédigée par l'IA - tout est réuni au même endroit.
           </p>
           <div className="flex flex-wrap gap-2 text-sm">
             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card/80 border border-border/40">
@@ -80,7 +80,7 @@ export const UnifiedCoverStudio: React.FC<UnifiedCoverStudioProps> = ({
         </div>
       </div>
 
-      {/* ONGLETS UNIFIÉS — 3 SEULEMENT */}
+      {/* ONGLETS UNIFIÉS - 3 SEULEMENT */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid grid-cols-3 w-full h-auto p-1.5 bg-muted/50 rounded-xl">
           <TabsTrigger

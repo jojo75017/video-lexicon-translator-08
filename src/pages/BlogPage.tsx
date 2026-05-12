@@ -150,7 +150,7 @@ const BlogPage = () => {
                       Des dizaines d'articles supplémentaires : tendances KDP, niches rentables, stratégies IA, témoignages d'auteurs et études de cas. Le complément parfait pour aller plus loin.
                     </p>
                     <p className="text-xs text-muted-foreground/80 italic">
-                      💡 S'ouvre dans un nouvel onglet — votre session sur ebookstudio.fr reste active, fermez simplement l'onglet pour revenir.
+                      💡 S'ouvre dans un nouvel onglet - votre session sur ebookstudio.fr reste active, fermez simplement l'onglet pour revenir.
                     </p>
                   </div>
 

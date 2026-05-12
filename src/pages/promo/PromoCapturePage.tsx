@@ -59,7 +59,7 @@ const PromoCapturePage = () => {
   return (
     <FunnelLayout>
       <SeoHead
-        title="5 niches rentables d'ebooks en 2026 — Guide gratuit"
+        title="5 niches rentables d'ebooks en 2026 - Guide gratuit"
         description="Téléchargez le guide PDF gratuit : 5 niches d'ebooks à fort potentiel sur Amazon en 2026, mots-clés et plan d'ebook inclus."
         canonical="/promo"
       />

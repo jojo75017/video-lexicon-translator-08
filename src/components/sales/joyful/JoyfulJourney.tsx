@@ -20,7 +20,7 @@ export const JoyfulJourney = () => {
           <h2 className="text-3xl md:text-5xl font-black text-joy-ink mb-4">
             Voici ta semaine type
           </h2>
-          <p className="text-lg text-joy-ink/70">Pas de précipitation, pas de marathon — juste un rythme doux</p>
+          <p className="text-lg text-joy-ink/70">Pas de précipitation, pas de marathon - juste un rythme doux</p>
         </div>
 
         <div className="space-y-4">

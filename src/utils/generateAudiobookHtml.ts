@@ -58,9 +58,9 @@ export function generateAudiobookHtml(book: AudiobookData): string {
 
   const buyButtons = [];
   if (stripeLink) {
-    buyButtons.push(`<a href="${escHtml(stripeLink)}" target="_blank" rel="noopener" class="ab-btn ab-btn-primary">🛒 Acheter — ${price} €</a>`);
+    buyButtons.push(`<a href="${escHtml(stripeLink)}" target="_blank" rel="noopener" class="ab-btn ab-btn-primary">🛒 Acheter - ${price} €</a>`);
   } else if (price && paypalLink) {
-    buyButtons.push(`<a href="${escHtml(paypalLink)}" target="_blank" rel="noopener" class="ab-btn ab-btn-primary">🛒 Acheter — ${price} €</a>`);
+    buyButtons.push(`<a href="${escHtml(paypalLink)}" target="_blank" rel="noopener" class="ab-btn ab-btn-primary">🛒 Acheter - ${price} €</a>`);
   } else if (price) {
     buyButtons.push(`<span class="ab-btn ab-btn-primary" style="cursor:default;">🛒 ${price} €</span>`);
   }
@@ -68,7 +68,7 @@ export function generateAudiobookHtml(book: AudiobookData): string {
     buyButtons.push(`<a href="${escHtml(paypalLink)}" target="_blank" rel="noopener" class="ab-btn ab-btn-paypal">💳 Payer via PayPal</a>`);
   }
 
-  return `<!-- Fiche Audiobook — Généré par EbookStudio Pro -->
+  return `<!-- Fiche Audiobook - Généré par EbookStudio Pro -->
 <style>
 .ab-root{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:960px;margin:0 auto;color:#fff;background:linear-gradient(180deg,#3a4a5c 0%,#1e2a38 40%,#0f1319 100%);border-radius:20px;overflow:hidden;position:relative}
 .ab-root *{box-sizing:border-box;margin:0;padding:0}
@@ -243,7 +243,7 @@ export function generateAudiobookHtml(book: AudiobookData): string {
   <div class="ab-guarantee">
     <div class="ab-guarantee-icon">🛡️</div>
     <div class="ab-guarantee-text">
-      <h3>Garantie Satisfait ou Remboursé — 30 jours</h3>
+      <h3>Garantie Satisfait ou Remboursé - 30 jours</h3>
       <p>Vous n'êtes pas satisfait ? Nous vous remboursons intégralement, sans conditions et sans questions. Votre satisfaction est notre priorité absolue.</p>
     </div>
   </div>

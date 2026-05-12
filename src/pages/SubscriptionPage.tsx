@@ -434,7 +434,7 @@ const SubscriptionPage = ({ subscriberEmail, subscriberData, onLogout }: Subscri
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <BarChart3 className="w-5 h-5" />
-                  Google Analytics 4 — Tableau de bord
+                  Google Analytics 4 - Tableau de bord
                 </CardTitle>
                 <CardDescription>
                   Données en temps réel depuis GA4 (ID: G-EK4JM3SWKL)

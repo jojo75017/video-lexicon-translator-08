@@ -18,7 +18,7 @@ export interface BlogArticle {
   faq: { question: string; answer: string }[];
 }
 
-// Example article structure — content will be filled with real SEO content
+// Example article structure - content will be filled with real SEO content
 export const blogArticles: BlogArticle[] = [
   {
     slug: 'auto-edition-amazon-kdp',
@@ -315,15 +315,15 @@ EbookStudio Pro est un générateur d'ebooks IA tout-en-un qui combine **15 agen
 
 C'est LA fonctionnalité qui distingue EbookStudio Pro de la concurrence. Chaque agent a un rôle précis :
 
-1. **P1 — Architecte de Niche** : valide la rentabilité du sujet
-2. **P2 — Recherche KDP** : analyse les meilleures ventes Amazon
-3. **P3 — Architecture Manuscrit** : structure complète et plan détaillé
-4. **P4 à P10 — Rédaction par chapitre** : avec persistance du contexte
-5. **P11 — Relecture éditoriale** : correction sans dénaturer le style
-6. **P12 — Humanisation** : suppression des marqueurs IA
-7. **P13 — Mise en page KDP**
-8. **P14 — Couverture Imagen 3**
-9. **P15 — Audiobook Azure**
+1. **P1 - Architecte de Niche** : valide la rentabilité du sujet
+2. **P2 - Recherche KDP** : analyse les meilleures ventes Amazon
+3. **P3 - Architecture Manuscrit** : structure complète et plan détaillé
+4. **P4 à P10 - Rédaction par chapitre** : avec persistance du contexte
+5. **P11 - Relecture éditoriale** : correction sans dénaturer le style
+6. **P12 - Humanisation** : suppression des marqueurs IA
+7. **P13 - Mise en page KDP**
+8. **P14 - Couverture Imagen 3**
+9. **P15 - Audiobook Azure**
 
 Cette approche multi-agents garantit une cohérence narrative impossible à obtenir avec un seul prompt ChatGPT.
 
@@ -357,7 +357,7 @@ C'est l'un des modèles tarifaires les plus honnêtes du marché : la plupart de
 
 - ⚠️ Limité à 30 chapitres par projet (suffisant pour 95% des cas)
 - ⚠️ Nécessite votre propre clé API Gemini gratuite (BYOK)
-- ⚠️ Interface dense pour les débutants — formation incluse recommandée
+- ⚠️ Interface dense pour les débutants - formation incluse recommandée
 
 ## Pour qui ?
 
@@ -425,9 +425,9 @@ Amazon vous offre 7 champs de mots-clés. La plupart des auteurs les remplissent
 
 ### La méthode des 3 couches
 
-- **Couche 1 — Mot-clé principal** : volume élevé, concurrence forte (1 mot-clé)
-- **Couche 2 — Longue traîne ciblée** : volume moyen, concurrence faible (3 mots-clés)
-- **Couche 3 — Niches connexes** : élargissement de portée (3 mots-clés)
+- **Couche 1 - Mot-clé principal** : volume élevé, concurrence forte (1 mot-clé)
+- **Couche 2 - Longue traîne ciblée** : volume moyen, concurrence faible (3 mots-clés)
+- **Couche 3 - Niches connexes** : élargissement de portée (3 mots-clés)
 
 Cette structure pyramidale maximise votre couverture sans diluer la pertinence.
 

@@ -113,7 +113,7 @@ Format JSON strict (utilise les phaseId exacts ci-dessus):
         parsed = JSON.parse(jsonMatch[0]);
       } catch (parseErr) {
         console.error('JSON invalide. Réponse brute:', text);
-        throw new Error('JSON tronqué — réessayez');
+        throw new Error('JSON tronqué - réessayez');
       }
 
       if (parsed.emails && parsed.emails.length > 0) {
@@ -155,7 +155,7 @@ Format JSON strict (utilise les phaseId exacts ci-dessus):
       return `═══ ${phase?.label?.toUpperCase()} ═══\n\nObjet: ${email.subject}\nPreview: ${email.preview}\n\n${email.body}`;
     }).join('\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n');
     
-    const blob = new Blob([`📧 Séquence d'emails de lancement — ${title}\n\n${text}`], { type: 'text/plain;charset=utf-8' });
+    const blob = new Blob([`📧 Séquence d'emails de lancement - ${title}\n\n${text}`], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url; a.download = `emails-lancement-${title.replace(/\s+/g, '-').toLowerCase()}.txt`;

@@ -62,7 +62,7 @@ export const EbookAdvancedExport: React.FC<EbookAdvancedExportProps> = ({
     chapters.forEach((ch, i) => {
       parts.push(`CHAPITRE ${i + 1} : ${ch.title}\n\n${cleanGeneratedText(ch.content || '')}`);
       ch.subChapters?.forEach((sc, j) => {
-        if (sc.content) parts.push(`${ch.title} — ${sc.title}\n\n${cleanGeneratedText(sc.content)}`);
+        if (sc.content) parts.push(`${ch.title} - ${sc.title}\n\n${cleanGeneratedText(sc.content)}`);
       });
     });
     if (includeConclusion && conclusion) parts.push(`CONCLUSION\n\n${cleanGeneratedText(conclusion)}`);
@@ -429,7 +429,7 @@ h2+p,h3+p{text-indent:0}
             <Badge className="bg-primary/10 text-primary border-primary/30">PRO</Badge>
           </CardTitle>
           <CardDescription>
-            DOCX KDP, EPUB 3, PDF impression/digital, TXT et HTML — avec table des matières et mise en page professionnelle
+            DOCX KDP, EPUB 3, PDF impression/digital, TXT et HTML - avec table des matières et mise en page professionnelle
           </CardDescription>
         </CardHeader>
       </Card>

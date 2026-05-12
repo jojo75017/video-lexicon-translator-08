@@ -57,7 +57,7 @@ const STEP_ESTIMATES: Record<string, { minutes: number; tip: string }> = {
   P12: { minutes: 5, tip: "Améliorations automatiques basées sur P11." },
   P13: { minutes: 2, tip: "Unification du style sur l'ensemble du manuscrit." },
   P14: { minutes: 2, tip: "Validation finale par l'éditeur IA." },
-  P15: { minutes: 5, tip: "🎁 BONUS — Rend le texte indétectable par les outils anti-IA." },
+  P15: { minutes: 5, tip: "🎁 BONUS - Rend le texte indétectable par les outils anti-IA." },
 };
 
 export const WorkflowDashboard: React.FC<WorkflowDashboardProps> = ({
@@ -170,7 +170,7 @@ export const WorkflowDashboard: React.FC<WorkflowDashboardProps> = ({
         </div>
       </div>
 
-      {/* Agent Remyr — Créer un livre */}
+      {/* Agent Remyr - Créer un livre */}
       {completedCount === 0 && (
         <Card className="border-2 border-primary/40 bg-gradient-to-br from-primary/10 via-card/95 to-accent/10 shadow-xl shadow-primary/10 overflow-hidden relative">
           <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 rounded-full blur-[60px] pointer-events-none" />
@@ -293,7 +293,7 @@ export const WorkflowDashboard: React.FC<WorkflowDashboardProps> = ({
                 </Badge>
                 <div>
                   <h3 className="text-xl font-bold text-foreground">
-                    Continuer avec {nextAvailableStep.id} — {nextAvailableStep.label}
+                    Continuer avec {nextAvailableStep.id} - {nextAvailableStep.label}
                   </h3>
                   <p className="text-sm text-muted-foreground mt-1">
                     {nextAvailableStep.description} · ~{STEP_ESTIMATES[nextAvailableStep.id]?.minutes || 3} min

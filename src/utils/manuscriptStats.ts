@@ -140,7 +140,7 @@ function textStats(text: string) {
   const sentences = (text.match(/[.!?…]+/g) || []).length || 1;
   const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim().length > 0).length || 1;
 
-  // Dialogue lines: starting with — or « or "
+  // Dialogue lines: starting with - or « or "
   const dialogueLines = (text.match(/^(?:—|«|"|–)\s*/gm) || []).length;
 
   return { words, chars, charsNoSpaces, sentences, paragraphs, dialogueLines };
@@ -191,7 +191,7 @@ export function validateCoverDimensions(
     return {
       valid: false,
       status: 'fail',
-      message: `${width}×${height} px — Minimum KDP : 625×1000 px`,
+      message: `${width}×${height} px - Minimum KDP : 625×1000 px`,
     };
   }
 
@@ -200,17 +200,17 @@ export function validateCoverDimensions(
     return {
       valid: false,
       status: 'warning',
-      message: `Ratio ${ratio.toFixed(2)} — Recommandé entre 1.4:1 et 1.8:1`,
+      message: `Ratio ${ratio.toFixed(2)} - Recommandé entre 1.4:1 et 1.8:1`,
     };
   }
 
   if (width >= 2560 && height >= 1600) {
-    return { valid: true, status: 'pass', message: `${width}×${height} px — Qualité optimale` };
+    return { valid: true, status: 'pass', message: `${width}×${height} px - Qualité optimale` };
   }
 
   return {
     valid: true,
     status: 'warning',
-    message: `${width}×${height} px — Recommandé : 2560×1600 px minimum`,
+    message: `${width}×${height} px - Recommandé : 2560×1600 px minimum`,
   };
 }

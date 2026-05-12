@@ -60,7 +60,7 @@ export const PhaseCard: React.FC<PhaseCardProps> = ({ phase, ctx, isActive, onNa
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <h3 className="text-lg font-bold" style={{ color: '#232F3E' }}>
-              Phase {phase.number} — {phase.title}
+              Phase {phase.number} - {phase.title}
             </h3>
             {status === 'done' && (
               <Badge className="bg-green-100 text-green-700 border-green-200">

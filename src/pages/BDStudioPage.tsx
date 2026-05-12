@@ -45,7 +45,7 @@ const BDStudioPage: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>BD Studio — Créez des Bandes Dessinées Franco-Belges avec l'IA</title>
+        <title>BD Studio - Créez des Bandes Dessinées Franco-Belges avec l'IA</title>
         <meta name="description" content="Créez des BD style Tintin, Astérix, Lucky Luke avec l'IA. Générateur de bandes dessinées franco-belges complet : scénario, illustrations, export KDP." />
       </Helmet>
 
@@ -83,7 +83,7 @@ const BDStudioPage: React.FC = () => {
               <motion.div variants={fadeUp}>
                 <Badge className="bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/30 px-4 py-1.5 text-sm font-semibold">
                   <Sparkles className="w-3.5 h-3.5 mr-1.5" />
-                  BD Studio Pro — Nouveau
+                  BD Studio Pro - Nouveau
                 </Badge>
               </motion.div>
 
@@ -101,7 +101,7 @@ const BDStudioPage: React.FC = () => {
               </motion.h1>
 
               <motion.p variants={fadeUp} custom={2} className="text-lg md:text-xl text-muted-foreground leading-relaxed">
-                Styles franco-belges légendaires — <strong>Tintin</strong>, <strong>Astérix</strong>, <strong>Lucky Luke</strong> — 
+                Styles franco-belges légendaires - <strong>Tintin</strong>, <strong>Astérix</strong>, <strong>Lucky Luke</strong> - 
                 du scénario complet à l'export KDP en quelques clics.
               </motion.p>
 
@@ -301,7 +301,7 @@ const BDStudioPage: React.FC = () => {
         {/* Footer */}
         <footer className="py-8 px-4 border-t border-border/50 text-center">
           <p className="text-sm text-muted-foreground">
-            BD Studio Pro — Propulsé par l'IA • Export compatible Amazon KDP
+            BD Studio Pro - Propulsé par l'IA • Export compatible Amazon KDP
           </p>
         </footer>
       </div>

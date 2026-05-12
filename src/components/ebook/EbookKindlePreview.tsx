@@ -31,7 +31,7 @@ export const EbookKindlePreview: React.FC<Props> = ({ title, authorName, chapter
       ch.subChapters?.forEach(sc => {
         if (sc.content) content += `\n\n${sc.title}\n\n${cleanGeneratedText(sc.content)}`;
       });
-      result.push({ type: 'chapter', title: `Chapitre ${i + 1} — ${ch.title}`, content });
+      result.push({ type: 'chapter', title: `Chapitre ${i + 1} - ${ch.title}`, content });
     });
     // Conclusion
     if (conclusion) result.push({ type: 'chapter', title: 'Conclusion', content: cleanGeneratedText(conclusion) });

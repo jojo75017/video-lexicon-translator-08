@@ -76,7 +76,7 @@ export async function callGemini(
 
     // Retry automatique en cas de 429 (quota momentané)
     if (response.status === 429) {
-      console.warn('Gemini 429 — retry dans 30s...');
+      console.warn('Gemini 429 - retry dans 30s...');
       await new Promise(r => setTimeout(r, 30000));
       response = await doFetch();
     }
@@ -167,7 +167,7 @@ export async function callGeminiWithHistory(
     let response = await doFetch();
 
     if (response.status === 429) {
-      console.warn('Gemini 429 — retry dans 30s...');
+      console.warn('Gemini 429 - retry dans 30s...');
       await new Promise(r => setTimeout(r, 30000));
       response = await doFetch();
     }

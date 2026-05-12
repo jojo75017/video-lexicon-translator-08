@@ -43,7 +43,7 @@ export const KdpKeywordWidget: React.FC<KdpKeywordWidgetProps> = ({ defaultSeed 
               <Sparkles className="h-4 w-4 text-accent" />
             </h3>
             <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
-              Volume, difficulté, opportunité, longue traîne et <strong>backend 7 mots-clés Amazon</strong> — généré par IA.
+              Volume, difficulté, opportunité, longue traîne et <strong>backend 7 mots-clés Amazon</strong> - généré par IA.
             </p>
           </div>
         </div>

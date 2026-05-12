@@ -9,7 +9,7 @@ const PromoDecouvertePage = () => {
   useReferralTracking();
 
   const features = [
-    { icon: Sparkles, title: 'Plan d\'ebook IA', desc: 'Génération du plan complet en 30 secondes — pipeline 15 agents.' },
+    { icon: Sparkles, title: 'Plan d\'ebook IA', desc: 'Génération du plan complet en 30 secondes - pipeline 15 agents.' },
     { icon: BookOpen, title: 'Chapitres pro', desc: 'Rédaction chapitre par chapitre, ton et style adaptés à votre niche.' },
     { icon: Zap, title: 'Couverture KDP', desc: 'Couvertures photoréalistes Imagen 3, format Amazon respecté.' },
     { icon: TrendingUp, title: 'Recherche mots-clés', desc: 'Mots-clés Amazon ciblés + catégories KDP pour ranker.' },
@@ -28,13 +28,13 @@ const PromoDecouvertePage = () => {
     { q: 'Les ebooks sont-ils acceptés sur Amazon KDP ?', a: 'Oui. Tous nos exports respectent les normes KDP (typographie, dimensions, Modulo 10).' },
     { q: 'Combien d\'ebooks puis-je créer ?', a: 'Illimité, à vie, avec votre accès. Jusqu\'à 40 chapitres par projet.' },
     { q: 'Y a-t-il une garantie ?', a: 'Oui, satisfait ou remboursé sous 7 jours.' },
-    { q: 'Puis-je revendre les ebooks créés ?', a: 'Oui. Licence commerciale incluse — vous gardez 100% des droits.' },
+    { q: 'Puis-je revendre les ebooks créés ?', a: 'Oui. Licence commerciale incluse - vous gardez 100% des droits.' },
   ];
 
   return (
     <FunnelLayout>
       <SeoHead
-        title="EbookStudio — Créez et publiez des ebooks rentables avec l'IA"
+        title="EbookStudio - Créez et publiez des ebooks rentables avec l'IA"
         description="Plan, chapitres, couverture, mots-clés Amazon : créez un ebook prêt pour KDP en 30 minutes grâce à l'IA. Essai sans risque."
         canonical="/promo/decouverte"
         jsonLd={{
@@ -52,7 +52,7 @@ const PromoDecouvertePage = () => {
       <section className="bg-gradient-to-b from-[#008296]/5 to-transparent">
         <div className="max-w-5xl mx-auto px-4 py-16 md:py-24 text-center space-y-6">
           <span className="inline-block bg-[#FF9E2D]/10 text-[#FF9E2D] px-3 py-1 rounded-full text-sm font-semibold">
-            ✨ Nouveau — Pipeline 15 agents IA
+            ✨ Nouveau - Pipeline 15 agents IA
           </span>
           <h1 className="text-4xl md:text-6xl font-bold leading-tight">
             Créez un <span className="text-[#008296]">ebook rentable</span> en 30 minutes
@@ -63,7 +63,7 @@ const PromoDecouvertePage = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
             <Link to="/promo/commande">
               <Button className="bg-[#FF9E2D] hover:bg-[#e88f1f] text-white font-bold py-6 px-8 text-base">
-                🚀 Démarrer maintenant — 67€ à vie
+                🚀 Démarrer maintenant - 67€ à vie
               </Button>
             </Link>
             <Link to="/demo">
@@ -187,7 +187,7 @@ const PromoDecouvertePage = () => {
           <p className="text-lg opacity-90">Rejoignez les centaines d'auteurs qui publient avec EbookStudio.</p>
           <Link to="/promo/commande">
             <Button className="bg-[#FF9E2D] hover:bg-[#e88f1f] text-white font-bold py-6 px-8 text-base">
-              🚀 Commander — 67€ à vie
+              🚀 Commander - 67€ à vie
             </Button>
           </Link>
           <p className="text-sm opacity-75 pt-4">

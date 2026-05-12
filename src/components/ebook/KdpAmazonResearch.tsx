@@ -730,7 +730,7 @@ const BookDataCard: React.FC<{ book: BookData; onCopy: (t: string) => void }> = 
       </div>
       {book.bsr ? (
         <p className="text-xs text-muted-foreground mb-6 italic">
-          ⚠️ Estimations basées sur le BSR (#{book.bsr.toLocaleString()}) — les ventes réelles peuvent varier significativement.
+          ⚠️ Estimations basées sur le BSR (#{book.bsr.toLocaleString()}) - les ventes réelles peuvent varier significativement.
         </p>
       ) : (
         <div className="mb-6 p-3 rounded-lg border border-orange-200 bg-orange-50 flex items-start gap-2">

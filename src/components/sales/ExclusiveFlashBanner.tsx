@@ -47,7 +47,7 @@ export const ExclusiveFlashBanner: React.FC = () => {
               {
                 icon: Diamond,
                 title: "Suite IA Complète",
-                desc: "Rédaction, couvertures, audiobooks — tout en un seul outil",
+                desc: "Rédaction, couvertures, audiobooks - tout en un seul outil",
               },
               {
                 icon: AlertTriangle,

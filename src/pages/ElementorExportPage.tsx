@@ -289,7 +289,7 @@ const ElementorExportPage = () => {
                     <p><span className="text-foreground font-medium">2.</span> Copiez le code HTML ci-dessous</p>
                     <p><span className="text-foreground font-medium">3.</span> Dans Elementor, ajoutez un widget <strong className="text-primary">HTML</strong></p>
                     <p><span className="text-foreground font-medium">4.</span> Collez le code dans le champ HTML du widget</p>
-                    <p><span className="text-foreground font-medium">5.</span> Publiez votre page — c'est prêt !</p>
+                    <p><span className="text-foreground font-medium">5.</span> Publiez votre page - c'est prêt !</p>
                   </CardContent>
                 </Card>
 

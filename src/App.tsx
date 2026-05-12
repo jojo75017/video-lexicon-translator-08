@@ -109,7 +109,7 @@ const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [subscriberEmail, setSubscriberEmail] = useState('');
   const [subscriberData, setSubscriberData] = useState<any>(null);
-  // Admin status is ONLY set after server-side verification — never from client storage
+  // Admin status is ONLY set after server-side verification - never from client storage
   const [isAdmin, setIsAdmin] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
@@ -117,14 +117,14 @@ const App = () => {
 
   useEffect(() => {
     // Safety timeout FIRST: never leave the app stuck on loader
-    // 6s is enough — initial localStorage check is synchronous, only Supabase admin check is async
+    // 6s is enough - initial localStorage check is synchronous, only Supabase admin check is async
     const safetyTimer = setTimeout(() => {
       console.warn('Safety timer triggered – forcing auth check complete');
       setIsCheckingAuth(false);
     }, 6000);
 
     const initAuth = async () => {
-      // Check subscriber auth (client cache) — fast, localStorage only
+      // Check subscriber auth (client cache) - fast, localStorage only
       const savedEmail = localStorage.getItem('subscriber_email');
       const savedData = localStorage.getItem('subscriber_data');
 
@@ -148,7 +148,7 @@ const App = () => {
         }
       }
 
-      // Unblock rendering NOW — subscribers can proceed while admin check runs in background
+      // Unblock rendering NOW - subscribers can proceed while admin check runs in background
       setIsCheckingAuth(false);
 
       // Check admin session in background (non-blocking)
@@ -558,7 +558,7 @@ const App = () => {
             <Route path="/nouveautes-2026" element={<Nouveautes2026Page />} />
             <Route path="/install" element={<InstallPage />} />
             
-            {/* SaaS routes removed — orphan system */}
+            {/* SaaS routes removed - orphan system */}
             <Route path="/mon-code" element={<RecuperationCodePage />} />
             
             {/* Catch-all : redirige vers /offres */}
@@ -569,7 +569,7 @@ const App = () => {
           <SubscriberActivityPopup />
           {/* Onboarding 1er ebook (modal one-shot après inscription) */}
           {isAuthenticated && <FirstEbookOnboarding subscriberEmail={subscriberEmail} />}
-          {/* EBOOKBOT — copilote IA flottant accessible sur tout le site */}
+          {/* EBOOKBOT - copilote IA flottant accessible sur tout le site */}
           <EbookbotFloatingButton />
           <Toaster />
         </div>

@@ -94,7 +94,7 @@ const NewsletterForm = () => {
 };
 
 // ════════════════════════════════════════════════════════════════════════════
-// MAIN SALES PAGE — version joyeuse
+// MAIN SALES PAGE - version joyeuse
 // ════════════════════════════════════════════════════════════════════════════
 
 const SalesPage = () => {
@@ -110,7 +110,7 @@ const SalesPage = () => {
   }, [location.search]);
 
   useEffect(() => {
-    document.title = "EbookStudio Pro — Crée ton ebook avec l'IA, en mode fun ✨";
+    document.title = "EbookStudio Pro - Crée ton ebook avec l'IA, en mode fun ✨";
     const meta = document.querySelector('meta[name="description"]');
     if (meta)
       meta.setAttribute(
@@ -163,12 +163,12 @@ const SalesPage = () => {
   return (
     <div className="min-h-screen bg-joy-cream text-joy-ink overflow-x-hidden">
       <Helmet>
-        <title>EbookStudio Pro — Crée ton ebook avec l'IA en mode fun ✨</title>
+        <title>EbookStudio Pro - Crée ton ebook avec l'IA en mode fun ✨</title>
         <meta
           name="description"
           content="Crée et publie ton ebook sur Amazon KDP avec 15 agents IA bienveillants. Workflow guidé, sans stress. 67€ à vie, garantie 30 jours."
         />
-        <meta property="og:title" content="EbookStudio Pro — Ton ebook, en mode fun" />
+        <meta property="og:title" content="EbookStudio Pro - Ton ebook, en mode fun" />
         <meta property="og:description" content="15 agents IA pour créer ton ebook sans stress. 67€ à vie." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://ebookstudio.fr/offres" />
@@ -177,7 +177,7 @@ const SalesPage = () => {
           "@context": "https://schema.org",
           "@type": "Product",
           "name": "EbookStudio Pro",
-          "description": "Plateforme de création d'ebooks et audiobooks par IA — 15 agents pour créer, illustrer, publier sur Amazon KDP.",
+          "description": "Plateforme de création d'ebooks et audiobooks par IA - 15 agents pour créer, illustrer, publier sur Amazon KDP.",
           "brand": { "@type": "Brand", "name": "EbookStudio" },
           "offers": {
             "@type": "Offer",
@@ -284,7 +284,7 @@ const SalesPage = () => {
       {/* RÉSULTAT CONCRET + CTA gratuit faible friction */}
       <ResultatConcretBlock />
 
-      {/* LEAD MAGNET — 10 niches offertes (tunnel Systeme.io) */}
+      {/* LEAD MAGNET - 10 niches offertes (tunnel Systeme.io) */}
       <Guide10NichesBlock />
 
       {/* VIDÉO */}
@@ -315,7 +315,7 @@ const SalesPage = () => {
         </div>
       </section>
 
-      {/* GARANTIE COMPACTE — juste avant le CTA principal pour lever les freins */}
+      {/* GARANTIE COMPACTE - juste avant le CTA principal pour lever les freins */}
       <GuaranteeBlock />
 
       {/* OFFRE UNIQUE 67€ */}
@@ -352,7 +352,7 @@ const SalesPage = () => {
                 <h3 className="text-lg font-black text-joy-ink">EbookStudio Pro</h3>
               </div>
               <p className="text-joy-ink/70 text-sm leading-relaxed">
-                Le workflow IA #1 en France pour Amazon KDP — version joyeuse 🌈
+                Le workflow IA #1 en France pour Amazon KDP - version joyeuse 🌈
               </p>
             </div>
             <div>
@@ -379,7 +379,7 @@ const SalesPage = () => {
             </div>
           </div>
           <div className="border-t border-joy-ink/10 pt-8 text-center">
-            <p className="text-xs text-joy-ink/50">© 2026 EbookStudio Pro — Tous droits réservés</p>
+            <p className="text-xs text-joy-ink/50">© 2026 EbookStudio Pro - Tous droits réservés</p>
           </div>
         </div>
       </footer>

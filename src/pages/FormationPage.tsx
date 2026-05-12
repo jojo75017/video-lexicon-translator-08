@@ -989,7 +989,7 @@ ${module.content}
                   { 
                     icon: ChefHat,
                     title: 'Livres de Recettes', 
-                    desc: '40 recettes avec photos réalistes et accords vins — 125+ pays disponibles',
+                    desc: '40 recettes avec photos réalistes et accords vins - 125+ pays disponibles',
                     color: 'from-amber-500 to-orange-500',
                     badge: '2026'
                   },
@@ -1045,7 +1045,7 @@ ${module.content}
                   { 
                     icon: Sparkles, 
                     title: 'Humaniseur IA', 
-                    desc: 'Rendez vos textes IA indétectables — anti-détection GPTZero/Originality',
+                    desc: 'Rendez vos textes IA indétectables - anti-détection GPTZero/Originality',
                     color: 'from-primary to-accent',
                     badge: '2026'
                   },

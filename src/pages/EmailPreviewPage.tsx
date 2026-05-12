@@ -41,7 +41,7 @@ En 47 minutes.
 
 Ce qui a changé ? J'ai construit un outil. Un vrai générateur d'ebooks propulsé par l'IA la plus avancée du marché.
 
-🔥 EbookStudio Pro 2026 — L'usine à ebooks que j'utilise personnellement :
+🔥 EbookStudio Pro 2026 - L'usine à ebooks que j'utilise personnellement :
 
 → 300+ idées de titres par niche rentable
 → Plan complet généré en 30 secondes
@@ -73,9 +73,9 @@ P.S: Mon profil Amazon avec mes 35+ livres publiés : https://www.amazon.fr/Mr-G
 
 Savez-vous pourquoi 90% des gens qui veulent publier sur Amazon... n'y arrivent jamais ?
 
-❌ ERREUR #1 : Écrire sans plan — abandon garanti à la page 12.
-❌ ERREUR #2 : Passer 3 semaines sur un seul livre — pendant que d'autres en publient 5.
-❌ ERREUR #3 : Négliger la couverture et les mots-clés — 0 vente.
+❌ ERREUR #1 : Écrire sans plan - abandon garanti à la page 12.
+❌ ERREUR #2 : Passer 3 semaines sur un seul livre - pendant que d'autres en publient 5.
+❌ ERREUR #3 : Négliger la couverture et les mots-clés - 0 vente.
 
 EbookStudio Pro résout ces 3 problèmes en même temps :
 ✅ Plan structuré automatiquement
@@ -98,7 +98,7 @@ P.S: Testez d'abord gratuitement : ${DEMO_LINK}`,
     step: 3,
     dayOffset: 4,
     dayLabel: "J+4",
-    subject: "💰 De 0 à 35 livres Amazon — Mon parcours transparent",
+    subject: "💰 De 0 à 35 livres Amazon - Mon parcours transparent",
     preheader: "Chiffres réels, résultats réels, outil réel.",
     strategy: "PREUVE SOCIALE",
     strategyColor: "bg-green-500/10 text-green-600 border-green-500/30",

@@ -6,7 +6,7 @@ interface BlobProps {
   style?: CSSProperties;
 }
 
-// Decorative SVG blob — uses currentColor so you can color it via text-*
+// Decorative SVG blob - uses currentColor so you can color it via text-*
 export const Blob = ({ className = "", color = "text-joy-peach", style }: BlobProps) => (
   <svg
     viewBox="0 0 200 200"

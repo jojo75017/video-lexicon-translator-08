@@ -67,7 +67,7 @@ const EbookSelfCritique = () => {
         <CardContent className="space-y-4">
           <div className="p-4 bg-purple-500/10 rounded-lg border border-purple-500/20">
             <p className="text-sm text-muted-foreground">
-              <strong>🎯 Effet Clé :</strong> L'IA ne se contente plus d'écrire — elle se corrige elle-même. 
+              <strong>🎯 Effet Clé :</strong> L'IA ne se contente plus d'écrire - elle se corrige elle-même. 
               Challenge ce qui est faible, manque de profondeur, ou peut être amélioré.
             </p>
           </div>

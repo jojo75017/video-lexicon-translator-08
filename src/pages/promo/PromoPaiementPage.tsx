@@ -37,7 +37,7 @@ const PromoPaiementPage = () => {
   return (
     <FunnelLayout>
       <SeoHead
-        title="Instructions de paiement — EbookStudio"
+        title="Instructions de paiement - EbookStudio"
         description="Finalisez votre paiement EbookStudio par PayPal ou virement bancaire."
         canonical="/promo/paiement"
         noindex
@@ -49,7 +49,7 @@ const PromoPaiementPage = () => {
           </div>
           <h1 className="text-3xl md:text-4xl font-bold text-[#232F3E] mb-2">Dernière étape : votre paiement</h1>
           <p className="text-gray-600">
-            Réf. <strong className="text-[#232F3E]">{ref}</strong> — Montant <strong className="text-[#232F3E]">{amount}€</strong>
+            Réf. <strong className="text-[#232F3E]">{ref}</strong> - Montant <strong className="text-[#232F3E]">{amount}€</strong>
           </p>
         </div>
 

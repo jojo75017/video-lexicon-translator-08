@@ -50,19 +50,19 @@ EbookStudio Pro est un atelier de création littéraire complet propulsé par **
 
 ### Votre premier objectif : tout configurer en 10 minutes
 
-**Étape 1 — Créer votre compte**
+**Étape 1 - Créer votre compte**
 Rendez-vous sur ebookstudio.fr et entrez votre code d'accès EBK-XXXXXX reçu par email. Votre espace de travail se crée automatiquement avec tous les outils déverrouillés.
 
-**Étape 2 — Configurer votre clé API Gemini**
+**Étape 2 - Configurer votre clé API Gemini**
 L'intelligence artificielle fonctionne avec votre propre clé Gemini 3 Flash (gratuite jusqu'à 1500 requêtes/jour) :
 1. Ouvrez **aistudio.google.com** et connectez-vous avec votre compte Google
 2. Cliquez sur **"Get API Key"** → **"Create API Key"**
 3. Copiez la clé et collez-la dans **Mon Compte → Paramètres → Clé API Gemini**
-4. Cliquez sur "Tester la clé" pour vérifier — un message vert confirme la connexion
+4. Cliquez sur "Tester la clé" pour vérifier - un message vert confirme la connexion
 
 > 💡 **Coût réel** : environ 0,15€ à 0,40€ par ebook complet. La clé gratuite couvre largement vos premiers livres.
 
-**Étape 3 — Découvrir l'interface**
+**Étape 3 - Découvrir l'interface**
 - **Sidebar gauche** : 14 catégories d'outils organisées par couleur
 - **Zone centrale** : votre espace de travail principal
 - **Barre supérieure** : progression du workflow, notifications, mode sombre
@@ -78,7 +78,7 @@ L'intelligence artificielle fonctionne avec votre propre clé Gemini 3 Flash (gr
 | 📣 Marketing | Ads, SEO, réseaux sociaux, plan de lancement | 8 |
 
 ### Offre Pro Lifetime
-- 🎯 **Accès Pro à 67€** — Paiement unique, accès à vie
+- 🎯 **Accès Pro à 67€** - Paiement unique, accès à vie
 - 📈 Tarif de lancement limité (ensuite 147€ le 1er juillet)
 - 🚀 Toutes les mises à jour futures incluses gratuitement
 - 💬 Support prioritaire par email 7j/7`
@@ -98,7 +98,7 @@ L'intelligence artificielle fonctionne avec votre propre clé Gemini 3 Flash (gr
 
 Chaque générateur est un workflow spécialisé qui produit un type de livre précis. Vous renseignez quelques paramètres (thème, ton, public) et l'IA fait le reste.
 
-### 🚀 Livre Complet IA — Le Générateur Principal
+### 🚀 Livre Complet IA - Le Générateur Principal
 
 C'est l'outil le plus puissant de la plateforme. Il enchaîne automatiquement les 14 étapes du workflow éditorial pour produire un ebook complet :
 
@@ -149,7 +149,7 @@ Commencez par le **Livre Complet IA** pour votre premier projet. Une fois famili
     category: 'core',
     content: `## Création & Rédaction Assistée
 
-### Le Planificateur Avancé — Votre Centre de Commande
+### Le Planificateur Avancé - Votre Centre de Commande
 
 Avant d'écrire un seul mot, le Planificateur vous aide à structurer votre projet :
 - **Titre & sous-titre** : suggestions IA basées sur les tendances KDP
@@ -201,13 +201,13 @@ Pour ceux qui veulent aller vite : entrez un titre et un genre, cliquez sur "Gé
     image: module04,
     color: "from-teal-500 to-green-500",
     category: 'advanced',
-    content: `## Le Workflow Éditorial Professionnel — Partie 1
+    content: `## Le Workflow Éditorial Professionnel - Partie 1
 
 ### Architecture du moteur
 
 Le workflow éditorial est le cœur d'EbookStudio. Il s'inspire des processus d'une maison d'édition professionnelle, automatisés grâce à Gemini 3 Flash. Chaque étape (P1 à P14) traite un aspect précis de la production éditoriale.
 
-### P1 — Directeur Éditorial 🎯
+### P1 - Directeur Éditorial 🎯
 
 Le Directeur analyse votre concept et produit :
 - **Score de potentiel commercial** (0-100) basé sur la demande KDP
@@ -217,7 +217,7 @@ Le Directeur analyse votre concept et produit :
 
 > 💡 Ne lancez jamais un projet avec un score inférieur à 60. Ajustez le titre ou le genre et relancez P1.
 
-### P2 — Analyste de Marché 📊
+### P2 - Analyste de Marché 📊
 
 Génère une fiche marché complète :
 - 7 mots-clés KDP optimisés (volume de recherche estimé)
@@ -226,7 +226,7 @@ Génère une fiche marché complète :
 - Prix optimal avec simulation des royalties (35% vs 70%)
 - Fenêtre de publication idéale
 
-### P3 — Architecte de Contenu 🏗️
+### P3 - Architecte de Contenu 🏗️
 
 Crée la structure complète du manuscrit :
 - Préface calibrée (500-800 mots)
@@ -235,7 +235,7 @@ Crée la structure complète du manuscrit :
 - Fils rouges narratifs et transitions
 - Conclusion avec appel à l'action
 
-### P4 — Rédacteur Expert ✍️
+### P4 - Rédacteur Expert ✍️
 
 Génère le contenu chapitre par chapitre en respectant :
 - Le plan de P3
@@ -243,7 +243,7 @@ Génère le contenu chapitre par chapitre en respectant :
 - La longueur cible par chapitre
 - Les personnages et leur voix propre (fiction)
 
-### P5 — Réécriture Naturelle 🔄
+### P5 - Réécriture Naturelle 🔄
 
 Humanise le texte pour le rendre indétectable par les outils anti-IA :
 - Variation de la longueur des phrases
@@ -251,7 +251,7 @@ Humanise le texte pour le rendre indétectable par les outils anti-IA :
 - Diversification du vocabulaire
 - Ajout de tournures personnelles
 
-### P6 — Éditeur Qualité ✅
+### P6 - Éditeur Qualité ✅
 
 Vérifie et corrige :
 - Grammaire et orthographe avancée
@@ -260,7 +260,7 @@ Vérifie et corrige :
 - Lisibilité (score Flesch-Kincaid)
 - Équilibre des chapitres en longueur
 
-### P7 — Packaging Éditorial 📦
+### P7 - Packaging Éditorial 📦
 
 Prépare les éléments commerciaux :
 - Description Amazon (4000 caractères, formatée HTML)
@@ -268,7 +268,7 @@ Prépare les éléments commerciaux :
 - Argumentaire de vente en 3 points
 - Accroche de couverture
 
-### P8 — Diagnostic Pré-Publication 🔍
+### P8 - Diagnostic Pré-Publication 🔍
 
 Rapport complet avant publication :
 - Checklist de conformité KDP
@@ -287,13 +287,13 @@ Rapport complet avant publication :
     image: module05,
     color: "from-violet-500 to-purple-500",
     category: 'advanced',
-    content: `## Le Moteur IA Avancé — Partie 2
+    content: `## Le Moteur IA Avancé - Partie 2
 
 ### Pourquoi ces 6 étapes supplémentaires ?
 
 Les étapes P1-P8 produisent un manuscrit solide. Les étapes P9-P14 le transforment en livre de qualité professionnelle grâce à des mécanismes d'auto-amélioration.
 
-### P9 — Mémoire Éditoriale 🧠
+### P9 - Mémoire Éditoriale 🧠
 
 Le système conserve le contexte complet du projet entre les sessions :
 - Résumé de chaque chapitre généré
@@ -303,7 +303,7 @@ Le système conserve le contexte complet du projet entre les sessions :
 
 **Pourquoi c'est important** : sans mémoire, chaque génération repartait de zéro et pouvait contredire les chapitres précédents. P9 élimine ce problème.
 
-### P10 — Cohérence Inter-Chapitres 🔗
+### P10 - Cohérence Inter-Chapitres 🔗
 
 Analyse croisée de tous les chapitres pour détecter :
 - Contradictions factuelles (un personnage blond au ch.2 devenu brun au ch.7)
@@ -313,7 +313,7 @@ Analyse croisée de tous les chapitres pour détecter :
 
 Le système produit un rapport et corrige automatiquement les incohérences détectées.
 
-### P11 — Auto-Critique IA 🔎
+### P11 - Auto-Critique IA 🔎
 
 L'IA adopte le rôle d'un lecteur critique exigeant :
 - Évalue la tension narrative par chapitre (graphique)
@@ -321,7 +321,7 @@ L'IA adopte le rôle d'un lecteur critique exigeant :
 - Propose des améliorations concrètes avec exemples
 - Note chaque chapitre individuellement
 
-### P12 — Boucle Itérative 🔁
+### P12 - Boucle Itérative 🔁
 
 Applique les corrections de P11 automatiquement :
 - Réécrit les passages identifiés comme faibles
@@ -329,7 +329,7 @@ Applique les corrections de P11 automatiquement :
 - Enrichit les descriptions et dialogues
 - Peut tourner 2-3 fois jusqu'à atteindre le seuil de qualité
 
-### P13 — Signature Stylistique ✨
+### P13 - Signature Stylistique ✨
 
 Définit et maintient votre voix d'auteur :
 - Analyse votre style à partir de vos textes existants
@@ -337,7 +337,7 @@ Définit et maintient votre voix d'auteur :
 - Applique ce profil à tout le manuscrit
 - Garantit une cohérence de voix sur plusieurs livres
 
-### P14 — Verdict Ultime 📊
+### P14 - Verdict Ultime 📊
 
 Rapport final de qualité avec note globale sur 10 :
 - Score de lisibilité (Flesch-Kincaid adapté au français)
@@ -487,19 +487,19 @@ Planifiez vos campagnes publicitaires avant de dépenser un centime :
 
 Un calendrier détaillé jour par jour :
 
-**Semaine 1 — Pré-lancement**
+**Semaine 1 - Pré-lancement**
 - Créer une page auteur Amazon
 - Constituer une liste d'emails (ARC readers)
 - Préparer les visuels pour les réseaux sociaux
 - Solliciter 5-10 lecteurs beta pour des avis
 
-**Semaine 2 — Jour J**
+**Semaine 2 - Jour J**
 - Publier sur KDP (prix promotionnel 0,99€ les 3 premiers jours)
 - Lancer la campagne Amazon Ads
 - Poster sur Instagram, Facebook, TikTok
 - Envoyer un email à votre liste
 
-**Semaines 3-4 — Post-lancement**
+**Semaines 3-4 - Post-lancement**
 - Suivre le BSR et ajuster le prix
 - Optimiser les mots-clés Ads en fonction des données
 - Relancer les lecteurs pour des avis
@@ -550,7 +550,7 @@ EbookStudio convertit vos chapitres en audio professionnel grâce à la technolo
 | Antoine | Masculin | Conversationnel | Dev. perso, business |
 | Claude | Masculin | Narrateur classique | Documentaires |
 
-**Langues additionnelles** : anglais (US/UK), espagnol, allemand, italien, portugais — idéal pour des éditions multilingues.
+**Langues additionnelles** : anglais (US/UK), espagnol, allemand, italien, portugais - idéal pour des éditions multilingues.
 
 ### Processus de Création
 
@@ -654,7 +654,7 @@ Votre clé API personnelle vous donne le contrôle total sur les coûts :
 
 Ce module vous guide pas à pas à travers le processus optimal. Suivez ces 5 phases et vous aurez un ebook prêt à publier en 60 minutes.
 
-### Phase 1 — Définir (5 min)
+### Phase 1 - Définir (5 min)
 
 **Objectif** : poser les fondations de votre projet.
 
@@ -664,53 +664,53 @@ Ce module vous guide pas à pas à travers le processus optimal. Suivez ces 5 ph
 4. Définissez votre public cible en une phrase
 5. Choisissez le nombre de chapitres (8-12 pour un premier livre)
 
-> 💡 Pas d'idée de titre ? Utilisez les **Templates par Niche** — plus de 12 structures prêtes à l'emploi.
+> 💡 Pas d'idée de titre ? Utilisez les **Templates par Niche** - plus de 12 structures prêtes à l'emploi.
 
-### Phase 2 — Analyser (5 min)
+### Phase 2 - Analyser (5 min)
 
 **Objectif** : valider le potentiel commercial.
 
-1. Lancez **P1 — Directeur Éditorial**
+1. Lancez **P1 - Directeur Éditorial**
 2. Consultez le score de potentiel (objectif : ≥ 60/100)
 3. Adoptez les suggestions de titre si le score est meilleur
-4. Lancez **P2 — Analyse de Marché** pour les mots-clés KDP
+4. Lancez **P2 - Analyse de Marché** pour les mots-clés KDP
 
-### Phase 3 — Générer (30 min)
+### Phase 3 - Générer (30 min)
 
 **Objectif** : produire le manuscrit complet.
 
-**Option A — Automatique (recommandé)** :
+**Option A - Automatique (recommandé)** :
 1. Cliquez sur **"Livre Complet IA"** dans les Générateurs
 2. Confirmez les paramètres
 3. Attendez que les 14 étapes s'exécutent (barre de progression visible)
 4. Prenez un café ☕
 
-**Option B — Manuel** :
+**Option B - Manuel** :
 1. Lancez P3 (structure) puis validez le plan
 2. Lancez P4 (rédaction) chapitre par chapitre
 3. Lancez P5-P6 (réécriture + qualité)
 4. Lancez P7-P8 (packaging + diagnostic)
 
-### Phase 4 — Valider (10 min)
+### Phase 4 - Valider (10 min)
 
 **Objectif** : s'assurer de la qualité.
 
-1. Consultez le **Verdict Ultime** (P14) — objectif : ≥ 7/10
+1. Consultez le **Verdict Ultime** (P14) - objectif : ≥ 7/10
 2. Si < 7/10 : relancez P12 (boucle itérative) pour une amélioration
 3. Relisez le premier et le dernier chapitre manuellement
 4. Vérifiez la couverture générée
 
-### Phase 5 — Publier (10 min)
+### Phase 5 - Publier (10 min)
 
 **Objectif** : mettre en vente sur Amazon KDP.
 
 1. Exportez en **PDF** (pour livre broché) et/ou **EPUB** (pour Kindle)
-2. Lancez l'**Anti-Plagiat** — objectif : ≥ 95% d'originalité
+2. Lancez l'**Anti-Plagiat** - objectif : ≥ 95% d'originalité
 3. Suivez la **Checklist de Publication** (Module 12)
 4. Uploadez sur **kdp.amazon.com**
 5. Lancez votre **Plan Marketing** (Module 8)
 
-### Alternative Express — 15 minutes
+### Alternative Express - 15 minutes
 
 Pour les générateurs spécialisés (Recettes, Voyages, Fiches) :
 1. Sélectionnez le générateur → renseignez le pays/thème → Générer
@@ -723,7 +723,7 @@ C'est tout. 🚀`
     id: 12,
     title: "Checklist de Publication KDP",
     shortTitle: "Checklist",
-    description: "La vérification finale complète avant de publier sur Amazon — rien ne doit être oublié.",
+    description: "La vérification finale complète avant de publier sur Amazon - rien ne doit être oublié.",
     icon: CheckSquare,
     image: module12,
     color: "from-yellow-500 to-amber-500",
@@ -996,19 +996,19 @@ Le générateur de BD résout le plus grand défi de la création de bandes dess
 
 ### Processus de Création
 
-**Étape 1 — Définir le personnage principal**
+**Étape 1 - Définir le personnage principal**
 Décrivez physiquement votre héros : taille, cheveux, yeux, vêtements, signes distinctifs. Le système crée un "profil visuel" qui sera transmis à chaque génération.
 
-**Étape 2 — Choisir le genre**
+**Étape 2 - Choisir le genre**
 Aventure, Humour, Science-Fiction, Fantasy, Policier, Slice-of-Life, Horreur, Romance.
 
-**Étape 3 — Générer le scénario**
+**Étape 3 - Générer le scénario**
 L'IA crée un script case par case avec :
 - Description de la scène (angle, décor, action)
 - Dialogue de chaque personnage
 - Indications d'émotion et de mouvement
 
-**Étape 4 — Générer les images**
+**Étape 4 - Générer les images**
 Chaque case est générée avec le profil visuel du personnage, garantissant la cohérence.
 
 ### Layouts de Pages
@@ -1075,14 +1075,14 @@ L'outil applique 7 techniques de transformation :
 
 ### Intégration dans le Workflow
 
-L'Humaniseur est automatiquement intégré dans **P5 — Réécriture Naturelle** du workflow éditorial. Si vous utilisez le "Livre Complet IA", l'humanisation est déjà incluse.
+L'Humaniseur est automatiquement intégré dans **P5 - Réécriture Naturelle** du workflow éditorial. Si vous utilisez le "Livre Complet IA", l'humanisation est déjà incluse.
 
 ### Bonnes Pratiques
 
 - Humanisez **chapitre par chapitre** pour un meilleur contrôle
 - Relisez toujours le résultat (l'IA peut parfois modifier le sens)
 - Ajoutez vos propres anecdotes et réflexions personnelles
-- Utilisez le niveau "Moyen" par défaut — le niveau "Fort" peut altérer le style
+- Utilisez le niveau "Moyen" par défaut - le niveau "Fort" peut altérer le style
 
 > ⚠️ **Important** : l'Humaniseur est un outil d'amélioration stylistique. Le meilleur contenu reste celui auquel vous ajoutez votre touche personnelle.`
   },

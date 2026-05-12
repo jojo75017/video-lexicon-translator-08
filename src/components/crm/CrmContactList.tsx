@@ -24,9 +24,9 @@ interface CrmContactListProps {
 
 const temperatureIndicator = (temp: string) => {
   switch (temp) {
-    case 'hot': return <span className="inline-block w-3 h-3 rounded-full bg-blue-500 shadow-[0_0_8px_2px_rgba(59,130,246,0.5)]" title="Chaud — a cliqué" />;
+    case 'hot': return <span className="inline-block w-3 h-3 rounded-full bg-blue-500 shadow-[0_0_8px_2px_rgba(59,130,246,0.5)]" title="Chaud - a cliqué" />;
     case 'warm': return <span className="inline-block w-3 h-3 rounded-full bg-amber-400 shadow-[0_0_6px_2px_rgba(251,191,36,0.4)]" title="Tiède" />;
-    case 'cold': return <span className="inline-block w-3 h-3 rounded-full bg-gray-800 dark:bg-gray-300" title="Froid — à relancer" />;
+    case 'cold': return <span className="inline-block w-3 h-3 rounded-full bg-gray-800 dark:bg-gray-300" title="Froid - à relancer" />;
     default: return <span className="inline-block w-3 h-3 rounded-full bg-muted" />;
   }
 };

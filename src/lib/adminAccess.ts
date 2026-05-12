@@ -45,7 +45,7 @@ export async function getIsCurrentSessionAdmin(): Promise<boolean> {
       return false;
     }
 
-    // Try edge function with a 6s timeout — fallback to localStorage if it fails
+    // Try edge function with a 6s timeout - fallback to localStorage if it fails
     const invokePromise = supabase.functions.invoke('check-admin', {
       headers: { Authorization: `Bearer ${session.access_token}` },
     });
