@@ -71,17 +71,18 @@ async function callGeminiDirect(systemPrompt: string, userPrompt: string, maxTok
     const errText = await response.text();
     console.error(`Gemini direct error ${status}: ${errText}`);
     
-    // Retry automatique sur 429 avec délai exponentiel
-    if (status === 429 && retryCount < MAX_RETRIES) {
-      // Extraire le délai suggéré par Google ou utiliser un backoff exponentiel
+    // Retry automatique sur 429/503/500 avec délai exponentiel
+    if ((status === 429 || status === 503 || status === 500) && retryCount < MAX_RETRIES) {
       const retryMatch = errText.match(/retry in (\d+)/i);
-      const waitSeconds = retryMatch ? parseInt(retryMatch[1]) + 5 : Math.min(15 * Math.pow(2, retryCount), 120);
-      console.log(`⏳ Rate limit Gemini - retry ${retryCount + 1}/${MAX_RETRIES} dans ${waitSeconds}s...`);
+      const baseWait = status === 503 ? 8 : 15;
+      const waitSeconds = retryMatch ? parseInt(retryMatch[1]) + 5 : Math.min(baseWait * Math.pow(2, retryCount), 120);
+      console.log(`⏳ Gemini ${status} - retry ${retryCount + 1}/${MAX_RETRIES} dans ${waitSeconds}s...`);
       await new Promise(resolve => setTimeout(resolve, waitSeconds * 1000));
       return await callGeminiDirect(systemPrompt, userPrompt, maxTokens, apiKey, retryCount + 1);
     }
     
     if (status === 429) throw new Error('RATE_LIMIT: Limite Gemini atteinte après 3 tentatives. Activez la facturation sur votre projet Google Cloud pour supprimer cette limite.');
+    if (status === 503 || status === 500) throw new Error('GEMINI_OVERLOAD: Le service Gemini est temporairement surchargé. Réessayez dans 1-2 minutes.');
     if (status === 400 || status === 401 || status === 403) throw new Error('INVALID_API_KEY: Clé API Gemini invalide. Utilisez une clé Google AI Studio commençant par AIza.');
     throw new Error(`Gemini Error: ${status}`);
   }
