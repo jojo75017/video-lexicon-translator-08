@@ -359,10 +359,15 @@ const PromoEspacePage = () => {
                         )}
                       </div>
 
-                      <div className="text-center">
+                      <div className="flex flex-wrap justify-center gap-3">
                         <Link to="/promo/affilie">
                           <Button variant="outline" className="border-[#008296] text-[#008296]">
-                            Voir la page programme d'affiliation <ExternalLink className="w-4 h-4 ml-2" />
+                            Voir la page programme <ExternalLink className="w-4 h-4 ml-2" />
+                          </Button>
+                        </Link>
+                        <Link to="/promo/affilie#kit">
+                          <Button className="bg-[#FF9E2D] hover:bg-[#e88f1f] text-white">
+                            🎁 Accéder au kit de promotion
                           </Button>
                         </Link>
                       </div>
