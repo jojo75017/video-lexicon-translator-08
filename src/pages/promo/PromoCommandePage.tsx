@@ -19,7 +19,7 @@ const schema = z.object({
   payment_method: z.enum(['stripe', 'paypal']),
 });
 
-const PRODUCT = { key: 'main', label: 'EbookStudio — Accès à vie', amount: 67 };
+const PRODUCT = { key: 'main', label: 'EbookStudio - Accès à vie', amount: 67 };
 
 const PromoCommandePage = () => {
   useReferralTracking();
@@ -83,7 +83,7 @@ const PromoCommandePage = () => {
   return (
     <FunnelLayout>
       <SeoHead
-        title="Commande — EbookStudio"
+        title="Commande - EbookStudio"
         description="Finalisez votre commande EbookStudio. Paiement carte sécurisé ou PayPal."
         canonical="/promo/commande"
         noindex
@@ -96,7 +96,7 @@ const PromoCommandePage = () => {
             <div className="flex justify-between items-start">
               <div>
                 <p className="font-bold">{PRODUCT.label}</p>
-                <p className="text-sm text-gray-500">Accès 12 mois — Renouvellement manuel</p>
+                <p className="text-sm text-gray-500">Accès 12 mois - Renouvellement manuel</p>
               </div>
               <p className="font-bold text-xl">{PRODUCT.amount}€</p>
             </div>
@@ -147,7 +147,7 @@ const PromoCommandePage = () => {
               <Label>Mode de paiement</Label>
               <div className="space-y-2">
                 {[
-                  { v: 'stripe' as const, l: 'Carte bancaire', sub: 'Accès immédiat — Visa, Mastercard, Amex', icon: <Zap className="w-4 h-4" /> },
+                  { v: 'stripe' as const, l: 'Carte bancaire', sub: 'Accès immédiat - Visa, Mastercard, Amex', icon: <Zap className="w-4 h-4" /> },
                   { v: 'paypal' as const, l: 'PayPal', sub: 'Accès activé sous 1h ouvrée', icon: null },
                 ].map((opt) => (
                   <button
@@ -169,7 +169,7 @@ const PromoCommandePage = () => {
             </div>
 
             <Button type="submit" disabled={loading} className="w-full bg-[#FF9E2D] hover:bg-[#e88f1f] text-white font-bold py-6 text-base">
-              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : `🔒 Confirmer — ${PRODUCT.amount}€`}
+              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : `🔒 Confirmer - ${PRODUCT.amount}€`}
             </Button>
             <p className="text-xs text-gray-500 text-center">
               En cliquant, vous acceptez les CGV.
