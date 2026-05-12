@@ -305,7 +305,7 @@ export const SimpleSidebar: React.FC<SimpleSidebarProps> = ({
                 })}
               </div>
             )}
-            </React.Fragment>
+            </div>
           );
         })}
 
