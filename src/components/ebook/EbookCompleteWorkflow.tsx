@@ -2321,6 +2321,11 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
                     size="sm"
                     onClick={() => {
                       cancelRef.current = true;
+                      autoResumeCountRef.current = 999; // bloque toute reprise auto
+                      if (autoResumeTimerRef.current) {
+                        clearTimeout(autoResumeTimerRef.current);
+                        autoResumeTimerRef.current = null;
+                      }
                       toast.info('⏹️ Arrêt demandé… La génération s\'arrêtera après l\'étape en cours.');
                     }}
                     className="gap-2 text-destructive border-destructive/40 hover:bg-destructive/10"
