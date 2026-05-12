@@ -1,120 +1,59 @@
 
-# Plan — Paiement CB automatique + PayPal sur /promo
+## Plan complet — Affiliation visible + kit de promo
 
-## Objectif
-Permettre l'encaissement des 67 € via **carte bancaire (Stripe automatique)** ou **PayPal manuel**, et supprimer l'option virement bancaire.
+### 1. Corriger le discours lifetime sur `/promo/affilie`
+- Supprimer "récurrente", "abonnement", "par mois récurrent"
+- Hero : "Gagnez 20,10€ par vente (paiement unique 67€ à vie)"
+- Calculateur : "ventes par mois" → "revenus mensuels potentiels" (pas récurrent)
+- FAQ : "sur la vente principale + bonus" au lieu de "abonnement"
 
----
+### 2. Footer global du tunnel
+- Dans `FunnelLayout.tsx`, ajouter lien discret "Programme d'affiliation — 30%" → `/promo/affilie`
+- Visible sur toutes les pages `/promo/*`
 
-## Étape 1 — Activer Lovable Payments (Stripe intégré)
+### 3. Encart post-achat sur `/promo/merci`
+- Bloc "Vous adorez EbookStudio ? Recommandez-le et gagnez 20€ par vente"
+- CTA → `/promo/affilie`
 
-Pré-requis avant tout code :
+### 4. Lien dans `/promo/decouverte`
+- Petit lien footer "Vous êtes blogueur / créateur ? Devenez affilié (30%)"
 
-1. **Vérifier l'éligibilité** du produit (`recommend_payment_provider`).
-2. **Activer Lovable Payments** (`enable_stripe_payments`) — un formulaire Lovable s'ouvrira pour saisir : email de compte, nom, raison sociale. L'environnement **test** est créé immédiatement, le **live** après vérification d'identité (KYC ~24-48 h).
-3. Créer le produit **"EbookStudio — Abonnement annuel 67 €"** dans le catalogue Lovable Payments.
+### 5. Onglet Affiliation de `/promo/espace`
+- Bouton "Voir / partager la page publique" → ouvre `/promo/affilie` dans nouvel onglet
+- Bouton "Accéder au kit de promotion" → scrolle vers la nouvelle section sur `/promo/affilie`
 
-> ⚠️ Plan **Pro** requis pour activer les paiements. Lovable Cloud déjà activé ✅.
+### 6. Section "Kit de promotion" sur `/promo/affilie` (visible une fois connecté)
 
----
+**a) Liens préfillés avec son `?ref=CODE`** (boutons "Copier") :
+- Page de vente principale
+- Page bonus
+- Page formation
 
-## Étape 2 — Recueillir les infos manquantes
+**b) Argumentaires prêts à copier** (3 onglets, copier-coller) :
+- **Email** : objet + corps prêt
+- **Post LinkedIn / Facebook** : 800 caractères
+- **Tweet / X** : 280 caractères
+- **Story Instagram / Reel** : script court
 
-Avant de coder, tu devras me donner :
+**c) Visuels** (placeholder pour cette étape — vrais visuels générés ensuite) :
+- 3 vignettes 1200x630, 1080x1080, 1080x1920
+- Bouton "Télécharger" (lien direct vers fichiers dans bucket Supabase)
 
-- **Lien PayPal.me** exact (ex : `https://paypal.me/tonpseudo`)
-- **Email de notification PayPal** (pour relier la commande au virement reçu)
+**d) Mini-FAQ "réponses aux objections"** que l'affilié peut copier pour répondre à ses prospects (prix, garantie, support, formation).
 
----
+## Découpage technique
 
-## Étape 3 — Modifier le tunnel `/promo/commande`
+| # | Fichier | Modification |
+|---|---------|-------------|
+| 1 | `src/pages/promo/PromoAffiliePage.tsx` | Réécrire copy lifetime + ajouter section Kit |
+| 2 | `src/components/funnel/FunnelLayout.tsx` | Lien footer affiliation |
+| 3 | `src/pages/promo/PromoMerciPage.tsx` | Encart post-achat |
+| 4 | `src/pages/promo/PromoDecouvertePage.tsx` | Lien footer |
+| 5 | `src/pages/promo/PromoEspacePage.tsx` | 2 boutons dans onglet Affiliation |
 
-`src/pages/promo/PromoCommandePage.tsx` :
+## Hors scope (étape suivante)
+- Génération réelle des visuels via `imagegen`
+- Email broadcast aux clients existants pour annoncer le programme
+- Système d'auto-paiement des commissions PayPal
 
-- Remplacer les 2 options actuelles (PayPal / Virement) par **2 nouvelles** :
-  - 🟢 **Carte bancaire** (badge "Accès immédiat") → Stripe Checkout auto
-  - 🔵 **PayPal** (badge "Validation 1 h") → page instructions
-- Retirer toute mention "virement bancaire".
-- Le champ `payment_method` accepte désormais : `stripe` | `paypal` (plus de `virement`).
-
----
-
-## Étape 4 — Nouveau flux Stripe (CB automatique)
-
-1. **Edge function `create-stripe-checkout`** (nouveau) :
-   - Reçoit email + first_name + ref_code
-   - Crée une `funnel_orders` avec `payment_method = 'stripe'`, `status = 'pending'`
-   - Crée une session Stripe Checkout (67 €, mode `payment`) avec `metadata.order_id` + `success_url = /promo/merci?order_id=X` + `cancel_url = /promo/commande`
-   - Retourne l'URL Checkout → redirection navigateur
-2. **Edge function `stripe-webhook`** (nouveau, public, no JWT) :
-   - Écoute `checkout.session.completed`
-   - Met à jour `funnel_orders.status = 'paid'`, `paid_at = now()`
-   - Le trigger DB existant `handle_funnel_order_paid` se charge déjà de créer la commission affilié 30 % ✅
-   - Insère dans `subscribers` (création accès) + envoie email Resend "Bienvenue + accès" via `send-transactional-email`
-3. **Page `/promo/merci`** : déjà existante, on enrichit pour afficher confirmation Stripe quand `?order_id=` présent.
-
----
-
-## Étape 5 — Flux PayPal simplifié
-
-`src/pages/promo/PromoPaiementPage.tsx` :
-- Retirer tout le bloc IBAN/BIC/Référence virement.
-- Garder uniquement le bloc **PayPal** : bouton vers ton lien `paypal.me/tonpseudo/67`, instruction "indique ton email dans la note".
-- Email de confirmation (déjà envoyé par `funnel-create-order`) → adapter le template : retirer le bloc virement, garder PayPal seulement.
-
-`supabase/functions/funnel-create-order/index.ts` :
-- Validation : `payment_method` ∈ `['paypal']` (le cas `stripe` passe par l'autre edge function).
-- Email Resend : retirer le bloc virement.
-
----
-
-## Étape 6 — Tunnel d'accès post-paiement
-
-| Méthode | Activation | Délai |
-|---|---|---|
-| **CB** (Stripe) | Webhook → `subscribers` auto | < 1 min |
-| **PayPal** | Manuelle (admin valide depuis `/admin`) | < 1 h ouvré |
-
-Pour PayPal, garder la mécanique actuelle (admin marque `funnel_orders.status = 'paid'` → trigger crée commission + email manuel "Accès activé").
-
----
-
-## Étape 7 — QA end-to-end (env test)
-
-1. CB test Stripe `4242 4242 4242 4242` → vérifier `funnel_orders.status = 'paid'`, `subscribers` créé, email envoyé, commission affilié si `?ref=…`
-2. PayPal → vérifier email instructions, page `/promo/paiement` affiche bien le lien
-3. Vérifier que la séquence nurturing s'arrête bien quand `funnel_orders.status = 'paid'` (à ajouter dans `process-promo-nurture`).
-
----
-
-## Détails techniques (pour info)
-
-- **Secrets utilisés** : Lovable Payments gère sa propre clé Stripe en interne — pas besoin d'ajouter `STRIPE_SECRET_KEY` (l'existant `STRIPE_SECRET_KEY` du compte legacy reste inutilisé pour ce flux).
-- **Tables** : aucun changement de schéma nécessaire (`funnel_orders` accepte déjà `payment_method` text libre).
-- **Webhook URL** : `https://xvdgazrewsuaqtalqxue.supabase.co/functions/v1/stripe-webhook` (à coller dans le dashboard Lovable Payments après activation).
-- **Frais Stripe** : ~1,5 % + 0,25 € par CB EU (≈ 1,25 € sur 67 €).
-
----
-
-## Hors scope (volontairement)
-
-- Abonnement récurrent automatique → on reste sur paiement unique 67 €/an manuel renouvelé.
-- 3D Secure custom → géré nativement par Stripe Checkout.
-- Refonte PromoMerciPage existante au-delà du `?order_id=`.
-
----
-
-## Ordre d'exécution
-
-```text
-1. recommend_payment_provider      (vérif éligibilité)
-2. enable_stripe_payments          (formulaire utilisateur)
-3. Tu me donnes ton lien PayPal.me
-4. Création produit 67 € dans catalogue
-5. Edge create-stripe-checkout + stripe-webhook
-6. Modif PromoCommandePage (CB + PayPal, virement retiré)
-7. Modif PromoPaiementPage + funnel-create-order (virement retiré)
-8. Test CB 4242 + test PayPal
-```
-
-Dis-moi "ok j'implémente" + ton **lien PayPal.me** et je lance.
+Je peux implémenter cela d'un seul coup.
