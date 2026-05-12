@@ -8,26 +8,6 @@ import { Copy, Check, ExternalLink, Mail, ShieldCheck } from 'lucide-react';
 import { toast } from 'sonner';
 
 const PAYPAL_URL = 'https://paypal.me/ebookstudio/67';
-const IBAN = 'FR76 XXXX XXXX XXXX XXXX XXXX XXX';
-const BIC = 'XXXXXXXX';
-
-const CopyBtn = ({ value, label }: { value: string; label: string }) => {
-  const [copied, setCopied] = useState(false);
-  return (
-    <button
-      type="button"
-      onClick={() => {
-        navigator.clipboard.writeText(value);
-        setCopied(true);
-        toast.success(`${label} copié`);
-        setTimeout(() => setCopied(false), 1500);
-      }}
-      className="inline-flex items-center gap-1 text-[#008296] hover:text-[#006b7a] text-sm font-medium"
-    >
-      {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />} Copier
-    </button>
-  );
-};
 
 const PromoPaiementPage = () => {
   const [params] = useSearchParams();
@@ -77,47 +57,19 @@ const PromoPaiementPage = () => {
           <div className="text-center text-gray-500">Chargement…</div>
         ) : (
           <div className="space-y-6">
-            {method === 'paypal' ? (
-              <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-4">
-                <h2 className="text-xl font-bold flex items-center gap-2">💳 Paiement PayPal</h2>
-                <p className="text-gray-600">
-                  Cliquez ci-dessous pour régler <strong>{amount}€</strong> en toute sécurité via PayPal.
-                  Pensez à indiquer votre email <strong>{order?.email}</strong> dans la note du paiement.
-                </p>
-                <a href={PAYPAL_URL} target="_blank" rel="noopener noreferrer" className="block">
-                  <Button className="w-full bg-[#FF9E2D] hover:bg-[#e88f1f] text-white font-bold py-6 text-base">
-                    Payer {amount}€ sur PayPal <ExternalLink className="w-4 h-4 ml-2" />
-                  </Button>
-                </a>
-                <p className="text-xs text-gray-500 text-center">Validation immédiate — Accès envoyé sous 1h ouvrée</p>
-              </div>
-            ) : (
-              <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-4">
-                <h2 className="text-xl font-bold flex items-center gap-2">🏦 Virement bancaire</h2>
-                <p className="text-gray-600">
-                  Effectuez un virement de <strong>{amount}€</strong> avec les coordonnées ci-dessous.
-                  <strong className="text-[#FF9E2D]"> N'oubliez pas d'indiquer la référence</strong> en libellé.
-                </p>
-                <div className="bg-gray-50 rounded-lg p-4 space-y-3 font-mono text-sm">
-                  <div className="flex justify-between items-center">
-                    <span><span className="text-gray-500">IBAN :</span> {IBAN}</span>
-                    <CopyBtn value={IBAN} label="IBAN" />
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span><span className="text-gray-500">BIC :</span> {BIC}</span>
-                    <CopyBtn value={BIC} label="BIC" />
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span><span className="text-gray-500">Bénéficiaire :</span> EbookStudio</span>
-                  </div>
-                  <div className="flex justify-between items-center bg-[#FF9E2D]/10 -mx-4 px-4 py-2 rounded">
-                    <span><span className="text-gray-500">Référence :</span> <strong>{ref}</strong></span>
-                    <CopyBtn value={ref} label="Référence" />
-                  </div>
-                </div>
-                <p className="text-xs text-gray-500 text-center">Validation sous 24h ouvrées après réception</p>
-              </div>
-            )}
+            <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-4">
+              <h2 className="text-xl font-bold flex items-center gap-2">💳 Paiement PayPal</h2>
+              <p className="text-gray-600">
+                Cliquez ci-dessous pour régler <strong>{amount}€</strong> en toute sécurité via PayPal.
+                Indiquez bien la référence <strong>{ref}</strong> et votre email <strong>{order?.email}</strong> dans la note du paiement.
+              </p>
+              <a href={PAYPAL_URL} target="_blank" rel="noopener noreferrer" className="block">
+                <Button className="w-full bg-[#FF9E2D] hover:bg-[#e88f1f] text-white font-bold py-6 text-base">
+                  Payer {amount}€ sur PayPal <ExternalLink className="w-4 h-4 ml-2" />
+                </Button>
+              </a>
+              <p className="text-xs text-gray-500 text-center">Accès envoyé sous 1h ouvrée après réception</p>
+            </div>
 
             <div className="bg-[#008296]/5 border border-[#008296]/20 rounded-xl p-6">
               <h3 className="font-bold mb-3 flex items-center gap-2"><Mail className="w-5 h-5 text-[#008296]" /> Email de confirmation</h3>
