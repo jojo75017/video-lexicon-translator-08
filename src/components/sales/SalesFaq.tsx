@@ -47,7 +47,7 @@ const SalesFaq: React.FC = () => {
     },
     {
       question: "Puis-je gagner de l'argent en recommandant EbookStudio ?",
-      answer: "Oui ! Notre programme de parrainage vous permet de gagner 30€ par vente pour chaque personne que vous recommandez. Vous recevez un lien unique dans votre espace membre, et vos commissions sont suivies en temps réel dans votre tableau de bord. C'est un excellent moyen de rentabiliser votre investissement dès les premières recommandations."
+      answer: "Oui ! Notre programme d'affiliation vous reverse 30% de commission, soit 20,10€ par vente (sur le paiement unique de 67€ à vie). Vous recevez un lien unique dans votre espace membre avec un kit de promotion complet (templates email, posts sociaux, visuels), et vos commissions sont suivies en temps réel. Paiement PayPal mensuel dès 50€."
     },
     {
       question: "Comment fonctionne le paiement en plusieurs fois ?",
