@@ -7,7 +7,7 @@ const corsHeaders = {
 };
 
 const LEAD_MAGNET_URL =
-  "https://ebookstudio.fr/lead-magnets/5-niches-rentables-ebooks-2026.pdf";
+  "https://ebookstudio.fr/lead-magnets/5-niches-rentables-2026.pdf";
 
 const isValidEmail = (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
 

@@ -1,52 +1,39 @@
-## Plan d’action
+## Objectif
+Préparer le tunnel pour le lancement affilié du **1er juillet** : corriger le bug PDF, ajuster l'upsell templates à 25€ et y inclure le guide 10 niches en cadeau.
 
-### Objectif
-Rendre l’affiliation impossible à rater depuis l’application principale, pas seulement depuis le tunnel `/promo/*`, et regrouper tout au même endroit : lien affilié, commissions, kit de promotion, textes à copier et page publique.
+## 1. Fix bug PDF cadeau (urgent — déjà signalé)
+Dans `supabase/functions/funnel-capture-lead/index.ts`, la constante `LEAD_MAGNET_URL` pointe vers `5-niches-rentables-ebooks-2026.pdf` mais le fichier réel est `5-niches-rentables-2026.pdf` → 404 sur `/promo/merci` et dans l'email Resend.
 
-### 1. Ajouter une vraie entrée visible dans la sidebar
-Dans la sidebar principale de l’app :
-- Remplacer l’ancien item `Parrainage 30€` par `Affiliation 30%`
-- Le faire pointer directement vers `/promo/affilie`
-- Mettre à jour sa description : `Lien affilié, commissions et kit de promotion prêt à copier`
-- Le garder dans la section `Communauté`, ou créer une petite section dédiée `Business` / `Monétisation` si la structure actuelle le permet proprement
+**Correctif** : remplacer par `https://ebookstudio.fr/lead-magnets/5-niches-rentables-2026.pdf`.
 
-### 2. Rediriger l’ancien système `/parrainage`
-Pour éviter que toi ou un affilié tombiez sur l’ancienne page sans kit :
-- Transformer `/parrainage` en redirection vers `/promo/affilie`
-- Garder la route existante pour ne pas casser les anciens liens
+## 2. Upsell "Pack 50 templates premium" → 25€ + bonus niches
+Dans `src/pages/promo/PromoBonusPage.tsx`, modifier l'objet `templates_premium` :
 
-### 3. Faire de `/promo/affilie` la page centrale
-La page `/promo/affilie` doit rester le centre unique avec :
-- Code affilié
-- Lien affilié principal
-- Statistiques : clics, inscrits, conversions, gains
-- Kit de promotion
-- Liens préremplis avec `?ref=CODE`
-- Templates email / réseaux sociaux / tweet / Reel
-- FAQ objections
+- **Prix** : `27` → `25`
+- **Description** : ajouter mention du bonus
+- **Bénéfices** : ajouter en tête une ligne `🎁 BONUS offert : Guide PDF "10 niches KDP rentables 2026"`
+- **Visuel** : ajouter un petit badge orange "+ Cadeau 10 niches inclus" sur la carte
 
-### 4. Ajouter des onglets clairs dans la page affiliation
-Au lieu d’un long bloc confus, organiser la page avec des onglets visibles :
-- `Tableau de bord`
-- `Mes liens`
-- `Kit email`
-- `Réseaux sociaux`
-- `FAQ objections`
-- `Visuels`
+Note : il n'y a qu'**un seul** upsell templates dans le code, pas deux. L'autre upsell est la "Licence commerciale étendue" à 47€ — on ne la touche pas.
 
-### 5. Corriger les anciens textes incohérents
-Corriger toutes les références restantes à :
-- `30€ par filleul`
-- `abonnement`
-- `commission récurrente`
+## 3. Livraison du pack templates (Drive)
+Le lien Drive partagé (`15Dtc44dPNoy8VImg2CtMBzCvSM7seJa7`) est sur ton compte personnel et n'est pas accessible via le connecteur (qui n'est pas connecté). 
 
-Pour les remplacer par :
-- `30% par vente`
-- `20,10€ par vente`
-- `paiement unique 67€ à vie`
+**Question** : comment veux-tu livrer le pack templates après achat ?
+- **Option A** (le plus simple) : tu me partages le fichier (download depuis Drive et upload ici), je le mets dans `public/downloads/pack-50-templates.pdf` et l'email de confirmation contient le lien direct
+- **Option B** : je laisse le lien Drive public (`https://drive.google.com/file/d/15Dtc44dPNoy8VImg2CtMBzCvSM7seJa7/view`) dans l'email de livraison, en passant le partage en "Toute personne avec le lien"
 
-### 6. Vérification
-Après modification :
-- Vérifier que `/promo/affilie` est accessible depuis la sidebar depuis `/ebook-planner`
-- Vérifier que `/parrainage` redirige bien vers `/promo/affilie`
-- Vérifier que le kit s’affiche sur la page affiliation
+→ je pars sur **Option A** par défaut (plus pro, pas de risque de fuite/suppression). Si tu préfères B, dis-le moi avant impl.
+
+## 4. Email de livraison du pack
+Étendre l'edge function `funnel-confirm-payment` (ou créer `funnel-deliver-upsell` si elle n'existe pas) pour, quand `product_key = 'templates_premium'` est marqué payé, envoyer via Resend un email contenant :
+- Lien de téléchargement du pack templates
+- Lien de téléchargement du guide 10 niches (cadeau)
+
+## 5. Préparation lancement affilié 1er juillet
+- Vérifier que `/promo/affilie` est accessible et que le code affilié se génère bien
+- Vérifier que `funnel_orders` → trigger `handle_funnel_order_paid` crée bien la commission 30% sur les ventes (déjà en place, juste tester un flux complet en sandbox)
+- Tester le flux complet : `/promo?ref=CODE` → email → `/promo/merci` (PDF) → `/promo/decouverte` → `/promo/commande` → `/promo/bonus` (upsell 25€) → `/promo/espace`
+
+## Hors scope
+Pas de redesign, pas de nouveau tunnel, pas de modif sur la licence étendue à 47€.

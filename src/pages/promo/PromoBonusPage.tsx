@@ -26,9 +26,11 @@ const UPSELLS = [
     key: 'templates_premium',
     icon: Sparkles,
     title: 'Pack 50 templates premium',
-    price: 27,
-    desc: '50 plans d\'ebooks best-sellers prêts à utiliser : développement personnel, business, fiction, jeunesse, parascolaire, cuisine…',
+    price: 25,
+    badge: '🎁 + Cadeau : Guide 10 niches inclus',
+    desc: '50 plans d\'ebooks best-sellers prêts à utiliser : développement personnel, business, fiction, jeunesse, parascolaire, cuisine… + le guide PDF "10 niches KDP rentables 2026" offert.',
     benefits: [
+      '🎁 BONUS offert : Guide PDF "10 niches KDP rentables 2026"',
       '50 plans complets KDP-ready',
       'Mots-clés Amazon optimisés',
       'Couvertures concept incluses',
