@@ -2,14 +2,21 @@ import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { supabase } from "@/integrations/supabase/client";
 
+interface Bonus {
+  key: string;
+  title: string;
+  amount: number;
+}
+
 interface Props {
   email: string;
   firstName?: string;
   refCode?: string | null;
   returnUrl: string;
+  bonuses?: Bonus[];
 }
 
-export function PromoStripeCheckout({ email, firstName, refCode, returnUrl }: Props) {
+export function PromoStripeCheckout({ email, firstName, refCode, returnUrl, bonuses }: Props) {
   const fetchClientSecret = async (): Promise<string> => {
     const { data, error } = await supabase.functions.invoke("create-promo-checkout", {
       body: {
@@ -18,6 +25,7 @@ export function PromoStripeCheckout({ email, firstName, refCode, returnUrl }: Pr
         ref_code: refCode,
         environment: getStripeEnvironment(),
         returnUrl,
+        bonuses: bonuses || [],
       },
     });
     if (error || !data?.clientSecret) {
