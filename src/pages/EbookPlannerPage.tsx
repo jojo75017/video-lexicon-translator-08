@@ -103,6 +103,9 @@ import EbookHumanizer from '@/components/ebook/EbookHumanizer';
 import EbookStrictProofreader from '@/components/ebook/EbookStrictProofreader';
 import SubscriberActivityPopup from '@/components/admin/SubscriberActivityPopup';
 import { EbookLibrary } from '@/components/ebook/EbookLibrary';
+import { EbookImageLibrary } from '@/components/ebook/EbookImageLibrary';
+import { EbookChapterImageGenerator } from '@/components/ebook/EbookChapterImageGenerator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AudioExpressWorkflow } from '@/components/ebook/AudioExpressWorkflow';
 
 import { CoverDesignEditor } from '@/components/ebook/CoverDesignEditor';
@@ -2462,6 +2465,47 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           />
         );
       
+      case 'images':
+        return (
+          <div className="space-y-6 animate-fade-in">
+            <Tabs defaultValue="generator" className="w-full">
+              <TabsList className="grid grid-cols-2 w-full max-w-xl">
+                <TabsTrigger value="generator">
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Générateur d'images IA
+                </TabsTrigger>
+                <TabsTrigger value="library">
+                  <ImageIcon className="w-4 h-4 mr-2" />
+                  Bibliothèque d'images
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="generator" className="mt-6">
+                <EbookChapterImageGenerator
+                  ebookTitle={ebookTitle}
+                  chapters={chapters}
+                  characters={characters}
+                  ebookImages={ebookImages as any}
+                  onImagesUpdate={(imgs) => setEbookImages(imgs as any)}
+                  onInsertImageToChapter={(chapterId, url) => {
+                    const chapter = chapters.find(c => c.id === chapterId);
+                    if (chapter) {
+                      updateChapterContent(chapterId, (chapter.content || '') + `\n\n![Image](${url})\n\n`);
+                    }
+                  }}
+                />
+              </TabsContent>
+              <TabsContent value="library" className="mt-6">
+                <EbookImageLibrary
+                  ebookTitle={ebookTitle}
+                  onImageSelect={(url) => {
+                    setEbookImages(prev => [{ url, title: 'Image bibliothèque' }, ...prev]);
+                  }}
+                />
+              </TabsContent>
+            </Tabs>
+          </div>
+        );
+
       case 'cover':
         // Bloquer la couverture en mode démo
         if (isDemo) {
@@ -2490,7 +2534,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             authorName={authorName}
             chapters={chapters}
             isGenerating={isGenerating}
-            defaultTab="technical"
+            defaultTab="ai"
             onGenerateBackCover={async (tone, audience, highlights) =>
               await generateBackCover(ebookTitle, authorName, chapters, tone, audience, highlights)
             }
