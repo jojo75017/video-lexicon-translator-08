@@ -160,8 +160,11 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   }, [bookIntroduction, cibleProfil, cibleBesoins, cibleFrustrations, cibleNiveau, promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion]);
 
   const handleAutofillTargetPromise = useCallback(async () => {
-    if (!title.trim() || !bookIntroduction.trim()) {
-      toast.error('Remplis d\'abord le titre et l\'introduction du livre.');
+    const missing: string[] = [];
+    if (!title.trim()) missing.push('le titre');
+    if (!bookIntroduction.trim()) missing.push('l\'introduction');
+    if (missing.length > 0) {
+      toast.error(`Remplis d'abord ${missing.join(' et ')} du livre, puis relance l'IA.`);
       return;
     }
     if (!hasUsableApiKey) {
