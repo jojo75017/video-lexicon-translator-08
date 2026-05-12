@@ -101,7 +101,7 @@ const PromoBonusPage = () => {
               <div className="pt-4 border-t border-gray-100">
                 <p className="text-3xl font-bold text-[#008296] mb-3">{u.price}€ <span className="text-sm text-gray-500 font-normal">paiement unique</span></p>
                 <Button
-                  onClick={() => buyUpsell(u.key, u.price)}
+                  onClick={() => addBonus(u.key, u.title, u.price)}
                   disabled={loadingKey !== null}
                   className="w-full bg-[#FF9E2D] hover:bg-[#e88f1f] text-white font-bold py-5"
                 >
