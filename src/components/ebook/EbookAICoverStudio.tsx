@@ -689,6 +689,7 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
           </CardContent>
         </Card>
       </div>
+      )}
     </div>
   );
 };
