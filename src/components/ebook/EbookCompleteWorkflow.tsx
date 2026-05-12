@@ -1513,7 +1513,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
           <Button
             type="button"
             onClick={handleAutofillTargetPromise}
-            disabled={autofillLoading || isGenerating || !title.trim() || !bookIntroduction.trim()}
+            disabled={autofillLoading || isGenerating}
             className="w-full bg-joy-sun hover:bg-joy-sun/80 text-joy-ink border-2 border-joy-ink/10 shadow-joy rounded-2xl font-semibold"
           >
             {autofillLoading ? (
