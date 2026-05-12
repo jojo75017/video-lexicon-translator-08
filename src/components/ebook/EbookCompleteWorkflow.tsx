@@ -563,7 +563,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
       ? chapter.sousSections.filter(Boolean)
       : [];
 
-    if (totalChapters < 30) {
+    if (totalChapters <= 1) {
       return [{ partNumber: 1, totalParts: 1, sectionTitles: rawSections }];
     }
 
