@@ -263,7 +263,10 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
         setBookIntroduction(data.bookIntroduction || '');
         setHasReadSteps(Boolean(data.hasReadSteps));
         setNumberOfChapters(data.numberOfChapters || 8);
-        setCurrentStepIndex(data.currentStepIndex);
+        const restoredStepIndex = data.currentStepIndex === 0 && Boolean(data.stepResults?.P1 || data.allContext?.P1)
+          ? 1
+          : data.currentStepIndex;
+        setCurrentStepIndex(restoredStepIndex);
         setStepResults(data.stepResults || {});
         setAllContext(data.allContext || {});
 
@@ -398,7 +401,10 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
         setCategory(data.category);
         setAuthorName(data.authorName);
         setNumberOfChapters(data.numberOfChapters);
-        setCurrentStepIndex(data.currentStepIndex);
+        const restoredStepIndex = data.currentStepIndex === 0 && Boolean(data.stepResults?.P1 || data.allContext?.P1)
+          ? 1
+          : data.currentStepIndex;
+        setCurrentStepIndex(restoredStepIndex);
         setStepResults(data.stepResults);
         setAllContext(data.allContext);
         setHasReadSteps(true);
