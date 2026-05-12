@@ -147,7 +147,7 @@ const allToolGroups: ToolGroup[] = [
       { id: 'projects', label: 'Mes Projets', icon: FolderOpen },
       { id: 'ebook-library', label: 'Ma Bibliothèque', icon: Library },
       { id: 'subscription', label: 'Abonnement', icon: CreditCard },
-      { id: 'parrainage', label: '🎁 Parrainage 30€', icon: Gift, isLink: true, href: '/parrainage' },
+      { id: 'parrainage', label: '💰 Affiliation 30%', icon: Gift, isLink: true, href: '/promo/affilie' },
       { id: 'communaute', label: '💬 Communauté', icon: MessageCircle, isLink: true, href: '/communaute' },
       { id: 'settings', label: 'Paramètres', icon: Settings },
       { id: 'admin-subscribers', label: '👥 Mes Abonnés', icon: Users, isLink: true, href: '/admin', adminOnly: true },
