@@ -1221,6 +1221,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
       // Clear saved progress on success
       localStorage.removeItem(STORAGE_KEY);
       setHasSavedProgress(false);
+      autoResumeCountRef.current = 0;
 
       toast.success('✅ Livre généré ! Le contenu a été importé dans l\'onglet "Rédaction".');
       onComplete(bookData);
