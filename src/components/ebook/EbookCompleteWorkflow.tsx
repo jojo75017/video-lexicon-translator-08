@@ -130,6 +130,26 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   const [generatedConclusion, setGeneratedConclusion] = useState('');
 
   const progress = currentStepIndex >= 0 ? ((currentStepIndex + 1) / WORKFLOW_STEP_COUNT) * 100 : 0;
+
+  // Per-agent progress simulation: when a step starts, animate 0 → 95%, snap to 100% on completion
+  useEffect(() => {
+    if (!isGenerating || currentStepIndex < 0) {
+      setActiveStepProgress(0);
+      return;
+    }
+    setActiveStepProgress(3);
+    const interval = setInterval(() => {
+      setActiveStepProgress((p) => {
+        if (p >= 95) return 95;
+        // ease-out: smaller increments as we approach 95
+        const remaining = 95 - p;
+        const inc = Math.max(0.4, remaining * 0.04);
+        return Math.min(95, p + inc);
+      });
+    }, 600);
+    return () => clearInterval(interval);
+  }, [currentStepIndex, isGenerating]);
+
   const normalizedUserApiKey = typeof userApiKey === 'string' ? userApiKey.trim() : '';
   const hasConfiguredApiKey = normalizedUserApiKey.length > 0;
   const hasPlausibleApiKeyFormat = normalizedUserApiKey.startsWith('AIza');
