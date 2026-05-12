@@ -4,6 +4,7 @@ import FunnelLayout from '@/components/funnel/FunnelLayout';
 import SeoHead from '@/components/funnel/SeoHead';
 import { Button } from '@/components/ui/button';
 import { CheckCircle2, Download, ArrowRight } from 'lucide-react';
+import { trackLeadMagnetDownload, trackCTAClick } from '@/utils/analytics';
 
 const PromoMerciPage = () => {
   const location = useLocation();
