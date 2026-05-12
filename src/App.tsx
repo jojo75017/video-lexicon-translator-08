@@ -496,6 +496,14 @@ const App = () => {
               }
             />
             <Route 
+              path="/admin/funnel" 
+              element={
+                <AdminGate>
+                  <AdminFunnelPage />
+                </AdminGate>
+              }
+            />
+            <Route 
               path="/formation" 
               element={<FormationPage />}
             />
