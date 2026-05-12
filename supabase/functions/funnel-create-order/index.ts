@@ -22,20 +22,35 @@ const NICHES_GUIDE_URL = "https://www.ebookstudio.fr/lead-magnets/5-niches-renta
 
 const isValidEmail = (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
 
-async function sendInstructions(email: string, firstName: string, product: string, amount: number, method: string) {
+async function sendInstructions(email: string, firstName: string, productKey: string, product: { label: string; amount: number }, method: string) {
   const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
   if (!RESEND_API_KEY) return false;
 
   const greeting = firstName ? `Bonjour ${firstName},` : "Bonjour,";
   const paymentBlock = `<p><strong>Paiement par PayPal :</strong></p>
-         <p>Envoyez <strong>${amount} €</strong> à l'adresse : <a href="https://paypal.me/ebookstudio/67">paypal.me/ebookstudio</a></p>
+         <p>Envoyez <strong>${product.amount} €</strong> à l'adresse : <a href="https://paypal.me/ebookstudio/${product.amount}">paypal.me/ebookstudio</a></p>
          <p>Précisez votre email <strong>${email}</strong> dans la note du paiement.</p>`;
+
+  const isTemplatesPack = productKey === "templates_premium" || productKey === "upsell_templates";
+  const downloadsBlock = isTemplatesPack ? `
+    <div style="background:#fff;border:2px solid #FF9E2D;border-radius:12px;padding:20px;margin:24px 0">
+      <h2 style="color:#FF9E2D;margin:0 0 12px;font-size:18px">🎁 Vos téléchargements immédiats</h2>
+      <p style="margin:0 0 12px">Voici dès maintenant les fichiers de votre pack :</p>
+      <p style="margin:8px 0">
+        📘 <a href="${TEMPLATES_PACK_URL}" style="color:#008296;font-weight:bold">Télécharger le Pack 50 templates premium (PDF)</a>
+      </p>
+      <p style="margin:8px 0">
+        🎁 <a href="${NICHES_GUIDE_URL}" style="color:#008296;font-weight:bold">Télécharger le Guide niches KDP rentables 2026 (cadeau offert)</a>
+      </p>
+      <p style="font-size:12px;color:#666;margin:12px 0 0">Conservez précieusement ces liens. Licence d'utilisation personnelle, revente interdite.</p>
+    </div>` : "";
 
   const html = `
   <div style="font-family:Inter,Arial,sans-serif;max-width:560px;margin:0 auto;color:#232F3E;background:#FAFAFA;padding:24px;border-radius:12px">
     <h1 style="color:#008296">Votre commande EbookStudio</h1>
     <p>${greeting}</p>
-    <p>Merci pour votre commande : <strong>${product}</strong> (${amount} €).</p>
+    <p>Merci pour votre commande : <strong>${product.label}</strong> (${product.amount} €).</p>
+    ${downloadsBlock}
     ${paymentBlock}
     <p>Dès réception, nous activons votre accès sous 24h ouvrées et vous recevez vos identifiants par email.</p>
     <p>Une question ? Répondez simplement à cet email.</p>
@@ -48,7 +63,7 @@ async function sendInstructions(email: string, firstName: string, product: strin
     body: JSON.stringify({
       from: "EbookStudio <contact@ebookstudio.fr>",
       to: [email],
-      subject: `Instructions de paiement — ${product}`,
+      subject: `Instructions de paiement — ${product.label}`,
       html,
     }),
   });
