@@ -29,6 +29,7 @@ const PromoCommandePage = () => {
   const [method, setMethod] = useState<'stripe' | 'paypal'>('stripe');
   const [loading, setLoading] = useState(false);
   const [showCheckout, setShowCheckout] = useState(false);
+  const [bonuses, setBonuses] = useState<Array<{ key: string; title: string; amount: number }>>([]);
 
   useEffect(() => {
     try {
@@ -36,8 +37,19 @@ const PromoCommandePage = () => {
       const f = localStorage.getItem('ebs_lead_first_name');
       if (e) setEmail(e);
       if (f) setFirstName(f);
+      const b = localStorage.getItem('ebs_selected_bonuses');
+      if (b) setBonuses(JSON.parse(b));
     } catch { /* ignore */ }
   }, []);
+
+  const removeBonus = (key: string) => {
+    const next = bonuses.filter((b) => b.key !== key);
+    setBonuses(next);
+    try { localStorage.setItem('ebs_selected_bonuses', JSON.stringify(next)); } catch {}
+  };
+
+  const bonusTotal = bonuses.reduce((s, b) => s + b.amount, 0);
+  const totalAmount = PRODUCT.amount + bonusTotal;
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,7 +74,8 @@ const PromoCommandePage = () => {
           email: parsed.data.email,
           first_name: parsed.data.first_name,
           product_key: PRODUCT.key,
-          amount: PRODUCT.amount,
+          amount: totalAmount,
+          bonuses,
           payment_method: 'paypal',
           ref_code: getStoredRefCode(),
         },
