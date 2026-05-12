@@ -191,9 +191,9 @@ export const SimpleSidebar: React.FC<SimpleSidebarProps> = ({
           const active = isStepActive(item);
 
           return (
+            <React.Fragment key={item.id}>
             <button
-              key={item.id}
-              onClick={() => onTabChange(item.id)}
+              onClick={() => onTabChange(item.id === 'images' ? 'images-library' : item.id)}
               title={`${item.label} - ${item.hint}`}
               className={cn(
                 'w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group text-left',
@@ -268,6 +268,32 @@ export const SimpleSidebar: React.FC<SimpleSidebarProps> = ({
                 />
               )}
             </button>
+
+            {item.id === 'images' && !isCollapsed && (
+              <div className="ml-12 mt-1 mb-2 space-y-1">
+                {IMAGE_SUBTABS.map((subtab) => {
+                  const SubIcon = subtab.icon;
+                  const subActive = activeTab === subtab.id || (subtab.id === 'images-cover' && activeTab === 'images');
+
+                  return (
+                    <button
+                      key={subtab.id}
+                      onClick={() => onTabChange(subtab.id)}
+                      className={cn(
+                        'w-full flex items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium transition-colors',
+                        subActive
+                          ? 'bg-primary text-primary-foreground'
+                          : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground'
+                      )}
+                    >
+                      <SubIcon className="h-3.5 w-3.5 flex-shrink-0" />
+                      <span className="truncate">{subtab.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+            </React.Fragment>
           );
         })}
 
