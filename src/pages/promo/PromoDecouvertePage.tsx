@@ -187,7 +187,7 @@ const PromoDecouvertePage = () => {
           <p className="text-lg opacity-90">Rejoignez les centaines d'auteurs qui publient avec EbookStudio.</p>
           <Link to="/promo/commande">
             <Button className="bg-[#FF9E2D] hover:bg-[#e88f1f] text-white font-bold py-6 px-8 text-base">
-              🚀 Commander — 67€/an
+              🚀 Commander — 67€ à vie
             </Button>
           </Link>
         </div>
