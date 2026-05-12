@@ -51,7 +51,7 @@ const PromoEspacePage = () => {
   }, [email]);
 
   const productLabel = (k: string) => {
-    if (k === 'main_yearly') return 'EbookStudio — Abonnement annuel';
+    if (k === 'main' || k === 'main_yearly') return 'EbookStudio — Accès à vie';
     if (k === 'license_extended') return 'Licence commerciale étendue';
     if (k === 'templates_premium') return 'Pack 50 templates premium';
     return k;
