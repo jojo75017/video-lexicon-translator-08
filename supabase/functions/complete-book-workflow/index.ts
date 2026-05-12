@@ -45,7 +45,7 @@ let totalTokenUsage = {
 };
 
 async function callGeminiDirect(systemPrompt: string, userPrompt: string, maxTokens: number, apiKey: string, retryCount = 0): Promise<string> {
-  const MAX_RETRIES = 3;
+  const MAX_RETRIES = maxTokens >= 5000 ? 0 : 1;
   const cleanKey = apiKey.trim();
   
   // Pre-flight: vérifier le format de la clé Gemini
@@ -55,16 +55,33 @@ async function callGeminiDirect(systemPrompt: string, userPrompt: string, maxTok
   
   console.log(`[Gemini] Using key: length=${cleanKey.length}, prefix=${cleanKey.substring(0, 8)}..., retry=${retryCount}`);
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${cleanKey}`;
-  
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      system_instruction: { parts: [{ text: `${systemPrompt}\n\n${EDITORIAL_PRO_RULES}` }] },
-      contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
-      generationConfig: { maxOutputTokens: maxTokens, temperature: 0.7 },
-    }),
-  });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), maxTokens >= 5000 ? 115000 : 90000);
+  let response: Response | null = null;
+
+  try {
+    response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        system_instruction: { parts: [{ text: `${systemPrompt}\n\n${EDITORIAL_PRO_RULES}` }] },
+        contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+        generationConfig: { maxOutputTokens: maxTokens, temperature: 0.7 },
+      }),
+      signal: controller.signal,
+    });
+  } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error('TIMEOUT: La génération Gemini a dépassé le délai sécurisé. Le workflow va reprendre automatiquement.');
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+
+  if (!response) {
+    throw new Error('TIMEOUT: Aucune réponse Gemini reçue. Le workflow va reprendre automatiquement.');
+  }
 
   if (!response.ok) {
     const status = response.status;
@@ -167,11 +184,17 @@ async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
       console.warn('User Gemini key failed, falling back to Lovable AI:', msg);
+      if (/TIMEOUT|RATE_LIMIT|GEMINI_OVERLOAD|Gemini Error: 5/i.test(msg)) {
+        throw error;
+      }
       try {
         return await callLovableAI(finalSystemPrompt, userPrompt, maxTokens);
       } catch (fallbackErr) {
         const fbMsg = fallbackErr instanceof Error ? fallbackErr.message : String(fallbackErr);
         console.warn('Lovable AI fallback failed, retrying Gemini after long wait:', fbMsg);
+        if (/TIMEOUT|RATE_LIMIT|GEMINI_OVERLOAD|CREDITS_EXHAUSTED|LOVABLE_AI_ERROR/i.test(fbMsg)) {
+          throw fallbackErr;
+        }
         // Dernier recours : attendre 30s et retenter Gemini une fois
         await new Promise((r) => setTimeout(r, 30000));
         return await callGeminiDirect(finalSystemPrompt, userPrompt, maxTokens, userKey);
@@ -782,9 +805,9 @@ function getP4GenerationSettings(numberOfChapters: number) {
     targetWords: isVeryLargeProject ? 1600 : 3000,
     maxWords: isVeryLargeProject ? 1900 : 3500,
     minScore: isVeryLargeProject ? 7 : 8,
-    maxRetries: isVeryLargeProject ? 0 : 1,
+    maxRetries: 0,
     previousChapterChars: isVeryLargeProject ? 400 : 800,
-    segmentCount: isVeryLargeProject ? 2 : 1,
+    segmentCount: 2,
   };
 }
 

@@ -563,7 +563,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
       ? chapter.sousSections.filter(Boolean)
       : [];
 
-    if (totalChapters < 30) {
+    if (totalChapters <= 1) {
       return [{ partNumber: 1, totalParts: 1, sectionTitles: rawSections }];
     }
 
@@ -1239,7 +1239,18 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
       const friendly = getFriendlyError(err);
       setError(friendly);
       // Save progress on error so user can resume
-      saveProgress();
+      const latestStepResults: Record<string, { result: any; displayContent: string }> = { ...stepResults };
+      Object.entries(context).forEach(([stepId, resultValue]) => {
+        if (!latestStepResults[stepId]) {
+          latestStepResults[stepId] = {
+            result: resultValue,
+            displayContent: stepId === 'P4'
+              ? `**📄 Chapitres rédigés : ${(resultValue as any)?.chapitres?.length || 0}/${context.P3?.chapitres?.length || numberOfChapters}**`
+              : 'Résultat sauvegardé pour reprise.',
+          };
+        }
+      });
+      saveProgress({ currentStepIndex: lastStepI, stepResults: latestStepResults, allContext: { ...context } });
       const stepLabel = WORKFLOW_STEPS[lastStepI]?.id ? `Étape ${WORKFLOW_STEPS[lastStepI].id} : ` : '';
 
       // ⏯️ AUTO-REPRISE : si l'erreur est transitoire (rate limit, surcharge, timeout), on relance tout seul
@@ -1255,7 +1266,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
         if (autoResumeTimerRef.current) clearTimeout(autoResumeTimerRef.current);
         autoResumeTimerRef.current = setTimeout(() => {
           if (!cancelRef.current) {
-            generateCompleteBook(lastStepI, { ...allContext });
+            generateCompleteBook(lastStepI, { ...context });
           }
         }, waitSec * 1000);
       } else {
