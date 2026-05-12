@@ -1311,6 +1311,11 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
           }
           extraContext = { ...data.allContext, ...extraContext };
         }
+
+        // Compatibilité avec les anciennes sauvegardes créées quand P1 demandait une validation manuelle.
+        if (resumeIndex === 0 && (data.stepResults?.P1 || data.allContext?.P1)) {
+          resumeIndex = 1;
+        }
       }
     } catch (e) {
       console.error('Error resuming workflow from progress:', e);
