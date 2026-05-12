@@ -128,9 +128,12 @@ ${formatGuidance}
 - No watermarks, no logos, no UI mockups, no Amazon badges, NO 3D book mockup.
 ${referenceImage ? '- Use the attached reference image ONLY for stylistic inspiration (mood, palette, composition). Do NOT copy it.' : ''}`;
 
-    const userContent: any[] = [{ type: "text", text: textPrompt }];
+    let messageContent: string | any[] = textPrompt;
     if (referenceImage && typeof referenceImage === 'string' && referenceImage.length < 6_000_000) {
-      userContent.push({ type: "image_url", image_url: { url: referenceImage } });
+      messageContent = [
+        { type: "text", text: textPrompt },
+        { type: "image_url", image_url: { url: referenceImage } },
+      ];
     }
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -138,7 +141,7 @@ ${referenceImage ? '- Use the attached reference image ONLY for stylistic inspir
       headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({
         model: "google/gemini-3-pro-image-preview",
-        messages: [{ role: "user", content: userContent }],
+        messages: [{ role: "user", content: messageContent }],
         modalities: ["image", "text"],
       }),
     });

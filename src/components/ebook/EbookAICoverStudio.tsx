@@ -215,8 +215,9 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
           ? 'Couverture Kindle générée !'
           : 'Couverture Broché complète générée !'
       );
-    } catch (err: any) {
-      toast.error(err.message || 'Erreur lors de la génération');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Erreur lors de la génération';
+      toast.error(message);
     } finally {
       setIsGenerating(false);
     }
@@ -568,128 +569,129 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
           </CardContent>
         </Card>
 
-        {/* Gallery */}
-        <Card className="lg:col-span-2">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <ImageIcon className="h-5 w-5" /> Couvertures générées ({generatedCovers.length})
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {generatedCovers.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
-                <Palette className="h-16 w-16 mb-4 opacity-20" />
-                <p className="text-lg">Aucune couverture générée</p>
-                <p className="text-sm">Choisissez le format Kindle ou Broché et lancez une génération</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 gap-6">
-                {generatedCovers.map((cover, i) => (
-                  <div key={i} className="rounded-lg border bg-muted/20 overflow-hidden">
-                    <div className="flex items-center justify-between p-3 border-b bg-background/50">
-                      <Badge className="bg-primary/10 text-primary border-primary/30">
-                        {cover.format === 'kindle' ? '📱 Kindle eBook' : '📖 Broché complet (face + dos + 4ème)'}
-                      </Badge>
-                      <div className="flex gap-2">
-                        <Button size="sm" variant="outline" onClick={() => downloadCover(cover, i)}>
-                          <Download className="h-3 w-3 mr-1" /> Télécharger
-                        </Button>
-                        <Button
-                          size="sm"
-                          onClick={() => {
-                            onCoverGenerated?.(cover.url);
-                            toast.success('Couverture sélectionnée');
-                          }}
-                        >
-                          ✓ Utiliser cette couverture
-                        </Button>
-                      </div>
+      </div>
+      )}
+
+      {/* Gallery */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <ImageIcon className="h-5 w-5" /> Couvertures générées ({generatedCovers.length})
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {generatedCovers.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
+              <Palette className="h-16 w-16 mb-4 opacity-20" />
+              <p className="text-lg">Aucune couverture générée</p>
+              <p className="text-sm">Saisissez le titre puis lancez la génération en 1 clic</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-6">
+              {generatedCovers.map((cover, i) => (
+                <div key={i} className="rounded-lg border bg-muted/20 overflow-hidden">
+                  <div className="flex items-center justify-between p-3 border-b bg-background/50">
+                    <Badge className="bg-primary/10 text-primary border-primary/30">
+                      {cover.format === 'kindle' ? '📱 Kindle eBook' : '📖 Broché complet (face + dos + 4ème)'}
+                    </Badge>
+                    <div className="flex gap-2">
+                      <Button size="sm" variant="outline" onClick={() => downloadCover(cover, i)}>
+                        <Download className="h-3 w-3 mr-1" /> Télécharger
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          onCoverGenerated?.(cover.url);
+                          toast.success('Couverture sélectionnée');
+                        }}
+                      >
+                        ✓ Utiliser cette couverture
+                      </Button>
                     </div>
+                  </div>
 
-                    <div className="relative bg-muted">
-                      <img
-                        src={cover.url}
-                        alt={`Couverture ${i + 1}`}
-                        className={`w-full object-contain ${
-                          cover.format === 'kindle' ? 'max-h-[600px]' : 'max-h-[420px]'
-                        }`}
-                      />
+                  <div className="relative bg-muted">
+                    <img
+                      src={cover.url}
+                      alt={`Couverture ${i + 1}`}
+                      className={`w-full object-contain ${
+                        cover.format === 'kindle' ? 'max-h-[600px]' : 'max-h-[420px]'
+                      }`}
+                    />
 
-                      {/* Overlay repères broché */}
-                      {cover.format === 'paperback' && (
-                        <svg
-                          className="absolute inset-0 w-full h-full pointer-events-none"
-                          viewBox="0 0 100 60"
-                          preserveAspectRatio="none"
-                        >
-                          {/* Marge de sécurité 3mm (≈3% du wrap) */}
-                          <rect x="3" y="3" width="94" height="54" fill="none" stroke="hsl(var(--primary))" strokeWidth="0.15" strokeDasharray="0.5,0.5" opacity="0.7" />
-                          {/* Séparateurs panneaux : back | spine | front */}
-                          <line x1="46" y1="0" x2="46" y2="60" stroke="hsl(var(--primary))" strokeWidth="0.2" strokeDasharray="0.8,0.4" opacity="0.8" />
-                          <line x1="54" y1="0" x2="54" y2="60" stroke="hsl(var(--primary))" strokeWidth="0.2" strokeDasharray="0.8,0.4" opacity="0.8" />
-                          {/* Zone ISBN (bas droit du panneau back) */}
-                          <rect x="33" y="46" width="11" height="9" fill="hsl(var(--primary) / 0.15)" stroke="hsl(var(--primary))" strokeWidth="0.2" />
-                        </svg>
-                      )}
-
-                      {cover.format === 'paperback' && (
-                        <div className="absolute inset-x-0 bottom-0 bg-background/85 backdrop-blur-sm border-t px-3 py-2 flex flex-wrap gap-3 text-[11px]">
-                          <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-primary" /> Marge sécurité 3mm</span>
-                          <span className="flex items-center gap-1"><span className="w-3 h-0.5 border-t border-dashed border-primary" /> Pliures dos</span>
-                          <span className="flex items-center gap-1"><span className="w-3 h-2 bg-primary/30 border border-primary" /> Zone ISBN (5×3 cm)</span>
-                          <span className="ml-auto text-muted-foreground">4ème · Dos · Face</span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Spec dimensions broché */}
-                    {cover.format === 'paperback' && cover.paperbackSpec && (
-                      <div className="px-3 py-2 border-t bg-muted/30 text-[11px] flex flex-wrap gap-x-4 gap-y-1">
-                        <span className="flex items-center gap-1 font-semibold"><Ruler className="w-3 h-3" /> Spec calculée :</span>
-                        <span>Trim <strong>{cover.paperbackSpec.trim}</strong></span>
-                        <span>Dos <strong>{cover.paperbackSpec.spineMm} mm</strong>{cover.paperbackSpec.pages ? ` (${cover.paperbackSpec.pages} p.)` : ''}</span>
-                        <span>Wrap total <strong>{cover.paperbackSpec.totalWmm} × {cover.paperbackSpec.totalHmm} mm</strong></span>
-                        <span>Bleed <strong>{cover.paperbackSpec.bleed} mm</strong></span>
-                      </div>
+                    {/* Overlay repères broché */}
+                    {cover.format === 'paperback' && (
+                      <svg
+                        className="absolute inset-0 w-full h-full pointer-events-none"
+                        viewBox="0 0 100 60"
+                        preserveAspectRatio="none"
+                      >
+                        {/* Marge de sécurité 3mm (≈3% du wrap) */}
+                        <rect x="3" y="3" width="94" height="54" fill="none" stroke="hsl(var(--primary))" strokeWidth="0.15" strokeDasharray="0.5,0.5" opacity="0.7" />
+                        {/* Séparateurs panneaux : back | spine | front */}
+                        <line x1="46" y1="0" x2="46" y2="60" stroke="hsl(var(--primary))" strokeWidth="0.2" strokeDasharray="0.8,0.4" opacity="0.8" />
+                        <line x1="54" y1="0" x2="54" y2="60" stroke="hsl(var(--primary))" strokeWidth="0.2" strokeDasharray="0.8,0.4" opacity="0.8" />
+                        {/* Zone ISBN (bas droit du panneau back) */}
+                        <rect x="33" y="46" width="11" height="9" fill="hsl(var(--primary) / 0.15)" stroke="hsl(var(--primary))" strokeWidth="0.2" />
+                      </svg>
                     )}
 
-                    {/* Prompts recto + verso à copier */}
-                    {cover.prompts && (
-                      <div className="border-t bg-background p-3 space-y-3">
-                        <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
-                          <Sparkles className="w-3.5 h-3.5 text-primary" />
-                          Prompts professionnels prêts à copier (MidJourney, DALL·E, Imagen, Firefly…)
-                        </div>
-                        <div className="grid md:grid-cols-2 gap-3">
-                          <div className="rounded-lg border bg-muted/20 p-2 space-y-1.5">
-                            <div className="flex items-center justify-between">
-                              <Badge variant="outline" className="text-[10px]">RECTO · Face</Badge>
-                              <Button size="sm" variant="ghost" className="h-6 px-2 text-[11px]" onClick={() => copyPrompt(cover.prompts!.recto, 'recto')}>
-                                <Copy className="w-3 h-3 mr-1" /> Copier
-                              </Button>
-                            </div>
-                            <Textarea readOnly value={cover.prompts.recto} className="text-[11px] min-h-[120px] font-mono" />
-                          </div>
-                          <div className="rounded-lg border bg-muted/20 p-2 space-y-1.5">
-                            <div className="flex items-center justify-between">
-                              <Badge variant="outline" className="text-[10px]">VERSO · 4ème</Badge>
-                              <Button size="sm" variant="ghost" className="h-6 px-2 text-[11px]" onClick={() => copyPrompt(cover.prompts!.verso, 'verso')}>
-                                <Copy className="w-3 h-3 mr-1" /> Copier
-                              </Button>
-                            </div>
-                            <Textarea readOnly value={cover.prompts.verso} className="text-[11px] min-h-[120px] font-mono" />
-                          </div>
-                        </div>
+                    {cover.format === 'paperback' && (
+                      <div className="absolute inset-x-0 bottom-0 bg-background/85 backdrop-blur-sm border-t px-3 py-2 flex flex-wrap gap-3 text-[11px]">
+                        <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-primary" /> Marge sécurité 3mm</span>
+                        <span className="flex items-center gap-1"><span className="w-3 h-0.5 border-t border-dashed border-primary" /> Pliures dos</span>
+                        <span className="flex items-center gap-1"><span className="w-3 h-2 bg-primary/30 border border-primary" /> Zone ISBN (5×3 cm)</span>
+                        <span className="ml-auto text-muted-foreground">4ème · Dos · Face</span>
                       </div>
                     )}
                   </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-      )}
+
+                  {/* Spec dimensions broché */}
+                  {cover.format === 'paperback' && cover.paperbackSpec && (
+                    <div className="px-3 py-2 border-t bg-muted/30 text-[11px] flex flex-wrap gap-x-4 gap-y-1">
+                      <span className="flex items-center gap-1 font-semibold"><Ruler className="w-3 h-3" /> Spec calculée :</span>
+                      <span>Trim <strong>{cover.paperbackSpec.trim}</strong></span>
+                      <span>Dos <strong>{cover.paperbackSpec.spineMm} mm</strong>{cover.paperbackSpec.pages ? ` (${cover.paperbackSpec.pages} p.)` : ''}</span>
+                      <span>Wrap total <strong>{cover.paperbackSpec.totalWmm} × {cover.paperbackSpec.totalHmm} mm</strong></span>
+                      <span>Bleed <strong>{cover.paperbackSpec.bleed} mm</strong></span>
+                    </div>
+                  )}
+
+                  {/* Prompts recto + verso à copier */}
+                  {cover.prompts && (
+                    <div className="border-t bg-background p-3 space-y-3">
+                      <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
+                        <Sparkles className="w-3.5 h-3.5 text-primary" />
+                        Prompts professionnels prêts à copier (MidJourney, DALL·E, Imagen, Firefly…)
+                      </div>
+                      <div className="grid md:grid-cols-2 gap-3">
+                        <div className="rounded-lg border bg-muted/20 p-2 space-y-1.5">
+                          <div className="flex items-center justify-between">
+                            <Badge variant="outline" className="text-[10px]">RECTO · Face</Badge>
+                            <Button size="sm" variant="ghost" className="h-6 px-2 text-[11px]" onClick={() => copyPrompt(cover.prompts!.recto, 'recto')}>
+                              <Copy className="w-3 h-3 mr-1" /> Copier
+                            </Button>
+                          </div>
+                          <Textarea readOnly value={cover.prompts.recto} className="text-[11px] min-h-[120px] font-mono" />
+                        </div>
+                        <div className="rounded-lg border bg-muted/20 p-2 space-y-1.5">
+                          <div className="flex items-center justify-between">
+                            <Badge variant="outline" className="text-[10px]">VERSO · 4ème</Badge>
+                            <Button size="sm" variant="ghost" className="h-6 px-2 text-[11px]" onClick={() => copyPrompt(cover.prompts!.verso, 'verso')}>
+                              <Copy className="w-3 h-3 mr-1" /> Copier
+                            </Button>
+                          </div>
+                          <Textarea readOnly value={cover.prompts.verso} className="text-[11px] min-h-[120px] font-mono" />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };
