@@ -2244,6 +2244,14 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
                       <div className="flex items-center gap-2 flex-wrap">
                         <Badge variant="outline" className="border-primary/30 text-primary">{agent.id}</Badge>
                         <span className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Agent {agent.sequence}</span>
+                        {agent.codename && (
+                          <Badge className="bg-primary/20 text-primary border border-primary/30">🤖 {agent.codename}</Badge>
+                        )}
+                        {agent.status === 'active' && (
+                          <Badge className="bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/40">
+                            {Math.round(activeStepProgress)}%
+                          </Badge>
+                        )}
                       </div>
                       <h3 className="mt-2 text-lg font-semibold text-foreground">{agent.agentTitle}</h3>
                       <p className="text-sm font-medium text-foreground/80">{agent.agentSubtitle}</p>
@@ -2253,6 +2261,9 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
                     <p className="text-sm font-medium text-foreground">{agent.name}</p>
                     <p className="text-sm text-muted-foreground">{agent.description}</p>
                     <p className="text-sm text-muted-foreground">{agent.agentMission}</p>
+                    {agent.status === 'active' && (
+                      <Progress value={activeStepProgress} className="h-2 mt-2" />
+                    )}
                   </div>
                 </div>
               );
