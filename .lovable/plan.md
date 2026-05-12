@@ -1,39 +1,42 @@
 ## Objectif
-Préparer le tunnel pour le lancement affilié du **1er juillet** : corriger le bug PDF, ajuster l'upsell templates à 25€ et y inclure le guide 10 niches en cadeau.
+Te permettre de voir, depuis l'admin, qui s'est inscrit via le formulaire `/promo` (lead magnet 5 niches), qui a commandé (67€ et upsells), et combien chaque affilié a généré de commissions — sans avoir à ouvrir la base de données.
 
-## 1. Fix bug PDF cadeau (urgent — déjà signalé)
-Dans `supabase/functions/funnel-capture-lead/index.ts`, la constante `LEAD_MAGNET_URL` pointe vers `5-niches-rentables-ebooks-2026.pdf` mais le fichier réel est `5-niches-rentables-2026.pdf` → 404 sur `/promo/merci` et dans l'email Resend.
+## Ce qui sera ajouté
 
-**Correctif** : remplacer par `https://ebookstudio.fr/lead-magnets/5-niches-rentables-2026.pdf`.
+### 1. Nouvelle page admin `/admin/funnel`
+Accessible uniquement aux admins (vérifié via `has_role(uid, 'admin')`), avec 3 onglets :
 
-## 2. Upsell "Pack 50 templates premium" → 25€ + bonus niches
-Dans `src/pages/promo/PromoBonusPage.tsx`, modifier l'objet `templates_premium` :
+**Onglet "Leads" (inscriptions formulaire)**
+- Tableau : Email · Prénom · Date d'inscription · Code parrain (si présent) · Source UTM · Guide envoyé ✅/❌
+- Filtre période : 24h / 7j / 30j / tout
+- Recherche par email
+- Compteurs en haut : Total leads · Leads 7j · Leads avec parrain
+- Bouton export CSV
 
-- **Prix** : `27` → `25`
-- **Description** : ajouter mention du bonus
-- **Bénéfices** : ajouter en tête une ligne `🎁 BONUS offert : Guide PDF "10 niches KDP rentables 2026"`
-- **Visuel** : ajouter un petit badge orange "+ Cadeau 10 niches inclus" sur la carte
+**Onglet "Commandes"**
+- Tableau : Email · Produit (main 67€ / licence 47€ / pack 25€) · Montant · Statut (pending/paid) · Méthode (stripe/paypal) · Date · Affilié
+- Filtre statut : tous / payé / en attente
+- Compteurs : CA total · CA 7j · Commandes payées · En attente
+- Bouton export CSV
 
-Note : il n'y a qu'**un seul** upsell templates dans le code, pas deux. L'autre upsell est la "Licence commerciale étendue" à 47€ — on ne la touche pas.
+**Onglet "Affiliés & Commissions"**
+- Tableau par affilié : Email affilié · Code · Nb clics · Nb commandes · Commissions totales · À payer · Payé
+- Lien vers détail des commissions de chaque affilié
 
-## 3. Livraison du pack templates (Drive)
-Le lien Drive partagé (`15Dtc44dPNoy8VImg2CtMBzCvSM7seJa7`) est sur ton compte personnel et n'est pas accessible via le connecteur (qui n'est pas connecté). 
+### 2. Lien d'accès dans l'admin existant
+Ajout d'une carte "Tunnel d'acquisition" dans la page admin principale (`AdminPage.tsx`) qui mène vers `/admin/funnel`.
 
-**Question** : comment veux-tu livrer le pack templates après achat ?
-- **Option A** (le plus simple) : tu me partages le fichier (download depuis Drive et upload ici), je le mets dans `public/downloads/pack-50-templates.pdf` et l'email de confirmation contient le lien direct
-- **Option B** : je laisse le lien Drive public (`https://drive.google.com/file/d/15Dtc44dPNoy8VImg2CtMBzCvSM7seJa7/view`) dans l'email de livraison, en passant le partage en "Toute personne avec le lien"
+### 3. Test du formulaire en live (recommandé après build)
+Une fois la page admin déployée, tu testes toi-même : tu vas sur `/promo`, tu remplis avec ton vrai email, tu valides → tu devrais recevoir le PDF dans ta boîte ET voir ta ligne apparaître dans l'onglet "Leads".
 
-→ je pars sur **Option A** par défaut (plus pro, pas de risque de fuite/suppression). Si tu préfères B, dis-le moi avant impl.
-
-## 4. Email de livraison du pack
-Étendre l'edge function `funnel-confirm-payment` (ou créer `funnel-deliver-upsell` si elle n'existe pas) pour, quand `product_key = 'templates_premium'` est marqué payé, envoyer via Resend un email contenant :
-- Lien de téléchargement du pack templates
-- Lien de téléchargement du guide 10 niches (cadeau)
-
-## 5. Préparation lancement affilié 1er juillet
-- Vérifier que `/promo/affilie` est accessible et que le code affilié se génère bien
-- Vérifier que `funnel_orders` → trigger `handle_funnel_order_paid` crée bien la commission 30% sur les ventes (déjà en place, juste tester un flux complet en sandbox)
-- Tester le flux complet : `/promo?ref=CODE` → email → `/promo/merci` (PDF) → `/promo/decouverte` → `/promo/commande` → `/promo/bonus` (upsell 25€) → `/promo/espace`
+## Détails techniques
+- 1 nouveau fichier : `src/pages/admin/AdminFunnelPage.tsx`
+- 1 route ajoutée dans `App.tsx` : `/admin/funnel` protégée par `AdminGuard`
+- Composants shadcn déjà présents : Tabs, Table, Card, Badge, Input
+- Requêtes Supabase directes (RLS admin déjà OK sur les 3 tables)
+- Aucune migration nécessaire — les RLS `Admins manage leads/orders` existent déjà
 
 ## Hors scope
-Pas de redesign, pas de nouveau tunnel, pas de modif sur la licence étendue à 47€.
+- Pas de modification du formulaire `/promo` (il fonctionne, juste pas encore testé)
+- Pas de notification temps-réel (rafraîchissement manuel)
+- Pas de graphiques (juste tableaux + compteurs)
