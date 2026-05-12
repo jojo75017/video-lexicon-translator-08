@@ -2466,9 +2466,17 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
         );
       
       case 'images':
+      case 'images-cover':
+      case 'images-generator':
+      case 'images-library':
+        const imageStudioTab = activeTab === 'images-generator' ? 'generator' : activeTab === 'images-library' ? 'library' : 'cover';
         return (
           <div className="space-y-6 animate-fade-in">
-            <Tabs defaultValue="cover" className="w-full">
+            <Tabs
+              value={imageStudioTab}
+              onValueChange={(value) => setActiveTab(value === 'library' ? 'images-library' : value === 'generator' ? 'images-generator' : 'images-cover')}
+              className="w-full"
+            >
               <TabsList className="grid grid-cols-3 w-full max-w-2xl">
                 <TabsTrigger value="cover">
                   <BookOpen className="w-4 h-4 mr-2" />
