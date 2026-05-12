@@ -2464,6 +2464,47 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           />
         );
       
+      case 'images':
+        return (
+          <div className="space-y-6 animate-fade-in">
+            <Tabs defaultValue="generator" className="w-full">
+              <TabsList className="grid grid-cols-2 w-full max-w-xl">
+                <TabsTrigger value="generator">
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Générateur d'images IA
+                </TabsTrigger>
+                <TabsTrigger value="library">
+                  <ImageIcon className="w-4 h-4 mr-2" />
+                  Bibliothèque d'images
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="generator" className="mt-6">
+                <EbookChapterImageGenerator
+                  ebookTitle={ebookTitle}
+                  chapters={chapters}
+                  characters={characters}
+                  ebookImages={ebookImages as any}
+                  onImagesUpdate={(imgs) => setEbookImages(imgs as any)}
+                  onInsertImageToChapter={(chapterId, url) => {
+                    const chapter = chapters.find(c => c.id === chapterId);
+                    if (chapter) {
+                      updateChapterContent(chapterId, (chapter.content || '') + `\n\n![Image](${url})\n\n`);
+                    }
+                  }}
+                />
+              </TabsContent>
+              <TabsContent value="library" className="mt-6">
+                <EbookImageLibrary
+                  ebookTitle={ebookTitle}
+                  onImageSelect={(url) => {
+                    setEbookImages(prev => [{ url, title: 'Image bibliothèque' }, ...prev]);
+                  }}
+                />
+              </TabsContent>
+            </Tabs>
+          </div>
+        );
+
       case 'cover':
         // Bloquer la couverture en mode démo
         if (isDemo) {
