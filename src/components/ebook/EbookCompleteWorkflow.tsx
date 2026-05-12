@@ -2357,13 +2357,18 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
                       </div>
                       
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <Badge 
                             variant={isCompleted ? 'default' : isActive ? 'secondary' : 'outline'} 
                             className="text-xs"
                           >
                             {step.id}
                           </Badge>
+                          {step.codename && (
+                            <Badge className="text-xs bg-primary/15 text-primary border border-primary/30">
+                              🤖 {step.codename}
+                            </Badge>
+                          )}
                           <span className={`font-medium ${isActive ? 'text-primary' : ''}`}>
                             {step.name}
                           </span>
@@ -2371,11 +2376,14 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
                         <p className="text-sm text-muted-foreground truncate">
                           {step.description}
                         </p>
+                        {isActive && (
+                          <Progress value={activeStepProgress} className="h-1.5 mt-2" />
+                        )}
                       </div>
 
                       {isActive && (
-                        <div className="text-xs text-primary font-medium animate-pulse">
-                          En cours...
+                        <div className="text-xs text-primary font-semibold animate-pulse whitespace-nowrap">
+                          {Math.round(activeStepProgress)}% · En cours…
                         </div>
                       )}
                       
