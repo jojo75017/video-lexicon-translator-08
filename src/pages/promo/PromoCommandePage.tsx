@@ -11,7 +11,7 @@ import { useReferralTracking, getStoredRefCode } from '@/hooks/useReferralTracki
 import { toast } from 'sonner';
 import { Loader2, Check, Lock, ShieldCheck, CreditCard, Zap } from 'lucide-react';
 import { PromoStripeCheckout } from '@/components/promo/PromoStripeCheckout';
-import { PaymentTestModeBanner } from '@/components/PaymentTestModeBanner';
+
 
 const schema = z.object({
   first_name: z.string().trim().max(80).optional(),
