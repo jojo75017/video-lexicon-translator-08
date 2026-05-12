@@ -33,6 +33,18 @@ Deno.serve(async (req) => {
     const environment: StripeEnv = body.environment === "live" ? "live" : "sandbox";
     const returnUrl = String(body.returnUrl || "").trim();
 
+    // Validate optional bonuses payload
+    const rawBonuses = Array.isArray(body.bonuses) ? body.bonuses : [];
+    const bonuses = rawBonuses
+      .map((b: any) => ({
+        key: String(b?.key || "").slice(0, 64),
+        title: String(b?.title || "").slice(0, 120),
+        amount: Number(b?.amount) || 0,
+      }))
+      .filter((b: any) => b.key && b.title && b.amount > 0 && b.amount <= 500);
+    const bonusTotal = bonuses.reduce((s: number, b: any) => s + b.amount, 0);
+    const totalAmount = AMOUNT_EUR + bonusTotal;
+
     if (!isValidEmail(email)) {
       return new Response(JSON.stringify({ error: "Email invalide" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -49,24 +61,25 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    // 1. Insert pending order
+    // 1. Insert pending order with TOTAL amount (base + bonuses)
     const { data: order, error: orderErr } = await supabase
       .from("funnel_orders")
       .insert({
         email,
         first_name: first_name || null,
         product_key: "main",
-        amount: AMOUNT_EUR,
+        amount: totalAmount,
         currency: "EUR",
         payment_method: "stripe",
         status: "pending",
         ref_code,
+        metadata: bonuses.length > 0 ? { bonuses } : null,
       })
       .select("id")
       .single();
     if (orderErr) throw orderErr;
 
-    // 2. Resolve Stripe price by lookup_key
+    // 2. Resolve Stripe price by lookup_key for the base product
     const prices = await stripeRequest<{ data: any[] }>(
       environment, "GET", "/prices",
       { lookup_keys: [PRICE_LOOKUP_KEY], active: true, limit: 1 },
@@ -76,7 +89,20 @@ Deno.serve(async (req) => {
     }
     const stripePriceId = prices.data[0].id;
 
-    // 3. Create embedded checkout session
+    // 3. Build line_items: base product + each bonus as inline price_data
+    const lineItems: any[] = [{ price: stripePriceId, quantity: 1 }];
+    for (const b of bonuses) {
+      lineItems.push({
+        price_data: {
+          currency: "eur",
+          product_data: { name: b.title },
+          unit_amount: Math.round(b.amount * 100),
+        },
+        quantity: 1,
+      });
+    }
+
+    // 4. Create embedded checkout session
     const session = await stripeRequest<{ id: string; client_secret: string }>(
       environment, "POST", "/checkout/sessions",
       {
@@ -84,11 +110,12 @@ Deno.serve(async (req) => {
         ui_mode: "embedded",
         return_url: returnUrl,
         customer_email: email,
-        line_items: [{ price: stripePriceId, quantity: 1 }],
+        line_items: lineItems,
         metadata: {
           order_id: order.id,
           ref_code: ref_code || "",
           product: "ebookstudio_lifetime",
+          bonus_keys: bonuses.map((b: any) => b.key).join(",") || "",
         },
         payment_intent_data: {
           metadata: { order_id: order.id, ref_code: ref_code || "" },
