@@ -48,7 +48,7 @@ const ROBOT_CODENAMES: Record<string, string> = {
   P15: 'Orin',
 };
 
-export const WORKFLOW_STEPS: WorkflowStepDefinition[] = [
+export const WORKFLOW_STEPS: WorkflowStepDefinition[] = ([
   {
     id: 'P1',
     name: "L'Éditeur",
