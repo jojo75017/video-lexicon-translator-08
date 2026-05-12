@@ -132,7 +132,7 @@ serve(async (req) => {
       console.warn("payment_confirmations mirror failed:", (e as Error).message);
     }
 
-    await sendInstructions(email, first_name, product.label, product.amount, payment_method);
+    await sendInstructions(email, first_name, product_key, product, payment_method);
 
     return new Response(JSON.stringify({ ok: true, order_id: order.id }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
