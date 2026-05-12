@@ -57,7 +57,7 @@ async function callGeminiDirect(systemPrompt: string, userPrompt: string, maxTok
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${cleanKey}`;
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), maxTokens >= 5000 ? 115000 : 90000);
-  let response: Response;
+  let response: Response | null = null;
 
   try {
     response = await fetch(url, {
@@ -77,6 +77,10 @@ async function callGeminiDirect(systemPrompt: string, userPrompt: string, maxTok
     throw error;
   } finally {
     clearTimeout(timeoutId);
+  }
+
+  if (!response) {
+    throw new Error('TIMEOUT: Aucune réponse Gemini reçue. Le workflow va reprendre automatiquement.');
   }
 
   if (!response.ok) {
