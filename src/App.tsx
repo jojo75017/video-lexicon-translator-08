@@ -20,6 +20,7 @@ const SubscriptionPage = lazy(() => import('./pages/SubscriptionPage'));
 const AdminPage = lazy(() => import('./pages/AdminPage').then(m => ({ default: m.AdminPage })));
 const AuthPage = lazy(() => import('./pages/AuthPage'));
 const AdminProfilePage = lazy(() => import('./pages/AdminProfilePage'));
+const AdminFunnelPage = lazy(() => import('./pages/admin/AdminFunnelPage'));
 const AdminDirectPage = lazy(() => import('./pages/AdminDirectPage'));
 const AffiliationFormationPage = lazy(() => import('./pages/AffiliationFormationPage'));
 const ParrainagePage = lazy(() => import('./pages/ParrainagePage'));
