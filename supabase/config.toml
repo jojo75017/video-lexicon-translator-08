@@ -152,3 +152,9 @@ verify_jwt = false
 
 [functions.unsubscribe]
 verify_jwt = false
+
+[functions.create-promo-checkout]
+verify_jwt = false
+
+[functions.payments-webhook]
+verify_jwt = false

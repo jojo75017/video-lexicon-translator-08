@@ -19,16 +19,9 @@ async function sendInstructions(email: string, firstName: string, product: strin
   if (!RESEND_API_KEY) return false;
 
   const greeting = firstName ? `Bonjour ${firstName},` : "Bonjour,";
-  const paymentBlock =
-    method === "paypal"
-      ? `<p><strong>Paiement par PayPal :</strong></p>
-         <p>Envoyez <strong>${amount} €</strong> à l'adresse : <a href="https://paypal.me/ebookstudio">paypal.me/ebookstudio</a></p>
-         <p>Précisez votre email <strong>${email}</strong> dans la note.</p>`
-      : `<p><strong>Paiement par virement :</strong></p>
-         <p>IBAN : <code>FR76 XXXX XXXX XXXX XXXX XXXX XXX</code><br/>
-         BIC : <code>XXXXXXXX</code><br/>
-         Montant : <strong>${amount} €</strong><br/>
-         Référence : votre email <strong>${email}</strong></p>`;
+  const paymentBlock = `<p><strong>Paiement par PayPal :</strong></p>
+         <p>Envoyez <strong>${amount} €</strong> à l'adresse : <a href="https://paypal.me/ebookstudio/67">paypal.me/ebookstudio</a></p>
+         <p>Précisez votre email <strong>${email}</strong> dans la note du paiement.</p>`;
 
   const html = `
   <div style="font-family:Inter,Arial,sans-serif;max-width:560px;margin:0 auto;color:#232F3E;background:#FAFAFA;padding:24px;border-radius:12px">
@@ -78,7 +71,7 @@ serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    if (!["paypal", "virement"].includes(payment_method)) {
+    if (!["paypal"].includes(payment_method)) {
       return new Response(JSON.stringify({ error: "Méthode de paiement invalide" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
