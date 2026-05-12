@@ -19,7 +19,7 @@ const schema = z.object({
   payment_method: z.enum(['stripe', 'paypal']),
 });
 
-const PRODUCT = { key: 'main', label: 'EbookStudio — Abonnement annuel', amount: 67 };
+const PRODUCT = { key: 'main', label: 'EbookStudio — Accès à vie', amount: 67 };
 
 const PromoCommandePage = () => {
   useReferralTracking();
