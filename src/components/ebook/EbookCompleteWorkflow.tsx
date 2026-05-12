@@ -412,7 +412,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
           setWaitingForCharacterValidation(true);
         }
         if (data.waitingForTitleValidation) {
-          setWaitingForTitleValidation(true);
+          setWaitingForTitleValidation(false);
           if (data.titleSuggestions) setTitleSuggestions(data.titleSuggestions);
           if (data.originalTitleScore) setOriginalTitleScore(data.originalTitleScore);
           if (data.selectedTitleIndex !== undefined) setSelectedTitleIndex(data.selectedTitleIndex);
@@ -528,11 +528,15 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   const canResumeAfterP3 = !isGenerating && !waitingForCharacterValidation && p3Structure.length > 0 && !stepResults.P4;
   const savedResumeStepIndex = failedStepIndex !== null
     ? failedStepIndex
+    : currentStepIndex === 0 && Boolean(stepResults.P1 || allContext.P1)
+      ? 1
     : currentStepIndex >= 0 && currentStepIndex < WORKFLOW_STEPS.length && currentStepIndex < 14
       ? currentStepIndex
       : null;
   const persistedResumeStepIndex = savedProgressSnapshot && savedProgressSnapshot.currentStepIndex >= 0 && savedProgressSnapshot.currentStepIndex < 14
-    ? savedProgressSnapshot.currentStepIndex
+    ? savedProgressSnapshot.currentStepIndex === 0 && Boolean(savedProgressSnapshot.stepResults?.P1 || savedProgressSnapshot.allContext?.P1)
+      ? 1
+      : savedProgressSnapshot.currentStepIndex
     : null;
   const effectiveResumeStepIndex = savedResumeStepIndex ?? persistedResumeStepIndex;
   const canResumeAfterP3FromSavedState = !isGenerating && !waitingForCharacterValidation && effectiveP3Structure.length > 0 && !stepResults.P4 && !persistedHasP4;
