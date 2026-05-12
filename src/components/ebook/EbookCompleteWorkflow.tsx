@@ -1142,28 +1142,15 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
               setExpandedSteps(prev => ({ ...prev, [prevStep.id]: false }));
             }
             
-            // APRÈS P3 : TOUJOURS marquer une pause pour valider les personnages avant P4
-            // Même si 0 personnages, on laisse l'utilisateur vérifier et ajouter des personnages si besoin
+            // APRÈS P3 : on enchaîne directement P4 (workflow non-stop P1→P15)
+            // Les personnages générés restent éditables a posteriori si besoin
             if (step.id === 'P3') {
               const personnagesP3 = Array.isArray(result.result?.personnages) ? result.result.personnages : [];
-              const nextStepResults = { ...stepResults, [step.id]: result };
-              const nextContext = { ...context, [step.id]: result.result };
-
               setGeneratedCharacters(personnagesP3);
-              setWaitingForCharacterValidation(true);
-              setIsGenerating(false);
-              saveProgress({
-                currentStepIndex: i,
-                stepResults: nextStepResults,
-                allContext: nextContext,
-                generatedCharacters: personnagesP3,
-                waitingForCharacterValidation: true,
-                waitingForTitleValidation: false,
-              });
-              toast.info(personnagesP3.length > 0
-                ? '🎭 Personnages générés ! Validez-les ou modifiez-les avant la rédaction.'
-                : '✅ Structure générée ! Vous pouvez ajouter des personnages ou continuer directement.');
-              return; // Pause le workflow - l'utilisateur doit cliquer pour continuer
+              setWaitingForCharacterValidation(false);
+              if (personnagesP3.length > 0) {
+                toast.success(`🎭 ${personnagesP3.length} personnage(s) généré(s) — rédaction des chapitres en cours…`);
+              }
             }
           }
         }
