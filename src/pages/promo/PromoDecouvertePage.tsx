@@ -151,9 +151,9 @@ const PromoDecouvertePage = () => {
       <section className="max-w-3xl mx-auto px-4 py-16 text-center">
         <h2 className="text-3xl font-bold mb-4">Un seul tarif. Tout inclus.</h2>
         <div className="bg-white border-2 border-[#008296] rounded-2xl p-8 mt-8 shadow-lg">
-          <p className="text-sm font-semibold text-[#FF9E2D] uppercase">Abonnement annuel</p>
-          <p className="text-5xl font-bold my-4">67€<span className="text-xl text-gray-500">/an</span></p>
-          <p className="text-gray-600 mb-6">Soit moins de 6€/mois. Sans engagement, résiliable à tout moment.</p>
+          <p className="text-sm font-semibold text-[#FF9E2D] uppercase">Accès à vie</p>
+          <p className="text-5xl font-bold my-4">67€<span className="text-xl text-gray-500"> à vie</span></p>
+          <p className="text-gray-600 mb-6">Paiement unique. Aucun abonnement. Accès illimité pour toujours.</p>
           <ul className="text-left space-y-2 mb-8 max-w-md mx-auto">
             {['Ebooks illimités', 'Couvertures illimitées', 'Audiobook + BD inclus', 'Licence commerciale', 'Formation + Forum', 'Support email prioritaire'].map((x) => (
               <li key={x} className="flex gap-2"><Check className="w-5 h-5 text-[#008296]" /> {x}</li>
