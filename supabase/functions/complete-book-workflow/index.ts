@@ -71,17 +71,18 @@ async function callGeminiDirect(systemPrompt: string, userPrompt: string, maxTok
     const errText = await response.text();
     console.error(`Gemini direct error ${status}: ${errText}`);
     
-    // Retry automatique sur 429 avec délai exponentiel
-    if (status === 429 && retryCount < MAX_RETRIES) {
-      // Extraire le délai suggéré par Google ou utiliser un backoff exponentiel
+    // Retry automatique sur 429/503/500 avec délai exponentiel
+    if ((status === 429 || status === 503 || status === 500) && retryCount < MAX_RETRIES) {
       const retryMatch = errText.match(/retry in (\d+)/i);
-      const waitSeconds = retryMatch ? parseInt(retryMatch[1]) + 5 : Math.min(15 * Math.pow(2, retryCount), 120);
-      console.log(`⏳ Rate limit Gemini - retry ${retryCount + 1}/${MAX_RETRIES} dans ${waitSeconds}s...`);
+      const baseWait = status === 503 ? 8 : 15;
+      const waitSeconds = retryMatch ? parseInt(retryMatch[1]) + 5 : Math.min(baseWait * Math.pow(2, retryCount), 120);
+      console.log(`⏳ Gemini ${status} - retry ${retryCount + 1}/${MAX_RETRIES} dans ${waitSeconds}s...`);
       await new Promise(resolve => setTimeout(resolve, waitSeconds * 1000));
       return await callGeminiDirect(systemPrompt, userPrompt, maxTokens, apiKey, retryCount + 1);
     }
     
     if (status === 429) throw new Error('RATE_LIMIT: Limite Gemini atteinte après 3 tentatives. Activez la facturation sur votre projet Google Cloud pour supprimer cette limite.');
+    if (status === 503 || status === 500) throw new Error('GEMINI_OVERLOAD: Le service Gemini est temporairement surchargé. Réessayez dans 1-2 minutes.');
     if (status === 400 || status === 401 || status === 403) throw new Error('INVALID_API_KEY: Clé API Gemini invalide. Utilisez une clé Google AI Studio commençant par AIza.');
     throw new Error(`Gemini Error: ${status}`);
   }
@@ -156,7 +157,6 @@ async function callLovableAI(systemPrompt: string, userPrompt: string, maxTokens
 
 async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000): Promise<string> {
   const userKey = activeApiKey?.trim();
-  // Injection automatique de la directive de langue dans CHAQUE appel IA
   const finalSystemPrompt = activeLanguageDirective
     ? `${systemPrompt}\n\n${activeLanguageDirective}`
     : systemPrompt;
@@ -165,7 +165,17 @@ async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000
     try {
       return await callGeminiDirect(finalSystemPrompt, userPrompt, maxTokens, userKey);
     } catch (error) {
-      console.warn('User Gemini key failed, falling back to Lovable AI:', error instanceof Error ? error.message : error);
+      const msg = error instanceof Error ? error.message : String(error);
+      console.warn('User Gemini key failed, falling back to Lovable AI:', msg);
+      try {
+        return await callLovableAI(finalSystemPrompt, userPrompt, maxTokens);
+      } catch (fallbackErr) {
+        const fbMsg = fallbackErr instanceof Error ? fallbackErr.message : String(fallbackErr);
+        console.warn('Lovable AI fallback failed, retrying Gemini after long wait:', fbMsg);
+        // Dernier recours : attendre 30s et retenter Gemini une fois
+        await new Promise((r) => setTimeout(r, 30000));
+        return await callGeminiDirect(finalSystemPrompt, userPrompt, maxTokens, userKey);
+      }
     }
   }
 
@@ -185,15 +195,26 @@ async function callAIWithQualityLoop(
   let bestScore = 0;
   let attempts = 0;
   
+  let lastError: unknown = null;
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     attempts = attempt + 1;
     
-    // Ajouter la demande d'auto-évaluation au prompt
     const qualityPrompt = attempt === 0 
       ? userPrompt + `\n\nIMPORTANT : Ajoute un champ "qualityScore" (1-10) dans ton JSON. Sois HONNÊTE. Vise ${minScore}/10 minimum.`
       : userPrompt + `\n\nATTENTION : Le résultat précédent n'a obtenu que ${bestScore}/10. Tu DOIS atteindre ${minScore}/10 minimum cette fois. Améliore la qualité, la profondeur et l'originalité. Ajoute "qualityScore" dans ton JSON.`;
     
-    const content = await callAI(systemPrompt, qualityPrompt, maxTokens);
+    let content = '';
+    try {
+      content = await callAI(systemPrompt, qualityPrompt, maxTokens);
+    } catch (err) {
+      lastError = err;
+      console.warn(`⚠️ ${stepName} - Attempt ${attempts} failed:`, err instanceof Error ? err.message : err);
+      if (attempt < maxRetries) {
+        await new Promise((r) => setTimeout(r, 15000));
+        continue;
+      }
+      break;
+    }
     const parsed = parseJSON(content);
     const score = parsed?.qualityScore || parsed?.scoreGlobal || parsed?.scoreReelEstime || 7;
     
@@ -212,6 +233,10 @@ async function callAIWithQualityLoop(
     if (attempt < maxRetries) {
       console.log(`🔄 ${stepName} - Score ${score}/10 < ${minScore}, retrying...`);
     }
+  }
+  
+  if (!bestContent && lastError) {
+    throw lastError;
   }
   
   return { content: bestContent, qualityScore: bestScore, attempts };
