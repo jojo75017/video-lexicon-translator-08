@@ -158,6 +158,7 @@ const PromoCommandePage = () => {
               firstName={firstName}
               refCode={getStoredRefCode()}
               returnUrl={returnUrl}
+              bonuses={bonuses}
             />
           </div>
         ) : (
