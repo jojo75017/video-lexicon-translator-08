@@ -63,7 +63,7 @@ const PromoDecouvertePage = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
             <Link to="/promo/commande">
               <Button className="bg-[#FF9E2D] hover:bg-[#e88f1f] text-white font-bold py-6 px-8 text-base">
-                🚀 Démarrer maintenant — 67€/an
+                🚀 Démarrer maintenant — 67€ à vie
               </Button>
             </Link>
             <Link to="/demo">
