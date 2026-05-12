@@ -157,28 +157,40 @@ export const SimpleSidebar: React.FC<SimpleSidebarProps> = ({
             </p>
             <div className="grid grid-cols-2 gap-2">
               <button
+                type="button"
                 onClick={() => onTabChange('complete-workflow')}
                 title="Workflow IA - 15 agents enchaînent toutes les étapes (P1 → P15)"
-                className="group flex flex-col items-start gap-1 rounded-lg border border-primary/30 bg-primary/5 p-2.5 text-left transition-all hover:border-primary hover:bg-primary/10"
+                className={cn(
+                  'group flex flex-col items-start gap-1 rounded-lg border p-2.5 text-left transition-all',
+                  activeTab === 'complete-workflow'
+                    ? 'border-blue-600 bg-blue-600 text-white shadow-sm'
+                    : 'border-blue-500/40 bg-blue-50 text-blue-700 hover:border-blue-600 hover:bg-blue-600 hover:text-white'
+                )}
               >
                 <div className="flex items-center gap-1.5">
-                  <Zap className="h-3.5 w-3.5 text-primary" />
-                  <span className="text-xs font-bold text-primary">Workflow IA</span>
+                  <Zap className={cn('h-3.5 w-3.5', activeTab === 'complete-workflow' ? 'text-white' : 'text-blue-600 group-hover:text-white')} />
+                  <span className="text-xs font-bold">Workflow IA</span>
                 </div>
-                <span className="text-[10px] leading-tight text-muted-foreground">
+                <span className={cn('text-[10px] leading-tight', activeTab === 'complete-workflow' ? 'text-white/90' : 'text-blue-700/70 group-hover:text-white/90')}>
                   15 agents auto · ~30 min
                 </span>
               </button>
               <button
+                type="button"
                 onClick={() => onTabChange('planner')}
                 title="Mode simple - tu pilotes manuellement chaque étape"
-                className="group flex flex-col items-start gap-1 rounded-lg border border-border bg-card p-2.5 text-left transition-all hover:border-amber-500/50 hover:bg-amber-500/5"
+                className={cn(
+                  'group flex flex-col items-start gap-1 rounded-lg border p-2.5 text-left transition-all',
+                  activeTab === 'planner'
+                    ? 'border-emerald-600 bg-emerald-600 text-white shadow-sm'
+                    : 'border-emerald-500/40 bg-emerald-50 text-emerald-700 hover:border-emerald-600 hover:bg-emerald-600 hover:text-white'
+                )}
               >
                 <div className="flex items-center gap-1.5">
-                  <Hand className="h-3.5 w-3.5 text-foreground" />
-                  <span className="text-xs font-bold text-foreground">Mode simple</span>
+                  <Hand className={cn('h-3.5 w-3.5', activeTab === 'planner' ? 'text-white' : 'text-emerald-600 group-hover:text-white')} />
+                  <span className="text-xs font-bold">Mode simple</span>
                 </div>
-                <span className="text-[10px] leading-tight text-muted-foreground">
+                <span className={cn('text-[10px] leading-tight', activeTab === 'planner' ? 'text-white/90' : 'text-emerald-700/70 group-hover:text-white/90')}>
                   À ton rythme, manuel
                 </span>
               </button>
