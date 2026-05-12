@@ -1,0 +1,2 @@
+ALTER TABLE public.funnel_orders DROP CONSTRAINT IF EXISTS funnel_orders_payment_method_check;
+ALTER TABLE public.funnel_orders ADD CONSTRAINT funnel_orders_payment_method_check CHECK (payment_method = ANY (ARRAY['paypal'::text, 'virement'::text, 'stripe'::text]));
