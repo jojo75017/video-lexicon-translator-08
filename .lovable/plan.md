@@ -1,62 +1,120 @@
-# Finalisation du tunnel /promo
 
-Quatre chantiers à enchaîner pour rendre le tunnel 100% opérationnel.
+# Plan — Paiement CB automatique + PayPal sur /promo
 
-## 1. PDF lead magnet "5 niches rentables 2026"
+## Objectif
+Permettre l'encaissement des 67 € via **carte bancaire (Stripe automatique)** ou **PayPal manuel**, et supprimer l'option virement bancaire.
 
-- **Génération one-shot** via script `scripts/generate-lead-magnet.ts` utilisant Lovable AI (Gemini) pour produire le contenu structuré (5 niches × {sous-niche, audience, mots-clés Amazon, plan d'ebook, fourchette de prix, exemples best-sellers}).
-- **Mise en page PDF** avec ReportLab (Python) ou pdf-lib (Node) — charte KDP : fond #FAFAFA, accents #008296 / #FF9E2D, texte #232F3E, logo EbookStudio en couverture.
-- **Sortie** : `public/lead-magnets/5-niches-rentables-2026.pdf` (servi en statique, pas besoin de bucket Storage).
-- **QA visuelle** obligatoire : conversion en images, vérification des pages, retouches.
+---
 
-## 2. Tracking des clics affiliés
+## Étape 1 — Activer Lovable Payments (Stripe intégré)
 
-- Modifier `src/hooks/useReferralTracking.ts` : après écriture cookie/localStorage, appeler `supabase.functions.invoke('track-affiliate-click', { body: { ref_code, landing_path, referrer } })`.
-- Ne logguer qu'une fois par session (sessionStorage `ebs_ref_logged`) pour éviter le spam d'inserts à chaque navigation interne.
-- Vérifier que le compteur "Clics" du dashboard `/promo/affilie` remonte.
+Pré-requis avant tout code :
 
-## 3. Instructions de paiement post-checkout
+1. **Vérifier l'éligibilité** du produit (`recommend_payment_provider`).
+2. **Activer Lovable Payments** (`enable_stripe_payments`) — un formulaire Lovable s'ouvrira pour saisir : email de compte, nom, raison sociale. L'environnement **test** est créé immédiatement, le **live** après vérification d'identité (KYC ~24-48 h).
+3. Créer le produit **"EbookStudio — Abonnement annuel 67 €"** dans le catalogue Lovable Payments.
 
-- Nouvelle page `/promo/paiement` (PromoPaiementPage) affichée après `/promo/commande`.
-- Affiche selon `payment_method` choisi :
-  - **PayPal** : bouton vers `https://paypal.me/ebookstudio/67` (ou lien existant) + rappel email.
-  - **Virement** : IBAN/BIC + référence = `EBS-{order.id.slice(0,8)}` à mettre en libellé.
-- Récupère la dernière `funnel_orders` de l'email courant pour afficher montant + ref.
-- Modifier `funnel-create-order` edge function : envoyer un email Resend "Confirmation de commande" via `LOVABLE_API_KEY` + gateway, contenant le récap + instructions paiement + bouton "Accéder à mon espace".
-- Rediriger `/promo/commande` → `/promo/paiement` (au lieu de `/promo/bonus`), et garder le CTA bonus depuis la page paiement.
+> ⚠️ Plan **Pro** requis pour activer les paiements. Lovable Cloud déjà activé ✅.
 
-## 4. Séquence email nurturing pour leads /promo
+---
 
-- Dans `funnel-capture-lead`, après insert lead : créer une ligne dans `email_sequences` avec `sequence_name = 'promo_nurture'`, `email`, `current_step = 0`, `next_email_at = now() + 1 day`, `sequence_started = true` sur `funnel_leads`.
-- Nouvelle edge function `process-promo-nurture` (cron toutes les heures via pg_cron) qui :
-  - lit `email_sequences` où `sequence_name = 'promo_nurture'`, `completed = false`, `unsubscribed = false`, `next_email_at <= now()`.
-  - envoie l'email du `current_step` via Resend (gateway Lovable).
-  - incrémente `current_step`, met à jour `last_email_sent_at` et `next_email_at` selon planning, marque `completed = true` à la fin.
-- Planning sur 5 emails (cohérent avec [Email Nurture Flow](mem://features/marketing/sales-nurture-sequence)) :
-  - J+0 (capture) : confirmation + lien PDF (déjà envoyé via funnel-capture-lead)
-  - J+1 : "As-tu lu le guide ? Voici la niche n°1 en détail" → CTA `/promo/decouverte`
-  - J+3 : Cas client (témoignage Marie L.) → CTA `/promo/decouverte`
-  - J+5 : Levée d'objection (temps/compétences) + démo produit → CTA `/promo/commande`
-  - J+7 : Offre dernière chance (rappel garantie 7j) → CTA `/promo/commande`
-- Lien désinscription : edge function `unsubscribe?email=...&seq=promo_nurture` qui met `unsubscribed = true`.
+## Étape 2 — Recueillir les infos manquantes
+
+Avant de coder, tu devras me donner :
+
+- **Lien PayPal.me** exact (ex : `https://paypal.me/tonpseudo`)
+- **Email de notification PayPal** (pour relier la commande au virement reçu)
+
+---
+
+## Étape 3 — Modifier le tunnel `/promo/commande`
+
+`src/pages/promo/PromoCommandePage.tsx` :
+
+- Remplacer les 2 options actuelles (PayPal / Virement) par **2 nouvelles** :
+  - 🟢 **Carte bancaire** (badge "Accès immédiat") → Stripe Checkout auto
+  - 🔵 **PayPal** (badge "Validation 1 h") → page instructions
+- Retirer toute mention "virement bancaire".
+- Le champ `payment_method` accepte désormais : `stripe` | `paypal` (plus de `virement`).
+
+---
+
+## Étape 4 — Nouveau flux Stripe (CB automatique)
+
+1. **Edge function `create-stripe-checkout`** (nouveau) :
+   - Reçoit email + first_name + ref_code
+   - Crée une `funnel_orders` avec `payment_method = 'stripe'`, `status = 'pending'`
+   - Crée une session Stripe Checkout (67 €, mode `payment`) avec `metadata.order_id` + `success_url = /promo/merci?order_id=X` + `cancel_url = /promo/commande`
+   - Retourne l'URL Checkout → redirection navigateur
+2. **Edge function `stripe-webhook`** (nouveau, public, no JWT) :
+   - Écoute `checkout.session.completed`
+   - Met à jour `funnel_orders.status = 'paid'`, `paid_at = now()`
+   - Le trigger DB existant `handle_funnel_order_paid` se charge déjà de créer la commission affilié 30 % ✅
+   - Insère dans `subscribers` (création accès) + envoie email Resend "Bienvenue + accès" via `send-transactional-email`
+3. **Page `/promo/merci`** : déjà existante, on enrichit pour afficher confirmation Stripe quand `?order_id=` présent.
+
+---
+
+## Étape 5 — Flux PayPal simplifié
+
+`src/pages/promo/PromoPaiementPage.tsx` :
+- Retirer tout le bloc IBAN/BIC/Référence virement.
+- Garder uniquement le bloc **PayPal** : bouton vers ton lien `paypal.me/tonpseudo/67`, instruction "indique ton email dans la note".
+- Email de confirmation (déjà envoyé par `funnel-create-order`) → adapter le template : retirer le bloc virement, garder PayPal seulement.
+
+`supabase/functions/funnel-create-order/index.ts` :
+- Validation : `payment_method` ∈ `['paypal']` (le cas `stripe` passe par l'autre edge function).
+- Email Resend : retirer le bloc virement.
+
+---
+
+## Étape 6 — Tunnel d'accès post-paiement
+
+| Méthode | Activation | Délai |
+|---|---|---|
+| **CB** (Stripe) | Webhook → `subscribers` auto | < 1 min |
+| **PayPal** | Manuelle (admin valide depuis `/admin`) | < 1 h ouvré |
+
+Pour PayPal, garder la mécanique actuelle (admin marque `funnel_orders.status = 'paid'` → trigger crée commission + email manuel "Accès activé").
+
+---
+
+## Étape 7 — QA end-to-end (env test)
+
+1. CB test Stripe `4242 4242 4242 4242` → vérifier `funnel_orders.status = 'paid'`, `subscribers` créé, email envoyé, commission affilié si `?ref=…`
+2. PayPal → vérifier email instructions, page `/promo/paiement` affiche bien le lien
+3. Vérifier que la séquence nurturing s'arrête bien quand `funnel_orders.status = 'paid'` (à ajouter dans `process-promo-nurture`).
+
+---
+
+## Détails techniques (pour info)
+
+- **Secrets utilisés** : Lovable Payments gère sa propre clé Stripe en interne — pas besoin d'ajouter `STRIPE_SECRET_KEY` (l'existant `STRIPE_SECRET_KEY` du compte legacy reste inutilisé pour ce flux).
+- **Tables** : aucun changement de schéma nécessaire (`funnel_orders` accepte déjà `payment_method` text libre).
+- **Webhook URL** : `https://xvdgazrewsuaqtalqxue.supabase.co/functions/v1/stripe-webhook` (à coller dans le dashboard Lovable Payments après activation).
+- **Frais Stripe** : ~1,5 % + 0,25 € par CB EU (≈ 1,25 € sur 67 €).
+
+---
+
+## Hors scope (volontairement)
+
+- Abonnement récurrent automatique → on reste sur paiement unique 67 €/an manuel renouvelé.
+- 3D Secure custom → géré nativement par Stripe Checkout.
+- Refonte PromoMerciPage existante au-delà du `?order_id=`.
+
+---
 
 ## Ordre d'exécution
 
-1. PDF lead magnet (autonome, livrable visible immédiatement)
-2. Tracking clics (1 fichier modifié, validation rapide)
-3. Page paiement + email confirmation (nouvelle page + edit edge function)
-4. Séquence nurturing (nouvelle edge function + cron + 4 templates HTML)
+```text
+1. recommend_payment_provider      (vérif éligibilité)
+2. enable_stripe_payments          (formulaire utilisateur)
+3. Tu me donnes ton lien PayPal.me
+4. Création produit 67 € dans catalogue
+5. Edge create-stripe-checkout + stripe-webhook
+6. Modif PromoCommandePage (CB + PayPal, virement retiré)
+7. Modif PromoPaiementPage + funnel-create-order (virement retiré)
+8. Test CB 4242 + test PayPal
+```
 
-## Hors scope
-
-- Stripe/CB automatique (paiement reste manuel PayPal/virement validé admin)
-- A/B testing copywriting
-- Connexion ESP externe (Mailchimp/Brevo) — Resend natif suffit
-- Refonte des pages `/offres` et `/demo`
-
-## Détails techniques
-
-- Edge functions : `verify_jwt = false` pour `track-affiliate-click`, `process-promo-nurture`, `unsubscribe` (déjà OK pour les autres).
-- Cron : enregistré via `supabase--insert` (et non migration) car contient l'URL projet et l'anon key.
-- Resend : envoi via `https://connector-gateway.lovable.dev/resend` avec `LOVABLE_API_KEY` + `RESEND_API_KEY` (déjà secrets).
-- Templates email : HTML inline-CSS, marque KDP, bouton CTA orange #FF9E2D.
+Dis-moi "ok j'implémente" + ton **lien PayPal.me** et je lance.
