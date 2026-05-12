@@ -200,7 +200,7 @@ const PromoCommandePage = () => {
             </div>
 
             <Button type="submit" disabled={loading} className="w-full bg-[#FF9E2D] hover:bg-[#e88f1f] text-white font-bold py-6 text-base">
-              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : `🔒 Confirmer - ${PRODUCT.amount}€`}
+              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : `🔒 Confirmer - ${totalAmount}€`}
             </Button>
             <p className="text-xs text-gray-500 text-center">
               En cliquant, vous acceptez les CGV.
