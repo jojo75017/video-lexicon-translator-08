@@ -263,7 +263,10 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
         setBookIntroduction(data.bookIntroduction || '');
         setHasReadSteps(Boolean(data.hasReadSteps));
         setNumberOfChapters(data.numberOfChapters || 8);
-        setCurrentStepIndex(data.currentStepIndex);
+        const restoredStepIndex = data.currentStepIndex === 0 && Boolean(data.stepResults?.P1 || data.allContext?.P1)
+          ? 1
+          : data.currentStepIndex;
+        setCurrentStepIndex(restoredStepIndex);
         setStepResults(data.stepResults || {});
         setAllContext(data.allContext || {});
 
@@ -271,7 +274,9 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
           setGeneratedCharacters(data.generatedCharacters);
         }
         setWaitingForCharacterValidation(Boolean(data.waitingForCharacterValidation));
-        setWaitingForTitleValidation(Boolean(data.waitingForTitleValidation));
+        // Ancienne sauvegarde : le workflow s'arrêtait après P1 pour validation manuelle du titre.
+        // Désormais P1 reste une étape automatique, puis la reprise continue vers P2.
+        setWaitingForTitleValidation(false);
         if (data.titleSuggestions) setTitleSuggestions(data.titleSuggestions);
         if (data.originalTitleScore) setOriginalTitleScore(data.originalTitleScore);
         if (data.selectedTitleIndex !== undefined) setSelectedTitleIndex(data.selectedTitleIndex);
@@ -396,7 +401,10 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
         setCategory(data.category);
         setAuthorName(data.authorName);
         setNumberOfChapters(data.numberOfChapters);
-        setCurrentStepIndex(data.currentStepIndex);
+        const restoredStepIndex = data.currentStepIndex === 0 && Boolean(data.stepResults?.P1 || data.allContext?.P1)
+          ? 1
+          : data.currentStepIndex;
+        setCurrentStepIndex(restoredStepIndex);
         setStepResults(data.stepResults);
         setAllContext(data.allContext);
         setHasReadSteps(true);
@@ -410,7 +418,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
           setWaitingForCharacterValidation(true);
         }
         if (data.waitingForTitleValidation) {
-          setWaitingForTitleValidation(true);
+          setWaitingForTitleValidation(false);
           if (data.titleSuggestions) setTitleSuggestions(data.titleSuggestions);
           if (data.originalTitleScore) setOriginalTitleScore(data.originalTitleScore);
           if (data.selectedTitleIndex !== undefined) setSelectedTitleIndex(data.selectedTitleIndex);
@@ -523,18 +531,22 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   const persistedP3Structure = normalizeP3Structure((savedProgressSnapshot?.allContext?.P3 || savedProgressSnapshot?.stepResults?.P3?.result || {})?.chapitres || []);
   const effectiveP3Structure = p3Structure.length > 0 ? p3Structure : persistedP3Structure;
   const persistedHasP4 = Boolean(savedProgressSnapshot?.stepResults?.P4 || savedProgressSnapshot?.allContext?.P4);
-  const canResumeAfterP3 = !isGenerating && !waitingForTitleValidation && !waitingForCharacterValidation && p3Structure.length > 0 && !stepResults.P4;
+  const canResumeAfterP3 = !isGenerating && !waitingForCharacterValidation && p3Structure.length > 0 && !stepResults.P4;
   const savedResumeStepIndex = failedStepIndex !== null
     ? failedStepIndex
+    : currentStepIndex === 0 && Boolean(stepResults.P1 || allContext.P1)
+      ? 1
     : currentStepIndex >= 0 && currentStepIndex < WORKFLOW_STEPS.length && currentStepIndex < 14
       ? currentStepIndex
       : null;
   const persistedResumeStepIndex = savedProgressSnapshot && savedProgressSnapshot.currentStepIndex >= 0 && savedProgressSnapshot.currentStepIndex < 14
-    ? savedProgressSnapshot.currentStepIndex
+    ? savedProgressSnapshot.currentStepIndex === 0 && Boolean(savedProgressSnapshot.stepResults?.P1 || savedProgressSnapshot.allContext?.P1)
+      ? 1
+      : savedProgressSnapshot.currentStepIndex
     : null;
   const effectiveResumeStepIndex = savedResumeStepIndex ?? persistedResumeStepIndex;
-  const canResumeAfterP3FromSavedState = !isGenerating && !waitingForTitleValidation && !waitingForCharacterValidation && effectiveP3Structure.length > 0 && !stepResults.P4 && !persistedHasP4;
-  const canResumeWorkflow = !isGenerating && !waitingForTitleValidation && !waitingForCharacterValidation && effectiveResumeStepIndex !== null;
+  const canResumeAfterP3FromSavedState = !isGenerating && !waitingForCharacterValidation && effectiveP3Structure.length > 0 && !stepResults.P4 && !persistedHasP4;
+  const canResumeWorkflow = !isGenerating && !waitingForCharacterValidation && effectiveResumeStepIndex !== null;
 
   const splitIntoChunks = <T,>(items: T[], chunkCount: number) => {
     if (items.length === 0) return [] as T[][];
@@ -682,6 +694,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             language,
             numberOfChapters,
             bookIntroduction: buildEnrichedIntroduction(),
+            previousContext,
             userApiKey: hasUsableApiKey ? normalizedUserApiKey : undefined,
             useUserKey: hasUsableApiKey,
             ...extraBody,
@@ -1107,8 +1120,8 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
         } else {
           const result = await runStepWithRetry(step.id, context, {}, {}, step.id === 'P3' ? 2 : 1);
 
-          // APRÈS P1 : TOUJOURS pause pour valider/choisir le titre best-seller
-          // On fait ce check AVANT le if(result) pour garantir l'arrêt même si result est null
+          // APRÈS P1 : ne plus bloquer les abonnés sur une validation manuelle.
+          // On conserve les suggestions et l'intro/conclusion, puis le workflow enchaîne P2 automatiquement.
           if (step.id === 'P1') {
             if (result) {
               const nextStepResults = { ...stepResults, [step.id]: result };
@@ -1129,26 +1142,20 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
               if (result.result?.introductionGeneree) setGeneratedIntro(result.result.introductionGeneree);
               if (result.result?.conclusionGeneree) setGeneratedConclusion(result.result.conclusionGeneree);
 
-              setWaitingForTitleValidation(true);
-              setIsGenerating(false);
+              setWaitingForTitleValidation(false);
               saveProgress({
                 currentStepIndex: i,
                 stepResults: nextStepResults,
                 allContext: nextContext,
-                waitingForTitleValidation: true,
+                waitingForTitleValidation: false,
                 waitingForCharacterValidation: false,
                 titleSuggestions: suggestions,
                 originalTitleScore: origScore,
                 selectedTitleIndex: null,
               });
-              toast.info('📊 Analyse du titre terminée ! Choisissez votre titre best-seller avant de continuer.');
-              return; // STOP - l'utilisateur doit valider avant P2
+              toast.success('📊 P1 terminé, le workflow continue automatiquement vers P2.');
             }
-            setWaitingForTitleValidation(true);
-            setIsGenerating(false);
-            saveProgress({ waitingForTitleValidation: true, waitingForCharacterValidation: false });
-            toast.info('📊 Analyse du titre terminée ! Choisissez votre titre best-seller avant de continuer.');
-            return; // STOP - l'utilisateur doit valider avant P2
+            continue;
           }
 
           if (result) {
@@ -1313,6 +1320,11 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             setAllContext(data.allContext);
           }
           extraContext = { ...data.allContext, ...extraContext };
+        }
+
+        // Compatibilité avec les anciennes sauvegardes créées quand P1 demandait une validation manuelle.
+        if (resumeIndex === 0 && (data.stepResults?.P1 || data.allContext?.P1)) {
+          resumeIndex = 1;
         }
       }
     } catch (e) {
