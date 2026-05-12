@@ -2534,7 +2534,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             authorName={authorName}
             chapters={chapters}
             isGenerating={isGenerating}
-            defaultTab="technical"
+            defaultTab="ai"
             onGenerateBackCover={async (tone, audience, highlights) =>
               await generateBackCover(ebookTitle, authorName, chapters, tone, audience, highlights)
             }
