@@ -215,8 +215,9 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
           ? 'Couverture Kindle générée !'
           : 'Couverture Broché complète générée !'
       );
-    } catch (err: any) {
-      toast.error(err.message || 'Erreur lors de la génération');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Erreur lors de la génération';
+      toast.error(message);
     } finally {
       setIsGenerating(false);
     }
