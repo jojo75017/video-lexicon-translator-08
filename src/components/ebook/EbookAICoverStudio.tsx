@@ -177,6 +177,154 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
     reader.readAsDataURL(file);
   };
 
+  const createFallbackCover = (reason = 'Couverture créée sans IA') => {
+    if (!title.trim()) {
+      toast.error('Titre requis');
+      return null;
+    }
+
+    const isPaperback = format === 'paperback';
+    const canvas = document.createElement('canvas');
+    canvas.width = isPaperback ? 3300 : 1600;
+    canvas.height = isPaperback ? 2100 : 2560;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return null;
+
+    const root = getComputedStyle(document.documentElement);
+    const primary = `hsl(${root.getPropertyValue('--primary').trim() || '22 100% 55%'})`;
+    const foreground = `hsl(${root.getPropertyValue('--foreground').trim() || '0 0% 8%'})`;
+    const background = `hsl(${root.getPropertyValue('--background').trim() || '0 0% 100%'})`;
+    const muted = `hsl(${root.getPropertyValue('--muted').trim() || '30 15% 96%'})`;
+
+    const fillWrappedText = (text: string, x: number, y: number, maxWidth: number, lineHeight: number, maxLines: number) => {
+      const words = text.split(/\s+/).filter(Boolean);
+      const lines: string[] = [];
+      let line = '';
+      words.forEach((word) => {
+        const testLine = line ? `${line} ${word}` : word;
+        if (ctx.measureText(testLine).width > maxWidth && line) {
+          lines.push(line);
+          line = word;
+        } else {
+          line = testLine;
+        }
+      });
+      if (line) lines.push(line);
+      lines.slice(0, maxLines).forEach((lineText, index) => ctx.fillText(lineText, x, y + index * lineHeight));
+      return Math.min(lines.length, maxLines) * lineHeight;
+    };
+
+    const drawFront = (x: number, y: number, w: number, h: number) => {
+      const gradient = ctx.createLinearGradient(x, y, x + w, y + h);
+      gradient.addColorStop(0, background);
+      gradient.addColorStop(0.55, muted);
+      gradient.addColorStop(1, primary);
+      ctx.fillStyle = gradient;
+      ctx.fillRect(x, y, w, h);
+
+      ctx.fillStyle = primary;
+      ctx.globalAlpha = 0.14;
+      ctx.fillRect(x + w * 0.08, y + h * 0.1, w * 0.84, h * 0.02);
+      ctx.fillRect(x + w * 0.12, y + h * 0.84, w * 0.76, h * 0.018);
+      ctx.globalAlpha = 1;
+
+      ctx.textAlign = 'center';
+      ctx.fillStyle = foreground;
+      ctx.font = `800 ${Math.max(72, Math.floor(w * 0.095))}px Inter, Arial, sans-serif`;
+      const titleHeight = fillWrappedText(title.toUpperCase(), x + w / 2, y + h * 0.32, w * 0.78, Math.floor(w * 0.12), 4);
+
+      if (subtitle.trim()) {
+        ctx.font = `500 ${Math.max(34, Math.floor(w * 0.042))}px Inter, Arial, sans-serif`;
+        ctx.fillStyle = foreground;
+        ctx.globalAlpha = 0.78;
+        fillWrappedText(subtitle, x + w / 2, y + h * 0.32 + titleHeight + h * 0.045, w * 0.72, Math.floor(w * 0.06), 2);
+        ctx.globalAlpha = 1;
+      }
+
+      ctx.font = `700 ${Math.max(34, Math.floor(w * 0.044))}px Inter, Arial, sans-serif`;
+      ctx.fillStyle = foreground;
+      ctx.fillText(author.trim() || 'Auteur', x + w / 2, y + h * 0.9);
+
+      ctx.font = `600 ${Math.max(18, Math.floor(w * 0.025))}px Inter, Arial, sans-serif`;
+      ctx.fillStyle = primary;
+      ctx.fillText((genre || 'KDP').replace('-', ' ').toUpperCase(), x + w / 2, y + h * 0.15);
+    };
+
+    if (isPaperback) {
+      ctx.fillStyle = background;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      const backW = 1450;
+      const spineW = 400;
+      drawFront(backW + spineW, 0, backW, canvas.height);
+      ctx.fillStyle = muted;
+      ctx.fillRect(0, 0, backW, canvas.height);
+      ctx.fillStyle = foreground;
+      ctx.textAlign = 'left';
+      ctx.font = '800 80px Inter, Arial, sans-serif';
+      ctx.fillText('À propos du livre', 150, 260);
+      ctx.font = '400 44px Inter, Arial, sans-serif';
+      ctx.globalAlpha = 0.65;
+      ['Un espace prêt pour votre résumé Amazon.', 'Ajoutez ensuite votre texte de 4e de couverture.', 'Zone ISBN conservée en bas à droite.'].forEach((line, idx) => ctx.fillText(line, 150, 390 + idx * 80));
+      ctx.globalAlpha = 1;
+      ctx.strokeStyle = primary;
+      ctx.lineWidth = 6;
+      ctx.strokeRect(150, canvas.height - 420, 480, 260);
+      ctx.fillStyle = foreground;
+      ctx.font = '700 44px Inter, Arial, sans-serif';
+      ctx.fillText(author.trim() || 'Auteur', 150, canvas.height - 600);
+      ctx.fillStyle = primary;
+      ctx.fillRect(backW, 0, spineW, canvas.height);
+      ctx.save();
+      ctx.translate(backW + spineW / 2, canvas.height / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillStyle = background;
+      ctx.textAlign = 'center';
+      ctx.font = '800 74px Inter, Arial, sans-serif';
+      ctx.fillText(title.toUpperCase(), 0, -20);
+      ctx.font = '600 42px Inter, Arial, sans-serif';
+      ctx.fillText(author.trim() || 'Auteur', 0, 70);
+      ctx.restore();
+    } else {
+      drawFront(0, 0, canvas.width, canvas.height);
+    }
+
+    const url = canvas.toDataURL('image/png');
+    const localCover: GeneratedCover = {
+      url,
+      desc: reason,
+      format,
+      paperbackSpec: format === 'paperback' ? buildLocalPaperbackSpec() : null,
+      prompts: livePromptPreview || undefined,
+    };
+
+    setGeneratedCovers((prev) => [localCover, ...prev]);
+    onCoverGenerated?.(url);
+    toast.success(reason);
+    return localCover;
+  };
+
+  const buildLocalPaperbackSpec = (): PaperbackSpec => {
+    const parsed = (initialDescription || '').toLowerCase();
+    const pages = Number(parsed.match(/(\d{2,4})\s*pages?/)?.[1]) || undefined;
+    const trimMatch = parsed.match(/(\d{1,2}[.,]?\d?)\s*[x×]\s*(\d{1,2}[.,]?\d?)\s*cm/);
+    const widthMm = trimMatch ? parseFloat(trimMatch[1].replace(',', '.')) * 10 : 152;
+    const heightMm = trimMatch ? parseFloat(trimMatch[2].replace(',', '.')) * 10 : 229;
+    const paper = /blanc|white/.test(parsed) ? 'white' : 'cream';
+    const spineMm = +((pages || 200) * (paper === 'white' ? 0.0524 : 0.0573)).toFixed(2);
+    const bleed = 3.175;
+    return {
+      widthMm,
+      heightMm,
+      spineMm,
+      bleed,
+      totalWmm: +(widthMm * 2 + spineMm + bleed * 2).toFixed(2),
+      totalHmm: +(heightMm + bleed * 2).toFixed(2),
+      pages,
+      paper,
+      trim: `${(widthMm / 10).toFixed(2)}x${(heightMm / 10).toFixed(2)} cm`,
+    };
+  };
+
   const generateCover = async () => {
     if (!title.trim()) {
       toast.error('Titre requis');
@@ -188,20 +336,24 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
     }
     setIsGenerating(true);
     try {
-      const { data, error } = await supabase.functions.invoke('generate-ai-cover', {
-        body: {
-          title,
-          subtitle,
-          author,
-          genre,
-          style,
-          colorScheme,
-          description,
-          format,
-          kdpBrief: initialDescription, // brief from KDP calculator if any
-          referenceImage,
-        },
+      const invokePromise = supabase.functions.invoke('generate-ai-cover', {
+          body: {
+            title,
+            subtitle,
+            author,
+            genre,
+            style,
+            colorScheme,
+            description,
+            format,
+            kdpBrief: initialDescription, // brief from KDP calculator if any
+            referenceImage,
+          },
+        });
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        window.setTimeout(() => reject(new Error('La génération IA prend trop de temps')), 45000);
       });
+      const { data, error } = await Promise.race([invokePromise, timeoutPromise]);
       if (error) throw error;
       if (!data?.imageUrl) throw new Error('Aucune image générée');
 
@@ -217,7 +369,8 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
       );
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Erreur lors de la génération';
-      toast.error(message);
+      console.error('Cover AI generation failed, using local fallback:', message);
+      createFallbackCover('IA indisponible : couverture de secours créée pour continuer');
     } finally {
       setIsGenerating(false);
     }
