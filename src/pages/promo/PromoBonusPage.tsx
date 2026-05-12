@@ -44,28 +44,17 @@ const PromoBonusPage = () => {
   const navigate = useNavigate();
   const [loadingKey, setLoadingKey] = useState<string | null>(null);
 
-  const buyUpsell = async (key: string, amount: number) => {
+  const addBonus = (key: string, title: string, amount: number) => {
     setLoadingKey(key);
     try {
-      const email = localStorage.getItem('ebs_lead_email');
-      if (!email) {
-        toast.error('Email manquant. Recommencez la commande.');
-        navigate('/promo/commande');
-        return;
+      const raw = localStorage.getItem('ebs_selected_bonuses');
+      const current: Array<{ key: string; title: string; amount: number }> = raw ? JSON.parse(raw) : [];
+      if (!current.find((b) => b.key === key)) {
+        current.push({ key, title, amount });
+        localStorage.setItem('ebs_selected_bonuses', JSON.stringify(current));
       }
-      const { error } = await supabase.functions.invoke('funnel-create-order', {
-        body: {
-          email,
-          first_name: localStorage.getItem('ebs_lead_first_name') || undefined,
-          product_key: key,
-          amount,
-          payment_method: 'paypal',
-          ref_code: getStoredRefCode(),
-        },
-      });
-      if (error) throw error;
-      toast.success('Bonus ajouté à votre commande !');
-      navigate('/promo/espace');
+      toast.success(`${title} ajouté à votre commande !`);
+      navigate('/promo/commande');
     } catch (err) {
       console.error(err);
       toast.error('Erreur. Réessayez.');
@@ -112,7 +101,7 @@ const PromoBonusPage = () => {
               <div className="pt-4 border-t border-gray-100">
                 <p className="text-3xl font-bold text-[#008296] mb-3">{u.price}€ <span className="text-sm text-gray-500 font-normal">paiement unique</span></p>
                 <Button
-                  onClick={() => buyUpsell(u.key, u.price)}
+                  onClick={() => addBonus(u.key, u.title, u.price)}
                   disabled={loadingKey !== null}
                   className="w-full bg-[#FF9E2D] hover:bg-[#e88f1f] text-white font-bold py-5"
                 >

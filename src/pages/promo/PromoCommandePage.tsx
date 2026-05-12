@@ -11,7 +11,7 @@ import { useReferralTracking, getStoredRefCode } from '@/hooks/useReferralTracki
 import { toast } from 'sonner';
 import { Loader2, Check, Lock, ShieldCheck, CreditCard, Zap } from 'lucide-react';
 import { PromoStripeCheckout } from '@/components/promo/PromoStripeCheckout';
-import { PaymentTestModeBanner } from '@/components/PaymentTestModeBanner';
+
 
 const schema = z.object({
   first_name: z.string().trim().max(80).optional(),
@@ -29,6 +29,7 @@ const PromoCommandePage = () => {
   const [method, setMethod] = useState<'stripe' | 'paypal'>('stripe');
   const [loading, setLoading] = useState(false);
   const [showCheckout, setShowCheckout] = useState(false);
+  const [bonuses, setBonuses] = useState<Array<{ key: string; title: string; amount: number }>>([]);
 
   useEffect(() => {
     try {
@@ -36,8 +37,19 @@ const PromoCommandePage = () => {
       const f = localStorage.getItem('ebs_lead_first_name');
       if (e) setEmail(e);
       if (f) setFirstName(f);
+      const b = localStorage.getItem('ebs_selected_bonuses');
+      if (b) setBonuses(JSON.parse(b));
     } catch { /* ignore */ }
   }, []);
+
+  const removeBonus = (key: string) => {
+    const next = bonuses.filter((b) => b.key !== key);
+    setBonuses(next);
+    try { localStorage.setItem('ebs_selected_bonuses', JSON.stringify(next)); } catch {}
+  };
+
+  const bonusTotal = bonuses.reduce((s, b) => s + b.amount, 0);
+  const totalAmount = PRODUCT.amount + bonusTotal;
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,7 +74,8 @@ const PromoCommandePage = () => {
           email: parsed.data.email,
           first_name: parsed.data.first_name,
           product_key: PRODUCT.key,
-          amount: PRODUCT.amount,
+          amount: totalAmount,
+          bonuses,
           payment_method: 'paypal',
           ref_code: getStoredRefCode(),
         },
@@ -88,7 +101,7 @@ const PromoCommandePage = () => {
         canonical="/promo/commande"
         noindex
       />
-      <PaymentTestModeBanner />
+      
       <section className="max-w-5xl mx-auto px-4 py-12 grid md:grid-cols-2 gap-8">
         <div className="space-y-6">
           <h1 className="text-3xl font-bold">Votre commande</h1>
@@ -100,10 +113,27 @@ const PromoCommandePage = () => {
               </div>
               <p className="font-bold text-xl">{PRODUCT.amount}€</p>
             </div>
+            {bonuses.map((b) => (
+              <div key={b.key} className="flex justify-between items-start pt-2 border-t border-dashed border-gray-200">
+                <div className="flex-1">
+                  <p className="font-semibold text-sm flex items-center gap-2">
+                    <span className="text-[#FF9E2D]">+</span> {b.title}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => removeBonus(b.key)}
+                    className="text-xs text-gray-400 hover:text-red-500 underline mt-1"
+                  >
+                    Retirer
+                  </button>
+                </div>
+                <p className="font-bold text-sm">{b.amount}€</p>
+              </div>
+            ))}
             <hr />
             <div className="flex justify-between text-lg font-bold">
               <span>Total TTC</span>
-              <span className="text-[#008296]">{PRODUCT.amount}€</span>
+              <span className="text-[#008296]">{totalAmount}€</span>
             </div>
           </div>
 
@@ -128,6 +158,7 @@ const PromoCommandePage = () => {
               firstName={firstName}
               refCode={getStoredRefCode()}
               returnUrl={returnUrl}
+              bonuses={bonuses}
             />
           </div>
         ) : (
@@ -169,7 +200,7 @@ const PromoCommandePage = () => {
             </div>
 
             <Button type="submit" disabled={loading} className="w-full bg-[#FF9E2D] hover:bg-[#e88f1f] text-white font-bold py-6 text-base">
-              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : `🔒 Confirmer - ${PRODUCT.amount}€`}
+              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : `🔒 Confirmer - ${totalAmount}€`}
             </Button>
             <p className="text-xs text-gray-500 text-center">
               En cliquant, vous acceptez les CGV.

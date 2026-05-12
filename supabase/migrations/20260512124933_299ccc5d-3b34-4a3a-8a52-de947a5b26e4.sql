@@ -1,0 +1,1 @@
+ALTER TABLE public.funnel_orders ADD COLUMN IF NOT EXISTS metadata jsonb;
