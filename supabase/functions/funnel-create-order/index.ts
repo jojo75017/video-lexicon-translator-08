@@ -8,7 +8,7 @@ const corsHeaders = {
 };
 
 const PRODUCTS: Record<string, { label: string; amount: number }> = {
-  main: { label: "EbookStudio — Accès annuel", amount: 67 },
+  main: { label: "EbookStudio — Accès à vie", amount: 67 },
   upsell_license: { label: "Licence commerciale", amount: 47 },
   upsell_templates: { label: "Pack 50 templates premium", amount: 27 },
 };

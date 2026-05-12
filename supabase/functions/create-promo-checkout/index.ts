@@ -10,8 +10,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const PRICE_LOOKUP_KEY = "ebookstudio_annual_67";
-const PRODUCT_LABEL = "EbookStudio — Abonnement annuel";
+const PRICE_LOOKUP_KEY = "ebookstudio_lifetime_67";
+const PRODUCT_LABEL = "EbookStudio — Accès à vie";
 const AMOUNT_EUR = 67;
 
 const isValidEmail = (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
@@ -88,7 +88,7 @@ Deno.serve(async (req) => {
         metadata: {
           order_id: order.id,
           ref_code: ref_code || "",
-          product: "ebookstudio_annual",
+          product: "ebookstudio_lifetime",
         },
         payment_intent_data: {
           metadata: { order_id: order.id, ref_code: ref_code || "" },

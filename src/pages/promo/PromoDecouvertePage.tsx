@@ -26,7 +26,7 @@ const PromoDecouvertePage = () => {
   const faq = [
     { q: 'Faut-il être écrivain pour utiliser EbookStudio ?', a: 'Non. L\'IA rédige pour vous, vous gardez la main sur le ton, le sujet et la structure.' },
     { q: 'Les ebooks sont-ils acceptés sur Amazon KDP ?', a: 'Oui. Tous nos exports respectent les normes KDP (typographie, dimensions, Modulo 10).' },
-    { q: 'Combien d\'ebooks puis-je créer ?', a: 'Illimité avec votre abonnement annuel. Jusqu\'à 40 chapitres par projet.' },
+    { q: 'Combien d\'ebooks puis-je créer ?', a: 'Illimité, à vie, avec votre accès. Jusqu\'à 40 chapitres par projet.' },
     { q: 'Y a-t-il une garantie ?', a: 'Oui, satisfait ou remboursé sous 7 jours.' },
     { q: 'Puis-je revendre les ebooks créés ?', a: 'Oui. Licence commerciale incluse — vous gardez 100% des droits.' },
   ];
@@ -63,7 +63,7 @@ const PromoDecouvertePage = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
             <Link to="/promo/commande">
               <Button className="bg-[#FF9E2D] hover:bg-[#e88f1f] text-white font-bold py-6 px-8 text-base">
-                🚀 Démarrer maintenant — 67€/an
+                🚀 Démarrer maintenant — 67€ à vie
               </Button>
             </Link>
             <Link to="/demo">
@@ -151,9 +151,9 @@ const PromoDecouvertePage = () => {
       <section className="max-w-3xl mx-auto px-4 py-16 text-center">
         <h2 className="text-3xl font-bold mb-4">Un seul tarif. Tout inclus.</h2>
         <div className="bg-white border-2 border-[#008296] rounded-2xl p-8 mt-8 shadow-lg">
-          <p className="text-sm font-semibold text-[#FF9E2D] uppercase">Abonnement annuel</p>
-          <p className="text-5xl font-bold my-4">67€<span className="text-xl text-gray-500">/an</span></p>
-          <p className="text-gray-600 mb-6">Soit moins de 6€/mois. Sans engagement, résiliable à tout moment.</p>
+          <p className="text-sm font-semibold text-[#FF9E2D] uppercase">Accès à vie</p>
+          <p className="text-5xl font-bold my-4">67€<span className="text-xl text-gray-500"> à vie</span></p>
+          <p className="text-gray-600 mb-6">Paiement unique. Aucun abonnement. Accès illimité pour toujours.</p>
           <ul className="text-left space-y-2 mb-8 max-w-md mx-auto">
             {['Ebooks illimités', 'Couvertures illimitées', 'Audiobook + BD inclus', 'Licence commerciale', 'Formation + Forum', 'Support email prioritaire'].map((x) => (
               <li key={x} className="flex gap-2"><Check className="w-5 h-5 text-[#008296]" /> {x}</li>
@@ -187,7 +187,7 @@ const PromoDecouvertePage = () => {
           <p className="text-lg opacity-90">Rejoignez les centaines d'auteurs qui publient avec EbookStudio.</p>
           <Link to="/promo/commande">
             <Button className="bg-[#FF9E2D] hover:bg-[#e88f1f] text-white font-bold py-6 px-8 text-base">
-              🚀 Commander — 67€/an
+              🚀 Commander — 67€ à vie
             </Button>
           </Link>
         </div>
