@@ -113,21 +113,6 @@ const PromoCommandePage = () => {
               </div>
               <p className="font-bold text-xl">{PRODUCT.amount}€</p>
             </div>
-            <hr />
-            <div className="flex justify-between text-lg font-bold">
-              <span>Total TTC</span>
-              <span className="text-[#008296]">{PRODUCT.amount}€</span>
-            </div>
-          </div>
-
-          <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-4">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="font-bold">{PRODUCT.label}</p>
-                <p className="text-sm text-gray-500">Accès 12 mois - Renouvellement manuel</p>
-              </div>
-              <p className="font-bold text-xl">{PRODUCT.amount}€</p>
-            </div>
             {bonuses.map((b) => (
               <div key={b.key} className="flex justify-between items-start pt-2 border-t border-dashed border-gray-200">
                 <div className="flex-1">
