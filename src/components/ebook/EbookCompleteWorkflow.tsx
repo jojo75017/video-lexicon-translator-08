@@ -108,6 +108,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   const [isGenerating, setIsGenerating] = useState(false);
   const cancelRef = useRef(false);
   const [currentStepIndex, setCurrentStepIndex] = useState(-1);
+  const [activeStepProgress, setActiveStepProgress] = useState(0);
   const [stepResults, setStepResults] = useState<Record<string, { result: any; displayContent: string }>>({});
   const [expandedSteps, setExpandedSteps] = useState<Record<string, boolean>>({});
   const [error, setError] = useState<string | null>(null);
@@ -129,6 +130,26 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   const [generatedConclusion, setGeneratedConclusion] = useState('');
 
   const progress = currentStepIndex >= 0 ? ((currentStepIndex + 1) / WORKFLOW_STEP_COUNT) * 100 : 0;
+
+  // Per-agent progress simulation: when a step starts, animate 0 → 95%, snap to 100% on completion
+  useEffect(() => {
+    if (!isGenerating || currentStepIndex < 0) {
+      setActiveStepProgress(0);
+      return;
+    }
+    setActiveStepProgress(3);
+    const interval = setInterval(() => {
+      setActiveStepProgress((p) => {
+        if (p >= 95) return 95;
+        // ease-out: smaller increments as we approach 95
+        const remaining = 95 - p;
+        const inc = Math.max(0.4, remaining * 0.04);
+        return Math.min(95, p + inc);
+      });
+    }, 600);
+    return () => clearInterval(interval);
+  }, [currentStepIndex, isGenerating]);
+
   const normalizedUserApiKey = typeof userApiKey === 'string' ? userApiKey.trim() : '';
   const hasConfiguredApiKey = normalizedUserApiKey.length > 0;
   const hasPlausibleApiKeyFormat = normalizedUserApiKey.startsWith('AIza');
@@ -2223,6 +2244,14 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
                       <div className="flex items-center gap-2 flex-wrap">
                         <Badge variant="outline" className="border-primary/30 text-primary">{agent.id}</Badge>
                         <span className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Agent {agent.sequence}</span>
+                        {agent.codename && (
+                          <Badge className="bg-primary/20 text-primary border border-primary/30">🤖 {agent.codename}</Badge>
+                        )}
+                        {agent.status === 'active' && (
+                          <Badge className="bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/40">
+                            {Math.round(activeStepProgress)}%
+                          </Badge>
+                        )}
                       </div>
                       <h3 className="mt-2 text-lg font-semibold text-foreground">{agent.agentTitle}</h3>
                       <p className="text-sm font-medium text-foreground/80">{agent.agentSubtitle}</p>
@@ -2232,6 +2261,9 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
                     <p className="text-sm font-medium text-foreground">{agent.name}</p>
                     <p className="text-sm text-muted-foreground">{agent.description}</p>
                     <p className="text-sm text-muted-foreground">{agent.agentMission}</p>
+                    {agent.status === 'active' && (
+                      <Progress value={activeStepProgress} className="h-2 mt-2" />
+                    )}
                   </div>
                 </div>
               );
@@ -2325,13 +2357,18 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
                       </div>
                       
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <Badge 
                             variant={isCompleted ? 'default' : isActive ? 'secondary' : 'outline'} 
                             className="text-xs"
                           >
                             {step.id}
                           </Badge>
+                          {step.codename && (
+                            <Badge className="text-xs bg-primary/15 text-primary border border-primary/30">
+                              🤖 {step.codename}
+                            </Badge>
+                          )}
                           <span className={`font-medium ${isActive ? 'text-primary' : ''}`}>
                             {step.name}
                           </span>
@@ -2339,11 +2376,14 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
                         <p className="text-sm text-muted-foreground truncate">
                           {step.description}
                         </p>
+                        {isActive && (
+                          <Progress value={activeStepProgress} className="h-1.5 mt-2" />
+                        )}
                       </div>
 
                       {isActive && (
-                        <div className="text-xs text-primary font-medium animate-pulse">
-                          En cours...
+                        <div className="text-xs text-primary font-semibold animate-pulse whitespace-nowrap">
+                          {Math.round(activeStepProgress)}% · En cours…
                         </div>
                       )}
                       
