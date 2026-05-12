@@ -2451,7 +2451,29 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
               <p className="font-medium text-destructive">
                 Erreur à l'étape {failedStepIndex !== null ? WORKFLOW_STEPS[failedStepIndex]?.id : '?'}
               </p>
-              <p className="text-sm text-muted-foreground mt-1">{error}</p>
+              <p className="text-sm text-muted-foreground mt-1 whitespace-pre-wrap">{error}</p>
+
+              {error?.includes('limite GRATUITE') && (
+                <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-md">
+                  <p className="text-xs font-medium text-amber-900 mb-2">
+                    📋 Procédure rapide (déjà testée par d'autres abonnés) :
+                  </p>
+                  <ol className="text-xs text-amber-900 space-y-1 list-decimal list-inside">
+                    <li>Ouvrez Google AI Studio (lien ci-dessous)</li>
+                    <li>Cliquez sur votre clé Gemini (badge "Free")</li>
+                    <li>Cliquez "Set up Billing" → liez une CB Google Cloud</li>
+                    <li>Revenez ici et cliquez "Reprendre" — c'est instantané ✅</li>
+                  </ol>
+                  <a
+                    href="https://aistudio.google.com/app/apikey"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 mt-2 text-xs font-semibold text-amber-900 underline hover:text-amber-700"
+                  >
+                    👉 Ouvrir Google AI Studio
+                  </a>
+                </div>
+              )}
               
               <div className="flex flex-wrap gap-2 mt-3">
                 {/* Bouton principal : Reprendre */}
