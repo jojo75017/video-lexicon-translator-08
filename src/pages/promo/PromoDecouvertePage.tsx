@@ -26,7 +26,7 @@ const PromoDecouvertePage = () => {
   const faq = [
     { q: 'Faut-il être écrivain pour utiliser EbookStudio ?', a: 'Non. L\'IA rédige pour vous, vous gardez la main sur le ton, le sujet et la structure.' },
     { q: 'Les ebooks sont-ils acceptés sur Amazon KDP ?', a: 'Oui. Tous nos exports respectent les normes KDP (typographie, dimensions, Modulo 10).' },
-    { q: 'Combien d\'ebooks puis-je créer ?', a: 'Illimité avec votre abonnement annuel. Jusqu\'à 40 chapitres par projet.' },
+    { q: 'Combien d\'ebooks puis-je créer ?', a: 'Illimité, à vie, avec votre accès. Jusqu\'à 40 chapitres par projet.' },
     { q: 'Y a-t-il une garantie ?', a: 'Oui, satisfait ou remboursé sous 7 jours.' },
     { q: 'Puis-je revendre les ebooks créés ?', a: 'Oui. Licence commerciale incluse — vous gardez 100% des droits.' },
   ];
