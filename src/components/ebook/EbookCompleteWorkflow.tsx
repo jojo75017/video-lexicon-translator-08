@@ -271,7 +271,9 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
           setGeneratedCharacters(data.generatedCharacters);
         }
         setWaitingForCharacterValidation(Boolean(data.waitingForCharacterValidation));
-        setWaitingForTitleValidation(Boolean(data.waitingForTitleValidation));
+        // Ancienne sauvegarde : le workflow s'arrêtait après P1 pour validation manuelle du titre.
+        // Désormais P1 reste une étape automatique, puis la reprise continue vers P2.
+        setWaitingForTitleValidation(false);
         if (data.titleSuggestions) setTitleSuggestions(data.titleSuggestions);
         if (data.originalTitleScore) setOriginalTitleScore(data.originalTitleScore);
         if (data.selectedTitleIndex !== undefined) setSelectedTitleIndex(data.selectedTitleIndex);
@@ -523,7 +525,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   const persistedP3Structure = normalizeP3Structure((savedProgressSnapshot?.allContext?.P3 || savedProgressSnapshot?.stepResults?.P3?.result || {})?.chapitres || []);
   const effectiveP3Structure = p3Structure.length > 0 ? p3Structure : persistedP3Structure;
   const persistedHasP4 = Boolean(savedProgressSnapshot?.stepResults?.P4 || savedProgressSnapshot?.allContext?.P4);
-  const canResumeAfterP3 = !isGenerating && !waitingForTitleValidation && !waitingForCharacterValidation && p3Structure.length > 0 && !stepResults.P4;
+  const canResumeAfterP3 = !isGenerating && !waitingForCharacterValidation && p3Structure.length > 0 && !stepResults.P4;
   const savedResumeStepIndex = failedStepIndex !== null
     ? failedStepIndex
     : currentStepIndex >= 0 && currentStepIndex < WORKFLOW_STEPS.length && currentStepIndex < 14
@@ -533,8 +535,8 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
     ? savedProgressSnapshot.currentStepIndex
     : null;
   const effectiveResumeStepIndex = savedResumeStepIndex ?? persistedResumeStepIndex;
-  const canResumeAfterP3FromSavedState = !isGenerating && !waitingForTitleValidation && !waitingForCharacterValidation && effectiveP3Structure.length > 0 && !stepResults.P4 && !persistedHasP4;
-  const canResumeWorkflow = !isGenerating && !waitingForTitleValidation && !waitingForCharacterValidation && effectiveResumeStepIndex !== null;
+  const canResumeAfterP3FromSavedState = !isGenerating && !waitingForCharacterValidation && effectiveP3Structure.length > 0 && !stepResults.P4 && !persistedHasP4;
+  const canResumeWorkflow = !isGenerating && !waitingForCharacterValidation && effectiveResumeStepIndex !== null;
 
   const splitIntoChunks = <T,>(items: T[], chunkCount: number) => {
     if (items.length === 0) return [] as T[][];
@@ -682,6 +684,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             language,
             numberOfChapters,
             bookIntroduction: buildEnrichedIntroduction(),
+            previousContext,
             userApiKey: hasUsableApiKey ? normalizedUserApiKey : undefined,
             useUserKey: hasUsableApiKey,
             ...extraBody,
