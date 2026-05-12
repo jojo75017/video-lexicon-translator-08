@@ -26,9 +26,11 @@ const UPSELLS = [
     key: 'templates_premium',
     icon: Sparkles,
     title: 'Pack 50 templates premium',
-    price: 27,
-    desc: '50 plans d\'ebooks best-sellers prêts à utiliser : développement personnel, business, fiction, jeunesse, parascolaire, cuisine…',
+    price: 25,
+    badge: '🎁 + Cadeau : Guide 10 niches inclus',
+    desc: '50 plans d\'ebooks best-sellers prêts à utiliser : développement personnel, business, fiction, jeunesse, parascolaire, cuisine… + le guide PDF "10 niches KDP rentables 2026" offert.',
     benefits: [
+      '🎁 BONUS offert : Guide PDF "10 niches KDP rentables 2026"',
       '50 plans complets KDP-ready',
       'Mots-clés Amazon optimisés',
       'Couvertures concept incluses',
@@ -93,7 +95,12 @@ const PromoBonusPage = () => {
 
         <div className="grid md:grid-cols-2 gap-6">
           {UPSELLS.map((u) => (
-            <div key={u.key} className="bg-white border-2 border-gray-200 hover:border-[#008296] transition rounded-2xl p-6 space-y-4">
+            <div key={u.key} className="bg-white border-2 border-gray-200 hover:border-[#008296] transition rounded-2xl p-6 space-y-4 relative">
+              {(u as any).badge && (
+                <span className="absolute -top-3 left-4 bg-[#FF9E2D] text-white text-xs font-bold px-3 py-1 rounded-full shadow">
+                  {(u as any).badge}
+                </span>
+              )}
               <u.icon className="w-10 h-10 text-[#008296]" />
               <h2 className="text-xl font-bold">{u.title}</h2>
               <p className="text-gray-700">{u.desc}</p>
