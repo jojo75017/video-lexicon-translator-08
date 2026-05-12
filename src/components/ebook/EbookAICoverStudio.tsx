@@ -477,6 +477,17 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
             )}
           </Button>
 
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => createFallbackCover('Couverture de secours créée : vous pouvez continuer')}
+            disabled={isGenerating || !title.trim()}
+            className="w-full"
+          >
+            <ImageIcon className="w-4 h-4 mr-2" />
+            Continuer avec une couverture simple
+          </Button>
+
           <p className="text-xs text-muted-foreground text-center">
             ✨ Style professionnel · Format Kindle · Qualité bestseller Amazon
           </p>
