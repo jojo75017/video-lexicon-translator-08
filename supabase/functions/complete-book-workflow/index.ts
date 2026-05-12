@@ -195,15 +195,26 @@ async function callAIWithQualityLoop(
   let bestScore = 0;
   let attempts = 0;
   
+  let lastError: unknown = null;
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     attempts = attempt + 1;
     
-    // Ajouter la demande d'auto-évaluation au prompt
     const qualityPrompt = attempt === 0 
       ? userPrompt + `\n\nIMPORTANT : Ajoute un champ "qualityScore" (1-10) dans ton JSON. Sois HONNÊTE. Vise ${minScore}/10 minimum.`
       : userPrompt + `\n\nATTENTION : Le résultat précédent n'a obtenu que ${bestScore}/10. Tu DOIS atteindre ${minScore}/10 minimum cette fois. Améliore la qualité, la profondeur et l'originalité. Ajoute "qualityScore" dans ton JSON.`;
     
-    const content = await callAI(systemPrompt, qualityPrompt, maxTokens);
+    let content = '';
+    try {
+      content = await callAI(systemPrompt, qualityPrompt, maxTokens);
+    } catch (err) {
+      lastError = err;
+      console.warn(`⚠️ ${stepName} - Attempt ${attempts} failed:`, err instanceof Error ? err.message : err);
+      if (attempt < maxRetries) {
+        await new Promise((r) => setTimeout(r, 15000));
+        continue;
+      }
+      break;
+    }
     const parsed = parseJSON(content);
     const score = parsed?.qualityScore || parsed?.scoreGlobal || parsed?.scoreReelEstime || 7;
     
@@ -222,6 +233,10 @@ async function callAIWithQualityLoop(
     if (attempt < maxRetries) {
       console.log(`🔄 ${stepName} - Score ${score}/10 < ${minScore}, retrying...`);
     }
+  }
+  
+  if (!bestContent && lastError) {
+    throw lastError;
   }
   
   return { content: bestContent, qualityScore: bestScore, attempts };
