@@ -894,6 +894,7 @@ export type Database = {
           email: string
           first_name: string | null
           id: string
+          metadata: Json | null
           paid_at: string | null
           payment_method: string
           product_key: string
@@ -909,6 +910,7 @@ export type Database = {
           email: string
           first_name?: string | null
           id?: string
+          metadata?: Json | null
           paid_at?: string | null
           payment_method: string
           product_key: string
@@ -924,6 +926,7 @@ export type Database = {
           email?: string
           first_name?: string | null
           id?: string
+          metadata?: Json | null
           paid_at?: string | null
           payment_method?: string
           product_key?: string
