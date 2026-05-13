@@ -191,6 +191,15 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
 }) => {
   const [allToolsOpen, setAllToolsOpen] = useState(false);
   const [search, setSearch] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    getIsCurrentSessionAdmin()
+      .then((v) => { if (!cancelled) setIsAdmin(!!v); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
 
   const showTabBar =
     !!activeTab && !!onTabChange && !HIDE_TABBAR_ON.has(activeTab);
