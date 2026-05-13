@@ -45,7 +45,7 @@ let totalTokenUsage = {
 };
 
 async function callGeminiDirect(systemPrompt: string, userPrompt: string, maxTokens: number, apiKey: string, retryCount = 0): Promise<string> {
-  const MAX_RETRIES = maxTokens >= 5000 ? 0 : 1;
+  const MAX_RETRIES = 1;
   const cleanKey = apiKey.trim();
   
   // Pre-flight: vérifier le format de la clé Gemini
@@ -88,11 +88,13 @@ async function callGeminiDirect(systemPrompt: string, userPrompt: string, maxTok
     const errText = await response.text();
     console.error(`Gemini direct error ${status}: ${errText}`);
     
-    // Retry automatique sur 429/503/500 avec délai exponentiel
+    // Retry automatique sur 429/503/500 avec délai exponentiel.
+    // Les gros appels P4 sont maintenant segmentés avec moins de tokens pour laisser
+    // assez de marge au retry sans bloquer l'étape entière.
     if ((status === 429 || status === 503 || status === 500) && retryCount < MAX_RETRIES) {
-      const retryMatch = errText.match(/retry in (\d+)/i);
-      const baseWait = status === 503 ? 8 : 15;
-      const waitSeconds = retryMatch ? parseInt(retryMatch[1]) + 5 : Math.min(baseWait * Math.pow(2, retryCount), 120);
+      const retryMatch = errText.match(/retry(?:\s+in|Delay"\s*:\s*")?\s*(\d+)/i);
+      const baseWait = status === 503 ? 20 : 30;
+      const waitSeconds = retryMatch ? parseInt(retryMatch[1]) + 5 : Math.min(baseWait * Math.pow(2, retryCount), 60);
       console.log(`⏳ Gemini ${status} - retry ${retryCount + 1}/${MAX_RETRIES} dans ${waitSeconds}s...`);
       await new Promise(resolve => setTimeout(resolve, waitSeconds * 1000));
       return await callGeminiDirect(systemPrompt, userPrompt, maxTokens, apiKey, retryCount + 1);
