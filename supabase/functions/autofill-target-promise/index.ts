@@ -14,6 +14,7 @@ const json = (status: number, body: unknown) =>
 interface Body {
   title?: string;
   subtitle?: string;
+  category?: string;
   bookIntroduction?: string;
   language?: string;
   userApiKey?: string;
