@@ -74,7 +74,7 @@ Renvoie uniquement cet objet JSON:
   "promesseEmotion": "string (3-5 mots: émotion visée)"
 }`;
 
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${userKey}`;
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${userKey}`;
 
     const geminiRes = await fetch(geminiUrl, {
       method: "POST",
