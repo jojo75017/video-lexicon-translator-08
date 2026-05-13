@@ -1,33 +1,59 @@
-## Objectif
+# Problème
 
-Retirer la sidebar du planner pour que l'abonné navigue uniquement depuis sa grille de tuiles `/espace`, avec une mini-barre d'onglets contextuelle en haut et un retour `← Mon espace` toujours visible.
+La sidebar a été retirée. Il ne reste que 5 onglets (Plan · Écrire · Habiller · Publier · Vendre) en haut du planner. Or, chaque "famille" contient en réalité 5 à 15 sous-outils (workflow IA, personnages, templates, AI chat, proofread, cover designer, back-cover, KDP checklist, export Calibre, marketing, etc.). L'abonné ne peut plus y accéder.
 
-## Changements
+# Objectif
 
-### 1. `src/pages/EbookPlannerPage.tsx`
-- Supprimer l'import et le render de `SimpleSidebar` (lignes 17, 3464-3476) ainsi que l'état `sidebarCollapsed`.
-- Le `<main>` devient pleine largeur (`flex-1` reste, plus de flex parent à 2 colonnes — passer le wrapper en simple `min-h-screen`).
-- `EspaceHeader` garde un nouveau bouton « ← Mon espace » à gauche qui fait `navigate('/espace')`.
+Que l'abonné retrouve TOUT, simplement, depuis le haut de l'écran, sans sidebar.
 
-### 2. `src/components/layout/EspaceHeader.tsx`
-- Ajouter un bouton retour discret « ← Mon espace » (icône `ArrowLeft`, ghost, rounded-full).
-- Juste sous le header, ajouter une **PlannerTabBar** horizontale et compacte (sticky, fond `bg-white/90 backdrop-blur`, séparateur peach) avec 5 onglets contextualisés selon le mode :
-  - Mode ebook : Plan · Écrire · Habiller · Publier · Vendre
-  - Mode audio / coloriage : on masque la barre (l'outil est mono-écran).
-- Détection du mode via la prop `activeTab` (déjà connue dans le planner) — passer `activeTab` + `onTabChange` à `EspaceHeader`.
-- Onglet actif : pilule teal (`bg-[hsl(var(--joy-teal))] text-white`), inactif : `text-joy-ink/70 hover:bg-joy-cream`.
+# Solution : navigation à 2 niveaux + menu "Tous les outils"
 
-### 3. `src/pages/EspacePage.tsx`
-- Aucun changement structurel. Vérifier juste que chaque tuile envoie bien le bon `?tab=` au planner (déjà fait au lot précédent).
+## 1. Barre principale (déjà en place)
+5 onglets de familles, comme aujourd'hui : **Plan · Écrire · Habiller · Publier · Vendre**.
 
-### 4. Nettoyage
-- `SimpleSidebar` reste pour les pages admin/autres usages mais n'est plus utilisée par `/ebook-planner`. Pas de suppression du fichier (risque de casse ailleurs).
-- Vérifier `rg "SimpleSidebar"` après l'edit pour confirmer qu'il n'y a plus d'import dans le planner.
+## 2. Sous-barre contextuelle (NOUVEAU)
+Sous la barre principale, une 2ᵉ ligne discrète (chips arrondies, plus petites, fond blanc, texte gris→teal actif) qui change selon l'onglet sélectionné.
 
-## Résultat
+```text
+[Plan]   [Écrire]   [Habiller]   [Publier]   [Vendre]        ← principale (teal pill)
+  ↓
+ Tableau de bord IA · Plan du livre · Personnages · Templates · Importer doc      ← contextuelle
+```
 
-L'abonné voit : son espace plein écran avec les tuiles colorées → clic sur 📖 Ebook → planner sans sidebar, juste un header avec retour `← Mon espace` et une mini-barre 5 onglets pour passer d'une étape à l'autre. Plus rien ne « gêne » sur le côté.
+Mapping proposé (par famille) :
 
-## Hors scope
+- **Plan** : Tableau de bord IA · Plan du livre · Personnages · Templates · Importer un doc
+- **Écrire** : Workflow complet · Chapitre par chapitre · AI Chat · Proofread strict · Table des matières · Anti-IA / humaniser
+- **Habiller** : Studio image · Couverture IA · Éditeur de couverture · 4ᵉ de couverture · Bibliothèque d'images
+- **Publier** : Export KDP · Checklist pré-publication · Export EPUB (Calibre) · Audiobook · Audio Express
+- **Vendre** : Plan marketing · Plan de lancement · Mots-clés KDP · Niches · Stratégie avancée
 
-Pas de refonte du contenu interne du planner, pas de modification des autres pages (`/bd-studio`, `/kdp-keywords`, etc.) qui ont déjà leurs propres layouts.
+## 3. Bouton "Tous les outils" (overflow, à droite de la barre)
+Un bouton `⋯ Tous les outils` qui ouvre un **popover** structuré en colonnes (les 5 familles) listant 100% des sous-outils, plus une recherche en haut. Filet de sécurité pour les outils rarement utilisés (séries, encyclopedia, atlas, multi-translator, doc-transform, url-import, etc.).
+
+## 4. Bouton "Mon espace" (déjà en place, à gauche)
+Reste le retour rapide vers /espace.
+
+# Pourquoi cette structure
+
+- **Pas de sidebar** : conforme à la demande utilisateur.
+- **Toujours 1 clic** pour accéder aux 25 outils principaux (sous-barre contextuelle).
+- **Toujours ≤ 2 clics** pour les outils rares (popover "Tous les outils").
+- **Cohérent avec /espace** : les tuiles de l'espace pointent vers le bon `?tab=` et la bonne famille s'illumine.
+
+# Détails techniques (pour info)
+
+Fichier concerné : `src/components/layout/EspaceHeader.tsx`
+
+- Ajouter un objet `PLANNER_SUBTABS: Record<familyId, Array<{id,label}>>` listant les sous-outils par famille.
+- Calculer la `currentFamily` depuis `activeTab` (déjà via `match[]`).
+- Rendre une 2ᵉ rangée (sous la rangée principale) quand `showTabBar` est vrai, qui mappe `PLANNER_SUBTABS[currentFamily]` → chips cliquables (`onTabChange(subId)`).
+- Ajouter un bouton overflow `Tous les outils` à droite, qui ouvre un `<Popover>` shadcn avec un `<Input>` de recherche et 5 colonnes scrollables (toutes les entrées du `case` du planner).
+- Aucun changement dans `EbookPlannerPage.tsx` au-delà de ce qui existe déjà (les `case 'xxx'` du switch gèrent déjà tous ces ids).
+- Aucun retour de la sidebar.
+
+# Hors périmètre
+
+- Pas de refonte du contenu des sous-écrans.
+- Pas de changement sur `/espace`, `/bd-studio`, `/kdp-keywords`, etc.
+- Pas de touche raccourci clavier (peut venir plus tard).
