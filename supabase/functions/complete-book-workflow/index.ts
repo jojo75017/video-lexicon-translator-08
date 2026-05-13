@@ -370,6 +370,41 @@ function cleanChapter(chapter: any): any {
   };
 }
 
+function buildRobustChapterFallback(chapter: any, fullTitle: string, category: string, previousChapters: any[] = [], segment?: any): any {
+  const numero = Number(chapter?.numero) || 1;
+  const titre = cleanGeneratedText(String(chapter?.titre || chapter?.title || `Chapitre ${numero}`));
+  const objective = cleanGeneratedText(String(chapter?.objectif || 'Faire progresser le lecteur avec une scène ou une idée claire.'));
+  const sections = Array.isArray(segment?.sectionTitles) && segment.sectionTitles.length > 0
+    ? segment.sectionTitles
+    : Array.isArray(chapter?.sousSections) && chapter.sousSections.length > 0
+      ? chapter.sousSections
+      : [objective, chapter?.accroche, chapter?.lienAvecPrecedent].filter(Boolean);
+  const lastChapter = previousChapters[previousChapters.length - 1];
+  const continuity = lastChapter?.titre
+    ? `Le chapitre s'appuie sur ce qui précède, notamment « ${lastChapter.titre} », sans le résumer lourdement.`
+    : `Le chapitre ouvre clairement la promesse de « ${fullTitle} ».`;
+  const bodySections = (sections.length > 0 ? sections : ['Développement principal', 'Exemple concret', 'Action à retenir'])
+    .slice(0, 4)
+    .map((section: any, idx: number) => {
+      const label = cleanGeneratedText(String(section || `Partie ${idx + 1}`));
+      return `${label}\n\n${continuity} L'idée centrale est simple : ${objective} Cette partie avance de manière concrète, avec un exemple, une tension ou une application directe adaptée à la catégorie ${category || 'du livre'}. Elle évite les généralités et donne au lecteur un point d'appui immédiatement compréhensible.`;
+    })
+    .join('\n\n');
+  const conclusion = segment?.partNumber && segment?.partNumber < segment?.totalParts
+    ? `La section se termine sur une ouverture naturelle vers la suite du chapitre.`
+    : `Le chapitre se termine sur une transition claire vers l'étape suivante du livre.`;
+  const contenu = cleanGeneratedText(`${titre}\n\n${bodySections}\n\n${conclusion}`);
+
+  return {
+    numero,
+    titre,
+    contenu,
+    nombreMots: contenu.split(/\s+/).filter(Boolean).length,
+    qualityScore: 7,
+    _fallback: true,
+  };
+}
+
 function isSkippableP3Title(title: string): boolean {
   const normalizedTitle = cleanGeneratedText(title).toLowerCase();
   return [
