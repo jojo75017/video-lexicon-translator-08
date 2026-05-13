@@ -252,6 +252,7 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
                 className="truncate font-serif italic text-joy-ink/90"
                 title={projectTitle}
               >
+                <span className="mr-1" aria-hidden>📖</span>
                 {projectTitle}
               </span>
             </>
