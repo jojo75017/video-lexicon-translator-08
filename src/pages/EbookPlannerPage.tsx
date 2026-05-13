@@ -126,6 +126,7 @@ interface EbookPlannerPageProps {
   subscriberData?: any;
   isDemo?: boolean;
   isAdmin?: boolean;
+  onLogout?: () => void;
 }
 
 const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
@@ -133,6 +134,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   subscriberData,
   isDemo: isDemoProp = false,
   isAdmin: isAdminProp = false,
+  onLogout,
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
