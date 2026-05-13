@@ -16,7 +16,7 @@ import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { SimpleSidebar } from '@/components/layout/SimpleSidebar';
 import { EspaceHeader } from '@/components/layout/EspaceHeader';
-import { QuickModeBar } from '@/components/ebook/QuickModeBar';
+
 import { OnboardingGuide } from '@/components/onboarding/OnboardingGuide';
 import { FirstVisitBanner } from '@/components/onboarding/FirstVisitBanner';
 import { MissingApiKeyBanner } from '@/components/ebook/MissingApiKeyBanner';
