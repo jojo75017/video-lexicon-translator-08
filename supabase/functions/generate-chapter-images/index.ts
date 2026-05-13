@@ -660,37 +660,21 @@ Instructions de génération:
       });
 
       if (!response.ok) {
-        // Si erreur 429 ou 402 (crédits Lovable), ne PAS fallback vers OpenAI si déjà en limite
+        // Si erreur 429 ou 402 (crédits Lovable), tenter Gemini direct avec la clé user
         if (response.status === 429 || response.status === 402) {
-          console.log('Lovable AI credits/rate limit reached, returning placeholder');
-          // Retourner une image placeholder au lieu d'une erreur (style approprié au contenu)
-          generatedImageUrl = getPlaceholderUrl(chapterTitle, style, colorScheme);
-        } else if (!disableOpenAIFallback) {
-          const ENV_OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
-          const FALLBACK_OPENAI_KEY = ENV_OPENAI_API_KEY || openaiApiKey;
-          if (FALLBACK_OPENAI_KEY) {
-            console.log('Lovable AI error, attempting automatic fallback to OpenAI...');
-            try {
-              generatedImageUrl = await generateWithOpenAI(chapterTitle, chapterContent, ebookTitle, style, characters, FALLBACK_OPENAI_KEY, ratio, quality, colorScheme, visualCoherence, coherenceIntensity, referenceImageUrl, isColoringBook, coloringBookAgeGroup, customPrompt);
-            } catch (openaiErr: any) {
-              // Si OpenAI aussi en limite, retourner placeholder plutôt qu'erreur
-              if (openaiErr?.message?.includes('billing') || openaiErr?.message?.includes('limit')) {
-                console.log('OpenAI billing limit, returning placeholder');
-                generatedImageUrl = getPlaceholderUrl(chapterTitle, style, colorScheme);
-              } else {
-                console.error('OpenAI fallback failed:', openaiErr);
-                throw openaiErr;
-              }
-            }
+          console.log('Lovable AI credits/rate limit reached, trying user Gemini key...');
+          const geminiImg = await tryGeminiDirect(imagePrompt, userGeminiApiKey);
+          if (geminiImg) {
+            generatedImageUrl = geminiImg;
           } else {
-            // Pas de clé fallback, retourner placeholder
+            console.log('No Gemini fallback available, returning placeholder');
             generatedImageUrl = getPlaceholderUrl(chapterTitle, style, colorScheme);
           }
         } else {
           const errorText = await response.text();
           console.error('AI Gateway error:', response.status, errorText);
-          // Retourner placeholder au lieu d'erreur
-          generatedImageUrl = getPlaceholderUrl(chapterTitle, style, colorScheme);
+          const geminiImg = await tryGeminiDirect(imagePrompt, userGeminiApiKey);
+          generatedImageUrl = geminiImg || getPlaceholderUrl(chapterTitle, style, colorScheme);
         }
       } else {
         // Réponse OK - extraire l'image base64 de la réponse Gemini
