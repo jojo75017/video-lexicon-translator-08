@@ -3479,6 +3479,7 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
           projectTitle={ebookTitle || null}
           onLogout={onLogout}
         />
+        <QuickModeBar activeTab={activeTab} onNavigate={handleTabChange} />
         <MissingApiKeyBanner
           apiKey={apiKey}
           onScrollToKeyField={() => {
