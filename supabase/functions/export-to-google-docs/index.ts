@@ -413,14 +413,33 @@ serve(async (req) => {
     const stuckBefore = (cleanContent.match(/[.!?…,:;][A-ZÀ-ÖØ-öø-ÿa-z0-9]/g) || []).length;
     console.log(`🔎 [spacing] occurrences mots collés (après cleanGeneratedText): ${stuckBefore}`);
 
-    // Correction grammaticale du contenu
+    // Correction grammaticale — on protège les lignes de titre (##H1##/##H2##) en les retirant avant correction
     console.log(`📝 Début de la correction grammaticale...`);
-    const correctedContentRaw = await correctGrammar(cleanContent);
-    // Sécurité: reclean après la correction (ou si la correction est désactivée)
+    const lines = cleanContent.split('\n');
+    const headingPlaceholders: { idx: number; line: string }[] = [];
+    const segments: string[] = [];
+    let buf: string[] = [];
+    lines.forEach((l, i) => {
+      if (l.startsWith('##H1##') || l.startsWith('##H2##')) {
+        segments.push(buf.join('\n'));
+        buf = [];
+        headingPlaceholders.push({ idx: segments.length, line: l });
+        segments.push('__HEADING_PLACEHOLDER__');
+      } else {
+        buf.push(l);
+      }
+    });
+    segments.push(buf.join('\n'));
+    const correctedSegments = await Promise.all(segments.map(async (seg) => {
+      if (seg === '__HEADING_PLACEHOLDER__') return seg;
+      return await correctGrammar(seg);
+    }));
+    headingPlaceholders.forEach(({ idx, line }) => { correctedSegments[idx] = line; });
+    const correctedContentRaw = correctedSegments.join('\n');
     const correctedContent = cleanGeneratedText(correctedContentRaw);
     const stuckAfter = (correctedContent.match(/[.!?…,:;][A-ZÀ-ÖØ-öø-ÿa-z0-9]/g) || []).length;
     console.log(`🔎 [spacing] occurrences mots collés (après correction + reclean): ${stuckAfter}`);
-    console.log(`✅ Correction grammaticale terminée`);
+    console.log(`✅ Correction grammaticale terminée (${headingPlaceholders.length} titres préservés)`);
 
     // Créer le JWT pour l'authentification Google
     const header = {
