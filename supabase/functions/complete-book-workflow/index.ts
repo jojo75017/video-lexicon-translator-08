@@ -1615,11 +1615,15 @@ Retourne en JSON :
 
           const fallbackChapter = buildRobustChapterFallback(chapitre, fullTitle, category, chapitresDejaGeneres, { ...chapterSegment, partNumber, totalParts });
           const parsedHasContent = typeof parsedChapter?.contenu === 'string' && parsedChapter.contenu.trim().length > 80;
-          const chapitreGenere = cleanChapter(parsedHasContent ? parsedChapter : (chapterContent ? {
+          const chapitreGenere = cleanChapter(parsedHasContent ? {
+            ...parsedChapter,
+            _fallbackTitle: chapitre.titre,
+          } : (chapterContent ? {
             numero: chapitre.numero,
             titre: chapitre.titre,
             contenu: chapterContent,
             nombreMots: chapterContent.split(/\s+/).filter(Boolean).length,
+            _fallbackTitle: chapitre.titre,
           } : fallbackChapter));
 
           result = totalParts > 1
@@ -1667,11 +1671,15 @@ Retourne en JSON :
             6000
           );
           const parsed = parseJSON(chapterContent);
-          chapitresComplets.push(cleanChapter(parsed || {
+          chapitresComplets.push(cleanChapter(parsed ? {
+            ...parsed,
+            _fallbackTitle: chapitre.titre,
+          } : {
             numero: chapitre.numero,
             titre: chapitre.titre,
             contenu: chapterContent,
             nombreMots: chapterContent.split(/\s+/).length,
+            _fallbackTitle: chapitre.titre,
           }));
         }
 
