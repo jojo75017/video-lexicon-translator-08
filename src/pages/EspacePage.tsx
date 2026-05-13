@@ -50,6 +50,13 @@ const EspacePage: React.FC<EspacePageProps> = ({ subscriberEmail, onLogout }) =>
   const [loading, setLoading] = useState(true);
   const [lastTab, setLastTab] = useState<string | null>(null);
   const [firstName, setFirstName] = useState<string>('');
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    getIsCurrentSessionAdmin().then((v) => { if (!cancelled) setIsAdmin(!!v); }).catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => {
     try { setLastTab(localStorage.getItem('ebook_planner_active_tab')); } catch {}
