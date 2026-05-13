@@ -204,7 +204,25 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
     return sections.join('\n\n');
   }, [bookIntroduction, cibleProfil, cibleBesoins, cibleFrustrations, cibleNiveau, promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion]);
 
-  const handleAutofillTargetPromise = useCallback(async (silent = false) => {
+  const buildSimpleTargetPromise = useCallback(() => {
+    const cleanTitle = title.trim();
+    const cleanSubtitle = subtitle.trim();
+    const cleanCategory = category.trim() || 'ce sujet';
+    const angle = cleanSubtitle || cleanCategory;
+
+    return {
+      cibleProfil: `Lecteurs intéressés par ${angle}, qui veulent avancer simplement avec un contenu clair, concret et facile à appliquer.`,
+      cibleNiveau: 'tous',
+      cibleBesoins: `Ils cherchent une méthode accessible, des repères pratiques et des conseils directement utilisables autour de « ${cleanTitle} ».`,
+      cibleFrustrations: `Ils peuvent se sentir perdus face à trop d'informations, manquer de structure ou ne pas savoir par où commencer.`,
+      promesseCentrale: `Avec « ${cleanTitle} », le lecteur obtient une méthode simple pour progresser pas à pas dans ${cleanCategory}.`,
+      promesseBenefices: `- Comprendre rapidement l'essentiel\n- Passer à l'action avec plus de clarté\n- Obtenir un résultat concret sans complexité`,
+      promesseDifferenciation: `Ce livre va droit au but : il transforme le sujet en étapes simples, utiles et adaptées au lecteur.`,
+      promesseEmotion: 'Clarté et confiance',
+    };
+  }, [title, subtitle, category]);
+
+  const handleAutofillTargetPromise = useCallback((silent = false) => {
     if (!title.trim()) {
       if (!silent) toast.error(`Remplis d'abord le titre du livre, puis relance l'IA.`);
       return;
@@ -216,21 +234,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
     if (hasExisting && silent) return; // never overwrite in silent/auto mode
     setAutofillLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('autofill-target-promise', {
-        body: {
-          title: title.trim(),
-          subtitle: subtitle.trim(),
-          category: category || '',
-          bookIntroduction: bookIntroduction.trim(),
-          language,
-          userApiKey: hasUsableApiKey ? normalizedUserApiKey : undefined,
-        },
-      });
-      if (error) {
-        const msg = (error as any)?.context?.json?.error || error.message || 'Erreur lors de l\'appel IA';
-        throw new Error(msg);
-      }
-      if (data?.error) throw new Error(data.error);
+      const data = buildSimpleTargetPromise();
       setCibleProfil(data.cibleProfil || '');
       setCibleNiveau(data.cibleNiveau || 'tous');
       setCibleBesoins(data.cibleBesoins || '');
@@ -240,15 +244,15 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
       setPromesseDifferenciation(data.promesseDifferenciation || '');
       setPromesseEmotion(data.promesseEmotion || '');
       setOpenAccordions(['cible', 'promesse']);
-      if (!silent) toast.success('Cible & Promesse remplies, vérifie/ajuste si besoin 🌈');
-      else toast.success('✨ Cible & Promesse pré-remplies par l\'IA');
+      if (!silent) toast.success('Cible & Promesse remplies simplement, vérifie/ajuste si besoin.');
+      else toast.success('✨ Cible & Promesse pré-remplies automatiquement');
     } catch (e: any) {
       if (!silent) toast.error(e?.message || 'Échec de l\'auto-remplissage');
       else console.warn('[Auto-fill silencieux] échec:', e?.message);
     } finally {
       setAutofillLoading(false);
     }
-  }, [title, subtitle, category, bookIntroduction, language, normalizedUserApiKey, hasUsableApiKey, cibleProfil, cibleBesoins, cibleFrustrations, promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion]);
+  }, [title, buildSimpleTargetPromise, cibleProfil, cibleBesoins, cibleFrustrations, promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion]);
 
   // Auto-trigger silencieux : dès que titre + catégorie sont saisis et que les champs cible/promesse sont vides
   const autoFilledRef = React.useRef(false);
