@@ -357,7 +357,8 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
                         key={group.family}
                         className="p-3 border-r border-b border-joy-ink/5 last:border-r-0"
                       >
-                        <div className="text-[10px] font-bold uppercase tracking-widest text-joy-ink/55 mb-2 px-1">
+                        <div className="text-[10px] font-bold uppercase tracking-widest text-joy-ink/55 mb-2 px-1 flex items-center gap-1">
+                          <span aria-hidden>{FAMILY_EMOJI[group.family]}</span>
                           {group.familyLabel}
                         </div>
                         <ul className="space-y-0.5">
@@ -370,8 +371,8 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
                                   className={cn(
                                     'w-full text-left text-sm rounded-lg px-2 py-1.5 transition-colors',
                                     active
-                                      ? 'bg-joy-teal/10 text-joy-ink font-semibold'
-                                      : 'text-joy-ink/75 hover:bg-joy-cream hover:text-joy-ink',
+                                      ? 'bg-joy-teal/15 text-joy-ink font-semibold'
+                                      : 'text-joy-ink/75 hover:bg-joy-cream hover:text-[#FF9E2D]',
                                   )}
                                 >
                                   {t.label}
