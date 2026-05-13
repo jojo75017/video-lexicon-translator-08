@@ -50,6 +50,7 @@ const PLANNER_SUBTABS: Record<FamilyId, Array<{ id: string; label: string }>> = 
     { id: 'strict-proofread', label: 'Proofread strict' },
     { id: 'humanize-anti-ia', label: 'Anti-IA / humaniser' },
     { id: 'multi-translator', label: 'Traduction' },
+    { id: 'tools', label: 'Boîte à outils' },
   ],
   images: [
     { id: 'images-cover', label: 'Studio image' },
@@ -61,6 +62,8 @@ const PLANNER_SUBTABS: Record<FamilyId, Array<{ id: string; label: string }>> = 
   export: [
     { id: 'kdp', label: 'Export KDP' },
     { id: 'kdp-prepublish-checklist', label: 'Checklist KDP' },
+    { id: 'audit-pilot', label: 'Audit pré-publication' },
+    { id: 'kdp-keywords-pro', label: 'Mots-clés KDP' },
     { id: 'calibre-epub', label: 'Export EPUB' },
     { id: 'audiobook', label: 'Audiobook' },
     { id: 'audio-express', label: 'Audio Express' },
@@ -68,6 +71,7 @@ const PLANNER_SUBTABS: Record<FamilyId, Array<{ id: string; label: string }>> = 
   marketing: [
     { id: 'marketing', label: 'Plan marketing' },
     { id: 'launch-plan', label: 'Plan de lancement' },
+    { id: 'kdp-ads-guide', label: 'Amazon Ads' },
     { id: 'advanced', label: 'Stratégie avancée' },
   ],
 };
