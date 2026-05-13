@@ -236,6 +236,11 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
     setSearch('');
   };
 
+  const [bannerDismissed, setBannerDismissed] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    return localStorage.getItem('launch_vip_banner_dismissed_v1') === '1';
+  });
+
   return (
     <header
       className="sticky top-0 z-40 w-full backdrop-blur-md"
@@ -244,6 +249,38 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
         borderBottom: '1px solid hsl(var(--joy-ink) / 0.08)',
       }}
     >
+      {!bannerDismissed && (
+        <div
+          className="w-full text-white text-sm"
+          style={{ background: 'linear-gradient(90deg, #008296 0%, #FF9E2D 100%)' }}
+        >
+          <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2 sm:px-6">
+            <span className="text-lg" aria-hidden>🎉</span>
+            <p className="flex-1 truncate font-medium">
+              <span className="hidden sm:inline">Lancement en cours — </span>
+              <strong>Tes 2 cadeaux abonné</strong> t'attendent : 30 min Zoom + −30 % à vie
+            </p>
+            <Link
+              to="/espace/lancement"
+              className="rounded-full bg-white/95 px-3 py-1 text-xs font-bold whitespace-nowrap hover:bg-white transition-colors"
+              style={{ color: '#008296' }}
+            >
+              Voir mes cadeaux →
+            </Link>
+            <button
+              onClick={() => {
+                setBannerDismissed(true);
+                try { localStorage.setItem('launch_vip_banner_dismissed_v1', '1'); } catch {}
+              }}
+              className="text-white/80 hover:text-white text-lg leading-none px-1"
+              aria-label="Fermer"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-2.5 sm:px-6">
         <div className="flex min-w-0 items-center gap-2 text-sm">
           <Link
