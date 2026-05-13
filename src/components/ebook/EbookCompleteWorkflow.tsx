@@ -1209,11 +1209,20 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
         bookDescription: context.P1?.descriptionGeneree || '',
         preface: context.P7?.descriptionKDP || '',
         bookSynopsis: context.P1?.promesseCentrale || '',
-        chapters: (context.P4?.chapitres || context.P5?.chapitresFinal || []).map((ch: any, idx: number) => ({
-          number: ch.numero || idx + 1,
-          title: ch.titre || ch.title || `Chapitre ${idx + 1}`,
-          content: ch.contenu || ch.content || ''
-        })),
+        chapters: (context.P4?.chapitres || context.P5?.chapitresFinal || []).map((ch: any, idx: number) => {
+          // Fallback : récupérer le titre depuis P3 si P4 ne l'a pas conservé
+          const p3Chapters = Array.isArray(context.P3?.chapitres) ? context.P3.chapitres : [];
+          const p3Match = p3Chapters.find((p: any) => (p.numero || 0) === (ch.numero || idx + 1)) || p3Chapters[idx];
+          const resolvedTitle =
+            ch.titre || ch.title ||
+            p3Match?.titre || p3Match?.title ||
+            `Chapitre ${idx + 1}`;
+          return {
+            number: ch.numero || idx + 1,
+            title: resolvedTitle,
+            content: ch.contenu || ch.content || ''
+          };
+        }),
         conclusion: context.P8?.verdict || '',
         marketPositioning: context.P2 || {},
         backCover: {
