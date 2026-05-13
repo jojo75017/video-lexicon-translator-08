@@ -1629,7 +1629,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
           {/* Sections déroulantes : Cible & Promesse (recommandées pour un meilleur résultat) */}
           <Button
             type="button"
-            onClick={handleAutofillTargetPromise}
+            onClick={() => handleAutofillTargetPromise(false)}
             disabled={autofillLoading || isGenerating}
             className="w-full bg-joy-sun hover:bg-joy-sun/80 text-joy-ink border-2 border-joy-ink/10 shadow-joy rounded-2xl font-semibold"
           >
