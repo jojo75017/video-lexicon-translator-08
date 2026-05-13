@@ -332,6 +332,7 @@ const EspacePage: React.FC<EspacePageProps> = ({ subscriberEmail, onLogout }) =>
               </button>
             </PopoverContent>
           </Popover>
+          </div>
         </div>
       </header>
 
