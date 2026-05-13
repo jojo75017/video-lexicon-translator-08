@@ -316,6 +316,7 @@ const App = () => {
             <Route path="/parrainage" element={<ParrainagePage />} />
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/admin-direct" element={<AdminDirectPage />} />
+            <Route path="/admin-cockpit" element={<AdminGate><AdminCockpitPage /></AdminGate>} />
             <Route path="/ai-chat" element={<AiChatPage />} />
             <Route path="/niches" element={<NichesPage />} />
             <Route path="/arc-signup" element={<ArcSignupPage />} />
