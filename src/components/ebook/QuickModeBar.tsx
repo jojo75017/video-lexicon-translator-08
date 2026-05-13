@@ -16,7 +16,8 @@ const MAIN_MODES = [
     sub: 'P1 → P15',
     icon: Sparkles,
     matches: ['workflow-dashboard', 'editorial-director', 'market-analysis', 'content-architect', 'expert-writing', 'natural-rewrite', 'editorial-quality', 'editorial-packaging', 'final-diagnosis', 'editorial-memory', 'chapter-coherence', 'self-critique', 'iterative-loop', 'style-signature', 'ultimate-verdict', 'humanize-anti-ia', 'complete-workflow'],
-    color: 'from-joy-mint to-joy-sun',
+    halo: 'bg-joy-mint/40',
+    dot: 'bg-joy-mint',
   },
   {
     id: 'writing',
@@ -24,7 +25,8 @@ const MAIN_MODES = [
     sub: 'Texte & chapitres',
     icon: FileText,
     matches: ['writing', 'planner'],
-    color: 'from-joy-peach to-joy-sun',
+    halo: 'bg-joy-peach/40',
+    dot: 'bg-joy-peach',
   },
   {
     id: 'images-cover',
@@ -32,7 +34,8 @@ const MAIN_MODES = [
     sub: 'Studio visuel',
     icon: ImageIcon,
     matches: ['images-cover', 'images-generator', 'images-library'],
-    color: 'from-joy-sun to-joy-peach',
+    halo: 'bg-joy-sun/40',
+    dot: 'bg-joy-sun',
   },
 ];
 
@@ -45,8 +48,8 @@ const MORE_TOOLS = [
 
 export const QuickModeBar: React.FC<QuickModeBarProps> = ({ activeTab, onNavigate }) => {
   return (
-    <div className="sticky top-[52px] z-30 bg-joy-cream/95 backdrop-blur border-b-2 border-joy-ink/10">
-      <div className="container mx-auto px-4 py-3">
+    <div className="sticky top-[52px] z-30 bg-joy-cream/90 backdrop-blur-md border-b border-joy-ink/10">
+      <div className="container mx-auto px-4 py-2.5">
         <div className="flex items-stretch gap-2 overflow-x-auto">
           {MAIN_MODES.map((mode) => {
             const isActive = mode.matches.includes(activeTab);
@@ -56,56 +59,63 @@ export const QuickModeBar: React.FC<QuickModeBarProps> = ({ activeTab, onNavigat
                 key={mode.id}
                 onClick={() => onNavigate(mode.id)}
                 className={cn(
-                  'flex-1 min-w-[160px] rounded-2xl border-2 px-4 py-3 text-left transition-all hover-scale',
+                  'group relative flex-1 min-w-[170px] rounded-xl px-3.5 py-2.5 text-left transition-all duration-200',
                   isActive
-                    ? 'border-joy-ink bg-white shadow-md'
-                    : 'border-joy-ink/15 bg-white/60 hover:bg-white'
+                    ? 'bg-white border border-joy-ink/80 shadow-[0_2px_8px_-2px_hsl(var(--joy-ink)/0.18)]'
+                    : 'bg-white/70 border border-transparent hover:bg-white hover:ring-1 hover:ring-joy-ink/15'
                 )}
               >
+                {isActive && (
+                  <span className={cn('absolute top-2 right-2 h-1.5 w-1.5 rounded-full', mode.dot)} />
+                )}
                 <div className="flex items-center gap-3">
-                  <div className={cn('h-10 w-10 rounded-xl bg-gradient-to-br flex items-center justify-center shrink-0', mode.color)}>
-                    <Icon className="h-5 w-5 text-joy-ink" />
+                  <div className="relative h-9 w-9 shrink-0 flex items-center justify-center">
+                    <span className={cn('absolute inset-0 rounded-full blur-md opacity-80', mode.halo)} />
+                    <Icon className="relative h-[18px] w-[18px] text-joy-ink" strokeWidth={2.2} />
                   </div>
                   <div className="min-w-0">
-                    <div className="font-bold text-sm text-joy-ink leading-tight">{mode.label}</div>
-                    <div className="text-xs text-joy-ink/60">{mode.sub}</div>
+                    <div className="font-semibold text-[13px] text-joy-ink leading-tight tracking-tight">{mode.label}</div>
+                    <div className="text-[11px] text-joy-ink/55 mt-0.5">{mode.sub}</div>
                   </div>
                 </div>
               </button>
             );
           })}
 
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className="h-auto rounded-2xl border-2 border-joy-ink/15 bg-white/60 hover:bg-white px-4 py-3 flex flex-col items-center justify-center gap-1 min-w-[80px]"
-              >
-                <MoreHorizontal className="h-5 w-5 text-joy-ink" />
-                <span className="text-xs font-bold text-joy-ink">Plus</span>
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent align="end" className="w-64 p-2 rounded-2xl border-2 border-joy-ink/15">
-              <div className="text-xs font-bold text-joy-ink/60 px-2 py-1.5 uppercase tracking-wide">
-                Outils complémentaires
-              </div>
-              <div className="grid gap-1">
-                {MORE_TOOLS.map((t) => {
-                  const Icon = t.icon;
-                  return (
-                    <button
-                      key={t.id}
-                      onClick={() => onNavigate(t.id)}
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-joy-cream text-left transition-colors"
-                    >
-                      <Icon className="h-4 w-4 text-joy-ink/70" />
-                      <span className="text-sm font-medium text-joy-ink">{t.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </PopoverContent>
-          </Popover>
+          <div className="flex items-stretch">
+            <span className="w-px bg-joy-ink/10 mx-1.5 my-1.5" aria-hidden />
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="h-auto rounded-full bg-white/70 hover:bg-white border border-joy-ink/15 px-4 py-2 flex items-center gap-1.5 self-center"
+                >
+                  <MoreHorizontal className="h-4 w-4 text-joy-ink" />
+                  <span className="text-xs font-semibold text-joy-ink">Plus</span>
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-64 p-2 rounded-2xl border border-joy-ink/10 shadow-lg">
+                <div className="text-[10px] font-bold text-joy-ink/50 px-2 py-1.5 uppercase tracking-wider">
+                  Outils complémentaires
+                </div>
+                <div className="grid gap-0.5">
+                  {MORE_TOOLS.map((t) => {
+                    const Icon = t.icon;
+                    return (
+                      <button
+                        key={t.id}
+                        onClick={() => onNavigate(t.id)}
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-joy-cream text-left transition-colors"
+                      >
+                        <Icon className="h-4 w-4 text-joy-ink/70" />
+                        <span className="text-sm font-medium text-joy-ink">{t.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </PopoverContent>
+            </Popover>
+          </div>
         </div>
       </div>
     </div>
