@@ -172,6 +172,7 @@ export const EbookColoringBookGenerator: React.FC<ColoringBookGeneratorProps> = 
           colorScheme: 'monochrome',
           useOpenAI: false,
           forceLovable: true,
+          userGeminiApiKey: userApiKey || undefined,
           isColoringBook: true,
           coloringBookAgeGroup: ageGroup,
         },
