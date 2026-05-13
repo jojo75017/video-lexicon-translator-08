@@ -357,7 +357,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
 
     return () => window.clearTimeout(timer);
   }, [requestedFocusFromUrl, activeTab]);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  
   const [viewMode, setViewMode] = useState<'trello' | 'classic'>(() => {
     try {
       const savedMode = localStorage.getItem(DASHBOARD_VIEW_MODE_KEY);
