@@ -1,56 +1,71 @@
-ns# Raffinement élégance — Espace abonné
 
-Objectif : rendre l'expérience plus élégante et lisible, **sans toucher à la logique métier** ni au monolithe `EbookPlannerPage` (au-delà de l'injection déjà faite).
+# Plan — /espace tout-en-un, jovial, sans renvoi vers les offres
 
-## Périmètre (4 fichiers uniquement)
+## Objectif
+Faire de `/espace` un vrai cockpit abonné : tout est accessible depuis cette page via une grille de boutons colorés et chaleureux. Aucun bouton ne doit ramener un abonné sur une page de vente (offres, PayPal Coaching VIP, etc.). On en profite pour retirer la `QuickModeBar` redondante dans le planner.
 
-1. `src/components/ebook/QuickModeBar.tsx`
-2. `src/components/layout/EspaceHeader.tsx`
-3. `src/pages/EspacePage.tsx`
-4. `src/index.css` (ajout de 2 tokens d'ombre, aucune suppression)
+## Constats actuels (à corriger)
+- `EspacePage` mélange "Reprendre" + 4 cartes "Créer du neuf" + 6 liens secondaires "Aller plus loin" → manque de joie, hiérarchie tiède.
+- Les 6 liens "Aller plus loin" mènent à des pages partiellement publiques :
+  - `/coaching-vip` = page de vente PayPal → **à retirer** côté abonné.
+  - `/plan-marketing`, `/niches`, `/communaute`, `/formation` ne sont pas gated → peuvent afficher du contenu commercial. À conserver mais clairement présentés comme outils internes (et plus tard à protéger).
+- `QuickModeBar` (sticky barre rapide dans `EbookPlannerPage`) doublonne ce que l'espace va offrir → à retirer pour soulager le planner.
 
-Aucune modification de routes, d'API, d'edge functions, du SubscriberGate, ni des composants P1→P15.
+## Lots
 
-## Lot A — QuickModeBar
+### Lot 1 — `src/pages/EspacePage.tsx` : la grande grille jovial
+Remplacer "Créer du neuf" + "Aller plus loin" par **une seule grille "Mon atelier"** de 12 grosses tuiles colorées, regroupées par bandes :
 
-- Fond blanc + halo coloré derrière l'icône (au lieu du gradient plein)
-- État actif : bordure `joy-ink`, petit point indicateur, ombre douce
-- État inactif : bordure transparente, ring au hover
-- Icône dans cercle 36px avec teinte pastel monochrome par mode
-- Bouton "Plus" : pill compact avec séparateur vertical fin
-- Bar resserrée (`py-2.5`), padding card réduit
+**Bande "Créer"** (4 tuiles, fond pastel, emoji XL, ring couleur au hover, micro-animation `joy-wiggle` sur l'emoji) :
+- 📖 Écrire un ebook → `/ebook-planner` (tab `workflow-dashboard`) — `joy-peach`, badge "Recommandé"
+- 🎧 Audiobook → `/ebook-planner` (tab `audio`) — `joy-mint`
+- 🎨 Coloriage KDP → `/ebook-planner` (tab `coloring`) — `joy-lavender`
+- 💬 BD / Comic → `/bd-studio` — `joy-sun`
 
-## Lot B — EspaceHeader
+**Bande "Booster mes ventes"** (3 tuiles) :
+- 🔑 Mots-clés KDP → `/kdp-keywords` — `joy-mint`
+- 📊 Plan marketing → `/plan-marketing` — `joy-peach`
+- 🎯 Niches porteuses → `/niches` — `joy-sun`
 
-- Logo + chevron `›` + titre projet en `font-serif italic`
-- Bouton déconnexion : icône seule + tooltip
-- Backdrop-blur renforcé, hairline 1px en bas
-- Suppression du doublon "Mon espace" à droite
+**Bande "Apprendre & échanger"** (3 tuiles) :
+- 🎓 Formation → `/formation` — `joy-lavender`
+- 🤝 Communauté → `/communaute` — `joy-mint`
+- 🛠️ Guide des outils → `/guide-outils` — `joy-peach`
 
-## Lot C — EspacePage
+**Bande "Compte"** (2 mini-tuiles, taille réduite) :
+- 🪪 Mon code & accès → `/mon-code`
+- ❓ FAQ & assistance → `/faq`
 
-- Hero : "Bonjour 👋 — Voici ton atelier" + date du jour
-- Bloc Reprendre : carte large gradient cream→white, CTA arrondi
-- Bloc Mes livres : grille 3 colonnes hover scale
-- Bloc Créer du neuf : 4 cartes équi-hauteur, emoji XL, bouton outline arrondi
-- Bloc Aller plus loin : grille 2 colonnes de liens stylés (suppression accordion)
+Ce qui disparaît : la section "Aller plus loin", le lien "Coaching VIP", le lien "Niches" en doublon. Le bloc "Reprendre" et "Mes livres" restent intacts.
 
-## Lot D — Tokens & rythme
+Touches "jovial" :
+- Hero : taille +1 cran (`text-4xl sm:text-5xl`), garder `animate-joy-wiggle` sur 👋, ajouter sous-titre rotatif léger ("Belle journée pour publier ✨").
+- Tuiles : `rounded-3xl`, ombre `--shadow-soft`, hover : `-translate-y-1.5`, ring 2px de la couleur, emoji passe en `scale-110`.
+- En-tête de bande : petit titre tracking-wide + ligne fine pleine largeur.
+- Suppression de l'icône `LogOut` solo au profit d'un menu compact (avatar email + bouton déconnexion dans un popover).
 
-- Ajout dans `index.css` :
-  - `--shadow-soft: 0 2px 8px hsl(220 15% 20% / 0.04)`
-  - `--shadow-elevated: 0 8px 24px hsl(220 15% 20% / 0.08)`
-- Typographie : `tracking-tight` titres, `text-joy-ink/60` sous-titres
-- Radii standardisés : 12 / 16 / 9999
+### Lot 2 — `EbookPlannerPage.tsx` : retirer la QuickModeBar
+- Retirer l'import et le rendu de `QuickModeBar` (sticky bar sous le header).
+- Conserver `EspaceHeader` (logo + titre projet + retour `/espace`).
+- Aucun changement aux modes/tabs internes du planner (les liens `/ebook-planner` envoyant un `ebook_planner_active_tab` continuent de fonctionner via `localStorage`).
+- Supprimer le fichier `src/components/ebook/QuickModeBar.tsx` (plus utilisé).
 
-## Garanties anti-casse
+### Lot 3 — Garde-fou anti "renvoi offres"
+- Vérifier qu'aucun bouton de la nouvelle grille ne pointe vers `/offres`, `/coaching-vip`, `/upsell`, `/paiement-manuel`, `/promo/*`.
+- Conserver le lien direct vers Coaching VIP **uniquement** dans le footer (texte discret "Coaching VIP sur rendez-vous"), pas comme tuile.
 
-- Pas de changement de props publiques de `EspaceHeader` ni `QuickModeBar`
-- `MAIN_MODES.matches` et `onNavigate` inchangés → la navigation tabs reste identique
-- Aucun `localStorage` ni hook modifié
-- `EspacePage` : props `subscriberEmail`, `onLogout` conservées telles quelles
-- `index.css` : ajouts uniquement, pas de suppression de tokens existants
+## Hors scope (volontairement)
+- Pas de gating supplémentaire sur `/niches`, `/plan-marketing`, `/formation`, `/communaute` (ferait l'objet d'une passe sécurité dédiée).
+- Pas de refonte du planner monolithique (mémoire `refactoring-monolithe-ebook-planner` respectée).
+- Pas de nouvelle route, pas de changement back-end.
 
-## Ordre d'exécution
+## Fichiers touchés
+- `src/pages/EspacePage.tsx` — refonte de la grille + footer.
+- `src/pages/EbookPlannerPage.tsx` — retrait `<QuickModeBar />` et de son import.
+- `src/components/ebook/QuickModeBar.tsx` — supprimé.
 
-A → B → C → D, vérification visuelle après chaque lot via screenshot du preview.
+## Vérifications après build
+- Capture `/espace` desktop (1502px) → 4 bandes visibles, tuiles colorées et alignées.
+- Capture `/espace` mobile (≤640px) → grille 1 colonne, tuiles ≥ 96px de haut.
+- Capture `/ebook-planner` → plus de double barre sticky, juste `EspaceHeader`.
+- Cliquer chaque tuile et vérifier qu'aucune n'amène sur `/offres`.
