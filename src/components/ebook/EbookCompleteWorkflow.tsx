@@ -224,7 +224,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
 
   const handleAutofillTargetPromise = useCallback((silent = false) => {
     if (!title.trim()) {
-      if (!silent) toast.error(`Remplis d'abord le titre du livre, puis relance l'IA.`);
+      if (!silent) toast.error(`Remplis d'abord le titre du livre.`);
       return;
     }
     const hasExisting = [cibleProfil, cibleBesoins, cibleFrustrations, promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion].some(v => v.trim());
@@ -1633,9 +1633,9 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             className="w-full bg-joy-sun hover:bg-joy-sun/80 text-joy-ink border-2 border-joy-ink/10 shadow-joy rounded-2xl font-semibold"
           >
             {autofillLoading ? (
-              <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> L'IA réfléchit…</>
+              <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Remplissage…</>
             ) : (
-              <><Sparkles className="h-4 w-4 mr-2" /> Auto-remplir Cible &amp; Promesse avec l'IA</>
+              <><Sparkles className="h-4 w-4 mr-2" /> Auto-remplir Cible &amp; Promesse</>
             )}
           </Button>
 
