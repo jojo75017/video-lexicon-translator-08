@@ -292,6 +292,18 @@ const EspacePage: React.FC<EspacePageProps> = ({ subscriberEmail, onLogout }) =>
             <span>Mon espace</span>
           </button>
           <div className="flex items-center gap-2">
+            {isAdmin && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => navigate('/admin-cockpit')}
+                className="rounded-full px-3 gap-1.5 border-2 hover:scale-[1.03] transition-all"
+                style={{ borderColor: TEAL, color: TEAL }}
+              >
+                <Shield className="h-4 w-4" />
+                <span className="hidden sm:inline">Cockpit admin</span>
+              </Button>
+            )}
             <Button
               size="sm"
               onClick={() => goPlanner('workflow-dashboard')}
