@@ -257,7 +257,7 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
           <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2 sm:px-6">
             <span className="text-lg" aria-hidden>🎉</span>
             <p className="flex-1 truncate font-medium">
-              <span className="hidden sm:inline">Lancement en cours — </span>
+              <span className="hidden sm:inline">Lancement public le 1er juillet 2026 — </span>
               <strong>Tes 2 cadeaux abonné</strong> t'attendent : 30 min Zoom + −30 % à vie
             </p>
             <Link
