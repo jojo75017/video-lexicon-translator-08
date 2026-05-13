@@ -278,6 +278,19 @@ const App = () => {
                 </SubscriberGate>
               }
             />
+            <Route
+              path="/espace/lancement"
+              element={
+                <SubscriberGate
+                  isAdmin={isAdmin}
+                  subscriberEmail={subscriberEmail}
+                  subscriberData={subscriberData}
+                  onInvalid={handleLogout}
+                >
+                  <EspaceLancementPage />
+                </SubscriberGate>
+              }
+            />
             <Route path="/offres" element={<SalesPage />} />
             <Route path="/extension-chrome" element={<ExtensionChromePage />} />
             <Route path="/ebookbot" element={<EbookbotPage />} />
