@@ -40,6 +40,7 @@ Deno.serve(async (req) => {
     const body = (await req.json()) as Body;
     const title = (body.title || "").trim();
     const subtitle = (body.subtitle || "").trim();
+    const category = (body.category || "").trim();
     const intro = (body.bookIntroduction || "").trim();
     const language = body.language || "fr";
     const userKey = (body.userApiKey || "").trim();
@@ -53,10 +54,11 @@ Deno.serve(async (req) => {
 
     const langLabel = language === "en" ? "English" : language === "es" ? "Spanish" : language === "it" ? "Italian" : "French";
 
-    const prompt = `Tu es un expert en marketing éditorial KDP. À partir des informations ci-dessous, déduis la cible idéale du lecteur et la promesse centrale du livre. Réponds STRICTEMENT en JSON valide, sans markdown, en ${langLabel}.
+    const prompt = `Tu es un expert en marketing éditorial KDP. À partir des informations ci-dessous, déduis la cible idéale du lecteur et la promesse centrale du livre. Adapte le ton et le vocabulaire à la CATÉGORIE du livre. Réponds STRICTEMENT en JSON valide, sans markdown, en ${langLabel}.
 
 TITRE: ${title}
 ${subtitle ? `SOUS-TITRE: ${subtitle}` : ""}
+${category ? `CATÉGORIE: ${category}` : ""}
 INTRODUCTION:
 ${intro.slice(0, 4000)}
 
