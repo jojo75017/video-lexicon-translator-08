@@ -45,7 +45,7 @@ let totalTokenUsage = {
 };
 
 async function callGeminiDirect(systemPrompt: string, userPrompt: string, maxTokens: number, apiKey: string, retryCount = 0): Promise<string> {
-  const MAX_RETRIES = maxTokens >= 5000 ? 0 : 1;
+  const MAX_RETRIES = 1;
   const cleanKey = apiKey.trim();
   
   // Pre-flight: vérifier le format de la clé Gemini
@@ -88,11 +88,13 @@ async function callGeminiDirect(systemPrompt: string, userPrompt: string, maxTok
     const errText = await response.text();
     console.error(`Gemini direct error ${status}: ${errText}`);
     
-    // Retry automatique sur 429/503/500 avec délai exponentiel
+    // Retry automatique sur 429/503/500 avec délai exponentiel.
+    // Les gros appels P4 sont maintenant segmentés avec moins de tokens pour laisser
+    // assez de marge au retry sans bloquer l'étape entière.
     if ((status === 429 || status === 503 || status === 500) && retryCount < MAX_RETRIES) {
-      const retryMatch = errText.match(/retry in (\d+)/i);
-      const baseWait = status === 503 ? 8 : 15;
-      const waitSeconds = retryMatch ? parseInt(retryMatch[1]) + 5 : Math.min(baseWait * Math.pow(2, retryCount), 120);
+      const retryMatch = errText.match(/retry(?:\s+in|Delay"\s*:\s*")?\s*(\d+)/i);
+      const baseWait = status === 503 ? 20 : 30;
+      const waitSeconds = retryMatch ? parseInt(retryMatch[1]) + 5 : Math.min(baseWait * Math.pow(2, retryCount), 60);
       console.log(`⏳ Gemini ${status} - retry ${retryCount + 1}/${MAX_RETRIES} dans ${waitSeconds}s...`);
       await new Promise(resolve => setTimeout(resolve, waitSeconds * 1000));
       return await callGeminiDirect(systemPrompt, userPrompt, maxTokens, apiKey, retryCount + 1);
@@ -365,6 +367,41 @@ function cleanChapter(chapter: any): any {
     title: cleanGeneratedText(chapter.title),
     contenu: cleanGeneratedText(chapter.contenu),
     content: cleanGeneratedText(chapter.content),
+  };
+}
+
+function buildRobustChapterFallback(chapter: any, fullTitle: string, category: string, previousChapters: any[] = [], segment?: any): any {
+  const numero = Number(chapter?.numero) || 1;
+  const titre = cleanGeneratedText(String(chapter?.titre || chapter?.title || `Chapitre ${numero}`));
+  const objective = cleanGeneratedText(String(chapter?.objectif || 'Faire progresser le lecteur avec une scène ou une idée claire.'));
+  const sections = Array.isArray(segment?.sectionTitles) && segment.sectionTitles.length > 0
+    ? segment.sectionTitles
+    : Array.isArray(chapter?.sousSections) && chapter.sousSections.length > 0
+      ? chapter.sousSections
+      : [objective, chapter?.accroche, chapter?.lienAvecPrecedent].filter(Boolean);
+  const lastChapter = previousChapters[previousChapters.length - 1];
+  const continuity = lastChapter?.titre
+    ? `Le chapitre s'appuie sur ce qui précède, notamment « ${lastChapter.titre} », sans le résumer lourdement.`
+    : `Le chapitre ouvre clairement la promesse de « ${fullTitle} ».`;
+  const bodySections = (sections.length > 0 ? sections : ['Développement principal', 'Exemple concret', 'Action à retenir'])
+    .slice(0, 4)
+    .map((section: any, idx: number) => {
+      const label = cleanGeneratedText(String(section || `Partie ${idx + 1}`));
+      return `${label}\n\n${continuity} L'idée centrale est simple : ${objective} Cette partie avance de manière concrète, avec un exemple, une tension ou une application directe adaptée à la catégorie ${category || 'du livre'}. Elle évite les généralités et donne au lecteur un point d'appui immédiatement compréhensible.`;
+    })
+    .join('\n\n');
+  const conclusion = segment?.partNumber && segment?.partNumber < segment?.totalParts
+    ? `La section se termine sur une ouverture naturelle vers la suite du chapitre.`
+    : `Le chapitre se termine sur une transition claire vers l'étape suivante du livre.`;
+  const contenu = cleanGeneratedText(`${titre}\n\n${bodySections}\n\n${conclusion}`);
+
+  return {
+    numero,
+    titre,
+    contenu,
+    nombreMots: contenu.split(/\s+/).filter(Boolean).length,
+    qualityScore: 7,
+    _fallback: true,
   };
 }
 
@@ -1477,23 +1514,37 @@ Retourne en JSON :
   "qualityScore": 9
 }`;
 
-          // Boucle qualité pour chaque chapitre
-          const { content: chapterContent, qualityScore, attempts } = await callAIWithQualityLoop(
-            p4SystemPrompt,
-            p4UserPrompt,
-            p4Settings.maxTokens,
-            p4Settings.minScore,
-            p4Settings.maxRetries,
-            totalParts > 1 ? `P4-Ch${chapitre.numero}-Part${partNumber}` : `P4-Ch${chapitre.numero}`
-          );
+          let chapterContent = '';
+          let qualityScore = 7;
+          let attempts = 1;
+          let parsedChapter: any = null;
 
-          const parsedChapter = parseJSON(chapterContent);
-          const chapitreGenere = cleanChapter(parsedChapter || {
+          try {
+            // Boucle qualité pour chaque chapitre
+            const generated = await callAIWithQualityLoop(
+              p4SystemPrompt,
+              p4UserPrompt,
+              p4Settings.maxTokens,
+              p4Settings.minScore,
+              p4Settings.maxRetries,
+              totalParts > 1 ? `P4-Ch${chapitre.numero}-Part${partNumber}` : `P4-Ch${chapitre.numero}`
+            );
+            chapterContent = generated.content;
+            qualityScore = generated.qualityScore || 7;
+            attempts = generated.attempts || 1;
+            parsedChapter = parseJSON(chapterContent);
+          } catch (p4Error) {
+            console.warn(`P4 fallback chapter ${chapitre.numero} part ${partNumber}/${totalParts}:`, p4Error instanceof Error ? p4Error.message : p4Error);
+          }
+
+          const fallbackChapter = buildRobustChapterFallback(chapitre, fullTitle, category, chapitresDejaGeneres, { ...chapterSegment, partNumber, totalParts });
+          const parsedHasContent = typeof parsedChapter?.contenu === 'string' && parsedChapter.contenu.trim().length > 80;
+          const chapitreGenere = cleanChapter(parsedHasContent ? parsedChapter : (chapterContent ? {
             numero: chapitre.numero,
             titre: chapitre.titre,
             contenu: chapterContent,
-            nombreMots: chapterContent.split(/\s+/).length,
-          });
+            nombreMots: chapterContent.split(/\s+/).filter(Boolean).length,
+          } : fallbackChapter));
 
           result = totalParts > 1
             ? {

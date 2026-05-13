@@ -55,7 +55,7 @@ Pour CHAQUE email retourne :
 - subject     : objet de l'email (max 60 caractères, accrocheur, pas de clickbait)
 - preheader   : texte d'aperçu (60-90 caractères)
 - bodyText    : corps de l'email en TEXTE BRUT (pas de markdown), avec sauts de ligne \\n entre paragraphes,
-                signé "${b.authorName || 'L\\'auteur'}" à la fin.
+                signé "${b.authorName || "L'auteur"}" à la fin.
                 Inclure le lien d'achat ${b.buyLink || '[LIEN_ACHAT]'} dans les emails 3, 4 et 5.
 - bodyHtml    : même contenu en HTML simple (uniquement <p>, <strong>, <em>, <a href>, <br>),
                 pas de styles inline, pas de couleurs, prêt à coller dans Mailchimp/Brevo/Systeme.io.
