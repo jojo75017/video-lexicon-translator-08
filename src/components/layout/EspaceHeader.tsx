@@ -17,13 +17,17 @@ interface EspaceHeaderProps {
 
 type FamilyId = 'planner' | 'writing' | 'images' | 'export' | 'marketing' | 'account';
 
-const PLANNER_TABS: Array<{ id: FamilyId; label: string; match: string[] }> = [
-  { id: 'planner', label: 'Plan', match: ['planner', 'characters', 'templates', 'workflow-dashboard', 'url-import', 'doc-transform', 'projects', 'ebook-library', 'series'] },
-  { id: 'writing', label: 'Écrire', match: ['writing', 'strict-proofread', 'toc', 'aichat', 'complete-workflow', 'humanize-anti-ia', 'natural-rewrite', 'expert-writing', 'multi-translator', 'tools', 'atlas', 'encyclopedia', 'documentary', 'agenda', 'scolaire', 'content-architect'] },
-  { id: 'images', label: 'Habiller', match: ['images', 'cover', 'cover-design-editor', 'back-cover', 'backcover', 'images-cover', 'images-generator', 'images-library', 'editorial-packaging'] },
-  { id: 'export', label: 'Publier', match: ['export', 'kdp', 'kdp-prepublish-checklist', 'workflow-export', 'calibre-epub', 'audiobook', 'audio-express', 'audio', 'audit-pilot', 'kdp-keywords-pro'] },
-  { id: 'marketing', label: 'Vendre', match: ['marketing', 'monetization', 'advanced', 'launch-plan', 'editorial-quality', 'final-diagnosis', 'kdp-ads-guide', 'chrome-extension'] },
+const PLANNER_TABS: Array<{ id: FamilyId; label: string; emoji: string; match: string[] }> = [
+  { id: 'planner', label: 'Plan', emoji: '📘', match: ['planner', 'characters', 'templates', 'workflow-dashboard', 'url-import', 'doc-transform', 'projects', 'ebook-library', 'series'] },
+  { id: 'writing', label: 'Écrire', emoji: '✍️', match: ['writing', 'strict-proofread', 'toc', 'aichat', 'complete-workflow', 'humanize-anti-ia', 'natural-rewrite', 'expert-writing', 'multi-translator', 'tools', 'atlas', 'encyclopedia', 'documentary', 'agenda', 'scolaire', 'content-architect'] },
+  { id: 'images', label: 'Habiller', emoji: '🎨', match: ['images', 'cover', 'cover-design-editor', 'back-cover', 'backcover', 'images-cover', 'images-generator', 'images-library', 'editorial-packaging'] },
+  { id: 'export', label: 'Publier', emoji: '🚀', match: ['export', 'kdp', 'kdp-prepublish-checklist', 'workflow-export', 'calibre-epub', 'audiobook', 'audio-express', 'audio', 'audit-pilot', 'kdp-keywords-pro'] },
+  { id: 'marketing', label: 'Vendre', emoji: '💛', match: ['marketing', 'monetization', 'advanced', 'launch-plan', 'editorial-quality', 'final-diagnosis', 'kdp-ads-guide', 'chrome-extension'] },
 ];
+
+const FAMILY_EMOJI: Record<FamilyId, string> = {
+  planner: '📘', writing: '✍️', images: '🎨', export: '🚀', marketing: '💛', account: '⚙️',
+};
 
 const HIDE_TABBAR_ON = new Set([
   'onboarding',
@@ -248,6 +252,7 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
                 className="truncate font-serif italic text-joy-ink/90"
                 title={projectTitle}
               >
+                <span className="mr-1" aria-hidden>📖</span>
                 {projectTitle}
               </span>
             </>
@@ -288,7 +293,7 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
         <>
           {/* Rangée principale : familles + Tous les outils */}
           <nav
-            className="border-t border-joy-ink/5 bg-white/60"
+            className="border-t border-joy-ink/5 bg-gradient-to-r from-white via-joy-cream/30 to-white"
             aria-label="Étapes du livre"
           >
             <div className="mx-auto flex max-w-7xl items-center gap-1 overflow-x-auto px-3 py-2 sm:px-6 scrollbar-thin">
@@ -300,10 +305,10 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
                       key={tab.id}
                       onClick={() => onTabChange?.(tab.id)}
                       className={cn(
-                        'flex-shrink-0 rounded-full px-4 py-1.5 text-sm font-semibold transition-all',
+                        'flex-shrink-0 rounded-full px-4 py-1.5 text-sm font-semibold transition-all duration-200 hover:scale-[1.04]',
                         active
-                          ? 'text-white shadow-sm'
-                          : 'text-joy-ink/70 hover:bg-joy-cream hover:text-joy-ink',
+                          ? 'text-white shadow-[0_2px_10px_rgba(0,130,150,0.28)]'
+                          : 'text-joy-ink/70 hover:bg-joy-cream hover:text-[#FF9E2D]',
                       )}
                       style={
                         active
@@ -311,6 +316,7 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
                           : undefined
                       }
                     >
+                      <span className="mr-1.5" aria-hidden>{tab.emoji}</span>
                       {tab.label}
                     </button>
                   );
@@ -322,10 +328,11 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="rounded-full text-joy-ink/75 hover:text-joy-ink hover:bg-joy-cream gap-1.5 px-3 flex-shrink-0"
+                    className="rounded-full text-joy-ink/75 hover:text-[#FF9E2D] hover:bg-joy-cream gap-1.5 px-3 flex-shrink-0 transition-all hover:scale-[1.04]"
                   >
                     <LayoutGrid className="h-3.5 w-3.5" />
                     <span className="hidden sm:inline text-xs font-semibold">Tous les outils</span>
+                    <Sparkles className="h-3 w-3 animate-pulse" style={{ color: '#FF9E2D' }} />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent
@@ -350,7 +357,8 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
                         key={group.family}
                         className="p-3 border-r border-b border-joy-ink/5 last:border-r-0"
                       >
-                        <div className="text-[10px] font-bold uppercase tracking-widest text-joy-ink/55 mb-2 px-1">
+                        <div className="text-[10px] font-bold uppercase tracking-widest text-joy-ink/55 mb-2 px-1 flex items-center gap-1">
+                          <span aria-hidden>{FAMILY_EMOJI[group.family]}</span>
                           {group.familyLabel}
                         </div>
                         <ul className="space-y-0.5">
@@ -363,8 +371,8 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
                                   className={cn(
                                     'w-full text-left text-sm rounded-lg px-2 py-1.5 transition-colors',
                                     active
-                                      ? 'bg-joy-teal/10 text-joy-ink font-semibold'
-                                      : 'text-joy-ink/75 hover:bg-joy-cream hover:text-joy-ink',
+                                      ? 'bg-joy-teal/15 text-joy-ink font-semibold'
+                                      : 'text-joy-ink/75 hover:bg-joy-cream hover:text-[#FF9E2D]',
                                   )}
                                 >
                                   {t.label}
@@ -389,24 +397,25 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
           {/* Sous-barre contextuelle */}
           {currentFamily && PLANNER_SUBTABS[currentFamily]?.length > 0 && (
             <nav
-              className="border-t border-joy-ink/5 bg-white/40"
+              className="border-t border-joy-ink/5 bg-gradient-to-r from-white via-joy-cream/40 to-white"
               aria-label="Outils de l'étape"
             >
               <div className="mx-auto flex max-w-7xl items-center gap-1 overflow-x-auto px-3 py-1.5 sm:px-6 scrollbar-thin">
-                {PLANNER_SUBTABS[currentFamily].map((sub) => {
+                {PLANNER_SUBTABS[currentFamily]!.map((sub) => {
                   const active = isSubActive(sub.id);
                   return (
                     <button
                       key={sub.id}
                       onClick={() => onTabChange?.(sub.id)}
                       className={cn(
-                        'flex-shrink-0 rounded-full px-3 py-1 text-xs font-medium transition-all',
+                        'flex-shrink-0 rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 hover:scale-[1.05]',
                         active
-                          ? 'bg-joy-teal/10 text-joy-ink font-semibold'
-                          : 'text-joy-ink/60 hover:text-joy-ink hover:bg-joy-cream',
+                          ? 'bg-joy-teal/15 border border-joy-teal/30 font-semibold'
+                          : 'text-joy-ink/60 hover:text-[#FF9E2D] hover:bg-joy-cream',
                       )}
                       style={active ? { color: '#008296' } : undefined}
                     >
+                      {active && <span className="mr-1" aria-hidden>●</span>}
                       {sub.label}
                     </button>
                   );
