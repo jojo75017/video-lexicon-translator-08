@@ -489,6 +489,7 @@ serve(async (req) => {
       characters = [], 
       useOpenAI = false, 
       openaiApiKey, 
+      userGeminiApiKey,
       disableOpenAIFallback = false, 
       forceLovable = false,
       uploadToStorage = true,
