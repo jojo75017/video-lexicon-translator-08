@@ -160,7 +160,7 @@
   --joy-ink: 220 25% 22%;
   --joy-bubblegum: 340 90% 80%;
   --shadow-joy: 0 12px 32px -12px hsl(var(--joy-peach) / 0.55);
-  --shadow-joy-lg: 24px 48px -16px hsl(var(--joy-peach) / 0.45);
+  --shadow-joy-lg: 0 24px 48px -16px hsl(var(--joy-peach) / 0.45);
   --shadow-soft: 0 2px 8px hsl(var(--joy-ink) / 0.04);
   --shadow-elevated: 0 8px 24px hsl(var(--joy-ink) / 0.08);
 }
