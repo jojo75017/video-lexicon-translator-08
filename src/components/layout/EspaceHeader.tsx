@@ -131,6 +131,8 @@ const ALL_TOOLS: Array<{ family: FamilyId; familyLabel: string; tools: Array<{ i
     tools: [
       { id: 'kdp', label: 'Export KDP' },
       { id: 'kdp-prepublish-checklist', label: 'Checklist pré-publication' },
+      { id: 'audit-pilot', label: 'Audit pré-publication' },
+      { id: 'kdp-keywords-pro', label: 'Mots-clés KDP Pro' },
       { id: 'export', label: 'Export PDF/DOCX' },
       { id: 'calibre-epub', label: 'Export EPUB (Calibre)' },
       { id: 'workflow-export', label: 'Export workflow' },
@@ -150,6 +152,20 @@ const ALL_TOOLS: Array<{ family: FamilyId; familyLabel: string; tools: Array<{ i
       { id: 'advanced', label: 'Stratégie avancée' },
       { id: 'market-analysis', label: 'Analyse de marché' },
       { id: 'editorial-director', label: 'Directeur éditorial' },
+      { id: 'kdp-ads-guide', label: 'Guide Amazon Ads' },
+      { id: 'chrome-extension', label: 'Extension Chrome' },
+    ],
+  },
+  {
+    family: 'account',
+    familyLabel: 'Mon compte',
+    tools: [
+      { id: 'subscription', label: 'Mon abonnement' },
+      { id: 'settings', label: 'Paramètres' },
+      { id: 'parrainage', label: 'Parrainage' },
+      { id: 'communaute', label: 'Communauté' },
+      { id: 'admin', label: 'Admin' },
+      { id: 'admin-subscribers', label: 'Admin — abonnés' },
     ],
   },
 ];
