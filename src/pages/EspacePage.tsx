@@ -4,10 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import {
-  BookOpen, Headphones, Palette, MessageSquare, ArrowRight, Clock,
-  Sparkles, GraduationCap, Users, BarChart3, Crown, FileText, Loader2, LogOut,
-} from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { ArrowRight, Clock, Sparkles, FileText, Loader2, LogOut, ChevronDown } from 'lucide-react';
 
 interface EspacePageProps {
   subscriberEmail: string;
@@ -33,6 +31,16 @@ const formatRelative = (iso: string) => {
   if (h < 24) return `il y a ${h} h`;
   const d = Math.floor(h / 24);
   return `il y a ${d} j`;
+};
+
+type Tile = {
+  emoji: string;
+  title: string;
+  desc: string;
+  tint: string;     // pastel bg behind emoji
+  ring: string;     // hover ring color
+  action: () => void;
+  featured?: boolean;
 };
 
 const EspacePage: React.FC<EspacePageProps> = ({ subscriberEmail, onLogout }) => {
@@ -82,59 +90,183 @@ const EspacePage: React.FC<EspacePageProps> = ({ subscriberEmail, onLogout }) =>
     return new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
   }, []);
 
+  const cheers = useMemo(() => {
+    const list = [
+      'Belle journée pour publier ✨',
+      'Prêt à faire vibrer des lecteurs ? 🚀',
+      'Une page à la fois, ça compte 💫',
+      'Bonne énergie créative aujourd\'hui 🌿',
+    ];
+    return list[new Date().getDate() % list.length];
+  }, []);
+
   const goPlanner = (tab?: string) => {
     if (tab) { try { localStorage.setItem('ebook_planner_active_tab', tab); } catch {} }
     navigate('/ebook-planner');
   };
 
-  const createCards = [
+  // ───────── Bandes de tuiles ─────────
+  const createTiles: Tile[] = [
     {
-      title: 'Écrire un ebook',
-      desc: 'Pipeline IA P1 → P15 (Amazon KDP). Le chemin recommandé.',
       emoji: '📖',
-      icon: BookOpen,
-      tint: 'bg-joy-peach/30',
+      title: 'Écrire un ebook',
+      desc: 'Pipeline IA P1 → P15 (Amazon KDP)',
+      tint: 'bg-joy-peach/40',
+      ring: 'hover:ring-joy-peach',
       action: () => goPlanner('workflow-dashboard'),
-      cta: 'Démarrer',
       featured: true,
     },
     {
-      title: 'Audiobook',
-      desc: 'Transformer un manuscrit en livre audio TTS pro.',
       emoji: '🎧',
-      icon: Headphones,
-      tint: 'bg-joy-mint/30',
+      title: 'Audiobook',
+      desc: 'Manuscrit → livre audio TTS pro',
+      tint: 'bg-joy-mint/40',
+      ring: 'hover:ring-joy-mint',
       action: () => goPlanner('audio'),
-      cta: 'Créer',
     },
     {
-      title: 'Coloriage',
-      desc: 'Cahier KDP prêt à publier en quelques clics.',
       emoji: '🎨',
-      icon: Palette,
-      tint: 'bg-joy-lavender/30',
+      title: 'Coloriage KDP',
+      desc: 'Cahier prêt à publier',
+      tint: 'bg-joy-lavender/40',
+      ring: 'hover:ring-joy-lavender',
       action: () => goPlanner('coloring'),
-      cta: 'Créer',
     },
     {
-      title: 'BD / Comic',
-      desc: 'Assembler une bande dessinée à partir de prompts.',
       emoji: '💬',
-      icon: MessageSquare,
-      tint: 'bg-joy-sun/30',
+      title: 'BD / Comic',
+      desc: 'Assembler une BD à partir de prompts',
+      tint: 'bg-joy-sun/40',
+      ring: 'hover:ring-joy-sun',
       action: () => navigate('/bd-studio'),
-      cta: 'Ouvrir',
     },
   ];
 
-  const secondaryLinks = [
-    { icon: BarChart3, label: 'Plan marketing', to: '/plan-marketing' },
-    { icon: Sparkles, label: 'KDP Keywords', to: '/kdp-keywords' },
-    { icon: FileText, label: 'Niches porteuses', to: '/niches' },
-    { icon: GraduationCap, label: 'Formations', to: '/formation' },
-    { icon: Users, label: 'Communauté', to: '/communaute' },
-    { icon: Crown, label: 'Coaching VIP', to: '/coaching-vip' },
+  const boostTiles: Tile[] = [
+    {
+      emoji: '🔑',
+      title: 'Mots-clés KDP',
+      desc: 'Recherche & validation Amazon',
+      tint: 'bg-joy-mint/40',
+      ring: 'hover:ring-joy-mint',
+      action: () => navigate('/kdp-keywords'),
+    },
+    {
+      emoji: '📊',
+      title: 'Plan marketing',
+      desc: 'Stratégie complète de lancement',
+      tint: 'bg-joy-peach/40',
+      ring: 'hover:ring-joy-peach',
+      action: () => navigate('/plan-marketing'),
+    },
+    {
+      emoji: '🎯',
+      title: 'Niches porteuses',
+      desc: 'Best-sellers & opportunités 2026',
+      tint: 'bg-joy-sun/40',
+      ring: 'hover:ring-joy-sun',
+      action: () => navigate('/niches'),
+    },
   ];
+
+  const learnTiles: Tile[] = [
+    {
+      emoji: '🎓',
+      title: 'Formation',
+      desc: 'Modules pas à pas',
+      tint: 'bg-joy-lavender/40',
+      ring: 'hover:ring-joy-lavender',
+      action: () => navigate('/formation'),
+    },
+    {
+      emoji: '🤝',
+      title: 'Communauté',
+      desc: 'Échanger avec les auteurs',
+      tint: 'bg-joy-mint/40',
+      ring: 'hover:ring-joy-mint',
+      action: () => navigate('/communaute'),
+    },
+    {
+      emoji: '🛠️',
+      title: 'Guide des outils',
+      desc: 'Comment tirer le meilleur de l\'atelier',
+      tint: 'bg-joy-peach/40',
+      ring: 'hover:ring-joy-peach',
+      action: () => navigate('/guide-outils'),
+    },
+  ];
+
+  const accountTiles: Tile[] = [
+    {
+      emoji: '🪪',
+      title: 'Mon code & accès',
+      desc: 'Retrouver son code',
+      tint: 'bg-joy-cream',
+      ring: 'hover:ring-joy-ink/20',
+      action: () => navigate('/mon-code'),
+    },
+    {
+      emoji: '❓',
+      title: 'FAQ & assistance',
+      desc: 'Réponses & contact',
+      tint: 'bg-joy-cream',
+      ring: 'hover:ring-joy-ink/20',
+      action: () => navigate('/faq'),
+    },
+  ];
+
+  const renderTile = (t: Tile, key: string, compact = false) => (
+    <Card
+      key={key}
+      onClick={t.action}
+      className={`group relative cursor-pointer rounded-3xl border bg-white transition-all duration-200 hover:-translate-y-1.5 ring-1 ring-transparent ${t.ring} hover:ring-2`}
+      style={{
+        borderColor: t.featured ? TEAL : 'hsl(var(--joy-ink) / 0.08)',
+        boxShadow: 'var(--shadow-soft)',
+      }}
+    >
+      {t.featured && (
+        <Badge
+          className="absolute -top-2 right-3 rounded-full text-[10px] px-2 py-0.5"
+          style={{ background: TEAL, color: 'white' }}
+        >
+          Recommandé
+        </Badge>
+      )}
+      <CardContent className={compact ? 'p-4' : 'p-5'}>
+        <div className="flex items-start gap-3">
+          <div
+            className={`${t.tint} ${compact ? 'h-11 w-11 text-2xl' : 'h-14 w-14 text-3xl'} rounded-2xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-110 group-hover:rotate-3`}
+          >
+            {t.emoji}
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className={`font-semibold tracking-tight ${compact ? 'text-sm' : 'text-base'} text-joy-ink`}>
+              {t.title}
+            </div>
+            <p className={`text-joy-ink/60 mt-0.5 ${compact ? 'text-[11px]' : 'text-xs'} line-clamp-2`}>
+              {t.desc}
+            </p>
+          </div>
+          <ArrowRight className="h-4 w-4 text-joy-ink/25 group-hover:text-joy-ink/70 group-hover:translate-x-0.5 transition-all mt-2 shrink-0" />
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  const renderBand = (label: string, tiles: Tile[], cols: string, compact = false) => (
+    <section>
+      <div className="flex items-center gap-3 mb-3">
+        <span className="text-[11px] font-bold uppercase tracking-widest text-joy-ink/55">
+          {label}
+        </span>
+        <span className="flex-1 h-px bg-joy-ink/10" />
+      </div>
+      <div className={`grid gap-3 sm:gap-4 ${cols}`}>
+        {tiles.map((t, i) => renderTile(t, `${label}-${i}`, compact))}
+      </div>
+    </section>
+  );
 
   return (
     <div className="min-h-screen" style={{ background: '#FAFAFA', color: TEXT }}>
@@ -151,37 +283,64 @@ const EspacePage: React.FC<EspacePageProps> = ({ subscriberEmail, onLogout }) =>
             <Sparkles className="h-5 w-5" style={{ color: TEAL }} />
             <span>Mon espace</span>
           </button>
-          <div className="flex items-center gap-3">
-            <span className="text-xs text-joy-ink/55 hidden sm:inline">{subscriberEmail}</span>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onLogout}
-              aria-label="Déconnexion"
-              className="text-joy-ink/70 hover:text-joy-ink hover:bg-joy-ink/5 rounded-full h-9 w-9"
-            >
-              <LogOut className="h-4 w-4" />
-            </Button>
-          </div>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="rounded-full text-joy-ink/75 hover:text-joy-ink hover:bg-joy-ink/5 gap-1.5 px-3"
+              >
+                <div className="h-6 w-6 rounded-full bg-joy-cream flex items-center justify-center text-[11px] font-bold" style={{ color: TEAL }}>
+                  {(firstName || subscriberEmail || '?').charAt(0).toUpperCase()}
+                </div>
+                <span className="hidden sm:inline text-xs max-w-[180px] truncate">{subscriberEmail}</span>
+                <ChevronDown className="h-3.5 w-3.5" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-56 p-2 rounded-2xl">
+              <div className="px-2 py-2 text-xs text-joy-ink/60 truncate border-b border-joy-ink/8 mb-1">
+                {subscriberEmail}
+              </div>
+              <button
+                onClick={() => navigate('/mon-code')}
+                className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg hover:bg-joy-cream text-sm text-joy-ink text-left"
+              >
+                🪪 Mon code d'accès
+              </button>
+              <button
+                onClick={() => navigate('/faq')}
+                className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg hover:bg-joy-cream text-sm text-joy-ink text-left"
+              >
+                ❓ Aide & assistance
+              </button>
+              <div className="border-t border-joy-ink/8 my-1" />
+              <button
+                onClick={onLogout}
+                className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg hover:bg-joy-ink/5 text-sm text-joy-ink/75 text-left"
+              >
+                <LogOut className="h-3.5 w-3.5" /> Déconnexion
+              </button>
+            </PopoverContent>
+          </Popover>
         </div>
       </header>
 
       <main className="mx-auto max-w-6xl px-4 py-10 space-y-10">
         {/* Hero */}
-        <section className="space-y-1">
+        <section className="space-y-1.5">
           <p className="text-xs uppercase tracking-widest text-joy-ink/50">{today}</p>
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
+          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-tight">
             Bonjour{firstName ? `, ${firstName}` : ''} <span className="inline-block animate-joy-wiggle">👋</span>
           </h1>
-          <p className="text-joy-ink/65 text-base">Voici ton atelier — qu'est-ce qu'on crée aujourd'hui&nbsp;?</p>
+          <p className="text-joy-ink/65 text-base sm:text-lg">{cheers}</p>
         </section>
 
         {/* Bloc Reprendre */}
         <section>
           <Card
-            className="border rounded-2xl overflow-hidden"
+            className="border rounded-3xl overflow-hidden"
             style={{
-              background: 'linear-gradient(135deg, hsl(var(--joy-cream)) 0%, #ffffff 60%)',
+              background: 'linear-gradient(135deg, hsl(var(--joy-cream)) 0%, #ffffff 65%)',
               borderColor: 'hsl(var(--joy-ink) / 0.08)',
               boxShadow: 'var(--shadow-elevated)',
             }}
@@ -189,7 +348,7 @@ const EspacePage: React.FC<EspacePageProps> = ({ subscriberEmail, onLogout }) =>
             <CardContent className="p-6 sm:p-7">
               <div className="flex items-center gap-2 mb-3">
                 <Clock className="h-4 w-4" style={{ color: TEAL }} />
-                <span className="text-xs font-semibold uppercase tracking-wider text-joy-ink/60">
+                <span className="text-[11px] font-bold uppercase tracking-widest text-joy-ink/60">
                   Reprendre où vous en étiez
                 </span>
               </div>
@@ -241,12 +400,12 @@ const EspacePage: React.FC<EspacePageProps> = ({ subscriberEmail, onLogout }) =>
         {/* Bloc Mes livres */}
         {projects.length > 1 && (
           <section>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold tracking-tight flex items-center gap-2">
-                <FileText className="h-4 w-4" style={{ color: TEAL }} /> Mes livres
-              </h2>
-              <Button variant="ghost" size="sm" onClick={() => goPlanner('projects')} className="rounded-full">
-                Voir tout <ArrowRight className="h-4 w-4 ml-1" />
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[11px] font-bold uppercase tracking-widest text-joy-ink/55 flex items-center gap-2">
+                <FileText className="h-3.5 w-3.5" /> Mes livres récents
+              </span>
+              <Button variant="ghost" size="sm" onClick={() => goPlanner('projects')} className="rounded-full text-xs">
+                Voir tout <ArrowRight className="h-3.5 w-3.5 ml-1" />
               </Button>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -254,7 +413,7 @@ const EspacePage: React.FC<EspacePageProps> = ({ subscriberEmail, onLogout }) =>
                 <Card
                   key={p.id}
                   onClick={() => goPlanner()}
-                  className="cursor-pointer rounded-xl border transition-all duration-200 hover:-translate-y-0.5"
+                  className="cursor-pointer rounded-2xl border transition-all duration-200 hover:-translate-y-0.5"
                   style={{
                     borderColor: 'hsl(var(--joy-ink) / 0.08)',
                     boxShadow: 'var(--shadow-soft)',
@@ -272,77 +431,21 @@ const EspacePage: React.FC<EspacePageProps> = ({ subscriberEmail, onLogout }) =>
           </section>
         )}
 
-        {/* Bloc Créer du neuf */}
-        <section>
-          <h2 className="text-lg font-semibold tracking-tight mb-4 flex items-center gap-2">
-            <Sparkles className="h-4 w-4" style={{ color: ORANGE }} /> Créer du neuf
-          </h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {createCards.map((c) => (
-              <Card
-                key={c.title}
-                onClick={c.action}
-                className="relative cursor-pointer rounded-2xl border transition-all duration-200 hover:-translate-y-1 flex flex-col"
-                style={{
-                  borderColor: c.featured ? TEAL : 'hsl(var(--joy-ink) / 0.08)',
-                  boxShadow: 'var(--shadow-soft)',
-                }}
-              >
-                {c.featured && (
-                  <Badge
-                    className="absolute -top-2 right-3 rounded-full"
-                    style={{ background: TEAL, color: 'white' }}
-                  >
-                    Recommandé
-                  </Badge>
-                )}
-                <CardContent className="p-5 flex flex-col flex-1">
-                  <div className={`h-14 w-14 rounded-2xl ${c.tint} flex items-center justify-center text-3xl mb-3`}>
-                    {c.emoji}
-                  </div>
-                  <div className="font-semibold text-base tracking-tight">{c.title}</div>
-                  <p className="text-xs text-joy-ink/60 mt-1 mb-4 flex-1">{c.desc}</p>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="rounded-full w-full border-joy-ink/20 hover:bg-joy-ink hover:text-white hover:border-joy-ink"
-                    onClick={(e) => { e.stopPropagation(); c.action(); }}
-                  >
-                    {c.cta} <ArrowRight className="h-3.5 w-3.5 ml-1" />
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
+        {/* Bandes de tuiles : Mon atelier */}
+        <div className="space-y-8">
+          {renderBand('Créer', createTiles, 'sm:grid-cols-2 lg:grid-cols-4')}
+          {renderBand('Booster mes ventes', boostTiles, 'sm:grid-cols-2 lg:grid-cols-3')}
+          {renderBand('Apprendre & échanger', learnTiles, 'sm:grid-cols-2 lg:grid-cols-3')}
+          {renderBand('Mon compte', accountTiles, 'sm:grid-cols-2', true)}
+        </div>
 
-        {/* Bloc Aller plus loin */}
-        <section>
-          <h2 className="text-lg font-semibold tracking-tight mb-4 text-joy-ink/80">
-            Aller plus loin
-          </h2>
-          <div className="grid sm:grid-cols-2 gap-2.5">
-            {secondaryLinks.map((l) => (
-              <button
-                key={l.to}
-                onClick={() => navigate(l.to)}
-                className="group flex items-center gap-3 p-3.5 rounded-xl bg-white border transition-all hover:border-[#008296] hover:shadow-[var(--shadow-soft)] text-left"
-                style={{ borderColor: 'hsl(var(--joy-ink) / 0.08)' }}
-              >
-                <div className="h-9 w-9 rounded-lg bg-joy-cream flex items-center justify-center">
-                  <l.icon className="h-4 w-4" style={{ color: TEAL }} />
-                </div>
-                <span className="text-sm font-medium text-joy-ink flex-1">{l.label}</span>
-                <ArrowRight className="h-4 w-4 text-joy-ink/30 group-hover:text-joy-ink/70 group-hover:translate-x-0.5 transition-all" />
-              </button>
-            ))}
-          </div>
-        </section>
-
-        <footer className="text-center text-xs text-joy-ink/55 pt-6 pb-8">
-          Besoin d'aide ?{' '}
+        <footer className="text-center text-xs text-joy-ink/55 pt-6 pb-8 space-x-3">
           <button onClick={() => navigate('/faq')} className="underline hover:text-joy-ink">
             FAQ &amp; assistance
+          </button>
+          <span aria-hidden>·</span>
+          <button onClick={() => navigate('/coaching-vip')} className="hover:text-joy-ink">
+            Coaching VIP sur rendez-vous
           </button>
         </footer>
       </main>
