@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { ArrowRight, Clock, Sparkles, FileText, Loader2, LogOut, ChevronDown } from 'lucide-react';
+import { ArrowRight, Clock, Sparkles, FileText, Loader2, LogOut, ChevronDown, LayoutDashboard } from 'lucide-react';
 
 interface EspacePageProps {
   subscriberEmail: string;
@@ -283,6 +283,16 @@ const EspacePage: React.FC<EspacePageProps> = ({ subscriberEmail, onLogout }) =>
             <Sparkles className="h-5 w-5" style={{ color: TEAL }} />
             <span>Mon espace</span>
           </button>
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              onClick={() => goPlanner('workflow-dashboard')}
+              className="rounded-full px-4 gap-1.5 hover:opacity-90 hover:scale-[1.03] transition-all shadow-[0_2px_8px_rgba(0,130,150,0.25)]"
+              style={{ background: TEAL, color: 'white' }}
+            >
+              <LayoutDashboard className="h-4 w-4" />
+              <span className="hidden sm:inline">Tableau de bord</span>
+            </Button>
           <Popover>
             <PopoverTrigger asChild>
               <Button
@@ -322,6 +332,7 @@ const EspacePage: React.FC<EspacePageProps> = ({ subscriberEmail, onLogout }) =>
               </button>
             </PopoverContent>
           </Popover>
+          </div>
         </div>
       </header>
 
