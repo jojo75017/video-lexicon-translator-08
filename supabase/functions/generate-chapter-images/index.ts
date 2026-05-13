@@ -99,6 +99,43 @@ INSTRUCTIONS CRITIQUES POUR RÉALISME HUMAIN:
   return '';
 };
 
+// Direct call to Google Gemini image generation API using user's BYOK key
+async function tryGeminiDirect(prompt: string, apiKey?: string): Promise<string | null> {
+  if (!apiKey || !apiKey.startsWith('AIza')) return null;
+  const models = ['gemini-2.5-flash-image', 'gemini-2.5-flash-image-preview'];
+  for (const model of models) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      const r = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { responseModalities: ['IMAGE'] },
+        }),
+      });
+      if (!r.ok) {
+        const t = await r.text();
+        console.error(`Gemini direct (${model}) ${r.status}:`, t.substring(0, 300));
+        continue;
+      }
+      const data = await r.json();
+      const parts = data?.candidates?.[0]?.content?.parts || [];
+      for (const p of parts) {
+        const inline = p.inline_data || p.inlineData;
+        if (inline?.data) {
+          const mime = inline.mime_type || inline.mimeType || 'image/png';
+          return `data:${mime};base64,${inline.data}`;
+        }
+      }
+      console.error(`Gemini direct (${model}) no image in response`);
+    } catch (e) {
+      console.error(`Gemini direct (${model}) error:`, e);
+    }
+  }
+  return null;
+}
+
 // Upload une image (base64 ou URL) vers Supabase Storage et retourne l'URL publique
 async function uploadImageToStorage(imageData: string, chapterTitle: string): Promise<string> {
   const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
