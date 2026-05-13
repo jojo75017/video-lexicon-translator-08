@@ -278,6 +278,24 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
         </div>
 
         <div className="flex items-center gap-1">
+          {isAdmin && (
+            <TooltipProvider delayDuration={200}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link
+                    to="/admin-cockpit"
+                    aria-label="Cockpit admin"
+                    className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold border border-joy-teal/40 text-joy-ink hover:bg-joy-teal/10 transition-all"
+                    style={{ color: '#008296' }}
+                  >
+                    <Shield className="h-3.5 w-3.5" />
+                    <span className="hidden sm:inline">Cockpit admin</span>
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">Cockpit admin</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
           {onLogout && (
             <TooltipProvider delayDuration={200}>
               <Tooltip>
