@@ -397,24 +397,25 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
           {/* Sous-barre contextuelle */}
           {currentFamily && PLANNER_SUBTABS[currentFamily]?.length > 0 && (
             <nav
-              className="border-t border-joy-ink/5 bg-white/40"
+              className="border-t border-joy-ink/5 bg-gradient-to-r from-white via-joy-cream/40 to-white"
               aria-label="Outils de l'étape"
             >
               <div className="mx-auto flex max-w-7xl items-center gap-1 overflow-x-auto px-3 py-1.5 sm:px-6 scrollbar-thin">
-                {PLANNER_SUBTABS[currentFamily].map((sub) => {
+                {PLANNER_SUBTABS[currentFamily]!.map((sub) => {
                   const active = isSubActive(sub.id);
                   return (
                     <button
                       key={sub.id}
                       onClick={() => onTabChange?.(sub.id)}
                       className={cn(
-                        'flex-shrink-0 rounded-full px-3 py-1 text-xs font-medium transition-all',
+                        'flex-shrink-0 rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 hover:scale-[1.05]',
                         active
-                          ? 'bg-joy-teal/10 text-joy-ink font-semibold'
-                          : 'text-joy-ink/60 hover:text-joy-ink hover:bg-joy-cream',
+                          ? 'bg-joy-teal/15 border border-joy-teal/30 font-semibold'
+                          : 'text-joy-ink/60 hover:text-[#FF9E2D] hover:bg-joy-cream',
                       )}
                       style={active ? { color: '#008296' } : undefined}
                     >
+                      {active && <span className="mr-1" aria-hidden>●</span>}
                       {sub.label}
                     </button>
                   );
