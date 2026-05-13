@@ -1572,48 +1572,79 @@ Paperback: 9.99€ - 19.99€
     URL.revokeObjectURL(url);
   };
 
-  // Génère un contenu formaté pour Google Docs (optimisé KDP) avec images base64 pour l'edge function
+  // Supprime la répétition du titre/numéro de chapitre en début de contenu
+  const stripChapterTitlePrefix = (content: string, chapterNumber: number, chapterTitle: string): string => {
+    if (!content) return content;
+    let t = content.replace(/^[\s\u00A0]+/, '');
+    // Retire variantes "Chapitre N", "CHAPITRE N", "N", "N." "N," "N -" "N:" en début
+    t = t.replace(new RegExp(`^(?:chapitre\\s*)?${chapterNumber}\\s*[\\.,:\\-–—)]?\\s*`, 'i'), '');
+    // Retire "CHAPITRE N" suivi de saut de ligne ou ponctuation
+    t = t.replace(/^chapitre\s*\d+\s*[\.,:\-–—)]?\s*/i, '');
+    // Retire le titre du chapitre s'il est répété (avec ou sans ponctuation)
+    const norm = (s: string) => s.toLowerCase().replace(/[\s\u00A0]+/g, ' ').trim();
+    const titleN = norm(chapterTitle);
+    if (titleN && titleN.length > 2) {
+      const head = norm(t.slice(0, titleN.length + 4));
+      if (head.startsWith(titleN)) {
+        // trouver longueur réelle dans t (en respectant la casse/espaces)
+        let i = 0, j = 0;
+        const tl = t.toLowerCase();
+        const tn = titleN;
+        while (i < tl.length && j < tn.length) {
+          if (/\s/.test(tl[i]) && /\s/.test(tn[j])) { i++; j++; continue; }
+          if (tl[i] === tn[j]) { i++; j++; } else if (/\s/.test(tl[i])) { i++; } else if (/\s/.test(tn[j])) { j++; } else { break; }
+        }
+        if (j >= tn.length - 1) {
+          t = t.slice(i).replace(/^[\s\.,:;–—\-]+/, '');
+        }
+      }
+    }
+    return t;
+  };
+
+  // Génère un contenu formaté pour Google Docs avec marqueurs de titres
+  // Marqueurs: ##H1## ... pour titres de section / chapitre (style HEADING_1)
+  //            ##H2## ... pour sous-chapitres (HEADING_2)
   const generateKdpContent = () => {
     let content = '';
-    
-    // Préface
+
     if (cleanedPreface) {
-      content += `PRÉFACE\n\n`;
+      content += `##H1##PRÉFACE\n\n`;
       content += `${cleanedPreface}\n\n\n`;
     }
 
-    // Chapitres
     cleanedChapters.forEach((chapter, index) => {
       const chapterNumber = index + 1;
-      
-      content += `CHAPITRE ${chapterNumber}\n${chapter.title.toUpperCase()}\n\n`;
-      
-      if (chapter.content) {
-        content += `${chapter.content}\n\n`;
+      const cleanTitle = (chapter.title || '').replace(/\s+/g, ' ').trim();
+
+      content += `##H1##Chapitre ${chapterNumber} — ${cleanTitle}\n\n`;
+
+      const chapterContent = stripChapterTitlePrefix(chapter.content || '', chapterNumber, cleanTitle);
+      if (chapterContent) {
+        content += `${chapterContent}\n\n`;
       }
-      
-      // Sous-chapitres
+
       chapter.subChapters.forEach((subChapter, subIndex) => {
         const subNumber = `${chapterNumber}.${subIndex + 1}`;
-        content += `${subNumber}. ${subChapter.title}\n\n`;
-        
-        if (subChapter.content) {
-          content += `${subChapter.content}\n\n`;
+        const subTitle = (subChapter.title || '').replace(/\s+/g, ' ').trim();
+        content += `##H2##${subNumber}. ${subTitle}\n\n`;
+
+        const subContent = stripChapterTitlePrefix(subChapter.content || '', chapterNumber, subTitle);
+        if (subContent) {
+          content += `${subContent}\n\n`;
         }
       });
-      
+
       content += '\n';
     });
 
-    // Conclusion
     if (cleanedConclusion) {
-      content += `CONCLUSION\n\n`;
+      content += `##H1##CONCLUSION\n\n`;
       content += `${cleanedConclusion}\n\n`;
     }
 
-    // Épilogue
     if (cleanedEpilogue) {
-      content += `ÉPILOGUE\n\n`;
+      content += `##H1##ÉPILOGUE\n\n`;
       content += `${cleanedEpilogue}\n\n`;
     }
 
