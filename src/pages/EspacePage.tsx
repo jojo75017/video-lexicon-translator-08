@@ -22,7 +22,6 @@ interface ProjectRow {
   title: string | null;
   author_name: string | null;
   updated_at: string;
-  type?: string | null;
 }
 
 const TEAL = '#008296';
@@ -54,7 +53,7 @@ const EspacePage: React.FC<EspacePageProps> = ({ subscriberEmail, onLogout }) =>
         if (!user) { setProjects([]); return; }
         const { data } = await supabase
           .from('ebook_projects')
-          .select('id, title, author_name, updated_at, type')
+          .select('id, title, author_name, updated_at')
           .eq('user_id', user.id)
           .order('updated_at', { ascending: false })
           .limit(6);
@@ -207,7 +206,7 @@ const EspacePage: React.FC<EspacePageProps> = ({ subscriberEmail, onLogout }) =>
                   <CardContent className="p-4">
                     <div className="font-medium line-clamp-1">{p.title || 'Sans titre'}</div>
                     <div className="text-xs text-muted-foreground mt-1">
-                      {p.type || 'ebook'} · {formatRelative(p.updated_at)}
+                      {formatRelative(p.updated_at)}
                     </div>
                   </CardContent>
                 </Card>
