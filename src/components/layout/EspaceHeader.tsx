@@ -15,7 +15,7 @@ interface EspaceHeaderProps {
   onTabChange?: (tab: string) => void;
 }
 
-type FamilyId = 'planner' | 'writing' | 'images' | 'export' | 'marketing';
+type FamilyId = 'planner' | 'writing' | 'images' | 'export' | 'marketing' | 'account';
 
 const PLANNER_TABS: Array<{ id: FamilyId; label: string; match: string[] }> = [
   { id: 'planner', label: 'Plan', match: ['planner', 'characters', 'templates', 'workflow-dashboard', 'url-import', 'doc-transform', 'projects', 'ebook-library', 'series'] },
