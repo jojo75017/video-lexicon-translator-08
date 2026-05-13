@@ -15,14 +15,14 @@ interface EspaceHeaderProps {
   onTabChange?: (tab: string) => void;
 }
 
-type FamilyId = 'planner' | 'writing' | 'images' | 'export' | 'marketing';
+type FamilyId = 'planner' | 'writing' | 'images' | 'export' | 'marketing' | 'account';
 
 const PLANNER_TABS: Array<{ id: FamilyId; label: string; match: string[] }> = [
   { id: 'planner', label: 'Plan', match: ['planner', 'characters', 'templates', 'workflow-dashboard', 'url-import', 'doc-transform', 'projects', 'ebook-library', 'series'] },
-  { id: 'writing', label: 'Écrire', match: ['writing', 'strict-proofread', 'toc', 'aichat', 'complete-workflow', 'humanize-anti-ia', 'natural-rewrite', 'expert-writing', 'multi-translator'] },
+  { id: 'writing', label: 'Écrire', match: ['writing', 'strict-proofread', 'toc', 'aichat', 'complete-workflow', 'humanize-anti-ia', 'natural-rewrite', 'expert-writing', 'multi-translator', 'tools', 'atlas', 'encyclopedia', 'documentary', 'agenda', 'scolaire', 'content-architect'] },
   { id: 'images', label: 'Habiller', match: ['images', 'cover', 'cover-design-editor', 'back-cover', 'backcover', 'images-cover', 'images-generator', 'images-library', 'editorial-packaging'] },
-  { id: 'export', label: 'Publier', match: ['export', 'kdp', 'kdp-prepublish-checklist', 'workflow-export', 'calibre-epub', 'audiobook', 'audio-express', 'audio'] },
-  { id: 'marketing', label: 'Vendre', match: ['marketing', 'monetization', 'advanced', 'launch-plan', 'editorial-quality', 'final-diagnosis'] },
+  { id: 'export', label: 'Publier', match: ['export', 'kdp', 'kdp-prepublish-checklist', 'workflow-export', 'calibre-epub', 'audiobook', 'audio-express', 'audio', 'audit-pilot', 'kdp-keywords-pro'] },
+  { id: 'marketing', label: 'Vendre', match: ['marketing', 'monetization', 'advanced', 'launch-plan', 'editorial-quality', 'final-diagnosis', 'kdp-ads-guide', 'chrome-extension'] },
 ];
 
 const HIDE_TABBAR_ON = new Set([
@@ -34,7 +34,7 @@ const HIDE_TABBAR_ON = new Set([
 ]);
 
 // Sous-onglets contextuels par famille (les outils courants).
-const PLANNER_SUBTABS: Record<FamilyId, Array<{ id: string; label: string }>> = {
+const PLANNER_SUBTABS: Partial<Record<FamilyId, Array<{ id: string; label: string }>>> = {
   planner: [
     { id: 'workflow-dashboard', label: 'Tableau de bord IA' },
     { id: 'planner', label: 'Plan du livre' },
@@ -50,6 +50,7 @@ const PLANNER_SUBTABS: Record<FamilyId, Array<{ id: string; label: string }>> = 
     { id: 'strict-proofread', label: 'Proofread strict' },
     { id: 'humanize-anti-ia', label: 'Anti-IA / humaniser' },
     { id: 'multi-translator', label: 'Traduction' },
+    { id: 'tools', label: 'Boîte à outils' },
   ],
   images: [
     { id: 'images-cover', label: 'Studio image' },
@@ -61,6 +62,8 @@ const PLANNER_SUBTABS: Record<FamilyId, Array<{ id: string; label: string }>> = 
   export: [
     { id: 'kdp', label: 'Export KDP' },
     { id: 'kdp-prepublish-checklist', label: 'Checklist KDP' },
+    { id: 'audit-pilot', label: 'Audit pré-publication' },
+    { id: 'kdp-keywords-pro', label: 'Mots-clés KDP' },
     { id: 'calibre-epub', label: 'Export EPUB' },
     { id: 'audiobook', label: 'Audiobook' },
     { id: 'audio-express', label: 'Audio Express' },
@@ -68,6 +71,7 @@ const PLANNER_SUBTABS: Record<FamilyId, Array<{ id: string; label: string }>> = 
   marketing: [
     { id: 'marketing', label: 'Plan marketing' },
     { id: 'launch-plan', label: 'Plan de lancement' },
+    { id: 'kdp-ads-guide', label: 'Amazon Ads' },
     { id: 'advanced', label: 'Stratégie avancée' },
   ],
 };
@@ -127,6 +131,8 @@ const ALL_TOOLS: Array<{ family: FamilyId; familyLabel: string; tools: Array<{ i
     tools: [
       { id: 'kdp', label: 'Export KDP' },
       { id: 'kdp-prepublish-checklist', label: 'Checklist pré-publication' },
+      { id: 'audit-pilot', label: 'Audit pré-publication' },
+      { id: 'kdp-keywords-pro', label: 'Mots-clés KDP Pro' },
       { id: 'export', label: 'Export PDF/DOCX' },
       { id: 'calibre-epub', label: 'Export EPUB (Calibre)' },
       { id: 'workflow-export', label: 'Export workflow' },
@@ -146,6 +152,20 @@ const ALL_TOOLS: Array<{ family: FamilyId; familyLabel: string; tools: Array<{ i
       { id: 'advanced', label: 'Stratégie avancée' },
       { id: 'market-analysis', label: 'Analyse de marché' },
       { id: 'editorial-director', label: 'Directeur éditorial' },
+      { id: 'kdp-ads-guide', label: 'Guide Amazon Ads' },
+      { id: 'chrome-extension', label: 'Extension Chrome' },
+    ],
+  },
+  {
+    family: 'account',
+    familyLabel: 'Mon compte',
+    tools: [
+      { id: 'subscription', label: 'Mon abonnement' },
+      { id: 'settings', label: 'Paramètres' },
+      { id: 'parrainage', label: 'Parrainage' },
+      { id: 'communaute', label: 'Communauté' },
+      { id: 'admin', label: 'Admin' },
+      { id: 'admin-subscribers', label: 'Admin — abonnés' },
     ],
   },
 ];
