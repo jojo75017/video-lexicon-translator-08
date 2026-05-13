@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { ArrowRight, Clock, Sparkles, FileText, Loader2, LogOut, ChevronDown } from 'lucide-react';
+import { ArrowRight, Clock, Sparkles, FileText, Loader2, LogOut, ChevronDown, LayoutDashboard } from 'lucide-react';
 
 interface EspacePageProps {
   subscriberEmail: string;
