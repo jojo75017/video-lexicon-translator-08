@@ -515,17 +515,41 @@ serve(async (req) => {
     // Construire le texte complet dans le bon ordre
     let fullText = `${title}\n\n`;
     let titleEndIndex = fullText.length;
-    
+
     if (authorName) {
       fullText += `Par ${authorName}\n\n`;
     }
-    
+
+    const bodyStartOffset = fullText.length; // offset (0-based) où commence le corps
     fullText += correctedContent;
+
+    // Détecter les marqueurs de titres ##H1## / ##H2## et calculer leurs ranges (index Google Docs = +1)
+    const headingRanges: Array<{ start: number; end: number; level: 1 | 2 }> = [];
+    {
+      const lines = correctedContent.split('\n');
+      let cursor = bodyStartOffset; // offset 0-based dans fullText
+      const cleanedLines: string[] = [];
+      for (const line of lines) {
+        let outLine = line;
+        let level: 1 | 2 | 0 = 0;
+        if (line.startsWith('##H1##')) { outLine = line.slice(6); level = 1; }
+        else if (line.startsWith('##H2##')) { outLine = line.slice(6); level = 2; }
+        cleanedLines.push(outLine);
+        if (level) {
+          // +1 car les index Google Docs commencent à 1
+          const start = cursor + 1;
+          const end = start + outLine.length;
+          headingRanges.push({ start, end, level });
+        }
+        cursor += outLine.length + 1; // +1 pour le \n
+      }
+      const cleanedBody = cleanedLines.join('\n');
+      fullText = fullText.slice(0, bodyStartOffset) + cleanedBody;
+    }
 
     // Préparer les requêtes pour ajouter le contenu
     const requests: any[] = [];
-    
-    // Insérer tout le texte d'un coup
+
     requests.push({
       insertText: {
         location: { index: 1 },
@@ -533,19 +557,25 @@ serve(async (req) => {
       },
     });
 
-    // Styliser le titre
+    // Styliser le titre principal
     requests.push({
       updateParagraphStyle: {
-        range: {
-          startIndex: 1,
-          endIndex: titleEndIndex,
-        },
-        paragraphStyle: {
-          namedStyleType: 'TITLE',
-        },
+        range: { startIndex: 1, endIndex: titleEndIndex },
+        paragraphStyle: { namedStyleType: 'TITLE' },
         fields: 'namedStyleType',
       },
     });
+
+    // Styliser chaque titre H1/H2
+    for (const h of headingRanges) {
+      requests.push({
+        updateParagraphStyle: {
+          range: { startIndex: h.start, endIndex: h.end },
+          paragraphStyle: { namedStyleType: h.level === 1 ? 'HEADING_1' : 'HEADING_2' },
+          fields: 'namedStyleType',
+        },
+      });
+    }
 
     // Ajouter le contenu au document
     const updateResponse = await fetch(
