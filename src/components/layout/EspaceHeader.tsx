@@ -1,11 +1,12 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { ArrowLeft, LogOut, Sparkles, LayoutGrid, Search } from 'lucide-react';
+import { ArrowLeft, LogOut, Sparkles, LayoutGrid, Search, Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
 
 interface EspaceHeaderProps {
   projectTitle?: string | null;
