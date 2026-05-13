@@ -372,6 +372,7 @@ const App = () => {
                     subscriberData={subscriberData}
                     isDemo={false}
                     isAdmin={isAdmin}
+                    onLogout={handleLogout}
                   />
                 </SubscriberGate>
               }
