@@ -89,6 +89,7 @@ const RecuperationCodePage = lazy(() => import('./pages/RecuperationCodePage'));
 const ExtensionChromePage = lazy(() => import('./pages/ExtensionChromePage'));
 const EbookbotPage = lazy(() => import('./pages/EbookbotPage'));
 const EspacePage = lazy(() => import('./pages/EspacePage'));
+const EspaceLancementPage = lazy(() => import('./pages/EspaceLancementPage'));
 
 // Promo funnel pages
 const PromoCapturePage = lazy(() => import('./pages/promo/PromoCapturePage'));
