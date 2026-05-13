@@ -1538,7 +1538,8 @@ Retourne en JSON :
           }
 
           const fallbackChapter = buildRobustChapterFallback(chapitre, fullTitle, category, chapitresDejaGeneres, { ...chapterSegment, partNumber, totalParts });
-          const chapitreGenere = cleanChapter(parsedChapter || (chapterContent ? {
+          const parsedHasContent = typeof parsedChapter?.contenu === 'string' && parsedChapter.contenu.trim().length > 80;
+          const chapitreGenere = cleanChapter(parsedHasContent ? parsedChapter : (chapterContent ? {
             numero: chapitre.numero,
             titre: chapitre.titre,
             contenu: chapterContent,
