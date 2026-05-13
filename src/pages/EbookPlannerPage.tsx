@@ -3472,6 +3472,10 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
       )}
 
       <main className="flex-1 overflow-y-auto">
+        <EspaceHeader
+          projectTitle={ebookTitle || null}
+          onLogout={onLogout}
+        />
         <MissingApiKeyBanner
           apiKey={apiKey}
           onScrollToKeyField={() => {
