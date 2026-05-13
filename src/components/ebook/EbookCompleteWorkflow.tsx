@@ -252,7 +252,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
     } finally {
       setAutofillLoading(false);
     }
-  }, [title, subtitle, bookIntroduction, language, normalizedUserApiKey, cibleProfil, cibleBesoins, cibleFrustrations, promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion]);
+  }, [title, subtitle, category, bookIntroduction, language, normalizedUserApiKey, cibleProfil, cibleBesoins, cibleFrustrations, promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion]);
 
 
 
