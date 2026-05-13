@@ -293,7 +293,7 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
         <>
           {/* Rangée principale : familles + Tous les outils */}
           <nav
-            className="border-t border-joy-ink/5 bg-white/60"
+            className="border-t border-joy-ink/5 bg-gradient-to-r from-white via-joy-cream/30 to-white"
             aria-label="Étapes du livre"
           >
             <div className="mx-auto flex max-w-7xl items-center gap-1 overflow-x-auto px-3 py-2 sm:px-6 scrollbar-thin">
@@ -305,10 +305,10 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
                       key={tab.id}
                       onClick={() => onTabChange?.(tab.id)}
                       className={cn(
-                        'flex-shrink-0 rounded-full px-4 py-1.5 text-sm font-semibold transition-all',
+                        'flex-shrink-0 rounded-full px-4 py-1.5 text-sm font-semibold transition-all duration-200 hover:scale-[1.04]',
                         active
-                          ? 'text-white shadow-sm'
-                          : 'text-joy-ink/70 hover:bg-joy-cream hover:text-joy-ink',
+                          ? 'text-white shadow-[0_2px_10px_rgba(0,130,150,0.28)]'
+                          : 'text-joy-ink/70 hover:bg-joy-cream hover:text-[#FF9E2D]',
                       )}
                       style={
                         active
@@ -316,6 +316,7 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
                           : undefined
                       }
                     >
+                      <span className="mr-1.5" aria-hidden>{tab.emoji}</span>
                       {tab.label}
                     </button>
                   );
@@ -327,10 +328,11 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="rounded-full text-joy-ink/75 hover:text-joy-ink hover:bg-joy-cream gap-1.5 px-3 flex-shrink-0"
+                    className="rounded-full text-joy-ink/75 hover:text-[#FF9E2D] hover:bg-joy-cream gap-1.5 px-3 flex-shrink-0 transition-all hover:scale-[1.04]"
                   >
                     <LayoutGrid className="h-3.5 w-3.5" />
                     <span className="hidden sm:inline text-xs font-semibold">Tous les outils</span>
+                    <Sparkles className="h-3 w-3 animate-pulse" style={{ color: '#FF9E2D' }} />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent
