@@ -646,8 +646,8 @@ function normalizeP3Chapter(rawChapter: any, index: number, wordsPerChapter: num
   const numero = Number(rawChapter.numero) || Number(stringChapterMatch?.[1]) || index + 1;
   const derivedTitle = typeof rawChapter === 'string'
     ? stringChapterMatch?.[2] || rawChapter
-    : rawChapter.titre || rawChapter.title || rawChapter.nom || rawChapter.chapterTitle || rawChapter.heading || `Chapitre ${numero}`;
-  const titre = cleanGeneratedText(derivedTitle);
+    : rawChapter.titre || rawChapter.title || rawChapter.nom || rawChapter.chapterTitle || rawChapter.heading || rawChapter.titreLivreFinal || `Chapitre ${numero}`;
+  const titre = sanitizeChapterTitle(derivedTitle, '');
   const objectif = cleanGeneratedText(rawChapter.objectif || rawChapter.goal || rawChapter.resume || rawChapter.summary || rawChapter.description || '');
   const rawSubSections =
     rawChapter.sousSections ||
@@ -668,7 +668,7 @@ function normalizeP3Chapter(rawChapter: any, index: number, wordsPerChapter: num
       ? rawPointsCles.split(/\n|•|- /g).map((item: string) => cleanGeneratedText(item)).filter(Boolean)
       : [];
 
-  if (!titre || isSkippableP3Title(titre)) return null;
+  if (!titre || isGenericChapterTitle(titre) || isSkippableP3Title(titre)) return null;
 
   return {
     numero,
