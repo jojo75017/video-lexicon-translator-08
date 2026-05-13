@@ -20,6 +20,66 @@ interface Body {
   userApiKey?: string;
 }
 
+async function callGemini(prompt: string, apiKey: string) {
+  const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+  const response = await fetch(geminiUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      contents: [{ role: "user", parts: [{ text: prompt }] }],
+      generationConfig: {
+        responseMimeType: "application/json",
+        temperature: 0.8,
+        maxOutputTokens: 1500,
+      },
+    }),
+  });
+
+  if (!response.ok) {
+    const errText = await response.text();
+    console.error("Gemini error:", response.status, errText.slice(0, 500));
+    return { ok: false as const, status: response.status, text: errText };
+  }
+
+  const data = await response.json();
+  return { ok: true as const, text: data?.candidates?.[0]?.content?.parts?.[0]?.text || "" };
+}
+
+async function callLovableAI(prompt: string) {
+  const lovableApiKey = Deno.env.get("LOVABLE_API_KEY");
+  if (!lovableApiKey) return { ok: false as const, status: 500, text: "LOVABLE_API_KEY missing" };
+
+  const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${lovableApiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "google/gemini-2.5-flash",
+      messages: [
+        { role: "system", content: "Tu réponds uniquement en JSON valide, sans markdown." },
+        { role: "user", content: prompt },
+      ],
+      temperature: 0.8,
+      max_tokens: 1500,
+    }),
+  });
+
+  const text = await response.text();
+  if (!response.ok) {
+    console.error("Lovable AI error:", response.status, text.slice(0, 500));
+    return { ok: false as const, status: response.status, text };
+  }
+
+  try {
+    const data = JSON.parse(text);
+    return { ok: true as const, text: data?.choices?.[0]?.message?.content || "" };
+  } catch {
+    return { ok: true as const, text };
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return json(405, { error: "Method not allowed" });
@@ -48,9 +108,7 @@ Deno.serve(async (req) => {
     if (!title) {
       return json(400, { error: "Titre requis" });
     }
-    if (!userKey || !userKey.startsWith("AIza")) {
-      return json(400, { error: "Clé Gemini manquante ou invalide (doit commencer par AIza)" });
-    }
+    const serverGeminiKey = (Deno.env.get("GEMINI_API_KEY") || "").trim();
 
     const langLabel = language === "en" ? "English" : language === "es" ? "Spanish" : language === "it" ? "Italian" : "French";
 
@@ -73,32 +131,20 @@ Renvoie uniquement cet objet JSON:
   "promesseEmotion": "string (3-5 mots: émotion visée)"
 }`;
 
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${userKey}`;
-
-    const geminiRes = await fetch(geminiUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ role: "user", parts: [{ text: prompt }] }],
-        generationConfig: {
-          responseMimeType: "application/json",
-          temperature: 0.8,
-          maxOutputTokens: 1500,
-        },
-      }),
-    });
-
-    if (!geminiRes.ok) {
-      const errText = await geminiRes.text();
-      console.error("Gemini error:", geminiRes.status, errText.slice(0, 500));
-      if (geminiRes.status === 429) {
-        return json(429, { error: "Limite Gemini atteinte. Réessaye dans quelques secondes." });
-      }
-      return json(502, { error: `Erreur Gemini (${geminiRes.status})` });
+    let aiResult = userKey.startsWith("AIza") ? await callGemini(prompt, userKey) : null;
+    if (!aiResult?.ok && serverGeminiKey.startsWith("AIza")) aiResult = await callGemini(prompt, serverGeminiKey);
+    if (!aiResult?.ok) aiResult = await callLovableAI(prompt);
+    if (!aiResult.ok) {
+      const status = aiResult.status === 429 ? 429 : aiResult.status === 402 ? 402 : 502;
+      const message = status === 429
+        ? "Limite IA atteinte. Réessaye dans quelques secondes."
+        : status === 402
+          ? "Crédits IA indisponibles pour le moment."
+          : "Service IA temporairement indisponible.";
+      return json(status, { error: message });
     }
 
-    const geminiData = await geminiRes.json();
-    const text = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    const text = aiResult.text;
     let parsed: Record<string, string>;
     try {
       parsed = JSON.parse(text);
