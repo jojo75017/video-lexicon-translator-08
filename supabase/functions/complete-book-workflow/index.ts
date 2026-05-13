@@ -358,15 +358,91 @@ function cleanGeneratedText(text: string): string {
     .trim();
 }
 
+function isGenericChapterTitle(title: string): boolean {
+  const normalized = cleanGeneratedText(title || '')
+    .toLowerCase()
+    .replace(/["'«»“”]/g, '')
+    .trim();
+
+  return !normalized || /^(?:chapitre|chapter|ch\.?)(?:\s+|\.?)(\d+)$/.test(normalized);
+}
+
+function sanitizeChapterTitle(rawTitle: unknown, fallbackTitle = ''): string {
+  const raw = typeof rawTitle === 'string' ? rawTitle : '';
+  const fallback = cleanGeneratedText(fallbackTitle || '');
+
+  if (!raw.trim()) return fallback;
+
+  const keyedMatch = raw.match(/(?:titreLivreFinal|titreFinal|titreChapitre|chapterTitle|heading|titre|title|nom)\s*["»”']?\s*[:=]\s*["«“']?([^"\n}{]{3,180})/i);
+  let title = cleanGeneratedText(keyedMatch?.[1] || raw);
+
+  title = title
+    .replace(/^(?:titreLivreFinal|titreFinal|titreChapitre|chapterTitle|heading|titre|title|nom)\s*[:=]\s*/i, '')
+    .replace(/^chapitre\s+\d+\s*[:–—-]\s*/i, '')
+    .replace(/^chapter\s+\d+\s*[:–—-]\s*/i, '')
+    .replace(/^["'«»“”]+|["'«»“”]+$/g, '')
+    .trim();
+
+  if (isGenericChapterTitle(title) && fallback) return fallback;
+  return title || fallback;
+}
+
+function inferChapterTitleFromContent(rawContent: unknown): { title: string; content: string } {
+  const content = cleanGeneratedText(typeof rawContent === 'string' ? rawContent : '');
+  if (!content) return { title: '', content: '' };
+
+  const lines = content.split('\n').map((line) => cleanGeneratedText(line)).filter(Boolean);
+  if (lines.length === 0) return { title: '', content };
+
+  let title = '';
+  let updatedLines = [...lines];
+
+  const numberedTitleMatch = lines[0].match(/^\d+\s*[,.)\-–—]\s*([^:–—\n]{4,120})(?:\s*[:–—-]\s*(.+))?$/);
+  const chapterTitleMatch = lines[0].match(/^(?:chapitre|chapter)\s*\d+\s*[:–—-]\s*([^:–—\n]{4,120})(?:\s*[:–—-]\s*(.+))?$/i);
+
+  if (numberedTitleMatch) {
+    title = sanitizeChapterTitle(numberedTitleMatch[1]);
+    updatedLines = numberedTitleMatch[2]
+      ? [cleanGeneratedText(numberedTitleMatch[2]), ...lines.slice(1)].filter(Boolean)
+      : lines.slice(1);
+  } else if (chapterTitleMatch) {
+    title = sanitizeChapterTitle(chapterTitleMatch[1]);
+    updatedLines = chapterTitleMatch[2]
+      ? [cleanGeneratedText(chapterTitleMatch[2]), ...lines.slice(1)].filter(Boolean)
+      : lines.slice(1);
+  } else if (/^(?:chapitre|chapter)\s*\d+$/i.test(lines[0]) && lines[1] && lines[1].length <= 120) {
+    title = sanitizeChapterTitle(lines[1]);
+    updatedLines = lines.slice(2);
+  }
+
+  if (!title || isGenericChapterTitle(title) || isSkippableP3Title(title)) {
+    return { title: '', content };
+  }
+
+  return {
+    title,
+    content: updatedLines.join('\n\n').trim() || content,
+  };
+}
+
 function cleanChapter(chapter: any): any {
   if (!chapter) return chapter;
-  
+
+  const fallbackTitle = cleanGeneratedText(String(chapter._fallbackTitle || chapter.fallbackTitle || ''));
+  const baseContent = cleanGeneratedText(chapter.contenu || chapter.content || '');
+  const inferred = inferChapterTitleFromContent(baseContent);
+  const resolvedTitle = sanitizeChapterTitle(
+    chapter.titre || chapter.title || chapter.titreLivreFinal || chapter.chapterTitle || chapter.heading,
+    inferred.title || fallbackTitle
+  );
+  const resolvedContent = inferred.content || baseContent;
+
   return {
     ...chapter,
-    titre: cleanGeneratedText(chapter.titre),
-    title: cleanGeneratedText(chapter.title),
-    contenu: cleanGeneratedText(chapter.contenu),
-    content: cleanGeneratedText(chapter.content),
+    titre: resolvedTitle,
+    title: sanitizeChapterTitle(chapter.title || chapter.titre || chapter.titreLivreFinal, resolvedTitle),
+    contenu: resolvedContent,
+    content: resolvedContent,
   };
 }
 
@@ -393,7 +469,7 @@ function buildRobustChapterFallback(chapter: any, fullTitle: string, category: s
   const conclusion = segment?.partNumber && segment?.partNumber < segment?.totalParts
     ? `La section se termine sur une ouverture naturelle vers la suite du chapitre.`
     : `Le chapitre se termine sur une transition claire vers l'étape suivante du livre.`;
-  const contenu = cleanGeneratedText(`${titre}\n\n${bodySections}\n\n${conclusion}`);
+  const contenu = cleanGeneratedText(`${bodySections}\n\n${conclusion}`);
 
   return {
     numero,
