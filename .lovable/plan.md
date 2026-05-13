@@ -1,59 +1,66 @@
-# Problème
+## Constat
 
-La sidebar a été retirée. Il ne reste que 5 onglets (Plan · Écrire · Habiller · Publier · Vendre) en haut du planner. Or, chaque "famille" contient en réalité 5 à 15 sous-outils (workflow IA, personnages, templates, AI chat, proofread, cover designer, back-cover, KDP checklist, export Calibre, marketing, etc.). L'abonné ne peut plus y accéder.
+Tu as raison : le planner a ~56 `case` (tous les outils accessibles via `activeTab`). Le popover « Tous les outils » actuel n'en liste que **36**. Voici les **20 manquants** :
 
-# Objectif
+**Plan**
+- (rien à ajouter ici, tout y est)
 
-Que l'abonné retrouve TOUT, simplement, depuis le haut de l'écran, sans sidebar.
+**Écrire**
+- `tools` (boîte à outils)
+- `atlas`, `encyclopedia`, `documentary`, `agenda`, `scolaire` (formats KDP spécialisés)
+- `content-architect` (agent P3)
 
-# Solution : navigation à 2 niveaux + menu "Tous les outils"
+**Habiller**
+- (complet)
 
-## 1. Barre principale (déjà en place)
-5 onglets de familles, comme aujourd'hui : **Plan · Écrire · Habiller · Publier · Vendre**.
+**Publier**
+- `audit-pilot` (audit pré-publication)
+- `kdp-keywords-pro` (recherche mots-clés KDP)
 
-## 2. Sous-barre contextuelle (NOUVEAU)
-Sous la barre principale, une 2ᵉ ligne discrète (chips arrondies, plus petites, fond blanc, texte gris→teal actif) qui change selon l'onglet sélectionné.
+**Vendre**
+- `kdp-ads-guide` (guide Amazon Ads)
+- `chrome-extension` (extension)
 
-```text
-[Plan]   [Écrire]   [Habiller]   [Publier]   [Vendre]        ← principale (teal pill)
-  ↓
- Tableau de bord IA · Plan du livre · Personnages · Templates · Importer doc      ← contextuelle
-```
+**Mon Compte / Communauté** (nouvelle famille à créer dans le popover seulement, pas dans la barre)
+- `parrainage`, `communaute`, `admin`, `admin-subscribers`, `subscription`, `settings`
 
-Mapping proposé (par famille) :
+## Plan d'action
 
-- **Plan** : Tableau de bord IA · Plan du livre · Personnages · Templates · Importer un doc
-- **Écrire** : Workflow complet · Chapitre par chapitre · AI Chat · Proofread strict · Table des matières · Anti-IA / humaniser
-- **Habiller** : Studio image · Couverture IA · Éditeur de couverture · 4ᵉ de couverture · Bibliothèque d'images
-- **Publier** : Export KDP · Checklist pré-publication · Export EPUB (Calibre) · Audiobook · Audio Express
-- **Vendre** : Plan marketing · Plan de lancement · Mots-clés KDP · Niches · Stratégie avancée
+### 1. Compléter `ALL_TOOLS` dans `src/components/layout/EspaceHeader.tsx`
 
-## 3. Bouton "Tous les outils" (overflow, à droite de la barre)
-Un bouton `⋯ Tous les outils` qui ouvre un **popover** structuré en colonnes (les 5 familles) listant 100% des sous-outils, plus une recherche en haut. Filet de sécurité pour les outils rarement utilisés (séries, encyclopedia, atlas, multi-translator, doc-transform, url-import, etc.).
+Ajouter les 14 entrées manquantes dans les 5 groupes existants (Écrire +6, Publier +2, Vendre +2) + créer un 6ᵉ groupe **« Mon Compte »** (6 entrées : Mes projets *(déjà ailleurs, on garde)*, Abonnement, Paramètres, Parrainage, Communauté, Admin).
 
-## 4. Bouton "Mon espace" (déjà en place, à gauche)
-Reste le retour rapide vers /espace.
+→ On passe de **36 → 56 outils** dans le popover. Plus rien ne disparaît.
 
-# Pourquoi cette structure
+### 2. Compléter `PLANNER_SUBTABS` (sous-barre contextuelle)
 
-- **Pas de sidebar** : conforme à la demande utilisateur.
-- **Toujours 1 clic** pour accéder aux 25 outils principaux (sous-barre contextuelle).
-- **Toujours ≤ 2 clics** pour les outils rares (popover "Tous les outils").
-- **Cohérent avec /espace** : les tuiles de l'espace pointent vers le bon `?tab=` et la bonne famille s'illumine.
+Ajouter les outils utiles dans la 2ᵉ rangée :
+- **Écrire** : ajouter `tools` (« Boîte à outils »)
+- **Publier** : ajouter `audit-pilot` (« Audit pré-publication »), `kdp-keywords-pro` (« Mots-clés KDP »)
+- **Vendre** : ajouter `kdp-ads-guide` (« Amazon Ads »)
 
-# Détails techniques (pour info)
+### 3. Étendre les `match[]` de `PLANNER_TABS`
 
-Fichier concerné : `src/components/layout/EspaceHeader.tsx`
+Pour que la bonne famille s'illumine quand on clique sur ces outils :
+- `writing.match` += `tools, atlas, encyclopedia, documentary, agenda, scolaire, content-architect`
+- `export.match` += `audit-pilot, kdp-keywords-pro`
+- `marketing.match` += `kdp-ads-guide, chrome-extension`
 
-- Ajouter un objet `PLANNER_SUBTABS: Record<familyId, Array<{id,label}>>` listant les sous-outils par famille.
-- Calculer la `currentFamily` depuis `activeTab` (déjà via `match[]`).
-- Rendre une 2ᵉ rangée (sous la rangée principale) quand `showTabBar` est vrai, qui mappe `PLANNER_SUBTABS[currentFamily]` → chips cliquables (`onTabChange(subId)`).
-- Ajouter un bouton overflow `Tous les outils` à droite, qui ouvre un `<Popover>` shadcn avec un `<Input>` de recherche et 5 colonnes scrollables (toutes les entrées du `case` du planner).
-- Aucun changement dans `EbookPlannerPage.tsx` au-delà de ce qui existe déjà (les `case 'xxx'` du switch gèrent déjà tous ces ids).
-- Aucun retour de la sidebar.
+### 4. Ajouter un groupe « Mon Compte » dans le popover
 
-# Hors périmètre
+Le bouton « Mon espace » (à gauche) reste pour revenir à `/espace`. Mais `subscription`, `settings`, `parrainage`, `communaute`, `admin` sont accessibles depuis le planner — on les liste donc dans le popover sous une 6ᵉ colonne « Mon Compte ». La grille passe à `lg:grid-cols-6` (ou wrap propre).
 
-- Pas de refonte du contenu des sous-écrans.
-- Pas de changement sur `/espace`, `/bd-studio`, `/kdp-keywords`, etc.
-- Pas de touche raccourci clavier (peut venir plus tard).
+### 5. Hors périmètre (laissés volontairement)
+
+- `onboarding`, `coloring` (dédiées, pleines pages)
+- `bd-studio` (route séparée, pas dans `activeTab`)
+
+## Résultat attendu
+
+- 5 onglets familles (inchangés)
+- Sous-barre contextuelle qui couvre les outils courants de la famille
+- Popover « Tous les outils » qui liste **les 56 outils** organisés en 6 colonnes avec recherche → l'abonné retrouve **tout**, en ≤ 2 clics, sans sidebar.
+
+## Fichier modifié
+
+- `src/components/layout/EspaceHeader.tsx` (uniquement)

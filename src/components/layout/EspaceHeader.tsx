@@ -19,10 +19,10 @@ type FamilyId = 'planner' | 'writing' | 'images' | 'export' | 'marketing';
 
 const PLANNER_TABS: Array<{ id: FamilyId; label: string; match: string[] }> = [
   { id: 'planner', label: 'Plan', match: ['planner', 'characters', 'templates', 'workflow-dashboard', 'url-import', 'doc-transform', 'projects', 'ebook-library', 'series'] },
-  { id: 'writing', label: 'Écrire', match: ['writing', 'strict-proofread', 'toc', 'aichat', 'complete-workflow', 'humanize-anti-ia', 'natural-rewrite', 'expert-writing', 'multi-translator'] },
+  { id: 'writing', label: 'Écrire', match: ['writing', 'strict-proofread', 'toc', 'aichat', 'complete-workflow', 'humanize-anti-ia', 'natural-rewrite', 'expert-writing', 'multi-translator', 'tools', 'atlas', 'encyclopedia', 'documentary', 'agenda', 'scolaire', 'content-architect'] },
   { id: 'images', label: 'Habiller', match: ['images', 'cover', 'cover-design-editor', 'back-cover', 'backcover', 'images-cover', 'images-generator', 'images-library', 'editorial-packaging'] },
-  { id: 'export', label: 'Publier', match: ['export', 'kdp', 'kdp-prepublish-checklist', 'workflow-export', 'calibre-epub', 'audiobook', 'audio-express', 'audio'] },
-  { id: 'marketing', label: 'Vendre', match: ['marketing', 'monetization', 'advanced', 'launch-plan', 'editorial-quality', 'final-diagnosis'] },
+  { id: 'export', label: 'Publier', match: ['export', 'kdp', 'kdp-prepublish-checklist', 'workflow-export', 'calibre-epub', 'audiobook', 'audio-express', 'audio', 'audit-pilot', 'kdp-keywords-pro'] },
+  { id: 'marketing', label: 'Vendre', match: ['marketing', 'monetization', 'advanced', 'launch-plan', 'editorial-quality', 'final-diagnosis', 'kdp-ads-guide', 'chrome-extension'] },
 ];
 
 const HIDE_TABBAR_ON = new Set([
