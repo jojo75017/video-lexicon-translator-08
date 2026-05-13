@@ -3459,26 +3459,15 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
   };
 
   return (
-    <div className="min-h-screen flex bg-joy-cream text-joy-ink">
+    <div className="min-h-screen bg-joy-cream text-joy-ink">
       <OnboardingGuide />
-      {viewMode !== 'trello' && (
-        <SimpleSidebar
-          activeTab={activeTab}
-          onTabChange={handleTabChange}
-          isCollapsed={sidebarCollapsed}
-          onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-          onSwitchToTrello={() => {
-            setViewMode('trello');
-            localStorage.setItem(DASHBOARD_VIEW_MODE_KEY, 'trello');
-            setActiveTab('workflow-dashboard');
-          }}
-        />
-      )}
 
-      <main className="flex-1 overflow-y-auto">
+      <main className="min-h-screen overflow-y-auto">
         <EspaceHeader
           projectTitle={ebookTitle || null}
           onLogout={onLogout}
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
         />
         
         <MissingApiKeyBanner
