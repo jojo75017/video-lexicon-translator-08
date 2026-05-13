@@ -276,8 +276,35 @@ const EspacePage: React.FC<EspacePageProps> = ({ subscriberEmail, onLogout }) =>
     </section>
   );
 
+  const bannerDismissed = typeof window !== 'undefined' && localStorage.getItem('launch_vip_banner_dismissed_v1') === '1';
+
   return (
     <div className="min-h-screen" style={{ background: '#FAFAFA', color: TEXT }}>
+      {!bannerDismissed && (
+        <div className="w-full text-white text-sm" style={{ background: 'linear-gradient(90deg, #008296 0%, #FF9E2D 100%)' }}>
+          <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-2">
+            <span className="text-lg" aria-hidden>🎉</span>
+            <p className="flex-1 truncate font-medium">
+              <span className="hidden sm:inline">Lancement en cours — </span>
+              <strong>Tes 2 cadeaux abonné</strong> t'attendent : 30 min Zoom + −30 % à vie
+            </p>
+            <button
+              onClick={() => navigate('/espace/lancement')}
+              className="rounded-full bg-white/95 px-3 py-1 text-xs font-bold whitespace-nowrap hover:bg-white"
+              style={{ color: '#008296' }}
+            >
+              Voir mes cadeaux →
+            </button>
+            <button
+              onClick={() => { try { localStorage.setItem('launch_vip_banner_dismissed_v1', '1'); } catch {}; window.location.reload(); }}
+              className="text-white/80 hover:text-white text-lg leading-none px-1"
+              aria-label="Fermer"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
       {/* Header */}
       <header
         className="sticky top-0 z-30 backdrop-blur-md"
