@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_launches: {
+        Row: {
+          color: string | null
+          created_at: string
+          id: string
+          launch_date: string
+          notes: string | null
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          id?: string
+          launch_date: string
+          notes?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          id?: string
+          launch_date?: string
+          notes?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       affiliate_clicks: {
         Row: {
           clicked_at: string

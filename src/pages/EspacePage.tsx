@@ -5,7 +5,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { ArrowRight, Clock, Sparkles, FileText, Loader2, LogOut, ChevronDown, LayoutDashboard } from 'lucide-react';
+import { ArrowRight, Clock, Sparkles, FileText, Loader2, LogOut, ChevronDown, LayoutDashboard, Shield } from 'lucide-react';
+import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
 
 interface EspacePageProps {
   subscriberEmail: string;
@@ -49,6 +50,13 @@ const EspacePage: React.FC<EspacePageProps> = ({ subscriberEmail, onLogout }) =>
   const [loading, setLoading] = useState(true);
   const [lastTab, setLastTab] = useState<string | null>(null);
   const [firstName, setFirstName] = useState<string>('');
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    getIsCurrentSessionAdmin().then((v) => { if (!cancelled) setIsAdmin(!!v); }).catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => {
     try { setLastTab(localStorage.getItem('ebook_planner_active_tab')); } catch {}
@@ -284,6 +292,18 @@ const EspacePage: React.FC<EspacePageProps> = ({ subscriberEmail, onLogout }) =>
             <span>Mon espace</span>
           </button>
           <div className="flex items-center gap-2">
+            {isAdmin && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => navigate('/admin-cockpit')}
+                className="rounded-full px-3 gap-1.5 border-2 hover:scale-[1.03] transition-all"
+                style={{ borderColor: TEAL, color: TEAL }}
+              >
+                <Shield className="h-4 w-4" />
+                <span className="hidden sm:inline">Cockpit admin</span>
+              </Button>
+            )}
             <Button
               size="sm"
               onClick={() => goPlanner('workflow-dashboard')}

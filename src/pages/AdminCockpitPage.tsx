@@ -1,0 +1,474 @@
+import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { ArrowLeft, ChevronLeft, ChevronRight, Plus, Shield, Trash2, Calendar as CalendarIcon, Sparkles } from 'lucide-react';
+import { toast } from 'sonner';
+import {
+  addMonths, endOfMonth, endOfWeek, format, isSameDay, isSameMonth,
+  parseISO, startOfMonth, startOfWeek, isAfter, differenceInCalendarDays,
+} from 'date-fns';
+import { fr } from 'date-fns/locale';
+
+const TEAL = '#008296';
+const ORANGE = '#FF9E2D';
+const INK = '#232F3E';
+
+type Launch = {
+  id: string;
+  user_id: string;
+  title: string;
+  launch_date: string; // YYYY-MM-DD
+  status: 'planned' | 'in_progress' | 'done';
+  notes: string | null;
+  color: string | null;
+};
+
+type TunnelTile = {
+  emoji: string;
+  label: string;
+  caption: string;
+  path: string;
+};
+
+const TUNNEL_GROUPS: { name: string; tint: string; tiles: TunnelTile[] }[] = [
+  {
+    name: 'Tunnel principal',
+    tint: 'bg-joy-cream',
+    tiles: [
+      { emoji: '🎯', label: 'Capture',     caption: 'Étape 1 — email opt-in',         path: '/promo' },
+      { emoji: '🎁', label: 'Bonus',       caption: 'Étape 2 — cadeau immédiat',      path: '/promo/bonus' },
+      { emoji: '🔍', label: 'Découverte',  caption: 'Étape 3 — page de découverte',   path: '/promo/decouverte' },
+      { emoji: '🛒', label: 'Commande',    caption: 'Étape 4 — récap commande',       path: '/promo/commande' },
+      { emoji: '💳', label: 'Paiement',    caption: 'Étape 5 — checkout',             path: '/promo/paiement' },
+      { emoji: '🙏', label: 'Merci',       caption: 'Étape 6 — confirmation',         path: '/promo/merci' },
+      { emoji: '🚀', label: 'Espace promo',caption: 'Étape 7 — onboarding',           path: '/promo/espace' },
+      { emoji: '🤝', label: 'Affilié',     caption: 'Étape 8 — programme partenaire', path: '/promo/affilie' },
+    ],
+  },
+  {
+    name: 'Vente & upsells',
+    tint: 'bg-joy-peach/30',
+    tiles: [
+      { emoji: '💛', label: 'Page de vente',  caption: 'Offre principale',     path: '/offres' },
+      { emoji: '⭐', label: 'Upsell',         caption: 'Offre additionnelle',  path: '/upsell' },
+      { emoji: '💎', label: 'Upsell paiement',caption: 'Checkout upsell',      path: '/upsell-paiement' },
+      { emoji: '🧾', label: 'Paiement manuel',caption: 'Backup virement',      path: '/paiement-manuel' },
+      { emoji: '✅', label: 'Paiement réussi',caption: 'Page de succès',       path: '/paiement-succes' },
+    ],
+  },
+  {
+    name: 'Outils admin',
+    tint: 'bg-joy-mint/30',
+    tiles: [
+      { emoji: '⚡', label: 'Admin direct',     caption: 'Accès rapide admin',  path: '/admin-direct' },
+      { emoji: '📊', label: 'Dashboard mkt',    caption: 'KPIs marketing',      path: '/dashboard-marketing' },
+      { emoji: '👥', label: 'CRM',              caption: 'Contacts & leads',    path: '/crm' },
+      { emoji: '📣', label: 'Campagne vente',   caption: 'Séquences email',     path: '/campagne-vente' },
+      { emoji: '✉️', label: 'Aperçu emails',    caption: 'Preview templates',   path: '/apercu-emails' },
+      { emoji: '📝', label: 'Posts sociaux',    caption: 'Générateur posts',    path: '/generateur-posts' },
+      { emoji: '🎯', label: 'Prospects',        caption: 'Gestion prospects',   path: '/gestion-prospects' },
+    ],
+  },
+];
+
+const STATUS_OPTIONS: { value: Launch['status']; label: string }[] = [
+  { value: 'planned',     label: '📅 Prévu' },
+  { value: 'in_progress', label: '🚧 En cours' },
+  { value: 'done',        label: '✅ Lancé' },
+];
+
+const COLOR_PRESETS = ['#008296', '#FF9E2D', '#E94E77', '#7C3AED', '#10B981', '#3B82F6'];
+
+const emptyDraft = (date: Date | null = null): Partial<Launch> => ({
+  title: '',
+  launch_date: date ? format(date, 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd'),
+  status: 'planned',
+  notes: '',
+  color: TEAL,
+});
+
+const AdminCockpitPage: React.FC = () => {
+  const navigate = useNavigate();
+  const [launches, setLaunches] = useState<Launch[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [cursor, setCursor] = useState<Date>(new Date());
+  const [editing, setEditing] = useState<Launch | null>(null);
+  const [draft, setDraft] = useState<Partial<Launch> | null>(null);
+
+  const load = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('admin_launches')
+      .select('*')
+      .order('launch_date', { ascending: true });
+    if (error) {
+      toast.error('Impossible de charger les lancements');
+      console.error(error);
+    } else {
+      setLaunches((data || []) as Launch[]);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => { load(); }, []);
+
+  const monthStart = startOfMonth(cursor);
+  const monthEnd = endOfMonth(cursor);
+  const gridStart = startOfWeek(monthStart, { weekStartsOn: 1 });
+  const gridEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
+
+  const days: Date[] = useMemo(() => {
+    const out: Date[] = [];
+    let d = gridStart;
+    while (d <= gridEnd) {
+      out.push(d);
+      d = new Date(d.getTime() + 24 * 60 * 60 * 1000);
+    }
+    return out;
+  }, [gridStart, gridEnd]);
+
+  const launchesByDay = useMemo(() => {
+    const map: Record<string, Launch[]> = {};
+    launches.forEach((l) => {
+      (map[l.launch_date] ||= []).push(l);
+    });
+    return map;
+  }, [launches]);
+
+  const upcoming = useMemo(() => {
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    return launches
+      .filter((l) => !isAfter(today, parseISO(l.launch_date)))
+      .slice(0, 5);
+  }, [launches]);
+
+  const openCreate = (date: Date | null = null) => {
+    setEditing(null);
+    setDraft(emptyDraft(date));
+  };
+
+  const openEdit = (l: Launch) => {
+    setEditing(l);
+    setDraft({ ...l });
+  };
+
+  const save = async () => {
+    if (!draft?.title || !draft.launch_date) {
+      toast.error('Titre et date requis');
+      return;
+    }
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { toast.error('Session expirée'); return; }
+
+    if (editing) {
+      const { error } = await supabase
+        .from('admin_launches')
+        .update({
+          title: draft.title,
+          launch_date: draft.launch_date,
+          status: draft.status,
+          notes: draft.notes || null,
+          color: draft.color || TEAL,
+        })
+        .eq('id', editing.id);
+      if (error) { toast.error('Erreur enregistrement'); return; }
+      toast.success('Lancement mis à jour');
+    } else {
+      const { error } = await supabase
+        .from('admin_launches')
+        .insert({
+          user_id: user.id,
+          title: draft.title,
+          launch_date: draft.launch_date,
+          status: draft.status || 'planned',
+          notes: draft.notes || null,
+          color: draft.color || TEAL,
+        });
+      if (error) { toast.error('Erreur création'); return; }
+      toast.success('Lancement ajouté');
+    }
+    setDraft(null);
+    setEditing(null);
+    load();
+  };
+
+  const remove = async () => {
+    if (!editing) return;
+    if (!confirm('Supprimer ce lancement ?')) return;
+    const { error } = await supabase.from('admin_launches').delete().eq('id', editing.id);
+    if (error) { toast.error('Erreur suppression'); return; }
+    toast.success('Lancement supprimé');
+    setDraft(null); setEditing(null);
+    load();
+  };
+
+  return (
+    <div className="min-h-screen bg-[#FAFAFA]" style={{ color: INK }}>
+      {/* Header */}
+      <header className="sticky top-0 z-30 backdrop-blur-md bg-white/85 border-b border-joy-ink/8">
+        <div className="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
+          <button onClick={() => navigate('/espace')} className="flex items-center gap-2 text-sm hover:opacity-70 transition-opacity">
+            <ArrowLeft className="h-4 w-4" />
+            <span>Retour à l'espace</span>
+          </button>
+          <div className="flex items-center gap-2 font-semibold">
+            <Shield className="h-5 w-5" style={{ color: TEAL }} />
+            <span>Cockpit admin</span>
+          </div>
+          <Button
+            size="sm"
+            onClick={() => openCreate()}
+            className="rounded-full px-4 gap-1.5 hover:opacity-90 transition-all"
+            style={{ background: TEAL, color: 'white' }}
+          >
+            <Plus className="h-4 w-4" />
+            <span className="hidden sm:inline">Nouveau lancement</span>
+          </Button>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-7xl px-4 py-6 space-y-8">
+        {/* Tunnel */}
+        <section>
+          <div className="flex items-center gap-2 mb-3">
+            <Sparkles className="h-5 w-5" style={{ color: ORANGE }} />
+            <h2 className="text-lg font-bold">Tunnel de lancement</h2>
+            <span className="text-xs text-joy-ink/50">accès rapide à toutes les pages</span>
+          </div>
+
+          <div className="space-y-4">
+            {TUNNEL_GROUPS.map((group) => (
+              <div key={group.name}>
+                <div className="text-xs uppercase tracking-wider text-joy-ink/50 mb-2 px-1">{group.name}</div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2.5">
+                  {group.tiles.map((t) => (
+                    <button
+                      key={t.path}
+                      onClick={() => navigate(t.path)}
+                      className={`group text-left rounded-2xl p-3 ${group.tint} border border-joy-ink/5 hover:border-joy-teal/40 hover:scale-[1.02] hover:shadow-md transition-all`}
+                    >
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xl">{t.emoji}</span>
+                        <span className="font-semibold text-sm group-hover:text-[#FF9E2D] transition-colors">{t.label}</span>
+                      </div>
+                      <div className="text-[11px] text-joy-ink/60 leading-snug">{t.caption}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Calendar + Upcoming */}
+        <section className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-4">
+          <Card className="rounded-2xl border-joy-ink/10">
+            <CardContent className="p-4 sm:p-5">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <CalendarIcon className="h-5 w-5" style={{ color: TEAL }} />
+                  <h2 className="text-lg font-bold capitalize">
+                    {format(cursor, 'MMMM yyyy', { locale: fr })}
+                  </h2>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Button variant="ghost" size="icon" className="rounded-full" onClick={() => setCursor(addMonths(cursor, -1))}>
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="sm" className="rounded-full text-xs" onClick={() => setCursor(new Date())}>
+                    Aujourd'hui
+                  </Button>
+                  <Button variant="ghost" size="icon" className="rounded-full" onClick={() => setCursor(addMonths(cursor, 1))}>
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-7 gap-1 mb-1">
+                {['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].map((d) => (
+                  <div key={d} className="text-[11px] uppercase font-semibold text-joy-ink/50 text-center py-1">{d}</div>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-7 gap-1">
+                {days.map((day) => {
+                  const key = format(day, 'yyyy-MM-dd');
+                  const items = launchesByDay[key] || [];
+                  const inMonth = isSameMonth(day, cursor);
+                  const isToday = isSameDay(day, new Date());
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => items.length === 0 ? openCreate(day) : openEdit(items[0])}
+                      className={`min-h-[78px] rounded-xl p-1.5 text-left border transition-all hover:scale-[1.02] ${
+                        inMonth ? 'bg-white border-joy-ink/8' : 'bg-joy-ink/[0.02] border-transparent text-joy-ink/30'
+                      } ${isToday ? 'ring-2 ring-offset-1' : ''}`}
+                      style={isToday ? { boxShadow: `inset 0 0 0 2px ${ORANGE}` } : undefined}
+                    >
+                      <div className="text-[11px] font-semibold mb-1">{format(day, 'd')}</div>
+                      <div className="space-y-0.5">
+                        {items.slice(0, 3).map((l) => (
+                          <div
+                            key={l.id}
+                            onClick={(e) => { e.stopPropagation(); openEdit(l); }}
+                            className="text-[10px] leading-tight rounded px-1 py-0.5 truncate text-white font-medium cursor-pointer hover:opacity-90"
+                            style={{ background: l.color || TEAL }}
+                            title={l.title}
+                          >
+                            {l.title}
+                          </div>
+                        ))}
+                        {items.length > 3 && (
+                          <div className="text-[10px] text-joy-ink/50">+{items.length - 3}</div>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Upcoming list */}
+          <Card className="rounded-2xl border-joy-ink/10 h-fit">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-bold text-sm">Prochains lancements</h3>
+                <span className="text-xs text-joy-ink/50">{upcoming.length}</span>
+              </div>
+              {loading ? (
+                <div className="text-xs text-joy-ink/50 py-4 text-center">Chargement…</div>
+              ) : upcoming.length === 0 ? (
+                <div className="text-xs text-joy-ink/50 py-6 text-center">
+                  Aucun lancement prévu.
+                  <br />
+                  <button onClick={() => openCreate()} className="mt-2 text-[#008296] hover:text-[#FF9E2D] font-medium">
+                    + Créer le premier
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {upcoming.map((l) => {
+                    const days = differenceInCalendarDays(parseISO(l.launch_date), new Date());
+                    return (
+                      <button
+                        key={l.id}
+                        onClick={() => openEdit(l)}
+                        className="w-full text-left rounded-xl p-2.5 bg-joy-cream/50 hover:bg-joy-cream border border-transparent hover:border-joy-teal/30 transition-all"
+                      >
+                        <div className="flex items-start gap-2">
+                          <span
+                            className="mt-1 inline-block h-2.5 w-2.5 rounded-full flex-shrink-0"
+                            style={{ background: l.color || TEAL }}
+                          />
+                          <div className="min-w-0 flex-1">
+                            <div className="font-semibold text-sm truncate">{l.title}</div>
+                            <div className="text-[11px] text-joy-ink/60">
+                              {format(parseISO(l.launch_date), 'EEE d MMM', { locale: fr })}
+                              {' · '}
+                              {days === 0 ? "aujourd'hui" : days === 1 ? 'demain' : `J-${days}`}
+                            </div>
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </section>
+      </main>
+
+      {/* Modal */}
+      <Dialog open={!!draft} onOpenChange={(o) => { if (!o) { setDraft(null); setEditing(null); } }}>
+        <DialogContent className="max-w-md rounded-2xl">
+          <DialogHeader>
+            <DialogTitle>{editing ? 'Modifier le lancement' : 'Nouveau lancement'}</DialogTitle>
+          </DialogHeader>
+          {draft && (
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-semibold text-joy-ink/70 mb-1 block">Titre</label>
+                <Input
+                  value={draft.title || ''}
+                  onChange={(e) => setDraft({ ...draft, title: e.target.value })}
+                  placeholder="Lancement KDP, formation, série…"
+                  autoFocus
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-semibold text-joy-ink/70 mb-1 block">Date</label>
+                  <Input
+                    type="date"
+                    value={draft.launch_date || ''}
+                    onChange={(e) => setDraft({ ...draft, launch_date: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-joy-ink/70 mb-1 block">Statut</label>
+                  <Select
+                    value={draft.status || 'planned'}
+                    onValueChange={(v) => setDraft({ ...draft, status: v as Launch['status'] })}
+                  >
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {STATUS_OPTIONS.map((o) => (
+                        <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-joy-ink/70 mb-1 block">Couleur</label>
+                <div className="flex gap-2">
+                  {COLOR_PRESETS.map((c) => (
+                    <button
+                      key={c}
+                      onClick={() => setDraft({ ...draft, color: c })}
+                      className={`h-7 w-7 rounded-full transition-transform ${draft.color === c ? 'scale-110 ring-2 ring-offset-2 ring-joy-ink/30' : 'hover:scale-110'}`}
+                      style={{ background: c }}
+                      aria-label={c}
+                    />
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-joy-ink/70 mb-1 block">Notes</label>
+                <Textarea
+                  value={draft.notes || ''}
+                  onChange={(e) => setDraft({ ...draft, notes: e.target.value })}
+                  placeholder="Détails, checklist, liens…"
+                  rows={3}
+                />
+              </div>
+            </div>
+          )}
+          <DialogFooter className="gap-2 sm:justify-between">
+            {editing ? (
+              <Button variant="ghost" size="sm" onClick={remove} className="text-red-600 hover:text-red-700 hover:bg-red-50 gap-1.5">
+                <Trash2 className="h-4 w-4" /> Supprimer
+              </Button>
+            ) : <span />}
+            <div className="flex gap-2">
+              <Button variant="ghost" size="sm" onClick={() => { setDraft(null); setEditing(null); }}>Annuler</Button>
+              <Button size="sm" onClick={save} style={{ background: TEAL, color: 'white' }} className="hover:opacity-90">
+                Enregistrer
+              </Button>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};
+
+export default AdminCockpitPage;
