@@ -47,6 +47,28 @@ interface EbookCompleteWorkflowProps {
 
 const STORAGE_KEY = 'ebook_workflow_progress';
 
+const isGenericChapterTitle = (value: unknown) => {
+  const title = typeof value === 'string' ? value.trim().toLowerCase() : '';
+  return !title || /^(?:chapitre|chapter|ch\.?)\s*\d+$/.test(title);
+};
+
+const sanitizeWorkflowChapterTitle = (value: unknown, fallback = '') => {
+  const raw = typeof value === 'string' ? value.trim() : '';
+  const fallbackValue = typeof fallback === 'string' ? fallback.trim() : '';
+  if (!raw) return fallbackValue;
+
+  const keyedMatch = raw.match(/(?:titreLivreFinal|titreFinal|titreChapitre|chapterTitle|heading|titre|title|nom)\s*["»”']?\s*[:=]\s*["«“']?([^"\n}{]{3,180})/i);
+  const cleaned = (keyedMatch?.[1] || raw)
+    .replace(/^(?:titreLivreFinal|titreFinal|titreChapitre|chapterTitle|heading|titre|title|nom)\s*[:=]\s*/i, '')
+    .replace(/^chapitre\s+\d+\s*[:–—-]\s*/i, '')
+    .replace(/^chapter\s+\d+\s*[:–—-]\s*/i, '')
+    .replace(/^["'«»“”]+|["'«»“”]+$/g, '')
+    .trim();
+
+  if (isGenericChapterTitle(cleaned) && fallbackValue) return fallbackValue;
+  return cleaned || fallbackValue;
+};
+
 interface WorkflowProgress {
   title: string;
   subtitle: string;
@@ -509,9 +531,9 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
     return rawStructure
       .map((item: any, index: number) => {
         const numero = Number(item?.numero) || index + 1;
-        const titre = String(item?.titre || item?.title || '').trim();
+        const titre = sanitizeWorkflowChapterTitle(item?.titre || item?.title || item?.titreLivreFinal || item?.chapterTitle || item?.heading, '');
 
-        if (!titre) return null;
+        if (!titre || isGenericChapterTitle(titre)) return null;
 
         return {
           ...item,
