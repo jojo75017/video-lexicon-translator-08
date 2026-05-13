@@ -14,7 +14,7 @@ import {
 import { toast } from 'sonner';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { SimpleSidebar } from '@/components/layout/SimpleSidebar';
+
 import { EspaceHeader } from '@/components/layout/EspaceHeader';
 
 import { OnboardingGuide } from '@/components/onboarding/OnboardingGuide';
@@ -357,7 +357,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
 
     return () => window.clearTimeout(timer);
   }, [requestedFocusFromUrl, activeTab]);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  
   const [viewMode, setViewMode] = useState<'trello' | 'classic'>(() => {
     try {
       const savedMode = localStorage.getItem(DASHBOARD_VIEW_MODE_KEY);
@@ -3459,26 +3459,15 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
   };
 
   return (
-    <div className="min-h-screen flex bg-joy-cream text-joy-ink">
+    <div className="min-h-screen bg-joy-cream text-joy-ink">
       <OnboardingGuide />
-      {viewMode !== 'trello' && (
-        <SimpleSidebar
-          activeTab={activeTab}
-          onTabChange={handleTabChange}
-          isCollapsed={sidebarCollapsed}
-          onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-          onSwitchToTrello={() => {
-            setViewMode('trello');
-            localStorage.setItem(DASHBOARD_VIEW_MODE_KEY, 'trello');
-            setActiveTab('workflow-dashboard');
-          }}
-        />
-      )}
 
-      <main className="flex-1 overflow-y-auto">
+      <main className="min-h-screen overflow-y-auto">
         <EspaceHeader
           projectTitle={ebookTitle || null}
           onLogout={onLogout}
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
         />
         
         <MissingApiKeyBanner
