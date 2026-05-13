@@ -204,22 +204,20 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
     return sections.join('\n\n');
   }, [bookIntroduction, cibleProfil, cibleBesoins, cibleFrustrations, cibleNiveau, promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion]);
 
-  const handleAutofillTargetPromise = useCallback(async () => {
-    const missing: string[] = [];
-    if (!title.trim()) missing.push('le titre');
-    if (!bookIntroduction.trim()) missing.push('l\'introduction');
-    if (missing.length > 0) {
-      toast.error(`Remplis d'abord ${missing.join(' et ')} du livre, puis relance l'IA.`);
+  const handleAutofillTargetPromise = useCallback(async (silent = false) => {
+    if (!title.trim()) {
+      if (!silent) toast.error(`Remplis d'abord le titre du livre, puis relance l'IA.`);
       return;
     }
     if (!hasUsableApiKey) {
-      toast.error('Configure ta clé Gemini dans les paramètres avant d\'utiliser l\'IA.');
+      if (!silent) toast.error('Configure ta clé Gemini dans les paramètres avant d\'utiliser l\'IA.');
       return;
     }
     const hasExisting = [cibleProfil, cibleBesoins, cibleFrustrations, promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion].some(v => v.trim());
-    if (hasExisting && !window.confirm('Des champs sont déjà remplis. Les écraser avec la suggestion IA ?')) {
+    if (hasExisting && !silent && !window.confirm('Des champs sont déjà remplis. Les écraser avec la suggestion IA ?')) {
       return;
     }
+    if (hasExisting && silent) return; // never overwrite in silent/auto mode
     setAutofillLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke('autofill-target-promise', {
@@ -246,13 +244,30 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
       setPromesseDifferenciation(data.promesseDifferenciation || '');
       setPromesseEmotion(data.promesseEmotion || '');
       setOpenAccordions(['cible', 'promesse']);
-      toast.success('Cible & Promesse remplies, vérifie/ajuste si besoin 🌈');
+      if (!silent) toast.success('Cible & Promesse remplies, vérifie/ajuste si besoin 🌈');
+      else toast.success('✨ Cible & Promesse pré-remplies par l\'IA');
     } catch (e: any) {
-      toast.error(e?.message || 'Échec de l\'auto-remplissage');
+      if (!silent) toast.error(e?.message || 'Échec de l\'auto-remplissage');
+      else console.warn('[Auto-fill silencieux] échec:', e?.message);
     } finally {
       setAutofillLoading(false);
     }
-  }, [title, subtitle, category, bookIntroduction, language, normalizedUserApiKey, cibleProfil, cibleBesoins, cibleFrustrations, promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion]);
+  }, [title, subtitle, category, bookIntroduction, language, normalizedUserApiKey, hasUsableApiKey, cibleProfil, cibleBesoins, cibleFrustrations, promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion]);
+
+  // Auto-trigger silencieux : dès que titre + catégorie sont saisis et que les champs cible/promesse sont vides
+  const autoFilledRef = React.useRef(false);
+  useEffect(() => {
+    if (autoFilledRef.current) return;
+    if (autofillLoading) return;
+    if (!title.trim() || !category) return;
+    if (!hasUsableApiKey) return;
+    const hasExisting = [cibleProfil, cibleBesoins, cibleFrustrations, promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion].some(v => v.trim());
+    if (hasExisting) return;
+    autoFilledRef.current = true;
+    const t = setTimeout(() => { handleAutofillTargetPromise(true); }, 1200);
+    return () => clearTimeout(t);
+  }, [title, category, hasUsableApiKey, autofillLoading, cibleProfil, cibleBesoins, cibleFrustrations, promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion, handleAutofillTargetPromise]);
+
 
 
 
@@ -1614,7 +1629,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
           {/* Sections déroulantes : Cible & Promesse (recommandées pour un meilleur résultat) */}
           <Button
             type="button"
-            onClick={handleAutofillTargetPromise}
+            onClick={() => handleAutofillTargetPromise(false)}
             disabled={autofillLoading || isGenerating}
             className="w-full bg-joy-sun hover:bg-joy-sun/80 text-joy-ink border-2 border-joy-ink/10 shadow-joy rounded-2xl font-semibold"
           >

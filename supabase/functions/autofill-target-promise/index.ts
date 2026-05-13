@@ -45,8 +45,8 @@ Deno.serve(async (req) => {
     const language = body.language || "fr";
     const userKey = (body.userApiKey || "").trim();
 
-    if (!title || !intro) {
-      return json(400, { error: "Titre et introduction requis" });
+    if (!title) {
+      return json(400, { error: "Titre requis" });
     }
     if (!userKey || !userKey.startsWith("AIza")) {
       return json(400, { error: "Clé Gemini manquante ou invalide (doit commencer par AIza)" });
@@ -59,8 +59,7 @@ Deno.serve(async (req) => {
 TITRE: ${title}
 ${subtitle ? `SOUS-TITRE: ${subtitle}` : ""}
 ${category ? `CATÉGORIE: ${category}` : ""}
-INTRODUCTION:
-${intro.slice(0, 4000)}
+${intro ? `INTRODUCTION:\n${intro.slice(0, 4000)}` : ""}
 
 Renvoie uniquement cet objet JSON:
 {
