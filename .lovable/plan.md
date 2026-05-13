@@ -1,70 +1,59 @@
-## Objectif
-Valider de bout en bout le tunnel d'acquisition `/promo` avant le 1er juillet, en exécutant 3 tests réels et en corrigeant les blocages éventuels. Aucun nouveau feature : uniquement validation + corrections ciblées.
+## Audit UX — pourquoi les abonnés se perdent
 
----
+J'ai regardé l'app dans son ensemble (App.tsx, Dashboard, EbookPlannerPage, navigation P1‑P15, dossier `pages/`). Voici l'état réel et ce que je propose.
 
-## Test 1 — Tunnel complet (capture → paiement → confirmation)
+### Constat
 
-**Scénario :**
-1. Ouvrir `/promo` en navigation privée
-2. Soumettre prénom + email de test
-3. Vérifier réception email avec PDF (lead magnet)
-4. Cliquer le lien vers `/promo/merci`
-5. Suivre `/promo/decouverte` → `/promo/bonus` → `/promo/commande` → `/promo/paiement`
-6. Effectuer un paiement test Stripe (mode sandbox, carte 4242…)
-7. Vérifier la création dans `funnel_orders` (status = `paid`)
-8. Vérifier la redirection sur la page de confirmation
-9. Vérifier la réception de l'email de confirmation d'achat
+1. **80+ pages routables** dans `App.tsx`. Beaucoup d'entrées font des choses proches (génération, marketing, formations, audio, etc.). Il n'existe pas de "porte d'entrée unique" claire pour un abonné qui se connecte.
+2. **`EbookPlannerPage` = monolithe de 3 665 lignes** avec une trentaine d'onglets (`workflow-dashboard`, `planner`, `images-generator`, `images-library`, `cover`, P1‑P15…). Le pilier réel (P1→P15) est noyé au milieu d'outils annexes.
+3. **Trois "dashboards" différents** coexistent : `Dashboard.tsx` (admin/stats), `EbookHeroDashboard`, `EbookGlobalDashboard`, `EbookJourneyDashboard`, `WorkflowDashboard`. L'abonné ne sait pas lequel est "le sien".
+4. **Pas d'écran d'accueil abonné** : après login, on tombe directement dans le planner sur le dernier onglet mémorisé. Aucune vue "Mes projets / Reprendre / Nouveau livre / Audio / Coloriage".
+5. **Sous‑outils dispersés** sans regroupement : BD Studio, Coloriage, Audiobook, Audio Express, Recipe, Travel, Coaching VIP, Forum, Niches, KDP Keyword, etc. Chacun a sa route et son look.
+6. **Trop de chemins parallèles vers la même action** : "Générer un livre" est accessible depuis le Dashboard, le Hero, le Journey, le menu latéral, le bouton flottant Ebookbot, l'onboarding… ce qui crée de la friction décisionnelle.
+7. **Wording incohérent** : "Générateur", "Workflow", "Pipeline 15 agents", "Planner", "Studio" — tout désigne grosso modo la même chose.
 
-**Points de contrôle :**
-- Edge function `funnel-capture-lead` répond 200
-- Ligne créée dans `funnel_leads` avec `lead_magnet_sent_at` rempli
-- Bouton fallback PDF sur `/promo/merci` fonctionne
-- Webhook Stripe sandbox met à jour `funnel_orders.status` à `paid` et stamp `paid_at`
-- Email post-achat envoyé via Resend
+### Objectif du chantier
 
----
+Faire qu'un abonné qui se connecte sache en **moins de 5 secondes** : où il en est, ce qu'il doit faire ensuite, et où aller pour les outils annexes — **sans rien supprimer** de l'existant.
 
-## Test 2 — Attribution affilié `?ref=CODE`
+### Plan d'action (3 lots, frontend uniquement)
 
-**Scénario :**
-1. Se connecter avec un compte test, aller dans `/promo/espace` → onglet Affiliation
-2. Générer un code affilié (ex : `REF-ABC123`)
-3. En navigation privée, ouvrir `/promo/decouverte?ref=REF-ABC123`
-4. Vérifier qu'une ligne apparaît dans `affiliate_clicks` (edge `track-affiliate-click`)
-5. Faire un achat test complet avec un autre email
-6. Vérifier que `funnel_orders.ref_code = 'REF-ABC123'`
-7. Vérifier que le trigger `handle_funnel_order_paid` crée automatiquement une ligne dans `referrals` avec :
-   - `referrer_id` = compte affilié
-   - `commission_amount` = 20.10€ (30% de 67€)
-   - `status` = `converted`
-8. Recharger `/promo/espace` du compte affilié → vérifier que la commission s'affiche dans les stats
+**Lot 1 — Page d'accueil abonné unique `/espace`**
 
-**Points de contrôle :**
-- Cookie + localStorage `ebs_ref` persistent à travers les pages du tunnel
-- Le `ref_code` est bien transmis au moment de l'insertion dans `funnel_orders`
-- La fonction `get_referral_stats` renvoie les bons totaux
+Créer `src/pages/EspacePage.tsx` : seule page que voit l'abonné après login. Elle remplace la redirection actuelle `/` → `/offres` pour les utilisateurs connectés.
 
----
+Contenu (4 blocs verticaux, design KDP Amazon existant) :
+- **Bloc "Reprendre"** : dernier projet ouvert + bouton "Continuer P‑X" (lit `localStorage.ebook_planner_active_tab` + dernier `project_id`).
+- **Bloc "Mes livres"** : liste des `ebook_projects` (3 derniers + lien "Voir tout").
+- **Bloc "Créer du neuf"** : 4 grosses cartes — Ebook (P1‑P15) · Audiobook · Coloriage · BD. Chaque carte = 1 phrase + 1 bouton.
+- **Bloc "Aller plus loin"** : accordéon discret avec Marketing / KDP Tools / Formations / Forum / Coaching VIP.
 
-## Test 3 — Cas limites & robustesse
+**Lot 2 — Simplifier `EbookPlannerPage`**
 
-**Scénarios à valider :**
-1. **Email déjà capturé** : resoumettre `/promo` avec le même email → ne doit pas planter, doit renvoyer le PDF
-2. **Code ref invalide** : `/promo/decouverte?ref=INEXISTANT` → click loggé mais pas de commission créée à l'achat
-3. **Achat sans `ref_code`** : aucune ligne `referrals` créée (trigger ignore)
-4. **Refus paiement Stripe** : `funnel_orders` reste en `pending`, aucune commission
+Sans casser l'existant :
+- Réduire la barre d'onglets visible à **3 modes** : `Workflow IA (P1‑P15)` · `Manuscrit` · `Studio Image & Couverture`. Tout le reste passe dans un menu "Plus" (popover).
+- Toujours ouvrir par défaut sur `workflow-dashboard` (vue Kanban des 15 agents) au lieu du dernier onglet mémorisé quand le projet est neuf.
+- Ajouter un **fil d'Ariane permanent** en haut : `Mon espace › Projet "X" › P4 Rédaction` avec retour 1‑clic.
+- Ajouter une **barre de progression P1→P15** sticky en haut (4 phases : Créer / Optimiser / Publier / Bonus) — le composant `WorkflowNavigation` existe déjà, il faut juste le rendre sticky et toujours visible.
 
----
+**Lot 3 — Cohérence visuelle & wording**
 
-## Livrable
-- Tableau de résultats (PASS/FAIL) pour chacun des 3 tests
-- Liste des bugs trouvés avec niveau de priorité (bloquant 1er juillet vs cosmétique)
-- Corrections appliquées immédiatement pour les bloquants
-- Note des items cosmétiques renvoyés au sprint "espace affilié v2" (juin)
+- Renommer dans toute l'UI : "Générateur", "Workflow", "Pipeline" → **"Atelier d'écriture"** (un seul terme).
+- Ajouter sur chaque page abonnée un header commun `<EspaceHeader />` avec : logo, "Mon espace" (retour `/espace`), nom du projet, avatar, déconnexion. Supprime la sensation de "pages éparpillées".
+- Masquer du menu abonné les pages purement admin/marketing (`/dashboard-marketing`, `/crm`, `/gestion-prospects`, `/apercu-emails`) — déjà protégées par `AdminGate`, mais elles polluent encore l'imaginaire.
 
-## Détails techniques (pour info)
-- Tables touchées : `funnel_leads`, `funnel_orders`, `affiliate_clicks`, `referral_codes`, `referrals`
-- Edge functions impliquées : `funnel-capture-lead`, `track-affiliate-click`, `track-referral`, `stripe-webhooks`
-- Trigger SQL clé : `handle_funnel_order_paid` (déjà en place)
-- Mode Stripe : sandbox (pas d'impact sur la prod)
+### Détails techniques
+
+- Nouveaux fichiers : `src/pages/EspacePage.tsx`, `src/components/layout/EspaceHeader.tsx`, `src/components/espace/ResumeProjectCard.tsx`, `src/components/espace/CreateNewGrid.tsx`.
+- Modif `App.tsx` : route `/espace` (sous `SubscriberGate`), rediriger `/` vers `/espace` si `isAuthenticated`, sinon `/offres`.
+- Modif `EbookPlannerPage.tsx` : ajouter `EspaceHeader` + barre `WorkflowNavigation` sticky + popover "Plus" pour onglets secondaires. Aucune logique métier touchée.
+- Mémoire à mettre à jour : ajouter une règle "L'entrée abonné canonique est `/espace`" dans `mem://index.md`.
+- Aucune migration DB, aucun edge function modifié.
+
+### Hors périmètre (pour garder la stabilisation)
+
+- Pas de refactor de `EbookPlannerPage` (juste habillage).
+- Pas de suppression de pages.
+- Pas de changement du pipeline P1‑P15 ni de l'export.
+
+Si tu valides, je commence par le **Lot 1** (page `/espace`) — c'est ce qui change le plus la perception sans risque technique.
