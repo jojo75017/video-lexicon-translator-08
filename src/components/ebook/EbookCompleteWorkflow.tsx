@@ -226,6 +226,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
         body: {
           title: title.trim(),
           subtitle: subtitle.trim(),
+          category: category || '',
           bookIntroduction: bookIntroduction.trim(),
           language,
           userApiKey: normalizedUserApiKey,
