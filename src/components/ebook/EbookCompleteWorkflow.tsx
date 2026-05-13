@@ -209,10 +209,6 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
       if (!silent) toast.error(`Remplis d'abord le titre du livre, puis relance l'IA.`);
       return;
     }
-    if (!hasUsableApiKey) {
-      if (!silent) toast.error('Configure ta clé Gemini dans les paramètres avant d\'utiliser l\'IA.');
-      return;
-    }
     const hasExisting = [cibleProfil, cibleBesoins, cibleFrustrations, promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion].some(v => v.trim());
     if (hasExisting && !silent && !window.confirm('Des champs sont déjà remplis. Les écraser avec la suggestion IA ?')) {
       return;
@@ -227,7 +223,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
           category: category || '',
           bookIntroduction: bookIntroduction.trim(),
           language,
-          userApiKey: normalizedUserApiKey,
+          userApiKey: hasUsableApiKey ? normalizedUserApiKey : undefined,
         },
       });
       if (error) {
@@ -260,13 +256,12 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
     if (autoFilledRef.current) return;
     if (autofillLoading) return;
     if (!title.trim() || !category) return;
-    if (!hasUsableApiKey) return;
     const hasExisting = [cibleProfil, cibleBesoins, cibleFrustrations, promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion].some(v => v.trim());
     if (hasExisting) return;
     autoFilledRef.current = true;
     const t = setTimeout(() => { handleAutofillTargetPromise(true); }, 1200);
     return () => clearTimeout(t);
-  }, [title, category, hasUsableApiKey, autofillLoading, cibleProfil, cibleBesoins, cibleFrustrations, promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion, handleAutofillTargetPromise]);
+  }, [title, category, autofillLoading, cibleProfil, cibleBesoins, cibleFrustrations, promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion, handleAutofillTargetPromise]);
 
 
 
