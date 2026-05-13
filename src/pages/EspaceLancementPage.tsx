@@ -132,8 +132,9 @@ export default function EspaceLancementPage() {
           <span style={{ color: TEAL }}>2 cadeaux de lancement</span>
         </h1>
         <p className="text-lg text-joy-ink/70 max-w-2xl mx-auto leading-relaxed">
-          Le lancement public d'<strong>ebookstudio.fr</strong> démarre. Avant que les nouveaux
-          arrivent, voici ce que je t'offre — parce que c'est grâce à toi que tout ça existe.
+          Le lancement public d'<strong>ebookstudio.fr</strong> démarre le{' '}
+          <strong style={{ color: TEAL }}>1<sup>er</sup> juillet 2026</strong>. Avant que les
+          nouveaux arrivent, voici ce que je t'offre — parce que c'est grâce à toi que tout ça existe.
         </p>
       </section>
 
