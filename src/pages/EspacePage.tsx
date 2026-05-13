@@ -1,12 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import {
-  Accordion, AccordionContent, AccordionItem, AccordionTrigger,
-} from '@/components/ui/accordion';
 import {
   BookOpen, Headphones, Palette, MessageSquare, ArrowRight, Clock,
   Sparkles, GraduationCap, Users, BarChart3, Crown, FileText, Loader2, LogOut,
@@ -43,6 +40,7 @@ const EspacePage: React.FC<EspacePageProps> = ({ subscriberEmail, onLogout }) =>
   const [projects, setProjects] = useState<ProjectRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [lastTab, setLastTab] = useState<string | null>(null);
+  const [firstName, setFirstName] = useState<string>('');
 
   useEffect(() => {
     try { setLastTab(localStorage.getItem('ebook_planner_active_tab')); } catch {}
@@ -51,6 +49,9 @@ const EspacePage: React.FC<EspacePageProps> = ({ subscriberEmail, onLogout }) =>
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) { setProjects([]); return; }
+        const meta = (user.user_metadata || {}) as Record<string, string>;
+        const fn = meta.first_name || meta.full_name?.split(' ')[0] || (subscriberEmail || '').split('@')[0];
+        if (!cancelled && fn) setFirstName(fn.charAt(0).toUpperCase() + fn.slice(1));
         const { data } = await supabase
           .from('ebook_projects')
           .select('id, title, author_name, updated_at')
@@ -65,7 +66,7 @@ const EspacePage: React.FC<EspacePageProps> = ({ subscriberEmail, onLogout }) =>
       }
     })();
     return () => { cancelled = true; };
-  }, []);
+  }, [subscriberEmail]);
 
   const lastProject = projects[0];
   const lastStepLabel = useMemo(() => {
@@ -77,6 +78,10 @@ const EspacePage: React.FC<EspacePageProps> = ({ subscriberEmail, onLogout }) =>
     return lastTab;
   }, [lastTab]);
 
+  const today = useMemo(() => {
+    return new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+  }, []);
+
   const goPlanner = (tab?: string) => {
     if (tab) { try { localStorage.setItem('ebook_planner_active_tab', tab); } catch {} }
     navigate('/ebook-planner');
@@ -86,100 +91,144 @@ const EspacePage: React.FC<EspacePageProps> = ({ subscriberEmail, onLogout }) =>
     {
       title: 'Écrire un ebook',
       desc: 'Pipeline IA P1 → P15 (Amazon KDP). Le chemin recommandé.',
+      emoji: '📖',
       icon: BookOpen,
-      bg: 'bg-joy-peach',
+      tint: 'bg-joy-peach/30',
       action: () => goPlanner('workflow-dashboard'),
-      cta: 'Démarrer un livre',
+      cta: 'Démarrer',
       featured: true,
     },
     {
       title: 'Audiobook',
       desc: 'Transformer un manuscrit en livre audio TTS pro.',
+      emoji: '🎧',
       icon: Headphones,
-      bg: 'bg-joy-mint',
+      tint: 'bg-joy-mint/30',
       action: () => goPlanner('audio'),
-      cta: "Créer l'audio",
+      cta: 'Créer',
     },
     {
-      title: 'Livre de coloriage',
-      desc: 'Générer un cahier KDP prêt à publier en quelques clics.',
+      title: 'Coloriage',
+      desc: 'Cahier KDP prêt à publier en quelques clics.',
+      emoji: '🎨',
       icon: Palette,
-      bg: 'bg-joy-lavender',
+      tint: 'bg-joy-lavender/30',
       action: () => goPlanner('coloring'),
-      cta: 'Créer un coloriage',
+      cta: 'Créer',
     },
     {
       title: 'BD / Comic',
       desc: 'Assembler une bande dessinée à partir de prompts.',
+      emoji: '💬',
       icon: MessageSquare,
-      bg: 'bg-joy-sun',
+      tint: 'bg-joy-sun/30',
       action: () => navigate('/bd-studio'),
-      cta: 'Ouvrir BD Studio',
+      cta: 'Ouvrir',
     },
+  ];
+
+  const secondaryLinks = [
+    { icon: BarChart3, label: 'Plan marketing', to: '/plan-marketing' },
+    { icon: Sparkles, label: 'KDP Keywords', to: '/kdp-keywords' },
+    { icon: FileText, label: 'Niches porteuses', to: '/niches' },
+    { icon: GraduationCap, label: 'Formations', to: '/formation' },
+    { icon: Users, label: 'Communauté', to: '/communaute' },
+    { icon: Crown, label: 'Coaching VIP', to: '/coaching-vip' },
   ];
 
   return (
     <div className="min-h-screen" style={{ background: '#FAFAFA', color: TEXT }}>
-      {/* Header simple */}
-      <header className="border-b bg-white/80 backdrop-blur sticky top-0 z-30">
-        <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
-          <button onClick={() => navigate('/espace')} className="flex items-center gap-2 font-semibold">
+      {/* Header */}
+      <header
+        className="sticky top-0 z-30 backdrop-blur-md"
+        style={{
+          backgroundColor: 'rgba(250,250,250,0.85)',
+          borderBottom: '1px solid hsl(var(--joy-ink) / 0.08)',
+        }}
+      >
+        <div className="mx-auto max-w-6xl px-4 py-2.5 flex items-center justify-between">
+          <button onClick={() => navigate('/espace')} className="flex items-center gap-2 font-semibold tracking-tight">
             <Sparkles className="h-5 w-5" style={{ color: TEAL }} />
             <span>Mon espace</span>
           </button>
           <div className="flex items-center gap-3">
-            <span className="text-xs text-muted-foreground hidden sm:inline">{subscriberEmail}</span>
-            <Button variant="ghost" size="sm" onClick={onLogout}>
-              <LogOut className="h-4 w-4 mr-1" /> Déconnexion
+            <span className="text-xs text-joy-ink/55 hidden sm:inline">{subscriberEmail}</span>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onLogout}
+              aria-label="Déconnexion"
+              className="text-joy-ink/70 hover:text-joy-ink hover:bg-joy-ink/5 rounded-full h-9 w-9"
+            >
+              <LogOut className="h-4 w-4" />
             </Button>
           </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-4 py-8 space-y-8">
+      <main className="mx-auto max-w-6xl px-4 py-10 space-y-10">
+        {/* Hero */}
+        <section className="space-y-1">
+          <p className="text-xs uppercase tracking-widest text-joy-ink/50">{today}</p>
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
+            Bonjour{firstName ? `, ${firstName}` : ''} <span className="inline-block animate-joy-wiggle">👋</span>
+          </h1>
+          <p className="text-joy-ink/65 text-base">Voici ton atelier — qu'est-ce qu'on crée aujourd'hui&nbsp;?</p>
+        </section>
+
         {/* Bloc Reprendre */}
         <section>
-          <Card className="border-2" style={{ borderColor: TEAL }}>
-            <CardHeader className="pb-3">
-              <div className="flex items-center gap-2">
-                <Clock className="h-5 w-5" style={{ color: TEAL }} />
-                <CardTitle className="text-xl">Reprendre où vous en étiez</CardTitle>
+          <Card
+            className="border rounded-2xl overflow-hidden"
+            style={{
+              background: 'linear-gradient(135deg, hsl(var(--joy-cream)) 0%, #ffffff 60%)',
+              borderColor: 'hsl(var(--joy-ink) / 0.08)',
+              boxShadow: 'var(--shadow-elevated)',
+            }}
+          >
+            <CardContent className="p-6 sm:p-7">
+              <div className="flex items-center gap-2 mb-3">
+                <Clock className="h-4 w-4" style={{ color: TEAL }} />
+                <span className="text-xs font-semibold uppercase tracking-wider text-joy-ink/60">
+                  Reprendre où vous en étiez
+                </span>
               </div>
-            </CardHeader>
-            <CardContent>
+
               {loading ? (
-                <div className="flex items-center gap-2 text-muted-foreground">
+                <div className="flex items-center gap-2 text-joy-ink/60">
                   <Loader2 className="h-4 w-4 animate-spin" /> Chargement…
                 </div>
               ) : lastProject ? (
-                <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
-                  <div>
-                    <div className="font-semibold text-lg">{lastProject.title || 'Projet sans titre'}</div>
-                    <div className="text-sm text-muted-foreground">
+                <div className="flex flex-col sm:flex-row sm:items-end gap-4 justify-between">
+                  <div className="min-w-0">
+                    <div className="font-serif italic text-2xl text-joy-ink truncate">
+                      {lastProject.title || 'Projet sans titre'}
+                    </div>
+                    <div className="text-sm text-joy-ink/60 mt-1">
                       {lastProject.author_name ? `par ${lastProject.author_name} · ` : ''}
                       modifié {formatRelative(lastProject.updated_at)}
-                      {lastStepLabel ? ` · dernière étape : ${lastStepLabel}` : ''}
+                      {lastStepLabel ? ` · ${lastStepLabel}` : ''}
                     </div>
                   </div>
                   <Button
                     size="lg"
                     onClick={() => goPlanner(lastTab || undefined)}
+                    className="rounded-full px-6 hover:opacity-90 shrink-0"
                     style={{ background: TEAL, color: 'white' }}
-                    className="hover:opacity-90"
                   >
                     Continuer <ArrowRight className="h-4 w-4 ml-2" />
                   </Button>
                 </div>
               ) : (
                 <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
-                  <div className="text-muted-foreground">
+                  <div className="text-joy-ink/65">
                     Aucun projet en cours. Lancez votre premier livre en 1 clic.
                   </div>
                   <Button
                     size="lg"
                     onClick={() => goPlanner('workflow-dashboard')}
+                    className="rounded-full px-6 hover:opacity-90 font-semibold shrink-0"
                     style={{ background: ORANGE, color: TEXT }}
-                    className="hover:opacity-90 font-semibold"
                   >
                     Créer mon premier livre <ArrowRight className="h-4 w-4 ml-2" />
                   </Button>
@@ -192,22 +241,30 @@ const EspacePage: React.FC<EspacePageProps> = ({ subscriberEmail, onLogout }) =>
         {/* Bloc Mes livres */}
         {projects.length > 1 && (
           <section>
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-lg font-semibold flex items-center gap-2">
-                <FileText className="h-5 w-5" style={{ color: TEAL }} /> Mes livres
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold tracking-tight flex items-center gap-2">
+                <FileText className="h-4 w-4" style={{ color: TEAL }} /> Mes livres
               </h2>
-              <Button variant="ghost" size="sm" onClick={() => goPlanner('projects')}>
+              <Button variant="ghost" size="sm" onClick={() => goPlanner('projects')} className="rounded-full">
                 Voir tout <ArrowRight className="h-4 w-4 ml-1" />
               </Button>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {projects.slice(1, 4).map((p) => (
-                <Card key={p.id} className="hover:shadow-md transition cursor-pointer" onClick={() => goPlanner()}>
+                <Card
+                  key={p.id}
+                  onClick={() => goPlanner()}
+                  className="cursor-pointer rounded-xl border transition-all duration-200 hover:-translate-y-0.5"
+                  style={{
+                    borderColor: 'hsl(var(--joy-ink) / 0.08)',
+                    boxShadow: 'var(--shadow-soft)',
+                  }}
+                >
                   <CardContent className="p-4">
-                    <div className="font-medium line-clamp-1">{p.title || 'Sans titre'}</div>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      {formatRelative(p.updated_at)}
+                    <div className="font-serif italic text-base text-joy-ink line-clamp-1">
+                      {p.title || 'Sans titre'}
                     </div>
+                    <div className="text-xs text-joy-ink/55 mt-1">{formatRelative(p.updated_at)}</div>
                   </CardContent>
                 </Card>
               ))}
@@ -217,32 +274,41 @@ const EspacePage: React.FC<EspacePageProps> = ({ subscriberEmail, onLogout }) =>
 
         {/* Bloc Créer du neuf */}
         <section>
-          <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-            <Sparkles className="h-5 w-5" style={{ color: ORANGE }} /> Créer du neuf
+          <h2 className="text-lg font-semibold tracking-tight mb-4 flex items-center gap-2">
+            <Sparkles className="h-4 w-4" style={{ color: ORANGE }} /> Créer du neuf
           </h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {createCards.map((c) => (
               <Card
                 key={c.title}
-                className={`${c.bg} border-2 cursor-pointer hover:shadow-lg transition relative`}
-                style={{ borderColor: c.featured ? TEAL : 'transparent' }}
                 onClick={c.action}
+                className="relative cursor-pointer rounded-2xl border transition-all duration-200 hover:-translate-y-1 flex flex-col"
+                style={{
+                  borderColor: c.featured ? TEAL : 'hsl(var(--joy-ink) / 0.08)',
+                  boxShadow: 'var(--shadow-soft)',
+                }}
               >
                 {c.featured && (
-                  <Badge className="absolute -top-2 right-3" style={{ background: TEAL, color: 'white' }}>
+                  <Badge
+                    className="absolute -top-2 right-3 rounded-full"
+                    style={{ background: TEAL, color: 'white' }}
+                  >
                     Recommandé
                   </Badge>
                 )}
-                <CardHeader className="pb-2">
-                  <c.icon className="h-7 w-7" style={{ color: TEXT }} />
-                  <CardTitle className="text-base mt-2">{c.title}</CardTitle>
-                  <CardDescription className="text-xs" style={{ color: TEXT, opacity: 0.75 }}>
-                    {c.desc}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Button size="sm" variant="secondary" className="w-full" onClick={(e) => { e.stopPropagation(); c.action(); }}>
-                    {c.cta} <ArrowRight className="h-4 w-4 ml-1" />
+                <CardContent className="p-5 flex flex-col flex-1">
+                  <div className={`h-14 w-14 rounded-2xl ${c.tint} flex items-center justify-center text-3xl mb-3`}>
+                    {c.emoji}
+                  </div>
+                  <div className="font-semibold text-base tracking-tight">{c.title}</div>
+                  <p className="text-xs text-joy-ink/60 mt-1 mb-4 flex-1">{c.desc}</p>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="rounded-full w-full border-joy-ink/20 hover:bg-joy-ink hover:text-white hover:border-joy-ink"
+                    onClick={(e) => { e.stopPropagation(); c.action(); }}
+                  >
+                    {c.cta} <ArrowRight className="h-3.5 w-3.5 ml-1" />
                   </Button>
                 </CardContent>
               </Card>
@@ -252,42 +318,36 @@ const EspacePage: React.FC<EspacePageProps> = ({ subscriberEmail, onLogout }) =>
 
         {/* Bloc Aller plus loin */}
         <section>
-          <Accordion type="single" collapsible>
-            <AccordionItem value="more" className="border rounded-lg bg-white px-4">
-              <AccordionTrigger className="text-base font-semibold">
-                Aller plus loin (marketing, KDP, formations…)
-              </AccordionTrigger>
-              <AccordionContent>
-                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-2">
-                  <SecondaryLink icon={BarChart3} label="Plan marketing" onClick={() => navigate('/plan-marketing')} />
-                  <SecondaryLink icon={Sparkles} label="KDP Keywords" onClick={() => navigate('/kdp-keywords')} />
-                  <SecondaryLink icon={FileText} label="Niches porteuses" onClick={() => navigate('/niches')} />
-                  <SecondaryLink icon={GraduationCap} label="Formations" onClick={() => navigate('/formation')} />
-                  <SecondaryLink icon={Users} label="Communauté" onClick={() => navigate('/communaute')} />
-                  <SecondaryLink icon={Crown} label="Coaching VIP" onClick={() => navigate('/coaching-vip')} />
+          <h2 className="text-lg font-semibold tracking-tight mb-4 text-joy-ink/80">
+            Aller plus loin
+          </h2>
+          <div className="grid sm:grid-cols-2 gap-2.5">
+            {secondaryLinks.map((l) => (
+              <button
+                key={l.to}
+                onClick={() => navigate(l.to)}
+                className="group flex items-center gap-3 p-3.5 rounded-xl bg-white border transition-all hover:border-[#008296] hover:shadow-[var(--shadow-soft)] text-left"
+                style={{ borderColor: 'hsl(var(--joy-ink) / 0.08)' }}
+              >
+                <div className="h-9 w-9 rounded-lg bg-joy-cream flex items-center justify-center">
+                  <l.icon className="h-4 w-4" style={{ color: TEAL }} />
                 </div>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
+                <span className="text-sm font-medium text-joy-ink flex-1">{l.label}</span>
+                <ArrowRight className="h-4 w-4 text-joy-ink/30 group-hover:text-joy-ink/70 group-hover:translate-x-0.5 transition-all" />
+              </button>
+            ))}
+          </div>
         </section>
 
-        <footer className="text-center text-xs text-muted-foreground pt-4 pb-8">
-          Besoin d'aide ? <button onClick={() => navigate('/faq')} className="underline">FAQ & assistance</button>
+        <footer className="text-center text-xs text-joy-ink/55 pt-6 pb-8">
+          Besoin d'aide ?{' '}
+          <button onClick={() => navigate('/faq')} className="underline hover:text-joy-ink">
+            FAQ &amp; assistance
+          </button>
         </footer>
       </main>
     </div>
   );
 };
-
-const SecondaryLink: React.FC<{ icon: React.ElementType; label: string; onClick: () => void }> = ({ icon: Icon, label, onClick }) => (
-  <button
-    onClick={onClick}
-    className="flex items-center gap-2 p-3 rounded-md border hover:border-[#008296] hover:bg-[#0082960d] transition text-left"
-  >
-    <Icon className="h-4 w-4" style={{ color: TEAL }} />
-    <span className="text-sm">{label}</span>
-    <ArrowRight className="h-4 w-4 ml-auto opacity-50" />
-  </button>
-);
 
 export default EspacePage;
