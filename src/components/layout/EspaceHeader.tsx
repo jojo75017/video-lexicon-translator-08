@@ -1,11 +1,12 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { ArrowLeft, LogOut, Sparkles, LayoutGrid, Search } from 'lucide-react';
+import { ArrowLeft, LogOut, Sparkles, LayoutGrid, Search, Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
 
 interface EspaceHeaderProps {
   projectTitle?: string | null;
@@ -190,6 +191,15 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
 }) => {
   const [allToolsOpen, setAllToolsOpen] = useState(false);
   const [search, setSearch] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    getIsCurrentSessionAdmin()
+      .then((v) => { if (!cancelled) setIsAdmin(!!v); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
 
   const showTabBar =
     !!activeTab && !!onTabChange && !HIDE_TABBAR_ON.has(activeTab);
@@ -268,6 +278,24 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
         </div>
 
         <div className="flex items-center gap-1">
+          {isAdmin && (
+            <TooltipProvider delayDuration={200}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link
+                    to="/admin-cockpit"
+                    aria-label="Cockpit admin"
+                    className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold border border-joy-teal/40 text-joy-ink hover:bg-joy-teal/10 transition-all"
+                    style={{ color: '#008296' }}
+                  >
+                    <Shield className="h-3.5 w-3.5" />
+                    <span className="hidden sm:inline">Cockpit admin</span>
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">Cockpit admin</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
           {onLogout && (
             <TooltipProvider delayDuration={200}>
               <Tooltip>
