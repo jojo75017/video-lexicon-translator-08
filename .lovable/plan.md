@@ -1,101 +1,68 @@
-## Objectif
-Créer une page admin **/admin-cockpit** réservée à toi, avec :
-1. Liens rapides vers chaque étape du tunnel de lancement
-2. Calendrier mensuel de tes lancements à venir (créer / éditer / supprimer)
-3. Bouton d'accès depuis le header de `/espace` (visible seulement si tu es admin)
+## Lancement public ebookstudio.fr — ce que reçoivent les abonnés
+
+Tu offres déjà à tes abonnés actuels :
+1. **−30 % à vie** sur tout upsell / pack / formation
+2. **30 min de coaching Zoom 1:1 offert** → https://calendly.com/boubetgeorges/nouvelle-reunion
+
+Objectif : transformer ces abonnés en **ambassadeurs** (parrainage = bouche-à-oreille).
 
 ---
 
-## 1. Base de données
+### 1. Email "Cadeau lancement" (à envoyer le jour J)
 
-Nouvelle table `admin_launches` (migration) :
+Sujet : `🎁 Pour toi, avant tout le monde : 30 min en visio avec moi + −30 %`
 
-| Colonne | Type | Notes |
-|---|---|---|
-| id | uuid PK | gen_random_uuid() |
-| user_id | uuid | propriétaire (toi) |
-| title | text | nom du lancement |
-| launch_date | date | jour cible |
-| status | text | `planned` / `in_progress` / `done` |
-| notes | text nullable | détails |
-| color | text nullable | code couleur pastille |
-| created_at / updated_at | timestamptz | defaults |
+Corps (résumé) :
+- "Le grand lancement public démarre aujourd'hui. Avant les nouveaux, **toi tu as deux cadeaux** :"
+- 🎯 **30 min Zoom 1:1 offert** pour bloquer ton plan d'attaque KDP — bouton CTA → Calendly
+- 💸 **−30 % à vie** sur les upsells (formation, coaching VIP, packs prompts)
+- 🤝 **Ton lien de parrainage perso** — gagne 30 % sur chaque vente (lien dynamique vers `/parrainage`)
+- P.S. : "Partage ton lien aujourd'hui = double effet (tu aides un proche + tu touches une commission)."
 
-RLS : `ALL` réservé aux admins via `has_role(auth.uid(), 'admin')`.
+### 2. Bannière persistante dans /espace (header abonné)
 
----
-
-## 2. Page `/admin-cockpit`
-
-Fichier : `src/pages/AdminCockpitPage.tsx`, montée dans `src/App.tsx` derrière `<AdminGate>` (qui existe déjà).
-
-Structure visuelle (charte KDP teal/orange) :
-
+Une **bandeau jovial teal** affiché 7 jours :
 ```text
-┌─ Header ─────────────────────────────────────┐
-│ ← Retour Espace      Cockpit Admin     [⎋]   │
-├─ Bloc « Tunnel de lancement » ───────────────┤
-│ [Capture] [Bonus] [Découverte] [Vente]       │
-│ [Commande] [Paiement] [Merci] [Upsell]       │
-│ [Affilié] (+ Funnel admin · CRM · Emails)    │
-├─ Bloc « Calendrier des lancements » ─────────┤
-│  ◀  Mai 2026  ▶            [+ Nouveau]       │
-│  Grille mois : pastille colorée par jour     │
-│  Liste latérale : prochains lancements       │
-└──────────────────────────────────────────────┘
+🎉 Lancement en cours — Ton cadeau VIP : 30 min Zoom + −30 % à vie  [Réserver] [Mon lien parrainage]
 ```
 
-### Tunnel — liens rapides
-Tuiles cliquables (réutilise `Card` joy) vers les routes existantes :
-- `/promo-capture`, `/promo-bonus`, `/promo-decouverte`, `/promo-paiement`, `/promo-commande`, `/promo-merci`, `/promo-affilie`, `/promo-espace`
-- Sales : `/sales`, `/upsell`, `/upsell-paiement`, `/paiement-manuel`
-- Outils admin : `/admin-funnel`, `/crm`, `/sales-campaign`, `/email-preview`, `/admin-direct`
+### 3. Page dédiée /espace/lancement (one-pager)
 
-Chaque tuile : emoji + label + petit caption ("Étape 1 — Capture email"…).
+3 blocs verticaux :
+1. **Ton coaching offert** → embed Calendly + rappel "1 fois, pas renouvelable"
+2. **Ton code −30 %** → code affiché en gros (ex: `MERCIVIP30`) + liste des produits éligibles
+3. **Ton kit ambassadeur** → lien parrainage + 3 textes pré-rédigés (Facebook, WhatsApp, email à un ami) à copier-coller
 
-### Calendrier
-- Vue mois en CSS grid 7 colonnes (composant maison léger, pas de lib).
-- Navigation `< mois >` avec `date-fns` (déjà installé).
-- Chaque jour affiche la pastille de chaque lancement (couleur + titre tronqué).
-- Clic sur un jour vide → modal « Nouveau lancement » (titre, date, statut, couleur, notes).
-- Clic sur une pastille → modal édition / suppression.
-- Bouton `+ Nouveau lancement` aussi en haut.
-- Liste « 5 prochains lancements » à droite avec compte à rebours.
+### 4. Post forum épinglé
 
-CRUD via `supabase.from('admin_launches')`.
+Annonce dans la communauté : "Lancement en cours, voici vos 2 cadeaux + appel à partager."
+
+### 5. Reminder J+3
+
+Email court : "T'as réservé ton Zoom ? Il reste X créneaux cette semaine."
 
 ---
 
-## 3. Accès depuis `/espace`
+### Côté technique (à faire dans l'app)
 
-Dans `src/pages/EspacePage.tsx` :
-- Récupérer `has_role` (déjà fait via AuthContext → `user.role === 'admin'`).
-- Si admin, ajouter un 2ᵉ bouton dans le header (à gauche du bouton « Tableau de bord ») :
-  - Icône `Shield` + label « Cockpit admin » (caché < sm)
-  - Style outline teal pour le distinguer du CTA principal.
-
----
-
-## 4. Détails techniques
-
-- Route : `<Route path="/admin-cockpit" element={<AdminGate><AdminCockpitPage /></AdminGate>} />`
-- `AdminGate` existe déjà (`src/components/auth/AdminGate.tsx`) — bloque les non-admins.
-- Pas de nouvelle dépendance, on réutilise `date-fns`, `lucide-react`, shadcn `Dialog`, `Calendar`, `Button`, `Card`, `Input`, `Select`.
-- Pas de modification du workflow ebook, ni du planner, ni de l'auth.
-- Couleurs : teal `#008296`, orange `#FF9E2D`, fond `#FAFAFA`, accents `joy-cream/peach/mint`.
+- **Composant `LaunchVipBanner`** dans `EspaceHeader` (au-dessus de la nav, dismissible, dates de lancement codées en dur).
+- **Page `/espace/lancement`** (lazy route) avec :
+  - Iframe Calendly
+  - Code promo affiché + bouton "copier"
+  - Pull du `referral_code` de l'utilisateur depuis la table `referral_codes` + 3 templates de partage
+- **Edge function `send-launch-vip-email`** :
+  - Cible : tous les `subscribers` avec `status='active'`
+  - Resend API, template HTML aux couleurs KDP (teal #008296)
+  - Inclut le lien parrainage personnalisé de chaque abonné
+- **Tracking** : ajouter une ligne dans `admin_launches` (déjà créé) pour ce lancement avec date et lien vers les 2 cadeaux dans `notes`.
 
 ---
 
-## 5. Fichiers touchés
-- **Nouveau** : `src/pages/AdminCockpitPage.tsx`
-- **Migration** : table `admin_launches` + RLS admin
-- **Modifié** : `src/App.tsx` (ajout route)
-- **Modifié** : `src/pages/EspacePage.tsx` (bouton admin conditionnel)
+### Ce que tu dois me valider avant que je code
 
----
+1. **Date du lancement public** (pour figer les bannières et l'envoi email)
+2. **Code promo −30 %** : tu veux un code unique (ex: `MERCIVIP30`) ou un code par abonné ?
+3. **Sur quoi s'applique le −30 %** : formation seule ? coaching VIP ? tout l'écosystème ?
+4. **Limite Calendly** : 1 créneau / abonné ou illimité ?
 
-## Hors-scope
-- Pas de stats live conversions (à ajouter plus tard si besoin).
-- Pas de checklist tunnel persistée.
-- Pas de drag-and-drop kanban.
-- Pas d'onglets perso supplémentaires (tu n'as pas listé lesquels — tous les outils admin existants restent accessibles via les tuiles « Outils admin »).
+Réponds-moi à ces 4 points et je passe en mode build pour créer la bannière, la page `/espace/lancement` et l'email VIP.
