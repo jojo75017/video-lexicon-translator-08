@@ -87,6 +87,7 @@ const TutorielsPage = lazy(() => import('./pages/TutorielsPage'));
 const RecuperationCodePage = lazy(() => import('./pages/RecuperationCodePage'));
 const ExtensionChromePage = lazy(() => import('./pages/ExtensionChromePage'));
 const EbookbotPage = lazy(() => import('./pages/EbookbotPage'));
+const EspacePage = lazy(() => import('./pages/EspacePage'));
 
 // Promo funnel pages
 const PromoCapturePage = lazy(() => import('./pages/promo/PromoCapturePage'));
@@ -261,7 +262,20 @@ const App = () => {
               }
             />
 
-            <Route path="/" element={<Navigate to="/offres" replace />} />
+            <Route path="/" element={<Navigate to={isAuthenticated || isAdmin ? '/espace' : '/offres'} replace />} />
+            <Route
+              path="/espace"
+              element={
+                <SubscriberGate
+                  isAdmin={isAdmin}
+                  subscriberEmail={subscriberEmail}
+                  subscriberData={subscriberData}
+                  onInvalid={handleLogout}
+                >
+                  <EspacePage subscriberEmail={subscriberEmail || ''} onLogout={handleLogout} />
+                </SubscriberGate>
+              }
+            />
             <Route path="/offres" element={<SalesPage />} />
             <Route path="/extension-chrome" element={<ExtensionChromePage />} />
             <Route path="/ebookbot" element={<EbookbotPage />} />
