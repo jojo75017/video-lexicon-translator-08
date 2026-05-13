@@ -1514,23 +1514,36 @@ Retourne en JSON :
   "qualityScore": 9
 }`;
 
-          // Boucle qualité pour chaque chapitre
-          const { content: chapterContent, qualityScore, attempts } = await callAIWithQualityLoop(
-            p4SystemPrompt,
-            p4UserPrompt,
-            p4Settings.maxTokens,
-            p4Settings.minScore,
-            p4Settings.maxRetries,
-            totalParts > 1 ? `P4-Ch${chapitre.numero}-Part${partNumber}` : `P4-Ch${chapitre.numero}`
-          );
+          let chapterContent = '';
+          let qualityScore = 7;
+          let attempts = 1;
+          let parsedChapter: any = null;
 
-          const parsedChapter = parseJSON(chapterContent);
-          const chapitreGenere = cleanChapter(parsedChapter || {
+          try {
+            // Boucle qualité pour chaque chapitre
+            const generated = await callAIWithQualityLoop(
+              p4SystemPrompt,
+              p4UserPrompt,
+              p4Settings.maxTokens,
+              p4Settings.minScore,
+              p4Settings.maxRetries,
+              totalParts > 1 ? `P4-Ch${chapitre.numero}-Part${partNumber}` : `P4-Ch${chapitre.numero}`
+            );
+            chapterContent = generated.content;
+            qualityScore = generated.qualityScore || 7;
+            attempts = generated.attempts || 1;
+            parsedChapter = parseJSON(chapterContent);
+          } catch (p4Error) {
+            console.warn(`P4 fallback chapter ${chapitre.numero} part ${partNumber}/${totalParts}:`, p4Error instanceof Error ? p4Error.message : p4Error);
+          }
+
+          const fallbackChapter = buildRobustChapterFallback(chapitre, fullTitle, category, chapitresDejaGeneres, { ...chapterSegment, partNumber, totalParts });
+          const chapitreGenere = cleanChapter(parsedChapter || (chapterContent ? {
             numero: chapitre.numero,
             titre: chapitre.titre,
             contenu: chapterContent,
-            nombreMots: chapterContent.split(/\s+/).length,
-          });
+            nombreMots: chapterContent.split(/\s+/).filter(Boolean).length,
+          } : fallbackChapter));
 
           result = totalParts > 1
             ? {
