@@ -20,7 +20,7 @@ type FamilyId = 'planner' | 'writing' | 'images' | 'export' | 'marketing' | 'acc
 
 const PLANNER_TABS: Array<{ id: FamilyId; label: string; emoji: string; match: string[] }> = [
   { id: 'planner', label: 'Plan', emoji: '📘', match: ['planner', 'characters', 'templates', 'workflow-dashboard', 'url-import', 'doc-transform', 'projects', 'ebook-library', 'series'] },
-  { id: 'writing', label: 'Écrire', emoji: '✍️', match: ['writing', 'strict-proofread', 'toc', 'aichat', 'complete-workflow', 'humanize-anti-ia', 'natural-rewrite', 'expert-writing', 'multi-translator', 'tools', 'atlas', 'encyclopedia', 'documentary', 'agenda', 'scolaire', 'content-architect'] },
+  { id: 'writing', label: 'Écrire', emoji: '✍️', match: ['writing', 'strict-proofread', 'toc', 'aichat', 'complete-workflow', 'humanize-anti-ia', 'natural-rewrite', 'expert-writing', 'multi-translator', 'tools', 'atlas', 'encyclopedia', 'documentary', 'agenda', 'scolaire', 'pedagogique', 'content-architect'] },
   { id: 'images', label: 'Habiller', emoji: '🎨', match: ['images', 'cover', 'cover-design-editor', 'back-cover', 'backcover', 'images-cover', 'images-generator', 'images-library', 'editorial-packaging'] },
   { id: 'export', label: 'Publier', emoji: '🚀', match: ['export', 'kdp', 'kdp-prepublish-checklist', 'workflow-export', 'calibre-epub', 'audiobook', 'audio-express', 'audio', 'audit-pilot', 'kdp-keywords-pro'] },
   { id: 'marketing', label: 'Vendre', emoji: '💛', match: ['marketing', 'monetization', 'advanced', 'launch-plan', 'editorial-quality', 'final-diagnosis', 'kdp-ads-guide', 'chrome-extension'] },
