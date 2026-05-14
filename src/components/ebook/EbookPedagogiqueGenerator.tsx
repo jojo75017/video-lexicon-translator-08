@@ -244,7 +244,7 @@ Pour CHAQUE chapitre, retourne un objet JSON avec :
 
 QUALITÉ : surpasse-toi. Le rendu doit être digne d'un livre vendu en librairie : progression claire, exemples concrets, vocabulaire précis, jamais creux.`;
 
-      const text = await callGemini(geminiKey, prompt, {
+      const text = await callAIWriting(prompt, {
         systemPrompt: sysPrompt,
         temperature: 0.7,
         maxTokens: 24000,
