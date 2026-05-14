@@ -10,15 +10,18 @@ serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
   try {
-    const { title, context, style, preset, folder } = await req.json();
+    const { title, context, style, preset, folder, openrouterKey } = await req.json();
     if (!title) {
       return new Response(JSON.stringify({ error: 'title requis' }), {
         status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
 
+    // Si l'abonné fournit sa clé OpenRouter (sk-or-...), on route vers OpenRouter
+    // sinon on utilise Lovable AI Gateway (crédits Lovable).
+    const useOpenRouter = typeof openrouterKey === 'string' && openrouterKey.trim().startsWith('sk-or-');
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) {
+    if (!useOpenRouter && !LOVABLE_API_KEY) {
       return new Response(JSON.stringify({ error: 'LOVABLE_API_KEY manquante' }), {
         status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
