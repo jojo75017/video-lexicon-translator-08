@@ -64,6 +64,12 @@ export const EbookSettingsPanel: React.FC<Props> = ({ onTypographyChange }) => {
   const [openrouter, setOpenrouter] = useState<string>(getOpenRouterKey());
   const [typo, setTypo] = useState<EbookExportTypography>(loadTypography());
 
+  type TestState = 'idle' | 'testing' | 'ok' | 'fail';
+  const [providerTest, setProviderTest] = useState<Record<AIProvider, TestState>>({
+    gemini: 'idle', claude: 'idle', openai: 'idle',
+  });
+  const [openrouterTest, setOpenrouterTest] = useState<TestState>('idle');
+
   useEffect(() => { onTypographyChange?.(typo); }, [typo, onTypographyChange]);
 
   const updateProvider = (p: AIProvider) => {
@@ -73,16 +79,98 @@ export const EbookSettingsPanel: React.FC<Props> = ({ onTypographyChange }) => {
   const updateKey = (p: AIProvider, v: string) => {
     setKeys(k => ({ ...k, [p]: v }));
     setProviderKey(p, v);
+    setProviderTest(s => ({ ...s, [p]: 'idle' }));
   };
   const updateOpenRouter = (v: string) => {
     setOpenrouter(v);
     setOpenRouterKey(v);
+    setOpenrouterTest('idle');
   };
   const updateTypo = (patch: Partial<EbookExportTypography>) => {
     const next = { ...typo, ...patch };
     setTypo(next);
     saveTypography(next);
   };
+
+  const testProviderKey = async (p: AIProvider) => {
+    const key = (keys[p] || '').trim();
+    if (!key) { toast.error('Saisissez d\'abord la clé.'); return; }
+    if (!validateKeyFormat(p, key)) {
+      setProviderTest(s => ({ ...s, [p]: 'fail' }));
+      toast.error(`Format de clé ${PROVIDER_LABELS[p]} invalide.`);
+      return;
+    }
+    setProviderTest(s => ({ ...s, [p]: 'testing' }));
+    try {
+      let ok = false;
+      if (p === 'gemini') {
+        const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(key)}`);
+        ok = r.ok || r.status === 429;
+      } else if (p === 'openai') {
+        const r = await fetch('https://api.openai.com/v1/models', {
+          headers: { Authorization: `Bearer ${key}` },
+        });
+        ok = r.ok || r.status === 429;
+      } else if (p === 'claude') {
+        const r = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': key,
+            'anthropic-version': '2023-06-01',
+            'anthropic-dangerous-direct-browser-access': 'true',
+          },
+          body: JSON.stringify({
+            model: 'claude-3-5-haiku-20241022',
+            max_tokens: 1,
+            messages: [{ role: 'user', content: 'ping' }],
+          }),
+        });
+        // 200 = ok, 429 = quota mais clé valide, 400 (bad request) peut indiquer clé valide selon la réponse
+        ok = r.ok || r.status === 429;
+      }
+      setProviderTest(s => ({ ...s, [p]: ok ? 'ok' : 'fail' }));
+      ok ? toast.success(`Clé ${PROVIDER_LABELS[p]} valide ✓`) : toast.error(`Clé ${PROVIDER_LABELS[p]} rejetée.`);
+    } catch (e) {
+      console.error('[KeyTest]', p, e);
+      setProviderTest(s => ({ ...s, [p]: 'fail' }));
+      toast.error('Erreur réseau lors du test.');
+    }
+  };
+
+  const testOpenRouter = async () => {
+    const key = openrouter.trim();
+    if (!key) { toast.error('Saisissez d\'abord la clé OpenRouter.'); return; }
+    if (!key.startsWith('sk-or-')) {
+      setOpenrouterTest('fail');
+      toast.error('Une clé OpenRouter commence par sk-or-');
+      return;
+    }
+    setOpenrouterTest('testing');
+    try {
+      const r = await fetch('https://openrouter.ai/api/v1/auth/key', {
+        headers: { Authorization: `Bearer ${key}` },
+      });
+      const ok = r.ok;
+      setOpenrouterTest(ok ? 'ok' : 'fail');
+      if (ok) {
+        const j = await r.json().catch(() => ({}));
+        const credits = j?.data?.limit_remaining ?? j?.data?.usage;
+        toast.success(`Clé OpenRouter valide ✓${credits != null ? ` (crédits: ${credits})` : ''}`);
+      } else {
+        toast.error('Clé OpenRouter rejetée.');
+      }
+    } catch (e) {
+      console.error('[OpenRouterTest]', e);
+      setOpenrouterTest('fail');
+      toast.error('Erreur réseau lors du test.');
+    }
+  };
+
+  const TestIcon = ({ s }: { s: TestState }) =>
+    s === 'testing' ? <Loader2 className="w-4 h-4 animate-spin" /> :
+    s === 'ok' ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> :
+    s === 'fail' ? <XCircle className="w-4 h-4 text-destructive" /> : null;
 
   const currentKey = keys[provider];
   const keyValid = currentKey ? validateKeyFormat(provider, currentKey) : null;
