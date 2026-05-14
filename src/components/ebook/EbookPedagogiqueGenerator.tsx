@@ -371,19 +371,36 @@ QUALITÉ : surpasse-toi. Le rendu doit être digne d'un livre vendu en librairie
   };
 
   const buildExportSections = () => chapters.map(c => {
-    const blocks: Array<{ heading?: string; text: string }> = [];
-    if (c.intro) blocks.push({ text: c.intro });
-    c.subSections.forEach(s => blocks.push({ heading: s.heading, text: s.paragraphs.join('\n\n') }));
+    const blocks: any[] = [];
+    if (c.intro) blocks.push({ kind: 'paragraph', text: c.intro });
+    c.subSections.forEach(s => blocks.push({ kind: 'paragraph', heading: s.heading, text: s.paragraphs.join('\n\n') }));
     c.callouts.forEach(b => {
-      const meta = CALLOUT_META[b.type];
-      blocks.push({ heading: `${meta.icon} ${meta.label} — ${b.title}`, text: b.body });
+      blocks.push({ kind: 'callout', variant: b.type, title: b.title, body: b.body });
     });
     c.tables.forEach(t => {
-      const tableText = [t.headers.join(' | '), ...t.rows.map(r => r.join(' | '))].join('\n');
-      blocks.push({ heading: t.caption || 'Tableau', text: tableText });
+      blocks.push({ kind: 'table', caption: t.caption, headers: t.headers, rows: t.rows });
     });
     return { title: c.title, imageUrl: c.imageUrl, blocks };
   });
+
+  const handleUploadImage = (chapter: PedagogiqueChapter, file: File) => {
+    if (!file.type.startsWith('image/')) {
+      toast.error('Veuillez sélectionner une image (JPG, PNG, WebP)');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image trop lourde (max 5 Mo)');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result as string;
+      setChapters(prev => prev.map(c => c.id === chapter.id ? { ...c, imageUrl: dataUrl } : c));
+      toast.success('Illustration importée');
+    };
+    reader.onerror = () => toast.error('Erreur de lecture du fichier');
+    reader.readAsDataURL(file);
+  };
 
   const exportDocx = async () => {
     try {
