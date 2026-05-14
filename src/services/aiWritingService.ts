@@ -1,11 +1,11 @@
 /**
  * Service de rédaction multi-providers (BYOK).
- * Permet à l'abonné de choisir Gemini, Claude (Anthropic) ou ChatGPT (OpenAI).
- * Chaque provider utilise sa propre clé stockée en localStorage.
+ * Permet à l'abonné de choisir Gemini, Claude (Anthropic), ChatGPT (OpenAI)
+ * ou OpenRouter (avec choix libre du modèle).
  */
 import { callGemini } from './geminiService';
 
-export type AIProvider = 'gemini' | 'claude' | 'openai';
+export type AIProvider = 'gemini' | 'claude' | 'openai' | 'openrouter';
 
 export interface AIWritingOptions {
   systemPrompt?: string;
@@ -19,14 +19,16 @@ const LS_KEYS: Record<AIProvider, string> = {
   gemini: 'openai_api_key',         // legacy key name (Gemini), conservée pour compat
   claude: 'anthropic_api_key',
   openai: 'openai_real_api_key',
+  openrouter: 'openrouter_image_api_key', // partagée avec les images (une seule clé sk-or-)
 };
 
 const LS_PROVIDER = 'ai_writing_provider';
+const LS_OPENROUTER_MODEL = 'openrouter_writing_model';
 
 export const getProvider = (): AIProvider => {
   if (typeof window === 'undefined') return 'gemini';
   const v = localStorage.getItem(LS_PROVIDER);
-  return (v === 'claude' || v === 'openai' || v === 'gemini') ? v : 'gemini';
+  return (v === 'claude' || v === 'openai' || v === 'gemini' || v === 'openrouter') ? v : 'gemini';
 };
 
 export const setProvider = (p: AIProvider) => {
@@ -53,6 +55,7 @@ export const validateKeyFormat = (p: AIProvider, key: string): boolean => {
     case 'gemini': return k.startsWith('AIza') && k.length > 20;
     case 'claude': return k.startsWith('sk-ant-') && k.length > 20;
     case 'openai': return k.startsWith('sk-') && k.length > 20;
+    case 'openrouter': return k.startsWith('sk-or-') && k.length > 20;
   }
 };
 
@@ -60,15 +63,41 @@ export const PROVIDER_LABELS: Record<AIProvider, string> = {
   gemini: 'Google Gemini',
   claude: 'Anthropic Claude',
   openai: 'OpenAI ChatGPT',
+  openrouter: 'OpenRouter (multi-modèles)',
 };
 
 export const PROVIDER_KEY_HINT: Record<AIProvider, string> = {
   gemini: "Clé commençant par AIza... (aistudio.google.com)",
   claude: "Clé commençant par sk-ant-... (console.anthropic.com)",
   openai: "Clé commençant par sk-... (platform.openai.com)",
+  openrouter: "Clé commençant par sk-or-... (openrouter.ai)",
 };
 
-const DEFAULT_MODELS: Record<AIProvider, string> = {
+/** Modèles OpenRouter recommandés (slug officiel). */
+export const OPENROUTER_MODELS: { id: string; label: string }[] = [
+  { id: 'anthropic/claude-sonnet-4',           label: 'Claude Sonnet 4 (rédaction premium)' },
+  { id: 'anthropic/claude-3.5-sonnet',         label: 'Claude 3.5 Sonnet' },
+  { id: 'openai/gpt-4o',                       label: 'GPT-4o' },
+  { id: 'openai/gpt-4o-mini',                  label: 'GPT-4o mini (rapide & économique)' },
+  { id: 'google/gemini-2.5-pro',               label: 'Gemini 2.5 Pro' },
+  { id: 'google/gemini-2.5-flash',             label: 'Gemini 2.5 Flash' },
+  { id: 'deepseek/deepseek-chat',              label: 'DeepSeek V3 (économique)' },
+  { id: 'meta-llama/llama-3.3-70b-instruct',   label: 'Llama 3.3 70B' },
+  { id: 'mistralai/mistral-large',             label: 'Mistral Large' },
+];
+
+export const getOpenRouterModel = (): string => {
+  if (typeof window === 'undefined') return OPENROUTER_MODELS[0].id;
+  return (localStorage.getItem(LS_OPENROUTER_MODEL) || OPENROUTER_MODELS[0].id).trim();
+};
+export const setOpenRouterModel = (m: string) => {
+  if (typeof window === 'undefined') return;
+  const v = (m || '').trim();
+  if (v) localStorage.setItem(LS_OPENROUTER_MODEL, v);
+  else localStorage.removeItem(LS_OPENROUTER_MODEL);
+};
+
+const DEFAULT_MODELS: Record<Exclude<AIProvider, 'openrouter'>, string> = {
   gemini: 'gemini-2.5-flash',
   claude: 'claude-3-5-sonnet-20241022',
   openai: 'gpt-4o-mini',
@@ -151,6 +180,47 @@ async function callOpenAI(apiKey: string, prompt: string, opts: AIWritingOptions
   } finally { clearTimeout(timeout); }
 }
 
+async function callOpenRouter(apiKey: string, prompt: string, opts: AIWritingOptions): Promise<string> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), opts.timeout ?? 120000);
+  try {
+    const model = getOpenRouterModel();
+    const messages: any[] = [];
+    if (opts.systemPrompt) messages.push({ role: 'system', content: opts.systemPrompt });
+    messages.push({ role: 'user', content: prompt });
+    const body: any = {
+      model,
+      messages,
+      temperature: opts.temperature ?? 0.7,
+      max_tokens: opts.maxTokens ?? 8192,
+    };
+    if (opts.jsonMode) body.response_format = { type: 'json_object' };
+    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+        'HTTP-Referer': typeof window !== 'undefined' ? window.location.origin : 'https://ebookstudio.fr',
+        'X-Title': 'EbookStudio',
+      },
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+    if (!res.ok) {
+      const txt = await res.text();
+      console.error('[OpenRouter] error', res.status, txt);
+      if (res.status === 401 || res.status === 403) throw new Error('Clé OpenRouter invalide.');
+      if (res.status === 402) throw new Error('Crédits OpenRouter insuffisants.');
+      if (res.status === 429) throw new Error('Limite OpenRouter atteinte.');
+      throw new Error(`Erreur OpenRouter: ${res.status}`);
+    }
+    const data = await res.json();
+    const text = data?.choices?.[0]?.message?.content || '';
+    if (!text) throw new Error('Réponse OpenRouter vide');
+    return opts.jsonMode ? tryExtractJson(text.trim()) : text.trim();
+  } finally { clearTimeout(timeout); }
+}
+
 /**
  * Appel unifié — détermine automatiquement le provider courant et sa clé.
  * Compatible drop-in avec callGemini(apiKey, prompt, options).
@@ -165,5 +235,6 @@ export async function callAIWriting(prompt: string, opts: AIWritingOptions = {})
     case 'gemini': return callGemini(key, prompt, opts);
     case 'claude': return callClaude(key, prompt, opts);
     case 'openai': return callOpenAI(key, prompt, opts);
+    case 'openrouter': return callOpenRouter(key, prompt, opts);
   }
 }

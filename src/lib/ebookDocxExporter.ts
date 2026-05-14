@@ -14,7 +14,36 @@ import {
   BorderStyle,
   ShadingType,
 } from 'docx';
-import { DEFAULT_TYPOGRAPHY, loadTypography, type EbookExportTypography } from './ebookExportOptions';
+import { DEFAULT_TYPOGRAPHY, loadTypography, type EbookExportTypography, hexNoHash, marginToDxa } from './ebookExportOptions';
+
+/** Parse very simple inline markdown (_italic_ / *italic*) into TextRun array. */
+const parseInline = (
+  text: string,
+  baseSize: number,
+  fontFamily: string,
+  color: string,
+  forceItalic = false,
+): TextRun[] => {
+  const runs: TextRun[] = [];
+  const re = /(_([^_\n]+)_|\*([^*\n]+)\*)/g;
+  let last = 0;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(text)) !== null) {
+    if (m.index > last) {
+      runs.push(new TextRun({ text: text.slice(last, m.index), size: baseSize, font: fontFamily, color, italics: forceItalic }));
+    }
+    const inner = m[2] || m[3] || '';
+    runs.push(new TextRun({ text: inner, size: baseSize, font: fontFamily, color, italics: true }));
+    last = m.index + m[0].length;
+  }
+  if (last < text.length) {
+    runs.push(new TextRun({ text: text.slice(last), size: baseSize, font: fontFamily, color, italics: forceItalic }));
+  }
+  if (runs.length === 0) {
+    runs.push(new TextRun({ text, size: baseSize, font: fontFamily, color, italics: forceItalic }));
+  }
+  return runs;
+};
 
 export type DocxBlock =
   | { kind?: 'paragraph'; heading?: string; text: string }
@@ -73,18 +102,25 @@ const textToParagraphs = (
   text: any,
   bodyHalfPt: number,
   fontFamily: string,
-  justify: boolean
+  justify: boolean,
+  bodyColor: string,
+  italicQuotes: boolean,
+  lineHeight: number,
 ): Paragraph[] => {
   const str = toText(text);
   if (!str) return [];
-  return str.split(/\n+/).map(
-    line =>
-      new Paragraph({
-        alignment: justify ? AlignmentType.JUSTIFIED : AlignmentType.LEFT,
-        children: [new TextRun({ text: line.replace(/^[-•]\s*/, '• '), size: bodyHalfPt, font: fontFamily })],
-        spacing: { after: 120 },
-      })
-  );
+  // 240 = ligne simple en docx → multiplier par lineHeight
+  const lineRule = Math.round(240 * lineHeight);
+  return str.split(/\n+/).map(line => {
+    const isQuote = italicQuotes && /^\s*>\s+/.test(line);
+    const cleanLine = isQuote ? line.replace(/^\s*>\s+/, '') : line.replace(/^[-•]\s*/, '• ');
+    return new Paragraph({
+      alignment: justify ? AlignmentType.JUSTIFIED : AlignmentType.LEFT,
+      indent: isQuote ? { left: 360 } : undefined,
+      children: parseInline(cleanLine, bodyHalfPt, fontFamily, bodyColor, isQuote),
+      spacing: { after: 120, line: lineRule },
+    });
+  });
 };
 
 const buildCalloutTable = (
@@ -93,7 +129,10 @@ const buildCalloutTable = (
   body: string,
   bodyHalfPt: number,
   fontFamily: string,
-  justify: boolean
+  justify: boolean,
+  bodyColor: string,
+  italicQuotes: boolean,
+  lineHeight: number,
 ): Table => {
   const meta = CALLOUT_STYLE[variant] || CALLOUT_STYLE['point-cle'];
   const innerChildren: Paragraph[] = [
@@ -110,7 +149,7 @@ const buildCalloutTable = (
       })
     );
   }
-  innerChildren.push(...textToParagraphs(body, bodyHalfPt, fontFamily, justify));
+  innerChildren.push(...textToParagraphs(body, bodyHalfPt, fontFamily, justify, bodyColor, italicQuotes, lineHeight));
 
   const fullBorder = { style: BorderStyle.SINGLE, size: 12, color: meta.border };
   return new Table({
@@ -198,6 +237,11 @@ export const exportEbookToDocx = async (opts: {
   const headingHalfPt = typo.headingSize * 2;
   const subHeadingHalfPt = Math.max(bodyHalfPt + 2, typo.headingSize * 2 - 4);
   const justify = typo.justify;
+  const headingColor = hexNoHash(typo.headingColor);
+  const bodyColor = hexNoHash(typo.bodyColor);
+  const italicQuotes = typo.italicQuotes;
+  const lineHeight = typo.lineHeight;
+  const marginDxa = marginToDxa(typo.margin);
 
   const children: (Paragraph | Table)[] = [];
 
@@ -228,7 +272,7 @@ export const exportEbookToDocx = async (opts: {
       new Paragraph({
         heading: HeadingLevel.HEADING_6,
         spacing: { before: 200, after: 160 },
-        children: [new TextRun({ text: s.title, bold: true, size: headingHalfPt, font: fontFamily, color: '232F3E' })],
+        children: [new TextRun({ text: s.title, bold: true, size: headingHalfPt, font: fontFamily, color: headingColor })],
       })
     );
     if (s.subtitle) {
@@ -261,7 +305,7 @@ export const exportEbookToDocx = async (opts: {
     for (const b of s.blocks) {
       if ((b as any).kind === 'callout') {
         const cb = b as Extract<DocxBlock, { kind: 'callout' }>;
-        children.push(buildCalloutTable(cb.variant, cb.title, cb.body, bodyHalfPt, fontFamily, justify));
+        children.push(buildCalloutTable(cb.variant, cb.title, cb.body, bodyHalfPt, fontFamily, justify, bodyColor, italicQuotes, lineHeight));
         children.push(new Paragraph({ spacing: { after: 160 }, children: [] }));
       } else if ((b as any).kind === 'table') {
         const tb = b as Extract<DocxBlock, { kind: 'table' }>;
@@ -284,11 +328,11 @@ export const exportEbookToDocx = async (opts: {
             new Paragraph({
               heading: HeadingLevel.HEADING_2,
               spacing: { before: 200, after: 120 },
-              children: [new TextRun({ text: pb.heading, bold: true, size: subHeadingHalfPt, font: fontFamily })],
+              children: [new TextRun({ text: pb.heading, bold: true, size: subHeadingHalfPt, font: fontFamily, color: headingColor })],
             })
           );
         }
-        children.push(...textToParagraphs(pb.text, bodyHalfPt, fontFamily, justify));
+        children.push(...textToParagraphs(pb.text, bodyHalfPt, fontFamily, justify, bodyColor, italicQuotes, lineHeight));
       }
     }
     if (i < opts.sections.length - 1) {
@@ -305,7 +349,7 @@ export const exportEbookToDocx = async (opts: {
         properties: {
           page: {
             size: { width: 12240, height: 15840 },
-            margin: { top: 1440, right: 1440, bottom: 1440, left: 1440 },
+            margin: { top: marginDxa, right: marginDxa, bottom: marginDxa, left: marginDxa },
           },
         },
         children,

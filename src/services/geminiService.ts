@@ -35,7 +35,7 @@ async function maybeRouteToOtherProvider(
   if (typeof window === 'undefined') return null;
   try {
     const provider = localStorage.getItem('ai_writing_provider');
-    if (provider !== 'claude' && provider !== 'openai') return null;
+    if (provider !== 'claude' && provider !== 'openai' && provider !== 'openrouter') return null;
     // Import dynamique pour éviter un cycle d'imports.
     const { callAIWriting, getProviderKey, validateKeyFormat } = await import('./aiWritingService');
     const key = getProviderKey(provider);

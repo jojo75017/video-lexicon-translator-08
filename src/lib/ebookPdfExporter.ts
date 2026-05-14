@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-import { DEFAULT_TYPOGRAPHY, loadTypography, type EbookExportTypography, pdfFontFor } from './ebookExportOptions';
+import { DEFAULT_TYPOGRAPHY, loadTypography, type EbookExportTypography, pdfFontFor, hexToRgb, marginToPt } from './ebookExportOptions';
 
 export type PdfBlock =
   | { kind?: 'paragraph'; heading?: string; text: string }
@@ -59,11 +59,15 @@ export const exportEbookToPdf = async (opts: {
   const headingSize = typo.headingSize;
   const bodySize = typo.bodySize;
   const justifyBody = typo.justify;
+  const headingRgb = hexToRgb(typo.headingColor);
+  const bodyRgb = hexToRgb(typo.bodyColor);
+  const italicQuotes = typo.italicQuotes;
+  const lineHeightMul = typo.lineHeight;
 
   const doc = new jsPDF({ unit: 'pt', format: 'a4' });
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
-  const margin = 50;
+  const margin = marginToPt(typo.margin);
   const contentW = pageW - margin * 2;
   let y = margin;
 
@@ -103,21 +107,27 @@ export const exportEbookToPdf = async (opts: {
     size: number,
     opts2: {
       bold?: boolean;
+      italic?: boolean;
       color?: [number, number, number];
       spacingAfter?: number;
       align?: 'left' | 'center' | 'justify';
       x?: number;
       maxW?: number;
       fontOverride?: 'helvetica' | 'times' | 'courier';
+      lineHeightMul?: number;
     } = {}
   ) => {
     const str = toText(text);
     if (!str) return;
-    doc.setFont(opts2.fontOverride || pdfFont, opts2.bold ? 'bold' : 'normal');
+    const fontStyle = opts2.bold && opts2.italic ? 'bolditalic'
+      : opts2.bold ? 'bold'
+      : opts2.italic ? 'italic'
+      : 'normal';
+    doc.setFont(opts2.fontOverride || pdfFont, fontStyle);
     doc.setFontSize(size);
-    doc.setTextColor(...(opts2.color || [35, 47, 62]));
+    doc.setTextColor(...(opts2.color || bodyRgb));
     const w = opts2.maxW ?? contentW;
-    const lineH = size * 1.45;
+    const lineH = size * (opts2.lineHeightMul ?? 1.45);
     const xLeft = opts2.x ?? margin;
 
     // Split by paragraphs first to preserve line breaks
@@ -262,8 +272,8 @@ export const exportEbookToPdf = async (opts: {
       y = margin;
     }
     // Chapter title — small dark heading (H6 equivalent), no big colored "chapitre IA"
-    writeText(s.title, headingSize, { bold: true, color: [35, 47, 62], spacingAfter: 8 });
-    if (s.subtitle) writeText(s.subtitle, bodySize - 1, { color: [120, 120, 120], spacingAfter: 8 });
+    writeText(s.title, headingSize, { bold: true, color: headingRgb, spacingAfter: 8 });
+    if (s.subtitle) writeText(s.subtitle, bodySize - 1, { color: [120, 120, 120], spacingAfter: 8, italic: true });
 
     if (s.imageUrl) {
       const img = await loadImageDataUrl(s.imageUrl);
@@ -284,6 +294,27 @@ export const exportEbookToPdf = async (opts: {
       }
     }
 
+    const writeBody = (text: string) => {
+      // Split by paragraph; each line may be a blockquote (>) → full italic
+      const paragraphs = String(text || '').split(/\n+/);
+      paragraphs.forEach(para => {
+        const isQuote = italicQuotes && /^\s*>\s+/.test(para);
+        const cleanRaw = isQuote ? para.replace(/^\s*>\s+/, '') : para;
+        // Strip inline _italic_ / *italic* markers (full inline italic mid-line is not supported in jsPDF without segment-by-segment rendering; we keep the wrapped justification working)
+        const hasInline = /(_[^_\n]+_|\*[^*\n]+\*)/.test(cleanRaw);
+        const clean = cleanRaw.replace(/_([^_\n]+)_/g, '$1').replace(/\*([^*\n]+)\*/g, '$1');
+        writeText(clean, bodySize, {
+          spacingAfter: 4,
+          align: justifyBody ? 'justify' : 'left',
+          italic: isQuote || hasInline,
+          color: bodyRgb,
+          x: isQuote ? margin + 16 : margin,
+          maxW: isQuote ? contentW - 16 : contentW,
+          lineHeightMul: lineHeightMul,
+        });
+      });
+    };
+
     for (const b of s.blocks) {
       if ((b as any).kind === 'callout') {
         const cb = b as Extract<PdfBlock, { kind: 'callout' }>;
@@ -293,8 +324,8 @@ export const exportEbookToPdf = async (opts: {
         drawDataTable(tb.headers || [], tb.rows || [], tb.caption);
       } else {
         const pb = b as Extract<PdfBlock, { kind?: 'paragraph' }>;
-        if (pb.heading) writeText(pb.heading, bodySize + 1, { bold: true, color: [35, 47, 62], spacingAfter: 4 });
-        if (pb.text) writeText(pb.text, bodySize, { spacingAfter: 8, align: justifyBody ? 'justify' : 'left' });
+        if (pb.heading) writeText(pb.heading, bodySize + 1, { bold: true, color: headingRgb, spacingAfter: 4 });
+        if (pb.text) writeBody(String(pb.text));
       }
     }
   }
