@@ -272,7 +272,7 @@ export const exportEbookToDocx = async (opts: {
       new Paragraph({
         heading: HeadingLevel.HEADING_6,
         spacing: { before: 200, after: 160 },
-        children: [new TextRun({ text: s.title, bold: true, size: headingHalfPt, font: fontFamily, color: '232F3E' })],
+        children: [new TextRun({ text: s.title, bold: true, size: headingHalfPt, font: fontFamily, color: headingColor })],
       })
     );
     if (s.subtitle) {
@@ -305,7 +305,7 @@ export const exportEbookToDocx = async (opts: {
     for (const b of s.blocks) {
       if ((b as any).kind === 'callout') {
         const cb = b as Extract<DocxBlock, { kind: 'callout' }>;
-        children.push(buildCalloutTable(cb.variant, cb.title, cb.body, bodyHalfPt, fontFamily, justify));
+        children.push(buildCalloutTable(cb.variant, cb.title, cb.body, bodyHalfPt, fontFamily, justify, bodyColor, italicQuotes, lineHeight));
         children.push(new Paragraph({ spacing: { after: 160 }, children: [] }));
       } else if ((b as any).kind === 'table') {
         const tb = b as Extract<DocxBlock, { kind: 'table' }>;
@@ -328,11 +328,11 @@ export const exportEbookToDocx = async (opts: {
             new Paragraph({
               heading: HeadingLevel.HEADING_2,
               spacing: { before: 200, after: 120 },
-              children: [new TextRun({ text: pb.heading, bold: true, size: subHeadingHalfPt, font: fontFamily })],
+              children: [new TextRun({ text: pb.heading, bold: true, size: subHeadingHalfPt, font: fontFamily, color: headingColor })],
             })
           );
         }
-        children.push(...textToParagraphs(pb.text, bodyHalfPt, fontFamily, justify));
+        children.push(...textToParagraphs(pb.text, bodyHalfPt, fontFamily, justify, bodyColor, italicQuotes, lineHeight));
       }
     }
     if (i < opts.sections.length - 1) {
