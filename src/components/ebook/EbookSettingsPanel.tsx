@@ -274,6 +274,63 @@ export const EbookSettingsPanel: React.FC<Props> = ({ onTypographyChange }) => {
           <div className="flex items-center gap-2 text-sm font-semibold">
             <Type className="w-4 h-4" /> Mise en page de l'export (DOCX & PDF)
           </div>
+
+          {/* Presets 1-clic */}
+          <div className="space-y-2">
+            <Label className="text-xs">Style en 1 clic</Label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+              {TYPO_PRESETS.map(p => (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => { updateTypo(p.values); toast.success(`Style appliqué : ${p.label}`); }}
+                  className="text-left px-3 py-2 rounded-lg border hover:border-[#008296] hover:bg-[#008296]/5 transition-colors"
+                >
+                  <div className="text-sm font-semibold">{p.label}</div>
+                  <div className="text-[11px] text-muted-foreground mt-0.5">{p.description}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Aperçu live */}
+          <div className="rounded-lg border bg-white p-4 space-y-2">
+            <div className="text-[10px] uppercase tracking-wide text-muted-foreground">Aperçu en temps réel</div>
+            <div
+              style={{
+                fontFamily: typo.fontFamily === 'Calibri' ? 'Calibri, system-ui, sans-serif'
+                          : typo.fontFamily === 'Helvetica' ? 'Helvetica, Arial, sans-serif'
+                          : typo.fontFamily === 'Georgia' ? 'Georgia, serif'
+                          : 'Garamond, "EB Garamond", serif',
+                fontSize: `${typo.headingSize + 2}px`,
+                color: typo.headingColor,
+                fontWeight: 700,
+                lineHeight: 1.2,
+              }}
+            >
+              Chapitre 1 — Le commencement
+            </div>
+            <div
+              style={{
+                fontFamily: typo.fontFamily === 'Calibri' ? 'Calibri, system-ui, sans-serif'
+                          : typo.fontFamily === 'Helvetica' ? 'Helvetica, Arial, sans-serif'
+                          : typo.fontFamily === 'Georgia' ? 'Georgia, serif'
+                          : 'Garamond, "EB Garamond", serif',
+                fontSize: `${typo.bodySize + 2}px`,
+                color: typo.bodyColor,
+                lineHeight: typo.lineHeight,
+                textAlign: typo.justify ? 'justify' : 'left',
+              }}
+            >
+              Voici un aperçu de votre corps de texte. Vous pouvez glisser une phrase en <em>italique</em> en l'entourant de <code className="text-xs">_underscores_</code> dans vos chapitres.{' '}
+              {typo.italicQuotes && (
+                <span className="block mt-2 pl-3 border-l-2 border-current italic opacity-90">
+                  « Une citation mise en italique automatiquement. »
+                </span>
+              )}
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
             <div className="space-y-2">
               <Label>Police</Label>
