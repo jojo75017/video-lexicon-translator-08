@@ -60,6 +60,7 @@ import EbookDocumentaryGenerator from '@/components/ebook/EbookDocumentaryGenera
 import { EbookColoringBookGenerator } from '@/components/ebook/EbookColoringBookGenerator';
 import EbookAgendaGenerator from '@/components/ebook/EbookAgendaGenerator';
 import EbookScolaireGenerator from '@/components/ebook/EbookScolaireGenerator';
+import EbookPedagogiqueGenerator from '@/components/ebook/EbookPedagogiqueGenerator';
 import EbookMultiTranslator from '@/components/ebook/EbookMultiTranslator';
 import { KdpQuickTools } from '@/components/ebook/KdpQuickTools';
 import { EbookAudioGenerator } from '@/components/ebook/EbookAudioGenerator';
@@ -3429,6 +3430,9 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
 
       case 'scolaire':
         return <EbookScolaireGenerator ebookTitle={ebookTitle} />;
+
+      case 'pedagogique':
+        return <EbookPedagogiqueGenerator ebookTitle={ebookTitle} />;
 
       case 'subscription':
         // Rediriger vers la page Abonnement

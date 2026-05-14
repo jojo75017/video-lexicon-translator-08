@@ -20,7 +20,7 @@ type FamilyId = 'planner' | 'writing' | 'images' | 'export' | 'marketing' | 'acc
 
 const PLANNER_TABS: Array<{ id: FamilyId; label: string; emoji: string; match: string[] }> = [
   { id: 'planner', label: 'Plan', emoji: '📘', match: ['planner', 'characters', 'templates', 'workflow-dashboard', 'url-import', 'doc-transform', 'projects', 'ebook-library', 'series'] },
-  { id: 'writing', label: 'Écrire', emoji: '✍️', match: ['writing', 'strict-proofread', 'toc', 'aichat', 'complete-workflow', 'humanize-anti-ia', 'natural-rewrite', 'expert-writing', 'multi-translator', 'tools', 'atlas', 'encyclopedia', 'documentary', 'agenda', 'scolaire', 'content-architect'] },
+  { id: 'writing', label: 'Écrire', emoji: '✍️', match: ['writing', 'strict-proofread', 'toc', 'aichat', 'complete-workflow', 'humanize-anti-ia', 'natural-rewrite', 'expert-writing', 'multi-translator', 'tools', 'atlas', 'encyclopedia', 'documentary', 'agenda', 'scolaire', 'pedagogique', 'content-architect'] },
   { id: 'images', label: 'Habiller', emoji: '🎨', match: ['images', 'cover', 'cover-design-editor', 'back-cover', 'backcover', 'images-cover', 'images-generator', 'images-library', 'editorial-packaging'] },
   { id: 'export', label: 'Publier', emoji: '🚀', match: ['export', 'kdp', 'kdp-prepublish-checklist', 'workflow-export', 'calibre-epub', 'audiobook', 'audio-express', 'audio', 'audit-pilot', 'kdp-keywords-pro'] },
   { id: 'marketing', label: 'Vendre', emoji: '💛', match: ['marketing', 'monetization', 'advanced', 'launch-plan', 'editorial-quality', 'final-diagnosis', 'kdp-ads-guide', 'chrome-extension'] },
@@ -165,9 +165,9 @@ const ALL_TOOLS: Array<{ family: FamilyId; familyLabel: string; tools: Array<{ i
     family: 'writing',
     familyLabel: '📚 Formats spéciaux',
     tools: [
+      { id: 'pedagogique', label: '📖 Livres pédagogiques (encadrés, schémas, tableaux)' },
       { id: 'agenda', label: '🗓️ Agendas & Planners' },
       { id: 'scolaire', label: '🎓 Scolaire & Parascolaire' },
-      { id: 'writing', label: '📖 Livres pédagogiques (schémas & graphiques)' },
       { id: 'atlas', label: '🗺️ Atlas' },
       { id: 'encyclopedia', label: '📚 Encyclopédie' },
       { id: 'documentary', label: '🎬 Documentaire' },
@@ -430,7 +430,7 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
                       />
                     </div>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-0 max-h-[60vh] overflow-y-auto">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-0 max-h-[60vh] overflow-y-auto">
                     {filteredTools.map((group) => (
                       <div
                         key={group.family}
