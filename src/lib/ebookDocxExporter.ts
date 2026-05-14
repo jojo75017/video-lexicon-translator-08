@@ -349,7 +349,7 @@ export const exportEbookToDocx = async (opts: {
         properties: {
           page: {
             size: { width: 12240, height: 15840 },
-            margin: { top: 1440, right: 1440, bottom: 1440, left: 1440 },
+            margin: { top: marginDxa, right: marginDxa, bottom: marginDxa, left: marginDxa },
           },
         },
         children,
