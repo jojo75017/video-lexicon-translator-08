@@ -20,12 +20,12 @@ interface EspaceHeaderProps {
 
 type FamilyId = 'planner' | 'writing' | 'images' | 'export' | 'marketing' | 'account';
 
-const PLANNER_TABS: Array<{ id: FamilyId; label: string; emoji: string; match: string[] }> = [
-  { id: 'planner', label: 'Plan', emoji: '📘', match: ['planner', 'characters', 'templates', 'workflow-dashboard', 'url-import', 'doc-transform', 'projects', 'ebook-library', 'series'] },
-  { id: 'writing', label: 'Écrire', emoji: '✍️', match: ['writing', 'strict-proofread', 'toc', 'aichat', 'complete-workflow', 'humanize-anti-ia', 'natural-rewrite', 'expert-writing', 'multi-translator', 'tools', 'atlas', 'encyclopedia', 'documentary', 'agenda', 'scolaire', 'pedagogique', 'content-architect'] },
-  { id: 'images', label: 'Habiller', emoji: '🎨', match: ['images', 'cover', 'cover-design-editor', 'back-cover', 'backcover', 'images-cover', 'images-generator', 'images-library', 'editorial-packaging'] },
-  { id: 'export', label: 'Publier', emoji: '🚀', match: ['export', 'kdp', 'kdp-prepublish-checklist', 'workflow-export', 'calibre-epub', 'audiobook', 'audio-express', 'audio', 'audit-pilot', 'kdp-keywords-pro'] },
-  { id: 'marketing', label: 'Vendre', emoji: '💛', match: ['marketing', 'monetization', 'advanced', 'launch-plan', 'editorial-quality', 'final-diagnosis', 'kdp-ads-guide', 'chrome-extension'] },
+const PLANNER_TABS: Array<{ id: FamilyId; label: string; emoji: string; bg: string; bgActive: string; ring: string; match: string[] }> = [
+  { id: 'planner',   label: 'Plan',     emoji: '📘', bg: 'bg-sky-100 text-sky-800 hover:bg-sky-200',         bgActive: 'bg-sky-500 text-white shadow-md shadow-sky-500/30',         ring: 'ring-sky-400/30',     match: ['planner', 'characters', 'templates', 'workflow-dashboard', 'url-import', 'doc-transform', 'projects', 'ebook-library', 'series'] },
+  { id: 'writing',   label: 'Écrire',   emoji: '✍️', bg: 'bg-amber-100 text-amber-800 hover:bg-amber-200',   bgActive: 'bg-amber-500 text-white shadow-md shadow-amber-500/30',     ring: 'ring-amber-400/30',   match: ['writing', 'strict-proofread', 'toc', 'aichat', 'complete-workflow', 'humanize-anti-ia', 'natural-rewrite', 'expert-writing', 'multi-translator', 'tools', 'atlas', 'encyclopedia', 'documentary', 'agenda', 'scolaire', 'pedagogique', 'content-architect'] },
+  { id: 'images',    label: 'Habiller', emoji: '🎨', bg: 'bg-fuchsia-100 text-fuchsia-800 hover:bg-fuchsia-200', bgActive: 'bg-fuchsia-500 text-white shadow-md shadow-fuchsia-500/30', ring: 'ring-fuchsia-400/30', match: ['images', 'cover', 'cover-design-editor', 'back-cover', 'backcover', 'images-cover', 'images-generator', 'images-library', 'editorial-packaging'] },
+  { id: 'export',    label: 'Publier',  emoji: '🚀', bg: 'bg-teal-100 text-teal-800 hover:bg-teal-200',       bgActive: 'bg-teal-600 text-white shadow-md shadow-teal-600/30',       ring: 'ring-teal-400/30',    match: ['export', 'kdp', 'kdp-prepublish-checklist', 'workflow-export', 'calibre-epub', 'audiobook', 'audio-express', 'audio', 'audit-pilot', 'kdp-keywords-pro'] },
+  { id: 'marketing', label: 'Vendre',   emoji: '💛', bg: 'bg-rose-100 text-rose-800 hover:bg-rose-200',       bgActive: 'bg-rose-500 text-white shadow-md shadow-rose-500/30',       ring: 'ring-rose-400/30',    match: ['marketing', 'monetization', 'advanced', 'launch-plan', 'editorial-quality', 'final-diagnosis', 'kdp-ads-guide', 'chrome-extension'] },
 ];
 
 const FAMILY_EMOJI: Record<FamilyId, string> = {
@@ -402,8 +402,8 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
             className="border-t border-joy-ink/5 bg-gradient-to-r from-white via-joy-cream/30 to-white"
             aria-label="Étapes du livre"
           >
-            <div className="mx-auto flex max-w-7xl items-center gap-1 overflow-x-auto px-3 py-2 sm:px-6 scrollbar-thin">
-              <div className="flex items-center gap-1 flex-1 min-w-0">
+            <div className="mx-auto flex max-w-7xl items-center gap-2 overflow-x-auto px-3 py-2.5 sm:px-6 scrollbar-thin">
+              <div className="flex items-center justify-center gap-2 flex-1 min-w-0 flex-wrap">
                 {PLANNER_TABS.map((tab) => {
                   const active = isFamilyActive(tab);
                   return (
@@ -411,18 +411,11 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
                       key={tab.id}
                       onClick={() => onTabChange?.(tab.id)}
                       className={cn(
-                        'flex-shrink-0 rounded-full px-4 py-1.5 text-sm font-semibold transition-all duration-200 hover:scale-[1.04]',
-                        active
-                          ? 'text-white shadow-[0_2px_10px_rgba(0,130,150,0.28)]'
-                          : 'text-joy-ink/70 hover:bg-joy-cream hover:text-[#FF9E2D]',
+                        'flex-shrink-0 inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-base font-bold transition-all duration-200 hover:scale-[1.05] ring-1',
+                        active ? `${tab.bgActive} ${tab.ring}` : `${tab.bg} ${tab.ring}`,
                       )}
-                      style={
-                        active
-                          ? { backgroundColor: 'hsl(var(--joy-teal))' }
-                          : undefined
-                      }
                     >
-                      <span className="mr-1.5" aria-hidden>{tab.emoji}</span>
+                      <span className="text-lg leading-none" aria-hidden>{tab.emoji}</span>
                       {tab.label}
                     </button>
                   );
@@ -506,7 +499,7 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
               className="border-t border-joy-ink/5 bg-gradient-to-r from-white via-joy-cream/40 to-white"
               aria-label="Outils de l'étape"
             >
-              <div className="mx-auto flex max-w-7xl items-center gap-1 overflow-x-auto px-3 py-1.5 sm:px-6 scrollbar-thin">
+              <div className="mx-auto flex max-w-7xl items-center justify-center gap-2 overflow-x-auto px-3 py-2 sm:px-6 scrollbar-thin flex-wrap">
                 {PLANNER_SUBTABS[currentFamily]!.map((sub) => {
                   const active = isSubActive(sub.id);
                   return (
@@ -514,14 +507,13 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
                       key={sub.id}
                       onClick={() => onTabChange?.(sub.id)}
                       className={cn(
-                        'flex-shrink-0 rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 hover:scale-[1.05]',
+                        'flex-shrink-0 rounded-xl px-3.5 py-1.5 text-sm font-semibold transition-all duration-200 hover:scale-[1.05] border',
                         active
-                          ? 'bg-joy-teal/15 border border-joy-teal/30 font-semibold'
-                          : 'text-joy-ink/60 hover:text-[#FF9E2D] hover:bg-joy-cream',
+                          ? 'bg-white text-[#008296] border-[#008296]/40 shadow-sm'
+                          : 'bg-joy-cream/60 text-joy-ink/70 border-transparent hover:bg-white hover:text-[#FF9E2D] hover:border-[#FF9E2D]/30',
                       )}
-                      style={active ? { color: '#008296' } : undefined}
                     >
-                      {active && <span className="mr-1" aria-hidden>●</span>}
+                      {active && <span className="mr-1.5" aria-hidden>●</span>}
                       {sub.label}
                     </button>
                   );
