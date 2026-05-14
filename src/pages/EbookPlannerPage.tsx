@@ -20,6 +20,7 @@ import { EspaceHeader } from '@/components/layout/EspaceHeader';
 import { OnboardingGuide } from '@/components/onboarding/OnboardingGuide';
 import { FirstVisitBanner } from '@/components/onboarding/FirstVisitBanner';
 import { MissingApiKeyBanner } from '@/components/ebook/MissingApiKeyBanner';
+import { WorkflowAIProviderBadge } from '@/components/ebook/WorkflowAIProviderBadge';
 import { useEbookDatabase } from '@/hooks/useEbookDatabase';
 import { EbookMarketing } from '@/components/ebook/EbookMarketing';
 import {
@@ -3473,6 +3474,8 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
           activeTab={activeTab}
           onTabChange={handleTabChange}
         />
+
+        <WorkflowAIProviderBadge />
         
         <MissingApiKeyBanner
           apiKey={apiKey}
