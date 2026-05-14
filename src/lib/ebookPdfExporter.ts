@@ -294,26 +294,104 @@ export const exportEbookToPdf = async (opts: {
       }
     }
 
+    // Render a paragraph with mixed inline italic (_..._  or  *...*).
+    // Splits into segments, wraps words across lines while preserving italic per segment.
+    type Seg = { text: string; italic: boolean };
+    const parseInlineItalic = (s: string): Seg[] => {
+      const segs: Seg[] = [];
+      const re = /(_([^_\n]+)_|\*([^*\n]+)\*)/g;
+      let last = 0; let m: RegExpExecArray | null;
+      while ((m = re.exec(s)) !== null) {
+        if (m.index > last) segs.push({ text: s.slice(last, m.index), italic: false });
+        segs.push({ text: (m[2] ?? m[3] ?? ''), italic: true });
+        last = m.index + m[0].length;
+      }
+      if (last < s.length) segs.push({ text: s.slice(last), italic: false });
+      return segs.length ? segs : [{ text: s, italic: false }];
+    };
+
+    const writeRichParagraph = (paraSegs: Seg[], opts3: { x: number; maxW: number; size: number; lineHeightMul: number; justify: boolean }) => {
+      const { x, maxW, size, lineHeightMul, justify } = opts3;
+      const lineH = size * lineHeightMul;
+      // Tokenize into words while keeping italic flag on each token.
+      type Tok = { text: string; italic: boolean; w: number };
+      const tokens: Tok[] = [];
+      paraSegs.forEach(seg => {
+        const parts = seg.text.split(/(\s+)/).filter(p => p.length);
+        parts.forEach(p => {
+          doc.setFont(pdfFont, seg.italic ? 'italic' : 'normal');
+          doc.setFontSize(size);
+          tokens.push({ text: p, italic: seg.italic, w: doc.getTextWidth(p) });
+        });
+      });
+      // Build lines (greedy wrap)
+      const lines: Tok[][] = [];
+      let cur: Tok[] = []; let curW = 0;
+      tokens.forEach(t => {
+        // Skip leading whitespace on a new line
+        if (cur.length === 0 && /^\s+$/.test(t.text)) return;
+        if (curW + t.w > maxW && cur.length > 0) {
+          // Trim trailing whitespace
+          while (cur.length && /^\s+$/.test(cur[cur.length - 1].text)) { curW -= cur[cur.length - 1].w; cur.pop(); }
+          lines.push(cur); cur = []; curW = 0;
+          if (/^\s+$/.test(t.text)) return;
+        }
+        cur.push(t); curW += t.w;
+      });
+      if (cur.length) {
+        while (cur.length && /^\s+$/.test(cur[cur.length - 1].text)) cur.pop();
+        lines.push(cur);
+      }
+      // Render
+      lines.forEach((lineToks, li) => {
+        ensureSpace(lineH);
+        const baseline = y + size * 0.9;
+        const isLast = li === lines.length - 1;
+        // Compute words for justification (whitespace tokens become gaps)
+        const visible = lineToks.filter(t => !/^\s+$/.test(t.text));
+        const totalVisibleW = visible.reduce((a, t) => a + t.w, 0);
+        const gapCount = Math.max(visible.length - 1, 0);
+        let gap = 0;
+        if (justify && !isLast && gapCount > 0) {
+          gap = (maxW - totalVisibleW) / gapCount;
+        } else {
+          // natural single space width
+          doc.setFont(pdfFont, 'normal');
+          doc.setFontSize(size);
+          gap = doc.getTextWidth(' ');
+        }
+        let xPos = x;
+        visible.forEach((t, i) => {
+          doc.setFont(pdfFont, t.italic ? 'italic' : 'normal');
+          doc.setFontSize(size);
+          doc.text(t.text, xPos, baseline);
+          xPos += t.w + (i < visible.length - 1 ? gap : 0);
+        });
+        y += lineH;
+      });
+    };
+
     const writeBody = (text: string) => {
-      // Split by paragraph; each line may be a blockquote (>) → full italic
       const paragraphs = String(text || '').split(/\n+/);
       paragraphs.forEach(para => {
         const isQuote = italicQuotes && /^\s*>\s+/.test(para);
         const cleanRaw = isQuote ? para.replace(/^\s*>\s+/, '') : para;
-        // Strip inline _italic_ / *italic* markers (full inline italic mid-line is not supported in jsPDF without segment-by-segment rendering; we keep the wrapped justification working)
-        const hasInline = /(_[^_\n]+_|\*[^*\n]+\*)/.test(cleanRaw);
-        const clean = cleanRaw.replace(/_([^_\n]+)_/g, '$1').replace(/\*([^*\n]+)\*/g, '$1');
-        writeText(clean, bodySize, {
-          spacingAfter: 4,
-          align: justifyBody ? 'justify' : 'left',
-          italic: isQuote || hasInline,
-          color: bodyRgb,
+        // Set color before rendering this paragraph
+        doc.setTextColor(...bodyRgb);
+        const segs = parseInlineItalic(cleanRaw);
+        // If quote → force italic on all segments
+        if (isQuote) segs.forEach(s => { s.italic = true; });
+        writeRichParagraph(segs, {
           x: isQuote ? margin + 16 : margin,
           maxW: isQuote ? contentW - 16 : contentW,
-          lineHeightMul: lineHeightMul,
+          size: bodySize,
+          lineHeightMul,
+          justify: justifyBody,
         });
+        y += 4;
       });
     };
+
 
     for (const b of s.blocks) {
       if ((b as any).kind === 'callout') {
