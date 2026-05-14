@@ -243,12 +243,26 @@ export const EbookSettingsPanel: React.FC<Props> = ({ onTypographyChange }) => {
           </div>
           <div className="space-y-2">
             <Label>Clé OpenRouter (sk-or-…)</Label>
-            <Input
-              type="password"
-              value={openrouter}
-              onChange={e => updateOpenRouter(e.target.value)}
-              placeholder="sk-or-v1-… (laissez vide pour utiliser les crédits Lovable)"
-            />
+            <div className="flex gap-2">
+              <Input
+                type="password"
+                value={openrouter}
+                onChange={e => updateOpenRouter(e.target.value)}
+                placeholder="sk-or-v1-… (laissez vide pour utiliser les crédits Lovable)"
+                className="flex-1"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={!openrouter || openrouterTest === 'testing'}
+                onClick={testOpenRouter}
+                className="gap-1"
+              >
+                <TestIcon s={openrouterTest} />
+                Tester
+              </Button>
+            </div>
             {openrouter && (
               <p className={`text-xs ${openrouterValid ? 'text-emerald-600' : 'text-destructive'}`}>
                 {openrouterValid ? '✓ Clé OpenRouter détectée — vos images utiliseront vos crédits OpenRouter' : '⚠️ Une clé OpenRouter commence par sk-or-'}
