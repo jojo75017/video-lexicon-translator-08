@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-import { DEFAULT_TYPOGRAPHY, loadTypography, type EbookExportTypography, pdfFontFor } from './ebookExportOptions';
+import { DEFAULT_TYPOGRAPHY, loadTypography, type EbookExportTypography, pdfFontFor, hexToRgb, marginToPt } from './ebookExportOptions';
 
 export type PdfBlock =
   | { kind?: 'paragraph'; heading?: string; text: string }
@@ -59,11 +59,15 @@ export const exportEbookToPdf = async (opts: {
   const headingSize = typo.headingSize;
   const bodySize = typo.bodySize;
   const justifyBody = typo.justify;
+  const headingRgb = hexToRgb(typo.headingColor);
+  const bodyRgb = hexToRgb(typo.bodyColor);
+  const italicQuotes = typo.italicQuotes;
+  const lineHeightMul = typo.lineHeight;
 
   const doc = new jsPDF({ unit: 'pt', format: 'a4' });
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
-  const margin = 50;
+  const margin = marginToPt(typo.margin);
   const contentW = pageW - margin * 2;
   let y = margin;
 
