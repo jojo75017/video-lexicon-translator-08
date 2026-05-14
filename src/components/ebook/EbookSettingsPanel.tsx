@@ -2,9 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Settings2, KeyRound, Type, Image as ImageIcon } from 'lucide-react';
+import { Settings2, KeyRound, Type, Image as ImageIcon, Loader2, CheckCircle2, XCircle } from 'lucide-react';
+import { toast } from 'sonner';
 import {
   type AIProvider,
   PROVIDER_LABELS,
