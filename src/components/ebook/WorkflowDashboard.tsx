@@ -19,6 +19,7 @@ import { useWorkflowCloudSync } from '@/hooks/useWorkflowCloudSync';
 import { WORKFLOW_STEPS, STEP_TO_TAB } from './WorkflowNavigation';
 import { WorkflowBookConfigForm } from './WorkflowBookConfigForm';
 import { toast } from 'sonner';
+import KdpPackButton from '@/components/shared/KdpPackButton';
 
 interface WorkflowDashboardProps {
   ebookTitle: string;
