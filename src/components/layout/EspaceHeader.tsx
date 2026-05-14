@@ -9,6 +9,7 @@ import { ArrowLeft, LogOut, Sparkles, LayoutGrid, Search, Shield, Settings } fro
 import { cn } from '@/lib/utils';
 import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
 import { EbookSettingsPanel } from '@/components/ebook/EbookSettingsPanel';
+import KdpPackButton from '@/components/shared/KdpPackButton';
 
 interface EspaceHeaderProps {
   projectTitle?: string | null;
