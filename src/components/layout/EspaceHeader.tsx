@@ -162,6 +162,20 @@ const ALL_TOOLS: Array<{ family: FamilyId; familyLabel: string; tools: Array<{ i
     ],
   },
   {
+    family: 'writing',
+    familyLabel: '📚 Formats spéciaux',
+    tools: [
+      { id: 'agenda', label: '🗓️ Agendas & Planners' },
+      { id: 'scolaire', label: '🎓 Scolaire & Parascolaire' },
+      { id: 'writing', label: '📖 Livres pédagogiques (schémas & graphiques)' },
+      { id: 'atlas', label: '🗺️ Atlas' },
+      { id: 'encyclopedia', label: '📚 Encyclopédie' },
+      { id: 'documentary', label: '🎬 Documentaire' },
+      { id: 'coloring', label: '🎨 Livre de coloriage' },
+      { id: 'series', label: '📚 Séries / Tomes' },
+    ],
+  },
+  {
     family: 'account',
     familyLabel: 'Mon compte',
     tools: [
