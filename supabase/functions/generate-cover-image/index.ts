@@ -147,7 +147,8 @@ async function generateWithLovableAI(
     authorNamePosition?: string;
     includeBookSummary?: boolean;
     colorScheme?: string;
-  } = {}
+  } = {},
+  useOpenRouter = false
 ) {
   const genreText = genre || 'non-fiction';
   const variationNum = variation || 1;
@@ -224,20 +225,23 @@ This should look like a REAL book back cover with professional typography.`;
 
   console.log('Generating back cover with Lovable AI for variation', variationNum, 'options:', options);
 
-  const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+  const endpoint = useOpenRouter
+    ? 'https://openrouter.ai/api/v1/chat/completions'
+    : 'https://ai.gateway.lovable.dev/v1/chat/completions';
+  const modelId = useOpenRouter
+    ? 'google/gemini-2.5-flash-image-preview'
+    : 'google/gemini-3-pro-image-preview';
+
+  const response = await fetch(endpoint, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${lovableApiKey}`,
       'Content-Type': 'application/json',
+      ...(useOpenRouter ? { 'HTTP-Referer': 'https://ebookstudio.fr', 'X-Title': 'EbookStudio' } : {}),
     },
     body: JSON.stringify({
-      model: 'google/gemini-3-pro-image-preview',
-      messages: [
-        {
-          role: 'user',
-          content: imagePrompt
-        }
-      ],
+      model: modelId,
+      messages: [{ role: 'user', content: imagePrompt }],
       modalities: ['image', 'text']
     }),
   });
@@ -289,6 +293,7 @@ serve(async (req) => {
       variation = 1, 
       useOpenAI = false, 
       openaiApiKey,
+      openrouterKey,
       // Nouvelles options
       includeAuthorName = true,
       authorNamePosition = 'bottom',
@@ -314,6 +319,16 @@ serve(async (req) => {
       } catch (err) {
         console.error('OpenAI generation failed, falling back to Lovable AI:', err);
         // Continue vers Lovable AI ci-dessous
+      }
+    }
+
+    // BYOK : si l'abonné fournit sa clé OpenRouter, on l'utilise (économise les crédits Lovable).
+    const useOpenRouter = typeof openrouterKey === 'string' && openrouterKey.trim().startsWith('sk-or-');
+    if (useOpenRouter) {
+      try {
+        return await generateWithLovableAI(ebookTitle, authorName, genre, style, variation, openrouterKey.trim(), options, true);
+      } catch (err) {
+        console.error('OpenRouter generation failed, falling back to Lovable AI:', err);
       }
     }
 
