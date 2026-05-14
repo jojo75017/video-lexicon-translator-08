@@ -237,6 +237,11 @@ export const exportEbookToDocx = async (opts: {
   const headingHalfPt = typo.headingSize * 2;
   const subHeadingHalfPt = Math.max(bodyHalfPt + 2, typo.headingSize * 2 - 4);
   const justify = typo.justify;
+  const headingColor = hexNoHash(typo.headingColor);
+  const bodyColor = hexNoHash(typo.bodyColor);
+  const italicQuotes = typo.italicQuotes;
+  const lineHeight = typo.lineHeight;
+  const marginDxa = marginToDxa(typo.margin);
 
   const children: (Paragraph | Table)[] = [];
 
