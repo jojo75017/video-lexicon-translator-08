@@ -170,13 +170,12 @@ export const WorkflowDashboard: React.FC<WorkflowDashboardProps> = ({
           )}
           <KdpPackButton
             size="sm"
+            label="Pack KDP ZIP"
             getOptions={() => ({
               ebookTitle: ebookTitle || 'Mon ebook',
-              authorName,
+              authorName: authorName || '',
               subtitle: bookSubtitle,
-              description: bookDescription,
-              genre,
-              targetAudience,
+              kdpDescription: bookDescription,
             })}
           />
         </div>
