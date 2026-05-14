@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { BookOpen, Loader2, Sparkles, Download, Copy, Trash2, ImageIcon, FileText, RefreshCw, Lightbulb, Star, PenLine, Wand2 } from 'lucide-react';
+import { BookOpen, Loader2, Sparkles, Download, Copy, Trash2, ImageIcon, FileText, RefreshCw, Lightbulb, Star, PenLine, Wand2, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { buildImageCacheKey, getCachedImage, setCachedImage } from '@/lib/educationalImageCache';
@@ -371,19 +371,36 @@ QUALITÉ : surpasse-toi. Le rendu doit être digne d'un livre vendu en librairie
   };
 
   const buildExportSections = () => chapters.map(c => {
-    const blocks: Array<{ heading?: string; text: string }> = [];
-    if (c.intro) blocks.push({ text: c.intro });
-    c.subSections.forEach(s => blocks.push({ heading: s.heading, text: s.paragraphs.join('\n\n') }));
+    const blocks: any[] = [];
+    if (c.intro) blocks.push({ kind: 'paragraph', text: c.intro });
+    c.subSections.forEach(s => blocks.push({ kind: 'paragraph', heading: s.heading, text: s.paragraphs.join('\n\n') }));
     c.callouts.forEach(b => {
-      const meta = CALLOUT_META[b.type];
-      blocks.push({ heading: `${meta.icon} ${meta.label} — ${b.title}`, text: b.body });
+      blocks.push({ kind: 'callout', variant: b.type, title: b.title, body: b.body });
     });
     c.tables.forEach(t => {
-      const tableText = [t.headers.join(' | '), ...t.rows.map(r => r.join(' | '))].join('\n');
-      blocks.push({ heading: t.caption || 'Tableau', text: tableText });
+      blocks.push({ kind: 'table', caption: t.caption, headers: t.headers, rows: t.rows });
     });
     return { title: c.title, imageUrl: c.imageUrl, blocks };
   });
+
+  const handleUploadImage = (chapter: PedagogiqueChapter, file: File) => {
+    if (!file.type.startsWith('image/')) {
+      toast.error('Veuillez sélectionner une image (JPG, PNG, WebP)');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image trop lourde (max 5 Mo)');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result as string;
+      setChapters(prev => prev.map(c => c.id === chapter.id ? { ...c, imageUrl: dataUrl } : c));
+      toast.success('Illustration importée');
+    };
+    reader.onerror = () => toast.error('Erreur de lecture du fichier');
+    reader.readAsDataURL(file);
+  };
 
   const exportDocx = async () => {
     try {
@@ -563,9 +580,22 @@ QUALITÉ : surpasse-toi. Le rendu doit être digne d'un livre vendu en librairie
                   <div className="flex items-start justify-between gap-3">
                     <CardTitle className="text-lg">{c.title}</CardTitle>
                     <div className="flex gap-1">
-                      <Button variant="ghost" size="icon" onClick={() => generateChapterImage(c)} disabled={c.isGeneratingImage} title="Générer illustration">
+                      <Button variant="ghost" size="icon" onClick={() => generateChapterImage(c)} disabled={c.isGeneratingImage} title="Générer illustration avec l'IA">
                         {c.isGeneratingImage ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImageIcon className="w-4 h-4" />}
                       </Button>
+                      <label title="Importer ma propre image" className="inline-flex items-center justify-center h-9 w-9 rounded-md hover:bg-accent cursor-pointer">
+                        <Upload className="w-4 h-4" />
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const f = e.target.files?.[0];
+                            if (f) handleUploadImage(c, f);
+                            e.target.value = '';
+                          }}
+                        />
+                      </label>
                       <Button variant="ghost" size="icon" onClick={() => copyChapter(c)} title="Copier"><Copy className="w-4 h-4" /></Button>
                       <Button variant="ghost" size="icon" onClick={() => removeChapter(c.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
                     </div>
