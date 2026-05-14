@@ -353,7 +353,7 @@ QUALITÉ : surpasse-toi. Le rendu doit être digne d'un livre vendu en librairie
   };
 
   const buildExportSections = () => chapters.map(c => {
-    const blocks: Array<{ heading?: string; text?: string }> = [];
+    const blocks: Array<{ heading?: string; text: string }> = [];
     if (c.intro) blocks.push({ text: c.intro });
     c.subSections.forEach(s => blocks.push({ heading: s.heading, text: s.paragraphs.join('\n\n') }));
     c.callouts.forEach(b => {
