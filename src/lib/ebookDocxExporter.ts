@@ -14,7 +14,7 @@ import {
   BorderStyle,
   ShadingType,
 } from 'docx';
-import { DEFAULT_TYPOGRAPHY, type EbookExportTypography } from './ebookExportOptions';
+import { DEFAULT_TYPOGRAPHY, loadTypography, type EbookExportTypography } from './ebookExportOptions';
 
 export type DocxBlock =
   | { kind?: 'paragraph'; heading?: string; text: string }
@@ -191,7 +191,7 @@ export const exportEbookToDocx = async (opts: {
   sections: DocxSection[];
   typography?: Partial<EbookExportTypography>;
 }) => {
-  const typo: EbookExportTypography = { ...DEFAULT_TYPOGRAPHY, ...(opts.typography || {}) };
+  const typo: EbookExportTypography = { ...loadTypography(), ...(opts.typography || {}) };
   const fontFamily = typo.fontFamily;
   // docx-js sizes are in HALF-POINTS
   const bodyHalfPt = typo.bodySize * 2;

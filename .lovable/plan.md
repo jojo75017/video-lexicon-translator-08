@@ -1,57 +1,87 @@
-## Plan : Livres Pédagogiques avec Schémas et Graphiques
+# Déploiement global des options "Pédagogique" à tous les livres
 
-### 1. Architecture Pédagogique (Phase Éditoriale)
-- **Structure recommandée** : Introduction → Concept théorique → Schéma explicatif → Exemple concret → Exercice pratique → Synthèse visuelle.
-- **Règle des 3 niveaux** : Chaque chapitre doit avoir (a) un schéma de synthèse global, (b) 2-4 graphiques de détail, (c) une infographie récapitulative finale.
-- **Contrôle de volume** : ~250 mots par page pour que les schémas ne noient pas le texte.
+Objectif : appliquer les 3 lots déjà livrés sur `EbookPedagogiqueGenerator` à **tous les autres générateurs et flux d'écriture**, pour que chaque abonné ait les mêmes possibilités partout.
 
-### 2. Types de Visuels à Générer
-| Type | Usage | Format |
-|------|-------|--------|
-| Schéma conceptuel | Vue d'ensemble du chapitre | PNG, largeur 1200px |
-| Graphique de processus | Étapes, workflows, chronologies | PNG ou SVG |
-| Tableau comparatif | Comparaisons, avant/après | PNG |
-| Infographie récap | Page de fin de chapitre | PNG, carré ou vertical |
-| Mind map | Vision globale du livre | PNG |
+## Périmètre couvert
 
-### 3. Pipeline de Création Proposé
+### A. Générateurs spécialisés (réutilisent les exporters DOCX/PDF)
+- `EbookScolaireGenerator.tsx`
+- `EbookAgendaGenerator.tsx`
+- `EbookAtlas.tsx`
+- `EbookDiaryGenerator.tsx`
+- `EbookDocumentaryGenerator.tsx`
+- `EbookComicBookGenerator.tsx`, `EbookColoringBookGenerator.tsx`, `EbookBirdSheetGenerator.tsx`, `EbookAquariumGenerator.tsx`, `EbookBDTemplatesSelector` (livres pédagogiques visuels)
 
-**Étape 1 — Génération du manuscrit**
-- Utiliser le pipeline P1-P15 existant avec une contrainte supplémentaire : chaque section doit être annotée avec un tag `[VISUEL: type-schéma]` là où un graphique est nécessaire.
+### B. Flux ebook "classique" (romans / non-fiction)
+- `pages/EbookPlannerPage.tsx` (entrée principale du pipeline P1‑P15)
+- `EbookExporter.tsx` (export central utilisé par le planner)
+- `EbookExpertWriting.tsx` (rédaction longue)
+- `EbookAiChat.tsx` (chat de réécriture)
+- Hooks : `useEbookGeneration.ts`, `useSubscriptionGeneration.ts`, `useProductGeneration.ts`
 
-**Étape 2 — Extraction des briefs visuels**
-- Un agent dédié lit le manuscrit et génère pour chaque tag un brief technique : sujet, éléments clés, style (minimaliste, couleurs), dimensions.
+## Lot 1 — Options de mise en page export (DOCX/PDF) partout
 
-**Étape 3 — Génération des visuels**
-- Utiliser l'Imagen 3 existant (KDP Cover AI) avec des prompts structurés : "Diagramme éducatif minimaliste montrant X en 3 étapes, fond blanc, couleurs teal et orange, style flat design..."
+1. Le panneau `EbookSettingsPanel` (police, taille titres 14/16, corps 11/12/14, justification) devient un composant partagé déjà prêt.
+2. L'intégrer dans :
+   - `EbookExporter.tsx` (impacte planner + tous les générateurs qui passent par lui)
+   - Chaque générateur listé en A. qui appelle directement `exportEbookToDocx/Pdf` → on lit `getEbookExportOptions()` depuis `ebookExportOptions.ts` (déjà créé) au moment de l'export, donc 1 seul ajout de panneau global suffit si on centralise.
+3. Stratégie retenue : **stocker les options dans `localStorage` via `ebookExportOptions.ts`** + un seul panneau "Réglages export" accessible depuis :
+   - le header du planner
+   - chaque générateur spécialisé (bouton "Réglages d'export")
+   Les exporters lisent les options par défaut → aucun générateur n'a besoin de les passer manuellement.
+4. Appliquer le titre H6 + tableaux à colonnes fixes : déjà fait dans les exporters → automatiquement propagé partout.
 
-**Étape 4 — Assemblage**
-- Insérer les images générées dans le flux du texte au niveau des tags.
-- Exporter en PDF KDP-compliant (marge respectée, image haute résolution 300 DPI).
+## Lot 2 — OpenRouter pour les images partout
 
-### 4. Implémentation Technique Possible
+1. `generate-educational-image` accepte déjà `openrouterKey`.
+2. Faire pareil pour les autres edge functions image utilisées dans les livres :
+   - `generate-cover-image`
+   - `generate-chapter-image`
+   - `generate-illustration`
+   - toute fonction `generate-*-image` détectée
+3. Créer un helper front `src/services/imageGenerationService.ts` qui :
+   - lit la clé OpenRouter depuis `localStorage` (déjà gérée par `EbookSettingsPanel`)
+   - injecte automatiquement `openrouterKey` dans toutes les invocations Supabase d'images
+4. Remplacer les appels directs `supabase.functions.invoke('generate-*-image', …)` par ce helper dans les composants concernés (cover studio, chapter image, atlas, etc.).
 
-**Option A — Léger (recommandé pour commencer)**
-- Ajouter un champ "Type de visuel" dans le générateur de chapitres (badge schéma/graphique/tableau).
-- Générer les visuels manuellement via l'outil Cover AI existant, puis upload dans l'éditeur de chapitre.
+## Lot 3 — Choix Gemini / Claude / OpenAI pour la rédaction partout
 
-**Option B — Automatisé**
-- Nouveau module "Pédagogie Visuelle" avec :
-  - Détection automatique des concepts complexes dans le texte (via Gemini).
-  - Génération automatique du brief visuel.
-  - Génération par lot des images (jusqu'à 20 par livre).
-  - Prévisualisation WYSIWYG du livre avec images positionnées.
+1. `aiWritingService.ts` (déjà créé) expose `callAIWriting()`.
+2. Migrer tous les appels `geminiService` → `callAIWriting()` :
+   - `useEbookGeneration.ts`
+   - `useSubscriptionGeneration.ts`
+   - `useProductGeneration.ts`
+   - `EbookExpertWriting.tsx`
+   - `EbookAiChat.tsx`
+   - `EbookStatisticsTools.tsx`
+   - `EbookScolaireGenerator.tsx`
+   - `pages/PromptsGeneratorPage.tsx`, `pages/AiChatPage.tsx`, `pages/EbookPlannerPage.tsx`
+3. Côté edge functions, faire la même bascule pour les fonctions serveur de rédaction :
+   - `expert-writing` → accepter `provider` + clé BYOK et router vers Gemini / Anthropic / OpenAI
+   - Idem pour `chapter-writer`, `bible-generator`, `proofreader`, `developmental-editor` si utilisées
+4. Le sélecteur "Moteur de rédaction" du `EbookSettingsPanel` (déjà existant) devient la source unique : sa valeur (`gemini` | `claude` | `openai`) est lue par `aiWritingService` et envoyée aux edge functions.
 
-### 5. Contrôle Qualité
-- Vérifier que chaque schéma a une légende explicite.
-- Vérifier la lisibilité en noir et blanc (impression KDP) — éviter les dégradés subtils.
-- Respecter la règle : 1 visuel toutes les 2-3 pages maximum pour ne pas surcharger.
+## Détails techniques
 
-### 6. Livrables
-- Manuscrit textuel enrichi de tags visuels.
-- Bibliothèque d'images générées (bucket `ebook-images`).
-- PDF final prêt KDP avec images intégrées à 300 DPI.
+- **Centralisation** : un seul `EbookSettingsPanel` global accessible depuis `EspaceHeader` (icône Réglages) + raccourci dans chaque générateur. Évite la duplication.
+- **Stockage clés BYOK** : `localStorage` (`gemini_api_key`, `claude_api_key`, `openai_api_key`, `openrouter_api_key`) — pas de table DB (cohérent avec la mémoire BYOK).
+- **Fallbacks** : si aucune clé BYOK n'est fournie, on retombe sur Lovable AI (Gemini par défaut) pour la rédaction et sur Lovable AI pour les images. Aucun blocage.
+- **Edge functions** : ajouter dans chaque fonction de rédaction un switch `provider` → URL + headers + format de payload + parser de réponse (factorisé dans un util `_shared/aiProviders.ts`).
+- **Pas de refacto du Planner monolithe** (conforme à la mémoire `refactoring-monolithe-ebook-planner`) : on branche le service, on ne déplace pas la logique.
 
----
+## Hors périmètre
 
-**Recommandation de démarrage** : Commencer par l'Option A sur un chapitre test pour valider la qualité des schémas générés avant d'automatiser.
+- Pas de UI WYSIWYG live de l'export.
+- Pas de clé partagée côté serveur (BYOK strict).
+- Pas de migration des audiobooks (TTS reste OpenAI serveur, conforme à la mémoire).
+
+## Ordre d'exécution suggéré
+
+1. Centraliser le `EbookSettingsPanel` dans le header (1 fichier).
+2. Brancher `callAIWriting` dans les 3 hooks (`useEbookGeneration`, `useSubscriptionGeneration`, `useProductGeneration`) → impact immédiat sur 80% du flux.
+3. Créer `imageGenerationService.ts` + brancher OpenRouter dans les autres edge functions image.
+4. Migrer `EbookExpertWriting`, `EbookAiChat`, `EbookScolaireGenerator`, `EbookStatisticsTools`.
+5. Étendre `EbookExporter.tsx` pour qu'il honore les options globales.
+6. Vérifier les générateurs spécialisés restants (Atlas, Agenda, Diary, Documentary, BD).
+
+Je peux exécuter ce plan tel quel — confirme et je lance.

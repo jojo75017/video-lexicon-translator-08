@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-import { DEFAULT_TYPOGRAPHY, type EbookExportTypography, pdfFontFor } from './ebookExportOptions';
+import { DEFAULT_TYPOGRAPHY, loadTypography, type EbookExportTypography, pdfFontFor } from './ebookExportOptions';
 
 export type PdfBlock =
   | { kind?: 'paragraph'; heading?: string; text: string }
@@ -54,7 +54,7 @@ export const exportEbookToPdf = async (opts: {
   sections: PdfSection[];
   typography?: Partial<EbookExportTypography>;
 }) => {
-  const typo: EbookExportTypography = { ...DEFAULT_TYPOGRAPHY, ...(opts.typography || {}) };
+  const typo: EbookExportTypography = { ...loadTypography(), ...(opts.typography || {}) };
   const pdfFont = pdfFontFor(typo.fontFamily);
   const headingSize = typo.headingSize;
   const bodySize = typo.bodySize;
