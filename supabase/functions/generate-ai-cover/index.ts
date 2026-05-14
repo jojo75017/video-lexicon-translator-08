@@ -80,6 +80,7 @@ serve(async (req) => {
       format = 'kindle',
       kdpBrief = '',
       referenceImage,
+      openrouterKey,
     } = body;
 
     if (!title) {
@@ -89,8 +90,9 @@ serve(async (req) => {
       });
     }
 
+    const useOpenRouter = typeof openrouterKey === 'string' && openrouterKey.trim().startsWith('sk-or-');
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY non configurée");
+    if (!useOpenRouter && !LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY non configurée");
 
     const parsed = parseKdpBrief(kdpBrief);
     const paperbackSpec = format === 'paperback' ? buildPaperbackSpec(parsed) : null;
@@ -136,11 +138,19 @@ ${referenceImage ? '- Use the attached reference image ONLY for stylistic inspir
       ];
     }
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const endpoint = useOpenRouter
+      ? 'https://openrouter.ai/api/v1/chat/completions'
+      : 'https://ai.gateway.lovable.dev/v1/chat/completions';
+    const authHeaders: Record<string, string> = useOpenRouter
+      ? { 'Authorization': `Bearer ${openrouterKey.trim()}`, 'Content-Type': 'application/json', 'HTTP-Referer': 'https://ebookstudio.fr', 'X-Title': 'EbookStudio' }
+      : { 'Lovable-API-Key': LOVABLE_API_KEY!, 'Content-Type': 'application/json' };
+    const modelId = useOpenRouter ? 'google/gemini-2.5-flash-image-preview' : 'google/gemini-3.1-flash-image-preview';
+
+    const response = await fetch(endpoint, {
       method: "POST",
-      headers: { "Lovable-API-Key": LOVABLE_API_KEY, "Content-Type": "application/json" },
+      headers: authHeaders,
       body: JSON.stringify({
-        model: "google/gemini-3.1-flash-image-preview",
+        model: modelId,
         messages: [{ role: "user", content: messageContent }],
         modalities: ["image", "text"],
       }),
