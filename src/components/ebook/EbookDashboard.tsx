@@ -11,6 +11,7 @@ import {
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Text, Environment, PresentationControls } from '@react-three/drei';
 import { Chapter } from '@/hooks/useSubscriptionGeneration';
+import KdpPackButton from '@/components/shared/KdpPackButton';
 
 interface EbookDashboardProps {
   ebookTitle: string;
@@ -237,14 +238,28 @@ export const EbookDashboard: React.FC<EbookDashboardProps> = ({
   return (
     <div className="space-y-6">
       {/* En-tête avec titre du projet */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h2 className="text-2xl font-bold">{ebookTitle || 'Mon Projet Ebook'}</h2>
           <p className="text-muted-foreground">par {authorName || 'Auteur'}</p>
         </div>
-        <Badge variant={stats.progressPercent >= 100 ? 'default' : 'secondary'} className="text-lg px-4 py-2">
-          {Math.round(stats.progressPercent)}% complet
-        </Badge>
+        <div className="flex items-center gap-3 flex-wrap">
+          <KdpPackButton
+            size="sm"
+            label="Pack KDP (ZIP)"
+            getOptions={() => ({
+              ebookTitle,
+              authorName,
+              kdpDescription,
+              kdpKeywords,
+              coverFrontUrl: coverImageUrl,
+              coverFullUrl: coverImageUrl,
+            })}
+          />
+          <Badge variant={stats.progressPercent >= 100 ? 'default' : 'secondary'} className="text-lg px-4 py-2">
+            {Math.round(stats.progressPercent)}% complet
+          </Badge>
+        </div>
       </div>
 
       {/* Grille principale */}
