@@ -327,12 +327,14 @@ QUALITÉ : surpasse-toi. Le rendu doit être digne d'un livre vendu en librairie
     try {
       const richContext = chapter.imagePrompt ||
         `Editorial illustration for the chapter "${chapter.title}" of a pedagogical book about ${topic}. Audience: ${audience}. Photoréalisme doux, lumière naturelle, no text.`;
+      const orKey = getOpenRouterKey();
       const { data, error } = await supabase.functions.invoke('generate-educational-image', {
         body: {
           title: chapter.title,
           context: richContext,
           preset: imageStyle,
           folder: `pedagogique/${(topic || 'livre').slice(0, 40)}`,
+          openrouterKey: orKey || undefined,
         }
       });
       if (error) throw error;
