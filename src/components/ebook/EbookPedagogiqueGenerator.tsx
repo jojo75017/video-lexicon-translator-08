@@ -580,9 +580,22 @@ QUALITÉ : surpasse-toi. Le rendu doit être digne d'un livre vendu en librairie
                   <div className="flex items-start justify-between gap-3">
                     <CardTitle className="text-lg">{c.title}</CardTitle>
                     <div className="flex gap-1">
-                      <Button variant="ghost" size="icon" onClick={() => generateChapterImage(c)} disabled={c.isGeneratingImage} title="Générer illustration">
+                      <Button variant="ghost" size="icon" onClick={() => generateChapterImage(c)} disabled={c.isGeneratingImage} title="Générer illustration avec l'IA">
                         {c.isGeneratingImage ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImageIcon className="w-4 h-4" />}
                       </Button>
+                      <label title="Importer ma propre image" className="inline-flex items-center justify-center h-9 w-9 rounded-md hover:bg-accent cursor-pointer">
+                        <Upload className="w-4 h-4" />
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const f = e.target.files?.[0];
+                            if (f) handleUploadImage(c, f);
+                            e.target.value = '';
+                          }}
+                        />
+                      </label>
                       <Button variant="ghost" size="icon" onClick={() => copyChapter(c)} title="Copier"><Copy className="w-4 h-4" /></Button>
                       <Button variant="ghost" size="icon" onClick={() => removeChapter(c.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
                     </div>
