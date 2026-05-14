@@ -410,6 +410,7 @@ QUALITÉ : surpasse-toi. Le rendu doit être digne d'un livre vendu en librairie
         documentTitle: bookTitle || topic,
         documentSubtitle: bookSubtitle,
         sections: buildExportSections(),
+        typography,
       });
       toast.success('Livre exporté en .docx');
     } catch (e: any) { toast.error(e?.message || 'Erreur export DOCX'); }
@@ -422,6 +423,7 @@ QUALITÉ : surpasse-toi. Le rendu doit être digne d'un livre vendu en librairie
         documentTitle: bookTitle || topic,
         documentSubtitle: bookSubtitle,
         sections: buildExportSections(),
+        typography,
       });
       toast.success('Livre exporté en .pdf');
     } catch (e: any) { toast.error(e?.message || 'Erreur export PDF'); }
