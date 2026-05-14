@@ -272,8 +272,8 @@ export const exportEbookToPdf = async (opts: {
       y = margin;
     }
     // Chapter title — small dark heading (H6 equivalent), no big colored "chapitre IA"
-    writeText(s.title, headingSize, { bold: true, color: [35, 47, 62], spacingAfter: 8 });
-    if (s.subtitle) writeText(s.subtitle, bodySize - 1, { color: [120, 120, 120], spacingAfter: 8 });
+    writeText(s.title, headingSize, { bold: true, color: headingRgb, spacingAfter: 8 });
+    if (s.subtitle) writeText(s.subtitle, bodySize - 1, { color: [120, 120, 120], spacingAfter: 8, italic: true });
 
     if (s.imageUrl) {
       const img = await loadImageDataUrl(s.imageUrl);
@@ -294,6 +294,27 @@ export const exportEbookToPdf = async (opts: {
       }
     }
 
+    const writeBody = (text: string) => {
+      // Split by paragraph; each line may be a blockquote (>) → full italic
+      const paragraphs = String(text || '').split(/\n+/);
+      paragraphs.forEach(para => {
+        const isQuote = italicQuotes && /^\s*>\s+/.test(para);
+        const cleanRaw = isQuote ? para.replace(/^\s*>\s+/, '') : para;
+        // Strip inline _italic_ / *italic* markers (full inline italic mid-line is not supported in jsPDF without segment-by-segment rendering; we keep the wrapped justification working)
+        const hasInline = /(_[^_\n]+_|\*[^*\n]+\*)/.test(cleanRaw);
+        const clean = cleanRaw.replace(/_([^_\n]+)_/g, '$1').replace(/\*([^*\n]+)\*/g, '$1');
+        writeText(clean, bodySize, {
+          spacingAfter: 4,
+          align: justifyBody ? 'justify' : 'left',
+          italic: isQuote || hasInline,
+          color: bodyRgb,
+          x: isQuote ? margin + 16 : margin,
+          maxW: isQuote ? contentW - 16 : contentW,
+          lineHeightMul: lineHeightMul,
+        });
+      });
+    };
+
     for (const b of s.blocks) {
       if ((b as any).kind === 'callout') {
         const cb = b as Extract<PdfBlock, { kind: 'callout' }>;
@@ -303,8 +324,8 @@ export const exportEbookToPdf = async (opts: {
         drawDataTable(tb.headers || [], tb.rows || [], tb.caption);
       } else {
         const pb = b as Extract<PdfBlock, { kind?: 'paragraph' }>;
-        if (pb.heading) writeText(pb.heading, bodySize + 1, { bold: true, color: [35, 47, 62], spacingAfter: 4 });
-        if (pb.text) writeText(pb.text, bodySize, { spacingAfter: 8, align: justifyBody ? 'justify' : 'left' });
+        if (pb.heading) writeText(pb.heading, bodySize + 1, { bold: true, color: headingRgb, spacingAfter: 4 });
+        if (pb.text) writeBody(String(pb.text));
       }
     }
   }
