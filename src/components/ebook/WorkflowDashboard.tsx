@@ -168,6 +168,17 @@ export const WorkflowDashboard: React.FC<WorkflowDashboardProps> = ({
               Exporter vers Audio Express
             </Button>
           )}
+          <KdpPackButton
+            size="sm"
+            getOptions={() => ({
+              ebookTitle: ebookTitle || 'Mon ebook',
+              authorName,
+              subtitle: bookSubtitle,
+              description: bookDescription,
+              genre,
+              targetAudience,
+            })}
+          />
         </div>
       </div>
 
