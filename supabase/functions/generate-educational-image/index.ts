@@ -10,15 +10,18 @@ serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
   try {
-    const { title, context, style, preset, folder } = await req.json();
+    const { title, context, style, preset, folder, openrouterKey } = await req.json();
     if (!title) {
       return new Response(JSON.stringify({ error: 'title requis' }), {
         status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
 
+    // Si l'abonné fournit sa clé OpenRouter (sk-or-...), on route vers OpenRouter
+    // sinon on utilise Lovable AI Gateway (crédits Lovable).
+    const useOpenRouter = typeof openrouterKey === 'string' && openrouterKey.trim().startsWith('sk-or-');
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) {
+    if (!useOpenRouter && !LOVABLE_API_KEY) {
       return new Response(JSON.stringify({ error: 'LOVABLE_API_KEY manquante' }), {
         status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
@@ -37,13 +40,25 @@ serve(async (req) => {
 
     const prompt = `${baseStyle}\n\nSubject: ${title}.${context ? ` Context: ${context}.` : ''}\n\nStrict rules: NO text, NO letters, NO numbers, NO words, NO writing of any kind in the image. Only pure illustration.`;
 
-    console.log('[generate-educational-image] Generating:', title);
+    console.log('[generate-educational-image] Generating:', title, '— provider:', useOpenRouter ? 'openrouter' : 'lovable');
 
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    const endpoint = useOpenRouter
+      ? 'https://openrouter.ai/api/v1/chat/completions'
+      : 'https://ai.gateway.lovable.dev/v1/chat/completions';
+    const authToken = useOpenRouter ? openrouterKey.trim() : LOVABLE_API_KEY!;
+    const modelId = useOpenRouter
+      ? 'google/gemini-2.5-flash-image-preview'
+      : 'google/gemini-2.5-flash-image';
+
+    const response = await fetch(endpoint, {
       method: 'POST',
-      headers: { 'Authorization': `Bearer ${LOVABLE_API_KEY}`, 'Content-Type': 'application/json' },
+      headers: {
+        'Authorization': `Bearer ${authToken}`,
+        'Content-Type': 'application/json',
+        ...(useOpenRouter ? { 'HTTP-Referer': 'https://ebookstudio.fr', 'X-Title': 'EbookStudio' } : {}),
+      },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash-image',
+        model: modelId,
         messages: [{ role: 'user', content: prompt }],
         modalities: ['image', 'text']
       }),
@@ -58,7 +73,11 @@ serve(async (req) => {
         });
       }
       if (response.status === 402) {
-        return new Response(JSON.stringify({ error: 'Crédits IA épuisés' }), {
+        return new Response(JSON.stringify({
+          error: useOpenRouter
+            ? 'Crédits OpenRouter épuisés — créditez votre compte sur openrouter.ai'
+            : 'Crédits IA Lovable épuisés'
+        }), {
           status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         });
       }
@@ -66,12 +85,22 @@ serve(async (req) => {
     }
 
     const data = await response.json();
+    // Lovable: choices[0].message.images[0].image_url.url (data: ou URL)
+    // OpenRouter (gemini image): choices[0].message.images[0].image_url.url
     const imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
     if (!imageUrl) throw new Error('Aucune image générée');
 
     const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
-    const base64Data = imageUrl.replace(/^data:image\/\w+;base64,/, '');
-    const imageBuffer = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+    let imageBuffer: Uint8Array;
+    if (imageUrl.startsWith('data:')) {
+      const base64Data = imageUrl.replace(/^data:image\/\w+;base64,/, '');
+      imageBuffer = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+    } else {
+      // OpenRouter peut renvoyer une URL HTTP — on la télécharge pour la stocker dans notre bucket
+      const imgRes = await fetch(imageUrl);
+      if (!imgRes.ok) throw new Error('Téléchargement image distante échoué');
+      imageBuffer = new Uint8Array(await imgRes.arrayBuffer());
+    }
     const safeTitle = title.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9]/g, '-').substring(0, 40);
     const fileName = `${folder || 'educational'}/${Date.now()}-${safeTitle}.png`;
 

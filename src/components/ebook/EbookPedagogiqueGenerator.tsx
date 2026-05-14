@@ -15,12 +15,9 @@ import { exportEbookToPdf } from '@/lib/ebookPdfExporter';
 import { getFriendlyError } from '@/lib/errorMessages';
 import { writeAutosave, readAutosave } from '@/lib/ebookProjectStorage';
 import { EbookProjectsPanel } from './EbookProjectsPanel';
-import { callGemini } from '@/services/geminiService';
-
-const getGeminiKey = (): string => {
-  if (typeof window === 'undefined') return '';
-  return (localStorage.getItem('openai_api_key') || '').trim();
-};
+import { EbookSettingsPanel, loadTypography, getOpenRouterKey } from './EbookSettingsPanel';
+import { callAIWriting, getProvider, getProviderKey, validateKeyFormat, PROVIDER_LABELS } from '@/services/aiWritingService';
+import type { EbookExportTypography } from '@/lib/ebookExportOptions';
 
 interface PedagogiqueGeneratorProps {
   ebookTitle?: string;
@@ -154,6 +151,7 @@ const EbookPedagogiqueGenerator: React.FC<PedagogiqueGeneratorProps> = ({ ebookT
   const [imageStats, setImageStats] = useState<{ success: number; failed: number; lastError: 'credits' | 'rate' | 'other' | null }>(
     { success: 0, failed: 0, lastError: null }
   );
+  const [typography, setTypography] = useState<EbookExportTypography>(loadTypography());
   const hydrated = useRef(false);
 
   useEffect(() => {
@@ -197,9 +195,10 @@ const EbookPedagogiqueGenerator: React.FC<PedagogiqueGeneratorProps> = ({ ebookT
   };
 
   const generate = async () => {
-    const geminiKey = getGeminiKey();
-    if (!geminiKey || !geminiKey.startsWith('AIza')) {
-      toast.error("Clé Gemini manquante ou invalide. Renseignez-la dans Paramètres > Clés API (commence par 'AIza').");
+    const prov = getProvider();
+    const provKey = getProviderKey(prov);
+    if (!provKey || !validateKeyFormat(prov, provKey)) {
+      toast.error(`Clé ${PROVIDER_LABELS[prov]} manquante ou invalide. Renseignez-la dans Réglages avancés.`);
       return;
     }
     if (!topic.trim()) {
@@ -245,7 +244,7 @@ Pour CHAQUE chapitre, retourne un objet JSON avec :
 
 QUALITÉ : surpasse-toi. Le rendu doit être digne d'un livre vendu en librairie : progression claire, exemples concrets, vocabulaire précis, jamais creux.`;
 
-      const text = await callGemini(geminiKey, prompt, {
+      const text = await callAIWriting(prompt, {
         systemPrompt: sysPrompt,
         temperature: 0.7,
         maxTokens: 24000,
@@ -328,12 +327,14 @@ QUALITÉ : surpasse-toi. Le rendu doit être digne d'un livre vendu en librairie
     try {
       const richContext = chapter.imagePrompt ||
         `Editorial illustration for the chapter "${chapter.title}" of a pedagogical book about ${topic}. Audience: ${audience}. Photoréalisme doux, lumière naturelle, no text.`;
+      const orKey = getOpenRouterKey();
       const { data, error } = await supabase.functions.invoke('generate-educational-image', {
         body: {
           title: chapter.title,
           context: richContext,
           preset: imageStyle,
           folder: `pedagogique/${(topic || 'livre').slice(0, 40)}`,
+          openrouterKey: orKey || undefined,
         }
       });
       if (error) throw error;
@@ -409,6 +410,7 @@ QUALITÉ : surpasse-toi. Le rendu doit être digne d'un livre vendu en librairie
         documentTitle: bookTitle || topic,
         documentSubtitle: bookSubtitle,
         sections: buildExportSections(),
+        typography,
       });
       toast.success('Livre exporté en .docx');
     } catch (e: any) { toast.error(e?.message || 'Erreur export DOCX'); }
@@ -421,6 +423,7 @@ QUALITÉ : surpasse-toi. Le rendu doit être digne d'un livre vendu en librairie
         documentTitle: bookTitle || topic,
         documentSubtitle: bookSubtitle,
         sections: buildExportSections(),
+        typography,
       });
       toast.success('Livre exporté en .pdf');
     } catch (e: any) { toast.error(e?.message || 'Erreur export PDF'); }
@@ -508,6 +511,8 @@ QUALITÉ : surpasse-toi. Le rendu doit être digne d'un livre vendu en librairie
           </Button>
         </CardContent>
       </Card>
+
+      <EbookSettingsPanel onTypographyChange={setTypography} />
 
       <EbookProjectsPanel
         scope="pedagogique"

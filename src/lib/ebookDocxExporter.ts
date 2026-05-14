@@ -14,6 +14,7 @@ import {
   BorderStyle,
   ShadingType,
 } from 'docx';
+import { DEFAULT_TYPOGRAPHY, type EbookExportTypography } from './ebookExportOptions';
 
 export type DocxBlock =
   | { kind?: 'paragraph'; heading?: string; text: string }
@@ -68,13 +69,19 @@ const toText = (v: any): string => {
   return String(v);
 };
 
-const textToParagraphs = (text: any): Paragraph[] => {
+const textToParagraphs = (
+  text: any,
+  bodyHalfPt: number,
+  fontFamily: string,
+  justify: boolean
+): Paragraph[] => {
   const str = toText(text);
   if (!str) return [];
   return str.split(/\n+/).map(
     line =>
       new Paragraph({
-        children: [new TextRun({ text: line.replace(/^[-•]\s*/, '• '), size: 22 })],
+        alignment: justify ? AlignmentType.JUSTIFIED : AlignmentType.LEFT,
+        children: [new TextRun({ text: line.replace(/^[-•]\s*/, '• '), size: bodyHalfPt, font: fontFamily })],
         spacing: { after: 120 },
       })
   );
@@ -83,24 +90,27 @@ const textToParagraphs = (text: any): Paragraph[] => {
 const buildCalloutTable = (
   variant: string,
   title: string | undefined,
-  body: string
+  body: string,
+  bodyHalfPt: number,
+  fontFamily: string,
+  justify: boolean
 ): Table => {
   const meta = CALLOUT_STYLE[variant] || CALLOUT_STYLE['point-cle'];
   const innerChildren: Paragraph[] = [
     new Paragraph({
       spacing: { after: 80 },
-      children: [new TextRun({ text: meta.label, bold: true, size: 20, color: '1F2937' })],
+      children: [new TextRun({ text: meta.label, bold: true, size: Math.max(20, bodyHalfPt - 2), color: '1F2937', font: fontFamily })],
     }),
   ];
   if (title) {
     innerChildren.push(
       new Paragraph({
         spacing: { after: 80 },
-        children: [new TextRun({ text: title, bold: true, size: 22, color: '111827' })],
+        children: [new TextRun({ text: title, bold: true, size: bodyHalfPt + 2, color: '111827', font: fontFamily })],
       })
     );
   }
-  innerChildren.push(...textToParagraphs(body));
+  innerChildren.push(...textToParagraphs(body, bodyHalfPt, fontFamily, justify));
 
   const fullBorder = { style: BorderStyle.SINGLE, size: 12, color: meta.border };
   return new Table({
@@ -122,15 +132,23 @@ const buildCalloutTable = (
   });
 };
 
-const buildDataTable = (headers: string[], rows: string[][]): Table => {
+const buildDataTable = (
+  headers: string[],
+  rows: string[][],
+  bodyHalfPt: number,
+  fontFamily: string
+): Table => {
   const colCount = Math.max(headers.length, 1);
   const totalWidth = 9360;
-  const colW = Math.floor(totalWidth / colCount);
-  const columnWidths = Array(colCount).fill(colW);
-  // Adjust last col to make sum exact
-  columnWidths[colCount - 1] = totalWidth - colW * (colCount - 1);
+  // Distribute width EXACTLY (avoid trailing whitespace columns)
+  const baseW = Math.floor(totalWidth / colCount);
+  const remainder = totalWidth - baseW * colCount;
+  const columnWidths = Array(colCount).fill(0).map((_, i) => baseW + (i < remainder ? 1 : 0));
   const cellBorder = { style: BorderStyle.SINGLE, size: 4, color: 'CBD5E1' };
   const borders = { top: cellBorder, bottom: cellBorder, left: cellBorder, right: cellBorder };
+
+  const headerSize = Math.max(18, bodyHalfPt - 2);
+  const cellSize = Math.max(18, bodyHalfPt - 2);
 
   const headerRow = new TableRow({
     tableHeader: true,
@@ -139,8 +157,8 @@ const buildDataTable = (headers: string[], rows: string[][]): Table => {
         width: { size: columnWidths[i], type: WidthType.DXA },
         shading: { fill: '008296', type: ShadingType.CLEAR },
         borders,
-        margins: { top: 100, bottom: 100, left: 120, right: 120 },
-        children: [new Paragraph({ children: [new TextRun({ text: toText(h), bold: true, size: 20, color: 'FFFFFF' })] })],
+        margins: { top: 80, bottom: 80, left: 100, right: 100 },
+        children: [new Paragraph({ children: [new TextRun({ text: toText(h), bold: true, size: headerSize, color: 'FFFFFF', font: fontFamily })] })],
       })
     ),
   });
@@ -152,8 +170,8 @@ const buildDataTable = (headers: string[], rows: string[][]): Table => {
           width: { size: columnWidths[ci], type: WidthType.DXA },
           shading: ri % 2 ? { fill: 'F9FAFB', type: ShadingType.CLEAR } : undefined,
           borders,
-          margins: { top: 80, bottom: 80, left: 120, right: 120 },
-          children: [new Paragraph({ children: [new TextRun({ text: toText(r[ci] ?? ''), size: 20 })] })],
+          margins: { top: 60, bottom: 60, left: 100, right: 100 },
+          children: [new Paragraph({ children: [new TextRun({ text: toText(r[ci] ?? ''), size: cellSize, font: fontFamily })] })],
         })
       ),
     })
@@ -171,7 +189,16 @@ export const exportEbookToDocx = async (opts: {
   documentTitle: string;
   documentSubtitle?: string;
   sections: DocxSection[];
+  typography?: Partial<EbookExportTypography>;
 }) => {
+  const typo: EbookExportTypography = { ...DEFAULT_TYPOGRAPHY, ...(opts.typography || {}) };
+  const fontFamily = typo.fontFamily;
+  // docx-js sizes are in HALF-POINTS
+  const bodyHalfPt = typo.bodySize * 2;
+  const headingHalfPt = typo.headingSize * 2;
+  const subHeadingHalfPt = Math.max(bodyHalfPt + 2, typo.headingSize * 2 - 4);
+  const justify = typo.justify;
+
   const children: (Paragraph | Table)[] = [];
 
   // Cover
@@ -180,7 +207,7 @@ export const exportEbookToDocx = async (opts: {
       heading: HeadingLevel.TITLE,
       alignment: AlignmentType.CENTER,
       spacing: { before: 2400, after: 240 },
-      children: [new TextRun({ text: opts.documentTitle, bold: true, size: 48 })],
+      children: [new TextRun({ text: opts.documentTitle, bold: true, size: 48, font: fontFamily })],
     })
   );
   if (opts.documentSubtitle) {
@@ -188,7 +215,7 @@ export const exportEbookToDocx = async (opts: {
       new Paragraph({
         alignment: AlignmentType.CENTER,
         spacing: { after: 480 },
-        children: [new TextRun({ text: opts.documentSubtitle, size: 28, italics: true })],
+        children: [new TextRun({ text: opts.documentSubtitle, size: 28, italics: true, font: fontFamily })],
       })
     );
   }
@@ -196,18 +223,19 @@ export const exportEbookToDocx = async (opts: {
 
   for (let i = 0; i < opts.sections.length; i++) {
     const s = opts.sections[i];
+    // Chapter title — Heading 6 (small, no thick underline / no separator line)
     children.push(
       new Paragraph({
-        heading: HeadingLevel.HEADING_1,
-        spacing: { before: 240, after: 200 },
-        children: [new TextRun({ text: s.title, bold: true, size: 36 })],
+        heading: HeadingLevel.HEADING_6,
+        spacing: { before: 200, after: 160 },
+        children: [new TextRun({ text: s.title, bold: true, size: headingHalfPt, font: fontFamily, color: '232F3E' })],
       })
     );
     if (s.subtitle) {
       children.push(
         new Paragraph({
           spacing: { after: 200 },
-          children: [new TextRun({ text: s.subtitle, italics: true, size: 22, color: '666666' })],
+          children: [new TextRun({ text: s.subtitle, italics: true, size: bodyHalfPt, color: '666666', font: fontFamily })],
         })
       );
     }
@@ -233,17 +261,17 @@ export const exportEbookToDocx = async (opts: {
     for (const b of s.blocks) {
       if ((b as any).kind === 'callout') {
         const cb = b as Extract<DocxBlock, { kind: 'callout' }>;
-        children.push(buildCalloutTable(cb.variant, cb.title, cb.body));
+        children.push(buildCalloutTable(cb.variant, cb.title, cb.body, bodyHalfPt, fontFamily, justify));
         children.push(new Paragraph({ spacing: { after: 160 }, children: [] }));
       } else if ((b as any).kind === 'table') {
         const tb = b as Extract<DocxBlock, { kind: 'table' }>;
-        children.push(buildDataTable(tb.headers || [], tb.rows || []));
+        children.push(buildDataTable(tb.headers || [], tb.rows || [], bodyHalfPt, fontFamily));
         if (tb.caption) {
           children.push(
             new Paragraph({
               alignment: AlignmentType.CENTER,
               spacing: { before: 80, after: 200 },
-              children: [new TextRun({ text: tb.caption, italics: true, size: 18, color: '6B7280' })],
+              children: [new TextRun({ text: tb.caption, italics: true, size: Math.max(16, bodyHalfPt - 4), color: '6B7280', font: fontFamily })],
             })
           );
         } else {
@@ -256,11 +284,11 @@ export const exportEbookToDocx = async (opts: {
             new Paragraph({
               heading: HeadingLevel.HEADING_2,
               spacing: { before: 200, after: 120 },
-              children: [new TextRun({ text: pb.heading, bold: true, size: 28 })],
+              children: [new TextRun({ text: pb.heading, bold: true, size: subHeadingHalfPt, font: fontFamily })],
             })
           );
         }
-        children.push(...textToParagraphs(pb.text));
+        children.push(...textToParagraphs(pb.text, bodyHalfPt, fontFamily, justify));
       }
     }
     if (i < opts.sections.length - 1) {
@@ -270,7 +298,7 @@ export const exportEbookToDocx = async (opts: {
 
   const doc = new Document({
     styles: {
-      default: { document: { run: { font: 'Calibri', size: 22 } } },
+      default: { document: { run: { font: fontFamily, size: bodyHalfPt } } },
     },
     sections: [
       {
