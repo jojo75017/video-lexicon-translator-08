@@ -12,6 +12,8 @@ import SubscriberActivityPopup from '@/components/admin/SubscriberActivityPopup'
 import { FirstEbookOnboarding } from '@/components/onboarding/FirstEbookOnboarding';
 import EbookbotFloatingButton from '@/components/ebookbot/EbookbotFloatingButton';
 import ApiKeysFloatingButton from '@/components/ebook/ApiKeysFloatingButton';
+import AISosModal from '@/components/shared/AISosModal';
+import AICostBadge from '@/components/shared/AICostBadge';
 
 // Lazy-loaded pages for performance
 const EbookPlannerPage = lazy(() => import('./pages/EbookPlannerPage'));
@@ -605,6 +607,10 @@ const App = () => {
           <EbookbotFloatingButton />
           {/* Bouton flottant Clés API & réglages (pages ebook / KDP) */}
           {isAuthenticated && <ApiKeysFloatingButton />}
+          {/* SOS modal erreurs IA — humanise les erreurs Gemini/Claude/OpenAI/OpenRouter */}
+          {isAuthenticated && <AISosModal />}
+          {/* Badge coût IA cumulé par projet */}
+          {isAuthenticated && <AICostBadge />}
           <Toaster />
         </div>
       </TooltipProvider>

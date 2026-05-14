@@ -237,17 +237,41 @@ async function callOpenRouter(apiKey: string, prompt: string, opts: AIWritingOpt
 /**
  * Appel unifié — détermine automatiquement le provider courant et sa clé.
  * Compatible drop-in avec callGemini(apiKey, prompt, options).
+ * Additif : track coût + emit erreurs SOS (sans changer la signature).
  */
 export async function callAIWriting(prompt: string, opts: AIWritingOptions = {}): Promise<string> {
   const provider = getProvider();
   const key = getProviderKey(provider);
   if (!key || !validateKeyFormat(provider, key)) {
-    throw new Error(`Clé ${PROVIDER_LABELS[provider]} manquante ou invalide. Configurez-la dans Paramètres.`);
+    const err = new Error(`Clé ${PROVIDER_LABELS[provider]} manquante ou invalide. Configurez-la dans Paramètres.`);
+    try {
+      const { emitAIError } = await import('@/lib/aiErrorBus');
+      emitAIError(provider, err);
+    } catch { /* noop */ }
+    throw err;
   }
-  switch (provider) {
-    case 'gemini': return callGemini(key, prompt, opts);
-    case 'claude': return callClaude(key, prompt, opts);
-    case 'openai': return callOpenAI(key, prompt, opts);
-    case 'openrouter': return callOpenRouter(key, prompt, opts);
+  try {
+    let result: string;
+    switch (provider) {
+      case 'gemini': result = await callGemini(key, prompt, opts); break;
+      case 'claude': result = await callClaude(key, prompt, opts); break;
+      case 'openai': result = await callOpenAI(key, prompt, opts); break;
+      case 'openrouter': result = await callOpenRouter(key, prompt, opts); break;
+    }
+    try {
+      const { trackAIUsage } = await import('@/lib/aiCostTracker');
+      trackAIUsage({
+        provider,
+        promptChars: (prompt?.length || 0) + (opts.systemPrompt?.length || 0),
+        responseChars: result?.length || 0,
+      });
+    } catch { /* noop */ }
+    return result!;
+  } catch (e) {
+    try {
+      const { emitAIError } = await import('@/lib/aiErrorBus');
+      emitAIError(provider, e);
+    } catch { /* noop */ }
+    throw e;
   }
 }
