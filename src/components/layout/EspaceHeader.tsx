@@ -4,9 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { ArrowLeft, LogOut, Sparkles, LayoutGrid, Search, Shield } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { ArrowLeft, LogOut, Sparkles, LayoutGrid, Search, Shield, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
+import { EbookSettingsPanel } from '@/components/ebook/EbookSettingsPanel';
 
 interface EspaceHeaderProps {
   projectTitle?: string | null;
@@ -347,6 +349,31 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
               </Tooltip>
             </TooltipProvider>
           )}
+          <TooltipProvider delayDuration={200}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label="Réglages avancés"
+                      className="text-joy-ink/70 hover:text-joy-ink hover:bg-joy-ink/5 rounded-full h-9 w-9"
+                    >
+                      <Settings className="h-4 w-4" />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>Réglages avancés</DialogTitle>
+                    </DialogHeader>
+                    <EbookSettingsPanel />
+                  </DialogContent>
+                </Dialog>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">Réglages (rédaction, images, mise en page)</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           {onLogout && (
             <TooltipProvider delayDuration={200}>
               <Tooltip>
