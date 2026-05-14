@@ -20,12 +20,12 @@ interface EspaceHeaderProps {
 
 type FamilyId = 'planner' | 'writing' | 'images' | 'export' | 'marketing' | 'account';
 
-const PLANNER_TABS: Array<{ id: FamilyId; label: string; emoji: string; match: string[] }> = [
-  { id: 'planner', label: 'Plan', emoji: '📘', match: ['planner', 'characters', 'templates', 'workflow-dashboard', 'url-import', 'doc-transform', 'projects', 'ebook-library', 'series'] },
-  { id: 'writing', label: 'Écrire', emoji: '✍️', match: ['writing', 'strict-proofread', 'toc', 'aichat', 'complete-workflow', 'humanize-anti-ia', 'natural-rewrite', 'expert-writing', 'multi-translator', 'tools', 'atlas', 'encyclopedia', 'documentary', 'agenda', 'scolaire', 'pedagogique', 'content-architect'] },
-  { id: 'images', label: 'Habiller', emoji: '🎨', match: ['images', 'cover', 'cover-design-editor', 'back-cover', 'backcover', 'images-cover', 'images-generator', 'images-library', 'editorial-packaging'] },
-  { id: 'export', label: 'Publier', emoji: '🚀', match: ['export', 'kdp', 'kdp-prepublish-checklist', 'workflow-export', 'calibre-epub', 'audiobook', 'audio-express', 'audio', 'audit-pilot', 'kdp-keywords-pro'] },
-  { id: 'marketing', label: 'Vendre', emoji: '💛', match: ['marketing', 'monetization', 'advanced', 'launch-plan', 'editorial-quality', 'final-diagnosis', 'kdp-ads-guide', 'chrome-extension'] },
+const PLANNER_TABS: Array<{ id: FamilyId; label: string; emoji: string; bg: string; bgActive: string; ring: string; match: string[] }> = [
+  { id: 'planner',   label: 'Plan',     emoji: '📘', bg: 'bg-sky-100 text-sky-800 hover:bg-sky-200',         bgActive: 'bg-sky-500 text-white shadow-md shadow-sky-500/30',         ring: 'ring-sky-400/30',     match: ['planner', 'characters', 'templates', 'workflow-dashboard', 'url-import', 'doc-transform', 'projects', 'ebook-library', 'series'] },
+  { id: 'writing',   label: 'Écrire',   emoji: '✍️', bg: 'bg-amber-100 text-amber-800 hover:bg-amber-200',   bgActive: 'bg-amber-500 text-white shadow-md shadow-amber-500/30',     ring: 'ring-amber-400/30',   match: ['writing', 'strict-proofread', 'toc', 'aichat', 'complete-workflow', 'humanize-anti-ia', 'natural-rewrite', 'expert-writing', 'multi-translator', 'tools', 'atlas', 'encyclopedia', 'documentary', 'agenda', 'scolaire', 'pedagogique', 'content-architect'] },
+  { id: 'images',    label: 'Habiller', emoji: '🎨', bg: 'bg-fuchsia-100 text-fuchsia-800 hover:bg-fuchsia-200', bgActive: 'bg-fuchsia-500 text-white shadow-md shadow-fuchsia-500/30', ring: 'ring-fuchsia-400/30', match: ['images', 'cover', 'cover-design-editor', 'back-cover', 'backcover', 'images-cover', 'images-generator', 'images-library', 'editorial-packaging'] },
+  { id: 'export',    label: 'Publier',  emoji: '🚀', bg: 'bg-teal-100 text-teal-800 hover:bg-teal-200',       bgActive: 'bg-teal-600 text-white shadow-md shadow-teal-600/30',       ring: 'ring-teal-400/30',    match: ['export', 'kdp', 'kdp-prepublish-checklist', 'workflow-export', 'calibre-epub', 'audiobook', 'audio-express', 'audio', 'audit-pilot', 'kdp-keywords-pro'] },
+  { id: 'marketing', label: 'Vendre',   emoji: '💛', bg: 'bg-rose-100 text-rose-800 hover:bg-rose-200',       bgActive: 'bg-rose-500 text-white shadow-md shadow-rose-500/30',       ring: 'ring-rose-400/30',    match: ['marketing', 'monetization', 'advanced', 'launch-plan', 'editorial-quality', 'final-diagnosis', 'kdp-ads-guide', 'chrome-extension'] },
 ];
 
 const FAMILY_EMOJI: Record<FamilyId, string> = {
