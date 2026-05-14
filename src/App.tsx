@@ -603,6 +603,8 @@ const App = () => {
           {isAuthenticated && <FirstEbookOnboarding subscriberEmail={subscriberEmail} />}
           {/* EBOOKBOT - copilote IA flottant accessible sur tout le site */}
           <EbookbotFloatingButton />
+          {/* Bouton flottant Clés API & réglages (pages ebook / KDP) */}
+          {isAuthenticated && <ApiKeysFloatingButton />}
           <Toaster />
         </div>
       </TooltipProvider>
