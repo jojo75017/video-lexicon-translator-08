@@ -27,11 +27,13 @@ import {
   type ExportLineHeight,
   type ExportMargin,
   COLOR_PRESETS,
+  TYPO_PRESETS,
   loadTypography,
   saveTypography,
   getOpenRouterImageKey,
   setOpenRouterImageKey,
 } from '@/lib/ebookExportOptions';
+import { formatModelPricing } from '@/services/aiWritingService';
 
 // Re-export pour compat avec imports existants
 export { loadTypography, saveTypography };
@@ -227,9 +229,21 @@ export const EbookSettingsPanel: React.FC<Props> = ({ onTypographyChange }) => {
               ) : (
                 <Select value={openrouterModel} onValueChange={updateOpenrouterModel}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="max-w-[460px]">
                     {OPENROUTER_MODELS.map(m => (
-                      <SelectItem key={m.id} value={m.id}>{m.label}</SelectItem>
+                      <SelectItem key={m.id} value={m.id}>
+                        <div className="flex flex-col gap-0.5 py-0.5">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium">{m.label}</span>
+                            {m.recommended && (
+                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 font-semibold">⭐ Recommandé</span>
+                            )}
+                          </div>
+                          <div className="text-[11px] text-muted-foreground">
+                            {m.tag}{m.pricing ? ` · ${formatModelPricing(m)}` : ''}
+                          </div>
+                        </div>
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
