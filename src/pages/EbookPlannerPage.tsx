@@ -3474,6 +3474,8 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
           activeTab={activeTab}
           onTabChange={handleTabChange}
         />
+
+        <WorkflowAIProviderBadge />
         
         <MissingApiKeyBanner
           apiKey={apiKey}
