@@ -151,6 +151,9 @@ const EbookPedagogiqueGenerator: React.FC<PedagogiqueGeneratorProps> = ({ ebookT
   const [chapters, setChapters] = useState<PedagogiqueChapter[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [imageStyle, setImageStyle] = useState<'hatier-school' | 'flat-clean' | 'soft-planner'>('soft-planner');
+  const [imageStats, setImageStats] = useState<{ success: number; failed: number; lastError: 'credits' | 'rate' | 'other' | null }>(
+    { success: 0, failed: 0, lastError: null }
+  );
   const hydrated = useRef(false);
 
   useEffect(() => {
@@ -338,10 +341,25 @@ QUALITÉ : surpasse-toi. Le rendu doit être digne d'un livre vendu en librairie
       if (!url) throw new Error("Pas d'image");
       setCachedImage(cacheKey, url);
       setChapters(prev => prev.map(c => c.id === chapter.id ? { ...c, imageUrl: url, isGeneratingImage: false } : c));
+      setImageStats(s => ({ success: s.success + 1, failed: s.failed, lastError: null }));
       toast.success('Illustration générée');
     } catch (e: any) {
       console.error(e);
-      toast.error(e?.message || 'Erreur génération image');
+      const raw = (e?.message || e?.context?.body || JSON.stringify(e || {})).toString().toLowerCase();
+      const errKind: 'credits' | 'rate' | 'other' =
+        raw.includes('payment_required') || raw.includes('credits') || raw.includes('402')
+          ? 'credits'
+          : raw.includes('rate') || raw.includes('429')
+          ? 'rate'
+          : 'other';
+      setImageStats(s => ({ success: s.success, failed: s.failed + 1, lastError: errKind }));
+      const msg =
+        errKind === 'credits'
+          ? '⚠️ Crédits IA Lovable épuisés — rechargez pour continuer'
+          : errKind === 'rate'
+          ? 'Limite atteinte, réessayez dans quelques instants'
+          : (e?.message || 'Erreur génération image');
+      toast.error(msg);
       setChapters(prev => prev.map(c => c.id === chapter.id ? { ...c, isGeneratingImage: false } : c));
     }
   };
@@ -505,6 +523,37 @@ QUALITÉ : surpasse-toi. Le rendu doit être digne d'un livre vendu en librairie
             </Button>
             <Button variant="outline" onClick={exportDocx}><Download className="w-4 h-4 mr-2" />DOCX</Button>
             <Button onClick={exportPdf}><FileText className="w-4 h-4 mr-2" />PDF</Button>
+          </div>
+
+          {/* Indicateur de crédits IA pour les illustrations */}
+          <div className={`rounded-lg border-2 p-4 flex items-center justify-between gap-4 ${
+            imageStats.lastError === 'credits' ? 'border-destructive bg-destructive/10'
+              : imageStats.lastError === 'rate' ? 'border-amber-400 bg-amber-50'
+              : 'border-teal-300 bg-teal-50'
+          }`}>
+            <div className="flex items-center gap-3">
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                imageStats.lastError === 'credits' ? 'bg-destructive text-white' : 'bg-teal-600 text-white'
+              }`}>
+                <Sparkles className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="font-semibold text-sm">
+                  {imageStats.lastError === 'credits' ? '⚠️ Crédits IA Lovable épuisés'
+                    : imageStats.lastError === 'rate' ? '⏳ Limite atteinte temporairement'
+                    : 'Crédits IA disponibles pour les illustrations'}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  ✅ {imageStats.success} générée{imageStats.success > 1 ? 's' : ''} · ❌ {imageStats.failed} échec{imageStats.failed > 1 ? 's' : ''}
+                  {imageStats.lastError === 'credits' && ' — Rechargez votre solde Lovable AI pour continuer'}
+                </div>
+              </div>
+            </div>
+            {imageStats.lastError === 'credits' && (
+              <Button size="sm" onClick={() => window.open('https://lovable.dev/settings/workspace', '_blank')}>
+                Recharger les crédits
+              </Button>
+            )}
           </div>
 
           <div className="space-y-4">
