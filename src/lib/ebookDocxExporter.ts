@@ -102,18 +102,25 @@ const textToParagraphs = (
   text: any,
   bodyHalfPt: number,
   fontFamily: string,
-  justify: boolean
+  justify: boolean,
+  bodyColor: string,
+  italicQuotes: boolean,
+  lineHeight: number,
 ): Paragraph[] => {
   const str = toText(text);
   if (!str) return [];
-  return str.split(/\n+/).map(
-    line =>
-      new Paragraph({
-        alignment: justify ? AlignmentType.JUSTIFIED : AlignmentType.LEFT,
-        children: [new TextRun({ text: line.replace(/^[-•]\s*/, '• '), size: bodyHalfPt, font: fontFamily })],
-        spacing: { after: 120 },
-      })
-  );
+  // 240 = ligne simple en docx → multiplier par lineHeight
+  const lineRule = Math.round(240 * lineHeight);
+  return str.split(/\n+/).map(line => {
+    const isQuote = italicQuotes && /^\s*>\s+/.test(line);
+    const cleanLine = isQuote ? line.replace(/^\s*>\s+/, '') : line.replace(/^[-•]\s*/, '• ');
+    return new Paragraph({
+      alignment: justify ? AlignmentType.JUSTIFIED : AlignmentType.LEFT,
+      indent: isQuote ? { left: 360 } : undefined,
+      children: parseInline(cleanLine, bodyHalfPt, fontFamily, bodyColor, isQuote),
+      spacing: { after: 120, line: lineRule },
+    });
+  });
 };
 
 const buildCalloutTable = (
