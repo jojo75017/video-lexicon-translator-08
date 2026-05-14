@@ -45,10 +45,10 @@ const KdpPackButton: React.FC<KdpPackButtonProps> = ({
       onClick={handleClick}
       disabled={loading}
       size={size}
-      className={`gap-2 bg-[#008296] hover:bg-[#FF9E2D] text-white ${className || ''}`}
+      className={`gap-2 bg-[#FF9E2D] hover:bg-[#008296] text-white font-bold shadow-lg shadow-orange-500/30 ring-2 ring-[#FF9E2D]/40 hover:ring-[#008296]/40 animate-pulse hover:animate-none ${className || ''}`}
     >
-      {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Package className="h-4 w-4" />}
-      {loading ? 'Création du pack…' : label}
+      {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Package className="h-5 w-5" />}
+      {loading ? 'Création du pack…' : `📦 ${label}`}
     </Button>
   );
 };
