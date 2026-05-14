@@ -151,6 +151,7 @@ const EbookPedagogiqueGenerator: React.FC<PedagogiqueGeneratorProps> = ({ ebookT
   const [imageStats, setImageStats] = useState<{ success: number; failed: number; lastError: 'credits' | 'rate' | 'other' | null }>(
     { success: 0, failed: 0, lastError: null }
   );
+  const [typography, setTypography] = useState<EbookExportTypography>(loadTypography());
   const hydrated = useRef(false);
 
   useEffect(() => {
