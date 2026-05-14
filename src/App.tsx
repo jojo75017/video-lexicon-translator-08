@@ -11,6 +11,7 @@ import { Loader2 } from 'lucide-react';
 import SubscriberActivityPopup from '@/components/admin/SubscriberActivityPopup';
 import { FirstEbookOnboarding } from '@/components/onboarding/FirstEbookOnboarding';
 import EbookbotFloatingButton from '@/components/ebookbot/EbookbotFloatingButton';
+import ApiKeysFloatingButton from '@/components/ebook/ApiKeysFloatingButton';
 
 // Lazy-loaded pages for performance
 const EbookPlannerPage = lazy(() => import('./pages/EbookPlannerPage'));
@@ -602,6 +603,8 @@ const App = () => {
           {isAuthenticated && <FirstEbookOnboarding subscriberEmail={subscriberEmail} />}
           {/* EBOOKBOT - copilote IA flottant accessible sur tout le site */}
           <EbookbotFloatingButton />
+          {/* Bouton flottant Clés API & réglages (pages ebook / KDP) */}
+          {isAuthenticated && <ApiKeysFloatingButton />}
           <Toaster />
         </div>
       </TooltipProvider>
