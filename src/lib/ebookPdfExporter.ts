@@ -107,21 +107,27 @@ export const exportEbookToPdf = async (opts: {
     size: number,
     opts2: {
       bold?: boolean;
+      italic?: boolean;
       color?: [number, number, number];
       spacingAfter?: number;
       align?: 'left' | 'center' | 'justify';
       x?: number;
       maxW?: number;
       fontOverride?: 'helvetica' | 'times' | 'courier';
+      lineHeightMul?: number;
     } = {}
   ) => {
     const str = toText(text);
     if (!str) return;
-    doc.setFont(opts2.fontOverride || pdfFont, opts2.bold ? 'bold' : 'normal');
+    const fontStyle = opts2.bold && opts2.italic ? 'bolditalic'
+      : opts2.bold ? 'bold'
+      : opts2.italic ? 'italic'
+      : 'normal';
+    doc.setFont(opts2.fontOverride || pdfFont, fontStyle);
     doc.setFontSize(size);
-    doc.setTextColor(...(opts2.color || [35, 47, 62]));
+    doc.setTextColor(...(opts2.color || bodyRgb));
     const w = opts2.maxW ?? contentW;
-    const lineH = size * 1.45;
+    const lineH = size * (opts2.lineHeightMul ?? 1.45);
     const xLeft = opts2.x ?? margin;
 
     // Split by paragraphs first to preserve line breaks
