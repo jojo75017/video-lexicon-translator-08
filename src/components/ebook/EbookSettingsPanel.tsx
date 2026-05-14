@@ -204,12 +204,26 @@ export const EbookSettingsPanel: React.FC<Props> = ({ onTypographyChange }) => {
             </div>
             <div className="space-y-2 md:col-span-2">
               <Label>Clé API {PROVIDER_LABELS[provider]}</Label>
-              <Input
-                type="password"
-                value={currentKey}
-                onChange={e => updateKey(provider, e.target.value)}
-                placeholder={PROVIDER_KEY_HINT[provider]}
-              />
+              <div className="flex gap-2">
+                <Input
+                  type="password"
+                  value={currentKey}
+                  onChange={e => updateKey(provider, e.target.value)}
+                  placeholder={PROVIDER_KEY_HINT[provider]}
+                  className="flex-1"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={!currentKey || providerTest[provider] === 'testing'}
+                  onClick={() => testProviderKey(provider)}
+                  className="gap-1"
+                >
+                  <TestIcon s={providerTest[provider]} />
+                  Tester
+                </Button>
+              </div>
               {currentKey && (
                 <p className={`text-xs ${keyValid ? 'text-emerald-600' : 'text-destructive'}`}>
                   {keyValid ? '✓ Format de clé valide' : '⚠️ Format inattendu — vérifiez la clé'}
