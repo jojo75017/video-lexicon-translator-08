@@ -499,7 +499,7 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
               className="border-t border-joy-ink/5 bg-gradient-to-r from-white via-joy-cream/40 to-white"
               aria-label="Outils de l'étape"
             >
-              <div className="mx-auto flex max-w-7xl items-center gap-1 overflow-x-auto px-3 py-1.5 sm:px-6 scrollbar-thin">
+              <div className="mx-auto flex max-w-7xl items-center justify-center gap-2 overflow-x-auto px-3 py-2 sm:px-6 scrollbar-thin flex-wrap">
                 {PLANNER_SUBTABS[currentFamily]!.map((sub) => {
                   const active = isSubActive(sub.id);
                   return (
@@ -507,14 +507,13 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
                       key={sub.id}
                       onClick={() => onTabChange?.(sub.id)}
                       className={cn(
-                        'flex-shrink-0 rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 hover:scale-[1.05]',
+                        'flex-shrink-0 rounded-xl px-3.5 py-1.5 text-sm font-semibold transition-all duration-200 hover:scale-[1.05] border',
                         active
-                          ? 'bg-joy-teal/15 border border-joy-teal/30 font-semibold'
-                          : 'text-joy-ink/60 hover:text-[#FF9E2D] hover:bg-joy-cream',
+                          ? 'bg-white text-[#008296] border-[#008296]/40 shadow-sm'
+                          : 'bg-joy-cream/60 text-joy-ink/70 border-transparent hover:bg-white hover:text-[#FF9E2D] hover:border-[#FF9E2D]/30',
                       )}
-                      style={active ? { color: '#008296' } : undefined}
                     >
-                      {active && <span className="mr-1" aria-hidden>●</span>}
+                      {active && <span className="mr-1.5" aria-hidden>●</span>}
                       {sub.label}
                     </button>
                   );
