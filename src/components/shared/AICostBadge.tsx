@@ -19,7 +19,6 @@ const AICostBadge: React.FC = () => {
 
   const visible = VISIBLE_PREFIXES.some((p) => location.pathname.startsWith(p));
   if (!visible) return null;
-  if (entry.callsCount === 0) return null;
 
   return (
     <Popover>
