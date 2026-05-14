@@ -14,7 +14,36 @@ import {
   BorderStyle,
   ShadingType,
 } from 'docx';
-import { DEFAULT_TYPOGRAPHY, loadTypography, type EbookExportTypography } from './ebookExportOptions';
+import { DEFAULT_TYPOGRAPHY, loadTypography, type EbookExportTypography, hexNoHash, marginToDxa } from './ebookExportOptions';
+
+/** Parse very simple inline markdown (_italic_ / *italic*) into TextRun array. */
+const parseInline = (
+  text: string,
+  baseSize: number,
+  fontFamily: string,
+  color: string,
+  forceItalic = false,
+): TextRun[] => {
+  const runs: TextRun[] = [];
+  const re = /(_([^_\n]+)_|\*([^*\n]+)\*)/g;
+  let last = 0;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(text)) !== null) {
+    if (m.index > last) {
+      runs.push(new TextRun({ text: text.slice(last, m.index), size: baseSize, font: fontFamily, color, italics: forceItalic }));
+    }
+    const inner = m[2] || m[3] || '';
+    runs.push(new TextRun({ text: inner, size: baseSize, font: fontFamily, color, italics: true }));
+    last = m.index + m[0].length;
+  }
+  if (last < text.length) {
+    runs.push(new TextRun({ text: text.slice(last), size: baseSize, font: fontFamily, color, italics: forceItalic }));
+  }
+  if (runs.length === 0) {
+    runs.push(new TextRun({ text, size: baseSize, font: fontFamily, color, italics: forceItalic }));
+  }
+  return runs;
+};
 
 export type DocxBlock =
   | { kind?: 'paragraph'; heading?: string; text: string }
