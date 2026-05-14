@@ -195,9 +195,10 @@ const EbookPedagogiqueGenerator: React.FC<PedagogiqueGeneratorProps> = ({ ebookT
   };
 
   const generate = async () => {
-    const geminiKey = getGeminiKey();
-    if (!geminiKey || !geminiKey.startsWith('AIza')) {
-      toast.error("Clé Gemini manquante ou invalide. Renseignez-la dans Paramètres > Clés API (commence par 'AIza').");
+    const prov = getProvider();
+    const provKey = getProviderKey(prov);
+    if (!provKey || !validateKeyFormat(prov, provKey)) {
+      toast.error(`Clé ${PROVIDER_LABELS[prov]} manquante ou invalide. Renseignez-la dans Réglages avancés.`);
       return;
     }
     if (!topic.trim()) {
