@@ -430,7 +430,7 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
                       />
                     </div>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-0 max-h-[60vh] overflow-y-auto">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-0 max-h-[60vh] overflow-y-auto">
                     {filteredTools.map((group) => (
                       <div
                         key={group.family}
