@@ -191,7 +191,7 @@ export const exportEbookToDocx = async (opts: {
   sections: DocxSection[];
   typography?: Partial<EbookExportTypography>;
 }) => {
-  const typo: EbookExportTypography = { ...DEFAULT_TYPOGRAPHY, ...(opts.typography || {}) };
+  const typo: EbookExportTypography = { ...loadTypography(), ...(opts.typography || {}) };
   const fontFamily = typo.fontFamily;
   // docx-js sizes are in HALF-POINTS
   const bodyHalfPt = typo.bodySize * 2;
