@@ -3431,6 +3431,9 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
       case 'scolaire':
         return <EbookScolaireGenerator ebookTitle={ebookTitle} />;
 
+      case 'pedagogique':
+        return <EbookPedagogiqueGenerator ebookTitle={ebookTitle} />;
+
       case 'subscription':
         // Rediriger vers la page Abonnement
         navigate('/subscription');
