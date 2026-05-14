@@ -21,6 +21,35 @@ export const DEFAULT_TYPOGRAPHY: EbookExportTypography = {
   justify: true,
 };
 
+const TYPO_LS = 'ebook_export_typography_v1';
+
+/** Charge les options typo depuis localStorage (utilisé par défaut par les exporters). */
+export const loadTypography = (): EbookExportTypography => {
+  if (typeof window === 'undefined') return DEFAULT_TYPOGRAPHY;
+  try {
+    const raw = localStorage.getItem(TYPO_LS);
+    if (raw) return { ...DEFAULT_TYPOGRAPHY, ...JSON.parse(raw) };
+  } catch {}
+  return DEFAULT_TYPOGRAPHY;
+};
+
+export const saveTypography = (t: EbookExportTypography) => {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem(TYPO_LS, JSON.stringify(t));
+};
+
+const OPENROUTER_LS = 'openrouter_image_api_key';
+export const getOpenRouterImageKey = (): string => {
+  if (typeof window === 'undefined') return '';
+  return (localStorage.getItem(OPENROUTER_LS) || '').trim();
+};
+export const setOpenRouterImageKey = (k: string) => {
+  if (typeof window === 'undefined') return;
+  const v = (k || '').trim();
+  if (v) localStorage.setItem(OPENROUTER_LS, v);
+  else localStorage.removeItem(OPENROUTER_LS);
+};
+
 /** Famille jsPDF acceptée (helvetica / times / courier).
  *  jsPDF ne supporte pas Calibri/Garamond → fallback raisonnable. */
 export const pdfFontFor = (f: ExportFontFamily): 'helvetica' | 'times' | 'courier' => {
