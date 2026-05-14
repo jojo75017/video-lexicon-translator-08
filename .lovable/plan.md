@@ -1,68 +1,57 @@
-## Lancement public ebookstudio.fr — ce que reçoivent les abonnés
+## Plan : Livres Pédagogiques avec Schémas et Graphiques
 
-Tu offres déjà à tes abonnés actuels :
-1. **−30 % à vie** sur tout upsell / pack / formation
-2. **30 min de coaching Zoom 1:1 offert** → https://calendly.com/boubetgeorges/nouvelle-reunion
+### 1. Architecture Pédagogique (Phase Éditoriale)
+- **Structure recommandée** : Introduction → Concept théorique → Schéma explicatif → Exemple concret → Exercice pratique → Synthèse visuelle.
+- **Règle des 3 niveaux** : Chaque chapitre doit avoir (a) un schéma de synthèse global, (b) 2-4 graphiques de détail, (c) une infographie récapitulative finale.
+- **Contrôle de volume** : ~250 mots par page pour que les schémas ne noient pas le texte.
 
-Objectif : transformer ces abonnés en **ambassadeurs** (parrainage = bouche-à-oreille).
+### 2. Types de Visuels à Générer
+| Type | Usage | Format |
+|------|-------|--------|
+| Schéma conceptuel | Vue d'ensemble du chapitre | PNG, largeur 1200px |
+| Graphique de processus | Étapes, workflows, chronologies | PNG ou SVG |
+| Tableau comparatif | Comparaisons, avant/après | PNG |
+| Infographie récap | Page de fin de chapitre | PNG, carré ou vertical |
+| Mind map | Vision globale du livre | PNG |
 
----
+### 3. Pipeline de Création Proposé
 
-### 1. Email "Cadeau lancement" (à envoyer le jour J)
+**Étape 1 — Génération du manuscrit**
+- Utiliser le pipeline P1-P15 existant avec une contrainte supplémentaire : chaque section doit être annotée avec un tag `[VISUEL: type-schéma]` là où un graphique est nécessaire.
 
-Sujet : `🎁 Pour toi, avant tout le monde : 30 min en visio avec moi + −30 %`
+**Étape 2 — Extraction des briefs visuels**
+- Un agent dédié lit le manuscrit et génère pour chaque tag un brief technique : sujet, éléments clés, style (minimaliste, couleurs), dimensions.
 
-Corps (résumé) :
-- "Le grand lancement public démarre aujourd'hui. Avant les nouveaux, **toi tu as deux cadeaux** :"
-- 🎯 **30 min Zoom 1:1 offert** pour bloquer ton plan d'attaque KDP — bouton CTA → Calendly
-- 💸 **−30 % à vie** sur les upsells (formation, coaching VIP, packs prompts)
-- 🤝 **Ton lien de parrainage perso** — gagne 30 % sur chaque vente (lien dynamique vers `/parrainage`)
-- P.S. : "Partage ton lien aujourd'hui = double effet (tu aides un proche + tu touches une commission)."
+**Étape 3 — Génération des visuels**
+- Utiliser l'Imagen 3 existant (KDP Cover AI) avec des prompts structurés : "Diagramme éducatif minimaliste montrant X en 3 étapes, fond blanc, couleurs teal et orange, style flat design..."
 
-### 2. Bannière persistante dans /espace (header abonné)
+**Étape 4 — Assemblage**
+- Insérer les images générées dans le flux du texte au niveau des tags.
+- Exporter en PDF KDP-compliant (marge respectée, image haute résolution 300 DPI).
 
-Une **bandeau jovial teal** affiché 7 jours :
-```text
-🎉 Lancement en cours — Ton cadeau VIP : 30 min Zoom + −30 % à vie  [Réserver] [Mon lien parrainage]
-```
+### 4. Implémentation Technique Possible
 
-### 3. Page dédiée /espace/lancement (one-pager)
+**Option A — Léger (recommandé pour commencer)**
+- Ajouter un champ "Type de visuel" dans le générateur de chapitres (badge schéma/graphique/tableau).
+- Générer les visuels manuellement via l'outil Cover AI existant, puis upload dans l'éditeur de chapitre.
 
-3 blocs verticaux :
-1. **Ton coaching offert** → embed Calendly + rappel "1 fois, pas renouvelable"
-2. **Ton code −30 %** → code affiché en gros (ex: `MERCIVIP30`) + liste des produits éligibles
-3. **Ton kit ambassadeur** → lien parrainage + 3 textes pré-rédigés (Facebook, WhatsApp, email à un ami) à copier-coller
+**Option B — Automatisé**
+- Nouveau module "Pédagogie Visuelle" avec :
+  - Détection automatique des concepts complexes dans le texte (via Gemini).
+  - Génération automatique du brief visuel.
+  - Génération par lot des images (jusqu'à 20 par livre).
+  - Prévisualisation WYSIWYG du livre avec images positionnées.
 
-### 4. Post forum épinglé
+### 5. Contrôle Qualité
+- Vérifier que chaque schéma a une légende explicite.
+- Vérifier la lisibilité en noir et blanc (impression KDP) — éviter les dégradés subtils.
+- Respecter la règle : 1 visuel toutes les 2-3 pages maximum pour ne pas surcharger.
 
-Annonce dans la communauté : "Lancement en cours, voici vos 2 cadeaux + appel à partager."
-
-### 5. Reminder J+3
-
-Email court : "T'as réservé ton Zoom ? Il reste X créneaux cette semaine."
-
----
-
-### Côté technique (à faire dans l'app)
-
-- **Composant `LaunchVipBanner`** dans `EspaceHeader` (au-dessus de la nav, dismissible, dates de lancement codées en dur).
-- **Page `/espace/lancement`** (lazy route) avec :
-  - Iframe Calendly
-  - Code promo affiché + bouton "copier"
-  - Pull du `referral_code` de l'utilisateur depuis la table `referral_codes` + 3 templates de partage
-- **Edge function `send-launch-vip-email`** :
-  - Cible : tous les `subscribers` avec `status='active'`
-  - Resend API, template HTML aux couleurs KDP (teal #008296)
-  - Inclut le lien parrainage personnalisé de chaque abonné
-- **Tracking** : ajouter une ligne dans `admin_launches` (déjà créé) pour ce lancement avec date et lien vers les 2 cadeaux dans `notes`.
+### 6. Livrables
+- Manuscrit textuel enrichi de tags visuels.
+- Bibliothèque d'images générées (bucket `ebook-images`).
+- PDF final prêt KDP avec images intégrées à 300 DPI.
 
 ---
 
-### Ce que tu dois me valider avant que je code
-
-1. **Date du lancement public** (pour figer les bannières et l'envoi email)
-2. **Code promo −30 %** : tu veux un code unique (ex: `MERCIVIP30`) ou un code par abonné ?
-3. **Sur quoi s'applique le −30 %** : formation seule ? coaching VIP ? tout l'écosystème ?
-4. **Limite Calendly** : 1 créneau / abonné ou illimité ?
-
-Réponds-moi à ces 4 points et je passe en mode build pour créer la bannière, la page `/espace/lancement` et l'email VIP.
+**Recommandation de démarrage** : Commencer par l'Option A sur un chapitre test pour valider la qualité des schémas générés avant d'automatiser.

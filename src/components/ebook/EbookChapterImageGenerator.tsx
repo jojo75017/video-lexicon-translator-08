@@ -149,6 +149,19 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
         { value: 'glitch digital art', label: 'Glitch Art', preview: '📺' },
         { value: 'neon cyberpunk', label: 'Néon cyberpunk', preview: '💜' },
       ]
+    },
+    {
+      category: '📚 Pédagogique (livres éducatifs)',
+      styles: [
+        { value: 'educational diagram flat minimalist infographic clean white background labeled arrows teal and orange accents', label: 'Schéma conceptuel', preview: '📊' },
+        { value: 'process flowchart educational steps numbered boxes connected by arrows clean minimalist flat design white background', label: 'Diagramme de processus', preview: '🔄' },
+        { value: 'comparison table educational two columns before after pros cons clean flat design minimalist white background', label: 'Tableau comparatif', preview: '📋' },
+        { value: 'educational infographic vertical recap key points icons numbered sections clean modern flat design', label: 'Infographie récap', preview: '📈' },
+        { value: 'mind map educational central concept branches nodes hand drawn clean minimalist flat design white background', label: 'Mind map', preview: '🧠' },
+        { value: 'bar chart educational data visualization clean labeled axes flat minimalist design white background', label: 'Graphique de données', preview: '📊' },
+        { value: 'timeline educational chronological events horizontal arrow milestones clean flat design', label: 'Frise chronologique', preview: '⏱️' },
+        { value: 'anatomical labeled diagram educational scientific illustration clean white background', label: 'Schéma anatomique/labellé', preview: '🔬' },
+      ]
     }
   ];
 
