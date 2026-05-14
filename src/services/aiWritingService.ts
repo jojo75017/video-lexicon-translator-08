@@ -73,18 +73,31 @@ export const PROVIDER_KEY_HINT: Record<AIProvider, string> = {
   openrouter: "Clé commençant par sk-or-... (openrouter.ai)",
 };
 
-/** Modèles OpenRouter recommandés (slug officiel). */
-export const OPENROUTER_MODELS: { id: string; label: string }[] = [
-  { id: 'anthropic/claude-sonnet-4',           label: 'Claude Sonnet 4 (rédaction premium)' },
-  { id: 'anthropic/claude-3.5-sonnet',         label: 'Claude 3.5 Sonnet' },
-  { id: 'openai/gpt-4o',                       label: 'GPT-4o' },
-  { id: 'openai/gpt-4o-mini',                  label: 'GPT-4o mini (rapide & économique)' },
-  { id: 'google/gemini-2.5-pro',               label: 'Gemini 2.5 Pro' },
-  { id: 'google/gemini-2.5-flash',             label: 'Gemini 2.5 Flash' },
-  { id: 'deepseek/deepseek-chat',              label: 'DeepSeek V3 (économique)' },
-  { id: 'meta-llama/llama-3.3-70b-instruct',   label: 'Llama 3.3 70B' },
-  { id: 'mistralai/mistral-large',             label: 'Mistral Large' },
+/** Modèles OpenRouter recommandés (slug officiel).
+ *  pricing = $ par 1M tokens (input / output) — indicatif, à jour 2026-05. */
+export interface OpenRouterModelInfo {
+  id: string;
+  label: string;
+  pricing?: { in: number; out: number };
+  recommended?: boolean;
+  tag?: string; // ex: "Premium", "Économique", "Rapide"
+}
+export const OPENROUTER_MODELS: OpenRouterModelInfo[] = [
+  { id: 'anthropic/claude-sonnet-4',           label: 'Claude Sonnet 4',         pricing: { in: 3,    out: 15 },   recommended: true, tag: 'Premium · rédaction longue' },
+  { id: 'anthropic/claude-3.5-sonnet',         label: 'Claude 3.5 Sonnet',       pricing: { in: 3,    out: 15 },   tag: 'Premium' },
+  { id: 'openai/gpt-4o',                       label: 'GPT-4o',                  pricing: { in: 2.5,  out: 10 },   tag: 'Polyvalent' },
+  { id: 'openai/gpt-4o-mini',                  label: 'GPT-4o mini',             pricing: { in: 0.15, out: 0.60 }, tag: 'Rapide & économique' },
+  { id: 'google/gemini-2.5-pro',               label: 'Gemini 2.5 Pro',          pricing: { in: 1.25, out: 5 },    tag: 'Long contexte' },
+  { id: 'google/gemini-2.5-flash',             label: 'Gemini 2.5 Flash',        pricing: { in: 0.30, out: 2.5 },  tag: 'Rapide' },
+  { id: 'deepseek/deepseek-chat',              label: 'DeepSeek V3',             pricing: { in: 0.27, out: 1.10 }, tag: 'Économique' },
+  { id: 'meta-llama/llama-3.3-70b-instruct',   label: 'Llama 3.3 70B',           pricing: { in: 0.20, out: 0.60 }, tag: 'Open-source' },
+  { id: 'mistralai/mistral-large',             label: 'Mistral Large',           pricing: { in: 2,    out: 6 },    tag: 'Européen' },
 ];
+
+export const formatModelPricing = (m: OpenRouterModelInfo): string => {
+  if (!m.pricing) return '';
+  return `~$${m.pricing.in}/M in · $${m.pricing.out}/M out`;
+};
 
 export const getOpenRouterModel = (): string => {
   if (typeof window === 'undefined') return OPENROUTER_MODELS[0].id;
