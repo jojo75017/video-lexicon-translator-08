@@ -26,11 +26,36 @@ function extractGeminiText(data: any): string {
 /**
  * Appelle l'API Gemini avec un prompt et retourne le texte généré
  */
+/** Routage multi-provider : si l'abonné a sélectionné Claude/OpenAI dans
+ *  les Réglages avancés ET fourni une clé valide, on délègue. Sinon Gemini. */
+async function maybeRouteToOtherProvider(
+  prompt: string,
+  options: GeminiCallOptions
+): Promise<string | null> {
+  if (typeof window === 'undefined') return null;
+  try {
+    const provider = localStorage.getItem('ai_writing_provider');
+    if (provider !== 'claude' && provider !== 'openai') return null;
+    // Import dynamique pour éviter un cycle d'imports.
+    const { callAIWriting, getProviderKey, validateKeyFormat } = await import('./aiWritingService');
+    const key = getProviderKey(provider);
+    if (!key || !validateKeyFormat(provider, key)) return null;
+    return await callAIWriting(prompt, options);
+  } catch (e) {
+    console.warn('[geminiService] routage provider échoué, fallback Gemini', e);
+    return null;
+  }
+}
+
 export async function callGemini(
   apiKey: string,
   prompt: string,
   options: GeminiCallOptions = {}
 ): Promise<string> {
+  // Routage automatique vers Claude/OpenAI si configuré.
+  const routed = await maybeRouteToOtherProvider(prompt, options);
+  if (routed !== null) return routed;
+
   const {
     systemPrompt,
     temperature = 0.7,
