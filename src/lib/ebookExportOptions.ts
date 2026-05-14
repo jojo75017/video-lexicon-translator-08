@@ -45,6 +45,35 @@ export const COLOR_PRESETS = [
   { id: 'kdp',      label: 'KDP Pro (teal)', headingColor: '#008296', bodyColor: '#232F3E' },
 ] as const;
 
+/** Presets globaux complets (police + tailles + couleurs + interligne + marges).
+ *  Permet à l'abonné d'appliquer un style cohérent en 1 clic. */
+export const TYPO_PRESETS: { id: string; label: string; description: string; values: Partial<EbookExportTypography> }[] = [
+  {
+    id: 'lecture-confort',
+    label: '📖 Mode lecture confort',
+    description: 'Texte plus grand, gris doux, marges larges — idéal KDP papier',
+    values: { fontFamily: 'Georgia', headingSize: 16, bodySize: 14, justify: true, headingColor: '#374151', bodyColor: '#4B5563', italicQuotes: true, lineHeight: 1.5, margin: 'wide' },
+  },
+  {
+    id: 'kdp-pro',
+    label: '⭐ KDP Pro',
+    description: 'Charte EbookStudio · teal + Calibri · prêt à publier',
+    values: { fontFamily: 'Calibri', headingSize: 14, bodySize: 12, justify: true, headingColor: '#008296', bodyColor: '#232F3E', italicQuotes: true, lineHeight: 1.5, margin: 'standard' },
+  },
+  {
+    id: 'roman-classique',
+    label: '📚 Roman classique',
+    description: 'Garamond · texte serré · style édition française',
+    values: { fontFamily: 'Garamond', headingSize: 14, bodySize: 12, justify: true, headingColor: '#1F2937', bodyColor: '#111111', italicQuotes: true, lineHeight: 1.5, margin: 'standard' },
+  },
+  {
+    id: 'compact',
+    label: '⚡ Compact (économique)',
+    description: 'Moins de pages — utile pour les guides courts',
+    values: { fontFamily: 'Calibri', headingSize: 14, bodySize: 11, justify: true, headingColor: '#1F2937', bodyColor: '#111111', italicQuotes: true, lineHeight: 1.15, margin: 'tight' },
+  },
+];
+
 const TYPO_LS = 'ebook_export_typography_v1';
 
 /** Charge les options typo depuis localStorage (utilisé par défaut par les exporters). */
