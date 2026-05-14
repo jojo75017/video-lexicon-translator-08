@@ -92,33 +92,49 @@ export const WorkflowAIProviderBadge = () => {
           type="button"
           onClick={() => setOpen(true)}
           className={[
-            'w-full flex items-center justify-between gap-3 rounded-xl border px-4 py-2.5 text-left transition-all',
+            'w-full mx-auto max-w-3xl flex items-center justify-between gap-4 rounded-2xl border px-5 py-3.5 text-left transition-all shadow-sm',
             valid
-              ? 'bg-[#008296]/5 border-[#008296]/30 hover:bg-[#008296]/10'
-              : 'bg-orange-50 border-orange-300 hover:bg-orange-100 animate-pulse',
+              ? 'bg-gradient-to-r from-[#008296]/10 via-white to-[#FF9E2D]/10 border-[#008296]/25 hover:shadow-md'
+              : 'bg-gradient-to-r from-orange-100 via-amber-50 to-orange-100 border-orange-300 hover:shadow-md animate-pulse',
           ].join(' ')}
         >
           <div className="flex items-center gap-3 min-w-0">
-            {valid ? (
-              <CheckCircle2 className="h-5 w-5 text-[#008296] shrink-0" />
-            ) : (
-              <AlertTriangle className="h-5 w-5 text-orange-600 shrink-0" />
-            )}
+            <div
+              className={[
+                'flex h-10 w-10 items-center justify-center rounded-full shrink-0 ring-4',
+                valid
+                  ? 'bg-[#008296]/15 ring-[#008296]/10'
+                  : 'bg-orange-200/60 ring-orange-200/40',
+              ].join(' ')}
+            >
+              {valid ? (
+                <CheckCircle2 className="h-5 w-5 text-[#008296]" />
+              ) : (
+                <AlertTriangle className="h-5 w-5 text-orange-600" />
+              )}
+            </div>
             <div className="min-w-0">
               {valid ? (
-                <div className="text-sm">
-                  <span className="text-[#5b6675]">IA active : </span>
-                  <span className="font-semibold text-[#232F3E]">
-                    {PROVIDER_LABELS[provider]}
-                  </span>
-                  {modelLabel && (
-                    <span className="text-[#232F3E]"> — {modelLabel}</span>
-                  )}
-                </div>
+                <>
+                  <div className="text-base md:text-lg font-bold text-[#232F3E] leading-tight">
+                    ✨ IA active&nbsp;: {PROVIDER_LABELS[provider]}
+                    {modelLabel && (
+                      <span className="text-[#232F3E]"> — {modelLabel}</span>
+                    )}
+                  </div>
+                  <div className="text-xs text-[#5b6675] mt-0.5">
+                    Tous les agents P1–P15 utiliseront ce modèle
+                  </div>
+                </>
               ) : (
-                <div className="text-sm font-semibold text-orange-800">
-                  ⚠ Aucune IA configurée — cliquez pour choisir Gemini, Claude, ChatGPT ou OpenRouter
-                </div>
+                <>
+                  <div className="text-base md:text-lg font-bold text-orange-900 leading-tight">
+                    ⚠ Aucune IA configurée
+                  </div>
+                  <div className="text-xs text-orange-800 mt-0.5">
+                    Cliquez pour choisir Gemini, Claude, ChatGPT ou OpenRouter
+                  </div>
+                </>
               )}
             </div>
           </div>
