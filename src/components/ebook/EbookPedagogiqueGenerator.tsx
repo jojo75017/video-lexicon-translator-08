@@ -151,6 +151,9 @@ const EbookPedagogiqueGenerator: React.FC<PedagogiqueGeneratorProps> = ({ ebookT
   const [chapters, setChapters] = useState<PedagogiqueChapter[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [imageStyle, setImageStyle] = useState<'hatier-school' | 'flat-clean' | 'soft-planner'>('soft-planner');
+  const [imageStats, setImageStats] = useState<{ success: number; failed: number; lastError: 'credits' | 'rate' | 'other' | null }>(
+    { success: 0, failed: 0, lastError: null }
+  );
   const hydrated = useRef(false);
 
   useEffect(() => {
