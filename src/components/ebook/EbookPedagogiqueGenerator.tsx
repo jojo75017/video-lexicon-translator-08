@@ -512,6 +512,8 @@ QUALITÉ : surpasse-toi. Le rendu doit être digne d'un livre vendu en librairie
         </CardContent>
       </Card>
 
+      <EbookSettingsPanel onTypographyChange={setTypography} />
+
       <EbookProjectsPanel
         scope="pedagogique"
         label="Pédagogique"
