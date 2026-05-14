@@ -91,8 +91,16 @@ serve(async (req) => {
     if (!imageUrl) throw new Error('Aucune image générée');
 
     const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
-    const base64Data = imageUrl.replace(/^data:image\/\w+;base64,/, '');
-    const imageBuffer = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+    let imageBuffer: Uint8Array;
+    if (imageUrl.startsWith('data:')) {
+      const base64Data = imageUrl.replace(/^data:image\/\w+;base64,/, '');
+      imageBuffer = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+    } else {
+      // OpenRouter peut renvoyer une URL HTTP — on la télécharge pour la stocker dans notre bucket
+      const imgRes = await fetch(imageUrl);
+      if (!imgRes.ok) throw new Error('Téléchargement image distante échoué');
+      imageBuffer = new Uint8Array(await imgRes.arrayBuffer());
+    }
     const safeTitle = title.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9]/g, '-').substring(0, 40);
     const fileName = `${folder || 'educational'}/${Date.now()}-${safeTitle}.png`;
 
