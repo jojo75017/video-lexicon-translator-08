@@ -402,8 +402,8 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
             className="border-t border-joy-ink/5 bg-gradient-to-r from-white via-joy-cream/30 to-white"
             aria-label="Étapes du livre"
           >
-            <div className="mx-auto flex max-w-7xl items-center gap-1 overflow-x-auto px-3 py-2 sm:px-6 scrollbar-thin">
-              <div className="flex items-center gap-1 flex-1 min-w-0">
+            <div className="mx-auto flex max-w-7xl items-center gap-2 overflow-x-auto px-3 py-2.5 sm:px-6 scrollbar-thin">
+              <div className="flex items-center justify-center gap-2 flex-1 min-w-0 flex-wrap">
                 {PLANNER_TABS.map((tab) => {
                   const active = isFamilyActive(tab);
                   return (
@@ -411,18 +411,11 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
                       key={tab.id}
                       onClick={() => onTabChange?.(tab.id)}
                       className={cn(
-                        'flex-shrink-0 rounded-full px-4 py-1.5 text-sm font-semibold transition-all duration-200 hover:scale-[1.04]',
-                        active
-                          ? 'text-white shadow-[0_2px_10px_rgba(0,130,150,0.28)]'
-                          : 'text-joy-ink/70 hover:bg-joy-cream hover:text-[#FF9E2D]',
+                        'flex-shrink-0 inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-base font-bold transition-all duration-200 hover:scale-[1.05] ring-1',
+                        active ? `${tab.bgActive} ${tab.ring}` : `${tab.bg} ${tab.ring}`,
                       )}
-                      style={
-                        active
-                          ? { backgroundColor: 'hsl(var(--joy-teal))' }
-                          : undefined
-                      }
                     >
-                      <span className="mr-1.5" aria-hidden>{tab.emoji}</span>
+                      <span className="text-lg leading-none" aria-hidden>{tab.emoji}</span>
                       {tab.label}
                     </button>
                   );
