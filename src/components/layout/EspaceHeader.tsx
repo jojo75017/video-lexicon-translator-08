@@ -9,6 +9,7 @@ import { ArrowLeft, LogOut, Sparkles, LayoutGrid, Search, Shield, Settings } fro
 import { cn } from '@/lib/utils';
 import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
 import { EbookSettingsPanel } from '@/components/ebook/EbookSettingsPanel';
+import KdpPackButton from '@/components/shared/KdpPackButton';
 
 interface EspaceHeaderProps {
   projectTitle?: string | null;
@@ -331,6 +332,30 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
         </div>
 
         <div className="flex items-center gap-1">
+          <KdpPackButton
+            size="sm"
+            label="Pack KDP"
+            getOptions={() => {
+              // Récupère les infos du projet courant depuis localStorage (best-effort)
+              let ebookTitle = projectTitle || '';
+              let authorName = '';
+              let subtitle = '';
+              let kdpDescription = '';
+              let kdpKeywords = '';
+              try {
+                const raw = localStorage.getItem('ebook_current_project') || localStorage.getItem('ebookProject');
+                if (raw) {
+                  const p = JSON.parse(raw);
+                  ebookTitle = p.ebookTitle || p.title || ebookTitle;
+                  authorName = p.authorName || p.author || '';
+                  subtitle = p.subtitle || '';
+                  kdpDescription = p.kdpDescription || p.description || '';
+                  kdpKeywords = p.kdpKeywords || (Array.isArray(p.keywords) ? p.keywords.join(', ') : '') || '';
+                }
+              } catch {}
+              return { ebookTitle, authorName, subtitle, kdpDescription, kdpKeywords };
+            }}
+          />
           {isAdmin && (
             <TooltipProvider delayDuration={200}>
               <Tooltip>
