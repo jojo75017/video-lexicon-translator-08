@@ -6,9 +6,7 @@ import { Button } from '@/components/ui/button';
 const FIRST_VISIT_KEY = 'ebookstudio_first_visit_banner_dismissed';
 
 /**
- * Yellow banner displayed on first visit to /ebook-planner.
- * Invites the subscriber to read /guide-outils (2 min) before diving in.
- * Dismissed permanently via localStorage.
+ * Encart de bienvenue centré, jovial, affiché à la première visite du Planner.
  */
 export const FirstVisitBanner = () => {
   const navigate = useNavigate();
@@ -40,34 +38,39 @@ export const FirstVisitBanner = () => {
   if (!visible) return null;
 
   return (
-    <div className="bg-gradient-to-r from-kdp-orange/15 via-amber-200/20 to-kdp-orange/10 border-b border-kdp-orange/30">
-      <div className="container mx-auto px-6 py-3 flex items-center gap-4">
-        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-kdp-orange/20 flex-shrink-0">
-          <Sparkles className="h-4 w-4 text-kdp-orange" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-foreground">
-            👋 Bienvenue sur EbookStudio !
-          </p>
-          <p className="text-xs text-muted-foreground">
-            Découvrez le guide des outils en 2 min pour ne pas vous perdre dans les 44 outils disponibles.
-          </p>
-        </div>
-        <Button
-          size="sm"
-          onClick={goToGuide}
-          className="bg-kdp-orange hover:bg-kdp-orange/90 text-white rounded-lg flex-shrink-0"
-        >
-          Voir le guide
-          <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
-        </Button>
+    <div className="px-4 md:px-6 pt-3">
+      <div className="relative mx-auto max-w-3xl rounded-2xl border border-[#FF9E2D]/30 bg-gradient-to-br from-[#FF9E2D]/10 via-amber-50 to-[#008296]/5 shadow-sm px-6 py-5">
         <button
           onClick={dismiss}
           aria-label="Fermer"
-          className="p-1.5 rounded-md hover:bg-background/40 text-muted-foreground flex-shrink-0"
+          className="absolute top-2.5 right-2.5 p-1.5 rounded-md hover:bg-white/60 text-[#5b6675]"
         >
           <X className="h-4 w-4" />
         </button>
+
+        <div className="flex flex-col items-center text-center gap-3">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#FF9E2D]/20 ring-4 ring-[#FF9E2D]/10">
+            <Sparkles className="h-6 w-6 text-[#FF9E2D]" />
+          </div>
+
+          <div className="space-y-1">
+            <h2 className="text-lg md:text-xl font-bold text-[#232F3E]">
+              👋 Bienvenue sur EbookStudio !
+            </h2>
+            <p className="text-sm text-[#5b6675] max-w-xl mx-auto">
+              Découvrez le guide des outils en 2 min pour ne pas vous perdre dans les 44 outils disponibles.
+            </p>
+          </div>
+
+          <Button
+            size="sm"
+            onClick={goToGuide}
+            className="bg-[#FF9E2D] hover:bg-[#e88a14] text-white rounded-full px-5 font-semibold shadow-md"
+          >
+            Voir le guide
+            <ArrowRight className="ml-1.5 h-4 w-4" />
+          </Button>
+        </div>
       </div>
     </div>
   );
