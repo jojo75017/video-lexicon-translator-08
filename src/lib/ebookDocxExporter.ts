@@ -129,7 +129,10 @@ const buildCalloutTable = (
   body: string,
   bodyHalfPt: number,
   fontFamily: string,
-  justify: boolean
+  justify: boolean,
+  bodyColor: string,
+  italicQuotes: boolean,
+  lineHeight: number,
 ): Table => {
   const meta = CALLOUT_STYLE[variant] || CALLOUT_STYLE['point-cle'];
   const innerChildren: Paragraph[] = [
@@ -146,7 +149,7 @@ const buildCalloutTable = (
       })
     );
   }
-  innerChildren.push(...textToParagraphs(body, bodyHalfPt, fontFamily, justify));
+  innerChildren.push(...textToParagraphs(body, bodyHalfPt, fontFamily, justify, bodyColor, italicQuotes, lineHeight));
 
   const fullBorder = { style: BorderStyle.SINGLE, size: 12, color: meta.border };
   return new Table({
