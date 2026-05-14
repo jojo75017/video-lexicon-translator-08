@@ -19,6 +19,7 @@ import { useWorkflowCloudSync } from '@/hooks/useWorkflowCloudSync';
 import { WORKFLOW_STEPS, STEP_TO_TAB } from './WorkflowNavigation';
 import { WorkflowBookConfigForm } from './WorkflowBookConfigForm';
 import { toast } from 'sonner';
+import KdpPackButton from '@/components/shared/KdpPackButton';
 
 interface WorkflowDashboardProps {
   ebookTitle: string;
@@ -167,6 +168,16 @@ export const WorkflowDashboard: React.FC<WorkflowDashboardProps> = ({
               Exporter vers Audio Express
             </Button>
           )}
+          <KdpPackButton
+            size="sm"
+            label="Pack KDP ZIP"
+            getOptions={() => ({
+              ebookTitle: ebookTitle || 'Mon ebook',
+              authorName: authorName || '',
+              subtitle: bookSubtitle,
+              kdpDescription: bookDescription,
+            })}
+          />
         </div>
       </div>
 
