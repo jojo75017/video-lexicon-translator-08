@@ -341,10 +341,25 @@ QUALITÉ : surpasse-toi. Le rendu doit être digne d'un livre vendu en librairie
       if (!url) throw new Error("Pas d'image");
       setCachedImage(cacheKey, url);
       setChapters(prev => prev.map(c => c.id === chapter.id ? { ...c, imageUrl: url, isGeneratingImage: false } : c));
+      setImageStats(s => ({ success: s.success + 1, failed: s.failed, lastError: null }));
       toast.success('Illustration générée');
     } catch (e: any) {
       console.error(e);
-      toast.error(e?.message || 'Erreur génération image');
+      const raw = (e?.message || e?.context?.body || JSON.stringify(e || {})).toString().toLowerCase();
+      const errKind: 'credits' | 'rate' | 'other' =
+        raw.includes('payment_required') || raw.includes('credits') || raw.includes('402')
+          ? 'credits'
+          : raw.includes('rate') || raw.includes('429')
+          ? 'rate'
+          : 'other';
+      setImageStats(s => ({ success: s.success, failed: s.failed + 1, lastError: errKind }));
+      const msg =
+        errKind === 'credits'
+          ? '⚠️ Crédits IA Lovable épuisés — rechargez pour continuer'
+          : errKind === 'rate'
+          ? 'Limite atteinte, réessayez dans quelques instants'
+          : (e?.message || 'Erreur génération image');
+      toast.error(msg);
       setChapters(prev => prev.map(c => c.id === chapter.id ? { ...c, isGeneratingImage: false } : c));
     }
   };
