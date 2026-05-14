@@ -14,7 +14,7 @@ import {
   BorderStyle,
   ShadingType,
 } from 'docx';
-import { DEFAULT_TYPOGRAPHY, type EbookExportTypography } from './ebookExportOptions';
+import { DEFAULT_TYPOGRAPHY, loadTypography, type EbookExportTypography } from './ebookExportOptions';
 
 export type DocxBlock =
   | { kind?: 'paragraph'; heading?: string; text: string }

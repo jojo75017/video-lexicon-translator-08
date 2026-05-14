@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-import { DEFAULT_TYPOGRAPHY, type EbookExportTypography, pdfFontFor } from './ebookExportOptions';
+import { DEFAULT_TYPOGRAPHY, loadTypography, type EbookExportTypography, pdfFontFor } from './ebookExportOptions';
 
 export type PdfBlock =
   | { kind?: 'paragraph'; heading?: string; text: string }
