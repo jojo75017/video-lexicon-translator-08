@@ -207,13 +207,14 @@ export const EbookSettingsPanel: React.FC<Props> = ({ onTypographyChange }) => {
             <div className="space-y-2">
               <Label>Texte justifié</Label>
               <div className="flex items-center h-10 gap-2">
-                <Switch
+                <Checkbox
+                  id="justify-toggle"
                   checked={typo.justify}
-                  onCheckedChange={(checked) => updateTypo({ justify: checked })}
+                  onCheckedChange={(checked) => updateTypo({ justify: checked === true })}
                 />
-                <span className="text-xs text-muted-foreground">
+                <label htmlFor="justify-toggle" className="text-xs text-muted-foreground cursor-pointer">
                   {typo.justify ? 'Justifié (livre)' : 'Aligné à gauche'}
-                </span>
+                </label>
               </div>
             </div>
           </div>
