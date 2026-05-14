@@ -40,13 +40,25 @@ serve(async (req) => {
 
     const prompt = `${baseStyle}\n\nSubject: ${title}.${context ? ` Context: ${context}.` : ''}\n\nStrict rules: NO text, NO letters, NO numbers, NO words, NO writing of any kind in the image. Only pure illustration.`;
 
-    console.log('[generate-educational-image] Generating:', title);
+    console.log('[generate-educational-image] Generating:', title, '— provider:', useOpenRouter ? 'openrouter' : 'lovable');
 
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    const endpoint = useOpenRouter
+      ? 'https://openrouter.ai/api/v1/chat/completions'
+      : 'https://ai.gateway.lovable.dev/v1/chat/completions';
+    const authToken = useOpenRouter ? openrouterKey.trim() : LOVABLE_API_KEY!;
+    const modelId = useOpenRouter
+      ? 'google/gemini-2.5-flash-image-preview'
+      : 'google/gemini-2.5-flash-image';
+
+    const response = await fetch(endpoint, {
       method: 'POST',
-      headers: { 'Authorization': `Bearer ${LOVABLE_API_KEY}`, 'Content-Type': 'application/json' },
+      headers: {
+        'Authorization': `Bearer ${authToken}`,
+        'Content-Type': 'application/json',
+        ...(useOpenRouter ? { 'HTTP-Referer': 'https://ebookstudio.fr', 'X-Title': 'EbookStudio' } : {}),
+      },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash-image',
+        model: modelId,
         messages: [{ role: 'user', content: prompt }],
         modalities: ['image', 'text']
       }),
@@ -61,7 +73,11 @@ serve(async (req) => {
         });
       }
       if (response.status === 402) {
-        return new Response(JSON.stringify({ error: 'Crédits IA épuisés' }), {
+        return new Response(JSON.stringify({
+          error: useOpenRouter
+            ? 'Crédits OpenRouter épuisés — créditez votre compte sur openrouter.ai'
+            : 'Crédits IA Lovable épuisés'
+        }), {
           status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         });
       }
@@ -69,6 +85,8 @@ serve(async (req) => {
     }
 
     const data = await response.json();
+    // Lovable: choices[0].message.images[0].image_url.url (data: ou URL)
+    // OpenRouter (gemini image): choices[0].message.images[0].image_url.url
     const imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
     if (!imageUrl) throw new Error('Aucune image générée');
 
