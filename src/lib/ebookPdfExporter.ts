@@ -1,4 +1,5 @@
 import jsPDF from 'jspdf';
+import { DEFAULT_TYPOGRAPHY, type EbookExportTypography, pdfFontFor } from './ebookExportOptions';
 
 export type PdfBlock =
   | { kind?: 'paragraph'; heading?: string; text: string }
@@ -51,7 +52,14 @@ export const exportEbookToPdf = async (opts: {
   documentTitle: string;
   documentSubtitle?: string;
   sections: PdfSection[];
+  typography?: Partial<EbookExportTypography>;
 }) => {
+  const typo: EbookExportTypography = { ...DEFAULT_TYPOGRAPHY, ...(opts.typography || {}) };
+  const pdfFont = pdfFontFor(typo.fontFamily);
+  const headingSize = typo.headingSize;
+  const bodySize = typo.bodySize;
+  const justifyBody = typo.justify;
+
   const doc = new jsPDF({ unit: 'pt', format: 'a4' });
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
@@ -74,24 +82,65 @@ export const exportEbookToPdf = async (opts: {
     return String(v);
   };
 
-  const writeText = (text: any, size: number, opts2: { bold?: boolean; color?: [number, number, number]; spacingAfter?: number; align?: 'left' | 'center'; x?: number; maxW?: number } = {}) => {
+  // Justified rendering for a single line of words.
+  const drawJustifiedLine = (words: string[], xLeft: number, yBaseline: number, lineWidth: number) => {
+    if (words.length === 0) return;
+    if (words.length === 1) {
+      doc.text(words[0], xLeft, yBaseline);
+      return;
+    }
+    const totalWordsW = words.reduce((acc, w) => acc + doc.getTextWidth(w), 0);
+    const gap = (lineWidth - totalWordsW) / (words.length - 1);
+    let x = xLeft;
+    for (let i = 0; i < words.length; i++) {
+      doc.text(words[i], x, yBaseline);
+      x += doc.getTextWidth(words[i]) + gap;
+    }
+  };
+
+  const writeText = (
+    text: any,
+    size: number,
+    opts2: {
+      bold?: boolean;
+      color?: [number, number, number];
+      spacingAfter?: number;
+      align?: 'left' | 'center' | 'justify';
+      x?: number;
+      maxW?: number;
+      fontOverride?: 'helvetica' | 'times' | 'courier';
+    } = {}
+  ) => {
     const str = toText(text);
     if (!str) return;
-    doc.setFont('helvetica', opts2.bold ? 'bold' : 'normal');
+    doc.setFont(opts2.fontOverride || pdfFont, opts2.bold ? 'bold' : 'normal');
     doc.setFontSize(size);
     doc.setTextColor(...(opts2.color || [35, 47, 62]));
     const w = opts2.maxW ?? contentW;
-    const lines = doc.splitTextToSize(str, w);
-    const lineH = size * 1.35;
-    for (const line of lines) {
-      ensureSpace(lineH);
-      if (opts2.align === 'center') {
-        doc.text(line, pageW / 2, y + size * 0.9, { align: 'center' });
-      } else {
-        doc.text(line, opts2.x ?? margin, y + size * 0.9);
+    const lineH = size * 1.45;
+    const xLeft = opts2.x ?? margin;
+
+    // Split by paragraphs first to preserve line breaks
+    const paragraphs = str.split(/\n+/);
+    paragraphs.forEach((para, pi) => {
+      const lines: string[] = doc.splitTextToSize(para, w);
+      for (let li = 0; li < lines.length; li++) {
+        const line = lines[li];
+        ensureSpace(lineH);
+        const baseline = y + size * 0.9;
+        if (opts2.align === 'center') {
+          doc.text(line, pageW / 2, baseline, { align: 'center' });
+        } else if (opts2.align === 'justify' && li < lines.length - 1 && line.trim().includes(' ')) {
+          // Don't justify the last line of a paragraph
+          const words = line.split(/\s+/).filter(Boolean);
+          drawJustifiedLine(words, xLeft, baseline, w);
+        } else {
+          doc.text(line, xLeft, baseline);
+        }
+        y += lineH;
       }
-      y += lineH;
-    }
+      if (pi < paragraphs.length - 1) y += size * 0.3;
+    });
     y += opts2.spacingAfter ?? 6;
   };
 
@@ -99,34 +148,35 @@ export const exportEbookToPdf = async (opts: {
     const meta = CALLOUT_COLORS[variant] || CALLOUT_COLORS['point-cle'];
     const padding = 12;
     const innerW = contentW - padding * 2;
-    doc.setFontSize(10);
     const labelLines = 1;
-    doc.setFontSize(11);
+    doc.setFont(pdfFont, 'bold');
+    doc.setFontSize(bodySize);
     const titleLines = title ? doc.splitTextToSize(title, innerW).length : 0;
-    doc.setFontSize(10);
+    doc.setFont(pdfFont, 'normal');
+    doc.setFontSize(bodySize - 1);
     const bodyLines = doc.splitTextToSize(body || '', innerW);
-    const lineH = 13;
+    const lineH = (bodySize - 1) * 1.35;
     const boxH = padding * 2 + (labelLines + titleLines + bodyLines.length) * lineH + 4;
     ensureSpace(boxH + 8);
-    // background + border
     doc.setFillColor(...meta.fill);
     doc.setDrawColor(...meta.border);
     doc.setLineWidth(1.2);
     doc.roundedRect(margin, y, contentW, boxH, 6, 6, 'FD');
     let yy = y + padding;
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10);
+    doc.setFont(pdfFont, 'bold');
+    doc.setFontSize(bodySize - 1);
     doc.setTextColor(31, 41, 55);
     doc.text(meta.label, margin + padding, yy + 8);
     yy += lineH;
     if (title) {
-      doc.setFontSize(11);
+      doc.setFont(pdfFont, 'bold');
+      doc.setFontSize(bodySize);
       doc.setTextColor(17, 24, 39);
       const tl = doc.splitTextToSize(title, innerW);
       tl.forEach((l: string) => { doc.text(l, margin + padding, yy + 8); yy += lineH; });
     }
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
+    doc.setFont(pdfFont, 'normal');
+    doc.setFontSize(bodySize - 1);
     doc.setTextColor(31, 41, 55);
     bodyLines.forEach((l: string) => { doc.text(l, margin + padding, yy + 8); yy += lineH; });
     y += boxH + 10;
@@ -134,27 +184,29 @@ export const exportEbookToPdf = async (opts: {
 
   const drawDataTable = (headers: string[], rows: string[][], caption?: string) => {
     const colCount = Math.max(headers.length, 1);
+    // Distribute width EXACTLY across columns (no rounding gaps)
     const colW = contentW / colCount;
     const cellPad = 5;
-    const lineH = 11;
+    const tableFontSize = Math.max(8, bodySize - 2);
+    const lineH = tableFontSize * 1.25;
     const measureRowH = (cells: string[]) => {
-      doc.setFontSize(9);
+      doc.setFontSize(tableFontSize);
       let maxLines = 1;
-      cells.forEach((c, i) => {
+      cells.forEach((c) => {
         const lines = doc.splitTextToSize(toText(c), colW - cellPad * 2);
         maxLines = Math.max(maxLines, lines.length);
       });
       return maxLines * lineH + cellPad * 2;
     };
-    // header
+    // Header
     const headerH = measureRowH(headers);
     ensureSpace(headerH);
     doc.setFillColor(0, 130, 150);
     doc.setDrawColor(203, 213, 225);
     doc.setLineWidth(0.5);
     doc.rect(margin, y, contentW, headerH, 'FD');
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(9);
+    doc.setFont(pdfFont, 'bold');
+    doc.setFontSize(tableFontSize);
     doc.setTextColor(255, 255, 255);
     headers.forEach((h, i) => {
       const lines = doc.splitTextToSize(toText(h), colW - cellPad * 2);
@@ -164,8 +216,8 @@ export const exportEbookToPdf = async (opts: {
       if (i > 0) doc.line(margin + i * colW, y, margin + i * colW, y + headerH);
     });
     y += headerH;
-    // body
-    doc.setFont('helvetica', 'normal');
+    // Body
+    doc.setFont(pdfFont, 'normal');
     doc.setTextColor(31, 41, 55);
     rows.forEach((r, ri) => {
       const cells = Array(colCount).fill(0).map((_, i) => toText(r[i] ?? ''));
@@ -188,7 +240,7 @@ export const exportEbookToPdf = async (opts: {
     });
     y += 6;
     if (caption) {
-      writeText(caption, 9, { color: [107, 114, 128], align: 'center', spacingAfter: 10 });
+      writeText(caption, Math.max(8, bodySize - 3), { color: [107, 114, 128], align: 'center', spacingAfter: 10 });
     } else {
       y += 6;
     }
@@ -209,8 +261,9 @@ export const exportEbookToPdf = async (opts: {
       doc.addPage();
       y = margin;
     }
-    writeText(s.title, 20, { bold: true, color: [0, 130, 150], spacingAfter: 6 });
-    if (s.subtitle) writeText(s.subtitle, 11, { color: [120, 120, 120], spacingAfter: 8 });
+    // Chapter title — small dark heading (H6 equivalent), no big colored "chapitre IA"
+    writeText(s.title, headingSize, { bold: true, color: [35, 47, 62], spacingAfter: 8 });
+    if (s.subtitle) writeText(s.subtitle, bodySize - 1, { color: [120, 120, 120], spacingAfter: 8 });
 
     if (s.imageUrl) {
       const img = await loadImageDataUrl(s.imageUrl);
@@ -240,8 +293,8 @@ export const exportEbookToPdf = async (opts: {
         drawDataTable(tb.headers || [], tb.rows || [], tb.caption);
       } else {
         const pb = b as Extract<PdfBlock, { kind?: 'paragraph' }>;
-        if (pb.heading) writeText(pb.heading, 13, { bold: true, color: [255, 158, 45], spacingAfter: 4 });
-        if (pb.text) writeText(pb.text, 11, { spacingAfter: 8 });
+        if (pb.heading) writeText(pb.heading, bodySize + 1, { bold: true, color: [35, 47, 62], spacingAfter: 4 });
+        if (pb.text) writeText(pb.text, bodySize, { spacingAfter: 8, align: justifyBody ? 'justify' : 'left' });
       }
     }
   }
