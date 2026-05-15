@@ -9,8 +9,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import {
   Loader2, Copy, Check, TrendingUp, Users, Euro, Share2,
-  Mail, MessageSquare, Twitter, Image as ImageIcon, Link as LinkIcon,
+  Mail, MessageSquare, Twitter, Image as ImageIcon, Link as LinkIcon, Lock,
 } from 'lucide-react';
+import { isReferralActive, getReferralCountdown, REFERRAL_LAUNCH_DATE } from '@/lib/referralLaunch';
 
 const COMMISSION_RATE = 0.30;
 const PRICE = 67;
@@ -18,7 +19,49 @@ const COMMISSION = Math.round(PRICE * COMMISSION_RATE * 100) / 100; // 20.10
 
 const ORIGIN = 'https://ebookstudio.fr';
 
+const ReferralLockedScreen = () => {
+  const [t, setT] = useState(getReferralCountdown());
+  useEffect(() => {
+    const id = setInterval(() => setT(getReferralCountdown()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  const launchLabel = REFERRAL_LAUNCH_DATE.toLocaleDateString('fr-FR', {
+    day: 'numeric', month: 'long', year: 'numeric',
+  });
+  return (
+    <FunnelLayout>
+      <SeoHead title="Programme de parrainage — Ouverture le 1er juillet 2026" description="Le programme de parrainage EbookStudio ouvre officiellement le 1er juillet 2026." />
+      <div className="max-w-2xl mx-auto px-4 py-20 text-center">
+        <div className="w-20 h-20 mx-auto mb-6 bg-[#FF9E2D]/15 rounded-full flex items-center justify-center">
+          <Lock className="w-10 h-10 text-[#FF9E2D]" />
+        </div>
+        <h1 className="text-3xl md:text-4xl font-bold text-[#232F3E] mb-3">
+          Programme de parrainage
+        </h1>
+        <p className="text-lg text-[#232F3E]/70 mb-8">
+          Lancement officiel le <strong>{launchLabel}</strong>.<br />
+          À votre succès — préparez vos contacts dès maintenant.
+        </p>
+        {t && (
+          <div className="inline-flex gap-3 bg-[#FF9E2D] text-[#232F3E] rounded-xl px-6 py-4 font-mono font-bold text-2xl tabular-nums shadow-lg">
+            <span>{t.days}j</span><span className="opacity-50">:</span>
+            <span>{String(t.hours).padStart(2, '0')}h</span><span className="opacity-50">:</span>
+            <span>{String(t.minutes).padStart(2, '0')}m</span><span className="opacity-50">:</span>
+            <span>{String(t.seconds).padStart(2, '0')}s</span>
+          </div>
+        )}
+        <div className="mt-10">
+          <Link to="/promo" className="text-[#008296] hover:text-[#FF9E2D] underline">
+            ← Retour à l'accueil
+          </Link>
+        </div>
+      </div>
+    </FunnelLayout>
+  );
+};
+
 const PromoAffiliePage = () => {
+  if (!isReferralActive()) return <ReferralLockedScreen />;
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
