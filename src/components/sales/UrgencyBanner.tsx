@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { TrendingUp, ShieldCheck, Zap, Clock, CreditCard, Sparkles } from 'lucide-react';
+import { TrendingUp, ShieldCheck, Zap, Clock, CreditCard, Sparkles, Gift, Hourglass } from 'lucide-react';
 
 // Messages 100% factuels - aucun chiffre fictif (conformité DGCCRF + règle projet "no fake data")
 const messages = [
-  { icon: Clock, text: "Coaching VIP : 47€ au lieu de 197€ jusqu'au 15 juin", color: "text-kdp-orange" },
-  { icon: TrendingUp, text: "EbookStudio Pro : 67€ à vie, paiement unique", color: "text-kdp-orange" },
-  { icon: ShieldCheck, text: "Garantie 30 jours - remboursé sans question", color: "text-primary" },
-  { icon: CreditCard, text: "Paiement unique 67€ - pas d'abonnement", color: "text-primary" },
-  { icon: Zap, text: "Accès immédiat après paiement", color: "text-primary" },
-  { icon: Sparkles, text: "15 agents IA pour écrire ton ebook KDP", color: "text-primary" },
+  { icon: Gift, text: "Programme de parrainage — à votre succès ! Lancement officiel le 1er juillet", color: "text-[#232F3E]" },
+  { icon: Hourglass, text: "Parrainage : ouverture le 1er juillet — préparez vos contacts", color: "text-[#232F3E]" },
+  { icon: Clock, text: "Coaching VIP : 47€ au lieu de 197€ jusqu'au 15 juin", color: "text-[#232F3E]" },
+  { icon: TrendingUp, text: "EbookStudio Pro : 67€ à vie, paiement unique", color: "text-[#232F3E]" },
+  { icon: ShieldCheck, text: "Garantie 30 jours - remboursé sans question", color: "text-[#232F3E]" },
+  { icon: CreditCard, text: "Paiement unique 67€ - pas d'abonnement", color: "text-[#232F3E]" },
+  { icon: Zap, text: "Accès immédiat après paiement", color: "text-[#232F3E]" },
+  { icon: Sparkles, text: "15 agents IA pour écrire ton ebook KDP", color: "text-[#232F3E]" },
 ];
 
 export const UrgencyBanner: React.FC = () => {
