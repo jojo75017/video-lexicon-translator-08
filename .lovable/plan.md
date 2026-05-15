@@ -1,33 +1,52 @@
-## Objectif
+# Séquence 5 emails HTML — GetResponse
 
-1. Annoncer le parrainage dans le bandeau `UrgencyBanner` avec la **couleur orange charte** (`#FF9E2D` / `kdp-orange`).
-2. **Verrouiller le programme** jusqu'au **1er juillet 2026** : aucun lien de parrainage récupérable, aucune action possible avant cette date.
+Objectif : créer 5 emails HTML prêts à coller dans GetResponse pour lancer EbookStudio aujourd'hui. Livraison sous forme de fichiers `.html` téléchargeables + un aperçu d'objet/preheader pour chaque email.
 
-## Modifications
+## Ton et cadre
+- Tutoiement, ton chaleureux d'auteur à lecteur (cohérent avec la charte EbookStudio).
+- HTML simple compatible GetResponse : `<p>`, `<strong>`, `<em>`, `<a>`, `<br>`, `<h2>`, table simple pour le bouton CTA. Pas de CSS externe.
+- Couleurs charte : fond #FAFAFA, texte #232F3E, accent teal #008296, hover orange #FF9E2D.
+- Largeur max 600px, responsive basique (table centrée).
+- Signature : Georges — EbookStudio.
 
-### 1. `src/components/sales/UrgencyBanner.tsx`
-- Remplacer le fond actuel `bg-secondary` par un fond **orange charte** (`bg-[#FF9E2D]` ou `bg-kdp-orange`) avec texte sombre lisible.
-- Ajouter en tête de la liste de messages :
-  - 🎁 **"Programme de parrainage — à votre succès ! Lancement officiel le 1er juillet"**
-  - ⏳ **"Parrainage : ouverture le 1er juillet — préparez vos contacts"**
-- Pas de lien cliquable (le programme n'est pas actif).
+## Plan des 5 emails
 
-### 2. Verrouillage du parrainage avant le 1er juillet 2026
+1. **Email 1 — Présentation (pas de lien)**
+   - Objet : « Bienvenue — un mot avant qu'on commence »
+   - Préheader : « Je me présente, et ce qui arrive bientôt »
+   - Corps : qui est Georges, pourquoi EbookStudio existe, à qui ça s'adresse, rassurance (pas de spam, désabonnement 1 clic), annonce qu'une **vidéo de démo complète** arrive très bientôt.
+   - **Aucun lien d'achat, aucun CTA cliquable.** Juste du texte.
 
-Créer une constante partagée `REFERRAL_LAUNCH_DATE = new Date("2026-07-01T00:00:00+02:00")` (dans `src/lib/referralLaunch.ts` ou similaire) + helper `isReferralActive()`.
+2. **Email 2 — La promesse**
+   - Objet : « Écrire un livre en 1 journée, vraiment ? »
+   - Le déclic : ce que l'IA permet aujourd'hui pour publier sur Amazon KDP.
+   - 1 lien doux vers la page d'accueil ebookstudio.fr (pas encore l'offre).
 
-Sur la page `/promo/affilie` (`src/pages/promo/PromoAffiliePage.tsx`) et tout composant exposant le **lien de parrainage / dashboard filleuls** :
-- Si `Date.now() < REFERRAL_LAUNCH_DATE` → afficher un écran "🔒 Programme de parrainage — Ouverture le 1er juillet 2026" avec compte à rebours, et **masquer** le lien personnel + boutons de partage.
-- Sinon → comportement actuel inchangé.
+3. **Email 3 — Démo / Vidéo**
+   - Objet : « La vidéo est en ligne (5 min, regarde) »
+   - Présente la vidéo de démo de l'outil, capture d'écran cliquable.
+   - CTA : « Voir la démo ».
 
-Vérifier également :
-- `src/hooks/useReferral.ts` / `useReferralTracking.ts` : ne pas générer/exposer le code avant la date (retourner `null` ou `locked: true`).
-- Composants liés (boutons "Copier mon lien", widgets dashboard parrainage) : afficher l'état verrouillé.
+4. **Email 4 — Preuve & cas d'usage**
+   - Objet : « 3 livres publiés ce mois-ci avec EbookStudio »
+   - Mini cas concrets, types de niches qui marchent, lever les objections (« je ne sais pas écrire », « je n'ai pas le temps »).
+   - CTA : « Découvrir l'outil ».
 
-### 3. Footer `FunnelLayout`
-Le lien "💰 Programme d'affiliation - 30%" reste visible mais redirige vers la page verrouillée (avec compte à rebours), pas de changement de routing.
+5. **Email 5 — Offre lancement**
+   - Objet : « 67 € à vie — c'est maintenant »
+   - Présentation de l'offre paiement unique 67 € (lifetime, pas d'abonnement, conforme à la mémoire projet).
+   - Urgence douce, garantie, dernier rappel.
+   - CTA principal : « Je prends EbookStudio à 67 € ».
 
-## Hors scope
-- Pas de modification du tracking serveur (sera réactivé naturellement le 1er juillet).
-- Pas de retrait du lien dans la navigation — la page elle-même gère le verrouillage.
-- Pas de touche au CTA 67€ ni aux autres bandeaux.
+## Détails techniques
+- Génération via un script Node qui écrit 5 fichiers dans `/mnt/documents/getresponse/` :
+  `email-1-presentation.html` … `email-5-offre.html`.
+- Chaque fichier = HTML complet (`<!doctype>` + `<html>` + `<body>`) collable tel quel dans l'éditeur HTML brut de GetResponse.
+- Un fichier `README.txt` listant pour chaque email : objet, préheader, jour d'envoi suggéré (J0, J+2, J+4, J+6, J+8).
+- QA visuelle : conversion de chaque HTML en PNG (via headless) pour vérifier rendu avant livraison.
+
+## Questions rapides avant génération
+Si tu veux je peux ajuster, sinon je pars sur ces hypothèses :
+- Lien démo vidéo = `https://ebookstudio.fr/demo` (à confirmer, sinon je mets `[LIEN_VIDEO]`).
+- Lien offre = `https://ebookstudio.fr/offres`.
+- Logo / image d'en-tête : aucun pour rester sobre et passer les filtres anti-spam (juste texte stylé).
