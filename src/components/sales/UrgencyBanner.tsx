@@ -28,7 +28,7 @@ export const UrgencyBanner: React.FC = () => {
   const Icon = current.icon;
 
   return (
-    <div className="bg-secondary border-y border-kdp-orange/20 py-2.5 overflow-hidden">
+    <div className="bg-[#FF9E2D] border-y border-[#FF9E2D]/30 py-2.5 overflow-hidden">
       <motion.div
         key={currentIndex}
         initial={{ opacity: 0, y: 10 }}
