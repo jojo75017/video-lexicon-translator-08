@@ -37,7 +37,7 @@ export const UrgencyBanner: React.FC = () => {
         className="flex items-center justify-center gap-2 text-sm"
       >
         <Icon className={`w-4 h-4 ${current.color}`} />
-        <span className="text-foreground/80 font-medium">{current.text}</span>
+        <span className="text-[#232F3E] font-semibold">{current.text}</span>
       </motion.div>
     </div>
   );
