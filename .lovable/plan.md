@@ -1,37 +1,33 @@
-## Mise à jour du script vidéo 22 min — Ajout nouveautés V2
+## Objectif
 
-J'ajoute au fichier `SCRIPT_VIDEO_EBOOKSTUDIO_V2_22MIN.md` les nouveautés V2 que tu viens de me citer, sans toucher au reste du script existant.
+1. Annoncer le parrainage dans le bandeau `UrgencyBanner` avec la **couleur orange charte** (`#FF9E2D` / `kdp-orange`).
+2. **Verrouiller le programme** jusqu'au **1er juillet 2026** : aucun lien de parrainage récupérable, aucune action possible avant cette date.
 
-### Ce que j'ajoute
+## Modifications
 
-**1. Nouveau bloc "Slide 2bis — Les 3 révolutions V2" (~2 min, intercalé après la promesse)**
+### 1. `src/components/sales/UrgencyBanner.tsx`
+- Remplacer le fond actuel `bg-secondary` par un fond **orange charte** (`bg-[#FF9E2D]` ou `bg-kdp-orange`) avec texte sombre lisible.
+- Ajouter en tête de la liste de messages :
+  - 🎁 **"Programme de parrainage — à votre succès ! Lancement officiel le 1er juillet"**
+  - ⏳ **"Parrainage : ouverture le 1er juillet — préparez vos contacts"**
+- Pas de lien cliquable (le programme n'est pas actif).
 
-- **Révolution 1 — OpenRouter intégré (choix du modèle)**  
-  L'abonné peut désormais choisir SON moteur IA : Claude Sonnet 4, GPT-4o, Gemini 2.5 Pro, DeepSeek, Llama, Mistral… via une seule clé OpenRouter. Liberté totale, pas de lock-in Gemini.
+### 2. Verrouillage du parrainage avant le 1er juillet 2026
 
-- **Révolution 2 — Le Pack Outils (au-delà de l'ebook classique)**  
-  EbookStudio V2 ne fait plus seulement des ebooks romans/non-fiction. Tu peux générer :
-  - 📘 Atlas
-  - 📚 Encyclopédies
-  - 🎨 Livres de coloriage
-  - 🎓 Livres pédagogiques & parascolaires
-  - 📅 Agendas
-  - 💥 Bandes dessinées (BD Studio avec ta clé OpenRouter)
-  - Et bien d'autres formats KDP rentables
+Créer une constante partagée `REFERRAL_LAUNCH_DATE = new Date("2026-07-01T00:00:00+02:00")` (dans `src/lib/referralLaunch.ts` ou similaire) + helper `isReferralActive()`.
 
-- **Révolution 3 — Couverture pro avec ta clé OpenRouter**  
-  Tu créditez 5€, 10€ ou 20€ sur OpenRouter et tu génères des couvertures avec TOUS les points essentiels imaginables (typographie, mood, style, niche, public cible…). "Je ne peux pas tout vous citer, vous le découvrirez en l'utilisant."
+Sur la page `/promo/affilie` (`src/pages/promo/PromoAffiliePage.tsx`) et tout composant exposant le **lien de parrainage / dashboard filleuls** :
+- Si `Date.now() < REFERRAL_LAUNCH_DATE` → afficher un écran "🔒 Programme de parrainage — Ouverture le 1er juillet 2026" avec compte à rebours, et **masquer** le lien personnel + boutons de partage.
+- Sinon → comportement actuel inchangé.
 
-**2. Phrase signature ajoutée à la slide finale (CTA)**  
-> "Et sachez que je suis toujours là pour vous."
+Vérifier également :
+- `src/hooks/useReferral.ts` / `useReferralTracking.ts` : ne pas générer/exposer le code avant la date (retourner `null` ou `locked: true`).
+- Composants liés (boutons "Copier mon lien", widgets dashboard parrainage) : afficher l'état verrouillé.
 
-### Impact sur le timing
+### 3. Footer `FunnelLayout`
+Le lien "💰 Programme d'affiliation - 30%" reste visible mais redirige vers la page verrouillée (avec compte à rebours), pas de changement de routing.
 
-Le script passe de ~22 min à ~24 min. Je réajuste la table de timing slide par slide pour que tout reste cohérent.
-
-### Ce que je NE touche pas
-
-- Le reste du script mot-pour-mot existant (P1→P15, audio, KDP, marketing, pricing 67€, garantie 30 jours)
-- Aucun fichier de code de l'app
-
-Confirme et j'applique.
+## Hors scope
+- Pas de modification du tracking serveur (sera réactivé naturellement le 1er juillet).
+- Pas de retrait du lien dans la navigation — la page elle-même gère le verrouillage.
+- Pas de touche au CTA 67€ ni aux autres bandeaux.
