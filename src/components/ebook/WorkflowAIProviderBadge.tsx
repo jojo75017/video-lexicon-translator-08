@@ -87,15 +87,15 @@ export const WorkflowAIProviderBadge = () => {
 
   return (
     <>
-      <div className="px-4 md:px-6 pt-3">
+      <div className="px-4 md:px-6 lg:px-10 pt-3">
         <button
           type="button"
           onClick={() => setOpen(true)}
           className={[
-            'w-full mx-auto max-w-3xl flex items-center justify-between gap-4 rounded-2xl border px-5 py-3.5 text-left transition-all shadow-sm',
+            'w-full mx-auto max-w-[1600px] flex items-center justify-between gap-4 rounded-2xl border px-6 py-4 text-left transition-all shadow-[0_4px_20px_-4px_rgba(0,130,150,0.15)] hover:shadow-[0_8px_30px_-6px_rgba(0,130,150,0.25)]',
             valid
-              ? 'bg-gradient-to-r from-[#008296]/10 via-white to-[#FF9E2D]/10 border-[#008296]/25 hover:shadow-md'
-              : 'bg-gradient-to-r from-orange-100 via-amber-50 to-orange-100 border-orange-300 hover:shadow-md animate-pulse',
+              ? 'bg-gradient-to-r from-[#008296] via-[#0a6b7a] to-[#005f6b] border-[#FF9E2D]/40 text-white'
+              : 'bg-gradient-to-r from-orange-100 via-amber-50 to-orange-100 border-orange-300 animate-pulse',
           ].join(' ')}
         >
           <div className="flex items-center gap-3 min-w-0">
