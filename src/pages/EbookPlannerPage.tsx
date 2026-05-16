@@ -3510,16 +3510,16 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
             </Button>
           </div>
         )}
-        {/* Hero Header - Joyful */}
-        <div className="relative overflow-hidden bg-joy-cream border-b-2 border-joy-ink/10">
-          {/* Joyful blobs */}
+        {/* Hero Header - Premium */}
+        <div className="relative overflow-hidden bg-gradient-to-br from-[#0f1419] via-[#1a2530] to-[#0f1419] border-b border-[#FF9E2D]/20">
+          {/* Subtle premium accents */}
           <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-            <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full bg-joy-peach/60 blur-3xl animate-joy-float" />
-            <div className="absolute -bottom-20 -left-20 w-72 h-72 rounded-full bg-joy-mint/50 blur-3xl animate-joy-float" style={{ animationDelay: '1.5s' }} />
-            <div className="absolute top-1/2 left-1/3 w-60 h-60 rounded-full bg-joy-sun/40 blur-3xl animate-joy-float" style={{ animationDelay: '3s' }} />
+            <div className="absolute -top-40 -right-40 w-[500px] h-[500px] rounded-full bg-[#008296]/10 blur-3xl" />
+            <div className="absolute -bottom-40 -left-40 w-[500px] h-[500px] rounded-full bg-[#FF9E2D]/5 blur-3xl" />
+            <div aria-hidden className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '32px 32px' }} />
           </div>
 
-          <div className="relative container mx-auto px-6 py-6">
+          <div className="relative max-w-[1600px] mx-auto px-6 lg:px-10 py-7">
             {/* Top bar */}
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2">
@@ -3529,7 +3529,7 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
                     setActiveTab('workflow-dashboard');
                     setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 50);
                   }}
-                  className="text-joy-ink hover:bg-white border-2 border-joy-ink/20 bg-white rounded-full text-sm font-bold"
+                  className="text-white hover:bg-white/10 border border-white/20 bg-white/5 backdrop-blur-sm rounded-full text-sm font-semibold"
                 >
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Retour au tableau de bord
@@ -3541,7 +3541,7 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
                   type="button"
                   onClick={handleManualSave}
                   disabled={isSaving || !ebookTitle}
-                  className="bg-white hover:bg-joy-cream text-joy-ink border-2 border-joy-ink/20 rounded-full font-bold transition-all"
+                  className="bg-white/5 hover:bg-white/10 text-white border border-white/20 backdrop-blur-sm rounded-full font-semibold transition-all"
                 >
                   <Save className="h-4 w-4 mr-2" />
                   {isSaving ? 'Sauvegarde...' : 'Sauvegarder'}
@@ -3549,7 +3549,7 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
                 <Button
                   type="button"
                   onClick={resetPlan}
-                  className="bg-joy-peach hover:bg-joy-peach/80 text-joy-ink border-2 border-joy-ink/10 rounded-full font-bold"
+                  className="bg-[#FF9E2D] hover:bg-[#FF9E2D]/90 text-[#0f1419] border-0 rounded-full font-bold shadow-lg shadow-[#FF9E2D]/20"
                 >
                   <Plus className="h-4 w-4 mr-2" />
                   Nouveau
@@ -3557,56 +3557,56 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
               </div>
             </div>
 
-            <div className="max-w-3xl mx-auto text-center pb-6">
-              <div className="inline-flex items-center justify-center w-16 h-16 mb-5 rounded-3xl bg-joy-sun shadow-joy animate-joy-float">
-                <Sparkles className="w-8 h-8 text-joy-ink" />
+            <div className="max-w-3xl mx-auto text-center pb-4">
+              <div className="inline-flex items-center justify-center w-14 h-14 mb-5 rounded-2xl bg-gradient-to-br from-[#FF9E2D] to-[#FF7B00] shadow-lg shadow-[#FF9E2D]/30">
+                <Sparkles className="w-7 h-7 text-[#0f1419]" />
               </div>
 
-              <h1 className="text-4xl md:text-5xl font-black mb-3 text-joy-ink tracking-tight">
+              <h1 className="text-4xl md:text-5xl font-bold mb-3 text-white tracking-tight">
                 {ebookTitle || (
-                  <>Ton <span className="px-2 rounded-2xl bg-joy-bubblegum/40 inline-block -rotate-1">studio</span> ✨</>
+                  <>Votre <span className="bg-gradient-to-r from-[#FF9E2D] to-[#FFB85C] bg-clip-text text-transparent">studio éditorial</span></>
                 )}
               </h1>
 
               {isSaving && (
-                <Badge className="bg-joy-mint text-joy-ink border-0 font-bold">
+                <Badge className="bg-[#008296] text-white border-0 font-semibold">
                   <Save className="w-3 h-3 mr-1 animate-pulse" />
                   Sauvegarde...
                 </Badge>
               )}
 
-              <p className="text-joy-ink/70 max-w-xl mx-auto mt-2 text-sm tracking-wide uppercase font-bold">
-                Crée des ebooks pros avec tes 15 agents IA 🌈
+              <p className="text-white/60 max-w-xl mx-auto mt-2 text-xs tracking-[0.2em] uppercase font-semibold">
+                15 agents IA · Édition professionnelle Amazon KDP
               </p>
 
               {/* CTA principal unique */}
-              <div className="mt-6 flex flex-col items-center gap-2">
+              <div className="mt-6 flex flex-col items-center gap-3">
                 <Button
                   type="button"
                   onClick={() => handleTabChange('editorial-director')}
-                  className="bg-joy-ink text-joy-cream hover:bg-joy-ink/90 font-black px-8 py-6 h-auto rounded-full shadow-joy hover:shadow-joy-lg transition-all hover:-translate-y-0.5"
+                  className="bg-[#FF9E2D] text-[#0f1419] hover:bg-[#FF9E2D]/90 font-bold px-8 py-6 h-auto rounded-full shadow-xl shadow-[#FF9E2D]/30 transition-all hover:-translate-y-0.5 hover:shadow-2xl hover:shadow-[#FF9E2D]/40"
                 >
                   <Rocket className="w-5 h-5 mr-3" />
-                  🚀 Créer mon ebook (Workflow IA)
+                  Créer mon ebook (Workflow IA)
                 </Button>
                 <button
                   type="button"
                   onClick={() => handleTabChange('planner')}
-                  className="text-xs text-joy-ink/60 underline-offset-2 hover:underline hover:text-joy-ink transition-colors"
+                  className="text-xs text-white/50 underline-offset-2 hover:underline hover:text-white/80 transition-colors"
                 >
                   ou utiliser le formulaire manuel
                 </button>
               </div>
 
-              <p className="mt-5 text-joy-ink/70 text-sm italic">
-                🚀 1, 2, 3… Fonce ! Je suis là pour t'accompagner en Zoom gratuit - Georges
+              <p className="mt-5 text-white/50 text-xs italic">
+                Accompagnement gratuit en Zoom — Georges
               </p>
             </div>
           </div>
         </div>
 
         {/* Content */}
-        <div ref={contentContainerRef} className="container mx-auto px-6 py-8">
+        <div ref={contentContainerRef} className="max-w-[1600px] mx-auto px-6 lg:px-10 py-8">
           <DemoBanner 
             plansGenerated={demoLimits.plansGenerated} 
             maxPlans={demoLimits.maxPlansInDemo} 
