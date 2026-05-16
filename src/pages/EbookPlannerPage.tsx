@@ -3606,7 +3606,7 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
         </div>
 
         {/* Content */}
-        <div ref={contentContainerRef} className="container mx-auto px-6 py-8">
+        <div ref={contentContainerRef} className="max-w-[1600px] mx-auto px-6 lg:px-10 py-8">
           <DemoBanner 
             plansGenerated={demoLimits.plansGenerated} 
             maxPlans={demoLimits.maxPlansInDemo} 
