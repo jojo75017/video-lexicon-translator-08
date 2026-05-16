@@ -3510,16 +3510,16 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
             </Button>
           </div>
         )}
-        {/* Hero Header - Joyful */}
-        <div className="relative overflow-hidden bg-joy-cream border-b-2 border-joy-ink/10">
-          {/* Joyful blobs */}
+        {/* Hero Header - Premium */}
+        <div className="relative overflow-hidden bg-gradient-to-br from-[#0f1419] via-[#1a2530] to-[#0f1419] border-b border-[#FF9E2D]/20">
+          {/* Subtle premium accents */}
           <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-            <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full bg-joy-peach/60 blur-3xl animate-joy-float" />
-            <div className="absolute -bottom-20 -left-20 w-72 h-72 rounded-full bg-joy-mint/50 blur-3xl animate-joy-float" style={{ animationDelay: '1.5s' }} />
-            <div className="absolute top-1/2 left-1/3 w-60 h-60 rounded-full bg-joy-sun/40 blur-3xl animate-joy-float" style={{ animationDelay: '3s' }} />
+            <div className="absolute -top-40 -right-40 w-[500px] h-[500px] rounded-full bg-[#008296]/10 blur-3xl" />
+            <div className="absolute -bottom-40 -left-40 w-[500px] h-[500px] rounded-full bg-[#FF9E2D]/5 blur-3xl" />
+            <div aria-hidden className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '32px 32px' }} />
           </div>
 
-          <div className="relative container mx-auto px-6 py-6">
+          <div className="relative max-w-[1600px] mx-auto px-6 lg:px-10 py-7">
             {/* Top bar */}
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2">
