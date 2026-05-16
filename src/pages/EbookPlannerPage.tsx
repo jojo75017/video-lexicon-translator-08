@@ -3529,7 +3529,7 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
                     setActiveTab('workflow-dashboard');
                     setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 50);
                   }}
-                  className="text-joy-ink hover:bg-white border-2 border-joy-ink/20 bg-white rounded-full text-sm font-bold"
+                  className="text-white hover:bg-white/10 border border-white/20 bg-white/5 backdrop-blur-sm rounded-full text-sm font-semibold"
                 >
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Retour au tableau de bord
@@ -3541,7 +3541,7 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
                   type="button"
                   onClick={handleManualSave}
                   disabled={isSaving || !ebookTitle}
-                  className="bg-white hover:bg-joy-cream text-joy-ink border-2 border-joy-ink/20 rounded-full font-bold transition-all"
+                  className="bg-white/5 hover:bg-white/10 text-white border border-white/20 backdrop-blur-sm rounded-full font-semibold transition-all"
                 >
                   <Save className="h-4 w-4 mr-2" />
                   {isSaving ? 'Sauvegarde...' : 'Sauvegarder'}
@@ -3549,7 +3549,7 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
                 <Button
                   type="button"
                   onClick={resetPlan}
-                  className="bg-joy-peach hover:bg-joy-peach/80 text-joy-ink border-2 border-joy-ink/10 rounded-full font-bold"
+                  className="bg-[#FF9E2D] hover:bg-[#FF9E2D]/90 text-[#0f1419] border-0 rounded-full font-bold shadow-lg shadow-[#FF9E2D]/20"
                 >
                   <Plus className="h-4 w-4 mr-2" />
                   Nouveau
@@ -3557,49 +3557,49 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
               </div>
             </div>
 
-            <div className="max-w-3xl mx-auto text-center pb-6">
-              <div className="inline-flex items-center justify-center w-16 h-16 mb-5 rounded-3xl bg-joy-sun shadow-joy animate-joy-float">
-                <Sparkles className="w-8 h-8 text-joy-ink" />
+            <div className="max-w-3xl mx-auto text-center pb-4">
+              <div className="inline-flex items-center justify-center w-14 h-14 mb-5 rounded-2xl bg-gradient-to-br from-[#FF9E2D] to-[#FF7B00] shadow-lg shadow-[#FF9E2D]/30">
+                <Sparkles className="w-7 h-7 text-[#0f1419]" />
               </div>
 
-              <h1 className="text-4xl md:text-5xl font-black mb-3 text-joy-ink tracking-tight">
+              <h1 className="text-4xl md:text-5xl font-bold mb-3 text-white tracking-tight">
                 {ebookTitle || (
-                  <>Ton <span className="px-2 rounded-2xl bg-joy-bubblegum/40 inline-block -rotate-1">studio</span> ✨</>
+                  <>Votre <span className="bg-gradient-to-r from-[#FF9E2D] to-[#FFB85C] bg-clip-text text-transparent">studio éditorial</span></>
                 )}
               </h1>
 
               {isSaving && (
-                <Badge className="bg-joy-mint text-joy-ink border-0 font-bold">
+                <Badge className="bg-[#008296] text-white border-0 font-semibold">
                   <Save className="w-3 h-3 mr-1 animate-pulse" />
                   Sauvegarde...
                 </Badge>
               )}
 
-              <p className="text-joy-ink/70 max-w-xl mx-auto mt-2 text-sm tracking-wide uppercase font-bold">
-                Crée des ebooks pros avec tes 15 agents IA 🌈
+              <p className="text-white/60 max-w-xl mx-auto mt-2 text-xs tracking-[0.2em] uppercase font-semibold">
+                15 agents IA · Édition professionnelle Amazon KDP
               </p>
 
               {/* CTA principal unique */}
-              <div className="mt-6 flex flex-col items-center gap-2">
+              <div className="mt-6 flex flex-col items-center gap-3">
                 <Button
                   type="button"
                   onClick={() => handleTabChange('editorial-director')}
-                  className="bg-joy-ink text-joy-cream hover:bg-joy-ink/90 font-black px-8 py-6 h-auto rounded-full shadow-joy hover:shadow-joy-lg transition-all hover:-translate-y-0.5"
+                  className="bg-[#FF9E2D] text-[#0f1419] hover:bg-[#FF9E2D]/90 font-bold px-8 py-6 h-auto rounded-full shadow-xl shadow-[#FF9E2D]/30 transition-all hover:-translate-y-0.5 hover:shadow-2xl hover:shadow-[#FF9E2D]/40"
                 >
                   <Rocket className="w-5 h-5 mr-3" />
-                  🚀 Créer mon ebook (Workflow IA)
+                  Créer mon ebook (Workflow IA)
                 </Button>
                 <button
                   type="button"
                   onClick={() => handleTabChange('planner')}
-                  className="text-xs text-joy-ink/60 underline-offset-2 hover:underline hover:text-joy-ink transition-colors"
+                  className="text-xs text-white/50 underline-offset-2 hover:underline hover:text-white/80 transition-colors"
                 >
                   ou utiliser le formulaire manuel
                 </button>
               </div>
 
-              <p className="mt-5 text-joy-ink/70 text-sm italic">
-                🚀 1, 2, 3… Fonce ! Je suis là pour t'accompagner en Zoom gratuit - Georges
+              <p className="mt-5 text-white/50 text-xs italic">
+                Accompagnement gratuit en Zoom — Georges
               </p>
             </div>
           </div>
