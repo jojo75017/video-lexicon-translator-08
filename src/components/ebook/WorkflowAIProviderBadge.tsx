@@ -148,12 +148,12 @@ export const WorkflowAIProviderBadge = () => {
                 onClick={handleTest}
                 onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleTest(e as any); }}
                 className={[
-                  'inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-colors',
+                  'inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors backdrop-blur-sm',
                   testState === 'ok'
                     ? 'bg-emerald-50 border-emerald-300 text-emerald-700'
                     : testState === 'fail'
                     ? 'bg-red-50 border-red-300 text-red-700'
-                    : 'bg-white border-[#008296]/30 text-[#008296] hover:bg-[#008296]/10 cursor-pointer',
+                    : 'bg-white/10 border-white/30 text-white hover:bg-white/20 cursor-pointer',
                 ].join(' ')}
                 title="Tester la clé sans ouvrir le panneau"
               >
@@ -168,9 +168,9 @@ export const WorkflowAIProviderBadge = () => {
             )}
             <span
               className={[
-                'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold',
+                'inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold transition-all',
                 valid
-                  ? 'bg-[#008296] text-white hover:bg-[#006b7a]'
+                  ? 'bg-[#FF9E2D] text-[#0a3a44] hover:bg-[#ffb05c] shadow-md shadow-[#FF9E2D]/30'
                   : 'bg-[#FF9E2D] text-white hover:bg-[#e88a14]',
               ].join(' ')}
             >
