@@ -101,14 +101,14 @@ export const WorkflowAIProviderBadge = () => {
           <div className="flex items-center gap-3 min-w-0">
             <div
               className={[
-                'flex h-10 w-10 items-center justify-center rounded-full shrink-0 ring-4',
+                'flex h-11 w-11 items-center justify-center rounded-xl shrink-0 ring-4',
                 valid
-                  ? 'bg-[#008296]/15 ring-[#008296]/10'
+                  ? 'bg-[#FF9E2D] ring-white/10 shadow-lg shadow-[#FF9E2D]/30'
                   : 'bg-orange-200/60 ring-orange-200/40',
               ].join(' ')}
             >
               {valid ? (
-                <CheckCircle2 className="h-5 w-5 text-[#008296]" />
+                <CheckCircle2 className="h-5 w-5 text-[#0a3a44]" />
               ) : (
                 <AlertTriangle className="h-5 w-5 text-orange-600" />
               )}
@@ -116,13 +116,13 @@ export const WorkflowAIProviderBadge = () => {
             <div className="min-w-0">
               {valid ? (
                 <>
-                  <div className="text-base md:text-lg font-bold text-[#232F3E] leading-tight">
+                  <div className="text-base md:text-lg font-bold text-white leading-tight tracking-tight">
                     ✨ IA active&nbsp;: {PROVIDER_LABELS[provider]}
                     {modelLabel && (
-                      <span className="text-[#232F3E]"> — {modelLabel}</span>
+                      <span className="text-[#FF9E2D]"> — {modelLabel}</span>
                     )}
                   </div>
-                  <div className="text-xs text-[#5b6675] mt-0.5">
+                  <div className="text-xs text-white/70 mt-0.5 font-medium tracking-wide">
                     Tous les agents P1–P15 utiliseront ce modèle
                   </div>
                 </>
