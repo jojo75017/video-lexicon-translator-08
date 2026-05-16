@@ -38,8 +38,8 @@ export const FirstVisitBanner = () => {
   if (!visible) return null;
 
   return (
-    <div className="px-4 md:px-6 pt-3">
-      <div className="relative mx-auto max-w-3xl rounded-2xl border border-[#FF9E2D]/30 bg-gradient-to-br from-[#FF9E2D]/10 via-amber-50 to-[#008296]/5 shadow-sm px-6 py-5">
+    <div className="px-4 md:px-6 lg:px-10 pt-3">
+      <div className="relative mx-auto max-w-[1600px] rounded-2xl border border-[#008296]/20 bg-gradient-to-br from-white via-[#008296]/[0.03] to-[#FF9E2D]/[0.06] shadow-[0_4px_20px_-4px_rgba(0,130,150,0.1)] px-6 py-5">
         <button
           onClick={dismiss}
           aria-label="Fermer"
