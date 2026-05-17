@@ -1768,6 +1768,15 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                       <HelpCircle className="h-4 w-4 mr-2" />
                       Aide
                     </Button>
+                    <Button
+                      type="button"
+                      onClick={() => navigate('/ambiances')}
+                      className="bg-white/10 backdrop-blur-md hover:bg-white/20 text-white border border-white/20 rounded-xl"
+                      title="Choisir une ambiance d'écriture"
+                    >
+                      <Sparkles className="h-4 w-4 mr-2" />
+                      Ambiances
+                    </Button>
                     {isAdminProp && (
                       <Button 
                         type="button"
