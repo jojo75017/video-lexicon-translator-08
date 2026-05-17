@@ -379,6 +379,10 @@ const App = () => {
               element={<EbookIdeasPage />}
             />
             <Route
+              path="/ambiances"
+              element={<AmbiancesPage />}
+            />
+            <Route
               path="/ebook-planner"
               element={
                 <SubscriberGate
