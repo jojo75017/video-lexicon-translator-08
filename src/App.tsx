@@ -18,6 +18,7 @@ import AICostBadge from '@/components/shared/AICostBadge';
 // Lazy-loaded pages for performance
 const EbookPlannerPage = lazy(() => import('./pages/EbookPlannerPage'));
 const EbookIdeasPage = lazy(() => import('./pages/EbookIdeasPage'));
+const AmbiancesPage = lazy(() => import('./pages/AmbiancesPage'));
 const AiChatPage = lazy(() => import('./pages/AiChatPage'));
 const SubscriptionPage = lazy(() => import('./pages/SubscriptionPage'));
 const AdminPage = lazy(() => import('./pages/AdminPage').then(m => ({ default: m.AdminPage })));
@@ -376,6 +377,10 @@ const App = () => {
             <Route
               path="/ebook-ideas"
               element={<EbookIdeasPage />}
+            />
+            <Route
+              path="/ambiances"
+              element={<AmbiancesPage />}
             />
             <Route
               path="/ebook-planner"
