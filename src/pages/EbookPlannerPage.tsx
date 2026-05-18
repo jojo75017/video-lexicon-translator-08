@@ -3549,6 +3549,16 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
               <div className="flex gap-2">
                 <Button
                   type="button"
+                  onClick={() => navigate('/ambiances')}
+                  className="bg-gradient-to-r from-[#FF9E2D] to-[#FFB85C] hover:from-[#FF8C0A] hover:to-[#FFA53D] text-[#0f1419] font-bold border border-[#FF9E2D]/40 shadow-[0_0_20px_rgba(255,158,45,0.45)] hover:shadow-[0_0_30px_rgba(255,158,45,0.6)] rounded-full transition-all hover:-translate-y-0.5"
+                  title="Choisir une ambiance d'écriture (17 thèmes inclus)"
+                >
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Ambiances
+                  <span className="ml-2 text-[10px] uppercase tracking-wider bg-white/30 text-[#0f1419] px-1.5 py-0.5 rounded-full font-extrabold">NEW</span>
+                </Button>
+                <Button
+                  type="button"
                   onClick={handleManualSave}
                   disabled={isSaving || !ebookTitle}
                   className="bg-white/5 hover:bg-white/10 text-white border border-white/20 backdrop-blur-sm rounded-full font-semibold transition-all"
