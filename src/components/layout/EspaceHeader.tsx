@@ -473,7 +473,7 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
 
               {/* Bouton Audit ASIN — accès direct au scraper Amazon */}
               <button
-                onClick={() => onTabChange?.('audit-pilot')}
+                onClick={() => navigate('/audit-pilot')}
                 title="Auditer une fiche produit Amazon par ASIN"
                 className="relative flex-shrink-0 inline-flex items-center gap-1.5 rounded-2xl px-3 py-2 text-sm font-bold transition-all duration-200 hover:scale-[1.05] border-2 border-[#008296]/50 bg-[#008296]/10 hover:bg-[#008296]/20 text-[#008296]"
               >
