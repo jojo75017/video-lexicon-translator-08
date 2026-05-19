@@ -70,7 +70,7 @@ const PLANNER_SUBTABS: Partial<Record<FamilyId, Array<{ id: string; label: strin
     { id: 'images-library', label: 'Bibliothèque' },
   ],
   export: [
-    { id: 'audit-pilot', label: '🔍 Auditer un ASIN' },
+    // audit-pilot retiré ici : c'est une route /audit-pilot, accessible via le bouton "Audit ASIN" du header.
     { id: 'kdp', label: 'Export KDP' },
     { id: 'kdp-prepublish-checklist', label: 'Checklist KDP' },
     { id: 'kdp-keywords-pro', label: 'Mots-clés KDP' },
