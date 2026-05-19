@@ -243,7 +243,7 @@ export const AdminPage = () => {
     starter: 27,
     pro: 47,
     enterprise: 97,
-    lifetime: 147,
+    lifetime: 197,
   };
 
   // Calcul des revenus

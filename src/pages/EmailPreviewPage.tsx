@@ -88,7 +88,7 @@ Le tout pour ~0,30€ par livre.
 
 👉 Découvrir EbookStudio Pro : ${OFFRES_LINK}
 
-L'offre Fondateur à 67€ (au lieu de 147€) est disponible jusqu'au 1er juillet.
+L'offre Fondateur à 67€ (au lieu de 197€) est disponible jusqu'au 1er juillet.
 
 Georges
 
@@ -134,19 +134,19 @@ https://www.amazon.fr/Mr-Georges-Boubet/e/B0CGVLHNX7`,
     dayOffset: 6,
     dayLabel: "J+6",
     subject: "⏰ [Dernière chance] L'offre Fondateur disparaît dans 48h",
-    preheader: "Après ça, le prix passe à 147€. Point final.",
+    preheader: "Après ça, le prix passe à 197€. Point final.",
     strategy: "URGENCE",
     strategyColor: "bg-amber-500/10 text-amber-600 border-amber-500/30",
     body: `[PRÉNOM],
 
 L'offre Fondateur EbookStudio Pro à 67€ se termine dans 48 heures.
 
-Après ? Le prix passe à 147€.
+Après ? Le prix passe à 197€.
 
 🧮 Ce que vous obtenez (valeur 749€) :
 - Générateur IA illimité (197€)
 - Créateur de couvertures (67€)
-- Convertisseur livre audio (147€)
+- Convertisseur livre audio (197€)
 - Dashboard marketing (67€)
 - Outils réseaux sociaux (47€)
 - Templates email (67€)

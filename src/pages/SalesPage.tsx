@@ -42,7 +42,7 @@ import CountdownDeadline from "@/components/sales/CountdownDeadline";
 import GuaranteeBlock from "@/components/sales/GuaranteeBlock";
 
 const LAUNCH_PRICE = 67;
-const NORMAL_PRICE = 147;
+const NORMAL_PRICE = 197;
 
 // ── Newsletter form (footer) ─────────────────────────────────────────────────
 const NewsletterForm = () => {

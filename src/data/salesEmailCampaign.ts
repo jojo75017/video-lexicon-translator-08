@@ -112,7 +112,7 @@ Comparez avec un ghostwriter à 500€... ou un designer à 150€ la couverture
 
 👉 **Découvrir EbookStudio Pro** : [LIEN OFFRES]
 
-L'offre Fondateur à 67€ (au lieu de 147€) est disponible jusqu'au 1er juillet.
+L'offre Fondateur à 67€ (au lieu de 197€) est disponible jusqu'au 1er juillet.
 
 Georges
 
@@ -171,7 +171,7 @@ https://www.amazon.fr/Mr-Georges-Boubet/e/B0CGVLHNX7`
     id: 'email-4-urgence',
     day: 'J+6',
     subject: '⏰ [Dernière chance] L\'offre Fondateur disparaît dans 48h',
-    preheader: 'Après ça, le prix passe à 147€. Point final.',
+    preheader: 'Après ça, le prix passe à 197€. Point final.',
     strategy: 'URGENCE + FOMO - Créer un sentiment d\'urgence légitime',
     body: `[PRÉNOM],
 
@@ -179,7 +179,7 @@ Je serai bref.
 
 L'offre **Fondateur EbookStudio Pro** à 67€ se termine dans **48 heures**.
 
-Après ? Le prix passe à **147€**. Et ce n'est pas du marketing. C'est la valeur réelle de l'outil.
+Après ? Le prix passe à **197€**. Et ce n'est pas du marketing. C'est la valeur réelle de l'outil.
 
 🧮 **Faisons les comptes ensemble** :
 
@@ -187,7 +187,7 @@ Après ? Le prix passe à **147€**. Et ce n'est pas du marketing. C'est la val
 |---|---|
 | Générateur IA illimité | 197€ |
 | Créateur de couvertures | 97€ |
-| Convertisseur livre audio | 147€ |
+| Convertisseur livre audio | 197€ |
 | Dashboard marketing | 97€ |
 | Outils réseaux sociaux | 67€ |
 | Templates email marketing | 47€ |
@@ -349,7 +349,7 @@ J'ai ouvert l'accès au public pour la première fois.
 
 Si ça intéresse quelqu'un :
 🆓 Démo gratuite (sans CB) : [LIEN]
-💰 Offre Fondateur à 67€ (au lieu de 147€) : [LIEN]
+💰 Offre Fondateur à 67€ (au lieu de 197€) : [LIEN]
 
 Posez vos questions en commentaire, je réponds à tout ! 👇`,
     hashtags: ['revenus passifs', 'kdp', 'amazon', 'ebook', 'ia', 'autoedition']

@@ -17,7 +17,7 @@ export const StickyCtaBar: React.FC<StickyCtaBarProps> = ({ onCtaClick }) => {
   const [isDismissed, setIsDismissed] = useState(false);
 
   const price = '67';
-  const originalPrice = '147';
+  const originalPrice = '197';
   const discount = '-54%';
   const daysLeft = daysRemaining ?? 0;
 
