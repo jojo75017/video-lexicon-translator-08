@@ -14,6 +14,7 @@ import EbookbotFloatingButton from '@/components/ebookbot/EbookbotFloatingButton
 import ApiKeysFloatingButton from '@/components/ebook/ApiKeysFloatingButton';
 import AISosModal from '@/components/shared/AISosModal';
 import AICostBadge from '@/components/shared/AICostBadge';
+import { useBrandTitle } from '@/hooks/useBrandTitle';
 
 // Lazy-loaded pages for performance
 const EbookPlannerPage = lazy(() => import('./pages/EbookPlannerPage'));
