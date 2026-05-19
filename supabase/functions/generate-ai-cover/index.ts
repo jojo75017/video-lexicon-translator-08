@@ -125,11 +125,12 @@ ${description ? `Concept: ${description}` : ''}
 === FORMAT ===
 ${formatGuidance}
 
-=== QUALITY BAR ===
-- Photorealistic, magazine-grade. ZERO cartoon, ZERO low-fidelity.
-- Title typography perfectly legible — clean, sharp, no warped letters, no fake glyphs.
-- Inspired by current Amazon top 100 best-sellers in this genre.
-- No watermarks, no logos, no UI mockups, no Amazon badges, NO 3D book mockup.
+=== QUALITY BAR (NON-NEGOTIABLE) ===
+- PHOTOREALISTIC CINEMATIC SCENE, full bleed. Think Amazon top-10 thriller / non-fiction bestseller covers (e.g. "Atomic Habits", "Sapiens", thriller covers with dramatic photo scenes + gold/white huge typography).
+- The artwork MUST depict a REAL SCENE with real objects/environment related to the book topic — NOT a flat color, NOT a plain gradient, NOT a pastel watercolor, NOT abstract shapes alone.
+- Dramatic lighting: deep shadows, rim light, golden highlights, volumetric atmosphere, shallow depth of field.
+- Title typography: HUGE, bold sans-serif, white or gold, perfectly sharp, no warped or fake glyphs. Strong contrast against the image (use dark vignette behind text if needed).
+- NO watermark, NO logo, NO UI mockup, NO Amazon badge, NO 3D book mockup, NO tilted device.
 ${referenceImage ? '- Use the attached reference image ONLY for stylistic inspiration (mood, palette, composition). Do NOT copy it.' : ''}`;
 
     let messageContent: string | any[] = textPrompt;
