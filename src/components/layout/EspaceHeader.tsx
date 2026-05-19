@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { ArrowLeft, LogOut, Sparkles, LayoutGrid, Search, Shield, Settings, Target } from 'lucide-react';
+import { ArrowLeft, LogOut, Sparkles, LayoutGrid, Search, Shield, Settings, Target, ClipboardCheck, MessageCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
@@ -70,9 +70,9 @@ const PLANNER_SUBTABS: Partial<Record<FamilyId, Array<{ id: string; label: strin
     { id: 'images-library', label: 'Bibliothèque' },
   ],
   export: [
+    { id: 'audit-pilot', label: '🔍 Auditer un ASIN' },
     { id: 'kdp', label: 'Export KDP' },
     { id: 'kdp-prepublish-checklist', label: 'Checklist KDP' },
-    { id: 'audit-pilot', label: 'Audit pré-publication' },
     { id: 'kdp-keywords-pro', label: 'Mots-clés KDP' },
     { id: 'calibre-epub', label: 'Export EPUB' },
     { id: 'audiobook', label: 'Audiobook' },
@@ -470,6 +470,29 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
                   );
                 })}
               </div>
+
+              {/* Bouton Audit ASIN — accès direct au scraper Amazon */}
+              <button
+                onClick={() => onTabChange?.('audit-pilot')}
+                title="Auditer une fiche produit Amazon par ASIN"
+                className="relative flex-shrink-0 inline-flex items-center gap-1.5 rounded-2xl px-3 py-2 text-sm font-bold transition-all duration-200 hover:scale-[1.05] border-2 border-[#008296]/50 bg-[#008296]/10 hover:bg-[#008296]/20 text-[#008296]"
+              >
+                <ClipboardCheck className="h-4 w-4" />
+                <span className="hidden md:inline">Audit ASIN</span>
+              </button>
+
+              {/* Bouton Communauté — accès direct au forum */}
+              <button
+                onClick={() => navigate('/communaute')}
+                title="Forum entre abonnés : entraide, retours, astuces"
+                className="relative flex-shrink-0 inline-flex items-center gap-1.5 rounded-2xl px-3 py-2 text-sm font-bold transition-all duration-200 hover:scale-[1.05] border-2 border-[#EC4899]/50 bg-[#EC4899]/10 hover:bg-[#EC4899]/20 text-[#9F1239]"
+              >
+                <MessageCircle className="h-4 w-4" />
+                <span className="hidden md:inline">Communauté</span>
+                <span className="text-[9px] font-black px-1.5 py-0.5 rounded-full bg-[#EC4899] text-white">
+                  NEW
+                </span>
+              </button>
 
               {/* Bouton 600 Niches — NOUVEAUTÉ Mai 2026 */}
               <button
