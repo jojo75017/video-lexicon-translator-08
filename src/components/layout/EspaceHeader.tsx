@@ -70,9 +70,9 @@ const PLANNER_SUBTABS: Partial<Record<FamilyId, Array<{ id: string; label: strin
     { id: 'images-library', label: 'Bibliothèque' },
   ],
   export: [
+    { id: 'audit-pilot', label: '🔍 Auditer un ASIN' },
     { id: 'kdp', label: 'Export KDP' },
     { id: 'kdp-prepublish-checklist', label: 'Checklist KDP' },
-    { id: 'audit-pilot', label: 'Audit pré-publication' },
     { id: 'kdp-keywords-pro', label: 'Mots-clés KDP' },
     { id: 'calibre-epub', label: 'Export EPUB' },
     { id: 'audiobook', label: 'Audiobook' },
