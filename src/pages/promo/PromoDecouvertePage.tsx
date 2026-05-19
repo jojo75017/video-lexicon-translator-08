@@ -1,12 +1,31 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import FunnelLayout from '@/components/funnel/FunnelLayout';
 import SeoHead from '@/components/funnel/SeoHead';
 import { Button } from '@/components/ui/button';
 import { useReferralTracking } from '@/hooks/useReferralTracking';
-import { Check, Sparkles, Zap, Shield, BookOpen, TrendingUp, Star, ArrowRight } from 'lucide-react';
+import { Check, Sparkles, Zap, Shield, BookOpen, TrendingUp, Star, ArrowRight, Gift, Clock } from 'lucide-react';
+
+const OFFER_END = new Date('2026-06-30T23:59:59');
+const GUIDE_10_NICHES_URL = 'https://www.trafic-affiliation.com/niches_ebookstudio';
+
+function useCountdown(target: Date) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 60_000);
+    return () => clearInterval(id);
+  }, []);
+  const diff = Math.max(0, target.getTime() - now);
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  return { days, hours, expired: diff === 0 };
+}
 
 const PromoDecouvertePage = () => {
   useReferralTracking();
+  const { days, hours, expired } = useCountdown(OFFER_END);
+  const offerActive = !expired;
+  const price = offerActive ? '47' : '67';
 
   const features = [
     { icon: Sparkles, title: 'Plan d\'ebook IA', desc: 'Génération du plan complet en 30 secondes - pipeline 15 agents.' },
@@ -43,16 +62,27 @@ const PromoDecouvertePage = () => {
           name: 'EbookStudio',
           description: 'Outil IA tout-en-un pour créer et publier des ebooks rentables sur Amazon KDP.',
           brand: { '@type': 'Brand', name: 'EbookStudio' },
-          offers: { '@type': 'Offer', price: '67', priceCurrency: 'EUR', availability: 'https://schema.org/InStock' },
+          offers: { '@type': 'Offer', price, priceCurrency: 'EUR', availability: 'https://schema.org/InStock' },
           aggregateRating: { '@type': 'AggregateRating', ratingValue: '4.9', reviewCount: '127' },
         }}
       />
+
+      {/* BANDEAU OFFRE FONDATEUR */}
+      {offerActive && (
+        <div className="bg-gradient-to-r from-[#EC4899] via-[#FF9E2D] to-[#EC4899] text-white text-center py-2.5 px-4 text-sm font-semibold flex items-center justify-center gap-2 flex-wrap">
+          <Gift className="w-4 h-4" />
+          <span>🎁 Offre fondateur — <strong>47€</strong> au lieu de 67€ + Licence commerciale + Guide 10 niches OFFERTS</span>
+          <span className="hidden sm:inline-flex items-center gap-1 bg-white/20 px-2 py-0.5 rounded-full text-xs">
+            <Clock className="w-3 h-3" /> {days}j {hours}h restants
+          </span>
+        </div>
+      )}
 
       {/* HERO */}
       <section className="bg-gradient-to-b from-[#008296]/5 to-transparent">
         <div className="max-w-5xl mx-auto px-4 py-16 md:py-24 text-center space-y-6">
           <span className="inline-block bg-[#FF9E2D]/10 text-[#FF9E2D] px-3 py-1 rounded-full text-sm font-semibold">
-            ✨ Nouveau - Pipeline 15 agents IA
+            ✨ Nouveau - Pipeline 15 agents IA · EbookStudio V2
           </span>
           <h1 className="text-4xl md:text-6xl font-bold leading-tight">
             Créez un <span className="text-[#008296]">ebook rentable</span> en 30 minutes
@@ -61,9 +91,9 @@ const PromoDecouvertePage = () => {
             EbookStudio génère plan, chapitres, couverture, mots-clés Amazon et fichiers KDP-compliant. Sans ligne d'écriture.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-            <Link to="/promo/commande">
+            <Link to={offerActive ? "/promo/commande?plan=fondateur47" : "/promo/commande"}>
               <Button className="bg-[#FF9E2D] hover:bg-[#e88f1f] text-white font-bold py-6 px-8 text-base">
-                🚀 Démarrer maintenant - 67€ à vie
+                🚀 Démarrer maintenant — {price}€ à vie
               </Button>
             </Link>
             <Link to="/demo">
@@ -150,18 +180,66 @@ const PromoDecouvertePage = () => {
       {/* PRICING */}
       <section className="max-w-3xl mx-auto px-4 py-16 text-center">
         <h2 className="text-3xl font-bold mb-4">Un seul tarif. Tout inclus.</h2>
-        <div className="bg-white border-2 border-[#008296] rounded-2xl p-8 mt-8 shadow-lg">
+        <div className="bg-white border-2 border-[#008296] rounded-2xl p-8 mt-8 shadow-lg relative">
+          {offerActive && (
+            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#EC4899] to-[#FF9E2D] text-white text-xs font-black px-4 py-1.5 rounded-full shadow-lg animate-pulse">
+              🎁 OFFRE FONDATEUR — JUSQU'AU 30 JUIN 2026
+            </div>
+          )}
           <p className="text-sm font-semibold text-[#FF9E2D] uppercase">Accès à vie</p>
-          <p className="text-5xl font-bold my-4">67€<span className="text-xl text-gray-500"> à vie</span></p>
+          <p className="text-5xl font-bold my-4 flex items-baseline justify-center gap-3">
+            {offerActive && <span className="text-2xl text-gray-400 line-through font-normal">67€</span>}
+            <span>{price}€</span>
+            <span className="text-xl text-gray-500 font-normal"> à vie</span>
+          </p>
+          {offerActive && (
+            <span className="inline-block bg-[#EC4899]/10 text-[#EC4899] text-xs font-bold px-3 py-1 rounded-full mb-3">
+              -30% · Économisez 20€
+            </span>
+          )}
           <p className="text-gray-600 mb-6">Paiement unique. Aucun abonnement. Accès illimité pour toujours.</p>
+
+          {offerActive && (
+            <div className="bg-gradient-to-br from-[#FF9E2D]/10 to-[#EC4899]/10 border-2 border-dashed border-[#FF9E2D] rounded-xl p-5 mb-6 text-left">
+              <p className="text-sm font-black text-[#232F3E] uppercase mb-3 flex items-center gap-2">
+                <Gift className="w-4 h-4 text-[#EC4899]" /> 2 Bonus offerts (valeur 97€)
+              </p>
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-start gap-2">
+                  <Check className="w-5 h-5 text-[#008296] flex-shrink-0 mt-0.5" />
+                  <span>
+                    <strong>Licence commerciale étendue</strong> — revendre, packager, white-label.{' '}
+                    <Link to="/licence-etendue" className="text-[#008296] underline hover:text-[#FF9E2D]">
+                      Voir détails →
+                    </Link>
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-5 h-5 text-[#008296] flex-shrink-0 mt-0.5" />
+                  <span>
+                    <strong>Guide des 10 niches KDP rentables 2026</strong> — mots-clés, exemples, prix.{' '}
+                    <a
+                      href={GUIDE_10_NICHES_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[#008296] underline hover:text-[#FF9E2D]"
+                    >
+                      Aperçu →
+                    </a>
+                  </span>
+                </li>
+              </ul>
+            </div>
+          )}
+
           <ul className="text-left space-y-2 mb-8 max-w-md mx-auto">
             {['Ebooks illimités', 'Couvertures illimitées', 'Audiobook + BD inclus', 'Licence commerciale', 'Formation + Forum', 'Support email prioritaire'].map((x) => (
               <li key={x} className="flex gap-2"><Check className="w-5 h-5 text-[#008296]" /> {x}</li>
             ))}
           </ul>
-          <Link to="/promo/commande">
+          <Link to={offerActive ? "/promo/commande?plan=fondateur47" : "/promo/commande"}>
             <Button className="bg-[#FF9E2D] hover:bg-[#e88f1f] text-white font-bold w-full py-6 text-base">
-              Je commande maintenant <ArrowRight className="w-5 h-5 ml-2" />
+              Je commande maintenant — {price}€ <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
           </Link>
         </div>
@@ -185,9 +263,9 @@ const PromoDecouvertePage = () => {
         <div className="max-w-3xl mx-auto px-4 text-center space-y-6">
           <h2 className="text-3xl md:text-4xl font-bold">Votre prochain ebook commence aujourd'hui</h2>
           <p className="text-lg opacity-90">Rejoignez les centaines d'auteurs qui publient avec EbookStudio.</p>
-          <Link to="/promo/commande">
+          <Link to={offerActive ? "/promo/commande?plan=fondateur47" : "/promo/commande"}>
             <Button className="bg-[#FF9E2D] hover:bg-[#e88f1f] text-white font-bold py-6 px-8 text-base">
-              🚀 Commander - 67€ à vie
+              🚀 Commander — {price}€ à vie
             </Button>
           </Link>
           <p className="text-sm opacity-75 pt-4">

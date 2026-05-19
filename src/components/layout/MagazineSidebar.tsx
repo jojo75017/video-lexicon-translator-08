@@ -16,6 +16,7 @@ import {
   ChevronRight,
   CreditCard,
   Shield,
+  Target,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -219,6 +220,29 @@ export function MagazineSidebar({
         >
           <Search className="h-4 w-4 flex-shrink-0" />
           {!isCollapsed && <span className="text-sm font-medium">Mots-clés KDP</span>}
+        </button>
+
+        {/* 600 Niches → page dédiée (NOUVEAUTÉ Mai 2026) */}
+        <button
+          onClick={() => navigate('/niches-600')}
+          title="600 niches KDP rentables — Nouveauté Mai 2026"
+          className={cn(
+            'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-left relative',
+            'text-foreground hover:bg-gradient-to-r hover:from-[#FF9E2D]/10 hover:to-[#EC4899]/10'
+          )}
+        >
+          <Target className="h-4 w-4 flex-shrink-0 text-[#EC4899]" />
+          {!isCollapsed && (
+            <>
+              <span className="text-sm font-semibold">600 Niches</span>
+              <span className="ml-auto text-[9px] font-black px-1.5 py-0.5 rounded-full bg-gradient-to-r from-[#FF9E2D] to-[#EC4899] text-white animate-pulse shadow-sm">
+                NEW
+              </span>
+            </>
+          )}
+          {isCollapsed && (
+            <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-[#EC4899] animate-pulse" />
+          )}
         </button>
 
         {/* Tous les outils (vue Trello) */}
