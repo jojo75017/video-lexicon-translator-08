@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { ArrowRight, Clock, Sparkles, FileText, Loader2, LogOut, ChevronDown, LayoutDashboard, Shield } from 'lucide-react';
+import { ArrowRight, Clock, Sparkles, FileText, Loader2, LogOut, ChevronDown, LayoutDashboard, Shield, Target } from 'lucide-react';
 import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
 
 interface EspacePageProps {
@@ -54,12 +54,12 @@ const EspacePage: React.FC<EspacePageProps> = ({ subscriberEmail, onLogout }) =>
 
   useEffect(() => {
     let cancelled = false;
-    getIsCurrentSessionAdmin().then((v) => { if (!cancelled) setIsAdmin(!!v); }).catch(() => {});
+    getIsCurrentSessionAdmin().then((v) => { if (!cancelled) setIsAdmin(!!v); }).catch(() => undefined);
     return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {
-    try { setLastTab(localStorage.getItem('ebook_planner_active_tab')); } catch {}
+    try { setLastTab(localStorage.getItem('ebook_planner_active_tab')); } catch { void 0; }
     let cancelled = false;
     (async () => {
       try {
@@ -109,7 +109,7 @@ const EspacePage: React.FC<EspacePageProps> = ({ subscriberEmail, onLogout }) =>
   }, []);
 
   const goPlanner = (tab?: string) => {
-    if (tab) { try { localStorage.setItem('ebook_planner_active_tab', tab); } catch {} }
+    if (tab) { try { localStorage.setItem('ebook_planner_active_tab', tab); } catch { void 0; } }
     navigate('/ebook-planner');
   };
 
@@ -296,7 +296,7 @@ const EspacePage: React.FC<EspacePageProps> = ({ subscriberEmail, onLogout }) =>
               Voir mes cadeaux →
             </button>
             <button
-              onClick={() => { try { localStorage.setItem('launch_vip_banner_dismissed_v1', '1'); } catch {}; window.location.reload(); }}
+                onClick={() => { try { localStorage.setItem('launch_vip_banner_dismissed_v1', '1'); } catch { void 0; } window.location.reload(); }}
               className="text-white/80 hover:text-white text-lg leading-none px-1"
               aria-label="Fermer"
             >
@@ -382,6 +382,29 @@ const EspacePage: React.FC<EspacePageProps> = ({ subscriberEmail, onLogout }) =>
           </div>
         </div>
       </header>
+
+      <section className="border-b border-joy-ink/10 bg-joy-cream">
+        <div className="mx-auto max-w-6xl px-4 py-4">
+          <button
+            onClick={() => navigate('/niches-600')}
+            className="group flex w-full flex-col gap-3 rounded-3xl border border-joy-ink/10 bg-white p-4 text-left shadow-[var(--shadow-elevated)] transition-all hover:-translate-y-0.5 hover:border-joy-peach sm:flex-row sm:items-center sm:justify-between"
+          >
+            <span className="flex min-w-0 items-center gap-3">
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-joy-sun/45 text-joy-ink">
+                <Target className="h-6 w-6" />
+              </span>
+              <span className="min-w-0">
+                <span className="block text-xs font-black uppercase tracking-widest text-joy-ink/55">Nouveau dans ton espace</span>
+                <span className="block text-lg font-black tracking-tight text-joy-ink">600 niches KDP rentables 2026</span>
+                <span className="block text-sm text-joy-ink/65">Accès direct à la liste complète avec mots-clés, BSR, concurrence et export CSV.</span>
+              </span>
+            </span>
+            <span className="inline-flex shrink-0 items-center gap-2 rounded-full bg-joy-peach px-4 py-2 text-sm font-black text-joy-ink transition-transform group-hover:translate-x-1">
+              Ouvrir les 600 niches <ArrowRight className="h-4 w-4" />
+            </span>
+          </button>
+        </div>
+      </section>
 
       <main className="mx-auto max-w-6xl px-4 py-10 space-y-10">
         {/* Hero */}
