@@ -1,8 +1,18 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import {
   Accordion,
   AccordionContent,
@@ -15,6 +25,7 @@ import {
   Check,
   Crown,
   Eye,
+  Loader2,
   Mail,
   MessageCircle,
   PlayCircle,
@@ -26,6 +37,8 @@ import {
   CalendarDays,
 } from "lucide-react";
 import { trackEvent } from "@/utils/analytics";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const PRICE = 47;
 const NORMAL_PRICE = 197;
@@ -137,15 +150,54 @@ const faqs = [
   },
 ];
 
-const handlePaypalClick = (location: string) => {
-  trackEvent("coaching_paypal_click", { location });
-};
-
 const handleVideoPlay = () => {
   trackEvent("coaching_video_play", {});
 };
 
 const CoachingVipPage = () => {
+  const [open, setOpen] = useState(false);
+  const [email, setEmail] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [ctaLocation, setCtaLocation] = useState<string>("main_cta");
+
+  const openCheckout = (location: string) => {
+    setCtaLocation(location);
+    trackEvent("coaching_paypal_click", { location });
+    setOpen(true);
+  };
+
+  const submitAndPay = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const cleanEmail = email.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+      toast.error("Email invalide");
+      return;
+    }
+    setLoading(true);
+    try {
+      const { error } = await supabase.functions.invoke("funnel-create-order", {
+        body: {
+          email: cleanEmail,
+          first_name: firstName.trim(),
+          product_key: "license_extended",
+          payment_method: "paypal",
+        },
+      });
+      if (error) throw error;
+      toast.success("Bonus envoyés par email ! Direction PayPal...");
+      trackEvent("coaching_order_created", { location: ctaLocation });
+      // Open PayPal in new tab
+      window.open(PAYPAL_LINK, "_blank", "noopener,noreferrer");
+      setOpen(false);
+    } catch (err) {
+      console.error(err);
+      toast.error("Erreur lors de l'enregistrement. Réessayez.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#FAFAFA] text-[#232F3E] py-10 px-4">
       <Helmet>
@@ -348,20 +400,14 @@ const CoachingVipPage = () => {
               Paiement unique • 30 jours d'accompagnement • Réponse sous 24h
             </p>
 
-            <a
-              href={PAYPAL_LINK}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => handlePaypalClick("main_cta")}
+            <Button
+              size="lg"
+              onClick={() => openCheckout("main_cta")}
+              className="w-full md:w-auto px-10 py-6 text-lg font-black bg-[#FF9E2D] hover:bg-[#FF8C00] text-[#232F3E] rounded-xl shadow-lg"
             >
-              <Button
-                size="lg"
-                className="w-full md:w-auto px-10 py-6 text-lg font-black bg-[#FF9E2D] hover:bg-[#FF8C00] text-[#232F3E] rounded-xl shadow-lg"
-              >
-                Je réserve ma place - {PRICE}€
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-            </a>
+              Je réserve ma place - {PRICE}€
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </Button>
             <p className="text-xs text-[#232F3E]/60 mt-4 flex items-center justify-center gap-2">
               <ShieldCheck className="w-3 h-3" />
               Paiement sécurisé PayPal (carte bancaire acceptée)
@@ -432,20 +478,14 @@ const CoachingVipPage = () => {
               {SEATS} places. Une fois rempli, je ferme et je n'ouvre plus
               avant longtemps.
             </p>
-            <a
-              href={PAYPAL_LINK}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => handlePaypalClick("final_cta")}
+            <Button
+              size="lg"
+              onClick={() => openCheckout("final_cta")}
+              className="bg-[#008296] hover:bg-[#006d7e] text-white font-black rounded-xl px-8"
             >
-              <Button
-                size="lg"
-                className="bg-[#008296] hover:bg-[#006d7e] text-white font-black rounded-xl px-8"
-              >
-                <Check className="w-5 h-5 mr-2" />
-                Je réserve ma place ({PRICE}€)
-              </Button>
-            </a>
+              <Check className="w-5 h-5 mr-2" />
+              Je réserve ma place ({PRICE}€)
+            </Button>
           </CardContent>
         </Card>
 
@@ -459,6 +499,55 @@ const CoachingVipPage = () => {
           </a>
         </p>
       </div>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Réserve ta place — {PRICE}€</DialogTitle>
+            <DialogDescription>
+              Indique ton email : tes bonus (licence + 10 niches) te seront envoyés immédiatement, puis tu seras redirigé(e) vers PayPal pour finaliser le paiement.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={submitAndPay} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="vip-firstname">Prénom</Label>
+              <Input
+                id="vip-firstname"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                maxLength={80}
+                placeholder="Georges"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="vip-email">Email *</Label>
+              <Input
+                id="vip-email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                maxLength={255}
+                placeholder="ton@email.com"
+              />
+            </div>
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-[#FF9E2D] hover:bg-[#FF8C00] text-[#232F3E] font-black py-6 text-base"
+            >
+              {loading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <>Recevoir mes bonus & payer {PRICE}€ sur PayPal</>
+              )}
+            </Button>
+            <p className="text-xs text-center text-[#232F3E]/60 flex items-center justify-center gap-1.5">
+              <ShieldCheck className="w-3 h-3" /> Bonus envoyés avant le paiement • PayPal sécurisé
+            </p>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
