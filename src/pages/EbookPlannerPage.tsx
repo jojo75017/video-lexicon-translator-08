@@ -469,61 +469,70 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       ebookImages, numberOfChapters, bookSummary, coverConcepts, seoOptimization, bookDescription, genre,
       kdpDescription, kdpKeywords, kdpCategories]);
 
+  // Flag indiquant que le chargement initial du projet cloud est terminé.
+  // Tant qu'il est false, on bloque toute sauvegarde pour éviter de créer un doublon
+  // pendant que currentProjectId n'est pas encore connu.
+  const [initialLoadDone, setInitialLoadDone] = useState(false);
+
   useEffect(() => {
     const loadFromDatabase = async () => {
-      // Si on vient de cliquer "+ Nouveau", ne pas recharger l'ancien projet
       try {
-        if (localStorage.getItem('ebook_just_reset') === '1') {
-          localStorage.removeItem('ebook_just_reset');
-          console.log('📋 [loadFromDatabase] Reset détecté, on ignore le projet cloud');
-          return;
-        }
-      } catch {}
-
-      const dbProject = await loadLatestProject();
-      if (dbProject) {
-        // Comparer avec le brouillon local pour ne pas écraser un travail plus récent
+        // Si on vient de cliquer "+ Nouveau", ne pas recharger l'ancien projet
         try {
-          const localRaw = localStorage.getItem(STORAGE_KEY);
-          if (localRaw) {
-            const localData = JSON.parse(localRaw);
-            const localTime = localData.lastSaved ? new Date(localData.lastSaved).getTime() : 0;
-            const cloudTime = dbProject.updated_at ? new Date(dbProject.updated_at).getTime() : 0;
-            
-            if (localTime > cloudTime && localData.ebookTitle) {
-              console.log('📋 [loadFromDatabase] Brouillon local plus récent que le cloud, conservation du local');
-              toast.info('Brouillon local plus récent détecté', {
-                description: 'Vos modifications locales ont été conservées. Sauvegardez pour synchroniser.',
-                duration: 5000,
-              });
-              return; // Ne pas écraser le brouillon local
-            }
+          if (localStorage.getItem('ebook_just_reset') === '1') {
+            localStorage.removeItem('ebook_just_reset');
+            console.log('📋 [loadFromDatabase] Reset détecté, on ignore le projet cloud');
+            return;
           }
-        } catch (e) {
-          console.error('Erreur comparaison timestamps:', e);
+        } catch {}
+
+        const dbProject = await loadLatestProject();
+        if (dbProject) {
+          // Comparer avec le brouillon local pour ne pas écraser un travail plus récent
+          try {
+            const localRaw = localStorage.getItem(STORAGE_KEY);
+            if (localRaw) {
+              const localData = JSON.parse(localRaw);
+              const localTime = localData.lastSaved ? new Date(localData.lastSaved).getTime() : 0;
+              const cloudTime = dbProject.updated_at ? new Date(dbProject.updated_at).getTime() : 0;
+              
+              if (localTime > cloudTime && localData.ebookTitle) {
+                console.log('📋 [loadFromDatabase] Brouillon local plus récent que le cloud, conservation du local');
+                toast.info('Brouillon local plus récent détecté', {
+                  description: 'Vos modifications locales ont été conservées. Sauvegardez pour synchroniser.',
+                  duration: 5000,
+                });
+                return; // Ne pas écraser le brouillon local
+              }
+            }
+          } catch (e) {
+            console.error('Erreur comparaison timestamps:', e);
+          }
+
+          setEbookTitle(dbProject.title);
+          setAuthorName(dbProject.author_name || '');
+          setTargetAudience(dbProject.target_audience || 'Adultes');
+          setTomeNumber(dbProject.tome_number);
+          setWritingStyle(dbProject.writing_style || 'narratif');
+          setChapterLength(dbProject.chapter_length || 'moyen');
+          setDetailLevel(dbProject.detail_level || 'détaillé');
+          setTone(dbProject.tone || 'professionnel');
+          setNarrativeFormat(dbProject.narrative_format || 'troisième personne');
+          setPreface(dbProject.preface || '');
+          setConclusion(dbProject.conclusion || '');
+          setChapters(Array.isArray(dbProject.chapters) ? dbProject.chapters as unknown as Chapter[] : []);
+          setCharacters(Array.isArray(dbProject.characters) ? dbProject.characters as unknown as EbookCharacter[] : []);
+          setEbookImages(normalizeEbookImages(dbProject.ebook_images));
+          setNumberOfChapters(dbProject.number_of_chapters || 8);
+          setBookSummary(dbProject.book_summary || '');
+          setCoverConcepts(dbProject.cover_concepts || '');
+          setSeoOptimization(dbProject.seo_optimization || '');
+          setKdpDescription(dbProject.kdp_description || '');
+          setKdpKeywords(dbProject.kdp_keywords || '');
+          setKdpCategories(dbProject.kdp_categories || '');
         }
-        
-        setEbookTitle(dbProject.title);
-        setAuthorName(dbProject.author_name || '');
-        setTargetAudience(dbProject.target_audience || 'Adultes');
-        setTomeNumber(dbProject.tome_number);
-        setWritingStyle(dbProject.writing_style || 'narratif');
-        setChapterLength(dbProject.chapter_length || 'moyen');
-        setDetailLevel(dbProject.detail_level || 'détaillé');
-        setTone(dbProject.tone || 'professionnel');
-        setNarrativeFormat(dbProject.narrative_format || 'troisième personne');
-        setPreface(dbProject.preface || '');
-        setConclusion(dbProject.conclusion || '');
-        setChapters(Array.isArray(dbProject.chapters) ? dbProject.chapters as unknown as Chapter[] : []);
-        setCharacters(Array.isArray(dbProject.characters) ? dbProject.characters as unknown as EbookCharacter[] : []);
-        setEbookImages(normalizeEbookImages(dbProject.ebook_images));
-        setNumberOfChapters(dbProject.number_of_chapters || 8);
-        setBookSummary(dbProject.book_summary || '');
-        setCoverConcepts(dbProject.cover_concepts || '');
-        setSeoOptimization(dbProject.seo_optimization || '');
-        setKdpDescription(dbProject.kdp_description || '');
-        setKdpKeywords(dbProject.kdp_keywords || '');
-        setKdpCategories(dbProject.kdp_categories || '');
+      } finally {
+        setInitialLoadDone(true);
       }
     };
     loadFromDatabase();
