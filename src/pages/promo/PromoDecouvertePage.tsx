@@ -91,7 +91,7 @@ const PromoDecouvertePage = () => {
             EbookStudio génère plan, chapitres, couverture, mots-clés Amazon et fichiers KDP-compliant. Sans ligne d'écriture.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-            <Link to={offerActive ? "/promo/commande?plan=fondateur47" : "/promo/commande"}>
+            <Link to={offerActive ? "/coaching-vip" : "/promo/commande"}>
               <Button className="bg-[#FF9E2D] hover:bg-[#e88f1f] text-white font-bold py-6 px-8 text-base">
                 🚀 Démarrer maintenant — {price}€ à vie
               </Button>
@@ -236,7 +236,7 @@ const PromoDecouvertePage = () => {
               <li key={x} className="flex gap-2"><Check className="w-5 h-5 text-[#008296]" /> {x}</li>
             ))}
           </ul>
-          <Link to={offerActive ? "/promo/commande?plan=fondateur47" : "/promo/commande"}>
+          <Link to={offerActive ? "/coaching-vip" : "/promo/commande"}>
             <Button className="bg-[#FF9E2D] hover:bg-[#e88f1f] text-white font-bold w-full py-6 text-base">
               Je commande maintenant — {price}€ <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
@@ -262,7 +262,7 @@ const PromoDecouvertePage = () => {
         <div className="max-w-3xl mx-auto px-4 text-center space-y-6">
           <h2 className="text-3xl md:text-4xl font-bold">Votre prochain ebook commence aujourd'hui</h2>
           <p className="text-lg opacity-90">Rejoignez les centaines d'auteurs qui publient avec EbookStudio.</p>
-          <Link to={offerActive ? "/promo/commande?plan=fondateur47" : "/promo/commande"}>
+          <Link to={offerActive ? "/coaching-vip" : "/promo/commande"}>
             <Button className="bg-[#FF9E2D] hover:bg-[#e88f1f] text-white font-bold py-6 px-8 text-base">
               🚀 Commander — {price}€ à vie
             </Button>
