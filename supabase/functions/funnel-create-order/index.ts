@@ -19,6 +19,8 @@ const PRODUCTS: Record<string, { label: string; amount: number }> = {
 // Direct download links delivered after upsell payment
 const TEMPLATES_PACK_URL = "https://drive.google.com/uc?export=download&id=177h1X9Up5ufQQOg0Ojc2WMPkVlGkXI4B";
 const NICHES_GUIDE_URL = "https://www.ebookstudio.fr/lead-magnets/5-niches-rentables-2026.pdf";
+const LICENSE_PDF_URL = "https://www.ebookstudio.fr/licence-etendue";
+const NICHES_10_URL = "https://www.ebookstudio.fr/niches-600";
 
 const isValidEmail = (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
 
