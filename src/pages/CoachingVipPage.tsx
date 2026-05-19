@@ -201,6 +201,9 @@ const CoachingVipPage = () => {
       setLoading(false);
     }
   };
+
+  return (
+    <div className="min-h-screen bg-[#FAFAFA] text-[#232F3E] py-10 px-4">
       <Helmet>
         <title>Coaching VIP 30 jours - 10 places à 47€ | EbookStudio</title>
         <meta
