@@ -42,13 +42,15 @@ function buildPaperbackSpec(parsed: ReturnType<typeof parseKdpBrief>) {
   };
 }
 
-const KINDLE_SPEC = `KINDLE eBOOK FRONT COVER — FLAT PRINT-READY ARTWORK.
-- Output a FLAT 2D cover artwork only — NOT a 3D mockup, NOT a book photo, NOT a tilted Kindle device, NOT a shelf scene, NO shadow under a fake book.
+const KINDLE_SPEC = `KINDLE eBOOK FRONT COVER — FLAT PRINT-READY ARTWORK, AMAZON TOP-100 BEST-SELLER GRADE.
+- Output a FLAT 2D cover artwork only — NOT a 3D mockup, NOT a tilted Kindle device, NOT a shelf scene, NO shadow under a fake book.
 - Pure rectangular artwork edge to edge, no border, no frame, no perspective.
-- Vertical portrait, aspect ratio exactly 1.6:1 (e.g. 1600 x 2560 px).
-- Title HUGE, bold, centered, readable at 200px wide thumbnail.
-- Author name clean at the bottom.
-- 8% safe margin from each edge.`;
+- Vertical portrait, aspect ratio exactly 1.6:1 (1600 x 2560 px).
+- MANDATORY VISUAL: a full-bleed CINEMATIC PHOTOREALISTIC SCENE filling 100% of the cover (objects, environment, dramatic lighting, depth of field, rim light, volumetric atmosphere). Shot like a Hollywood movie poster / National Geographic / Phase One photography.
+- ABSOLUTELY FORBIDDEN: plain gradient backgrounds, empty pastel backgrounds, blank colored rectangles, minimalist flat colors, abstract shapes only, watercolor washes, "soft pastel" looks. The cover MUST contain real depicted subject matter relevant to the topic (objects, scene, props, environment).
+- Title placement: HUGE bold sans-serif at TOP, brilliant white or gold with subtle shadow, readable at 200px thumbnail. Subtitle smaller below. Author name clean at the very BOTTOM in solid color.
+- High contrast between text and image (add a dark vignette behind text if needed).
+- Style reference: bestselling non-fiction / thriller covers — dramatic, premium, photographic, $$$ production value.`;
 
 function paperbackSpecPrompt(spec: ReturnType<typeof buildPaperbackSpec>) {
   return `AMAZON KDP PAPERBACK FULL WRAP — single continuous landscape artwork.
@@ -101,7 +103,7 @@ serve(async (req) => {
       : KINDLE_SPEC;
 
     // ===== Build the two reusable prompts (recto + verso) =====
-    const baseArt = `Style: ${style || 'professional'}. Palette: ${colorScheme || 'modern, high contrast'}. Genre: ${genre || 'non-fiction'}.${description ? ` Concept: ${description}.` : ''} Photorealistic magazine-grade quality, NO cartoon, NO low-fidelity, NO watermark, NO Amazon badge, NO mockup. Title typography sharp and perfectly legible.`;
+    const baseArt = `Style: ${style || 'cinematic photorealistic'}. Palette: ${colorScheme || 'deep blacks, brilliant gold accents, dramatic high contrast'}. Genre: ${genre || 'non-fiction'}.${description ? ` Concept to depict literally: ${description}.` : ''} MUST be a real PHOTOGRAPHIC scene with relevant objects/environment shot with Phase One IQ4 + 85mm f/1.4 lens equivalent — sharp foreground subject, cinematic lighting (key + rim + volumetric haze), shallow depth of field, golden hour or dramatic spotlight, magazine-grade detail. NO cartoon, NO illustration, NO flat gradient background, NO empty pastel canvas, NO watercolor, NO low-fidelity. Title typography sharp, perfectly legible, bestseller hierarchy.`;
 
     const rectoPrompt = `FRONT COVER (recto) for the book "${title}"${subtitle ? `, subtitle "${subtitle}"` : ''}, by ${author || 'Author'}. Vertical portrait artwork, ratio 1.6:1, flat 2D print-ready. Title HUGE centered at top third, ${subtitle ? 'subtitle clearly below in smaller elegant type, ' : ''}author name at the bottom. ${baseArt}`;
 
@@ -123,11 +125,12 @@ ${description ? `Concept: ${description}` : ''}
 === FORMAT ===
 ${formatGuidance}
 
-=== QUALITY BAR ===
-- Photorealistic, magazine-grade. ZERO cartoon, ZERO low-fidelity.
-- Title typography perfectly legible — clean, sharp, no warped letters, no fake glyphs.
-- Inspired by current Amazon top 100 best-sellers in this genre.
-- No watermarks, no logos, no UI mockups, no Amazon badges, NO 3D book mockup.
+=== QUALITY BAR (NON-NEGOTIABLE) ===
+- PHOTOREALISTIC CINEMATIC SCENE, full bleed. Think Amazon top-10 thriller / non-fiction bestseller covers (e.g. "Atomic Habits", "Sapiens", thriller covers with dramatic photo scenes + gold/white huge typography).
+- The artwork MUST depict a REAL SCENE with real objects/environment related to the book topic — NOT a flat color, NOT a plain gradient, NOT a pastel watercolor, NOT abstract shapes alone.
+- Dramatic lighting: deep shadows, rim light, golden highlights, volumetric atmosphere, shallow depth of field.
+- Title typography: HUGE, bold sans-serif, white or gold, perfectly sharp, no warped or fake glyphs. Strong contrast against the image (use dark vignette behind text if needed).
+- NO watermark, NO logo, NO UI mockup, NO Amazon badge, NO 3D book mockup, NO tilted device.
 ${referenceImage ? '- Use the attached reference image ONLY for stylistic inspiration (mood, palette, composition). Do NOT copy it.' : ''}`;
 
     let messageContent: string | any[] = textPrompt;
