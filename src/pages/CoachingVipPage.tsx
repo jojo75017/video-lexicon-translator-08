@@ -151,8 +151,6 @@ const faqs = [
 ];
 
 const handleVideoPlay = () => {
-
-const handleVideoPlay = () => {
   trackEvent("coaching_video_play", {});
 };
 
