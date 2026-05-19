@@ -33,7 +33,7 @@ const BG = "#0a0a0a";
 const WHITE = "#FFFFFF";
 const GREY = "#D4D4D4";
 
-const BlackPackHero = ({ onCtaClick, launchEnd, launchPrice = 67, normalPrice = 147 }: BlackPackHeroProps) => {
+const BlackPackHero = ({ onCtaClick, launchEnd, launchPrice = 67, normalPrice = 197 }: BlackPackHeroProps) => {
   const c = useCountdown(launchEnd);
   const discount = Math.round(((normalPrice - launchPrice) / normalPrice) * 100);
 

@@ -16,7 +16,7 @@ const WHITE = "#FFFFFF";
 const GREY = "#D4D4D4";
 const SOFT = "#1a1a1a";
 
-const BlackPackPricing = ({ onCtaClick, launchPrice = 67, normalPrice = 147 }: BlackPackPricingProps) => {
+const BlackPackPricing = ({ onCtaClick, launchPrice = 67, normalPrice = 197 }: BlackPackPricingProps) => {
   const discount = Math.round(((normalPrice - launchPrice) / normalPrice) * 100);
   const navigate = useNavigate();
   const [email, setEmail] = useState("");

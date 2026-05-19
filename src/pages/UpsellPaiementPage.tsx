@@ -13,7 +13,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
 const LAUNCH_PRICE = 67;
-const NORMAL_PRICE = 147;
+const NORMAL_PRICE = 197;
 const SERENITY_PRICE = 30;
 const EXTENDED_LICENSE_PRICE = 47;
 
@@ -30,7 +30,7 @@ const PLAN = {
     "Imagen 3 - couvertures pro",
     "Azure Neural - audiobooks",
     "Export PDF/EPUB/Word",
-    "18 modules de formation (147€ offerts)",
+    "18 modules de formation (197€ offerts)",
     "Outils KDP Premium + SEO",
     "Traduction 30+ langues",
     "P15 Humanisation Anti-IA",

@@ -55,7 +55,7 @@ const OfferValuePage = () => {
       icon: FileText,
       name: "Rédaction de Chapitres IA",
       description: "Génération de contenu de qualité professionnelle pour chaque chapitre",
-      marketValue: 147,
+      marketValue: 197,
       color: "from-primary to-accent"
     },
     {
@@ -142,7 +142,7 @@ const OfferValuePage = () => {
       icon: Mic,
       name: "Formation Audio Premium",
       description: "Toutes les formations en version audio (5h+)",
-      marketValue: 147,
+      marketValue: 197,
       color: "from-blue-600 to-blue-700"
     },
     {
@@ -163,7 +163,7 @@ const OfferValuePage = () => {
       icon: Zap,
       name: "Mises à Jour à Vie",
       description: "Toutes les nouvelles fonctionnalités gratuitement",
-      marketValue: 147,
+      marketValue: 197,
       color: "from-lime-500 to-lime-600"
     },
   ];
@@ -508,7 +508,7 @@ const OfferValuePage = () => {
                 Pourquoi le prix passera-t-il à 247€ ?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground">
-                Le tarif actuel de 67€ est un prix de lancement exceptionnel pour remercier nos premiers utilisateurs. Le 15 septembre 2026 (après les vacances d'été), le prix passera à 147€ pour refléter la valeur réelle de l'outil.
+                Le tarif actuel de 67€ est un prix de lancement exceptionnel pour remercier nos premiers utilisateurs. Le 15 septembre 2026 (après les vacances d'été), le prix passera à 197€ pour refléter la valeur réelle de l'outil.
               </AccordionContent>
             </AccordionItem>
 

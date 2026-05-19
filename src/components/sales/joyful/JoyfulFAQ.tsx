@@ -30,7 +30,7 @@ const items = [
   },
   {
     q: "Le prix va vraiment augmenter ?",
-    a: "Oui, le 15 septembre 2026 il passe à 147€ à vie. C'est le tarif fondateur, on le tient pour récompenser les early adopters comme toi.",
+    a: "Oui, le 15 septembre 2026 il passe à 197€ à vie. C'est le tarif fondateur, on le tient pour récompenser les early adopters comme toi.",
     color: "bg-joy-peach",
   },
 ];
