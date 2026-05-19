@@ -114,12 +114,14 @@ const PageLoader = () => (
 const queryClient = new QueryClient();
 
 const App = () => {
+  useBrandTitle();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [subscriberEmail, setSubscriberEmail] = useState('');
   const [subscriberData, setSubscriberData] = useState<any>(null);
   // Admin status is ONLY set after server-side verification - never from client storage
   const [isAdmin, setIsAdmin] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
 
   // Admin email is checked server-side only (via check-admin edge function)
 
