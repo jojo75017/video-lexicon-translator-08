@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
 import { EbookSettingsPanel } from '@/components/ebook/EbookSettingsPanel';
 import KdpPackButton from '@/components/shared/KdpPackButton';
+import AITokenHeaderBadge from '@/components/shared/AITokenHeaderBadge';
 
 interface EspaceHeaderProps {
   projectTitle?: string | null;
@@ -352,6 +353,7 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
         </div>
 
         <div className="flex items-center gap-1">
+          <AITokenHeaderBadge />
           <KdpPackButton
             size="sm"
             label="Pack KDP"
