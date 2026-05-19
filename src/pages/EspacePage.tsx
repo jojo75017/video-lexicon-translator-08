@@ -54,7 +54,7 @@ const EspacePage: React.FC<EspacePageProps> = ({ subscriberEmail, onLogout }) =>
 
   useEffect(() => {
     let cancelled = false;
-    getIsCurrentSessionAdmin().then((v) => { if (!cancelled) setIsAdmin(!!v); }).catch(() => {});
+    getIsCurrentSessionAdmin().then((v) => { if (!cancelled) setIsAdmin(!!v); }).catch(() => undefined);
     return () => { cancelled = true; };
   }, []);
 
@@ -109,7 +109,7 @@ const EspacePage: React.FC<EspacePageProps> = ({ subscriberEmail, onLogout }) =>
   }, []);
 
   const goPlanner = (tab?: string) => {
-    if (tab) { try { localStorage.setItem('ebook_planner_active_tab', tab); } catch {} }
+    if (tab) { try { localStorage.setItem('ebook_planner_active_tab', tab); } catch { void 0; } }
     navigate('/ebook-planner');
   };
 
@@ -296,7 +296,7 @@ const EspacePage: React.FC<EspacePageProps> = ({ subscriberEmail, onLogout }) =>
               Voir mes cadeaux →
             </button>
             <button
-              onClick={() => { try { localStorage.setItem('launch_vip_banner_dismissed_v1', '1'); } catch {}; window.location.reload(); }}
+                onClick={() => { try { localStorage.setItem('launch_vip_banner_dismissed_v1', '1'); } catch { void 0; } window.location.reload(); }}
               className="text-white/80 hover:text-white text-lg leading-none px-1"
               aria-label="Fermer"
             >
