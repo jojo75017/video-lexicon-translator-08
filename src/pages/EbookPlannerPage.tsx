@@ -553,7 +553,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   }, []);
 
   // Sauvegarde forcée périodique toutes les 60 secondes (filet de sécurité pour le workflow)
+  // ⚠️ Bloquée tant que le chargement initial n'est pas terminé, sinon doublon en base.
   useEffect(() => {
+    if (!initialLoadDone) return;
     const forceSaveInterval = setInterval(async () => {
       const data = currentDataRef.current;
       if (data.ebookTitle) {
@@ -575,7 +577,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       }
     }, 60000);
     return () => clearInterval(forceSaveInterval);
-  }, [saveProject]);
+  }, [saveProject, initialLoadDone]);
 
   // Sauvegarde avant fermeture/refresh de la page
   useEffect(() => {
@@ -601,7 +603,10 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   }, []);
 
   // Récupérer la sauvegarde en attente au chargement
+  // ⚠️ Attend la fin de loadLatestProject pour que currentProjectId soit défini
+  // → la sauvegarde devient UPDATE au lieu de créer un doublon.
   useEffect(() => {
+    if (!initialLoadDone) return;
     const pending = localStorage.getItem('ebook_pending_save');
     if (pending) {
       try {
@@ -610,7 +615,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
         saveProject(projectData, false);
       } catch {}
     }
-  }, []);
+  }, [initialLoadDone, saveProject]);
 
   // Fonction pour nettoyer les images base64 volumineuses du contenu avant localStorage
   // Garde les URLs cloud [IMAGE_URL:https://...] mais supprime les base64
