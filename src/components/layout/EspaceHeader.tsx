@@ -211,6 +211,7 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
   const [allToolsOpen, setAllToolsOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     let cancelled = false;
