@@ -42,13 +42,15 @@ function buildPaperbackSpec(parsed: ReturnType<typeof parseKdpBrief>) {
   };
 }
 
-const KINDLE_SPEC = `KINDLE eBOOK FRONT COVER — FLAT PRINT-READY ARTWORK.
-- Output a FLAT 2D cover artwork only — NOT a 3D mockup, NOT a book photo, NOT a tilted Kindle device, NOT a shelf scene, NO shadow under a fake book.
+const KINDLE_SPEC = `KINDLE eBOOK FRONT COVER — FLAT PRINT-READY ARTWORK, AMAZON TOP-100 BEST-SELLER GRADE.
+- Output a FLAT 2D cover artwork only — NOT a 3D mockup, NOT a tilted Kindle device, NOT a shelf scene, NO shadow under a fake book.
 - Pure rectangular artwork edge to edge, no border, no frame, no perspective.
-- Vertical portrait, aspect ratio exactly 1.6:1 (e.g. 1600 x 2560 px).
-- Title HUGE, bold, centered, readable at 200px wide thumbnail.
-- Author name clean at the bottom.
-- 8% safe margin from each edge.`;
+- Vertical portrait, aspect ratio exactly 1.6:1 (1600 x 2560 px).
+- MANDATORY VISUAL: a full-bleed CINEMATIC PHOTOREALISTIC SCENE filling 100% of the cover (objects, environment, dramatic lighting, depth of field, rim light, volumetric atmosphere). Shot like a Hollywood movie poster / National Geographic / Phase One photography.
+- ABSOLUTELY FORBIDDEN: plain gradient backgrounds, empty pastel backgrounds, blank colored rectangles, minimalist flat colors, abstract shapes only, watercolor washes, "soft pastel" looks. The cover MUST contain real depicted subject matter relevant to the topic (objects, scene, props, environment).
+- Title placement: HUGE bold sans-serif at TOP, brilliant white or gold with subtle shadow, readable at 200px thumbnail. Subtitle smaller below. Author name clean at the very BOTTOM in solid color.
+- High contrast between text and image (add a dark vignette behind text if needed).
+- Style reference: bestselling non-fiction / thriller covers — dramatic, premium, photographic, $$$ production value.`;
 
 function paperbackSpecPrompt(spec: ReturnType<typeof buildPaperbackSpec>) {
   return `AMAZON KDP PAPERBACK FULL WRAP — single continuous landscape artwork.
