@@ -277,6 +277,7 @@ function NotificationsPanel() {
 
 // ─── Main Forum Page ───
 export default function ForumPage() {
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeCategory = searchParams.get('cat') || '';
   const activePostId = searchParams.get('post') || '';
