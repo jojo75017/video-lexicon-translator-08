@@ -366,6 +366,22 @@ const CoachingVipPage = () => {
               <ShieldCheck className="w-3 h-3" />
               Paiement sécurisé PayPal (carte bancaire acceptée)
             </p>
+
+            {/* Bonus inclus — envoi par email après commande */}
+            <div className="mt-6 bg-gradient-to-r from-[#FF9E2D]/10 to-[#008296]/10 border-2 border-[#FF9E2D]/40 rounded-xl p-4 text-left">
+              <p className="text-sm font-black text-[#232F3E] mb-2 flex items-center gap-2">
+                🎁 Bonus inclus avec votre commande
+              </p>
+              <ul className="text-sm text-[#232F3E]/80 space-y-1.5 mb-3">
+                <li className="flex gap-2"><span>✅</span><span><strong>Licence commerciale étendue</strong> — revendez vos ebooks sans limite</span></li>
+                <li className="flex gap-2"><span>✅</span><span><strong>Guide des 10 niches KDP rentables 2026</strong> — mots-clés, exemples, prix conseillés</span></li>
+              </ul>
+              <p className="text-xs text-[#232F3E]/70 flex items-start gap-1.5 bg-white/60 rounded-lg p-2.5 border border-[#FF9E2D]/30">
+                <span className="text-base leading-none">🔒</span>
+                <span><strong>Liens d'accès envoyés par email dans les minutes suivant le paiement</strong> — réservés aux acheteurs uniquement (non publics).</span>
+              </p>
+            </div>
+
           </CardContent>
         </Card>
 
