@@ -753,109 +753,221 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
           ) : (
             <div className="grid grid-cols-1 gap-6">
               {generatedCovers.map((cover, i) => (
-                <div key={i} className="rounded-lg border bg-muted/20 overflow-hidden">
-                  <div className="flex items-center justify-between p-3 border-b bg-background/50">
-                    <Badge className="bg-primary/10 text-primary border-primary/30">
-                      {cover.format === 'kindle' ? '📱 Kindle eBook' : '📖 Broché complet (face + dos + 4ème)'}
-                    </Badge>
-                    <div className="flex gap-2">
-                      <Button size="sm" variant="outline" onClick={() => downloadCover(cover, i)}>
-                        <Download className="h-3 w-3 mr-1" /> Télécharger
-                      </Button>
-                      <Button
-                        size="sm"
-                        onClick={() => {
-                          onCoverGenerated?.(cover.url);
-                          toast.success('Couverture sélectionnée');
-                        }}
-                      >
-                        ✓ Utiliser cette couverture
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className="relative bg-muted">
-                    <img
-                      src={cover.url}
-                      alt={`Couverture ${i + 1}`}
-                      className={`w-full object-contain ${
-                        cover.format === 'kindle' ? 'max-h-[600px]' : 'max-h-[420px]'
-                      }`}
-                    />
-
-                    {/* Overlay repères broché */}
-                    {cover.format === 'paperback' && (
-                      <svg
-                        className="absolute inset-0 w-full h-full pointer-events-none"
-                        viewBox="0 0 100 60"
-                        preserveAspectRatio="none"
-                      >
-                        {/* Marge de sécurité 3mm (≈3% du wrap) */}
-                        <rect x="3" y="3" width="94" height="54" fill="none" stroke="hsl(var(--primary))" strokeWidth="0.15" strokeDasharray="0.5,0.5" opacity="0.7" />
-                        {/* Séparateurs panneaux : back | spine | front */}
-                        <line x1="46" y1="0" x2="46" y2="60" stroke="hsl(var(--primary))" strokeWidth="0.2" strokeDasharray="0.8,0.4" opacity="0.8" />
-                        <line x1="54" y1="0" x2="54" y2="60" stroke="hsl(var(--primary))" strokeWidth="0.2" strokeDasharray="0.8,0.4" opacity="0.8" />
-                        {/* Zone ISBN (bas droit du panneau back) */}
-                        <rect x="33" y="46" width="11" height="9" fill="hsl(var(--primary) / 0.15)" stroke="hsl(var(--primary))" strokeWidth="0.2" />
-                      </svg>
-                    )}
-
-                    {cover.format === 'paperback' && (
-                      <div className="absolute inset-x-0 bottom-0 bg-background/85 backdrop-blur-sm border-t px-3 py-2 flex flex-wrap gap-3 text-[11px]">
-                        <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-primary" /> Marge sécurité 3mm</span>
-                        <span className="flex items-center gap-1"><span className="w-3 h-0.5 border-t border-dashed border-primary" /> Pliures dos</span>
-                        <span className="flex items-center gap-1"><span className="w-3 h-2 bg-primary/30 border border-primary" /> Zone ISBN (5×3 cm)</span>
-                        <span className="ml-auto text-muted-foreground">4ème · Dos · Face</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Spec dimensions broché */}
-                  {cover.format === 'paperback' && cover.paperbackSpec && (
-                    <div className="px-3 py-2 border-t bg-muted/30 text-[11px] flex flex-wrap gap-x-4 gap-y-1">
-                      <span className="flex items-center gap-1 font-semibold"><Ruler className="w-3 h-3" /> Spec calculée :</span>
-                      <span>Trim <strong>{cover.paperbackSpec.trim}</strong></span>
-                      <span>Dos <strong>{cover.paperbackSpec.spineMm} mm</strong>{cover.paperbackSpec.pages ? ` (${cover.paperbackSpec.pages} p.)` : ''}</span>
-                      <span>Wrap total <strong>{cover.paperbackSpec.totalWmm} × {cover.paperbackSpec.totalHmm} mm</strong></span>
-                      <span>Bleed <strong>{cover.paperbackSpec.bleed} mm</strong></span>
-                    </div>
-                  )}
-
-                  {/* Prompts recto + verso à copier */}
-                  {cover.prompts && (
-                    <div className="border-t bg-background p-3 space-y-3">
-                      <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
-                        <Sparkles className="w-3.5 h-3.5 text-primary" />
-                        Prompts professionnels prêts à copier (MidJourney, DALL·E, Imagen, Firefly…)
-                      </div>
-                      <div className="grid md:grid-cols-2 gap-3">
-                        <div className="rounded-lg border bg-muted/20 p-2 space-y-1.5">
-                          <div className="flex items-center justify-between">
-                            <Badge variant="outline" className="text-[10px]">RECTO · Face</Badge>
-                            <Button size="sm" variant="ghost" className="h-6 px-2 text-[11px]" onClick={() => copyPrompt(cover.prompts!.recto, 'recto')}>
-                              <Copy className="w-3 h-3 mr-1" /> Copier
-                            </Button>
-                          </div>
-                          <Textarea readOnly value={cover.prompts.recto} className="text-[11px] min-h-[120px] font-mono" />
-                        </div>
-                        <div className="rounded-lg border bg-muted/20 p-2 space-y-1.5">
-                          <div className="flex items-center justify-between">
-                            <Badge variant="outline" className="text-[10px]">VERSO · 4ème</Badge>
-                            <Button size="sm" variant="ghost" className="h-6 px-2 text-[11px]" onClick={() => copyPrompt(cover.prompts!.verso, 'verso')}>
-                              <Copy className="w-3 h-3 mr-1" /> Copier
-                            </Button>
-                          </div>
-                          <Textarea readOnly value={cover.prompts.verso} className="text-[11px] min-h-[120px] font-mono" />
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
+                <CoverCard
+                  key={i}
+                  cover={cover}
+                  index={i}
+                  onDownload={() => downloadCover(cover, i)}
+                  onUse={() => {
+                    onCoverGenerated?.(cover.url);
+                    toast.success('Couverture sélectionnée');
+                  }}
+                  copyPrompt={copyPrompt}
+                />
               ))}
             </div>
           )}
         </CardContent>
       </Card>
+    </div>
+  );
+};
+
+// ============================================================
+// CoverCard - affiche la couverture dans le bon ratio Amazon
+// + mockup vignette/fiche pour éviter toute mauvaise surprise
+// ============================================================
+interface CoverCardProps {
+  cover: GeneratedCover;
+  index: number;
+  onDownload: () => void;
+  onUse: () => void;
+  copyPrompt: (text: string, label: string) => void;
+}
+
+const CoverCard: React.FC<CoverCardProps> = ({ cover, index, onDownload, onUse, copyPrompt }) => {
+  const [dims, setDims] = useState<{ w: number; h: number } | null>(null);
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  const handleImgLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    setDims({ w: img.naturalWidth, h: img.naturalHeight });
+  };
+
+  // Ratios cibles Amazon : Kindle 1.6:1 (2560x1600 mini), Broché variable
+  const kindleTargetRatio = 1.6;
+  const realRatio = dims ? dims.h / dims.w : null;
+  const ratioOk = cover.format === 'kindle' && realRatio
+    ? Math.abs(realRatio - kindleTargetRatio) < 0.05
+    : true;
+  const resolutionOk = dims ? dims.w >= 1600 && dims.h >= 2560 : true;
+
+  return (
+    <div className="rounded-lg border bg-muted/20 overflow-hidden">
+      <div className="flex items-center justify-between p-3 border-b bg-background/50">
+        <Badge className="bg-primary/10 text-primary border-primary/30">
+          {cover.format === 'kindle' ? '📱 Kindle eBook' : '📖 Broché complet (face + dos + 4ème)'}
+        </Badge>
+        <div className="flex gap-2">
+          <Button size="sm" variant="outline" onClick={onDownload}>
+            <Download className="h-3 w-3 mr-1" /> Télécharger
+          </Button>
+          <Button size="sm" onClick={onUse}>
+            ✓ Utiliser cette couverture
+          </Button>
+        </div>
+      </div>
+
+      {/* ===== Aperçu KINDLE dans le BON ratio Amazon (1.6:1) ===== */}
+      {cover.format === 'kindle' ? (
+        <div className="p-4 grid grid-cols-1 md:grid-cols-[1fr_280px] gap-4 bg-gradient-to-br from-muted/30 to-background">
+          {/* Cadre exact ratio Amazon Kindle */}
+          <div className="flex flex-col items-center">
+            <div
+              className="relative bg-[#1a1a1a] rounded-md shadow-2xl overflow-hidden"
+              style={{ aspectRatio: '1600 / 2560', width: '100%', maxWidth: 360 }}
+            >
+              <img
+                ref={imgRef}
+                src={cover.url}
+                alt={`Couverture ${index + 1}`}
+                onLoad={handleImgLoad}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              <div className="absolute top-2 left-2 bg-black/70 text-white text-[9px] px-2 py-0.5 rounded-full backdrop-blur-sm">
+                Cadre Amazon Kindle 1.6:1
+              </div>
+            </div>
+
+            {/* Validation dimensions */}
+            <div className="mt-3 w-full max-w-[360px] space-y-1.5">
+              {dims && (
+                <div className="text-[11px] flex items-center justify-between bg-background/80 border rounded-md px-2.5 py-1.5">
+                  <span className="font-mono text-muted-foreground">{dims.w} × {dims.h} px</span>
+                  <span className="text-muted-foreground">Ratio {realRatio?.toFixed(2)}:1</span>
+                </div>
+              )}
+              <div className={`text-[11px] flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border ${ratioOk ? 'bg-emerald-50 border-emerald-200 text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-300' : 'bg-amber-50 border-amber-200 text-amber-800 dark:bg-amber-950/30 dark:text-amber-300'}`}>
+                {ratioOk ? <CheckCircle2 className="w-3.5 h-3.5" /> : <AlertTriangle className="w-3.5 h-3.5" />}
+                {ratioOk ? 'Ratio conforme Amazon Kindle (1.6:1)' : `Ratio ${realRatio?.toFixed(2)}:1 — Amazon attend 1.6:1, des bandes pourront apparaître`}
+              </div>
+              {dims && (
+                <div className={`text-[11px] flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border ${resolutionOk ? 'bg-emerald-50 border-emerald-200 text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-300' : 'bg-amber-50 border-amber-200 text-amber-800 dark:bg-amber-950/30 dark:text-amber-300'}`}>
+                  {resolutionOk ? <CheckCircle2 className="w-3.5 h-3.5" /> : <AlertTriangle className="w-3.5 h-3.5" />}
+                  {resolutionOk ? 'Résolution suffisante (≥ 1600×2560 px)' : 'Résolution sous le minimum recommandé Amazon (1600×2560 px)'}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Mockup Amazon : vignette catalogue + fiche produit */}
+          <div className="space-y-3">
+            <div className="text-[11px] font-semibold text-muted-foreground flex items-center gap-1.5">
+              <Eye className="w-3.5 h-3.5 text-primary" /> Aperçu Amazon (sans surprise)
+            </div>
+
+            {/* Vignette catalogue */}
+            <div className="rounded-md border bg-background p-2.5 shadow-sm">
+              <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1.5">Vignette résultats</div>
+              <div className="flex gap-2.5">
+                <img src={cover.url} alt="thumb" className="w-[60px] h-[96px] object-cover rounded-sm border" />
+                <div className="flex-1 min-w-0">
+                  <div className="text-[11px] font-semibold text-[#007185] truncate">Votre couverture</div>
+                  <div className="text-[10px] text-muted-foreground mt-0.5">Format Kindle</div>
+                  <div className="text-[10px] text-[#B12704] font-bold mt-1">EUR 4,99</div>
+                  <div className="flex items-center gap-0.5 mt-0.5 text-[#FF9E2D] text-[10px]">★★★★★</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Fiche produit */}
+            <div className="rounded-md border bg-background p-2.5 shadow-sm">
+              <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1.5">Fiche produit</div>
+              <div className="flex gap-2.5">
+                <img src={cover.url} alt="detail" className="w-[90px] h-[144px] object-cover rounded-sm border" />
+                <div className="flex-1 min-w-0 space-y-1">
+                  <div className="text-[11px] font-semibold text-[#0F1111] truncate">Votre titre</div>
+                  <div className="text-[10px] text-[#007185]">par Auteur</div>
+                  <button type="button" className="mt-1 text-[10px] bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] font-medium rounded-full px-3 py-1 border border-[#FCD200]">
+                    Acheter en 1-Click
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <p className="text-[10px] text-muted-foreground leading-relaxed">
+              C'est exactement ainsi que ta couverture apparaîtra sur Amazon. Si tu vois des éléments coupés ou mal cadrés, régénère avec un autre style.
+            </p>
+          </div>
+        </div>
+      ) : (
+        /* ===== Aperçu BROCHÉ (inchangé, avec overlay repères) ===== */
+        <div className="relative bg-muted">
+          <img
+            src={cover.url}
+            alt={`Couverture ${index + 1}`}
+            onLoad={handleImgLoad}
+            className="w-full object-contain max-h-[420px]"
+          />
+          <svg
+            className="absolute inset-0 w-full h-full pointer-events-none"
+            viewBox="0 0 100 60"
+            preserveAspectRatio="none"
+          >
+            <rect x="3" y="3" width="94" height="54" fill="none" stroke="hsl(var(--primary))" strokeWidth="0.15" strokeDasharray="0.5,0.5" opacity="0.7" />
+            <line x1="46" y1="0" x2="46" y2="60" stroke="hsl(var(--primary))" strokeWidth="0.2" strokeDasharray="0.8,0.4" opacity="0.8" />
+            <line x1="54" y1="0" x2="54" y2="60" stroke="hsl(var(--primary))" strokeWidth="0.2" strokeDasharray="0.8,0.4" opacity="0.8" />
+            <rect x="33" y="46" width="11" height="9" fill="hsl(var(--primary) / 0.15)" stroke="hsl(var(--primary))" strokeWidth="0.2" />
+          </svg>
+          <div className="absolute inset-x-0 bottom-0 bg-background/85 backdrop-blur-sm border-t px-3 py-2 flex flex-wrap gap-3 text-[11px]">
+            <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-primary" /> Marge sécurité 3mm</span>
+            <span className="flex items-center gap-1"><span className="w-3 h-0.5 border-t border-dashed border-primary" /> Pliures dos</span>
+            <span className="flex items-center gap-1"><span className="w-3 h-2 bg-primary/30 border border-primary" /> Zone ISBN (5×3 cm)</span>
+            <span className="ml-auto text-muted-foreground">4ème · Dos · Face</span>
+          </div>
+        </div>
+      )}
+
+      {/* Spec dimensions broché */}
+      {cover.format === 'paperback' && cover.paperbackSpec && (
+        <div className="px-3 py-2 border-t bg-muted/30 text-[11px] flex flex-wrap gap-x-4 gap-y-1">
+          <span className="flex items-center gap-1 font-semibold"><Ruler className="w-3 h-3" /> Spec calculée :</span>
+          <span>Trim <strong>{cover.paperbackSpec.trim}</strong></span>
+          <span>Dos <strong>{cover.paperbackSpec.spineMm} mm</strong>{cover.paperbackSpec.pages ? ` (${cover.paperbackSpec.pages} p.)` : ''}</span>
+          <span>Wrap total <strong>{cover.paperbackSpec.totalWmm} × {cover.paperbackSpec.totalHmm} mm</strong></span>
+          <span>Bleed <strong>{cover.paperbackSpec.bleed} mm</strong></span>
+        </div>
+      )}
+
+      {/* Prompts recto + verso à copier */}
+      {cover.prompts && (
+        <div className="border-t bg-background p-3 space-y-3">
+          <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
+            <Sparkles className="w-3.5 h-3.5 text-primary" />
+            Prompts professionnels prêts à copier (MidJourney, DALL·E, Imagen, Firefly…)
+          </div>
+          <div className="grid md:grid-cols-2 gap-3">
+            <div className="rounded-lg border bg-muted/20 p-2 space-y-1.5">
+              <div className="flex items-center justify-between">
+                <Badge variant="outline" className="text-[10px]">RECTO · Face</Badge>
+                <Button size="sm" variant="ghost" className="h-6 px-2 text-[11px]" onClick={() => copyPrompt(cover.prompts!.recto, 'recto')}>
+                  <Copy className="w-3 h-3 mr-1" /> Copier
+                </Button>
+              </div>
+              <Textarea readOnly value={cover.prompts.recto} className="text-[11px] min-h-[120px] font-mono" />
+            </div>
+            <div className="rounded-lg border bg-muted/20 p-2 space-y-1.5">
+              <div className="flex items-center justify-between">
+                <Badge variant="outline" className="text-[10px]">VERSO · 4ème</Badge>
+                <Button size="sm" variant="ghost" className="h-6 px-2 text-[11px]" onClick={() => copyPrompt(cover.prompts!.verso, 'verso')}>
+                  <Copy className="w-3 h-3 mr-1" /> Copier
+                </Button>
+              </div>
+              <Textarea readOnly value={cover.prompts.verso} className="text-[11px] min-h-[120px] font-mono" />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
