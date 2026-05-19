@@ -210,27 +210,26 @@ const PromoDecouvertePage = () => {
                   <span>
                     <strong>Licence commerciale étendue</strong> — revendre, packager, white-label.{' '}
                     <Link to="/licence-etendue" className="text-[#008296] underline hover:text-[#FF9E2D]">
-                      Voir détails →
+                      Voir conditions →
                     </Link>
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-5 h-5 text-[#008296] flex-shrink-0 mt-0.5" />
                   <span>
-                    <strong>Guide des 10 niches KDP rentables 2026</strong> — mots-clés, exemples, prix.{' '}
-                    <a
-                      href={GUIDE_10_NICHES_URL}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[#008296] underline hover:text-[#FF9E2D]"
-                    >
-                      Aperçu →
-                    </a>
+                    <strong>Guide des 10 niches KDP rentables 2026</strong> — mots-clés, exemples, prix de vente conseillés.
                   </span>
                 </li>
               </ul>
+              <div className="mt-4 pt-3 border-t border-[#FF9E2D]/30 flex items-start gap-2 text-xs text-[#232F3E]/80 bg-white/60 rounded-lg p-2.5">
+                <span className="text-base">🔒</span>
+                <span>
+                  <strong>Liens d'accès aux bonus envoyés par email après votre commande</strong> — réservés aux acheteurs uniquement. Vous recevrez tout dans les minutes suivant le paiement.
+                </span>
+              </div>
             </div>
           )}
+
 
           <ul className="text-left space-y-2 mb-8 max-w-md mx-auto">
             {['Ebooks illimités', 'Couvertures illimitées', 'Audiobook + BD inclus', 'Licence commerciale', 'Formation + Forum', 'Support email prioritaire'].map((x) => (
