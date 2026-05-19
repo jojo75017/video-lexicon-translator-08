@@ -1,9 +1,25 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import FunnelLayout from '@/components/funnel/FunnelLayout';
 import SeoHead from '@/components/funnel/SeoHead';
 import { Button } from '@/components/ui/button';
 import { useReferralTracking } from '@/hooks/useReferralTracking';
-import { Check, Sparkles, Zap, Shield, BookOpen, TrendingUp, Star, ArrowRight } from 'lucide-react';
+import { Check, Sparkles, Zap, Shield, BookOpen, TrendingUp, Star, ArrowRight, Gift, Clock } from 'lucide-react';
+
+const OFFER_END = new Date('2026-06-30T23:59:59');
+const GUIDE_10_NICHES_URL = 'https://www.trafic-affiliation.com/niches_ebookstudio';
+
+function useCountdown(target: Date) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 60_000);
+    return () => clearInterval(id);
+  }, []);
+  const diff = Math.max(0, target.getTime() - now);
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  return { days, hours, expired: diff === 0 };
+}
 
 const PromoDecouvertePage = () => {
   useReferralTracking();
