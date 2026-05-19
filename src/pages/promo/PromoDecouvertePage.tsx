@@ -180,18 +180,66 @@ const PromoDecouvertePage = () => {
       {/* PRICING */}
       <section className="max-w-3xl mx-auto px-4 py-16 text-center">
         <h2 className="text-3xl font-bold mb-4">Un seul tarif. Tout inclus.</h2>
-        <div className="bg-white border-2 border-[#008296] rounded-2xl p-8 mt-8 shadow-lg">
+        <div className="bg-white border-2 border-[#008296] rounded-2xl p-8 mt-8 shadow-lg relative">
+          {offerActive && (
+            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#EC4899] to-[#FF9E2D] text-white text-xs font-black px-4 py-1.5 rounded-full shadow-lg animate-pulse">
+              🎁 OFFRE FONDATEUR — JUSQU'AU 30 JUIN 2026
+            </div>
+          )}
           <p className="text-sm font-semibold text-[#FF9E2D] uppercase">Accès à vie</p>
-          <p className="text-5xl font-bold my-4">67€<span className="text-xl text-gray-500"> à vie</span></p>
+          <p className="text-5xl font-bold my-4 flex items-baseline justify-center gap-3">
+            {offerActive && <span className="text-2xl text-gray-400 line-through font-normal">67€</span>}
+            <span>{price}€</span>
+            <span className="text-xl text-gray-500 font-normal"> à vie</span>
+          </p>
+          {offerActive && (
+            <span className="inline-block bg-[#EC4899]/10 text-[#EC4899] text-xs font-bold px-3 py-1 rounded-full mb-3">
+              -30% · Économisez 20€
+            </span>
+          )}
           <p className="text-gray-600 mb-6">Paiement unique. Aucun abonnement. Accès illimité pour toujours.</p>
+
+          {offerActive && (
+            <div className="bg-gradient-to-br from-[#FF9E2D]/10 to-[#EC4899]/10 border-2 border-dashed border-[#FF9E2D] rounded-xl p-5 mb-6 text-left">
+              <p className="text-sm font-black text-[#232F3E] uppercase mb-3 flex items-center gap-2">
+                <Gift className="w-4 h-4 text-[#EC4899]" /> 2 Bonus offerts (valeur 97€)
+              </p>
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-start gap-2">
+                  <Check className="w-5 h-5 text-[#008296] flex-shrink-0 mt-0.5" />
+                  <span>
+                    <strong>Licence commerciale étendue</strong> — revendre, packager, white-label.{' '}
+                    <Link to="/licence-etendue" className="text-[#008296] underline hover:text-[#FF9E2D]">
+                      Voir détails →
+                    </Link>
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-5 h-5 text-[#008296] flex-shrink-0 mt-0.5" />
+                  <span>
+                    <strong>Guide des 10 niches KDP rentables 2026</strong> — mots-clés, exemples, prix.{' '}
+                    <a
+                      href={GUIDE_10_NICHES_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[#008296] underline hover:text-[#FF9E2D]"
+                    >
+                      Aperçu →
+                    </a>
+                  </span>
+                </li>
+              </ul>
+            </div>
+          )}
+
           <ul className="text-left space-y-2 mb-8 max-w-md mx-auto">
             {['Ebooks illimités', 'Couvertures illimitées', 'Audiobook + BD inclus', 'Licence commerciale', 'Formation + Forum', 'Support email prioritaire'].map((x) => (
               <li key={x} className="flex gap-2"><Check className="w-5 h-5 text-[#008296]" /> {x}</li>
             ))}
           </ul>
-          <Link to="/promo/commande">
+          <Link to={offerActive ? "/promo/commande?plan=fondateur47" : "/promo/commande"}>
             <Button className="bg-[#FF9E2D] hover:bg-[#e88f1f] text-white font-bold w-full py-6 text-base">
-              Je commande maintenant <ArrowRight className="w-5 h-5 ml-2" />
+              Je commande maintenant — {price}€ <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
           </Link>
         </div>
