@@ -404,20 +404,14 @@ const CoachingVipPage = () => {
               Paiement unique • 30 jours d'accompagnement • Réponse sous 24h
             </p>
 
-            <a
-              href={PAYPAL_LINK}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => handlePaypalClick("main_cta")}
+            <Button
+              size="lg"
+              onClick={() => openCheckout("main_cta")}
+              className="w-full md:w-auto px-10 py-6 text-lg font-black bg-[#FF9E2D] hover:bg-[#FF8C00] text-[#232F3E] rounded-xl shadow-lg"
             >
-              <Button
-                size="lg"
-                className="w-full md:w-auto px-10 py-6 text-lg font-black bg-[#FF9E2D] hover:bg-[#FF8C00] text-[#232F3E] rounded-xl shadow-lg"
-              >
-                Je réserve ma place - {PRICE}€
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-            </a>
+              Je réserve ma place - {PRICE}€
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </Button>
             <p className="text-xs text-[#232F3E]/60 mt-4 flex items-center justify-center gap-2">
               <ShieldCheck className="w-3 h-3" />
               Paiement sécurisé PayPal (carte bancaire acceptée)
