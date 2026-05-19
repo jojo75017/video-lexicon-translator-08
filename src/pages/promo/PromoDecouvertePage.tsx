@@ -23,6 +23,9 @@ function useCountdown(target: Date) {
 
 const PromoDecouvertePage = () => {
   useReferralTracking();
+  const { days, hours, expired } = useCountdown(OFFER_END);
+  const offerActive = !expired;
+  const price = offerActive ? '47' : '67';
 
   const features = [
     { icon: Sparkles, title: 'Plan d\'ebook IA', desc: 'Génération du plan complet en 30 secondes - pipeline 15 agents.' },
