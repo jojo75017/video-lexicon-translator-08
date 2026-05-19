@@ -103,7 +103,7 @@ serve(async (req) => {
       : KINDLE_SPEC;
 
     // ===== Build the two reusable prompts (recto + verso) =====
-    const baseArt = `Style: ${style || 'professional'}. Palette: ${colorScheme || 'modern, high contrast'}. Genre: ${genre || 'non-fiction'}.${description ? ` Concept: ${description}.` : ''} Photorealistic magazine-grade quality, NO cartoon, NO low-fidelity, NO watermark, NO Amazon badge, NO mockup. Title typography sharp and perfectly legible.`;
+    const baseArt = `Style: ${style || 'cinematic photorealistic'}. Palette: ${colorScheme || 'deep blacks, brilliant gold accents, dramatic high contrast'}. Genre: ${genre || 'non-fiction'}.${description ? ` Concept to depict literally: ${description}.` : ''} MUST be a real PHOTOGRAPHIC scene with relevant objects/environment shot with Phase One IQ4 + 85mm f/1.4 lens equivalent — sharp foreground subject, cinematic lighting (key + rim + volumetric haze), shallow depth of field, golden hour or dramatic spotlight, magazine-grade detail. NO cartoon, NO illustration, NO flat gradient background, NO empty pastel canvas, NO watercolor, NO low-fidelity. Title typography sharp, perfectly legible, bestseller hierarchy.`;
 
     const rectoPrompt = `FRONT COVER (recto) for the book "${title}"${subtitle ? `, subtitle "${subtitle}"` : ''}, by ${author || 'Author'}. Vertical portrait artwork, ratio 1.6:1, flat 2D print-ready. Title HUGE centered at top third, ${subtitle ? 'subtitle clearly below in smaller elegant type, ' : ''}author name at the bottom. ${baseArt}`;
 
