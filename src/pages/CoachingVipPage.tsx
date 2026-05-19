@@ -1,8 +1,18 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import {
   Accordion,
   AccordionContent,
@@ -15,6 +25,7 @@ import {
   Check,
   Crown,
   Eye,
+  Loader2,
   Mail,
   MessageCircle,
   PlayCircle,
@@ -26,6 +37,8 @@ import {
   CalendarDays,
 } from "lucide-react";
 import { trackEvent } from "@/utils/analytics";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const PRICE = 47;
 const NORMAL_PRICE = 197;
