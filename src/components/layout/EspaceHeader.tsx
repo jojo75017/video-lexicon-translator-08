@@ -471,6 +471,19 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
                 })}
               </div>
 
+              {/* Bouton 600 Niches — NOUVEAUTÉ Mai 2026 */}
+              <button
+                onClick={() => navigate('/niches-600')}
+                title="600 niches KDP rentables — Nouveauté Mai 2026"
+                className="relative flex-shrink-0 inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-bold transition-all duration-200 hover:scale-[1.05] border-2 border-[#FF9E2D]/60 bg-gradient-to-r from-[#FF9E2D]/15 to-[#EC4899]/15 hover:from-[#FF9E2D]/25 hover:to-[#EC4899]/25 text-[#9F1239]"
+              >
+                <Target className="h-4 w-4 text-[#EC4899]" />
+                <span>600 Niches</span>
+                <span className="text-[9px] font-black px-1.5 py-0.5 rounded-full bg-gradient-to-r from-[#FF9E2D] to-[#EC4899] text-white animate-pulse shadow-sm">
+                  NEW
+                </span>
+              </button>
+
               <Popover open={allToolsOpen} onOpenChange={setAllToolsOpen}>
                 <PopoverTrigger asChild>
                   <Button
