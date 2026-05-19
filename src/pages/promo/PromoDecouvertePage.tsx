@@ -263,9 +263,9 @@ const PromoDecouvertePage = () => {
         <div className="max-w-3xl mx-auto px-4 text-center space-y-6">
           <h2 className="text-3xl md:text-4xl font-bold">Votre prochain ebook commence aujourd'hui</h2>
           <p className="text-lg opacity-90">Rejoignez les centaines d'auteurs qui publient avec EbookStudio.</p>
-          <Link to="/promo/commande">
+          <Link to={offerActive ? "/promo/commande?plan=fondateur47" : "/promo/commande"}>
             <Button className="bg-[#FF9E2D] hover:bg-[#e88f1f] text-white font-bold py-6 px-8 text-base">
-              🚀 Commander - 67€ à vie
+              🚀 Commander — {price}€ à vie
             </Button>
           </Link>
           <p className="text-sm opacity-75 pt-4">
