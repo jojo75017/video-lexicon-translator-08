@@ -14,6 +14,7 @@ import EbookbotFloatingButton from '@/components/ebookbot/EbookbotFloatingButton
 import ApiKeysFloatingButton from '@/components/ebook/ApiKeysFloatingButton';
 import AISosModal from '@/components/shared/AISosModal';
 import AICostBadge from '@/components/shared/AICostBadge';
+import { useBrandTitle } from '@/hooks/useBrandTitle';
 
 // Lazy-loaded pages for performance
 const EbookPlannerPage = lazy(() => import('./pages/EbookPlannerPage'));
@@ -113,12 +114,14 @@ const PageLoader = () => (
 const queryClient = new QueryClient();
 
 const App = () => {
+  useBrandTitle();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [subscriberEmail, setSubscriberEmail] = useState('');
   const [subscriberData, setSubscriberData] = useState<any>(null);
   // Admin status is ONLY set after server-side verification - never from client storage
   const [isAdmin, setIsAdmin] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
 
   // Admin email is checked server-side only (via check-admin edge function)
 
