@@ -62,16 +62,27 @@ const PromoDecouvertePage = () => {
           name: 'EbookStudio',
           description: 'Outil IA tout-en-un pour créer et publier des ebooks rentables sur Amazon KDP.',
           brand: { '@type': 'Brand', name: 'EbookStudio' },
-          offers: { '@type': 'Offer', price: '67', priceCurrency: 'EUR', availability: 'https://schema.org/InStock' },
+          offers: { '@type': 'Offer', price, priceCurrency: 'EUR', availability: 'https://schema.org/InStock' },
           aggregateRating: { '@type': 'AggregateRating', ratingValue: '4.9', reviewCount: '127' },
         }}
       />
+
+      {/* BANDEAU OFFRE FONDATEUR */}
+      {offerActive && (
+        <div className="bg-gradient-to-r from-[#EC4899] via-[#FF9E2D] to-[#EC4899] text-white text-center py-2.5 px-4 text-sm font-semibold flex items-center justify-center gap-2 flex-wrap">
+          <Gift className="w-4 h-4" />
+          <span>🎁 Offre fondateur — <strong>47€</strong> au lieu de 67€ + Licence commerciale + Guide 10 niches OFFERTS</span>
+          <span className="hidden sm:inline-flex items-center gap-1 bg-white/20 px-2 py-0.5 rounded-full text-xs">
+            <Clock className="w-3 h-3" /> {days}j {hours}h restants
+          </span>
+        </div>
+      )}
 
       {/* HERO */}
       <section className="bg-gradient-to-b from-[#008296]/5 to-transparent">
         <div className="max-w-5xl mx-auto px-4 py-16 md:py-24 text-center space-y-6">
           <span className="inline-block bg-[#FF9E2D]/10 text-[#FF9E2D] px-3 py-1 rounded-full text-sm font-semibold">
-            ✨ Nouveau - Pipeline 15 agents IA
+            ✨ Nouveau - Pipeline 15 agents IA · EbookStudio V2
           </span>
           <h1 className="text-4xl md:text-6xl font-bold leading-tight">
             Créez un <span className="text-[#008296]">ebook rentable</span> en 30 minutes
@@ -80,9 +91,9 @@ const PromoDecouvertePage = () => {
             EbookStudio génère plan, chapitres, couverture, mots-clés Amazon et fichiers KDP-compliant. Sans ligne d'écriture.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-            <Link to="/promo/commande">
+            <Link to={offerActive ? "/promo/commande?plan=fondateur47" : "/promo/commande"}>
               <Button className="bg-[#FF9E2D] hover:bg-[#e88f1f] text-white font-bold py-6 px-8 text-base">
-                🚀 Démarrer maintenant - 67€ à vie
+                🚀 Démarrer maintenant — {price}€ à vie
               </Button>
             </Link>
             <Link to="/demo">
