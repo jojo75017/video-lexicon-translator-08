@@ -316,6 +316,19 @@ export default function ForumPage() {
       </Helmet>
 
       <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
+        {/* Retour Planner */}
+        <div className="flex items-center justify-between">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/ebook-planner')}
+            className="gap-2 text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Retour Planner
+          </Button>
+        </div>
+
         {/* Header */}
         <div className="text-center space-y-3">
           <h1 className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent">
