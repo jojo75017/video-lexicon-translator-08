@@ -503,6 +503,55 @@ const CoachingVipPage = () => {
           </a>
         </p>
       </div>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Réserve ta place — {PRICE}€</DialogTitle>
+            <DialogDescription>
+              Indique ton email : tes bonus (licence + 10 niches) te seront envoyés immédiatement, puis tu seras redirigé(e) vers PayPal pour finaliser le paiement.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={submitAndPay} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="vip-firstname">Prénom</Label>
+              <Input
+                id="vip-firstname"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                maxLength={80}
+                placeholder="Georges"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="vip-email">Email *</Label>
+              <Input
+                id="vip-email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                maxLength={255}
+                placeholder="ton@email.com"
+              />
+            </div>
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-[#FF9E2D] hover:bg-[#FF8C00] text-[#232F3E] font-black py-6 text-base"
+            >
+              {loading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <>Recevoir mes bonus & payer {PRICE}€ sur PayPal</>
+              )}
+            </Button>
+            <p className="text-xs text-center text-[#232F3E]/60 flex items-center justify-center gap-1.5">
+              <ShieldCheck className="w-3 h-3" /> Bonus envoyés avant le paiement • PayPal sécurisé
+            </p>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
