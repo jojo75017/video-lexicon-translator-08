@@ -157,17 +157,16 @@ export const useEbookDatabase = () => {
         let savedData = null;
         let projectIdToUse = currentProjectIdRef.current;
 
-        // Garde-fou anti-doublon : si pas d'ID en mémoire, chercher un projet existant
-        // récent du même utilisateur portant exactement le même titre (créé < 24h)
+        // Garde-fou anti-doublon : si pas d'ID en mémoire, chercher TOUT projet existant
+        // du même utilisateur portant exactement le même titre (toute date).
+        // Évite la création d'un doublon à chaque ouverture/refresh.
         if (!projectIdToUse && projectData.title && projectData.title.trim() !== '' && projectData.title !== 'Sans titre') {
-          const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
           const { data: existing } = await supabase
             .from('ebook_projects')
             .select('id')
             .eq('user_id', user.id)
             .eq('title', projectData.title)
-            .gte('created_at', since)
-            .order('created_at', { ascending: false })
+            .order('updated_at', { ascending: false })
             .limit(1)
             .maybeSingle();
 
