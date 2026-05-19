@@ -1,52 +1,55 @@
-# Séquence 5 emails HTML — GetResponse
+# Plan — Offre 47€ + 600 niches + EbookStudio V2 (révisé)
 
-Objectif : créer 5 emails HTML prêts à coller dans GetResponse pour lancer EbookStudio aujourd'hui. Livraison sous forme de fichiers `.html` téléchargeables + un aperçu d'objet/preheader pour chaque email.
+## 1. Offre exceptionnelle 47€ (jusqu'au 30 juin 2026)
 
-## Ton et cadre
-- Tutoiement, ton chaleureux d'auteur à lecteur (cohérent avec la charte EbookStudio).
-- HTML simple compatible GetResponse : `<p>`, `<strong>`, `<em>`, `<a>`, `<br>`, `<h2>`, table simple pour le bouton CTA. Pas de CSS externe.
-- Couleurs charte : fond #FAFAFA, texte #232F3E, accent teal #008296, hover orange #FF9E2D.
-- Largeur max 600px, responsive basique (table centrée).
-- Signature : Georges — EbookStudio.
+**Scope** : uniquement sur `/promo/decouverte` (les autres pages gardent 67€).
 
-## Plan des 5 emails
+**Bonus offerts** (47€ au lieu de 67€) :
+- ✅ **Licence commerciale étendue** → lien vers `/licence-etendue`
+- ✅ **Guide des 10 niches KDP rentables 2026** → lien vers `https://www.trafic-affiliation.com/niches_ebookstudio` (URL déjà utilisée dans `Guide10NichesBlock.tsx`)
 
-1. **Email 1 — Présentation (pas de lien)**
-   - Objet : « Bienvenue — un mot avant qu'on commence »
-   - Préheader : « Je me présente, et ce qui arrive bientôt »
-   - Corps : qui est Georges, pourquoi EbookStudio existe, à qui ça s'adresse, rassurance (pas de spam, désabonnement 1 clic), annonce qu'une **vidéo de démo complète** arrive très bientôt.
-   - **Aucun lien d'achat, aucun CTA cliquable.** Juste du texte.
+> Les **600 niches** ne font PAS partie de l'offre — c'est une fonctionnalité produit accessible via la sidebar.
 
-2. **Email 2 — La promesse**
-   - Objet : « Écrire un livre en 1 journée, vraiment ? »
-   - Le déclic : ce que l'IA permet aujourd'hui pour publier sur Amazon KDP.
-   - 1 lien doux vers la page d'accueil ebookstudio.fr (pas encore l'offre).
+**Modifications dans `src/pages/promo/PromoDecouvertePage.tsx`** :
+- Bandeau countdown jusqu'au 30 juin 2026 : "🎁 Offre fondateur — 47€ au lieu de 67€ — Plus que X jours".
+- Bouton hero : `🚀 Démarrer maintenant — 47€ à vie`.
+- Bloc PRICING : prix `47€` avec `67€` barré + badge `-30%`. Sous le prix, encart "2 bonus offerts" avec les 2 liens cliquables (Licence + 10 niches).
+- CTA final : `🚀 Commander — 47€ à vie`.
+- JSON-LD `offers.price` → `47`.
+- Param URL passée au checkout : `/promo/commande?plan=fondateur47`.
 
-3. **Email 3 — Démo / Vidéo**
-   - Objet : « La vidéo est en ligne (5 min, regarde) »
-   - Présente la vidéo de démo de l'outil, capture d'écran cliquable.
-   - CTA : « Voir la démo ».
+**Mini hook countdown** intégré au composant (pas de fichier séparé).
 
-4. **Email 4 — Preuve & cas d'usage**
-   - Objet : « 3 livres publiés ce mois-ci avec EbookStudio »
-   - Mini cas concrets, types de niches qui marchent, lever les objections (« je ne sais pas écrire », « je n'ai pas le temps »).
-   - CTA : « Découvrir l'outil ».
+## 2. Page dédiée "600 niches — Nouveauté Mai 2026"
 
-5. **Email 5 — Offre lancement**
-   - Objet : « 67 € à vie — c'est maintenant »
-   - Présentation de l'offre paiement unique 67 € (lifetime, pas d'abonnement, conforme à la mémoire projet).
-   - Urgence douce, garantie, dernier rappel.
-   - CTA principal : « Je prends EbookStudio à 67 € ».
+**Nouvelle route** : `/niches-600`
+
+**Fichiers créés** :
+- `src/data/niches600.ts` — 600 entrées générées par templates déterministes (12 catégories × 50 niches), basé sur la structure de `bestSellers2026.ts`. Champs : `{ id, niche, sousNiche, motCleAmazon, bsrCible, concurrence, potentiel, exemplePrix, category }`. Aucun `Math.random` — valeurs calculées via formule (index + catégorie).
+- `src/pages/Niches600Page.tsx` — UI :
+  - Header "🆕 Nouveauté Mai 2026 — 600 niches KDP" + badge flashy animé (gradient orange→rose, pulse).
+  - Filtres catégorie + recherche texte + tri (BSR/potentiel).
+  - Grille paginée (50/page) + export CSV.
+
+**Sidebar** (`MagazineSidebar.tsx` ou `modernSidebarSections.ts`) : nouvel item `600 Niches` avec badge `NEW` flashy (`bg-gradient-to-r from-[#FF9E2D] to-[#EC4899] text-white animate-pulse`), icône `Target`, lien `/niches-600`.
+
+**Route** ajoutée dans `src/App.tsx`.
+
+## 3. "EbookStudio V2" partout
+
+- `useBrandTitle` (déjà installé) suffixe automatiquement le `<title>` de toutes les routes ✅.
+- Logo texte dans `FunnelLayout`, sidebar header, et footers globaux → `EbookStudio V2`.
 
 ## Détails techniques
-- Génération via un script Node qui écrit 5 fichiers dans `/mnt/documents/getresponse/` :
-  `email-1-presentation.html` … `email-5-offre.html`.
-- Chaque fichier = HTML complet (`<!doctype>` + `<html>` + `<body>`) collable tel quel dans l'éditeur HTML brut de GetResponse.
-- Un fichier `README.txt` listant pour chaque email : objet, préheader, jour d'envoi suggéré (J0, J+2, J+4, J+6, J+8).
-- QA visuelle : conversion de chaque HTML en PNG (via headless) pour vérifier rendu avant livraison.
 
-## Questions rapides avant génération
-Si tu veux je peux ajuster, sinon je pars sur ces hypothèses :
-- Lien démo vidéo = `https://ebookstudio.fr/demo` (à confirmer, sinon je mets `[LIEN_VIDEO]`).
-- Lien offre = `https://ebookstudio.fr/offres`.
-- Logo / image d'en-tête : aucun pour rester sobre et passer les filtres anti-spam (juste texte stylé).
+- Aucune migration DB, aucun edge function modifié.
+- Stripe : pas de nouveau price créé pour l'instant — l'ancien checkout reste, l'offre 47€ est visuelle (la remise réelle sera appliquée par toi côté admin/paiement manuel, comme déjà géré dans `PaiementManuelPage`). Si tu veux un vrai checkout Stripe à 47€, je peux créer le price `fondateur_47` dans une étape suivante.
+- Palette respectée (teal #008296, orange #FF9E2D).
+
+## Ordre d'exécution
+
+1. `/promo/decouverte` → offre 47€ + countdown + 2 bonus avec liens.
+2. `src/data/niches600.ts` (data générée).
+3. `Niches600Page.tsx` + route `/niches-600`.
+4. Sidebar : item "600 Niches" badge NEW flashy.
+5. Logo `EbookStudio V2` dans header/footer.
