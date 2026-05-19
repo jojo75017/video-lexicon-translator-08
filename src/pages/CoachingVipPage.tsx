@@ -159,8 +159,48 @@ const handleVideoPlay = () => {
 };
 
 const CoachingVipPage = () => {
-  return (
-    <div className="min-h-screen bg-[#FAFAFA] text-[#232F3E] py-10 px-4">
+  const [open, setOpen] = useState(false);
+  const [email, setEmail] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [ctaLocation, setCtaLocation] = useState<string>("main_cta");
+
+  const openCheckout = (location: string) => {
+    setCtaLocation(location);
+    trackEvent("coaching_paypal_click", { location });
+    setOpen(true);
+  };
+
+  const submitAndPay = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const cleanEmail = email.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+      toast.error("Email invalide");
+      return;
+    }
+    setLoading(true);
+    try {
+      const { error } = await supabase.functions.invoke("funnel-create-order", {
+        body: {
+          email: cleanEmail,
+          first_name: firstName.trim(),
+          product_key: "license_extended",
+          payment_method: "paypal",
+        },
+      });
+      if (error) throw error;
+      toast.success("Bonus envoyés par email ! Direction PayPal...");
+      trackEvent("coaching_order_created", { location: ctaLocation });
+      // Open PayPal in new tab
+      window.open(PAYPAL_LINK, "_blank", "noopener,noreferrer");
+      setOpen(false);
+    } catch (err) {
+      console.error(err);
+      toast.error("Erreur lors de l'enregistrement. Réessayez.");
+    } finally {
+      setLoading(false);
+    }
+  };
       <Helmet>
         <title>Coaching VIP 30 jours - 10 places à 47€ | EbookStudio</title>
         <meta
