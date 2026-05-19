@@ -54,6 +54,7 @@ const PaiementManuelPage = lazy(() => import('./pages/PaiementManuelPage'));
 const ConfirmationPaiementPage = lazy(() => import('./pages/ConfirmationPaiementPage'));
 const FaqAssistancePage = lazy(() => import('./pages/FaqAssistancePage'));
 const NichesPage = lazy(() => import('./pages/NichesPage'));
+const Niches600Page = lazy(() => import('./pages/Niches600Page'));
 const ArcSignupPage = lazy(() => import('./pages/ArcSignupPage'));
 const MarketingPlanPage = lazy(() => import('./pages/MarketingPlanPage'));
 const UpsellPage = lazy(() => import('./pages/UpsellPage'));
@@ -340,6 +341,7 @@ const App = () => {
             <Route path="/admin-cockpit" element={<AdminGate><AdminCockpitPage /></AdminGate>} />
             <Route path="/ai-chat" element={<AiChatPage />} />
             <Route path="/niches" element={<NichesPage />} />
+            <Route path="/niches-600" element={<Niches600Page />} />
             <Route path="/arc-signup" element={<ArcSignupPage />} />
             <Route path="/communaute" element={<ForumPage />} />
             <Route path="/plan-marketing" element={<MarketingPlanPage />} />
