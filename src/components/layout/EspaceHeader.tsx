@@ -353,6 +353,7 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
         </div>
 
         <div className="flex items-center gap-1">
+          <AITokenHeaderBadge />
           <KdpPackButton
             size="sm"
             label="Pack KDP"
