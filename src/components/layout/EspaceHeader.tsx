@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
 import { EbookSettingsPanel } from '@/components/ebook/EbookSettingsPanel';
 import KdpPackButton from '@/components/shared/KdpPackButton';
+import AITokenHeaderBadge from '@/components/shared/AITokenHeaderBadge';
 
 interface EspaceHeaderProps {
   projectTitle?: string | null;
