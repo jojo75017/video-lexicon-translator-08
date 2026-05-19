@@ -150,9 +150,7 @@ const faqs = [
   },
 ];
 
-const handlePaypalClick = (location: string) => {
-  trackEvent("coaching_paypal_click", { location });
-};
+const handleVideoPlay = () => {
 
 const handleVideoPlay = () => {
   trackEvent("coaching_video_play", {});
