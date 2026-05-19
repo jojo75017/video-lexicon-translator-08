@@ -34,7 +34,10 @@ async function sendInstructions(email: string, firstName: string, productKey: st
          <p>Précisez votre email <strong>${email}</strong> dans la note du paiement.</p>`;
 
   const isTemplatesPack = productKey === "templates_premium" || productKey === "upsell_templates";
-  const downloadsBlock = isTemplatesPack ? `
+  const isLicenseExtended = productKey === "license_extended" || productKey === "upsell_license";
+  let downloadsBlock = "";
+  if (isTemplatesPack) {
+    downloadsBlock = `
     <div style="background:#fff;border:2px solid #FF9E2D;border-radius:12px;padding:20px;margin:24px 0">
       <h2 style="color:#FF9E2D;margin:0 0 12px;font-size:18px">🎁 Vos téléchargements immédiats</h2>
       <p style="margin:0 0 12px">Voici dès maintenant les fichiers de votre pack :</p>
@@ -45,7 +48,21 @@ async function sendInstructions(email: string, firstName: string, productKey: st
         🎁 <a href="${NICHES_GUIDE_URL}" style="color:#008296;font-weight:bold">Télécharger le Guide niches KDP rentables 2026 (cadeau offert)</a>
       </p>
       <p style="font-size:12px;color:#666;margin:12px 0 0">Conservez précieusement ces liens. Licence d'utilisation personnelle, revente interdite.</p>
-    </div>` : "";
+    </div>`;
+  } else if (isLicenseExtended) {
+    downloadsBlock = `
+    <div style="background:#fff;border:2px solid #008296;border-radius:12px;padding:20px;margin:24px 0">
+      <h2 style="color:#008296;margin:0 0 12px;font-size:18px">🎁 Bonus inclus avec votre commande</h2>
+      <p style="margin:0 0 12px">Voici vos accès privés (réservés aux acheteurs, non publics) :</p>
+      <p style="margin:8px 0">
+        📜 <a href="${LICENSE_PDF_URL}" style="color:#008296;font-weight:bold">Accéder à la Licence commerciale étendue</a>
+      </p>
+      <p style="margin:8px 0">
+        🎯 <a href="${NICHES_10_URL}" style="color:#008296;font-weight:bold">Accéder au Guide des 10 niches KDP rentables 2026</a>
+      </p>
+      <p style="font-size:12px;color:#666;margin:12px 0 0">Ces liens sont personnels. Merci de ne pas les diffuser publiquement.</p>
+    </div>`;
+  }
 
   const html = `
   <div style="font-family:Inter,Arial,sans-serif;max-width:560px;margin:0 auto;color:#232F3E;background:#FAFAFA;padding:24px;border-radius:12px">
