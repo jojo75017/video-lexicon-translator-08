@@ -482,20 +482,14 @@ const CoachingVipPage = () => {
               {SEATS} places. Une fois rempli, je ferme et je n'ouvre plus
               avant longtemps.
             </p>
-            <a
-              href={PAYPAL_LINK}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => handlePaypalClick("final_cta")}
+            <Button
+              size="lg"
+              onClick={() => openCheckout("final_cta")}
+              className="bg-[#008296] hover:bg-[#006d7e] text-white font-black rounded-xl px-8"
             >
-              <Button
-                size="lg"
-                className="bg-[#008296] hover:bg-[#006d7e] text-white font-black rounded-xl px-8"
-              >
-                <Check className="w-5 h-5 mr-2" />
-                Je réserve ma place ({PRICE}€)
-              </Button>
-            </a>
+              <Check className="w-5 h-5 mr-2" />
+              Je réserve ma place ({PRICE}€)
+            </Button>
           </CardContent>
         </Card>
 
