@@ -471,6 +471,29 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
                 })}
               </div>
 
+              {/* Bouton Audit ASIN — accès direct au scraper Amazon */}
+              <button
+                onClick={() => onTabChange?.('audit-pilot')}
+                title="Auditer une fiche produit Amazon par ASIN"
+                className="relative flex-shrink-0 inline-flex items-center gap-1.5 rounded-2xl px-3 py-2 text-sm font-bold transition-all duration-200 hover:scale-[1.05] border-2 border-[#008296]/50 bg-[#008296]/10 hover:bg-[#008296]/20 text-[#008296]"
+              >
+                <ClipboardCheck className="h-4 w-4" />
+                <span className="hidden md:inline">Audit ASIN</span>
+              </button>
+
+              {/* Bouton Communauté — accès direct au forum */}
+              <button
+                onClick={() => navigate('/communaute')}
+                title="Forum entre abonnés : entraide, retours, astuces"
+                className="relative flex-shrink-0 inline-flex items-center gap-1.5 rounded-2xl px-3 py-2 text-sm font-bold transition-all duration-200 hover:scale-[1.05] border-2 border-[#EC4899]/50 bg-[#EC4899]/10 hover:bg-[#EC4899]/20 text-[#9F1239]"
+              >
+                <MessageCircle className="h-4 w-4" />
+                <span className="hidden md:inline">Communauté</span>
+                <span className="text-[9px] font-black px-1.5 py-0.5 rounded-full bg-[#EC4899] text-white">
+                  NEW
+                </span>
+              </button>
+
               {/* Bouton 600 Niches — NOUVEAUTÉ Mai 2026 */}
               <button
                 onClick={() => navigate('/niches-600')}
