@@ -103,6 +103,7 @@ serve(async (req) => {
       kdpBrief = '',
       referenceImage,
       openrouterKey,
+      customPrompt = '',
     } = body;
 
     if (!title) {
@@ -175,10 +176,13 @@ ${formatGuidance}
 
 Render variation #${variationSeed}. Photograph the scene above — real depicted subject matter from the user's brief.${referenceImage ? ' Use attached reference for mood only, do not copy.' : ''}`;
 
-    let messageContent: string | any[] = textPrompt;
+    // Si l'utilisateur a édité manuellement le prompt final, on l'utilise tel quel.
+    const finalTextPrompt = (customPrompt && customPrompt.trim().length > 30) ? customPrompt.trim() : textPrompt;
+
+    let messageContent: string | any[] = finalTextPrompt;
     if (referenceImage && typeof referenceImage === 'string' && referenceImage.length < 6_000_000) {
       messageContent = [
-        { type: "text", text: textPrompt },
+        { type: "text", text: finalTextPrompt },
         { type: "image_url", image_url: { url: referenceImage } },
       ];
     }
