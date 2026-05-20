@@ -237,18 +237,65 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
     };
 
     const drawFront = (x: number, y: number, w: number, h: number) => {
+      const activePreset = COVER_PRESETS.find((preset) => preset.value === registre)?.value || 'business';
       const gradient = ctx.createLinearGradient(x, y, x + w, y + h);
-      gradient.addColorStop(0, background);
-      gradient.addColorStop(0.55, muted);
-      gradient.addColorStop(1, primary);
-      ctx.fillStyle = gradient;
-      ctx.fillRect(x, y, w, h);
 
-      ctx.fillStyle = primary;
-      ctx.globalAlpha = 0.14;
-      ctx.fillRect(x + w * 0.08, y + h * 0.1, w * 0.84, h * 0.02);
-      ctx.fillRect(x + w * 0.12, y + h * 0.84, w * 0.76, h * 0.018);
-      ctx.globalAlpha = 1;
+      if (activePreset === 'thriller') {
+        gradient.addColorStop(0, '#07090d');
+        gradient.addColorStop(0.58, '#111827');
+        gradient.addColorStop(1, '#7f1d1d');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(x, y, w, h);
+        ctx.fillStyle = '#e5e7eb';
+        ctx.globalAlpha = 0.08;
+        for (let i = 0; i < 16; i += 1) ctx.fillRect(x + Math.random() * w, y, 2, h);
+        ctx.globalAlpha = 0.28;
+        ctx.fillStyle = '#dc2626';
+        ctx.fillRect(x + w * 0.12, y + h * 0.68, w * 0.76, h * 0.018);
+        ctx.globalAlpha = 1;
+      } else if (activePreset === 'fantasy') {
+        gradient.addColorStop(0, '#152238');
+        gradient.addColorStop(0.52, '#31416a');
+        gradient.addColorStop(1, '#065f46');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(x, y, w, h);
+        const moon = ctx.createRadialGradient(x + w * 0.72, y + h * 0.2, 8, x + w * 0.72, y + h * 0.2, w * 0.18);
+        moon.addColorStop(0, 'rgba(255,244,190,0.9)');
+        moon.addColorStop(1, 'rgba(255,244,190,0)');
+        ctx.fillStyle = moon;
+        ctx.fillRect(x, y, w, h);
+        ctx.fillStyle = 'rgba(250,204,21,0.5)';
+        ctx.beginPath();
+        ctx.moveTo(x + w * 0.5, y + h * 0.18);
+        ctx.lineTo(x + w * 0.58, y + h * 0.56);
+        ctx.lineTo(x + w * 0.42, y + h * 0.56);
+        ctx.closePath();
+        ctx.fill();
+      } else if (activePreset === 'wellness') {
+        gradient.addColorStop(0, '#f7f3ea');
+        gradient.addColorStop(0.58, '#d8e3cf');
+        gradient.addColorStop(1, '#b86f52');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(x, y, w, h);
+        ctx.strokeStyle = 'rgba(68,94,68,0.34)';
+        ctx.lineWidth = Math.max(8, w * 0.012);
+        for (let i = 0; i < 5; i += 1) {
+          ctx.beginPath();
+          ctx.ellipse(x + w * (0.22 + i * 0.14), y + h * 0.66, w * 0.09, h * 0.16, -0.7, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+      } else {
+        gradient.addColorStop(0, background);
+        gradient.addColorStop(0.55, muted);
+        gradient.addColorStop(1, primary);
+        ctx.fillStyle = gradient;
+        ctx.fillRect(x, y, w, h);
+        ctx.fillStyle = primary;
+        ctx.globalAlpha = 0.14;
+        ctx.fillRect(x + w * 0.08, y + h * 0.1, w * 0.84, h * 0.02);
+        ctx.fillRect(x + w * 0.12, y + h * 0.84, w * 0.76, h * 0.018);
+        ctx.globalAlpha = 1;
+      }
 
       ctx.textAlign = 'center';
       ctx.fillStyle = foreground;
