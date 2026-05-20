@@ -489,7 +489,7 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
             <Badge className="bg-primary/10 text-primary border-primary/30">PRO Bestseller</Badge>
           </CardTitle>
           <CardDescription>
-            Générez la couverture <strong>Kindle</strong> ou <strong>Broché complet</strong> (face + dos + 4ème) avec qualité best-seller Amazon.
+            Générez une couverture <strong>Kindle</strong> ou <strong>Broché complet</strong> (face + dos + 4ème). Format calculé selon les règles KDP — à toujours vérifier dans l'aperçu Amazon avant publication.
           </CardDescription>
         </CardHeader>
       </Card>
@@ -509,7 +509,7 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
               </Badge>
               </CardTitle>
               <CardDescription className="mt-1">
-                Choisissez un preset visible, puis générez une couverture adaptée au registre du livre.
+                1. Choisissez un modèle visuel. 2. Décrivez la scène voulue. 3. Générez.
               </CardDescription>
             </div>
           </div>
@@ -546,9 +546,9 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
             <div className="flex items-center justify-between gap-3">
               <Label className="text-sm font-semibold flex items-center gap-2">
                 <Palette className="h-4 w-4 text-primary" />
-                Presets de couverture visibles
+                1. Choisissez un modèle visuel
               </Label>
-              <Badge variant="outline" className="border-primary/30 text-primary">Choix obligatoire</Badge>
+              <Badge variant="outline" className="border-primary/30 text-primary">Obligatoire</Badge>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
               {COVER_PRESETS.map((preset) => {
@@ -573,6 +573,23 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
                 );
               })}
             </div>
+          </div>
+
+          <div className="rounded-lg border border-primary/30 bg-background/85 p-3 space-y-2">
+            <Label htmlFor="user-prompt" className="text-sm font-semibold flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-primary" />
+              2. Décrivez la scène voulue (votre prompt)
+            </Label>
+            <Textarea
+              id="user-prompt"
+              value={userPrompt}
+              onChange={(e) => setUserPrompt(e.target.value)}
+              placeholder="Ex : une vieille machine à écrire sur un bureau en bois sombre, lumière dorée latérale, pluie derrière la fenêtre, ambiance solitude et mystère. Ne montrer aucun visage."
+              className="min-h-[110px] bg-background text-sm"
+            />
+            <p className="text-[11px] text-muted-foreground">
+              Sujet central, décor, lumière, palette, choses à éviter. Plus c'est précis, plus l'image colle à votre livre.
+            </p>
           </div>
 
           <Button
