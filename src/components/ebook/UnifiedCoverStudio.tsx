@@ -134,6 +134,10 @@ export const UnifiedCoverStudio: React.FC<UnifiedCoverStudioProps> = ({
               ebookTitle={ebookTitle}
               authorName={authorName}
               initialDescription={coverBrief}
+              initialSubtitle={bookSubtitle}
+              initialGenre={genre}
+              initialTargetAudience={targetAudience}
+              initialBookDescription={bookDescription}
               onCoverGenerated={onCoverGenerated}
             />
           </TabsContent>
