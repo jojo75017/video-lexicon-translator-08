@@ -3604,7 +3604,7 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
                 <div className="flex items-center gap-2 flex-wrap justify-end">
                   <button
                     type="button"
-                    onClick={() => handleTabChange('editorial-director')}
+                    onClick={() => handleTabChange('complete-workflow')}
                     className="bg-[#FF9E2D] hover:bg-[#f08d1c] text-white px-4 py-2 font-bold text-[11px] tracking-[0.18em] uppercase transition-colors inline-flex items-center gap-1.5 shadow-sm"
                   >
                     <Rocket className="w-3.5 h-3.5" />
