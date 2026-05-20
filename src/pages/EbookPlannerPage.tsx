@@ -2546,7 +2546,11 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                 <UnifiedCoverStudio
                   ebookTitle={ebookTitle}
                   authorName={authorName}
-                  chapters={chapters}
+                  bookSubtitle={bookSubtitle}
+            bookDescription={bookDescription}
+            genre={genre}
+            targetAudience={targetAudience}
+            chapters={chapters}
                   isGenerating={isGenerating}
                   defaultTab="ai"
                   onGenerateBackCover={async (tone, audience, highlights) =>
@@ -2611,6 +2615,10 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           <UnifiedCoverStudio
             ebookTitle={ebookTitle}
             authorName={authorName}
+            bookSubtitle={bookSubtitle}
+            bookDescription={bookDescription}
+            genre={genre}
+            targetAudience={targetAudience}
             chapters={chapters}
             isGenerating={isGenerating}
             defaultTab="ai"
@@ -2948,6 +2956,10 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
           <UnifiedCoverStudio
             ebookTitle={ebookTitle}
             authorName={authorName}
+            bookSubtitle={bookSubtitle}
+            bookDescription={bookDescription}
+            genre={genre}
+            targetAudience={targetAudience}
             chapters={chapters}
             isGenerating={isGenerating}
             defaultTab="backcover"
@@ -3386,6 +3398,10 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
           <UnifiedCoverStudio
             ebookTitle={ebookTitle}
             authorName={authorName}
+            bookSubtitle={bookSubtitle}
+            bookDescription={bookDescription}
+            genre={genre}
+            targetAudience={targetAudience}
             chapters={chapters}
             isGenerating={isGenerating}
             defaultTab="ai"
