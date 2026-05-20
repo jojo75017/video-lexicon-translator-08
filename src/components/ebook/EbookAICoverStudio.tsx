@@ -529,6 +529,7 @@ FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine
             kdpBrief: initialDescription, // brief from KDP calculator if any
             referenceImage,
             customPrompt: assembledPromptOverride || undefined,
+            openrouterKey: openrouterKey.trim().startsWith('sk-or-') ? openrouterKey.trim() : undefined,
           },
         });
       const timeoutPromise = new Promise<never>((_, reject) => {
