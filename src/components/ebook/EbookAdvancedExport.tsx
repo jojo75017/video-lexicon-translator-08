@@ -147,7 +147,10 @@ export const EbookAdvancedExport: React.FC<EbookAdvancedExportProps> = ({
     // Chapters
     chapters.forEach((ch, i) => {
       const fn = `chapter${i + 1}.xhtml`;
-      let body = `<h1>Chapitre ${i + 1}<br/><span style="font-size:0.75em;font-weight:normal;font-style:italic">${escapeXml(ch.title)}</span></h1>`;
+      const cleanTitle = stripChapterPrefix(ch.title || '', i);
+      let body = cleanTitle
+        ? `<h1>Chapitre ${i + 1}<br/><span style="font-size:0.75em;font-weight:normal;font-style:italic">${escapeXml(cleanTitle)}</span></h1>`
+        : `<h1>Chapitre ${i + 1}</h1>`;
       body += textToHtml(cleanGeneratedText(ch.content || ''));
       ch.subChapters?.forEach(sc => {
         if (sc.content) {
