@@ -34,6 +34,21 @@ const formats: { id: ExportFormat; label: string; desc: string; icon: string }[]
   { id: 'html', label: 'HTML', desc: 'Page web autonome avec styles intégrés', icon: '🌐' },
 ];
 
+// Retire un préfixe "Chapitre N", "CHAPITRE N", "Chapter N" du titre pour éviter le doublon
+const stripChapterPrefix = (title: string, i: number): string => {
+  if (!title) return '';
+  const n = i + 1;
+  const patterns = [
+    new RegExp(`^\\s*chapitres?\\s*0*${n}\\b\\s*[:\\-–—.\\s]*`, 'i'),
+    new RegExp(`^\\s*chapter\\s*0*${n}\\b\\s*[:\\-–—.\\s]*`, 'i'),
+    /^\s*chapitres?\s*[ivxlcdm]+\b\s*[:\-–—.\s]*/i,
+  ];
+  let t = title.trim();
+  for (const p of patterns) t = t.replace(p, '');
+  return t.trim();
+};
+
+
 export const EbookAdvancedExport: React.FC<EbookAdvancedExportProps> = ({
   ebookTitle, authorName, chapters, preface, conclusion, characters, coverImage,
 }) => {
