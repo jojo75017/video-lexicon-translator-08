@@ -455,12 +455,12 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
             <div className="flex-1">
               <CardTitle className="text-xl flex items-center gap-2">
                 Mode Express
-                <Badge className="bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30">
-                  Recommandé
-                </Badge>
+              <Badge className="bg-primary/10 text-primary border-primary/30">
+                Presets visibles
+              </Badge>
               </CardTitle>
               <CardDescription className="mt-1">
-                Titre + auteur → couverture professionnelle en 1 clic. L'IA choisit le style optimal.
+                Choisissez un preset visible, puis générez une couverture adaptée au registre du livre.
               </CardDescription>
             </div>
           </div>
