@@ -45,6 +45,20 @@ const genres = [
   { value: 'cooking', label: 'Cuisine' },
 ];
 
+// Registre visuel = brief artistique fort injecté dans le prompt scène
+const REGISTRES = [
+  { value: 'auto', label: 'Auto (détecté par l\'IA)', prompt: '' },
+  { value: 'thriller', label: '🔪 Thriller / Suspense', prompt: 'Cinematic thriller cover — moody chiaroscuro, deep shadows, single dramatic light source, fog or rain, desaturated cold palette with one accent (blood red, neon blue), subject partially in shadow, sense of dread, Fincher / Villeneuve cinematography, anamorphic lens flare' },
+  { value: 'business', label: '💼 Business / Productivité', prompt: 'Modern business book cover — sleek minimalist object photography (chess piece, mountain, geometric architecture, gold ingot, single bold icon), clean white or deep navy background, high-end editorial typography à la HBR / Penguin Business, premium matte texture, gold or copper accents, Atomic Habits / Sapiens energy' },
+  { value: 'fantasy', label: '🐉 Fantasy / SF', prompt: 'Epic fantasy cover — sweeping painted landscape, ancient ruins or ethereal forest, magical luminescence, mist, dramatic sky (twin moons, aurora), heroic silhouette in distance, ornate medallion or weapon foreground, oil painting feel, Brandon Sanderson / Tolkien edition style' },
+  { value: 'wellness', label: '🌿 Wellness / Spiritualité', prompt: 'Wellness book cover — serene natural photography, soft golden hour light, organic textures (linen, stone, water, leaves, ceramic), warm earthy palette (sage, terracotta, cream), zen composition with breathing whitespace, calming and aspirational, Goop / Mindful magazine aesthetic' },
+  { value: 'romance', label: '💕 Romance', prompt: 'Romance cover — soft cinematic portrait or evocative object (rose, intertwined hands, silk fabric), warm dusky lighting, dreamy bokeh, pastel pink/gold/burgundy palette, elegant script accent typography, emotional intimate atmosphere' },
+  { value: 'memoir', label: '📖 Mémoire / Récit de vie', prompt: 'Literary memoir cover — single iconic photographic object or vintage portrait, faded film grain, muted nostalgic palette (sepia, dusty blue, ochre), handwritten or classic serif typography, New Yorker / NYT bestseller feel' },
+  { value: 'jeunesse', label: '🎨 Jeunesse', prompt: 'Children book cover — vibrant illustrated scene with friendly character, painted or digital art style, saturated joyful palette, playful hand-lettered title, magical atmosphere, Pixar / Disney book edition energy' },
+  { value: 'cuisine', label: '🍴 Cuisine', prompt: 'Cookbook cover — top-down or close-up food photography, natural daylight, rustic wooden or marble surface, fresh ingredients, steam, warm appetizing tones, Ottolenghi / Bon Appétit editorial style' },
+  { value: 'horror', label: '👻 Horror / Mystère', prompt: 'Horror cover — unsettling symbolic object, deep blacks, blood red or sickly green accent, decaying texture, lone silhouette in distance, gothic atmosphere, Stephen King paperback feel' },
+];
+
 type CoverFormat = 'kindle' | 'paperback';
 
 interface PaperbackSpec {
@@ -71,6 +85,7 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
   const [author, setAuthor] = useState(authorName);
   const [format, setFormat] = useState<CoverFormat>('kindle');
   const [style, setStyle] = useState('professional');
+  const [registre, setRegistre] = useState('auto');
   const [genre, setGenre] = useState('non-fiction');
   const [colorScheme, setColorScheme] = useState('');
   const [description, setDescription] = useState('');
@@ -342,7 +357,10 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
             subtitle,
             author,
             genre,
-            style,
+            style: (() => {
+              const reg = REGISTRES.find(r => r.value === registre);
+              return reg && reg.prompt ? `${reg.prompt}. Additional style note: ${style}` : style;
+            })(),
             colorScheme,
             description,
             format,
@@ -616,6 +634,15 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {genres.map((g) => <SelectItem key={g.value} value={g.value}>{g.label}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Registre visuel <span className="text-xs text-muted-foreground">(force le style de la scène)</span></Label>
+              <Select value={registre} onValueChange={setRegistre}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {REGISTRES.map((r) => <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
