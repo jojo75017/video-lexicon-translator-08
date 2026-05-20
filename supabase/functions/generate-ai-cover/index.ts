@@ -182,7 +182,7 @@ Render variation #${variationSeed}. Photograph the scene above — real depicted
     let messageContent: string | any[] = finalTextPrompt;
     if (referenceImage && typeof referenceImage === 'string' && referenceImage.length < 6_000_000) {
       messageContent = [
-        { type: "text", text: textPrompt },
+        { type: "text", text: finalTextPrompt },
         { type: "image_url", image_url: { url: referenceImage } },
       ];
     }
