@@ -792,17 +792,8 @@ FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine
             )}
           </Button>
 
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => createFallbackCover('Maquette temporaire générée localement (à remplacer par une vraie couverture IA)')}
-            disabled={isGenerating || !title.trim()}
-            className="w-full text-xs text-muted-foreground"
-          >
-            <ImageIcon className="w-3.5 h-3.5 mr-2" />
-            Générer une maquette temporaire (dépannage si l'IA est indisponible)
-          </Button>
+          {/* Bouton fallback retiré : il créait une fausse couverture orange basique
+              prise pour une vraie génération IA. Si l'IA échoue, on affiche un message d'erreur. */}
 
           <p className="text-xs text-muted-foreground text-center">
             Image IA basée sur votre prompt · Format calculé KDP · À vérifier dans l'aperçu Amazon avant publication
