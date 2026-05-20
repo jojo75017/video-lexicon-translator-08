@@ -493,6 +493,39 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
             </div>
           </div>
 
+          <div className="rounded-lg border border-primary/30 bg-background/85 p-3 space-y-3">
+            <div className="flex items-center justify-between gap-3">
+              <Label className="text-sm font-semibold flex items-center gap-2">
+                <Palette className="h-4 w-4 text-primary" />
+                Presets de couverture visibles
+              </Label>
+              <Badge variant="outline" className="border-primary/30 text-primary">Choix obligatoire</Badge>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+              {COVER_PRESETS.map((preset) => {
+                const active = registre === preset.value;
+                return (
+                  <button
+                    key={preset.value}
+                    type="button"
+                    onClick={() => applyPreset(preset)}
+                    className={`min-h-[118px] rounded-lg border p-3 text-left transition-all ${
+                      active
+                        ? 'border-primary bg-primary/10 ring-2 ring-primary/30 shadow-md'
+                        : 'border-border bg-card hover:border-primary/50 hover:bg-primary/5'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-base font-bold text-foreground">{preset.title}</span>
+                      {active && <CheckCircle2 className="h-4 w-4 text-primary" />}
+                    </div>
+                    <p className="mt-2 text-xs leading-snug text-muted-foreground">{preset.subtitle}</p>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           <Button
             onClick={generateCover}
             disabled={isGenerating || !title.trim()}
