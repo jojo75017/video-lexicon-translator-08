@@ -1080,7 +1080,13 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
           const chapitresComplets: any[] = [...existingChapters];
           const startFromChapter = existingChapters.length;
 
+          console.log(`📚 [P4] Démarrage rédaction : ${retryStructure.length} chapitre(s) à écrire (reprise depuis #${startFromChapter + 1})`);
+          if (retryStructure.length > 1) {
+            toast.info(`✍️ Rédaction de ${retryStructure.length} chapitres en cours...`);
+          }
+
           for (let chIdx = startFromChapter; chIdx < retryStructure.length; chIdx++) {
+            console.log(`✍️ [P4] Chapitre ${chIdx + 1}/${retryStructure.length} : « ${retryStructure[chIdx]?.titre || 'Sans titre'} »`);
             const chapitre = retryStructure[chIdx];
             const chapterSegments = buildP4Segments(chapitre, retryStructure.length);
             const generatedSegments: any[] = [];
@@ -1122,6 +1128,9 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
 
             const chapitreGenere = mergeChapterSegments(chapitre, generatedSegments);
             if (chapitreGenere) chapitresComplets.push(chapitreGenere);
+
+            console.log(`✅ [P4] Chapitre ${chapitresComplets.length}/${retryStructure.length} terminé : « ${chapitreGenere?.titre || ''} »`);
+            toast.success(`✅ Chapitre ${chapitresComplets.length}/${retryStructure.length} rédigé`, { duration: 2000 });
 
             // UI : on met à jour P4 au fil de l'eau
             const p4DisplayContent = `**📄 Chapitres rédigés : ${chapitresComplets.length}/${retryStructure.length}**\n\nDernier : ${chapitreGenere?.titre || partial?.displayContent || ''}`;
