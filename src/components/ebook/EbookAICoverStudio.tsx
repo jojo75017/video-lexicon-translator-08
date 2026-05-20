@@ -806,6 +806,41 @@ FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine
           {/* Bouton fallback retiré : il créait une fausse couverture orange basique
               prise pour une vraie génération IA. Si l'IA échoue, on affiche un message d'erreur. */}
 
+          {/* ============ CLÉ OPENROUTER (BYOK pour la génération d'image) ============ */}
+          <div className="rounded-lg border border-border/60 bg-muted/30 p-3 space-y-2">
+            <button
+              type="button"
+              onClick={() => setShowKeyInput(v => !v)}
+              className="w-full flex items-center justify-between text-xs font-medium text-foreground hover:text-primary transition-colors"
+            >
+              <span className="flex items-center gap-2">
+                🔑 Clé API OpenRouter (optionnel)
+                {openrouterKey.trim().startsWith('sk-or-') && (
+                  <Badge variant="secondary" className="text-[10px] h-4">Active</Badge>
+                )}
+              </span>
+              {showKeyInput ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+            </button>
+            {showKeyInput && (
+              <div className="space-y-2 pt-1">
+                <Input
+                  type="password"
+                  placeholder="sk-or-v1-..."
+                  value={openrouterKey}
+                  onChange={(e) => setOpenrouterKey(e.target.value)}
+                  className="h-9 text-xs font-mono"
+                  autoComplete="off"
+                />
+                <p className="text-[11px] text-muted-foreground leading-snug">
+                  Utilisez votre propre clé <a href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer" className="text-primary underline">OpenRouter</a> (préfixe <code>sk-or-</code>) pour générer la couverture sur votre quota. Stockée localement dans votre navigateur. Sans clé, la génération utilise les crédits Lovable AI partagés (peut être épuisé).
+                </p>
+                {openrouterKey && !openrouterKey.trim().startsWith('sk-or-') && (
+                  <p className="text-[11px] text-amber-600">⚠️ Clé invalide : doit commencer par <code>sk-or-</code></p>
+                )}
+              </div>
+            )}
+          </div>
+
           <p className="text-xs text-muted-foreground text-center">
             Image IA basée sur votre prompt · Format calculé KDP · À vérifier dans l'aperçu Amazon avant publication
           </p>
