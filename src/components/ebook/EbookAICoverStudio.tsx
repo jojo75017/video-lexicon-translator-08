@@ -613,17 +613,18 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
 
           <Button
             type="button"
-            variant="outline"
-            onClick={() => createFallbackCover('Maquette créée avec le preset choisi')}
+            variant="ghost"
+            size="sm"
+            onClick={() => createFallbackCover('Maquette temporaire générée localement (à remplacer par une vraie couverture IA)')}
             disabled={isGenerating || !title.trim()}
-            className="w-full"
+            className="w-full text-xs text-muted-foreground"
           >
-            <ImageIcon className="w-4 h-4 mr-2" />
-            Créer une maquette avec le preset choisi
+            <ImageIcon className="w-3.5 h-3.5 mr-2" />
+            Générer une maquette temporaire (dépannage si l'IA est indisponible)
           </Button>
 
           <p className="text-xs text-muted-foreground text-center">
-            ✨ Style professionnel · Format Kindle · Qualité bestseller Amazon
+            Image IA basée sur votre prompt · Format calculé KDP · À vérifier dans l'aperçu Amazon avant publication
           </p>
         </CardContent>
       </Card>
