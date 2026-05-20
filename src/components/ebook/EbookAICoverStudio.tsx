@@ -357,7 +357,10 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
             subtitle,
             author,
             genre,
-            style,
+            style: (() => {
+              const reg = REGISTRES.find(r => r.value === registre);
+              return reg && reg.prompt ? `${reg.prompt}. Additional style note: ${style}` : style;
+            })(),
             colorScheme,
             description,
             format,
