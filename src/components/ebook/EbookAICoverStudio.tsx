@@ -828,7 +828,11 @@ FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine
             </button>
             {showKeyInput && (
               <div className="space-y-2 pt-1">
+                <Label htmlFor="cover-openrouter-key" className="text-[11px] font-semibold text-foreground">
+                  Champ utilisé pour la génération image
+                </Label>
                 <Input
+                  id="cover-openrouter-key"
                   type="password"
                   placeholder="sk-or-v1-..."
                   value={openrouterKey}
@@ -836,6 +840,11 @@ FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine
                   className="h-9 text-xs font-mono"
                   autoComplete="off"
                 />
+                <p className="text-[11px] font-medium text-primary">
+                  {openrouterKey.trim().startsWith('sk-or-')
+                    ? '✅ Cette clé OpenRouter sera envoyée à generate-ai-cover pour la génération image.'
+                    : 'Sans clé sk-or- valide ici, l’outil repasse sur Lovable AI.'}
+                </p>
                 <p className="text-[11px] text-muted-foreground leading-snug">
                   Utilisez votre propre clé <a href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer" className="text-primary underline">OpenRouter</a> (préfixe <code>sk-or-</code>) pour générer la couverture sur votre quota. Stockée localement dans votre navigateur. Sans clé, la génération utilise les crédits Lovable AI partagés (peut être épuisé).
                 </p>
