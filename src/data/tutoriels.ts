@@ -203,7 +203,7 @@ export const TUTORIELS: Tutoriel[] = [
     id: 'cover-ai',
     category: 'creation',
     title: 'Générer une couverture KDP avec IA',
-    description: "Couverture professionnelle conforme aux dimensions Amazon KDP.",
+    description: "Couverture générée par IA, à dimensions calculées selon les règles KDP — à vérifier dans l'aperçu Amazon.",
     durationMin: 8,
     icon: ImagePlus,
     steps: [

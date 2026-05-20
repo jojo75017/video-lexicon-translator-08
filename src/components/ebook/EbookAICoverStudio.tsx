@@ -184,11 +184,14 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
   // ========== APERÇU DES PROMPTS AVANT GÉNÉRATION ==========
   const livePromptPreview = React.useMemo(() => {
     if (!title.trim()) return null;
-    const baseArt = `Style: ${style}. Palette: ${colorScheme || 'modern, high contrast'}. Genre: ${genre}.${description ? ` Concept: ${description}.` : ''} Photorealistic magazine-grade quality, NO cartoon, NO low-fidelity, NO watermark, NO Amazon badge, NO mockup. Title typography sharp and perfectly legible.`;
+    const reg = REGISTRES.find(r => r.value === registre);
+    const registreLine = reg && reg.prompt ? `Register: ${reg.prompt}. ` : '';
+    const userLine = userPrompt.trim() ? `USER SCENE BRIEF (must be respected exactly): ${userPrompt.trim()}. ` : '';
+    const baseArt = `${userLine}${registreLine}Style: ${style}. Palette: ${colorScheme || 'modern, high contrast'}. Genre: ${genre}.${description ? ` Concept: ${description}.` : ''} Photorealistic magazine-grade quality, NO cartoon, NO low-fidelity, NO watermark, NO Amazon badge, NO mockup, NO generic gradient background. Title typography sharp and perfectly legible.`;
     const recto = `FRONT COVER (recto) for the book "${title}"${subtitle ? `, subtitle "${subtitle}"` : ''}, by ${author || 'Author'}. Vertical portrait artwork, ratio 1.6:1, flat 2D print-ready. Title HUGE centered at top third, ${subtitle ? 'subtitle clearly below in smaller elegant type, ' : ''}author name at the bottom. ${baseArt}`;
     const verso = `BACK COVER (verso / 4ème de couverture) for the same book "${title}" by ${author || 'Author'}. Same visual universe as the front cover (same palette, lighting, typography). Vertical portrait, same dimensions as the front. Compose a clean back panel with: a short hook headline at the top, a 3–5 line synopsis area in readable body text, a small author bio block at the bottom-left, and a CLEAN EMPTY rectangular zone of 50 x 30 mm in the BOTTOM-RIGHT reserved for ISBN barcode. ${baseArt}`;
     return { recto, verso };
-  }, [title, subtitle, author, style, colorScheme, genre, description]);
+  }, [title, subtitle, author, style, colorScheme, genre, description, userPrompt, registre]);
 
   const handleReferenceUpload = (file: File) => {
     if (file.size > 4 * 1024 * 1024) {
