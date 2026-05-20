@@ -193,6 +193,48 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
     return { recto, verso };
   }, [title, subtitle, author, style, colorScheme, genre, description, userPrompt, registre]);
 
+  // ========== APERÇU EXACT DU PAYLOAD ENVOYÉ À L'EDGE FUNCTION ==========
+  const edgePayloadPreview = React.useMemo(() => {
+    if (!title.trim()) return null;
+    const reg = REGISTRES.find(r => r.value === registre);
+    const styleSent = reg && reg.prompt ? `${reg.prompt}. Additional style note: ${style}` : style;
+    const payload = {
+      title,
+      subtitle,
+      author,
+      genre,
+      style: styleSent,
+      colorScheme,
+      description,
+      userPrompt,
+      registre,
+      format,
+      kdpBrief: initialDescription || '',
+      referenceImage: referenceImage ? '[image attachée]' : null,
+    };
+    const sceneSource = userPrompt.trim().length > 10
+      ? userPrompt.trim()
+      : `[Sera généré automatiquement par l'IA à partir du titre / genre / palette — non visible à l'avance]`;
+    const assembledPrompt = `Create a PROFESSIONAL Amazon best-seller book cover.
+
+MANDATORY SCENE TO PHOTOGRAPH (render EXACTLY this scene, do not invent a generic background):
+${sceneSource}
+
+${registre ? `REGISTER / GENRE LANE: ${registre}. Treat the cover with the visual codes of this register (composition, palette, lighting, props).\n\n` : ''}BOOK:
+- Title: "${title}" — HUGE bold sans-serif at top, sharp legible glyphs.
+${subtitle ? `- Subtitle: "${subtitle}" — smaller elegant type below.\n` : ''}- Author: "${author || 'Author'}" — clean at the bottom.
+
+ART DIRECTION:
+- Style: ${styleSent || 'cinematic photorealistic'}
+- Palette: ${colorScheme || 'deep contrast, dramatic light'}
+- Genre: ${genre || 'non-fiction'}
+
+STRICT BANS: generic gradient/flat background, empty silhouette, cartoon, AI artifact, watermark, Amazon badge, 3D mockup.
+
+FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine + front)' : 'Kindle vertical portrait 1.6:1 (1600x2560)'}.`;
+    return { payload, assembledPrompt };
+  }, [title, subtitle, author, genre, style, colorScheme, description, userPrompt, registre, format, initialDescription, referenceImage]);
+
   const handleReferenceUpload = (file: File) => {
     if (file.size > 4 * 1024 * 1024) {
       toast.error('Image de référence trop lourde (max 4 Mo)');
@@ -860,6 +902,41 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
                     )}
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* ========= APERÇU EXACT DU PAYLOAD ENVOYÉ À L'EDGE FUNCTION ========= */}
+            {edgePayloadPreview && (
+              <div className="rounded-lg border-2 border-primary/30 bg-primary/5">
+                <div className="flex items-center justify-between p-2.5 border-b border-primary/20">
+                  <span className="flex items-center gap-2 text-xs font-bold text-primary">
+                    <Eye className="w-3.5 h-3.5" />
+                    Prompt exact envoyé à l'IA (generate-ai-cover)
+                  </span>
+                  <Badge variant="outline" className="text-[10px] bg-background">
+                    {userPrompt.trim() ? 'Avec votre prompt' : 'Sans prompt utilisateur'} · Registre: {registre}
+                  </Badge>
+                </div>
+                <div className="p-2 space-y-2">
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-semibold text-muted-foreground uppercase">Payload JSON envoyé</span>
+                      <Button size="sm" variant="ghost" className="h-6 px-2 text-[10px]" onClick={() => copyPrompt(JSON.stringify(edgePayloadPreview.payload, null, 2), 'payload')}>
+                        <Copy className="w-3 h-3 mr-1" /> Copier
+                      </Button>
+                    </div>
+                    <Textarea readOnly value={JSON.stringify(edgePayloadPreview.payload, null, 2)} className="text-[10px] min-h-[120px] font-mono bg-background" />
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-semibold text-muted-foreground uppercase">Prompt final assemblé côté serveur</span>
+                      <Button size="sm" variant="ghost" className="h-6 px-2 text-[10px]" onClick={() => copyPrompt(edgePayloadPreview.assembledPrompt, 'assembled')}>
+                        <Copy className="w-3 h-3 mr-1" /> Copier
+                      </Button>
+                    </div>
+                    <Textarea readOnly value={edgePayloadPreview.assembledPrompt} className="text-[10px] min-h-[200px] font-mono bg-background" />
+                  </div>
+                </div>
               </div>
             )}
 
