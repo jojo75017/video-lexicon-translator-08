@@ -92,7 +92,7 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
   const [author, setAuthor] = useState(authorName);
   const [format, setFormat] = useState<CoverFormat>('kindle');
   const [style, setStyle] = useState('professional');
-  const [registre, setRegistre] = useState('auto');
+  const [registre, setRegistre] = useState('business');
   const [genre, setGenre] = useState('non-fiction');
   const [colorScheme, setColorScheme] = useState('');
   const [description, setDescription] = useState('');
@@ -595,12 +595,12 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
           <Button
             type="button"
             variant="outline"
-            onClick={() => createFallbackCover('Couverture de secours créée : vous pouvez continuer')}
+            onClick={() => createFallbackCover('Maquette créée avec le preset choisi')}
             disabled={isGenerating || !title.trim()}
             className="w-full"
           >
             <ImageIcon className="w-4 h-4 mr-2" />
-            Continuer avec une couverture simple
+            Créer une maquette avec le preset choisi
           </Button>
 
           <p className="text-xs text-muted-foreground text-center">
