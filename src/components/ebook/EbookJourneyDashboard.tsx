@@ -104,7 +104,7 @@ export const EbookJourneyDashboard: React.FC<EbookJourneyDashboardProps> = (prop
               style={{ color: '#232F3E' }}
             >
               <Zap className="w-4 h-4 mr-2" style={{ color: '#FF9E2D' }} />
-              Lancer le Workflow IA · 15 agents
+              Workflow IA (15 agents)
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
 
