@@ -1423,7 +1423,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between bg-card rounded-xl border p-3 shadow-sm">
               <div className="px-2">
                 <p className="text-sm font-semibold text-foreground">Affichage du tableau de bord</p>
-                <p className="text-xs text-muted-foreground">Choisissez comment voir votre projet — pour lancer la rédaction IA, utilisez le bouton bleu.</p>
+                <p className="text-xs text-muted-foreground">Choisissez comment voir votre projet — pour lancer la rédaction IA, utilisez le bouton orange <strong>Workflow IA (15 agents)</strong>.</p>
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 <div className="inline-flex rounded-lg border overflow-hidden bg-background" role="group" aria-label="Mode d'affichage">
