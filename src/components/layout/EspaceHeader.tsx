@@ -271,39 +271,22 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
     >
       {!bannerDismissed && (
         <div
-          className="w-full text-white text-sm relative overflow-hidden"
-          style={{
-            background: 'linear-gradient(90deg, #0d1117 0%, #1a2332 50%, #232F3E 100%)',
-            borderBottom: '1px solid rgba(255,158,45,0.25)',
-            boxShadow: '0 1px 0 rgba(255,255,255,0.04) inset, 0 2px 12px rgba(0,0,0,0.15)',
-          }}
+          className="w-full text-white text-sm relative"
+          style={{ backgroundColor: '#232F3E', borderBottom: '1px solid rgba(255,255,255,0.06)' }}
         >
-          {/* Subtle gold accent line */}
-          <div
-            className="absolute inset-x-0 top-0 h-px"
-            style={{ background: 'linear-gradient(90deg, transparent, #FF9E2D 50%, transparent)' }}
-          />
-          <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2.5 sm:px-6">
+          <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2 sm:px-6">
             <span
-              className="inline-flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-bold"
-              style={{ background: 'linear-gradient(135deg, #FF9E2D, #d97706)', color: '#0d1117' }}
+              className="inline-block h-1.5 w-1.5 rounded-full bg-[#FF9E2D]"
               aria-hidden
-            >
-              ✦
-            </span>
-            <p className="flex-1 truncate font-medium tracking-tight">
-              <span className="hidden sm:inline text-white/60 mr-1">Lancement public le 1er juillet 2026 —</span>
+            />
+            <p className="flex-1 truncate text-[12px] tracking-tight" style={{ fontFamily: "'Work Sans', system-ui, sans-serif" }}>
+              <span className="hidden sm:inline text-white/55 mr-1 uppercase tracking-[0.14em] text-[10px] font-semibold">Lancement 1ᵉʳ juillet 2026 ·</span>
               <strong className="text-white font-semibold">Tes 2 cadeaux abonné</strong>
-              <span className="text-white/70"> t'attendent : 30 min Zoom + −30 % à vie</span>
+              <span className="text-white/60"> : 30 min Zoom + −30 % à vie</span>
             </p>
             <Link
               to="/espace/lancement"
-              className="rounded-full px-4 py-1.5 text-xs font-semibold whitespace-nowrap transition-all hover:scale-[1.02]"
-              style={{
-                background: 'linear-gradient(135deg, #FF9E2D 0%, #d97706 100%)',
-                color: '#0d1117',
-                boxShadow: '0 2px 8px rgba(255,158,45,0.35)',
-              }}
+              className="border border-white/30 hover:border-[#FF9E2D] hover:text-[#FF9E2D] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] whitespace-nowrap transition-colors"
             >
               Voir mes cadeaux →
             </Link>
@@ -387,10 +370,9 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
                   <Link
                     to="/admin-cockpit"
                     aria-label="Cockpit admin"
-                    className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold border border-joy-teal/40 text-joy-ink hover:bg-joy-teal/10 transition-all"
-                    style={{ color: '#008296' }}
+                    className="inline-flex items-center gap-1.5 border border-[#e8ecf1] hover:border-[#008296] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#232F3E] hover:text-[#008296] transition-colors"
                   >
-                    <Shield className="h-3.5 w-3.5" />
+                    <Shield className="h-3 w-3" />
                     <span className="hidden sm:inline">Cockpit admin</span>
                   </Link>
                 </TooltipTrigger>
@@ -446,13 +428,14 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
 
       {showTabBar && (
         <>
-          {/* Rangée principale : familles + Tous les outils */}
+          {/* Rangée principale : familles + outils (style éditorial magazine) */}
           <nav
-            className="border-t border-joy-ink/5 bg-gradient-to-r from-white via-joy-cream/30 to-white"
+            className="border-t border-[#e8ecf1] bg-[#fafbfc]"
             aria-label="Étapes du livre"
+            style={{ fontFamily: "'Work Sans', system-ui, sans-serif" }}
           >
-            <div className="mx-auto flex max-w-7xl items-center gap-2 overflow-x-auto px-3 py-2.5 sm:px-6 scrollbar-thin">
-              <div className="flex items-center justify-center gap-2 flex-1 min-w-0 flex-wrap">
+            <div className="mx-auto flex max-w-7xl items-center gap-1 overflow-x-auto px-4 sm:px-6 scrollbar-thin">
+              <div className="flex items-center flex-1 min-w-0">
                 {PLANNER_TABS.map((tab) => {
                   const active = isFamilyActive(tab);
                   return (
@@ -460,77 +443,72 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
                       key={tab.id}
                       onClick={() => onTabChange?.(tab.id)}
                       className={cn(
-                        'flex-shrink-0 inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-base font-bold transition-all duration-200 hover:scale-[1.05] ring-1',
-                        active ? `${tab.bgActive} ${tab.ring}` : `${tab.bg} ${tab.ring}`,
+                        'flex-shrink-0 inline-flex items-center gap-2 px-4 py-3 text-[11px] font-bold uppercase tracking-[0.18em] transition-colors border-b-2',
+                        active
+                          ? 'text-[#232F3E] border-[#FF9E2D]'
+                          : 'text-[#232F3E]/55 border-transparent hover:text-[#008296]',
                       )}
                     >
-                      <span className="text-lg leading-none" aria-hidden>{tab.emoji}</span>
+                      <span className="text-xs opacity-60" aria-hidden>{tab.emoji}</span>
                       {tab.label}
                     </button>
                   );
                 })}
+
+                {/* Audit ASIN */}
+                <button
+                  onClick={() => navigate('/audit-pilot')}
+                  title="Auditer une fiche produit Amazon par ASIN"
+                  className="flex-shrink-0 inline-flex items-center gap-1.5 px-4 py-3 text-[11px] font-bold uppercase tracking-[0.18em] text-[#232F3E]/55 border-b-2 border-transparent hover:text-[#008296] transition-colors"
+                >
+                  <ClipboardCheck className="h-3 w-3" />
+                  <span className="hidden md:inline">Audit ASIN</span>
+                </button>
+
+                {/* Communauté */}
+                <button
+                  onClick={() => navigate('/communaute')}
+                  title="Forum entre abonnés"
+                  className="flex-shrink-0 inline-flex items-center gap-1.5 px-4 py-3 text-[11px] font-bold uppercase tracking-[0.18em] text-[#232F3E]/55 border-b-2 border-transparent hover:text-[#008296] transition-colors"
+                >
+                  <MessageCircle className="h-3 w-3" />
+                  <span className="hidden md:inline">Communauté</span>
+                  <span className="text-[8px] font-bold tracking-widest px-1 bg-[#008296] text-white">NEW</span>
+                </button>
+
+                {/* 600 Niches */}
+                <button
+                  onClick={() => navigate('/niches-600')}
+                  title="600 niches KDP rentables"
+                  className="flex-shrink-0 inline-flex items-center gap-1.5 px-4 py-3 text-[11px] font-bold uppercase tracking-[0.18em] text-[#232F3E]/55 border-b-2 border-transparent hover:text-[#008296] transition-colors"
+                >
+                  <Target className="h-3 w-3" />
+                  <span>600 Niches</span>
+                  <span className="text-[8px] font-bold tracking-widest px-1 bg-[#008296] text-white">NEW</span>
+                </button>
               </div>
-
-              {/* Bouton Audit ASIN — accès direct au scraper Amazon */}
-              <button
-                onClick={() => navigate('/audit-pilot')}
-                title="Auditer une fiche produit Amazon par ASIN"
-                className="relative flex-shrink-0 inline-flex items-center gap-1.5 rounded-2xl px-3 py-2 text-sm font-bold transition-all duration-200 hover:scale-[1.05] border-2 border-[#008296]/50 bg-[#008296]/10 hover:bg-[#008296]/20 text-[#008296]"
-              >
-                <ClipboardCheck className="h-4 w-4" />
-                <span className="hidden md:inline">Audit ASIN</span>
-              </button>
-
-              {/* Bouton Communauté — accès direct au forum */}
-              <button
-                onClick={() => navigate('/communaute')}
-                title="Forum entre abonnés : entraide, retours, astuces"
-                className="relative flex-shrink-0 inline-flex items-center gap-1.5 rounded-2xl px-3 py-2 text-sm font-bold transition-all duration-200 hover:scale-[1.05] border-2 border-[#EC4899]/50 bg-[#EC4899]/10 hover:bg-[#EC4899]/20 text-[#9F1239]"
-              >
-                <MessageCircle className="h-4 w-4" />
-                <span className="hidden md:inline">Communauté</span>
-                <span className="text-[9px] font-black px-1.5 py-0.5 rounded-full bg-[#EC4899] text-white">
-                  NEW
-                </span>
-              </button>
-
-              {/* Bouton 600 Niches — NOUVEAUTÉ Mai 2026 */}
-              <button
-                onClick={() => navigate('/niches-600')}
-                title="600 niches KDP rentables — Nouveauté Mai 2026"
-                className="relative flex-shrink-0 inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-bold transition-all duration-200 hover:scale-[1.05] border-2 border-[#FF9E2D]/60 bg-gradient-to-r from-[#FF9E2D]/15 to-[#EC4899]/15 hover:from-[#FF9E2D]/25 hover:to-[#EC4899]/25 text-[#9F1239]"
-              >
-                <Target className="h-4 w-4 text-[#EC4899]" />
-                <span>600 Niches</span>
-                <span className="text-[9px] font-black px-1.5 py-0.5 rounded-full bg-gradient-to-r from-[#FF9E2D] to-[#EC4899] text-white animate-pulse shadow-sm">
-                  NEW
-                </span>
-              </button>
 
               <Popover open={allToolsOpen} onOpenChange={setAllToolsOpen}>
                 <PopoverTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="rounded-full text-joy-ink/75 hover:text-[#FF9E2D] hover:bg-joy-cream gap-1.5 px-3 flex-shrink-0 transition-all hover:scale-[1.04]"
+                  <button
+                    className="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-3 text-[11px] font-bold uppercase tracking-[0.18em] text-[#008296] hover:text-[#FF9E2D] transition-colors"
                   >
-                    <LayoutGrid className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline text-xs font-semibold">Tous les outils</span>
-                    <Sparkles className="h-3 w-3 animate-pulse" style={{ color: '#FF9E2D' }} />
-                  </Button>
+                    <LayoutGrid className="h-3 w-3" />
+                    <span className="hidden sm:inline">+ Tous les outils</span>
+                  </button>
                 </PopoverTrigger>
                 <PopoverContent
                   align="end"
-                  className="w-[min(92vw,860px)] p-0 rounded-2xl overflow-hidden"
+                  className="w-[min(92vw,860px)] p-0 rounded-none border border-[#e8ecf1] overflow-hidden"
                 >
-                  <div className="p-3 border-b border-joy-ink/8 bg-joy-cream/30">
+                  <div className="p-3 border-b border-[#e8ecf1] bg-[#fafbfc]">
                     <div className="relative">
-                      <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-joy-ink/40" />
+                      <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#232F3E]/40" />
                       <Input
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         placeholder="Rechercher un outil…"
-                        className="pl-8 h-9 rounded-full bg-white border-joy-ink/10 text-sm"
+                        className="pl-8 h-9 rounded-none bg-white border-[#e8ecf1] text-sm"
                         autoFocus
                       />
                     </div>
@@ -539,10 +517,10 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
                     {filteredTools.map((group) => (
                       <div
                         key={group.family}
-                        className="p-3 border-r border-b border-joy-ink/5 last:border-r-0"
+                        className="p-3 border-r border-b border-[#e8ecf1] last:border-r-0"
                       >
-                        <div className="text-[10px] font-bold uppercase tracking-widest text-joy-ink/55 mb-2 px-1 flex items-center gap-1">
-                          <span aria-hidden>{FAMILY_EMOJI[group.family]}</span>
+                        <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#008296] mb-2 px-1 flex items-center gap-1">
+                          <span aria-hidden className="opacity-60">{FAMILY_EMOJI[group.family]}</span>
                           {group.familyLabel}
                         </div>
                         <ul className="space-y-0.5">
@@ -553,10 +531,10 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
                                 <button
                                   onClick={() => handlePick(t.id)}
                                   className={cn(
-                                    'w-full text-left text-sm rounded-lg px-2 py-1.5 transition-colors',
+                                    'w-full text-left text-sm px-2 py-1.5 transition-colors',
                                     active
-                                      ? 'bg-joy-teal/15 text-joy-ink font-semibold'
-                                      : 'text-joy-ink/75 hover:bg-joy-cream hover:text-[#FF9E2D]',
+                                      ? 'bg-[#e8ecf1] text-[#232F3E] font-semibold'
+                                      : 'text-[#232F3E]/75 hover:bg-[#fafbfc] hover:text-[#008296]',
                                   )}
                                 >
                                   {t.label}
@@ -568,7 +546,7 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
                       </div>
                     ))}
                     {filteredTools.length === 0 && (
-                      <div className="col-span-full p-6 text-center text-sm text-joy-ink/55">
+                      <div className="col-span-full p-6 text-center text-sm text-[#232F3E]/55">
                         Aucun outil ne correspond à « {search} ».
                       </div>
                     )}
@@ -578,13 +556,14 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
             </div>
           </nav>
 
-          {/* Sous-barre contextuelle */}
+          {/* Sous-barre contextuelle (style éditorial) */}
           {currentFamily && PLANNER_SUBTABS[currentFamily]?.length > 0 && (
             <nav
-              className="border-t border-joy-ink/5 bg-gradient-to-r from-white via-joy-cream/40 to-white"
+              className="border-t border-[#e8ecf1] bg-[#fafbfc]"
               aria-label="Outils de l'étape"
+              style={{ fontFamily: "'Work Sans', system-ui, sans-serif" }}
             >
-              <div className="mx-auto flex max-w-7xl items-center justify-center gap-2 overflow-x-auto px-3 py-2 sm:px-6 scrollbar-thin flex-wrap">
+              <div className="mx-auto flex max-w-7xl items-center justify-center gap-6 overflow-x-auto px-4 py-2.5 sm:px-6 scrollbar-thin">
                 {PLANNER_SUBTABS[currentFamily]!.map((sub) => {
                   const active = isSubActive(sub.id);
                   return (
@@ -592,13 +571,13 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
                       key={sub.id}
                       onClick={() => onTabChange?.(sub.id)}
                       className={cn(
-                        'flex-shrink-0 rounded-xl px-3.5 py-1.5 text-sm font-semibold transition-all duration-200 hover:scale-[1.05] border',
+                        'flex-shrink-0 inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] transition-colors',
                         active
-                          ? 'bg-white text-[#008296] border-[#008296]/40 shadow-sm'
-                          : 'bg-joy-cream/60 text-joy-ink/70 border-transparent hover:bg-white hover:text-[#FF9E2D] hover:border-[#FF9E2D]/30',
+                          ? 'text-[#008296]'
+                          : 'text-[#232F3E]/55 hover:text-[#232F3E]',
                       )}
                     >
-                      {active && <span className="mr-1.5" aria-hidden>●</span>}
+                      {active && <span className="w-1.5 h-1.5 rounded-full bg-[#008296]" aria-hidden />}
                       {sub.label}
                     </button>
                   );
