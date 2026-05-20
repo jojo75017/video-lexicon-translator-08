@@ -96,6 +96,7 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
   const [genre, setGenre] = useState('non-fiction');
   const [colorScheme, setColorScheme] = useState('');
   const [description, setDescription] = useState('');
+  const [userPrompt, setUserPrompt] = useState('');
   const [referenceImage, setReferenceImage] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedCovers, setGeneratedCovers] = useState<GeneratedCover[]>([]);
@@ -183,11 +184,14 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
   // ========== APERÇU DES PROMPTS AVANT GÉNÉRATION ==========
   const livePromptPreview = React.useMemo(() => {
     if (!title.trim()) return null;
-    const baseArt = `Style: ${style}. Palette: ${colorScheme || 'modern, high contrast'}. Genre: ${genre}.${description ? ` Concept: ${description}.` : ''} Photorealistic magazine-grade quality, NO cartoon, NO low-fidelity, NO watermark, NO Amazon badge, NO mockup. Title typography sharp and perfectly legible.`;
+    const reg = REGISTRES.find(r => r.value === registre);
+    const registreLine = reg && reg.prompt ? `Register: ${reg.prompt}. ` : '';
+    const userLine = userPrompt.trim() ? `USER SCENE BRIEF (must be respected exactly): ${userPrompt.trim()}. ` : '';
+    const baseArt = `${userLine}${registreLine}Style: ${style}. Palette: ${colorScheme || 'modern, high contrast'}. Genre: ${genre}.${description ? ` Concept: ${description}.` : ''} Photorealistic magazine-grade quality, NO cartoon, NO low-fidelity, NO watermark, NO Amazon badge, NO mockup, NO generic gradient background. Title typography sharp and perfectly legible.`;
     const recto = `FRONT COVER (recto) for the book "${title}"${subtitle ? `, subtitle "${subtitle}"` : ''}, by ${author || 'Author'}. Vertical portrait artwork, ratio 1.6:1, flat 2D print-ready. Title HUGE centered at top third, ${subtitle ? 'subtitle clearly below in smaller elegant type, ' : ''}author name at the bottom. ${baseArt}`;
     const verso = `BACK COVER (verso / 4ème de couverture) for the same book "${title}" by ${author || 'Author'}. Same visual universe as the front cover (same palette, lighting, typography). Vertical portrait, same dimensions as the front. Compose a clean back panel with: a short hook headline at the top, a 3–5 line synopsis area in readable body text, a small author bio block at the bottom-left, and a CLEAN EMPTY rectangular zone of 50 x 30 mm in the BOTTOM-RIGHT reserved for ISBN barcode. ${baseArt}`;
     return { recto, verso };
-  }, [title, subtitle, author, style, colorScheme, genre, description]);
+  }, [title, subtitle, author, style, colorScheme, genre, description, userPrompt, registre]);
 
   const handleReferenceUpload = (file: File) => {
     if (file.size > 4 * 1024 * 1024) {
@@ -417,6 +421,8 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
             })(),
             colorScheme,
             description,
+            userPrompt, // ce que l'utilisateur veut VRAIMENT voir sur la couverture
+            registre,
             format,
             kdpBrief: initialDescription, // brief from KDP calculator if any
             referenceImage,
@@ -470,9 +476,8 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
     setGenre(preset.genre);
     setStyle(preset.style);
     setColorScheme(preset.colorScheme);
-    setDescription(preset.description);
-    setShowAdvanced(true);
-    toast.success(`Preset ${preset.title} appliqué`);
+    if (!description.trim()) setDescription(preset.description);
+    toast.success(`Modèle « ${preset.title} » appliqué — décrivez maintenant la scène voulue.`);
   };
 
   return (
@@ -487,7 +492,7 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
             <Badge className="bg-primary/10 text-primary border-primary/30">PRO Bestseller</Badge>
           </CardTitle>
           <CardDescription>
-            Générez la couverture <strong>Kindle</strong> ou <strong>Broché complet</strong> (face + dos + 4ème) avec qualité best-seller Amazon.
+            Générez une couverture <strong>Kindle</strong> ou <strong>Broché complet</strong> (face + dos + 4ème). Format calculé selon les règles KDP — à toujours vérifier dans l'aperçu Amazon avant publication.
           </CardDescription>
         </CardHeader>
       </Card>
@@ -507,7 +512,7 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
               </Badge>
               </CardTitle>
               <CardDescription className="mt-1">
-                Choisissez un preset visible, puis générez une couverture adaptée au registre du livre.
+                1. Choisissez un modèle visuel. 2. Décrivez la scène voulue. 3. Générez.
               </CardDescription>
             </div>
           </div>
@@ -544,9 +549,9 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
             <div className="flex items-center justify-between gap-3">
               <Label className="text-sm font-semibold flex items-center gap-2">
                 <Palette className="h-4 w-4 text-primary" />
-                Presets de couverture visibles
+                1. Choisissez un modèle visuel
               </Label>
-              <Badge variant="outline" className="border-primary/30 text-primary">Choix obligatoire</Badge>
+              <Badge variant="outline" className="border-primary/30 text-primary">Obligatoire</Badge>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
               {COVER_PRESETS.map((preset) => {
@@ -573,6 +578,23 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
             </div>
           </div>
 
+          <div className="rounded-lg border border-primary/30 bg-background/85 p-3 space-y-2">
+            <Label htmlFor="user-prompt" className="text-sm font-semibold flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-primary" />
+              2. Décrivez la scène voulue (votre prompt)
+            </Label>
+            <Textarea
+              id="user-prompt"
+              value={userPrompt}
+              onChange={(e) => setUserPrompt(e.target.value)}
+              placeholder="Ex : une vieille machine à écrire sur un bureau en bois sombre, lumière dorée latérale, pluie derrière la fenêtre, ambiance solitude et mystère. Ne montrer aucun visage."
+              className="min-h-[110px] bg-background text-sm"
+            />
+            <p className="text-[11px] text-muted-foreground">
+              Sujet central, décor, lumière, palette, choses à éviter. Plus c'est précis, plus l'image colle à votre livre.
+            </p>
+          </div>
+
           <Button
             onClick={generateCover}
             disabled={isGenerating || !title.trim()}
@@ -594,17 +616,18 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
 
           <Button
             type="button"
-            variant="outline"
-            onClick={() => createFallbackCover('Maquette créée avec le preset choisi')}
+            variant="ghost"
+            size="sm"
+            onClick={() => createFallbackCover('Maquette temporaire générée localement (à remplacer par une vraie couverture IA)')}
             disabled={isGenerating || !title.trim()}
-            className="w-full"
+            className="w-full text-xs text-muted-foreground"
           >
-            <ImageIcon className="w-4 h-4 mr-2" />
-            Créer une maquette avec le preset choisi
+            <ImageIcon className="w-3.5 h-3.5 mr-2" />
+            Générer une maquette temporaire (dépannage si l'IA est indisponible)
           </Button>
 
           <p className="text-xs text-muted-foreground text-center">
-            ✨ Style professionnel · Format Kindle · Qualité bestseller Amazon
+            Image IA basée sur votre prompt · Format calculé KDP · À vérifier dans l'aperçu Amazon avant publication
           </p>
         </CardContent>
       </Card>

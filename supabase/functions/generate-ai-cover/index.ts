@@ -97,6 +97,8 @@ serve(async (req) => {
       style,
       colorScheme,
       description,
+      userPrompt = '',
+      registre = '',
       format = 'kindle',
       kdpBrief = '',
       referenceImage,
@@ -129,10 +131,16 @@ serve(async (req) => {
       ? { 'Authorization': `Bearer ${openrouterKey.trim()}`, 'Content-Type': 'application/json', 'HTTP-Referer': 'https://ebookstudio.fr', 'X-Title': 'EbookStudio' }
       : { 'Lovable-API-Key': LOVABLE_API_KEY!, 'Content-Type': 'application/json' };
 
-    const sceneConcept = await generateSceneConcept({
-      title, subtitle, genre, description, style, colorScheme,
-      endpoint: conceptEndpoint, authHeaders: conceptHeaders,
-    });
+    // Si l'utilisateur fournit son propre prompt, on s'en sert COMME SCÈNE et on saute la génération d'idée.
+    let sceneConcept = '';
+    if (userPrompt && userPrompt.trim().length > 10) {
+      sceneConcept = userPrompt.trim();
+    } else {
+      sceneConcept = await generateSceneConcept({
+        title, subtitle, genre, description: description || userPrompt, style, colorScheme,
+        endpoint: conceptEndpoint, authHeaders: conceptHeaders,
+      });
+    }
 
     const variationSeed = Math.floor(Math.random() * 999999);
     const baseArt = sceneConcept || `Cinematic photorealistic scene relevant to "${title}". Real subject + environment, dramatic lighting (rim light, golden hour or chiaroscuro), shallow depth of field, magazine-grade detail.`;
@@ -143,10 +151,10 @@ serve(async (req) => {
     // === STEP 2: image prompt — short, positive, scene-led ===
     const textPrompt = `Create a PROFESSIONAL Amazon best-seller book cover.
 
-SCENE TO PHOTOGRAPH (mandatory, do not replace with a flat color or gradient):
+MANDATORY SCENE TO PHOTOGRAPH (this is the user's explicit brief — render EXACTLY this scene, do not invent a generic background, do not fall back to a flat gradient, do not reuse a default office/desk/sunset scene):
 ${baseArt}
 
-BOOK:
+${registre ? `REGISTER / GENRE LANE: ${registre}. Treat the cover with the visual codes of this register (composition, palette, lighting, props).\n\n` : ''}BOOK:
 - Title: "${title}" — render HUGE bold sans-serif at top, brilliant white or gold, sharp legible glyphs, dark vignette behind if needed.
 ${subtitle ? `- Subtitle: "${subtitle}" — smaller elegant type below the title.\n` : ''}- Author: "${author || 'Author'}" — clean at the bottom.
 
@@ -155,10 +163,17 @@ ART DIRECTION:
 - Palette: ${colorScheme || 'deep contrast, dramatic light'}
 - Genre: ${genre || 'non-fiction'}
 
+STRICT BANS — do NOT produce any of these:
+- generic gradient or flat color background
+- empty silhouette in an empty space
+- the same default scene as previous runs
+- low-fidelity cartoon, AI artifact, plastic skin, melted hands
+- watermark, Amazon badge, fake price, mockup of a 3D book
+
 FORMAT:
 ${formatGuidance}
 
-Render variation #${variationSeed}. Photograph the scene above — real depicted subject matter, NOT an empty colored background.${referenceImage ? ' Use attached reference for mood only, do not copy.' : ''}`;
+Render variation #${variationSeed}. Photograph the scene above — real depicted subject matter from the user's brief.${referenceImage ? ' Use attached reference for mood only, do not copy.' : ''}`;
 
     let messageContent: string | any[] = textPrompt;
     if (referenceImage && typeof referenceImage === 'string' && referenceImage.length < 6_000_000) {
