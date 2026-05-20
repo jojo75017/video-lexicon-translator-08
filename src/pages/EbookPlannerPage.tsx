@@ -1462,6 +1462,14 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                 </button>
                 <button
                   type="button"
+                  onClick={() => setActiveTab('kdp')}
+                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-lg border border-[#FF9E2D] bg-[#FF9E2D] text-white hover:bg-[#008296] hover:border-[#008296] transition-all shadow-sm"
+                  title="Description, Mots-clés A9, Catégories, Prix, Plan de lancement, Bio, A+ Content"
+                >
+                  🎯 Outils KDP (Description + A+)
+                </button>
+                <button
+                  type="button"
                   onClick={() => setActiveTab('images-cover')}
                   className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg border border-[#FF9E2D]/40 bg-white text-[#FF9E2D] hover:bg-[#FF9E2D]/10 transition-all"
                   title="Créer la couverture KDP (Studio IA + Format + 4ᵉ de couverture)"
