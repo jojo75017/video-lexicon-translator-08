@@ -905,6 +905,41 @@ FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine
               </div>
             )}
 
+            {/* ========= APERÇU EXACT DU PAYLOAD ENVOYÉ À L'EDGE FUNCTION ========= */}
+            {edgePayloadPreview && (
+              <div className="rounded-lg border-2 border-primary/30 bg-primary/5">
+                <div className="flex items-center justify-between p-2.5 border-b border-primary/20">
+                  <span className="flex items-center gap-2 text-xs font-bold text-primary">
+                    <Eye className="w-3.5 h-3.5" />
+                    Prompt exact envoyé à l'IA (generate-ai-cover)
+                  </span>
+                  <Badge variant="outline" className="text-[10px] bg-background">
+                    {userPrompt.trim() ? 'Avec votre prompt' : 'Sans prompt utilisateur'} · Registre: {registre}
+                  </Badge>
+                </div>
+                <div className="p-2 space-y-2">
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-semibold text-muted-foreground uppercase">Payload JSON envoyé</span>
+                      <Button size="sm" variant="ghost" className="h-6 px-2 text-[10px]" onClick={() => copyPrompt(JSON.stringify(edgePayloadPreview.payload, null, 2), 'payload')}>
+                        <Copy className="w-3 h-3 mr-1" /> Copier
+                      </Button>
+                    </div>
+                    <Textarea readOnly value={JSON.stringify(edgePayloadPreview.payload, null, 2)} className="text-[10px] min-h-[120px] font-mono bg-background" />
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-semibold text-muted-foreground uppercase">Prompt final assemblé côté serveur</span>
+                      <Button size="sm" variant="ghost" className="h-6 px-2 text-[10px]" onClick={() => copyPrompt(edgePayloadPreview.assembledPrompt, 'assembled')}>
+                        <Copy className="w-3 h-3 mr-1" /> Copier
+                      </Button>
+                    </div>
+                    <Textarea readOnly value={edgePayloadPreview.assembledPrompt} className="text-[10px] min-h-[200px] font-mono bg-background" />
+                  </div>
+                </div>
+              </div>
+            )}
+
             <Button
               className="w-full"
               onClick={generateCover}
