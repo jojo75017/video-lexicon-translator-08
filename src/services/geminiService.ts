@@ -223,6 +223,11 @@ export async function callGeminiWithHistory(
     const data = await response.json();
     const content = extractGeminiText(data);
     if (!content) throw new Error('Aucune réponse de Gemini');
+    try {
+      const { trackAIUsage } = await import('@/lib/aiCostTracker');
+      const promptChars = messages.reduce((n, m) => n + (m.text?.length || 0), 0) + (systemPrompt?.length || 0);
+      trackAIUsage({ provider: 'gemini', promptChars, responseChars: content.length });
+    } catch { /* ignore */ }
     return content;
   } catch (error: any) {
     clearTimeout(timeoutId);
