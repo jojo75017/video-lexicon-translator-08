@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Sparkles, ArrowRight, Trophy } from 'lucide-react';
+import { Sparkles, ArrowRight, Trophy, Zap, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PhaseCard } from './journey/PhaseCard';
 import {
