@@ -640,6 +640,88 @@ FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine
             </p>
           </div>
 
+          <div className="rounded-lg border-2 border-primary/40 bg-primary/5 p-3 space-y-3 shadow-sm">
+            <div className="flex items-center justify-between gap-2 flex-wrap">
+              <div className="flex items-center gap-2">
+                <Eye className="h-4 w-4 text-primary" />
+                <Label className="text-sm font-bold text-primary">3. Vérifiez / modifiez le prompt envoyé à l'IA</Label>
+              </div>
+              <Badge variant="outline" className="border-primary/30 bg-background text-primary">
+                Visible avant génération
+              </Badge>
+            </div>
+
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-xs font-semibold text-muted-foreground uppercase">Votre prompt utilisateur</span>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={editUserPromptInPreview ? 'default' : 'outline'}
+                  className="h-8 px-3 text-xs"
+                  onClick={() => setEditUserPromptInPreview((v) => !v)}
+                >
+                  <Wand2 className="w-3.5 h-3.5 mr-1" />
+                  {editUserPromptInPreview ? 'Verrouiller' : 'Modifier'}
+                </Button>
+              </div>
+              <Textarea
+                readOnly={!editUserPromptInPreview}
+                value={userPrompt}
+                onChange={(e) => setUserPrompt(e.target.value)}
+                placeholder="Décrivez ici précisément la scène à voir sur la couverture..."
+                className={`min-h-[90px] bg-background text-xs font-mono ${editUserPromptInPreview ? 'ring-2 ring-primary/40' : ''}`}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between gap-2 flex-wrap">
+                <span className="text-xs font-semibold text-muted-foreground uppercase">
+                  Prompt final envoyé à generate-ai-cover {assembledPromptOverride ? '(personnalisé)' : '(auto)'}
+                </span>
+                <div className="flex items-center gap-1">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant={editAssembledPrompt ? 'default' : 'outline'}
+                    className="h-8 px-3 text-xs"
+                    onClick={() => {
+                      if (!editAssembledPrompt && assembledPromptOverride === null) {
+                        setAssembledPromptOverride(edgePayloadPreview.assembledPrompt);
+                      }
+                      setEditAssembledPrompt((v) => !v);
+                    }}
+                  >
+                    <Wand2 className="w-3.5 h-3.5 mr-1" />
+                    {editAssembledPrompt ? 'Verrouiller' : 'Modifier'}
+                  </Button>
+                  {assembledPromptOverride !== null && (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      className="h-8 px-3 text-xs"
+                      onClick={() => { setAssembledPromptOverride(null); setEditAssembledPrompt(false); }}
+                    >
+                      Réinitialiser
+                    </Button>
+                  )}
+                </div>
+              </div>
+              <Textarea
+                readOnly={!editAssembledPrompt}
+                value={assembledPromptOverride ?? edgePayloadPreview.assembledPrompt}
+                onChange={(e) => setAssembledPromptOverride(e.target.value)}
+                className={`min-h-[170px] bg-background text-[11px] font-mono ${editAssembledPrompt ? 'ring-2 ring-primary/40' : ''}`}
+              />
+              {assembledPromptOverride !== null && (
+                <p className="text-[11px] font-medium text-primary">
+                  Ce prompt personnalisé sera envoyé tel quel à l'IA.
+                </p>
+              )}
+            </div>
+          </div>
+
           <Button
             onClick={generateCover}
             disabled={isGenerating || !title.trim()}
