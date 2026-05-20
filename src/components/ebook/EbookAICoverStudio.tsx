@@ -258,6 +258,7 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
   const edgePayloadPreview = React.useMemo(() => {
     const reg = REGISTRES.find(r => r.value === registre);
     const styleSent = reg && reg.prompt ? `${reg.prompt}. Additional style note: ${style}` : style;
+    const usesOpenRouter = openrouterKey.trim().startsWith('sk-or-');
     const payload = {
       title,
       subtitle,
@@ -271,6 +272,8 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
       format,
       kdpBrief: initialDescription || '',
       referenceImage: referenceImage ? '[image attachée]' : null,
+      provider: usesOpenRouter ? 'OpenRouter' : 'Lovable AI',
+      openrouterKey: usesOpenRouter ? '[clé OpenRouter active envoyée]' : '[aucune clé OpenRouter valide envoyée]',
     };
     const sceneSource = userPrompt.trim().length > 10
       ? userPrompt.trim()
@@ -293,7 +296,7 @@ STRICT BANS: generic gradient/flat background, empty silhouette, cartoon, AI art
 
 FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine + front)' : 'Kindle vertical portrait 1.6:1 (1600x2560)'}.`;
     return { payload, assembledPrompt };
-  }, [title, subtitle, author, genre, style, colorScheme, description, userPrompt, registre, format, initialDescription, referenceImage]);
+  }, [title, subtitle, author, genre, style, colorScheme, description, userPrompt, registre, format, initialDescription, referenceImage, openrouterKey]);
 
   const handleReferenceUpload = (file: File) => {
     if (file.size > 4 * 1024 * 1024) {
