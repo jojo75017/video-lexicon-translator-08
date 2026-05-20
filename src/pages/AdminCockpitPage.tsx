@@ -7,7 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { ArrowLeft, ChevronLeft, ChevronRight, Plus, Shield, Trash2, Calendar as CalendarIcon, Sparkles } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight, Plus, Shield, Trash2, Calendar as CalendarIcon, Sparkles, Rocket } from 'lucide-react';
+import { V3_MODULES, V3_PILLAR_META, V3_PRICE, V2_PRICE, type V3Pillar } from '@/data/roadmapV3';
 import { toast } from 'sonner';
 import {
   addMonths, endOfMonth, endOfWeek, format, isSameDay, isSameMonth,
@@ -263,6 +264,63 @@ const AdminCockpitPage: React.FC = () => {
                 </div>
               </div>
             ))}
+          </div>
+        </section>
+
+        {/* Roadmap V3 */}
+        <section>
+          <div className="flex items-center gap-2 mb-3 flex-wrap">
+            <Rocket className="h-5 w-5" style={{ color: ORANGE }} />
+            <h2 className="text-lg font-bold">Roadmap V3 — Publication Assistée Pro</h2>
+            <span
+              className="text-[11px] font-bold uppercase tracking-wider rounded-full px-2.5 py-0.5"
+              style={{ background: ORANGE, color: 'white' }}
+            >
+              {V3_PRICE}€ à vie
+            </span>
+            <span className="text-xs text-joy-ink/50">
+              (V2 actuelle : {V2_PRICE}€) · {V3_MODULES.length} modules · éditable dans <code>src/data/roadmapV3.ts</code>
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+            {(Object.keys(V3_PILLAR_META) as V3Pillar[]).map((pillar) => {
+              const meta = V3_PILLAR_META[pillar];
+              const items = V3_MODULES.filter((m) => m.pillar === pillar);
+              return (
+                <div
+                  key={pillar}
+                  className="rounded-2xl border bg-white p-3"
+                  style={{ borderColor: `${meta.color}33` }}
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-lg">{meta.emoji}</span>
+                    <span className="font-bold text-sm" style={{ color: meta.color }}>{meta.label}</span>
+                    <span className="ml-auto text-[11px] text-joy-ink/40">{items.length}</span>
+                  </div>
+                  <ul className="space-y-1.5">
+                    {items.map((m) => (
+                      <li key={m.id} className="rounded-lg p-2 bg-joy-cream/40 hover:bg-joy-cream transition-colors">
+                        <div className="flex items-start gap-2">
+                          <span className="text-[10px] uppercase tracking-wider rounded px-1.5 py-0.5 mt-0.5"
+                            style={{
+                              background: m.status === 'done' ? '#10B98122' : m.status === 'in_progress' ? '#FF9E2D22' : '#23232322',
+                              color:      m.status === 'done' ? '#10B981'   : m.status === 'in_progress' ? '#FF9E2D'   : '#666',
+                            }}
+                          >
+                            {m.status === 'done' ? '✓' : m.status === 'in_progress' ? '…' : 'todo'}
+                          </span>
+                          <div className="flex-1 min-w-0">
+                            <div className="text-xs font-semibold leading-tight">{m.title}</div>
+                            <div className="text-[11px] text-joy-ink/60 leading-snug mt-0.5">{m.description}</div>
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })}
           </div>
         </section>
 
