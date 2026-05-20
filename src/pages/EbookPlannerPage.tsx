@@ -3559,12 +3559,12 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
             </Button>
           </div>
         )}
-        {/* Hero Header — Magazine éditorial premium */}
+        {/* Hero Header — Magazine compact */}
         <div className="bg-[#fafbfc] border-b border-[#e8ecf1]" style={{ fontFamily: "'Work Sans', system-ui, sans-serif", color: '#232F3E' }}>
-          <div className="max-w-6xl mx-auto px-4 md:px-8 py-6">
+          <div className="max-w-[1600px] mx-auto px-4 md:px-8 py-4 flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
 
-            {/* Barre d'actions discrète */}
-            <div className="flex items-center justify-between mb-8 pb-4 border-b border-[#e8ecf1]">
+            {/* Colonne gauche : retour + label */}
+            <div className="flex md:flex-col md:items-start items-center justify-between md:justify-start gap-2 md:gap-1 md:min-w-[200px] md:border-r md:border-[#e8ecf1] md:pr-6">
               <button
                 type="button"
                 onClick={() => {
@@ -3576,92 +3576,88 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
                 <ArrowLeft className="h-3.5 w-3.5" />
                 Tableau de bord
               </button>
-
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => navigate('/ambiances')}
-                  className="px-3 py-1.5 border border-[#e8ecf1] hover:border-[#008296] text-[10px] font-bold uppercase tracking-[0.18em] text-[#232F3E] hover:text-[#008296] transition-colors inline-flex items-center gap-1.5"
-                  title="Choisir une ambiance d'écriture"
-                >
-                  <Sparkles className="h-3 w-3" />
-                  Ambiances
-                </button>
-                <button
-                  type="button"
-                  onClick={handleManualSave}
-                  disabled={isSaving || !ebookTitle}
-                  className="px-3 py-1.5 border border-[#e8ecf1] hover:border-[#008296] text-[10px] font-bold uppercase tracking-[0.18em] text-[#232F3E] hover:text-[#008296] transition-colors inline-flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                  <Save className="h-3 w-3" />
-                  {isSaving ? 'Sauvegarde…' : 'Sauvegarder'}
-                </button>
-                <button
-                  type="button"
-                  onClick={resetPlan}
-                  className="px-3 py-1.5 bg-[#232F3E] hover:bg-[#008296] text-white text-[10px] font-bold uppercase tracking-[0.18em] transition-colors inline-flex items-center gap-1.5"
-                >
-                  <Plus className="h-3 w-3" />
-                  Nouveau
-                </button>
-              </div>
+              <span className="text-[10px] tracking-[0.22em] font-semibold uppercase text-[#008296]">
+                15 agents IA · KDP
+              </span>
             </div>
 
-            {/* En-tête éditorial centré */}
-            <header className="text-center py-8 md:py-12">
-              <div className="inline-block px-3 py-1 bg-[#e8ecf1] text-[#008296] text-[10px] tracking-[0.22em] font-semibold uppercase mb-8">
-                15 agents IA · Édition Amazon KDP
-              </div>
+            {/* Colonne droite : titre + actions */}
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+                <div className="min-w-0">
+                  <h1
+                    className="text-2xl md:text-3xl font-normal italic leading-tight text-[#232F3E] truncate"
+                    style={{ fontFamily: "'Instrument Serif', Georgia, serif" }}
+                    title={ebookTitle || 'Nouveau manuscrit'}
+                  >
+                    {ebookTitle || 'Nouveau manuscrit'}
+                  </h1>
+                  <div className="flex items-center gap-2 mt-1 text-[10px] uppercase tracking-[0.18em] text-[#232F3E]/50">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span>{isSaving ? 'Sauvegarde en cours' : 'IA Connectée'}</span>
+                    {authorName && <span className="text-[#232F3E]/30">· {authorName}</span>}
+                    <span className="text-[#232F3E]/30">· {chapters.length} chapitre{chapters.length > 1 ? 's' : ''}</span>
+                  </div>
+                </div>
 
-              <h1
-                className="text-5xl md:text-7xl font-normal italic leading-[0.95] mb-6 text-[#232F3E]"
-                style={{ fontFamily: "'Instrument Serif', Georgia, serif" }}
-              >
-                {ebookTitle || 'Nouveau manuscrit'}
-              </h1>
-
-              <p className="max-w-xl mx-auto text-base md:text-lg text-[#232F3E]/70 mb-10 leading-relaxed font-light">
-                Transformez votre intuition en manuscrit professionnel. Un accompagnement éditorial complet piloté par l'intelligence artificielle.
-              </p>
-
-              <div className="flex flex-col items-center gap-4">
-                <button
-                  type="button"
-                  onClick={() => handleTabChange('editorial-director')}
-                  className="bg-[#FF9E2D] hover:bg-[#f08d1c] text-white px-10 py-4 font-bold text-xs tracking-[0.18em] uppercase shadow-sm transition-all hover:shadow-md inline-flex items-center gap-3"
-                >
-                  <Rocket className="w-4 h-4" />
-                  Créer mon ebook (Workflow IA)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleTabChange('planner')}
-                  className="text-[11px] text-[#232F3E]/50 hover:text-[#008296] underline-offset-4 hover:underline transition-colors"
-                >
-                  ou utiliser le formulaire manuel
-                </button>
-              </div>
-
-              <p className="mt-8 text-[10px] uppercase tracking-[0.22em] text-[#232F3E]/40 italic">
-                Accompagnement gratuit en Zoom — Georges
-              </p>
-            </header>
-
-            {/* Barre de statut éditoriale */}
-            <div className="mt-8 border-t border-[#e8ecf1] pt-3 flex items-center justify-between">
-              <span className="text-[10px] font-medium uppercase tracking-[0.22em] text-[#232F3E]/40">
-                EbookStudio — Système d'édition éditorial
-              </span>
-              <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#232F3E]/60">
-                  {isSaving ? 'Sauvegarde en cours' : 'IA Connectée'}
-                </span>
+                {/* Barre d'actions unifiée */}
+                <div className="flex items-center gap-2 flex-wrap justify-end">
+                  <button
+                    type="button"
+                    onClick={() => handleTabChange('editorial-director')}
+                    className="bg-[#FF9E2D] hover:bg-[#f08d1c] text-white px-4 py-2 font-bold text-[11px] tracking-[0.18em] uppercase transition-colors inline-flex items-center gap-1.5 shadow-sm"
+                  >
+                    <Rocket className="w-3.5 h-3.5" />
+                    Workflow IA
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('images-cover')}
+                    className="px-3 py-2 border border-[#FF9E2D] text-[#FF9E2D] hover:bg-[#FF9E2D] hover:text-white text-[10px] font-bold uppercase tracking-[0.18em] transition-colors inline-flex items-center gap-1.5"
+                    title="Créer la couverture KDP"
+                  >
+                    🎨 Couverture
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => navigate('/ambiances')}
+                    className="px-3 py-2 border border-[#e8ecf1] hover:border-[#008296] text-[10px] font-bold uppercase tracking-[0.18em] text-[#232F3E] hover:text-[#008296] transition-colors inline-flex items-center gap-1.5"
+                    title="Choisir une ambiance d'écriture"
+                  >
+                    <Sparkles className="h-3 w-3" />
+                    Ambiances
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleManualSave}
+                    disabled={isSaving || !ebookTitle}
+                    className="px-3 py-2 border border-[#e8ecf1] hover:border-[#008296] text-[10px] font-bold uppercase tracking-[0.18em] text-[#232F3E] hover:text-[#008296] transition-colors inline-flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    <Save className="h-3 w-3" />
+                    {isSaving ? 'Sauvegarde…' : 'Sauvegarder'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={resetPlan}
+                    className="px-3 py-2 bg-[#232F3E] hover:bg-[#008296] text-white text-[10px] font-bold uppercase tracking-[0.18em] transition-colors inline-flex items-center gap-1.5"
+                  >
+                    <Plus className="h-3 w-3" />
+                    Nouveau
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleTabChange('planner')}
+                    className="text-[10px] text-[#232F3E]/50 hover:text-[#008296] underline-offset-4 hover:underline transition-colors ml-1"
+                  >
+                    Formulaire manuel
+                  </button>
+                </div>
               </div>
             </div>
 
           </div>
         </div>
+
 
         {/* Content */}
         <div ref={contentContainerRef} className="max-w-[1600px] mx-auto px-6 lg:px-10 py-8">
@@ -3722,17 +3718,7 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
       {/* Admin: Subscriber Activity Popup */}
       <SubscriberActivityPopup />
 
-      {/* FAB: Créer ma couverture KDP - toujours visible */}
-      {activeTab !== 'images-cover' && (
-        <button
-          type="button"
-          onClick={() => setActiveTab('images-cover')}
-          title="Créer la couverture KDP (Studio IA + Format + 4ᵉ de couverture)"
-          className="fixed bottom-6 right-6 z-50 inline-flex items-center gap-2 px-5 py-3 text-sm font-bold rounded-full border-2 border-orange-500 bg-gradient-to-r from-orange-500 to-amber-500 text-white hover:from-orange-600 hover:to-amber-600 transition-all shadow-2xl hover:shadow-orange-500/50 animate-pulse"
-        >
-          🎨 Créer ma couverture KDP
-        </button>
-      )}
+      {/* FAB couverture supprimé : bouton intégré dans la barre d'actions du hero */}
     </div>
   );
 };
