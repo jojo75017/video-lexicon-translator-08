@@ -11,6 +11,10 @@ import coverHero from '@/assets/cover-studio-hero.jpg';
 interface UnifiedCoverStudioProps {
   ebookTitle?: string;
   authorName?: string;
+  bookSubtitle?: string;
+  bookDescription?: string;
+  genre?: string;
+  targetAudience?: string;
   chapters?: any[];
   isGenerating?: boolean;
   onGenerateBackCover?: (tone: string, audience: string, highlights: string) => Promise<string>;
@@ -21,6 +25,10 @@ interface UnifiedCoverStudioProps {
 export const UnifiedCoverStudio: React.FC<UnifiedCoverStudioProps> = ({
   ebookTitle = '',
   authorName = '',
+  bookSubtitle = '',
+  bookDescription = '',
+  genre = '',
+  targetAudience = '',
   chapters = [],
   isGenerating = false,
   onGenerateBackCover,
