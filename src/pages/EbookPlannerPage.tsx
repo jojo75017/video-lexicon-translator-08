@@ -1492,14 +1492,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                 >
                   💬 Discuter avec l'IA
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveTab('kdp')}
-                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-lg border border-[#FF9E2D] bg-[#FF9E2D] text-white hover:bg-[#008296] hover:border-[#008296] transition-all shadow-sm"
-                  title="Description, Mots-clés A9, Catégories, Prix, Plan de lancement, Bio, A+ Content"
-                >
-                  🎯 Outils KDP (Description + A+)
-                </button>
+
+
+
 
 
               </div>
