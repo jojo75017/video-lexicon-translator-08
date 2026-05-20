@@ -243,21 +243,38 @@ Produis la stratégie éditoriale + 5 titres alternatifs PERCUTANTS et VARIÉS (
     }
     if (!Array.isArray(analysis.suggestionsTitle)) analysis.suggestionsTitle = [];
 
-    // Auto-complétion si moins de 5 titres -> appel sous-prompt dédié
-    if (analysis.suggestionsTitle.length < 5) {
-      console.log(`Seulement ${analysis.suggestionsTitle.length} titres reçus, génération complémentaire...`);
+    const validTitles = (arr: any[]) =>
+      arr.filter((t) => t && typeof t === "object" && typeof t.titre === "string" && t.titre.trim().length > 0);
+
+    // Auto-complétion si moins de 5 titres valides -> appel sous-prompt dédié
+    if (validTitles(analysis.suggestionsTitle).length < 5) {
+      console.log(`Seulement ${validTitles(analysis.suggestionsTitle).length} titres valides, génération complémentaire...`);
       try {
         const extra = await generateTitlesOnly(userApiKey, sujet);
-        if (extra.length >= analysis.suggestionsTitle.length) {
-          analysis.suggestionsTitle = extra;
-          if (!analysis.meilleurTitre) {
-            const best = extra.reduce((acc: number, cur: any, i: number) => (cur.scoreKdp > (extra[acc]?.scoreKdp ?? 0) ? i : acc), 0);
-            analysis.meilleurTitre = { index: best, explication: "Score KDP le plus élevé." };
-          }
+        const extraValid = validTitles(extra);
+        if (extraValid.length >= 5) {
+          analysis.suggestionsTitle = extraValid.slice(0, 5);
+          const best = analysis.suggestionsTitle.reduce(
+            (acc: number, cur: any, i: number) =>
+              (cur.scoreKdp ?? 0) > (analysis.suggestionsTitle[acc]?.scoreKdp ?? 0) ? i : acc,
+            0
+          );
+          analysis.meilleurTitre = { index: best, explication: "Score KDP le plus élevé." };
+        } else if (extraValid.length > analysis.suggestionsTitle.length) {
+          analysis.suggestionsTitle = extraValid;
         }
       } catch (e) {
         console.error("Échec génération titres complémentaires:", e);
       }
+    }
+
+    // Garantir titreOriginalScore non-null
+    if (!analysis.titreOriginalScore || typeof analysis.titreOriginalScore.scoreKdp !== "number") {
+      analysis.titreOriginalScore = {
+        scoreKdp: 65,
+        forces: "Sujet pertinent et compréhensible",
+        faiblesses: "Manque d'accroche émotionnelle ou de bénéfice chiffré",
+      };
     }
 
     return new Response(JSON.stringify({ analysis }), {
