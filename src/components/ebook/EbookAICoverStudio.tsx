@@ -193,6 +193,48 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
     return { recto, verso };
   }, [title, subtitle, author, style, colorScheme, genre, description, userPrompt, registre]);
 
+  // ========== APERÇU EXACT DU PAYLOAD ENVOYÉ À L'EDGE FUNCTION ==========
+  const edgePayloadPreview = React.useMemo(() => {
+    if (!title.trim()) return null;
+    const reg = REGISTRES.find(r => r.value === registre);
+    const styleSent = reg && reg.prompt ? `${reg.prompt}. Additional style note: ${style}` : style;
+    const payload = {
+      title,
+      subtitle,
+      author,
+      genre,
+      style: styleSent,
+      colorScheme,
+      description,
+      userPrompt,
+      registre,
+      format,
+      kdpBrief: initialDescription || '',
+      referenceImage: referenceImage ? '[image attachée]' : null,
+    };
+    const sceneSource = userPrompt.trim().length > 10
+      ? userPrompt.trim()
+      : `[Sera généré automatiquement par l'IA à partir du titre / genre / palette — non visible à l'avance]`;
+    const assembledPrompt = `Create a PROFESSIONAL Amazon best-seller book cover.
+
+MANDATORY SCENE TO PHOTOGRAPH (render EXACTLY this scene, do not invent a generic background):
+${sceneSource}
+
+${registre ? `REGISTER / GENRE LANE: ${registre}. Treat the cover with the visual codes of this register (composition, palette, lighting, props).\n\n` : ''}BOOK:
+- Title: "${title}" — HUGE bold sans-serif at top, sharp legible glyphs.
+${subtitle ? `- Subtitle: "${subtitle}" — smaller elegant type below.\n` : ''}- Author: "${author || 'Author'}" — clean at the bottom.
+
+ART DIRECTION:
+- Style: ${styleSent || 'cinematic photorealistic'}
+- Palette: ${colorScheme || 'deep contrast, dramatic light'}
+- Genre: ${genre || 'non-fiction'}
+
+STRICT BANS: generic gradient/flat background, empty silhouette, cartoon, AI artifact, watermark, Amazon badge, 3D mockup.
+
+FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine + front)' : 'Kindle vertical portrait 1.6:1 (1600x2560)'}.`;
+    return { payload, assembledPrompt };
+  }, [title, subtitle, author, genre, style, colorScheme, description, userPrompt, registre, format, initialDescription, referenceImage]);
+
   const handleReferenceUpload = (file: File) => {
     if (file.size > 4 * 1024 * 1024) {
       toast.error('Image de référence trop lourde (max 4 Mo)');
