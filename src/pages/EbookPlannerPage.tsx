@@ -3559,108 +3559,107 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
             </Button>
           </div>
         )}
-        {/* Hero Header - Premium */}
-        <div className="relative overflow-hidden bg-gradient-to-br from-[#0f1419] via-[#1a2530] to-[#0f1419] border-b border-[#FF9E2D]/20">
-          {/* Subtle premium accents */}
-          <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-            <div className="absolute -top-40 -right-40 w-[500px] h-[500px] rounded-full bg-[#008296]/10 blur-3xl" />
-            <div className="absolute -bottom-40 -left-40 w-[500px] h-[500px] rounded-full bg-[#FF9E2D]/5 blur-3xl" />
-            <div aria-hidden className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '32px 32px' }} />
-          </div>
+        {/* Hero Header — Magazine éditorial premium */}
+        <div className="bg-[#fafbfc] border-b border-[#e8ecf1]" style={{ fontFamily: "'Work Sans', system-ui, sans-serif", color: '#232F3E' }}>
+          <div className="max-w-6xl mx-auto px-4 md:px-8 py-6">
 
-          <div className="relative max-w-[1600px] mx-auto px-6 lg:px-10 py-7">
-            {/* Top bar */}
-            <div className="flex items-center justify-between mb-6">
+            {/* Barre d'actions discrète */}
+            <div className="flex items-center justify-between mb-8 pb-4 border-b border-[#e8ecf1]">
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveTab('workflow-dashboard');
+                  setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 50);
+                }}
+                className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#232F3E]/60 hover:text-[#008296] transition-colors"
+              >
+                <ArrowLeft className="h-3.5 w-3.5" />
+                Tableau de bord
+              </button>
+
               <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  onClick={() => {
-                    setActiveTab('workflow-dashboard');
-                    setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 50);
-                  }}
-                  className="text-white hover:bg-white/10 border border-white/20 bg-white/5 backdrop-blur-sm rounded-full text-sm font-semibold"
-                >
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Retour au tableau de bord
-                </Button>
-              </div>
-
-              <div className="flex gap-2">
-                <Button
+                <button
                   type="button"
                   onClick={() => navigate('/ambiances')}
-                  className="bg-gradient-to-r from-[#FF9E2D] to-[#FFB85C] hover:from-[#FF8C0A] hover:to-[#FFA53D] text-[#0f1419] font-bold border border-[#FF9E2D]/40 shadow-[0_0_20px_rgba(255,158,45,0.45)] hover:shadow-[0_0_30px_rgba(255,158,45,0.6)] rounded-full transition-all hover:-translate-y-0.5"
-                  title="Choisir une ambiance d'écriture (17 thèmes inclus)"
+                  className="px-3 py-1.5 border border-[#e8ecf1] hover:border-[#008296] text-[10px] font-bold uppercase tracking-[0.18em] text-[#232F3E] hover:text-[#008296] transition-colors inline-flex items-center gap-1.5"
+                  title="Choisir une ambiance d'écriture"
                 >
-                  <Sparkles className="h-4 w-4 mr-2" />
+                  <Sparkles className="h-3 w-3" />
                   Ambiances
-                  <span className="ml-2 text-[10px] uppercase tracking-wider bg-white/30 text-[#0f1419] px-1.5 py-0.5 rounded-full font-extrabold">NEW</span>
-                </Button>
-                <Button
+                </button>
+                <button
                   type="button"
                   onClick={handleManualSave}
                   disabled={isSaving || !ebookTitle}
-                  className="bg-white/5 hover:bg-white/10 text-white border border-white/20 backdrop-blur-sm rounded-full font-semibold transition-all"
+                  className="px-3 py-1.5 border border-[#e8ecf1] hover:border-[#008296] text-[10px] font-bold uppercase tracking-[0.18em] text-[#232F3E] hover:text-[#008296] transition-colors inline-flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  <Save className="h-4 w-4 mr-2" />
-                  {isSaving ? 'Sauvegarde...' : 'Sauvegarder'}
-                </Button>
-                <Button
+                  <Save className="h-3 w-3" />
+                  {isSaving ? 'Sauvegarde…' : 'Sauvegarder'}
+                </button>
+                <button
                   type="button"
                   onClick={resetPlan}
-                  className="bg-[#FF9E2D] hover:bg-[#FF9E2D]/90 text-[#0f1419] border-0 rounded-full font-bold shadow-lg shadow-[#FF9E2D]/20"
+                  className="px-3 py-1.5 bg-[#232F3E] hover:bg-[#008296] text-white text-[10px] font-bold uppercase tracking-[0.18em] transition-colors inline-flex items-center gap-1.5"
                 >
-                  <Plus className="h-4 w-4 mr-2" />
+                  <Plus className="h-3 w-3" />
                   Nouveau
-                </Button>
+                </button>
               </div>
             </div>
 
-            <div className="max-w-3xl mx-auto text-center pb-4">
-              <div className="inline-flex items-center justify-center w-14 h-14 mb-5 rounded-2xl bg-gradient-to-br from-[#FF9E2D] to-[#FF7B00] shadow-lg shadow-[#FF9E2D]/30">
-                <Sparkles className="w-7 h-7 text-[#0f1419]" />
+            {/* En-tête éditorial centré */}
+            <header className="text-center py-8 md:py-12">
+              <div className="inline-block px-3 py-1 bg-[#e8ecf1] text-[#008296] text-[10px] tracking-[0.22em] font-semibold uppercase mb-8">
+                15 agents IA · Édition Amazon KDP
               </div>
 
-              <h1 className="text-4xl md:text-5xl font-bold mb-3 text-white tracking-tight">
-                {ebookTitle || (
-                  <>Votre <span className="bg-gradient-to-r from-[#FF9E2D] to-[#FFB85C] bg-clip-text text-transparent">studio éditorial</span></>
-                )}
+              <h1
+                className="text-5xl md:text-7xl font-normal italic leading-[0.95] mb-6 text-[#232F3E]"
+                style={{ fontFamily: "'Instrument Serif', Georgia, serif" }}
+              >
+                {ebookTitle || 'Nouveau manuscrit'}
               </h1>
 
-              {isSaving && (
-                <Badge className="bg-[#008296] text-white border-0 font-semibold">
-                  <Save className="w-3 h-3 mr-1 animate-pulse" />
-                  Sauvegarde...
-                </Badge>
-              )}
-
-              <p className="text-white/60 max-w-xl mx-auto mt-2 text-xs tracking-[0.2em] uppercase font-semibold">
-                15 agents IA · Édition professionnelle Amazon KDP
+              <p className="max-w-xl mx-auto text-base md:text-lg text-[#232F3E]/70 mb-10 leading-relaxed font-light">
+                Transformez votre intuition en manuscrit professionnel. Un accompagnement éditorial complet piloté par l'intelligence artificielle.
               </p>
 
-              {/* CTA principal unique */}
-              <div className="mt-6 flex flex-col items-center gap-3">
-                <Button
+              <div className="flex flex-col items-center gap-4">
+                <button
                   type="button"
                   onClick={() => handleTabChange('editorial-director')}
-                  className="bg-[#FF9E2D] text-[#0f1419] hover:bg-[#FF9E2D]/90 font-bold px-8 py-6 h-auto rounded-full shadow-xl shadow-[#FF9E2D]/30 transition-all hover:-translate-y-0.5 hover:shadow-2xl hover:shadow-[#FF9E2D]/40"
+                  className="bg-[#FF9E2D] hover:bg-[#f08d1c] text-white px-10 py-4 font-bold text-xs tracking-[0.18em] uppercase shadow-sm transition-all hover:shadow-md inline-flex items-center gap-3"
                 >
-                  <Rocket className="w-5 h-5 mr-3" />
+                  <Rocket className="w-4 h-4" />
                   Créer mon ebook (Workflow IA)
-                </Button>
+                </button>
                 <button
                   type="button"
                   onClick={() => handleTabChange('planner')}
-                  className="text-xs text-white/50 underline-offset-2 hover:underline hover:text-white/80 transition-colors"
+                  className="text-[11px] text-[#232F3E]/50 hover:text-[#008296] underline-offset-4 hover:underline transition-colors"
                 >
                   ou utiliser le formulaire manuel
                 </button>
               </div>
 
-              <p className="mt-5 text-white/50 text-xs italic">
+              <p className="mt-8 text-[10px] uppercase tracking-[0.22em] text-[#232F3E]/40 italic">
                 Accompagnement gratuit en Zoom — Georges
               </p>
+            </header>
+
+            {/* Barre de statut éditoriale */}
+            <div className="mt-8 border-t border-[#e8ecf1] pt-3 flex items-center justify-between">
+              <span className="text-[10px] font-medium uppercase tracking-[0.22em] text-[#232F3E]/40">
+                EbookStudio — Système d'édition éditorial
+              </span>
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#232F3E]/60">
+                  {isSaving ? 'Sauvegarde en cours' : 'IA Connectée'}
+                </span>
+              </div>
             </div>
+
           </div>
         </div>
 
