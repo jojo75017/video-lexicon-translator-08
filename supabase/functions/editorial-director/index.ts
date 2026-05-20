@@ -182,10 +182,10 @@ Produis la stratégie éditoriale + 5 titres alternatifs PERCUTANTS et VARIÉS (
     let content = "";
     try {
       content = await callGemini(userApiKey, systemPrompt, userPrompt, {
-        maxTokens: 4000,
+        maxTokens: 6000,
         temperature: 0.85,
         jsonMode: true,
-        timeout: 50000,
+        timeout: 55000,
         label: "full-analysis",
       });
     } catch (e: any) {
