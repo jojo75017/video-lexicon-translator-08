@@ -509,6 +509,8 @@ FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine
       toast.error('Dimensions broché incomplètes - corrigez la validation avant de générer');
       return;
     }
+    const cleanOpenrouterKey = openrouterKey.trim();
+    const usesOpenRouter = cleanOpenrouterKey.startsWith('sk-or-');
     setIsGenerating(true);
     try {
       const invokePromise = supabase.functions.invoke('generate-ai-cover', {
@@ -529,7 +531,7 @@ FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine
             kdpBrief: initialDescription, // brief from KDP calculator if any
             referenceImage,
             customPrompt: assembledPromptOverride || undefined,
-            openrouterKey: openrouterKey.trim().startsWith('sk-or-') ? openrouterKey.trim() : undefined,
+            openrouterKey: usesOpenRouter ? cleanOpenrouterKey : undefined,
           },
         });
       const timeoutPromise = new Promise<never>((_, reject) => {
@@ -552,7 +554,7 @@ FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Erreur lors de la génération';
       console.error('Cover AI generation failed:', message);
-      toast.error(`Génération IA échouée : ${message}. Ajustez votre prompt et réessayez — aucune maquette de secours n'est générée pour ne pas dégrader la qualité.`, { duration: 8000 });
+      toast.error(`Génération IA échouée : ${message}. ${usesOpenRouter ? 'La clé OpenRouter active a bien été envoyée.' : 'Aucune clé OpenRouter valide détectée : la génération utilise Lovable AI.'} Aucune maquette de secours n'est générée pour ne pas dégrader la qualité.`, { duration: 10000 });
     } finally {
       setIsGenerating(false);
     }
