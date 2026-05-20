@@ -241,30 +241,30 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
       const gradient = ctx.createLinearGradient(x, y, x + w, y + h);
 
       if (activePreset === 'thriller') {
-        gradient.addColorStop(0, '#07090d');
-        gradient.addColorStop(0.58, '#111827');
-        gradient.addColorStop(1, '#7f1d1d');
+        gradient.addColorStop(0, 'hsl(222 34% 4%)');
+        gradient.addColorStop(0.58, 'hsl(221 39% 11%)');
+        gradient.addColorStop(1, 'hsl(0 74% 30%)');
         ctx.fillStyle = gradient;
         ctx.fillRect(x, y, w, h);
-        ctx.fillStyle = '#e5e7eb';
+        ctx.fillStyle = 'hsl(220 13% 91%)';
         ctx.globalAlpha = 0.08;
-        for (let i = 0; i < 16; i += 1) ctx.fillRect(x + Math.random() * w, y, 2, h);
+        for (let i = 0; i < 16; i += 1) ctx.fillRect(x + w * (0.08 + i * 0.055), y, 2, h);
         ctx.globalAlpha = 0.28;
-        ctx.fillStyle = '#dc2626';
+        ctx.fillStyle = 'hsl(0 72% 51%)';
         ctx.fillRect(x + w * 0.12, y + h * 0.68, w * 0.76, h * 0.018);
         ctx.globalAlpha = 1;
       } else if (activePreset === 'fantasy') {
-        gradient.addColorStop(0, '#152238');
-        gradient.addColorStop(0.52, '#31416a');
-        gradient.addColorStop(1, '#065f46');
+        gradient.addColorStop(0, 'hsl(215 46% 15%)');
+        gradient.addColorStop(0.52, 'hsl(226 37% 30%)');
+        gradient.addColorStop(1, 'hsl(162 88% 20%)');
         ctx.fillStyle = gradient;
         ctx.fillRect(x, y, w, h);
         const moon = ctx.createRadialGradient(x + w * 0.72, y + h * 0.2, 8, x + w * 0.72, y + h * 0.2, w * 0.18);
-        moon.addColorStop(0, 'rgba(255,244,190,0.9)');
-        moon.addColorStop(1, 'rgba(255,244,190,0)');
+        moon.addColorStop(0, 'hsl(49 100% 87% / 0.9)');
+        moon.addColorStop(1, 'hsl(49 100% 87% / 0)');
         ctx.fillStyle = moon;
         ctx.fillRect(x, y, w, h);
-        ctx.fillStyle = 'rgba(250,204,21,0.5)';
+        ctx.fillStyle = 'hsl(48 96% 53% / 0.5)';
         ctx.beginPath();
         ctx.moveTo(x + w * 0.5, y + h * 0.18);
         ctx.lineTo(x + w * 0.58, y + h * 0.56);
@@ -272,12 +272,12 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
         ctx.closePath();
         ctx.fill();
       } else if (activePreset === 'wellness') {
-        gradient.addColorStop(0, '#f7f3ea');
-        gradient.addColorStop(0.58, '#d8e3cf');
-        gradient.addColorStop(1, '#b86f52');
+        gradient.addColorStop(0, 'hsl(42 45% 94%)');
+        gradient.addColorStop(0.58, 'hsl(96 27% 85%)');
+        gradient.addColorStop(1, 'hsl(15 44% 52%)');
         ctx.fillStyle = gradient;
         ctx.fillRect(x, y, w, h);
-        ctx.strokeStyle = 'rgba(68,94,68,0.34)';
+        ctx.strokeStyle = 'hsl(120 16% 32% / 0.34)';
         ctx.lineWidth = Math.max(8, w * 0.012);
         for (let i = 0; i < 5; i += 1) {
           ctx.beginPath();
