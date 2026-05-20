@@ -1,60 +1,54 @@
-# Refonte premium du générateur (`/ebook-planner`)
+# Aplatir le header global (`EspaceHeader.tsx`) en style magazine éditorial
 
-Direction choisie : **Magazine archive dense** — palette Cloud White (#fafbfc / #e8ecf1 / teal #008296 / orange #FF9E2D), Instrument Serif + Work Sans, layout magazine éditorial.
+## Le vrai coupable
 
-## Périmètre (UI uniquement)
+Les "gros boutons" que tu vois ne sont **pas** dans le hero (déjà refait), mais dans `src/components/layout/EspaceHeader.tsx` — la barre sticky en haut qui apparaît sur `/ebook-planner` et plusieurs autres pages.
 
-Je ne touche **pas** au workflow IA, ni à la logique des 15 agents, ni aux exports. Je refais uniquement l'**en-tête + le hero** de `/ebook-planner` (le bloc sombre actuel "La Belle-sœur" + toutes les barres au-dessus). Le fichier `EbookPlannerPage.tsx` fait 3741 lignes — je n'éditerai que les sections de présentation du haut.
+Cette barre empile actuellement :
+1. Bandeau promo "Lancement public" (dark)
+2. Ligne breadcrumb + AI badge + Pack KDP orange + Cockpit admin + Settings + Logout
+3. **Rangée de boutons piliers ronds colorés** : Plan (bleu) / Écrire (vert) / Habiller (violet) / Publier (orange) / Vendre (rose) + Audit ASIN (teal) + Communauté NEW (rose) + 600 Niches NEW (gradient) + Tous les outils
+4. Sous-barre contextuelle (Tableau de bord IA / Plan du livre / Personnages / Modèles / …)
 
-## Ce qui change
+## Refonte (toujours direction "Magazine archive dense")
 
-1. **Suppression du bandeau sombre actuel** ("La Belle-sœur" sur fond noir) → remplacé par un cadre éditorial clair sur fond `#fafbfc`.
-2. **Nouveau hero magazine** (dans un nouveau composant `src/components/ebook/EbookPlannerHero.tsx`) :
-   - Cadre `border border-[#e8ecf1] shadow-sm` centré max-w-6xl
-   - Header centré : pastille teal `15 AGENTS IA · ÉDITION AMAZON KDP`
-   - Titre du projet en **Instrument Serif italique** taille 5xl→7xl (dynamique : reprend `ebookTitle` du projet courant ; fallback "Nouveau manuscrit")
-   - Sous-titre éditorial calme
-   - CTA unique orange `CRÉER MON EBOOK (WORKFLOW IA)` qui déclenche l'action existante (lancement du workflow)
-3. **Grille magazine sous le hero (12 cols)** :
-   - **Aside gauche (4 cols)** : "Parcours de Création" → liste verticale numérotée des 15 agents (P1→P15) avec puce teal au hover, libellés tirés de la config existante `WORKFLOW_STEPS`. État courant (P en cours) mis en avant en `bg-[#e8ecf1] font-bold`.
-   - **Main droite (8 cols)** :
-     - "Projets récents" : cartes 3/4 avec mini-couverture (couleur dérivée du genre), titre italique, badge teal "% complété" ou "Prêt pour KDP" — données réelles de `useEbookDatabase` (pas de mock).
-     - Divider hairline.
-     - "Modèles & Structures" : boutons outline en small-caps tirés des templates existants (`src/data/ebookTemplates.ts`).
-4. **Footer barre de statut** : `EBOOKSTUDIO — SYSTÈME D'ÉDITION ÉDITORIAL` + pastille verte animée "IA Connectée" (basée sur `useOpenAIConfig`).
-5. **Nettoyage** : retirer la duplication d'onglets/pillules colorées (Plan/Écrire/Habiller/Publier/Vendre) du *haut* de la page — elles restent disponibles via la sidebar existante (pas de duplication). Les onglets `Tableau de bord IA / Plan du livre / Personnages / Modèles / Importer un doc / Mes projets` sont préservés mais déplacés **sous** le hero, en barre éditoriale fine alignée avec la grille (pas de pillules colorées géantes).
+Toutes les **fonctions** sont préservées — seul le style change. Pas d'éléments retirés.
 
-## Préservation
+### 1. Bandeau promo (banner top)
+Reste mais aplati : fond `#232F3E` uni (plus de gradient), pastille orange remplacée par un point, lien "Voir mes cadeaux" devient un bouton outline blanc petit caps `VOIR MES CADEAUX →`.
 
-- Toutes les routes, hooks, sauvegardes (`ebook-planner-autosave`), workflow P1→P15, sidebar, breadcrumb "Mon espace" restent intacts.
-- Les boutons `Sauvegarder`, `Nouveau`, `Ambiances`, `Retour au tableau de bord` sont **conservés** mais déplacés en barre d'action discrète juste sous le footer du hero, en style éditorial (pas de gradients orange brillants).
-- Le bandeau promo "Lancement public le 1er juillet 2026" reste tout en haut (hors scope).
-- Le badge IA actif (OpenRouter/GPT-4o) reste mais redessiné en bande plate fine teal sous le bandeau promo (pas un gros bloc vert turquoise).
+### 2. Ligne breadcrumb + actions
+- Breadcrumb `Mon espace › Titre projet` reste en Instrument Serif italique pour le titre.
+- AI badge, Pack KDP, Cockpit admin, Settings, Logout : tous repassés en **boutons outline hairline** (`border border-[#e8ecf1]`, fond transparent, texte uppercase 10px tracking large, hover → border teal `#008296`, hover bg `#e8ecf1/30`). Plus de gradients orange brillants ni d'icônes colorées géantes.
 
-## Tokens (à ajouter à `src/index.css` si manquants)
+### 3. Rangée piliers (PLANNER_TABS) — le gros chantier visuel
+Remplacer les pastilles colorées arrondies `rounded-2xl` + `hover:scale-[1.05]` par une **rangée d'onglets éditoriaux** :
+- Style : `px-4 py-3 text-[11px] font-bold uppercase tracking-[0.2em] border-b-2 border-transparent text-[#232F3E]/60 hover:text-[#008296]`
+- Actif : `text-[#232F3E] border-b-2 border-[#FF9E2D]` (souligné orange éditorial, comme un sommaire de magazine)
+- Emojis : conservés mais réduits à `text-sm opacity-60` (ou retirés si on veut full austère — je propose de les garder en monochrome subtil)
+- Plus de fond coloré par pilier, plus de ring, plus de scale au hover
 
-```css
---editorial-bg: 210 20% 98%;       /* #fafbfc */
---editorial-surface: 213 20% 92%;  /* #e8ecf1 */
---editorial-accent: 187 100% 26%;  /* #008296 teal KDP */
---editorial-cta: 32 100% 59%;      /* #FF9E2D orange */
---editorial-ink: 215 24% 19%;      /* #232F3E */
-```
-Polices : ajouter `Instrument Serif` + `Work Sans` à `index.html` (Google Fonts), et tokens Tailwind `font-serif-editorial` / `font-sans-editorial`.
+### 4. Boutons spéciaux (Audit ASIN / Communauté / 600 Niches)
+Mêmes onglets que les piliers, mais avec un mini-tag NEW teal flat (`bg-[#008296] text-white text-[8px] uppercase tracking-widest px-1 ml-2`) au lieu des badges gradient animés rose/orange.
 
-## Détails techniques (pour info)
+### 5. "Tous les outils"
+Devient un simple lien texte uppercase à droite : `+ TOUS LES OUTILS` en `text-[#008296]`, ouvre toujours le même popover.
 
-- Le composant `EbookPlannerHero` reçoit en props : `projectTitle`, `currentStepId`, `onLaunchWorkflow`, `recentProjects`, `templates`, `aiConnected`.
-- Les 15 agents sont mappés depuis la constante `WORKFLOW_STEPS` déjà présente dans `EbookCompleteWorkflow.tsx` (j'exporterai juste la liste si elle n'est pas déjà accessible).
-- Mocks interdits par la charte projet : si `recentProjects` est vide → afficher une carte CTA "Créer votre premier livre" au lieu de fausses entrées.
-- Pas de refactor du monolithe `EbookPlannerPage.tsx` (interdit par memory) — j'extrais juste l'en-tête.
+### 6. Sous-barre contextuelle (PLANNER_SUBTABS)
+Aplatit : fond `#fafbfc`, séparateur hairline, onglets en `text-xs uppercase tracking-wider`, actif = texte teal + petit point teal devant. Plus de cartes blanches arrondies à scale.
 
-## Hors scope (V3)
+## Tokens / polices
+Déjà ajoutés (Instrument Serif + Work Sans chargés dans `index.html` au tour précédent). Le header utilisera `font-family: 'Work Sans'` partout, et Instrument Serif italique uniquement pour le titre du projet dans le breadcrumb.
 
-- Mockup 3D photoréaliste de la couverture (sera fait après le test vidéo).
-- Redesign du bloc workflow lui-même (les cartes P1→P15 actuelles restent inchangées).
-- Refonte du panneau "Plan du livre / Personnages / Modèles" (autres onglets).
+## Hors scope
+- Pas de suppression de boutons.
+- Pas de refonte de la sidebar `SimpleSidebar` / `MagazineSidebar`.
+- Pas de touche au workflow IA, aux 15 agents, aux exports.
+- La page `/espace` (dashboard) garde son look actuel — ce header s'affiche aussi dessus, donc le changement se propagera proprement (cohérent avec le hero éditorial du planner).
+
+## Vérification
+Après l'édition : screenshot du preview sur `/ebook-planner` pour confirmer que la barre est devenue calme et éditoriale.
 
 ---
 
-**Tu approuves ?** Une fois validé, je crée `EbookPlannerHero.tsx`, j'ajoute les tokens CSS + les polices, et je remplace uniquement le bloc d'en-tête dans `EbookPlannerPage.tsx`. Pas de touche au workflow IA — tu pourras enchaîner le test des chapitres juste après.
+**Tu approuves cette refonte du header global ?**
