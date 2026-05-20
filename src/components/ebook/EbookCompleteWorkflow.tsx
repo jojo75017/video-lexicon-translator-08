@@ -546,9 +546,11 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
     return rawStructure
       .map((item: any, index: number) => {
         const numero = Number(item?.numero) || index + 1;
-        const titre = sanitizeWorkflowChapterTitle(item?.titre || item?.title || item?.titreLivreFinal || item?.chapterTitle || item?.heading, '');
-
-        if (!titre || isGenericChapterTitle(titre)) return null;
+        const rawTitle = sanitizeWorkflowChapterTitle(item?.titre || item?.title || item?.titreLivreFinal || item?.chapterTitle || item?.heading, '');
+        // ⚠️ Ne PAS filtrer les chapitres au titre générique ("Chapitre N") :
+        // le backend les retourne en padding pour atteindre numberOfChapters.
+        // Les supprimer côté client = perdre des chapitres entiers en P4.
+        const titre = rawTitle || `Chapitre ${numero}`;
 
         return {
           ...item,
