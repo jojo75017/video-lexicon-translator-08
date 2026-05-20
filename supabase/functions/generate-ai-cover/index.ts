@@ -120,12 +120,6 @@ serve(async (req) => {
       ? paperbackSpecPrompt(paperbackSpec!)
       : KINDLE_SPEC;
 
-    // ===== Build the two reusable prompts (recto + verso) =====
-    const baseArt = `Style: ${style || 'cinematic photorealistic'}. Palette: ${colorScheme || 'deep blacks, brilliant gold accents, dramatic high contrast'}. Genre: ${genre || 'non-fiction'}.${description ? ` Concept to depict literally: ${description}.` : ''} MUST be a real PHOTOGRAPHIC scene with relevant objects/environment shot with Phase One IQ4 + 85mm f/1.4 lens equivalent — sharp foreground subject, cinematic lighting (key + rim + volumetric haze), shallow depth of field, golden hour or dramatic spotlight, magazine-grade detail. NO cartoon, NO illustration, NO flat gradient background, NO empty pastel canvas, NO watercolor, NO low-fidelity. Title typography sharp, perfectly legible, bestseller hierarchy.`;
-
-    const rectoPrompt = `FRONT COVER (recto) for the book "${title}"${subtitle ? `, subtitle "${subtitle}"` : ''}, by ${author || 'Author'}. Vertical portrait artwork, ratio 1.6:1, flat 2D print-ready. Title HUGE centered at top third, ${subtitle ? 'subtitle clearly below in smaller elegant type, ' : ''}author name at the bottom. ${baseArt}`;
-
-    const versoPrompt = `BACK COVER (verso / 4ème de couverture) for the same book "${title}" by ${author || 'Author'}. Same visual universe as the front cover (same palette, lighting, typography). Vertical portrait, same dimensions as the front. Compose a clean back panel with: a short hook headline at the top, a 3–5 line synopsis area in readable body text, a small author bio block at the bottom-left, and a CLEAN EMPTY rectangular zone of 50 x 30 mm in the BOTTOM-RIGHT reserved for ISBN barcode (do not draw a barcode, leave it white/neutral). ${baseArt}`;
 
     // === STEP 1: generate a unique cinematic scene concept ===
     const conceptEndpoint = useOpenRouter
