@@ -75,7 +75,8 @@ export const EbookAdvancedExport: React.FC<EbookAdvancedExportProps> = ({
     const parts: string[] = [];
     if (includePreface && preface) parts.push(`PRÉFACE\n\n${cleanGeneratedText(preface)}`);
     chapters.forEach((ch, i) => {
-      parts.push(`CHAPITRE ${i + 1} : ${ch.title}\n\n${cleanGeneratedText(ch.content || '')}`);
+      const cleanT = stripChapterPrefix(ch.title || '', i);
+      parts.push(`CHAPITRE ${i + 1}${cleanT ? ` : ${cleanT}` : ''}\n\n${cleanGeneratedText(ch.content || '')}`);
       ch.subChapters?.forEach((sc, j) => {
         if (sc.content) parts.push(`${ch.title} - ${sc.title}\n\n${cleanGeneratedText(sc.content)}`);
       });
