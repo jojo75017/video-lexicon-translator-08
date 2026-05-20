@@ -540,8 +540,8 @@ FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine
       );
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Erreur lors de la génération';
-      console.error('Cover AI generation failed, using local fallback:', message);
-      createFallbackCover('IA indisponible : couverture de secours créée pour continuer');
+      console.error('Cover AI generation failed:', message);
+      toast.error(`Génération IA échouée : ${message}. Ajustez votre prompt et réessayez — aucune maquette de secours n'est générée pour ne pas dégrader la qualité.`, { duration: 8000 });
     } finally {
       setIsGenerating(false);
     }
