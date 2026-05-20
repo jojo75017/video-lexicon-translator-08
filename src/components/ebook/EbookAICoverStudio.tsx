@@ -59,6 +59,13 @@ const REGISTRES = [
   { value: 'horror', label: '👻 Horror / Mystère', prompt: 'Horror cover — unsettling symbolic object, deep blacks, blood red or sickly green accent, decaying texture, lone silhouette in distance, gothic atmosphere, Stephen King paperback feel' },
 ];
 
+const COVER_PRESETS = [
+  { value: 'thriller', title: 'Thriller', subtitle: 'Ombres, pluie, tension, rouge sang', genre: 'thriller', style: 'thriller', colorScheme: 'noir profond, bleu froid, gris pluie, accent rouge sang', description: 'Une couverture thriller photoréaliste avec un symbole central inquiétant, lumière dure, profondeur cinématographique et tension immédiate.' },
+  { value: 'business', title: 'Business', subtitle: 'Premium, clair, objet iconique, cuivre', genre: 'business', style: 'professional', colorScheme: 'blanc éditorial, bleu nuit, graphite, accent cuivre ou or', description: 'Une couverture business haut de gamme avec un objet métaphorique fort, composition minimaliste, texture mate et impact rayon Amazon.' },
+  { value: 'fantasy', title: 'Fantasy', subtitle: 'Ruines, magie, ciel épique, brume', genre: 'fantasy', style: 'fantasy', colorScheme: 'bleu nuit, violet profond, vert émeraude, lumière dorée magique', description: 'Une couverture fantasy spectaculaire avec décor vaste, lumière magique, silhouette héroïque et atmosphère de grande saga.' },
+  { value: 'wellness', title: 'Wellness', subtitle: 'Nature, calme, lumière douce, sage', genre: 'self-help', style: 'photo', colorScheme: 'sauge, crème, terracotta douce, lumière dorée naturelle', description: 'Une couverture wellness apaisante avec matière naturelle, respiration visuelle, lumière douce et rendu photo premium.' },
+];
+
 type CoverFormat = 'kindle' | 'paperback';
 
 interface PaperbackSpec {
