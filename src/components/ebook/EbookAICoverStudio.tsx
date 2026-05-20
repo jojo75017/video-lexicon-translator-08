@@ -789,28 +789,6 @@ FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine
             </div>
           </div>
 
-          <Button
-            onClick={generateCover}
-            disabled={isGenerating || !title.trim()}
-            size="lg"
-            className="w-full h-14 text-base font-semibold bg-gradient-to-r from-primary to-orange-500 hover:from-primary/90 hover:to-orange-500/90 shadow-md"
-          >
-            {isGenerating ? (
-              <>
-                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                Création en cours… (~30s)
-              </>
-            ) : (
-              <>
-                <Sparkles className="w-5 h-5 mr-2" />
-                Générer ma couverture en 1 clic
-              </>
-            )}
-          </Button>
-
-          {/* Bouton fallback retiré : il créait une fausse couverture orange basique
-              prise pour une vraie génération IA. Si l'IA échoue, on affiche un message d'erreur. */}
-
           {/* ============ CLÉ OPENROUTER (BYOK pour la génération d'image) ============ */}
           <div className="rounded-lg border border-border/60 bg-muted/30 p-3 space-y-2">
             <button
@@ -854,6 +832,28 @@ FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine
               </div>
             )}
           </div>
+
+          <Button
+            onClick={generateCover}
+            disabled={isGenerating || !title.trim()}
+            size="lg"
+            className="w-full h-14 text-base font-semibold bg-gradient-to-r from-primary to-orange-500 hover:from-primary/90 hover:to-orange-500/90 shadow-md"
+          >
+            {isGenerating ? (
+              <>
+                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                Création en cours… (~30s)
+              </>
+            ) : (
+              <>
+                <Sparkles className="w-5 h-5 mr-2" />
+                {openrouterKey.trim().startsWith('sk-or-') ? 'Générer avec OpenRouter' : 'Générer avec Lovable AI'}
+              </>
+            )}
+          </Button>
+
+          {/* Bouton fallback retiré : il créait une fausse couverture orange basique
+              prise pour une vraie génération IA. Si l'IA échoue, on affiche un message d'erreur. */}
 
           <p className="text-xs text-muted-foreground text-center">
             Image IA basée sur votre prompt · Format calculé KDP · À vérifier dans l'aperçu Amazon avant publication
