@@ -271,39 +271,22 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
     >
       {!bannerDismissed && (
         <div
-          className="w-full text-white text-sm relative overflow-hidden"
-          style={{
-            background: 'linear-gradient(90deg, #0d1117 0%, #1a2332 50%, #232F3E 100%)',
-            borderBottom: '1px solid rgba(255,158,45,0.25)',
-            boxShadow: '0 1px 0 rgba(255,255,255,0.04) inset, 0 2px 12px rgba(0,0,0,0.15)',
-          }}
+          className="w-full text-white text-sm relative"
+          style={{ backgroundColor: '#232F3E', borderBottom: '1px solid rgba(255,255,255,0.06)' }}
         >
-          {/* Subtle gold accent line */}
-          <div
-            className="absolute inset-x-0 top-0 h-px"
-            style={{ background: 'linear-gradient(90deg, transparent, #FF9E2D 50%, transparent)' }}
-          />
-          <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2.5 sm:px-6">
+          <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2 sm:px-6">
             <span
-              className="inline-flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-bold"
-              style={{ background: 'linear-gradient(135deg, #FF9E2D, #d97706)', color: '#0d1117' }}
+              className="inline-block h-1.5 w-1.5 rounded-full bg-[#FF9E2D]"
               aria-hidden
-            >
-              ✦
-            </span>
-            <p className="flex-1 truncate font-medium tracking-tight">
-              <span className="hidden sm:inline text-white/60 mr-1">Lancement public le 1er juillet 2026 —</span>
+            />
+            <p className="flex-1 truncate text-[12px] tracking-tight" style={{ fontFamily: "'Work Sans', system-ui, sans-serif" }}>
+              <span className="hidden sm:inline text-white/55 mr-1 uppercase tracking-[0.14em] text-[10px] font-semibold">Lancement 1ᵉʳ juillet 2026 ·</span>
               <strong className="text-white font-semibold">Tes 2 cadeaux abonné</strong>
-              <span className="text-white/70"> t'attendent : 30 min Zoom + −30 % à vie</span>
+              <span className="text-white/60"> : 30 min Zoom + −30 % à vie</span>
             </p>
             <Link
               to="/espace/lancement"
-              className="rounded-full px-4 py-1.5 text-xs font-semibold whitespace-nowrap transition-all hover:scale-[1.02]"
-              style={{
-                background: 'linear-gradient(135deg, #FF9E2D 0%, #d97706 100%)',
-                color: '#0d1117',
-                boxShadow: '0 2px 8px rgba(255,158,45,0.35)',
-              }}
+              className="border border-white/30 hover:border-[#FF9E2D] hover:text-[#FF9E2D] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] whitespace-nowrap transition-colors"
             >
               Voir mes cadeaux →
             </Link>
