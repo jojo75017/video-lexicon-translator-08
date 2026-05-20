@@ -921,7 +921,33 @@ FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine
                     {userPrompt.trim() ? 'Avec votre prompt' : 'Sans prompt utilisateur'} · Registre: {registre}
                   </Badge>
                 </div>
-                <div className="p-2 space-y-2">
+                <div className="p-2 space-y-3">
+                  {/* USER PROMPT — éditable inline */}
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-semibold text-muted-foreground uppercase">
+                        Votre prompt utilisateur (scène à représenter)
+                      </span>
+                      <Button
+                        size="sm"
+                        variant={editUserPromptInPreview ? 'default' : 'outline'}
+                        className="h-6 px-2 text-[10px]"
+                        onClick={() => setEditUserPromptInPreview(v => !v)}
+                      >
+                        <Wand2 className="w-3 h-3 mr-1" />
+                        {editUserPromptInPreview ? 'Verrouiller' : 'Modifier'}
+                      </Button>
+                    </div>
+                    <Textarea
+                      readOnly={!editUserPromptInPreview}
+                      value={userPrompt}
+                      onChange={(e) => setUserPrompt(e.target.value)}
+                      placeholder="Décrivez ici précisément la scène à voir sur la couverture..."
+                      className={`text-[11px] min-h-[80px] font-mono ${editUserPromptInPreview ? 'bg-background ring-2 ring-primary/40' : 'bg-background'}`}
+                    />
+                  </div>
+
+                  {/* PAYLOAD JSON — lecture seule */}
                   <div className="space-y-1">
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] font-semibold text-muted-foreground uppercase">Payload JSON envoyé</span>
@@ -931,14 +957,54 @@ FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine
                     </div>
                     <Textarea readOnly value={JSON.stringify(edgePayloadPreview.payload, null, 2)} className="text-[10px] min-h-[120px] font-mono bg-background" />
                   </div>
+
+                  {/* PROMPT FINAL — éditable */}
                   <div className="space-y-1">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-semibold text-muted-foreground uppercase">Prompt final assemblé côté serveur</span>
-                      <Button size="sm" variant="ghost" className="h-6 px-2 text-[10px]" onClick={() => copyPrompt(edgePayloadPreview.assembledPrompt, 'assembled')}>
-                        <Copy className="w-3 h-3 mr-1" /> Copier
-                      </Button>
+                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                      <span className="text-[10px] font-semibold text-muted-foreground uppercase">
+                        Prompt final assemblé {assembledPromptOverride ? '(personnalisé)' : '(auto)'}
+                      </span>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          size="sm"
+                          variant={editAssembledPrompt ? 'default' : 'outline'}
+                          className="h-6 px-2 text-[10px]"
+                          onClick={() => {
+                            if (!editAssembledPrompt && assembledPromptOverride === null) {
+                              setAssembledPromptOverride(edgePayloadPreview.assembledPrompt);
+                            }
+                            setEditAssembledPrompt(v => !v);
+                          }}
+                        >
+                          <Wand2 className="w-3 h-3 mr-1" />
+                          {editAssembledPrompt ? 'Verrouiller' : 'Modifier'}
+                        </Button>
+                        {assembledPromptOverride !== null && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-6 px-2 text-[10px]"
+                            onClick={() => { setAssembledPromptOverride(null); setEditAssembledPrompt(false); }}
+                          >
+                            Réinitialiser
+                          </Button>
+                        )}
+                        <Button size="sm" variant="ghost" className="h-6 px-2 text-[10px]" onClick={() => copyPrompt(assembledPromptOverride ?? edgePayloadPreview.assembledPrompt, 'assembled')}>
+                          <Copy className="w-3 h-3 mr-1" /> Copier
+                        </Button>
+                      </div>
                     </div>
-                    <Textarea readOnly value={edgePayloadPreview.assembledPrompt} className="text-[10px] min-h-[200px] font-mono bg-background" />
+                    <Textarea
+                      readOnly={!editAssembledPrompt}
+                      value={assembledPromptOverride ?? edgePayloadPreview.assembledPrompt}
+                      onChange={(e) => setAssembledPromptOverride(e.target.value)}
+                      className={`text-[10px] min-h-[220px] font-mono ${editAssembledPrompt ? 'bg-background ring-2 ring-primary/40' : 'bg-background'}`}
+                    />
+                    {assembledPromptOverride !== null && (
+                      <p className="text-[10px] text-primary/80 italic">
+                        ✏️ Ce prompt personnalisé sera utilisé tel quel pour la génération (le prompt auto est ignoré).
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
