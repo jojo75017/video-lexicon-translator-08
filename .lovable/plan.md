@@ -1,54 +1,66 @@
-# Aplatir le header global (`EspaceHeader.tsx`) en style magazine éditorial
+## Constat
 
-## Le vrai coupable
+Sur `/ebook-planner` tu remontes 4 problèmes :
 
-Les "gros boutons" que tu vois ne sont **pas** dans le hero (déjà refait), mais dans `src/components/layout/EspaceHeader.tsx` — la barre sticky en haut qui apparaît sur `/ebook-planner` et plusieurs autres pages.
+1. **Workflow peu accessible** — le CTA orange "Créer mon ebook (Workflow IA)" est noyé dans un gros pavé éditorial, on ne voit pas que c'est l'entrée principale.
+2. **Compteur jetons figé à 0** — `AITokenHeaderBadge` lit `aiCostTracker`, qui n'est alimenté QUE par `aiWritingService.ts`. Or les 15 agents P1-P15 appellent `geminiService.callGemini` / `callGeminiWithHistory` / `callGeminiJSON` directement → aucune trace, le compteur ne bouge jamais.
+3. **Pavé "Nouveau manuscrit" trop gros** — titre 5xl–7xl + sous-titre + statut occupent ~500 px de hauteur avant même de voir le contenu.
+4. **FAB "Créer ma couverture KDP"** (orange pulsant, bottom-right) se télescope avec le bouton flottant "Clés API" (`ApiKeysFloatingButton`) au même endroit.
 
-Cette barre empile actuellement :
-1. Bandeau promo "Lancement public" (dark)
-2. Ligne breadcrumb + AI badge + Pack KDP orange + Cockpit admin + Settings + Logout
-3. **Rangée de boutons piliers ronds colorés** : Plan (bleu) / Écrire (vert) / Habiller (violet) / Publier (orange) / Vendre (rose) + Audit ASIN (teal) + Communauté NEW (rose) + 600 Niches NEW (gradient) + Tous les outils
-4. Sous-barre contextuelle (Tableau de bord IA / Plan du livre / Personnages / Modèles / …)
+## Plan
 
-## Refonte (toujours direction "Magazine archive dense")
+### 1. Compacter le hero `EbookPlannerPage.tsx` (lignes 3562-3664)
 
-Toutes les **fonctions** sont préservées — seul le style change. Pas d'éléments retirés.
+Passer d'un bloc éditorial centré ~500 px à une bande horizontale ~120 px :
 
-### 1. Bandeau promo (banner top)
-Reste mais aplati : fond `#232F3E` uni (plus de gradient), pastille orange remplacée par un point, lien "Voir mes cadeaux" devient un bouton outline blanc petit caps `VOIR MES CADEAUX →`.
+```text
+┌────────────────────────────────────────────────────────────────────┐
+│ ← TABLEAU DE BORD   │  La Belle-sœur (italic, 2xl)                 │
+│  15 AGENTS IA · KDP │  Auteur · 0 chapitre · IA Connectée •        │
+│                     │                                              │
+│                     │  [🚀 WORKFLOW IA] [🎨 COUVERTURE] [✨ AMB.]  │
+│                     │  [💾 SAUVEGARDER] [+ NOUVEAU] [📝 MANUEL]    │
+└────────────────────────────────────────────────────────────────────┘
+```
 
-### 2. Ligne breadcrumb + actions
-- Breadcrumb `Mon espace › Titre projet` reste en Instrument Serif italique pour le titre.
-- AI badge, Pack KDP, Cockpit admin, Settings, Logout : tous repassés en **boutons outline hairline** (`border border-[#e8ecf1]`, fond transparent, texte uppercase 10px tracking large, hover → border teal `#008296`, hover bg `#e8ecf1/30`). Plus de gradients orange brillants ni d'icônes colorées géantes.
+- Supprimer le sous-titre long ("Transformez votre intuition…") et la phrase "Accompagnement gratuit en Zoom"
+- Titre passe de `text-5xl md:text-7xl` à `text-2xl md:text-3xl` italique Instrument Serif, aligné à gauche
+- La barre d'actions et la barre de statut fusionnent dans le même bloc
 
-### 3. Rangée piliers (PLANNER_TABS) — le gros chantier visuel
-Remplacer les pastilles colorées arrondies `rounded-2xl` + `hover:scale-[1.05]` par une **rangée d'onglets éditoriaux** :
-- Style : `px-4 py-3 text-[11px] font-bold uppercase tracking-[0.2em] border-b-2 border-transparent text-[#232F3E]/60 hover:text-[#008296]`
-- Actif : `text-[#232F3E] border-b-2 border-[#FF9E2D]` (souligné orange éditorial, comme un sommaire de magazine)
-- Emojis : conservés mais réduits à `text-sm opacity-60` (ou retirés si on veut full austère — je propose de les garder en monochrome subtil)
-- Plus de fond coloré par pilier, plus de ring, plus de scale au hover
+### 2. Regrouper tous les boutons dans la barre actions
 
-### 4. Boutons spéciaux (Audit ASIN / Communauté / 600 Niches)
-Mêmes onglets que les piliers, mais avec un mini-tag NEW teal flat (`bg-[#008296] text-white text-[8px] uppercase tracking-widest px-1 ml-2`) au lieu des badges gradient animés rose/orange.
+Ordre final, gauche → droite, style hairline `border-[#e8ecf1]` uniforme :
 
-### 5. "Tous les outils"
-Devient un simple lien texte uppercase à droite : `+ TOUS LES OUTILS` en `text-[#008296]`, ouvre toujours le même popover.
+1. **🚀 WORKFLOW IA** (fond `#FF9E2D` — c'est le CTA principal, donc le seul plein)
+2. **🎨 COUVERTURE KDP** (border `#FF9E2D` text `#FF9E2D` — remplace le FAB pulsant)
+3. **✨ AMBIANCES**
+4. **💾 SAUVEGARDER**
+5. **+ NOUVEAU**
+6. **📝 Formulaire manuel** (lien texte discret à droite)
 
-### 6. Sous-barre contextuelle (PLANNER_SUBTABS)
-Aplatit : fond `#fafbfc`, séparateur hairline, onglets en `text-xs uppercase tracking-wider`, actif = texte teal + petit point teal devant. Plus de cartes blanches arrondies à scale.
+→ Suppression complète du FAB `🎨 Créer ma couverture KDP` (lignes 3725-3735) qui se chevauchait avec `ApiKeysFloatingButton`.
 
-## Tokens / polices
-Déjà ajoutés (Instrument Serif + Work Sans chargés dans `index.html` au tour précédent). Le header utilisera `font-family: 'Work Sans'` partout, et Instrument Serif italique uniquement pour le titre du projet dans le breadcrumb.
+### 3. Fiabiliser le compteur jetons
 
-## Hors scope
-- Pas de suppression de boutons.
-- Pas de refonte de la sidebar `SimpleSidebar` / `MagazineSidebar`.
-- Pas de touche au workflow IA, aux 15 agents, aux exports.
-- La page `/espace` (dashboard) garde son look actuel — ce header s'affiche aussi dessus, donc le changement se propagera proprement (cohérent avec le hero éditorial du planner).
+Ajouter le tracking dans `src/services/geminiService.ts` :
 
-## Vérification
-Après l'édition : screenshot du preview sur `/ebook-planner` pour confirmer que la barre est devenue calme et éditoriale.
+- Dans `callGemini` (l.99-146) : après réception, calculer `promptChars` (prompt + systemPrompt) et `responseChars` (content), puis appeler `trackAIUsage({ provider: 'gemini', promptChars, responseChars })` via import dynamique pour éviter le cycle.
+- Idem dans `callGeminiWithHistory` (l.152+).
+- `callGeminiJSON` réutilise `callGemini` → déjà couvert.
 
----
+Comme ça, dès qu'un agent P1-P15 répond, le badge en haut s'incrémente en temps réel.
 
-**Tu approuves cette refonte du header global ?**
+### 4. Hors scope
+
+- Pas de refonte sidebar / EspaceHeader (déjà fait).
+- Pas de modif workflow / export / agents.
+- Pas de modif du `ApiKeysFloatingButton` (il reste flottant, mais sans collision puisque le FAB couverture disparaît).
+
+## Détail technique
+
+| Fichier | Changements |
+|---|---|
+| `src/pages/EbookPlannerPage.tsx` | Hero compact + barre actions unifiée (boutons workflow, couverture, ambiances, sauver, nouveau, manuel) ; suppression FAB couverture l.3725-3735 |
+| `src/services/geminiService.ts` | Ajout `trackAIUsage` après réponse dans `callGemini` et `callGeminiWithHistory` (import dynamique) |
+
+Aucun changement de logique métier, juste UI + télémétrie passive.
