@@ -3706,6 +3706,18 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
 
       {/* Admin: Subscriber Activity Popup */}
       <SubscriberActivityPopup />
+
+      {/* FAB: Créer ma couverture KDP - toujours visible */}
+      {activeTab !== 'images-cover' && (
+        <button
+          type="button"
+          onClick={() => setActiveTab('images-cover')}
+          title="Créer la couverture KDP (Studio IA + Format + 4ᵉ de couverture)"
+          className="fixed bottom-6 right-6 z-50 inline-flex items-center gap-2 px-5 py-3 text-sm font-bold rounded-full border-2 border-orange-500 bg-gradient-to-r from-orange-500 to-amber-500 text-white hover:from-orange-600 hover:to-amber-600 transition-all shadow-2xl hover:shadow-orange-500/50 animate-pulse"
+        >
+          🎨 Créer ma couverture KDP
+        </button>
+      )}
     </div>
   );
 };
