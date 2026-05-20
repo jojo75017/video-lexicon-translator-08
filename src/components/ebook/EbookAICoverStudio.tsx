@@ -103,6 +103,9 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showPromptsPreview, setShowPromptsPreview] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [editUserPromptInPreview, setEditUserPromptInPreview] = useState(false);
+  const [editAssembledPrompt, setEditAssembledPrompt] = useState(false);
+  const [assembledPromptOverride, setAssembledPromptOverride] = useState<string | null>(null);
 
   useEffect(() => {
     if (initialDescription.trim()) setDescription(initialDescription);
