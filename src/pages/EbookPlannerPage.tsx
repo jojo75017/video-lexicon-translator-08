@@ -1455,7 +1455,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                 <button
                   type="button"
                   onClick={() => setActiveTab('complete-workflow')}
-                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg border border-blue-600 bg-blue-600 text-white hover:bg-blue-700 transition-all shadow-sm"
+                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-lg border border-[#FF9E2D] bg-[#FF9E2D] text-white hover:bg-[#e88a1a] transition-all shadow-sm"
                   title="Lancer les 15 agents IA qui rédigent automatiquement votre livre"
                 >
                   ⚡ Workflow IA (15 agents)
@@ -1463,7 +1463,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                 <button
                   type="button"
                   onClick={() => setActiveTab('images-cover')}
-                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-lg border-2 border-orange-500 bg-gradient-to-r from-orange-500 to-amber-500 text-white hover:from-orange-600 hover:to-amber-600 transition-all shadow-md hover:shadow-lg animate-pulse"
+                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg border border-[#FF9E2D]/40 bg-white text-[#FF9E2D] hover:bg-[#FF9E2D]/10 transition-all"
                   title="Créer la couverture KDP (Studio IA + Format + 4ᵉ de couverture)"
                 >
                   🎨 Créer ma couverture KDP
@@ -1471,7 +1471,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                 <button
                   type="button"
                   onClick={() => setActiveTab('aichat')}
-                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg border border-accent/40 bg-accent/10 text-accent hover:bg-accent hover:text-accent-foreground transition-all"
+                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg border border-[#008296]/40 bg-white text-[#008296] hover:bg-[#008296]/10 transition-all"
                   title="Poser une question ou échanger avec l'IA"
                 >
                   💬 Discuter avec l'IA
