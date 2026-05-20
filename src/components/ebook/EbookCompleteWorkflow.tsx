@@ -1129,6 +1129,9 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             const chapitreGenere = mergeChapterSegments(chapitre, generatedSegments);
             if (chapitreGenere) chapitresComplets.push(chapitreGenere);
 
+            console.log(`✅ [P4] Chapitre ${chapitresComplets.length}/${retryStructure.length} terminé : « ${chapitreGenere?.titre || ''} »`);
+            toast.success(`✅ Chapitre ${chapitresComplets.length}/${retryStructure.length} rédigé`, { duration: 2000 });
+
             // UI : on met à jour P4 au fil de l'eau
             const p4DisplayContent = `**📄 Chapitres rédigés : ${chapitresComplets.length}/${retryStructure.length}**\n\nDernier : ${chapitreGenere?.titre || partial?.displayContent || ''}`;
             const nextP4State = {
