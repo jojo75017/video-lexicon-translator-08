@@ -1080,7 +1080,13 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
           const chapitresComplets: any[] = [...existingChapters];
           const startFromChapter = existingChapters.length;
 
+          console.log(`📚 [P4] Démarrage rédaction : ${retryStructure.length} chapitre(s) à écrire (reprise depuis #${startFromChapter + 1})`);
+          if (retryStructure.length > 1) {
+            toast.info(`✍️ Rédaction de ${retryStructure.length} chapitres en cours...`);
+          }
+
           for (let chIdx = startFromChapter; chIdx < retryStructure.length; chIdx++) {
+            console.log(`✍️ [P4] Chapitre ${chIdx + 1}/${retryStructure.length} : « ${retryStructure[chIdx]?.titre || 'Sans titre'} »`);
             const chapitre = retryStructure[chIdx];
             const chapterSegments = buildP4Segments(chapitre, retryStructure.length);
             const generatedSegments: any[] = [];
