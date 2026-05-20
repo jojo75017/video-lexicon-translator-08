@@ -42,28 +42,46 @@ function buildPaperbackSpec(parsed: ReturnType<typeof parseKdpBrief>) {
   };
 }
 
-const KINDLE_SPEC = `KINDLE eBOOK FRONT COVER — FLAT PRINT-READY ARTWORK, AMAZON TOP-100 BEST-SELLER GRADE.
-- Output a FLAT 2D cover artwork only — NOT a 3D mockup, NOT a tilted Kindle device, NOT a shelf scene, NO shadow under a fake book.
-- Pure rectangular artwork edge to edge, no border, no frame, no perspective.
-- Vertical portrait, aspect ratio exactly 1.6:1 (1600 x 2560 px).
-- MANDATORY VISUAL: a full-bleed CINEMATIC PHOTOREALISTIC SCENE filling 100% of the cover (objects, environment, dramatic lighting, depth of field, rim light, volumetric atmosphere). Shot like a Hollywood movie poster / National Geographic / Phase One photography.
-- ABSOLUTELY FORBIDDEN: plain gradient backgrounds, empty pastel backgrounds, blank colored rectangles, minimalist flat colors, abstract shapes only, watercolor washes, "soft pastel" looks. The cover MUST contain real depicted subject matter relevant to the topic (objects, scene, props, environment).
-- Title placement: HUGE bold sans-serif at TOP, brilliant white or gold with subtle shadow, readable at 200px thumbnail. Subtitle smaller below. Author name clean at the very BOTTOM in solid color.
-- High contrast between text and image (add a dark vignette behind text if needed).
-- Style reference: bestselling non-fiction / thriller covers — dramatic, premium, photographic, $$$ production value.`;
+const KINDLE_SPEC = `Vertical portrait flat 2D print-ready artwork, aspect ratio 1.6:1 (1600x2560 px), full-bleed edge to edge, no border, no 3D mockup, no tilted device.`;
 
 function paperbackSpecPrompt(spec: ReturnType<typeof buildPaperbackSpec>) {
   return `AMAZON KDP PAPERBACK FULL WRAP — single continuous landscape artwork.
-- Total wrap dimensions: ${spec.totalWmm} mm wide x ${spec.totalHmm} mm tall (includes 3.175 mm bleed each side).
-- LEFT panel = BACK COVER, width ${spec.widthMm} mm.
-- CENTER = SPINE, width EXACTLY ${spec.spineMm} mm — narrow vertical strip${spec.pages ? ` (calculated for ${spec.pages} pages, ${spec.paper ?? 'cream'} paper)` : ''}.
-- RIGHT panel = FRONT COVER, width ${spec.widthMm} mm.
-- Trim per cover panel: ${spec.trim}.
-- SPINE: title written vertically top-to-bottom + author name, all text 5 mm minimum from spine edges.
-- BACK PANEL: leave a clean rectangular zone 50 x 30 mm in the BOTTOM-RIGHT for ISBN barcode (no text, no critical art there).
-- Artwork must flow seamlessly across spine — same colors, lighting, typography family on all 3 panels.
-- 3 mm safe bleed all around. Add discreet fold guide marks just outside the spine on top/bottom edges.
-- Output a FLAT 2D wrap, NOT a 3D mockup of the book.`;
+- Total wrap: ${spec.totalWmm} mm wide x ${spec.totalHmm} mm tall (3.175 mm bleed each side).
+- LEFT = BACK COVER (${spec.widthMm} mm). CENTER = SPINE (${spec.spineMm} mm${spec.pages ? `, ${spec.pages} pages ${spec.paper ?? 'cream'}` : ''}). RIGHT = FRONT COVER (${spec.widthMm} mm).
+- SPINE: title vertical top-to-bottom + author, 5 mm safe from edges.
+- BACK: clean 50x30 mm zone bottom-right for ISBN.
+- Seamless artwork across all 3 panels. Flat 2D wrap, not a 3D mockup.`;
+}
+
+// Generate a unique cinematic SCENE concept so each cover is visually different.
+async function generateSceneConcept(opts: {
+  title: string; subtitle?: string; genre?: string; description?: string; style?: string; colorScheme?: string;
+  endpoint: string; authHeaders: Record<string, string>;
+}): Promise<string> {
+  const seed = Math.floor(Math.random() * 999999);
+  const sysPrompt = `You are an award-winning art director for Amazon best-seller book covers (Penguin, HarperCollins). Describe ONE precise, UNIQUE cinematic photographic scene for the book cover. No generalities, no "gradient background" — a REAL scene with subject, setting, props, lighting. Reply in 3-4 sentences max, in English, ultra concrete and visual. Variation seed #${seed}.`;
+  const userPrompt = `Book: "${opts.title}"${opts.subtitle ? ` — ${opts.subtitle}` : ''}
+Genre: ${opts.genre || 'non-fiction'}
+${opts.description ? `Topic: ${opts.description}` : ''}
+${opts.style ? `Style: ${opts.style}` : ''}
+${opts.colorScheme ? `Palette: ${opts.colorScheme}` : ''}
+
+Describe ONE original photorealistic cinematic scene that powerfully evokes this book. Include: foreground subject, environment/setting, dramatic lighting (golden hour, chiaroscuro, neon, backlight…), atmosphere. AVOID generic clichés (just a gradient, empty silhouette, flat color). Be SPECIFIC about objects and composition.`;
+
+  try {
+    const res = await fetch(opts.endpoint, {
+      method: "POST",
+      headers: opts.authHeaders,
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-flash',
+        messages: [{ role: "system", content: sysPrompt }, { role: "user", content: userPrompt }],
+        temperature: 1.1,
+      }),
+    });
+    if (!res.ok) return '';
+    const j = await res.json();
+    return (j.choices?.[0]?.message?.content || '').trim();
+  } catch { return ''; }
 }
 
 serve(async (req) => {
