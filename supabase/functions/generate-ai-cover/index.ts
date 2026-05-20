@@ -103,6 +103,7 @@ serve(async (req) => {
       kdpBrief = '',
       referenceImage,
       openrouterKey,
+      customPrompt = '',
     } = body;
 
     if (!title) {
