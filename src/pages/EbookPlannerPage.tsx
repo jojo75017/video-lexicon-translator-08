@@ -1462,12 +1462,21 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                 </button>
                 <button
                   type="button"
+                  onClick={() => setActiveTab('images-cover')}
+                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-lg border-2 border-orange-500 bg-gradient-to-r from-orange-500 to-amber-500 text-white hover:from-orange-600 hover:to-amber-600 transition-all shadow-md hover:shadow-lg animate-pulse"
+                  title="Créer la couverture KDP (Studio IA + Format + 4ᵉ de couverture)"
+                >
+                  🎨 Créer ma couverture KDP
+                </button>
+                <button
+                  type="button"
                   onClick={() => setActiveTab('aichat')}
                   className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg border border-accent/40 bg-accent/10 text-accent hover:bg-accent hover:text-accent-foreground transition-all"
                   title="Poser une question ou échanger avec l'IA"
                 >
                   💬 Discuter avec l'IA
                 </button>
+
               </div>
             </div>
 
