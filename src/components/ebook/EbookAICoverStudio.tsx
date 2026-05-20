@@ -59,11 +59,59 @@ const REGISTRES = [
   { value: 'horror', label: '👻 Horror / Mystère', prompt: 'Horror cover — unsettling symbolic object, deep blacks, blood red or sickly green accent, decaying texture, lone silhouette in distance, gothic atmosphere, Stephen King paperback feel' },
 ];
 
+// Presets = vraies directions artistiques de couverture bestseller.
+// scenePrompt = prompt PRO prérempli si l'utilisateur ne tape rien.
 const COVER_PRESETS = [
-  { value: 'thriller', title: 'Thriller', subtitle: 'Ombres, pluie, tension, rouge sang', genre: 'thriller', style: 'thriller', colorScheme: 'noir profond, bleu froid, gris pluie, accent rouge sang', description: 'Une couverture thriller photoréaliste avec un symbole central inquiétant, lumière dure, profondeur cinématographique et tension immédiate.' },
-  { value: 'business', title: 'Business', subtitle: 'Premium, clair, objet iconique, cuivre', genre: 'business', style: 'professional', colorScheme: 'blanc éditorial, bleu nuit, graphite, accent cuivre ou or', description: 'Une couverture business haut de gamme avec un objet métaphorique fort, composition minimaliste, texture mate et impact rayon Amazon.' },
-  { value: 'fantasy', title: 'Fantasy', subtitle: 'Ruines, magie, ciel épique, brume', genre: 'fantasy', style: 'fantasy', colorScheme: 'bleu nuit, violet profond, vert émeraude, lumière dorée magique', description: 'Une couverture fantasy spectaculaire avec décor vaste, lumière magique, silhouette héroïque et atmosphère de grande saga.' },
-  { value: 'wellness', title: 'Wellness', subtitle: 'Nature, calme, lumière douce, sage', genre: 'self-help', style: 'photo', colorScheme: 'sauge, crème, terracotta douce, lumière dorée naturelle', description: 'Une couverture wellness apaisante avec matière naturelle, respiration visuelle, lumière douce et rendu photo premium.' },
+  {
+    value: 'thriller',
+    title: 'Thriller psychologique',
+    subtitle: 'Visage immergé, eau noire, typo blanche massive',
+    genre: 'thriller',
+    style: 'thriller',
+    colorScheme: 'noir profond, bleu nuit, eau sombre, accent rouge sang',
+    description: 'Couverture thriller psychologique premium type bestseller Amazon — visage partiellement immergé dans une eau sombre, ambiance glaciale, typographie monumentale.',
+    scenePrompt: "Close-up cinematic photograph of a woman's face half-submerged in dark cold water, only the upper half of the face visible above the waterline, eyes closed, wet hair floating, faint reflection of the lower face under the water, pitch black background fading into deep teal water, dramatic top lighting, hyper realistic skin texture, magazine-grade photography, mood of dread and secrecy. NO smile, NO bright colors, NO logo, NO text added by AI.",
+  },
+  {
+    value: 'business',
+    title: 'Business premium',
+    subtitle: 'Objet iconique, fond premium, accent or/cuivre',
+    genre: 'business',
+    style: 'professional',
+    colorScheme: 'blanc cassé éditorial, bleu nuit, graphite, accent cuivre ou or',
+    description: 'Couverture business haut de gamme type Penguin Business / HBR — un objet métaphorique fort, composition minimaliste, texture mate, impact rayon Amazon.',
+    scenePrompt: "Editorial product photograph of a single iconic metaphorical object (a polished brass chess king OR a sharp mountain peak OR a stack of gold ingots), centered on a deep navy background with subtle paper texture, dramatic side lighting, premium matte finish, Harvard Business Review aesthetic, hyper sharp focus, magazine-grade.",
+  },
+  {
+    value: 'fantasy',
+    title: 'Fantasy épique',
+    subtitle: 'Ruines, lumière magique, ciel dramatique',
+    genre: 'fantasy',
+    style: 'fantasy',
+    colorScheme: 'bleu nuit, violet profond, vert émeraude, lumière dorée magique',
+    description: 'Couverture fantasy spectaculaire type édition Brandon Sanderson — décor vaste, lumière magique, silhouette héroïque, ciel dramatique.',
+    scenePrompt: "Epic painted fantasy landscape: ancient stone ruins emerging from glowing mist, a lone hooded silhouette walking towards a massive dramatic sky with twin moons and aurora, magical golden particles in the air, oil painting style, Brandon Sanderson edition feel, cinematic wide composition, no modern objects.",
+  },
+  {
+    value: 'wellness',
+    title: 'Wellness / Self-help',
+    subtitle: 'Nature, matière brute, lumière dorée',
+    genre: 'self-help',
+    style: 'photo',
+    colorScheme: 'sauge, crème, terracotta douce, lumière dorée naturelle',
+    description: 'Couverture wellness apaisante type Goop / Mindful — matière naturelle, respiration visuelle, lumière douce, rendu photo premium.',
+    scenePrompt: "Serene still-life photograph: a single ceramic bowl with floating green leaves on raw linen fabric, soft warm golden-hour light from the left, organic shadows, sage and terracotta palette, calm and aspirational composition with generous negative space, hyper realistic, magazine cover quality.",
+  },
+  {
+    value: 'romance',
+    title: 'Romance',
+    subtitle: 'Bokeh doré, intimité, élégance',
+    genre: 'romance',
+    style: 'romance',
+    colorScheme: 'pastel pêche, doré chaud, bordeaux, lumière dorée tamisée',
+    description: 'Couverture romance élégante — objet ou silhouette évocatrice, lumière chaude tamisée, palette pastel et bordeaux.',
+    scenePrompt: "Soft cinematic photograph of two hands almost touching across a vintage wooden table, single red rose petal between them, warm dusky window light, creamy bokeh background in peach and gold, emotional and intimate atmosphere, hyper realistic, shallow depth of field.",
+  },
 ];
 
 type CoverFormat = 'kindle' | 'paperback';
@@ -492,8 +540,8 @@ FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine
       );
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Erreur lors de la génération';
-      console.error('Cover AI generation failed, using local fallback:', message);
-      createFallbackCover('IA indisponible : couverture de secours créée pour continuer');
+      console.error('Cover AI generation failed:', message);
+      toast.error(`Génération IA échouée : ${message}. Ajustez votre prompt et réessayez — aucune maquette de secours n'est générée pour ne pas dégrader la qualité.`, { duration: 8000 });
     } finally {
       setIsGenerating(false);
     }
@@ -522,7 +570,10 @@ FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine
     setStyle(preset.style);
     setColorScheme(preset.colorScheme);
     if (!description.trim()) setDescription(preset.description);
-    toast.success(`Modèle « ${preset.title} » appliqué — décrivez maintenant la scène voulue.`);
+    // Pré-remplit le prompt utilisateur si vide pour garantir un rendu PRO immédiat.
+    if (!userPrompt.trim() && preset.scenePrompt) setUserPrompt(preset.scenePrompt);
+    setAssembledPromptOverride(null);
+    toast.success(`Modèle « ${preset.title} » appliqué — prompt PRO pré-rempli, modifiable.`);
   };
 
   return (
@@ -741,17 +792,8 @@ FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine
             )}
           </Button>
 
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => createFallbackCover('Maquette temporaire générée localement (à remplacer par une vraie couverture IA)')}
-            disabled={isGenerating || !title.trim()}
-            className="w-full text-xs text-muted-foreground"
-          >
-            <ImageIcon className="w-3.5 h-3.5 mr-2" />
-            Générer une maquette temporaire (dépannage si l'IA est indisponible)
-          </Button>
+          {/* Bouton fallback retiré : il créait une fausse couverture orange basique
+              prise pour une vraie génération IA. Si l'IA échoue, on affiche un message d'erreur. */}
 
           <p className="text-xs text-muted-foreground text-center">
             Image IA basée sur votre prompt · Format calculé KDP · À vérifier dans l'aperçu Amazon avant publication

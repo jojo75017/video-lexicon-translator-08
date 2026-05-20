@@ -1,40 +1,32 @@
-Je propose de corriger le problème en profondeur, pas avec un simple bouton en plus.
+Objectif : faire en sorte que le client voie une couverture photoréaliste premium, proche de votre exemple, et jamais une maquette orange basique vendue comme résultat.
 
-## Objectif
-Rendre le module couverture honnête et utilisable commercialement : l’utilisateur choisit un registre, ajoute son propre prompt, obtient une image vraiment adaptée, et l’interface ne promet plus du “millimétré” si ce n’est pas réellement garanti.
+Plan d’action :
 
-## Plan d’implémentation
+1. Supprimer le piège de la couverture orange
+- Renommer clairement le bouton de maquette locale en outil de dépannage, ou le retirer du Mode Express.
+- Empêcher qu’une maquette locale orange soit confondue avec une vraie génération IA.
+- Ajouter un message explicite si l’IA échoue : “la génération IA n’a pas abouti”, au lieu de produire une fausse couverture médiocre.
 
-1. Remplacer le fonctionnement actuel des presets
-- Supprimer l’idée de “maquette simple” comme solution mise en avant.
-- Transformer les presets en vrais modèles de prompt éditorial : Thriller, Business, Fantasy, Wellness, Romance, Mémoire, Cuisine, Jeunesse, etc.
-- Chaque preset affichera clairement : ambiance, palette, composition, type d’image attendu.
+2. Refaire les presets visuels pour qu’ils soient vraiment des directions de couverture
+- Remplacer les 4 presets trop abstraits par des presets concrets avec intention visuelle forte.
+- Ajouter au minimum un preset “Thriller psychologique premium” basé sur votre exemple : visage partiellement immergé, eau sombre, contraste bleu/noir, typographie blanche massive, sous-titre rouge, auteur en bas.
+- Chaque preset devra contenir : scène précise, composition, lumière, palette, typographie, éléments interdits.
 
-2. Ajouter un vrai champ “Prompt utilisateur” dans le modèle choisi
-- Quand l’utilisateur clique sur un preset, il pourra écrire son intention : scène, symbole, décor, émotion, objets à voir, choses à éviter.
-- Ce prompt sera fusionné avec le preset, le titre, le genre, le sous-titre et le brief KDP.
-- Le prompt final sera visible avant génération, pour que l’utilisateur comprenne ce qui part à l’IA.
+3. Rendre le prompt utilisateur obligatoire ou fortement prioritaire
+- En Mode Express, le client choisit un modèle puis décrit la scène.
+- Si le prompt est vide, proposer un prompt professionnel prérempli depuis le preset sélectionné au lieu d’envoyer une consigne vague.
+- Le prompt final affiché avant génération doit correspondre exactement au rendu attendu.
 
-3. Renforcer la fonction IA de génération
-- Modifier `generate-ai-cover` pour donner la priorité au preset + prompt utilisateur.
-- Interdire explicitement les fonds génériques, les décors répétés, les images plates et les couvertures “template”.
-- Demander une couverture photoréaliste, éditoriale, avec sujet central concret, composition de livre et typographie lisible.
-- Garder le modèle Lovable AI existant, sans demander de nouvelle clé.
+4. Renforcer l’edge function de génération
+- Arrêter les formulations trop génériques qui laissent l’IA produire des fonds plats ou des couvertures simples.
+- Envoyer un prompt orienté “photorealistic commercial book cover”, avec structure stricte : sujet visuel, zone titre, sous-titre, auteur, style typographique, interdits.
+- Pour le modèle thriller, inclure explicitement les codes de votre exemple sans copier l’image : cadrage visage/eau, ambiance froide, typographie bestseller, rendu Amazon professionnel.
 
-4. Rendre le résultat plus honnête côté KDP
-- Remplacer les textes trop absolus comme “conforme”, “millimétré”, “prêt à publier” quand ils concernent une image IA.
-- Utiliser une formulation honnête : “format calculé”, “base compatible KDP”, “à vérifier dans l’aperçu KDP Amazon”.
-- Garder les vrais calculs de format, tranche, fond perdu et zone ISBN, mais ne pas promettre une validation finale Amazon automatique.
+5. Ajouter un vrai aperçu de direction avant génération
+- Afficher dans le Mode Express une carte “Direction visuelle sélectionnée” avec la scène, la palette, la typographie et les interdits.
+- Garder les boutons Modifier pour le prompt utilisateur et le prompt final, mais les rendre visibles directement dans le flux principal.
 
-5. Corriger l’UX du studio couverture
-- Mettre les presets visibles dès l’ouverture du studio, pas cachés dans les options avancées.
-- Ajouter un workflow clair : choisir un modèle → compléter le prompt → générer.
-- Remplacer le bouton “couverture simple” par une action discrète de secours, clairement nommée “maquette temporaire”, pour ne pas la vendre comme résultat final.
-
-6. Vérification
-- Vérifier que les presets sont visibles sur `/ebook-planner`.
-- Vérifier que le prompt final contient bien le preset sélectionné et le prompt de l’utilisateur.
-- Vérifier qu’aucun texte visible ne promet une précision “millimétrée” non garantie.
-
-## Résultat attendu
-Les clients ne verront plus une couverture générique ou mensongère : ils auront un vrai choix de registre, un champ de prompt personnel, une génération plus spécifique, et une communication honnête sur les limites KDP.
+6. Vérification après implémentation
+- Vérifier que le Mode Express affiche bien les presets, le panneau de prompt et le bouton de génération dans le même écran.
+- Vérifier que le bouton de dépannage ne peut plus faire croire à une couverture IA professionnelle.
+- Vérifier que le prompt envoyé pour “La Belle-sœur” + thriller ressemble bien à une commande de couverture premium comme votre exemple.

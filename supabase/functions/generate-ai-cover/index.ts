@@ -149,32 +149,35 @@ serve(async (req) => {
     const rectoPrompt = `FRONT COVER (recto) for "${title}"${subtitle ? `, subtitle "${subtitle}"` : ''}, by ${author || 'Author'}. ${baseArt}`;
     const versoPrompt = `BACK COVER for the same book "${title}" by ${author || 'Author'}. Same visual universe as the front. Clean back panel with hook headline top, 3-5 line synopsis, author bio bottom-left, empty 50x30 mm white zone bottom-right for ISBN. ${baseArt}`;
 
-    // === STEP 2: image prompt — short, positive, scene-led ===
-    const textPrompt = `Create a PROFESSIONAL Amazon best-seller book cover.
+    // === STEP 2: image prompt — bestseller Amazon, photoréaliste ===
+    const textPrompt = `You are generating a PROFESSIONAL Amazon BESTSELLER book cover (the kind sold for $20+ on Amazon by Penguin, HarperCollins, Hachette). Quality target: indistinguishable from a real published cover by a top art director.
 
-MANDATORY SCENE TO PHOTOGRAPH (this is the user's explicit brief — render EXACTLY this scene, do not invent a generic background, do not fall back to a flat gradient, do not reuse a default office/desk/sunset scene):
+═══ MANDATORY SCENE (render EXACTLY — do NOT replace with a generic background, gradient, plain color, abstract pattern, or default office/desk/sunset) ═══
 ${baseArt}
 
-${registre ? `REGISTER / GENRE LANE: ${registre}. Treat the cover with the visual codes of this register (composition, palette, lighting, props).\n\n` : ''}BOOK:
-- Title: "${title}" — render HUGE bold sans-serif at top, brilliant white or gold, sharp legible glyphs, dark vignette behind if needed.
-${subtitle ? `- Subtitle: "${subtitle}" — smaller elegant type below the title.\n` : ''}- Author: "${author || 'Author'}" — clean at the bottom.
+═══ TYPOGRAPHY (must be rendered cleanly on the cover, perfectly legible, no AI gibberish letters) ═══
+- TITLE: "${title}" — MASSIVE bold condensed sans-serif (think Impact / Bebas Neue / Oswald), pure white, centered, occupying ~35–45% of cover height, slightly textured / grainy print finish, sharp letterforms.
+${subtitle ? `- TAGLINE: "${subtitle}" — smaller bold uppercase, accent color (blood red or gold depending on genre), placed just below the title.\n` : ''}- AUTHOR: "${author || 'Author'}" — clean uppercase tracked-out sans-serif at the very bottom, smaller than the title, gold or white.
 
-ART DIRECTION:
-- Style: ${style || 'cinematic photorealistic, Phase One IQ4 + 85mm f/1.4 look'}
+═══ ART DIRECTION ═══
+- Register: ${registre || 'commercial bestseller'}
+- Style: ${style || 'cinematic photorealistic, Phase One IQ4 + 85mm f/1.4'}
 - Palette: ${colorScheme || 'deep contrast, dramatic light'}
 - Genre: ${genre || 'non-fiction'}
+- Composition: full-bleed photographic image, subject occupies upper 50%, title occupies lower-middle, author at bottom — Amazon thumbnail must remain readable at 200 px wide.
 
-STRICT BANS — do NOT produce any of these:
-- generic gradient or flat color background
-- empty silhouette in an empty space
-- the same default scene as previous runs
-- low-fidelity cartoon, AI artifact, plastic skin, melted hands
-- watermark, Amazon badge, fake price, mockup of a 3D book
+═══ ABSOLUTE BANS — failing any of these = unusable cover ═══
+- NO flat color or simple gradient background
+- NO empty silhouette in empty space
+- NO cartoon, illustration, anime, 3D-render look
+- NO AI artifacts (melted hands, extra fingers, distorted faces, gibberish text)
+- NO watermark, Amazon badge, fake price tag, 3D book mockup, tilted device
+- NO generic stock-photo feel — must look like a CURATED art-directed bestseller cover
 
-FORMAT:
+═══ FORMAT ═══
 ${formatGuidance}
 
-Render variation #${variationSeed}. Photograph the scene above — real depicted subject matter from the user's brief.${referenceImage ? ' Use attached reference for mood only, do not copy.' : ''}`;
+Render variation #${variationSeed}. The output MUST be a finished, print-ready, photorealistic bestseller cover with the scene above as the hero image and the title/author rendered as real legible typography.${referenceImage ? ' Use the attached reference for mood/lighting only — do not copy its subject.' : ''}`;
 
     // Si l'utilisateur a édité manuellement le prompt final, on l'utilise tel quel.
     const finalTextPrompt = (customPrompt && customPrompt.trim().length > 30) ? customPrompt.trim() : textPrompt;
