@@ -209,9 +209,9 @@ export const TUTORIELS: Tutoriel[] = [
     steps: [
       "Depuis le Dashboard, ouvrez l'onglet 'Cover Studio'.",
       "Saisissez titre, auteur, format et nombre de pages.",
-      "Décrivez l'ambiance visuelle souhaitée.",
-      "Lancez la génération IA (photo-réaliste).",
-      "Téléchargez la couverture aux bonnes dimensions KDP.",
+      "Choisissez un modèle visuel (Thriller, Business, Fantasy, Wellness…).",
+      "Écrivez votre prompt : scène, décor, lumière, choses à éviter.",
+      "Lancez la génération IA puis téléchargez l'image. Vérifiez les dimensions dans l'aperçu KDP Amazon avant publication.",
     ],
     targetRoute: '/ebook-planner',
     targetTab: 'cover',
