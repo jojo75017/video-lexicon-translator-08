@@ -168,6 +168,13 @@ export const WorkflowDashboard: React.FC<WorkflowDashboardProps> = ({
               Exporter vers Audio Express
             </Button>
           )}
+          <Button
+            onClick={() => onNavigate('kdp')}
+            className="gap-2 bg-[#FF9E2D] hover:bg-[#008296] text-white font-semibold shadow-md"
+          >
+            <Sparkles className="h-4 w-4" />
+            Outils KDP (Description, Mots-clés, A+…)
+          </Button>
           <KdpPackButton
             size="sm"
             label="Pack KDP ZIP"
