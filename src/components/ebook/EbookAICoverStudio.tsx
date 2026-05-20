@@ -418,6 +418,16 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
     }
   };
 
+  const applyPreset = (preset: typeof COVER_PRESETS[number]) => {
+    setRegistre(preset.value);
+    setGenre(preset.genre);
+    setStyle(preset.style);
+    setColorScheme(preset.colorScheme);
+    setDescription(preset.description);
+    setShowAdvanced(true);
+    toast.success(`Preset ${preset.title} appliqué`);
+  };
+
   return (
     <div className="space-y-6">
       <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
