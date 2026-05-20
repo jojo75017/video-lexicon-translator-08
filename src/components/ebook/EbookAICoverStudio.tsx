@@ -198,7 +198,6 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
 
   // ========== APERÇU EXACT DU PAYLOAD ENVOYÉ À L'EDGE FUNCTION ==========
   const edgePayloadPreview = React.useMemo(() => {
-    if (!title.trim()) return null;
     const reg = REGISTRES.find(r => r.value === registre);
     const styleSent = reg && reg.prompt ? `${reg.prompt}. Additional style note: ${style}` : style;
     const payload = {
