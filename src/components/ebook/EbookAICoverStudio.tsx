@@ -570,7 +570,10 @@ FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine
     setStyle(preset.style);
     setColorScheme(preset.colorScheme);
     if (!description.trim()) setDescription(preset.description);
-    toast.success(`Modèle « ${preset.title} » appliqué — décrivez maintenant la scène voulue.`);
+    // Pré-remplit le prompt utilisateur si vide pour garantir un rendu PRO immédiat.
+    if (!userPrompt.trim() && preset.scenePrompt) setUserPrompt(preset.scenePrompt);
+    setAssembledPromptOverride(null);
+    toast.success(`Modèle « ${preset.title} » appliqué — prompt PRO pré-rempli, modifiable.`);
   };
 
   return (
