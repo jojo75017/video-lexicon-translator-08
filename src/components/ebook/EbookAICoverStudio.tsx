@@ -154,6 +154,16 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
   const [editUserPromptInPreview, setEditUserPromptInPreview] = useState(false);
   const [editAssembledPrompt, setEditAssembledPrompt] = useState(false);
   const [assembledPromptOverride, setAssembledPromptOverride] = useState<string | null>(null);
+  const [openrouterKey, setOpenrouterKey] = useState<string>(() => {
+    try { return localStorage.getItem('cover_openrouter_key') || ''; } catch { return ''; }
+  });
+  const [showKeyInput, setShowKeyInput] = useState(false);
+  useEffect(() => {
+    try {
+      if (openrouterKey) localStorage.setItem('cover_openrouter_key', openrouterKey);
+      else localStorage.removeItem('cover_openrouter_key');
+    } catch {}
+  }, [openrouterKey]);
 
   useEffect(() => {
     if (initialDescription.trim()) setDescription(initialDescription);
