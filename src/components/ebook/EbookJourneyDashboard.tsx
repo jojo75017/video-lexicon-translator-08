@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Sparkles, ArrowRight, Trophy } from 'lucide-react';
+import { Sparkles, ArrowRight, Trophy, Zap, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PhaseCard } from './journey/PhaseCard';
 import {
@@ -96,35 +96,40 @@ export const EbookJourneyDashboard: React.FC<EbookJourneyDashboardProps> = (prop
           </div>
 
           <div className="flex flex-col gap-2">
+            {/* CTA principal : lance le vrai pipeline 15 agents */}
+            <Button
+              size="lg"
+              onClick={props.onStartAutoWorkflow}
+              className="bg-white hover:bg-white/90 font-semibold shadow-lg min-w-[260px]"
+              style={{ color: '#232F3E' }}
+            >
+              <Zap className="w-4 h-4 mr-2" style={{ color: '#FF9E2D' }} />
+              Lancer le Workflow IA · 15 agents
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+
+            {/* CTA secondaire : continuer manuellement étape par étape */}
             {nextStep ? (
               <Button
-                size="lg"
+                variant="outline"
+                size="sm"
                 onClick={handleContinue}
-                className="bg-white hover:bg-white/90 font-semibold shadow-lg"
-                style={{ color: '#232F3E' }}
+                className="bg-white/10 border-white/30 text-white hover:bg-white/20 hover:text-white min-w-[260px]"
               >
-                ▶ Continuer : {nextStep.label}
-                <ArrowRight className="w-4 h-4 ml-2" />
+                <Play className="w-3.5 h-3.5 mr-2" />
+                Continuer manuellement : {nextStep.label}
               </Button>
             ) : (
               <Button
-                size="lg"
-                className="bg-white font-semibold shadow-lg"
-                style={{ color: '#232F3E' }}
+                variant="outline"
+                size="sm"
+                className="bg-white/10 border-white/30 text-white min-w-[260px]"
                 disabled
               >
-                <Trophy className="w-4 h-4 mr-2" />
+                <Trophy className="w-3.5 h-3.5 mr-2" />
                 Parcours complété !
               </Button>
             )}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={props.onStartAutoWorkflow}
-              className="bg-white/10 border-white/30 text-white hover:bg-white/20 hover:text-white"
-            >
-              🪄 Lancer le Workflow IA 15 Agents
-            </Button>
           </div>
         </div>
         {/* Decorative shapes */}

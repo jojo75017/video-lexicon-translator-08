@@ -1,42 +1,33 @@
-## Problème 1 — Éditeur P1 ne renvoie plus les 5 titres alternatifs avec scores
+## Problème
 
-**Cause** : dans `supabase/functions/editorial-director/index.ts`, l'appel "full-analysis" demande tout (promesse, angle, cible, erreurs, vision, 5 titres, meilleur titre, score original) en un seul JSON limité à `maxTokens: 4000`. Avec un sujet long ou une réponse verbeuse, le JSON est tronqué → `tryParseJSON` échoue → on tombe dans le fallback partiel (sans titres ou avec liste vide). Le front (`EbookEditorialDirector.tsx`) relance bien via `regenerateTitles` quand `titles.length < 3`, mais si Gemini renvoie un quota/timeout, l'utilisateur n'a plus aucun titre.
+Dans la bannière orange dégradée (`EbookJourneyDashboard.tsx`, en bas de la capture), deux boutons cohabitent et **n'ont pas la même fonction** :
 
-**Fix edge function `editorial-director/index.ts`** :
-- Passer `maxTokens` de 4000 → 6000 pour le full-analysis.
-- Si le JSON parsé n'a pas 5 titres valides (`suggestionsTitle.length < 5`), appeler systématiquement `generateTitlesOnly()` et fusionner — déjà partiellement fait mais à durcir : remplacer la liste seulement si le retour est ≥ 5 items avec `scoreKdp` numérique.
-- Garantir `titreOriginalScore` non-null (forces/faiblesses) — fournir defaults si absent pour que la barre de progression "Votre titre actuel" s'affiche toujours.
+1. **`▶ Continuer : Idée & niche`** (bouton blanc, en haut) → navigue vers l'étape **manuelle suivante** du parcours (ex. l'éditeur P1 seul).
+2. **`🪄 Lancer le Workflow IA 15 Agents`** (bouton outline, en bas) → lance le **vrai pipeline automatique** des 15 agents (`complete-workflow`).
 
-**Fix front `EbookEditorialDirector.tsx`** :
-- Si `analysis.suggestionsTitle.length === 0` après analyse, afficher un encart "Aucun titre généré — Cliquer Régénérer" + auto-trigger silencieux de `regenerateTitles` (au lieu de simplement masquer la carte).
+Or c'est le **second** qui correspond au bouton bleu principal `⚡ Workflow IA (15 agents)` de la barre d'action au-dessus — c'est le CTA principal et il doit être **en haut**, plus visible. De plus, les icônes `▶` et `🪄` s'affichent comme des carrés vides (□) car la police système ne les supporte pas → il faut passer aux icônes Lucide.
 
-## Problème 2 — Doublon "CHAPITRE 2" dans l'export PDF
+## Fix dans `src/components/ebook/EbookJourneyDashboard.tsx` (lignes 98-128)
 
-**Cause** : dans `src/components/ebook/EbookAdvancedExport.tsx` (lignes 294-303), l'export PDF imprime systématiquement :
-1. `CHAPITRE {i+1}` (petit, gris, centré, ligne 300)
-2. puis `ch.title` (gros, gras, ligne 303)
+**Inverser l'ordre + harmoniser le style** :
 
-Quand l'utilisateur (ou la génération IA) nomme son chapitre `Chapitre 2` ou `CHAPITRE 2`, les deux libellés sont identiques → effet "titre dupliqué" visible sur la capture.
+1. **En haut (CTA principal, blanc plein, taille `lg`)** : `Lancer le Workflow IA · 15 agents`
+   - `onClick = props.onStartAutoWorkflow`
+   - Icône `Zap` (Lucide) à gauche + `ArrowRight` à droite
+   - Style : `bg-white text-[#232F3E] hover:bg-white/90 font-semibold shadow-lg`
 
-Même problème dans :
-- `EbookAdvancedExport.tsx` ligne 135 (export EPUB) : `<h1>Chapitre {i+1}<br/>...{ch.title}</h1>`
-- À vérifier mais probablement pas affecté : `ebookPdfExporter.ts` ligne 275 (n'imprime que `s.title`).
+2. **En dessous (CTA secondaire, outline blanc translucide, taille `sm`)** : `Continuer manuellement : {nextStep.label}`
+   - `onClick = handleContinue`
+   - Icône `Play` (Lucide) à gauche
+   - Style : `bg-white/10 border-white/30 text-white hover:bg-white/20`
+   - Si plus de `nextStep` → afficher `Trophy + Parcours complété` désactivé à la place
 
-**Fix** : normaliser et dédupliquer. Ajouter un helper :
-```ts
-const stripChapterNumber = (title: string, i: number) => {
-  const patterns = [
-    new RegExp(`^\\s*chapitre\\s*${i+1}\\s*[:\\-–—.]?\\s*`, 'i'),
-    new RegExp(`^\\s*chapter\\s*${i+1}\\s*[:\\-–—.]?\\s*`, 'i'),
-  ];
-  let t = title.trim();
-  for (const p of patterns) t = t.replace(p, '');
-  return t.trim();
-};
-```
-Utiliser ce helper dans l'export PDF (l.303) et EPUB (l.135) : si après strip le titre est vide ou identique au libellé "Chapitre N" déjà imprimé, ne pas afficher la seconde ligne.
+3. **Remplacer tous les emojis** (`▶`, `🪄`) par des composants Lucide (`Play`, `Zap`, `Sparkles`, `ArrowRight`, `Trophy`) déjà importés dans le fichier — corrige les carrés vides visibles dans la capture.
+
+4. **Largeur des boutons** : ajouter `min-w-[260px]` sur les deux pour qu'ils soient alignés verticalement et lisibles.
 
 ## Hors scope
 
-- Pas de changement sur le workflow IA, le header, la sidebar, ou les autres exports (DOCX/TXT/HTML qui n'ont pas le doublon).
-- Pas de refonte de l'éditeur P1 — uniquement fiabilisation des titres.
+- Pas de changement à la barre d'action au-dessus (`Workflow IA (15 agents)`, `Créer ma couverture KDP`, `Discuter avec l'IA`) — déjà OK.
+- Pas de refonte du dégradé orange ni des phases timeline en dessous.
+- Aucun changement de logique métier : seules les **étiquettes, l'ordre et le style** des deux boutons changent.
