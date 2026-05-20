@@ -1354,11 +1354,27 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
 
       case 'projects':
         return (
-          <EbookProjectsList 
-            onProjectLoad={handleProjectLoad}
-            onCreateNew={handleCreateNewProject}
-            currentProject={{ title: ebookTitle, hasContent: chapters.length > 0 || preface.length > 0 || conclusion.length > 0 }}
-          />
+          <div className="space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-3 bg-card rounded-xl border p-3 shadow-sm">
+              <div className="px-2">
+                <p className="text-sm font-semibold text-foreground">Mes projets ebook</p>
+                <p className="text-xs text-muted-foreground">Retrouvez tous vos livres et accédez en 1 clic aux outils KDP (Description, A+, mots-clés…).</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveTab('kdp')}
+                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-lg border border-[#FF9E2D] bg-[#FF9E2D] text-white hover:bg-[#008296] hover:border-[#008296] transition-all shadow-sm"
+                title="Description, Mots-clés A9, Catégories, Prix, Plan de lancement, Bio, A+ Content"
+              >
+                🎯 Outils KDP (Description + A+)
+              </button>
+            </div>
+            <EbookProjectsList 
+              onProjectLoad={handleProjectLoad}
+              onCreateNew={handleCreateNewProject}
+              currentProject={{ title: ebookTitle, hasContent: chapters.length > 0 || preface.length > 0 || conclusion.length > 0 }}
+            />
+          </div>
         );
 
       case 'workflow-dashboard':
