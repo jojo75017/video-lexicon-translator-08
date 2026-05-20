@@ -17,6 +17,10 @@ interface EbookAICoverStudioProps {
   ebookTitle?: string;
   authorName?: string;
   initialDescription?: string;
+  initialSubtitle?: string;
+  initialGenre?: string;
+  initialTargetAudience?: string;
+  initialBookDescription?: string;
   onCoverGenerated?: (url: string) => void;
 }
 
