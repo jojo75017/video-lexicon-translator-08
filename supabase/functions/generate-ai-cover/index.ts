@@ -127,29 +127,44 @@ serve(async (req) => {
 
     const versoPrompt = `BACK COVER (verso / 4ème de couverture) for the same book "${title}" by ${author || 'Author'}. Same visual universe as the front cover (same palette, lighting, typography). Vertical portrait, same dimensions as the front. Compose a clean back panel with: a short hook headline at the top, a 3–5 line synopsis area in readable body text, a small author bio block at the bottom-left, and a CLEAN EMPTY rectangular zone of 50 x 30 mm in the BOTTOM-RIGHT reserved for ISBN barcode (do not draw a barcode, leave it white/neutral). ${baseArt}`;
 
-    const textPrompt = `You are an award-winning book-cover art director. Create a PROFESSIONAL Amazon best-seller quality book cover.
+    // === STEP 1: generate a unique cinematic scene concept ===
+    const conceptEndpoint = useOpenRouter
+      ? 'https://openrouter.ai/api/v1/chat/completions'
+      : 'https://ai.gateway.lovable.dev/v1/chat/completions';
+    const conceptHeaders: Record<string, string> = useOpenRouter
+      ? { 'Authorization': `Bearer ${openrouterKey.trim()}`, 'Content-Type': 'application/json', 'HTTP-Referer': 'https://ebookstudio.fr', 'X-Title': 'EbookStudio' }
+      : { 'Lovable-API-Key': LOVABLE_API_KEY!, 'Content-Type': 'application/json' };
 
-=== BOOK ===
-Title: "${title}"
-${subtitle ? `Subtitle: "${subtitle}" — display it clearly BELOW the title, smaller but elegant, hierarchically subordinate.` : ''}
-Author: "${author || 'Author'}"
-Genre: ${genre || 'non-fiction'}
+    const sceneConcept = await generateSceneConcept({
+      title, subtitle, genre, description, style, colorScheme,
+      endpoint: conceptEndpoint, authHeaders: conceptHeaders,
+    });
 
-=== ART DIRECTION ===
-Style: ${style || 'professional'}
-Color palette: ${colorScheme || 'modern and elegant, high contrast'}
-${description ? `Concept: ${description}` : ''}
+    const variationSeed = Math.floor(Math.random() * 999999);
+    const baseArt = sceneConcept || `Cinematic photorealistic scene relevant to "${title}". Real subject + environment, dramatic lighting (rim light, golden hour or chiaroscuro), shallow depth of field, magazine-grade detail.`;
 
-=== FORMAT ===
+    const rectoPrompt = `FRONT COVER (recto) for "${title}"${subtitle ? `, subtitle "${subtitle}"` : ''}, by ${author || 'Author'}. ${baseArt}`;
+    const versoPrompt = `BACK COVER for the same book "${title}" by ${author || 'Author'}. Same visual universe as the front. Clean back panel with hook headline top, 3-5 line synopsis, author bio bottom-left, empty 50x30 mm white zone bottom-right for ISBN. ${baseArt}`;
+
+    // === STEP 2: image prompt — short, positive, scene-led ===
+    const textPrompt = `Create a PROFESSIONAL Amazon best-seller book cover.
+
+SCENE TO PHOTOGRAPH (mandatory, do not replace with a flat color or gradient):
+${baseArt}
+
+BOOK:
+- Title: "${title}" — render HUGE bold sans-serif at top, brilliant white or gold, sharp legible glyphs, dark vignette behind if needed.
+${subtitle ? `- Subtitle: "${subtitle}" — smaller elegant type below the title.\n` : ''}- Author: "${author || 'Author'}" — clean at the bottom.
+
+ART DIRECTION:
+- Style: ${style || 'cinematic photorealistic, Phase One IQ4 + 85mm f/1.4 look'}
+- Palette: ${colorScheme || 'deep contrast, dramatic light'}
+- Genre: ${genre || 'non-fiction'}
+
+FORMAT:
 ${formatGuidance}
 
-=== QUALITY BAR (NON-NEGOTIABLE) ===
-- PHOTOREALISTIC CINEMATIC SCENE, full bleed. Think Amazon top-10 thriller / non-fiction bestseller covers (e.g. "Atomic Habits", "Sapiens", thriller covers with dramatic photo scenes + gold/white huge typography).
-- The artwork MUST depict a REAL SCENE with real objects/environment related to the book topic — NOT a flat color, NOT a plain gradient, NOT a pastel watercolor, NOT abstract shapes alone.
-- Dramatic lighting: deep shadows, rim light, golden highlights, volumetric atmosphere, shallow depth of field.
-- Title typography: HUGE, bold sans-serif, white or gold, perfectly sharp, no warped or fake glyphs. Strong contrast against the image (use dark vignette behind text if needed).
-- NO watermark, NO logo, NO UI mockup, NO Amazon badge, NO 3D book mockup, NO tilted device.
-${referenceImage ? '- Use the attached reference image ONLY for stylistic inspiration (mood, palette, composition). Do NOT copy it.' : ''}`;
+Render variation #${variationSeed}. Photograph the scene above — real depicted subject matter, NOT an empty colored background.${referenceImage ? ' Use attached reference for mood only, do not copy.' : ''}`;
 
     let messageContent: string | any[] = textPrompt;
     if (referenceImage && typeof referenceImage === 'string' && referenceImage.length < 6_000_000) {
@@ -159,12 +174,8 @@ ${referenceImage ? '- Use the attached reference image ONLY for stylistic inspir
       ];
     }
 
-    const endpoint = useOpenRouter
-      ? 'https://openrouter.ai/api/v1/chat/completions'
-      : 'https://ai.gateway.lovable.dev/v1/chat/completions';
-    const authHeaders: Record<string, string> = useOpenRouter
-      ? { 'Authorization': `Bearer ${openrouterKey.trim()}`, 'Content-Type': 'application/json', 'HTTP-Referer': 'https://ebookstudio.fr', 'X-Title': 'EbookStudio' }
-      : { 'Lovable-API-Key': LOVABLE_API_KEY!, 'Content-Type': 'application/json' };
+    const endpoint = conceptEndpoint;
+    const authHeaders = conceptHeaders;
     const modelId = useOpenRouter ? 'google/gemini-2.5-flash-image-preview' : 'google/gemini-3.1-flash-image-preview';
 
     const response = await fetch(endpoint, {
