@@ -96,6 +96,7 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
   const [genre, setGenre] = useState('non-fiction');
   const [colorScheme, setColorScheme] = useState('');
   const [description, setDescription] = useState('');
+  const [userPrompt, setUserPrompt] = useState('');
   const [referenceImage, setReferenceImage] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedCovers, setGeneratedCovers] = useState<GeneratedCover[]>([]);
@@ -417,6 +418,8 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
             })(),
             colorScheme,
             description,
+            userPrompt, // ce que l'utilisateur veut VRAIMENT voir sur la couverture
+            registre,
             format,
             kdpBrief: initialDescription, // brief from KDP calculator if any
             referenceImage,
@@ -470,9 +473,8 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
     setGenre(preset.genre);
     setStyle(preset.style);
     setColorScheme(preset.colorScheme);
-    setDescription(preset.description);
-    setShowAdvanced(true);
-    toast.success(`Preset ${preset.title} appliqué`);
+    if (!description.trim()) setDescription(preset.description);
+    toast.success(`Modèle « ${preset.title} » appliqué — décrivez maintenant la scène voulue.`);
   };
 
   return (
