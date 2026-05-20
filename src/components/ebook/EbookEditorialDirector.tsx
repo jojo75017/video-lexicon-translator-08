@@ -428,6 +428,24 @@ export const EbookEditorialDirector = ({
             </CardContent>
           </Card>
 
+          {(!analysis.suggestionsTitle || analysis.suggestionsTitle.length === 0) && (
+            <Card className="md:col-span-2 border-orange-500/30 bg-orange-500/5">
+              <CardContent className="py-6 flex items-center justify-between gap-4">
+                <div className="text-sm">
+                  <p className="font-medium text-orange-700 dark:text-orange-400">Aucun titre alternatif généré</p>
+                  <p className="text-xs text-muted-foreground mt-1">La réponse IA a été tronquée ou filtrée. Relancez pour obtenir 5 propositions avec scores KDP.</p>
+                </div>
+                <Button onClick={() => regenerateTitles()} disabled={isRegeneratingTitles || isAnalyzing} size="sm">
+                  {isRegeneratingTitles ? (
+                    <><Loader2 className="mr-2 h-3 w-3 animate-spin" /> Génération…</>
+                  ) : (
+                    <><RefreshCw className="mr-2 h-3 w-3" /> Générer 5 titres</>
+                  )}
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
           {analysis.suggestionsTitle && analysis.suggestionsTitle.length > 0 && (
             <Card className="md:col-span-2 border-yellow-500/30 bg-yellow-500/5">
               <CardHeader className="pb-2">

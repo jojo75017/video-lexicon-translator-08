@@ -34,6 +34,21 @@ const formats: { id: ExportFormat; label: string; desc: string; icon: string }[]
   { id: 'html', label: 'HTML', desc: 'Page web autonome avec styles intégrés', icon: '🌐' },
 ];
 
+// Retire un préfixe "Chapitre N", "CHAPITRE N", "Chapter N" du titre pour éviter le doublon
+const stripChapterPrefix = (title: string, i: number): string => {
+  if (!title) return '';
+  const n = i + 1;
+  const patterns = [
+    new RegExp(`^\\s*chapitres?\\s*0*${n}\\b\\s*[:\\-–—.\\s]*`, 'i'),
+    new RegExp(`^\\s*chapter\\s*0*${n}\\b\\s*[:\\-–—.\\s]*`, 'i'),
+    /^\s*chapitres?\s*[ivxlcdm]+\b\s*[:\-–—.\s]*/i,
+  ];
+  let t = title.trim();
+  for (const p of patterns) t = t.replace(p, '');
+  return t.trim();
+};
+
+
 export const EbookAdvancedExport: React.FC<EbookAdvancedExportProps> = ({
   ebookTitle, authorName, chapters, preface, conclusion, characters, coverImage,
 }) => {
@@ -60,7 +75,8 @@ export const EbookAdvancedExport: React.FC<EbookAdvancedExportProps> = ({
     const parts: string[] = [];
     if (includePreface && preface) parts.push(`PRÉFACE\n\n${cleanGeneratedText(preface)}`);
     chapters.forEach((ch, i) => {
-      parts.push(`CHAPITRE ${i + 1} : ${ch.title}\n\n${cleanGeneratedText(ch.content || '')}`);
+      const cleanT = stripChapterPrefix(ch.title || '', i);
+      parts.push(`CHAPITRE ${i + 1}${cleanT ? ` : ${cleanT}` : ''}\n\n${cleanGeneratedText(ch.content || '')}`);
       ch.subChapters?.forEach((sc, j) => {
         if (sc.content) parts.push(`${ch.title} - ${sc.title}\n\n${cleanGeneratedText(sc.content)}`);
       });
@@ -132,7 +148,10 @@ export const EbookAdvancedExport: React.FC<EbookAdvancedExportProps> = ({
     // Chapters
     chapters.forEach((ch, i) => {
       const fn = `chapter${i + 1}.xhtml`;
-      let body = `<h1>Chapitre ${i + 1}<br/><span style="font-size:0.75em;font-weight:normal;font-style:italic">${escapeXml(ch.title)}</span></h1>`;
+      const cleanTitle = stripChapterPrefix(ch.title || '', i);
+      let body = cleanTitle
+        ? `<h1>Chapitre ${i + 1}<br/><span style="font-size:0.75em;font-weight:normal;font-style:italic">${escapeXml(cleanTitle)}</span></h1>`
+        : `<h1>Chapitre ${i + 1}</h1>`;
       body += textToHtml(cleanGeneratedText(ch.content || ''));
       ch.subChapters?.forEach(sc => {
         if (sc.content) {
@@ -300,7 +319,8 @@ ${chapterFiles.map(cf => `<li><a href="${cf.filename}">${escapeXml(cf.title)}</a
       doc.text(`CHAPITRE ${i + 1}`, pageW / 2, y, { align: 'center' });
       doc.setTextColor(30);
       y += 0.5;
-      addText(ch.title, 22, true, false, 'center');
+      const cleanTitle = stripChapterPrefix(ch.title || '', i);
+      if (cleanTitle) addText(cleanTitle, 22, true, false, 'center');
       // Decorative separator
       doc.setDrawColor(200);
       doc.line(pageW * 0.35, y + 0.1, pageW * 0.65, y + 0.1);

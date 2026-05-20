@@ -1,66 +1,42 @@
-## Constat
+## Problème 1 — Éditeur P1 ne renvoie plus les 5 titres alternatifs avec scores
 
-Sur `/ebook-planner` tu remontes 4 problèmes :
+**Cause** : dans `supabase/functions/editorial-director/index.ts`, l'appel "full-analysis" demande tout (promesse, angle, cible, erreurs, vision, 5 titres, meilleur titre, score original) en un seul JSON limité à `maxTokens: 4000`. Avec un sujet long ou une réponse verbeuse, le JSON est tronqué → `tryParseJSON` échoue → on tombe dans le fallback partiel (sans titres ou avec liste vide). Le front (`EbookEditorialDirector.tsx`) relance bien via `regenerateTitles` quand `titles.length < 3`, mais si Gemini renvoie un quota/timeout, l'utilisateur n'a plus aucun titre.
 
-1. **Workflow peu accessible** — le CTA orange "Créer mon ebook (Workflow IA)" est noyé dans un gros pavé éditorial, on ne voit pas que c'est l'entrée principale.
-2. **Compteur jetons figé à 0** — `AITokenHeaderBadge` lit `aiCostTracker`, qui n'est alimenté QUE par `aiWritingService.ts`. Or les 15 agents P1-P15 appellent `geminiService.callGemini` / `callGeminiWithHistory` / `callGeminiJSON` directement → aucune trace, le compteur ne bouge jamais.
-3. **Pavé "Nouveau manuscrit" trop gros** — titre 5xl–7xl + sous-titre + statut occupent ~500 px de hauteur avant même de voir le contenu.
-4. **FAB "Créer ma couverture KDP"** (orange pulsant, bottom-right) se télescope avec le bouton flottant "Clés API" (`ApiKeysFloatingButton`) au même endroit.
+**Fix edge function `editorial-director/index.ts`** :
+- Passer `maxTokens` de 4000 → 6000 pour le full-analysis.
+- Si le JSON parsé n'a pas 5 titres valides (`suggestionsTitle.length < 5`), appeler systématiquement `generateTitlesOnly()` et fusionner — déjà partiellement fait mais à durcir : remplacer la liste seulement si le retour est ≥ 5 items avec `scoreKdp` numérique.
+- Garantir `titreOriginalScore` non-null (forces/faiblesses) — fournir defaults si absent pour que la barre de progression "Votre titre actuel" s'affiche toujours.
 
-## Plan
+**Fix front `EbookEditorialDirector.tsx`** :
+- Si `analysis.suggestionsTitle.length === 0` après analyse, afficher un encart "Aucun titre généré — Cliquer Régénérer" + auto-trigger silencieux de `regenerateTitles` (au lieu de simplement masquer la carte).
 
-### 1. Compacter le hero `EbookPlannerPage.tsx` (lignes 3562-3664)
+## Problème 2 — Doublon "CHAPITRE 2" dans l'export PDF
 
-Passer d'un bloc éditorial centré ~500 px à une bande horizontale ~120 px :
+**Cause** : dans `src/components/ebook/EbookAdvancedExport.tsx` (lignes 294-303), l'export PDF imprime systématiquement :
+1. `CHAPITRE {i+1}` (petit, gris, centré, ligne 300)
+2. puis `ch.title` (gros, gras, ligne 303)
 
-```text
-┌────────────────────────────────────────────────────────────────────┐
-│ ← TABLEAU DE BORD   │  La Belle-sœur (italic, 2xl)                 │
-│  15 AGENTS IA · KDP │  Auteur · 0 chapitre · IA Connectée •        │
-│                     │                                              │
-│                     │  [🚀 WORKFLOW IA] [🎨 COUVERTURE] [✨ AMB.]  │
-│                     │  [💾 SAUVEGARDER] [+ NOUVEAU] [📝 MANUEL]    │
-└────────────────────────────────────────────────────────────────────┘
+Quand l'utilisateur (ou la génération IA) nomme son chapitre `Chapitre 2` ou `CHAPITRE 2`, les deux libellés sont identiques → effet "titre dupliqué" visible sur la capture.
+
+Même problème dans :
+- `EbookAdvancedExport.tsx` ligne 135 (export EPUB) : `<h1>Chapitre {i+1}<br/>...{ch.title}</h1>`
+- À vérifier mais probablement pas affecté : `ebookPdfExporter.ts` ligne 275 (n'imprime que `s.title`).
+
+**Fix** : normaliser et dédupliquer. Ajouter un helper :
+```ts
+const stripChapterNumber = (title: string, i: number) => {
+  const patterns = [
+    new RegExp(`^\\s*chapitre\\s*${i+1}\\s*[:\\-–—.]?\\s*`, 'i'),
+    new RegExp(`^\\s*chapter\\s*${i+1}\\s*[:\\-–—.]?\\s*`, 'i'),
+  ];
+  let t = title.trim();
+  for (const p of patterns) t = t.replace(p, '');
+  return t.trim();
+};
 ```
+Utiliser ce helper dans l'export PDF (l.303) et EPUB (l.135) : si après strip le titre est vide ou identique au libellé "Chapitre N" déjà imprimé, ne pas afficher la seconde ligne.
 
-- Supprimer le sous-titre long ("Transformez votre intuition…") et la phrase "Accompagnement gratuit en Zoom"
-- Titre passe de `text-5xl md:text-7xl` à `text-2xl md:text-3xl` italique Instrument Serif, aligné à gauche
-- La barre d'actions et la barre de statut fusionnent dans le même bloc
+## Hors scope
 
-### 2. Regrouper tous les boutons dans la barre actions
-
-Ordre final, gauche → droite, style hairline `border-[#e8ecf1]` uniforme :
-
-1. **🚀 WORKFLOW IA** (fond `#FF9E2D` — c'est le CTA principal, donc le seul plein)
-2. **🎨 COUVERTURE KDP** (border `#FF9E2D` text `#FF9E2D` — remplace le FAB pulsant)
-3. **✨ AMBIANCES**
-4. **💾 SAUVEGARDER**
-5. **+ NOUVEAU**
-6. **📝 Formulaire manuel** (lien texte discret à droite)
-
-→ Suppression complète du FAB `🎨 Créer ma couverture KDP` (lignes 3725-3735) qui se chevauchait avec `ApiKeysFloatingButton`.
-
-### 3. Fiabiliser le compteur jetons
-
-Ajouter le tracking dans `src/services/geminiService.ts` :
-
-- Dans `callGemini` (l.99-146) : après réception, calculer `promptChars` (prompt + systemPrompt) et `responseChars` (content), puis appeler `trackAIUsage({ provider: 'gemini', promptChars, responseChars })` via import dynamique pour éviter le cycle.
-- Idem dans `callGeminiWithHistory` (l.152+).
-- `callGeminiJSON` réutilise `callGemini` → déjà couvert.
-
-Comme ça, dès qu'un agent P1-P15 répond, le badge en haut s'incrémente en temps réel.
-
-### 4. Hors scope
-
-- Pas de refonte sidebar / EspaceHeader (déjà fait).
-- Pas de modif workflow / export / agents.
-- Pas de modif du `ApiKeysFloatingButton` (il reste flottant, mais sans collision puisque le FAB couverture disparaît).
-
-## Détail technique
-
-| Fichier | Changements |
-|---|---|
-| `src/pages/EbookPlannerPage.tsx` | Hero compact + barre actions unifiée (boutons workflow, couverture, ambiances, sauver, nouveau, manuel) ; suppression FAB couverture l.3725-3735 |
-| `src/services/geminiService.ts` | Ajout `trackAIUsage` après réponse dans `callGemini` et `callGeminiWithHistory` (import dynamique) |
-
-Aucun changement de logique métier, juste UI + télémétrie passive.
+- Pas de changement sur le workflow IA, le header, la sidebar, ou les autres exports (DOCX/TXT/HTML qui n'ont pas le doublon).
+- Pas de refonte de l'éditeur P1 — uniquement fiabilisation des titres.
