@@ -258,6 +258,7 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
   const edgePayloadPreview = React.useMemo(() => {
     const reg = REGISTRES.find(r => r.value === registre);
     const styleSent = reg && reg.prompt ? `${reg.prompt}. Additional style note: ${style}` : style;
+    const usesOpenRouter = openrouterKey.trim().startsWith('sk-or-');
     const payload = {
       title,
       subtitle,
@@ -271,6 +272,8 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
       format,
       kdpBrief: initialDescription || '',
       referenceImage: referenceImage ? '[image attachée]' : null,
+      provider: usesOpenRouter ? 'OpenRouter' : 'Lovable AI',
+      openrouterKey: usesOpenRouter ? '[clé OpenRouter active envoyée]' : '[aucune clé OpenRouter valide envoyée]',
     };
     const sceneSource = userPrompt.trim().length > 10
       ? userPrompt.trim()
@@ -293,7 +296,7 @@ STRICT BANS: generic gradient/flat background, empty silhouette, cartoon, AI art
 
 FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine + front)' : 'Kindle vertical portrait 1.6:1 (1600x2560)'}.`;
     return { payload, assembledPrompt };
-  }, [title, subtitle, author, genre, style, colorScheme, description, userPrompt, registre, format, initialDescription, referenceImage]);
+  }, [title, subtitle, author, genre, style, colorScheme, description, userPrompt, registre, format, initialDescription, referenceImage, openrouterKey]);
 
   const handleReferenceUpload = (file: File) => {
     if (file.size > 4 * 1024 * 1024) {
@@ -509,6 +512,8 @@ FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine
       toast.error('Dimensions broché incomplètes - corrigez la validation avant de générer');
       return;
     }
+    const cleanOpenrouterKey = openrouterKey.trim();
+    const usesOpenRouter = cleanOpenrouterKey.startsWith('sk-or-');
     setIsGenerating(true);
     try {
       const invokePromise = supabase.functions.invoke('generate-ai-cover', {
@@ -529,7 +534,7 @@ FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine
             kdpBrief: initialDescription, // brief from KDP calculator if any
             referenceImage,
             customPrompt: assembledPromptOverride || undefined,
-            openrouterKey: openrouterKey.trim().startsWith('sk-or-') ? openrouterKey.trim() : undefined,
+            openrouterKey: usesOpenRouter ? cleanOpenrouterKey : undefined,
           },
         });
       const timeoutPromise = new Promise<never>((_, reject) => {
@@ -552,7 +557,7 @@ FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Erreur lors de la génération';
       console.error('Cover AI generation failed:', message);
-      toast.error(`Génération IA échouée : ${message}. Ajustez votre prompt et réessayez — aucune maquette de secours n'est générée pour ne pas dégrader la qualité.`, { duration: 8000 });
+      toast.error(`Génération IA échouée : ${message}. ${usesOpenRouter ? 'La clé OpenRouter active a bien été envoyée.' : 'Aucune clé OpenRouter valide détectée : la génération utilise Lovable AI.'} Aucune maquette de secours n'est générée pour ne pas dégrader la qualité.`, { duration: 10000 });
     } finally {
       setIsGenerating(false);
     }
@@ -784,28 +789,6 @@ FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine
             </div>
           </div>
 
-          <Button
-            onClick={generateCover}
-            disabled={isGenerating || !title.trim()}
-            size="lg"
-            className="w-full h-14 text-base font-semibold bg-gradient-to-r from-primary to-orange-500 hover:from-primary/90 hover:to-orange-500/90 shadow-md"
-          >
-            {isGenerating ? (
-              <>
-                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                Création en cours… (~30s)
-              </>
-            ) : (
-              <>
-                <Sparkles className="w-5 h-5 mr-2" />
-                Générer ma couverture en 1 clic
-              </>
-            )}
-          </Button>
-
-          {/* Bouton fallback retiré : il créait une fausse couverture orange basique
-              prise pour une vraie génération IA. Si l'IA échoue, on affiche un message d'erreur. */}
-
           {/* ============ CLÉ OPENROUTER (BYOK pour la génération d'image) ============ */}
           <div className="rounded-lg border border-border/60 bg-muted/30 p-3 space-y-2">
             <button
@@ -823,7 +806,11 @@ FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine
             </button>
             {showKeyInput && (
               <div className="space-y-2 pt-1">
+                <Label htmlFor="cover-openrouter-key" className="text-[11px] font-semibold text-foreground">
+                  Champ utilisé pour la génération image
+                </Label>
                 <Input
+                  id="cover-openrouter-key"
                   type="password"
                   placeholder="sk-or-v1-..."
                   value={openrouterKey}
@@ -831,6 +818,11 @@ FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine
                   className="h-9 text-xs font-mono"
                   autoComplete="off"
                 />
+                <p className="text-[11px] font-medium text-primary">
+                  {openrouterKey.trim().startsWith('sk-or-')
+                    ? '✅ Cette clé OpenRouter sera envoyée à generate-ai-cover pour la génération image.'
+                    : 'Sans clé sk-or- valide ici, l’outil repasse sur Lovable AI.'}
+                </p>
                 <p className="text-[11px] text-muted-foreground leading-snug">
                   Utilisez votre propre clé <a href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer" className="text-primary underline">OpenRouter</a> (préfixe <code>sk-or-</code>) pour générer la couverture sur votre quota. Stockée localement dans votre navigateur. Sans clé, la génération utilise les crédits Lovable AI partagés (peut être épuisé).
                 </p>
@@ -840,6 +832,28 @@ FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine
               </div>
             )}
           </div>
+
+          <Button
+            onClick={generateCover}
+            disabled={isGenerating || !title.trim()}
+            size="lg"
+            className="w-full h-14 text-base font-semibold bg-gradient-to-r from-primary to-orange-500 hover:from-primary/90 hover:to-orange-500/90 shadow-md"
+          >
+            {isGenerating ? (
+              <>
+                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                Création en cours… (~30s)
+              </>
+            ) : (
+              <>
+                <Sparkles className="w-5 h-5 mr-2" />
+                {openrouterKey.trim().startsWith('sk-or-') ? 'Générer avec OpenRouter' : 'Générer avec Lovable AI'}
+              </>
+            )}
+          </Button>
+
+          {/* Bouton fallback retiré : il créait une fausse couverture orange basique
+              prise pour une vraie génération IA. Si l'IA échoue, on affiche un message d'erreur. */}
 
           <p className="text-xs text-muted-foreground text-center">
             Image IA basée sur votre prompt · Format calculé KDP · À vérifier dans l'aperçu Amazon avant publication

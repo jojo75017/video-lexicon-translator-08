@@ -44,6 +44,24 @@ function buildPaperbackSpec(parsed: ReturnType<typeof parseKdpBrief>) {
 
 const KINDLE_SPEC = `Vertical portrait flat 2D print-ready artwork, aspect ratio 1.6:1 (1600x2560 px), full-bleed edge to edge, no border, no 3D mockup, no tilted device.`;
 
+const OPENROUTER_IMAGE_MODEL = 'google/gemini-3.1-flash-image-preview';
+const LOVABLE_IMAGE_MODEL = 'google/gemini-3.1-flash-image-preview';
+
+function extractImageUrl(data: any): string | undefined {
+  const message = data?.choices?.[0]?.message;
+  const directImage = message?.images?.[0]?.image_url?.url;
+  if (directImage) return directImage;
+
+  if (Array.isArray(message?.content)) {
+    const imagePart = message.content.find((part: any) =>
+      part?.type === 'image_url' || part?.type === 'output_image' || part?.image_url || part?.url,
+    );
+    return imagePart?.image_url?.url || imagePart?.url;
+  }
+
+  return data?.images?.[0]?.url || data?.image?.url;
+}
+
 function paperbackSpecPrompt(spec: ReturnType<typeof buildPaperbackSpec>) {
   return `AMAZON KDP PAPERBACK FULL WRAP — single continuous landscape artwork.
 - Total wrap: ${spec.totalWmm} mm wide x ${spec.totalHmm} mm tall (3.175 mm bleed each side).
@@ -192,7 +210,7 @@ Render variation #${variationSeed}. The output MUST be a finished, print-ready, 
 
     const endpoint = conceptEndpoint;
     const authHeaders = conceptHeaders;
-    const modelId = useOpenRouter ? 'google/gemini-2.5-flash-image-preview' : 'google/gemini-3.1-flash-image-preview';
+    const modelId = useOpenRouter ? OPENROUTER_IMAGE_MODEL : LOVABLE_IMAGE_MODEL;
 
     const response = await fetch(endpoint, {
       method: "POST",
@@ -210,11 +228,18 @@ Render variation #${variationSeed}. The output MUST be a finished, print-ready, 
       if (status === 402) return new Response(JSON.stringify({ error: "Crédits IA insuffisants" }), { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
       const t = await response.text();
       console.error("AI gateway error:", status, t);
-      throw new Error(`Erreur génération: ${status}`);
+      return new Response(JSON.stringify({
+        error: useOpenRouter
+          ? `OpenRouter a refusé la génération (${status}). Vérifiez que votre clé est valide, créditée, et que le modèle ${modelId} est accessible sur votre compte.`
+          : `Erreur génération Lovable AI (${status})`,
+        details: t.slice(0, 800),
+        provider: useOpenRouter ? 'openrouter' : 'lovable-ai',
+        model: modelId,
+      }), { status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
     const data = await response.json();
-    const imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+    const imageUrl = extractImageUrl(data);
     const textResponse = data.choices?.[0]?.message?.content || "";
 
     if (!imageUrl) throw new Error("Aucune image générée");
