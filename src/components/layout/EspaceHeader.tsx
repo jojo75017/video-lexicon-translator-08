@@ -370,10 +370,9 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
                   <Link
                     to="/admin-cockpit"
                     aria-label="Cockpit admin"
-                    className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold border border-joy-teal/40 text-joy-ink hover:bg-joy-teal/10 transition-all"
-                    style={{ color: '#008296' }}
+                    className="inline-flex items-center gap-1.5 border border-[#e8ecf1] hover:border-[#008296] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#232F3E] hover:text-[#008296] transition-colors"
                   >
-                    <Shield className="h-3.5 w-3.5" />
+                    <Shield className="h-3 w-3" />
                     <span className="hidden sm:inline">Cockpit admin</span>
                   </Link>
                 </TooltipTrigger>
