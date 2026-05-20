@@ -59,6 +59,13 @@ const REGISTRES = [
   { value: 'horror', label: '👻 Horror / Mystère', prompt: 'Horror cover — unsettling symbolic object, deep blacks, blood red or sickly green accent, decaying texture, lone silhouette in distance, gothic atmosphere, Stephen King paperback feel' },
 ];
 
+const COVER_PRESETS = [
+  { value: 'thriller', title: 'Thriller', subtitle: 'Ombres, pluie, tension, rouge sang', genre: 'thriller', style: 'thriller', colorScheme: 'noir profond, bleu froid, gris pluie, accent rouge sang', description: 'Une couverture thriller photoréaliste avec un symbole central inquiétant, lumière dure, profondeur cinématographique et tension immédiate.' },
+  { value: 'business', title: 'Business', subtitle: 'Premium, clair, objet iconique, cuivre', genre: 'business', style: 'professional', colorScheme: 'blanc éditorial, bleu nuit, graphite, accent cuivre ou or', description: 'Une couverture business haut de gamme avec un objet métaphorique fort, composition minimaliste, texture mate et impact rayon Amazon.' },
+  { value: 'fantasy', title: 'Fantasy', subtitle: 'Ruines, magie, ciel épique, brume', genre: 'fantasy', style: 'fantasy', colorScheme: 'bleu nuit, violet profond, vert émeraude, lumière dorée magique', description: 'Une couverture fantasy spectaculaire avec décor vaste, lumière magique, silhouette héroïque et atmosphère de grande saga.' },
+  { value: 'wellness', title: 'Wellness', subtitle: 'Nature, calme, lumière douce, sage', genre: 'self-help', style: 'photo', colorScheme: 'sauge, crème, terracotta douce, lumière dorée naturelle', description: 'Une couverture wellness apaisante avec matière naturelle, respiration visuelle, lumière douce et rendu photo premium.' },
+];
+
 type CoverFormat = 'kindle' | 'paperback';
 
 interface PaperbackSpec {
@@ -85,7 +92,7 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
   const [author, setAuthor] = useState(authorName);
   const [format, setFormat] = useState<CoverFormat>('kindle');
   const [style, setStyle] = useState('professional');
-  const [registre, setRegistre] = useState('auto');
+  const [registre, setRegistre] = useState('business');
   const [genre, setGenre] = useState('non-fiction');
   const [colorScheme, setColorScheme] = useState('');
   const [description, setDescription] = useState('');
@@ -230,18 +237,65 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
     };
 
     const drawFront = (x: number, y: number, w: number, h: number) => {
+      const activePreset = COVER_PRESETS.find((preset) => preset.value === registre)?.value || 'business';
       const gradient = ctx.createLinearGradient(x, y, x + w, y + h);
-      gradient.addColorStop(0, background);
-      gradient.addColorStop(0.55, muted);
-      gradient.addColorStop(1, primary);
-      ctx.fillStyle = gradient;
-      ctx.fillRect(x, y, w, h);
 
-      ctx.fillStyle = primary;
-      ctx.globalAlpha = 0.14;
-      ctx.fillRect(x + w * 0.08, y + h * 0.1, w * 0.84, h * 0.02);
-      ctx.fillRect(x + w * 0.12, y + h * 0.84, w * 0.76, h * 0.018);
-      ctx.globalAlpha = 1;
+      if (activePreset === 'thriller') {
+        gradient.addColorStop(0, 'hsl(222 34% 4%)');
+        gradient.addColorStop(0.58, 'hsl(221 39% 11%)');
+        gradient.addColorStop(1, 'hsl(0 74% 30%)');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(x, y, w, h);
+        ctx.fillStyle = 'hsl(220 13% 91%)';
+        ctx.globalAlpha = 0.08;
+        for (let i = 0; i < 16; i += 1) ctx.fillRect(x + w * (0.08 + i * 0.055), y, 2, h);
+        ctx.globalAlpha = 0.28;
+        ctx.fillStyle = 'hsl(0 72% 51%)';
+        ctx.fillRect(x + w * 0.12, y + h * 0.68, w * 0.76, h * 0.018);
+        ctx.globalAlpha = 1;
+      } else if (activePreset === 'fantasy') {
+        gradient.addColorStop(0, 'hsl(215 46% 15%)');
+        gradient.addColorStop(0.52, 'hsl(226 37% 30%)');
+        gradient.addColorStop(1, 'hsl(162 88% 20%)');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(x, y, w, h);
+        const moon = ctx.createRadialGradient(x + w * 0.72, y + h * 0.2, 8, x + w * 0.72, y + h * 0.2, w * 0.18);
+        moon.addColorStop(0, 'hsl(49 100% 87% / 0.9)');
+        moon.addColorStop(1, 'hsl(49 100% 87% / 0)');
+        ctx.fillStyle = moon;
+        ctx.fillRect(x, y, w, h);
+        ctx.fillStyle = 'hsl(48 96% 53% / 0.5)';
+        ctx.beginPath();
+        ctx.moveTo(x + w * 0.5, y + h * 0.18);
+        ctx.lineTo(x + w * 0.58, y + h * 0.56);
+        ctx.lineTo(x + w * 0.42, y + h * 0.56);
+        ctx.closePath();
+        ctx.fill();
+      } else if (activePreset === 'wellness') {
+        gradient.addColorStop(0, 'hsl(42 45% 94%)');
+        gradient.addColorStop(0.58, 'hsl(96 27% 85%)');
+        gradient.addColorStop(1, 'hsl(15 44% 52%)');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(x, y, w, h);
+        ctx.strokeStyle = 'hsl(120 16% 32% / 0.34)';
+        ctx.lineWidth = Math.max(8, w * 0.012);
+        for (let i = 0; i < 5; i += 1) {
+          ctx.beginPath();
+          ctx.ellipse(x + w * (0.22 + i * 0.14), y + h * 0.66, w * 0.09, h * 0.16, -0.7, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+      } else {
+        gradient.addColorStop(0, background);
+        gradient.addColorStop(0.55, muted);
+        gradient.addColorStop(1, primary);
+        ctx.fillStyle = gradient;
+        ctx.fillRect(x, y, w, h);
+        ctx.fillStyle = primary;
+        ctx.globalAlpha = 0.14;
+        ctx.fillRect(x + w * 0.08, y + h * 0.1, w * 0.84, h * 0.02);
+        ctx.fillRect(x + w * 0.12, y + h * 0.84, w * 0.76, h * 0.018);
+        ctx.globalAlpha = 1;
+      }
 
       ctx.textAlign = 'center';
       ctx.fillStyle = foreground;
@@ -411,6 +465,16 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
     }
   };
 
+  const applyPreset = (preset: typeof COVER_PRESETS[number]) => {
+    setRegistre(preset.value);
+    setGenre(preset.genre);
+    setStyle(preset.style);
+    setColorScheme(preset.colorScheme);
+    setDescription(preset.description);
+    setShowAdvanced(true);
+    toast.success(`Preset ${preset.title} appliqué`);
+  };
+
   return (
     <div className="space-y-6">
       <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
@@ -438,12 +502,12 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
             <div className="flex-1">
               <CardTitle className="text-xl flex items-center gap-2">
                 Mode Express
-                <Badge className="bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30">
-                  Recommandé
-                </Badge>
+              <Badge className="bg-primary/10 text-primary border-primary/30">
+                Presets visibles
+              </Badge>
               </CardTitle>
               <CardDescription className="mt-1">
-                Titre + auteur → couverture professionnelle en 1 clic. L'IA choisit le style optimal.
+                Choisissez un preset visible, puis générez une couverture adaptée au registre du livre.
               </CardDescription>
             </div>
           </div>
@@ -476,6 +540,39 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
             </div>
           </div>
 
+          <div className="rounded-lg border border-primary/30 bg-background/85 p-3 space-y-3">
+            <div className="flex items-center justify-between gap-3">
+              <Label className="text-sm font-semibold flex items-center gap-2">
+                <Palette className="h-4 w-4 text-primary" />
+                Presets de couverture visibles
+              </Label>
+              <Badge variant="outline" className="border-primary/30 text-primary">Choix obligatoire</Badge>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+              {COVER_PRESETS.map((preset) => {
+                const active = registre === preset.value;
+                return (
+                  <button
+                    key={preset.value}
+                    type="button"
+                    onClick={() => applyPreset(preset)}
+                    className={`min-h-[118px] rounded-lg border p-3 text-left transition-all ${
+                      active
+                        ? 'border-primary bg-primary/10 ring-2 ring-primary/30 shadow-md'
+                        : 'border-border bg-card hover:border-primary/50 hover:bg-primary/5'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-base font-bold text-foreground">{preset.title}</span>
+                      {active && <CheckCircle2 className="h-4 w-4 text-primary" />}
+                    </div>
+                    <p className="mt-2 text-xs leading-snug text-muted-foreground">{preset.subtitle}</p>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           <Button
             onClick={generateCover}
             disabled={isGenerating || !title.trim()}
@@ -498,12 +595,12 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
           <Button
             type="button"
             variant="outline"
-            onClick={() => createFallbackCover('Couverture de secours créée : vous pouvez continuer')}
+            onClick={() => createFallbackCover('Maquette créée avec le preset choisi')}
             disabled={isGenerating || !title.trim()}
             className="w-full"
           >
             <ImageIcon className="w-4 h-4 mr-2" />
-            Continuer avec une couverture simple
+            Créer une maquette avec le preset choisi
           </Button>
 
           <p className="text-xs text-muted-foreground text-center">
