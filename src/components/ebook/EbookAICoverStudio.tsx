@@ -638,6 +638,15 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
               </Select>
             </div>
             <div className="space-y-2">
+              <Label>Registre visuel <span className="text-xs text-muted-foreground">(force le style de la scène)</span></Label>
+              <Select value={registre} onValueChange={setRegistre}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {REGISTRES.map((r) => <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
               <Label>Style visuel</Label>
               <Select value={style} onValueChange={setStyle}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
