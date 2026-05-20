@@ -318,7 +318,8 @@ ${chapterFiles.map(cf => `<li><a href="${cf.filename}">${escapeXml(cf.title)}</a
       doc.text(`CHAPITRE ${i + 1}`, pageW / 2, y, { align: 'center' });
       doc.setTextColor(30);
       y += 0.5;
-      addText(ch.title, 22, true, false, 'center');
+      const cleanTitle = stripChapterPrefix(ch.title || '', i);
+      if (cleanTitle) addText(cleanTitle, 22, true, false, 'center');
       // Decorative separator
       doc.setDrawColor(200);
       doc.line(pageW * 0.35, y + 0.1, pageW * 0.65, y + 0.1);
