@@ -170,10 +170,11 @@ export const WorkflowDashboard: React.FC<WorkflowDashboardProps> = ({
           )}
           <Button
             onClick={() => onNavigate('kdp')}
-            className="gap-2 bg-[#FF9E2D] hover:bg-[#008296] text-white font-semibold shadow-md"
+            className="relative gap-2 bg-[#FF9E2D] hover:bg-[#008296] text-white font-semibold shadow-md ring-2 ring-[#FF9E2D]/40 animate-[pulse_2.6s_ease-in-out_infinite]"
           >
-            <Sparkles className="h-4 w-4" />
-            Outils KDP (Description, Mots-clés, A+…)
+            <span className="pointer-events-none absolute inset-0 rounded-md bg-white/30 opacity-0 animate-[ping_2.6s_ease-out_infinite]" />
+            <Sparkles className="h-4 w-4 relative z-10" />
+            <span className="relative z-10">Outils KDP (Description, Mots-clés, A+…)</span>
           </Button>
           <KdpPackButton
             size="sm"
