@@ -60,7 +60,7 @@ const VideoTestimonials = () => {
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Ils ont transformé leur écriture avec{" "}
             <span className="text-primary">
-              EbookStudio Pro
+              Ebookstudio Pro V2
             </span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
@@ -137,7 +137,7 @@ const VideoTestimonials = () => {
 
         <div className="text-center mt-8">
           <p className="text-sm text-muted-foreground">
-            <span className="text-primary font-semibold">+150 auteurs</span> ont déjà publié avec EbookStudio Pro
+            <span className="text-primary font-semibold">+150 auteurs</span> ont déjà publié avec Ebookstudio Pro V2
           </p>
         </div>
       </div>

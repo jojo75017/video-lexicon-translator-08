@@ -41,7 +41,7 @@ En 47 minutes.
 
 Ce qui a changé ? J'ai construit un outil. Un vrai générateur d'ebooks propulsé par l'IA la plus avancée du marché.
 
-🔥 EbookStudio Pro 2026 - L'usine à ebooks que j'utilise personnellement :
+🔥 Ebookstudio Pro V2 2026 - L'usine à ebooks que j'utilise personnellement :
 
 → 300+ idées de titres par niche rentable
 → Plan complet généré en 30 secondes
@@ -77,7 +77,7 @@ Savez-vous pourquoi 90% des gens qui veulent publier sur Amazon... n'y arrivent 
 ❌ ERREUR #2 : Passer 3 semaines sur un seul livre - pendant que d'autres en publient 5.
 ❌ ERREUR #3 : Négliger la couverture et les mots-clés - 0 vente.
 
-EbookStudio Pro résout ces 3 problèmes en même temps :
+Ebookstudio Pro V2 résout ces 3 problèmes en même temps :
 ✅ Plan structuré automatiquement
 ✅ Génération en 47 min
 ✅ Couvertures pro + optimisation KDP intégrée
@@ -86,7 +86,7 @@ Le tout pour ~0,30€ par livre.
 
 📊 Le calcul : 1 ebook/semaine × 52 = 52 livres/an, pour ~15€ de production.
 
-👉 Découvrir EbookStudio Pro : ${OFFRES_LINK}
+👉 Découvrir Ebookstudio Pro V2 : ${OFFRES_LINK}
 
 L'offre Fondateur à 67€ (au lieu de 197€) est disponible jusqu'au 1er juillet.
 
@@ -109,9 +109,9 @@ Aujourd'hui, pas de pitch. Juste des faits.
 📊 Mon parcours Amazon KDP :
 • 2023 : 0 livre publié
 • 2024 : 18 livres (méthode manuelle)
-• 2025-2026 : 35+ livres (avec EbookStudio)
+• 2025-2026 : 35+ livres (avec Ebookstudio Pro V2)
 
-EbookStudio Pro 2026 inclut :
+Ebookstudio Pro V2 2026 inclut :
 📝 Générateur IA (Gemini 3 Flash)
 🎨 Créateur de couvertures pro
 🔊 Convertisseur en livre audio
@@ -139,7 +139,7 @@ https://www.amazon.fr/Mr-Georges-Boubet/e/B0CGVLHNX7`,
     strategyColor: "bg-amber-500/10 text-amber-600 border-amber-500/30",
     body: `[PRÉNOM],
 
-L'offre Fondateur EbookStudio Pro à 67€ se termine dans 48 heures.
+L'offre Fondateur Ebookstudio Pro V2 à 67€ se termine dans 48 heures.
 
 Après ? Le prix passe à 197€.
 
@@ -198,7 +198,7 @@ Georges
 
 ---
 📖 35+ livres publiés sur Amazon
-🛠️ Créateur d'EbookStudio Pro
+🛠️ Créateur d'Ebookstudio Pro V2
 🔗 amazon.fr/Mr-Georges-Boubet/e/B0CGVLHNX7`,
   },
 ];
@@ -349,7 +349,7 @@ const EmailPreviewPage = () => {
               {/* Email footer */}
               <div className="border-t border-gray-200 px-6 py-4 bg-gray-50">
                 <p className="text-[11px] text-gray-400">
-                  Vous recevez cet email car vous avez manifesté un intérêt pour EbookStudio Pro.<br />
+                  Vous recevez cet email car vous avez manifesté un intérêt pour Ebookstudio Pro V2.<br />
                   <span className="text-amber-600 underline cursor-pointer">Voir l'offre</span> · <span className="text-amber-600 underline cursor-pointer">Tester la démo</span><br />
                   Pour ne plus recevoir ces emails, répondez "STOP" à cet email.
                 </p>

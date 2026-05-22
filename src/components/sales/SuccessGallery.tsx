@@ -37,7 +37,7 @@ const successStories: SuccessStory[] = [
     rating: 4.7,
     reviews: 156,
     publishDate: "Septembre 2024",
-    testimonial: "J'ai généré mon livre en une journée avec EbookStudio Pro. Le workflow IA m'a guidée pas à pas !",
+    testimonial: "J'ai généré mon livre en une journée avec Ebookstudio Pro V2. Le workflow IA m'a guidée pas à pas !",
     niche: "Recettes rapides"
   },
   {
@@ -97,7 +97,7 @@ const successStories: SuccessStory[] = [
     rating: 4.8,
     reviews: 445,
     publishDate: "Juillet 2024",
-    testimonial: "Mon 5ème livre avec EbookStudio. Le simulateur Amazon Ads m'a fait économiser des centaines d'euros.",
+    testimonial: "Mon 5ème livre avec Ebookstudio Pro V2. Le simulateur Amazon Ads m'a fait économiser des centaines d'euros.",
     niche: "Productivité"
   }
 ];
@@ -216,7 +216,7 @@ const SuccessGallery: React.FC<SuccessGalleryProps> = ({
             Success Stories
           </Badge>
           <h2 className="text-3xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-            Ils ont publié avec EbookStudio Pro
+            Ils ont publié avec Ebookstudio Pro V2
           </h2>
           <p className="text-muted-foreground mt-2">
             Découvrez les résultats de nos auteurs

@@ -25,7 +25,7 @@ const PolitiqueConfidentialite = () => (
           <h2 className="text-xl font-bold">Utilisation des données</h2>
           <p>Vos données sont utilisées pour :</p>
           <ul className="list-disc pl-5 space-y-1">
-            <li>Fournir l'accès au service EbookStudio Pro</li>
+            <li>Fournir l'accès au service Ebookstudio Pro V2</li>
             <li>Envoyer des emails transactionnels (accès, mises à jour)</li>
             <li>Envoyer la newsletter (uniquement si vous êtes inscrit)</li>
           </ul>

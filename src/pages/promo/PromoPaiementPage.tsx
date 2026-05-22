@@ -37,8 +37,8 @@ const PromoPaiementPage = () => {
   return (
     <FunnelLayout>
       <SeoHead
-        title="Instructions de paiement - EbookStudio"
-        description="Finalisez votre paiement EbookStudio par PayPal ou virement bancaire."
+        title="Instructions de paiement - Ebookstudio Pro V2"
+        description="Finalisez votre paiement Ebookstudio Pro V2 par PayPal ou virement bancaire."
         canonical="/promo/paiement"
         noindex
       />

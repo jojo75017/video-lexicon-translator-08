@@ -112,7 +112,7 @@ const PaymentSuccessPage = () => {
             )}
           </div>
           <h1 className="text-4xl md:text-5xl font-black text-black mb-3">
-            {ok ? "🎉 Bienvenue dans EbookStudio Pro !" : "Activation en attente"}
+            {ok ? "🎉 Bienvenue dans Ebookstudio Pro V2 !" : "Activation en attente"}
           </h1>
           <p className="text-lg text-black/60">
             {ok

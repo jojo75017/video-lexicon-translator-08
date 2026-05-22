@@ -23,7 +23,7 @@ export const blogArticles: BlogArticle[] = [
   {
     slug: 'auto-edition-amazon-kdp',
     title: 'Auto-édition Amazon KDP : Le Guide Ultime 2025',
-    metaTitle: 'Auto-édition Amazon KDP : Guide Ultime 2025 | EbookStudio Pro',
+    metaTitle: 'Auto-édition Amazon KDP : Guide Ultime 2025 | Ebookstudio Pro V2',
     metaDescription: 'Tout ce qu\'il faut savoir pour réussir son auto-édition sur Amazon KDP. Formatage, prix, catégories et stratégies de lancement.',
     excerpt: 'Tout ce qu\'il faut savoir pour réussir son auto-édition sur Amazon KDP. Formatage, prix, catégories et stratégies de lancement.',
     category: 'Guide',
@@ -57,7 +57,7 @@ Rendez-vous sur kdp.amazon.com et créez votre compte. Vous aurez besoin d'infor
 
 ### Étape 2 : Préparer votre manuscrit
 
-Le formatage est crucial pour une bonne expérience de lecture. Utilisez un outil comme EbookStudio Pro pour générer un manuscrit parfaitement formaté.
+Le formatage est crucial pour une bonne expérience de lecture. Utilisez un outil comme Ebookstudio Pro V2 pour générer un manuscrit parfaitement formaté.
 
 ### Étape 3 : Créer votre couverture
 
@@ -104,7 +104,7 @@ L'auto-édition sur Amazon KDP est une opportunité formidable en 2025. Avec les
   {
     slug: 'gagner-argent-ebook',
     title: 'Gagner de l\'Argent avec les Ebooks : Stratégies Rentables',
-    metaTitle: 'Gagner de l\'Argent avec les Ebooks en 2025 | EbookStudio Pro',
+    metaTitle: 'Gagner de l\'Argent avec les Ebooks en 2025 | Ebookstudio Pro V2',
     metaDescription: 'Découvrez comment générer des revenus passifs avec vos ebooks. Niches rentables, pricing et techniques de vente sur Amazon.',
     excerpt: 'Découvrez comment générer des revenus passifs avec vos ebooks. Niches rentables, pricing et techniques de vente sur Amazon.',
     category: 'Monétisation',
@@ -167,7 +167,7 @@ La clé du succès dans la vente d'ebooks réside dans la combinaison d'un conte
     relatedSlugs: ['auto-edition-amazon-kdp', 'idees-ebook-rentables'],
     faq: [
       { question: 'Combien peut-on gagner avec un ebook ?', answer: 'Les revenus varient énormément. Certains auteurs gagnent quelques dizaines d\'euros par mois, d\'autres plusieurs milliers. La moyenne se situe entre 100€ et 500€/mois par ebook bien positionné.' },
-      { question: 'Faut-il être un expert pour écrire un ebook ?', answer: 'Pas nécessairement. Vous pouvez compiler des recherches, interviewer des experts ou utiliser des outils IA comme EbookStudio Pro pour créer du contenu de qualité.' },
+      { question: 'Faut-il être un expert pour écrire un ebook ?', answer: 'Pas nécessairement. Vous pouvez compiler des recherches, interviewer des experts ou utiliser des outils IA comme Ebookstudio Pro V2 pour créer du contenu de qualité.' },
       { question: 'Combien de temps faut-il pour écrire un ebook ?', answer: 'Avec les outils IA modernes, vous pouvez créer un ebook de qualité en quelques heures au lieu de plusieurs semaines.' },
       { question: 'Où vendre ses ebooks ?', answer: 'Amazon KDP est la plateforme principale, mais vous pouvez aussi vendre sur Kobo, Apple Books, Google Play Books et votre propre site.' },
       { question: 'Les ebooks sont-ils encore rentables en 2025 ?', answer: 'Oui, le marché des ebooks continue de croître. La clé est de cibler les bonnes niches et d\'offrir un contenu de qualité supérieure.' },
@@ -176,7 +176,7 @@ La clé du succès dans la vente d'ebooks réside dans la combinaison d'un conte
   {
     slug: 'idees-ebook-rentables',
     title: '50 Idées d\'Ebooks Rentables à Créer en 2025',
-    metaTitle: '50 Idées d\'Ebooks Rentables en 2025 | EbookStudio Pro',
+    metaTitle: '50 Idées d\'Ebooks Rentables en 2025 | Ebookstudio Pro V2',
     metaDescription: 'Liste complète d\'idées de niches et sujets d\'ebooks qui se vendent bien sur Amazon KDP. Inspirez-vous pour votre prochain bestseller.',
     excerpt: 'Liste complète d\'idées de niches et sujets d\'ebooks qui se vendent bien sur Amazon KDP.',
     category: 'Inspiration',
@@ -262,7 +262,7 @@ Pour choisir la bonne idée, analysez trois critères : la **demande** (volume d
 
 ## Conclusion
 
-Ces 50 idées ne sont qu'un point de départ. Utilisez EbookStudio Pro pour valider votre niche et créer votre ebook rapidement grâce à l'IA.`,
+Ces 50 idées ne sont qu'un point de départ. Utilisez Ebookstudio Pro V2 pour valider votre niche et créer votre ebook rapidement grâce à l'IA.`,
     tableOfContents: [
       { id: 'introduction', title: 'Introduction', level: 2 },
       { id: 'developpement-personnel-1-10', title: 'Développement personnel (1-10)', level: 2 },
@@ -276,7 +276,7 @@ Ces 50 idées ne sont qu'un point de départ. Utilisez EbookStudio Pro pour vali
     relatedSlugs: ['auto-edition-amazon-kdp', 'gagner-argent-ebook'],
     faq: [
       { question: 'Quelle est la niche la plus rentable pour un ebook ?', answer: 'Le développement personnel et le business en ligne sont les niches les plus rentables, avec des volumes de recherche élevés et des acheteurs prêts à investir.' },
-      { question: 'Peut-on écrire un ebook sur un sujet qu\'on ne maîtrise pas ?', answer: 'Oui, avec de bonnes recherches et des outils IA comme EbookStudio Pro, vous pouvez créer un contenu de qualité sur n\'importe quel sujet.' },
+      { question: 'Peut-on écrire un ebook sur un sujet qu\'on ne maîtrise pas ?', answer: 'Oui, avec de bonnes recherches et des outils IA comme Ebookstudio Pro V2, vous pouvez créer un contenu de qualité sur n\'importe quel sujet.' },
       { question: 'Combien d\'ebooks faut-il publier pour en vivre ?', answer: 'En général, 10 à 20 ebooks bien positionnés peuvent générer un revenu confortable. Mais un seul bestseller peut suffire.' },
       { question: 'Comment valider une idée d\'ebook ?', answer: 'Vérifiez le volume de recherche du mot-clé principal, analysez la concurrence sur Amazon et évaluez les avis des livres existants.' },
       { question: 'Faut-il écrire un long ebook pour qu\'il se vende ?', answer: 'Non, la qualité prime sur la quantité. Un ebook de 50-80 pages bien structuré peut très bien se vendre s\'il apporte de la valeur.' },
@@ -284,10 +284,10 @@ Ces 50 idées ne sont qu'un point de départ. Utilisez EbookStudio Pro pour vali
   },
   {
     slug: 'ebookstudio-pro-avis',
-    title: 'EbookStudio Pro : Avis Complet, Fonctionnalités et Test 2026',
-    metaTitle: 'EbookStudio Pro : Avis et Test Complet 2026 | Générateur d\'Ebooks IA',
-    metaDescription: 'Test complet d\'EbookStudio Pro : workflow 15 agents IA, Gemini 3 Flash, audiobooks Azure, export KDP. Avis honnête et fonctionnalités détaillées.',
-    excerpt: 'Test complet d\'EbookStudio Pro : workflow 15 agents IA, Gemini 3 Flash, audiobooks. Tout ce que vous devez savoir avant d\'investir 67€ à vie.',
+    title: 'Ebookstudio Pro V2 : Avis Complet, Fonctionnalités et Test 2026',
+    metaTitle: 'Ebookstudio Pro V2 : Avis et Test Complet 2026 | Générateur d\'Ebooks IA',
+    metaDescription: 'Test complet d\'Ebookstudio Pro V2 : workflow 15 agents IA, Gemini 3 Flash, audiobooks Azure, export KDP. Avis honnête et fonctionnalités détaillées.',
+    excerpt: 'Test complet d\'Ebookstudio Pro V2 : workflow 15 agents IA, Gemini 3 Flash, audiobooks. Tout ce que vous devez savoir avant d\'investir 67€ à vie.',
     category: 'Avis',
     readTime: '13 min',
     keyword: 'ebookstudio pro avis',
@@ -298,11 +298,11 @@ Ces 50 idées ne sont qu'un point de départ. Utilisez EbookStudio Pro pour vali
     iconName: 'Sparkles',
     content: `## Introduction
 
-EbookStudio Pro est l'une des plateformes francophones les plus complètes pour créer et publier des ebooks sur Amazon KDP avec l'intelligence artificielle. Après plusieurs mois d'utilisation intensive, voici notre test complet et honnête.
+Ebookstudio Pro V2 est l'une des plateformes francophones les plus complètes pour créer et publier des ebooks sur Amazon KDP avec l'intelligence artificielle. Après plusieurs mois d'utilisation intensive, voici notre test complet et honnête.
 
-## Qu'est-ce qu'EbookStudio Pro ?
+## Qu'est-ce qu'Ebookstudio Pro V2 ?
 
-EbookStudio Pro est un générateur d'ebooks IA tout-en-un qui combine **15 agents intelligents spécialisés** (P1 à P15) pour produire un manuscrit complet, formaté et prêt à publier sur Amazon KDP. À la différence d'un simple wrapper ChatGPT, la plateforme orchestre une véritable chaîne éditoriale professionnelle.
+Ebookstudio Pro V2 est un générateur d'ebooks IA tout-en-un qui combine **15 agents intelligents spécialisés** (P1 à P15) pour produire un manuscrit complet, formaté et prêt à publier sur Amazon KDP. À la différence d'un simple wrapper ChatGPT, la plateforme orchestre une véritable chaîne éditoriale professionnelle.
 
 ### Les technologies embarquées
 
@@ -313,7 +313,7 @@ EbookStudio Pro est un générateur d'ebooks IA tout-en-un qui combine **15 agen
 
 ## Le workflow 15 Agents : la pièce maîtresse
 
-C'est LA fonctionnalité qui distingue EbookStudio Pro de la concurrence. Chaque agent a un rôle précis :
+C'est LA fonctionnalité qui distingue Ebookstudio Pro V2 de la concurrence. Chaque agent a un rôle précis :
 
 1. **P1 - Architecte de Niche** : valide la rentabilité du sujet
 2. **P2 - Recherche KDP** : analyse les meilleures ventes Amazon
@@ -330,7 +330,7 @@ Cette approche multi-agents garantit une cohérence narrative impossible à obte
 ## Les fonctionnalités exclusives
 
 ### Studio Audiobook intégré
-EbookStudio est l'un des rares outils francophones à proposer un module audiobook complet : segmentation automatique, voix Azure premium, export MP3 haute définition, hébergement public avec page de vente intégrée et liens PayPal/Stripe.
+Ebookstudio Pro V2 est l'un des rares outils francophones à proposer un module audiobook complet : segmentation automatique, voix Azure premium, export MP3 haute définition, hébergement public avec page de vente intégrée et liens PayPal/Stripe.
 
 ### KDP Keyword Research
 Recherche de mots-clés Amazon en temps réel avec analyse de concurrence, scores BSR estimés et suggestions de niches sous-exploitées.
@@ -340,7 +340,7 @@ Diagnostic complet d'un ebook existant : conformité KDP, lisibilité, optimisat
 
 ## Combien ça coûte ?
 
-EbookStudio Pro est proposé à **67€ en paiement unique avec accès à vie**. Pas d'abonnement mensuel, pas de récurrence cachée. Vous payez une fois et bénéficiez de toutes les futures mises à jour gratuitement, avec une garantie satisfait ou remboursé de 30 jours.
+Ebookstudio Pro V2 est proposé à **67€ en paiement unique avec accès à vie**. Pas d'abonnement mensuel, pas de récurrence cachée. Vous payez une fois et bénéficiez de toutes les futures mises à jour gratuitement, avec une garantie satisfait ou remboursé de 30 jours.
 
 C'est l'un des modèles tarifaires les plus honnêtes du marché : la plupart des concurrents (Sudowrite, Jasper, KDP Rocket) facturent entre 30 et 100€ par mois.
 
@@ -361,17 +361,17 @@ C'est l'un des modèles tarifaires les plus honnêtes du marché : la plupart de
 
 ## Pour qui ?
 
-EbookStudio Pro s'adresse en priorité aux :
+Ebookstudio Pro V2 s'adresse en priorité aux :
 - **Auteurs auto-édités** qui veulent publier régulièrement sans y passer 200h
 - **Coachs et experts** qui souhaitent transformer leur expertise en livre
 - **Entrepreneurs** qui utilisent l'ebook comme aimant à prospects ou produit d'appel
 
 ## Conclusion
 
-EbookStudio Pro tient ses promesses : c'est un générateur d'ebooks IA professionnel, pensé spécifiquement pour le marché Amazon KDP francophone. Le workflow 15 agents est la vraie innovation et le modèle 67€ à vie en fait l'un des meilleurs rapports qualité/prix du marché en 2026.`,
+Ebookstudio Pro V2 tient ses promesses : c'est un générateur d'ebooks IA professionnel, pensé spécifiquement pour le marché Amazon KDP francophone. Le workflow 15 agents est la vraie innovation et le modèle 67€ à vie en fait l'un des meilleurs rapports qualité/prix du marché en 2026.`,
     tableOfContents: [
       { id: 'introduction', title: 'Introduction', level: 2 },
-      { id: 'questce-quebookstudio-pro', title: 'Qu\'est-ce qu\'EbookStudio Pro ?', level: 2 },
+      { id: 'questce-quebookstudio-pro', title: 'Qu\'est-ce qu\'Ebookstudio Pro V2 ?', level: 2 },
       { id: 'le-workflow-15-agents-la-piece-maitresse', title: 'Le workflow 15 Agents', level: 2 },
       { id: 'les-fonctionnalites-exclusives', title: 'Fonctionnalités exclusives', level: 2 },
       { id: 'combien-ca-coute', title: 'Combien ça coûte ?', level: 2 },
@@ -382,17 +382,17 @@ EbookStudio Pro tient ses promesses : c'est un générateur d'ebooks IA professi
     ],
     relatedSlugs: ['auto-edition-amazon-kdp', 'kdp-pilot-strategie-publication'],
     faq: [
-      { question: 'EbookStudio Pro est-il vraiment à 67€ à vie ?', answer: 'Oui, c\'est un paiement unique. Aucun abonnement, aucune récurrence. Vous bénéficiez de toutes les futures mises à jour gratuitement, avec une garantie satisfait ou remboursé de 30 jours.' },
-      { question: 'Faut-il une clé API pour utiliser EbookStudio Pro ?', answer: 'Oui, vous utilisez votre propre clé API Gemini (gratuite chez Google AI Studio). Cela vous permet de garder le contrôle total sur vos consommations et de bénéficier du quota gratuit Google.' },
-      { question: 'Combien d\'ebooks puis-je créer avec EbookStudio Pro ?', answer: 'Aucune limite. Vous pouvez créer autant d\'ebooks que vous voulez, dans n\'importe quelle niche, en français ou en anglais.' },
+      { question: 'Ebookstudio Pro V2 est-il vraiment à 67€ à vie ?', answer: 'Oui, c\'est un paiement unique. Aucun abonnement, aucune récurrence. Vous bénéficiez de toutes les futures mises à jour gratuitement, avec une garantie satisfait ou remboursé de 30 jours.' },
+      { question: 'Faut-il une clé API pour utiliser Ebookstudio Pro V2 ?', answer: 'Oui, vous utilisez votre propre clé API Gemini (gratuite chez Google AI Studio). Cela vous permet de garder le contrôle total sur vos consommations et de bénéficier du quota gratuit Google.' },
+      { question: 'Combien d\'ebooks puis-je créer avec Ebookstudio Pro V2 ?', answer: 'Aucune limite. Vous pouvez créer autant d\'ebooks que vous voulez, dans n\'importe quelle niche, en français ou en anglais.' },
       { question: 'Le module audiobook est-il vraiment inclus ?', answer: 'Oui, le studio audiobook avec voix Azure neuronales est inclus dans le pack 67€. Vous pouvez générer, héberger et vendre vos audiobooks sans frais supplémentaires.' },
-      { question: 'EbookStudio Pro fonctionne-t-il pour l\'anglais ?', answer: 'Oui, la plateforme supporte 30+ langues, dont l\'anglais. Vous pouvez cibler aussi bien Amazon.fr qu\'Amazon.com.' },
+      { question: 'Ebookstudio Pro V2 fonctionne-t-il pour l\'anglais ?', answer: 'Oui, la plateforme supporte 30+ langues, dont l\'anglais. Vous pouvez cibler aussi bien Amazon.fr qu\'Amazon.com.' },
     ],
   },
   {
     slug: 'kdp-pilot-strategie-publication',
     title: 'KDP Pilot : La Stratégie de Publication Amazon qui Cartonne en 2026',
-    metaTitle: 'KDP Pilot : Stratégie de Publication Amazon 2026 | EbookStudio',
+    metaTitle: 'KDP Pilot : Stratégie de Publication Amazon 2026 | Ebookstudio Pro V2',
     metaDescription: 'Découvrez la méthode KDP Pilot : niches rentables, mots-clés Amazon, BSR, séries et lancement optimisé pour percer sur Kindle Direct Publishing.',
     excerpt: 'La méthode complète pour piloter votre lancement Amazon KDP : recherche de niches, mots-clés, BSR, séries et stratégie de revues.',
     category: 'Stratégie',
@@ -417,7 +417,7 @@ C'est l'étape la plus critique. 80% du succès d'un ebook se joue avant même l
 2. **Concurrence maîtrisable** : moins de 50 livres avec un BSR < 50 000
 3. **Pouvoir d'achat** : prix moyen des livres concurrents > 4€
 
-L'outil **KDP Keyword Research** d'EbookStudio Pro permet d'auditer ces 3 critères en quelques clics, en interrogeant directement l'API Amazon.
+L'outil **KDP Keyword Research** d'Ebookstudio Pro V2 permet d'auditer ces 3 critères en quelques clics, en interrogeant directement l'API Amazon.
 
 ## Phase 2 : Le pilotage des mots-clés
 
@@ -450,7 +450,7 @@ Les auteurs qui gagnent vraiment de l'argent sur KDP publient en série. Pourquo
 - **Algorithme favorable** : Amazon pousse les séries dans les recommandations
 - **Valeur perçue supérieure** : 5 livres à 7€ > 1 livre à 35€
 
-EbookStudio Pro intègre un module **Séries & Tomes** qui maintient la cohérence narrative et stylistique entre les volumes grâce à la "manuscript bible" partagée.
+Ebookstudio Pro V2 intègre un module **Séries & Tomes** qui maintient la cohérence narrative et stylistique entre les volumes grâce à la "manuscript bible" partagée.
 
 ## Phase 5 : Le funnel post-publication
 
@@ -478,11 +478,11 @@ Avec la méthode KDP Pilot appliquée rigoureusement :
 - **Mois 6** : 1 000-3 000€ (10+ livres en catalogue)
 - **Mois 12** : 3 000-10 000€/mois (catalogue mature avec séries)
 
-Ces chiffres sont des moyennes observées sur les utilisateurs actifs d'EbookStudio Pro. Certains font moins, d'autres beaucoup plus.
+Ces chiffres sont des moyennes observées sur les utilisateurs actifs d'Ebookstudio Pro V2. Certains font moins, d'autres beaucoup plus.
 
 ## Conclusion
 
-KDP Pilot n'est pas une méthode magique. C'est une discipline de publication qui transforme l'auto-édition Amazon en véritable business. Combinée à un outil comme EbookStudio Pro qui automatise la production, elle permet de construire un catalogue rentable en 6 à 12 mois.`,
+KDP Pilot n'est pas une méthode magique. C'est une discipline de publication qui transforme l'auto-édition Amazon en véritable business. Combinée à un outil comme Ebookstudio Pro V2 qui automatise la production, elle permet de construire un catalogue rentable en 6 à 12 mois.`,
     tableOfContents: [
       { id: 'introduction', title: 'Introduction', level: 2 },
       { id: 'phase-1-la-selection-de-niche-rentable', title: 'Phase 1 : Sélection de niche', level: 2 },
@@ -499,14 +499,14 @@ KDP Pilot n'est pas une méthode magique. C'est une discipline de publication qu
       { question: 'Combien de livres faut-il publier pour vivre du KDP ?', answer: 'En moyenne 15 à 25 livres bien positionnés permettent un revenu de 3 000€/mois. La méthode des séries accélère significativement ce résultat.' },
       { question: 'Le KDP Pilot fonctionne-t-il pour les non-fictions ?', answer: 'Oui, et même mieux. Les non-fictions ont des cycles de vie plus longs et des taux de conversion plus élevés que les fictions.' },
       { question: 'Faut-il un budget publicitaire Amazon Ads pour réussir ?', answer: 'Non, mais c\'est un accélérateur puissant. Un budget de 5€/jour bien optimisé peut multiplier vos ventes par 3.' },
-      { question: 'Combien de temps pour produire un ebook avec EbookStudio Pro ?', answer: 'Avec le workflow 15 agents, comptez 2 à 4 heures de travail effectif pour un ebook de 80-120 pages prêt à publier sur KDP.' },
+      { question: 'Combien de temps pour produire un ebook avec Ebookstudio Pro V2 ?', answer: 'Avec le workflow 15 agents, comptez 2 à 4 heures de travail effectif pour un ebook de 80-120 pages prêt à publier sur KDP.' },
       { question: 'KDP Select ou distribution élargie : que choisir ?', answer: 'KDP Select pour les 90 premiers jours (boost algorithmique + Kindle Unlimited), puis évaluation au cas par cas selon les performances.' },
     ],
   },
   {
     slug: 'audiobook-ia-amazon-acx',
     title: 'Créer un Audiobook IA en 2026 : Guide Complet (Amazon ACX, Audible)',
-    metaTitle: 'Créer un Audiobook IA 2026 : Guide Amazon ACX & Audible | EbookStudio',
+    metaTitle: 'Créer un Audiobook IA 2026 : Guide Amazon ACX & Audible | Ebookstudio Pro V2',
     metaDescription: 'Comment produire un audiobook professionnel avec l\'IA, le vendre sur votre site et préparer votre soumission Amazon ACX / Audible.',
     excerpt: 'Méthode complète pour créer, héberger et vendre un audiobook IA professionnel. Voix Azure, segmentation, hébergement, vente directe.',
     category: 'Audiobook',
@@ -540,7 +540,7 @@ Avant l'IA, un audiobook de 5h coûtait 2 500€ à produire (narrateur + studio
 - **Qualité** : excellente, indistinguable d'un humain pour 90% des auditeurs
 - **Prix** : très abordable
 - **Voix françaises** : Brigitte, Henri, Denise, Alain (toutes excellentes)
-- **Avantage** : intégré nativement dans EbookStudio Pro
+- **Avantage** : intégré nativement dans Ebookstudio Pro V2
 
 ### ElevenLabs
 - **Qualité** : la meilleure du marché pour les émotions
@@ -555,19 +555,19 @@ Avant l'IA, un audiobook de 5h coûtait 2 500€ à produire (narrateur + studio
 ## La méthode complète : de l'ebook à l'audiobook
 
 ### Étape 1 : Préparation du texte
-Le texte doit être nettoyé : suppression des marqueurs markdown, des citations entre parenthèses qui cassent le flow, des listes à puces converties en phrases. EbookStudio Pro automatise cette étape via son module **Audio Cleaning**.
+Le texte doit être nettoyé : suppression des marqueurs markdown, des citations entre parenthèses qui cassent le flow, des listes à puces converties en phrases. Ebookstudio Pro V2 automatise cette étape via son module **Audio Cleaning**.
 
 ### Étape 2 : Segmentation intelligente
 Un audiobook se découpe en chapitres de 10-25 minutes maximum. Au-delà, l'attention chute. La segmentation doit respecter les pauses narratives, pas couper au milieu d'une scène.
 
 ### Étape 3 : Génération multi-chunks
-Les API TTS limitent les requêtes à 2 000-5 000 caractères. EbookStudio Pro découpe automatiquement, génère, puis fusionne via FFmpeg.wasm directement dans le navigateur.
+Les API TTS limitent les requêtes à 2 000-5 000 caractères. Ebookstudio Pro V2 découpe automatiquement, génère, puis fusionne via FFmpeg.wasm directement dans le navigateur.
 
 ### Étape 4 : Intro professionnelle
 Une intro courte (10s) annonce le titre et l'auteur. Pas de jingle musical (Audible refuse), pas de blabla. Juste du contenu.
 
 ### Étape 5 : Export et hébergement
-EbookStudio Pro propose un hébergement public avec page de vente intégrée, lecteur audio teaser pour le public et accès complet réservé aux acheteurs après paiement Stripe ou PayPal.
+Ebookstudio Pro V2 propose un hébergement public avec page de vente intégrée, lecteur audio teaser pour le public et accès complet réservé aux acheteurs après paiement Stripe ou PayPal.
 
 ## Vendre son audiobook : 3 stratégies
 
@@ -601,7 +601,7 @@ Un catalogue de 10 audiobooks générant 30 ventes/mois chacun = 6 000€/mois d
 
 ## Conclusion
 
-L'audiobook IA n'est plus une expérimentation : c'est un canal de revenus mature, accessible et hautement rentable en 2026. Avec un outil intégré comme EbookStudio Pro qui gère production, hébergement et vente, vous pouvez lancer votre premier audiobook en moins d'une journée.`,
+L'audiobook IA n'est plus une expérimentation : c'est un canal de revenus mature, accessible et hautement rentable en 2026. Avec un outil intégré comme Ebookstudio Pro V2 qui gère production, hébergement et vente, vous pouvez lancer votre premier audiobook en moins d'une journée.`,
     tableOfContents: [
       { id: 'introduction', title: 'Introduction', level: 2 },
       { id: 'pourquoi-se-lancer-dans-laudiobook', title: 'Pourquoi se lancer ?', level: 2 },
@@ -615,10 +615,10 @@ L'audiobook IA n'est plus une expérimentation : c'est un canal de revenus matur
     relatedSlugs: ['ebookstudio-pro-avis', 'gagner-argent-ebook'],
     faq: [
       { question: 'Amazon ACX accepte-t-il les audiobooks IA en 2026 ?', answer: 'Oui, avec déclaration obligatoire. Audible a assoupli ses règles fin 2025 mais exige la transparence sur l\'usage de l\'IA dans la narration.' },
-      { question: 'Combien de temps pour produire un audiobook de 5h ?', answer: 'Avec EbookStudio Pro et les voix Azure, comptez 1 à 2 heures de génération + 30 minutes de validation.' },
+      { question: 'Combien de temps pour produire un audiobook de 5h ?', answer: 'Avec Ebookstudio Pro V2 et les voix Azure, comptez 1 à 2 heures de génération + 30 minutes de validation.' },
       { question: 'Les voix IA sonnent-elles vraiment naturelles ?', answer: 'En 2026, les voix Azure Neural et ElevenLabs sont indistinguables d\'un humain pour 90% des auditeurs lors de tests à l\'aveugle.' },
       { question: 'Vente directe ou Audible : que choisir ?', answer: 'Vente directe pour les audiences existantes (marge 100%). Audible pour la visibilité si vous partez de zéro. L\'idéal : les deux en parallèle.' },
-      { question: 'Faut-il payer ElevenLabs pour avoir une bonne qualité ?', answer: 'Non. Les voix Azure Neural intégrées dans EbookStudio Pro offrent une qualité comparable pour une fraction du coût.' },
+      { question: 'Faut-il payer ElevenLabs pour avoir une bonne qualité ?', answer: 'Non. Les voix Azure Neural intégrées dans Ebookstudio Pro V2 offrent une qualité comparable pour une fraction du coût.' },
     ],
   },
 ];

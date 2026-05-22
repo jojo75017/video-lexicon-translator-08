@@ -12,10 +12,10 @@ import { toast } from 'sonner';
 // SEO Meta + Schema.org FAQ pour la page
 const useFaqSeo = (faqItems: { question: string; answer: string }[]) => {
   useEffect(() => {
-    document.title = "FAQ & Assistance - EbookStudio Pro | Support Client";
+    document.title = "FAQ & Assistance - Ebookstudio Pro V2 | Support Client";
     const metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription) {
-      metaDescription.setAttribute("content", "Besoin d'aide avec EbookStudio Pro ? Trouvez des réponses à vos questions sur l'accès, le paiement, l'utilisation du générateur d'ebook IA. Support client réactif.");
+      metaDescription.setAttribute("content", "Besoin d'aide avec Ebookstudio Pro V2 ? Trouvez des réponses à vos questions sur l'accès, le paiement, l'utilisation du générateur d'ebook IA. Support client réactif.");
     }
     
     // Schema.org FAQPage pour SEO
@@ -131,7 +131,7 @@ Aucune question posée, aucune justification nécessaire.`
     {
       category: 'usage',
       question: "Comment fonctionne le générateur d'ebook ?",
-      answer: `EbookStudio Pro utilise un workflow éditorial en 14 étapes :
+      answer: `Ebookstudio Pro V2 utilise un workflow éditorial en 14 étapes :
 
 1. **Directeur Éditorial** - Analyse votre sujet et audience
 2. **Analyse Marché** - Identifie les mots-clés KDP rentables
@@ -157,7 +157,7 @@ La seule limite est votre imagination !`
     {
       category: 'usage',
       question: "Comment fonctionne l'IA Gemini 3 Flash ?",
-      answer: `EbookStudio utilise l'IA Gemini 3 Flash de Google - plus rapide et moins chère que les alternatives :
+      answer: `Ebookstudio Pro V2 utilise l'IA Gemini 3 Flash de Google - plus rapide et moins chère que les alternatives :
 
 **Configuration en 2 minutes :**
 1. Créez un compte gratuit sur Google AI Studio
@@ -168,8 +168,8 @@ La seule limite est votre imagination !`
     },
     {
       category: 'technical',
-      question: "Sur quels appareils puis-je utiliser EbookStudio Pro ?",
-      answer: `EbookStudio Pro fonctionne sur tous les appareils avec un navigateur web :
+      question: "Sur quels appareils puis-je utiliser Ebookstudio Pro V2 ?",
+      answer: `Ebookstudio Pro V2 fonctionne sur tous les appareils avec un navigateur web :
 
 ✅ Ordinateur (Windows, Mac, Linux)
 ✅ Tablette (iPad, Android)
@@ -384,7 +384,7 @@ Vos ebooks vous appartiennent à 100%.`
               <Button 
                 variant="secondary" 
                 size="lg"
-                onClick={() => window.location.href = 'mailto:boubetgeorges@gmail.com?subject=Assistance EbookStudio Pro'}
+                onClick={() => window.location.href = 'mailto:boubetgeorges@gmail.com?subject=Assistance Ebookstudio Pro V2'}
                 className="gap-2"
               >
                 <Mail className="h-5 w-5" />
@@ -402,7 +402,7 @@ Vos ebooks vous appartiennent à 100%.`
             onClick={() => navigate('/offres')}
             className="bg-gradient-to-r from-primary to-fuchsia-500 hover:opacity-90"
           >
-            Découvrir EbookStudio Pro → 67€ à vie
+            Découvrir Ebookstudio Pro V2 → 67€ à vie
           </Button>
         </div>
       </div>

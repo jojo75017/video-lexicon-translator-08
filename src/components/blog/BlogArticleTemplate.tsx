@@ -42,7 +42,7 @@ const FaqSection = ({ faq }: { faq: BlogArticle['faq'] }) => (
 const CtaBanner = () => (
   <div className="my-10 bg-primary/5 border border-primary/20 rounded-xl p-6 text-center">
     <h3 className="text-xl font-bold text-foreground mb-2">🚀 Prêt à créer votre ebook ?</h3>
-    <p className="text-muted-foreground mb-4 text-sm">EbookStudio Pro génère des ebooks professionnels avec l'IA en quelques minutes.</p>
+    <p className="text-muted-foreground mb-4 text-sm">Ebookstudio Pro V2 génère des ebooks professionnels avec l'IA en quelques minutes.</p>
     <div className="flex flex-col sm:flex-row gap-3 justify-center">
       <Link to="/demo"><Button variant="outline">Essai gratuit</Button></Link>
       <Link to="/offres"><Button>Voir les offres <ArrowRight className="w-4 h-4 ml-2" /></Button></Link>
@@ -79,7 +79,7 @@ const BlogArticleTemplate = () => {
   if (!article) return <Navigate to="/blog" replace />;
 
   const faqSchema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: article.faq.map((item) => ({ '@type': 'Question', name: item.question, acceptedAnswer: { '@type': 'Answer', text: item.answer } })) };
-  const articleSchema = { '@context': 'https://schema.org', '@type': 'BlogPosting', headline: article.title, description: article.metaDescription, url: `https://ebookstudio.fr/blog/${article.slug}`, datePublished: article.dateISO, dateModified: article.dateISO, author: { '@type': 'Organization', name: 'EbookStudio Pro' }, publisher: { '@type': 'Organization', name: 'EbookStudio Pro', url: 'https://ebookstudio.fr' }, mainEntityOfPage: `https://ebookstudio.fr/blog/${article.slug}` };
+  const articleSchema = { '@context': 'https://schema.org', '@type': 'BlogPosting', headline: article.title, description: article.metaDescription, url: `https://ebookstudio.fr/blog/${article.slug}`, datePublished: article.dateISO, dateModified: article.dateISO, author: { '@type': 'Organization', name: 'Ebookstudio Pro V2' }, publisher: { '@type': 'Organization', name: 'Ebookstudio Pro V2', url: 'https://ebookstudio.fr' }, mainEntityOfPage: `https://ebookstudio.fr/blog/${article.slug}` };
   const breadcrumbSchema = { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [ { '@type': 'ListItem', position: 1, name: 'Accueil', item: 'https://ebookstudio.fr' }, { '@type': 'ListItem', position: 2, name: 'Blog', item: 'https://ebookstudio.fr/blog' }, { '@type': 'ListItem', position: 3, name: article.title, item: `https://ebookstudio.fr/blog/${article.slug}` } ] };
 
   return (
@@ -103,7 +103,7 @@ const BlogArticleTemplate = () => {
           <div className="container mx-auto px-4 py-4 flex items-center justify-between gap-3">
             <Link to="/offres" className="flex items-center gap-2">
               <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center"><BookOpen className="w-5 h-5 text-primary-foreground" /></div>
-              <span className="text-xl font-bold text-foreground hidden sm:inline">EbookStudio Pro</span>
+              <span className="text-xl font-bold text-foreground hidden sm:inline">Ebookstudio Pro V2</span>
             </Link>
             <nav className="hidden md:flex items-center gap-6">
               <Link to="/offres" onClick={() => { import('@/utils/analytics').then(m => m.trackOffresClick('article_nav')); }} className="text-muted-foreground hover:text-foreground transition-colors">Accueil</Link>
@@ -198,7 +198,7 @@ const BlogArticleTemplate = () => {
         </article>
 
         <footer className="border-t border-border py-8 bg-muted/30">
-          <div className="container mx-auto px-4 text-center text-muted-foreground text-sm">© 2025 EbookStudio Pro. Tous droits réservés.</div>
+          <div className="container mx-auto px-4 text-center text-muted-foreground text-sm">© 2025 Ebookstudio Pro V2. Tous droits réservés.</div>
         </footer>
       </div>
     </>

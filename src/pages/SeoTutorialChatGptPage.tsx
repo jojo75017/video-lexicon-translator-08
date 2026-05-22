@@ -212,7 +212,7 @@ const SeoTutorialChatGptPage = () => {
             🚀 Solution Tout-en-Un
           </Badge>
           <h2 className="text-2xl md:text-3xl font-bold mb-4">
-            Automatisez Tout le Processus avec EbookStudio
+            Automatisez Tout le Processus avec Ebookstudio Pro V2
           </h2>
           <p className="text-lg text-foreground mb-8 max-w-2xl mx-auto">
             Pourquoi jongler avec ChatGPT quand vous pouvez avoir un <strong>générateur de livre IA professionnel</strong> 
@@ -231,7 +231,7 @@ const SeoTutorialChatGptPage = () => {
             ))}
           </div>
           <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-bold" onClick={() => navigate("/offres")}>
-            Découvrir EbookStudio <ArrowRight className="ml-2 h-5 w-5" />
+            Découvrir Ebookstudio Pro V2 <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </div>
       </section>
@@ -310,7 +310,7 @@ const SeoTutorialChatGptPage = () => {
             </div>
           </div>
           <div className="border-t border-border pt-6 text-center text-sm">
-            <p className="text-muted-foreground">© 2025 EbookStudio Pro - Comment écrire un livre avec ChatGPT</p>
+            <p className="text-muted-foreground">© 2025 Ebookstudio Pro V2 - Comment écrire un livre avec ChatGPT</p>
           </div>
         </div>
       </footer>

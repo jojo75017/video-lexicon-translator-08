@@ -15,7 +15,7 @@ const testimonials = [
   {
     name: "Thomas R.",
     avatar: "TR",
-    quote: "J'ai publié 8 ebooks en 2 mois avec EbookStudio. L'audiobook intégré m'a fait gagner 40% de ventes en plus sur ACX.",
+    quote: "J'ai publié 8 ebooks en 2 mois avec Ebookstudio Pro V2. L'audiobook intégré m'a fait gagner 40% de ventes en plus sur ACX.",
     bsr: "#1 850",
     revenue: "580€/mois",
     category: "Business & Finances",
@@ -46,7 +46,7 @@ const KdpTestimonials: React.FC = () => {
             Résultats <span className="text-primary">réels</span> de nos utilisateurs
           </h2>
           <p className="text-muted-foreground text-lg">
-            Des auteurs KDP qui génèrent des revenus passifs grâce à EbookStudio Pro
+            Des auteurs KDP qui génèrent des revenus passifs grâce à Ebookstudio Pro V2
           </p>
         </motion.div>
 

@@ -43,7 +43,7 @@ const PromoDecouvertePage = () => {
   ];
 
   const faq = [
-    { q: 'Faut-il être écrivain pour utiliser EbookStudio ?', a: 'Non. L\'IA rédige pour vous, vous gardez la main sur le ton, le sujet et la structure.' },
+    { q: 'Faut-il être écrivain pour utiliser Ebookstudio Pro V2 ?', a: 'Non. L\'IA rédige pour vous, vous gardez la main sur le ton, le sujet et la structure.' },
     { q: 'Les ebooks sont-ils acceptés sur Amazon KDP ?', a: 'Oui. Tous nos exports respectent les normes KDP (typographie, dimensions, Modulo 10).' },
     { q: 'Combien d\'ebooks puis-je créer ?', a: 'Illimité, à vie, avec votre accès. Jusqu\'à 40 chapitres par projet.' },
     { q: 'Y a-t-il une garantie ?', a: 'Oui, satisfait ou remboursé sous 7 jours.' },
@@ -53,15 +53,15 @@ const PromoDecouvertePage = () => {
   return (
     <FunnelLayout>
       <SeoHead
-        title="EbookStudio - Créez et publiez des ebooks rentables avec l'IA"
+        title="Ebookstudio Pro V2 - Créez et publiez des ebooks rentables avec l'IA"
         description="Plan, chapitres, couverture, mots-clés Amazon : créez un ebook prêt pour KDP en 30 minutes grâce à l'IA. Essai sans risque."
         canonical="/promo/decouverte"
         jsonLd={{
           '@context': 'https://schema.org',
           '@type': 'Product',
-          name: 'EbookStudio',
+          name: 'Ebookstudio Pro V2',
           description: 'Outil IA tout-en-un pour créer et publier des ebooks rentables sur Amazon KDP.',
-          brand: { '@type': 'Brand', name: 'EbookStudio' },
+          brand: { '@type': 'Brand', name: 'Ebookstudio Pro V2' },
           offers: { '@type': 'Offer', price, priceCurrency: 'EUR', availability: 'https://schema.org/InStock' },
           aggregateRating: { '@type': 'AggregateRating', ratingValue: '4.9', reviewCount: '127' },
         }}
@@ -82,13 +82,13 @@ const PromoDecouvertePage = () => {
       <section className="bg-gradient-to-b from-[#008296]/5 to-transparent">
         <div className="max-w-5xl mx-auto px-4 py-16 md:py-24 text-center space-y-6">
           <span className="inline-block bg-[#FF9E2D]/10 text-[#FF9E2D] px-3 py-1 rounded-full text-sm font-semibold">
-            ✨ Nouveau - Pipeline 15 agents IA · EbookStudio V2
+            ✨ Nouveau - Pipeline 15 agents IA · Ebookstudio Pro V2
           </span>
           <h1 className="text-4xl md:text-6xl font-bold leading-tight">
             Créez un <span className="text-[#008296]">ebook rentable</span> en 30 minutes
           </h1>
           <p className="text-xl text-gray-700 max-w-2xl mx-auto">
-            EbookStudio génère plan, chapitres, couverture, mots-clés Amazon et fichiers KDP-compliant. Sans ligne d'écriture.
+            Ebookstudio Pro V2 génère plan, chapitres, couverture, mots-clés Amazon et fichiers KDP-compliant. Sans ligne d'écriture.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
             <Link to={offerActive ? "/coaching-vip" : "/promo/commande"}>
@@ -113,7 +113,7 @@ const PromoDecouvertePage = () => {
           Vous avez une idée d'ebook. Vous ouvrez Word. Page blanche. Trois semaines plus tard, vous abandonnez. C'est ce qui arrive à <strong>9 personnes sur 10</strong> qui veulent vivre de leurs livres.
         </p>
         <p className="text-lg text-gray-700">
-          EbookStudio a été créé pour briser ce mur. Notre pipeline de 15 agents IA spécialisés (plan, chapitres, dialogue, SEO Amazon, couverture…) écrit votre ebook avec vous, étape par étape, en respectant votre style.
+          Ebookstudio Pro V2 a été créé pour briser ce mur. Notre pipeline de 15 agents IA spécialisés (plan, chapitres, dialogue, SEO Amazon, couverture…) écrit votre ebook avec vous, étape par étape, en respectant votre style.
         </p>
         <p className="text-lg text-gray-700">
           Résultat&nbsp;: un ebook complet, original, prêt à publier sur Amazon KDP. Et qui peut générer des revenus passifs pendant des années.
@@ -161,7 +161,7 @@ const PromoDecouvertePage = () => {
       {/* TESTIMONIALS */}
       <section className="bg-[#008296]/5 py-16">
         <div className="max-w-5xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">Ils ont publié grâce à EbookStudio</h2>
+          <h2 className="text-3xl font-bold text-center mb-12">Ils ont publié grâce à Ebookstudio Pro V2</h2>
           <div className="grid md:grid-cols-3 gap-6">
             {testimonials.map((t) => (
               <div key={t.name} className="bg-white rounded-xl p-6 shadow-sm">
@@ -261,7 +261,7 @@ const PromoDecouvertePage = () => {
       <section className="bg-[#232F3E] text-white py-16">
         <div className="max-w-3xl mx-auto px-4 text-center space-y-6">
           <h2 className="text-3xl md:text-4xl font-bold">Votre prochain ebook commence aujourd'hui</h2>
-          <p className="text-lg opacity-90">Rejoignez les centaines d'auteurs qui publient avec EbookStudio.</p>
+          <p className="text-lg opacity-90">Rejoignez les centaines d'auteurs qui publient avec Ebookstudio Pro V2.</p>
           <Link to={offerActive ? "/coaching-vip" : "/promo/commande"}>
             <Button className="bg-[#FF9E2D] hover:bg-[#e88f1f] text-white font-bold py-6 px-8 text-base">
               🚀 Commander — {price}€ à vie

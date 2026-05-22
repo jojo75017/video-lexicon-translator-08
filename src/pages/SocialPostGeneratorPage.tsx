@@ -63,7 +63,7 @@ const SocialPostGeneratorPage = () => {
 
 Génère EXACTEMENT 2 posts pour ${PLATFORM_CONFIG[customPlatform].label}.
 
-Contexte : EbookStudio Pro - générateur d'ebooks IA. 150 pages en 47 min pour ~0,30€. 35+ livres publiés par Georges Boubet.
+Contexte : Ebookstudio Pro V2 - générateur d'ebooks IA. 150 pages en 47 min pour ~0,30€. 35+ livres publiés par Georges Boubet.
 
 Liens :
 - Démo : ${DEMO_LINK}

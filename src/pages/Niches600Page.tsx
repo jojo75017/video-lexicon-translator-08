@@ -195,7 +195,7 @@ export default function Niches600Page() {
 
         <div className="text-center mt-8 text-sm text-gray-500 flex items-center justify-center gap-2">
           <Sparkles className="w-4 h-4 text-[#FF9E2D]" />
-          Liste actualisée — Mai 2026 — EbookStudio V2
+          Liste actualisée — Mai 2026 — Ebookstudio Pro V2
         </div>
       </div>
     </div>

@@ -190,7 +190,7 @@ const PdfKdpReformatter: React.FC = () => {
         '',
         '---',
         '',
-        'Reformate aux normes KDP avec EbookStudio Pro',
+        'Reformate aux normes KDP avec Ebookstudio Pro V2',
       ];
 
       let copyrightY = safeAreaTop + 50;
@@ -271,7 +271,7 @@ const PdfKdpReformatter: React.FC = () => {
         '',
         '---',
         '',
-        'Reformate avec EbookStudio Pro',
+        'Reformate avec Ebookstudio Pro V2',
       ];
 
       let aboutY = safeAreaTop + 40;

@@ -12,7 +12,7 @@ const articles = [
   { slug: '/blog/auto-edition-amazon-kdp', title: 'Auto-édition Amazon KDP : Le Guide Ultime 2025', excerpt: 'Tout ce qu\'il faut savoir pour réussir son auto-édition sur Amazon KDP. Formatage, prix, catégories et stratégies de lancement.', category: 'Guide', readTime: '15 min', keyword: 'auto édition amazon kdp', searchVolume: 880, icon: PenTool, gradient: 'from-rose-500 to-pink-500', date: '14 Janvier 2025' },
   { slug: '/blog/gagner-argent-ebook', title: 'Gagner de l\'Argent avec les Ebooks : Stratégies Rentables', excerpt: 'Découvrez comment générer des revenus passifs avec vos ebooks. Niches rentables, pricing et techniques de vente sur Amazon.', category: 'Monétisation', readTime: '11 min', keyword: 'gagner argent ebook', searchVolume: 590, icon: DollarSign, gradient: 'from-emerald-500 to-teal-500', date: '14 Janvier 2025' },
   { slug: '/blog/idees-ebook-rentables', title: '50 Idées d\'Ebooks Rentables à Créer en 2025', excerpt: 'Liste complète d\'idées de niches et sujets d\'ebooks qui se vendent bien sur Amazon KDP. Inspirez-vous pour votre prochain bestseller.', category: 'Inspiration', readTime: '9 min', keyword: 'idées ebook rentables', searchVolume: 390, icon: Lightbulb, gradient: 'from-indigo-500 to-blue-500', date: '14 Janvier 2025' },
-  { slug: '/blog/ebookstudio-pro-avis', title: 'EbookStudio Pro : Avis Complet, Fonctionnalités et Test 2026', excerpt: 'Test complet : workflow 15 agents IA, Gemini 3 Flash, audiobooks Azure, export KDP. Avis honnête sur le pack 67€ à vie.', category: 'Avis', readTime: '13 min', keyword: 'ebookstudio pro avis', searchVolume: 320, icon: Sparkles, gradient: 'from-amber-500 to-orange-500', date: '1 Mai 2026' },
+  { slug: '/blog/ebookstudio-pro-avis', title: 'Ebookstudio Pro V2 : Avis Complet, Fonctionnalités et Test 2026', excerpt: 'Test complet : workflow 15 agents IA, Gemini 3 Flash, audiobooks Azure, export KDP. Avis honnête sur le pack 67€ à vie.', category: 'Avis', readTime: '13 min', keyword: 'ebookstudio pro avis', searchVolume: 320, icon: Sparkles, gradient: 'from-amber-500 to-orange-500', date: '1 Mai 2026' },
   { slug: '/blog/kdp-pilot-strategie-publication', title: 'KDP Pilot : La Stratégie de Publication Amazon qui Cartonne en 2026', excerpt: 'Méthode complète : sélection de niches, mots-clés Amazon, BSR, séries et lancement optimisé pour percer sur Kindle Direct Publishing.', category: 'Stratégie', readTime: '14 min', keyword: 'kdp pilot stratégie', searchVolume: 410, icon: Target, gradient: 'from-violet-500 to-purple-600', date: '1 Mai 2026' },
   { slug: '/blog/audiobook-ia-amazon-acx', title: 'Créer un Audiobook IA en 2026 : Guide Complet (Amazon ACX, Audible)', excerpt: 'Méthode complète pour créer, héberger et vendre un audiobook IA professionnel. Voix Azure, segmentation, ACX et vente directe.', category: 'Audiobook', readTime: '12 min', keyword: 'créer audiobook ia', searchVolume: 480, icon: Headphones, gradient: 'from-cyan-500 to-blue-600', date: '1 Mai 2026' },
 ];
@@ -21,20 +21,20 @@ const BlogPage = () => {
   return (
     <>
       <Helmet>
-        <title>Blog EbookStudio Pro - Guides IA pour Créer des Ebooks | Tutoriels KDP</title>
+        <title>Blog Ebookstudio Pro V2 - Guides IA pour Créer des Ebooks | Tutoriels KDP</title>
         <meta name="description" content="Découvrez nos guides complets pour créer des ebooks avec l'IA. Tutoriels ChatGPT, astuces KDP et stratégies de publication Amazon." />
         <meta name="keywords" content="blog ebook ia, tutoriel chatgpt livre, guide kdp amazon, créer ebook intelligence artificielle" />
         <link rel="canonical" href="https://ebookstudio.fr/blog" />
-        <meta property="og:title" content="Blog EbookStudio Pro - Guides IA pour Créer des Ebooks" />
+        <meta property="og:title" content="Blog Ebookstudio Pro V2 - Guides IA pour Créer des Ebooks" />
         <meta property="og:description" content="Guides complets pour créer des ebooks avec l'IA. Tutoriels ChatGPT et stratégies KDP." />
         <meta property="og:url" content="https://ebookstudio.fr/blog" />
         <meta property="og:type" content="website" />
         <script type="application/ld+json">
           {JSON.stringify({
-            "@context": "https://schema.org", "@type": "Blog", "name": "Blog EbookStudio Pro",
+            "@context": "https://schema.org", "@type": "Blog", "name": "Blog Ebookstudio Pro V2",
             "description": "Guides et tutoriels pour créer des ebooks avec l'intelligence artificielle",
             "url": "https://ebookstudio.fr/blog",
-            "publisher": { "@type": "Organization", "name": "EbookStudio Pro", "url": "https://ebookstudio.fr" },
+            "publisher": { "@type": "Organization", "name": "Ebookstudio Pro V2", "url": "https://ebookstudio.fr" },
             "blogPost": articles.map(article => ({ "@type": "BlogPosting", "headline": article.title, "description": article.excerpt, "url": `https://ebookstudio.fr${article.slug}`, "datePublished": "2025-01-13" }))
           })}
         </script>
@@ -48,7 +48,7 @@ const BlogPage = () => {
               <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
                 <BookOpen className="w-5 h-5 text-primary-foreground" />
               </div>
-              <span className="text-xl font-bold text-foreground">EbookStudio Pro</span>
+              <span className="text-xl font-bold text-foreground">Ebookstudio Pro V2</span>
             </Link>
             <nav className="hidden md:flex items-center gap-6">
               <Link to="/offres" onClick={() => { import('@/utils/analytics').then(m => m.trackOffresClick('blog_nav')); }} className="text-muted-foreground hover:text-foreground transition-colors">Accueil</Link>
@@ -76,7 +76,7 @@ const BlogPage = () => {
           <div className="container mx-auto px-4 text-center">
             <Badge className="mb-6 bg-primary/10 text-primary border-primary/30">📚 Ressources & Guides</Badge>
             <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6">
-              Blog <span className="text-primary">EbookStudio Pro</span>
+              Blog <span className="text-primary">Ebookstudio Pro V2</span>
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
               Guides complets, tutoriels et stratégies pour créer des ebooks professionnels avec l'intelligence artificielle
@@ -197,7 +197,7 @@ const BlogPage = () => {
               <div>
                 <div className="flex items-center gap-2 mb-4">
                   <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center"><BookOpen className="w-4 h-4 text-primary-foreground" /></div>
-                  <span className="font-bold text-foreground">EbookStudio Pro</span>
+                  <span className="font-bold text-foreground">Ebookstudio Pro V2</span>
                 </div>
                 <p className="text-muted-foreground text-sm">Le générateur d'ebooks IA le plus complet pour publier sur Amazon KDP.</p>
               </div>
@@ -226,7 +226,7 @@ const BlogPage = () => {
                 </ul>
               </div>
             </div>
-            <div className="border-t border-border pt-8 text-center text-muted-foreground text-sm">© 2025 EbookStudio Pro. Tous droits réservés.</div>
+            <div className="border-t border-border pt-8 text-center text-muted-foreground text-sm">© 2025 Ebookstudio Pro V2. Tous droits réservés.</div>
           </div>
         </footer>
       </div>

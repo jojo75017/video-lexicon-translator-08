@@ -56,7 +56,7 @@ const ExtensionChromePage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-orange-50/40 to-white text-black">
       <Helmet>
-        <title>Extension Chrome KDP - Scanner Amazon Kindle gratuit | EbookStudio</title>
+        <title>Extension Chrome KDP - Scanner Amazon Kindle gratuit | Ebookstudio Pro V2</title>
         <meta name="description" content="Scanne n'importe quelle page Amazon Kindle : score de niche /100, ventes estimées, concurrence et verdict GO/À éviter. Extension Chrome 100% gratuite." />
         <link rel="canonical" href="https://www.ebookstudio.fr/extension-chrome" />
       </Helmet>
@@ -88,7 +88,7 @@ const ExtensionChromePage = () => {
               <span className="text-orange-500">en 1 clic</span>
             </h1>
             <p className="text-lg md:text-xl text-black/60 leading-relaxed max-w-3xl mx-auto">
-              Installe l'extension <span className="font-bold text-black">EbookStudio Scanner</span> sur Chrome et obtiens instantanément le 
+              Installe l'extension <span className="font-bold text-black">Ebookstudio Pro V2 Scanner</span> sur Chrome et obtiens instantanément le 
               potentiel d'une niche, le score de concurrence et les mots-clés gagnants 
               directement sur Amazon.
             </p>
@@ -198,7 +198,7 @@ const ExtensionChromePage = () => {
                     <div className="px-3 py-2.5 text-white relative" style={{ background: 'linear-gradient(135deg, #FF9E2D, #008296)' }}>
                       <div className="flex items-start justify-between">
                         <div>
-                          <div className="font-bold text-[13px] flex items-center gap-1.5">📚 EbookStudio</div>
+                          <div className="font-bold text-[13px] flex items-center gap-1.5">📚 Ebookstudio Pro V2</div>
                         </div>
                         <button className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[10px]">×</button>
                       </div>
@@ -286,7 +286,7 @@ const ExtensionChromePage = () => {
 
                     {/* CTA bottom */}
                     <button className="w-full bg-[#232F3E] hover:bg-[#FF9E2D] text-white text-[10px] font-bold py-2.5 transition-colors">
-                      Analyse complète sur EbookStudio →
+                      Analyse complète sur Ebookstudio Pro V2 →
                     </button>
                   </div>
                 </div>

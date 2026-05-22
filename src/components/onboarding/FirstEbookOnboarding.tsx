@@ -81,7 +81,7 @@ export const FirstEbookOnboarding = ({ subscriberEmail }: { subscriberEmail?: st
                 Étape 0 - Connectez votre IA
               </DialogTitle>
               <DialogDescription>
-                EbookStudio utilise Gemini de Google pour rédiger vos livres.
+                Ebookstudio Pro V2 utilise Gemini de Google pour rédiger vos livres.
                 C'est gratuit et prend 2 minutes.
               </DialogDescription>
             </DialogHeader>
@@ -139,7 +139,7 @@ export const FirstEbookOnboarding = ({ subscriberEmail }: { subscriberEmail?: st
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2 text-xl">
                 <Sparkles className="h-5 w-5 text-primary" />
-                Bienvenue sur EbookStudio Pro !
+                Bienvenue sur Ebookstudio Pro V2 !
               </DialogTitle>
               <DialogDescription>
                 Créez votre premier ebook professionnel en suivant 3 étapes simples.

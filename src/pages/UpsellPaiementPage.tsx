@@ -55,9 +55,9 @@ const UpsellPaiementPage = () => {
 
   const baseAmounts = { full: LAUNCH_PRICE, installment2: 35, installment3: 25 };
   const baseLabels = {
-    full: "EbookStudio Pro Lifetime",
-    installment2: "EbookStudio Pro (1/2)",
-    installment3: "EbookStudio Pro (1/3)",
+    full: "Ebookstudio Pro V2 Lifetime",
+    installment2: "Ebookstudio Pro V2 (1/2)",
+    installment3: "Ebookstudio Pro V2 (1/3)",
   };
 
   // Les add-ons s'ajoutent uniquement à la 1ère échéance (paiement initial)
@@ -128,7 +128,7 @@ const UpsellPaiementPage = () => {
                 </Badge>
               </div>
               <CardTitle className="text-2xl font-bold">Finalisez votre commande</CardTitle>
-              <p className="text-foreground/80 mt-1 text-sm">EbookStudio Pro - Accès à vie</p>
+              <p className="text-foreground/80 mt-1 text-sm">Ebookstudio Pro V2 - Accès à vie</p>
               <div className="mt-5 flex items-baseline justify-center gap-3">
                 <span className="text-xl text-muted-foreground line-through">{PLAN.originalPrice}€</span>
                 <span className="text-6xl font-black text-white">{PLAN.price}€</span>
@@ -421,7 +421,7 @@ const UpsellPaiementPage = () => {
                   <div>
                     <p className="text-emerald-300 font-semibold text-sm">Garantie 30 jours - Satisfait ou remboursé</p>
                     <p className="text-emerald-400/70 text-xs mt-1">
-                      Testez EbookStudio pendant 30 jours. Si vous ne publiez pas votre premier ebook, remboursement intégral. Aucune question posée.
+                      Testez Ebookstudio Pro V2 pendant 30 jours. Si vous ne publiez pas votre premier ebook, remboursement intégral. Aucune question posée.
                     </p>
                   </div>
                 </div>

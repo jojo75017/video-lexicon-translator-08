@@ -46,7 +46,7 @@ const SEATS = 10;
 const VIDEO_SRC = "/videos/coaching-vip-georges.mp4";
 
 const PAYPAL_LINK = `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=${PRICE}&currency_code=EUR&item_name=${encodeURIComponent(
-  "Coaching VIP 30 jours - EbookStudio"
+  "Coaching VIP 30 jours - Ebookstudio Pro V2"
 )}`;
 
 const inclusions = [
@@ -201,7 +201,7 @@ const CoachingVipPage = () => {
   return (
     <div className="min-h-screen bg-[#FAFAFA] text-[#232F3E] py-10 px-4">
       <Helmet>
-        <title>Coaching VIP 30 jours - 10 places à 47€ | EbookStudio</title>
+        <title>Coaching VIP 30 jours - 10 places à 47€ | Ebookstudio Pro V2</title>
         <meta
           name="description"
           content="Accompagnement privé de 30 jours avec Georges Boubet : 3 sessions Zoom, email perso, audit ebook. 10 places seulement à 47€ au lieu de 197€."

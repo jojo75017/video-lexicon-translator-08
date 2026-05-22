@@ -40,7 +40,7 @@ const AuthorShowcase: React.FC = () => {
           <h2 className="text-3xl md:text-4xl font-extrabold mb-3 text-foreground">
             ✨ Exemples réels d'ebooks publiés avec{' '}
             <span className="text-primary">
-              EbookStudio
+              Ebookstudio Pro V2
             </span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
@@ -55,7 +55,7 @@ const AuthorShowcase: React.FC = () => {
           <div className="rounded-2xl overflow-hidden border border-primary/20 shadow-2xl shadow-primary/10 hover:shadow-primary/20 transition-shadow duration-500">
             <img
               src={ebooksShowcase1}
-              alt="Ebooks publiés avec EbookStudio - Ce que la femme de ménage a vu, Revenu Passif 2025, Retour en Provence"
+              alt="Ebooks publiés avec Ebookstudio Pro V2 - Ce que la femme de ménage a vu, Revenu Passif 2025, Retour en Provence"
               className="w-full h-auto"
               loading="lazy"
             />
@@ -63,7 +63,7 @@ const AuthorShowcase: React.FC = () => {
           <div className="rounded-2xl overflow-hidden border border-primary/20 shadow-2xl shadow-primary/10 hover:shadow-primary/20 transition-shadow duration-500">
             <img
               src={ebooksShowcase2}
-              alt="Ebooks publiés avec EbookStudio - L'Appel des Ombres, Revenu Passif 2025, Bien-Être au Quotidien"
+              alt="Ebooks publiés avec Ebookstudio Pro V2 - L'Appel des Ombres, Revenu Passif 2025, Bien-Être au Quotidien"
               className="w-full h-auto"
               loading="lazy"
             />
@@ -74,7 +74,7 @@ const AuthorShowcase: React.FC = () => {
           {[
             '+ de 35 ebooks publiés',
             'Succès sur Amazon KDP',
-            'Créés avec EbookStudio Pro',
+            'Créés avec Ebookstudio Pro V2',
           ].map((text) => (
             <div key={text} className="flex items-center gap-2 text-muted-foreground">
               <CheckCircle2 className="w-4 h-4 text-primary" />
@@ -93,7 +93,7 @@ const AuthorShowcase: React.FC = () => {
             <ExternalLink className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
           </Button>
           <p className="text-xs text-muted-foreground mt-2">
-            S'ouvre dans un nouvel onglet - restez sur EbookStudio
+            S'ouvre dans un nouvel onglet - restez sur Ebookstudio Pro V2
           </p>
           <p className="text-xs text-muted-foreground mt-1">
             👉 Preuve réelle - résultats visibles publiquement.

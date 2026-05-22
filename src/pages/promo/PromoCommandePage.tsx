@@ -19,7 +19,7 @@ const schema = z.object({
   payment_method: z.enum(['stripe', 'paypal']),
 });
 
-const PRODUCT = { key: 'main', label: 'EbookStudio - Accès à vie', amount: 67 };
+const PRODUCT = { key: 'main', label: 'Ebookstudio Pro V2 - Accès à vie', amount: 67 };
 
 const PromoCommandePage = () => {
   useReferralTracking();
@@ -96,8 +96,8 @@ const PromoCommandePage = () => {
   return (
     <FunnelLayout>
       <SeoHead
-        title="Commande - EbookStudio"
-        description="Finalisez votre commande EbookStudio. Paiement carte sécurisé ou PayPal."
+        title="Commande - Ebookstudio Pro V2"
+        description="Finalisez votre commande Ebookstudio Pro V2. Paiement carte sécurisé ou PayPal."
         canonical="/promo/commande"
         noindex
       />

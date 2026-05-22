@@ -13,7 +13,7 @@ const MentionsLegales = () => (
       <div className="prose prose-sm dark:prose-invert max-w-none space-y-6">
         <section>
           <h2 className="text-xl font-bold">Éditeur du site</h2>
-          <p>EbookStudio Pro est édité par Georges Boubet, entrepreneur individuel.</p>
+          <p>Ebookstudio Pro V2 est édité par Georges Boubet, entrepreneur individuel.</p>
           <p>Email : boubetgeorges@gmail.com</p>
           <p>Siège social : France</p>
         </section>
@@ -30,7 +30,7 @@ const MentionsLegales = () => (
 
         <section>
           <h2 className="text-xl font-bold">Responsabilité</h2>
-          <p>Les ebooks générés via EbookStudio Pro sont la propriété de l'utilisateur. L'éditeur ne saurait être tenu responsable du contenu généré par l'IA.</p>
+          <p>Les ebooks générés via Ebookstudio Pro V2 sont la propriété de l'utilisateur. L'éditeur ne saurait être tenu responsable du contenu généré par l'IA.</p>
         </section>
 
         <section>

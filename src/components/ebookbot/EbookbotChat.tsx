@@ -186,7 +186,7 @@ const EbookbotChat = ({ variant = 'page', className }: EbookbotChatProps) => {
                 <li>🎯 Niches, BSR, mots-clés, catégories Amazon</li>
                 <li>✍️ Structure & écriture d'ebook</li>
                 <li>📈 Marketing, description Amazon, lancement</li>
-                <li>🛠️ Comment utiliser EbookStudio</li>
+                <li>🛠️ Comment utiliser Ebookstudio Pro V2</li>
               </ul>
             </div>
             <div>

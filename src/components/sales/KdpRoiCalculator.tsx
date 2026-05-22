@@ -64,7 +64,7 @@ export const KdpRoiCalculator: React.FC<KdpRoiCalculatorProps> = ({ onCtaClick }
             </div>
             <Slider value={[ebooksPerMonth]} onValueChange={(v) => setEbooksPerMonth(v[0])} min={1} max={10} step={1} />
             <p className="text-xs text-muted-foreground">
-              Avec EbookStudio Pro, créez un ebook complet en 2-3h au lieu de plusieurs semaines
+              Avec Ebookstudio Pro V2, créez un ebook complet en 2-3h au lieu de plusieurs semaines
             </p>
           </div>
 

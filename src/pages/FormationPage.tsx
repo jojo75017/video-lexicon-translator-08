@@ -73,7 +73,7 @@ const FormationPage = () => {
       content: `# Étape 0 : Configurer votre Clé API Gemini
 
 ## Pourquoi une clé API ?
-**EbookStudio utilise votre propre clé Gemini** pour générer du contenu. Cela vous donne le contrôle total sur vos coûts.
+**Ebookstudio Pro V2 utilise votre propre clé Gemini** pour générer du contenu. Cela vous donne le contrôle total sur vos coûts.
 
 ---
 
@@ -88,7 +88,7 @@ const FormationPage = () => {
 - Cliquez sur **"Create API Key"**
 - Copiez la clé (commence par "AIza...")
 
-### 3. Ajoutez-la dans EbookStudio
+### 3. Ajoutez-la dans Ebookstudio Pro V2
 - Allez dans **Mon Compte → Paramètres**
 - Collez votre clé dans le champ dédié
 - Cliquez sur **"Valider"**
@@ -549,7 +549,7 @@ ${module.content}
                 <div className="text-left">
                   <h1 className="text-3xl md:text-4xl font-black tracking-tight">
                     <span className="bg-gradient-to-r from-amber-300 via-orange-400 to-amber-300 bg-clip-text text-transparent">
-                      EbookStudio
+                      Ebookstudio Pro V2
                     </span>
                     <span className="bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
                       {' '}Pro
@@ -863,7 +863,7 @@ ${module.content}
                 </span>
               </div>
               <CardTitle className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary via-amber-500 to-orange-500 bg-clip-text text-transparent">
-                Ce que vous découvrirez dans EbookStudio Pro V2
+                Ce que vous découvrirez dans Ebookstudio Pro V2
               </CardTitle>
               <p className="text-muted-foreground mt-2 text-lg">
                 14 outils IA professionnels pour créer des ebooks de qualité éditoriale
@@ -923,7 +923,7 @@ ${module.content}
                   className="gap-3 px-8 py-6 text-lg font-semibold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 shadow-lg shadow-orange-500/25"
                 >
                   <Rocket className="h-5 w-5" />
-                  Accéder à EbookStudio Pro V2
+                  Accéder à Ebookstudio Pro V2
                   <ChevronRight className="h-5 w-5" />
                 </Button>
               </motion.div>

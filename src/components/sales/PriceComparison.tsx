@@ -61,7 +61,7 @@ const PriceComparison: React.FC = () => {
             💸 COMPARATIF PRIX DU MARCHÉ
           </span>
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
-            Combien coûte un ebook <span className="text-destructive line-through decoration-2">sans</span> EbookStudio ?
+            Combien coûte un ebook <span className="text-destructive line-through decoration-2">sans</span> Ebookstudio Pro V2 ?
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
             Voici ce que facturent les professionnels pour <strong>un seul</strong> ebook…

@@ -12,10 +12,10 @@ const HeroVideoTeaser = () => {
             Vidéo de présentation
           </Badge>
           <h2 className="text-2xl md:text-4xl font-bold text-foreground">
-            Découvrez <span className="text-primary">EbookStudio Pro</span> en vidéo
+            Découvrez <span className="text-primary">Ebookstudio Pro V2</span> en vidéo
           </h2>
           <p className="text-muted-foreground mt-3 max-w-2xl mx-auto">
-            Découvrez comment EbookStudio Pro automatise tout le workflow : du brief à la publication sur KDP.
+            Découvrez comment Ebookstudio Pro V2 automatise tout le workflow : du brief à la publication sur KDP.
           </p>
         </div>
 

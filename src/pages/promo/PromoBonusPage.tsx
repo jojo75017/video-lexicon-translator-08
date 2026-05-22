@@ -18,7 +18,7 @@ const UPSELLS = [
     benefits: [
       'Marque blanche illimitée',
       'Droits de revente complets',
-      'Pas de mention EbookStudio',
+      'Pas de mention Ebookstudio Pro V2',
       'Idéal pour agences & studios',
     ],
   },
@@ -66,7 +66,7 @@ const PromoBonusPage = () => {
   return (
     <FunnelLayout>
       <SeoHead
-        title="Boostez votre commande - Bonus EbookStudio"
+        title="Boostez votre commande - Bonus Ebookstudio Pro V2"
         description="Ajoutez la licence commerciale étendue ou le pack 50 templates premium à votre commande."
         canonical="/promo/bonus"
         noindex

@@ -167,7 +167,7 @@ const EbookGallery: React.FC = () => {
             Voyez ce que <span className="text-primary">vous allez créer</span>
           </h2>
           <p className="text-foreground/70 text-lg max-w-2xl mx-auto">
-            Chaque ebook ci-dessous a été créé avec EbookStudio. Cliquez pour voir la fiche complète :
+            Chaque ebook ci-dessous a été créé avec Ebookstudio Pro V2. Cliquez pour voir la fiche complète :
             description, mots-clés KDP et stats Amazon.
           </p>
         </motion.div>

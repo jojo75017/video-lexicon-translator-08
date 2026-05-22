@@ -10,7 +10,7 @@ const items = [
   },
   {
     q: "Et si je suis nul·le en informatique ?",
-    a: "Aucun souci ! Si tu sais utiliser un email, tu sais utiliser EbookStudio. Tout est guidé, l'IA fait le boulot technique, et on a des tutos vidéo pour chaque étape.",
+    a: "Aucun souci ! Si tu sais utiliser un email, tu sais utiliser Ebookstudio Pro V2. Tout est guidé, l'IA fait le boulot technique, et on a des tutos vidéo pour chaque étape.",
     color: "bg-joy-mint",
   },
   {

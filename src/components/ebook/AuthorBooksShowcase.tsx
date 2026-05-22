@@ -36,7 +36,7 @@ export const AuthorBooksShowcase: React.FC<Props> = ({ onStartWorkflow }) => {
           Vitrine auteur
         </div>
         <h3 className="text-2xl font-bold text-foreground">
-          Des livres déjà publiés sur Amazon avec EbookStudio
+          Des livres déjà publiés sur Amazon avec Ebookstudio Pro V2
         </h3>
         <p className="text-sm text-muted-foreground">
           6 titres signés <strong className="text-foreground">Georges Boubet</strong> - preuve que la méthode fonctionne.

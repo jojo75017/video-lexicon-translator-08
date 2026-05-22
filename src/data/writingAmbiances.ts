@@ -1,4 +1,4 @@
-// Ambiances d'écriture - 17 thèmes visuels originaux pour l'éditeur EbookStudio
+// Ambiances d'écriture - 17 thèmes visuels originaux pour l'éditeur Ebookstudio Pro V2
 // Inspiration: créer un confort visuel adapté au genre du livre.
 // Toutes les couleurs et noms sont originaux (pas de reprise d'un produit tiers).
 
@@ -32,7 +32,7 @@ export const WRITING_AMBIANCES: WritingAmbiance[] = [
   {
     id: 'atelier',
     name: 'Atelier',
-    tagline: 'Le confort EbookStudio par défaut',
+    tagline: 'Le confort Ebookstudio Pro V2 par défaut',
     category: 'claire',
     recommendedFor: 'Tout type de livre · usage quotidien',
     palette: {

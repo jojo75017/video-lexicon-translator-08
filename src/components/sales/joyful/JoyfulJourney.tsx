@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 
 const days = [
-  { day: "Jour 1", emoji: "💡", title: "Tu choisis ton sujet", desc: "Avec l'aide d'EbookStudio, tu trouves une niche qui te ressemble en 10 minutes." },
+  { day: "Jour 1", emoji: "💡", title: "Tu choisis ton sujet", desc: "Avec l'aide d'Ebookstudio Pro V2, tu trouves une niche qui te ressemble en 10 minutes." },
   { day: "Jour 2", emoji: "📝", title: "L'IA écrit ton plan", desc: "P1 (l'éditeur) bâtit le squelette. Tu ajustes ce que tu veux." },
   { day: "Jour 3-4", emoji: "✍️", title: "Rédaction express", desc: "Les agents P2 à P10 écrivent chapitre par chapitre. Toi tu relis et tu kiffes." },
   { day: "Jour 5", emoji: "🎨", title: "Couverture magique", desc: "Imagen 3 te génère une couverture pro en 30 secondes. Tu choisis ta préférée." },

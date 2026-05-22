@@ -186,7 +186,7 @@ export default function KdpAdsGuidePage() {
           <AlertTriangle className="h-4 w-4 text-amber-600" />
           <AlertTitle className="text-amber-900">À lire avant de commencer</AlertTitle>
           <AlertDescription className="text-amber-800">
-            Ce guide est <strong>éducatif uniquement</strong>. Aucune campagne n'est créée ni gérée depuis EbookStudio.
+            Ce guide est <strong>éducatif uniquement</strong>. Aucune campagne n'est créée ni gérée depuis Ebookstudio Pro V2.
             Tu dois te connecter à <a href="https://advertising.amazon.com" target="_blank" rel="noopener noreferrer" className="underline font-medium">advertising.amazon.com</a> pour appliquer ces conseils.
           </AlertDescription>
         </Alert>
@@ -262,7 +262,7 @@ export default function KdpAdsGuidePage() {
                 })}
                 <Alert className="border-[#008296] bg-[#008296]/5">
                   <CheckCircle2 className="h-4 w-4 text-[#008296]" />
-                  <AlertTitle className="text-[#008296]">Recommandation EbookStudio</AlertTitle>
+                  <AlertTitle className="text-[#008296]">Recommandation Ebookstudio Pro V2</AlertTitle>
                   <AlertDescription>
                     <strong>1 livre = 2 campagnes maximum :</strong> 1 auto (14 jours) + 1 manuelle exact match.
                     C'est tout. Le reste, c'est de la complexité inutile qui te fait perdre de l'argent.
@@ -565,7 +565,7 @@ export default function KdpAdsGuidePage() {
 
                 <Card className="bg-[#232F3E] text-white">
                   <CardContent className="pt-6">
-                    <h3 className="font-bold text-lg mb-2">🎯 Règle d'or EbookStudio</h3>
+                    <h3 className="font-bold text-lg mb-2">🎯 Règle d'or Ebookstudio Pro V2</h3>
                     <p className="text-sm opacity-90">
                       <strong>Mieux vaut 5 €/jour rentables pendant 6 mois que 50 €/jour à perte pendant 1 mois.</strong><br />
                       Les pubs Amazon ne sauvent pas un mauvais livre. Elles amplifient un bon livre.

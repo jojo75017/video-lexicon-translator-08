@@ -300,7 +300,7 @@ const PdfKdpAnalyzer: React.FC = () => {
       });
     }
 
-    doc.text('Genere par EbookStudio Pro - Analyseur KDP', 105, 285, { align: 'center' });
+    doc.text('Genere par Ebookstudio Pro V2 - Analyseur KDP', 105, 285, { align: 'center' });
     doc.save(`analyse-kdp-${fileName.replace(/\.pdf$/i, '')}.pdf`);
     toast.success('Rapport PDF téléchargé !');
   }, [pages, measurements, fileName]);

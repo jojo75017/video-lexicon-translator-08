@@ -64,7 +64,7 @@ const WhoIsThisFor = () => {
             Vous vous reconnaissez ?
           </motion.h2>
           <motion.p variants={fadeIn} custom={2} className="text-foreground/70 text-lg max-w-xl mx-auto">
-            EbookStudio est fait pour vous si…
+            Ebookstudio Pro V2 est fait pour vous si…
           </motion.p>
         </motion.div>
 

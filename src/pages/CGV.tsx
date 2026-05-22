@@ -13,7 +13,7 @@ const CGV = () => (
       <div className="prose prose-sm dark:prose-invert max-w-none space-y-6">
         <section>
           <h2 className="text-xl font-bold">Article 1 - Objet</h2>
-          <p>Les présentes CGV régissent la vente de l'accès à la plateforme EbookStudio Pro, outil de création d'ebooks assisté par intelligence artificielle.</p>
+          <p>Les présentes CGV régissent la vente de l'accès à la plateforme Ebookstudio Pro V2, outil de création d'ebooks assisté par intelligence artificielle.</p>
         </section>
 
         <section>
@@ -33,12 +33,12 @@ const CGV = () => (
 
         <section>
           <h2 className="text-xl font-bold">Article 5 - Propriété du contenu généré</h2>
-          <p>Les ebooks et contenus générés via EbookStudio Pro sont la propriété exclusive de l'utilisateur. L'utilisateur est libre de les publier, vendre ou distribuer comme il le souhaite.</p>
+          <p>Les ebooks et contenus générés via Ebookstudio Pro V2 sont la propriété exclusive de l'utilisateur. L'utilisateur est libre de les publier, vendre ou distribuer comme il le souhaite.</p>
         </section>
 
         <section>
           <h2 className="text-xl font-bold">Article 6 - Responsabilité</h2>
-          <p>EbookStudio Pro fournit un outil de création assistée par IA. L'utilisateur reste responsable du contenu final qu'il publie. Nous ne garantissons pas de revenus spécifiques.</p>
+          <p>Ebookstudio Pro V2 fournit un outil de création assistée par IA. L'utilisateur reste responsable du contenu final qu'il publie. Nous ne garantissons pas de revenus spécifiques.</p>
         </section>
 
         <section>

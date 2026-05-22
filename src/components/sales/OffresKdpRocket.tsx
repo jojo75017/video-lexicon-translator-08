@@ -44,7 +44,7 @@ const OFFERS: Offer[] = [
       "⏰ Tarif de lancement jusqu'au 15 septembre (puis 197€ à vie)",
     ],
     longDescription:
-      "L'offre fondateur unique : payez 67€ une seule fois et accédez à EbookStudio Pro À VIE. Après le 15 septembre, le tarif passera définitivement à 197€ à vie. Aucun abonnement, aucun renouvellement, toutes les futures fonctionnalités incluses.",
+      "L'offre fondateur unique : payez 67€ une seule fois et accédez à Ebookstudio Pro V2 À VIE. Après le 15 septembre, le tarif passera définitivement à 197€ à vie. Aucun abonnement, aucun renouvellement, toutes les futures fonctionnalités incluses.",
     features: [
       "✅ Accès illimité À VIE (paiement unique)",
       "✅ Workflow complet 15 agents IA (P1 à P15)",

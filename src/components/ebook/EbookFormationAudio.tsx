@@ -269,7 +269,7 @@ const audioModules = [
     color: "from-teal-500 to-cyan-500",
     content: [
       {
-        subtitle: "🌐 Mise en ligne sur EbookStudio",
+        subtitle: "🌐 Mise en ligne sur Ebookstudio Pro V2",
         text: "Hébergez votre livre audio directement sur la plateforme ! Chaque audiobook obtient une page publique avec lecteur intégré et un code d'intégration pour l'embarquer sur votre site.",
         items: [
           "Page publique avec lecteur audio professionnel",

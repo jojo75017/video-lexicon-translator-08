@@ -430,7 +430,7 @@ const PublicAudiobookPage = () => {
                   </button>
                 </div>
                 <div className="absolute -bottom-3 -right-3 bg-gradient-to-br from-amber-500 to-orange-600 text-foreground text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg shadow-lg rotate-[-3deg]">
-                  EbookStudio
+                  Ebookstudio Pro V2
                 </div>
               </div>
             </motion.div>
@@ -563,7 +563,7 @@ const PublicAudiobookPage = () => {
                 <MetaRow icon={<Clock className="w-4 h-4 text-cyan-400" />} label="Durée estimée" value={formatDuration(audiobook.duration_seconds)} />
                 <MetaRow icon={<Download className="w-4 h-4 text-emerald-400" />} label="Accès" value="Téléchargement immédiat" />
                 {createdDate && <MetaRow icon={<Calendar className="w-4 h-4 text-blue-400" />} label="Publication" value={createdDate} />}
-                <MetaRow icon={<Building2 className="w-4 h-4 text-pink-400" />} label="Éditeur" value="EbookStudio" />
+                <MetaRow icon={<Building2 className="w-4 h-4 text-pink-400" />} label="Éditeur" value="Ebookstudio Pro V2" />
                 <MetaRow icon={<Headphones className="w-4 h-4 text-amber-400" />} label="Écoutes" value={`${audiobook.play_count || 0}`} />
                 <MetaRow icon={<Star className="w-4 h-4 text-amber-400 fill-amber-400" />} label="Qualité" value="HD 192 kbps" />
                 
@@ -588,7 +588,7 @@ const PublicAudiobookPage = () => {
               Comment est créé ce livre audio ?
             </h2>
             <p className="text-foreground/35 text-center mb-10 max-w-lg mx-auto text-sm">
-              Une production 100% automatisée grâce à la technologie EbookStudio
+              Une production 100% automatisée grâce à la technologie Ebookstudio Pro V2
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {[
@@ -727,7 +727,7 @@ const PublicAudiobookPage = () => {
 
       {/* Footer */}
       <div className="text-center pb-10 pt-6 border-t border-border">
-        <p className="text-xs text-foreground/20">Propulsé par EbookStudio Pro 2026 • Audio IA Premium</p>
+        <p className="text-xs text-foreground/20">Propulsé par Ebookstudio Pro V2 2026 • Audio IA Premium</p>
       </div>
     </div>
   );

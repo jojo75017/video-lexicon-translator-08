@@ -31,12 +31,12 @@ const PaiementManuelPage = () => {
 
   const totalPrice = BASE_PRICE + (serenityAddon ? SERENITY_PRICE : 0);
   const itemName = serenityAddon
-    ? "EbookStudio Pro Lifetime + Pack Sérénité"
-    : "EbookStudio Pro - Acces a Vie";
+    ? "Ebookstudio Pro V2 Lifetime + Pack Sérénité"
+    : "Ebookstudio Pro V2 - Acces a Vie";
 
   const paymentInfo = {
     price: String(totalPrice),
-    name: "EbookStudio Pro - Accès à Vie",
+    name: "Ebookstudio Pro V2 - Accès à Vie",
     description: "Offre de lancement • Accès complet à vie",
     paypalLink: buildPaypalLink(totalPrice, itemName),
     iban: "FR76 XXXX XXXX XXXX XXXX XXXX XXX",

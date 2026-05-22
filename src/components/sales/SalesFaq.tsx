@@ -15,7 +15,7 @@ const SalesFaq: React.FC = () => {
     },
     {
       question: "Ai-je besoin de compétences techniques ou de savoir écrire ?",
-      answer: "Absolument pas ! EbookStudio est conçu pour les débutants complets. L'IA Gemini 3 Flash rédige l'intégralité de votre ebook. Vous choisissez simplement le sujet, le ton et le style - l'IA s'occupe de tout le reste, de la structure aux chapitres en passant par la couverture."
+      answer: "Absolument pas ! Ebookstudio Pro V2 est conçu pour les débutants complets. L'IA Gemini 3 Flash rédige l'intégralité de votre ebook. Vous choisissez simplement le sujet, le ton et le style - l'IA s'occupe de tout le reste, de la structure aux chapitres en passant par la couverture."
     },
     {
       question: "Qu'est-ce que Gemini 3 Flash et combien ça coûte ?",
@@ -39,14 +39,14 @@ const SalesFaq: React.FC = () => {
     },
     {
       question: "Puis-je créer des audiobooks et des BD ?",
-      answer: "Oui ! EbookStudio inclut un module audiobook (via Azure Speech, optionnel et gratuit jusqu'à 5 audiobooks/mois) et un module BD/Comics avec génération de scénarios et mise en page automatique. Tout est inclus sans surcoût."
+      answer: "Oui ! Ebookstudio Pro V2 inclut un module audiobook (via Azure Speech, optionnel et gratuit jusqu'à 5 audiobooks/mois) et un module BD/Comics avec génération de scénarios et mise en page automatique. Tout est inclus sans surcoût."
     },
     {
       question: "Le prix de 67€ va-t-il augmenter ?",
       answer: "Oui. Le prix normal passera à 197€ le 15 septembre 2026 (après les vacances d'été). Parce que j'accompagne les créateurs et que je veux rendre cet outil accessible, le tarif de lancement est à 67€ à vie avec toutes les futures mises à jour incluses. Profitez-en avant l'augmentation !"
     },
     {
-      question: "Puis-je gagner de l'argent en recommandant EbookStudio ?",
+      question: "Puis-je gagner de l'argent en recommandant Ebookstudio Pro V2 ?",
       answer: "Oui ! Notre programme d'affiliation vous reverse 30% de commission, soit 20,10€ par vente (sur le paiement unique de 67€ à vie). Vous recevez un lien unique dans votre espace membre avec un kit de promotion complet (templates email, posts sociaux, visuels), et vos commissions sont suivies en temps réel. Paiement PayPal mensuel dès 50€."
     },
     {

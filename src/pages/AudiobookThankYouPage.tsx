@@ -60,7 +60,7 @@ const AudiobookThankYouPage = () => {
         body: {
           email: buyerEmail,
           bookTitle: audiobook.title,
-          bookAuthor: audiobook.author_name || 'EbookStudio',
+          bookAuthor: audiobook.author_name || 'Ebookstudio Pro V2',
           downloadUrl: audiobook.audio_url,
           coverUrl: audiobook.cover_url,
         },
@@ -154,7 +154,7 @@ const AudiobookThankYouPage = () => {
             <div className="min-w-0">
               <h2 className="text-xl font-bold mb-1">{audiobook.title}</h2>
               <p className="text-amber-400/80 text-sm mb-1">
-                Par {audiobook.author_name || 'EbookStudio'}
+                Par {audiobook.author_name || 'Ebookstudio Pro V2'}
               </p>
               <div className="flex flex-wrap gap-2 mt-2">
                 <Badge className="bg-amber-500/10 text-amber-400/70 border-amber-500/20 text-xs">

@@ -127,7 +127,7 @@ const ResultatEn5MinPage: React.FC = () => {
                     ✅ Garantie satisfait ou remboursé 30 jours
                   </h3>
                   <p className="text-muted-foreground">
-                    Teste EbookStudio Pro en conditions réelles.
+                    Teste Ebookstudio Pro V2 en conditions réelles.
                     <br />
                     Si ce n'est pas pour toi, tu demandes le remboursement, <strong>sans discussion.</strong>
                   </p>

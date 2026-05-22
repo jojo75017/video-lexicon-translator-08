@@ -68,7 +68,7 @@ const TutorielsPage: React.FC = () => {
                 Tutoriels - Actions principales
               </h1>
               <p className="text-muted-foreground mt-1">
-                Les actions essentielles pour réussir votre ebook avec EbookStudio, pas à pas.
+                Les actions essentielles pour réussir votre ebook avec Ebookstudio Pro V2, pas à pas.
               </p>
             </div>
           </div>
