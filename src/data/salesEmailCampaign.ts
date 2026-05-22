@@ -44,7 +44,7 @@ J'ai construit un outil. Un vrai générateur d'ebooks propulsé par l'IA la plu
 
 Et aujourd'hui, je vous ouvre les portes.
 
-🔥 **EbookStudio Pro 2026** - L'usine à ebooks que j'utilise personnellement :
+🔥 **Ebookstudio Pro V2 2026** - L'usine à ebooks que j'utilise personnellement :
 
 → 300+ idées de titres par niche rentable
 → Plan complet généré en 30 secondes
@@ -95,7 +95,7 @@ Un bon livre avec les mauvais mots-clés = invisible sur Amazon.
 
 **La bonne nouvelle ?**
 
-EbookStudio Pro résout ces 3 problèmes en même temps :
+Ebookstudio Pro V2 résout ces 3 problèmes en même temps :
 
 ✅ Plan structuré automatiquement → Plus d'abandon
 ✅ Génération en 47 min → Production rapide
@@ -110,7 +110,7 @@ Comparez avec un ghostwriter à 500€... ou un designer à 150€ la couverture
 - Coût total : ~15€ de production
 - Revenus potentiels : les auteurs KDP actifs gagnent entre 500€ et 5000€/mois
 
-👉 **Découvrir EbookStudio Pro** : [LIEN OFFRES]
+👉 **Découvrir Ebookstudio Pro V2** : [LIEN OFFRES]
 
 L'offre Fondateur à 67€ (au lieu de 197€) est disponible jusqu'au 1er juillet.
 
@@ -132,7 +132,7 @@ Aujourd'hui, pas de pitch. Juste des faits.
 
 • 2023 : 0 livre publié
 • 2024 : 18 livres publiés (méthode manuelle, 2-3 semaines par livre)
-• 2025-2026 : 35+ livres publiés (avec EbookStudio, 1-2 jours par livre)
+• 2025-2026 : 35+ livres publiés (avec Ebookstudio Pro V2, 1-2 jours par livre)
 
 **Ce qui a fait la différence ?**
 
@@ -146,7 +146,7 @@ Quand j'ai automatisé le processus, tout a changé :
 
 Et je n'ai pas gardé cet outil pour moi. Je l'ai transformé en plateforme complète pour que VOUS puissiez faire pareil.
 
-**EbookStudio Pro 2026 inclut** :
+**Ebookstudio Pro V2 2026 inclut** :
 📝 Générateur IA (Gemini 3 Flash - le plus performant)
 🎨 Créateur de couvertures pro
 🔊 Convertisseur en livre audio (Azure Neural)
@@ -164,7 +164,7 @@ Vérifiez par vous-même : mes livres sont sur Amazon, mon nom est public, mes r
 
 Cordialement,
 **Georges Boubet**
-Auteur Amazon & Créateur d'EbookStudio
+Auteur Amazon & Créateur d'Ebookstudio Pro V2
 https://www.amazon.fr/Mr-Georges-Boubet/e/B0CGVLHNX7`
   },
   {
@@ -177,7 +177,7 @@ https://www.amazon.fr/Mr-Georges-Boubet/e/B0CGVLHNX7`
 
 Je serai bref.
 
-L'offre **Fondateur EbookStudio Pro** à 67€ se termine dans **48 heures**.
+L'offre **Fondateur Ebookstudio Pro V2** à 67€ se termine dans **48 heures**.
 
 Après ? Le prix passe à **197€**. Et ce n'est pas du marketing. C'est la valeur réelle de l'outil.
 
@@ -229,7 +229,7 @@ P.S: Je ne relancerai pas après cet email. La décision vous appartient.`
 
 Dernier email. Dernier appel.
 
-Ce soir à minuit, l'offre Fondateur EbookStudio Pro à 67€ se ferme définitivement.
+Ce soir à minuit, l'offre Fondateur Ebookstudio Pro V2 à 67€ se ferme définitivement.
 
 Je ne vais pas vous resservir les arguments. Vous les connaissez.
 
@@ -266,7 +266,7 @@ Mais si une petite voix vous dit "et si ça marchait pour moi ?"...
 
 ---
 📖 35+ livres publiés sur Amazon
-🛠️ Créateur d'EbookStudio Pro
+🛠️ Créateur d'Ebookstudio Pro V2
 🔗 amazon.fr/Mr-Georges-Boubet/e/B0CGVLHNX7`
   }
 ];
@@ -302,13 +302,13 @@ Moi j'en publie 3 par semaine. 📚
     platform: 'tiktok',
     type: 'Avant/Après',
     hook: '0-3s: Split screen - galère vs facilité',
-    content: `AVANT EbookStudio :
+    content: `AVANT Ebookstudio Pro V2 :
 😩 3 semaines pour UN livre
 😩 500€ de ghostwriter
 😩 150€ pour la couverture
 😩 0 vente car mauvais mots-clés
 
-APRÈS EbookStudio :
+APRÈS Ebookstudio Pro V2 :
 🚀 47 min pour un livre complet
 🚀 0,30€ de coût
 🚀 Couverture pro incluse
@@ -362,7 +362,7 @@ Posez vos questions en commentaire, je réponds à tout ! 👇`,
 
 Vous rêvez de publier un livre sur Amazon mais vous n'avez pas le temps ?
 
-EbookStudio Pro génère votre ebook de A à Z :
+Ebookstudio Pro V2 génère votre ebook de A à Z :
 📝 Plan → Chapitres → Couverture → Export KDP
 
 ✅ 35+ livres publiés par le créateur
@@ -391,7 +391,7 @@ Puis j'ai découvert l'IA générative. Et j'ai eu une autre idée :
 
 Résultat en 2026 :
 → 35+ livres publiés sur Amazon
-→ Un générateur d'ebooks complet (EbookStudio Pro)
+→ Un générateur d'ebooks complet (Ebookstudio Pro V2)
 → Technologie Gemini 3 Flash + Azure Neural
 → Coût de production par livre : 0,30€
 
@@ -411,7 +411,7 @@ Vous avez un livre en vous. Cet outil le fait sortir.
 
 ---
 #IA #KDP #Amazon #Entrepreneuriat #SelfPublishing #EdTech #Innovation`,
-    hashtags: ['IA', 'KDP', 'Amazon', 'Entrepreneuriat', 'SelfPublishing', 'EdTech', 'Innovation', 'EbookStudio']
+    hashtags: ['IA', 'KDP', 'Amazon', 'Entrepreneuriat', 'SelfPublishing', 'EdTech', 'Innovation', 'Ebookstudio Pro V2']
   },
   {
     id: 'li-2',
@@ -451,7 +451,7 @@ Commentez "EBOOK" et je vous envoie le lien de la démo gratuite.
 
 L'IA qui transforme vos idées en livres prêts pour Amazon KDP
 
-✨ Ce que fait EbookStudio Pro :
+✨ Ce que fait Ebookstudio Pro V2 :
 → Génère le plan complet automatiquement
 → Rédige 12+ chapitres structurés
 → Crée une couverture professionnelle
@@ -477,7 +477,7 @@ SLIDE 1 : "35 livres publiés. Temps moyen : 47 min/livre."
 
 SLIDE 2 : "❌ L'ancienne méthode : 3 semaines, 500€+ de ghostwriter"
 
-SLIDE 3 : "✅ Ma méthode : EbookStudio Pro - plan en 30s, chapitres en minutes"
+SLIDE 3 : "✅ Ma méthode : Ebookstudio Pro V2 - plan en 30s, chapitres en minutes"
 
 SLIDE 4 : "Le coût ? 0,30€ par ebook. Oui, trente centimes."
 

@@ -380,7 +380,7 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
 
     // Pied de page
     content += `\n\n${'='.repeat(50)}\n`;
-    content += `Généré avec EbookStudio Pro\n`;
+    content += `Généré avec Ebookstudio Pro V2\n`;
     content += `${new Date().toLocaleDateString()}\n`;
     content += `${'='.repeat(50)}`;
 

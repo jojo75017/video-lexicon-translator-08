@@ -42,7 +42,7 @@ const FormationModuleTabs = () => {
       <CardHeader className="text-center pb-4">
         <div className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white px-4 py-2 rounded-full text-sm font-semibold mb-4 mx-auto">
           <Rocket className="h-4 w-4" />
-          Formation EbookStudio Pro
+          Formation Ebookstudio Pro V2
           <Badge variant="secondary" className="bg-white/20 text-white text-[10px]">
             {formationModules.length} Modules
           </Badge>

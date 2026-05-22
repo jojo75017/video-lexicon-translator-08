@@ -51,7 +51,7 @@ const SeoGenerateurEbookPage: React.FC = () => {
 
   const faqs = [
     { question: "Qu'est-ce qu'un générateur d'ebook IA ?", answer: "Un générateur d'ebook IA est un outil qui utilise l'intelligence artificielle pour créer automatiquement des livres numériques complets : structure, chapitres, contenu, couverture et formatage." },
-    { question: "Le générateur est-il vraiment gratuit ?", answer: "EbookStudio Pro propose un essai gratuit avec 3 plans d'ebooks. L'accès complet à vie est ensuite à 67€, incluant toutes les fonctionnalités et mises à jour futures." },
+    { question: "Le générateur est-il vraiment gratuit ?", answer: "Ebookstudio Pro V2 propose un essai gratuit avec 3 plans d'ebooks. L'accès complet à vie est ensuite à 67€, incluant toutes les fonctionnalités et mises à jour futures." },
     { question: "Les ebooks générés sont-ils uniques ?", answer: "Oui, chaque ebook est original et unique. Le système inclut un validateur anti-plagiat et une réécriture naturelle pour garantir l'originalité du contenu." },
     { question: "Puis-je utiliser le générateur pour créer des ebooks à vendre ?", answer: "Absolument ! Les ebooks créés vous appartiennent entièrement. Vous pouvez les vendre sur Amazon KDP, votre site, ou toute autre plateforme." },
     { question: "Quels types d'ebooks puis-je créer ?", answer: "Le générateur supporte tous les genres : guides pratiques, développement personnel, fiction, romance, thriller, cuisine, business, et bien plus avec 17 templates spécialisés." },
@@ -63,7 +63,7 @@ const SeoGenerateurEbookPage: React.FC = () => {
         __html: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "SoftwareApplication",
-          "name": "EbookStudio Pro - Générateur Ebook IA",
+          "name": "Ebookstudio Pro V2 - Générateur Ebook IA",
           "applicationCategory": "BusinessApplication",
           "operatingSystem": "Web",
           "offers": { "@type": "Offer", "price": "67", "priceCurrency": "EUR" },
@@ -158,7 +158,7 @@ const SeoGenerateurEbookPage: React.FC = () => {
                 <tr className="bg-background/50">
                   <th className="px-6 py-4 text-left font-semibold text-foreground">Fonctionnalité</th>
                   <th className="px-6 py-4 text-center font-semibold text-muted-foreground">Traditionnel</th>
-                  <th className="px-6 py-4 text-center font-semibold text-primary">EbookStudio</th>
+                  <th className="px-6 py-4 text-center font-semibold text-primary">Ebookstudio Pro V2</th>
                 </tr>
               </thead>
               <tbody>
@@ -217,7 +217,7 @@ const SeoGenerateurEbookPage: React.FC = () => {
         <div className="max-w-4xl mx-auto prose prose-invert prose-lg">
           <h2>Le meilleur générateur d'ebook IA en 2025</h2>
           <p>
-            <strong>EbookStudio Pro</strong> est le générateur d'ebook le plus complet du marché. 
+            <strong>Ebookstudio Pro V2</strong> est le générateur d'ebook le plus complet du marché. 
             Contrairement aux outils basiques qui se contentent de générer du texte, notre plateforme 
             offre un <strong>workflow éditorial professionnel en 14 étapes</strong>.
           </p>
@@ -322,7 +322,7 @@ const SeoGenerateurEbookPage: React.FC = () => {
             </div>
           </div>
           <div className="border-t border-border pt-6 text-center text-sm">
-            <p className="text-muted-foreground">© 2025 EbookStudio Pro - Le meilleur générateur d'ebook IA</p>
+            <p className="text-muted-foreground">© 2025 Ebookstudio Pro V2 - Le meilleur générateur d'ebook IA</p>
           </div>
         </div>
       </footer>

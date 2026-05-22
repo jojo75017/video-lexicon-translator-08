@@ -330,7 +330,7 @@ export const AudiobookPublisher: React.FC<AudiobookPublisherProps> = ({
         b.price || '',                                // Regular price
         '',                                           // Sale price
         'Livres Audio, Audio IA',                     // Categories
-        `${b.voice_name || 'Audio IA'},Livre Audio,EbookStudio`, // Tags
+        `${b.voice_name || 'Audio IA'},Livre Audio,Ebookstudio Pro V2`, // Tags
         b.cover_url || '',                            // Images
         b.audio_url ? 'MP3 Complet' : '',            // Download 1 name
         b.audio_url || '',                            // Download 1 URL

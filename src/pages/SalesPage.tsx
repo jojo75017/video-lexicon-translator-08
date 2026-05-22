@@ -110,7 +110,7 @@ const SalesPage = () => {
   }, [location.search]);
 
   useEffect(() => {
-    document.title = "EbookStudio Pro - Crée ton ebook avec l'IA, en mode fun ✨";
+    document.title = "Ebookstudio Pro V2 - Crée ton ebook avec l'IA, en mode fun ✨";
     const meta = document.querySelector('meta[name="description"]');
     if (meta)
       meta.setAttribute(
@@ -163,12 +163,12 @@ const SalesPage = () => {
   return (
     <div className="min-h-screen bg-joy-cream text-joy-ink overflow-x-hidden">
       <Helmet>
-        <title>EbookStudio Pro - Crée ton ebook avec l'IA en mode fun ✨</title>
+        <title>Ebookstudio Pro V2 - Crée ton ebook avec l'IA en mode fun ✨</title>
         <meta
           name="description"
           content="Crée et publie ton ebook sur Amazon KDP avec 15 agents IA bienveillants. Workflow guidé, sans stress. 67€ à vie, garantie 30 jours."
         />
-        <meta property="og:title" content="EbookStudio Pro - Ton ebook, en mode fun" />
+        <meta property="og:title" content="Ebookstudio Pro V2 - Ton ebook, en mode fun" />
         <meta property="og:description" content="15 agents IA pour créer ton ebook sans stress. 67€ à vie." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://ebookstudio.fr/offres" />
@@ -176,9 +176,9 @@ const SalesPage = () => {
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",
           "@type": "Product",
-          "name": "EbookStudio Pro",
+          "name": "Ebookstudio Pro V2",
           "description": "Plateforme de création d'ebooks et audiobooks par IA - 15 agents pour créer, illustrer, publier sur Amazon KDP.",
-          "brand": { "@type": "Brand", "name": "EbookStudio" },
+          "brand": { "@type": "Brand", "name": "Ebookstudio Pro V2" },
           "offers": {
             "@type": "Offer",
             "price": "67",
@@ -245,7 +245,7 @@ const SalesPage = () => {
               <BookOpen className="w-5 h-5 text-joy-ink" />
             </div>
             <div className="font-black text-lg text-joy-ink">
-              EbookStudio<span className="text-[hsl(var(--joy-bubblegum))] ml-1">Pro</span>
+              Ebookstudio Pro V2<span className="text-[hsl(var(--joy-bubblegum))] ml-1">Pro</span>
             </div>
           </Link>
 
@@ -349,7 +349,7 @@ const SalesPage = () => {
                 <div className="w-9 h-9 rounded-2xl bg-joy-sun flex items-center justify-center">
                   <BookOpen className="w-4 h-4 text-joy-ink" />
                 </div>
-                <h3 className="text-lg font-black text-joy-ink">EbookStudio Pro</h3>
+                <h3 className="text-lg font-black text-joy-ink">Ebookstudio Pro V2</h3>
               </div>
               <p className="text-joy-ink/70 text-sm leading-relaxed">
                 Le workflow IA #1 en France pour Amazon KDP - version joyeuse 🌈
@@ -379,7 +379,7 @@ const SalesPage = () => {
             </div>
           </div>
           <div className="border-t border-joy-ink/10 pt-8 text-center">
-            <p className="text-xs text-joy-ink/50">© 2026 EbookStudio Pro - Tous droits réservés</p>
+            <p className="text-xs text-joy-ink/50">© 2026 Ebookstudio Pro V2 - Tous droits réservés</p>
           </div>
         </div>
       </footer>

@@ -13,7 +13,7 @@ interface OnboardingGuideProps {
 const steps = [
   {
     icon: BookOpen,
-    title: "Bienvenue sur EbookStudio Pro ! 🎉",
+    title: "Bienvenue sur Ebookstudio Pro V2 ! 🎉",
     description: "Vous avez accès à la plateforme la plus complète pour créer et publier des ebooks sur Amazon KDP avec l'IA.",
     tips: [
       "Génération de plans structurés avec chapitres",
@@ -75,9 +75,9 @@ export const OnboardingGuide = ({ userName }: OnboardingGuideProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => { if (!open) handleSkip(); }}>
       <DialogContent className="sm:max-w-lg p-0 overflow-hidden border-border bg-card text-foreground">
-        <DialogTitle className="sr-only">Guide d'onboarding EbookStudio</DialogTitle>
+        <DialogTitle className="sr-only">Guide d'onboarding Ebookstudio Pro V2</DialogTitle>
         <DialogDescription className="sr-only">
-          Découvrez les principales fonctionnalités d'EbookStudio en quelques étapes guidées.
+          Découvrez les principales fonctionnalités d'Ebookstudio Pro V2 en quelques étapes guidées.
         </DialogDescription>
         {/* Progress */}
         <div className="flex gap-1.5 px-6 pt-5">

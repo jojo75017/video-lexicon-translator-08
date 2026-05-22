@@ -6,11 +6,11 @@ import { ArrowLeft, ArrowRight, Check, Sparkles, Briefcase, Users, TrendingUp, S
 
 const EXTENDED_PRICE = 47;
 
-const PAYPAL_LINK = `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=${EXTENDED_PRICE}&currency_code=EUR&item_name=${encodeURIComponent("EbookStudio Pro - Licence Commerciale Etendue")}`;
+const PAYPAL_LINK = `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=${EXTENDED_PRICE}&currency_code=EUR&item_name=${encodeURIComponent("Ebookstudio Pro V2 - Licence Commerciale Etendue")}`;
 
 const benefits = [
   { icon: Briefcase, title: "Créez pour vos clients", desc: "Réalisez des ebooks à la commande pour des clients tiers (entrepreneurs, coachs, marques)." },
-  { icon: Users, title: "Usage freelance & agence", desc: "Utilisez EbookStudio dans un cadre professionnel : freelance, agence, studio." },
+  { icon: Users, title: "Usage freelance & agence", desc: "Utilisez Ebookstudio Pro V2 dans un cadre professionnel : freelance, agence, studio." },
   { icon: TrendingUp, title: "Projets illimités", desc: "Exploitez les contenus générés pour autant de projets commerciaux que vous le souhaitez." },
   { icon: Sparkles, title: "Revente autorisée", desc: "Revendez vos prestations incluant les contenus générés (ebooks, couvertures, audio)." },
 ];
@@ -18,7 +18,7 @@ const benefits = [
 const restrictions = [
   "Revente, partage ou mise à disposition du Service strictement interdite",
   "L'accès au Service reste personnel et non transférable",
-  "Interdiction de proposer un outil concurrent basé sur EbookStudio Pro",
+  "Interdiction de proposer un outil concurrent basé sur Ebookstudio Pro V2",
 ];
 
 const LicenceEtenduePage = () => {

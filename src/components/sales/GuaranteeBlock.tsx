@@ -13,7 +13,7 @@ const GuaranteeBlock = () => {
         </div>
         <div className="text-sm md:text-base text-joy-ink leading-snug">
           <strong className="font-black">Garantie 30 jours, sans question.</strong>{" "}
-          Tu testes EbookStudio. Si ça ne te convient pas, tu m'écris un email
+          Tu testes Ebookstudio Pro V2. Si ça ne te convient pas, tu m'écris un email
           et je te rembourse intégralement. Aucun risque pour toi.
         </div>
       </div>

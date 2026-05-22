@@ -20,7 +20,7 @@ const InstallPage = () => {
             <Smartphone className="w-10 h-10 text-primary" />
           </div>
           <h1 className="text-3xl font-bold text-foreground mb-3">
-            Installer EbookStudio
+            Installer Ebookstudio Pro V2
           </h1>
           <p className="text-muted-foreground text-lg">
             Accédez à l'app directement depuis votre écran d'accueil, comme une vraie application mobile.
@@ -46,7 +46,7 @@ const InstallPage = () => {
                 Faites défiler et appuyez sur <strong>« Sur l'écran d'accueil »</strong>.
               </Step>
               <Step number={3} icon={<Download className="w-5 h-5" />}>
-                Appuyez sur <strong>« Ajouter »</strong> en haut à droite. L'icône EbookStudio apparaît sur votre écran d'accueil !
+                Appuyez sur <strong>« Ajouter »</strong> en haut à droite. L'icône Ebookstudio Pro V2 apparaît sur votre écran d'accueil !
               </Step>
             </ol>
           </CardContent>

@@ -19,7 +19,7 @@ const PromoMerciPage = () => {
     <FunnelLayout>
       <SeoHead
         title="Merci ! Votre guide est prêt"
-        description="Téléchargez votre guide PDF gratuit et découvrez l'outil EbookStudio."
+        description="Téléchargez votre guide PDF gratuit et découvrez l'outil Ebookstudio Pro V2."
         canonical="/promo/merci"
         noindex
       />
@@ -54,7 +54,7 @@ const PromoMerciPage = () => {
             🚀 Et si vous publiiez votre 1er ebook cette semaine ?
           </h2>
           <p className="text-gray-700">
-            EbookStudio est l'outil tout-en-un qui transforme une simple idée en ebook prêt pour Amazon KDP en moins de 30 minutes&nbsp;: plan, chapitres, couverture, mots-clés SEO, fichiers KDP-compliant.
+            Ebookstudio Pro V2 est l'outil tout-en-un qui transforme une simple idée en ebook prêt pour Amazon KDP en moins de 30 minutes&nbsp;: plan, chapitres, couverture, mots-clés SEO, fichiers KDP-compliant.
           </p>
           <Link to="/promo/decouverte">
             <Button className="bg-[#FF9E2D] hover:bg-[#e88f1f] text-white font-bold w-full md:w-auto py-6 px-8">
@@ -67,7 +67,7 @@ const PromoMerciPage = () => {
         <div className="bg-gradient-to-br from-[#008296]/10 to-[#FF9E2D]/10 border border-[#008296]/30 rounded-xl p-8 text-left">
           <p className="text-xs uppercase tracking-wide text-[#008296] font-bold mb-2">💰 Bonus</p>
           <h2 className="text-2xl font-bold text-[#232F3E] mb-2">
-            Vous adorez EbookStudio ? Gagnez 20€ par recommandation
+            Vous adorez Ebookstudio Pro V2 ? Gagnez 20€ par recommandation
           </h2>
           <p className="text-gray-700 mb-4">
             Notre programme d'affiliation vous reverse <strong>30% de commission</strong> (soit 20,10€) sur chaque vente que vous générez. Cookie 30 jours, paiement PayPal.

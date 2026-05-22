@@ -31,7 +31,7 @@ const BeforeAfterSection: React.FC = () => {
           className="text-center mb-12"
         >
           <h2 className="text-3xl sm:text-4xl font-extrabold text-foreground mb-3">
-            Avant vs Après <span className="text-primary">EbookStudio Pro</span>
+            Avant vs Après <span className="text-primary">Ebookstudio Pro V2</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
             Comparez votre ancien process à la puissance de l'IA
@@ -51,7 +51,7 @@ const BeforeAfterSection: React.FC = () => {
               <div className="w-10 h-10 rounded-full bg-destructive/20 flex items-center justify-center">
                 <X className="w-5 h-5 text-destructive" />
               </div>
-              <h3 className="text-xl font-bold text-destructive">Sans EbookStudio</h3>
+              <h3 className="text-xl font-bold text-destructive">Sans Ebookstudio Pro V2</h3>
             </div>
             <ul className="space-y-4">
               {before.map((item, i) => (
@@ -85,7 +85,7 @@ const BeforeAfterSection: React.FC = () => {
               <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
                 <Check className="w-5 h-5 text-primary" />
               </div>
-              <h3 className="text-xl font-bold text-primary">Avec EbookStudio Pro</h3>
+              <h3 className="text-xl font-bold text-primary">Avec Ebookstudio Pro V2</h3>
             </div>
             <ul className="space-y-4 relative z-10">
               {after.map((item, i) => (

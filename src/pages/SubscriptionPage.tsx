@@ -385,7 +385,7 @@ const SubscriptionPage = ({ subscriberEmail, subscriberData, onLogout }: Subscri
           <CardHeader>
             <CardTitle>Offre unique : Accès Pro Lifetime (67€)</CardTitle>
             <CardDescription>
-              EbookStudio Pro fonctionne désormais avec une seule offre à 67€ (accès à vie + mises à jour).
+              Ebookstudio Pro V2 fonctionne désormais avec une seule offre à 67€ (accès à vie + mises à jour).
             </CardDescription>
           </CardHeader>
           <CardContent>

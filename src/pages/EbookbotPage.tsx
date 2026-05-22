@@ -8,7 +8,7 @@ const EbookbotPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50/30">
       <Helmet>
-        <title>EBOOKBOT - Ton copilote IA pour réussir sur Amazon KDP | EbookStudio</title>
+        <title>EBOOKBOT - Ton copilote IA pour réussir sur Amazon KDP | Ebookstudio Pro V2</title>
         <meta name="description" content="EBOOKBOT, l'assistant IA gratuit qui te guide sur Amazon KDP : niches rentables, mots-clés, structure d'ebook, marketing et lancement. Réponses en 3 secondes." />
         <link rel="canonical" href="https://www.ebookstudio.fr/ebookbot" />
       </Helmet>
@@ -91,7 +91,7 @@ const EbookbotPage = () => {
             { emoji: '🎯', title: 'Expert KDP', items: ['Choix de niche & BSR', 'Mots-clés titre + 7 backend', '2 catégories optimales', 'Stratégie de prix'] },
             { emoji: '✍️', title: 'Écriture & structure', items: ['Idées d\'ebooks', 'Plan en 8-12 chapitres', 'Hook d\'introduction', 'Conclusion qui vend'] },
             { emoji: '📈', title: 'Marketing', items: ['Description Amazon HEAL', 'Séquences emails', 'Posts Pinterest/Insta', 'Stratégie de lancement'] },
-            { emoji: '🛠️', title: 'Support EbookStudio', items: ['Workflow 15 agents', 'Studio Couverture IA', 'Génération audio', 'Module formation'] },
+            { emoji: '🛠️', title: 'Support Ebookstudio Pro V2', items: ['Workflow 15 agents', 'Studio Couverture IA', 'Génération audio', 'Module formation'] },
           ].map(c => (
             <Card key={c.title} className="p-5 border-2 hover:border-orange-300 transition-colors">
               <div className="text-3xl mb-2">{c.emoji}</div>

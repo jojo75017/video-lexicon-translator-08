@@ -86,7 +86,7 @@ const KdpRocketParityTable: React.FC = () => {
             <div className="p-4 sm:p-5 text-center border-l border-border bg-primary/5">
               <p className="text-xs sm:text-sm font-bold text-primary flex items-center justify-center gap-1">
                 <Crown className="w-3.5 h-3.5" />
-                EbookStudio
+                Ebookstudio Pro V2
               </p>
               <p className="text-[10px] sm:text-xs text-primary/80 mt-0.5 font-semibold">67€ à vie</p>
             </div>
@@ -123,7 +123,7 @@ const KdpRocketParityTable: React.FC = () => {
             <div className="p-4 text-center">
               <p className="text-sm sm:text-base font-black text-kdp-orange uppercase tracking-wide flex items-center justify-center gap-2">
                 <Sparkles className="w-4 h-4" />
-                9 outils exclusifs EbookStudio
+                9 outils exclusifs Ebookstudio Pro V2
                 <Sparkles className="w-4 h-4" />
               </p>
             </div>

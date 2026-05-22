@@ -650,7 +650,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
           {!isCollapsed && (
             <>
               <div className="min-w-0 flex-1">
-                <h1 className="font-bold text-gradient-gold">EbookStudio</h1>
+                <h1 className="font-bold text-gradient-gold">Ebookstudio Pro V2</h1>
                 <p className="text-xs text-gold-muted">Pro Edition 2026</p>
               </div>
               <Button

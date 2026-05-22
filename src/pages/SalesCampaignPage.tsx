@@ -86,7 +86,7 @@ const SalesCampaignPage = () => {
 
         <div className="text-center mb-10">
           <h1 className="text-3xl md:text-4xl font-bold text-gradient-gold mb-3">
-            🚀 Campagne Marketing EbookStudio Pro
+            🚀 Campagne Marketing Ebookstudio Pro V2
           </h1>
           <p className="text-muted-foreground text-lg">
             5 emails haute conversion + 8 posts réseaux sociaux prêts à l'emploi

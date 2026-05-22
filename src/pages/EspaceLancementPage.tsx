@@ -79,7 +79,7 @@ export default function EspaceLancementPage() {
       },
       {
         label: '✉️ Email à un proche',
-        text: `Salut,\n\nJe sais que tu cherches une activité complémentaire. Je te recommande EbookStudio (ebookstudio.fr) : c'est l'outil que j'utilise pour publier mes livres sur Amazon Kindle. Tout est guidé par IA, et c'est un paiement unique à vie.\n\nMon lien : ${refLink}\n\nDis-moi ce que tu en penses 😉`,
+        text: `Salut,\n\nJe sais que tu cherches une activité complémentaire. Je te recommande Ebookstudio Pro V2 (ebookstudio.fr) : c'est l'outil que j'utilise pour publier mes livres sur Amazon Kindle. Tout est guidé par IA, et c'est un paiement unique à vie.\n\nMon lien : ${refLink}\n\nDis-moi ce que tu en penses 😉`,
       },
     ];
   }, [refLink]);

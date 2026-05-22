@@ -24,7 +24,7 @@ const FormationVideosPage = () => {
               Offerte avec votre accès
             </Badge>
             <h1 className="text-3xl sm:text-4xl font-extrabold mb-3">
-              Formation EbookStudio Pro
+              Formation Ebookstudio Pro V2
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               15 modules vidéo pour maîtriser chaque fonctionnalité et publier votre premier ebook rapidement.
@@ -59,7 +59,7 @@ const FormationVideosPage = () => {
           <CardContent className="p-0">
             <iframe
               src={formationUrl}
-              title="Formation EbookStudio Pro - 15 modules vidéo"
+              title="Formation Ebookstudio Pro V2 - 15 modules vidéo"
               className="w-full border-0"
               style={{ height: '80vh', minHeight: '600px' }}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"

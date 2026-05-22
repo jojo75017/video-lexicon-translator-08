@@ -1,35 +1,64 @@
-Je suis en mode Plan, donc je ne peux pas générer le fichier maintenant. Passez en **mode Build** et je produis le PDF immédiatement.
+# Plan — 3 correctifs Ebookstudio Pro V2
 
-## Ce que je vais livrer
+## 1. Réparer le bouton "Biographie Auteur" (Outils KDP)
 
-Un **PDF paysage 16:9, 8 slides**, format présentation premium à offrir, déposé dans `/mnt/documents/EbookStudio_Pro_V2_Video4_Slides.pdf`.
+**Fichier** : `src/components/ebook/EbookKdpTools.tsx`
 
-## Charte visuelle (cohérente avec EbookStudio)
-- Fond clair `#FAFAFA`, texte `#232F3E`
-- Accent teal `#008296` (titres, onglets actifs)
-- Accent orange `#FF9E2D` (CTA, puces, "lumière flash")
-- Typo Helvetica bold pour titres XL, corps 18 pt
-- Footer paginé "EbookStudio Pro V2 · Vidéo 4"
-- Marque « EbookStudio Pro V2 » partout (zéro mention "EbookStudio" seul)
+Problème : `handleGenerateAuthorBio` (ligne 132) ne valide rien et n'affiche aucun toast. Si `authorName` est vide (cas fréquent quand l'utilisateur arrive directement sur l'onglet), le prompt se génère avec "l'auteur" générique mais aucune confirmation visuelle → l'utilisateur croit que ça ne marche pas. De plus aucune gestion d'erreur.
 
-## Effet "flash lumière" (élégant, pas clinquant)
-- Halo orange dégradé (3 cercles transparents) + cœur blanc + 12 rayons fins
-- Posé sur le slide 2 (mockup tableau de bord) et en éléments décoratifs sur les slides cover/finale
-- Discret, jamais sur du texte à lire
+Correctifs :
+- Ajouter validation `if (!authorName) { toast.error('Renseigne le nom de l'auteur dans la fiche projet'); return; }`
+- Wrapper dans `try/catch` avec `toast.success('Biographie générée !')` et `toast.error` sur échec
+- Pré-remplir `authorName`/`genre` depuis le projet courant si la prop n'est pas passée (lecture `localStorage.ebook_current_project` comme le fait déjà `KdpPackButton` dans `EspaceHeader`)
 
-## Les 8 slides
-1. **Cover** — fond sombre teal, titre XL « Rédigez votre ebook de 10 chapitres en un après-midi », 4 pills stats (10 ch / 5 onglets / 2-4 h / 15 agents), flash décoratif
-2. **Le tableau de bord** — mockup stylisé Plan (5 onglets + 3 boutons + liste projets) avec **flash lumineux** posé sur l'angle du dashboard
-3. **Onglet Mes Projets** — bullets + mockup formulaire création projet
-4. **Onglet Planificateur** — bullets + mockup liste des 10 chapitres
-5. **Workflow IA 15 Agents** — bandeau orange, grille 3×5 des agents P1→P15 reliés
-6. **Onglet Couverture** — bullets + mockup 3D du livre teal/orange
-7. **🎯 Outils KDP** — grille de 6 cartes (Description, Mots-clés A9, Catégories, Prix, Bio, Checklist)
-8. **Récap & Export** — fond sombre, 3 étapes (PDF / EPUB / Pack ZIP), CTA orange « 6 étapes · 10 chapitres · 1 après-midi », teaser vidéo 5
+## 2. Renommer "EbookStudio" → "Ebookstudio Pro V2" partout dans l'UI
 
-## Technique
-- ReportLab (canvas vectoriel pur, sans dépendance image)
-- QA visuel automatique : conversion en JPG via `pdftoppm` puis inspection de chaque page (overflow, contraste, alignement) avant livraison
-- Aucune modification du code projet — uniquement génération d'artefact dans `/mnt/documents/`
+Inventaire : ~401 occurrences dans `src/`. Pour éviter de casser variables, classes CSS, noms de fichiers ou IDs techniques, on cible **uniquement les chaînes affichées** (JSX, titres, descriptions, contenus marketing).
 
-Dites « approuver » ou passez en Build et je lance la génération.
+Méthode :
+- Mise à jour de la source unique : `src/hooks/useBrandTitle.ts` → `BRAND_SUFFIX = 'Ebookstudio Pro V2'` (affecte tous les `<title>` du site)
+- Script `sed` ciblé sur les fichiers de contenu visible :
+  - `src/pages/**/*.tsx` (textes JSX, headings, hero)
+  - `src/components/**/*.tsx` (titres de cards, labels)
+  - `src/data/*.ts` (templates emails, articles blog, modules formation)
+  - `index.html` (balise `<title>` par défaut)
+- Patterns remplacés : `EbookStudio V2`, `EbookStudio Pro`, `EbookStudio` (dans cet ordre, le plus spécifique d'abord) → `Ebookstudio Pro V2`. Variante `ebookstudio` (minuscule) **non** touchée (domaines, slugs, IDs).
+- **Exclusions** : `src/integrations/`, `src/lib/utils.ts`, fichiers `.test.ts`, identifiants comme `EbookStudioPro` accolés (camelCase de noms de composants)
+- Vérification post-rename : `rg "EbookStudio[^P]"` doit renvoyer 0 (hors composants).
+
+## 3. Titre flashy centré dans le header Ebook Planner
+
+**Fichier** : `src/components/layout/EspaceHeader.tsx` (lignes 307-340)
+
+Le header actuel : `[Mon espace › 📖 Projet]  ............ [Token | Pack KDP | Cockpit | ⚙ | ↪]`
+
+Ajout d'un bloc central absolument positionné (pour rester vraiment centré indépendamment des éléments de gauche/droite) :
+
+```
+<div class="absolute left-1/2 -translate-x-1/2 pointer-events-none">
+  <span class="px-4 py-1 rounded-full font-extrabold text-sm tracking-wide
+               bg-gradient-to-r from-[#008296] via-[#00A8B5] to-[#FF9E2D]
+               text-white shadow-md shadow-[#FF9E2D]/30
+               animate-[pulse_2.4s_ease-in-out_infinite]">
+    ✨ Ebookstudio Pro V2
+  </span>
+</div>
+```
+
+- Pulse Tailwind déjà disponible (animation native)
+- Dégradé teal → orange (palette KDP, validée)
+- `pointer-events-none` pour ne pas bloquer le clic sur les boutons en dessous si chevauchement
+- Caché en `< md` (responsive) pour ne pas écraser le titre du projet sur mobile : ajouter `hidden md:inline-flex`
+
+## Détails techniques
+
+- Pas de modification du backend ni des edge functions
+- Pas de migration DB
+- `useBrandTitle` est déjà importé globalement → un seul changement de constante suffit pour tous les onglets navigateur
+- Le script de rename sera exécuté via `code--exec` avec `sed -i` après dry-run `rg` de contrôle
+- Aucun composant/route renommé (uniquement texte visible)
+
+## Hors scope
+
+- Pas de refonte du dashboard
+- Pas de changement de logique des autres outils KDP (Description, Mots-clés, etc.) — seul le Bio est défaillant d'après l'utilisateur

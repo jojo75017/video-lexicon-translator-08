@@ -28,7 +28,7 @@ export const ALL_TEMPLATES: SocialPostTemplate[] = [
   // === FACEBOOK ===
   {
     id: 'fb-1', platform: 'facebook', type: 'Post groupe "Revenus Passifs"',
-    visualDescription: 'Screenshot du dashboard EbookStudio avec compteur de livres publiés. Overlay doré avec chiffres clés.',
+    visualDescription: 'Screenshot du dashboard Ebookstudio Pro V2 avec compteur de livres publiés. Overlay doré avec chiffres clés.',
     content: `📖 [RETOUR D'EXPÉRIENCE] Comment je publie 3 ebooks/semaine sur Amazon KDP
 
 Salut le groupe 👋
@@ -55,7 +55,7 @@ Questions en commentaire ! 👇`,
   },
   {
     id: 'fb-2', platform: 'facebook', type: 'Post témoignage avant/après',
-    visualDescription: 'Infographie split en deux : gauche (rouge/négatif) = ancienne méthode, droite (vert/positif) = avec EbookStudio.',
+    visualDescription: 'Infographie split en deux : gauche (rouge/négatif) = ancienne méthode, droite (vert/positif) = avec Ebookstudio Pro V2.',
     content: `🔥 J'aurais aimé avoir cet outil il y a 2 ans...
 
 AVANT :
@@ -64,7 +64,7 @@ AVANT :
 ❌ Des couvertures amateurs
 ❌ 0 vente pendant 3 mois
 
-APRÈS EbookStudio Pro :
+APRÈS Ebookstudio Pro V2 :
 ✅ 47 min pour un ebook complet
 ✅ 0,30€ de coût de production
 ✅ Couvertures professionnelles en 1 clic
@@ -78,7 +78,7 @@ Aucune CB requise. 🙌`,
   },
   {
     id: 'fb-3', platform: 'facebook', type: 'Post question/engagement',
-    visualDescription: 'Visuel sondage avec les 3 options A/B/C en gros, couleurs vives, logo EbookStudio en watermark.',
+    visualDescription: 'Visuel sondage avec les 3 options A/B/C en gros, couleurs vives, logo Ebookstudio Pro V2 en watermark.',
     content: `💬 Sondage rapide :
 
 Si vous pouviez publier un livre sur Amazon en MOINS d'une heure...
@@ -110,7 +110,7 @@ Répondez avec votre lettre ! 👇`,
 
 💡 L'astuce : 3-5 titres par niche pour dominer Amazon.
 
-Avec EbookStudio Pro, un ebook par niche en ~47 min.
+Avec Ebookstudio Pro V2, un ebook par niche en ~47 min.
 
 🎁 Commentez "NICHES" → je vous envoie mon guide gratuit en MP !`,
     hashtags: ['kdp', 'niches', 'amazon', 'revenuspassifs', 'ebook', 'business2026']
@@ -118,7 +118,7 @@ Avec EbookStudio Pro, un ebook par niche en ~47 min.
   {
     id: 'fb-5', platform: 'facebook', type: 'Post urgence/FOMO',
     visualDescription: 'Bandeau rouge "DERNIÈRE SEMAINE", prix barré 197€ → 67€, timer visuel.',
-    content: `⏰ [DERNIÈRE SEMAINE] Offre Fondateur EbookStudio Pro
+    content: `⏰ [DERNIÈRE SEMAINE] Offre Fondateur Ebookstudio Pro V2
 
 Le 1er juillet, le prix passe à 197€.
 
@@ -275,12 +275,12 @@ Moi j'en publie 3 par semaine. 📚
     id: 'tk-2', platform: 'tiktok', type: 'Avant/Après',
     hook: '0-3s: Split screen - galère vs facilité',
     visualDescription: 'Split screen vertical: gauche = personne stressée qui écrit, droite = clic et ebook prêt. Transition satisfaisante.',
-    content: `AVANT EbookStudio :
+    content: `AVANT Ebookstudio Pro V2 :
 😩 3 semaines pour UN livre
 😩 500€ de ghostwriter
 😩 0 vente car mauvais mots-clés
 
-APRÈS EbookStudio :
+APRÈS Ebookstudio Pro V2 :
 🚀 47 min pour un livre complet
 🚀 0,30€ de coût
 🚀 Couverture pro incluse
@@ -306,7 +306,7 @@ APRÈS EbookStudio :
 
 Total : 47 minutes. Coût : 0,30€.
 
-L'outil ? EbookStudio Pro.
+L'outil ? Ebookstudio Pro V2.
 Lien en bio pour tester gratuitement 🆓`,
     hashtags: ['tuto', 'tutoriel', 'kdp', 'amazon', 'ebook', 'ia', 'howto', 'learnontiktok']
   },
@@ -348,7 +348,7 @@ L'IA qui transforme vos idées en livres Amazon KDP
 ⏱️ Temps de création : 47 min/livre
 💰 Coût : 0,30€ par ebook
 
-Outil utilisé : EbookStudio Pro
+Outil utilisé : Ebookstudio Pro V2
 📌 Enregistrez + visitez ebookstudio.fr`,
     hashtags: ['kdp', 'niches', 'amazon', 'revenus', 'ebook', 'business', 'sidehustle', 'passiveincome', 'entrepreneuriat']
   },
@@ -359,7 +359,7 @@ Outil utilisé : EbookStudio Pro
 
 • 2023 : 0 livre publié
 • 2024 : 18 livres (méthode manuelle)
-• 2025-2026 : 35+ livres (avec EbookStudio)
+• 2025-2026 : 35+ livres (avec Ebookstudio Pro V2)
 
 ⏱️ Temps moyen : 47 min/livre
 💰 Coût moyen : 0,30€/livre
@@ -383,7 +383,7 @@ Voici comment (thread) ↓
 1/ Le problème : écrire un livre prend des semaines.
 La solution : l'IA le fait en 47 minutes.
 
-2/ Mon outil : EbookStudio Pro
+2/ Mon outil : Ebookstudio Pro V2
 - Plan structuré en 30 sec
 - Chapitres rédigés par IA (Gemini 3 Flash)
 - Couverture pro en 1 clic

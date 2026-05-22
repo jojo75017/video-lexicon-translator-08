@@ -161,7 +161,7 @@ const DemoPage = () => {
   return (
     <div className="min-h-screen bg-joy-cream text-joy-ink overflow-x-hidden">
       <Helmet>
-        <title>Démo Gratuite - Génère ton plan d'ebook en 30 secondes | EbookStudio</title>
+        <title>Démo Gratuite - Génère ton plan d'ebook en 30 secondes | Ebookstudio Pro V2</title>
         <meta name="description" content="Teste gratuitement notre IA : un plan d'ebook structuré avec chapitres et mots-clés Amazon KDP, en 30 secondes. Sans inscription." />
         <link rel="canonical" href="https://ebookstudio.fr/demo" />
       </Helmet>
@@ -185,7 +185,7 @@ const DemoPage = () => {
               <div className="w-11 h-11 rounded-2xl bg-joy-peach flex items-center justify-center shadow-joy animate-joy-wiggle">
                 <BookOpen className="w-5 h-5 text-joy-ink" />
               </div>
-              <span className="font-black text-lg text-joy-ink">EbookStudio</span>
+              <span className="font-black text-lg text-joy-ink">Ebookstudio Pro V2</span>
             </Link>
           </div>
           <Button onClick={() => navigate('/offres')} className="bg-joy-ink hover:bg-joy-ink/90 text-joy-cream font-black rounded-full px-5 shadow-joy">
@@ -499,7 +499,7 @@ const DemoPage = () => {
             Prêt à publier ton premier ebook ?
           </h2>
           <p className="text-joy-ink/70 max-w-lg mx-auto mb-6">
-            Rejoins +2 400 créateurs qui utilisent EbookStudio pour publier sur Amazon KDP.
+            Rejoins +2 400 créateurs qui utilisent Ebookstudio Pro V2 pour publier sur Amazon KDP.
           </p>
           <Button size="lg" className="bg-joy-peach hover:bg-joy-peach/90 text-joy-ink font-black rounded-2xl px-10 py-7 text-lg shadow-joy-lg hover:scale-105 transition-transform" onClick={() => navigate('/offres')}>
             <Crown className="w-5 h-5 mr-2" /> Tout débloquer pour 67€

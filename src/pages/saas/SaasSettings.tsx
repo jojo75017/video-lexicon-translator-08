@@ -377,7 +377,7 @@ export const SaasSettings: React.FC = () => {
                 🔑 Vos Clés API - Ce qu'il faut savoir
               </CardTitle>
               <CardDescription className="text-base">
-                EbookStudio Pro fonctionne avec vos propres clés API. Vous ne payez que ce que vous utilisez, sans intermédiaire.
+                Ebookstudio Pro V2 fonctionne avec vos propres clés API. Vous ne payez que ce que vous utilisez, sans intermédiaire.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -460,7 +460,7 @@ export const SaasSettings: React.FC = () => {
                 {[
                   { step: "1", title: "Créez un compte Google AI Studio", desc: "Rendez-vous sur aistudio.google.com et connectez-vous avec votre compte Google (celui de Gmail suffit)", icon: "🌐", color: "from-blue-500 to-cyan-500" },
                   { step: "2", title: "Générez votre clé API", desc: "Cliquez sur 'Get API Key' en haut à gauche → 'Create API Key' → Copiez la clé qui commence par 'AIza...'", icon: "🔑", color: "from-indigo-500 to-blue-500" },
-                  { step: "3", title: "Collez dans EbookStudio", desc: "Collez votre clé dans le champ ci-dessous et cliquez Valider. Le badge passe au vert = vous êtes prêt !", icon: "✅", color: "from-green-500 to-emerald-500" },
+                  { step: "3", title: "Collez dans Ebookstudio Pro V2", desc: "Collez votre clé dans le champ ci-dessous et cliquez Valider. Le badge passe au vert = vous êtes prêt !", icon: "✅", color: "from-green-500 to-emerald-500" },
                 ].map((item, i) => (
                   <div key={i} className="flex items-start gap-3 p-4 bg-card border border-border rounded-xl hover:border-blue-500/30 transition-colors">
                     <div className={`w-9 h-9 rounded-lg bg-gradient-to-br ${item.color} flex items-center justify-center text-white font-bold text-sm flex-shrink-0`}>
@@ -597,7 +597,7 @@ export const SaasSettings: React.FC = () => {
                 🗣️ Voix Azure disponibles par thématique
               </CardTitle>
               <CardDescription>
-                EbookStudio sélectionne automatiquement la meilleure voix selon votre genre littéraire, mais vous pouvez aussi la choisir manuellement.
+                Ebookstudio Pro V2 sélectionne automatiquement la meilleure voix selon votre genre littéraire, mais vous pouvez aussi la choisir manuellement.
               </CardDescription>
             </CardHeader>
             <CardContent>

@@ -70,7 +70,7 @@ const marketingChannels: MarketingChannel[] = [
       { id: 'yt-2', title: 'Créer vidéo "Génération contenu IA"', description: 'Montrer le workflow complet', priority: 'high', timeframe: 'Semaine 1' },
       { id: 'yt-3', title: 'Créer vidéo "Design couverture"', description: 'Démonstration génération cover', priority: 'medium', timeframe: 'Semaine 2' },
       { id: 'yt-4', title: 'Créer vidéo "Export KDP + SEO"', description: 'Process complet publication', priority: 'medium', timeframe: 'Semaine 2' },
-      { id: 'yt-5', title: 'Comparatif "EbookStudio vs KDP Spy"', description: 'Vidéo comparative pour capter trafic concurrent', priority: 'low', timeframe: 'Mois 1' },
+      { id: 'yt-5', title: 'Comparatif "Ebookstudio Pro V2 vs KDP Spy"', description: 'Vidéo comparative pour capter trafic concurrent', priority: 'low', timeframe: 'Mois 1' },
     ]
   },
   {
@@ -202,7 +202,7 @@ const MarketingPlanPage: React.FC = () => {
               <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
                 📈 Plan Marketing
               </h1>
-              <p className="text-muted-foreground">Stratégie d'acquisition de trafic EbookStudio</p>
+              <p className="text-muted-foreground">Stratégie d'acquisition de trafic Ebookstudio Pro V2</p>
             </div>
           </div>
           <Button variant="outline" size="sm" onClick={resetProgress}>

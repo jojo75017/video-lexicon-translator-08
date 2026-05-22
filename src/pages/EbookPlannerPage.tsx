@@ -1371,13 +1371,13 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             >
               <div className="relative z-10 max-w-3xl">
                 <p className="text-xs font-semibold uppercase tracking-wide opacity-90 mb-2">
-                  ✨ EbookStudio · Suite IA pour auteurs Amazon KDP
+                  ✨ Ebookstudio Pro V2 · Suite IA pour auteurs Amazon KDP
                 </p>
                 <h2 className="text-2xl md:text-3xl font-bold leading-tight mb-2">
                   Votre livre Amazon KDP mérite d'être lu.
                 </h2>
                 <p className="text-sm md:text-base opacity-95 leading-relaxed">
-                  EbookStudio est la suite d'outils IA pensée pour les auteurs Amazon Kindle Direct Publishing.
+                  Ebookstudio Pro V2 est la suite d'outils IA pensée pour les auteurs Amazon Kindle Direct Publishing.
                   Identifiez les niches rentables, optimisez vos titres, mots-clés, descriptions et couvertures —
                   et donnez à votre livre toutes ses chances dès la première publication.
                 </p>
@@ -1405,7 +1405,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                 </span>
                 <span>
                   <span className="block text-sm font-semibold text-foreground">Nouveau ici ? Voir les tutoriels</span>
-                  <span className="block text-xs text-muted-foreground">11 actions essentielles pas à pas pour maîtriser EbookStudio</span>
+                  <span className="block text-xs text-muted-foreground">11 actions essentielles pas à pas pour maîtriser Ebookstudio Pro V2</span>
                 </span>
               </span>
               <span className="text-xs font-medium text-primary group-hover:text-accent transition-colors">Découvrir →</span>

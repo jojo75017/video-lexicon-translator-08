@@ -1025,7 +1025,7 @@ Réponds en JSON:
         `© ${new Date().getFullYear()} - Tous droits réservés`,
         '',
         `Titre : ${title}`,
-        `Créé avec EbookStudio Pro`,
+        `Créé avec Ebookstudio Pro V2`,
         '',
         'Ce livre est une œuvre de fiction générée par intelligence artificielle.',
         'Toute ressemblance avec des personnes réelles serait fortuite.',
@@ -1152,7 +1152,7 @@ Réponds en JSON:
       pdf.setFontSize(14);
       pdf.text(`Merci d'avoir lu "${title}"`, pageWidth / 2, pageHeight / 2 + 10, { align: 'center' });
       pdf.setFontSize(10);
-      pdf.text('Créé avec EbookStudio Pro', pageWidth / 2, pageHeight / 2 + 30, { align: 'center' });
+      pdf.text('Créé avec Ebookstudio Pro V2', pageWidth / 2, pageHeight / 2 + 30, { align: 'center' });
 
       // Sauvegarde
       const fileName = `BD_${title.replace(/[^a-zA-Z0-9]/g, '_')}_${Date.now()}.pdf`;

@@ -92,7 +92,7 @@ const distributionModules: FormationModule[] = [
   },
   {
     id: 3,
-    title: "Générer avec EbookStudio",
+    title: "Générer avec Ebookstudio Pro V2",
     description: "Guide pas à pas de la génération audio",
     icon: Zap,
     color: "from-yellow-500 to-orange-500",
@@ -100,7 +100,7 @@ const distributionModules: FormationModule[] = [
       {
         subtitle: "🚀 Étapes de génération",
         items: [
-          "1. Ouvrez votre projet ebook dans EbookStudio",
+          "1. Ouvrez votre projet ebook dans Ebookstudio Pro V2",
           "2. Allez dans l'onglet '🎙️ Livre Audio' dans la sidebar",
           "3. Votre texte (préface, chapitres, conclusion) est automatiquement synchronisé",
           "4. Sélectionnez une voix dans le menu déroulant",
@@ -139,8 +139,8 @@ const distributionModules: FormationModule[] = [
     color: "from-purple-500 to-violet-500",
     content: [
       {
-        subtitle: "🌐 Le Publisher AudioBook d'EbookStudio",
-        text: "EbookStudio inclut un système de publication gratuit qui vous permet d'héberger vos livres audio avec une page publique et un lecteur intégrable."
+        subtitle: "🌐 Le Publisher AudioBook d'Ebookstudio Pro V2",
+        text: "Ebookstudio Pro V2 inclut un système de publication gratuit qui vous permet d'héberger vos livres audio avec une page publique et un lecteur intégrable."
       },
       {
         subtitle: "📋 Comment publier",
@@ -285,7 +285,7 @@ const distributionModules: FormationModule[] = [
           "3. Proposez un prix légèrement inférieur à Audible (-20%)",
           "4. Offrez un bonus exclusif : chapitre bonus, guide complémentaire...",
           "5. Mettez en place un système de livraison automatique du fichier MP3",
-          "6. Intégrez le lecteur embed d'EbookStudio pour l'aperçu"
+          "6. Intégrez le lecteur embed d'Ebookstudio Pro V2 pour l'aperçu"
         ]
       },
       {
@@ -545,7 +545,7 @@ const FormationAudiobookDistribution: React.FC = () => {
     y += 8;
     pdf.setFontSize(10);
     pdf.setTextColor(100);
-    pdf.text('EbookStudio Pro - Guide complet de distribution audiobook', 105, y, { align: 'center' });
+    pdf.text('Ebookstudio Pro V2 - Guide complet de distribution audiobook', 105, y, { align: 'center' });
     y += 15;
 
     distributionModules.forEach((module) => {

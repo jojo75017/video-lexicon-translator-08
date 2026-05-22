@@ -131,8 +131,8 @@ export default function Nouveautes2026Page() {
   return (
     <>
       <Helmet>
-        <title>Nouveautés 2026 - EbookStudio Pro | Toutes les fonctionnalités</title>
-        <meta name="description" content="Découvrez toutes les nouveautés 2026 d'EbookStudio Pro : moteur IA Gemini 3 Flash, livres audio professionnels, 7 générateurs spécialisés et outils marketing KDP intégrés." />
+        <title>Nouveautés 2026 - Ebookstudio Pro V2 | Toutes les fonctionnalités</title>
+        <meta name="description" content="Découvrez toutes les nouveautés 2026 d'Ebookstudio Pro V2 : moteur IA Gemini 3 Flash, livres audio professionnels, 7 générateurs spécialisés et outils marketing KDP intégrés." />
       </Helmet>
 
       <div className="min-h-screen bg-background text-foreground">
@@ -140,7 +140,7 @@ export default function Nouveautes2026Page() {
         <header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-xl">
           <div className="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
             <Link to="/offres" className="text-lg font-bold text-primary">
-              ← EbookStudio Pro
+              ← Ebookstudio Pro V2
             </Link>
             <Badge variant="outline" className="border-primary/50 text-primary">
               <Sparkles className="w-3 h-3 mr-1" /> Mise à jour 2026
@@ -205,7 +205,7 @@ export default function Nouveautes2026Page() {
                 </video>
               </div>
               <p className="text-sm text-muted-foreground mt-3">
-                <Play className="w-4 h-4 inline mr-1" /> Toutes les nouveautés EbookStudio Pro 2026 en vidéo
+                <Play className="w-4 h-4 inline mr-1" /> Toutes les nouveautés Ebookstudio Pro V2 2026 en vidéo
               </p>
             </motion.div>
           </div>
@@ -281,7 +281,7 @@ export default function Nouveautes2026Page() {
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button asChild size="lg" className="gap-2">
                   <Link to="/offres">
-                    Découvrir EbookStudio Pro <ArrowRight className="w-4 h-4" />
+                    Découvrir Ebookstudio Pro V2 <ArrowRight className="w-4 h-4" />
                   </Link>
                 </Button>
                 <Button asChild variant="outline" size="lg" className="gap-2">
@@ -317,7 +317,7 @@ export default function Nouveautes2026Page() {
 
         {/* Footer */}
         <footer className="border-t border-border/40 py-6 text-center text-xs text-muted-foreground">
-          <p>© {new Date().getFullYear()} EbookStudio Pro - Tous droits réservés</p>
+          <p>© {new Date().getFullYear()} Ebookstudio Pro V2 - Tous droits réservés</p>
         </footer>
       </div>
     </>

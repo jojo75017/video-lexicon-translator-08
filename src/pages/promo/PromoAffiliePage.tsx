@@ -30,7 +30,7 @@ const ReferralLockedScreen = () => {
   });
   return (
     <FunnelLayout>
-      <SeoHead title="Programme de parrainage — Ouverture le 1er juillet 2026" description="Le programme de parrainage EbookStudio ouvre officiellement le 1er juillet 2026." />
+      <SeoHead title="Programme de parrainage — Ouverture le 1er juillet 2026" description="Le programme de parrainage Ebookstudio Pro V2 ouvre officiellement le 1er juillet 2026." />
       <div className="max-w-2xl mx-auto px-4 py-20 text-center">
         <div className="w-20 h-20 mx-auto mb-6 bg-[#FF9E2D]/15 rounded-full flex items-center justify-center">
           <Lock className="w-10 h-10 text-[#FF9E2D]" />
@@ -136,7 +136,7 @@ Bonjour,
 
 Si vous avez déjà rêvé d'écrire et publier votre propre livre sur Amazon KDP mais que vous bloquiez sur le plan, les chapitres, la couverture ou les mots-clés SEO… j'ai trouvé l'outil qui débloque tout.
 
-EbookStudio transforme une simple idée en ebook complet (plan, chapitres, couverture, fichiers KDP-compliant) en moins de 30 minutes. Tout est généré, vous n'avez qu'à valider.
+Ebookstudio Pro V2 transforme une simple idée en ebook complet (plan, chapitres, couverture, fichiers KDP-compliant) en moins de 30 minutes. Tout est généré, vous n'avez qu'à valider.
 
 Le mieux ? C'est un paiement unique de 67€ - accès à vie, aucun abonnement.
 
@@ -146,7 +146,7 @@ Si vous le testez, dites-moi ce que vous en pensez !` : '';
 
   const socialPost = code ? `🚀 Vous voulez publier votre 1er ebook sur Amazon KDP cette semaine ?
 
-J'utilise EbookStudio depuis quelques semaines : un outil tout-en-un qui génère le plan, les chapitres, la couverture, les mots-clés SEO et les fichiers KDP-compliant en moins de 30 minutes.
+J'utilise Ebookstudio Pro V2 depuis quelques semaines : un outil tout-en-un qui génère le plan, les chapitres, la couverture, les mots-clés SEO et les fichiers KDP-compliant en moins de 30 minutes.
 
 ✅ Paiement unique 67€
 ✅ Accès à vie (pas d'abonnement)
@@ -154,7 +154,7 @@ J'utilise EbookStudio depuis quelques semaines : un outil tout-en-un qui génèr
 
 Mon lien (avec petit cashback pour moi 😉) : ${link}` : '';
 
-  const tweet = code ? `J'ai testé EbookStudio : un ebook complet (plan, chapitres, couverture, KDP) en 30 min pour 67€ à vie.
+  const tweet = code ? `J'ai testé Ebookstudio Pro V2 : un ebook complet (plan, chapitres, couverture, KDP) en 30 min pour 67€ à vie.
 
 Plus besoin de bricoler 10 outils. ${link}` : '';
 
@@ -162,14 +162,14 @@ Plus besoin de bricoler 10 outils. ${link}` : '';
 
 [BODY 3-25s]
 - Avant : 6 mois bloqué sur le plan
-- Maintenant : 30 min avec EbookStudio
+- Maintenant : 30 min avec Ebookstudio Pro V2
 - Plan, chapitres, couverture, mots-clés : tout généré
 - Paiement unique 67€, accès à vie
 
 [CTA 25-30s] "Lien dans la bio" → ${link}` : '';
 
   const objections = [
-    { q: 'C\'est de l\'IA, donc le contenu est plat ?', a: 'Non - EbookStudio utilise un workflow à 15 agents IA spécialisés (un par tâche : plan, narration, dialogue, SEO, etc.) qui produit du contenu structuré et professionnel. L\'auteur garde le contrôle à chaque étape.' },
+    { q: 'C\'est de l\'IA, donc le contenu est plat ?', a: 'Non - Ebookstudio Pro V2 utilise un workflow à 15 agents IA spécialisés (un par tâche : plan, narration, dialogue, SEO, etc.) qui produit du contenu structuré et professionnel. L\'auteur garde le contrôle à chaque étape.' },
     { q: 'Pourquoi 67€ alors que d\'autres outils sont gratuits ?', a: 'Parce que c\'est un paiement unique - pas un abonnement à 30€/mois. À l\'année, vous économisez plusieurs centaines d\'euros vs Jasper, Sudowrite ou ChatGPT Plus.' },
     { q: 'Je suis débutant, c\'est pour moi ?', a: 'Oui - tout est guidé pas à pas. Une formation est incluse pour publier votre 1er ebook sur Amazon KDP de A à Z.' },
     { q: 'Y a-t-il une garantie ?', a: 'Garantie satisfait ou remboursé 14 jours, sans condition.' },
@@ -178,8 +178,8 @@ Plus besoin de bricoler 10 outils. ${link}` : '';
   return (
     <FunnelLayout>
       <SeoHead
-        title="Programme d'affiliation EbookStudio - 30% par vente"
-        description="Gagnez 20,10€ par vente en recommandant EbookStudio. Paiement unique 67€ à vie. Cookie 30 jours, paiement PayPal."
+        title="Programme d'affiliation Ebookstudio Pro V2 - 30% par vente"
+        description="Gagnez 20,10€ par vente en recommandant Ebookstudio Pro V2. Paiement unique 67€ à vie. Cookie 30 jours, paiement PayPal."
         canonical="/promo/affilie"
       />
 
@@ -193,7 +193,7 @@ Plus besoin de bricoler 10 outils. ${link}` : '';
             Gagnez <span className="text-[#008296]">20,10€</span> par vente
           </h1>
           <p className="text-lg text-gray-700 max-w-2xl mx-auto">
-            30% de commission sur chaque vente d'EbookStudio (paiement unique 67€ à vie). Cookie 30 jours, paiement PayPal mensuel dès 50€.
+            30% de commission sur chaque vente d'Ebookstudio Pro V2 (paiement unique 67€ à vie). Cookie 30 jours, paiement PayPal mensuel dès 50€.
           </p>
         </div>
       </section>
@@ -283,7 +283,7 @@ Plus besoin de bricoler 10 outils. ${link}` : '';
                   🎁 Kit de promotion
                 </h2>
                 <p className="text-gray-600 text-sm mt-1">
-                  Tout ce dont vous avez besoin pour promouvoir EbookStudio. Copiez-collez et adaptez.
+                  Tout ce dont vous avez besoin pour promouvoir Ebookstudio Pro V2. Copiez-collez et adaptez.
                 </p>
               </div>
 

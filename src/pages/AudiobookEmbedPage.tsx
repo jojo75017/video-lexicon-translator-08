@@ -146,7 +146,7 @@ const AudiobookEmbedPage = () => {
                 date && ['Publication', date],
                 ['Format', 'MP3 · HD'],
                 ['Écoutes', String(playCount)],
-                ['Éditeur', 'EbookStudio'],
+                ['Éditeur', 'Ebookstudio Pro V2'],
               ].filter(Boolean).map((row: any, i) => (
                 <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', fontSize: '.85rem' }}>
                   <span style={{ color: 'rgba(255,255,255,.4)', textTransform: 'uppercase', fontSize: '.7rem', letterSpacing: '.06em' }}>{row[0]}</span>
@@ -208,7 +208,7 @@ const AudiobookEmbedPage = () => {
 
         {/* FOOTER */}
         <div style={{ textAlign: 'center', padding: 20, borderTop: '1px solid rgba(255,255,255,.05)', fontSize: '.7rem', color: 'rgba(255,255,255,.15)' }}>
-          Propulsé par EbookStudio Pro • Audio IA Premium
+          Propulsé par Ebookstudio Pro V2 • Audio IA Premium
         </div>
       </div>
     </div>

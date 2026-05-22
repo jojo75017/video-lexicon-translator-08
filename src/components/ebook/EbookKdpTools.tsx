@@ -130,9 +130,33 @@ export const EbookKdpTools: React.FC<EbookKdpToolsProps> = ({
   };
 
   const handleGenerateAuthorBio = async () => {
-    const result = await generateAuthorBio(authorName, genre);
-    if (result) {
-      setAuthorBio(result);
+    // Fallback : récupère auteur/genre depuis le projet courant si props vides
+    let effectiveAuthor = authorName;
+    let effectiveGenre = genre;
+    if (!effectiveAuthor || !effectiveGenre) {
+      try {
+        const raw = localStorage.getItem('ebook_current_project') || localStorage.getItem('ebookProject');
+        if (raw) {
+          const p = JSON.parse(raw);
+          effectiveAuthor = effectiveAuthor || p.authorName || p.author || '';
+          effectiveGenre = effectiveGenre || p.genre || p.category || '';
+        }
+      } catch {}
+    }
+    if (!effectiveAuthor) {
+      toast.error("Renseigne le nom de l'auteur dans la fiche projet avant de générer la bio.");
+      return;
+    }
+    try {
+      const result = await generateAuthorBio(effectiveAuthor, effectiveGenre || 'écriture');
+      if (result) {
+        setAuthorBio(result);
+        toast.success('Biographie auteur générée !');
+      } else {
+        toast.error('Aucun contenu généré, réessaie.');
+      }
+    } catch (e: any) {
+      toast.error(`Erreur génération bio: ${e?.message || 'inconnue'}`);
     }
   };
 

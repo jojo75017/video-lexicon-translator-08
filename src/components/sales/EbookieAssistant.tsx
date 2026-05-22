@@ -94,11 +94,11 @@ const EbookieAssistant: React.FC = () => {
               VOTRE COPILOTE IA INTÉGRÉ
             </Badge>
             <h2 className="text-3xl md:text-4xl font-black text-foreground mb-4 leading-tight">
-              Rencontrez votre copilote <span className="text-primary">EbookStudio</span><br />
+              Rencontrez votre copilote <span className="text-primary">Ebookstudio Pro V2</span><br />
               KDP 24/7
             </h2>
             <p className="text-foreground/70 text-lg mb-6">
-              Bloqué sur une niche ? Une couverture qui pèche ? Un titre faible ? EbookStudio répond
+              Bloqué sur une niche ? Une couverture qui pèche ? Un titre faible ? Ebookstudio Pro V2 répond
               en moins de 2 secondes, dans toutes les langues, sans jamais dormir.
             </p>
 
@@ -134,7 +134,7 @@ const EbookieAssistant: React.FC = () => {
               className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl px-8 py-6"
             >
               <Sparkles className="w-5 h-5 mr-2" />
-              Activer EbookStudio - 67€ à vie
+              Activer Ebookstudio Pro V2 - 67€ à vie
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
           </motion.div>
@@ -155,7 +155,7 @@ const EbookieAssistant: React.FC = () => {
                   <Bot className="w-5 h-5 text-primary-foreground" />
                 </div>
                 <div className="text-primary-foreground flex-1">
-                  <p className="font-bold text-sm">EbookStudio</p>
+                  <p className="font-bold text-sm">Ebookstudio Pro V2</p>
                   <p className="text-[11px] opacity-80 flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-primary-foreground animate-pulse" />
                     En ligne - répond en 2s

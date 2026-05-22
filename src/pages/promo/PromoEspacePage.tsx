@@ -141,7 +141,7 @@ const PromoEspacePage = () => {
   };
 
   const productLabel = (k: string) => {
-    if (k === 'main' || k === 'main_yearly') return 'EbookStudio - Accès à vie';
+    if (k === 'main' || k === 'main_yearly') return 'Ebookstudio Pro V2 - Accès à vie';
     if (k === 'license_extended') return 'Licence commerciale étendue';
     if (k === 'templates_premium') return 'Pack 50 templates premium';
     return k;
@@ -150,8 +150,8 @@ const PromoEspacePage = () => {
   return (
     <FunnelLayout>
       <SeoHead
-        title="Espace membre - EbookStudio"
-        description="Accédez à vos commandes, votre lien d'affiliation et vos bonus EbookStudio."
+        title="Espace membre - Ebookstudio Pro V2"
+        description="Accédez à vos commandes, votre lien d'affiliation et vos bonus Ebookstudio Pro V2."
         canonical="/promo/espace"
         noindex
       />
@@ -381,7 +381,7 @@ const PromoEspacePage = () => {
             <TabsContent value="acces" className="mt-6">
               <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-3">
                 <h2 className="text-xl font-bold">🚀 Accéder à l'outil</h2>
-                <p className="text-gray-700">Une fois votre paiement validé, accédez à EbookStudio.</p>
+                <p className="text-gray-700">Une fois votre paiement validé, accédez à Ebookstudio Pro V2.</p>
                 <Link to="/offres">
                   <Button variant="outline" className="border-[#008296] text-[#008296]">Aller à l'application</Button>
                 </Link>

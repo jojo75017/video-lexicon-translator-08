@@ -42,11 +42,11 @@ export const formationModules: FormationModule[] = [
     image: module01,
     color: "from-orange-500 to-amber-500",
     category: 'core',
-    content: `## Bienvenue dans EbookStudio Pro 2026
+    content: `## Bienvenue dans Ebookstudio Pro V2 2026
 
 ### Ce que cette formation va vous apporter
 
-EbookStudio Pro est un atelier de création littéraire complet propulsé par **Gemini 3 Flash**, le modèle d'IA de Google. En 18 modules, vous allez maîtriser chaque outil pour produire, publier et vendre des ebooks professionnels.
+Ebookstudio Pro V2 est un atelier de création littéraire complet propulsé par **Gemini 3 Flash**, le modèle d'IA de Google. En 18 modules, vous allez maîtriser chaque outil pour produire, publier et vendre des ebooks professionnels.
 
 ### Votre premier objectif : tout configurer en 10 minutes
 
@@ -205,7 +205,7 @@ Pour ceux qui veulent aller vite : entrez un titre et un genre, cliquez sur "Gé
 
 ### Architecture du moteur
 
-Le workflow éditorial est le cœur d'EbookStudio. Il s'inspire des processus d'une maison d'édition professionnelle, automatisés grâce à Gemini 3 Flash. Chaque étape (P1 à P14) traite un aspect précis de la production éditoriale.
+Le workflow éditorial est le cœur d'Ebookstudio Pro V2. Il s'inspire des processus d'une maison d'édition professionnelle, automatisés grâce à Gemini 3 Flash. Chaque étape (P1 à P14) traite un aspect précis de la production éditoriale.
 
 ### P1 - Directeur Éditorial 🎯
 
@@ -414,7 +414,7 @@ Pour enrichir vos livres avec des images :
 
 ### Exporter votre manuscrit
 
-EbookStudio produit des fichiers prêts à uploader directement sur Amazon KDP sans retouche.
+Ebookstudio Pro V2 produit des fichiers prêts à uploader directement sur Amazon KDP sans retouche.
 
 **Formats disponibles** :
 
@@ -427,7 +427,7 @@ EbookStudio produit des fichiers prêts à uploader directement sur Amazon KDP s
 
 ### Recherche KDP Intégrée
 
-Sans quitter EbookStudio, explorez le marché Amazon :
+Sans quitter Ebookstudio Pro V2, explorez le marché Amazon :
 - **Bestsellers** par catégorie avec BSR (Best Seller Rank)
 - **Niches rentables** : catégories avec forte demande et faible concurrence
 - **Mots-clés** : volume de recherche estimé, difficulté, CPC
@@ -472,7 +472,7 @@ Checklist automatique vérifiant :
 
 ### Pourquoi le marketing est essentiel
 
-Un excellent livre sans marketing, c'est un livre invisible. EbookStudio intègre une suite complète d'outils pour maximiser vos ventes dès le premier jour.
+Un excellent livre sans marketing, c'est un livre invisible. Ebookstudio Pro V2 intègre une suite complète d'outils pour maximiser vos ventes dès le premier jour.
 
 ### Amazon Ads Simulator
 
@@ -536,7 +536,7 @@ Templates prêts à poster :
 
 ### Créer un Audiobook avec Azure Neural Speech
 
-EbookStudio convertit vos chapitres en audio professionnel grâce à la technologie **Azure Neural Speech** (Microsoft), reconnue comme la synthèse vocale la plus naturelle du marché.
+Ebookstudio Pro V2 convertit vos chapitres en audio professionnel grâce à la technologie **Azure Neural Speech** (Microsoft), reconnue comme la synthèse vocale la plus naturelle du marché.
 
 ### Voix Disponibles
 
@@ -570,7 +570,7 @@ Pour ceux qui préfèrent dicter plutôt qu'écrire :
 
 ### Hébergement & Distribution
 
-Une fois votre audiobook prêt, EbookStudio vous permet de :
+Une fois votre audiobook prêt, Ebookstudio Pro V2 vous permet de :
 - **Publier** une page de vente avec lecteur intégré
 - **Partager** via un lien unique ou un code embed
 - **Vendre** directement avec intégration Stripe/PayPal
@@ -1098,7 +1098,7 @@ L'Humaniseur est automatiquement intégré dans **P5 - Réécriture Naturelle** 
     isNew: true,
     content: `## Génération d'Images IA Pro
 
-### Le système visuel d'EbookStudio
+### Le système visuel d'Ebookstudio Pro V2
 
 Toutes les images de la plateforme sont générées par **Imagen 3** (Google), le modèle de génération d'images le plus récent, capable de produire des visuels photoréalistes et artistiques de haute qualité.
 

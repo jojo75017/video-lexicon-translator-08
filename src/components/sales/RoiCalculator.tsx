@@ -30,7 +30,7 @@ const RoiCalculator = () => {
           </div>
           <div>
             <h3 className="font-bold text-xl text-foreground">Calculateur de ROI</h3>
-            <p className="text-sm text-foreground/60">Estimez vos revenus KDP avec EbookStudio</p>
+            <p className="text-sm text-foreground/60">Estimez vos revenus KDP avec Ebookstudio Pro V2</p>
           </div>
         </div>
 

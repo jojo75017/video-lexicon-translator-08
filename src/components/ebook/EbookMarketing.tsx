@@ -143,7 +143,7 @@ Comment utiliser ces fichiers :
 3. Programme l'envoi selon le calendrier J-7, J-3, J0, J+3, J+7.
 4. Remplace [LIEN_ACHAT] par le vrai lien si tu ne l'as pas renseigné.
 
-EbookStudio génère le contenu - l'envoi se fait depuis ton outil d'emailing.`);
+Ebookstudio Pro V2 génère le contenu - l'envoi se fait depuis ton outil d'emailing.`);
       const blob = await zip.generateAsync({ type: 'blob' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -177,7 +177,7 @@ EbookStudio génère le contenu - l'envoi se fait depuis ton outil d'emailing.`)
             <Info className="h-4 w-4 text-primary mt-0.5 shrink-0" />
             <p className="text-xs text-muted-foreground">
               Ces emails sont à <strong>copier-coller dans ton outil d'emailing</strong> habituel
-              (Mailchimp, Brevo, Systeme.io, ConvertKit, MailerLite…). EbookStudio génère le contenu —
+              (Mailchimp, Brevo, Systeme.io, ConvertKit, MailerLite…). Ebookstudio Pro V2 génère le contenu —
               <strong> l'envoi se fait depuis ton outil</strong>. Aucun email n'est envoyé d'ici.
             </p>
           </div>

@@ -55,7 +55,7 @@ export const FirstVisitBanner = () => {
 
           <div className="space-y-1">
             <h2 className="text-lg md:text-xl font-bold text-[#232F3E]">
-              👋 Bienvenue sur EbookStudio !
+              👋 Bienvenue sur Ebookstudio Pro V2 !
             </h2>
             <p className="text-sm text-[#5b6675] max-w-xl mx-auto">
               Découvrez le guide des outils en 2 min pour ne pas vous perdre dans les 44 outils disponibles.

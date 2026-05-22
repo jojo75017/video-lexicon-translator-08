@@ -265,7 +265,7 @@ export const EbookColoringBookGenerator: React.FC<ColoringBookGeneratorProps> = 
         'Aucune partie de ce livre ne peut etre reproduite',
         'sans l\'autorisation ecrite prealable de l\'editeur.',
         '',
-        'Cree avec EbookStudio - www.ebookstudio.fr',
+        'Cree avec Ebookstudio Pro V2 - www.ebookstudio.fr',
       ];
       let y = mTop + 50;
       copy.forEach(l => { pdf.text(l, cx, y, { align: 'center' }); y += 7; });

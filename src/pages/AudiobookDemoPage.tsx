@@ -17,7 +17,7 @@ import { motion } from 'framer-motion';
 const DEMO_DATA = {
   title: "Le Cow-Boy le Plus Rapide",
   subtitle: "Une aventure de Far West drôle, rythmée et pleine de rebondissements",
-  author_name: "EbookStudio",
+  author_name: "Ebookstudio Pro V2",
   voice_name: "Brigitte (IA Premium)",
   description: "Plongez dans une aventure hilarante au cœur du Far West ! Billy le cow-boy rêve de devenir le plus rapide de l'Ouest, mais entre ses bottes trop grandes, son cheval têtu et un bandit pas si méchant que ça, rien ne se passe comme prévu. Une histoire drôle, rythmée et pleine de rebondissements qui captivera les jeunes lecteurs et les fera rire du début à la fin. Idéal pour les trajets en voiture ou le rituel du coucher !",
   cover_url: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=400&h=400&fit=crop",
@@ -293,7 +293,7 @@ const AudiobookDemoPage = () => {
                   </button>
                 </div>
                 <div className="absolute -bottom-3 -right-3 bg-gradient-to-br from-amber-500 to-orange-600 text-foreground text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg shadow-lg rotate-[-3deg]">
-                  EbookStudio
+                  Ebookstudio Pro V2
                 </div>
               </div>
             </motion.div>
@@ -471,7 +471,7 @@ const AudiobookDemoPage = () => {
                 <MetaRow icon={<Download className="w-4 h-4 text-emerald-400" />} label="Accès" value="Téléchargement immédiat" />
                 <MetaRow icon={<Mic2 className="w-4 h-4 text-purple-400" />} label="Narrateur" value={audiobook.voice_name} />
                 <MetaRow icon={<Calendar className="w-4 h-4 text-blue-400" />} label="Publication" value={createdDate} />
-                <MetaRow icon={<Building2 className="w-4 h-4 text-pink-400" />} label="Éditeur" value="EbookStudio" />
+                <MetaRow icon={<Building2 className="w-4 h-4 text-pink-400" />} label="Éditeur" value="Ebookstudio Pro V2" />
                 <MetaRow icon={<Headphones className="w-4 h-4 text-amber-400" />} label="Écoutes" value={`${audiobook.play_count}`} />
                 
                 {/* Mini CTA in sidebar */}
@@ -510,7 +510,7 @@ const AudiobookDemoPage = () => {
               Comment est créé ce livre audio ?
             </h2>
             <p className="text-foreground/35 text-center mb-10 max-w-lg mx-auto text-sm">
-              Une production 100% automatisée grâce à la technologie EbookStudio
+              Une production 100% automatisée grâce à la technologie Ebookstudio Pro V2
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {[
@@ -632,7 +632,7 @@ const AudiobookDemoPage = () => {
       </div>
 
       <div className="text-center pb-10 pt-6 border-t border-border">
-        <p className="text-xs text-foreground/20">Propulsé par EbookStudio Pro 2026 • Audio IA Premium</p>
+        <p className="text-xs text-foreground/20">Propulsé par Ebookstudio Pro V2 2026 • Audio IA Premium</p>
       </div>
     </div>
   );

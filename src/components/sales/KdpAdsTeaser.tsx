@@ -51,7 +51,7 @@ export default function KdpAdsTeaser() {
                 Découvrir le guide complet <ArrowRight className="h-4 w-4" />
               </Button>
               <p className="text-xs text-muted-foreground mt-3">
-                Inclus dans l'abonnement EbookStudio Pro · Aucune campagne réelle n'est lancée depuis EbookStudio.
+                Inclus dans l'abonnement Ebookstudio Pro V2 · Aucune campagne réelle n'est lancée depuis Ebookstudio Pro V2.
               </p>
             </CardContent>
           </div>

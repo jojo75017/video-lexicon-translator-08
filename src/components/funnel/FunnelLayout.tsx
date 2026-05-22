@@ -12,7 +12,7 @@ const FunnelLayout = ({ children, showFooter = true }: FunnelLayoutProps) => {
       <header className="border-b border-gray-200 bg-white/80 backdrop-blur sticky top-0 z-40">
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
           <Link to="/promo" className="font-bold text-lg text-[#008296]">
-            EbookStudio
+            Ebookstudio Pro V2
           </Link>
           <nav className="flex items-center gap-4 text-sm">
             <Link to="/promo/decouverte" className="hover:text-[#FF9E2D] transition">L'outil</Link>
@@ -26,7 +26,7 @@ const FunnelLayout = ({ children, showFooter = true }: FunnelLayoutProps) => {
       {showFooter && (
         <footer className="border-t border-gray-200 bg-white mt-16">
           <div className="max-w-6xl mx-auto px-4 py-8 text-sm text-gray-600 flex flex-col md:flex-row justify-between gap-4">
-            <p>© {new Date().getFullYear()} EbookStudio - Tous droits réservés</p>
+            <p>© {new Date().getFullYear()} Ebookstudio Pro V2 - Tous droits réservés</p>
             <div className="flex flex-wrap gap-4">
               <Link to="/promo/affilie" className="text-[#FF9E2D] hover:underline font-semibold">
                 💰 Programme d'affiliation - 30%

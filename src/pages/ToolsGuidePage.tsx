@@ -225,7 +225,7 @@ const ToolsGuidePage: React.FC = () => {
             <h1 className="text-3xl font-bold text-foreground">Guide des outils</h1>
           </div>
           <p className="text-muted-foreground max-w-2xl">
-            Ta carte au trésor pour ne jamais te perdre dans EbookStudio. Suis le parcours, ou clique
+            Ta carte au trésor pour ne jamais te perdre dans Ebookstudio Pro V2. Suis le parcours, ou clique
             directement sur le cas d’usage qui te concerne.
           </p>
         </div>

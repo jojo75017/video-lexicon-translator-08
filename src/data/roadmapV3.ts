@@ -1,4 +1,4 @@
-// Roadmap V3 — EbookStudio "Publication Assistée Pro"
+// Roadmap V3 — Ebookstudio Pro V2 "Publication Assistée Pro"
 // Prix cible : 197€ à vie (vs 67€ pour V2 actuelle)
 // La liste reste éditable : on peut ajouter/retirer des modules.
 

@@ -312,8 +312,8 @@ export default function ForumPage() {
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
-        <title>Communauté EbookStudio - Forum</title>
-        <meta name="description" content="Rejoignez la communauté EbookStudio. Partagez vos résultats, posez vos questions et échangez avec d'autres auteurs KDP." />
+        <title>Communauté Ebookstudio Pro V2 - Forum</title>
+        <meta name="description" content="Rejoignez la communauté Ebookstudio Pro V2. Partagez vos résultats, posez vos questions et échangez avec d'autres auteurs KDP." />
       </Helmet>
 
       <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
@@ -333,7 +333,7 @@ export default function ForumPage() {
         {/* Header */}
         <div className="text-center space-y-3">
           <h1 className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent">
-            🏠 Communauté EbookStudio
+            🏠 Communauté Ebookstudio Pro V2
           </h1>
           <p className="text-muted-foreground max-w-xl mx-auto">
             Échangez, partagez vos résultats et progressez ensemble avec la communauté des auteurs KDP.

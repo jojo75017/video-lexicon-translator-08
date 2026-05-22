@@ -185,7 +185,7 @@ export const TUTORIELS: Tutoriel[] = [
     id: 'import-word',
     category: 'creation',
     title: 'Importer un manuscrit Word existant',
-    description: "Reprenez un .docx déjà écrit et continuez le travail dans EbookStudio.",
+    description: "Reprenez un .docx déjà écrit et continuez le travail dans Ebookstudio Pro V2.",
     durationMin: 5,
     icon: FileUp,
     steps: [
