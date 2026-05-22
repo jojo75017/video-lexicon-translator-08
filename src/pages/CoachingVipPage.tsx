@@ -180,7 +180,7 @@ const CoachingVipPage = () => {
         body: {
           email: cleanEmail,
           first_name: firstName.trim(),
-          product_key: "license_extended",
+          product_key: "coaching_vip",
           payment_method: "paypal",
         },
       });
