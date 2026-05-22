@@ -51,7 +51,7 @@ const categories = [
   'Histoire', 'Sciences', 'Autre',
 ];
 
-export const PriceEbookstudio Pro V2: React.FC = () => {
+export const PriceEbookStudio: React.FC = () => {
   const [title, setTitle] = useState('');
   const [subtitle, setSubtitle] = useState('');
   const [category, setCategory] = useState('');
