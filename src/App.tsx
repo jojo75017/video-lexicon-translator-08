@@ -26,6 +26,7 @@ const AdminPage = lazy(() => import('./pages/AdminPage').then(m => ({ default: m
 const AuthPage = lazy(() => import('./pages/AuthPage'));
 const AdminProfilePage = lazy(() => import('./pages/AdminProfilePage'));
 const AdminFunnelPage = lazy(() => import('./pages/admin/AdminFunnelPage'));
+const AdminPdfGiftsPage = lazy(() => import('./pages/admin/AdminPdfGiftsPage'));
 const AdminDirectPage = lazy(() => import('./pages/AdminDirectPage'));
 const AdminCockpitPage = lazy(() => import('./pages/AdminCockpitPage'));
 const AffiliationFormationPage = lazy(() => import('./pages/AffiliationFormationPage'));
