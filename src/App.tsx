@@ -549,6 +549,14 @@ const App = () => {
               }
             />
             <Route 
+              path="/admin/cadeaux-pdf" 
+              element={
+                <AdminGate>
+                  <AdminPdfGiftsPage />
+                </AdminGate>
+              }
+            />
+            <Route 
               path="/formation" 
               element={<FormationPage />}
             />
