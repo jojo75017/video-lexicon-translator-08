@@ -17,18 +17,39 @@ interface PdfGift {
 // Centralisé : ajouter ici tous les PDF disponibles dans /public
 const PDF_GIFTS: PdfGift[] = [
   {
-    id: 'guide-cle-gemini',
-    title: 'Guide — Obtenir sa clé API Gemini',
-    description: 'Tutoriel pas-à-pas pour créer une clé Gemini gratuite (Google AI Studio) et la coller dans Ebookstudio Pro V2.',
-    path: '/Guide_Cle_Gemini_API.pdf',
+    id: 'manuel-ebookstudio',
+    title: '📘 Manuel Officiel Ebookstudio',
+    description: 'Le guide principal du générateur : 15 agents IA, brief, génération chapitres, couverture KDP, export. À envoyer en priorité à tout nouvel abonné.',
+    path: '/lead-magnets/guide-generateur-ebookstudio-principal.pdf',
     category: 'guide',
   },
   {
+    id: 'guide-ebook-audio',
+    title: '🎧 Ebook Audio — Mode d\'emploi',
+    description: 'Workflow complet pour transformer un ebook en livre audio pro (voix neuronale, fusion FFmpeg, page de vente publique, livraison auto).',
+    path: '/lead-magnets/guide-ebook-audio-fonctionnement.pdf',
+    category: 'guide',
+  },
+  {
+    id: 'lead-50-niches-2026',
+    title: '💎 50 Niches Rentables KDP 2026',
+    description: 'Lead magnet vedette : 50 niches Amazon KDP analysées (6 catégories), format, mots-clés, exemples de titres qui vendent.',
+    path: '/lead-magnets/50-niches-rentables-kdp-2026.pdf',
+    category: 'lead-magnet',
+  },
+  {
     id: 'lead-5-niches-2026',
-    title: '5 Niches Rentables KDP 2026',
-    description: 'Lead magnet — analyse de 5 niches Amazon KDP à fort potentiel pour 2026 (BSR, concurrence, mots-clés).',
+    title: '🎯 5 Niches Rentables KDP 2026 (version courte)',
+    description: 'Version condensée — 5 niches détaillées (BSR, concurrence, mots-clés). Idéal pour séquence email rapide.',
     path: '/lead-magnets/5-niches-rentables-2026.pdf',
     category: 'lead-magnet',
+  },
+  {
+    id: 'guide-cle-gemini',
+    title: '🔑 Guide — Obtenir sa clé API Gemini',
+    description: 'Tutoriel pas-à-pas pour créer une clé Gemini gratuite (Google AI Studio) et la coller dans Ebookstudio Pro V2.',
+    path: '/Guide_Cle_Gemini_API.pdf',
+    category: 'guide',
   },
 ];
 
