@@ -193,6 +193,23 @@ export default function ContactSupportPage({ subscriberEmail }: Props) {
           </form>
 
           <aside className="space-y-4">
+            <div className="bg-gradient-to-br from-[#008296] to-[#006d7e] text-white rounded-2xl p-5 shadow-lg">
+              <div className="text-xs uppercase tracking-wide text-white/80 font-bold mb-2 flex items-center gap-1.5">
+                <Video className="w-3.5 h-3.5" /> Rendez-vous Zoom / Google Meet
+              </div>
+              <p className="text-sm text-white/90 mb-3">
+                Préférez un échange en visio ? Réservez un créneau gratuit avec moi (Georges).
+              </p>
+              <a
+                href="https://calendly.com/boubetgeorges/nouvelle-reunion"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-white text-[#008296] font-semibold px-4 py-2 rounded-full text-sm hover:bg-[#FF9E2D] hover:text-white transition w-full justify-center"
+              >
+                <Calendar className="w-4 h-4" /> Réserver un créneau
+              </a>
+            </div>
+
             <div className="bg-white border border-gray-200 rounded-2xl p-5">
               <div className="text-xs uppercase tracking-wide text-gray-500 mb-2">Email direct</div>
               <div className="flex items-center gap-2 text-[#008296] font-semibold">
