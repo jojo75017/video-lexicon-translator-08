@@ -326,6 +326,15 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
             <span className="hidden sm:inline tracking-tight">Mon espace</span>
             <Sparkles className="h-3.5 w-3.5 sm:hidden" style={{ color: '#008296' }} />
           </Link>
+          <Link
+            to="/contact-support"
+            title="Contacter le support — Georges répond sous 48h"
+            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-white shadow-md shadow-[#FF9E2D]/30 ring-1 ring-white/50 hover:brightness-110 transition"
+            style={{ backgroundImage: 'linear-gradient(90deg,#FF9E2D 0%,#FF6B35 100%)' }}
+          >
+            <MessageCircle className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Contact</span>
+          </Link>
           {projectTitle && (
             <>
               <span className="text-joy-ink/30 text-base">›</span>
