@@ -10,8 +10,9 @@ interface PdfGift {
   title: string;
   description: string;
   path: string; // public path, served from root
-  category: 'lead-magnet' | 'guide' | 'formation';
+  category: 'lead-magnet' | 'guide' | 'formation' | 'projet';
   sizeKb?: number;
+  internal?: boolean;
 }
 
 // Centralisé : ajouter ici tous les PDF disponibles dans /public
