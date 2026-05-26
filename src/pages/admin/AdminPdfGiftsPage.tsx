@@ -10,8 +10,9 @@ interface PdfGift {
   title: string;
   description: string;
   path: string; // public path, served from root
-  category: 'lead-magnet' | 'guide' | 'formation';
+  category: 'lead-magnet' | 'guide' | 'formation' | 'projet';
   sizeKb?: number;
+  internal?: boolean;
 }
 
 // Centralisé : ajouter ici tous les PDF disponibles dans /public
@@ -51,12 +52,21 @@ const PDF_GIFTS: PdfGift[] = [
     path: '/Guide_Cle_Gemini_API.pdf',
     category: 'guide',
   },
+  {
+    id: 'projet-v3',
+    title: '🚀 Projet V3 — Publication Assistée Pro (interne)',
+    description: 'Plan complet V3 : 9 modules (600 niches, validation Amazon live, pipeline 400+ pages…), comparatif kdpaccelerator, roadmap 7 sprints jusqu\'à octobre 2026. Document de travail interne — pour notes & décisions.',
+    path: '/lead-magnets/projet-v3-publication-assistee-pro.pdf',
+    category: 'projet',
+    internal: true,
+  },
 ];
 
 const CATEGORY_LABELS: Record<PdfGift['category'], { label: string; color: string }> = {
   'lead-magnet': { label: 'Lead Magnet', color: 'bg-[#FF9E2D]/15 text-[#FF9E2D] border-[#FF9E2D]/30' },
   'guide':       { label: 'Guide',       color: 'bg-[#008296]/15 text-[#008296] border-[#008296]/30' },
   'formation':   { label: 'Formation',   color: 'bg-purple-500/15 text-purple-600 border-purple-500/30' },
+  'projet':      { label: 'Projet interne', color: 'bg-red-500/15 text-red-600 border-red-500/30' },
 };
 
 const AdminPdfGiftsPage: React.FC = () => {
