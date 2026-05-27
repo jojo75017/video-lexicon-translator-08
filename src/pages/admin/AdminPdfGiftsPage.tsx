@@ -60,6 +60,14 @@ const PDF_GIFTS: PdfGift[] = [
     category: 'projet',
     internal: true,
   },
+  {
+    id: 'projet-v3-addendum',
+    title: '➕ V3 Addendum — 10 modules additionnels (interne)',
+    description: 'Complément au plan V3 : 10 nouveaux modules inspirés de kdpaccelerator (Wizard 6 étapes, Live Cockpit, Activity Books, Listing Optimizer Pro, OTO Engine, Predictor live, Launch Checklist 8 étapes, Multi-langue, Cover IA 6 variantes, Multi-Voice TTS). Total V3 = 22 modules.',
+    path: '/lead-magnets/projet-v3-addendum-10-modules.pdf',
+    category: 'projet',
+    internal: true,
+  },
 ];
 
 const CATEGORY_LABELS: Record<PdfGift['category'], { label: string; color: string }> = {
