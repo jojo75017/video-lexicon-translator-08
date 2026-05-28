@@ -664,55 +664,7 @@ const SalesPage = () => {
         </div>
       </section>
 
-      {/* ════════════════ 8. TESTIMONIALS ════════════════ */}
-      <section id="resultats" className="py-24 px-4 bg-secondary/40 border-y border-border">
-        <div className="max-w-6xl mx-auto">
-          <SectionTitle
-            eyebrow="Résultats réels"
-            title={<>Ils ont publié leur premier <span className="text-primary">eBook rentable.</span></>}
-          />
-
-          <div className="grid md:grid-cols-3 gap-5">
-            {[
-              {
-                name: "Camille R.",
-                role: "Coach bien-être · Bordeaux",
-                quote: "J'ai publié 4 livres en 3 mois. Mon meilleur titre me rapporte 1 240€/mois en passif sur Amazon.",
-                result: "+1 240 €/mois",
-              },
-              {
-                name: "Marc T.",
-                role: "Ex-salarié, retraité",
-                quote: "À 67 ans je n'avais jamais écrit. En 5 jours mon livre était sur KDP. 320 ventes le premier mois.",
-                result: "320 ventes / mois",
-              },
-              {
-                name: "Sophia L.",
-                role: "Formatrice indépendante",
-                quote: "L'audiobook neural a doublé mes revenus. Les gens achètent les deux formats sans hésiter.",
-                result: "Revenus ×2",
-              },
-            ].map((t, i) => (
-              <motion.div
-                key={i}
-                {...fadeUp}
-                transition={{ ...fadeUp.transition, delay: i * 0.1 }}
-                className="bg-card border border-border rounded-2xl p-7 flex flex-col"
-              >
-                <Quote className="w-7 h-7 text-primary/40 mb-3" />
-                <p className="text-foreground leading-relaxed mb-5 flex-1">"{t.quote}"</p>
-                <div className="flex items-center justify-between pt-5 border-t border-border">
-                  <div>
-                    <div className="font-bold text-foreground">{t.name}</div>
-                    <div className="text-xs text-muted-foreground">{t.role}</div>
-                  </div>
-                  <span className="text-sm font-extrabold text-accent">{t.result}</span>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Section témoignages retirée — sera ajoutée uniquement avec de vrais avis clients vérifiés */}
 
       {/* ════════════════ 9. ROI CALCULATOR ════════════════ */}
       <section className="py-20 px-4">
