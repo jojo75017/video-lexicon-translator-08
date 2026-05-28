@@ -577,9 +577,9 @@ const SalesPage = () => {
 
             {/* Après */}
             <div className="bg-foreground text-background rounded-2xl p-7 relative overflow-hidden">
-              <div className="absolute -top-20 -right-20 w-60 h-60 bg-primary/30 rounded-full blur-3xl" />
-              <div className="relative">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 text-primary text-xs font-bold uppercase mb-5">
+              <div className="absolute -top-32 -right-32 w-48 h-48 bg-primary/15 rounded-full blur-3xl pointer-events-none" />
+              <div className="relative z-10">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary text-primary-foreground text-xs font-bold uppercase mb-5">
                   <Check className="w-3.5 h-3.5" /> Avec Ebookstudio Pro
                 </div>
                 <ul className="space-y-3.5">
@@ -591,9 +591,9 @@ const SalesPage = () => {
                     "Audiobook neural inclus + hébergement",
                     "Posts, emails et visuels prêts à publier",
                   ].map((t) => (
-                    <li key={t} className="flex items-start gap-2.5 text-sm">
-                      <Check className="w-4 h-4 text-accent shrink-0 mt-0.5" />
-                      {t}
+                    <li key={t} className="flex items-start gap-2.5 text-sm text-background font-medium">
+                      <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                      <span>{t}</span>
                     </li>
                   ))}
                 </ul>
