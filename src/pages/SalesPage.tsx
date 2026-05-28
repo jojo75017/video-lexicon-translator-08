@@ -340,13 +340,8 @@ const SalesPage = () => {
 
             <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted-foreground">
               <span className="flex items-center gap-1.5"><ShieldCheck className="w-4 h-4 text-accent" /> Garantie 30 jours</span>
-              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-accent" /> Paiement unique</span>
-              <span className="flex items-center gap-1.5">
-                <span className="flex -space-x-1">
-                  {[1,2,3].map(i => <span key={i} className="w-5 h-5 rounded-full bg-gradient-to-br from-primary/40 to-primary/10 border-2 border-background" />)}
-                </span>
-                +212 auteurs publiés
-              </span>
+              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-accent" /> Paiement unique · à vie</span>
+              <span className="flex items-center gap-1.5"><Zap className="w-4 h-4 text-primary" /> Mises à jour incluses</span>
             </div>
           </motion.div>
 
