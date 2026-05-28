@@ -407,11 +407,11 @@ const SalesPage = () => {
               className="absolute -bottom-5 -left-5 bg-card border border-border rounded-2xl shadow-xl px-4 py-3 flex items-center gap-3"
             >
               <div className="w-10 h-10 rounded-full bg-accent/15 flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-accent" />
+                <ShieldCheck className="w-5 h-5 text-accent" />
               </div>
               <div>
-                <div className="text-xs text-muted-foreground">Revenus mois 3</div>
-                <div className="text-lg font-extrabold text-foreground leading-none">+1 240 €</div>
+                <div className="text-xs text-muted-foreground">Garantie</div>
+                <div className="text-sm font-extrabold text-foreground leading-none">30 jours satisfait</div>
               </div>
             </motion.div>
           </motion.div>
