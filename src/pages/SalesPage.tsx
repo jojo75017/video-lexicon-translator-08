@@ -576,10 +576,9 @@ const SalesPage = () => {
             </div>
 
             {/* Après */}
-            <div className="bg-foreground text-background rounded-2xl p-7 relative overflow-hidden">
-              <div className="absolute -top-32 -right-32 w-48 h-48 bg-primary/15 rounded-full blur-3xl pointer-events-none" />
+            <div style={{ backgroundColor: '#0F1115', color: '#FFFFFF' }} className="rounded-2xl p-7 relative overflow-hidden">
               <div className="relative z-10">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary text-primary-foreground text-xs font-bold uppercase mb-5">
+                <div style={{ backgroundColor: '#FF6B1A', color: '#FFFFFF' }} className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase mb-5">
                   <Check className="w-3.5 h-3.5" /> Avec Ebookstudio Pro
                 </div>
                 <ul className="space-y-3.5">
@@ -591,9 +590,9 @@ const SalesPage = () => {
                     "Audiobook neural inclus + hébergement",
                     "Posts, emails et visuels prêts à publier",
                   ].map((t) => (
-                    <li key={t} className="flex items-start gap-2.5 text-sm text-background font-medium">
-                      <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                      <span>{t}</span>
+                    <li key={t} style={{ color: '#FFFFFF' }} className="flex items-start gap-2.5 text-sm font-medium">
+                      <Check className="w-4 h-4 shrink-0 mt-0.5" style={{ color: '#10B981' }} />
+                      <span style={{ color: '#FFFFFF' }}>{t}</span>
                     </li>
                   ))}
                 </ul>
