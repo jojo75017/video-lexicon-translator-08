@@ -227,8 +227,6 @@ const SalesPage = () => {
             <ShieldCheck className="w-3.5 h-3.5 text-accent" />
             <strong>Garantie 30 jours</strong> satisfait ou remboursé
           </span>
-          <span className="opacity-40">·</span>
-          <span className="flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5 text-accent" /> Garantie 30 jours</span>
           <span className="opacity-40 hidden sm:inline">·</span>
           <span className="hidden sm:flex items-center gap-1.5"><Zap className="w-3.5 h-3.5 text-primary" /> Paiement unique · accès à vie</span>
         </div>
