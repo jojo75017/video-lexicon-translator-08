@@ -224,11 +224,9 @@ const SalesPage = () => {
       <div className="bg-foreground text-background text-xs">
         <div className="max-w-7xl mx-auto px-4 py-2 flex flex-wrap items-center justify-center gap-x-6 gap-y-1">
           <span className="flex items-center gap-1.5">
-            <Star className="w-3.5 h-3.5 fill-primary text-primary" />
-            <strong>4,9/5</strong> · 212 auteurs
+            <ShieldCheck className="w-3.5 h-3.5 text-accent" />
+            <strong>Garantie 30 jours</strong> satisfait ou remboursé
           </span>
-          <span className="opacity-40">·</span>
-          <span className="flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5 text-accent" /> Garantie 30 jours</span>
           <span className="opacity-40 hidden sm:inline">·</span>
           <span className="hidden sm:flex items-center gap-1.5"><Zap className="w-3.5 h-3.5 text-primary" /> Paiement unique · accès à vie</span>
         </div>
@@ -342,13 +340,8 @@ const SalesPage = () => {
 
             <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted-foreground">
               <span className="flex items-center gap-1.5"><ShieldCheck className="w-4 h-4 text-accent" /> Garantie 30 jours</span>
-              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-accent" /> Paiement unique</span>
-              <span className="flex items-center gap-1.5">
-                <span className="flex -space-x-1">
-                  {[1,2,3].map(i => <span key={i} className="w-5 h-5 rounded-full bg-gradient-to-br from-primary/40 to-primary/10 border-2 border-background" />)}
-                </span>
-                +212 auteurs publiés
-              </span>
+              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-accent" /> Paiement unique · à vie</span>
+              <span className="flex items-center gap-1.5"><Zap className="w-4 h-4 text-primary" /> Mises à jour incluses</span>
             </div>
           </motion.div>
 
@@ -414,11 +407,11 @@ const SalesPage = () => {
               className="absolute -bottom-5 -left-5 bg-card border border-border rounded-2xl shadow-xl px-4 py-3 flex items-center gap-3"
             >
               <div className="w-10 h-10 rounded-full bg-accent/15 flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-accent" />
+                <ShieldCheck className="w-5 h-5 text-accent" />
               </div>
               <div>
-                <div className="text-xs text-muted-foreground">Revenus mois 3</div>
-                <div className="text-lg font-extrabold text-foreground leading-none">+1 240 €</div>
+                <div className="text-xs text-muted-foreground">Garantie</div>
+                <div className="text-sm font-extrabold text-foreground leading-none">30 jours satisfait</div>
               </div>
             </motion.div>
           </motion.div>
@@ -576,10 +569,9 @@ const SalesPage = () => {
             </div>
 
             {/* Après */}
-            <div className="bg-foreground text-background rounded-2xl p-7 relative overflow-hidden">
-              <div className="absolute -top-32 -right-32 w-48 h-48 bg-primary/15 rounded-full blur-3xl pointer-events-none" />
+            <div style={{ backgroundColor: '#0F1115', color: '#FFFFFF' }} className="rounded-2xl p-7 relative overflow-hidden">
               <div className="relative z-10">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary text-primary-foreground text-xs font-bold uppercase mb-5">
+                <div style={{ backgroundColor: '#FF6B1A', color: '#FFFFFF' }} className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase mb-5">
                   <Check className="w-3.5 h-3.5" /> Avec Ebookstudio Pro
                 </div>
                 <ul className="space-y-3.5">
@@ -591,9 +583,9 @@ const SalesPage = () => {
                     "Audiobook neural inclus + hébergement",
                     "Posts, emails et visuels prêts à publier",
                   ].map((t) => (
-                    <li key={t} className="flex items-start gap-2.5 text-sm text-background font-medium">
-                      <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                      <span>{t}</span>
+                    <li key={t} style={{ color: '#FFFFFF' }} className="flex items-start gap-2.5 text-sm font-medium">
+                      <Check className="w-4 h-4 shrink-0 mt-0.5" style={{ color: '#10B981' }} />
+                      <span style={{ color: '#FFFFFF' }}>{t}</span>
                     </li>
                   ))}
                 </ul>
@@ -672,55 +664,7 @@ const SalesPage = () => {
         </div>
       </section>
 
-      {/* ════════════════ 8. TESTIMONIALS ════════════════ */}
-      <section id="resultats" className="py-24 px-4 bg-secondary/40 border-y border-border">
-        <div className="max-w-6xl mx-auto">
-          <SectionTitle
-            eyebrow="Résultats réels"
-            title={<>Ils ont publié leur premier <span className="text-primary">eBook rentable.</span></>}
-          />
-
-          <div className="grid md:grid-cols-3 gap-5">
-            {[
-              {
-                name: "Camille R.",
-                role: "Coach bien-être · Bordeaux",
-                quote: "J'ai publié 4 livres en 3 mois. Mon meilleur titre me rapporte 1 240€/mois en passif sur Amazon.",
-                result: "+1 240 €/mois",
-              },
-              {
-                name: "Marc T.",
-                role: "Ex-salarié, retraité",
-                quote: "À 67 ans je n'avais jamais écrit. En 5 jours mon livre était sur KDP. 320 ventes le premier mois.",
-                result: "320 ventes / mois",
-              },
-              {
-                name: "Sophia L.",
-                role: "Formatrice indépendante",
-                quote: "L'audiobook neural a doublé mes revenus. Les gens achètent les deux formats sans hésiter.",
-                result: "Revenus ×2",
-              },
-            ].map((t, i) => (
-              <motion.div
-                key={i}
-                {...fadeUp}
-                transition={{ ...fadeUp.transition, delay: i * 0.1 }}
-                className="bg-card border border-border rounded-2xl p-7 flex flex-col"
-              >
-                <Quote className="w-7 h-7 text-primary/40 mb-3" />
-                <p className="text-foreground leading-relaxed mb-5 flex-1">"{t.quote}"</p>
-                <div className="flex items-center justify-between pt-5 border-t border-border">
-                  <div>
-                    <div className="font-bold text-foreground">{t.name}</div>
-                    <div className="text-xs text-muted-foreground">{t.role}</div>
-                  </div>
-                  <span className="text-sm font-extrabold text-accent">{t.result}</span>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Section témoignages retirée — sera ajoutée uniquement avec de vrais avis clients vérifiés */}
 
       {/* ════════════════ 9. ROI CALCULATOR ════════════════ */}
       <section className="py-20 px-4">
