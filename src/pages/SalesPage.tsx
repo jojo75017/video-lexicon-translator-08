@@ -224,8 +224,8 @@ const SalesPage = () => {
       <div className="bg-foreground text-background text-xs">
         <div className="max-w-7xl mx-auto px-4 py-2 flex flex-wrap items-center justify-center gap-x-6 gap-y-1">
           <span className="flex items-center gap-1.5">
-            <Star className="w-3.5 h-3.5 fill-primary text-primary" />
-            <strong>4,9/5</strong> · 212 auteurs
+            <ShieldCheck className="w-3.5 h-3.5 text-accent" />
+            <strong>Garantie 30 jours</strong> satisfait ou remboursé
           </span>
           <span className="opacity-40">·</span>
           <span className="flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5 text-accent" /> Garantie 30 jours</span>
