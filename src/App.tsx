@@ -317,6 +317,7 @@ const App = () => {
               }
             />
             <Route path="/offres" element={<SalesPage />} />
+            <Route path="/activer-beta" element={<ActivationBetaPage />} />
             <Route path="/extension-chrome" element={<ExtensionChromePage />} />
             <Route path="/ebookbot" element={<EbookbotPage />} />
             <Route path="/mentions-legales" element={<MentionsLegales />} />
