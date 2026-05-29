@@ -574,6 +574,15 @@ const App = () => {
               }
             />
             <Route 
+              path="/admin/codes-beta" 
+              element={
+                <AdminGate>
+                  <AdminBetaCodesPage />
+                </AdminGate>
+              }
+            />
+
+            <Route 
               path="/formation" 
               element={<FormationPage />}
             />
