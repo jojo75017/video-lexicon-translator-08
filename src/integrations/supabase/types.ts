@@ -146,6 +146,33 @@ export type Database = {
         }
         Relationships: []
       }
+      beta_promo_codes: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          status: string
+          used_at: string | null
+          used_by_email: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          status?: string
+          used_at?: string | null
+          used_by_email?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          status?: string
+          used_at?: string | null
+          used_by_email?: string | null
+        }
+        Relationships: []
+      }
       book_tracking_history: {
         Row: {
           book_id: string
