@@ -27,6 +27,8 @@ const AuthPage = lazy(() => import('./pages/AuthPage'));
 const AdminProfilePage = lazy(() => import('./pages/AdminProfilePage'));
 const AdminFunnelPage = lazy(() => import('./pages/admin/AdminFunnelPage'));
 const AdminPdfGiftsPage = lazy(() => import('./pages/admin/AdminPdfGiftsPage'));
+const AdminBetaCodesPage = lazy(() => import('./pages/admin/AdminBetaCodesPage'));
+const ActivationBetaPage = lazy(() => import('./pages/ActivationBetaPage'));
 const ContactSupportPage = lazy(() => import('./pages/ContactSupportPage'));
 const AdminDirectPage = lazy(() => import('./pages/AdminDirectPage'));
 const AdminCockpitPage = lazy(() => import('./pages/AdminCockpitPage'));
@@ -315,6 +317,7 @@ const App = () => {
               }
             />
             <Route path="/offres" element={<SalesPage />} />
+            <Route path="/activer-beta" element={<ActivationBetaPage />} />
             <Route path="/extension-chrome" element={<ExtensionChromePage />} />
             <Route path="/ebookbot" element={<EbookbotPage />} />
             <Route path="/mentions-legales" element={<MentionsLegales />} />
@@ -570,6 +573,15 @@ const App = () => {
                 </AdminGate>
               }
             />
+            <Route 
+              path="/admin/codes-beta" 
+              element={
+                <AdminGate>
+                  <AdminBetaCodesPage />
+                </AdminGate>
+              }
+            />
+
             <Route 
               path="/formation" 
               element={<FormationPage />}
