@@ -14,6 +14,8 @@ export interface KdpPackOptions {
   pdfBlob?: Blob | null;
   coverFrontUrl?: string | null;
   coverFullUrl?: string | null;
+  /** PDF wrap complet exact KDP (généré par kdpCoverPdf) */
+  coverPdfBlob?: Blob | null;
   audioFiles?: Array<{ name: string; blob: Blob }>;
 }
 
