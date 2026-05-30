@@ -182,21 +182,33 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
     if (initialDescription.trim()) setDescription(initialDescription);
   }, [initialDescription]);
 
+  // Pré-remplissage des champs broché depuis le brief (si présent), sans bloquer
+  useEffect(() => {
+    const brief = (initialDescription || '').toLowerCase();
+    const trimMatch = brief.match(/(\d{1,2}[.,]?\d?)\s*[x×]\s*(\d{1,2}[.,]?\d?)\s*cm/);
+    if (trimMatch) {
+      setPbWidthCm(parseFloat(trimMatch[1].replace(',', '.')).toString());
+      setPbHeightCm(parseFloat(trimMatch[2].replace(',', '.')).toString());
+    }
+    const pagesMatch = brief.match(/(\d{2,4})\s*pages?/);
+    if (pagesMatch) setPbPages(pagesMatch[1]);
+    if (/blanc|white/.test(brief)) setPbPaper('white');
+  }, [initialDescription]);
+
   // ========== VALIDATION DIMENSIONS BROCHÉ (en direct, avant génération) ==========
   type CheckStatus = 'ok' | 'warn' | 'error';
   interface Check { label: string; status: CheckStatus; detail: string; }
 
   const paperbackValidation = React.useMemo(() => {
     if (format !== 'paperback') return null;
-    const brief = (initialDescription || '').toLowerCase();
     const checks: Check[] = [];
 
+    const widthMm = parseFloat(pbWidthCm.replace(',', '.')) * 10;
+    const heightMm = parseFloat(pbHeightCm.replace(',', '.')) * 10;
+    const pages = parseInt(pbPages, 10);
+
     // Trim
-    const trimMatch = brief.match(/(\d{1,2}[.,]?\d?)\s*[x×]\s*(\d{1,2}[.,]?\d?)\s*cm/);
-    let widthMm = 0, heightMm = 0;
-    if (trimMatch) {
-      widthMm = parseFloat(trimMatch[1].replace(',', '.')) * 10;
-      heightMm = parseFloat(trimMatch[2].replace(',', '.')) * 10;
+    if (!isNaN(widthMm) && !isNaN(heightMm) && widthMm > 0 && heightMm > 0) {
       const validKdp = widthMm >= 102 && widthMm <= 216 && heightMm >= 152 && heightMm <= 279;
       checks.push({
         label: 'Trim (format final)',
@@ -207,35 +219,30 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
       checks.push({
         label: 'Trim (format final)',
         status: 'error',
-        detail: 'Aucune dimension trouvée. Renseignez le format dans Format & Tranche KDP (ex : 15.24 × 22.86 cm).',
+        detail: 'Renseignez la largeur et la hauteur en cm ci-dessous (ex : 15.24 × 22.86 cm).',
       });
     }
 
     // Pages + papier
-    const pagesMatch = brief.match(/(\d{2,4})\s*pages?/);
-    const paper: 'cream' | 'white' = /blanc|white/.test(brief) ? 'white' : 'cream';
-    if (pagesMatch) {
-      const pages = parseInt(pagesMatch[1], 10);
+    if (!isNaN(pages) && pages > 0) {
       const validPages = pages >= 24 && pages <= 828;
       checks.push({
         label: 'Pages & papier',
         status: validPages ? 'ok' : 'error',
-        detail: `${pages} pages, papier ${paper === 'white' ? 'blanc' : 'crème'}${validPages ? '' : ' - KDP exige 24 à 828 pages'}`,
+        detail: `${pages} pages, papier ${pbPaper === 'white' ? 'blanc' : 'crème'}${validPages ? '' : ' - KDP exige 24 à 828 pages'}`,
       });
     } else {
       checks.push({
         label: 'Pages & papier',
         status: 'error',
-        detail: 'Nombre de pages manquant - impossible de calculer le dos. Saisissez-le dans Format & Tranche KDP.',
+        detail: 'Saisissez le nombre de pages ci-dessous pour calculer le dos.',
       });
     }
 
     // Dos calculé
-    if (pagesMatch) {
-      const pages = parseInt(pagesMatch[1], 10);
-      const factor = paper === 'white' ? 0.0524 : 0.0573;
+    if (!isNaN(pages) && pages > 0) {
+      const factor = pbPaper === 'white' ? 0.0524 : 0.0573;
       const spineMm = +(pages * factor).toFixed(2);
-      const spineOk = spineMm >= 1; // KDP : pas de texte sur le dos < 80p (~4.6mm) mais structure OK >= 1mm
       checks.push({
         label: 'Dos (spine)',
         status: spineMm < 4.6 ? 'warn' : 'ok',
@@ -253,7 +260,7 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
     const hasError = checks.some((c) => c.status === 'error');
     const hasWarn = checks.some((c) => c.status === 'warn');
     return { checks, hasError, hasWarn };
-  }, [format, initialDescription]);
+  }, [format, pbWidthCm, pbHeightCm, pbPages, pbPaper]);
 
   // ========== APERÇU DES PROMPTS AVANT GÉNÉRATION ==========
   const livePromptPreview = React.useMemo(() => {
