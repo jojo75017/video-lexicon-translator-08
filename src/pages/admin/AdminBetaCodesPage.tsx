@@ -38,6 +38,34 @@ const AdminBetaCodesPage: React.FC = () => {
   const [generating, setGenerating] = useState(false);
   const [quantity, setQuantity] = useState(5);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [sendDialog, setSendDialog] = useState<BetaCode | null>(null);
+  const [sendEmail, setSendEmail] = useState('');
+  const [sending, setSending] = useState(false);
+
+  const handleSendEmail = async () => {
+    if (!sendDialog) return;
+    const email = sendEmail.trim().toLowerCase();
+    if (!email || !email.includes('@')) {
+      toast.error('Adresse email invalide');
+      return;
+    }
+    setSending(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('send-beta-code', {
+        body: { email, code: sendDialog.code },
+      });
+      if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || "Échec de l'envoi");
+      toast.success(`Code envoyé à ${email}`);
+      setSendDialog(null);
+      setSendEmail('');
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err?.message || "Impossible d'envoyer l'email");
+    } finally {
+      setSending(false);
+    }
+  };
 
   const fetchCodes = useCallback(async () => {
     setLoading(true);
