@@ -235,6 +235,21 @@ const AdminBetaCodesPage: React.FC = () => {
                         </span>
                       )}
                     </TableCell>
+                    <TableCell className="text-sm">
+                      {c.sent_to_email ? (
+                        <span className="flex flex-col">
+                          <span>{c.sent_to_email}</span>
+                          {c.sent_at && (
+                            <span className="text-[11px] text-muted-foreground">
+                              envoyé le{' '}
+                              {new Date(c.sent_at).toLocaleString('fr-FR', { timeZone: 'Europe/Paris' })}
+                            </span>
+                          )}
+                        </span>
+                      ) : (
+                        '—'
+                      )}
+                    </TableCell>
                     <TableCell className="text-sm">{c.used_by_email || '—'}</TableCell>
                     <TableCell className="text-sm text-muted-foreground">
                       {c.used_at
