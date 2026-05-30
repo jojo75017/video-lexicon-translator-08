@@ -61,9 +61,9 @@ export const V3_MODULES: V3Module[] = [
     description: '20 pins générés automatiquement depuis la couverture du livre.' },
 
   // IA AVANCÉE
-  { id: 'p16-competitive',     pillar: 'ia',        status: 'todo', title: 'Agent P16 — Analyse Concurrentielle',
+  { id: 'p16-competitive',     pillar: 'ia',        status: 'todo', title: 'SCOUT — Analyse Concurrentielle (P16)',
     description: 'Scan top 10 Amazon de la niche pour positionnement et angles.' },
-  { id: 'p17-series',          pillar: 'ia',        status: 'todo', title: 'Agent P17 — Architecte de Série',
+  { id: 'p17-series',          pillar: 'ia',        status: 'todo', title: 'SAGA — Architecte de Série (P17)',
     description: 'Plan cohérent des tomes 2 / 3 / 4 (arcs, persos, cliffhangers).' },
 
   // ===== AJOUTS — lancement progressif juillet / août =====
@@ -95,11 +95,11 @@ export const V3_MODULES: V3Module[] = [
     description: "Templates et calendrier d'emails pour fidéliser les lecteurs." },
 
   // IA AVANCÉE
-  { id: 'p18-readability',      pillar: 'ia',        status: 'todo', title: 'Agent P18 — Audit Lisibilité',
+  { id: 'p18-readability',      pillar: 'ia',        status: 'todo', title: 'LUMEN — Audit Lisibilité (P18)',
     description: 'Score de lisibilité, rythme, longueur de phrases et suggestions par chapitre.' },
-  { id: 'p19-author-voice',     pillar: 'ia',        status: 'todo', title: "Agent P19 — Voix d'Auteur Persistante",
+  { id: 'p19-author-voice',     pillar: 'ia',        status: 'todo', title: "ÉCHO — Voix d'Auteur Persistante (P19)",
     description: 'Mémorise et applique le style signature sur toute une série.' },
-  { id: 'p20-chat-manuscript',  pillar: 'ia',        status: 'todo', title: 'Agent P20 — Chat Manuscrit',
+  { id: 'p20-chat-manuscript',  pillar: 'ia',        status: 'todo', title: 'ORACLE — Chat Manuscrit (P20)',
     description: 'Pose des questions à ton propre livre (cohérence, résumé, fiches persos).' },
 
   // ===== AJOUTS — issus du guide publication KDP (modules 03 → 08) — en attente =====
@@ -139,8 +139,8 @@ export const V3_MODULES: V3Module[] = [
     description: 'Crée visuels et accroches ciblés par niche pour les campagnes BookBub et Facebook Ads.' },
 
   // IA AVANCÉE
-  { id: 'p21-blurb-ab-tester',   pillar: 'ia',        status: 'todo', title: 'Agent P21 — A/B Test 4e de Couverture',
+  { id: 'p21-blurb-ab-tester',   pillar: 'ia',        status: 'todo', title: 'DUEL — A/B Test 4e de Couverture (P21)',
     description: 'Génère plusieurs variantes de 4e de couverture et les score pour identifier la plus vendeuse.' },
-  { id: 'p22-trend-radar',       pillar: 'ia',        status: 'todo', title: 'Agent P22 — Radar de Tendances',
+  { id: 'p22-trend-radar',       pillar: 'ia',        status: 'todo', title: 'VIGIE — Radar de Tendances (P22)',
     description: 'Détecte sujets émergents et saisonnalité d’une niche pour choisir le prochain livre à écrire.' },
 ];
