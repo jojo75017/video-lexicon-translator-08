@@ -1,71 +1,52 @@
-# Système de codes bêta-testeurs — EbookStudio Pro V2
+# V3 — Couverture KDP exacte en PDF + cohérence « wow »
 
-Objectif : permettre d'offrir un accès gratuit à vie à des bêta-testeurs via des codes promo à usage unique, avec page d'activation, dashboard admin et email de bienvenue automatique.
+## Objectif
+Aujourd'hui le Studio Couverture ne produit qu'un **gabarit PNG** et des dimensions à recopier. La V3 doit livrer un **vrai PDF de couverture complète** (4e de couv + dos + 1re de couv) aux **dimensions exactes KDP**, prêt à uploader. Le tout présenté comme un **nouveau module V3 dédié**, avec un rendu homogène et premium (effet « wouhaa »).
 
-## Comment l'accès gratuit est réellement accordé
+---
 
-Sur EbookStudio, un utilisateur se connecte avec **email + code d'accès `EBK-XXXXXX`** (table `subscribers`). Pour donner un accès gratuit à vie, on crée donc, au moment de l'activation, un abonné `plan_type = 'lifetime'` avec un code d'accès personnel `EBK-XXXXXX`, puis on l'envoie par email. Le code bêta `BETA-EBOOK-XXXX` sert uniquement à débloquer cette création (usage unique).
+## 1. Nouveau module dans la roadmap V3
+Dans `src/data/roadmapV3.ts`, ajouter un module pilier `publier` :
+```text
+id: 'cover-pdf-exact'
+title: 'Couverture KDP Exacte (PDF)'
+description: 'Génère le PDF wrap complet (4e+dos+1re) aux dimensions exactes KDP, bleed + zone ISBN, prêt à uploader.'
+status: 'in_progress'
+```
 
-## 1. Base de données
+## 2. Moteur de génération PDF exact
+Nouveau fichier `src/lib/kdpCoverPdf.ts` (utilise `jsPDF`, déjà installé) :
+- Entrées : format trim (po), nb de pages, type de papier (facteur dos), bleed, image 1re de couv (URL/dataURL), titre/auteur, texte 4e de couv.
+- Calcule la **largeur totale** = `2×(trim_w + bleed) + (pages × facteur_papier)` et **hauteur** = `trim_h + 2×bleed` (mêmes formules que `KdpCoverStudio`).
+- Crée un PDF `unit: 'in'` à la taille exacte (donc 300 DPI à l'impression), une seule page paysage.
+- Place : image de couv sur le panneau avant (avec bleed), bloc dos (titre + auteur verticaux centrés sur la tranche), 4e de couv (fond + description + réserve **zone ISBN 2"×1.2"** en bas à droite laissée blanche).
+- Repères de sécurité optionnels désactivés dans l'export final (PDF propre).
+- Export `downloadKdpCoverPdf()` + retour `Blob` réutilisable.
 
-Nouvelle table `beta_promo_codes` :
-- `code` (texte unique, format `BETA-EBOOK-XXXX`)
-- `status` (`available` / `used`)
-- `used_by_email`, `used_at`
-- champs standards (id, created_at)
+## 3. Brancher dans le Studio Couverture
+Dans `src/components/ebook/KdpCoverStudio.tsx` : à côté du bouton « Télécharger le gabarit », ajouter **« Télécharger le PDF couverture (exact KDP) »** qui appelle le nouveau moteur avec l'image de couverture actuelle, le format, le nb de pages et le papier sélectionnés.
 
-Sécurité (RLS) :
-- Les admins peuvent tout voir / créer / modifier.
-- Les codes ne sont **jamais** lisibles publiquement (la validation passe par une fonction backend sécurisée avec clé service).
-- Insertion initiale des **5 codes** : `BETA-EBOOK-4872`, `BETA-EBOOK-1953`, `BETA-EBOOK-7341`, `BETA-EBOOK-2608`, `BETA-EBOOK-9174`.
+## 4. Intégrer la couverture full au Pack KDP
+Dans `src/lib/kdpPackZip.ts` : permettre de fournir le **Blob PDF couverture** (et l'ajouter comme `couverture-complete.pdf`) en plus des images, pour un pack 100 % cohérent.
 
-## 2. Fonction backend d'activation (`redeem-beta-code`)
+## 5. Page / accès module dédié
+- Ajouter une route `/couverture-kdp` (lazy import) dans `src/App.tsx`, mirroring `/audit-pilot`.
+- Page wrapper réutilisant `UnifiedCoverStudio`/`KdpCoverStudio` avec en-tête module V3.
 
-Logique atomique (anti double-usage) :
-1. Reçoit `email` + `code`.
-2. Code inexistant → message **« Code invalide… »**.
-3. Code déjà `used` → message **« Ce code a déjà été utilisé… »** (avec l'adresse tranboub75017@gmail.com).
-4. Code `available` :
-   - marque le code `used` (avec email + date),
-   - crée/met à jour l'abonné en `plan_type = 'lifetime'`, statut `active`, avec un code d'accès `EBK-XXXXXX` généré,
-   - envoie l'email de bienvenue,
-   - retourne le succès + le code d'accès `EBK-XXXXXX` pour connexion.
+## 6. Homogénéité « wouhaa »
+Uniformiser sur la charte KDP (fond `#FAFAFA`, teal `#008296`, texte `#232F3E`, hover `#FF9E2D`) via tokens sémantiques :
+- Hero, badges et boutons du Studio Couverture alignés sur le style des autres modules V3.
+- Cohérence des libellés/CTA et des états de chargement.
 
-## 3. Page d'activation `/activer-beta`
+## 7. Correctif rapide
+Erreur runtime « Failed to fetch dynamically imported module EbookPlannerPage.tsx » : vérifier qu'elle est bien transitoire (chunk obsolète après les derniers edits) après le build ; corriger si un import casse réellement.
 
-Design identique à EbookStudio (mêmes tokens, composants `Card`/`Input`/`Button`, thème KDP) :
-- Champ email, champ code promo, bouton « Activer mon accès ».
-- Message de succès : **« Félicitations ! Votre accès gratuit à vie à EbookStudio Pro V2 est activé. Bienvenue dans la communauté ! »**, suivi du code d'accès `EBK-XXXXXX` et d'un bouton vers la connexion.
-- Messages d'erreur exactement comme demandé (code déjà utilisé / code invalide).
-
-## 4. Email de bienvenue automatique
-
-Envoyé via Resend (déjà configuré) depuis `redeem-beta-code` :
-- **Sujet** : « Bienvenue chez EbookStudio Pro V2 — Votre accès est activé »
-- **Corps** (FR) : message demandé + ajout du code d'accès `EBK-XXXXXX` et du lien de connexion pour que le bêta-testeur puisse se connecter immédiatement. Signature : « Georges » (modifiable).
-- Mise en page HTML aux couleurs de la marque.
-
-## 5. Dashboard admin `/admin/codes-beta`
-
-Protégé par le système admin existant (connexion par mot de passe de votre compte admin, validé côté serveur via `AdminGate` — plus sûr qu'un mot de passe en dur). Ajout d'un onglet « Codes Bêta » dans la navigation admin.
-
-Affiche :
-- Liste des 5 codes (et suivants),
-- Statut (utilisé / disponible),
-- Email du bêta-testeur ayant utilisé chaque code,
-- Date + heure d'activation,
-- Compteur : codes utilisés vs restants.
-
-Action : bouton **« Générer de nouveaux codes »** (format `BETA-EBOOK-XXXX`, 4 chiffres aléatoires uniques, avec contrôle d'unicité).
+---
 
 ## Détails techniques
+- Pas de backend nécessaire : génération 100 % client (`jsPDF`).
+- Images chargées en dataURL avant insertion (gestion CORS/fetch comme `fetchAsBlob`).
+- Facteurs papier et bleed repris à l'identique de `KdpCoverStudio` pour cohérence des calculs.
+- PDF en pouces = dimensions physiques exactes ; on documente CMJN/300 DPI dans la checklist existante.
 
-- Format code bêta : `BETA-EBOOK-` + 4 chiffres aléatoires uniques.
-- Anti-collision : génération avec vérification d'unicité côté base, nouvelle migration pour la table + RLS + seed des 5 codes.
-- Activation traitée intégralement côté serveur (clé service) pour éviter toute fraude depuis le navigateur.
-- Route `/activer-beta` ajoutée dans `App.tsx` (publique), route admin sous `AdminGate`.
-- Réutilisation de la logique existante d'abonné lifetime (`subscribers`) et de Resend.
-
-## Note sur le « mot de passe admin »
-
-Vous disposez déjà d'un système admin sécurisé (votre compte `boubetgeorges@gmail.com`, vérifié côté serveur). J'utiliserai ce système pour protéger la page — c'est plus sûr qu'un mot de passe écrit dans le code, qui serait visible et facilement contournable. Si vous préférez vraiment un mot de passe dédié distinct, dites-le-moi.
+Je confirmerai chaque export en QA (conversion PDF→image) avant livraison.

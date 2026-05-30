@@ -1,13 +1,15 @@
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BookOpen, Ruler, FileText, Copy, Download, Info, Calculator, Palette } from 'lucide-react';
+import { BookOpen, Ruler, FileText, Copy, Download, Info, Calculator, Palette, FileImage, Loader2, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
+import { downloadKdpCoverPdf } from '@/lib/kdpCoverPdf';
 
 // KDP trim sizes (inches)
 const KDP_FORMATS = [
@@ -45,14 +47,84 @@ function mmToIn(mm: number) { return Math.round(mm / 25.4 * 1000) / 1000; }
 
 interface KdpCoverStudioProps {
   onUseForGeneration?: (description: string) => void;
+  defaultTitle?: string;
+  defaultAuthor?: string;
+  defaultFrontCoverUrl?: string;
+  defaultBackText?: string;
 }
 
-const KdpCoverStudio: React.FC<KdpCoverStudioProps> = ({ onUseForGeneration }) => {
+const KdpCoverStudio: React.FC<KdpCoverStudioProps> = ({
+  onUseForGeneration,
+  defaultTitle = '',
+  defaultAuthor = '',
+  defaultFrontCoverUrl = '',
+  defaultBackText = '',
+}) => {
   const [formatId, setFormatId] = useState('6x9');
   const [pageCount, setPageCount] = useState(172);
   const [paperType, setPaperType] = useState('white');
   const [hasBleed, setHasBleed] = useState(true);
   const [activeTab, setActiveTab] = useState('calculator');
+
+  // PDF couverture exacte
+  const [pdfTitle, setPdfTitle] = useState(defaultTitle);
+  const [pdfAuthor, setPdfAuthor] = useState(defaultAuthor);
+  const [pdfBackText, setPdfBackText] = useState(defaultBackText);
+  const [frontImage, setFrontImage] = useState<string | null>(defaultFrontCoverUrl || null);
+  const [backImage, setBackImage] = useState<string | null>(null);
+  const [bgColor, setBgColor] = useState('#232F3E');
+  const [textColor, setTextColor] = useState('#FFFFFF');
+  const [pdfLoading, setPdfLoading] = useState(false);
+
+  const readFileAsDataUrl = (file: File): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = () => reject(new Error('lecture du fichier impossible'));
+      reader.readAsDataURL(file);
+    });
+
+  const handleFrontUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setFrontImage(await readFileAsDataUrl(file));
+  };
+  const handleBackUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setBackImage(await readFileAsDataUrl(file));
+  };
+
+  const handleGeneratePdf = async () => {
+    if (!pdfTitle.trim()) {
+      toast.error('Renseigne au moins le titre du livre');
+      return;
+    }
+    setPdfLoading(true);
+    try {
+      await downloadKdpCoverPdf({
+        trimW: format.w,
+        trimH: format.h,
+        pageCount,
+        paperFactor: paper.factor,
+        hasBleed,
+        frontCoverImage: frontImage,
+        backCoverImage: backImage,
+        ebookTitle: pdfTitle,
+        authorName: pdfAuthor,
+        backText: pdfBackText,
+        backgroundColor: bgColor,
+        textColor,
+      });
+      toast.success('PDF couverture KDP généré ✨', {
+        description: `Dimensions exactes ${calculations.totalWidth.toFixed(3)}" × ${calculations.totalHeight.toFixed(3)}" — prêt à uploader.`,
+      });
+    } catch (e: any) {
+      toast.error('Erreur lors de la génération du PDF', { description: e?.message });
+    } finally {
+      setPdfLoading(false);
+    }
+  };
 
   const format = useMemo(() => KDP_FORMATS.find(f => f.id === formatId) || KDP_FORMATS[4], [formatId]);
   const paper = useMemo(() => PAPER_TYPES.find(p => p.id === paperType) || PAPER_TYPES[0], [paperType]);
@@ -130,13 +202,96 @@ Prévoir recto, dos et quatrième de couverture, avec zone code-barres ISBN 2" x
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-5 w-full">
+        <TabsList className="grid grid-cols-3 md:grid-cols-6 w-full h-auto">
           <TabsTrigger value="calculator" className="text-xs"><Calculator className="w-3 h-3 mr-1" />Calculateur</TabsTrigger>
+          <TabsTrigger value="pdf" className="text-xs data-[state=active]:bg-[#008296] data-[state=active]:text-white"><FileImage className="w-3 h-3 mr-1" />PDF Pro</TabsTrigger>
           <TabsTrigger value="acrobat" className="text-xs"><FileText className="w-3 h-3 mr-1" />Acrobat</TabsTrigger>
           <TabsTrigger value="template" className="text-xs"><BookOpen className="w-3 h-3 mr-1" />Gabarit</TabsTrigger>
           <TabsTrigger value="zones" className="text-xs"><Palette className="w-3 h-3 mr-1" />Zones</TabsTrigger>
           <TabsTrigger value="checklist" className="text-xs"><Info className="w-3 h-3 mr-1" />Checklist</TabsTrigger>
         </TabsList>
+
+        {/* ====== PDF COUVERTURE EXACTE ====== */}
+        <TabsContent value="pdf" className="space-y-4 mt-4">
+          <Card className="overflow-hidden border-0 shadow-xl">
+            <div className="bg-gradient-to-r from-[#008296] to-[#00667a] px-6 py-5 text-white">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5" />
+                <h3 className="text-lg font-bold">Couverture KDP exacte en PDF</h3>
+                <Badge className="bg-[#FF9E2D] text-white border-0">V3</Badge>
+              </div>
+              <p className="text-sm text-white/85 mt-1">
+                Génère le wrap complet (4e + dos + 1re) aux dimensions exactes — bleed, dos calculé et zone ISBN inclus.
+              </p>
+            </div>
+            <CardContent className="p-6 space-y-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Titre du livre</Label>
+                  <Input value={pdfTitle} onChange={e => setPdfTitle(e.target.value)} placeholder="Mon super titre" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Auteur</Label>
+                  <Input value={pdfAuthor} onChange={e => setPdfAuthor(e.target.value)} placeholder="Prénom Nom" />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Texte de la 4ème de couverture</Label>
+                <Textarea
+                  value={pdfBackText}
+                  onChange={e => setPdfBackText(e.target.value)}
+                  placeholder="Résumé / accroche qui apparaîtra au dos du livre…"
+                  rows={4}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-1"><FileImage className="w-3.5 h-3.5" /> Image 1re de couverture</Label>
+                  <Input type="file" accept="image/*" onChange={handleFrontUpload} />
+                  {frontImage && <img src={frontImage} alt="aperçu couverture" className="h-24 rounded-md border object-cover" />}
+                </div>
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-1"><FileImage className="w-3.5 h-3.5" /> Image 4e de couverture <span className="text-muted-foreground">(optionnel)</span></Label>
+                  <Input type="file" accept="image/*" onChange={handleBackUpload} />
+                  {backImage && <img src={backImage} alt="aperçu 4e" className="h-24 rounded-md border object-cover" />}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 max-w-sm">
+                <div className="space-y-2">
+                  <Label>Couleur de fond</Label>
+                  <Input type="color" value={bgColor} onChange={e => setBgColor(e.target.value)} className="h-10 p-1" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Couleur du texte</Label>
+                  <Input type="color" value={textColor} onChange={e => setTextColor(e.target.value)} className="h-10 p-1" />
+                </div>
+              </div>
+
+              <div className="rounded-lg bg-[#FAFAFA] dark:bg-muted/30 border border-border p-3 text-sm text-muted-foreground">
+                Dimensions du PDF généré :{' '}
+                <span className="font-mono font-semibold text-foreground">
+                  {calculations.totalWidth.toFixed(3)}" × {calculations.totalHeight.toFixed(3)}"
+                </span>{' '}
+                ({calculations.totalWidthMm} × {calculations.totalHeightMm} mm) · dos {calculations.spineWidth.toFixed(3)}" · {pageCount} pages
+                {pageCount % 2 !== 0 && <span className="text-orange-600 font-medium"> · ⚠️ nombre de pages impair</span>}
+              </div>
+
+              <Button
+                onClick={handleGeneratePdf}
+                disabled={pdfLoading}
+                size="lg"
+                className="w-full gap-2 bg-[#FF9E2D] hover:bg-[#008296] text-white font-bold shadow-lg"
+              >
+                {pdfLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Download className="w-5 h-5" />}
+                {pdfLoading ? 'Génération du PDF…' : 'Télécharger le PDF couverture (exact KDP)'}
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
 
         {/* ====== CALCULATEUR ====== */}
         <TabsContent value="calculator" className="space-y-4 mt-4">

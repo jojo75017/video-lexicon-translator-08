@@ -14,6 +14,8 @@ export interface KdpPackOptions {
   pdfBlob?: Blob | null;
   coverFrontUrl?: string | null;
   coverFullUrl?: string | null;
+  /** PDF wrap complet exact KDP (généré par kdpCoverPdf) */
+  coverPdfBlob?: Blob | null;
   audioFiles?: Array<{ name: string; blob: Blob }>;
 }
 
@@ -131,6 +133,9 @@ export const generateKdpPackZip = async (opts: KdpPackOptions): Promise<Blob> =>
   if (opts.coverFullUrl) {
     const b = await fetchAsBlob(opts.coverFullUrl);
     if (b) root.file('couverture-full.jpg', b);
+  }
+  if (opts.coverPdfBlob) {
+    root.file('couverture-complete.pdf', opts.coverPdfBlob);
   }
 
   // Audio

@@ -74,6 +74,7 @@ const SeriesTomesPage = lazy(() => import('./pages/SeriesTomesPage'));
 const ForumPage = lazy(() => import('./pages/ForumPage'));
 const KdpKeywordResearchPage = lazy(() => import('./pages/KdpKeywordResearchPage'));
 const AuditPilotPage = lazy(() => import('./pages/AuditPilotPage'));
+const CouvertureKdpPage = lazy(() => import('./pages/CouvertureKdpPage'));
 const PublicAudiobookPage = lazy(() => import('./pages/PublicAudiobookPage'));
 const AudiobookEmbedPage = lazy(() => import('./pages/AudiobookEmbedPage'));
 const AudiobookDemoPage = lazy(() => import('./pages/AudiobookDemoPage'));
@@ -447,6 +448,19 @@ const App = () => {
                   onInvalid={handleLogout}
                 >
                   <AuditPilotPage />
+                </SubscriberGate>
+              }
+            />
+            <Route
+              path="/couverture-kdp"
+              element={
+                <SubscriberGate
+                  isAdmin={isAdmin}
+                  subscriberEmail={subscriberEmail}
+                  subscriberData={subscriberData}
+                  onInvalid={handleLogout}
+                >
+                  <CouvertureKdpPage />
                 </SubscriberGate>
               }
             />
