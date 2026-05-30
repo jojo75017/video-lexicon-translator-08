@@ -273,6 +273,41 @@ const AdminBetaCodesPage: React.FC = () => {
           )}
         </Card>
       </div>
+
+      <Dialog open={!!sendDialog} onOpenChange={(o) => !o && setSendDialog(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Envoyer le code par email</DialogTitle>
+            <DialogDescription>
+              Le bêta-testeur recevra le code{' '}
+              <span className="font-mono font-semibold">{sendDialog?.code}</span> avec un lien
+              d'activation.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground">Email du bêta-testeur</label>
+            <Input
+              type="email"
+              placeholder="exemple@email.com"
+              value={sendEmail}
+              onChange={(e) => setSendEmail(e.target.value)}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSendDialog(null)} disabled={sending}>
+              Annuler
+            </Button>
+            <Button onClick={handleSendEmail} disabled={sending}>
+              {sending ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Send className="h-4 w-4 mr-2" />
+              )}
+              Envoyer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
