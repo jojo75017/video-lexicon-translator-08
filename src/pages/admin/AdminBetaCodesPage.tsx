@@ -29,6 +29,8 @@ interface BetaCode {
   status: string;
   used_by_email: string | null;
   used_at: string | null;
+  sent_to_email: string | null;
+  sent_at: string | null;
   created_at: string;
 }
 
@@ -78,7 +80,7 @@ const AdminBetaCodesPage: React.FC = () => {
       console.error(error);
       toast.error('Impossible de charger les codes');
     } else {
-      setCodes(data || []);
+      setCodes((data as BetaCode[]) || []);
     }
     setLoading(false);
   }, []);
@@ -212,6 +214,7 @@ const AdminBetaCodesPage: React.FC = () => {
                 <TableRow>
                   <TableHead>Code</TableHead>
                   <TableHead>Statut</TableHead>
+                  <TableHead>Envoyé à</TableHead>
                   <TableHead>Utilisé par</TableHead>
                   <TableHead>Date d'activation</TableHead>
                   <TableHead className="text-right">Action</TableHead>
@@ -230,6 +233,21 @@ const AdminBetaCodesPage: React.FC = () => {
                         <span className="text-[11px] font-semibold uppercase px-2 py-0.5 rounded-full bg-[#008296]/10 text-[#008296] border border-[#008296]/30">
                           Disponible
                         </span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      {c.sent_to_email ? (
+                        <span className="flex flex-col">
+                          <span>{c.sent_to_email}</span>
+                          {c.sent_at && (
+                            <span className="text-[11px] text-muted-foreground">
+                              envoyé le{' '}
+                              {new Date(c.sent_at).toLocaleString('fr-FR', { timeZone: 'Europe/Paris' })}
+                            </span>
+                          )}
+                        </span>
+                      ) : (
+                        '—'
                       )}
                     </TableCell>
                     <TableCell className="text-sm">{c.used_by_email || '—'}</TableCell>

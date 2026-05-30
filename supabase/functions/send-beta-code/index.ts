@@ -91,6 +91,12 @@ Deno.serve(async (req) => {
 
     console.log('Beta code email sent to', email, res);
 
+    // Record the recipient so the admin can track sent invitations
+    await admin
+      .from('beta_promo_codes')
+      .update({ sent_to_email: email, sent_at: new Date().toISOString() })
+      .eq('id', codeRow.id);
+
     return new Response(
       JSON.stringify({ success: true }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
