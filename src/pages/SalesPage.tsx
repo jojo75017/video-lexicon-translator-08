@@ -39,6 +39,7 @@ import {
 import CoachingVipBanner from "@/components/sales/CoachingVipBanner";
 import CountdownDeadline from "@/components/sales/CountdownDeadline";
 import KdpRoiCalculator from "@/components/sales/KdpRoiCalculator";
+import TravelConsultCTA from "@/components/sales/TravelConsultCTA";
 
 const LAUNCH_PRICE = 67;
 const NORMAL_PRICE = 197;
@@ -792,6 +793,9 @@ const SalesPage = () => {
           </div>
         </div>
       </section>
+
+      {/* ════════════════ Consultation Voyage (bêta-testeurs & visiteurs) ════════════════ */}
+      <TravelConsultCTA />
 
       {/* ════════════════ 13. FINAL CTA ════════════════ */}
       <section className="py-24 px-4 bg-foreground text-background relative overflow-hidden">
