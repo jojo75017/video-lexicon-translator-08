@@ -93,4 +93,20 @@ export const V3_MODULES: V3Module[] = [
     description: 'Mémorise et applique le style signature sur toute une série.' },
   { id: 'p20-chat-manuscript',  pillar: 'ia',        status: 'todo', title: 'Agent P20 — Chat Manuscrit',
     description: 'Pose des questions à ton propre livre (cohérence, résumé, fiches persos).' },
+
+  // ===== AJOUTS — issus du guide publication KDP (modules 03 → 08) — en attente =====
+
+  // PUBLIER
+  { id: 'cover-variants-thumbnail', pillar: 'publier',  status: 'todo', title: 'Cover Designer 6 Variantes + Test Miniature',
+    description: 'Génère 6 variantes de couverture et les affiche en 200×300 px pour valider la lisibilité du titre dans les résultats Amazon.' },
+  { id: 'categories-manager-10',    pillar: 'publier',  status: 'todo', title: 'Gestionnaire de Catégories 10/livre',
+    description: 'Sélectionne 2 catégories optimales (1 large + 1 spécifique) puis prépare la demande des 8 catégories supplémentaires via le support KDP.' },
+
+  // MONÉTISER
+  { id: 'sales-description',        pillar: 'monetiser', status: 'todo', title: 'Description Vendeuse (5 parties)',
+    description: 'Rédige une description style page de vente : accroche, agitation, promesse, 5–7 bénéfices, CTA, avec mots de conversion (1500–2500 caractères).' },
+
+  // MARKETING
+  { id: 'arc-team-builder',         pillar: 'marketing', status: 'todo', title: "Constructeur d'Équipe ARC",
+    description: 'Recrute 10–30 lecteurs ARC, gère l’envoi du manuscrit et suit les objectifs d’avis (10 à J14, 25 à J30, 50 à J60).' },
 ];
