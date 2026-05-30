@@ -185,17 +185,23 @@ const AdminPdfGiftsPage: React.FC = () => {
                 </div>
 
                 <div className="flex flex-wrap gap-2">
-                  <Button asChild size="sm" className="bg-[#008296] hover:bg-[#FF9E2D] text-white">
-                    <a href={gift.path} download>
-                      <Download className="mr-2 h-4 w-4" />
-                      Télécharger
-                    </a>
+                  <Button
+                    size="sm"
+                    className="bg-[#008296] hover:bg-[#FF9E2D] text-white"
+                    disabled={busyId === gift.id}
+                    onClick={() => handleDownload(gift)}
+                  >
+                    <Download className="mr-2 h-4 w-4" />
+                    {busyId === gift.id ? 'Chargement…' : 'Télécharger'}
                   </Button>
-                  <Button asChild size="sm" variant="outline">
-                    <a href={gift.path} target="_blank" rel="noopener noreferrer">
-                      <ExternalLink className="mr-2 h-4 w-4" />
-                      Ouvrir
-                    </a>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={busyId === gift.id}
+                    onClick={() => handleOpen(gift)}
+                  >
+                    <ExternalLink className="mr-2 h-4 w-4" />
+                    Ouvrir
                   </Button>
                   <Button size="sm" variant="outline" onClick={() => handleCopy(gift)}>
                     {copiedId === gift.id ? (
