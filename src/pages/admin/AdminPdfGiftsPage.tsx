@@ -93,6 +93,54 @@ const AdminPdfGiftsPage: React.FC = () => {
     }
   };
 
+  const [busyId, setBusyId] = useState<string | null>(null);
+
+  // Récupère le PDF en blob (évite que l'iframe de preview se fige sur une navigation directe)
+  const fetchBlob = async (gift: PdfGift): Promise<Blob> => {
+    const res = await fetch(gift.path, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const blob = await res.blob();
+    if (blob.type && !blob.type.includes('pdf') && !blob.type.includes('octet-stream')) {
+      // Si on récupère du HTML (fallback SPA), le fichier n'existe pas réellement
+      throw new Error('Fichier introuvable');
+    }
+    return blob;
+  };
+
+  const handleDownload = async (gift: PdfGift) => {
+    setBusyId(gift.id);
+    try {
+      const blob = await fetchBlob(gift);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = gift.path.split('/').pop() || 'document.pdf';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+    } catch (e) {
+      toast.error("Téléchargement impossible — ouvrez plutôt le lien public dans un nouvel onglet");
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  const handleOpen = async (gift: PdfGift) => {
+    setBusyId(gift.id);
+    try {
+      const blob = await fetchBlob(gift);
+      const url = URL.createObjectURL(blob);
+      window.open(url, '_blank', 'noopener,noreferrer');
+      setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    } catch (e) {
+      // Fallback : ouverture directe du lien public absolu
+      window.open(`${origin}${gift.path}`, '_blank', 'noopener,noreferrer');
+    } finally {
+      setBusyId(null);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto p-4 md:p-6 max-w-6xl space-y-6">
@@ -137,17 +185,23 @@ const AdminPdfGiftsPage: React.FC = () => {
                 </div>
 
                 <div className="flex flex-wrap gap-2">
-                  <Button asChild size="sm" className="bg-[#008296] hover:bg-[#FF9E2D] text-white">
-                    <a href={gift.path} download>
-                      <Download className="mr-2 h-4 w-4" />
-                      Télécharger
-                    </a>
+                  <Button
+                    size="sm"
+                    className="bg-[#008296] hover:bg-[#FF9E2D] text-white"
+                    disabled={busyId === gift.id}
+                    onClick={() => handleDownload(gift)}
+                  >
+                    <Download className="mr-2 h-4 w-4" />
+                    {busyId === gift.id ? 'Chargement…' : 'Télécharger'}
                   </Button>
-                  <Button asChild size="sm" variant="outline">
-                    <a href={gift.path} target="_blank" rel="noopener noreferrer">
-                      <ExternalLink className="mr-2 h-4 w-4" />
-                      Ouvrir
-                    </a>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={busyId === gift.id}
+                    onClick={() => handleOpen(gift)}
+                  >
+                    <ExternalLink className="mr-2 h-4 w-4" />
+                    Ouvrir
                   </Button>
                   <Button size="sm" variant="outline" onClick={() => handleCopy(gift)}>
                     {copiedId === gift.id ? (
