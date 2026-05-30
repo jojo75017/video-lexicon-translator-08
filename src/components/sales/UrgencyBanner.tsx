@@ -4,8 +4,8 @@ import { TrendingUp, ShieldCheck, Zap, Clock, CreditCard, Sparkles, Gift, Hourgl
 
 // Messages 100% factuels - aucun chiffre fictif (conformité DGCCRF + règle projet "no fake data")
 const messages = [
-  { icon: Gift, text: "Programme de parrainage — à votre succès ! Lancement officiel le 1er juin", color: "text-[#232F3E]" },
-  { icon: Hourglass, text: "Parrainage : ouverture le 1er juin — préparez vos contacts", color: "text-[#232F3E]" },
+  { icon: Gift, text: "Programme de parrainage — à votre succès ! Lancement officiel le 1er juillet", color: "text-[#232F3E]" },
+  { icon: Hourglass, text: "Parrainage : ouverture le 1er juillet — préparez vos contacts", color: "text-[#232F3E]" },
   { icon: Clock, text: "Coaching VIP : 47€ au lieu de 197€ jusqu'au 15 juin", color: "text-[#232F3E]" },
   { icon: TrendingUp, text: "Ebookstudio Pro V2 : 67€ à vie, paiement unique", color: "text-[#232F3E]" },
   { icon: ShieldCheck, text: "Garantie 30 jours - remboursé sans question", color: "text-[#232F3E]" },

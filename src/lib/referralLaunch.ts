@@ -1,6 +1,6 @@
 // Date d'ouverture officielle du programme de parrainage
 // Avant cette date, aucune fonctionnalité de parrainage n'est accessible.
-export const REFERRAL_LAUNCH_DATE = new Date('2026-06-01T00:00:00+02:00');
+export const REFERRAL_LAUNCH_DATE = new Date('2026-07-01T00:00:00+02:00');
 
 export const isReferralActive = (): boolean => Date.now() >= REFERRAL_LAUNCH_DATE.getTime();
 
