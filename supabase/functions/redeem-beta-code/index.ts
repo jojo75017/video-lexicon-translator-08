@@ -70,6 +70,34 @@ async function sendWelcomeEmail(email: string, accessCode: string, loginUrl: str
   }
 }
 
+// Adresses qui reçoivent une notification à chaque activation bêta
+const ADMIN_NOTIFY_EMAILS = ['boubetgeorges@gmail.com', 'tranboub75017@gmail.com'];
+
+async function notifyAdmin(email: string, code: string, accessCode: string) {
+  const html = `
+  <div style="font-family:Arial,Helvetica,sans-serif;color:#232F3E;max-width:600px;margin:0 auto;">
+    <h2 style="color:#008296;">Nouvelle activation bêta-testeur 🎉</h2>
+    <p>Un bêta-testeur vient d'activer son accès gratuit à vie :</p>
+    <ul>
+      <li><strong>Email :</strong> ${email}</li>
+      <li><strong>Code bêta utilisé :</strong> ${code}</li>
+      <li><strong>Code d'accès attribué :</strong> ${accessCode}</li>
+      <li><strong>Date :</strong> ${new Date().toLocaleString('fr-FR')}</li>
+    </ul>
+  </div>`;
+  try {
+    const res = await resend.emails.send({
+      from: 'EbookStudio <noreply@ebookstudio.fr>',
+      to: ADMIN_NOTIFY_EMAILS,
+      subject: `Nouveau bêta-testeur : ${email}`,
+      html,
+    });
+    console.log('Admin notification sent', res);
+  } catch (e) {
+    console.error('Failed to send admin notification:', e);
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -176,6 +204,7 @@ Deno.serve(async (req) => {
     const loginUrl = `${origin}/subscription`;
 
     await sendWelcomeEmail(email, accessCode, loginUrl);
+    await notifyAdmin(email, code, accessCode);
 
     return new Response(
       JSON.stringify({ success: true, message: SUCCESS_MSG, access_code: accessCode }),
