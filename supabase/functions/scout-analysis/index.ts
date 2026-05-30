@@ -100,14 +100,27 @@ Deno.serve(async (req) => {
       });
     }
 
+    const OPENROUTER_API_KEY = Deno.env.get('OPENROUTER_API_KEY');
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) throw new Error('LOVABLE_API_KEY manquante');
 
-    const aiRes = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    // Préférence : OpenRouter (clé de l'utilisateur) > Lovable AI
+    const useOpenRouter = !!OPENROUTER_API_KEY;
+    const endpoint = useOpenRouter
+      ? 'https://openrouter.ai/api/v1/chat/completions'
+      : 'https://ai.gateway.lovable.dev/v1/chat/completions';
+    const apiKey = useOpenRouter ? OPENROUTER_API_KEY : LOVABLE_API_KEY;
+    const model = useOpenRouter ? 'google/gemini-2.0-flash-001' : 'google/gemini-3-flash-preview';
+    if (!apiKey) throw new Error('Aucune clé IA configurée (OpenRouter ou Lovable)');
+
+    const aiRes = await fetch(endpoint, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, 'Content-Type': 'application/json' },
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+        ...(useOpenRouter ? { 'HTTP-Referer': 'https://ebookstudio.fr', 'X-Title': 'SCOUT - eBook Studio' } : {}),
+      },
       body: JSON.stringify({
-        model: 'google/gemini-3-flash-preview',
+        model,
         messages: [
           {
             role: 'system',
