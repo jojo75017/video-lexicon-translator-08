@@ -502,12 +502,10 @@ FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine
   };
 
   const buildLocalPaperbackSpec = (): PaperbackSpec => {
-    const parsed = (initialDescription || '').toLowerCase();
-    const pages = Number(parsed.match(/(\d{2,4})\s*pages?/)?.[1]) || undefined;
-    const trimMatch = parsed.match(/(\d{1,2}[.,]?\d?)\s*[x×]\s*(\d{1,2}[.,]?\d?)\s*cm/);
-    const widthMm = trimMatch ? parseFloat(trimMatch[1].replace(',', '.')) * 10 : 152;
-    const heightMm = trimMatch ? parseFloat(trimMatch[2].replace(',', '.')) * 10 : 229;
-    const paper = /blanc|white/.test(parsed) ? 'white' : 'cream';
+    const pages = parseInt(pbPages, 10) || undefined;
+    const widthMm = (parseFloat(pbWidthCm.replace(',', '.')) || 15.24) * 10;
+    const heightMm = (parseFloat(pbHeightCm.replace(',', '.')) || 22.86) * 10;
+    const paper = pbPaper;
     const spineMm = +((pages || 200) * (paper === 'white' ? 0.0524 : 0.0573)).toFixed(2);
     const bleed = 3.175;
     return {
