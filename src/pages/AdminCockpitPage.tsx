@@ -105,11 +105,11 @@ const AdminCockpitPage: React.FC = () => {
   const { isAdmin, v3Mode, setV3Mode } = useV3Mode();
   const [selectedModule, setSelectedModule] = useState<V3Module | null>(null);
 
-  // Thème conditionnel : V2 (KDP clair) par défaut, V3 (Emerald Prestige) quand v3Mode est actif.
+  // Thème conditionnel : V2 (KDP clair) par défaut, V3 (Midnight Indigo) quand v3Mode est actif.
   const skin = isAdmin && v3Mode;
-  const teal = skin ? '#0d7a5f' : TEAL;
-  const accent = skin ? '#c9a84c' : ORANGE;
-  const ink = skin ? '#f5f0e0' : INK;
+  const teal = skin ? '#6366f1' : TEAL;
+  const accent = skin ? '#818cf8' : ORANGE;
+  const ink = skin ? '#eef1fb' : INK;
   const pillarColor = (p: V3Pillar) => (skin ? V3_PILLAR_COLORS[p] : V3_PILLAR_META[p].color);
 
   const v3Counts = useMemo(() => ({
