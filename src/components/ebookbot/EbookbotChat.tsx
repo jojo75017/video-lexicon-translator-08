@@ -49,6 +49,7 @@ const EbookbotChat = ({ variant = 'page', className }: EbookbotChatProps) => {
     abortRef.current = controller;
 
     try {
+      const geminiApiKey = localStorage.getItem('openai_api_key') || undefined;
       const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ebookbot-chat`;
       const resp = await fetch(url, {
         method: 'POST',
@@ -56,7 +57,7 @@ const EbookbotChat = ({ variant = 'page', className }: EbookbotChatProps) => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
-        body: JSON.stringify({ messages: newHistory }),
+        body: JSON.stringify({ messages: newHistory, geminiApiKey }),
         signal: controller.signal,
       });
 
