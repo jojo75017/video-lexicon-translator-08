@@ -204,6 +204,7 @@ Deno.serve(async (req) => {
     const loginUrl = `${origin}/subscription`;
 
     await sendWelcomeEmail(email, accessCode, loginUrl);
+    await notifyAdmin(email, code, accessCode);
 
     return new Response(
       JSON.stringify({ success: true, message: SUCCESS_MSG, access_code: accessCode }),
