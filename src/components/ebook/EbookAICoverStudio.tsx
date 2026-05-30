@@ -154,6 +154,11 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
   const [description, setDescription] = useState(initialBookDescription || '');
   const [userPrompt, setUserPrompt] = useState('');
   const [referenceImage, setReferenceImage] = useState<string | null>(null);
+  // Dimensions broché explicites (pré-remplies avec un format KDP standard valide)
+  const [pbWidthCm, setPbWidthCm] = useState('15.24');
+  const [pbHeightCm, setPbHeightCm] = useState('22.86');
+  const [pbPages, setPbPages] = useState('200');
+  const [pbPaper, setPbPaper] = useState<'cream' | 'white'>('cream');
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedCovers, setGeneratedCovers] = useState<GeneratedCover[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -177,21 +182,33 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
     if (initialDescription.trim()) setDescription(initialDescription);
   }, [initialDescription]);
 
+  // Pré-remplissage des champs broché depuis le brief (si présent), sans bloquer
+  useEffect(() => {
+    const brief = (initialDescription || '').toLowerCase();
+    const trimMatch = brief.match(/(\d{1,2}[.,]?\d?)\s*[x×]\s*(\d{1,2}[.,]?\d?)\s*cm/);
+    if (trimMatch) {
+      setPbWidthCm(parseFloat(trimMatch[1].replace(',', '.')).toString());
+      setPbHeightCm(parseFloat(trimMatch[2].replace(',', '.')).toString());
+    }
+    const pagesMatch = brief.match(/(\d{2,4})\s*pages?/);
+    if (pagesMatch) setPbPages(pagesMatch[1]);
+    if (/blanc|white/.test(brief)) setPbPaper('white');
+  }, [initialDescription]);
+
   // ========== VALIDATION DIMENSIONS BROCHÉ (en direct, avant génération) ==========
   type CheckStatus = 'ok' | 'warn' | 'error';
   interface Check { label: string; status: CheckStatus; detail: string; }
 
   const paperbackValidation = React.useMemo(() => {
     if (format !== 'paperback') return null;
-    const brief = (initialDescription || '').toLowerCase();
     const checks: Check[] = [];
 
+    const widthMm = parseFloat(pbWidthCm.replace(',', '.')) * 10;
+    const heightMm = parseFloat(pbHeightCm.replace(',', '.')) * 10;
+    const pages = parseInt(pbPages, 10);
+
     // Trim
-    const trimMatch = brief.match(/(\d{1,2}[.,]?\d?)\s*[x×]\s*(\d{1,2}[.,]?\d?)\s*cm/);
-    let widthMm = 0, heightMm = 0;
-    if (trimMatch) {
-      widthMm = parseFloat(trimMatch[1].replace(',', '.')) * 10;
-      heightMm = parseFloat(trimMatch[2].replace(',', '.')) * 10;
+    if (!isNaN(widthMm) && !isNaN(heightMm) && widthMm > 0 && heightMm > 0) {
       const validKdp = widthMm >= 102 && widthMm <= 216 && heightMm >= 152 && heightMm <= 279;
       checks.push({
         label: 'Trim (format final)',
@@ -202,35 +219,30 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
       checks.push({
         label: 'Trim (format final)',
         status: 'error',
-        detail: 'Aucune dimension trouvée. Renseignez le format dans Format & Tranche KDP (ex : 15.24 × 22.86 cm).',
+        detail: 'Renseignez la largeur et la hauteur en cm ci-dessous (ex : 15.24 × 22.86 cm).',
       });
     }
 
     // Pages + papier
-    const pagesMatch = brief.match(/(\d{2,4})\s*pages?/);
-    const paper: 'cream' | 'white' = /blanc|white/.test(brief) ? 'white' : 'cream';
-    if (pagesMatch) {
-      const pages = parseInt(pagesMatch[1], 10);
+    if (!isNaN(pages) && pages > 0) {
       const validPages = pages >= 24 && pages <= 828;
       checks.push({
         label: 'Pages & papier',
         status: validPages ? 'ok' : 'error',
-        detail: `${pages} pages, papier ${paper === 'white' ? 'blanc' : 'crème'}${validPages ? '' : ' - KDP exige 24 à 828 pages'}`,
+        detail: `${pages} pages, papier ${pbPaper === 'white' ? 'blanc' : 'crème'}${validPages ? '' : ' - KDP exige 24 à 828 pages'}`,
       });
     } else {
       checks.push({
         label: 'Pages & papier',
         status: 'error',
-        detail: 'Nombre de pages manquant - impossible de calculer le dos. Saisissez-le dans Format & Tranche KDP.',
+        detail: 'Saisissez le nombre de pages ci-dessous pour calculer le dos.',
       });
     }
 
     // Dos calculé
-    if (pagesMatch) {
-      const pages = parseInt(pagesMatch[1], 10);
-      const factor = paper === 'white' ? 0.0524 : 0.0573;
+    if (!isNaN(pages) && pages > 0) {
+      const factor = pbPaper === 'white' ? 0.0524 : 0.0573;
       const spineMm = +(pages * factor).toFixed(2);
-      const spineOk = spineMm >= 1; // KDP : pas de texte sur le dos < 80p (~4.6mm) mais structure OK >= 1mm
       checks.push({
         label: 'Dos (spine)',
         status: spineMm < 4.6 ? 'warn' : 'ok',
@@ -248,7 +260,7 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
     const hasError = checks.some((c) => c.status === 'error');
     const hasWarn = checks.some((c) => c.status === 'warn');
     return { checks, hasError, hasWarn };
-  }, [format, initialDescription]);
+  }, [format, pbWidthCm, pbHeightCm, pbPages, pbPaper]);
 
   // ========== APERÇU DES PROMPTS AVANT GÉNÉRATION ==========
   const livePromptPreview = React.useMemo(() => {
@@ -490,12 +502,10 @@ FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine
   };
 
   const buildLocalPaperbackSpec = (): PaperbackSpec => {
-    const parsed = (initialDescription || '').toLowerCase();
-    const pages = Number(parsed.match(/(\d{2,4})\s*pages?/)?.[1]) || undefined;
-    const trimMatch = parsed.match(/(\d{1,2}[.,]?\d?)\s*[x×]\s*(\d{1,2}[.,]?\d?)\s*cm/);
-    const widthMm = trimMatch ? parseFloat(trimMatch[1].replace(',', '.')) * 10 : 152;
-    const heightMm = trimMatch ? parseFloat(trimMatch[2].replace(',', '.')) * 10 : 229;
-    const paper = /blanc|white/.test(parsed) ? 'white' : 'cream';
+    const pages = parseInt(pbPages, 10) || undefined;
+    const widthMm = (parseFloat(pbWidthCm.replace(',', '.')) || 15.24) * 10;
+    const heightMm = (parseFloat(pbHeightCm.replace(',', '.')) || 22.86) * 10;
+    const paper = pbPaper;
     const spineMm = +((pages || 200) * (paper === 'white' ? 0.0524 : 0.0573)).toFixed(2);
     const bleed = 3.175;
     return {
@@ -938,6 +948,40 @@ FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine
                 </p>
               )}
             </div>
+
+            {/* ========= DIMENSIONS BROCHÉ (saisie directe) ========= */}
+            {format === 'paperback' && (
+              <div className="rounded-lg border border-border p-3 space-y-3">
+                <div className="text-xs font-semibold flex items-center gap-2">
+                  <BookOpen className="w-4 h-4 text-primary" /> Dimensions broché KDP
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <Label className="text-[11px]">Largeur (cm)</Label>
+                    <Input type="number" step="0.01" min="10.2" max="21.6" value={pbWidthCm} onChange={(e) => setPbWidthCm(e.target.value)} placeholder="15.24" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-[11px]">Hauteur (cm)</Label>
+                    <Input type="number" step="0.01" min="15.2" max="27.9" value={pbHeightCm} onChange={(e) => setPbHeightCm(e.target.value)} placeholder="22.86" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-[11px]">Nombre de pages</Label>
+                    <Input type="number" step="1" min="24" max="828" value={pbPages} onChange={(e) => setPbPages(e.target.value)} placeholder="200" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-[11px]">Papier</Label>
+                    <Select value={pbPaper} onValueChange={(v) => setPbPaper(v as 'cream' | 'white')}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="cream">Crème</SelectItem>
+                        <SelectItem value="white">Blanc</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+            )}
+
 
             {/* ========= VALIDATION DIMENSIONS BROCHÉ EN DIRECT ========= */}
             {format === 'paperback' && paperbackValidation && (
