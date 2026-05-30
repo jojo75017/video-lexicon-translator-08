@@ -239,17 +239,32 @@ const AdminBetaCodesPage: React.FC = () => {
                         : '—'}
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        onClick={() => copyCode(c.id, c.code)}
-                      >
-                        {copiedId === c.id ? (
-                          <Check className="h-4 w-4 text-[#008296]" />
-                        ) : (
-                          <Copy className="h-4 w-4" />
+                      <div className="flex items-center justify-end gap-1">
+                        {c.status !== 'used' && (
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            title="Envoyer par email"
+                            onClick={() => {
+                              setSendDialog(c);
+                              setSendEmail(c.used_by_email || '');
+                            }}
+                          >
+                            <Mail className="h-4 w-4" />
+                          </Button>
                         )}
-                      </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => copyCode(c.id, c.code)}
+                        >
+                          {copiedId === c.id ? (
+                            <Check className="h-4 w-4 text-[#008296]" />
+                          ) : (
+                            <Copy className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
