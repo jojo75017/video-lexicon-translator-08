@@ -1411,6 +1411,23 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               <span className="text-xs font-medium text-primary group-hover:text-accent transition-colors">Découvrir →</span>
             </button>
 
+            {/* Bloc 1quater - Accès rapide au Parrainage */}
+            <button
+              onClick={() => navigate('/parrainage')}
+              className="w-full flex items-center justify-between gap-3 rounded-xl border-2 border-dashed border-accent/40 bg-card hover:bg-accent/10 hover:border-accent/60 px-4 py-3 transition-all text-left group"
+            >
+              <span className="flex items-center gap-3">
+                <span className="h-9 w-9 rounded-lg bg-accent/10 text-accent flex items-center justify-center">
+                  <Gift className="h-5 w-5" />
+                </span>
+                <span>
+                  <span className="block text-sm font-semibold text-foreground">Parrainez et gagnez des récompenses</span>
+                  <span className="block text-xs text-muted-foreground">Invitez d'autres auteurs et accédez à votre espace de parrainage</span>
+                </span>
+              </span>
+              <span className="text-xs font-medium text-accent group-hover:text-primary transition-colors">Accéder →</span>
+            </button>
+
             {/* Bloc 2 - Vitrine livres Amazon (toujours visible) */}
             <AuthorBooksShowcase
               onStartWorkflow={() => {
