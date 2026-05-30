@@ -226,7 +226,7 @@ const AdminCockpitPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA]" style={{ color: INK }}>
+    <div className={`min-h-screen ${skin ? 'v3-skin' : 'bg-[#FAFAFA]'}`} style={{ color: ink }}>
       {/* Header */}
       <header className="sticky top-0 z-30 backdrop-blur-md bg-white/85 border-b border-joy-ink/8">
         <div className="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
@@ -235,14 +235,14 @@ const AdminCockpitPage: React.FC = () => {
             <span>Retour à l'espace</span>
           </button>
           <div className="flex items-center gap-2 font-semibold">
-            <Shield className="h-5 w-5" style={{ color: TEAL }} />
-            <span>Cockpit admin</span>
+            <Shield className="h-5 w-5" style={{ color: teal }} />
+            <span>{skin ? 'Cockpit V3 — Publication Assistée Pro' : 'Cockpit admin'}</span>
           </div>
           <Button
             size="sm"
             onClick={() => openCreate()}
             className="rounded-full px-4 gap-1.5 hover:opacity-90 transition-all"
-            style={{ background: TEAL, color: 'white' }}
+            style={{ background: teal, color: skin ? '#06251f' : 'white' }}
           >
             <Plus className="h-4 w-4" />
             <span className="hidden sm:inline">Nouveau lancement</span>
@@ -254,7 +254,7 @@ const AdminCockpitPage: React.FC = () => {
         {/* Tunnel */}
         <section>
           <div className="flex items-center gap-2 mb-3">
-            <Sparkles className="h-5 w-5" style={{ color: ORANGE }} />
+            <Sparkles className="h-5 w-5" style={{ color: accent }} />
             <h2 className="text-lg font-bold">Tunnel de lancement</h2>
             <span className="text-xs text-joy-ink/50">accès rapide à toutes les pages</span>
           </div>
