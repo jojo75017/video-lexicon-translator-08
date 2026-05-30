@@ -1,24 +1,43 @@
-# Ajout de modules V3 « en attente » à partir des captures
+## Objectif
 
-## Contexte
-Les 6 captures correspondent aux modules 03→08 d'un guide de publication KDP. On garde l'existant tel quel (rien ne change pour la V2). On ajoute uniquement dans le dossier/fichier V3 existant `src/data/roadmapV3.ts` les idées **nouvelles**, toutes en statut `todo` (= en attente).
+Donner à la **V3** une identité visuelle et un concept totalement nouveaux (palette **Emerald Prestige**, typo **Space Grotesk + DM Sans**), appliqués **uniquement quand le mode V3 est activé** dans le cockpit admin. La **V2 reste 100% intacte** : aucune modification des tokens globaux ni des autres pages.
 
-## Comparaison capture ↔ existant
-- **03 – Couverture qui attire le clic (6 variantes + test miniature 200×300)** → l'existant `cover-pdf-exact` gère le PDF KDP exact, mais PAS la génération de 6 variantes + test miniature. → **Nouveau module.**
-- **04 – Description qui vend (structure 5 parties + mots de conversion)** → pas de module dédié dans V3. → **Nouveau module.**
-- **05 – Mots-clés (7 emplacements) & catégories (10 max)** → recherche mots-clés déjà en V2 ; mais le **Gestionnaire de catégories 10/livre** (2 + 8 supplémentaires) n'existe pas. → **Nouveau module.**
-- **06 – Prix / redevances 70 %** → déjà couvert par `auto-pricing`. → rien à ajouter.
-- **07 – Lancement velocity / équipe ARC** → `launch-sequence-j7` + `reviews-booster` existent, mais pas un **Constructeur d'équipe ARC** (recrutement 10–30 lecteurs, objectifs d'avis J14/J30/J60). → **Nouveau module.**
-- **08 – Séries / formats multiples** → déjà couvert par `multi-format-express`, `bundles-boxsets`, `p17-series`. → rien à ajouter.
+## Garde-fous (non négociables)
 
-## Modules à ajouter (tous `status: 'todo'`)
-1. `cover-variants-thumbnail` — pilier **publier** : « Cover Designer 6 Variantes + Test Miniature » — génère 6 couvertures et les affiche en 200×300 px pour valider la lisibilité du titre dans les résultats Amazon.
-2. `sales-description` — pilier **monetiser** (ou marketing) : « Description Vendeuse (5 parties) » — accroche, agitation, promesse, 5–7 bénéfices, CTA + mots de conversion, longueur 1500–2500 caractères.
-3. `categories-manager-10` — pilier **publier** : « Gestionnaire de Catégories 10/livre » — choix de 2 catégories optimales + demande des 8 catégories supplémentaires via support KDP.
-4. `arc-team-builder` — pilier **marketing** : « Constructeur d'Équipe ARC » — recrutement de 10–30 lecteurs, envoi manuscrit, suivi des objectifs d'avis (10 à J14, 25 à J30, 50 à J60).
+- On ne touche **pas** au thème global (`index.css` tokens V2, teal #008296, FAFAFA, etc.).
+- Tout le nouveau style est **scopé** sous une classe `.v3-skin` et conditionné à `v3Mode` (admin uniquement, déjà sécurisé côté serveur via `useV3Mode`).
+- En mode V2 (par défaut), le cockpit s'affiche exactement comme aujourd'hui.
+
+## Direction visuelle V3
+
+- Fond profond émeraude/charbon, accents **or** (#c9a84c) pour les CTA et titres clés.
+- Palette : `#064e3b` (base), `#0d7a5f` (primaire), `#c9a84c` (accent or), `#f5f0e0` (texte clair).
+- Titres en **Space Grotesk**, corps en **DM Sans**.
+- Concept « Publication Assistée Pro » : look premium/sombre haut de gamme qui tranche avec le clair KDP de la V2.
+
+## Ce qui change concrètement
+
+1. **`index.css`** — ajouts additifs uniquement :
+   - Import Google Fonts Space Grotesk + DM Sans.
+   - Un bloc `.v3-skin { --v3-bg; --v3-surface; --v3-primary; --v3-gold; --v3-ink; --v3-muted; ... }` + styles de base (fond, police, scrollbar) qui ne s'appliquent QUE sous `.v3-skin`. Rien hors de ce scope.
+
+2. **`src/pages/AdminCockpitPage.tsx`** :
+   - Remplacer les constantes couleur figées (TEAL/ORANGE/INK) par un objet `theme` calculé selon `v3Mode` : valeurs V2 actuelles si off, valeurs V3 (émeraude/or) si on.
+   - Appliquer la classe `v3Mode ? 'v3-skin' : ''` sur le conteneur racine de la page.
+   - Re-styler en mode V3 : header, cartes piliers, modules, badge prix, bannière « Mode V3 actif », dialog détail module → fond sombre, bordures or, titres Space Grotesk.
+   - Le toggle V2/V3 reste identique (sert d'interrupteur de thème en plus).
+
+3. **`src/data/roadmapV3.ts`** :
+   - Ajouter une variante de couleurs piliers pour le mode V3 (mapping émeraude/or) tout en gardant les couleurs actuelles pour compat. Aucune autre donnée modifiée.
 
 ## Détails techniques
-- Fichier unique modifié : `src/data/roadmapV3.ts`.
-- Ajout de 4 entrées dans le tableau `V3_MODULES`, dans les sections correspondantes (commentaires PUBLIER / MONÉTISER / MARKETING).
-- Aucun changement de prix, de pilier meta, ni de code applicatif. Les modules apparaîtront automatiquement dans la roadmap V3 existante avec le statut « en attente ».
-- Pas de duplication avec les modules déjà présents (06 et 08 volontairement non dupliqués).
+
+- Aucune migration DB, aucun changement de prix, aucune route nouvelle.
+- Le thème V3 est purement CSS scopé + logique conditionnelle React gated sur `v3Mode` (déjà admin-only et validé serveur).
+- Impact V2 / abonnés : nul (la classe `.v3-skin` n'existe jamais hors mode V3 admin).
+
+## Vérification
+
+- Mode V2 (défaut) : capture cockpit → identique à l'actuel.
+- Mode V3 (toggle on) : capture cockpit → fond émeraude, accents or, Space Grotesk/DM Sans, modules re-stylés.
+- Build OK, pas d'erreur console.

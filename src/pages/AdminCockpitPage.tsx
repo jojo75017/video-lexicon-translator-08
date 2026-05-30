@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ArrowLeft, ChevronLeft, ChevronRight, Plus, Shield, Trash2, Calendar as CalendarIcon, Sparkles, Rocket } from 'lucide-react';
-import { V3_MODULES, V3_PILLAR_META, V3_PRICE, V2_PRICE, type V3Pillar, type V3Module } from '@/data/roadmapV3';
+import { V3_MODULES, V3_PILLAR_META, V3_PILLAR_COLORS, V3_PRICE, V2_PRICE, type V3Pillar, type V3Module } from '@/data/roadmapV3';
 import { useV3Mode } from '@/hooks/useV3Mode';
 import { toast } from 'sonner';
 import {
@@ -104,6 +104,13 @@ const AdminCockpitPage: React.FC = () => {
   const [draft, setDraft] = useState<Partial<Launch> | null>(null);
   const { isAdmin, v3Mode, setV3Mode } = useV3Mode();
   const [selectedModule, setSelectedModule] = useState<V3Module | null>(null);
+
+  // Thème conditionnel : V2 (KDP clair) par défaut, V3 (Emerald Prestige) quand v3Mode est actif.
+  const skin = isAdmin && v3Mode;
+  const teal = skin ? '#0d7a5f' : TEAL;
+  const accent = skin ? '#c9a84c' : ORANGE;
+  const ink = skin ? '#f5f0e0' : INK;
+  const pillarColor = (p: V3Pillar) => (skin ? V3_PILLAR_COLORS[p] : V3_PILLAR_META[p].color);
 
   const v3Counts = useMemo(() => ({
     todo: V3_MODULES.filter((m) => m.status === 'todo').length,
@@ -219,7 +226,7 @@ const AdminCockpitPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA]" style={{ color: INK }}>
+    <div className={`min-h-screen ${skin ? 'v3-skin' : 'bg-[#FAFAFA]'}`} style={{ color: ink }}>
       {/* Header */}
       <header className="sticky top-0 z-30 backdrop-blur-md bg-white/85 border-b border-joy-ink/8">
         <div className="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
@@ -228,14 +235,14 @@ const AdminCockpitPage: React.FC = () => {
             <span>Retour à l'espace</span>
           </button>
           <div className="flex items-center gap-2 font-semibold">
-            <Shield className="h-5 w-5" style={{ color: TEAL }} />
-            <span>Cockpit admin</span>
+            <Shield className="h-5 w-5" style={{ color: teal }} />
+            <span>{skin ? 'Cockpit V3 — Publication Assistée Pro' : 'Cockpit admin'}</span>
           </div>
           <Button
             size="sm"
             onClick={() => openCreate()}
             className="rounded-full px-4 gap-1.5 hover:opacity-90 transition-all"
-            style={{ background: TEAL, color: 'white' }}
+            style={{ background: teal, color: skin ? '#06251f' : 'white' }}
           >
             <Plus className="h-4 w-4" />
             <span className="hidden sm:inline">Nouveau lancement</span>
@@ -247,7 +254,7 @@ const AdminCockpitPage: React.FC = () => {
         {/* Tunnel */}
         <section>
           <div className="flex items-center gap-2 mb-3">
-            <Sparkles className="h-5 w-5" style={{ color: ORANGE }} />
+            <Sparkles className="h-5 w-5" style={{ color: accent }} />
             <h2 className="text-lg font-bold">Tunnel de lancement</h2>
             <span className="text-xs text-joy-ink/50">accès rapide à toutes les pages</span>
           </div>
@@ -279,11 +286,11 @@ const AdminCockpitPage: React.FC = () => {
         {/* Roadmap V3 */}
         <section>
           <div className="flex items-center gap-2 mb-3 flex-wrap">
-            <Rocket className="h-5 w-5" style={{ color: ORANGE }} />
+            <Rocket className="h-5 w-5" style={{ color: accent }} />
             <h2 className="text-lg font-bold">Roadmap V3 — Publication Assistée Pro</h2>
             <span
               className="text-[11px] font-bold uppercase tracking-wider rounded-full px-2.5 py-0.5"
-              style={{ background: ORANGE, color: 'white' }}
+              style={{ background: accent, color: skin ? '#06251f' : 'white' }}
             >
               {V3_PRICE}€ à vie
             </span>
@@ -298,16 +305,16 @@ const AdminCockpitPage: React.FC = () => {
                 onClick={() => setV3Mode(!v3Mode)}
                 className="ml-auto inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors"
                 style={{
-                  borderColor: v3Mode ? ORANGE : '#23232322',
-                  background: v3Mode ? `${ORANGE}1a` : 'white',
-                  color: v3Mode ? ORANGE : INK,
+                  borderColor: v3Mode ? accent : '#23232322',
+                  background: v3Mode ? `${accent}1a` : 'white',
+                  color: v3Mode ? accent : ink,
                 }}
                 title="Bascule réservée admin — préparation du lancement V3"
               >
                 <span className={!v3Mode ? 'font-bold' : 'opacity-50'}>V2</span>
                 <span
                   className="relative inline-flex h-4 w-8 items-center rounded-full transition-colors"
-                  style={{ background: v3Mode ? ORANGE : '#cbd5e1' }}
+                  style={{ background: v3Mode ? accent : '#cbd5e1' }}
                 >
                   <span
                     className="inline-block h-3 w-3 rounded-full bg-white transition-transform"
@@ -323,15 +330,15 @@ const AdminCockpitPage: React.FC = () => {
           {isAdmin && v3Mode && (
             <div
               className="mb-3 flex flex-wrap items-center gap-3 rounded-xl border px-3 py-2 text-xs"
-              style={{ borderColor: `${ORANGE}55`, background: `${ORANGE}12` }}
+              style={{ borderColor: `${accent}55`, background: `${accent}12` }}
             >
-              <Sparkles className="h-4 w-4" style={{ color: ORANGE }} />
-              <span className="font-bold" style={{ color: ORANGE }}>Mode V3 actif (préparation)</span>
+              <Sparkles className="h-4 w-4" style={{ color: accent }} />
+              <span className="font-bold" style={{ color: accent }}>Mode V3 actif (préparation)</span>
               <span className="text-joy-ink/60">Clique un module pour voir son détail. Visible par toi seul (admin).</span>
               <span className="ml-auto flex items-center gap-2">
-                <span className="rounded px-1.5 py-0.5" style={{ background: '#23232322', color: '#666' }}>todo {v3Counts.todo}</span>
-                <span className="rounded px-1.5 py-0.5" style={{ background: '#FF9E2D22', color: '#FF9E2D' }}>en cours {v3Counts.in_progress}</span>
-                <span className="rounded px-1.5 py-0.5" style={{ background: '#10B98122', color: '#10B981' }}>fait {v3Counts.done}</span>
+                <span className="rounded px-1.5 py-0.5" style={{ background: '#ffffff1a', color: ink }}>todo {v3Counts.todo}</span>
+                <span className="rounded px-1.5 py-0.5" style={{ background: `${accent}22`, color: accent }}>en cours {v3Counts.in_progress}</span>
+                <span className="rounded px-1.5 py-0.5" style={{ background: '#10B98122', color: '#3ddc97' }}>fait {v3Counts.done}</span>
               </span>
             </div>
           )}
@@ -339,16 +346,17 @@ const AdminCockpitPage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
             {(Object.keys(V3_PILLAR_META) as V3Pillar[]).map((pillar) => {
               const meta = V3_PILLAR_META[pillar];
+              const pc = pillarColor(pillar);
               const items = V3_MODULES.filter((m) => m.pillar === pillar);
               return (
                 <div
                   key={pillar}
                   className="rounded-2xl border bg-white p-3"
-                  style={{ borderColor: `${meta.color}33` }}
+                  style={{ borderColor: `${pc}33` }}
                 >
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-lg">{meta.emoji}</span>
-                    <span className="font-bold text-sm" style={{ color: meta.color }}>{meta.label}</span>
+                    <span className="font-bold text-sm" style={{ color: pc }}>{meta.label}</span>
                     <span className="ml-auto text-[11px] text-joy-ink/40">{items.length}</span>
                   </div>
                   <ul className="space-y-1.5">
@@ -357,7 +365,7 @@ const AdminCockpitPage: React.FC = () => {
                         key={m.id}
                         onClick={isAdmin && v3Mode ? () => setSelectedModule(m) : undefined}
                         className={`rounded-lg p-2 bg-joy-cream/40 hover:bg-joy-cream transition-colors ${isAdmin && v3Mode ? 'cursor-pointer hover:ring-1' : ''}`}
-                        style={isAdmin && v3Mode ? ({ ['--tw-ring-color' as any]: `${meta.color}66` }) : undefined}
+                        style={isAdmin && v3Mode ? ({ ['--tw-ring-color' as any]: `${pc}66` }) : undefined}
                       >
                         <div className="flex items-start gap-2">
                           <span className="text-[10px] uppercase tracking-wider rounded px-1.5 py-0.5 mt-0.5"
@@ -397,7 +405,7 @@ const AdminCockpitPage: React.FC = () => {
                   <div className="flex flex-wrap items-center gap-2">
                     <span
                       className="rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider"
-                      style={{ background: `${V3_PILLAR_META[selectedModule.pillar].color}22`, color: V3_PILLAR_META[selectedModule.pillar].color }}
+                      style={{ background: `${pillarColor(selectedModule.pillar)}22`, color: pillarColor(selectedModule.pillar) }}
                     >
                       {V3_PILLAR_META[selectedModule.pillar].label}
                     </span>
@@ -429,7 +437,7 @@ const AdminCockpitPage: React.FC = () => {
             <CardContent className="p-4 sm:p-5">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <CalendarIcon className="h-5 w-5" style={{ color: TEAL }} />
+                  <CalendarIcon className="h-5 w-5" style={{ color: teal }} />
                   <h2 className="text-lg font-bold capitalize">
                     {format(cursor, 'MMMM yyyy', { locale: fr })}
                   </h2>
@@ -466,7 +474,7 @@ const AdminCockpitPage: React.FC = () => {
                       className={`min-h-[78px] rounded-xl p-1.5 text-left border transition-all hover:scale-[1.02] ${
                         inMonth ? 'bg-white border-joy-ink/8' : 'bg-joy-ink/[0.02] border-transparent text-joy-ink/30'
                       } ${isToday ? 'ring-2 ring-offset-1' : ''}`}
-                      style={isToday ? { boxShadow: `inset 0 0 0 2px ${ORANGE}` } : undefined}
+                      style={isToday ? { boxShadow: `inset 0 0 0 2px ${accent}` } : undefined}
                     >
                       <div className="text-[11px] font-semibold mb-1">{format(day, 'd')}</div>
                       <div className="space-y-0.5">
