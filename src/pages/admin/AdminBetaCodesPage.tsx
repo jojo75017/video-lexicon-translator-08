@@ -1,8 +1,16 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Ticket, Plus, Copy, Check, RefreshCw, Loader2 } from 'lucide-react';
+import { Ticket, Plus, Copy, Check, RefreshCw, Loader2, Mail, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import {
   Table,
   TableBody,
@@ -30,6 +38,34 @@ const AdminBetaCodesPage: React.FC = () => {
   const [generating, setGenerating] = useState(false);
   const [quantity, setQuantity] = useState(5);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [sendDialog, setSendDialog] = useState<BetaCode | null>(null);
+  const [sendEmail, setSendEmail] = useState('');
+  const [sending, setSending] = useState(false);
+
+  const handleSendEmail = async () => {
+    if (!sendDialog) return;
+    const email = sendEmail.trim().toLowerCase();
+    if (!email || !email.includes('@')) {
+      toast.error('Adresse email invalide');
+      return;
+    }
+    setSending(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('send-beta-code', {
+        body: { email, code: sendDialog.code },
+      });
+      if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || "Échec de l'envoi");
+      toast.success(`Code envoyé à ${email}`);
+      setSendDialog(null);
+      setSendEmail('');
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err?.message || "Impossible d'envoyer l'email");
+    } finally {
+      setSending(false);
+    }
+  };
 
   const fetchCodes = useCallback(async () => {
     setLoading(true);
@@ -203,17 +239,32 @@ const AdminBetaCodesPage: React.FC = () => {
                         : '—'}
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        onClick={() => copyCode(c.id, c.code)}
-                      >
-                        {copiedId === c.id ? (
-                          <Check className="h-4 w-4 text-[#008296]" />
-                        ) : (
-                          <Copy className="h-4 w-4" />
+                      <div className="flex items-center justify-end gap-1">
+                        {c.status !== 'used' && (
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            title="Envoyer par email"
+                            onClick={() => {
+                              setSendDialog(c);
+                              setSendEmail(c.used_by_email || '');
+                            }}
+                          >
+                            <Mail className="h-4 w-4" />
+                          </Button>
                         )}
-                      </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => copyCode(c.id, c.code)}
+                        >
+                          {copiedId === c.id ? (
+                            <Check className="h-4 w-4 text-[#008296]" />
+                          ) : (
+                            <Copy className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -222,6 +273,41 @@ const AdminBetaCodesPage: React.FC = () => {
           )}
         </Card>
       </div>
+
+      <Dialog open={!!sendDialog} onOpenChange={(o) => !o && setSendDialog(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Envoyer le code par email</DialogTitle>
+            <DialogDescription>
+              Le bêta-testeur recevra le code{' '}
+              <span className="font-mono font-semibold">{sendDialog?.code}</span> avec un lien
+              d'activation.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground">Email du bêta-testeur</label>
+            <Input
+              type="email"
+              placeholder="exemple@email.com"
+              value={sendEmail}
+              onChange={(e) => setSendEmail(e.target.value)}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSendDialog(null)} disabled={sending}>
+              Annuler
+            </Button>
+            <Button onClick={handleSendEmail} disabled={sending}>
+              {sending ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Send className="h-4 w-4 mr-2" />
+              )}
+              Envoyer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
