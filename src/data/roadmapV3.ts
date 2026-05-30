@@ -109,4 +109,30 @@ export const V3_MODULES: V3Module[] = [
   // MARKETING
   { id: 'arc-team-builder',         pillar: 'marketing', status: 'todo', title: "Constructeur d'Équipe ARC",
     description: 'Recrute 10–30 lecteurs ARC, gère l’envoi du manuscrit et suit les objectifs d’avis (10 à J14, 25 à J30, 50 à J60).' },
+
+  // ===== AJOUTS — propositions pour enrichir la V3 — en attente =====
+
+  // PUBLIER
+  { id: 'back-matter-builder',  pillar: 'publier',   status: 'todo', title: 'Pages de Fin Automatiques',
+    description: 'Génère les pages de fin : appel à laisser un avis, « Du même auteur », bio + lien newsletter, à insérer en fin d’ebook.' },
+  { id: 'print-proof-checker',  pillar: 'publier',   status: 'todo', title: "Vérificateur d'Épreuve Broché",
+    description: 'Contrôle bleed, marge de reliure (gutter), dos et code-barres avant de commander l’épreuve papier KDP.' },
+
+  // MONÉTISER
+  { id: 'kdp-select-planner',   pillar: 'monetiser', status: 'todo', title: 'Planificateur KDP Select / KU',
+    description: 'Calendrier des 5 jours promo gratuits + Countdown Deals optimisés sur la période de 90 jours.' },
+  { id: 'back-catalog-funnel',  pillar: 'monetiser', status: 'todo', title: 'Tunnel de Back-Catalogue',
+    description: 'Liens croisés entre tomes et titres pour maximiser le read-through et les ventes en chaîne.' },
+
+  // MARKETING
+  { id: 'author-page-optimizer', pillar: 'marketing', status: 'todo', title: 'Optimiseur Page Auteur Amazon',
+    description: 'Optimise Author Central : bio, photo, mots-clés et mise en avant des titres pour convertir les visiteurs.' },
+  { id: 'bookbub-ad-builder',    pillar: 'marketing', status: 'todo', title: 'Générateur Annonces BookBub / Facebook',
+    description: 'Crée visuels et accroches ciblés par niche pour les campagnes BookBub et Facebook Ads.' },
+
+  // IA AVANCÉE
+  { id: 'p21-blurb-ab-tester',   pillar: 'ia',        status: 'todo', title: 'Agent P21 — A/B Test 4e de Couverture',
+    description: 'Génère plusieurs variantes de 4e de couverture et les score pour identifier la plus vendeuse.' },
+  { id: 'p22-trend-radar',       pillar: 'ia',        status: 'todo', title: 'Agent P22 — Radar de Tendances',
+    description: 'Détecte sujets émergents et saisonnalité d’une niche pour choisir le prochain livre à écrire.' },
 ];
