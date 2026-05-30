@@ -47,14 +47,84 @@ function mmToIn(mm: number) { return Math.round(mm / 25.4 * 1000) / 1000; }
 
 interface KdpCoverStudioProps {
   onUseForGeneration?: (description: string) => void;
+  defaultTitle?: string;
+  defaultAuthor?: string;
+  defaultFrontCoverUrl?: string;
+  defaultBackText?: string;
 }
 
-const KdpCoverStudio: React.FC<KdpCoverStudioProps> = ({ onUseForGeneration }) => {
+const KdpCoverStudio: React.FC<KdpCoverStudioProps> = ({
+  onUseForGeneration,
+  defaultTitle = '',
+  defaultAuthor = '',
+  defaultFrontCoverUrl = '',
+  defaultBackText = '',
+}) => {
   const [formatId, setFormatId] = useState('6x9');
   const [pageCount, setPageCount] = useState(172);
   const [paperType, setPaperType] = useState('white');
   const [hasBleed, setHasBleed] = useState(true);
   const [activeTab, setActiveTab] = useState('calculator');
+
+  // PDF couverture exacte
+  const [pdfTitle, setPdfTitle] = useState(defaultTitle);
+  const [pdfAuthor, setPdfAuthor] = useState(defaultAuthor);
+  const [pdfBackText, setPdfBackText] = useState(defaultBackText);
+  const [frontImage, setFrontImage] = useState<string | null>(defaultFrontCoverUrl || null);
+  const [backImage, setBackImage] = useState<string | null>(null);
+  const [bgColor, setBgColor] = useState('#232F3E');
+  const [textColor, setTextColor] = useState('#FFFFFF');
+  const [pdfLoading, setPdfLoading] = useState(false);
+
+  const readFileAsDataUrl = (file: File): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = () => reject(new Error('lecture du fichier impossible'));
+      reader.readAsDataURL(file);
+    });
+
+  const handleFrontUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setFrontImage(await readFileAsDataUrl(file));
+  };
+  const handleBackUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setBackImage(await readFileAsDataUrl(file));
+  };
+
+  const handleGeneratePdf = async () => {
+    if (!pdfTitle.trim()) {
+      toast.error('Renseigne au moins le titre du livre');
+      return;
+    }
+    setPdfLoading(true);
+    try {
+      await downloadKdpCoverPdf({
+        trimW: format.w,
+        trimH: format.h,
+        pageCount,
+        paperFactor: paper.factor,
+        hasBleed,
+        frontCoverImage: frontImage,
+        backCoverImage: backImage,
+        ebookTitle: pdfTitle,
+        authorName: pdfAuthor,
+        backText: pdfBackText,
+        backgroundColor: bgColor,
+        textColor,
+      });
+      toast.success('PDF couverture KDP généré ✨', {
+        description: `Dimensions exactes ${calculations.totalWidth.toFixed(3)}" × ${calculations.totalHeight.toFixed(3)}" — prêt à uploader.`,
+      });
+    } catch (e: any) {
+      toast.error('Erreur lors de la génération du PDF', { description: e?.message });
+    } finally {
+      setPdfLoading(false);
+    }
+  };
 
   const format = useMemo(() => KDP_FORMATS.find(f => f.id === formatId) || KDP_FORMATS[4], [formatId]);
   const paper = useMemo(() => PAPER_TYPES.find(p => p.id === paperType) || PAPER_TYPES[0], [paperType]);
