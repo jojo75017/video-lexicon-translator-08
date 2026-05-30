@@ -1317,7 +1317,7 @@ const CoverCard: React.FC<CoverCardProps> = ({ cover, index, onDownload, onUse, 
                 src={cover.url}
                 alt={`Couverture ${index + 1}`}
                 onLoad={handleImgLoad}
-                className="absolute inset-0 w-full h-full object-cover"
+                className="absolute inset-0 w-full h-full object-contain"
               />
               <div className="absolute top-2 left-2 bg-black/70 text-white text-[9px] px-2 py-0.5 rounded-full backdrop-blur-sm">
                 Cadre Amazon Kindle 1.6:1
