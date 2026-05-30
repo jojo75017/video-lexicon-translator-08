@@ -107,9 +107,9 @@ const AdminCockpitPage: React.FC = () => {
 
   // Thème conditionnel : V2 (KDP clair) par défaut, V3 (Midnight Indigo) quand v3Mode est actif.
   const skin = isAdmin && v3Mode;
-  const teal = skin ? '#6366f1' : TEAL;
-  const accent = skin ? '#818cf8' : ORANGE;
-  const ink = skin ? '#eef1fb' : INK;
+  const teal = skin ? '#4f46e5' : TEAL;
+  const accent = skin ? '#6366f1' : ORANGE;
+  const ink = skin ? '#1e2240' : INK;
   const pillarColor = (p: V3Pillar) => (skin ? V3_PILLAR_COLORS[p] : V3_PILLAR_META[p].color);
 
   const v3Counts = useMemo(() => ({
@@ -242,7 +242,7 @@ const AdminCockpitPage: React.FC = () => {
             size="sm"
             onClick={() => openCreate()}
             className="rounded-full px-4 gap-1.5 hover:opacity-90 transition-all"
-            style={{ background: teal, color: skin ? '#0b1020' : 'white' }}
+            style={{ background: teal, color: 'white' }}
           >
             <Plus className="h-4 w-4" />
             <span className="hidden sm:inline">Nouveau lancement</span>
@@ -290,7 +290,7 @@ const AdminCockpitPage: React.FC = () => {
             <h2 className="text-lg font-bold">Roadmap V3 — Publication Assistée Pro</h2>
             <span
               className="text-[11px] font-bold uppercase tracking-wider rounded-full px-2.5 py-0.5"
-              style={{ background: accent, color: skin ? '#0b1020' : 'white' }}
+              style={{ background: accent, color: 'white' }}
             >
               {V3_PRICE}€ à vie
             </span>
