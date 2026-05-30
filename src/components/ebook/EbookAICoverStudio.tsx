@@ -949,6 +949,40 @@ FORMAT: ${format === 'paperback' ? 'Amazon KDP paperback full wrap (back + spine
               )}
             </div>
 
+            {/* ========= DIMENSIONS BROCHÉ (saisie directe) ========= */}
+            {format === 'paperback' && (
+              <div className="rounded-lg border border-border p-3 space-y-3">
+                <div className="text-xs font-semibold flex items-center gap-2">
+                  <BookOpen className="w-4 h-4 text-primary" /> Dimensions broché KDP
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <Label className="text-[11px]">Largeur (cm)</Label>
+                    <Input type="number" step="0.01" min="10.2" max="21.6" value={pbWidthCm} onChange={(e) => setPbWidthCm(e.target.value)} placeholder="15.24" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-[11px]">Hauteur (cm)</Label>
+                    <Input type="number" step="0.01" min="15.2" max="27.9" value={pbHeightCm} onChange={(e) => setPbHeightCm(e.target.value)} placeholder="22.86" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-[11px]">Nombre de pages</Label>
+                    <Input type="number" step="1" min="24" max="828" value={pbPages} onChange={(e) => setPbPages(e.target.value)} placeholder="200" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-[11px]">Papier</Label>
+                    <Select value={pbPaper} onValueChange={(v) => setPbPaper(v as 'cream' | 'white')}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="cream">Crème</SelectItem>
+                        <SelectItem value="white">Blanc</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+            )}
+
+
             {/* ========= VALIDATION DIMENSIONS BROCHÉ EN DIRECT ========= */}
             {format === 'paperback' && paperbackValidation && (
               <div className={`rounded-lg border p-3 space-y-2 ${
