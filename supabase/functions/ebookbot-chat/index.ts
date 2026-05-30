@@ -50,11 +50,55 @@ const SYSTEM_PROMPT = `Tu es **EBOOKBOT**, le copilote IA officiel d'EbookStudio
 - Pas de génération d'ebook complet en chat (renvoie vers le Workflow 15 agents)
 - Pas de promesses de revenus garantis`;
 
+// Transforme un flux SSE Gemini en flux SSE compatible OpenAI (choices[].delta.content)
+function geminiToOpenAIStream(geminiBody: ReadableStream<Uint8Array>): ReadableStream<Uint8Array> {
+  const reader = geminiBody.getReader();
+  const decoder = new TextDecoder();
+  const encoder = new TextEncoder();
+  let buffer = "";
+
+  return new ReadableStream({
+    async pull(controller) {
+      const { value, done } = await reader.read();
+      if (done) {
+        controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+        controller.close();
+        return;
+      }
+      buffer += decoder.decode(value, { stream: true });
+      let nl: number;
+      while ((nl = buffer.indexOf("\n")) !== -1) {
+        let line = buffer.slice(0, nl);
+        buffer = buffer.slice(nl + 1);
+        if (line.endsWith("\r")) line = line.slice(0, -1);
+        if (!line || !line.startsWith("data: ")) continue;
+        const json = line.slice(6).trim();
+        if (!json || json === "[DONE]") continue;
+        try {
+          const parsed = JSON.parse(json);
+          const text = parsed?.candidates?.[0]?.content?.parts
+            ?.map((p: { text?: string }) => p.text ?? "")
+            .join("") ?? "";
+          if (text) {
+            const chunk = { choices: [{ delta: { content: text } }] };
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify(chunk)}\n\n`));
+          }
+        } catch {
+          // ignore les fragments JSON incomplets
+        }
+      }
+    },
+    cancel() {
+      reader.cancel();
+    },
+  });
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { messages } = await req.json();
+    const { messages, geminiApiKey } = await req.json();
 
     if (!Array.isArray(messages) || messages.length === 0) {
       return new Response(JSON.stringify({ error: "messages array required" }), {
@@ -63,6 +107,47 @@ serve(async (req) => {
       });
     }
 
+    // ===== Mode BYOK : clé Gemini personnelle de l'abonné =====
+    if (typeof geminiApiKey === "string" && geminiApiKey.startsWith("AIza")) {
+      const model = "gemini-2.5-flash";
+      const contents = messages.map((m: { role: string; content: string }) => ({
+        role: m.role === "assistant" ? "model" : "user",
+        parts: [{ text: m.content }],
+      }));
+
+      const geminiResp = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?alt=sse&key=${geminiApiKey}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+            contents,
+          }),
+        }
+      );
+
+      if (!geminiResp.ok || !geminiResp.body) {
+        const errText = await geminiResp.text();
+        console.error("Gemini error", geminiResp.status, errText);
+        if (geminiResp.status === 429) {
+          return new Response(
+            JSON.stringify({ error: "Quota Gemini atteint. Patiente ou vérifie ta clé API." }),
+            { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+        return new Response(
+          JSON.stringify({ error: "Clé Gemini invalide ou erreur API. Vérifie ta clé dans les réglages." }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      return new Response(geminiToOpenAIStream(geminiResp.body), {
+        headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
+      });
+    }
+
+    // ===== Fallback : passerelle Lovable AI =====
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
       return new Response(JSON.stringify({ error: "LOVABLE_API_KEY missing" }), {
@@ -97,7 +182,7 @@ serve(async (req) => {
         return new Response(
           JSON.stringify({
             error:
-              "Crédits IA épuisés. Recharge ton workspace Lovable AI dans Settings → Workspace → Usage.",
+              "Crédits IA épuisés. Ajoute ta clé Gemini personnelle dans les réglages pour continuer à utiliser EBOOKBOT.",
           }),
           { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
