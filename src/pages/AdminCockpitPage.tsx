@@ -346,16 +346,17 @@ const AdminCockpitPage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
             {(Object.keys(V3_PILLAR_META) as V3Pillar[]).map((pillar) => {
               const meta = V3_PILLAR_META[pillar];
+              const pc = pillarColor(pillar);
               const items = V3_MODULES.filter((m) => m.pillar === pillar);
               return (
                 <div
                   key={pillar}
                   className="rounded-2xl border bg-white p-3"
-                  style={{ borderColor: `${meta.color}33` }}
+                  style={{ borderColor: `${pc}33` }}
                 >
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-lg">{meta.emoji}</span>
-                    <span className="font-bold text-sm" style={{ color: meta.color }}>{meta.label}</span>
+                    <span className="font-bold text-sm" style={{ color: pc }}>{meta.label}</span>
                     <span className="ml-auto text-[11px] text-joy-ink/40">{items.length}</span>
                   </div>
                   <ul className="space-y-1.5">
@@ -364,7 +365,7 @@ const AdminCockpitPage: React.FC = () => {
                         key={m.id}
                         onClick={isAdmin && v3Mode ? () => setSelectedModule(m) : undefined}
                         className={`rounded-lg p-2 bg-joy-cream/40 hover:bg-joy-cream transition-colors ${isAdmin && v3Mode ? 'cursor-pointer hover:ring-1' : ''}`}
-                        style={isAdmin && v3Mode ? ({ ['--tw-ring-color' as any]: `${meta.color}66` }) : undefined}
+                        style={isAdmin && v3Mode ? ({ ['--tw-ring-color' as any]: `${pc}66` }) : undefined}
                       >
                         <div className="flex items-start gap-2">
                           <span className="text-[10px] uppercase tracking-wider rounded px-1.5 py-0.5 mt-0.5"
