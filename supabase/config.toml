@@ -3,6 +3,9 @@ project_id = "xvdgazrewsuaqtalqxue"
 [functions.redeem-beta-code]
 verify_jwt = false
 
+[functions.beta-slots]
+verify_jwt = false
+
 [functions.generate-content]
 verify_jwt = false
 

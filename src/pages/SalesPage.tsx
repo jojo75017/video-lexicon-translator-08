@@ -40,6 +40,7 @@ import CoachingVipBanner from "@/components/sales/CoachingVipBanner";
 import CountdownDeadline from "@/components/sales/CountdownDeadline";
 import KdpRoiCalculator from "@/components/sales/KdpRoiCalculator";
 import TravelConsultCTA from "@/components/sales/TravelConsultCTA";
+import BetaTesterBanner from "@/components/sales/BetaTesterBanner";
 
 const LAUNCH_PRICE = 67;
 const NORMAL_PRICE = 197;
@@ -218,6 +219,7 @@ const SalesPage = () => {
         })}</script>
       </Helmet>
 
+      <BetaTesterBanner />
       <CountdownDeadline />
       <CoachingVipBanner />
 
