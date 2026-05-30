@@ -33,6 +33,8 @@ export const V3_MODULES: V3Module[] = [
     description: '25 points cochables avant clic "Publier" sur KDP.' },
   { id: 'kindle-previewer',    pillar: 'publier',   status: 'todo', title: 'Kindle Previewer Simulé',
     description: 'Aperçu visuel Kindle / tablette / phone avec rendu typographique fidèle.' },
+  { id: 'cover-pdf-exact',     pillar: 'publier',   status: 'in_progress', title: 'Couverture KDP Exacte (PDF)',
+    description: 'Génère le PDF wrap complet (4e + dos + 1re) aux dimensions exactes KDP, bleed + zone ISBN, prêt à uploader.' },
 
   // MONÉTISER
   { id: 'sales-tracker',       pillar: 'monetiser', status: 'todo', title: 'Tracker Ventes KDP',
