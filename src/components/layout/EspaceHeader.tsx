@@ -280,7 +280,7 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
               aria-hidden
             />
             <p className="flex-1 truncate text-[12px] tracking-tight" style={{ fontFamily: "'Work Sans', system-ui, sans-serif" }}>
-              <span className="hidden sm:inline text-white/55 mr-1 uppercase tracking-[0.14em] text-[10px] font-semibold">Lancement 1ᵉʳ juillet 2026 ·</span>
+              <span className="hidden sm:inline text-white/55 mr-1 uppercase tracking-[0.14em] text-[10px] font-semibold">Lancement 1ᵉʳ juin 2026 ·</span>
               <strong className="text-white font-semibold">Tes 2 cadeaux abonné</strong>
               <span className="text-white/60"> : 30 min Zoom + −30 % à vie</span>
             </p>
