@@ -382,6 +382,47 @@ const AdminCockpitPage: React.FC = () => {
           </div>
         </section>
 
+        {/* Détail module V3 (mode V3 admin) */}
+        <Dialog open={!!selectedModule} onOpenChange={(o) => !o && setSelectedModule(null)}>
+          <DialogContent>
+            {selectedModule && (
+              <>
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    <span>{V3_PILLAR_META[selectedModule.pillar].emoji}</span>
+                    {selectedModule.title}
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="space-y-3 text-sm">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span
+                      className="rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider"
+                      style={{ background: `${V3_PILLAR_META[selectedModule.pillar].color}22`, color: V3_PILLAR_META[selectedModule.pillar].color }}
+                    >
+                      {V3_PILLAR_META[selectedModule.pillar].label}
+                    </span>
+                    <span
+                      className="rounded px-2 py-0.5 text-[11px] uppercase tracking-wider"
+                      style={{
+                        background: selectedModule.status === 'done' ? '#10B98122' : selectedModule.status === 'in_progress' ? '#FF9E2D22' : '#23232322',
+                        color:      selectedModule.status === 'done' ? '#10B981'   : selectedModule.status === 'in_progress' ? '#FF9E2D'   : '#666',
+                      }}
+                    >
+                      {selectedModule.status === 'done' ? 'Fait' : selectedModule.status === 'in_progress' ? 'En cours' : 'En attente'}
+                    </span>
+                    <code className="text-[11px] text-joy-ink/40">{selectedModule.id}</code>
+                  </div>
+                  <p className="text-joy-ink/70 leading-relaxed">{selectedModule.description}</p>
+                  <p className="text-[11px] text-joy-ink/40">
+                    Module en préparation pour la V3 ({V3_PRICE}€ à vie). Visible uniquement par l'admin.
+                  </p>
+                </div>
+              </>
+            )}
+          </DialogContent>
+        </Dialog>
+
+
         {/* Calendar + Upcoming */}
         <section className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-4">
           <Card className="rounded-2xl border-joy-ink/10">
