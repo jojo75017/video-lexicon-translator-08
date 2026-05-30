@@ -151,6 +151,8 @@ export type Database = {
           code: string
           created_at: string
           id: string
+          sent_at: string | null
+          sent_to_email: string | null
           status: string
           used_at: string | null
           used_by_email: string | null
@@ -159,6 +161,8 @@ export type Database = {
           code: string
           created_at?: string
           id?: string
+          sent_at?: string | null
+          sent_to_email?: string | null
           status?: string
           used_at?: string | null
           used_by_email?: string | null
@@ -167,6 +171,8 @@ export type Database = {
           code?: string
           created_at?: string
           id?: string
+          sent_at?: string | null
+          sent_to_email?: string | null
           status?: string
           used_at?: string | null
           used_by_email?: string | null
