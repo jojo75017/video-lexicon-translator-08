@@ -464,7 +464,7 @@ const App = () => {
                 </SubscriberGate>
               }
             />
-
+            <Route
               path="/series-tomes"
               element={
                 <SubscriberGate
