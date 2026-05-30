@@ -38,25 +38,31 @@ const BetaTesterBanner = () => {
   const left = remaining ?? TOTAL_SLOTS;
 
   return (
-    <div className="bg-accent text-foreground border-b border-accent">
-      <div className="max-w-7xl mx-auto px-4 py-2.5 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-center">
-        <span className="flex items-center gap-2 text-sm font-semibold">
-          <Gift className="w-4 h-4 shrink-0" />
-          Programme bêta-testeurs : accès gratuit à vie
+    <div className="bg-gradient-to-r from-accent via-accent to-accent/90 text-foreground border-b-2 border-accent">
+      <div className="max-w-5xl mx-auto px-4 py-5 sm:py-6 flex flex-col items-center text-center gap-3">
+        <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-foreground text-background text-[11px] font-extrabold uppercase tracking-wider">
+          <Gift className="w-3.5 h-3.5 shrink-0" />
+          Programme bêta-testeurs ouvert
         </span>
-        <span className="flex items-center gap-2 text-sm font-bold">
-          <span className="inline-flex items-center justify-center rounded-full bg-foreground text-background px-2.5 py-0.5 text-xs">
+        <h2 className="text-xl sm:text-2xl font-extrabold leading-tight">
+          Rejoignez nos bêta-testeurs : accès gratuit à vie
+        </h2>
+        <p className="text-sm sm:text-base font-medium max-w-2xl">
+          Nous ouvrons seulement <strong>{TOTAL_SLOTS} places</strong> aux premiers bêta-testeurs
+          d'EbookStudio Pro V2. Soyez parmi les premiers à tester la plateforme gratuitement.
+        </p>
+        <div className="flex flex-col sm:flex-row items-center gap-3 mt-1">
+          <span className="inline-flex items-center justify-center rounded-full bg-foreground text-background px-4 py-1.5 text-sm font-bold">
             {left} / {TOTAL_SLOTS} {left > 1 ? "places restantes" : "place restante"}
           </span>
-        </span>
-        <Button
-          size="sm"
-          onClick={() => navigate("/activer-beta")}
-          className="h-8 bg-foreground text-background hover:bg-foreground/90 font-bold rounded-full px-4"
-        >
-          Activer mon code bêta
-          <ArrowRight className="w-3.5 h-3.5 ml-1" />
-        </Button>
+          <Button
+            onClick={() => navigate("/activer-beta")}
+            className="bg-foreground text-background hover:bg-foreground/90 font-bold rounded-full px-6"
+          >
+            Activer mon code bêta
+            <ArrowRight className="w-4 h-4 ml-1.5" />
+          </Button>
+        </div>
       </div>
     </div>
   );
