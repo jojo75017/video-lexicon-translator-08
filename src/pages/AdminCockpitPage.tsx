@@ -392,7 +392,7 @@ const AdminCockpitPage: React.FC = () => {
 
         {/* Détail module V3 (mode V3 admin) */}
         <Dialog open={!!selectedModule} onOpenChange={(o) => !o && setSelectedModule(null)}>
-          <DialogContent>
+          <DialogContent className={selectedModule?.id === 'p16-competitive' ? 'max-w-2xl max-h-[85vh] overflow-y-auto' : undefined}>
             {selectedModule && (
               <>
                 <DialogHeader>
@@ -421,9 +421,16 @@ const AdminCockpitPage: React.FC = () => {
                     <code className="text-[11px] text-joy-ink/40">{selectedModule.id}</code>
                   </div>
                   <p className="text-joy-ink/70 leading-relaxed">{selectedModule.description}</p>
-                  <p className="text-[11px] text-joy-ink/40">
-                    Module en préparation pour la V3 ({V3_PRICE}€ à vie). Visible uniquement par l'admin.
-                  </p>
+
+                  {selectedModule.id === 'p16-competitive' ? (
+                    <div className="border-t pt-3">
+                      <ScoutAnalysis />
+                    </div>
+                  ) : (
+                    <p className="text-[11px] text-joy-ink/40">
+                      Module en préparation pour la V3 ({V3_PRICE}€ à vie). Visible uniquement par l'admin.
+                    </p>
+                  )}
                 </div>
               </>
             )}
