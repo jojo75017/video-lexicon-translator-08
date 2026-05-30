@@ -134,6 +134,9 @@ export const generateKdpPackZip = async (opts: KdpPackOptions): Promise<Blob> =>
     const b = await fetchAsBlob(opts.coverFullUrl);
     if (b) root.file('couverture-full.jpg', b);
   }
+  if (opts.coverPdfBlob) {
+    root.file('couverture-complete.pdf', opts.coverPdfBlob);
+  }
 
   // Audio
   if (opts.audioFiles && opts.audioFiles.length) {
