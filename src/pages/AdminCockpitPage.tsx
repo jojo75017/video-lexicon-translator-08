@@ -286,11 +286,11 @@ const AdminCockpitPage: React.FC = () => {
         {/* Roadmap V3 */}
         <section>
           <div className="flex items-center gap-2 mb-3 flex-wrap">
-            <Rocket className="h-5 w-5" style={{ color: ORANGE }} />
+            <Rocket className="h-5 w-5" style={{ color: accent }} />
             <h2 className="text-lg font-bold">Roadmap V3 — Publication Assistée Pro</h2>
             <span
               className="text-[11px] font-bold uppercase tracking-wider rounded-full px-2.5 py-0.5"
-              style={{ background: ORANGE, color: 'white' }}
+              style={{ background: accent, color: skin ? '#06251f' : 'white' }}
             >
               {V3_PRICE}€ à vie
             </span>
@@ -305,16 +305,16 @@ const AdminCockpitPage: React.FC = () => {
                 onClick={() => setV3Mode(!v3Mode)}
                 className="ml-auto inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors"
                 style={{
-                  borderColor: v3Mode ? ORANGE : '#23232322',
-                  background: v3Mode ? `${ORANGE}1a` : 'white',
-                  color: v3Mode ? ORANGE : INK,
+                  borderColor: v3Mode ? accent : '#23232322',
+                  background: v3Mode ? `${accent}1a` : 'white',
+                  color: v3Mode ? accent : ink,
                 }}
                 title="Bascule réservée admin — préparation du lancement V3"
               >
                 <span className={!v3Mode ? 'font-bold' : 'opacity-50'}>V2</span>
                 <span
                   className="relative inline-flex h-4 w-8 items-center rounded-full transition-colors"
-                  style={{ background: v3Mode ? ORANGE : '#cbd5e1' }}
+                  style={{ background: v3Mode ? accent : '#cbd5e1' }}
                 >
                   <span
                     className="inline-block h-3 w-3 rounded-full bg-white transition-transform"
@@ -330,15 +330,15 @@ const AdminCockpitPage: React.FC = () => {
           {isAdmin && v3Mode && (
             <div
               className="mb-3 flex flex-wrap items-center gap-3 rounded-xl border px-3 py-2 text-xs"
-              style={{ borderColor: `${ORANGE}55`, background: `${ORANGE}12` }}
+              style={{ borderColor: `${accent}55`, background: `${accent}12` }}
             >
-              <Sparkles className="h-4 w-4" style={{ color: ORANGE }} />
-              <span className="font-bold" style={{ color: ORANGE }}>Mode V3 actif (préparation)</span>
+              <Sparkles className="h-4 w-4" style={{ color: accent }} />
+              <span className="font-bold" style={{ color: accent }}>Mode V3 actif (préparation)</span>
               <span className="text-joy-ink/60">Clique un module pour voir son détail. Visible par toi seul (admin).</span>
               <span className="ml-auto flex items-center gap-2">
-                <span className="rounded px-1.5 py-0.5" style={{ background: '#23232322', color: '#666' }}>todo {v3Counts.todo}</span>
-                <span className="rounded px-1.5 py-0.5" style={{ background: '#FF9E2D22', color: '#FF9E2D' }}>en cours {v3Counts.in_progress}</span>
-                <span className="rounded px-1.5 py-0.5" style={{ background: '#10B98122', color: '#10B981' }}>fait {v3Counts.done}</span>
+                <span className="rounded px-1.5 py-0.5" style={{ background: '#ffffff1a', color: ink }}>todo {v3Counts.todo}</span>
+                <span className="rounded px-1.5 py-0.5" style={{ background: `${accent}22`, color: accent }}>en cours {v3Counts.in_progress}</span>
+                <span className="rounded px-1.5 py-0.5" style={{ background: '#10B98122', color: '#3ddc97' }}>fait {v3Counts.done}</span>
               </span>
             </div>
           )}
