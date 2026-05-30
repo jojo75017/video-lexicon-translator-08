@@ -452,6 +452,19 @@ const App = () => {
               }
             />
             <Route
+              path="/couverture-kdp"
+              element={
+                <SubscriberGate
+                  isAdmin={isAdmin}
+                  subscriberEmail={subscriberEmail}
+                  subscriberData={subscriberData}
+                  onInvalid={handleLogout}
+                >
+                  <CouvertureKdpPage />
+                </SubscriberGate>
+              }
+            />
+
               path="/series-tomes"
               element={
                 <SubscriberGate
