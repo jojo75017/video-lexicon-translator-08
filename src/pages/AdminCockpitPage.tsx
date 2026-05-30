@@ -102,6 +102,14 @@ const AdminCockpitPage: React.FC = () => {
   const [cursor, setCursor] = useState<Date>(new Date());
   const [editing, setEditing] = useState<Launch | null>(null);
   const [draft, setDraft] = useState<Partial<Launch> | null>(null);
+  const { isAdmin, v3Mode, setV3Mode } = useV3Mode();
+  const [selectedModule, setSelectedModule] = useState<V3Module | null>(null);
+
+  const v3Counts = useMemo(() => ({
+    todo: V3_MODULES.filter((m) => m.status === 'todo').length,
+    in_progress: V3_MODULES.filter((m) => m.status === 'in_progress').length,
+    done: V3_MODULES.filter((m) => m.status === 'done').length,
+  }), []);
 
   const load = async () => {
     setLoading(true);
