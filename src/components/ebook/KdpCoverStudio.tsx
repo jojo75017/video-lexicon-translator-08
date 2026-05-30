@@ -1,13 +1,15 @@
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BookOpen, Ruler, FileText, Copy, Download, Info, Calculator, Palette } from 'lucide-react';
+import { BookOpen, Ruler, FileText, Copy, Download, Info, Calculator, Palette, FileImage, Loader2, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
+import { downloadKdpCoverPdf } from '@/lib/kdpCoverPdf';
 
 // KDP trim sizes (inches)
 const KDP_FORMATS = [
