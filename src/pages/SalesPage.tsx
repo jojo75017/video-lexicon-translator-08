@@ -794,6 +794,9 @@ const SalesPage = () => {
         </div>
       </section>
 
+      {/* ════════════════ Consultation Voyage (bêta-testeurs & visiteurs) ════════════════ */}
+      <TravelConsultCTA />
+
       {/* ════════════════ 13. FINAL CTA ════════════════ */}
       <section className="py-24 px-4 bg-foreground text-background relative overflow-hidden">
         <div className="absolute inset-0 -z-0">
