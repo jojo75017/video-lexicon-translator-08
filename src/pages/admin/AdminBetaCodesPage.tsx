@@ -214,6 +214,7 @@ const AdminBetaCodesPage: React.FC = () => {
                 <TableRow>
                   <TableHead>Code</TableHead>
                   <TableHead>Statut</TableHead>
+                  <TableHead>Envoyé à</TableHead>
                   <TableHead>Utilisé par</TableHead>
                   <TableHead>Date d'activation</TableHead>
                   <TableHead className="text-right">Action</TableHead>
