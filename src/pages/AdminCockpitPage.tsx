@@ -9,8 +9,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ArrowLeft, ChevronLeft, ChevronRight, Plus, Shield, Trash2, Calendar as CalendarIcon, Sparkles, Rocket } from 'lucide-react';
 import { V3_MODULES, V3_PILLAR_META, V3_PRICE, V2_PRICE, type V3Pillar, type V3Module } from '@/data/roadmapV3';
-import { Switch } from '@/components/ui/switch';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { useV3Mode } from '@/hooks/useV3Mode';
 import { toast } from 'sonner';
 import {
