@@ -46,6 +46,13 @@ const PDF_GIFTS: PdfGift[] = [
     category: 'lead-magnet',
   },
   {
+    id: 'guide-parrainage-abonnes',
+    title: '🤝 Guide Parrainage — Abonnés',
+    description: 'Instructions complètes pour qu\'un abonné lance son parrainage : éligibilité, 4 étapes (lien, kit, suivi), liens disponibles, conseils et règles de commission (30% / 20,10€ / PayPal). À envoyer aux abonnés.',
+    path: '/lead-magnets/guide-parrainage-abonnes.pdf',
+    category: 'guide',
+  },
+  {
     id: 'guide-cle-gemini',
     title: '🔑 Guide — Obtenir sa clé API Gemini',
     description: 'Tutoriel pas-à-pas pour créer une clé Gemini gratuite (Google AI Studio) et la coller dans Ebookstudio Pro V2.',
