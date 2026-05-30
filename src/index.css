@@ -617,24 +617,25 @@ a:hover {
 }
 
 /* ============================================================
-   THÈME V3 — "Midnight Indigo" (Publication Assistée Pro)
+   THÈME V3 — "Platinum Light" (Publication Assistée Pro)
+   Fond clair lumineux + accent bleu. Texte foncé = lisibilité max.
    Scopé sous .v3-skin uniquement. N'affecte JAMAIS la V2.
    ============================================================ */
 .v3-skin {
-  --v3-bg: #0b1020;
-  --v3-bg-2: #11183a;
-  --v3-surface: rgba(255, 255, 255, 0.05);
-  --v3-surface-hover: rgba(255, 255, 255, 0.09);
-  --v3-border: rgba(129, 140, 248, 0.22);
-  --v3-primary: #6366f1;
-  --v3-gold: #818cf8;
-  --v3-gold-soft: rgba(129, 140, 248, 0.16);
-  --v3-ink: #eef1fb;
-  --v3-muted: rgba(238, 241, 251, 0.62);
+  --v3-bg: #f5f7fc;
+  --v3-bg-2: #eaeefb;
+  --v3-surface: #ffffff;
+  --v3-surface-hover: #f0f3fc;
+  --v3-border: rgba(99, 102, 241, 0.18);
+  --v3-primary: #4f46e5;
+  --v3-gold: #6366f1;
+  --v3-gold-soft: rgba(99, 102, 241, 0.14);
+  --v3-ink: #1e2240;
+  --v3-muted: #565b7e;
 
   background:
-    radial-gradient(1200px 600px at 100% -10%, rgba(99, 102, 241, 0.32), transparent 60%),
-    radial-gradient(900px 500px at -10% 110%, rgba(56, 189, 248, 0.14), transparent 55%),
+    radial-gradient(1100px 560px at 100% -10%, rgba(99, 102, 241, 0.12), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, rgba(56, 189, 248, 0.10), transparent 55%),
     linear-gradient(160deg, var(--v3-bg) 0%, var(--v3-bg-2) 100%) !important;
   color: var(--v3-ink) !important;
   font-family: 'DM Sans', system-ui, sans-serif;
@@ -646,9 +647,10 @@ a:hover {
 .v3-skin .v3-display {
   font-family: 'Space Grotesk', system-ui, sans-serif;
   letter-spacing: -0.01em;
+  color: var(--v3-ink) !important;
 }
 
-/* Surfaces claires V2 -> surfaces sombres translucides */
+/* Surfaces claires V2 -> cartes blanches nettes */
 .v3-skin .bg-white,
 .v3-skin .bg-white\/85,
 .v3-skin .bg-joy-cream,
@@ -657,14 +659,14 @@ a:hover {
 .v3-skin .bg-joy-peach\/30,
 .v3-skin .bg-joy-mint\/30 {
   background: var(--v3-surface) !important;
-  backdrop-filter: blur(8px);
+  box-shadow: 0 1px 3px rgba(30, 34, 64, 0.06);
 }
 
 .v3-skin .hover\:bg-joy-cream:hover {
   background: var(--v3-surface-hover) !important;
 }
 
-/* Texte & bordures issus des tokens V2 -> tons crème/or */
+/* Texte & bordures issus des tokens V2 -> tons sombres lisibles */
 .v3-skin [class*="text-joy-ink"] {
   color: var(--v3-muted) !important;
 }
@@ -676,7 +678,7 @@ a:hover {
   border-color: var(--v3-gold) !important;
 }
 
-/* Scrollbar premium */
+/* Scrollbar */
 .v3-skin ::-webkit-scrollbar { width: 10px; height: 10px; }
 .v3-skin ::-webkit-scrollbar-thumb {
   background: var(--v3-gold-soft);
