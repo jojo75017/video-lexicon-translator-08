@@ -29,6 +29,8 @@ interface BetaCode {
   status: string;
   used_by_email: string | null;
   used_at: string | null;
+  sent_to_email: string | null;
+  sent_at: string | null;
   created_at: string;
 }
 
