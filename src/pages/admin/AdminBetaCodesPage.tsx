@@ -1,8 +1,16 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Ticket, Plus, Copy, Check, RefreshCw, Loader2 } from 'lucide-react';
+import { Ticket, Plus, Copy, Check, RefreshCw, Loader2, Mail, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import {
   Table,
   TableBody,
