@@ -80,7 +80,7 @@ const AdminBetaCodesPage: React.FC = () => {
       console.error(error);
       toast.error('Impossible de charger les codes');
     } else {
-      setCodes(data || []);
+      setCodes((data as BetaCode[]) || []);
     }
     setLoading(false);
   }, []);
