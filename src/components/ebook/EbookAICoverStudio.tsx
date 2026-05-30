@@ -154,6 +154,11 @@ export const EbookAICoverStudio: React.FC<EbookAICoverStudioProps> = ({
   const [description, setDescription] = useState(initialBookDescription || '');
   const [userPrompt, setUserPrompt] = useState('');
   const [referenceImage, setReferenceImage] = useState<string | null>(null);
+  // Dimensions broché explicites (pré-remplies avec un format KDP standard valide)
+  const [pbWidthCm, setPbWidthCm] = useState('15.24');
+  const [pbHeightCm, setPbHeightCm] = useState('22.86');
+  const [pbPages, setPbPages] = useState('200');
+  const [pbPaper, setPbPaper] = useState<'cream' | 'white'>('cream');
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedCovers, setGeneratedCovers] = useState<GeneratedCover[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
