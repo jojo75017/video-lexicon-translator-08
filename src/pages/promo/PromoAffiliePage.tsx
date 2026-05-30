@@ -30,7 +30,7 @@ const ReferralLockedScreen = () => {
   });
   return (
     <FunnelLayout>
-      <SeoHead title="Programme de parrainage — Ouverture le 1er juillet 2026" description="Le programme de parrainage Ebookstudio Pro V2 ouvre officiellement le 1er juillet 2026." />
+      <SeoHead title="Programme de parrainage — Ouverture le 1er juin 2026" description="Le programme de parrainage Ebookstudio Pro V2 ouvre officiellement le 1er juin 2026." />
       <div className="max-w-2xl mx-auto px-4 py-20 text-center">
         <div className="w-20 h-20 mx-auto mb-6 bg-[#FF9E2D]/15 rounded-full flex items-center justify-center">
           <Lock className="w-10 h-10 text-[#FF9E2D]" />
