@@ -242,7 +242,7 @@ const AdminCockpitPage: React.FC = () => {
             size="sm"
             onClick={() => openCreate()}
             className="rounded-full px-4 gap-1.5 hover:opacity-90 transition-all"
-            style={{ background: teal, color: skin ? '#06251f' : 'white' }}
+            style={{ background: teal, color: skin ? '#0b1020' : 'white' }}
           >
             <Plus className="h-4 w-4" />
             <span className="hidden sm:inline">Nouveau lancement</span>
@@ -290,7 +290,7 @@ const AdminCockpitPage: React.FC = () => {
             <h2 className="text-lg font-bold">Roadmap V3 — Publication Assistée Pro</h2>
             <span
               className="text-[11px] font-bold uppercase tracking-wider rounded-full px-2.5 py-0.5"
-              style={{ background: accent, color: skin ? '#06251f' : 'white' }}
+              style={{ background: accent, color: skin ? '#0b1020' : 'white' }}
             >
               {V3_PRICE}€ à vie
             </span>
