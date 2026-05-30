@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { 
   BookOpen, Plus, Wand2, RotateCcw, ArrowLeft, Merge, Sparkles, Eye, Search, Palette, Users,
   Save, Zap, Target, FileText, Crown, Trash2, ImageIcon, Loader2, X, ChevronRight, Rocket, CheckCircle2,
-  HelpCircle, GraduationCap
+  HelpCircle, GraduationCap, Gift
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
