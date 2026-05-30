@@ -622,11 +622,11 @@ a:hover {
    Scopé sous .v3-skin uniquement. N'affecte JAMAIS la V2.
    ============================================================ */
 .v3-skin {
-  --v3-bg: #f5f7fc;
-  --v3-bg-2: #eaeefb;
+  --v3-bg: #eef1fb;
+  --v3-bg-2: #dfe5f9;
   --v3-surface: #ffffff;
-  --v3-surface-hover: #f0f3fc;
-  --v3-border: rgba(99, 102, 241, 0.18);
+  --v3-surface-hover: #eef1fc;
+  --v3-border: rgba(79, 70, 229, 0.22);
   --v3-primary: #4f46e5;
   --v3-gold: #6366f1;
   --v3-gold-soft: rgba(99, 102, 241, 0.14);
@@ -634,8 +634,8 @@ a:hover {
   --v3-muted: #565b7e;
 
   background:
-    radial-gradient(1100px 560px at 100% -10%, rgba(99, 102, 241, 0.12), transparent 60%),
-    radial-gradient(900px 500px at -10% 110%, rgba(56, 189, 248, 0.10), transparent 55%),
+    radial-gradient(1100px 560px at 100% -10%, rgba(99, 102, 241, 0.22), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, rgba(56, 189, 248, 0.18), transparent 55%),
     linear-gradient(160deg, var(--v3-bg) 0%, var(--v3-bg-2) 100%) !important;
   color: var(--v3-ink) !important;
   font-family: 'DM Sans', system-ui, sans-serif;
@@ -650,7 +650,7 @@ a:hover {
   color: var(--v3-ink) !important;
 }
 
-/* Surfaces claires V2 -> cartes blanches nettes */
+/* Surfaces claires V2 -> cartes blanches avec liseré bleu */
 .v3-skin .bg-white,
 .v3-skin .bg-white\/85,
 .v3-skin .bg-joy-cream,
@@ -659,7 +659,8 @@ a:hover {
 .v3-skin .bg-joy-peach\/30,
 .v3-skin .bg-joy-mint\/30 {
   background: var(--v3-surface) !important;
-  box-shadow: 0 1px 3px rgba(30, 34, 64, 0.06);
+  border: 1px solid var(--v3-border) !important;
+  box-shadow: 0 6px 18px -10px rgba(79, 70, 229, 0.35) !important;
 }
 
 .v3-skin .hover\:bg-joy-cream:hover {
