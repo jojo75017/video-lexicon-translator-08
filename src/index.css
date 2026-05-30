@@ -617,24 +617,24 @@ a:hover {
 }
 
 /* ============================================================
-   THÈME V3 — "Emerald Prestige" (Publication Assistée Pro)
+   THÈME V3 — "Midnight Indigo" (Publication Assistée Pro)
    Scopé sous .v3-skin uniquement. N'affecte JAMAIS la V2.
    ============================================================ */
 .v3-skin {
-  --v3-bg: #06251f;
-  --v3-bg-2: #04332a;
-  --v3-surface: rgba(255, 255, 255, 0.045);
-  --v3-surface-hover: rgba(255, 255, 255, 0.08);
-  --v3-border: rgba(201, 168, 76, 0.22);
-  --v3-primary: #0d7a5f;
-  --v3-gold: #c9a84c;
-  --v3-gold-soft: rgba(201, 168, 76, 0.14);
-  --v3-ink: #f5f0e0;
-  --v3-muted: rgba(245, 240, 224, 0.6);
+  --v3-bg: #0b1020;
+  --v3-bg-2: #11183a;
+  --v3-surface: rgba(255, 255, 255, 0.05);
+  --v3-surface-hover: rgba(255, 255, 255, 0.09);
+  --v3-border: rgba(129, 140, 248, 0.22);
+  --v3-primary: #6366f1;
+  --v3-gold: #818cf8;
+  --v3-gold-soft: rgba(129, 140, 248, 0.16);
+  --v3-ink: #eef1fb;
+  --v3-muted: rgba(238, 241, 251, 0.62);
 
   background:
-    radial-gradient(1200px 600px at 100% -10%, rgba(13, 122, 95, 0.35), transparent 60%),
-    radial-gradient(900px 500px at -10% 110%, rgba(201, 168, 76, 0.12), transparent 55%),
+    radial-gradient(1200px 600px at 100% -10%, rgba(99, 102, 241, 0.32), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, rgba(56, 189, 248, 0.14), transparent 55%),
     linear-gradient(160deg, var(--v3-bg) 0%, var(--v3-bg-2) 100%) !important;
   color: var(--v3-ink) !important;
   font-family: 'DM Sans', system-ui, sans-serif;
