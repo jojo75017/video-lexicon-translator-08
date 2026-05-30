@@ -474,7 +474,7 @@ const AdminCockpitPage: React.FC = () => {
                       className={`min-h-[78px] rounded-xl p-1.5 text-left border transition-all hover:scale-[1.02] ${
                         inMonth ? 'bg-white border-joy-ink/8' : 'bg-joy-ink/[0.02] border-transparent text-joy-ink/30'
                       } ${isToday ? 'ring-2 ring-offset-1' : ''}`}
-                      style={isToday ? { boxShadow: `inset 0 0 0 2px ${ORANGE}` } : undefined}
+                      style={isToday ? { boxShadow: `inset 0 0 0 2px ${accent}` } : undefined}
                     >
                       <div className="text-[11px] font-semibold mb-1">{format(day, 'd')}</div>
                       <div className="space-y-0.5">
