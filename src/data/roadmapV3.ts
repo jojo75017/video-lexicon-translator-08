@@ -23,6 +23,14 @@ export const V3_PILLAR_META: Record<V3Pillar, { label: string; color: string; em
   ia:         { label: 'IA avancée', color: '#10B981', emoji: '🧠' },
 };
 
+// Variante "Emerald Prestige" — utilisée uniquement en mode V3 (cockpit admin).
+export const V3_PILLAR_COLORS: Record<V3Pillar, string> = {
+  publier:    '#0d7a5f',
+  monetiser:  '#c9a84c',
+  marketing:  '#7fd1b9',
+  ia:         '#e8c97a',
+};
+
 export const V3_MODULES: V3Module[] = [
   // PUBLIER
   { id: 'kdp-pack-zip',        pillar: 'publier',   status: 'todo', title: 'Pack KDP ZIP',
