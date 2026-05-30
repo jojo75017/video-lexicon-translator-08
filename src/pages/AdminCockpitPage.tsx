@@ -405,7 +405,7 @@ const AdminCockpitPage: React.FC = () => {
                   <div className="flex flex-wrap items-center gap-2">
                     <span
                       className="rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider"
-                      style={{ background: `${V3_PILLAR_META[selectedModule.pillar].color}22`, color: V3_PILLAR_META[selectedModule.pillar].color }}
+                      style={{ background: `${pillarColor(selectedModule.pillar)}22`, color: pillarColor(selectedModule.pillar) }}
                     >
                       {V3_PILLAR_META[selectedModule.pillar].label}
                     </span>
