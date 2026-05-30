@@ -290,7 +290,51 @@ const AdminCockpitPage: React.FC = () => {
             <span className="text-xs text-joy-ink/50">
               (V2 actuelle : {V2_PRICE}€) · {V3_MODULES.length} modules · éditable dans <code>src/data/roadmapV3.ts</code>
             </span>
+
+            {/* Bascule V2 / V3 — admin uniquement */}
+            {isAdmin && (
+              <button
+                type="button"
+                onClick={() => setV3Mode(!v3Mode)}
+                className="ml-auto inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors"
+                style={{
+                  borderColor: v3Mode ? ORANGE : '#23232322',
+                  background: v3Mode ? `${ORANGE}1a` : 'white',
+                  color: v3Mode ? ORANGE : INK,
+                }}
+                title="Bascule réservée admin — préparation du lancement V3"
+              >
+                <span className={!v3Mode ? 'font-bold' : 'opacity-50'}>V2</span>
+                <span
+                  className="relative inline-flex h-4 w-8 items-center rounded-full transition-colors"
+                  style={{ background: v3Mode ? ORANGE : '#cbd5e1' }}
+                >
+                  <span
+                    className="inline-block h-3 w-3 rounded-full bg-white transition-transform"
+                    style={{ transform: v3Mode ? 'translateX(18px)' : 'translateX(2px)' }}
+                  />
+                </span>
+                <span className={v3Mode ? 'font-bold' : 'opacity-50'}>V3</span>
+              </button>
+            )}
           </div>
+
+          {/* Bannière mode V3 actif (admin) */}
+          {isAdmin && v3Mode && (
+            <div
+              className="mb-3 flex flex-wrap items-center gap-3 rounded-xl border px-3 py-2 text-xs"
+              style={{ borderColor: `${ORANGE}55`, background: `${ORANGE}12` }}
+            >
+              <Sparkles className="h-4 w-4" style={{ color: ORANGE }} />
+              <span className="font-bold" style={{ color: ORANGE }}>Mode V3 actif (préparation)</span>
+              <span className="text-joy-ink/60">Clique un module pour voir son détail. Visible par toi seul (admin).</span>
+              <span className="ml-auto flex items-center gap-2">
+                <span className="rounded px-1.5 py-0.5" style={{ background: '#23232322', color: '#666' }}>todo {v3Counts.todo}</span>
+                <span className="rounded px-1.5 py-0.5" style={{ background: '#FF9E2D22', color: '#FF9E2D' }}>en cours {v3Counts.in_progress}</span>
+                <span className="rounded px-1.5 py-0.5" style={{ background: '#10B98122', color: '#10B981' }}>fait {v3Counts.done}</span>
+              </span>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
             {(Object.keys(V3_PILLAR_META) as V3Pillar[]).map((pillar) => {
