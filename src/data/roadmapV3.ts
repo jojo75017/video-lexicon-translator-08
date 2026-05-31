@@ -143,4 +143,6 @@ export const V3_MODULES: V3Module[] = [
     description: 'Génère plusieurs variantes de 4e de couverture et les score pour identifier la plus vendeuse.' },
   { id: 'p22-trend-radar',       pillar: 'ia',        status: 'in_progress', title: 'VIGIE — Radar de Tendances (P22)',
     description: 'Détecte sujets émergents et saisonnalité d’une niche pour choisir le prochain livre à écrire.' },
+  { id: 'niche-intelligence',    pillar: 'ia',        status: 'in_progress', title: 'INTEL — Intelligence de Niche',
+    description: '4 onglets : découverte IA (SCOUT), niches cachées, prédicteur de tendances (VIGIE) et 600+ idées par catégorie.' },
 ];
