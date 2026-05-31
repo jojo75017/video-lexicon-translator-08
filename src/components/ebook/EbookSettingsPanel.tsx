@@ -91,7 +91,7 @@ export const EbookSettingsPanel: React.FC<Props> = ({ onTypographyChange }) => {
   };
 
   const testProviderKey = async (p: AIProvider) => {
-    const key = (keys[p] || '').trim();
+    const key = sanitizeKey(keys[p] || '');
     if (!key) { toast.error('Saisissez d\'abord la clé.'); return; }
     if (!validateKeyFormat(p, key)) {
       setProviderTest(s => ({ ...s, [p]: 'fail' }));
