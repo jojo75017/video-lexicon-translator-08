@@ -12,6 +12,9 @@ import { V3_MODULES, V3_PILLAR_META, V3_PILLAR_COLORS, V3_PRICE, V2_PRICE, type 
 import { useV3Mode } from '@/hooks/useV3Mode';
 import ScoutAnalysis from '@/components/admin/ScoutAnalysis';
 import SagaArchitect from '@/components/admin/SagaArchitect';
+import LumenReadability from '@/components/admin/LumenReadability';
+import EchoAuthorVoice from '@/components/admin/EchoAuthorVoice';
+import OracleManuscript from '@/components/admin/OracleManuscript';
 import { toast } from 'sonner';
 import {
   addMonths, endOfMonth, endOfWeek, format, isSameDay, isSameMonth,
@@ -363,7 +366,7 @@ const AdminCockpitPage: React.FC = () => {
                   </div>
                   <ul className="space-y-1.5">
                     {items.map((m) => {
-                      const clickable = (isAdmin && v3Mode) || m.id === 'p16-competitive' || m.id === 'p17-series';
+                      const clickable = (isAdmin && v3Mode) || ['p16-competitive', 'p17-series', 'p18-readability', 'p19-author-voice', 'p20-chat-manuscript'].includes(m.id);
                       return (
                       <li
                         key={m.id}
@@ -397,7 +400,7 @@ const AdminCockpitPage: React.FC = () => {
 
         {/* Détail module V3 (mode V3 admin) */}
         <Dialog open={!!selectedModule} onOpenChange={(o) => !o && setSelectedModule(null)}>
-          <DialogContent className={selectedModule?.id === 'p16-competitive' ? 'max-w-2xl max-h-[85vh] overflow-y-auto' : undefined}>
+          <DialogContent className={['p16-competitive', 'p17-series', 'p18-readability', 'p19-author-voice', 'p20-chat-manuscript'].includes(selectedModule?.id ?? '') ? 'max-w-2xl max-h-[85vh] overflow-y-auto' : undefined}>
             {selectedModule && (
               <>
                 <DialogHeader>
@@ -434,6 +437,18 @@ const AdminCockpitPage: React.FC = () => {
                   ) : selectedModule.id === 'p17-series' ? (
                     <div className="border-t pt-3">
                       <SagaArchitect />
+                    </div>
+                  ) : selectedModule.id === 'p18-readability' ? (
+                    <div className="border-t pt-3">
+                      <LumenReadability />
+                    </div>
+                  ) : selectedModule.id === 'p19-author-voice' ? (
+                    <div className="border-t pt-3">
+                      <EchoAuthorVoice />
+                    </div>
+                  ) : selectedModule.id === 'p20-chat-manuscript' ? (
+                    <div className="border-t pt-3">
+                      <OracleManuscript />
                     </div>
                   ) : (
                     <p className="text-[11px] text-joy-ink/40">
