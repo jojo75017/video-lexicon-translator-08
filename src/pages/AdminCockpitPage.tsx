@@ -456,6 +456,10 @@ const AdminCockpitPage: React.FC = () => {
                     <div className="border-t pt-3">
                       <DuelBlurb />
                     </div>
+                  ) : selectedModule.id === 'p22-trend-radar' ? (
+                    <div className="border-t pt-3">
+                      <VigieTrends />
+                    </div>
                   ) : (
                     <p className="text-[11px] text-joy-ink/40">
                       Module en préparation pour la V3 ({V3_PRICE}€ à vie). Visible uniquement par l'admin.
