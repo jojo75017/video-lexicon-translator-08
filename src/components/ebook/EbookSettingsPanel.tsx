@@ -16,6 +16,7 @@ import {
   getProviderKey,
   setProviderKey,
   validateKeyFormat,
+  sanitizeKey,
   OPENROUTER_MODELS,
   getOpenRouterModel,
   setOpenRouterModel,
