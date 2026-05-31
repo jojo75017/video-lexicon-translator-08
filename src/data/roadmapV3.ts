@@ -53,6 +53,8 @@ export const V3_MODULES: V3Module[] = [
     description: 'Suggère le prix optimal selon niche, concurrence et longueur.' },
 
   // MARKETING
+  { id: 'listing-optimizer',     pillar: 'marketing', status: 'in_progress', title: "Optimiseur d'annonces KDP",
+    description: 'Optimise titre, sous-titre, mots-clés KDP, catégories, description, contenu A+ et tarification du livre.' },
   { id: 'launch-sequence-j7',  pillar: 'marketing', status: 'todo', title: 'Séquence Lancement J-7',
     description: 'Emails + posts sociaux pré-programmés sur 7 jours avant publication.' },
   { id: 'amazon-ads',          pillar: 'marketing', status: 'todo', title: 'Amazon Ads Generator',
@@ -63,6 +65,8 @@ export const V3_MODULES: V3Module[] = [
   // IA AVANCÉE
   { id: 'p16-competitive',     pillar: 'ia',        status: 'done', title: 'SCOUT — Analyse Concurrentielle (P16)',
     description: 'Scan top 10 Amazon de la niche pour positionnement et angles.' },
+  { id: 'niche-intelligence',    pillar: 'ia',        status: 'in_progress', title: 'INTEL — Intelligence de Niche',
+    description: '4 onglets : découverte IA (SCOUT), niches cachées, prédicteur de tendances (VIGIE) et 600+ idées par catégorie.' },
   { id: 'p17-series',          pillar: 'ia',        status: 'in_progress', title: 'SAGA — Architecte de Série (P17)',
     description: 'Plan cohérent des tomes 2 / 3 / 4 (arcs, persos, cliffhangers).' },
 
@@ -143,6 +147,4 @@ export const V3_MODULES: V3Module[] = [
     description: 'Génère plusieurs variantes de 4e de couverture et les score pour identifier la plus vendeuse.' },
   { id: 'p22-trend-radar',       pillar: 'ia',        status: 'in_progress', title: 'VIGIE — Radar de Tendances (P22)',
     description: 'Détecte sujets émergents et saisonnalité d’une niche pour choisir le prochain livre à écrire.' },
-  { id: 'niche-intelligence',    pillar: 'ia',        status: 'in_progress', title: 'INTEL — Intelligence de Niche',
-    description: '4 onglets : découverte IA (SCOUT), niches cachées, prédicteur de tendances (VIGIE) et 600+ idées par catégorie.' },
 ];
