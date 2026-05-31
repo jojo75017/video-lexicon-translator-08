@@ -100,6 +100,7 @@ const RecuperationCodePage = lazy(() => import('./pages/RecuperationCodePage'));
 const ExtensionChromePage = lazy(() => import('./pages/ExtensionChromePage'));
 const EbookbotPage = lazy(() => import('./pages/EbookbotPage'));
 const EspacePage = lazy(() => import('./pages/EspacePage'));
+const DashboardPage = lazy(() => import('./pages/DashboardPage'));
 const EspaceLancementPage = lazy(() => import('./pages/EspaceLancementPage'));
 
 // Promo funnel pages
@@ -288,6 +289,19 @@ const App = () => {
                   onInvalid={handleLogout}
                 >
                   <EspacePage subscriberEmail={subscriberEmail || ''} onLogout={handleLogout} />
+                </SubscriberGate>
+              }
+            />
+            <Route
+              path="/tableau-de-bord"
+              element={
+                <SubscriberGate
+                  isAdmin={isAdmin}
+                  subscriberEmail={subscriberEmail}
+                  subscriberData={subscriberData}
+                  onInvalid={handleLogout}
+                >
+                  <DashboardPage subscriberEmail={subscriberEmail || ''} onLogout={handleLogout} />
                 </SubscriberGate>
               }
             />
