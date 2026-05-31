@@ -249,15 +249,28 @@ const AdminCockpitPage: React.FC = () => {
             <Shield className="h-5 w-5" style={{ color: teal }} />
             <span>{skin ? 'Cockpit V3 — Publication Assistée Pro' : 'Cockpit admin'}</span>
           </div>
-          <Button
-            size="sm"
-            onClick={() => openCreate()}
-            className="rounded-full px-4 gap-1.5 hover:opacity-90 transition-all"
-            style={{ background: teal, color: 'white' }}
-          >
-            <Plus className="h-4 w-4" />
-            <span className="hidden sm:inline">Nouveau lancement</span>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => navigate('/tableau-de-bord')}
+              className="rounded-full px-4 gap-1.5 hover:opacity-90 transition-all"
+              style={{ borderColor: accent, color: accent }}
+            >
+              <Rocket className="h-4 w-4" />
+              <span className="hidden sm:inline">Tableau de bord V3</span>
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => openCreate()}
+              className="rounded-full px-4 gap-1.5 hover:opacity-90 transition-all"
+              style={{ background: teal, color: 'white' }}
+            >
+              <Plus className="h-4 w-4" />
+              <span className="hidden sm:inline">Nouveau lancement</span>
+            </Button>
+          </div>
+
         </div>
       </header>
 
