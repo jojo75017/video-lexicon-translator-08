@@ -467,6 +467,8 @@ const AdminCockpitPage: React.FC = () => {
                     <NicheIntelligence />
                   ) : selectedModule.id === 'listing-optimizer' ? (
                     <ListingOptimizer />
+                  ) : selectedModule.id === 'book-creation-studio' ? (
+                    <BookCreationStudio />
                   ) : (
                     <p className="text-[11px] text-joy-ink/40">
                       Module en préparation pour la V3 ({V3_PRICE}€ à vie). Visible uniquement par l'admin.
