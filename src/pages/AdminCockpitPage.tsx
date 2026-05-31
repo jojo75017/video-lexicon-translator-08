@@ -363,7 +363,7 @@ const AdminCockpitPage: React.FC = () => {
                   </div>
                   <ul className="space-y-1.5">
                     {items.map((m) => {
-                      const clickable = (isAdmin && v3Mode) || m.id === 'p16-competitive';
+                      const clickable = (isAdmin && v3Mode) || m.id === 'p16-competitive' || m.id === 'p17-series';
                       return (
                       <li
                         key={m.id}
