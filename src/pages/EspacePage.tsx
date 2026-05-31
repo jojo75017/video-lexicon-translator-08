@@ -333,7 +333,7 @@ const EspacePage: React.FC<EspacePageProps> = ({ subscriberEmail, onLogout }) =>
             )}
             <Button
               size="sm"
-              onClick={() => navigate('/tableau-de-bord')}
+              onClick={() => goPlanner('workflow-dashboard')}
               className="rounded-full px-4 gap-1.5 hover:opacity-90 hover:scale-[1.03] transition-all shadow-[0_2px_8px_rgba(0,130,150,0.25)]"
               style={{ background: TEAL, color: 'white' }}
             >
