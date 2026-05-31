@@ -61,7 +61,7 @@ export const V3_MODULES: V3Module[] = [
     description: '20 pins générés automatiquement depuis la couverture du livre.' },
 
   // IA AVANCÉE
-  { id: 'p16-competitive',     pillar: 'ia',        status: 'todo', title: 'SCOUT — Analyse Concurrentielle (P16)',
+  { id: 'p16-competitive',     pillar: 'ia',        status: 'done', title: 'SCOUT — Analyse Concurrentielle (P16)',
     description: 'Scan top 10 Amazon de la niche pour positionnement et angles.' },
   { id: 'p17-series',          pillar: 'ia',        status: 'in_progress', title: 'SAGA — Architecte de Série (P17)',
     description: 'Plan cohérent des tomes 2 / 3 / 4 (arcs, persos, cliffhangers).' },
