@@ -12,6 +12,9 @@ import { V3_MODULES, V3_PILLAR_META, V3_PILLAR_COLORS, V3_PRICE, V2_PRICE, type 
 import { useV3Mode } from '@/hooks/useV3Mode';
 import ScoutAnalysis from '@/components/admin/ScoutAnalysis';
 import SagaArchitect from '@/components/admin/SagaArchitect';
+import LumenReadability from '@/components/admin/LumenReadability';
+import EchoAuthorVoice from '@/components/admin/EchoAuthorVoice';
+import OracleManuscript from '@/components/admin/OracleManuscript';
 import { toast } from 'sonner';
 import {
   addMonths, endOfMonth, endOfWeek, format, isSameDay, isSameMonth,
