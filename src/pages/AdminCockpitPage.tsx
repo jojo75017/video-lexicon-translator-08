@@ -20,6 +20,7 @@ import VigieTrends from '@/components/admin/VigieTrends';
 import NicheIntelligence from '@/components/admin/NicheIntelligence';
 import ListingOptimizer from '@/components/admin/ListingOptimizer';
 import BookCreationStudio from '@/components/admin/BookCreationStudio';
+import LibraryModule from '@/components/admin/LibraryModule';
 import { toast } from 'sonner';
 import {
   addMonths, endOfMonth, endOfWeek, format, isSameDay, isSameMonth,
