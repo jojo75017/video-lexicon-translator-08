@@ -95,11 +95,11 @@ export const V3_MODULES: V3Module[] = [
     description: "Templates et calendrier d'emails pour fidéliser les lecteurs." },
 
   // IA AVANCÉE
-  { id: 'p18-readability',      pillar: 'ia',        status: 'todo', title: 'LUMEN — Audit Lisibilité (P18)',
+  { id: 'p18-readability',      pillar: 'ia',        status: 'in_progress', title: 'LUMEN — Audit Lisibilité (P18)',
     description: 'Score de lisibilité, rythme, longueur de phrases et suggestions par chapitre.' },
-  { id: 'p19-author-voice',     pillar: 'ia',        status: 'todo', title: "ÉCHO — Voix d'Auteur Persistante (P19)",
+  { id: 'p19-author-voice',     pillar: 'ia',        status: 'in_progress', title: "ÉCHO — Voix d'Auteur Persistante (P19)",
     description: 'Mémorise et applique le style signature sur toute une série.' },
-  { id: 'p20-chat-manuscript',  pillar: 'ia',        status: 'todo', title: 'ORACLE — Chat Manuscrit (P20)',
+  { id: 'p20-chat-manuscript',  pillar: 'ia',        status: 'in_progress', title: 'ORACLE — Chat Manuscrit (P20)',
     description: 'Pose des questions à ton propre livre (cohérence, résumé, fiches persos).' },
 
   // ===== AJOUTS — issus du guide publication KDP (modules 03 → 08) — en attente =====
