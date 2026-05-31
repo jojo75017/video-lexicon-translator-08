@@ -16,6 +16,7 @@ import LumenReadability from '@/components/admin/LumenReadability';
 import EchoAuthorVoice from '@/components/admin/EchoAuthorVoice';
 import OracleManuscript from '@/components/admin/OracleManuscript';
 import DuelBlurb from '@/components/admin/DuelBlurb';
+import VigieTrends from '@/components/admin/VigieTrends';
 import { toast } from 'sonner';
 import {
   addMonths, endOfMonth, endOfWeek, format, isSameDay, isSameMonth,
@@ -367,7 +368,7 @@ const AdminCockpitPage: React.FC = () => {
                   </div>
                   <ul className="space-y-1.5">
                     {items.map((m) => {
-                      const clickable = (isAdmin && v3Mode) || ['p16-competitive', 'p17-series', 'p18-readability', 'p19-author-voice', 'p20-chat-manuscript', 'p21-blurb-ab-tester'].includes(m.id);
+                      const clickable = (isAdmin && v3Mode) || ['p16-competitive', 'p17-series', 'p18-readability', 'p19-author-voice', 'p20-chat-manuscript', 'p21-blurb-ab-tester', 'p22-trend-radar'].includes(m.id);
                       return (
                       <li
                         key={m.id}
@@ -401,7 +402,7 @@ const AdminCockpitPage: React.FC = () => {
 
         {/* Détail module V3 (mode V3 admin) */}
         <Dialog open={!!selectedModule} onOpenChange={(o) => !o && setSelectedModule(null)}>
-          <DialogContent className={['p16-competitive', 'p17-series', 'p18-readability', 'p19-author-voice', 'p20-chat-manuscript', 'p21-blurb-ab-tester'].includes(selectedModule?.id ?? '') ? 'max-w-2xl max-h-[85vh] overflow-y-auto' : undefined}>
+          <DialogContent className={['p16-competitive', 'p17-series', 'p18-readability', 'p19-author-voice', 'p20-chat-manuscript', 'p21-blurb-ab-tester', 'p22-trend-radar'].includes(selectedModule?.id ?? '') ? 'max-w-2xl max-h-[85vh] overflow-y-auto' : undefined}>
             {selectedModule && (
               <>
                 <DialogHeader>
@@ -454,6 +455,10 @@ const AdminCockpitPage: React.FC = () => {
                   ) : selectedModule.id === 'p21-blurb-ab-tester' ? (
                     <div className="border-t pt-3">
                       <DuelBlurb />
+                    </div>
+                  ) : selectedModule.id === 'p22-trend-radar' ? (
+                    <div className="border-t pt-3">
+                      <VigieTrends />
                     </div>
                   ) : (
                     <p className="text-[11px] text-joy-ink/40">

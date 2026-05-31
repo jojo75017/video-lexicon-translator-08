@@ -61,7 +61,7 @@ export const V3_MODULES: V3Module[] = [
     description: '20 pins générés automatiquement depuis la couverture du livre.' },
 
   // IA AVANCÉE
-  { id: 'p16-competitive',     pillar: 'ia',        status: 'todo', title: 'SCOUT — Analyse Concurrentielle (P16)',
+  { id: 'p16-competitive',     pillar: 'ia',        status: 'done', title: 'SCOUT — Analyse Concurrentielle (P16)',
     description: 'Scan top 10 Amazon de la niche pour positionnement et angles.' },
   { id: 'p17-series',          pillar: 'ia',        status: 'in_progress', title: 'SAGA — Architecte de Série (P17)',
     description: 'Plan cohérent des tomes 2 / 3 / 4 (arcs, persos, cliffhangers).' },
@@ -141,6 +141,6 @@ export const V3_MODULES: V3Module[] = [
   // IA AVANCÉE
   { id: 'p21-blurb-ab-tester',   pillar: 'ia',        status: 'in_progress', title: 'DUEL — A/B Test 4e de Couverture (P21)',
     description: 'Génère plusieurs variantes de 4e de couverture et les score pour identifier la plus vendeuse.' },
-  { id: 'p22-trend-radar',       pillar: 'ia',        status: 'todo', title: 'VIGIE — Radar de Tendances (P22)',
+  { id: 'p22-trend-radar',       pillar: 'ia',        status: 'in_progress', title: 'VIGIE — Radar de Tendances (P22)',
     description: 'Détecte sujets émergents et saisonnalité d’une niche pour choisir le prochain livre à écrire.' },
 ];
