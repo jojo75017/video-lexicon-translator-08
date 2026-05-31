@@ -15,6 +15,7 @@ import SagaArchitect from '@/components/admin/SagaArchitect';
 import LumenReadability from '@/components/admin/LumenReadability';
 import EchoAuthorVoice from '@/components/admin/EchoAuthorVoice';
 import OracleManuscript from '@/components/admin/OracleManuscript';
+import DuelBlurb from '@/components/admin/DuelBlurb';
 import { toast } from 'sonner';
 import {
   addMonths, endOfMonth, endOfWeek, format, isSameDay, isSameMonth,
