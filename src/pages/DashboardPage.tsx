@@ -122,8 +122,9 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ subscriberEmail, onLogout
   }, [subscriberEmail]);
 
   const goPlanner = (tab?: string) => {
-    if (tab) { try { localStorage.setItem('ebook_planner_active_tab', tab); } catch { void 0; } }
-    navigate('/ebook-planner');
+    const t = tab || 'workflow-dashboard';
+    try { localStorage.setItem('ebook_planner_active_tab', t); } catch { void 0; }
+    navigate(`/ebook-planner?tab=${encodeURIComponent(t)}`);
   };
 
   const withProgress = useMemo(() => ebooks.map((p) => {
