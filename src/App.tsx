@@ -295,16 +295,12 @@ const App = () => {
             <Route
               path="/tableau-de-bord"
               element={
-                <SubscriberGate
-                  isAdmin={isAdmin}
-                  subscriberEmail={subscriberEmail}
-                  subscriberData={subscriberData}
-                  onInvalid={handleLogout}
-                >
+                <AdminGate>
                   <DashboardPage subscriberEmail={subscriberEmail || ''} onLogout={handleLogout} />
-                </SubscriberGate>
+                </AdminGate>
               }
             />
+
             <Route
               path="/espace/lancement"
               element={
