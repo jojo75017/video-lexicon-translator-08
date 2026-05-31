@@ -385,7 +385,8 @@ const AdminCockpitPage: React.FC = () => {
                           </div>
                         </div>
                       </li>
-                    ))}
+                      );
+                    })}
                   </ul>
                 </div>
               );
