@@ -139,7 +139,7 @@ export const V3_MODULES: V3Module[] = [
     description: 'Crée visuels et accroches ciblés par niche pour les campagnes BookBub et Facebook Ads.' },
 
   // IA AVANCÉE
-  { id: 'p21-blurb-ab-tester',   pillar: 'ia',        status: 'todo', title: 'DUEL — A/B Test 4e de Couverture (P21)',
+  { id: 'p21-blurb-ab-tester',   pillar: 'ia',        status: 'in_progress', title: 'DUEL — A/B Test 4e de Couverture (P21)',
     description: 'Génère plusieurs variantes de 4e de couverture et les score pour identifier la plus vendeuse.' },
   { id: 'p22-trend-radar',       pillar: 'ia',        status: 'todo', title: 'VIGIE — Radar de Tendances (P22)',
     description: 'Détecte sujets émergents et saisonnalité d’une niche pour choisir le prochain livre à écrire.' },
