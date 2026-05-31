@@ -33,6 +33,8 @@ export const V3_PILLAR_COLORS: Record<V3Pillar, string> = {
 
 export const V3_MODULES: V3Module[] = [
   // PUBLIER
+  { id: 'library',             pillar: 'publier',   status: 'in_progress', title: 'BIBLIOTHÈQUE — Mes Créations',
+    description: 'Toutes vos créations au même endroit : livres numériques et audio avec actions Modifier, Publier, Exporter, Supprimer.' },
   { id: 'kdp-pack-zip',        pillar: 'publier',   status: 'todo', title: 'Pack KDP ZIP',
     description: 'Export bundle PDF intérieur + couverture + métadonnées prêt upload Amazon.' },
   { id: 'cockpit-audit-pilot', pillar: 'publier',   status: 'todo', title: 'Cockpit Audit Pilot',
