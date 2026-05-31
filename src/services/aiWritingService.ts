@@ -97,16 +97,42 @@ export interface OpenRouterModelInfo {
   tag?: string; // ex: "Premium", "Économique", "Rapide"
 }
 export const OPENROUTER_MODELS: OpenRouterModelInfo[] = [
-  { id: 'anthropic/claude-sonnet-4',           label: 'Claude Sonnet 4',         pricing: { in: 3,    out: 15 },   recommended: true, tag: 'Premium · rédaction longue' },
+  // ===== Anthropic Claude =====
+  { id: 'anthropic/claude-sonnet-4.5',         label: 'Claude Sonnet 4.5',       pricing: { in: 3,    out: 15 },   recommended: true, tag: 'Premium · rédaction longue' },
+  { id: 'anthropic/claude-sonnet-4',           label: 'Claude Sonnet 4',         pricing: { in: 3,    out: 15 },   tag: 'Premium' },
+  { id: 'anthropic/claude-opus-4.1',           label: 'Claude Opus 4.1',         pricing: { in: 15,   out: 75 },   tag: 'Premium · maximal' },
+  { id: 'anthropic/claude-3.7-sonnet',         label: 'Claude 3.7 Sonnet',       pricing: { in: 3,    out: 15 },   tag: 'Premium' },
   { id: 'anthropic/claude-3.5-sonnet',         label: 'Claude 3.5 Sonnet',       pricing: { in: 3,    out: 15 },   tag: 'Premium' },
-  { id: 'openai/gpt-4o',                       label: 'GPT-4o',                  pricing: { in: 2.5,  out: 10 },   tag: 'Polyvalent' },
+  { id: 'anthropic/claude-3.5-haiku',          label: 'Claude 3.5 Haiku',        pricing: { in: 0.80, out: 4 },    tag: 'Rapide & économique' },
+  // ===== OpenAI =====
+  { id: 'openai/gpt-5',                         label: 'GPT-5',                   pricing: { in: 1.25, out: 10 },   tag: 'Premium' },
+  { id: 'openai/gpt-5-mini',                    label: 'GPT-5 mini',              pricing: { in: 0.25, out: 2 },    tag: 'Rapide & économique' },
+  { id: 'openai/gpt-4.1',                       label: 'GPT-4.1',                 pricing: { in: 2,    out: 8 },    tag: 'Polyvalent' },
+  { id: 'openai/gpt-4.1-mini',                 label: 'GPT-4.1 mini',            pricing: { in: 0.40, out: 1.60 }, tag: 'Rapide & économique' },
+  { id: 'openai/gpt-4o',                        label: 'GPT-4o',                  pricing: { in: 2.5,  out: 10 },   tag: 'Polyvalent' },
   { id: 'openai/gpt-4o-mini',                  label: 'GPT-4o mini',             pricing: { in: 0.15, out: 0.60 }, tag: 'Rapide & économique' },
+  { id: 'openai/o3',                            label: 'OpenAI o3',               pricing: { in: 2,    out: 8 },    tag: 'Raisonnement' },
+  { id: 'openai/o4-mini',                       label: 'OpenAI o4-mini',          pricing: { in: 1.10, out: 4.40 }, tag: 'Raisonnement · rapide' },
+  // ===== Google Gemini =====
   { id: 'google/gemini-2.5-pro',               label: 'Gemini 2.5 Pro',          pricing: { in: 1.25, out: 5 },    tag: 'Long contexte' },
   { id: 'google/gemini-2.5-flash',             label: 'Gemini 2.5 Flash',        pricing: { in: 0.30, out: 2.5 },  tag: 'Rapide' },
+  { id: 'google/gemini-2.5-flash-lite',        label: 'Gemini 2.5 Flash Lite',   pricing: { in: 0.10, out: 0.40 }, tag: 'Ultra-économique' },
+  // ===== DeepSeek =====
   { id: 'deepseek/deepseek-chat',              label: 'DeepSeek V3',             pricing: { in: 0.27, out: 1.10 }, tag: 'Économique' },
+  { id: 'deepseek/deepseek-r1',                label: 'DeepSeek R1',             pricing: { in: 0.55, out: 2.19 }, tag: 'Raisonnement · économique' },
+  // ===== Meta Llama =====
   { id: 'meta-llama/llama-3.3-70b-instruct',   label: 'Llama 3.3 70B',           pricing: { in: 0.20, out: 0.60 }, tag: 'Open-source' },
+  { id: 'meta-llama/llama-4-maverick',         label: 'Llama 4 Maverick',        pricing: { in: 0.20, out: 0.85 }, tag: 'Open-source' },
+  // ===== Mistral =====
   { id: 'mistralai/mistral-large',             label: 'Mistral Large',           pricing: { in: 2,    out: 6 },    tag: 'Européen' },
+  { id: 'mistralai/mistral-medium-3',          label: 'Mistral Medium 3',        pricing: { in: 0.40, out: 2 },    tag: 'Européen · équilibré' },
+  // ===== xAI =====
+  { id: 'x-ai/grok-4',                          label: 'Grok 4',                  pricing: { in: 3,    out: 15 },   tag: 'Premium' },
+  { id: 'x-ai/grok-3-mini',                     label: 'Grok 3 mini',             pricing: { in: 0.30, out: 0.50 }, tag: 'Rapide & économique' },
+  // ===== Qwen =====
+  { id: 'qwen/qwen-2.5-72b-instruct',          label: 'Qwen 2.5 72B',            pricing: { in: 0.23, out: 0.40 }, tag: 'Open-source · économique' },
 ];
+
 
 export const formatModelPricing = (m: OpenRouterModelInfo): string => {
   if (!m.pricing) return '';
