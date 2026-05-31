@@ -438,6 +438,18 @@ const AdminCockpitPage: React.FC = () => {
                     <div className="border-t pt-3">
                       <SagaArchitect />
                     </div>
+                  ) : selectedModule.id === 'p18-readability' ? (
+                    <div className="border-t pt-3">
+                      <LumenReadability />
+                    </div>
+                  ) : selectedModule.id === 'p19-author-voice' ? (
+                    <div className="border-t pt-3">
+                      <EchoAuthorVoice />
+                    </div>
+                  ) : selectedModule.id === 'p20-chat-manuscript' ? (
+                    <div className="border-t pt-3">
+                      <OracleManuscript />
+                    </div>
                   ) : (
                     <p className="text-[11px] text-joy-ink/40">
                       Module en préparation pour la V3 ({V3_PRICE}€ à vie). Visible uniquement par l'admin.
