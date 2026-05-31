@@ -260,7 +260,7 @@ const NicheIntelligence: React.FC = () => {
                 </div>
                 <p className="font-semibold leading-tight">{n.niche}</p>
                 <p className="text-xs text-joy-ink/50">{n.sousNiche} · {n.motCleAmazon}</p>
-                <span className="mt-1.5 flex items-center text-xs text-joy-teal opacity-0 transition-opacity group-hover:opacity-100">
+                <span className="mt-1.5 flex items-center text-xs opacity-0 transition-opacity group-hover:opacity-100" style={{ color: '#008296' }}>
                   Analyser <ChevronRight className="h-3 w-3" />
                 </span>
               </button>
