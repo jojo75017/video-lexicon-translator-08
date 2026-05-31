@@ -145,4 +145,6 @@ export const V3_MODULES: V3Module[] = [
     description: 'Détecte sujets émergents et saisonnalité d’une niche pour choisir le prochain livre à écrire.' },
   { id: 'niche-intelligence',    pillar: 'ia',        status: 'in_progress', title: 'INTEL — Intelligence de Niche',
     description: '4 onglets : découverte IA (SCOUT), niches cachées, prédicteur de tendances (VIGIE) et 600+ idées par catégorie.' },
+  { id: 'listing-optimizer',     pillar: 'marketing', status: 'in_progress', title: "Optimiseur d'annonces KDP",
+    description: 'Optimise titre, sous-titre, mots-clés KDP, catégories, description, contenu A+ et tarification du livre.' },
 ];
