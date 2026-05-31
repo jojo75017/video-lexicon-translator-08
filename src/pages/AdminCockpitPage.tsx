@@ -16,6 +16,7 @@ import LumenReadability from '@/components/admin/LumenReadability';
 import EchoAuthorVoice from '@/components/admin/EchoAuthorVoice';
 import OracleManuscript from '@/components/admin/OracleManuscript';
 import DuelBlurb from '@/components/admin/DuelBlurb';
+import VigieTrends from '@/components/admin/VigieTrends';
 import { toast } from 'sonner';
 import {
   addMonths, endOfMonth, endOfWeek, format, isSameDay, isSameMonth,
