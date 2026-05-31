@@ -63,6 +63,8 @@ export const V3_MODULES: V3Module[] = [
     description: '20 pins générés automatiquement depuis la couverture du livre.' },
 
   // IA AVANCÉE
+  { id: 'book-creation-studio', pillar: 'ia',        status: 'in_progress', title: 'STUDIO — Création de Livres',
+    description: 'Assistant 6 étapes (Taper, Détails, Générer, Aperçu, Exporter, Publier) avec choix du type de livre, titre, sous-titre et mots-clés.' },
   { id: 'p16-competitive',     pillar: 'ia',        status: 'done', title: 'SCOUT — Analyse Concurrentielle (P16)',
     description: 'Scan top 10 Amazon de la niche pour positionnement et angles.' },
   { id: 'niche-intelligence',    pillar: 'ia',        status: 'in_progress', title: 'INTEL — Intelligence de Niche',
