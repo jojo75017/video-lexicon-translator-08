@@ -406,7 +406,7 @@ const AdminCockpitPage: React.FC = () => {
 
         {/* Détail module V3 (mode V3 admin) */}
         <Dialog open={!!selectedModule} onOpenChange={(o) => !o && setSelectedModule(null)}>
-          <DialogContent className={['p16-competitive', 'p17-series', 'p18-readability', 'p19-author-voice', 'p20-chat-manuscript', 'p21-blurb-ab-tester', 'p22-trend-radar'].includes(selectedModule?.id ?? '') ? 'max-w-2xl max-h-[85vh] overflow-y-auto' : ['niche-intelligence', 'listing-optimizer', 'book-creation-studio'].includes(selectedModule?.id ?? '') ? 'max-w-6xl max-h-[88vh] overflow-y-auto' : undefined}>
+          <DialogContent className={['p16-competitive', 'p17-series', 'p18-readability', 'p19-author-voice', 'p20-chat-manuscript', 'p21-blurb-ab-tester', 'p22-trend-radar'].includes(selectedModule?.id ?? '') ? 'max-w-2xl max-h-[85vh] overflow-y-auto' : ['niche-intelligence', 'listing-optimizer', 'book-creation-studio', 'library'].includes(selectedModule?.id ?? '') ? 'max-w-6xl max-h-[88vh] overflow-y-auto' : undefined}>
             {selectedModule && (
               <>
                 <DialogHeader>
