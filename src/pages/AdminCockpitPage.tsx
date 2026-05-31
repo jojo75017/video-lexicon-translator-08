@@ -461,6 +461,8 @@ const AdminCockpitPage: React.FC = () => {
                     <div className="border-t pt-3">
                       <VigieTrends />
                     </div>
+                  ) : selectedModule.id === 'niche-intelligence' ? (
+                    <NicheIntelligence />
                   ) : (
                     <p className="text-[11px] text-joy-ink/40">
                       Module en préparation pour la V3 ({V3_PRICE}€ à vie). Visible uniquement par l'admin.
