@@ -132,11 +132,12 @@ Deno.serve(async (req) => {
               "À partir d'un livre / d'une prémisse, tu conçois un plan cohérent de plusieurs tomes : " +
               "arc global, personnages récurrents, arcs par tome, événements clés, cliffhangers et conseils de continuité. " +
               "Tu privilégies la cohérence narrative et la rejouabilité commerciale (read-through entre tomes). " +
+              `RÈGLE ABSOLUE : le tableau "tomes" doit contenir EXACTEMENT ${tomeCount} tomes, numérotés de 1 à ${tomeCount}, ni plus ni moins. ` +
               "Réponds toujours via l'outil report_series_architecture, en français.",
           },
           {
             role: 'user',
-            content: `Conçois l'architecture d'une série de ${tomeCount} tomes${genre ? ` dans le genre « ${genre} »` : ''}, à partir de cette prémisse : "${premise}". Donne un arc global cohérent, les personnages récurrents, puis un plan détaillé pour chaque tome avec cliffhangers.`,
+            content: `Conçois l'architecture d'une série de EXACTEMENT ${tomeCount} tomes${genre ? ` dans le genre « ${genre} »` : ''}, à partir de cette prémisse : "${premise}". Tu dois produire ${tomeCount} tomes (numéros 1 à ${tomeCount}). Donne un arc global cohérent, les personnages récurrents, puis un plan détaillé pour chacun des ${tomeCount} tomes avec cliffhangers.`,
           },
         ],
         tools: [TOOL],
