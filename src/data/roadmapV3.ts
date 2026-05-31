@@ -63,7 +63,7 @@ export const V3_MODULES: V3Module[] = [
   // IA AVANCÉE
   { id: 'p16-competitive',     pillar: 'ia',        status: 'todo', title: 'SCOUT — Analyse Concurrentielle (P16)',
     description: 'Scan top 10 Amazon de la niche pour positionnement et angles.' },
-  { id: 'p17-series',          pillar: 'ia',        status: 'todo', title: 'SAGA — Architecte de Série (P17)',
+  { id: 'p17-series',          pillar: 'ia',        status: 'in_progress', title: 'SAGA — Architecte de Série (P17)',
     description: 'Plan cohérent des tomes 2 / 3 / 4 (arcs, persos, cliffhangers).' },
 
   // ===== AJOUTS — lancement progressif juillet / août =====
