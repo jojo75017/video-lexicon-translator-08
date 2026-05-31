@@ -36,23 +36,37 @@ export const setProvider = (p: AIProvider) => {
   localStorage.setItem(LS_PROVIDER, p);
 };
 
+// Nettoie une clé collée : enlève espaces, retours à la ligne, guillemets
+// et caractères invisibles (zéro-width, BOM, espaces insécables) souvent
+// introduits lors d'un copier-coller depuis Google AI Studio.
+export const sanitizeKey = (key: string): string => {
+  return (key || '')
+    .replace(/[\u200B-\u200D\uFEFF\u00A0]/g, '') // zero-width + nbsp
+    .replace(/["'`]/g, '')                        // guillemets parasites
+    .replace(/\s+/g, '')                          // tout espace/retour ligne
+    .trim();
+};
+
 export const getProviderKey = (p: AIProvider): string => {
   if (typeof window === 'undefined') return '';
-  return (localStorage.getItem(LS_KEYS[p]) || '').trim();
+  return sanitizeKey(localStorage.getItem(LS_KEYS[p]) || '');
 };
 
 export const setProviderKey = (p: AIProvider, key: string) => {
   if (typeof window === 'undefined') return;
-  const k = key.trim();
+  const k = sanitizeKey(key);
   if (k) localStorage.setItem(LS_KEYS[p], k);
   else localStorage.removeItem(LS_KEYS[p]);
 };
 
 export const validateKeyFormat = (p: AIProvider, key: string): boolean => {
-  const k = (key || '').trim();
+  const k = sanitizeKey(key);
   if (!k) return false;
   switch (p) {
-    case 'gemini': return k.startsWith('AIza') && k.length > 20;
+    // Gemini : la plupart des clés commencent par "AIza", mais certaines clés
+    // Google Cloud valides ne le font pas. On accepte donc toute clé plausible
+    // (assez longue, sans caractères interdits) pour ne pas bloquer à tort.
+    case 'gemini': return /^[A-Za-z0-9_-]{30,}$/.test(k);
     case 'claude': return k.startsWith('sk-ant-') && k.length > 20;
     case 'openai': return k.startsWith('sk-') && k.length > 20;
     case 'openrouter': return k.startsWith('sk-or-') && k.length > 20;
