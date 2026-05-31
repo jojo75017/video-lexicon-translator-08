@@ -361,12 +361,14 @@ const AdminCockpitPage: React.FC = () => {
                     <span className="ml-auto text-[11px] text-joy-ink/40">{items.length}</span>
                   </div>
                   <ul className="space-y-1.5">
-                    {items.map((m) => (
+                    {items.map((m) => {
+                      const clickable = (isAdmin && v3Mode) || m.id === 'p16-competitive';
+                      return (
                       <li
                         key={m.id}
-                        onClick={isAdmin && v3Mode ? () => setSelectedModule(m) : undefined}
-                        className={`rounded-lg p-2 bg-joy-cream/40 hover:bg-joy-cream transition-colors ${isAdmin && v3Mode ? 'cursor-pointer hover:ring-1' : ''}`}
-                        style={isAdmin && v3Mode ? ({ ['--tw-ring-color' as any]: `${pc}66` }) : undefined}
+                        onClick={clickable ? () => setSelectedModule(m) : undefined}
+                        className={`rounded-lg p-2 bg-joy-cream/40 hover:bg-joy-cream transition-colors ${clickable ? 'cursor-pointer hover:ring-1' : ''}`}
+                        style={clickable ? ({ ['--tw-ring-color' as any]: `${pc}66` }) : undefined}
                       >
                         <div className="flex items-start gap-2">
                           <span className="text-[10px] uppercase tracking-wider rounded px-1.5 py-0.5 mt-0.5"
