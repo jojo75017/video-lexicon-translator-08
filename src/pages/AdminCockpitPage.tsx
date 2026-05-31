@@ -470,6 +470,8 @@ const AdminCockpitPage: React.FC = () => {
                     <ListingOptimizer />
                   ) : selectedModule.id === 'book-creation-studio' ? (
                     <BookCreationStudio />
+                  ) : selectedModule.id === 'library' ? (
+                    <LibraryModule />
                   ) : (
                     <p className="text-[11px] text-joy-ink/40">
                       Module en préparation pour la V3 ({V3_PRICE}€ à vie). Visible uniquement par l'admin.
