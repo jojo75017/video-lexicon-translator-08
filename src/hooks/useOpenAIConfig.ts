@@ -128,7 +128,7 @@ export const useOpenAIConfig = () => {
     if (!key) return false;
 
     const normalizedKey = key.trim();
-    const isValidFormat = isValidApiKeyFormat(normalizedKey, 'AIza');
+    const isValidFormat = isValidGeminiKey(normalizedKey);
     if (!isValidFormat) {
       setIsValid(false);
       return false;
