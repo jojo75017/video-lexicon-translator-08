@@ -25,13 +25,19 @@ const validateOpenAIApiKey = async (apiKey: string, _model: string): Promise<boo
   }
 };
 import { 
-  isValidApiKeyFormat, 
   maskApiKey, 
   getApiKeySecurityWarning 
 } from '@/utils/security/secureStorage';
+import { getProvider, getProviderKey, validateKeyFormat } from '@/services/aiWritingService';
 
 const GEMINI_API_KEY = 'openai_api_key'; // Keep same localStorage key for backward compat
 const GEMINI_MODEL = 'openai_model';
+
+// Accepte les DEUX formats de clé Google : l'ancien (AIza...) et le nouveau
+// format (clés Google Cloud / AI Studio qui ne commencent plus par AIza).
+// On valide donc sur une base de longueur/caractères plausibles.
+const isValidGeminiKey = (key: string): boolean => validateKeyFormat('gemini', key);
+
 
 // Security: Log warning about localStorage API key storage
 const logSecurityWarning = () => {
@@ -51,14 +57,27 @@ export const useOpenAIConfig = () => {
 
   // Charger la configuration depuis localStorage
   useEffect(() => {
-    const savedApiKey = localStorage.getItem(GEMINI_API_KEY);
     const savedModel = localStorage.getItem(GEMINI_MODEL);
-    
+    if (savedModel) setModel(savedModel);
+
+    // Si l'abonné utilise un AUTRE provider (Claude / OpenAI / OpenRouter)
+    // avec une clé valide, on considère la config comme valide SANS exiger
+    // de clé Gemini. La clé du provider actif est exposée comme `apiKey`
+    // (callGemini route automatiquement vers le bon provider).
+    const provider = getProvider();
+    if (provider !== 'gemini') {
+      const providerKey = getProviderKey(provider);
+      if (providerKey && validateKeyFormat(provider, providerKey)) {
+        setApiKey(providerKey);
+        setIsValid(true);
+        return;
+      }
+    }
+
+    const savedApiKey = localStorage.getItem(GEMINI_API_KEY);
     if (savedApiKey) {
       const normalizedSavedApiKey = savedApiKey.trim();
-      const isGeminiKey = isValidApiKeyFormat(normalizedSavedApiKey, 'AIza');
-
-      if (isGeminiKey) {
+      if (isValidGeminiKey(normalizedSavedApiKey)) {
         setApiKey(normalizedSavedApiKey);
         logSecurityWarning();
         setTimeout(() => validateApiKey(normalizedSavedApiKey), 100);
@@ -67,10 +86,8 @@ export const useOpenAIConfig = () => {
         localStorage.removeItem(GEMINI_API_KEY);
       }
     }
-    if (savedModel) {
-      setModel(savedModel);
-    }
   }, []);
+
 
   const updateApiKey = async (newApiKey: string) => {
     setApiKey(newApiKey);
@@ -78,7 +95,7 @@ export const useOpenAIConfig = () => {
     
     if (newApiKey) {
       const normalizedApiKey = newApiKey.trim();
-      const isValidFormat = isValidApiKeyFormat(normalizedApiKey, 'AIza');
+      const isValidFormat = isValidGeminiKey(normalizedApiKey);
       if (!isValidFormat) {
         console.warn('[Security] API key has invalid format');
         setIsValid(false);
@@ -110,7 +127,7 @@ export const useOpenAIConfig = () => {
     if (!key) return false;
 
     const normalizedKey = key.trim();
-    const isValidFormat = isValidApiKeyFormat(normalizedKey, 'AIza');
+    const isValidFormat = isValidGeminiKey(normalizedKey);
     if (!isValidFormat) {
       setIsValid(false);
       return false;

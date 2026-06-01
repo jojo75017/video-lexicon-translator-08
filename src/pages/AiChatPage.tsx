@@ -54,10 +54,11 @@ const AiChatPage: React.FC = () => {
       return;
     }
     
-    if (!tempApiKey.startsWith('AIza')) {
-      toast.error('La clé API Gemini doit commencer par "AIza"');
+    if (tempApiKey.trim().length < 20) {
+      toast.error('Clé API Gemini invalide (trop courte)');
       return;
     }
+
 
     localStorage.setItem('openai_api_key', tempApiKey);
     setApiKey(tempApiKey);
