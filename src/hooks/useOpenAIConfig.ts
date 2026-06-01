@@ -29,9 +29,16 @@ import {
   maskApiKey, 
   getApiKeySecurityWarning 
 } from '@/utils/security/secureStorage';
+import { getProvider, getProviderKey, validateKeyFormat } from '@/services/aiWritingService';
 
 const GEMINI_API_KEY = 'openai_api_key'; // Keep same localStorage key for backward compat
 const GEMINI_MODEL = 'openai_model';
+
+// Accepte les DEUX formats de clé Google : l'ancien (AIza...) et le nouveau
+// format (clés Google Cloud / AI Studio qui ne commencent plus par AIza).
+// On valide donc sur une base de longueur/caractères plausibles.
+const isValidGeminiKey = (key: string): boolean => validateKeyFormat('gemini', key);
+
 
 // Security: Log warning about localStorage API key storage
 const logSecurityWarning = () => {
