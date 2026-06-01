@@ -131,6 +131,10 @@ export const OPENROUTER_MODELS: OpenRouterModelInfo[] = [
   { id: 'x-ai/grok-3-mini',                     label: 'Grok 3 mini',             pricing: { in: 0.30, out: 0.50 }, tag: 'Rapide & économique' },
   // ===== Qwen =====
   { id: 'qwen/qwen-2.5-72b-instruct',          label: 'Qwen 2.5 72B',            pricing: { in: 0.23, out: 0.40 }, tag: 'Open-source · économique' },
+  // ===== Modèles gratuits (:free) =====
+  { id: 'moonshotai/kimi-k2.6:free',           label: 'Kimi K2.6 (gratuit)',     pricing: { in: 0,    out: 0 },    tag: 'Gratuit' },
+  { id: 'google/gemma-4-31b-it:free',          label: 'Gemma 4 31B (gratuit)',   pricing: { in: 0,    out: 0 },    tag: 'Gratuit' },
+  { id: 'openrouter/free',                      label: 'OpenRouter Free (auto)',  pricing: { in: 0,    out: 0 },    tag: 'Gratuit' },
 ];
 
 
