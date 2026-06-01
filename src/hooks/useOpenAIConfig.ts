@@ -96,7 +96,7 @@ export const useOpenAIConfig = () => {
     
     if (newApiKey) {
       const normalizedApiKey = newApiKey.trim();
-      const isValidFormat = isValidApiKeyFormat(normalizedApiKey, 'AIza');
+      const isValidFormat = isValidGeminiKey(normalizedApiKey);
       if (!isValidFormat) {
         console.warn('[Security] API key has invalid format');
         setIsValid(false);
