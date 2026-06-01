@@ -25,7 +25,6 @@ const validateOpenAIApiKey = async (apiKey: string, _model: string): Promise<boo
   }
 };
 import { 
-  isValidApiKeyFormat, 
   maskApiKey, 
   getApiKeySecurityWarning 
 } from '@/utils/security/secureStorage';
