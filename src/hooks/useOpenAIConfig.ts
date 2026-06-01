@@ -58,14 +58,27 @@ export const useOpenAIConfig = () => {
 
   // Charger la configuration depuis localStorage
   useEffect(() => {
-    const savedApiKey = localStorage.getItem(GEMINI_API_KEY);
     const savedModel = localStorage.getItem(GEMINI_MODEL);
-    
+    if (savedModel) setModel(savedModel);
+
+    // Si l'abonné utilise un AUTRE provider (Claude / OpenAI / OpenRouter)
+    // avec une clé valide, on considère la config comme valide SANS exiger
+    // de clé Gemini. La clé du provider actif est exposée comme `apiKey`
+    // (callGemini route automatiquement vers le bon provider).
+    const provider = getProvider();
+    if (provider !== 'gemini') {
+      const providerKey = getProviderKey(provider);
+      if (providerKey && validateKeyFormat(provider, providerKey)) {
+        setApiKey(providerKey);
+        setIsValid(true);
+        return;
+      }
+    }
+
+    const savedApiKey = localStorage.getItem(GEMINI_API_KEY);
     if (savedApiKey) {
       const normalizedSavedApiKey = savedApiKey.trim();
-      const isGeminiKey = isValidApiKeyFormat(normalizedSavedApiKey, 'AIza');
-
-      if (isGeminiKey) {
+      if (isValidGeminiKey(normalizedSavedApiKey)) {
         setApiKey(normalizedSavedApiKey);
         logSecurityWarning();
         setTimeout(() => validateApiKey(normalizedSavedApiKey), 100);
@@ -74,10 +87,8 @@ export const useOpenAIConfig = () => {
         localStorage.removeItem(GEMINI_API_KEY);
       }
     }
-    if (savedModel) {
-      setModel(savedModel);
-    }
   }, []);
+
 
   const updateApiKey = async (newApiKey: string) => {
     setApiKey(newApiKey);
