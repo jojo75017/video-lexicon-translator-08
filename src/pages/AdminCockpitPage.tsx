@@ -275,8 +275,19 @@ const AdminCockpitPage: React.FC = () => {
       </header>
 
       <main className="mx-auto max-w-7xl px-4 py-6 space-y-8">
+        {/* Configuration IA — clés & modèles (Gemini / Claude / ChatGPT / OpenRouter) */}
+        <section>
+          <div className="flex items-center gap-2 mb-3">
+            <KeyRound className="h-5 w-5" style={{ color: accent }} />
+            <h2 className="text-lg font-bold">Configuration IA — clés &amp; modèles</h2>
+            <span className="text-xs text-joy-ink/50">Gemini · Claude · ChatGPT · OpenRouter</span>
+          </div>
+          <EbookSettingsPanel />
+        </section>
+
         {/* Tunnel */}
         <section>
+
           <div className="flex items-center gap-2 mb-3">
             <Sparkles className="h-5 w-5" style={{ color: accent }} />
             <h2 className="text-lg font-bold">Tunnel de lancement</h2>
