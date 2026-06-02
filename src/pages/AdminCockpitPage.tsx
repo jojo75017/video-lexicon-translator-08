@@ -7,7 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { ArrowLeft, ChevronLeft, ChevronRight, Plus, Shield, Trash2, Calendar as CalendarIcon, Sparkles, Rocket } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight, Plus, Shield, Trash2, Calendar as CalendarIcon, Sparkles, Rocket, KeyRound } from 'lucide-react';
+import { EbookSettingsPanel } from '@/components/ebook/EbookSettingsPanel';
 import { V3_MODULES, V3_PILLAR_META, V3_PILLAR_COLORS, V3_PRICE, V2_PRICE, type V3Pillar, type V3Module } from '@/data/roadmapV3';
 import { useV3Mode } from '@/hooks/useV3Mode';
 import ScoutAnalysis from '@/components/admin/ScoutAnalysis';
@@ -275,8 +276,19 @@ const AdminCockpitPage: React.FC = () => {
       </header>
 
       <main className="mx-auto max-w-7xl px-4 py-6 space-y-8">
+        {/* Configuration IA — clés & modèles (Gemini / Claude / ChatGPT / OpenRouter) */}
+        <section>
+          <div className="flex items-center gap-2 mb-3">
+            <KeyRound className="h-5 w-5" style={{ color: accent }} />
+            <h2 className="text-lg font-bold">Configuration IA — clés &amp; modèles</h2>
+            <span className="text-xs text-joy-ink/50">Gemini · Claude · ChatGPT · OpenRouter</span>
+          </div>
+          <EbookSettingsPanel />
+        </section>
+
         {/* Tunnel */}
         <section>
+
           <div className="flex items-center gap-2 mb-3">
             <Sparkles className="h-5 w-5" style={{ color: accent }} />
             <h2 className="text-lg font-bold">Tunnel de lancement</h2>
