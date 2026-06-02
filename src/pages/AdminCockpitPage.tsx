@@ -386,21 +386,21 @@ const AdminCockpitPage: React.FC = () => {
                   <ul className="space-y-1.5">
                     {items.map((m) => {
                       const clickable = (isAdmin && v3Mode) || ['p16-competitive', 'p17-series', 'p18-readability', 'p19-author-voice', 'p20-chat-manuscript', 'p21-blurb-ab-tester', 'p22-trend-radar', 'niche-intelligence', 'listing-optimizer', 'book-creation-studio', 'library'].includes(m.id);
+                      const statusColor = m.status === 'done' ? '#10B981' : m.status === 'in_progress' ? '#FF9E2D' : '#94A3B8';
+                      const statusBg = m.status === 'done' ? '#10B98114' : m.status === 'in_progress' ? '#FF9E2D14' : '#F1F5F9';
+                      const statusLabel = m.status === 'done' ? '✓ Fait' : m.status === 'in_progress' ? '… En cours' : 'À faire';
                       return (
                       <li
                         key={m.id}
                         onClick={clickable ? () => setSelectedModule(m) : undefined}
-                        className={`rounded-lg p-2 bg-joy-cream/40 hover:bg-joy-cream transition-colors ${clickable ? 'cursor-pointer hover:ring-1' : ''}`}
-                        style={clickable ? ({ ['--tw-ring-color' as any]: `${pc}66` }) : undefined}
+                        className={`rounded-lg p-2 transition-colors ${clickable ? 'cursor-pointer hover:brightness-95' : ''}`}
+                        style={{ background: statusBg, borderLeft: `4px solid ${statusColor}` }}
                       >
                         <div className="flex items-start gap-2">
-                          <span className="text-[10px] uppercase tracking-wider rounded px-1.5 py-0.5 mt-0.5"
-                            style={{
-                              background: m.status === 'done' ? '#10B98122' : m.status === 'in_progress' ? '#FF9E2D22' : '#23232322',
-                              color:      m.status === 'done' ? '#10B981'   : m.status === 'in_progress' ? '#FF9E2D'   : '#666',
-                            }}
+                          <span className="text-[10px] font-bold uppercase tracking-wider rounded px-1.5 py-0.5 mt-0.5 whitespace-nowrap"
+                            style={{ background: statusColor, color: 'white' }}
                           >
-                            {m.status === 'done' ? '✓' : m.status === 'in_progress' ? '…' : 'todo'}
+                            {statusLabel}
                           </span>
                           <div className="flex-1 min-w-0">
                             <div className="text-xs font-semibold leading-tight">{m.title}</div>
