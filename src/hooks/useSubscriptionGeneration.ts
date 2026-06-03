@@ -402,8 +402,8 @@ Format JSON attendu:
 
   const generateKDPDescription = async (title: string, chapters: Chapter[]) => {
     const key = getGeminiKey(apiKey);
-    if (!key || !key.startsWith('AIza')) {
-      toast.error('Clé API Gemini manquante', { description: 'Ajoute ta clé Gemini (commençant par AIza) dans Paramètres.' });
+    if (!isAIConfigured() || !key) {
+      toast.error('Clé API IA manquante', { description: `Ajoute une clé valide pour ${PROVIDER_LABELS[getProvider()]} dans Paramètres.` });
       return null;
     }
     const chaptersText = chapters.map(c => c.title).join(', ') || '(pas de chapitres définis)';
@@ -438,8 +438,8 @@ Contraintes :
 
   const generateKDPKeywords = async (title: string, chapters: Chapter[]) => {
     const key = getGeminiKey(apiKey);
-    if (!key || !key.startsWith('AIza')) {
-      toast.error('Clé API Gemini manquante', { description: 'Ajoute ta clé Gemini (commençant par AIza) dans Paramètres.' });
+    if (!isAIConfigured() || !key) {
+      toast.error('Clé API IA manquante', { description: `Ajoute une clé valide pour ${PROVIDER_LABELS[getProvider()]} dans Paramètres.` });
       return null;
     }
     const chaptersText = chapters.map(c => c.title).join(', ') || '(pas de chapitres définis)';
@@ -494,8 +494,8 @@ Les niveaux de "relevance" autorisés : "haute", "moyenne", "faible".`;
 
   const generateKDPCategories = async (title: string, chapters: Chapter[]) => {
     const key = getGeminiKey(apiKey);
-    if (!key || !key.startsWith('AIza')) {
-      toast.error('Clé API Gemini manquante', { description: 'Ajoute ta clé Gemini (commençant par AIza) dans Paramètres.' });
+    if (!isAIConfigured() || !key) {
+      toast.error('Clé API IA manquante', { description: `Ajoute une clé valide pour ${PROVIDER_LABELS[getProvider()]} dans Paramètres.` });
       return null;
     }
     const chaptersText = chapters.map(c => c.title).join(', ') || '(pas de chapitres définis)';
@@ -860,8 +860,8 @@ IMPORTANT :
 - Les "testimonial_templates" sont des MODÈLES à faire remplir par de vrais lecteurs : ne jamais les présenter comme des avis réels. Indique clairement par le style qu'il s'agit d'exemples à personnaliser.`;
 
     const key = getGeminiKey(apiKey);
-    if (!key || !key.startsWith('AIza')) {
-      toast.error('Clé API Gemini manquante', { description: 'Ajoute ta clé Gemini (commençant par AIza) dans Paramètres.' });
+    if (!isAIConfigured() || !key) {
+      toast.error('Clé API IA manquante', { description: `Ajoute une clé valide pour ${PROVIDER_LABELS[getProvider()]} dans Paramètres.` });
       return null;
     }
     setIsGenerating(true);
