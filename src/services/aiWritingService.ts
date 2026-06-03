@@ -84,6 +84,25 @@ export const isValidGoogleKey = (key: string): boolean => {
   return /^[A-Za-z0-9._-]{30,}$/.test(k);                      // autre clé plausible
 };
 
+/** True si le provider IA actif possède une clé au format valide
+ *  (Gemini, Claude, OpenAI ou OpenRouter — peu importe lequel). */
+export const isAIConfigured = (): boolean => {
+  const p = getProvider();
+  const k = getProviderKey(p);
+  return !!k && validateKeyFormat(p, k);
+};
+
+/** Clé à transmettre à callGemini : la clé Gemini si le provider actif est
+ *  Gemini, sinon la clé du provider sélectionné (callGemini route ensuite
+ *  automatiquement vers le bon provider). */
+export const getActiveAIKey = (geminiFallback?: string): string => {
+  const p = getProvider();
+  if (p === 'gemini') return getProviderKey('gemini') || sanitizeKey(geminiFallback || '');
+  return getProviderKey(p);
+};
+
+
+
 export const PROVIDER_LABELS: Record<AIProvider, string> = {
   gemini: 'Google Gemini',
   claude: 'Anthropic Claude',
