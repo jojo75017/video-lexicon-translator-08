@@ -1821,10 +1821,10 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
               </div>
               <p className="text-xs text-muted-foreground">
                 {hasStrictlyValidatedApiKey
-                    ? 'Les coûts de génération seront facturés directement sur votre compte Gemini (~0,30€ par livre).'
+                    ? 'Les coûts de génération seront facturés directement sur votre compte IA (~0,30€ par livre).'
                   : hasUsableApiKey
-                    ? 'Une clé Gemini valide est bien présente. Le workflow peut démarrer.'
-                    : 'Configurez une clé Gemini commençant par AIza dans l\'onglet "Paramètres" pour générer votre livre. Les anciens formats de clé ne sont plus acceptés.'}
+                    ? 'Une clé IA valide est bien présente. Le workflow peut démarrer.'
+                    : 'Configurez une clé valide (Google Gemini — ancien format AIza… ou nouveau format AQ.Ab… — ou Claude / OpenAI / OpenRouter) dans l\'onglet "Paramètres" pour générer votre livre.'}
               </p>
             </div>
           </div>
