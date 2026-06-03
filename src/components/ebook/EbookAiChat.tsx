@@ -325,11 +325,11 @@ Donne des conseils pratiques et des exemples concrets.`,
             )}
             <div>
               <label className="text-sm font-medium mb-2 block">
-                Clé API Gemini (commençant par AIza)
+                Clé API Google Gemini (AIza… ou AQ.Ab…)
               </label>
               <Input
                 type="password"
-                placeholder="AIza..."
+                placeholder="AIza... ou AQ.Ab..."
                 value={tempApiKey}
                 onChange={(e) => setTempApiKey(e.target.value)}
                 className="mb-2"
