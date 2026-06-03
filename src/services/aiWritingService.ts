@@ -145,6 +145,7 @@ export const OPENROUTER_MODELS: OpenRouterModelInfo[] = [
   // ===== Modèles gratuits (:free) =====
   { id: 'moonshotai/kimi-k2.6:free',           label: 'Kimi K2.6 (gratuit)',     pricing: { in: 0,    out: 0 },    tag: 'Gratuit' },
   { id: 'google/gemma-4-31b-it:free',          label: 'Gemma 4 31B (gratuit)',   pricing: { in: 0,    out: 0 },    tag: 'Gratuit' },
+  { id: 'openrouter/owl-alpha',                label: 'OpenRouter Owl Alpha',    pricing: { in: 0,    out: 0 },    tag: 'Gratuit · bêta' },
   { id: 'openrouter/free',                      label: 'OpenRouter Free (auto)',  pricing: { in: 0,    out: 0 },    tag: 'Gratuit' },
 ];
 
