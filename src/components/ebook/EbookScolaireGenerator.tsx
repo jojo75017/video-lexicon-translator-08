@@ -128,8 +128,8 @@ const EbookScolaireGenerator: React.FC<ScolaireGeneratorProps> = ({ ebookTitle }
 
   const generate = async () => {
     const geminiKey = getGeminiKey();
-    if (!geminiKey || !geminiKey.startsWith('AIza')) {
-      toast.error("Clé Gemini manquante ou invalide. Renseignez-la dans Paramètres > Clés API (commence par 'AIza').");
+    if (!isValidGoogleKey(geminiKey)) {
+      toast.error("Clé Google Gemini manquante ou invalide. Renseignez-la dans Paramètres > Clés API (AIza… ou AQ.Ab…).");
       return;
     }
     setIsGenerating(true);
