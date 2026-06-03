@@ -56,15 +56,9 @@ export const useSubscriptionGeneration = (
     }
 
     const geminiKey = getGeminiKey(apiKey);
-    if (!geminiKey) {
-      toast.error('Clé API Gemini requise', {
-        description: 'Renseignez votre clé Gemini (commence par AIza) dans les paramètres.',
-      });
-      return null;
-    }
-    if (!geminiKey.startsWith('AIza')) {
-      toast.error('Clé API invalide', {
-        description: 'Cette application utilise Gemini. Votre clé doit commencer par "AIza".',
+    if (!isAIConfigured() || !geminiKey) {
+      toast.error('Clé API IA requise', {
+        description: `Renseignez une clé valide pour ${PROVIDER_LABELS[getProvider()]} dans les paramètres.`,
       });
       return null;
     }
