@@ -86,8 +86,8 @@ export const EbookMarketing: React.FC<EbookMarketingProps> = ({
       return;
     }
     const apiKey = getGeminiApiKey();
-    if (!apiKey || !apiKey.startsWith('AIza')) {
-      toast.error('Configure d\'abord ta clé Gemini dans les Paramètres (commence par AIza...).');
+    if (!isValidGoogleKey(apiKey)) {
+      toast.error('Configure d\'abord ta clé Google Gemini dans les Paramètres (AIza… ou AQ.Ab…).');
       return;
     }
 
