@@ -57,8 +57,8 @@ export const EbookAiChat: React.FC<{ isDemo?: boolean }> = ({ isDemo = false }) 
       return;
     }
 
-    if (!tempApiKey.startsWith('AIza')) {
-      toast.error('La clé API Gemini doit commencer par "AIza"');
+    if (!isValidGoogleKey(tempApiKey)) {
+      toast.error('Clé Google invalide', { description: 'Format accepté : ancien (AIza…) ou nouveau (AQ.Ab…).' });
       return;
     }
 
