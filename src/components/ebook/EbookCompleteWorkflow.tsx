@@ -177,8 +177,9 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
 
   const normalizedUserApiKey = typeof userApiKey === 'string' ? userApiKey.trim() : '';
   const hasConfiguredApiKey = normalizedUserApiKey.length > 0;
-  const hasPlausibleApiKeyFormat = normalizedUserApiKey.startsWith('AIza');
-  const hasUsableApiKey = hasConfiguredApiKey && hasPlausibleApiKeyFormat;
+  // Accepte n'importe quel provider IA valide (Gemini ancien/nouveau format, Claude, OpenAI, OpenRouter)
+  const hasPlausibleApiKeyFormat = isAIConfigured() || (hasConfiguredApiKey && validateKeyFormat(getProvider(), normalizedUserApiKey));
+  const hasUsableApiKey = hasPlausibleApiKeyFormat;
   const hasStrictlyValidatedApiKey = hasUsableApiKey && isUserKeyValid === true;
   const hasApiKeyValidationWarning = hasConfiguredApiKey && !hasPlausibleApiKeyFormat;
   const canGenerate = title.trim() && authorName.trim() && category && bookIntroduction.trim() && hasReadSteps;
