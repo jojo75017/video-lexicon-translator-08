@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { Share2, Globe, Mail, Target, Copy, Download, Loader2, Rocket, Info } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { isValidGoogleKey } from '@/services/aiWritingService';
 
 const getGeminiApiKey = (): string => (localStorage.getItem('openai_api_key') || '').trim();
 
@@ -86,8 +87,8 @@ export const EbookMarketing: React.FC<EbookMarketingProps> = ({
       return;
     }
     const apiKey = getGeminiApiKey();
-    if (!apiKey || !apiKey.startsWith('AIza')) {
-      toast.error('Configure d\'abord ta clé Gemini dans les Paramètres (commence par AIza...).');
+    if (!isValidGoogleKey(apiKey)) {
+      toast.error('Configure d\'abord ta clé Google Gemini dans les Paramètres (AIza… ou AQ.Ab…).');
       return;
     }
 

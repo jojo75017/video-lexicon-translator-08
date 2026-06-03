@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Sparkles, BookOpen, Wand2, Rocket, KeyRound, ExternalLink, ArrowRight, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useOpenAIConfig } from "@/hooks/useOpenAIConfig";
+import { isValidGoogleKey } from "@/services/aiWritingService";
 
 const ONBOARDING_KEY = "ebookstudio_first_ebook_onboarding_done";
 
@@ -42,9 +43,9 @@ export const FirstEbookOnboarding = ({ subscriberEmail }: { subscriberEmail?: st
 
   const saveKeyAndContinue = async () => {
     const trimmed = keyInput.trim();
-    if (!trimmed.startsWith("AIza")) {
+    if (!isValidGoogleKey(trimmed)) {
       toast.error("Format de clé invalide", {
-        description: "Une clé Gemini commence toujours par 'AIza'.",
+        description: "Clé Google acceptée : ancien format (AIza…) ou nouveau (AQ.Ab…).",
       });
       return;
     }

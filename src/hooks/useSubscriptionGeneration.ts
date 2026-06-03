@@ -2,13 +2,10 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { callGemini, callGeminiJSON, extractKeywordsFromText } from '@/services/geminiService';
+import { getActiveAIKey, isAIConfigured, getProvider, PROVIDER_LABELS } from '@/services/aiWritingService';
 
-// Récupère la clé Gemini de l'abonné depuis le localStorage (BYOK).
-const getGeminiKey = (fallback?: string) => {
-  const local = (typeof window !== 'undefined' ? localStorage.getItem('openai_api_key') : '') || '';
-  const key = (local || fallback || '').trim();
-  return key;
-};
+// Récupère la clé du provider IA actif (Gemini par défaut, ou Claude/OpenAI/OpenRouter).
+const getGeminiKey = (fallback?: string) => getActiveAIKey(fallback);
 
 export interface Chapter {
   id: string;
@@ -59,15 +56,9 @@ export const useSubscriptionGeneration = (
     }
 
     const geminiKey = getGeminiKey(apiKey);
-    if (!geminiKey) {
-      toast.error('Clé API Gemini requise', {
-        description: 'Renseignez votre clé Gemini (commence par AIza) dans les paramètres.',
-      });
-      return null;
-    }
-    if (!geminiKey.startsWith('AIza')) {
-      toast.error('Clé API invalide', {
-        description: 'Cette application utilise Gemini. Votre clé doit commencer par "AIza".',
+    if (!isAIConfigured() || !geminiKey) {
+      toast.error('Clé API IA requise', {
+        description: `Renseignez une clé valide pour ${PROVIDER_LABELS[getProvider()]} dans les paramètres.`,
       });
       return null;
     }
@@ -411,8 +402,8 @@ Format JSON attendu:
 
   const generateKDPDescription = async (title: string, chapters: Chapter[]) => {
     const key = getGeminiKey(apiKey);
-    if (!key || !key.startsWith('AIza')) {
-      toast.error('Clé API Gemini manquante', { description: 'Ajoute ta clé Gemini (commençant par AIza) dans Paramètres.' });
+    if (!isAIConfigured() || !key) {
+      toast.error('Clé API IA manquante', { description: `Ajoute une clé valide pour ${PROVIDER_LABELS[getProvider()]} dans Paramètres.` });
       return null;
     }
     const chaptersText = chapters.map(c => c.title).join(', ') || '(pas de chapitres définis)';
@@ -447,8 +438,8 @@ Contraintes :
 
   const generateKDPKeywords = async (title: string, chapters: Chapter[]) => {
     const key = getGeminiKey(apiKey);
-    if (!key || !key.startsWith('AIza')) {
-      toast.error('Clé API Gemini manquante', { description: 'Ajoute ta clé Gemini (commençant par AIza) dans Paramètres.' });
+    if (!isAIConfigured() || !key) {
+      toast.error('Clé API IA manquante', { description: `Ajoute une clé valide pour ${PROVIDER_LABELS[getProvider()]} dans Paramètres.` });
       return null;
     }
     const chaptersText = chapters.map(c => c.title).join(', ') || '(pas de chapitres définis)';
@@ -503,8 +494,8 @@ Les niveaux de "relevance" autorisés : "haute", "moyenne", "faible".`;
 
   const generateKDPCategories = async (title: string, chapters: Chapter[]) => {
     const key = getGeminiKey(apiKey);
-    if (!key || !key.startsWith('AIza')) {
-      toast.error('Clé API Gemini manquante', { description: 'Ajoute ta clé Gemini (commençant par AIza) dans Paramètres.' });
+    if (!isAIConfigured() || !key) {
+      toast.error('Clé API IA manquante', { description: `Ajoute une clé valide pour ${PROVIDER_LABELS[getProvider()]} dans Paramètres.` });
       return null;
     }
     const chaptersText = chapters.map(c => c.title).join(', ') || '(pas de chapitres définis)';
@@ -869,8 +860,8 @@ IMPORTANT :
 - Les "testimonial_templates" sont des MODÈLES à faire remplir par de vrais lecteurs : ne jamais les présenter comme des avis réels. Indique clairement par le style qu'il s'agit d'exemples à personnaliser.`;
 
     const key = getGeminiKey(apiKey);
-    if (!key || !key.startsWith('AIza')) {
-      toast.error('Clé API Gemini manquante', { description: 'Ajoute ta clé Gemini (commençant par AIza) dans Paramètres.' });
+    if (!isAIConfigured() || !key) {
+      toast.error('Clé API IA manquante', { description: `Ajoute une clé valide pour ${PROVIDER_LABELS[getProvider()]} dans Paramètres.` });
       return null;
     }
     setIsGenerating(true);

@@ -63,15 +63,45 @@ export const validateKeyFormat = (p: AIProvider, key: string): boolean => {
   const k = sanitizeKey(key);
   if (!k) return false;
   switch (p) {
-    // Gemini : la plupart des clés commencent par "AIza", mais certaines clés
-    // Google Cloud valides ne le font pas. On accepte donc toute clé plausible
-    // (assez longue, sans caractères interdits) pour ne pas bloquer à tort.
-    case 'gemini': return /^[A-Za-z0-9_-]{30,}$/.test(k);
+    case 'gemini': return isValidGoogleKey(k);
     case 'claude': return k.startsWith('sk-ant-') && k.length > 20;
     case 'openai': return k.startsWith('sk-') && k.length > 20;
     case 'openrouter': return k.startsWith('sk-or-') && k.length > 20;
   }
 };
+
+/**
+ * Accepte les DEUX formats de clé Google :
+ *  - Ancien format "hérité" : préfixe AIza...
+ *  - Nouveau format : préfixe AQ.Ab / AQ.Ab8... (contient un point)
+ * + repli tolérant pour les clés Google Cloud plausibles.
+ */
+export const isValidGoogleKey = (key: string): boolean => {
+  const k = sanitizeKey(key);
+  if (!k) return false;
+  if (/^AIza[A-Za-z0-9_-]{20,}$/.test(k)) return true;        // ancien format (AIza)
+  if (/^AQ\.[A-Za-z0-9._-]{15,}$/i.test(k)) return true;      // nouveau format (AQ.Ab...)
+  return /^[A-Za-z0-9._-]{30,}$/.test(k);                      // autre clé plausible
+};
+
+/** True si le provider IA actif possède une clé au format valide
+ *  (Gemini, Claude, OpenAI ou OpenRouter — peu importe lequel). */
+export const isAIConfigured = (): boolean => {
+  const p = getProvider();
+  const k = getProviderKey(p);
+  return !!k && validateKeyFormat(p, k);
+};
+
+/** Clé à transmettre à callGemini : la clé Gemini si le provider actif est
+ *  Gemini, sinon la clé du provider sélectionné (callGemini route ensuite
+ *  automatiquement vers le bon provider). */
+export const getActiveAIKey = (geminiFallback?: string): string => {
+  const p = getProvider();
+  if (p === 'gemini') return getProviderKey('gemini') || sanitizeKey(geminiFallback || '');
+  return getProviderKey(p);
+};
+
+
 
 export const PROVIDER_LABELS: Record<AIProvider, string> = {
   gemini: 'Google Gemini',
@@ -134,6 +164,7 @@ export const OPENROUTER_MODELS: OpenRouterModelInfo[] = [
   // ===== Modèles gratuits (:free) =====
   { id: 'moonshotai/kimi-k2.6:free',           label: 'Kimi K2.6 (gratuit)',     pricing: { in: 0,    out: 0 },    tag: 'Gratuit' },
   { id: 'google/gemma-4-31b-it:free',          label: 'Gemma 4 31B (gratuit)',   pricing: { in: 0,    out: 0 },    tag: 'Gratuit' },
+  { id: 'openrouter/owl-alpha',                label: 'OpenRouter Owl Alpha',    pricing: { in: 0,    out: 0 },    tag: 'Gratuit · bêta' },
   { id: 'openrouter/free',                      label: 'OpenRouter Free (auto)',  pricing: { in: 0,    out: 0 },    tag: 'Gratuit' },
 ];
 

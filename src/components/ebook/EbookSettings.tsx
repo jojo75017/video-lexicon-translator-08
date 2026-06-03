@@ -156,7 +156,7 @@ export const EbookSettings: React.FC<EbookSettingsProps> = ({
               <Input
                 id="gemini-api-key"
                 type="password"
-                placeholder="AIza..."
+                placeholder="AIza... ou AQ.Ab..."
                 value={configApiKey}
                 onChange={(e) => updateApiKey(e.target.value)}
                 className="flex-1 font-mono text-sm"

@@ -23,6 +23,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { useWorkflowResults } from '@/hooks/useWorkflowResults';
 import { useWorkflowCloudSync } from '@/hooks/useWorkflowCloudSync';
 import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
+import { getProvider, validateKeyFormat, isAIConfigured } from '@/services/aiWritingService';
 import { WORKFLOW_STEPS, WORKFLOW_STEP_COUNT } from './workflow/workflowAgents';
 
 interface Character {
@@ -176,8 +177,9 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
 
   const normalizedUserApiKey = typeof userApiKey === 'string' ? userApiKey.trim() : '';
   const hasConfiguredApiKey = normalizedUserApiKey.length > 0;
-  const hasPlausibleApiKeyFormat = normalizedUserApiKey.startsWith('AIza');
-  const hasUsableApiKey = hasConfiguredApiKey && hasPlausibleApiKeyFormat;
+  // Accepte n'importe quel provider IA valide (Gemini ancien/nouveau format, Claude, OpenAI, OpenRouter)
+  const hasPlausibleApiKeyFormat = isAIConfigured() || (hasConfiguredApiKey && validateKeyFormat(getProvider(), normalizedUserApiKey));
+  const hasUsableApiKey = hasPlausibleApiKeyFormat;
   const hasStrictlyValidatedApiKey = hasUsableApiKey && isUserKeyValid === true;
   const hasApiKeyValidationWarning = hasConfiguredApiKey && !hasPlausibleApiKeyFormat;
   const canGenerate = title.trim() && authorName.trim() && category && bookIntroduction.trim() && hasReadSteps;
@@ -1819,10 +1821,10 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
               </div>
               <p className="text-xs text-muted-foreground">
                 {hasStrictlyValidatedApiKey
-                    ? 'Les coûts de génération seront facturés directement sur votre compte Gemini (~0,30€ par livre).'
+                    ? 'Les coûts de génération seront facturés directement sur votre compte IA (~0,30€ par livre).'
                   : hasUsableApiKey
-                    ? 'Une clé Gemini valide est bien présente. Le workflow peut démarrer.'
-                    : 'Configurez une clé Gemini commençant par AIza dans l\'onglet "Paramètres" pour générer votre livre. Les anciens formats de clé ne sont plus acceptés.'}
+                    ? 'Une clé IA valide est bien présente. Le workflow peut démarrer.'
+                    : 'Configurez une clé valide (Google Gemini — ancien format AIza… ou nouveau format AQ.Ab… — ou Claude / OpenAI / OpenRouter) dans l\'onglet "Paramètres" pour générer votre livre.'}
               </p>
             </div>
           </div>

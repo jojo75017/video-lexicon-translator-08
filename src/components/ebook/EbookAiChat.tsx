@@ -9,6 +9,7 @@ import {
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { callGemini } from '@/services/geminiService';
+import { isValidGoogleKey } from '@/services/aiWritingService';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -56,8 +57,8 @@ export const EbookAiChat: React.FC<{ isDemo?: boolean }> = ({ isDemo = false }) 
       return;
     }
 
-    if (!tempApiKey.startsWith('AIza')) {
-      toast.error('La clé API Gemini doit commencer par "AIza"');
+    if (!isValidGoogleKey(tempApiKey)) {
+      toast.error('Clé Google invalide', { description: 'Format accepté : ancien (AIza…) ou nouveau (AQ.Ab…).' });
       return;
     }
 
@@ -324,11 +325,11 @@ Donne des conseils pratiques et des exemples concrets.`,
             )}
             <div>
               <label className="text-sm font-medium mb-2 block">
-                Clé API Gemini (commençant par AIza)
+                Clé API Google Gemini (AIza… ou AQ.Ab…)
               </label>
               <Input
                 type="password"
-                placeholder="AIza..."
+                placeholder="AIza... ou AQ.Ab..."
                 value={tempApiKey}
                 onChange={(e) => setTempApiKey(e.target.value)}
                 className="mb-2"
