@@ -43,9 +43,9 @@ export const FirstEbookOnboarding = ({ subscriberEmail }: { subscriberEmail?: st
 
   const saveKeyAndContinue = async () => {
     const trimmed = keyInput.trim();
-    if (!trimmed.startsWith("AIza")) {
+    if (!isValidGoogleKey(trimmed)) {
       toast.error("Format de clé invalide", {
-        description: "Une clé Gemini commence toujours par 'AIza'.",
+        description: "Clé Google acceptée : ancien format (AIza…) ou nouveau (AQ.Ab…).",
       });
       return;
     }
