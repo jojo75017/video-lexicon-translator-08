@@ -16,6 +16,7 @@ import { getFriendlyError } from '@/lib/errorMessages';
 import { writeAutosave, readAutosave } from '@/lib/ebookProjectStorage';
 import { EbookProjectsPanel } from './EbookProjectsPanel';
 import { callGemini } from '@/services/geminiService';
+import { isValidGoogleKey } from '@/services/aiWritingService';
 
 const getGeminiKey = (): string => {
   if (typeof window === 'undefined') return '';
