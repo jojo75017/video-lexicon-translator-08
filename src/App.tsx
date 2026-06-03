@@ -242,6 +242,14 @@ const App = () => {
     setIsAuthenticated(false);
     setSubscriberEmail('');
     setSubscriberData(null);
+
+    // CRITIQUE : terminer aussi la session Supabase, sinon SubscriberGate
+    // détecte la session active et ré-autorise l'accès (la déconnexion semble
+    // alors "ne rien faire"). On force ensuite une vraie sortie via /logout-total
+    // qui purge tout le cache et redirige proprement.
+    void supabase.auth.signOut().finally(() => {
+      window.location.assign('/logout-total');
+    });
   }, []);
 
   const showAccessDebug = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('debug') === '1';
