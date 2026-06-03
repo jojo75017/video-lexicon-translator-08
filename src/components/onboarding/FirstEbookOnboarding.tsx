@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Sparkles, BookOpen, Wand2, Rocket, KeyRound, ExternalLink, ArrowRight, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useOpenAIConfig } from "@/hooks/useOpenAIConfig";
+import { isValidGoogleKey } from "@/services/aiWritingService";
 
 const ONBOARDING_KEY = "ebookstudio_first_ebook_onboarding_done";
 
