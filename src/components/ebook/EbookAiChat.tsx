@@ -9,7 +9,7 @@ import {
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { callGemini } from '@/services/geminiService';
-import { getActiveAIKey, getProvider, isAIConfigured, isValidGoogleKey, PROVIDER_LABELS, sanitizeKey } from '@/services/aiWritingService';
+import { getActiveAIKey, isAIConfigured, isValidGoogleKey, sanitizeKey } from '@/services/aiWritingService';
 
 interface Message {
   role: 'user' | 'assistant';
