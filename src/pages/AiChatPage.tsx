@@ -11,6 +11,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { callGemini } from '@/services/geminiService';
+import { getActiveAIKey, isAIConfigured, isValidGoogleKey, sanitizeKey } from '@/services/aiWritingService';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -35,9 +36,8 @@ const AiChatPage: React.FC = () => {
   useEffect(() => {
     // Load API key from localStorage
     const savedKey = localStorage.getItem('openai_api_key');
-    if (savedKey) {
-      setApiKey(savedKey);
-    }
+    const activeKey = getActiveAIKey(savedKey || '');
+    if (activeKey || savedKey) setApiKey(activeKey || savedKey || '');
   }, []);
 
   useEffect(() => {
@@ -49,19 +49,19 @@ const AiChatPage: React.FC = () => {
   };
 
   const saveApiKey = () => {
-    if (!tempApiKey.trim()) {
+    const normalizedKey = sanitizeKey(tempApiKey);
+    if (!normalizedKey) {
       toast.error('Veuillez entrer une clé API');
       return;
     }
     
-    if (tempApiKey.trim().length < 20) {
-      toast.error('Clé API Gemini invalide (trop courte)');
+    if (!isValidGoogleKey(normalizedKey)) {
+      toast.error('Clé Google invalide', { description: 'Format accepté : ancien (AIza…) ou nouveau (AQ.Ab… / AQ.Ab8…).' });
       return;
     }
 
-
-    localStorage.setItem('openai_api_key', tempApiKey);
-    setApiKey(tempApiKey);
+    localStorage.setItem('openai_api_key', normalizedKey);
+    setApiKey(normalizedKey);
     setShowSettings(false);
     toast.success('Clé API Gemini enregistrée avec succès');
   };
@@ -69,8 +69,9 @@ const AiChatPage: React.FC = () => {
   const handleSend = async () => {
     if (!input.trim()) return;
     
-    if (!apiKey) {
-      toast.error('Veuillez configurer votre clé API Gemini dans les paramètres');
+    const activeKey = getActiveAIKey(apiKey);
+    if (!activeKey && !isAIConfigured()) {
+      toast.error('Veuillez configurer une clé IA valide dans les paramètres');
       setShowSettings(true);
       return;
     }
@@ -83,7 +84,7 @@ const AiChatPage: React.FC = () => {
     try {
       const chatHistory = messages.map(m => `${m.role === 'user' ? 'Utilisateur' : 'Assistant'}: ${m.content}`).join('\n\n');
       
-      const response = await callGemini(apiKey,
+      const response = await callGemini(activeKey,
         `Historique de la conversation:\n${chatHistory}\n\nUtilisateur: ${input}`,
         {
           systemPrompt: `Tu es un expert en marketing d'ebook et en analyse des tendances Amazon. 
@@ -179,11 +180,11 @@ Donne des conseils pratiques et des exemples concrets.`,
             <CardContent className="space-y-4">
               <div>
                 <label className="text-sm font-medium mb-2 block">
-                  Clé API Gemini (commençant par AIza)
+                  Clé API Gemini (AIza… ou AQ.Ab… / AQ.Ab8…)
                 </label>
                 <Input
                   type="password"
-                  placeholder="AIza..."
+                  placeholder="AIza... ou AQ.Ab..."
                   value={tempApiKey}
                   onChange={(e) => setTempApiKey(e.target.value)}
                   className="mb-2"

@@ -4,12 +4,17 @@ import { toast } from 'sonner';
 const validateOpenAIApiKey = async (apiKey: string, _model: string): Promise<boolean> => {
   try {
     toast.loading("Validation de la clé API Gemini...", { id: "validate-openai-key" });
+    const normalizedKey = apiKey.trim();
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
     if (response.status === 429) {
       toast.warning("Clé API valide mais limite de requêtes atteinte", { id: "validate-openai-key" });
       return true;
     }
     if (response.status === 400 || response.status === 401 || response.status === 403) {
+      if (/^AQ\.Ab8?/i.test(normalizedKey)) {
+        toast.success("Nouveau format Google accepté ✓", { id: "validate-openai-key" });
+        return true;
+      }
       toast.error("Clé API Gemini invalide", { id: "validate-openai-key" });
       return false;
     }

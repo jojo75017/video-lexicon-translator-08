@@ -13,6 +13,18 @@ const STORAGE_KEYS_TO_CLEAR = [
   // pour que la clé Gemini persiste entre les sessions
 ];
 
+const clearAuthStorage = () => {
+  for (const key of STORAGE_KEYS_TO_CLEAR) localStorage.removeItem(key);
+  Object.keys(localStorage).forEach((key) => {
+    if (key === "supabase.auth.token" || (key.startsWith("sb-") && key.includes("auth-token"))) {
+      localStorage.removeItem(key);
+    }
+  });
+  Object.keys(sessionStorage).forEach((key) => {
+    if (key.startsWith("sb-") || key.includes("auth")) sessionStorage.removeItem(key);
+  });
+};
+
 export default function LogoutTotalPage() {
   const navigate = useNavigate();
   const [status, setStatus] = useState<"running" | "done" | "error">("running");
@@ -23,20 +35,13 @@ export default function LogoutTotalPage() {
     const run = async () => {
       try {
         // 1) Supprimer la session admin (si présente)
-        await supabase.auth.signOut();
+        await Promise.race([
+          supabase.auth.signOut(),
+          new Promise((resolve) => setTimeout(resolve, 1200)),
+        ]);
 
         // 2) Purger les caches locaux (abonnement + démo + autosave + clés)
-        for (const key of STORAGE_KEYS_TO_CLEAR) {
-          localStorage.removeItem(key);
-        }
-
-        // 3) Purge large (au cas où d'autres clés existent)
-        // On garde quand même un fallback doux : si ça jette (quota/iframe), on continue.
-        try {
-          localStorage.removeItem("supabase.auth.token");
-        } catch {
-          // ignore
-        }
+        clearAuthStorage();
 
         if (cancelled) return;
         setStatus("done");
