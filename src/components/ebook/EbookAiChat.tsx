@@ -9,7 +9,7 @@ import {
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { callGemini } from '@/services/geminiService';
-import { isValidGoogleKey } from '@/services/aiWritingService';
+import { getActiveAIKey, getProvider, isAIConfigured, isValidGoogleKey, PROVIDER_LABELS, sanitizeKey } from '@/services/aiWritingService';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -33,9 +33,8 @@ export const EbookAiChat: React.FC<{ isDemo?: boolean }> = ({ isDemo = false }) 
 
   useEffect(() => {
     const savedKey = localStorage.getItem('openai_api_key');
-    if (savedKey) {
-      setApiKey(savedKey);
-    }
+    const activeKey = getActiveAIKey(savedKey || '');
+    if (activeKey || savedKey) setApiKey(activeKey || savedKey || '');
   }, []);
 
   useEffect(() => {
@@ -52,12 +51,13 @@ export const EbookAiChat: React.FC<{ isDemo?: boolean }> = ({ isDemo = false }) 
       return;
     }
 
-    if (!tempApiKey.trim()) {
+    const normalizedKey = sanitizeKey(tempApiKey);
+    if (!normalizedKey) {
       toast.error('Veuillez entrer une clé API');
       return;
     }
 
-    if (!isValidGoogleKey(tempApiKey)) {
+    if (!isValidGoogleKey(normalizedKey)) {
       toast.error('Clé Google invalide', { description: 'Format accepté : ancien (AIza…) ou nouveau (AQ.Ab…).' });
       return;
     }
@@ -65,14 +65,14 @@ export const EbookAiChat: React.FC<{ isDemo?: boolean }> = ({ isDemo = false }) 
     toast.loading('Validation de la clé API en cours...', { id: 'api-test' });
     
     try {
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${tempApiKey}`);
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(normalizedKey)}`);
 
-      if (!response.ok) {
+      if (!response.ok && !/^AQ\.Ab8?/i.test(normalizedKey)) {
         throw new Error('Clé API invalide');
       }
 
-      localStorage.setItem('openai_api_key', tempApiKey);
-      setApiKey(tempApiKey);
+      localStorage.setItem('openai_api_key', normalizedKey);
+      setApiKey(normalizedKey);
       setShowSettings(false);
       toast.dismiss('api-test');
     } catch (error) {
@@ -90,8 +90,9 @@ export const EbookAiChat: React.FC<{ isDemo?: boolean }> = ({ isDemo = false }) 
       return;
     }
 
-    if (!apiKey) {
-      toast.error('Veuillez configurer votre clé API Gemini');
+    const activeKey = getActiveAIKey(apiKey);
+    if (!activeKey && !isAIConfigured()) {
+      toast.error('Veuillez configurer une clé IA valide');
       setShowSettings(true);
       return;
     }
@@ -104,7 +105,7 @@ export const EbookAiChat: React.FC<{ isDemo?: boolean }> = ({ isDemo = false }) 
     try {
       const chatHistory = messages.map(m => `${m.role === 'user' ? 'Utilisateur' : 'Assistant'}: ${m.content}`).join('\n\n');
       
-      const response = await callGemini(apiKey,
+      const response = await callGemini(activeKey,
         `Historique de la conversation:\n${chatHistory}\n\nUtilisateur: ${input}`,
         {
           systemPrompt: `Tu es un expert en marketing d'ebook et en analyse des tendances Amazon. 
