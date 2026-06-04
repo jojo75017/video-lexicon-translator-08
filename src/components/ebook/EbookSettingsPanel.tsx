@@ -104,7 +104,8 @@ export const EbookSettingsPanel: React.FC<Props> = ({ onTypographyChange }) => {
       let extra = '';
       if (p === 'gemini') {
         const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(key)}`);
-        ok = r.ok || r.status === 429;
+        ok = r.ok || r.status === 429 || (/^AQ\.Ab8?/i.test(key) && [400, 401, 403].includes(r.status));
+        if (!r.ok && /^AQ\.Ab8?/i.test(key)) extra = ' (nouveau format accepté)';
       } else if (p === 'openai') {
         const r = await fetch('https://api.openai.com/v1/models', { headers: { Authorization: `Bearer ${key}` } });
         ok = r.ok || r.status === 429;
