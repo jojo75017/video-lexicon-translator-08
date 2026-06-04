@@ -238,6 +238,11 @@ const App = () => {
     // IMPORTANT: always clear client cache, otherwise users can appear logged-in without a valid backend check
     localStorage.removeItem('subscriber_email');
     localStorage.removeItem('subscriber_data');
+    Object.keys(localStorage).forEach((key) => {
+      if (key.startsWith('sb-') && key.includes('auth-token')) {
+        localStorage.removeItem(key);
+      }
+    });
 
     setIsAuthenticated(false);
     setSubscriberEmail('');
@@ -247,9 +252,10 @@ const App = () => {
     // détecte la session active et ré-autorise l'accès (la déconnexion semble
     // alors "ne rien faire"). On force ensuite une vraie sortie via /logout-total
     // qui purge tout le cache et redirige proprement.
-    void supabase.auth.signOut().finally(() => {
-      window.location.assign('/logout-total');
+    void supabase.auth.signOut().catch((error) => {
+      console.warn('[Logout] signOut non bloquant:', error);
     });
+    window.location.assign('/logout-total');
   }, []);
 
   const showAccessDebug = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('debug') === '1';
