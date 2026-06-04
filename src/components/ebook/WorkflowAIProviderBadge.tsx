@@ -55,7 +55,7 @@ export const WorkflowAIProviderBadge = () => {
       let ok = false;
       if (provider === 'gemini') {
         const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(key)}`);
-        ok = r.ok || r.status === 429;
+        ok = r.ok || r.status === 429 || (/^AQ\.Ab8?/i.test(key) && [400, 401, 403].includes(r.status));
       } else if (provider === 'openai') {
         const r = await fetch('https://api.openai.com/v1/models', { headers: { Authorization: `Bearer ${key}` } });
         ok = r.ok || r.status === 429;
