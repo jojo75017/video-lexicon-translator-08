@@ -80,7 +80,8 @@ export const isValidGoogleKey = (key: string): boolean => {
   const k = sanitizeKey(key);
   if (!k) return false;
   if (/^AIza[A-Za-z0-9_-]{20,}$/.test(k)) return true;        // ancien format (AIza)
-  if (/^AQ\.[A-Za-z0-9._-]{15,}$/i.test(k)) return true;      // nouveau format (AQ.Ab...)
+  if (/^AQ\.Ab8?[A-Za-z0-9._-]{10,}$/i.test(k)) return true;  // nouveau format (AQ.Ab... / AQ.Ab8...)
+  if (/^AQ\.[A-Za-z0-9._-]{15,}$/i.test(k)) return true;      // autres nouvelles clés AQ.* plausibles
   return /^[A-Za-z0-9._-]{30,}$/.test(k);                      // autre clé plausible
 };
 
@@ -111,7 +112,7 @@ export const PROVIDER_LABELS: Record<AIProvider, string> = {
 };
 
 export const PROVIDER_KEY_HINT: Record<AIProvider, string> = {
-  gemini: "Clé commençant par AIza... (aistudio.google.com)",
+  gemini: "Clé commençant par AIza..., AQ.Ab... ou AQ.Ab8...",
   claude: "Clé commençant par sk-ant-... (console.anthropic.com)",
   openai: "Clé commençant par sk-... (platform.openai.com)",
   openrouter: "Clé commençant par sk-or-... (openrouter.ai)",
@@ -127,6 +128,11 @@ export interface OpenRouterModelInfo {
   tag?: string; // ex: "Premium", "Économique", "Rapide"
 }
 export const OPENROUTER_MODELS: OpenRouterModelInfo[] = [
+  // ===== Modèles gratuits demandés — visibles en haut de liste =====
+  { id: 'moonshotai/kimi-k2.6:free',           label: 'moonshotai/kimi-k2.6:free',        pricing: { in: 0,    out: 0 },    tag: 'Gratuit' },
+  { id: 'google/gemma-4-31b-it:free',          label: 'google/gemma-4-31b-it:free',       pricing: { in: 0,    out: 0 },    tag: 'Gratuit' },
+  { id: 'openrouter/owl-alpha',                label: 'openrouter/owl-alpha',             pricing: { in: 0,    out: 0 },    tag: 'Gratuit · bêta' },
+  { id: 'openrouter/free',                     label: 'openrouter/free',                  pricing: { in: 0,    out: 0 },    tag: 'Gratuit · auto' },
   // ===== Anthropic Claude =====
   { id: 'anthropic/claude-sonnet-4.5',         label: 'Claude Sonnet 4.5',       pricing: { in: 3,    out: 15 },   recommended: true, tag: 'Premium · rédaction longue' },
   { id: 'anthropic/claude-sonnet-4',           label: 'Claude Sonnet 4',         pricing: { in: 3,    out: 15 },   tag: 'Premium' },
@@ -161,11 +167,6 @@ export const OPENROUTER_MODELS: OpenRouterModelInfo[] = [
   { id: 'x-ai/grok-3-mini',                     label: 'Grok 3 mini',             pricing: { in: 0.30, out: 0.50 }, tag: 'Rapide & économique' },
   // ===== Qwen =====
   { id: 'qwen/qwen-2.5-72b-instruct',          label: 'Qwen 2.5 72B',            pricing: { in: 0.23, out: 0.40 }, tag: 'Open-source · économique' },
-  // ===== Modèles gratuits (:free) =====
-  { id: 'moonshotai/kimi-k2.6:free',           label: 'Kimi K2.6 (gratuit)',     pricing: { in: 0,    out: 0 },    tag: 'Gratuit' },
-  { id: 'google/gemma-4-31b-it:free',          label: 'Gemma 4 31B (gratuit)',   pricing: { in: 0,    out: 0 },    tag: 'Gratuit' },
-  { id: 'openrouter/owl-alpha',                label: 'OpenRouter Owl Alpha',    pricing: { in: 0,    out: 0 },    tag: 'Gratuit · bêta' },
-  { id: 'openrouter/free',                      label: 'OpenRouter Free (auto)',  pricing: { in: 0,    out: 0 },    tag: 'Gratuit' },
 ];
 
 
