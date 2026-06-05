@@ -299,6 +299,15 @@ const AdminCockpitPage: React.FC = () => {
           <div className="flex items-center gap-2">
             <Button
               size="sm"
+              onClick={() => navigate('/hub-v3')}
+              className="rounded-full px-4 gap-1.5 hover:opacity-90 transition-all"
+              style={{ background: 'linear-gradient(90deg, #c9a84c, #f0d78c)', color: '#1a1a1a' }}
+            >
+              <Sparkles className="h-4 w-4" />
+              <span className="hidden sm:inline">Hub V3 ✨</span>
+            </Button>
+            <Button
+              size="sm"
               variant="outline"
               onClick={() => navigate('/tableau-de-bord')}
               className="rounded-full px-4 gap-1.5 hover:opacity-90 transition-all"
