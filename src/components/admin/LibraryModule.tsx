@@ -285,13 +285,13 @@ function BookCard({
       </div>
 
       <div className="flex flex-col gap-2 shrink-0">
-        <Button variant="outline" size="sm" className="justify-start" onClick={() => toast('Ouverture de l\'éditeur…')}>
+        <Button variant="outline" size="sm" className="justify-start" onClick={onEdit}>
           <Pencil className="h-3.5 w-3.5 mr-1.5" /> Modifier
         </Button>
-        <Button size="sm" className="justify-start" style={{ background: '#FF9E2D', color: INK }} onClick={() => toast('Publication…')}>
+        <Button size="sm" className="justify-start" style={{ background: '#FF9E2D', color: INK }} onClick={onPublish}>
           <Rocket className="h-3.5 w-3.5 mr-1.5" /> Publier
         </Button>
-        <Button variant="outline" size="sm" className="justify-start" onClick={() => toast('Export en cours…')}>
+        <Button variant="outline" size="sm" className="justify-start" onClick={onExport}>
           <Download className="h-3.5 w-3.5 mr-1.5" /> Exporter
         </Button>
         <Button
