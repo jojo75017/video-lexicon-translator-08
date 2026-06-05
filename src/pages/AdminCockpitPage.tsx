@@ -34,6 +34,15 @@ import PrintProofChecker from '@/components/admin/PrintProofChecker';
 import BackMatterBuilder from '@/components/admin/BackMatterBuilder';
 import CoverVariantsThumbnail from '@/components/admin/CoverVariantsThumbnail';
 import TranslationMarkets from '@/components/admin/TranslationMarkets';
+import SalesTrackerKdp from '@/components/admin/SalesTrackerKdp';
+import RoyaltiesDashboard from '@/components/admin/RoyaltiesDashboard';
+import SalesDescription from '@/components/admin/SalesDescription';
+import AplusGenerator from '@/components/admin/AplusGenerator';
+import AutoPricingAI from '@/components/admin/AutoPricingAI';
+import BundlesBoxsets from '@/components/admin/BundlesBoxsets';
+import LeadMagnetBuilder from '@/components/admin/LeadMagnetBuilder';
+import BackCatalogFunnel from '@/components/admin/BackCatalogFunnel';
+import KdpSelectPlanner from '@/components/admin/KdpSelectPlanner';
 import { toast } from 'sonner';
 import {
   addMonths, endOfMonth, endOfWeek, format, isSameDay, isSameMonth,
@@ -409,7 +418,7 @@ const AdminCockpitPage: React.FC = () => {
                   </div>
                   <ul className="space-y-1.5">
                     {items.map((m) => {
-                      const clickable = (isAdmin && v3Mode) || ['p16-competitive', 'p17-series', 'p18-readability', 'p19-author-voice', 'p20-chat-manuscript', 'p21-blurb-ab-tester', 'p22-trend-radar', 'niche-intelligence', 'listing-optimizer', 'book-creation-studio', 'library', 'cover-pdf-exact', 'cockpit-audit-pilot', 'kdp-pack-zip', 'multi-format-express', 'prepub-checklist', 'kindle-previewer', 'isbn-metadata', 'categories-manager-10', 'print-proof-checker', 'back-matter-builder', 'cover-variants-thumbnail', 'translation-markets'].includes(m.id);
+                      const clickable = (isAdmin && v3Mode) || ['p16-competitive', 'p17-series', 'p18-readability', 'p19-author-voice', 'p20-chat-manuscript', 'p21-blurb-ab-tester', 'p22-trend-radar', 'niche-intelligence', 'listing-optimizer', 'book-creation-studio', 'library', 'cover-pdf-exact', 'cockpit-audit-pilot', 'kdp-pack-zip', 'multi-format-express', 'prepub-checklist', 'kindle-previewer', 'isbn-metadata', 'categories-manager-10', 'print-proof-checker', 'back-matter-builder', 'cover-variants-thumbnail', 'translation-markets', 'sales-tracker', 'royalties-dashboard', 'sales-description', 'aplus-generator', 'auto-pricing', 'bundles-boxsets', 'lead-magnet', 'back-catalog-funnel', 'kdp-select-planner'].includes(m.id);
                       const statusColor = m.status === 'done' ? '#10B981' : m.status === 'in_progress' ? '#FF9E2D' : '#94A3B8';
                       const statusBg = m.status === 'done' ? '#10B98114' : m.status === 'in_progress' ? '#FF9E2D14' : '#F1F5F9';
                       const statusLabel = m.status === 'done' ? '✓ Fait' : m.status === 'in_progress' ? '… En cours' : 'À faire';
@@ -443,7 +452,7 @@ const AdminCockpitPage: React.FC = () => {
 
         {/* Détail module V3 (mode V3 admin) */}
         <Dialog open={!!selectedModule} onOpenChange={(o) => !o && setSelectedModule(null)}>
-          <DialogContent className={['p16-competitive', 'p17-series', 'p18-readability', 'p19-author-voice', 'p20-chat-manuscript', 'p21-blurb-ab-tester', 'p22-trend-radar'].includes(selectedModule?.id ?? '') ? 'max-w-2xl max-h-[85vh] overflow-y-auto' : ['niche-intelligence', 'listing-optimizer', 'book-creation-studio', 'library', 'cover-pdf-exact', 'cockpit-audit-pilot', 'kdp-pack-zip', 'multi-format-express', 'prepub-checklist', 'kindle-previewer', 'isbn-metadata', 'categories-manager-10', 'print-proof-checker', 'back-matter-builder', 'cover-variants-thumbnail', 'translation-markets'].includes(selectedModule?.id ?? '') ? 'max-w-6xl max-h-[88vh] overflow-y-auto' : undefined}>
+          <DialogContent className={['p16-competitive', 'p17-series', 'p18-readability', 'p19-author-voice', 'p20-chat-manuscript', 'p21-blurb-ab-tester', 'p22-trend-radar'].includes(selectedModule?.id ?? '') ? 'max-w-2xl max-h-[85vh] overflow-y-auto' : ['niche-intelligence', 'listing-optimizer', 'book-creation-studio', 'library', 'cover-pdf-exact', 'cockpit-audit-pilot', 'kdp-pack-zip', 'multi-format-express', 'prepub-checklist', 'kindle-previewer', 'isbn-metadata', 'categories-manager-10', 'print-proof-checker', 'back-matter-builder', 'cover-variants-thumbnail', 'translation-markets', 'sales-tracker', 'royalties-dashboard', 'sales-description', 'aplus-generator', 'auto-pricing', 'bundles-boxsets', 'lead-magnet', 'back-catalog-funnel', 'kdp-select-planner'].includes(selectedModule?.id ?? '') ? 'max-w-6xl max-h-[88vh] overflow-y-auto' : undefined}>
             {selectedModule && (
               <>
                 <DialogHeader>
@@ -533,6 +542,24 @@ const AdminCockpitPage: React.FC = () => {
                     <CoverVariantsThumbnail />
                   ) : selectedModule.id === 'translation-markets' ? (
                     <TranslationMarkets />
+                  ) : selectedModule.id === 'sales-tracker' ? (
+                    <SalesTrackerKdp />
+                  ) : selectedModule.id === 'royalties-dashboard' ? (
+                    <RoyaltiesDashboard />
+                  ) : selectedModule.id === 'sales-description' ? (
+                    <SalesDescription />
+                  ) : selectedModule.id === 'aplus-generator' ? (
+                    <AplusGenerator />
+                  ) : selectedModule.id === 'auto-pricing' ? (
+                    <AutoPricingAI />
+                  ) : selectedModule.id === 'bundles-boxsets' ? (
+                    <BundlesBoxsets />
+                  ) : selectedModule.id === 'lead-magnet' ? (
+                    <LeadMagnetBuilder />
+                  ) : selectedModule.id === 'back-catalog-funnel' ? (
+                    <BackCatalogFunnel />
+                  ) : selectedModule.id === 'kdp-select-planner' ? (
+                    <KdpSelectPlanner />
                   ) : (
                     <p className="text-[11px] text-joy-ink/40">
                       Module en préparation pour la V3 ({V3_PRICE}€ à vie). Visible uniquement par l'admin.

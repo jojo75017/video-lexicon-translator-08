@@ -47,11 +47,11 @@ export const V3_MODULES: V3Module[] = [
     description: 'Génère le PDF wrap complet (4e + dos + 1re) aux dimensions exactes KDP, bleed + zone ISBN, prêt à uploader.' },
 
   // MONÉTISER
-  { id: 'sales-tracker',       pillar: 'monetiser', status: 'todo', title: 'Tracker Ventes KDP',
+  { id: 'sales-tracker',       pillar: 'monetiser', status: 'done', title: 'Tracker Ventes KDP',
     description: 'Import CSV royalties Amazon + graphes revenus mensuels / par titre.' },
-  { id: 'aplus-generator',     pillar: 'monetiser', status: 'todo', title: 'Générateur Page A+',
+  { id: 'aplus-generator',     pillar: 'monetiser', status: 'done', title: 'Générateur Page A+',
     description: 'Génère le HTML Amazon A+ Content avec visuels et blocs prêts à coller.' },
-  { id: 'auto-pricing',        pillar: 'monetiser', status: 'todo', title: 'Auto-Pricing IA',
+  { id: 'auto-pricing',        pillar: 'monetiser', status: 'done', title: 'Auto-Pricing IA',
     description: 'Suggère le prix optimal selon niche, concurrence et longueur.' },
 
   // MARKETING
@@ -85,11 +85,11 @@ export const V3_MODULES: V3Module[] = [
     description: 'Traduit et adapte le livre pour Amazon US/UK/DE/ES via IA, avec ajustement culturel.' },
 
   // MONÉTISER
-  { id: 'royalties-dashboard',  pillar: 'monetiser', status: 'todo', title: 'Royalties Dashboard Live',
+  { id: 'royalties-dashboard',  pillar: 'monetiser', status: 'done', title: 'Royalties Dashboard Live',
     description: 'Import KDP avec prévisions de revenus et alertes seuils.' },
-  { id: 'bundles-boxsets',      pillar: 'monetiser', status: 'todo', title: 'Bundles & Box Sets',
+  { id: 'bundles-boxsets',      pillar: 'monetiser', status: 'done', title: 'Bundles & Box Sets',
     description: 'Génère des offres groupées (séries) avec pricing optimisé et page de vente.' },
-  { id: 'lead-magnet',          pillar: 'monetiser', status: 'todo', title: 'Lead Magnet Builder',
+  { id: 'lead-magnet',          pillar: 'monetiser', status: 'done', title: 'Lead Magnet Builder',
     description: 'Crée un chapitre offert + tunnel de capture email pour bâtir une liste lecteurs.' },
 
   // MARKETING
@@ -119,7 +119,7 @@ export const V3_MODULES: V3Module[] = [
     description: 'Sélectionne 2 catégories optimales (1 large + 1 spécifique) puis prépare la demande des 8 catégories supplémentaires via le support KDP.' },
 
   // MONÉTISER
-  { id: 'sales-description',        pillar: 'monetiser', status: 'todo', title: 'Description Vendeuse (5 parties)',
+  { id: 'sales-description',        pillar: 'monetiser', status: 'done', title: 'Description Vendeuse (5 parties)',
     description: 'Rédige une description style page de vente : accroche, agitation, promesse, 5–7 bénéfices, CTA, avec mots de conversion (1500–2500 caractères).' },
 
   // MARKETING
@@ -135,9 +135,9 @@ export const V3_MODULES: V3Module[] = [
     description: 'Contrôle bleed, marge de reliure (gutter), dos et code-barres avant de commander l’épreuve papier KDP.' },
 
   // MONÉTISER
-  { id: 'kdp-select-planner',   pillar: 'monetiser', status: 'todo', title: 'Planificateur KDP Select / KU',
+  { id: 'kdp-select-planner',   pillar: 'monetiser', status: 'done', title: 'Planificateur KDP Select / KU',
     description: 'Calendrier des 5 jours promo gratuits + Countdown Deals optimisés sur la période de 90 jours.' },
-  { id: 'back-catalog-funnel',  pillar: 'monetiser', status: 'todo', title: 'Tunnel de Back-Catalogue',
+  { id: 'back-catalog-funnel',  pillar: 'monetiser', status: 'done', title: 'Tunnel de Back-Catalogue',
     description: 'Liens croisés entre tomes et titres pour maximiser le read-through et les ventes en chaîne.' },
 
   // MARKETING
