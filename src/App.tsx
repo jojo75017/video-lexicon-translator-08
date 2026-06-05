@@ -311,7 +311,7 @@ const App = () => {
               path="/tableau-de-bord"
               element={
                 <AdminGate>
-                  <DashboardPage subscriberEmail={subscriberEmail || ''} onLogout={handleLogout} />
+                  <V3HubPage />
                 </AdminGate>
               }
             />
