@@ -77,6 +77,40 @@ function cleanJson(text: string) {
   return match ? match[0] : cleaned;
 }
 
+/**
+ * Répare un JSON tronqué par la limite de tokens :
+ * coupe après la dernière virgule de fin de valeur complète, puis ferme
+ * les chaînes/objets/tableaux encore ouverts.
+ */
+function repairJson(input: string): string {
+  let s = (input || '').trim();
+  // Retire un objet/clé partiel en fin de chaîne (après la dernière accolade/crochet/valeur fermée).
+  const lastClose = Math.max(s.lastIndexOf('}'), s.lastIndexOf(']'), s.lastIndexOf('"'));
+  if (lastClose > 0 && lastClose < s.length - 1) {
+    s = s.slice(0, lastClose + 1);
+  }
+  s = s.replace(/,\s*$/, '');
+
+  // Compte les structures ouvertes en ignorant ce qui est dans des chaînes.
+  let inString = false;
+  let escaped = false;
+  const stack: string[] = [];
+  for (const ch of s) {
+    if (escaped) { escaped = false; continue; }
+    if (ch === '\\') { escaped = true; continue; }
+    if (ch === '"') { inString = !inString; continue; }
+    if (inString) continue;
+    if (ch === '{' || ch === '[') stack.push(ch);
+    else if (ch === '}' || ch === ']') stack.pop();
+  }
+  if (inString) s += '"';
+  while (stack.length) {
+    const open = stack.pop();
+    s += open === '{' ? '}' : ']';
+  }
+  return s;
+}
+
 function buildBookAuditPrompt(bookData: Record<string, unknown>) {
   return `Tu es un expert Amazon KDP senior. Analyse cette fiche publique et retourne UNIQUEMENT un JSON valide, sans markdown.
 
