@@ -1,45 +1,57 @@
-## Problème
+## Objectif
 
-Sur la page V3 (cockpit admin), plusieurs modules affichent « En cours » alors que rien n'a avancé. La raison : le statut de chaque module est **écrit à la main** dans `src/data/roadmapV3.ts` (`status: 'in_progress'`), il n'est pas calculé d'après ce qui est réellement codé. Résultat : l'affichage ne reflète pas la réalité et on ne sait pas quoi avancer.
+Rendre **tous les modules de l'onglet « Publier »** fonctionnels et cliquables dans le cockpit V3, puis passer leur statut à « Fait ». Chaque module s'ouvre dans la fenêtre du cockpit (comme SCOUT, INTEL, etc.), en thème clair KDP. Aucun changement backend lourd : on réutilise les outils déjà codés et on construit les manquants côté front (IA via clé Gemini BYOK quand nécessaire).
 
-## Réalité du code
-
-Dans `AdminCockpitPage.tsx`, seuls 11 modules sont **réellement construits** : ils ont un composant qui s'ouvre quand on clique dessus. Ce sont :
+## Liste des 12 modules Publier
 
 ```text
-SCOUT (P16)            → ScoutAnalysis
-SAGA (P17)             → SagaArchitect
-LUMEN (P18)            → LumenReadability
-ÉCHO (P19)             → EchoAuthorVoice
-ORACLE (P20)           → OracleManuscript
-DUEL (P21)             → DuelBlurb
-VIGIE (P22)            → VigieTrends
-INTEL — Intelligence de Niche → NicheIntelligence
-Optimiseur d'annonces KDP     → ListingOptimizer
-STUDIO — Création de Livres   → BookCreationStudio
-BIBLIOTHÈQUE — Mes Créations  → LibraryModule
+Déjà codé ailleurs → à BRANCHER (rapide)
+  1. cover-pdf-exact      → réutilise KdpCoverStudio (page Couverture KDP)
+  2. cockpit-audit-pilot  → réutilise KdpAmazonResearch (onglet "pilot")
+  3. kdp-pack-zip         → réutilise lib downloadKdpPack + petite UI
+  4. multi-format-express → réutilise exporters PDF/DOCX + petite UI
+
+À CONSTRUIRE (nouveaux composants)
+  5. prepub-checklist       → checklist 25 points cochable (déterministe)
+  6. kindle-previewer       → aperçu rendu Kindle/tablette/phone (CSS)
+  7. isbn-metadata          → gestionnaire ISBN/BISAC/catégories (formulaire + stockage)
+  8. categories-manager-10  → 2 catégories optimales + préparation des 8 via support KDP
+  9. back-matter-builder    → pages de fin (avis, "Du même auteur", bio + newsletter) via IA
+ 10. print-proof-checker    → contrôle bleed/gutter/dos/code-barres avant épreuve papier
+ 11. cover-variants-thumbnail → 6 variantes de couverture + test miniature 200×300 (IA image)
+ 12. translation-markets    → traduction/adaptation US/UK/DE/ES via IA
 ```
 
-Tous les autres modules **n'ont aucun composant** branché : ils ne sont pas faits. En particulier `Couverture KDP Exacte (PDF)` est marqué « En cours » mais n'est branché nulle part dans le cockpit.
+## Approche par module
 
-## Correction proposée
+**Branchements rapides (1 à 4).** On crée un composant léger dans `src/components/admin/` qui réutilise le composant/lib existant, puis on l'ajoute au cockpit. Pas de nouvelle logique métier.
 
-Mettre les statuts en accord avec le code, pour qu'un coup d'œil suffise à voir ce qui est fait :
+**Nouveaux outils (5 à 12).** Chaque module = un composant autonome dans `src/components/admin/`, suivant le même patron visuel que `ListingOptimizer`/`LumenReadability` (Card, Tabs, Badge, tokens clairs teal #008296 / hover #FF9E2D). Les modules IA (back-matter, cover-variants, translation) utilisent la clé Gemini BYOK déjà en place (via `aiWritingService` / edge functions existantes), sans données simulées.
 
-1. **Passer en « Fait » (`done`)** les 11 modules réellement construits listés ci-dessus.
-2. **Passer en « En attente » (`todo`)** tous les modules qui n'ont pas de composant branché — y compris ceux aujourd'hui faussement marqués « En cours » (ex. `cover-pdf-exact`).
-3. Plus aucun module ne reste en `in_progress`, sauf si tu m'indiques précisément un chantier que tu considères « en cours de construction » (dans ce cas je le garde en `in_progress`).
+## Câblage cockpit (`src/pages/AdminCockpitPage.tsx`)
 
-Aucune logique n'est touchée : on ne modifie que les valeurs `status` dans `src/data/roadmapV3.ts`. L'affichage des couleurs/badges (Fait / En cours / En attente) existe déjà et se mettra à jour automatiquement.
+Pour chaque module : ajouter son `id` à la liste `clickable` (ligne ~400), ajouter une branche de rendu dans la fenêtre (ligne ~464+), et inclure son `id` dans la classe de largeur du `DialogContent` (large/scroll pour les outils riches).
+
+## Statuts (`src/data/roadmapV3.ts`)
+
+Passer les 12 modules Publier à `status: 'done'` au fur et à mesure de leur branchement effectif.
 
 ## Détails techniques
 
-- Fichier unique modifié : `src/data/roadmapV3.ts`.
-- Éditer le champ `status` de chaque entrée de `V3_MODULES` selon les règles ci-dessus.
-- Aucun changement de composant, de route, ni de backend.
+- Nouveaux fichiers : `src/components/admin/KdpPackExport.tsx`, `MultiFormatExport.tsx`, `PrepubChecklist.tsx`, `KindlePreviewer.tsx`, `IsbnMetadataManager.tsx`, `CategoriesManager10.tsx`, `BackMatterBuilder.tsx`, `PrintProofChecker.tsx`, `CoverVariantsThumbnail.tsx`, `TranslationMarkets.tsx`, et deux wrappers légers `CoverPdfExact.tsx`, `AuditPilotModule.tsx`.
+- Réutilisation : `KdpCoverStudio`, `KdpAmazonResearch`, `downloadKdpPack`/`generateKdpPackZip`, `ebookPdfExporter`, `ebookDocxExporter`, `kdpCoverPdf`.
+- IA : clé Gemini BYOK existante ; aucune nouvelle dépendance backend si possible (réutilise les edge functions déjà déployées).
+- Persistance locale (ISBN, checklist, catégories) via `localStorage`, cohérent avec le reste du projet.
+- Respect de la charte : pas de couleurs en dur hors tokens, thème clair KDP.
+
+## Déroulé proposé (par lots, pour garder la qualité)
+
+1. **Lot 1 — Branchements** : modules 1 à 4 (réutilisation), tests, statut « Fait ».
+2. **Lot 2 — Outils déterministes** : 5, 6, 7, 8, 10 (sans IA).
+3. **Lot 3 — Outils IA** : 9, 11, 12.
 
 ## Vérification
 
-- Ouvrir `/admin-cockpit` en mode V3.
-- Confirmer que les 11 modules branchés affichent le badge « Fait » (vert) et s'ouvrent au clic.
-- Confirmer qu'aucun module non construit n'affiche plus « En cours » : ils sont tous en « En attente ».
+- Ouvrir `/admin-cockpit` en mode V3, colonne « Publier ».
+- Chaque module est cliquable, s'ouvre, et son outil fonctionne (export ZIP/PDF, checklist, aperçu, IA…).
+- Tous les modules Publier affichent le badge « Fait » (vert).

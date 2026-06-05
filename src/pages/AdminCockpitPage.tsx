@@ -22,6 +22,18 @@ import NicheIntelligence from '@/components/admin/NicheIntelligence';
 import ListingOptimizer from '@/components/admin/ListingOptimizer';
 import BookCreationStudio from '@/components/admin/BookCreationStudio';
 import LibraryModule from '@/components/admin/LibraryModule';
+import CoverPdfExact from '@/components/admin/CoverPdfExact';
+import AuditPilotModule from '@/components/admin/AuditPilotModule';
+import KdpPackExport from '@/components/admin/KdpPackExport';
+import MultiFormatExport from '@/components/admin/MultiFormatExport';
+import PrepubChecklist from '@/components/admin/PrepubChecklist';
+import KindlePreviewer from '@/components/admin/KindlePreviewer';
+import IsbnMetadataManager from '@/components/admin/IsbnMetadataManager';
+import CategoriesManager10 from '@/components/admin/CategoriesManager10';
+import PrintProofChecker from '@/components/admin/PrintProofChecker';
+import BackMatterBuilder from '@/components/admin/BackMatterBuilder';
+import CoverVariantsThumbnail from '@/components/admin/CoverVariantsThumbnail';
+import TranslationMarkets from '@/components/admin/TranslationMarkets';
 import { toast } from 'sonner';
 import {
   addMonths, endOfMonth, endOfWeek, format, isSameDay, isSameMonth,
@@ -397,7 +409,7 @@ const AdminCockpitPage: React.FC = () => {
                   </div>
                   <ul className="space-y-1.5">
                     {items.map((m) => {
-                      const clickable = (isAdmin && v3Mode) || ['p16-competitive', 'p17-series', 'p18-readability', 'p19-author-voice', 'p20-chat-manuscript', 'p21-blurb-ab-tester', 'p22-trend-radar', 'niche-intelligence', 'listing-optimizer', 'book-creation-studio', 'library'].includes(m.id);
+                      const clickable = (isAdmin && v3Mode) || ['p16-competitive', 'p17-series', 'p18-readability', 'p19-author-voice', 'p20-chat-manuscript', 'p21-blurb-ab-tester', 'p22-trend-radar', 'niche-intelligence', 'listing-optimizer', 'book-creation-studio', 'library', 'cover-pdf-exact', 'cockpit-audit-pilot', 'kdp-pack-zip', 'multi-format-express', 'prepub-checklist', 'kindle-previewer', 'isbn-metadata', 'categories-manager-10', 'print-proof-checker', 'back-matter-builder', 'cover-variants-thumbnail', 'translation-markets'].includes(m.id);
                       const statusColor = m.status === 'done' ? '#10B981' : m.status === 'in_progress' ? '#FF9E2D' : '#94A3B8';
                       const statusBg = m.status === 'done' ? '#10B98114' : m.status === 'in_progress' ? '#FF9E2D14' : '#F1F5F9';
                       const statusLabel = m.status === 'done' ? '✓ Fait' : m.status === 'in_progress' ? '… En cours' : 'À faire';
@@ -431,7 +443,7 @@ const AdminCockpitPage: React.FC = () => {
 
         {/* Détail module V3 (mode V3 admin) */}
         <Dialog open={!!selectedModule} onOpenChange={(o) => !o && setSelectedModule(null)}>
-          <DialogContent className={['p16-competitive', 'p17-series', 'p18-readability', 'p19-author-voice', 'p20-chat-manuscript', 'p21-blurb-ab-tester', 'p22-trend-radar'].includes(selectedModule?.id ?? '') ? 'max-w-2xl max-h-[85vh] overflow-y-auto' : ['niche-intelligence', 'listing-optimizer', 'book-creation-studio', 'library'].includes(selectedModule?.id ?? '') ? 'max-w-6xl max-h-[88vh] overflow-y-auto' : undefined}>
+          <DialogContent className={['p16-competitive', 'p17-series', 'p18-readability', 'p19-author-voice', 'p20-chat-manuscript', 'p21-blurb-ab-tester', 'p22-trend-radar'].includes(selectedModule?.id ?? '') ? 'max-w-2xl max-h-[85vh] overflow-y-auto' : ['niche-intelligence', 'listing-optimizer', 'book-creation-studio', 'library', 'cover-pdf-exact', 'cockpit-audit-pilot', 'kdp-pack-zip', 'multi-format-express', 'prepub-checklist', 'kindle-previewer', 'isbn-metadata', 'categories-manager-10', 'print-proof-checker', 'back-matter-builder', 'cover-variants-thumbnail', 'translation-markets'].includes(selectedModule?.id ?? '') ? 'max-w-6xl max-h-[88vh] overflow-y-auto' : undefined}>
             {selectedModule && (
               <>
                 <DialogHeader>
@@ -497,6 +509,30 @@ const AdminCockpitPage: React.FC = () => {
                     <BookCreationStudio />
                   ) : selectedModule.id === 'library' ? (
                     <LibraryModule />
+                  ) : selectedModule.id === 'cover-pdf-exact' ? (
+                    <CoverPdfExact />
+                  ) : selectedModule.id === 'cockpit-audit-pilot' ? (
+                    <AuditPilotModule />
+                  ) : selectedModule.id === 'kdp-pack-zip' ? (
+                    <KdpPackExport />
+                  ) : selectedModule.id === 'multi-format-express' ? (
+                    <MultiFormatExport />
+                  ) : selectedModule.id === 'prepub-checklist' ? (
+                    <PrepubChecklist />
+                  ) : selectedModule.id === 'kindle-previewer' ? (
+                    <KindlePreviewer />
+                  ) : selectedModule.id === 'isbn-metadata' ? (
+                    <IsbnMetadataManager />
+                  ) : selectedModule.id === 'categories-manager-10' ? (
+                    <CategoriesManager10 />
+                  ) : selectedModule.id === 'print-proof-checker' ? (
+                    <PrintProofChecker />
+                  ) : selectedModule.id === 'back-matter-builder' ? (
+                    <BackMatterBuilder />
+                  ) : selectedModule.id === 'cover-variants-thumbnail' ? (
+                    <CoverVariantsThumbnail />
+                  ) : selectedModule.id === 'translation-markets' ? (
+                    <TranslationMarkets />
                   ) : (
                     <p className="text-[11px] text-joy-ink/40">
                       Module en préparation pour la V3 ({V3_PRICE}€ à vie). Visible uniquement par l'admin.
