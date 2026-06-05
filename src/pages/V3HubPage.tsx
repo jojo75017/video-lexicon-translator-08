@@ -63,7 +63,7 @@ function ModuleCard({
       <div className="relative">
         <div className="flex items-center justify-between mb-2">
           <span className="text-lg">{V3_PILLAR_META[module.pillar].emoji}</span>
-          <span className="text-[9px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5"
+          <span data-tour={isFirst ? 'status' : undefined} className="text-[9px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5"
             style={{ background: `${statusColor}1f`, color: statusColor }}>
             {statusLabel}
           </span>
