@@ -570,6 +570,26 @@ const AdminCockpitPage: React.FC = () => {
                     <BackCatalogFunnel />
                   ) : selectedModule.id === 'kdp-select-planner' ? (
                     <KdpSelectPlanner />
+                  ) : selectedModule.id === 'launch-sequence-j7' ? (
+                    <LaunchSequenceJ7 />
+                  ) : selectedModule.id === 'amazon-ads' ? (
+                    <AmazonAdsGenerator />
+                  ) : selectedModule.id === 'pinterest-pins' ? (
+                    <PinterestAutoPins />
+                  ) : selectedModule.id === 'book-trailer' ? (
+                    <BookTrailerAI />
+                  ) : selectedModule.id === 'reviews-booster' ? (
+                    <ReviewsBooster />
+                  ) : selectedModule.id === 'tiktok-hooks' ? (
+                    <TiktokHooks />
+                  ) : selectedModule.id === 'author-newsletter' ? (
+                    <AuthorNewsletter />
+                  ) : selectedModule.id === 'author-page-optimizer' ? (
+                    <AuthorPageOptimizer />
+                  ) : selectedModule.id === 'bookbub-ad-builder' ? (
+                    <BookBubAdBuilder />
+                  ) : selectedModule.id === 'arc-team-builder' ? (
+                    <ArcTeamBuilder />
                   ) : (
                     <p className="text-[11px] text-joy-ink/40">
                       Module en préparation pour la V3 ({V3_PRICE}€ à vie). Visible uniquement par l'admin.
