@@ -1,8 +1,26 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { BookOpen, Headphones, Pencil, Rocket, Download, Trash2, Loader2 } from 'lucide-react';
+
+const slugify = (s: string) =>
+  (s || 'livre')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9]+/g, '-').replace(/(^-|-$)/g, '').toLowerCase() || 'livre';
+
+const downloadText = (filename: string, content: string) => {
+  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+};
 
 const TEAL = '#008296';
 const INK = '#232F3E';
@@ -25,11 +43,40 @@ interface AudioRow {
 }
 
 export default function LibraryModule() {
+  const navigate = useNavigate();
   const [tab, setTab] = useState<'numeriques' | 'audio'>('numeriques');
   const [loading, setLoading] = useState(true);
   const [ebooks, setEbooks] = useState<EbookRow[]>([]);
   const [audios, setAudios] = useState<AudioRow[]>([]);
   const [deleting, setDeleting] = useState<string | null>(null);
+
+  const openEditor = () => navigate('/ebook-planner');
+  const goPublish = () => navigate('/couverture-kdp');
+
+  const exportEbook = (b: EbookRow) => {
+    const content = [
+      `Titre : ${b.title}`,
+      b.target_audience ? `Public cible : ${b.target_audience}` : null,
+      b.project_type ? `Type : ${b.project_type}` : null,
+      '',
+      b.book_summary || '(Aucun résumé enregistré pour ce projet.)',
+    ].filter(Boolean).join('\n');
+    downloadText(`${slugify(b.title)}.txt`, content);
+    toast.success('Fiche exportée ✓');
+  };
+
+  const exportAudio = (a: AudioRow) => {
+    const content = [
+      `Titre : ${a.title}`,
+      a.author_name ? `Auteur : ${a.author_name}` : null,
+      a.status ? `Statut : ${a.status}` : null,
+      a.duration_seconds ? `Durée : ${Math.round(a.duration_seconds / 60)} min` : null,
+      '',
+      a.description || '(Aucune description enregistrée.)',
+    ].filter(Boolean).join('\n');
+    downloadText(`${slugify(a.title)}-audio.txt`, content);
+    toast.success('Fiche exportée ✓');
+  };
 
   const load = async () => {
     setLoading(true);
@@ -143,6 +190,9 @@ export default function LibraryModule() {
                 subtitle={b.target_audience}
                 summary={b.book_summary}
                 deleting={deleting === b.id}
+                onEdit={openEditor}
+                onPublish={goPublish}
+                onExport={() => exportEbook(b)}
                 onDelete={() => deleteEbook(b.id)}
               />
             ))}
@@ -160,6 +210,9 @@ export default function LibraryModule() {
               summary={a.description}
               status={a.status}
               deleting={deleting === a.id}
+              onEdit={openEditor}
+              onPublish={goPublish}
+              onExport={() => exportAudio(a)}
               onDelete={() => deleteAudio(a.id)}
             />
           ))}
@@ -183,6 +236,9 @@ function BookCard({
   summary,
   status,
   deleting,
+  onEdit,
+  onPublish,
+  onExport,
   onDelete,
 }: {
   title: string;
@@ -190,6 +246,9 @@ function BookCard({
   summary?: string | null;
   status?: string | null;
   deleting?: boolean;
+  onEdit: () => void;
+  onPublish: () => void;
+  onExport: () => void;
   onDelete: () => void;
 }) {
   return (
@@ -226,13 +285,13 @@ function BookCard({
       </div>
 
       <div className="flex flex-col gap-2 shrink-0">
-        <Button variant="outline" size="sm" className="justify-start" onClick={() => toast('Ouverture de l\'éditeur…')}>
+        <Button variant="outline" size="sm" className="justify-start" onClick={onEdit}>
           <Pencil className="h-3.5 w-3.5 mr-1.5" /> Modifier
         </Button>
-        <Button size="sm" className="justify-start" style={{ background: '#FF9E2D', color: INK }} onClick={() => toast('Publication…')}>
+        <Button size="sm" className="justify-start" style={{ background: '#FF9E2D', color: INK }} onClick={onPublish}>
           <Rocket className="h-3.5 w-3.5 mr-1.5" /> Publier
         </Button>
-        <Button variant="outline" size="sm" className="justify-start" onClick={() => toast('Export en cours…')}>
+        <Button variant="outline" size="sm" className="justify-start" onClick={onExport}>
           <Download className="h-3.5 w-3.5 mr-1.5" /> Exporter
         </Button>
         <Button
