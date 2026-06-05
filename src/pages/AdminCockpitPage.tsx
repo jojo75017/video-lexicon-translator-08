@@ -43,6 +43,16 @@ import BundlesBoxsets from '@/components/admin/BundlesBoxsets';
 import LeadMagnetBuilder from '@/components/admin/LeadMagnetBuilder';
 import BackCatalogFunnel from '@/components/admin/BackCatalogFunnel';
 import KdpSelectPlanner from '@/components/admin/KdpSelectPlanner';
+import LaunchSequenceJ7 from '@/components/admin/LaunchSequenceJ7';
+import AmazonAdsGenerator from '@/components/admin/AmazonAdsGenerator';
+import PinterestAutoPins from '@/components/admin/PinterestAutoPins';
+import BookTrailerAI from '@/components/admin/BookTrailerAI';
+import ReviewsBooster from '@/components/admin/ReviewsBooster';
+import TiktokHooks from '@/components/admin/TiktokHooks';
+import AuthorNewsletter from '@/components/admin/AuthorNewsletter';
+import AuthorPageOptimizer from '@/components/admin/AuthorPageOptimizer';
+import BookBubAdBuilder from '@/components/admin/BookBubAdBuilder';
+import ArcTeamBuilder from '@/components/admin/ArcTeamBuilder';
 import { toast } from 'sonner';
 import {
   addMonths, endOfMonth, endOfWeek, format, isSameDay, isSameMonth,
