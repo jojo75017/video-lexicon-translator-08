@@ -56,6 +56,7 @@ import ArcTeamBuilder from '@/components/admin/ArcTeamBuilder';
 import ManuscriptConverter from '@/components/admin/ManuscriptConverter';
 import ContentComplianceChecker from '@/components/admin/ContentComplianceChecker';
 import CopyrightPageGenerator from '@/components/admin/CopyrightPageGenerator';
+import EbookAntiPlagiat from '@/components/admin/EbookAntiPlagiat';
 import RoyaltiesSimulator from '@/components/admin/RoyaltiesSimulator';
 import KuNicheDetector from '@/components/admin/KuNicheDetector';
 import LaunchPricingStrategy from '@/components/admin/LaunchPricingStrategy';
@@ -632,6 +633,8 @@ const AdminCockpitPage: React.FC = () => {
                     <ToneAdapter />
                   ) : selectedModule.id === 'p26-commercial-score' ? (
                     <CommercialScore />
+                  ) : selectedModule.id === 'ebook-anti-plagiat' ? (
+                    <EbookAntiPlagiat />
                   ) : (
                     <p className="text-[11px] text-joy-ink/40">
                       Module en préparation pour la V3 ({V3_PRICE}€ à vie). Visible uniquement par l'admin.
