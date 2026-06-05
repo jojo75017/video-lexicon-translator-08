@@ -34,6 +34,8 @@ interface TrelloBoardViewProps {
   onUpdateSubtitle?: (value: string) => void;
   onUpdateAuthor?: (value: string) => void;
   onUpdateDescription?: (value: string) => void;
+  onGenerateDescription?: () => void;
+  isGeneratingDescription?: boolean;
   onUpdateGenre?: (value: string) => void;
   onUpdateTargetAudience?: (value: string) => void;
   onUpdateNumberOfChapters?: (value: number) => void;
@@ -60,6 +62,8 @@ export const TrelloBoardView: React.FC<TrelloBoardViewProps> = ({
   onUpdateSubtitle,
   onUpdateAuthor,
   onUpdateDescription,
+  onGenerateDescription,
+  isGeneratingDescription = false,
   onUpdateGenre,
   onUpdateTargetAudience,
   onUpdateNumberOfChapters,
@@ -208,6 +212,8 @@ export const TrelloBoardView: React.FC<TrelloBoardViewProps> = ({
                   onUpdateSubtitle={onUpdateSubtitle}
                   onUpdateAuthor={onUpdateAuthor}
                   onUpdateDescription={onUpdateDescription}
+                  onGenerateDescription={onGenerateDescription}
+                  isGeneratingDescription={isGeneratingDescription}
                   onUpdateGenre={onUpdateGenre}
                   onUpdateTargetAudience={onUpdateTargetAudience}
                   onUpdateNumberOfChapters={onUpdateNumberOfChapters}

@@ -357,6 +357,22 @@ Cette synopsis sera utilisée pour garantir que la préface, tous les chapitres,
     return content;
   };
 
+  // Génère la description / sujet du livre (champ "Petite introduction / sujet")
+  const generateBookDescription = async (title: string, audience?: string, bookGenre?: string) => {
+    const audienceLine = audience ? `\nPublic cible : ${audience}.` : '';
+    const genreLine = bookGenre || genre ? `\nGenre : ${bookGenre || genre}.` : '';
+    const prompt = `Tu es un éditeur expert. Rédige une présentation courte et inspirante (le "sujet" du livre) pour l'ouvrage intitulé "${title}".${audienceLine}${genreLine}
+
+Contraintes :
+- 4 à 6 phrases (environ 80 à 120 mots).
+- Décris clairement le SUJET, l'ANGLE original et l'INTENTION du livre.
+- Adapté au public cible et au genre indiqués.
+- Ton engageant, sans titres ni puces, en un seul paragraphe fluide.
+- Réponds UNIQUEMENT avec le texte de la présentation, sans préambule.`;
+
+    return await callGenerateContent('chapters_generated', prompt);
+  };
+
   const generateEbookCover = async (ebookTitle: string) => {
     const prompt = `Génère 3 concepts créatifs de couverture pour l'ebook "${ebookTitle}". Pour chaque concept, décris :
 - Le style visuel
@@ -893,6 +909,7 @@ IMPORTANT :
     generateEbookPlan,
     generateBookSummary,
     generateBookSynopsis,
+    generateBookDescription,
     generateEbookCover,
     optimizeForSEO,
     generateKDPDescription,

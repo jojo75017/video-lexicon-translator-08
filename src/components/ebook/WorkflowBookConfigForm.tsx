@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { BookOpen, FileText, Plus } from 'lucide-react';
+import { BookOpen, FileText, Plus, Sparkles, Loader2 } from 'lucide-react';
 
 export interface WorkflowBookConfigFormProps {
   ebookTitle: string;
@@ -20,6 +20,8 @@ export interface WorkflowBookConfigFormProps {
   onUpdateSubtitle?: (value: string) => void;
   onUpdateAuthor?: (value: string) => void;
   onUpdateDescription?: (value: string) => void;
+  onGenerateDescription?: () => void;
+  isGeneratingDescription?: boolean;
   onUpdateGenre?: (value: string) => void;
   onUpdateTargetAudience?: (value: string) => void;
   onUpdateNumberOfChapters?: (value: number) => void;
@@ -43,6 +45,8 @@ const InnerForm: React.FC<WorkflowBookConfigFormProps> = ({
   onUpdateSubtitle,
   onUpdateAuthor,
   onUpdateDescription,
+  onGenerateDescription,
+  isGeneratingDescription = false,
   onUpdateGenre,
   onUpdateTargetAudience,
   onUpdateNumberOfChapters,
@@ -83,7 +87,26 @@ const InnerForm: React.FC<WorkflowBookConfigFormProps> = ({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="workflow-book-description">Petite introduction / sujet</Label>
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <Label htmlFor="workflow-book-description">Petite introduction / sujet</Label>
+          {onGenerateDescription && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => onGenerateDescription()}
+              disabled={isGeneratingDescription || !ebookTitle.trim()}
+              className="border-[#008296] text-[#008296] hover:bg-[#008296] hover:text-white"
+            >
+              {isGeneratingDescription ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Sparkles className="h-4 w-4 mr-2" />
+              )}
+              Générer avec l'IA
+            </Button>
+          )}
+        </div>
         <Textarea
           id="workflow-book-description"
           value={bookDescription}

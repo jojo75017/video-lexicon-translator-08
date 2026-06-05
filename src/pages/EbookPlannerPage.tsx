@@ -270,7 +270,24 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   const [genre, setGenre] = useState(categoryFromUrl || savedData?.genre || '');
   const [characters, setCharacters] = useState<EbookCharacter[]>(savedData?.characters || []);
   
-  const { isGenerating, generateChapterContent, generateSubChapterContent, generateEbookPlan, generateBookSummary, generateBookSynopsis, generateEbookCover, optimizeForSEO, generateKDPDescription, generateKDPKeywords, generateKDPCategories, generateBackCover, generatePreface, generateConclusion, generateEpilogue, translateContent, analyzeTextStatistics } = useSubscriptionGeneration(subscriberEmail, apiKey, ebookTitle, targetAudience, tomeNumber, writingStyle, chapterLength, detailLevel, tone, narrativeFormat, bookDescription, genre, characters, isDemo);
+  const { isGenerating, generateChapterContent, generateSubChapterContent, generateEbookPlan, generateBookSummary, generateBookSynopsis, generateBookDescription, generateEbookCover, optimizeForSEO, generateKDPDescription, generateKDPKeywords, generateKDPCategories, generateBackCover, generatePreface, generateConclusion, generateEpilogue, translateContent, analyzeTextStatistics } = useSubscriptionGeneration(subscriberEmail, apiKey, ebookTitle, targetAudience, tomeNumber, writingStyle, chapterLength, detailLevel, tone, narrativeFormat, bookDescription, genre, characters, isDemo);
+  const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
+  const handleGenerateDescription = async () => {
+    if (!ebookTitle.trim()) {
+      toast.error('Renseignez d\'abord un titre.');
+      return;
+    }
+    setIsGeneratingDescription(true);
+    try {
+      const text = await generateBookDescription(ebookTitle, targetAudience, genre);
+      if (text) {
+        setBookDescription(text.trim());
+        toast.success('Sujet généré par l\'IA ✓');
+      }
+    } finally {
+      setIsGeneratingDescription(false);
+    }
+  };
   
   const [authorName, setAuthorName] = useState(savedData?.authorName || '');
   const [preface, setPreface] = useState(savedData?.preface || '');
@@ -338,6 +355,16 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
       localStorage.setItem('ebook_planner_active_tab', activeTab);
     } catch {}
   }, [activeTab]);
+
+  // Quand on arrive depuis "Idées & Niches" avec un titre choisi,
+  // on amène directement l'utilisateur à l'étape suivante (le plan / config)
+  // au lieu de le laisser sur le tableau de bord.
+  useEffect(() => {
+    if (location.state?.suggestedTitle) {
+      setActiveTab('planner');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (requestedTabFromUrl && requestedTabFromUrl !== activeTab && requestedTabFromUrl !== 'onboarding' && requestedTabFromUrl !== 'subscription') {
@@ -1529,6 +1556,8 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                 onUpdateSubtitle={setBookSubtitle}
                 onUpdateAuthor={setAuthorName}
                 onUpdateDescription={setBookDescription}
+                onGenerateDescription={handleGenerateDescription}
+                isGeneratingDescription={isGeneratingDescription}
                 onUpdateGenre={setGenre}
                 onUpdateTargetAudience={setTargetAudience}
                 onUpdateNumberOfChapters={setNumberOfChapters}

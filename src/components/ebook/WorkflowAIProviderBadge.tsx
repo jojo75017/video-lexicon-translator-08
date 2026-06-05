@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Settings2, AlertTriangle, CheckCircle2, Loader2, XCircle, Zap } from 'lucide-react';
+import { Settings2, AlertTriangle, CheckCircle2, Loader2, XCircle, Zap, ChevronDown, ChevronUp } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { EbookSettingsPanel } from './EbookSettingsPanel';
@@ -24,6 +24,16 @@ export const WorkflowAIProviderBadge = () => {
   const [open, setOpen] = useState(false);
   const [tick, setTick] = useState(0);
   const [testState, setTestState] = useState<TestState>('idle');
+  const COLLAPSE_KEY = 'workflow-ai-badge-collapsed';
+  const [collapsed, setCollapsed] = useState(() => localStorage.getItem(COLLAPSE_KEY) === '1');
+  const toggleCollapsed = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCollapsed((c) => {
+      const next = !c;
+      localStorage.setItem(COLLAPSE_KEY, next ? '1' : '0');
+      return next;
+    });
+  };
 
   // Re-évalue après fermeture du dialog (clé peut avoir changé)
   useEffect(() => {
@@ -84,6 +94,49 @@ export const WorkflowAIProviderBadge = () => {
       setTimeout(() => setTestState('idle'), 4000);
     }
   };
+
+  if (collapsed) {
+    return (
+      <>
+        <div className="px-4 md:px-6 lg:px-10 pt-3">
+          <div className="w-full mx-auto max-w-[1600px] flex items-center justify-between gap-2 rounded-full border px-4 py-1.5 bg-card/80 backdrop-blur-sm">
+            <button
+              type="button"
+              onClick={() => setOpen(true)}
+              className="flex items-center gap-2 min-w-0 text-sm"
+            >
+              {valid ? (
+                <CheckCircle2 className="h-4 w-4 text-[#008296] shrink-0" />
+              ) : (
+                <AlertTriangle className="h-4 w-4 text-orange-500 shrink-0 animate-pulse" />
+              )}
+              <span className="truncate font-medium text-foreground">
+                {valid ? `IA : ${PROVIDER_LABELS[provider]}${modelLabel ? ` — ${modelLabel}` : ''}` : 'Aucune IA configurée'}
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={toggleCollapsed}
+              className="shrink-0 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+              title="Déplier le bandeau IA"
+            >
+              <ChevronDown className="h-4 w-4" />
+              Déplier
+            </button>
+          </div>
+        </div>
+
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Choisir mon IA · Clés API & réglages</DialogTitle>
+            </DialogHeader>
+            <EbookSettingsPanel />
+          </DialogContent>
+        </Dialog>
+      </>
+    );
+  }
 
   return (
     <>
@@ -176,6 +229,22 @@ export const WorkflowAIProviderBadge = () => {
             >
               <Settings2 className="h-3.5 w-3.5" />
               {valid ? 'Changer' : 'Configurer'}
+            </span>
+            <span
+              role="button"
+              tabIndex={0}
+              onClick={toggleCollapsed}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') toggleCollapsed(e as any); }}
+              title="Réduire le bandeau IA"
+              className={[
+                'inline-flex items-center gap-1 px-3 py-2 rounded-lg text-xs font-semibold border transition-colors cursor-pointer',
+                valid
+                  ? 'bg-white/10 border-white/30 text-white hover:bg-white/20'
+                  : 'bg-white/60 border-orange-300 text-orange-800 hover:bg-white',
+              ].join(' ')}
+            >
+              <ChevronUp className="h-3.5 w-3.5" />
+              Réduire
             </span>
           </div>
         </button>
