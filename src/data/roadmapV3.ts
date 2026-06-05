@@ -155,38 +155,38 @@ export const V3_MODULES: V3Module[] = [
   // ===== AJOUTS V3 — enrichissement octobre (nouveaux modules) — à construire =====
 
   // PUBLIER
-  { id: 'manuscript-converter',  pillar: 'publier',   status: 'todo', title: 'Convertisseur Manuscrit Universel',
+  { id: 'manuscript-converter',  pillar: 'publier',   status: 'done', title: 'Convertisseur Manuscrit Universel',
     description: 'Importe .docx/.pdf/Google Docs et nettoie automatiquement (styles, sauts de page, notes) vers un format KDP propre.' },
-  { id: 'content-compliance',    pillar: 'publier',   status: 'todo', title: 'Vérificateur de Conformité Contenu',
+  { id: 'content-compliance',    pillar: 'publier',   status: 'done', title: 'Vérificateur de Conformité Contenu',
     description: 'Détecte le contenu interdit KDP (liens, mentions concurrents, langage promo) avant soumission pour éviter le blocage.' },
-  { id: 'copyright-page',        pillar: 'publier',   status: 'todo', title: 'Générateur Page Copyright / Mentions légales',
+  { id: 'copyright-page',        pillar: 'publier',   status: 'done', title: 'Générateur Page Copyright / Mentions légales',
     description: 'Page légale + dédicace + table des matières cliquable, multi-langue, prête à insérer.' },
 
   // MONÉTISER
-  { id: 'royalties-simulator',   pillar: 'monetiser', status: 'todo', title: 'Simulateur de Royalties Multi-Prix',
+  { id: 'royalties-simulator',   pillar: 'monetiser', status: 'done', title: 'Simulateur de Royalties Multi-Prix',
     description: 'Compare les gains nets 35% vs 70% selon prix et marché, avec point d’équilibre.' },
-  { id: 'ku-niche-detector',     pillar: 'monetiser', status: 'todo', title: 'Détecteur de Niches Rentables (KU)',
+  { id: 'ku-niche-detector',     pillar: 'monetiser', status: 'done', title: 'Détecteur de Niches Rentables (KU)',
     description: 'Croise demande et concurrence pour estimer le potentiel de pages lues Kindle Unlimited.' },
-  { id: 'launch-pricing',        pillar: 'monetiser', status: 'todo', title: 'Stratégie de Prix de Lancement Dynamique',
+  { id: 'launch-pricing',        pillar: 'monetiser', status: 'done', title: 'Stratégie de Prix de Lancement Dynamique',
     description: 'Calendrier de prix montant (0,99€ → prix cible) sur les premiers jours de lancement.' },
 
   // MARKETING
-  { id: 'social-calendar-30',    pillar: 'marketing', status: 'todo', title: 'Calendrier Éditorial Réseaux 30 jours',
+  { id: 'social-calendar-30',    pillar: 'marketing', status: 'done', title: 'Calendrier Éditorial Réseaux 30 jours',
     description: 'Planning de posts multi-plateformes généré automatiquement depuis le livre.' },
-  { id: 'quote-visuals',         pillar: 'marketing', status: 'todo', title: 'Générateur de Visuels Citations',
+  { id: 'quote-visuals',         pillar: 'marketing', status: 'done', title: 'Générateur de Visuels Citations',
     description: 'Extrait des phrases fortes du manuscrit et les transforme en visuels partageables.' },
-  { id: 'media-kit',             pillar: 'marketing', status: 'todo', title: 'Kit Presse / Media Kit Auteur',
+  { id: 'media-kit',             pillar: 'marketing', status: 'done', title: 'Kit Presse / Media Kit Auteur',
     description: 'Dossier de presse (bio, pitch, couverture HD, FAQ) prêt à envoyer aux médias.' },
-  { id: 'goodreads-optimizer',   pillar: 'marketing', status: 'todo', title: 'Optimiseur Goodreads',
+  { id: 'goodreads-optimizer',   pillar: 'marketing', status: 'done', title: 'Optimiseur Goodreads',
     description: 'Fiche, description et plan d’animation lecteurs optimisés pour Goodreads.' },
 
   // IA AVANCÉE
-  { id: 'p23-universe-bible',    pillar: 'ia',        status: 'todo', title: 'BIBLE — Cohérence Univers (P23)',
+  { id: 'p23-universe-bible',    pillar: 'ia',        status: 'done', title: 'BIBLE — Cohérence Univers (P23)',
     description: 'Vérifie la continuité des noms, lieux et timeline sur toute une série.' },
-  { id: 'p24-cliche-detector',  pillar: 'ia',        status: 'todo', title: 'NETTOYAGE — Clichés & Répétitions (P24)',
+  { id: 'p24-cliche-detector',  pillar: 'ia',        status: 'done', title: 'NETTOYAGE — Clichés & Répétitions (P24)',
     description: 'Repère les tics d’écriture, répétitions et formules toutes faites.' },
-  { id: 'p25-tone-adapter',     pillar: 'ia',        status: 'todo', title: 'CAMÉLÉON — Adaptation de Ton (P25)',
+  { id: 'p25-tone-adapter',     pillar: 'ia',        status: 'done', title: 'CAMÉLÉON — Adaptation de Ton (P25)',
     description: 'Réécrit un passage selon la cible (ados, professionnels, grand public).' },
-  { id: 'p26-commercial-score', pillar: 'ia',        status: 'todo', title: 'PRONOSTIC — Score Potentiel Commercial (P26)',
+  { id: 'p26-commercial-score', pillar: 'ia',        status: 'done', title: 'PRONOSTIC — Score Potentiel Commercial (P26)',
     description: 'Note hook, titre, couverture et niche pour estimer le potentiel commercial.' },
 ];

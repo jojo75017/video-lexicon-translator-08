@@ -53,6 +53,20 @@ import AuthorNewsletter from '@/components/admin/AuthorNewsletter';
 import AuthorPageOptimizer from '@/components/admin/AuthorPageOptimizer';
 import BookBubAdBuilder from '@/components/admin/BookBubAdBuilder';
 import ArcTeamBuilder from '@/components/admin/ArcTeamBuilder';
+import ManuscriptConverter from '@/components/admin/ManuscriptConverter';
+import ContentComplianceChecker from '@/components/admin/ContentComplianceChecker';
+import CopyrightPageGenerator from '@/components/admin/CopyrightPageGenerator';
+import RoyaltiesSimulator from '@/components/admin/RoyaltiesSimulator';
+import KuNicheDetector from '@/components/admin/KuNicheDetector';
+import LaunchPricingStrategy from '@/components/admin/LaunchPricingStrategy';
+import SocialCalendar30 from '@/components/admin/SocialCalendar30';
+import QuoteVisualsGenerator from '@/components/admin/QuoteVisualsGenerator';
+import MediaKitAuthor from '@/components/admin/MediaKitAuthor';
+import GoodreadsOptimizer from '@/components/admin/GoodreadsOptimizer';
+import UniverseBibleCheck from '@/components/admin/UniverseBibleCheck';
+import ClicheDetector from '@/components/admin/ClicheDetector';
+import ToneAdapter from '@/components/admin/ToneAdapter';
+import CommercialScore from '@/components/admin/CommercialScore';
 import { toast } from 'sonner';
 import {
   addMonths, endOfMonth, endOfWeek, format, isSameDay, isSameMonth,
@@ -428,7 +442,7 @@ const AdminCockpitPage: React.FC = () => {
                   </div>
                   <ul className="space-y-1.5">
                     {items.map((m) => {
-                      const clickable = (isAdmin && v3Mode) || ['p16-competitive', 'p17-series', 'p18-readability', 'p19-author-voice', 'p20-chat-manuscript', 'p21-blurb-ab-tester', 'p22-trend-radar', 'niche-intelligence', 'listing-optimizer', 'book-creation-studio', 'library', 'cover-pdf-exact', 'cockpit-audit-pilot', 'kdp-pack-zip', 'multi-format-express', 'prepub-checklist', 'kindle-previewer', 'isbn-metadata', 'categories-manager-10', 'print-proof-checker', 'back-matter-builder', 'cover-variants-thumbnail', 'translation-markets', 'sales-tracker', 'royalties-dashboard', 'sales-description', 'aplus-generator', 'auto-pricing', 'bundles-boxsets', 'lead-magnet', 'back-catalog-funnel', 'kdp-select-planner', 'launch-sequence-j7', 'amazon-ads', 'pinterest-pins', 'book-trailer', 'reviews-booster', 'tiktok-hooks', 'author-newsletter', 'author-page-optimizer', 'bookbub-ad-builder', 'arc-team-builder'].includes(m.id);
+                      const clickable = (isAdmin && v3Mode) || ['p16-competitive', 'p17-series', 'p18-readability', 'p19-author-voice', 'p20-chat-manuscript', 'p21-blurb-ab-tester', 'p22-trend-radar', 'niche-intelligence', 'listing-optimizer', 'book-creation-studio', 'library', 'cover-pdf-exact', 'cockpit-audit-pilot', 'kdp-pack-zip', 'multi-format-express', 'prepub-checklist', 'kindle-previewer', 'isbn-metadata', 'categories-manager-10', 'print-proof-checker', 'back-matter-builder', 'cover-variants-thumbnail', 'translation-markets', 'sales-tracker', 'royalties-dashboard', 'sales-description', 'aplus-generator', 'auto-pricing', 'bundles-boxsets', 'lead-magnet', 'back-catalog-funnel', 'kdp-select-planner', 'launch-sequence-j7', 'amazon-ads', 'pinterest-pins', 'book-trailer', 'reviews-booster', 'tiktok-hooks', 'author-newsletter', 'author-page-optimizer', 'bookbub-ad-builder', 'arc-team-builder', 'manuscript-converter', 'content-compliance', 'copyright-page', 'royalties-simulator', 'ku-niche-detector', 'launch-pricing', 'social-calendar-30', 'quote-visuals', 'media-kit', 'goodreads-optimizer', 'p23-universe-bible', 'p24-cliche-detector', 'p25-tone-adapter', 'p26-commercial-score'].includes(m.id);
                       const statusColor = m.status === 'done' ? '#10B981' : m.status === 'in_progress' ? '#FF9E2D' : '#94A3B8';
                       const statusBg = m.status === 'done' ? '#10B98114' : m.status === 'in_progress' ? '#FF9E2D14' : '#F1F5F9';
                       const statusLabel = m.status === 'done' ? '✓ Fait' : m.status === 'in_progress' ? '… En cours' : 'À faire';
@@ -462,7 +476,7 @@ const AdminCockpitPage: React.FC = () => {
 
         {/* Détail module V3 (mode V3 admin) */}
         <Dialog open={!!selectedModule} onOpenChange={(o) => !o && setSelectedModule(null)}>
-          <DialogContent className={['p16-competitive', 'p17-series', 'p18-readability', 'p19-author-voice', 'p20-chat-manuscript', 'p21-blurb-ab-tester', 'p22-trend-radar'].includes(selectedModule?.id ?? '') ? 'max-w-2xl max-h-[85vh] overflow-y-auto' : ['niche-intelligence', 'listing-optimizer', 'book-creation-studio', 'library', 'cover-pdf-exact', 'cockpit-audit-pilot', 'kdp-pack-zip', 'multi-format-express', 'prepub-checklist', 'kindle-previewer', 'isbn-metadata', 'categories-manager-10', 'print-proof-checker', 'back-matter-builder', 'cover-variants-thumbnail', 'translation-markets', 'sales-tracker', 'royalties-dashboard', 'sales-description', 'aplus-generator', 'auto-pricing', 'bundles-boxsets', 'lead-magnet', 'back-catalog-funnel', 'kdp-select-planner', 'launch-sequence-j7', 'amazon-ads', 'pinterest-pins', 'book-trailer', 'reviews-booster', 'tiktok-hooks', 'author-newsletter', 'author-page-optimizer', 'bookbub-ad-builder', 'arc-team-builder'].includes(selectedModule?.id ?? '') ? 'max-w-6xl max-h-[88vh] overflow-y-auto' : undefined}>
+          <DialogContent className={['p16-competitive', 'p17-series', 'p18-readability', 'p19-author-voice', 'p20-chat-manuscript', 'p21-blurb-ab-tester', 'p22-trend-radar'].includes(selectedModule?.id ?? '') ? 'max-w-2xl max-h-[85vh] overflow-y-auto' : ['niche-intelligence', 'listing-optimizer', 'book-creation-studio', 'library', 'cover-pdf-exact', 'cockpit-audit-pilot', 'kdp-pack-zip', 'multi-format-express', 'prepub-checklist', 'kindle-previewer', 'isbn-metadata', 'categories-manager-10', 'print-proof-checker', 'back-matter-builder', 'cover-variants-thumbnail', 'translation-markets', 'sales-tracker', 'royalties-dashboard', 'sales-description', 'aplus-generator', 'auto-pricing', 'bundles-boxsets', 'lead-magnet', 'back-catalog-funnel', 'kdp-select-planner', 'launch-sequence-j7', 'amazon-ads', 'pinterest-pins', 'book-trailer', 'reviews-booster', 'tiktok-hooks', 'author-newsletter', 'author-page-optimizer', 'bookbub-ad-builder', 'arc-team-builder', 'manuscript-converter', 'content-compliance', 'copyright-page', 'royalties-simulator', 'ku-niche-detector', 'launch-pricing', 'social-calendar-30', 'quote-visuals', 'media-kit', 'goodreads-optimizer', 'p23-universe-bible', 'p24-cliche-detector', 'p25-tone-adapter', 'p26-commercial-score'].includes(selectedModule?.id ?? '') ? 'max-w-6xl max-h-[88vh] overflow-y-auto' : undefined}>
             {selectedModule && (
               <>
                 <DialogHeader>
@@ -590,6 +604,34 @@ const AdminCockpitPage: React.FC = () => {
                     <BookBubAdBuilder />
                   ) : selectedModule.id === 'arc-team-builder' ? (
                     <ArcTeamBuilder />
+                  ) : selectedModule.id === 'manuscript-converter' ? (
+                    <ManuscriptConverter />
+                  ) : selectedModule.id === 'content-compliance' ? (
+                    <ContentComplianceChecker />
+                  ) : selectedModule.id === 'copyright-page' ? (
+                    <CopyrightPageGenerator />
+                  ) : selectedModule.id === 'royalties-simulator' ? (
+                    <RoyaltiesSimulator />
+                  ) : selectedModule.id === 'ku-niche-detector' ? (
+                    <KuNicheDetector />
+                  ) : selectedModule.id === 'launch-pricing' ? (
+                    <LaunchPricingStrategy />
+                  ) : selectedModule.id === 'social-calendar-30' ? (
+                    <SocialCalendar30 />
+                  ) : selectedModule.id === 'quote-visuals' ? (
+                    <QuoteVisualsGenerator />
+                  ) : selectedModule.id === 'media-kit' ? (
+                    <MediaKitAuthor />
+                  ) : selectedModule.id === 'goodreads-optimizer' ? (
+                    <GoodreadsOptimizer />
+                  ) : selectedModule.id === 'p23-universe-bible' ? (
+                    <UniverseBibleCheck />
+                  ) : selectedModule.id === 'p24-cliche-detector' ? (
+                    <ClicheDetector />
+                  ) : selectedModule.id === 'p25-tone-adapter' ? (
+                    <ToneAdapter />
+                  ) : selectedModule.id === 'p26-commercial-score' ? (
+                    <CommercialScore />
                   ) : (
                     <p className="text-[11px] text-joy-ink/40">
                       Module en préparation pour la V3 ({V3_PRICE}€ à vie). Visible uniquement par l'admin.
