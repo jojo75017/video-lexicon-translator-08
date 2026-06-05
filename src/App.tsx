@@ -32,6 +32,7 @@ const ActivationBetaPage = lazy(() => import('./pages/ActivationBetaPage'));
 const ContactSupportPage = lazy(() => import('./pages/ContactSupportPage'));
 const AdminDirectPage = lazy(() => import('./pages/AdminDirectPage'));
 const AdminCockpitPage = lazy(() => import('./pages/AdminCockpitPage'));
+const V3HubPage = lazy(() => import('./pages/V3HubPage'));
 const AffiliationFormationPage = lazy(() => import('./pages/AffiliationFormationPage'));
 const ParrainagePage = lazy(() => import('./pages/ParrainagePage'));
 const FormationPage = lazy(() => import('./pages/FormationPage'));
