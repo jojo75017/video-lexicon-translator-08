@@ -32,6 +32,7 @@ const ActivationBetaPage = lazy(() => import('./pages/ActivationBetaPage'));
 const ContactSupportPage = lazy(() => import('./pages/ContactSupportPage'));
 const AdminDirectPage = lazy(() => import('./pages/AdminDirectPage'));
 const AdminCockpitPage = lazy(() => import('./pages/AdminCockpitPage'));
+const V3HubPage = lazy(() => import('./pages/V3HubPage'));
 const AffiliationFormationPage = lazy(() => import('./pages/AffiliationFormationPage'));
 const ParrainagePage = lazy(() => import('./pages/ParrainagePage'));
 const FormationPage = lazy(() => import('./pages/FormationPage'));
@@ -382,6 +383,7 @@ const App = () => {
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/admin-direct" element={<AdminDirectPage />} />
             <Route path="/admin-cockpit" element={<AdminGate><AdminCockpitPage /></AdminGate>} />
+            <Route path="/hub-v3" element={<AdminGate><V3HubPage /></AdminGate>} />
             <Route path="/ai-chat" element={<AiChatPage />} />
             <Route path="/niches" element={<NichesPage />} />
             <Route path="/niches-600" element={<Niches600Page />} />
