@@ -356,6 +356,16 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
     } catch {}
   }, [activeTab]);
 
+  // Quand on arrive depuis "Idées & Niches" avec un titre choisi,
+  // on amène directement l'utilisateur à l'étape suivante (le plan / config)
+  // au lieu de le laisser sur le tableau de bord.
+  useEffect(() => {
+    if (location.state?.suggestedTitle) {
+      setActiveTab('planner');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     if (requestedTabFromUrl && requestedTabFromUrl !== activeTab && requestedTabFromUrl !== 'onboarding' && requestedTabFromUrl !== 'subscription') {
       setActiveTab(requestedTabFromUrl);
