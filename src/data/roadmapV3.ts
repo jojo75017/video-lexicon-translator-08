@@ -57,11 +57,11 @@ export const V3_MODULES: V3Module[] = [
   // MARKETING
   { id: 'listing-optimizer',     pillar: 'marketing', status: 'done', title: "Optimiseur d'annonces KDP",
     description: 'Optimise titre, sous-titre, mots-clés KDP, catégories, description, contenu A+ et tarification du livre.' },
-  { id: 'launch-sequence-j7',  pillar: 'marketing', status: 'todo', title: 'Séquence Lancement J-7',
+  { id: 'launch-sequence-j7',  pillar: 'marketing', status: 'done', title: 'Séquence Lancement J-7',
     description: 'Emails + posts sociaux pré-programmés sur 7 jours avant publication.' },
-  { id: 'amazon-ads',          pillar: 'marketing', status: 'todo', title: 'Amazon Ads Generator',
+  { id: 'amazon-ads',          pillar: 'marketing', status: 'done', title: 'Amazon Ads Generator',
     description: 'Campagnes Sponsored Products / Brands avec mots-clés ciblés.' },
-  { id: 'pinterest-pins',      pillar: 'marketing', status: 'todo', title: 'Pinterest Auto-Pins',
+  { id: 'pinterest-pins',      pillar: 'marketing', status: 'done', title: 'Pinterest Auto-Pins',
     description: '20 pins générés automatiquement depuis la couverture du livre.' },
 
   // IA AVANCÉE
@@ -93,13 +93,13 @@ export const V3_MODULES: V3Module[] = [
     description: 'Crée un chapitre offert + tunnel de capture email pour bâtir une liste lecteurs.' },
 
   // MARKETING
-  { id: 'book-trailer',         pillar: 'marketing', status: 'todo', title: 'Book Trailer IA',
+  { id: 'book-trailer',         pillar: 'marketing', status: 'done', title: 'Book Trailer IA',
     description: 'Génère une vidéo promo courte (script + visuels + voix) depuis la couverture.' },
-  { id: 'reviews-booster',      pillar: 'marketing', status: 'todo', title: 'Reviews Booster',
+  { id: 'reviews-booster',      pillar: 'marketing', status: 'done', title: 'Reviews Booster',
     description: "Séquence d'emails post-achat pour obtenir des avis Amazon légitimes." },
-  { id: 'tiktok-hooks',         pillar: 'marketing', status: 'todo', title: 'TikTok / Reels Hooks',
+  { id: 'tiktok-hooks',         pillar: 'marketing', status: 'done', title: 'TikTok / Reels Hooks',
     description: '20 accroches vidéo + scripts BookTok adaptés à la niche.' },
-  { id: 'author-newsletter',    pillar: 'marketing', status: 'todo', title: 'Newsletter Auteur',
+  { id: 'author-newsletter',    pillar: 'marketing', status: 'done', title: 'Newsletter Auteur',
     description: "Templates et calendrier d'emails pour fidéliser les lecteurs." },
 
   // IA AVANCÉE
@@ -123,7 +123,7 @@ export const V3_MODULES: V3Module[] = [
     description: 'Rédige une description style page de vente : accroche, agitation, promesse, 5–7 bénéfices, CTA, avec mots de conversion (1500–2500 caractères).' },
 
   // MARKETING
-  { id: 'arc-team-builder',         pillar: 'marketing', status: 'todo', title: "Constructeur d'Équipe ARC",
+  { id: 'arc-team-builder',         pillar: 'marketing', status: 'done', title: "Constructeur d'Équipe ARC",
     description: 'Recrute 10–30 lecteurs ARC, gère l’envoi du manuscrit et suit les objectifs d’avis (10 à J14, 25 à J30, 50 à J60).' },
 
   // ===== AJOUTS — propositions pour enrichir la V3 — en attente =====
@@ -141,9 +141,9 @@ export const V3_MODULES: V3Module[] = [
     description: 'Liens croisés entre tomes et titres pour maximiser le read-through et les ventes en chaîne.' },
 
   // MARKETING
-  { id: 'author-page-optimizer', pillar: 'marketing', status: 'todo', title: 'Optimiseur Page Auteur Amazon',
+  { id: 'author-page-optimizer', pillar: 'marketing', status: 'done', title: 'Optimiseur Page Auteur Amazon',
     description: 'Optimise Author Central : bio, photo, mots-clés et mise en avant des titres pour convertir les visiteurs.' },
-  { id: 'bookbub-ad-builder',    pillar: 'marketing', status: 'todo', title: 'Générateur Annonces BookBub / Facebook',
+  { id: 'bookbub-ad-builder',    pillar: 'marketing', status: 'done', title: 'Générateur Annonces BookBub / Facebook',
     description: 'Crée visuels et accroches ciblés par niche pour les campagnes BookBub et Facebook Ads.' },
 
   // IA AVANCÉE
