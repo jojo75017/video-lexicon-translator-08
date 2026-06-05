@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Settings2, AlertTriangle, CheckCircle2, Loader2, XCircle, Zap } from 'lucide-react';
+import { Settings2, AlertTriangle, CheckCircle2, Loader2, XCircle, Zap, ChevronDown, ChevronUp } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { EbookSettingsPanel } from './EbookSettingsPanel';
