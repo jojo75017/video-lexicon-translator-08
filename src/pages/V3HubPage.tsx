@@ -83,6 +83,19 @@ const V3HubPage: React.FC = () => {
   const [query, setQuery] = useState('');
   const [pillar, setPillar] = useState<V3Pillar | 'all'>('all');
   const [selected, setSelected] = useState<V3Module | null>(null);
+  const [tourOpen, setTourOpen] = useState(false);
+
+  useEffect(() => {
+    if (!localStorage.getItem(TOUR_KEY)) {
+      const t = setTimeout(() => setTourOpen(true), 1000);
+      return () => clearTimeout(t);
+    }
+  }, []);
+
+  const finishTour = () => {
+    localStorage.setItem(TOUR_KEY, 'true');
+    setTourOpen(false);
+  };
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
