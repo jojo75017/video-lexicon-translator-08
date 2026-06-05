@@ -230,6 +230,22 @@ export const WorkflowAIProviderBadge = () => {
               <Settings2 className="h-3.5 w-3.5" />
               {valid ? 'Changer' : 'Configurer'}
             </span>
+            <span
+              role="button"
+              tabIndex={0}
+              onClick={toggleCollapsed}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') toggleCollapsed(e as any); }}
+              title="Réduire le bandeau IA"
+              className={[
+                'inline-flex items-center gap-1 px-3 py-2 rounded-lg text-xs font-semibold border transition-colors cursor-pointer',
+                valid
+                  ? 'bg-white/10 border-white/30 text-white hover:bg-white/20'
+                  : 'bg-white/60 border-orange-300 text-orange-800 hover:bg-white',
+              ].join(' ')}
+            >
+              <ChevronUp className="h-3.5 w-3.5" />
+              Réduire
+            </span>
           </div>
         </button>
       </div>
