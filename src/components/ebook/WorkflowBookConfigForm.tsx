@@ -45,6 +45,8 @@ const InnerForm: React.FC<WorkflowBookConfigFormProps> = ({
   onUpdateSubtitle,
   onUpdateAuthor,
   onUpdateDescription,
+  onGenerateDescription,
+  isGeneratingDescription = false,
   onUpdateGenre,
   onUpdateTargetAudience,
   onUpdateNumberOfChapters,
