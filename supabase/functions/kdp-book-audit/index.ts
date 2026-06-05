@@ -26,7 +26,7 @@ serve(async (req) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ role: 'user', parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.45, maxOutputTokens: 8192, responseMimeType: 'application/json' },
+          generationConfig: { temperature: 0.45, maxOutputTokens: 32768, responseMimeType: 'application/json' },
         }),
       },
     );
@@ -39,10 +39,27 @@ serve(async (req) => {
     }
 
     const aiData = await response.json();
-    const rawText = aiData?.candidates?.[0]?.content?.parts?.[0]?.text;
+    const candidate = aiData?.candidates?.[0];
+    const finishReason = candidate?.finishReason;
+    const rawText = candidate?.content?.parts?.[0]?.text;
     if (!rawText) return jsonResponse({ success: false, error: 'Réponse Gemini vide' }, 500);
+    if (finishReason && finishReason !== 'STOP') {
+      console.warn('Gemini finishReason:', finishReason, '- réponse possiblement tronquée, tentative de réparation.');
+    }
 
-    const audit = JSON.parse(cleanJson(rawText));
+    let audit: Record<string, unknown>;
+    try {
+      audit = JSON.parse(cleanJson(rawText));
+    } catch (parseErr) {
+      console.warn('JSON direct invalide, tentative de réparation:', parseErr instanceof Error ? parseErr.message : parseErr);
+      const repaired = repairJson(cleanJson(rawText));
+      try {
+        audit = JSON.parse(repaired);
+      } catch (repairErr) {
+        console.error('Réparation JSON échouée:', repairErr instanceof Error ? repairErr.message : repairErr);
+        return jsonResponse({ success: false, error: 'Réponse IA incomplète, relancez l’audit.' }, 502);
+      }
+    }
     return jsonResponse({ success: true, data: normalizeAudit(audit) });
   } catch (error) {
     console.error('Audit error:', error);
@@ -58,6 +75,40 @@ function cleanJson(text: string) {
   const cleaned = text.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
   const match = cleaned.match(/\{[\s\S]*\}/);
   return match ? match[0] : cleaned;
+}
+
+/**
+ * Répare un JSON tronqué par la limite de tokens :
+ * coupe après la dernière virgule de fin de valeur complète, puis ferme
+ * les chaînes/objets/tableaux encore ouverts.
+ */
+function repairJson(input: string): string {
+  let s = (input || '').trim();
+  // Retire un objet/clé partiel en fin de chaîne (après la dernière accolade/crochet/valeur fermée).
+  const lastClose = Math.max(s.lastIndexOf('}'), s.lastIndexOf(']'), s.lastIndexOf('"'));
+  if (lastClose > 0 && lastClose < s.length - 1) {
+    s = s.slice(0, lastClose + 1);
+  }
+  s = s.replace(/,\s*$/, '');
+
+  // Compte les structures ouvertes en ignorant ce qui est dans des chaînes.
+  let inString = false;
+  let escaped = false;
+  const stack: string[] = [];
+  for (const ch of s) {
+    if (escaped) { escaped = false; continue; }
+    if (ch === '\\') { escaped = true; continue; }
+    if (ch === '"') { inString = !inString; continue; }
+    if (inString) continue;
+    if (ch === '{' || ch === '[') stack.push(ch);
+    else if (ch === '}' || ch === ']') stack.pop();
+  }
+  if (inString) s += '"';
+  while (stack.length) {
+    const open = stack.pop();
+    s += open === '{' ? '}' : ']';
+  }
+  return s;
 }
 
 function buildBookAuditPrompt(bookData: Record<string, unknown>) {
