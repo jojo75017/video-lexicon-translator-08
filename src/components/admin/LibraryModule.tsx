@@ -43,11 +43,40 @@ interface AudioRow {
 }
 
 export default function LibraryModule() {
+  const navigate = useNavigate();
   const [tab, setTab] = useState<'numeriques' | 'audio'>('numeriques');
   const [loading, setLoading] = useState(true);
   const [ebooks, setEbooks] = useState<EbookRow[]>([]);
   const [audios, setAudios] = useState<AudioRow[]>([]);
   const [deleting, setDeleting] = useState<string | null>(null);
+
+  const openEditor = () => navigate('/ebook-planner');
+  const goPublish = () => navigate('/couverture-kdp');
+
+  const exportEbook = (b: EbookRow) => {
+    const content = [
+      `Titre : ${b.title}`,
+      b.target_audience ? `Public cible : ${b.target_audience}` : null,
+      b.project_type ? `Type : ${b.project_type}` : null,
+      '',
+      b.book_summary || '(Aucun résumé enregistré pour ce projet.)',
+    ].filter(Boolean).join('\n');
+    downloadText(`${slugify(b.title)}.txt`, content);
+    toast.success('Fiche exportée ✓');
+  };
+
+  const exportAudio = (a: AudioRow) => {
+    const content = [
+      `Titre : ${a.title}`,
+      a.author_name ? `Auteur : ${a.author_name}` : null,
+      a.status ? `Statut : ${a.status}` : null,
+      a.duration_seconds ? `Durée : ${Math.round(a.duration_seconds / 60)} min` : null,
+      '',
+      a.description || '(Aucune description enregistrée.)',
+    ].filter(Boolean).join('\n');
+    downloadText(`${slugify(a.title)}-audio.txt`, content);
+    toast.success('Fiche exportée ✓');
+  };
 
   const load = async () => {
     setLoading(true);
