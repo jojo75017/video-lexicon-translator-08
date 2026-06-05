@@ -1,60 +1,70 @@
-# V3 — EBOOK ANTI-PLAGIAT + nouvelles idées
+# Tableau de bord V3 — Hub de lancement « Noir & Or » (effet wouhou)
 
 ## Objectif
-Ajouter une nouvelle brique « Ebook Anti-Plagiat » : un ensemble d'outils pour protéger l'auteur contre le plagiat (avant et après publication), plus un PDF téléchargeable à mettre à disposition dans le cockpit. Tout le contenu est rédigé en original (aucun copier-coller du texte source de la formation), seules les idées sont reprises.
+Créer une nouvelle page d'accueil premium pour la V3 « Publication Assistée Pro » : un **hub de lancement** élégant et spectaculaire qui regroupe les ~60 modules existants, organisés par pilier (Publier / Monétiser / Marketing / IA avancée), avec recherche instantanée et ouverture directe de chaque outil. La roadmap actuelle du cockpit reste en place ; ce hub vient s'ajouter comme nouvelle expérience d'entrée V3.
+
+Direction visuelle retenue : **Noir & Or luxe** (fond #0d0d0d → #1a1a1a, accents or #c9a84c / #f0d78c), animations **spectaculaires**.
 
 ## Ce qui sera construit
 
-### 1. Nouveau module cockpit `ebook-anti-plagiat` (pilier Publier)
-Un outil unique, ouvert dans le dialog du cockpit comme les autres modules, organisé en 4 onglets :
+### 1. Nouvelle page `V3HubPage` (route `/hub-v3`)
+Accès réservé admin (comme `/tableau-de-bord`) via `AdminGate`, pour préparer le lancement.
 
+Structure de la page :
+```text
+┌──────────────────────────────────────────────┐
+│  HÉRO « édition limitée »                      │
+│  Logo/titre or • « Publication Assistée Pro »  │
+│  Badge 197€ à vie • compteur modules • CTA     │
+│  (fond particules/beams animés, halo doré)     │
+├──────────────────────────────────────────────┤
+│  Barre de recherche instantanée + filtres      │
+│  [Tous] [Publier] [Monétiser] [Marketing] [IA] │
+├──────────────────────────────────────────────┤
+│  4 sections pilier (or par pilier)             │
+│   → grille de cartes module (glassmorphism)    │
+│     hover : tilt 3D + glow doré + scale         │
+│     clic : ouvre le module dans un dialog       │
+└──────────────────────────────────────────────┘
 ```
-EBOOK ANTI-PLAGIAT
-├── 1. Protéger AVANT publication
-│     • Générateur de page Copyright renforcée (clause non-fiction + déni de
-│       responsabilité financière), multi-langue, prête à coller.
-│     • Mini-guide « marquage & traçage » : conseils watermark texte/phrases-pièges.
-├── 2. Surveiller (monitoring)
-│     • Générateur de requêtes Google Alerts (titre + phrases uniques extraites
-│       du manuscrit) avec lien direct vers google.com/alerts.
-│     • Checklist hebdomadaire interactive (cochable) du mini-audit 10 min.
-├── 3. Réagir en cas de plagiat
-│     • Générateur d'email DMCA / retrait à Amazon KDP (champs : titre, date,
-│       pseudo, titre copié, lien) → texte prêt à copier.
-│     • Checklist des preuves d'antériorité (cochable).
-│     • Liens utiles (contact KDP, dépôt légal).
-└── 4. Pack de défense (PDF)
-      • Bouton « Télécharger le PDF » (voir point 3).
-```
 
-Le contenu textuel (clauses, email, checklists) sera **réécrit en formulation originale**.
+### 2. Cartes module premium
+- Chaque carte = un module de `V3_MODULES` (titre, description, pilier, statut).
+- Effet : bordure dégradé or, halo lumineux au survol, légère inclinaison 3D (tilt), apparition en cascade (`stagger` fade-in).
+- Badge statut discret (Fait / En cours / À faire).
+- Clic → ouvre le **même dialog** et le **même mapping de composants** que le cockpit actuel (réutilisation totale, aucun outil réécrit).
 
-### 2. Inscription dans la roadmap V3
-Ajouter dans `src/data/roadmapV3.ts` une nouvelle entrée module :
-`{ id: 'ebook-anti-plagiat', pillar: 'publier', status: 'done', title: 'Ebook Anti-Plagiat — Protection & Défense', description: '...' }`
+### 3. Recherche + filtres
+- Champ de recherche filtrant par titre/description en temps réel.
+- Onglets pilier pour filtrer la grille.
+- Compteur dynamique « X outils disponibles ».
 
-### 3. PDF téléchargeable (pack de défense)
-Générer un PDF propre et professionnel (charte KDP : fond clair, accent teal #008296, texte #232F3E) contenant :
-- Page de garde
-- Modèle de page Copyright (FR) à insérer dans l'ebook
-- Modèle d'email de signalement à Amazon KDP (avec champs à compléter)
-- Checklist des preuves d'antériorité
-- Routine hebdomadaire de surveillance (10 min)
-- Liens utiles (Google Alerts, contact KDP)
+### 4. Réutilisation du moteur d'ouverture des modules
+Le cockpit contient déjà : la liste `clickable`, la logique de largeur de dialog, et la longue branche `selectedModule.id === '...'` qui rend chaque composant. Pour éviter la duplication :
+- Extraire cette logique dans un composant partagé `V3ModuleDialog` (props : `module`, `onClose`) + un helper `getV3ModuleRenderer(id)`.
+- Le cockpit ET le nouveau hub utilisent ce composant partagé.
 
-Le PDF sera livré comme **artefact téléchargeable** et placé dans `public/` pour être servi par le bouton du module.
+### 5. Accès au hub
+- Bouton « Hub V3 » ajouté dans l'en-tête du cockpit (`AdminCockpitPage`) à côté de « Tableau de bord V3 ».
+- Lien depuis le toggle V3.
 
-### 4. Autres idées V3 proposées (à valider — non construites dans ce plan)
-- **Coffre-fort de preuves horodatées** : génère un PDF horodaté du manuscrit + hash SHA-256 comme preuve d'antériorité.
-- **Détecteur de similarité** : compare deux textes (le tien vs un suspect) et calcule un % de chevauchement.
-- **Générateur de dépôt légal** : fiche pré-remplie pour BNF / équivalents internationaux.
+### 6. Autres briques V3 que je recommande de finaliser ensuite (hors de ce plan, à valider)
+Idées pour compléter la valeur perçue des 197€ :
+- **Coffre-fort de preuves horodatées** (déjà évoqué) : PDF horodaté + hash SHA-256.
+- **Détecteur de similarité** : compare ton texte vs un suspect, % de chevauchement.
+- **Centre de progression auteur** : suivre l'avancement livre par livre (étape sur les 60 outils).
+- **Mode V3 visible pour les abonnés** (aujourd'hui réservé admin) — à activer au lancement.
+- **Onboarding guidé** « par où commencer » dans le hub.
 
 ## Détails techniques
-- **Nouveau composant** `src/components/admin/EbookAntiPlagiat.tsx` (4 onglets via `Tabs` shadcn), réutilisant les patterns existants (Card, Textarea, Button teal, toast, copie presse-papier). Les générateurs Copyright / email sont **déterministes** (pas d'appel IA nécessaire) ; les extractions de phrases uniques peuvent réutiliser `callAIWriting` si souhaité.
-- **Câblage cockpit** dans `src/pages/AdminCockpitPage.tsx` : ajouter l'import, l'id `ebook-anti-plagiat` dans la liste `clickable`, dans la liste des dialogs `max-w-6xl`, et une branche de rendu `selectedModule.id === 'ebook-anti-plagiat'`.
-- **PDF** généré via script Python (reportlab) écrit dans `/mnt/documents/` pour livraison, puis copié dans `public/pack-anti-plagiat.pdf` pour le bouton de téléchargement. QA visuelle obligatoire (conversion en images + inspection de chaque page).
-- Aucun changement de schéma backend requis.
+- **Nouveau fichier** `src/pages/V3HubPage.tsx` + route dans `src/App.tsx` sous `AdminGate`.
+- **Composant partagé** `src/components/admin/V3ModuleDialog.tsx` : déplace la branche de rendu + la logique de largeur de dialog depuis `AdminCockpitPage.tsx`. Le cockpit est refactoré pour l'importer (pas de régression).
+- **Style Noir & Or** : tokens locaux (or `#c9a84c`/`#f0d78c`, fonds `#0d0d0d`/`#1a1a1a`) appliqués sur la page hub ; on n'altère pas la charte KDP globale (`index.css`) pour ne pas casser le reste de l'app. Couleurs en HSL via classes utilitaires locales.
+- **Animations spectaculaires** : particules/beams en arrière-plan (composant léger maison ou MagicUI Particles/Meteors), `animate-fade-in` + `scale-in` en cascade sur les cartes, tilt 3D au survol (CSS transform sur mousemove), halo doré (box-shadow animé). Respect de `prefers-reduced-motion`.
+- **Source de données** : `V3_MODULES` de `src/data/roadmapV3.ts` (aucune nouvelle donnée).
+- Aucun changement backend, aucune migration.
 
 ## Hors périmètre
-- Surveillance automatique réelle du web (Google Alerts reste manuel côté utilisateur).
-- Dépôt légal automatisé auprès d'organismes officiels.
+- Aucune réécriture des 60 outils existants (réutilisation telle quelle).
+- Pas de modification de la charte KDP globale ni du cockpit roadmap actuel (juste ajout d'un bouton + refacto interne du dialog).
+- Activation du hub pour les abonnés non-admin : repoussée au lancement V3.
