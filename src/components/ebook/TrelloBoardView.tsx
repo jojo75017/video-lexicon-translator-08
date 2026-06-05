@@ -62,6 +62,8 @@ export const TrelloBoardView: React.FC<TrelloBoardViewProps> = ({
   onUpdateSubtitle,
   onUpdateAuthor,
   onUpdateDescription,
+  onGenerateDescription,
+  isGeneratingDescription = false,
   onUpdateGenre,
   onUpdateTargetAudience,
   onUpdateNumberOfChapters,
