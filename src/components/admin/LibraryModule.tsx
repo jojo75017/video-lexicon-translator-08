@@ -236,6 +236,9 @@ function BookCard({
   summary,
   status,
   deleting,
+  onEdit,
+  onPublish,
+  onExport,
   onDelete,
 }: {
   title: string;
@@ -243,6 +246,9 @@ function BookCard({
   summary?: string | null;
   status?: string | null;
   deleting?: boolean;
+  onEdit: () => void;
+  onPublish: () => void;
+  onExport: () => void;
   onDelete: () => void;
 }) {
   return (
