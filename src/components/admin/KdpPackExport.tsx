@@ -4,11 +4,9 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
-import { Loader2, Package, Image as ImageIcon } from 'lucide-react';
+import { Loader2, Package, Image as ImageIcon, FileUp } from 'lucide-react';
 import { toast } from 'sonner';
 import { downloadKdpPack } from '@/lib/kdpPackZip';
-import { exportEbookToPdf } from '@/lib/ebookPdfExporter';
-import { parseManuscript } from '@/lib/manuscriptParser';
 
 const TEAL = '#008296';
 
@@ -23,24 +21,13 @@ const KdpPackExport: React.FC = () => {
   const [keywords, setKeywords] = useState('');
   const [categories, setCategories] = useState('');
   const [coverFrontUrl, setCoverFrontUrl] = useState('');
-  const [manuscript, setManuscript] = useState('');
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
 
   const build = async () => {
     if (!title.trim() || !author.trim()) return toast.error('Titre et auteur requis.');
     setBusy(true);
     try {
-      let pdfBlob: Blob | null = null;
-      const sections = parseManuscript(manuscript, title);
-      if (sections.length > 0) {
-        pdfBlob = await exportEbookToPdf({
-          filename: 'interieur.pdf',
-          documentTitle: title,
-          documentSubtitle: subtitle || undefined,
-          sections: sections.map((s) => ({ title: s.title, blocks: s.blocks })),
-          returnBlob: true,
-        } as any);
-      }
       await downloadKdpPack({
         ebookTitle: title,
         authorName: author,
@@ -48,7 +35,7 @@ const KdpPackExport: React.FC = () => {
         kdpDescription: description || undefined,
         kdpKeywords: keywords || undefined,
         kdpCategories: categories ? categories.split(',').map((c) => c.trim()).filter(Boolean) : undefined,
-        pdfBlob,
+        pdfBlob: pdfFile || null,
         coverFrontUrl: coverFrontUrl || undefined,
       });
       toast.success('Pack KDP ZIP généré ✓');
@@ -61,7 +48,8 @@ const KdpPackExport: React.FC = () => {
     <div className="space-y-4">
       <p className="text-sm text-joy-ink/70">
         Génère un fichier ZIP contenant le PDF intérieur, la couverture, les métadonnées et un
-        README de publication — prêt à téléverser sur Amazon KDP.
+        README de publication — prêt à téléverser sur Amazon KDP. Génère le PDF intérieur via le
+        module « Multi-format Express », puis ajoute-le ici.
       </p>
 
       <div className="grid gap-3 sm:grid-cols-2">
@@ -97,9 +85,8 @@ const KdpPackExport: React.FC = () => {
       </div>
 
       <div>
-        <Label className="text-xs">Manuscrit (optionnel — génère le PDF intérieur)</Label>
-        <Textarea rows={6} value={manuscript} onChange={(e) => setManuscript(e.target.value)}
-          placeholder={'# Chapitre 1\nTexte…'} />
+        <Label className="text-xs flex items-center gap-1"><FileUp className="h-3 w-3" /> PDF intérieur (optionnel)</Label>
+        <Input type="file" accept="application/pdf" onChange={(e) => setPdfFile(e.target.files?.[0] ?? null)} />
       </div>
 
       <Card className="border-joy-ink/10">
