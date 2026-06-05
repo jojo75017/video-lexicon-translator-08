@@ -509,6 +509,30 @@ const AdminCockpitPage: React.FC = () => {
                     <BookCreationStudio />
                   ) : selectedModule.id === 'library' ? (
                     <LibraryModule />
+                  ) : selectedModule.id === 'cover-pdf-exact' ? (
+                    <CoverPdfExact />
+                  ) : selectedModule.id === 'cockpit-audit-pilot' ? (
+                    <AuditPilotModule />
+                  ) : selectedModule.id === 'kdp-pack-zip' ? (
+                    <KdpPackExport />
+                  ) : selectedModule.id === 'multi-format-express' ? (
+                    <MultiFormatExport />
+                  ) : selectedModule.id === 'prepub-checklist' ? (
+                    <PrepubChecklist />
+                  ) : selectedModule.id === 'kindle-previewer' ? (
+                    <KindlePreviewer />
+                  ) : selectedModule.id === 'isbn-metadata' ? (
+                    <IsbnMetadataManager />
+                  ) : selectedModule.id === 'categories-manager-10' ? (
+                    <CategoriesManager10 />
+                  ) : selectedModule.id === 'print-proof-checker' ? (
+                    <PrintProofChecker />
+                  ) : selectedModule.id === 'back-matter-builder' ? (
+                    <BackMatterBuilder />
+                  ) : selectedModule.id === 'cover-variants-thumbnail' ? (
+                    <CoverVariantsThumbnail />
+                  ) : selectedModule.id === 'translation-markets' ? (
+                    <TranslationMarkets />
                   ) : (
                     <p className="text-[11px] text-joy-ink/40">
                       Module en préparation pour la V3 ({V3_PRICE}€ à vie). Visible uniquement par l'admin.
