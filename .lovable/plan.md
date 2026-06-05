@@ -1,42 +1,60 @@
-# Enrichissement V3 — Nouveaux modules à ajouter
+# V3 — EBOOK ANTI-PLAGIAT + nouvelles idées
 
-## Constat
+## Objectif
+Ajouter une nouvelle brique « Ebook Anti-Plagiat » : un ensemble d'outils pour protéger l'auteur contre le plagiat (avant et après publication), plus un PDF téléchargeable à mettre à disposition dans le cockpit. Tout le contenu est rédigé en original (aucun copier-coller du texte source de la formation), seules les idées sont reprises.
 
-Les ~38 modules V3 actuels sont tous en statut `done`. Pour continuer à muscler l'offre **Publication Assistée Pro (197€)** et se rapprocher de la référence kdpaiccelerator, voici une sélection de modules **nouveaux** (aucun doublon avec l'existant), répartis par pilier. La liste reste éditable : on garde, retire ou réordonne avant de coder.
+## Ce qui sera construit
 
-## Nouveaux modules proposés
+### 1. Nouveau module cockpit `ebook-anti-plagiat` (pilier Publier)
+Un outil unique, ouvert dans le dialog du cockpit comme les autres modules, organisé en 4 onglets :
 
-### 📦 Publier
-1. **Convertisseur Manuscrit Universel** — importe `.docx`/`.pdf`/Google Docs et nettoie automatiquement (styles, sauts de page, notes) vers format KDP propre.
-2. **Vérificateur de Conformité Contenu** — détecte contenu interdit KDP (liens, mentions concurrents, langage promo) avant soumission pour éviter le blocage.
-3. **Générateur Page de Copyright / Mentions légales** — page légale + dédicace + table des matières cliquable, multi-langue.
+```
+EBOOK ANTI-PLAGIAT
+├── 1. Protéger AVANT publication
+│     • Générateur de page Copyright renforcée (clause non-fiction + déni de
+│       responsabilité financière), multi-langue, prête à coller.
+│     • Mini-guide « marquage & traçage » : conseils watermark texte/phrases-pièges.
+├── 2. Surveiller (monitoring)
+│     • Générateur de requêtes Google Alerts (titre + phrases uniques extraites
+│       du manuscrit) avec lien direct vers google.com/alerts.
+│     • Checklist hebdomadaire interactive (cochable) du mini-audit 10 min.
+├── 3. Réagir en cas de plagiat
+│     • Générateur d'email DMCA / retrait à Amazon KDP (champs : titre, date,
+│       pseudo, titre copié, lien) → texte prêt à copier.
+│     • Checklist des preuves d'antériorité (cochable).
+│     • Liens utiles (contact KDP, dépôt légal).
+└── 4. Pack de défense (PDF)
+      • Bouton « Télécharger le PDF » (voir point 3).
+```
 
-### 💰 Monétiser
-4. **Simulateur de Royalties Multi-Prix** — compare gains nets 35% vs 70% selon prix et marché, avec point d'équilibre.
-5. **Détecteur de Niches Rentables (KU)** — croise demande/concurrence pour estimer le potentiel de pages lues KU.
-6. **Stratégie de Prix de Lancement Dynamique** — calendrier prix montant (0,99€ → prix cible) sur les premiers jours.
+Le contenu textuel (clauses, email, checklists) sera **réécrit en formulation originale**.
 
-### 📣 Marketing
-7. **Calendrier Éditorial Réseaux 30 jours** — planning de posts multi-plateformes généré depuis le livre.
-8. **Générateur de Visuels Citations** — extrait des phrases fortes du manuscrit en visuels partageables.
-9. **Kit Presse / Media Kit Auteur** — dossier de presse (bio, pitch, couverture HD, FAQ) prêt à envoyer.
-10. **Optimiseur Goodreads** — fiche, description et plan d'animation lecteurs Goodreads.
+### 2. Inscription dans la roadmap V3
+Ajouter dans `src/data/roadmapV3.ts` une nouvelle entrée module :
+`{ id: 'ebook-anti-plagiat', pillar: 'publier', status: 'done', title: 'Ebook Anti-Plagiat — Protection & Défense', description: '...' }`
 
-### 🧠 IA avancée
-11. **Agent P23 — Cohérence Univers (Bible)** — vérifie continuité noms/lieux/timeline sur toute une série.
-12. **Agent P24 — Détecteur de Clichés & Répétitions** — repère tics d'écriture, répétitions et formules toutes faites.
-13. **Agent P25 — Adaptation de Ton par Public** — réécrit un passage selon la cible (ados, pro, grand public).
-14. **Agent P26 — Score de Potentiel Commercial** — note hook, titre, couverture et niche pour prédire le succès.
+### 3. PDF téléchargeable (pack de défense)
+Générer un PDF propre et professionnel (charte KDP : fond clair, accent teal #008296, texte #232F3E) contenant :
+- Page de garde
+- Modèle de page Copyright (FR) à insérer dans l'ebook
+- Modèle d'email de signalement à Amazon KDP (avec champs à compléter)
+- Checklist des preuves d'antériorité
+- Routine hebdomadaire de surveillance (10 min)
+- Liens utiles (Google Alerts, contact KDP)
 
-## Mise en œuvre (quand validé)
+Le PDF sera livré comme **artefact téléchargeable** et placé dans `public/` pour être servi par le bouton du module.
 
-- **Source de vérité** : ajouter chaque module choisi dans `src/data/roadmapV3.ts` (statut `todo`).
-- Suivre le patron existant : composant autonome dans `src/components/admin/`, thème clair KDP (teal #008296 / hover #FF9E2D), IA via clé Gemini BYOK (`aiWritingService`).
-- Câblage cockpit dans `src/pages/AdminCockpitPage.tsx` (id `clickable`, largeur dialog, branche de rendu).
-- Persistance locale (`localStorage`) pour les données utilisateur.
-- Lancement progressif (octobre) : on bascule `todo → in_progress → done` au fil de la construction.
+### 4. Autres idées V3 proposées (à valider — non construites dans ce plan)
+- **Coffre-fort de preuves horodatées** : génère un PDF horodaté du manuscrit + hash SHA-256 comme preuve d'antériorité.
+- **Détecteur de similarité** : compare deux textes (le tien vs un suspect) et calcule un % de chevauchement.
+- **Générateur de dépôt légal** : fiche pré-remplie pour BNF / équivalents internationaux.
 
-## À confirmer avant de coder
+## Détails techniques
+- **Nouveau composant** `src/components/admin/EbookAntiPlagiat.tsx` (4 onglets via `Tabs` shadcn), réutilisant les patterns existants (Card, Textarea, Button teal, toast, copie presse-papier). Les générateurs Copyright / email sont **déterministes** (pas d'appel IA nécessaire) ; les extractions de phrases uniques peuvent réutiliser `callAIWriting` si souhaité.
+- **Câblage cockpit** dans `src/pages/AdminCockpitPage.tsx` : ajouter l'import, l'id `ebook-anti-plagiat` dans la liste `clickable`, dans la liste des dialogs `max-w-6xl`, et une branche de rendu `selectedModule.id === 'ebook-anti-plagiat'`.
+- **PDF** généré via script Python (reportlab) écrit dans `/mnt/documents/` pour livraison, puis copié dans `public/pack-anti-plagiat.pdf` pour le bouton de téléchargement. QA visuelle obligatoire (conversion en images + inspection de chaque page).
+- Aucun changement de schéma backend requis.
 
-- Quels modules de cette liste retenir (tous, ou un sous-ensemble) ?
-- Faut-il juste **inscrire** ces modules dans la roadmap V3 (statut `todo`, visibles dans le cockpit) ou aussi **commencer à en construire** maintenant ?
+## Hors périmètre
+- Surveillance automatique réelle du web (Google Alerts reste manuel côté utilisateur).
+- Dépôt légal automatisé auprès d'organismes officiels.
