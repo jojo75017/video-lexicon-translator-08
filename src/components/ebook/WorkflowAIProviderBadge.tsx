@@ -95,6 +95,49 @@ export const WorkflowAIProviderBadge = () => {
     }
   };
 
+  if (collapsed) {
+    return (
+      <>
+        <div className="px-4 md:px-6 lg:px-10 pt-3">
+          <div className="w-full mx-auto max-w-[1600px] flex items-center justify-between gap-2 rounded-full border px-4 py-1.5 bg-card/80 backdrop-blur-sm">
+            <button
+              type="button"
+              onClick={() => setOpen(true)}
+              className="flex items-center gap-2 min-w-0 text-sm"
+            >
+              {valid ? (
+                <CheckCircle2 className="h-4 w-4 text-[#008296] shrink-0" />
+              ) : (
+                <AlertTriangle className="h-4 w-4 text-orange-500 shrink-0 animate-pulse" />
+              )}
+              <span className="truncate font-medium text-foreground">
+                {valid ? `IA : ${PROVIDER_LABELS[provider]}${modelLabel ? ` — ${modelLabel}` : ''}` : 'Aucune IA configurée'}
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={toggleCollapsed}
+              className="shrink-0 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+              title="Déplier le bandeau IA"
+            >
+              <ChevronDown className="h-4 w-4" />
+              Déplier
+            </button>
+          </div>
+        </div>
+
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Choisir mon IA · Clés API & réglages</DialogTitle>
+            </DialogHeader>
+            <EbookSettingsPanel />
+          </DialogContent>
+        </Dialog>
+      </>
+    );
+  }
+
   return (
     <>
       <div className="px-4 md:px-6 lg:px-10 pt-3">
