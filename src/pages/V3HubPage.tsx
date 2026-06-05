@@ -20,10 +20,12 @@ function ModuleCard({
   module,
   index,
   onOpen,
+  isFirst,
 }: {
   module: V3Module;
   index: number;
   onOpen: (m: V3Module) => void;
+  isFirst?: boolean;
 }) {
   const ref = React.useRef<HTMLButtonElement>(null);
   const [tilt, setTilt] = useState('');
