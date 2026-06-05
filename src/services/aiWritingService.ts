@@ -175,9 +175,21 @@ export const formatModelPricing = (m: OpenRouterModelInfo): string => {
   return `~$${m.pricing.in}/M in · $${m.pricing.out}/M out`;
 };
 
+// Modèle payant fiable par défaut. Les modèles ":free" d'OpenRouter ont des
+// limites de débit très strictes (quelques req/min) INDÉPENDANTES du crédit,
+// ce qui provoque "Limite OpenRouter atteinte" même avec un solde positif.
+// On bascule donc le défaut sur un modèle payant économique et fiable.
+export const OPENROUTER_DEFAULT_MODEL = 'google/gemini-2.5-flash-lite';
+
 export const getOpenRouterModel = (): string => {
-  if (typeof window === 'undefined') return OPENROUTER_MODELS[0].id;
-  return (localStorage.getItem(LS_OPENROUTER_MODEL) || OPENROUTER_MODELS[0].id).trim();
+  if (typeof window === 'undefined') return OPENROUTER_DEFAULT_MODEL;
+  const stored = (localStorage.getItem(LS_OPENROUTER_MODEL) || '').trim();
+  // Pas de choix explicite OU choix bloqué sur un modèle gratuit (rate-limité)
+  // => on force le modèle payant par défaut.
+  if (!stored || stored.endsWith(':free') || stored === 'openrouter/free') {
+    return OPENROUTER_DEFAULT_MODEL;
+  }
+  return stored;
 };
 export const setOpenRouterModel = (m: string) => {
   if (typeof window === 'undefined') return;
