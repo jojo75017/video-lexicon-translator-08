@@ -190,6 +190,9 @@ export default function LibraryModule() {
                 subtitle={b.target_audience}
                 summary={b.book_summary}
                 deleting={deleting === b.id}
+                onEdit={openEditor}
+                onPublish={goPublish}
+                onExport={() => exportEbook(b)}
                 onDelete={() => deleteEbook(b.id)}
               />
             ))}
@@ -207,6 +210,9 @@ export default function LibraryModule() {
               summary={a.description}
               status={a.status}
               deleting={deleting === a.id}
+              onEdit={openEditor}
+              onPublish={goPublish}
+              onExport={() => exportAudio(a)}
               onDelete={() => deleteAudio(a.id)}
             />
           ))}
