@@ -383,6 +383,7 @@ const App = () => {
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/admin-direct" element={<AdminDirectPage />} />
             <Route path="/admin-cockpit" element={<AdminGate><AdminCockpitPage /></AdminGate>} />
+            <Route path="/hub-v3" element={<AdminGate><V3HubPage /></AdminGate>} />
             <Route path="/ai-chat" element={<AiChatPage />} />
             <Route path="/niches" element={<NichesPage />} />
             <Route path="/niches-600" element={<Niches600Page />} />
