@@ -909,6 +909,7 @@ IMPORTANT :
     generateEbookPlan,
     generateBookSummary,
     generateBookSynopsis,
+    generateBookDescription,
     generateEbookCover,
     optimizeForSEO,
     generateKDPDescription,
