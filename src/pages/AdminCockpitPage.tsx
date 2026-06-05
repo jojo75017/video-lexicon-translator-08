@@ -542,6 +542,24 @@ const AdminCockpitPage: React.FC = () => {
                     <CoverVariantsThumbnail />
                   ) : selectedModule.id === 'translation-markets' ? (
                     <TranslationMarkets />
+                  ) : selectedModule.id === 'sales-tracker' ? (
+                    <SalesTrackerKdp />
+                  ) : selectedModule.id === 'royalties-dashboard' ? (
+                    <RoyaltiesDashboard />
+                  ) : selectedModule.id === 'sales-description' ? (
+                    <SalesDescription />
+                  ) : selectedModule.id === 'aplus-generator' ? (
+                    <AplusGenerator />
+                  ) : selectedModule.id === 'auto-pricing' ? (
+                    <AutoPricingAI />
+                  ) : selectedModule.id === 'bundles-boxsets' ? (
+                    <BundlesBoxsets />
+                  ) : selectedModule.id === 'lead-magnet' ? (
+                    <LeadMagnetBuilder />
+                  ) : selectedModule.id === 'back-catalog-funnel' ? (
+                    <BackCatalogFunnel />
+                  ) : selectedModule.id === 'kdp-select-planner' ? (
+                    <KdpSelectPlanner />
                   ) : (
                     <p className="text-[11px] text-joy-ink/40">
                       Module en préparation pour la V3 ({V3_PRICE}€ à vie). Visible uniquement par l'admin.
