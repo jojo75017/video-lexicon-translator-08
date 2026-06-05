@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { BookOpen, FileText, Plus } from 'lucide-react';
+import { BookOpen, FileText, Plus, Sparkles, Loader2 } from 'lucide-react';
 
 export interface WorkflowBookConfigFormProps {
   ebookTitle: string;
