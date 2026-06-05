@@ -1,57 +1,42 @@
-## Objectif
+# Enrichissement V3 — Nouveaux modules à ajouter
 
-Rendre **tous les modules de l'onglet « Publier »** fonctionnels et cliquables dans le cockpit V3, puis passer leur statut à « Fait ». Chaque module s'ouvre dans la fenêtre du cockpit (comme SCOUT, INTEL, etc.), en thème clair KDP. Aucun changement backend lourd : on réutilise les outils déjà codés et on construit les manquants côté front (IA via clé Gemini BYOK quand nécessaire).
+## Constat
 
-## Liste des 12 modules Publier
+Les ~38 modules V3 actuels sont tous en statut `done`. Pour continuer à muscler l'offre **Publication Assistée Pro (197€)** et se rapprocher de la référence kdpaiccelerator, voici une sélection de modules **nouveaux** (aucun doublon avec l'existant), répartis par pilier. La liste reste éditable : on garde, retire ou réordonne avant de coder.
 
-```text
-Déjà codé ailleurs → à BRANCHER (rapide)
-  1. cover-pdf-exact      → réutilise KdpCoverStudio (page Couverture KDP)
-  2. cockpit-audit-pilot  → réutilise KdpAmazonResearch (onglet "pilot")
-  3. kdp-pack-zip         → réutilise lib downloadKdpPack + petite UI
-  4. multi-format-express → réutilise exporters PDF/DOCX + petite UI
+## Nouveaux modules proposés
 
-À CONSTRUIRE (nouveaux composants)
-  5. prepub-checklist       → checklist 25 points cochable (déterministe)
-  6. kindle-previewer       → aperçu rendu Kindle/tablette/phone (CSS)
-  7. isbn-metadata          → gestionnaire ISBN/BISAC/catégories (formulaire + stockage)
-  8. categories-manager-10  → 2 catégories optimales + préparation des 8 via support KDP
-  9. back-matter-builder    → pages de fin (avis, "Du même auteur", bio + newsletter) via IA
- 10. print-proof-checker    → contrôle bleed/gutter/dos/code-barres avant épreuve papier
- 11. cover-variants-thumbnail → 6 variantes de couverture + test miniature 200×300 (IA image)
- 12. translation-markets    → traduction/adaptation US/UK/DE/ES via IA
-```
+### 📦 Publier
+1. **Convertisseur Manuscrit Universel** — importe `.docx`/`.pdf`/Google Docs et nettoie automatiquement (styles, sauts de page, notes) vers format KDP propre.
+2. **Vérificateur de Conformité Contenu** — détecte contenu interdit KDP (liens, mentions concurrents, langage promo) avant soumission pour éviter le blocage.
+3. **Générateur Page de Copyright / Mentions légales** — page légale + dédicace + table des matières cliquable, multi-langue.
 
-## Approche par module
+### 💰 Monétiser
+4. **Simulateur de Royalties Multi-Prix** — compare gains nets 35% vs 70% selon prix et marché, avec point d'équilibre.
+5. **Détecteur de Niches Rentables (KU)** — croise demande/concurrence pour estimer le potentiel de pages lues KU.
+6. **Stratégie de Prix de Lancement Dynamique** — calendrier prix montant (0,99€ → prix cible) sur les premiers jours.
 
-**Branchements rapides (1 à 4).** On crée un composant léger dans `src/components/admin/` qui réutilise le composant/lib existant, puis on l'ajoute au cockpit. Pas de nouvelle logique métier.
+### 📣 Marketing
+7. **Calendrier Éditorial Réseaux 30 jours** — planning de posts multi-plateformes généré depuis le livre.
+8. **Générateur de Visuels Citations** — extrait des phrases fortes du manuscrit en visuels partageables.
+9. **Kit Presse / Media Kit Auteur** — dossier de presse (bio, pitch, couverture HD, FAQ) prêt à envoyer.
+10. **Optimiseur Goodreads** — fiche, description et plan d'animation lecteurs Goodreads.
 
-**Nouveaux outils (5 à 12).** Chaque module = un composant autonome dans `src/components/admin/`, suivant le même patron visuel que `ListingOptimizer`/`LumenReadability` (Card, Tabs, Badge, tokens clairs teal #008296 / hover #FF9E2D). Les modules IA (back-matter, cover-variants, translation) utilisent la clé Gemini BYOK déjà en place (via `aiWritingService` / edge functions existantes), sans données simulées.
+### 🧠 IA avancée
+11. **Agent P23 — Cohérence Univers (Bible)** — vérifie continuité noms/lieux/timeline sur toute une série.
+12. **Agent P24 — Détecteur de Clichés & Répétitions** — repère tics d'écriture, répétitions et formules toutes faites.
+13. **Agent P25 — Adaptation de Ton par Public** — réécrit un passage selon la cible (ados, pro, grand public).
+14. **Agent P26 — Score de Potentiel Commercial** — note hook, titre, couverture et niche pour prédire le succès.
 
-## Câblage cockpit (`src/pages/AdminCockpitPage.tsx`)
+## Mise en œuvre (quand validé)
 
-Pour chaque module : ajouter son `id` à la liste `clickable` (ligne ~400), ajouter une branche de rendu dans la fenêtre (ligne ~464+), et inclure son `id` dans la classe de largeur du `DialogContent` (large/scroll pour les outils riches).
+- **Source de vérité** : ajouter chaque module choisi dans `src/data/roadmapV3.ts` (statut `todo`).
+- Suivre le patron existant : composant autonome dans `src/components/admin/`, thème clair KDP (teal #008296 / hover #FF9E2D), IA via clé Gemini BYOK (`aiWritingService`).
+- Câblage cockpit dans `src/pages/AdminCockpitPage.tsx` (id `clickable`, largeur dialog, branche de rendu).
+- Persistance locale (`localStorage`) pour les données utilisateur.
+- Lancement progressif (octobre) : on bascule `todo → in_progress → done` au fil de la construction.
 
-## Statuts (`src/data/roadmapV3.ts`)
+## À confirmer avant de coder
 
-Passer les 12 modules Publier à `status: 'done'` au fur et à mesure de leur branchement effectif.
-
-## Détails techniques
-
-- Nouveaux fichiers : `src/components/admin/KdpPackExport.tsx`, `MultiFormatExport.tsx`, `PrepubChecklist.tsx`, `KindlePreviewer.tsx`, `IsbnMetadataManager.tsx`, `CategoriesManager10.tsx`, `BackMatterBuilder.tsx`, `PrintProofChecker.tsx`, `CoverVariantsThumbnail.tsx`, `TranslationMarkets.tsx`, et deux wrappers légers `CoverPdfExact.tsx`, `AuditPilotModule.tsx`.
-- Réutilisation : `KdpCoverStudio`, `KdpAmazonResearch`, `downloadKdpPack`/`generateKdpPackZip`, `ebookPdfExporter`, `ebookDocxExporter`, `kdpCoverPdf`.
-- IA : clé Gemini BYOK existante ; aucune nouvelle dépendance backend si possible (réutilise les edge functions déjà déployées).
-- Persistance locale (ISBN, checklist, catégories) via `localStorage`, cohérent avec le reste du projet.
-- Respect de la charte : pas de couleurs en dur hors tokens, thème clair KDP.
-
-## Déroulé proposé (par lots, pour garder la qualité)
-
-1. **Lot 1 — Branchements** : modules 1 à 4 (réutilisation), tests, statut « Fait ».
-2. **Lot 2 — Outils déterministes** : 5, 6, 7, 8, 10 (sans IA).
-3. **Lot 3 — Outils IA** : 9, 11, 12.
-
-## Vérification
-
-- Ouvrir `/admin-cockpit` en mode V3, colonne « Publier ».
-- Chaque module est cliquable, s'ouvre, et son outil fonctionne (export ZIP/PDF, checklist, aperçu, IA…).
-- Tous les modules Publier affichent le badge « Fait » (vert).
+- Quels modules de cette liste retenir (tous, ou un sous-ensemble) ?
+- Faut-il juste **inscrire** ces modules dans la roadmap V3 (statut `todo`, visibles dans le cockpit) ou aussi **commencer à en construire** maintenant ?
