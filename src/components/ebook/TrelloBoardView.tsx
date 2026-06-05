@@ -34,6 +34,8 @@ interface TrelloBoardViewProps {
   onUpdateSubtitle?: (value: string) => void;
   onUpdateAuthor?: (value: string) => void;
   onUpdateDescription?: (value: string) => void;
+  onGenerateDescription?: () => void;
+  isGeneratingDescription?: boolean;
   onUpdateGenre?: (value: string) => void;
   onUpdateTargetAudience?: (value: string) => void;
   onUpdateNumberOfChapters?: (value: number) => void;
