@@ -35,15 +35,15 @@ export const V3_MODULES: V3Module[] = [
   // PUBLIER
   { id: 'library',             pillar: 'publier',   status: 'done', title: 'BIBLIOTHÈQUE — Mes Créations',
     description: 'Toutes vos créations au même endroit : livres numériques et audio avec actions Modifier, Publier, Exporter, Supprimer.' },
-  { id: 'kdp-pack-zip',        pillar: 'publier',   status: 'todo', title: 'Pack KDP ZIP',
+  { id: 'kdp-pack-zip',        pillar: 'publier',   status: 'done', title: 'Pack KDP ZIP',
     description: 'Export bundle PDF intérieur + couverture + métadonnées prêt upload Amazon.' },
-  { id: 'cockpit-audit-pilot', pillar: 'publier',   status: 'todo', title: 'Cockpit Audit Pilot',
+  { id: 'cockpit-audit-pilot', pillar: 'publier',   status: 'done', title: 'Cockpit Audit Pilot',
     description: 'Score de conformité KDP (marges, polices, ISBN, bleed, Modulo 10).' },
-  { id: 'prepub-checklist',    pillar: 'publier',   status: 'todo', title: 'Checklist Prépublication',
+  { id: 'prepub-checklist',    pillar: 'publier',   status: 'done', title: 'Checklist Prépublication',
     description: '25 points cochables avant clic "Publier" sur KDP.' },
-  { id: 'kindle-previewer',    pillar: 'publier',   status: 'todo', title: 'Kindle Previewer Simulé',
+  { id: 'kindle-previewer',    pillar: 'publier',   status: 'done', title: 'Kindle Previewer Simulé',
     description: 'Aperçu visuel Kindle / tablette / phone avec rendu typographique fidèle.' },
-  { id: 'cover-pdf-exact',     pillar: 'publier',   status: 'todo', title: 'Couverture KDP Exacte (PDF)',
+  { id: 'cover-pdf-exact',     pillar: 'publier',   status: 'done', title: 'Couverture KDP Exacte (PDF)',
     description: 'Génère le PDF wrap complet (4e + dos + 1re) aux dimensions exactes KDP, bleed + zone ISBN, prêt à uploader.' },
 
   // MONÉTISER
@@ -77,11 +77,11 @@ export const V3_MODULES: V3Module[] = [
   // ===== AJOUTS — lancement progressif juillet / août =====
 
   // PUBLIER
-  { id: 'multi-format-express', pillar: 'publier',  status: 'todo', title: 'Multi-format Express',
+  { id: 'multi-format-express', pillar: 'publier',  status: 'done', title: 'Multi-format Express',
     description: 'Export simultané Kindle (.epub/.mobi), broché PDF KDP et grand format relié en un clic.' },
-  { id: 'isbn-metadata',        pillar: 'publier',  status: 'todo', title: 'ISBN & Métadonnées Manager',
+  { id: 'isbn-metadata',        pillar: 'publier',  status: 'done', title: 'ISBN & Métadonnées Manager',
     description: 'Centralise ISBN, BISAC, catégories, mots-clés, langue et droits par titre.' },
-  { id: 'translation-markets',  pillar: 'publier',  status: 'todo', title: 'Traduction Multi-Marchés',
+  { id: 'translation-markets',  pillar: 'publier',  status: 'done', title: 'Traduction Multi-Marchés',
     description: 'Traduit et adapte le livre pour Amazon US/UK/DE/ES via IA, avec ajustement culturel.' },
 
   // MONÉTISER
@@ -113,9 +113,9 @@ export const V3_MODULES: V3Module[] = [
   // ===== AJOUTS — issus du guide publication KDP (modules 03 → 08) — en attente =====
 
   // PUBLIER
-  { id: 'cover-variants-thumbnail', pillar: 'publier',  status: 'todo', title: 'Cover Designer 6 Variantes + Test Miniature',
+  { id: 'cover-variants-thumbnail', pillar: 'publier',  status: 'done', title: 'Cover Designer 6 Variantes + Test Miniature',
     description: 'Génère 6 variantes de couverture et les affiche en 200×300 px pour valider la lisibilité du titre dans les résultats Amazon.' },
-  { id: 'categories-manager-10',    pillar: 'publier',  status: 'todo', title: 'Gestionnaire de Catégories 10/livre',
+  { id: 'categories-manager-10',    pillar: 'publier',  status: 'done', title: 'Gestionnaire de Catégories 10/livre',
     description: 'Sélectionne 2 catégories optimales (1 large + 1 spécifique) puis prépare la demande des 8 catégories supplémentaires via le support KDP.' },
 
   // MONÉTISER
@@ -129,9 +129,9 @@ export const V3_MODULES: V3Module[] = [
   // ===== AJOUTS — propositions pour enrichir la V3 — en attente =====
 
   // PUBLIER
-  { id: 'back-matter-builder',  pillar: 'publier',   status: 'todo', title: 'Pages de Fin Automatiques',
+  { id: 'back-matter-builder',  pillar: 'publier',   status: 'done', title: 'Pages de Fin Automatiques',
     description: 'Génère les pages de fin : appel à laisser un avis, « Du même auteur », bio + lien newsletter, à insérer en fin d’ebook.' },
-  { id: 'print-proof-checker',  pillar: 'publier',   status: 'todo', title: "Vérificateur d'Épreuve Broché",
+  { id: 'print-proof-checker',  pillar: 'publier',   status: 'done', title: "Vérificateur d'Épreuve Broché",
     description: 'Contrôle bleed, marge de reliure (gutter), dos et code-barres avant de commander l’épreuve papier KDP.' },
 
   // MONÉTISER
