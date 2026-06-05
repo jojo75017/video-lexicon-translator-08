@@ -202,29 +202,32 @@ const V3HubPage: React.FC = () => {
         {filtered.length === 0 ? (
           <div className="text-center text-white/40 py-20 text-sm">Aucun outil ne correspond à « {query} ».</div>
         ) : pillar === 'all' ? (
-          PILLAR_ORDER.map((p) => {
-            const items = filtered.filter((m) => m.pillar === p);
-            if (items.length === 0) return null;
-            return (
-              <section key={p} className="mb-10">
-                <div className="flex items-center gap-2 mb-4">
-                  <span className="text-xl">{V3_PILLAR_META[p].emoji}</span>
-                  <h2 className="text-lg font-bold" style={{ color: GOLD_LIGHT }}>{V3_PILLAR_META[p].label}</h2>
-                  <span className="text-xs text-white/30">{items.length}</span>
-                  <div className="flex-1 h-px ml-2" style={{ background: `linear-gradient(90deg, ${GOLD}33, transparent)` }} />
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                  {items.map((m, i) => (
-                    <ModuleCard key={m.id} module={m} index={i} onOpen={setSelected} />
-                  ))}
-                </div>
-              </section>
-            );
-          })
+          (() => {
+            const firstPillarWithItems = PILLAR_ORDER.find((p) => filtered.some((m) => m.pillar === p));
+            return PILLAR_ORDER.map((p) => {
+              const items = filtered.filter((m) => m.pillar === p);
+              if (items.length === 0) return null;
+              return (
+                <section key={p} className="mb-10">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="text-xl">{V3_PILLAR_META[p].emoji}</span>
+                    <h2 className="text-lg font-bold" style={{ color: GOLD_LIGHT }}>{V3_PILLAR_META[p].label}</h2>
+                    <span className="text-xs text-white/30">{items.length}</span>
+                    <div className="flex-1 h-px ml-2" style={{ background: `linear-gradient(90deg, ${GOLD}33, transparent)` }} />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                    {items.map((m, i) => (
+                      <ModuleCard key={m.id} module={m} index={i} onOpen={setSelected} isFirst={p === firstPillarWithItems && i === 0} />
+                    ))}
+                  </div>
+                </section>
+              );
+            });
+          })()
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
             {filtered.map((m, i) => (
-              <ModuleCard key={m.id} module={m} index={i} onOpen={setSelected} />
+              <ModuleCard key={m.id} module={m} index={i} onOpen={setSelected} isFirst={i === 0} />
             ))}
           </div>
         )}
