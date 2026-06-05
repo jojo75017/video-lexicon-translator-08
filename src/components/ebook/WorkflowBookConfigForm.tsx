@@ -87,7 +87,26 @@ const InnerForm: React.FC<WorkflowBookConfigFormProps> = ({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="workflow-book-description">Petite introduction / sujet</Label>
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <Label htmlFor="workflow-book-description">Petite introduction / sujet</Label>
+          {onGenerateDescription && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => onGenerateDescription()}
+              disabled={isGeneratingDescription || !ebookTitle.trim()}
+              className="border-[#008296] text-[#008296] hover:bg-[#008296] hover:text-white"
+            >
+              {isGeneratingDescription ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Sparkles className="h-4 w-4 mr-2" />
+              )}
+              Générer avec l'IA
+            </Button>
+          )}
+        </div>
         <Textarea
           id="workflow-book-description"
           value={bookDescription}
