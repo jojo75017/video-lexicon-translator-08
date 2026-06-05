@@ -24,6 +24,16 @@ export const WorkflowAIProviderBadge = () => {
   const [open, setOpen] = useState(false);
   const [tick, setTick] = useState(0);
   const [testState, setTestState] = useState<TestState>('idle');
+  const COLLAPSE_KEY = 'workflow-ai-badge-collapsed';
+  const [collapsed, setCollapsed] = useState(() => localStorage.getItem(COLLAPSE_KEY) === '1');
+  const toggleCollapsed = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCollapsed((c) => {
+      const next = !c;
+      localStorage.setItem(COLLAPSE_KEY, next ? '1' : '0');
+      return next;
+    });
+  };
 
   // Re-évalue après fermeture du dialog (clé peut avoir changé)
   useEffect(() => {
