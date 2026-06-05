@@ -111,7 +111,7 @@ const V3HubPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0d0d0d] via-[#121212] to-[#0d0d0d] text-white">
       {/* Hero */}
-      <header className="relative overflow-hidden border-b border-[#c9a84c22]">
+      <header className="relative overflow-hidden border-b border-[#c9a84c22]" data-tour="hero">
         {/* particules dorées */}
         <div className="pointer-events-none absolute inset-0">
           {Array.from({ length: 18 }).map((_, i) => (
@@ -132,12 +132,22 @@ const V3HubPage: React.FC = () => {
           ))}
         </div>
         <div className="relative mx-auto max-w-7xl px-4 py-10">
-          <button
-            onClick={() => navigate('/admin-cockpit')}
-            className="inline-flex items-center gap-1.5 text-xs text-white/50 hover:text-[#f0d78c] transition-colors mb-6"
-          >
-            <ArrowLeft className="h-4 w-4" /> Retour au cockpit
-          </button>
+          <div className="flex items-center justify-between mb-6">
+            <button
+              data-tour="back"
+              onClick={() => navigate('/admin-cockpit')}
+              className="inline-flex items-center gap-1.5 text-xs text-white/50 hover:text-[#f0d78c] transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4" /> Retour au cockpit
+            </button>
+            <button
+              onClick={() => setTourOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold border transition-colors"
+              style={{ borderColor: `${GOLD}66`, color: GOLD_LIGHT }}
+            >
+              <Compass className="h-4 w-4" /> Visite guidée
+            </button>
+          </div>
 
           <div className="flex items-center gap-2 mb-3">
             <Crown className="h-6 w-6" style={{ color: GOLD }} />
@@ -154,7 +164,7 @@ const V3HubPage: React.FC = () => {
           </p>
 
           <div className="mt-6 flex flex-wrap items-center gap-3">
-            <span className="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-bold"
+            <span data-tour="price" className="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-bold"
               style={{ background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, color: '#1a1a1a' }}>
               <Sparkles className="h-4 w-4" /> 197€ à vie
             </span>
