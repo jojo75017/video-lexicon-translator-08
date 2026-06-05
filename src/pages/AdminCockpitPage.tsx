@@ -409,7 +409,7 @@ const AdminCockpitPage: React.FC = () => {
                   </div>
                   <ul className="space-y-1.5">
                     {items.map((m) => {
-                      const clickable = (isAdmin && v3Mode) || ['p16-competitive', 'p17-series', 'p18-readability', 'p19-author-voice', 'p20-chat-manuscript', 'p21-blurb-ab-tester', 'p22-trend-radar', 'niche-intelligence', 'listing-optimizer', 'book-creation-studio', 'library'].includes(m.id);
+                      const clickable = (isAdmin && v3Mode) || ['p16-competitive', 'p17-series', 'p18-readability', 'p19-author-voice', 'p20-chat-manuscript', 'p21-blurb-ab-tester', 'p22-trend-radar', 'niche-intelligence', 'listing-optimizer', 'book-creation-studio', 'library', 'cover-pdf-exact', 'cockpit-audit-pilot', 'kdp-pack-zip', 'multi-format-express', 'prepub-checklist', 'kindle-previewer', 'isbn-metadata', 'categories-manager-10', 'print-proof-checker', 'back-matter-builder', 'cover-variants-thumbnail', 'translation-markets'].includes(m.id);
                       const statusColor = m.status === 'done' ? '#10B981' : m.status === 'in_progress' ? '#FF9E2D' : '#94A3B8';
                       const statusBg = m.status === 'done' ? '#10B98114' : m.status === 'in_progress' ? '#FF9E2D14' : '#F1F5F9';
                       const statusLabel = m.status === 'done' ? '✓ Fait' : m.status === 'in_progress' ? '… En cours' : 'À faire';
