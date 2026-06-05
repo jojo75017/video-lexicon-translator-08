@@ -26,7 +26,7 @@ serve(async (req) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ role: 'user', parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.45, maxOutputTokens: 8192, responseMimeType: 'application/json' },
+          generationConfig: { temperature: 0.45, maxOutputTokens: 32768, responseMimeType: 'application/json' },
         }),
       },
     );
@@ -39,10 +39,27 @@ serve(async (req) => {
     }
 
     const aiData = await response.json();
-    const rawText = aiData?.candidates?.[0]?.content?.parts?.[0]?.text;
+    const candidate = aiData?.candidates?.[0];
+    const finishReason = candidate?.finishReason;
+    const rawText = candidate?.content?.parts?.[0]?.text;
     if (!rawText) return jsonResponse({ success: false, error: 'Réponse Gemini vide' }, 500);
+    if (finishReason && finishReason !== 'STOP') {
+      console.warn('Gemini finishReason:', finishReason, '- réponse possiblement tronquée, tentative de réparation.');
+    }
 
-    const audit = JSON.parse(cleanJson(rawText));
+    let audit: Record<string, unknown>;
+    try {
+      audit = JSON.parse(cleanJson(rawText));
+    } catch (parseErr) {
+      console.warn('JSON direct invalide, tentative de réparation:', parseErr instanceof Error ? parseErr.message : parseErr);
+      const repaired = repairJson(cleanJson(rawText));
+      try {
+        audit = JSON.parse(repaired);
+      } catch (repairErr) {
+        console.error('Réparation JSON échouée:', repairErr instanceof Error ? repairErr.message : repairErr);
+        return jsonResponse({ success: false, error: 'Réponse IA incomplète, relancez l’audit.' }, 502);
+      }
+    }
     return jsonResponse({ success: true, data: normalizeAudit(audit) });
   } catch (error) {
     console.error('Audit error:', error);
