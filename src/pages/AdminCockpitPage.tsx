@@ -53,6 +53,20 @@ import AuthorNewsletter from '@/components/admin/AuthorNewsletter';
 import AuthorPageOptimizer from '@/components/admin/AuthorPageOptimizer';
 import BookBubAdBuilder from '@/components/admin/BookBubAdBuilder';
 import ArcTeamBuilder from '@/components/admin/ArcTeamBuilder';
+import ManuscriptConverter from '@/components/admin/ManuscriptConverter';
+import ContentComplianceChecker from '@/components/admin/ContentComplianceChecker';
+import CopyrightPageGenerator from '@/components/admin/CopyrightPageGenerator';
+import RoyaltiesSimulator from '@/components/admin/RoyaltiesSimulator';
+import KuNicheDetector from '@/components/admin/KuNicheDetector';
+import LaunchPricingStrategy from '@/components/admin/LaunchPricingStrategy';
+import SocialCalendar30 from '@/components/admin/SocialCalendar30';
+import QuoteVisualsGenerator from '@/components/admin/QuoteVisualsGenerator';
+import MediaKitAuthor from '@/components/admin/MediaKitAuthor';
+import GoodreadsOptimizer from '@/components/admin/GoodreadsOptimizer';
+import UniverseBibleCheck from '@/components/admin/UniverseBibleCheck';
+import ClicheDetector from '@/components/admin/ClicheDetector';
+import ToneAdapter from '@/components/admin/ToneAdapter';
+import CommercialScore from '@/components/admin/CommercialScore';
 import { toast } from 'sonner';
 import {
   addMonths, endOfMonth, endOfWeek, format, isSameDay, isSameMonth,
