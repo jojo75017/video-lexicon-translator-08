@@ -1,10 +1,13 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Search, Sparkles, Crown } from 'lucide-react';
+import { ArrowLeft, Search, Sparkles, Crown, Compass } from 'lucide-react';
 import {
   V3_MODULES, V3_PILLAR_META, type V3Pillar, type V3Module,
 } from '@/data/roadmapV3';
 import { isModuleClickable, V3ModuleDialog } from '@/components/admin/v3ModuleRegistry';
+import { V3HubTour } from '@/components/admin/V3HubTour';
+
+const TOUR_KEY = 'v3hub_tour_done';
 
 // Palette « Noir & Or luxe » — locale à cette page uniquement.
 const GOLD = '#c9a84c';
@@ -17,10 +20,12 @@ function ModuleCard({
   module,
   index,
   onOpen,
+  isFirst,
 }: {
   module: V3Module;
   index: number;
   onOpen: (m: V3Module) => void;
+  isFirst?: boolean;
 }) {
   const ref = React.useRef<HTMLButtonElement>(null);
   const [tilt, setTilt] = useState('');
@@ -43,6 +48,7 @@ function ModuleCard({
   return (
     <button
       ref={ref}
+      data-tour={isFirst ? 'card' : undefined}
       onClick={() => clickable && onOpen(module)}
       onMouseMove={handleMove}
       onMouseLeave={() => setTilt('')}
@@ -57,7 +63,7 @@ function ModuleCard({
       <div className="relative">
         <div className="flex items-center justify-between mb-2">
           <span className="text-lg">{V3_PILLAR_META[module.pillar].emoji}</span>
-          <span className="text-[9px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5"
+          <span data-tour={isFirst ? 'status' : undefined} className="text-[9px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5"
             style={{ background: `${statusColor}1f`, color: statusColor }}>
             {statusLabel}
           </span>
@@ -77,6 +83,19 @@ const V3HubPage: React.FC = () => {
   const [query, setQuery] = useState('');
   const [pillar, setPillar] = useState<V3Pillar | 'all'>('all');
   const [selected, setSelected] = useState<V3Module | null>(null);
+  const [tourOpen, setTourOpen] = useState(false);
+
+  useEffect(() => {
+    if (!localStorage.getItem(TOUR_KEY)) {
+      const t = setTimeout(() => setTourOpen(true), 1000);
+      return () => clearTimeout(t);
+    }
+  }, []);
+
+  const finishTour = () => {
+    localStorage.setItem(TOUR_KEY, 'true');
+    setTourOpen(false);
+  };
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -92,7 +111,7 @@ const V3HubPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0d0d0d] via-[#121212] to-[#0d0d0d] text-white">
       {/* Hero */}
-      <header className="relative overflow-hidden border-b border-[#c9a84c22]">
+      <header className="relative overflow-hidden border-b border-[#c9a84c22]" data-tour="hero">
         {/* particules dorées */}
         <div className="pointer-events-none absolute inset-0">
           {Array.from({ length: 18 }).map((_, i) => (
@@ -113,12 +132,22 @@ const V3HubPage: React.FC = () => {
           ))}
         </div>
         <div className="relative mx-auto max-w-7xl px-4 py-10">
-          <button
-            onClick={() => navigate('/admin-cockpit')}
-            className="inline-flex items-center gap-1.5 text-xs text-white/50 hover:text-[#f0d78c] transition-colors mb-6"
-          >
-            <ArrowLeft className="h-4 w-4" /> Retour au cockpit
-          </button>
+          <div className="flex items-center justify-between mb-6">
+            <button
+              data-tour="back"
+              onClick={() => navigate('/admin-cockpit')}
+              className="inline-flex items-center gap-1.5 text-xs text-white/50 hover:text-[#f0d78c] transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4" /> Retour au cockpit
+            </button>
+            <button
+              onClick={() => setTourOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold border transition-colors"
+              style={{ borderColor: `${GOLD}66`, color: GOLD_LIGHT }}
+            >
+              <Compass className="h-4 w-4" /> Visite guidée
+            </button>
+          </div>
 
           <div className="flex items-center gap-2 mb-3">
             <Crown className="h-6 w-6" style={{ color: GOLD }} />
@@ -135,7 +164,7 @@ const V3HubPage: React.FC = () => {
           </p>
 
           <div className="mt-6 flex flex-wrap items-center gap-3">
-            <span className="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-bold"
+            <span data-tour="price" className="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-bold"
               style={{ background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, color: '#1a1a1a' }}>
               <Sparkles className="h-4 w-4" /> 197€ à vie
             </span>
@@ -147,7 +176,7 @@ const V3HubPage: React.FC = () => {
       <main className="mx-auto max-w-7xl px-4 py-8">
         {/* Recherche + filtres */}
         <div className="sticky top-0 z-10 -mx-4 px-4 py-3 bg-[#0d0d0d]/80 backdrop-blur-md mb-6">
-          <div className="relative max-w-md mb-3">
+          <div className="relative max-w-md mb-3" data-tour="search">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
             <input
               value={query}
@@ -156,7 +185,7 @@ const V3HubPage: React.FC = () => {
               className="w-full rounded-full bg-[#1a1a1a] border border-[#c9a84c33] pl-9 pr-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#c9a84c] transition-colors"
             />
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2" data-tour="filters">
             <FilterChip active={pillar === 'all'} onClick={() => setPillar('all')} label={`Tous (${V3_MODULES.length})`} />
             {PILLAR_ORDER.map((p) => (
               <FilterChip
@@ -173,35 +202,39 @@ const V3HubPage: React.FC = () => {
         {filtered.length === 0 ? (
           <div className="text-center text-white/40 py-20 text-sm">Aucun outil ne correspond à « {query} ».</div>
         ) : pillar === 'all' ? (
-          PILLAR_ORDER.map((p) => {
-            const items = filtered.filter((m) => m.pillar === p);
-            if (items.length === 0) return null;
-            return (
-              <section key={p} className="mb-10">
-                <div className="flex items-center gap-2 mb-4">
-                  <span className="text-xl">{V3_PILLAR_META[p].emoji}</span>
-                  <h2 className="text-lg font-bold" style={{ color: GOLD_LIGHT }}>{V3_PILLAR_META[p].label}</h2>
-                  <span className="text-xs text-white/30">{items.length}</span>
-                  <div className="flex-1 h-px ml-2" style={{ background: `linear-gradient(90deg, ${GOLD}33, transparent)` }} />
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                  {items.map((m, i) => (
-                    <ModuleCard key={m.id} module={m} index={i} onOpen={setSelected} />
-                  ))}
-                </div>
-              </section>
-            );
-          })
+          (() => {
+            const firstPillarWithItems = PILLAR_ORDER.find((p) => filtered.some((m) => m.pillar === p));
+            return PILLAR_ORDER.map((p) => {
+              const items = filtered.filter((m) => m.pillar === p);
+              if (items.length === 0) return null;
+              return (
+                <section key={p} className="mb-10">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="text-xl">{V3_PILLAR_META[p].emoji}</span>
+                    <h2 className="text-lg font-bold" style={{ color: GOLD_LIGHT }}>{V3_PILLAR_META[p].label}</h2>
+                    <span className="text-xs text-white/30">{items.length}</span>
+                    <div className="flex-1 h-px ml-2" style={{ background: `linear-gradient(90deg, ${GOLD}33, transparent)` }} />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                    {items.map((m, i) => (
+                      <ModuleCard key={m.id} module={m} index={i} onOpen={setSelected} isFirst={p === firstPillarWithItems && i === 0} />
+                    ))}
+                  </div>
+                </section>
+              );
+            });
+          })()
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
             {filtered.map((m, i) => (
-              <ModuleCard key={m.id} module={m} index={i} onOpen={setSelected} />
+              <ModuleCard key={m.id} module={m} index={i} onOpen={setSelected} isFirst={i === 0} />
             ))}
           </div>
         )}
       </main>
 
       <V3ModuleDialog module={selected} onClose={() => setSelected(null)} />
+      <V3HubTour isOpen={tourOpen} onClose={finishTour} onComplete={finishTour} />
     </div>
   );
 };
