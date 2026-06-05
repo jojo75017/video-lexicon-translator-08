@@ -48,6 +48,7 @@ function ModuleCard({
   return (
     <button
       ref={ref}
+      data-tour={isFirst ? 'card' : undefined}
       onClick={() => clickable && onOpen(module)}
       onMouseMove={handleMove}
       onMouseLeave={() => setTilt('')}
