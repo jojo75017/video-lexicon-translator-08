@@ -22,6 +22,18 @@ import NicheIntelligence from '@/components/admin/NicheIntelligence';
 import ListingOptimizer from '@/components/admin/ListingOptimizer';
 import BookCreationStudio from '@/components/admin/BookCreationStudio';
 import LibraryModule from '@/components/admin/LibraryModule';
+import CoverPdfExact from '@/components/admin/CoverPdfExact';
+import AuditPilotModule from '@/components/admin/AuditPilotModule';
+import KdpPackExport from '@/components/admin/KdpPackExport';
+import MultiFormatExport from '@/components/admin/MultiFormatExport';
+import PrepubChecklist from '@/components/admin/PrepubChecklist';
+import KindlePreviewer from '@/components/admin/KindlePreviewer';
+import IsbnMetadataManager from '@/components/admin/IsbnMetadataManager';
+import CategoriesManager10 from '@/components/admin/CategoriesManager10';
+import PrintProofChecker from '@/components/admin/PrintProofChecker';
+import BackMatterBuilder from '@/components/admin/BackMatterBuilder';
+import CoverVariantsThumbnail from '@/components/admin/CoverVariantsThumbnail';
+import TranslationMarkets from '@/components/admin/TranslationMarkets';
 import { toast } from 'sonner';
 import {
   addMonths, endOfMonth, endOfWeek, format, isSameDay, isSameMonth,
