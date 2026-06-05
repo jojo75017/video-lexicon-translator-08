@@ -604,6 +604,34 @@ const AdminCockpitPage: React.FC = () => {
                     <BookBubAdBuilder />
                   ) : selectedModule.id === 'arc-team-builder' ? (
                     <ArcTeamBuilder />
+                  ) : selectedModule.id === 'manuscript-converter' ? (
+                    <ManuscriptConverter />
+                  ) : selectedModule.id === 'content-compliance' ? (
+                    <ContentComplianceChecker />
+                  ) : selectedModule.id === 'copyright-page' ? (
+                    <CopyrightPageGenerator />
+                  ) : selectedModule.id === 'royalties-simulator' ? (
+                    <RoyaltiesSimulator />
+                  ) : selectedModule.id === 'ku-niche-detector' ? (
+                    <KuNicheDetector />
+                  ) : selectedModule.id === 'launch-pricing' ? (
+                    <LaunchPricingStrategy />
+                  ) : selectedModule.id === 'social-calendar-30' ? (
+                    <SocialCalendar30 />
+                  ) : selectedModule.id === 'quote-visuals' ? (
+                    <QuoteVisualsGenerator />
+                  ) : selectedModule.id === 'media-kit' ? (
+                    <MediaKitAuthor />
+                  ) : selectedModule.id === 'goodreads-optimizer' ? (
+                    <GoodreadsOptimizer />
+                  ) : selectedModule.id === 'p23-universe-bible' ? (
+                    <UniverseBibleCheck />
+                  ) : selectedModule.id === 'p24-cliche-detector' ? (
+                    <ClicheDetector />
+                  ) : selectedModule.id === 'p25-tone-adapter' ? (
+                    <ToneAdapter />
+                  ) : selectedModule.id === 'p26-commercial-score' ? (
+                    <CommercialScore />
                   ) : (
                     <p className="text-[11px] text-joy-ink/40">
                       Module en préparation pour la V3 ({V3_PRICE}€ à vie). Visible uniquement par l'admin.
