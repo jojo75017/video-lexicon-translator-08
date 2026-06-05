@@ -34,6 +34,15 @@ import PrintProofChecker from '@/components/admin/PrintProofChecker';
 import BackMatterBuilder from '@/components/admin/BackMatterBuilder';
 import CoverVariantsThumbnail from '@/components/admin/CoverVariantsThumbnail';
 import TranslationMarkets from '@/components/admin/TranslationMarkets';
+import SalesTrackerKdp from '@/components/admin/SalesTrackerKdp';
+import RoyaltiesDashboard from '@/components/admin/RoyaltiesDashboard';
+import SalesDescription from '@/components/admin/SalesDescription';
+import AplusGenerator from '@/components/admin/AplusGenerator';
+import AutoPricingAI from '@/components/admin/AutoPricingAI';
+import BundlesBoxsets from '@/components/admin/BundlesBoxsets';
+import LeadMagnetBuilder from '@/components/admin/LeadMagnetBuilder';
+import BackCatalogFunnel from '@/components/admin/BackCatalogFunnel';
+import KdpSelectPlanner from '@/components/admin/KdpSelectPlanner';
 import { toast } from 'sonner';
 import {
   addMonths, endOfMonth, endOfWeek, format, isSameDay, isSameMonth,
