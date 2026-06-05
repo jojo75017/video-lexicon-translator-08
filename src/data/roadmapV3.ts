@@ -161,6 +161,8 @@ export const V3_MODULES: V3Module[] = [
     description: 'Détecte le contenu interdit KDP (liens, mentions concurrents, langage promo) avant soumission pour éviter le blocage.' },
   { id: 'copyright-page',        pillar: 'publier',   status: 'done', title: 'Générateur Page Copyright / Mentions légales',
     description: 'Page légale + dédicace + table des matières cliquable, multi-langue, prête à insérer.' },
+  { id: 'ebook-anti-plagiat',    pillar: 'publier',   status: 'done', title: 'Ebook Anti-Plagiat — Protection & Défense',
+    description: 'Protège ton ebook avant publication (copyright renforcé, traçage), surveille le web (alertes + audit hebdo), réagis en cas de plagiat (email de retrait KDP, preuves) et télécharge le Pack Anti-Plagiat PDF.' },
 
   // MONÉTISER
   { id: 'royalties-simulator',   pillar: 'monetiser', status: 'done', title: 'Simulateur de Royalties Multi-Prix',
