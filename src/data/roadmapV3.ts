@@ -33,7 +33,7 @@ export const V3_PILLAR_COLORS: Record<V3Pillar, string> = {
 
 export const V3_MODULES: V3Module[] = [
   // PUBLIER
-  { id: 'library',             pillar: 'publier',   status: 'in_progress', title: 'BIBLIOTHÈQUE — Mes Créations',
+  { id: 'library',             pillar: 'publier',   status: 'done', title: 'BIBLIOTHÈQUE — Mes Créations',
     description: 'Toutes vos créations au même endroit : livres numériques et audio avec actions Modifier, Publier, Exporter, Supprimer.' },
   { id: 'kdp-pack-zip',        pillar: 'publier',   status: 'todo', title: 'Pack KDP ZIP',
     description: 'Export bundle PDF intérieur + couverture + métadonnées prêt upload Amazon.' },
@@ -43,7 +43,7 @@ export const V3_MODULES: V3Module[] = [
     description: '25 points cochables avant clic "Publier" sur KDP.' },
   { id: 'kindle-previewer',    pillar: 'publier',   status: 'todo', title: 'Kindle Previewer Simulé',
     description: 'Aperçu visuel Kindle / tablette / phone avec rendu typographique fidèle.' },
-  { id: 'cover-pdf-exact',     pillar: 'publier',   status: 'in_progress', title: 'Couverture KDP Exacte (PDF)',
+  { id: 'cover-pdf-exact',     pillar: 'publier',   status: 'todo', title: 'Couverture KDP Exacte (PDF)',
     description: 'Génère le PDF wrap complet (4e + dos + 1re) aux dimensions exactes KDP, bleed + zone ISBN, prêt à uploader.' },
 
   // MONÉTISER
@@ -55,7 +55,7 @@ export const V3_MODULES: V3Module[] = [
     description: 'Suggère le prix optimal selon niche, concurrence et longueur.' },
 
   // MARKETING
-  { id: 'listing-optimizer',     pillar: 'marketing', status: 'in_progress', title: "Optimiseur d'annonces KDP",
+  { id: 'listing-optimizer',     pillar: 'marketing', status: 'done', title: "Optimiseur d'annonces KDP",
     description: 'Optimise titre, sous-titre, mots-clés KDP, catégories, description, contenu A+ et tarification du livre.' },
   { id: 'launch-sequence-j7',  pillar: 'marketing', status: 'todo', title: 'Séquence Lancement J-7',
     description: 'Emails + posts sociaux pré-programmés sur 7 jours avant publication.' },
@@ -65,13 +65,13 @@ export const V3_MODULES: V3Module[] = [
     description: '20 pins générés automatiquement depuis la couverture du livre.' },
 
   // IA AVANCÉE
-  { id: 'book-creation-studio', pillar: 'ia',        status: 'in_progress', title: 'STUDIO — Création de Livres',
+  { id: 'book-creation-studio', pillar: 'ia',        status: 'done', title: 'STUDIO — Création de Livres',
     description: 'Assistant 6 étapes (Taper, Détails, Générer, Aperçu, Exporter, Publier) avec choix du type de livre, titre, sous-titre et mots-clés.' },
   { id: 'p16-competitive',     pillar: 'ia',        status: 'done', title: 'SCOUT — Analyse Concurrentielle (P16)',
     description: 'Scan top 10 Amazon de la niche pour positionnement et angles.' },
-  { id: 'niche-intelligence',    pillar: 'ia',        status: 'in_progress', title: 'INTEL — Intelligence de Niche',
+  { id: 'niche-intelligence',    pillar: 'ia',        status: 'done', title: 'INTEL — Intelligence de Niche',
     description: '4 onglets : découverte IA (SCOUT), niches cachées, prédicteur de tendances (VIGIE) et 600+ idées par catégorie.' },
-  { id: 'p17-series',          pillar: 'ia',        status: 'in_progress', title: 'SAGA — Architecte de Série (P17)',
+  { id: 'p17-series',          pillar: 'ia',        status: 'done', title: 'SAGA — Architecte de Série (P17)',
     description: 'Plan cohérent des tomes 2 / 3 / 4 (arcs, persos, cliffhangers).' },
 
   // ===== AJOUTS — lancement progressif juillet / août =====
@@ -103,11 +103,11 @@ export const V3_MODULES: V3Module[] = [
     description: "Templates et calendrier d'emails pour fidéliser les lecteurs." },
 
   // IA AVANCÉE
-  { id: 'p18-readability',      pillar: 'ia',        status: 'in_progress', title: 'LUMEN — Audit Lisibilité (P18)',
+  { id: 'p18-readability',      pillar: 'ia',        status: 'done', title: 'LUMEN — Audit Lisibilité (P18)',
     description: 'Score de lisibilité, rythme, longueur de phrases et suggestions par chapitre.' },
-  { id: 'p19-author-voice',     pillar: 'ia',        status: 'in_progress', title: "ÉCHO — Voix d'Auteur Persistante (P19)",
+  { id: 'p19-author-voice',     pillar: 'ia',        status: 'done', title: "ÉCHO — Voix d'Auteur Persistante (P19)",
     description: 'Mémorise et applique le style signature sur toute une série.' },
-  { id: 'p20-chat-manuscript',  pillar: 'ia',        status: 'in_progress', title: 'ORACLE — Chat Manuscrit (P20)',
+  { id: 'p20-chat-manuscript',  pillar: 'ia',        status: 'done', title: 'ORACLE — Chat Manuscrit (P20)',
     description: 'Pose des questions à ton propre livre (cohérence, résumé, fiches persos).' },
 
   // ===== AJOUTS — issus du guide publication KDP (modules 03 → 08) — en attente =====
@@ -147,8 +147,8 @@ export const V3_MODULES: V3Module[] = [
     description: 'Crée visuels et accroches ciblés par niche pour les campagnes BookBub et Facebook Ads.' },
 
   // IA AVANCÉE
-  { id: 'p21-blurb-ab-tester',   pillar: 'ia',        status: 'in_progress', title: 'DUEL — A/B Test 4e de Couverture (P21)',
+  { id: 'p21-blurb-ab-tester',   pillar: 'ia',        status: 'done', title: 'DUEL — A/B Test 4e de Couverture (P21)',
     description: 'Génère plusieurs variantes de 4e de couverture et les score pour identifier la plus vendeuse.' },
-  { id: 'p22-trend-radar',       pillar: 'ia',        status: 'in_progress', title: 'VIGIE — Radar de Tendances (P22)',
+  { id: 'p22-trend-radar',       pillar: 'ia',        status: 'done', title: 'VIGIE — Radar de Tendances (P22)',
     description: 'Détecte sujets émergents et saisonnalité d’une niche pour choisir le prochain livre à écrire.' },
 ];

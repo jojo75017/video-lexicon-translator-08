@@ -1,35 +1,45 @@
-## Objectif
+## Problème
 
-Construire la vraie interface V3 « Intelligence de niche » (inspirée des captures) dans le **cockpit admin**, en **thème clair Amazon KDP**, avec 4 onglets, en réutilisant SCOUT + VIGIE et les 600 niches existantes.
+Sur la page V3 (cockpit admin), plusieurs modules affichent « En cours » alors que rien n'a avancé. La raison : le statut de chaque module est **écrit à la main** dans `src/data/roadmapV3.ts` (`status: 'in_progress'`), il n'est pas calculé d'après ce qui est réellement codé. Résultat : l'affichage ne reflète pas la réalité et on ne sait pas quoi avancer.
 
-## Aperçu des 4 onglets
+## Réalité du code
+
+Dans `AdminCockpitPage.tsx`, seuls 11 modules sont **réellement construits** : ils ont un composant qui s'ouvre quand on clique dessus. Ce sont :
 
 ```text
-┌───────────────────────────────────────────────────────────────┐
-│ [✨ Découverte] [👁 Niches cachées] [📈 Prédicteur] [💡 100 idées]│
-├───────────────────────────────────────────────────────────────┤
-│ contenu de l'onglet actif                                       │
-└───────────────────────────────────────────────────────────────┘
+SCOUT (P16)            → ScoutAnalysis
+SAGA (P17)             → SagaArchitect
+LUMEN (P18)            → LumenReadability
+ÉCHO (P19)             → EchoAuthorVoice
+ORACLE (P20)           → OracleManuscript
+DUEL (P21)             → DuelBlurb
+VIGIE (P22)            → VigieTrends
+INTEL — Intelligence de Niche → NicheIntelligence
+Optimiseur d'annonces KDP     → ListingOptimizer
+STUDIO — Création de Livres   → BookCreationStudio
+BIBLIOTHÈQUE — Mes Créations  → LibraryModule
 ```
 
-1. **Découverte intelligente** — champ « Saisissez un sujet, un mot-clé ou un public » + bouton « Découvrez des niches ». Appelle l'edge function existante `scout-analysis` (SCOUT) et affiche la synthèse marché, concurrents, angles, mots-clés, plan d'action.
-2. **Niches cachées** — sélection des niches `niches600` à **faible concurrence** et **fort potentiel**, présentées en cartes (titre = niche, sous-titre = mot-clé Amazon + catégorie), triées par potentiel. Pas d'IA, données déterministes.
-3. **Prédicteur de tendances** — bloc « Prédicteur de tendances » + bouton « Prédire les niches émergentes » + champ niche. Appelle l'edge function existante `vigie-trends` (VIGIE) et affiche sujets émergents, saisonnalité, recommandations.
-4. **Plus de 100 idées** — toutes les `niches600` regroupées **par catégorie** (12 catégories), en grille de cartes avec **titre** (la niche) + **sous-titre** (mot-clé / catégorie). Clic sur une carte → pré-remplit et bascule sur l'onglet « Découverte intelligente » pour lancer l'analyse SCOUT.
+Tous les autres modules **n'ont aucun composant** branché : ils ne sont pas faits. En particulier `Couverture KDP Exacte (PDF)` est marqué « En cours » mais n'est branché nulle part dans le cockpit.
+
+## Correction proposée
+
+Mettre les statuts en accord avec le code, pour qu'un coup d'œil suffise à voir ce qui est fait :
+
+1. **Passer en « Fait » (`done`)** les 11 modules réellement construits listés ci-dessus.
+2. **Passer en « En attente » (`todo`)** tous les modules qui n'ont pas de composant branché — y compris ceux aujourd'hui faussement marqués « En cours » (ex. `cover-pdf-exact`).
+3. Plus aucun module ne reste en `in_progress`, sauf si tu m'indiques précisément un chantier que tu considères « en cours de construction » (dans ce cas je le garde en `in_progress`).
+
+Aucune logique n'est touchée : on ne modifie que les valeurs `status` dans `src/data/roadmapV3.ts`. L'affichage des couleurs/badges (Fait / En cours / En attente) existe déjà et se mettra à jour automatiquement.
 
 ## Détails techniques
 
-- **Nouveau composant** `src/components/admin/NicheIntelligence.tsx` : gère les 4 onglets (`Tabs` shadcn), l'état du champ de recherche partagé, et les appels `supabase.functions.invoke('scout-analysis' | 'vigie-trends')`. Réutilise le rendu des résultats déjà présent dans `ScoutAnalysis.tsx` / `VigieTrends.tsx` (on factorise au besoin, sinon on intègre des sous-vues légères).
-- **Données** : import direct de `niches600` et `niches600Categories` depuis `src/data/niches600.ts`. Onglet « Niches cachées » = filtre `concurrence === 'Faible'` trié par `potentiel` décroissant. Onglet « 100 idées » = `groupBy(category)`.
-- **Thème** : composants shadcn (`Card`, `Tabs`, `Input`, `Button`, `Badge`) avec tokens clairs existants (teal `#008296`, hover `#FF9E2D`, fond clair) — pas de fond sombre.
-- **Intégration cockpit** `src/pages/AdminCockpitPage.tsx` :
-  - import `NicheIntelligence`.
-  - nouveau module dans `src/data/roadmapV3.ts` : `{ id: 'niche-intelligence', pillar: 'ia', status: 'in_progress', title: 'INTEL — Intelligence de Niche', description: '4 onglets : découverte IA, niches cachées, prédicteur de tendances, 100+ idées par catégorie.' }`.
-  - ajouter `'niche-intelligence'` à la liste `clickable`, à la classe `DialogContent` (large, scroll), et un `case` de rendu qui affiche `<NicheIntelligence />`.
-- **Pas de changement backend** : SCOUT (`scout-analysis`) et VIGIE (`vigie-trends`) sont déjà déployés et testés.
+- Fichier unique modifié : `src/data/roadmapV3.ts`.
+- Éditer le champ `status` de chaque entrée de `V3_MODULES` selon les règles ci-dessus.
+- Aucun changement de composant, de route, ni de backend.
 
-## Validation
+## Vérification
 
-- Ouvrir le module depuis le cockpit, vérifier le passage entre les 4 onglets.
-- Tester « Découvrez des niches » (SCOUT) et « Prédire les niches émergentes » (VIGIE) via la preview.
-- Vérifier le regroupement par catégorie et le clic d'une carte « 100 idées » qui pré-remplit la découverte.
+- Ouvrir `/admin-cockpit` en mode V3.
+- Confirmer que les 11 modules branchés affichent le badge « Fait » (vert) et s'ouvrent au clic.
+- Confirmer qu'aucun module non construit n'affiche plus « En cours » : ils sont tous en « En attente ».
