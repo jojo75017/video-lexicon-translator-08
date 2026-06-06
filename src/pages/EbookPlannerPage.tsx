@@ -1117,10 +1117,23 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
   const applyTemplate = (templateType: string) => {
     const template = ebookTemplates[templateType];
     if (!template) return;
-    setEbookTitle(template.title);
-    setAuthorName(template.author);
-    setPreface(template.preface);
-    setConclusion(template.conclusion);
+
+    // Ne pas écraser le travail déjà saisi par l'utilisateur sans confirmation
+    const hasExistingWork =
+      ebookTitle.trim().length > 0 ||
+      chapters.some((c) => c.title.trim().length > 0 || c.content.trim().length > 0);
+    if (hasExistingWork) {
+      const confirmReplace = window.confirm(
+        "Appliquer ce template va remplacer la structure des chapitres. Votre titre, auteur et description seront conservés. Continuer ?"
+      );
+      if (!confirmReplace) return;
+    }
+
+    // Conserver le titre/auteur de l'utilisateur s'ils sont déjà renseignés
+    if (!ebookTitle.trim()) setEbookTitle(template.title);
+    if (!authorName.trim()) setAuthorName(template.author);
+    if (!preface.trim()) setPreface(template.preface);
+    if (!conclusion.trim()) setConclusion(template.conclusion);
     const templateChapters = template.chapters.map((chapter, index) => ({
       id: (Date.now() + index).toString(),
       title: chapter.title,
