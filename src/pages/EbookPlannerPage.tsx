@@ -1849,7 +1849,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                     <Button 
                       type="button"
                       onClick={resetPlan}
-                      className="bg-white/10 backdrop-blur-md hover:bg-white/20 text-white border border-white/20 rounded-xl"
+                      className="bg-secondary hover:bg-secondary/80 text-foreground border border-border rounded-xl"
                     >
                       <RotateCcw className="h-4 w-4 mr-2" />
                       Nouveau
@@ -1857,7 +1857,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                     <Button 
                       type="button"
                       onClick={() => { setShowWelcome(true); setShowTutorial(true); }}
-                      className="bg-white/10 backdrop-blur-md hover:bg-white/20 text-white border border-white/20 rounded-xl"
+                      className="bg-secondary hover:bg-secondary/80 text-foreground border border-border rounded-xl"
                     >
                       <HelpCircle className="h-4 w-4 mr-2" />
                       Aide
