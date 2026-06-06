@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import FunnelLayout from '@/components/funnel/FunnelLayout';
-import QuotaDepasseBanner from '@/components/sales/QuotaDepasseBanner';
 import SeoHead from '@/components/funnel/SeoHead';
 import { Button } from '@/components/ui/button';
 import { useReferralTracking } from '@/hooks/useReferralTracking';
