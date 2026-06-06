@@ -21,7 +21,7 @@ const PRODUCT_CATALOG: Record<string, { name: string; description: string; amoun
   extended_license: {
     name: "Licence Commerciale Étendue",
     description: "Usage freelance / agence + projets clients illimités",
-    amount: 4700,
+    amount: 6700,
   },
 };
 
