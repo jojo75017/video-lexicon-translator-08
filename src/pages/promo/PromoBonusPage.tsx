@@ -13,7 +13,7 @@ const UPSELLS = [
     key: 'license_extended',
     icon: Crown,
     title: 'Licence commerciale étendue',
-    price: 47,
+    price: 67,
     desc: 'Vendez vos ebooks sous votre marque blanche, créez votre propre catalogue éditorial, redistribuez vos productions sans limite.',
     benefits: [
       'Marque blanche illimitée',
