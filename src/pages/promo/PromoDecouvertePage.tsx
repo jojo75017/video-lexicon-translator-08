@@ -68,9 +68,6 @@ const PromoDecouvertePage = () => {
         }}
       />
 
-      {/* BANDEAU QUOTA DÉPASSÉ */}
-      <QuotaDepasseBanner />
-
       {/* BANDEAU OFFRE FONDATEUR */}
       {offerActive && (
         <div className="bg-gradient-to-r from-[#EC4899] via-[#FF9E2D] to-[#EC4899] text-white text-center py-2.5 px-4 text-sm font-semibold flex items-center justify-center gap-2 flex-wrap">
