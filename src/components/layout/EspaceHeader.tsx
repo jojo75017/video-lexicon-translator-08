@@ -306,14 +306,25 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
 
       <div className="relative mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-2.5 sm:px-6">
         {/* Titre flashy centré — visible md+ */}
-        <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:block z-10">
-          <span
-            className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-extrabold tracking-wide text-white shadow-lg shadow-[#FF9E2D]/40 ring-1 ring-white/40 animate-[pulse_2.4s_ease-in-out_infinite]"
-            style={{ backgroundImage: 'linear-gradient(90deg,#008296 0%,#00A8B5 50%,#FF9E2D 100%)' }}
-          >
-            <Sparkles className="h-3.5 w-3.5" />
-            Ebookstudio Pro V2
-          </span>
+        <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:block z-10 max-w-[50%]">
+          {projectTitle ? (
+            <span
+              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-extrabold tracking-wide text-white shadow-lg shadow-[#FF9E2D]/40 ring-1 ring-white/40 truncate max-w-full"
+              style={{ backgroundImage: 'linear-gradient(90deg,#008296 0%,#00A8B5 50%,#FF9E2D 100%)' }}
+              title={projectTitle}
+            >
+              <BookOpen className="h-3.5 w-3.5 flex-shrink-0" />
+              <span className="truncate">{projectTitle}</span>
+            </span>
+          ) : (
+            <span
+              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-extrabold tracking-wide text-white shadow-lg shadow-[#FF9E2D]/40 ring-1 ring-white/40 animate-[pulse_2.4s_ease-in-out_infinite]"
+              style={{ backgroundImage: 'linear-gradient(90deg,#008296 0%,#00A8B5 50%,#FF9E2D 100%)' }}
+            >
+              <Sparkles className="h-3.5 w-3.5" />
+              Ebookstudio Pro V2
+            </span>
+          )}
         </div>
 
         <div className="flex min-w-0 items-center gap-2 text-sm">
@@ -445,6 +456,22 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
           )}
         </div>
       </div>
+
+      {projectTitle && (
+        <div className="w-full border-t border-[#e8ecf1] bg-gradient-to-r from-[#008296]/5 to-[#FF9E2D]/5 py-3 px-4 sm:px-6">
+          <div className="mx-auto max-w-7xl">
+            <h1 className="text-xl sm:text-2xl font-extrabold text-[#232F3E] tracking-tight leading-tight truncate">
+              <span className="mr-2" aria-hidden>📖</span>
+              {projectTitle}
+            </h1>
+            {currentStepLabel && (
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#008296] mt-0.5 truncate">
+                {currentStepLabel}
+              </p>
+            )}
+          </div>
+        </div>
+      )}
 
       {showTabBar && (
         <>
