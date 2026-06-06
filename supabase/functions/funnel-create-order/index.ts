@@ -9,10 +9,10 @@ const corsHeaders = {
 
 const PRODUCTS: Record<string, { label: string; amount: number }> = {
   main: { label: "EbookStudio — Accès à vie", amount: 67 },
-  license_extended: { label: "Licence commerciale étendue", amount: 47 },
+  license_extended: { label: "Licence commerciale étendue", amount: 67 },
   templates_premium: { label: "Pack 50 templates premium", amount: 25 },
   // Legacy aliases
-  upsell_license: { label: "Licence commerciale étendue", amount: 47 },
+  upsell_license: { label: "Licence commerciale étendue", amount: 67 },
   upsell_templates: { label: "Pack 50 templates premium", amount: 25 },
 };
 

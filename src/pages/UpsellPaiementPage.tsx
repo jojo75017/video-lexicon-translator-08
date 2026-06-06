@@ -15,7 +15,7 @@ import { motion } from "framer-motion";
 const LAUNCH_PRICE = 67;
 const NORMAL_PRICE = 197;
 const SERENITY_PRICE = 30;
-const EXTENDED_LICENSE_PRICE = 47;
+const EXTENDED_LICENSE_PRICE = 67;
 
 const buildPaypalLink = (amount: number, label: string) =>
   `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=${amount}&currency_code=EUR&item_name=${encodeURIComponent(label)}`;

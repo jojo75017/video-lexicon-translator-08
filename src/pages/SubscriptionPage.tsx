@@ -114,7 +114,7 @@ const SubscriptionPage = ({ subscriberEmail, subscriberData, onLogout }: Subscri
       starter: 'bg-blue-500',
     };
     const labels: Record<string, string> = {
-      starter: 'STARTER - 47€',
+      starter: 'STARTER - 67€',
     };
     return <Badge className={colors[plan] || 'bg-gray-500'}>{labels[plan] || plan.toUpperCase()}</Badge>;
   };
