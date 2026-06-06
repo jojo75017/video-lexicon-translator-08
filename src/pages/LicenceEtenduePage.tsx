@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, ArrowRight, Check, Sparkles, Briefcase, Users, TrendingUp, ShieldCheck, Lock, CreditCard } from "lucide-react";
 
-const EXTENDED_PRICE = 47;
+const EXTENDED_PRICE = 67;
 
 const PAYPAL_LINK = `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=boubetgeorges@gmail.com&amount=${EXTENDED_PRICE}&currency_code=EUR&item_name=${encodeURIComponent("Ebookstudio Pro V2 - Licence Commerciale Etendue")}`;
 
@@ -64,7 +64,7 @@ const LicenceEtenduePage = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-bold text-lg text-purple-300">Licence Étendue</h3>
-                <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/30">+47€</Badge>
+                <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/30">+67€</Badge>
               </div>
               <ul className="space-y-2 text-sm">
                 <li className="flex items-start gap-2"><Sparkles className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" /><strong>Tout de la commerciale +</strong></li>

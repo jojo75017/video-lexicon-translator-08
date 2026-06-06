@@ -40,7 +40,7 @@ import { trackEvent } from "@/utils/analytics";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-const PRICE = 47;
+const PRICE = 67;
 const NORMAL_PRICE = 197;
 const SEATS = 10;
 const VIDEO_SRC = "/videos/coaching-vip-georges.mp4";
@@ -112,7 +112,7 @@ const notForYou = [
 const steps = [
   {
     n: 1,
-    title: "Tu règles 47€ via PayPal",
+    title: "Tu règles 67€ via PayPal",
     desc: "Paiement sécurisé avec ton compte PayPal ou ta carte bancaire.",
   },
   {
@@ -201,10 +201,10 @@ const CoachingVipPage = () => {
   return (
     <div className="min-h-screen bg-[#FAFAFA] text-[#232F3E] py-10 px-4">
       <Helmet>
-        <title>Coaching VIP 30 jours - 10 places à 47€ | Ebookstudio Pro V2</title>
+        <title>Coaching VIP 30 jours - 10 places à 67€ | Ebookstudio Pro V2</title>
         <meta
           name="description"
-          content="Accompagnement privé de 30 jours avec Georges Boubet : 3 sessions Zoom, email perso, audit ebook. 10 places seulement à 47€ au lieu de 197€."
+          content="Accompagnement privé de 30 jours avec Georges Boubet : 3 sessions Zoom, email perso, audit ebook. 10 places seulement à 67€ au lieu de 197€."
         />
         <meta name="robots" content="noindex,nofollow" />
       </Helmet>

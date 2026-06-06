@@ -241,7 +241,7 @@ export const AdminPage = () => {
   // Prix des plans pour calcul des revenus
   const planPrices: Record<string, number> = {
     starter: 27,
-    pro: 47,
+    pro: 67,
     enterprise: 97,
     lifetime: 197,
   };

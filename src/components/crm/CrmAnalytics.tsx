@@ -63,7 +63,7 @@ export const CrmAnalytics: React.FC<CrmAnalyticsProps> = ({ contacts }) => {
     let monthly = 0;
     activeSubs.forEach(s => {
       if (s.plan_tier === 'vip') monthly += 97 / 12; // VIP yearly
-      else if (s.plan_type === 'lifetime') monthly += 47 / 24; // Lifetime amortized
+      else if (s.plan_type === 'lifetime') monthly += 67 / 24; // Lifetime amortized
       else if (s.plan_type === 'starter') monthly += 27;
     });
     return {

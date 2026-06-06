@@ -37,7 +37,7 @@ Le Générateur d'Ebook Pro est un outil professionnel tout-en-un qui permet de 
 ✅ Banque d'images professionnelles
 ✅ Outils de marketing et monétisation
 
-Prix : 47€ - 197€ (selon l'offre)
+Prix : 67€ - 197€ (selon l'offre)
 Cible : Auteurs, entrepreneurs, formateurs, marketeurs, blogueurs`,
 
     commissions: `💰 VOTRE COMMISSION D'AFFILIATION

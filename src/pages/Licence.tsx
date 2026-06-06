@@ -149,7 +149,7 @@ const Licence = () => (
 
         <section className="border-l-4 border-purple-500 pl-4 bg-purple-50/50 dark:bg-purple-950/20 py-4 rounded-r">
           <h2 className="text-xl font-bold">15. Licence commerciale étendue</h2>
-          <p>En complément de la licence commerciale standard, l'utilisateur ayant souscrit à la <strong>licence étendue (47€)</strong> bénéficie des droits supplémentaires suivants :</p>
+          <p>En complément de la licence commerciale standard, l'utilisateur ayant souscrit à la <strong>licence étendue (67€)</strong> bénéficie des droits supplémentaires suivants :</p>
           <ul className="list-disc pl-5 space-y-1 mt-2">
             <li>possibilité de créer des ebooks pour des clients tiers</li>
             <li>utilisation du Service dans un cadre professionnel (freelance, agence)</li>

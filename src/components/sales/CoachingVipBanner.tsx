@@ -54,7 +54,7 @@ const CoachingVipBanner = () => {
           <div className="flex items-center gap-2 mt-1.5 text-sm">
             <span className="line-through opacity-80">197€</span>
             <span className="font-black bg-white text-[#008296] px-2.5 py-0.5 rounded-full">
-              47€
+              67€
             </span>
             <span className="hidden sm:inline opacity-90 text-xs">
               · Paiement PayPal · Réponse sous 24h
