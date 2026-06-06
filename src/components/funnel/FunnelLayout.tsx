@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ReactNode } from 'react';
+import QuotaDepasseBanner from '@/components/sales/QuotaDepasseBanner';
 
 interface FunnelLayoutProps {
   children: ReactNode;
@@ -9,6 +10,7 @@ interface FunnelLayoutProps {
 const FunnelLayout = ({ children, showFooter = true }: FunnelLayoutProps) => {
   return (
     <div className="min-h-screen bg-[#FAFAFA] text-[#232F3E] flex flex-col">
+      <QuotaDepasseBanner />
       <header className="border-b border-gray-200 bg-white/80 backdrop-blur sticky top-0 z-40">
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
           <Link to="/promo" className="font-bold text-lg text-[#008296]">
