@@ -1822,10 +1822,10 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                   <div className="space-y-3">
                     <div className="flex items-center gap-4">
                       <div className="p-3 bg-primary/10 backdrop-blur-md rounded-2xl border border-primary/20 shadow-[0_0_30px_rgba(59,158,255,0.3)]">
-                        <BookOpen className="w-8 h-8 text-white" />
+                        <BookOpen className="w-8 h-8 text-primary" />
                       </div>
                       <div>
-                        <h1 className="text-3xl font-extrabold text-white tracking-tight">
+                        <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
                           {ebookTitle || "Votre prochain best-seller"}
                         </h1>
                         <p className="text-muted-foreground text-sm mt-1 font-medium">
