@@ -71,7 +71,7 @@ const PromoDecouvertePage = () => {
       {offerActive && (
         <div className="bg-gradient-to-r from-[#EC4899] via-[#FF9E2D] to-[#EC4899] text-white text-center py-2.5 px-4 text-sm font-semibold flex items-center justify-center gap-2 flex-wrap">
           <Gift className="w-4 h-4" />
-          <span>🎁 Offre fondateur — <strong>47€</strong> au lieu de 67€ + Licence commerciale + Guide 10 niches OFFERTS</span>
+          <span>🎁 Offre fondateur — <strong>67€</strong> à vie + Licence commerciale + Guide 10 niches OFFERTS</span>
           <span className="hidden sm:inline-flex items-center gap-1 bg-white/20 px-2 py-0.5 rounded-full text-xs">
             <Clock className="w-3 h-3" /> {days}j {hours}h restants
           </span>
