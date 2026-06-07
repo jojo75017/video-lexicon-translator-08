@@ -14,7 +14,8 @@ const TOUR_KEY = 'v3hub_tour_done';
 const GOLD = '#c9a84c';
 const GOLD_LIGHT = '#f0d78c';
 
-const PILLAR_ORDER: V3Pillar[] = ['publier', 'monetiser', 'marketing', 'ia'];
+// L'écriture/rédaction (STUDIO de création) vit dans « IA avancée » : c'est le 1er palier.
+const PILLAR_ORDER: V3Pillar[] = ['ia', 'publier', 'monetiser', 'marketing'];
 
 /** Carte module premium avec tilt 3D + halo doré au survol. */
 function ModuleCard({
