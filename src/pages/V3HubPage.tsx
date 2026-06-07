@@ -238,7 +238,10 @@ const V3HubPage: React.FC = () => {
             ))}
           </div>
         )}
+
+        <V2V3Compare />
       </main>
+
 
       <V3ModuleDialog module={selected} onClose={() => setSelected(null)} />
       <V3HubTour isOpen={tourOpen} onClose={finishTour} onComplete={finishTour} />
