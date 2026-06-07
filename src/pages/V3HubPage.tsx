@@ -100,6 +100,12 @@ const V3HubPage: React.FC = () => {
     setTourOpen(false);
   };
 
+  // Ouvre le STUDIO V3 (BookCreationStudio) sans quitter le Hub V3.
+  const openStudio = (_sourceId: string) => {
+    const studio = V3_MODULES.find((m) => m.id === 'book-creation-studio');
+    if (studio) setSelected(studio);
+  };
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return V3_MODULES.filter((m) => {
@@ -205,7 +211,7 @@ const V3HubPage: React.FC = () => {
 
         {/* Onglet spécial : hub de création */}
         {pillar === 'create' ? (
-          <CreateBookHub />
+          <CreateBookHub onSelectSource={openStudio} />
         ) : filtered.length === 0 ? (
           <div className="text-center text-white/40 py-20 text-sm">Aucun outil ne correspond à « {query} ».</div>
         ) : pillar === 'all' ? (

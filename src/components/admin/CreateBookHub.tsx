@@ -1,5 +1,4 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   Sparkles, FileText, FileType2, BookOpen, Link2, Newspaper,
   Video, Youtube, FileEdit, Crown, Star,
@@ -13,29 +12,26 @@ type Source = {
   title: string;
   description: string;
   icon: React.ComponentType<{ className?: string }>;
-  to: string;
   badge?: 'pro' | 'star';
 };
 
-// Toutes les sources de création — chaque carte ouvre le planificateur
-// avec la source pré-sélectionnée (paramètre ?create=...).
+// Toutes les sources de création — chaque carte ouvre le STUDIO V3 (reste en V3).
 const SOURCES: Source[] = [
-  { id: 'scratch', title: 'Partir de zéro', description: 'Créez votre livre à partir d’une page blanche, guidé par l’IA.', icon: FileEdit, to: '/ebook-planner?create=scratch' },
-  { id: 'template', title: 'Commencer à partir d’un modèle', description: 'Choisissez un modèle professionnel prêt à l’emploi.', icon: BookOpen, to: '/ebook-planner?create=template' },
-  { id: 'url', title: 'Importer depuis un article ou une URL', description: 'Transformez un article de blog ou une page web en livre.', icon: Link2, to: '/ebook-planner?create=url' },
-  { id: 'docx', title: 'Importer depuis un fichier DOCX', description: 'Convertissez un document Word en livre numérique propre.', icon: FileText, to: '/ebook-planner?create=docx' },
-  { id: 'pdf', title: 'Importer depuis un PDF', description: 'Transformez un PDF existant en ebook éditable.', icon: FileType2, to: '/ebook-planner?create=pdf', badge: 'star' },
-  { id: 'gdocs', title: 'Importer depuis Google Docs', description: 'Importez directement un document Google Docs.', icon: Newspaper, to: '/ebook-planner?create=gdocs' },
-  { id: 'video', title: 'Importer depuis une vidéo', description: 'Convertissez une vidéo en livre via la transcription IA.', icon: Video, to: '/ebook-planner?create=video', badge: 'pro' },
-  { id: 'youtube', title: 'Importer depuis YouTube', description: 'Transformez une vidéo YouTube en livre numérique.', icon: Youtube, to: '/ebook-planner?create=youtube', badge: 'pro' },
+  { id: 'scratch', title: 'Partir de zéro', description: 'Créez votre livre à partir d’une page blanche, guidé par l’IA.', icon: FileEdit },
+  { id: 'template', title: 'Commencer à partir d’un modèle', description: 'Choisissez un modèle professionnel prêt à l’emploi.', icon: BookOpen },
+  { id: 'url', title: 'Importer depuis un article ou une URL', description: 'Transformez un article de blog ou une page web en livre.', icon: Link2 },
+  { id: 'docx', title: 'Importer depuis un fichier DOCX', description: 'Convertissez un document Word en livre numérique propre.', icon: FileText },
+  { id: 'pdf', title: 'Importer depuis un PDF', description: 'Transformez un PDF existant en ebook éditable.', icon: FileType2, badge: 'star' },
+  { id: 'gdocs', title: 'Importer depuis Google Docs', description: 'Importez directement un document Google Docs.', icon: Newspaper },
+  { id: 'video', title: 'Importer depuis une vidéo', description: 'Convertissez une vidéo en livre via la transcription IA.', icon: Video, badge: 'pro' },
+  { id: 'youtube', title: 'Importer depuis YouTube', description: 'Transformez une vidéo YouTube en livre numérique.', icon: Youtube, badge: 'pro' },
 ];
 
-function SourceCard({ source }: { source: Source }) {
-  const navigate = useNavigate();
+function SourceCard({ source, onSelect }: { source: Source; onSelect: (id: string) => void }) {
   const Icon = source.icon;
   return (
     <button
-      onClick={() => navigate(source.to)}
+      onClick={() => onSelect(source.id)}
       className="group relative text-left rounded-2xl p-5 border bg-[#161616] border-[#c9a84c22] transition-all duration-300 overflow-hidden hover:border-[#c9a84c] hover:shadow-[0_0_30px_-6px_rgba(201,168,76,0.45)] hover:-translate-y-1"
     >
       <div className="pointer-events-none absolute -inset-px opacity-0 group-hover:opacity-100 transition-opacity duration-300"
@@ -63,8 +59,11 @@ function SourceCard({ source }: { source: Source }) {
   );
 }
 
-/** Onglet spécial V3 — hub de création « Créer un livre numérique ». */
-const CreateBookHub: React.FC = () => {
+/**
+ * Onglet spécial V3 — hub de création « Créer un livre numérique ».
+ * Chaque source ouvre le STUDIO V3 (BookCreationStudio) SANS quitter le Hub V3.
+ */
+const CreateBookHub: React.FC<{ onSelectSource: (sourceId: string) => void }> = ({ onSelectSource }) => {
   return (
     <section>
       <div className="flex items-center gap-2 mb-2">
@@ -73,12 +72,12 @@ const CreateBookHub: React.FC = () => {
       </div>
       <p className="text-sm text-white/50 mb-6 max-w-2xl">
         Choisissez votre point de départ. Importez depuis n’importe quelle source ou partez d’une page blanche —
-        l’IA s’occupe de la mise en forme et de la structure.
+        l’IA s’occupe de la mise en forme et de la structure, directement dans le Studio V3.
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {SOURCES.map((s) => (
-          <SourceCard key={s.id} source={s} />
+          <SourceCard key={s.id} source={s} onSelect={onSelectSource} />
         ))}
       </div>
     </section>
