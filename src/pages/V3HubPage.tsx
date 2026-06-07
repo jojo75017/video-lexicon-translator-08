@@ -186,8 +186,9 @@ const V3HubPage: React.FC = () => {
               className="w-full rounded-full bg-[#1a1a1a] border border-[#c9a84c33] pl-9 pr-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#c9a84c] transition-colors"
             />
           </div>
-          <div className="flex flex-wrap gap-2" data-tour="filters">
-            <FilterChip active={pillar === 'create'} onClick={() => setPillar('create')} label="✨ Créer un livre" />
+          <div className="flex flex-wrap items-center gap-2" data-tour="filters">
+            <CreateBookChip active={pillar === 'create'} onClick={() => setPillar('create')} />
+            <span className="mx-1 h-6 w-px self-center" style={{ background: `${GOLD}33` }} aria-hidden />
             <FilterChip active={pillar === 'all'} onClick={() => setPillar('all')} label={`Tous (${V3_MODULES.length})`} />
             {PILLAR_ORDER.map((p) => (
               <FilterChip
