@@ -205,7 +205,7 @@ const V3HubPage: React.FC = () => {
 
         {/* Onglet spécial : hub de création */}
         {pillar === 'create' ? (
-          <CreateBookHub />
+          <CreateBookHub onSelectSource={openStudio} />
         ) : filtered.length === 0 ? (
           <div className="text-center text-white/40 py-20 text-sm">Aucun outil ne correspond à « {query} ».</div>
         ) : pillar === 'all' ? (
