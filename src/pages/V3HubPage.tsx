@@ -82,7 +82,7 @@ function ModuleCard({
 const V3HubPage: React.FC = () => {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
-  const [pillar, setPillar] = useState<V3Pillar | 'all'>('all');
+  const [pillar, setPillar] = useState<V3Pillar | 'all' | 'create'>('all');
   const [selected, setSelected] = useState<V3Module | null>(null);
   const [tourOpen, setTourOpen] = useState(false);
 
