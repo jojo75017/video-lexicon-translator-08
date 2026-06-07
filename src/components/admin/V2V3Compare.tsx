@@ -73,25 +73,57 @@ export default function V2V3Compare() {
       </div>
 
       {/* Encarts agents gauche (V2 vert) / droite (V3 doré) */}
+      <style>{`
+        @keyframes gold-shimmer {
+          0% { transform: translateX(-100%) skewX(-15deg); }
+          100% { transform: translateX(200%) skewX(-15deg); }
+        }
+        @keyframes gold-halo {
+          0%, 100% { opacity: 0.5; transform: scale(1); }
+          50% { opacity: 0.9; transform: scale(1.05); }
+        }
+        @keyframes green-pulse {
+          0%, 100% { opacity: 0.6; }
+          50% { opacity: 1; }
+        }
+      `}</style>
       <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="rounded-2xl border p-6 text-center"
-          style={{ borderColor: `${GREEN}55`, background: `linear-gradient(135deg, ${GREEN}1a, transparent)`, boxShadow: `0 0 30px -12px ${GREEN}` }}>
-          <div className="text-xs uppercase tracking-widest text-white/50 mb-1">V2 — actuel</div>
-          <div className="text-5xl font-black" style={{ color: GREEN_LIGHT }}>{V2_AGENTS}</div>
-          <div className="mt-1 text-sm font-semibold" style={{ color: GREEN_LIGHT }}>agents IA</div>
-        </div>
-        <div className="relative rounded-2xl border p-6 text-center overflow-hidden"
-          style={{ borderColor: GOLD, background: `linear-gradient(135deg, ${GOLD}26, transparent)`, boxShadow: `0 0 36px -10px ${GOLD}` }}>
-          <span className="pointer-events-none absolute -inset-2 animate-pulse"
-            style={{ background: `radial-gradient(60% 60% at 50% 0%, ${GOLD}22, transparent 70%)` }} aria-hidden />
-          <div className="relative text-xs uppercase tracking-widest text-white/50 mb-1 flex items-center justify-center gap-1">
-            <Sparkles className="h-3 w-3" /> V3 — nouveau
+        {/* Encart V2 — glow subtil au survol */}
+        <div className="group relative rounded-2xl border p-6 text-center overflow-hidden transition-all duration-500 hover:scale-[1.02]"
+          style={{ borderColor: `${GREEN}55`, background: `linear-gradient(135deg, ${GREEN}1a, transparent)`, boxShadow: `0 0 30px -12px ${GREEN}` }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.boxShadow = `0 0 50px -8px ${GREEN}`; (e.currentTarget as HTMLDivElement).style.borderColor = `${GREEN}aa`; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.boxShadow = `0 0 30px -12px ${GREEN}`; (e.currentTarget as HTMLDivElement).style.borderColor = `${GREEN}55`; }}>
+          <span className="pointer-events-none absolute -inset-2"
+            style={{ background: `radial-gradient(60% 60% at 50% 0%, ${GREEN}18, transparent 70%)`, animation: 'green-pulse 3s ease-in-out infinite' }} aria-hidden />
+          <div className="relative">
+            <div className="text-xs uppercase tracking-widest text-white/50 mb-1">V2 — actuel</div>
+            <div className="text-5xl font-black transition-transform duration-300 group-hover:scale-110" style={{ color: GREEN_LIGHT }}>{V2_AGENTS}</div>
+            <div className="mt-1 text-sm font-semibold" style={{ color: GREEN_LIGHT }}>agents IA</div>
           </div>
-          <div className="relative text-5xl font-black" style={{ color: GOLD_LIGHT }}>{V3_AGENTS}</div>
-          <div className="relative mt-1 text-sm font-semibold" style={{ color: GOLD_LIGHT }}>agents IA</div>
-          <div className="relative mt-2 inline-block rounded-full px-3 py-0.5 text-[11px] font-extrabold"
-            style={{ background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, color: '#1a1a1a' }}>
-            ×2 plus puissant
+        </div>
+
+        {/* Encart V3 — halo doré + shimmer */}
+        <div className="group relative rounded-2xl border p-6 text-center overflow-hidden transition-all duration-500 hover:scale-[1.02]"
+          style={{ borderColor: GOLD, background: `linear-gradient(135deg, ${GOLD}26, transparent)`, boxShadow: `0 0 36px -10px ${GOLD}` }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.boxShadow = `0 0 60px -4px ${GOLD}`; (e.currentTarget as HTMLDivElement).style.borderColor = `${GOLD_LIGHT}`; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.boxShadow = `0 0 36px -10px ${GOLD}`; (e.currentTarget as HTMLDivElement).style.borderColor = GOLD; }}>
+          {/* Halo pulsant */}
+          <span className="pointer-events-none absolute -inset-2"
+            style={{ background: `radial-gradient(60% 60% at 50% 0%, ${GOLD}35, transparent 70%)`, animation: 'gold-halo 2.5s ease-in-out infinite' }} aria-hidden />
+          {/* Shimmer */}
+          <span className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl" aria-hidden>
+            <span className="absolute inset-0" style={{ background: `linear-gradient(90deg, transparent, ${GOLD_LIGHT}18, transparent)`, animation: 'gold-shimmer 3.5s ease-in-out infinite' }} />
+          </span>
+          <div className="relative">
+            <div className="text-xs uppercase tracking-widest text-white/50 mb-1 flex items-center justify-center gap-1">
+              <Sparkles className="h-3 w-3" /> V3 — nouveau
+            </div>
+            <div className="text-5xl font-black transition-transform duration-300 group-hover:scale-110" style={{ color: GOLD_LIGHT }}>{V3_AGENTS}</div>
+            <div className="relative mt-1 text-sm font-semibold" style={{ color: GOLD_LIGHT }}>agents IA</div>
+            <div className="relative mt-2 inline-block rounded-full px-3 py-0.5 text-[11px] font-extrabold"
+              style={{ background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, color: '#1a1a1a' }}>
+              ×2 plus puissant
+            </div>
           </div>
         </div>
       </div>
