@@ -7,6 +7,7 @@ import {
 import { isModuleClickable, V3ModuleDialog } from '@/components/admin/v3ModuleRegistry';
 import { V3HubTour } from '@/components/admin/V3HubTour';
 import CreateBookHub from '@/components/admin/CreateBookHub';
+import V2V3Compare from '@/components/admin/V2V3Compare';
 
 const TOUR_KEY = 'v3hub_tour_done';
 
