@@ -6,6 +6,7 @@ import {
 } from '@/data/roadmapV3';
 import { isModuleClickable, V3ModuleDialog } from '@/components/admin/v3ModuleRegistry';
 import { V3HubTour } from '@/components/admin/V3HubTour';
+import CreateBookHub from '@/components/admin/CreateBookHub';
 
 const TOUR_KEY = 'v3hub_tour_done';
 
@@ -81,7 +82,7 @@ function ModuleCard({
 const V3HubPage: React.FC = () => {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
-  const [pillar, setPillar] = useState<V3Pillar | 'all'>('all');
+  const [pillar, setPillar] = useState<V3Pillar | 'all' | 'create'>('all');
   const [selected, setSelected] = useState<V3Module | null>(null);
   const [tourOpen, setTourOpen] = useState(false);
 
@@ -186,6 +187,7 @@ const V3HubPage: React.FC = () => {
             />
           </div>
           <div className="flex flex-wrap gap-2" data-tour="filters">
+            <FilterChip active={pillar === 'create'} onClick={() => setPillar('create')} label="✨ Créer un livre" />
             <FilterChip active={pillar === 'all'} onClick={() => setPillar('all')} label={`Tous (${V3_MODULES.length})`} />
             {PILLAR_ORDER.map((p) => (
               <FilterChip
@@ -198,8 +200,10 @@ const V3HubPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Grille */}
-        {filtered.length === 0 ? (
+        {/* Onglet spécial : hub de création */}
+        {pillar === 'create' ? (
+          <CreateBookHub />
+        ) : filtered.length === 0 ? (
           <div className="text-center text-white/40 py-20 text-sm">Aucun outil ne correspond à « {query} ».</div>
         ) : pillar === 'all' ? (
           (() => {
