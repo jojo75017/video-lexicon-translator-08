@@ -338,6 +338,24 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
             Ebookstudio Pro V2
           </span>
 
+          {/* Accès direct à mes projets — toujours visible, quelle que soit l'étape */}
+          {onTabChange && (
+            <button
+              onClick={() => onTabChange('projects')}
+              title="Voir tous mes projets"
+              className={cn(
+                'inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] transition-colors shrink-0',
+                activeTab === 'projects'
+                  ? 'bg-[#008296] text-white'
+                  : 'border border-[#008296]/40 text-[#008296] hover:bg-[#008296]/10',
+              )}
+            >
+              <FolderOpen className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Mes projets</span>
+            </button>
+          )}
+
+
           {projectTitle && (
             <>
               <span className="text-joy-ink/30 text-base">›</span>
