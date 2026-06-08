@@ -818,6 +818,50 @@ export async function generateProfessionalDocx(options: DocxExportOptions): Prom
     }
   }
 
+  // ═══ PAGES DE FIN (BACK MATTER) ═══
+  const authorDisplay = (authorName || '').trim();
+  const authorForText = authorDisplay || "l'auteur";
+
+  const backPage = (heading: string, paragraphs: string[]) => {
+    children.push(new Paragraph({ children: [new PageBreak()] }));
+    children.push(new Paragraph({
+      children: [new TextRun({ text: heading, bold: true, size: chapterTitleSize, font })],
+      heading: HeadingLevel.HEADING_1,
+      alignment: AlignmentType.CENTER,
+      spacing: { before: 600, after: 400 },
+    }));
+    paragraphs.forEach((p) => {
+      children.push(new Paragraph({
+        children: [new TextRun({ text: p, size: baseSize, font })],
+        alignment: AlignmentType.JUSTIFIED,
+        spacing: { after: 200, line: 360 },
+      }));
+    });
+  };
+
+  // 1/ Remerciements
+  backPage('REMERCIEMENTS', [
+    `Merci à vous, cher lecteur, d'avoir accordé votre temps et votre confiance à « ${title} ».`,
+    `Ce livre n'aurait pu voir le jour sans le soutien de celles et ceux qui ont accompagné ${authorForText} tout au long de ce projet : famille, proches et lecteurs fidèles. Votre présence et vos encouragements ont nourri chaque page.`,
+    `Du fond du cœur, merci.`,
+  ]);
+
+  // 2/ Mot de l'auteur
+  backPage("MOT DE L'AUTEUR", [
+    `J'ai écrit ce livre avec l'envie sincère de vous transmettre quelque chose d'utile, et j'espère qu'il aura trouvé un écho en vous.`,
+    `Si ces pages vous ont apporté ne serait-ce qu'une idée, une émotion ou une nouvelle perspective, alors ma mission est accomplie.`,
+    `Au plaisir de vous retrouver dans un prochain ouvrage.`,
+    authorDisplay ? `— ${authorDisplay}` : '— L\'auteur',
+  ]);
+
+  // 3/ Demande d'avis (courtoise)
+  backPage('UN DERNIER MOT', [
+    `Si vous avez aimé ce livre, accepteriez-vous de prendre un instant pour partager votre avis ?`,
+    `Un simple commentaire, déposé en toute liberté et sans aucune obligation, aide énormément les lecteurs à découvrir cet ouvrage et encourage ${authorForText} à poursuivre ce travail.`,
+    `Quelques mots suffisent, et chaque retour est reçu avec une profonde gratitude.`,
+    `Merci infiniment pour votre lecture et votre bienveillance.`,
+  ]);
+
   // ═══ CONSTRUCTION DU DOCUMENT ═══
   const doc = new Document({
     creator: authorName || 'Auteur',
