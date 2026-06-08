@@ -16,6 +16,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
+import AmazonSpyTab from '@/components/ebook/AmazonSpyTab';
 
 interface KdpKeyword {
   keyword: string;
@@ -528,9 +529,12 @@ Réponds UNIQUEMENT avec un tableau JSON valide.`;
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="grid grid-cols-3 w-full max-w-lg bg-orange-100/50 dark:bg-orange-900/20">
+          <TabsList className="grid grid-cols-2 sm:grid-cols-4 w-full max-w-2xl bg-orange-100/50 dark:bg-orange-900/20">
             <TabsTrigger value="research" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">
               <Search className="w-4 h-4 mr-1" /> Recherche
+            </TabsTrigger>
+            <TabsTrigger value="spy" className="data-[state=active]:bg-amber-600 data-[state=active]:text-white">
+              <Target className="w-4 h-4 mr-1" /> Espion Amazon
             </TabsTrigger>
             <TabsTrigger value="longtail" className="data-[state=active]:bg-purple-500 data-[state=active]:text-white">
               <Layers className="w-4 h-4 mr-1" /> Longue traîne
@@ -539,6 +543,11 @@ Réponds UNIQUEMENT avec un tableau JSON valide.`;
               <Hash className="w-4 h-4 mr-1" /> 7 Backend KDP
             </TabsTrigger>
           </TabsList>
+
+          {/* ==== TAB: Espion Amazon (KDSpy-like, données réelles via Firecrawl) ==== */}
+          <TabsContent value="spy">
+            <AmazonSpyTab initialKeyword={seedKeyword} />
+          </TabsContent>
 
           {/* ==== TAB: Research ==== */}
           <TabsContent value="research">
