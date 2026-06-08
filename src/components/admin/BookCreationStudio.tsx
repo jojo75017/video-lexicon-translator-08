@@ -30,13 +30,37 @@ const BOOK_TYPES: BookType[] = [
   { id: 'cuisine', emoji: '🔍', title: 'Livre de cuisine', subtitle: 'Recettes, menus' },
 ];
 
+type SourceMeta = {
+  emoji: string;
+  label: string;
+  hint: string;
+  needsImport: boolean;
+  importLabel?: string;
+  importPlaceholder?: string;
+  multiline?: boolean;
+};
+
+const SOURCE_META: Record<string, SourceMeta> = {
+  scratch: { emoji: '✏️', label: 'Partir de zéro', hint: 'Page blanche guidée par l’IA — choisissez le type puis renseignez les détails.', needsImport: false },
+  template: { emoji: '📚', label: 'À partir d’un modèle', hint: 'Sélectionnez un type ci-dessous : il servira de modèle de structure.', needsImport: false },
+  url: { emoji: '🔗', label: 'Importer depuis une URL', hint: 'Collez l’URL d’un article ou d’une page web à transformer en livre.', needsImport: true, importLabel: 'URL de l’article', importPlaceholder: 'https://…' },
+  docx: { emoji: '📄', label: 'Importer depuis un DOCX', hint: 'Collez le contenu de votre document Word.', needsImport: true, importLabel: 'Contenu du document', importPlaceholder: 'Collez ici le texte du fichier DOCX…', multiline: true },
+  pdf: { emoji: '📕', label: 'Importer depuis un PDF', hint: 'Collez le texte extrait de votre PDF.', needsImport: true, importLabel: 'Contenu du PDF', importPlaceholder: 'Collez ici le texte du PDF…', multiline: true },
+  gdocs: { emoji: '📝', label: 'Importer depuis Google Docs', hint: 'Collez le lien partagé ou le contenu du Google Docs.', needsImport: true, importLabel: 'Lien ou contenu Google Docs', importPlaceholder: 'https://docs.google.com/… ou collez le texte', multiline: true },
+  video: { emoji: '🎬', label: 'Importer depuis une vidéo', hint: 'Collez la transcription de votre vidéo.', needsImport: true, importLabel: 'Transcription / lien vidéo', importPlaceholder: 'Collez la transcription ou le lien…', multiline: true },
+  youtube: { emoji: '▶️', label: 'Importer depuis YouTube', hint: 'Collez le lien YouTube ou la transcription.', needsImport: true, importLabel: 'Lien YouTube / transcription', importPlaceholder: 'https://youtube.com/watch?v=…', multiline: true },
+};
+
 const slugify = (s: string) =>
   (s || 'mon-livre')
     .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-zA-Z0-9]+/g, '-').replace(/(^-|-$)/g, '').toLowerCase() || 'mon-livre';
 
-export default function BookCreationStudio() {
+export default function BookCreationStudio({ initialSource }: { initialSource?: string | null } = {}) {
+  const source = (initialSource && SOURCE_META[initialSource]) ? initialSource : 'scratch';
+  const meta = SOURCE_META[source];
   const [step, setStep] = useState(0);
+  const [importValue, setImportValue] = useState('');
   const [bookType, setBookType] = useState<string | null>(null);
   const [title, setTitle] = useState('');
   const [subtitle, setSubtitle] = useState('');
@@ -64,6 +88,7 @@ ${subtitle ? `Sous-titre : "${subtitle}"` : ''}
 ${audience ? `Public cible : ${audience}` : ''}
 ${keywords ? `Mots-clés : ${keywords}` : ''}
 ${idea ? `Idée / description : ${idea}` : ''}
+${meta.needsImport && importValue.trim() ? `Source à transformer (${meta.label}) :\n${importValue.trim()}` : ''}
 
 Produis en français, en texte brut (titres avec #, sans HTML) :
 1. Une introduction rédigée (200-300 mots).
@@ -101,13 +126,30 @@ Sois concret, orienté valeur lecteur et cohérent avec la niche.`;
     <div className="space-y-6">
       {/* Header */}
       <div>
+        <div className="inline-flex items-center gap-2 mb-1 rounded-full px-3 py-1 text-xs font-semibold"
+          style={{ background: `${TEAL}14`, color: TEAL }}>
+          <span>{meta.emoji}</span> {meta.label}
+        </div>
         <h2 className="text-2xl font-bold" style={{ color: TEAL }}>
           Studio de création de livres
         </h2>
-        <p className="text-sm" style={{ color: `${INK}99` }}>
-          De l'idée au plan complet, prêt à développer puis exporter.
-        </p>
+        <p className="text-sm" style={{ color: `${INK}99` }}>{meta.hint}</p>
       </div>
+
+      {/* Panneau d'import contextuel selon la source */}
+      {step === 0 && meta.needsImport && (
+        <div className="rounded-xl border p-4 space-y-2" style={{ borderColor: `${TEAL}40`, background: `${TEAL}08` }}>
+          <label className="text-xs font-semibold" style={{ color: INK }}>{meta.importLabel}</label>
+          {meta.multiline ? (
+            <Textarea value={importValue} onChange={(e) => setImportValue(e.target.value)} rows={5} placeholder={meta.importPlaceholder} />
+          ) : (
+            <Input value={importValue} onChange={(e) => setImportValue(e.target.value)} placeholder={meta.importPlaceholder} />
+          )}
+          <p className="text-[11px]" style={{ color: `${INK}80` }}>
+            Ce contenu sera transformé par l'IA. Choisissez ensuite le type de livre ci-dessous.
+          </p>
+        </div>
+      )}
 
       {/* Steps */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1">

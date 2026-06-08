@@ -143,12 +143,14 @@ export function isModuleClickable(id: string): boolean {
 export function V3ModuleDialog({
   module,
   onClose,
+  toolProps,
 }: {
   module: V3Module | null;
   onClose: () => void;
+  toolProps?: Record<string, unknown>;
 }) {
   const id = module?.id ?? '';
-  const Tool = V3_MODULE_COMPONENTS[id];
+  const Tool = V3_MODULE_COMPONENTS[id] as React.ComponentType<Record<string, unknown>> | undefined;
   const widthClass = NARROW_MODULE_IDS.includes(id)
     ? 'max-w-2xl max-h-[85vh] overflow-y-auto'
     : Tool
@@ -170,7 +172,7 @@ export function V3ModuleDialog({
               <p className="text-muted-foreground leading-relaxed">{module.description}</p>
               {Tool ? (
                 <div className="border-t pt-3">
-                  <Tool />
+                  <Tool {...(toolProps ?? {})} />
                 </div>
               ) : (
                 <p className="text-[11px] text-muted-foreground/60">

@@ -86,6 +86,7 @@ const V3HubPage: React.FC = () => {
   const [query, setQuery] = useState('');
   const [pillar, setPillar] = useState<V3Pillar | 'all' | 'create'>('all');
   const [selected, setSelected] = useState<V3Module | null>(null);
+  const [studioSource, setStudioSource] = useState<string | null>(null);
   const [tourOpen, setTourOpen] = useState(false);
 
   useEffect(() => {
@@ -100,10 +101,13 @@ const V3HubPage: React.FC = () => {
     setTourOpen(false);
   };
 
-  // Ouvre le STUDIO V3 (BookCreationStudio) sans quitter le Hub V3.
-  const openStudio = (_sourceId: string) => {
+  // Ouvre le STUDIO V3 (BookCreationStudio) sans quitter le Hub V3, avec la source pré-sélectionnée.
+  const openStudio = (sourceId: string) => {
     const studio = V3_MODULES.find((m) => m.id === 'book-creation-studio');
-    if (studio) setSelected(studio);
+    if (studio) {
+      setStudioSource(sourceId);
+      setSelected(studio);
+    }
   };
 
   const filtered = useMemo(() => {
@@ -249,7 +253,11 @@ const V3HubPage: React.FC = () => {
       </main>
 
 
-      <V3ModuleDialog module={selected} onClose={() => setSelected(null)} />
+      <V3ModuleDialog
+        module={selected}
+        onClose={() => { setSelected(null); setStudioSource(null); }}
+        toolProps={selected?.id === 'book-creation-studio' ? { initialSource: studioSource } : undefined}
+      />
       <V3HubTour isOpen={tourOpen} onClose={finishTour} onComplete={finishTour} />
     </div>
   );
