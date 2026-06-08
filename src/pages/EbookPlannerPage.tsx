@@ -367,7 +367,12 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // On applique le tab demandé par l'URL UNE SEULE FOIS (au montage),
+  // sinon il écrase la navigation (ex: ouvrir un projet renvoie au workflow).
+  const urlTabAppliedRef = useRef(false);
   useEffect(() => {
+    if (urlTabAppliedRef.current) return;
+    urlTabAppliedRef.current = true;
     if (requestedTabFromUrl && requestedTabFromUrl !== activeTab && requestedTabFromUrl !== 'onboarding' && requestedTabFromUrl !== 'subscription') {
       setActiveTab(requestedTabFromUrl);
     }
