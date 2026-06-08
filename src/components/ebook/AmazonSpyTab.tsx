@@ -165,6 +165,50 @@ const AmazonSpyTab: React.FC<AmazonSpyTabProps> = ({ initialKeyword = '' }) => {
 
       {result && !loading && (
         <>
+          {/* ⭐ POINT POSITIF #1 — mots-clés récurrents dans les titres concurrents */}
+          {(() => {
+            const titleKeywords = extractTitleKeywords(result.books);
+            if (!titleKeywords.length) return null;
+            const max = titleKeywords[0].count;
+            return (
+              <Card className="border-2 border-emerald-400/70 bg-gradient-to-br from-emerald-50/80 to-teal-50/50 dark:from-emerald-950/25 dark:to-teal-950/10 shadow-sm">
+                <CardContent className="p-4 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white shrink-0">
+                      <Key className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-sm leading-tight flex items-center gap-1.5">
+                        Mots-clés gagnants dans les titres concurrents
+                        <Badge className="bg-emerald-600 text-white text-[9px] py-0">POINT FORT</Badge>
+                      </h3>
+                      <p className="text-[11px] text-muted-foreground">
+                        Réutilisez ces mots dans VOTRE titre pour être trouvé sur la même requête.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    {titleKeywords.map((k) => (
+                      <span
+                        key={k.word}
+                        className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300 bg-white/80 dark:bg-emerald-950/30 px-3 py-1 text-xs font-medium"
+                        title={`Présent dans ${k.count} titres sur ${result.books.length}`}
+                      >
+                        <span className="capitalize">{k.word}</span>
+                        <span
+                          className="rounded-full bg-emerald-600 text-white text-[10px] font-bold px-1.5 py-0.5"
+                          style={{ opacity: 0.55 + 0.45 * (k.count / max) }}
+                        >
+                          ×{k.count}
+                        </span>
+                      </span>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })()}
+
           {/* Synthèse */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <Card>
