@@ -50,6 +50,38 @@ interface AmazonSpyTabProps {
 const opportunityColor = (score: number) =>
   score >= 70 ? 'text-emerald-600' : score >= 50 ? 'text-orange-500' : 'text-red-500';
 
+// Mots vides à ignorer lors de l'extraction de mots-clés depuis les titres concurrents.
+const STOPWORDS = new Set([
+  'le','la','les','un','une','des','de','du','et','ou','à','a','au','aux','en','dans','sur','pour','par','avec','sans',
+  'ce','cette','ces','son','sa','ses','leur','leurs','mon','ma','mes','votre','vos','nos','notre','qui','que','quoi',
+  'the','a','an','of','and','or','to','in','on','for','with','your','you','how','is','it','book','livre','tome','vol',
+  'guide','édition','edition','ebook','kindle','broché','broche','format','pdf','volume',
+]);
+
+/** Extrait les mots-clés récurrents dans les titres des concurrents (point positif #1). */
+function extractTitleKeywords(books: SpyBook[]): { word: string; count: number }[] {
+  const freq = new Map<string, number>();
+  for (const b of books) {
+    const seen = new Set<string>();
+    const words = (b.title || '')
+      .toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9\s]/g, ' ')
+      .split(/\s+/)
+      .filter((w) => w.length >= 4 && !STOPWORDS.has(w) && !/^\d+$/.test(w));
+    for (const w of words) {
+      if (seen.has(w)) continue; // 1 occurrence max par titre
+      seen.add(w);
+      freq.set(w, (freq.get(w) || 0) + 1);
+    }
+  }
+  return [...freq.entries()]
+    .map(([word, count]) => ({ word, count }))
+    .filter((k) => k.count >= 2)
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 12);
+}
+
 const AmazonSpyTab: React.FC<AmazonSpyTabProps> = ({ initialKeyword = '' }) => {
   const [keyword, setKeyword] = useState(initialKeyword);
   const [marketplace, setMarketplace] = useState('fr');
