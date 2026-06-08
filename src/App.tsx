@@ -696,7 +696,7 @@ const App = () => {
           {/* Bouton flottant Clés API & réglages (pages ebook / KDP) */}
           {isAuthenticated && <ApiKeysFloatingButton />}
           {/* Admin: bascule V2/V3 importante, toujours visible */}
-          {isAuthenticated && <V2V3FloatingSwitch />}
+          {(isAuthenticated || isAdmin) && <V2V3FloatingSwitch />}
           {/* SOS modal erreurs IA — humanise les erreurs Gemini/Claude/OpenAI/OpenRouter */}
           {isAuthenticated && <AISosModal />}
           {/* Badge coût IA cumulé par projet */}
