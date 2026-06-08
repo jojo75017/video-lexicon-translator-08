@@ -306,18 +306,8 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
       )}
 
       <div className="relative mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-2.5 sm:px-6">
-        {/* Badge "Ebookstudio Pro V2" centré — uniquement sans projet ouvert, pour éviter le chevauchement avec le fil d'Ariane */}
-        {!projectTitle && (
-          <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden lg:block z-10 max-w-[40%]">
-            <span
-              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-extrabold tracking-wide text-white shadow-lg shadow-[#FF9E2D]/40 ring-1 ring-white/40 animate-[pulse_2.4s_ease-in-out_infinite]"
-              style={{ backgroundImage: 'linear-gradient(90deg,#008296 0%,#00A8B5 50%,#FF9E2D 100%)' }}
-            >
-              <Sparkles className="h-3.5 w-3.5" />
-              Ebookstudio Pro V2
-            </span>
-          </div>
-        )}
+
+
 
 
         <div className="flex min-w-0 items-center gap-2 text-sm">
