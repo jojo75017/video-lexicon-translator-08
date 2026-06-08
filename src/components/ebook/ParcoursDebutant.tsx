@@ -84,20 +84,24 @@ export const ParcoursDebutant: React.FC<ParcoursDebutantProps> = ({ onNavigateTo
   };
 
   return (
-    <div className="rounded-2xl border border-[#008296]/20 bg-white p-5 md:p-6 shadow-sm">
-      <div className="mb-5">
-        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#008296] bg-[#008296]/10 px-3 py-1 rounded-full">
-          🚀 Parcours débutant
+    <section className="relative overflow-hidden rounded-xl border-2 border-primary bg-gradient-hero p-5 md:p-7 shadow-xl ring-4 ring-primary/15">
+      <div className="absolute right-4 top-4 hidden rounded-full bg-primary px-4 py-2 text-sm font-black uppercase text-primary-foreground shadow-lg md:block">
+        Commencez ici
+      </div>
+
+      <div className="mb-6 max-w-4xl">
+        <span className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-black uppercase text-primary-foreground shadow-md">
+          🚀 Parcours débutant — pour ne pas se perdre
         </span>
-        <h2 className="text-xl md:text-2xl font-bold text-[#232F3E] mt-2">
-          Publiez votre livre en 6 étapes simples
+        <h2 className="mt-4 text-3xl font-black leading-tight text-foreground md:text-4xl">
+          Publier mon livre sur Amazon KDP : le chemin simple en 6 clics
         </h2>
-        <p className="text-sm text-muted-foreground mt-1">
-          Suivez les étapes dans l'ordre, de l'idée jusqu'à la publication sur Amazon. Pas besoin de réfléchir : cliquez et avancez.
+        <p className="mt-2 text-base font-semibold text-foreground/80 md:text-lg">
+          Faites les étapes dans l'ordre : niche → workflow → export → mots-clés → couverture → publication.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         {ETAPES.map((etape) => {
           const Icon = etape.icon;
           return (
@@ -105,25 +109,25 @@ export const ParcoursDebutant: React.FC<ParcoursDebutantProps> = ({ onNavigateTo
               key={etape.num}
               type="button"
               onClick={() => handleClick(etape)}
-              className="group text-left rounded-xl border border-[#232F3E]/10 bg-[#FAFAFA] hover:bg-white hover:border-[#FF9E2D] hover:shadow-md transition-all p-4 flex flex-col h-full"
+              className="group flex h-full min-h-[168px] flex-col rounded-xl border-2 border-border bg-card p-5 text-left shadow-md transition-all hover:-translate-y-1 hover:border-primary hover:shadow-xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30"
             >
-              <div className="flex items-center gap-3 mb-2">
-                <span className="flex items-center justify-center w-9 h-9 rounded-full bg-[#008296] text-white font-bold text-sm shrink-0">
+              <div className="mb-3 flex items-center gap-3">
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary text-xl font-black text-primary-foreground shadow-md">
                   {etape.num}
                 </span>
-                <Icon className="w-5 h-5 text-[#008296]" />
+                <Icon className="h-7 w-7 text-primary" />
               </div>
-              <h3 className="font-bold text-[#232F3E] text-sm">{etape.title}</h3>
-              <p className="text-xs text-muted-foreground mt-1 flex-1">{etape.description}</p>
-              <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#FF9E2D] mt-3 group-hover:gap-2.5 transition-all">
+              <h3 className="text-lg font-black leading-snug text-card-foreground">{etape.title}</h3>
+              <p className="mt-2 flex-1 text-sm font-medium leading-relaxed text-muted-foreground">{etape.description}</p>
+              <span className="mt-4 inline-flex items-center gap-2 text-base font-black text-primary transition-all group-hover:gap-3">
                 {etape.cta}
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="h-5 w-5" />
               </span>
             </button>
           );
         })}
       </div>
-    </div>
+    </section>
   );
 };
 
