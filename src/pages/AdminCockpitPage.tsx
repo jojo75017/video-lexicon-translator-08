@@ -301,25 +301,26 @@ const AdminCockpitPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setV3Mode(!v3Mode)}
-                className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors"
+                className="inline-flex items-center gap-3 rounded-full border-2 px-4 py-2 text-sm font-black shadow-lg transition-all hover:scale-[1.03]"
                 style={{
-                  borderColor: v3Mode ? accent : '#23232322',
-                  background: v3Mode ? `${accent}1a` : 'white',
-                  color: v3Mode ? accent : ink,
+                  borderColor: v3Mode ? '#c9a84c' : ORANGE,
+                  background: v3Mode ? 'linear-gradient(135deg, #0d0d0d, #161616)' : ORANGE,
+                  color: v3Mode ? '#f0d78c' : '#ffffff',
+                  boxShadow: v3Mode ? '0 0 0 4px #c9a84c22' : '0 0 0 4px #FF9E2D33',
                 }}
                 title="Bascule V2 / V3 — réservée admin"
               >
-                <span className={!v3Mode ? 'font-bold' : 'opacity-50'}>V2</span>
+                <span className={!v3Mode ? 'font-black' : 'opacity-60'}>V2</span>
                 <span
-                  className="relative inline-flex h-4 w-8 items-center rounded-full transition-colors"
-                  style={{ background: v3Mode ? accent : '#cbd5e1' }}
+                  className="relative inline-flex h-5 w-10 items-center rounded-full transition-colors"
+                  style={{ background: v3Mode ? '#c9a84c' : '#ffffff' }}
                 >
                   <span
-                    className="inline-block h-3 w-3 rounded-full bg-white transition-transform"
-                    style={{ transform: v3Mode ? 'translateX(18px)' : 'translateX(2px)' }}
+                    className="inline-block h-4 w-4 rounded-full transition-transform"
+                    style={{ transform: v3Mode ? 'translateX(22px)' : 'translateX(2px)', background: v3Mode ? '#111111' : ORANGE }}
                   />
                 </span>
-                <span className={v3Mode ? 'font-bold' : 'opacity-50'}>V3</span>
+                <span className={v3Mode ? 'font-black' : 'opacity-80'}>V3</span>
               </button>
             )}
             <Button
@@ -419,25 +420,26 @@ const AdminCockpitPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setV3Mode(!v3Mode)}
-                className="ml-auto inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors"
+                className="ml-auto inline-flex items-center gap-3 rounded-full border-2 px-4 py-2 text-sm font-black shadow-lg transition-all hover:scale-[1.03]"
                 style={{
-                  borderColor: v3Mode ? accent : '#23232322',
-                  background: v3Mode ? `${accent}1a` : 'white',
-                  color: v3Mode ? accent : ink,
+                  borderColor: v3Mode ? '#c9a84c' : ORANGE,
+                  background: v3Mode ? 'linear-gradient(135deg, #0d0d0d, #161616)' : ORANGE,
+                  color: v3Mode ? '#f0d78c' : '#ffffff',
+                  boxShadow: v3Mode ? '0 0 0 4px #c9a84c22' : '0 0 0 4px #FF9E2D33',
                 }}
                 title="Bascule réservée admin — préparation du lancement V3"
               >
-                <span className={!v3Mode ? 'font-bold' : 'opacity-50'}>V2</span>
+                <span className={!v3Mode ? 'font-black' : 'opacity-60'}>V2</span>
                 <span
-                  className="relative inline-flex h-4 w-8 items-center rounded-full transition-colors"
-                  style={{ background: v3Mode ? accent : '#cbd5e1' }}
+                  className="relative inline-flex h-5 w-10 items-center rounded-full transition-colors"
+                  style={{ background: v3Mode ? '#c9a84c' : '#ffffff' }}
                 >
                   <span
-                    className="inline-block h-3 w-3 rounded-full bg-white transition-transform"
-                    style={{ transform: v3Mode ? 'translateX(18px)' : 'translateX(2px)' }}
+                    className="inline-block h-4 w-4 rounded-full transition-transform"
+                    style={{ transform: v3Mode ? 'translateX(22px)' : 'translateX(2px)', background: v3Mode ? '#111111' : ORANGE }}
                   />
                 </span>
-                <span className={v3Mode ? 'font-bold' : 'opacity-50'}>V3</span>
+                <span className={v3Mode ? 'font-black' : 'opacity-80'}>V3</span>
               </button>
             )}
           </div>

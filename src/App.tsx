@@ -16,6 +16,7 @@ import ApiKeysFloatingButton from '@/components/ebook/ApiKeysFloatingButton';
 import AISosModal from '@/components/shared/AISosModal';
 import AICostBadge from '@/components/shared/AICostBadge';
 import { useBrandTitle } from '@/hooks/useBrandTitle';
+import V2V3FloatingSwitch from '@/components/admin/V2V3FloatingSwitch';
 
 // Lazy-loaded pages for performance
 const EbookPlannerPage = lazy(() => import('./pages/EbookPlannerPage'));
@@ -694,6 +695,8 @@ const App = () => {
           <EbookbotFloatingButton />
           {/* Bouton flottant Clés API & réglages (pages ebook / KDP) */}
           {isAuthenticated && <ApiKeysFloatingButton />}
+          {/* Admin: bascule V2/V3 importante, toujours visible */}
+          {(isAuthenticated || isAdmin) && <V2V3FloatingSwitch />}
           {/* SOS modal erreurs IA — humanise les erreurs Gemini/Claude/OpenAI/OpenRouter */}
           {isAuthenticated && <AISosModal />}
           {/* Badge coût IA cumulé par projet */}
