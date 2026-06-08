@@ -184,11 +184,11 @@ export const OPENROUTER_DEFAULT_MODEL = 'google/gemini-2.5-flash-lite';
 export const getOpenRouterModel = (): string => {
   if (typeof window === 'undefined') return OPENROUTER_DEFAULT_MODEL;
   const stored = (localStorage.getItem(LS_OPENROUTER_MODEL) || '').trim();
-  // Pas de choix explicite OU choix bloqué sur un modèle gratuit (rate-limité)
-  // => on force le modèle payant par défaut.
-  if (!stored || stored.endsWith(':free') || stored === 'openrouter/free') {
-    return OPENROUTER_DEFAULT_MODEL;
-  }
+  // On respecte TOUJOURS le choix explicite de l'abonné, y compris les modèles
+  // gratuits (":free"). On ne force le modèle par défaut QUE si aucun choix
+  // n'a été fait. (Les modèles gratuits peuvent être rate-limités côté
+  // OpenRouter — l'erreur 429 est alors remontée telle quelle à l'utilisateur.)
+  if (!stored) return OPENROUTER_DEFAULT_MODEL;
   return stored;
 };
 export const setOpenRouterModel = (m: string) => {
