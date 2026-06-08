@@ -1623,9 +1623,6 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               </div>
             </div>
 
-            {/* Parcours débutant - guide simple en 6 étapes */}
-            <ParcoursDebutant onNavigateToTab={(tabId) => setActiveTab(tabId)} />
-
             {/* Bloc 4 - Plan complet selon le mode */}
             {viewMode === 'trello' ? (
               <TrelloBoardView
@@ -1772,7 +1769,6 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
 
         return (
           <div className="space-y-6">
-            <ParcoursDebutant onNavigateToTab={(tabId) => setActiveTab(tabId)} />
             <EbookCompleteWorkflow
               characters={characters}
               initialTitle={ebookTitle}
@@ -3687,6 +3683,12 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
           activeTab={activeTab}
           onTabChange={handleTabChange}
         />
+
+        {(activeTab === 'workflow-dashboard' || activeTab === 'complete-workflow') && (
+          <div className="border-b bg-background px-4 py-4 md:px-8">
+            <ParcoursDebutant onNavigateToTab={(tabId) => setActiveTab(tabId)} />
+          </div>
+        )}
 
         <WorkflowAIProviderBadge />
         
