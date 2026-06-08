@@ -1623,9 +1623,6 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               </div>
             </div>
 
-            {/* Parcours débutant - guide simple en 6 étapes */}
-            <ParcoursDebutant onNavigateToTab={(tabId) => setActiveTab(tabId)} />
-
             {/* Bloc 4 - Plan complet selon le mode */}
             {viewMode === 'trello' ? (
               <TrelloBoardView
@@ -1771,15 +1768,16 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
         }
 
         return (
-          <EbookCompleteWorkflow
-            characters={characters}
-            initialTitle={ebookTitle}
-            initialSubtitle={bookSubtitle}
-            initialCategory={genre}
-            initialAuthorName={authorName}
-            initialBookIntroduction={bookDescription}
-            initialNumberOfChapters={numberOfChapters}
-            onComplete={(bookData) => {
+          <div className="space-y-6">
+            <EbookCompleteWorkflow
+              characters={characters}
+              initialTitle={ebookTitle}
+              initialSubtitle={bookSubtitle}
+              initialCategory={genre}
+              initialAuthorName={authorName}
+              initialBookIntroduction={bookDescription}
+              initialNumberOfChapters={numberOfChapters}
+              onComplete={(bookData) => {
               // Update title and author from the workflow
               if (bookData?.title) setEbookTitle(bookData.title);
               if (bookData?.authorName) setAuthorName(bookData.authorName);
@@ -1820,8 +1818,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               } else {
                 toast.error("La génération s'est terminée, mais aucun chapitre n'a été renvoyé.");
               }
-            }}
-          />
+              }}
+            />
+          </div>
         );
       }
       
@@ -3684,6 +3683,12 @@ ${architecture.conclusion?.elements?.join('\n') || ''}`;
           activeTab={activeTab}
           onTabChange={handleTabChange}
         />
+
+        {(activeTab === 'workflow-dashboard' || activeTab === 'complete-workflow') && (
+          <div className="border-b bg-background px-4 py-4 md:px-8">
+            <ParcoursDebutant onNavigateToTab={(tabId) => setActiveTab(tabId)} />
+          </div>
+        )}
 
         <WorkflowAIProviderBadge />
         
