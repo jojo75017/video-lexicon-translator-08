@@ -1459,22 +1459,46 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               style={{ background: 'linear-gradient(135deg, #008296 0%, #FF9E2D 100%)' }}
             >
               <div className="relative z-10 max-w-3xl">
-                <p className="text-xs font-semibold uppercase tracking-wide opacity-90 mb-2">
-                  ✨ Ebookstudio Pro V2 · Suite IA pour auteurs Amazon KDP
-                </p>
-                <h2 className="text-2xl md:text-3xl font-bold leading-tight mb-2">
-                  Votre livre Amazon KDP mérite d'être lu.
-                </h2>
-                <p className="text-sm md:text-base opacity-95 leading-relaxed">
-                  Ebookstudio Pro V2 est la suite d'outils IA pensée pour les auteurs Amazon Kindle Direct Publishing.
-                  Identifiez les niches rentables, optimisez vos titres, mots-clés, descriptions et couvertures —
-                  et donnez à votre livre toutes ses chances dès la première publication.
-                </p>
-                <div className="mt-4 flex flex-wrap gap-2 text-xs font-semibold">
-                  <span className="rounded-full bg-white/20 px-3 py-1 backdrop-blur-sm">🎯 Niches rentables</span>
-                  <span className="rounded-full bg-white/20 px-3 py-1 backdrop-blur-sm">🔑 Optimisation KDP</span>
-                  <span className="rounded-full bg-white/20 px-3 py-1 backdrop-blur-sm">🎨 Couvertures pro</span>
-                </div>
+                {ebookTitle?.trim() ? (
+                  <>
+                    <p className="text-xs font-semibold uppercase tracking-wide opacity-90 mb-2">
+                      📖 Projet en cours · Ebookstudio Pro V2
+                    </p>
+                    <h2 className="text-2xl md:text-3xl font-bold leading-tight mb-2">
+                      {ebookTitle}
+                    </h2>
+                    {bookSubtitle?.trim() && (
+                      <p className="text-base md:text-lg font-medium opacity-95 leading-snug mb-2">
+                        {bookSubtitle}
+                      </p>
+                    )}
+                    <div className="mt-3 flex flex-wrap gap-2 text-xs font-semibold">
+                      {authorName?.trim() && (
+                        <span className="rounded-full bg-white/20 px-3 py-1 backdrop-blur-sm">✍️ {authorName}</span>
+                      )}
+                      <span className="rounded-full bg-white/20 px-3 py-1 backdrop-blur-sm">📚 {chapters.length} chapitre{chapters.length > 1 ? 's' : ''}</span>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-xs font-semibold uppercase tracking-wide opacity-90 mb-2">
+                      ✨ Ebookstudio Pro V2 · Suite IA pour auteurs Amazon KDP
+                    </p>
+                    <h2 className="text-2xl md:text-3xl font-bold leading-tight mb-2">
+                      Votre livre Amazon KDP mérite d'être lu.
+                    </h2>
+                    <p className="text-sm md:text-base opacity-95 leading-relaxed">
+                      Ebookstudio Pro V2 est la suite d'outils IA pensée pour les auteurs Amazon Kindle Direct Publishing.
+                      Identifiez les niches rentables, optimisez vos titres, mots-clés, descriptions et couvertures —
+                      et donnez à votre livre toutes ses chances dès la première publication.
+                    </p>
+                    <div className="mt-4 flex flex-wrap gap-2 text-xs font-semibold">
+                      <span className="rounded-full bg-white/20 px-3 py-1 backdrop-blur-sm">🎯 Niches rentables</span>
+                      <span className="rounded-full bg-white/20 px-3 py-1 backdrop-blur-sm">🔑 Optimisation KDP</span>
+                      <span className="rounded-full bg-white/20 px-3 py-1 backdrop-blur-sm">🎨 Couvertures pro</span>
+                    </div>
+                  </>
+                )}
               </div>
               <div className="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-white/10" />
               <div className="absolute -right-20 -bottom-20 w-60 h-60 rounded-full bg-white/5" />
