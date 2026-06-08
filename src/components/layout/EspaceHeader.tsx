@@ -24,7 +24,7 @@ interface EspaceHeaderProps {
 type FamilyId = 'planner' | 'writing' | 'images' | 'export' | 'marketing' | 'account';
 
 const PLANNER_TABS: Array<{ id: FamilyId; label: string; emoji: string; bg: string; bgActive: string; ring: string; match: string[] }> = [
-  { id: 'planner',   label: 'Plan',     emoji: '📘', bg: 'bg-[#DBEAFE] text-[#1E40AF] hover:bg-[#BFDBFE]',         bgActive: 'bg-[#3B82F6] text-white shadow-md shadow-[#3B82F6]/30',       ring: 'ring-[#3B82F6]/30', match: ['planner', 'characters', 'templates', 'workflow-dashboard', 'url-import', 'doc-transform', 'projects', 'ebook-library', 'series'] },
+  { id: 'planner',   label: 'Plan',     emoji: '📘', bg: 'bg-[#DBEAFE] text-[#1E40AF] hover:bg-[#BFDBFE]',         bgActive: 'bg-[#3B82F6] text-white shadow-md shadow-[#3B82F6]/30',       ring: 'ring-[#3B82F6]/30', match: ['planner', 'characters', 'templates', 'workflow-dashboard', 'url-import', 'doc-transform', 'projects', 'ebook-library', 'series', 'kdp-keywords-pro'] },
   { id: 'writing',   label: 'Écrire',   emoji: '✍️', bg: 'bg-[#DCFCE7] text-[#166534] hover:bg-[#BBF7D0]',         bgActive: 'bg-[#22C55E] text-white shadow-md shadow-[#22C55E]/30',       ring: 'ring-[#22C55E]/30', match: ['writing', 'strict-proofread', 'toc', 'aichat', 'complete-workflow', 'humanize-anti-ia', 'natural-rewrite', 'expert-writing', 'multi-translator', 'tools', 'atlas', 'encyclopedia', 'documentary', 'agenda', 'scolaire', 'pedagogique', 'content-architect'] },
   { id: 'images',    label: 'Habiller', emoji: '🎨', bg: 'bg-[#EDE9FE] text-[#5B21B6] hover:bg-[#DDD6FE]',         bgActive: 'bg-[#8B5CF6] text-white shadow-md shadow-[#8B5CF6]/30',       ring: 'ring-[#8B5CF6]/30', match: ['images', 'cover', 'cover-design-editor', 'back-cover', 'backcover', 'images-cover', 'images-generator', 'images-library', 'editorial-packaging'] },
   { id: 'export',    label: 'Publier',  emoji: '🚀', bg: 'bg-[#FFEDD5] text-[#9A3412] hover:bg-[#FED7AA]',         bgActive: 'bg-[#F97316] text-white shadow-md shadow-[#F97316]/30',       ring: 'ring-[#F97316]/30', match: ['export', 'kdp', 'kdp-prepublish-checklist', 'workflow-export', 'calibre-epub', 'audiobook', 'audio-express', 'audio', 'audit-pilot', 'kdp-keywords-pro'] },
@@ -46,6 +46,7 @@ const HIDE_TABBAR_ON = new Set([
 // Sous-onglets contextuels par famille (les outils courants).
 const PLANNER_SUBTABS: Partial<Record<FamilyId, Array<{ id: string; label: string }>>> = {
   planner: [
+    { id: 'kdp-keywords-pro', label: '🔍 Mots-clés Amazon (KDSpy)' },
     { id: 'workflow-dashboard', label: 'Tableau de bord IA' },
     { id: 'planner', label: 'Plan du livre' },
     { id: 'characters', label: 'Personnages' },
