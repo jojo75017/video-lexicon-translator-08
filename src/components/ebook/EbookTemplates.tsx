@@ -21,6 +21,11 @@ export const EbookTemplates: React.FC<EbookTemplatesProps> = ({ onApplyTemplate 
         <p className="text-sm text-muted-foreground">
           {allTemplates.length} structures professionnelles prêtes à l'emploi
         </p>
+        <p className="text-xs text-muted-foreground max-w-xl mx-auto">
+          En choisissant un template, son <strong>titre</strong>, sa <strong>structure de chapitres</strong> et
+          ses sous-parties sont automatiquement chargés dans le plan — vous n'avez plus qu'à
+          personnaliser le contenu. Survolez une vignette pour voir son détail.
+        </p>
       </div>
 
       {/* Templates en grille - 12 premiers */}
@@ -29,6 +34,7 @@ export const EbookTemplates: React.FC<EbookTemplatesProps> = ({ onApplyTemplate 
           <button
             key={template.id}
             onClick={() => onApplyTemplate(template.id)}
+            title={`${template.description} — ${template.chapters.length} chapitres`}
             className="group relative aspect-[3/4] rounded-lg overflow-hidden border border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
           >
             {/* Image */}
@@ -40,12 +46,24 @@ export const EbookTemplates: React.FC<EbookTemplatesProps> = ({ onApplyTemplate 
             
             {/* Overlay permanent léger */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-            
+
+            {/* Badge nombre de chapitres */}
+            <div className="absolute top-2 right-2 rounded-full bg-primary/90 px-1.5 py-0.5 text-[10px] font-bold text-white">
+              {template.chapters.length} ch.
+            </div>
+
             {/* Badge */}
             <div className="absolute top-2 left-2 text-xl">
               {template.icon}
             </div>
-            
+
+            {/* Description au survol */}
+            <div className="absolute inset-0 flex items-center justify-center bg-black/80 p-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+              <p className="text-[11px] leading-snug text-white text-center">
+                {template.description}
+              </p>
+            </div>
+
             {/* Titre toujours visible */}
             <div className="absolute bottom-0 left-0 right-0 p-2">
               <p className="text-xs text-white font-medium line-clamp-2 drop-shadow-lg">
@@ -66,10 +84,16 @@ export const EbookTemplates: React.FC<EbookTemplatesProps> = ({ onApplyTemplate 
                 key={template.id}
                 variant="outline"
                 onClick={() => onApplyTemplate(template.id)}
+                title={`${template.description} — ${template.chapters.length} chapitres`}
                 className="w-full h-auto py-3 px-3 justify-start text-left hover:bg-primary/10"
               >
                 <span className="text-lg mr-2">{template.icon}</span>
-                <span className="text-sm truncate flex-1">{template.title.split(':')[0]}</span>
+                <span className="flex-1 min-w-0">
+                  <span className="block text-sm truncate">{template.title.split(':')[0]}</span>
+                  <span className="block text-[11px] text-muted-foreground truncate">
+                    {template.chapters.length} chapitres · {template.description}
+                  </span>
+                </span>
               </Button>
             ))}
           </div>

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import QuotaDepasseBanner from "@/components/sales/QuotaDepasseBanner";
+
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -270,7 +270,7 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <div className="min-h-screen bg-background">
-          <QuotaDepasseBanner />
+          
           {showAccessDebug && (
             <div className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur">
               <div className="mx-auto max-w-6xl px-4 py-2 text-xs text-muted-foreground flex flex-wrap gap-3">
