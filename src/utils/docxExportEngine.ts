@@ -692,6 +692,9 @@ export async function generateProfessionalDocx(options: DocxExportOptions): Prom
       chapter.subChapters.some(s => s.content && s.content.trim().length > 50);
     if (!hasAnyContent && /^chapitre\s+\d+$/i.test(chapter.title.trim())) return;
 
+    // Titre + corps résolus (extrait le vrai titre si le champ est générique)
+    const { displayTitle, body } = resolveChapter(chapter, index);
+
     // Numéro du chapitre (discret)
     children.push(new Paragraph({
       children: [new TextRun({ text: `CHAPITRE ${index + 1}`, bold: true, size: subTitleSize, font, color: '888888' })],
@@ -700,18 +703,22 @@ export async function generateProfessionalDocx(options: DocxExportOptions): Prom
       spacing: { before: 800, after: 200 },
     }));
 
-    // Titre du chapitre - nettoyé avec cleanChapterTitle
-    const cleanTitle = cleanChapterTitle(chapter.title);
-    children.push(new Paragraph({
-      children: [new TextRun({ text: cleanTitle.toUpperCase(), bold: true, size: chapterTitleSize, font })],
-      alignment: AlignmentType.CENTER,
-      spacing: { after: 600 },
-    }));
+    // Titre du chapitre — on n'affiche pas un titre générique (évite "CHAPITRE 2" en double)
+    if (!isGenericTitle(displayTitle)) {
+      children.push(new Paragraph({
+        children: [new TextRun({ text: displayTitle.toUpperCase(), bold: true, size: chapterTitleSize, font })],
+        alignment: AlignmentType.CENTER,
+        spacing: { after: 600 },
+      }));
+    } else {
+      children.push(new Paragraph({ spacing: { after: 400 } }));
+    }
 
     // Contenu du chapitre
-    if (chapter.content && chapter.content.trim().length > 0) {
-      children.push(...buildContentParagraphs(chapter.content, baseSize, font));
+    if (body && body.trim().length > 0) {
+      children.push(...buildContentParagraphs(body, baseSize, font));
     }
+
 
     // Sous-chapitres
     chapter.subChapters.forEach((sub, subIdx) => {
