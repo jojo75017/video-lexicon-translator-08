@@ -88,6 +88,7 @@ import { WorkflowDashboard } from '@/components/ebook/WorkflowDashboard';
 import { EbookProgressDashboard } from '@/components/ebook/EbookProgressDashboard';
 import { EbookHeroDashboard } from '@/components/ebook/EbookHeroDashboard';
 import { EbookJourneyDashboard } from '@/components/ebook/EbookJourneyDashboard';
+import { ParcoursDebutant } from '@/components/ebook/ParcoursDebutant';
 import { AuthorBooksShowcase } from '@/components/ebook/AuthorBooksShowcase';
 import { KdpKeywordWidget } from '@/components/ebook/KdpKeywordWidget';
 import type { EbookExample } from '@/data/ebookExamples';
@@ -1621,6 +1622,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
 
               </div>
             </div>
+
+            {/* Parcours débutant - guide simple en 6 étapes */}
+            <ParcoursDebutant onNavigateToTab={(tabId) => setActiveTab(tabId)} />
 
             {/* Bloc 4 - Plan complet selon le mode */}
             {viewMode === 'trello' ? (
