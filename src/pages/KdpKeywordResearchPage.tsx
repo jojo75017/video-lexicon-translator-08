@@ -211,6 +211,7 @@ Réponds UNIQUEMENT avec un tableau JSON valide.`;
       const parsed = safeParseJsonArray(content) as KdpKeyword[] | null;
       if (parsed && parsed.length > 0) {
         setKeywords(parsed);
+        setActiveTab('research');
         toast.success(`${parsed.length} mots-clés KDP générés (mode ${effectiveMode === 'title' ? 'titre' : 'niche'}) !`);
       } else {
         throw new Error('Réponse IA mal formée. Simplifiez votre niche ou réessayez.');
