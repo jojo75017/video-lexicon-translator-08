@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import {
   Search, Star, MessageSquare, Crown, ExternalLink, Loader2, Target,
-  TrendingUp, AlertTriangle, ShieldCheck, BarChart3, Tag,
+  TrendingUp, AlertTriangle, ShieldCheck, BarChart3, Tag, Key,
 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
