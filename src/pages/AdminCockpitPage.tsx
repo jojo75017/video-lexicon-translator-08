@@ -297,6 +297,31 @@ const AdminCockpitPage: React.FC = () => {
             <span>{skin ? 'Cockpit V3 — Publication Assistée Pro' : 'Cockpit admin'}</span>
           </div>
           <div className="flex items-center gap-2">
+            {isAdmin && (
+              <button
+                type="button"
+                onClick={() => setV3Mode(!v3Mode)}
+                className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors"
+                style={{
+                  borderColor: v3Mode ? accent : '#23232322',
+                  background: v3Mode ? `${accent}1a` : 'white',
+                  color: v3Mode ? accent : ink,
+                }}
+                title="Bascule V2 / V3 — réservée admin"
+              >
+                <span className={!v3Mode ? 'font-bold' : 'opacity-50'}>V2</span>
+                <span
+                  className="relative inline-flex h-4 w-8 items-center rounded-full transition-colors"
+                  style={{ background: v3Mode ? accent : '#cbd5e1' }}
+                >
+                  <span
+                    className="inline-block h-3 w-3 rounded-full bg-white transition-transform"
+                    style={{ transform: v3Mode ? 'translateX(18px)' : 'translateX(2px)' }}
+                  />
+                </span>
+                <span className={v3Mode ? 'font-bold' : 'opacity-50'}>V3</span>
+              </button>
+            )}
             <Button
               size="sm"
               onClick={() => navigate('/hub-v3')}
