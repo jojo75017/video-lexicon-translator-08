@@ -1623,6 +1623,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               </div>
             </div>
 
+            {/* Parcours débutant - guide simple en 6 étapes */}
+            <ParcoursDebutant onNavigateToTab={(tabId) => setActiveTab(tabId)} />
+
             {/* Bloc 4 - Plan complet selon le mode */}
             {viewMode === 'trello' ? (
               <TrelloBoardView
