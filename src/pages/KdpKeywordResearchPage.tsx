@@ -338,7 +338,20 @@ Réponds UNIQUEMENT avec un tableau JSON valide.`;
   const bestOpportunity = currentKeywords.length > 0 ? currentKeywords.reduce((best, k) => k.opportunity > best.opportunity ? k : best, currentKeywords[0]) : null;
   const lowCompCount = currentKeywords.filter(k => k.competition === 'low').length;
 
-  const renderKeywordRow = (kw: KdpKeyword, i: number) => (
+  const getVerdict = (kw: KdpKeyword) => {
+    // Rouge : trop de concurrents ; Vert : belle opportunité ; Orange : moyen
+    if (kw.competition === 'high' || kw.opportunity < 40) {
+      return { color: 'bg-red-500', label: '🔴 Trop de concurrents' };
+    }
+    if (kw.competition === 'low' && kw.opportunity >= 65) {
+      return { color: 'bg-emerald-500', label: '🟢 Belle opportunité' };
+    }
+    return { color: 'bg-amber-500', label: '🟡 Moyen' };
+  };
+
+  const renderKeywordRow = (kw: KdpKeyword, i: number) => {
+    const verdict = getVerdict(kw);
+    return (
     <motion.div key={kw.keyword} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.02 }}>
       <Card
         className={`cursor-pointer transition-all hover:shadow-md ${
@@ -352,6 +365,10 @@ Réponds UNIQUEMENT avec un tableau JSON valide.`;
           <div className="flex flex-col md:flex-row md:items-center gap-3">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1.5">
+                <span
+                  className={`shrink-0 w-3 h-3 rounded-full ${verdict.color} ring-2 ring-white dark:ring-background shadow`}
+                  title={verdict.label}
+                />
                 <span className="font-semibold text-foreground truncate">{kw.keyword}</span>
                 <Button variant="ghost" size="sm" className="h-6 w-6 p-0 shrink-0" onClick={(e) => { e.stopPropagation(); copyKeyword(kw.keyword); }}>
                   <Copy className="w-3 h-3" />
