@@ -44,7 +44,7 @@ const KdpKeywordResearchPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedKeywords, setSelectedKeywords] = useState<Set<string>>(new Set());
   const [sortBy, setSortBy] = useState<'volume' | 'difficulty' | 'opportunity'>('opportunity');
-  const [activeTab, setActiveTab] = useState<string>('research');
+  const [activeTab, setActiveTab] = useState<string>(searchParams.get('tab') || 'research');
   const [searchMode, setSearchMode] = useState<SearchMode>(isFromProject ? 'title' : 'auto');
   const [backend7Keywords, setBackend7Keywords] = useState<string[]>([]);
   const [longTailKeywords, setLongTailKeywords] = useState<KdpKeyword[]>([]);
