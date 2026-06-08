@@ -329,6 +329,15 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
             <MessageCircle className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">Contact</span>
           </Link>
+          {/* Badge d'orientation — toujours visible pour savoir où l'on est */}
+          <span
+            className="hidden md:inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-extrabold tracking-wide text-white shadow-md shadow-[#FF9E2D]/30 ring-1 ring-white/40 whitespace-nowrap shrink-0"
+            style={{ backgroundImage: 'linear-gradient(90deg,#008296 0%,#00A8B5 50%,#FF9E2D 100%)' }}
+          >
+            <Sparkles className="h-3.5 w-3.5" />
+            Ebookstudio Pro V2
+          </span>
+
           {projectTitle && (
             <>
               <span className="text-joy-ink/30 text-base">›</span>
