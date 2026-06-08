@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { ArrowLeft, LogOut, Sparkles, LayoutGrid, Search, Shield, Settings, Target, ClipboardCheck, MessageCircle, BookOpen } from 'lucide-react';
+import { ArrowLeft, LogOut, Sparkles, LayoutGrid, Search, Shield, Settings, Target, ClipboardCheck, MessageCircle, BookOpen, FolderOpen } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { getIsCurrentSessionAdmin } from '@/lib/adminAccess';
@@ -337,6 +337,24 @@ export const EspaceHeader: React.FC<EspaceHeaderProps> = ({
             <Sparkles className="h-3.5 w-3.5" />
             Ebookstudio Pro V2
           </span>
+
+          {/* Accès direct à mes projets — toujours visible, quelle que soit l'étape */}
+          {onTabChange && (
+            <button
+              onClick={() => onTabChange('projects')}
+              title="Voir tous mes projets"
+              className={cn(
+                'inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] transition-colors shrink-0',
+                activeTab === 'projects'
+                  ? 'bg-[#008296] text-white'
+                  : 'border border-[#008296]/40 text-[#008296] hover:bg-[#008296]/10',
+              )}
+            >
+              <FolderOpen className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Mes projets</span>
+            </button>
+          )}
+
 
           {projectTitle && (
             <>
