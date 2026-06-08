@@ -2059,14 +2059,21 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
                           />
                         </div>
                         <div className="space-y-2" id="gemini-api-key-field">
-                          <Label className="text-sm font-medium">Clé API Gemini</Label>
+                          <Label className="text-sm font-medium">
+                            Clé API · {PROVIDER_LABELS[getProvider()]}
+                          </Label>
                           <Input
                             type="password"
-                            placeholder="AIza..."
+                            placeholder={PROVIDER_KEY_HINT[getProvider()]}
                             value={apiKey}
                             onChange={(e) => setApiKey(e.target.value)}
                             className="h-12 border-2 focus:border-primary"
                           />
+                          <p className="text-xs text-muted-foreground">
+                            Vous utilisez actuellement <strong>{PROVIDER_LABELS[getProvider()]}</strong>.
+                            Pour changer de fournisseur (Gemini, Claude, ChatGPT ou OpenRouter),
+                            ouvrez le bouton « Choisir mon IA · Clés API » en bas à droite.
+                          </p>
                         </div>
                       </div>
 
