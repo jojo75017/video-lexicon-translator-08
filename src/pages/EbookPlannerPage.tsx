@@ -1775,13 +1775,13 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             <ParcoursDebutant onNavigateToTab={(tabId) => setActiveTab(tabId)} />
             <EbookCompleteWorkflow
               characters={characters}
-            initialTitle={ebookTitle}
-            initialSubtitle={bookSubtitle}
-            initialCategory={genre}
-            initialAuthorName={authorName}
-            initialBookIntroduction={bookDescription}
-            initialNumberOfChapters={numberOfChapters}
-            onComplete={(bookData) => {
+              initialTitle={ebookTitle}
+              initialSubtitle={bookSubtitle}
+              initialCategory={genre}
+              initialAuthorName={authorName}
+              initialBookIntroduction={bookDescription}
+              initialNumberOfChapters={numberOfChapters}
+              onComplete={(bookData) => {
               // Update title and author from the workflow
               if (bookData?.title) setEbookTitle(bookData.title);
               if (bookData?.authorName) setAuthorName(bookData.authorName);
