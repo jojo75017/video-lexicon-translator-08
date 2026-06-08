@@ -172,7 +172,7 @@ export function V3ModuleDialog({
               <p className="text-muted-foreground leading-relaxed">{module.description}</p>
               {Tool ? (
                 <div className="border-t pt-3">
-                  <Tool />
+                  <Tool {...(toolProps ?? {})} />>
                 </div>
               ) : (
                 <p className="text-[11px] text-muted-foreground/60">
