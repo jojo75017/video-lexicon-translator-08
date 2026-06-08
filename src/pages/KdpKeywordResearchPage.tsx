@@ -412,7 +412,8 @@ Réponds UNIQUEMENT avec un tableau JSON valide.`;
         </CardContent>
       </Card>
     </motion.div>
-  );
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50/60 to-rose-50/40 dark:from-orange-950/20 dark:via-amber-950/10 dark:to-background p-4 md:p-6">
