@@ -100,10 +100,13 @@ const V3HubPage: React.FC = () => {
     setTourOpen(false);
   };
 
-  // Ouvre le STUDIO V3 (BookCreationStudio) sans quitter le Hub V3.
-  const openStudio = (_sourceId: string) => {
+  // Ouvre le STUDIO V3 (BookCreationStudio) sans quitter le Hub V3, avec la source pré-sélectionnée.
+  const openStudio = (sourceId: string) => {
     const studio = V3_MODULES.find((m) => m.id === 'book-creation-studio');
-    if (studio) setSelected(studio);
+    if (studio) {
+      setStudioSource(sourceId);
+      setSelected(studio);
+    }
   };
 
   const filtered = useMemo(() => {
