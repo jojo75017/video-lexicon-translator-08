@@ -88,6 +88,7 @@ ${subtitle ? `Sous-titre : "${subtitle}"` : ''}
 ${audience ? `Public cible : ${audience}` : ''}
 ${keywords ? `Mots-clés : ${keywords}` : ''}
 ${idea ? `Idée / description : ${idea}` : ''}
+${meta.needsImport && importValue.trim() ? `Source à transformer (${meta.label}) :\n${importValue.trim()}` : ''}
 
 Produis en français, en texte brut (titres avec #, sans HTML) :
 1. Une introduction rédigée (200-300 mots).
