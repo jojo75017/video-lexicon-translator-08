@@ -253,7 +253,11 @@ const V3HubPage: React.FC = () => {
       </main>
 
 
-      <V3ModuleDialog module={selected} onClose={() => setSelected(null)} />
+      <V3ModuleDialog
+        module={selected}
+        onClose={() => { setSelected(null); setStudioSource(null); }}
+        toolProps={selected?.id === 'book-creation-studio' ? { initialSource: studioSource } : undefined}
+      />
       <V3HubTour isOpen={tourOpen} onClose={finishTour} onComplete={finishTour} />
     </div>
   );
