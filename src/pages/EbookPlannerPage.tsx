@@ -1017,30 +1017,67 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
 
       // Étape 3: Générer le contenu de chaque chapitre (sans sous-chapitres)
       let previousChapterSummary = '';
-      
+      const wait = (ms: number) => new Promise(r => setTimeout(r, ms));
+
       for (let i = 0; i < currentChapters.length; i++) {
         const chapter = currentChapters[i];
-        
+
         // Générer le contenu du chapitre principal si vide (avec synopsis et contexte)
         if (!chapter.content) {
-          setGenerationProgress({ 
-            current: currentProgress, 
-            total: totalItems, 
-            currentItem: `📝 Chapitre ${i + 1}/${currentChapters.length}: ${chapter.title}` 
+          setGenerationProgress({
+            current: currentProgress,
+            total: totalItems,
+            currentItem: `📝 Chapitre ${i + 1}/${currentChapters.length}: ${chapter.title}`
           });
-          const chapterContent = await generateChapterContent(
-            chapter, 
-            targetWordsPerChapter, 
-            synopsis || undefined, 
-            i, 
-            currentChapters.length, 
-            previousChapterSummary || undefined
-          );
+
+          // Retry avec backoff pour résister aux limites de quota Gemini (429)
+          let chapterContent: string | null = null;
+          const maxAttempts = 4;
+          for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+            chapterContent = await generateChapterContent(
+              chapter,
+              targetWordsPerChapter,
+              synopsis || undefined,
+              i,
+              currentChapters.length,
+              previousChapterSummary || undefined
+            );
+            if (chapterContent) break;
+
+            if (attempt < maxAttempts) {
+              const backoff = attempt * 20000; // 20s, 40s, 60s
+              setGenerationProgress({
+                current: currentProgress,
+                total: totalItems,
+                currentItem: `⏳ Limite IA atteinte — nouvelle tentative chapitre ${i + 1} dans ${backoff / 1000}s (essai ${attempt + 1}/${maxAttempts})`
+              });
+              toast.info(`Limite IA atteinte. Nouvelle tentative du chapitre ${i + 1} dans ${backoff / 1000}s...`);
+              await wait(backoff);
+            }
+          }
+
           if (chapterContent) {
             updateChapterContent(chapter.id, chapterContent);
             currentChapters[i] = { ...chapter, content: chapterContent };
             // Créer un résumé du chapitre pour le suivant
             previousChapterSummary = chapterContent.substring(0, 500) + '...';
+          } else {
+            // Échec persistant : on arrête proprement pour ne pas "bloquer" silencieusement
+            toast.error(
+              `⚠️ Génération interrompue au chapitre ${i + 1} (quota IA épuisé). Patientez ~60s puis relancez : les chapitres déjà rédigés sont conservés et la génération reprendra là où elle s'est arrêtée.`,
+              { duration: 12000 }
+            );
+            setGenerationProgress({
+              current: currentProgress,
+              total: totalItems,
+              currentItem: `⏸️ En pause au chapitre ${i + 1} — relancez pour reprendre`
+            });
+            return;
+          }
+
+          // Pacing entre chapitres pour éviter d'épuiser le quota par minute
+          if (i < currentChapters.length - 1) {
+            await wait(4000);
           }
         } else {
           previousChapterSummary = chapter.content.substring(0, 500) + '...';
