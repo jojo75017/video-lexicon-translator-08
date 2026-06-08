@@ -124,6 +124,7 @@ import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubsc
 import { ebookTemplates } from '@/data/ebookTemplates';
 import { type Character as EbookCharacter } from '@/components/ebook/EbookCharacters';
 import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
+import { getProvider, PROVIDER_LABELS, PROVIDER_KEY_HINT } from '@/services/aiWritingService';
 
 interface EbookPlannerPageProps {
   subscriberEmail?: string;
