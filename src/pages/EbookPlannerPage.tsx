@@ -1206,6 +1206,12 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
 
   // Fonction de changement d'onglet avec sauvegarde (utilise la ref pour avoir les dernières données)
   const handleTabChange = (newTab: string) => {
+    // La recherche de mots-clés Amazon (KDSpy) vit sur sa page dédiée /kdp-keywords.
+    if (newTab === 'kdp-keywords-pro') {
+      const seed = currentDataRef.current?.ebookTitle;
+      navigate(`/kdp-keywords?tab=spy${seed ? `&title=${encodeURIComponent(seed)}` : ''}`);
+      return;
+    }
     if (newTab === 'subscription') {
       try {
         localStorage.setItem('ebook_planner_active_tab', activeTab === 'subscription' ? 'workflow-dashboard' : activeTab);
