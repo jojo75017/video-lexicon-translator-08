@@ -256,7 +256,7 @@ function extractInlineTitle(body: string): { title: string; rest: string } | nul
   while (title.length && (isPunct(title[title.length - 1]) || connectors.has(bare(title[title.length - 1])))) {
     title.pop();
   }
-  const t = title.join(' ').replace(/\s+([:;,.!?])/g, '$1').trim();
+  const t = title.join(' ').replace(/\s+([,.])/g, '$1').trim();
   if (t.length < 5 || t.length > 110) return null;
   const rest = words.slice(title.length).join(' ').trim();
   if (rest.length < 30) return null;
