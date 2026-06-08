@@ -46,14 +46,16 @@ const steps = [
 export const OnboardingGuide = ({ userName }: OnboardingGuideProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
+  const isPlannerPage = typeof window !== 'undefined' && window.location.pathname.includes('/ebook-planner');
 
   useEffect(() => {
+    if (isPlannerPage) return;
     const done = localStorage.getItem(ONBOARDING_KEY);
     if (!done) {
       const timer = setTimeout(() => setIsOpen(true), 1500);
       return () => clearTimeout(timer);
     }
-  }, []);
+  }, [isPlannerPage]);
 
   const handleNext = () => {
     if (currentStep < steps.length - 1) {
@@ -71,6 +73,8 @@ export const OnboardingGuide = ({ userName }: OnboardingGuideProps) => {
 
   const step = steps[currentStep];
   const StepIcon = step.icon;
+
+  if (isPlannerPage) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => { if (!open) handleSkip(); }}>
