@@ -16,6 +16,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
+import AmazonSpyTab from '@/components/ebook/AmazonSpyTab';
 
 interface KdpKeyword {
   keyword: string;
