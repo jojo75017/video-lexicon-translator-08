@@ -126,13 +126,30 @@ Sois concret, orienté valeur lecteur et cohérent avec la niche.`;
     <div className="space-y-6">
       {/* Header */}
       <div>
+        <div className="inline-flex items-center gap-2 mb-1 rounded-full px-3 py-1 text-xs font-semibold"
+          style={{ background: `${TEAL}14`, color: TEAL }}>
+          <span>{meta.emoji}</span> {meta.label}
+        </div>
         <h2 className="text-2xl font-bold" style={{ color: TEAL }}>
           Studio de création de livres
         </h2>
-        <p className="text-sm" style={{ color: `${INK}99` }}>
-          De l'idée au plan complet, prêt à développer puis exporter.
-        </p>
+        <p className="text-sm" style={{ color: `${INK}99` }}>{meta.hint}</p>
       </div>
+
+      {/* Panneau d'import contextuel selon la source */}
+      {step === 0 && meta.needsImport && (
+        <div className="rounded-xl border p-4 space-y-2" style={{ borderColor: `${TEAL}40`, background: `${TEAL}08` }}>
+          <label className="text-xs font-semibold" style={{ color: INK }}>{meta.importLabel}</label>
+          {meta.multiline ? (
+            <Textarea value={importValue} onChange={(e) => setImportValue(e.target.value)} rows={5} placeholder={meta.importPlaceholder} />
+          ) : (
+            <Input value={importValue} onChange={(e) => setImportValue(e.target.value)} placeholder={meta.importPlaceholder} />
+          )}
+          <p className="text-[11px]" style={{ color: `${INK}80` }}>
+            Ce contenu sera transformé par l'IA. Choisissez ensuite le type de livre ci-dessous.
+          </p>
+        </div>
+      )}
 
       {/* Steps */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1">
