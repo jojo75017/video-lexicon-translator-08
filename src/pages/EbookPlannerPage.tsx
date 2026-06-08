@@ -1769,6 +1769,12 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
         return (
           <EbookCompleteWorkflow
             characters={characters}
+            initialTitle={ebookTitle}
+            initialSubtitle={bookSubtitle}
+            initialCategory={genre}
+            initialAuthorName={authorName}
+            initialBookIntroduction={bookDescription}
+            initialNumberOfChapters={numberOfChapters}
             onComplete={(bookData) => {
               // Update title and author from the workflow
               if (bookData?.title) setEbookTitle(bookData.title);
