@@ -44,6 +44,12 @@ interface GeneratedCharacter {
 interface EbookCompleteWorkflowProps {
   onComplete: (bookData: any) => void;
   characters?: Character[];
+  initialTitle?: string;
+  initialSubtitle?: string;
+  initialCategory?: string;
+  initialAuthorName?: string;
+  initialBookIntroduction?: string;
+  initialNumberOfChapters?: number;
 }
 
 const STORAGE_KEY = 'ebook_workflow_progress';
@@ -90,7 +96,16 @@ interface WorkflowProgress {
   selectedTitleIndex?: number | null;
 }
 
-const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplete, characters: externalCharacters = [] }) => {
+const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
+  onComplete,
+  characters: externalCharacters = [],
+  initialTitle = '',
+  initialSubtitle = '',
+  initialCategory = '',
+  initialAuthorName = '',
+  initialBookIntroduction = '',
+  initialNumberOfChapters = 8,
+}) => {
   // Hook pour sauvegarder les résultats P1-P14 globalement
   const { saveStepResult } = useWorkflowResults();
   const { saveStepToCloud } = useWorkflowCloudSync();
@@ -153,6 +168,35 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   const [selectedTitleIndex, setSelectedTitleIndex] = useState<number | null>(null); // null = titre original
   const [generatedIntro, setGeneratedIntro] = useState('');
   const [generatedConclusion, setGeneratedConclusion] = useState('');
+
+  useEffect(() => {
+    if (isGenerating || currentStepIndex >= 0 || hasSavedProgress) return;
+
+    if (!title.trim() && initialTitle.trim()) setTitle(initialTitle);
+    if (!subtitle.trim() && initialSubtitle.trim()) setSubtitle(initialSubtitle);
+    if (!category.trim() && initialCategory.trim()) setCategory(initialCategory);
+    if (!authorName.trim() && initialAuthorName.trim()) setAuthorName(initialAuthorName);
+    if (!bookIntroduction.trim() && initialBookIntroduction.trim()) setBookIntroduction(initialBookIntroduction);
+    if (numberOfChapters === 8 && initialNumberOfChapters && initialNumberOfChapters !== 8) {
+      setNumberOfChapters(initialNumberOfChapters);
+    }
+  }, [
+    isGenerating,
+    currentStepIndex,
+    hasSavedProgress,
+    title,
+    subtitle,
+    category,
+    authorName,
+    bookIntroduction,
+    numberOfChapters,
+    initialTitle,
+    initialSubtitle,
+    initialCategory,
+    initialAuthorName,
+    initialBookIntroduction,
+    initialNumberOfChapters,
+  ]);
 
   const progress = currentStepIndex >= 0 ? ((currentStepIndex + 1) / WORKFLOW_STEP_COUNT) * 100 : 0;
 
