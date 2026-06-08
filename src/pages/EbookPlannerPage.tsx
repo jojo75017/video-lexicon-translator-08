@@ -1771,8 +1771,10 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
         }
 
         return (
-          <EbookCompleteWorkflow
-            characters={characters}
+          <div className="space-y-6">
+            <ParcoursDebutant onNavigateToTab={(tabId) => setActiveTab(tabId)} />
+            <EbookCompleteWorkflow
+              characters={characters}
             initialTitle={ebookTitle}
             initialSubtitle={bookSubtitle}
             initialCategory={genre}
@@ -1820,8 +1822,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
               } else {
                 toast.error("La génération s'est terminée, mais aucun chapitre n'a été renvoyé.");
               }
-            }}
-          />
+              }}
+            />
+          </div>
         );
       }
       
