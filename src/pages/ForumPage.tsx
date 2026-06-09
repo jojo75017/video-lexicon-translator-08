@@ -527,9 +527,23 @@ export default function ForumPage() {
             onChange={e => setSearch(e.target.value)}
             className="flex-1 min-w-[200px]"
           />
-          {session && <NewPostDialog categories={categories} onCreated={refetch} />}
+          {session && (
+            <Button className="gap-2 bg-gradient-to-r from-primary to-primary/80" onClick={() => openNewTopic(undefined)}>
+              <Plus className="w-4 h-4" /> Nouveau sujet
+            </Button>
+          )}
           {session && <NotificationsPanel />}
         </div>
+
+        {session && (
+          <NewPostDialog
+            categories={categories}
+            onCreated={refetch}
+            open={newPostOpen}
+            onOpenChange={setNewPostOpen}
+            defaultCategoryId={newPostCat}
+          />
+        )}
 
         {/* Category Hub (vue d'accueil façon forum KDP) */}
         {!activeCategory && !search && (
@@ -538,8 +552,11 @@ export default function ForumPage() {
             counts={counts}
             onSelect={(slug) => setSearchParams({ cat: slug })}
             onDeeplink={(to) => navigate(to)}
+            onNewTopic={(categoryId) => openNewTopic(categoryId)}
+            canPost={!!session}
           />
         )}
+
 
         {/* Categories tabs */}
         <div className="flex flex-wrap gap-2">
