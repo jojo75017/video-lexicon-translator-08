@@ -442,6 +442,11 @@ const SalesPage = () => {
         </div>
       </section>
 
+      {/* ════════════════ 1b. PLAYLIST VIDÉOS ════════════════ */}
+      <VideoPlaylistCarousel />
+
+
+
       {/* ════════════════ 2. LOGOS / TRUST STRIP ════════════════ */}
       <section className="py-10 border-y border-border bg-secondary/40">
         <div className="max-w-6xl mx-auto px-4">
