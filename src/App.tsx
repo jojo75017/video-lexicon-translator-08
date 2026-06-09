@@ -116,6 +116,7 @@ const PromoPaiementPage = lazy(() => import('./pages/promo/PromoPaiementPage'));
 const PromoBonusPage = lazy(() => import('./pages/promo/PromoBonusPage'));
 const PromoEspacePage = lazy(() => import('./pages/promo/PromoEspacePage'));
 const PromoAffiliePage = lazy(() => import('./pages/promo/PromoAffiliePage'));
+const InfluenceursPage = lazy(() => import('./pages/InfluenceursPage'));
 
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center bg-background">
@@ -365,6 +366,7 @@ const App = () => {
             <Route path="/promo/bonus" element={<PromoBonusPage />} />
             <Route path="/promo/espace" element={<PromoEspacePage />} />
             <Route path="/promo/affilie" element={<PromoAffiliePage />} />
+            <Route path="/influenceurs" element={<InfluenceursPage />} />
             <Route path="/blog" element={<BlogPage />} />
             <Route path="/blog/:slug" element={<BlogArticleTemplate />} />
             <Route path="/ecrire-livre-chatgpt" element={<SeoTutorialChatGptPage />} />
