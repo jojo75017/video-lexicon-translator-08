@@ -20,6 +20,8 @@ const InfluencerKit: React.FC = () => {
   const [name, setName] = useState('');
   const [code, setCode] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [email, setEmail] = useState('');
   const [copied, setCopied] = useState<string | null>(null);
   const [rows, setRows] = useState<Tracking[]>([]);
 
