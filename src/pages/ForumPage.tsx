@@ -275,6 +275,94 @@ function NotificationsPanel() {
   );
 }
 
+// Liens directs vers l'outil qui résout le blocage (deeplinks par rubrique)
+const categoryToolLinks: Record<string, { label: string; to: string }> = {
+  'kdp-publication': { label: 'Ouvrir le Planner KDP', to: '/ebook-planner' },
+  'ecriture-ia': { label: 'Créer un ebook avec l\'IA', to: '/creer-ebook-ia' },
+  'marketing-ventes': { label: 'Recherche de mots-clés', to: '/kdp-keywords' },
+  'resultats-succes': { label: 'Explorer les niches', to: '/niches' },
+  'questions-aide': { label: 'Demander à l\'assistant IA', to: '/ebookbot' },
+  'compte-conformite': { label: 'Guide conformité & FAQ', to: '/faq' },
+  'page-amazon': { label: 'Optimiser la fiche Amazon', to: '/kdp-keywords' },
+  'paiements-royalties': { label: 'Calculer mes redevances', to: '/word-count' },
+  'couverture-mise-en-forme': { label: 'Couverture KDP exacte', to: '/couverture-kdp' },
+  'audiobooks-voix': { label: 'Studio Audiobook', to: '/formation-audio' },
+};
+
+const cardAccentMap: Record<string, string> = {
+  blue: 'hover:border-blue-400/60 hover:shadow-blue-500/10',
+  purple: 'hover:border-purple-400/60 hover:shadow-purple-500/10',
+  green: 'hover:border-green-400/60 hover:shadow-green-500/10',
+  amber: 'hover:border-amber-400/60 hover:shadow-amber-500/10',
+  red: 'hover:border-red-400/60 hover:shadow-red-500/10',
+};
+
+// ─── Category Hub (cartes façon forum KDP officiel) ───
+function CategoryHub({
+  categories,
+  counts,
+  onSelect,
+  onDeeplink,
+}: {
+  categories: any[];
+  counts: Record<string, number>;
+  onSelect: (slug: string) => void;
+  onDeeplink: (to: string) => void;
+}) {
+  return (
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {categories.map((cat, i) => {
+        const link = categoryToolLinks[cat.slug];
+        return (
+          <motion.div
+            key={cat.id}
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.04 }}
+          >
+            <Card
+              className={`h-full cursor-pointer border transition-all hover:shadow-lg ${cardAccentMap[cat.color] || cardAccentMap.blue}`}
+              onClick={() => onSelect(cat.slug)}
+            >
+              <CardContent className="flex h-full flex-col p-5">
+                <div className="flex items-start gap-3">
+                  <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${colorMap[cat.color] || colorMap.blue} text-xl shadow-sm`}>
+                    {cat.emoji}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-bold text-foreground leading-tight">{cat.name}</h3>
+                    <span className="text-xs text-muted-foreground">
+                      {counts[cat.id] || 0} discussion{(counts[cat.id] || 0) > 1 ? 's' : ''}
+                    </span>
+                  </div>
+                </div>
+                {cat.description && (
+                  <p className="mt-3 text-sm text-muted-foreground line-clamp-3 flex-1">{cat.description}</p>
+                )}
+                <div className="mt-4 flex items-center gap-2">
+                  <Button size="sm" variant="outline" className="gap-1" onClick={(e) => { e.stopPropagation(); onSelect(cat.slug); }}>
+                    <MessageSquare className="h-3.5 w-3.5" /> Voir les fils
+                  </Button>
+                  {link && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="gap-1 text-primary"
+                      onClick={(e) => { e.stopPropagation(); onDeeplink(link.to); }}
+                    >
+                      <TrendingUp className="h-3.5 w-3.5" /> {link.label}
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        );
+      })}
+    </div>
+  );
+}
+
 // ─── Main Forum Page ───
 export default function ForumPage() {
   const navigate = useNavigate();
@@ -285,10 +373,24 @@ export default function ForumPage() {
   const { posts, loading: postsLoading, refetch } = useForumPosts(activeCategory);
   const [session, setSession] = useState<any>(null);
   const [search, setSearch] = useState('');
+  const [counts, setCounts] = useState<Record<string, number>>({});
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSession(data.session));
   }, []);
+
+  useEffect(() => {
+    supabase
+      .from('forum_posts')
+      .select('category_id')
+      .then(({ data }) => {
+        const map: Record<string, number> = {};
+        ((data as any[]) || []).forEach((p) => {
+          if (p.category_id) map[p.category_id] = (map[p.category_id] || 0) + 1;
+        });
+        setCounts(map);
+      });
+  }, [posts.length]);
 
   const activePost = posts.find(p => p.id === activePostId);
   const filteredPosts = search
@@ -332,11 +434,13 @@ export default function ForumPage() {
 
         {/* Header */}
         <div className="text-center space-y-3">
+          <Badge variant="secondary" className="mx-auto">Communauté Premium · Solutions KDP</Badge>
           <h1 className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent">
-            🏠 Communauté Ebookstudio Pro V2
+            🏠 Centre d'entraide KDP
           </h1>
           <p className="text-muted-foreground max-w-xl mx-auto">
-            Échangez, partagez vos résultats et progressez ensemble avec la communauté des auteurs KDP.
+            Trouvez vite une solution : choisissez une rubrique façon KDP, lisez les fils,
+            et accédez directement à l'outil qui débloque votre situation.
           </p>
           <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
             <span className="flex items-center gap-1"><MessageSquare className="w-4 h-4" /> {totalPosts} discussions</span>
@@ -356,7 +460,17 @@ export default function ForumPage() {
           {session && <NotificationsPanel />}
         </div>
 
-        {/* Categories */}
+        {/* Category Hub (vue d'accueil façon forum KDP) */}
+        {!activeCategory && !search && (
+          <CategoryHub
+            categories={categories}
+            counts={counts}
+            onSelect={(slug) => setSearchParams({ cat: slug })}
+            onDeeplink={(to) => navigate(to)}
+          />
+        )}
+
+        {/* Categories tabs */}
         <div className="flex flex-wrap gap-2">
           <Button
             variant={!activeCategory ? 'default' : 'outline'}
@@ -377,6 +491,13 @@ export default function ForumPage() {
             </Button>
           ))}
         </div>
+
+        <h2 className="text-lg font-bold text-foreground">
+          {activeCategory
+            ? (categories.find(c => c.slug === activeCategory)?.name || 'Discussions')
+            : search ? 'Résultats de recherche' : 'Discussions récentes'}
+        </h2>
+
 
         {/* Posts */}
         {postsLoading ? (
