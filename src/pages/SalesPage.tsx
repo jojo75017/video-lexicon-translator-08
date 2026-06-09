@@ -236,26 +236,24 @@ const SalesPage = () => {
       </div>
 
       {/* Quiz CTA Banner */}
-      <div className="bg-gradient-to-r from-[#FF9E2D] via-[#ff8a1f] to-[#FF9E2D] text-white shadow-md">
-        <div className="max-w-7xl mx-auto px-4 py-3.5 flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
-          <span className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider">
-            <Sparkles className="w-3.5 h-3.5" />
+      <div className="bg-gradient-to-r from-[#FF9E2D] via-[#ff8a1f] to-[#FF9E2D] text-[#232F3E] shadow-md">
+        <div className="max-w-7xl mx-auto px-4 py-5 md:py-6 flex flex-col sm:flex-row flex-wrap items-center justify-center gap-x-6 gap-y-3 text-center">
+          <span className="inline-flex items-center gap-2 bg-[#232F3E] text-white px-3.5 py-1.5 rounded-full text-xs font-black uppercase tracking-wider">
+            <Sparkles className="w-4 h-4" />
             Gratuit · 2 min
           </span>
-          <span className="flex items-center gap-2 font-bold text-base">
-            <Target className="w-5 h-5" />
+          <span className="flex items-center gap-2 font-extrabold text-lg md:text-2xl">
+            <Target className="w-6 h-6 md:w-7 md:h-7" />
             🎯 Découvrez quel auteur vous êtes
           </span>
           <Link
             to="/quiz?source=offres"
-            className="underline underline-offset-2 hover:text-white/90 font-extrabold text-base"
+            className="inline-flex items-center gap-2 bg-[#232F3E] text-white hover:bg-black font-extrabold text-base md:text-lg px-6 py-3 rounded-full transition-colors shadow-lg"
           >
-            Faire le quiz →
+            Faire le quiz <ArrowRight className="w-5 h-5" />
           </Link>
         </div>
       </div>
-
-      {/* Bandeau admin */}
       {hasAdminSession && (
         <div className="bg-accent/10 text-foreground text-xs border-b border-accent/30">
           <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 px-4 py-1.5">
