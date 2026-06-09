@@ -18,7 +18,6 @@ import { BookOpen, ArrowRight, CheckCircle2, Sparkles, Loader2 } from "lucide-re
 type Step = "intro" | "questions" | "capture" | "result";
 
 const QuizPage = () => {
-  const { toast } = useToast();
   const [step, setStep] = useState<Step>("intro");
   const [current, setCurrent] = useState(0);
   const [scores, setScores] = useState<Record<ProfileKey, number>>({
@@ -55,7 +54,7 @@ const QuizPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      toast({ title: "Email invalide", description: "Vérifiez votre adresse email.", variant: "destructive" });
+      toast.error("Email invalide", { description: "Vérifiez votre adresse email." });
       return;
     }
     setSubmitting(true);
@@ -76,7 +75,7 @@ const QuizPage = () => {
     } catch (err) {
       console.error(err);
       // On affiche quand même le résultat pour ne pas frustrer le prospect
-      toast({ title: "Petit souci d'enregistrement", description: "Mais voici votre résultat !" });
+      toast("Voici votre résultat !");
       setStep("result");
     } finally {
       setSubmitting(false);
