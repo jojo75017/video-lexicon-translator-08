@@ -438,6 +438,13 @@ export default function ForumPage() {
   const [session, setSession] = useState<any>(null);
   const [search, setSearch] = useState('');
   const [counts, setCounts] = useState<Record<string, number>>({});
+  const [newPostOpen, setNewPostOpen] = useState(false);
+  const [newPostCat, setNewPostCat] = useState<string | undefined>(undefined);
+
+  const openNewTopic = (categoryId?: string) => {
+    setNewPostCat(categoryId);
+    setNewPostOpen(true);
+  };
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSession(data.session));
