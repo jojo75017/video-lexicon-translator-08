@@ -44,7 +44,7 @@ export default function VideoPlaylistCarousel() {
                     className="absolute inset-0 w-full h-full"
                     src={`https://www.youtube.com/embed/${v.id}?autoplay=1&list=${PLAYLIST_ID}&rel=0`}
                     title={v.title}
-                    allow="accelerratometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                   />
                 ) : (
