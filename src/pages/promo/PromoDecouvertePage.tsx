@@ -78,6 +78,14 @@ const PromoDecouvertePage = () => {
         </div>
       )}
 
+      {/* Quiz CTA Banner */}
+      <div className="bg-[#008296] text-white text-center py-2 px-4 text-sm font-semibold">
+        <span className="flex items-center justify-center gap-2 flex-wrap">
+          🎯 Découvrez votre profil d'auteur en 2 minutes —
+          <Link to="/quiz?source=promo" className="underline hover:text-[#FF9E2D] transition">Faire le quiz gratuit →</Link>
+        </span>
+      </div>
+
       {/* HERO */}
       <section className="bg-gradient-to-b from-[#008296]/5 to-transparent">
         <div className="max-w-5xl mx-auto px-4 py-16 md:py-24 text-center space-y-6">
