@@ -160,7 +160,9 @@ serve(async (req) => {
     }
 
     // Envoi vers Systeme.io (non bloquant)
-    const sio = await pushToSystemeIo(email, first_name, tag);
+    const tags = [tag];
+    if (source) tags.push(`quiz-source-${source}`);
+    const sio = await pushToSystemeIo(email, first_name, tags);
 
     return new Response(
       JSON.stringify({ ok: true, lead_id: leadId, systemeio: sio.ok, systemeio_detail: sio.detail, profile_key, profile_title }),
