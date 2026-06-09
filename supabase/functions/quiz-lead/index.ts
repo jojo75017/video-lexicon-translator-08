@@ -104,6 +104,7 @@ serve(async (req) => {
     const profile_key = String(body.profile_key || "").trim().slice(0, 32);
     const profile_title = String(body.profile_title || "").trim().slice(0, 120);
     const tag = String(body.tag || "quiz-auteur").trim().slice(0, 64);
+    const source = String(body.source || "").trim().slice(0, 32);
     const honeypot = String(body.website || "").trim();
 
     if (honeypot) {
