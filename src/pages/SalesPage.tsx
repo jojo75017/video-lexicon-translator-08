@@ -236,17 +236,21 @@ const SalesPage = () => {
       </div>
 
       {/* Quiz CTA Banner */}
-      <div className="bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 text-white">
-        <div className="max-w-7xl mx-auto px-4 py-2.5 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-sm">
-          <span className="flex items-center gap-1.5 font-semibold">
-            <Target className="w-4 h-4" />
+      <div className="bg-gradient-to-r from-[#FF9E2D] via-[#ff8a1f] to-[#FF9E2D] text-white shadow-md">
+        <div className="max-w-7xl mx-auto px-4 py-3.5 flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+          <span className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider">
+            <Sparkles className="w-3.5 h-3.5" />
+            Gratuit · 2 min
+          </span>
+          <span className="flex items-center gap-2 font-bold text-base">
+            <Target className="w-5 h-5" />
             🎯 Découvrez quel auteur vous êtes
           </span>
           <Link
             to="/quiz?source=offres"
-            className="underline underline-offset-2 hover:text-white/80 font-bold"
+            className="underline underline-offset-2 hover:text-white/90 font-extrabold text-base"
           >
-            Faire le quiz gratuit (2 min) →
+            Faire le quiz →
           </Link>
         </div>
       </div>
